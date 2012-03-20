@@ -1,0 +1,6 @@
+
+createBean1() {
+	bean = zorka.mbean("java", "zorka.test:name=Bean1");
+	bean.add("test1", 1);
+	return "OK";
+}

@@ -1,0 +1,5 @@
+
+// This function should override its previous declaration from script 01_test1 
+testLoadScriptDir() {
+	return "oja! right!";
+}

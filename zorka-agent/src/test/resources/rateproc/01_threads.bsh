@@ -1,0 +1,18 @@
+
+// Przyklad 1: threads by cpu
+
+// Przyklad 2: threads by wait time
+
+// Przyklad 3: zliczanie wątków wiszących na czytaniu z socketów (ogólnie);  
+
+// Przyklad 4: zliczanie wątków wiszących na LDAP i oczekujących na odpowiedź z LDAP'a;  (skan po [fragmentach] stack trace'a i stanie wątku);
+
+// Przykład 5: "thread top" - przemyśleć jak go odpalać :) 
+
+// Przykład 6: zliczanie wątków (po regexp) i prezentacja w beanie;  
+//             inny wariant: zliczenie po regexp i poklasyfikowanie wg. stanów
+
+// Przykład 7: pogrupowane wątki - posortowane po stanie i stosach - w danej chwili;
+               inny wariant: ranking za 5 minut (z CPU utilization);  
+
+//  

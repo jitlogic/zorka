@@ -1,0 +1,4 @@
+
+testLoopForever() {
+	while (true) {  } 
+}

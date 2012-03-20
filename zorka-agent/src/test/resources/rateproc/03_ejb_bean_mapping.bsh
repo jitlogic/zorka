@@ -1,0 +1,7 @@
+
+// Example: mapping all methods from single EJB3 statistic
+
+ 
+zorka.beanRanking("jboss", "jboss.ejb3:type=EJB3Stats,*", "name", "stats", "time", "count", 10);
+
+

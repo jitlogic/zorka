@@ -1,0 +1,5 @@
+
+// Test if scripts load in valid order 
+testLoadScriptDir() {
+	return "oja!";
+}

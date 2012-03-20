@@ -1,0 +1,4 @@
+
+tescik() {
+	return "oja!";
+}

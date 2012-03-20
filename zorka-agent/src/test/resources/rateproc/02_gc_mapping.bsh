@@ -1,0 +1,18 @@
+
+jvm_version() {
+	vmName = zorka.jmx("java", "java.lang:type=Runtime", "VMname")
+	arch = zorka.jmx("java", "java.lang:type=OperatingSystem", "Arch")
+}
+
+
+//for (var horiz : [60, 300, 900]) {
+
+bean = zorka.mbean("java", "zorka:type=jvm,name=GCstats");
+
+//for (var name : ["PS Perm Gen", "PS Eden Space", "PS Old Gen", "PS Survivor Space"]) {
+//	var b = jmx("java.lang:name=" + name + ",type=MemoryPool","Usage");
+//	bean.add(name, zorka.util(()->b.used, ()->b.max));
+//}
+//	zorka.register("java", "zorka:type=jvm,name=GCStats", bean);
+//}
+

@@ -1,0 +1,36 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.jitlogic.zorka</groupId>
+    <artifactId>zorka</artifactId>
+    <packaging>pom</packaging>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>ZORKA: parent aggregator</name>
+    <url>http://www.jitlogic.com/zorka</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+           <version>4.8.1</version>
+            <scope>test</scope>
+        </dependency>
+  		<dependency>
+  			<groupId>org.slf4j</groupId>
+  			<artifactId>slf4j-simple</artifactId>
+  			<version>1.5.11</version>
+  			<scope>test</scope>
+  		</dependency>
+    </dependencies>
+
+
+    <modules>
+        <module>zorka-agent</module>
+        <module>zorka-agent-jboss5</module>
+        <module>zorka-agent-java</module>
+    </modules>
+
+</project>
