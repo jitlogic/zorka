@@ -70,7 +70,7 @@ public class ObjectDumper {
 				return;
 			}
 		
-			if (c == OMIT) return;
+			if (c == OMIT) { return; }
 		}
 
 		if (depth > MAX_DEPTH) {
@@ -101,10 +101,10 @@ public class ObjectDumper {
 		sb.append("\n");
 		for (Method m : obj.getClass().getMethods()) {
 			String name = m.getName();
-			if (m.getParameterTypes().length != 0) continue;
-			if (!name.startsWith("get") && !name.startsWith("is")) continue;
+			if (m.getParameterTypes().length != 0) { continue; }
+			if (!name.startsWith("get") && !name.startsWith("is")) { continue; }
 			Integer cm = filteredMethods.get(name);
-			if (cm != null && cm.equals(OMIT)) continue;
+			if (cm != null && cm.equals(OMIT)) { continue; }
 			name = name.startsWith("get") ? name.substring(3) : name.substring(2);
 			name = name.substring(0,1).toLowerCase() + name.substring(1);
 			sb.append(lead); sb.append(name); sb.append(" : "); 
@@ -112,7 +112,7 @@ public class ObjectDumper {
 			try {
 				Object o = m.invoke(obj);
 				serialize(lead+LEAD, o, sb, depth+1);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				sb.append("<error: " + e.getMessage() + ">");
 			}
 		}
@@ -202,16 +202,17 @@ public class ObjectDumper {
 					Object o = jmx.getConn().getAttribute(jmx.getName(), mbi.getName());
 					sb.append(lead); sb.append(mbi.getName()); sb.append(" : ");
 					sb.append(mbi.getType()); sb.append(" = ");
-					if (o != obj)
+					if (o != obj) {
 						serialize(lead+LEAD, o, sb, depth+1);
-					else
+					} else {
 						sb.append("<points to itself>");
+					}
 					sb.append("\n");
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					sb.append("<error: " + e.getMessage() + ">");
 				}
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			sb.append("<error: " + e.getMessage() + ">");
 		}
 	}
@@ -220,8 +221,9 @@ public class ObjectDumper {
 	private int checkNewLine(String lead, StringBuilder sb, int pos) {
 		if (sb.length()-pos > SCREEN_WIDTH) {
 			sb.append("\n");
-			pos = sb.length();
+			int rpos = sb.length();
 			sb.append(lead);
+			return rpos;
 		}
 		return pos;
 	}
@@ -236,7 +238,9 @@ public class ObjectDumper {
 			"java.io.File",  "java.lang.String", "javax.management.ObjectName"
 		};
 		
-		for (String t : simpleTypes) fcs.put(t, PRINT);
+		for (String t : simpleTypes) { 
+			fcs.put(t, PRINT);
+		}
 		fcs.put("java.lang.Object", OMIT);
 		filteredClasses = Collections.unmodifiableMap(fcs);
 		

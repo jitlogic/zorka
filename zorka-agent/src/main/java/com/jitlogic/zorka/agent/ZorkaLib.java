@@ -33,9 +33,9 @@ import javax.management.ObjectName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jitlogic.zorka.agent.beanmap.AttrGetter;
-import com.jitlogic.zorka.agent.beanmap.ValGetter;
-import com.jitlogic.zorka.agent.beanmap.ZorkaMappedMBean;
+import com.jitlogic.zorka.agent.mapbean.AttrGetter;
+import com.jitlogic.zorka.agent.mapbean.ValGetter;
+import com.jitlogic.zorka.agent.mapbean.ZorkaMappedMBean;
 import com.jitlogic.zorka.agent.rankproc.BeanRankLister;
 import com.jitlogic.zorka.agent.rankproc.ThreadRankLister;
 
@@ -95,32 +95,39 @@ public class ZorkaLib implements ZorkaService {
 	
 	
 	public List<Object> jmxList(List<Object> args) {
-		if (args.size() < 2)
-			throw new ZorkaError("zorka.jmx() function requires at least 2 arguments");
+		List<Object> objs = new ArrayList<Object>();
+		if (args.size() < 2) {
+			log.error("Zorka JMX function takes at least 2 arguments.");
+			return objs;
+		}
 		MBeanServerConnection conn = conns.get(args.get(0));
-		if (conn == null)
-			throw new ZorkaError("MBean server named '" + args.get(0) + "' is not registered.");
+		if (conn == null) {
+			log.error("MBean server named '" + args.get(0) + "' is not registered.");
+			return objs;
+		}
 		String conname = args.get(0).toString();
 		Set<ObjectName> names = resolver.queryNames(conn, args.get(1).toString());
-		List<Object> objs = new ArrayList<Object>();
 		if (args.size() == 2) {
-			for (ObjectName name : names)
+			for (ObjectName name : names) {
 				objs.add(new JmxObject(name, conn));
+			}
 		} else {
 			for (ObjectName name : names) {
 				Object obj = null;
 				try {
 					obj = conn.getAttribute(name, args.get(2).toString());
 				} catch (AttributeNotFoundException e) {
-					throw new ZorkaError("Object '" + conname + "|" + name + 
-								"' has no attribute '" + args.get(2) + "'.");
-				} catch (Throwable e) {
-					throw new ZorkaError("Error getting attribute '" + args.get(2) 
+					ZorkaUtil.error(log, "Object '" + conname + "|" + name + 
+						"' has no attribute '" + args.get(2) + "'.", e);
+				} catch (Exception e) {
+					ZorkaUtil.error(log, "Error getting attribute '" + args.get(2) 
 						+ "' from '" + conname + "|" + name + "'", e);
 				}
-				if (args.size() > 3)
-					for (Object arg : args.subList(3, args.size()))
+				if (args.size() > 3) {
+					for (Object arg : args.subList(3, args.size())) {
 						obj = ZorkaUtil.get(obj, arg);
+					}
+				}
 				objs.add(obj);
 			}
 		}
@@ -176,39 +183,48 @@ public class ZorkaLib implements ZorkaService {
 	
 	public Object jmx(List<Object> args) {
 		
-		if (args.size() < 2)
-			throw new ZorkaError("zorka.jmx() function requires at least 2 arguments");
+		if (args.size() < 2) {
+			log.error("zorka.jmx() function requires at least 2 arguments");
+			return null;
+		}
 		
 		String conname = args.get(0).toString();
 		MBeanServerConnection conn = conns.get(conname);
 		
-		if (conn == null)
-			throw new ZorkaError("MBean server named '" + args.get(0) + "' is not registered.");
+		if (conn == null) {
+			log.error("MBean server named '" + args.get(0) + "' is not registered.");
+			return null;
+		}
 		
 		Set<ObjectName> names = resolver.queryNames(conn, args.get(1).toString());
 		
-		if (names.isEmpty()) 
+		if (names.isEmpty()) { 
 			return null;
+		}
 		
 		ObjectName name = names.iterator().next();
 		
-		if (args.size() == 2)
+		if (args.size() == 2) {
 			return new JmxObject(name, conn);
+		}
 		
 		Object obj = null;
 		try {
 			obj = conn.getAttribute(name, args.get(2).toString());
 		} catch (AttributeNotFoundException e) {
-			throw new ZorkaError("Object '" + conname + "|" + name + 
+			log.error("Object '" + conname + "|" + name + 
 						"' has no attribute '" + args.get(2) + "'.");
-		} catch (Throwable e) {
-			throw new ZorkaError("Error getting attribute '" + args.get(2) 
+			return null;
+		} catch (Exception e) {
+			ZorkaUtil.error(log, "Error getting attribute '" + args.get(2) 
 				+ "' from '" + conname + "|" + name + "'", e);
 		}
 		
-		if (args.size() > 3 && obj != null)
-			for (Object arg : args.subList(3, args.size()))
+		if (args.size() > 3 && obj != null) {
+			for (Object arg : args.subList(3, args.size())) {
 				obj = ZorkaUtil.get(obj, arg);
+			}
+		}
 		
 		return obj;
 	} // jmx()
@@ -251,8 +267,9 @@ public class ZorkaLib implements ZorkaService {
 
 	
 	private Object getAttr(Object obj, Object...args) {
-		for (Object arg : args)
+		for (Object arg : args) {
 			obj = ZorkaUtil.get(obj, arg);
+		}
 		return obj;
 	}
 	
@@ -266,8 +283,9 @@ public class ZorkaLib implements ZorkaService {
 		try {
 			ZorkaMappedMBean mbean = new ZorkaMappedMBean(desc);
 			MBeanServer conn = (MBeanServer)conns.get(mbs);
-			if (conn == null)
-				throw new ZorkaError("There is no mbean server named '" + mbs + "'");
+			if (conn == null) {
+				throw new ZorkaException("There is no mbean server named '" + mbs + "'");
+			}
 			
 			ObjectName on = new ObjectName(name);
 			conn.registerMBean(mbean, on);
@@ -328,7 +346,7 @@ public class ZorkaLib implements ZorkaService {
 		String bname = "zorka.jvm:name = " + name + ",type=ThreadMonitor,updateInterval=" + updateInterval + ",rerankInterval=" + rerankInterval;
 		
 		ZorkaMappedMBean bean = (ZorkaMappedMBean)jmx("java", bname, "this"); 
-		if (bean != null) return bean;
+		if (bean != null) { return bean; }
 		
 		bean = mbean("java", bname, desc);
 		
@@ -340,8 +358,9 @@ public class ZorkaLib implements ZorkaService {
 		tl.newAttr("block5",  "Blokced time percentage 5-minute average",  5*60000, 100, "blockedTime", "tstamp");
 		tl.newAttr("block15", "Blokced time percentage 15-minute average", 5*60000, 100, "blockedTime", "tstamp");
 		
-		for (String attr : new String[]{ "cpu1", "cpu5", "cpu15", "block1", "block5", "block15" }) 
+		for (String attr : new String[]{ "cpu1", "cpu5", "cpu15", "block1", "block5", "block15" }) { 
 			bean.add(attr, tl.newList(attr, attr, size));
+		}
 		
 		agent.svcAdd(tl);
 		
@@ -354,11 +373,13 @@ public class ZorkaLib implements ZorkaService {
 		long updateInterval = 15000;
 		MBeanServerConnection conn = conns.get(mbs);
 		
-		if (conn == null) 
-			throw new ZorkaError("There is no mbean server named '" + mbs + "'");
+		if (conn == null)  {
+			log.error("There is no mbean server named '" + mbs + "'");
+			return null;
+		}
 		
 		ZorkaMappedMBean bean = (ZorkaMappedMBean)jmx("java", bname, "this");
-		if (bean != null) return bean;
+		if (bean != null) { return bean; }
 		
 		bean = mbean(mbs, bname, "");
 		
@@ -367,8 +388,9 @@ public class ZorkaLib implements ZorkaService {
 		bl.newAttr("avg5", "5-minutes average", 5*60000, 1, nominalAttr, dividerAttr);
 		bl.newAttr("avg15", "15-minute average", 15*60000, 1, nominalAttr, dividerAttr);
 		
-		for (String attr : new String[]{ "avg1", "avg5", "avg15" })
+		for (String attr : new String[]{ "avg1", "avg5", "avg15" }) {
 			bean.add(attrs,  bl.newList(attr, attr, size));
+		}
 		
 		return bean;
 	}

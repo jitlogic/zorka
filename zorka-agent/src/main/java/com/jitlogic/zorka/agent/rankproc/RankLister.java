@@ -34,7 +34,6 @@ import javax.management.openmbean.TabularType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jitlogic.zorka.agent.ZorkaError;
 import com.jitlogic.zorka.agent.ZorkaService;
 import com.jitlogic.zorka.agent.ZorkaUtil;
 import com.jitlogic.zorka.agent.rateproc.RateAggregate;
@@ -59,49 +58,53 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 
 	private long updateInterval, rerankInterval;
 	private long lastUpdate = 0L, lastRerank = 0L;
-	protected long lastGen = 0L;
+	private long lastGen = 0L;
 
-	protected List<RankAttr<K,T>> extAttrs = new ArrayList<RankAttr<K,T>>();
-	protected Map<String,RankList<K,T>> rankLists = new HashMap<String, RankList<K,T>>();
+	private List<RankAttr<K,T>> extAttrs = new ArrayList<RankAttr<K,T>>();
+	private Map<String,RankList<K,T>> rankLists = new HashMap<String, RankList<K,T>>();
 
-	protected Map<K,RankItem<K,T>> items = new HashMap<K,RankItem<K,T>>();
+	private Map<K,RankItem<K,T>> items = new HashMap<K,RankItem<K,T>>();
 	
-	protected CompositeType type = null;
-	protected TabularType tabularType = null;
+	private CompositeType type = null;
+	private TabularType tabularType = null;
 
 	protected String[] basicAttr;
 	protected String[] basicDesc;
 	protected OpenType[] basicType;
 	
-	protected int STD_LEN;
+	private int stdLen;
 	
 	private volatile boolean running = false;
 	
 	private Thread thread = null;
 	
 	
-	public abstract List<T> list();  // TODO refactor list() to return List<T> instead of T[]
+	public abstract List<T> list();  
 	public abstract K getKey(T info);
 	public abstract void updateBasicAttrs(RankItem<K,T> item, T info, long tstamp);
 
 	public RankLister(long updateInterval, long rerankInterval, String[] basicAttr, String[] basicDesc, OpenType[] basicType) {
 		this.updateInterval = updateInterval;
 		this.rerankInterval = rerankInterval;
-		this.basicAttr = basicAttr;
-		this.basicDesc = basicDesc;
-		this.basicType = basicType;
-		STD_LEN = basicAttr.length;
+		this.basicAttr = basicAttr.clone(); 
+		this.basicDesc = basicDesc.clone(); 
+		this.basicType = basicType.clone(); 
+		stdLen = basicAttr.length;
 	}
 
 	
 	public int attrIndex(String attr) {
-		for (int i = 0; i < basicAttr.length; i++)
-			if (basicAttr[i].equals(attr))
+		for (int i = 0; i < basicAttr.length; i++) {
+			if (basicAttr[i].equals(attr)) {
 				return i;
+			}
+		}
 		
-		for (int i = 0; i < extAttrs.size(); i++)
-			if (extAttrs.get(i).name.equals(attr))
-				return STD_LEN+i;
+		for (int i = 0; i < extAttrs.size(); i++) {
+			if (extAttrs.get(i).getName().equals(attr)) {
+				return stdLen+i;
+			}
+		}
 			
 		return -1;
 	}
@@ -109,49 +112,52 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 	
 	public OpenType attrType(String attr) {
 		int idx = attrIndex(attr);
-		if (idx >= 0) 
-			return idx < STD_LEN ? basicType[idx] : SimpleType.DOUBLE;
-		else
+		if (idx >= 0) {
+			return idx < stdLen ? basicType[idx] : SimpleType.DOUBLE;
+		} else {
 			return null;
+		}
 	}
 	
 
 	public Comparator<RankItem<K,T>> comparator(String attr) {
 		final int idx = attrIndex(attr);
 		
-		if (idx < 0)
-			throw new ZorkaError("Thread lister has no such attribute: '" + attr + "'");
+		if (idx < 0) {
+			throw new IllegalArgumentException("Thread lister has no such attribute: '" + attr + "'"); // TODO review standard exceptions and eventually choose more appropriate
+		}
 		
-		OpenType type = attrType(attr);
+		OpenType attrType = attrType(attr);
 		
-		if (type == null)
-			throw new ZorkaError("Attribute '" + attr + "' has no data type(?)");
+		if (attrType == null) {
+			throw new IllegalArgumentException("Attribute '" + attr + "' has no data type(?)"); // TODO review standard exceptions and eventually choose more appropriate
+		}
 		
-		if (SimpleType.DOUBLE.equals(type)) {
+		if (SimpleType.DOUBLE.equals(attrType)) {
 			return new Comparator<RankItem<K,T>>() {
 				public int compare(RankItem<K,T> o1, RankItem<K,T> o2) {
 					return (Double)o1.getValues()[idx] > (Double)o2.getValues()[idx] ? -1 : 1;
 				}
 			};
-		} else if (SimpleType.LONG.equals(type)) {
+		} else if (SimpleType.LONG.equals(attrType)) {
 			return new Comparator<RankItem<K,T>>() {
 				public int compare(RankItem<K,T> o1, RankItem<K,T> o2) {
 					return (Long)o1.getValues()[idx] > (Long)o2.getValues()[idx] ? -1 : 1;
 				}
 			};			
-		} else if (SimpleType.INTEGER.equals(type)) {
+		} else if (SimpleType.INTEGER.equals(attrType)) {
 			return new Comparator<RankItem<K,T>>() {
 				public int compare(RankItem<K,T> o1, RankItem<K,T> o2) {
 					return (Integer)o1.getValues()[idx] > (Integer)o2.getValues()[idx] ? -1 : 1;
 				}
 			};			
-		} else if (SimpleType.STRING.equals(type)) {
+		} else if (SimpleType.STRING.equals(attrType)) {
 			return new Comparator<RankItem<K,T>>() {
 				public int compare(RankItem<K,T> o1, RankItem<K,T> o2) {
 					return -1*((String)o1.getValues()[idx]).compareTo((String)o2.getValues()[idx]);
 				}
 			};						
-		} else if (SimpleType.SHORT.equals(type)) {
+		} else if (SimpleType.SHORT.equals(attrType)) {
 			return new Comparator<RankItem<K,T>>() {
 				public int compare(RankItem<K,T> o1, RankItem<K,T> o2) {
 					return (Short)o1.getValues()[idx] > (Short)o2.getValues()[idx] ? -1 : 1;
@@ -159,22 +165,20 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 			};						
 		}
 		
-		throw new ZorkaError("Illegal data type for attribute " + attr + ": " + type); 
+		throw new IllegalArgumentException("Illegal data type for attribute " + attr + ": " + attrType); // TODO review standard exceptions and eventually choose more appropriate 
 	}
 
 	
 	private RankItem<K,T> extendItem(RankItem<K,T> item) {
 		Object[] oldVals = item.getValues();
-		Object[] newVals = new Object[STD_LEN+extAttrs.size()];
+		Object[] newVals = new Object[stdLen+extAttrs.size()];
 		
-		for (int i = 0; i < oldVals.length; i++) 
-			newVals[i] = oldVals[i];
+		System.arraycopy(oldVals, 0, newVals, 0, oldVals.length);
 		
 		RateAggregate[] oldRates = item.getRates();
 		RateAggregate[] newRates = new RateAggregate[extAttrs.size()];
 		
-		for (int i = 0; i < oldRates.length; i++)
-			newRates[i] = oldRates[i];
+		System.arraycopy(oldRates, 0, newRates, 0, oldRates.length);
 		
 		for (int i = oldRates.length; i < newRates.length; i++) {
 			newRates[i] = extAttrs.get(i).newAggregate();
@@ -186,13 +190,13 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 	
 	
 	protected void makeCompositeType() {
-		int size = STD_LEN + extAttrs.size();
+		int size = stdLen + extAttrs.size();
 		
 		String[] newAttr = new String[size];
 		String[] newDesc = new String[size];
 		OpenType[] newType = new OpenType[size];
 		
-		for (int i = 0; i < STD_LEN; i++) {
+		for (int i = 0; i < stdLen; i++) {
 			newAttr[i] = basicAttr[i];
 			newDesc[i] = basicDesc[i];
 			newType[i] = basicType[i];	
@@ -200,23 +204,25 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 		
 		for (int i = 0; i < extAttrs.size(); i++) {
 			RankAttr<K,T> ra = extAttrs.get(i);
-			newAttr[STD_LEN+i] = ra.name;
-			newDesc[STD_LEN+i] = ra.description;
-			newType[STD_LEN+i] = SimpleType.DOUBLE;
+			newAttr[stdLen+i] = ra.getName();
+			newDesc[stdLen+i] = ra.getDescription();
+			newType[stdLen+i] = SimpleType.DOUBLE;
 		}
 		
 		try {
 			type = new CompositeType("com.jitlogic.zorka.threadproc.ThreadItem", 
 				"Thread statistic.", newAttr, newDesc, newType);
 		} catch (OpenDataException e) {
-			throw new ZorkaError("Error creating CompositeType for thread lister", e);
+			// TODO to sie bedzie mscilo w innych czesciach kodu - tutaj musimy sypnac jakims wyjatkiem
+			ZorkaUtil.error(log, "Error creating CompositeType for thread lister", e);
 		} 
 		
 		String[] index = { "id" };
 		try {
 			tabularType = new TabularType("ThreadList", "Thread Ranking List", type, index);
 		} catch (OpenDataException e) {
-			throw new ZorkaError("Error creating TabularType for thread lister", e);
+			// TODO to sie bedzie mscilo w innych czesciach kodu - tutaj musimy sypnac jakims wyjatkiem
+			ZorkaUtil.error(log, "Error creating TabularType for thread lister", e);
 		}
 
 	} // makeCompositeType()
@@ -224,11 +230,12 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 	
 	protected RankItem<K,T> makeItem(T info, long tstamp) {
 		
-		Object[] vals = new Object[STD_LEN+extAttrs.size()];
+		Object[] vals = new Object[stdLen+extAttrs.size()];
 		RateAggregate[] rates = new RateAggregate[extAttrs.size()];
 		
-		for (int i = 0; i < extAttrs.size(); i++)
+		for (int i = 0; i < extAttrs.size(); i++) {
 			rates[i] = extAttrs.get(i).newAggregate();
+		}
 		
 		RankItem<K,T> item = new RankItem<K,T>(this, type, vals, rates);
 		
@@ -240,8 +247,9 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 	
 
 	public void newAttr(String name, String description, long horizon, double multiplier, String nominalAttr, String dividerAttr) {
-		if (attrIndex(name) >= 0)
-			throw new ZorkaError("Attribute '" + name + "' already exists.");
+		if (attrIndex(name) >= 0) {
+			throw new IllegalStateException("Attribute '" + name + "' already exists.");
+		}
 		
 		RankAttr<K,T> attr = new RankAttr<K,T>(this, name, description, horizon, multiplier, nominalAttr, dividerAttr);
 		extAttrs.add(attr);
@@ -250,8 +258,9 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 		
 		// Rebuild all items 
 		Map<K,RankItem<K,T>> newItems = new HashMap<K,RankItem<K,T>>();
-		for (Entry<K,RankItem<K,T>> entry : items.entrySet())
+		for (Entry<K,RankItem<K,T>> entry : items.entrySet()) {
 			newItems.put(entry.getKey(), extendItem(entry.getValue()));
+		}
 		
 		// Update TabularType for all associated rank lists
 		for (RankList<K,T> rlist : rankLists.values()) {
@@ -264,11 +273,13 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 
 	public RankList<K,T> newList(String listName, String attrName, int size) {
 		
-		if (rankLists.containsKey(listName))
-			throw new ZorkaError("List '" + listName + "' already exists.");
+		if (rankLists.containsKey(listName)) {
+			throw new IllegalStateException("List '" + listName + "' already exists.");
+		}
 		
-		if (-1 == attrIndex(attrName))
-			throw new ZorkaError("Attribute '" + attrName + "' not defined.");
+		if (-1 == attrIndex(attrName)) {
+			throw new IllegalStateException("Attribute '" + attrName + "' not defined.");
+		}
 		
 		RankList<K,T> rlist = new RankList<K,T>(listName, attrName, size, tabularType);
 		rankLists.put(listName,  rlist);
@@ -278,15 +289,18 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 
 	public void rerank(long tstamp) {
 		
-		if (items.size() == 0) return;
+		if (items.size() == 0) {
+			return;
+		}
 		
 		@SuppressWarnings("unchecked")
 		RankItem<K,T>[] itab = new RankItem[items.size()]; 
 		
 		int i = 0; 
 		
-		for (RankItem<K,T> item : items.values())
+		for (RankItem<K,T> item : items.values()) {
 			itab[i++] = item;
+		}
 
 		for (RankList<K,T> rlist : rankLists.values()) {
 			Comparator<RankItem<K,T>> cmp = comparator(rlist.getAttrName());
@@ -305,10 +319,12 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 				long ts1 = updateInterval-tstamp+lastUpdate;
 				long ts2 = rerankInterval-tstamp+lastRerank;
 				long ts = ts1 < ts2 ? ts1 : ts2;
-				if (ts > 0) Thread.sleep(ts);
+				if (ts > 0) {
+					Thread.sleep(ts);
+				}
 			} catch (InterruptedException e) { 
 				
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error("Error executing ThreadLister cycle", e);
 			}
 		} // while (running)
@@ -335,8 +351,8 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 		
 		for (int i = 0; i < extAttrs.size(); i++) {
 			RankAttr<K,T> attr = extAttrs.get(i);
-			rates[i].feed((Long)vals[attr.nominalOffs], (Long)vals[attr.dividerOffs]);
-			vals[STD_LEN+i] = rates[i].rate();
+			rates[i].feed((Long)vals[attr.getNominalOffs()], (Long)vals[attr.getDividerOffs()]);
+			vals[stdLen+i] = rates[i].rate();
 		}
 	}
 	

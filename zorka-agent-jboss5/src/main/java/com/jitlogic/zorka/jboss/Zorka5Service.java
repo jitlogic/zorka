@@ -68,7 +68,7 @@ public class Zorka5Service extends ServiceMBeanSupport
 	public String zoolaQuery(String expr) {
 		try {
 			return zorkaAgent.query(expr);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			return "ERROR: " + ZorkaUtil.errorDump(e);
 		}
 	}
@@ -77,7 +77,7 @@ public class Zorka5Service extends ServiceMBeanSupport
 	public String zabbixQuery(String query) {
 		try {
 			return zorkaAgent.query(ZabbixRequestHandler.translate(query));
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			return "ERROR: " + ZorkaUtil.errorDump(e);
 		}
 	}
@@ -87,8 +87,9 @@ public class Zorka5Service extends ServiceMBeanSupport
 		Properties props = new Properties();
 		String url = System.getProperty("jboss.server.config.url") + "/zorka/zabbix.properties";
 		ZorkaUtil.loadProps(url , props);
-		if (!props.contains("listen_addr")) 
+		if (!props.contains("listen_addr")) { 
 			props.setProperty("listen_addr", System.getProperty("jboss.bind.address"));
+		}
 		
 		if (props.getProperty("enabled", "no").equalsIgnoreCase("yes")) {
 			zabbixAgent = new ZabbixAgent(props, zorkaAgent);

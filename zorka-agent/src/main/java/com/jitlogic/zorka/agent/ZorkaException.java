@@ -15,10 +15,18 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.beanmap;
+package com.jitlogic.zorka.agent;
 
-public interface ValGetter {
+public class ZorkaException extends Exception {
+
+	private static final long serialVersionUID = 403339688211580095L;
+
+	public ZorkaException(String msg) {
+		super(msg);
+	}
 	
-	public Object get();
+	public ZorkaException(String msg, Throwable inner) {
+		super(msg, inner); 
+	}
 	
 }

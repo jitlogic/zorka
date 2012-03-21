@@ -112,7 +112,7 @@ public class ZabbixAgent implements Runnable {
 				rh = new ZabbixRequestHandler(sock);
 				agent.exec(rh.getReq(), rh);
 				sock = null;
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				if (running) {
 					log.error("Error occured when processing request.", e);
 				}

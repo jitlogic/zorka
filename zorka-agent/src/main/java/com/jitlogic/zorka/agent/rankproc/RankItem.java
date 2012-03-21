@@ -45,8 +45,8 @@ public class RankItem<K,V> implements CompositeData {
 	public RankItem(RankLister<K,V> lister, CompositeType type, Object[] values, RateAggregate[] rates) {
 		this.lister = lister;
 		this.type = type;
-		this.values = values;
-		this.rates = rates;
+		this.values = values.clone();
+		this.rates = rates.clone();
 	}
 	
 	public void updateGen(long lastGen) {
@@ -89,8 +89,9 @@ public class RankItem<K,V> implements CompositeData {
 	public Object[] getAll(String[] keys) {
 		Object[] rval = new Object[keys.length];
 		
-		for (int i = 0; i < keys.length; i++)
+		for (int i = 0; i < keys.length; i++) {
 			rval[i] = get(keys[i]);
+		}
 
 		return rval;
 	}
@@ -102,9 +103,11 @@ public class RankItem<K,V> implements CompositeData {
 	
 	
 	public boolean containsValue(Object value) {
-		for (Object obj : values)
-			if (ZorkaUtil.objEquals(obj, value))
+		for (Object obj : values) {
+			if (ZorkaUtil.objEquals(obj, value)) {
 				return true;
+			}
+		}
 
 		return false;
 	}
@@ -113,7 +116,9 @@ public class RankItem<K,V> implements CompositeData {
 	public Collection<?> values() {
 		List<Object> lst = new ArrayList<Object>(values.length);
 
-		for (Object obj : values) lst.add(obj);
+		for (Object obj : values) {  
+			lst.add(obj);
+		}
 
 		return lst;
 	}

@@ -32,8 +32,8 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 
 	private static final Logger log = LoggerFactory.getLogger(ZabbixRequestHandler.class);
 	
-	Socket socket;
-	String req = null;
+	private Socket socket;
+	private String req = null;
 	
 	private static final String ZBX_NOTSUPPORTED = "ZBX_NOTSUPPORTED";
 	
@@ -42,9 +42,9 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 	}
 	
 	
-	private static byte[] header = { 0x5a, 0x42, 0x58, 0x44, 0x01 };
-	private static int HDR_LEN = 13;	
-	public static int MAX_REQUEST_LENGTH = 1024;
+	private static final byte[] header = { 0x5a, 0x42, 0x58, 0x44, 0x01 };
+	private static final int HDR_LEN = 13;	
+	private static final int MAX_REQUEST_LENGTH = 1024;
 	
 	
 	public static String decode(InputStream in) throws IOException {
@@ -54,44 +54,58 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 		
 		for (int b = in.read(); b != -1 && pos < buf.length; b = in.read()) {
 			buf[pos++] = (byte)b;
-			if (b == 0x0a) break;
+			if (b == 0x0a) {
+				break;
+			}
 		}
 		
 		boolean hasHdr = true;
 		
-		if (buf.length > 5)
-			for (int i = 0; i < header.length; i++)
-				if (buf[i] != header[i])
+		if (buf.length > 5) {
+			for (int i = 0; i < header.length; i++) {
+				if (buf[i] != header[i]) {
 					hasHdr = false;
+				}
+			}
+		}
 		
 		if (hasHdr) {
 			while (pos < HDR_LEN) {
 				int b = in.read();
-				if (b == -1) return null;
+				if (b == -1) { 
+					return null;
+				}
 				buf[pos++] = (byte)b;
 			}
 			
 			long len = 0;
 			
-			for (int i = 0; i < 8; i++)
+			for (int i = 0; i < 8; i++) {
 				len |= ((long)buf[i+5]) << (i*8);
-
+			}
 			
-			if (len > MAX_REQUEST_LENGTH) return null;
+			if (len > MAX_REQUEST_LENGTH) {
+				return null;
+			}
 			
 			while (pos < len+HDR_LEN) {
 				int b = in.read();
-				if (b == -1) return null;
+				if (b == -1) {
+					return null;
+				}
 				buf[pos++] = (byte)b;
 			}
 		}
 		
-		if (buf[pos-1] == 0x0a) pos--;
+		if (buf[pos-1] == 0x0a) {
+			pos--;
+		}
 		
 		StringBuffer sb = new StringBuffer(pos);
 		
-		for (int i = hasHdr?13:0 ; i < pos; i++)
+		for (int i = hasHdr?13:0 ; i < pos; i++) {
 			sb.append((char)buf[i]);
+		}
 		
 		return sb.toString();
 	}
@@ -104,20 +118,28 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 		StringBuilder sb = new StringBuilder(query.length());
 		int pos = 0;
 		
-		while (pos < query.length() && query.charAt(pos) != '[') pos++;
+		while (pos < query.length() && query.charAt(pos) != '[') {
+			pos++;
+		}
+		
 		sb.append(query.substring(0, pos).replace("__", "."));
 		
-		if (pos >= query.length()) return sb.toString();
+		if (pos >= query.length()) {
+			return sb.toString();
+		}
 		
 		sb.append('('); pos++;
 				
 		while (pos < query.length() && query.charAt(pos) != ']') {
 			if (query.charAt(pos) == '"') {
 				int pstart = pos++;
-				while (pos < query.length() && query.charAt(pos) != '"') pos++;
+				while (pos < query.length() && query.charAt(pos) != '"') {
+					pos++;
+				}
 				sb.append(query.substring(pstart, ++pos));
-			} else
+			} else {
 				sb.append(query.charAt(pos));
+			}
 			pos++;
 		}
 		
@@ -130,8 +152,9 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 	private void send(String resp) throws IOException {
 		byte[] buf = new byte[resp.length()+zbx_hdr.length+8];
 		
-		for (int i = 0; i < zbx_hdr.length; i++) 
+		for (int i = 0; i < zbx_hdr.length; i++) { 
 			buf[i] = zbx_hdr[i];
+		}
 		
 		long len = resp.length();
 		
@@ -140,8 +163,9 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 			len >>= 8;
 		}
 		
-		for (int i = 0 ; i < resp.length(); i++)
+		for (int i = 0 ; i < resp.length(); i++) {
 			buf[i+zbx_hdr.length+8] = (byte)resp.charAt(i);
+		}
 		
 		OutputStream out = socket.getOutputStream();
 		out.write(buf); out.flush();
@@ -176,6 +200,4 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 			log.error("I/O Error returning (error) result: " + e.getMessage());
 		}
 	}
-	
-	
 }

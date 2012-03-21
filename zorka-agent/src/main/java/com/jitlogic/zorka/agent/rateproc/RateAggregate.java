@@ -25,7 +25,7 @@ import com.jitlogic.zorka.agent.ZorkaUtil;
 public class RateAggregate {
 	
 	private static class Sample {
-		public final long nom, div, time;
+		private final long nom, div, time;
 		public Sample(long nom, long div, long time) {
 			this.nom = nom; this.div = div; this.time = time;
 		}
@@ -63,7 +63,9 @@ public class RateAggregate {
 	public double rate() {
 		slide();
 		
-		if (samples.size() == 0) return defVal;
+		if (samples.size() == 0) {
+			return defVal;
+		}
 		
 		Sample s1 = samples.getFirst(), s2 = samples.getLast();
 		long nom = s2.nom - s1.nom, div = s2.div - s1.div;
@@ -76,9 +78,13 @@ public class RateAggregate {
 		long tst = ZorkaUtil.currentTimeMillis() - horizon;		
 		
 		for (;;) {
-			if (samples.size() == 0) break;
+			if (samples.size() == 0) {
+				break;
+			}
 			Sample s = samples.getFirst();
-			if (s.time >= tst) break;
+			if (s.time >= tst) {
+				break;
+			}
 			samples.removeFirst();
 		}
 	}

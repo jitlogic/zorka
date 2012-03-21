@@ -15,18 +15,27 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent;
+package com.jitlogic.zorka.agent.mapbean;
 
-public class ZorkaError extends Error {
+import com.jitlogic.zorka.agent.ZorkaUtil;
 
-	private static final long serialVersionUID = 403339688211580095L;
+public class AttrGetter implements ValGetter {
 
-	public ZorkaError(String msg) {
-		super(msg);
+	private Object obj;
+	private String[] attrs;
+	
+	public AttrGetter(Object obj, String...attrs) {
+		this.obj = obj;
+		this.attrs = attrs;
 	}
 	
-	public ZorkaError(String msg, Throwable inner) {
-		super(msg, inner); 
+	public Object get() {
+		Object v = obj;
+		
+		for (String attr : attrs)
+			v = ZorkaUtil.get(v, attr);
+		
+		return v;
 	}
-	
+
 }

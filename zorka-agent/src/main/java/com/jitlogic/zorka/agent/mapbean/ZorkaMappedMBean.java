@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.beanmap;
+package com.jitlogic.zorka.agent.mapbean;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,13 +51,17 @@ public class ZorkaMappedMBean implements DynamicMBean {
 	public synchronized Object getAttribute(String attribute)
 			throws AttributeNotFoundException, MBeanException,
 			ReflectionException {
-		if (!attrs.containsKey(attribute))
+		if (!attrs.containsKey(attribute)) {
 			throw new AttributeNotFoundException("This MBean has no '" + attribute + "' attribute.");
+		}
 		
 		// TODO ujawnic to w MBeanInfo 
-		if ("this".equals(attribute)) return this;
+		if ("this".equals(attribute)) {
+			return this;
+		}
 		
 		Object v = attrs.get(attribute).getValue();
+		
 		return v instanceof ValGetter ? ((ValGetter)v).get() : v;
 	}
 	
@@ -114,8 +118,9 @@ public class ZorkaMappedMBean implements DynamicMBean {
 		
 		String[] attrNames = new String[attrs.size()];
 		
-		for (String name : attrs.keySet())
+		for (String name : attrs.keySet()) {
 			attrNames[i++] = name;
+		}
 
 		Arrays.sort(attrNames);
 

@@ -21,15 +21,15 @@ import com.jitlogic.zorka.agent.rateproc.RateAggregate;
 
 public class RankAttr<K,V> {
 
-	public final String name;
-	public final String description;
-	public final long horizon;
-	public final double multiplier;
+	private final String name;
+	private final String description;
+	private final long horizon;
+	private final double multiplier;
 	
-	public final String nominalAttr;
-	public final String dividerAttr;
+	private final String nominalAttr;
+	private final String dividerAttr;
 	
-	public final int nominalOffs, dividerOffs;
+	private final int nominalOffs, dividerOffs;
 
 	
 	public RankAttr(RankLister<K,V> lister, String name, String description, long horizon, double multiplier, String nominalAttr, String dividerAttr) {
@@ -45,6 +45,38 @@ public class RankAttr<K,V> {
 	
 	public RateAggregate newAggregate() {
 		return new RateAggregate(horizon, 0.0, multiplier);
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public long getHorizon() {
+		return horizon;
+	}
+
+	public double getMultiplier() {
+		return multiplier;
+	}
+
+	public String getNominalAttr() {
+		return nominalAttr;
+	}
+
+	public String getDividerAttr() {
+		return dividerAttr;
+	}
+
+	public int getNominalOffs() {
+		return nominalOffs;
+	}
+
+	public int getDividerOffs() {
+		return dividerOffs;
 	}
 	
 }

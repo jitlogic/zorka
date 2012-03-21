@@ -81,7 +81,7 @@ public class ZorkaBshAgent implements ZorkaService {
 	public void loadScript(URL url) {
 		try {
 			interpreter.source(url.getPath());
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			ZorkaUtil.error(log, "Error loading script " + url, e);
 		}
 	}
@@ -91,15 +91,18 @@ public class ZorkaBshAgent implements ZorkaService {
 			configDir = url;
 			File dir = new File(url.toURI());
 			String[] files = dir.list();
-			if (files == null || files.length == 0) return;
+			if (files == null || files.length == 0) {
+				return;
+			}
 			Arrays.sort(files);
 			for (String fname : files) {
 				URL scrUrl = new URL(url + "/" + fname);
 				File scrFile = new File(scrUrl.toURI());
-				if (fname.endsWith(".bsh") && scrFile.isFile())
+				if (fname.endsWith(".bsh") && scrFile.isFile()) {
 					loadScript(scrUrl);
+				}
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error("Cannot open directory: " + url, e);
 		}
 	}
@@ -120,8 +123,9 @@ public class ZorkaBshAgent implements ZorkaService {
 	
 	public synchronized void svcStart() {
 		if (!svcStarted) {
-			for (ZorkaService svc : services)
+			for (ZorkaService svc : services) {
 				svc.svcStart();
+			}
 			svcStarted = true;
 		}
 	}
@@ -129,8 +133,9 @@ public class ZorkaBshAgent implements ZorkaService {
 	
 	public synchronized void svcStop() {
 		if (svcStarted) {
-			for (ZorkaService svc : services)
+			for (ZorkaService svc : services) {
 				svc.svcStop();
+			}
 			svcStarted = false;
 		}
 	}
@@ -138,21 +143,24 @@ public class ZorkaBshAgent implements ZorkaService {
 	
 	public synchronized void svcClear() {
 		if (svcStarted) {
-			for (ZorkaService svc : services)
+			for (ZorkaService svc : services) {
 				svc.svcClear();
+			}
 		}
 	}
 	
 	
 	public synchronized void svcReload() {
 		if (svcStarted) {
-			for (ZorkaService svc : services)
+			for (ZorkaService svc : services) {
 				svc.svcReload();
+			}
 			
 			interpreter = new Interpreter();
 			
-			if (configDir != null)
+			if (configDir != null) {
 				loadScriptDir(configDir);
+			}
 		}
 	}
 	
@@ -160,6 +168,8 @@ public class ZorkaBshAgent implements ZorkaService {
 	
 	public synchronized void svcAdd(ZorkaService service) {
 		services.add(service);
-		if (svcStarted) service.svcStart();
+		if (svcStarted) { 
+			service.svcStart();
+		}
 	}
 }

@@ -26,7 +26,7 @@ import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularType;
 
-import com.jitlogic.zorka.agent.ZorkaError;
+import com.jitlogic.zorka.agent.ZorkaException;
 
 /**
  * 
@@ -74,8 +74,9 @@ public class RankList<K,T> implements TabularData {
 		
 		 RankItem<K,T>[] newItems = new RankItem[sz];
 		 
-		 for (int i = 0; i < sz; i++)
+		 for (int i = 0; i < sz; i++) {
 			 newItems[i] = items[i];
+		 }
 		
 		this.items = newItems;
 	}
@@ -93,7 +94,7 @@ public class RankList<K,T> implements TabularData {
 			return idx;
 		}
 		
-		throw new ZorkaError("Only RankItems originating from this object are accepted.");
+		throw new IllegalArgumentException("Only RankItems originating from this object are accepted.");
 	}
 
 	
@@ -108,49 +109,57 @@ public class RankList<K,T> implements TabularData {
 	
 	
 	public boolean containsKey(Object[] key) {
-		if (key.length != 1)
-			throw new ZorkaError("RankList accepts only single-field keys.");
+		if (key.length != 1) {
+			throw new IllegalArgumentException("RankList accepts only single-field keys.");
+		}
 
-		for (RankItem<K,T> item : items)
-			if (item.getKey().equals(key[0]))
-					return true;
+		for (RankItem<K,T> item : items) {
+			if (item.getKey().equals(key[0])) {
+				return true;
+			}
+		}
 			
 		return false;
 	}
 	
 	
 	public boolean containsValue(CompositeData value) {
-		for (RankItem<K,T> item : items)
-			if (item.equals(value))
+		for (RankItem<K,T> item : items) {
+			if (item.equals(value)) {
 				return true;
+			}
+		}
 		return false;
 	}
 	
 	
 	public CompositeData get(Object[] key) {
-		if (key.length != 1)
-			throw new ZorkaError("RankList accepts only single-field keys.");
+		if (key.length != 1) {
+			throw new IllegalArgumentException("RankList accepts only single-field keys.");
+		}
 
-		for (RankItem<K,T> item : items)
-			if (item.getKey().equals(key[0]))
+		for (RankItem<K,T> item : items) {
+			if (item.getKey().equals(key[0])) {
 				return item;
+			}
+		}
 		
 		return null; 
 	}
 	
 	
 	public void put(CompositeData value) {
-		throw new ZorkaError("Manual putting values to ranking list is not supported.");
+		throw new UnsupportedOperationException("Manual putting values to ranking list is not supported.");
 	}
 	
 	
 	public CompositeData remove(Object[] key) {
-		throw new ZorkaError("Manual removal of values from ranking list is not supported.");
+		throw new UnsupportedOperationException("Manual removal of values from ranking list is not supported.");
 	}
 	
 	
 	public void putAll(CompositeData[] values) {
-		throw new ZorkaError("Manual putting values to ranking list is not supported.");
+		throw new UnsupportedOperationException("Manual putting values to ranking list is not supported.");
 	}
 	
 	
@@ -161,8 +170,10 @@ public class RankList<K,T> implements TabularData {
 	
 	public Set<?> keySet() {
 		Set<Object> keys = new HashSet<Object>();
-		for (RankItem<K,T> item : items)
+		for (RankItem<K,T> item : items) {
 			keys.add(item.getKey());
+		}
+		
 		return keys;
 	}
 	

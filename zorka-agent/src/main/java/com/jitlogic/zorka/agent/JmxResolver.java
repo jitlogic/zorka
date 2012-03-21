@@ -17,20 +17,26 @@
 
 package com.jitlogic.zorka.agent;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class JmxResolver {
 	
-	@SuppressWarnings("unchecked")
-	public Set<ObjectName> queryNames(MBeanServerConnection conn, String query) throws ZorkaError {
+	private static final Logger log = LoggerFactory.getLogger(JmxResolver.class); 
+	
+	public Set<ObjectName> queryNames(MBeanServerConnection conn, String query) {
 		try {
 			ObjectName on = new ObjectName(query);
 			return (Set<ObjectName>)conn.queryNames(on, null);
 		} catch (Exception e) {
-			throw new ZorkaError("Error resolving object names.", e);
+			ZorkaUtil.error(log, "Error resolving object names.", e);
+			return new HashSet<ObjectName>();
 		}
 	}
 	

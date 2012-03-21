@@ -31,7 +31,7 @@ import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaUtil;
 import com.jitlogic.zorka.agent.zabbix.ZabbixAgent;
 
-public class JavaAgent {
+public final class JavaAgent {
 
 	public static final int MAX_THREADS = 5;
 	public static final long DEFAULT_TIMEOUT = 3000;
@@ -55,8 +55,12 @@ public class JavaAgent {
 		
 		try {
 			String urlpath = "file://" + System.getProperty("zorka.config.dir", "/opt/zorka");
-			if (!urlpath.contains("://")) urlpath = "file://" + urlpath;
-			if (!urlpath.endsWith("/")) urlpath += "/";
+			if (!urlpath.contains("://")) {
+				urlpath = "file://" + urlpath;
+			}
+			if (!urlpath.endsWith("/")) {
+				urlpath += "/";
+			}
 			urlpath += "init.d";
 			
 			zorkaAgent.loadScriptDir(new URL(urlpath));
@@ -72,8 +76,12 @@ public class JavaAgent {
 		Properties props = new Properties();
 		
 		String url = System.getProperty("zorka.config.dir", "/opt/zorka");
-		if (!url.contains("://")) url = "file://" + url;
-		if (!url.endsWith("/")) url += "/";
+		if (!url.contains("://")) {
+			url = "file://" + url;
+		}
+		if (!url.endsWith("/")) {
+			url += "/";
+		}
 		url += "zabbix.properties";
 		
 		ZorkaUtil.loadProps(url , props);
@@ -98,7 +106,7 @@ public class JavaAgent {
 	private static JavaAgent agent = null;
 	
 	
-	public static void premain(String args, Instrumentation inst) throws Exception {
+	public static void premain(String args, Instrumentation inst) {
 		start();
 	}
 

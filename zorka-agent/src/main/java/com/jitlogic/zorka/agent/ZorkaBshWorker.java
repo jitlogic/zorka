@@ -32,7 +32,7 @@ public class ZorkaBshWorker implements Runnable {
 	public void run() {
 		try {
 			callback.handleResult(agent.eval(expr));
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			callback.handleError(e);
 		} 
 	}

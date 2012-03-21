@@ -43,25 +43,28 @@ public class ZorkaUtil {
 	
 	private final static Logger log = LoggerFactory.getLogger(ZorkaUtil.class);
 	
+	private ZorkaUtil() {
+	}
+	
 	public static void loadProps(String urlpath, Properties props) {
 		InputStream is = null;
 		try {
-			if (urlpath.startsWith("classpath://"))
+			if (urlpath.startsWith("classpath://")) {
 				is = ZorkaUtil.class.getResourceAsStream(urlpath.substring(12));
-			else if (urlpath.startsWith("file://"))
+			} else if (urlpath.startsWith("file://")) {
 				is = new FileInputStream(urlpath.substring(7));
-			else {
+			} else {
 				URL url = new URL(urlpath);
 				is = url.openStream();
 			}
 			props.load(is);
 		} catch (IOException e) {
-			log.error("I/O error while reading properties file '" 
-					+ urlpath + "': " + e.getMessage());
-			e.printStackTrace();
+			error(log, "I/O error while reading properties file '" 
+					+ urlpath + "': " + e.getMessage(), e);
 		} finally {
-			if (is != null)
+			if (is != null) {
 				try { is.close(); } catch (IOException e) { }
+			}
 		}
 	}
 	
@@ -99,16 +102,16 @@ public class ZorkaUtil {
 	
 	public static Object coerce(Object obj, Class<?> c) {
 		
-		if (obj == null || c == null) return null;
-		if (obj.getClass() == c) return obj;
+		if (obj == null || c == null) { return null; }
+		if (obj.getClass() == c) { return obj; }
 		
-		if (c == Long.class)    return ((Number)obj).longValue();
-		if (c == Integer.class) return ((Number)obj).intValue();
-		if (c == Double.class)  return ((Number)obj).doubleValue();
-		if (c == Short.class)   return ((Number)obj).shortValue();
-		if (c == Float.class)   return ((Number)obj).floatValue();
-		if (c == String.class)  return ""+obj;
-		if (c == Boolean.class) return coerceBool(obj);
+		if (c == Long.class)    { return ((Number)obj).longValue(); }
+		if (c == Integer.class) { return ((Number)obj).intValue(); }
+		if (c == Double.class)  { return ((Number)obj).doubleValue(); }
+		if (c == Short.class)   { return ((Number)obj).shortValue(); }
+		if (c == Float.class)   { return ((Number)obj).floatValue(); }
+		if (c == String.class)  { return ""+obj; }
+		if (c == Boolean.class) { return coerceBool(obj); }
 		
 		return null; 
 	}
@@ -124,12 +127,16 @@ public class ZorkaUtil {
 		} catch (NoSuchMethodException e) {
 			for (Class<?> icl : clazz.getInterfaces()) {
 				Method m = lookupMethod(icl, name);
-				if (m != null) return m;
+				if (m != null) {
+					return m;
+				}
 			}
 			Class<?> mcl = clazz;
 			while ((mcl = clazz.getSuperclass()) != null) {
 				Method m = lookupMethod(mcl, name);
-				if (m != null) return m;
+				if (m != null) {
+					return m;
+				}
 			}
 		}
 		return null;
@@ -137,9 +144,13 @@ public class ZorkaUtil {
 	
 	public static Method lookupGetter(Class<?> clazz, String name) {
 		Method m = lookupMethod(clazz, "get" + name.substring(0,1).toUpperCase() + name.substring(1));
-		if (m != null) return m;
+		if (m != null) { 
+			return m; 
+		}
 		m = lookupMethod(clazz, "is" + name.substring(0, 1) + name.substring(1));
-		if (m != null) return m;
+		if (m != null) {
+			return m;
+		}
 		m = lookupMethod(clazz, name);
 		return m;
 	}
@@ -157,8 +168,7 @@ public class ZorkaUtil {
 		} else if (obj.getClass().isArray()) {
 			Integer idx = (Integer)coerce(key, Integer.class);
 			return idx != null ? ((Object[])obj)[idx] : null;
-		}		
-		if (obj instanceof CompositeData) {
+		} else if (obj instanceof CompositeData) {
 			return ((CompositeData)obj).get(""+key);
 		} else if (obj instanceof Stats){
 			return ((Stats)obj).getStatistic(""+key);
@@ -172,20 +182,21 @@ public class ZorkaUtil {
 			
 			// Try getter method (if any)
 			Method m = lookupGetter(clazz, name);
-			if (m != null)
+			if (m != null) {
 				try {
 					return m.invoke(obj);
 				} catch (Exception e) {
-					// TODO zalogowac problem 
+					error(log, "Method '" + m.getName() + "' invocation failed", e);
 					return null;
 				}
+			}
 			
 			// Try field (if any)
 			try {
 				Field field = clazz.getField(name);
 				return field.get(name);
 			} catch (Exception e) {
-				// TODO zalogowac problem
+				error(log, "Field '" + name + "' fetch failed", e);
 				return null;
 			}
 		}
@@ -197,8 +208,9 @@ public class ZorkaUtil {
 	public static List<String> listAttrNames(Object obj) {
 		List<String> lst = new ArrayList<String>();
 		if (obj instanceof Map) {
-			for (Object key : ((Map<?,?>)obj).keySet())
+			for (Object key : ((Map<?,?>)obj).keySet()) {
 				lst.add(key.toString());
+			}
 		} else if (obj instanceof Stats) {
 			for (String name : ((Stats)obj).getStatisticNames()) {
 				lst.add(name);
@@ -227,12 +239,13 @@ public class ZorkaUtil {
 			|| a != null && a.equals(b);
 	}
 	
-	public static boolean fullStackDumps = true;
+	private static boolean fullStackDumps = true;
 	
 	public static void error(Logger log, String msg, Throwable e) {
-		if (fullStackDumps)
+		if (fullStackDumps) {
 			log.error(msg, e);
-		else
+		} else {
 			log.error(msg + ": " + e.getMessage());
+		}
 	}
 }
