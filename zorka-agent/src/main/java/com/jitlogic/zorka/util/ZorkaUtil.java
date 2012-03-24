@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent;
+package com.jitlogic.zorka.util;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -36,14 +36,23 @@ import java.util.Properties;
 import javax.management.j2ee.statistics.Stats;
 import javax.management.openmbean.CompositeData;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.jitlogic.zorka.agent.JmxObject;
 
 public class ZorkaUtil {
 	
-	private final static Logger log = LoggerFactory.getLogger(ZorkaUtil.class);
+	private final static ZorkaLogger log = ZorkaLogger.getLogger(ZorkaUtil.class);
 	
-	private ZorkaUtil() {
+	protected static ZorkaUtil instance;
+	
+	public static synchronized ZorkaUtil getInstance() {
+		
+		if (instance == null)
+			instance = new ZorkaUtil();
+		
+		return instance;
+	}
+	
+	protected ZorkaUtil() {
 	}
 	
 	public static void loadProps(String urlpath, Properties props) {
@@ -59,7 +68,7 @@ public class ZorkaUtil {
 			}
 			props.load(is);
 		} catch (IOException e) {
-			error(log, "I/O error while reading properties file '" 
+			log.error("I/O error while reading properties file '" 
 					+ urlpath + "': " + e.getMessage(), e);
 		} finally {
 			if (is != null) {
@@ -186,7 +195,7 @@ public class ZorkaUtil {
 				try {
 					return m.invoke(obj);
 				} catch (Exception e) {
-					error(log, "Method '" + m.getName() + "' invocation failed", e);
+					log.error("Method '" + m.getName() + "' invocation failed", e);
 					return null;
 				}
 			}
@@ -196,7 +205,7 @@ public class ZorkaUtil {
 				Field field = clazz.getField(name);
 				return field.get(name);
 			} catch (Exception e) {
-				error(log, "Field '" + name + "' fetch failed", e);
+				log.error("Field '" + name + "' fetch failed", e);
 				return null;
 			}
 		}
@@ -229,7 +238,7 @@ public class ZorkaUtil {
 		return ""+v;
 	}
 	
-	public static long currentTimeMillis() {
+	public long currentTimeMillis() {
 		return System.currentTimeMillis();
 	}
 	
@@ -241,11 +250,4 @@ public class ZorkaUtil {
 	
 	private static boolean fullStackDumps = true;
 	
-	public static void error(Logger log, String msg, Throwable e) {
-		if (fullStackDumps) {
-			log.error(msg, e);
-		} else {
-			log.error(msg + ": " + e.getMessage());
-		}
-	}
 }

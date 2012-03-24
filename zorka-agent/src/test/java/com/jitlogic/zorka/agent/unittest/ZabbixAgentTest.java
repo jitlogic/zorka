@@ -48,6 +48,11 @@ public class ZabbixAgentTest {
 		assertEquals("func3(\"ab[]cd\")", tr("func3[\"ab[]cd\"]"));
 	}
 	
+	@Test
+	public void testBiggerFuncs() {
+		assertEquals("zorka.jmx(\"java\", \"java.lang:type=OperatingSystem\", \"Arch\")", 
+			tr("zorka__jmx[\"java\", \"java.lang:type=OperatingSystem\", \"Arch\"]"));
+	}
 	
 	private static InputStream mkIS(Object...args) {
 		byte buf[] = new byte[2048];

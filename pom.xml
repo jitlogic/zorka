@@ -18,18 +18,11 @@
            <version>4.8.1</version>
             <scope>test</scope>
         </dependency>
-  		<dependency>
-  			<groupId>org.slf4j</groupId>
-  			<artifactId>slf4j-simple</artifactId>
-  			<version>1.5.11</version>
-  			<scope>test</scope>
-  		</dependency>
     </dependencies>
 
 
     <modules>
         <module>zorka-agent</module>
-        <module>zorka-agent-jboss5</module>
         <module>zorka-agent-java</module>
     </modules>
 

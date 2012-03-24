@@ -30,14 +30,13 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.jitlogic.zorka.agent.mapbean.AttrGetter;
 import com.jitlogic.zorka.agent.mapbean.ValGetter;
 import com.jitlogic.zorka.agent.mapbean.ZorkaMappedMBean;
 import com.jitlogic.zorka.agent.rankproc.BeanRankLister;
 import com.jitlogic.zorka.agent.rankproc.ThreadRankLister;
+import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 
 /**
@@ -48,7 +47,7 @@ import com.jitlogic.zorka.agent.rankproc.ThreadRankLister;
  */
 public class ZorkaLib implements ZorkaService {
 	
-	private static final Logger log = LoggerFactory.getLogger(ZorkaLib.class);
+	private static final ZorkaLogger log = ZorkaLogger.getLogger(ZorkaLib.class);
 	
 	private ZorkaBshAgent agent;
 	private Map<String, MBeanServerConnection> conns = new HashMap<String, MBeanServerConnection>();
@@ -117,10 +116,10 @@ public class ZorkaLib implements ZorkaService {
 				try {
 					obj = conn.getAttribute(name, args.get(2).toString());
 				} catch (AttributeNotFoundException e) {
-					ZorkaUtil.error(log, "Object '" + conname + "|" + name + 
+					log.error("Object '" + conname + "|" + name + 
 						"' has no attribute '" + args.get(2) + "'.", e);
 				} catch (Exception e) {
-					ZorkaUtil.error(log, "Error getting attribute '" + args.get(2) 
+					log.error("Error getting attribute '" + args.get(2) 
 						+ "' from '" + conname + "|" + name + "'", e);
 				}
 				if (args.size() > 3) {
@@ -216,7 +215,7 @@ public class ZorkaLib implements ZorkaService {
 						"' has no attribute '" + args.get(2) + "'.");
 			return null;
 		} catch (Exception e) {
-			ZorkaUtil.error(log, "Error getting attribute '" + args.get(2) 
+			log.error("Error getting attribute '" + args.get(2) 
 				+ "' from '" + conname + "|" + name + "'", e);
 		}
 		
@@ -405,7 +404,7 @@ public class ZorkaLib implements ZorkaService {
 			try {
 				obj.getConn().unregisterMBean(obj.getName());
 			} catch (Exception e) {
-				ZorkaUtil.error(log, "Error unregistering bean " + obj.getName(), e);
+				log.error("Error unregistering bean " + obj.getName(), e);
 			}
 		}
 	} // svcStop()
@@ -419,13 +418,14 @@ public class ZorkaLib implements ZorkaService {
 	}
 	
 	
-	public void reload() {
+	public String reload() {
 		agent.getExecutor().execute(
 		new Runnable() {
 			public void run() {
-				try { Thread.sleep(500); } catch (InterruptedException e) { }
+				try { Thread.sleep(5); } catch (InterruptedException e) { }
 				agent.svcReload();
 			}
 		});
+		return "OK";
 	}
 }

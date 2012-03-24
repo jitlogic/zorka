@@ -20,12 +20,11 @@ package com.jitlogic.zorka.agent;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 public class JmxObject {
 	
-	private final static Logger log = LoggerFactory.getLogger(JmxObject.class);
+	private final static ZorkaLogger log = ZorkaLogger.getLogger(JmxObject.class);
 	
 	private final ObjectName name;
 	private final MBeanServerConnection conn;
@@ -39,7 +38,7 @@ public class JmxObject {
 		try {
 			return conn.getAttribute(name, key.toString());
 		} catch (Exception e) {
-			ZorkaUtil.error(log, "Cannot get attribute '" + key + "' of '" + name + "'", e);
+			log.error("Cannot get attribute '" + key + "' of '" + name + "'", e);
 			return null;
 		}
 	}

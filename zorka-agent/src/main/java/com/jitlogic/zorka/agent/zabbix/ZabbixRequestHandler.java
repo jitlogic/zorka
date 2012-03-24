@@ -23,19 +23,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.jitlogic.zorka.agent.ZorkaCallback;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 public class ZabbixRequestHandler implements ZorkaCallback {
 
-	private static final Logger log = LoggerFactory.getLogger(ZabbixRequestHandler.class);
+	private static final ZorkaLogger log = ZorkaLogger.getLogger(ZabbixRequestHandler.class);
 	
 	private Socket socket;
 	private String req = null;
 	
-	private static final String ZBX_NOTSUPPORTED = "ZBX_NOTSUPPORTED";
+	public static final String ZBX_NOTSUPPORTED = "ZBX_NOTSUPPORTED";
 	
 	public ZabbixRequestHandler(Socket socket) {
 		this.socket = socket;
@@ -136,7 +134,7 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 				while (pos < query.length() && query.charAt(pos) != '"') {
 					pos++;
 				}
-				sb.append(query.substring(pstart, ++pos));
+				sb.append(query.substring(pstart, pos+1));
 			} else {
 				sb.append(query.charAt(pos));
 			}
@@ -175,6 +173,7 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 	public String getReq() throws IOException {
 		if (req == null) {
 			String s = decode(socket.getInputStream());
+			log.debug("Incoming ZABBIX query: '" + s + "'"); // TODO avoid concatenation when log level > 0 (? on ZorkaLogger level ?)
 			req = translate(s);
 		}
 		return req;

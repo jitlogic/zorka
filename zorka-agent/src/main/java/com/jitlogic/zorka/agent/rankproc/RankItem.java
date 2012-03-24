@@ -24,8 +24,8 @@ import java.util.List;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeType;
 
-import com.jitlogic.zorka.agent.ZorkaUtil;
 import com.jitlogic.zorka.agent.rateproc.RateAggregate;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 
 /**

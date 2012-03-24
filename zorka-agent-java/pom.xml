@@ -14,11 +14,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <artifactId>zorka-agent</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.5.11</version>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -39,7 +34,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Premain-Class>com.jitlogic.zorka.tibco.TibcoAgent</Premain-Class>
+                            <Premain-Class>com.jitlogic.zorka.agent.java.JavaAgent</Premain-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                         </manifestEntries>
@@ -59,7 +54,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                         <configuration>
                             <includes>
                                 <include>org.beanshell:bsh-core</include>
-                                <include>com.jitlogic:zorka-agent</include>
+                                <include>com.jitlogic.zorka:zorka-agent</include>
                             </includes>
                             <rules></rules>
                             <keep>

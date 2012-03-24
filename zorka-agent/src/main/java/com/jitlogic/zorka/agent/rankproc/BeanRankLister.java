@@ -28,7 +28,7 @@ import javax.management.openmbean.SimpleType;
 
 import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.agent.JmxResolver;
-import com.jitlogic.zorka.agent.ZorkaUtil;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 	
@@ -62,8 +62,9 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 				
 		int len = attrs.length;
 		
-		if (len > 0)
+		if (len > 0) {
 			attr0 = attrs[0];
+		}
 		
 		if (len > 1) {
 			String m = attrs[len-1];
@@ -73,8 +74,9 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 			
 			attrs = new String[len-1];
 			
-			for (int i = 1; i < len; i++)
+			for (int i = 1; i < len; i++) {
 				this.attrs[i-1] = attrs[i]; 
+			}
 		}
 		
 	}
@@ -90,14 +92,17 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 			try {
 				Object obj = attr0 != null ? conn.getAttribute(on, attr0) : new JmxObject(on, conn);
 				for (String attr : attrs) obj = ZorkaUtil.get(obj, attr);
-				if (obj == null) continue;
+				if (obj == null) { continue; }
 				String key = on.getKeyProperty(keyName);
 				if (mask != null) {
-					for (String k2 : ZorkaUtil.listAttrNames(obj))
-						if (k2.matches(mask))
+					for (String k2 : ZorkaUtil.listAttrNames(obj)) {
+						if (k2.matches(mask)) {
 							lst.add(new BeanRankInfo(key + "." + k2, ZorkaUtil.get(obj, k2)));
-				} else
+						}
+					}
+				} else {
 					lst.add(new BeanRankInfo(key, obj));
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

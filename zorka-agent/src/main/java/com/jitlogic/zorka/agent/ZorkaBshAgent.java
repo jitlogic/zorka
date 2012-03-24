@@ -25,17 +25,17 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 import bsh.EvalError;
 import bsh.Interpreter;
 
 public class ZorkaBshAgent implements ZorkaService {
 	
-	public static final String VERSION = "0.1-SNAPSHOT";
+	public static final String VERSION = "0.0.1-SNAPSHOT";
 	
-	private static Logger log = LoggerFactory.getLogger(ZorkaBshAgent.class);
+	private static ZorkaLogger log = ZorkaLogger.getLogger(ZorkaBshAgent.class);
 	private Interpreter interpreter;
 	private ZorkaLib zorkaLib;
 	private Executor executor;
@@ -61,7 +61,7 @@ public class ZorkaBshAgent implements ZorkaService {
 		try {
 			return ""+interpreter.eval(expr);
 		} catch (EvalError e) {
-			ZorkaUtil.error(log, "Error evaluating '" + expr + "': ", e);
+			log.error("Error evaluating '" + expr + "': ", e);
 			return ZorkaUtil.errorDump(e);
 		}
 	}
@@ -73,6 +73,7 @@ public class ZorkaBshAgent implements ZorkaService {
 	
 	
 	public void exec(String expr, ZorkaCallback callback) {
+		log.debug("Executing ZORKA query: '" + expr + "'"); // TODO avoid concatenation when log level > 0 (? on ZorkaLogger level ?)
 		ZorkaBshWorker worker = new ZorkaBshWorker(this, expr, callback);
 		executor.execute(worker);
 	}
@@ -82,7 +83,7 @@ public class ZorkaBshAgent implements ZorkaService {
 		try {
 			interpreter.source(url.getPath());
 		} catch (Exception e) {
-			ZorkaUtil.error(log, "Error loading script " + url, e);
+			log.error("Error loading script " + url, e);
 		}
 	}
 	
@@ -111,6 +112,7 @@ public class ZorkaBshAgent implements ZorkaService {
 	public ZorkaLib getZorkaLib() {
 		return zorkaLib;
 	}
+	
 	
 	public Executor getExecutor() {
 		return executor;
@@ -153,7 +155,7 @@ public class ZorkaBshAgent implements ZorkaService {
 	public synchronized void svcReload() {
 		if (svcStarted) {
 			for (ZorkaService svc : services) {
-				svc.svcReload();
+				svc.svcStop();
 			}
 			
 			interpreter = new Interpreter();
@@ -161,10 +163,13 @@ public class ZorkaBshAgent implements ZorkaService {
 			if (configDir != null) {
 				loadScriptDir(configDir);
 			}
+			
+			for (ZorkaService svc : services) {
+				svc.svcStart();
+			}
 		}
 	}
 	
-		
 	
 	public synchronized void svcAdd(ZorkaService service) {
 		services.add(service);

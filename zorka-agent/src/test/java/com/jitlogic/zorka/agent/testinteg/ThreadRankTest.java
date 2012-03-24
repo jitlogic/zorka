@@ -23,16 +23,18 @@ import java.util.Collection;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import com.jitlogic.zorka.agent.ZorkaUtil;
 import com.jitlogic.zorka.agent.rankproc.RankList;
 import com.jitlogic.zorka.agent.rankproc.ThreadRankLister;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 public class ThreadRankTest {
+	
+	private ZorkaUtil util = ZorkaUtil.getInstance();
 	
 	@Test
 	public void testCreateSimpleRankList() throws Exception {
 		ThreadRankLister lister = new ThreadRankLister(60000, 600000);
-		lister.update(ZorkaUtil.currentTimeMillis());
+		lister.update(util.currentTimeMillis());
 		
 		RankList<Long,ThreadInfo> rlist = lister.newList("cpu1", "cpuTime", 3);		
 		assertNotNull("Should return some list", rlist);
@@ -45,10 +47,10 @@ public class ThreadRankTest {
 	@Test
 	public void testCreateSimpleRankListAndRerank() throws Exception {
 		ThreadRankLister lister = new ThreadRankLister(60000, 600000);
-		lister.update(ZorkaUtil.currentTimeMillis());
+		lister.update(util.currentTimeMillis());
 		
 		RankList<Long,ThreadInfo> rlist = lister.newList("cpu1", "cpuTime", 3);		
-		lister.rerank(ZorkaUtil.currentTimeMillis());
+		lister.rerank(util.currentTimeMillis());
 		
 		Collection<?> vals = rlist.values();
 		assertEquals(3, vals.size());
@@ -61,8 +63,8 @@ public class ThreadRankTest {
 		lister.newAttr("cpu1", "Cpu utilization avg 1m", 60000, 1, "cpuTime", "tstamp");
 		RankList<Long,ThreadInfo> rlist = lister.newList("cpu1", "cpu1", 3);		
 
-		lister.update(ZorkaUtil.currentTimeMillis());
-		lister.rerank(ZorkaUtil.currentTimeMillis());
+		lister.update(util.currentTimeMillis());
+		lister.rerank(util.currentTimeMillis());
 		
 		Collection<?> vals = rlist.values();
 		assertEquals(3, vals.size());

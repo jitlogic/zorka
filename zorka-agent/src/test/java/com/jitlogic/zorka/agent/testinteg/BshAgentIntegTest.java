@@ -75,7 +75,7 @@ public class BshAgentIntegTest {
 	
 	@Test
 	public void testAgentFunctions() throws Exception {
-		assertEquals("0.1-SNAPSHOT", execute("zorka.version()", 1000));
+		assertEquals(ZorkaBshAgent.VERSION, execute("zorka.version()", 1000));
 	}
 
 	@Test

@@ -31,12 +31,10 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 import javax.management.openmbean.TabularType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.jitlogic.zorka.agent.ZorkaService;
-import com.jitlogic.zorka.agent.ZorkaUtil;
 import com.jitlogic.zorka.agent.rateproc.RateAggregate;
+import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 /**
  * 
@@ -51,7 +49,7 @@ import com.jitlogic.zorka.agent.rateproc.RateAggregate;
  */
 public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 
-	private static Logger log = LoggerFactory.getLogger(RankLister.class);
+	private static ZorkaLogger log = ZorkaLogger.getLogger(RankLister.class);
 
 	protected static final int ATTR_ID            = 0;
 	protected static final int ATTR_TSTAMP        = 1;
@@ -78,6 +76,7 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 	
 	private Thread thread = null;
 	
+	private ZorkaUtil util = ZorkaUtil.getInstance();
 	
 	public abstract List<T> list();  
 	public abstract K getKey(T info);
@@ -214,7 +213,7 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 				"Thread statistic.", newAttr, newDesc, newType);
 		} catch (OpenDataException e) {
 			// TODO to sie bedzie mscilo w innych czesciach kodu - tutaj musimy sypnac jakims wyjatkiem
-			ZorkaUtil.error(log, "Error creating CompositeType for thread lister", e);
+			log.error("Error creating CompositeType for thread lister", e);
 		} 
 		
 		String[] index = { "id" };
@@ -222,7 +221,7 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 			tabularType = new TabularType("ThreadList", "Thread Ranking List", type, index);
 		} catch (OpenDataException e) {
 			// TODO to sie bedzie mscilo w innych czesciach kodu - tutaj musimy sypnac jakims wyjatkiem
-			ZorkaUtil.error(log, "Error creating TabularType for thread lister", e);
+			log.error("Error creating TabularType for thread lister", e);
 		}
 
 	} // makeCompositeType()
@@ -313,7 +312,7 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 	public void run() {
 		while (running) {
 			try {
-				long tstamp = ZorkaUtil.currentTimeMillis();
+				long tstamp = util.currentTimeMillis();
 				runCycle(tstamp);
 			
 				long ts1 = updateInterval-tstamp+lastUpdate;

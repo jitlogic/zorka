@@ -23,13 +23,11 @@ import java.net.URL;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.jitlogic.zorka.agent.TimeoutThreadPoolExecutor;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.agent.ZorkaUtil;
 import com.jitlogic.zorka.agent.zabbix.ZabbixAgent;
+import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 public final class JavaAgent {
 
@@ -37,7 +35,7 @@ public final class JavaAgent {
 	public static final long DEFAULT_TIMEOUT = 3000;
 	public static final long DEFAULT_KILL_TIMEOUT = 3000;
 
-	private static Logger log = LoggerFactory.getLogger(JavaAgent.class);
+	private static ZorkaLogger log = ZorkaLogger.getLogger(JavaAgent.class);
 	
 	private ExecutorService executor;
 	private ZorkaBshAgent zorkaAgent = null;
@@ -65,7 +63,7 @@ public final class JavaAgent {
 			
 			zorkaAgent.loadScriptDir(new URL(urlpath));
 		} catch (MalformedURLException e) {
-			log.error("Error loading ZORKA scripts: " + e.getMessage());
+			log.error("Error loading ZORKA scripts", e);
 		}
 		
 		zorkaAgent.svcStart();		
@@ -112,14 +110,14 @@ public final class JavaAgent {
 
 
 	public static void start() {
-		log.info("ZORKA Agent starting...");
+		log.notice("ZORKA Agent starting...");
 		agent = new JavaAgent();
 		agent.startZorkaAgent();
 		agent.startZabbixAgent();
 	}
 	
 	public static void stop() {
-		log.info("ZORKA agent stopping...");
+		log.notice("ZORKA agent stopping...");
 		agent.stopZabbixAgent();
 		agent.stopZorkaAgent();
 	}

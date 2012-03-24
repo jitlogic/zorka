@@ -25,14 +25,12 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 public class ZabbixAgent implements Runnable {
 	
-	private static Logger log = LoggerFactory.getLogger(ZabbixAgent.class);
+	private static ZorkaLogger log = ZorkaLogger.getLogger(ZabbixAgent.class);
 	
 	private volatile ZorkaBshAgent agent;
 	

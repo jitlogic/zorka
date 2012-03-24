@@ -17,22 +17,28 @@
 
 package com.jitlogic.zorka.agent.unittest;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.junit.Assert.*;
 
-import com.jitlogic.zorka.agent.ZorkaUtil;
 import com.jitlogic.zorka.agent.rateproc.RateAggregate;
 import com.jitlogic.zorka.agent.testutil.ZorkaTestUtil;
 
-// TODO wyrugowac PowerMock i EasyMock
-
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ZorkaUtil.class})
 public class SlidingWindowTest {
+
+	private ZorkaTestUtil testUtil;
+	
+	@Before
+	public void setUp() {
+		testUtil = ZorkaTestUtil.setUp();
+	}
+	
+	@After
+	public void tearDown() {
+		ZorkaTestUtil.tearDown();
+	}
 	
 	@Test
 	public void testQueryEmptyWindow() throws Exception {
@@ -61,7 +67,7 @@ public class SlidingWindowTest {
 	@Test
 	public void testWindowNotYetSlide() throws Exception {
 		RateAggregate wnd = new RateAggregate(100, -1);
-		ZorkaTestUtil.mockCurrentTimeMillis(0, 0, 50, 50, 100, 100, 100);
+		testUtil.mockCurrentTimeMillis(0, 0, 50, 50, 100, 100, 100);
 		wnd.feed(100);
 		wnd.feed(150);
 		wnd.feed(200);
@@ -71,7 +77,7 @@ public class SlidingWindowTest {
 	@Test
 	public void testWindowSlide() throws Exception {
 		RateAggregate wnd = new RateAggregate(100, -1);
-		ZorkaTestUtil.mockCurrentTimeMillis(0, 0, 50, 50, 100, 100, 150);
+		testUtil.mockCurrentTimeMillis(0, 0, 50, 50, 100, 100, 150);
 		wnd.feed(100);
 		wnd.feed(150);
 		wnd.feed(200);
@@ -81,7 +87,7 @@ public class SlidingWindowTest {
 	@Test
 	public void testWindowSlideOutOfHorizon() throws Exception {
 		RateAggregate wnd = new RateAggregate(100, -1);
-		ZorkaTestUtil.mockCurrentTimeMillis(0, 0, 50, 50, 100, 100, 1500);
+		testUtil.mockCurrentTimeMillis(0, 0, 50, 50, 100, 100, 1500);
 		wnd.feed(100);
 		wnd.feed(150);
 		wnd.feed(200);

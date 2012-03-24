@@ -17,7 +17,7 @@
 
 package com.jitlogic.zorka.agent.mapbean;
 
-import com.jitlogic.zorka.agent.ZorkaUtil;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 public class AttrGetter implements ValGetter {
 

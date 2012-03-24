@@ -17,7 +17,7 @@
 
 package com.jitlogic.zorka.agent.testinteg;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -30,7 +30,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
+import com.jitlogic.zorka.agent.ZorkaLib;
 import com.jitlogic.zorka.agent.zabbix.ZabbixAgent;
+import com.jitlogic.zorka.agent.zabbix.ZabbixRequestHandler;
 
 public class ZabbixAgentIntegTest {
 
@@ -70,7 +72,21 @@ public class ZabbixAgentIntegTest {
 	
 	@Test
 	public void testTrivialRequestAsync() throws Exception {
-		assertEquals("0.1-SNAPSHOT", query("zorka__version[]"));
+		assertEquals(ZorkaBshAgent.VERSION, query("zorka__version[]"));
+	}
+	
+	@Test
+	public void testReloadConfig() throws Exception {
+		assertEquals("OK", query("zorka__reload[]"));
+		Thread.sleep(50);
+		assertEquals(ZorkaBshAgent.VERSION, query("zorka__version[]"));
+	}
+	
+	@Test
+	public void testJavaQuery() throws Exception {
+		String rslt = query("zorka__jmx[\"java\", \"java.lang:type=OperatingSystem\", \"Arch\"]");
+		assertFalse("Query has crashed.", 
+			ZabbixRequestHandler.ZBX_NOTSUPPORTED.equals(rslt));
 	}
 
 	

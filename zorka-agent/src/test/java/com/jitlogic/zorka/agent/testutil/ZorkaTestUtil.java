@@ -17,18 +17,41 @@
 
 package com.jitlogic.zorka.agent.testutil;
 
-import static org.easymock.EasyMock.expect;
-import static org.powermock.api.easymock.PowerMock.*;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
-import com.jitlogic.zorka.agent.ZorkaUtil;
+/**
+ * Test double for ZorkaUtil class.
+ * 
+ * @author Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ */
+public class ZorkaTestUtil extends ZorkaUtil {
 
-public class ZorkaTestUtil {
-
-	public static void mockCurrentTimeMillis(final long...tstamps) {
-		mockStatic(ZorkaUtil.class);
-		for (long tst : tstamps)
-			expect(ZorkaUtil.currentTimeMillis()).andReturn(tst);
-		replay(ZorkaUtil.class);
+	private long[] tsValues = null;
+	private int tsIndex = -1;
+	
+	public void mockCurrentTimeMillis(final long...tstamps) {
+		tsValues = tstamps.length > 0 ? tstamps : null;
+		tsIndex = -1;
 	}
 	
+	public static ZorkaTestUtil setUp() {
+		instance = new ZorkaTestUtil();
+		return (ZorkaTestUtil)instance;
+	}
+	
+	public static void tearDown() {
+		instance = null;
+	}
+	
+	public long currentTimeMillis() {
+		if (tsValues != null) {
+			if (tsIndex < tsValues.length-1) {
+				tsIndex++;
+			}
+			return tsValues[tsIndex];
+		} else {
+			return System.currentTimeMillis();
+		}
+	}
 }

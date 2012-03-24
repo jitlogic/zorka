@@ -17,6 +17,8 @@
 
 package com.jitlogic.zorka.agent;
 
+import com.jitlogic.zorka.util.ZorkaUtil;
+
 public class ZorkaBasicCallback implements ZorkaCallback {
 
 	private Object result = null;

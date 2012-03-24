@@ -19,7 +19,7 @@ package com.jitlogic.zorka.agent.rateproc;
 
 import java.util.LinkedList;
 
-import com.jitlogic.zorka.agent.ZorkaUtil;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 // TODO support for other values than long 
 public class RateAggregate {
@@ -36,6 +36,8 @@ public class RateAggregate {
 	
 	private final double defVal;
 	private final double multiplier;
+	
+	private ZorkaUtil util = ZorkaUtil.getInstance();
 	
 	public RateAggregate(long horizon, double defVal) {
 		this(horizon, defVal, 1.0);
@@ -56,7 +58,7 @@ public class RateAggregate {
 	
 	public void feed(long nom, long div) {
 		slide();
-		samples.addLast(new Sample(nom, div, ZorkaUtil.currentTimeMillis()));
+		samples.addLast(new Sample(nom, div, util.currentTimeMillis()));
 	}
 	
 	
@@ -75,7 +77,7 @@ public class RateAggregate {
 	
 	
 	public void slide() {
-		long tst = ZorkaUtil.currentTimeMillis() - horizon;		
+		long tst = util.currentTimeMillis() - horizon;		
 		
 		for (;;) {
 			if (samples.size() == 0) {
