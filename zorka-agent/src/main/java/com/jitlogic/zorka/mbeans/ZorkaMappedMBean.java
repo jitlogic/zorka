@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.mapbean;
+package com.jitlogic.zorka.mbeans;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -157,6 +157,11 @@ public class ZorkaMappedMBean implements DynamicMBean {
 		} catch (Exception e) {
 			// TODO obsluzyc i zalogowac problem
 		}
+	}
+	
+	
+	public synchronized boolean hasAttribute(String name) {
+		return attrs.containsKey(name);
 	}
 	
 	@Override

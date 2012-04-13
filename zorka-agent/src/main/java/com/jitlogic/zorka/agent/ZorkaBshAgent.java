@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.concurrent.Executor;
 
 import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.util.ZorkaUtil;
 
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -62,7 +61,7 @@ public class ZorkaBshAgent implements ZorkaService {
 			return ""+interpreter.eval(expr);
 		} catch (EvalError e) {
 			log.error("Error evaluating '" + expr + "': ", e);
-			return ZorkaUtil.errorDump(e);
+			return ObjectDumper.errorDump(e);
 		}
 	}
 	

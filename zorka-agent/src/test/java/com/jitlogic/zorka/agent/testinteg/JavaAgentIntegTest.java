@@ -26,8 +26,8 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import com.jitlogic.zorka.agent.JavaAgent;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.agent.java.JavaAgent;
 
 public class JavaAgentIntegTest {
 
@@ -52,7 +52,7 @@ public class JavaAgentIntegTest {
 	public void setUp() throws Exception {
 		Thread.sleep(10);
 		String path = this.getClass().getResource("/conf").getPath();
-		System.setProperty("zorka.config.dir", path);
+		System.setProperty("zorka.home.dir", path);
 		JavaAgent.start();
 		Thread.sleep(10);
 	}

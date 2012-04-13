@@ -26,8 +26,6 @@ import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularType;
 
-import com.jitlogic.zorka.agent.ZorkaException;
-
 /**
  * 
  * @author rlewczuk

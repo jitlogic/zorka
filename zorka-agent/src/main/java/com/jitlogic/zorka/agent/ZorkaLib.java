@@ -30,13 +30,12 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
-import com.jitlogic.zorka.agent.mapbean.AttrGetter;
-import com.jitlogic.zorka.agent.mapbean.ValGetter;
-import com.jitlogic.zorka.agent.mapbean.ZorkaMappedMBean;
 import com.jitlogic.zorka.agent.rankproc.BeanRankLister;
 import com.jitlogic.zorka.agent.rankproc.ThreadRankLister;
+import com.jitlogic.zorka.mbeans.AttrGetter;
+import com.jitlogic.zorka.mbeans.ValGetter;
+import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
 import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.util.ZorkaUtil;
 
 
 /**
@@ -124,7 +123,7 @@ public class ZorkaLib implements ZorkaService {
 				}
 				if (args.size() > 3) {
 					for (Object arg : args.subList(3, args.size())) {
-						obj = ZorkaUtil.get(obj, arg);
+						obj = JmxResolver.get(obj, arg);
 					}
 				}
 				objs.add(obj);
@@ -221,7 +220,7 @@ public class ZorkaLib implements ZorkaService {
 		
 		if (args.size() > 3 && obj != null) {
 			for (Object arg : args.subList(3, args.size())) {
-				obj = ZorkaUtil.get(obj, arg);
+				obj = JmxResolver.get(obj, arg);
 			}
 		}
 		
@@ -267,7 +266,7 @@ public class ZorkaLib implements ZorkaService {
 	
 	private Object getAttr(Object obj, Object...args) {
 		for (Object arg : args) {
-			obj = ZorkaUtil.get(obj, arg);
+			obj = JmxResolver.get(obj, arg);
 		}
 		return obj;
 	}

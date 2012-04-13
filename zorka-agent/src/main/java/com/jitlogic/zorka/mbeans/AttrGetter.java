@@ -15,10 +15,27 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.mapbean;
+package com.jitlogic.zorka.mbeans;
 
-public interface ValGetter {
+import com.jitlogic.zorka.agent.JmxResolver;
+
+public class AttrGetter implements ValGetter {
+
+	private Object obj;
+	private String[] attrs;
 	
-	public Object get();
+	public AttrGetter(Object obj, String...attrs) {
+		this.obj = obj;
+		this.attrs = attrs;
+	}
 	
+	public Object get() {
+		Object v = obj;
+		
+		for (String attr : attrs)
+			v = JmxResolver.get(v, attr);
+		
+		return v;
+	}
+
 }

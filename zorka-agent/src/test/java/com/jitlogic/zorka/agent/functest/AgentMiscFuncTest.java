@@ -64,8 +64,7 @@ public class AgentMiscFuncTest {
 	public void testObjectDumper() throws Exception {
 		agent.svcStart();
 		Object obj = query("zorka.jmx('java','java.lang:type=Runtime')");
-		ObjectDumper dumper = new ObjectDumper();
-		String s = dumper.dump(obj);
+		String s = ObjectDumper.objectDump(obj);
 		System.out.println(s);
 	}
 	

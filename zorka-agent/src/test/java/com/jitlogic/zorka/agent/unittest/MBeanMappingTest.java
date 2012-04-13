@@ -21,8 +21,8 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import com.jitlogic.zorka.agent.mapbean.AttrGetter;
-import com.jitlogic.zorka.agent.mapbean.ZorkaMappedMBean;
+import com.jitlogic.zorka.mbeans.AttrGetter;
+import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
 
 public class MBeanMappingTest {
 

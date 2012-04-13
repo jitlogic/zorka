@@ -17,6 +17,9 @@
 
 package com.jitlogic.zorka.agent;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,16 +49,23 @@ public class ObjectDumper {
 	private static final int SCREEN_WIDTH = 120;
 	
 	
-	public ObjectDumper() {
+	private ObjectDumper() { }  // Ban instantiation of this class
+	
+	public static String errorDump(Throwable e) {
+		Writer rslt = new StringWriter();
+		PrintWriter pw = new PrintWriter(rslt);
+		e.printStackTrace(pw);
+		return e.getMessage() + "\n" + rslt;
 	}
 	
-	public String dump(Object obj) {
+
+	public static String objectDump(Object obj) {
 		StringBuilder sb = new StringBuilder();
 		serialize("", obj, sb, 0);
 		return sb.toString();
 	}
 	
-	private void serialize(String lead, Object obj, StringBuilder sb, int depth) {
+	private static void serialize(String lead, Object obj, StringBuilder sb, int depth) {
 		
 		if (obj == null) {
 			sb.append("null");
@@ -96,7 +106,7 @@ public class ObjectDumper {
 	} //serialize()
 	
 	
-	private void serializePojoObj(String lead, Object obj, StringBuilder sb,
+	private static void serializePojoObj(String lead, Object obj, StringBuilder sb,
 			int depth) {
 		sb.append("\n");
 		for (Method m : obj.getClass().getMethods()) {
@@ -119,7 +129,7 @@ public class ObjectDumper {
 	}
 	
 	
-	private void serializeTabularData(String lead, Object obj,
+	private static void serializeTabularData(String lead, Object obj,
 			StringBuilder sb, int depth) {
 		TabularData td = (TabularData)obj;
 		for (Object ksObj : td.keySet()) {
@@ -130,7 +140,7 @@ public class ObjectDumper {
 	}
 	
 	
-	private void serializeCompositeData(String lead, Object obj,
+	private static void serializeCompositeData(String lead, Object obj,
 			StringBuilder sb, int depth) {
 		CompositeData data = (CompositeData)obj;
 		CompositeType type = data.getCompositeType();
@@ -151,7 +161,7 @@ public class ObjectDumper {
 	}
 	
 	
-	private void serializeStats(String lead, Object obj, StringBuilder sb,
+	private static void serializeStats(String lead, Object obj, StringBuilder sb,
 			int depth) {
 		Stats stats = (Stats)obj;
 		for (Statistic s : stats.getStatistics()) {
@@ -162,7 +172,7 @@ public class ObjectDumper {
 	}
 	
 	
-	private void serializeMap(String lead, Object obj, StringBuilder sb,
+	private static void serializeMap(String lead, Object obj, StringBuilder sb,
 			int depth) {
 		Map<?,?> map = (Map<?,?>)obj;
 		sb.append("{");
@@ -177,7 +187,7 @@ public class ObjectDumper {
 	}
 	
 	
-	private void serializeCollection(String lead, Object obj, StringBuilder sb,
+	private static void serializeCollection(String lead, Object obj, StringBuilder sb,
 			int depth) {
 		Collection<?> col = (Collection<?>)obj;
 		sb.append("[");
@@ -191,7 +201,7 @@ public class ObjectDumper {
 	}
 	
 	
-	private void serializeJmxObject(String lead, Object obj, StringBuilder sb,
+	private static void serializeJmxObject(String lead, Object obj, StringBuilder sb,
 			int depth) {
 		JmxObject jmx = (JmxObject)obj;
 		sb.append(jmx.getName()); sb.append(":\n");
@@ -218,7 +228,7 @@ public class ObjectDumper {
 	}
 	
 	
-	private int checkNewLine(String lead, StringBuilder sb, int pos) {
+	private static int checkNewLine(String lead, StringBuilder sb, int pos) {
 		if (sb.length()-pos > SCREEN_WIDTH) {
 			sb.append("\n");
 			int rpos = sb.length();

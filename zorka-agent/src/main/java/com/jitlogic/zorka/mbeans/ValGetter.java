@@ -15,27 +15,10 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.mapbean;
+package com.jitlogic.zorka.mbeans;
 
-import com.jitlogic.zorka.util.ZorkaUtil;
-
-public class AttrGetter implements ValGetter {
-
-	private Object obj;
-	private String[] attrs;
+public interface ValGetter {
 	
-	public AttrGetter(Object obj, String...attrs) {
-		this.obj = obj;
-		this.attrs = attrs;
-	}
+	public Object get();
 	
-	public Object get() {
-		Object v = obj;
-		
-		for (String attr : attrs)
-			v = ZorkaUtil.get(v, attr);
-		
-		return v;
-	}
-
 }

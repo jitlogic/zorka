@@ -91,13 +91,13 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 		for (ObjectName on : names) {
 			try {
 				Object obj = attr0 != null ? conn.getAttribute(on, attr0) : new JmxObject(on, conn);
-				for (String attr : attrs) obj = ZorkaUtil.get(obj, attr);
+				for (String attr : attrs) obj = JmxResolver.get(obj, attr);
 				if (obj == null) { continue; }
 				String key = on.getKeyProperty(keyName);
 				if (mask != null) {
 					for (String k2 : ZorkaUtil.listAttrNames(obj)) {
 						if (k2.matches(mask)) {
-							lst.add(new BeanRankInfo(key + "." + k2, ZorkaUtil.get(obj, k2)));
+							lst.add(new BeanRankInfo(key + "." + k2, JmxResolver.get(obj, k2)));
 						}
 					}
 				} else {
@@ -122,8 +122,8 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 		Object[] v = item.getValues();
 		v[0] = info.getName();
 		v[1] = tstamp;
-		v[2] = ZorkaUtil.get(info.getValue(), nominalAttr); // TODO coerce to long 
-		v[3] = ZorkaUtil.get(info.getValue(), dividerAttr); // TODO coerce to long 
+		v[2] = JmxResolver.get(info.getValue(), nominalAttr); // TODO coerce to long 
+		v[3] = JmxResolver.get(info.getValue(), dividerAttr); // TODO coerce to long 
 	}
 	
 }

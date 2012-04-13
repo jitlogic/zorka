@@ -18,29 +18,23 @@
 package com.jitlogic.zorka.util;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.management.j2ee.statistics.Stats;
-import javax.management.openmbean.CompositeData;
 
-import com.jitlogic.zorka.agent.JmxObject;
 
 public class ZorkaUtil {
 	
-	private final static ZorkaLogger log = ZorkaLogger.getLogger(ZorkaUtil.class);
+	public final static ZorkaLogger log = ZorkaLogger.getLogger(ZorkaUtil.class);
 	
 	protected static ZorkaUtil instance;
 	
@@ -53,28 +47,6 @@ public class ZorkaUtil {
 	}
 	
 	protected ZorkaUtil() {
-	}
-	
-	public static void loadProps(String urlpath, Properties props) {
-		InputStream is = null;
-		try {
-			if (urlpath.startsWith("classpath://")) {
-				is = ZorkaUtil.class.getResourceAsStream(urlpath.substring(12));
-			} else if (urlpath.startsWith("file://")) {
-				is = new FileInputStream(urlpath.substring(7));
-			} else {
-				URL url = new URL(urlpath);
-				is = url.openStream();
-			}
-			props.load(is);
-		} catch (IOException e) {
-			log.error("I/O error while reading properties file '" 
-					+ urlpath + "': " + e.getMessage(), e);
-		} finally {
-			if (is != null) {
-				try { is.close(); } catch (IOException e) { }
-			}
-		}
 	}
 	
 	public static String readText(InputStream is) throws IOException {
@@ -95,19 +67,7 @@ public class ZorkaUtil {
 		
 		return sb.toString();
 	}
-	
-	public static String errorDump(Throwable e) {
-		Writer rslt = new StringWriter();
-		PrintWriter pw = new PrintWriter(rslt);
-		e.printStackTrace(pw);
-		return e.getMessage() + "\n" + rslt;
-	}
-	
-	
-	public static String objectDump(Object o) {
-		// TODO zrobić poprawną introspekcję tutaj 
-		return ""+o;
-	}
+
 	
 	public static Object coerce(Object obj, Class<?> c) {
 		
@@ -166,54 +126,6 @@ public class ZorkaUtil {
 
 	
 	// TODO przenieść do dedykowanego obiektu i zrefaktorować
-	public static Object get(Object obj, Object key) {
-		if (obj == null) {
-			return null;
-		} else if (obj instanceof Map<?, ?>) {
-			return ((Map<?,?>)obj).get(key);
-		} else if (obj instanceof List<?>) {
-			Integer idx = (Integer)coerce(key, Integer.class);
-			return idx != null ? ((List<?>)obj).get(idx) : null;
-		} else if (obj.getClass().isArray()) {
-			Integer idx = (Integer)coerce(key, Integer.class);
-			return idx != null ? ((Object[])obj)[idx] : null;
-		} else if (obj instanceof CompositeData) {
-			return ((CompositeData)obj).get(""+key);
-		} else if (obj instanceof Stats){
-			return ((Stats)obj).getStatistic(""+key);
-		} else if (obj instanceof JmxObject) {
-			return ((JmxObject)obj).get(key);
-		} 
-		
-		if (key instanceof String) {
-			String name = (String)key;
-			Class<?> clazz = obj.getClass();
-			
-			// Try getter method (if any)
-			Method m = lookupGetter(clazz, name);
-			if (m != null) {
-				try {
-					return m.invoke(obj);
-				} catch (Exception e) {
-					log.error("Method '" + m.getName() + "' invocation failed", e);
-					return null;
-				}
-			}
-			
-			// Try field (if any)
-			try {
-				Field field = clazz.getField(name);
-				return field.get(name);
-			} catch (Exception e) {
-				log.error("Field '" + name + "' fetch failed", e);
-				return null;
-			}
-		}
-			
-		return null;
-	}
-	
-	// TODO przenieść do dedykowanego obiektu i zrefaktorować
 	public static List<String> listAttrNames(Object obj) {
 		List<String> lst = new ArrayList<String>();
 		if (obj instanceof Map) {
@@ -248,6 +160,5 @@ public class ZorkaUtil {
 			|| a != null && a.equals(b);
 	}
 	
-	private static boolean fullStackDumps = true;
 	
 }

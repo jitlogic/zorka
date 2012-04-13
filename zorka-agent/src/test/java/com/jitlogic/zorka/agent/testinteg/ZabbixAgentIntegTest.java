@@ -22,7 +22,6 @@ import static org.junit.Assert.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
-import java.util.Properties;
 import java.util.concurrent.Executors;
 
 import org.junit.After;
@@ -30,9 +29,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.agent.ZorkaLib;
 import com.jitlogic.zorka.agent.zabbix.ZabbixAgent;
 import com.jitlogic.zorka.agent.zabbix.ZabbixRequestHandler;
+import com.jitlogic.zorka.util.ZorkaConfig;
 
 public class ZabbixAgentIntegTest {
 
@@ -59,9 +58,9 @@ public class ZabbixAgentIntegTest {
 	@Before
 	public void setUp() throws Exception {
 		agent = new ZorkaBshAgent(Executors.newSingleThreadExecutor());
-		Properties props = new Properties();
-		props.setProperty("listen_port", "10066");
-		service = new ZabbixAgent(props, agent);
+		ZorkaConfig.put("zabbix.listen.addr", "127.0.0.1");
+		ZorkaConfig.put("zabbix.listen.port", "10066");
+		service = new ZabbixAgent(agent);
 		service.start();
 	}
 	

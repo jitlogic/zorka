@@ -23,9 +23,9 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Properties;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
+import com.jitlogic.zorka.util.ZorkaConfig;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 public class ZabbixAgent implements Runnable {
@@ -42,14 +42,14 @@ public class ZabbixAgent implements Runnable {
 	
 	private ServerSocket socket;
 		
-	public ZabbixAgent(Properties props, ZorkaBshAgent agent) {
-		this.addr = props.getProperty("listen_addr", "0.0.0.0");
+	public ZabbixAgent(ZorkaBshAgent agent) {
+		this.addr = ZorkaConfig.get("zabbix.listen.addr", "0.0.0.0");
 		this.agent = agent;
 		try {
-			port = Integer.parseInt(props.getProperty("listen_port", "10055"));
+			port = Integer.parseInt(ZorkaConfig.get("zabbix.listen.port", "10055"));
 		} catch (Exception e) {
 			log.error("Invalid 'listen_port' setting in zabbix.properties file. Was '" +
-						props.getProperty("listen_port", "10055") + "', should be integer.");
+						ZorkaConfig.get("zorka.listen.port", "10055") + "', should be integer.");
 		}
 	}
 	
