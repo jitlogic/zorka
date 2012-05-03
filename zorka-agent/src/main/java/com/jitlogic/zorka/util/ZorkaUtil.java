@@ -21,9 +21,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -160,5 +157,14 @@ public class ZorkaUtil {
 			|| a != null && a.equals(b);
 	}
 	
-	
+	public static String join(String sep, Object...vals) {
+		StringBuilder sb = new StringBuilder();
+		
+		for (Object val : vals) {
+			if (sb.length() > 0) sb.append(sep);
+			sb.append(val != null ? val.toString() : "null");
+		}
+		
+		return sb.toString();
+	}
 }

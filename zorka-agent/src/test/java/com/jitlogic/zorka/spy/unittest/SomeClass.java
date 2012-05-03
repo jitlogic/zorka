@@ -20,4 +20,8 @@ public class SomeClass {
 		TestUtil.sleep(waitTime);
 		errorMethod();
 	}
+	
+	public void singleArgMethod(String arg1) {
+		TestUtil.sleep(waitTime);
+	}
 }

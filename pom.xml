@@ -23,7 +23,6 @@
 
     <modules>
         <module>zorka-agent</module>
-        <module>zorka-agent-java</module>
     </modules>
 
 </project>

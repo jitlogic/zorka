@@ -357,7 +357,7 @@ public class ZorkaLib implements ZorkaService {
 		tl.newAttr("block15", "Blokced time percentage 15-minute average", 5*60000, 100, "blockedTime", "tstamp");
 		
 		for (String attr : new String[]{ "cpu1", "cpu5", "cpu15", "block1", "block5", "block15" }) { 
-			bean.add(attr, tl.newList(attr, attr, size));
+			bean.put(attr, tl.newList(attr, attr, size));
 		}
 		
 		agent.svcAdd(tl);
@@ -387,7 +387,7 @@ public class ZorkaLib implements ZorkaService {
 		bl.newAttr("avg15", "15-minute average", 15*60000, 1, nominalAttr, dividerAttr);
 		
 		for (String attr : new String[]{ "avg1", "avg5", "avg15" }) {
-			bean.add(attrs,  bl.newList(attr, attr, size));
+			bean.put(attrs,  bl.newList(attr, attr, size));
 		}
 		
 		return bean;

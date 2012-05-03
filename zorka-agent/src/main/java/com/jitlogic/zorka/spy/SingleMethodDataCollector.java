@@ -5,12 +5,12 @@ import org.objectweb.asm.MethodVisitor;
 
 import com.jitlogic.zorka.mbeans.MethodCallStatisticImpl;
 
-public class SimpleDataCollector implements DataCollector {
+public class SingleMethodDataCollector implements DataCollector {
 
 	private long id = -1L;
 	private MethodCallStatisticImpl mcs;
 	
-	public SimpleDataCollector(MethodCallStatisticImpl mcs) {
+	public SingleMethodDataCollector(MethodCallStatisticImpl mcs) {
 		this.mcs = mcs;
 		this.id = MainCollector.register(this);
 	}
@@ -20,10 +20,12 @@ public class SimpleDataCollector implements DataCollector {
 	}
 
 	public void logCall(long tst, CallInfo info) {
+		// TODO wyrugować System.nanoTime() ? 
 		mcs.logCall(tst, System.nanoTime()-info.getTst());
 	}
 
 	public void logError(long tst, CallInfo info) {
+		// TODO wyrugować System.nanoTime() ? 
 		mcs.logError(tst, System.nanoTime()-info.getTst());
 	}
 

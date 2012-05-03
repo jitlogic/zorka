@@ -19,11 +19,11 @@ public class MainCollector {
 	
 	
 	public static void logStart(long id) {
-		logStart(id, null);
+		logStart(null, id);
 	}
 	
 	
-	public static void logStart(long id, Object[] args) {
+	public static void logStart(Object[] args, long id) {
 		DataCollector collector = collectors.get(id);
 		if (collector != null) {
 			CallInfo ci = collector.logStart(id, System.nanoTime(), args);

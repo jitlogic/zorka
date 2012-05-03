@@ -36,31 +36,31 @@ public class MBeanMappingTest {
 	
 	@Test
 	public void testMapConstantAttr() throws Exception {
-		bean.add("test", 1L);
+		bean.put("test", 1L);
 		assertEquals(1L, bean.getAttribute("test"));
 	}
 	
 	
 	@Test
 	public void testMapGetterAttr() throws Exception {
-		bean.add("test", new AttrGetter(this, "class"));
+		bean.put("test", new AttrGetter(this, "class"));
 		assertSame(this.getClass(), bean.getAttribute("test"));
 	}
 	
 	
 	@Test
 	public void testMapGetterMultiAttr() throws Exception {
-		bean.add("test", new AttrGetter(this, "class", "name", "length"));
+		bean.put("test", new AttrGetter(this, "class", "name", "length"));
 		
 	}
 	
 	
 	@Test
 	public void testMapGetterWithInterimChange() throws Exception {
-		bean.add("test", 1L);
+		bean.put("test", 1L);
 		assertEquals(1L, bean.getAttribute("test"));
 		
-		bean.add("boo", 2L);
+		bean.put("boo", 2L);
 		assertEquals(2L, bean.getAttribute("boo"));
 	}
 }

@@ -150,7 +150,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
 		return mbeanInfo;
 	}
 
-	public synchronized void add(String name, Object value) {
+	public synchronized void put(String name, Object value) {
 		try {
 			Attribute attr = new Attribute(name, value);
 			setAttribute(attr);
@@ -159,6 +159,10 @@ public class ZorkaMappedMBean implements DynamicMBean {
 		}
 	}
 	
+	public synchronized Object get(String name) {
+		Attribute attr = attrs.get(name);
+		return attr != null ? attr.getValue() : null;
+	}
 	
 	public synchronized boolean hasAttribute(String name) {
 		return attrs.containsKey(name);

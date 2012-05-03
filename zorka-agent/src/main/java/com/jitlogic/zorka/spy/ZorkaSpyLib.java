@@ -1,6 +1,9 @@
 package com.jitlogic.zorka.spy;
 
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import javax.management.Attribute;
 
 import com.jitlogic.zorka.agent.JmxObject;
@@ -54,12 +57,35 @@ public class ZorkaSpyLib {
 		
 		return (MethodCallStats)obj;
 	}
-	
+
 	
 	public void simple(String className, String methodName, String beanName, String attrName) {
 		MethodCallStats mcs = getStats(beanName, attrName);
 		MethodCallStatisticImpl st = mcs.getMethodCallStat(methodName);
-		DataCollector collector = new SimpleDataCollector(st);
+		DataCollector collector = new SingleMethodDataCollector(st);
+		MethodTemplate mt = new MethodTemplate(className, methodName, null, collector);
+		spy.addTemplate(mt);
+	}
+	
+	
+	public void byArgs(String className, String methodName, String beanName, String attrName, int arg1) {
+		byArgv(className, methodName, beanName, attrName, arg1);
+	}
+	
+	
+	public void byArgs(String className, String methodName, String beanName, String attrName, int arg1, int arg2) {
+		byArgv(className, methodName, beanName, attrName, arg1, arg2);
+	}
+	
+	
+	public void byArg3(String className, String methodName, String beanName, String attrName, int arg1, int arg2, int arg3) {
+		byArgv(className, methodName, beanName, attrName, arg1, arg2, arg3);
+	}
+	
+	
+	private void byArgv(String className, String methodName, String beanName, String attrName, int...args) {
+		MethodCallStats mcs = getStats(beanName, attrName);
+		DataCollector collector = new MultiMethodDataCollector(mcs, ".", args);
 		MethodTemplate mt = new MethodTemplate(className, methodName, null, collector);
 		spy.addTemplate(mt);
 	}
