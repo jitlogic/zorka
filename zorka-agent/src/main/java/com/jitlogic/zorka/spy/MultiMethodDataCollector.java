@@ -1,29 +1,36 @@
 package com.jitlogic.zorka.spy;
 
+import java.util.List;
+
 import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
 
 import com.jitlogic.zorka.mbeans.MethodCallStatisticImpl;
 import com.jitlogic.zorka.mbeans.MethodCallStats;
-import com.jitlogic.zorka.util.ZorkaUtil;
 
 public class MultiMethodDataCollector implements DataCollector {
 
 	private MethodCallStats mcs;
 	private long id = -1L;
-	private String separator;
-	int[] args;
+	private SpyExpression expr;
+	private int[] args;
 	
-	public MultiMethodDataCollector(MethodCallStats mcs, String separator, int[] args) {
+	
+	public MultiMethodDataCollector(MethodCallStats mcs, SpyExpression expr) {
 		this.mcs = mcs;
-		this.args = args;
-		this.separator = separator;
 		this.id = MainCollector.register(this);
+		this.expr = expr;
+		
+		List<Integer> argMap = expr.getArgMap();
+		args = new int[argMap.size()];
+		
+		for (int i = 0; i < args.length; i++)
+			args[i] = argMap.get(i);
 	}
 	
 	
-	public CallInfo logStart(long id, long tst, Object[] args) {
-		return new CallInfo(id, tst, ZorkaUtil.join(separator, args));
+	public CallInfo logStart(long id, long tst, Object[] vals) {
+		return new CallInfo(id, tst, expr.format(vals));
 	}
 	
 	

@@ -24,4 +24,12 @@ public class SomeClass {
 	public void singleArgMethod(String arg1) {
 		TestUtil.sleep(waitTime);
 	}
+	
+	public void twoArgMethod(String arg1, String arg2) {
+		TestUtil.sleep(waitTime);
+	}
+
+	public void threeArgMethod(String arg1, String arg2, String arg3) {
+		TestUtil.sleep(waitTime);
+	}
 }

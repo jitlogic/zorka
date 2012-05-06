@@ -53,4 +53,7 @@ public class MethodCallStats implements Stats {
 		return ret;
 	}
 
+	public synchronized void clear() {
+		stats.clear();
+	}
 }

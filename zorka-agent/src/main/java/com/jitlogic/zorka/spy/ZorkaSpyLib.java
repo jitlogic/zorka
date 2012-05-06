@@ -1,9 +1,6 @@
 package com.jitlogic.zorka.spy;
 
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import javax.management.Attribute;
 
 import com.jitlogic.zorka.agent.JmxObject;
@@ -20,13 +17,13 @@ public class ZorkaSpyLib {
 	private static final ZorkaLogger log = ZorkaLogger.getLogger(ZorkaSpyLib.class);
 	
 	
-	private ZorkaBshAgent agent;
+	//private ZorkaBshAgent agent;
 	private ZorkaSpy spy;
 	private ZorkaLib lib;
 	
 	
 	public ZorkaSpyLib(ZorkaBshAgent agent) {
-		this.agent = agent;
+		//this.agent = agent;
 		this.lib = agent.getZorkaLib();
 		spy = new ZorkaSpy();
 	}
@@ -66,36 +63,11 @@ public class ZorkaSpyLib {
 		MethodTemplate mt = new MethodTemplate(className, methodName, null, collector);
 		spy.addTemplate(mt);
 	}
+		
 	
-	
-	public void byArgs(String className, String methodName, String beanName, String attrName, int arg1) {
-		byArgv(className, methodName, beanName, attrName, arg1);
-	}
-	
-	
-	public void byArgs(String className, String methodName, String beanName, String attrName, int arg1, int arg2) {
-		byArgv(className, methodName, beanName, attrName, arg1, arg2);
-	}
-	
-	
-	public void byArg(String className, String methodName, String beanName, String attrName, int arg1, int arg2, int arg3) {
-		byArgv(className, methodName, beanName, attrName, arg1, arg2, arg3);
-	}
-	
-	
-	public void byArg(String className, String methodName, String beanName, String attrName, int arg1, int arg2, int arg3, int arg4) {
-		byArgv(className, methodName, beanName, attrName, arg1, arg2, arg3, arg4);
-	}
-
-	
-	public void byArg(String className, String methodName, String beanName, String attrName, int arg1, int arg2, int arg3, int arg4, int arg5) {
-		byArgv(className, methodName, beanName, attrName, arg1, arg2, arg3, arg4, arg5);
-	}
-	
-	
-	private void byArgv(String className, String methodName, String beanName, String attrName, int...args) {
+	public void simple(String className, String methodName, String beanName, String attrName, String expr) {
 		MethodCallStats mcs = getStats(beanName, attrName);
-		DataCollector collector = new MultiMethodDataCollector(mcs, ".", args);
+		DataCollector collector = new MultiMethodDataCollector(mcs, SpyExpression.parse(expr));
 		MethodTemplate mt = new MethodTemplate(className, methodName, null, collector);
 		spy.addTemplate(mt);
 	}
