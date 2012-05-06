@@ -32,7 +32,6 @@ import javax.management.openmbean.SimpleType;
 import javax.management.openmbean.TabularType;
 
 import com.jitlogic.zorka.agent.ZorkaService;
-import com.jitlogic.zorka.agent.rateproc.RateAggregate;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 

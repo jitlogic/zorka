@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.rateproc;
+package com.jitlogic.zorka.agent.rankproc;
 
 import java.util.LinkedList;
 

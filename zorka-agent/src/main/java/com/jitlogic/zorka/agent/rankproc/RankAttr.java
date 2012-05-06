@@ -17,7 +17,6 @@
 
 package com.jitlogic.zorka.agent.rankproc;
 
-import com.jitlogic.zorka.agent.rateproc.RateAggregate;
 
 public class RankAttr<K,V> {
 
