@@ -78,8 +78,18 @@ public class ZorkaSpyLib {
 	}
 	
 	
-	public void byArg3(String className, String methodName, String beanName, String attrName, int arg1, int arg2, int arg3) {
+	public void byArg(String className, String methodName, String beanName, String attrName, int arg1, int arg2, int arg3) {
 		byArgv(className, methodName, beanName, attrName, arg1, arg2, arg3);
+	}
+	
+	
+	public void byArg(String className, String methodName, String beanName, String attrName, int arg1, int arg2, int arg3, int arg4) {
+		byArgv(className, methodName, beanName, attrName, arg1, arg2, arg3, arg4);
+	}
+
+	
+	public void byArg(String className, String methodName, String beanName, String attrName, int arg1, int arg2, int arg3, int arg4, int arg5) {
+		byArgv(className, methodName, beanName, attrName, arg1, arg2, arg3, arg4, arg5);
 	}
 	
 	

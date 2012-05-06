@@ -157,6 +157,23 @@ public class ZorkaUtil {
 			|| a != null && a.equals(b);
 	}
 	
+	public static boolean arrayEquals(Object[] a, Object[] b) {
+		
+		if (a == null || b == null) {
+			return a == null && b == null;
+		}
+		
+		if (a.length != b.length) {
+			return false;
+		}
+		
+		for (int i = 0; i < a.length; i++)
+			if (!objEquals(a[i], b[i]))
+				return false;
+		
+		return true;
+	}
+	
 	public static String join(String sep, Object...vals) {
 		StringBuilder sb = new StringBuilder();
 		
