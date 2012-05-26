@@ -38,16 +38,8 @@ public class SimpleMethodsTest {
 	
 	@Test
 	public void testTrivialMethod() throws Exception {
-		lib.simple("com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod", 
-					"zorka:type=ZorkaStats,name=SomeClass", "stats");
-		
-		Object obj = TestUtil.instrumentAndInstantiate(spy, 
-					"com.jitlogic.zorka.spy.unittest.SomeClass");
-		
-		assertNotNull(obj);
-		
-		TestUtil.callMethod(obj, "someMethod");
-		
+		Object obj = makeCall("someMethod");		
+		assertEquals(1, obj.getClass().getField("runCounter").get(obj));
 		checkStats("someMethod", 1, 0, 1);
 	}
 	
@@ -99,6 +91,29 @@ public class SimpleMethodsTest {
 		}
 
 		checkStats("indirectErrorMethod", 1, 1, 2);		
+	}
+	
+	
+	@Test
+	public void testInstrumentTryCatchFinallyMethod() throws Exception {
+		Object obj = makeCall("tryCatchFinallyMethod", "OKAU");
+		assertEquals(1, obj.getClass().getField("runCounter").get(obj));
+		assertEquals(1, obj.getClass().getField("finCounter").get(obj));
+		checkStats("tryCatchFinallyMethod", 1, 0, 1);
+	}
+	
+	
+	private Object makeCall(String method, Object...args) throws Exception {
+		
+		lib.simple("com.jitlogic.zorka.spy.unittest.SomeClass", method, 
+				"zorka:type=ZorkaStats,name=SomeClass", "stats");
+		
+		Object obj = TestUtil.instrumentAndInstantiate(spy, 
+				"com.jitlogic.zorka.spy.unittest.SomeClass");
+
+		TestUtil.callMethod(obj, method, args);
+		
+		return obj;
 	}
 	
 	

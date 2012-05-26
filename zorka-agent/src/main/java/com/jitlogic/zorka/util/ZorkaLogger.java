@@ -37,9 +37,11 @@ public class ZorkaLogger {
 	
 	private Logger log;
 	private boolean logExceptions;
+	private boolean doTrace;
 	
 	private ZorkaLogger(String name) {
 		logExceptions = "yes".equalsIgnoreCase(ZorkaConfig.get("zorka.log.exceptions", "yes"));
+		doTrace = "yes".equalsIgnoreCase(ZorkaConfig.get("zorka.log.trace", "no"));
 		log = Logger.getLogger(name);
 		log.setLevel(Level.parse(ZorkaConfig.get("zorka.log.level", "ALL")));
 		try {
@@ -84,5 +86,9 @@ public class ZorkaLogger {
 		} else {
 			log.log(Level.WARNING, msg);
 		}
+	}
+	
+	public boolean isTrace() {
+		return doTrace;
 	}
 }

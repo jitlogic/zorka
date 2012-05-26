@@ -44,7 +44,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Premain-Class>com.jitlogic.zorka.agent.GenericAgent</Premain-Class>
+                            <Premain-Class>com.jitlogic.zorka.agent.JavaAgent</Premain-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                         </manifestEntries>

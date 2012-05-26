@@ -26,6 +26,9 @@ import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularType;
 
+import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
+import com.jitlogic.zorka.util.ZorkaLogger;
+
 /**
  * 
  * @author rlewczuk
@@ -33,6 +36,8 @@ import javax.management.openmbean.TabularType;
  */
 public class RankList<K,T> implements TabularData {
 
+	private static ZorkaLogger log = ZorkaLogger.getLogger(RankList.class);
+	
 	private String listName;
 	private String attrName;
 	private int size;
@@ -68,7 +73,11 @@ public class RankList<K,T> implements TabularData {
 	
 	@SuppressWarnings("unchecked")
 	public void refresh(RankItem<K,T>[] items) {
+		
 		int sz = items.length > size ? size : items.length;
+		
+		if (log.isTrace())
+			log.trace("RankList.rerank(size=" + sz + ")");
 		
 		 RankItem<K,T>[] newItems = new RankItem[sz];
 		 
@@ -81,6 +90,8 @@ public class RankList<K,T> implements TabularData {
 	
 	
 	public TabularType getTabularType() {
+		if (log.isTrace())
+			log.trace("getTabularType()");
 		return tabularType;
 	}
 	
@@ -97,7 +108,9 @@ public class RankList<K,T> implements TabularData {
 
 	
 	public int size() {
-		return items != null ? items.length : 0;
+		int sz = items != null ? items.length : 0;
+		log.trace("Returning size:" + sz);
+		return sz;
 	}
 	
 	
@@ -180,6 +193,9 @@ public class RankList<K,T> implements TabularData {
 		return Arrays.asList(items);
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "RankList(size=" + size + ")";
+	}
 	
 }

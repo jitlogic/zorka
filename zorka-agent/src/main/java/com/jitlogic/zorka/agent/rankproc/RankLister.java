@@ -210,6 +210,8 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 		try {
 			type = new CompositeType("com.jitlogic.zorka.threadproc.ThreadItem", 
 				"Thread statistic.", newAttr, newDesc, newType);
+			if (log.isTrace())
+				log.trace("Creating composite type: " + type);
 		} catch (OpenDataException e) {
 			// TODO to sie bedzie mscilo w innych czesciach kodu - tutaj musimy sypnac jakims wyjatkiem
 			log.error("Error creating CompositeType for thread lister", e);
@@ -218,6 +220,8 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 		String[] index = { "id" };
 		try {
 			tabularType = new TabularType("ThreadList", "Thread Ranking List", type, index);
+			if (log.isTrace())
+				log.trace("Creating tabular type: " + type);
 		} catch (OpenDataException e) {
 			// TODO to sie bedzie mscilo w innych czesciach kodu - tutaj musimy sypnac jakims wyjatkiem
 			log.error("Error creating TabularType for thread lister", e);
@@ -312,10 +316,18 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 		while (running) {
 			try {
 				long tstamp = util.currentTimeMillis();
+				
+				if (log.isTrace())
+					log.trace("Running one cycle: t=" + tstamp);
+				
 				runCycle(tstamp);
-			
+				
 				long ts1 = updateInterval-tstamp+lastUpdate;
 				long ts2 = rerankInterval-tstamp+lastRerank;
+				
+				if (log.isTrace())
+					log.trace("Next cycle: ts1=" + ts1 + ", ts2=" + ts2);
+				
 				long ts = ts1 < ts2 ? ts1 : ts2;
 				if (ts > 0) {
 					Thread.sleep(ts);
@@ -338,7 +350,7 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 		}
 		if (tstamp-lastRerank >= rerankInterval) {
 			rerank(tstamp);
-			lastUpdate = tstamp;
+			lastRerank = tstamp;
 		}		
 	}
 		

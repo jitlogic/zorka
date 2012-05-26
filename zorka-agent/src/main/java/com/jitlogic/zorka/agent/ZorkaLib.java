@@ -341,7 +341,8 @@ public class ZorkaLib implements ZorkaService {
 	// TODO move this to "initialization library" script (?)
 	public ZorkaMappedMBean threadRanking(String name, String desc, int size, long rerankInterval) {
 		long updateInterval = 15000;
-		String bname = "zorka.jvm:name = " + name + ",type=ThreadMonitor,updateInterval=" + updateInterval + ",rerankInterval=" + rerankInterval;
+		//String bname = "zorka.jvm:name = " + name + ",type=ThreadMonitor,updateInterval=" + updateInterval + ",rerankInterval=" + rerankInterval;
+		String bname = name;
 		
 		ZorkaMappedMBean bean = (ZorkaMappedMBean)jmx("java", bname, "this"); 
 		if (bean != null) { return bean; }

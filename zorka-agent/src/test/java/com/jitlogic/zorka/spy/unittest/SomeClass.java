@@ -6,9 +6,13 @@ public class SomeClass {
 	
 	public long waitTime = 1L;
 	
+	public int finCounter = 0;
+	public int errCounter = 0;
+	public int runCounter = 0;
+	
 	public void someMethod() {
 		TestUtil.sleep(waitTime);
-		//i++;
+		runCounter++;
 	}
 	
 	public void errorMethod() throws TestException {
@@ -31,5 +35,18 @@ public class SomeClass {
 
 	public void threeArgMethod(String arg1, String arg2, String arg3) {
 		TestUtil.sleep(waitTime);
+	}
+	
+	public void tryCatchFinallyMethod(String arg) {
+		try {
+			TestUtil.sleep(1);
+			if (arg.startsWith("ERR"))
+				throw new Exception(arg);
+			runCounter++;
+		} catch (Exception e) {
+			errCounter++;
+		} finally {
+			finCounter++;
+		}
 	}
 }

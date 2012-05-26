@@ -34,10 +34,15 @@ import javax.management.MBeanNotificationInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.ReflectionException;
 
+import com.jitlogic.zorka.agent.rankproc.RankLister;
+import com.jitlogic.zorka.util.ZorkaLogger;
+
 // TODO proper structure for supporting parallelism (in somewhat more elegant way)
 
 public class ZorkaMappedMBean implements DynamicMBean {
 
+	private static ZorkaLogger log = ZorkaLogger.getLogger(ZorkaMappedMBean.class);
+	
 	private String description;
 	private Map<String,Attribute> attrs = new HashMap<String, Attribute>();
 	
@@ -62,7 +67,14 @@ public class ZorkaMappedMBean implements DynamicMBean {
 		
 		Object v = attrs.get(attribute).getValue();
 		
-		return v instanceof ValGetter ? ((ValGetter)v).get() : v;
+		if (v instanceof ValGetter) {
+			v = ((ValGetter)v).get();
+			log.debug("Returning ValGetter value: " + v);
+			return v;
+		} else {
+			log.debug("Returning value: " + v);
+			return v;
+		}
 	}
 	
 	
