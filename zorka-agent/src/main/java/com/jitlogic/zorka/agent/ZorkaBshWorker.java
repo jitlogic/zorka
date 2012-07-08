@@ -17,7 +17,10 @@
 
 package com.jitlogic.zorka.agent;
 
-public class ZorkaBshWorker implements Runnable {
+import java.io.Closeable;
+import java.io.IOException;
+
+public class ZorkaBshWorker implements Runnable, Closeable {
 
 	private final ZorkaBshAgent agent;
 	private final String expr;
@@ -36,4 +39,8 @@ public class ZorkaBshWorker implements Runnable {
 			callback.handleError(e);
 		} 
 	}
+
+    public void close() throws IOException {
+        callback.handleError(new RuntimeException("Request timed out."));
+    }
 }

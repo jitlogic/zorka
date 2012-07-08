@@ -183,10 +183,15 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 	public void handleResult(Object rslt) {
 		try {
 			send(rslt != null ? rslt.toString() : ZBX_NOTSUPPORTED);
-			socket.close();
 		} catch (IOException e) {
 			log.error("I/O error returning result: " + e.getMessage());
-		}
+		} finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                log.error("I/O error closing socker.", e);
+            }
+        }
 	}
 	
 	
@@ -194,9 +199,14 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 		try {
 			log.error("Error processing request", e);
 			send(ZBX_NOTSUPPORTED);
-			socket.close();
 		} catch (IOException e1) {
 			log.error("I/O Error returning (error) result: " + e.getMessage());
-		}
+		} finally {
+            try {
+                socket.close();
+            } catch (IOException e2) {
+                log.error("I/O error closing socker.", e2);
+            }
+        }
 	}
 }

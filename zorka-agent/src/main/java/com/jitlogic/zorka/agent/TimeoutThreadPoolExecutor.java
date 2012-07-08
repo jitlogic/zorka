@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.agent;
 
+import java.io.Closeable;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -106,7 +107,7 @@ public class TimeoutThreadPoolExecutor extends ThreadPoolExecutor {
     	//System.err.println("beforeExecute()");
         if(timeout > 0) {
             final ScheduledFuture<?> scheduled = timeoutExecutor.schedule(
-            		new TimeoutTask(t), timeout, timeoutUnit);
+            		new TimeoutTask(t, r), timeout, timeoutUnit);
             runningTasks.put(r, scheduled);
         }
     }
@@ -124,9 +125,11 @@ public class TimeoutThreadPoolExecutor extends ThreadPoolExecutor {
     
     class TimeoutTask implements Runnable {
         private final Thread thread;
+        private final Runnable task;
 
-        public TimeoutTask(Thread thread) {
+        public TimeoutTask(Thread thread, Runnable task) {
             this.thread = thread;
+            this.task = task;
         }
 
         @SuppressWarnings("deprecation")
@@ -136,8 +139,15 @@ public class TimeoutThreadPoolExecutor extends ThreadPoolExecutor {
             try {
             	Thread.sleep(killTimeout);
             	// If thread did not finish, kill it forcibly (not safe)
-            	if (thread.isAlive()) 
+            	if (thread.isAlive()) {
             		thread.stop();
+                    if (task instanceof Closeable)
+                    try {
+                        ((Closeable)task).close();
+                    } catch (Exception e) {
+                        // TODO log something here ?
+                    }
+                }
             } catch (InterruptedException e) {
             	
             }
