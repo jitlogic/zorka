@@ -33,6 +33,8 @@ public class ZabbixAgent implements Runnable {
 	private static ZorkaLogger log = ZorkaLogger.getLogger(ZabbixAgent.class);
 	
 	private volatile ZorkaBshAgent agent;
+
+    private ZabbixLib zabbixLib;
 	
 	private String addr;
 	private int port = 10055;
@@ -45,6 +47,10 @@ public class ZabbixAgent implements Runnable {
 	public ZabbixAgent(ZorkaBshAgent agent) {
 		this.addr = ZorkaConfig.get("zabbix.listen.addr", "0.0.0.0");
 		this.agent = agent;
+        this.zabbixLib = new ZabbixLib(agent, agent.getZorkaLib());
+
+        this.agent.installModule("zabbix", zabbixLib);
+
 		try {
 			port = Integer.parseInt(ZorkaConfig.get("zabbix.listen.port", "10055"));
 		} catch (Exception e) {

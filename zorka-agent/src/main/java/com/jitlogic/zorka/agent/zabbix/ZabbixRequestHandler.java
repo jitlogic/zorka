@@ -25,6 +25,9 @@ import java.net.Socket;
 
 import com.jitlogic.zorka.agent.ZorkaCallback;
 import com.jitlogic.zorka.util.ZorkaLogger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONAware;
+import org.json.simple.JSONObject;
 
 public class ZabbixRequestHandler implements ZorkaCallback {
 
@@ -182,7 +185,7 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 	
 	public void handleResult(Object rslt) {
 		try {
-			send(rslt != null ? rslt.toString() : ZBX_NOTSUPPORTED);
+			send(serialize(rslt));
 		} catch (IOException e) {
 			log.error("I/O error returning result: " + e.getMessage());
 		} finally {
@@ -193,9 +196,16 @@ public class ZabbixRequestHandler implements ZorkaCallback {
             }
         }
 	}
-	
-	
-	public void handleError(Throwable e) {
+
+    private String serialize(Object obj) {
+        if (obj instanceof JSONAware) {
+            return ((JSONAware)obj).toJSONString();
+        }
+        return obj != null ? obj.toString() : ZBX_NOTSUPPORTED;
+    }
+
+
+    public void handleError(Throwable e) {
 		try {
 			log.error("Error processing request", e);
 			send(ZBX_NOTSUPPORTED);

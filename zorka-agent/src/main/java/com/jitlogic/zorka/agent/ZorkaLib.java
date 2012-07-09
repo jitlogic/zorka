@@ -36,6 +36,7 @@ import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
 import com.jitlogic.zorka.util.ZorkaLogger;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 /**
@@ -393,8 +394,8 @@ public class ZorkaLib implements ZorkaService {
 		
 		return bean;
 	}
-	
-	
+
+
 	public void svcStart() {
 	}
 	

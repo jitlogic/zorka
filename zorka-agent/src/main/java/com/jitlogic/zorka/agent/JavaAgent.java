@@ -78,6 +78,7 @@ public class JavaAgent {
 	
 	
 	public static void premain(String args, Instrumentation inst) {
+
 		start();
 	}
 

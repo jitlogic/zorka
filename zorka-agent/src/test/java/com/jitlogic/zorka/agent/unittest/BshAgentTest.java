@@ -19,6 +19,10 @@ package com.jitlogic.zorka.agent.unittest;
 
 import java.util.concurrent.Executor;
 
+import com.jitlogic.zorka.agent.zabbix.ZabbixLib;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONAware;
+import org.json.simple.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +43,10 @@ public class BshAgentTest {
 	@Before
 	public void setUp() throws Exception {
 		agent = new ZorkaBshAgent(new TrivialExecutor());
+        ZabbixLib zl = new ZabbixLib(agent, agent.getZorkaLib());
+
+        agent.installModule("zabbix", zl); // TODO move ZabbixLib tests somewhere else ...
+
 		agent.svcStart();
 		agent.loadScript(getClass().getResource("/unittest/BshAgentTest.bsh"));
 	}
@@ -55,7 +63,7 @@ public class BshAgentTest {
 
 	@Test
 	public void testJmxCalls() throws Exception {
-		assertEquals("1.0", agent.query("zorka.jmx(\"java\",\"java.lang:type=Runtime\",\"SpecVersion\")"));
+		assertTrue("1.0", agent.query("zorka.jmx(\"java\",\"java.lang:type=Runtime\",\"SpecVersion\")").startsWith("1."));
 	}
 	
 	@Test
@@ -72,5 +80,15 @@ public class BshAgentTest {
 		String rslt = agent.query("zorka.jmx(\"java\", \"zorka.test:name=Bean1\", \"test1\")");
 		assertEquals("1", rslt);
 	}
-	
+
+    @Test
+    public void testZabbixDiscoveryFunc() throws Exception {
+        Object obj = agent.eval("zabbix.discovery(\"java\", \"java.lang:type=MemoryPool,*\", \"name\")");
+        assertTrue("should return JSSONObject", obj instanceof JSONObject);
+        Object data = ((JSONObject)obj).get("data");
+        assertTrue("obj.data should be JSONArray", data instanceof JSONArray);
+        JSONArray array = (JSONArray)obj;
+        System.out.println(((JSONAware)obj).toJSONString());
+    }
+
 }

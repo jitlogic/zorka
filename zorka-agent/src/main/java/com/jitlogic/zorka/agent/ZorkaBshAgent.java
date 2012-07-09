@@ -39,7 +39,8 @@ public class ZorkaBshAgent implements ZorkaService {
 	private ZorkaLib zorkaLib;
 	private Executor executor;
 	private URL configDir = null;
-	
+
+
 	public ZorkaBshAgent(Executor executor) {
 		this.interpreter = new Interpreter();
 		this.executor = executor;
@@ -48,17 +49,22 @@ public class ZorkaBshAgent implements ZorkaService {
 		zorkaLib.addServer("java", ManagementFactory.getPlatformMBeanServer());
 		svcAdd(zorkaLib);
 
+        installModule("zorka", zorkaLib);
+    }
+
+
+    public void installModule(String name, Object module) {
+        try {
+            interpreter.set(name, module);
+        } catch (EvalError e) {
+            log.error("Error adding module '" + name + "' to global namespace", e);
+        }
+    }
+
+
+    public String query(String expr) {
 		try {
-			interpreter.set("zorka", zorkaLib);
-		} catch (EvalError e) {
-			log.error("Error adding zorka lib to global namespace", e);
-		}
-	}
-	
-	
-	public String query(String expr) {
-		try {
-			return ""+interpreter.eval(expr);
+			return ""+interpreter.eval(expr); // TODO proper object-to-string conversion
 		} catch (EvalError e) {
 			log.error("Error evaluating '" + expr + "': ", e);
 			return ObjectDumper.errorDump(e);
@@ -85,7 +91,8 @@ public class ZorkaBshAgent implements ZorkaService {
 			log.error("Error loading script " + url, e);
 		}
 	}
-	
+
+
 	public void loadScriptDir(URL url) {
 		try {
 			configDir = url;
