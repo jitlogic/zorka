@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 
 public class TimeoutThreadPoolExecutor extends ThreadPoolExecutor {
     private final long timeout;
-	private final long killTimeout;
     private final TimeUnit timeoutUnit;
 
     private final ScheduledExecutorService timeoutExecutor = Executors.newSingleThreadScheduledExecutor();
@@ -43,50 +42,13 @@ public class TimeoutThreadPoolExecutor extends ThreadPoolExecutor {
     
     public TimeoutThreadPoolExecutor(int corePoolSize, int maximumPoolSize, 
     		long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, 
-    		long timeout, TimeUnit timeoutUnit, long killTimeout) {
+    		long timeout, TimeUnit timeoutUnit) {
     	
-        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
+        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, new ZorkaWorkerThreadFactory());
         this.timeout = timeout;
         this.timeoutUnit = timeoutUnit;
-        this.killTimeout = killTimeout;
     }
-    
-    
-    public TimeoutThreadPoolExecutor(int corePoolSize, int maximumPoolSize, 
-    		long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, 
-    		ThreadFactory threadFactory, long timeout, TimeUnit timeoutUnit,
-    		long killTimeout) {
-    	
-        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory);
-        this.timeout = timeout;
-        this.timeoutUnit = timeoutUnit;
-        this.killTimeout = killTimeout;
-    }
-    
-    
-    public TimeoutThreadPoolExecutor(int corePoolSize, int maximumPoolSize, 
-    		long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, 
-    		RejectedExecutionHandler handler, long timeout, TimeUnit timeoutUnit,
-    		long killTimeout) {
-    	
-        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, handler);
-        this.timeout = timeout;
-        this.timeoutUnit = timeoutUnit;
-        this.killTimeout = killTimeout;
-    }
-    
-    
-    public TimeoutThreadPoolExecutor(int corePoolSize, int maximumPoolSize, 
-    		long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue, 
-    		ThreadFactory threadFactory, RejectedExecutionHandler handler, 
-    		long timeout, TimeUnit timeoutUnit, long killTimeout) {
-    	
-        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler);
-        this.timeout = timeout;
-        this.timeoutUnit = timeoutUnit;
-        this.killTimeout = killTimeout;
-    }
-    
+
     
     @Override
     public void shutdown() {
@@ -104,7 +66,7 @@ public class TimeoutThreadPoolExecutor extends ThreadPoolExecutor {
     
     @Override
     protected void beforeExecute(Thread t, Runnable r) {
-    	//System.err.println("beforeExecute()");
+        super.beforeExecute(t, r);
         if(timeout > 0) {
             final ScheduledFuture<?> scheduled = timeoutExecutor.schedule(
             		new TimeoutTask(t, r), timeout, timeoutUnit);
@@ -115,10 +77,15 @@ public class TimeoutThreadPoolExecutor extends ThreadPoolExecutor {
     
     @Override
     protected void afterExecute(Runnable r, Throwable t) {
-    	//System.err.println("AfterExecute()");
-        ScheduledFuture<?> timeoutTask = runningTasks.remove(r);
-        if(timeoutTask != null) {
-            timeoutTask.cancel(false);
+        try {
+            ScheduledFuture<?> timeoutTask = runningTasks.remove(r);
+            if(timeoutTask != null) {
+                timeoutTask.cancel(false);
+            }
+            if (t != null)
+                closeTask(r);
+        } finally {
+            super.afterExecute(r, t);
         }
     }
     
@@ -127,38 +94,61 @@ public class TimeoutThreadPoolExecutor extends ThreadPoolExecutor {
         private final Thread thread;
         private final Runnable task;
 
+
         public TimeoutTask(Thread thread, Runnable task) {
             this.thread = thread;
             this.task = task;
         }
 
+
         @SuppressWarnings("deprecation")
         public void run() {
             thread.interrupt();
-            if (killTimeout <= 0) return;
+
             try {
-            	Thread.sleep(killTimeout);
+            	Thread.sleep(10);
             	// If thread did not finish, kill it forcibly (not safe)
             	if (thread.isAlive()) {
             		thread.stop();
-                    if (task instanceof Closeable)
-                    try {
-                        ((Closeable)task).close();
-                    } catch (Exception e) {
-                        // TODO log something here ?
-                    }
                 }
             } catch (InterruptedException e) {
-            	
+            	// TODO some error logging here ?
+            } finally {
+                closeTask(task);
             }
+        }
+
+    }
+
+
+    public static class ZorkaWorkerThreadFactory implements ThreadFactory {
+
+        public Thread newThread(Runnable r) {
+            return new Thread(r, "ZORKA-WORKIER");
         }
     }
 
-    
-    public static ExecutorService newBoundedPool(int maxThreads, long timeout, long killTimeout) {
-    	return new TimeoutThreadPoolExecutor(1, maxThreads, 2000, 
-    		TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), 
-    		timeout, TimeUnit.MILLISECONDS, killTimeout);
+
+    public static void closeTask(Runnable task) {
+        if (task instanceof Closeable)
+            try {
+                ((Closeable)task).close();
+            } catch (Exception e) {
+                // TODO log something here ?
+            }
+    }
+
+
+    public static ExecutorService newBoundedPool(long timeout) {
+    	ThreadPoolExecutor ex = new TimeoutThreadPoolExecutor(8, 8, 2000,
+    		TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(32),
+    		timeout, TimeUnit.MILLISECONDS);
+        ex.setRejectedExecutionHandler(new RejectedExecutionHandler() {
+            public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+                closeTask(r);
+            }
+        });
+        return ex;
     }
     
 }

@@ -31,10 +31,11 @@ import bsh.EvalError;
 import bsh.Interpreter;
 
 public class ZorkaBshAgent implements ZorkaService {
-	
+
 	public static final String VERSION = "0.0.1-SNAPSHOT";
 	
 	private static ZorkaLogger log = ZorkaLogger.getLogger(ZorkaBshAgent.class);
+
 	private Interpreter interpreter;
 	private ZorkaLib zorkaLib;
 	private Executor executor;
@@ -92,11 +93,20 @@ public class ZorkaBshAgent implements ZorkaService {
 		}
 	}
 
+    public void loadScript(String path) {
+        try {
+            interpreter.source(path);
+        } catch (Exception e) {
+            log.error("Error loading script " + path, e);
+        }
+    }
 
-	public void loadScriptDir(URL url) {
+
+    public void loadScriptDir(URL url) {
 		try {
 			configDir = url;
-			File dir = new File(url.toURI());
+			File dir = new File(url.getPath());
+            log.debug("Listing directory: " + url.getPath());
 			String[] files = dir.list();
 			if (files == null || files.length == 0) {
 				return;
@@ -104,7 +114,8 @@ public class ZorkaBshAgent implements ZorkaService {
 			Arrays.sort(files);
 			for (String fname : files) {
 				URL scrUrl = new URL(url + "/" + fname);
-				File scrFile = new File(scrUrl.toURI());
+                log.debug("Loading file: " + scrUrl.getPath());
+				File scrFile = new File(scrUrl.getPath());
 				if (fname.endsWith(".bsh") && scrFile.isFile()) {
 					loadScript(scrUrl);
 				}
@@ -113,9 +124,34 @@ public class ZorkaBshAgent implements ZorkaService {
 			log.error("Cannot open directory: " + url, e);
 		}
 	}
-	
-	
-	public ZorkaLib getZorkaLib() {
+
+
+    public void loadScriptDir(String path) {
+        try {
+            //configDir = url;
+            configDir = new URL("file://" + path);
+            File dir = new File(path);
+            log.debug("Listing directory: " + path);
+            String[] files = dir.list();
+            if (files == null || files.length == 0) {
+                return;
+            }
+            Arrays.sort(files);
+            for (String fname : files) {
+                //URL scrUrl = new URL(url + "/" + fname);
+                String scrPath = path + "/" + fname;
+                log.debug("Loading file: " + scrPath);
+                File scrFile = new File(scrPath);
+                if (fname.endsWith(".bsh") && scrFile.isFile()) {
+                    loadScript(scrPath);
+                }
+            }
+        } catch (Exception e) {
+            log.error("Cannot open directory: " + path, e);
+        }
+    }
+
+    public ZorkaLib getZorkaLib() {
 		return zorkaLib;
 	}
 	

@@ -20,38 +20,34 @@ package com.jitlogic.zorka.agent;
 import java.lang.instrument.Instrumentation;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 import com.jitlogic.zorka.agent.zabbix.ZabbixAgent;
+import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
 import com.jitlogic.zorka.util.ZorkaConfig;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 public class JavaAgent {
 
-	public static final int MAX_THREADS = 5;
-	public static final long DEFAULT_TIMEOUT = 3000;
-	public static final long DEFAULT_KILL_TIMEOUT = 3000;
+	public static final long DEFAULT_TIMEOUT = 5000;
 
 	private static ZorkaLogger log = ZorkaLogger.getLogger(JavaAgent.class);
 	
-	private ExecutorService executor;
+	private Executor executor;
 	private ZorkaBshAgent zorkaAgent = null;
 	private ZabbixAgent zabbixAgent = null;
 		
 	public JavaAgent() {
-		executor = TimeoutThreadPoolExecutor.newBoundedPool(
-				MAX_THREADS, DEFAULT_TIMEOUT, DEFAULT_KILL_TIMEOUT);
+		//executor = TimeoutThreadPoolExecutor.newBoundedPool(DEFAULT_TIMEOUT);
+        executor = new ClosingTimeoutExecutor(4, 32, DEFAULT_TIMEOUT);
 	}
 	
 	public void startZorkaAgent() {
 		zorkaAgent = new ZorkaBshAgent(executor);
 		
-		try {
-			zorkaAgent.loadScriptDir(new URL("file://" + ZorkaConfig.getConfDir()));
-		} catch (MalformedURLException e) {
-			log.error("Error loading ZORKA scripts", e);
-		}
-		
+	    zorkaAgent.loadScriptDir(ZorkaConfig.getConfDir());
+
 		zorkaAgent.svcStart();		
 	}
 	
