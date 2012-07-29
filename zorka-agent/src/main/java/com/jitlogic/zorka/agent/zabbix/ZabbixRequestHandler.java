@@ -192,7 +192,7 @@ public class ZabbixRequestHandler implements ZorkaCallback {
             try {
                 socket.close();
             } catch (IOException e) {
-                log.error("I/O error closing socker.", e);
+                log.error("I/O error closing socket.", e);
             }
         }
 	}

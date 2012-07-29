@@ -1,0 +1,115 @@
+package com.jitlogic.zorka.agent.testinteg;
+
+import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
+import org.junit.Test;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.*;
+
+/**
+ * @author RLE <rafal.lewczuk@gmail.com>
+ */
+public class ClosingTimeoutExecutorIntegTest {
+
+
+    public static class TestTask implements Runnable, Closeable {
+
+
+        private volatile int runs = 0, closes = 0;
+        private volatile long sleepTime;
+
+        public TestTask(long sleepTime) {
+            this.sleepTime = sleepTime;
+        }
+
+        public void close() throws IOException {
+            closes++;
+        }
+
+        public void run() {
+            if (sleepTime > 0) {
+                try {
+                    //System.out.println("Sleeping for " + sleepTime);
+                    Thread.sleep(sleepTime);
+                    //System.out.println("go !");
+                    runs++;
+                } catch (InterruptedException e) {
+                    //System.out.println("Thread interrupted !");
+                    closes++;
+                }
+            } else
+                while (true) ;
+        }
+
+        public int getRuns() {
+            return runs;
+        }
+
+        public int getCloses() {
+            return closes;
+        }
+    }
+
+
+
+    @Test
+    public void testImmediateTaskExecution() throws Exception {
+        ClosingTimeoutExecutor executor = new ClosingTimeoutExecutor(2, 2, 1000);
+        TestTask task =  new TestTask(1);
+        executor.execute(task);
+        Thread.sleep(20);
+        assertEquals(1, task.getRuns());
+    }
+
+
+    @Test
+    public void testTimeoutTaskExecutionWithCheck() throws Exception {
+        ClosingTimeoutExecutor executor = new ClosingTimeoutExecutor(2, 2, 30);
+        TestTask task =  new TestTask(50);
+        executor.execute(task);
+        Thread.sleep(20);
+        assertEquals(0, task.getRuns());
+        assertEquals(0, task.getCloses());
+        Thread.sleep(30);
+        assertEquals(0, task.getRuns());
+        assertEquals(1, task.getCloses());
+    }
+
+
+    @Test
+    public void testTimeoutTaskExecutionWithoutCheck() throws Exception {
+        ClosingTimeoutExecutor executor = new ClosingTimeoutExecutor(2, 2, 30);
+        TestTask task =  new TestTask(-1);
+        executor.execute(task);
+        Thread.sleep(20);
+        assertEquals(0, task.getRuns());
+        assertEquals(0, task.getCloses());
+        Thread.sleep(30);
+        assertEquals(0, task.getRuns());
+        assertEquals(1, task.getCloses());
+    }
+
+
+    @Test
+    public void testQueueOverflow() throws Exception {
+        ClosingTimeoutExecutor executor = new ClosingTimeoutExecutor(2, 2, 500);
+        List<TestTask> tasks = new ArrayList<TestTask>(6);
+        for (int i = 1; i <= 6; i++)
+            tasks.add(new TestTask(i*200));
+
+        for (TestTask t : tasks)
+            executor.execute(t);
+
+        Thread.sleep(10);
+
+        assertEquals(0, tasks.get(0).getCloses());
+        assertEquals(0, tasks.get(1).getCloses());
+        assertEquals(1, tasks.get(4).getCloses());
+        assertEquals(1, tasks.get(5).getCloses());
+
+    }
+}

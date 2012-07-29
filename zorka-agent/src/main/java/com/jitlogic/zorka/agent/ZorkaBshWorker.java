@@ -20,7 +20,10 @@ package com.jitlogic.zorka.agent;
 import java.io.Closeable;
 import java.io.IOException;
 
+
 public class ZorkaBshWorker implements Runnable, Closeable {
+
+    // TODO integrate with ZorkaCallback, create single interface representing zorka query execution task;
 
 	private final ZorkaBshAgent agent;
 	private final String expr;
