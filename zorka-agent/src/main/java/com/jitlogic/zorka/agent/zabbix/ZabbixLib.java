@@ -31,11 +31,11 @@ public class ZabbixLib {
      *
      * @param mbs
      * @param filter
-     * @param attr
+     * @param attrs
      *
      * @return
      */
-    public JSONObject discovery(String mbs, String filter, String attr) {
+    private JSONObject _discovery(String mbs, String filter, String...attrs) {
 
         List<Object> objs = zorkaLib.jmxList(Arrays.asList((Object)mbs, filter));
 
@@ -44,10 +44,14 @@ public class ZabbixLib {
         for (Object obj : objs) {
             if (obj instanceof JmxObject) {
                 ObjectName on = ((JmxObject)obj).getName();
-                String atval = on.getKeyProperty(attr);
-                if (atval != null) {
-                    JSONObject odo = new JSONObject();
-                    odo.put("{#" + attr.toUpperCase() + "}", atval);
+                JSONObject odo = new JSONObject();
+                for (String attr : attrs) {
+                    String atval = on.getKeyProperty(attr);
+                    if (atval != null) {
+                        odo.put("{#" + attr.toUpperCase() + "}", atval);
+                    }
+                }
+                if (odo.size() > 0) {
                     dlist.add(odo);
                 }
             }
@@ -59,4 +63,35 @@ public class ZabbixLib {
         return discoveries;
     }
 
+
+    public JSONObject discovery(String mbs, String filter, String attr1) {
+        return _discovery(mbs, filter, attr1);
+    }
+
+
+    public JSONObject discovery(String mbs, String filter, String attr1, String attr2) {
+        return _discovery(mbs, filter, attr1, attr2);
+    }
+
+
+    public JSONObject discovery(String mbs, String filter, String attr1, String attr2, String attr3) {
+        return _discovery(mbs, filter, attr1, attr2, attr3);
+    }
+
+
+    public JSONObject discovery(String mbs, String filter, String attr1, String attr2, String attr3, String attr4) {
+        return _discovery(mbs, filter, attr1, attr2, attr3, attr4);
+    }
+
+
+    public JSONObject discovery(String mbs, String filter, String attr1, String attr2, String attr3, String attr4,
+                                String attr5) {
+        return _discovery(mbs, filter, attr1, attr2, attr3, attr4, attr5);
+    }
+
+
+    public JSONObject discovery(String mbs, String filter, String attr1, String attr2, String attr3, String attr4,
+                                String attr5, String attr6) {
+        return _discovery(mbs, filter, attr1, attr2, attr3, attr4, attr5, attr6);
+    }
 }
