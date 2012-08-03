@@ -192,7 +192,7 @@ public class Parser/*@bgen(jjtree)*/implements ParserTreeConstants/*@egen*/
 		int line = errortok.beginLine, column = errortok.beginColumn;
 		String mess = (errortok.kind == 0) ? tokenImage[0] : errortok.image;
 		return new ParseException( "Parse error at line " + line 
-			+ ", column " + column + " : " + message, e );
+			+ ", column " + column + " : " + message + "\n" +  e );
 	}
 
 	int parseInt(String s) throws NumberFormatException {

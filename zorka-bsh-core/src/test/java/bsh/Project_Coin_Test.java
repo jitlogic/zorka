@@ -99,9 +99,9 @@ public class Project_Coin_Test {
 			);
 			fail("expected exception");
 		} catch (final EvalError evalError) {
-			if (evalError instanceof ParseException) {
-				throw evalError;
-			}
+			//if (evalError instanceof ParseException) {
+			//	throw evalError;
+			//}
 			final Throwable e = evalError.getCause();
 			assertSame(fromWrite, e);
 			interpreter.set("exception", e);

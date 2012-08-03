@@ -498,7 +498,7 @@ public class Interpreter
 			}
 			catch(ParseException e)
 			{
-				error("Parser Error: " + e.getMessage(DEBUG));
+				error("Parser Error: " + e.getMessage());
 				if ( DEBUG )
 					e.printStackTrace();
 				if(!interactive)
@@ -685,11 +685,11 @@ public class Interpreter
 				*/
 				if ( DEBUG )
 					// show extra "expecting..." info
-					error( e.getMessage(DEBUG) );
+					error( e.getMessage() );
 
 				// add the source file info and throw again
-				e.setErrorSourceFile( sourceFileInfo );
-				throw e;
+				//e.setErrorSourceFile( sourceFileInfo );
+				throw new EvalError("Error:", node, callstack, e);
 
 			} catch ( InterpreterError e ) {
 				e.printStackTrace();

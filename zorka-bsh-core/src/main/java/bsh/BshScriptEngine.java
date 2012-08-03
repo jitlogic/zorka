@@ -88,9 +88,10 @@ public class BshScriptEngine extends AbstractScriptEngine implements Compilable,
 			} else {
 				return bsh.eval((String) source);
 			}
-		} catch (ParseException e) {
-			// explicit parsing error
-			throw new ScriptException(e.toString(), e.getErrorSourceFile(), e.getErrorLineNumber());
+		//} catch (ParseException e) {
+			// explicit parsing error  TODO how to handle parse exception ?
+			//throw new ScriptException(e.toString());
+                    //e.getErrorSourceFile(), e.getErrorLineNumber());
 		} catch (TargetError e) {
 			// The script threw an application level exception
 			// set it as the cause ?
@@ -262,9 +263,9 @@ public class BshScriptEngine extends AbstractScriptEngine implements Compilable,
 
 		try {
 			return bshObject.invokeMethod(name, args);
-		} catch (ParseException e) {
+		//} catch (ParseException e) {
 			// explicit parsing error
-			throw new ScriptException(e.toString(), e.getErrorSourceFile(), e.getErrorLineNumber());
+		//	throw new ScriptException(e.toString(), e.getErrorSourceFile(), e.getErrorLineNumber());
 		} catch (TargetError e) {
 			// The script threw an application level exception
 			// set it as the cause ?
