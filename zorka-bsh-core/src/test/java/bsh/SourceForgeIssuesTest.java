@@ -1,6 +1,6 @@
 package bsh;
 
-import bsh.classpath.ClassManagerImpl;
+//import bsh.classpath.ClassManagerImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,20 +45,20 @@ public class SourceForgeIssuesTest {
 
 
 	/** <a href="http://sourceforge.net/tracker/?func=detail&aid=2884749&group_id=4075&atid=104075">Sourceforge issue "Memory leak with WeakReferences" - ID: 2884749</a>. */
-	@Test
-	public void sourceforge_issue_2884749() throws Exception {
-		final ClassManagerImpl classManager = new ClassManagerImpl();
-		final WeakReference<BshClassManager.Listener> weakRef;
-		{
-			final BshClassManager.Listener listener = new DummyListener(1024 * 1000);
-			classManager.addListener(listener);
-			weakRef = new WeakReference<BshClassManager.Listener>(listener);
-		}
-		for (int i = 0; i < 10000; i++) {
-			  classManager.addListener(new DummyListener(1024 * 100));
-		}
-		Assert.assertNull(weakRef.get());
-	}
+//	@Test
+//	public void sourceforge_issue_2884749() throws Exception {
+//		final ClassManagerImpl classManager = new ClassManagerImpl();
+//		final WeakReference<BshClassManager.Listener> weakRef;
+//		{
+//			final BshClassManager.Listener listener = new DummyListener(1024 * 1000);
+//			classManager.addListener(listener);
+//			weakRef = new WeakReference<BshClassManager.Listener>(listener);
+//		}
+//		for (int i = 0; i < 10000; i++) {
+//			  classManager.addListener(new DummyListener(1024 * 100));
+//		}
+//		Assert.assertNull(weakRef.get());
+//	}
 
 
 	/** <a href="http://sourceforge.net/tracker/?func=detail&aid=2945459&group_id=4075&atid=104075">Sourceforge issue "Parsing of long hex literals fails" - ID: 2945459</a>. */

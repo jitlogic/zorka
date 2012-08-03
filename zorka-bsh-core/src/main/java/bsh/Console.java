@@ -34,8 +34,6 @@
 
 package bsh;
 
-import bsh.util.*;
-
 /**
 	Console startup class.
 */
@@ -48,7 +46,7 @@ public class Console
 
 		if ( Capabilities.haveSwing() ) 
 		{
-			bsh.util.Util.startSplashScreen();
+			//bsh.util.Util.startSplashScreen();
 			try {
 				new Interpreter().eval("desktop()");
 			} catch ( EvalError e ) {
