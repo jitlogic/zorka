@@ -87,7 +87,7 @@ public class BshAgentTest {
         assertTrue("should return JSSONObject", obj instanceof JSONObject);
         Object data = ((JSONObject)obj).get("data");
         assertTrue("obj.data should be JSONArray", data instanceof JSONArray);
-        JSONArray array = (JSONArray)obj;
+        //JSONArray array = (JSONArray)obj;
         System.out.println(((JSONAware)obj).toJSONString());
     }
 

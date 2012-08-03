@@ -10,11 +10,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <version>1.0.10</version>
         </dependency>
         <dependency>
-            <groupId>org.beanshell</groupId>
-            <artifactId>bsh-core</artifactId>
-            <version>2.0b4</version>
-        </dependency>
-        <dependency>
             <groupId>asm</groupId>
             <artifactId>asm</artifactId>
             <version>3.3.1</version>
@@ -23,6 +18,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jitlogic.zorka</groupId>
+            <artifactId>zorka-bsh-core</artifactId>
+            <version>${project.version}<version>
         </dependency>
     </dependencies>
     <parent>
@@ -68,8 +68,8 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                         </goals>
                         <configuration>
                             <includes>
-                                <include>org.beanshell:bsh-core</include>
                                 <include>asm:asm</include>
+                                <include>com.jitlogic.zorka:zorka-bsh-core</include>
                                 <include>com.jitlogic.zorka:zorka-agent</include>
                                 <include>com.googlecode.json-simple:json-simple</include>
                             </includes>
