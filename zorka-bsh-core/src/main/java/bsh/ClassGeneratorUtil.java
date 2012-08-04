@@ -33,8 +33,8 @@
 
 package bsh;
 
-import bsh.org.objectweb.asm.*;
-import bsh.org.objectweb.asm.Type;
+import org.objectweb.asm.*;
+import org.objectweb.asm.Type;
 
 import java.lang.reflect.*;
 import java.util.ArrayList;
@@ -77,7 +77,7 @@ import java.util.List;
 	It would not be hard to eliminate the use of org.objectweb.asm.Type from
 	this class, making the distribution a tiny bit smaller.
 */
-public class ClassGeneratorUtil implements Constants {
+public class ClassGeneratorUtil implements Opcodes {
 
 	/**
 	 * The name of the static field holding the reference to the bsh
@@ -188,7 +188,7 @@ public class ClassGeneratorUtil implements Constants {
 		// Force the class public for now...
 		int classMods = getASMModifiers(classModifiers) | ACC_PUBLIC;
 		if (isInterface) {
-			classMods |= ACC_INTERFACE;
+			classMods |= (ACC_INTERFACE|ACC_ABSTRACT);
 		}
 
 		String[] interfaceNames = new String[interfaces.length + (isInterface ? 0 : 1)]; // one more interface for instance init callback
@@ -200,8 +200,8 @@ public class ClassGeneratorUtil implements Constants {
 		}
 
 		String sourceFile = "BeanShell Generated via ASM (www.objectweb.org)";
-		ClassWriter cw = new ClassWriter(false);
-		cw.visit(classMods, fqClassName, superClassName, interfaceNames, sourceFile);
+		ClassWriter cw = new ClassWriter(0);
+		cw.visit(Opcodes.V1_6, classMods, fqClassName, null, superClassName, interfaceNames);
 
 		if ( ! isInterface) {
 			// Generate the bsh instance 'This' reference holder field
@@ -309,7 +309,7 @@ public class ClassGeneratorUtil implements Constants {
 	 * Generate a field - static or instance.
 	 */
 	private static void generateField(String fieldName, String type, int modifiers, ClassWriter cw) {
-		cw.visitField(modifiers, fieldName, type, null/*value*/);
+		cw.visitField(modifiers, fieldName, type, null, null);
 	}
 
 
@@ -332,7 +332,7 @@ public class ClassGeneratorUtil implements Constants {
 		String methodDescriptor = getMethodDescriptor(returnType, paramTypes);
 
 		// Generate method body
-		CodeVisitor cv = cw.visitMethod(modifiers, methodName, methodDescriptor, exceptions);
+		MethodVisitor cv = cw.visitMethod(modifiers, methodName, methodDescriptor, null, exceptions);
 
 		if ((modifiers & ACC_ABSTRACT) != 0) {
 			return;
@@ -364,7 +364,9 @@ public class ClassGeneratorUtil implements Constants {
 		cv.visitInsn(ICONST_1);
 
 		// Invoke the method This.invokeMethod( name, Class [] sig, boolean )
-		cv.visitMethodInsn(INVOKEVIRTUAL, "bsh/This", "invokeMethod", Type.getMethodDescriptor(Type.getType(Object.class), new Type[]{Type.getType(String.class), Type.getType(Object[].class), Type.getType(Interpreter.class), Type.getType(CallStack.class), Type.getType(SimpleNode.class), Type.getType(Boolean.TYPE)}));
+		cv.visitMethodInsn(INVOKEVIRTUAL, "bsh/This", "invokeMethod", Type.getMethodDescriptor(Type.getType(Object.class),
+                new Type[]{Type.getType(String.class), Type.getType(Object[].class), Type.getType(Interpreter.class),
+                        Type.getType(CallStack.class), Type.getType(SimpleNode.class), Type.getType(Boolean.TYPE)}));
 
 		// Generate code to unwrap bsh Primitive types
 		cv.visitMethodInsn(INVOKESTATIC, "bsh/Primitive", "unwrap", "(Ljava/lang/Object;)Ljava/lang/Object;");
@@ -373,7 +375,7 @@ public class ClassGeneratorUtil implements Constants {
 		generateReturnCode(returnType, cv);
 
 		// Need to calculate this... just fudging here for now.
-		cv.visitMaxs(20, 20);
+	    cv.visitMaxs(20, 20);
 	}
 
 
@@ -390,7 +392,7 @@ public class ClassGeneratorUtil implements Constants {
 		String methodDescriptor = getMethodDescriptor("V", paramTypes);
 
 		// Create this constructor method
-		CodeVisitor cv = cw.visitMethod(modifiers, "<init>", methodDescriptor, exceptions);
+		MethodVisitor cv = cw.visitMethod(modifiers, "<init>", methodDescriptor, null, exceptions);
 
 		// Generate code to push arguments as an object array
 		generateParameterReifierCode(paramTypes, false/*isStatic*/, cv);
@@ -433,7 +435,7 @@ public class ClassGeneratorUtil implements Constants {
 	 * arguments at runtime.  The getConstructorArgs() method returns the
 	 * actual arguments as well as the index of the constructor to call.
 	 */
-	void generateConstructorSwitch(int consIndex, int argsVar, int consArgsVar, CodeVisitor cv) {
+	void generateConstructorSwitch(int consIndex, int argsVar, int consArgsVar, MethodVisitor cv) {
 		Label defaultLabel = new Label();
 		Label endLabel = new Label();
 		int cases = superConstructors.length + constructors.length;
@@ -500,7 +502,7 @@ public class ClassGeneratorUtil implements Constants {
 		 */
 
 
-	private static void doSwitchBranch(int index, String targetClassName, String[] paramTypes, Label endLabel, Label[] labels, int consArgsVar, CodeVisitor cv) {
+	private static void doSwitchBranch(int index, String targetClassName, String[] paramTypes, Label endLabel, Label[] labels, int consArgsVar, MethodVisitor cv) {
 		cv.visitLabel(labels[index]);
 		//cv.visitLineNumber( index, labels[index] );
 		cv.visitVarInsn(ALOAD, 0); // push this before args
@@ -579,7 +581,7 @@ public class ClassGeneratorUtil implements Constants {
 		String methodDescriptor = getMethodDescriptor(returnType, paramTypes);
 
 		// Add method body
-		CodeVisitor cv = cw.visitMethod(modifiers, "_bshSuper" + methodName, methodDescriptor, exceptions);
+		MethodVisitor cv = cw.visitMethod(modifiers, "_bshSuper" + methodName, methodDescriptor, null, exceptions);
 
 		cv.visitVarInsn(ALOAD, 0);
 		// Push vars
@@ -631,7 +633,7 @@ public class ClassGeneratorUtil implements Constants {
 	/**
 	 * Generate return code for a normal bytecode
 	 */
-	private static void generatePlainReturnCode(String returnType, CodeVisitor cv) {
+	private static void generatePlainReturnCode(String returnType, MethodVisitor cv) {
 		if (returnType.equals("V")) {
 			cv.visitInsn(RETURN);
 		} else if (isPrimitive(returnType)) {
@@ -664,7 +666,7 @@ public class ClassGeneratorUtil implements Constants {
 	 * @author Eric Bruneton
 	 * @author Pat Niemeyer
 	 */
-	private static void generateParameterReifierCode(String[] paramTypes, boolean isStatic, final CodeVisitor cv) {
+	private static void generateParameterReifierCode(String[] paramTypes, boolean isStatic, final MethodVisitor cv) {
 		cv.visitIntInsn(SIPUSH, paramTypes.length);
 		cv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
 		int localVarIndex = isStatic ? 0 : 1;
@@ -713,7 +715,7 @@ public class ClassGeneratorUtil implements Constants {
 	 * @author Eric Bruneton
 	 * @author Pat Niemeyer
 	 */
-	private static void generateReturnCode(String returnType, CodeVisitor cv) {
+	private static void generateReturnCode(String returnType, MethodVisitor cv) {
 		if (returnType.equals("V")) {
 			cv.visitInsn(POP);
 			cv.visitInsn(RETURN);
@@ -1080,7 +1082,7 @@ public class ClassGeneratorUtil implements Constants {
 	 * call as well as the index of a possible alternate selector to invoke.
 	 * This object is used by the constructor switch.
 	 *
-	 * @see bsh.ClassGeneratorUtil#generateConstructor(int, String[], int, bsh.org.objectweb.asm.ClassWriter)
+	 * @see bsh.ClassGeneratorUtil# generateConstructor(int, String[], int, bsh.org.objectweb.asm.ClassWriter)
 	 */
 	public static class ConstructorArgs {
 
