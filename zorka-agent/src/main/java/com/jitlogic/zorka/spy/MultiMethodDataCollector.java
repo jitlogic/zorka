@@ -2,7 +2,6 @@ package com.jitlogic.zorka.spy;
 
 import java.util.List;
 
-import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
 
 import com.jitlogic.zorka.mbeans.MethodCallStatisticImpl;
@@ -48,7 +47,7 @@ public class MultiMethodDataCollector implements DataCollector {
 	}
 	
 	
-	public MethodAdapter getAdapter(MethodVisitor mv) {
+	public MethodVisitor getAdapter(MethodVisitor mv) {
 		return new SimpleMethodInstrumentator(mv, id, args);
 	}
 }

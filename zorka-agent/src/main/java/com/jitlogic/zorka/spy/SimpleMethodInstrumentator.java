@@ -3,10 +3,10 @@ package com.jitlogic.zorka.spy;
 import static org.objectweb.asm.Opcodes.*;
 
 import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
-public class SimpleMethodInstrumentator extends MethodAdapter {
+public class SimpleMethodInstrumentator extends MethodVisitor {
 
 	private long id;
 	private int[] args;
@@ -16,7 +16,7 @@ public class SimpleMethodInstrumentator extends MethodAdapter {
 	Label l_try_handler = new Label();
 	
 	public SimpleMethodInstrumentator(MethodVisitor mv, long id, int...args) {
-		super(mv);
+		super(Opcodes.V1_6, mv);
 		this.id = id;
 		this.args = args;
 	}
