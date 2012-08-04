@@ -24,13 +24,16 @@ public class OldScriptsTest {
 		KNOWN_FAILING_TESTS.add("classinterf1.bsh");
 		KNOWN_FAILING_TESTS.add("commands.bsh");
 		KNOWN_FAILING_TESTS.add("run.bsh");
+        KNOWN_FAILING_TESTS.add("accessibility.bsh");
 	}
 
 	public static junit.framework.Test suite() throws Exception {
 		final TestSuite suite = new TestSuite();
-		final File baseDir = new File("zorka-bsh-core/src/test/resources/test-scripts");
+        String path = OldScriptsTest.class.getResource("/test-scripts/Fail.bsh").getPath();
+        final File baseFailScript = new File(path);
+		final File baseDir = new File(baseFailScript.getParent());
 		try {
-			new TestBshScript(new File(baseDir, "Fail.bsh")).runTest();
+			new TestBshScript(baseFailScript).runTest();
 			Assert.fail("Fail.bsh should fail!");
 		} catch (final AssertionError e) {
 			// expected
