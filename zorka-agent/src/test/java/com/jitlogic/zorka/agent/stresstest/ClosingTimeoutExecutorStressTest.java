@@ -108,7 +108,7 @@ public class ClosingTimeoutExecutorStressTest {
         System.out.println("numReapKills=" + executor.numReapKills);
     }
 
-    @Test
+    //@Test
     public void testStress1() throws Exception {
         doStress(1000, 8, 150);
     }

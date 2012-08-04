@@ -2,11 +2,11 @@ package com.jitlogic.zorka.spy;
 
 import static org.objectweb.asm.Opcodes.ACC_INTERFACE;
 
-import org.objectweb.asm.ClassAdapter;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
-public class ClassInstrumentator extends ClassAdapter {
+public class ClassInstrumentator extends ClassVisitor {
 
 	private String className;
 	private ZorkaSpy spy;
@@ -15,7 +15,7 @@ public class ClassInstrumentator extends ClassAdapter {
 	private String[] interfaces;
 	
 	public ClassInstrumentator(String className, ZorkaSpy spy, ClassVisitor cv) {
-		super(cv);
+		super(Opcodes.V1_6, cv);
 		this.className = className;
 		this.spy = spy;
 	}
