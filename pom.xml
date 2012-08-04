@@ -29,6 +29,7 @@
     <modules>
         <module>zorka-bsh-core</module>
         <module>zorka-agent</module>
+        <module>zorka-bsh-shell</module>
     </modules>
 
 </project>
