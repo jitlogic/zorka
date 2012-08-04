@@ -36,7 +36,6 @@ import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
 import com.jitlogic.zorka.util.ZorkaLogger;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 /**
@@ -69,30 +68,7 @@ public class ZorkaLib implements ZorkaService {
 		return ZorkaBshAgent.VERSION;
 	}
 	
-//	@ZoolaFunc(name="system")
-//	public String system(String cmd) {
-//		Process proc = null;
-//		StringBuilder sb = new StringBuilder();
-//		try {
-//			proc = Runtime.getRuntime().exec(cmd);
-//			BufferedReader rdr = new BufferedReader(
-//				new InputStreamReader(proc.getInputStream()));
-//		} 
-//		catch (Exception e) { 
-//			throw new ZoolaError("Failed executing command: " + cmd, e);
-//		}
-//		finally {
-//			try { 
-//				if (null != proc) proc.destroy();
-//			} catch (Exception _) { }
-//			try {
-//				if (null != proc) proc.waitFor();
-//			} catch (Exception _) { }
-//		}
-//		return sb.toString();
-//	}
-	
-	
+
 	public List<Object> jmxList(List<Object> args) {
 		List<Object> objs = new ArrayList<Object>();
 		if (args.size() < 2) {
@@ -133,69 +109,26 @@ public class ZorkaLib implements ZorkaService {
 		return objs;
 	} // jmxList()
 	
-	
-	// TODO BSH fix badly needed
-	public Object jmx(Object arg1) {
-		return jmx(Arrays.asList(arg1));
-	}
-	
-	
-	// TODO BSH fix badly needed
-	public Object jmx(Object arg1, Object arg2) {
-		return jmx(Arrays.asList(arg1,arg2));
-	}
-	
-	
-	// TODO BSH fix badly needed
-	public Object jmx(Object arg1, Object arg2, Object arg3) {
-		return jmx(Arrays.asList(arg1,arg2,arg3));
-	}
-	
-	
-	// TODO BSH fix badly needed
-	public Object jmx(Object arg1, Object arg2, Object arg3, Object arg4) {
-		return jmx(Arrays.asList(arg1,arg2,arg3,arg4));
-	}
-	
-	
-	// TODO BSH fix badly needed
-	public Object jmx(Object arg1, Object arg2, Object arg3, Object arg4, Object arg5) {
-		return jmx(Arrays.asList(arg1,arg2,arg3,arg4,arg5));
-	}
-	
-	
-	// TODO BSH fix badly needed
-	public Object jmx(Object arg1, Object arg2, Object arg3, Object arg4, Object arg5, Object arg6) {
-		return jmx(Arrays.asList(arg1,arg2,arg3,arg4,arg5,arg6));
-	}
-
-	// TODO BSH fix badly needed
-	public Object jmx(Object arg1, Object arg2, Object arg3, Object arg4, Object arg5, Object arg6, Object arg7) {
-		return jmx(Arrays.asList(arg1,arg2,arg3,arg4,arg5,arg6,arg7));
-	}
-
-	// TODO BSH fix badly needed
-	public Object jmx(Object arg1, Object arg2, Object arg3, Object arg4, Object arg5, Object arg6, Object arg7, Object arg8) {
-		return jmx(Arrays.asList(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8));
-	}
 
 	
-	public Object jmx(List<Object> args) {
-		
-		if (args.size() < 2) {
+	public Object jmx(Object...args) {
+
+        List<Object> argList = Arrays.asList(args);
+
+		if (argList.size() < 2) {
 			log.error("zorka.jmx() function requires at least 2 arguments");
 			return null;
 		}
 		
-		String conname = args.get(0).toString();
+		String conname = argList.get(0).toString();
 		MBeanServerConnection conn = conns.get(conname);
 		
 		if (conn == null) {
-			log.error("MBean server named '" + args.get(0) + "' is not registered.");
+			log.error("MBean server named '" + argList.get(0) + "' is not registered.");
 			return null;
 		}
 		
-		Set<ObjectName> names = resolver.queryNames(conn, args.get(1).toString());
+		Set<ObjectName> names = resolver.queryNames(conn, argList.get(1).toString());
 		
 		if (names.isEmpty()) { 
 			return null;
@@ -203,24 +136,24 @@ public class ZorkaLib implements ZorkaService {
 		
 		ObjectName name = names.iterator().next();
 		
-		if (args.size() == 2) {
+		if (argList.size() == 2) {
 			return new JmxObject(name, conn);
 		}
 		
 		Object obj = null;
 		try {
-			obj = conn.getAttribute(name, args.get(2).toString());
+			obj = conn.getAttribute(name, argList.get(2).toString());
 		} catch (AttributeNotFoundException e) {
 			log.error("Object '" + conname + "|" + name + 
-						"' has no attribute '" + args.get(2) + "'.");
+						"' has no attribute '" + argList.get(2) + "'.");
 			return null;
 		} catch (Exception e) {
-			log.error("Error getting attribute '" + args.get(2) 
+			log.error("Error getting attribute '" + argList.get(2)
 				+ "' from '" + conname + "|" + name + "'", e);
 		}
 		
-		if (args.size() > 3 && obj != null) {
-			for (Object arg : args.subList(3, args.size())) {
+		if (argList.size() > 3 && obj != null) {
+			for (Object arg : argList.subList(3, argList.size())) {
 				obj = JmxResolver.get(obj, arg);
 			}
 		}
@@ -228,44 +161,15 @@ public class ZorkaLib implements ZorkaService {
 		return obj;
 	} // jmx()
 
-	
-	// TODO BSH fix badly needed
-	public Object get(Object obj, Object arg1) {
-		return getAttr(obj, arg1);
-	}
 
-	// TODO BSH fix badly needed
-	public Object get(Object obj, Object arg1, Object arg2) {
-		return getAttr(obj, arg1, arg2);
-	}
-
-	// TODO BSH fix badly needed
-	public Object get(Object obj, Object arg1, Object arg2, Object arg3) {
-		return getAttr(obj, arg1, arg2, arg3);
-	}
-
-	// TODO BSH fix badly needed
-	public Object get(Object obj, Object arg1, Object arg2, Object arg3, Object arg4) {
-		return getAttr(obj, arg1, arg2, arg3, arg4);
-	}
-
-	// TODO BSH fix badly needed
-	public Object get(Object obj, Object arg1, Object arg2, Object arg3, Object arg4, Object arg5) {
-		return getAttr(obj, arg1, arg2, arg3, arg4, arg5);
-	}
-
-	// TODO BSH fix badly needed
-	public Object get(Object obj, Object arg1, Object arg2, Object arg3, Object arg4, Object arg5, Object arg6) {
-		return getAttr(obj, arg1, arg2, arg3, arg4, arg5, arg6);
-	}
-
-	// TODO BSH fix badly needed
-	public Object get(Object obj, Object arg1, Object arg2, Object arg3, Object arg4, Object arg5, Object arg6, Object arg7) {
-		return getAttr(obj, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-	}
-
-	
-	private Object getAttr(Object obj, Object...args) {
+    /**
+     * Recursively accesses object.
+     *
+     * @param obj
+     * @param args
+     * @return
+     */
+	public Object get(Object obj, Object...args) {
 		for (Object arg : args) {
 			obj = JmxResolver.get(obj, arg);
 		}
@@ -295,49 +199,19 @@ public class ZorkaLib implements ZorkaService {
 			return null;
 		}
 	}
-	
-	
-	// TODO BSH fix badly needed
-	public ValGetter getter(Object obj, String attr1) {
-		return new AttrGetter(obj, attr1);
-	}
-	
-	
-	// TODO BSH fix badly needed
-	public ValGetter getter(Object obj, String attr1, String attr2) {
-		return new AttrGetter(obj, attr1, attr2);
-	}
-	
-	
-	// TODO BSH fix badly needed
-	public ValGetter getter(Object obj, String attr1, String attr2, String attr3) {
-		return new AttrGetter(obj, attr1, attr2, attr3);
-	}
-	
-	
-	// TODO BSH fix badly needed
-	public ValGetter getter(Object obj, String attr1, String attr2, String attr3, String attr4) {
-		return new AttrGetter(obj, attr1, attr2, attr3, attr4);
-	}
-	
-	
-	// TODO BSH fix badly needed
-	public ValGetter getter(Object obj, String attr1, String attr2, String attr3, String attr4, String attr5) {
-		return new AttrGetter(obj, attr1, attr2, attr3, attr4, attr5);
-	}
-	
-	
-	// TODO BSH fix badly needed
-	public ValGetter getter(Object obj, String attr1, String attr2, String attr3, String attr4, String attr5, String attr6) {
-		return new AttrGetter(obj, attr1, attr2, attr3, attr4, attr5, attr6);
-	}
-	
-	
-	// TODO BSH fix badly needed
-	public ValGetter getter(Object obj, String attr1, String attr2, String attr3, String attr4, String attr5, String attr6, String attr7) {
-		return new AttrGetter(obj, attr1, attr2, attr3, attr4, attr5, attr6, attr7);
-	}
-	
+
+
+    /**
+     * Creates Attribute getter object.
+     *
+     * @param obj
+     * @param attrs
+     * @return
+     */
+    public ValGetter getter(Object obj, String...attrs) {
+        return new AttrGetter(obj, attrs);
+    }
+
 	
 	// TODO move this to "initialization library" script (?)
 	public ZorkaMappedMBean threadRanking(String name, String desc, int size, long rerankInterval) {

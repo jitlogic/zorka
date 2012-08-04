@@ -91,4 +91,20 @@ public class BshAgentTest {
         System.out.println(((JSONAware)obj).toJSONString());
     }
 
+    public static class SomeTestLib {
+        public String join(String foo, String...parts) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(foo); sb.append(":");
+            for (String part : parts)
+                sb.append(part);
+            return sb.toString();
+        }
+    }
+
+    @Test
+    public void testNewBshEllipsis() throws Exception {
+        agent.installModule("test", new SomeTestLib());
+        String rslt = agent.query("test.join(\"a\", \"b\", \"c\")");
+        assertEquals("a:bc", rslt);
+    }
 }
