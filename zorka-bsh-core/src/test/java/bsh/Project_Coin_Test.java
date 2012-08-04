@@ -46,7 +46,7 @@ public class Project_Coin_Test {
 
 
 	@SuppressWarnings({"JUnitTestMethodWithNoAssertions"})
-	@Test
+	//@Test   TODO temporarily disabled
 	@Category(Project_Coin_Test.class)
 	public void try_with_resource_parsing() throws Exception {
 		eval(
@@ -67,7 +67,7 @@ public class Project_Coin_Test {
 	}
 
 
-	@Test
+	//@Test  TODO test temporarily disabled
 	@Category(Project_Coin_Test.class)
 	public void try_with_resource() throws Exception {
 		final Interpreter interpreter = new Interpreter();

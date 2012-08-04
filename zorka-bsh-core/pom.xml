@@ -11,6 +11,9 @@
 
     <artifactId>zorka-bsh-core</artifactId>
 
+    <dependencies>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>

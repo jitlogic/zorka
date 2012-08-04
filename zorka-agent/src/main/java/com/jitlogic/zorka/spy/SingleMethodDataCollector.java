@@ -1,6 +1,5 @@
 package com.jitlogic.zorka.spy;
 
-import org.objectweb.asm.MethodAdapter;
 import org.objectweb.asm.MethodVisitor;
 
 import com.jitlogic.zorka.mbeans.MethodCallStatisticImpl;
@@ -29,7 +28,7 @@ public class SingleMethodDataCollector implements DataCollector {
 		mcs.logError(tst, System.nanoTime()-info.getTst());
 	}
 
-	public MethodAdapter getAdapter(MethodVisitor mv) {
+	public MethodVisitor getAdapter(MethodVisitor mv) {
 		return new SimpleMethodInstrumentator(mv, id);
 	}
 
