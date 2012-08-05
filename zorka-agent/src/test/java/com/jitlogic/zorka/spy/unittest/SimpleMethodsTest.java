@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.lang.reflect.InvocationTargetException;
 
+import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +25,7 @@ public class SimpleMethodsTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		agent = new ZorkaBshAgent(new TestExecutor());
+		agent = new ZorkaBshAgent(new TestExecutor(), new MBeanServerRegistry());
 		lib = new ZorkaSpyLib(agent);
 		spy = lib.getSpy();
 	}

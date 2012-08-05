@@ -19,6 +19,7 @@ package com.jitlogic.zorka.agent.unittest;
 
 import java.util.concurrent.Executor;
 
+import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.zabbix.ZabbixLib;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
@@ -42,7 +43,7 @@ public class BshAgentTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		agent = new ZorkaBshAgent(new TrivialExecutor());
+		agent = new ZorkaBshAgent(new TrivialExecutor(), new MBeanServerRegistry());
         ZabbixLib zl = new ZabbixLib(agent, agent.getZorkaLib());
 
         agent.installModule("zabbix", zl); // TODO move ZabbixLib tests somewhere else ...
@@ -91,4 +92,20 @@ public class BshAgentTest {
         System.out.println(((JSONAware)obj).toJSONString());
     }
 
+    public static class SomeTestLib {
+        public String join(String foo, String...parts) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(foo); sb.append(":");
+            for (String part : parts)
+                sb.append(part);
+            return sb.toString();
+        }
+    }
+
+    @Test
+    public void testNewBshEllipsis() throws Exception {
+        agent.installModule("test", new SomeTestLib());
+        String rslt = agent.query("test.join(\"a\", \"b\", \"c\")");
+        assertEquals("a:bc", rslt);
+    }
 }

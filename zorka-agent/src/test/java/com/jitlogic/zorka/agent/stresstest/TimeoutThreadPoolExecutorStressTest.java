@@ -82,7 +82,7 @@ public class TimeoutThreadPoolExecutorStressTest {
     }
 
 
-    @Test
+    //@Test
     public void testStress1() throws Exception {
         doStress(1000);
     }

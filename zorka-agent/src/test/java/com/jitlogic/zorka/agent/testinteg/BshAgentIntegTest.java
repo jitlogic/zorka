@@ -22,6 +22,7 @@ import static org.junit.Assert.*;
 import java.net.URL;
 
 
+import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -66,7 +67,7 @@ public class BshAgentIntegTest {
 	public void setUp() {
 		agent = new ZorkaBshAgent(
             //new ClosingTimeoutExecutor(5, 5, 100));
-			TimeoutThreadPoolExecutor.newBoundedPool(100));
+			TimeoutThreadPoolExecutor.newBoundedPool(100), new MBeanServerRegistry());
 		result = null;
 		err = null;
 	}

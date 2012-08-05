@@ -63,7 +63,7 @@ public class JavaAgentIntegTest {
 		Thread.sleep(10);		
 	}
 	
-	@Test
+	//@Test
 	public void testStartAndStopTibcoAgent() throws Exception {
 		assertEquals(ZorkaBshAgent.VERSION, query("zorka__version[]"));		
 	}
