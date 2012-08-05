@@ -28,29 +28,31 @@ import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
 import com.jitlogic.zorka.util.ZorkaConfig;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
+import javax.management.MBeanServerConnection;
+
 public class JavaAgent {
 
-	public static final long DEFAULT_TIMEOUT = 5000;
+
+	public static final long DEFAULT_TIMEOUT = 500000;
 
 	private static ZorkaLogger log = ZorkaLogger.getLogger(JavaAgent.class);
 	
 	private Executor executor;
 	private ZorkaBshAgent zorkaAgent = null;
 	private ZabbixAgent zabbixAgent = null;
-		
+    private MBeanServerRegistry mBeanServerRegistry = new MBeanServerRegistry();
+
 	public JavaAgent() {
-		//executor = TimeoutThreadPoolExecutor.newBoundedPool(DEFAULT_TIMEOUT);
         executor = new ClosingTimeoutExecutor(4, 32, DEFAULT_TIMEOUT);
 	}
 	
 	public void startZorkaAgent() {
-		zorkaAgent = new ZorkaBshAgent(executor);
+		zorkaAgent = new ZorkaBshAgent(executor, mBeanServerRegistry);
 		
 	    zorkaAgent.loadScriptDir(ZorkaConfig.getConfDir());
 
 		zorkaAgent.svcStart();		
 	}
-	
 	
 	public void startZabbixAgent() {		
 		if (ZorkaConfig.get("zabbix.enabled", "yes").equalsIgnoreCase("yes")) {
@@ -59,16 +61,13 @@ public class JavaAgent {
 		}		
 	}
 	
-	
 	public void stopZabbixAgent() {
 		zabbixAgent.stop();
 	}
 	
-	
 	public void stopZorkaAgent() {
 		zorkaAgent.svcStop();
 	}
-	
 	
 	private static JavaAgent agent = null;
 	
@@ -77,7 +76,6 @@ public class JavaAgent {
 
 		start();
 	}
-
 
 	public static void start() {
 		agent = new JavaAgent();
@@ -89,5 +87,16 @@ public class JavaAgent {
 		agent.stopZabbixAgent();
 		agent.stopZorkaAgent();
 	}
-	
+
+    public static JavaAgent getAgent() {
+        return agent;
+    }
+
+    public ZorkaBshAgent getZorkaAgent() {
+        return zorkaAgent;
+    }
+
+    public MBeanServerRegistry getMBeanServerRegistry() {
+        return mBeanServerRegistry;
+    }
 }

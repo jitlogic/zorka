@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>zorka-bsh-core</artifactId>
+    <name>zorka-bsh-core: beanshell interpreter for Zorka</name>
 
     <dependencies>
     </dependencies>
