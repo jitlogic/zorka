@@ -47,7 +47,7 @@ public class ZorkaBshAgent implements ZorkaService {
 		this.executor = executor;
 		
 		zorkaLib = new ZorkaLib(this);
-		zorkaLib.addServer("java", ManagementFactory.getPlatformMBeanServer());
+		//zorkaLib.addServer("java", ManagementFactory.getPlatformMBeanServer());
 		svcAdd(zorkaLib);
 
         installModule("zorka", zorkaLib);

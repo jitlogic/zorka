@@ -19,10 +19,8 @@ package com.jitlogic.zorka.agent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.management.AttributeNotFoundException;
@@ -49,21 +47,15 @@ public class ZorkaLib implements ZorkaService {
 	private static final ZorkaLogger log = ZorkaLogger.getLogger(ZorkaLib.class);
 	
 	private ZorkaBshAgent agent;
-	private Map<String, MBeanServerConnection> conns = new HashMap<String, MBeanServerConnection>();
-	private Set<JmxObject> registeredObjects = new HashSet<JmxObject>();
+    private Set<JmxObject> registeredObjects = new HashSet<JmxObject>();
 	private JmxResolver resolver = new JmxResolver();
-	
-	public ZorkaLib(ZorkaBshAgent agent) {
+
+    private MBeanServerRegistry mbsRegistry = new MBeanServerRegistry();
+
+    public ZorkaLib(ZorkaBshAgent agent) {
 		this.agent = agent;
 	}
-	
 
-	
-	public void addServer(String name, MBeanServerConnection conn) {
-		// TODO conns przenieść do agenta i dostarczać tutaj przez konstruktor. 
-		conns.put(name,  conn);
-	}
-	
 	public String version() {
 		return ZorkaBshAgent.VERSION;
 	}
@@ -75,7 +67,7 @@ public class ZorkaLib implements ZorkaService {
 			log.error("Zorka JMX function takes at least 2 arguments.");
 			return objs;
 		}
-		MBeanServerConnection conn = conns.get(args.get(0));
+		MBeanServerConnection conn = mbsRegistry.lookup(args.get(0).toString());
 		if (conn == null) {
 			log.error("MBean server named '" + args.get(0) + "' is not registered.");
 			return objs;
@@ -121,9 +113,10 @@ public class ZorkaLib implements ZorkaService {
 		}
 		
 		String conname = argList.get(0).toString();
-		MBeanServerConnection conn = conns.get(conname);
-		
-		if (conn == null) {
+
+        MBeanServerConnection conn = mbsRegistry.lookup(conname);
+
+        if (conn == null) {
 			log.error("MBean server named '" + argList.get(0) + "' is not registered.");
 			return null;
 		}
@@ -185,7 +178,7 @@ public class ZorkaLib implements ZorkaService {
 	public ZorkaMappedMBean mbean(String mbs, String name, String desc) { 
 		try {
 			ZorkaMappedMBean mbean = new ZorkaMappedMBean(desc);
-			MBeanServer conn = (MBeanServer)conns.get(mbs);
+			MBeanServer conn = (MBeanServer) mbsRegistry.lookup(mbs);
 			if (conn == null) {
 				throw new ZorkaException("There is no mbean server named '" + mbs + "'");
 			}
@@ -245,9 +238,9 @@ public class ZorkaLib implements ZorkaService {
 	// TODO move this to "initialization library" script (?)
 	public ZorkaMappedMBean beanRanking(String mbs, String bname, String query, String keyName, String attrs, String nominalAttr, String dividerAttr, int size, long rerankInterval) {
 		long updateInterval = 15000;
-		MBeanServerConnection conn = conns.get(mbs);
-		
-		if (conn == null)  {
+        MBeanServerConnection conn = mbsRegistry.lookup(mbs);
+
+        if (conn == null)  {
 			log.error("There is no mbean server named '" + mbs + "'");
 			return null;
 		}

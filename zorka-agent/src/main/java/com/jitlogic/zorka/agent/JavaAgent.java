@@ -30,7 +30,8 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 
 public class JavaAgent {
 
-	public static final long DEFAULT_TIMEOUT = 5000;
+
+	public static final long DEFAULT_TIMEOUT = 500000;
 
 	private static ZorkaLogger log = ZorkaLogger.getLogger(JavaAgent.class);
 	
