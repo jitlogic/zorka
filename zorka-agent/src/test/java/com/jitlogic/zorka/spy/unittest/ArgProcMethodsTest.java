@@ -2,6 +2,7 @@ package com.jitlogic.zorka.spy.unittest;
 
 import static org.junit.Assert.*;
 
+import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +24,7 @@ public class ArgProcMethodsTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		agent = new ZorkaBshAgent(new TestExecutor());
+		agent = new ZorkaBshAgent(new TestExecutor(), new MBeanServerRegistry());
 		lib = new ZorkaSpyLib(agent);
 		spy = lib.getSpy();
 	}

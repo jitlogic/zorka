@@ -50,10 +50,11 @@ public class ZorkaLib implements ZorkaService {
     private Set<JmxObject> registeredObjects = new HashSet<JmxObject>();
 	private JmxResolver resolver = new JmxResolver();
 
-    private MBeanServerRegistry mbsRegistry = new MBeanServerRegistry();
+    private MBeanServerRegistry mbsRegistry;
 
-    public ZorkaLib(ZorkaBshAgent agent) {
+    public ZorkaLib(ZorkaBshAgent agent, MBeanServerRegistry mBeanServerRegistry) {
 		this.agent = agent;
+        this.mbsRegistry = mBeanServerRegistry;
 	}
 
 	public String version() {

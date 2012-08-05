@@ -18,7 +18,6 @@
 package com.jitlogic.zorka.agent;
 
 import java.io.File;
-import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -41,12 +40,15 @@ public class ZorkaBshAgent implements ZorkaService {
 	private Executor executor;
 	private URL configDir = null;
 
+    private MBeanServerRegistry mBeanServerRegistry;
 
-	public ZorkaBshAgent(Executor executor) {
+
+	public ZorkaBshAgent(Executor executor, MBeanServerRegistry mBeanServerRegistry) {
 		this.interpreter = new Interpreter();
 		this.executor = executor;
+        this.mBeanServerRegistry = mBeanServerRegistry;
 		
-		zorkaLib = new ZorkaLib(this);
+		zorkaLib = new ZorkaLib(this, mBeanServerRegistry);
 		//zorkaLib.addServer("java", ManagementFactory.getPlatformMBeanServer());
 		svcAdd(zorkaLib);
 
@@ -219,4 +221,9 @@ public class ZorkaBshAgent implements ZorkaService {
 			service.svcStart();
 		}
 	}
+
+
+    public MBeanServerRegistry getMBeanServerRegistry() {
+        return mBeanServerRegistry;
+    }
 }

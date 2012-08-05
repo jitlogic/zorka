@@ -19,16 +19,11 @@ package com.jitlogic.zorka.agent.functest;
 
 import java.net.URL;
 
+import com.jitlogic.zorka.agent.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
-
-import com.jitlogic.zorka.agent.ObjectDumper;
-import com.jitlogic.zorka.agent.TimeoutThreadPoolExecutor;
-import com.jitlogic.zorka.agent.ZorkaBasicCallback;
-import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.agent.ZorkaBshWorker;
 
 public class AgentMiscFuncTest {
 
@@ -44,7 +39,7 @@ public class AgentMiscFuncTest {
 	@Before
 	public void setUp() {
 		agent = new ZorkaBshAgent(//new ClosingTimeoutExecutor(2, 2, 100));
-		    TimeoutThreadPoolExecutor.newBoundedPool(100));
+		    TimeoutThreadPoolExecutor.newBoundedPool(100), new MBeanServerRegistry());
 	}
 	
 	@After

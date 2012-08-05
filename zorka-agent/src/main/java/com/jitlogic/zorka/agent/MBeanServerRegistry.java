@@ -1,18 +1,23 @@
 package com.jitlogic.zorka.agent;
 
+import com.jitlogic.zorka.integ.JBossIntegration;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 import javax.management.MBeanServerConnection;
 import javax.naming.InitialContext;
 import java.lang.management.ManagementFactory;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MBeanServerRegistry {
 
     private static final ZorkaLogger log = ZorkaLogger.getLogger(MBeanServerRegistry.class);
 
-    private MBeanServerConnection mbsJava = ManagementFactory.getPlatformMBeanServer();
+    private Map<String,MBeanServerConnection> conns = new ConcurrentHashMap<String, MBeanServerConnection>();
 
-    private volatile MBeanServerConnection mbsJboss = null;
+    public MBeanServerRegistry() {
+        conns.put("java", ManagementFactory.getPlatformMBeanServer());
+    }
 
     /**
      * Looks for a given MBean server. java and jboss mbean servers are currently available.
@@ -21,30 +26,24 @@ public class MBeanServerRegistry {
      * @return
      */
     public MBeanServerConnection lookup(String name) {
-
-        if ("java".equals(name)) {
-            return mbsJava;
-        }
-
-        if ("jboss".equals(name)) {
-            return mbsJboss != null ? mbsJboss : getJBossMbs();
-        }
-
-        return null;
+        return conns.get(name);
     }
 
 
-    private synchronized MBeanServerConnection getJBossMbs() {
-        try {
-            InitialContext ctx = new InitialContext();
-            MBeanServerConnection server = mbsJboss =
-                    (MBeanServerConnection)ctx.lookup("/jmx/rmi/RMIAdaptor");
-            return server;
-        } catch (Exception e) {
-            log.error("Cannot find MBeanServer for JBoss: ", e);
-        } catch (NoClassDefFoundError e) {
-            log.error("Cannot find MBeanServer for JBoss: ", e);
+    public void register(String name, MBeanServerConnection conn) {
+        if (!conns.containsKey(name)) {
+            conns.put(name, conn);
+        } else {
+            log.error("MBean server '" + name + "' is already registered.");
         }
-        return null;
+    }
+
+
+    public void unregister(String name) {
+        if (conns.containsKey(name)) {
+            conns.remove(name);
+        } else {
+            log.error("Trying to unregister non-existent MBean server '" + name + "'");
+        }
     }
 }

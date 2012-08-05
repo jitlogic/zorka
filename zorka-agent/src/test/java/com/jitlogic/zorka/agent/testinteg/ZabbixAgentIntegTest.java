@@ -24,6 +24,7 @@ import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.concurrent.Executors;
 
+import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,7 +58,7 @@ public class ZabbixAgentIntegTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		agent = new ZorkaBshAgent(Executors.newSingleThreadExecutor());
+		agent = new ZorkaBshAgent(Executors.newSingleThreadExecutor(), new MBeanServerRegistry());
 		ZorkaConfig.put("zabbix.listen.addr", "127.0.0.1");
 		ZorkaConfig.put("zabbix.listen.port", "10066");
 		service = new ZabbixAgent(agent);

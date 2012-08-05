@@ -4,7 +4,7 @@
     <artifactId>zorka</artifactId>
     <packaging>pom</packaging>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ZORKA: parent aggregator</name>
+    <name>zorka: parent aggregator</name>
     <url>http://www.jitlogic.com/zorka</url>
 
     <properties>
@@ -30,6 +30,7 @@
         <module>zorka-bsh-core</module>
         <module>zorka-agent</module>
         <module>zorka-bsh-shell</module>
+        <module>zorka-jboss5</module>
     </modules>
 
 </project>
