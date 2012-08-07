@@ -28,6 +28,7 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
+import com.jitlogic.zorka.agent.rankproc.AvgRateCounter;
 import com.jitlogic.zorka.agent.rankproc.BeanRankLister;
 import com.jitlogic.zorka.agent.rankproc.ThreadRankLister;
 import com.jitlogic.zorka.mbeans.AttrGetter;
@@ -263,6 +264,9 @@ public class ZorkaLib implements ZorkaService {
 		return bean;
 	}
 
+    public AvgRateCounter newRateCounter() {
+        return new AvgRateCounter(this);
+    }
 
 	public void svcStart() {
 	}
