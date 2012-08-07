@@ -68,7 +68,7 @@ public class AvgRateCounter {
     }
 
 
-    private long coerce(Object val) {
+    public long coerce(Object val) {
         if (val instanceof Long) {
             return (Long)val;
         } else if (val instanceof Integer) {

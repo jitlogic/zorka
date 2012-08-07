@@ -38,7 +38,7 @@ public class AverageRateCountingTest {
         ZabbixLib zl = new ZabbixLib(bshAgent, bshAgent.getZorkaLib());
         zorkaLib = bshAgent.getZorkaLib();
         testUtil.setUp(bshAgent);
-        counter = zorkaLib.newRateCounter();
+        counter = new AvgRateCounter(zorkaLib);
     }
 
     @After
@@ -81,6 +81,15 @@ public class AverageRateCountingTest {
 
         tj.setNom(10); tj.setDiv(20);
         assertEquals(0.0, counter.get(path, "Nom", "Div", AvgRateCounter.AVG5), 0.01);
+    }
 
+    @Test
+    public void testZorkaLibRateFn1() throws Exception {
+        TestJmx tj = testUtil.makeTestJmx("test:name=bean1,type=TestJmx", 0, 0);
+
+        assertEquals(0.0, zorkaLib.rate("test", "test:name=bean1,type=TestJmx", "Nom", "Div", 60), 0.01);
+        tj.setNom(5); tj.setDiv(5);
+        assertEquals(1.0, zorkaLib.rate("test", "test:name=bean1,type=TestJmx", "Nom", "Div", 60), 0.01);
+        assertEquals(1.0, zorkaLib.rate("test", "test:name=bean1,type=TestJmx", "Nom", "Div", "AVG1"), 0.01);
     }
 }
