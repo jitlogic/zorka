@@ -35,6 +35,7 @@ import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
 import com.jitlogic.zorka.util.ZorkaLogger;
+import com.sun.xml.internal.ws.api.addressing.AddressingVersion;
 
 
 /**
@@ -264,9 +265,41 @@ public class ZorkaLib implements ZorkaService {
 		return bean;
 	}
 
-    public AvgRateCounter newRateCounter() {
-        return new AvgRateCounter(this);
+    private AvgRateCounter rateCounter = new AvgRateCounter(this);
+
+    public Double rate(Object...args) {
+
+        if (args.length < 5) {
+            log.error("Too little arguments for zorka.rate(). At least 5 args are required");
+            return null;
+        }
+
+        Object oh = args[args.length-1];
+        long horizon = 0;
+
+        if (oh instanceof String && ((String) oh).matches("^AVG[0-9]+$")) {
+            horizon = Long.parseLong(oh.toString().substring(3)) * 60000;
+        } else {
+            horizon = rateCounter.coerce(args[args.length-1]) * 1000;
+        }
+
+        if (horizon == 0) {
+            log.error("Invalid time horizon in zorka.rate()");
+            return null;
+        }
+
+        String div = (String)args[args.length-2];
+        String nom = (String)args[args.length-3];
+
+        List<Object> path = new ArrayList<Object>(args.length-3);
+
+        for (int i = 0; i < args.length-3; i++) {
+            path.add(args[i]);
+        }
+
+        return rateCounter.get(path, nom, div, horizon);
     }
+
 
 	public void svcStart() {
 	}
