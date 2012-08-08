@@ -64,6 +64,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                         <configuration>
                             <includes>
                                 <include>org.ow2.asm:asm</include>
+                                <include>org.ow2.spec.ee:ow2-jsr77-1.1-spec</include>
                                 <include>com.jitlogic.zorka:zorka-bsh-core</include>
                                 <include>com.jitlogic.zorka:zorka-agent</include>
                                 <include>com.googlecode.json-simple:json-simple</include>
@@ -75,6 +76,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                                 <pattern>org.objectweb.**</pattern>
                                 <pattern>com.jitlogic.zorka.agent.**</pattern>
                                 <pattern>org.json.**</pattern>
+                                <pattern>javax.management.j2ee.**</pattern>
                             </keep>
                         </configuration>
                     </execution>

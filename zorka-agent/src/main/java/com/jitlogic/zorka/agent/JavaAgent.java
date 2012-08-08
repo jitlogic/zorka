@@ -24,6 +24,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 import com.jitlogic.zorka.agent.zabbix.ZabbixAgent;
+import com.jitlogic.zorka.spy.ZorkaSpyLib;
 import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
 import com.jitlogic.zorka.util.ZorkaConfig;
 import com.jitlogic.zorka.util.ZorkaLogger;
@@ -40,6 +41,8 @@ public class JavaAgent {
 	private Executor executor;
 	private ZorkaBshAgent zorkaAgent = null;
 	private ZabbixAgent zabbixAgent = null;
+    private ZorkaSpyLib spyLib = null;
+
     private MBeanServerRegistry mBeanServerRegistry = new MBeanServerRegistry();
 
 	public JavaAgent() {
@@ -48,8 +51,14 @@ public class JavaAgent {
 	
 	public void startZorkaAgent() {
 		zorkaAgent = new ZorkaBshAgent(executor, mBeanServerRegistry);
-		
-	    zorkaAgent.loadScriptDir(ZorkaConfig.getConfDir());
+
+        if (ZorkaConfig.get("spy", "no").equalsIgnoreCase("yes")) {
+            log.info("Enabling Zorka SPY");
+            spyLib = new ZorkaSpyLib(zorkaAgent);
+            zorkaAgent.installModule("spy", spyLib);
+        }
+
+        zorkaAgent.loadScriptDir(ZorkaConfig.getConfDir());
 
 		zorkaAgent.svcStart();		
 	}
@@ -60,7 +69,7 @@ public class JavaAgent {
 			zabbixAgent.start();
 		}		
 	}
-	
+
 	public void stopZabbixAgent() {
 		zabbixAgent.stop();
 	}
@@ -75,13 +84,18 @@ public class JavaAgent {
 	public static void premain(String args, Instrumentation inst) {
 
 		start();
-	}
+
+        if (agent.spyLib != null) {
+            log.info("Adding ZORKA class transformer in premain()");
+            inst.addTransformer(agent.spyLib.getSpy(), true);
+        }
+    }
 
 	public static void start() {
 		agent = new JavaAgent();
 		agent.startZorkaAgent();
 		agent.startZabbixAgent();
-	}
+    }
 	
 	public static void stop() {
 		agent.stopZabbixAgent();

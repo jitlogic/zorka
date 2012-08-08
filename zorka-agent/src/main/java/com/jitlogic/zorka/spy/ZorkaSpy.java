@@ -7,11 +7,14 @@ import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jitlogic.zorka.util.ZorkaLogger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 
 public class ZorkaSpy implements ClassFileTransformer {
+
+    private static ZorkaLogger log = ZorkaLogger.getLogger(ZorkaSpy.class);
 
 	private List<MethodTemplate> templates = new ArrayList<MethodTemplate>();
 	
@@ -44,7 +47,9 @@ public class ZorkaSpy implements ClassFileTransformer {
 	public byte[] instrument(String className, byte[] buf, ClassReader cr) throws IOException {
 		
 		if (!lookup(className)) return buf;
-		
+
+        log.info("Instrumenting class: " + className);
+
 		ClassWriter cw = new ClassWriter(cr, 0);
 		ClassVisitor ca = new ClassInstrumentator(className, this, cw);
 		

@@ -35,7 +35,6 @@ import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
 import com.jitlogic.zorka.util.ZorkaLogger;
-import com.sun.xml.internal.ws.api.addressing.AddressingVersion;
 
 
 /**
