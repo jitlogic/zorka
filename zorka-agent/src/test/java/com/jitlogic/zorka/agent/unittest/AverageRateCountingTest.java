@@ -21,6 +21,7 @@ import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaLib;
 import com.jitlogic.zorka.agent.rankproc.AvgRateCounter;
+import com.jitlogic.zorka.agent.testutil.TestExecutor;
 import com.jitlogic.zorka.agent.testutil.TestJmx;
 import com.jitlogic.zorka.agent.testutil.TestUtil;
 import com.jitlogic.zorka.agent.zabbix.ZabbixLib;
@@ -38,12 +39,6 @@ import java.util.concurrent.Executor;
  */
 public class AverageRateCountingTest {
 
-    private static class TrivialExecutor implements Executor {
-        public void execute(Runnable command) {
-            command.run();
-        }
-    }
-
     private TestUtil testUtil = new TestUtil();
     private ZorkaBshAgent bshAgent;
     private ZorkaLib zorkaLib;
@@ -51,7 +46,7 @@ public class AverageRateCountingTest {
 
     @Before
     public void setUp() {
-        bshAgent = new ZorkaBshAgent(new TrivialExecutor(), new MBeanServerRegistry());
+        bshAgent = new ZorkaBshAgent(new TestExecutor(), new MBeanServerRegistry());
         ZabbixLib zl = new ZabbixLib(bshAgent, bshAgent.getZorkaLib());
         zorkaLib = bshAgent.getZorkaLib();
         testUtil.setUp(bshAgent);

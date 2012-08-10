@@ -17,12 +17,16 @@
 
 package com.jitlogic.zorka.agent.testutil;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author RLE <rafal.lewczuk@gmail.com>
  */
 public class TestJmx implements TestJmxMBean {
 
     public long nom, div;
+    private Map<String,String> strMap = new HashMap<String, String>();
 
     public long getNom() {
         return nom;
@@ -30,6 +34,10 @@ public class TestJmx implements TestJmxMBean {
 
     public long getDiv() {
         return div;
+    }
+
+    public Map<String, String> getStrMap() {
+        return strMap;
     }
 
     public void setNom(long nom) {

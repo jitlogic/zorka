@@ -83,12 +83,12 @@ public class ZabbixLib {
             for (int oidx = 0; oidx < osrc.size(); oidx++) {
 
                 Object srcObj = osrc.get(oidx);
-                JSONObject dstObj = (JSONObject)odst.get(oidx);
+                JSONObject dstObj = (JSONObject)dsrc.get(oidx);
 
                 if (pathItem.startsWith("~")) {
                     for (String attr : ZorkaUtil.listAttrNames(srcObj)) {
-                        if (attr != null && attr.matches(pathItem)) {
-                            Object obj = zorkaLib.get(srcObj);
+                        if (attr != null && attr.matches(pathItem.substring(1))) {
+                            Object obj = zorkaLib.get(srcObj, attr);
                             if (obj != null) {
                                 JSONObject dsr = pathAttr == null ? dstObj
                                         : extend(dstObj, pathAttr, attr);
@@ -97,16 +97,16 @@ public class ZabbixLib {
                         }
                     }
                 } else {
-                    Object obj = zorkaLib.get(srcObj);
+                    Object obj = zorkaLib.get(srcObj, pathItem);
                     if (obj != null) {
                         JSONObject dsr = pathAttr == null ? dstObj
                             : extend(dstObj, pathAttr, pathItem);
                         odst.add(obj); ddst.add(dsr);
                     }
                 } //
-            }
+            } // for (int oidx = 0 ...
             osrc = odst; dsrc = ddst;
-        }
+        } // for (int pidx = 0 ...
 
         JSONObject discoveries = new JSONObject();
         discoveries.put("data", dsrc);

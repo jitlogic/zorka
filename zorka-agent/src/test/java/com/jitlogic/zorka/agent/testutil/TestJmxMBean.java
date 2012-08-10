@@ -17,10 +17,13 @@
 
 package com.jitlogic.zorka.agent.testutil;
 
+import java.util.Map;
+
 public interface TestJmxMBean {
 
     public long getNom();
 
     public long getDiv();
 
+    public Map<String,String> getStrMap();
 }
