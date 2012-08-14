@@ -18,10 +18,9 @@
 package com.jitlogic.zorka.agent.rankproc;
 
 import com.jitlogic.zorka.agent.ZorkaLib;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.util.ZorkaUtil;
 
-import javax.management.MBeanServerConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class AvgRateCounter {
 
-    private static final ZorkaLogger log = ZorkaLogger.getLogger(AvgRateCounter.class);
+    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     public final static long AVG1  =      60 * 1000;
     public final static long AVG5  =  5 * 60 * 1000;

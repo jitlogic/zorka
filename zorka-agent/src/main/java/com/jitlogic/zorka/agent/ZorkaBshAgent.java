@@ -24,16 +24,17 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLog;
 
 import bsh.EvalError;
 import bsh.Interpreter;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 public class ZorkaBshAgent implements ZorkaService {
 
 	public static final String VERSION = "0.0.1-SNAPSHOT";
 	
-	private static ZorkaLogger log = ZorkaLogger.getLogger(ZorkaBshAgent.class);
+	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
 	private Interpreter interpreter;
 	private ZorkaLib zorkaLib;
@@ -81,7 +82,7 @@ public class ZorkaBshAgent implements ZorkaService {
 	
 	
 	public void exec(String expr, ZorkaCallback callback) {
-		log.debug("Executing ZORKA query: '" + expr + "'"); // TODO avoid concatenation when log level > 0 (? on ZorkaLogger level ?)
+		log.debug("Executing ZORKA query: '" + expr + "'"); // TODO avoid concatenation when log level > 0 (? on ZorkaLog level ?)
 		ZorkaBshWorker worker = new ZorkaBshWorker(this, expr, callback);
 		executor.execute(worker);
 	}

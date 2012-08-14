@@ -1,94 +1,89 @@
-/** 
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
- * 
- * ZORKA is free software. You can redistribute it and/or modify it under the
- * terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
- * 
- * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * ZORKA. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.jitlogic.zorka.util;
 
-import java.io.IOException;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+import java.io.*;
+import java.util.Date;
 
-
+/**
+ * This has been written from scratch in order to not interfere with
+ * other logging frameworks.
+ *
+ * @author RLE <rafal.lewczuk@gmail.com>
+ */
 public class ZorkaLogger {
 
-	private static ZorkaLogger logger = null;
-	
-	public synchronized static ZorkaLogger getLogger(Class<?> clazz) {
-		if (logger == null) {
-			logger = new ZorkaLogger("com.jitlogic.zorka");
-		}
-		return logger;
-	}
-	
-	private Logger log;
-	private boolean logExceptions;
-	private boolean doTrace;
-	
-	private ZorkaLogger(String name) {
-		logExceptions = "yes".equalsIgnoreCase(ZorkaConfig.get("zorka.log.exceptions", "yes"));
-		doTrace = "yes".equalsIgnoreCase(ZorkaConfig.get("zorka.log.trace", "no"));
-		log = Logger.getLogger(name);
-		log.setLevel(Level.parse(ZorkaConfig.get("zorka.log.level", "ALL")));
-		try {
-			FileHandler handler = new FileHandler(
-				ZorkaConfig.get("zorka.log.file", 
-					ZorkaConfig.getLogDir() + "/zorka_%u.log"), 
-					1024*1024, 10);
-			handler.setLevel(Level.ALL);
-			handler.setFormatter(new SimpleFormatter());
-			log.addHandler(handler);
-		} catch (IOException e) { }
-	}
-	
-	public void trace(String msg) {
-		log.finest(msg);
-	}
-	
-	public void debug(String msg) {
-		log.fine(msg);
-	}
-	
-	public void notice(String msg) {
-		log.log(Level.CONFIG, msg);
-	}
-	
-	public void info(String msg) {
-		log.info(msg);
-	}
-	
-	public void warn(String msg) {
-		log.log(Level.WARNING, msg);
-	}
-	
-	public void error(String msg) {
-		log.log(Level.WARNING, msg);
-	}
-	
-	
-	public void error(String msg, Throwable e) {
-		if (logExceptions) {
-			log.log(Level.WARNING, msg, e);
-		} else {
-			log.log(Level.WARNING, msg);
-		}
-	}
-	
-	public boolean isTrace() {
-		return doTrace;
-	}
+    private static ZorkaLogger logger = null;
+
+    public synchronized static ZorkaLog getLog(Class<?> clazz) {
+
+        if (logger == null) {
+            logger = new ZorkaLogger();
+        }
+
+        return new ZorkaLog(clazz, logger);
+    }
+
+    private String logDir;
+    private boolean logExceptions;
+    private boolean doTrace;
+    private ZorkaLogLevel logThreshold;
+
+    private int maxSize = 10*1024*1024;
+    private int maxLogs = 4;
+
+    private boolean active = true;
+
+    private PrintStream out = null;
+    private OutputStream os = null;
+    private int currentSize = 0;
+
+    public ZorkaLogger() {
+        logDir = ZorkaConfig.getLogDir();
+        logExceptions = "yes".equalsIgnoreCase(ZorkaConfig.get("zorka.log.exceptions", "yes"));
+        doTrace = "yes".equalsIgnoreCase(ZorkaConfig.get("zorka.log.trace", "no"));
+        logThreshold = ZorkaLogLevel.valueOf (ZorkaConfig.get("zorka.log.level", "DEBUG"));
+    }
+
+    public void log(ZorkaLog source, ZorkaLogLevel logLevel, String message) {
+        log(source, logLevel, message, null);
+    }
+
+    public void log(ZorkaLog source, ZorkaLogLevel logLevel, String message, Throwable e) {
+        if (active && logLevel.getPriority() >= logThreshold.getPriority()) {
+            if (out == null || currentSize >= maxSize) {
+                reopen();
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(new Date());
+            sb.append(" ");
+            sb.append(message);
+
+            String s = sb.toString();
+
+            out.println(s);
+            currentSize += s.getBytes().length + 1;
+        }
+    }
+
+    private void reopen() {
+        if (out != null) {
+            out.close();
+            out = null;
+        }
+
+        if (os != null) {
+            try {
+                os.close();
+            } catch (IOException e) {
+            }
+            os = null;
+        }
+
+        try {
+            // TODO tutaj przerolowanie pliku
+            os = new FileOutputStream(logDir + "/zorka.log");
+            out = new PrintStream(os);
+        } catch (FileNotFoundException e) {
+        }
+    }
 }

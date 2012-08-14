@@ -34,14 +34,14 @@ import javax.management.MBeanNotificationInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.ReflectionException;
 
-import com.jitlogic.zorka.agent.rankproc.RankLister;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 // TODO proper structure for supporting parallelism (in somewhat more elegant way)
 
 public class ZorkaMappedMBean implements DynamicMBean {
 
-	private static ZorkaLogger log = ZorkaLogger.getLogger(ZorkaMappedMBean.class);
+	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 	
 	private String description;
 	private Map<String,Attribute> attrs = new HashMap<String, Attribute>();

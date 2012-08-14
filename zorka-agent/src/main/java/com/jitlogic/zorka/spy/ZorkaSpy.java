@@ -24,6 +24,7 @@ import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -31,7 +32,7 @@ import org.objectweb.asm.ClassWriter;
 
 public class ZorkaSpy implements ClassFileTransformer {
 
-    private static ZorkaLogger log = ZorkaLogger.getLogger(ZorkaSpy.class);
+    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
 	private List<MethodTemplate> templates = new ArrayList<MethodTemplate>();
 	

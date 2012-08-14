@@ -18,25 +18,21 @@
 package com.jitlogic.zorka.agent;
 
 import java.lang.instrument.Instrumentation;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 
 import com.jitlogic.zorka.agent.zabbix.ZabbixAgent;
 import com.jitlogic.zorka.spy.ZorkaSpyLib;
 import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
 import com.jitlogic.zorka.util.ZorkaConfig;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
-
-import javax.management.MBeanServerConnection;
 
 public class JavaAgent {
 
 
 	public static final long DEFAULT_TIMEOUT = 500000;
 
-	private static ZorkaLogger log = ZorkaLogger.getLogger(JavaAgent.class);
+	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 	
 	private Executor executor;
 	private ZorkaBshAgent zorkaAgent = null;
@@ -86,7 +82,7 @@ public class JavaAgent {
 		start();
 
         if (agent.spyLib != null) {
-            log.info("Adding ZORKA class transformer in premain()");
+            //log.info("Adding ZORKA class transformer in premain()");
             inst.addTransformer(agent.spyLib.getSpy(), true);
         }
     }

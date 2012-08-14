@@ -17,18 +17,17 @@
 
 package com.jitlogic.zorka.agent;
 
-import com.jitlogic.zorka.integ.JBossIntegration;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 import javax.management.MBeanServerConnection;
-import javax.naming.InitialContext;
 import java.lang.management.ManagementFactory;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MBeanServerRegistry {
 
-    private static final ZorkaLogger log = ZorkaLogger.getLogger(MBeanServerRegistry.class);
+    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private Map<String,MBeanServerConnection> conns = new ConcurrentHashMap<String, MBeanServerConnection>();
 

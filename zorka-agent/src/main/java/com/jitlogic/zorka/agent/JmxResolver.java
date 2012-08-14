@@ -29,12 +29,13 @@ import javax.management.ObjectName;
 import javax.management.j2ee.statistics.Stats;
 import javax.management.openmbean.CompositeData;
 
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 public class JmxResolver {
 	
-	private static final ZorkaLogger log = ZorkaLogger.getLogger(JmxResolver.class); 
+	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 	
 	@SuppressWarnings("unchecked")
 	public Set<ObjectName> queryNames(MBeanServerConnection conn, String query) {
@@ -77,7 +78,7 @@ public class JmxResolver {
 				try {
 					return m.invoke(obj);
 				} catch (Exception e) {
-					log.error("Method '" + m.getName() + "' invocation failed", e);
+					//TODO log.error("Method '" + m.getName() + "' invocation failed", e);
 					return null;
 				}
 			}
@@ -87,7 +88,7 @@ public class JmxResolver {
 				Field field = clazz.getField(name);
 				return field.get(name);
 			} catch (Exception e) {
-				ZorkaUtil.log.error("Field '" + name + "' fetch failed", e);
+				//TODO ZorkaUtil.log.error("Field '" + name + "' fetch failed", e);
 				return null;
 			}
 		}
