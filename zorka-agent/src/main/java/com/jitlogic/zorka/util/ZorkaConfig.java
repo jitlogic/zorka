@@ -17,6 +17,8 @@
 
 package com.jitlogic.zorka.util;
 
+import com.jitlogic.zorka.bootstrap.AgentMain;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,11 +53,15 @@ public class ZorkaConfig {
 	public static String getConfDir() {
 		return getHomeDir("conf");
 	}
-	
+
+    public synchronized void setHomeDir(String dir) {
+        homeDir = dir;
+    }
 	
 	private synchronized static String getHomeDir(String suffix) {
 		if (homeDir == null)
-			homeDir = System.getProperty("zorka.home.dir", "/opt/zorka");			
+            homeDir = AgentMain.getHomeDir();
+			//homeDir = System.getProperty("zorka.home.dir", "/opt/zorka");
 		
 		return homeDir.endsWith("/") ? homeDir + suffix : homeDir + "/" + suffix;
 	}

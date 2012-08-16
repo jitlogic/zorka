@@ -58,5 +58,8 @@ public class ZorkaLog {
 	public void error(String msg, Throwable e) {
         output.log(this, ZorkaLogLevel.ERROR, msg, e);
 	}
-	
+
+    public Class<?> getClazz() {
+        return clazz;
+    }
 }
