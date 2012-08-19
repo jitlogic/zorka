@@ -34,6 +34,7 @@ import com.jitlogic.zorka.agent.rankproc.ThreadRankLister;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 
@@ -45,7 +46,7 @@ import com.jitlogic.zorka.util.ZorkaLogger;
  */
 public class ZorkaLib implements ZorkaService {
 	
-	private static final ZorkaLogger log = ZorkaLogger.getLogger(ZorkaLib.class);
+	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 	
 	private ZorkaBshAgent agent;
     private Set<JmxObject> registeredObjects = new HashSet<JmxObject>();

@@ -26,11 +26,12 @@ import java.net.UnknownHostException;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.util.ZorkaConfig;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 public class ZabbixAgent implements Runnable {
 	
-	private static ZorkaLogger log = ZorkaLogger.getLogger(ZabbixAgent.class);
+	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 	
 	private volatile ZorkaBshAgent agent;
 

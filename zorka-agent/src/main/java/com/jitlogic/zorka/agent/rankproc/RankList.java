@@ -26,7 +26,7 @@ import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularType;
 
-import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 /**
@@ -36,7 +36,7 @@ import com.jitlogic.zorka.util.ZorkaLogger;
  */
 public class RankList<K,T> implements TabularData {
 
-	private static ZorkaLogger log = ZorkaLogger.getLogger(RankList.class);
+	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 	
 	private String listName;
 	private String attrName;
@@ -76,8 +76,7 @@ public class RankList<K,T> implements TabularData {
 		
 		int sz = items.length > size ? size : items.length;
 		
-		if (log.isTrace())
-			log.trace("RankList.rerank(size=" + sz + ")");
+		log.trace("RankList.rerank(size=" + sz + ")");
 		
 		 RankItem<K,T>[] newItems = new RankItem[sz];
 		 
@@ -90,8 +89,7 @@ public class RankList<K,T> implements TabularData {
 	
 	
 	public TabularType getTabularType() {
-		if (log.isTrace())
-			log.trace("getTabularType()");
+		log.trace("getTabularType()");
 		return tabularType;
 	}
 	

@@ -32,6 +32,7 @@ import javax.management.openmbean.SimpleType;
 import javax.management.openmbean.TabularType;
 
 import com.jitlogic.zorka.agent.ZorkaService;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
@@ -48,7 +49,7 @@ import com.jitlogic.zorka.util.ZorkaUtil;
  */
 public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 
-	private static ZorkaLogger log = ZorkaLogger.getLogger(RankLister.class);
+	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
 	protected static final int ATTR_ID            = 0;
 	protected static final int ATTR_TSTAMP        = 1;
@@ -210,8 +211,7 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 		try {
 			type = new CompositeType("com.jitlogic.zorka.threadproc.ThreadItem", 
 				"Thread statistic.", newAttr, newDesc, newType);
-			if (log.isTrace())
-				log.trace("Creating composite type: " + type);
+            log.trace("Creating composite type: " + type);
 		} catch (OpenDataException e) {
 			// TODO to sie bedzie mscilo w innych czesciach kodu - tutaj musimy sypnac jakims wyjatkiem
 			log.error("Error creating CompositeType for thread lister", e);
@@ -220,8 +220,7 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 		String[] index = { "id" };
 		try {
 			tabularType = new TabularType("ThreadList", "Thread Ranking List", type, index);
-			if (log.isTrace())
-				log.trace("Creating tabular type: " + type);
+            log.trace("Creating tabular type: " + type);
 		} catch (OpenDataException e) {
 			// TODO to sie bedzie mscilo w innych czesciach kodu - tutaj musimy sypnac jakims wyjatkiem
 			log.error("Error creating TabularType for thread lister", e);
@@ -317,16 +316,14 @@ public abstract class RankLister<K,T> implements Runnable, ZorkaService {
 			try {
 				long tstamp = util.currentTimeMillis();
 				
-				if (log.isTrace())
-					log.trace("Running one cycle: t=" + tstamp);
+				log.trace("Running one cycle: t=" + tstamp);
 				
 				runCycle(tstamp);
 				
 				long ts1 = updateInterval-tstamp+lastUpdate;
 				long ts2 = rerankInterval-tstamp+lastRerank;
 				
-				if (log.isTrace())
-					log.trace("Next cycle: ts1=" + ts1 + ", ts2=" + ts2);
+				log.trace("Next cycle: ts1=" + ts1 + ", ts2=" + ts2);
 				
 				long ts = ts1 < ts2 ? ts1 : ts2;
 				if (ts > 0) {

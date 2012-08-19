@@ -19,6 +19,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <artifactId>zorka-bsh-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.jitlogic.zorka</groupId>
+            <artifactId>zorka-bootstrap</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <parent>
         <groupId>com.jitlogic.zorka</groupId>
@@ -50,37 +55,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                         </manifestEntries>
                     </archive>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>jarjar-maven-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jarjar</goal>
-                        </goals>
-                        <configuration>
-                            <includes>
-                                <include>org.ow2.asm:asm</include>
-                                <include>org.ow2.spec.ee:ow2-jsr77-1.1-spec</include>
-                                <include>com.jitlogic.zorka:zorka-bsh-core</include>
-                                <include>com.jitlogic.zorka:zorka-agent</include>
-                                <include>com.googlecode.json-simple:json-simple</include>
-                            </includes>
-                            <rules>
-                            </rules>
-                            <keep>
-                                <pattern>bsh.**</pattern>
-                                <pattern>org.objectweb.**</pattern>
-                                <pattern>com.jitlogic.zorka.agent.**</pattern>
-                                <pattern>org.json.**</pattern>
-                                <pattern>javax.management.j2ee.**</pattern>
-                            </keep>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

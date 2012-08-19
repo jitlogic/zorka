@@ -17,23 +17,24 @@
 
 package com.jitlogic.zorka.agent;
 
-import com.jitlogic.zorka.integ.JBossIntegration;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
+import javax.management.MBeanServerBuilder;
 import javax.management.MBeanServerConnection;
-import javax.naming.InitialContext;
 import java.lang.management.ManagementFactory;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MBeanServerRegistry {
 
-    private static final ZorkaLogger log = ZorkaLogger.getLogger(MBeanServerRegistry.class);
+    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private Map<String,MBeanServerConnection> conns = new ConcurrentHashMap<String, MBeanServerConnection>();
 
     public MBeanServerRegistry() {
-        conns.put("java", ManagementFactory.getPlatformMBeanServer());
+        //conns.put("java", ManagementFactory.getPlatformMBeanServer());
+        //conns.put("zorka", new MBeanServerBuilder().newMBeanServer("test", null, null));
     }
 
     /**
@@ -43,7 +44,15 @@ public class MBeanServerRegistry {
      * @return
      */
     public MBeanServerConnection lookup(String name) {
-        return conns.get(name);
+        MBeanServerConnection conn = conns.get(name);
+        if (conn == null) {
+            if ("java".equals(name)) {
+                conn = ManagementFactory.getPlatformMBeanServer();
+                conns.put("java", conn);
+            }
+        }
+
+        return conn;
     }
 
 
