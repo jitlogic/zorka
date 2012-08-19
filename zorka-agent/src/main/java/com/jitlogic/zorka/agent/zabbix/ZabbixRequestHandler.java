@@ -24,14 +24,13 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 import com.jitlogic.zorka.agent.ZorkaCallback;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
-import org.json.simple.JSONObject;
 
 public class ZabbixRequestHandler implements ZorkaCallback {
 
-	private static final ZorkaLogger log = ZorkaLogger.getLogger(ZabbixRequestHandler.class);
+	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 	
 	private Socket socket;
 	private String req = null;
@@ -176,7 +175,7 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 	public String getReq() throws IOException {
 		if (req == null) {
 			String s = decode(socket.getInputStream());
-			log.debug("Incoming ZABBIX query: '" + s + "'"); // TODO avoid concatenation when log level > 0 (? on ZorkaLogger level ?)
+			log.debug("Incoming ZABBIX query: '" + s + "'"); // TODO avoid concatenation when log level > 0 (? on ZorkaLog level ?)
 			req = translate(s);
 		}
 		return req;

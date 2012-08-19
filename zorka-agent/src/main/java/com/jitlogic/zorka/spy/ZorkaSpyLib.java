@@ -26,12 +26,13 @@ import com.jitlogic.zorka.agent.ZorkaLib;
 import com.jitlogic.zorka.mbeans.MethodCallStatisticImpl;
 import com.jitlogic.zorka.mbeans.MethodCallStats;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 public class ZorkaSpyLib {
 	
 	
-	private static final ZorkaLogger log = ZorkaLogger.getLogger(ZorkaSpyLib.class);
+	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 	
 	
 	//private ZorkaBshAgent agent;

@@ -31,7 +31,7 @@ import javax.management.j2ee.statistics.Stats;
 
 public class ZorkaUtil {
 	
-	public final static ZorkaLogger log = ZorkaLogger.getLogger(ZorkaUtil.class);
+	public final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 	
 	protected static ZorkaUtil instance;
 	

@@ -17,11 +17,11 @@
 
 package com.jitlogic.zorka.integ;
 
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 import javax.management.MBeanServerConnection;
 import javax.naming.InitialContext;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -30,7 +30,7 @@ import java.net.URLClassLoader;
  */
 public class JBossIntegration extends URLClassLoader {
 
-    private static final ZorkaLogger log = ZorkaLogger.getLogger(JBossIntegration.class);
+    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
 
     public JBossIntegration() {

@@ -1,0 +1,23 @@
+
+__hotspot() {
+
+	memutil(name) {
+		mem_used = zorka.jmx("java", "java.lang:name="+name+",type=MemoryPool", "Usage", "used");
+		mem_max = zorka.jmx("java", "java.lang:name="+name+",type=MemoryPool", "PeakUsage", "max");
+		if (mem_used == null || mem_max == null) return null;
+		if (mem_used.equals(0L) || mem_max.equals(0L)) return 0.0;
+		return 100.0 * mem_used.longValue() / mem_max.longValue();
+	}
+
+	heaputil(name) {
+		mem_used = zorka.jmx("java", "java.lang:type=Memory",name, "used");
+		mem_max = zorka.jmx("java", "java.lang:type=Memory",name, "max");
+		if (mem_used == null || mem_max == null) return null;
+		if (mem_used.equals(0L) || mem_max.equals(0L)) return 0.0;
+		return 100.0 * mem_used.longValue() / mem_max.longValue();
+	}
+	return this;
+}
+
+
+hotspot = __hotspot();

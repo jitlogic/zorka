@@ -17,26 +17,23 @@
 
 package com.jitlogic.zorka.agent;
 
-import java.lang.instrument.Instrumentation;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.lang.instrument.ClassFileTransformer;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 
 import com.jitlogic.zorka.agent.zabbix.ZabbixAgent;
+import com.jitlogic.zorka.bootstrap.Agent;
 import com.jitlogic.zorka.spy.ZorkaSpyLib;
 import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
 import com.jitlogic.zorka.util.ZorkaConfig;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
-import javax.management.MBeanServerConnection;
-
-public class JavaAgent {
+public class JavaAgent implements Agent {
 
 
 	public static final long DEFAULT_TIMEOUT = 500000;
 
-	private static ZorkaLogger log = ZorkaLogger.getLogger(JavaAgent.class);
+	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 	
 	private Executor executor;
 	private ZorkaBshAgent zorkaAgent = null;
@@ -48,9 +45,10 @@ public class JavaAgent {
 	public JavaAgent() {
         executor = new ClosingTimeoutExecutor(4, 32, DEFAULT_TIMEOUT);
 	}
-	
-	public void startZorkaAgent() {
-		zorkaAgent = new ZorkaBshAgent(executor, mBeanServerRegistry);
+
+	public  void start() {
+		//agent = new JavaAgent();
+        zorkaAgent = new ZorkaBshAgent(executor, mBeanServerRegistry);
 
         if (ZorkaConfig.get("spy", "no").equalsIgnoreCase("yes")) {
             log.info("Enabling Zorka SPY");
@@ -60,50 +58,16 @@ public class JavaAgent {
 
         zorkaAgent.loadScriptDir(ZorkaConfig.getConfDir());
 
-		zorkaAgent.svcStart();		
-	}
-	
-	public void startZabbixAgent() {		
-		if (ZorkaConfig.get("zabbix.enabled", "yes").equalsIgnoreCase("yes")) {
-			zabbixAgent = new ZabbixAgent(zorkaAgent);
-			zabbixAgent.start();
-		}		
-	}
-
-	public void stopZabbixAgent() {
-		zabbixAgent.stop();
-	}
-	
-	public void stopZorkaAgent() {
-		zorkaAgent.svcStop();
-	}
-	
-	private static JavaAgent agent = null;
-	
-	
-	public static void premain(String args, Instrumentation inst) {
-
-		start();
-
-        if (agent.spyLib != null) {
-            log.info("Adding ZORKA class transformer in premain()");
-            inst.addTransformer(agent.spyLib.getSpy(), true);
+        zorkaAgent.svcStart();
+        if (ZorkaConfig.get("zabbix.enabled", "yes").equalsIgnoreCase("yes")) {
+            zabbixAgent = new ZabbixAgent(zorkaAgent);
+            zabbixAgent.start();
         }
     }
-
-	public static void start() {
-		agent = new JavaAgent();
-		agent.startZorkaAgent();
-		agent.startZabbixAgent();
-    }
 	
-	public static void stop() {
-		agent.stopZabbixAgent();
-		agent.stopZorkaAgent();
-	}
-
-    public static JavaAgent getAgent() {
-        return agent;
+	public void stop() {
+        zabbixAgent.stop();
+        zorkaAgent.svcStop();
     }
 
     public ZorkaBshAgent getZorkaAgent() {
@@ -112,5 +76,9 @@ public class JavaAgent {
 
     public MBeanServerRegistry getMBeanServerRegistry() {
         return mBeanServerRegistry;
+    }
+
+    public ClassFileTransformer getSpyTransformer() {
+        return spyLib != null ? spyLib.getSpy() : null;
     }
 }

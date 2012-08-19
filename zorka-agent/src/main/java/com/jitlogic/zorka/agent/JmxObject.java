@@ -20,11 +20,12 @@ package com.jitlogic.zorka.agent;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 public class JmxObject {
 	
-	private final static ZorkaLogger log = ZorkaLogger.getLogger(JmxObject.class);
+	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 	
 	private final ObjectName name;
 	private final MBeanServerConnection conn;
