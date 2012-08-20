@@ -33,7 +33,7 @@ public class TestUtil extends ClassLoader {
 		return clazz.newInstance();
 	}
 
-	public static void callMethod(Object obj, String name, Object...args) throws Exception {
+	public static Object callMethod(Object obj, String name, Object...args) throws Exception {
 		Method method = null;
 		Class<?> clazz = obj.getClass();
 		
@@ -46,11 +46,13 @@ public class TestUtil extends ClassLoader {
 		
 		if (method != null) {
 			if (args.length == 0) {
-				method.invoke(obj);
+				return method.invoke(obj);
 			} else {
-				method.invoke(obj, args);
+				return method.invoke(obj, args);
 			}
 		}
+
+        return null;
 	}
 	
 	public static void sleep(long waitTime) {

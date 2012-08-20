@@ -21,7 +21,9 @@ import static org.junit.Assert.*;
 
 import java.lang.reflect.InvocationTargetException;
 
+import com.jitlogic.zorka.agent.JavaAgent;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
+import com.jitlogic.zorka.bootstrap.AgentMain;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +47,9 @@ public class SimpleMethodsTest {
 		agent = new ZorkaBshAgent(new TestExecutor(), new MBeanServerRegistry());
 		lib = new ZorkaSpyLib(agent);
 		spy = lib.getSpy();
-	}
+        agent.getMBeanServerRegistry().lookup("java");
+        AgentMain.agent = new JavaAgent();
+    }
 	
 	@After
 	public void tearDown() {
@@ -119,7 +123,23 @@ public class SimpleMethodsTest {
 		assertEquals(1, obj.getClass().getField("finCounter").get(obj));
 		checkStats("tryCatchFinallyMethod", 1, 0, 1);
 	}
-	
+
+
+    @Test
+    public void testInstrumentAndCheckRetVal() throws Exception {
+        Object obj = makeCall("methodWithStringRetVal", 1);
+        Object ret = TestUtil.callMethod(obj, "methodWithStringRetVal", 1);
+        assertEquals("Returning: 1", ret);
+    }
+
+    @Test
+    public void testInstrumentWithSubsequenctCall() throws Exception {
+        Object obj = makeCall("testWithSubsequentCall", "aaa");
+        Object ret = TestUtil.callMethod(obj, "testWithSubsequentCall", "aaa");
+        assertEquals(true, ret);
+
+    }
+
 	
 	private Object makeCall(String method, Object...args) throws Exception {
 		
@@ -133,6 +153,8 @@ public class SimpleMethodsTest {
 		
 		return obj;
 	}
+
+
 	
 	
 	private void checkStats(String method, long calls, long errors, long time) throws Exception {
@@ -149,5 +171,5 @@ public class SimpleMethodsTest {
 		assertEquals("number of errors", errors, mcs.getErrors());
 		assertEquals("execution time", time, mcs.getTotalTime());
 	}
-	
+
 }

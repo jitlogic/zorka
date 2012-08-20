@@ -64,7 +64,10 @@ public class ZorkaSpy implements ClassFileTransformer {
 	
 	public byte[] instrument(String className, byte[] buf, ClassReader cr) throws IOException {
 		
-		if (!lookup(className)) return buf;
+		if (!lookup(className)) {
+            //log.info("Ignoring class: " + className);
+            return buf;
+        }
 
         log.info("Instrumenting class: " + className);
 

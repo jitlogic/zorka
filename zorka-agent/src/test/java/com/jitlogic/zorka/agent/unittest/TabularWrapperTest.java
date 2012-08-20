@@ -48,7 +48,7 @@ public class TabularWrapperTest {
         return ret;
     }
 
-    @Test
+    //@Test
     public void testWrapMapOfMapsAndPresentAsAnMBean() throws Exception {
         List<?> lst = Arrays.asList(
                 map("name", "aaa", "type", "ttt", "val", 1),
