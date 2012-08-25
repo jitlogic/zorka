@@ -66,4 +66,31 @@ public class SomeClass {
 			finCounter++;
 		}
 	}
+
+    public String methodWithStringRetVal(int i) {
+        TestUtil.sleep(waitTime);
+        return "Returning: " + i;
+    }
+
+
+    protected boolean subsequentPre(String input) {
+        return "aaa".equals(input);
+    }
+
+    protected boolean subsequentDo(String input) {
+        return "aaa".equals(input);
+    }
+
+    protected boolean subsequentPost(String input, boolean bo) {
+        return "aaa".equals(input) && bo;
+    }
+
+    public boolean testWithSubsequentCall(String input) throws Exception {
+        if (!subsequentPre(input))
+            return false;
+
+        final boolean ret = subsequentDo(input);
+
+        return subsequentPost(input, ret);
+    }
 }

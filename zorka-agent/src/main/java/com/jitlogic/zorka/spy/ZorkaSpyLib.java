@@ -18,14 +18,10 @@
 package com.jitlogic.zorka.spy;
 
 
-import javax.management.Attribute;
-
-import com.jitlogic.zorka.agent.JmxObject;
+import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.agent.ZorkaLib;
 import com.jitlogic.zorka.mbeans.MethodCallStatisticImpl;
 import com.jitlogic.zorka.mbeans.MethodCallStats;
-import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
@@ -37,45 +33,47 @@ public class ZorkaSpyLib {
 	
 	//private ZorkaBshAgent agent;
 	private ZorkaSpy spy;
-	private ZorkaLib lib;
+	//private ZorkaLib lib;
+    private MBeanServerRegistry mbr;
 	
 	
 	public ZorkaSpyLib(ZorkaBshAgent agent) {
 		//this.agent = agent;
-		this.lib = agent.getZorkaLib();
+		//this.lib = agent.getZorkaLib();
 		spy = new ZorkaSpy();
+        mbr = agent.getMBeanServerRegistry();
 	}
 	
 	
-	private MethodCallStats getStats(String beanName, String attrName) {
-		Object obj = lib.jmx("java", beanName, attrName);
-		
-		if (obj == null) {
-			obj = new MethodCallStats();
-			JmxObject jmxobj = (JmxObject)lib.jmx("java", beanName);
-			try {
-				if (jmxobj != null) {
-					jmxobj.getConn().setAttribute(jmxobj.getName(), new Attribute(attrName, obj));
-				} else {
-					ZorkaMappedMBean bean = lib.mbean("java", beanName);
-					bean.setAttribute(new Attribute(attrName, obj));
-				}
-			} catch (Exception e) {
-				log.error("Error setting attribute '" + attrName + "' for '" + beanName, e);
-				return null;
-			}
-		}
-		
-		if (! (obj instanceof MethodCallStats)) {
-			log.error("Attribute '" + attrName + "' of '" + beanName + "' is not MethodCallStats object.");
-		}
-		
-		return (MethodCallStats)obj;
-	}
+//	private MethodCallStats getStats(String bean, String attrName) {
+//		Object obj = mbr.getOrRegisterBeanAttr("java", bean, attrName, new MethodCallStats());
+//
+//		if (obj == null) {
+//			obj = new MethodCallStats();
+//			JmxObject jmxobj = (JmxObject)lib.jmx("java", bean);
+//			try {
+//				if (jmxobj != null) {
+//					jmxobj.getConn().setAttribute(jmxobj.getName(), new Attribute(attrName, obj));
+//				} else {
+//					ZorkaMappedMBean bean = lib.mbean("java", bean);
+//					bean.setAttribute(new Attribute(attrName, obj));
+//				}
+//			} catch (Exception e) {
+//				log.error("Error setting attribute '" + attrName + "' for '" + bean, e);
+//				return null;
+//			}
+//		}
+//
+//		if (! (obj instanceof MethodCallStats)) {
+//			log.error("Attribute '" + attrName + "' of '" + bean + "' is not MethodCallStats object.");
+//		}
+//
+//		return (MethodCallStats)obj;
+//	}
 
 	
 	public void simple(String className, String methodName, String beanName, String attrName) {
-		MethodCallStats mcs = getStats(beanName, attrName);
+		MethodCallStats mcs = mbr.getOrRegisterBeanAttr("java", beanName, attrName, new MethodCallStats(), "Zorka Spy Stats"); //getStats(bean, attrName);
 		MethodCallStatisticImpl st = mcs.getMethodCallStat(methodName);
 		DataCollector collector = new SingleMethodDataCollector(st);
 		MethodTemplate mt = new MethodTemplate(className, methodName, null, collector);
@@ -84,7 +82,7 @@ public class ZorkaSpyLib {
 		
 	
 	public void simple(String className, String methodName, String beanName, String attrName, String expr) {
-		MethodCallStats mcs = getStats(beanName, attrName);
+		MethodCallStats mcs = mbr.getOrRegisterBeanAttr("java", beanName, attrName, new MethodCallStats(), "Zorka Spy stats"); //getStats(bean, attrName);
 		DataCollector collector = new MultiMethodDataCollector(mcs, SpyExpression.parse(expr));
 		MethodTemplate mt = new MethodTemplate(className, methodName, null, collector);
 		spy.addTemplate(mt);

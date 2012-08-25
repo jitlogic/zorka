@@ -60,7 +60,8 @@ public class ZorkaLogger {
 
             String s = sb.toString();
 
-            out.println(s);
+            if (out != null)
+                out.println(s);
             currentSize += s.getBytes().length + 1;
         }
     }

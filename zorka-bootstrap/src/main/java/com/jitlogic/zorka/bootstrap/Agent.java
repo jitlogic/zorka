@@ -12,4 +12,11 @@ public interface Agent {
 
     public ClassFileTransformer getSpyTransformer();
 
+    public void logStart(long id);
+
+    public void logStart(Object[] args, long id);
+
+    public void logCall(long id);
+
+    public void logError(long id);
 }
