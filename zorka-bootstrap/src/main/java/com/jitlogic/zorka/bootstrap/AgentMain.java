@@ -1,7 +1,5 @@
 package com.jitlogic.zorka.bootstrap;
 
-import sun.reflect.FieldInfo;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.lang.instrument.Instrumentation;
