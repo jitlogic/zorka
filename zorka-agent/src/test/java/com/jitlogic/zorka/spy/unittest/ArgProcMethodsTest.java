@@ -19,7 +19,9 @@ package com.jitlogic.zorka.spy.unittest;
 
 import static org.junit.Assert.*;
 
+import com.jitlogic.zorka.agent.JavaAgent;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
+import com.jitlogic.zorka.bootstrap.AgentMain;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +46,8 @@ public class ArgProcMethodsTest {
 		agent = new ZorkaBshAgent(new TestExecutor(), new MBeanServerRegistry());
 		lib = new ZorkaSpyLib(agent);
 		spy = lib.getSpy();
+        agent.getMBeanServerRegistry().lookup("java");
+        AgentMain.agent = new JavaAgent();
 	}
 	
 	

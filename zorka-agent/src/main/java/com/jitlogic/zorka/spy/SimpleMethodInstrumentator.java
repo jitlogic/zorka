@@ -25,7 +25,10 @@ import org.objectweb.asm.Opcodes;
 
 public class SimpleMethodInstrumentator extends MethodVisitor {
 
-	private long id;
+    //private final static String COLLECTOR_CLASS = "com/jitlogic/zorka/spy/MainCollector";
+    private final static String COLLECTOR_CLASS = "com/jitlogic/zorka/bootstrap/AgentMain";
+
+    private long id;
 	private int[] args;
 
 	Label l_try_from = new Label();
@@ -58,8 +61,7 @@ public class SimpleMethodInstrumentator extends MethodVisitor {
 		
 		if (args.length == 0) {
 			mv.visitLdcInsn(id);
-			mv.visitMethodInsn(INVOKESTATIC, 
-					"com/jitlogic/zorka/spy/MainCollector", "logStart", "(J)V");
+			mv.visitMethodInsn(INVOKESTATIC, COLLECTOR_CLASS, "logStart", "(J)V");
 		} else {
 			emitLoadInt(args.length);
 			mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
@@ -70,9 +72,7 @@ public class SimpleMethodInstrumentator extends MethodVisitor {
 				mv.visitInsn(AASTORE);
 			}
 			mv.visitLdcInsn(id);
-			mv.visitMethodInsn(INVOKESTATIC, 
-				"com/jitlogic/zorka/spy/MainCollector", 
-				"logStart", "([Ljava/lang/Object;J)V");			
+			mv.visitMethodInsn(INVOKESTATIC, COLLECTOR_CLASS, "logStart", "([Ljava/lang/Object;J)V");
 		}
 				
 		mv.visitTryCatchBlock(l_try_from, l_try_to, l_try_handler, null);
@@ -85,7 +85,7 @@ public class SimpleMethodInstrumentator extends MethodVisitor {
 		if ((opcode >= IRETURN && opcode <= RETURN)) {
 			mv.visitLdcInsn(id);
 			mv.visitMethodInsn(INVOKESTATIC,
-				"com/jitlogic/zorka/spy/MainCollector", "logCall", "(J)V");
+                    COLLECTOR_CLASS, "logCall", "(J)V");
 		}
 		mv.visitInsn(opcode);
 	}
@@ -96,8 +96,7 @@ public class SimpleMethodInstrumentator extends MethodVisitor {
 		mv.visitLabel(l_try_to);
 		mv.visitLabel(l_try_handler);
 		mv.visitLdcInsn(id);
-		mv.visitMethodInsn(INVOKESTATIC,
-			"com/jitlogic/zorka/spy/MainCollector", "logError", "(J)V");		
+		mv.visitMethodInsn(INVOKESTATIC, COLLECTOR_CLASS, "logError", "(J)V");
 		mv.visitInsn(ATHROW);
 		mv.visitMaxs(maxStack+5+args.length, maxLocals);
 		

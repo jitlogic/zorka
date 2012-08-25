@@ -1,7 +1,5 @@
 package com.jitlogic.zorka.bootstrap;
 
-import sun.reflect.FieldInfo;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.lang.instrument.Instrumentation;
@@ -19,7 +17,7 @@ public class AgentMain {
     private static String homeDir;
     private static ClassLoader systemClassLoader;
     private static ClassLoader zorkaClassLoader;
-    private static Agent agent;
+    public static Agent agent; // TODO uporządkować to !
     private static String serverType = "generic";
 
     public static void premain(String args, Instrumentation instr) {
@@ -29,21 +27,9 @@ public class AgentMain {
         setupClassLoader();
         startZorkaAgent();
 
-        // Clean up logger after booting
-        //        try {
-        //            Class<?> clazz = Class.forName("java.util.logging.LogManager");
-        //            Field f = clazz.getDeclaredField("manager");
-        //            f.setAccessible(true);
-        //            f.set(clazz, null);
-        //            f.setAccessible(false);
-        //        } catch (ClassNotFoundException e) {
-        //            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        //        } catch (NoSuchFieldException e) {
-        //            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        //        } catch (IllegalAccessException e) {
-        //            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        //        }
-
+        if (agent != null && agent.getSpyTransformer() != null) {
+            instr.addTransformer(agent.getSpyTransformer(), false);
+        }
     }
 
     private static void startZorkaAgent() {
@@ -87,4 +73,21 @@ public class AgentMain {
     public static String getHomeDir() {
         return homeDir;
     }
+
+    public static void logStart(long id) {
+        agent.logStart(id);
+    }
+
+    public static void logStart(Object[] args, long id) {
+        agent.logStart(args, id);
+    }
+
+    public static void logCall(long id) {
+        agent.logCall(id);
+    }
+
+    public static void logError(long id) {
+        agent.logError(id);
+    }
+
 }

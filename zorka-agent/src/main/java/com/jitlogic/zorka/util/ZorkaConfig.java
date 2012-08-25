@@ -60,7 +60,7 @@ public class ZorkaConfig {
 	
 	private synchronized static String getHomeDir(String suffix) {
 		if (homeDir == null)
-            homeDir = AgentMain.getHomeDir();
+            homeDir = AgentMain.getHomeDir() != null ? AgentMain.getHomeDir() : "/opt/zorka";
 			//homeDir = System.getProperty("zorka.home.dir", "/opt/zorka");
 		
 		return homeDir.endsWith("/") ? homeDir + suffix : homeDir + "/" + suffix;

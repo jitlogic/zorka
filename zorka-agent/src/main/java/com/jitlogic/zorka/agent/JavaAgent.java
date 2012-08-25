@@ -22,6 +22,7 @@ import java.util.concurrent.Executor;
 
 import com.jitlogic.zorka.agent.zabbix.ZabbixAgent;
 import com.jitlogic.zorka.bootstrap.Agent;
+import com.jitlogic.zorka.spy.MainCollector;
 import com.jitlogic.zorka.spy.ZorkaSpyLib;
 import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
 import com.jitlogic.zorka.util.ZorkaConfig;
@@ -35,23 +36,20 @@ public class JavaAgent implements Agent {
 
 	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 	
-	private Executor executor;
+	private Executor executor = null;
 	private ZorkaBshAgent zorkaAgent = null;
 	private ZabbixAgent zabbixAgent = null;
     private ZorkaSpyLib spyLib = null;
 
     private MBeanServerRegistry mBeanServerRegistry = new MBeanServerRegistry();
 
-	public JavaAgent() {
-        executor = new ClosingTimeoutExecutor(4, 32, DEFAULT_TIMEOUT);
-	}
-
 	public  void start() {
-		//agent = new JavaAgent();
+        executor = new ClosingTimeoutExecutor(4, 32, DEFAULT_TIMEOUT);
         zorkaAgent = new ZorkaBshAgent(executor, mBeanServerRegistry);
 
         if (ZorkaConfig.get("spy", "no").equalsIgnoreCase("yes")) {
             log.info("Enabling Zorka SPY");
+            MainCollector.clear();
             spyLib = new ZorkaSpyLib(zorkaAgent);
             zorkaAgent.installModule("spy", spyLib);
         }
@@ -59,6 +57,7 @@ public class JavaAgent implements Agent {
         zorkaAgent.loadScriptDir(ZorkaConfig.getConfDir());
 
         zorkaAgent.svcStart();
+
         if (ZorkaConfig.get("zabbix.enabled", "yes").equalsIgnoreCase("yes")) {
             zabbixAgent = new ZabbixAgent(zorkaAgent);
             zabbixAgent.start();
@@ -80,5 +79,21 @@ public class JavaAgent implements Agent {
 
     public ClassFileTransformer getSpyTransformer() {
         return spyLib != null ? spyLib.getSpy() : null;
+    }
+
+    public void logStart(long id) {
+        MainCollector.logStart(id);
+    }
+
+    public void logStart(Object[] args, long id) {
+        MainCollector.logStart(args, id);
+    }
+
+    public void logCall(long id) {
+        MainCollector.logCall(id);
+    }
+
+    public void logError(long id) {
+        MainCollector.logError(id);
     }
 }
