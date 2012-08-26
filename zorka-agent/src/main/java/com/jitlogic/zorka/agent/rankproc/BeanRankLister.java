@@ -98,7 +98,7 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 				if (obj == null) { continue; }
 				String key = on.getKeyProperty(keyName);
 				if (mask != null) {
-					for (String k2 : ZorkaUtil.listAttrNames(obj)) {
+					for (String k2 : inspector.listAttrNames(obj)) {
 						if (k2.matches(mask)) {
 							lst.add(new BeanRankInfo(key + "." + k2, inspector.get(obj, k2)));
 						}
