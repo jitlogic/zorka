@@ -29,6 +29,8 @@ import com.jitlogic.zorka.util.ZorkaConfig;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
+import javax.management.MBeanServerConnection;
+
 public class JavaAgent implements Agent {
 
 
@@ -95,5 +97,13 @@ public class JavaAgent implements Agent {
 
     public void logError(long id) {
         MainCollector.logError(id);
+    }
+
+    public void registerMbs(String name, MBeanServerConnection conn) {
+        mBeanServerRegistry.register(name, conn);
+    }
+
+    public void unregisterMbs(String name) {
+        mBeanServerRegistry.unregister(name);
     }
 }

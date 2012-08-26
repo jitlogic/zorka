@@ -18,6 +18,7 @@
 package com.jitlogic.zorka.jboss;
 
 import com.jitlogic.zorka.agent.JavaAgent;
+import com.jitlogic.zorka.bootstrap.AgentMain;
 import org.jboss.system.ServiceMBeanSupport;
 
 import javax.management.MBeanServerConnection;
@@ -32,8 +33,8 @@ public class Zorka5Service extends ServiceMBeanSupport implements Zorka5ServiceM
         log.info("Starting ZORKA-5 Service");
         MBeanServerConnection conn = this.getServer();
 
-        if (JavaAgent.getAgent() != null) {
-            JavaAgent.getAgent().getMBeanServerRegistry().register("jboss", getServer());
+        if (AgentMain.getAgent() != null) {
+            AgentMain.getAgent().registerMbs("jboss", getServer());
             log.info("Registered JBoss MBean server as 'jboss'.");
         } else {
             log.warn("Zorka agent not started ?");
@@ -41,15 +42,15 @@ public class Zorka5Service extends ServiceMBeanSupport implements Zorka5ServiceM
     }
 
     protected void stopService() {
-        if (JavaAgent.getAgent() != null) {
+        if (AgentMain.getAgent() != null) {
             log.info("Unregistering 'jboss' MBean server.");
-            JavaAgent.getAgent().getMBeanServerRegistry().unregister("jboss");
+            AgentMain.getAgent().unregisterMbs("jboss");
         } else {
             log.warn("Zorka agent not started ?");
         }
     }
 
     public boolean isRunning() {
-        return JavaAgent.getAgent() != null;
+        return AgentMain.getAgent() != null;
     }
 }

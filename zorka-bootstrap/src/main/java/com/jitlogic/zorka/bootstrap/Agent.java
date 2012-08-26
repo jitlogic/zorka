@@ -1,5 +1,6 @@
 package com.jitlogic.zorka.bootstrap;
 
+import javax.management.MBeanServerConnection;
 import java.lang.instrument.ClassFileTransformer;
 
 /**
@@ -19,4 +20,8 @@ public interface Agent {
     public void logCall(long id);
 
     public void logError(long id);
+
+    public void registerMbs(String name, MBeanServerConnection conn);
+
+    public void unregisterMbs(String name);
 }
