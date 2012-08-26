@@ -87,9 +87,33 @@ public class ZorkaSpyLib {
 		MethodTemplate mt = new MethodTemplate(className, methodName, null, collector);
 		spy.addTemplate(mt);
 	}
-	
-	
-	public ZorkaSpy getSpy() {
+
+    public static final int PRESENT_ARGUMENT = 1;
+    public static final int PRESENT_ATTRIBUTE = 2;
+    public static final int PRESENT_STATIC = 3;
+
+    /**
+     * Catches specified method call of a specified class and presents some object visible at beginning of the method
+     * as an attribute in a JMX bean.
+     *
+     * @param className
+     * @param methodName
+     * @param signature
+     * @param beanName
+     * @param attrName
+     * @param argPath
+     * @param getPath
+     */
+    public void present(String className, String methodName, String signature,
+                        String beanName, String attrName,
+                        String[] argPath, String[] getPath,
+                        int type, boolean once) {
+
+    }
+
+    // TODO function similiar to present() that will pass extracted argument to user-specified BSH function
+
+    public ZorkaSpy getSpy() {
 		return spy;
 	}
 }
