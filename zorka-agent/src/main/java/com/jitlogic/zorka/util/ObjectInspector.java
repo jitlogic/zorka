@@ -13,6 +13,8 @@ import java.util.Map;
 /**
  * Tools for introspection of various objects.
  *
+ * TODO fix & describe get() semantics in more detail
+ *
  * @author RLE <rafal.lewczuk@gmail.com>
  */
 public class ObjectInspector {
@@ -22,7 +24,7 @@ public class ObjectInspector {
 
     public Method lookupMethod(Class<?> clazz, String name) {
         try {
-            return clazz.getMethod(name);
+            return name != null ? clazz.getMethod(name) : null;
         } catch (NoSuchMethodException e) {
             for (Class<?> icl : clazz.getInterfaces()) {
                 Method m = lookupMethod(icl, name);
@@ -31,7 +33,7 @@ public class ObjectInspector {
                 }
             }
             Class<?> mcl = clazz;
-            while ((mcl = clazz.getSuperclass()) != null) {
+            while ((mcl = mcl.getSuperclass()) != null && mcl != clazz) {
                 Method m = lookupMethod(mcl, name);
                 if (m != null) {
                     return m;
@@ -42,12 +44,25 @@ public class ObjectInspector {
     }
 
 
+    public String methodName(String name, String prefix) {
+        if (name.startsWith(".")) {
+            return null;
+        }
+        if (name.endsWith("()")) {
+            return name.substring(0, name.length()-2);
+        } else {
+            return prefix + name.substring(0,1).toUpperCase() + name.substring(1);
+        }
+    }
+
+
     public Method lookupGetter(Class<?> clazz, String name) {
-        Method m = lookupMethod(clazz, "get" + name.substring(0,1).toUpperCase() + name.substring(1));
+        //String methodName
+        Method m = lookupMethod(clazz, methodName(name, "get"));
         if (m != null) {
             return m;
         }
-        m = lookupMethod(clazz, "is" + name.substring(0, 1) + name.substring(1));
+        m = lookupMethod(clazz, methodName(name, "is"));
         if (m != null) {
             return m;
         }
@@ -74,6 +89,18 @@ public class ObjectInspector {
             return ((Stats)obj).getStatistic(""+key);
         } else if (obj instanceof JmxObject) {
             return ((JmxObject)obj).get(key);
+        } else if (obj instanceof Class<?>) {
+            String name = (String)key;
+            if (name.endsWith("()")) {
+                Method m = lookupGetter((Class)obj, name);
+                try {
+                    return m.invoke(null);
+                } catch (Exception e) {
+                    log.error("Method '" + m.getName() + "' invocation failed", e);
+                    return null;
+                }
+
+            }
         }
 
         if (key instanceof String) {
@@ -103,6 +130,7 @@ public class ObjectInspector {
 
         return null;
     }
+
 
     public List<String> listAttrNames(Object obj) {
         List<String> lst = new ArrayList<String>();
