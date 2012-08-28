@@ -21,13 +21,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.jitlogic.zorka.agent.JmxResolver;
+import com.jitlogic.zorka.util.ObjectInspector;
 
 public class SpyExpression {
 
 	private final List<Integer> argMap;
 	private final List<Object> segs;
-	
+	private ObjectInspector inspector = new ObjectInspector();
 	
 	private SpyExpression(List<Integer> argMap, List<Object> segs) {
 		this.argMap = Collections.unmodifiableList(argMap);
@@ -63,7 +63,7 @@ public class SpyExpression {
 				Object val = args[idx];
 				
 				for (String attr : mac.getSegments())
-					val = JmxResolver.get(val, attr);
+					val = inspector.get(val, attr);
 
 				sb.append(val != null ? val.toString() : "null");
 			}

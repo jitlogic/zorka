@@ -90,4 +90,8 @@ public class AgentMain {
         agent.logError(id);
     }
 
+    public static Agent getAgent() {
+        return agent;
+    }
+
 }

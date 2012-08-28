@@ -34,6 +34,7 @@ import com.jitlogic.zorka.agent.rankproc.ThreadRankLister;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
+import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
@@ -51,6 +52,7 @@ public class ZorkaLib implements ZorkaService {
 	private ZorkaBshAgent agent;
     private Set<JmxObject> registeredObjects = new HashSet<JmxObject>();
 	private JmxResolver resolver = new JmxResolver();
+    private ObjectInspector inspector = new ObjectInspector();
 
     private MBeanServerRegistry mbsRegistry;
 
@@ -95,7 +97,7 @@ public class ZorkaLib implements ZorkaService {
 				}
 				if (args.size() > 3) {
 					for (Object arg : args.subList(3, args.size())) {
-						obj = JmxResolver.get(obj, arg);
+						obj = inspector.get(obj, arg);
 					}
 				}
 				objs.add(obj);
@@ -150,7 +152,7 @@ public class ZorkaLib implements ZorkaService {
 		
 		if (argList.size() > 3 && obj != null) {
 			for (Object arg : argList.subList(3, argList.size())) {
-				obj = JmxResolver.get(obj, arg);
+				obj = inspector.get(obj, arg);
 			}
 		}
 		
@@ -167,7 +169,7 @@ public class ZorkaLib implements ZorkaService {
      */
 	public Object get(Object obj, Object...args) {
 		for (Object arg : args) {
-			obj = JmxResolver.get(obj, arg);
+			obj = inspector.get(obj, arg);
 		}
 		return obj;
 	}

@@ -25,11 +25,15 @@ import com.jitlogic.zorka.spy.ZorkaSpy;
 
 public class TestUtil extends ClassLoader {
 
+    public static Class<?> instrumentAndReturnClass(ZorkaSpy spy, String className) throws Exception {
+        ClassReader cr = new ClassReader(className);
+        byte[] buf = spy.instrument(className, null, cr);
+        if (buf == null) return null;
+        return new TestUtil().defineClass(className, buf, 0, buf.length);
+    }
+
 	public static Object instrumentAndInstantiate(ZorkaSpy spy, String className) throws Exception {
-		ClassReader cr = new ClassReader(className);
-		byte[] buf = spy.instrument(className, null, cr);
-		if (buf == null) return null;
-		Class<?> clazz = new TestUtil().defineClass(className, buf, 0, buf.length);
+        Class<?> clazz = instrumentAndReturnClass(spy, className);
 		return clazz.newInstance();
 	}
 
