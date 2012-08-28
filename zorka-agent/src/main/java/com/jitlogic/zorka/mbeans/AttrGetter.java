@@ -17,12 +17,14 @@
 
 package com.jitlogic.zorka.mbeans;
 
-import com.jitlogic.zorka.agent.JmxResolver;
+import com.jitlogic.zorka.util.ObjectInspector;
 
 public class AttrGetter implements ValGetter {
 
 	private Object obj;
 	private String[] attrs;
+
+    private ObjectInspector inspector = new ObjectInspector();
 	
 	public AttrGetter(Object obj, String...attrs) {
 		this.obj = obj;
@@ -33,7 +35,7 @@ public class AttrGetter implements ValGetter {
 		Object v = obj;
 		
 		for (String attr : attrs)
-			v = JmxResolver.get(v, attr);
+			v = inspector.get(v, attr);
 		
 		return v;
 	}

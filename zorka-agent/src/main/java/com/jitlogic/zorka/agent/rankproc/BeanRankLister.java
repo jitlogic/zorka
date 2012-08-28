@@ -28,6 +28,7 @@ import javax.management.openmbean.SimpleType;
 
 import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.agent.JmxResolver;
+import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 public class BeanRankLister extends RankLister<String,BeanRankInfo> {
@@ -40,6 +41,8 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 	private String[] attrs = new String[0];
 	private String mask = ".*";
 	private String nominalAttr, dividerAttr;
+
+    private ObjectInspector inspector = new ObjectInspector();
 	
 	
 	public BeanRankLister(long updateInterval, long rerankInterval,  
@@ -91,13 +94,13 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 		for (ObjectName on : names) {
 			try {
 				Object obj = attr0 != null ? conn.getAttribute(on, attr0) : new JmxObject(on, conn);
-				for (String attr : attrs) obj = JmxResolver.get(obj, attr);
+				for (String attr : attrs) obj = inspector.get(obj, attr);
 				if (obj == null) { continue; }
 				String key = on.getKeyProperty(keyName);
 				if (mask != null) {
-					for (String k2 : ZorkaUtil.listAttrNames(obj)) {
+					for (String k2 : inspector.listAttrNames(obj)) {
 						if (k2.matches(mask)) {
-							lst.add(new BeanRankInfo(key + "." + k2, JmxResolver.get(obj, k2)));
+							lst.add(new BeanRankInfo(key + "." + k2, inspector.get(obj, k2)));
 						}
 					}
 				} else {
@@ -122,8 +125,8 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 		Object[] v = item.getValues();
 		v[0] = info.getName();
 		v[1] = tstamp;
-		v[2] = JmxResolver.get(info.getValue(), nominalAttr); // TODO coerce to long 
-		v[3] = JmxResolver.get(info.getValue(), dividerAttr); // TODO coerce to long 
+		v[2] = inspector.get(info.getValue(), nominalAttr); // TODO coerce to long
+		v[3] = inspector.get(info.getValue(), dividerAttr); // TODO coerce to long
 	}
 	
 }

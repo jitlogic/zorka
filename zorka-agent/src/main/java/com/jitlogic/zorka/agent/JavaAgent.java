@@ -29,6 +29,8 @@ import com.jitlogic.zorka.util.ZorkaConfig;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
+import javax.management.MBeanServerConnection;
+
 public class JavaAgent implements Agent {
 
 
@@ -43,8 +45,20 @@ public class JavaAgent implements Agent {
 
     private MBeanServerRegistry mBeanServerRegistry = new MBeanServerRegistry();
 
+    public JavaAgent() {
+
+    }
+
+    public JavaAgent(Executor executor, MBeanServerRegistry mBeanServerRegistry, ZorkaBshAgent bshAgent, ZorkaSpyLib spyLib) {
+        this.executor = executor;
+        this.mBeanServerRegistry = mBeanServerRegistry;
+        this.zorkaAgent = bshAgent;
+        this.spyLib = spyLib;
+    }
+
 	public  void start() {
-        executor = new ClosingTimeoutExecutor(4, 32, DEFAULT_TIMEOUT);
+        if (executor == null)
+            executor = new ClosingTimeoutExecutor(4, 32, DEFAULT_TIMEOUT);
         zorkaAgent = new ZorkaBshAgent(executor, mBeanServerRegistry);
 
         if (ZorkaConfig.get("spy", "no").equalsIgnoreCase("yes")) {
@@ -63,8 +77,8 @@ public class JavaAgent implements Agent {
             zabbixAgent.start();
         }
     }
-	
-	public void stop() {
+
+    public void stop() {
         zabbixAgent.stop();
         zorkaAgent.svcStop();
     }
@@ -81,6 +95,10 @@ public class JavaAgent implements Agent {
         return spyLib != null ? spyLib.getSpy() : null;
     }
 
+    public ZorkaSpyLib getSpyLib() {
+        return spyLib;
+    }
+
     public void logStart(long id) {
         MainCollector.logStart(id);
     }
@@ -95,5 +113,18 @@ public class JavaAgent implements Agent {
 
     public void logError(long id) {
         MainCollector.logError(id);
+    }
+
+    public void registerMbs(String name, MBeanServerConnection conn) {
+        mBeanServerRegistry.register(name, conn);
+    }
+
+    public void unregisterMbs(String name) {
+        mBeanServerRegistry.unregister(name);
+    }
+
+    public void registerBeanAttr(String mbsName, String beanName, String attr, Object val) {
+        // TODO use overwriting registration here
+        mBeanServerRegistry.getOrRegisterBeanAttr(mbsName, beanName, attr, val, attr);
     }
 }

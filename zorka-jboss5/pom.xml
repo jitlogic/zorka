@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>com.jitlogic.zorka</groupId>
-            <artifactId>zorka-agent</artifactId>
+            <artifactId>zorka-bootstrap</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

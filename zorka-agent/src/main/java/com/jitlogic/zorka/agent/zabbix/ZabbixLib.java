@@ -3,6 +3,7 @@ package com.jitlogic.zorka.agent.zabbix;
 import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaLib;
+import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -23,6 +24,8 @@ public class ZabbixLib {
 
     private ZorkaBshAgent bshAgent;
     private ZorkaLib zorkaLib;
+
+    private ObjectInspector inspector = new ObjectInspector();
 
     public ZabbixLib(ZorkaBshAgent bshAgent, ZorkaLib zorkaLib) {
         this.bshAgent = bshAgent;
@@ -86,9 +89,9 @@ public class ZabbixLib {
                 JSONObject dstObj = (JSONObject)dsrc.get(oidx);
 
                 if (pathItem.startsWith("~")) {
-                    for (String attr : ZorkaUtil.listAttrNames(srcObj)) {
+                    for (String attr : inspector.listAttrNames(srcObj)) {
                         if (attr != null && attr.matches(pathItem.substring(1))) {
-                            Object obj = zorkaLib.get(srcObj, attr);
+                            Object obj = inspector.get(srcObj, attr);
                             if (obj != null) {
                                 JSONObject dsr = pathAttr == null ? dstObj
                                         : extend(dstObj, pathAttr, attr);
@@ -97,7 +100,7 @@ public class ZabbixLib {
                         }
                     }
                 } else {
-                    Object obj = zorkaLib.get(srcObj, pathItem);
+                    Object obj = inspector.get(srcObj, pathItem);
                     if (obj != null) {
                         JSONObject dsr = pathAttr == null ? dstObj
                             : extend(dstObj, pathAttr, pathItem);

@@ -87,57 +87,6 @@ public class ZorkaUtil {
 		return !(obj == null || obj.equals(false));
 	}
 
-	public static Method lookupMethod(Class<?> clazz, String name) {
-		try {
-			return clazz.getMethod(name);
-		} catch (NoSuchMethodException e) {
-			for (Class<?> icl : clazz.getInterfaces()) {
-				Method m = lookupMethod(icl, name);
-				if (m != null) {
-					return m;
-				}
-			}
-			Class<?> mcl = clazz;
-			while ((mcl = clazz.getSuperclass()) != null) {
-				Method m = lookupMethod(mcl, name);
-				if (m != null) {
-					return m;
-				}
-			}
-		}
-		return null;
-	}
-	
-	public static Method lookupGetter(Class<?> clazz, String name) {
-		Method m = lookupMethod(clazz, "get" + name.substring(0,1).toUpperCase() + name.substring(1));
-		if (m != null) { 
-			return m; 
-		}
-		m = lookupMethod(clazz, "is" + name.substring(0, 1) + name.substring(1));
-		if (m != null) {
-			return m;
-		}
-		m = lookupMethod(clazz, name);
-		return m;
-	}
-
-	
-	// TODO przenieść do dedykowanego obiektu i zrefaktorować
-	public static List<String> listAttrNames(Object obj) {
-		List<String> lst = new ArrayList<String>();
-		if (obj instanceof Map) {
-			for (Object key : ((Map<?,?>)obj).keySet()) {
-				lst.add(key.toString());
-			}
-		} else if (obj instanceof Stats) {
-			for (String name : ((Stats)obj).getStatisticNames()) {
-				lst.add(name);
-			}
-		}
-		// TODO uzupelnic 
-		return lst;
-	}
-	
 	/**
 	 * 
 	 * @param v
