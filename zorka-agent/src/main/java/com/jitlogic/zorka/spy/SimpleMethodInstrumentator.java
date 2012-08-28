@@ -22,6 +22,7 @@ import static org.objectweb.asm.Opcodes.*;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
 public class SimpleMethodInstrumentator extends MethodVisitor {
 
@@ -30,16 +31,25 @@ public class SimpleMethodInstrumentator extends MethodVisitor {
 
     private long id;
 	private int[] args;
+    private String className;
 
 	Label l_try_from = new Label();
 	Label l_try_to = new Label();
 	Label l_try_handler = new Label();
-	
+
+
 	public SimpleMethodInstrumentator(MethodVisitor mv, long id, int...args) {
 		super(Opcodes.V1_6, mv);
 		this.id = id;
 		this.args = args;
 	}
+
+
+    public SimpleMethodInstrumentator(MethodVisitor mv, long id, String className) {
+        super(Opcodes.V1_6, mv);
+        this.id = id;
+        this.className = className;
+    }
 	
 	
 	private void emitLoadInt(int v) {
@@ -57,6 +67,31 @@ public class SimpleMethodInstrumentator extends MethodVisitor {
 	
 	@Override
 	public void visitCode() {
+        if (args != null) {
+            emitArgsFetch();
+        } else {
+            emitTypeFetch();
+        }
+    }
+
+
+    private void emitTypeFetch() {
+        mv.visitCode();
+        mv.visitInsn(ICONST_1);
+        mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
+        mv.visitInsn(DUP);
+        mv.visitInsn(ICONST_0);
+        String cn = "L"+className.replace(".", "/") + ";";
+        mv.visitLdcInsn(Type.getType(cn));
+        mv.visitInsn(AASTORE);
+        mv.visitLdcInsn(id);
+        mv.visitMethodInsn(INVOKESTATIC, COLLECTOR_CLASS, "logStart", "([Ljava/lang/Object;J)V");
+        mv.visitTryCatchBlock(l_try_from, l_try_to, l_try_handler, null);
+        mv.visitLabel(l_try_from);
+    }
+
+
+    private void emitArgsFetch() {
 		mv.visitCode();
 		
 		if (args.length == 0) {
@@ -98,9 +133,13 @@ public class SimpleMethodInstrumentator extends MethodVisitor {
 		mv.visitLdcInsn(id);
 		mv.visitMethodInsn(INVOKESTATIC, COLLECTOR_CLASS, "logError", "(J)V");
 		mv.visitInsn(ATHROW);
-		mv.visitMaxs(maxStack+5+args.length, maxLocals);
-		
+        if (args != null) {
+		    mv.visitMaxs(maxStack+5+args.length, maxLocals);
+        } else {
+            mv.visitMaxs(maxStack+5, maxLocals);
+        }
 	}
+
 
 	@SuppressWarnings("unused")
 	private void injectPrintf(String msg) {

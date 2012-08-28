@@ -93,4 +93,10 @@ public class SomeClass {
 
         return subsequentPost(input, ret);
     }
+
+    public static int someStaticInt = 123;
+
+    public static int count() {
+        return someStaticInt;
+    }
 }

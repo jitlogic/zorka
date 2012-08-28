@@ -73,24 +73,32 @@ public class ZorkaSpyLib {
 
 	
 	public void simple(String className, String methodName, String beanName, String attrName) {
-		MethodCallStats mcs = mbr.getOrRegisterBeanAttr("java", beanName, attrName, new MethodCallStats(), "Zorka Spy Stats"); //getStats(bean, attrName);
+
+		MethodCallStats mcs = mbr.getOrRegisterBeanAttr("java", beanName, attrName, new MethodCallStats(),
+                                "Zorka Spy Stats"); //getStats(bean, attrName);
 		MethodCallStatisticImpl st = mcs.getMethodCallStat(methodName);
 		DataCollector collector = new SingleMethodDataCollector(st);
 		MethodTemplate mt = new MethodTemplate(className, methodName, null, collector);
 		spy.addTemplate(mt);
+
 	}
 		
 	
 	public void simple(String className, String methodName, String beanName, String attrName, String expr) {
-		MethodCallStats mcs = mbr.getOrRegisterBeanAttr("java", beanName, attrName, new MethodCallStats(), "Zorka Spy stats"); //getStats(bean, attrName);
+
+		MethodCallStats mcs = mbr.getOrRegisterBeanAttr("java", beanName, attrName, new MethodCallStats(),
+                                "Zorka Spy stats"); //getStats(bean, attrName);
 		DataCollector collector = new MultiMethodDataCollector(mcs, SpyExpression.parse(expr));
 		MethodTemplate mt = new MethodTemplate(className, methodName, null, collector);
 		spy.addTemplate(mt);
+
 	}
+
 
     public static final int PRESENT_ARGUMENT = 1;
     public static final int PRESENT_ATTRIBUTE = 2;
     public static final int PRESENT_STATIC = 3;
+
 
     /**
      * Catches specified method call of a specified class and presents some object visible at beginning of the method
@@ -98,20 +106,24 @@ public class ZorkaSpyLib {
      *
      * @param className
      * @param methodName
-     * @param signature
      * @param beanName
      * @param attrName
      * @param argPath
      * @param getPath
      */
-    public void present(String className, String methodName, String signature,
+    public void present(String mbeanServer, String className, String methodName,
                         String beanName, String attrName,
-                        String[] argPath, String[] getPath,
+                        Object argObj, String[] argPath, String[] getPath,
                         int type, boolean once) {
 
+        DataCollector collector = new PresentingDataCollector(mbeanServer, beanName, attrName,
+                                                    argObj, argPath, getPath, type, once);
+
+        MethodTemplate mt = new MethodTemplate(className, methodName, null, collector);
+        spy.addTemplate(mt);
     }
 
-    // TODO function similiar to present() that will pass extracted argument to user-specified BSH function
+    // TODO function similiar to present() that will pass extracted argument to a user-specified BSH function
 
     public ZorkaSpy getSpy() {
 		return spy;

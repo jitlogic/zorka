@@ -24,4 +24,6 @@ public interface Agent {
     public void registerMbs(String name, MBeanServerConnection conn);
 
     public void unregisterMbs(String name);
+
+    public void registerBeanAttr(String mbsName, String beanName, String attr, Object val);
 }

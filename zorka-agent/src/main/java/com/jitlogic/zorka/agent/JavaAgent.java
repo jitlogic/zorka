@@ -45,8 +45,20 @@ public class JavaAgent implements Agent {
 
     private MBeanServerRegistry mBeanServerRegistry = new MBeanServerRegistry();
 
+    public JavaAgent() {
+
+    }
+
+    public JavaAgent(Executor executor, MBeanServerRegistry mBeanServerRegistry, ZorkaBshAgent bshAgent, ZorkaSpyLib spyLib) {
+        this.executor = executor;
+        this.mBeanServerRegistry = mBeanServerRegistry;
+        this.zorkaAgent = bshAgent;
+        this.spyLib = spyLib;
+    }
+
 	public  void start() {
-        executor = new ClosingTimeoutExecutor(4, 32, DEFAULT_TIMEOUT);
+        if (executor == null)
+            executor = new ClosingTimeoutExecutor(4, 32, DEFAULT_TIMEOUT);
         zorkaAgent = new ZorkaBshAgent(executor, mBeanServerRegistry);
 
         if (ZorkaConfig.get("spy", "no").equalsIgnoreCase("yes")) {
@@ -65,8 +77,8 @@ public class JavaAgent implements Agent {
             zabbixAgent.start();
         }
     }
-	
-	public void stop() {
+
+    public void stop() {
         zabbixAgent.stop();
         zorkaAgent.svcStop();
     }
@@ -81,6 +93,10 @@ public class JavaAgent implements Agent {
 
     public ClassFileTransformer getSpyTransformer() {
         return spyLib != null ? spyLib.getSpy() : null;
+    }
+
+    public ZorkaSpyLib getSpyLib() {
+        return spyLib;
     }
 
     public void logStart(long id) {
@@ -105,5 +121,10 @@ public class JavaAgent implements Agent {
 
     public void unregisterMbs(String name) {
         mBeanServerRegistry.unregister(name);
+    }
+
+    public void registerBeanAttr(String mbsName, String beanName, String attr, Object val) {
+        // TODO use overwriting registration here
+        mBeanServerRegistry.getOrRegisterBeanAttr(mbsName, beanName, attr, val, attr);
     }
 }
