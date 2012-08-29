@@ -4,12 +4,16 @@ import com.jitlogic.zorka.bootstrap.AgentMain;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.util.ObjectInspector;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 import org.objectweb.asm.MethodVisitor;
 
 /**
  * @author RLE <rafal.lewczuk@gmail.com>
  */
 public class PresentingDataCollector implements DataCollector {
+
+    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private long id;
     private String mbsName, mbeanName, attrName;
@@ -45,6 +49,8 @@ public class PresentingDataCollector implements DataCollector {
         for (Object o : argPath) {
             obj = inspector.get(args[0], o);
         }
+
+        log.debug("Presenting object as attribute '" + attrName + " at '" + mbeanName + "'");
 
         if (getPath != null && getPath.length > 0) {
             ValGetter getter = new AttrGetter(obj, getPath);
