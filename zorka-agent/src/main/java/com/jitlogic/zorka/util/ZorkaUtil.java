@@ -34,7 +34,8 @@ public class ZorkaUtil {
 	public final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 	
 	protected static ZorkaUtil instance;
-	
+
+
 	public static synchronized ZorkaUtil getInstance() {
 		
 		if (instance == null)
@@ -42,10 +43,12 @@ public class ZorkaUtil {
 		
 		return instance;
 	}
-	
+
+
 	protected ZorkaUtil() {
 	}
-	
+
+
 	public static String readText(InputStream is) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		
@@ -87,6 +90,7 @@ public class ZorkaUtil {
 		return !(obj == null || obj.equals(false));
 	}
 
+
 	/**
 	 * 
 	 * @param v
@@ -95,7 +99,8 @@ public class ZorkaUtil {
 	public static String valueDump(Object v) {
 		return ""+v;
 	}
-	
+
+
 	public long currentTimeMillis() {
 		return System.currentTimeMillis();
 	}
@@ -105,7 +110,8 @@ public class ZorkaUtil {
 		return a == null && b == null 
 			|| a != null && a.equals(b);
 	}
-	
+
+
 	public static boolean arrayEquals(Object[] a, Object[] b) {
 		
 		if (a == null || b == null) {
@@ -122,7 +128,8 @@ public class ZorkaUtil {
 		
 		return true;
 	}
-	
+
+
 	public static String join(String sep, Object...vals) {
 		StringBuilder sb = new StringBuilder();
 		
@@ -133,4 +140,36 @@ public class ZorkaUtil {
 		
 		return sb.toString();
 	}
+
+
+    public static int parseIntSize(String s) {
+
+        String sn = s.trim();
+        int n1 = 1;
+
+        if (sn.length() == 0) {
+            throw new NumberFormatException("Invalid (empty) size number passed.");
+        }
+
+        char ch = sn.charAt(sn.length()-1);
+
+        if (Character.isLetter(ch)) {
+            sn = sn.substring(0, sn.length()-1);
+            switch (ch) {
+                case 'k':
+                case 'K':
+                    n1 = 1024; break;
+                case 'm':
+                case 'M':
+                    n1 = 1024*1024; break;
+                case 'g':
+                case 'G':
+                    n1 = 1024*1024*1024; break;
+                default:
+                    throw new NumberFormatException("Invalid size number passed: '" + s + "'");
+            }
+        }
+
+        return Integer.parseInt(sn) * n1;
+    }
 }
