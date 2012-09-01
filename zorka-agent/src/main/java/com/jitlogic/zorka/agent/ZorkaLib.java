@@ -17,6 +17,9 @@
 
 package com.jitlogic.zorka.agent;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -31,6 +34,7 @@ import javax.management.ObjectName;
 import com.jitlogic.zorka.agent.rankproc.AvgRateCounter;
 import com.jitlogic.zorka.agent.rankproc.BeanRankLister;
 import com.jitlogic.zorka.agent.rankproc.ThreadRankLister;
+import com.jitlogic.zorka.bootstrap.AgentMain;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
@@ -300,6 +304,20 @@ public class ZorkaLib implements ZorkaService {
         }
 
         return rateCounter.get(path, nom, div, horizon);
+    }
+
+    public void addJars(String...paths) {
+        for (String path : paths) {
+            File f = new File(path);
+            if (!f.canRead() || !f.canRead()) {
+                throw new RuntimeException("Cannot open jar file: '" + path + "'");
+            }
+            try {
+                AgentMain.addJarURL(f.toURI().toURL());
+            } catch (MalformedURLException e) {
+                throw new RuntimeException("Error converting URL '" + path + "'");
+            }
+        }
     }
 
 
