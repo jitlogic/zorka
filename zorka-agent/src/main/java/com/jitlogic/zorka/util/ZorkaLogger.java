@@ -23,7 +23,7 @@ public class ZorkaLogger {
     }
 
     private String logDir;
-    private boolean logExceptions;
+    private boolean logExceptions = false;
     private boolean doTrace;
     private ZorkaLogLevel logThreshold = ZorkaLogLevel.DEBUG;
 
@@ -46,6 +46,7 @@ public class ZorkaLogger {
             logThreshold = ZorkaLogLevel.valueOf (ZorkaConfig.get("zorka.log.level", "DEBUG"));
             maxSize = ZorkaUtil.parseIntSize(ZorkaConfig.get("zorka.log.size", "1048576").trim());
             maxLogs = ZorkaUtil.parseIntSize(ZorkaConfig.get("zorka.log.fnum", "4").trim());
+            logExceptions = "yes".equalsIgnoreCase(ZorkaConfig.get("zorka.log.exceptions", "no").trim());
         } catch (Exception e) {
             System.err.println("Error parsing logger arguments: " + e.getMessage());
             e.printStackTrace();
@@ -69,6 +70,20 @@ public class ZorkaLogger {
             sb.append(new Date());
             sb.append(" ");
             sb.append(message);
+
+            if (e != null) {
+                sb.append(" [");
+                sb.append(e.toString());
+                sb.append("]");
+
+                if (logExceptions) {
+                    StringWriter sw = new StringWriter(512);
+                    PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+                    sb.append("\n");
+                    sb.append(sw.toString());
+                }
+            }
 
             String s = sb.toString();
 
