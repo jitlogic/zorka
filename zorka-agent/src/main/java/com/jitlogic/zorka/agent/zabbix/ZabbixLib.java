@@ -72,7 +72,11 @@ public class ZabbixLib {
                 }
                 if (odo.size() > 0) {
                     dsrc.add(odo);
+                } else {
+                    dsrc.add(null);
                 }
+            } else {
+                dsrc.add(null);
             }
         }
 
@@ -87,6 +91,8 @@ public class ZabbixLib {
 
                 Object srcObj = osrc.get(oidx);
                 JSONObject dstObj = (JSONObject)dsrc.get(oidx);
+
+                if (dstObj == null) continue;
 
                 if (pathItem.startsWith("~")) {
                     for (String attr : inspector.listAttrNames(srcObj)) {

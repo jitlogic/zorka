@@ -17,7 +17,6 @@
 
 package com.jitlogic.zorka.jboss;
 
-import com.jitlogic.zorka.agent.JavaAgent;
 import com.jitlogic.zorka.bootstrap.AgentMain;
 import org.jboss.system.ServiceMBeanSupport;
 
