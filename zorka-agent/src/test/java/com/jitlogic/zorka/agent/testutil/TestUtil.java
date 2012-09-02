@@ -38,7 +38,7 @@ public class TestUtil {
     public void setUp(ZorkaBshAgent agent) {
         mbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
         this.agent = agent;
-        this.agent.getMBeanServerRegistry().register("test", mbs);
+        this.agent.getMBeanServerRegistry().register("test", mbs, null);
     }
 
 

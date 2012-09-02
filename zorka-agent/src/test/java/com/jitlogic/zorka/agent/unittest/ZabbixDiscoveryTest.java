@@ -29,7 +29,7 @@ public class ZabbixDiscoveryTest {
 
     @Before
     public void setUp() {
-        bshAgent = new ZorkaBshAgent(new TestExecutor(), new MBeanServerRegistry());
+        bshAgent = new ZorkaBshAgent(new TestExecutor(), new MBeanServerRegistry(true));
         ZabbixLib zl = new ZabbixLib(bshAgent, bshAgent.getZorkaLib());
         zorkaLib = bshAgent.getZorkaLib();
         zabbixLib = new ZabbixLib(bshAgent, zorkaLib);

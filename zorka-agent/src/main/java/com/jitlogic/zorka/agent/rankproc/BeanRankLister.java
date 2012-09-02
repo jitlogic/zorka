@@ -93,7 +93,8 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 		
 		for (ObjectName on : names) {
 			try {
-				Object obj = attr0 != null ? conn.getAttribute(on, attr0) : new JmxObject(on, conn);
+                // TODO class loader switching here
+				Object obj = attr0 != null ? conn.getAttribute(on, attr0) : new JmxObject(on, conn, null);
 				for (String attr : attrs) obj = inspector.get(obj, attr);
 				if (obj == null) { continue; }
 				String key = on.getKeyProperty(keyName);
