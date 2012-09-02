@@ -16,7 +16,7 @@ public class AgentMain {
 
     private static String homeDir;
     private static ClassLoader systemClassLoader;
-    private static ClassLoader zorkaClassLoader;
+    private static AgentClassLoader zorkaClassLoader;
     public static Agent agent; // TODO uporządkować to !
     private static String serverType = "generic";
 
@@ -66,7 +66,7 @@ public class AgentMain {
         }
 
         systemClassLoader = Thread.currentThread().getContextClassLoader();
-        zorkaClassLoader = new URLClassLoader(urls, systemClassLoader);
+        zorkaClassLoader = new AgentClassLoader(urls, systemClassLoader);
         Thread.currentThread().setContextClassLoader(systemClassLoader);
     }
 
@@ -93,5 +93,11 @@ public class AgentMain {
     public static Agent getAgent() {
         return agent;
     }
+
+    public static void addJarURL(URL url) {
+        if (zorkaClassLoader != null)
+            zorkaClassLoader.addURL(url);
+    }
+
 
 }

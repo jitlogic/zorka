@@ -46,7 +46,7 @@ public class AverageRateCountingTest {
 
     @Before
     public void setUp() {
-        bshAgent = new ZorkaBshAgent(new TestExecutor(), new MBeanServerRegistry());
+        bshAgent = new ZorkaBshAgent(new TestExecutor(), new MBeanServerRegistry(true));
         ZabbixLib zl = new ZabbixLib(bshAgent, bshAgent.getZorkaLib());
         zorkaLib = bshAgent.getZorkaLib();
         testUtil.setUp(bshAgent);

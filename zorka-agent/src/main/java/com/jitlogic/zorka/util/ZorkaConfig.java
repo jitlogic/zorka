@@ -19,10 +19,16 @@ package com.jitlogic.zorka.util;
 
 import com.jitlogic.zorka.bootstrap.AgentMain;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Zorka Configuration handling class. 
@@ -108,4 +114,34 @@ public class ZorkaConfig {
 		
 		properties.put(key, val);
 	}
+
+    public static URL[] getExtClasspath(Properties props, boolean checkExistence) {
+        Properties fusedProps = new Properties();
+        fusedProps.putAll(System.getProperties());
+        fusedProps.putAll(props);
+
+        ArrayList<URL> lst = new ArrayList<URL>();
+
+        for (Object key : props.keySet()) {
+            if (key.toString().startsWith("zorka.classpath.")) {
+                String[] jars = ZorkaUtil.evalPropStr(props.get(key).toString(), fusedProps).split(",");
+                for (String jar : jars) {
+                    File f = new File(jar.trim());
+
+                    if (checkExistence && !(f.isFile() && f.canRead())) {
+                        throw new RuntimeException("Cannot find jar file: " + jar);
+                    }
+
+                    try {
+                        lst.add(f.toURI().toURL());
+                    } catch (MalformedURLException e) {
+                        throw new RuntimeException("Cannot convert '" + jar + "' to an URL.");
+                    }
+                }
+            }
+        }
+
+        return lst.toArray(new URL[lst.size()]);
+    }
+
 }

@@ -25,6 +25,9 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.management.j2ee.statistics.Stats;
 
@@ -172,4 +175,23 @@ public class ZorkaUtil {
 
         return Integer.parseInt(sn) * n1;
     }
+
+    private final static Pattern rePropVar = Pattern.compile("\\$\\{([^\\}]+)\\}");
+
+    public static String evalPropStr(String input, Properties props){
+        StringBuffer sb = new StringBuffer(input.length()+50);
+
+        Matcher matcher = rePropVar.matcher(input);
+
+        while (matcher.find()) {
+            String var = matcher.group(1);
+            if (props.containsKey(var)) {
+                matcher.appendReplacement(sb, props.get(var).toString());
+            }
+        }
+        matcher.appendTail(sb);
+
+        return sb.toString();
+    }
+
 }

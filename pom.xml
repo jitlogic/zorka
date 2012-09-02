@@ -27,11 +27,11 @@
 
 
     <modules>
+        <module>zorka-bootstrap</module>
         <module>zorka-bsh-core</module>
         <module>zorka-agent</module>
         <module>zorka-bsh-shell</module>
-        <!-- <module>zorka-jboss5</module> -->
-        <module>zorka-bootstrap</module>
+        <module>zorka-jboss5</module>
     </modules>
 
 </project>

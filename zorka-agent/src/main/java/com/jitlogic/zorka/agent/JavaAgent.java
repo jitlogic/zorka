@@ -43,10 +43,11 @@ public class JavaAgent implements Agent {
 	private ZabbixAgent zabbixAgent = null;
     private ZorkaSpyLib spyLib = null;
 
-    private MBeanServerRegistry mBeanServerRegistry = new MBeanServerRegistry();
+    private MBeanServerRegistry mBeanServerRegistry;
 
     public JavaAgent() {
-
+        mBeanServerRegistry = new MBeanServerRegistry(
+            "yes".equals(ZorkaConfig.get("zorka.mbs.autoregister", "yes")));
     }
 
     public JavaAgent(Executor executor, MBeanServerRegistry mBeanServerRegistry, ZorkaBshAgent bshAgent, ZorkaSpyLib spyLib) {
@@ -115,8 +116,8 @@ public class JavaAgent implements Agent {
         MainCollector.logError(id);
     }
 
-    public void registerMbs(String name, MBeanServerConnection conn) {
-        mBeanServerRegistry.register(name, conn);
+    public void registerMbs(String name, MBeanServerConnection conn, ClassLoader classLoader) {
+        mBeanServerRegistry.register(name, conn, classLoader);
     }
 
     public void unregisterMbs(String name) {
