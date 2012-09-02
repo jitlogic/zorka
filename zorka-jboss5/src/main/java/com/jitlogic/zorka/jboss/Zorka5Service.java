@@ -21,6 +21,7 @@ import com.jitlogic.zorka.bootstrap.AgentMain;
 import org.jboss.system.ServiceMBeanSupport;
 
 import javax.management.MBeanServerConnection;
+import java.lang.management.ManagementFactory;
 
 /**
  * @author RLE <rafal.lewczuk@gmail.com>
@@ -33,6 +34,8 @@ public class Zorka5Service extends ServiceMBeanSupport implements Zorka5ServiceM
         MBeanServerConnection conn = this.getServer();
 
         if (AgentMain.getAgent() != null) {
+            AgentMain.getAgent().registerMbs("java", ManagementFactory.getPlatformMBeanServer());
+            log.info("Registered Platform JBoss Server as 'java'");
             AgentMain.getAgent().registerMbs("jboss", getServer());
             log.info("Registered JBoss MBean server as 'jboss'.");
         } else {

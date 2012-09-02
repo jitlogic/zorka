@@ -67,7 +67,7 @@ public class BshAgentIntegTest {
 	public void setUp() {
 		agent = new ZorkaBshAgent(
             //new ClosingTimeoutExecutor(5, 5, 100));
-			TimeoutThreadPoolExecutor.newBoundedPool(100), new MBeanServerRegistry());
+			TimeoutThreadPoolExecutor.newBoundedPool(100), new MBeanServerRegistry(true));
 		result = null;
 		err = null;
 	}

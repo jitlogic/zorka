@@ -43,7 +43,7 @@ public class ArgProcMethodsTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		agent = new ZorkaBshAgent(new TestExecutor(), new MBeanServerRegistry());
+		agent = new ZorkaBshAgent(new TestExecutor(), new MBeanServerRegistry(true));
 		lib = new ZorkaSpyLib(agent);
 		spy = lib.getSpy();
         agent.getMBeanServerRegistry().lookup("java");

@@ -43,7 +43,7 @@ public class BshAgentTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		agent = new ZorkaBshAgent(new TrivialExecutor(), new MBeanServerRegistry());
+		agent = new ZorkaBshAgent(new TrivialExecutor(), new MBeanServerRegistry(true));
         ZabbixLib zl = new ZabbixLib(agent, agent.getZorkaLib());
 
         agent.installModule("zabbix", zl); // TODO move ZabbixLib tests somewhere else ...

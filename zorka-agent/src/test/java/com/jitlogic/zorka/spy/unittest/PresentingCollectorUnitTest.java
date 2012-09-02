@@ -28,7 +28,7 @@ public class PresentingCollectorUnitTest {
     ZorkaSpy spy;
     ZorkaSpyLib lib;
 
-    MBeanServerRegistry mbsRegistry = new MBeanServerRegistry();
+    MBeanServerRegistry mbsRegistry = new MBeanServerRegistry(true);
 
 
     @Before

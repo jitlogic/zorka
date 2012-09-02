@@ -39,7 +39,7 @@ public class AgentMiscFuncTest {
 	@Before
 	public void setUp() {
 		agent = new ZorkaBshAgent(//new ClosingTimeoutExecutor(2, 2, 100));
-		    TimeoutThreadPoolExecutor.newBoundedPool(100), new MBeanServerRegistry());
+		    TimeoutThreadPoolExecutor.newBoundedPool(100), new MBeanServerRegistry(true));
 	}
 	
 	@After

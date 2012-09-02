@@ -58,7 +58,7 @@ public class ZabbixAgentIntegTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		agent = new ZorkaBshAgent(Executors.newSingleThreadExecutor(), new MBeanServerRegistry());
+		agent = new ZorkaBshAgent(Executors.newSingleThreadExecutor(), new MBeanServerRegistry(true));
 		ZorkaConfig.put("zabbix.listen.addr", "127.0.0.1");
 		ZorkaConfig.put("zabbix.listen.port", "10066");
 		service = new ZabbixAgent(agent);

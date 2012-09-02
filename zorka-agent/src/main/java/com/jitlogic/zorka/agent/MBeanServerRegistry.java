@@ -33,6 +33,8 @@ public class MBeanServerRegistry {
 
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
+    private boolean autoRegister = true;
+
     private static class DeferredRegistration {
         public final String name, bean, attr, desc;
         public final Object obj;
@@ -45,6 +47,12 @@ public class MBeanServerRegistry {
     private List<DeferredRegistration> deferredRegistrations = new ArrayList<DeferredRegistration>();
 
 
+    public MBeanServerRegistry(boolean autoRegister) {
+        log.info("Initializing MBeanServerRegistry with autoRegister=" + autoRegister);
+        this.autoRegister = autoRegister;
+    }
+
+
     /**
      * Looks for a given MBean server. java and jboss mbean servers are currently available.
      *
@@ -53,7 +61,7 @@ public class MBeanServerRegistry {
      */
     public MBeanServerConnection lookup(String name) {
         MBeanServerConnection conn = conns.get(name);
-        if (conn == null) {
+        if (conn == null && autoRegister) {
             if ("java".equals(name)) {
                 conn = ManagementFactory.getPlatformMBeanServer();
                 conns.put("java", conn);
