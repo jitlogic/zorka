@@ -44,6 +44,8 @@ public class MBeanServerRegistry {
     }
 
     private Map<String,MBeanServerConnection> conns = new ConcurrentHashMap<String, MBeanServerConnection>();
+    private Map<String,ClassLoader> classLoaders = new ConcurrentHashMap<String, ClassLoader>();
+
     private List<DeferredRegistration> deferredRegistrations = new ArrayList<DeferredRegistration>();
 
 
@@ -72,28 +74,40 @@ public class MBeanServerRegistry {
         return conn;
     }
 
+    public ClassLoader getClassLoader(String name) {
+        return classLoaders.get(name);
+    }
 
-    public void register(String name, MBeanServerConnection conn) {
+    public synchronized void register(String name, MBeanServerConnection conn, ClassLoader classLoader) {
         if (!conns.containsKey(name)) {
             conns.put(name, conn);
+            if (classLoader != null) {
+                classLoaders.put(name, classLoader);
+            }
             registerDeferred(name);
         } else {
             log.error("MBean server '" + name + "' is already registered.");
         }
+
+
     }
 
 
-    public void unregister(String name) {
+    public synchronized void unregister(String name) {
         if (conns.containsKey(name)) {
             conns.remove(name);
         } else {
             log.error("Trying to unregister non-existent MBean server '" + name + "'");
         }
+
+        classLoaders.remove(name);
     }
 
 
     public <T> T getOrRegisterBeanAttr(String name, String bean, String attr, T obj, String desc) {
         MBeanServerConnection mbs = conns.get(name);
+
+        // TODO switch class loader if needed
 
         if (mbs != null) {
             try {

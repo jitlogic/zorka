@@ -34,9 +34,9 @@ public class Zorka5Service extends ServiceMBeanSupport implements Zorka5ServiceM
         MBeanServerConnection conn = this.getServer();
 
         if (AgentMain.getAgent() != null) {
-            AgentMain.getAgent().registerMbs("java", ManagementFactory.getPlatformMBeanServer());
+            AgentMain.getAgent().registerMbs("java", ManagementFactory.getPlatformMBeanServer(), Thread.currentThread().getContextClassLoader());
             log.info("Registered Platform JBoss Server as 'java'");
-            AgentMain.getAgent().registerMbs("jboss", getServer());
+            AgentMain.getAgent().registerMbs("jboss", getServer(), Thread.currentThread().getContextClassLoader());
             log.info("Registered JBoss MBean server as 'jboss'.");
         } else {
             log.warn("Zorka agent not started ?");

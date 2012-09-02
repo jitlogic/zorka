@@ -116,8 +116,8 @@ public class JavaAgent implements Agent {
         MainCollector.logError(id);
     }
 
-    public void registerMbs(String name, MBeanServerConnection conn) {
-        mBeanServerRegistry.register(name, conn);
+    public void registerMbs(String name, MBeanServerConnection conn, ClassLoader classLoader) {
+        mBeanServerRegistry.register(name, conn, classLoader);
     }
 
     public void unregisterMbs(String name) {

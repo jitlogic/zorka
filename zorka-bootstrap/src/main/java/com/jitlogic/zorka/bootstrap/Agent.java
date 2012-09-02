@@ -21,7 +21,7 @@ public interface Agent {
 
     public void logError(long id);
 
-    public void registerMbs(String name, MBeanServerConnection conn);
+    public void registerMbs(String name, MBeanServerConnection conn, ClassLoader classLoader);
 
     public void unregisterMbs(String name);
 

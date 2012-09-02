@@ -76,18 +76,23 @@ public class ZorkaLib implements ZorkaService {
 			log.error("Zorka JMX function takes at least 2 arguments.");
 			return objs;
 		}
-		MBeanServerConnection conn = mbsRegistry.lookup(args.get(0).toString());
+        String conname = args.get(0).toString();
+        MBeanServerConnection conn = mbsRegistry.lookup(conname);
 		if (conn == null) {
 			log.error("MBean server named '" + args.get(0) + "' is not registered.");
 			return objs;
 		}
-		String conname = args.get(0).toString();
-		Set<ObjectName> names = resolver.queryNames(conn, args.get(1).toString());
+        ClassLoader cl0 = Thread.currentThread().getContextClassLoader(), cl1 = mbsRegistry.getClassLoader(conname);
+
+        Set<ObjectName> names = resolver.queryNames(conn, args.get(1).toString());
 		if (args.size() == 2) {
 			for (ObjectName name : names) {
-				objs.add(new JmxObject(name, conn));
+				objs.add(new JmxObject(name, conn, cl1));
 			}
 		} else {
+            if (cl1 != null) {
+                Thread.currentThread().setContextClassLoader(cl1);
+            }
 			for (ObjectName name : names) {
 				Object obj = null;
 				try {
@@ -99,6 +104,7 @@ public class ZorkaLib implements ZorkaService {
 					log.error("Error getting attribute '" + args.get(2) 
 						+ "' from '" + conname + "|" + name + "'", e);
 				}
+
 				if (args.size() > 3) {
 					for (Object arg : args.subList(3, args.size())) {
 						obj = inspector.get(obj, arg);
@@ -106,6 +112,9 @@ public class ZorkaLib implements ZorkaService {
 				}
 				objs.add(obj);
 			}
+            if (cl1 != null) {
+                Thread.currentThread().setContextClassLoader(cl0);
+            }
 		}
 		return objs;
 	} // jmxList()
@@ -129,21 +138,25 @@ public class ZorkaLib implements ZorkaService {
 			log.error("MBean server named '" + argList.get(0) + "' is not registered.");
 			return null;
 		}
-		
-		Set<ObjectName> names = resolver.queryNames(conn, argList.get(1).toString());
+
+        Set<ObjectName> names = resolver.queryNames(conn, argList.get(1).toString());
 		
 		if (names.isEmpty()) { 
 			return null;
 		}
 		
 		ObjectName name = names.iterator().next();
-		
-		if (argList.size() == 2) {
-			return new JmxObject(name, conn);
+
+        ClassLoader cl0 = Thread.currentThread().getContextClassLoader(), cl1 = mbsRegistry.getClassLoader(conname);
+
+        if (argList.size() == 2) {
+			return new JmxObject(name, conn, cl1);
 		}
 		
 		Object obj = null;
 		try {
+            if (cl1 != null)
+                Thread.currentThread().setContextClassLoader(cl1);
 			obj = conn.getAttribute(name, argList.get(2).toString());
 		} catch (AttributeNotFoundException e) {
 			log.error("Object '" + conname + "|" + name + 
@@ -152,7 +165,10 @@ public class ZorkaLib implements ZorkaService {
 		} catch (Exception e) {
 			log.error("Error getting attribute '" + argList.get(2)
 				+ "' from '" + conname + "|" + name + "'", e);
-		}
+		} finally {
+            if (cl1 != null)
+                Thread.currentThread().setContextClassLoader(cl0);
+        }
 		
 		if (argList.size() > 3 && obj != null) {
 			for (Object arg : argList.subList(3, argList.size())) {
@@ -194,7 +210,7 @@ public class ZorkaLib implements ZorkaService {
 			
 			ObjectName on = new ObjectName(name);
 			conn.registerMBean(mbean, on);
-			registeredObjects.add(new JmxObject(on, conn));
+			registeredObjects.add(new JmxObject(on, conn, Thread.currentThread().getContextClassLoader()));
 			return mbean;
 		} catch (Exception e) {
 			// TODO zalogowac problem

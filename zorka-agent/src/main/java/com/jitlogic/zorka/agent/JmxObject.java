@@ -26,22 +26,35 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 public class JmxObject {
 	
 	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
-	
+
 	private final ObjectName name;
 	private final MBeanServerConnection conn;
-	
-	public JmxObject(ObjectName name, MBeanServerConnection conn) {
+    private final ClassLoader classLoader;
+
+    public JmxObject(ObjectName name, MBeanServerConnection conn, ClassLoader classLoader) {
 		this.name = name;
 		this.conn = conn;
+        this.classLoader = classLoader;
 	}
 	
 	public Object get(Object key) {
+        ClassLoader cl0 = null;
+        Object ret = null;
 		try {
-			return conn.getAttribute(name, key.toString());
+            if (classLoader != null) {
+                cl0 = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(classLoader);
+            }
+			ret = conn.getAttribute(name, key.toString());
 		} catch (Exception e) {
 			log.error("Cannot get attribute '" + key + "' of '" + name + "'", e);
-			return null;
-		}
+		} finally {
+            if (cl0 != null) {
+                Thread.currentThread().setContextClassLoader(cl0);
+            }
+        }
+
+        return ret;
 	}
 	
 	public ObjectName getName() {
