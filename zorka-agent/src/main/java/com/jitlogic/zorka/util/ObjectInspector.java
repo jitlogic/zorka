@@ -121,7 +121,7 @@ public class ObjectInspector {
             // Try field (if any)
             try {
                 Field field = clazz.getField(name);
-                return field.get(name);
+                return field.get(obj);
             } catch (Exception e) {
                 log.error("Field '" + name + "' fetch failed", e);
                 return null;
