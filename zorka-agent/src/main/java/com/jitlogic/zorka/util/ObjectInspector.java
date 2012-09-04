@@ -7,6 +7,7 @@ import javax.management.openmbean.CompositeData;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -44,38 +45,37 @@ public class ObjectInspector {
     }
 
 
-    public String methodName(String name, String prefix) {
-        if (name.startsWith(".")) {
-            return null;
-        }
-        if (name.endsWith("()")) {
-            return name.substring(0, name.length()-2);
-        } else {
-            return prefix + name.substring(0,1).toUpperCase() + name.substring(1);
-        }
-    }
-
-
-    public Method lookupGetter(Class<?> clazz, String name) {
-        //String methodName
-        Method m = lookupMethod(clazz, methodName(name, "get"));
-        if (m != null) {
-            return m;
-        }
-        m = lookupMethod(clazz, methodName(name, "is"));
-        if (m != null) {
-            return m;
-        }
-        m = lookupMethod(clazz, name);
-        return m;
-    }
-
-
-
+    /**
+     * Gets (logical) attribute from an object. Exact semantics may differ
+     * depending on type of object. If object is an class, get() will look
+     * in its static methods/fields. Instance metods or fields will be used
+     * otherwise.
+     *
+     * @param obj object subjected
+     *
+     * @param key attribute identified (name, index, etc. - depending on object type)
+     *
+     * @return attribute value or null if no matching attribute has been found
+     */
     public Object get(Object obj, Object key) {
         if (obj == null) {
             return null;
-        } else if (obj instanceof Map<?, ?>) {
+        }
+
+        Class<?> clazz = (obj instanceof Class<?>) ? (Class)obj : obj.getClass();
+
+        if (key instanceof String && key.toString().endsWith("()")) {
+            // Explicit method call for attributes ending with '()'
+            String name = key.toString();
+            return fetchViaMethod(obj, clazz, lookupMethod(clazz, name.substring(0, name.length()-2)));
+        }
+
+        if (key instanceof String && key.toString().startsWith(".")) {
+            // Explicit field accesses for attributes starting with '.'
+            return fetchFieldVal(obj, clazz, key.toString().substring(1));
+        }
+
+        if (obj instanceof Map<?, ?>) {
             return ((Map<?,?>)obj).get(key);
         } else if (obj instanceof List<?>) {
             Integer idx = (Integer)ZorkaUtil.coerce(key, Integer.class);
@@ -86,53 +86,63 @@ public class ObjectInspector {
         } else if (obj instanceof CompositeData) {
             return ((CompositeData)obj).get(""+key);
         } else if (obj instanceof Stats){
+            // TODO cut off j2ee dependency - use reflection;
             return ((Stats)obj).getStatistic(""+key);
         } else if (obj instanceof JmxObject) {
             return ((JmxObject)obj).get(key);
-        } else if (obj instanceof Class<?>) {
-            String name = (String)key;
-            if (name.endsWith("()")) {
-                Method m = lookupGetter((Class)obj, name);
-                try {
-                    return m.invoke(null);
-                } catch (Exception e) {
-                    log.error("Method '" + m.getName() + "' invocation failed", e);
-                    return null;
-                }
-
-            }
-        }
+        }  // TODO support for tabular data
 
         if (key instanceof String) {
-            String name = (String)key;
-            Class<?> clazz = obj.getClass();
+            String name = (String) key;
 
-            // Try getter method (if any)
-            Method m = lookupGetter(clazz, name);
-            if (m != null) {
-                try {
-                    return m.invoke(obj);
-                } catch (Exception e) {
-                    log.error("Method '" + m.getName() + "' invocation failed", e);
-                    return null;
-                }
+            Method method = lookupMethod(clazz, "get" + name.substring(0, 1).toUpperCase() + name.substring(1));
+
+            if (method == null) {
+                method = lookupMethod(clazz, "is" + name.substring(0, 1).toUpperCase() + name.substring(1));
             }
 
-            // Try field (if any)
-            try {
-                Field field = clazz.getField(name);
-                return field.get(obj);
-            } catch (Exception e) {
-                log.error("Field '" + name + "' fetch failed", e);
-                return null;
+            if (method == null) {
+                method = lookupMethod(clazz, name);
             }
+
+            if (method != null) {
+                return fetchViaMethod(obj, clazz, method);
+            }
+
+            return fetchFieldVal(obj, clazz, name);
         }
 
         return null;
     }
 
+    private Object fetchViaMethod(Object obj, Class<?> clazz, Method method) {
+        if (method != null) {
+            try {
+                return method.invoke(obj);
+            } catch (Exception e) {
+                log.error("Method '" + method.getName() + "' invocation failed", e);
+                return null;
+            }
+        }
+        return null;
+    }
 
-    public List<String> listAttrNames(Object obj) {
+    private Object fetchFieldVal(Object obj, Class<?> clazz, String name) {
+        try {
+            Field field = clazz.getDeclaredField(name.startsWith(".") ? name.substring(1) : name);
+            boolean accessible = field.isAccessible();
+            if (!accessible) field.setAccessible(true);
+            Object ret = field.get(obj);
+            if (!accessible) field.setAccessible(accessible);
+            return ret;
+        } catch (Exception e) {
+            log.error("Field '" + name + "' fetch failed", e);
+            return null;
+        }
+    }
+
+
+    public List<String> list(Object obj) {
         List<String> lst = new ArrayList<String>();
         if (obj instanceof Map) {
             for (Object key : ((Map<?,?>)obj).keySet()) {
@@ -143,7 +153,9 @@ public class ObjectInspector {
                 lst.add(name);
             }
         }
-        // TODO uzupelnic
+
+        Collections.sort(lst);
+
         return lst;
     }
 
