@@ -5,11 +5,16 @@ package com.jitlogic.zorka.agent.testutil;
  */
 public class TestInspectorClass {
 
-    public static int cnt = 123;
+    private static int priv = 234;
+
+    public static int count = 123;
 
     public static int count() {
-        return cnt;
+        return count+3;
+    }
 
+    public static int getCount() {
+        return count + 2;
     }
 
 }

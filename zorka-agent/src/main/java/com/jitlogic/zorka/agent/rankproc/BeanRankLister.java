@@ -29,7 +29,6 @@ import javax.management.openmbean.SimpleType;
 import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.agent.JmxResolver;
 import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.util.ZorkaUtil;
 
 public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 	
@@ -99,7 +98,7 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 				if (obj == null) { continue; }
 				String key = on.getKeyProperty(keyName);
 				if (mask != null) {
-					for (String k2 : inspector.listAttrNames(obj)) {
+					for (String k2 : inspector.list(obj)) {
 						if (k2.matches(mask)) {
 							lst.add(new BeanRankInfo(key + "." + k2, inspector.get(obj, k2)));
 						}

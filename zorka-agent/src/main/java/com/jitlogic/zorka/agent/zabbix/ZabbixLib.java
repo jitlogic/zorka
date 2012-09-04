@@ -4,7 +4,6 @@ import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaLib;
 import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.util.ZorkaUtil;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -95,7 +94,7 @@ public class ZabbixLib {
                 if (dstObj == null) continue;
 
                 if (pathItem.startsWith("~")) {
-                    for (String attr : inspector.listAttrNames(srcObj)) {
+                    for (String attr : inspector.list(srcObj)) {
                         if (attr != null && attr.matches(pathItem.substring(1))) {
                             Object obj = inspector.get(srcObj, attr);
                             if (obj != null) {
