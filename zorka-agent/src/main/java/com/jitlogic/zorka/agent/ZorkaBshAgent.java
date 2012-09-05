@@ -82,7 +82,6 @@ public class ZorkaBshAgent implements ZorkaService {
 	
 	
 	public void exec(String expr, ZorkaCallback callback) {
-		log.debug("Executing ZORKA query: '" + expr + "'"); // TODO avoid concatenation when log level > 0 (? on ZorkaLog level ?)
 		ZorkaBshWorker worker = new ZorkaBshWorker(this, expr, callback);
 		executor.execute(worker);
 	}

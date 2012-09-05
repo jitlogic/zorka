@@ -34,11 +34,13 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 	
 	private Socket socket;
 	private String req = null;
-	
+    private long tStart, tStop;
+
 	public static final String ZBX_NOTSUPPORTED = "ZBX_NOTSUPPORTED";
 	
 	public ZabbixRequestHandler(Socket socket) {
 		this.socket = socket;
+        this.tStart = System.currentTimeMillis();
 	}
 	
 	
@@ -175,7 +177,7 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 	public String getReq() throws IOException {
 		if (req == null) {
 			String s = decode(socket.getInputStream());
-			log.debug("Incoming ZABBIX query: '" + s + "'"); // TODO avoid concatenation when log level > 0 (? on ZorkaLog level ?)
+			//log.debug("Incoming ZABBIX query: '" + s + "'"); // TODO avoid concatenation when log level > 0 (? on ZorkaLog level ?)
 			req = translate(s);
 		}
 		return req;
@@ -184,6 +186,8 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 	
 	public void handleResult(Object rslt) {
 		try {
+            tStop = System.currentTimeMillis();
+            log.debug("OK [t=" + (tStop-tStart) + "ms] '" + req + "' -> '" + rslt + "'");
 			send(serialize(rslt));
 		} catch (IOException e) {
 			log.error("I/O error returning result: " + e.getMessage());
@@ -206,7 +210,8 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 
     public void handleError(Throwable e) {
 		try {
-			log.error("Error processing request", e);
+            this.tStop = System.currentTimeMillis();
+			log.error("ERROR [t=" + (tStop=tStart) + "ms] + '" + req + "'", e);
 			send(ZBX_NOTSUPPORTED);
 		} catch (IOException e1) {
 			log.error("I/O Error returning (error) result: " + e.getMessage());
