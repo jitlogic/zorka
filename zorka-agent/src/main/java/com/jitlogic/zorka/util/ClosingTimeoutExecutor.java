@@ -25,8 +25,12 @@ import java.util.concurrent.*;
 
 /**
  * @author RLE <rafal.lewczuk@gmail.com>
+ *
+ *     TODO wyczyscic ten mess i zrobic to porzadnie
  */
 public class ClosingTimeoutExecutor implements Executor {
+
+    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private List<Thread>     runnerThreads;
     private List<RunnerTask> runnerTasks;
@@ -34,7 +38,6 @@ public class ClosingTimeoutExecutor implements Executor {
 
     private BlockingQueue<Runnable> queuedTasks;
 
-    private int queueLength;
     private long timeout;
 
     public volatile long numRuns = 0, numInterruptions = 0, numTimeouts = 0, numErrors = 0, numDrops = 0;
@@ -63,25 +66,35 @@ public class ClosingTimeoutExecutor implements Executor {
 
 
     public void execute(Runnable task) {
-        try {
-            if (!queuedTasks.offer(task, 1, TimeUnit.MILLISECONDS)) {
-                //System.out.println("discarding task: " + task);
-                closeTask(task);
+        for (int i = 0; i < 100; i++) {
+            try {
+                if (!queuedTasks.offer(task, 1, TimeUnit.MILLISECONDS)) {
+                    log.info("Task queue overflow. Retrying");
+                    //closeTask(task);
+                    numDrops++;
+                } else {
+                    return;
+                }
+            } catch (InterruptedException e) {
+                log.info("Interrupted while enqueueing. Retrying");
+                //closeTask(task);
                 numDrops++;
-            } //else
-                //System.out.println("accepted task: " + task);
-        } catch (InterruptedException e) {
-            //System.out.println("discarding task [2]: " + task);
-            closeTask(task);
-            numDrops++;
+            }
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+
+            }
         }
+        log.info("Task not enqueued properly, killing ...");
+        closeTask(task);
     }
 
 
     private class RunnerTask implements Runnable {
 
         private volatile boolean running = true;
-        private volatile long timestamp = 0;
+        private long timestamp = 0;
         //private volatile Runnable task = null;
 
         public void run() {
@@ -97,15 +110,18 @@ public class ClosingTimeoutExecutor implements Executor {
                     numRuns++;
                 } catch (InterruptedException e) {
                     numInterruptions++;
+                    log.info("Closing task because of InterruptedException.");
                     //System.out.println("Got interruptException ...");
                     // nothing interesting here, just try again
                     closeTask(task);
                 } catch (TimeoutException e) {
                     numTimeouts++;
+                    log.info("Closing task because of TimeoutException.");
                     closeTask(task);
                 } catch (Exception e) {
-                    System.out.println("Error: " + e);
-                    e.printStackTrace();
+                    log.error("Exception during task execution: ", e);
+                    //System.out.println("Error: " + e);
+                    //e.printStackTrace();
                     numErrors++;
                     closeTask(task); // TODO error handling here
                 }
@@ -122,6 +138,10 @@ public class ClosingTimeoutExecutor implements Executor {
 
         public long getTimestamp() {
             return timestamp;
+        }
+
+        public void setTimestamp(long timestamp) {
+            this.timestamp = timestamp;
         }
 
 //        public Runnable getTask() {
@@ -151,9 +171,16 @@ public class ClosingTimeoutExecutor implements Executor {
                         Thread thread = runnerThreads.get(i);
                         RunnerTask task = runnerTasks.get(i);
 
-                        if (task.getTimestamp() > 0 && time - task.getTimestamp() > timeout) {
+                        long ts = task.getTimestamp();
+                        long tdif = time - ts;
 
-                            //System.out.println("Interrupting thread ..." + i + "(tst=" + task.getTimestamp() + ")");
+                        if (ts > 0 && tdif > 86400000) {
+                            log.info("Task time fuzz too big, resetting tdif ...");
+                            task.setTimestamp(time);
+                        }
+
+                        if (ts > 0 && tdif > timeout) {
+                            log.info("Killing thread ..." + i + "(tst=" + ts + ", time=" + time + ")");
                             thread.interrupt();
                             thread.join(1);
                             if (thread.isAlive()) {
