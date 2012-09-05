@@ -34,7 +34,7 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 	
 	private Socket socket;
 	private String req = null;
-    private long tStart, tStop;
+    private volatile long tStart, tStop;
 
 	public static final String ZBX_NOTSUPPORTED = "ZBX_NOTSUPPORTED";
 	
