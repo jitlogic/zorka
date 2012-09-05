@@ -34,10 +34,14 @@ import javax.management.MBeanServerConnection;
 public class JavaAgent implements Agent {
 
 
-	public static final long DEFAULT_TIMEOUT = 500000;
+	public static final long DEFAULT_TIMEOUT = 60000;
 
-	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
-	
+	private final ZorkaLog log = ZorkaLogger.getLog(JavaAgent.class);
+
+    private long requestTimeout = DEFAULT_TIMEOUT;
+    private int requestThreads = 4;
+    private int requestQueue = 64;
+
 	private Executor executor = null;
 	private ZorkaBshAgent zorkaAgent = null;
 	private ZabbixAgent zabbixAgent = null;
@@ -48,6 +52,25 @@ public class JavaAgent implements Agent {
     public JavaAgent() {
         mBeanServerRegistry = new MBeanServerRegistry(
             "yes".equals(ZorkaConfig.get("zorka.mbs.autoregister", "yes")));
+
+        try {
+            requestTimeout = Long.parseLong(ZorkaConfig.get("zorka.req.timeout", "15000").trim());
+        } catch (NumberFormatException e) {
+            log.error("Invalid zorka.req.timeout setting: '" + ZorkaConfig.get("zorka.req.timeout", "15000").trim());
+        }
+
+        try {
+            requestThreads = Integer.parseInt(ZorkaConfig.get("zorka.req.threads", "4").trim());
+        } catch (NumberFormatException e) {
+            log.error("Invalid zorka.req.threads setting: '" + ZorkaConfig.get("zorka.req.threads", "4").trim());
+        }
+
+        try {
+            requestQueue = Integer.parseInt(ZorkaConfig.get("zorka.req.queue", "64").trim());
+        } catch (NumberFormatException e) {
+            log.error("Invalid zorka.req.queue setting: '" + ZorkaConfig.get("zorka.req.queue", "64").trim());
+        }
+
     }
 
     public JavaAgent(Executor executor, MBeanServerRegistry mBeanServerRegistry, ZorkaBshAgent bshAgent, ZorkaSpyLib spyLib) {
@@ -59,7 +82,7 @@ public class JavaAgent implements Agent {
 
 	public  void start() {
         if (executor == null)
-            executor = new ClosingTimeoutExecutor(4, 32, DEFAULT_TIMEOUT);
+            executor = new ClosingTimeoutExecutor(requestThreads, requestQueue, requestTimeout);
         zorkaAgent = new ZorkaBshAgent(executor, mBeanServerRegistry);
 
         if (ZorkaConfig.get("spy", "no").equalsIgnoreCase("yes")) {
