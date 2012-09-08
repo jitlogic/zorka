@@ -77,11 +77,33 @@ public class ZorkaUtil {
 		if (obj == null || c == null) { return null; }
 		if (obj.getClass() == c) { return obj; }
 		
-		if (c == Long.class)    { return ((Number)obj).longValue(); }
-		if (c == Integer.class) { return ((Number)obj).intValue(); }
-		if (c == Double.class)  { return ((Number)obj).doubleValue(); }
-		if (c == Short.class)   { return ((Number)obj).shortValue(); }
-		if (c == Float.class)   { return ((Number)obj).floatValue(); }
+		if (c == Long.class)    {
+            return (obj instanceof String) ?
+                    Long.parseLong(obj.toString().trim()) :
+                    ((Number)obj).longValue();
+        }
+
+		if (c == Integer.class) {
+            return (obj instanceof String) ?
+                    Integer.parseInt(obj.toString().trim()) :
+                    ((Number)obj).intValue();
+        }
+
+		if (c == Double.class)  { return (obj instanceof String) ?
+                Double.parseDouble(obj.toString().trim()) :
+                ((Number)obj).doubleValue();
+        }
+
+		if (c == Short.class)   { return (obj instanceof String) ?
+                Short.parseShort(obj.toString().trim()) :
+                ((Number)obj).shortValue();
+        }
+
+		if (c == Float.class)   { return (obj instanceof String) ?
+                Float.parseFloat(obj.toString().trim()) :
+                ((Number)obj).floatValue();
+        }
+
 		if (c == String.class)  { return ""+obj; }
 		if (c == Boolean.class) { return coerceBool(obj); }
 		
