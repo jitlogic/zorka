@@ -39,6 +39,7 @@ import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
 import com.jitlogic.zorka.util.ObjectInspector;
+import com.jitlogic.zorka.util.ZorkaConfig;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
@@ -60,14 +61,27 @@ public class ZorkaLib implements ZorkaService {
 
     private MBeanServerRegistry mbsRegistry;
 
+    private String hostname = null;
+
+
     public ZorkaLib(ZorkaBshAgent agent, MBeanServerRegistry mBeanServerRegistry) {
 		this.agent = agent;
         this.mbsRegistry = mBeanServerRegistry;
+        this.hostname = ZorkaConfig.get("zorka.hostname", "null").trim();
 	}
+
 
 	public String version() {
 		return ZorkaBshAgent.VERSION;
 	}
+
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
+    }
+
+    public String getHostname() {
+        return ""+hostname;
+    }
 	
 
 	public List<Object> jmxList(List<Object> args) {
