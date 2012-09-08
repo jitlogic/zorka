@@ -26,5 +26,5 @@ agent.version = zorka.version();
 
 // this is NOT underlying OS hostname
 // user can set presented hostname in zorka.properties file
-agent.hostname = zorka.hostname();
+agent.hostname = zorka.getHostname();
 
