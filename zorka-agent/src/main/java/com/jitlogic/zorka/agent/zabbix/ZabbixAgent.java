@@ -37,43 +37,53 @@ public class ZabbixAgent implements Runnable {
 
     private ZabbixLib zabbixLib;
 	
-	private String addr;
-	private int port = 10055;
-	
+	private String listenAddr;
+	private int listenPort = 10055;
+
+    private InetAddress serverAddr = null;
+
 	private volatile Thread thread;
 	private volatile boolean running = false;
 	
 	private ServerSocket socket;
 		
 	public ZabbixAgent(ZorkaBshAgent agent) {
-		this.addr = ZorkaConfig.get("zabbix.listen.addr", "0.0.0.0");
+		this.listenAddr = ZorkaConfig.get("zabbix.listen.addr", "0.0.0.0");
 		this.agent = agent;
         this.zabbixLib = new ZabbixLib(agent, agent.getZorkaLib());
 
         this.agent.installModule("zabbix", zabbixLib);
 
 		try {
-			port = Integer.parseInt(ZorkaConfig.get("zabbix.listen.port", "10055"));
+			listenPort = Integer.parseInt(ZorkaConfig.get("zabbix.listen.port", "10055"));
 		} catch (Exception e) {
 			log.error("Invalid 'listen_port' setting in zabbix.properties file. Was '" +
 						ZorkaConfig.get("zorka.listen.port", "10055") + "', should be integer.");
 		}
-	}
+
+        try {
+            String sa = ZorkaConfig.get("zabbix.server.addr", "127.0.0.1");
+            log.info("Zorka will accept connections from '" + sa.trim() + "'.");
+            serverAddr = InetAddress.getByName(sa.trim());
+        } catch (UnknownHostException e) {
+            log.error("Cannot parse zabbix.server.addr in zorka.properties", e);
+        }
+    }
 	
 	
 	public void start() {
 		if (!running) {
 			try {
-				InetAddress iaddr = InetAddress.getByName(addr);
-				socket = new ServerSocket(port, 0, iaddr);
+				InetAddress iaddr = InetAddress.getByName(listenAddr);
+				socket = new ServerSocket(listenPort, 0, iaddr);
 				running = true;
 				thread = new Thread(this);
 				thread.setName("ZORKA-zabbix-main");
 				thread.setDaemon(true);
 				thread.start();
-				log.info("ZORKA-zabbix agent is listening at " + addr + ":" + port + ".");
+				log.info("ZORKA-zabbix agent is listening at " + listenAddr + ":" + listenPort + ".");
 			} catch (UnknownHostException e) {
-				log.error("Error starting ZABBIX agent: unknown address: '" + addr + "'");
+				log.error("Error starting ZABBIX agent: unknown address: '" + listenAddr + "'");
 			} catch (IOException e) {
 				log.error("I/O error while starting zabbix agent:" + e.getMessage());
 			}
@@ -114,6 +124,11 @@ public class ZabbixAgent implements Runnable {
 			ZabbixRequestHandler rh = null;
 			try {
 				sock = socket.accept();
+                if (!sock.getInetAddress().equals(serverAddr)) {
+                    log.warn("Illegal connection attempt from '" + sock.getInetAddress() + "'.");
+                    sock.close();
+                    continue;
+                }
 				rh = new ZabbixRequestHandler(sock);
 				agent.exec(rh.getReq(), rh);
 				sock = null;
