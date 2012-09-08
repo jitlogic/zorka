@@ -1,0 +1,157 @@
+/**
+ * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// JBoss 4.x/5.x support functions
+
+__jboss() {
+
+  // Servlets
+  __servlet() {
+
+    discovery() {
+      return zabbix.discovery("jboss", "jboss.web:j2eeType=Servlet,*",
+                 "name", "WebModule", "J2EEServer", "J2EEApplication");
+    }
+
+    // Request count
+    requests(server,application,module,name) {
+      ret = zorka.jmx("jboss", "jboss.web:j2eeType=Servlet,J2EEServer="+server+
+        ",J2EEApplication="+application+",WebModule="+module+",name="+name, "requestCount");
+      return ret != null ? ret : 0.0;
+    }
+
+    // Error count
+    errors(server,application,module,name) {
+      ret = zorka.jmx("jboss", "jboss.web:j2eeType=Servlet,J2EEServer="+server+
+        ",J2EEApplication="+application+",WebModule="+module+",name="+name, "errorCount");
+      return ret != null ? ret : 0.0;
+    }
+
+    // Average processing time
+    time(server,application,module,name,horizon) {
+      ret = zorka.rate("jboss", "jboss.web:j2eeType=Servlet,J2EEServer="+server+
+        ",J2EEApplication="+application+",WebModule="+module+",name="+name,
+        "processingTime", "requestCount", horizon);
+      return ret != null ? ret : 0.0;
+    }
+
+    return this;
+  }
+
+  servlet = __servlet();
+
+  // EJB 3.x stuff
+  __ejb3() {
+
+    // Discover EJB3 beans
+    discovery() {
+      String[] names = { "ear", "jar", "name" };
+      String[] path  = { "InvokeStats", "Stats", "~.*" };
+      String[] attrs = { null, null, "method" };
+      return zabbix.discovery("jboss", "jboss.j2ee:service=EJB3,*", names, path, attrs);
+    }
+
+    // Returns number of calls of an EJB method
+    calls(ear, jar, name, method) {
+      ret = zorka.jmx("jboss",
+        "jboss.j2ee:service=EJB3,name="+name+",ear="+ear+",jar="+jar,
+        "InvokeStats", "stats", method, "count");
+      return ret != null ? ret : 0.0;
+    }
+
+    // Average processing time 
+    time(ear, jar, name, method, horizon) {
+      ret = zorka.rate("jboss",
+        "jboss.j2ee:service=EJB3,name="+name+",ear="+ear+",jar="+jar,
+        "InvokeStats", "stats", method, "totalTime", "count", horizon);
+      return ret != null ? ret : 0.0;
+    }
+
+    return this;
+
+  } // __ejb3()
+
+  ejb3 = __ejb3();
+
+
+  // JCA resources
+  __jca() {
+
+    discovery() {
+      return zabbix.discovery("jboss", "jboss.management.local:j2eeType=JCAResource,*", 
+        "J2EEServer", "ResourceAdapter", "name");
+    }
+
+    conn_created(server, adapter, name) {
+      return zorka.jmx("jboss", 
+        "jboss.management.local:j2eeType=JCAResource,J2EEServer="+server+",name="+name+",ResourceAdapter="+adapter,
+        "stats", "connectionPools", "0", "CreateCount", "count");
+    }
+
+    conn_closed(server, adapter, name) {
+      return zorka.jmx("jboss", 
+        "jboss.management.local:j2eeType=JCAResource,J2EEServer="+server+",name="+name+",ResourceAdapter="+adapter,
+        "stats", "connectionPools", "0", "CloseCount", "count");
+    }
+
+    pool_size(server, adapter, name) {
+      return zorka.jmx("jboss", 
+        "jboss.management.local:j2eeType=JCAResource,J2EEServer="+server+",name="+name+",ResourceAdapter="+adapter,
+        "stats", "connectionPools", "0", "PoolSize", "current");
+    }
+
+    free_size(server, adapter, name) {
+      return zorka.jmx("jboss", 
+        "jboss.management.local:j2eeType=JCAResource,J2EEServer="+server+",name="+name+",ResourceAdapter="+adapter,
+        "stats", "connectionPools", "0", "FreePoolSize", "current");
+    }
+
+    use_count(server, adapter, name) {
+      return zorka.jmx("jboss",
+        "jboss.management.local:j2eeType=JCAResource,J2EEServer="+server+",name="+name+",ResourceAdapter="+adapter,
+        "stats", "connectionPools", "0", "UseTime", "count");
+    }
+
+    use_time(server, adapter, name, horiz) {
+      return zorka.rate("jboss",
+        "jboss.management.local:j2eeType=JCAResource,J2EEServer="+server+",name="+name+",ResourceAdapter="+adapter,
+        "stats", "connectionPools", "0", "UseTime", "totalTime", "count", horiz);
+    }
+
+    wait_count(server, adapter, name) {
+      return zorka.jmx("jboss",
+        "jboss.management.local:j2eeType=JCAResource,J2EEServer="+server+",name="+name+",ResourceAdapter="+adapter,
+        "stats", "connectionPools", "0", "WaitingThreadCount", "current");
+    }
+
+    wait_time(server, adapter, name, horiz) {
+      return zorka.rate("jboss",
+        "jboss.management.local:j2eeType=JCAResource,J2EEServer="+server+",name="+name+",ResourceAdapter="+adapter,
+        "stats", "connectionPools", "0", "WaitTime", "totalTime", "count", horiz);
+    }
+
+    return this;
+  } // __jca()
+
+  jca = __jca();
+
+  return this;
+}
+
+
+jboss = __jboss();
+

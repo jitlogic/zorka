@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2012-07-24T05:44:20Z</date>
+    <date>2012-09-08T10:17:35Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
     <templates>
         <template>
-            <template>Template_HotSpot6</template>
-            <name>Template_HotSpot6</name>
+            <template>Template_Zorka_Hotspot</template>
+            <name>Template_Zorka_Hotspot</name>
             <groups>
                 <group>
                     <name>Templates</name>
@@ -27,57 +32,15 @@
                 <application>
                     <name>Hotspot Threads</name>
                 </application>
-                <application>
-                    <name>Zorka Agent</name>
-                </application>
             </applications>
             <items>
-                <item>
-                    <name>Agent Version</name>
-                    <type>0</type>
-                    <snmp_community>public</snmp_community>
-                    <multiplier>0</multiplier>
-                    <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__version[]</key>
-                    <delay>14400</delay>
-                    <history>10</history>
-                    <trends>0</trends>
-                    <status>0</status>
-                    <value_type>4</value_type>
-                    <allowed_hosts/>
-                    <units/>
-                    <delta>0</delta>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privpassphrase/>
-                    <formula>1</formula>
-                    <delay_flex/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <data_type>0</data_type>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>Zorka Agent</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                </item>
                 <item>
                     <name>CPU architecture</name>
                     <type>0</type>
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=OperatingSystem&quot;,&quot;Arch&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=OperatingSystem&quot;,&quot;Arch&quot;]</key>
                     <delay>14400</delay>
                     <history>10</history>
                     <trends>0</trends>
@@ -116,7 +79,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;HeapMemoryUsage&quot;,&quot;used&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;HeapMemoryUsage&quot;,&quot;used&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -155,7 +118,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;HeapMemoryUsage&quot;,&quot;committed&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;HeapMemoryUsage&quot;,&quot;committed&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -194,7 +157,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;HeapMemoryUsage&quot;,&quot;init&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;HeapMemoryUsage&quot;,&quot;init&quot;]</key>
                     <delay>7200</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -233,7 +196,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;HeapMemoryUsage&quot;,&quot;max&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;HeapMemoryUsage&quot;,&quot;max&quot;]</key>
                     <delay>7200</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -272,7 +235,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>hotspot__heaputil[&quot;HeapMemoryUsage&quot;]</key>
+                    <key>hotspot.heaputil[&quot;HeapMemoryUsage&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -311,7 +274,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Runtime&quot;,&quot;VmName&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Runtime&quot;,&quot;VmName&quot;]</key>
                     <delay>14400</delay>
                     <history>10</history>
                     <trends>0</trends>
@@ -350,7 +313,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>1</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Runtime&quot;,&quot;Uptime&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Runtime&quot;,&quot;Uptime&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -389,7 +352,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Runtime&quot;,&quot;VmVendor&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Runtime&quot;,&quot;VmVendor&quot;]</key>
                     <delay>14400</delay>
                     <history>10</history>
                     <trends>0</trends>
@@ -428,7 +391,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Runtime&quot;,&quot;VmVersion&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Runtime&quot;,&quot;VmVersion&quot;]</key>
                     <delay>14400</delay>
                     <history>10</history>
                     <trends>0</trends>
@@ -467,7 +430,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;NonHeapMemoryUsage&quot;,&quot;committed&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;NonHeapMemoryUsage&quot;,&quot;committed&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -506,7 +469,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;NonHeapMemoryUsage&quot;,&quot;init&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;NonHeapMemoryUsage&quot;,&quot;init&quot;]</key>
                     <delay>7200</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -545,7 +508,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;NonHeapMemoryUsage&quot;,&quot;max&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;NonHeapMemoryUsage&quot;,&quot;max&quot;]</key>
                     <delay>7200</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -584,7 +547,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;NonHeapMemoryUsage&quot;,&quot;used&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;NonHeapMemoryUsage&quot;,&quot;used&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -623,7 +586,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>hotspot__heaputil[&quot;NonHeapMemoryUsage&quot;]</key>
+                    <key>hotspot.heaputil[&quot;NonHeapMemoryUsage&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -662,7 +625,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=ClassLoading&quot;,&quot;LoadedClassCount&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=ClassLoading&quot;,&quot;LoadedClassCount&quot;]</key>
                     <delay>3600</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -701,7 +664,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;DaemonThreadCount&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;DaemonThreadCount&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -740,7 +703,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;ThreadCount&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;ThreadCount&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -779,7 +742,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>1</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;TotalStartedThreadCount&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;TotalStartedThreadCount&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -818,7 +781,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;ObjectPendingFinalizationCount&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Memory&quot;,&quot;ObjectPendingFinalizationCount&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -857,7 +820,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=OperatingSystem&quot;,&quot;Name&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=OperatingSystem&quot;,&quot;Name&quot;]</key>
                     <delay>14400</delay>
                     <history>10</history>
                     <trends>0</trends>
@@ -896,7 +859,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=OperatingSystem&quot;,&quot;Version&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=OperatingSystem&quot;,&quot;Version&quot;]</key>
                     <delay>14400</delay>
                     <history>10</history>
                     <trends>0</trends>
@@ -935,7 +898,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;PeakThreadCount&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;PeakThreadCount&quot;]</key>
                     <delay>3600</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -974,7 +937,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>hotspot__memutil[&quot;Perm Gen&quot;]</key>
+                    <key>hotspot.memutil[&quot;Perm Gen&quot;]</key>
                     <delay>300</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -1013,7 +976,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=OperatingSystem&quot;,&quot;TotalPhysicalMemorySize&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=OperatingSystem&quot;,&quot;TotalPhysicalMemorySize&quot;]</key>
                     <delay>14400</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -1052,7 +1015,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>1</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Compilation&quot;,&quot;TotalCompilationTime&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Compilation&quot;,&quot;TotalCompilationTime&quot;]</key>
                     <delay>300</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -1091,7 +1054,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:type=OperatingSystem&quot;,&quot;CommittedVirtualMemorySize&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=OperatingSystem&quot;,&quot;CommittedVirtualMemorySize&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -1131,7 +1094,7 @@
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix__discovery[&quot;java&quot;, &quot;java.lang:type=GarbageCollector,*&quot;, &quot;name&quot;]</key>
+                    <key>zabbix.discovery[&quot;java&quot;, &quot;java.lang:type=GarbageCollector,*&quot;, &quot;name&quot;]</key>
                     <delay>3600</delay>
                     <status>0</status>
                     <allowed_hosts/>
@@ -1158,7 +1121,7 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=GarbageCollector&quot;,&quot;CollectionCount&quot;]</key>
+                            <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=GarbageCollector&quot;,&quot;CollectionCount&quot;]</key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -1197,7 +1160,7 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=GarbageCollector&quot;,&quot;CollectionTime&quot;]</key>
+                            <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=GarbageCollector&quot;,&quot;CollectionTime&quot;]</key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -1233,7 +1196,7 @@
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Template_HotSpot_6:zorka__jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].last(0)}&gt;25</expression>
+                            <expression>{Template_Zorka_Hotspot:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].last(0)}&gt;25</expression>
                             <name>{HOSTNAME} {#NAME} GC overload</name>
                             <url/>
                             <status>0</status>
@@ -1249,7 +1212,7 @@
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix__discovery[&quot;java&quot;, &quot;java.lang:type=MemoryPool,*&quot;, &quot;name&quot;]</key>
+                    <key>zabbix.discovery[&quot;java&quot;, &quot;java.lang:type=MemoryPool,*&quot;, &quot;name&quot;]</key>
                     <delay>3600</delay>
                     <status>0</status>
                     <allowed_hosts/>
@@ -1276,7 +1239,7 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=MemoryPool&quot;,&quot;Usage&quot;,&quot;used&quot;]</key>
+                            <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=MemoryPool&quot;,&quot;Usage&quot;,&quot;used&quot;]</key>
                             <delay>300</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -1315,7 +1278,7 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=MemoryPool&quot;,&quot;PeakUsage&quot;,&quot;max&quot;]</key>
+                            <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=MemoryPool&quot;,&quot;PeakUsage&quot;,&quot;max&quot;]</key>
                             <delay>7200</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -1354,7 +1317,7 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=MemoryPool&quot;,&quot;PeakUsage&quot;,&quot;used&quot;]</key>
+                            <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=MemoryPool&quot;,&quot;PeakUsage&quot;,&quot;used&quot;]</key>
                             <delay>3600</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -1393,7 +1356,7 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>zorka__jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=MemoryPool&quot;,&quot;CollectionUsage&quot;,&quot;used&quot;]</key>
+                            <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=MemoryPool&quot;,&quot;CollectionUsage&quot;,&quot;used&quot;]</key>
                             <delay>300</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -1432,7 +1395,7 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>hotspot__memutil[&quot;{#NAME}&quot;]</key>
+                            <key>hotspot.memutil[&quot;{#NAME}&quot;]</key>
                             <delay>300</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -1484,13 +1447,17 @@
                     <value>85</value>
                 </macro>
             </macros>
-            <templates/>
+            <templates>
+                <template>
+                    <name>Template App Zabbix Agent</name>
+                </template>
+            </templates>
             <screens/>
         </template>
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template_HotSpot_6:zorka__jmx[&quot;java&quot;,&quot;java.lang:type=Runtime&quot;,&quot;Uptime&quot;].nodata(200)}=1</expression>
+            <expression>{Template_Zorka_Hotspot:zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Runtime&quot;,&quot;Uptime&quot;].nodata(200)}=1</expression>
             <name>{HOSTNAME} is unavailable</name>
             <url/>
             <status>0</status>
@@ -1500,7 +1467,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>({TRIGGER.VALUE}=0&amp;{Template_HotSpot_6:hotspot__heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_H})|({TRIGGER.VALUE}=1&amp;{Template_HotSpot_6:hotspot__heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})</expression>
+            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_Hotspot:hotspot.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_H})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_Hotspot:hotspot.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})</expression>
             <name>{HOSTNAME} memory usage too high</name>
             <url/>
             <status>0</status>
@@ -1510,7 +1477,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>({TRIGGER.VALUE}=0&amp;{Template_HotSpot_6:hotspot__heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})|({TRIGGER.VALUE}=1&amp;{Template_HotSpot_6:hotspot__heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_L})</expression>
+            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_Hotspot:hotspot.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_Hotspot:hotspot.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_L})</expression>
             <name>{HOSTNAME} memory usage too high</name>
             <url/>
             <status>0</status>
@@ -1520,7 +1487,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>({TRIGGER.VALUE}=0&amp;{Template_HotSpot_6:hotspot__heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_H})|({TRIGGER.VALUE}=1&amp;{Template_HotSpot_6:hotspot__heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})</expression>
+            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_Hotspot:hotspot.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_H})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_Hotspot:hotspot.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})</expression>
             <name>{HOSTNAME} NonHeap memory usage to high</name>
             <url/>
             <status>0</status>
@@ -1530,7 +1497,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>({TRIGGER.VALUE}=0&amp;{Template_HotSpot_6:hotspot__heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})|({TRIGGER.VALUE}=1&amp;{Template_HotSpot_6:hotspot__heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_L})</expression>
+            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_Hotspot:hotspot.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_Hotspot:hotspot.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_L})</expression>
             <name>{HOSTNAME} NonHeap memory usage to high</name>
             <url/>
             <status>0</status>
@@ -1540,7 +1507,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_HotSpot_6:hotspot__memutil[&quot;Perm Gen&quot;].last(0)}&gt;90.0</expression>
+            <expression>{Template_Zorka_Hotspot:hotspot.memutil[&quot;Perm Gen&quot;].last(0)}&gt;90.0</expression>
             <name>{HOSTNAME} PermGen utilization is &gt; 90%</name>
             <url/>
             <status>0</status>
