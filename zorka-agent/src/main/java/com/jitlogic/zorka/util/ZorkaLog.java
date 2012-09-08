@@ -20,15 +20,19 @@ package com.jitlogic.zorka.util;
 
 public class ZorkaLog {
 
-    private Class<?> clazz;
+    private String tag;
     private ZorkaLogger output;
 
 
 	ZorkaLog(Class<?> clazz, ZorkaLogger output) {
-        this.clazz = clazz;
+        this.tag = clazz.getName();
         this.output = output;
 	}
 
+    ZorkaLog(String tag, ZorkaLogger output) {
+        this.tag = tag;
+        this.output = output;
+    }
 
 	public void trace(String msg) {
 		output.log(this, ZorkaLogLevel.TRACE, msg);
@@ -58,8 +62,4 @@ public class ZorkaLog {
 	public void error(String msg, Throwable e) {
         output.log(this, ZorkaLogLevel.ERROR, msg, e);
 	}
-
-    public Class<?> getClazz() {
-        return clazz;
-    }
 }

@@ -13,13 +13,16 @@ public class ZorkaLogger {
 
     private static ZorkaLogger logger = null;
 
-    public synchronized static ZorkaLog getLog(Class<?> clazz) {
+    public static ZorkaLog getLog(Class<?> clazz) {
+        return getLog(clazz.getName());
+    }
 
+    public synchronized  static ZorkaLog getLog(String tag) {
         if (logger == null) {
             logger = new ZorkaLogger();
         }
 
-        return new ZorkaLog(clazz, logger);
+        return new ZorkaLog(tag, logger);
     }
 
     private String logDir;

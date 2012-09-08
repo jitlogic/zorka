@@ -336,6 +336,10 @@ public class ZorkaLib implements ZorkaService {
         return rateCounter.get(path, nom, div, horizon);
     }
 
+    public ZorkaLog log(String tag) {
+        return ZorkaLogger.getLog(tag);
+    }
+
     public void addJars(String...paths) {
         for (String path : paths) {
             File f = new File(path);
