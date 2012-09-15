@@ -48,7 +48,7 @@ public class AgentMain {
     }
 
     private static void setupClassLoader() {
-        File lib = new File(homeDir + "/../lib");
+        File lib = new File(homeDir + File.separator + "lib");
 
         if (!lib.isDirectory()) {
             throw new RuntimeException("" + lib.getPath() + " should exist and be a directory !");
