@@ -67,6 +67,10 @@ public class ZabbixLib {
                     String atval = on.getKeyProperty(attr);
                     if (atval != null) {
                         odo.put("{#" + attr.toUpperCase() + "}", atval);
+                    } else {
+                        // A bit of a hack - filter out all objects without all (queried) attributes
+                        odo.clear();
+                        break;
                     }
                 }
                 if (odo.size() > 0) {
@@ -117,7 +121,14 @@ public class ZabbixLib {
         } // for (int pidx = 0 ...
 
         JSONObject discoveries = new JSONObject();
-        discoveries.put("data", dsrc);
+        JSONArray data = new JSONArray();
+
+        for (Object o : dsrc) {
+            if (o != null) data.add(o);
+        }
+
+        discoveries.put("data", data);
+
         return discoveries;
     } // discovery()
 
