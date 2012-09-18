@@ -19,7 +19,6 @@ public class PresentingDataCollector implements DataCollector {
     private String mbsName, mbeanName, attrName;
     private Object argObj;
     private String[] argPath, getPath;
-    private int type;
     private boolean once;
     private volatile boolean gotIt = false;
 
@@ -27,14 +26,13 @@ public class PresentingDataCollector implements DataCollector {
 
 
     public PresentingDataCollector(String mbsName, String mbeanName, String attrName,
-                Object argObj, String[] argPath, String[] getPath, int type, boolean once) {
+                Object argObj, String[] argPath, String[] getPath, boolean once) {
         this.mbsName = mbsName;
         this.mbeanName = mbeanName;
         this.attrName = attrName;
         this.argObj = argObj;
         this.argPath = argPath;
         this.getPath = getPath;
-        this.type = type;
         this.once = once;
         this.id = MainCollector.register(this);
     }
