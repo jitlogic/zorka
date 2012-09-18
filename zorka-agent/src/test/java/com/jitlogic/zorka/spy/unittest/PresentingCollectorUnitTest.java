@@ -54,7 +54,7 @@ public class PresentingCollectorUnitTest {
 
     @Test
     public void testPresentStaticMethodAsValGetter() throws Exception {
-        lib.present("java", "com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
+        lib.present("com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
                 "zorka:type=ZorkaStats1,name=SomeClass", "count",
                 "com.jitlogic.zorka.spy.unittest.SomeClass",
                 new String[] { },   // argPath
@@ -71,5 +71,45 @@ public class PresentingCollectorUnitTest {
     }
 
 
+    @Test
+    public void testPresentInstanceMethodAsValGetter() throws Exception {
+        lib.present("com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
+                "zorka:type=ZorkaStats2,name=SomeClass", "testcount",
+                0,
+                new String[] { },
+                new String[] { "getTstCount()" },
+                ZorkaSpyLib.PRESENT_ARGUMENT, true);
 
+        Object obj = TestUtil.instrumentAndInstantiate(spy,
+                "com.jitlogic.zorka.spy.unittest.SomeClass");
+
+        assertNotNull(obj);
+        TestUtil.callMethod(obj, "someMethod");
+        TestUtil.callMethod(obj, "someMethod");
+        TestUtil.callMethod(obj, "someMethod");
+
+        assertEquals(126, agent.getZorkaLib().jmx("java", "zorka:type=ZorkaStats2,name=SomeClass", "testcount"));
+    }
+
+
+    @Test
+    public void testPresentAttributeAsValGetter() throws Exception {
+        lib.present("com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
+                "zorka:type=ZorkaStats3,name=SomeClass", "runcounter",
+                0,
+                new String[] { },
+                new String[] { ".runCounter" },
+                ZorkaSpyLib.PRESENT_ATTRIBUTE, true);
+
+        Object obj = TestUtil.instrumentAndInstantiate(spy,
+                "com.jitlogic.zorka.spy.unittest.SomeClass");
+
+        assertNotNull(obj);
+        TestUtil.callMethod(obj, "someMethod");
+        TestUtil.callMethod(obj, "someMethod");
+        TestUtil.callMethod(obj, "someMethod");
+
+        assertEquals(3, agent.getZorkaLib().jmx("java", "zorka:type=ZorkaStats3,name=SomeClass", "runcounter"));
+
+    }
 }

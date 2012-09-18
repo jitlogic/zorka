@@ -26,7 +26,11 @@ public class SomeClass {
 	public int finCounter = 0;
 	public int errCounter = 0;
 	public int runCounter = 0;
-	
+
+    public int getTstCount() {
+        return 123+runCounter;
+    }
+
 	public void someMethod() {
 		TestUtil.sleep(waitTime);
 		runCounter++;
