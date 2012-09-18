@@ -1,0 +1,96 @@
+/**
+ * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+__jboss7() {
+
+    // Basic servlet statistics
+    __servlet() {
+
+        discovery() {
+            return zabbix.discovery("java", "jboss.as:subsystem=web,*", "deployment", "servlet");
+        }
+
+        requests(deployment,servlet) {
+            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment+",servlet="+servlet, "requestCount");
+        }
+
+        time(deployment,servlet,horizon) {
+           return zorka.rate("java", "jboss.as:subsystem=web,deployment="+deployment+",servlet="+servlet, "processingTime", "requestCount", horizon);
+        }
+
+        return this;
+    }
+
+    servlet = __servlet();
+
+    // Basic session statistics
+    __sessions() {
+
+        discovery() {
+            return zabbix.discovery("java", "jboss.as:subsystem=web,deployment=*", "deployment");
+        }
+
+        active(deployment) {
+            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment", "activeSessions");
+        }
+
+        expired(deployment) {
+            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment", "expiredSessions");
+        }
+
+        created(deployment) {
+            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment", "createdSessions");
+        }
+
+        duplicated(deployment) {
+            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment", "duplicateSessionIds");
+        }
+
+        return this;
+    }
+
+    sessions = __sessions();
+
+    // Basic data source statistics
+    __datasources() {
+        discovery() {
+            return zabbix.discovery("java", "jboss.as:subsystem=datasources,data-source=*", "data-source");
+        }
+
+        url(datasource) {
+            return zorka.jmx("java", "jboss.as:subsystem=datasources,data-source="+datasource, "connectionUrl");
+        }
+
+        jndi(datasource) {
+            return zorka.jmx("java", "jboss.as:subsystem=datasources,data-source="+datasource, "jndiName");
+        }
+
+        // TODO find out how to get statistics
+
+        return this;
+    }
+
+    datasources = __datasources();
+
+    return this;
+}
+
+
+jboss7 = __jboss7();
+
+
+
