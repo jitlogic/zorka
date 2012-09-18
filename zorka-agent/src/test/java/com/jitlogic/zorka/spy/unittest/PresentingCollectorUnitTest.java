@@ -54,7 +54,7 @@ public class PresentingCollectorUnitTest {
 
     @Test
     public void testPresentStaticMethodAsValGetter() throws Exception {
-        lib.present("java", "com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
+        lib.present("com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
                 "zorka:type=ZorkaStats1,name=SomeClass", "count",
                 "com.jitlogic.zorka.spy.unittest.SomeClass",
                 new String[] { },   // argPath
@@ -73,7 +73,7 @@ public class PresentingCollectorUnitTest {
 
     @Test
     public void testPresentInstanceMethodAsValGetter() throws Exception {
-        lib.present("java", "com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
+        lib.present("com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
                 "zorka:type=ZorkaStats2,name=SomeClass", "testcount",
                 0,
                 new String[] { },
@@ -94,7 +94,7 @@ public class PresentingCollectorUnitTest {
 
     @Test
     public void testPresentAttributeAsValGetter() throws Exception {
-        lib.present("java", "com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
+        lib.present("com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
                 "zorka:type=ZorkaStats3,name=SomeClass", "runcounter",
                 0,
                 new String[] { },

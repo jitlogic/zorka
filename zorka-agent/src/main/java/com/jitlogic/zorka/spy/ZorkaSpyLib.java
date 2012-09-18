@@ -104,7 +104,6 @@ public class ZorkaSpyLib {
      * Catches specified method call of a specified class and presents some object visible at beginning of the method
      * as an attribute in a JMX bean.
      *
-     * @param mbeanServer
      * @param className - class to be instrumented
      * @param methodName - method name
      * @param beanName - bean that will present our attribute
@@ -113,12 +112,12 @@ public class ZorkaSpyLib {
      * @param argPath - path into argument
      * @param getPath - path into value getter
      */
-    public void present(String mbeanServer, String className, String methodName,
+    public void present(String className, String methodName,
                         String beanName, String attrName,
                         Object argObj, String[] argPath, String[] getPath,
                         int type, boolean once) {
 
-        DataCollector collector = new PresentingDataCollector(mbeanServer, beanName, attrName,
+        DataCollector collector = new PresentingDataCollector(beanName, attrName,
                                                     argObj, argPath, getPath, once);
 
         MethodTemplate mt = new MethodTemplate(className, methodName, null, collector);

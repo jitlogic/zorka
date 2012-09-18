@@ -16,7 +16,7 @@ public class PresentingDataCollector implements DataCollector {
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private long id;
-    private String mbsName, mbeanName, attrName;
+    private String mbeanName, attrName;
     private Object argObj;
     private String[] argPath, getPath;
     private boolean once;
@@ -25,9 +25,8 @@ public class PresentingDataCollector implements DataCollector {
     private ObjectInspector inspector = new ObjectInspector();
 
 
-    public PresentingDataCollector(String mbsName, String mbeanName, String attrName,
+    public PresentingDataCollector(String mbeanName, String attrName,
                 Object argObj, String[] argPath, String[] getPath, boolean once) {
-        this.mbsName = mbsName;
         this.mbeanName = mbeanName;
         this.attrName = attrName;
         this.argObj = argObj;
@@ -52,9 +51,9 @@ public class PresentingDataCollector implements DataCollector {
 
         if (getPath != null && getPath.length > 0) {
             ValGetter getter = new AttrGetter(obj, getPath);
-            AgentMain.getAgent().registerBeanAttr(mbsName, mbeanName, attrName, getter);
+            AgentMain.getAgent().registerBeanAttr("java", mbeanName, attrName, getter);
         } else {
-            AgentMain.getAgent().registerBeanAttr(mbsName, mbeanName, attrName, obj);
+            AgentMain.getAgent().registerBeanAttr("java", mbeanName, attrName, obj);
         }
 
         return null;
