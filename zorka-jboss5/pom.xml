@@ -5,12 +5,12 @@
     <parent>
         <artifactId>zorka</artifactId>
         <groupId>com.jitlogic.zorka</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>zorka-jboss5</artifactId>
-    <name>zorka-jboss5: JBoss AS 5.1 integration helper for ZORKA</name>
+    <name>zorka-jboss5: JBoss AS 5.1 integration helper</name>
 
     <dependencies>
         <dependency>
