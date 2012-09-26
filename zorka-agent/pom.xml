@@ -15,9 +15,9 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <version>1.1.1</version>
         </dependency>
         <dependency>
-            <groupId>com.jitlogic.zorka</groupId>
-            <artifactId>zorka-bsh-core</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.jitlogic.zoola</groupId>
+            <artifactId>zoola-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.jitlogic.zorka</groupId>
