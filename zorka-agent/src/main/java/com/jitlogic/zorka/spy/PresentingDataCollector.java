@@ -8,6 +8,8 @@ import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.objectweb.asm.MethodVisitor;
 
+import java.util.Arrays;
+
 /**
  * @author RLE <rafal.lewczuk@gmail.com>
  */
@@ -30,8 +32,8 @@ public class PresentingDataCollector implements DataCollector {
         this.mbeanName = mbeanName;
         this.attrName = attrName;
         this.argObj = argObj;
-        this.argPath = argPath;
-        this.getPath = getPath;
+        this.argPath = Arrays.copyOf(argPath, argPath.length);
+        this.getPath = Arrays.copyOf(getPath, getPath.length);
         this.once = once;
         this.id = MainCollector.register(this);
     }

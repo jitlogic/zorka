@@ -21,7 +21,6 @@ import com.jitlogic.zorka.agent.ZorkaLib;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
-import javax.management.j2ee.statistics.Stats;
 import javax.management.openmbean.*;
 import java.io.Serializable;
 import java.util.*;
@@ -90,14 +89,12 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
             extractor = new CollectionSetExtractor();
         } else if (data instanceof Map) {
             extractor = new MapSetExtractor();
-        } else if (data instanceof Stats) {
-            extractor = new StatsSetExtractor();
         } else {
             throw new IllegalArgumentException("Data set of type '" + data.getClass().getName() + "' is not supported.");
         }
 
-        this.attrNames = attrNames;
-        this.attrTypes = attrTypes;
+        this.attrNames = Arrays.copyOf(attrNames, attrNames.length);
+        this.attrTypes = Arrays.copyOf(attrTypes, attrTypes.length);
 
         this.rowType = new CompositeType(wrappedClass.getName(),
                 description, attrNames, attrDescriptions, this.attrTypes);
@@ -278,39 +275,39 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
     /**
      * Support for statistics as data sets
      */
-    private class StatsSetExtractor implements TabularSetExtractor {
-
-
-        public int size() {
-            return ((Stats)data).getStatistics().length;
-        }
-
-        public Collection<?> values() {
-            return Arrays.asList(((Stats)data).getStatistics());
-        }
-
-        public boolean containsKey(String key) {
-            for (String statName : ((Stats)data).getStatisticNames())
-                if (statName.equals(key))
-                    return true;
-            return false;
-        }
-
-        public Set<?> keySet() {
-            String[] statNames = ((Stats)data).getStatisticNames();
-            Set<List<?>> keyset = new HashSet<List<?>>(size()*2);
-
-            for (String statName : statNames) {
-                keyset.add(Arrays.asList(statName));
-            }
-
-            return keyset;
-        }
-
-        public Object get(String key) {
-            return ((Stats)data).getStatistic(key);
-        }
-    }
+//    private class StatsSetExtractor implements TabularSetExtractor {
+//
+//
+//        public int size() {
+//            return ((Stats)data).getStatistics().length;
+//        }
+//
+//        public Collection<?> values() {
+//            return Arrays.asList(((Stats)data).getStatistics());
+//        }
+//
+//        public boolean containsKey(String key) {
+//            for (String statName : ((Stats)data).getStatisticNames())
+//                if (statName.equals(key))
+//                    return true;
+//            return false;
+//        }
+//
+//        public Set<?> keySet() {
+//            String[] statNames = ((Stats)data).getStatisticNames();
+//            Set<List<?>> keyset = new HashSet<List<?>>(size()*2);
+//
+//            for (String statName : statNames) {
+//                keyset.add(Arrays.asList(statName));
+//            }
+//
+//            return keyset;
+//        }
+//
+//        public Object get(String key) {
+//            return ((Stats)data).getStatistic(key);
+//        }
+//    }
 
     // TODO toString()
 

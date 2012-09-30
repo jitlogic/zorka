@@ -17,12 +17,50 @@
 
 package com.jitlogic.zorka.mbeans;
 
-import javax.management.j2ee.statistics.TimeStatistic;
 
-public interface MethodCallStatistic extends TimeStatistic {
+public class MethodCallStatistic implements MethodCallStat {
 
-	public long getCalls();
+	public static final long NS = 1000000;
 	
-	public long getErrors();
+	private String name;
 	
+	private long totalTimeNs = 0;
+	
+	private long calls = 0, errors = 0;
+
+    public MethodCallStatistic(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return "Number of calls (as measured by Zorka Spy) and its summary time.";
+    }
+
+    public String getUnit() {
+        return "MILLISECOND";
+    }
+
+	public synchronized long getCalls() {
+		return calls;
+	}
+	
+	public synchronized long getErrors() {
+		return errors;
+	}
+	
+	public synchronized long getTime() {
+		return totalTimeNs/NS;
+	}
+
+	public synchronized void logCall(long tst, long ns) {
+		calls++; totalTimeNs += ns;
+	}
+	
+	public synchronized void logError(long tst, long ns) {
+		calls++; errors++; totalTimeNs += ns;
+    }
 }

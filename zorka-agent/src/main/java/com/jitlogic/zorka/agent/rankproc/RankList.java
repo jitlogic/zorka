@@ -97,8 +97,7 @@ public class RankList<K,T> implements TabularData {
 	@SuppressWarnings("unchecked")
 	public Object[] calculateIndex(CompositeData value) {
 		if (value instanceof RankItem) {
-			Object[] idx = { ((RankItem<K,T>)value).getKey() };
-			return idx;
+			return new Object[] { ((RankItem<K,T>)value).getKey() };
 		}
 		
 		throw new IllegalArgumentException("Only RankItems originating from this object are accepted.");

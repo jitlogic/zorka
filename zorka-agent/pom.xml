@@ -5,11 +5,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
     <name>zorka-agent: agent core</name>
     <dependencies>
         <dependency>
-            <groupId>org.ow2.spec.ee</groupId>
-            <artifactId>ow2-jsr77-1.1-spec</artifactId>
-            <version>1.0.10</version>
-        </dependency>
-        <dependency>
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1.1</version>

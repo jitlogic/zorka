@@ -24,14 +24,14 @@ import java.lang.reflect.InvocationTargetException;
 import com.jitlogic.zorka.agent.JavaAgent;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.bootstrap.AgentMain;
+import com.jitlogic.zorka.mbeans.MethodCallStat;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.testutil.TestExecutor;
-import com.jitlogic.zorka.mbeans.MethodCallStatistic;
-import com.jitlogic.zorka.mbeans.MethodCallStats;
+import com.jitlogic.zorka.mbeans.MethodCallStatistics;
 import com.jitlogic.zorka.spy.MainCollector;
 import com.jitlogic.zorka.spy.ZorkaSpy;
 import com.jitlogic.zorka.spy.ZorkaSpyLib;
@@ -159,17 +159,17 @@ public class SimpleMethodsTest {
 	
 	private void checkStats(String method, long calls, long errors, long time) throws Exception {
 		
-		MethodCallStats stats = (MethodCallStats)agent.getZorkaLib().jmx(
+		MethodCallStatistics stats = (MethodCallStatistics)agent.getZorkaLib().jmx(
 			"java", "zorka:type=ZorkaStats,name=SomeClass", "stats");
 		
 		assertNotNull(stats);
 		
-		MethodCallStatistic mcs = stats.getMethodCallStat(method);
+		MethodCallStat mcs = stats.getMethodCallStatistic(method);
 		
 		assertNotNull(mcs);
 		assertEquals("number of calls", calls, mcs.getCalls());
 		assertEquals("number of errors", errors, mcs.getErrors());
-		//assertEquals("execution time", time, mcs.getTotalTime());
+		//assertEquals("execution time", time, mcs.getTime());
 	}
 
 }
