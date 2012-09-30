@@ -5,7 +5,6 @@ import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.testutil.TestExecutor;
 import com.jitlogic.zorka.bootstrap.AgentMain;
-import com.jitlogic.zorka.mbeans.MethodCallStats;
 import com.jitlogic.zorka.spy.MainCollector;
 import com.jitlogic.zorka.spy.ZorkaSpy;
 import com.jitlogic.zorka.spy.ZorkaSpyLib;

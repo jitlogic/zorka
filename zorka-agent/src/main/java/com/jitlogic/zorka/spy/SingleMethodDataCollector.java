@@ -17,16 +17,15 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.mbeans.MethodCallStatistic;
 import org.objectweb.asm.MethodVisitor;
-
-import com.jitlogic.zorka.mbeans.MethodCallStatisticImpl;
 
 public class SingleMethodDataCollector implements DataCollector {
 
 	private long id = -1L;
-	private MethodCallStatisticImpl mcs;
+	private MethodCallStatistic mcs;
 	
-	public SingleMethodDataCollector(MethodCallStatisticImpl mcs) {
+	public SingleMethodDataCollector(MethodCallStatistic mcs) {
 		this.mcs = mcs;
 		this.id = MainCollector.register(this);
 	}

@@ -19,20 +19,20 @@ package com.jitlogic.zorka.spy;
 
 import java.util.List;
 
+import com.jitlogic.zorka.mbeans.MethodCallStatistic;
 import org.objectweb.asm.MethodVisitor;
 
-import com.jitlogic.zorka.mbeans.MethodCallStatisticImpl;
-import com.jitlogic.zorka.mbeans.MethodCallStats;
+import com.jitlogic.zorka.mbeans.MethodCallStatistics;
 
 public class MultiMethodDataCollector implements DataCollector {
 
-	private MethodCallStats mcs;
+	private MethodCallStatistics mcs;
 	private long id = -1L;
 	private SpyExpression expr;
 	private int[] args;
 	
 	
-	public MultiMethodDataCollector(MethodCallStats mcs, SpyExpression expr) {
+	public MultiMethodDataCollector(MethodCallStatistics mcs, SpyExpression expr) {
 		this.mcs = mcs;
 		this.id = MainCollector.register(this);
 		this.expr = expr;
@@ -52,14 +52,14 @@ public class MultiMethodDataCollector implements DataCollector {
 	
 	public void logCall(long tst, CallInfo info) {
 		String name = info.getTag();
-		MethodCallStatisticImpl mci = mcs.getMethodCallStat(name);		
+		MethodCallStatistic mci = (MethodCallStatistic)mcs.getMethodCallStatistic(name);
 		mci.logCall(tst, System.nanoTime()-info.getTst());
 	}
 	
 	
 	public void logError(long tst, CallInfo info) {		
 		String name = info.getTag();
-		MethodCallStatisticImpl mci = mcs.getMethodCallStat(name);		
+		MethodCallStatistic mci = (MethodCallStatistic)mcs.getMethodCallStatistic(name);
 		mci.logError(tst, System.nanoTime()-info.getTst());
 	}
 	

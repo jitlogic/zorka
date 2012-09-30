@@ -17,6 +17,9 @@
 
 package com.jitlogic.zorka.agent;
 
+import com.jitlogic.zorka.mbeans.ZorkaStat;
+import com.jitlogic.zorka.mbeans.ZorkaStats;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -29,8 +32,6 @@ import java.util.Map.Entry;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
-import javax.management.j2ee.statistics.Statistic;
-import javax.management.j2ee.statistics.Stats;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.TabularData;
@@ -94,8 +95,11 @@ public class ObjectDumper {
 			serializeCollection(lead, obj, sb, depth);
 		} else if (obj instanceof Map) {
 			serializeMap(lead, obj, sb, depth); 
-		} else if (obj instanceof Stats) {
-			serializeStats(lead, obj, sb, depth);
+//		} else if (obj instanceof Stats) {
+//            // TODO do it via introspection
+//			serializeStats(lead, obj, sb, depth);
+        } else if (obj instanceof ZorkaStats) {
+            serializeZorkaStats(lead, obj, sb, depth);
 		} else if (obj instanceof CompositeData) {
 			serializeCompositeData(lead, obj, sb, depth);
 		} else if (obj instanceof TabularData) {
@@ -161,18 +165,28 @@ public class ObjectDumper {
 	}
 	
 	
-	private static void serializeStats(String lead, Object obj, StringBuilder sb,
-			int depth) {
-		Stats stats = (Stats)obj;
-		for (Statistic s : stats.getStatistics()) {
-			sb.append(lead); sb.append(s.getName()); sb.append(" : "); 
+//	private static void serializeStats(String lead, Object obj, StringBuilder sb,
+//			int depth) {
+//		Stats stats = (Stats)obj;
+//		for (Statistic s : stats.getStatistics()) {
+//			sb.append(lead); sb.append(s.getName()); sb.append(" : ");
+//			sb.append(s.getClass().getName()); sb.append(" = ");
+//			serialize(lead+LEAD, s, sb, depth+1);
+//		}
+//	}
+
+
+	private static void serializeZorkaStats(String lead, Object obj, StringBuilder sb, int depth) {
+		ZorkaStats stats = (ZorkaStats)obj;
+		for (String sn : stats.getStatisticNames()) {
+            ZorkaStat s = stats.getStatistic(sn);
+			sb.append(lead); sb.append(s.getName()); sb.append(" : ");
 			sb.append(s.getClass().getName()); sb.append(" = ");
 			serialize(lead+LEAD, s, sb, depth+1);
 		}
 	}
-	
-	
-	private static void serializeMap(String lead, Object obj, StringBuilder sb,
+
+    private static void serializeMap(String lead, Object obj, StringBuilder sb,
 			int depth) {
 		Map<?,?> map = (Map<?,?>)obj;
 		sb.append("{");
