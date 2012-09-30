@@ -96,8 +96,8 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
             throw new IllegalArgumentException("Data set of type '" + data.getClass().getName() + "' is not supported.");
         }
 
-        this.attrNames = attrNames;
-        this.attrTypes = attrTypes;
+        this.attrNames = Arrays.copyOf(attrNames, attrNames.length);
+        this.attrTypes = Arrays.copyOf(attrTypes, attrTypes.length);
 
         this.rowType = new CompositeType(wrappedClass.getName(),
                 description, attrNames, attrDescriptions, this.attrTypes);

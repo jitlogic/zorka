@@ -31,7 +31,6 @@ public class Zorka5Service extends ServiceMBeanSupport implements Zorka5ServiceM
 
     protected void startService() {
         log.info("Starting ZORKA-5 Service");
-        MBeanServerConnection conn = this.getServer();
 
         if (AgentMain.getAgent() != null) {
             AgentMain.getAgent().registerMbs("java", ManagementFactory.getPlatformMBeanServer(), Thread.currentThread().getContextClassLoader());

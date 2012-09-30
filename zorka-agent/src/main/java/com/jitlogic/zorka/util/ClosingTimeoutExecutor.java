@@ -188,8 +188,9 @@ public class ClosingTimeoutExecutor implements Executor {
                                 thread.stop(new TimeoutException());
                                 numReapKills++;
                                 //closeTask(runnerTasks.get(i).getTask());
-                            } else
+                            } else {
                                 numReapInterruptions++;
+                            }
                         }
                     }
                 } catch (InterruptedException e) {
