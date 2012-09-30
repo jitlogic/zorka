@@ -23,6 +23,8 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import java.util.Arrays;
+
 public class ClassInstrumentator extends ClassVisitor {
 
 	private String className;
@@ -41,7 +43,7 @@ public class ClassInstrumentator extends ClassVisitor {
 	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
 		cv.visit(version, access, name, signature, superName, interfaces);
 		isInterface = (access & ACC_INTERFACE) != 0;
-		this.interfaces = interfaces;
+		this.interfaces = Arrays.copyOf(interfaces, interfaces.length);
 	}
 
 	@Override

@@ -26,12 +26,9 @@ import java.util.Set;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
-import javax.management.j2ee.statistics.Stats;
-import javax.management.openmbean.CompositeData;
 
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.util.ZorkaUtil;
 
 public class JmxResolver {
 	

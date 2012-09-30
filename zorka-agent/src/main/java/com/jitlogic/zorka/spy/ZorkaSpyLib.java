@@ -20,8 +20,8 @@ package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.mbeans.MethodCallStatisticImpl;
-import com.jitlogic.zorka.mbeans.MethodCallStats;
+import com.jitlogic.zorka.mbeans.MethodCallStatistic;
+import com.jitlogic.zorka.mbeans.MethodCallStatistics;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
@@ -45,11 +45,11 @@ public class ZorkaSpyLib {
 	}
 	
 	
-//	private MethodCallStats getStats(String bean, String attrName) {
-//		Object obj = mbr.getOrRegisterBeanAttr("java", bean, attrName, new MethodCallStats());
+//	private MethodCallStatistics getStats(String bean, String attrName) {
+//		Object obj = mbr.getOrRegisterBeanAttr("java", bean, attrName, new MethodCallStatistics());
 //
 //		if (obj == null) {
-//			obj = new MethodCallStats();
+//			obj = new MethodCallStatistics();
 //			JmxObject jmxobj = (JmxObject)lib.jmx("java", bean);
 //			try {
 //				if (jmxobj != null) {
@@ -64,19 +64,19 @@ public class ZorkaSpyLib {
 //			}
 //		}
 //
-//		if (! (obj instanceof MethodCallStats)) {
-//			log.error("Attribute '" + attrName + "' of '" + bean + "' is not MethodCallStats object.");
+//		if (! (obj instanceof MethodCallStatistics)) {
+//			log.error("Attribute '" + attrName + "' of '" + bean + "' is not MethodCallStatistics object.");
 //		}
 //
-//		return (MethodCallStats)obj;
+//		return (MethodCallStatistics)obj;
 //	}
 
 	
 	public void simple(String className, String methodName, String beanName, String attrName) {
 
-		MethodCallStats mcs = mbr.getOrRegisterBeanAttr("java", beanName, attrName, new MethodCallStats(),
+		MethodCallStatistics mcs = mbr.getOrRegisterBeanAttr("java", beanName, attrName, new MethodCallStatistics(),
                                 "Zorka Spy Stats"); //getStats(bean, attrName);
-		MethodCallStatisticImpl st = mcs.getMethodCallStat(methodName);
+		MethodCallStatistic st = (MethodCallStatistic)mcs.getMethodCallStatistic(methodName);
 		DataCollector collector = new SingleMethodDataCollector(st);
 		MethodTemplate mt = new MethodTemplate(className, methodName, null, collector);
 		spy.addTemplate(mt);
@@ -86,7 +86,7 @@ public class ZorkaSpyLib {
 	
 	public void simple(String className, String methodName, String beanName, String attrName, String expr) {
 
-		MethodCallStats mcs = mbr.getOrRegisterBeanAttr("java", beanName, attrName, new MethodCallStats(),
+		MethodCallStatistics mcs = mbr.getOrRegisterBeanAttr("java", beanName, attrName, new MethodCallStatistics(),
                                 "Zorka Spy stats"); //getStats(bean, attrName);
 		DataCollector collector = new MultiMethodDataCollector(mcs, SpyExpression.parse(expr));
 		MethodTemplate mt = new MethodTemplate(className, methodName, null, collector);

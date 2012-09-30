@@ -1,15 +1,12 @@
 package com.jitlogic.zorka.util;
 
 import com.jitlogic.zorka.agent.JmxObject;
+import com.jitlogic.zorka.mbeans.ZorkaStats;
 
-import javax.management.j2ee.statistics.Stats;
 import javax.management.openmbean.CompositeData;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Tools for introspection of various objects.
@@ -85,9 +82,11 @@ public class ObjectInspector {
             return idx != null ? ((Object[])obj)[idx] : null;
         } else if (obj instanceof CompositeData) {
             return ((CompositeData)obj).get(""+key);
-        } else if (obj instanceof Stats){
-            // TODO cut off j2ee dependency - use reflection;
-            return ((Stats)obj).getStatistic(""+key);
+        } else if (obj instanceof ZorkaStats) {
+            return ((ZorkaStats)obj).getStatistic(key.toString());
+//        } else if (obj instanceof Stats){
+//            // TODO cut off j2ee dependency - use reflection;
+//            return ((Stats)obj).getStatistic(key.toString());
         } else if (obj instanceof JmxObject) {
             return ((JmxObject)obj).get(key);
         }  // TODO support for tabular data
@@ -115,6 +114,7 @@ public class ObjectInspector {
         return null;
     }
 
+
     private Object fetchViaMethod(Object obj, Class<?> clazz, Method method) {
         if (method != null) {
             try {
@@ -126,6 +126,7 @@ public class ObjectInspector {
         }
         return null;
     }
+
 
     private Object fetchFieldVal(Object obj, Class<?> clazz, String name) {
         try {
@@ -148,10 +149,10 @@ public class ObjectInspector {
             for (Object key : ((Map<?,?>)obj).keySet()) {
                 lst.add(key.toString());
             }
-        } else if (obj instanceof Stats) {
-            for (String name : ((Stats)obj).getStatisticNames()) {
-                lst.add(name);
-            }
+        } else if (obj instanceof ZorkaStats) {
+            lst = Arrays.asList(((ZorkaStats)obj).getStatisticNames());
+//        } else if (obj instanceof Stats) {
+//            lst = Arrays.asList(((Stats)obj).getStatisticNames());
         }
 
         Collections.sort(lst);
