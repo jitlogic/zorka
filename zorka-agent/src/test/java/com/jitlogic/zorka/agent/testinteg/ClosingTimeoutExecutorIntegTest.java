@@ -86,7 +86,7 @@ public class ClosingTimeoutExecutorIntegTest {
     @Test
     public void testTimeoutTaskExecutionWithCheck() throws Exception {
         ClosingTimeoutExecutor executor = new ClosingTimeoutExecutor(2, 2, 30);
-        TestTask task =  new TestTask(50);
+        TestTask task =  new TestTask(45);
         executor.execute(task);
         Thread.sleep(20);
         assertEquals(0, task.getRuns());

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2012-09-08T15:15:52Z</date>
+    <date>2012-09-30T12:42:08Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -141,7 +141,7 @@
                             <value_type>0</value_type>
                             <allowed_hosts/>
                             <units>req/min</units>
-                            <delta>0</delta>
+                            <delta>1</delta>
                             <snmpv3_securityname/>
                             <snmpv3_securitylevel>0</snmpv3_securitylevel>
                             <snmpv3_authpassphrase/>
@@ -180,7 +180,7 @@
                             <value_type>0</value_type>
                             <allowed_hosts/>
                             <units>req/min</units>
-                            <delta>0</delta>
+                            <delta>1</delta>
                             <snmpv3_securityname/>
                             <snmpv3_securitylevel>0</snmpv3_securitylevel>
                             <snmpv3_authpassphrase/>
