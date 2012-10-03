@@ -19,6 +19,12 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <artifactId>zorka-bootstrap</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.ow2.spec.ee</groupId>
+            <artifactId>ow2-jsr77-1.1-spec</artifactId>
+            <version>1.0.10</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <parent>
         <groupId>com.jitlogic.zorka</groupId>

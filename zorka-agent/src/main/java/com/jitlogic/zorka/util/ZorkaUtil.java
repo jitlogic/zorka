@@ -210,4 +210,27 @@ public class ZorkaUtil {
         return sb.toString();
     }
 
+
+    public static boolean instanceOfIfc(Class<?> c, String ifName) {
+
+        for (Class<?> clazz = c; !"java.lang.Object".equals(clazz.getName()); clazz = clazz.getSuperclass()) {
+            if (ifName.equals(clazz.getName()) || interfaceOf(clazz, ifName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    public static boolean interfaceOf(Class<?> c, String ifName) {
+        for (Class<?> ifc : c.getInterfaces()) {
+            if (ifName.equals(ifc.getName()) || interfaceOf(ifc, ifName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

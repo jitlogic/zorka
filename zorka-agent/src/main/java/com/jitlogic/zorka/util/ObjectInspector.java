@@ -4,6 +4,7 @@ import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.mbeans.ZorkaStats;
 
 import javax.management.openmbean.CompositeData;
+import java.io.ObjectStreamConstants;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -20,7 +21,7 @@ public class ObjectInspector {
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
 
-    public Method lookupMethod(Class<?> clazz, String name) {
+    private Method lookupMethod(Class<?> clazz, String name) {
         try {
             return name != null ? clazz.getMethod(name) : null;
         } catch (NoSuchMethodException e) {
@@ -84,9 +85,15 @@ public class ObjectInspector {
             return ((CompositeData)obj).get(""+key);
         } else if (obj instanceof ZorkaStats) {
             return ((ZorkaStats)obj).getStatistic(key.toString());
-//        } else if (obj instanceof Stats){
-//            // TODO cut off j2ee dependency - use reflection;
-//            return ((Stats)obj).getStatistic(key.toString());
+        } else if (ZorkaUtil.instanceOfIfc(obj.getClass(), "javax.management.j2ee.statistics.Stats")) {
+            try {
+                Method m = obj.getClass().getMethod("getStatistic", String.class);
+                if (m != null) {
+                    return m.invoke(obj, key);
+                }
+            } catch (Exception e) {
+                log.error("Error invoking getStatistic('" + key + "')", e);
+            }
         } else if (obj instanceof JmxObject) {
             return ((JmxObject)obj).get(key);
         }  // TODO support for tabular data
@@ -151,8 +158,16 @@ public class ObjectInspector {
             }
         } else if (obj instanceof ZorkaStats) {
             lst = Arrays.asList(((ZorkaStats)obj).getStatisticNames());
-//        } else if (obj instanceof Stats) {
-//            lst = Arrays.asList(((Stats)obj).getStatisticNames());
+        } else if (ZorkaUtil.instanceOfIfc(obj.getClass(), "javax.management.j2ee.statistics.Stats")) {
+            try {
+                Method m = obj.getClass().getMethod("getStatisticNames");
+                if (m != null) {
+                    return Arrays.asList((String[])m.invoke(obj));
+                }
+            } catch (Exception e) {
+                log.error("Error invoking getStatisticNames()", e);
+            }
+
         }
 
         Collections.sort(lst);
