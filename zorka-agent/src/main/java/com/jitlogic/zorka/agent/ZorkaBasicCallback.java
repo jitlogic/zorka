@@ -17,6 +17,8 @@
 
 package com.jitlogic.zorka.agent;
 
+import com.jitlogic.zorka.util.ObjectDumper;
+
 public class ZorkaBasicCallback implements ZorkaCallback {
 
 	private Object result = null;
@@ -33,7 +35,7 @@ public class ZorkaBasicCallback implements ZorkaCallback {
 	@Override
 	public String toString() {
 		return error != null ? 
-				ObjectDumper.errorDump(error) : 
+				ObjectDumper.errorDump(error) :
 				ObjectDumper.objectDump(result);
 	}
 	
