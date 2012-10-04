@@ -6,8 +6,6 @@ import com.jitlogic.zorka.mbeans.ZorkaStats;
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
-import java.io.IOException;
-import java.io.ObjectStreamConstants;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -70,7 +68,7 @@ public class ObjectInspector {
             obj = ((TabularData)obj).get(keys);
         } else if (obj instanceof ZorkaStats) {
             return ((ZorkaStats)obj).getStatistic(key.toString());
-        } else if (ZorkaUtil.instanceOfIfc(obj.getClass(), "javax.management.j2ee.statistics.Stats")) {
+        } else if (ZorkaUtil.instanceOf(obj.getClass(), "javax.management.j2ee.statistics.Stats")) {
             try {
                 Method m = obj.getClass().getMethod("getStatistic", String.class);
                 if (m != null) {
@@ -136,7 +134,7 @@ public class ObjectInspector {
             }
         } else if (obj instanceof ZorkaStats) {
             lst = Arrays.asList(((ZorkaStats)obj).getStatisticNames());
-        } else if (ZorkaUtil.instanceOfIfc(obj.getClass(), "javax.management.j2ee.statistics.Stats")) {
+        } else if (ZorkaUtil.instanceOf(obj.getClass(), "javax.management.j2ee.statistics.Stats")) {
             try {
                 Method m = obj.getClass().getMethod("getStatisticNames");
                 if (m != null) {

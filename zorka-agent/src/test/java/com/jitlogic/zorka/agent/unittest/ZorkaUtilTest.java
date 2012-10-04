@@ -30,24 +30,31 @@ public class ZorkaUtilTest {
     @Test
     public void testInstanceOf1() throws Exception {
         Assert.assertTrue("immediate implements",
-            ZorkaUtil.instanceOfIfc(MethodCallStatistic.class, "com.jitlogic.zorka.mbeans.MethodCallStat"));
+            ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.mbeans.MethodCallStat"));
     }
 
     @Test
     public void testInstanceOf2() throws Exception {
         Assert.assertTrue("subinterface implements",
-                ZorkaUtil.instanceOfIfc(MethodCallStatistic.class, "com.jitlogic.zorka.mbeans.ZorkaStat"));
+                ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.mbeans.ZorkaStat"));
     }
 
     @Test
     public void testInstanceOf3() throws Exception {
         Assert.assertTrue("superclass implements subinterface",
-                ZorkaUtil.instanceOfIfc(TestCallStatistic.class, "com.jitlogic.zorka.mbeans.MethodCallStat"));
+                ZorkaUtil.instanceOf(TestCallStatistic.class, "com.jitlogic.zorka.mbeans.MethodCallStat"));
     }
 
     @Test
     public void testInstanceOf4() throws Exception {
         Assert.assertFalse("should not implement",
-                ZorkaUtil.instanceOfIfc(MethodCallStatistic.class, "com.jitlogic.zorka.mbeans.ValGetter"));
+                ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.mbeans.ValGetter"));
     }
+
+    @Test
+    public void testInstanceOf5() throws Exception {
+        Assert.assertTrue("immediate implements",
+                ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.mbeans.MethodCallStatistic"));
+    }
+
 }
