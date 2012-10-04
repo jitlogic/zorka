@@ -110,20 +110,26 @@ public class ObjectInspector {
      * @param obj
      * @return
      */
-    public List<String> list(Object obj) {
+    public List<?> list(Object obj) {
         List<String> lst = new ArrayList<String>();
         if (obj instanceof Map) {
             for (Object key : ((Map<?,?>)obj).keySet()) {
                 lst.add(key.toString());
             }
         } else if (obj instanceof List<?>) {
-            for (Object o : (List)obj) {
-                lst.add(""+o);
+            int len = ((List)obj).size();
+            List<Integer> ret = new ArrayList<Integer>(len);
+            for (int i = 0; i < len; i++) {
+                ret.add(i);
             }
+            return ret;
         } else if (obj.getClass().isArray()) {
-            for (Object o : (Object[])obj) {
-                lst.add(""+o);
+            int len = ((Object[])obj).length;
+            List<Integer> ret = new ArrayList<Integer>(len);
+            for (int i = 0; i < len; i++) {
+                ret.add(i);
             }
+            return ret;
         } else if (obj instanceof CompositeData) {
             for (String s : ((CompositeData)obj).getCompositeType().keySet()) {
                 lst.add(s);
@@ -138,7 +144,7 @@ public class ObjectInspector {
             try {
                 Method m = obj.getClass().getMethod("getStatisticNames");
                 if (m != null) {
-                    return Arrays.asList((String[])m.invoke(obj));
+                    return Arrays.asList((Object[])m.invoke(obj));
                 }
             } catch (Exception e) {
                 log.error("Error invoking getStatisticNames()", e);
