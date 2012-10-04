@@ -5,12 +5,11 @@ import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaLib;
 import com.jitlogic.zorka.agent.rankproc.AvgRateCounter;
 import com.jitlogic.zorka.agent.testutil.TestExecutor;
-import com.jitlogic.zorka.agent.testutil.TestUtil;
+import com.jitlogic.zorka.agent.testutil.JmxTestUtil;
 import com.jitlogic.zorka.agent.zabbix.ZabbixLib;
 import com.jitlogic.zorka.mbeans.TabularDataWrapper;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
 import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
@@ -20,7 +19,7 @@ import java.util.*;
  */
 public class TabularWrapperTest {
 
-    private TestUtil testUtil = new TestUtil();
+    private JmxTestUtil jmxTestUtil = new JmxTestUtil();
     private ZorkaBshAgent bshAgent;
     private ZorkaLib zorkaLib;
     private AvgRateCounter counter;
@@ -30,13 +29,13 @@ public class TabularWrapperTest {
         bshAgent = new ZorkaBshAgent(new TestExecutor(), new MBeanServerRegistry(true));
         ZabbixLib zl = new ZabbixLib(bshAgent, bshAgent.getZorkaLib());
         zorkaLib = bshAgent.getZorkaLib();
-        testUtil.setUp(bshAgent);
+        jmxTestUtil.setUp(bshAgent);
         counter = new AvgRateCounter(zorkaLib);
     }
 
     @After
     public void tearDown() {
-        testUtil.tearDown();
+        jmxTestUtil.tearDown();
     }
 
     private Map map(Object...vals) {

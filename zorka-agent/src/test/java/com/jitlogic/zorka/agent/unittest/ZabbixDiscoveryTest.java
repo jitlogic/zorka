@@ -6,7 +6,7 @@ import com.jitlogic.zorka.agent.ZorkaLib;
 import com.jitlogic.zorka.agent.rankproc.AvgRateCounter;
 import com.jitlogic.zorka.agent.testutil.TestExecutor;
 import com.jitlogic.zorka.agent.testutil.TestJmx;
-import com.jitlogic.zorka.agent.testutil.TestUtil;
+import com.jitlogic.zorka.agent.testutil.JmxTestUtil;
 import com.jitlogic.zorka.agent.zabbix.ZabbixLib;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
  */
 public class ZabbixDiscoveryTest {
 
-    private TestUtil testUtil = new TestUtil();
+    private JmxTestUtil jmxTestUtil = new JmxTestUtil();
     private ZorkaBshAgent bshAgent;
     private ZorkaLib zorkaLib;
     private ZabbixLib zabbixLib;
@@ -33,14 +33,14 @@ public class ZabbixDiscoveryTest {
         ZabbixLib zl = new ZabbixLib(bshAgent, bshAgent.getZorkaLib());
         zorkaLib = bshAgent.getZorkaLib();
         zabbixLib = new ZabbixLib(bshAgent, zorkaLib);
-        testUtil.setUp(bshAgent);
+        jmxTestUtil.setUp(bshAgent);
         counter = new AvgRateCounter(zorkaLib);
     }
 
 
     @After
     public void tearDown() {
-        testUtil.tearDown();
+        jmxTestUtil.tearDown();
     }
 
 
@@ -55,10 +55,10 @@ public class ZabbixDiscoveryTest {
 
     @Test
     public void testDiscoveryWithInternalAttrs() throws Exception {
-        TestJmx jmx1 = testUtil.makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
+        TestJmx jmx1 = jmxTestUtil.makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
         jmx1.getStrMap().put("a", "aaa");
 
-        TestJmx jmx2 = testUtil.makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);
+        TestJmx jmx2 = jmxTestUtil.makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);
         jmx2.getStrMap().put("b", "bbb");
 
         JSONObject obj = zabbixLib.discovery("test", "test:type=TestJmx,*", new String[]{ "name" },
@@ -74,11 +74,11 @@ public class ZabbixDiscoveryTest {
 
     @Test
     public void testDiscoveryWithMoreThanOneInternapAttr() throws Exception {
-        TestJmx jmx1 = testUtil.makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
+        TestJmx jmx1 = jmxTestUtil.makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
         jmx1.getStrMap().put("a", "aaa");
         jmx1.getStrMap().put("c", "ccc");
 
-        TestJmx jmx2 = testUtil.makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);
+        TestJmx jmx2 = jmxTestUtil.makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);
         jmx2.getStrMap().put("b", "bbb");
 
         JSONObject obj = zabbixLib.discovery("test", "test:type=TestJmx,*", new String[]{ "name" },
