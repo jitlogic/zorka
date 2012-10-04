@@ -18,6 +18,7 @@
 package com.jitlogic.zorka.agent.testutil;
 
 import com.jitlogic.zorka.agent.JavaAgent;
+import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 
 import javax.management.MBeanServer;
@@ -29,7 +30,7 @@ import java.lang.management.ManagementFactory;
 /**
  * @author RLE <rafal.lewczuk@gmail.com>
  */
-public class TestUtil {
+public class JmxTestUtil {
 
     private MBeanServer mbs;
     private ZorkaBshAgent agent;

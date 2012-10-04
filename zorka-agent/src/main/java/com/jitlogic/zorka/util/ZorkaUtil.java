@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -149,6 +150,18 @@ public class ZorkaUtil {
 	}
 
 
+    public static String join(String sep, Collection<?> col) {
+        StringBuilder sb = new StringBuilder();
+
+        for (Object val : col) {
+            if (sb.length() > 0) sb.append(sep);
+            sb.append(val != null ? val.toString() : "null");
+        }
+
+        return sb.toString();
+    }
+
+
 	public static String join(String sep, Object...vals) {
 		StringBuilder sb = new StringBuilder();
 		
@@ -208,6 +221,29 @@ public class ZorkaUtil {
         matcher.appendTail(sb);
 
         return sb.toString();
+    }
+
+
+    public static boolean instanceOfIfc(Class<?> c, String ifName) {
+
+        for (Class<?> clazz = c; !"java.lang.Object".equals(clazz.getName()); clazz = clazz.getSuperclass()) {
+            if (ifName.equals(clazz.getName()) || interfaceOf(clazz, ifName)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    public static boolean interfaceOf(Class<?> c, String ifName) {
+        for (Class<?> ifc : c.getInterfaces()) {
+            if (ifName.equals(ifc.getName()) || interfaceOf(ifc, ifName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }
