@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
+import com.jitlogic.zorka.util.ObjectDumper;
 import com.jitlogic.zorka.util.ZorkaLog;
 
 import bsh.EvalError;

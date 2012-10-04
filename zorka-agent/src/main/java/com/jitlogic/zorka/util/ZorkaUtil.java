@@ -47,26 +47,6 @@ public class ZorkaUtil {
 	}
 
 
-	public static String readText(InputStream is) throws IOException {
-		StringBuilder sb = new StringBuilder();
-		
-		BufferedReader rdr = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-		String nl = System.getProperty("line.separator");
-		String line;
-		
-		try {
-			while (null != (line = rdr.readLine())) {
-				sb.append(line);
-				sb.append(nl);
-			}
-		} finally {
-			rdr.close();
-		}
-		
-		return sb.toString();
-	}
-
-	
 	public static Object coerce(Object obj, Class<?> c) {
 		
 		if (obj == null || c == null) { return null; }
@@ -108,16 +88,6 @@ public class ZorkaUtil {
 	
 	public static boolean coerceBool(Object obj) {
 		return !(obj == null || obj.equals(false));
-	}
-
-
-	/**
-	 * 
-	 * @param v
-	 * @return
-	 */
-	public static String valueDump(Object v) {
-		return ""+v;
 	}
 
 
@@ -224,10 +194,10 @@ public class ZorkaUtil {
     }
 
 
-    public static boolean instanceOfIfc(Class<?> c, String ifName) {
+    public static boolean instanceOf(Class<?> c, String name) {
 
         for (Class<?> clazz = c; !"java.lang.Object".equals(clazz.getName()); clazz = clazz.getSuperclass()) {
-            if (ifName.equals(clazz.getName()) || interfaceOf(clazz, ifName)) {
+            if (name.equals(clazz.getName()) || interfaceOf(clazz, name)) {
                 return true;
             }
         }

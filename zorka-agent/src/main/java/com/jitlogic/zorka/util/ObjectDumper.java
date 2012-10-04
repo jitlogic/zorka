@@ -15,8 +15,9 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent;
+package com.jitlogic.zorka.util;
 
+import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.mbeans.ZorkaStat;
 import com.jitlogic.zorka.mbeans.ZorkaStats;
 
@@ -39,7 +40,9 @@ import javax.management.openmbean.TabularData;
 
 public class ObjectDumper {
 
-	private static final Map<String,Integer> filteredClasses;
+    private final static ZorkaLog log = ZorkaLogger.getLog(ObjectDumper.class);
+
+    private static final Map<String,Integer> filteredClasses;
 	private static final Map<String,Integer> filteredMethods;
 	
 	private static final int PRINT = 1;
@@ -94,10 +97,9 @@ public class ObjectDumper {
 		} else if (obj instanceof Collection) {
 			serializeCollection(lead, obj, sb, depth);
 		} else if (obj instanceof Map) {
-			serializeMap(lead, obj, sb, depth); 
-//		} else if (obj instanceof Stats) {
-//            // TODO do it via introspection
-//			serializeStats(lead, obj, sb, depth);
+			serializeMap(lead, obj, sb, depth);
+        } else if (ZorkaUtil.instanceOf(obj.getClass(), "javax.management.j2ee.statistics.Stats")) {
+            serializeStats(lead, obj, sb, depth);
         } else if (obj instanceof ZorkaStats) {
             serializeZorkaStats(lead, obj, sb, depth);
 		} else if (obj instanceof CompositeData) {
@@ -163,17 +165,23 @@ public class ObjectDumper {
 			sb.append("\n");
 		}
 	}
-	
-	
-//	private static void serializeStats(String lead, Object obj, StringBuilder sb,
-//			int depth) {
-//		Stats stats = (Stats)obj;
-//		for (Statistic s : stats.getStatistics()) {
-//			sb.append(lead); sb.append(s.getName()); sb.append(" : ");
-//			sb.append(s.getClass().getName()); sb.append(" = ");
-//			serialize(lead+LEAD, s, sb, depth+1);
-//		}
-//	}
+
+
+    private static void serializeStats(String lead, Object obj, StringBuilder sb, int depth)  {
+        try {
+            Method m = obj.getClass().getMethod("getStatistics");
+            for (Object o : (Object[])m.invoke(obj)) {
+                if (o == null) { continue; }
+                Method m2 = o.getClass().getMethod("getName");
+                String name = (String)m2.invoke(obj);
+                sb.append(lead); sb.append(name); sb.append(" : ");
+                sb.append(o.getClass().getName()); sb.append(" = ");
+                serialize(lead+LEAD, o, sb, depth+1);
+            }
+        } catch (Exception e) {
+            log.error("Error serializing java stats: ", e);
+        }
+    }
 
 
 	private static void serializeZorkaStats(String lead, Object obj, StringBuilder sb, int depth) {

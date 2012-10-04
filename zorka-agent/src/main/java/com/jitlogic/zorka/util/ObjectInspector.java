@@ -6,8 +6,6 @@ import com.jitlogic.zorka.mbeans.ZorkaStats;
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
-import java.io.IOException;
-import java.io.ObjectStreamConstants;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -70,7 +68,7 @@ public class ObjectInspector {
             obj = ((TabularData)obj).get(keys);
         } else if (obj instanceof ZorkaStats) {
             return ((ZorkaStats)obj).getStatistic(key.toString());
-        } else if (ZorkaUtil.instanceOfIfc(obj.getClass(), "javax.management.j2ee.statistics.Stats")) {
+        } else if (ZorkaUtil.instanceOf(obj.getClass(), "javax.management.j2ee.statistics.Stats")) {
             try {
                 Method m = obj.getClass().getMethod("getStatistic", String.class);
                 if (m != null) {
@@ -112,20 +110,26 @@ public class ObjectInspector {
      * @param obj
      * @return
      */
-    public List<String> list(Object obj) {
+    public List<?> list(Object obj) {
         List<String> lst = new ArrayList<String>();
         if (obj instanceof Map) {
             for (Object key : ((Map<?,?>)obj).keySet()) {
                 lst.add(key.toString());
             }
         } else if (obj instanceof List<?>) {
-            for (Object o : (List)obj) {
-                lst.add(""+o);
+            int len = ((List)obj).size();
+            List<Integer> ret = new ArrayList<Integer>(len);
+            for (int i = 0; i < len; i++) {
+                ret.add(i);
             }
+            return ret;
         } else if (obj.getClass().isArray()) {
-            for (Object o : (Object[])obj) {
-                lst.add(""+o);
+            int len = ((Object[])obj).length;
+            List<Integer> ret = new ArrayList<Integer>(len);
+            for (int i = 0; i < len; i++) {
+                ret.add(i);
             }
+            return ret;
         } else if (obj instanceof CompositeData) {
             for (String s : ((CompositeData)obj).getCompositeType().keySet()) {
                 lst.add(s);
@@ -136,11 +140,11 @@ public class ObjectInspector {
             }
         } else if (obj instanceof ZorkaStats) {
             lst = Arrays.asList(((ZorkaStats)obj).getStatisticNames());
-        } else if (ZorkaUtil.instanceOfIfc(obj.getClass(), "javax.management.j2ee.statistics.Stats")) {
+        } else if (ZorkaUtil.instanceOf(obj.getClass(), "javax.management.j2ee.statistics.Stats")) {
             try {
                 Method m = obj.getClass().getMethod("getStatisticNames");
                 if (m != null) {
-                    return Arrays.asList((String[])m.invoke(obj));
+                    return Arrays.asList((Object[])m.invoke(obj));
                 }
             } catch (Exception e) {
                 log.error("Error invoking getStatisticNames()", e);
