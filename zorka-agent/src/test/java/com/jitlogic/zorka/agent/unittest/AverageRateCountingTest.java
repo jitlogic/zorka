@@ -23,7 +23,7 @@ import com.jitlogic.zorka.agent.ZorkaLib;
 import com.jitlogic.zorka.agent.rankproc.AvgRateCounter;
 import com.jitlogic.zorka.agent.testutil.TestExecutor;
 import com.jitlogic.zorka.agent.testutil.TestJmx;
-import com.jitlogic.zorka.agent.testutil.TestUtil;
+import com.jitlogic.zorka.agent.testutil.JmxTestUtil;
 import com.jitlogic.zorka.agent.zabbix.ZabbixLib;
 import org.junit.After;
 import org.junit.Before;
@@ -32,14 +32,13 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.util.List;
-import java.util.concurrent.Executor;
 
 /**
  * @author RLE <rafal.lewczuk@gmail.com>
  */
 public class AverageRateCountingTest {
 
-    private TestUtil testUtil = new TestUtil();
+    private JmxTestUtil jmxTestUtil = new JmxTestUtil();
     private ZorkaBshAgent bshAgent;
     private ZorkaLib zorkaLib;
     private AvgRateCounter counter;
@@ -49,24 +48,24 @@ public class AverageRateCountingTest {
         bshAgent = new ZorkaBshAgent(new TestExecutor(), new MBeanServerRegistry(true));
         ZabbixLib zl = new ZabbixLib(bshAgent, bshAgent.getZorkaLib());
         zorkaLib = bshAgent.getZorkaLib();
-        testUtil.setUp(bshAgent);
+        jmxTestUtil.setUp(bshAgent);
         counter = new AvgRateCounter(zorkaLib);
     }
 
     @After
     public void tearDown() {
-        testUtil.tearDown();
+        jmxTestUtil.tearDown();
     }
 
     @Test
     public void testRegisterAndQueryTrivialBean() throws Exception {
-        testUtil.makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
+        jmxTestUtil.makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
         assertEquals("10", bshAgent.query("zorka.jmx(\"test\", \"test:name=bean1,type=TestJmx\", \"Nom\")"));
     }
 
     @Test
     public void testOneObjectAvgRateCount() throws Exception {
-        TestJmx tj = testUtil.makeTestJmx("test:name=bean1,type=TestJmx", 0, 0);
+        TestJmx tj = jmxTestUtil.makeTestJmx("test:name=bean1,type=TestJmx", 0, 0);
         List<Object> path = counter.list("test", "test:name=bean1,type=TestJmx");
 
         assertEquals(0.0, counter.get(path, "Nom", "Div", AvgRateCounter.AVG1), 0.01);
@@ -79,7 +78,7 @@ public class AverageRateCountingTest {
 
     @Test
     public void testOneObjectTwoAverages() throws Exception {
-        TestJmx tj = testUtil.makeTestJmx("test:name=bean1,type=TestJmx", 0, 0);
+        TestJmx tj = jmxTestUtil.makeTestJmx("test:name=bean1,type=TestJmx", 0, 0);
         List<Object> path = counter.list("test", "test:name=bean1,type=TestJmx");
 
         tj.setNom(5); tj.setDiv(5);
@@ -97,7 +96,7 @@ public class AverageRateCountingTest {
 
     @Test
     public void testZorkaLibRateFn1() throws Exception {
-        TestJmx tj = testUtil.makeTestJmx("test:name=bean1,type=TestJmx", 0, 0);
+        TestJmx tj = jmxTestUtil.makeTestJmx("test:name=bean1,type=TestJmx", 0, 0);
 
         assertEquals(0.0, zorkaLib.rate("test", "test:name=bean1,type=TestJmx", "Nom", "Div", 60), 0.01);
         tj.setNom(5); tj.setDiv(5);

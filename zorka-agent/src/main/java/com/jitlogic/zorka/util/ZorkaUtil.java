@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -147,6 +148,18 @@ public class ZorkaUtil {
 		
 		return true;
 	}
+
+
+    public static String join(String sep, Collection<?> col) {
+        StringBuilder sb = new StringBuilder();
+
+        for (Object val : col) {
+            if (sb.length() > 0) sb.append(sep);
+            sb.append(val != null ? val.toString() : "null");
+        }
+
+        return sb.toString();
+    }
 
 
 	public static String join(String sep, Object...vals) {
