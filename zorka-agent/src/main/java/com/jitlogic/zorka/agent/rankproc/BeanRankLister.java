@@ -98,8 +98,8 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 				if (obj == null) { continue; }
 				String key = on.getKeyProperty(keyName);
 				if (mask != null) {
-					for (String k2 : inspector.list(obj)) {
-						if (k2.matches(mask)) {
+					for (Object k2 : inspector.list(obj)) {
+						if (k2.toString().matches(mask)) {
 							lst.add(new BeanRankInfo(key + "." + k2, inspector.get(obj, k2)));
 						}
 					}

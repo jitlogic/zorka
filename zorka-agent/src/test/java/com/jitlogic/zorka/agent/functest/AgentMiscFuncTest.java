@@ -20,6 +20,7 @@ package com.jitlogic.zorka.agent.functest;
 import java.net.URL;
 
 import com.jitlogic.zorka.agent.*;
+import com.jitlogic.zorka.util.ObjectDumper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

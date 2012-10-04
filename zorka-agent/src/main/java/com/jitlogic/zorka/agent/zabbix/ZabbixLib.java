@@ -98,12 +98,12 @@ public class ZabbixLib {
                 if (dstObj == null) continue;
 
                 if (pathItem.startsWith("~")) {
-                    for (String attr : inspector.list(srcObj)) {
-                        if (attr != null && attr.matches(pathItem.substring(1))) {
+                    for (Object attr : inspector.list(srcObj)) {
+                        if (attr != null && attr.toString().matches(pathItem.substring(1))) {
                             Object obj = inspector.get(srcObj, attr);
                             if (obj != null) {
                                 JSONObject dsr = pathAttr == null ? dstObj
-                                        : extend(dstObj, pathAttr, attr);
+                                        : extend(dstObj, pathAttr, attr.toString());
                                 odst.add(obj); ddst.add(dsr);
                             }
                         }

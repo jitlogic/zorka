@@ -51,7 +51,7 @@ public class ObjectInspectorUnitTest {
     public void testListArray() {
         String[] array = { "c", "b", "a" };
 
-        assertEquals(Arrays.asList("a","b","c"), inspector.list(array));
+        assertEquals(Arrays.asList(0,1,2), inspector.list(array));
     }
 
     @Test
@@ -83,7 +83,7 @@ public class ObjectInspectorUnitTest {
     public void testListList() {
         List<String> list = Arrays.asList("c", "b", "a");
 
-        assertEquals(Arrays.asList("a","b","c"), inspector.list(list));
+        assertEquals(Arrays.asList(0,1,2), inspector.list(list));
     }
 
     @Test
