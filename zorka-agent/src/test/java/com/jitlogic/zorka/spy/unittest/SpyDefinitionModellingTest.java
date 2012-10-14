@@ -37,7 +37,6 @@ public class SpyDefinitionModellingTest {
         SpyDefinition sdef =
             SpyDefinition.instrument("com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod", SpyDefinition.NO_ARGS)
                     .toStats("java", "some.app:type=ZorkaStats,name=SomeClass", "stats");
-
     }
 
     /**
@@ -49,13 +48,6 @@ public class SpyDefinitionModellingTest {
         SpyDefinition sdef =
             SpyDefinition.instrument("com.jitlogic.zorka.spy.**", "*")
                 .toStats("java", "some.app:type=ZorkaStats,name=${className}", "stats");
-
-        Assert.assertTrue("should match",
-            sdef.matches("com.jitlogic.zorka.spy.unittest.SomeClass"));
-        Assert.assertTrue("should match",
-            sdef.matches("com.jitlogic.zorka.spy.AClass"));
-        Assert.assertFalse("should NOT match",
-            sdef.matches("comXjitlogicXzorkaXspyXAClass"));
     }
 
     /**
@@ -66,11 +58,6 @@ public class SpyDefinitionModellingTest {
         SpyDefinition sdef =
             SpyDefinition.instrument("com.jitlogic.zorka.spy.*", "*")
                 .toStats("java", "some.app:type=ZorkaStats,name=${className}", "${methodName}");
-
-        Assert.assertFalse("should NOT match",
-                sdef.matches("com.jitlogic.zorka.spy.unittest.SomeClass"));
-        Assert.assertTrue("should match",
-                sdef.matches("com.jitlogic.zorka.spy.AClass"));
     }
 
 
