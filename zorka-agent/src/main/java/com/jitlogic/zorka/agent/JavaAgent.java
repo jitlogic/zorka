@@ -92,7 +92,7 @@ public class JavaAgent implements Agent {
             zorkaAgent.installModule("spy", spyLib);
         }
 
-        zorkaAgent.loadScriptDir(ZorkaConfig.getConfDir());
+        zorkaAgent.loadScriptDir(ZorkaConfig.getConfDir(), null);
 
         zorkaAgent.svcStart();
 

@@ -355,6 +355,12 @@ public class ZorkaLib implements ZorkaService {
     }
 
 
+    public void reload(String mask) {
+        agent.loadScriptDir(ZorkaConfig.getConfDir(),
+            "^"+mask.replace("\\.", "\\\\.").replace("*", ".*")+"$");
+    }
+
+
 	public void svcStart() {
 	}
 	
