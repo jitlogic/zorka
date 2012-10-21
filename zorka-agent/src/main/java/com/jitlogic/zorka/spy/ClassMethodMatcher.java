@@ -23,19 +23,30 @@ import java.util.regex.Pattern;
 
 public class ClassMethodMatcher {
 
-
     private String methodSignature;
+    private int flags;
 
+    public static final int PUBLIC_FILTER = 0x01;
+    public static final int PRIVATE_FILTER = 0x02;
+    public static final int PACKAGE_FILTER = 0x04;
+    public static final int STATIC_FILTER = 0x10;
+    public static final int INSTANCE_FILTER = 0x20;
+
+    public static final int NULL_FILTER = 0x00;
+    public static final int DEFAULT_FILTER = 0x31;
+    public static final int ANY_FILTER = 0xFF;
 
     private Pattern classMatch, methodMatch, signatureMatch;
 
 
-    public ClassMethodMatcher(String className, String methodName, String retType, String... argTypes) {
+    public ClassMethodMatcher(String className, String methodName, String retType, int flags, String... argTypes) {
+        this.flags = flags;
         this.classMatch = toSymbolMatch(className);
         this.methodMatch = toSymbolMatch(methodName);
         this.signatureMatch = toSignatureMatch(retType, argTypes);
 
     }
+
 
     private Pattern toSymbolMatch(String symbolName) {
         if (symbolName.startsWith("~")) {

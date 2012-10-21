@@ -16,13 +16,13 @@ package com.jitlogic.zorka.spy.transformers;
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-public class MethodCallingTransformer implements SpyTransformer {
+public class StringFormatTransformer implements SpyTransformer {
 
-    public MethodCallingTransformer(int src, int dst, String methodName, Object...args) {
+    public StringFormatTransformer(int dst, String expr) {
         // TODO
     }
 
     public Object[] transform(Object... args) {
-        return new Object[0];  // TODO
+        return new Object[0];  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

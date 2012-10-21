@@ -18,7 +18,7 @@ import bsh.This;
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-public class BshFilterTransformer implements ArgTransformer {
+public class BshFilterTransformer implements SpyTransformer {
 
     private final This ns;
     private final String funcName;

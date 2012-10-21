@@ -25,7 +25,7 @@ public class ClassMethodMatchTest {
 
     @Test
     public void testSimpleClassOnlyMatch() {
-        ClassMethodMatcher cm = new ClassMethodMatcher("com.jitlogic.zorka.spy.**", "*", null);
+        ClassMethodMatcher cm = new ClassMethodMatcher("com.jitlogic.zorka.spy.**", "*", null, 0xFF);
 
         Assert.assertTrue(cm.matches("com.jitlogic.zorka.spy.unittest.SomeClass"));
         Assert.assertTrue(cm.matches("com.jitlogic.zorka.spy.AClass"));
@@ -34,7 +34,7 @@ public class ClassMethodMatchTest {
 
     @Test
     public void testClassMatchWithSingleLevelWildcard() {
-        ClassMethodMatcher cm = new ClassMethodMatcher("com.jitlogic.zorka.spy.*", "*", null);
+        ClassMethodMatcher cm = new ClassMethodMatcher("com.jitlogic.zorka.spy.*", "*", null, 0xFF);
 
         Assert.assertFalse(cm.matches("com.jitlogic.zorka.spy.unittest.SomeClass"));
         Assert.assertTrue(cm.matches("com.jitlogic.zorka.spy.AClass"));
@@ -43,7 +43,7 @@ public class ClassMethodMatchTest {
 
     @Test
     public void testClassMethodMatch() {
-        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "get*", null);
+        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "get*", null, 0xFF);
 
         Assert.assertTrue(cm.matches("test.SomeClass", "getVal"));
         Assert.assertFalse(cm.matches("test.SomeClass", "setVal"));
@@ -51,7 +51,7 @@ public class ClassMethodMatchTest {
 
     @Test
     public void testClassMethodStrictMatch() {
-        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "getVal", null);
+        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "getVal", null, 0xFF);
 
         Assert.assertTrue(cm.matches("test.SomeClass", "getVal"));
         Assert.assertFalse(cm.matches("test.someClass", "getValAndSome"));
@@ -59,7 +59,7 @@ public class ClassMethodMatchTest {
 
     @Test
     public void testClassMatchSignatureWithoutTypes() {
-        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "getVal", null);
+        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "getVal", null, 0xFF);
 
         Assert.assertTrue(cm.matches("test.someClass", "getVal", "()V"));
         Assert.assertTrue(cm.matches("test.someClass", "getVal", "(II)V"));
@@ -68,7 +68,7 @@ public class ClassMethodMatchTest {
 
     @Test
     public void testClassMatchSignatureWithReturnVoidType() {
-        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "someMethod", "void");
+        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "someMethod", "void", 0xFF);
         Assert.assertTrue(cm.matches("test.SomeClass", "someMethod", "()V"));
         Assert.assertFalse(cm.matches("test.SomeClass", "someMethod", "()Void"));
         Assert.assertFalse(cm.matches("test.SomeClass", "someMethod", "()I"));
@@ -76,14 +76,14 @@ public class ClassMethodMatchTest {
 
     @Test
     public void testClassMatchSignatureReturnClassType() {
-        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "getVal", "java.lang.String");
+        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "getVal", "java.lang.String", 0xFF);
 
         Assert.assertTrue(cm.matches("test.SomeClass", "getVal", "()Ljava/lang/String;"));
     }
 
     @Test
     public void testClassMatchSignatureWithSimpleReturnAndArgumentType() {
-        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "frobnicate", "int", "int");
+        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "frobnicate", "int", 0xFF, "int");
 
         Assert.assertTrue(cm.matches("test.someClass", "frobnicate", "(I)I"));
         Assert.assertFalse(cm.matches("test.SomeClass", "frobnicate", "(J)I"));
@@ -92,7 +92,7 @@ public class ClassMethodMatchTest {
 
     @Test
     public void testClassMatchSignatureWithStringType() {
-        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "frobnicate", "String", "String");
+        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "frobnicate", "String", 0xFF, "String");
 
         Assert.assertTrue(cm.matches("test.someClass", "frobnicate", "(Ljava/lang/String;)Ljava/lang/String;"));
         Assert.assertFalse(cm.matches("test.SomeClass", "frobnicate", "(J)I"));
@@ -101,7 +101,7 @@ public class ClassMethodMatchTest {
     @Test
     public void testClassMatchWithVariousArgs() {
         ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "frobnicate",
-                "String", "int", "com.jitlogic.zorka.spy.CallInfo");
+                "String", 0xFF, "int", "com.jitlogic.zorka.spy.CallInfo");
 
         Assert.assertTrue(cm.matches("test.SomeClass", "frobnicate",
                 "(ILcom/jitlogic/zorka/spy/CallInfo;)Ljava/lang/String;"));
@@ -109,7 +109,7 @@ public class ClassMethodMatchTest {
 
     @Test
     public void testClassMatchWithNoArgsMarker() {
-        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "frobnicate", null, SpyDefinition.NO_ARGS);
+        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "frobnicate", null, 0xFF, SpyDefinition.NO_ARGS);
 
         Assert.assertTrue(cm.matches("test.SomeClass", "frobnicate", "()V"));
         Assert.assertFalse(cm.matches("test.SomeClass", "frobnicate", "(I)V"));
@@ -117,7 +117,7 @@ public class ClassMethodMatchTest {
 
     @Test
     public void testMatchWithMoreAttributesAndNoArgsFlag() {
-        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "frobnicate", null, "int", SpyDefinition.NO_ARGS);
+        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "frobnicate", null, 0xFF, "int", SpyDefinition.NO_ARGS);
 
         Assert.assertTrue(cm.matches("test.SomeClass", "frobnicate", "(I)V"));
         Assert.assertFalse(cm.matches("test.SomeClass", "frobnicate", "(II)V"));
@@ -125,7 +125,7 @@ public class ClassMethodMatchTest {
 
     @Test
     public void testMatchWithJustSomeAttributes() {
-        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "frobnicate", null, "int");
+        ClassMethodMatcher cm = new ClassMethodMatcher("test.*", "frobnicate", null, 0xFF, "int");
 
         Assert.assertTrue(cm.matches("test.SomeClass", "frobnicate", "(I)V"));
         Assert.assertTrue(cm.matches("test.SomeClass", "frobnicate", "(II)V"));

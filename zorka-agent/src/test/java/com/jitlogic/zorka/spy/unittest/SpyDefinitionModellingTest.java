@@ -18,6 +18,7 @@ package com.jitlogic.zorka.spy.unittest;
  */
 
 import bsh.This;
+import com.jitlogic.zorka.spy.ClassMethodMatcher;
 import com.jitlogic.zorka.spy.SpyDefinition;
 
 /**
@@ -34,8 +35,8 @@ public class SpyDefinitionModellingTest {
     //@Test
     public void testDefineSimpleInstrumentation() {
         SpyDefinition sdef =
-            SpyDefinition.instrument("com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
-                                     SpyDefinition.ANY_TYPE, SpyDefinition.NO_ARGS)
+            SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
+                                     SpyDefinition.ANY_TYPE, ClassMethodMatcher.DEFAULT_FILTER, SpyDefinition.NO_ARGS)
                     .toStats("java", "some.app:type=ZorkaStats,name=SomeClass", "stats");
     }
 
@@ -47,7 +48,7 @@ public class SpyDefinitionModellingTest {
     //@Test
     public void testDefineInstrumentationWithAntMasks() {
         SpyDefinition sdef =
-            SpyDefinition.instrument("com.jitlogic.zorka.spy.**", "*", SpyDefinition.ANY_TYPE)
+            SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.**", "*")
                 .toStats("java", "some.app:type=ZorkaStats,name=${className}", "stats");
     }
 
@@ -58,7 +59,7 @@ public class SpyDefinitionModellingTest {
     //@Test
     public void testInstrumentMethodWithArgProcAndTestAndShortMask() {
         SpyDefinition sdef =
-            SpyDefinition.instrument("com.jitlogic.zorka.spy.*", "*", SpyDefinition.ANY_TYPE)
+            SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.*", "*")
                 .toStats("java", "some.app:type=ZorkaStats,name=${className}", "${methodName}");
     }
 
@@ -69,8 +70,8 @@ public class SpyDefinitionModellingTest {
     //@Test
     public void testInstrumentWithFormatArgs() {
         SpyDefinition sdef =
-            SpyDefinition.instrument("org.apache.catalina.core.StandardEngineValve", "invoke", SpyDefinition.ANY_TYPE)
-                .withFormat("${1.request.requestURI}")
+            SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
+                .withFormat(2,"${1.request.requestURI}")
                 .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI");
     }
 
@@ -81,8 +82,8 @@ public class SpyDefinitionModellingTest {
     //@Test
     public void testInstrumentWithFormatArgsAndTransformViaMethod() {
         SpyDefinition sdef =
-            SpyDefinition.instrument("org.apache.catalina.core.StandardEngineValve", "invoke", SpyDefinition.ANY_TYPE)
-                .withFormat("${1.request.requestURI}")
+            SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
+                .withFormat(2,"${1.request.requestURI}")
                 .transform(0, "split", "\\?").get(0, 0)
                 .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI");
     }
@@ -95,7 +96,7 @@ public class SpyDefinitionModellingTest {
     public void testInstrumentWithCallRawArgsAndBshTransformingFunction() {
         This ns = null; // Use 'this' keyword in BSH
         SpyDefinition sdef =
-            SpyDefinition.instrument("org.apache.catalina.core.StandardEngineValve", "invoke", SpyDefinition.ANY_TYPE)
+            SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
                 .withArguments(1).transform(ns, "classify_uris")
                 .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byClass");
     }
@@ -107,8 +108,8 @@ public class SpyDefinitionModellingTest {
     //@Test
     public void testInstrumentWithCatchArgsOnExit() {
         SpyDefinition sdef =
-            SpyDefinition.instrument("org.apache.catalina.core.StandardEngineValve", "invoke", SpyDefinition.ANY_TYPE)
-                .withFormat("${2.reply.replyCode}").onExit()
+            SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
+                .withFormat(3,"${2.reply.replyCode}").onExit()
                 .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byCode");
     }
 
@@ -119,8 +120,8 @@ public class SpyDefinitionModellingTest {
     //@Test
     public void testInstrumentTomcatWithPathAndCode() {
         SpyDefinition sdef =
-            SpyDefinition.instrument("org.apache.catalina.core.StandardEngineValve", "invoke", SpyDefinition.ANY_TYPE)
-                .withFormat("${1.request.requestURI}", "${2.reply.replyCode}").onExit()
+            SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
+                .withFormat(0,"${1.request.requestURI}").withFormat(1,"${2.reply.replyCode}").onExit()
                 .transform(0, "split", "\\?").get(0, 0)
                 .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests,httpCode=${1}", "stats", "${0}");
     }
@@ -132,7 +133,7 @@ public class SpyDefinitionModellingTest {
      */
     public void testInstrumentAndGetReturnValue() {
         SpyDefinition sdef =
-            SpyDefinition.instrument("com.jitlogic.zorka.spy.unittest.SomeClass", "getTstCount", SpyDefinition.ANY_TYPE)
+            SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.unittest.SomeClass", "getTstCount")
                 .withRetVal().toBsh("someapp", "tstcount");
 
     }
@@ -144,7 +145,7 @@ public class SpyDefinitionModellingTest {
     //@Test
     public void testInstrumentGetSomeArgsAndReturnValue() {
         SpyDefinition sdef =
-            SpyDefinition.instrument("com.jitlogic.zorka.spy.unittest.SomeClass", "otherMethod", SpyDefinition.ANY_TYPE)
+            SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.unittest.SomeClass", "otherMethod")
                 .withRetVal().toBsh("someapp", "tstcount");
     }
 
@@ -156,7 +157,7 @@ public class SpyDefinitionModellingTest {
      */
     public void testExposeStaticMethodFromSomeClassAtStartup() {
         SpyDefinition sdef =
-            SpyDefinition.catchOnce("com.hp.ifc.bus.AppServer", "startup", SpyDefinition.ANY_TYPE)
+            SpyDefinition.catcher().once().lookFor("com.hp.ifc.bus.AppServer", "startup")
                 .withClass("com.hp.ifc.net.mq.AppMessageQueue").withClassLoader()
                 .toGetter("java", "hpsd:type=SDStats,name=AppMessageQueue", "size", "getSize()");
     }
@@ -169,7 +170,7 @@ public class SpyDefinitionModellingTest {
      */
     public void testExposeSomeStaticMethodsOfAnObject() {
         SpyDefinition sdef =
-            SpyDefinition.catchEvery("some.package.SomeBean", SpyDefinition.CONSTRUCTOR, SpyDefinition.ANY_TYPE)
+            SpyDefinition.catcher().lookFor("some.package.SomeBean", SpyDefinition.CONSTRUCTOR)
                 .withArguments(0).withClassLoader()
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "count", "getCount()")
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "backlog", "getBacklog()")
@@ -185,8 +186,8 @@ public class SpyDefinitionModellingTest {
      */
     //@Test
     public void testRegisterJBossMBeanServer() {
-        SpyDefinition.catchOnce("org.jboss.mx.MBeanServerImpl", SpyDefinition.CONSTRUCTOR, SpyDefinition.ANY_TYPE)
-           .withFormat("jboss").withArguments(0).withClassLoader()
+        SpyDefinition.catcher().once().lookFor("org.jboss.mx.MBeanServerImpl", SpyDefinition.CONSTRUCTOR)
+           .withFormat(0,"jboss").withArguments(0).withClassLoader()
            .toBsh("zorka", "registerMBeanServer");
     }
 
@@ -197,8 +198,8 @@ public class SpyDefinitionModellingTest {
     //@Test
     public void testExposeSomeHashMapAsMBeanAttribute() {
         SpyDefinition sdef =
-            SpyDefinition.catchOnce("some.package.SingletonBean", SpyDefinition.CONSTRUCTOR, SpyDefinition.ANY_TYPE)
+            SpyDefinition.catcher().once().lookFor("some.package.SingletonBean", SpyDefinition.CONSTRUCTOR)
                 .withArguments(0).get(0, "someMap")
-                .toStatAttr("java", "SomeApp:type=SingletonType", "map");
+                .toGetter("java", "SomeApp:type=SingletonType", "map");
     }
 }

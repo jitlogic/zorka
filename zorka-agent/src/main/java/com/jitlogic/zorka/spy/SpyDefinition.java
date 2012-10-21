@@ -49,62 +49,50 @@ public class SpyDefinition {
     private static final Integer FETCH_THREAD  = -2;
     private static final Integer FETCH_LOADER  = -3;
 
+    private static final List<Object> EMPTY_OBJS = Collections.unmodifiableList(Arrays.asList(new Object[0]));
+    private static final List<SpyTransformer> EMPTY_XF = Collections.unmodifiableList(Arrays.asList(new SpyTransformer[0]));
+    private static final List<SpyCollector> EMPTY_DC = Collections.unmodifiableList(Arrays.asList(new SpyCollector[0]));
+    private static final ClassMethodMatcher NULL_MATCHER = new ClassMethodMatcher("", "", "", 0);
+
     private SpyType spyType;
     private ClassMethodMatcher matcher;
     private boolean onExit = false;
 
-    private static final List<Object> EMPTY_OBJS = Collections.unmodifiableList(Arrays.asList(new Object[0]));
-    private static final List<ArgTransformer> EMPTY_XF = Collections.unmodifiableList(Arrays.asList(new ArgTransformer[0]));
-    private static final List<SpyCollector> EMPTY_DC = Collections.unmodifiableList(Arrays.asList(new SpyCollector[0]));
-
     private List<Object> fetchArgs = EMPTY_OBJS;
-    private List<String> formatStrings;
 
     private Integer synchronizeWithArg;
     private List<Object> synchronizeWithPath;
     private Object synchronizeWithObj;
 
-    private List<ArgTransformer> transformers = EMPTY_XF;
+    private List<SpyTransformer> transformers = EMPTY_XF;
     private List<SpyCollector> collectors = EMPTY_DC;
 
-    public static SpyDefinition instrument(String classPattern, String methodPattern, String retType, String...argTypes) {
-        return new SpyDefinition(SpyType.INSTRUMENT, classPattern, methodPattern, retType, argTypes);
+    public static SpyDefinition instrument() {
+        return new SpyDefinition(SpyType.INSTRUMENT, NULL_MATCHER);
     }
 
 
-    public static SpyDefinition catchOnce(String classPattern, String methodPattern, String retType, String...argTypes) {
-        return new SpyDefinition(SpyType.CATCH_ONCE, classPattern, methodPattern, retType, argTypes);
+    public static SpyDefinition catcher() {
+        return new SpyDefinition(SpyType.CATCH_EVERY, NULL_MATCHER);
     }
 
 
-    public static SpyDefinition catchEvery(String classPattern, String methodPattern, String retType, String...argTypes) {
-        return new SpyDefinition(SpyType.CATCH_EVERY, classPattern, methodPattern, retType, argTypes);
-    }
-
-
-    public SpyDefinition(SpyType spyType, String classPattern, String methodPattern, String retType, String...argTypes) {
+    public SpyDefinition(SpyType spyType, ClassMethodMatcher matcher) {
         this.spyType = spyType;
-        matcher = new ClassMethodMatcher(classPattern, methodPattern, retType, argTypes);
+        this.matcher = matcher;
     }
 
-
-    private SpyDefinition fullClone() {
-        // TODO implement actual cloning
-        return this;
+    private SpyDefinition(SpyDefinition orig) {
+        this.spyType = orig.spyType;
+        this.matcher = orig.matcher;
+        this.onExit = orig.onExit;
+        this.fetchArgs = orig.fetchArgs;
+        this.synchronizeWithArg = orig.synchronizeWithArg;
+        this.synchronizeWithPath = orig.synchronizeWithPath;
+        this.synchronizeWithObj = orig.synchronizeWithObj;
+        this.transformers = orig.transformers;
+        this.collectors = orig.collectors;
     }
-
-
-    public DataCollector getCollector(String clazzName, String methodName, String methodSignature) {
-//        if (matcher.matcher(clazzName).matches() &&
-//            methodMatch.matcher(methodName).matches() &&
-//            signatureMatch.matcher(methodSignature).matches()) {
-//
-//            return null;
-//        }
-
-        return null;
-    }
-
 
     public ClassMethodMatcher getMatcher() {
         return matcher;
@@ -113,6 +101,27 @@ public class SpyDefinition {
 
     public SpyType getType() {
         return spyType;
+    }
+
+
+
+    public SpyDefinition once() {
+        SpyDefinition sdef = new SpyDefinition(this);
+        sdef.spyType = SpyType.CATCH_ONCE;
+        return sdef;
+    }
+
+
+    public SpyDefinition lookFor(String classPattern, String methodPattern) {
+        return lookFor(classPattern, methodPattern, null, ClassMethodMatcher.DEFAULT_FILTER);
+    }
+
+
+
+    public SpyDefinition lookFor(String classPattern, String methodPattern, String retType, int flags, String...argTypes) {
+        SpyDefinition sdef = new SpyDefinition(this);
+        sdef.matcher = new ClassMethodMatcher(classPattern, methodPattern, retType, flags, argTypes);
+        return sdef;
     }
 
 
@@ -132,7 +141,7 @@ public class SpyDefinition {
      * @return spy definition with augmented fetched argument list;
      */
     public SpyDefinition withArguments(Object... args) {
-        SpyDefinition sdef = this.fullClone();
+        SpyDefinition sdef = new SpyDefinition(this);
 
         List<Object> lst = new ArrayList<Object>(sdef.fetchArgs.size()+args.length);
         lst.addAll(sdef.fetchArgs);
@@ -154,10 +163,8 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition withFormat(String...expr) {
-        SpyDefinition sdef = this.fullClone();
-        sdef.formatStrings = Collections.unmodifiableList(Arrays.asList(expr));
-        return sdef;
+    public SpyDefinition withFormat(int dst, String expr) {
+        return withTransformer(new StringFormatTransformer(dst, expr));
     }
 
 
@@ -215,7 +222,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition synchronizeWithArg(Integer arg, Object...path) {
-        SpyDefinition sdef = this.fullClone();
+        SpyDefinition sdef = new SpyDefinition(this);
         sdef.synchronizeWithArg = arg;
         sdef.synchronizeWithPath = Collections.unmodifiableList(Arrays.asList(path));
         return sdef;
@@ -230,7 +237,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition synchronizeWithObj(Object obj) {
-        SpyDefinition sdef = this.fullClone();
+        SpyDefinition sdef = new SpyDefinition(this);
         sdef.synchronizeWithObj = obj;
         return sdef;
     }
@@ -243,9 +250,9 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition withTransformer(ArgTransformer transformer) {
-        SpyDefinition sdef = this.fullClone();
-        List<ArgTransformer> lst = new ArrayList<ArgTransformer>(transformers.size()+1);
+    public SpyDefinition withTransformer(SpyTransformer transformer) {
+        SpyDefinition sdef = new SpyDefinition(this);
+        List<SpyTransformer> lst = new ArrayList<SpyTransformer>(transformers.size()+1);
         lst.addAll(transformers);
         lst.add(transformer);
         sdef.transformers = lst;
@@ -383,7 +390,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition onExit() {
-        SpyDefinition sdef = this.fullClone();
+        SpyDefinition sdef = new SpyDefinition(this);
         sdef.onExit = true;
         return sdef;
     }
@@ -397,7 +404,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition toCollector(SpyCollector collector) {
-        SpyDefinition sdef = this.fullClone();
+        SpyDefinition sdef = new SpyDefinition(this);
         List<SpyCollector> lst = new ArrayList<SpyCollector>(collectors.size()+1);
         lst.addAll(collectors); lst.add(collector);
         sdef.collectors = lst;

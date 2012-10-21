@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-public class RegexFilterTransformer implements ArgTransformer {
+public class RegexFilterTransformer implements SpyTransformer {
 
     private final int arg;
     private final Pattern regex;
