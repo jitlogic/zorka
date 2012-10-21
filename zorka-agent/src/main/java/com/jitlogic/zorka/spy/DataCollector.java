@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.spy.CallInfo;
 import org.objectweb.asm.MethodVisitor;
 
 public interface DataCollector {
