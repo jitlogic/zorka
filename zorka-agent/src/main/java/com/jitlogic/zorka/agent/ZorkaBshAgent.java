@@ -129,7 +129,7 @@ public class ZorkaBshAgent implements ZorkaService {
 	}
 
 
-    public void loadScriptDir(String path) {
+    public void loadScriptDir(String path, String mask) {
         try {
             //configDir = url;
             configDir = new URL("file://" + path);
@@ -141,6 +141,9 @@ public class ZorkaBshAgent implements ZorkaService {
             }
             Arrays.sort(files);
             for (String fname : files) {
+                if (!fname.matches(mask)) {
+                    continue;
+                }
                 //URL scrUrl = new URL(url + "/" + fname);
                 String scrPath = path + "/" + fname;
                 log.debug("Loading file: " + scrPath);
