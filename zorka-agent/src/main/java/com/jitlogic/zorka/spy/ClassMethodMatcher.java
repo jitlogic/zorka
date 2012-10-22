@@ -21,26 +21,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static org.objectweb.asm.Opcodes.*;
+
 public class ClassMethodMatcher {
 
     private String methodSignature;
-    private int flags;
+    private int access;
 
-    public static final int PUBLIC_FILTER = 0x01;
-    public static final int PRIVATE_FILTER = 0x02;
-    public static final int PACKAGE_FILTER = 0x04;
-    public static final int STATIC_FILTER = 0x10;
-    public static final int INSTANCE_FILTER = 0x20;
+    public static final int ACC_PKGPRIV = 0x10000;
 
-    public static final int NULL_FILTER = 0x00;
-    public static final int DEFAULT_FILTER = 0x31;
-    public static final int ANY_FILTER = 0xFF;
+    public static final int NULL_FILTER    = 0x0000;
+    public static final int DEFAULT_FILTER = ACC_PUBLIC;
+    public static final int ANY_FILTER     = ACC_PUBLIC|ACC_PRIVATE|ACC_PROTECTED|ACC_PKGPRIV;
 
     private Pattern classMatch, methodMatch, signatureMatch;
 
-
-    public ClassMethodMatcher(String className, String methodName, String retType, int flags, String... argTypes) {
-        this.flags = flags;
+    public ClassMethodMatcher(String className, String methodName, String retType, int access, String... argTypes) {
+        this.access = access;
         this.classMatch = toSymbolMatch(className);
         this.methodMatch = toSymbolMatch(methodName);
         this.signatureMatch = toSignatureMatch(retType, argTypes);
@@ -149,20 +146,28 @@ public class ClassMethodMatcher {
     }
 
 
-    public boolean matches(String clazzName) {
-        return classMatch.matcher(clazzName).matches();
+    public boolean matches(String className) {
+        return classMatch.matcher(className).matches();
     }
 
 
-    public boolean matches(String clazzName, String methodName) {
-        return classMatch.matcher(clazzName).matches()
-                && methodMatch.matcher(methodName).matches();
+    public boolean matches(String className, String methodName) {
+        return matches(className) && methodMatch.matcher(methodName).matches();
     }
 
 
     public boolean matches(String className, String methodName, String signature) {
-        return classMatch.matcher(className).matches()
-                && methodMatch.matcher(methodName).matches()
-                && signatureMatch.matcher(signature).matches();
+        return matches(className, methodName) && signatureMatch.matcher(signature).matches();
+    }
+
+
+    public boolean matches(String className, String methodName, String signature, int access) {
+        return matches(className, methodName, signature) && matches(access);
+    }
+
+
+    private boolean matches(int access) {
+        return 0 != (access & (ACC_PUBLIC|ACC_PRIVATE|ACC_PROTECTED)) ?
+                (0 != (access & this.access)) : (0 != (this.access & ACC_PKGPRIV));
     }
 }
