@@ -21,6 +21,8 @@ import bsh.This;
 import com.jitlogic.zorka.spy.ClassMethodMatcher;
 import com.jitlogic.zorka.spy.SpyDefinition;
 
+import static com.jitlogic.zorka.spy.SpyDefinition.*;
+
 /**
  * This is API modelling exercise rather then a real unit test.
  *
@@ -109,7 +111,7 @@ public class SpyDefinitionModellingTest {
     public void testInstrumentWithCatchArgsOnExit() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
-                .withFormat(3,"${2.reply.replyCode}").onExit()
+                .withArguments(2).withFormat(0,"${0.reply.replyCode}")
                 .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byCode");
     }
 
@@ -121,7 +123,8 @@ public class SpyDefinitionModellingTest {
     public void testInstrumentTomcatWithPathAndCode() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
-                .withFormat(0,"${1.request.requestURI}").withFormat(1,"${2.reply.replyCode}").onExit()
+                .onExit().withArguments(1,2)
+                .withFormat(0,"${0.request.requestURI}").withFormat(1,"${1.reply.replyCode}")
                 .transform(0, "split", "\\?").get(0, 0)
                 .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests,httpCode=${1}", "stats", "${0}");
     }
@@ -157,7 +160,7 @@ public class SpyDefinitionModellingTest {
      */
     public void testExposeStaticMethodFromSomeClassAtStartup() {
         SpyDefinition sdef =
-            SpyDefinition.catcher().once().lookFor("com.hp.ifc.bus.AppServer", "startup")
+            SpyDefinition.intercept().once().lookFor("com.hp.ifc.bus.AppServer", "startup")
                 .withClass("com.hp.ifc.net.mq.AppMessageQueue").withClassLoader()
                 .toGetter("java", "hpsd:type=SDStats,name=AppMessageQueue", "size", "getSize()");
     }
@@ -170,13 +173,12 @@ public class SpyDefinitionModellingTest {
      */
     public void testExposeSomeStaticMethodsOfAnObject() {
         SpyDefinition sdef =
-            SpyDefinition.catcher().lookFor("some.package.SomeBean", SpyDefinition.CONSTRUCTOR)
+            SpyDefinition.intercept().once().lookFor("some.package.SomeBean", SpyDefinition.CONSTRUCTOR)
                 .withArguments(0).withClassLoader()
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "count", "getCount()")
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "backlog", "getBacklog()")
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "time", "getProcessingTime()")
-                .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "url", "getUrl()")
-                .synchronizeWithArg(0);
+                .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "url", "getUrl()");
     }
 
     /**
@@ -186,7 +188,7 @@ public class SpyDefinitionModellingTest {
      */
     //@Test
     public void testRegisterJBossMBeanServer() {
-        SpyDefinition.catcher().once().lookFor("org.jboss.mx.MBeanServerImpl", SpyDefinition.CONSTRUCTOR)
+        SpyDefinition.intercept().once().lookFor("org.jboss.mx.MBeanServerImpl", SpyDefinition.CONSTRUCTOR)
            .withFormat(0,"jboss").withArguments(0).withClassLoader()
            .toBsh("zorka", "registerMBeanServer");
     }
@@ -198,7 +200,7 @@ public class SpyDefinitionModellingTest {
     //@Test
     public void testExposeSomeHashMapAsMBeanAttribute() {
         SpyDefinition sdef =
-            SpyDefinition.catcher().once().lookFor("some.package.SingletonBean", SpyDefinition.CONSTRUCTOR)
+            SpyDefinition.intercept().once().lookFor("some.package.SingletonBean", SpyDefinition.CONSTRUCTOR)
                 .withArguments(0).get(0, "someMap")
                 .toGetter("java", "SomeApp:type=SingletonType", "map");
     }

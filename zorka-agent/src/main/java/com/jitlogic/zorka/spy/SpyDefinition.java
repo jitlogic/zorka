@@ -34,93 +34,178 @@ import java.util.*;
  */
 public class SpyDefinition {
 
-    public static enum SpyType {
-        INSTRUMENT,
-        CATCH_ONCE,
-        CATCH_EVERY;
-    }
-
-    public static final String NO_ARGS = "<no-args>";
+    public static final String NO_ARGS     = "<no-args>";
     public static final String CONSTRUCTOR = "<init>";
-    public static final String ANY_TYPE = null;  // currently it only applies to return type
-    public static final String STATIC = "<clinit>";
+    public static final String ANY_TYPE    = null;
+    public static final String STATIC      = "<clinit>";
 
-    private static final Integer FETCH_RET_VAL = -1;
-    private static final Integer FETCH_THREAD  = -2;
-    private static final Integer FETCH_LOADER  = -3;
+    public static final int ON_ENTER   = 0;
+    public static final int ON_EXIT    = 1;
+    public static final int ON_ERROR   = 2;
+    public static final int ON_SUBMIT  = 3;
+    public static final int ON_COLLECT = 4;
 
-    private static final List<Object> EMPTY_OBJS = Collections.unmodifiableList(Arrays.asList(new Object[0]));
-    private static final List<SpyTransformer> EMPTY_XF = Collections.unmodifiableList(Arrays.asList(new SpyTransformer[0]));
-    private static final List<SpyCollector> EMPTY_DC = Collections.unmodifiableList(Arrays.asList(new SpyCollector[0]));
-    private static final ClassMethodMatcher NULL_MATCHER = new ClassMethodMatcher("", "", "", 0);
+    private static final Integer FETCH_TIME    = -1;
+    private static final Integer FETCH_RET_VAL = -2;
+    private static final Integer FETCH_ERROR   = -3;
+    private static final Integer FETCH_THREAD  = -4;
+    private static final Integer FETCH_LOADER  = -5;
 
-    private SpyType spyType;
-    private ClassMethodMatcher matcher;
-    private boolean onExit = false;
 
-    private List<Object> fetchArgs = EMPTY_OBJS;
+    private static final List<SpyTransformer> EMPTY_XF =
+            Collections.unmodifiableList(Arrays.asList(new SpyTransformer[0]));
+    private static final List<SpyCollector> EMPTY_DC =
+            Collections.unmodifiableList(Arrays.asList(new SpyCollector[0]));
+    private static final List<ClassMethodMatcher> EMPTY_MATCHERS =
+            Collections.unmodifiableList(Arrays.asList(new ClassMethodMatcher[0]));
+    private static final List<ArgFetcher> EMPTY_AF =
+            Collections.unmodifiableList(Arrays.asList(new ArgFetcher[0]));
 
-    private Integer synchronizeWithArg;
-    private List<Object> synchronizeWithPath;
-    private Object synchronizeWithObj;
 
-    private List<SpyTransformer> transformers = EMPTY_XF;
+    private List<ClassMethodMatcher> matchers = EMPTY_MATCHERS;
+
+    private List<ArgFetcher>[] fetchers;
+    private List<SpyTransformer>[] transformers;
     private List<SpyCollector> collectors = EMPTY_DC;
 
+    private int curCPoint = ON_ENTER;
+    private boolean once = false;
+
     public static SpyDefinition instrument() {
-        return new SpyDefinition(SpyType.INSTRUMENT, NULL_MATCHER);
+        return new SpyDefinition().withTime().onExit().withTime().onEnter();
     }
 
-
-    public static SpyDefinition catcher() {
-        return new SpyDefinition(SpyType.CATCH_EVERY, NULL_MATCHER);
+    public static SpyDefinition intercept() {
+        return new SpyDefinition();
     }
 
+    private SpyDefinition() {
 
-    public SpyDefinition(SpyType spyType, ClassMethodMatcher matcher) {
-        this.spyType = spyType;
-        this.matcher = matcher;
+        fetchers = new List[5];
+        for (int i = 0; i < fetchers.length; i++) {
+            fetchers[i] = EMPTY_AF;
+        }
+
+        transformers = new List[5];
+        for (int i = 0; i < transformers.length; i++) {
+            transformers[i] = EMPTY_XF;
+        }
     }
+
 
     private SpyDefinition(SpyDefinition orig) {
-        this.spyType = orig.spyType;
-        this.matcher = orig.matcher;
-        this.onExit = orig.onExit;
-        this.fetchArgs = orig.fetchArgs;
-        this.synchronizeWithArg = orig.synchronizeWithArg;
-        this.synchronizeWithPath = orig.synchronizeWithPath;
-        this.synchronizeWithObj = orig.synchronizeWithObj;
-        this.transformers = orig.transformers;
+        this.matchers = orig.matchers;
+        this.fetchers = Arrays.copyOf(this.fetchers, this.fetchers.length);
+        this.transformers = Arrays.copyOf(this.transformers, this.transformers.length);
         this.collectors = orig.collectors;
     }
 
-    public ClassMethodMatcher getMatcher() {
-        return matcher;
-    }
 
-
-    public SpyType getType() {
-        return spyType;
-    }
-
-
-
-    public SpyDefinition once() {
+    /**
+     * Instructs spy what should be collected at the beginning of a method.
+     *
+     * @return
+     */
+    public SpyDefinition onEnter() {
         SpyDefinition sdef = new SpyDefinition(this);
-        sdef.spyType = SpyType.CATCH_ONCE;
+        sdef.curCPoint = ON_ENTER;
         return sdef;
     }
 
 
+    /**
+     * Instructs spy what should be collected at the end of a method.
+     *
+     * @return
+     */
+    public SpyDefinition onExit() {
+        SpyDefinition sdef = new SpyDefinition(this);
+        sdef.curCPoint = ON_EXIT;
+        return sdef;
+    }
+
+
+    /**
+     * Instructs spy what should be collected at exception handling code of a method.
+     *
+     * @return
+     */
+    public SpyDefinition onError() {
+        SpyDefinition sdef = new SpyDefinition(this);
+        sdef.curCPoint = ON_ERROR;
+        return sdef;
+    }
+
+
+    /**
+     * Instructs spy that subsequent transforms will be executed at data submission
+     * point.
+     *
+     * @return augmented spy definition
+     */
+    public SpyDefinition onSubmit() {
+        SpyDefinition sdef = new SpyDefinition(this);
+        sdef.curCPoint = ON_SUBMIT;
+        return sdef;
+    }
+
+
+    /**
+     * Instructs spy that subsequent transforms will be executed jest before passing
+     * data to collector objects. Transforms execution at this point is guaranteed to
+     * be single threaded and can execute asynchronously to instrumented methods.
+     *
+     * @return augmented spy definition
+     */
+    public SpyDefinition onCollect() {
+        SpyDefinition sdef = new SpyDefinition(this);
+        sdef.curCPoint = ON_COLLECT;
+        return sdef;
+    }
+
+    /**
+     * Instructs spy what methods (of what classes) this instrumentation
+     * definition should be applied on.
+     *
+     * @param classPattern
+     *
+     * @param methodPattern
+     *
+     * @return
+     */
     public SpyDefinition lookFor(String classPattern, String methodPattern) {
         return lookFor(classPattern, methodPattern, null, ClassMethodMatcher.DEFAULT_FILTER);
     }
 
 
-
+    /**
+     * Instructs spy what methods (of what classes) this instrumentation
+     * definition should be applied on.
+     *
+     * @param classPattern
+     *
+     * @param methodPattern
+     *
+     * @param retType
+     *
+     * @param flags
+     *
+     * @param argTypes
+     *
+     * @return
+     */
     public SpyDefinition lookFor(String classPattern, String methodPattern, String retType, int flags, String...argTypes) {
         SpyDefinition sdef = new SpyDefinition(this);
-        sdef.matcher = new ClassMethodMatcher(classPattern, methodPattern, retType, flags, argTypes);
+        List<ClassMethodMatcher> lst = new ArrayList<ClassMethodMatcher>(sdef.matchers.size()+1);
+        lst.addAll(sdef.matchers);
+        lst.add(new ClassMethodMatcher(classPattern, methodPattern, retType, flags, argTypes));
+        return sdef;
+    }
+
+
+    public SpyDefinition once() {
+        SpyDefinition sdef = new SpyDefinition(this);
+        sdef.once = true;
         return sdef;
     }
 
@@ -136,18 +221,23 @@ public class SpyDefinition {
      *    instance reference will be present at index 0. </p>
      * <p>For static methods arguments start with 0. </p>
      *
-     * @param args argument indexes to be fetched
+     * @param args argument indexes to be fetched (or class names if
+     *             class objects are to be fetched)
      *
      * @return spy definition with augmented fetched argument list;
      */
     public SpyDefinition withArguments(Object... args) {
         SpyDefinition sdef = new SpyDefinition(this);
 
-        List<Object> lst = new ArrayList<Object>(sdef.fetchArgs.size()+args.length);
-        lst.addAll(sdef.fetchArgs);
-        lst.addAll(Arrays.asList(args));
+        List<ArgFetcher> lst = new ArrayList<ArgFetcher>(sdef.fetchers[curCPoint].size()+args.length);
+        lst.addAll(sdef.fetchers[curCPoint]);
+        for (Object arg : args) {
+            lst.add(new ArgFetcher(arg));
+        }
 
-        sdef.fetchArgs = Collections.unmodifiableList(lst);
+        sdef.fetchers = Arrays.copyOf(fetchers, fetchers.length);
+        sdef.fetchers[curCPoint] = Collections.unmodifiableList(lst);
+
         return sdef;
     }
 
@@ -169,6 +259,16 @@ public class SpyDefinition {
 
 
     /**
+     * Fetches current time at current stage of execution.
+     *
+     * @return augmented spy definition
+     */
+    public SpyDefinition withTime() {
+        return this.withArguments(FETCH_TIME);
+    }
+
+
+    /**
      * Instructs spy that return value should also be catched.
      * Return value will be added at the end of current argument list.
      *
@@ -178,6 +278,14 @@ public class SpyDefinition {
         return this.withArguments(FETCH_RET_VAL);
     }
 
+
+    /**
+     * Fetches exception
+     * @return
+     */
+    public SpyDefinition withError() {
+        return this.withArguments(FETCH_ERROR);
+    }
 
     /**
      * Instructs spy that current thread should be catched.
@@ -215,35 +323,6 @@ public class SpyDefinition {
 
 
     /**
-     * Synchronize with object given by argument numbered as in withArgs().
-     *
-     * @param arg argumetn index
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition synchronizeWithArg(Integer arg, Object...path) {
-        SpyDefinition sdef = new SpyDefinition(this);
-        sdef.synchronizeWithArg = arg;
-        sdef.synchronizeWithPath = Collections.unmodifiableList(Arrays.asList(path));
-        return sdef;
-    }
-
-
-    /**
-     * Synchronize with an specific object passed as obj.
-     *
-     * @param obj object we will synchronize with
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition synchronizeWithObj(Object obj) {
-        SpyDefinition sdef = new SpyDefinition(this);
-        sdef.synchronizeWithObj = obj;
-        return sdef;
-    }
-
-
-    /**
      * Adds a custom transformer to transform chain.
      *
      * @param transformer
@@ -252,10 +331,11 @@ public class SpyDefinition {
      */
     public SpyDefinition withTransformer(SpyTransformer transformer) {
         SpyDefinition sdef = new SpyDefinition(this);
-        List<SpyTransformer> lst = new ArrayList<SpyTransformer>(transformers.size()+1);
-        lst.addAll(transformers);
+        List<SpyTransformer> lst = new ArrayList<SpyTransformer>(transformers[curCPoint].size()+1);
+        lst.addAll(transformers[curCPoint]);
         lst.add(transformer);
-        sdef.transformers = lst;
+        sdef.transformers = Arrays.copyOf(transformers, transformers.length);
+        sdef.transformers[curCPoint] = lst;
         return sdef;
     }
 
@@ -381,18 +461,6 @@ public class SpyDefinition {
      */
     public SpyDefinition transform(This ns, String func) {
         return withTransformer(new BshFunctionTransformer(ns, func));
-    }
-
-
-    /**
-     * Instructs spy that arguments will be grabbed and processed on exit.
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition onExit() {
-        SpyDefinition sdef = new SpyDefinition(this);
-        sdef.onExit = true;
-        return sdef;
     }
 
 
