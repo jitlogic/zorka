@@ -1,7 +1,3 @@
-package com.jitlogic.zorka.spy.transformers;
-
-import bsh.This;
-
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -18,6 +14,11 @@ import bsh.This;
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.spy.transformers;
+
+import bsh.This;
+import com.jitlogic.zorka.spy.InstrumentationContext;
+
 public class BshFunctionTransformer implements SpyTransformer {
 
     public BshFunctionTransformer(This ns, String funcName) {
@@ -26,5 +27,9 @@ public class BshFunctionTransformer implements SpyTransformer {
 
     public Object[] transform(Object... args) {
         return new Object[0];  // TODO
+    }
+
+    public BshFunctionTransformer parametrize(InstrumentationContext ctx) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

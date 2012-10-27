@@ -1,5 +1,3 @@
-package com.jitlogic.zorka.spy.collectors;
-
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -16,6 +14,11 @@ package com.jitlogic.zorka.spy.collectors;
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-public interface SpyCollector {
+
+package com.jitlogic.zorka.spy.collectors;
+
+import com.jitlogic.zorka.spy.TemplateObject;
+
+public interface SpyCollector extends TemplateObject {
     // TODO add metods
 }

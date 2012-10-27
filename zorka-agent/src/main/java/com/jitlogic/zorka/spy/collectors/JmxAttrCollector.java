@@ -1,5 +1,3 @@
-package com.jitlogic.zorka.spy.collectors;
-
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -16,6 +14,11 @@ package com.jitlogic.zorka.spy.collectors;
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+
+package com.jitlogic.zorka.spy.collectors;
+
+import com.jitlogic.zorka.spy.InstrumentationContext;
+
 public class JmxAttrCollector implements SpyCollector {
 
     public JmxAttrCollector(String mbsName, String beanName, String attrName) {
@@ -26,4 +29,7 @@ public class JmxAttrCollector implements SpyCollector {
 
     }
 
+    public JmxAttrCollector parametrize(InstrumentationContext ctx) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

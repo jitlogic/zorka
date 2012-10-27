@@ -1,5 +1,3 @@
-package com.jitlogic.zorka.spy.transformers;
-
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -16,6 +14,10 @@ package com.jitlogic.zorka.spy.transformers;
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.spy.transformers;
+
+import com.jitlogic.zorka.spy.InstrumentationContext;
+
 public class StringFormatTransformer implements SpyTransformer {
 
     public StringFormatTransformer(int dst, String expr) {
@@ -24,5 +26,9 @@ public class StringFormatTransformer implements SpyTransformer {
 
     public Object[] transform(Object... args) {
         return new Object[0];  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public StringFormatTransformer parametrize(InstrumentationContext ctx) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

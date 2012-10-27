@@ -1,5 +1,3 @@
-package com.jitlogic.zorka.spy.transformers;
-
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -16,6 +14,11 @@ package com.jitlogic.zorka.spy.transformers;
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-public interface SpyTransformer {
+
+package com.jitlogic.zorka.spy.transformers;
+
+import com.jitlogic.zorka.spy.TemplateObject;
+
+public interface SpyTransformer extends TemplateObject {
     public Object[] transform(Object...args);
 }

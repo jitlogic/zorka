@@ -17,6 +17,8 @@
 
 package com.jitlogic.zorka.spy;
 
+import org.objectweb.asm.MethodVisitor;
+
 /**
  *
  */
@@ -50,4 +52,7 @@ public class SpyProbe {
         return className;
     }
 
+    public void emit(MethodVisitor mv) {
+
+    }
 }

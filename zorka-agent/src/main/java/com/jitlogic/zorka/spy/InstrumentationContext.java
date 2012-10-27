@@ -14,26 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.spy.transformers;
+package com.jitlogic.zorka.spy;
 
-import bsh.This;
-import com.jitlogic.zorka.spy.InstrumentationContext;
+public class InstrumentationContext {
 
-public class BshFilterTransformer implements SpyTransformer {
-
-    private final This ns;
-    private final String funcName;
-
-    public BshFilterTransformer(This ns, String funcName) {
-        this.ns = ns;
-        this.funcName = funcName;
-    }
-
-    public Object[] transform(Object... args) {
-        return new Object[0];  // TODO
-    }
-
-    public BshFilterTransformer parametrize(InstrumentationContext ctx) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
 }

@@ -1,7 +1,3 @@
-package com.jitlogic.zorka.spy.collectors;
-
-import bsh.This;
-
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -18,6 +14,12 @@ import bsh.This;
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+
+package com.jitlogic.zorka.spy.collectors;
+
+import bsh.This;
+import com.jitlogic.zorka.spy.InstrumentationContext;
+
 public class BshFuncCollector implements SpyCollector {
 
     public BshFuncCollector(String ns, String name) {
@@ -28,4 +30,7 @@ public class BshFuncCollector implements SpyCollector {
         // TODO
     }
 
+    public BshFuncCollector parametrize(InstrumentationContext ctx) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }
