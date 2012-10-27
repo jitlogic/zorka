@@ -32,9 +32,9 @@ import org.junit.Test;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.testutil.TestExecutor;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
-import com.jitlogic.zorka.spy.MainCollector;
-import com.jitlogic.zorka.spy.ZorkaSpy;
-import com.jitlogic.zorka.spy.ZorkaSpyLib;
+import com.jitlogic.zorka.spy.old.MainCollector;
+import com.jitlogic.zorka.spy.old.ZorkaSpy;
+import com.jitlogic.zorka.spy.old.ZorkaSpyLib;
 
 public class SimpleMethodsTest {
 

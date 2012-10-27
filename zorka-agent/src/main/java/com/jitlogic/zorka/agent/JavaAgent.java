@@ -22,8 +22,8 @@ import java.util.concurrent.Executor;
 
 import com.jitlogic.zorka.agent.zabbix.ZabbixAgent;
 import com.jitlogic.zorka.bootstrap.Agent;
-import com.jitlogic.zorka.spy.MainCollector;
-import com.jitlogic.zorka.spy.ZorkaSpyLib;
+import com.jitlogic.zorka.spy.old.MainCollector;
+import com.jitlogic.zorka.spy.old.ZorkaSpyLib;
 import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
 import com.jitlogic.zorka.util.ZorkaConfig;
 import com.jitlogic.zorka.util.ZorkaLog;

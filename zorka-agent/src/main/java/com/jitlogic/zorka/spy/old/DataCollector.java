@@ -15,9 +15,9 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy;
+package com.jitlogic.zorka.spy.old;
 
-import com.jitlogic.zorka.spy.CallInfo;
+import com.jitlogic.zorka.spy.old.CallInfo;
 import org.objectweb.asm.MethodVisitor;
 
 public interface DataCollector {

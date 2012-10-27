@@ -23,8 +23,8 @@ import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import com.jitlogic.zorka.spy.SpyExprMacro;
-import com.jitlogic.zorka.spy.SpyExpression;
+import com.jitlogic.zorka.spy.old.SpyExprMacro;
+import com.jitlogic.zorka.spy.old.SpyExpression;
 
 public class SpyExprUnitTest {
 	

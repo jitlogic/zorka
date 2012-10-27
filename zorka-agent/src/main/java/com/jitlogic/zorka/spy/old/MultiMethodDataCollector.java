@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy;
+package com.jitlogic.zorka.spy.old;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public class MultiMethodDataCollector implements DataCollector {
 	}
 	
 	
-	public void logError(long tst, CallInfo info) {		
+	public void logError(long tst, CallInfo info) {
 		String name = info.getTag();
 		MethodCallStatistic mci = (MethodCallStatistic)mcs.getMethodCallStatistic(name);
 		mci.logError(tst, System.nanoTime()-info.getTst());

@@ -5,9 +5,9 @@ import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.testutil.TestExecutor;
 import com.jitlogic.zorka.bootstrap.AgentMain;
-import com.jitlogic.zorka.spy.MainCollector;
-import com.jitlogic.zorka.spy.ZorkaSpy;
-import com.jitlogic.zorka.spy.ZorkaSpyLib;
+import com.jitlogic.zorka.spy.old.MainCollector;
+import com.jitlogic.zorka.spy.old.ZorkaSpy;
+import com.jitlogic.zorka.spy.old.ZorkaSpyLib;
 
 import org.junit.After;
 import org.junit.Before;

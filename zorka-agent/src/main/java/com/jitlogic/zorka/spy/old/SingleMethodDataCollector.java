@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy;
+package com.jitlogic.zorka.spy.old;
 
 import com.jitlogic.zorka.mbeans.MethodCallStatistic;
 import org.objectweb.asm.MethodVisitor;

@@ -1,4 +1,4 @@
-package com.jitlogic.zorka.spy;
+package com.jitlogic.zorka.spy.old;
 
 import com.jitlogic.zorka.bootstrap.AgentMain;
 import com.jitlogic.zorka.mbeans.AttrGetter;

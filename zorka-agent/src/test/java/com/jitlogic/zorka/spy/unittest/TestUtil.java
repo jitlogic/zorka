@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 
 import org.objectweb.asm.ClassReader;
 
-import com.jitlogic.zorka.spy.ZorkaSpy;
+import com.jitlogic.zorka.spy.old.ZorkaSpy;
 
 public class TestUtil extends ClassLoader {
 
