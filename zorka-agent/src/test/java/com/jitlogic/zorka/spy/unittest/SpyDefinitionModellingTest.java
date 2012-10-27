@@ -4,42 +4,110 @@ package com.jitlogic.zorka.spy.unittest;
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software
+ * terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
  * <p/>
  * This software is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
  * <p/>
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
 import bsh.This;
-import com.jitlogic.zorka.spy.ClassMethodMatcher;
+import com.jitlogic.zorka.spy.SpyMatcher;
 import com.jitlogic.zorka.spy.SpyDefinition;
+import com.jitlogic.zorka.spy.SpyProbe;
+import org.junit.Test;
 
-import static com.jitlogic.zorka.spy.SpyDefinition.*;
+import java.util.List;
+
+import static junit.framework.Assert.*;
 
 /**
- * This is API modelling exercise rather then a real unit test.
+ * This is an API modelling exercise rather then a real unit test.
  *
- * Some tests checking
+ * @author Rafal Lewczuk
+ *
  */
 public class SpyDefinitionModellingTest {
+
+
+    @Test
+    public void testDefineEmptySpyDef() throws Exception {
+        SpyDefinition sdef = SpyDefinition.newInstance();
+
+        assertNotNull(sdef.getCollectors());
+        assertEquals(0, sdef.getCollectors().size());
+
+        assertNotNull(sdef.getMatchers());
+        assertEquals(0, sdef.getMatchers().size());
+
+        assertNotNull(sdef.getProbes(SpyDefinition.ON_ENTER));
+        assertEquals(0, sdef.getProbes(SpyDefinition.ON_ENTER).size());
+
+        assertNotNull(sdef.getTransformers(SpyDefinition.ON_EXIT));
+        assertEquals(0, sdef.getTransformers(SpyDefinition.ON_EXIT).size());
+    }
+
+
+    @Test
+    public void testDefineTrivialInstrumentingDef() throws Exception {
+        SpyDefinition sdef = SpyDefinition.instrument();
+
+        List<SpyProbe> probes1 = sdef.getProbes(SpyDefinition.ON_ENTER);
+        assertEquals(1, probes1.size());
+        assertEquals(SpyProbe.FETCH_TIME, probes1.get(0).getArgType());
+
+
+        List<SpyProbe> probes2 = sdef.getProbes(SpyDefinition.ON_EXIT);
+        assertEquals(1, probes2.size());
+        assertEquals(SpyProbe.FETCH_TIME, probes2.get(0).getArgType());
+
+        List<SpyProbe> probes3 = sdef.getProbes(SpyDefinition.ON_ERROR);
+        assertEquals(1, probes3.size());
+        assertEquals(SpyProbe.FETCH_TIME, probes3.get(0).getArgType());
+    }
+
+
+    @Test
+    public void testCheckProperStateInTrivialInstrumentationAndTryExtension() throws Exception {
+        SpyDefinition sdef = SpyDefinition.instrument().withClass("com.jitlogic.test.SomeClass");
+
+        List<SpyProbe> probes = sdef.getProbes(SpyDefinition.ON_ENTER);
+        assertEquals(2, probes.size());
+        assertEquals(SpyProbe.FETCH_CLASS, probes.get(1).getArgType());
+        assertEquals("com.jitlogic.test.SomeClass", probes.get(1).getClassName());
+
+
+
+    }
+
+
+    @Test
+    public void testSwitchStageAndCheckImmutability() throws Exception {
+        SpyDefinition sdef1 = SpyDefinition.instrument();
+
+        SpyDefinition sdef2 = sdef1.onExit().withError();
+        List<SpyProbe> probes2 = sdef2.getProbes(SpyDefinition.ON_EXIT);
+
+        assertEquals(1, sdef1.getProbes(SpyDefinition.ON_EXIT).size());
+        assertEquals(2, sdef2.getProbes(SpyDefinition.ON_EXIT).size());
+    }
 
 
     /**
      * Simple instrumenting of a single method. Only method with no arguments will be chosen.
      */
-    //@Test
+    @Test
     public void testDefineSimpleInstrumentation() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
-                                     SpyDefinition.ANY_TYPE, ClassMethodMatcher.DEFAULT_FILTER, SpyDefinition.NO_ARGS)
-                    .toStats("java", "some.app:type=ZorkaStats,name=SomeClass", "stats");
+                SpyDefinition.ANY_TYPE, SpyMatcher.DEFAULT_FILTER, SpyDefinition.NO_ARGS)
+                .toStats("java", "some.app:type=ZorkaStats,name=SomeClass", "stats");
     }
 
 
@@ -160,7 +228,7 @@ public class SpyDefinitionModellingTest {
      */
     public void testExposeStaticMethodFromSomeClassAtStartup() {
         SpyDefinition sdef =
-            SpyDefinition.intercept().once().lookFor("com.hp.ifc.bus.AppServer", "startup")
+            SpyDefinition.newInstance().once().lookFor("com.hp.ifc.bus.AppServer", "startup")
                 .withClass("com.hp.ifc.net.mq.AppMessageQueue").withClassLoader()
                 .toGetter("java", "hpsd:type=SDStats,name=AppMessageQueue", "size", "getSize()");
     }
@@ -173,7 +241,7 @@ public class SpyDefinitionModellingTest {
      */
     public void testExposeSomeStaticMethodsOfAnObject() {
         SpyDefinition sdef =
-            SpyDefinition.intercept().once().lookFor("some.package.SomeBean", SpyDefinition.CONSTRUCTOR)
+            SpyDefinition.newInstance().once().lookFor("some.package.SomeBean", SpyDefinition.CONSTRUCTOR)
                 .withArguments(0).withClassLoader()
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "count", "getCount()")
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "backlog", "getBacklog()")
@@ -188,7 +256,7 @@ public class SpyDefinitionModellingTest {
      */
     //@Test
     public void testRegisterJBossMBeanServer() {
-        SpyDefinition.intercept().once().lookFor("org.jboss.mx.MBeanServerImpl", SpyDefinition.CONSTRUCTOR)
+        SpyDefinition.newInstance().once().lookFor("org.jboss.mx.MBeanServerImpl", SpyDefinition.CONSTRUCTOR)
            .withFormat(0,"jboss").withArguments(0).withClassLoader()
            .toBsh("zorka", "registerMBeanServer");
     }
@@ -200,7 +268,7 @@ public class SpyDefinitionModellingTest {
     //@Test
     public void testExposeSomeHashMapAsMBeanAttribute() {
         SpyDefinition sdef =
-            SpyDefinition.intercept().once().lookFor("some.package.SingletonBean", SpyDefinition.CONSTRUCTOR)
+            SpyDefinition.newInstance().once().lookFor("some.package.SingletonBean", SpyDefinition.CONSTRUCTOR)
                 .withArguments(0).get(0, "someMap")
                 .toGetter("java", "SomeApp:type=SingletonType", "map");
     }

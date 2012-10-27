@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 
 import static org.objectweb.asm.Opcodes.*;
 
-public class ClassMethodMatcher {
+public class SpyMatcher {
 
     private String methodSignature;
     private int access;
@@ -36,7 +36,7 @@ public class ClassMethodMatcher {
 
     private Pattern classMatch, methodMatch, signatureMatch;
 
-    public ClassMethodMatcher(String className, String methodName, String retType, int access, String... argTypes) {
+    public SpyMatcher(String className, String methodName, String retType, int access, String... argTypes) {
         this.access = access;
         this.classMatch = toSymbolMatch(className);
         this.methodMatch = toSymbolMatch(methodName);

@@ -45,45 +45,39 @@ public class SpyDefinition {
     public static final int ON_SUBMIT  = 3;
     public static final int ON_COLLECT = 4;
 
-    private static final Integer FETCH_TIME    = -1;
-    private static final Integer FETCH_RET_VAL = -2;
-    private static final Integer FETCH_ERROR   = -3;
-    private static final Integer FETCH_THREAD  = -4;
-    private static final Integer FETCH_LOADER  = -5;
-
 
     private static final List<SpyTransformer> EMPTY_XF =
             Collections.unmodifiableList(Arrays.asList(new SpyTransformer[0]));
     private static final List<SpyCollector> EMPTY_DC =
             Collections.unmodifiableList(Arrays.asList(new SpyCollector[0]));
-    private static final List<ClassMethodMatcher> EMPTY_MATCHERS =
-            Collections.unmodifiableList(Arrays.asList(new ClassMethodMatcher[0]));
-    private static final List<ArgFetcher> EMPTY_AF =
-            Collections.unmodifiableList(Arrays.asList(new ArgFetcher[0]));
+    private static final List<SpyMatcher> EMPTY_MATCHERS =
+            Collections.unmodifiableList(Arrays.asList(new SpyMatcher[0]));
+    private static final List<SpyProbe> EMPTY_AF =
+            Collections.unmodifiableList(Arrays.asList(new SpyProbe[0]));
 
 
-    private List<ClassMethodMatcher> matchers = EMPTY_MATCHERS;
-
-    private List<ArgFetcher>[] fetchers;
+    private List<SpyProbe>[] probes;
     private List<SpyTransformer>[] transformers;
-    private List<SpyCollector> collectors = EMPTY_DC;
 
-    private int curCPoint = ON_ENTER;
+    private List<SpyCollector> collectors = EMPTY_DC;
+    private List<SpyMatcher> matchers = EMPTY_MATCHERS;
+
+    private int curStage = ON_ENTER;
     private boolean once = false;
 
     public static SpyDefinition instrument() {
-        return new SpyDefinition().withTime().onExit().withTime().onEnter();
+        return new SpyDefinition().withTime().onExit().withTime().onError().withTime().onEnter();
     }
 
-    public static SpyDefinition intercept() {
+    public static SpyDefinition newInstance() {
         return new SpyDefinition();
     }
 
     private SpyDefinition() {
 
-        fetchers = new List[5];
-        for (int i = 0; i < fetchers.length; i++) {
-            fetchers[i] = EMPTY_AF;
+        probes = new List[5];
+        for (int i = 0; i < probes.length; i++) {
+            probes[i] = EMPTY_AF;
         }
 
         transformers = new List[5];
@@ -95,11 +89,59 @@ public class SpyDefinition {
 
     private SpyDefinition(SpyDefinition orig) {
         this.matchers = orig.matchers;
-        this.fetchers = Arrays.copyOf(this.fetchers, this.fetchers.length);
-        this.transformers = Arrays.copyOf(this.transformers, this.transformers.length);
+        this.probes = Arrays.copyOf(orig.probes, orig.probes.length);
+        this.transformers = Arrays.copyOf(orig.transformers, orig.transformers.length);
         this.collectors = orig.collectors;
     }
 
+
+    /**
+     * Returns list of probe definitions from particular stage
+     *
+     * @param stage stage we're interested in
+     *
+     * @return list of probes defined for this stage
+     */
+    public List<SpyProbe> getProbes(int stage) {
+        return probes[stage];
+    }
+
+
+    /**
+     * Returns list of transformers for a particular stage.
+     *
+     * @param stage
+     *
+     * @return
+     */
+    public List<SpyTransformer> getTransformers(int stage) {
+        return transformers[stage];
+    }
+
+
+    /**
+     * Returns list of collectors definitions.
+     *
+     * @return
+     */
+    public List<SpyCollector> getCollectors() {
+        return collectors;
+    }
+
+
+    /**
+     * Returns list of matchers declared SpyDefinition.
+     *
+     * @return list of matchers
+     */
+    public List<SpyMatcher> getMatchers() {
+        return matchers;
+    }
+
+
+    public boolean isOnce() {
+        return once;
+    }
 
     /**
      * Instructs spy what should be collected at the beginning of a method.
@@ -108,7 +150,7 @@ public class SpyDefinition {
      */
     public SpyDefinition onEnter() {
         SpyDefinition sdef = new SpyDefinition(this);
-        sdef.curCPoint = ON_ENTER;
+        sdef.curStage = ON_ENTER;
         return sdef;
     }
 
@@ -120,7 +162,7 @@ public class SpyDefinition {
      */
     public SpyDefinition onExit() {
         SpyDefinition sdef = new SpyDefinition(this);
-        sdef.curCPoint = ON_EXIT;
+        sdef.curStage = ON_EXIT;
         return sdef;
     }
 
@@ -132,7 +174,7 @@ public class SpyDefinition {
      */
     public SpyDefinition onError() {
         SpyDefinition sdef = new SpyDefinition(this);
-        sdef.curCPoint = ON_ERROR;
+        sdef.curStage = ON_ERROR;
         return sdef;
     }
 
@@ -145,7 +187,7 @@ public class SpyDefinition {
      */
     public SpyDefinition onSubmit() {
         SpyDefinition sdef = new SpyDefinition(this);
-        sdef.curCPoint = ON_SUBMIT;
+        sdef.curStage = ON_SUBMIT;
         return sdef;
     }
 
@@ -159,7 +201,7 @@ public class SpyDefinition {
      */
     public SpyDefinition onCollect() {
         SpyDefinition sdef = new SpyDefinition(this);
-        sdef.curCPoint = ON_COLLECT;
+        sdef.curStage = ON_COLLECT;
         return sdef;
     }
 
@@ -174,7 +216,7 @@ public class SpyDefinition {
      * @return
      */
     public SpyDefinition lookFor(String classPattern, String methodPattern) {
-        return lookFor(classPattern, methodPattern, null, ClassMethodMatcher.DEFAULT_FILTER);
+        return lookFor(classPattern, methodPattern, null, SpyMatcher.DEFAULT_FILTER);
     }
 
 
@@ -196,9 +238,9 @@ public class SpyDefinition {
      */
     public SpyDefinition lookFor(String classPattern, String methodPattern, String retType, int flags, String...argTypes) {
         SpyDefinition sdef = new SpyDefinition(this);
-        List<ClassMethodMatcher> lst = new ArrayList<ClassMethodMatcher>(sdef.matchers.size()+1);
+        List<SpyMatcher> lst = new ArrayList<SpyMatcher>(sdef.matchers.size()+1);
         lst.addAll(sdef.matchers);
-        lst.add(new ClassMethodMatcher(classPattern, methodPattern, retType, flags, argTypes));
+        lst.add(new SpyMatcher(classPattern, methodPattern, retType, flags, argTypes));
         return sdef;
     }
 
@@ -229,14 +271,14 @@ public class SpyDefinition {
     public SpyDefinition withArguments(Object... args) {
         SpyDefinition sdef = new SpyDefinition(this);
 
-        List<ArgFetcher> lst = new ArrayList<ArgFetcher>(sdef.fetchers[curCPoint].size()+args.length);
-        lst.addAll(sdef.fetchers[curCPoint]);
+        List<SpyProbe> lst = new ArrayList<SpyProbe>(sdef.probes[curStage].size()+args.length);
+        lst.addAll(sdef.probes[curStage]);
         for (Object arg : args) {
-            lst.add(new ArgFetcher(arg));
+            lst.add(new SpyProbe(arg));
         }
 
-        sdef.fetchers = Arrays.copyOf(fetchers, fetchers.length);
-        sdef.fetchers[curCPoint] = Collections.unmodifiableList(lst);
+        sdef.probes = Arrays.copyOf(probes, probes.length);
+        sdef.probes[curStage] = Collections.unmodifiableList(lst);
 
         return sdef;
     }
@@ -264,7 +306,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition withTime() {
-        return this.withArguments(FETCH_TIME);
+        return this.withArguments(SpyProbe.FETCH_TIME);
     }
 
 
@@ -275,7 +317,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition withRetVal() {
-        return this.withArguments(FETCH_RET_VAL);
+        return this.withArguments(SpyProbe.FETCH_RET_VAL);
     }
 
 
@@ -284,7 +326,7 @@ public class SpyDefinition {
      * @return
      */
     public SpyDefinition withError() {
-        return this.withArguments(FETCH_ERROR);
+        return this.withArguments(SpyProbe.FETCH_ERROR);
     }
 
     /**
@@ -294,7 +336,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition withThread() {
-        return this.withArguments(FETCH_THREAD);
+        return this.withArguments(SpyProbe.FETCH_THREAD);
     }
 
 
@@ -305,7 +347,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition withClassLoader() {
-        return this.withArguments(FETCH_LOADER);
+        return this.withArguments(SpyProbe.FETCH_LOADER);
     }
 
 
@@ -331,11 +373,11 @@ public class SpyDefinition {
      */
     public SpyDefinition withTransformer(SpyTransformer transformer) {
         SpyDefinition sdef = new SpyDefinition(this);
-        List<SpyTransformer> lst = new ArrayList<SpyTransformer>(transformers[curCPoint].size()+1);
-        lst.addAll(transformers[curCPoint]);
+        List<SpyTransformer> lst = new ArrayList<SpyTransformer>(transformers[curStage].size()+1);
+        lst.addAll(transformers[curStage]);
         lst.add(transformer);
         sdef.transformers = Arrays.copyOf(transformers, transformers.length);
-        sdef.transformers[curCPoint] = lst;
+        sdef.transformers[curStage] = lst;
         return sdef;
     }
 
