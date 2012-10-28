@@ -18,6 +18,7 @@ package com.jitlogic.zorka.spy;
 
 
 import bsh.This;
+import com.jitlogic.zorka.vmsci.SpyCollector;
 import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.transformers.*;
 
@@ -52,11 +53,11 @@ public class SpyDefinition {
             Collections.unmodifiableList(Arrays.asList(new SpyCollector[0]));
     private static final List<SpyMatcher> EMPTY_MATCHERS =
             Collections.unmodifiableList(Arrays.asList(new SpyMatcher[0]));
-    private static final List<SpyProbe> EMPTY_AF =
-            Collections.unmodifiableList(Arrays.asList(new SpyProbe[0]));
+    private static final List<SpyProbeElement> EMPTY_AF =
+            Collections.unmodifiableList(Arrays.asList(new SpyProbeElement[0]));
 
 
-    private List<SpyProbe>[] probes;
+    private List<SpyProbeElement>[] probes;
     private List<SpyTransformer>[] transformers;
 
     private List<SpyCollector> collectors = EMPTY_DC;
@@ -102,7 +103,7 @@ public class SpyDefinition {
      *
      * @return list of probes defined for this stage
      */
-    public List<SpyProbe> getProbes(int stage) {
+    public List<SpyProbeElement> getProbes(int stage) {
         return probes[stage];
     }
 
@@ -128,6 +129,35 @@ public class SpyDefinition {
         return collectors;
     }
 
+
+    /**
+     * Returns true if given class name matches this spy definition.
+     *
+     * @param className
+     *
+     * @return
+     */
+    public boolean match(String className) {
+
+        for (SpyMatcher matcher : matchers) {
+            if (matcher.matches(className)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean match(String className, String methodName, String signature, int access) {
+
+        for (SpyMatcher matcher : matchers) {
+            if (matcher.matches(className, methodName, signature, access)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Returns list of matchers declared SpyDefinition.
@@ -271,10 +301,10 @@ public class SpyDefinition {
     public SpyDefinition withArguments(Object... args) {
         SpyDefinition sdef = new SpyDefinition(this);
 
-        List<SpyProbe> lst = new ArrayList<SpyProbe>(sdef.probes[curStage].size()+args.length);
+        List<SpyProbeElement> lst = new ArrayList<SpyProbeElement>(sdef.probes[curStage].size()+args.length);
         lst.addAll(sdef.probes[curStage]);
         for (Object arg : args) {
-            lst.add(new SpyProbe(arg));
+            lst.add(new SpyProbeElement(arg));
         }
 
         sdef.probes = Arrays.copyOf(probes, probes.length);
@@ -306,7 +336,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition withTime() {
-        return this.withArguments(SpyProbe.FETCH_TIME);
+        return this.withArguments(SpyProbeElement.FETCH_TIME);
     }
 
 
@@ -317,7 +347,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition withRetVal() {
-        return this.withArguments(SpyProbe.FETCH_RET_VAL);
+        return this.withArguments(SpyProbeElement.FETCH_RET_VAL);
     }
 
 
@@ -326,7 +356,7 @@ public class SpyDefinition {
      * @return
      */
     public SpyDefinition withError() {
-        return this.withArguments(SpyProbe.FETCH_ERROR);
+        return this.withArguments(SpyProbeElement.FETCH_ERROR);
     }
 
     /**
@@ -336,18 +366,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition withThread() {
-        return this.withArguments(SpyProbe.FETCH_THREAD);
-    }
-
-
-    /**
-     * Instructs spy that current class loader should be catched.
-     * Reference to current class loader will added at the end of current argument list.
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition withClassLoader() {
-        return this.withArguments(SpyProbe.FETCH_LOADER);
+        return this.withArguments(SpyProbeElement.FETCH_THREAD);
     }
 
 

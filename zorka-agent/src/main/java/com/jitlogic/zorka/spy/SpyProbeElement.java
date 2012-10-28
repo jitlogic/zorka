@@ -22,19 +22,18 @@ import org.objectweb.asm.MethodVisitor;
 /**
  *
  */
-public class SpyProbe {
+public class SpyProbeElement {
 
     public static final int FETCH_TIME    = -1;
     public static final int FETCH_RET_VAL = -2;
     public static final int FETCH_ERROR   = -3;
     public static final int FETCH_THREAD  = -4;
-    public static final int FETCH_LOADER  = -5;
-    public static final int FETCH_CLASS   = -6;
+    public static final int FETCH_CLASS   = -5;
 
     private int argType;
     private String className;
 
-    public SpyProbe(Object arg) {
+    public SpyProbeElement(Object arg) {
         if (arg instanceof String) {
             className = (String)arg;
             argType = FETCH_CLASS;
@@ -52,7 +51,4 @@ public class SpyProbe {
         return className;
     }
 
-    public void emit(MethodVisitor mv) {
-
-    }
 }

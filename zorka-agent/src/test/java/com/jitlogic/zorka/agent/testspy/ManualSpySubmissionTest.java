@@ -15,17 +15,22 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.collectors;
+package com.jitlogic.zorka.agent.testspy;
 
-import com.jitlogic.zorka.vmsci.SpyCollector;
+import com.jitlogic.zorka.vmsci.MainCollector;
+import org.junit.Test;
 
-public class ZorkaStatsCollector implements SpyCollector {
+public class ManualSpySubmissionTest {
 
-    public ZorkaStatsCollector(String mbsName, String beanName, String attrName, String keyExpr) {
-        // TODO
+    @Test
+    public void testCollectTrivialData() throws Exception {
+        MainCollector.collect(1, 1, true, null);
     }
 
-    public void collect(int type, int id, boolean submit, Object[] vals) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    @Test
+    public void testSystemNanotime() throws Exception {
+        long l = System.nanoTime();
+        //System.out.println("t=" + l);
     }
+
 }

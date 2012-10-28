@@ -15,10 +15,10 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.collectors;
+package com.jitlogic.zorka.vmsci;
 
-import com.jitlogic.zorka.spy.TemplateObject;
+public interface SpyCollector {
 
-public interface SpyCollector extends TemplateObject {
-    // TODO add metods
+    void collect(int type, int id, boolean submit, Object[] vals);
+
 }

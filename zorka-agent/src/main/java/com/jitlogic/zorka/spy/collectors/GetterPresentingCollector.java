@@ -17,7 +17,7 @@
 
 package com.jitlogic.zorka.spy.collectors;
 
-import com.jitlogic.zorka.spy.InstrumentationContext;
+import com.jitlogic.zorka.vmsci.SpyCollector;
 
 public class GetterPresentingCollector implements SpyCollector {
 
@@ -25,7 +25,7 @@ public class GetterPresentingCollector implements SpyCollector {
 
     }
 
-    public GetterPresentingCollector parametrize(InstrumentationContext ctx) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public void collect(int type, int id, boolean submit, Object[] vals) {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

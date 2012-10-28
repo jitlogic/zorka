@@ -20,7 +20,7 @@ package com.jitlogic.zorka.spy.unittest;
 import bsh.This;
 import com.jitlogic.zorka.spy.SpyMatcher;
 import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.SpyProbe;
+import com.jitlogic.zorka.spy.SpyProbeElement;
 import org.junit.Test;
 
 import java.util.List;
@@ -58,18 +58,18 @@ public class SpyDefinitionModellingTest {
     public void testDefineTrivialInstrumentingDef() throws Exception {
         SpyDefinition sdef = SpyDefinition.instrument();
 
-        List<SpyProbe> probes1 = sdef.getProbes(SpyDefinition.ON_ENTER);
+        List<SpyProbeElement> probes1 = sdef.getProbes(SpyDefinition.ON_ENTER);
         assertEquals(1, probes1.size());
-        assertEquals(SpyProbe.FETCH_TIME, probes1.get(0).getArgType());
+        assertEquals(SpyProbeElement.FETCH_TIME, probes1.get(0).getArgType());
 
 
-        List<SpyProbe> probes2 = sdef.getProbes(SpyDefinition.ON_EXIT);
+        List<SpyProbeElement> probes2 = sdef.getProbes(SpyDefinition.ON_EXIT);
         assertEquals(1, probes2.size());
-        assertEquals(SpyProbe.FETCH_TIME, probes2.get(0).getArgType());
+        assertEquals(SpyProbeElement.FETCH_TIME, probes2.get(0).getArgType());
 
-        List<SpyProbe> probes3 = sdef.getProbes(SpyDefinition.ON_ERROR);
+        List<SpyProbeElement> probes3 = sdef.getProbes(SpyDefinition.ON_ERROR);
         assertEquals(1, probes3.size());
-        assertEquals(SpyProbe.FETCH_TIME, probes3.get(0).getArgType());
+        assertEquals(SpyProbeElement.FETCH_TIME, probes3.get(0).getArgType());
     }
 
 
@@ -77,10 +77,10 @@ public class SpyDefinitionModellingTest {
     public void testCheckProperStateInTrivialInstrumentationAndTryExtension() throws Exception {
         SpyDefinition sdef = SpyDefinition.instrument().withClass("com.jitlogic.test.SomeClass");
 
-        List<SpyProbe> probes = sdef.getProbes(SpyDefinition.ON_ENTER);
-        assertEquals(2, probes.size());
-        assertEquals(SpyProbe.FETCH_CLASS, probes.get(1).getArgType());
-        assertEquals("com.jitlogic.test.SomeClass", probes.get(1).getClassName());
+        List<SpyProbeElement> probeElements = sdef.getProbes(SpyDefinition.ON_ENTER);
+        assertEquals(2, probeElements.size());
+        assertEquals(SpyProbeElement.FETCH_CLASS, probeElements.get(1).getArgType());
+        assertEquals("com.jitlogic.test.SomeClass", probeElements.get(1).getClassName());
 
 
 
@@ -92,7 +92,7 @@ public class SpyDefinitionModellingTest {
         SpyDefinition sdef1 = SpyDefinition.instrument();
 
         SpyDefinition sdef2 = sdef1.onExit().withError();
-        List<SpyProbe> probes2 = sdef2.getProbes(SpyDefinition.ON_EXIT);
+        List<SpyProbeElement> probes2 = sdef2.getProbes(SpyDefinition.ON_EXIT);
 
         assertEquals(1, sdef1.getProbes(SpyDefinition.ON_EXIT).size());
         assertEquals(2, sdef2.getProbes(SpyDefinition.ON_EXIT).size());
@@ -229,7 +229,7 @@ public class SpyDefinitionModellingTest {
     public void testExposeStaticMethodFromSomeClassAtStartup() {
         SpyDefinition sdef =
             SpyDefinition.newInstance().once().lookFor("com.hp.ifc.bus.AppServer", "startup")
-                .withClass("com.hp.ifc.net.mq.AppMessageQueue").withClassLoader()
+                .withClass("com.hp.ifc.net.mq.AppMessageQueue")
                 .toGetter("java", "hpsd:type=SDStats,name=AppMessageQueue", "size", "getSize()");
     }
 
@@ -242,7 +242,7 @@ public class SpyDefinitionModellingTest {
     public void testExposeSomeStaticMethodsOfAnObject() {
         SpyDefinition sdef =
             SpyDefinition.newInstance().once().lookFor("some.package.SomeBean", SpyDefinition.CONSTRUCTOR)
-                .withArguments(0).withClassLoader()
+                .withArguments(0)
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "count", "getCount()")
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "backlog", "getBacklog()")
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "time", "getProcessingTime()")
@@ -257,7 +257,7 @@ public class SpyDefinitionModellingTest {
     //@Test
     public void testRegisterJBossMBeanServer() {
         SpyDefinition.newInstance().once().lookFor("org.jboss.mx.MBeanServerImpl", SpyDefinition.CONSTRUCTOR)
-           .withFormat(0,"jboss").withArguments(0).withClassLoader()
+           .withFormat(0,"jboss").withArguments(0).withThread()
            .toBsh("zorka", "registerMBeanServer");
     }
 

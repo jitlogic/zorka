@@ -16,6 +16,41 @@
  */
 package com.jitlogic.zorka.spy;
 
+/**
+ *
+ */
 public class InstrumentationContext {
+
+    private Integer id = null;
+
+    private SpyDefinition spyDefinition;
+    private String className;
+    private String methodName;
+    private String methodSignature;
+    private int access;
+
+    public InstrumentationContext(SpyDefinition spyDefinition, String className,
+                 String methodName, String methodSignature, int access) {
+
+        this.spyDefinition = spyDefinition;
+        this.className = className;
+        this.methodName = methodName;
+        this.methodSignature = methodSignature;
+        this.access = access;
+    }
+
+    public void setId(Integer id) {
+        if (this.id == null) {
+            this.id = id;
+        }
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public SpyDefinition getSpyDefinition() {
+        return spyDefinition;
+    }
 
 }

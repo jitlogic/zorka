@@ -24,7 +24,6 @@ import java.util.List;
 
 public class MethodInstrumenter extends MethodVisitor {
 
-    private static boolean debug = false;
 
     private List<SpyDefinition> sdefs;
 
@@ -43,6 +42,7 @@ public class MethodInstrumenter extends MethodVisitor {
 
     @Override
     public void visitCode() {
+        mv.visitCode();
         emitEntryCode();
     }
 
@@ -81,19 +81,4 @@ public class MethodInstrumenter extends MethodVisitor {
         // TODO
     }
 
-
-    private void emitDebugPrint(String msg) {
-        if (debug) {
-            mv.visitFieldInsn(Opcodes.GETSTATIC,
-                "java/lang/System", "out", "Ljava/io/PrintStream;");
-            mv.visitLdcInsn(msg);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
-                "java/io/PrintStream", "println", "(Ljava/lang/String;)V");
-        }
-    }
-
-
-    public static void setDebug() {
-        debug = true;
-    }
 }

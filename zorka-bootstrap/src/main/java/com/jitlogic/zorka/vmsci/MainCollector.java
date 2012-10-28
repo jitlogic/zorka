@@ -15,17 +15,20 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.collectors;
+package com.jitlogic.zorka.vmsci;
 
-import com.jitlogic.zorka.vmsci.SpyCollector;
+public class MainCollector {
 
-public class ZorkaStatsCollector implements SpyCollector {
+    private static SpyCollector collector = null;
 
-    public ZorkaStatsCollector(String mbsName, String beanName, String attrName, String keyExpr) {
-        // TODO
+    public static void collect(int stage, int id, boolean submitNow, Object[] vals) {
+        if (collector != null) {
+            collector.collect(stage, id, submitNow, vals);
+        }
     }
 
-    public void collect(int type, int id, boolean submit, Object[] vals) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public static void setCollector(SpyCollector collector) {
+        MainCollector.collector = collector;
     }
+
 }
