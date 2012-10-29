@@ -18,14 +18,14 @@ package com.jitlogic.zorka.spy;
 
 
 import bsh.This;
-import com.jitlogic.zorka.vmsci.SpyCollector;
+import com.jitlogic.zorka.vmsci.SpySubmitter;
 import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.transformers.*;
 
 import java.util.*;
 
 /**
- * This class defines mini-DSL for configuring instrumentator. Language allows for
+ * This class defines mini-DSL for configuring instrumentation. Language allows for
  * choosing classes and methods to instrument, extracting parameters, return values,
  * transforming/filtering intercepted values and presenting them via JMX in various
  * ways.
@@ -121,7 +121,7 @@ public class SpyDefinition {
 
 
     /**
-     * Returns list of collectors definitions.
+     * Returns list of submitters definitions.
      *
      * @return
      */
@@ -148,10 +148,10 @@ public class SpyDefinition {
         return false;
     }
 
-    public boolean match(String className, String methodName, String signature, int access) {
+    public boolean match(String className, String methodName, String methodDesc, int access) {
 
         for (SpyMatcher matcher : matchers) {
-            if (matcher.matches(className, methodName, signature, access)) {
+            if (matcher.matches(className, methodName, methodDesc, access)) {
                 return true;
             }
         }
@@ -271,6 +271,7 @@ public class SpyDefinition {
         List<SpyMatcher> lst = new ArrayList<SpyMatcher>(sdef.matchers.size()+1);
         lst.addAll(sdef.matchers);
         lst.add(new SpyMatcher(classPattern, methodPattern, retType, flags, argTypes));
+        sdef.matchers = lst;
         return sdef;
     }
 
@@ -526,7 +527,7 @@ public class SpyDefinition {
 
 
     /**
-     * Instructs spy to submit data to a given collector.
+     * Instructs spy to submit data to a given submitter.
      *
      * @param collector
      *

@@ -1,3 +1,4 @@
+
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -15,20 +16,19 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.vmsci;
+package com.jitlogic.zorka.agent.testspy;
 
-public class MainCollector {
 
-    private static SpyCollector collector = null;
+public class TestClass1 {
 
-    public static void collect(int stage, int id, boolean submitNow, Object[] vals) {
-        if (collector != null) {
-            collector.collect(stage, id, submitNow, vals);
-        }
+    private int calls = 0;
+
+    public void trivialMethod() {
+        calls++;
     }
 
-    public static void setCollector(SpyCollector collector) {
-        MainCollector.collector = collector;
-    }
 
+    public int getCalls() {
+        return calls;
+    }
 }

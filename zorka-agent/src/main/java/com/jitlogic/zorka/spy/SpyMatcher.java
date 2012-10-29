@@ -34,24 +34,24 @@ public class SpyMatcher {
     public static final int DEFAULT_FILTER = ACC_PUBLIC;
     public static final int ANY_FILTER     = ACC_PUBLIC|ACC_PRIVATE|ACC_PROTECTED|ACC_PKGPRIV;
 
-    private Pattern classMatch, methodMatch, signatureMatch;
+    private Pattern classMatch, methodMatch, descriptorMatch;
 
     public SpyMatcher(String className, String methodName, String retType, int access, String... argTypes) {
         this.access = access;
         this.classMatch = toSymbolMatch(className);
         this.methodMatch = toSymbolMatch(methodName);
-        this.signatureMatch = toSignatureMatch(retType, argTypes);
-
+        this.descriptorMatch = toDescriptorMatch(retType, argTypes);
     }
 
 
     private Pattern toSymbolMatch(String symbolName) {
-        if (symbolName.startsWith("~")) {
+        if (symbolName == null) {
+            return Pattern.compile(".*");
+        } else if (symbolName.startsWith("~")) {
             return Pattern.compile(symbolName.substring(1));
         } else {
-            String s = symbolName.replaceAll("\\*\\*", "@A@").replaceAll("\\*", "@B@");
-            return Pattern.compile(s.replaceAll("\\.", "\\\\.")
-                    .replaceAll("@A@", ".+").replaceAll("@B@", "[a-zA-Z0-9_]+"));
+            return Pattern.compile(symbolName.replaceAll("\\.", "\\\\.")
+                    .replaceAll("\\*\\*", ".+").replaceAll("\\*", "[a-zA-Z0-9_]+"));
         }
     }
 
@@ -120,7 +120,7 @@ public class SpyMatcher {
     }
 
 
-    private Pattern toSignatureMatch(String retType, String...argTypes) {
+    private Pattern toDescriptorMatch(String retType, String... argTypes) {
         String retCode = retType != null ? strToRegex(toTypeCode(retType)) : ".*";
         StringBuilder sb = new StringBuilder(128);
         boolean moreAttrs = true;
@@ -156,13 +156,13 @@ public class SpyMatcher {
     }
 
 
-    public boolean matches(String className, String methodName, String signature) {
-        return matches(className, methodName) && signatureMatch.matcher(signature).matches();
+    public boolean matches(String className, String methodName, String descriptor) {
+        return matches(className, methodName) && descriptorMatch.matcher(descriptor).matches();
     }
 
 
-    public boolean matches(String className, String methodName, String signature, int access) {
-        return matches(className, methodName, signature) && matches(access);
+    public boolean matches(String className, String methodName, String descriptor, int access) {
+        return matches(className, methodName, descriptor) && matches(access);
     }
 
 

@@ -57,8 +57,9 @@ public class SpyClassVisitor extends ClassVisitor {
         List<InstrumentationContext> ctxs = new ArrayList<InstrumentationContext>(sdefs.size());
 
         for (SpyDefinition sdef : sdefs) {
-            if (sdef.match(className, name, signature, access)) {
-                ctxs.add(engine.lookupContext(new InstrumentationContext(sdef, className, name, signature, access)));
+            if (sdef.match(className, name, desc, access)) {
+                ctxs.add(engine.lookupContext(
+                        new InstrumentationContext(sdef, className, name, desc, access)));
             }
         }
 

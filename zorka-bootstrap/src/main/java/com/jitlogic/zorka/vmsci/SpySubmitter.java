@@ -17,8 +17,8 @@
 
 package com.jitlogic.zorka.vmsci;
 
-public interface SpyCollector {
+public interface SpySubmitter {
 
-    void collect(int type, int id, boolean submit, Object[] vals);
+    void submit(int stage, int id, boolean submit, Object[] vals);
 
 }

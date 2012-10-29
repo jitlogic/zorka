@@ -61,7 +61,7 @@ public class InstrumentationEngine implements ClassFileTransformer {
     }
 
 
-    public void addSpyDef(SpyDefinition sdef) {
+    public void add(SpyDefinition sdef) {
         sdefs.add(sdef);
     }
 
@@ -71,7 +71,7 @@ public class InstrumentationEngine implements ClassFileTransformer {
 
         String clazzName = className.replace("/", ".");
 
-        List<SpyDefinition> found = new ArrayList<SpyDefinition>(sdefs.size());
+        List<SpyDefinition> found = new ArrayList<SpyDefinition>();
 
         for (SpyDefinition sdef : sdefs) {
             if (sdef.match(clazzName)) {
@@ -79,10 +79,10 @@ public class InstrumentationEngine implements ClassFileTransformer {
             }
         }
 
-        if (sdefs.size() > 0) {
+        if (found.size() > 0) {
             ClassReader cr = new ClassReader(classfileBuffer);
             ClassWriter cw = new ClassWriter(cr, 0);
-            SpyClassVisitor scv = new SpyClassVisitor(this, className, found, cw);
+            SpyClassVisitor scv = new SpyClassVisitor(this, clazzName, found, cw);
             cr.accept(scv, 0);
             return cw.toByteArray();
         }

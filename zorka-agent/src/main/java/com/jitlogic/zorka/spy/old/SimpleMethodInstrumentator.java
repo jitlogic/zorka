@@ -26,7 +26,7 @@ import org.objectweb.asm.Type;
 
 public class SimpleMethodInstrumentator extends MethodVisitor {
 
-    //private final static String COLLECTOR_CLASS = "com/jitlogic/zorka/spy/MainCollector";
+    //private final static String COLLECTOR_CLASS = "com/jitlogic/zorka/spy/MainSubmitter";
     private final static String COLLECTOR_CLASS = "com/jitlogic/zorka/bootstrap/AgentMain";
 
     private long id;

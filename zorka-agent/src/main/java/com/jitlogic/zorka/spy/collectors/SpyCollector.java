@@ -1,3 +1,4 @@
+
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -15,22 +16,8 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.testspy;
+package com.jitlogic.zorka.spy.collectors;
 
-import com.jitlogic.zorka.vmsci.MainSubmitter;
-import org.junit.Test;
-
-public class ManualSpySubmissionTest {
-
-    @Test
-    public void testCollectTrivialData() throws Exception {
-        MainSubmitter.submit(1, 1, true, null);
-    }
-
-    @Test
-    public void testSystemNanotime() throws Exception {
-        long l = System.nanoTime();
-        //System.out.println("t=" + l);
-    }
+public interface SpyCollector {
 
 }

@@ -29,6 +29,10 @@ import static org.objectweb.asm.Opcodes.SIPUSH;
 
 public class SpyMethodVisitor extends MethodVisitor {
 
+    private final static String SUBMIT_CLASS = "com/jitlogic/zorka/vmsci/MainSubmitter";
+    private final static String SUBMIT_METHOD = "submit";
+    private final static String SUBMIT_DESC = "(IIZ[Ljava/lang/Object;)V";
+
     private static boolean debug = false;
     private List<InstrumentationContext> ctxs;
     private int stackDelta = 0, localDelta = 0;
@@ -49,6 +53,11 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     }
 
+    @Override
+    public void visitMaxs(int maxStack, int maxLocals) {
+        mv.visitMaxs(maxStack + stackDelta, maxLocals + localDelta);
+    }
+
     private static int max(int x, int y) {
         return x > y ? x : y;
     }
@@ -59,12 +68,14 @@ public class SpyMethodVisitor extends MethodVisitor {
         boolean submitNow = (stage != SpyDefinition.ON_ENTER) ||
             (sdef.getProbes(SpyDefinition.ON_EXIT).size()+sdef.getProbes(SpyDefinition.ON_ERROR).size() == 0);
 
+        // Put first 3 arguments of MainSubmitter.submit() onto stack
         emitLoadInt(stage);
         emitLoadInt(ctx.getId());
         emitLoadInt(submitNow ? 1 : 0);
 
         int sd = 3;
 
+        // Create an array with fetched data (or push null)
         if (probeElements.size() > 0) {
             emitLoadInt(probeElements.size());
             mv.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
@@ -79,6 +90,9 @@ public class SpyMethodVisitor extends MethodVisitor {
             mv.visitInsn(Opcodes.ACONST_NULL);
             sd++;
         }
+
+        // Call MainSubmitter.submit()
+        mv.visitMethodInsn(Opcodes.INVOKESTATIC, SUBMIT_CLASS, SUBMIT_METHOD, SUBMIT_DESC);
 
         return sd;
     }

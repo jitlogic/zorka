@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.spy.unittest;
+package com.jitlogic.zorka.agent.testspy;
 
 import com.jitlogic.zorka.spy.SpyMatcher;
 import com.jitlogic.zorka.spy.SpyDefinition;
@@ -129,6 +129,14 @@ public class SpyMatcherTest {
 
         Assert.assertTrue(cm.matches("test.SomeClass", "frobnicate", "(I)V"));
         Assert.assertTrue(cm.matches("test.SomeClass", "frobnicate", "(II)V"));
+    }
+
+    @Test
+    public void testMatchOnlyNames() {
+        SpyMatcher cm = new SpyMatcher("test.someClass", "trivialMethod", null, SpyMatcher.DEFAULT_FILTER);
+
+        Assert.assertTrue(cm.matches("test.someClass", "trivialMethod", "()V", 1));
+        Assert.assertTrue(cm.matches("test.someClass", "trivialMethod", "(I)I", 1));
     }
 
 }

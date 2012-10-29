@@ -1,4 +1,4 @@
-package com.jitlogic.zorka.spy.unittest;
+package com.jitlogic.zorka.agent.testspy;
 
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
@@ -108,6 +108,7 @@ public class SpyDefinitionModellingTest {
             SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
                 SpyDefinition.ANY_TYPE, SpyMatcher.DEFAULT_FILTER, SpyDefinition.NO_ARGS)
                 .toStats("java", "some.app:type=ZorkaStats,name=SomeClass", "stats");
+        assertEquals(1, sdef.getMatchers().size());
     }
 
 
@@ -173,7 +174,7 @@ public class SpyDefinitionModellingTest {
 
 
     /**
-     * Example: Instrument HTTP replies and collect statistics on return code (200, 404, etc.).
+     * Example: Instrument HTTP replies and submit statistics on return code (200, 404, etc.).
      */
     //@Test
     public void testInstrumentWithCatchArgsOnExit() {

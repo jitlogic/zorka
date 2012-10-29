@@ -26,16 +26,16 @@ public class InstrumentationContext {
     private SpyDefinition spyDefinition;
     private String className;
     private String methodName;
-    private String methodSignature;
+    private String methodDesc;
     private int access;
 
     public InstrumentationContext(SpyDefinition spyDefinition, String className,
-                 String methodName, String methodSignature, int access) {
+                 String methodName, String methodDesc, int access) {
 
         this.spyDefinition = spyDefinition;
         this.className = className;
         this.methodName = methodName;
-        this.methodSignature = methodSignature;
+        this.methodDesc = methodDesc;
         this.access = access;
     }
 

@@ -18,7 +18,7 @@
 package com.jitlogic.zorka.spy.collectors;
 
 import bsh.This;
-import com.jitlogic.zorka.vmsci.SpyCollector;
+import com.jitlogic.zorka.vmsci.SpySubmitter;
 
 public class BshFuncCollector implements SpyCollector {
 
@@ -30,7 +30,4 @@ public class BshFuncCollector implements SpyCollector {
         // TODO
     }
 
-    public void collect(int type, int id, boolean submit, Object[] vals) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 }

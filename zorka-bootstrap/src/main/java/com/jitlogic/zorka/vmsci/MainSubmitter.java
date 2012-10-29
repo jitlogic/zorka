@@ -15,22 +15,20 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.testspy;
+package com.jitlogic.zorka.vmsci;
 
-import com.jitlogic.zorka.vmsci.MainSubmitter;
-import org.junit.Test;
+public class MainSubmitter {
 
-public class ManualSpySubmissionTest {
+    private static SpySubmitter submitter = null;
 
-    @Test
-    public void testCollectTrivialData() throws Exception {
-        MainSubmitter.submit(1, 1, true, null);
+    public static void submit(int stage, int id, boolean submitNow, Object[] vals) {
+        if (submitter != null) {
+            submitter.submit(stage, id, submitNow, vals);
+        }
     }
 
-    @Test
-    public void testSystemNanotime() throws Exception {
-        long l = System.nanoTime();
-        //System.out.println("t=" + l);
+    public static void setSubmitter(SpySubmitter submitter) {
+        MainSubmitter.submitter = submitter;
     }
 
 }
