@@ -57,12 +57,17 @@ public class TestUtil extends ClassLoader {
             }
         }
 
-        if (method != null) {
-            if (args.length == 0) {
-                return method.invoke(obj);
-            } else {
-                return method.invoke(obj, args);
+        try {
+
+            if (method != null) {
+                if (args.length == 0) {
+                    return method.invoke(obj);
+                } else {
+                    return method.invoke(obj, args);
+                }
             }
+        } catch (Throwable e) {
+            return e;
         }
 
         return null;

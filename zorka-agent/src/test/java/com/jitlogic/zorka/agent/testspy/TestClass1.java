@@ -28,6 +28,11 @@ public class TestClass1 {
     }
 
 
+    public void errorMethod() {
+        throw new NullPointerException("dUP!");
+    }
+
+
     public int getCalls() {
         return calls;
     }

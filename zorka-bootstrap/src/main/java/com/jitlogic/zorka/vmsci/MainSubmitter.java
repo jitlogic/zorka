@@ -19,16 +19,30 @@ package com.jitlogic.zorka.vmsci;
 
 public class MainSubmitter {
 
-    private static SpySubmitter submitter = null;
+    public final static int SF_IMMEDIATE = 1;
+    public final static int SF_FLUSH = 2;
 
-    public static void submit(int stage, int id, boolean submitNow, Object[] vals) {
-        if (submitter != null) {
-            submitter.submit(stage, id, submitNow, vals);
+    private static SpySubmitter submitter = null;
+    private static long errorCount = 0;
+
+    public static void submit(int stage, int id, int submitFlags, Object[] vals) {
+        try {
+            if (submitter != null) {
+                submitter.submit(stage, id, submitFlags, vals);
+            }
+        } catch (Throwable e) {
+            synchronized (MainSubmitter.class) {
+                errorCount++;
+            }
         }
     }
 
     public static void setSubmitter(SpySubmitter submitter) {
         MainSubmitter.submitter = submitter;
+    }
+
+    public static long getErrorCount() {
+        return errorCount;
     }
 
 }

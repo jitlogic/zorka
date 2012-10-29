@@ -28,13 +28,13 @@ public class TestSubmitter implements SpySubmitter {
     public static class SubmitEntry {
         public final int stage;
         public final int id;
-        public final boolean submit;
+        public final int submitFlags;
         private final Object[] vals;
 
-        public SubmitEntry(int stage, int id, boolean  submit, Object[] vals) {
+        public SubmitEntry(int stage, int id, int submitFlags, Object[] vals) {
             this.stage = stage;
             this.id = id;
-            this.submit = submit;
+            this.submitFlags = submitFlags;
             this.vals = Arrays.copyOf(vals, vals.length);
         }
 
@@ -45,8 +45,8 @@ public class TestSubmitter implements SpySubmitter {
 
     private List<SubmitEntry> entries = new ArrayList<SubmitEntry>();
 
-    public void submit(int stage, int id, boolean submit, Object[] vals) {
-        entries.add(new SubmitEntry(stage, id, submit, vals));
+    public void submit(int stage, int id, int submitFlags, Object[] vals) {
+        entries.add(new SubmitEntry(stage, id, submitFlags, vals));
     }
 
     public SubmitEntry get(int idx) {

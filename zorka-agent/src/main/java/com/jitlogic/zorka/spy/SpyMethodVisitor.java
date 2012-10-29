@@ -17,30 +17,34 @@
 
 package com.jitlogic.zorka.spy;
 
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
 
-import static org.objectweb.asm.Opcodes.BIPUSH;
-import static org.objectweb.asm.Opcodes.ICONST_0;
-import static org.objectweb.asm.Opcodes.SIPUSH;
+import static org.objectweb.asm.Opcodes.*;
 
 public class SpyMethodVisitor extends MethodVisitor {
 
     private final static String SUBMIT_CLASS = "com/jitlogic/zorka/vmsci/MainSubmitter";
     private final static String SUBMIT_METHOD = "submit";
-    private final static String SUBMIT_DESC = "(IIZ[Ljava/lang/Object;)V";
+    private final static String SUBMIT_DESC = "(III[Ljava/lang/Object;)V";
 
     private static boolean debug = false;
     private List<InstrumentationContext> ctxs;
     private int stackDelta = 0, localDelta = 0;
 
+    Label l_try_from = new Label();
+    Label l_try_to = new Label();
+    Label l_try_handler = new Label();
+
+
     public SpyMethodVisitor(List<InstrumentationContext> ctxs, MethodVisitor mv) {
-        super(Opcodes.V1_6, mv);
+        super(V1_6, mv);
         this.ctxs = ctxs;
     }
+
 
     @Override
     public void visitCode() {
@@ -51,16 +55,44 @@ public class SpyMethodVisitor extends MethodVisitor {
             }
         }
 
+        mv.visitTryCatchBlock(l_try_from, l_try_to, l_try_handler, null);
+        mv.visitLabel(l_try_from);
     }
+
+
+    @Override
+    public void visitInsn(int opcode) {
+        if ((opcode >= IRETURN && opcode <= RETURN)) {
+            for (InstrumentationContext ctx : ctxs) {
+                if (ctx.getSpyDefinition().getProbes(SpyDefinition.ON_EXIT).size() > 0) {
+                    stackDelta = max(stackDelta, emitProbe(SpyDefinition.ON_EXIT, ctx));
+                }
+            }
+        }
+        mv.visitInsn(opcode);
+    }
+
 
     @Override
     public void visitMaxs(int maxStack, int maxLocals) {
+        mv.visitLabel(l_try_to);
+        mv.visitLabel(l_try_handler);
+
+        for (InstrumentationContext ctx : ctxs) {
+            if (ctx.getSpyDefinition().getProbes(SpyDefinition.ON_ERROR).size() > 0) {
+                stackDelta = max(stackDelta, emitProbe(SpyDefinition.ON_ERROR, ctx));
+            }
+        }
+
+        mv.visitInsn(ATHROW);
         mv.visitMaxs(maxStack + stackDelta, maxLocals + localDelta);
     }
+
 
     private static int max(int x, int y) {
         return x > y ? x : y;
     }
+
 
     private int emitProbe(int stage, InstrumentationContext ctx) {
         SpyDefinition sdef = ctx.getSpyDefinition();
@@ -71,28 +103,28 @@ public class SpyMethodVisitor extends MethodVisitor {
         // Put first 3 arguments of MainSubmitter.submit() onto stack
         emitLoadInt(stage);
         emitLoadInt(ctx.getId());
-        emitLoadInt(submitNow ? 1 : 0);
+        emitLoadInt(submitNow ? 1 : 0); // TODO implement better logic for this
 
         int sd = 3;
 
         // Create an array with fetched data (or push null)
         if (probeElements.size() > 0) {
             emitLoadInt(probeElements.size());
-            mv.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
+            mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
             for (int i = 0; i < probeElements.size(); i++) {
                 SpyProbeElement element = probeElements.get(i);
-                mv.visitInsn(Opcodes.DUP);
+                mv.visitInsn(DUP);
                 emitLoadInt(i);
                 sd = max(sd, emitProbeElement(stage, 0, probeElements.get(i)) + 5);
-                mv.visitInsn(Opcodes.AASTORE);
+                mv.visitInsn(AASTORE);
             }
         } else {
-            mv.visitInsn(Opcodes.ACONST_NULL);
+            mv.visitInsn(ACONST_NULL);
             sd++;
         }
 
         // Call MainSubmitter.submit()
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC, SUBMIT_CLASS, SUBMIT_METHOD, SUBMIT_DESC);
+        mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, SUBMIT_METHOD, SUBMIT_DESC);
 
         return sd;
     }
@@ -101,7 +133,8 @@ public class SpyMethodVisitor extends MethodVisitor {
     private int emitProbeElement(int stage, int opcode, SpyProbeElement element) {
         switch (element.getArgType()) {
             case SpyProbeElement.FETCH_TIME:
-                mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/System", "nanoTime", "()J");
+                mv.visitMethodInsn(INVOKESTATIC, "java/lang/System", "nanoTime", "()J");
+                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;");
                 break;
             case SpyProbeElement.FETCH_CLASS:
                 throw new NotImplementedException();
@@ -113,7 +146,7 @@ public class SpyMethodVisitor extends MethodVisitor {
                 throw new NotImplementedException();
             default:
                 if (element.getArgType() >= 0) {
-                    mv.visitVarInsn(Opcodes.ALOAD, element.getArgType());
+                    mv.visitVarInsn(ALOAD, element.getArgType());
                 }
                 break;
         }
@@ -137,10 +170,10 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     private void emitDebugPrint(String msg) {
         if (debug) {
-            mv.visitFieldInsn(Opcodes.GETSTATIC,
+            mv.visitFieldInsn(GETSTATIC,
                     "java/lang/System", "out", "Ljava/io/PrintStream;");
             mv.visitLdcInsn(msg);
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
+            mv.visitMethodInsn(INVOKEVIRTUAL,
                     "java/io/PrintStream", "println", "(Ljava/lang/String;)V");
         }
     }

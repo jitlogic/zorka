@@ -22,15 +22,16 @@ import org.junit.Test;
 
 public class ManualSpySubmissionTest {
 
-    @Test
+    //@Test
     public void testCollectTrivialData() throws Exception {
-        MainSubmitter.submit(1, 1, true, null);
+        MainSubmitter.submit(1, 1, 1, null);
     }
 
-    @Test
+    //@Test
     public void testSystemNanotime() throws Exception {
-        long l = System.nanoTime();
-        //System.out.println("t=" + l);
+        Object[] v = new Object[1];
+        v[0] = System.nanoTime();
+        MainSubmitter.submit(1, 1, 1, null);
     }
 
 }

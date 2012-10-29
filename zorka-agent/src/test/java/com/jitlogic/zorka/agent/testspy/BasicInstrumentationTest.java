@@ -52,12 +52,77 @@ public class BasicInstrumentationTest {
     }
 
     @Test
-    public void testTrivialInstrumentOnlyEntryPointPlusSomeArg() throws Exception {
+    public void testTrivialInstrumentOnlyEntryPointWithThisRef() throws Exception {
         engine.add(SpyDefinition.newInstance().onEnter().withArguments(0).lookFor(TCLASS1, "trivialMethod"));
         Object obj = TestUtil.instantiate(engine, TCLASS1);
+
         TestUtil.invoke(obj, "trivialMethod");
+
         assertEquals(1, submitter.size());
+        assertEquals(obj, submitter.get(0).getVal(0));
     }
 
+
+    @Test
+    public void testTrivialInstrumentOnlyEntryPointWithCurrentTime() throws Exception {
+        engine.add(SpyDefinition.newInstance().onEnter().withTime().lookFor(TCLASS1, "trivialMethod"));
+        Object obj = TestUtil.instantiate(engine, TCLASS1);
+
+        TestUtil.invoke(obj, "trivialMethod");
+
+        assertEquals("should catch entry point", 1, submitter.size());
+        assertTrue("should return Long", submitter.get(0).getVal(0) instanceof Long);
+
+    }
+
+    @Test
+    public void testInstrumentWithTimeOnEnterExit() throws Exception {
+        engine.add(SpyDefinition.instrument().lookFor(TCLASS1, "trivialMethod"));
+        Object obj = TestUtil.instantiate(engine, TCLASS1);
+
+        TestUtil.invoke(obj, "trivialMethod");
+
+        assertEquals("should catch both entry and exit points", 2, submitter.size());
+        // TODO sprawdzenie 1 entry
+        // TODO sprawdzenie 2 entry
+    }
+
+    @Test
+    public void testInstrumentWithTimeOnEnterError() throws Exception {
+        engine.add(SpyDefinition.instrument().lookFor(TCLASS1, "errorMethod"));
+        Object obj = TestUtil.instantiate(engine, TCLASS1);
+
+        TestUtil.invoke(obj, "errorMethod");
+
+        assertEquals("should catch both entry and error points", 2, submitter.size());
+        // TODO sprawdzenie 1 entry
+        // TODO sprawdzenie 2 entry
+    }
+
+    // TODO test for multiple probes on a single method
+
+    // TODO proper SF_IMMEDIATE and SF_FLUSH emission
+
+    // TODO parameters of simple types
+
+    // TODO handle
+
+    // TODO catch a return value
+
+    // TODO return values of simple types
+
+    // TODO fetch a class
+
+    // TODO fetch current thread
+
+    // TODO fetch object's class loader
+
+    // TODO catch exception object
+
+    // TODO test instrumenting static method
+
+    // TODO test instrumenting a constructor
+
+    // TODO test instrumenting static constructor
 
 }

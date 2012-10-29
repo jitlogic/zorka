@@ -19,6 +19,6 @@ package com.jitlogic.zorka.vmsci;
 
 public interface SpySubmitter {
 
-    void submit(int stage, int id, boolean submit, Object[] vals);
+    void submit(int stage, int id, int submitFlags, Object[] vals);
 
 }
