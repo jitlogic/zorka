@@ -19,8 +19,11 @@ package com.jitlogic.zorka.spy;
 
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.objectweb.asm.Opcodes.*;
@@ -32,6 +35,11 @@ public class SpyMethodVisitor extends MethodVisitor {
     private final static String SUBMIT_DESC = "(III[Ljava/lang/Object;)V";
 
     private static boolean debug = false;
+
+    private int access;
+    private String methodName;
+    private String methodDesc;
+
     private List<InstrumentationContext> ctxs;
     private int stackDelta = 0, localDelta = 0;
 
@@ -40,8 +48,11 @@ public class SpyMethodVisitor extends MethodVisitor {
     Label l_try_handler = new Label();
 
 
-    public SpyMethodVisitor(List<InstrumentationContext> ctxs, MethodVisitor mv) {
+    public SpyMethodVisitor(int access, String methodName, String methodDesc, List<InstrumentationContext> ctxs, MethodVisitor mv) {
         super(V1_6, mv);
+        this.access = access;
+        this.methodName = methodName;
+        this.methodDesc = methodDesc;
         this.ctxs = ctxs;
     }
 
@@ -115,7 +126,7 @@ public class SpyMethodVisitor extends MethodVisitor {
                 SpyProbeElement element = probeElements.get(i);
                 mv.visitInsn(DUP);
                 emitLoadInt(i);
-                sd = max(sd, emitProbeElement(stage, 0, probeElements.get(i)) + 5);
+                sd = max(sd, emitProbeElement(stage, 0, probeElements.get(i)) + 6);
                 mv.visitInsn(AASTORE);
             }
         } else {
@@ -137,7 +148,9 @@ public class SpyMethodVisitor extends MethodVisitor {
                 mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;");
                 break;
             case SpyProbeElement.FETCH_CLASS:
-                throw new NotImplementedException();
+                String cn = "L"+element.getClassName().replace(".", "/") + ";";
+                mv.visitLdcInsn(Type.getType(cn));
+                break;
             case SpyProbeElement.FETCH_THREAD:
                 throw new NotImplementedException();
             case SpyProbeElement.FETCH_ERROR:
@@ -145,9 +158,75 @@ public class SpyMethodVisitor extends MethodVisitor {
             case SpyProbeElement.FETCH_RET_VAL:
                 throw new NotImplementedException();
             default:
-                if (element.getArgType() >= 0) {
-                    mv.visitVarInsn(ALOAD, element.getArgType());
+                if (stage == SpyDefinition.ON_ENTER && element.getArgType() == 0 && "<init>".equals(methodName)) {
+                    // TODO log warning
+                    mv.visitInsn(ACONST_NULL);
+                } else if (element.getArgType() >= 0) {
+                    return emitFetchArgument(element);
+                } else {
+                    // TODO log warning
+                    mv.visitInsn(ACONST_NULL);
                 }
+                break;
+        }
+
+        return 1;
+    }
+
+
+    private int emitFetchArgument(SpyProbeElement element) {
+
+        if ((access & ACC_STATIC) == 0 && element.getArgType() == 0) {
+            mv.visitVarInsn(ALOAD, element.getArgType());
+            return 1;
+        }
+
+        Type[] argTypes = Type.getArgumentTypes(methodDesc);
+        int aoffs = (access & ACC_STATIC) == 0 ? 1 : 0;
+        int aidx = element.getArgType() - aoffs;
+        Type type = argTypes[aidx];
+        int insn = type.getOpcode(ILOAD);
+
+        for (int i = 0; i < aidx; i++) {
+            aoffs += argTypes[i].getSize();
+        }
+
+        mv.visitVarInsn(insn, aoffs);
+
+        switch (type.getSort()) {
+            case Type.INT:
+                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer",
+                        "valueOf", "(I)Ljava/lang/Integer;");
+                break;
+            case Type.LONG:
+                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long",
+                        "valueOf", "(J)Ljava/lang/Long;");
+                break;
+            case Type.FLOAT:
+                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float",
+                        "valueOf", "(F)Ljava/lang/Float;");
+                break;
+            case Type.DOUBLE:
+                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double",
+                        "valueOf", "(D)Ljava/lang/Double;");
+                break;
+            case Type.SHORT:
+                mv.visitInsn(I2S);
+                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Short",
+                        "valueOf", "(S)Ljava/lang/Short;");
+                break;
+            case Type.BYTE:
+                mv.visitInsn(I2B);
+                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Byte",
+                        "valueOf", "(B)Ljava/lang/Byte;");
+                break;
+            case Type.BOOLEAN:
+                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean",
+                        "valueOf", "(Z)Ljava/lang/Boolean;");
+                break;
+            case Type.CHAR:
+                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Character",
+                        "valueOf", "(C)Ljava/lang/Character;");
                 break;
         }
 

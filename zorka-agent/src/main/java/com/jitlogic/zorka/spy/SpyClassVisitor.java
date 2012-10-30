@@ -53,7 +53,7 @@ public class SpyClassVisitor extends ClassVisitor {
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-        MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
+        MethodVisitor mv = createVisitor(access, name, desc, signature, exceptions);
         List<InstrumentationContext> ctxs = new ArrayList<InstrumentationContext>(sdefs.size());
 
         for (SpyDefinition sdef : sdefs) {
@@ -64,9 +64,13 @@ public class SpyClassVisitor extends ClassVisitor {
         }
 
         if (ctxs.size() > 0) {
-            return new SpyMethodVisitor(ctxs, mv);
+            return new SpyMethodVisitor(access, name, desc, ctxs, mv);
         }
 
         return mv;
+    }
+
+    protected MethodVisitor createVisitor(int access, String name, String desc, String signature, String[] exceptions) {
+        return cv.visitMethod(access, name, desc, signature, exceptions);
     }
 }

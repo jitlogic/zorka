@@ -20,6 +20,7 @@ package com.jitlogic.zorka.spy;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 
 import java.lang.instrument.ClassFileTransformer;
@@ -82,11 +83,15 @@ public class InstrumentationEngine implements ClassFileTransformer {
         if (found.size() > 0) {
             ClassReader cr = new ClassReader(classfileBuffer);
             ClassWriter cw = new ClassWriter(cr, 0);
-            SpyClassVisitor scv = new SpyClassVisitor(this, clazzName, found, cw);
+            ClassVisitor scv = createVisitor(clazzName, found, cw);
             cr.accept(scv, 0);
             return cw.toByteArray();
         }
 
         return classfileBuffer;
+    }
+
+    protected ClassVisitor createVisitor(String clazzName, List<SpyDefinition> found, ClassWriter cw) {
+        return new SpyClassVisitor(this, clazzName, found, cw);
     }
 }

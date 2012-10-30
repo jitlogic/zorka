@@ -45,25 +45,25 @@ public class SpyMatcherTest {
     public void testClassMethodMatch() {
         SpyMatcher cm = new SpyMatcher("test.*", "get*", null, 0xFF);
 
-        Assert.assertTrue(cm.matches("test.SomeClass", "getVal"));
+        Assert.assertTrue(cm.matches("test.SomeClass", "get"));
         Assert.assertFalse(cm.matches("test.SomeClass", "setVal"));
     }
 
     @Test
     public void testClassMethodStrictMatch() {
-        SpyMatcher cm = new SpyMatcher("test.*", "getVal", null, 0xFF);
+        SpyMatcher cm = new SpyMatcher("test.*", "get", null, 0xFF);
 
-        Assert.assertTrue(cm.matches("test.SomeClass", "getVal"));
+        Assert.assertTrue(cm.matches("test.SomeClass", "get"));
         Assert.assertFalse(cm.matches("test.someClass", "getValAndSome"));
     }
 
     @Test
     public void testClassMatchSignatureWithoutTypes() {
-        SpyMatcher cm = new SpyMatcher("test.*", "getVal", null, 0xFF);
+        SpyMatcher cm = new SpyMatcher("test.*", "get", null, 0xFF);
 
-        Assert.assertTrue(cm.matches("test.someClass", "getVal", "()V"));
-        Assert.assertTrue(cm.matches("test.someClass", "getVal", "(II)V"));
-        Assert.assertFalse(cm.matches("test.someClass", "getVal", "malformed"));
+        Assert.assertTrue(cm.matches("test.someClass", "get", "()V"));
+        Assert.assertTrue(cm.matches("test.someClass", "get", "(II)V"));
+        Assert.assertFalse(cm.matches("test.someClass", "get", "malformed"));
     }
 
     @Test
@@ -76,9 +76,9 @@ public class SpyMatcherTest {
 
     @Test
     public void testClassMatchSignatureReturnClassType() {
-        SpyMatcher cm = new SpyMatcher("test.*", "getVal", "java.lang.String", 0xFF);
+        SpyMatcher cm = new SpyMatcher("test.*", "get", "java.lang.String", 0xFF);
 
-        Assert.assertTrue(cm.matches("test.SomeClass", "getVal", "()Ljava/lang/String;"));
+        Assert.assertTrue(cm.matches("test.SomeClass", "get", "()Ljava/lang/String;"));
     }
 
     @Test

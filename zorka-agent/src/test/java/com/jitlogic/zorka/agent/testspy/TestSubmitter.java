@@ -38,7 +38,7 @@ public class TestSubmitter implements SpySubmitter {
             this.vals = Arrays.copyOf(vals, vals.length);
         }
 
-        public Object getVal(int idx) {
+        public Object get(int idx) {
             return vals[idx];
         }
     }

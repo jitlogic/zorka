@@ -105,8 +105,9 @@ public class SpyDefinitionModellingTest {
     @Test
     public void testDefineSimpleInstrumentation() {
         SpyDefinition sdef =
-            SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
-                SpyDefinition.ANY_TYPE, SpyMatcher.DEFAULT_FILTER, SpyDefinition.NO_ARGS)
+            SpyDefinition.instrument().lookFor(SpyMatcher.DEFAULT_FILTER,
+                "com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
+                SpyDefinition.ANY_TYPE, SpyDefinition.NO_ARGS)
                 .toStats("java", "some.app:type=ZorkaStats,name=SomeClass", "stats");
         assertEquals(1, sdef.getMatchers().size());
     }
