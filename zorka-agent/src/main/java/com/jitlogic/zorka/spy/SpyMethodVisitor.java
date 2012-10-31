@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.vmsci.MainSubmitter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -41,6 +42,7 @@ public class SpyMethodVisitor extends MethodVisitor {
     private String methodDesc;
 
     private List<InstrumentationContext> ctxs;
+
     private int stackDelta = 0, localDelta = 0;
 
     Label l_try_from = new Label();
@@ -75,7 +77,8 @@ public class SpyMethodVisitor extends MethodVisitor {
     public void visitInsn(int opcode) {
         if ((opcode >= IRETURN && opcode <= RETURN)) {
             for (InstrumentationContext ctx : ctxs) {
-                if (ctx.getSpyDefinition().getProbes(SpyDefinition.ON_EXIT).size() > 0) {
+                if (getSubmitFlags(SpyDefinition.ON_ENTER, ctx.getSpyDefinition()) == MainSubmitter.SF_NONE ||
+                    ctx.getSpyDefinition().getProbes(SpyDefinition.ON_EXIT).size() > 0) {
                     stackDelta = max(stackDelta, emitProbe(SpyDefinition.ON_EXIT, ctx));
                 }
             }
@@ -90,7 +93,8 @@ public class SpyMethodVisitor extends MethodVisitor {
         mv.visitLabel(l_try_handler);
 
         for (InstrumentationContext ctx : ctxs) {
-            if (ctx.getSpyDefinition().getProbes(SpyDefinition.ON_ERROR).size() > 0) {
+            if (getSubmitFlags(SpyDefinition.ON_ENTER, ctx.getSpyDefinition()) == MainSubmitter.SF_NONE ||
+                ctx.getSpyDefinition().getProbes(SpyDefinition.ON_ERROR).size() > 0) {
                 stackDelta = max(stackDelta, emitProbe(SpyDefinition.ON_ERROR, ctx));
             }
         }
@@ -105,16 +109,29 @@ public class SpyMethodVisitor extends MethodVisitor {
     }
 
 
+    public static int getSubmitFlags(int stage, SpyDefinition sdef) {
+
+        if (stage == SpyDefinition.ON_ENTER) {
+            return (sdef.getProbes(SpyDefinition.ON_EXIT).size() == 0
+                    && sdef.getProbes(SpyDefinition.ON_ERROR).size() == 0)
+                    ? MainSubmitter.SF_IMMEDIATE : MainSubmitter.SF_NONE;
+        } else {
+            return (sdef.getProbes(SpyDefinition.ON_ENTER).size() == 0)
+                    ? MainSubmitter.SF_IMMEDIATE : MainSubmitter.SF_FLUSH;
+        }
+    }
+
+
     private int emitProbe(int stage, InstrumentationContext ctx) {
         SpyDefinition sdef = ctx.getSpyDefinition();
         List<SpyProbeElement> probeElements = sdef.getProbes(stage);
-        boolean submitNow = (stage != SpyDefinition.ON_ENTER) ||
-            (sdef.getProbes(SpyDefinition.ON_EXIT).size()+sdef.getProbes(SpyDefinition.ON_ERROR).size() == 0);
+
+        int submitFlags = getSubmitFlags(stage, sdef);
 
         // Put first 3 arguments of MainSubmitter.submit() onto stack
         emitLoadInt(stage);
         emitLoadInt(ctx.getId());
-        emitLoadInt(submitNow ? 1 : 0); // TODO implement better logic for this
+        emitLoadInt(submitFlags);
 
         int sd = 3;
 
@@ -139,7 +156,6 @@ public class SpyMethodVisitor extends MethodVisitor {
 
         return sd;
     }
-
 
     private int emitProbeElement(int stage, int opcode, SpyProbeElement element) {
         switch (element.getArgType()) {

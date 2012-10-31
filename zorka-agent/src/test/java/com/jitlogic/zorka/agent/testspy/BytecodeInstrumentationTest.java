@@ -160,9 +160,9 @@ public class BytecodeInstrumentationTest {
     public void testFetchClassFromInstrumentedCode() throws Exception {
         engine.add(SpyDefinition.newInstance().withClass(TCLASS1).lookFor(TCLASS1, "trivialMethod"));
         Object obj = TestUtil.instantiate(engine, TCLASS1);
-        TestUtil.invoke(obj, "trivialMethod");
+        TestUtil.checkForError(TestUtil.invoke(obj, "trivialMethod"));
 
-        assertEquals("should catch exactly one argument", 1, submitter.size());
+        assertEquals(1, submitter.size());
         assertTrue("Fetched object is a class", submitter.get(0).get(0) instanceof Class);
         assertEquals(TCLASS1, ((Class)(submitter.get(0).get(0))).getName());
     }
@@ -174,9 +174,9 @@ public class BytecodeInstrumentationTest {
                 .lookFor(TCLASS1, "paramMethod1"));
         //engine.enableDebug();
         Object obj = TestUtil.instantiate(engine, TCLASS1);
-        TestUtil.invoke(obj, "paramMethod1", 10, 20L, (short)30, (byte)40);
+        TestUtil.checkForError(TestUtil.invoke(obj, "paramMethod1", 10, 20L, (short)30, (byte)40));
 
-        assertEquals("should catch exactly one argument", 1, submitter.size());
+        assertEquals(1, submitter.size());
         assertEquals(Integer.valueOf(10), submitter.get(0).get(0));
         assertEquals(Long.valueOf(20), submitter.get(0).get(1));
         assertEquals((short)30, submitter.get(0).get(2));
@@ -190,8 +190,8 @@ public class BytecodeInstrumentationTest {
                 .lookFor(TCLASS1, "paramMethod2"));
         //engine.enableDebug();
         Object obj = TestUtil.instantiate(engine, TCLASS1);
-        TestUtil.invoke(obj, "paramMethod2", true, 'A');
-        assertEquals("should catch exactly one argument", 1, submitter.size());
+        TestUtil.checkForError(TestUtil.invoke(obj, "paramMethod2", true, 'A'));
+        assertEquals(1, submitter.size());
         assertEquals(true, submitter.get(0).get(0));
         assertEquals('A', submitter.get(0).get(1));
     }
@@ -201,15 +201,77 @@ public class BytecodeInstrumentationTest {
     public void testFetchFloatingPointArgs() throws Exception {
         engine.add(SpyDefinition.newInstance().withArguments(1,2)
                 .lookFor(TCLASS1, "paramMethod3"));
-        engine.enableDebug();
+        //engine.enableDebug();
         Object obj = TestUtil.instantiate(engine, TCLASS1);
-        TestUtil.invoke(obj, "paramMethod3", 1.23, (float)2.34);
-        assertEquals("should catch exactly one argument", 1, submitter.size());
+        TestUtil.checkForError(TestUtil.invoke(obj, "paramMethod3", 1.23, (float)2.34));
+        assertEquals(1, submitter.size());
         assertEquals(1.23, (Double)(submitter.get(0).get(0)), 0.01);
         assertEquals(2.34, (Float)(submitter.get(0).get(1)), 0.01);
     }
 
-    // TODO proper SF_IMMEDIATE and SF_FLUSH emission
+
+    @Test
+    public void testCheckImmediateFlagInEntryPointOnlyProbe() throws Exception {
+        engine.add(SpyDefinition.newInstance().withTime().lookFor(TCLASS1, "trivialMethod"));
+        Object obj = TestUtil.instantiate(engine, TCLASS1);
+        TestUtil.checkForError(TestUtil.invoke(obj, "trivialMethod"));
+
+        assertEquals(1, submitter.size());
+        assertEquals(MainSubmitter.SF_IMMEDIATE, submitter.get(0).submitFlags);
+    }
+
+
+    @Test
+    public void testCheckNoFlagOnEnterAndFlushFlagOnExit() throws Exception {
+        engine.add(SpyDefinition.instrument().lookFor(TCLASS1, "trivialMethod"));
+        Object obj = TestUtil.instantiate(engine, TCLASS1);
+        TestUtil.checkForError(TestUtil.invoke(obj, "trivialMethod"));
+
+        assertEquals(2, submitter.size());
+        assertEquals(MainSubmitter.SF_NONE, submitter.get(0).submitFlags);
+        assertEquals(MainSubmitter.SF_FLUSH, submitter.get(1).submitFlags);
+    }
+
+
+    @Test
+    public void testCheckNoProbeOnEnterAndImmediateFlagOnExit() throws Exception {
+        engine.add(SpyDefinition.newInstance().onExit().withTime().lookFor(TCLASS1, "trivialMethod"));
+        Object obj = TestUtil.instantiate(engine, TCLASS1);
+        TestUtil.checkForError(TestUtil.invoke(obj, "trivialMethod"));
+
+        assertEquals(1, submitter.size());
+        assertEquals(MainSubmitter.SF_IMMEDIATE, submitter.get(0).submitFlags);
+    }
+
+
+    @Test
+    public void testNoProbeOnExitButProbeOnErrorAndOnEnter() throws Exception {
+        engine.add(SpyDefinition.newInstance().withTime().onError().withTime().lookFor(TCLASS1, "trivialMethod"));
+        //engine.enableDebug();
+        Object obj = TestUtil.instantiate(engine, TCLASS1);
+        TestUtil.checkForError(TestUtil.invoke(obj, "trivialMethod"));
+
+        assertEquals(2, submitter.size());
+        assertEquals(MainSubmitter.SF_NONE, submitter.get(0).submitFlags);
+        assertEquals(MainSubmitter.SF_FLUSH, submitter.get(1).submitFlags);
+        assertTrue("should pass no values", submitter.get(1).nullVals());
+    }
+
+
+    @Test
+    public void testNoProbeOnErrorButProbeOnEnterAndExit() throws Exception {
+        engine.add(SpyDefinition.newInstance().withTime().onExit().withTime().lookFor(TCLASS1, "errorMethod"));
+
+        Object obj = TestUtil.instantiate(engine, TCLASS1);
+        TestUtil.invoke(obj, "errorMethod");
+
+        assertEquals(2, submitter.size());
+        assertEquals(MainSubmitter.SF_NONE, submitter.get(0).submitFlags);
+        assertEquals(MainSubmitter.SF_FLUSH, submitter.get(1).submitFlags);
+        assertTrue("should pass no values", submitter.get(1).nullVals());
+    }
+
+
 
     // TODO array parameters (arrays of simple types)
 

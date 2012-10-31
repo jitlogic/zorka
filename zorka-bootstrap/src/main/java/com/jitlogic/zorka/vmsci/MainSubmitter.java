@@ -19,6 +19,7 @@ package com.jitlogic.zorka.vmsci;
 
 public class MainSubmitter {
 
+    public final static int SF_NONE = 0;
     public final static int SF_IMMEDIATE = 1;
     public final static int SF_FLUSH = 2;
 

@@ -73,4 +73,12 @@ public class TestUtil extends ClassLoader {
         return null;
     }
 
+
+    public static void checkForError(Object obj) {
+        if (obj instanceof Throwable) {
+            System.err.println("Error: " + obj);
+            ((Throwable)obj).printStackTrace(System.err);
+        }
+    }
+
 }

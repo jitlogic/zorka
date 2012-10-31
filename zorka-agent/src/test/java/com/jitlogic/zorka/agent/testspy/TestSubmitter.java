@@ -35,11 +35,15 @@ public class TestSubmitter implements SpySubmitter {
             this.stage = stage;
             this.id = id;
             this.submitFlags = submitFlags;
-            this.vals = Arrays.copyOf(vals, vals.length);
+            this.vals = vals != null ? Arrays.copyOf(vals, vals.length) : null;
         }
 
         public Object get(int idx) {
             return vals[idx];
+        }
+
+        public boolean nullVals() {
+            return this.vals == null;
         }
     }
 
