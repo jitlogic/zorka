@@ -110,7 +110,7 @@ public class SpyDefinitionModellingTest {
             SpyDefinition.instrument().lookFor(SpyMatcher.DEFAULT_FILTER,
                 "com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
                     SM_ANY_TYPE, SM_NOARGS)
-                .toStats("java", "some.app:type=ZorkaStats,name=SomeClass", "stats");
+                .toStats("java", "some.app:type=ZorkaStats,name=SomeClass", "stats", 0);
         assertEquals(1, sdef.getMatchers().size());
     }
 
@@ -123,7 +123,7 @@ public class SpyDefinitionModellingTest {
     public void testDefineInstrumentationWithAntMasks() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.**", "*")
-                .toStats("java", "some.app:type=ZorkaStats,name=${className}", "stats");
+                .toStats("java", "some.app:type=ZorkaStats,name=${className}", "stats", 0);
     }
 
 
@@ -134,7 +134,7 @@ public class SpyDefinitionModellingTest {
     public void testInstrumentMethodWithArgProcAndTestAndShortMask() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.*", "*")
-                .toStats("java", "some.app:type=ZorkaStats,name=${className}", "${methodName}");
+                .toStats("java", "some.app:type=ZorkaStats,name=${className}", "${methodName}", 0);
     }
 
 
@@ -146,7 +146,7 @@ public class SpyDefinitionModellingTest {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
                 .withFormat(2,"${1.request.requestURI}")
-                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI");
+                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI", 0);
     }
 
 
@@ -159,7 +159,7 @@ public class SpyDefinitionModellingTest {
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
                 .withFormat(2,"${1.request.requestURI}")
                 .transform(0, "split", "\\?").get(0, 0)
-                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI");
+                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI", 0);
     }
 
 
@@ -172,7 +172,7 @@ public class SpyDefinitionModellingTest {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
                 .withArguments(1).transform(ns, "classify_uris")
-                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byClass");
+                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byClass", 0);
     }
 
 
@@ -184,7 +184,7 @@ public class SpyDefinitionModellingTest {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
                 .withArguments(2).withFormat(0,"${0.reply.replyCode}")
-                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byCode");
+                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byCode", 0);
     }
 
 
@@ -198,7 +198,7 @@ public class SpyDefinitionModellingTest {
                 .onExit().withArguments(1,2)
                 .withFormat(0,"${0.request.requestURI}").withFormat(1,"${1.reply.replyCode}")
                 .transform(0, "split", "\\?").get(0, 0)
-                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests,httpCode=${1}", "stats", "${0}");
+                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests,httpCode=${1}", "stats", "${0}", 0);
     }
 
 

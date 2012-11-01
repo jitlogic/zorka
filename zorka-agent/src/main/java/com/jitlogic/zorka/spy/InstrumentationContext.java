@@ -24,7 +24,7 @@ public class InstrumentationContext {
     private Integer id = null;
 
     private SpyDefinition spyDefinition;
-    private String className;
+    private String className, shortClassName;
     private String methodName;
     private String methodDesc;
     private int access;
@@ -37,6 +37,9 @@ public class InstrumentationContext {
         this.methodName = methodName;
         this.methodDesc = methodDesc;
         this.access = access;
+
+        String[] segs = className.split("\\.");
+        this.shortClassName = segs[segs.length-1];
     }
 
     public void setId(Integer id) {
@@ -51,6 +54,18 @@ public class InstrumentationContext {
 
     public SpyDefinition getSpyDefinition() {
         return spyDefinition;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public String getShortClassName() {
+        return shortClassName;
+    }
+
+    public String getMethodName() {
+        return methodName;
     }
 
     @Override

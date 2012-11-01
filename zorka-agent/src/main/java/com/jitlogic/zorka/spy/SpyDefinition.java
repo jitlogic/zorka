@@ -62,7 +62,7 @@ public class SpyDefinition {
         return new SpyDefinition();
     }
 
-    private SpyDefinition() {
+    public SpyDefinition() {
 
         probes = new List[5];
         for (int i = 0; i < probes.length; i++) {
@@ -542,8 +542,8 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition toStats(String mbsName, String beanName, String attrName) {
-        return toCollector(new ZorkaStatsCollector(mbsName, beanName, attrName, null));
+    public SpyDefinition toStats(String mbsName, String beanName, String attrName, int timeField) {
+        return toCollector(new ZorkaStatsCollector(mbsName, beanName, attrName, null, timeField));
     }
 
 
@@ -561,8 +561,8 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition toStats(String mbsName, String beanName, String attrName, String keyExpr) {
-        return toCollector(new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr));
+    public SpyDefinition toStats(String mbsName, String beanName, String attrName, String keyExpr, int timeField) {
+        return toCollector(new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, timeField));
     }
 
 

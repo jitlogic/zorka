@@ -17,15 +17,70 @@
 
 package com.jitlogic.zorka.spy.collectors;
 
+import com.jitlogic.zorka.agent.AgentGlobals;
+import com.jitlogic.zorka.agent.MBeanServerRegistry;
+import com.jitlogic.zorka.mbeans.MethodCallStatistic;
+import com.jitlogic.zorka.mbeans.MethodCallStatistics;
+import com.jitlogic.zorka.spy.InstrumentationContext;
 import com.jitlogic.zorka.spy.SpyRecord;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.jitlogic.zorka.spy.SpyConst.*;
 
 public class ZorkaStatsCollector implements SpyCollector {
 
-    public ZorkaStatsCollector(String mbsName, String beanName, String attrName, String keyExpr) {
-        // TODO
+    private MBeanServerRegistry registry = AgentGlobals.getMBeanServerRegistry();
+    private String mbsName, mbeanTemplate, attrTemplate, keyTemplate;
+    private int timeField;
+
+    private Map<InstrumentationContext,MethodCallStatistics> statsCache =
+            new HashMap<InstrumentationContext, MethodCallStatistics>();
+
+
+    public ZorkaStatsCollector(String mbsName, String mbeanTemplate, String attrTemplate,
+                               String keyTemplate, int timeField) {
+        this.mbsName  = mbsName;
+        this.mbeanTemplate = mbeanTemplate;
+        this.attrTemplate = attrTemplate;
+        this.keyTemplate = keyTemplate;
+        this.timeField = timeField;
     }
 
+
     public void collect(SpyRecord record) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
+        InstrumentationContext ctx = record.getContext();
+        MethodCallStatistics stats = statsCache.get(record.getContext());
+
+        if (stats == null) {
+            stats = registry.getOrRegisterBeanAttr(mbsName, subst(mbeanTemplate, ctx), subst(attrTemplate, ctx),
+                        new MethodCallStatistics(), "Method call statistics");
+        }
+
+        String key = subst(keyTemplate, ctx);
+
+        MethodCallStatistic statistic = (MethodCallStatistic)stats.getMethodCallStatistic(key);
+
+        Object timeObj = record.get(ON_COLLECT, timeField);
+
+        if (timeObj instanceof Long) {
+            if (record.gotStage(ON_EXIT)) {
+                statistic.logCall(0, (Long)record.get(ON_COLLECT, timeField));
+            } else if (record.gotStage(ON_ERROR)) {
+                statistic.logError(0, (Long)record.get(ON_COLLECT, timeField));
+            } // else (log error [warning] here)
+        } // else (log error [warning] here)
     }
+
+
+    private String subst(String template, InstrumentationContext ctx) {
+        return template
+                .replace("${className}", ctx.getClassName())
+                .replace("${methodName}", ctx.getMethodName())
+                .replace("${shortClassName}", ctx.getShortClassName());
+    }
+
+
 }

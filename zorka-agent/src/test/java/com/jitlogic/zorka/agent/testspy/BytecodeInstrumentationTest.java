@@ -16,6 +16,7 @@
  */
 package com.jitlogic.zorka.agent.testspy;
 
+import com.jitlogic.zorka.agent.testutil.JmxTestUtil;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.vmsci.MainSubmitter;
 import org.junit.After;
@@ -25,6 +26,8 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import static com.jitlogic.zorka.spy.SpyConst.*;
+
+import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.*;
 
 public class BytecodeInstrumentationTest {
 
@@ -50,7 +53,7 @@ public class BytecodeInstrumentationTest {
 
     @Test
     public void testClassWithoutAnyTransform() throws Exception{
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
+        Object obj = instantiate(engine, TCLASS1);
         assertNotNull(obj);
         assertEquals(TCLASS1, obj.getClass().getName());
     }
@@ -59,9 +62,9 @@ public class BytecodeInstrumentationTest {
     @Test
     public void testTrivialInstrumentOnlyEntryPointWithThisRef() throws Exception {
         engine.add(SpyDefinition.newInstance().onEnter().withArguments(0).lookFor(TCLASS1, "trivialMethod"));
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
+        Object obj = instantiate(engine, TCLASS1);
 
-        TestUtil.invoke(obj, "trivialMethod");
+        invoke(obj, "trivialMethod");
 
         assertEquals(1, submitter.size());
         assertEquals(obj, submitter.get(0).get(0));
@@ -71,9 +74,9 @@ public class BytecodeInstrumentationTest {
     @Test
     public void testTrivialInstrumentOnlyEntryPointWithCurrentTime() throws Exception {
         engine.add(SpyDefinition.newInstance().onEnter().withTime().lookFor(TCLASS1, "trivialMethod"));
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
+        Object obj = instantiate(engine, TCLASS1);
 
-        TestUtil.invoke(obj, "trivialMethod");
+        invoke(obj, "trivialMethod");
 
         assertEquals("should catch entry point", 1, submitter.size());
         assertTrue("should return Long", submitter.get(0).get(0) instanceof Long);
@@ -84,9 +87,9 @@ public class BytecodeInstrumentationTest {
     @Test
     public void testInstrumentWithTimeOnEnterExit() throws Exception {
         engine.add(SpyDefinition.instrument().lookFor(TCLASS1, "trivialMethod"));
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
+        Object obj = instantiate(engine, TCLASS1);
 
-        TestUtil.invoke(obj, "trivialMethod");
+        invoke(obj, "trivialMethod");
 
         assertEquals("should catch both entry and exit points", 2, submitter.size());
         assertTrue("should pass Long", submitter.get(0).get(0) instanceof Long);
@@ -97,9 +100,9 @@ public class BytecodeInstrumentationTest {
     @Test
     public void testInstrumentWithTimeOnEnterError() throws Exception {
         engine.add(SpyDefinition.instrument().lookFor(TCLASS1, "errorMethod"));
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
+        Object obj = instantiate(engine, TCLASS1);
 
-        TestUtil.invoke(obj, "errorMethod");
+        invoke(obj, "errorMethod");
 
         assertEquals("should catch both entry and error points", 2, submitter.size());
         assertTrue("should pass Long", submitter.get(0).get(0) instanceof Long);
@@ -112,9 +115,9 @@ public class BytecodeInstrumentationTest {
         engine.add(SpyDefinition.instrument().lookFor(TCLASS1, "trivialMethod"));
         engine.add(SpyDefinition.newInstance().withArguments(0).lookFor(TCLASS1, "trivialMethod"));
 
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
+        Object obj = instantiate(engine, TCLASS1);
 
-        TestUtil.invoke(obj, "trivialMethod");
+        invoke(obj, "trivialMethod");
 
         assertEquals("should submit 3 times. ", 3, submitter.size());
 
@@ -128,7 +131,7 @@ public class BytecodeInstrumentationTest {
     public void testInstrumentConstructorWithTime() throws Exception {
         engine.add(SpyDefinition.instrument().lookFor(TCLASS1, SM_CONSTRUCTOR));
         //engine.enableDebug();
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
+        Object obj = instantiate(engine, TCLASS1);
 
         assertEquals(2, submitter.size());
     }
@@ -138,7 +141,7 @@ public class BytecodeInstrumentationTest {
     public void testInstrumentConstructorWithSelfRef() throws Exception {
         engine.add(SpyDefinition.newInstance().onExit().withArguments(0).lookFor(TCLASS1, SM_CONSTRUCTOR));
         //engine.enableDebug();
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
+        Object obj = instantiate(engine, TCLASS1);
 
         assertEquals(1, submitter.size());
         assertEquals("should return object itself", obj, submitter.get(0).get(0));
@@ -149,7 +152,7 @@ public class BytecodeInstrumentationTest {
     public void testInstrumentConstructorWithInvalidSelfRefOnBeginning() throws Exception {
         engine.add(SpyDefinition.newInstance().withArguments(0).lookFor(TCLASS1, SM_CONSTRUCTOR));
         //engine.enableDebug();
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
+        Object obj = instantiate(engine, TCLASS1);
 
         assertEquals(1, submitter.size());
         //assertEquals("should return object itself", obj, submitter.get(0).get(0));
@@ -160,8 +163,8 @@ public class BytecodeInstrumentationTest {
     @Test
     public void testFetchClassFromInstrumentedCode() throws Exception {
         engine.add(SpyDefinition.newInstance().withClass(TCLASS1).lookFor(TCLASS1, "trivialMethod"));
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
-        TestUtil.checkForError(TestUtil.invoke(obj, "trivialMethod"));
+        Object obj = instantiate(engine, TCLASS1);
+        checkForError(invoke(obj, "trivialMethod"));
 
         assertEquals(1, submitter.size());
         assertTrue("Fetched object is a class", submitter.get(0).get(0) instanceof Class);
@@ -174,8 +177,8 @@ public class BytecodeInstrumentationTest {
         engine.add(SpyDefinition.newInstance().withArguments(1,2,3,4)
                 .lookFor(TCLASS1, "paramMethod1"));
         //engine.enableDebug();
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
-        TestUtil.checkForError(TestUtil.invoke(obj, "paramMethod1", 10, 20L, (short)30, (byte)40));
+        Object obj = instantiate(engine, TCLASS1);
+        checkForError(invoke(obj, "paramMethod1", 10, 20L, (short) 30, (byte) 40));
 
         assertEquals(1, submitter.size());
         assertEquals(Integer.valueOf(10), submitter.get(0).get(0));
@@ -190,8 +193,8 @@ public class BytecodeInstrumentationTest {
         engine.add(SpyDefinition.newInstance().withArguments(1,2)
                 .lookFor(TCLASS1, "paramMethod2"));
         //engine.enableDebug();
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
-        TestUtil.checkForError(TestUtil.invoke(obj, "paramMethod2", true, 'A'));
+        Object obj = instantiate(engine, TCLASS1);
+        checkForError(invoke(obj, "paramMethod2", true, 'A'));
         assertEquals(1, submitter.size());
         assertEquals(true, submitter.get(0).get(0));
         assertEquals('A', submitter.get(0).get(1));
@@ -203,8 +206,8 @@ public class BytecodeInstrumentationTest {
         engine.add(SpyDefinition.newInstance().withArguments(1,2)
                 .lookFor(TCLASS1, "paramMethod3"));
         //engine.enableDebug();
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
-        TestUtil.checkForError(TestUtil.invoke(obj, "paramMethod3", 1.23, (float)2.34));
+        Object obj = instantiate(engine, TCLASS1);
+        checkForError(invoke(obj, "paramMethod3", 1.23, (float) 2.34));
         assertEquals(1, submitter.size());
         assertEquals(1.23, (Double)(submitter.get(0).get(0)), 0.01);
         assertEquals(2.34, (Float)(submitter.get(0).get(1)), 0.01);
@@ -214,8 +217,8 @@ public class BytecodeInstrumentationTest {
     @Test
     public void testCheckImmediateFlagInEntryPointOnlyProbe() throws Exception {
         engine.add(SpyDefinition.newInstance().withTime().lookFor(TCLASS1, "trivialMethod"));
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
-        TestUtil.checkForError(TestUtil.invoke(obj, "trivialMethod"));
+        Object obj = instantiate(engine, TCLASS1);
+        checkForError(invoke(obj, "trivialMethod"));
 
         assertEquals(1, submitter.size());
         assertEquals(SF_IMMEDIATE, submitter.get(0).submitFlags);
@@ -225,8 +228,8 @@ public class BytecodeInstrumentationTest {
     @Test
     public void testCheckNoFlagOnEnterAndFlushFlagOnExit() throws Exception {
         engine.add(SpyDefinition.instrument().lookFor(TCLASS1, "trivialMethod"));
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
-        TestUtil.checkForError(TestUtil.invoke(obj, "trivialMethod"));
+        Object obj = instantiate(engine, TCLASS1);
+        checkForError(invoke(obj, "trivialMethod"));
 
         assertEquals(2, submitter.size());
         assertEquals(SF_NONE, submitter.get(0).submitFlags);
@@ -237,8 +240,8 @@ public class BytecodeInstrumentationTest {
     @Test
     public void testCheckNoProbeOnEnterAndImmediateFlagOnExit() throws Exception {
         engine.add(SpyDefinition.newInstance().onExit().withTime().lookFor(TCLASS1, "trivialMethod"));
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
-        TestUtil.checkForError(TestUtil.invoke(obj, "trivialMethod"));
+        Object obj = instantiate(engine, TCLASS1);
+        checkForError(invoke(obj, "trivialMethod"));
 
         assertEquals(1, submitter.size());
         assertEquals(SF_IMMEDIATE, submitter.get(0).submitFlags);
@@ -249,8 +252,8 @@ public class BytecodeInstrumentationTest {
     public void testNoProbeOnExitButProbeOnErrorAndOnEnter() throws Exception {
         engine.add(SpyDefinition.newInstance().withTime().onError().withTime().lookFor(TCLASS1, "trivialMethod"));
         //engine.enableDebug();
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
-        TestUtil.checkForError(TestUtil.invoke(obj, "trivialMethod"));
+        Object obj = instantiate(engine, TCLASS1);
+        checkForError(invoke(obj, "trivialMethod"));
 
         assertEquals(2, submitter.size());
         assertEquals(SF_NONE, submitter.get(0).submitFlags);
@@ -263,8 +266,8 @@ public class BytecodeInstrumentationTest {
     public void testNoProbeOnErrorButProbeOnEnterAndExit() throws Exception {
         engine.add(SpyDefinition.newInstance().withTime().onExit().withTime().lookFor(TCLASS1, "errorMethod"));
 
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
-        TestUtil.invoke(obj, "errorMethod");
+        Object obj = instantiate(engine, TCLASS1);
+        invoke(obj, "errorMethod");
 
         assertEquals(2, submitter.size());
         assertEquals(SF_NONE, submitter.get(0).submitFlags);
@@ -277,11 +280,11 @@ public class BytecodeInstrumentationTest {
     public void testIfContextIsTheSameForTheSameClassLoadedTwice() throws Exception {
         engine.add(SpyDefinition.newInstance().withTime().lookFor(TCLASS1, "trivialMethod"));
 
-        Object obj1 = TestUtil.instantiate(engine, TCLASS1);
-        Object obj2 = TestUtil.instantiate(engine, TCLASS1);
+        Object obj1 = instantiate(engine, TCLASS1);
+        Object obj2 = instantiate(engine, TCLASS1);
 
-        TestUtil.checkForError(TestUtil.invoke(obj1, "trivialMethod"));
-        TestUtil.checkForError(TestUtil.invoke(obj2, "trivialMethod"));
+        checkForError(invoke(obj1, "trivialMethod"));
+        checkForError(invoke(obj2, "trivialMethod"));
 
         assertEquals(2, submitter.size());
         assertEquals("context IDs should be the same", submitter.get(0).id, submitter.get(1).id);
@@ -293,8 +296,8 @@ public class BytecodeInstrumentationTest {
         engine.add(SpyDefinition.instrument().lookFor(TCLASS1, "trivialMethod"));
         engine.add(SpyDefinition.instrument().lookFor(TCLASS1, "trivialMethod"));
 
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
-        TestUtil.checkForError(TestUtil.invoke(obj, "trivialMethod"));
+        Object obj = instantiate(engine, TCLASS1);
+        checkForError(invoke(obj, "trivialMethod"));
 
         assertEquals(4, submitter.size());
 
@@ -311,8 +314,8 @@ public class BytecodeInstrumentationTest {
         engine.add(SpyDefinition.instrument().lookFor(TCLASS1, "errorMethod"));
         engine.add(SpyDefinition.instrument().lookFor(TCLASS1, "errorMethod"));
 
-        Object obj = TestUtil.instantiate(engine, TCLASS1);
-        TestUtil.invoke(obj, "errorMethod");
+        Object obj = instantiate(engine, TCLASS1);
+        invoke(obj, "errorMethod");
 
         assertEquals(4, submitter.size());
 

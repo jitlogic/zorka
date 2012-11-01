@@ -17,20 +17,25 @@
 
 package com.jitlogic.zorka.agent.testutil;
 
+import com.jitlogic.zorka.agent.AgentGlobals;
 import com.jitlogic.zorka.agent.JavaAgent;
 import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
+import com.jitlogic.zorka.spy.InstrumentationEngine;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerBuilder;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  * @author RLE <rafal.lewczuk@gmail.com>
  */
-public class JmxTestUtil {
+public class JmxTestUtil extends ClassLoader {
 
     private MBeanServer mbs;
     private ZorkaBshAgent agent;
@@ -57,4 +62,63 @@ public class JmxTestUtil {
         return bean;
     }
 
+    public static byte[] readResource(String name) throws Exception {
+        InputStream is = JmxTestUtil.class.getResourceAsStream("/"+name);
+        byte[] buf = new byte[65536];
+        int len = is.read(buf);
+        is.close();
+        return Arrays.copyOf(buf, len);
+    }
+
+
+    public static Object instantiate(InstrumentationEngine engine, String clazzName) throws Exception {
+        String className = clazzName.replace(".", "/");
+        byte[] classBytes = readResource(className + ".class");
+        byte[] transformed = engine.transform(JmxTestUtil.getSystemClassLoader(), className, null, null, classBytes);
+
+        Class<?> clazz = new JmxTestUtil().defineClass(clazzName, transformed, 0, transformed.length);
+
+        return clazz.newInstance();
+    }
+
+
+    public static Object invoke(Object obj, String name, Object...args) throws Exception {
+        Method method = null;
+        Class<?> clazz = obj.getClass();
+
+        for (Method met : clazz.getMethods()) {
+            if (name.equals(met.getName())) {
+                method = met;
+                break;
+            }
+        }
+
+        try {
+
+            if (method != null) {
+                if (args.length == 0) {
+                    return method.invoke(obj);
+                } else {
+                    return method.invoke(obj, args);
+                }
+            }
+        } catch (Throwable e) {
+            return e;
+        }
+
+        return null;
+    }
+
+
+    public static void checkForError(Object obj) {
+        if (obj instanceof Throwable) {
+            System.err.println("Error: " + obj);
+            ((Throwable)obj).printStackTrace(System.err);
+        }
+    }
+
+    public static Object getAttr(String mbsName, String mbeanName, String attr) throws Exception{
+        MBeanServerConnection mbs = AgentGlobals.getMBeanServerRegistry().lookup(mbsName);
+        return mbs.getAttribute(new ObjectName(mbeanName), attr);
+    }
 }
