@@ -23,6 +23,8 @@ import java.util.regex.Pattern;
 
 import static org.objectweb.asm.Opcodes.*;
 
+import static com.jitlogic.zorka.spy.SpyConst.SM_NOARGS;
+
 public class SpyMatcher {
 
     private String methodSignature;
@@ -130,7 +132,7 @@ public class SpyMatcher {
         } else {
             sb.append("^\\(");
             for (String argType : argTypes) {
-                if (SpyDefinition.NO_ARGS.equals(argType)) {
+                if (SM_NOARGS.equals(argType)) {
                     moreAttrs = false;
                     break;
                 }

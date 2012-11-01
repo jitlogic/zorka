@@ -18,6 +18,7 @@
 package com.jitlogic.zorka.spy.transformers;
 
 import com.jitlogic.zorka.spy.InstrumentationContext;
+import com.jitlogic.zorka.spy.SpyRecord;
 
 import java.util.regex.Pattern;
 
@@ -37,11 +38,7 @@ public class RegexFilterTransformer implements SpyTransformer {
         this.filterOut = filterOut;
     }
 
-    public Object[] transform(Object... args) {
-        return new Object[0];  // TODO
-    }
-
-    public RegexFilterTransformer parametrize(InstrumentationContext ctx) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public SpyRecord transform(SpyRecord record) {
+        return record;
     }
 }

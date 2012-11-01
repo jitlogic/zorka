@@ -15,22 +15,25 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.collectors;
+package com.jitlogic.zorka.spy;
 
-import bsh.This;
-import com.jitlogic.zorka.spy.SpyRecord;
+public interface SpyConst {
 
-public class BshFuncCollector implements SpyCollector {
+    public static final int ON_ENTER   = 0;
+    public static final int ON_EXIT    = 1;
+    public static final int ON_ERROR   = 2;
+    public static final int ON_SUBMIT  = 3;
+    public static final int ON_COLLECT = 4;
 
-    public BshFuncCollector(String ns, String name) {
-        // TODO (is it needed after all ?)
-    }
 
-    public BshFuncCollector(This ns, String name) {
-        // TODO
-    }
+    public static final String SM_NOARGS      = "<no-args>";
+    public static final String SM_CONSTRUCTOR = "<init>";
+    public static final String SM_ANY_TYPE    = null;
+    public static final String SM_STATIC      = "<clinit>";
 
-    public void collect(SpyRecord record) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
+
+    public final static int SF_NONE = 0;
+    public final static int SF_IMMEDIATE = 1;
+    public final static int SF_FLUSH = 2;
+
 }

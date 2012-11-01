@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.objectweb.asm.Opcodes.*;
+import static com.jitlogic.zorka.spy.SpyConst.*;
 
 public class SpyMethodVisitor extends MethodVisitor {
 
@@ -62,9 +63,10 @@ public class SpyMethodVisitor extends MethodVisitor {
     @Override
     public void visitCode() {
         mv.visitCode();
+        // ON_ENTER probes are inserted here
         for (InstrumentationContext ctx : ctxs) {
-            if (ctx.getSpyDefinition().getProbes(SpyDefinition.ON_ENTER).size() > 0) {
-                stackDelta = max(stackDelta, emitProbe(SpyDefinition.ON_ENTER, ctx));
+            if (ctx.getSpyDefinition().getProbes(ON_ENTER).size() > 0) {
+                stackDelta = SpyUtil.max(stackDelta, emitProbe(ON_ENTER, ctx));
             }
         }
 
@@ -76,10 +78,12 @@ public class SpyMethodVisitor extends MethodVisitor {
     @Override
     public void visitInsn(int opcode) {
         if ((opcode >= IRETURN && opcode <= RETURN)) {
-            for (InstrumentationContext ctx : ctxs) {
-                if (getSubmitFlags(SpyDefinition.ON_ENTER, ctx.getSpyDefinition()) == MainSubmitter.SF_NONE ||
-                    ctx.getSpyDefinition().getProbes(SpyDefinition.ON_EXIT).size() > 0) {
-                    stackDelta = max(stackDelta, emitProbe(SpyDefinition.ON_EXIT, ctx));
+            // ON_EXIT probes are inserted here
+            for (int i = ctxs.size()-1; i >= 0; i--) {
+                InstrumentationContext ctx = ctxs.get(i);
+                if (getSubmitFlags(ON_ENTER, ctx.getSpyDefinition()) == SF_NONE ||
+                    ctx.getSpyDefinition().getProbes(ON_EXIT).size() > 0) {
+                    stackDelta = SpyUtil.max(stackDelta, emitProbe(ON_EXIT, ctx));
                 }
             }
         }
@@ -92,10 +96,11 @@ public class SpyMethodVisitor extends MethodVisitor {
         mv.visitLabel(l_try_to);
         mv.visitLabel(l_try_handler);
 
-        for (InstrumentationContext ctx : ctxs) {
-            if (getSubmitFlags(SpyDefinition.ON_ENTER, ctx.getSpyDefinition()) == MainSubmitter.SF_NONE ||
-                ctx.getSpyDefinition().getProbes(SpyDefinition.ON_ERROR).size() > 0) {
-                stackDelta = max(stackDelta, emitProbe(SpyDefinition.ON_ERROR, ctx));
+        for (int i = ctxs.size()-1; i >= 0; i--) {
+            InstrumentationContext ctx = ctxs.get(i);
+            if (getSubmitFlags(ON_ENTER, ctx.getSpyDefinition()) == SF_NONE ||
+                ctx.getSpyDefinition().getProbes(ON_ERROR).size() > 0) {
+                stackDelta = SpyUtil.max(stackDelta, emitProbe(ON_ERROR, ctx));
             }
         }
 
@@ -104,20 +109,15 @@ public class SpyMethodVisitor extends MethodVisitor {
     }
 
 
-    private static int max(int x, int y) {
-        return x > y ? x : y;
-    }
-
-
     public static int getSubmitFlags(int stage, SpyDefinition sdef) {
 
-        if (stage == SpyDefinition.ON_ENTER) {
-            return (sdef.getProbes(SpyDefinition.ON_EXIT).size() == 0
-                    && sdef.getProbes(SpyDefinition.ON_ERROR).size() == 0)
-                    ? MainSubmitter.SF_IMMEDIATE : MainSubmitter.SF_NONE;
+        if (stage == ON_ENTER) {
+            return (sdef.getProbes(ON_EXIT).size() == 0
+                    && sdef.getProbes(ON_ERROR).size() == 0)
+                    ? SF_IMMEDIATE : SF_NONE;
         } else {
-            return (sdef.getProbes(SpyDefinition.ON_ENTER).size() == 0)
-                    ? MainSubmitter.SF_IMMEDIATE : MainSubmitter.SF_FLUSH;
+            return (sdef.getProbes(ON_ENTER).size() == 0)
+                    ? SF_IMMEDIATE : SF_FLUSH;
         }
     }
 
@@ -143,7 +143,7 @@ public class SpyMethodVisitor extends MethodVisitor {
                 SpyProbeElement element = probeElements.get(i);
                 mv.visitInsn(DUP);
                 emitLoadInt(i);
-                sd = max(sd, emitProbeElement(stage, 0, probeElements.get(i)) + 6);
+                sd = SpyUtil.max(sd, emitProbeElement(stage, 0, probeElements.get(i)) + 6);
                 mv.visitInsn(AASTORE);
             }
         } else {
@@ -174,7 +174,7 @@ public class SpyMethodVisitor extends MethodVisitor {
             case SpyProbeElement.FETCH_RET_VAL:
                 throw new NotImplementedException();
             default:
-                if (stage == SpyDefinition.ON_ENTER && element.getArgType() == 0 && "<init>".equals(methodName)) {
+                if (stage == ON_ENTER && element.getArgType() == 0 && "<init>".equals(methodName)) {
                     // TODO log warning
                     mv.visitInsn(ACONST_NULL);
                 } else if (element.getArgType() >= 0) {

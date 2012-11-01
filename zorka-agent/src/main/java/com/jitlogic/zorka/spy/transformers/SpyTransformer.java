@@ -17,8 +17,8 @@
 
 package com.jitlogic.zorka.spy.transformers;
 
-import com.jitlogic.zorka.spy.TemplateObject;
+import com.jitlogic.zorka.spy.SpyRecord;
 
-public interface SpyTransformer extends TemplateObject {
-    public Object[] transform(Object...args);
+public interface SpyTransformer {
+    public SpyRecord transform(SpyRecord record);
 }

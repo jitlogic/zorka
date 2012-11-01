@@ -18,6 +18,10 @@
 
 package com.jitlogic.zorka.spy.collectors;
 
+import com.jitlogic.zorka.spy.SpyRecord;
+
 public interface SpyCollector {
+
+    public void collect(SpyRecord record);
 
 }

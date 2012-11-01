@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.spy.transformers;
 
 import com.jitlogic.zorka.spy.InstrumentationContext;
+import com.jitlogic.zorka.spy.SpyRecord;
 
 public class MethodCallingTransformer implements SpyTransformer {
 
@@ -24,11 +25,7 @@ public class MethodCallingTransformer implements SpyTransformer {
         // TODO
     }
 
-    public Object[] transform(Object... args) {
-        return new Object[0];  // TODO
-    }
-
-    public MethodCallingTransformer parametrize(InstrumentationContext ctx) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public SpyRecord transform(SpyRecord record) {
+        return record;
     }
 }

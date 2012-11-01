@@ -53,4 +53,22 @@ public class InstrumentationContext {
         return spyDefinition;
     }
 
+    @Override
+    public int hashCode() {
+        return spyDefinition.hashCode() + className.hashCode() +
+            methodName.hashCode() + methodDesc.hashCode() + access;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof InstrumentationContext)) {
+            return false;
+        }
+
+        InstrumentationContext ic = (InstrumentationContext)obj;
+
+        return spyDefinition.equals(ic.spyDefinition) &&
+            className.equals(ic.className) && methodName.equals(ic.methodName) &&
+            methodDesc.equals(ic.methodDesc) && access == ic.access;
+    }
 }

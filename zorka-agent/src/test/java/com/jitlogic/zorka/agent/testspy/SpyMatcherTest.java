@@ -17,9 +17,10 @@
 package com.jitlogic.zorka.agent.testspy;
 
 import com.jitlogic.zorka.spy.SpyMatcher;
-import com.jitlogic.zorka.spy.SpyDefinition;
 import org.junit.Assert;
 import org.junit.Test;
+
+import static com.jitlogic.zorka.spy.SpyConst.*;
 
 public class SpyMatcherTest {
 
@@ -45,7 +46,7 @@ public class SpyMatcherTest {
     public void testClassMethodMatch() {
         SpyMatcher cm = new SpyMatcher("test.*", "get*", null, 0xFF);
 
-        Assert.assertTrue(cm.matches("test.SomeClass", "get"));
+        Assert.assertTrue(cm.matches("test.SomeClass", "getVal"));
         Assert.assertFalse(cm.matches("test.SomeClass", "setVal"));
     }
 
@@ -109,7 +110,7 @@ public class SpyMatcherTest {
 
     @Test
     public void testClassMatchWithNoArgsMarker() {
-        SpyMatcher cm = new SpyMatcher("test.*", "frobnicate", null, 0xFF, SpyDefinition.NO_ARGS);
+        SpyMatcher cm = new SpyMatcher("test.*", "frobnicate", null, 0xFF, SM_NOARGS);
 
         Assert.assertTrue(cm.matches("test.SomeClass", "frobnicate", "()V"));
         Assert.assertFalse(cm.matches("test.SomeClass", "frobnicate", "(I)V"));
@@ -117,7 +118,7 @@ public class SpyMatcherTest {
 
     @Test
     public void testMatchWithMoreAttributesAndNoArgsFlag() {
-        SpyMatcher cm = new SpyMatcher("test.*", "frobnicate", null, 0xFF, "int", SpyDefinition.NO_ARGS);
+        SpyMatcher cm = new SpyMatcher("test.*", "frobnicate", null, 0xFF, "int", SM_NOARGS);
 
         Assert.assertTrue(cm.matches("test.SomeClass", "frobnicate", "(I)V"));
         Assert.assertFalse(cm.matches("test.SomeClass", "frobnicate", "(II)V"));

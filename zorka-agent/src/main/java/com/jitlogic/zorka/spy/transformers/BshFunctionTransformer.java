@@ -18,6 +18,7 @@ package com.jitlogic.zorka.spy.transformers;
 
 import bsh.This;
 import com.jitlogic.zorka.spy.InstrumentationContext;
+import com.jitlogic.zorka.spy.SpyRecord;
 
 public class BshFunctionTransformer implements SpyTransformer {
 
@@ -25,11 +26,7 @@ public class BshFunctionTransformer implements SpyTransformer {
 
     }
 
-    public Object[] transform(Object... args) {
-        return new Object[0];  // TODO
-    }
-
-    public BshFunctionTransformer parametrize(InstrumentationContext ctx) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public SpyRecord transform(SpyRecord record) {
+        return record;
     }
 }

@@ -15,22 +15,27 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.collectors;
+package com.jitlogic.zorka.agent.testspy;
 
-import bsh.This;
 import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.spy.collectors.SpyCollector;
 
-public class BshFuncCollector implements SpyCollector {
+import java.util.ArrayList;
+import java.util.List;
 
-    public BshFuncCollector(String ns, String name) {
-        // TODO (is it needed after all ?)
-    }
+public class TestCollector implements SpyCollector {
 
-    public BshFuncCollector(This ns, String name) {
-        // TODO
-    }
+    private List<SpyRecord> records = new ArrayList<SpyRecord>();
 
     public void collect(SpyRecord record) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        records.add(record);
+    }
+
+    public int size() {
+        return records.size();
+    }
+
+    public SpyRecord get(int i) {
+        return records.get(i);
     }
 }

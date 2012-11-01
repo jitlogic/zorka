@@ -17,10 +17,15 @@
 
 package com.jitlogic.zorka.spy.collectors;
 
+import com.jitlogic.zorka.spy.SpyRecord;
+
 public class ZorkaStatsCollector implements SpyCollector {
 
     public ZorkaStatsCollector(String mbsName, String beanName, String attrName, String keyExpr) {
         // TODO
     }
 
+    public void collect(SpyRecord record) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

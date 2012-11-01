@@ -16,7 +16,6 @@
  */
 package com.jitlogic.zorka.agent.testspy;
 
-import com.jitlogic.zorka.spy.InstrumentationEngine;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.vmsci.MainSubmitter;
 import org.junit.After;
@@ -24,6 +23,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+
+import static com.jitlogic.zorka.spy.SpyConst.*;
 
 public class BytecodeInstrumentationTest {
 
@@ -125,7 +126,7 @@ public class BytecodeInstrumentationTest {
 
     @Test
     public void testInstrumentConstructorWithTime() throws Exception {
-        engine.add(SpyDefinition.instrument().lookFor(TCLASS1, SpyDefinition.CONSTRUCTOR));
+        engine.add(SpyDefinition.instrument().lookFor(TCLASS1, SM_CONSTRUCTOR));
         //engine.enableDebug();
         Object obj = TestUtil.instantiate(engine, TCLASS1);
 
@@ -135,7 +136,7 @@ public class BytecodeInstrumentationTest {
 
     @Test
     public void testInstrumentConstructorWithSelfRef() throws Exception {
-        engine.add(SpyDefinition.newInstance().onExit().withArguments(0).lookFor(TCLASS1, SpyDefinition.CONSTRUCTOR));
+        engine.add(SpyDefinition.newInstance().onExit().withArguments(0).lookFor(TCLASS1, SM_CONSTRUCTOR));
         //engine.enableDebug();
         Object obj = TestUtil.instantiate(engine, TCLASS1);
 
@@ -146,7 +147,7 @@ public class BytecodeInstrumentationTest {
 
     @Test
     public void testInstrumentConstructorWithInvalidSelfRefOnBeginning() throws Exception {
-        engine.add(SpyDefinition.newInstance().withArguments(0).lookFor(TCLASS1, SpyDefinition.CONSTRUCTOR));
+        engine.add(SpyDefinition.newInstance().withArguments(0).lookFor(TCLASS1, SM_CONSTRUCTOR));
         //engine.enableDebug();
         Object obj = TestUtil.instantiate(engine, TCLASS1);
 
@@ -217,7 +218,7 @@ public class BytecodeInstrumentationTest {
         TestUtil.checkForError(TestUtil.invoke(obj, "trivialMethod"));
 
         assertEquals(1, submitter.size());
-        assertEquals(MainSubmitter.SF_IMMEDIATE, submitter.get(0).submitFlags);
+        assertEquals(SF_IMMEDIATE, submitter.get(0).submitFlags);
     }
 
 
@@ -228,8 +229,8 @@ public class BytecodeInstrumentationTest {
         TestUtil.checkForError(TestUtil.invoke(obj, "trivialMethod"));
 
         assertEquals(2, submitter.size());
-        assertEquals(MainSubmitter.SF_NONE, submitter.get(0).submitFlags);
-        assertEquals(MainSubmitter.SF_FLUSH, submitter.get(1).submitFlags);
+        assertEquals(SF_NONE, submitter.get(0).submitFlags);
+        assertEquals(SF_FLUSH, submitter.get(1).submitFlags);
     }
 
 
@@ -240,7 +241,7 @@ public class BytecodeInstrumentationTest {
         TestUtil.checkForError(TestUtil.invoke(obj, "trivialMethod"));
 
         assertEquals(1, submitter.size());
-        assertEquals(MainSubmitter.SF_IMMEDIATE, submitter.get(0).submitFlags);
+        assertEquals(SF_IMMEDIATE, submitter.get(0).submitFlags);
     }
 
 
@@ -252,8 +253,8 @@ public class BytecodeInstrumentationTest {
         TestUtil.checkForError(TestUtil.invoke(obj, "trivialMethod"));
 
         assertEquals(2, submitter.size());
-        assertEquals(MainSubmitter.SF_NONE, submitter.get(0).submitFlags);
-        assertEquals(MainSubmitter.SF_FLUSH, submitter.get(1).submitFlags);
+        assertEquals(SF_NONE, submitter.get(0).submitFlags);
+        assertEquals(SF_FLUSH, submitter.get(1).submitFlags);
         assertTrue("should pass no values", submitter.get(1).nullVals());
     }
 
@@ -266,12 +267,61 @@ public class BytecodeInstrumentationTest {
         TestUtil.invoke(obj, "errorMethod");
 
         assertEquals(2, submitter.size());
-        assertEquals(MainSubmitter.SF_NONE, submitter.get(0).submitFlags);
-        assertEquals(MainSubmitter.SF_FLUSH, submitter.get(1).submitFlags);
+        assertEquals(SF_NONE, submitter.get(0).submitFlags);
+        assertEquals(SF_FLUSH, submitter.get(1).submitFlags);
         assertTrue("should pass no values", submitter.get(1).nullVals());
     }
 
 
+    @Test
+    public void testIfContextIsTheSameForTheSameClassLoadedTwice() throws Exception {
+        engine.add(SpyDefinition.newInstance().withTime().lookFor(TCLASS1, "trivialMethod"));
+
+        Object obj1 = TestUtil.instantiate(engine, TCLASS1);
+        Object obj2 = TestUtil.instantiate(engine, TCLASS1);
+
+        TestUtil.checkForError(TestUtil.invoke(obj1, "trivialMethod"));
+        TestUtil.checkForError(TestUtil.invoke(obj2, "trivialMethod"));
+
+        assertEquals(2, submitter.size());
+        assertEquals("context IDs should be the same", submitter.get(0).id, submitter.get(1).id);
+    }
+
+
+    @Test
+    public void testSubmissionOrderWhenMoreThanOneProbeInOneMethodRet() throws Exception {
+        engine.add(SpyDefinition.instrument().lookFor(TCLASS1, "trivialMethod"));
+        engine.add(SpyDefinition.instrument().lookFor(TCLASS1, "trivialMethod"));
+
+        Object obj = TestUtil.instantiate(engine, TCLASS1);
+        TestUtil.checkForError(TestUtil.invoke(obj, "trivialMethod"));
+
+        assertEquals(4, submitter.size());
+
+        assertEquals("first and last submit should have the same context ID:",
+                submitter.get(0).id, submitter.get(3).id);
+
+        assertEquals("second and third submit should have the same context ID:",
+                submitter.get(1).id, submitter.get(2).id);
+    }
+
+
+    @Test
+    public void testSubmissionOrderWhenMoreThanOneProbeInOneMethodErr() throws Exception {
+        engine.add(SpyDefinition.instrument().lookFor(TCLASS1, "errorMethod"));
+        engine.add(SpyDefinition.instrument().lookFor(TCLASS1, "errorMethod"));
+
+        Object obj = TestUtil.instantiate(engine, TCLASS1);
+        TestUtil.invoke(obj, "errorMethod");
+
+        assertEquals(4, submitter.size());
+
+        assertEquals("first and last submit should have the same context ID:",
+                submitter.get(0).id, submitter.get(3).id);
+
+        assertEquals("second and third submit should have the same context ID:",
+                submitter.get(1).id, submitter.get(2).id);
+    }
 
     // TODO array parameters (arrays of simple types)
 

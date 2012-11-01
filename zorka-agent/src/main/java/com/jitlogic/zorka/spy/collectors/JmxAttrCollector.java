@@ -17,7 +17,7 @@
 
 package com.jitlogic.zorka.spy.collectors;
 
-import com.jitlogic.zorka.vmsci.SpySubmitter;
+import com.jitlogic.zorka.spy.SpyRecord;
 
 public class JmxAttrCollector implements SpyCollector {
 
@@ -29,4 +29,7 @@ public class JmxAttrCollector implements SpyCollector {
 
     }
 
+    public void collect(SpyRecord record) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

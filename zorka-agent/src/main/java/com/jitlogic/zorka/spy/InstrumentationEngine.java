@@ -39,22 +39,21 @@ public class InstrumentationEngine implements ClassFileTransformer {
 
     private List<SpyDefinition> sdefs = new ArrayList<SpyDefinition>();
 
-    private int nextCtxId = 1;
+    private int nextId = 1;
     private Map<Integer, InstrumentationContext> ctxById = new ConcurrentHashMap<Integer, InstrumentationContext>();
-    private Map<InstrumentationContext, InstrumentationContext> ctxInstances
-                = new HashMap<InstrumentationContext, InstrumentationContext>();
+    private Map<InstrumentationContext, InstrumentationContext> ctxInstances = new HashMap<InstrumentationContext, InstrumentationContext>();
 
 
-    public InstrumentationContext getContext(long id) {
+    public InstrumentationContext getContext(int id) {
         return ctxById.get(id);
     }
 
 
-    public synchronized InstrumentationContext lookupContext(InstrumentationContext keyCtx) {
+    public synchronized InstrumentationContext lookup(InstrumentationContext keyCtx) {
         InstrumentationContext ctx = ctxInstances.get(keyCtx);
         if (ctx == null) {
             ctx = keyCtx;
-            ctx.setId(nextCtxId++);
+            ctx.setId(nextId++);
             ctxInstances.put(ctx, ctx);
             ctxById.put(ctx.getId(), ctx);
         }
@@ -62,8 +61,9 @@ public class InstrumentationEngine implements ClassFileTransformer {
     }
 
 
-    public void add(SpyDefinition sdef) {
+    public SpyDefinition add(SpyDefinition sdef) {
         sdefs.add(sdef);
+        return sdef;
     }
 
 

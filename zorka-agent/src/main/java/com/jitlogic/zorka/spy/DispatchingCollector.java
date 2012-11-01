@@ -14,14 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.jitlogic.zorka.spy;
 
-/**
- * All objects capable of
- */
-public interface TemplateObject {
+import com.jitlogic.zorka.spy.collectors.SpyCollector;
+import static com.jitlogic.zorka.spy.SpyConst.*;
 
-    public <T extends TemplateObject> T parametrize(InstrumentationContext ctx);
+public class DispatchingCollector implements SpyCollector {
 
+    public synchronized  void collect(SpyRecord record) {
+
+        InstrumentationContext ctx = record.getContext();
+
+        SpyDefinition sdef = ctx.getSpyDefinition();
+
+        if (null == (record = SpyUtil.transform(ON_COLLECT, sdef, record))) {
+            return;
+        }
+
+        for (SpyCollector collector : sdef.getCollectors()) {
+            collector.collect(record);
+        }
+    }
 
 }

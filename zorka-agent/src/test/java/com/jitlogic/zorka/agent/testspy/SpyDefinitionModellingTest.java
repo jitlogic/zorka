@@ -27,6 +27,8 @@ import java.util.List;
 
 import static junit.framework.Assert.*;
 
+import static com.jitlogic.zorka.spy.SpyConst.*;
+
 /**
  * This is an API modelling exercise rather then a real unit test.
  *
@@ -46,11 +48,11 @@ public class SpyDefinitionModellingTest {
         assertNotNull(sdef.getMatchers());
         assertEquals(0, sdef.getMatchers().size());
 
-        assertNotNull(sdef.getProbes(SpyDefinition.ON_ENTER));
-        assertEquals(0, sdef.getProbes(SpyDefinition.ON_ENTER).size());
+        assertNotNull(sdef.getProbes(ON_ENTER));
+        assertEquals(0, sdef.getProbes(ON_ENTER).size());
 
-        assertNotNull(sdef.getTransformers(SpyDefinition.ON_EXIT));
-        assertEquals(0, sdef.getTransformers(SpyDefinition.ON_EXIT).size());
+        assertNotNull(sdef.getTransformers(ON_EXIT));
+        assertEquals(0, sdef.getTransformers(ON_EXIT).size());
     }
 
 
@@ -58,16 +60,16 @@ public class SpyDefinitionModellingTest {
     public void testDefineTrivialInstrumentingDef() throws Exception {
         SpyDefinition sdef = SpyDefinition.instrument();
 
-        List<SpyProbeElement> probes1 = sdef.getProbes(SpyDefinition.ON_ENTER);
+        List<SpyProbeElement> probes1 = sdef.getProbes(ON_ENTER);
         assertEquals(1, probes1.size());
         assertEquals(SpyProbeElement.FETCH_TIME, probes1.get(0).getArgType());
 
 
-        List<SpyProbeElement> probes2 = sdef.getProbes(SpyDefinition.ON_EXIT);
+        List<SpyProbeElement> probes2 = sdef.getProbes(ON_EXIT);
         assertEquals(1, probes2.size());
         assertEquals(SpyProbeElement.FETCH_TIME, probes2.get(0).getArgType());
 
-        List<SpyProbeElement> probes3 = sdef.getProbes(SpyDefinition.ON_ERROR);
+        List<SpyProbeElement> probes3 = sdef.getProbes(ON_ERROR);
         assertEquals(1, probes3.size());
         assertEquals(SpyProbeElement.FETCH_TIME, probes3.get(0).getArgType());
     }
@@ -77,7 +79,7 @@ public class SpyDefinitionModellingTest {
     public void testCheckProperStateInTrivialInstrumentationAndTryExtension() throws Exception {
         SpyDefinition sdef = SpyDefinition.instrument().withClass("com.jitlogic.test.SomeClass");
 
-        List<SpyProbeElement> probeElements = sdef.getProbes(SpyDefinition.ON_ENTER);
+        List<SpyProbeElement> probeElements = sdef.getProbes(ON_ENTER);
         assertEquals(2, probeElements.size());
         assertEquals(SpyProbeElement.FETCH_CLASS, probeElements.get(1).getArgType());
         assertEquals("com.jitlogic.test.SomeClass", probeElements.get(1).getClassName());
@@ -92,10 +94,10 @@ public class SpyDefinitionModellingTest {
         SpyDefinition sdef1 = SpyDefinition.instrument();
 
         SpyDefinition sdef2 = sdef1.onExit().withError();
-        List<SpyProbeElement> probes2 = sdef2.getProbes(SpyDefinition.ON_EXIT);
+        List<SpyProbeElement> probes2 = sdef2.getProbes(ON_EXIT);
 
-        assertEquals(1, sdef1.getProbes(SpyDefinition.ON_EXIT).size());
-        assertEquals(2, sdef2.getProbes(SpyDefinition.ON_EXIT).size());
+        assertEquals(1, sdef1.getProbes(ON_EXIT).size());
+        assertEquals(2, sdef2.getProbes(ON_EXIT).size());
     }
 
 
@@ -107,7 +109,7 @@ public class SpyDefinitionModellingTest {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor(SpyMatcher.DEFAULT_FILTER,
                 "com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
-                SpyDefinition.ANY_TYPE, SpyDefinition.NO_ARGS)
+                    SM_ANY_TYPE, SM_NOARGS)
                 .toStats("java", "some.app:type=ZorkaStats,name=SomeClass", "stats");
         assertEquals(1, sdef.getMatchers().size());
     }
@@ -243,7 +245,7 @@ public class SpyDefinitionModellingTest {
      */
     public void testExposeSomeStaticMethodsOfAnObject() {
         SpyDefinition sdef =
-            SpyDefinition.newInstance().once().lookFor("some.package.SomeBean", SpyDefinition.CONSTRUCTOR)
+            SpyDefinition.newInstance().once().lookFor("some.package.SomeBean", SM_CONSTRUCTOR)
                 .withArguments(0)
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "count", "getCount()")
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "backlog", "getBacklog()")
@@ -258,8 +260,8 @@ public class SpyDefinitionModellingTest {
      */
     //@Test
     public void testRegisterJBossMBeanServer() {
-        SpyDefinition.newInstance().once().lookFor("org.jboss.mx.MBeanServerImpl", SpyDefinition.CONSTRUCTOR)
-           .withFormat(0,"jboss").withArguments(0).withThread()
+        SpyDefinition.newInstance().once().lookFor("org.jboss.mx.MBeanServerImpl", SM_CONSTRUCTOR)
+           .withFormat(0, "jboss").withArguments(0).withThread()
            .toBsh("zorka", "registerMBeanServer");
     }
 
@@ -270,7 +272,7 @@ public class SpyDefinitionModellingTest {
     //@Test
     public void testExposeSomeHashMapAsMBeanAttribute() {
         SpyDefinition sdef =
-            SpyDefinition.newInstance().once().lookFor("some.package.SingletonBean", SpyDefinition.CONSTRUCTOR)
+            SpyDefinition.newInstance().once().lookFor("some.package.SingletonBean", SM_CONSTRUCTOR)
                 .withArguments(0).get(0, "someMap")
                 .toGetter("java", "SomeApp:type=SingletonType", "map");
     }

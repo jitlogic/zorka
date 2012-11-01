@@ -15,22 +15,28 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.collectors;
+package com.jitlogic.zorka.spy;
 
-import bsh.This;
-import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.spy.transformers.SpyTransformer;
 
-public class BshFuncCollector implements SpyCollector {
+import java.util.List;
 
-    public BshFuncCollector(String ns, String name) {
-        // TODO (is it needed after all ?)
+public class SpyUtil {
+
+    public static int max(int x, int y) {
+        return x > y ? x : y;
     }
 
-    public BshFuncCollector(This ns, String name) {
-        // TODO
+    public static SpyRecord transform(int stage, SpyDefinition sdef, SpyRecord record) {
+        List<SpyTransformer> transformers = sdef.getTransformers(stage);
+
+        for (SpyTransformer transformer : transformers) {
+            if (null == (record = transformer.transform(record))) {
+                break;
+            }
+        }
+
+        return record;
     }
 
-    public void collect(SpyRecord record) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 }

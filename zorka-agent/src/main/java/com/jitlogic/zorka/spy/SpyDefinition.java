@@ -23,6 +23,7 @@ import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.transformers.*;
 
 import java.util.*;
+import static com.jitlogic.zorka.spy.SpyConst.*;
 
 /**
  * This class defines mini-DSL for configuring instrumentation. Language allows for
@@ -35,18 +36,6 @@ import java.util.*;
  */
 public class SpyDefinition {
 
-    public static final String NO_ARGS     = "<no-args>";
-    public static final String CONSTRUCTOR = "<init>";
-    public static final String ANY_TYPE    = null;
-    public static final String STATIC      = "<clinit>";
-
-    public static final int ON_ENTER   = 0;
-    public static final int ON_EXIT    = 1;
-    public static final int ON_ERROR   = 2;
-    public static final int ON_SUBMIT  = 3;
-    public static final int ON_COLLECT = 4;
-
-
     private static final List<SpyTransformer> EMPTY_XF =
             Collections.unmodifiableList(Arrays.asList(new SpyTransformer[0]));
     private static final List<SpyCollector> EMPTY_DC =
@@ -55,7 +44,6 @@ public class SpyDefinition {
             Collections.unmodifiableList(Arrays.asList(new SpyMatcher[0]));
     private static final List<SpyProbeElement> EMPTY_AF =
             Collections.unmodifiableList(Arrays.asList(new SpyProbeElement[0]));
-
 
     private List<SpyProbeElement>[] probes;
     private List<SpyTransformer>[] transformers;
