@@ -1,5 +1,6 @@
 package com.jitlogic.zorka.agent.unittest;
 
+import com.jitlogic.zorka.agent.AgentGlobals;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaLib;
@@ -29,7 +30,8 @@ public class ZabbixDiscoveryTest {
 
     @Before
     public void setUp() {
-        bshAgent = new ZorkaBshAgent(new TestExecutor(), new MBeanServerRegistry(true));
+        AgentGlobals.setMBeanServerRegistry(new MBeanServerRegistry(true));
+        bshAgent = new ZorkaBshAgent(new TestExecutor());
         ZabbixLib zl = new ZabbixLib(bshAgent, bshAgent.getZorkaLib());
         zorkaLib = bshAgent.getZorkaLib();
         zabbixLib = new ZabbixLib(bshAgent, zorkaLib);
@@ -41,6 +43,7 @@ public class ZabbixDiscoveryTest {
     @After
     public void tearDown() {
         jmxTestUtil.tearDown();
+        AgentGlobals.setMBeanServerRegistry(null);
     }
 
 

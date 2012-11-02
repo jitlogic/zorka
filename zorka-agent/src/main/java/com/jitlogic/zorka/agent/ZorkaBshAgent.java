@@ -42,16 +42,11 @@ public class ZorkaBshAgent implements ZorkaService {
 	private Executor executor;
 	private URL configDir = null;
 
-    private MBeanServerRegistry mBeanServerRegistry;
-
-
-	public ZorkaBshAgent(Executor executor, MBeanServerRegistry mBeanServerRegistry) {
+	public ZorkaBshAgent(Executor executor) {
 		this.interpreter = new Interpreter();
 		this.executor = executor;
-        this.mBeanServerRegistry = mBeanServerRegistry;
-		
-		zorkaLib = new ZorkaLib(this, mBeanServerRegistry);
-		//zorkaLib.addServer("java", ManagementFactory.getPlatformMBeanServer());
+
+		zorkaLib = new ZorkaLib(this);
 		svcAdd(zorkaLib);
 
         installModule("zorka", zorkaLib);
@@ -226,8 +221,4 @@ public class ZorkaBshAgent implements ZorkaService {
 		}
 	}
 
-
-    public MBeanServerRegistry getMBeanServerRegistry() {
-        return mBeanServerRegistry;
-    }
 }

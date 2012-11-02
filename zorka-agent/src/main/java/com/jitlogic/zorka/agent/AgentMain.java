@@ -15,6 +15,7 @@ public class AgentMain {
     private static String homeDir;
     private static ClassLoader systemClassLoader;
     private static AgentClassLoader zorkaClassLoader;
+    private static MBeanServerRegistry mBeanServerRegistry;
     public static JavaAgent agent;
 
     public static void premain(String args, Instrumentation instr) {
@@ -30,7 +31,12 @@ public class AgentMain {
     }
 
     private static void startZorkaAgent() {
+
         Thread.currentThread().setContextClassLoader(zorkaClassLoader);
+
+        mBeanServerRegistry = new MBeanServerRegistry(
+            "yes".equalsIgnoreCase(ZorkaConfig.get("zorka.mbs.autoregister", "yes")));
+        AgentGlobals.setMBeanServerRegistry(mBeanServerRegistry);
 
         try {
             Class<?> clazz = zorkaClassLoader.loadClass("com.jitlogic.zorka.agent.JavaAgent");
@@ -38,10 +44,10 @@ public class AgentMain {
             agent.start();
         } catch (Exception e) {
             throw new RuntimeException("Error starting up agent.", e);
-        } finally {
         }
 
         Thread.currentThread().setContextClassLoader(systemClassLoader);
+
     }
 
     private static void setupClassLoader() {
