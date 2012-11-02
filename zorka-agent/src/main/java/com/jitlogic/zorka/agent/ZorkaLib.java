@@ -338,20 +338,6 @@ public class ZorkaLib implements ZorkaService {
         return ZorkaLogger.getLog(tag);
     }
 
-    public void addJars(String...paths) {
-        for (String path : paths) {
-            File f = new File(path);
-            if (!f.canRead() || !f.canRead()) {
-                throw new RuntimeException("Cannot open jar file: '" + path + "'");
-            }
-            try {
-                AgentMain.addJarURL(f.toURI().toURL());
-            } catch (MalformedURLException e) {
-                throw new RuntimeException("Error converting URL '" + path + "'");
-            }
-        }
-    }
-
 
     public void reload(String mask) {
         agent.loadScriptDir(ZorkaConfig.getConfDir(),

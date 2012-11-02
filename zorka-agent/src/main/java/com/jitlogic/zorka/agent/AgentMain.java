@@ -13,8 +13,6 @@ import java.net.URL;
 public class AgentMain {
 
     private static String homeDir;
-    private static ClassLoader systemClassLoader;
-    private static AgentClassLoader zorkaClassLoader;
     private static MBeanServerRegistry mBeanServerRegistry;
     public static JavaAgent agent;
 
@@ -22,7 +20,6 @@ public class AgentMain {
         String[] argv = args.split(",");
         homeDir = argv[0];
 
-        setupClassLoader();
         startZorkaAgent();
 
         if (agent != null && agent.getSpyTransformer() != null) {
@@ -32,55 +29,17 @@ public class AgentMain {
 
     private static void startZorkaAgent() {
 
-        Thread.currentThread().setContextClassLoader(zorkaClassLoader);
 
         mBeanServerRegistry = new MBeanServerRegistry(
             "yes".equalsIgnoreCase(ZorkaConfig.get("zorka.mbs.autoregister", "yes")));
         AgentGlobals.setMBeanServerRegistry(mBeanServerRegistry);
 
-        try {
-            Class<?> clazz = zorkaClassLoader.loadClass("com.jitlogic.zorka.agent.JavaAgent");
-            agent = (JavaAgent)clazz.newInstance();
-            agent.start();
-        } catch (Exception e) {
-            throw new RuntimeException("Error starting up agent.", e);
-        }
-
-        Thread.currentThread().setContextClassLoader(systemClassLoader);
-
-    }
-
-    private static void setupClassLoader() {
-        File lib = new File(homeDir + File.separator + "lib");
-
-        if (!lib.isDirectory()) {
-            throw new RuntimeException("" + lib.getPath() + " should exist and be a directory !");
-        }
-
-        File[] libs = lib.listFiles((FileFilter)null);
-        URL[] urls = new URL[libs.length];
-
-        try {
-            for (int i = 0; i < libs.length; i++) {
-                urls[i] = libs[i].toURI().toURL();
-            }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Malformed URL for Zorka component", e);
-        }
-
-        systemClassLoader = Thread.currentThread().getContextClassLoader();
-        zorkaClassLoader = new AgentClassLoader(urls, systemClassLoader);
-        Thread.currentThread().setContextClassLoader(systemClassLoader);
+        agent = new JavaAgent();
+        agent.start();
     }
 
     public static String getHomeDir() {
         return homeDir;
     }
-
-    public static void addJarURL(URL url) {
-        if (zorkaClassLoader != null)
-            zorkaClassLoader.addURL(url);
-    }
-
 
 }

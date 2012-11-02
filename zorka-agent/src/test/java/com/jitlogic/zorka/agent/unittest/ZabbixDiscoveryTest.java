@@ -32,7 +32,6 @@ public class ZabbixDiscoveryTest {
     public void setUp() {
         AgentGlobals.setMBeanServerRegistry(new MBeanServerRegistry(true));
         bshAgent = new ZorkaBshAgent(new TestExecutor());
-        ZabbixLib zl = new ZabbixLib(bshAgent, bshAgent.getZorkaLib());
         zorkaLib = bshAgent.getZorkaLib();
         zabbixLib = new ZabbixLib(bshAgent, zorkaLib);
         jmxTestUtil.setUp(bshAgent);

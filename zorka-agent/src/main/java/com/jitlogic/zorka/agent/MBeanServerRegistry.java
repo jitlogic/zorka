@@ -105,7 +105,7 @@ public class MBeanServerRegistry {
 
 
     public <T> T getOrRegisterBeanAttr(String name, String bean, String attr, T obj, String desc) {
-        MBeanServerConnection mbs = conns.get(name);
+        MBeanServerConnection mbs = lookup(name);
 
         // TODO switch class loader if needed
 
