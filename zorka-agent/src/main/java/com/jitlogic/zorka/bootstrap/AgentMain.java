@@ -3,10 +3,8 @@ package com.jitlogic.zorka.bootstrap;
 import java.io.File;
 import java.io.FileFilter;
 import java.lang.instrument.Instrumentation;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 
 /**
  * This class is responsible for bootstrapping zorka agent.

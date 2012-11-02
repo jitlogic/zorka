@@ -27,9 +27,7 @@
 
 
     <modules>
-        <module>zorka-bootstrap</module>
         <module>zorka-agent</module>
-        <module>zorka-jboss5</module>
     </modules>
 
 </project>

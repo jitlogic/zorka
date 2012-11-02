@@ -19,7 +19,6 @@ package com.jitlogic.zorka.agent;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
