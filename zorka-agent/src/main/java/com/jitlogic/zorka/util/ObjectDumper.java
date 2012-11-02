@@ -40,7 +40,7 @@ import javax.management.openmbean.TabularData;
 
 public class ObjectDumper {
 
-    private final static ZorkaLog log = ZorkaLogger.getLog(ObjectDumper.class);
+    private final ZorkaLog log = ZorkaLogger.getLog(ObjectDumper.class);
 
     private static final Map<String,Integer> filteredClasses;
 	private static final Map<String,Integer> filteredMethods;
@@ -179,7 +179,7 @@ public class ObjectDumper {
                 serialize(lead+LEAD, o, sb, depth+1);
             }
         } catch (Exception e) {
-            log.error("Error serializing java stats: ", e);
+            //log.error("Error serializing java stats: ", e);  TODO make this non-static
         }
     }
 

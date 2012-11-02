@@ -22,12 +22,13 @@ import java.util.concurrent.Executor;
 
 import com.jitlogic.zorka.agent.zabbix.ZabbixAgent;
 import com.jitlogic.zorka.bootstrap.Agent;
-import com.jitlogic.zorka.spy.MainCollector;
-import com.jitlogic.zorka.spy.ZorkaSpyLib;
+import com.jitlogic.zorka.spy.SpyInstance;
+import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
 import com.jitlogic.zorka.util.ZorkaConfig;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.vmsci.MainSubmitter;
 
 import javax.management.MBeanServerConnection;
 
@@ -45,13 +46,17 @@ public class JavaAgent implements Agent {
 	private Executor executor = null;
 	private ZorkaBshAgent zorkaAgent = null;
 	private ZabbixAgent zabbixAgent = null;
-    private ZorkaSpyLib spyLib = null;
+
+    private SpyLib spyLib = null;
+    private SpyInstance spyInstance = null;
 
     private MBeanServerRegistry mBeanServerRegistry;
 
     public JavaAgent() {
         mBeanServerRegistry = new MBeanServerRegistry(
             "yes".equals(ZorkaConfig.get("zorka.mbs.autoregister", "yes")));
+
+        AgentGlobals.setMBeanServerRegistry(mBeanServerRegistry);
 
         try {
             requestTimeout = Long.parseLong(ZorkaConfig.get("zorka.req.timeout", "15000").trim());
@@ -73,26 +78,25 @@ public class JavaAgent implements Agent {
 
     }
 
-    public JavaAgent(Executor executor, MBeanServerRegistry mBeanServerRegistry, ZorkaBshAgent bshAgent, ZorkaSpyLib spyLib) {
-        this.executor = executor;
-        this.mBeanServerRegistry = mBeanServerRegistry;
-        this.zorkaAgent = bshAgent;
-        this.spyLib = spyLib;
-    }
 
 	public  void start() {
         if (executor == null)
             executor = new ClosingTimeoutExecutor(requestThreads, requestQueue, requestTimeout);
+
         zorkaAgent = new ZorkaBshAgent(executor, mBeanServerRegistry);
 
         if (ZorkaConfig.get("spy", "no").equalsIgnoreCase("yes")) {
             log.info("Enabling Zorka SPY");
-            MainCollector.clear();
-            spyLib = new ZorkaSpyLib(zorkaAgent);
+            spyInstance = SpyInstance.instance();
+            spyLib = new SpyLib(spyInstance);
             zorkaAgent.installModule("spy", spyLib);
+            MainSubmitter.setSubmitter(spyInstance.getSubmitter());
+            log.debug("Installed submitter: " + spyInstance.getSubmitter());
+        } else {
+            log.info("Zorka SPY is diabled. No loaded classes will be transformed in any way.");
         }
 
-        zorkaAgent.loadScriptDir(ZorkaConfig.getConfDir(), null);
+        zorkaAgent.loadScriptDir(ZorkaConfig.getConfDir(), ".*\\.bsh$");
 
         zorkaAgent.svcStart();
 
@@ -102,53 +106,26 @@ public class JavaAgent implements Agent {
         }
     }
 
+
     public void stop() {
         zabbixAgent.stop();
         zorkaAgent.svcStop();
+        AgentGlobals.setMBeanServerRegistry(null);
     }
 
-    public ZorkaBshAgent getZorkaAgent() {
-        return zorkaAgent;
-    }
-
-    public MBeanServerRegistry getMBeanServerRegistry() {
-        return mBeanServerRegistry;
-    }
 
     public ClassFileTransformer getSpyTransformer() {
-        return spyLib != null ? spyLib.getSpy() : null;
+        return spyInstance != null ? spyInstance.getClassTransformer() : null;
     }
 
-    public ZorkaSpyLib getSpyLib() {
-        return spyLib;
-    }
-
-    public void logStart(long id) {
-        MainCollector.logStart(id);
-    }
-
-    public void logStart(Object[] args, long id) {
-        MainCollector.logStart(args, id);
-    }
-
-    public void logCall(long id) {
-        MainCollector.logCall(id);
-    }
-
-    public void logError(long id) {
-        MainCollector.logError(id);
-    }
 
     public void registerMbs(String name, MBeanServerConnection conn, ClassLoader classLoader) {
         mBeanServerRegistry.register(name, conn, classLoader);
     }
 
+
     public void unregisterMbs(String name) {
         mBeanServerRegistry.unregister(name);
     }
 
-    public void registerBeanAttr(String mbsName, String beanName, String attr, Object val) {
-        // TODO use overwriting registration here
-        mBeanServerRegistry.getOrRegisterBeanAttr(mbsName, beanName, attr, val, attr);
-    }
 }

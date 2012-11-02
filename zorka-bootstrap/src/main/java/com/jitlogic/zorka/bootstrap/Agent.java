@@ -13,17 +13,7 @@ public interface Agent {
 
     public ClassFileTransformer getSpyTransformer();
 
-    public void logStart(long id);
-
-    public void logStart(Object[] args, long id);
-
-    public void logCall(long id);
-
-    public void logError(long id);
-
     public void registerMbs(String name, MBeanServerConnection conn, ClassLoader classLoader);
 
     public void unregisterMbs(String name);
-
-    public void registerBeanAttr(String mbsName, String beanName, String attr, Object val);
 }

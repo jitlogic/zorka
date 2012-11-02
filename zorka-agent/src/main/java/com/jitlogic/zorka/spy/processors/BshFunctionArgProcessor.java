@@ -14,22 +14,18 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.spy.processors;
 
-package com.jitlogic.zorka.spy.collectors;
-
+import bsh.This;
 import com.jitlogic.zorka.spy.SpyRecord;
 
-public class JmxAttrCollector implements SpyCollector {
+public class BshFunctionArgProcessor implements SpyArgProcessor {
 
-    public JmxAttrCollector(String mbsName, String beanName, String attrName) {
-        this(mbsName, beanName, attrName, null);
-    }
-
-    public JmxAttrCollector(String mbsName, String beanName, String attrName, String statAttr) {
+    public BshFunctionArgProcessor(This ns, String funcName) {
 
     }
 
-    public void collect(SpyRecord record) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public SpyRecord process(SpyRecord record) {
+        return record;
     }
 }

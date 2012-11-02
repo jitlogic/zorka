@@ -15,22 +15,17 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.collectors;
+package com.jitlogic.zorka.spy;
 
-import bsh.This;
-import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.spy.processors.SpyArgProcessor;
+import com.jitlogic.zorka.util.ZorkaLog;
 
-public class BshFuncCollector implements SpyCollector {
+import java.util.List;
 
-    public BshFuncCollector(String ns, String name) {
-        // TODO (is it needed after all ?)
+public class SpyUtil {
+
+    public static int max(int x, int y) {
+        return x > y ? x : y;
     }
 
-    public BshFuncCollector(This ns, String name) {
-        // TODO
-    }
-
-    public void collect(SpyRecord record) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 }
