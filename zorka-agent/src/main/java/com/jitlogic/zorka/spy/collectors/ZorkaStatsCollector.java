@@ -22,7 +22,10 @@ import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.mbeans.MethodCallStatistic;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
 import com.jitlogic.zorka.spy.SpyContext;
+import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +33,8 @@ import java.util.Map;
 import static com.jitlogic.zorka.spy.SpyConst.*;
 
 public class ZorkaStatsCollector implements SpyCollector {
+
+    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private MBeanServerRegistry registry = AgentGlobals.getMBeanServerRegistry();
     private String mbsName, mbeanTemplate, attrTemplate, keyTemplate;
@@ -51,6 +56,10 @@ public class ZorkaStatsCollector implements SpyCollector {
 
     public void collect(SpyRecord record) {
 
+        if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
+            log.debug("Collecting record: " + record);
+        }
+
         SpyContext ctx = record.getContext();
         MethodCallStatistics stats = statsCache.get(record.getContext());
 
@@ -67,11 +76,25 @@ public class ZorkaStatsCollector implements SpyCollector {
 
         if (timeObj instanceof Long) {
             if (record.gotStage(ON_EXIT)) {
+                if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
+                    log.debug("Logging record using logCall()");
+                }
                 statistic.logCall(0, (Long)record.get(ON_COLLECT, timeField));
             } else if (record.gotStage(ON_ERROR)) {
+                if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
+                    log.debug("Logging record using logError()");
+                }
                 statistic.logError(0, (Long)record.get(ON_COLLECT, timeField));
-            } // else (log error [warning] here)
-        } // else (log error [warning] here)
+            } else {
+                if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
+                    log.debug("No ON_EXIT nor ON_ERROR marked on record " + record);
+                }
+            }
+        } else {
+            if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
+                log.debug("Unknown type of time object: " + timeObj);
+            }
+        }
     }
 
 

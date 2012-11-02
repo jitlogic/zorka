@@ -15,27 +15,36 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.old;
+package com.jitlogic.zorka.spy;
+
+/**
+ * This is API for zorka users.
+ */
+public class SpyLib {
+
+	private SpyInstance instance;
 
 
-import com.jitlogic.zorka.agent.MBeanServerRegistry;
-import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.mbeans.MethodCallStatistic;
-import com.jitlogic.zorka.mbeans.MethodCallStatistics;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
-
-public class ZorkaSpyLib {
-	
-	
-	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
-	
-	
-    private MBeanServerRegistry mbr;
-	
-	
-	public ZorkaSpyLib(ZorkaBshAgent agent) {
-        mbr = agent.getMBeanServerRegistry();
+	public SpyLib(SpyInstance instance) {
+        this.instance = instance;
 	}
 
+
+    public void add(SpyDefinition sdef) {
+        instance.add(sdef);
+    }
+
+
+    public SpyDefinition empty() {
+        return SpyDefinition.newInstance();
+    }
+
+
+    public SpyDefinition instrument() {
+        return SpyDefinition.instrument().onSubmit().timeDiff(0,1,1);
+    }
+
+    // TODO tutaj instrument() z argumentem-kluczem
+
+    // TODO wyrugować SpyDefinition.instrument()
 }

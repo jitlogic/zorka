@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.jitlogic.zorka.spy.SpyConst.*;
 
 public class SpyClassTransformer implements ClassFileTransformer {
 
@@ -42,7 +43,6 @@ public class SpyClassTransformer implements ClassFileTransformer {
     private int nextId = 1;
     private Map<Integer, SpyContext> ctxById = new ConcurrentHashMap<Integer, SpyContext>();
     private Map<SpyContext, SpyContext> ctxInstances = new HashMap<SpyContext, SpyContext>();
-
 
     public SpyContext getContext(int id) {
         return ctxById.get(id);
@@ -75,7 +75,17 @@ public class SpyClassTransformer implements ClassFileTransformer {
         List<SpyDefinition> found = new ArrayList<SpyDefinition>();
 
         for (SpyDefinition sdef : sdefs) {
+
+            if (SpyInstance.isDebugEnabled(SPD_CLASSALL)) {
+                log.debug("Encountered class: " + className);
+            }
+
             if (sdef.match(clazzName)) {
+
+                if (SpyInstance.isDebugEnabled(SPD_CLASSXFORM)) {
+                    log.debug("Transforming class: " + className);
+                }
+
                 found.add(sdef);
             }
         }

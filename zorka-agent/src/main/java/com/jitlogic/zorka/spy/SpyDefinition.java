@@ -550,7 +550,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition toStats(String mbsName, String beanName, String attrName, int timeField) {
-        return toCollector(new ZorkaStatsCollector(mbsName, beanName, attrName, null, timeField));
+        return toCollector(new ZorkaStatsCollector(mbsName, beanName, attrName, "${methodName}", timeField));
     }
 
 

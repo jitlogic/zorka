@@ -18,23 +18,57 @@
 package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.spy.collectors.SpyCollector;
+import com.jitlogic.zorka.spy.processors.SpyArgProcessor;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
+
+import java.util.List;
+
 import static com.jitlogic.zorka.spy.SpyConst.*;
 
 public class DispatchingCollector implements SpyCollector {
 
+    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+
     public synchronized  void collect(SpyRecord record) {
+
+        if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
+            log.debug("Dispatching collector record: " + record);
+        }
 
         SpyContext ctx = record.getContext();
 
         SpyDefinition sdef = ctx.getSpyDefinition();
 
-        if (null == (record = SpyUtil.process(ON_COLLECT, sdef, record))) {
+        if (null == (record = process(sdef, record))) {
             return;
         }
 
         for (SpyCollector collector : sdef.getCollectors()) {
-            collector.collect(record);
+            try {
+                collector.collect(record);
+            } catch (Throwable e) {
+                log.error("Error collecting record " + record, e);
+            }
         }
     }
+
+    private SpyRecord process(SpyDefinition sdef, SpyRecord record) {
+        List<SpyArgProcessor> argProcessors = sdef.getTransformers(ON_COLLECT);
+
+        for (SpyArgProcessor argProcessor : argProcessors) {
+            try {
+                if (null == (record = argProcessor.process(record))) {
+                    break;
+                }
+            } catch (Throwable e) {
+                log.error("Error transforming record: " + record + " (on processor " + argProcessor + ")", e);
+                return null;
+            }
+        }
+
+        return record;
+    }
+
 
 }

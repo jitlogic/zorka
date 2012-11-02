@@ -18,7 +18,6 @@ public class AgentMain {
     private static ClassLoader systemClassLoader;
     private static AgentClassLoader zorkaClassLoader;
     public static Agent agent; // TODO uporządkować to !
-    private static String serverType = "generic";
 
     public static void premain(String args, Instrumentation instr) {
         String[] argv = args.split(",");
@@ -37,11 +36,11 @@ public class AgentMain {
 
         try {
             Class<?> clazz = zorkaClassLoader.loadClass("com.jitlogic.zorka.agent.JavaAgent");
-            //Class<?> clazz = Class.forName("com.jitlogic.zorka.agent.JavaAgent");
             agent = (Agent)clazz.newInstance();
             agent.start();
         } catch (Exception e) {
             throw new RuntimeException("Error starting up agent.", e);
+        } finally {
         }
 
         Thread.currentThread().setContextClassLoader(systemClassLoader);

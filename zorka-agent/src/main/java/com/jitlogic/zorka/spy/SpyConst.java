@@ -36,4 +36,43 @@ public interface SpyConst {
     public final static int SF_IMMEDIATE = 1;
     public final static int SF_FLUSH = 2;
 
+
+    // Debug levels
+
+    /** Be quiet */
+    public final static int SPD_NONE = 0;
+
+    /** Basic status messages */
+    public final static int SPD_STATUS = 1;
+
+    /** Detailed configuration information */
+    public final static int SPD_CONFIG = 2;
+
+    /** Log transformed classes */
+    public final static int SPD_CLASSXFORM = 3;
+
+    /** Log transformed methods */
+    public final static int SPD_METHODXFORM = 4;
+
+    /** Log all collected records reaching collector dispatcher */
+    public final static int SPD_CDISPATCHES = 5;
+
+    /** Log all collected records on each collector */
+    public final static int SPD_COLLECTORS = 6;
+
+    /** Log all argument processing events */
+    public final static int SPD_ARGPROC = 7;
+
+    /** Log all submissions from instrumented code */
+    public final static int SPD_SUBMISSIONS = 8;
+
+    /** Log all encountered methods (only from transformed classes) */
+    public final static int SPD_METHODALL = 9;
+
+    /** Log all classes going through transformer */
+    public final static int SPD_CLASSALL = 10;
+
+    /** Maximum possible debug log level */
+    public final static int SPD_MAX = 10;
+
 }

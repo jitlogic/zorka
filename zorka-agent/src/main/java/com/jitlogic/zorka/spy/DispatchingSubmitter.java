@@ -18,8 +18,12 @@
 package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.spy.collectors.SpyCollector;
+import com.jitlogic.zorka.spy.processors.SpyArgProcessor;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.vmsci.SpySubmitter;
 
+import java.util.List;
 import java.util.Stack;
 
 import static com.jitlogic.zorka.spy.SpyConst.*;
@@ -30,6 +34,8 @@ import static com.jitlogic.zorka.spy.SpyConst.ON_SUBMIT;
  *
  */
 public class DispatchingSubmitter implements SpySubmitter {
+
+    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private SpyClassTransformer engine;
     private SpyCollector collector;
@@ -50,6 +56,12 @@ public class DispatchingSubmitter implements SpySubmitter {
 
 
     public void submit(int stage, int id, int submitFlags, Object[] vals) {
+
+        if (SpyInstance.isDebugEnabled(SPD_SUBMISSIONS)) {
+            log.debug("Submitted: stage=" + stage + ", id=" + id + ", flags=" + submitFlags);
+            // TODO ewentualnie wyświetlić zasubmitowane wartości tutaj.
+        }
+
         SpyContext ctx = engine.getContext(id);
 
         if (ctx == null) {
@@ -60,7 +72,7 @@ public class DispatchingSubmitter implements SpySubmitter {
 
         SpyDefinition sdef = ctx.getSpyDefinition();
 
-        if (null == (record = SpyUtil.process(stage, sdef, record))) {
+        if (null == (record = process(stage, sdef, record))) {
             return;
         }
 
@@ -71,7 +83,7 @@ public class DispatchingSubmitter implements SpySubmitter {
 
         record.beforeSubmit();
 
-        if (null == (record = SpyUtil.process(ON_SUBMIT, sdef, record))) {
+        if (null == (record = process(ON_SUBMIT, sdef, record))) {
             return;
         }
 
@@ -102,4 +114,23 @@ public class DispatchingSubmitter implements SpySubmitter {
 
         return record;
     }
+
+    private SpyRecord process(int stage, SpyDefinition sdef, SpyRecord record) {
+        List<SpyArgProcessor> argProcessors = sdef.getTransformers(stage);
+
+        for (SpyArgProcessor argProcessor : argProcessors) {
+            try {
+                if (null == (record = argProcessor.process(record))) {
+                    break;
+                }
+            } catch (Throwable e) {
+                log.error("Error processing record " + record + " (on processor "
+                            + argProcessor + ", stage=" + stage + ")");
+            }
+        }
+
+        return record;
+    }
+
+
 }

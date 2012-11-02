@@ -18,6 +18,7 @@
 package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.spy.processors.SpyArgProcessor;
+import com.jitlogic.zorka.util.ZorkaLog;
 
 import java.util.List;
 
@@ -25,18 +26,6 @@ public class SpyUtil {
 
     public static int max(int x, int y) {
         return x > y ? x : y;
-    }
-
-    public static SpyRecord process(int stage, SpyDefinition sdef, SpyRecord record) {
-        List<SpyArgProcessor> argProcessors = sdef.getTransformers(stage);
-
-        for (SpyArgProcessor argProcessor : argProcessors) {
-            if (null == (record = argProcessor.process(record))) {
-                break;
-            }
-        }
-
-        return record;
     }
 
 }

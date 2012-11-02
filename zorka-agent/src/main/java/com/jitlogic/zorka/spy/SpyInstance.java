@@ -18,10 +18,14 @@ package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.spy.collectors.SpyCollector;
 import com.jitlogic.zorka.util.ZorkaConfig;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.vmsci.MainSubmitter;
 import com.jitlogic.zorka.vmsci.SpySubmitter;
 
 import java.util.Properties;
+
+import static com.jitlogic.zorka.spy.SpyConst.*;
 
 /**
  * This class binds all parts of spy together to make fully configured instrumentation
@@ -29,13 +33,35 @@ import java.util.Properties;
  */
 public class SpyInstance {
 
+    private static int debugLevel = 0;
+    private static ZorkaLog log = null;
+
     private static SpyInstance instance = null;
 
+
     public static synchronized SpyInstance instance() {
-        if (null == instance) {
-            instance = new SpyInstance(ZorkaConfig.getProperties());
-            MainSubmitter.setSubmitter(instance.getSubmitter());
+
+        if (null == log) {
+            log = ZorkaLogger.getLog(SpyInstance.class);
         }
+
+        if (isDebugEnabled(SPD_CONFIG)) {
+            log.debug("Requested a submitter instance.");
+        }
+
+        if (null == instance) {
+
+            instance = new SpyInstance(ZorkaConfig.getProperties());
+
+        }
+
+        if (isDebugEnabled(SPD_CONFIG)) {
+            log.debug("Setting up submitter: " + instance.getSubmitter());
+        }
+
+        MainSubmitter.setSubmitter(instance.getSubmitter());
+
+        debugLevel = Integer.parseInt(ZorkaConfig.get("spy.debug", "0").trim());
 
         return instance;
     }
@@ -47,6 +73,13 @@ public class SpyInstance {
         instance = null;
     }
 
+    public static int getDebugLevel() {
+        return debugLevel;
+    }
+
+    public static boolean isDebugEnabled(int level) {
+        return debugLevel >= level;
+    }
 
     private SpyClassTransformer classTransformer;
     private SpySubmitter   submitter;
