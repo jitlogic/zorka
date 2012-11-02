@@ -29,7 +29,7 @@ import static com.jitlogic.zorka.spy.SpyConst.*;
 
 public class SpyMethodVisitor extends MethodVisitor {
 
-    private final static String SUBMIT_CLASS = "com/jitlogic/zorka/vmsci/MainSubmitter";
+    private final static String SUBMIT_CLASS = "com/jitlogic/zorka/spy/MainSubmitter";
     private final static String SUBMIT_METHOD = "submit";
     private final static String SUBMIT_DESC = "(III[Ljava/lang/Object;)V";
 

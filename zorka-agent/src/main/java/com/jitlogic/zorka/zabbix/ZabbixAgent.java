@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.zabbix;
+package com.jitlogic.zorka.zabbix;
 
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.util.ZorkaConfig;
+import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 

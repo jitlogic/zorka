@@ -1,12 +1,13 @@
 package com.jitlogic.zorka.agent.unittest;
 
+import com.jitlogic.zorka.agent.AgentGlobals;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaLib;
-import com.jitlogic.zorka.agent.rankproc.AvgRateCounter;
+import com.jitlogic.zorka.rankproc.AvgRateCounter;
 import com.jitlogic.zorka.agent.testutil.TestExecutor;
 import com.jitlogic.zorka.agent.testutil.JmxTestUtil;
-import com.jitlogic.zorka.agent.zabbix.ZabbixLib;
+import com.jitlogic.zorka.zabbix.ZabbixLib;
 import com.jitlogic.zorka.mbeans.TabularDataWrapper;
 import org.junit.After;
 import org.junit.Before;
@@ -26,7 +27,8 @@ public class TabularWrapperTest {
 
     @Before
     public void setUp() {
-        bshAgent = new ZorkaBshAgent(new TestExecutor(), new MBeanServerRegistry(true));
+        AgentGlobals.setMBeanServerRegistry(new MBeanServerRegistry(true));
+        bshAgent = new ZorkaBshAgent(new TestExecutor());
         ZabbixLib zl = new ZabbixLib(bshAgent, bshAgent.getZorkaLib());
         zorkaLib = bshAgent.getZorkaLib();
         jmxTestUtil.setUp(bshAgent);
@@ -36,6 +38,7 @@ public class TabularWrapperTest {
     @After
     public void tearDown() {
         jmxTestUtil.tearDown();
+        AgentGlobals.setMBeanServerRegistry(null);
     }
 
     private Map map(Object...vals) {

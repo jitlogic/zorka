@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.rankproc;
+package com.jitlogic.zorka.rankproc;
 
 import com.jitlogic.zorka.agent.ZorkaLib;
 import com.jitlogic.zorka.util.ZorkaLog;

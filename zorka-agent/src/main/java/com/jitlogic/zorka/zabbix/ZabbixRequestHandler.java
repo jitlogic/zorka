@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.zabbix;
+package com.jitlogic.zorka.zabbix;
 
 
 import java.io.IOException;

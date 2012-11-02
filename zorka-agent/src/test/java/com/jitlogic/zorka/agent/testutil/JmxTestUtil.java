@@ -41,12 +41,12 @@ public class JmxTestUtil extends ClassLoader {
     public void setUp(ZorkaBshAgent agent) {
         mbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
         this.agent = agent;
-        this.agent.getMBeanServerRegistry().register("test", mbs, null);
+        AgentGlobals.getMBeanServerRegistry().register("test", mbs, null);
     }
 
 
     public void tearDown() {
-        agent.getMBeanServerRegistry().unregister("test");
+        AgentGlobals.getMBeanServerRegistry().unregister("test");
     }
 
 

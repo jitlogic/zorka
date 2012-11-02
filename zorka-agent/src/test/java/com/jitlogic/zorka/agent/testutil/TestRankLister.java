@@ -25,8 +25,8 @@ import java.util.Queue;
 import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 
-import com.jitlogic.zorka.agent.rankproc.RankItem;
-import com.jitlogic.zorka.agent.rankproc.RankLister;
+import com.jitlogic.zorka.rankproc.RankItem;
+import com.jitlogic.zorka.rankproc.RankLister;
 
 /**
  * Test double for rankproc unit tests.

@@ -60,7 +60,7 @@ public class ZorkaStatsCollectionUnitTest {
 
     @Test
     public void testCollectToStatsMbeanWithoutPlaceholders() throws Exception {
-        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "test", 0);
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "test", 0, 0);
         SpyContext ctx = new SpyContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
 
         SpyRecord sr = new SpyRecord(ctx);
@@ -76,7 +76,7 @@ public class ZorkaStatsCollectionUnitTest {
 
     @Test
     public void testCollectorToStatsMbeanWithMethodNamePlaceholder() throws Exception {
-        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "${methodName}", 0);
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "${methodName}", 0, 0);
         SpyContext ctx = new SpyContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
 
         SpyRecord sr = new SpyRecord(ctx);
@@ -92,7 +92,7 @@ public class ZorkaStatsCollectionUnitTest {
 
     @Test
     public void testCollectoToStatsMbeanWithClassAndMethodNamePlaceholder() throws Exception {
-        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${methodName}", 0);
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${methodName}", 0, 0);
         SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
 
         SpyRecord sr = new SpyRecord(ctx);
