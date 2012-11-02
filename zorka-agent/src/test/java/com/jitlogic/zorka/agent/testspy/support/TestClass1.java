@@ -1,3 +1,4 @@
+
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -15,22 +16,38 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.collectors;
+package com.jitlogic.zorka.agent.testspy.support;
 
-import bsh.This;
-import com.jitlogic.zorka.spy.SpyRecord;
 
-public class BshFuncCollector implements SpyCollector {
+public class TestClass1 {
 
-    public BshFuncCollector(String ns, String name) {
-        // TODO (is it needed after all ?)
+    private int calls = 0;
+    private int vals = 0;
+
+    public void trivialMethod() {
+        calls++;
     }
 
-    public BshFuncCollector(This ns, String name) {
-        // TODO
+
+    public void errorMethod() {
+        throw new NullPointerException("dUP!");
     }
 
-    public void collect(SpyRecord record) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
+    public void paramMethod1(int i, long j, short s, byte b) {
+        calls++;
+        vals += i + j + s + b;
+    }
+
+    public void paramMethod2(boolean b, char c) {
+        vals += (b ? 1 : 0) + (byte)c;
+    }
+
+    public void paramMethod3(double d, float f) {
+        vals += (int)(d*100) + (int)(f*10);
+    }
+
+    public int getCalls() {
+        return calls;
     }
 }

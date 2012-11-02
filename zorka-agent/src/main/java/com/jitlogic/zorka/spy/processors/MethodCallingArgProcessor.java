@@ -14,23 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.spy.processors;
 
-package com.jitlogic.zorka.spy.collectors;
-
-import bsh.This;
 import com.jitlogic.zorka.spy.SpyRecord;
 
-public class BshFuncCollector implements SpyCollector {
+public class MethodCallingArgProcessor implements SpyArgProcessor {
 
-    public BshFuncCollector(String ns, String name) {
-        // TODO (is it needed after all ?)
-    }
-
-    public BshFuncCollector(This ns, String name) {
+    public MethodCallingArgProcessor(int src, int dst, String methodName, Object... args) {
         // TODO
     }
 
-    public void collect(SpyRecord record) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public SpyRecord process(SpyRecord record) {
+        return record;
     }
 }

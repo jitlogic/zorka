@@ -15,22 +15,31 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.collectors;
+package com.jitlogic.zorka.vmsci;
 
-import bsh.This;
-import com.jitlogic.zorka.spy.SpyRecord;
+public class MainSubmitter {
 
-public class BshFuncCollector implements SpyCollector {
+    private static SpySubmitter submitter = null;
+    private static long errorCount = 0;
 
-    public BshFuncCollector(String ns, String name) {
-        // TODO (is it needed after all ?)
+    public static void submit(int stage, int id, int submitFlags, Object[] vals) {
+        try {
+            if (submitter != null) {
+                submitter.submit(stage, id, submitFlags, vals);
+            }
+        } catch (Throwable e) {
+            synchronized (MainSubmitter.class) {
+                errorCount++;
+            }
+        }
     }
 
-    public BshFuncCollector(This ns, String name) {
-        // TODO
+    public static void setSubmitter(SpySubmitter submitter) {
+        MainSubmitter.submitter = submitter;
     }
 
-    public void collect(SpyRecord record) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public static long getErrorCount() {
+        return errorCount;
     }
+
 }

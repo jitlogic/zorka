@@ -15,22 +15,10 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.collectors;
+package com.jitlogic.zorka.vmsci;
 
-import bsh.This;
-import com.jitlogic.zorka.spy.SpyRecord;
+public interface SpySubmitter {
 
-public class BshFuncCollector implements SpyCollector {
+    void submit(int stage, int id, int submitFlags, Object[] vals);
 
-    public BshFuncCollector(String ns, String name) {
-        // TODO (is it needed after all ?)
-    }
-
-    public BshFuncCollector(This ns, String name) {
-        // TODO
-    }
-
-    public void collect(SpyRecord record) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
 }

@@ -214,7 +214,8 @@ public class ZorkaLib implements ZorkaService {
 	}
 	
 	
-	public ZorkaMappedMBean mbean(String mbs, String name, String desc) { 
+	public ZorkaMappedMBean mbean(String mbs, String name, String desc) {
+        // TODO wyrugować ręczne tworzenie mbeanów, zdefiniować jedną (wspólną) metodę do tego i używać jej
 		try {
 			ZorkaMappedMBean mbean = new ZorkaMappedMBean(desc);
 			MBeanServer conn = (MBeanServer) mbsRegistry.lookup(mbs);

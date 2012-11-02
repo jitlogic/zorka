@@ -44,12 +44,14 @@ import java.util.regex.Pattern;
  */
 public class ZorkaConfig {
 
-	public static final String CONF_SUBDIR = "conf";
-	public static final String LOG_SUBFIR = "log";
-	
 	private static Properties properties = null;
 	private static String homeDir = null;
-	
+
+
+    public static Properties getProperties() {
+        return properties;
+    }
+
 	
 	public static String getLogDir() {
 		return getHomeDir("log");
@@ -60,15 +62,11 @@ public class ZorkaConfig {
 		return getHomeDir("conf");
 	}
 
-    public synchronized void setHomeDir(String dir) {
-        homeDir = dir;
-    }
-	
+
 	private synchronized static String getHomeDir(String suffix) {
 		if (homeDir == null)
             homeDir = AgentMain.getHomeDir() != null ? AgentMain.getHomeDir() : "/opt/zorka";
-			//homeDir = System.getProperty("zorka.home.dir", "/opt/zorka");
-		
+
 		return homeDir.endsWith("/") ? homeDir + suffix : homeDir + "/" + suffix;
 	}
 	
