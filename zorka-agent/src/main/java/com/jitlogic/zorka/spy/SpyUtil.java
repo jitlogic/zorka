@@ -17,7 +17,7 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.spy.transformers.SpyTransformer;
+import com.jitlogic.zorka.spy.processors.SpyArgProcessor;
 
 import java.util.List;
 
@@ -27,11 +27,11 @@ public class SpyUtil {
         return x > y ? x : y;
     }
 
-    public static SpyRecord transform(int stage, SpyDefinition sdef, SpyRecord record) {
-        List<SpyTransformer> transformers = sdef.getTransformers(stage);
+    public static SpyRecord process(int stage, SpyDefinition sdef, SpyRecord record) {
+        List<SpyArgProcessor> argProcessors = sdef.getTransformers(stage);
 
-        for (SpyTransformer transformer : transformers) {
-            if (null == (record = transformer.transform(record))) {
+        for (SpyArgProcessor argProcessor : argProcessors) {
+            if (null == (record = argProcessor.process(record))) {
                 break;
             }
         }

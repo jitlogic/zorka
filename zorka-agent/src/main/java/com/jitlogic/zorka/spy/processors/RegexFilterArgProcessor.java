@@ -14,17 +14,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.spy.transformers;
+
+package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.SpyRecord;
 
-public class MethodCallingTransformer implements SpyTransformer {
+import java.util.regex.Pattern;
 
-    public MethodCallingTransformer(int src, int dst, String methodName, Object...args) {
-        // TODO
+public class RegexFilterArgProcessor implements SpyArgProcessor {
+
+    private final int arg;
+    private final Pattern regex;
+    private final boolean filterOut;
+
+    public RegexFilterArgProcessor(int arg, String regex) {
+        this(arg, regex, false);
     }
 
-    public SpyRecord transform(SpyRecord record) {
+    public RegexFilterArgProcessor(int arg, String regex, boolean filterOut) {
+        this.arg = arg;
+        this.regex = Pattern.compile(regex);
+        this.filterOut = filterOut;
+    }
+
+    public SpyRecord process(SpyRecord record) {
         return record;
     }
 }

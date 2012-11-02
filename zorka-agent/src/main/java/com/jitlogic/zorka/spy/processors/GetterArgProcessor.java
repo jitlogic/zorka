@@ -1,4 +1,3 @@
-
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -15,39 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.spy.processors;
 
-package com.jitlogic.zorka.agent.testspy;
+import com.jitlogic.zorka.spy.SpyRecord;
+
+public class GetterArgProcessor implements SpyArgProcessor {
 
 
-public class TestClass1 {
 
-    private int calls = 0;
-    private int vals = 0;
-
-    public void trivialMethod() {
-        calls++;
+    public GetterArgProcessor(int src, int dst, Object... path) {
+        // TODO
     }
 
-
-    public void errorMethod() {
-        throw new NullPointerException("dUP!");
-    }
-
-
-    public void paramMethod1(int i, long j, short s, byte b) {
-        calls++;
-        vals += i + j + s + b;
-    }
-
-    public void paramMethod2(boolean b, char c) {
-        vals += (b ? 1 : 0) + (byte)c;
-    }
-
-    public void paramMethod3(double d, float f) {
-        vals += (int)(d*100) + (int)(f*10);
-    }
-
-    public int getCalls() {
-        return calls;
+    public SpyRecord process(SpyRecord record) {
+        return record;
     }
 }

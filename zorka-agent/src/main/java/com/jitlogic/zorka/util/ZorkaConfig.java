@@ -50,6 +50,11 @@ public class ZorkaConfig {
 	private static Properties properties = null;
 	private static String homeDir = null;
 
+
+    public static Properties getProperties() {
+        return properties;
+    }
+
 	
 	public static String getLogDir() {
 		return getHomeDir("log");

@@ -18,9 +18,8 @@ package com.jitlogic.zorka.spy;
 
 
 import bsh.This;
-import com.jitlogic.zorka.vmsci.SpySubmitter;
 import com.jitlogic.zorka.spy.collectors.*;
-import com.jitlogic.zorka.spy.transformers.*;
+import com.jitlogic.zorka.spy.processors.*;
 
 import java.util.*;
 import static com.jitlogic.zorka.spy.SpyConst.*;
@@ -36,8 +35,8 @@ import static com.jitlogic.zorka.spy.SpyConst.*;
  */
 public class SpyDefinition {
 
-    private static final List<SpyTransformer> EMPTY_XF =
-            Collections.unmodifiableList(Arrays.asList(new SpyTransformer[0]));
+    private static final List<SpyArgProcessor> EMPTY_XF =
+            Collections.unmodifiableList(Arrays.asList(new SpyArgProcessor[0]));
     private static final List<SpyCollector> EMPTY_DC =
             Collections.unmodifiableList(Arrays.asList(new SpyCollector[0]));
     private static final List<SpyMatcher> EMPTY_MATCHERS =
@@ -46,7 +45,7 @@ public class SpyDefinition {
             Collections.unmodifiableList(Arrays.asList(new SpyProbeElement[0]));
 
     private List<SpyProbeElement>[] probes;
-    private List<SpyTransformer>[] transformers;
+    private List<SpyArgProcessor>[] transformers;
 
     private List<SpyCollector> collectors = EMPTY_DC;
     private List<SpyMatcher> matchers = EMPTY_MATCHERS;
@@ -97,13 +96,13 @@ public class SpyDefinition {
 
 
     /**
-     * Returns list of transformers for a particular stage.
+     * Returns list of processors for a particular stage.
      *
      * @param stage
      *
      * @return
      */
-    public List<SpyTransformer> getTransformers(int stage) {
+    public List<SpyArgProcessor> getTransformers(int stage) {
         return transformers[stage];
     }
 
@@ -315,7 +314,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition withFormat(int dst, String expr) {
-        return withTransformer(new StringFormatTransformer(dst, expr));
+        return withArgProcessor(new StringFormatArgProcessor(dst, expr));
     }
 
 
@@ -327,6 +326,8 @@ public class SpyDefinition {
     public SpyDefinition withTime() {
         return this.withArguments(SpyProbeElement.FETCH_TIME);
     }
+
+
 
 
     /**
@@ -373,17 +374,17 @@ public class SpyDefinition {
 
 
     /**
-     * Adds a custom transformer to transform chain.
+     * Adds a custom transformer to process chain.
      *
-     * @param transformer
+     * @param classArgProcessor
      *
      * @return
      */
-    public SpyDefinition withTransformer(SpyTransformer transformer) {
+    public SpyDefinition withArgProcessor(SpyArgProcessor classArgProcessor) {
         SpyDefinition sdef = new SpyDefinition(this);
-        List<SpyTransformer> lst = new ArrayList<SpyTransformer>(transformers[curStage].size()+1);
+        List<SpyArgProcessor> lst = new ArrayList<SpyArgProcessor>(transformers[curStage].size()+1);
         lst.addAll(transformers[curStage]);
-        lst.add(transformer);
+        lst.add(classArgProcessor);
         sdef.transformers = Arrays.copyOf(transformers, transformers.length);
         sdef.transformers[curStage] = lst;
         return sdef;
@@ -391,7 +392,7 @@ public class SpyDefinition {
 
 
     /**
-     * Add an BSH filtering transformer to transform chain.
+     * Add an BSH filtering transformer to process chain.
      *
      * @param ns BSH namespace
      *
@@ -400,12 +401,12 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition filter(This ns, String func) {
-        return withTransformer(new BshFilterTransformer(ns, func));
+        return withArgProcessor(new BshFilterArgProcessor(ns, func));
     }
 
 
     /**
-     * Add an regex filtering transformer to transform chain.
+     * Add an regex filtering transformer to process chain.
      *
      * @param arg argument number
      *
@@ -414,12 +415,12 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition filter(Integer arg, String regex) {
-        return withTransformer(new RegexFilterTransformer(arg, regex));
+        return withArgProcessor(new RegexFilterArgProcessor(arg, regex));
     }
 
 
     /**
-     * Add an regex filtering transformer to transform chain that will exclude
+     * Add an regex filtering transformer to process chain that will exclude
      * matching items.
      *
      * @param arg argument number
@@ -429,7 +430,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition filterOut(Integer arg, String regex) {
-        return withTransformer(new RegexFilterTransformer(arg, regex, true));
+        return withArgProcessor(new RegexFilterArgProcessor(arg, regex, true));
     }
 
 
@@ -444,7 +445,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition get(int arg, Object...path) {
-        return withTransformer(new GetterTransformer(arg, arg, path));
+        return withArgProcessor(new GetterArgProcessor(arg, arg, path));
     }
 
 
@@ -461,8 +462,14 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition getTo(int arg, int dst, Object...path) {
-        return withTransformer(new GetterTransformer(arg, arg, path));
+        return withArgProcessor(new GetterArgProcessor(arg, arg, path));
     }
+
+
+    public SpyDefinition timeDiff(int in1, int in2, int out) {
+        return withArgProcessor(new TimeDiffArgProcessor(curStage, in1, in2, out));
+    }
+
 
 
     /**
@@ -478,7 +485,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition transform(int arg, String methodName, Object...methodArgs) {
-        return withTransformer(new MethodCallingTransformer(arg, arg, methodName, methodArgs));
+        return withArgProcessor(new MethodCallingArgProcessor(arg, arg, methodName, methodArgs));
     }
 
 
@@ -497,7 +504,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition transformTo(int src, int dst, String methodName, Object...methodArgs) {
-        return withTransformer(new MethodCallingTransformer(src, dst, methodName, methodArgs));
+        return withArgProcessor(new MethodCallingArgProcessor(src, dst, methodName, methodArgs));
     }
 
     /**
@@ -510,7 +517,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition transform(This ns, String func) {
-        return withTransformer(new BshFunctionTransformer(ns, func));
+        return withArgProcessor(new BshFunctionArgProcessor(ns, func));
     }
 
 

@@ -14,22 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.spy.transformers;
+package com.jitlogic.zorka.spy.processors;
 
 import bsh.This;
 import com.jitlogic.zorka.spy.SpyRecord;
 
-public class BshFilterTransformer implements SpyTransformer {
+public class BshFilterArgProcessor implements SpyArgProcessor {
 
     private final This ns;
     private final String funcName;
 
-    public BshFilterTransformer(This ns, String funcName) {
+    public BshFilterArgProcessor(This ns, String funcName) {
         this.ns = ns;
         this.funcName = funcName;
     }
 
-    public SpyRecord transform(SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
         return record;
     }
 }

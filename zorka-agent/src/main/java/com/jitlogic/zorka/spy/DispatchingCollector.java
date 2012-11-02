@@ -28,7 +28,7 @@ public class DispatchingCollector implements SpyCollector {
 
         SpyDefinition sdef = ctx.getSpyDefinition();
 
-        if (null == (record = SpyUtil.transform(ON_COLLECT, sdef, record))) {
+        if (null == (record = SpyUtil.process(ON_COLLECT, sdef, record))) {
             return;
         }
 

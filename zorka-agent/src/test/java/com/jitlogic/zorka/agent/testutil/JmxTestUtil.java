@@ -19,7 +19,7 @@ package com.jitlogic.zorka.agent.testutil;
 
 import com.jitlogic.zorka.agent.AgentGlobals;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.spy.SpyTransformer;
+import com.jitlogic.zorka.spy.SpyClassTransformer;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerBuilder;
@@ -68,7 +68,7 @@ public class JmxTestUtil extends ClassLoader {
     }
 
 
-    public static Object instantiate(SpyTransformer engine, String clazzName) throws Exception {
+    public static Object instantiate(SpyClassTransformer engine, String clazzName) throws Exception {
         String className = clazzName.replace(".", "/");
         byte[] classBytes = readResource(className + ".class");
         byte[] transformed = engine.transform(JmxTestUtil.getSystemClassLoader(), className, null, null, classBytes);

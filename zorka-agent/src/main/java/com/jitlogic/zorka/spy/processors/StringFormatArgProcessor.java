@@ -14,11 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-
-package com.jitlogic.zorka.spy.transformers;
+package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.SpyRecord;
 
-public interface SpyTransformer {
-    public SpyRecord transform(SpyRecord record);
+public class StringFormatArgProcessor implements SpyArgProcessor {
+
+    public StringFormatArgProcessor(int dst, String expr) {
+        // TODO
+    }
+
+    public SpyRecord process(SpyRecord record) {
+        return record;
+    }
 }

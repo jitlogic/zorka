@@ -15,29 +15,27 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.transformers;
+package com.jitlogic.zorka.agent.testspy.support;
 
 import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.spy.collectors.SpyCollector;
 
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 
-public class RegexFilterTransformer implements SpyTransformer {
+public class TestCollector implements SpyCollector {
 
-    private final int arg;
-    private final Pattern regex;
-    private final boolean filterOut;
+    private List<SpyRecord> records = new ArrayList<SpyRecord>();
 
-    public RegexFilterTransformer(int arg, String regex) {
-        this(arg, regex, false);
+    public void collect(SpyRecord record) {
+        records.add(record);
     }
 
-    public RegexFilterTransformer(int arg, String regex, boolean filterOut) {
-        this.arg = arg;
-        this.regex = Pattern.compile(regex);
-        this.filterOut = filterOut;
+    public int size() {
+        return records.size();
     }
 
-    public SpyRecord transform(SpyRecord record) {
-        return record;
+    public SpyRecord get(int i) {
+        return records.get(i);
     }
 }

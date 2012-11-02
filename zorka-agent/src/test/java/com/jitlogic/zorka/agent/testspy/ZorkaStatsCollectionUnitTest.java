@@ -37,7 +37,7 @@ import javax.management.MBeanServerBuilder;
 
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.getAttr;
 
-public class SpyZorkaStatsCollectionTest {
+public class ZorkaStatsCollectionUnitTest {
 
     private MBeanServerRegistry registry;
     private MBeanServer testMbs;

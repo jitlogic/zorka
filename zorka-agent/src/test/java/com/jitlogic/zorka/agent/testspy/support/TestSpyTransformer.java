@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.agent.testspy;
+package com.jitlogic.zorka.agent.testspy.support;
 
-import com.jitlogic.zorka.spy.SpyTransformer;
+import com.jitlogic.zorka.spy.SpyClassTransformer;
 import com.jitlogic.zorka.spy.SpyClassVisitor;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import org.objectweb.asm.ClassVisitor;
@@ -26,7 +26,7 @@ import org.objectweb.asm.util.TraceClassVisitor;
 import java.io.PrintWriter;
 import java.util.List;
 
-public class TestSpyTransformer extends SpyTransformer {
+public class TestSpyTransformer extends SpyClassTransformer {
 
     private boolean debug = false;
 

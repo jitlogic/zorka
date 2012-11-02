@@ -29,14 +29,14 @@ import static org.objectweb.asm.Opcodes.ACC_INTERFACE;
 
 public class SpyClassVisitor extends ClassVisitor {
 
-    private SpyTransformer engine;
+    private SpyClassTransformer engine;
     private List<SpyDefinition> sdefs;
     private String className;
 
     private boolean isInterface;
     private String interfaces[];
 
-    public SpyClassVisitor(SpyTransformer engine, String className,
+    public SpyClassVisitor(SpyClassTransformer engine, String className,
                            List<SpyDefinition> sdefs, ClassVisitor cv) {
         super(Opcodes.V1_6, cv);
         this.engine = engine;

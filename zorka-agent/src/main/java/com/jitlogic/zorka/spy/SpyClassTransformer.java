@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class SpyTransformer implements ClassFileTransformer {
+public class SpyClassTransformer implements ClassFileTransformer {
 
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 

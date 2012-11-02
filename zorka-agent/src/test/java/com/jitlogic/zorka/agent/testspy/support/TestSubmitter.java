@@ -15,7 +15,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.testspy;
+package com.jitlogic.zorka.agent.testspy.support;
 
 import com.jitlogic.zorka.vmsci.SpySubmitter;
 

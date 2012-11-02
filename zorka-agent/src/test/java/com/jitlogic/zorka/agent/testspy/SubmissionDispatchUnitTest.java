@@ -17,6 +17,8 @@
 
 package com.jitlogic.zorka.agent.testspy;
 
+import com.jitlogic.zorka.agent.testspy.support.TestCollector;
+import com.jitlogic.zorka.agent.testspy.support.TestSpyTransformer;
 import com.jitlogic.zorka.spy.DispatchingSubmitter;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
@@ -31,7 +33,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 
-public class SubmissionDispatchingTest {
+public class SubmissionDispatchUnitTest {
 
     private TestSpyTransformer engine;
     private SpySubmitter submitter;

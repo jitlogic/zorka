@@ -14,16 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.spy.processors;
 
-package com.jitlogic.zorka.agent.testspy.debug;
+import com.jitlogic.zorka.spy.SpyRecord;
 
-public class BytecodeSample2 extends BytecodeSample1 {
+public class MethodCallingArgProcessor implements SpyArgProcessor {
 
-    private int xxx;
-    private int xxxx = 4;
+    public MethodCallingArgProcessor(int src, int dst, String methodName, Object... args) {
+        // TODO
+    }
 
-    public BytecodeSample2(int xx) {
-        super(xx);
-        xxx = 3;
+    public SpyRecord process(SpyRecord record) {
+        return record;
     }
 }

@@ -16,6 +16,8 @@
  */
 package com.jitlogic.zorka.agent.testspy;
 
+import com.jitlogic.zorka.agent.testspy.support.TestSpyTransformer;
+import com.jitlogic.zorka.agent.testspy.support.TestSubmitter;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.vmsci.MainSubmitter;
 import org.junit.After;
@@ -28,9 +30,9 @@ import static com.jitlogic.zorka.spy.SpyConst.*;
 
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.*;
 
-public class BytecodeInstrumentationTest {
+public class BytecodeInstrumentationUnitTest {
 
-    private final static String TCLASS1 = "com.jitlogic.zorka.agent.testspy.TestClass1";
+    public final static String TCLASS1 = "com.jitlogic.zorka.agent.testspy.support.TestClass1";
 
     private TestSpyTransformer engine;
     private TestSubmitter submitter;

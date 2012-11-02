@@ -1,3 +1,4 @@
+
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -15,27 +16,38 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.testspy;
+package com.jitlogic.zorka.agent.testspy.support;
 
-import com.jitlogic.zorka.spy.SpyRecord;
-import com.jitlogic.zorka.spy.collectors.SpyCollector;
 
-import java.util.ArrayList;
-import java.util.List;
+public class TestClass1 {
 
-public class TestCollector implements SpyCollector {
+    private int calls = 0;
+    private int vals = 0;
 
-    private List<SpyRecord> records = new ArrayList<SpyRecord>();
-
-    public void collect(SpyRecord record) {
-        records.add(record);
+    public void trivialMethod() {
+        calls++;
     }
 
-    public int size() {
-        return records.size();
+
+    public void errorMethod() {
+        throw new NullPointerException("dUP!");
     }
 
-    public SpyRecord get(int i) {
-        return records.get(i);
+
+    public void paramMethod1(int i, long j, short s, byte b) {
+        calls++;
+        vals += i + j + s + b;
+    }
+
+    public void paramMethod2(boolean b, char c) {
+        vals += (b ? 1 : 0) + (byte)c;
+    }
+
+    public void paramMethod3(double d, float f) {
+        vals += (int)(d*100) + (int)(f*10);
+    }
+
+    public int getCalls() {
+        return calls;
     }
 }

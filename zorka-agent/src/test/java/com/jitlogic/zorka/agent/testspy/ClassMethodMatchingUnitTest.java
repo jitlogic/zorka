@@ -22,7 +22,7 @@ import org.junit.Test;
 
 import static com.jitlogic.zorka.spy.SpyConst.*;
 
-public class SpyMatcherTest {
+public class ClassMethodMatchingUnitTest {
 
     @Test
     public void testSimpleClassOnlyMatch() {
