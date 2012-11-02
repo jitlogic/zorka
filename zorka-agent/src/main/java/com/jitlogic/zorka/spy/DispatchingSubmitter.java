@@ -31,7 +31,7 @@ import static com.jitlogic.zorka.spy.SpyConst.ON_SUBMIT;
  */
 public class DispatchingSubmitter implements SpySubmitter {
 
-    private InstrumentationEngine engine;
+    private SpyTransformer engine;
     private SpyCollector collector;
 
     private ThreadLocal<Stack<SpyRecord>> submissionStack =
@@ -43,14 +43,14 @@ public class DispatchingSubmitter implements SpySubmitter {
         };
 
 
-    public DispatchingSubmitter(InstrumentationEngine engine, SpyCollector collector) {
+    public DispatchingSubmitter(SpyTransformer engine, SpyCollector collector) {
         this.engine = engine;
         this.collector = collector;
     }
 
 
     public void submit(int stage, int id, int submitFlags, Object[] vals) {
-        InstrumentationContext ctx = engine.getContext(id);
+        SpyContext ctx = engine.getContext(id);
 
         if (ctx == null) {
             return;
@@ -81,7 +81,7 @@ public class DispatchingSubmitter implements SpySubmitter {
     }
 
 
-    private SpyRecord getRecord(int stage, InstrumentationContext ctx, int submitFlags, Object[] vals) {
+    private SpyRecord getRecord(int stage, SpyContext ctx, int submitFlags, Object[] vals) {
 
         SpyRecord record = null;
 

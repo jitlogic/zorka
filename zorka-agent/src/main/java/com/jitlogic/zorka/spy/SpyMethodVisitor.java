@@ -17,14 +17,11 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.vmsci.MainSubmitter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.objectweb.asm.Opcodes.*;
@@ -42,7 +39,7 @@ public class SpyMethodVisitor extends MethodVisitor {
     private String methodName;
     private String methodDesc;
 
-    private List<InstrumentationContext> ctxs;
+    private List<SpyContext> ctxs;
 
     private int stackDelta = 0, localDelta = 0;
 
@@ -51,7 +48,7 @@ public class SpyMethodVisitor extends MethodVisitor {
     Label l_try_handler = new Label();
 
 
-    public SpyMethodVisitor(int access, String methodName, String methodDesc, List<InstrumentationContext> ctxs, MethodVisitor mv) {
+    public SpyMethodVisitor(int access, String methodName, String methodDesc, List<SpyContext> ctxs, MethodVisitor mv) {
         super(V1_6, mv);
         this.access = access;
         this.methodName = methodName;
@@ -64,7 +61,7 @@ public class SpyMethodVisitor extends MethodVisitor {
     public void visitCode() {
         mv.visitCode();
         // ON_ENTER probes are inserted here
-        for (InstrumentationContext ctx : ctxs) {
+        for (SpyContext ctx : ctxs) {
             if (ctx.getSpyDefinition().getProbes(ON_ENTER).size() > 0) {
                 stackDelta = SpyUtil.max(stackDelta, emitProbe(ON_ENTER, ctx));
             }
@@ -80,7 +77,7 @@ public class SpyMethodVisitor extends MethodVisitor {
         if ((opcode >= IRETURN && opcode <= RETURN)) {
             // ON_EXIT probes are inserted here
             for (int i = ctxs.size()-1; i >= 0; i--) {
-                InstrumentationContext ctx = ctxs.get(i);
+                SpyContext ctx = ctxs.get(i);
                 if (getSubmitFlags(ON_ENTER, ctx.getSpyDefinition()) == SF_NONE ||
                     ctx.getSpyDefinition().getProbes(ON_EXIT).size() > 0) {
                     stackDelta = SpyUtil.max(stackDelta, emitProbe(ON_EXIT, ctx));
@@ -97,7 +94,7 @@ public class SpyMethodVisitor extends MethodVisitor {
         mv.visitLabel(l_try_handler);
 
         for (int i = ctxs.size()-1; i >= 0; i--) {
-            InstrumentationContext ctx = ctxs.get(i);
+            SpyContext ctx = ctxs.get(i);
             if (getSubmitFlags(ON_ENTER, ctx.getSpyDefinition()) == SF_NONE ||
                 ctx.getSpyDefinition().getProbes(ON_ERROR).size() > 0) {
                 stackDelta = SpyUtil.max(stackDelta, emitProbe(ON_ERROR, ctx));
@@ -122,7 +119,7 @@ public class SpyMethodVisitor extends MethodVisitor {
     }
 
 
-    private int emitProbe(int stage, InstrumentationContext ctx) {
+    private int emitProbe(int stage, SpyContext ctx) {
         SpyDefinition sdef = ctx.getSpyDefinition();
         List<SpyProbeElement> probeElements = sdef.getProbes(stage);
 

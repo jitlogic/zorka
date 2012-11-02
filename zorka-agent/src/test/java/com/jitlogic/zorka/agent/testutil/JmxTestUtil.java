@@ -18,17 +18,14 @@
 package com.jitlogic.zorka.agent.testutil;
 
 import com.jitlogic.zorka.agent.AgentGlobals;
-import com.jitlogic.zorka.agent.JavaAgent;
-import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.spy.InstrumentationEngine;
+import com.jitlogic.zorka.spy.SpyTransformer;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerBuilder;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import java.io.InputStream;
-import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -71,7 +68,7 @@ public class JmxTestUtil extends ClassLoader {
     }
 
 
-    public static Object instantiate(InstrumentationEngine engine, String clazzName) throws Exception {
+    public static Object instantiate(SpyTransformer engine, String clazzName) throws Exception {
         String className = clazzName.replace(".", "/");
         byte[] classBytes = readResource(className + ".class");
         byte[] transformed = engine.transform(JmxTestUtil.getSystemClassLoader(), className, null, null, classBytes);

@@ -17,7 +17,6 @@
 
 package com.jitlogic.zorka.spy.transformers;
 
-import com.jitlogic.zorka.spy.InstrumentationContext;
 import com.jitlogic.zorka.spy.SpyRecord;
 
 import java.util.regex.Pattern;

@@ -49,7 +49,7 @@ public class ZorkaConfig {
 	
 	private static Properties properties = null;
 	private static String homeDir = null;
-	
+
 	
 	public static String getLogDir() {
 		return getHomeDir("log");
@@ -88,6 +88,11 @@ public class ZorkaConfig {
 		
 		return properties.getProperty(key, defVal);
 	}
+
+
+    public static void setProperties(Properties props) {
+        properties = props;
+    }
 
 
 	public static void loadProperties() {

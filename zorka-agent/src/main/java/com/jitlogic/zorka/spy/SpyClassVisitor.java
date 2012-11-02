@@ -29,14 +29,14 @@ import static org.objectweb.asm.Opcodes.ACC_INTERFACE;
 
 public class SpyClassVisitor extends ClassVisitor {
 
-    private InstrumentationEngine engine;
+    private SpyTransformer engine;
     private List<SpyDefinition> sdefs;
     private String className;
 
     private boolean isInterface;
     private String interfaces[];
 
-    public SpyClassVisitor(InstrumentationEngine engine, String className,
+    public SpyClassVisitor(SpyTransformer engine, String className,
                            List<SpyDefinition> sdefs, ClassVisitor cv) {
         super(Opcodes.V1_6, cv);
         this.engine = engine;
@@ -54,12 +54,12 @@ public class SpyClassVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
         MethodVisitor mv = createVisitor(access, name, desc, signature, exceptions);
-        List<InstrumentationContext> ctxs = new ArrayList<InstrumentationContext>(sdefs.size());
+        List<SpyContext> ctxs = new ArrayList<SpyContext>(sdefs.size());
 
         for (SpyDefinition sdef : sdefs) {
             if (sdef.match(className, name, desc, access)) {
                 ctxs.add(engine.lookup(
-                        new InstrumentationContext(sdef, className, name, desc, access)));
+                        new SpyContext(sdef, className, name, desc, access)));
             }
         }
 

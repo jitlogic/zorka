@@ -16,7 +16,6 @@
  */
 package com.jitlogic.zorka.agent.testspy;
 
-import com.jitlogic.zorka.agent.testutil.JmxTestUtil;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.vmsci.MainSubmitter;
 import org.junit.After;
@@ -33,13 +32,13 @@ public class BytecodeInstrumentationTest {
 
     private final static String TCLASS1 = "com.jitlogic.zorka.agent.testspy.TestClass1";
 
-    private TestInstrumentationEngine engine;
+    private TestSpyTransformer engine;
     private TestSubmitter submitter;
 
 
     @Before
     public void setUp() throws Exception {
-        engine = new TestInstrumentationEngine();
+        engine = new TestSpyTransformer();
         submitter = new TestSubmitter();
         MainSubmitter.setSubmitter(submitter);
     }

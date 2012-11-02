@@ -18,9 +18,8 @@ package com.jitlogic.zorka.agent.testspy;
 
 import com.jitlogic.zorka.agent.AgentGlobals;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
-import com.jitlogic.zorka.mbeans.MethodCallStat;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
-import com.jitlogic.zorka.spy.InstrumentationContext;
+import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.spy.collectors.ZorkaStatsCollector;
@@ -62,7 +61,7 @@ public class SpyZorkaStatsCollectionTest {
     @Test
     public void testCollectToStatsMbeanWithoutPlaceholders() throws Exception {
         ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "test", 0);
-        InstrumentationContext ctx = new InstrumentationContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
+        SpyContext ctx = new SpyContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
 
         SpyRecord sr = new SpyRecord(ctx);
         sr.feed(ON_COLLECT, new Object[] { 10L });
@@ -78,7 +77,7 @@ public class SpyZorkaStatsCollectionTest {
     @Test
     public void testCollectorToStatsMbeanWithMethodNamePlaceholder() throws Exception {
         ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "${methodName}", 0);
-        InstrumentationContext ctx = new InstrumentationContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
+        SpyContext ctx = new SpyContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
 
         SpyRecord sr = new SpyRecord(ctx);
         sr.feed(ON_COLLECT, new Object[] { 10L });
@@ -94,7 +93,7 @@ public class SpyZorkaStatsCollectionTest {
     @Test
     public void testCollectoToStatsMbeanWithClassAndMethodNamePlaceholder() throws Exception {
         ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${methodName}", 0);
-        InstrumentationContext ctx = new InstrumentationContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
+        SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
 
         SpyRecord sr = new SpyRecord(ctx);
         sr.feed(ON_COLLECT, new Object[] { 10L });

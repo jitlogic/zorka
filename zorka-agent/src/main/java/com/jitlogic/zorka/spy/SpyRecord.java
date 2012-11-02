@@ -17,22 +17,20 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.sun.org.apache.xerces.internal.impl.validation.ValidationState;
-
 import static com.jitlogic.zorka.spy.SpyConst.*;
 
 public class SpyRecord {
 
     private final static Object[] NO_VALS = { };
 
-    private InstrumentationContext ctx;
+    private SpyContext ctx;
 
     private Object[][] vals = { NO_VALS, NO_VALS, NO_VALS, NO_VALS, NO_VALS };
 
     private int stages = 0;
 
 
-    public SpyRecord(InstrumentationContext ctx) {
+    public SpyRecord(SpyContext ctx) {
         this.ctx = ctx;
     }
 
@@ -76,7 +74,7 @@ public class SpyRecord {
         vals[ON_SUBMIT] = NO_VALS;
     }
 
-    public InstrumentationContext getContext() {
+    public SpyContext getContext() {
         return ctx;
     }
 
@@ -88,5 +86,9 @@ public class SpyRecord {
 
     public Object get(int stage, int idx) {
         return vals[stage][idx];
+    }
+
+    public void put(int stage, int idx, Object v) {
+        vals[stage][idx] = v;
     }
 }

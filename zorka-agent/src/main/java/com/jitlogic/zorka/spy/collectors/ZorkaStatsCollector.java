@@ -21,7 +21,7 @@ import com.jitlogic.zorka.agent.AgentGlobals;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.mbeans.MethodCallStatistic;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
-import com.jitlogic.zorka.spy.InstrumentationContext;
+import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyRecord;
 
 import java.util.HashMap;
@@ -35,8 +35,8 @@ public class ZorkaStatsCollector implements SpyCollector {
     private String mbsName, mbeanTemplate, attrTemplate, keyTemplate;
     private int timeField;
 
-    private Map<InstrumentationContext,MethodCallStatistics> statsCache =
-            new HashMap<InstrumentationContext, MethodCallStatistics>();
+    private Map<SpyContext,MethodCallStatistics> statsCache =
+            new HashMap<SpyContext, MethodCallStatistics>();
 
 
     public ZorkaStatsCollector(String mbsName, String mbeanTemplate, String attrTemplate,
@@ -51,7 +51,7 @@ public class ZorkaStatsCollector implements SpyCollector {
 
     public void collect(SpyRecord record) {
 
-        InstrumentationContext ctx = record.getContext();
+        SpyContext ctx = record.getContext();
         MethodCallStatistics stats = statsCache.get(record.getContext());
 
         if (stats == null) {
@@ -75,7 +75,7 @@ public class ZorkaStatsCollector implements SpyCollector {
     }
 
 
-    private String subst(String template, InstrumentationContext ctx) {
+    private String subst(String template, SpyContext ctx) {
         return template
                 .replace("${className}", ctx.getClassName())
                 .replace("${methodName}", ctx.getMethodName())

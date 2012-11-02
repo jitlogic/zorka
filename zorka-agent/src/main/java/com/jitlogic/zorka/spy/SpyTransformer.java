@@ -33,24 +33,24 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class InstrumentationEngine implements ClassFileTransformer {
+public class SpyTransformer implements ClassFileTransformer {
 
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private List<SpyDefinition> sdefs = new ArrayList<SpyDefinition>();
 
     private int nextId = 1;
-    private Map<Integer, InstrumentationContext> ctxById = new ConcurrentHashMap<Integer, InstrumentationContext>();
-    private Map<InstrumentationContext, InstrumentationContext> ctxInstances = new HashMap<InstrumentationContext, InstrumentationContext>();
+    private Map<Integer, SpyContext> ctxById = new ConcurrentHashMap<Integer, SpyContext>();
+    private Map<SpyContext, SpyContext> ctxInstances = new HashMap<SpyContext, SpyContext>();
 
 
-    public InstrumentationContext getContext(int id) {
+    public SpyContext getContext(int id) {
         return ctxById.get(id);
     }
 
 
-    public synchronized InstrumentationContext lookup(InstrumentationContext keyCtx) {
-        InstrumentationContext ctx = ctxInstances.get(keyCtx);
+    public synchronized SpyContext lookup(SpyContext keyCtx) {
+        SpyContext ctx = ctxInstances.get(keyCtx);
         if (ctx == null) {
             ctx = keyCtx;
             ctx.setId(nextId++);

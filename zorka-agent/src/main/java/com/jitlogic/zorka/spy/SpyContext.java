@@ -19,7 +19,7 @@ package com.jitlogic.zorka.spy;
 /**
  *
  */
-public class InstrumentationContext {
+public class SpyContext {
 
     private Integer id = null;
 
@@ -29,8 +29,8 @@ public class InstrumentationContext {
     private String methodDesc;
     private int access;
 
-    public InstrumentationContext(SpyDefinition spyDefinition, String className,
-                 String methodName, String methodDesc, int access) {
+    public SpyContext(SpyDefinition spyDefinition, String className,
+                      String methodName, String methodDesc, int access) {
 
         this.spyDefinition = spyDefinition;
         this.className = className;
@@ -76,11 +76,11 @@ public class InstrumentationContext {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof InstrumentationContext)) {
+        if (!(obj instanceof SpyContext)) {
             return false;
         }
 
-        InstrumentationContext ic = (InstrumentationContext)obj;
+        SpyContext ic = (SpyContext)obj;
 
         return spyDefinition.equals(ic.spyDefinition) &&
             className.equals(ic.className) && methodName.equals(ic.methodName) &&

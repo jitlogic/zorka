@@ -24,7 +24,7 @@ public class DispatchingCollector implements SpyCollector {
 
     public synchronized  void collect(SpyRecord record) {
 
-        InstrumentationContext ctx = record.getContext();
+        SpyContext ctx = record.getContext();
 
         SpyDefinition sdef = ctx.getSpyDefinition();
 

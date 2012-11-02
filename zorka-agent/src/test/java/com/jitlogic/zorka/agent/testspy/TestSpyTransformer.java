@@ -16,18 +16,17 @@
  */
 package com.jitlogic.zorka.agent.testspy;
 
-import com.jitlogic.zorka.spy.InstrumentationEngine;
+import com.jitlogic.zorka.spy.SpyTransformer;
 import com.jitlogic.zorka.spy.SpyClassVisitor;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.util.Textifier;
 import org.objectweb.asm.util.TraceClassVisitor;
 
 import java.io.PrintWriter;
 import java.util.List;
 
-public class TestInstrumentationEngine extends InstrumentationEngine {
+public class TestSpyTransformer extends SpyTransformer {
 
     private boolean debug = false;
 

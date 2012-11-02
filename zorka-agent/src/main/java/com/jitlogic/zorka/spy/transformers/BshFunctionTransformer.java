@@ -17,7 +17,6 @@
 package com.jitlogic.zorka.spy.transformers;
 
 import bsh.This;
-import com.jitlogic.zorka.spy.InstrumentationContext;
 import com.jitlogic.zorka.spy.SpyRecord;
 
 public class BshFunctionTransformer implements SpyTransformer {

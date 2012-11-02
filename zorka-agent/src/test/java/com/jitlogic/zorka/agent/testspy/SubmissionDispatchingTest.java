@@ -18,7 +18,7 @@
 package com.jitlogic.zorka.agent.testspy;
 
 import com.jitlogic.zorka.spy.DispatchingSubmitter;
-import com.jitlogic.zorka.spy.InstrumentationContext;
+import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.vmsci.SpySubmitter;
@@ -33,14 +33,14 @@ import static org.junit.Assert.*;
 
 public class SubmissionDispatchingTest {
 
-    private TestInstrumentationEngine engine;
+    private TestSpyTransformer engine;
     private SpySubmitter submitter;
     private TestCollector collector;
 
 
     @Before
     public void setUp() {
-        engine = new TestInstrumentationEngine();
+        engine = new TestSpyTransformer();
         collector = new TestCollector();
         submitter = new DispatchingSubmitter(engine, collector);
     }
@@ -49,7 +49,7 @@ public class SubmissionDispatchingTest {
     @Test
     public void testSubmitWithImmediateFlagAndCheckIfCollected() throws Exception {
         SpyDefinition sdef = engine.add(SpyDefinition.newInstance().onEnter().withTime());
-        InstrumentationContext ctx = engine.lookup(new InstrumentationContext(sdef, "com.TClass", "tMethod", "()V", 1));
+        SpyContext ctx = engine.lookup(new SpyContext(sdef, "com.TClass", "tMethod", "()V", 1));
 
         submitter.submit(ON_ENTER, ctx.getId(), SF_IMMEDIATE, new Object[] { 1L });
 
@@ -60,7 +60,7 @@ public class SubmissionDispatchingTest {
     @Test
     public void testSubmitWithBufferAndFlush() throws Exception {
         SpyDefinition sdef = engine.add(SpyDefinition.instrument());
-        InstrumentationContext ctx = engine.lookup(new InstrumentationContext(sdef, "Class", "method", "()V", 1));
+        SpyContext ctx = engine.lookup(new SpyContext(sdef, "Class", "method", "()V", 1));
 
         submitter.submit(ON_ENTER, ctx.getId(), SF_NONE, new Object[] { 1L });
         assertEquals(0, collector.size());
@@ -73,7 +73,7 @@ public class SubmissionDispatchingTest {
     @Test
     public void testSubmitAndCheckOnCollectBuf() throws Exception {
         SpyDefinition sdef = engine.add(SpyDefinition.newInstance());
-        InstrumentationContext ctx = engine.lookup(new InstrumentationContext(sdef, "Class", "method", "()V", 1));
+        SpyContext ctx = engine.lookup(new SpyContext(sdef, "Class", "method", "()V", 1));
 
         submitter.submit(ON_ENTER, ctx.getId(), SF_IMMEDIATE, new Object[] { 1L });
 
@@ -85,7 +85,7 @@ public class SubmissionDispatchingTest {
     @Test
     public void testSubmitAndCheckSubmitBuffer() throws Exception {
         SpyDefinition sdef = engine.add(SpyDefinition.instrument());
-        InstrumentationContext ctx = engine.lookup(new InstrumentationContext(sdef, "Class", "method", "()V", 1));
+        SpyContext ctx = engine.lookup(new SpyContext(sdef, "Class", "method", "()V", 1));
 
         submitter.submit(ON_ENTER, ctx.getId(), SF_NONE, new Object[] { 1L });
         submitter.submit(ON_EXIT, ctx.getId(), SF_FLUSH, new Object[] { 2L });

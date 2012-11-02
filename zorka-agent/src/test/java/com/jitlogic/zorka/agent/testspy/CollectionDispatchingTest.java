@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.agent.testspy;
 
 import com.jitlogic.zorka.spy.DispatchingCollector;
-import com.jitlogic.zorka.spy.InstrumentationContext;
+import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.spy.collectors.SpyCollector;
@@ -29,12 +29,12 @@ import static org.junit.Assert.*;
 
 public class CollectionDispatchingTest {
 
-    private TestInstrumentationEngine engine;
+    private TestSpyTransformer engine;
     private SpyCollector collector;
 
     @Before
     public void setUp() {
-        engine = new TestInstrumentationEngine();
+        engine = new TestSpyTransformer();
         collector = new DispatchingCollector();
     }
 
@@ -45,7 +45,7 @@ public class CollectionDispatchingTest {
         TestCollector col2 = new TestCollector();
 
         SpyDefinition sdef = SpyDefinition.newInstance().withTime().toCollector(col1).toCollector(col2);
-        InstrumentationContext ctx = engine.lookup(new InstrumentationContext(sdef, "TClass", "method", "()V", 1));
+        SpyContext ctx = engine.lookup(new SpyContext(sdef, "TClass", "method", "()V", 1));
 
         SpyRecord sr = new SpyRecord(ctx);
 

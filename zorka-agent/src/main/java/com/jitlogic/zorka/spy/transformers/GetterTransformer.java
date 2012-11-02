@@ -16,7 +16,6 @@
  */
 package com.jitlogic.zorka.spy.transformers;
 
-import com.jitlogic.zorka.spy.InstrumentationContext;
 import com.jitlogic.zorka.spy.SpyRecord;
 
 public class GetterTransformer implements SpyTransformer {
