@@ -38,18 +38,18 @@ public class ZorkaStatsCollector implements SpyCollector {
 
     private MBeanServerRegistry registry = AgentGlobals.getMBeanServerRegistry();
     private String mbsName, mbeanTemplate, attrTemplate, keyTemplate;
-    private int timeField;
+    private int timeField, tstampField;
 
-    private Map<SpyContext,MethodCallStatistics> statsCache =
-            new HashMap<SpyContext, MethodCallStatistics>();
+    private Map<SpyContext,MethodCallStatistics> statsCache = new HashMap<SpyContext, MethodCallStatistics>();
 
 
     public ZorkaStatsCollector(String mbsName, String mbeanTemplate, String attrTemplate,
-                               String keyTemplate, int timeField) {
+                               String keyTemplate, int tstampField, int timeField) {
         this.mbsName  = mbsName;
         this.mbeanTemplate = mbeanTemplate;
         this.attrTemplate = attrTemplate;
         this.keyTemplate = keyTemplate;
+        this.tstampField = tstampField;
         this.timeField = timeField;
     }
 
@@ -73,18 +73,19 @@ public class ZorkaStatsCollector implements SpyCollector {
         MethodCallStatistic statistic = (MethodCallStatistic)stats.getMethodCallStatistic(key);
 
         Object timeObj = record.get(ON_COLLECT, timeField);
+        Object tstampObj = record.get(ON_COLLECT, tstampField);
 
-        if (timeObj instanceof Long) {
+        if (timeObj instanceof Long && tstampObj instanceof Long) {
             if (record.gotStage(ON_EXIT)) {
                 if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
                     log.debug("Logging record using logCall()");
                 }
-                statistic.logCall(0, (Long)record.get(ON_COLLECT, timeField));
+                statistic.logCall((Long)tstampObj, (Long)timeObj);
             } else if (record.gotStage(ON_ERROR)) {
                 if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
                     log.debug("Logging record using logError()");
                 }
-                statistic.logError(0, (Long)record.get(ON_COLLECT, timeField));
+                statistic.logError((Long)tstampObj, (Long)timeObj);
             } else {
                 if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
                     log.debug("No ON_EXIT nor ON_ERROR marked on record " + record);
@@ -92,7 +93,7 @@ public class ZorkaStatsCollector implements SpyCollector {
             }
         } else {
             if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
-                log.debug("Unknown type of time object: " + timeObj);
+                log.debug("Unknown type of time or tstamp object: " + timeObj);
             }
         }
     }

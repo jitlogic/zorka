@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.rankproc;
+package com.jitlogic.zorka.rankproc;
 
 public class BeanRankInfo {
 	private String name;

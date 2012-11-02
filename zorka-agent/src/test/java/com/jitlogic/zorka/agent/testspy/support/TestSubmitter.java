@@ -17,7 +17,7 @@
 
 package com.jitlogic.zorka.agent.testspy.support;
 
-import com.jitlogic.zorka.vmsci.SpySubmitter;
+import com.jitlogic.zorka.spy.SpySubmitter;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -215,5 +215,16 @@ public class ObjectInspector {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
+    public Set<ObjectName> queryNames(MBeanServerConnection conn, String query) {
+        try {
+            ObjectName on = new ObjectName(query);
+            return (Set<ObjectName>)conn.queryNames(on, null);
+        } catch (Exception e) {
+            //log.error("Error resolving object names.", e);
+            return new HashSet<ObjectName>();
+        }
+    }
+
 
 }

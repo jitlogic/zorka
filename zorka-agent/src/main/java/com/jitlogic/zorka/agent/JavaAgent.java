@@ -20,20 +20,15 @@ package com.jitlogic.zorka.agent;
 import java.lang.instrument.ClassFileTransformer;
 import java.util.concurrent.Executor;
 
-import com.jitlogic.zorka.agent.zabbix.ZabbixAgent;
-import com.jitlogic.zorka.bootstrap.Agent;
+import com.jitlogic.zorka.zabbix.ZabbixAgent;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
-import com.jitlogic.zorka.util.ZorkaConfig;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.vmsci.MainSubmitter;
+import com.jitlogic.zorka.spy.MainSubmitter;
 
-import javax.management.MBeanServerConnection;
-
-public class JavaAgent implements Agent {
-
+public class JavaAgent {
 
 	public static final long DEFAULT_TIMEOUT = 60000;
 
@@ -52,11 +47,9 @@ public class JavaAgent implements Agent {
 
     private MBeanServerRegistry mBeanServerRegistry;
 
-    public JavaAgent() {
-        mBeanServerRegistry = new MBeanServerRegistry(
-            "yes".equals(ZorkaConfig.get("zorka.mbs.autoregister", "yes")));
 
-        AgentGlobals.setMBeanServerRegistry(mBeanServerRegistry);
+    public JavaAgent() {
+        mBeanServerRegistry = AgentGlobals.getMBeanServerRegistry();
 
         try {
             requestTimeout = Long.parseLong(ZorkaConfig.get("zorka.req.timeout", "15000").trim());
@@ -75,7 +68,6 @@ public class JavaAgent implements Agent {
         } catch (NumberFormatException e) {
             log.error("Invalid zorka.req.queue setting: '" + ZorkaConfig.get("zorka.req.queue", "64").trim());
         }
-
     }
 
 
@@ -83,7 +75,7 @@ public class JavaAgent implements Agent {
         if (executor == null)
             executor = new ClosingTimeoutExecutor(requestThreads, requestQueue, requestTimeout);
 
-        zorkaAgent = new ZorkaBshAgent(executor, mBeanServerRegistry);
+        zorkaAgent = new ZorkaBshAgent(executor);
 
         if (ZorkaConfig.get("spy", "no").equalsIgnoreCase("yes")) {
             log.info("Enabling Zorka SPY");
@@ -107,25 +99,7 @@ public class JavaAgent implements Agent {
     }
 
 
-    public void stop() {
-        zabbixAgent.stop();
-        zorkaAgent.svcStop();
-        AgentGlobals.setMBeanServerRegistry(null);
-    }
-
-
     public ClassFileTransformer getSpyTransformer() {
         return spyInstance != null ? spyInstance.getClassTransformer() : null;
     }
-
-
-    public void registerMbs(String name, MBeanServerConnection conn, ClassLoader classLoader) {
-        mBeanServerRegistry.register(name, conn, classLoader);
-    }
-
-
-    public void unregisterMbs(String name) {
-        mBeanServerRegistry.unregister(name);
-    }
-
 }

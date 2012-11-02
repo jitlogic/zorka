@@ -10,6 +10,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <version>1.1.1</version>
         </dependency>
         <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>4.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.jitlogic.zoola</groupId>
             <artifactId>zoola-core</artifactId>
             <version>0.0.1-SNAPSHOT</version>
@@ -56,12 +61,45 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Premain-Class>com.jitlogic.zorka.agent.JavaAgent</Premain-Class>
+                            <Premain-Class>com.jitlogic.zorka.agent.AgentMain</Premain-Class>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
                         </manifestEntries>
                     </archive>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>jarjar-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jarjar</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>com.googlecode.json-simple:json-simple</include>
+                                <include>org.ow2.asm:asm</include>
+                                <include>com.jitlogic.zoola:zoola-core</include>
+                            </includes>
+                            <rules>
+                                <rule>
+                                    <pattern>org.json.simple.**</pattern>
+                                    <result>com.jitlogic.zorka.deps.json.@1</result>
+                                </rule>
+                                <rule>
+                                    <pattern>org.objectweb.asm.**</pattern>
+                                    <result>com.jitlogic.zorka.deps.asm.@1</result>
+                                </rule>
+                                <rule>
+                                    <pattern>bsh.**</pattern>
+                                    <result>com.jitlogic.zorka.deps.bsh.@1</result>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

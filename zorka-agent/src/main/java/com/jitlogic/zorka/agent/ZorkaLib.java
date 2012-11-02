@@ -17,9 +17,6 @@
 
 package com.jitlogic.zorka.agent;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -31,15 +28,13 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
-import com.jitlogic.zorka.agent.rankproc.AvgRateCounter;
-import com.jitlogic.zorka.agent.rankproc.BeanRankLister;
-import com.jitlogic.zorka.agent.rankproc.ThreadRankLister;
-import com.jitlogic.zorka.bootstrap.AgentMain;
+import com.jitlogic.zorka.rankproc.AvgRateCounter;
+import com.jitlogic.zorka.rankproc.BeanRankLister;
+import com.jitlogic.zorka.rankproc.ThreadRankLister;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
 import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.util.ZorkaConfig;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
@@ -56,7 +51,6 @@ public class ZorkaLib implements ZorkaService {
 	
 	private ZorkaBshAgent agent;
     private Set<JmxObject> registeredObjects = new HashSet<JmxObject>();
-	private JmxResolver resolver = new JmxResolver();
     private ObjectInspector inspector = new ObjectInspector();
 
     private MBeanServerRegistry mbsRegistry;
@@ -64,9 +58,9 @@ public class ZorkaLib implements ZorkaService {
     private String hostname = null;
 
 
-    public ZorkaLib(ZorkaBshAgent agent, MBeanServerRegistry mBeanServerRegistry) {
+    public ZorkaLib(ZorkaBshAgent agent) {
 		this.agent = agent;
-        this.mbsRegistry = mBeanServerRegistry;
+        this.mbsRegistry = AgentGlobals.getMBeanServerRegistry();
         this.hostname = ZorkaConfig.get("zorka.hostname", "null").trim();
 	}
 
@@ -98,7 +92,7 @@ public class ZorkaLib implements ZorkaService {
 		}
         ClassLoader cl0 = Thread.currentThread().getContextClassLoader(), cl1 = mbsRegistry.getClassLoader(conname);
 
-        Set<ObjectName> names = resolver.queryNames(conn, args.get(1).toString());
+        Set<ObjectName> names = inspector.queryNames(conn, args.get(1).toString());
 		if (args.size() == 2) {
 			for (ObjectName name : names) {
 				objs.add(new JmxObject(name, conn, cl1));
@@ -153,7 +147,7 @@ public class ZorkaLib implements ZorkaService {
 			return null;
 		}
 
-        Set<ObjectName> names = resolver.queryNames(conn, argList.get(1).toString());
+        Set<ObjectName> names = inspector.queryNames(conn, argList.get(1).toString());
 		
 		if (names.isEmpty()) { 
 			return null;
@@ -341,20 +335,6 @@ public class ZorkaLib implements ZorkaService {
         return ZorkaLogger.getLog(tag);
     }
 
-    public void addJars(String...paths) {
-        for (String path : paths) {
-            File f = new File(path);
-            if (!f.canRead() || !f.canRead()) {
-                throw new RuntimeException("Cannot open jar file: '" + path + "'");
-            }
-            try {
-                AgentMain.addJarURL(f.toURI().toURL());
-            } catch (MalformedURLException e) {
-                throw new RuntimeException("Error converting URL '" + path + "'");
-            }
-        }
-    }
-
 
     public void reload(String mask) {
         agent.loadScriptDir(ZorkaConfig.getConfDir(),
@@ -395,4 +375,6 @@ public class ZorkaLib implements ZorkaService {
 		});
 		return "OK";
 	}
+
+
 }

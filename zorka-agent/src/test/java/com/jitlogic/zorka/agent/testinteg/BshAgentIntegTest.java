@@ -22,13 +22,9 @@ import static org.junit.Assert.*;
 import java.net.URL;
 
 
-import com.jitlogic.zorka.agent.MBeanServerRegistry;
+import com.jitlogic.zorka.agent.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.jitlogic.zorka.agent.TimeoutThreadPoolExecutor;
-import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.agent.ZorkaCallback;
 
 public class BshAgentIntegTest {
 
@@ -65,9 +61,9 @@ public class BshAgentIntegTest {
 
 	@Before
 	public void setUp() {
+        AgentGlobals.setMBeanServerRegistry(new MBeanServerRegistry(true));
 		agent = new ZorkaBshAgent(
-            //new ClosingTimeoutExecutor(5, 5, 100));
-			TimeoutThreadPoolExecutor.newBoundedPool(100), new MBeanServerRegistry(true));
+			TimeoutThreadPoolExecutor.newBoundedPool(100));
 		result = null;
 		err = null;
 	}
@@ -75,6 +71,7 @@ public class BshAgentIntegTest {
 	@Test
 	public void testAgentFunctions() throws Exception {
 		assertEquals(ZorkaBshAgent.VERSION, execute("zorka.version()", 1000));
+        AgentGlobals.setMBeanServerRegistry(null);
 	}
 
 	@Test

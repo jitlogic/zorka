@@ -1,7 +1,6 @@
 package com.jitlogic.zorka.agent.unittest;
 
-import com.jitlogic.zorka.bootstrap.AgentMain;
-import com.jitlogic.zorka.util.ZorkaConfig;
+import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.util.ZorkaUtil;
 import org.junit.Before;
 import org.junit.Test;
