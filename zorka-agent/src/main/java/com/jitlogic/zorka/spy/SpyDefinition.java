@@ -438,14 +438,16 @@ public class SpyDefinition {
      * Gets slot number n, performs traditional get operation and stores
      * results in the same slot.
      *
-     * @param arg
+     * @param src
+     *
+     * @param dst
      *
      * @param path
      *
      * @return augmented spy definition
      */
-    public SpyDefinition get(int arg, Object...path) {
-        return withArgProcessor(new GetterArgProcessor(arg, arg, path));
+    public SpyDefinition get(int src, int dst, Object...path) {
+        return withArgProcessor(new GetterArgProcessor(src, dst, path));
     }
 
 
@@ -539,23 +541,6 @@ public class SpyDefinition {
 
     /**
      * Instructs spy to submit data to traditional Zorka Statistics object. Statistics
-     * will be organized by method name.
-     *
-     * @param mbsName mbean server name
-     *
-     * @param beanName bean name
-     *
-     * @param attrName attribute name
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition toStats(String mbsName, String beanName, String attrName, int timeField) {
-        return toCollector(new ZorkaStatsCollector(mbsName, beanName, attrName, "${methodName}", timeField));
-    }
-
-
-    /**
-     * Instructs spy to submit data to traditional Zorka Statistics object. Statistics
      * will be organized by keyExpr having all its macros properly expanded.
      *
      * @param mbsName mbean server name
@@ -568,8 +553,8 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition toStats(String mbsName, String beanName, String attrName, String keyExpr, int timeField) {
-        return toCollector(new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, timeField));
+    public SpyDefinition toStats(String mbsName, String beanName, String attrName, String keyExpr, int tstampField, int timeField) {
+        return toCollector(new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, tstampField, timeField));
     }
 
 

@@ -108,9 +108,9 @@ public class SpyDefinitionModellingTest {
     public void testDefineSimpleInstrumentation() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor(SpyMatcher.DEFAULT_FILTER,
-                "com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod",
-                    SM_ANY_TYPE, SM_NOARGS)
-                .toStats("java", "some.app:type=ZorkaStats,name=SomeClass", "stats", 0);
+                "com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod", SM_ANY_TYPE, SM_NOARGS)
+                .onSubmit().timeDiff(0,1,1)
+                .toStats("java", "some.app:type=ZorkaStats,name=SomeClass", "stats", "${methodName}", 0, 1);
         assertEquals(1, sdef.getMatchers().size());
     }
 
@@ -122,8 +122,8 @@ public class SpyDefinitionModellingTest {
     //@Test
     public void testDefineInstrumentationWithAntMasks() {
         SpyDefinition sdef =
-            SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.**", "*")
-                .toStats("java", "some.app:type=ZorkaStats,name=${className}", "stats", 0);
+            SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.**", "*").onSubmit().timeDiff(0,1,1)
+                .toStats("java", "some.app:type=ZorkaStats,name=${className}", "stats", "${methodName}", 0,1);
     }
 
 
@@ -133,8 +133,8 @@ public class SpyDefinitionModellingTest {
     //@Test
     public void testInstrumentMethodWithArgProcAndTestAndShortMask() {
         SpyDefinition sdef =
-            SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.*", "*")
-                .toStats("java", "some.app:type=ZorkaStats,name=${className}", "${methodName}", 0);
+            SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.*", "*").onSubmit().timeDiff(0,1,1)
+                .toStats("java", "some.app:type=ZorkaStats,name=${className}", "${methodName}", "method", 0, 1);
     }
 
 
@@ -145,8 +145,8 @@ public class SpyDefinitionModellingTest {
     public void testInstrumentWithFormatArgs() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
-                .withFormat(2,"${1.request.requestURI}")
-                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI", 0);
+                .withFormat(2,"${1.request.requestURI}").onSubmit().timeDiff(0,1,1)
+                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI", "${2}", 0, 1);
     }
 
 
@@ -157,9 +157,9 @@ public class SpyDefinitionModellingTest {
     public void testInstrumentWithFormatArgsAndTransformViaMethod() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
-                .withFormat(2,"${1.request.requestURI}")
-                .transform(0, "split", "\\?").get(0, 0)
-                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI", 0);
+                .withFormat(2,"${1.request.requestURI}").transform(0, "split", "\\?").get(0, 0)
+                .onSubmit().timeDiff(0,1,1)
+                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI", "${methodName}", 0, 1);
     }
 
 
@@ -171,8 +171,8 @@ public class SpyDefinitionModellingTest {
         This ns = null; // Use 'this' keyword in BSH
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
-                .withArguments(1).transform(ns, "classify_uris")
-                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byClass", 0);
+                .withArguments(1).transform(ns, "classify_uris").onSubmit().timeDiff(0,2,2)
+                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byClass", "${1}", 0, 2);
     }
 
 
@@ -183,8 +183,8 @@ public class SpyDefinitionModellingTest {
     public void testInstrumentWithCatchArgsOnExit() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
-                .withArguments(2).withFormat(0,"${0.reply.replyCode}")
-                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byCode", 0);
+                .withArguments(2).withFormat(1,"${0.reply.replyCode}").onSubmit().timeDiff(0,2,2)
+                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byCode", "${1}", 0, 2);
     }
 
 
@@ -196,9 +196,9 @@ public class SpyDefinitionModellingTest {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
                 .onExit().withArguments(1,2)
-                .withFormat(0,"${0.request.requestURI}").withFormat(1,"${1.reply.replyCode}")
-                .transform(0, "split", "\\?").get(0, 0)
-                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests,httpCode=${1}", "stats", "${0}", 0);
+                .withFormat(1,"${1.request.requestURI}").withFormat(2,"${2.reply.replyCode}")
+                .transform(1, "split", "\\?").get(1, 0).onSubmit().timeDiff(0, 1, 1)
+                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests,httpCode=${1}", "stats", "${0}", 0, 1);
     }
 
 
@@ -273,7 +273,7 @@ public class SpyDefinitionModellingTest {
     public void testExposeSomeHashMapAsMBeanAttribute() {
         SpyDefinition sdef =
             SpyDefinition.newInstance().once().lookFor("some.package.SingletonBean", SM_CONSTRUCTOR)
-                .withArguments(0).get(0, "someMap")
+                .withArguments(0).get(0, 0, "someMap")
                 .toGetter("java", "SomeApp:type=SingletonType", "map");
     }
 }

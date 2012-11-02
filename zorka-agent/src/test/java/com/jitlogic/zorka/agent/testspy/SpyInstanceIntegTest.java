@@ -62,7 +62,7 @@ public class SpyInstanceIntegTest {
     public void testTrivialMethodRun() throws Exception {
         SpyDefinition sdef = SpyDefinition.instrument().onSubmit().timeDiff(0, 1, 1)
                 .lookFor(TCLASS1, "trivialMethod")
-                .toStats("test", "test:name=${shortClassName}", "stats", 1);
+                .toStats("test", "test:name=${shortClassName}", "stats", "${methodName}", 0, 1);
 
         instance.add(sdef);
 

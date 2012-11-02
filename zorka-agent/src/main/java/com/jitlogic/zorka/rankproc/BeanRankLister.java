@@ -18,6 +18,7 @@
 package com.jitlogic.zorka.rankproc;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -27,12 +28,10 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 
 import com.jitlogic.zorka.agent.JmxObject;
-import com.jitlogic.zorka.agent.JmxResolver;
 import com.jitlogic.zorka.util.ObjectInspector;
 
 public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 	
-	private JmxResolver resolver = new JmxResolver();
 	private MBeanServerConnection conn;
 	private String query;
 	private String attr0 = null;
@@ -82,11 +81,10 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 		}
 		
 	}
-	
-	
-	@Override
+
+    @Override
 	public List<BeanRankInfo> list() {
-		Set<ObjectName> names = resolver.queryNames(conn, query);
+		Set<ObjectName> names = inspector.queryNames(conn, query);
 		
 		List<BeanRankInfo> lst = new ArrayList<BeanRankInfo>();
 		

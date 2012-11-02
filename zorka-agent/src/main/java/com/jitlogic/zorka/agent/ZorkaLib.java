@@ -17,8 +17,6 @@
 
 package com.jitlogic.zorka.agent;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -53,7 +51,6 @@ public class ZorkaLib implements ZorkaService {
 	
 	private ZorkaBshAgent agent;
     private Set<JmxObject> registeredObjects = new HashSet<JmxObject>();
-	private JmxResolver resolver = new JmxResolver();
     private ObjectInspector inspector = new ObjectInspector();
 
     private MBeanServerRegistry mbsRegistry;
@@ -95,7 +92,7 @@ public class ZorkaLib implements ZorkaService {
 		}
         ClassLoader cl0 = Thread.currentThread().getContextClassLoader(), cl1 = mbsRegistry.getClassLoader(conname);
 
-        Set<ObjectName> names = resolver.queryNames(conn, args.get(1).toString());
+        Set<ObjectName> names = inspector.queryNames(conn, args.get(1).toString());
 		if (args.size() == 2) {
 			for (ObjectName name : names) {
 				objs.add(new JmxObject(name, conn, cl1));
@@ -150,7 +147,7 @@ public class ZorkaLib implements ZorkaService {
 			return null;
 		}
 
-        Set<ObjectName> names = resolver.queryNames(conn, argList.get(1).toString());
+        Set<ObjectName> names = inspector.queryNames(conn, argList.get(1).toString());
 		
 		if (names.isEmpty()) { 
 			return null;
@@ -378,4 +375,6 @@ public class ZorkaLib implements ZorkaService {
 		});
 		return "OK";
 	}
+
+
 }
