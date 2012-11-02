@@ -15,9 +15,10 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.util;
+package com.jitlogic.zorka.agent;
 
-import com.jitlogic.zorka.bootstrap.AgentMain;
+import com.jitlogic.zorka.agent.AgentMain;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.io.File;
 import java.io.FileInputStream;

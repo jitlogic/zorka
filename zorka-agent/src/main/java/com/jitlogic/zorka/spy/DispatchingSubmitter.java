@@ -21,7 +21,6 @@ import com.jitlogic.zorka.spy.collectors.SpyCollector;
 import com.jitlogic.zorka.spy.processors.SpyArgProcessor;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.vmsci.SpySubmitter;
 
 import java.util.List;
 import java.util.Stack;

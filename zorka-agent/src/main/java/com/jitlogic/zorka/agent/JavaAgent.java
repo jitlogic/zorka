@@ -20,19 +20,17 @@ package com.jitlogic.zorka.agent;
 import java.lang.instrument.ClassFileTransformer;
 import java.util.concurrent.Executor;
 
-import com.jitlogic.zorka.agent.zabbix.ZabbixAgent;
-import com.jitlogic.zorka.bootstrap.Agent;
+import com.jitlogic.zorka.zabbix.ZabbixAgent;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
-import com.jitlogic.zorka.util.ZorkaConfig;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.vmsci.MainSubmitter;
+import com.jitlogic.zorka.spy.MainSubmitter;
 
 import javax.management.MBeanServerConnection;
 
-public class JavaAgent implements Agent {
+public class JavaAgent {
 
 
 	public static final long DEFAULT_TIMEOUT = 60000;

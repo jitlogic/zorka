@@ -30,15 +30,13 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
-import com.jitlogic.zorka.agent.rankproc.AvgRateCounter;
-import com.jitlogic.zorka.agent.rankproc.BeanRankLister;
-import com.jitlogic.zorka.agent.rankproc.ThreadRankLister;
-import com.jitlogic.zorka.bootstrap.AgentMain;
+import com.jitlogic.zorka.rankproc.AvgRateCounter;
+import com.jitlogic.zorka.rankproc.BeanRankLister;
+import com.jitlogic.zorka.rankproc.ThreadRankLister;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
 import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.util.ZorkaConfig;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 

@@ -1,4 +1,4 @@
-package com.jitlogic.zorka.bootstrap;
+package com.jitlogic.zorka.agent;
 
 import java.net.URL;
 import java.net.URLClassLoader;

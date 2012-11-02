@@ -1,4 +1,4 @@
-package com.jitlogic.zorka.bootstrap;
+package com.jitlogic.zorka.agent;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -15,7 +15,7 @@ public class AgentMain {
     private static String homeDir;
     private static ClassLoader systemClassLoader;
     private static AgentClassLoader zorkaClassLoader;
-    public static Agent agent; // TODO uporządkować to !
+    public static JavaAgent agent;
 
     public static void premain(String args, Instrumentation instr) {
         String[] argv = args.split(",");
@@ -34,7 +34,7 @@ public class AgentMain {
 
         try {
             Class<?> clazz = zorkaClassLoader.loadClass("com.jitlogic.zorka.agent.JavaAgent");
-            agent = (Agent)clazz.newInstance();
+            agent = (JavaAgent)clazz.newInstance();
             agent.start();
         } catch (Exception e) {
             throw new RuntimeException("Error starting up agent.", e);
@@ -69,10 +69,6 @@ public class AgentMain {
 
     public static String getHomeDir() {
         return homeDir;
-    }
-
-    public static Agent getAgent() {
-        return agent;
     }
 
     public static void addJarURL(URL url) {

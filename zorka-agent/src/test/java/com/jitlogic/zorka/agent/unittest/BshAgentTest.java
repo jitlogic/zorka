@@ -20,7 +20,7 @@ package com.jitlogic.zorka.agent.unittest;
 import java.util.concurrent.Executor;
 
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
-import com.jitlogic.zorka.agent.zabbix.ZabbixLib;
+import com.jitlogic.zorka.zabbix.ZabbixLib;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;

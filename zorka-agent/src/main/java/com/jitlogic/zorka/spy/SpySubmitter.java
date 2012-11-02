@@ -15,7 +15,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.vmsci;
+package com.jitlogic.zorka.spy;
 
 public interface SpySubmitter {
 

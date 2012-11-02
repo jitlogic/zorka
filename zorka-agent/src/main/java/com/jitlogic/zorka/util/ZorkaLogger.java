@@ -1,5 +1,7 @@
 package com.jitlogic.zorka.util;
 
+import com.jitlogic.zorka.agent.ZorkaConfig;
+
 import java.io.*;
 import java.util.Date;
 

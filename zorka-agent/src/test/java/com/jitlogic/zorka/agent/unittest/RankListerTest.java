@@ -25,8 +25,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import com.jitlogic.zorka.agent.rankproc.RankItem;
-import com.jitlogic.zorka.agent.rankproc.RankList;
+import com.jitlogic.zorka.rankproc.RankItem;
+import com.jitlogic.zorka.rankproc.RankList;
 import com.jitlogic.zorka.agent.testutil.TestRankLister;
 
 

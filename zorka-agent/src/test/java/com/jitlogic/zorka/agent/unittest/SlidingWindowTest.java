@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import com.jitlogic.zorka.agent.rankproc.RateAggregate;
+import com.jitlogic.zorka.rankproc.RateAggregate;
 import com.jitlogic.zorka.agent.testutil.ZorkaTestUtil;
 
 public class SlidingWindowTest {

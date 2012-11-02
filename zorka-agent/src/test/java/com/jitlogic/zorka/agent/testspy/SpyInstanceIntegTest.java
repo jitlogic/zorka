@@ -20,7 +20,7 @@ import com.jitlogic.zorka.agent.AgentGlobals;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyInstance;
-import com.jitlogic.zorka.vmsci.MainSubmitter;
+import com.jitlogic.zorka.spy.MainSubmitter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +60,7 @@ public class SpyInstanceIntegTest {
 
     @Test
     public void testTrivialMethodRun() throws Exception {
-        SpyDefinition sdef = SpyDefinition.instrument().onSubmit().timeDiff(0,1,1)
+        SpyDefinition sdef = SpyDefinition.instrument().onSubmit().timeDiff(0, 1, 1)
                 .lookFor(TCLASS1, "trivialMethod")
                 .toStats("test", "test:name=${shortClassName}", "stats", 1);
 

@@ -19,7 +19,7 @@ package com.jitlogic.zorka.agent.testspy;
 import com.jitlogic.zorka.agent.testspy.support.TestSpyTransformer;
 import com.jitlogic.zorka.agent.testspy.support.TestSubmitter;
 import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.vmsci.MainSubmitter;
+import com.jitlogic.zorka.spy.MainSubmitter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

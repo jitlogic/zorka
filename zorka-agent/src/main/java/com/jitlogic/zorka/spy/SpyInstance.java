@@ -17,11 +17,9 @@ package com.jitlogic.zorka.spy;
 
 
 import com.jitlogic.zorka.spy.collectors.SpyCollector;
-import com.jitlogic.zorka.util.ZorkaConfig;
+import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.vmsci.MainSubmitter;
-import com.jitlogic.zorka.vmsci.SpySubmitter;
 
 import java.util.Properties;
 

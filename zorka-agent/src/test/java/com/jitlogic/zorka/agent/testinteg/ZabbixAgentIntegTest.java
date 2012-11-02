@@ -30,9 +30,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.agent.zabbix.ZabbixAgent;
-import com.jitlogic.zorka.agent.zabbix.ZabbixRequestHandler;
-import com.jitlogic.zorka.util.ZorkaConfig;
+import com.jitlogic.zorka.zabbix.ZabbixAgent;
+import com.jitlogic.zorka.zabbix.ZabbixRequestHandler;
+import com.jitlogic.zorka.agent.ZorkaConfig;
 
 public class ZabbixAgentIntegTest {
 
