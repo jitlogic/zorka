@@ -74,22 +74,6 @@ public class AgentMain {
         return homeDir;
     }
 
-    public static void logStart(long id) {
-        agent.logStart(id);
-    }
-
-    public static void logStart(Object[] args, long id) {
-        agent.logStart(args, id);
-    }
-
-    public static void logCall(long id) {
-        agent.logCall(id);
-    }
-
-    public static void logError(long id) {
-        agent.logError(id);
-    }
-
     public static Agent getAgent() {
         return agent;
     }

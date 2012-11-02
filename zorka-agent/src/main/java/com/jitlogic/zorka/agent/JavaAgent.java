@@ -22,7 +22,6 @@ import java.util.concurrent.Executor;
 
 import com.jitlogic.zorka.agent.zabbix.ZabbixAgent;
 import com.jitlogic.zorka.bootstrap.Agent;
-import com.jitlogic.zorka.spy.old.MainCollector;
 import com.jitlogic.zorka.spy.old.ZorkaSpyLib;
 import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
 import com.jitlogic.zorka.util.ZorkaConfig;
@@ -87,7 +86,6 @@ public class JavaAgent implements Agent {
 
         if (ZorkaConfig.get("spy", "no").equalsIgnoreCase("yes")) {
             log.info("Enabling Zorka SPY");
-            MainCollector.clear();
             spyLib = new ZorkaSpyLib(zorkaAgent);
             zorkaAgent.installModule("spy", spyLib);
         }
@@ -116,27 +114,11 @@ public class JavaAgent implements Agent {
     }
 
     public ClassFileTransformer getSpyTransformer() {
-        return spyLib != null ? spyLib.getSpy() : null;
+        return null; // TODO insert new spy transformer here
     }
 
     public ZorkaSpyLib getSpyLib() {
         return spyLib;
-    }
-
-    public void logStart(long id) {
-        MainCollector.logStart(id);
-    }
-
-    public void logStart(Object[] args, long id) {
-        MainCollector.logStart(args, id);
-    }
-
-    public void logCall(long id) {
-        MainCollector.logCall(id);
-    }
-
-    public void logError(long id) {
-        MainCollector.logError(id);
     }
 
     public void registerMbs(String name, MBeanServerConnection conn, ClassLoader classLoader) {
