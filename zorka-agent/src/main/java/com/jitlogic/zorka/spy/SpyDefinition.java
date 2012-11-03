@@ -603,22 +603,20 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition toBsh(This ns, String func) {
-        return toCollector(new BshFuncCollector(ns, func));
+    public SpyDefinition toObjCall(This ns, String func) {
+        return toCollector(new CallingObjCollector(ns, func));
     }
 
 
     /**
-     * Instructs spy to submit data to a single BSH function.
+     * Instructs spy to submit data to a collect() function in a BSH namespace..
      *
      * @param ns BSH namespace
      *
-     * @param func function name
-     *
      * @return augmented spy definition
      */
-    public SpyDefinition toBsh(String ns, String func) {
-        return toCollector(new BshFuncCollector(ns, func));
+    public SpyDefinition toBsh(String ns) {
+        return toCollector(new CallingBshCollector(ns));
     }
 
 

@@ -8,8 +8,7 @@
  * <p/>
  * This software is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * <p/>
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
@@ -17,20 +16,23 @@
 
 package com.jitlogic.zorka.spy.collectors;
 
-import bsh.This;
+import com.jitlogic.zorka.agent.AgentInstance;
+import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.spy.SpyRecord;
 
-public class BshFuncCollector implements SpyCollector {
+public class CallingBshCollector implements SpyCollector {
 
-    public BshFuncCollector(String ns, String name) {
-        // TODO (is it needed after all ?)
-    }
+    private SpyCollector collector;
 
-    public BshFuncCollector(This ns, String name) {
-        // TODO
+    public CallingBshCollector(String ns) {
+        ZorkaBshAgent agent = AgentInstance.instance().getZorkaAgent();
+        collector = (SpyCollector)agent.eval(
+                "(com.jitlogic.zorka.spy.collectors.SpyCollector)"+ns);
     }
 
     public void collect(SpyRecord record) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        if (collector != null) {
+            collector.collect(record);
+        }
     }
 }

@@ -225,7 +225,7 @@ public class SpyDefinitionModellingTest {
     public void testInstrumentAndGetReturnValue() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.unittest.SomeClass", "getTstCount")
-                .withRetVal().toBsh("someapp", "tstcount");
+                .withRetVal().toBsh("someapp");
 
     }
 
@@ -237,7 +237,7 @@ public class SpyDefinitionModellingTest {
     public void testInstrumentGetSomeArgsAndReturnValue() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.unittest.SomeClass", "otherMethod")
-                .withRetVal().toBsh("someapp", "tstcount");
+                .withRetVal().toBsh("someapp");
     }
 
 
@@ -278,7 +278,7 @@ public class SpyDefinitionModellingTest {
     public void testRegisterJBossMBeanServer() {
         SpyDefinition.newInstance().once().lookFor("org.jboss.mx.MBeanServerImpl", SM_CONSTRUCTOR)
            .withFormat(0, "jboss").withArguments(0).withThread()
-           .toBsh("zorka", "registerMBeanServer");
+           .toBsh("jboss.register");
     }
 
 

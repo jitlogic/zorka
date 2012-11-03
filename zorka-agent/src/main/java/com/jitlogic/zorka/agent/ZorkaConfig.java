@@ -48,6 +48,7 @@ public class ZorkaConfig {
 
     public final static String DEFAULT_CONFDIR = "/opt/zorka";
 
+
     public static void cleanup() {
         properties = null;
         homeDir = null;
@@ -78,8 +79,6 @@ public class ZorkaConfig {
 	}
 	
 	
-	
-	
 	public synchronized static String get(String key, String defVal) {
 		return properties.getProperty(key, defVal);
 	}
@@ -105,10 +104,17 @@ public class ZorkaConfig {
         properties.put("zorka.config.dir", getHomeDir("conf"));
 	}
 	
-	
+
+    public static void setProperties(Properties props) {
+        homeDir = props.getProperty("zorka.home.dir", "/opt/zorka");
+        properties = props;
+    }
+
+
 	public static void put(String key, String val) {
 		properties.put(key, val);
 	}
+
 
     public static URL[] getExtClasspath(Properties props, boolean checkExistence) {
         Properties fusedProps = new Properties();

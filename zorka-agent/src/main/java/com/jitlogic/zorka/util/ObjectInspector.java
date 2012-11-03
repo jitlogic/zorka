@@ -194,7 +194,7 @@ public class ObjectInspector {
     }
 
 
-    private Method lookupMethod(Class<?> clazz, String name) {
+    public static Method lookupMethod(Class<?> clazz, String name) {
         try {
             return name != null ? clazz.getMethod(name) : null;
         } catch (NoSuchMethodException e) {

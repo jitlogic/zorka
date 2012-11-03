@@ -60,6 +60,11 @@ public class AgentInstance {
     }
 
 
+    public static void setInstance(AgentInstance newInstance) {
+        instance = newInstance;
+    }
+
+
     private long requestTimeout = DEFAULT_TIMEOUT;
     private int requestThreads = 4;
     private int requestQueue = 64;
@@ -133,6 +138,15 @@ public class AgentInstance {
 
     public ClassFileTransformer getSpyTransformer() {
         return spyInstance != null ? spyInstance.getClassTransformer() : null;
+    }
+
+
+    public SpyInstance getSpyInstance() {
+        return spyInstance;
+    }
+
+    public ZorkaBshAgent getZorkaAgent() {
+        return zorkaAgent;
     }
 
 }
