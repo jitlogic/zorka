@@ -61,7 +61,7 @@ public class BshAgentIntegTest {
 
 	@Before
 	public void setUp() {
-        AgentGlobals.setMBeanServerRegistry(new MBeanServerRegistry(true));
+        AgentInstance.setMBeanServerRegistry(new MBeanServerRegistry(true));
 		agent = new ZorkaBshAgent(
 			TimeoutThreadPoolExecutor.newBoundedPool(100));
 		result = null;
@@ -71,7 +71,7 @@ public class BshAgentIntegTest {
 	@Test
 	public void testAgentFunctions() throws Exception {
 		assertEquals(ZorkaBshAgent.VERSION, execute("zorka.version()", 1000));
-        AgentGlobals.setMBeanServerRegistry(null);
+        AgentInstance.setMBeanServerRegistry(null);
 	}
 
 	@Test

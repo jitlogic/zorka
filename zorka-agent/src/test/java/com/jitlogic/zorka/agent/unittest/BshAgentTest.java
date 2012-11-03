@@ -19,7 +19,7 @@ package com.jitlogic.zorka.agent.unittest;
 
 import java.util.concurrent.Executor;
 
-import com.jitlogic.zorka.agent.AgentGlobals;
+import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.zabbix.ZabbixLib;
 import org.json.simple.JSONArray;
@@ -44,7 +44,7 @@ public class BshAgentTest {
 	
 	@Before
 	public void setUp() throws Exception {
-        AgentGlobals.setMBeanServerRegistry(new MBeanServerRegistry(true));
+        AgentInstance.setMBeanServerRegistry(new MBeanServerRegistry(true));
 		agent = new ZorkaBshAgent(new TrivialExecutor());
         ZabbixLib zl = new ZabbixLib(agent, agent.getZorkaLib());
 
@@ -57,7 +57,7 @@ public class BshAgentTest {
 	@After
 	public void tearDown() throws Exception {
 		agent.svcStop();
-        AgentGlobals.setMBeanServerRegistry(null);
+        AgentInstance.setMBeanServerRegistry(null);
 	}
 	
 	@Test

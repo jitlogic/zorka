@@ -17,7 +17,7 @@
 
 package com.jitlogic.zorka.agent.unittest;
 
-import com.jitlogic.zorka.agent.AgentGlobals;
+import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaLib;
@@ -48,7 +48,7 @@ public class AverageRateCountingTest {
     @Before
     public void setUp() {
         mBeanServerRegistry = new MBeanServerRegistry(true);
-        AgentGlobals.setMBeanServerRegistry(mBeanServerRegistry);
+        AgentInstance.setMBeanServerRegistry(mBeanServerRegistry);
         bshAgent = new ZorkaBshAgent(new TestExecutor());
         ZabbixLib zl = new ZabbixLib(bshAgent, bshAgent.getZorkaLib());
         zorkaLib = bshAgent.getZorkaLib();
@@ -59,7 +59,7 @@ public class AverageRateCountingTest {
     @After
     public void tearDown() {
         jmxTestUtil.tearDown();
-        AgentGlobals.setMBeanServerRegistry(null);
+        AgentInstance.setMBeanServerRegistry(null);
     }
 
     @Test

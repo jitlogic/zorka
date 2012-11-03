@@ -1,10 +1,6 @@
 package com.jitlogic.zorka.agent;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.lang.instrument.Instrumentation;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * This class is responsible for bootstrapping zorka agent.
@@ -32,7 +28,7 @@ public class AgentMain {
 
         mBeanServerRegistry = new MBeanServerRegistry(
             "yes".equalsIgnoreCase(ZorkaConfig.get("zorka.mbs.autoregister", "yes")));
-        AgentGlobals.setMBeanServerRegistry(mBeanServerRegistry);
+        AgentInstance.setMBeanServerRegistry(mBeanServerRegistry);
 
         agent = new JavaAgent();
         agent.start();

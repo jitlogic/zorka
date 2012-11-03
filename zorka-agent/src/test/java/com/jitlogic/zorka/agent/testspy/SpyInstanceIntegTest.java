@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.agent.testspy;
 
-import com.jitlogic.zorka.agent.AgentGlobals;
+import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyInstance;
@@ -46,7 +46,7 @@ public class SpyInstanceIntegTest {
         registry = new MBeanServerRegistry(true);
         testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
         registry.register("test", testMbs, null);
-        AgentGlobals.setMBeanServerRegistry(registry);
+        AgentInstance.setMBeanServerRegistry(registry);
 
         instance = new SpyInstance(new Properties());
         MainSubmitter.setSubmitter(instance.getSubmitter());
@@ -55,7 +55,7 @@ public class SpyInstanceIntegTest {
 
     public void tearDown() {
         MainSubmitter.setSubmitter(null);
-        AgentGlobals.setMBeanServerRegistry(null);
+        AgentInstance.setMBeanServerRegistry(null);
     }
 
     @Test

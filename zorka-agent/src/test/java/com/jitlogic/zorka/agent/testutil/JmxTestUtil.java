@@ -17,7 +17,7 @@
 
 package com.jitlogic.zorka.agent.testutil;
 
-import com.jitlogic.zorka.agent.AgentGlobals;
+import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.spy.SpyClassTransformer;
 
@@ -41,12 +41,12 @@ public class JmxTestUtil extends ClassLoader {
     public void setUp(ZorkaBshAgent agent) {
         mbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
         this.agent = agent;
-        AgentGlobals.getMBeanServerRegistry().register("test", mbs, null);
+        AgentInstance.getMBeanServerRegistry().register("test", mbs, null);
     }
 
 
     public void tearDown() {
-        AgentGlobals.getMBeanServerRegistry().unregister("test");
+        AgentInstance.getMBeanServerRegistry().unregister("test");
     }
 
 
@@ -115,7 +115,7 @@ public class JmxTestUtil extends ClassLoader {
     }
 
     public static Object getAttr(String mbsName, String mbeanName, String attr) throws Exception{
-        MBeanServerConnection mbs = AgentGlobals.getMBeanServerRegistry().lookup(mbsName);
+        MBeanServerConnection mbs = AgentInstance.getMBeanServerRegistry().lookup(mbsName);
         return mbs.getAttribute(new ObjectName(mbeanName), attr);
     }
 }

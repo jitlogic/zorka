@@ -49,7 +49,7 @@ public class JavaAgent {
 
 
     public JavaAgent() {
-        mBeanServerRegistry = AgentGlobals.getMBeanServerRegistry();
+        mBeanServerRegistry = AgentInstance.getMBeanServerRegistry();
 
         try {
             requestTimeout = Long.parseLong(ZorkaConfig.get("zorka.req.timeout", "15000").trim());

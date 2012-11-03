@@ -18,7 +18,7 @@ package com.jitlogic.zorka.agent;
 
 import javax.management.MBeanServerConnection;
 
-public class AgentGlobals {
+public class AgentInstance {
 
     private static MBeanServerRegistry mBeanServerRegistry;
 

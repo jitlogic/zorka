@@ -39,7 +39,7 @@ public class AgentMiscFuncTest {
 	
 	@Before
 	public void setUp() {
-        AgentGlobals.setMBeanServerRegistry(new MBeanServerRegistry(true));
+        AgentInstance.setMBeanServerRegistry(new MBeanServerRegistry(true));
 		agent = new ZorkaBshAgent(//new ClosingTimeoutExecutor(2, 2, 100));
 		    TimeoutThreadPoolExecutor.newBoundedPool(100));
 	}
@@ -48,7 +48,7 @@ public class AgentMiscFuncTest {
 	public void tearDown() {
 		agent.svcStop();
 		agent = null;
-        AgentGlobals.setMBeanServerRegistry(null);
+        AgentInstance.setMBeanServerRegistry(null);
 	}
 	
 	@Test

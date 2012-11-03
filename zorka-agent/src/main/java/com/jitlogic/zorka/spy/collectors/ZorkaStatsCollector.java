@@ -17,7 +17,7 @@
 
 package com.jitlogic.zorka.spy.collectors;
 
-import com.jitlogic.zorka.agent.AgentGlobals;
+import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.mbeans.MethodCallStatistic;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
@@ -36,7 +36,7 @@ public class ZorkaStatsCollector implements SpyCollector {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private MBeanServerRegistry registry = AgentGlobals.getMBeanServerRegistry();
+    private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
     private String mbsName, mbeanTemplate, attrTemplate, keyTemplate;
     private int timeField, tstampField;
 

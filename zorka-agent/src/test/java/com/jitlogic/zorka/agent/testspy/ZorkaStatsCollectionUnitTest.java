@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.agent.testspy;
 
-import com.jitlogic.zorka.agent.AgentGlobals;
+import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
 import com.jitlogic.zorka.spy.SpyContext;
@@ -48,13 +48,13 @@ public class ZorkaStatsCollectionUnitTest {
         registry = new MBeanServerRegistry(true);
         testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
         registry.register("test", testMbs, null);
-        AgentGlobals.setMBeanServerRegistry(registry);
+        AgentInstance.setMBeanServerRegistry(registry);
     }
 
 
     @After
     public void tearDown() {
-        AgentGlobals.setMBeanServerRegistry(null);
+        AgentInstance.setMBeanServerRegistry(null);
     }
 
 
