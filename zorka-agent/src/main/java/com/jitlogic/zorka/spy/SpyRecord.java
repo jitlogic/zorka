@@ -88,6 +88,10 @@ public class SpyRecord {
         return vals[stage][idx];
     }
 
+    public Object[] getVals(int stage) {
+        return vals[stage];
+    }
+
     public void put(int stage, int idx, Object v) {
         vals[stage][idx] = v;
     }

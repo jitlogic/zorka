@@ -22,17 +22,20 @@ import com.jitlogic.zorka.spy.SpyRecord;
 
 public class CallingBshCollector implements SpyCollector {
 
-    private SpyCollector collector;
+    private SpyCollector collector = null;
+    private String ns;
 
     public CallingBshCollector(String ns) {
-        ZorkaBshAgent agent = AgentInstance.instance().getZorkaAgent();
-        collector = (SpyCollector)agent.eval(
-                "(com.jitlogic.zorka.spy.collectors.SpyCollector)"+ns);
+        this.ns = ns;
     }
 
     public void collect(SpyRecord record) {
-        if (collector != null) {
-            collector.collect(record);
+        if (collector == null) {
+            ZorkaBshAgent agent = AgentInstance.instance().getZorkaAgent();
+            collector = (SpyCollector)agent.eval(
+                    "(com.jitlogic.zorka.spy.collectors.SpyCollector)"+ns);
         }
+
+        collector.collect(record);
     }
 }

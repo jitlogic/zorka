@@ -9,6 +9,8 @@ import javax.management.openmbean.TabularData;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Tools for introspection of various objects.
@@ -194,7 +196,7 @@ public class ObjectInspector {
     }
 
 
-    public static Method lookupMethod(Class<?> clazz, String name) {
+    public Method lookupMethod(Class<?> clazz, String name) {
         try {
             return name != null ? clazz.getMethod(name) : null;
         } catch (NoSuchMethodException e) {
@@ -226,5 +228,24 @@ public class ObjectInspector {
         }
     }
 
+    private Pattern pattern = Pattern.compile("\\$\\{([^\\}]+)\\}");
+
+    public String substitute(String input, Object[] vals) {
+        Matcher m = pattern.matcher(input);
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            String expr = m.group(1);
+            String[] segs = expr.split("\\.");
+            Object v = vals[Integer.parseInt(segs[0])];
+            for (int i = 1; i < segs.length; i++) {
+                v = get(v, segs[i]);
+            }
+            m.appendReplacement(sb, ""+v);
+        }
+
+        m.appendTail(sb);
+
+        return sb.toString();
+    }
 
 }

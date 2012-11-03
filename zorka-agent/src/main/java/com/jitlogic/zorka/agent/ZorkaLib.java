@@ -376,5 +376,8 @@ public class ZorkaLib implements ZorkaService {
 		return "OK";
 	}
 
+    public void registerMbs(String name, MBeanServerConnection mbs) {
+        mbsRegistry.register(name, mbs, mbs.getClass().getClassLoader());
+    }
 
 }

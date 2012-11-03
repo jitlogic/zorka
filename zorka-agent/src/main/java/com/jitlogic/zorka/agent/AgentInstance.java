@@ -114,7 +114,7 @@ public class AgentInstance {
 
         zorkaAgent = new ZorkaBshAgent(executor);
 
-        if (props.getProperty("spy", "no").equalsIgnoreCase("yes")) {
+        if (props.getProperty("spy", "yes").equalsIgnoreCase("yes")) {
             log.info("Enabling Zorka SPY");
             spyInstance = SpyInstance.instance();
             spyLib = new SpyLib(spyInstance);

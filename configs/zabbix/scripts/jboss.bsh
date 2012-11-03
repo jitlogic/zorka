@@ -149,6 +149,24 @@ __jboss() {
 
   jca = __jca();
 
+  // Catch MX mbean server initialization and register JBoss MBean Server here ...
+
+  jbossMbs = null;
+
+  collect(record) {
+    synchronized (super) {
+      if (super.jbossMbs == null) {
+        mbs = record.get(4,0);
+        zorka.registerMbs("jboss", mbs);
+        super.jbossMbs = mbs;
+      }
+    }
+  }
+
+
+  spy.add(spy.empty().onExit().withArguments(0)
+     .lookFor("org.jboss.mx.server.MBeanServerImpl", "<init>").toBsh("jboss"));
+
   return this;
 }
 

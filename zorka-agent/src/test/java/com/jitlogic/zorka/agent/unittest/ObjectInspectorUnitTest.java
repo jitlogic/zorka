@@ -124,6 +124,14 @@ public class ObjectInspectorUnitTest {
         assertEquals(Arrays.asList("Div", "Nom", "StrMap"), inspector.list(jmxObject));
     }
 
+    @Test
+    public void testTrivialSubstitutions() {
+        assertEquals("ab123cd", inspector.substitute("ab${0}cd", new Object[] { "123" }));
+        assertEquals("3", inspector.substitute("${0.length()}", new Object[] { "123"}));
+    }
+
+    // TODO more tests for border cases of inspector.substitute()
+
     private JmxObject mkJmxObject() throws Exception {
         TestJmx bean = new TestJmx();
         bean.setNom(100);
@@ -134,4 +142,6 @@ public class ObjectInspectorUnitTest {
     }
 
     // TODO tests for tabular data
+
+
 }

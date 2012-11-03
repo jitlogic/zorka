@@ -112,5 +112,21 @@ public class ZorkaStatsCollectionUnitTest {
         assertNotNull(stats.getStatistic("testMethod"));
     }
 
+
+    @Test
+    public void testCollectToStatsWithKeyExpression() throws Exception {
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${1}", 0, 0);
+        SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
+
+        SpyRecord sr = new SpyRecord(ctx);
+        sr.feed(ON_COLLECT, new Object[] { 10L, "oja" });
+        collector.collect(sr);
+
+        MethodCallStatistics stats =  (MethodCallStatistics)getAttr("test", "test:name=TClass", "stats");
+
+        assertNotNull("", stats);
+        assertNotNull(stats.getStatistic("oja"));
+    }
+
     // TODO test if ctx<->stats pair is properly cached
 }

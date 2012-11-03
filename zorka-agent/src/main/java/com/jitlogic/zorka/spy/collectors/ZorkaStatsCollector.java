@@ -24,6 +24,7 @@ import com.jitlogic.zorka.mbeans.MethodCallStatistics;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
@@ -42,6 +43,7 @@ public class ZorkaStatsCollector implements SpyCollector {
 
     private Map<SpyContext,MethodCallStatistics> statsCache = new HashMap<SpyContext, MethodCallStatistics>();
 
+    private ObjectInspector inspector = new ObjectInspector();
 
     public ZorkaStatsCollector(String mbsName, String mbeanTemplate, String attrTemplate,
                                String keyTemplate, int tstampField, int timeField) {
@@ -68,7 +70,7 @@ public class ZorkaStatsCollector implements SpyCollector {
                         new MethodCallStatistics(), "Method call statistics");
         }
 
-        String key = subst(keyTemplate, ctx);
+        String key = inspector.substitute(subst(keyTemplate, ctx), record.getVals(ON_COLLECT));
 
         MethodCallStatistic statistic = (MethodCallStatistic)stats.getMethodCallStatistic(key);
 

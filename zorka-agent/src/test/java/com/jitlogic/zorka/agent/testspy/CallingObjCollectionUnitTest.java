@@ -105,11 +105,23 @@ public class CallingObjCollectionUnitTest extends ZorkaAgentFixture {
         assertEquals(record, results.get(0));
     }
 
+
     @Test
     public void testCollectRecordViaBshFuncInEmbeddedNamespace() throws Exception {
         zorkaAgent.eval("__that() { collect (obj) { test.result(obj); } return this; } that = __that();");
-
         SpyCollector col = new CallingBshCollector("that");
+
+        col.collect(record);
+
+        assertEquals(1, results.size());
+        assertEquals(record, results.get(0));
+    }
+
+
+    @Test
+    public void testDefineCollectorFirstAndBshNamespaceAfterThat() throws Exception {
+        SpyCollector col = new CallingBshCollector("that");
+        zorkaAgent.eval("__that() { collect (obj) { test.result(obj); } return this; } that = __that();");
 
         col.collect(record);
 
