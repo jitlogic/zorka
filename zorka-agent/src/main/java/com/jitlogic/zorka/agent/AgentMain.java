@@ -10,7 +10,7 @@ public class AgentMain {
 
     private static String homeDir;
     private static MBeanServerRegistry mBeanServerRegistry;
-    public static JavaAgent agent;
+    public static AgentInstance agent;
 
     public static void premain(String args, Instrumentation instr) {
         String[] argv = args.split(",");
@@ -30,8 +30,7 @@ public class AgentMain {
             "yes".equalsIgnoreCase(ZorkaConfig.get("zorka.mbs.autoregister", "yes")));
         AgentInstance.setMBeanServerRegistry(mBeanServerRegistry);
 
-        agent = new JavaAgent();
-        agent.start();
+        agent = AgentInstance.instance();
     }
 
     public static String getHomeDir() {
