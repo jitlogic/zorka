@@ -20,7 +20,9 @@ package com.jitlogic.zorka.agent.functest;
 import java.net.URL;
 
 import com.jitlogic.zorka.agent.*;
+import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.util.ObjectDumper;
+import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,42 +31,53 @@ import static org.junit.Assert.*;
 public class AgentMiscFuncTest {
 
 	ZorkaBshAgent agent;
-	
-	private Object query(final String src) throws Exception {
-		ZorkaBasicCallback callback = new ZorkaBasicCallback();
-		ZorkaBshWorker worker = new ZorkaBshWorker(agent, src, callback);
-		worker.run();
-		return callback.getResult();
-	}
-	
+
+
 	@Before
 	public void setUp() {
+        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
+        ZorkaLogger.setLogger(new TestLogger());
         AgentInstance.setMBeanServerRegistry(new MBeanServerRegistry(true));
 		agent = new ZorkaBshAgent(//new ClosingTimeoutExecutor(2, 2, 100));
 		    TimeoutThreadPoolExecutor.newBoundedPool(100));
+
 	}
-	
+
+
 	@After
 	public void tearDown() {
 		agent.svcStop();
 		agent = null;
         AgentInstance.setMBeanServerRegistry(null);
+        ZorkaLogger.setLogger(null);
+        ZorkaConfig.cleanup();
 	}
-	
-	@Test
+
+
+    private Object query(final String src) throws Exception {
+        ZorkaBasicCallback callback = new ZorkaBasicCallback();
+        ZorkaBshWorker worker = new ZorkaBshWorker(agent, src, callback);
+        worker.run();
+        return callback.getResult();
+    }
+
+
+    @Test
 	public void testStartAndLoadScripts() throws Exception {
 		agent.svcStart();
 		URL url = AgentMiscFuncTest.class.getResource("/cfg1");
 		agent.loadScriptDir(url);
 		assertEquals("oja! right!", query("testLoadScriptDir()"));
 	}
-	
+
+
 	@Test
 	public void testObjectDumper() throws Exception {
 		agent.svcStart();
 		Object obj = query("zorka.jmx(\"java\",\"java.lang:type=Runtime\")");
 		String s = ObjectDumper.objectDump(obj);
-		System.out.println(s);
+        assertTrue(s != null && s.length() > 100);
+		//System.out.println(s);
 	}
 
 }

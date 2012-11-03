@@ -20,6 +20,11 @@ package com.jitlogic.zorka.agent.testinteg;
 import java.lang.management.ThreadInfo;
 import java.util.Collection;
 
+import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.util.ZorkaLogger;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -29,9 +34,23 @@ import com.jitlogic.zorka.util.ZorkaUtil;
 
 public class ThreadRankTest {
 	
-	private ZorkaUtil util = ZorkaUtil.getInstance();
-	
-	@Test
+	private ZorkaUtil util;
+
+    @Before
+    public void setUp() {
+        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
+        ZorkaLogger.setLogger(new TestLogger());
+        util = ZorkaUtil.getInstance();
+    }
+
+    @After
+    public void tearDown() {
+        ZorkaLogger.setLogger(null);
+        ZorkaConfig.cleanup();;
+    }
+
+
+    @Test
 	public void testCreateSimpleRankList() throws Exception {
 		ThreadRankLister lister = new ThreadRankLister(60000, 600000);
 		lister.update(util.currentTimeMillis());

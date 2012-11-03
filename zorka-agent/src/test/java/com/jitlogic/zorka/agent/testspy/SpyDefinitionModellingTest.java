@@ -18,9 +18,14 @@ package com.jitlogic.zorka.agent.testspy;
  */
 
 import bsh.This;
+import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.spy.SpyMatcher;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyProbeElement;
+import com.jitlogic.zorka.util.ZorkaLogger;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
@@ -37,6 +42,17 @@ import static com.jitlogic.zorka.spy.SpyConst.*;
  */
 public class SpyDefinitionModellingTest {
 
+    @Before
+    public void setUp() {
+        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
+        ZorkaLogger.setLogger(new TestLogger());
+    }
+
+    @After
+    public void tearDown() {
+        ZorkaLogger.setLogger(null);
+        ZorkaConfig.cleanup();
+    }
 
     @Test
     public void testDefineEmptySpyDef() throws Exception {

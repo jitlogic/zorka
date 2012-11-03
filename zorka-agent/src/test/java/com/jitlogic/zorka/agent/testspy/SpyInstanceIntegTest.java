@@ -18,10 +18,14 @@ package com.jitlogic.zorka.agent.testspy;
 
 import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
+import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.MainSubmitter;
 
+import com.jitlogic.zorka.util.ZorkaLogger;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -43,6 +47,8 @@ public class SpyInstanceIntegTest {
 
     @Before
     public void setUp() {
+        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
+        ZorkaLogger.setLogger(new TestLogger());
         registry = new MBeanServerRegistry(true);
         testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
         registry.register("test", testMbs, null);
@@ -52,10 +58,12 @@ public class SpyInstanceIntegTest {
         MainSubmitter.setSubmitter(instance.getSubmitter());
     }
 
-
+    @After
     public void tearDown() {
         MainSubmitter.setSubmitter(null);
         AgentInstance.setMBeanServerRegistry(null);
+        ZorkaLogger.setLogger(null);
+        ZorkaConfig.cleanup();
     }
 
     @Test

@@ -18,6 +18,8 @@ package com.jitlogic.zorka.agent.testspy;
 
 import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
+import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
@@ -26,6 +28,7 @@ import com.jitlogic.zorka.spy.collectors.ZorkaStatsCollector;
 
 import static com.jitlogic.zorka.spy.SpyConst.*;
 
+import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +48,8 @@ public class ZorkaStatsCollectionUnitTest {
 
     @Before
     public void setUp() {
+        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
+        ZorkaLogger.setLogger(new TestLogger());
         registry = new MBeanServerRegistry(true);
         testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
         registry.register("test", testMbs, null);
@@ -55,6 +60,8 @@ public class ZorkaStatsCollectionUnitTest {
     @After
     public void tearDown() {
         AgentInstance.setMBeanServerRegistry(null);
+        ZorkaLogger.setLogger(null);
+        ZorkaConfig.cleanup();
     }
 
 

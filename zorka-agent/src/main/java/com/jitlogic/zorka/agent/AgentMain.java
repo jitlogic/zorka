@@ -16,6 +16,8 @@ public class AgentMain {
         String[] argv = args.split(",");
         homeDir = argv[0];
 
+        ZorkaConfig.loadProperties(homeDir);
+
         startZorkaAgent();
 
         if (agent != null && agent.getSpyTransformer() != null) {
@@ -31,10 +33,6 @@ public class AgentMain {
         AgentInstance.setMBeanServerRegistry(mBeanServerRegistry);
 
         agent = AgentInstance.instance();
-    }
-
-    public static String getHomeDir() {
-        return homeDir;
     }
 
 }

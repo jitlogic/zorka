@@ -17,8 +17,10 @@
 
 package com.jitlogic.zorka.agent.testspy;
 
+import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testspy.support.TestCollector;
 import com.jitlogic.zorka.agent.testspy.support.TestSpyTransformer;
+import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.spy.DispatchingSubmitter;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
@@ -27,6 +29,7 @@ import com.jitlogic.zorka.spy.SpySubmitter;
 
 import static com.jitlogic.zorka.spy.SpyConst.*;
 
+import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,11 +45,17 @@ public class SubmissionDispatchUnitTest {
 
     @Before
     public void setUp() {
+        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
+        ZorkaLogger.setLogger(new TestLogger());
         engine = new TestSpyTransformer();
         collector = new TestCollector();
         submitter = new DispatchingSubmitter(engine, collector);
     }
 
+    public void tearDown() {
+        ZorkaLogger.setLogger(null);
+        ZorkaConfig.cleanup();
+    }
 
     @Test
     public void testSubmitWithImmediateFlagAndCheckIfCollected() throws Exception {

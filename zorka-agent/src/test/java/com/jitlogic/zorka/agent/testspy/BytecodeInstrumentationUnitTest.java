@@ -16,10 +16,13 @@
  */
 package com.jitlogic.zorka.agent.testspy;
 
+import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testspy.support.TestSpyTransformer;
 import com.jitlogic.zorka.agent.testspy.support.TestSubmitter;
+import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.MainSubmitter;
+import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +43,8 @@ public class BytecodeInstrumentationUnitTest {
 
     @Before
     public void setUp() throws Exception {
+        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
+        ZorkaLogger.setLogger(new TestLogger());
         engine = new TestSpyTransformer();
         submitter = new TestSubmitter();
         MainSubmitter.setSubmitter(submitter);
@@ -49,6 +54,8 @@ public class BytecodeInstrumentationUnitTest {
     @After
     public void tearDown() throws Exception {
         MainSubmitter.setSubmitter(null);
+        ZorkaLogger.setLogger(null);
+        ZorkaConfig.cleanup();;
     }
 
 

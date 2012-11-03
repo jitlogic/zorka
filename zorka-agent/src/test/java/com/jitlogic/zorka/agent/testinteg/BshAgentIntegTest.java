@@ -23,6 +23,9 @@ import java.net.URL;
 
 
 import com.jitlogic.zorka.agent.*;
+import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.util.ZorkaLogger;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,9 +35,31 @@ public class BshAgentIntegTest {
 	
 	private volatile Object result = null;
 	private volatile Throwable err = null;
-	
-	
-	// Use it only with synchronous executor 
+
+
+    @Before
+    public void setUp() {
+        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
+        ZorkaLogger.setLogger(new TestLogger());
+        AgentInstance.setMBeanServerRegistry(new MBeanServerRegistry(true));
+        agent = new ZorkaBshAgent(
+                TimeoutThreadPoolExecutor.newBoundedPool(100));
+        result = null;
+        err = null;
+    }
+
+
+    @After
+    public void tearDown() {
+        AgentInstance.setMBeanServerRegistry(null);
+        ZorkaLogger.setLogger(null);
+        ZorkaConfig.cleanup();
+    }
+
+
+
+
+    // Use it only with synchronous executor
 	private Object execute(final String expr, long sleep) throws Exception {
 		
 		agent.exec(expr, new ZorkaCallback() {
@@ -59,15 +84,6 @@ public class BshAgentIntegTest {
 		return result;
 	}
 
-	@Before
-	public void setUp() {
-        AgentInstance.setMBeanServerRegistry(new MBeanServerRegistry(true));
-		agent = new ZorkaBshAgent(
-			TimeoutThreadPoolExecutor.newBoundedPool(100));
-		result = null;
-		err = null;
-	}
-	
 	@Test
 	public void testAgentFunctions() throws Exception {
 		assertEquals(ZorkaBshAgent.VERSION, execute("zorka.version()", 1000));
