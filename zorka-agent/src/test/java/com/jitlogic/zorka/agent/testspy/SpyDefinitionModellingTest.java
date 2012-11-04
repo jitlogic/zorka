@@ -17,10 +17,14 @@ package com.jitlogic.zorka.agent.testspy;
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import bsh.This;
+import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.spy.SpyMatcher;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyProbeElement;
+import com.jitlogic.zorka.util.ZorkaLogger;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
@@ -28,6 +32,7 @@ import java.util.List;
 import static junit.framework.Assert.*;
 
 import static com.jitlogic.zorka.spy.SpyConst.*;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 /**
  * This is an API modelling exercise rather then a real unit test.
@@ -37,10 +42,21 @@ import static com.jitlogic.zorka.spy.SpyConst.*;
  */
 public class SpyDefinitionModellingTest {
 
+    @Before
+    public void setUp() {
+        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
+        ZorkaLogger.setLogger(new TestLogger());
+    }
+
+    @After
+    public void tearDown() {
+        ZorkaLogger.setLogger(null);
+        ZorkaConfig.cleanup();
+    }
 
     @Test
     public void testDefineEmptySpyDef() throws Exception {
-        SpyDefinition sdef = SpyDefinition.newInstance();
+        SpyDefinition sdef = SpyDefinition.instance();
 
         assertNotNull(sdef.getCollectors());
         assertEquals(0, sdef.getCollectors().size());
@@ -51,8 +67,8 @@ public class SpyDefinitionModellingTest {
         assertNotNull(sdef.getProbes(ON_ENTER));
         assertEquals(0, sdef.getProbes(ON_ENTER).size());
 
-        assertNotNull(sdef.getTransformers(ON_EXIT));
-        assertEquals(0, sdef.getTransformers(ON_EXIT).size());
+        assertNotNull(sdef.getTransformers(ON_RETURN));
+        assertEquals(0, sdef.getTransformers(ON_RETURN).size());
     }
 
 
@@ -62,16 +78,16 @@ public class SpyDefinitionModellingTest {
 
         List<SpyProbeElement> probes1 = sdef.getProbes(ON_ENTER);
         assertEquals(1, probes1.size());
-        assertEquals(SpyProbeElement.FETCH_TIME, probes1.get(0).getArgType());
+        assertEquals(FETCH_TIME, probes1.get(0).getArgType());
 
 
-        List<SpyProbeElement> probes2 = sdef.getProbes(ON_EXIT);
+        List<SpyProbeElement> probes2 = sdef.getProbes(ON_RETURN);
         assertEquals(1, probes2.size());
-        assertEquals(SpyProbeElement.FETCH_TIME, probes2.get(0).getArgType());
+        assertEquals(FETCH_TIME, probes2.get(0).getArgType());
 
         List<SpyProbeElement> probes3 = sdef.getProbes(ON_ERROR);
         assertEquals(1, probes3.size());
-        assertEquals(SpyProbeElement.FETCH_TIME, probes3.get(0).getArgType());
+        assertEquals(FETCH_TIME, probes3.get(0).getArgType());
     }
 
 
@@ -81,7 +97,7 @@ public class SpyDefinitionModellingTest {
 
         List<SpyProbeElement> probeElements = sdef.getProbes(ON_ENTER);
         assertEquals(2, probeElements.size());
-        assertEquals(SpyProbeElement.FETCH_CLASS, probeElements.get(1).getArgType());
+        assertEquals(FETCH_CLASS, probeElements.get(1).getArgType());
         assertEquals("com.jitlogic.test.SomeClass", probeElements.get(1).getClassName());
 
 
@@ -93,11 +109,11 @@ public class SpyDefinitionModellingTest {
     public void testSwitchStageAndCheckImmutability() throws Exception {
         SpyDefinition sdef1 = SpyDefinition.instrument();
 
-        SpyDefinition sdef2 = sdef1.onExit().withError();
-        List<SpyProbeElement> probes2 = sdef2.getProbes(ON_EXIT);
+        SpyDefinition sdef2 = sdef1.onReturn().withError();
+        List<SpyProbeElement> probes2 = sdef2.getProbes(ON_RETURN);
 
-        assertEquals(1, sdef1.getProbes(ON_EXIT).size());
-        assertEquals(2, sdef2.getProbes(ON_EXIT).size());
+        assertEquals(1, sdef1.getProbes(ON_RETURN).size());
+        assertEquals(2, sdef2.getProbes(ON_RETURN).size());
     }
 
 
@@ -157,23 +173,11 @@ public class SpyDefinitionModellingTest {
     public void testInstrumentWithFormatArgsAndTransformViaMethod() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
-                .withFormat(2,"${1.request.requestURI}").transform(0, "split", "\\?").get(0, 0)
+                .withFormat(2,"${1.request.requestURI}").callMethod(0, 0, "split", "\\?").get(0, 0)
                 .onSubmit().timeDiff(0,1,1)
                 .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI", "${methodName}", 0, 1);
     }
 
-
-    /**
-     * Example: Instrument HTTP requests with transforming function defined in BSH
-     */
-    //@Test
-    public void testInstrumentWithCallRawArgsAndBshTransformingFunction() {
-        This ns = null; // Use 'this' keyword in BSH
-        SpyDefinition sdef =
-            SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
-                .withArguments(1).transform(ns, "classify_uris").onSubmit().timeDiff(0,2,2)
-                .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byClass", "${1}", 0, 2);
-    }
 
 
     /**
@@ -195,21 +199,21 @@ public class SpyDefinitionModellingTest {
     public void testInstrumentTomcatWithPathAndCode() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
-                .onExit().withArguments(1,2)
+                .onReturn().withArguments(1,2)
                 .withFormat(1,"${1.request.requestURI}").withFormat(2,"${2.reply.replyCode}")
-                .transform(1, "split", "\\?").get(1, 0).onSubmit().timeDiff(0, 1, 1)
+                .callMethod(1, 1, "split", "\\?").get(1, 0).onSubmit().timeDiff(0, 1, 1)
                 .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests,httpCode=${1}", "stats", "${0}", 0, 1);
     }
 
 
     /**
      * Example: Instrument some function, grab return values and pass them to my_app.log_tst_count.
-     * Not that withRetVal() implies onExit() and autmatically filters out exceptions.
+     * Not that withRetVal() implies onReturn() and autmatically filters out exceptions.
      */
     public void testInstrumentAndGetReturnValue() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.unittest.SomeClass", "getTstCount")
-                .withRetVal().toBsh("someapp", "tstcount");
+                .withRetVal().toBsh("someapp");
 
     }
 
@@ -221,7 +225,7 @@ public class SpyDefinitionModellingTest {
     public void testInstrumentGetSomeArgsAndReturnValue() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("com.jitlogic.zorka.spy.unittest.SomeClass", "otherMethod")
-                .withRetVal().toBsh("someapp", "tstcount");
+                .withRetVal().toBsh("someapp");
     }
 
 
@@ -232,7 +236,7 @@ public class SpyDefinitionModellingTest {
      */
     public void testExposeStaticMethodFromSomeClassAtStartup() {
         SpyDefinition sdef =
-            SpyDefinition.newInstance().once().lookFor("com.hp.ifc.bus.AppServer", "startup")
+            SpyDefinition.instance().once().lookFor("com.hp.ifc.bus.AppServer", "startup")
                 .withClass("com.hp.ifc.net.mq.AppMessageQueue")
                 .toGetter("java", "hpsd:type=SDStats,name=AppMessageQueue", "size", "getSize()");
     }
@@ -245,7 +249,7 @@ public class SpyDefinitionModellingTest {
      */
     public void testExposeSomeStaticMethodsOfAnObject() {
         SpyDefinition sdef =
-            SpyDefinition.newInstance().once().lookFor("some.package.SomeBean", SM_CONSTRUCTOR)
+            SpyDefinition.instance().once().lookFor("some.package.SomeBean", SM_CONSTRUCTOR)
                 .withArguments(0)
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "count", "getCount()")
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "backlog", "getBacklog()")
@@ -260,9 +264,9 @@ public class SpyDefinitionModellingTest {
      */
     //@Test
     public void testRegisterJBossMBeanServer() {
-        SpyDefinition.newInstance().once().lookFor("org.jboss.mx.MBeanServerImpl", SM_CONSTRUCTOR)
+        SpyDefinition.instance().once().lookFor("org.jboss.mx.MBeanServerImpl", SM_CONSTRUCTOR)
            .withFormat(0, "jboss").withArguments(0).withThread()
-           .toBsh("zorka", "registerMBeanServer");
+           .toBsh("jboss.register");
     }
 
 
@@ -272,7 +276,7 @@ public class SpyDefinitionModellingTest {
     //@Test
     public void testExposeSomeHashMapAsMBeanAttribute() {
         SpyDefinition sdef =
-            SpyDefinition.newInstance().once().lookFor("some.package.SingletonBean", SM_CONSTRUCTOR)
+            SpyDefinition.instance().once().lookFor("some.package.SingletonBean", SM_CONSTRUCTOR)
                 .withArguments(0).get(0, 0, "someMap")
                 .toGetter("java", "SomeApp:type=SingletonType", "map");
     }

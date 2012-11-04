@@ -20,5 +20,5 @@ package com.jitlogic.zorka.spy.processors;
 import com.jitlogic.zorka.spy.SpyRecord;
 
 public interface SpyArgProcessor {
-    public SpyRecord process(SpyRecord record);
+    public SpyRecord process(int stage, SpyRecord record);
 }

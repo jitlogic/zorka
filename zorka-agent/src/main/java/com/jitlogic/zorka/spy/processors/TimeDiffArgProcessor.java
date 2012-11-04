@@ -29,7 +29,7 @@ public class TimeDiffArgProcessor implements SpyArgProcessor {
         this.out = out;
     }
 
-    public SpyRecord process(SpyRecord record) {
+    public SpyRecord process(int stage, SpyRecord record) {
         Object v1 = record.get(stage, in1), v2 = record.get(stage, in2);
 
         if (v1 instanceof Long && v2 instanceof Long) {

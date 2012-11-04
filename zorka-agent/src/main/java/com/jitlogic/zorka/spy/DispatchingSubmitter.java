@@ -26,8 +26,7 @@ import java.util.List;
 import java.util.Stack;
 
 import static com.jitlogic.zorka.spy.SpyConst.*;
-
-import static com.jitlogic.zorka.spy.SpyConst.ON_SUBMIT;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 /**
  *
@@ -119,7 +118,7 @@ public class DispatchingSubmitter implements SpySubmitter {
 
         for (SpyArgProcessor argProcessor : argProcessors) {
             try {
-                if (null == (record = argProcessor.process(record))) {
+                if (null == (record = argProcessor.process(stage, record))) {
                     break;
                 }
             } catch (Throwable e) {

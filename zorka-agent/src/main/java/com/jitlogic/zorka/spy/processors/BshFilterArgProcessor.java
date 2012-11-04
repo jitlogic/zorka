@@ -29,7 +29,7 @@ public class BshFilterArgProcessor implements SpyArgProcessor {
         this.funcName = funcName;
     }
 
-    public SpyRecord process(SpyRecord record) {
+    public SpyRecord process(int stage, SpyRecord record) {
         return record;
     }
 }

@@ -17,18 +17,12 @@
 
 package com.jitlogic.zorka.spy;
 
-import org.objectweb.asm.MethodVisitor;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 /**
  *
  */
 public class SpyProbeElement {
-
-    public static final int FETCH_TIME    = -1;
-    public static final int FETCH_RET_VAL = -2;
-    public static final int FETCH_ERROR   = -3;
-    public static final int FETCH_THREAD  = -4;
-    public static final int FETCH_CLASS   = -5;
 
     private int argType;
     private String className;

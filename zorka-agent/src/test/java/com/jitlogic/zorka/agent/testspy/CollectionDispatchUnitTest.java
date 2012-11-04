@@ -16,14 +16,18 @@
 
 package com.jitlogic.zorka.agent.testspy;
 
+import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testspy.support.TestCollector;
 import com.jitlogic.zorka.agent.testspy.support.TestSpyTransformer;
+import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.spy.DispatchingCollector;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.spy.collectors.SpyCollector;
 
+import com.jitlogic.zorka.util.ZorkaLogger;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,8 +40,16 @@ public class CollectionDispatchUnitTest {
 
     @Before
     public void setUp() {
+        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
+        ZorkaLogger.setLogger(new TestLogger());
         engine = new TestSpyTransformer();
         collector = new DispatchingCollector();
+    }
+
+    @After
+    public void tearDown() {
+        ZorkaLogger.setLogger(null);
+        ZorkaConfig.cleanup();
     }
 
     @Test
@@ -46,7 +58,7 @@ public class CollectionDispatchUnitTest {
         TestCollector col1 = new TestCollector();
         TestCollector col2 = new TestCollector();
 
-        SpyDefinition sdef = SpyDefinition.newInstance().withTime().toCollector(col1).toCollector(col2);
+        SpyDefinition sdef = SpyDefinition.instance().withTime().toCollector(col1).toCollector(col2);
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "TClass", "method", "()V", 1));
 
         SpyRecord sr = new SpyRecord(ctx);

@@ -15,9 +15,11 @@ public class ZorkaLogger {
 
     private static ZorkaLogger logger = null;
 
+
     public static ZorkaLog getLog(Class<?> clazz) {
         return getLog(clazz.getName());
     }
+
 
     public synchronized  static ZorkaLog getLog(String tag) {
         if (logger == null) {
@@ -26,6 +28,12 @@ public class ZorkaLogger {
 
         return new ZorkaLog(tag, logger);
     }
+
+
+    public synchronized static void setLogger(ZorkaLogger newLogger) {
+        logger = newLogger;
+    }
+
 
     private String logDir;
     private boolean logExceptions = false;

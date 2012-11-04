@@ -14,24 +14,28 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent;
+package com.jitlogic.zorka.spy.collectors;
 
-import javax.management.MBeanServerConnection;
+import com.jitlogic.zorka.agent.AgentInstance;
+import com.jitlogic.zorka.agent.ZorkaBshAgent;
+import com.jitlogic.zorka.spy.SpyRecord;
 
-public class AgentGlobals {
+public class CallingBshCollector implements SpyCollector {
 
-    private static MBeanServerRegistry mBeanServerRegistry;
+    private SpyCollector collector = null;
+    private String ns;
 
-    public synchronized static MBeanServerConnection lookupMBeanServer(String name) {
-        return mBeanServerRegistry != null ? mBeanServerRegistry.lookup(name) : null;
+    public CallingBshCollector(String ns) {
+        this.ns = ns;
     }
 
-    public synchronized static MBeanServerRegistry getMBeanServerRegistry() {
-        return mBeanServerRegistry;
-    }
+    public void collect(SpyRecord record) {
+        if (collector == null) {
+            ZorkaBshAgent agent = AgentInstance.instance().getZorkaAgent();
+            collector = (SpyCollector)agent.eval(
+                    "(com.jitlogic.zorka.spy.collectors.SpyCollector)"+ns);
+        }
 
-    public synchronized static void setMBeanServerRegistry(MBeanServerRegistry registry) {
-        mBeanServerRegistry = registry;
+        collector.collect(record);
     }
-
 }

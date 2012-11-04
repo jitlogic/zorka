@@ -17,8 +17,10 @@
 
 package com.jitlogic.zorka.agent.testspy;
 
+import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testspy.support.TestCollector;
 import com.jitlogic.zorka.agent.testspy.support.TestSpyTransformer;
+import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.spy.DispatchingSubmitter;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
@@ -27,10 +29,12 @@ import com.jitlogic.zorka.spy.SpySubmitter;
 
 import static com.jitlogic.zorka.spy.SpyConst.*;
 
+import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 
 public class SubmissionDispatchUnitTest {
@@ -42,15 +46,21 @@ public class SubmissionDispatchUnitTest {
 
     @Before
     public void setUp() {
+        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
+        ZorkaLogger.setLogger(new TestLogger());
         engine = new TestSpyTransformer();
         collector = new TestCollector();
         submitter = new DispatchingSubmitter(engine, collector);
     }
 
+    public void tearDown() {
+        ZorkaLogger.setLogger(null);
+        ZorkaConfig.cleanup();
+    }
 
     @Test
     public void testSubmitWithImmediateFlagAndCheckIfCollected() throws Exception {
-        SpyDefinition sdef = engine.add(SpyDefinition.newInstance().onEnter().withTime());
+        SpyDefinition sdef = engine.add(SpyDefinition.instance().onEnter().withTime());
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "com.TClass", "tMethod", "()V", 1));
 
         submitter.submit(ON_ENTER, ctx.getId(), SF_IMMEDIATE, new Object[] { 1L });
@@ -67,14 +77,14 @@ public class SubmissionDispatchUnitTest {
         submitter.submit(ON_ENTER, ctx.getId(), SF_NONE, new Object[] { 1L });
         assertEquals(0, collector.size());
 
-        submitter.submit(ON_EXIT, ctx.getId(), SF_FLUSH, new Object[] { 2L });
+        submitter.submit(ON_RETURN, ctx.getId(), SF_FLUSH, new Object[] { 2L });
         assertEquals(1, collector.size());
     }
 
 
     @Test
     public void testSubmitAndCheckOnCollectBuf() throws Exception {
-        SpyDefinition sdef = engine.add(SpyDefinition.newInstance());
+        SpyDefinition sdef = engine.add(SpyDefinition.instance());
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "Class", "method", "()V", 1));
 
         submitter.submit(ON_ENTER, ctx.getId(), SF_IMMEDIATE, new Object[] { 1L });
@@ -90,14 +100,14 @@ public class SubmissionDispatchUnitTest {
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "Class", "method", "()V", 1));
 
         submitter.submit(ON_ENTER, ctx.getId(), SF_NONE, new Object[] { 1L });
-        submitter.submit(ON_EXIT, ctx.getId(), SF_FLUSH, new Object[] { 2L });
+        submitter.submit(ON_RETURN, ctx.getId(), SF_FLUSH, new Object[] { 2L });
 
         assertEquals(1, collector.size());
 
         SpyRecord sr = collector.get(0);
 
         assertEquals(0, sr.size(ON_ENTER));
-        assertEquals(0, sr.size(ON_EXIT));
+        assertEquals(0, sr.size(ON_RETURN));
         assertEquals(2, sr.size(ON_COLLECT));
 
         assertEquals(1L, sr.get(ON_COLLECT, 0));

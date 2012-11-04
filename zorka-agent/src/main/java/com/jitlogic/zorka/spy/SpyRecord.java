@@ -17,7 +17,7 @@
 
 package com.jitlogic.zorka.spy;
 
-import static com.jitlogic.zorka.spy.SpyConst.*;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class SpyRecord {
 
@@ -51,7 +51,7 @@ public class SpyRecord {
 
     public void beforeSubmit() {
 
-        Object[] v = new Object[vals[ON_ENTER].length+vals[ON_EXIT].length+vals[ON_ERROR].length];
+        Object[] v = new Object[vals[ON_ENTER].length+vals[ON_RETURN].length+vals[ON_ERROR].length];
 
         int offset = 0;
 
@@ -69,7 +69,7 @@ public class SpyRecord {
     public void beforeCollect() {
         vals[ON_COLLECT] = vals[ON_SUBMIT];
         vals[ON_ENTER] = NO_VALS;
-        vals[ON_EXIT] = NO_VALS;
+        vals[ON_RETURN] = NO_VALS;
         vals[ON_ERROR] = NO_VALS;
         vals[ON_SUBMIT] = NO_VALS;
     }
@@ -86,6 +86,10 @@ public class SpyRecord {
 
     public Object get(int stage, int idx) {
         return vals[stage][idx];
+    }
+
+    public Object[] getVals(int stage) {
+        return vals[stage];
     }
 
     public void put(int stage, int idx, Object v) {

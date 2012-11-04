@@ -46,6 +46,13 @@ public class ZorkaConfig {
 	private static Properties properties = null;
 	private static String homeDir = null;
 
+    public final static String DEFAULT_CONFDIR = "/opt/zorka";
+
+
+    public static void cleanup() {
+        properties = null;
+        homeDir = null;
+    }
 
     public static Properties getProperties() {
         return properties;
@@ -63,9 +70,6 @@ public class ZorkaConfig {
 
 
 	private synchronized static String getHomeDir(String suffix) {
-		if (homeDir == null)
-            homeDir = AgentMain.getHomeDir() != null ? AgentMain.getHomeDir() : "/opt/zorka";
-
 		return homeDir.endsWith("/") ? homeDir + suffix : homeDir + "/" + suffix;
 	}
 	
@@ -75,19 +79,13 @@ public class ZorkaConfig {
 	}
 	
 	
-	
-	
 	public synchronized static String get(String key, String defVal) {
-		
-		if (properties == null) {
-			loadProperties();
-		}
-		
 		return properties.getProperty(key, defVal);
 	}
 
 
-	public static void loadProperties() {
+	public static void loadProperties(String home) {
+        homeDir = home;
 		properties = new Properties();
 		InputStream is = null;
 		try {
@@ -101,16 +99,22 @@ public class ZorkaConfig {
 					is.close();
 				} catch (IOException e) { }
 		}
+
+        properties.put("zorka.home.dir", homeDir);
+        properties.put("zorka.config.dir", getHomeDir("conf"));
 	}
 	
-	
+
+    public static void setProperties(Properties props) {
+        homeDir = props.getProperty("zorka.home.dir", "/opt/zorka");
+        properties = props;
+    }
+
+
 	public static void put(String key, String val) {
-		if (properties == null) {
-			loadProperties();
-		}
-		
 		properties.put(key, val);
 	}
+
 
     public static URL[] getExtClasspath(Properties props, boolean checkExistence) {
         Properties fusedProps = new Properties();
