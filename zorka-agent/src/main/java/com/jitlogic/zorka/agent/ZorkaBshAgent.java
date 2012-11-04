@@ -33,7 +33,7 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 
 public class ZorkaBshAgent implements ZorkaService {
 
-	public static final String VERSION = "0.0.1-SNAPSHOT";
+	public static final String VERSION = "0.2-ALPHA2";
 	
 	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 

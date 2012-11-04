@@ -25,7 +25,7 @@ public class BshFunctionArgProcessor implements SpyArgProcessor {
 
     }
 
-    public SpyRecord process(SpyRecord record) {
+    public SpyRecord process(int stage, SpyRecord record) {
         return record;
     }
 }

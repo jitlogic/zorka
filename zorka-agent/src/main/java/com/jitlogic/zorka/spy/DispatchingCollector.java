@@ -26,6 +26,8 @@ import java.util.List;
 
 import static com.jitlogic.zorka.spy.SpyConst.*;
 
+import static com.jitlogic.zorka.spy.SpyLib.*;
+
 public class DispatchingCollector implements SpyCollector {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
@@ -58,7 +60,7 @@ public class DispatchingCollector implements SpyCollector {
 
         for (SpyArgProcessor argProcessor : argProcessors) {
             try {
-                if (null == (record = argProcessor.process(record))) {
+                if (null == (record = argProcessor.process(ON_COLLECT, record))) {
                     break;
                 }
             } catch (Throwable e) {

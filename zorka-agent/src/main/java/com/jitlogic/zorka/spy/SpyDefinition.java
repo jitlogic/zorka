@@ -22,7 +22,8 @@ import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.processors.*;
 
 import java.util.*;
-import static com.jitlogic.zorka.spy.SpyConst.*;
+
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 /**
  * This class defines mini-DSL for configuring instrumentation. Language allows for
@@ -54,10 +55,10 @@ public class SpyDefinition {
     private boolean once = false;
 
     public static SpyDefinition instrument() {
-        return new SpyDefinition().withTime().onExit().withTime().onError().withTime().onEnter();
+        return new SpyDefinition().withTime().onReturn().withTime().onError().withTime().onEnter();
     }
 
-    public static SpyDefinition newInstance() {
+    public static SpyDefinition instance() {
         return new SpyDefinition();
     }
 
@@ -160,15 +161,25 @@ public class SpyDefinition {
         return once;
     }
 
+
+    /**
+     *
+     * @param stage
+     * @return
+     */
+    public SpyDefinition on(int stage) {
+        SpyDefinition sdef = new SpyDefinition(this);
+        sdef.curStage = stage;
+        return sdef;
+    }
+
     /**
      * Instructs spy what should be collected at the beginning of a method.
      *
      * @return
      */
     public SpyDefinition onEnter() {
-        SpyDefinition sdef = new SpyDefinition(this);
-        sdef.curStage = ON_ENTER;
-        return sdef;
+        return on(ON_ENTER);
     }
 
 
@@ -177,10 +188,8 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition onExit() {
-        SpyDefinition sdef = new SpyDefinition(this);
-        sdef.curStage = ON_EXIT;
-        return sdef;
+    public SpyDefinition onReturn() {
+        return on(ON_RETURN);
     }
 
 
@@ -190,9 +199,7 @@ public class SpyDefinition {
      * @return
      */
     public SpyDefinition onError() {
-        SpyDefinition sdef = new SpyDefinition(this);
-        sdef.curStage = ON_ERROR;
-        return sdef;
+        return on(ON_ERROR);
     }
 
 
@@ -203,9 +210,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition onSubmit() {
-        SpyDefinition sdef = new SpyDefinition(this);
-        sdef.curStage = ON_SUBMIT;
-        return sdef;
+        return on(ON_SUBMIT);
     }
 
 
@@ -217,9 +222,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition onCollect() {
-        SpyDefinition sdef = new SpyDefinition(this);
-        sdef.curStage = ON_COLLECT;
-        return sdef;
+        return on(ON_COLLECT);
     }
 
     /**
@@ -303,28 +306,12 @@ public class SpyDefinition {
 
 
     /**
-     * Formats arguments and passes an array of formatted strings.
-     * Format expression is generally a string with special marker for
-     * extracting previous arguments '{n.field1.field2...}' where n is argument
-     * number, field1,field2,... are (optional) fields used exactly as in
-     * zorkalib.get() function.
-     *
-     * @param expr format expressions.
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition withFormat(int dst, String expr) {
-        return withArgProcessor(new StringFormatArgProcessor(dst, expr));
-    }
-
-
-    /**
      * Fetches current time at current stage of execution.
      *
      * @return augmented spy definition
      */
     public SpyDefinition withTime() {
-        return this.withArguments(SpyProbeElement.FETCH_TIME);
+        return this.withArguments(FETCH_TIME);
     }
 
 
@@ -337,7 +324,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition withRetVal() {
-        return this.withArguments(SpyProbeElement.FETCH_RET_VAL);
+        return this.withArguments(FETCH_RET_VAL);
     }
 
 
@@ -346,7 +333,7 @@ public class SpyDefinition {
      * @return
      */
     public SpyDefinition withError() {
-        return this.withArguments(SpyProbeElement.FETCH_ERROR);
+        return this.withArguments(FETCH_ERROR);
     }
 
     /**
@@ -356,7 +343,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition withThread() {
-        return this.withArguments(SpyProbeElement.FETCH_THREAD);
+        return this.withArguments(FETCH_THREAD);
     }
 
 
@@ -380,7 +367,7 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition withArgProcessor(SpyArgProcessor classArgProcessor) {
+    public SpyDefinition withProcessor(SpyArgProcessor classArgProcessor) {
         SpyDefinition sdef = new SpyDefinition(this);
         List<SpyArgProcessor> lst = new ArrayList<SpyArgProcessor>(transformers[curStage].size()+1);
         lst.addAll(transformers[curStage]);
@@ -390,32 +377,34 @@ public class SpyDefinition {
         return sdef;
     }
 
-
     /**
-     * Add an BSH filtering transformer to process chain.
+     * Formats arguments and passes an array of formatted strings.
+     * Format expression is generally a string with special marker for
+     * extracting previous arguments '${n.field1.field2...}' where n is argument
+     * number, field1,field2,... are (optional) fields used exactly as in
+     * zorkalib.get() function.
      *
-     * @param ns BSH namespace
-     *
-     * @param func BSH function name
+     * @param expr format expressions.
      *
      * @return augmented spy definition
      */
-    public SpyDefinition filter(This ns, String func) {
-        return withArgProcessor(new BshFilterArgProcessor(ns, func));
+    public SpyDefinition withFormat(int dst, String expr) {
+        return withProcessor(new StringFormatArgProcessor( dst, expr));
     }
+
 
 
     /**
      * Add an regex filtering transformer to process chain.
      *
-     * @param arg argument number
+     * @param src argument number
      *
      * @param regex regular expression
      *
      * @return augmented spy definition
      */
-    public SpyDefinition filter(Integer arg, String regex) {
-        return withArgProcessor(new RegexFilterArgProcessor(arg, regex));
+    public SpyDefinition filter(int src, String regex) {
+        return withProcessor(new RegexFilterArgProcessor(src, regex));
     }
 
 
@@ -423,14 +412,14 @@ public class SpyDefinition {
      * Add an regex filtering transformer to process chain that will exclude
      * matching items.
      *
-     * @param arg argument number
+     * @param src argument number
      *
      * @param regex regular expression
      *
      * @return augmented spy definition
      */
-    public SpyDefinition filterOut(Integer arg, String regex) {
-        return withArgProcessor(new RegexFilterArgProcessor(arg, regex, true));
+    public SpyDefinition filterOut(int src, String regex) {
+        return withProcessor(new RegexFilterArgProcessor(src, regex, true));
     }
 
 
@@ -447,48 +436,25 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition get(int src, int dst, Object...path) {
-        return withArgProcessor(new GetterArgProcessor(src, dst, path));
+        return withProcessor(new GetterArgProcessor(src, dst, path));
     }
 
 
     /**
-     * Gets slot number arg, performs traditional get operation and stores
-     * results in other slot.
+     * Calculates time difference between in1 and in2 and stores result in out.
      *
-     * @param arg
+     * @param in1
      *
-     * @param dst
+     * @param in2
      *
-     * @param path
+     * @param out
      *
-     * @return augmented spy definition
+     * @return
      */
-    public SpyDefinition getTo(int arg, int dst, Object...path) {
-        return withArgProcessor(new GetterArgProcessor(arg, arg, path));
-    }
-
-
     public SpyDefinition timeDiff(int in1, int in2, int out) {
-        return withArgProcessor(new TimeDiffArgProcessor(curStage, in1, in2, out));
+        return withProcessor(new TimeDiffArgProcessor(curStage, in1, in2, out));
     }
 
-
-
-    /**
-     * Gets object from slot number arg, calls given method on this slot and
-     * if method returns some value, stores its result in this slot.
-     *
-     * @param arg
-     *
-     * @param methodName
-     *
-     * @param methodArgs
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition transform(int arg, String methodName, Object...methodArgs) {
-        return withArgProcessor(new MethodCallingArgProcessor(arg, arg, methodName, methodArgs));
-    }
 
 
     /**
@@ -505,21 +471,8 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition transformTo(int src, int dst, String methodName, Object...methodArgs) {
-        return withArgProcessor(new MethodCallingArgProcessor(src, dst, methodName, methodArgs));
-    }
-
-    /**
-     * Transforms whole argument array using BSH function.
-     *
-     * @param ns BSH namespace
-     *
-     * @param func function name
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition transform(This ns, String func) {
-        return withArgProcessor(new BshFunctionArgProcessor(ns, func));
+    public SpyDefinition callMethod(int src, int dst, String methodName, Object... methodArgs) {
+        return withProcessor(new MethodCallingArgProcessor(src, dst, methodName, methodArgs));
     }
 
 
@@ -553,14 +506,14 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition toStats(String mbsName, String beanName, String attrName, String keyExpr, int tstampField, int timeField) {
+    public SpyDefinition toStats(String mbsName, String beanName, String attrName, String keyExpr,
+                                 int tstampField, int timeField) {
         return toCollector(new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, tstampField, timeField));
     }
 
 
     /**
-     * Instructs spy to submit data to a single object of ZorkaStat type and present
-     * it as Zorka
+     * Instructs spy to submit data to a single object of ZorkaStat object.
      *
      * @param mbsName mbean server name
      *
@@ -570,27 +523,9 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition toStat(String mbsName, String beanName, String attrName) {
+    public SpyDefinition toStat(String mbsName, String beanName, String attrName,
+                                int tstampField, int timeField) {
         return toCollector(new JmxAttrCollector(mbsName, beanName, attrName));
-    }
-
-
-    /**
-     * Instructs spy to submit data to a single object of ZorkaStat type and presents
-     * selected attribute of this object.
-     *
-     * @param mbsName mbean server name
-     *
-     * @param beanName mbean name
-     *
-     * @param attrName attribute name
-     *
-     * @param statAttr which stat attr to present
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition toStatAttr(String mbsName, String beanName, String attrName, String statAttr) {
-        return toCollector(new JmxAttrCollector(mbsName, beanName, attrName, statAttr));
     }
 
 
@@ -621,7 +556,7 @@ public class SpyDefinition {
 
 
     /**
-     * Instructs spy to submit data to a single BSH function.
+     * Instructs spy to present attribute as an getter object.
      *
      * @param mbsName mbean server name
      *
@@ -636,4 +571,8 @@ public class SpyDefinition {
     public SpyDefinition toGetter(String mbsName, String beanName, String attrName, Object...path) {
         return toCollector(new GetterPresentingCollector(mbsName, beanName, attrName, path));
     }
+
+    // TODO toString() method
+
+    // TODO some method printing 'execution plan' of this SpyDef
 }

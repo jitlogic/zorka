@@ -15,14 +15,13 @@
  */
 package com.jitlogic.zorka.agent.testspy;
 
-import bsh.This;
 import com.jitlogic.zorka.agent.testutil.ZorkaAgentFixture;
 
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyRecord;
 
-import static com.jitlogic.zorka.spy.SpyConst.ON_COLLECT;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 import com.jitlogic.zorka.spy.collectors.CallingBshCollector;
 import com.jitlogic.zorka.spy.collectors.CallingObjCollector;
@@ -53,7 +52,7 @@ public class CallingObjCollectionUnitTest extends ZorkaAgentFixture {
         super.setUp();
         zorkaAgent.installModule("test", this);
 
-        sdef = SpyDefinition.newInstance();
+        sdef = SpyDefinition.instance();
         ctx = new SpyContext(sdef, "some.Class", "someMethod", "()V", 1);
 
         record = new SpyRecord(ctx);

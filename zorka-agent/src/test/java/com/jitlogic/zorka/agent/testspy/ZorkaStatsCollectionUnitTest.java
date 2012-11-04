@@ -39,6 +39,7 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerBuilder;
 
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.getAttr;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class ZorkaStatsCollectionUnitTest {
 

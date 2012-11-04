@@ -19,12 +19,6 @@ package com.jitlogic.zorka.spy;
 
 public interface SpyConst {
 
-    public static final int ON_ENTER   = 0;
-    public static final int ON_EXIT    = 1;
-    public static final int ON_ERROR   = 2;
-    public static final int ON_SUBMIT  = 3;
-    public static final int ON_COLLECT = 4;
-
 
     public static final String SM_NOARGS      = "<no-args>";
     public static final String SM_CONSTRUCTOR = "<init>";

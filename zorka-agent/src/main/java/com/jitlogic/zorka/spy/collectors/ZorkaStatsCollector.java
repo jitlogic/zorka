@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.jitlogic.zorka.spy.SpyConst.*;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class ZorkaStatsCollector implements SpyCollector {
 
@@ -78,7 +79,7 @@ public class ZorkaStatsCollector implements SpyCollector {
         Object tstampObj = record.get(ON_COLLECT, tstampField);
 
         if (timeObj instanceof Long && tstampObj instanceof Long) {
-            if (record.gotStage(ON_EXIT)) {
+            if (record.gotStage(ON_RETURN)) {
                 if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
                     log.debug("Logging record using logCall()");
                 }
@@ -90,7 +91,7 @@ public class ZorkaStatsCollector implements SpyCollector {
                 statistic.logError((Long)tstampObj, (Long)timeObj);
             } else {
                 if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
-                    log.debug("No ON_EXIT nor ON_ERROR marked on record " + record);
+                    log.debug("No ON_RETURN nor ON_ERROR marked on record " + record);
                 }
             }
         } else {

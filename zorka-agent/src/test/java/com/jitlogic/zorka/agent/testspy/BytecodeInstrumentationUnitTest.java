@@ -69,7 +69,7 @@ public class BytecodeInstrumentationUnitTest {
 
     @Test
     public void testTrivialInstrumentOnlyEntryPointWithThisRef() throws Exception {
-        engine.add(SpyDefinition.newInstance().onEnter().withArguments(0).lookFor(TCLASS1, "trivialMethod"));
+        engine.add(SpyDefinition.instance().onEnter().withArguments(0).lookFor(TCLASS1, "trivialMethod"));
         Object obj = instantiate(engine, TCLASS1);
 
         invoke(obj, "trivialMethod");
@@ -81,7 +81,7 @@ public class BytecodeInstrumentationUnitTest {
 
     @Test
     public void testTrivialInstrumentOnlyEntryPointWithCurrentTime() throws Exception {
-        engine.add(SpyDefinition.newInstance().onEnter().withTime().lookFor(TCLASS1, "trivialMethod"));
+        engine.add(SpyDefinition.instance().onEnter().withTime().lookFor(TCLASS1, "trivialMethod"));
         Object obj = instantiate(engine, TCLASS1);
 
         invoke(obj, "trivialMethod");
@@ -121,7 +121,7 @@ public class BytecodeInstrumentationUnitTest {
     @Test
     public void testInstrumentWithTwoProbes() throws Exception {
         engine.add(SpyDefinition.instrument().lookFor(TCLASS1, "trivialMethod"));
-        engine.add(SpyDefinition.newInstance().withArguments(0).lookFor(TCLASS1, "trivialMethod"));
+        engine.add(SpyDefinition.instance().withArguments(0).lookFor(TCLASS1, "trivialMethod"));
 
         Object obj = instantiate(engine, TCLASS1);
 
@@ -147,7 +147,7 @@ public class BytecodeInstrumentationUnitTest {
 
     @Test
     public void testInstrumentConstructorWithSelfRef() throws Exception {
-        engine.add(SpyDefinition.newInstance().onExit().withArguments(0).lookFor(TCLASS1, SM_CONSTRUCTOR));
+        engine.add(SpyDefinition.instance().onReturn().withArguments(0).lookFor(TCLASS1, SM_CONSTRUCTOR));
         //engine.enableDebug();
         Object obj = instantiate(engine, TCLASS1);
 
@@ -158,7 +158,7 @@ public class BytecodeInstrumentationUnitTest {
 
     @Test
     public void testInstrumentConstructorWithInvalidSelfRefOnBeginning() throws Exception {
-        engine.add(SpyDefinition.newInstance().withArguments(0).lookFor(TCLASS1, SM_CONSTRUCTOR));
+        engine.add(SpyDefinition.instance().withArguments(0).lookFor(TCLASS1, SM_CONSTRUCTOR));
         //engine.enableDebug();
         Object obj = instantiate(engine, TCLASS1);
 
@@ -170,7 +170,7 @@ public class BytecodeInstrumentationUnitTest {
 
     @Test
     public void testFetchClassFromInstrumentedCode() throws Exception {
-        engine.add(SpyDefinition.newInstance().withClass(TCLASS1).lookFor(TCLASS1, "trivialMethod"));
+        engine.add(SpyDefinition.instance().withClass(TCLASS1).lookFor(TCLASS1, "trivialMethod"));
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
 
@@ -182,7 +182,7 @@ public class BytecodeInstrumentationUnitTest {
 
     @Test
     public void testFetchIntegerTypeArgument() throws Exception {
-        engine.add(SpyDefinition.newInstance().withArguments(1,2,3,4)
+        engine.add(SpyDefinition.instance().withArguments(1,2,3,4)
                 .lookFor(TCLASS1, "paramMethod1"));
         //engine.enableDebug();
         Object obj = instantiate(engine, TCLASS1);
@@ -198,7 +198,7 @@ public class BytecodeInstrumentationUnitTest {
 
     @Test
     public void testFetchBooleanCharTypeArgument() throws Exception {
-        engine.add(SpyDefinition.newInstance().withArguments(1,2)
+        engine.add(SpyDefinition.instance().withArguments(1,2)
                 .lookFor(TCLASS1, "paramMethod2"));
         //engine.enableDebug();
         Object obj = instantiate(engine, TCLASS1);
@@ -211,7 +211,7 @@ public class BytecodeInstrumentationUnitTest {
 
     @Test
     public void testFetchFloatingPointArgs() throws Exception {
-        engine.add(SpyDefinition.newInstance().withArguments(1,2)
+        engine.add(SpyDefinition.instance().withArguments(1,2)
                 .lookFor(TCLASS1, "paramMethod3"));
         //engine.enableDebug();
         Object obj = instantiate(engine, TCLASS1);
@@ -224,7 +224,7 @@ public class BytecodeInstrumentationUnitTest {
 
     @Test
     public void testCheckImmediateFlagInEntryPointOnlyProbe() throws Exception {
-        engine.add(SpyDefinition.newInstance().withTime().lookFor(TCLASS1, "trivialMethod"));
+        engine.add(SpyDefinition.instance().withTime().lookFor(TCLASS1, "trivialMethod"));
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
 
@@ -247,7 +247,7 @@ public class BytecodeInstrumentationUnitTest {
 
     @Test
     public void testCheckNoProbeOnEnterAndImmediateFlagOnExit() throws Exception {
-        engine.add(SpyDefinition.newInstance().onExit().withTime().lookFor(TCLASS1, "trivialMethod"));
+        engine.add(SpyDefinition.instance().onReturn().withTime().lookFor(TCLASS1, "trivialMethod"));
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
 
@@ -258,7 +258,7 @@ public class BytecodeInstrumentationUnitTest {
 
     @Test
     public void testNoProbeOnExitButProbeOnErrorAndOnEnter() throws Exception {
-        engine.add(SpyDefinition.newInstance().withTime().onError().withTime().lookFor(TCLASS1, "trivialMethod"));
+        engine.add(SpyDefinition.instance().withTime().onError().withTime().lookFor(TCLASS1, "trivialMethod"));
         //engine.enableDebug();
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
@@ -272,7 +272,7 @@ public class BytecodeInstrumentationUnitTest {
 
     @Test
     public void testNoProbeOnErrorButProbeOnEnterAndExit() throws Exception {
-        engine.add(SpyDefinition.newInstance().withTime().onExit().withTime().lookFor(TCLASS1, "errorMethod"));
+        engine.add(SpyDefinition.instance().withTime().onReturn().withTime().lookFor(TCLASS1, "errorMethod"));
 
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "errorMethod");
@@ -286,7 +286,7 @@ public class BytecodeInstrumentationUnitTest {
 
     @Test
     public void testIfContextIsTheSameForTheSameClassLoadedTwice() throws Exception {
-        engine.add(SpyDefinition.newInstance().withTime().lookFor(TCLASS1, "trivialMethod"));
+        engine.add(SpyDefinition.instance().withTime().lookFor(TCLASS1, "trivialMethod"));
 
         Object obj1 = instantiate(engine, TCLASS1);
         Object obj2 = instantiate(engine, TCLASS1);

@@ -26,6 +26,7 @@ import java.util.List;
 
 import static org.objectweb.asm.Opcodes.*;
 import static com.jitlogic.zorka.spy.SpyConst.*;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class SpyMethodVisitor extends MethodVisitor {
 
@@ -75,12 +76,12 @@ public class SpyMethodVisitor extends MethodVisitor {
     @Override
     public void visitInsn(int opcode) {
         if ((opcode >= IRETURN && opcode <= RETURN)) {
-            // ON_EXIT probes are inserted here
+            // ON_RETURN probes are inserted here
             for (int i = ctxs.size()-1; i >= 0; i--) {
                 SpyContext ctx = ctxs.get(i);
                 if (getSubmitFlags(ON_ENTER, ctx.getSpyDefinition()) == SF_NONE ||
-                    ctx.getSpyDefinition().getProbes(ON_EXIT).size() > 0) {
-                    stackDelta = SpyUtil.max(stackDelta, emitProbe(ON_EXIT, ctx));
+                    ctx.getSpyDefinition().getProbes(ON_RETURN).size() > 0) {
+                    stackDelta = SpyUtil.max(stackDelta, emitProbe(ON_RETURN, ctx));
                 }
             }
         }
@@ -109,7 +110,7 @@ public class SpyMethodVisitor extends MethodVisitor {
     public static int getSubmitFlags(int stage, SpyDefinition sdef) {
 
         if (stage == ON_ENTER) {
-            return (sdef.getProbes(ON_EXIT).size() == 0
+            return (sdef.getProbes(ON_RETURN).size() == 0
                     && sdef.getProbes(ON_ERROR).size() == 0)
                     ? SF_IMMEDIATE : SF_NONE;
         } else {
@@ -156,19 +157,19 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     private int emitProbeElement(int stage, int opcode, SpyProbeElement element) {
         switch (element.getArgType()) {
-            case SpyProbeElement.FETCH_TIME:
+            case FETCH_TIME:
                 mv.visitMethodInsn(INVOKESTATIC, "java/lang/System", "nanoTime", "()J");
                 mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;");
                 break;
-            case SpyProbeElement.FETCH_CLASS:
+            case FETCH_CLASS:
                 String cn = "L"+element.getClassName().replace(".", "/") + ";";
                 mv.visitLdcInsn(Type.getType(cn));
                 break;
-            case SpyProbeElement.FETCH_THREAD:
+            case FETCH_THREAD:
                 throw new NotImplementedException();
-            case SpyProbeElement.FETCH_ERROR:
+            case FETCH_ERROR:
                 throw new NotImplementedException();
-            case SpyProbeElement.FETCH_RET_VAL:
+            case FETCH_RET_VAL:
                 throw new NotImplementedException();
             default:
                 if (stage == ON_ENTER && element.getArgType() == 0 && "<init>".equals(methodName)) {

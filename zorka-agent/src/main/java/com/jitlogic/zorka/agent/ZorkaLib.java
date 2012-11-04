@@ -332,6 +332,7 @@ public class ZorkaLib implements ZorkaService {
     }
 
     public ZorkaLog log(String tag) {
+        // TODO this is badly designed API, log() should directly log messages, logger() method can return loggers.
         return ZorkaLogger.getLog(tag);
     }
 
