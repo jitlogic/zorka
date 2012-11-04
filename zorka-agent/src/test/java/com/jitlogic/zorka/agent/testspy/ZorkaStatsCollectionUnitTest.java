@@ -16,8 +16,10 @@
 
 package com.jitlogic.zorka.agent.testspy;
 
-import com.jitlogic.zorka.agent.AgentGlobals;
+import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
+import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
@@ -26,6 +28,7 @@ import com.jitlogic.zorka.spy.collectors.ZorkaStatsCollector;
 
 import static com.jitlogic.zorka.spy.SpyConst.*;
 
+import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +39,7 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerBuilder;
 
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.getAttr;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class ZorkaStatsCollectionUnitTest {
 
@@ -45,16 +49,20 @@ public class ZorkaStatsCollectionUnitTest {
 
     @Before
     public void setUp() {
+        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
+        ZorkaLogger.setLogger(new TestLogger());
         registry = new MBeanServerRegistry(true);
         testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
         registry.register("test", testMbs, null);
-        AgentGlobals.setMBeanServerRegistry(registry);
+        AgentInstance.setMBeanServerRegistry(registry);
     }
 
 
     @After
     public void tearDown() {
-        AgentGlobals.setMBeanServerRegistry(null);
+        AgentInstance.setMBeanServerRegistry(null);
+        ZorkaLogger.setLogger(null);
+        ZorkaConfig.cleanup();
     }
 
 
@@ -103,6 +111,22 @@ public class ZorkaStatsCollectionUnitTest {
 
         assertNotNull("", stats);
         assertNotNull(stats.getStatistic("testMethod"));
+    }
+
+
+    @Test
+    public void testCollectToStatsWithKeyExpression() throws Exception {
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${1}", 0, 0);
+        SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
+
+        SpyRecord sr = new SpyRecord(ctx);
+        sr.feed(ON_COLLECT, new Object[] { 10L, "oja" });
+        collector.collect(sr);
+
+        MethodCallStatistics stats =  (MethodCallStatistics)getAttr("test", "test:name=TClass", "stats");
+
+        assertNotNull("", stats);
+        assertNotNull(stats.getStatistic("oja"));
     }
 
     // TODO test if ctx<->stats pair is properly cached

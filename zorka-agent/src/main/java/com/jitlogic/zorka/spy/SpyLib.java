@@ -22,7 +22,20 @@ package com.jitlogic.zorka.spy;
  */
 public class SpyLib {
 
-	private SpyInstance instance;
+    public static final int ON_ENTER   = 0;
+    public static final int ON_RETURN  = 1;
+    public static final int ON_ERROR   = 2;
+    public static final int ON_SUBMIT  = 3;
+    public static final int ON_COLLECT = 4;
+
+    public static final int FETCH_TIME    = -1;
+    public static final int FETCH_RET_VAL = -2;
+    public static final int FETCH_ERROR   = -3;
+    public static final int FETCH_THREAD  = -4;
+    public static final int FETCH_CLASS   = -5;
+
+
+    private SpyInstance instance;
 
 
 	public SpyLib(SpyInstance instance) {
@@ -30,21 +43,22 @@ public class SpyLib {
 	}
 
 
-    public void add(SpyDefinition sdef) {
-        instance.add(sdef);
+    public void add(SpyDefinition...sdefs) {
+        for (SpyDefinition sdef : sdefs) {
+            instance.add(sdef);
+        }
     }
 
 
-    public SpyDefinition empty() {
-        return SpyDefinition.newInstance();
+    public SpyDefinition instance() {
+        return SpyDefinition.instance();
     }
 
 
     public SpyDefinition instrument() {
-        return SpyDefinition.instrument().onSubmit().timeDiff(0,1,1);
+        return SpyDefinition.instrument().onSubmit().timeDiff(0,1,1).onEnter();
     }
 
-    // TODO tutaj instrument() z argumentem-kluczem
+    // TODO instrument(String expr) convenience function;
 
-    // TODO wyrugować SpyDefinition.instrument()
 }

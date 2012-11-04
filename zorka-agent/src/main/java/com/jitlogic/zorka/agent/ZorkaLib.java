@@ -60,7 +60,7 @@ public class ZorkaLib implements ZorkaService {
 
     public ZorkaLib(ZorkaBshAgent agent) {
 		this.agent = agent;
-        this.mbsRegistry = AgentGlobals.getMBeanServerRegistry();
+        this.mbsRegistry = AgentInstance.getMBeanServerRegistry();
         this.hostname = ZorkaConfig.get("zorka.hostname", "null").trim();
 	}
 
@@ -332,6 +332,7 @@ public class ZorkaLib implements ZorkaService {
     }
 
     public ZorkaLog log(String tag) {
+        // TODO this is badly designed API, log() should directly log messages, logger() method can return loggers.
         return ZorkaLogger.getLog(tag);
     }
 
@@ -376,5 +377,8 @@ public class ZorkaLib implements ZorkaService {
 		return "OK";
 	}
 
+    public void registerMbs(String name, MBeanServerConnection mbs) {
+        mbsRegistry.register(name, mbs, mbs.getClass().getClassLoader());
+    }
 
 }

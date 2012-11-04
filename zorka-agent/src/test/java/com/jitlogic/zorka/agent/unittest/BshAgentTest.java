@@ -19,8 +19,11 @@ package com.jitlogic.zorka.agent.unittest;
 
 import java.util.concurrent.Executor;
 
-import com.jitlogic.zorka.agent.AgentGlobals;
+import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
+import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.zabbix.ZabbixLib;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONAware;
@@ -44,7 +47,9 @@ public class BshAgentTest {
 	
 	@Before
 	public void setUp() throws Exception {
-        AgentGlobals.setMBeanServerRegistry(new MBeanServerRegistry(true));
+        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
+        ZorkaLogger.setLogger(new TestLogger());
+        AgentInstance.setMBeanServerRegistry(new MBeanServerRegistry(true));
 		agent = new ZorkaBshAgent(new TrivialExecutor());
         ZabbixLib zl = new ZabbixLib(agent, agent.getZorkaLib());
 
@@ -57,8 +62,10 @@ public class BshAgentTest {
 	@After
 	public void tearDown() throws Exception {
 		agent.svcStop();
-        AgentGlobals.setMBeanServerRegistry(null);
-	}
+        AgentInstance.setMBeanServerRegistry(null);
+        ZorkaLogger.setLogger(null);
+        ZorkaConfig.cleanup();
+    }
 	
 	@Test
 	public void testTrivialQuery() throws Exception {
@@ -92,7 +99,7 @@ public class BshAgentTest {
         Object data = ((JSONObject)obj).get("data");
         assertTrue("obj.data should be JSONArray", data instanceof JSONArray);
         //JSONArray array = (JSONArray)obj;
-        System.out.println(((JSONAware)obj).toJSONString());
+        //System.out.println(((JSONAware)obj).toJSONString());
     }
 
     public static class SomeTestLib {

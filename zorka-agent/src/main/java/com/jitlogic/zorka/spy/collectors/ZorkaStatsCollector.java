@@ -17,13 +17,14 @@
 
 package com.jitlogic.zorka.spy.collectors;
 
-import com.jitlogic.zorka.agent.AgentGlobals;
+import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.mbeans.MethodCallStatistic;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
@@ -31,17 +32,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.jitlogic.zorka.spy.SpyConst.*;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class ZorkaStatsCollector implements SpyCollector {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private MBeanServerRegistry registry = AgentGlobals.getMBeanServerRegistry();
+    private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
     private String mbsName, mbeanTemplate, attrTemplate, keyTemplate;
     private int timeField, tstampField;
 
     private Map<SpyContext,MethodCallStatistics> statsCache = new HashMap<SpyContext, MethodCallStatistics>();
 
+    private ObjectInspector inspector = new ObjectInspector();
 
     public ZorkaStatsCollector(String mbsName, String mbeanTemplate, String attrTemplate,
                                String keyTemplate, int tstampField, int timeField) {
@@ -68,7 +71,7 @@ public class ZorkaStatsCollector implements SpyCollector {
                         new MethodCallStatistics(), "Method call statistics");
         }
 
-        String key = subst(keyTemplate, ctx);
+        String key = inspector.substitute(subst(keyTemplate, ctx), record.getVals(ON_COLLECT));
 
         MethodCallStatistic statistic = (MethodCallStatistic)stats.getMethodCallStatistic(key);
 
@@ -76,7 +79,7 @@ public class ZorkaStatsCollector implements SpyCollector {
         Object tstampObj = record.get(ON_COLLECT, tstampField);
 
         if (timeObj instanceof Long && tstampObj instanceof Long) {
-            if (record.gotStage(ON_EXIT)) {
+            if (record.gotStage(ON_RETURN)) {
                 if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
                     log.debug("Logging record using logCall()");
                 }
@@ -88,7 +91,7 @@ public class ZorkaStatsCollector implements SpyCollector {
                 statistic.logError((Long)tstampObj, (Long)timeObj);
             } else {
                 if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
-                    log.debug("No ON_EXIT nor ON_ERROR marked on record " + record);
+                    log.debug("No ON_RETURN nor ON_ERROR marked on record " + record);
                 }
             }
         } else {

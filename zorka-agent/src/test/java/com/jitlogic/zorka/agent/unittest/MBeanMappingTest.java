@@ -17,6 +17,10 @@
 
 package com.jitlogic.zorka.agent.unittest;
 
+import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.util.ZorkaLogger;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -30,9 +34,16 @@ public class MBeanMappingTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		bean = new ZorkaMappedMBean("test");
+        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
+        ZorkaLogger.setLogger(new TestLogger());
+        bean = new ZorkaMappedMBean("test");
 	}
-	
+
+    @After
+    public void tearDown() {
+        ZorkaLogger.setLogger(null);
+        ZorkaConfig.cleanup();
+    }
 	
 	@Test
 	public void testMapConstantAttr() throws Exception {

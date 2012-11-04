@@ -37,7 +37,7 @@ public class RegexFilterArgProcessor implements SpyArgProcessor {
         this.filterOut = filterOut;
     }
 
-    public SpyRecord process(SpyRecord record) {
+    public SpyRecord process(int stage, SpyRecord record) {
         return record;
     }
 }
