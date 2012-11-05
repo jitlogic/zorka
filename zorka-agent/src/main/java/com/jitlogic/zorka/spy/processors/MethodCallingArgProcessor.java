@@ -17,14 +17,105 @@
 package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MethodCallingArgProcessor implements SpyArgProcessor {
 
+    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+
+    private int src, dst;
+    private String methodName;
+    private Object[] args;
+    private Class<?>[] argTypes;
+
+
     public MethodCallingArgProcessor(int src, int dst, String methodName, Object... args) {
-        // TODO
+        this.src = src;
+        this.dst = dst;
+        this.methodName = methodName;
+        this.args = args;
+
+        argTypes = new Class<?>[args.length];
+
+        for (int i = 0; i < args.length; i++) {
+            argTypes[i] = args[i] != null ? args[i].getClass() : null;
+        }
     }
 
+
     public SpyRecord process(int stage, SpyRecord record) {
+        Object val = record.get(stage, src);
+
+        if (val == null) {
+            return record;
+        }
+
+        Method method = lookupMethod(val.getClass(), methodName, argTypes);
+
+        if (method == null) {
+            return record;
+        }
+
+        try {
+            val = method.invoke(val, args);
+            record.put(stage, dst, val);
+        } catch (Exception e) {
+            log.error("Error processing record calling its method", e);
+        }
+
         return record;
+    }
+
+    // TODO move this method to ObjectInspector
+    public Method lookupMethod(Class<?> clazz, String methodName, Class<?>...argTypes) {
+        for (Method m : clazz.getMethods()) {
+            if (methodName.equals(m.getName())) {
+                Class<?>[] paramTypes = m.getParameterTypes();
+                if (argTypes.length == 0 && paramTypes.length == 0) {
+                    return m;
+                }
+
+                if (argTypes.length != paramTypes.length) {
+                    continue;
+                }
+
+                boolean matches = true;
+
+                for (int i = 0; i < argTypes.length; i++) {
+                    if (argTypes[i] == null && paramTypes[i].isPrimitive()) {
+                        matches = false; break;
+                    }
+
+                    if (paramTypes[i].isPrimitive()) {
+                        paramTypes[i] = primitives.get(paramTypes[i].getName());
+                    }
+
+                    if (!paramTypes[i].isAssignableFrom(argTypes[i])) {
+                        matches = false; break;
+                    }
+                }
+
+                if (matches) {
+                    return m;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static Map<String,Class<?>> primitives;
+
+    static {
+        primitives = new HashMap<String, Class<?>>(32);
+        primitives.put("int", Integer.class);
+        primitives = Collections.unmodifiableMap(primitives);
     }
 }

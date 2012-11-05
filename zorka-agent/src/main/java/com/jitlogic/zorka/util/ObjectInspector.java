@@ -23,6 +23,7 @@ public class ObjectInspector {
 
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
+    // TODO multiargument get(), eg. getAll(Object obj, Object...path)  - there are several places it would be useful
 
     /**
      * Gets (logical) attribute from an object. Exact semantics may differ

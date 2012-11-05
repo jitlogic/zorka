@@ -19,25 +19,36 @@ package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.SpyRecord;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Filters records using regular expressions.
+ */
 public class RegexFilterArgProcessor implements SpyArgProcessor {
 
-    private final int arg;
+    private final int src;
     private final Pattern regex;
     private final boolean filterOut;
 
-    public RegexFilterArgProcessor(int arg, String regex) {
-        this(arg, regex, false);
+
+    public RegexFilterArgProcessor(int src, String regex) {
+        this(src, regex, false);
     }
 
-    public RegexFilterArgProcessor(int arg, String regex, boolean filterOut) {
-        this.arg = arg;
+
+    public RegexFilterArgProcessor(int src, String regex, boolean filterOut) {
+        this.src = src;
         this.regex = Pattern.compile(regex);
         this.filterOut = filterOut;
     }
 
+
     public SpyRecord process(int stage, SpyRecord record) {
-        return record;
+        Object val = record.get(stage, src);
+
+        boolean matches = val != null && regex.matcher(val.toString()).matches();
+
+        return matches^filterOut ? record : null;
     }
 }

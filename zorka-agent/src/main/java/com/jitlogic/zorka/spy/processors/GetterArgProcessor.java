@@ -17,16 +17,34 @@
 package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.util.ObjectInspector;
 
+/**
+ * Digs deeper into an object the same way zorka.jmx() does.
+ */
 public class GetterArgProcessor implements SpyArgProcessor {
 
+    private int src, dst;
+    private Object[] path;
+    private ObjectInspector inspector = new ObjectInspector();
 
 
     public GetterArgProcessor(int src, int dst, Object... path) {
-        // TODO
+        this.src = src;
+        this.dst = dst;
+        this.path = path;
     }
 
+
     public SpyRecord process(int stage, SpyRecord record) {
+        Object val = record.get(stage, src);
+
+        for (Object obj : path) {
+            val = inspector.get(val, obj);
+        }
+
+        record.put(stage, dst, val);
+
         return record;
     }
 }

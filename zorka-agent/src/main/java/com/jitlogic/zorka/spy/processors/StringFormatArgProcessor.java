@@ -17,14 +17,25 @@
 package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.util.ObjectInspector;
 
+/**
+ * Performs string formating using values from current stage.
+ */
 public class StringFormatArgProcessor implements SpyArgProcessor {
 
+    private int dst;
+    private String expr;
+
+    private ObjectInspector inspector = new ObjectInspector();
+
     public StringFormatArgProcessor(int dst, String expr) {
-        // TODO
+        this.dst = dst;
+        this.expr = expr;
     }
 
     public SpyRecord process(int stage, SpyRecord record) {
+        record.put(stage, dst, inspector.substitute(expr, record.getVals(stage)));
         return record;
     }
 }

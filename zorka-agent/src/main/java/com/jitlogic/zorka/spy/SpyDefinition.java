@@ -452,7 +452,7 @@ public class SpyDefinition {
      * @return
      */
     public SpyDefinition timeDiff(int in1, int in2, int out) {
-        return withProcessor(new TimeDiffArgProcessor(curStage, in1, in2, out));
+        return withProcessor(new TimeDiffArgProcessor(in1, in2, out));
     }
 
 
