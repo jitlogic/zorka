@@ -17,8 +17,6 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.spy.collectors.SpyCollector;
-import com.jitlogic.zorka.spy.processors.SpyArgProcessor;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
@@ -114,16 +112,16 @@ public class DispatchingSubmitter implements SpySubmitter {
     }
 
     private SpyRecord process(int stage, SpyDefinition sdef, SpyRecord record) {
-        List<SpyArgProcessor> argProcessors = sdef.getTransformers(stage);
+        List<SpyProcessor> processors = sdef.getTransformers(stage);
 
-        for (SpyArgProcessor argProcessor : argProcessors) {
+        for (SpyProcessor processor : processors) {
             try {
-                if (null == (record = argProcessor.process(stage, record))) {
+                if (null == (record = processor.process(stage, record))) {
                     break;
                 }
             } catch (Throwable e) {
                 log.error("Error processing record " + record + " (on processor "
-                            + argProcessor + ", stage=" + stage + ")");
+                            + processor + ", stage=" + stage + ")");
             }
         }
 

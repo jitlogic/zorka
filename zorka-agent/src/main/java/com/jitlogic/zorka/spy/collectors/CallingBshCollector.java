@@ -18,6 +18,7 @@ package com.jitlogic.zorka.spy.collectors;
 
 import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
+import com.jitlogic.zorka.spy.SpyCollector;
 import com.jitlogic.zorka.spy.SpyRecord;
 
 public class CallingBshCollector implements SpyCollector {
@@ -33,7 +34,7 @@ public class CallingBshCollector implements SpyCollector {
         if (collector == null) {
             ZorkaBshAgent agent = AgentInstance.instance().getZorkaAgent();
             collector = (SpyCollector)agent.eval(
-                    "(com.jitlogic.zorka.spy.collectors.SpyCollector)"+ns);
+                    "(com.jitlogic.zorka.spy.SpyCollector)"+ns);
         }
 
         collector.collect(record);

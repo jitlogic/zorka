@@ -22,11 +22,11 @@ import com.jitlogic.zorka.util.ObjectInspector;
 public class AttrGetter implements ValGetter {
 
 	private Object obj;
-	private String[] attrs;
+	private Object[] attrs;
 
     private ObjectInspector inspector = new ObjectInspector();
 	
-	public AttrGetter(Object obj, String...attrs) {
+	public AttrGetter(Object obj, Object...attrs) {
 		this.obj = obj;
 		this.attrs = attrs;
 	}
@@ -34,7 +34,7 @@ public class AttrGetter implements ValGetter {
 	public Object get() {
 		Object v = obj;
 		
-		for (String attr : attrs)
+		for (Object attr : attrs)
 			v = inspector.get(v, attr);
 		
 		return v;

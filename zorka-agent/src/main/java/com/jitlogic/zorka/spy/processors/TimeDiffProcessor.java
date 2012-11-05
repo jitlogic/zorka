@@ -16,14 +16,14 @@
 
 package com.jitlogic.zorka.spy.processors;
 
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 
-public class TimeDiffArgProcessor implements SpyArgProcessor {
+public class TimeDiffProcessor implements SpyProcessor {
 
-    private int in1, in2, out, stage;
+    private int in1, in2, out;
 
-    public TimeDiffArgProcessor(int stage, int in1, int in2, int out) {
-        this.stage = stage;
+    public TimeDiffProcessor(int in1, int in2, int out) {
         this.in1 = in1;
         this.in2 = in2;
         this.out = out;

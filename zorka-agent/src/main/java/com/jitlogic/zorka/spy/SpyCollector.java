@@ -1,3 +1,4 @@
+
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -14,19 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.spy.processors;
+
+package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.spy.SpyRecord;
 
-public class GetterArgProcessor implements SpyArgProcessor {
+public interface SpyCollector {
 
+    public void collect(SpyRecord record);
 
-
-    public GetterArgProcessor(int src, int dst, Object... path) {
-        // TODO
-    }
-
-    public SpyRecord process(int stage, SpyRecord record) {
-        return record;
-    }
 }
