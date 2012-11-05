@@ -16,17 +16,17 @@
  */
 package com.jitlogic.zorka.spy.processors;
 
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MethodCallingArgProcessor implements SpyArgProcessor {
+public class MethodCallingProcessor implements SpyProcessor {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
@@ -36,7 +36,7 @@ public class MethodCallingArgProcessor implements SpyArgProcessor {
     private Class<?>[] argTypes;
 
 
-    public MethodCallingArgProcessor(int src, int dst, String methodName, Object... args) {
+    public MethodCallingProcessor(int src, int dst, String methodName, Object... args) {
         this.src = src;
         this.dst = dst;
         this.methodName = methodName;

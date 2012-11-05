@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.spy.collectors;
 
+import com.jitlogic.zorka.spy.SpyCollector;
 import com.jitlogic.zorka.spy.SpyRecord;
 
 public class GetterPresentingCollector implements SpyCollector {

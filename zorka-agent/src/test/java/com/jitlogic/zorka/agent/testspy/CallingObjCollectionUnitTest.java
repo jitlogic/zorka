@@ -17,6 +17,7 @@ package com.jitlogic.zorka.agent.testspy;
 
 import com.jitlogic.zorka.agent.testutil.ZorkaAgentFixture;
 
+import com.jitlogic.zorka.spy.SpyCollector;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyRecord;
@@ -25,7 +26,6 @@ import static com.jitlogic.zorka.spy.SpyLib.*;
 
 import com.jitlogic.zorka.spy.collectors.CallingBshCollector;
 import com.jitlogic.zorka.spy.collectors.CallingObjCollector;
-import com.jitlogic.zorka.spy.collectors.SpyCollector;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -84,7 +84,7 @@ public class CallingObjCollectionUnitTest extends ZorkaAgentFixture {
     public void testCollectRecordViaBshFuncManual() throws Exception {
         zorkaAgent.eval("collect(obj) { test.result(obj); }");
         SpyCollector col = (SpyCollector)zorkaAgent.eval(
-                "(com.jitlogic.zorka.spy.collectors.SpyCollector)this");
+                "(com.jitlogic.zorka.spy.SpyCollector)this");
 
         col.collect(record);
 

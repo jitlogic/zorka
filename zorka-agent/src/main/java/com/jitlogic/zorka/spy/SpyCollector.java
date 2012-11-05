@@ -16,7 +16,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.collectors;
+package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.spy.SpyRecord;
 

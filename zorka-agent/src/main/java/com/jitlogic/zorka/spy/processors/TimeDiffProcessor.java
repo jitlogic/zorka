@@ -8,43 +8,36 @@
  * <p/>
  * This software is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * <p/>
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.jitlogic.zorka.spy.processors;
 
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
-import com.jitlogic.zorka.util.ObjectInspector;
 
-/**
- * Digs deeper into an object the same way zorka.jmx() does.
- */
-public class GetterArgProcessor implements SpyArgProcessor {
+public class TimeDiffProcessor implements SpyProcessor {
 
-    private int src, dst;
-    private Object[] path;
-    private ObjectInspector inspector = new ObjectInspector();
+    private int in1, in2, out;
 
-
-    public GetterArgProcessor(int src, int dst, Object... path) {
-        this.src = src;
-        this.dst = dst;
-        this.path = path;
+    public TimeDiffProcessor(int in1, int in2, int out) {
+        this.in1 = in1;
+        this.in2 = in2;
+        this.out = out;
     }
 
-
     public SpyRecord process(int stage, SpyRecord record) {
-        Object val = record.get(stage, src);
+        Object v1 = record.get(stage, in1), v2 = record.get(stage, in2);
 
-        for (Object obj : path) {
-            val = inspector.get(val, obj);
-        }
-
-        record.put(stage, dst, val);
+        if (v1 instanceof Long && v2 instanceof Long) {
+            long l1 = (Long)v1, l2 = (Long)v2;
+            record.put(stage, out, l2-l1);
+        } // TODO else (log something here ?)
 
         return record;
     }
+
 }

@@ -24,7 +24,7 @@ import com.jitlogic.zorka.spy.DispatchingCollector;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyRecord;
-import com.jitlogic.zorka.spy.collectors.SpyCollector;
+import com.jitlogic.zorka.spy.SpyCollector;
 
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.After;

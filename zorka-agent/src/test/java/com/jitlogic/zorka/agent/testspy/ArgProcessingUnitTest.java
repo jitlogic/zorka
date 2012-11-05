@@ -18,6 +18,7 @@ package com.jitlogic.zorka.agent.testspy;
 
 import com.jitlogic.zorka.agent.testutil.ZorkaAgentFixture;
 
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyRecord;
@@ -48,7 +49,7 @@ public class ArgProcessingUnitTest extends ZorkaAgentFixture {
 
     @Test
     public void testTrivialStringFormatArgProcessing() throws Exception {
-        SpyArgProcessor proc = new StringFormatArgProcessor(0, "len=${0.length()}");
+        SpyProcessor proc = new StringFormatProcessor(0, "len=${0.length()}");
         record.feed(ON_ENTER, new Object[] { "oja!"});
 
         proc.process(ON_ENTER, record);
@@ -59,7 +60,7 @@ public class ArgProcessingUnitTest extends ZorkaAgentFixture {
 
     @Test
     public void testTrivialGetterArgProcessing() throws Exception {
-        SpyArgProcessor proc = new GetterArgProcessor(0, 0, "length()");
+        SpyProcessor proc = new GetterProcessor(0, 0, "length()");
         record.feed(ON_ENTER, new Object[] { "oja!"});
 
         proc.process(ON_ENTER, record);
@@ -70,7 +71,7 @@ public class ArgProcessingUnitTest extends ZorkaAgentFixture {
 
     @Test
     public void testFilterNullVal() throws Exception {
-        SpyArgProcessor proc = new RegexFilterArgProcessor(0, "[a-z]+");
+        SpyProcessor proc = new RegexFilterProcessor(0, "[a-z]+");
         record.feed(ON_ENTER, new Object[] { null });
 
         assertNull(proc.process(ON_ENTER, record));
@@ -79,7 +80,7 @@ public class ArgProcessingUnitTest extends ZorkaAgentFixture {
 
     @Test
     public void testFilterPositiveVal() throws Exception {
-        SpyArgProcessor proc = new RegexFilterArgProcessor(0, "[a-z]+");
+        SpyProcessor proc = new RegexFilterProcessor(0, "[a-z]+");
         record.feed(ON_ENTER, new Object[] { "abc" });
 
         assertNotNull(proc.process(ON_ENTER, record));
@@ -88,7 +89,7 @@ public class ArgProcessingUnitTest extends ZorkaAgentFixture {
 
     @Test
     public void testFilterNegativeVal() throws Exception {
-        SpyArgProcessor proc = new RegexFilterArgProcessor(0, "[a-z]+");
+        SpyProcessor proc = new RegexFilterProcessor(0, "[a-z]+");
         record.feed(ON_ENTER, new Object[] { "123" });
 
         assertNull(proc.process(ON_ENTER, record));
@@ -97,7 +98,7 @@ public class ArgProcessingUnitTest extends ZorkaAgentFixture {
 
     @Test
     public void testFilterOutPositiveVal()  throws Exception {
-        SpyArgProcessor proc = new RegexFilterArgProcessor(0, "[a-z]+", true);
+        SpyProcessor proc = new RegexFilterProcessor(0, "[a-z]+", true);
         record.feed(ON_ENTER, new Object[] { "abc" });
 
         assertNull(proc.process(ON_ENTER, record));
@@ -106,7 +107,7 @@ public class ArgProcessingUnitTest extends ZorkaAgentFixture {
 
     @Test
     public void testFilterOutNegativeVal() throws Exception {
-        SpyArgProcessor proc = new RegexFilterArgProcessor(0, "[a-z]+", true);
+        SpyProcessor proc = new RegexFilterProcessor(0, "[a-z]+", true);
         record.feed(ON_ENTER, new Object[] { "123" });
 
         assertNotNull(proc.process(ON_ENTER, record));
@@ -115,7 +116,7 @@ public class ArgProcessingUnitTest extends ZorkaAgentFixture {
 
     @Test
     public void testMethodCallProcessing() throws Exception {
-        SpyArgProcessor proc = new MethodCallingArgProcessor(0, 0, "length");
+        SpyProcessor proc = new MethodCallingProcessor(0, 0, "length");
         record.feed(ON_ENTER, new Object[] { "oja!"});
 
         proc.process(ON_ENTER, record);
@@ -126,7 +127,7 @@ public class ArgProcessingUnitTest extends ZorkaAgentFixture {
 
     @Test
     public void testMethodCallProcessingWithOneArg() throws Exception {
-        SpyArgProcessor proc = new MethodCallingArgProcessor(0, 0, "substring", 1);
+        SpyProcessor proc = new MethodCallingProcessor(0, 0, "substring", 1);
         record.feed(ON_ENTER, new Object[] { "oja!"});
 
         proc.process(ON_ENTER, record);
@@ -137,7 +138,7 @@ public class ArgProcessingUnitTest extends ZorkaAgentFixture {
 
     @Test
     public void testOverloadedMethodCallProcessingWithTwoArgs() throws Exception {
-        SpyArgProcessor proc = new MethodCallingArgProcessor(0, 0, "substring", 1, 3);
+        SpyProcessor proc = new MethodCallingProcessor(0, 0, "substring", 1, 3);
         record.feed(ON_ENTER, new Object[] { "oja!"});
 
         proc.process(ON_ENTER, record);

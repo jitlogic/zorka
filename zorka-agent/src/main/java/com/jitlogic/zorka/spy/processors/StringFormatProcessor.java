@@ -14,41 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jitlogic.zorka.spy.processors;
 
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.jitlogic.zorka.util.ObjectInspector;
 
 /**
- * Filters records using regular expressions.
+ * Performs string formating using values from current stage.
  */
-public class RegexFilterArgProcessor implements SpyArgProcessor {
+public class StringFormatProcessor implements SpyProcessor {
 
-    private final int src;
-    private final Pattern regex;
-    private final boolean filterOut;
+    private int dst;
+    private String expr;
 
+    private ObjectInspector inspector = new ObjectInspector();
 
-    public RegexFilterArgProcessor(int src, String regex) {
-        this(src, regex, false);
+    public StringFormatProcessor(int dst, String expr) {
+        this.dst = dst;
+        this.expr = expr;
     }
-
-
-    public RegexFilterArgProcessor(int src, String regex, boolean filterOut) {
-        this.src = src;
-        this.regex = Pattern.compile(regex);
-        this.filterOut = filterOut;
-    }
-
 
     public SpyRecord process(int stage, SpyRecord record) {
-        Object val = record.get(stage, src);
-
-        boolean matches = val != null && regex.matcher(val.toString()).matches();
-
-        return matches^filterOut ? record : null;
+        record.put(stage, dst, inspector.substitute(expr, record.getVals(stage)));
+        return record;
     }
 }

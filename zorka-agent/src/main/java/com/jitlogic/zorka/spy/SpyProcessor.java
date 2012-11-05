@@ -15,7 +15,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.processors;
+package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.spy.SpyRecord;
 
@@ -24,7 +24,7 @@ import com.jitlogic.zorka.spy.SpyRecord;
  * Note that beanshell scripts can also make use of it with interface creation
  * feature. See documentation for more details.
  */
-public interface SpyArgProcessor {
+public interface SpyProcessor {
 
     /**
      * Transforms record passed by instrumentation engine.
