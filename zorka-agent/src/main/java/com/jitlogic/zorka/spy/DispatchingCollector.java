@@ -17,8 +17,6 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.spy.collectors.SpyCollector;
-import com.jitlogic.zorka.spy.processors.SpyArgProcessor;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
@@ -56,15 +54,15 @@ public class DispatchingCollector implements SpyCollector {
     }
 
     private SpyRecord process(SpyDefinition sdef, SpyRecord record) {
-        List<SpyArgProcessor> argProcessors = sdef.getTransformers(ON_COLLECT);
+        List<SpyProcessor> processors = sdef.getTransformers(ON_COLLECT);
 
-        for (SpyArgProcessor argProcessor : argProcessors) {
+        for (SpyProcessor processor : processors) {
             try {
-                if (null == (record = argProcessor.process(ON_COLLECT, record))) {
+                if (null == (record = processor.process(ON_COLLECT, record))) {
                     break;
                 }
             } catch (Throwable e) {
-                log.error("Error transforming record: " + record + " (on processor " + argProcessor + ")", e);
+                log.error("Error transforming record: " + record + " (on processor " + processor + ")", e);
                 return null;
             }
         }

@@ -14,22 +14,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.jitlogic.zorka.spy.processors;
 
-import bsh.This;
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 
-public class BshFilterArgProcessor implements SpyArgProcessor {
+import java.util.regex.Pattern;
 
-    private final This ns;
-    private final String funcName;
+/**
+ * Filters records using regular expressions.
+ */
+public class RegexFilterProcessor implements SpyProcessor {
 
-    public BshFilterArgProcessor(This ns, String funcName) {
-        this.ns = ns;
-        this.funcName = funcName;
+    private final int src;
+    private final Pattern regex;
+    private final boolean filterOut;
+
+
+    public RegexFilterProcessor(int src, String regex) {
+        this(src, regex, false);
     }
 
+
+    public RegexFilterProcessor(int src, String regex, boolean filterOut) {
+        this.src = src;
+        this.regex = Pattern.compile(regex);
+        this.filterOut = filterOut;
+    }
+
+
     public SpyRecord process(int stage, SpyRecord record) {
-        return record;
+        Object val = record.get(stage, src);
+
+        boolean matches = val != null && regex.matcher(val.toString()).matches();
+
+        return matches^filterOut ? record : null;
     }
 }

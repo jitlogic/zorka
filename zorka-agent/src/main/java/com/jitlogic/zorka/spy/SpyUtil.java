@@ -17,11 +17,6 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.spy.processors.SpyArgProcessor;
-import com.jitlogic.zorka.util.ZorkaLog;
-
-import java.util.List;
-
 public class SpyUtil {
 
     public static int max(int x, int y) {

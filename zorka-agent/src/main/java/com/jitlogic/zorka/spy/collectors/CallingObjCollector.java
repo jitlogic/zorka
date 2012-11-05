@@ -17,11 +17,8 @@
 
 package com.jitlogic.zorka.spy.collectors;
 
-import bsh.This;
-import com.jitlogic.zorka.agent.AgentInstance;
-import com.jitlogic.zorka.agent.ZorkaBshAgent;
+import com.jitlogic.zorka.spy.SpyCollector;
 import com.jitlogic.zorka.spy.SpyRecord;
-import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 

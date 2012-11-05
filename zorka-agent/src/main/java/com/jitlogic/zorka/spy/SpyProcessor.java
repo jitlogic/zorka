@@ -15,10 +15,26 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.processors;
+package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.spy.SpyRecord;
 
-public interface SpyArgProcessor {
+/**
+ * Spy Argument Processor interface. All argument processors must implement it.
+ * Note that beanshell scripts can also make use of it with interface creation
+ * feature. See documentation for more details.
+ */
+public interface SpyProcessor {
+
+    /**
+     * Transforms record passed by instrumentation engine.
+     *
+     * @param stage stage this record is processed at the moment.
+     *
+     * @param record record to be processed
+     *
+     * @return processed record (can be the same as passed with record argument)
+     *         or null to indicate that record should be dropped by instrumentation engine.
+     */
     public SpyRecord process(int stage, SpyRecord record);
 }

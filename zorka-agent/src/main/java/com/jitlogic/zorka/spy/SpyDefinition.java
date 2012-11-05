@@ -36,8 +36,8 @@ import static com.jitlogic.zorka.spy.SpyLib.*;
  */
 public class SpyDefinition {
 
-    private static final List<SpyArgProcessor> EMPTY_XF =
-            Collections.unmodifiableList(Arrays.asList(new SpyArgProcessor[0]));
+    private static final List<SpyProcessor> EMPTY_XF =
+            Collections.unmodifiableList(Arrays.asList(new SpyProcessor[0]));
     private static final List<SpyCollector> EMPTY_DC =
             Collections.unmodifiableList(Arrays.asList(new SpyCollector[0]));
     private static final List<SpyMatcher> EMPTY_MATCHERS =
@@ -46,7 +46,7 @@ public class SpyDefinition {
             Collections.unmodifiableList(Arrays.asList(new SpyProbeElement[0]));
 
     private List<SpyProbeElement>[] probes;
-    private List<SpyArgProcessor>[] transformers;
+    private List<SpyProcessor>[] transformers;
 
     private List<SpyCollector> collectors = EMPTY_DC;
     private List<SpyMatcher> matchers = EMPTY_MATCHERS;
@@ -103,7 +103,7 @@ public class SpyDefinition {
      *
      * @return
      */
-    public List<SpyArgProcessor> getTransformers(int stage) {
+    public List<SpyProcessor> getTransformers(int stage) {
         return transformers[stage];
     }
 
@@ -363,15 +363,15 @@ public class SpyDefinition {
     /**
      * Adds a custom transformer to process chain.
      *
-     * @param classArgProcessor
+     * @param processor
      *
      * @return
      */
-    public SpyDefinition withProcessor(SpyArgProcessor classArgProcessor) {
+    public SpyDefinition withProcessor(SpyProcessor processor) {
         SpyDefinition sdef = new SpyDefinition(this);
-        List<SpyArgProcessor> lst = new ArrayList<SpyArgProcessor>(transformers[curStage].size()+1);
+        List<SpyProcessor> lst = new ArrayList<SpyProcessor>(transformers[curStage].size()+1);
         lst.addAll(transformers[curStage]);
-        lst.add(classArgProcessor);
+        lst.add(processor);
         sdef.transformers = Arrays.copyOf(transformers, transformers.length);
         sdef.transformers[curStage] = lst;
         return sdef;
@@ -389,7 +389,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition withFormat(int dst, String expr) {
-        return withProcessor(new StringFormatArgProcessor( dst, expr));
+        return withProcessor(new StringFormatProcessor( dst, expr));
     }
 
 
@@ -404,7 +404,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition filter(int src, String regex) {
-        return withProcessor(new RegexFilterArgProcessor(src, regex));
+        return withProcessor(new RegexFilterProcessor(src, regex));
     }
 
 
@@ -419,7 +419,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition filterOut(int src, String regex) {
-        return withProcessor(new RegexFilterArgProcessor(src, regex, true));
+        return withProcessor(new RegexFilterProcessor(src, regex, true));
     }
 
 
@@ -436,7 +436,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition get(int src, int dst, Object...path) {
-        return withProcessor(new GetterArgProcessor(src, dst, path));
+        return withProcessor(new GetterProcessor(src, dst, path));
     }
 
 
@@ -452,7 +452,7 @@ public class SpyDefinition {
      * @return
      */
     public SpyDefinition timeDiff(int in1, int in2, int out) {
-        return withProcessor(new TimeDiffArgProcessor(curStage, in1, in2, out));
+        return withProcessor(new TimeDiffProcessor(in1, in2, out));
     }
 
 
@@ -472,7 +472,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition callMethod(int src, int dst, String methodName, Object... methodArgs) {
-        return withProcessor(new MethodCallingArgProcessor(src, dst, methodName, methodArgs));
+        return withProcessor(new MethodCallingProcessor(src, dst, methodName, methodArgs));
     }
 
 
@@ -568,8 +568,8 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition toGetter(String mbsName, String beanName, String attrName, Object...path) {
-        return toCollector(new GetterPresentingCollector(mbsName, beanName, attrName, path));
+    public SpyDefinition toGetter(String mbsName, String beanName, String attrName, String desc, int src, Object...path) {
+        return toCollector(new GetterPresentingCollector(mbsName, beanName, attrName, desc, src, path));
     }
 
     // TODO toString() method

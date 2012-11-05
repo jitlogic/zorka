@@ -1,4 +1,3 @@
-
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -15,13 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.spy.processors;
 
-package com.jitlogic.zorka.spy.collectors;
-
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.util.ObjectInspector;
 
-public interface SpyCollector {
+/**
+ * Performs string formating using values from current stage.
+ */
+public class StringFormatProcessor implements SpyProcessor {
 
-    public void collect(SpyRecord record);
+    private int dst;
+    private String expr;
 
+    private ObjectInspector inspector = new ObjectInspector();
+
+    public StringFormatProcessor(int dst, String expr) {
+        this.dst = dst;
+        this.expr = expr;
+    }
+
+    public SpyRecord process(int stage, SpyRecord record) {
+        record.put(stage, dst, inspector.substitute(expr, record.getVals(stage)));
+        return record;
+    }
 }
