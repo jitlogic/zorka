@@ -17,16 +17,62 @@
 
 package com.jitlogic.zorka.spy.collectors;
 
+import com.jitlogic.zorka.agent.AgentInstance;
+import com.jitlogic.zorka.agent.MBeanServerRegistry;
+import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.spy.SpyCollector;
+import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
+import static com.jitlogic.zorka.spy.SpyLib.ON_COLLECT;
+
+/**
+ * Presents object as mbean attribute using ValGetter object.
+ */
 public class GetterPresentingCollector implements SpyCollector {
 
-    public GetterPresentingCollector(String mbsName, String beanName, String attrName, Object...path) {
+    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
+    private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
+
+    private String mbsName;
+    private String mbeanTemplate, attrTemplate;
+    private String desc;
+    private int src;
+    private Object[] path;
+
+
+    public GetterPresentingCollector(String mbsName, String mbeanTemplate, String attrTemplate, String desc,
+                                     int src, Object...path) {
+        this.mbsName = mbsName;
+        this.mbeanTemplate = mbeanTemplate;
+        this.attrTemplate = attrTemplate;
+        this.src = src;
+        this.desc = desc;
+        this.path = path;
     }
+
 
     public void collect(SpyRecord record) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        SpyContext ctx = record.getContext();
+        String mbeanName = subst(mbeanTemplate, ctx);
+        String attrName = subst(attrTemplate, ctx);
+
+        Object obj1 = new AttrGetter(record.get(ON_COLLECT, src), path);
+        Object obj2 = registry.getOrRegisterBeanAttr(mbsName, mbeanName, attrName, obj1, desc);
+
+        if (obj1.equals(obj2)) {
+            log.warn("Attribute '" + attrName + "' of '" + mbeanName + "' is already used.");
+        }
     }
+
+    private String subst(String template, SpyContext ctx) {
+        return template
+                .replace("${className}", ctx.getClassName())
+                .replace("${methodName}", ctx.getMethodName())
+                .replace("${shortClassName}", ctx.getShortClassName());
+    }
+
 }

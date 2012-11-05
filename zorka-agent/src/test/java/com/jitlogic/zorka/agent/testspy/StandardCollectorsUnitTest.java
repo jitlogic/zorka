@@ -26,16 +26,22 @@ import static com.jitlogic.zorka.spy.SpyLib.*;
 
 import com.jitlogic.zorka.spy.collectors.CallingBshCollector;
 import com.jitlogic.zorka.spy.collectors.CallingObjCollector;
+import com.jitlogic.zorka.spy.collectors.GetterPresentingCollector;
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.management.MBeanServer;
+import javax.management.MBeanServerBuilder;
 
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.getAttr;
 
-public class CallingObjCollectionUnitTest extends ZorkaAgentFixture {
+
+public class StandardCollectorsUnitTest extends ZorkaAgentFixture {
 
     private List<Object> results = new ArrayList<Object>();
 
@@ -46,17 +52,20 @@ public class CallingObjCollectionUnitTest extends ZorkaAgentFixture {
     protected SpyContext ctx;
     protected SpyDefinition sdef;
     protected SpyRecord record;
+    protected MBeanServer testMbs;
 
     @Before
     public void setUp() {
         super.setUp();
         zorkaAgent.installModule("test", this);
 
+        testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
+        mBeanServerRegistry.register("test", testMbs, null);
+
         sdef = SpyDefinition.instance();
         ctx = new SpyContext(sdef, "some.Class", "someMethod", "()V", 1);
 
         record = new SpyRecord(ctx);
-        record.feed(ON_COLLECT, new Object[] {1L, 2L});
     }
 
 
@@ -72,6 +81,7 @@ public class CallingObjCollectionUnitTest extends ZorkaAgentFixture {
     @Test
     public void testCollectRecordToPlainJavaObj() throws Exception {
         SpyCollector col = new CallingObjCollector(this, "result");
+        record.feed(ON_COLLECT, new Object[] {1L, 2L, "abc"});
 
         col.collect(record);
 
@@ -85,6 +95,7 @@ public class CallingObjCollectionUnitTest extends ZorkaAgentFixture {
         zorkaAgent.eval("collect(obj) { test.result(obj); }");
         SpyCollector col = (SpyCollector)zorkaAgent.eval(
                 "(com.jitlogic.zorka.spy.SpyCollector)this");
+        record.feed(ON_COLLECT, new Object[] {1L, 2L});
 
         col.collect(record);
 
@@ -97,6 +108,7 @@ public class CallingObjCollectionUnitTest extends ZorkaAgentFixture {
     public void testCollectRecordViaBshFuncViaCallingBshCollector() throws Exception {
         zorkaAgent.eval("collect(obj) { test.result(obj); }");
         SpyCollector col = new CallingBshCollector("this");
+        record.feed(ON_COLLECT, new Object[] {1L, 2L});
 
         col.collect(record);
 
@@ -109,6 +121,7 @@ public class CallingObjCollectionUnitTest extends ZorkaAgentFixture {
     public void testCollectRecordViaBshFuncInEmbeddedNamespace() throws Exception {
         zorkaAgent.eval("__that() { collect (obj) { test.result(obj); } return this; } that = __that();");
         SpyCollector col = new CallingBshCollector("that");
+        record.feed(ON_COLLECT, new Object[] {1L, 2L});
 
         col.collect(record);
 
@@ -121,10 +134,35 @@ public class CallingObjCollectionUnitTest extends ZorkaAgentFixture {
     public void testDefineCollectorFirstAndBshNamespaceAfterThat() throws Exception {
         SpyCollector col = new CallingBshCollector("that");
         zorkaAgent.eval("__that() { collect (obj) { test.result(obj); } return this; } that = __that();");
+        record.feed(ON_COLLECT, new Object[]{1L, 2L});
 
         col.collect(record);
 
         assertEquals(1, results.size());
         assertEquals(record, results.get(0));
+    }
+
+
+    @Test
+    public void testPublishObjectViaGetterCollector() throws Exception {
+        SpyCollector col = new GetterPresentingCollector("test", "test:name=TestObj", "testAttr", "meh", 2);
+        record.feed(ON_COLLECT, new Object[] {1L, 2L, "oja!"});
+
+        col.collect(record);
+
+        Object obj = getAttr("test", "test:name=TestObj", "testAttr");
+        assertEquals("oja!", obj);
+    }
+
+
+    @Test
+    public void testPublishObjectViaGetterCollectorWithDispatch() throws Exception {
+        SpyCollector col = new GetterPresentingCollector("test", "test:name=TestObj", "testAttr", "meh", 2, "length()");
+        record.feed(ON_COLLECT, new Object[] {1L, 2L, "oja!"});
+
+        col.collect(record);
+
+        Object obj = getAttr("test", "test:name=TestObj", "testAttr");
+        assertEquals(4, obj);
     }
 }

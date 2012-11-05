@@ -238,7 +238,7 @@ public class SpyDefinitionModellingTest {
         SpyDefinition sdef =
             SpyDefinition.instance().once().lookFor("com.hp.ifc.bus.AppServer", "startup")
                 .withClass("com.hp.ifc.net.mq.AppMessageQueue")
-                .toGetter("java", "hpsd:type=SDStats,name=AppMessageQueue", "size", "getSize()");
+                .toGetter("java", "hpsd:type=SDStats,name=AppMessageQueue", "size", "meh", 0, "getSize()");
     }
 
 
@@ -251,10 +251,10 @@ public class SpyDefinitionModellingTest {
         SpyDefinition sdef =
             SpyDefinition.instance().once().lookFor("some.package.SomeBean", SM_CONSTRUCTOR)
                 .withArguments(0)
-                .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "count", "getCount()")
-                .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "backlog", "getBacklog()")
-                .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "time", "getProcessingTime()")
-                .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "url", "getUrl()");
+                .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "count", "meh", 0, "getCount()")
+                .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "backlog", "meh", 0, "getBacklog()")
+                .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "time", "meh", 0, "getProcessingTime()")
+                .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "url", "meh", 0, "getUrl()");
     }
 
     /**
@@ -278,6 +278,6 @@ public class SpyDefinitionModellingTest {
         SpyDefinition sdef =
             SpyDefinition.instance().once().lookFor("some.package.SingletonBean", SM_CONSTRUCTOR)
                 .withArguments(0).get(0, 0, "someMap")
-                .toGetter("java", "SomeApp:type=SingletonType", "map");
+                .toGetter("java", "SomeApp:type=SingletonType", "map", "Some map", 0);
     }
 }

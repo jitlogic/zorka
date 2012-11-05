@@ -568,8 +568,8 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition toGetter(String mbsName, String beanName, String attrName, Object...path) {
-        return toCollector(new GetterPresentingCollector(mbsName, beanName, attrName, path));
+    public SpyDefinition toGetter(String mbsName, String beanName, String attrName, String desc, int src, Object...path) {
+        return toCollector(new GetterPresentingCollector(mbsName, beanName, attrName, desc, src, path));
     }
 
     // TODO toString() method
