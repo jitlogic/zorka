@@ -13,11 +13,14 @@ import java.util.Date;
  */
 public class ZorkaLogger {
 
+    // TODO uporzadkowac logger do konca
+
     private static ZorkaLogger logger = null;
 
 
     public static ZorkaLog getLog(Class<?> clazz) {
-        return getLog(clazz.getName());
+        String[] segs = clazz.getName().split("\\.");
+        return getLog(segs[segs.length-1]);
     }
 
 
@@ -27,6 +30,11 @@ public class ZorkaLogger {
         }
 
         return new ZorkaLog(tag, logger);
+    }
+
+
+    public synchronized static ZorkaLogger getLogger() {
+        return logger;
     }
 
 
@@ -68,12 +76,7 @@ public class ZorkaLogger {
     }
 
 
-    public void log(ZorkaLog source, ZorkaLogLevel logLevel, String message) {
-        log(source, logLevel, message, null);
-    }
-
-
-    public synchronized void log(ZorkaLog source, ZorkaLogLevel logLevel, String message, Throwable e) {
+    public synchronized void log(String tag, ZorkaLogLevel logLevel, String message, Throwable e, Object...args) {
         if (active && logLevel.getPriority() >= logThreshold.getPriority()) {
             if (out == null || currentSize >= maxSize) {
                 reopen();
@@ -82,7 +85,9 @@ public class ZorkaLogger {
             StringBuilder sb = new StringBuilder();
             sb.append(new Date());
             sb.append(" ");
-            sb.append(message);
+            sb.append(tag);
+            sb.append(" ");
+            sb.append(format(message, args));
 
             if (e != null) {
                 sb.append(" [");
@@ -103,6 +108,19 @@ public class ZorkaLogger {
             if (out != null)
                 out.println(s);
             currentSize += s.getBytes().length + 1;
+        }
+    }
+
+
+    public String format(String message, Object...args) {
+        if (args.length == 0) {
+            return message;
+        } else {
+            try {
+                return String.format(message, args);
+            } catch (Exception e) {
+                return "Invalid format '" + message + "' [" + ZorkaUtil.join(",", args) + "]: " + e;
+            }
         }
     }
 
