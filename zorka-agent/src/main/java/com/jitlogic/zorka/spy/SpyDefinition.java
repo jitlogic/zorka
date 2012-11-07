@@ -525,7 +525,7 @@ public class SpyDefinition {
      */
     public SpyDefinition toStat(String mbsName, String beanName, String attrName,
                                 int tstampField, int timeField) {
-        return toCollector(new JmxAttrCollector(mbsName, beanName, attrName));
+        return toCollector(new JmxAttrCollector(mbsName, beanName, attrName, tstampField, timeField));
     }
 
 

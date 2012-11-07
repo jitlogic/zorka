@@ -20,13 +20,16 @@ import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.spy.collectors.JmxAttrCollector;
 import com.jitlogic.zorka.spy.collectors.ZorkaStatsCollector;
 
 import static com.jitlogic.zorka.spy.SpyConst.*;
+import static com.jitlogic.zorka.mbeans.MethodCallStatistic.NS;
 
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.After;
@@ -38,33 +41,12 @@ import static org.junit.Assert.*;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerBuilder;
 
+import java.util.Date;
+
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.getAttr;
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
-public class ZorkaStatsCollectionUnitTest {
-
-    private MBeanServerRegistry registry;
-    private MBeanServer testMbs;
-
-
-    @Before
-    public void setUp() {
-        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
-        ZorkaLogger.setLogger(new TestLogger());
-        registry = new MBeanServerRegistry(true);
-        testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
-        registry.register("test", testMbs, null);
-        AgentInstance.setMBeanServerRegistry(registry);
-    }
-
-
-    @After
-    public void tearDown() {
-        AgentInstance.setMBeanServerRegistry(null);
-        ZorkaLogger.setLogger(null);
-        ZorkaConfig.cleanup();
-    }
-
+public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
     @Test
     public void testCollectToStatsMbeanWithoutPlaceholders() throws Exception {
@@ -129,5 +111,47 @@ public class ZorkaStatsCollectionUnitTest {
         assertNotNull(stats.getStatistic("oja"));
     }
 
+    // TODO test for actual calls/errors collection
+
     // TODO test if ctx<->stats pair is properly cached
+
+
+    @Test
+    public void testJmxAttrCollectorTrivialCall() throws Exception {
+        JmxAttrCollector collector = new JmxAttrCollector("test", "test:name=${shortClassName}", "${methodName}", 0, 1);
+        SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
+
+        SpyRecord record = new SpyRecord(ctx);
+        record.feed(ON_RETURN, new Object[]{});  // Mark proper return from method
+        record.feed(ON_COLLECT, new Object[]{1000 * NS, 500 * NS});
+        collector.collect(record);
+
+        assertEquals(1L, getAttr("test", "test:name=TClass", "testMethod_calls"));
+        assertEquals(0L, getAttr("test", "test:name=TClass", "testMethod_errors"));
+        assertEquals(500L, getAttr("test", "test:name=TClass", "testMethod_time"));
+
+        Object date = getAttr("test", "test:name=TClass", "testMethod_last");
+        assertTrue("Should return java.util.Date object", date instanceof Date);
+        assertEquals(1000L, ((Date)date).getTime());
+    }
+
+
+    @Test
+    public void testJmxAttrCollectorTrivialError() throws Exception {
+        JmxAttrCollector collector = new JmxAttrCollector("test", "test:name=${shortClassName}", "${methodName}", 0, 1);
+        SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
+
+        SpyRecord record = new SpyRecord(ctx);
+        record.feed(ON_ERROR, new Object[]{});  // Mark proper return from method
+        record.feed(ON_COLLECT, new Object[]{1000 * NS, 500 * NS});
+        collector.collect(record);
+
+        assertEquals(1L, getAttr("test", "test:name=TClass", "testMethod_calls"));
+        assertEquals(1L, getAttr("test", "test:name=TClass", "testMethod_errors"));
+        assertEquals(500L, getAttr("test", "test:name=TClass", "testMethod_time"));
+
+        Object date = getAttr("test", "test:name=TClass", "testMethod_last");
+        assertTrue("Should return java.util.Date object", date instanceof Date);
+        assertEquals(1000L, ((Date)date).getTime());
+    }
 }

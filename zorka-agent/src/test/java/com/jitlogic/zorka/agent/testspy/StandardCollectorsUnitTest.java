@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.agent.testspy;
 
-import com.jitlogic.zorka.agent.testutil.ZorkaAgentFixture;
+import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 
 import com.jitlogic.zorka.spy.SpyCollector;
 import com.jitlogic.zorka.spy.SpyContext;
@@ -41,7 +41,7 @@ import java.util.List;
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.getAttr;
 
 
-public class StandardCollectorsUnitTest extends ZorkaAgentFixture {
+public class StandardCollectorsUnitTest extends ZorkaFixture {
 
     private List<Object> results = new ArrayList<Object>();
 
@@ -56,7 +56,6 @@ public class StandardCollectorsUnitTest extends ZorkaAgentFixture {
 
     @Before
     public void setUp() {
-        super.setUp();
         zorkaAgent.installModule("test", this);
 
         testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);

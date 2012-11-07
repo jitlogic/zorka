@@ -20,6 +20,7 @@ import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testspy.support.TestSpyTransformer;
 import com.jitlogic.zorka.agent.testspy.support.TestSubmitter;
 import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.MainSubmitter;
 import com.jitlogic.zorka.util.ZorkaLogger;
@@ -33,7 +34,7 @@ import static com.jitlogic.zorka.spy.SpyConst.*;
 
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.*;
 
-public class BytecodeInstrumentationUnitTest {
+public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     public final static String TCLASS1 = "com.jitlogic.zorka.agent.testspy.support.TestClass1";
 
@@ -43,8 +44,6 @@ public class BytecodeInstrumentationUnitTest {
 
     @Before
     public void setUp() throws Exception {
-        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
-        ZorkaLogger.setLogger(new TestLogger());
         engine = new TestSpyTransformer();
         submitter = new TestSubmitter();
         MainSubmitter.setSubmitter(submitter);
@@ -54,8 +53,6 @@ public class BytecodeInstrumentationUnitTest {
     @After
     public void tearDown() throws Exception {
         MainSubmitter.setSubmitter(null);
-        ZorkaLogger.setLogger(null);
-        ZorkaConfig.cleanup();;
     }
 
 
@@ -340,7 +337,16 @@ public class BytecodeInstrumentationUnitTest {
 
     // TODO return values of simple types
 
-    // TODO fetch current thread
+    @Test
+    public void testFetchCurrentThreadSubmission() throws Exception {
+        engine.add(SpyDefinition.instance().withThread().lookFor(TCLASS1, "trivialMethod"));
+
+        Object obj = instantiate(engine, TCLASS1);
+        invoke(obj, "trivialMethod");
+
+        assertEquals(1, submitter.size());
+        assertEquals(Thread.currentThread(), submitter.get(0).get(0));
+    }
 
     // TODO fetch object's class loader
 

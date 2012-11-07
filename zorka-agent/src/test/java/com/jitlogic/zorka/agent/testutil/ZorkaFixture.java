@@ -25,12 +25,15 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.After;
 import org.junit.Before;
 
+import javax.management.MBeanServer;
+import javax.management.MBeanServerBuilder;
 import java.util.Properties;
 
-public class ZorkaAgentFixture {
+public class ZorkaFixture {
 
     protected Properties configProperties;
     protected TestLogger testLogger;
+    protected MBeanServer testMbs;
     protected MBeanServerRegistry mBeanServerRegistry;
 
     protected AgentInstance agentInstance;
@@ -39,7 +42,7 @@ public class ZorkaAgentFixture {
     protected ZorkaBshAgent zorkaAgent;
 
     @Before
-    public void setUp() {
+    public void setUpFixture() {
         configProperties = setProps(new Properties(),
                 "zorka.home.dir", "/tmp",
                 "zabbix.enabled", "no",
@@ -63,10 +66,13 @@ public class ZorkaAgentFixture {
 
         spyInstance = agentInstance.getSpyInstance();
         zorkaAgent = agentInstance.getZorkaAgent();
+
+        testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
+        mBeanServerRegistry.register("test", testMbs, testMbs.getClass().getClassLoader());
     }
 
     @After
-    public void tearDown() {
+    public void tearDownFixture() {
         AgentInstance.setMBeanServerRegistry(null);
         ZorkaLogger.setLogger(null);
         ZorkaConfig.cleanup();
