@@ -20,6 +20,7 @@ import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testspy.support.TestCollector;
 import com.jitlogic.zorka.agent.testspy.support.TestSpyTransformer;
 import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.spy.DispatchingCollector;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
@@ -33,23 +34,15 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class CollectionDispatchUnitTest {
+public class CollectionDispatchUnitTest extends ZorkaFixture {
 
     private TestSpyTransformer engine;
     private SpyCollector collector;
 
     @Before
     public void setUp() {
-        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
-        ZorkaLogger.setLogger(new TestLogger());
         engine = new TestSpyTransformer();
         collector = new DispatchingCollector();
-    }
-
-    @After
-    public void tearDown() {
-        ZorkaLogger.setLogger(null);
-        ZorkaConfig.cleanup();
     }
 
     @Test

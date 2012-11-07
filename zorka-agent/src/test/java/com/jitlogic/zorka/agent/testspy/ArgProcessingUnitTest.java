@@ -38,7 +38,6 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     @Before
     public void setUp() {
-        super.setUp();
         zorkaAgent.installModule("test", this);
 
         sdef = SpyDefinition.instance();

@@ -20,6 +20,7 @@ import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.MainSubmitter;
@@ -38,33 +39,7 @@ import java.util.Properties;
 
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.*;
 
-public class SpyInstanceIntegTest {
-
-    private MBeanServerRegistry registry;
-    private MBeanServer testMbs;
-
-    private SpyInstance instance;
-
-    @Before
-    public void setUp() {
-        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
-        ZorkaLogger.setLogger(new TestLogger());
-        registry = new MBeanServerRegistry(true);
-        testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
-        registry.register("test", testMbs, null);
-        AgentInstance.setMBeanServerRegistry(registry);
-
-        instance = new SpyInstance(new Properties());
-        MainSubmitter.setSubmitter(instance.getSubmitter());
-    }
-
-    @After
-    public void tearDown() {
-        MainSubmitter.setSubmitter(null);
-        AgentInstance.setMBeanServerRegistry(null);
-        ZorkaLogger.setLogger(null);
-        ZorkaConfig.cleanup();
-    }
+public class SpyInstanceIntegTest extends ZorkaFixture {
 
     @Test
     public void testTrivialMethodRun() throws Exception {
@@ -72,9 +47,9 @@ public class SpyInstanceIntegTest {
                 .lookFor(TCLASS1, "trivialMethod")
                 .toStats("test", "test:name=${shortClassName}", "stats", "${methodName}", 0, 1);
 
-        instance.add(sdef);
+        spyInstance.add(sdef);
 
-        Object obj = instantiate(instance.getClassTransformer(), TCLASS1);
+        Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS1);
         invoke(obj, "trivialMethod");
 
         Object stats = getAttr("test", "test:name=TestClass1", "stats");

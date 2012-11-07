@@ -21,21 +21,13 @@ import static org.junit.Assert.*;
 /**
  * @author RLE <rafal.lewczuk@gmail.com>
  */
-public class ObjectInspectorUnitTest {
+public class ObjectInspectorUnitTest extends ZorkaFixture {
 
-    private MBeanServer mbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
     private ObjectInspector inspector;
 
     @Before
-    public void setUp() {
-        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
-        ZorkaLogger.setLogger(new TestLogger());
+    public void initLocal() {
         inspector  = new ObjectInspector();
-    }
-
-    public void tearDown() {
-        ZorkaLogger.setLogger(new TestLogger());
-        ZorkaConfig.cleanup();
     }
 
 
@@ -137,8 +129,8 @@ public class ObjectInspectorUnitTest {
         bean.setNom(100);
         bean.setDiv(200);
         ObjectName on = new ObjectName("zorka.test:name=test");
-        mbs.registerMBean(bean, on);
-        return new JmxObject(on, mbs, null);
+        testMbs.registerMBean(bean, on);
+        return new JmxObject(on, testMbs, null);
     }
 
     // TODO tests for tabular data

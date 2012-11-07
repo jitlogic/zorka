@@ -56,7 +56,6 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
     @Before
     public void setUp() {
-        super.setUp();
         zorkaAgent.installModule("test", this);
 
         testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);

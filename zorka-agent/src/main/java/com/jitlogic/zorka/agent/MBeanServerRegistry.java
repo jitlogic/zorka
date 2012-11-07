@@ -78,15 +78,15 @@ public class MBeanServerRegistry {
         return classLoaders.get(name);
     }
 
-    public synchronized void register(String name, MBeanServerConnection conn, ClassLoader classLoader) {
-        if (!conns.containsKey(name)) {
-            conns.put(name, conn);
+    public synchronized void register(String mbsName, MBeanServerConnection mbsConn, ClassLoader classLoader) {
+        if (!conns.containsKey(mbsName)) {
+            conns.put(mbsName, mbsConn);
             if (classLoader != null) {
-                classLoaders.put(name, classLoader);
+                classLoaders.put(mbsName, classLoader);
             }
-            registerDeferred(name);
+            registerDeferred(mbsName);
         } else {
-            log.error("MBean server '" + name + "' is already registered.");
+            log.error("MBean server '" + mbsName + "' is already registered.");
         }
 
 
@@ -104,31 +104,31 @@ public class MBeanServerRegistry {
     }
 
 
-    public <T> T getOrRegisterBeanAttr(String name, String bean, String attr, T obj, String desc) {
-        MBeanServerConnection mbs = lookup(name);
+    public <T> T getOrRegisterBeanAttr(String mbsName, String beanName, String attrName, T obj, String desc) {
+        MBeanServerConnection mbs = lookup(mbsName);
 
         // TODO switch class loader if needed
 
         if (mbs != null) {
             try {
-                return (T)mbs.getAttribute(new ObjectName(bean), attr);
+                return (T)mbs.getAttribute(new ObjectName(beanName), attrName);
             } catch (MBeanException e) {
                 log.error("Error registering mbean", e);
             } catch (AttributeNotFoundException e) {
-                return registerAttr(mbs, bean, attr, obj);
+                return registerAttr(mbs, beanName, attrName, obj);
             } catch (InstanceNotFoundException e) {
-                return registerBeanAttr(mbs, bean, attr, obj, desc);
+                return registerBeanAttr(mbs, beanName, attrName, obj, desc);
             } catch (ReflectionException e) {
                 log.error("Error registering bean", e);
             } catch (IOException e) {
                 log.error("Error registering bean", e);
             } catch (MalformedObjectNameException e) {
-                log.error("Malformed object name: '" + bean + "'");
+                log.error("Malformed object name: '" + beanName + "'");
             } catch (ClassCastException e) {
-                log.error("Object '" + bean + "'.'" + attr + "' of invalid type'", e);
+                log.error("Object '" + beanName + "'.'" + attrName + "' of invalid type'", e);
             }
         } else {
-            deferredRegistrations.add(new DeferredRegistration(name, bean, attr, obj, desc));
+            deferredRegistrations.add(new DeferredRegistration(mbsName, beanName, attrName, obj, desc));
             return obj;
         }
 

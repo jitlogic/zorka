@@ -20,6 +20,7 @@ import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
@@ -45,30 +46,7 @@ import java.util.Date;
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.getAttr;
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
-public class ZorkaStatsCollectionUnitTest {
-
-    private MBeanServerRegistry registry;
-    private MBeanServer testMbs;
-
-
-    @Before
-    public void setUp() {
-        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
-        ZorkaLogger.setLogger(new TestLogger());
-        registry = new MBeanServerRegistry(true);
-        testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
-        registry.register("test", testMbs, null);
-        AgentInstance.setMBeanServerRegistry(registry);
-    }
-
-
-    @After
-    public void tearDown() {
-        AgentInstance.setMBeanServerRegistry(null);
-        ZorkaLogger.setLogger(null);
-        ZorkaConfig.cleanup();
-    }
-
+public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
     @Test
     public void testCollectToStatsMbeanWithoutPlaceholders() throws Exception {
