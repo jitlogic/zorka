@@ -331,7 +331,20 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
                 submitter.get(1).id, submitter.get(2).id);
     }
 
-    // TODO array parameters (arrays of simple types)
+
+    @Test
+    public void testFetchArraysOfSimpleTypes() throws Exception {
+        engine.add(SpyDefinition.instance().withArguments(1,2,3).lookFor(TCLASS1, "paramMethod4"));
+
+        Object obj = instantiate(engine, TCLASS1);
+        checkForError(invoke(obj, "paramMethod4", new int[]{1,2,3}, new byte[]{5,6,7}, new double[]{7,8,9}));
+
+        assertEquals(1, submitter.size());
+        assertTrue("first parameter should be an array of integers", submitter.get(0).get(0) instanceof int[]);
+        assertTrue("first parameter should be an array of integers", submitter.get(0).get(1) instanceof byte[]);
+        assertTrue("first parameter should be an array of integers", submitter.get(0).get(2) instanceof double[]);
+    }
+
 
     // TODO catch a return value
 
@@ -348,8 +361,6 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         assertEquals(Thread.currentThread(), submitter.get(0).get(0));
     }
 
-    // TODO fetch object's class loader
-
     // TODO catch exception object
 
     // TODO test instrumenting static method
@@ -357,4 +368,5 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     // TODO test instrumenting static constructor
 
     // TODO check if stack traces for instrumented and non-instrumented method are the same if method throws an exception
+
 }

@@ -47,6 +47,14 @@ public class TestClass1 {
         vals += (int)(d*100) + (int)(f*10);
     }
 
+    public void paramMethod4(int[] a, byte[] b, double[] c) {
+        vals += a.length + b.length + c.length;
+    }
+
+    public String strMethod() {
+        return "oja!";
+    }
+
     public int getCalls() {
         return calls;
     }
