@@ -20,6 +20,7 @@ package com.jitlogic.zorka.mbeans;
 import com.jitlogic.zorka.agent.ZorkaLib;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 import javax.management.openmbean.*;
 import java.io.Serializable;
@@ -49,7 +50,7 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
 
     private String indexName;
     private String[] attrNames;
-    private OpenType<?>[] attrTypes;
+    private OpenType[] attrTypes;
 
     private CompositeType rowType;
     private TabularType tabularType;
@@ -66,13 +67,13 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
     }
 
     public TabularDataWrapper(Class<?> wrappedClass, ZorkaLib zorkaLib, Object data, String description,
-                              String indexName, String[] attrNames, OpenType<?>[] attrTypes)
+                              String indexName, String[] attrNames, OpenType[] attrTypes)
         throws OpenDataException {
         this(wrappedClass, zorkaLib, data, description, indexName, attrNames, attrTypes, attrNames);
     }
 
     public TabularDataWrapper(Class<?> wrappedClass, ZorkaLib zorkaLib, Object data, String description,
-            String indexName, String[] attrNames, OpenType<?>[] attrTypes, String[] attrDescriptions)
+            String indexName, String[] attrNames, OpenType[] attrTypes, String[] attrDescriptions)
             throws OpenDataException {
 
         this.zorkaLib = zorkaLib;
@@ -93,8 +94,8 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
             throw new IllegalArgumentException("Data set of type '" + data.getClass().getName() + "' is not supported.");
         }
 
-        this.attrNames = Arrays.copyOf(attrNames, attrNames.length);
-        this.attrTypes = Arrays.copyOf(attrTypes, attrTypes.length);
+        this.attrNames = ZorkaUtil.copyArray(attrNames);
+        this.attrTypes = ZorkaUtil.copyArray(attrTypes);
 
         this.rowType = new CompositeType(wrappedClass.getName(),
                 description, attrNames, attrDescriptions, this.attrTypes);

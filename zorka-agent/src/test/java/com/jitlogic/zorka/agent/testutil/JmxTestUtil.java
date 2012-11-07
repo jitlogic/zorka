@@ -20,6 +20,7 @@ package com.jitlogic.zorka.agent.testutil;
 import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.spy.SpyClassTransformer;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerBuilder;
@@ -65,7 +66,9 @@ public class JmxTestUtil extends ClassLoader {
         byte[] buf = new byte[65536];
         int len = is.read(buf);
         is.close();
-        return Arrays.copyOf(buf, len);
+        byte[] ret = new byte[len];
+        System.arraycopy(buf, 0, ret, 0, len);
+        return ret;
     }
 
 

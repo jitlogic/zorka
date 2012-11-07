@@ -50,8 +50,11 @@ public class ZabbixDiscoveryTest {
 
 
     @Test
-    public void testSimpleDiscovery() {
-        JSONObject obj = zabbixLib.discovery("java", "java.lang:type=GarbageCollector,*","name");
+    public void testSimpleDiscovery() throws Exception {
+        TestJmx jmx1 = jmxTestUtil.makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
+        TestJmx jmx2 = jmxTestUtil.makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);
+
+        JSONObject obj = zabbixLib.discovery("test", "test:type=TestJmx,*","name");
         assertTrue("Must return JSONObject", obj instanceof JSONObject);
         JSONArray data = (JSONArray)obj.get("data");
         assertTrue("Must return more than 1 item", data.size() > 1);

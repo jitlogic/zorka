@@ -16,6 +16,8 @@
  */
 package com.jitlogic.zorka.agent.testutil;
 
+import com.jitlogic.zorka.util.ZorkaUtil;
+
 import javax.management.j2ee.statistics.Statistic;
 import javax.management.j2ee.statistics.Stats;
 import java.util.Arrays;
@@ -45,7 +47,7 @@ public class TestStats implements Stats {
     }
 
     public String[] getStatisticNames() {
-        return Arrays.copyOf(names, names.length);
+        return ZorkaUtil.copyArray(names);
     }
 
     public Statistic[] getStatistics() {

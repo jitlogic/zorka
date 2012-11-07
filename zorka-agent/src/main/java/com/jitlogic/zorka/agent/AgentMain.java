@@ -21,7 +21,7 @@ public class AgentMain {
         startZorkaAgent();
 
         if (agent != null && agent.getSpyTransformer() != null) {
-            instr.addTransformer(agent.getSpyTransformer(), false);
+            instr.addTransformer(agent.getSpyTransformer());  // TODO what about retransforming ? (call it with reflection?)
         }
     }
 

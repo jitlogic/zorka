@@ -134,8 +134,8 @@ public class ObjectInspector {
             }
             return ret;
         } else if (obj instanceof CompositeData) {
-            for (String s : ((CompositeData)obj).getCompositeType().keySet()) {
-                lst.add(s);
+            for (Object s : ((CompositeData)obj).getCompositeType().keySet()) {
+                lst.add(s.toString());
             }
         } else if (obj instanceof TabularData) {
             for (Object k : ((TabularData)obj).keySet()) {

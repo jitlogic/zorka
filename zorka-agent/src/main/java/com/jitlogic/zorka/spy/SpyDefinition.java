@@ -20,6 +20,7 @@ package com.jitlogic.zorka.spy;
 import bsh.This;
 import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.processors.*;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.*;
 
@@ -78,8 +79,8 @@ public class SpyDefinition {
 
     private SpyDefinition(SpyDefinition orig) {
         this.matchers = orig.matchers;
-        this.probes = Arrays.copyOf(orig.probes, orig.probes.length);
-        this.transformers = Arrays.copyOf(orig.transformers, orig.transformers.length);
+        this.probes = ZorkaUtil.copyArray(orig.probes);
+        this.transformers = ZorkaUtil.copyArray(orig.transformers);
         this.collectors = orig.collectors;
     }
 
@@ -298,7 +299,7 @@ public class SpyDefinition {
             lst.add(new SpyProbeElement(arg));
         }
 
-        sdef.probes = Arrays.copyOf(probes, probes.length);
+        sdef.probes = ZorkaUtil.copyArray(probes);
         sdef.probes[curStage] = Collections.unmodifiableList(lst);
 
         return sdef;
@@ -372,7 +373,7 @@ public class SpyDefinition {
         List<SpyProcessor> lst = new ArrayList<SpyProcessor>(transformers[curStage].size()+1);
         lst.addAll(transformers[curStage]);
         lst.add(processor);
-        sdef.transformers = Arrays.copyOf(transformers, transformers.length);
+        sdef.transformers = ZorkaUtil.copyArray(transformers);
         sdef.transformers[curStage] = lst;
         return sdef;
     }

@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.rankproc;
 
+import com.jitlogic.zorka.util.ZorkaUtil;
+
 import java.util.Arrays;
 
 /**
@@ -75,7 +77,7 @@ public class BucketAggregate {
 
 
     public long[] getWindows() {
-        return Arrays.copyOf(windows, windows.length);
+        return ZorkaUtil.copyArray(windows);
     }
 
     public int getStage(long window) {
