@@ -47,7 +47,7 @@ public class SpyDefinition {
             Collections.unmodifiableList(Arrays.asList(new SpyProbeElement[0]));
 
     private List<SpyProbeElement>[] probes;
-    private List<SpyProcessor>[] transformers;
+    private List<SpyProcessor>[] processors;
 
     private List<SpyCollector> collectors = EMPTY_DC;
     private List<SpyMatcher> matchers = EMPTY_MATCHERS;
@@ -70,9 +70,9 @@ public class SpyDefinition {
             probes[i] = EMPTY_AF;
         }
 
-        transformers = new List[5];
-        for (int i = 0; i < transformers.length; i++) {
-            transformers[i] = EMPTY_XF;
+        processors = new List[5];
+        for (int i = 0; i < processors.length; i++) {
+            processors[i] = EMPTY_XF;
         }
     }
 
@@ -80,7 +80,7 @@ public class SpyDefinition {
     private SpyDefinition(SpyDefinition orig) {
         this.matchers = orig.matchers;
         this.probes = ZorkaUtil.copyArray(orig.probes);
-        this.transformers = ZorkaUtil.copyArray(orig.transformers);
+        this.processors = ZorkaUtil.copyArray(orig.processors);
         this.collectors = orig.collectors;
     }
 
@@ -105,7 +105,7 @@ public class SpyDefinition {
      * @return
      */
     public List<SpyProcessor> getTransformers(int stage) {
-        return transformers[stage];
+        return processors[stage];
     }
 
 
@@ -370,11 +370,11 @@ public class SpyDefinition {
      */
     public SpyDefinition withProcessor(SpyProcessor processor) {
         SpyDefinition sdef = new SpyDefinition(this);
-        List<SpyProcessor> lst = new ArrayList<SpyProcessor>(transformers[curStage].size()+1);
-        lst.addAll(transformers[curStage]);
+        List<SpyProcessor> lst = new ArrayList<SpyProcessor>(processors[curStage].size()+1);
+        lst.addAll(processors[curStage]);
         lst.add(processor);
-        sdef.transformers = ZorkaUtil.copyArray(transformers);
-        sdef.transformers[curStage] = lst;
+        sdef.processors = ZorkaUtil.copyArray(processors);
+        sdef.processors[curStage] = lst;
         return sdef;
     }
 

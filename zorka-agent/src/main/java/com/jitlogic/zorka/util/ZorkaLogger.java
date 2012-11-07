@@ -4,6 +4,7 @@ import com.jitlogic.zorka.agent.ZorkaConfig;
 
 import java.io.*;
 import java.util.Date;
+import java.util.Properties;
 
 /**
  * This has been written from scratch in order to not interfere with
@@ -60,14 +61,15 @@ public class ZorkaLogger {
 
     public ZorkaLogger() {
         logDir = ZorkaConfig.getLogDir();
-        logExceptions = "yes".equalsIgnoreCase(ZorkaConfig.get("zorka.log.exceptions", "yes"));
-        doTrace = "yes".equalsIgnoreCase(ZorkaConfig.get("zorka.log.trace", "no"));
+        Properties props = ZorkaConfig.getProperties(); // TODO make constructor argument of it
+        logExceptions = "yes".equalsIgnoreCase(props.getProperty("zorka.log.exceptions", "yes"));
+        doTrace = "yes".equalsIgnoreCase(props.getProperty("zorka.log.trace", "no"));
 
         try {
-            logThreshold = ZorkaLogLevel.valueOf (ZorkaConfig.get("zorka.log.level", "DEBUG"));
-            maxSize = ZorkaUtil.parseIntSize(ZorkaConfig.get("zorka.log.size", "1048576").trim());
-            maxLogs = ZorkaUtil.parseIntSize(ZorkaConfig.get("zorka.log.fnum", "4").trim());
-            logExceptions = "yes".equalsIgnoreCase(ZorkaConfig.get("zorka.log.exceptions", "no").trim());
+            logThreshold = ZorkaLogLevel.valueOf (props.getProperty("zorka.log.level", "DEBUG"));
+            maxSize = ZorkaUtil.parseIntSize(props.getProperty("zorka.log.size", "1048576").trim());
+            maxLogs = ZorkaUtil.parseIntSize(props.getProperty("zorka.log.fnum", "4").trim());
+            logExceptions = "yes".equalsIgnoreCase(props.getProperty("zorka.log.exceptions", "no").trim());
         } catch (Exception e) {
             System.err.println("Error parsing logger arguments: " + e.getMessage());
             e.printStackTrace();
