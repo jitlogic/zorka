@@ -337,7 +337,16 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     // TODO return values of simple types
 
-    // TODO fetch current thread
+    @Test
+    public void testFetchCurrentThreadSubmission() throws Exception {
+        engine.add(SpyDefinition.instance().withThread().lookFor(TCLASS1, "trivialMethod"));
+
+        Object obj = instantiate(engine, TCLASS1);
+        invoke(obj, "trivialMethod");
+
+        assertEquals(1, submitter.size());
+        assertEquals(Thread.currentThread(), submitter.get(0).get(0));
+    }
 
     // TODO fetch object's class loader
 
