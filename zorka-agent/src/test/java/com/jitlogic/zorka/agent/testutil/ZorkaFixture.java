@@ -27,7 +27,7 @@ import org.junit.Before;
 
 import java.util.Properties;
 
-public class ZorkaAgentFixture {
+public class ZorkaFixture {
 
     protected Properties configProperties;
     protected TestLogger testLogger;

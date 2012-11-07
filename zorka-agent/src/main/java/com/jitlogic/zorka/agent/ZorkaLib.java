@@ -49,7 +49,7 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 public class ZorkaLib implements ZorkaService {
 	
 	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
-    private final ZorkaLogger logger = ZorkaLogger.getLogger();
+    private final ZorkaLogger logger = null; // ZorkaLogger.getLogger();
 	
 	private ZorkaBshAgent agent;
     private Set<JmxObject> registeredObjects = new HashSet<JmxObject>();

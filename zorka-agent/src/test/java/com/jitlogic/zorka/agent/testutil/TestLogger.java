@@ -26,13 +26,13 @@ import java.util.List;
 public class TestLogger extends ZorkaLogger {
 
     public static class LogRecord {
-        public final ZorkaLog source;
+        public final String tag;
         public final ZorkaLogLevel level;
         public final String message;
         public final Throwable e;
 
-        public LogRecord(ZorkaLog source, ZorkaLogLevel level, String message, Throwable e) {
-            this.source = source;
+        public LogRecord(String tag, ZorkaLogLevel level, String message, Throwable e) {
+            this.tag = tag;
             this.level = level;
             this.message = message;
             this.e = e;
@@ -41,8 +41,8 @@ public class TestLogger extends ZorkaLogger {
 
     private List<LogRecord> logs = new ArrayList<LogRecord>();
 
-    public synchronized void log(ZorkaLog source, ZorkaLogLevel logLevel, String message, Throwable e) {
-        logs.add(new LogRecord(source, logLevel, message, e));
+    public synchronized void log(String tag, ZorkaLogLevel logLevel, String message, Throwable e, Object...args) {
+        logs.add(new LogRecord(tag, logLevel, message, e));
     }
 
     public int size() {
