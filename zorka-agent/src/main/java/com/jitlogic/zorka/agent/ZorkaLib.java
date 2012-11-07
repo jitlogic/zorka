@@ -36,6 +36,7 @@ import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogLevel;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 
@@ -48,6 +49,7 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 public class ZorkaLib implements ZorkaService {
 	
 	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private final ZorkaLogger logger = null; // ZorkaLogger.getLogger();
 	
 	private ZorkaBshAgent agent;
     private Set<JmxObject> registeredObjects = new HashSet<JmxObject>();
@@ -331,17 +333,29 @@ public class ZorkaLib implements ZorkaService {
         return rateCounter.get(path, nom, div, horizon);
     }
 
-    public ZorkaLog log(String tag) {
-        // TODO this is badly designed API, log() should directly log messages, logger() method can return loggers.
-        return ZorkaLogger.getLog(tag);
+
+    // TODO some basic testing for unused methods (after unit test / fixtures cleanup)
+
+    public void logDebug(String message, Object...args) {
+        logger.log("<script>", ZorkaLogLevel.DEBUG, message, null, args);
     }
 
+    public void logInfo(String message, Object...args) {
+        logger.log("<script>", ZorkaLogLevel.INFO, message, null, args);
+    }
+
+    public void logWarning(String message, Object...args) {
+        logger.log("<script>", ZorkaLogLevel.WARN, message, null, args);
+    }
+
+    public void logError(String message, Object...args) {
+        logger.log("<script>", ZorkaLogLevel.ERROR, message, null, args);
+    }
 
     public void reload(String mask) {
         agent.loadScriptDir(ZorkaConfig.getConfDir(),
             "^"+mask.replace("\\.", "\\\\.").replace("*", ".*")+"$");
     }
-
 
 	public void svcStart() {
 	}

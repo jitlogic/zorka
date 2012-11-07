@@ -166,7 +166,8 @@ public class SpyMethodVisitor extends MethodVisitor {
                 mv.visitLdcInsn(Type.getType(cn));
                 break;
             case FETCH_THREAD:
-                throw new NotImplementedException();
+                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;");
+                break;
             case FETCH_ERROR:
                 throw new NotImplementedException();
             case FETCH_RET_VAL:

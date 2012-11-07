@@ -21,6 +21,7 @@ import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testspy.support.TestCollector;
 import com.jitlogic.zorka.agent.testspy.support.TestSpyTransformer;
 import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.spy.DispatchingSubmitter;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
@@ -37,7 +38,7 @@ import static org.junit.Assert.*;
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
 
-public class SubmissionDispatchUnitTest {
+public class SubmissionDispatchUnitTest extends ZorkaFixture {
 
     private TestSpyTransformer engine;
     private SpySubmitter submitter;
@@ -45,17 +46,10 @@ public class SubmissionDispatchUnitTest {
 
 
     @Before
-    public void setUp() {
-        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
-        ZorkaLogger.setLogger(new TestLogger());
+    public void initEngine() {
         engine = new TestSpyTransformer();
         collector = new TestCollector();
         submitter = new DispatchingSubmitter(engine, collector);
-    }
-
-    public void tearDown() {
-        ZorkaLogger.setLogger(null);
-        ZorkaConfig.cleanup();
     }
 
     @Test

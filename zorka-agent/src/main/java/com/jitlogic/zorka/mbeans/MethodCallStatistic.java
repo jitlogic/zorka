@@ -18,13 +18,15 @@
 package com.jitlogic.zorka.mbeans;
 
 
+import java.util.Date;
+
 public class MethodCallStatistic implements MethodCallStat {
 
 	public static final long NS = 1000000;
 	
 	private String name;
 	
-	private long totalTimeNs = 0;
+	private long totalTimeNs = 0, tstampNs = 0;
 	
 	private long calls = 0, errors = 0;
 
@@ -58,9 +60,15 @@ public class MethodCallStatistic implements MethodCallStat {
 
 	public synchronized void logCall(long tst, long ns) {
 		calls++; totalTimeNs += ns;
+        tstampNs = tst;
 	}
 	
 	public synchronized void logError(long tst, long ns) {
 		calls++; errors++; totalTimeNs += ns;
+        tstampNs = tst;
+    }
+
+    public synchronized Date getLastCallTime() {
+        return new Date(tstampNs/NS);
     }
 }

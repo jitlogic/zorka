@@ -24,42 +24,38 @@ public class ZorkaLog {
     private ZorkaLogger output;
 
 
-	ZorkaLog(Class<?> clazz, ZorkaLogger output) {
-        this.tag = clazz.getName();
-        this.output = output;
-	}
-
     ZorkaLog(String tag, ZorkaLogger output) {
         this.tag = tag;
         this.output = output;
     }
 
-	public void trace(String msg) {
-		output.log(this, ZorkaLogLevel.TRACE, msg);
+	public void trace(String msg, Object...args) {
+		output.log(tag, ZorkaLogLevel.TRACE, msg, null, args);
 	}
 
 
-	public void debug(String msg) {
-        output.log(this, ZorkaLogLevel.DEBUG, msg);
+	public void debug(String msg, Object...args) {
+        output.log(tag, ZorkaLogLevel.DEBUG, msg, null, args);
 	}
 
 
-	public void info(String msg) {
-        output.log(this, ZorkaLogLevel.INFO, msg);
+	public void info(String msg, Object...args) {
+        output.log(tag, ZorkaLogLevel.INFO, msg, null, args);
 	}
 
 
-	public void warn(String msg) {
-        output.log(this, ZorkaLogLevel.WARN, msg);
+	public void warn(String msg, Object...args) {
+        output.log(tag, ZorkaLogLevel.WARN, msg, null, args);
 	}
 
 
-	public void error(String msg) {
-        output.log(this, ZorkaLogLevel.ERROR, msg);
+	public void error(String msg, Object...args) {
+        output.log(tag, ZorkaLogLevel.ERROR, msg, null, args);
 	}
 	
 	
-	public void error(String msg, Throwable e) {
-        output.log(this, ZorkaLogLevel.ERROR, msg, e);
+	public void error(String msg, Throwable e, Object args) {
+        output.log(tag, ZorkaLogLevel.ERROR, msg, e, args);
 	}
+
 }

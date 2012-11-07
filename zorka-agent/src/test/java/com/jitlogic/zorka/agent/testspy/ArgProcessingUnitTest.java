@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.agent.testspy;
 
-import com.jitlogic.zorka.agent.testutil.ZorkaAgentFixture;
+import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 
 import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyContext;
@@ -30,7 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class ArgProcessingUnitTest extends ZorkaAgentFixture {
+public class ArgProcessingUnitTest extends ZorkaFixture {
 
     protected SpyContext ctx;
     protected SpyDefinition sdef;
@@ -38,7 +38,6 @@ public class ArgProcessingUnitTest extends ZorkaAgentFixture {
 
     @Before
     public void setUp() {
-        super.setUp();
         zorkaAgent.installModule("test", this);
 
         sdef = SpyDefinition.instance();
