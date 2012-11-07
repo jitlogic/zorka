@@ -26,6 +26,7 @@ import javax.management.MBeanServerBuilder;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -99,6 +100,8 @@ public class JmxTestUtil extends ClassLoader {
                     return method.invoke(obj, args);
                 }
             }
+        } catch (InvocationTargetException e) {
+            return e.getCause();
         } catch (Throwable e) {
             return e;
         }
@@ -107,11 +110,12 @@ public class JmxTestUtil extends ClassLoader {
     }
 
 
-    public static void checkForError(Object obj) {
+    public static Object checkForError(Object obj) {
         if (obj instanceof Throwable) {
             System.err.println("Error: " + obj);
             ((Throwable)obj).printStackTrace(System.err);
         }
+        return obj;
     }
 
     public static Object getAttr(String mbsName, String mbeanName, String attr) throws Exception{

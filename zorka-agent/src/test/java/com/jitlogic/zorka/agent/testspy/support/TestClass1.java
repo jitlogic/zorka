@@ -55,6 +55,15 @@ public class TestClass1 {
         return "oja!";
     }
 
+    public int getUltimateQuestionOfLife() {
+        return 42;
+    }
+
+    public int getUltimateQuestionWithLocalVars() {
+        String s = "oja!";
+        return 38 + s.length();
+    }
+
     public int getCalls() {
         return calls;
     }

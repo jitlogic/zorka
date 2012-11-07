@@ -16,14 +16,13 @@
  */
 package com.jitlogic.zorka.agent.testspy;
 
-import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testspy.support.TestSpyTransformer;
 import com.jitlogic.zorka.agent.testspy.support.TestSubmitter;
-import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.MainSubmitter;
-import com.jitlogic.zorka.util.ZorkaLogger;
+
+import com.jitlogic.zorka.spy.SpyLib;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +30,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import static com.jitlogic.zorka.spy.SpyConst.*;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.*;
 
@@ -346,9 +346,49 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     }
 
 
-    // TODO catch a return value
+    @Test
+    public void testFetchReturnObject() throws Exception {
+        engine.add(SpyDefinition.instance().onReturn().withArguments(FETCH_RETVAL).lookFor(TCLASS1, "strMethod"));
 
-    // TODO return values of simple types
+        Object obj = instantiate(engine, TCLASS1);
+
+        Object retVal = checkForError(invoke(obj, "strMethod"));
+
+        assertEquals(1, submitter.size());
+        assertEquals("oja!", submitter.get(0).get(0));
+        assertEquals(retVal, submitter.get(0).get(0));
+    }
+
+
+    @Test
+    public void testFetchReturnSimpleTypeObject() throws Exception {
+        engine.add(SpyDefinition.instance().onReturn().withArguments(FETCH_RETVAL)
+                .lookFor(TCLASS1, "getUltimateQuestionOfLife"));
+
+        Object obj = instantiate(engine, TCLASS1);
+
+        Object retVal = checkForError(invoke(obj, "getUltimateQuestionOfLife"));
+
+        assertEquals(1, submitter.size());
+        assertEquals(42, submitter.get(0).get(0));
+        assertEquals(retVal, submitter.get(0).get(0));
+    }
+
+
+    @Test
+    public void testFetchReturnValWithDirtyVariableStack() throws Exception {
+        engine.add(SpyDefinition.instance().onReturn().withArguments(FETCH_RETVAL)
+                .lookFor(TCLASS1, "getUltimateQuestionWithLocalVars"));
+
+        Object obj = instantiate(engine, TCLASS1);
+
+        Object retVal = checkForError(invoke(obj, "getUltimateQuestionWithLocalVars"));
+
+        assertEquals(1, submitter.size());
+        assertEquals(42, submitter.get(0).get(0));
+        assertEquals(retVal, submitter.get(0).get(0));
+    }
+
 
     @Test
     public void testFetchCurrentThreadSubmission() throws Exception {
@@ -361,7 +401,22 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         assertEquals(Thread.currentThread(), submitter.get(0).get(0));
     }
 
-    // TODO catch exception object
+
+    @Test
+    public void testFetchExceptionObject() throws Exception {
+        engine.add(SpyDefinition.instance().onError().withArguments(FETCH_ERROR).lookFor(TCLASS1, "errorMethod"));
+
+        Object obj = instantiate(engine, TCLASS1);
+        Object err = invoke(obj, "errorMethod");
+
+        // Check what instrumentation catched
+        assertEquals(1, submitter.size());
+        assertEquals(err, submitter.get(0).get(0));
+        assertTrue("Should return an exception.", submitter.get(0).get(0) instanceof NullPointerException);
+        assertEquals("dUP!", ((Exception)submitter.get(0).get(0)).getMessage());
+    }
+
+    // TODO test if stack traces in exceptions are the same with and without intercepting errors by instrumentation
 
     // TODO test instrumenting static method
 

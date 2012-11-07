@@ -324,7 +324,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition withRetVal() {
-        return this.withArguments(FETCH_RET_VAL);
+        return this.withArguments(FETCH_RETVAL);
     }
 
 

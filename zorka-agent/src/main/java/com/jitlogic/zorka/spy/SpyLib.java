@@ -28,11 +28,11 @@ public class SpyLib {
     public static final int ON_SUBMIT  = 3;
     public static final int ON_COLLECT = 4;
 
-    public static final int FETCH_TIME    = -1;
-    public static final int FETCH_RET_VAL = -2;
-    public static final int FETCH_ERROR   = -3;
-    public static final int FETCH_THREAD  = -4;
-    public static final int FETCH_CLASS   = -5;
+    public static final int FETCH_TIME   = -1;
+    public static final int FETCH_RETVAL = -2;
+    public static final int FETCH_ERROR  = -3;
+    public static final int FETCH_THREAD = -4;
+    public static final int FETCH_CLASS  = -5;
 
 
     private SpyInstance instance;
