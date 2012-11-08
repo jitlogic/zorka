@@ -20,12 +20,14 @@ package com.jitlogic.zorka.agent.testutil;
 import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.spy.SpyClassTransformer;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerBuilder;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -64,7 +66,9 @@ public class JmxTestUtil extends ClassLoader {
         byte[] buf = new byte[65536];
         int len = is.read(buf);
         is.close();
-        return Arrays.copyOf(buf, len);
+        byte[] ret = new byte[len];
+        System.arraycopy(buf, 0, ret, 0, len);
+        return ret;
     }
 
 
@@ -99,6 +103,8 @@ public class JmxTestUtil extends ClassLoader {
                     return method.invoke(obj, args);
                 }
             }
+        } catch (InvocationTargetException e) {
+            return e.getCause();
         } catch (Throwable e) {
             return e;
         }
@@ -107,11 +113,12 @@ public class JmxTestUtil extends ClassLoader {
     }
 
 
-    public static void checkForError(Object obj) {
+    public static Object checkForError(Object obj) {
         if (obj instanceof Throwable) {
             System.err.println("Error: " + obj);
             ((Throwable)obj).printStackTrace(System.err);
         }
+        return obj;
     }
 
     public static Object getAttr(String mbsName, String mbeanName, String attr) throws Exception{

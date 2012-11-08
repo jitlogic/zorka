@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.rankproc;
 
+import com.jitlogic.zorka.util.ZorkaUtil;
+
 import java.util.Arrays;
 
 /**
@@ -54,14 +56,14 @@ public class BucketAggregate {
     private void init() {
         windows = new long[stages.length]; windows[0] = base;
         offsets = new int[stages.length]; offsets[0] = 0;
-        tstamps = new long[stages.length]; tstamps[0] = 0;
+        tstamps = new long[stages.length]; tstamps[0] = -1;
 
         int dlen = 1;
 
         for (int i = 1; i < stages.length; i++) {
             windows[i] = windows[i-1] * stages[i];
             offsets[i] = offsets[i-1] + stages[i-1];
-            tstamps[i] = 0;
+            tstamps[i] = -1;
             dlen += stages[i];
         }
 
@@ -75,7 +77,7 @@ public class BucketAggregate {
 
 
     public long[] getWindows() {
-        return Arrays.copyOf(windows, windows.length);
+        return ZorkaUtil.copyArray(windows);
     }
 
     public int getStage(long window) {
@@ -135,7 +137,13 @@ public class BucketAggregate {
         int len = stages[stage], idx1 = offsets[stage], idx2 = idx1 + len - 1;
         long tbase = windows[stage > 0 ? stage-1 : 0];
 
-        if (tstamp-tstamps[stage] <= tbase) {
+        if (tstamps[stage] == -1) {
+            tstamps[stage] = tstamp;
+            data[idx1] = nval;
+            return;
+        }
+
+        if (tstamp-tstamps[stage] < tbase) {
             data[idx1] += nval;
             return;
         }

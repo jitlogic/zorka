@@ -20,6 +20,7 @@ package com.jitlogic.zorka.spy;
 import bsh.This;
 import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.processors.*;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.*;
 
@@ -46,7 +47,7 @@ public class SpyDefinition {
             Collections.unmodifiableList(Arrays.asList(new SpyProbeElement[0]));
 
     private List<SpyProbeElement>[] probes;
-    private List<SpyProcessor>[] transformers;
+    private List<SpyProcessor>[] processors;
 
     private List<SpyCollector> collectors = EMPTY_DC;
     private List<SpyMatcher> matchers = EMPTY_MATCHERS;
@@ -69,17 +70,17 @@ public class SpyDefinition {
             probes[i] = EMPTY_AF;
         }
 
-        transformers = new List[5];
-        for (int i = 0; i < transformers.length; i++) {
-            transformers[i] = EMPTY_XF;
+        processors = new List[5];
+        for (int i = 0; i < processors.length; i++) {
+            processors[i] = EMPTY_XF;
         }
     }
 
 
     private SpyDefinition(SpyDefinition orig) {
         this.matchers = orig.matchers;
-        this.probes = Arrays.copyOf(orig.probes, orig.probes.length);
-        this.transformers = Arrays.copyOf(orig.transformers, orig.transformers.length);
+        this.probes = ZorkaUtil.copyArray(orig.probes);
+        this.processors = ZorkaUtil.copyArray(orig.processors);
         this.collectors = orig.collectors;
     }
 
@@ -104,7 +105,7 @@ public class SpyDefinition {
      * @return
      */
     public List<SpyProcessor> getTransformers(int stage) {
-        return transformers[stage];
+        return processors[stage];
     }
 
 
@@ -298,7 +299,7 @@ public class SpyDefinition {
             lst.add(new SpyProbeElement(arg));
         }
 
-        sdef.probes = Arrays.copyOf(probes, probes.length);
+        sdef.probes = ZorkaUtil.copyArray(probes);
         sdef.probes[curStage] = Collections.unmodifiableList(lst);
 
         return sdef;
@@ -324,7 +325,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition withRetVal() {
-        return this.withArguments(FETCH_RET_VAL);
+        return this.withArguments(FETCH_RETVAL);
     }
 
 
@@ -369,11 +370,11 @@ public class SpyDefinition {
      */
     public SpyDefinition withProcessor(SpyProcessor processor) {
         SpyDefinition sdef = new SpyDefinition(this);
-        List<SpyProcessor> lst = new ArrayList<SpyProcessor>(transformers[curStage].size()+1);
-        lst.addAll(transformers[curStage]);
+        List<SpyProcessor> lst = new ArrayList<SpyProcessor>(processors[curStage].size()+1);
+        lst.addAll(processors[curStage]);
         lst.add(processor);
-        sdef.transformers = Arrays.copyOf(transformers, transformers.length);
-        sdef.transformers[curStage] = lst;
+        sdef.processors = ZorkaUtil.copyArray(processors);
+        sdef.processors[curStage] = lst;
         return sdef;
     }
 

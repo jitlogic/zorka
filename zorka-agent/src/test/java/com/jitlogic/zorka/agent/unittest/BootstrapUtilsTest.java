@@ -42,12 +42,4 @@ public class BootstrapUtilsTest {
                 ZorkaUtil.evalPropStr("${jboss.home}/lib/jboss-system.jar,${jboss.home}/lib/jboss-mx.jar", props));
     }
 
-
-    @Test
-    public void testConstructExtClasspath() {
-        URL[] urls = ZorkaConfig.getExtClasspath(props, false);
-
-        assertEquals(3, urls.length);
-    }
-
 }

@@ -21,7 +21,7 @@ public class AgentMain {
         startZorkaAgent();
 
         if (agent != null && agent.getSpyTransformer() != null) {
-            instr.addTransformer(agent.getSpyTransformer(), false);
+            instr.addTransformer(agent.getSpyTransformer());  // TODO what about retransforming ? (call it with reflection?)
         }
     }
 
@@ -29,7 +29,7 @@ public class AgentMain {
 
 
         mBeanServerRegistry = new MBeanServerRegistry(
-            "yes".equalsIgnoreCase(ZorkaConfig.get("zorka.mbs.autoregister", "yes")));
+            "yes".equalsIgnoreCase(ZorkaConfig.getProperties().getProperty("zorka.mbs.autoregister", "yes")));
         AgentInstance.setMBeanServerRegistry(mBeanServerRegistry);
 
         agent = AgentInstance.instance();

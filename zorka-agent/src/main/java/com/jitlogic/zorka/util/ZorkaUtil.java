@@ -216,4 +216,28 @@ public class ZorkaUtil {
         return false;
     }
 
+
+    public static long[] copyArray(long[] src) {
+        if (src == null) {
+            return null;
+        }
+
+        long[] dst = new long[src.length];
+        System.arraycopy(src, 0, dst, 0, src.length);
+        return dst;
+    }
+
+
+    public static <T> T[] copyArray(T[] src) {
+        if (src == null) {
+            return null;
+        }
+
+        Class<?> arrayType = src.getClass().getComponentType();
+        T[] dst = (T[])java.lang.reflect.Array.newInstance(arrayType, src.length);
+        System.arraycopy(src, 0, dst, 0, src.length);
+
+        return dst;
+    }
+
 }

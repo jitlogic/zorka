@@ -65,8 +65,8 @@ public class ZabbixAgentIntegTest {
         ZorkaLogger.setLogger(new TestLogger());
         AgentInstance.setMBeanServerRegistry(new MBeanServerRegistry(true));
 		agent = new ZorkaBshAgent(Executors.newSingleThreadExecutor());
-		ZorkaConfig.put("zabbix.listen.addr", "127.0.0.1");
-		ZorkaConfig.put("zabbix.listen.port", "10066");
+		ZorkaConfig.getProperties().put ("zabbix.listen.addr", "127.0.0.1");
+		ZorkaConfig.getProperties().put("zabbix.listen.port", "10066");
 		service = new ZabbixAgent(agent);
 		service.start();
 	}

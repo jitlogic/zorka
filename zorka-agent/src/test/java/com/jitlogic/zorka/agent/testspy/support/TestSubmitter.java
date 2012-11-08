@@ -18,6 +18,7 @@
 package com.jitlogic.zorka.agent.testspy.support;
 
 import com.jitlogic.zorka.spy.SpySubmitter;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +36,7 @@ public class TestSubmitter implements SpySubmitter {
             this.stage = stage;
             this.id = id;
             this.submitFlags = submitFlags;
-            this.vals = vals != null ? Arrays.copyOf(vals, vals.length) : null;
+            this.vals = vals != null ? ZorkaUtil.copyArray(vals) : null;
         }
 
         public Object get(int idx) {

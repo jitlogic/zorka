@@ -49,21 +49,43 @@ public class ZorkaConfig {
     public final static String DEFAULT_CONFDIR = "/opt/zorka";
 
 
+    /**
+     * Clears static agent configuration. This is mainly useful for tests,
+     * but it might be also useful for online agent reload feature (which
+     * might be implemented some time in the future).
+     */
     public static void cleanup() {
         properties = null;
         homeDir = null;
     }
 
+
     public static Properties getProperties() {
         return properties;
     }
 
-	
-	public static String getLogDir() {
+    /**
+     * Set configuration properties manually. This is useful mainly for testing.
+     *
+     * @param props new properties
+     */
+    public static void setProperties(Properties props) {
+        homeDir = props.getProperty("zorka.home.dir", "/opt/zorka");
+        properties = props;
+    }
+
+
+    /**
+     * @return directory where agent will write its logs.
+     */
+    public static String getLogDir() {
 		return getHomeDir("log");
 	}
-	
-	
+
+
+    /**
+     * @return directory from which agent reads BSH configuration scripts.
+     */
 	public static String getConfDir() {
 		return getHomeDir("conf");
 	}
@@ -72,18 +94,14 @@ public class ZorkaConfig {
 	private synchronized static String getHomeDir(String suffix) {
 		return homeDir.endsWith("/") ? homeDir + suffix : homeDir + "/" + suffix;
 	}
-	
-	
-	public static String get(String key) {
-		return get(key, null);
-	}
-	
-	
-	public synchronized static String get(String key, String defVal) {
-		return properties.getProperty(key, defVal);
-	}
 
 
+    /**
+     * Sets agent home directory and load zorka.properties file from it.
+     *
+     * @param home home directory for zorka agent
+     *
+     */
 	public static void loadProperties(String home) {
         homeDir = home;
 		properties = new Properties();
@@ -92,7 +110,7 @@ public class ZorkaConfig {
 			is = new FileInputStream(getHomeDir("zorka.properties"));
 			properties.load(is);
 		} catch (IOException e) {
-			
+			// TODO what to do here ?
 		} finally {
 			if (is != null)
 				try {
@@ -104,45 +122,5 @@ public class ZorkaConfig {
         properties.put("zorka.config.dir", getHomeDir("conf"));
 	}
 	
-
-    public static void setProperties(Properties props) {
-        homeDir = props.getProperty("zorka.home.dir", "/opt/zorka");
-        properties = props;
-    }
-
-
-	public static void put(String key, String val) {
-		properties.put(key, val);
-	}
-
-
-    public static URL[] getExtClasspath(Properties props, boolean checkExistence) {
-        Properties fusedProps = new Properties();
-        fusedProps.putAll(System.getProperties());
-        fusedProps.putAll(props);
-
-        ArrayList<URL> lst = new ArrayList<URL>();
-
-        for (Object key : props.keySet()) {
-            if (key.toString().startsWith("zorka.classpath.")) {
-                String[] jars = ZorkaUtil.evalPropStr(props.get(key).toString(), fusedProps).split(",");
-                for (String jar : jars) {
-                    File f = new File(jar.trim());
-
-                    if (checkExistence && !(f.isFile() && f.canRead())) {
-                        throw new RuntimeException("Cannot find jar file: " + jar);
-                    }
-
-                    try {
-                        lst.add(f.toURI().toURL());
-                    } catch (MalformedURLException e) {
-                        throw new RuntimeException("Cannot convert '" + jar + "' to an URL.");
-                    }
-                }
-            }
-        }
-
-        return lst.toArray(new URL[lst.size()]);
-    }
 
 }
