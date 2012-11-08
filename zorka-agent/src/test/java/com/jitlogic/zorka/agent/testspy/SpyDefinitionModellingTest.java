@@ -17,15 +17,10 @@ package com.jitlogic.zorka.agent.testspy;
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.spy.SpyMatcher;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyProbeElement;
-import com.jitlogic.zorka.util.ZorkaLogger;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
@@ -151,7 +146,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testInstrumentWithFormatArgs() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
-                .withFormat(2,"${1.request.requestURI}").onSubmit().timeDiff(0,1,1)
+                .format(2, "${1.request.requestURI}").onSubmit().timeDiff(0,1,1)
                 .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI", "${2}", 0, 1);
     }
 
@@ -163,7 +158,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testInstrumentWithFormatArgsAndTransformViaMethod() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
-                .withFormat(2,"${1.request.requestURI}").callMethod(0, 0, "split", "\\?").get(0, 0)
+                .format(2, "${1.request.requestURI}").callMethod(0, 0, "split", "\\?").get(0, 0)
                 .onSubmit().timeDiff(0,1,1)
                 .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI", "${methodName}", 0, 1);
     }
@@ -177,7 +172,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testInstrumentWithCatchArgsOnExit() {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
-                .withArguments(2).withFormat(1,"${0.reply.replyCode}").onSubmit().timeDiff(0,2,2)
+                .withArguments(2).format(1, "${0.reply.replyCode}").onSubmit().timeDiff(0,2,2)
                 .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byCode", "${1}", 0, 2);
     }
 
@@ -190,7 +185,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
         SpyDefinition sdef =
             SpyDefinition.instrument().lookFor("org.apache.catalina.core.StandardEngineValve", "invoke")
                 .onReturn().withArguments(1,2)
-                .withFormat(1,"${1.request.requestURI}").withFormat(2,"${2.reply.replyCode}")
+                .format(1, "${1.request.requestURI}").format(2, "${2.reply.replyCode}")
                 .callMethod(1, 1, "split", "\\?").get(1, 0).onSubmit().timeDiff(0, 1, 1)
                 .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests,httpCode=${1}", "stats", "${0}", 0, 1);
     }
@@ -255,7 +250,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     //@Test
     public void testRegisterJBossMBeanServer() {
         SpyDefinition.instance().once().lookFor("org.jboss.mx.MBeanServerImpl", SM_CONSTRUCTOR)
-           .withFormat(0, "jboss").withArguments(0).withThread()
+           .format(0, "jboss").withArguments(0).withThread()
            .toBsh("jboss.register");
     }
 

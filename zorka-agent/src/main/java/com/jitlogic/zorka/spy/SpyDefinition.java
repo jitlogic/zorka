@@ -389,7 +389,7 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition withFormat(int dst, String expr) {
+    public SpyDefinition format(int dst, String expr) {
         return withProcessor(new StringFormatProcessor( dst, expr));
     }
 
@@ -421,6 +421,25 @@ public class SpyDefinition {
      */
     public SpyDefinition filterOut(int src, String regex) {
         return withProcessor(new RegexFilterProcessor(src, regex, true));
+    }
+
+
+    public SpyDefinition transform(int src, int dst, String regex, String expr) {
+        return transform(src, dst, regex, expr,  false);
+    }
+
+
+    /**
+     * Transforms data using regular expression and substitution.
+     *
+     * @param src
+     * @param dst
+     * @param regex
+     * @param expr
+     * @return
+     */
+    public SpyDefinition transform(int src, int dst, String regex, String expr, boolean filterOut) {
+        return withProcessor(new RegexFilterProcessor(src, dst, regex, expr, filterOut));
     }
 
 

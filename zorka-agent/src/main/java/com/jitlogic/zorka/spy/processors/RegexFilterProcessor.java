@@ -19,7 +19,9 @@ package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.util.ObjectInspector;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -27,9 +29,12 @@ import java.util.regex.Pattern;
  */
 public class RegexFilterProcessor implements SpyProcessor {
 
-    private final int src;
-    private final Pattern regex;
-    private final boolean filterOut;
+    private int src, dst;
+    private Pattern regex;
+    private String expr = null, defval = null;
+    private Boolean filterOut;
+
+    ObjectInspector inspector;
 
 
     public RegexFilterProcessor(int src, String regex) {
@@ -37,18 +42,47 @@ public class RegexFilterProcessor implements SpyProcessor {
     }
 
 
-    public RegexFilterProcessor(int src, String regex, boolean filterOut) {
+    public RegexFilterProcessor(int src, String regex, Boolean filterOut) {
         this.src = src;
         this.regex = Pattern.compile(regex);
         this.filterOut = filterOut;
     }
 
 
+    public RegexFilterProcessor(int src, int dst, String regex, String expr, Boolean filterOut) {
+        this(src, regex, filterOut);
+        this.dst = dst;
+        this.expr = expr;
+        inspector = new ObjectInspector();
+    }
+
+
+    public RegexFilterProcessor(int src, int dst, String regex, String expr, String defval) {
+        this(src, dst, regex, expr, (Boolean)null);
+        this.defval = defval;
+    }
+
+
     public SpyRecord process(int stage, SpyRecord record) {
         Object val = record.get(stage, src);
 
-        boolean matches = val != null && regex.matcher(val.toString()).matches();
-
-        return matches^filterOut ? record : null;
+        if (expr == null) {
+            boolean matches = val != null && regex.matcher(val.toString()).matches();
+            return matches^filterOut ? record : null;
+        } else if (val != null) {
+            Matcher matcher = regex.matcher(val.toString());
+            if (matcher.matches()) {
+                Object[] vals = new Object[matcher.groupCount()+1];
+                for (int i = 0; i < vals.length; i++) {
+                    vals[i] = matcher.group(i);
+                }
+                record.put(stage, dst, inspector.substitute(expr, vals));
+            } else if (defval != null) {
+                record.put(stage, dst, defval);
+            } else if (Boolean.TRUE.equals(filterOut)) {
+                return null;
+            }
+        }
+        return record;
     }
 }
