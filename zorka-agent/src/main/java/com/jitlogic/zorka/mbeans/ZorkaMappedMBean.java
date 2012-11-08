@@ -33,6 +33,9 @@ import javax.management.MBeanInfo;
 import javax.management.MBeanNotificationInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.ReflectionException;
+import javax.management.openmbean.OpenMBeanAttributeInfoSupport;
+import javax.management.openmbean.TabularData;
+import javax.management.openmbean.TabularType;
 
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
@@ -140,9 +143,22 @@ public class ZorkaMappedMBean implements DynamicMBean {
 		
 		for (i = 0; i < attrNames.length; i++) {
 			Attribute attr = attrs.get(attrNames[i]);
-			attrInfo[i] = new MBeanAttributeInfo(attrNames[i], 
-				attr.getValue() != null ? attr.getValue().getClass().getName() : "<null>", 
-				attrNames[i], true, false, false);
+
+            Object attrVal = attr.getValue();
+
+            if (attrVal instanceof TabularDataGetter) {
+                TabularDataGetter getter = (TabularDataGetter)attrVal;
+                attrInfo[i] = new OpenMBeanAttributeInfoSupport(getter.getTypeName(), getter.getTypeDesc(),
+                                                                getter.getTableType(), true, false, false);
+            } else if (attrVal instanceof TabularData) {
+                TabularType tt = ((TabularData)attrVal).getTabularType();
+                attrInfo[i] = new OpenMBeanAttributeInfoSupport(tt.getTypeName(), tt.getDescription(),
+                                                                tt, true, false, false);
+            } else {
+			    attrInfo[i] = new MBeanAttributeInfo(attrNames[i],
+				    attr.getValue() != null ? attr.getValue().getClass().getName() : "<null>",
+				    attrNames[i], true, false, false);
+            }
 		}
 		
 		mbeanInfo = new MBeanInfo(

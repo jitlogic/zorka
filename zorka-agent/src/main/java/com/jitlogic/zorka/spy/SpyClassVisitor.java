@@ -19,6 +19,7 @@ package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaUtil;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
@@ -55,7 +56,7 @@ public class SpyClassVisitor extends ClassVisitor {
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         cv.visit(version, access, name, signature, superName, interfaces);
         isInterface = (access & ACC_INTERFACE) != 0;
-        this.interfaces = Arrays.copyOf(interfaces, interfaces.length);
+        this.interfaces = ZorkaUtil.copyArray(interfaces);
     }
 
 

@@ -18,8 +18,10 @@
 package com.jitlogic.zorka.mbeans;
 
 import com.jitlogic.zorka.agent.ZorkaLib;
+import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 import javax.management.openmbean.*;
 import java.io.Serializable;
@@ -31,7 +33,7 @@ import java.util.*;
  * tabular data.
  *
  * Performance note: this wrapper is intended for jconsole and similiar interactive tools.
- * Do not use it for automated monitoring, use bare classes to obtain better performance.
+ * Do not use it for automated monitoring, use bare objects to obtain better performance.
  *
  * @author RLE <rafal.lewczuk@gmail.com>
  */
@@ -49,7 +51,7 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
 
     private String indexName;
     private String[] attrNames;
-    private OpenType<?>[] attrTypes;
+    private OpenType[] attrTypes;
 
     private CompositeType rowType;
     private TabularType tabularType;
@@ -59,23 +61,19 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
 
     private TabularSetExtractor extractor;
 
-    private ZorkaLib zorkaLib;
+    private ObjectInspector inspector = new ObjectInspector();
 
-    public TabularDataWrapper() {
 
-    }
-
-    public TabularDataWrapper(Class<?> wrappedClass, ZorkaLib zorkaLib, Object data, String description,
-                              String indexName, String[] attrNames, OpenType<?>[] attrTypes)
+    public TabularDataWrapper(Class<?> wrappedClass, Object data, String description,
+                              String indexName, String[] attrNames, OpenType[] attrTypes)
         throws OpenDataException {
-        this(wrappedClass, zorkaLib, data, description, indexName, attrNames, attrTypes, attrNames);
+        this(wrappedClass, data, description, indexName, attrNames, attrTypes, attrNames);
     }
 
-    public TabularDataWrapper(Class<?> wrappedClass, ZorkaLib zorkaLib, Object data, String description,
-            String indexName, String[] attrNames, OpenType<?>[] attrTypes, String[] attrDescriptions)
+    public TabularDataWrapper(Class<?> wrappedClass, Object data, String description,
+            String indexName, String[] attrNames, OpenType[] attrTypes, String[] attrDescriptions)
             throws OpenDataException {
 
-        this.zorkaLib = zorkaLib;
         this.data = data;
         this.indexName = indexName;
 
@@ -93,8 +91,8 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
             throw new IllegalArgumentException("Data set of type '" + data.getClass().getName() + "' is not supported.");
         }
 
-        this.attrNames = Arrays.copyOf(attrNames, attrNames.length);
-        this.attrTypes = Arrays.copyOf(attrTypes, attrTypes.length);
+        this.attrNames = ZorkaUtil.copyArray(attrNames);
+        this.attrTypes = ZorkaUtil.copyArray(attrTypes);
 
         this.rowType = new CompositeType(wrappedClass.getName(),
                 description, attrNames, attrDescriptions, this.attrTypes);
@@ -156,7 +154,7 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
         Object[] fields = new Object[attrNames.length];
 
         for (int i = 0; i < attrNames.length; i++) {
-            fields[i] = zorkaLib.get(obj, attrNames[i]);
+            fields[i] = inspector.get(obj, attrNames[i]);
         }
 
         try {
@@ -214,7 +212,7 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
 
         public boolean containsKey(String key) {
             for (Object obj : (Collection)data) {
-                if (key.equals(zorkaLib.get(obj, indexName)))
+                if (key.equals(inspector.get(obj, indexName)))
                     return true;
             }
             return false;
@@ -224,14 +222,14 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
             Set<List<?>> keyset = new HashSet<List<?>>(size()*2);
 
             for (Object obj : (Collection)data)
-                keyset.add(Arrays.asList(zorkaLib.get(obj, indexName)));
+                keyset.add(Arrays.asList(inspector.get(obj, indexName)));
 
             return keyset;
         }
 
         public Object get(String key) {
             for (Object obj : (Collection)data) {
-                if (key.equals(zorkaLib.get(obj, indexName)))
+                if (key.equals(inspector.get(obj, indexName)))
                     return obj;
             }
             return null;

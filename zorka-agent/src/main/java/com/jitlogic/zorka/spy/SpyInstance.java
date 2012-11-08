@@ -58,7 +58,7 @@ public class SpyInstance {
 
         MainSubmitter.setSubmitter(instance.getSubmitter());
 
-        debugLevel = Integer.parseInt(ZorkaConfig.get("spy.debug", "0").trim());
+        debugLevel = Integer.parseInt(ZorkaConfig.getProperties().getProperty("spy.debug", "0").trim());
 
         return instance;
     }

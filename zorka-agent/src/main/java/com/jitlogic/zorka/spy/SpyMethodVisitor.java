@@ -27,6 +27,7 @@ import java.util.List;
 import static org.objectweb.asm.Opcodes.*;
 import static com.jitlogic.zorka.spy.SpyConst.*;
 import static com.jitlogic.zorka.spy.SpyLib.*;
+import static com.jitlogic.zorka.spy.SpyUtil.max;
 
 public class SpyMethodVisitor extends MethodVisitor {
 
@@ -40,9 +41,15 @@ public class SpyMethodVisitor extends MethodVisitor {
     private String methodName;
     private String methodDesc;
 
+    private Type[] argTypes;
+    private Type returnType;
+
+    private int retValProbeSlot = 0;   // for both returns and errors
+    private boolean hasReturnVal, hasErrorVal;
+
     private List<SpyContext> ctxs;
 
-    private int stackDelta = 0, localDelta = 0;
+    private int stackDelta = 0;
 
     Label l_try_from = new Label();
     Label l_try_to = new Label();
@@ -55,6 +62,11 @@ public class SpyMethodVisitor extends MethodVisitor {
         this.methodName = methodName;
         this.methodDesc = methodDesc;
         this.ctxs = ctxs;
+
+        argTypes = Type.getArgumentTypes(methodDesc);
+        returnType = Type.getReturnType(methodDesc);
+
+        checkReturnVals();
     }
 
 
@@ -64,7 +76,7 @@ public class SpyMethodVisitor extends MethodVisitor {
         // ON_ENTER probes are inserted here
         for (SpyContext ctx : ctxs) {
             if (ctx.getSpyDefinition().getProbes(ON_ENTER).size() > 0) {
-                stackDelta = SpyUtil.max(stackDelta, emitProbe(ON_ENTER, ctx));
+                stackDelta = max(stackDelta, emitProbe(ON_ENTER, ctx));
             }
         }
 
@@ -77,11 +89,14 @@ public class SpyMethodVisitor extends MethodVisitor {
     public void visitInsn(int opcode) {
         if ((opcode >= IRETURN && opcode <= RETURN)) {
             // ON_RETURN probes are inserted here
+            if (hasReturnVal) {
+                emitFetchRetVal(returnType);
+            }
             for (int i = ctxs.size()-1; i >= 0; i--) {
                 SpyContext ctx = ctxs.get(i);
                 if (getSubmitFlags(ON_ENTER, ctx.getSpyDefinition()) == SF_NONE ||
                     ctx.getSpyDefinition().getProbes(ON_RETURN).size() > 0) {
-                    stackDelta = SpyUtil.max(stackDelta, emitProbe(ON_RETURN, ctx));
+                    stackDelta = max(stackDelta, emitProbe(ON_RETURN, ctx));
                 }
             }
         }
@@ -94,16 +109,20 @@ public class SpyMethodVisitor extends MethodVisitor {
         mv.visitLabel(l_try_to);
         mv.visitLabel(l_try_handler);
 
+        if (hasErrorVal) {
+            emitFetchRetVal(Type.getType(Object.class));
+        }
+
         for (int i = ctxs.size()-1; i >= 0; i--) {
             SpyContext ctx = ctxs.get(i);
             if (getSubmitFlags(ON_ENTER, ctx.getSpyDefinition()) == SF_NONE ||
                 ctx.getSpyDefinition().getProbes(ON_ERROR).size() > 0) {
-                stackDelta = SpyUtil.max(stackDelta, emitProbe(ON_ERROR, ctx));
+                stackDelta = max(stackDelta, emitProbe(ON_ERROR, ctx));
             }
         }
 
         mv.visitInsn(ATHROW);
-        mv.visitMaxs(maxStack + stackDelta, maxLocals + localDelta);
+        mv.visitMaxs(maxStack + stackDelta, max(maxLocals, retValProbeSlot+1));
     }
 
 
@@ -118,6 +137,30 @@ public class SpyMethodVisitor extends MethodVisitor {
                     ? SF_IMMEDIATE : SF_FLUSH;
         }
     }
+
+
+    private void checkReturnVals() {
+
+        for (SpyContext ctx : ctxs) {
+            for (int stage : new int[] { ON_ERROR, ON_RETURN }) {
+                for (SpyProbeElement spe : ctx.getSpyDefinition().getProbes(stage)) {
+                    switch (spe.getArgType()) {
+                        case FETCH_RETVAL:
+                            hasReturnVal = true;
+                            break;
+                        case FETCH_ERROR:
+                            hasErrorVal = true;
+                            break;
+                    } // switch()
+                } // for (SpyProbeElement spe ....
+            } // for (int stage ...
+        } // for (SpyContext ctx ...
+
+        if (hasReturnVal || hasErrorVal) {
+            retValProbeSlot = argTypes.length + 1;
+        } //
+
+    } // checkReturnVals()
 
 
     private int emitProbe(int stage, SpyContext ctx) {
@@ -141,7 +184,7 @@ public class SpyMethodVisitor extends MethodVisitor {
                 SpyProbeElement element = probeElements.get(i);
                 mv.visitInsn(DUP);
                 emitLoadInt(i);
-                sd = SpyUtil.max(sd, emitProbeElement(stage, 0, probeElements.get(i)) + 6);
+                sd = max(sd, emitProbeElement(stage, 0, probeElements.get(i)) + 6);
                 mv.visitInsn(AASTORE);
             }
         } else {
@@ -154,6 +197,7 @@ public class SpyMethodVisitor extends MethodVisitor {
 
         return sd;
     }
+
 
     private int emitProbeElement(int stage, int opcode, SpyProbeElement element) {
         switch (element.getArgType()) {
@@ -169,9 +213,9 @@ public class SpyMethodVisitor extends MethodVisitor {
                 mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;");
                 break;
             case FETCH_ERROR:
-                throw new NotImplementedException();
-            case FETCH_RET_VAL:
-                throw new NotImplementedException();
+            case FETCH_RETVAL:
+                mv.visitVarInsn(ALOAD, retValProbeSlot);
+                break;
             default:
                 if (stage == ON_ENTER && element.getArgType() == 0 && "<init>".equals(methodName)) {
                     // TODO log warning
@@ -196,7 +240,6 @@ public class SpyMethodVisitor extends MethodVisitor {
             return 1;
         }
 
-        Type[] argTypes = Type.getArgumentTypes(methodDesc);
         int aoffs = (access & ACC_STATIC) == 0 ? 1 : 0;
         int aidx = element.getArgType() - aoffs;
         Type type = argTypes[aidx];
@@ -207,7 +250,28 @@ public class SpyMethodVisitor extends MethodVisitor {
         }
 
         mv.visitVarInsn(insn, aoffs);
+        emitAutoboxing(type);
 
+        return 1;
+    }
+
+
+    private int emitFetchRetVal(Type type) {
+
+        if (Type.VOID == type.getSort()) {
+            mv.visitInsn(ACONST_NULL);
+            return 1;
+        }
+
+        mv.visitInsn(DUP);
+        emitAutoboxing(type);
+        mv.visitVarInsn(ASTORE, retValProbeSlot);
+
+        return type.getSize();
+    }
+
+
+    private void emitAutoboxing(Type type) {
         switch (type.getSort()) {
             case Type.INT:
                 mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer",
@@ -244,8 +308,6 @@ public class SpyMethodVisitor extends MethodVisitor {
                         "valueOf", "(C)Ljava/lang/Character;");
                 break;
         }
-
-        return 1;
     }
 
 

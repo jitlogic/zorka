@@ -88,7 +88,7 @@ public class AggregateCountingTest {
         BucketAggregate bag = new BucketAggregate(SEC, 2, 3, 3);
 
         bag.feed(SEC/2, 10);
-        bag.feed(SEC+SEC/2, 20);
+        bag.feed(SEC + SEC / 2, 20);
 
         assertEquals(20, bag.getDelta(0));
         assertEquals(10, bag.getDelta(1));
@@ -108,15 +108,45 @@ public class AggregateCountingTest {
     }
 
     @Test
-    public void testBucketFeedAndCheckIfAccumulatesProperly() throws Exception {
-        BucketAggregate bag = new BucketAggregate(SEC, 2, 3);
+    public void testBucketAccumulation1() throws Exception {
+        checkDeltas(makeAndFeed(7, 2, 3), 10, 20, 40);
+    }
 
-        for (int i = 1; i < 8; i++) {
+    @Test
+    public void testBucketAccumulation2() throws Exception {
+        checkDeltas(makeAndFeed(8, 2, 3, 3), 10, 20, 50, 0);
+    }
+
+    @Test
+    public void testBucketAccumulation3() throws Exception {
+        checkDeltas(makeAndFeed(9, 2, 3, 3), 10, 20, 50, 10);
+    }
+
+    @Test
+    public void testBucketAccumulation4() throws Exception {
+        checkDeltas(makeAndFeed(10, 2, 3, 3), 10, 20, 60, 10);
+    }
+
+    @Test
+    public void testBucketAccumulation5() throws Exception {
+        checkDeltas(makeAndFeed(11, 2, 3, 3), 10, 20, 50, 30);
+    }
+
+    private BucketAggregate makeAndFeed(int steps, int...stages) {
+        BucketAggregate bag = new BucketAggregate(SEC, stages);
+
+        for (int i = 1; i <= steps; i++) {
             bag.feed(i*SEC + SEC/2, 10);
         }
 
-        assertEquals(10, bag.getDelta(0));
-        assertEquals(20, bag.getDelta(1));
-        assertEquals(40, bag.getDelta(2));
+        return bag;
     }
+
+    private void checkDeltas(BucketAggregate bag, long...deltas) {
+        for (int i = 0; i < deltas.length; i++) {
+            assertEquals(deltas[i], bag.getDelta(i));
+        }
+    }
+
+
 }
