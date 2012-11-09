@@ -19,6 +19,7 @@ package com.jitlogic.zorka.agent.unittest;
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.After;
 import org.junit.Before;
@@ -29,24 +30,17 @@ import static org.junit.Assert.*;
 import com.jitlogic.zorka.rankproc.RateAggregate;
 import com.jitlogic.zorka.agent.testutil.ZorkaTestUtil;
 
-public class SlidingWindowTest {
+public class SlidingWindowTest extends ZorkaFixture {
 
 	private ZorkaTestUtil testUtil;
-	
+
+
 	@Before
 	public void setUp() {
-        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
-        ZorkaLogger.setLogger(new TestLogger());
         testUtil = ZorkaTestUtil.setUp();
 	}
-	
-	@After
-	public void tearDown() {
-		ZorkaTestUtil.tearDown();
-        ZorkaLogger.setLogger(null);
-        ZorkaConfig.cleanup();
-	}
-	
+
+
 	@Test
 	public void testQueryEmptyWindow() throws Exception {
 		RateAggregate wnd = new RateAggregate(100, -1);

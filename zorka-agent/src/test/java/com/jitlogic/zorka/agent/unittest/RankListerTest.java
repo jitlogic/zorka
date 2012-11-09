@@ -22,6 +22,7 @@ import java.util.Collection;
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,21 +34,16 @@ import com.jitlogic.zorka.rankproc.RankList;
 import com.jitlogic.zorka.agent.testutil.TestRankLister;
 
 
-public class RankListerTest {
+public class RankListerTest extends ZorkaFixture {
 
 	TestRankLister lister;
-	
+
+
 	@Before
 	public void setUp() {
-        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
-        ZorkaLogger.setLogger(new TestLogger());
         lister = new TestRankLister(60, 600);
 	}
 
-    public void tearDown() {
-        ZorkaLogger.setLogger(null);
-        ZorkaConfig.cleanup();
-    }
 
 	@Test
 	public void testCreateSimpleRankList() throws Exception {

@@ -22,6 +22,7 @@ import java.util.Collection;
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.After;
 import org.junit.Before;
@@ -32,21 +33,14 @@ import com.jitlogic.zorka.rankproc.RankList;
 import com.jitlogic.zorka.rankproc.ThreadRankLister;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
-public class ThreadRankTest {
+public class ThreadRankTest extends ZorkaFixture {
 	
 	private ZorkaUtil util;
 
+
     @Before
     public void setUp() {
-        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
-        ZorkaLogger.setLogger(new TestLogger());
         util = ZorkaUtil.getInstance();
-    }
-
-    @After
-    public void tearDown() {
-        ZorkaLogger.setLogger(null);
-        ZorkaConfig.cleanup();;
     }
 
 
