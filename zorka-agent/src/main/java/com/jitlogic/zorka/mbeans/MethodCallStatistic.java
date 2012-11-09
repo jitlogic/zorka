@@ -18,57 +18,103 @@
 package com.jitlogic.zorka.mbeans;
 
 
+import com.jitlogic.zorka.rankproc.BucketAggregate;
+
 import java.util.Date;
 
-public class MethodCallStatistic implements MethodCallStat {
+public class MethodCallStatistic implements ZorkaStat {
 
-	public static final long NS = 1000000;
-	
 	private String name;
-	
-	private long totalTimeNs = 0, tstampNs = 0;
-	
-	private long calls = 0, errors = 0;
 
-    public MethodCallStatistic(String name) {
-        this.name = name;
+    private BucketAggregate calls;
+    private BucketAggregate errors;
+    private BucketAggregate time;
+
+
+    public static MethodCallStatistic newStatAvg15(String name) {
+        return new MethodCallStatistic(name, 10*BucketAggregate.SEC, 6, 5, 3);
     }
+
+
+    public MethodCallStatistic(String name, long base, int...stages) {
+        this.name = name;
+        this.calls = new BucketAggregate(base, stages);
+        this.errors = new BucketAggregate(base, stages);
+        this.time = new BucketAggregate(base, stages);
+    }
+
 
     public String getName() {
         return name;
     }
 
+
     public String getDescription() {
         return "Number of calls (as measured by Zorka Spy) and its summary time.";
     }
+
 
     public String getUnit() {
         return "MILLISECOND";
     }
 
-	public synchronized long getCalls() {
-		return calls;
-	}
-	
-	public synchronized long getErrors() {
-		return errors;
-	}
-	
-	public synchronized long getTime() {
-		return totalTimeNs/NS;
-	}
 
-	public synchronized void logCall(long tst, long ns) {
-		calls++; totalTimeNs += ns;
-        tstampNs = tst;
-	}
-	
-	public synchronized void logError(long tst, long ns) {
-		calls++; errors++; totalTimeNs += ns;
-        tstampNs = tst;
+    public int getStage(long window) {
+        return calls.getStage(window);
     }
 
-    public synchronized Date getLastCallTime() {
-        return new Date(tstampNs/NS);
+
+	public synchronized long getCalls() {
+		return calls.getTotal();
+	}
+
+
+    public double getCallsAvg(long window) {
+        return getCallsAvg(getStage(window));
+    }
+
+
+    public synchronized double getCallsAvg(int stage) {
+        long cdelta = calls.getDelta(stage), tdelta = calls.getDelta(stage)/BucketAggregate.MS;
+        return tdelta > 0 ? 1000.0 * cdelta / tdelta : 0.0;
+    }
+
+
+	public synchronized long getErrors() {
+		return errors.getTotal();
+	}
+
+
+    public double getErrorsAvg(long window) {
+        return getErrorsAvg(getStage(window));
+    }
+
+
+    public synchronized double getErrorsAvg(int stage) {
+        long edelta = errors.getDelta(stage), tdelta = calls.getDelta(stage)/BucketAggregate.MS;
+        return edelta > 0 ? 1000.0 * edelta / tdelta : 0.0;
+    }
+
+
+	public synchronized long getTime() {
+		return time.getTotal()/BucketAggregate.MS;
+	}
+
+
+    public synchronized Date lastTime() {
+        return new Date(calls.getLast()/BucketAggregate.MS);
+    }
+
+
+	public synchronized void logCall(long tstamp, long time) {
+        this.calls.feed(tstamp, 1);
+        this.time.feed(tstamp, time);
+	}
+
+
+	public synchronized void logError(long tstamp, long time) {
+        this.calls.feed(tstamp, 1);
+        this.errors.feed(tstamp, 1);
+        this.time.feed(tstamp, time);
     }
 }

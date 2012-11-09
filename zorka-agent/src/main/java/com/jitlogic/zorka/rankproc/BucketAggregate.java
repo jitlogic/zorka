@@ -26,13 +26,13 @@ import java.util.Arrays;
 public class BucketAggregate {
 
     public static final long NS   = 1L;
-    public static final long MS   = NS * 1000;
+    public static final long MS   = NS * 1000000;
     public static final long SEC  = MS * 1000;
     public static final long MIN  = SEC * 60;
     public static final long HOUR = MIN * 60;
     public static final long DAY  = HOUR * 24;
 
-    private long base, total, tstart;
+    private long base, total, tstart, tlast;
     private int[] stages, offsets;
 
     private long[] data, windows, tstamps;
@@ -101,7 +101,12 @@ public class BucketAggregate {
 
 
     public long getTime() {
-        return 0L;
+        return tlast-tstart;
+    }
+
+
+    public long getLast() {
+        return tlast;
     }
 
 
@@ -130,6 +135,8 @@ public class BucketAggregate {
 
         data[0] += val;
         total += val;
+
+        tlast = tstamp;
     }
 
 
@@ -158,21 +165,6 @@ public class BucketAggregate {
 
         data[idx1] = nval;
         tstamps[stage] += tbase;
-    }
-
-
-    public double getAverage(int stage) {
-
-        if (stage < 0 || stage >= stages.length) {
-            return 0.0;
-        }
-
-        return (double)getDelta(stage)/(double)windows[stage];
-    }
-
-
-    public double getAverage(long window) {
-        return getDelta(getStage(window));
     }
 
 

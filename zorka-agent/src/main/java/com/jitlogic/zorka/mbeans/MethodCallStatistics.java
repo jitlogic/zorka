@@ -43,18 +43,15 @@ public class MethodCallStatistics implements ZorkaStats {
 	}
 
 
-	public synchronized MethodCallStat getMethodCallStatistic(String name) {
+	public synchronized MethodCallStatistic getMethodCallStatistic(String name) {
 		MethodCallStatistic ret = stats.get(name);
 		
 		if (ret == null) {
-			ret = new MethodCallStatistic(name);
+			ret = MethodCallStatistic.newStatAvg15(name);  // TODO make it configurable somewhere ...
 			stats.put(name,  ret);
 		}
 		
 		return ret;
 	}
 
-	public synchronized void clear() {
-		stats.clear();
-	}
 }

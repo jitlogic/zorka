@@ -68,11 +68,11 @@ public class JmxAttrCollector implements SpyCollector {
         MethodCallStatistic statistic = cachedStats.get(ctx);
 
         if (statistic == null) {
-            statistic = new MethodCallStatistic(ctx.getMethodName());
+            statistic = MethodCallStatistic.newStatAvg15(ctx.getMethodName()); // TODO make this configurable
             AttrGetter callsGetter = new AttrGetter(statistic, "calls");
             AttrGetter errorGetter = new AttrGetter(statistic, "errors");
             AttrGetter timeGetter = new AttrGetter(statistic, "time");
-            AttrGetter lastGetter = new AttrGetter(statistic, "lastCallTime");
+            AttrGetter lastGetter = new AttrGetter(statistic, "lastTime");
 
             String beanName = subst(beanTemplate,  ctx);
             String attrName = subst(attrTemplate, ctx);
