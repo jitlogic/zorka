@@ -120,7 +120,7 @@ public class SpyDefinition {
 
 
     /**
-     * Returns true if given class name matches this spy definition.
+     * Returns true if given class name matches this sdef.
      *
      * @param className
      *
@@ -137,6 +137,21 @@ public class SpyDefinition {
         return false;
     }
 
+
+    /**
+     * Returns true if given method (of given class) matches this spy definition.
+     * Note that method signature and access bits are also checked.
+     *
+     * @param className class name
+     *
+     * @param methodName method name
+     *
+     * @param methodDesc method descriptor (as in classfile)
+     *
+     * @param access access bits (as in classfile)
+     *
+     * @return true if all arguments match properly.
+     */
     public boolean match(String className, String methodName, String methodDesc, int access) {
 
         for (SpyMatcher matcher : matchers) {
