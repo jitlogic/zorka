@@ -68,8 +68,8 @@ public class ZorkaStatsCollector implements SpyCollector {
         MethodCallStatistics stats = statsCache.get(record.getContext());
 
         if (stats == null) {
-            stats = registry.getOrRegisterBeanAttr(mbsName, subst(mbeanTemplate, ctx), subst(attrTemplate, ctx),
-                        new MethodCallStatistics(), "Method call statistics");
+            stats = registry.getOrRegister(mbsName, subst(mbeanTemplate, ctx), subst(attrTemplate, ctx),
+                    new MethodCallStatistics(), "Method call statistics");
         }
 
         String key = inspector.substitute(subst(keyTemplate, ctx), record.getVals(ON_COLLECT));

@@ -21,7 +21,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -240,4 +242,42 @@ public class ZorkaUtil {
         return dst;
     }
 
+    public static <T> T[] clipArray(T[] src, int len) {
+
+        if (src == null) {
+            return null;
+        }
+
+
+        if (len < 0) {
+            len = src.length - len > 0 ? src.length - len : 0;
+        }
+
+
+        Class<?> arrayType = src.getClass().getComponentType();
+        T[] dst = (T[])java.lang.reflect.Array.newInstance(arrayType, len);
+
+        if (len > 0) {
+            System.arraycopy(src, 0, dst, 0, len);
+        }
+
+        return dst;
+
+    }
+
+
+    public static <T> List<T> clip(List<T> src, int maxSize) {
+
+        if (src.size() <= maxSize) {
+            return src;
+        }
+
+        List<T> lst = new ArrayList<T>(maxSize+2);
+
+        for (int i = 0; i < maxSize; i++) {
+            lst.add(src.get(i));
+        }
+
+        return lst;
+    }
 }

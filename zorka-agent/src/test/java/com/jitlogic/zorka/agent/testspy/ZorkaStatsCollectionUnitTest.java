@@ -16,24 +16,15 @@
 
 package com.jitlogic.zorka.agent.testspy;
 
-import com.jitlogic.zorka.agent.AgentInstance;
-import com.jitlogic.zorka.agent.MBeanServerRegistry;
-import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
+import com.jitlogic.zorka.rankproc.BucketAggregate;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.spy.collectors.JmxAttrCollector;
 import com.jitlogic.zorka.spy.collectors.ZorkaStatsCollector;
 
-import static com.jitlogic.zorka.spy.SpyConst.*;
-import static com.jitlogic.zorka.mbeans.MethodCallStatistic.NS;
-
-import com.jitlogic.zorka.util.ZorkaLogger;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -123,7 +114,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
         SpyRecord record = new SpyRecord(ctx);
         record.feed(ON_RETURN, new Object[]{});  // Mark proper return from method
-        record.feed(ON_COLLECT, new Object[]{1000 * NS, 500 * NS});
+        record.feed(ON_COLLECT, new Object[]{BucketAggregate.SEC, BucketAggregate.SEC/2 });
         collector.collect(record);
 
         assertEquals(1L, getAttr("test", "test:name=TClass", "testMethod_calls"));
@@ -143,7 +134,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
         SpyRecord record = new SpyRecord(ctx);
         record.feed(ON_ERROR, new Object[]{});  // Mark proper return from method
-        record.feed(ON_COLLECT, new Object[]{1000 * NS, 500 * NS});
+        record.feed(ON_COLLECT, new Object[]{BucketAggregate.SEC, BucketAggregate.SEC/2 });
         collector.collect(record);
 
         assertEquals(1L, getAttr("test", "test:name=TClass", "testMethod_calls"));

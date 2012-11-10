@@ -24,45 +24,22 @@ import java.net.URL;
 
 import com.jitlogic.zorka.agent.*;
 import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class BshAgentIntegTest {
+public class BshAgentIntegTest extends ZorkaFixture {
 
-	private ZorkaBshAgent agent;
-	
 	private volatile Object result = null;
 	private volatile Throwable err = null;
-
-
-    @Before
-    public void setUp() {
-        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
-        ZorkaLogger.setLogger(new TestLogger());
-        AgentInstance.setMBeanServerRegistry(new MBeanServerRegistry(true));
-        agent = new ZorkaBshAgent(
-                TimeoutThreadPoolExecutor.newBoundedPool(100));
-        result = null;
-        err = null;
-    }
-
-
-    @After
-    public void tearDown() {
-        AgentInstance.setMBeanServerRegistry(null);
-        ZorkaLogger.setLogger(null);
-        ZorkaConfig.cleanup();
-    }
-
-
 
 
     // Use it only with synchronous executor
 	private Object execute(final String expr, long sleep) throws Exception {
 		
-		agent.exec(expr, new ZorkaCallback() {
+		zorkaAgent.exec(expr, new ZorkaCallback() {
 			
 			public void handleResult(Object rslt) {
 				result = rslt;
@@ -100,7 +77,7 @@ public class BshAgentIntegTest {
 	@Test
 	public void testAgentTimeout() throws Exception {
 		URL script = this.getClass().getResource("/integTest.bsh");
-		agent.loadScript(script);
+		zorkaAgent.loadScript(script);
 		//assertNull(null, execute("testLoopForever()", 1000));  // TODO zobaczyc co z tym jest grane 
 		//assertTrue("should reach execution timeout", err instanceof ThreadDeath);
 	}

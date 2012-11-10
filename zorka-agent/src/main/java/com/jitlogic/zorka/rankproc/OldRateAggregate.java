@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 // TODO support for other values than long 
-public class RateAggregate {
+public class OldRateAggregate {
 	
 	private static class Sample {
 		private final long nom, div, time;
@@ -39,11 +39,11 @@ public class RateAggregate {
 	
 	private ZorkaUtil util = ZorkaUtil.getInstance();
 	
-	public RateAggregate(long horizon, double defVal) {
+	public OldRateAggregate(long horizon, double defVal) {
 		this(horizon, defVal, 1.0);
 	}
 	
-	public RateAggregate(long horizon, double defVal, double multiplier) {
+	public OldRateAggregate(long horizon, double defVal, double multiplier) {
 		this.horizon = horizon;
 		this.samples = new LinkedList<Sample>();
 		this.defVal = defVal;

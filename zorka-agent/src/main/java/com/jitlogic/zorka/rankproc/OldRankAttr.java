@@ -18,7 +18,7 @@
 package com.jitlogic.zorka.rankproc;
 
 
-public class RankAttr<K,V> {
+public class OldRankAttr<K,V> {
 
 	private final String name;
 	private final String description;
@@ -31,7 +31,7 @@ public class RankAttr<K,V> {
 	private final int nominalOffs, dividerOffs;
 
 	
-	public RankAttr(RankLister<K,V> lister, String name, String description, long horizon, double multiplier, String nominalAttr, String dividerAttr) {
+	public OldRankAttr(OldRankLister<K, V> lister, String name, String description, long horizon, double multiplier, String nominalAttr, String dividerAttr) {
 		this.name = name;
 		this.description = description;
 		this.horizon = horizon;
@@ -42,8 +42,8 @@ public class RankAttr<K,V> {
 		this.dividerOffs = lister.attrIndex(dividerAttr);
 	}
 	
-	public RateAggregate newAggregate() {
-		return new RateAggregate(horizon, 0.0, multiplier);
+	public OldRateAggregate newAggregate() {
+		return new OldRateAggregate(horizon, 0.0, multiplier);
 	}
 
 	public String getName() {

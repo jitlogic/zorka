@@ -120,7 +120,7 @@ public class SpyDefinition {
 
 
     /**
-     * Returns true if given class name matches this spy definition.
+     * Returns true if given class name matches this sdef.
      *
      * @param className
      *
@@ -137,6 +137,21 @@ public class SpyDefinition {
         return false;
     }
 
+
+    /**
+     * Returns true if given method (of given class) matches this spy definition.
+     * Note that method signature and access bits are also checked.
+     *
+     * @param className class name
+     *
+     * @param methodName method name
+     *
+     * @param methodDesc method descriptor (as in classfile)
+     *
+     * @param access access bits (as in classfile)
+     *
+     * @return true if all arguments match properly.
+     */
     public boolean match(String className, String methodName, String methodDesc, int access) {
 
         for (SpyMatcher matcher : matchers) {
@@ -259,7 +274,7 @@ public class SpyDefinition {
      */
     public SpyDefinition lookFor(int access, String classPattern, String methodPattern, String retType, String...argTypes) {
         SpyDefinition sdef = new SpyDefinition(this);
-        List<SpyMatcher> lst = new ArrayList<SpyMatcher>(sdef.matchers.size()+1);
+        List<SpyMatcher> lst = new ArrayList<SpyMatcher>(sdef.matchers.size()+2);
         lst.addAll(sdef.matchers);
         lst.add(new SpyMatcher(classPattern, methodPattern, retType, access, argTypes));
         sdef.matchers = lst;
@@ -293,7 +308,7 @@ public class SpyDefinition {
     public SpyDefinition withArguments(Object... args) {
         SpyDefinition sdef = new SpyDefinition(this);
 
-        List<SpyProbeElement> lst = new ArrayList<SpyProbeElement>(sdef.probes[curStage].size()+args.length);
+        List<SpyProbeElement> lst = new ArrayList<SpyProbeElement>(sdef.probes[curStage].size()+args.length+2);
         lst.addAll(sdef.probes[curStage]);
         for (Object arg : args) {
             lst.add(new SpyProbeElement(arg));
@@ -370,7 +385,7 @@ public class SpyDefinition {
      */
     public SpyDefinition withProcessor(SpyProcessor processor) {
         SpyDefinition sdef = new SpyDefinition(this);
-        List<SpyProcessor> lst = new ArrayList<SpyProcessor>(processors[curStage].size()+1);
+        List<SpyProcessor> lst = new ArrayList<SpyProcessor>(processors[curStage].size()+2);
         lst.addAll(processors[curStage]);
         lst.add(processor);
         sdef.processors = ZorkaUtil.copyArray(processors);
@@ -389,7 +404,7 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition withFormat(int dst, String expr) {
+    public SpyDefinition format(int dst, String expr) {
         return withProcessor(new StringFormatProcessor( dst, expr));
     }
 
@@ -421,6 +436,25 @@ public class SpyDefinition {
      */
     public SpyDefinition filterOut(int src, String regex) {
         return withProcessor(new RegexFilterProcessor(src, regex, true));
+    }
+
+
+    public SpyDefinition transform(int src, int dst, String regex, String expr) {
+        return transform(src, dst, regex, expr,  false);
+    }
+
+
+    /**
+     * Transforms data using regular expression and substitution.
+     *
+     * @param src
+     * @param dst
+     * @param regex
+     * @param expr
+     * @return
+     */
+    public SpyDefinition transform(int src, int dst, String regex, String expr, boolean filterOut) {
+        return withProcessor(new RegexFilterProcessor(src, dst, regex, expr, filterOut));
     }
 
 
@@ -486,7 +520,7 @@ public class SpyDefinition {
      */
     public SpyDefinition toCollector(SpyCollector collector) {
         SpyDefinition sdef = new SpyDefinition(this);
-        List<SpyCollector> lst = new ArrayList<SpyCollector>(collectors.size()+1);
+        List<SpyCollector> lst = new ArrayList<SpyCollector>(collectors.size()+2);
         lst.addAll(collectors); lst.add(collector);
         sdef.collectors = lst;
         return sdef;

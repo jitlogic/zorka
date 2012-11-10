@@ -43,7 +43,7 @@ import javax.management.openmbean.SimpleType;
  * @author RLE <rafal.lewczuk@jitlogic.com>
  *
  */
-public class ThreadRankLister extends RankLister<Long,ThreadInfo> {
+public class OldThreadRankLister extends OldRankLister<Long,ThreadInfo> {
 
 	private final static String[] xbasicAttr = { 
 		"id", "tstamp", "name", "state", 
@@ -66,14 +66,14 @@ public class ThreadRankLister extends RankLister<Long,ThreadInfo> {
 	
 	private ThreadMXBean threadMXBean;
 	
-	public ThreadRankLister(long updateInterval, long rerankInterval) {
+	public OldThreadRankLister(long updateInterval, long rerankInterval) {
 		super(updateInterval, rerankInterval, xbasicAttr, xbasicDesc, xbasicType);
 		threadMXBean = ManagementFactory.getThreadMXBean();
 		makeCompositeType();
 	}
 		
 	
-	public void updateBasicAttrs(RankItem<Long,ThreadInfo> item, ThreadInfo info, long tstamp) {
+	public void updateBasicAttrs(OldRankItem<Long,ThreadInfo> item, ThreadInfo info, long tstamp) {
 		Object[] v = item.getValues();
 		
 		v[ATTR_ID] = info.getThreadId();
@@ -94,7 +94,7 @@ public class ThreadRankLister extends RankLister<Long,ThreadInfo> {
 	@Override
 	public List<ThreadInfo> list() {
 		long[] ids = threadMXBean.getAllThreadIds();
-		List<ThreadInfo> tlist = new ArrayList<ThreadInfo>(ids.length);
+		List<ThreadInfo> tlist = new ArrayList<ThreadInfo>(ids.length+2);
 		for (long id : ids) {
 			ThreadInfo ti = threadMXBean.getThreadInfo(id);
 			if (ti != null) tlist.add(ti);

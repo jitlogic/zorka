@@ -121,14 +121,14 @@ public class ObjectInspector {
             }
         } else if (obj instanceof List<?>) {
             int len = ((List)obj).size();
-            List<Integer> ret = new ArrayList<Integer>(len);
+            List<Integer> ret = new ArrayList<Integer>(len+2);
             for (int i = 0; i < len; i++) {
                 ret.add(i);
             }
             return ret;
         } else if (obj.getClass().isArray()) {
             int len = ((Object[])obj).length;
-            List<Integer> ret = new ArrayList<Integer>(len);
+            List<Integer> ret = new ArrayList<Integer>(len+2);
             for (int i = 0; i < len; i++) {
                 ret.add(i);
             }

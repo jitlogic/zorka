@@ -85,13 +85,6 @@ public class ZabbixAgentIntegTest {
 	}
 	
 	@Test
-	public void testReloadConfig() throws Exception {
-		assertEquals("OK", query("zorka__reload[]"));
-		Thread.sleep(50);
-		assertEquals(ZorkaBshAgent.VERSION, query("zorka__version[]"));
-	}
-	
-	@Test
 	public void testJavaQuery() throws Exception {
 		String rslt = query("zorka__jmx[\"java\", \"java.lang:type=OperatingSystem\", \"Arch\"]");
 		assertFalse("Query has crashed.", 

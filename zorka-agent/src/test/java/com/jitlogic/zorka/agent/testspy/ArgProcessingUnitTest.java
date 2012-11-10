@@ -143,6 +143,40 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         proc.process(ON_ENTER, record);
 
         assertEquals("ja", record.get(ON_ENTER, 0));
+    }
 
+    private void checkHRT(String expected, String url) {
+        SpyProcessor sp = new RegexFilterProcessor(0, 0, "^(https?://[^/]+/[^/]+).*$", "${1}", true);
+        record.feed(ON_ENTER, new Object[] { url });
+        sp.process(ON_ENTER,  record);
+        assertEquals(expected, record.get(ON_ENTER, 0));
+    }
+
+
+    @Test
+    public void testRegexFilterTransformHttpReq() {
+        checkHRT("http://jitlogic.com/zorka", "http://jitlogic.com/zorka/some/page.html");
+    }
+
+
+    @Test
+    public void testRegexFilterTransformHttpsReq() {
+        checkHRT("https://jitlogic.com/zorka", "https://jitlogic.com/zorka/some/page.html");
+    }
+
+
+    @Test
+    public void testRegexFilterTransformShortUrl() {
+        checkHRT("https://jitlogic.com", "https://jitlogic.com");
+    }
+
+
+    @Test
+    public void testFilterNoMatchWithDefVal() {
+        SpyProcessor sp = new RegexFilterProcessor(0, 0, "^a(.*)", "${0}", "???");
+
+        record.feed(ON_ENTER, new Object[] { "xxx" });
+        sp.process(ON_ENTER, record);
+        assertEquals("???", record.get(ON_ENTER, 0));
     }
 }
