@@ -28,9 +28,7 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
-import com.jitlogic.zorka.rankproc.AvgRateCounter;
-import com.jitlogic.zorka.rankproc.OldBeanRankLister;
-import com.jitlogic.zorka.rankproc.OldThreadRankLister;
+import com.jitlogic.zorka.rankproc.*;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
@@ -49,7 +47,7 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 public class ZorkaLib implements ZorkaService {
 	
 	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
-    private final ZorkaLogger logger = null; // ZorkaLogger.getLogger();
+    private final ZorkaLogger logger = ZorkaLogger.getLogger();
 	
 	private ZorkaBshAgent agent;
     private Set<JmxObject> registeredObjects = new HashSet<JmxObject>();
@@ -284,22 +282,27 @@ public class ZorkaLib implements ZorkaService {
         logger.log("<script>", ZorkaLogLevel.DEBUG, message, null, args);
     }
 
+
     public void logInfo(String message, Object...args) {
         logger.log("<script>", ZorkaLogLevel.INFO, message, null, args);
     }
+
 
     public void logWarning(String message, Object...args) {
         logger.log("<script>", ZorkaLogLevel.WARN, message, null, args);
     }
 
+
     public void logError(String message, Object...args) {
         logger.log("<script>", ZorkaLogLevel.ERROR, message, null, args);
     }
+
 
     public void reload(String mask) {
         agent.loadScriptDir(ZorkaConfig.getConfDir(),
             "^"+mask.replace("\\.", "\\\\.").replace("*", ".*")+"$");
     }
+
 
 	public void svcStart() {
 	}
@@ -317,11 +320,11 @@ public class ZorkaLib implements ZorkaService {
 	
 	
 	public void svcClear() {
-	}
+	} // svcClear()
 	
 	
 	public void svcReload() {
-	}
+	} // svcReload()
 	
 	
 	public String reload() {
@@ -335,8 +338,23 @@ public class ZorkaLib implements ZorkaService {
 		return "OK";
 	}
 
+
     public void registerMbs(String name, MBeanServerConnection mbs) {
         mbsRegistry.register(name, mbs, mbs.getClass().getClassLoader());
     }
 
+
+    public <T> T getOrRegister(String mbsName, String beanName, String attrName, T obj) {
+        return mbsRegistry.getOrRegister(mbsName, beanName, attrName, obj);
+    }
+
+
+    public <T> T getOrRegister(String mbsName, String beanName, String attrName, T obj, String desc) {
+        return mbsRegistry.getOrRegister(mbsName, beanName, attrName, obj, desc);
+    }
+
+
+    public RankLister<Rankable> jmxLister(String mbsName, String onMask) {
+        return new JmxAggregatingLister<Rankable>(mbsName, onMask);
+    }
 }
