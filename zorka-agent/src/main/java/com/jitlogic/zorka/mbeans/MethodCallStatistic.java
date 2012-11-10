@@ -17,12 +17,17 @@
 
 package com.jitlogic.zorka.mbeans;
 
-
+import static com.jitlogic.zorka.rankproc.BucketAggregate.MS;
 import com.jitlogic.zorka.rankproc.BucketAggregate;
+import com.jitlogic.zorka.rankproc.Rankable;
 
 import java.util.Date;
 
-public class MethodCallStatistic implements ZorkaStat {
+public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatistic> {
+
+    public final static int CALLS_STAT = 0;
+    public final static int TIMES_STAT = 1;
+    public final static int ERROR_STAT = 2;
 
 	private String name;
 
@@ -41,6 +46,54 @@ public class MethodCallStatistic implements ZorkaStat {
         this.calls = new BucketAggregate(base, stages);
         this.errors = new BucketAggregate(base, stages);
         this.time = new BucketAggregate(base, stages);
+    }
+
+
+    public long getTotal(int metric) {
+        switch (metric) {
+            case CALLS_STAT:
+                return calls.getTotal();
+            case ERROR_STAT:
+                return errors.getTotal();
+            case TIMES_STAT:
+                return time.getTotal() / MS;
+        }
+
+        return -1;
+    }
+
+
+    public double getAverage(int metric, int average) {
+        switch (metric) {
+            case CALLS_STAT: {
+                long delta = calls.getDelta(average);
+                return 1000.0 * delta / (calls.getWindow(average) * MS);
+            }
+            case ERROR_STAT: {
+                long delta = errors.getDelta(average);
+                return 1000.0 * delta / (errors.getWindow(average) * MS);
+            }
+            case TIMES_STAT: {
+                long dc = calls.getDelta(average), dt = time.getDelta(average);
+                return dc == 0 ? 0.0 : 1000.0 * dt / (dc * MS);
+            }
+        }
+        return 0.0;
+    }
+
+
+    public String[] getMetrics() {
+        return new String[] { "calls", "time", "errors" };
+    }
+
+
+    public String[] getAverages() {
+        return new String[]  { "CUR", "AVG1", "AVG5", "AVG15" };
+    }
+
+
+    public MethodCallStatistic getWrapped() {
+        return this;
     }
 
 
@@ -69,40 +122,19 @@ public class MethodCallStatistic implements ZorkaStat {
 	}
 
 
-    public double getCallsAvg(long window) {
-        return getCallsAvg(getStage(window));
-    }
-
-
-    public synchronized double getCallsAvg(int stage) {
-        long cdelta = calls.getDelta(stage), tdelta = calls.getDelta(stage)/BucketAggregate.MS;
-        return tdelta > 0 ? 1000.0 * cdelta / tdelta : 0.0;
-    }
-
 
 	public synchronized long getErrors() {
 		return errors.getTotal();
 	}
 
 
-    public double getErrorsAvg(long window) {
-        return getErrorsAvg(getStage(window));
-    }
-
-
-    public synchronized double getErrorsAvg(int stage) {
-        long edelta = errors.getDelta(stage), tdelta = calls.getDelta(stage)/BucketAggregate.MS;
-        return edelta > 0 ? 1000.0 * edelta / tdelta : 0.0;
-    }
-
-
 	public synchronized long getTime() {
-		return time.getTotal()/BucketAggregate.MS;
+		return time.getTotal()/MS;
 	}
 
 
-    public synchronized Date lastTime() {
-        return new Date(calls.getLast()/BucketAggregate.MS);
+    public synchronized Date lastSample() {
+        return new Date(calls.getLast()/MS);
     }
 
 

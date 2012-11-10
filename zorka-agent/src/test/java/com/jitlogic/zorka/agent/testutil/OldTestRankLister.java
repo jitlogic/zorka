@@ -53,7 +53,7 @@ public class OldTestRankLister extends OldRankLister<Long, Long[]> {
 	 * @param tuples input data (all tuples flattened into a single sequence)
 	 */
 	public void testFeed(int...tuples) {
-		List<Long> tuple = new ArrayList<Long>(3);
+		List<Long> tuple = new ArrayList<Long>(4);
 		List<Long[]> data = new ArrayList<Long[]>();
 		
 		for (int v : tuples) {

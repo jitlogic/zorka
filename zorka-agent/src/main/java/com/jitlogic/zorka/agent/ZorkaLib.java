@@ -237,7 +237,7 @@ public class ZorkaLib implements ZorkaService {
      * @param attrs
      * @return
      */
-    public ValGetter getter(Object obj, String...attrs) {
+    public ValGetter getter(Object obj, Object...attrs) {
         return new AttrGetter(obj, attrs);
     }
 
@@ -324,7 +324,7 @@ public class ZorkaLib implements ZorkaService {
         String div = (String)args[args.length-2];
         String nom = (String)args[args.length-3];
 
-        List<Object> path = new ArrayList<Object>(args.length-3);
+        List<Object> path = new ArrayList<Object>(args.length+2);
 
         for (int i = 0; i < args.length-3; i++) {
             path.add(args[i]);

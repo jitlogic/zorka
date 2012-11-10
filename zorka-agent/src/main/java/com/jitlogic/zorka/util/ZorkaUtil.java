@@ -249,7 +249,7 @@ public class ZorkaUtil {
             return src;
         }
 
-        List<T> lst = new ArrayList<T>(maxSize);
+        List<T> lst = new ArrayList<T>(maxSize+2);
 
         for (int i = 0; i < maxSize; i++) {
             lst.add(src.get(i));

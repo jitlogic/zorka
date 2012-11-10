@@ -16,10 +16,6 @@
 
 package com.jitlogic.zorka.rankproc;
 
-import com.jitlogic.zorka.util.ZorkaUtil;
-
-import java.util.Arrays;
-
 /**
  * Bucket aggregate is
  */
@@ -49,22 +45,20 @@ public class BucketAggregate {
 
         this.total = 0;
 
-        this.init();
-    }
-
-
-    private void init() {
-        windows = new long[stages.length]; windows[0] = base;
-        offsets = new int[stages.length]; offsets[0] = 0;
-        tstamps = new long[stages.length]; tstamps[0] = -1;
+        windows = new long[this.stages.length];
+        windows[0] = this.base;
+        offsets = new int[this.stages.length];
+        offsets[0] = 0;
+        tstamps = new long[this.stages.length];
+        tstamps[0] = -1;
 
         int dlen = 1;
 
-        for (int i = 1; i < stages.length; i++) {
-            windows[i] = windows[i-1] * stages[i];
-            offsets[i] = offsets[i-1] + stages[i-1];
+        for (int i = 1; i < this.stages.length; i++) {
+            windows[i] = windows[i-1] * this.stages[i];
+            offsets[i] = offsets[i-1] + this.stages[i-1];
             tstamps[i] = -1;
-            dlen += stages[i];
+            dlen += this.stages[i];
         }
 
         data = new long[dlen];
@@ -76,8 +70,8 @@ public class BucketAggregate {
     }
 
 
-    public long[] getWindows() {
-        return ZorkaUtil.copyArray(windows);
+    public long getWindow(int stage) {
+        return windows[stage];
     }
 
     public int getStage(long window) {
@@ -184,11 +178,5 @@ public class BucketAggregate {
 
         return delta;
     }
-
-
-    public long getDelta(long window) {
-        return getDelta(getStage(window));
-    }
-
 
 }

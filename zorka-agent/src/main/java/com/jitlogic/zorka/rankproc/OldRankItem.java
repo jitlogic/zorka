@@ -113,7 +113,7 @@ public class OldRankItem<K,V> implements CompositeData {
 	
 	
 	public Collection<?> values() {
-		List<Object> lst = new ArrayList<Object>(values.length);
+		List<Object> lst = new ArrayList<Object>(values.length+2);
 
 		for (Object obj : values) {  
 			lst.add(obj);

@@ -29,4 +29,6 @@ public interface Rankable<T> {
 
     public T getWrapped();
 
+    public String getName();
+
 }

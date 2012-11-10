@@ -31,6 +31,7 @@ public class ZorkaFixture {
     protected Properties configProperties;
     protected TestLogger testLogger;
     protected MBeanServer testMbs;
+    private ZorkaTestUtil testUtil;
     protected MBeanServerRegistry mBeanServerRegistry;
 
     protected AgentInstance agentInstance;
@@ -68,6 +69,8 @@ public class ZorkaFixture {
 
         testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
         mBeanServerRegistry.register("test", testMbs, testMbs.getClass().getClassLoader());
+
+        testUtil = ZorkaTestUtil.setUp();
     }
 
     @After

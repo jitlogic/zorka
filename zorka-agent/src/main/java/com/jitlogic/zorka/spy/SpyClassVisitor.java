@@ -69,7 +69,7 @@ public class SpyClassVisitor extends ClassVisitor {
         }
 
         MethodVisitor mv = createVisitor(access, methodName, methodDesc, methodSignature, exceptions);
-        List<SpyContext> ctxs = new ArrayList<SpyContext>(sdefs.size());
+        List<SpyContext> ctxs = new ArrayList<SpyContext>(sdefs.size()+2);
 
         for (SpyDefinition sdef : sdefs) {
             if (sdef.match(className, methodName, methodDesc, access)) {

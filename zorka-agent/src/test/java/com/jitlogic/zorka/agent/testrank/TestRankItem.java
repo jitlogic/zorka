@@ -15,7 +15,6 @@
  */
 package com.jitlogic.zorka.agent.testrank;
 
-import com.jitlogic.zorka.agent.ZorkaBasicCallback;
 import com.jitlogic.zorka.rankproc.Rankable;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
@@ -46,5 +45,9 @@ public class TestRankItem implements Rankable<TestRankItem> {
 
     public TestRankItem getWrapped() {
         return this;
+    }
+
+    public String getName() {
+        return "TestRankItem(" + values[0] + ")";
     }
 }

@@ -94,7 +94,7 @@ public class OldThreadRankLister extends OldRankLister<Long,ThreadInfo> {
 	@Override
 	public List<ThreadInfo> list() {
 		long[] ids = threadMXBean.getAllThreadIds();
-		List<ThreadInfo> tlist = new ArrayList<ThreadInfo>(ids.length);
+		List<ThreadInfo> tlist = new ArrayList<ThreadInfo>(ids.length+2);
 		for (long id : ids) {
 			ThreadInfo ti = threadMXBean.getThreadInfo(id);
 			if (ti != null) tlist.add(ti);

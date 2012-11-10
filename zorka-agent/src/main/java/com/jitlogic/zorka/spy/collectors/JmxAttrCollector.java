@@ -72,7 +72,7 @@ public class JmxAttrCollector implements SpyCollector {
             AttrGetter callsGetter = new AttrGetter(statistic, "calls");
             AttrGetter errorGetter = new AttrGetter(statistic, "errors");
             AttrGetter timeGetter = new AttrGetter(statistic, "time");
-            AttrGetter lastGetter = new AttrGetter(statistic, "lastTime");
+            AttrGetter lastGetter = new AttrGetter(statistic, "lastSample");
 
             String beanName = subst(beanTemplate,  ctx);
             String attrName = subst(attrTemplate, ctx);

@@ -102,7 +102,7 @@ public class AvgRateCounter {
 
 
     public List<Object> list(Object...strings) {
-        List<Object> lst = new ArrayList<Object>(strings.length);
+        List<Object> lst = new ArrayList<Object>(strings.length+2);
         for (Object s : strings) {
             lst.add(s);
         }

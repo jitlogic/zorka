@@ -29,13 +29,6 @@ import java.util.List;
 
 public class RankProcUnitTest extends ZorkaFixture {
 
-    private ZorkaTestUtil testUtil;
-
-    @Before
-    public void setUp() {
-        testUtil = ZorkaTestUtil.setUp();
-    }
-
     @Test
     public void testCheckForLazyInitialRank() {
         RankLister lister = new TestRankLister("t", "avg1", 5, 4, 3, 2, 1);

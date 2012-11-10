@@ -45,7 +45,7 @@ public class TestRankLister implements RankLister<TestRankItem> {
     }
 
     public List<TestRankItem> list() {
-        List<TestRankItem> lst = new ArrayList<TestRankItem>(rankList.size());
+        List<TestRankItem> lst = new ArrayList<TestRankItem>(rankList.size()+2);
         lst.addAll(rankList);
         return lst;
     }

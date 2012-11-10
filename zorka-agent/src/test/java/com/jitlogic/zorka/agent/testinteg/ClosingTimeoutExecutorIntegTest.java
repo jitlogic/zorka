@@ -119,7 +119,7 @@ public class ClosingTimeoutExecutorIntegTest extends ZorkaFixture {
     public void testQueueOverflow() throws Exception {
         // TODO blinking test !!!
         ClosingTimeoutExecutor executor = new ClosingTimeoutExecutor(2, 2, 500);
-        List<TestTask> tasks = new ArrayList<TestTask>(6);
+        List<TestTask> tasks = new ArrayList<TestTask>(8);
         for (int i = 1; i <= 6; i++)
             tasks.add(new TestTask(i*200));
 

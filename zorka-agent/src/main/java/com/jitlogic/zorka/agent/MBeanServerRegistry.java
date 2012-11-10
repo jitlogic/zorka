@@ -104,6 +104,11 @@ public class MBeanServerRegistry {
     }
 
 
+    public <T> T getOrRegisterBeanAttr(String mbsName, String beanName, String attrName, T obj) {
+        return getOrRegisterBeanAttr(mbsName,  beanName,  attrName,  obj,  attrName);
+    }
+
+
     public <T> T getOrRegisterBeanAttr(String mbsName, String beanName, String attrName, T obj, String desc) {
         MBeanServerConnection mbs = lookup(mbsName);
 
@@ -162,7 +167,7 @@ public class MBeanServerRegistry {
     private void registerDeferred(String name) {
         if (deferredRegistrations.size() > 0 && conns.containsKey(name)) {
             List<DeferredRegistration> dregs = deferredRegistrations;
-            deferredRegistrations = new ArrayList<DeferredRegistration>(dregs.size());
+            deferredRegistrations = new ArrayList<DeferredRegistration>(dregs.size()+2);
             for (DeferredRegistration dr : dregs) {
                 if (name.equals(dr.name)) {
                     getOrRegisterBeanAttr(name, dr.bean, dr.attr, dr.obj, dr.desc);
