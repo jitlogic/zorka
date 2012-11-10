@@ -64,9 +64,9 @@ public class RankZorkaStatsUnitTest extends ZorkaFixture {
         MethodCallStatistics stats3 = new MethodCallStatistics();
         stats3.getMethodCallStatistic("ccc1"); stats3.getMethodCallStatistic("ccc2");
 
-        mBeanServerRegistry.getOrRegisterBeanAttr("test", "zorka:type=TestStats,name=aaa", "stats1", stats1);
-        mBeanServerRegistry.getOrRegisterBeanAttr("test", "zorka:type=TestStats,name=bbb", "stats2", stats2);
-        mBeanServerRegistry.getOrRegisterBeanAttr("test", "zorka:type=TestStats,name=ccc", "stats3", stats3);
+        mBeanServerRegistry.getOrRegister("test", "zorka:type=TestStats,name=aaa", "stats1", stats1);
+        mBeanServerRegistry.getOrRegister("test", "zorka:type=TestStats,name=bbb", "stats2", stats2);
+        mBeanServerRegistry.getOrRegister("test", "zorka:type=TestStats,name=ccc", "stats3", stats3);
 
         RankLister<MethodCallStatistic> lister = new JmxAggregatingLister<MethodCallStatistic>("test", "zorka:type=TestStats,*");
         List<MethodCallStatistic> lst = lister.list();

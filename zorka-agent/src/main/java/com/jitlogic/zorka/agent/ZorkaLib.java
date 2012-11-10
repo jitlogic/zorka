@@ -241,62 +241,6 @@ public class ZorkaLib implements ZorkaService {
         return new AttrGetter(obj, attrs);
     }
 
-	
-	// TODO move this to "initialization library" script (?)
-	public ZorkaMappedMBean threadRanking(String name, String desc, int size, long rerankInterval) {
-		long updateInterval = 15000;
-		//String bname = "zorka.jvm:name = " + name + ",type=ThreadMonitor,updateInterval=" + updateInterval + ",rerankInterval=" + rerankInterval;
-		String bname = name;
-		
-		ZorkaMappedMBean bean = (ZorkaMappedMBean)jmx("java", bname, "this"); 
-		if (bean != null) { return bean; }
-		
-		bean = mbean("java", bname, desc);
-		
-		OldThreadRankLister tl = new OldThreadRankLister(updateInterval, rerankInterval);
-		tl.newAttr("cpu1",  "CPU utilization 1-minute average",     60000, 100, "cpuTime", "tstamp");
-		tl.newAttr("cpu5",  "CPU utilization 5-minute average",   5*60000, 100, "cpuTime", "tstamp");
-		tl.newAttr("cpu15", "CPU utilization 15-minute average", 15*60000, 100, "cpuTime", "tstamp");
-		tl.newAttr("block1",  "Blocked time percentage 1-minute average",    60000, 100, "blockedTime", "tstamp");
-		tl.newAttr("block5",  "Blokced time percentage 5-minute average",  5*60000, 100, "blockedTime", "tstamp");
-		tl.newAttr("block15", "Blokced time percentage 15-minute average", 5*60000, 100, "blockedTime", "tstamp");
-		
-		for (String attr : new String[]{ "cpu1", "cpu5", "cpu15", "block1", "block5", "block15" }) { 
-			bean.put(attr, tl.newList(attr, attr, size));
-		}
-		
-		agent.svcAdd(tl);
-		
-		return bean; 
-	}	
-	
-	
-	// TODO move this to "initialization library" script (?)
-	public ZorkaMappedMBean beanRanking(String mbs, String bname, String query, String keyName, String attrs, String nominalAttr, String dividerAttr, int size, long rerankInterval) {
-		long updateInterval = 15000;
-        MBeanServerConnection conn = mbsRegistry.lookup(mbs);
-
-        if (conn == null)  {
-			log.error("There is no mbean server named '" + mbs + "'");
-			return null;
-		}
-		
-		ZorkaMappedMBean bean = (ZorkaMappedMBean)jmx("java", bname, "this");
-		if (bean != null) { return bean; }
-		
-		bean = mbean(mbs, bname, "");
-		
-		OldBeanRankLister bl = new OldBeanRankLister(updateInterval, rerankInterval, conn, query, keyName, attrs.split(","), nominalAttr, dividerAttr);
-		bl.newAttr("avg1", "1-minute average", 60000, 1, nominalAttr, dividerAttr);
-		bl.newAttr("avg5", "5-minutes average", 5*60000, 1, nominalAttr, dividerAttr);
-		bl.newAttr("avg15", "15-minute average", 15*60000, 1, nominalAttr, dividerAttr);
-		
-		for (String attr : new String[]{ "avg1", "avg5", "avg15" }) {
-			bean.put(attrs,  bl.newList(attr, attr, size));
-		}
-		
-		return bean;
-	}
 
     private AvgRateCounter rateCounter = new AvgRateCounter(this);
 

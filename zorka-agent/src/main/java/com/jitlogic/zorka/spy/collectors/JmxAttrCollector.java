@@ -79,22 +79,22 @@ public class JmxAttrCollector implements SpyCollector {
 
             String desc = ctx.getClassName() + "." + ctx.getMethodName();
 
-            if (!callsGetter.equals(registry.getOrRegisterBeanAttr(mbsName, beanName, attrName + "_calls", callsGetter,
+            if (!callsGetter.equals(registry.getOrRegister(mbsName, beanName, attrName + "_calls", callsGetter,
                     desc + " calls"))) {
                 log.warn("Cannot register attribute for " + desc + " calls. Atribute already taken.");
             }
 
-            if (!errorGetter.equals(registry.getOrRegisterBeanAttr(mbsName, beanName, attrName + "_errors", errorGetter,
+            if (!errorGetter.equals(registry.getOrRegister(mbsName, beanName, attrName + "_errors", errorGetter,
                     desc + " errors"))) {
                 log.warn("Cannot register attribute for " + desc + " errors.");
             }
 
-            if (!timeGetter.equals(registry.getOrRegisterBeanAttr(mbsName, beanName, attrName + "_time", timeGetter,
+            if (!timeGetter.equals(registry.getOrRegister(mbsName, beanName, attrName + "_time", timeGetter,
                     desc + " summary execution time"))) {
                 log.warn("Cannot register attribute for " + desc + " summary execution time.");
             }
 
-            if (!lastGetter.equals(registry.getOrRegisterBeanAttr(mbsName, beanName, attrName + "_last", lastGetter,
+            if (!lastGetter.equals(registry.getOrRegister(mbsName, beanName, attrName + "_last", lastGetter,
                     desc + " last call (error) registered"))) {
                 log.warn("Cannot register attribute for " + desc + " last call.");
             }
