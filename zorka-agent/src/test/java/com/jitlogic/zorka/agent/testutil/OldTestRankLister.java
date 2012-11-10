@@ -25,8 +25,8 @@ import java.util.Queue;
 import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 
-import com.jitlogic.zorka.rankproc.RankItem;
-import com.jitlogic.zorka.rankproc.RankLister;
+import com.jitlogic.zorka.rankproc.OldRankItem;
+import com.jitlogic.zorka.rankproc.OldRankLister;
 
 /**
  * Test double for rankproc unit tests.
@@ -34,11 +34,11 @@ import com.jitlogic.zorka.rankproc.RankLister;
  * @author RLE <rle@jitlogic.com>
  *
  */
-public class TestRankLister extends RankLister<Long, Long[]> {
+public class OldTestRankLister extends OldRankLister<Long, Long[]> {
 
 	private Queue<List<Long[]>> queue = new LinkedList<List<Long[]>>();
 	
-	public TestRankLister(long updateInterval, long rerankInterval) {
+	public OldTestRankLister(long updateInterval, long rerankInterval) {
 		super(updateInterval, rerankInterval, 
 			new String[] { "id", "tstamp", "v1", "v2" },
 			new String[] { "ID", "Timestamp", "Value1", "Value2" }, 
@@ -68,7 +68,7 @@ public class TestRankLister extends RankLister<Long, Long[]> {
 	
 	
 	@Override
-	public void updateBasicAttrs(RankItem<Long, Long[]> item, Long[] info, long tstamp) {
+	public void updateBasicAttrs(OldRankItem<Long, Long[]> item, Long[] info, long tstamp) {
 		Object[] v = item.getValues();
 		v[ATTR_ID] = info[0];
 		v[ATTR_TSTAMP] = tstamp;

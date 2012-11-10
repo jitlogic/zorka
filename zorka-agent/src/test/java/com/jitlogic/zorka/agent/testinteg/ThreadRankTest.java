@@ -20,17 +20,13 @@ package com.jitlogic.zorka.agent.testinteg;
 import java.lang.management.ThreadInfo;
 import java.util.Collection;
 
-import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
-import com.jitlogic.zorka.util.ZorkaLogger;
-import org.junit.After;
+import com.jitlogic.zorka.rankproc.OldRankList;
+import com.jitlogic.zorka.rankproc.OldThreadRankLister;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import com.jitlogic.zorka.rankproc.RankList;
-import com.jitlogic.zorka.rankproc.ThreadRankLister;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 public class ThreadRankTest extends ZorkaFixture {
@@ -46,10 +42,10 @@ public class ThreadRankTest extends ZorkaFixture {
 
     @Test
 	public void testCreateSimpleRankList() throws Exception {
-		ThreadRankLister lister = new ThreadRankLister(60000, 600000);
+		OldThreadRankLister lister = new OldThreadRankLister(60000, 600000);
 		lister.update(util.currentTimeMillis());
 		
-		RankList<Long,ThreadInfo> rlist = lister.newList("cpu1", "cpuTime", 3);		
+		OldRankList<Long,ThreadInfo> rlist = lister.newList("cpu1", "cpuTime", 3);
 		assertNotNull("Should return some list", rlist);
 		
 		Collection<?> vals = rlist.values();
@@ -59,10 +55,10 @@ public class ThreadRankTest extends ZorkaFixture {
 	
 	@Test
 	public void testCreateSimpleRankListAndRerank() throws Exception {
-		ThreadRankLister lister = new ThreadRankLister(60000, 600000);
+		OldThreadRankLister lister = new OldThreadRankLister(60000, 600000);
 		lister.update(util.currentTimeMillis());
 		
-		RankList<Long,ThreadInfo> rlist = lister.newList("cpu1", "cpuTime", 3);		
+		OldRankList<Long,ThreadInfo> rlist = lister.newList("cpu1", "cpuTime", 3);
 		lister.rerank(util.currentTimeMillis());
 		
 		Collection<?> vals = rlist.values();
@@ -72,9 +68,9 @@ public class ThreadRankTest extends ZorkaFixture {
 	
 	@Test
 	public void testCreateDerivedAttr() throws Exception {
-		ThreadRankLister lister = new ThreadRankLister(60000, 600000);
+		OldThreadRankLister lister = new OldThreadRankLister(60000, 600000);
 		lister.newAttr("cpu1", "Cpu utilization avg 1m", 60000, 1, "cpuTime", "tstamp");
-		RankList<Long,ThreadInfo> rlist = lister.newList("cpu1", "cpu1", 3);		
+		OldRankList<Long,ThreadInfo> rlist = lister.newList("cpu1", "cpu1", 3);
 
 		lister.update(util.currentTimeMillis());
 		lister.rerank(util.currentTimeMillis());

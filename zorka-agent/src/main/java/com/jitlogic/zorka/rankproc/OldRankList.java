@@ -34,7 +34,7 @@ import com.jitlogic.zorka.util.ZorkaLogger;
  * @author rlewczuk
  *
  */
-public class RankList<K,T> implements TabularData {
+public class OldRankList<K,T> implements TabularData {
 
 	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 	
@@ -44,16 +44,16 @@ public class RankList<K,T> implements TabularData {
 	
 	private TabularType tabularType;
 	
-	private RankItem<K,T>[] items;
+	private OldRankItem<K,T>[] items;
 	
 	
 	@SuppressWarnings("unchecked")
-	public RankList(String listName, String attrName, int size, TabularType tabularType) {
+	public OldRankList(String listName, String attrName, int size, TabularType tabularType) {
 		this.listName = listName;
 		this.attrName = attrName;
 		this.size = size;
 		this.tabularType = tabularType;
-		this.items = new RankItem[0];
+		this.items = new OldRankItem[0];
 	}
 	
 	
@@ -72,13 +72,13 @@ public class RankList<K,T> implements TabularData {
 	
 	
 	@SuppressWarnings("unchecked")
-	public void refresh(RankItem<K,T>[] items) {
+	public void refresh(OldRankItem<K,T>[] items) {
 		
 		int sz = items.length > size ? size : items.length;
 		
 		log.trace("RankList.rerank(size=" + sz + ")");
 		
-		 RankItem<K,T>[] newItems = new RankItem[sz];
+		 OldRankItem<K,T>[] newItems = new OldRankItem[sz];
 		 
 		 for (int i = 0; i < sz; i++) {
 			 newItems[i] = items[i];
@@ -96,8 +96,8 @@ public class RankList<K,T> implements TabularData {
 	
 	@SuppressWarnings("unchecked")
 	public Object[] calculateIndex(CompositeData value) {
-		if (value instanceof RankItem) {
-			return new Object[] { ((RankItem<K,T>)value).getKey() };
+		if (value instanceof OldRankItem) {
+			return new Object[] { ((OldRankItem<K,T>)value).getKey() };
 		}
 		
 		throw new IllegalArgumentException("Only RankItems originating from this object are accepted.");
@@ -121,7 +121,7 @@ public class RankList<K,T> implements TabularData {
 			throw new IllegalArgumentException("RankList accepts only single-field keys.");
 		}
 
-		for (RankItem<K,T> item : items) {
+		for (OldRankItem<K,T> item : items) {
 			if (item.getKey().equals(key[0])) {
 				return true;
 			}
@@ -132,7 +132,7 @@ public class RankList<K,T> implements TabularData {
 	
 	
 	public boolean containsValue(CompositeData value) {
-		for (RankItem<K,T> item : items) {
+		for (OldRankItem<K,T> item : items) {
 			if (item.equals(value)) {
 				return true;
 			}
@@ -146,7 +146,7 @@ public class RankList<K,T> implements TabularData {
 			throw new IllegalArgumentException("RankList accepts only single-field keys.");
 		}
 
-		for (RankItem<K,T> item : items) {
+		for (OldRankItem<K,T> item : items) {
 			if (item.getKey().equals(key[0])) {
 				return item;
 			}
@@ -178,7 +178,7 @@ public class RankList<K,T> implements TabularData {
 	
 	public Set<?> keySet() {
 		Set<Object> keys = new HashSet<Object>();
-		for (RankItem<K,T> item : items) {
+		for (OldRankItem<K,T> item : items) {
 			keys.add(item.getKey());
 		}
 		

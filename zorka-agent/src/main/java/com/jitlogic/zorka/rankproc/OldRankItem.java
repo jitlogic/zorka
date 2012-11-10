@@ -33,15 +33,15 @@ import com.jitlogic.zorka.util.ZorkaUtil;
  * @author Rafal Lewczuk <rle@jitlogic.com>
  *
  */
-public class RankItem<K,V> implements CompositeData {
+public class OldRankItem<K,V> implements CompositeData {
 
-	private RateAggregate[] rates;
+	private OldRateAggregate[] rates;
 	private Object[] values;
 	private CompositeType type;
-	private RankLister<K,V> lister;
+	private OldRankLister<K,V> lister;
 	private long lastGen = 0L;
 	
-	public RankItem(RankLister<K,V> lister, CompositeType type, Object[] values, RateAggregate[] rates) {
+	public OldRankItem(OldRankLister<K, V> lister, CompositeType type, Object[] values, OldRateAggregate[] rates) {
 		this.lister = lister;
 		this.type = type;
 		this.values = values.clone();
@@ -56,7 +56,7 @@ public class RankItem<K,V> implements CompositeData {
 		return lastGen;
 	}
 	
-	public RateAggregate[] getRates() {
+	public OldRateAggregate[] getRates() {
 		return rates;
 	}
 	

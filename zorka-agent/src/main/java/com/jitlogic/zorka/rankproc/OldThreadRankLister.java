@@ -43,7 +43,7 @@ import javax.management.openmbean.SimpleType;
  * @author RLE <rafal.lewczuk@jitlogic.com>
  *
  */
-public class ThreadRankLister extends RankLister<Long,ThreadInfo> {
+public class OldThreadRankLister extends OldRankLister<Long,ThreadInfo> {
 
 	private final static String[] xbasicAttr = { 
 		"id", "tstamp", "name", "state", 
@@ -66,14 +66,14 @@ public class ThreadRankLister extends RankLister<Long,ThreadInfo> {
 	
 	private ThreadMXBean threadMXBean;
 	
-	public ThreadRankLister(long updateInterval, long rerankInterval) {
+	public OldThreadRankLister(long updateInterval, long rerankInterval) {
 		super(updateInterval, rerankInterval, xbasicAttr, xbasicDesc, xbasicType);
 		threadMXBean = ManagementFactory.getThreadMXBean();
 		makeCompositeType();
 	}
 		
 	
-	public void updateBasicAttrs(RankItem<Long,ThreadInfo> item, ThreadInfo info, long tstamp) {
+	public void updateBasicAttrs(OldRankItem<Long,ThreadInfo> item, ThreadInfo info, long tstamp) {
 		Object[] v = item.getValues();
 		
 		v[ATTR_ID] = info.getThreadId();

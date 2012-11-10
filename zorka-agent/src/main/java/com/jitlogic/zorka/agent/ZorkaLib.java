@@ -29,8 +29,8 @@ import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
 import com.jitlogic.zorka.rankproc.AvgRateCounter;
-import com.jitlogic.zorka.rankproc.BeanRankLister;
-import com.jitlogic.zorka.rankproc.ThreadRankLister;
+import com.jitlogic.zorka.rankproc.OldBeanRankLister;
+import com.jitlogic.zorka.rankproc.OldThreadRankLister;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
@@ -253,7 +253,7 @@ public class ZorkaLib implements ZorkaService {
 		
 		bean = mbean("java", bname, desc);
 		
-		ThreadRankLister tl = new ThreadRankLister(updateInterval, rerankInterval);
+		OldThreadRankLister tl = new OldThreadRankLister(updateInterval, rerankInterval);
 		tl.newAttr("cpu1",  "CPU utilization 1-minute average",     60000, 100, "cpuTime", "tstamp");
 		tl.newAttr("cpu5",  "CPU utilization 5-minute average",   5*60000, 100, "cpuTime", "tstamp");
 		tl.newAttr("cpu15", "CPU utilization 15-minute average", 15*60000, 100, "cpuTime", "tstamp");
@@ -286,7 +286,7 @@ public class ZorkaLib implements ZorkaService {
 		
 		bean = mbean(mbs, bname, "");
 		
-		BeanRankLister bl = new BeanRankLister(updateInterval, rerankInterval, conn, query, keyName, attrs.split(","), nominalAttr, dividerAttr);
+		OldBeanRankLister bl = new OldBeanRankLister(updateInterval, rerankInterval, conn, query, keyName, attrs.split(","), nominalAttr, dividerAttr);
 		bl.newAttr("avg1", "1-minute average", 60000, 1, nominalAttr, dividerAttr);
 		bl.newAttr("avg5", "5-minutes average", 5*60000, 1, nominalAttr, dividerAttr);
 		bl.newAttr("avg15", "15-minute average", 15*60000, 1, nominalAttr, dividerAttr);

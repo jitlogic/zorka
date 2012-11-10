@@ -17,11 +17,11 @@
 
 package com.jitlogic.zorka.rankproc;
 
-public class BeanRankInfo {
+public class OldBeanRankInfo {
 	private String name;
 	private Object value;
 	
-	public BeanRankInfo(String name, Object value) {
+	public OldBeanRankInfo(String name, Object value) {
 		this.name = name;
 		this.value = value;
 	}

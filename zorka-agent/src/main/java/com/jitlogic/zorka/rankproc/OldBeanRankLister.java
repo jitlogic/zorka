@@ -18,7 +18,6 @@
 package com.jitlogic.zorka.rankproc;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -30,7 +29,7 @@ import javax.management.openmbean.SimpleType;
 import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.util.ObjectInspector;
 
-public class BeanRankLister extends RankLister<String,BeanRankInfo> {
+public class OldBeanRankLister extends OldRankLister<String,OldBeanRankInfo> {
 	
 	private MBeanServerConnection conn;
 	private String query;
@@ -43,10 +42,10 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
     private ObjectInspector inspector = new ObjectInspector();
 	
 	
-	public BeanRankLister(long updateInterval, long rerankInterval,  
-		MBeanServerConnection conn, String query,
-		String keyName, String attrs[],
-		String nominalAttr, String dividerAttr) {
+	public OldBeanRankLister(long updateInterval, long rerankInterval,
+                             MBeanServerConnection conn, String query,
+                             String keyName, String attrs[],
+                             String nominalAttr, String dividerAttr) {
 		
 		super(updateInterval, rerankInterval, null, null, null);
 		
@@ -83,10 +82,10 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 	}
 
     @Override
-	public List<BeanRankInfo> list() {
+	public List<OldBeanRankInfo> list() {
 		Set<ObjectName> names = inspector.queryNames(conn, query);
 		
-		List<BeanRankInfo> lst = new ArrayList<BeanRankInfo>();
+		List<OldBeanRankInfo> lst = new ArrayList<OldBeanRankInfo>();
 		
 		for (ObjectName on : names) {
 			try {
@@ -98,11 +97,11 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 				if (mask != null) {
 					for (Object k2 : inspector.list(obj)) {
 						if (k2.toString().matches(mask)) {
-							lst.add(new BeanRankInfo(key + "." + k2, inspector.get(obj, k2)));
+							lst.add(new OldBeanRankInfo(key + "." + k2, inspector.get(obj, k2)));
 						}
 					}
 				} else {
-					lst.add(new BeanRankInfo(key, obj));
+					lst.add(new OldBeanRankInfo(key, obj));
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -113,13 +112,13 @@ public class BeanRankLister extends RankLister<String,BeanRankInfo> {
 	
 	
 	@Override
-	public String getKey(BeanRankInfo info) {
+	public String getKey(OldBeanRankInfo info) {
 		return info.getName();
 	}
 	
 	
 	@Override
-	public void updateBasicAttrs(RankItem<String, BeanRankInfo> item, BeanRankInfo info, long tstamp) {
+	public void updateBasicAttrs(OldRankItem<String, OldBeanRankInfo> item, OldBeanRankInfo info, long tstamp) {
 		Object[] v = item.getValues();
 		v[0] = info.getName();
 		v[1] = tstamp;

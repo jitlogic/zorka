@@ -35,12 +35,12 @@ public class AvgRateCounter {
     public final static long AVG15 = 15 * 60 * 1000;
 
     private ZorkaLib zorkaLib;
-    private Map<String,RateAggregate> aggregates;
+    private Map<String,OldRateAggregate> aggregates;
 
 
 	public AvgRateCounter(ZorkaLib zorkaLib) {
         this.zorkaLib = zorkaLib;
-		aggregates = new ConcurrentHashMap<String, RateAggregate>();
+		aggregates = new ConcurrentHashMap<String, OldRateAggregate>();
 	}
 
 
@@ -48,10 +48,10 @@ public class AvgRateCounter {
 
         String tag = makeTag(path, nomAttr, divAttr, horizon);
 
-        RateAggregate aggregate = aggregates.get(tag);
+        OldRateAggregate aggregate = aggregates.get(tag);
 
         if (aggregate == null) {
-            aggregate = new RateAggregate(horizon, 0.0);
+            aggregate = new OldRateAggregate(horizon, 0.0);
             aggregates.put(tag, aggregate);
         }
 

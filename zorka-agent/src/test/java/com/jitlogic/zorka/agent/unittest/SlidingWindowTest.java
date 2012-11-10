@@ -17,17 +17,13 @@
 
 package com.jitlogic.zorka.agent.unittest;
 
-import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
-import com.jitlogic.zorka.util.ZorkaLogger;
-import org.junit.After;
+import com.jitlogic.zorka.rankproc.OldRateAggregate;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import com.jitlogic.zorka.rankproc.RateAggregate;
 import com.jitlogic.zorka.agent.testutil.ZorkaTestUtil;
 
 public class SlidingWindowTest extends ZorkaFixture {
@@ -43,14 +39,14 @@ public class SlidingWindowTest extends ZorkaFixture {
 
 	@Test
 	public void testQueryEmptyWindow() throws Exception {
-		RateAggregate wnd = new RateAggregate(100, -1);
+		OldRateAggregate wnd = new OldRateAggregate(100, -1);
 		assertEquals(-1.0, wnd.rate(), 0.0001);
 	}
 	
 	
 	@Test
 	public void testSlidingWindowWithSingleItem() throws Exception {
-		RateAggregate wnd = new RateAggregate(100, -1);
+		OldRateAggregate wnd = new OldRateAggregate(100, -1);
 		wnd.feed(100, 1);
 		assertEquals(0.0, wnd.rate(), 0.0001);
 	}
@@ -58,7 +54,7 @@ public class SlidingWindowTest extends ZorkaFixture {
 	
 	@Test
 	public void testSlidingWindowWithTwoItems() throws Exception {
-		RateAggregate wnd = new RateAggregate(100, -1);
+		OldRateAggregate wnd = new OldRateAggregate(100, -1);
 		wnd.feed(100, 1);
 		wnd.feed(150, 1);
 		assertEquals(50.0, wnd.rate(), 0.0001);
@@ -67,7 +63,7 @@ public class SlidingWindowTest extends ZorkaFixture {
 	
 	@Test
 	public void testWindowNotYetSlide() throws Exception {
-		RateAggregate wnd = new RateAggregate(100, -1);
+		OldRateAggregate wnd = new OldRateAggregate(100, -1);
 		testUtil.mockCurrentTimeMillis(0, 0, 50, 50, 100, 100, 100);
 		wnd.feed(100);
 		wnd.feed(150);
@@ -77,7 +73,7 @@ public class SlidingWindowTest extends ZorkaFixture {
 
 	@Test
 	public void testWindowSlide() throws Exception {
-		RateAggregate wnd = new RateAggregate(100, -1);
+		OldRateAggregate wnd = new OldRateAggregate(100, -1);
 		testUtil.mockCurrentTimeMillis(0, 0, 50, 50, 100, 100, 150);
 		wnd.feed(100);
 		wnd.feed(150);
@@ -87,7 +83,7 @@ public class SlidingWindowTest extends ZorkaFixture {
 	
 	@Test
 	public void testWindowSlideOutOfHorizon() throws Exception {
-		RateAggregate wnd = new RateAggregate(100, -1);
+		OldRateAggregate wnd = new OldRateAggregate(100, -1);
 		testUtil.mockCurrentTimeMillis(0, 0, 50, 50, 100, 100, 1500);
 		wnd.feed(100);
 		wnd.feed(150);
