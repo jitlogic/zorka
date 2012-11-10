@@ -242,6 +242,29 @@ public class ZorkaUtil {
         return dst;
     }
 
+    public static <T> T[] clipArray(T[] src, int len) {
+
+        if (src == null) {
+            return null;
+        }
+
+
+        if (len < 0) {
+            len = src.length - len > 0 ? src.length - len : 0;
+        }
+
+
+        Class<?> arrayType = src.getClass().getComponentType();
+        T[] dst = (T[])java.lang.reflect.Array.newInstance(arrayType, len);
+
+        if (len > 0) {
+            System.arraycopy(src, 0, dst, 0, len);
+        }
+
+        return dst;
+
+    }
+
 
     public static <T> List<T> clip(List<T> src, int maxSize) {
 

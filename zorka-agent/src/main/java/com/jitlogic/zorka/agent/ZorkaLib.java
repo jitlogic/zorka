@@ -32,10 +32,7 @@ import com.jitlogic.zorka.rankproc.*;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
-import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogLevel;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.util.*;
 
 
 /**
@@ -278,23 +275,34 @@ public class ZorkaLib implements ZorkaService {
 
     // TODO some basic testing for unused methods (after unit test / fixtures cleanup)
 
+
     public void logDebug(String message, Object...args) {
-        logger.log("<script>", ZorkaLogLevel.DEBUG, message, null, args);
+        log(ZorkaLogLevel.DEBUG, message, args);
     }
 
 
     public void logInfo(String message, Object...args) {
-        logger.log("<script>", ZorkaLogLevel.INFO, message, null, args);
+        log(ZorkaLogLevel.INFO, message, args);
     }
 
 
     public void logWarning(String message, Object...args) {
-        logger.log("<script>", ZorkaLogLevel.WARN, message, null, args);
+        log(ZorkaLogLevel.WARN, message, args);
     }
 
 
     public void logError(String message, Object...args) {
-        logger.log("<script>", ZorkaLogLevel.ERROR, message, null, args);
+        log(ZorkaLogLevel.ERROR, message, args);
+    }
+
+
+    private void log(ZorkaLogLevel level, String message, Object...args) {
+        Throwable ex = null;
+        if (args.length > 0 && args[args.length-1] instanceof Throwable) {
+            ex = (Throwable)args[args.length-1];
+            args = ZorkaUtil.clipArray(args, -1);
+        }
+        logger.log("<script>", level, message, ex, args);
     }
 
 
@@ -305,7 +313,7 @@ public class ZorkaLib implements ZorkaService {
 
 
 	public void svcStart() {
-	}
+	} // svcStart()
 	
 	
 	public void svcStop() {
@@ -325,18 +333,6 @@ public class ZorkaLib implements ZorkaService {
 	
 	public void svcReload() {
 	} // svcReload()
-	
-	
-	public String reload() {
-		agent.getExecutor().execute(
-		new Runnable() {
-			public void run() {
-				try { Thread.sleep(5); } catch (InterruptedException e) { }
-				agent.svcReload();
-			}
-		});
-		return "OK";
-	}
 
 
     public void registerMbs(String name, MBeanServerConnection mbs) {
@@ -354,7 +350,7 @@ public class ZorkaLib implements ZorkaService {
     }
 
 
-    public RankLister<Rankable> jmxLister(String mbsName, String onMask) {
-        return new JmxAggregatingLister<Rankable>(mbsName, onMask);
+    public <T extends Rankable<?>> RankLister<T> jmxLister(String mbsName, String onMask) {
+        return new JmxAggregatingLister<T>(mbsName, onMask);
     }
 }
