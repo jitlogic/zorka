@@ -17,6 +17,7 @@ package com.jitlogic.zorka.agent.unittest;
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 import com.jitlogic.zorka.mbeans.MethodCallStatistic;
+import com.jitlogic.zorka.rankproc.BucketAggregate;
 import com.jitlogic.zorka.util.ZorkaUtil;
 import junit.framework.Assert;
 import org.junit.Test;
@@ -24,25 +25,25 @@ import org.junit.Test;
 public class ZorkaUtilTest {
 
     public static class TestCallStatistic extends MethodCallStatistic {
-        public TestCallStatistic(String name) { super(name); }
+        public TestCallStatistic(String name) { super(name, BucketAggregate.SEC * 10, 6, 5, 3); }
     }
 
     @Test
     public void testInstanceOf1() throws Exception {
         Assert.assertTrue("immediate implements",
-            ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.mbeans.MethodCallStat"));
+            ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.mbeans.ZorkaStat"));
     }
 
     @Test
     public void testInstanceOf2() throws Exception {
-        Assert.assertTrue("subinterface implements",
+        Assert.assertTrue("subinterface implements",   // TODO find better example (as this one doesn't matter anymore)
                 ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.mbeans.ZorkaStat"));
     }
 
     @Test
     public void testInstanceOf3() throws Exception {
-        Assert.assertTrue("superclass implements subinterface",
-                ZorkaUtil.instanceOf(TestCallStatistic.class, "com.jitlogic.zorka.mbeans.MethodCallStat"));
+        Assert.assertTrue("superclass implements subinterface", // TODO find better example (as this one doesn't matter anymore)
+                ZorkaUtil.instanceOf(TestCallStatistic.class, "com.jitlogic.zorka.mbeans.ZorkaStat"));
     }
 
     @Test

@@ -88,7 +88,7 @@ public class ClosingTimeoutExecutorStressTest {
 
     public void doStress(int n, int sl, int rnd) throws Exception {
         ClosingTimeoutExecutor executor = new ClosingTimeoutExecutor(8, 32, 80);
-        List<TestTask> tasks = new ArrayList<TestTask>(n);
+        List<TestTask> tasks = new ArrayList<TestTask>(n+2);
         Random r = new Random();
 
         System.out.println("Submitting tasks ...");

@@ -47,8 +47,8 @@ public class ClosingTimeoutExecutor implements Executor {
     public ClosingTimeoutExecutor(int nthreads, int qlength, long timeout) {
         //queuedTasks = new ArrayBlockingQueue<Runnable>(qlength);
         queuedTasks = new SynchronousQueue<Runnable>();
-        runnerThreads = new ArrayList<Thread>(nthreads);
-        runnerTasks = new ArrayList<RunnerTask>(nthreads);
+        runnerThreads = new ArrayList<Thread>(nthreads+2);
+        runnerTasks = new ArrayList<RunnerTask>(nthreads+2);
         this.timeout = timeout;
 
         for (int i = 0; i < nthreads; i++) {

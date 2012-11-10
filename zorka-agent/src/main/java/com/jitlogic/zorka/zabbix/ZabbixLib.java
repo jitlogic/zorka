@@ -85,7 +85,7 @@ public class ZabbixLib {
 
         // Iterate over fetched list, resolve path and add attributes
         for (int pidx = 0; pidx < path.length; pidx++) {
-            List<Object> odst = new ArrayList<Object>(osrc.size());
+            List<Object> odst = new ArrayList<Object>(osrc.size()+2);
             JSONArray ddst = new JSONArray();
 
             String pathItem = path[pidx], pathAttr = pattrs[pidx];

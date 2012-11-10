@@ -19,6 +19,7 @@ package com.jitlogic.zorka.agent.unittest;
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.After;
 import org.junit.Before;
@@ -28,23 +29,17 @@ import static org.junit.Assert.*;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
 
-public class MBeanMappingTest {
+public class MBeanMappingTest extends ZorkaFixture {
 
 	private ZorkaMappedMBean bean;
-	
+
+
 	@Before
 	public void setUp() throws Exception {
-        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
-        ZorkaLogger.setLogger(new TestLogger());
         bean = new ZorkaMappedMBean("test");
 	}
 
-    @After
-    public void tearDown() {
-        ZorkaLogger.setLogger(null);
-        ZorkaConfig.cleanup();
-    }
-	
+
 	@Test
 	public void testMapConstantAttr() throws Exception {
 		bean.put("test", 1L);

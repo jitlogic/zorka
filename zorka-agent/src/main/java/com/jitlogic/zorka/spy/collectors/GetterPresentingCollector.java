@@ -61,7 +61,7 @@ public class GetterPresentingCollector implements SpyCollector {
         String attrName = subst(attrTemplate, ctx);
 
         Object obj1 = new AttrGetter(record.get(ON_COLLECT, src), path);
-        Object obj2 = registry.getOrRegisterBeanAttr(mbsName, mbeanName, attrName, obj1, desc);
+        Object obj2 = registry.getOrRegister(mbsName, mbeanName, attrName, obj1, desc);
 
         if (obj1.equals(obj2)) {
             log.warn("Attribute '" + attrName + "' of '" + mbeanName + "' is already used.");

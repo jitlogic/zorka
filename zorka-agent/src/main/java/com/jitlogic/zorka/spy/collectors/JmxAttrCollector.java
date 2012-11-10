@@ -68,33 +68,33 @@ public class JmxAttrCollector implements SpyCollector {
         MethodCallStatistic statistic = cachedStats.get(ctx);
 
         if (statistic == null) {
-            statistic = new MethodCallStatistic(ctx.getMethodName());
+            statistic = MethodCallStatistic.newStatAvg15(ctx.getMethodName()); // TODO make this configurable
             AttrGetter callsGetter = new AttrGetter(statistic, "calls");
             AttrGetter errorGetter = new AttrGetter(statistic, "errors");
             AttrGetter timeGetter = new AttrGetter(statistic, "time");
-            AttrGetter lastGetter = new AttrGetter(statistic, "lastCallTime");
+            AttrGetter lastGetter = new AttrGetter(statistic, "lastSample");
 
             String beanName = subst(beanTemplate,  ctx);
             String attrName = subst(attrTemplate, ctx);
 
             String desc = ctx.getClassName() + "." + ctx.getMethodName();
 
-            if (!callsGetter.equals(registry.getOrRegisterBeanAttr(mbsName, beanName, attrName + "_calls", callsGetter,
+            if (!callsGetter.equals(registry.getOrRegister(mbsName, beanName, attrName + "_calls", callsGetter,
                     desc + " calls"))) {
                 log.warn("Cannot register attribute for " + desc + " calls. Atribute already taken.");
             }
 
-            if (!errorGetter.equals(registry.getOrRegisterBeanAttr(mbsName, beanName, attrName + "_errors", errorGetter,
+            if (!errorGetter.equals(registry.getOrRegister(mbsName, beanName, attrName + "_errors", errorGetter,
                     desc + " errors"))) {
                 log.warn("Cannot register attribute for " + desc + " errors.");
             }
 
-            if (!timeGetter.equals(registry.getOrRegisterBeanAttr(mbsName, beanName, attrName + "_time", timeGetter,
+            if (!timeGetter.equals(registry.getOrRegister(mbsName, beanName, attrName + "_time", timeGetter,
                     desc + " summary execution time"))) {
                 log.warn("Cannot register attribute for " + desc + " summary execution time.");
             }
 
-            if (!lastGetter.equals(registry.getOrRegisterBeanAttr(mbsName, beanName, attrName + "_last", lastGetter,
+            if (!lastGetter.equals(registry.getOrRegister(mbsName, beanName, attrName + "_last", lastGetter,
                     desc + " last call (error) registered"))) {
                 log.warn("Cannot register attribute for " + desc + " last call.");
             }

@@ -15,20 +15,20 @@
  */
 package com.jitlogic.zorka.rankproc;
 
-import java.util.List;
+/**
+ *
+ * @param <T>
+ */
+public interface Rankable<T> {
 
+    public double getAverage(int metric, int average);
 
-public interface RankLister<T extends Rankable<?>> {
+    public String[] getMetrics();
 
-    /**
-     * Returns a list of wrapped items to be used to construct a ranking.
-     *
-     * Returned list must be mutable and rank lister object loses control
-     * over it (that means, any object receiving this list can modify it
-     * without consequences).
-     *
-     * @return list of items to construct ranking
-     */
-    public List<T> list();
+    public String[] getAverages();
+
+    public T getWrapped();
+
+    public String getName();
 
 }

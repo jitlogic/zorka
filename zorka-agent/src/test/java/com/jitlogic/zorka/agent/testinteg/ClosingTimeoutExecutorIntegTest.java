@@ -19,6 +19,7 @@ package com.jitlogic.zorka.agent.testinteg;
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.After;
@@ -35,7 +36,7 @@ import static org.junit.Assert.*;
 /**
  * @author RLE <rafal.lewczuk@gmail.com>
  */
-public class ClosingTimeoutExecutorIntegTest {
+public class ClosingTimeoutExecutorIntegTest extends ZorkaFixture {
 
 
     public static class TestTask implements Runnable, Closeable {
@@ -74,18 +75,6 @@ public class ClosingTimeoutExecutorIntegTest {
         public int getCloses() {
             return closes;
         }
-    }
-
-    @Before
-    public void setUp() {
-        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
-        ZorkaLogger.setLogger(new TestLogger());
-    }
-
-    @After
-    public void tearDown() {
-        ZorkaLogger.setLogger(null);
-        ZorkaConfig.cleanup();;
     }
 
     @Test
@@ -130,7 +119,7 @@ public class ClosingTimeoutExecutorIntegTest {
     public void testQueueOverflow() throws Exception {
         // TODO blinking test !!!
         ClosingTimeoutExecutor executor = new ClosingTimeoutExecutor(2, 2, 500);
-        List<TestTask> tasks = new ArrayList<TestTask>(6);
+        List<TestTask> tasks = new ArrayList<TestTask>(8);
         for (int i = 1; i <= 6; i++)
             tasks.add(new TestTask(i*200));
 

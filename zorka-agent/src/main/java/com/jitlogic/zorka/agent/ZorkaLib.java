@@ -28,16 +28,11 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
-import com.jitlogic.zorka.rankproc.AvgRateCounter;
-import com.jitlogic.zorka.rankproc.BeanRankLister;
-import com.jitlogic.zorka.rankproc.ThreadRankLister;
+import com.jitlogic.zorka.rankproc.*;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
-import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogLevel;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.util.*;
 
 
 /**
@@ -49,7 +44,7 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 public class ZorkaLib implements ZorkaService {
 	
 	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
-    private final ZorkaLogger logger = null; // ZorkaLogger.getLogger();
+    private final ZorkaLogger logger = ZorkaLogger.getLogger();
 	
 	private ZorkaBshAgent agent;
     private Set<JmxObject> registeredObjects = new HashSet<JmxObject>();
@@ -237,66 +232,10 @@ public class ZorkaLib implements ZorkaService {
      * @param attrs
      * @return
      */
-    public ValGetter getter(Object obj, String...attrs) {
+    public ValGetter getter(Object obj, Object...attrs) {
         return new AttrGetter(obj, attrs);
     }
 
-	
-	// TODO move this to "initialization library" script (?)
-	public ZorkaMappedMBean threadRanking(String name, String desc, int size, long rerankInterval) {
-		long updateInterval = 15000;
-		//String bname = "zorka.jvm:name = " + name + ",type=ThreadMonitor,updateInterval=" + updateInterval + ",rerankInterval=" + rerankInterval;
-		String bname = name;
-		
-		ZorkaMappedMBean bean = (ZorkaMappedMBean)jmx("java", bname, "this"); 
-		if (bean != null) { return bean; }
-		
-		bean = mbean("java", bname, desc);
-		
-		ThreadRankLister tl = new ThreadRankLister(updateInterval, rerankInterval);
-		tl.newAttr("cpu1",  "CPU utilization 1-minute average",     60000, 100, "cpuTime", "tstamp");
-		tl.newAttr("cpu5",  "CPU utilization 5-minute average",   5*60000, 100, "cpuTime", "tstamp");
-		tl.newAttr("cpu15", "CPU utilization 15-minute average", 15*60000, 100, "cpuTime", "tstamp");
-		tl.newAttr("block1",  "Blocked time percentage 1-minute average",    60000, 100, "blockedTime", "tstamp");
-		tl.newAttr("block5",  "Blokced time percentage 5-minute average",  5*60000, 100, "blockedTime", "tstamp");
-		tl.newAttr("block15", "Blokced time percentage 15-minute average", 5*60000, 100, "blockedTime", "tstamp");
-		
-		for (String attr : new String[]{ "cpu1", "cpu5", "cpu15", "block1", "block5", "block15" }) { 
-			bean.put(attr, tl.newList(attr, attr, size));
-		}
-		
-		agent.svcAdd(tl);
-		
-		return bean; 
-	}	
-	
-	
-	// TODO move this to "initialization library" script (?)
-	public ZorkaMappedMBean beanRanking(String mbs, String bname, String query, String keyName, String attrs, String nominalAttr, String dividerAttr, int size, long rerankInterval) {
-		long updateInterval = 15000;
-        MBeanServerConnection conn = mbsRegistry.lookup(mbs);
-
-        if (conn == null)  {
-			log.error("There is no mbean server named '" + mbs + "'");
-			return null;
-		}
-		
-		ZorkaMappedMBean bean = (ZorkaMappedMBean)jmx("java", bname, "this");
-		if (bean != null) { return bean; }
-		
-		bean = mbean(mbs, bname, "");
-		
-		BeanRankLister bl = new BeanRankLister(updateInterval, rerankInterval, conn, query, keyName, attrs.split(","), nominalAttr, dividerAttr);
-		bl.newAttr("avg1", "1-minute average", 60000, 1, nominalAttr, dividerAttr);
-		bl.newAttr("avg5", "5-minutes average", 5*60000, 1, nominalAttr, dividerAttr);
-		bl.newAttr("avg15", "15-minute average", 15*60000, 1, nominalAttr, dividerAttr);
-		
-		for (String attr : new String[]{ "avg1", "avg5", "avg15" }) {
-			bean.put(attrs,  bl.newList(attr, attr, size));
-		}
-		
-		return bean;
-	}
 
     private AvgRateCounter rateCounter = new AvgRateCounter(this);
 
@@ -324,7 +263,7 @@ public class ZorkaLib implements ZorkaService {
         String div = (String)args[args.length-2];
         String nom = (String)args[args.length-3];
 
-        List<Object> path = new ArrayList<Object>(args.length-3);
+        List<Object> path = new ArrayList<Object>(args.length+2);
 
         for (int i = 0; i < args.length-3; i++) {
             path.add(args[i]);
@@ -336,29 +275,45 @@ public class ZorkaLib implements ZorkaService {
 
     // TODO some basic testing for unused methods (after unit test / fixtures cleanup)
 
+
     public void logDebug(String message, Object...args) {
-        logger.log("<script>", ZorkaLogLevel.DEBUG, message, null, args);
+        log(ZorkaLogLevel.DEBUG, message, args);
     }
+
 
     public void logInfo(String message, Object...args) {
-        logger.log("<script>", ZorkaLogLevel.INFO, message, null, args);
+        log(ZorkaLogLevel.INFO, message, args);
     }
+
 
     public void logWarning(String message, Object...args) {
-        logger.log("<script>", ZorkaLogLevel.WARN, message, null, args);
+        log(ZorkaLogLevel.WARN, message, args);
     }
 
+
     public void logError(String message, Object...args) {
-        logger.log("<script>", ZorkaLogLevel.ERROR, message, null, args);
+        log(ZorkaLogLevel.ERROR, message, args);
     }
+
+
+    private void log(ZorkaLogLevel level, String message, Object...args) {
+        Throwable ex = null;
+        if (args.length > 0 && args[args.length-1] instanceof Throwable) {
+            ex = (Throwable)args[args.length-1];
+            args = ZorkaUtil.clipArray(args, -1);
+        }
+        logger.log("<script>", level, message, ex, args);
+    }
+
 
     public void reload(String mask) {
         agent.loadScriptDir(ZorkaConfig.getConfDir(),
             "^"+mask.replace("\\.", "\\\\.").replace("*", ".*")+"$");
     }
 
+
 	public void svcStart() {
-	}
+	} // svcStart()
 	
 	
 	public void svcStop() {
@@ -373,26 +328,29 @@ public class ZorkaLib implements ZorkaService {
 	
 	
 	public void svcClear() {
-	}
+	} // svcClear()
 	
 	
 	public void svcReload() {
-	}
-	
-	
-	public String reload() {
-		agent.getExecutor().execute(
-		new Runnable() {
-			public void run() {
-				try { Thread.sleep(5); } catch (InterruptedException e) { }
-				agent.svcReload();
-			}
-		});
-		return "OK";
-	}
+	} // svcReload()
+
 
     public void registerMbs(String name, MBeanServerConnection mbs) {
         mbsRegistry.register(name, mbs, mbs.getClass().getClassLoader());
     }
 
+
+    public <T> T getOrRegister(String mbsName, String beanName, String attrName, T obj) {
+        return mbsRegistry.getOrRegister(mbsName, beanName, attrName, obj);
+    }
+
+
+    public <T> T getOrRegister(String mbsName, String beanName, String attrName, T obj, String desc) {
+        return mbsRegistry.getOrRegister(mbsName, beanName, attrName, obj, desc);
+    }
+
+
+    public <T extends Rankable<?>> RankLister<T> jmxLister(String mbsName, String onMask) {
+        return new JmxAggregatingLister<T>(mbsName, onMask);
+    }
 }

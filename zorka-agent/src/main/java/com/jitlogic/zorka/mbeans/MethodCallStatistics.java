@@ -17,12 +17,16 @@
 
 package com.jitlogic.zorka.mbeans;
 
+import com.jitlogic.zorka.rankproc.RankLister;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class MethodCallStatistics implements ZorkaStats {
+public class MethodCallStatistics implements ZorkaStats, RankLister<MethodCallStatistic> {
 
-	private Map<String, MethodCallStatistic> stats = new HashMap<String, MethodCallStatistic>();
+	private HashMap<String, MethodCallStatistic> stats = new HashMap<String, MethodCallStatistic>();
 
 	
 	public synchronized ZorkaStat getStatistic(String statisticName) {
@@ -43,18 +47,25 @@ public class MethodCallStatistics implements ZorkaStats {
 	}
 
 
-	public synchronized MethodCallStat getMethodCallStatistic(String name) {
+	public synchronized MethodCallStatistic getMethodCallStatistic(String name) {
 		MethodCallStatistic ret = stats.get(name);
 		
 		if (ret == null) {
-			ret = new MethodCallStatistic(name);
+			ret = MethodCallStatistic.newStatAvg15(name);  // TODO make it configurable somewhere ...
 			stats.put(name,  ret);
 		}
 		
 		return ret;
 	}
 
-	public synchronized void clear() {
-		stats.clear();
-	}
+
+    public synchronized List<MethodCallStatistic> list() {
+        ArrayList<MethodCallStatistic> lst = new ArrayList<MethodCallStatistic>(stats.size()+2);
+
+        for (Map.Entry<String, MethodCallStatistic> entry : stats.entrySet()) {
+            lst.add(entry.getValue());
+        }
+
+        return lst;
+    }
 }

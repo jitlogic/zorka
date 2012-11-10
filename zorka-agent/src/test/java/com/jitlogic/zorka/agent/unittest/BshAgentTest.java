@@ -17,12 +17,13 @@
 
 package com.jitlogic.zorka.agent.unittest;
 
+import java.net.URL;
 import java.util.concurrent.Executor;
 
-import com.jitlogic.zorka.agent.AgentInstance;
-import com.jitlogic.zorka.agent.MBeanServerRegistry;
-import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.agent.*;
 import com.jitlogic.zorka.agent.testutil.TestLogger;
+import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
+import com.jitlogic.zorka.util.ObjectDumper;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.zabbix.ZabbixLib;
 import org.json.simple.JSONArray;
@@ -32,74 +33,87 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import com.jitlogic.zorka.agent.ZorkaBshAgent;
+public class BshAgentTest extends ZorkaFixture {
 
-public class BshAgentTest {
-
-	private static class TrivialExecutor implements Executor {
-		public void execute(Runnable command) {
-			command.run();
-		}
-	}
-	
-	ZorkaBshAgent agent;
-	
-	@Before
-	public void setUp() throws Exception {
-        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
-        ZorkaLogger.setLogger(new TestLogger());
-        AgentInstance.setMBeanServerRegistry(new MBeanServerRegistry(true));
-		agent = new ZorkaBshAgent(new TrivialExecutor());
-        ZabbixLib zl = new ZabbixLib(agent, agent.getZorkaLib());
-
-        agent.installModule("zabbix", zl); // TODO move ZabbixLib tests somewhere else ...
-
-		agent.svcStart();
-		agent.loadScript(getClass().getResource("/unittest/BshAgentTest.bsh"));
-	}
-	
-	@After
-	public void tearDown() throws Exception {
-		agent.svcStop();
-        AgentInstance.setMBeanServerRegistry(null);
-        ZorkaLogger.setLogger(null);
-        ZorkaConfig.cleanup();
+    @Before
+    public void setUp() throws Exception {
+        ZabbixLib zl = new ZabbixLib(zorkaAgent, zorkaAgent.getZorkaLib());
+        zorkaAgent.installModule("zabbix", zl);
+        zorkaAgent.loadScript(getClass().getResource("/unittest/BshAgentTest.bsh"));
     }
-	
+
+
 	@Test
 	public void testTrivialQuery() throws Exception {
-		assertEquals("5", agent.query("2+3"));
+		assertEquals("5", zorkaAgent.query("2+3"));
 	}
+
 
 	@Test
 	public void testJmxCalls() throws Exception {
-		assertTrue("1.0", agent.query("zorka.jmx(\"java\",\"java.lang:type=Runtime\",\"SpecVersion\")").startsWith("1."));
+		assertTrue("1.0", zorkaAgent.query("zorka.jmx(\"java\",\"java.lang:type=Runtime\",\"SpecVersion\")").startsWith("1."));
 	}
-	
+
+
 	@Test
 	public void testCreateMappedMBeanWithNoAttrs() throws Exception {
-		assertEquals("ZorkaMappedMBean()", agent.query("zorka.mbean(\"java\", \"zorka:type=jvm,name=GCstats\")"));
+		assertEquals("ZorkaMappedMBean()", zorkaAgent.query("zorka.mbean(\"java\", \"zorka:type=jvm,name=GCstats\")"));
 		
-		String rslt = agent.query("zorka.jmx(\"java\", \"zorka:type=jvm,name=GCstats\")");
+		String rslt = zorkaAgent.query("zorka.jmx(\"java\", \"zorka:type=jvm,name=GCstats\")");
 		assertEquals("zorka:type=jvm,name=GCstats", rslt);
 	}
 
+
 	@Test
 	public void testCreateMappedMBeanWithConstantAttr() throws Exception {
-		assertEquals("OK", agent.query("createBean1()"));
-		String rslt = agent.query("zorka.jmx(\"java\", \"zorka.test:name=Bean1\", \"test1\")");
+		assertEquals("OK", zorkaAgent.query("createBean1()"));
+		String rslt = zorkaAgent.query("zorka.jmx(\"java\", \"zorka.test:name=Bean1\", \"test1\")");
 		assertEquals("1", rslt);
 	}
 
+
     @Test
     public void testZabbixDiscoveryFunc() throws Exception {
-        Object obj = agent.eval("zabbix.discovery(\"java\", \"java.lang:type=MemoryPool,*\", \"name\")");
+        Object obj = zorkaAgent.eval("zabbix.discovery(\"java\", \"java.lang:type=MemoryPool,*\", \"name\")");
         assertTrue("should return JSSONObject", obj instanceof JSONObject);
         Object data = ((JSONObject)obj).get("data");
         assertTrue("obj.data should be JSONArray", data instanceof JSONArray);
-        //JSONArray array = (JSONArray)obj;
-        //System.out.println(((JSONAware)obj).toJSONString());
+    }
+
+
+    @Test
+    public void testNewBshEllipsis() throws Exception {
+        zorkaAgent.installModule("test", new SomeTestLib());
+        String rslt = zorkaAgent.query("test.join(\"a\", \"b\", \"c\")");
+        assertEquals("a:bc", rslt);
+    }
+
+
+    @Test
+    public void testStartAndLoadScripts() throws Exception {
+        zorkaAgent.svcStart();
+        URL url = this.getClass().getResource("/cfg1");
+        zorkaAgent.loadScriptDir(url);
+        assertEquals("oja! right!", query("testLoadScriptDir()"));
+    }
+
+
+    @Test
+    public void testObjectDumper() throws Exception {
+        zorkaAgent.svcStart();
+        Object obj = query("zorka.jmx(\"java\",\"java.lang:type=Runtime\")");
+        String s = ObjectDumper.objectDump(obj);
+        assertTrue(s != null && s.length() > 100);
+    }
+
+
+    private Object query(final String src) throws Exception {
+        ZorkaBasicCallback callback = new ZorkaBasicCallback();
+        ZorkaBshWorker worker = new ZorkaBshWorker(agentInstance.getZorkaAgent(), src, callback);
+        worker.run();
+        return callback.getResult();
     }
 
     public static class SomeTestLib {
@@ -112,10 +126,5 @@ public class BshAgentTest {
         }
     }
 
-    @Test
-    public void testNewBshEllipsis() throws Exception {
-        agent.installModule("test", new SomeTestLib());
-        String rslt = agent.query("test.join(\"a\", \"b\", \"c\")");
-        assertEquals("a:bc", rslt);
-    }
+
 }

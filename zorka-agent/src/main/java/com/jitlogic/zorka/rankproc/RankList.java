@@ -1,198 +1,100 @@
-/** 
+/**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
- * 
- * ZORKA is free software. You can redistribute it and/or modify it under the
+ * <p/>
+ * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
- * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * <p/>
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p/>
+ * You should have received a copy of the GNU General Public License
+ * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jitlogic.zorka.rankproc;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
-import javax.management.openmbean.CompositeData;
-import javax.management.openmbean.TabularData;
-import javax.management.openmbean.TabularType;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+public class RankList<T extends Rankable<?>> implements RankLister<T> {
 
-/**
- * 
- * @author rlewczuk
- *
- */
-public class RankList<K,T> implements TabularData {
+    private RankLister<T> lister;
+    private int metric, average, maxSize;
+    private long rerankTime, lastTime = 0L;
 
-	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
-	
-	private String listName;
-	private String attrName;
-	private int size;
-	
-	private TabularType tabularType;
-	
-	private RankItem<K,T>[] items;
-	
-	
-	@SuppressWarnings("unchecked")
-	public RankList(String listName, String attrName, int size, TabularType tabularType) {
-		this.listName = listName;
-		this.attrName = attrName;
-		this.size = size;
-		this.tabularType = tabularType;
-		this.items = new RankItem[0];
-	}
-	
-	
-	public String getListName() {
-		return listName;
-	}
-	
-	
-	public String getAttrName() {
-		return attrName;
-	}
-	
-	public void updateType(TabularType tabularType) {
-		this.tabularType = tabularType;
-	}
-	
-	
-	@SuppressWarnings("unchecked")
-	public void refresh(RankItem<K,T>[] items) {
-		
-		int sz = items.length > size ? size : items.length;
-		
-		log.trace("RankList.rerank(size=" + sz + ")");
-		
-		 RankItem<K,T>[] newItems = new RankItem[sz];
-		 
-		 for (int i = 0; i < sz; i++) {
-			 newItems[i] = items[i];
-		 }
-		
-		this.items = newItems;
-	}
-	
-	
-	public TabularType getTabularType() {
-		log.trace("getTabularType()");
-		return tabularType;
-	}
-	
-	
-	@SuppressWarnings("unchecked")
-	public Object[] calculateIndex(CompositeData value) {
-		if (value instanceof RankItem) {
-			return new Object[] { ((RankItem<K,T>)value).getKey() };
-		}
-		
-		throw new IllegalArgumentException("Only RankItems originating from this object are accepted.");
-	}
+    private int numReranks = 0;
 
-	
-	public int size() {
-		int sz = items != null ? items.length : 0;
-		log.trace("Returning size:" + sz);
-		return sz;
-	}
-	
-	
-	public boolean isEmpty() {
-		return size() == 0;
-	}
-	
-	
-	public boolean containsKey(Object[] key) {
-		if (key.length != 1) {
-			throw new IllegalArgumentException("RankList accepts only single-field keys.");
-		}
+    private List<T> rankList;
 
-		for (RankItem<K,T> item : items) {
-			if (item.getKey().equals(key[0])) {
-				return true;
-			}
-		}
-			
-		return false;
-	}
-	
-	
-	public boolean containsValue(CompositeData value) {
-		for (RankItem<K,T> item : items) {
-			if (item.equals(value)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	
-	public CompositeData get(Object[] key) {
-		if (key.length != 1) {
-			throw new IllegalArgumentException("RankList accepts only single-field keys.");
-		}
+    private ZorkaUtil util = ZorkaUtil.getInstance();
 
-		for (RankItem<K,T> item : items) {
-			if (item.getKey().equals(key[0])) {
-				return item;
-			}
-		}
-		
-		return null; 
-	}
-	
-	
-	public void put(CompositeData value) {
-		throw new UnsupportedOperationException("Manual putting values to ranking list is not supported.");
-	}
-	
-	
-	public CompositeData remove(Object[] key) {
-		throw new UnsupportedOperationException("Manual removal of values from ranking list is not supported.");
-	}
-	
-	
-	public void putAll(CompositeData[] values) {
-		throw new UnsupportedOperationException("Manual putting values to ranking list is not supported.");
-	}
-	
-	
-	public void clear() {
-		
-	}
-	
-	
-	public Set<?> keySet() {
-		Set<Object> keys = new HashSet<Object>();
-		for (RankItem<K,T> item : items) {
-			keys.add(item.getKey());
-		}
-		
-		return keys;
-	}
-	
-	
-	public Collection<?> values() {
-		return Arrays.asList(items);
-	}
-	
-	@Override
-	public String toString() {
-		return "RankList(size=" + size + ")";
-	}
-	
+    private Comparator<T> comparator = new Comparator<T>() {
+        public int compare(T o1, T o2) {
+            double dd = o2.getAverage(metric, average) - o1.getAverage(metric, average);
+            return dd == 0.0 ? 0 : dd > 0 ? 1 : -1;
+        }
+    };
+
+    public RankList(RankLister<T> lister, int maxSize, int metric, int average, long rerankTime) {
+        this.lister = lister;
+        this.maxSize = maxSize;
+        this.metric = metric;
+        this.average = average;
+        this.rerankTime = rerankTime;
+    }
+
+
+    public synchronized T get(int i) {
+
+        if (util.currentTimeMillis() > lastTime + rerankTime) {
+            rerank();
+        }
+
+        try {
+            return rankList.get(i);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
+
+    }
+
+
+    public synchronized List<T> list() {
+
+        if (util.currentTimeMillis() > lastTime + rerankTime) {
+            rerank();
+        }
+
+        return rankList;
+    }
+
+
+    public synchronized int size() {
+
+        if (util.currentTimeMillis() > lastTime + rerankTime) {
+            rerank();
+        }
+
+        return rankList.size();
+    }
+
+
+    private void rerank() {
+        List<T> lst = lister.list();
+        Collections.sort(lst, comparator);
+
+        rankList = Collections.unmodifiableList(ZorkaUtil.clip(lst, maxSize));
+
+        numReranks++;
+    }
+
+
+    public synchronized int getNumReranks() {
+        return numReranks;
+    }
 }

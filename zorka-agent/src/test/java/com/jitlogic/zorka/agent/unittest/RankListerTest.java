@@ -20,41 +20,33 @@ package com.jitlogic.zorka.agent.unittest;
 
 import java.util.Collection;
 
-import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.agent.testutil.TestLogger;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.agent.testutil.OldTestRankLister;
+import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
+import com.jitlogic.zorka.rankproc.OldRankItem;
+import com.jitlogic.zorka.rankproc.OldRankList;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import com.jitlogic.zorka.rankproc.RankItem;
-import com.jitlogic.zorka.rankproc.RankList;
-import com.jitlogic.zorka.agent.testutil.TestRankLister;
+
+public class RankListerTest extends ZorkaFixture {
+
+	OldTestRankLister lister;
 
 
-public class RankListerTest {
-
-	TestRankLister lister;
-	
 	@Before
 	public void setUp() {
-        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
-        ZorkaLogger.setLogger(new TestLogger());
-        lister = new TestRankLister(60, 600);
+        lister = new OldTestRankLister(60, 600);
 	}
 
-    public void tearDown() {
-        ZorkaLogger.setLogger(null);
-        ZorkaConfig.cleanup();
-    }
 
 	@Test
 	public void testCreateSimpleRankList() throws Exception {
 		lister.testFeed(1,10,10, 2,20,20, 3,30,30, 4,40,40);
 		lister.update(100);
 		
-		RankList<Long,Long[]> rlist = lister.newList("v1", "v1", 3);
+		OldRankList<Long,Long[]> rlist = lister.newList("v1", "v1", 3);
 		
 		assertNotNull(rlist);
 		assertNotNull(rlist.values());
@@ -66,7 +58,7 @@ public class RankListerTest {
 		lister.testFeed(1,10,10, 2,20,20, 3,30,30, 4,40,40);
 		lister.update(10);
 		
-		RankList<Long,Long[]> rlist = lister.newList("v1", "v1", 3);		
+		OldRankList<Long,Long[]> rlist = lister.newList("v1", "v1", 3);
 		lister.rerank(10);
 		
 		Collection<?> vals = rlist.values();
@@ -78,7 +70,7 @@ public class RankListerTest {
 	public void testCreateDerivedAttr() throws Exception {
 		lister.testFeed(1,10,10, 2,20,20, 3,30,30, 4,40,40);
 		lister.newAttr("d1", "derived1", 60, 1, "v1", "tstamp");
-		RankList<Long,Long[]> rlist = lister.newList("d1", "d1", 3);		
+		OldRankList<Long,Long[]> rlist = lister.newList("d1", "d1", 3);
 
 		lister.update(10);
 		lister.rerank(10);
@@ -94,7 +86,7 @@ public class RankListerTest {
 		lister.testFeed(1,10,10, 2,20,20, 3,30,30, 4,40,40);
 		lister.testFeed(1,20,20, 2,22,22, 3,33,33, 4,44,44);
 		lister.newAttr("d1", "derived1", 60, 1, "v1", "tstamp");
-		RankList<Long,Long[]> rlist = lister.newList("d1", "d1", 3);		
+		OldRankList<Long,Long[]> rlist = lister.newList("d1", "d1", 3);
 
 		lister.update(10);
 		lister.update(20);
@@ -102,13 +94,13 @@ public class RankListerTest {
 		
 		Collection<?> vals = rlist.values();
 		assertEquals(3, vals.size());
-		assertEquals(1L, (long)(Long)((RankItem<Long,Long[]>)vals.toArray()[0]).getKey());
+		assertEquals(1L, (long)(Long)((OldRankItem<Long,Long[]>)vals.toArray()[0]).getKey());
 	}
 	
 	
 	@Test
 	public void testEmptyRankingBeforeRerank() throws Exception {
-		RankList<Long,Long[]> rlist = lister.newList("v1", "v1", 3);		
+		OldRankList<Long,Long[]> rlist = lister.newList("v1", "v1", 3);
 		
 		Collection<?> vals = rlist.values();
 		assertEquals(0, vals.size());

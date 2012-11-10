@@ -19,7 +19,6 @@ package com.jitlogic.zorka.agent.manualtest;
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.mbeans.TabularDataGetter;
 import com.jitlogic.zorka.mbeans.TabularDataWrapper;
-import org.junit.Test;
 
 import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
@@ -50,7 +49,7 @@ public class JmxDataPresentationManualTest extends ZorkaFixture {
                 new String[] { "name", "type", "val" },
                 new OpenType[] {SimpleType.STRING, SimpleType.STRING, SimpleType.INTEGER  } );
 
-        mBeanServerRegistry.getOrRegisterBeanAttr("java", "zorka:name=TabularWrapperTest", "table", tdw, "Test table");
+        mBeanServerRegistry.getOrRegister("java", "zorka:name=TabularWrapperTest", "table", tdw, "Test table");
 
         while (true) Thread.sleep(1000);
     }
@@ -61,7 +60,7 @@ public class JmxDataPresentationManualTest extends ZorkaFixture {
                 new String[] { "name", "type", "val" }, new String[] { "name", "type", "val" },
                 new OpenType[] {SimpleType.STRING, SimpleType.STRING, SimpleType.INTEGER });
 
-        mBeanServerRegistry.getOrRegisterBeanAttr("java", "zorka:name=TabularTest1", "table", getter, "Test table");
+        mBeanServerRegistry.getOrRegister("java", "zorka:name=TabularTest1", "table", getter, "Test table");
 
         while (true) Thread.sleep(1000);
     }

@@ -28,12 +28,9 @@ public class AggregateCountingTest {
     public void testBucketConstructAndCheckWindowsCalculation() {
         BucketAggregate bag = new BucketAggregate(SEC, 60, 5, 3);
 
-        long[] windows = bag.getWindows();
-
-        assertNotNull(windows);
-        assertEquals(4, windows.length);
-        assertEquals(1*SEC, windows[0]);
-        assertEquals(900*SEC, windows[3]);
+        assertEquals(4, bag.size());
+        assertEquals(1*SEC, bag.getWindow(0));
+        assertEquals(900*SEC, bag.getWindow(3));
     }
 
 

@@ -15,10 +15,7 @@
  */
 package com.jitlogic.zorka.agent.testutil;
 
-import com.jitlogic.zorka.agent.AgentInstance;
-import com.jitlogic.zorka.agent.MBeanServerRegistry;
-import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.agent.*;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
@@ -34,12 +31,14 @@ public class ZorkaFixture {
     protected Properties configProperties;
     protected TestLogger testLogger;
     protected MBeanServer testMbs;
+    private ZorkaTestUtil testUtil;
     protected MBeanServerRegistry mBeanServerRegistry;
 
     protected AgentInstance agentInstance;
     protected SpyInstance spyInstance;
 
     protected ZorkaBshAgent zorkaAgent;
+    protected ZorkaLib zorkaLib;
 
     @Before
     public void setUpFixture() {
@@ -66,9 +65,12 @@ public class ZorkaFixture {
 
         spyInstance = agentInstance.getSpyInstance();
         zorkaAgent = agentInstance.getZorkaAgent();
+        zorkaLib = zorkaAgent.getZorkaLib();
 
         testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
         mBeanServerRegistry.register("test", testMbs, testMbs.getClass().getClassLoader());
+
+        testUtil = ZorkaTestUtil.setUp();
     }
 
     @After
