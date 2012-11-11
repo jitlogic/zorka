@@ -29,7 +29,7 @@ public class AgentMain {
 
 
         mBeanServerRegistry = new MBeanServerRegistry(
-            "yes".equalsIgnoreCase(ZorkaConfig.getProperties().getProperty("zorka.mbs.autoregister", "yes")));
+            "yes".equalsIgnoreCase(ZorkaConfig.getProperties().getProperty(ZorkaConfig.ZORKA_MBS_AUTOREG)));
         AgentInstance.setMBeanServerRegistry(mBeanServerRegistry);
 
         agent = AgentInstance.instance();
