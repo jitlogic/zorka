@@ -22,7 +22,7 @@ import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.zabbix.ZabbixAgent;
+import com.jitlogic.zorka.integ.zabbix.ZabbixAgent;
 
 import javax.management.MBeanServerConnection;
 import java.lang.instrument.ClassFileTransformer;
