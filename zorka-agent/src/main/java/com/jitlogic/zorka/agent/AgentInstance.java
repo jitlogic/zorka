@@ -16,18 +16,21 @@
 
 package com.jitlogic.zorka.agent;
 
+import com.jitlogic.zorka.integ.nagios.NagiosAgent;
 import com.jitlogic.zorka.spy.MainSubmitter;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.zabbix.ZabbixAgent;
+import com.jitlogic.zorka.integ.zabbix.ZabbixAgent;
 
 import javax.management.MBeanServerConnection;
 import java.lang.instrument.ClassFileTransformer;
 import java.util.Properties;
 import java.util.concurrent.Executor;
+
+import static com.jitlogic.zorka.agent.ZorkaConfig.*;
 
 public class AgentInstance {
 
@@ -72,6 +75,7 @@ public class AgentInstance {
     private Executor executor = null;
     private ZorkaBshAgent zorkaAgent = null;
     private ZabbixAgent zabbixAgent = null;
+    private NagiosAgent nagiosAgent = null;
 
     private SpyLib spyLib = null;
     private SpyInstance spyInstance = null;
@@ -89,21 +93,21 @@ public class AgentInstance {
         this.props = props;
 
         try {
-            requestTimeout = Long.parseLong(props.getProperty("zorka.req.timeout", "15000").trim());
+            requestTimeout = Long.parseLong(props.getProperty(ZORKA_REQ_TIMEOUT).trim());
         } catch (NumberFormatException e) {
-            log.error("Invalid zorka.req.timeout setting: '" + props.getProperty("zorka.req.timeout", "15000").trim());
+            log.error("Invalid " + ZORKA_REQ_TIMEOUT +  " property: '" + props.getProperty(ZORKA_REQ_TIMEOUT).trim() + "'");
         }
 
         try {
-            requestThreads = Integer.parseInt(props.getProperty("zorka.req.threads", "4").trim());
+            requestThreads = Integer.parseInt(props.getProperty(ZORKA_REQ_THREADS).trim());
         } catch (NumberFormatException e) {
-            log.error("Invalid zorka.req.threads setting: '" + props.getProperty("zorka.req.threads", "4").trim());
+            log.error("Invalid " + ZORKA_REQ_THREADS + " setting: '" + props.getProperty(ZORKA_REQ_THREADS).trim() + "'");
         }
 
         try {
-            requestQueue = Integer.parseInt(props.getProperty("zorka.req.queue", "64").trim());
+            requestQueue = Integer.parseInt(props.getProperty(ZORKA_REQ_QUEUE).trim());
         } catch (NumberFormatException e) {
-            log.error("Invalid zorka.req.queue setting: '" + props.getProperty("zorka.req.queue", "64").trim());
+            log.error("Invalid " + ZORKA_REQ_QUEUE + "setting: '" + props.getProperty(ZORKA_REQ_QUEUE).trim() + "'");
         }
     }
 
@@ -114,7 +118,7 @@ public class AgentInstance {
 
         zorkaAgent = new ZorkaBshAgent(executor);
 
-        if (props.getProperty("spy", "yes").equalsIgnoreCase("yes")) {
+        if ("yes".equalsIgnoreCase(props.getProperty(SPY_ENABLE))) {
             log.info("Enabling Zorka SPY");
             spyInstance = SpyInstance.instance();
             spyLib = new SpyLib(spyInstance);
@@ -125,13 +129,18 @@ public class AgentInstance {
             log.info("Zorka SPY is diabled. No loaded classes will be transformed in any way.");
         }
 
-        zorkaAgent.loadScriptDir(props.getProperty("zorka.config.dir", ZorkaConfig.DEFAULT_CONFDIR), ".*\\.bsh$");
+        zorkaAgent.loadScriptDir(props.getProperty(ZORKA_CONF_DIR), ".*\\.bsh$");
 
         zorkaAgent.svcStart();
 
-        if (props.getProperty("zabbix.enabled", "yes").equalsIgnoreCase("yes")) {
+        if ("yes".equalsIgnoreCase(props.getProperty(ZABBIX_ENABLE))) {
             zabbixAgent = new ZabbixAgent(zorkaAgent);
             zabbixAgent.start();
+        }
+
+        if ("yes".equalsIgnoreCase(props.getProperty(NAGIOS_ENABLE))) {
+            nagiosAgent = new NagiosAgent(zorkaAgent);
+            nagiosAgent.start();
         }
     }
 

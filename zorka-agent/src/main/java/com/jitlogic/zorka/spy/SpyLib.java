@@ -17,6 +17,13 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.util.ObjectInspector;
+import com.jitlogic.zorka.util.ZorkaUtil;
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * This is API for zorka users.
  */
@@ -59,6 +66,49 @@ public class SpyLib {
         return SpyDefinition.instrument().onSubmit().timeDiff(0,1,1).onEnter();
     }
 
+
     // TODO instrument(String expr) convenience function;
+    public SpyDefinition instrument(String mbsName, String mbeanName, String attrName, String expr) {
+
+        List<Integer> argList = new ArrayList<Integer>();
+
+        Matcher m = ObjectInspector.reVarSubstPattern.matcher(expr);
+
+        // Find out all used arguments
+        while (m.find()) {
+            String[] segs = m.group(1).split("\\.");
+            if (segs[0].matches("^[0-9]+$")) {
+                Integer arg = Integer.parseInt(segs[0]);
+                if (!argList.contains(arg)) {
+                    argList.add(arg);
+                }
+            }
+        }
+
+        // Patch expression string to match argList data
+        StringBuffer sb = new StringBuffer(expr.length()+4);
+        m = ObjectInspector.reVarSubstPattern.matcher(expr);
+
+        while (m.find()) {
+            String[] segs = m.group(1).split("\\.");
+            if (segs[0].matches("^[0-9]+$")) {
+                segs[0] = ""+argList.indexOf(Integer.parseInt(segs[0]));
+                m.appendReplacement(sb, "\\${" + ZorkaUtil.join(".", segs) + "}");
+            }
+        }
+
+        m.appendTail(sb);
+
+
+        // Create and return spy definition
+
+        int tidx = argList.size();
+
+        return SpyDefinition.instance()
+                .onEnter().withArguments(argList.toArray()).withTime()
+                .onReturn().withTime().onError().withTime()
+                .onSubmit().timeDiff(tidx, tidx+1, tidx+1)
+                .toStats(mbsName, mbeanName, attrName, sb.toString(), tidx, tidx+1);
+    }
 
 }

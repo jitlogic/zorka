@@ -1,4 +1,4 @@
-package com.jitlogic.zorka.zabbix;
+package com.jitlogic.zorka.integ.zabbix;
 
 import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;

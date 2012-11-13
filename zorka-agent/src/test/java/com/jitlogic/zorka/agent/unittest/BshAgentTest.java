@@ -18,18 +18,13 @@
 package com.jitlogic.zorka.agent.unittest;
 
 import java.net.URL;
-import java.util.concurrent.Executor;
 
 import com.jitlogic.zorka.agent.*;
-import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.util.ObjectDumper;
-import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.zabbix.ZabbixLib;
+import com.jitlogic.zorka.integ.zabbix.ZabbixLib;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;

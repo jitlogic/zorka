@@ -3,11 +3,9 @@ package com.jitlogic.zorka.agent.unittest;
 import com.jitlogic.zorka.agent.*;
 import com.jitlogic.zorka.agent.testutil.*;
 import com.jitlogic.zorka.rankproc.AvgRateCounter;
-import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.zabbix.ZabbixLib;
+import com.jitlogic.zorka.integ.zabbix.ZabbixLib;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 

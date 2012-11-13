@@ -21,23 +21,39 @@ import com.jitlogic.zorka.spy.SpyRecord;
 
 public class TimeDiffProcessor implements SpyProcessor {
 
-    private int in1, in2, out;
+    private int tStartSlot, tStopSlot, rsltSlot;
 
-    public TimeDiffProcessor(int in1, int in2, int out) {
-        this.in1 = in1;
-        this.in2 = in2;
-        this.out = out;
+
+    public TimeDiffProcessor(int tStartSlot, int tStopSlot, int rsltSlot) {
+        this.tStartSlot = tStartSlot;
+        this.tStopSlot = tStopSlot;
+        this.rsltSlot = rsltSlot;
     }
 
+
     public SpyRecord process(int stage, SpyRecord record) {
-        Object v1 = record.get(stage, in1), v2 = record.get(stage, in2);
+        Object v1 = record.get(stage, tStartSlot), v2 = record.get(stage, tStopSlot);
 
         if (v1 instanceof Long && v2 instanceof Long) {
             long l1 = (Long)v1, l2 = (Long)v2;
-            record.put(stage, out, l2-l1);
+            record.put(stage, rsltSlot, l2-l1);
         } // TODO else (log something here ?)
 
         return record;
     }
 
+
+    public int getStartSlot() {
+        return tStartSlot;
+    }
+
+
+    public int getStopSlot() {
+        return tStopSlot;
+    }
+
+
+    public int getResultSlot() {
+        return rsltSlot;
+    }
 }
