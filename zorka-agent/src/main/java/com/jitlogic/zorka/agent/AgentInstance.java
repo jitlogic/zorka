@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.agent;
 
+import com.jitlogic.zorka.integ.nagios.NagiosAgent;
 import com.jitlogic.zorka.spy.MainSubmitter;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyLib;
@@ -74,6 +75,7 @@ public class AgentInstance {
     private Executor executor = null;
     private ZorkaBshAgent zorkaAgent = null;
     private ZabbixAgent zabbixAgent = null;
+    private NagiosAgent nagiosAgent = null;
 
     private SpyLib spyLib = null;
     private SpyInstance spyInstance = null;
@@ -134,6 +136,11 @@ public class AgentInstance {
         if ("yes".equalsIgnoreCase(props.getProperty(ZABBIX_ENABLE))) {
             zabbixAgent = new ZabbixAgent(zorkaAgent);
             zabbixAgent.start();
+        }
+
+        if ("yes".equalsIgnoreCase(props.getProperty(NAGIOS_ENABLE))) {
+            nagiosAgent = new NagiosAgent(zorkaAgent);
+            nagiosAgent.start();
         }
     }
 

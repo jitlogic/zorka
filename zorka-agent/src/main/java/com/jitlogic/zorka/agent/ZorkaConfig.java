@@ -56,6 +56,8 @@ public class ZorkaConfig {
 
     public final static String ZABBIX_ENABLE = "zabbix";
 
+    public final static String NAGIOS_ENABLE = "nagios";
+
     public final static String ZORKA_HOME_DIR = "zorka.home.dir";
     public final static String ZORKA_CONF_DIR = "zorka.config.dir";
     public final static String ZORKA_LOG_DIR = "zorka.log.dir";
