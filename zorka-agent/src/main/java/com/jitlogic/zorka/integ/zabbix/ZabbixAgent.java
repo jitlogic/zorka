@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.zabbix;
+package com.jitlogic.zorka.integ.zabbix;
 
 
 import java.io.IOException;
@@ -60,7 +60,7 @@ public class ZabbixAgent implements Runnable {
 			listenPort = Integer.parseInt(props.getProperty("zabbix.listen.port", "10055"));
 		} catch (Exception e) {
 			log.error("Invalid 'listen_port' setting in zabbix.properties file. Was '" +
-						props.getProperty("zorka.listen.port", "10055") + "', should be integer.");
+						props.getProperty("zabbix.listen.port", "10055") + "', should be integer.");
 		}
 
         try {

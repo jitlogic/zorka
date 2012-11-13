@@ -6,6 +6,8 @@ import java.io.*;
 import java.util.Date;
 import java.util.Properties;
 
+import static com.jitlogic.zorka.agent.ZorkaConfig.*;
+
 /**
  * This has been written from scratch in order to not interfere with
  * other logging frameworks.
@@ -44,7 +46,7 @@ public class ZorkaLogger {
     }
 
 
-    private String logDir;
+    private String logDir, logFileName;
     private boolean logExceptions = false;
     private boolean doTrace;
     private ZorkaLogLevel logThreshold = ZorkaLogLevel.DEBUG;
@@ -61,15 +63,15 @@ public class ZorkaLogger {
 
     public ZorkaLogger() {
         logDir = ZorkaConfig.getLogDir();
-        Properties props = ZorkaConfig.getProperties(); // TODO make constructor argument of it
-        logExceptions = "yes".equalsIgnoreCase(props.getProperty("zorka.log.exceptions", "yes"));
-        doTrace = "yes".equalsIgnoreCase(props.getProperty("zorka.log.trace", "no"));
+        Properties props = ZorkaConfig.getProperties();
+        logExceptions = "yes".equalsIgnoreCase(props.getProperty(ZORKA_LOG_EXCEPTIONS));
+        doTrace = "yes".equalsIgnoreCase(props.getProperty(ZORKA_LOG_TRACE));
+        logFileName = props.getProperty(ZORKA_LOG_FNAME).trim();
 
         try {
-            logThreshold = ZorkaLogLevel.valueOf (props.getProperty("zorka.log.level", "DEBUG"));
-            maxSize = ZorkaUtil.parseIntSize(props.getProperty("zorka.log.size", "1048576").trim());
-            maxLogs = ZorkaUtil.parseIntSize(props.getProperty("zorka.log.fnum", "4").trim());
-            logExceptions = "yes".equalsIgnoreCase(props.getProperty("zorka.log.exceptions", "no").trim());
+            logThreshold = ZorkaLogLevel.valueOf (props.getProperty(ZORKA_LOG_LEVEL));
+            maxSize = ZorkaUtil.parseIntSize(props.getProperty(ZORKA_LOG_SIZE).trim());
+            maxLogs = ZorkaUtil.parseIntSize(props.getProperty(ZORKA_LOG_NUM).trim());
         } catch (Exception e) {
             System.err.println("Error parsing logger arguments: " + e.getMessage());
             e.printStackTrace();
@@ -143,7 +145,7 @@ public class ZorkaLogger {
 
         try {
             rotate();
-            os = new FileOutputStream(logDir + "/zorka.log");
+            os = new FileOutputStream(logDir + "/" + logFileName);
             out = new PrintStream(os);
             currentSize = 0;
         } catch (Exception e) {
@@ -154,21 +156,21 @@ public class ZorkaLogger {
 
 
     private void rotate() {
-        File f = new File(logDir + "/zorka.log." + maxLogs);
+        File f = new File(logDir + "/" + logFileName + "." + maxLogs);
         if (f.exists()) {
             f.delete();
         }
 
         for (int i = maxLogs-1; i >= 0; i--) {
-            f = new File(logDir + "/zorka.log." + i);
+            f = new File(logDir + "/" + logFileName + "." + i);
             if (f.exists()) {
-                File nf = new File(logDir + "/zorka.log." + (i+1));
+                File nf = new File(logDir + "/" + logFileName + "." + (i+1));
                 f.renameTo(nf);
             }
         }
 
-        f = new File(logDir + "/zorka.log");
-        File nf = new File(logDir + "/zorka.log.0");
+        f = new File(logDir + "/" + logFileName);
+        File nf = new File(logDir + "/" + logFileName + ".0");
         f.renameTo(nf);
     }
 }

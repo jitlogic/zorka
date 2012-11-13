@@ -229,10 +229,10 @@ public class ObjectInspector {
         }
     }
 
-    private Pattern pattern = Pattern.compile("\\$\\{([^\\}]+)\\}");
+    public final static Pattern reVarSubstPattern = Pattern.compile("\\$\\{([^\\}]+)\\}");
 
     public String substitute(String input, Object[] vals) {
-        Matcher m = pattern.matcher(input);
+        Matcher m = reVarSubstPattern.matcher(input);
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
             String expr = m.group(1);

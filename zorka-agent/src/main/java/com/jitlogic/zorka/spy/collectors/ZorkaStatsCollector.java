@@ -111,4 +111,32 @@ public class ZorkaStatsCollector implements SpyCollector {
     }
 
 
+    public String getMbsName() {
+        return mbsName;
+    }
+
+
+    public String getMbeanTemplate() {
+        return mbeanTemplate;
+    }
+
+
+    public String getAttrTemplate() {
+        return attrTemplate;
+    }
+
+
+    public int getTimeField() {
+        return timeField;
+    }
+
+
+    public int getTstampField() {
+        return tstampField;
+    }
+
+
+    public String getKeyTemplate() {
+        return keyTemplate;
+    }
 }

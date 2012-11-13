@@ -42,7 +42,8 @@ public class ZorkaFixture {
 
     @Before
     public void setUpFixture() {
-        configProperties = setProps(new Properties(),
+        configProperties = setProps(
+                ZorkaConfig.defaultProperties(),
                 "zorka.home.dir", "/tmp",
                 "zabbix.enabled", "no",
                 "zorka.hostname", "test",

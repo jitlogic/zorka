@@ -35,7 +35,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
     <parent>
         <groupId>com.jitlogic.zorka</groupId>
         <artifactId>zorka</artifactId>
-        <version>0.3</version>
+        <version>0.3.1-SNAPSHOT</version>
     </parent>
     <build>
         <plugins>
@@ -97,5 +97,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                 </executions>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 </project>

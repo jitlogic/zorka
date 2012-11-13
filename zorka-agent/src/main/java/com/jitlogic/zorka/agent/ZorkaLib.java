@@ -58,13 +58,14 @@ public class ZorkaLib implements ZorkaService {
     public ZorkaLib(ZorkaBshAgent agent) {
 		this.agent = agent;
         this.mbsRegistry = AgentInstance.getMBeanServerRegistry();
-        this.hostname = ZorkaConfig.getProperties().getProperty("zorka.hostname", "null").trim();
+        this.hostname = ZorkaConfig.getProperties().getProperty(ZorkaConfig.ZORKA_HOSTNAME).trim();
 	}
 
 
 	public String version() {
-		return ZorkaBshAgent.VERSION;
+		return ZorkaConfig.getProperties().getProperty(ZorkaConfig.ZORKA_VERSION).trim();
 	}
+
 
     public void setHostname(String hostname) {
         this.hostname = hostname;

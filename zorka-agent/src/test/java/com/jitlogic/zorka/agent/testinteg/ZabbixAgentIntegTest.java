@@ -33,8 +33,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.zabbix.ZabbixAgent;
-import com.jitlogic.zorka.zabbix.ZabbixRequestHandler;
+import com.jitlogic.zorka.integ.zabbix.ZabbixAgent;
+import com.jitlogic.zorka.integ.zabbix.ZabbixRequestHandler;
 import com.jitlogic.zorka.agent.ZorkaConfig;
 
 public class ZabbixAgentIntegTest {
@@ -81,7 +81,8 @@ public class ZabbixAgentIntegTest {
 	
 	@Test
 	public void testTrivialRequestAsync() throws Exception {
-		assertEquals(ZorkaBshAgent.VERSION, query("zorka__version[]"));
+		assertEquals(ZorkaConfig.getProperties().getProperty(ZorkaConfig.ZORKA_VERSION),
+                query("zorka__version[]"));
 	}
 	
 	@Test

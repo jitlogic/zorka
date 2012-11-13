@@ -43,11 +43,36 @@ import java.util.Properties;
  */
 public class ZorkaConfig {
 
+    public final static String ZORKA_VERSION = "zorka.version";
+    public final static String ZORKA_HOSTNAME = "zorka.hostname";
+
+    public final static String ZORKA_REQ_TIMEOUT = "zorka.req.timeout";
+    public final static String ZORKA_REQ_THREADS = "zorka.req.threads";
+    public final static String ZORKA_REQ_QUEUE = "zorka.req.queue";
+    public final static String ZORKA_MBS_AUTOREG = "zorka.mbs.autoregister";
+
+    public final static String SPY_ENABLE = "spy";
+    public final static String SPY_DEBUG = "spy.debug";
+
+    public final static String ZABBIX_ENABLE = "zabbix";
+
+    public final static String NAGIOS_ENABLE = "nagios";
+
+    public final static String ZORKA_HOME_DIR = "zorka.home.dir";
+    public final static String ZORKA_CONF_DIR = "zorka.config.dir";
+    public final static String ZORKA_LOG_DIR = "zorka.log.dir";
+
+    public final static String ZORKA_LOG_NUM = "zorka.log.num";
+    public final static String ZORKA_LOG_FNAME = "zorka.log.fname";
+    public final static String ZORKA_LOG_TRACE = "zorka.log.trace";
+    public final static String ZORKA_LOG_LEVEL = "zorka.log.level";
+    public final static String ZORKA_LOG_SIZE = "zorka.log.size";
+    public final static String ZORKA_LOG_EXCEPTIONS = "zorka.log.exceptions";
+
 	private static Properties properties = null;
 	private static String homeDir = null;
 
-    public final static String DEFAULT_CONFDIR = "/opt/zorka";
-
+    public final static String DEFAULT_CONF_PATH = "/com/jitlogic/zorka/agent/zorka.properties";
 
     /**
      * Clears static agent configuration. This is mainly useful for tests,
@@ -96,6 +121,20 @@ public class ZorkaConfig {
 	}
 
 
+    public static Properties defaultProperties() {
+        Properties props = new Properties();
+
+        InputStream is = ZorkaConfig.class.getResourceAsStream(DEFAULT_CONF_PATH);
+
+        try {
+            props.load(is);
+            is.close();
+        } catch (IOException e) {
+        }
+
+        return props;
+    }
+
     /**
      * Sets agent home directory and load zorka.properties file from it.
      *
@@ -104,7 +143,7 @@ public class ZorkaConfig {
      */
 	public static void loadProperties(String home) {
         homeDir = home;
-		properties = new Properties();
+		properties = defaultProperties();
 		InputStream is = null;
 		try {
 			is = new FileInputStream(getHomeDir("zorka.properties"));
@@ -118,8 +157,9 @@ public class ZorkaConfig {
 				} catch (IOException e) { }
 		}
 
-        properties.put("zorka.home.dir", homeDir);
-        properties.put("zorka.config.dir", getHomeDir("conf"));
+        properties.put(ZORKA_HOME_DIR, homeDir);
+        properties.put(ZORKA_CONF_DIR, getHomeDir("conf"));
+        properties.put(ZORKA_LOG_DIR, getHomeDir("log"));
 	}
 	
 
