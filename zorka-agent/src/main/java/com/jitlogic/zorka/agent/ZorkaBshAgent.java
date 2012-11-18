@@ -31,7 +31,7 @@ import bsh.EvalError;
 import bsh.Interpreter;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
-public class ZorkaBshAgent implements ZorkaService {
+public class ZorkaBshAgent {
 
 	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
@@ -45,7 +45,6 @@ public class ZorkaBshAgent implements ZorkaService {
 		this.executor = executor;
 
 		zorkaLib = new ZorkaLib(this);
-		svcAdd(zorkaLib);
 
         installModule("zorka", zorkaLib);
     }
@@ -155,68 +154,4 @@ public class ZorkaBshAgent implements ZorkaService {
 	}
 	
 	
-	public Executor getExecutor() {
-		return executor;
-	}
-	
-	
-	private boolean svcStarted = false;
-	private Set<ZorkaService> services = new HashSet<ZorkaService>(10);
-	
-	
-	public synchronized void svcStart() {
-		if (!svcStarted) {
-			for (ZorkaService svc : services) {
-				svc.svcStart();
-			}
-			svcStarted = true;
-		}
-	}
-	
-	
-	public synchronized void svcStop() {
-		if (svcStarted) {
-			for (ZorkaService svc : services) {
-				svc.svcStop();
-			}
-			svcStarted = false;
-		}
-	}
-	
-	
-	public synchronized void svcClear() {
-		if (svcStarted) {
-			for (ZorkaService svc : services) {
-				svc.svcClear();
-			}
-		}
-	}
-	
-	
-	public synchronized void svcReload() {
-		if (svcStarted) {
-			for (ZorkaService svc : services) {
-				svc.svcStop();
-			}
-			
-			interpreter = new Interpreter();
-			
-			if (configDir != null) {
-				loadScriptDir(configDir);
-			}
-			
-			for (ZorkaService svc : services) {
-				svc.svcStart();
-			}
-		}
-	}
-	
-	
-	public synchronized void svcAdd(ZorkaService service) {
-		services.add(service);
-		if (svcStarted) { 
-			service.svcStart();
-		}
-	}
-
 }

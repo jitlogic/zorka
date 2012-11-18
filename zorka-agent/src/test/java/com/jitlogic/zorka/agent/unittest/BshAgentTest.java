@@ -88,7 +88,6 @@ public class BshAgentTest extends ZorkaFixture {
 
     @Test
     public void testStartAndLoadScripts() throws Exception {
-        zorkaAgent.svcStart();
         URL url = this.getClass().getResource("/cfg1");
         zorkaAgent.loadScriptDir(url);
         assertEquals("oja! right!", query("testLoadScriptDir()"));
@@ -97,7 +96,6 @@ public class BshAgentTest extends ZorkaFixture {
 
     @Test
     public void testObjectDumper() throws Exception {
-        zorkaAgent.svcStart();
         Object obj = query("zorka.jmx(\"java\",\"java.lang:type=Runtime\")");
         String s = ObjectDumper.objectDump(obj);
         assertTrue(s != null && s.length() > 100);

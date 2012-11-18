@@ -31,7 +31,6 @@ import javax.management.openmbean.OpenType;
 import javax.management.openmbean.SimpleType;
 import javax.management.openmbean.TabularType;
 
-import com.jitlogic.zorka.agent.ZorkaService;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
@@ -47,7 +46,7 @@ import com.jitlogic.zorka.util.ZorkaUtil;
  *
  * @param <T>
  */
-public abstract class OldRankLister<K,T> implements Runnable, ZorkaService {
+public abstract class OldRankLister<K,T> implements Runnable {
 
 	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
@@ -383,27 +382,4 @@ public abstract class OldRankLister<K,T> implements Runnable, ZorkaService {
 			}
 		} 		
 	} // update()
-	
-	/* ZorkaService methods */
-	
-	public void svcStart() {
-		thread = new Thread(this);
-		thread.setName("Zorka-ThreadLister("+updateInterval+","+rerankInterval+")");
-		running = true;
-		thread.start();
-	}
-
-
-	public void svcStop() {
-		running = false;
-	}
-
-
-	public void svcClear() {
-	}
-
-
-	public void svcReload() {
-	}
-
 }

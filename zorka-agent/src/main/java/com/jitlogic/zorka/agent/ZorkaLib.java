@@ -35,7 +35,7 @@ import com.jitlogic.zorka.util.*;
  * @author RLE <rle@jitlogic.com>
  *
  */
-public class ZorkaLib implements ZorkaService {
+public class ZorkaLib  {
 	
 	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
     private final ZorkaLogger logger = ZorkaLogger.getLogger();
@@ -369,10 +369,6 @@ public class ZorkaLib implements ZorkaService {
     }
 
 
-	public void svcStart() {
-	} // svcStart()
-	
-	
 	public void svcStop() {
 		for (JmxObject obj : registeredObjects) {
 			try {
@@ -384,14 +380,6 @@ public class ZorkaLib implements ZorkaService {
 	} // svcStop()
 	
 	
-	public void svcClear() {
-	} // svcClear()
-	
-	
-	public void svcReload() {
-	} // svcReload()
-
-
     public void registerMbs(String name, MBeanServerConnection mbs) {
         mbsRegistry.register(name, mbs, mbs.getClass().getClassLoader());
     }

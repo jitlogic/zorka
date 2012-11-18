@@ -131,8 +131,6 @@ public class AgentInstance {
 
         zorkaAgent.loadScriptDir(props.getProperty(ZORKA_CONF_DIR), ".*\\.bsh$");
 
-        zorkaAgent.svcStart();
-
         if ("yes".equalsIgnoreCase(props.getProperty(ZABBIX_ENABLE))) {
             zabbixAgent = new ZabbixAgent(zorkaAgent);
             zabbixAgent.start();
