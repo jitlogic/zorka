@@ -385,12 +385,12 @@ public class ZorkaLib  {
     }
 
 
-    public <T> T getOrRegister(String mbsName, String beanName, String attrName, T obj) {
+    public <T> T registerAttr(String mbsName, String beanName, String attrName, T obj) {
         return mbsRegistry.getOrRegister(mbsName, beanName, attrName, obj);
     }
 
 
-    public <T> T getOrRegister(String mbsName, String beanName, String attrName, T obj, String desc) {
+    public <T> T registerAttr(String mbsName, String beanName, String attrName, T obj, String desc) {
         return mbsRegistry.getOrRegister(mbsName, beanName, attrName, obj, desc);
     }
 

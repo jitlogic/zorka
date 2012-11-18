@@ -19,7 +19,9 @@ import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -28,10 +30,10 @@ public class ZorkaLibUnitTest extends ZorkaFixture {
 
     @Test
     public void testRegisterTwoNamesAndListOnlyNames() throws Exception {
-        mBeanServerRegistry.getOrRegister("test", "test:type=ZorkaLib,name=test1", "a", "a");
-        mBeanServerRegistry.getOrRegister("test", "test:type=ZorkaLib,name=test2", "a", "a");
+        zorka.registerAttr("test", "test:type=ZorkaLib,name=test1", "a", "a");
+        zorka.registerAttr("test", "test:type=ZorkaLib,name=test2", "a", "a");
 
-        String[] s = zorkaLib.ls("test", "test:type=ZorkaLib,*").split("\n");
+        String[] s = zorka.ls("test", "test:type=ZorkaLib,*").split("\n");
 
         assertEquals(2, s.length);
         assertEquals("test:type=ZorkaLib,name=test1", s[0]);
@@ -40,10 +42,10 @@ public class ZorkaLibUnitTest extends ZorkaFixture {
 
     @Test
     public void testRegisterOneNameWithTwoAttributesAndListThem() throws Exception {
-        mBeanServerRegistry.getOrRegister("test", "test:type=ZorkaLib,name=test1", "a", "aaa");
-        mBeanServerRegistry.getOrRegister("test", "test:type=ZorkaLib,name=test1", "b", "bbb");
+        zorka.registerAttr("test", "test:type=ZorkaLib,name=test1", "a", "aaa");
+        zorka.registerAttr("test", "test:type=ZorkaLib,name=test1", "b", "bbb");
 
-        String[] s = zorkaLib.ls("test", "test:type=ZorkaLib,*", "*").split("\n");
+        String[] s = zorka.ls("test", "test:type=ZorkaLib,*", "*").split("\n");
 
         assertEquals(2, s.length);
 
@@ -54,12 +56,24 @@ public class ZorkaLibUnitTest extends ZorkaFixture {
     public void testRegisterAndListKeyValueHashMap() throws Exception {
         Map<String,String> map = new HashMap<String, String>();
         map.put("a", "aaa"); map.put("b", "bbb");
-        mBeanServerRegistry.getOrRegister("test", "test:type=ZorkaLib,name=test1", "map", map);
+        zorka.registerAttr("test", "test:type=ZorkaLib,name=test1", "map", map, "Some map.");
 
-        String[] s = zorkaLib.ls("test", "test:type=ZorkaLib,*", "map").split("\n");
+        String[] s = zorka.ls("test", "test:type=ZorkaLib,*", "map").split("\n");
 
         assertEquals(2, s.length);
         assertEquals("test:type=ZorkaLib,name=test1: map.a -> aaa", s[0]);
         assertEquals("test:type=ZorkaLib,name=test1: map.b -> bbb", s[1]);
+    }
+
+    @Test
+    public void testRegisterAndListListItems() throws Exception {
+        List<String> lst = Arrays.asList("aaa", "bbb");
+        zorka.registerAttr("test", "test:type=ZorkaLib,name=test1", "lst", lst, "Some list.");
+
+        String[] s = zorka.ls("test", "test:type=ZorkaLib,*", "lst").split("\n");
+
+        assertEquals(2, s.length);
+        assertEquals("test:type=ZorkaLib,name=test1: lst.0 -> aaa", s[0]);
+        assertEquals("test:type=ZorkaLib,name=test1: lst.1 -> bbb", s[1]);
     }
 }
