@@ -17,16 +17,10 @@
 
 package com.jitlogic.zorka.agent;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 
-import javax.management.AttributeNotFoundException;
-import javax.management.MBeanServer;
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectName;
+import javax.management.*;
 
 import com.jitlogic.zorka.rankproc.*;
 import com.jitlogic.zorka.mbeans.AttrGetter;
@@ -184,6 +178,68 @@ public class ZorkaLib implements ZorkaService {
 		
 		return obj;
 	} // jmx()
+
+
+    // TODO expand ls() functionality to filter over all arguments usign regex;
+    // TODO converge zorka.ls() and zabbix.discover() call conventions
+    // TODO converge zorka.jmxList() and zorka.list()
+    // TODO split zorka.ls() into zorka.ls() [returning list of strings] and zorka.list() [returning list of lists]
+    public String ls(String mbsName, String objectMask, Object...args) {
+        MBeanServerConnection conn = mbsRegistry.lookup(mbsName);
+
+        if (conn == null) {
+            log.error("MBean server named '" + mbsName + "' is not registered.");
+            return null;
+        }
+
+        Set<ObjectName> names = inspector.queryNames(conn, objectMask);
+        List<String> rslt = new ArrayList<String>(32);
+
+        ClassLoader cl0 = Thread.currentThread().getContextClassLoader(), cl1 = mbsRegistry.getClassLoader(mbsName);
+
+        if (cl1 != null) {
+            Thread.currentThread().setContextClassLoader(cl1);
+        }
+
+        for (ObjectName name : names) {
+            if (args.length == 0) {
+                rslt.add(name.toString());
+            } else {
+                try {
+                    Object obj = null;
+                    String path = name.toString() + ": ";
+                    if (args.length == 1 && "*".equals(args[0])) {
+                        obj = new JmxObject(name, conn, cl1);
+                    } else {
+                        obj = conn.getAttribute(name, args[0].toString());
+                        path =  path + ZorkaUtil.join(".", Arrays.asList(args)) + ".";
+                    }
+
+                    if (args.length > 1) {
+                        for (int i = 1; i < args.length; i++) {
+                            obj = inspector.get(obj, name);
+                        }
+                    }
+
+
+                    for (Object attr : inspector.list(obj)) {
+                        rslt.add(path + attr + " -> " + inspector.get(obj, attr));
+                    }
+
+                } catch (Throwable e) {
+                    log.error("Cannot resolve '" + name + "." + args[0], e);
+                }
+            }
+        }
+
+        if (cl1 != null) {
+            Thread.currentThread().setContextClassLoader(cl0);
+        }
+
+        Collections.sort(rslt);
+
+        return ZorkaUtil.join("\n", rslt) + "\n";
+    } // ls()
 
 
     /**
