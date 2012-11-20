@@ -27,7 +27,7 @@ import java.util.List;
 import static org.objectweb.asm.Opcodes.*;
 import static com.jitlogic.zorka.spy.SpyConst.*;
 import static com.jitlogic.zorka.spy.SpyLib.*;
-import static com.jitlogic.zorka.spy.SpyUtil.max;
+import static java.lang.Math.max;
 
 public class SpyMethodVisitor extends MethodVisitor {
 
