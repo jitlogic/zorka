@@ -38,7 +38,7 @@ public class ZorkaFixture {
     protected SpyInstance spyInstance;
 
     protected ZorkaBshAgent zorkaAgent;
-    protected ZorkaLib zorkaLib;
+    protected ZorkaLib zorka;
 
     @Before
     public void setUpFixture() {
@@ -66,7 +66,7 @@ public class ZorkaFixture {
 
         spyInstance = agentInstance.getSpyInstance();
         zorkaAgent = agentInstance.getZorkaAgent();
-        zorkaLib = zorkaAgent.getZorkaLib();
+        zorka = zorkaAgent.getZorkaLib();
 
         testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
         mBeanServerRegistry.register("test", testMbs, testMbs.getClass().getClassLoader());

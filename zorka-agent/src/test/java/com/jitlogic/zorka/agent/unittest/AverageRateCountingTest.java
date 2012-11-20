@@ -81,10 +81,10 @@ public class AverageRateCountingTest extends ZorkaFixture {
     public void testZorkaLibRateFn1() throws Exception {
         TestJmx tj = makeTestJmx("test:name=bean1,type=TestJmx", 0, 0);
 
-        assertEquals(0.0, zorkaLib.rate("test", "test:name=bean1,type=TestJmx", "Nom", "Div", 60), 0.01);
+        assertEquals(0.0, zorka.rate("test", "test:name=bean1,type=TestJmx", "Nom", "Div", 60), 0.01);
         tj.setNom(5); tj.setDiv(5);
-        assertEquals(1.0, zorkaLib.rate("test", "test:name=bean1,type=TestJmx", "Nom", "Div", 60), 0.01);
-        assertEquals(1.0, zorkaLib.rate("test", "test:name=bean1,type=TestJmx", "Nom", "Div", "AVG1"), 0.01);
+        assertEquals(1.0, zorka.rate("test", "test:name=bean1,type=TestJmx", "Nom", "Div", 60), 0.01);
+        assertEquals(1.0, zorka.rate("test", "test:name=bean1,type=TestJmx", "Nom", "Div", "AVG1"), 0.01);
     }
 
     private TestJmx makeTestJmx(String name, long nom, long div) throws Exception {

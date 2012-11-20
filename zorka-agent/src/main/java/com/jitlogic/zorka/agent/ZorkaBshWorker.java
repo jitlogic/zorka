@@ -38,7 +38,7 @@ public class ZorkaBshWorker implements Runnable, Closeable {
 	public void run() {
 		try {
 			callback.handleResult(agent.eval(expr));
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			callback.handleError(e);
 		} 
 	}
