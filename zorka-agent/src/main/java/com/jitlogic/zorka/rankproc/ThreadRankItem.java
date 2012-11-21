@@ -18,16 +18,16 @@ package com.jitlogic.zorka.rankproc;
 import java.lang.management.ThreadInfo;
 import static com.jitlogic.zorka.rankproc.BucketAggregate.*;
 
-public class ThreadRankItem implements Rankable<ThreadInfo> {
+public class ThreadRankItem implements Rankable<ThreadRankInfo> {
 
-    private ThreadInfo threadInfo;
+    private ThreadRankInfo threadInfo;
 
     private final static int BY_CPU = 0;
     private final static int BY_BLOCK = 1;
 
     private BucketAggregate byCpuTime, byBlockedTime;
 
-    public ThreadRankItem(ThreadInfo threadInfo) {
+    public ThreadRankItem(ThreadRankInfo threadInfo) {
         this.threadInfo = threadInfo;
         byCpuTime = new BucketAggregate(NS, 30, 2, 5, 3);
         byBlockedTime = new BucketAggregate(NS, 30, 2, 5, 3);
@@ -55,22 +55,22 @@ public class ThreadRankItem implements Rankable<ThreadInfo> {
     }
 
 
-    public ThreadInfo getWrapped() {
+    public ThreadRankInfo getWrapped() {
         return threadInfo;
     }
 
 
     public String getName() {
-        return threadInfo.getThreadName();
+        return threadInfo.getName();
     }
 
 
-    public synchronized void feed(long tstamp, ThreadInfo threadInfo, long threadTime) {
+    public synchronized void feed(long tstamp, ThreadRankInfo threadInfo) {
 
         this.threadInfo = threadInfo; // TODO copy only required values to avoid memory spill
 
-        if (threadTime >= 0) {
-            byCpuTime.feed(tstamp, threadTime);
+        if (threadInfo.getCpuTime() >= 0) {
+            byCpuTime.feed(tstamp, threadInfo.getCpuTime());
         }
 
         byBlockedTime.feed(tstamp, threadInfo.getBlockedTime());
