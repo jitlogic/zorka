@@ -55,39 +55,47 @@ public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
     }
 
 
-    protected ThreadInfo[] rawList() {
-        // Platform MBean Server startup might be
+    protected List<ThreadRankInfo> rawList() {
+        // Platform MBean Server startup might be suspended (eg. for JBoss AS);
         if (threadMXBean == null) {
             if (mBeanServerRegistry.lookup("java") != null) {
                 threadMXBean = ManagementFactory.getThreadMXBean();
             } else {
-                return new ThreadInfo[0];
+                return new ArrayList<ThreadRankInfo>(1);
             }
         }
 
-        return threadMXBean.getThreadInfo(threadMXBean.getAllThreadIds());
+        ThreadInfo[] ati = threadMXBean.getThreadInfo(threadMXBean.getAllThreadIds());
+        List<ThreadRankInfo> lst = new ArrayList<ThreadRankInfo>(ati.length);
+
+        for (ThreadInfo ti : ati) {
+            long tid = ti.getThreadId();
+            long cpuTime = threadMXBean.getThreadCpuTime(tid);
+            lst.add(new ThreadRankInfo(tid, ti.getThreadName(), cpuTime, ti.getBlockedTime()));
+        }
+
+        return lst;
     }
 
-
     public synchronized void runCycle(long tstamp) {
-        ThreadInfo[] raw = rawList();
-        int sz = Math.max(raw.length, threads.size());
+        List<ThreadRankInfo> raw = rawList();
+        int sz = Math.max(raw.size(), threads.size());
         Map<Long,ThreadRankItem> newThreads = new HashMap<Long, ThreadRankItem>(sz*2+10, 0.5f);
 
-        for (ThreadInfo threadInfo : raw) {
+        for (ThreadRankInfo threadInfo : raw) {
             if (threadInfo == null) {
                 continue;
             }
 
-            long tid = threadInfo.getThreadId();
+            long tid = threadInfo.getId();
 
-            ThreadRankItem threadItem = threads.get(threadInfo.getThreadId());
+            ThreadRankItem threadItem = threads.get(threadInfo.getId());
             if (threadItem == null) {
                 threadItem = new ThreadRankItem(threadInfo);
             }
 
-            threadItem.feed(tstamp, threadInfo, threadMXBean.getThreadUserTime(tid));
-            newThreads.put(threadInfo.getThreadId(), threadItem);
+            threadItem.feed(tstamp, threadInfo);
+            newThreads.put(threadInfo.getId(), threadItem);
         }
 
         threads = newThreads;
