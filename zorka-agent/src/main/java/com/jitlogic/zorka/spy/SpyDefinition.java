@@ -251,8 +251,8 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition lookFor(String classPattern, String methodPattern) {
-        return lookFor(SpyMatcher.DEFAULT_FILTER, classPattern, methodPattern, null);
+    public SpyDefinition include(String classPattern, String methodPattern) {
+        return include(SpyMatcher.DEFAULT_FILTER, classPattern, methodPattern, null);
     }
 
 
@@ -272,7 +272,7 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition lookFor(int access, String classPattern, String methodPattern, String retType, String...argTypes) {
+    public SpyDefinition include(int access, String classPattern, String methodPattern, String retType, String... argTypes) {
         SpyDefinition sdef = new SpyDefinition(this);
         List<SpyMatcher> lst = new ArrayList<SpyMatcher>(sdef.matchers.size()+2);
         lst.addAll(sdef.matchers);
