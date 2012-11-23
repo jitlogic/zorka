@@ -28,6 +28,7 @@ import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -61,7 +62,7 @@ public class ZorkaStatsCollector implements SpyCollector {
     public void collect(SpyRecord record) {
 
         if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
-            log.debug("Collecting record: " + record);
+            log.debug("Collecting record: [" + ZorkaUtil.join(",", record.getVals(ON_COLLECT)) + "]");
         }
 
         SpyContext ctx = record.getContext();

@@ -54,7 +54,7 @@ public class DispatchingCollector implements SpyCollector {
     }
 
     private SpyRecord process(SpyDefinition sdef, SpyRecord record) {
-        List<SpyProcessor> processors = sdef.getTransformers(ON_COLLECT);
+        List<SpyProcessor> processors = sdef.getProcessors(ON_COLLECT);
 
         for (SpyProcessor processor : processors) {
             try {

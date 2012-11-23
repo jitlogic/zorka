@@ -63,7 +63,7 @@ public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatis
     }
 
 
-    public double getAverage(int metric, int average) {
+    public synchronized double getAverage(int metric, int average) {
         switch (metric) {
             case CALLS_STAT: {
                 long delta = calls.getDelta(average);
@@ -148,5 +148,15 @@ public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatis
         this.calls.feed(tstamp, 1);
         this.errors.feed(tstamp, 1);
         this.time.feed(tstamp, time);
+    }
+
+    @Override
+    public String toString() {
+        return "(calls=" + getCalls()
+                + ", errors=" + getErrors()
+                +", avg1=" + getAverage(TIMES_STAT, 1)
+                + ", avg5=" + getAverage(TIMES_STAT,  2)
+                + ", avg15=" + getAverage(TIMES_STAT, 3)
+                + ")";
     }
 }

@@ -41,9 +41,9 @@ public class SpyLibFunctionsTest extends ZorkaFixture {
 
         assertEquals(1, sdef.getCollectors().size());
         assertEquals("${0}", ((ZorkaStatsCollector)sdef.getCollectors().get(0)).getKeyTemplate());
-        assertEquals(1, ((TimeDiffProcessor)sdef.getTransformers(SpyLib.ON_SUBMIT).get(0)).getStartSlot());
-        assertEquals(2, ((TimeDiffProcessor)sdef.getTransformers(SpyLib.ON_SUBMIT).get(0)).getStopSlot());
-        assertEquals(2, ((TimeDiffProcessor)sdef.getTransformers(SpyLib.ON_SUBMIT).get(0)).getResultSlot());
+        assertEquals(1, ((TimeDiffProcessor)sdef.getProcessors(SpyLib.ON_SUBMIT).get(0)).getStartSlot());
+        assertEquals(2, ((TimeDiffProcessor)sdef.getProcessors(SpyLib.ON_SUBMIT).get(0)).getStopSlot());
+        assertEquals(2, ((TimeDiffProcessor)sdef.getProcessors(SpyLib.ON_SUBMIT).get(0)).getResultSlot());
     }
 
     @Test

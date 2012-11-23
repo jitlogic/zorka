@@ -52,8 +52,8 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
         assertNotNull(sdef.getProbes(ON_ENTER));
         assertEquals(0, sdef.getProbes(ON_ENTER).size());
 
-        assertNotNull(sdef.getTransformers(ON_RETURN));
-        assertEquals(0, sdef.getTransformers(ON_RETURN).size());
+        assertNotNull(sdef.getProcessors(ON_RETURN));
+        assertEquals(0, sdef.getProcessors(ON_RETURN).size());
     }
 
 
@@ -113,6 +113,19 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
                 .onSubmit().timeDiff(0,1,1)
                 .toStats("java", "some.app:type=ZorkaStats,name=SomeClass", "stats", "${methodName}", 0, 1);
         assertEquals(1, sdef.getMatchers().size());
+    }
+
+
+    @Test
+    public void testInstrumentWithGetterOnReturn() {
+        SpyDefinition sdef = SpyDefinition.instance()
+            .onEnter().withTime()
+            .onReturn().withTime().withArguments(2).get(1, 1, "response", "status")
+            .onSubmit().timeDiff(0,2,2);
+
+        assertEquals(1, sdef.getProbes(ON_ENTER).size());
+        assertEquals(2, sdef.getProbes(ON_RETURN).size());
+        assertEquals(1, sdef.getProcessors(ON_SUBMIT).size());
     }
 
 
