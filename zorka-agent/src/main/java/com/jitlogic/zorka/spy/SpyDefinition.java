@@ -78,10 +78,12 @@ public class SpyDefinition {
 
 
     private SpyDefinition(SpyDefinition orig) {
-        this.matchers = orig.matchers;
         this.probes = ZorkaUtil.copyArray(orig.probes);
         this.processors = ZorkaUtil.copyArray(orig.processors);
         this.collectors = orig.collectors;
+        this.matchers = orig.matchers;
+        this.curStage = orig.curStage;
+        this.once = orig.once;
     }
 
 
@@ -104,7 +106,7 @@ public class SpyDefinition {
      *
      * @return
      */
-    public List<SpyProcessor> getTransformers(int stage) {
+    public List<SpyProcessor> getProcessors(int stage) {
         return processors[stage];
     }
 
@@ -251,8 +253,8 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition lookFor(String classPattern, String methodPattern) {
-        return lookFor(SpyMatcher.DEFAULT_FILTER, classPattern, methodPattern, null);
+    public SpyDefinition include(String classPattern, String methodPattern) {
+        return include(SpyMatcher.DEFAULT_FILTER, classPattern, methodPattern, null);
     }
 
 
@@ -272,7 +274,7 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition lookFor(int access, String classPattern, String methodPattern, String retType, String...argTypes) {
+    public SpyDefinition include(int access, String classPattern, String methodPattern, String retType, String... argTypes) {
         SpyDefinition sdef = new SpyDefinition(this);
         List<SpyMatcher> lst = new ArrayList<SpyMatcher>(sdef.matchers.size()+2);
         lst.addAll(sdef.matchers);
@@ -478,16 +480,16 @@ public class SpyDefinition {
     /**
      * Calculates time difference between in1 and in2 and stores result in out.
      *
-     * @param in1
+     * @param tstart slot with tstart
      *
-     * @param in2
+     * @param tstop slot with tstop
      *
-     * @param out
+     * @param dst destination slot
      *
-     * @return
+     * @return augmented spy definition
      */
-    public SpyDefinition timeDiff(int in1, int in2, int out) {
-        return withProcessor(new TimeDiffProcessor(in1, in2, out));
+    public SpyDefinition timeDiff(int tstart, int tstop, int dst) {
+        return withProcessor(new TimeDiffProcessor(tstart, tstop, dst));
     }
 
 

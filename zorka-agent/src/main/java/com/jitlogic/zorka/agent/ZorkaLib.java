@@ -378,8 +378,8 @@ public class ZorkaLib  {
 			}
 		}
 	} // svcStop()
-	
-	
+
+
     public void registerMbs(String name, MBeanServerConnection mbs) {
         mbsRegistry.register(name, mbs, mbs.getClass().getClassLoader());
     }
@@ -397,5 +397,17 @@ public class ZorkaLib  {
 
     public <T extends Rankable<?>> RankLister<T> jmxLister(String mbsName, String onMask) {
         return new JmxAggregatingLister<T>(mbsName, onMask);
+    }
+
+
+    private ThreadRankLister threadRankLister = null;
+
+    public synchronized ThreadRankLister threadRankLister() {
+        if (threadRankLister == null) {
+            threadRankLister = new ThreadRankLister();
+            threadRankLister.start();
+        }
+
+        return threadRankLister;
     }
 }

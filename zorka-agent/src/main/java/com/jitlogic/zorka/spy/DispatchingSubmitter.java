@@ -19,6 +19,7 @@ package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.List;
 import java.util.Stack;
@@ -112,7 +113,12 @@ public class DispatchingSubmitter implements SpySubmitter {
     }
 
     private SpyRecord process(int stage, SpyDefinition sdef, SpyRecord record) {
-        List<SpyProcessor> processors = sdef.getTransformers(stage);
+        List<SpyProcessor> processors = sdef.getProcessors(stage);
+
+        if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
+            log.debug("Processing records (stage=" + stage + ") ["
+                + ZorkaUtil.join(",", record.getVals(stage)) + "]");
+        }
 
         for (SpyProcessor processor : processors) {
             try {

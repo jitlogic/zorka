@@ -77,6 +77,11 @@ public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
         return lst;
     }
 
+
+    /**
+     *
+     * @param tstamp
+     */
     public synchronized void runCycle(long tstamp) {
         List<ThreadRankInfo> raw = rawList();
         int sz = Math.max(raw.size(), threads.size());

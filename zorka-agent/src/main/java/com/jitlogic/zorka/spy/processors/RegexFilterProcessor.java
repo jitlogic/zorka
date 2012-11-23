@@ -17,17 +17,24 @@
 
 package com.jitlogic.zorka.spy.processors;
 
+import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.jitlogic.zorka.spy.SpyConst.SPD_ARGPROC;
 
 /**
  * Filters records using regular expressions.
  */
 public class RegexFilterProcessor implements SpyProcessor {
+
+    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private int src, dst;
     private Pattern regex;
@@ -68,6 +75,11 @@ public class RegexFilterProcessor implements SpyProcessor {
 
         if (expr == null) {
             boolean matches = val != null && regex.matcher(val.toString()).matches();
+
+            if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
+                log.debug("Filtering '" + val + "' through '" + regex.pattern() + "': " + matches);
+            }
+
             return matches^filterOut ? record : null;
         } else if (val != null) {
             Matcher matcher = regex.matcher(val.toString());
@@ -76,11 +88,25 @@ public class RegexFilterProcessor implements SpyProcessor {
                 for (int i = 0; i < vals.length; i++) {
                     vals[i] = matcher.group(i);
                 }
-                record.put(stage, dst, inspector.substitute(expr, vals));
+                String subst = inspector.substitute(expr, vals);
+                record.put(stage, dst, subst);
+                if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
+                    log.debug("Processed '" + val + "' to '" + subst + "' using pattern '" + regex.pattern() + "'");
+                }
             } else if (defval != null) {
                 record.put(stage, dst, defval);
+                if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
+                    log.debug("No value to be processed. Using default value of '" + defval + "'");
+                }
             } else if (Boolean.TRUE.equals(filterOut)) {
+                if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
+                    log.debug("No value to be processed. Filtering out.");
+                }
                 return null;
+            }
+        } else {
+            if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
+                log.debug("No value to be processed. Leaving record unprocessed.");
             }
         }
         return record;

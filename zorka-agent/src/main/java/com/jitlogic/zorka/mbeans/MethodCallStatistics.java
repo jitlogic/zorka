@@ -68,4 +68,9 @@ public class MethodCallStatistics implements ZorkaStats, RankLister<MethodCallSt
 
         return lst;
     }
+
+    @Override
+    public synchronized String toString() {
+        return stats.toString();
+    }
 }

@@ -93,6 +93,12 @@ public class SpyRecord {
     }
 
     public void put(int stage, int idx, Object v) {
-        vals[stage][idx] = v;
+        Object[] vs = vals[stage];
+        if (idx >= vs.length) {
+            vs = new Object[idx+1];
+            System.arraycopy(vals[stage], 0, vs, 0, vals[stage].length);
+            vals[stage] = vs;
+        }
+        vs[idx] = v;
     }
 }
