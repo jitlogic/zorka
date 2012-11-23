@@ -16,14 +16,21 @@
  */
 package com.jitlogic.zorka.spy.processors;
 
+import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
+
+import static com.jitlogic.zorka.spy.SpyConst.SPD_ARGPROC;
 
 /**
  * Digs deeper into an object the same way zorka.jmx() does.
  */
 public class GetterProcessor implements SpyProcessor {
+
+    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private int src, dst;
     private Object[] path;
@@ -41,7 +48,14 @@ public class GetterProcessor implements SpyProcessor {
         Object val = record.get(stage, src);
 
         for (Object obj : path) {
+            if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
+                log.debug("Descending into '" + obj + "' of '" + val + "' ...");
+            }
             val = inspector.get(val, obj);
+        }
+
+        if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
+            log.debug("Final result: '" + val + "' stored to slot " + dst);
         }
 
         record.put(stage, dst, val);

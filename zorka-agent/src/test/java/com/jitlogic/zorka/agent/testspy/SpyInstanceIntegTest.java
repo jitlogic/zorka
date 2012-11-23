@@ -16,26 +16,13 @@
 
 package com.jitlogic.zorka.agent.testspy;
 
-import com.jitlogic.zorka.agent.AgentInstance;
-import com.jitlogic.zorka.agent.MBeanServerRegistry;
-import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.SpyInstance;
-import com.jitlogic.zorka.spy.MainSubmitter;
 
-import com.jitlogic.zorka.util.ZorkaLogger;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 import static com.jitlogic.zorka.agent.testspy.BytecodeInstrumentationUnitTest.*;
-
-import javax.management.MBeanServer;
-import javax.management.MBeanServerBuilder;
-import java.util.Properties;
 
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.*;
 
@@ -44,7 +31,7 @@ public class SpyInstanceIntegTest extends ZorkaFixture {
     @Test
     public void testTrivialMethodRun() throws Exception {
         SpyDefinition sdef = SpyDefinition.instrument().onSubmit().timeDiff(0, 1, 1)
-                .lookFor(TCLASS1, "trivialMethod")
+                .include(TCLASS1, "trivialMethod")
                 .toStats("test", "test:name=${shortClassName}", "stats", "${methodName}", 0, 1);
 
         spyInstance.add(sdef);

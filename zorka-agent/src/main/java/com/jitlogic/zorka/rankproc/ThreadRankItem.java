@@ -29,18 +29,20 @@ public class ThreadRankItem implements Rankable<ThreadRankInfo> {
 
     public ThreadRankItem(ThreadRankInfo threadInfo) {
         this.threadInfo = threadInfo;
-        byCpuTime = new BucketAggregate(NS, 30, 2, 5, 3);
-        byBlockedTime = new BucketAggregate(NS, 30, 2, 5, 3);
+        byCpuTime = new BucketAggregate(30*SEC, 2, 5, 3);
+        byBlockedTime = new BucketAggregate(30*SEC, 2, 5, 3);
     }
 
 
     public synchronized double getAverage(int metric, int average) {
+
         switch (metric) {
             case BY_CPU:
-                return 1000.0 * byCpuTime.getDelta(average) / (byCpuTime.getWindow(average) * MS);
+                return 100.0 * byCpuTime.getDelta(average) / byCpuTime.getWindow(average);
             case BY_BLOCK:
-                return 1000.0 * byBlockedTime.getDelta(average) / byBlockedTime.getWindow(average) * MS;
+                return 100.0 * byBlockedTime.getDelta(average) / byBlockedTime.getWindow(average);
         }
+
         return 0.0;
     }
 
@@ -51,7 +53,7 @@ public class ThreadRankItem implements Rankable<ThreadRankInfo> {
 
 
     public String[] getAverages() {
-        return new String[] { "10s", "AVG1", "AVG5", "AVG15" };
+        return new String[] { "30s", "AVG1", "AVG5", "AVG15" };
     }
 
 
@@ -65,15 +67,20 @@ public class ThreadRankItem implements Rankable<ThreadRankInfo> {
     }
 
 
+    /**
+     *
+     * @param tstamp
+     * @param threadInfo
+     */
     public synchronized void feed(long tstamp, ThreadRankInfo threadInfo) {
 
         this.threadInfo = threadInfo; // TODO copy only required values to avoid memory spill
 
         if (threadInfo.getCpuTime() >= 0) {
-            byCpuTime.feed(tstamp, threadInfo.getCpuTime());
+            byCpuTime.feed(tstamp * MS, threadInfo.getCpuTime());
         }
 
-        byBlockedTime.feed(tstamp, threadInfo.getBlockedTime());
+        byBlockedTime.feed(tstamp * MS, threadInfo.getBlockedTime());
     }
 
 }

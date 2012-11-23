@@ -108,6 +108,20 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
         assertEquals(2L, sr.get(ON_COLLECT, 1));
     }
 
+
+    @Test
+    public void testExtendSpyDefRecordValArray() throws Exception {
+        SpyDefinition sdef = engine.add(SpyDefinition.instrument());
+        SpyContext ctx = engine.lookup(new SpyContext(sdef, "Class", "method", "()V", 1));
+
+        SpyRecord rec = new SpyRecord(ctx);
+
+        rec.feed(ON_ENTER, new Object[] { 1, 2 });
+        rec.put(ON_ENTER, 2, 3);
+
+        assertEquals(3, rec.getVals(ON_ENTER).length);
+    }
+
     // TODO test if SpyRecord marks stages properly
 
     // TODO test submission stages are marked by DispatchingSubmitter
