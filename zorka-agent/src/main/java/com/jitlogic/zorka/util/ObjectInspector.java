@@ -8,6 +8,7 @@ import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,12 +43,20 @@ public class ObjectInspector {
             return null;
         }
 
-        Class<?> clazz = (obj instanceof Class<?>) ? (Class)obj : obj.getClass();
+        // TODO refactoring of this method (badly) needed
+        Class<?> clazz = obj.getClass();
 
         if (key instanceof String && key.toString().endsWith("()")) {
             // Explicit method call for attributes ending with '()'
             String name = key.toString();
-            return fetchViaMethod(obj, clazz, lookupMethod(clazz, name.substring(0, name.length()-2)));
+            name = name.substring(0, name.length()-2);
+            Method method = lookupMethod(clazz, name);
+
+            if (method == null && obj instanceof Class) {
+                method = lookupMethod((Class)obj, name);
+            }
+
+            return fetchViaMethod(obj, clazz, method);
         }
 
         if (key instanceof String && key.toString().startsWith(".")) {
@@ -89,12 +98,24 @@ public class ObjectInspector {
 
             Method method = lookupMethod(clazz, "get" + name.substring(0, 1).toUpperCase() + name.substring(1));
 
+            if (method == null && obj instanceof Class) {
+                method = lookupMethod((Class)obj, "get" + name.substring(0, 1).toUpperCase() + name.substring(1));
+            }
+
             if (method == null) {
                 method = lookupMethod(clazz, "is" + name.substring(0, 1).toUpperCase() + name.substring(1));
             }
 
+            if (method == null && obj instanceof Class) {
+                method = lookupMethod((Class)obj, "is" + name.substring(0, 1).toUpperCase() + name.substring(1));
+            }
+
             if (method == null) {
                 method = lookupMethod(clazz, name);
+            }
+
+            if (method == null && obj instanceof Class) {
+                method = lookupMethod((Class)obj, name);
             }
 
             if (method != null) {
@@ -172,6 +193,9 @@ public class ObjectInspector {
     private Object fetchViaMethod(Object obj, Class<?> clazz, Method method) {
         if (method != null) {
             try {
+                if (Modifier.isStatic(method.getModifiers())) {
+                    obj = obj.getClass();
+                }
                 return method.invoke(obj);
             } catch (Exception e) {
                 log.error("Method '" + method.getName() + "' invocation failed", e);
@@ -184,7 +208,14 @@ public class ObjectInspector {
 
     private Object fetchFieldVal(Object obj, Class<?> clazz, String name) {
         try {
-            Field field = clazz.getDeclaredField(name.startsWith(".") ? name.substring(1) : name);
+            name = name.startsWith(".") ? name.substring(1) : name;
+            Field field = lookupField(clazz, name);
+            if (field == null && obj instanceof Class) {
+                field = lookupField((Class)obj, name);
+            }
+            if (field == null) {
+                return null;
+            }
             boolean accessible = field.isAccessible();
             if (!accessible) field.setAccessible(true);
             Object ret = field.get(obj);
@@ -192,6 +223,14 @@ public class ObjectInspector {
             return ret;
         } catch (Exception e) {
             log.error("Field '" + name + "' fetch failed", e);
+            return null;
+        }
+    }
+
+    public Field lookupField(Class<?> clazz, String name) {
+        try {
+            return clazz.getDeclaredField(name);
+        } catch (NoSuchFieldException e) {
             return null;
         }
     }
