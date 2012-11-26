@@ -20,6 +20,7 @@ package com.jitlogic.zorka.mbeans;
 import static com.jitlogic.zorka.rankproc.BucketAggregate.MS;
 import com.jitlogic.zorka.rankproc.BucketAggregate;
 import com.jitlogic.zorka.rankproc.Rankable;
+import com.jitlogic.zorka.rankproc.SlidingBucketAggregate;
 
 import java.util.Date;
 
@@ -43,9 +44,9 @@ public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatis
 
     public MethodCallStatistic(String name, long base, int...stages) {
         this.name = name;
-        this.calls = new BucketAggregate(base, stages);
-        this.errors = new BucketAggregate(base, stages);
-        this.time = new BucketAggregate(base, stages);
+        this.calls = new SlidingBucketAggregate(base, stages);
+        this.errors = new SlidingBucketAggregate(base, stages);
+        this.time = new SlidingBucketAggregate(base, stages);
     }
 
 
@@ -63,18 +64,18 @@ public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatis
     }
 
 
-    public synchronized double getAverage(int metric, int average) {
+    public synchronized double getAverage(long tstamp, int metric, int average) {
         switch (metric) {
             case CALLS_STAT: {
-                long delta = calls.getDelta(average);
+                long delta = calls.getDeltaV(tstamp, average);
                 return 1000.0 * delta / (calls.getWindow(average) * MS);
             }
             case ERROR_STAT: {
-                long delta = errors.getDelta(average);
+                long delta = errors.getDeltaV(tstamp, average);
                 return 1000.0 * delta / (errors.getWindow(average) * MS);
             }
             case TIMES_STAT: {
-                long dc = calls.getDelta(average), dt = time.getDelta(average);
+                long dc = calls.getDeltaV(tstamp, average), dt = time.getDeltaV(tstamp, average);
                 return dc == 0 ? 0.0 : 1000.0 * dt / (dc * MS);
             }
         }
@@ -152,11 +153,12 @@ public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatis
 
     @Override
     public String toString() {
+        long tstamp = System.currentTimeMillis();
         return "(calls=" + getCalls()
                 + ", errors=" + getErrors()
-                +", avg1=" + getAverage(TIMES_STAT, 1)
-                + ", avg5=" + getAverage(TIMES_STAT,  2)
-                + ", avg15=" + getAverage(TIMES_STAT, 3)
+                +", avg1=" + getAverage(tstamp, TIMES_STAT, 1)
+                + ", avg5=" + getAverage(tstamp, TIMES_STAT,  2)
+                + ", avg15=" + getAverage(tstamp, TIMES_STAT, 3)
                 + ")";
     }
 }

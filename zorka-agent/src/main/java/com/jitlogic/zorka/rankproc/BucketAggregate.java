@@ -13,170 +13,103 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jitlogic.zorka.rankproc;
 
+
 /**
- * Bucket aggregate is
+ * Represents aggregate values.
+ * TODO clean up words and symbols (eg. stage-window)
  */
-public class BucketAggregate {
+public interface BucketAggregate {
 
-    public static final long NS   = 1L;
-    public static final long MS   = NS * 1000000;
-    public static final long SEC  = MS * 1000;
-    public static final long MIN  = SEC * 60;
-    public static final long HOUR = MIN * 60;
-    public static final long DAY  = HOUR * 24;
-
-    private long base, total, tstart, tlast;
-    private int[] stages, offsets;
-
-    private long[] data, windows, tstamps;
+    long NS   = 1L;
+    long MS   = NS * 1000000;
+    long SEC  = MS * 1000;
+    long MIN  = SEC * 60;
+    long HOUR = MIN * 60;
+    long DAY  = HOUR * 24;
 
 
-    public BucketAggregate(long base, int...stages) {
-        this.tstart = -1;
-        this.base = base;
-
-        this.stages = new int[stages.length+1];
-
-        this.stages[0] = 1;
-        System.arraycopy(stages, 0, this.stages, 1, stages.length);
-
-        this.total = 0;
-
-        windows = new long[this.stages.length];
-        windows[0] = this.base;
-        offsets = new int[this.stages.length];
-        offsets[0] = 0;
-        tstamps = new long[this.stages.length];
-        tstamps[0] = -1;
-
-        int dlen = 1;
-
-        for (int i = 1; i < this.stages.length; i++) {
-            windows[i] = windows[i-1] * this.stages[i];
-            offsets[i] = offsets[i-1] + this.stages[i-1];
-            tstamps[i] = -1;
-            dlen += this.stages[i];
-        }
-
-        data = new long[dlen];
-    }
+    /**
+     * Returns number of time windows (stages) this aggregate tracks.
+     *
+     * @return
+     */
+    int size();
 
 
-    public int size() {
-        return stages.length;
-    }
+    /**
+     * Returns window length on particular stage.
+     *
+     * @param stage
+     *
+     * @return
+     */
+    long getWindow(int stage);
 
 
-    public long getWindow(int stage) {
-        return windows[stage];
-    }
-
-    public int getStage(long window) {
-        for (int i = 0; i < windows.length; i++) {
-            if (windows[i] == window) {
-                return i;
-            }
-
-            if (windows[i] > window) {
-                return (i > 0 && window-windows[i-1] < windows[i]-window) ? i-1 : i;
-            }
-        }
-
-        return window < windows[windows.length-1] * 2 ? windows.length-1 : -1;
-    }
+    /**
+     * Returns stage number (based on window length).
+     *
+     * @param window
+     *
+     * @return
+     */
+    int getStage(long window);
 
 
-    public long getBase() {
-        return base;
-    }
+    /**
+     * Returns total time this aggregate is up and logging samples (that is, time
+     * elapsed between
+     *
+     * @return
+     */
+    long getTime();
 
 
-    public long getTime() {
-        return tlast-tstart;
-    }
+    /**
+     * Returns timestamp of last sample.
+     *
+     * @return
+     */
+    long getLast();
 
 
-    public long getLast() {
-        return tlast;
-    }
+    /**
+     * Return sum of all submitted samples.
+     *
+     * @return
+     */
+    long getTotal();
 
 
-    public long getTotal() {
-        return total;
-    }
+    /**
+     * Returns timestamp of first submitted sample.
+     *
+     * @return
+     */
+    long getStart();
 
 
-    public long getStart() {
-        return tstart;
-    }
+    /**
+     * Submits (tstamp,value) pair to aggregate.
+     *
+     * @param tstamp
+     *
+     * @param value
+     */
+    void feed(long tstamp, long value);
 
 
-    public void feed(long tstamp, long val) {
-
-        if (tstart < 0) {
-            tstart = tstamp - (tstamp % base);
-            tstamps[0] = tstart;
-        }
-
-        while (tstamp-tstamps[0] > base) {
-            shift(tstamps[0], data[0], 1);
-            tstamps[0] += base;
-            data[0] = 0;
-        }
-
-        data[0] += val;
-        total += val;
-
-        tlast = tstamp;
-    }
+    /**
+     * Returns value delta in given stage
+     * @param tstamp
+     * @param stage
+     * @return
+     */
+    long getDeltaV(long tstamp, int stage);
 
 
-    private void shift(long tstamp, long nval, int stage) {
-        int len = stages[stage], idx1 = offsets[stage], idx2 = idx1 + len - 1;
-        long tbase = windows[stage > 0 ? stage-1 : 0];
-
-        if (tstamps[stage] == -1) {
-            tstamps[stage] = tstamp;
-            data[idx1] = nval;
-            return;
-        }
-
-        if (tstamp-tstamps[stage] < tbase) {
-            data[idx1] += nval;
-            return;
-        }
-
-        if (stage < stages.length-1) {
-            shift(tstamp+tbase, data[idx2], stage+1);
-        }
-
-        for (int i = idx2; i > idx1; i--) {
-            data[i] = data[i-1];
-        }
-
-        data[idx1] = nval;
-        tstamps[stage] += tbase;
-    }
-
-
-    public long getDelta(int stage) {
-
-        if (stage < 0 || stage >= stages.length) {
-            return 0L;
-        }
-
-        int len = stages[stage], idx1 = offsets[stage];
-
-        long delta = 0L;
-
-        for (int i = idx1; i < idx1+len; i++) {
-            delta += data[i];
-        }
-
-        return delta;
-    }
-
+    long getDeltaT(long tstamp, int stage);
 }
+

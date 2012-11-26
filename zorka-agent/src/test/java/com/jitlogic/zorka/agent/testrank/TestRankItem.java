@@ -31,7 +31,7 @@ public class TestRankItem implements Rankable<TestRankItem> {
         System.arraycopy(buf, offset, values, 0, len);
     }
 
-    public double getAverage(int metric, int average) {
+    public double getAverage(long tstamp, int metric, int average) {
         return values[metric*averages.length + average];
     }
 
