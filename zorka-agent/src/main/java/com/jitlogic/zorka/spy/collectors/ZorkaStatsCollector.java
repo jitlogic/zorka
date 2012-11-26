@@ -77,8 +77,8 @@ public class ZorkaStatsCollector implements SpyCollector {
 
         MethodCallStatistic statistic = (MethodCallStatistic)stats.getMethodCallStatistic(key);
 
-        Object timeObj = record.get(ON_COLLECT, timeField);
-        Object tstampObj = record.get(ON_COLLECT, tstampField);
+        Object timeObj = timeField >= 0 ? record.get(ON_COLLECT, timeField) : 0L;
+        Object tstampObj = tstampField >= 0 ? record.get(ON_COLLECT, tstampField) : 0L;
 
         if (timeObj instanceof Long && tstampObj instanceof Long) {
             if (record.gotStage(ON_RETURN)) {

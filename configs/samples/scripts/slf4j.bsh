@@ -1,0 +1,48 @@
+/**
+ * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+  spy.add(
+    spy.instance()
+      .onEnter().withArguments(2).get(0,0,"class","name")
+      .toStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${0}", -1, -1)
+    .include(1, "org.slf4j.impl.JCLLoggerAdapter", "trace", "void", "String", "Throwable")
+    .include(1, "org.slf4j.impl.JCLLoggerAdapter", "debug", "void", "String", "Throwable")
+    .include(1, "org.slf4j.impl.JCLLoggerAdapter", "info",  "void", "String", "Throwable")
+    .include(1, "org.slf4j.impl.JCLLoggerAdapter", "warn",  "void", "String", "Throwable")
+    .include(1, "org.slf4j.impl.JCLLoggerAdapter", "error", "void", "String", "Throwable")
+  );
+
+  spy.add(
+    spy.instance()
+      .onEnter().withArguments(3).get(0,0,"class","name")
+      .toStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${0}", -1, -1)
+    .include("org.slf4j.impl.SimpleLogger", "log")
+  );
+
+  spy.add(
+    spy.instance()
+      .onEnter().withArguments(4).get(0,0,"class","name")
+      .toStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${0}", -1, -1)
+  );
+
+  spy.add(
+    spy.instance()
+      .onEnter().withArguments(6).get(0,0,"class","name")
+      .toStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${0}", -1, -1)
+    .include("org.slf4j.impl.Log4jLoggerAdapter", "log")
+  );
+

@@ -46,6 +46,6 @@ public class RankProcUnitTest extends ZorkaFixture {
 
         List<TestRankItem> items = rank.list();
 
-        assertEquals(5.0, items.get(0).getAverage(0, 0), 0.001);
+        assertEquals(5.0, items.get(0).getAverage(0L, 0, 0), 0.001);
     }
 }

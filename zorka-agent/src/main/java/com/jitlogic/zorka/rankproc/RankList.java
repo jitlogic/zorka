@@ -33,13 +33,6 @@ public class RankList<T extends Rankable<?>> implements RankLister<T> {
 
     private ZorkaUtil util = ZorkaUtil.getInstance();
 
-    private Comparator<T> comparator = new Comparator<T>() {
-        public int compare(T o1, T o2) {
-            double dd = o2.getAverage(metric, average) - o1.getAverage(metric, average);
-            return dd == 0.0 ? 0 : dd > 0 ? 1 : -1;
-        }
-    };
-
     public RankList(RankLister<T> lister, int maxSize, int metric, int average, long rerankTime) {
         this.lister = lister;
         this.maxSize = maxSize;
@@ -52,7 +45,7 @@ public class RankList<T extends Rankable<?>> implements RankLister<T> {
     public synchronized T get(int i) {
 
         if (util.currentTimeMillis() > lastTime + rerankTime) {
-            rerank();
+            rerank(util.currentTimeMillis());
         }
 
         try {
@@ -67,7 +60,7 @@ public class RankList<T extends Rankable<?>> implements RankLister<T> {
     public synchronized List<T> list() {
 
         if (util.currentTimeMillis() > lastTime + rerankTime) {
-            rerank();
+            rerank(util.currentTimeMillis());
         }
 
         return rankList;
@@ -77,16 +70,21 @@ public class RankList<T extends Rankable<?>> implements RankLister<T> {
     public synchronized int size() {
 
         if (util.currentTimeMillis() > lastTime + rerankTime) {
-            rerank();
+            rerank(util.currentTimeMillis());
         }
 
         return rankList.size();
     }
 
 
-    private void rerank() {
+    private void rerank(final long tstamp) {
         List<T> lst = lister.list();
-        Collections.sort(lst, comparator);
+        Collections.sort(lst, new Comparator<T>() {
+            public int compare(T o1, T o2) {
+                double dd = o2.getAverage(tstamp, metric, average) - o1.getAverage(tstamp, metric, average);
+                return dd == 0.0 ? 0 : dd > 0 ? 1 : -1;
+            }
+        });
 
         rankList = Collections.unmodifiableList(ZorkaUtil.clip(lst, maxSize));
 
