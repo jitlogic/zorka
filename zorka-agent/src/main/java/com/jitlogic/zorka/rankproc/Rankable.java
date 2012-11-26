@@ -21,7 +21,7 @@ package com.jitlogic.zorka.rankproc;
  */
 public interface Rankable<T> {
 
-    public double getAverage(int metric, int average);
+    public double getAverage(long tstamp, int metric, int average);
 
     public String[] getMetrics();
 

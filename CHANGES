@@ -1,9 +1,11 @@
 
-Zorka 0.4
+Zorka 0.4 (2012-11-26)
 ---------
 
  * documentation updates, cleanups and fixes (as usual);
-
+ * nagios NRPE protocol support;
+ * thread rank ported to new ranking framework;
+ * new - circular buffer aggregate;
 
 
 Zorka 0.3 (2012-11-10)

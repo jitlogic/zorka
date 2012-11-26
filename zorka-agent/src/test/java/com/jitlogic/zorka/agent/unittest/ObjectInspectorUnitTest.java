@@ -43,6 +43,7 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
         assertEquals(125, inspector.get(TestInspectorClass.class, "count"));
     }
 
+
     @Test
     public void testInspectArray() {
         String[] array = { "c", "b", "a" };
@@ -51,12 +52,14 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
         assertEquals("c", inspector.get(array, 0));
     }
 
+
     @Test
     public void testListArray() {
         String[] array = { "c", "b", "a" };
 
         assertEquals(Arrays.asList(0,1,2), inspector.list(array));
     }
+
 
     @Test
     public void testInspectMap() {
@@ -67,6 +70,7 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
         assertEquals(3, inspector.get(map, "size()"));
     }
 
+
     @Test
     public void testLisMap() {
         Map<String,Integer> map = new HashMap<String, Integer>();
@@ -74,6 +78,7 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
 
         assertEquals("sorted map keys", Arrays.asList("a", "b", "c"), inspector.list(map));
     }
+
 
     @Test
     public void testInspectList() {
@@ -83,12 +88,14 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
         assertEquals("c", inspector.get(list, 0));
     }
 
+
     @Test
     public void testListList() {
         List<String> list = Arrays.asList("c", "b", "a");
 
         assertEquals(Arrays.asList(0,1,2), inspector.list(list));
     }
+
 
     @Test
     public void testInspectJ2eeStats() throws Exception {
@@ -97,10 +104,12 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
         assertEquals("stat name", "aaa", ts.getName());
     }
 
+
     @Test
     public void testListJ2eeStats() throws Exception {
         assertEquals(Arrays.asList("aaa", "bbb", "ccc"), inspector.list(new TestStats()));
     }
+
 
     @Test
     public void testInspectJmxObj() throws Exception {
@@ -109,6 +118,7 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
         assertEquals(100L, inspector.get(jmxObject, "Nom"));
     }
 
+
     @Test
     public void testListJmxObj() throws Exception {
         JmxObject jmxObject = mkJmxObject();
@@ -116,10 +126,22 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
         assertEquals(Arrays.asList("Div", "Nom", "StrMap"), inspector.list(jmxObject));
     }
 
+
     @Test
     public void testTrivialSubstitutions() {
         assertEquals("ab123cd", inspector.substitute("ab${0}cd", new Object[] { "123" }));
         assertEquals("3", inspector.substitute("${0.length()}", new Object[] { "123"}));
+    }
+
+
+    @Test
+    public void testClassNameGet() {
+        String str = "oja!";
+
+        Object obj1 = inspector.get(str, "class");
+        Object obj2 = inspector.get(obj1, "name");
+
+        assertEquals("java.lang.String", obj2);
     }
 
     // TODO more tests for border cases of inspector.substitute()
@@ -132,6 +154,8 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
         testMbs.registerMBean(bean, on);
         return new JmxObject(on, testMbs, null);
     }
+
+
 
     // TODO tests for tabular data
 

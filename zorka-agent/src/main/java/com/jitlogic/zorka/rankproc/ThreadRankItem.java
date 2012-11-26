@@ -15,7 +15,6 @@
  */
 package com.jitlogic.zorka.rankproc;
 
-import java.lang.management.ThreadInfo;
 import static com.jitlogic.zorka.rankproc.BucketAggregate.*;
 
 public class ThreadRankItem implements Rankable<ThreadRankInfo> {
@@ -29,18 +28,18 @@ public class ThreadRankItem implements Rankable<ThreadRankInfo> {
 
     public ThreadRankItem(ThreadRankInfo threadInfo) {
         this.threadInfo = threadInfo;
-        byCpuTime = new BucketAggregate(30*SEC, 2, 5, 3);
-        byBlockedTime = new BucketAggregate(30*SEC, 2, 5, 3);
+        byCpuTime = new CircularBucketAggregate(SEC, 30, 60, 300, 900);
+        byBlockedTime = new CircularBucketAggregate(SEC, 30, 60, 300, 900);
     }
 
 
-    public synchronized double getAverage(int metric, int average) {
+    public synchronized double getAverage(long tstamp, int metric, int average) {
 
         switch (metric) {
             case BY_CPU:
-                return 100.0 * byCpuTime.getDelta(average) / byCpuTime.getWindow(average);
+                return 100.0 * byCpuTime.getDeltaV(tstamp, average) / byCpuTime.getWindow(average);
             case BY_BLOCK:
-                return 100.0 * byBlockedTime.getDelta(average) / byBlockedTime.getWindow(average);
+                return 100.0 * byBlockedTime.getDeltaV(tstamp, average) / byBlockedTime.getWindow(average);
         }
 
         return 0.0;
