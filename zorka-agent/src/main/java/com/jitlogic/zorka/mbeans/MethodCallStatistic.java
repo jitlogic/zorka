@@ -19,8 +19,8 @@ package com.jitlogic.zorka.mbeans;
 
 import static com.jitlogic.zorka.rankproc.BucketAggregate.MS;
 import com.jitlogic.zorka.rankproc.BucketAggregate;
+import com.jitlogic.zorka.rankproc.CircularBucketAggregate;
 import com.jitlogic.zorka.rankproc.Rankable;
-import com.jitlogic.zorka.rankproc.SlidingBucketAggregate;
 
 import java.util.Date;
 
@@ -38,15 +38,15 @@ public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatis
 
 
     public static MethodCallStatistic newStatAvg15(String name) {
-        return new MethodCallStatistic(name, 10*BucketAggregate.SEC, 6, 5, 3);
+        return new MethodCallStatistic(name, BucketAggregate.SEC, 10, 60, 300, 900);
     }
 
 
-    public MethodCallStatistic(String name, long base, int...stages) {
+    public MethodCallStatistic(String name, long base, int res, int...stages) {
         this.name = name;
-        this.calls = new SlidingBucketAggregate(base, stages);
-        this.errors = new SlidingBucketAggregate(base, stages);
-        this.time = new SlidingBucketAggregate(base, stages);
+        this.calls = new CircularBucketAggregate(base, res, stages);
+        this.errors = new CircularBucketAggregate(base, res, stages);
+        this.time = new CircularBucketAggregate(base, res, stages);
     }
 
 
@@ -156,9 +156,9 @@ public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatis
         long tstamp = System.currentTimeMillis();
         return "(calls=" + getCalls()
                 + ", errors=" + getErrors()
-                +", avg1=" + getAverage(tstamp, TIMES_STAT, 1)
-                + ", avg5=" + getAverage(tstamp, TIMES_STAT,  2)
-                + ", avg15=" + getAverage(tstamp, TIMES_STAT, 3)
+                +", avg1=" + getAverage(tstamp, TIMES_STAT, 0)
+                + ", avg5=" + getAverage(tstamp, TIMES_STAT,  1)
+                + ", avg15=" + getAverage(tstamp, TIMES_STAT, 2)
                 + ")";
     }
 }

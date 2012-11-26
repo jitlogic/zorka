@@ -28,8 +28,8 @@ public class ThreadRankItem implements Rankable<ThreadRankInfo> {
 
     public ThreadRankItem(ThreadRankInfo threadInfo) {
         this.threadInfo = threadInfo;
-        byCpuTime = new SlidingBucketAggregate(30*SEC, 2, 5, 3);
-        byBlockedTime = new SlidingBucketAggregate(30*SEC, 2, 5, 3);
+        byCpuTime = new CircularBucketAggregate(SEC, 30, 60, 300, 900);
+        byBlockedTime = new CircularBucketAggregate(SEC, 30, 60, 300, 900);
     }
 
 

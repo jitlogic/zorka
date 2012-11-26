@@ -142,6 +142,7 @@ public class CircularBucketAggregate implements BucketAggregate {
                 ts[stage] += sectn;
                 tmin[offset] = ts[stage];
                 tmax[offset] = ts[stage] + res;
+                values[offset] = 0;
             } // while ()
             values[offset] = value;
             tmin[offset] = tmax[offset] = tstamp;
@@ -195,6 +196,6 @@ public class CircularBucketAggregate implements BucketAggregate {
             }
         }
 
-        return t2-t1;
+        return Math.abs(t1-t2);
     }
 }

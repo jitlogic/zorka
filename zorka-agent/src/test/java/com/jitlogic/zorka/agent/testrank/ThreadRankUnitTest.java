@@ -70,7 +70,7 @@ public class ThreadRankUnitTest extends ZorkaFixture {
         lister.runCycle(2000);
 
         ThreadRankItem item = lister.list().get(0);
-        assertEquals(10.0, item.getAverage(0L, 0, 0), 0.001);
+        assertEquals(5.0, item.getAverage(0L, 0, 0), 0.001);
     }
 
 
@@ -79,12 +79,12 @@ public class ThreadRankUnitTest extends ZorkaFixture {
         TestThreadRankLister lister = new TestThreadRankLister().feed(1, "Thread-1", 6000, 0);
         lister.runCycle(1000);
 
-        assertEquals(20.0, lister.list().get(0).getAverage(0L, 0,0), 0.001);
+        assertEquals(10.0, lister.list().get(0).getAverage(0L, 0,0), 0.001);
 
         lister.clear().feed(1, "Thread-1", 1500, 0);
         lister.runCycle(31000);
 
-        assertEquals(5.0, lister.list().get(0).getAverage(0L, 0,0), 0.001);
-        assertEquals(10.0, lister.list().get(0).getAverage(0L, 0,1), 0.001);
+        assertEquals(12.5, lister.list().get(0).getAverage(0L, 0,0), 0.001);
+        assertEquals(2.5, lister.list().get(0).getAverage(0L, 0,1), 0.001);
     }
 }
