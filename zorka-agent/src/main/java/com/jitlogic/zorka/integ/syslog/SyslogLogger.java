@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Minimal syslog sender implementation.
  */
-public class SyslogSender implements Runnable {
+public class SyslogLogger implements Runnable {
 
     public final static int DEFAULT_PORT = 514;
 
@@ -52,7 +52,7 @@ public class SyslogSender implements Runnable {
     private Thread thread = null;
 
 
-    public SyslogSender(String syslogServer, String defaultHost) {
+    public SyslogLogger(String syslogServer, String defaultHost) {
 
         try {
             if (syslogServer.contains(":")) {
@@ -79,8 +79,10 @@ public class SyslogSender implements Runnable {
     public void log(int severity, int facility, String hostname, String tag, String content) {
         synchronized (sendQueue) {
             try {
-                String s = format(severity, facility, new Date(), hostname, tag, content);
-                sendQueue.offer(s, 5, TimeUnit.MILLISECONDS);
+                if (running) {
+                    String s = format(severity, facility, new Date(), hostname, tag, content);
+                    sendQueue.offer(s, 1, TimeUnit.MILLISECONDS);
+                }
             } catch (InterruptedException e) { }
         }
     }

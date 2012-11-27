@@ -17,15 +17,15 @@ package com.jitlogic.zorka.agent.testinteg;
 
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.integ.syslog.SyslogLib;
-import com.jitlogic.zorka.integ.syslog.SyslogSender;
+import com.jitlogic.zorka.integ.syslog.SyslogLogger;
 import org.junit.Test;
 
 public class SyslogIntegTest extends ZorkaFixture {
 
     @Test
     public void testTrivialSyslog() throws Exception{
-        SyslogSender sender = syslogLib.get("test", "127.0.0.1", "test");
-        sender.log(SyslogLib.S_ERROR, SyslogLib.F_LOCAL5, "test", "Some test message.");
+        SyslogLogger logger = syslogLib.get("test", "127.0.0.1", "test");
+        logger.log(SyslogLib.S_ERROR, SyslogLib.F_LOCAL5, "test", "Some test message.");
         Thread.sleep(10);
     }
 

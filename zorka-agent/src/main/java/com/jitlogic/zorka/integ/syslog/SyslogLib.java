@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SyslogLib {
 
+
     // Severity codes
     public final static int S_EMERGENCY = 0;
     public final static int S_ALERT = 1;
@@ -29,6 +30,7 @@ public class SyslogLib {
     public final static int S_NOTICE = 5;
     public final static int S_INFO = 6;
     public final static int S_DEBUG = 7;
+
 
     // Facilities
     public final static int F_KERNEL = 0;
@@ -57,30 +59,39 @@ public class SyslogLib {
     public final static int F_LOCAL7 = 23;
 
 
-    private Map<String,SyslogSender> senders = new ConcurrentHashMap<String, SyslogSender>();
+    private Map<String,SyslogLogger> loggers = new ConcurrentHashMap<String, SyslogLogger>();
 
 
-    public SyslogSender get(String id) {
-        return senders.get(id);
+    public SyslogLogger get(String id) {
+        return loggers.get(id);
     }
 
 
-    public SyslogSender get(String id, String syslogServer, String defaultHost) {
-        SyslogSender sender = senders.get(id);
-        if (sender == null) {
-            sender = new SyslogSender(syslogServer, defaultHost);
-            senders.put(id, sender);
-            sender.start();
+    public SyslogLogger get(String id, String syslogServer, String defaultHost) {
+        SyslogLogger logger = loggers.get(id);
+        if (logger == null) {
+            logger = new SyslogLogger(syslogServer, defaultHost);
+            loggers.put(id, logger);
+            logger.start();
         }
-        return sender;
+        return logger;
+    }
+
+
+    public void remove(String id) {
+        SyslogLogger logger = loggers.remove(id);
+
+        if (logger != null) {
+            logger.stop();
+        }
     }
 
 
     public void log(String id, int severity, int facility, String tag, String content) {
-        SyslogSender sender = senders.get(id);
+        SyslogLogger logger = loggers.get(id);
 
-        if (sender != null) {
-            sender.log(severity, facility,  tag,  content);
+        if (logger != null) {
+            logger.log(severity, facility,  tag,  content);
         }
     }
 

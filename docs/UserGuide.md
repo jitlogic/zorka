@@ -217,6 +217,8 @@ Zorka code). There are several library objects visible:
 
 * `nagios` - nagios-specific functions (available if nagios interface is enabled);
 
+* `syslog` - functions for sending messages to log host using syslog protocol;
+
 All above things are visible Beanshell scripts from `$ZORKA_HOME/conf` directory. Interfaces to monitoring systems
 (zabbix, nagios etc.) can call Beanshell functions as well (both built-in and user-defined) but due to their syntax
 are typically limited to simple calls. For example:
@@ -511,6 +513,60 @@ Reloads all configuration scripts in `$ZORKA_HOME/conf` directory matching given
 executing scripts once again. It is script implementer responsiblity to make sure that script is able to execute
 multiple times (and do reconfiguration properly).
 
+## Syslog functions
+
+### syslog.get()
+
+    syslog.get(id)
+    syslog.get(id, syslogServer, defaultHost)
+
+Returns syslog logger object (and creates it if object doesn't exist). See logger objects methods to see what it can do.
+There are two variants of this method: first one only looks for already configured logger and returns `null` if it finds
+nothing. Second one creates logger if necessary. Logger object is registered at syslog lib as `id`, syslog server address
+is passed as host name or ip address (with optional port number in `host:port` notation).
+
+### syslog.log()
+
+    syslog.log(id, severity, facility, tag, message)
+
+Logs message to a logger identified by `id`. Integer parameters `severity` and `facility` have to adhere to syslog
+standard conventions. Message is tagged using `tag` parameter (typically program name or component name) and log message
+is passed via `content` parameter.
+
+Severity and facility codes are defined directly in spy lib. The following severity codes are available: `S_EMERGENCY`,
+`S_ALERT`, `S_CRITICAL`, `S_ERROR`, `S_WARNING`, `S_NOTICE`, `S_INFO`, `S_DEBUG`. The following facility codes are valid:
+`F_LOCAL0`, `F_LOCAL1`, `F_LOCAL2`, `F_LOCAL3`, `F_LOCAL4`, `F_LOCAL5`, `F_LOCAL6`, `F_LOCAL7`, `F_KERNEL`, `F_USER`,
+`F_MAIL`, `F_SYSTEM`, `F_AUTH1`, `F_SYSLOG`, `F_PRINTER`, `F_NETWORK`, `F_UUCP`, `F_CLOCK1`, `F_AUTH2`, `F_FTPD`,
+`F_NTPD`, `F_AUDIT`, `F_ALERT`, `F_CLOCK2`.
+
+### syslog.remove()
+
+    syslog.remove(id)
+
+Stops and unregisters logger identified by `id`. Logger's thread will be stopped and UDP socket will be closed. Note
+that references to this logger object may be still used somewhere. In such case JVM won't release such object but
+all attempts to log using it will be ignored.
+
+### Logger objects
+
+Logger objects can be obtained using `syslog.get()` function and (potentially) can be
+
+#### log()
+
+    <logger-obj>.log(severity, facility, tag, message)
+    <logger-obj>.log(severity, facility, hostname, tag, message)
+
+Logs a message. First variant of this method logs message with default host name (which is set while creating object),
+in second case user can provide custom host names (it is sometimes useful, yet using one, identifiable hostname per JVM
+is generally recommended).
+
+#### stop()
+
+    <logger-obj>.stop()
+
+Calling `stop()` method will stop logger. This means stopping logger's sender thread, closing UDP socket and ignoring
+all subsequent `log()` calls.
+
 ## Zabbix-specific functions
 
 ### zabbix.discovery()
@@ -726,10 +782,11 @@ submitter matching them;
 
 Collectors are final objects receiving (fully processed) and presenting them in some way or performing real actions.
 There is a generic method `toCollector()` that allows attaching custom collectors (including beanshell scripts).
-There is also a set of convenience methods:
+There is also a set of convenience methods useful to configure collector quickly:
 
-    sdef = sdef.toStats(mbsName, beanName, attrName, keyExpr,
-			         tstampField, timeField);
+#### Collecting to Zorka Stats
+
+    sdef = sdef.toStats(mbsName, beanName, attrName, keyExpr, tstampField, timeField);
 
 This is collect method call statistics in `ZorkaStats` object visible via JMX as an attribute of some `MBean`.
 Method arguments:
@@ -761,11 +818,22 @@ It is also possible to attach single-method call statistic directly as mbean att
 
 All parameters are the same as in `toStats()` method (except for `keyExpr` which is missing).
 
+#### Intercepting and presenting objects via Zorka Getter
+
 Presenting intercepted values as mbean attributes is possible with `toGetter()` method:
 
     sdef = sdef.toGetter(mbsName, beanName, attrName, attr1, attr2, ...);
 
 This will present intercepted object as ValGetter attribute. Each time attribute is accessed (eg. via jconsole),
 Zorka will fetch value using attribute chain `(attr1, attr2, ...)` as in `zorka.jmx()` call.
+
+#### Logging collected events via syslog
+
+    sdef = sdef.toSyslog(logger, expr, severity, facility, hostname, tag)
+
+Parameter `logger` must be a reference to logger object obtained using `syslog.get()`. Parameter `expr` is message
+template (similiar to `keyExpr` in other collectors). Remaining parameters - `severity`, `facility`, `hostname` and
+`tag` work in the same way as in `syslog.log()` method.
+
 
 
