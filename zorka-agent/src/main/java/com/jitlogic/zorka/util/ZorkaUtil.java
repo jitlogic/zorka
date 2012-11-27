@@ -280,4 +280,38 @@ public class ZorkaUtil {
 
         return lst;
     }
+
+
+    private static final String tab00c0 = "AAAAAAACEEEEIIII" +
+            "DNOOOOO\u00d7\u00d8UUUUYI\u00df" +
+            "aaaaaaaceeeeiiii" +
+            "\u00f0nooooo\u00f7\u00f8uuuuy\u00fey" +
+            "AaAaAaCcCcCcCcDd" +
+            "DdEeEeEeEeEeGgGg" +
+            "GgGgHhHhIiIiIiIi" +
+            "IiJjJjKkkLlLlLlL" +
+            "lLlNnNnNnnNnOoOo" +
+            "OoOoRrRrRrSsSsSs" +
+            "SsTtTtTtUuUuUuUu" +
+            "UuUuWwYyYZzZzZzF";
+
+    public static String printableASCII7(String source) {
+        char[] vysl = new char[source.length()];
+        char one;
+
+        for (int i = 0; i < source.length(); i++) {
+            one = source.charAt(i);
+            if (one >= '\u00c0' && one <= '\u017f') {
+                one = tab00c0.charAt((int) one - '\u00c0');
+            }
+
+            if (one < (char)32 || one > (char)126) {
+                one = '.';
+            }
+
+            vysl[i] = one;
+        }
+
+        return new String(vysl);
+    }
 }

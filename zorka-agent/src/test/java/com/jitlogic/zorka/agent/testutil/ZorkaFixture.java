@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.agent.testutil;
 
 import com.jitlogic.zorka.agent.*;
+import com.jitlogic.zorka.integ.syslog.SyslogLib;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
@@ -36,6 +37,8 @@ public class ZorkaFixture {
 
     protected AgentInstance agentInstance;
     protected SpyInstance spyInstance;
+
+    protected SyslogLib syslogLib;
 
     protected ZorkaBshAgent zorkaAgent;
     protected ZorkaLib zorka;
@@ -72,6 +75,8 @@ public class ZorkaFixture {
         mBeanServerRegistry.register("test", testMbs, testMbs.getClass().getClassLoader());
 
         testUtil = ZorkaTestUtil.setUp();
+
+        syslogLib = AgentInstance.instance().getSyslogLib();
     }
 
     @After

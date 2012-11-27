@@ -18,6 +18,7 @@ package com.jitlogic.zorka.agent;
 
 import com.jitlogic.zorka.integ.nagios.NagiosAgent;
 import com.jitlogic.zorka.integ.nagios.NagiosLib;
+import com.jitlogic.zorka.integ.syslog.SyslogLib;
 import com.jitlogic.zorka.spy.MainSubmitter;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyLib;
@@ -83,6 +84,8 @@ public class AgentInstance {
     private SpyLib spyLib = null;
     private SpyInstance spyInstance = null;
 
+    private SyslogLib syslogLib = null;
+
     private Properties props;
 
 
@@ -132,6 +135,12 @@ public class AgentInstance {
             log.info("Zorka SPY is diabled. No loaded classes will be transformed in any way.");
         }
 
+        if ("yes".equalsIgnoreCase(props.getProperty(SYSLOG_ENABLE))) {
+            log.info("Enabling Syslog subsystem ....");
+            syslogLib = new SyslogLib();
+            zorkaAgent.installModule("syslog", syslogLib);
+        }
+
         zorkaAgent.loadScriptDir(props.getProperty(ZORKA_CONF_DIR), ".*\\.bsh$");
 
         if ("yes".equalsIgnoreCase(props.getProperty(ZABBIX_ENABLE))) {
@@ -159,6 +168,10 @@ public class AgentInstance {
 
     public ZorkaBshAgent getZorkaAgent() {
         return zorkaAgent;
+    }
+
+    public SyslogLib getSyslogLib() {
+        return syslogLib;
     }
 
 }

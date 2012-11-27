@@ -184,10 +184,13 @@ Logging directives:
 Directives useful for tuning (you propably don't need to change default values):
 
 * `zorka.req.threads = 4` - number of threads for processing requests;
+
 * `zorka.req.queue = 64` -
+
 * `zorka.req.timeout = 10000` - request timeout (in milliseconds) - requests taking more than this will be canceled
 and zorka will close connection abruply;
 
+* `syslog = yes` - controls whether enable (or disable) syslog support; syslog protocol is enabled by default;
 
 # Configuring Zorka
 
