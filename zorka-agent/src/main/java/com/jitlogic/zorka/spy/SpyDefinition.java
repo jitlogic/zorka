@@ -18,6 +18,7 @@ package com.jitlogic.zorka.spy;
 
 
 import bsh.This;
+import com.jitlogic.zorka.integ.syslog.SyslogLogger;
 import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.processors.*;
 import com.jitlogic.zorka.util.ZorkaUtil;
@@ -607,6 +608,28 @@ public class SpyDefinition {
      */
     public SpyDefinition toGetter(String mbsName, String beanName, String attrName, String desc, int src, Object...path) {
         return toCollector(new GetterPresentingCollector(mbsName, beanName, attrName, desc, src, path));
+    }
+
+
+    /**
+     * Instruct spy to send collected record to syslog.
+     *
+     * @param logger logger (object returned by syslog.get())
+     *
+     * @param expr message template
+     *
+     * @param severity
+     *
+     * @param facility
+     *
+     * @param hostname
+     *
+     * @param tag
+     *
+     * @return
+     */
+    public SpyDefinition toSyslog(SyslogLogger logger, String expr, int severity, int facility, String hostname, String tag) {
+        return toCollector(new SyslogCollector(logger, expr, severity, facility, hostname, tag));
     }
 
     // TODO toString() method
