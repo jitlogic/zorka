@@ -135,6 +135,7 @@ public class SnmpLib {
         if (trapper == null) {
             trapper = new SnmpTrapper(addr, community, agentAddr, protocol);
             trappers.put(id, trapper);
+            trapper.start();
         }
 
         return trapper;
