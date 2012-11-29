@@ -56,6 +56,8 @@ public class ZorkaConfig {
 
     public final static String SYSLOG_ENABLE = "syslog";
 
+    public final static String SNMP_ENABLE = "snmp";
+
     public final static String ZABBIX_ENABLE = "zabbix";
 
     public final static String NAGIOS_ENABLE = "nagios";

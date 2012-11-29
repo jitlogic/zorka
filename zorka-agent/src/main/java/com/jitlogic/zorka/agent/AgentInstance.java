@@ -18,6 +18,7 @@ package com.jitlogic.zorka.agent;
 
 import com.jitlogic.zorka.integ.nagios.NagiosAgent;
 import com.jitlogic.zorka.integ.nagios.NagiosLib;
+import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.syslog.SyslogLib;
 import com.jitlogic.zorka.spy.MainSubmitter;
 import com.jitlogic.zorka.spy.SpyInstance;
@@ -85,6 +86,7 @@ public class AgentInstance {
     private SpyInstance spyInstance = null;
 
     private SyslogLib syslogLib = null;
+    private SnmpLib snmpLib = null;
 
     private Properties props;
 
@@ -141,6 +143,12 @@ public class AgentInstance {
             zorkaAgent.installModule("syslog", syslogLib);
         }
 
+        if ("yes".equalsIgnoreCase(props.getProperty(SNMP_ENABLE))) {
+            log.info("Enabling SNMP subsystem ...");
+            snmpLib = new SnmpLib();
+            zorkaAgent.installModule("snmp", snmpLib);
+        }
+
         zorkaAgent.loadScriptDir(props.getProperty(ZORKA_CONF_DIR), ".*\\.bsh$");
 
         if ("yes".equalsIgnoreCase(props.getProperty(ZABBIX_ENABLE))) {
@@ -172,6 +180,10 @@ public class AgentInstance {
 
     public SyslogLib getSyslogLib() {
         return syslogLib;
+    }
+
+    public SnmpLib getSnmpLib() {
+        return snmpLib;
     }
 
 }

@@ -214,6 +214,9 @@ public class SNMPTrapSenderInterface
         return returnString;
     }
     
-    
+
+    public void close() {
+        dSocket.close();
+    }
     
 }
