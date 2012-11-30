@@ -184,5 +184,33 @@ _TODO_ Catching deadlocks
 
 ## CAS auditing with zorka and syslog
 
-This will be a more complete example: we'll implement audit logging of Jasig CAS that will send audit records to
-syslog server.
+This will be a more complete example. We'll re-implement audit logging of Jasig CAS that will send audit records to
+syslog server. CAS already has some audit capability implemented using `inspektr` library that stores audit data in
+application logs. CAS auditing configuration will be enclosed in its own namespace to avoid polluting default (global)
+namespace:
+
+    __cas() {
+        severity = syslog.S_INFO;
+        facility = syslog.F_LOCAL5;
+        logger = syslog.get("audit", "127.0.0.1", "cas");
+
+        // Authentication attempts
+        spy.add(spy.instance()
+          .onReturn().withArguments(1).format(1,"AUTHENTICATION_SUCCESS")
+          .onError().withArguments(1).format(1,"AUTHENTICATION_FAILED")
+          .toSyslog(logger, "action=${1} who=${0} what=${0}", severity, facility, "cas", "cas")
+          .include("org.jasig.cas.authentication.AbstractAuthenticationManager", "authenticate"));
+
+        // ... other methods instrumented
+
+        return this;
+    }
+
+    cas = __cas();
+
+Aside of two constants (used later for convenience), there is a logger defined (sending logs to localhost). Eight methods
+have been instrumented, only one is shown above. See `configs/samples/scripts/auditcas.bsh` for full script.
+
+
+
+
