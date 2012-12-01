@@ -479,6 +479,37 @@ public class SpyDefinition {
 
 
     /**
+     *
+     * @param slot
+     * @param threadLocal
+     * @return
+     */
+    public SpyDefinition get(int slot, ThreadLocal<Object> threadLocal) {
+        return withProcessor(new ThreadLocalProcessor(slot, ThreadLocalProcessor.GET, threadLocal));
+    }
+
+
+    /**
+     *
+     * @param slot
+     * @param threadLocal
+     * @return
+     */
+    public SpyDefinition set(int slot, ThreadLocal<Object> threadLocal) {
+        return withProcessor(new ThreadLocalProcessor(slot, ThreadLocalProcessor.SET, threadLocal));
+    }
+
+
+    /**
+     *
+     * @param threadLocal
+     * @return
+     */
+    public SpyDefinition remove(ThreadLocal<Object> threadLocal) {
+        return withProcessor(new ThreadLocalProcessor(0, ThreadLocalProcessor.REMOVE, threadLocal));
+    }
+
+    /**
      * Calculates time difference between in1 and in2 and stores result in out.
      *
      * @param tstart slot with tstart

@@ -194,23 +194,50 @@ namespace:
         facility = syslog.F_LOCAL5;
         logger = syslog.get("audit", "127.0.0.1", "cas");
 
+        request = new ThreadLocal();
+
+      // Intercept request dispatcher and store request object for later use
+      spy.add(spy.instance()
+        .onEnter().withArguments(1).set(0, request)
+        .onReturn().withArguments(1).remove(request)
+        .onError().withArguments(1).remove(request)
+        .include("org.jasig.cas.web.init.SafeDispatcherServlet", "service"));
+
         // Authentication attempts
         spy.add(spy.instance()
-          .onReturn().withArguments(1).format(1,"AUTHENTICATION_SUCCESS")
-          .onError().withArguments(1).format(1,"AUTHENTICATION_FAILED")
-          .toSyslog(logger, "action=${1} who=${0} what=${0}", severity, facility, "cas", "cas")
+          .onReturn().withArguments(1).format(1,"AUTHENTICATION_SUCCESS").get(2, request)
+          .onError().withArguments(1).format(1,"AUTHENTICATION_FAILED").get(2, request)
+          .toSyslog(logger, "remote=${2.remoteAddr} local=${2.localAddr} action=${1} who=${0} what=${0}",
+              severity, facility, "cas", "cas")
           .include("org.jasig.cas.authentication.AbstractAuthenticationManager", "authenticate"));
 
-        // ... other methods instrumented
+        // ... (other methods instrumented) ...
 
         return this;
     }
 
     cas = __cas();
 
-Aside of two constants (used later for convenience), there is a logger defined (sending logs to localhost). Eight methods
-have been instrumented, only one is shown above. See `configs/samples/scripts/auditcas.bsh` for full script.
+Aside of two constants (used later for convenience), there is a logger defined (sending logs to localhost) and one thread
+local object in `request` variable. It will be used to store servlet requests objects that are used to log client IP
+addresses along with audit events. In order to intercept request object, `SafeDispatcherServlet.service()` method is
+instrumented. It is main entry point to CAS web tier code. Object reference is stored with `set(slot, threadLocal)`
+method and cleared up with `remove(threadLocal)`. It is not necessary to clean up request object when exiting `service()`
+method, yet leaving it incurs unnecessary burden on VM garbage collector as request object is stored for (potentially)
+indefinite time. For all audited (instrumented) methods we use `get(slot, threadLocal)` method to retrieve request object
+to a specific slot, so we can access local and remote addresses using `${slot.remoteAddr}` and `${slot.localAddr}` in
+format strings.
+
+Sample logged records (remember to configure syslog to receive logs via UDP and store it in dedicated file):
+
+    Dec 1 10:52:00 cas cas remote=127.0.0.1 local=127.0.0.1 action=AUTHENTICATION_FAILED who=[username: test] what=[username: test]
+    Dec 1 10:52:00 cas cas remote=127.0.0.1 local=127.0.0.1 action=TICKET_GRANTING_TICKET_NOT_CREATED who=[username: test] what=org.jasig.cas.ticket.TicketCreationException: error.authentication.credentials.bad
+    Dec 1 10:52:06 cas cas remote=127.0.0.1 local=127.0.0.1 action=AUTHENTICATION_SUCCESS who=[username: test] what=[username: test]
+    Dec 1 10:52:06 cas cas remote=127.0.0.1 local=127.0.0.1 action=TICKET_GRANTING_TICKET_CREATED who=[username: test] what=TGT-1-qOggyd15UV6vFuyUncaeEBH1MBbdRY0kCCJKz3YDuOBOGw2f1E-cas01.example.org
+    Dec 1 11:08:07 cas cas remote=127.0.0.1 local=127.0.0.1 action=AUTHENTICATION_SUCCESS who=[username: test] what=[username: test]
+    Dec 1 11:08:07 cas cas remote=127.0.0.1 local=127.0.0.1 action=TICKET_GRANTING_TICKET_CREATED who=[username: test] what=TGT-1-ULOCJ1WsCUPRBykByzvbjnkk1GbeocPilEOQm26N34cugt7KSn-cas01.example.org
 
 
+Eight methods have been instrumented, only one is shown above. See `configs/samples/scripts/auditcas.bsh` for full script.
 
 
