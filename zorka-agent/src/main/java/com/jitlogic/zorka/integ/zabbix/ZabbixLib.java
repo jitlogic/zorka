@@ -147,12 +147,12 @@ public class ZabbixLib {
     }
 
 
-    public ZabbixTrapper get(String id) {
+    public ZabbixTrapper trapper(String id) {
         return trappers.get(id);
     }
 
 
-    public ZabbixTrapper get(String id, String serverAddr, String defaultHost) {
+    public ZabbixTrapper trapper(String id, String serverAddr, String defaultHost) {
         ZabbixTrapper trapper = trappers.get(id);
 
         if (trapper == null) {

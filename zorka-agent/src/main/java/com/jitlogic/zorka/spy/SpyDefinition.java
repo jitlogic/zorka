@@ -18,7 +18,10 @@ package com.jitlogic.zorka.spy;
 
 
 import bsh.This;
-import com.jitlogic.zorka.integ.syslog.SyslogLogger;
+import com.jitlogic.zorka.integ.snmp.SnmpLib;
+import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
+import com.jitlogic.zorka.integ.snmp.TrapVarBindDef;
+import com.jitlogic.zorka.integ.syslog.SyslogTrapper;
 import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
 import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.processors.*;
@@ -485,8 +488,19 @@ public class SpyDefinition {
      * @param threadLocal
      * @return
      */
-    public SpyDefinition get(int slot, ThreadLocal<Object> threadLocal) {
-        return withProcessor(new ThreadLocalProcessor(slot, ThreadLocalProcessor.GET, threadLocal));
+    public SpyDefinition get(int slot, ThreadLocal<Object> threadLocal, Object...path) {
+        return withProcessor(new ThreadLocalProcessor(slot, ThreadLocalProcessor.GET, threadLocal, path));
+    }
+
+
+    /**
+     *
+     * @param slot
+     * @param val
+     * @return
+     */
+    public SpyDefinition put(int slot, Object val) {
+        return withProcessor(new ConstPutProcessor(slot, val));
     }
 
 
@@ -644,9 +658,27 @@ public class SpyDefinition {
 
 
     /**
+     * Sends collected records as SNMP traps.
+     *
+     * @param trapper snmp trapper used to send traps;
+     *
+     * @param oid base OID - used as both enterprise OID in produced traps and prefix for variable OIDs;
+     *
+     * @param spcode - specific trap code; generic trap type is always enterpriseSpecific (6);
+     *
+     * @param bindings bindings defining additional variables attached to this trap;
+     *
+     * @return augmented spy definition
+     */
+    public SpyDefinition toSnmp(SnmpTrapper trapper, String oid, int spcode, TrapVarBindDef...bindings) {
+        return toCollector(new SnmpCollector(trapper, oid, SnmpLib.GT_SPECIFIC, spcode, oid, bindings));
+    }
+
+
+    /**
      * Instruct spy to send collected record to syslog.
      *
-     * @param logger logger (object returned by syslog.get())
+     * @param trapper logger (object returned by syslog.get())
      *
      * @param expr message template
      *
@@ -660,8 +692,8 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition toSyslog(SyslogLogger logger, String expr, int severity, int facility, String hostname, String tag) {
-        return toCollector(new SyslogCollector(logger, expr, severity, facility, hostname, tag));
+    public SpyDefinition toSyslog(SyslogTrapper trapper, String expr, int severity, int facility, String hostname, String tag) {
+        return toCollector(new SyslogCollector(trapper, expr, severity, facility, hostname, tag));
     }
 
 

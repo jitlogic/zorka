@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-//
+// CAS auditing example refactored a bit and extended to Zabbix (in addition to syslog)
 
 __cas() {
 
@@ -24,17 +24,16 @@ __cas() {
 
   request = new ThreadLocal();
 
-  syslogLog = syslog.get("audit", "127.0.0.1", zorka.getHostname());
-  zabbixLog = zabbix.get("audit", "127.0.0.1", zorka.getHostname());
-
+  syslogTrapper = useSyslog ? syslog.trapper("audit", "127.0.0.1", zorka.getHostname()) : null;
+  zabbixTrapper = useZabbix ? zabbix.trapper("audit", "127.0.0.1", zorka.getHostname()) : null;
 
   audit(sdef, expr) {
     if (useSyslog)
-      sdef = sdef.toSyslog(syslogLog, expr, syslog.S_INFO, syslog.F_LOCAL5, 
+      sdef = sdef.toSyslog(syslogTrapper, expr, syslog.S_INFO, syslog.F_LOCAL5, 
                                zorka.getHostname(), "cas.audit");
 
     if (useZabbix)
-      sdef = sdef.toZabbix(zabbixLog, expr, "cas.audit");
+      sdef = sdef.toZabbix(zabbixTrapper, expr, "cas.audit");
 
     spy.add(sdef);
   }

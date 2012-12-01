@@ -22,7 +22,7 @@ __cas() {
 
   severity = syslog.S_INFO;
   facility = syslog.F_LOCAL5;
-  logger = syslog.get("audit", "127.0.0.1", "cas");
+  logger = syslog.trapper("audit", "127.0.0.1", "cas");
 
   request = new ThreadLocal();
 

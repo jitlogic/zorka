@@ -59,39 +59,39 @@ public class SyslogLib {
     public final static int F_LOCAL7 = 23;
 
 
-    private Map<String,SyslogLogger> loggers = new ConcurrentHashMap<String, SyslogLogger>();
+    private Map<String,SyslogTrapper> trappers = new ConcurrentHashMap<String, SyslogTrapper>();
 
 
-    public SyslogLogger get(String id) {
-        return loggers.get(id);
+    public SyslogTrapper trapper(String id) {
+        return trappers.get(id);
     }
 
 
-    public SyslogLogger get(String id, String syslogServer, String defaultHost) {
-        SyslogLogger logger = loggers.get(id);
-        if (logger == null) {
-            logger = new SyslogLogger(syslogServer, defaultHost);
-            loggers.put(id, logger);
-            logger.start();
+    public SyslogTrapper trapper(String id, String syslogServer, String defaultHost) {
+        SyslogTrapper trapper = trappers.get(id);
+        if (trapper == null) {
+            trapper = new SyslogTrapper(syslogServer, defaultHost);
+            trappers.put(id, trapper);
+            trapper.start();
         }
-        return logger;
+        return trapper;
     }
 
 
     public void remove(String id) {
-        SyslogLogger logger = loggers.remove(id);
+        SyslogTrapper trapper = trappers.remove(id);
 
-        if (logger != null) {
-            logger.stop();
+        if (trapper != null) {
+            trapper.stop();
         }
     }
 
 
     public void log(String id, int severity, int facility, String tag, String content) {
-        SyslogLogger logger = loggers.get(id);
+        SyslogTrapper trapper = trappers.get(id);
 
-        if (logger != null) {
-            logger.log(severity, facility,  tag,  content);
+        if (trapper != null) {
+            trapper.log(severity, facility,  tag,  content);
         }
     }
 

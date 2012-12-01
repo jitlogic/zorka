@@ -231,13 +231,86 @@ format strings.
 Sample logged records (remember to configure syslog to receive logs via UDP and store it in dedicated file):
 
     Dec 1 10:52:00 cas cas remote=127.0.0.1 local=127.0.0.1 action=AUTHENTICATION_FAILED who=[username: test] what=[username: test]
-    Dec 1 10:52:00 cas cas remote=127.0.0.1 local=127.0.0.1 action=TICKET_GRANTING_TICKET_NOT_CREATED who=[username: test] what=org.jasig.cas.ticket.TicketCreationException: error.authentication.credentials.bad
+    Dec 1 10:52:00 cas cas remote=127.0.0.1 local=127.0.0.1 action=TICKET_GRANTING_TICKET_NOT_CREATED who=[username: test]
+    what=org.jasig.cas.ticket.TicketCreationException: error.authentication.credentials.bad
     Dec 1 10:52:06 cas cas remote=127.0.0.1 local=127.0.0.1 action=AUTHENTICATION_SUCCESS who=[username: test] what=[username: test]
-    Dec 1 10:52:06 cas cas remote=127.0.0.1 local=127.0.0.1 action=TICKET_GRANTING_TICKET_CREATED who=[username: test] what=TGT-1-qOggyd15UV6vFuyUncaeEBH1MBbdRY0kCCJKz3YDuOBOGw2f1E-cas01.example.org
+    Dec 1 10:52:06 cas cas remote=127.0.0.1 local=127.0.0.1 action=TICKET_GRANTING_TICKET_CREATED who=[username: test]
+    what=TGT-1-qOggyd15UV6vFuyUncaeEBH1MBbdRY0kCCJKz3YDuOBOGw2f1E-cas01.example.org
     Dec 1 11:08:07 cas cas remote=127.0.0.1 local=127.0.0.1 action=AUTHENTICATION_SUCCESS who=[username: test] what=[username: test]
-    Dec 1 11:08:07 cas cas remote=127.0.0.1 local=127.0.0.1 action=TICKET_GRANTING_TICKET_CREATED who=[username: test] what=TGT-1-ULOCJ1WsCUPRBykByzvbjnkk1GbeocPilEOQm26N34cugt7KSn-cas01.example.org
+    Dec 1 11:08:07 cas cas remote=127.0.0.1 local=127.0.0.1 action=TICKET_GRANTING_TICKET_CREATED who=[username: test]
+    what=TGT-1-ULOCJ1WsCUPRBykByzvbjnkk1GbeocPilEOQm26N34cugt7KSn-cas01.example.org
 
 
-Eight methods have been instrumented, only one is shown above. See `configs/samples/scripts/auditcas.bsh` for full script.
+Eight methods have been instrumented, only one is shown above. See `configs/samples/scripts/auditcas1.bsh` for full script.
+The `auditcas2.bsh` file contains the same script refactored in a way that it can send traps to syslog and zabbix.
 
+Third variant of this script - `auditcas3.bsh` - sends SNMP traps instead of text logs. It allows us to send structured
+messages instead of formated text. Each field of audit message has its own key-value pair added to SNMP trap. Actions and
+result statuses are encoded as integers:
+
+    // Action codes (sent as oid.3)
+    AUTHENTICATION = 1;
+    TGT_CREATED = 2;
+    TGT_DESTROYED = 3;
+    SVT_GRANTED = 4;
+    SVT_VALIDATED = 5;
+    PROXY_GRANTED = 6;
+    SVC_SAVED = 7;
+    SVC_DELETED = 8;
+
+    // Result codes (send as oid.4)
+    FAILURE = 0;
+    SUCCESS = 1;
+
+Two global variables actually matter (enclosed in `cas` namespace as in previous examples):
+
+    request = new ThreadLocal();
+    trapper = snmp.trapper("audit", "127.0.0.1", "public", "127.0.0.1");
+
+As most of fields are the same for all messages a convention has been assumed in collected records and quite a big chunk
+of work has been moved to common `audit()` function:
+
+    audit(sdef, action) {
+      // SUCCESS path ...
+      sdef = sdef.onReturn().put(2, action).put(3, SUCCESS)
+          .get(4, request, "remoteAddr").get(5, request, "localAddr");
+
+      // FAILURE path ...
+      sdef = sdef.onError().put(2, action).put(3, SUCCESS)
+          .get(4, request, "remoteAddr").get(5, request, "localAddr");
+
+      // Configure SNMP trap collector
+      sdef = sdef.toSnmp(trapper, oid, 0,
+         snmp.bind(0, snmp.OCTETSTRING, "1"), // WHO  (String)
+         snmp.bind(1, snmp.OCTETSTRING, "2"), // WHAT (String)
+         snmp.bind(2, snmp.INTEGER, "3"),     // ACTION (int)
+         snmp.bind(3, snmp.INTEGER, "4"),     // RESULT (int)
+         snmp.bind(4, snmp.IPADDRESS, "5"),   // REMOTE (ip address)
+         snmp.bind(5, snmp.IPADDRESS, "6"));  // LOCAL (ip address)
+
+      spy.add(sdef);
+    }
+
+So, most fetched fields are actually configured in `audit()` function. Two remaining ones are `WHO` and `WHAT` stored at
+slots `0` and `1`. These are configured when instrumenting actual methods, for example:
+
+    // Authentication attempts
+    sdefAuth = spy.instance()
+      .onReturn().withArguments(1,1)
+      .onError().withArguments(1,1)
+      .include("org.jasig.cas.authentication.AbstractAuthenticationManager", "authenticate");
+    audit(sdefAuth, AUTHENTICATION);
+
+All remaining methods are similiarly configured. See `auditcas3.bsh` for entire script. Results can be viewed using
+`snmptrapd` program or `tcpdump`:
+
+    # tcpdump -ni lo -s 1024 udp port 162
+    listening on lo, link-type EN10MB (Ethernet), capture size 1024 bytes
+    23:50:51.224454 IP 127.0.0.1.35370 > 127.0.0.1.snmptrap:  Trap(156)  .1.3.6.1.2.1.1.1 127.0.0.1 enterpriseSpecific
+    s=0 2296238946 .1.3.6.1.2.1.1.1.1="[username: test]" .1.3.6.1.2.1.1.1.2="[username: test]" .1.3.6.1.2.1.1.1.3=1
+    .1.3.6.1.2.1.1.1.4=1 .1.3.6.1.2.1.1.1.5=127.0.0.1 .1.3.6.1.2.1.1.1.6=127.0.0.1
+    23:50:51.229842 IP 127.0.0.1.35370 > 127.0.0.1.snmptrap:  Trap(215)  .1.3.6.1.2.1.1.1 127.0.0.1 enterpriseSpecific
+    s=0 2296238946 .1.3.6.1.2.1.1.1.1="[username: test]"
+    .1.3.6.1.2.1.1.1.2="TGT-1-wvfjuUoqmQj6rYmNbgOqQsXJkEt0E7BtFEzYFjMkDUFkfCYTWL-cas01.example.org" .1.3.6.1.2.1.1.1.3=2
+    .1.3.6.1.2.1.1.1.4=1 .1.3.6.1.2.1.1.1.5=127.0.0.1 .1.3.6.1.2.1.1.1.6=127.0.0.1
 

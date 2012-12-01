@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.spy.collectors;
 
-import com.jitlogic.zorka.integ.syslog.SyslogLogger;
+import com.jitlogic.zorka.integ.syslog.SyslogTrapper;
 import com.jitlogic.zorka.spy.SpyCollector;
 import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.spy.SpyRecord;
@@ -23,7 +23,7 @@ import com.jitlogic.zorka.util.ObjectInspector;
 
 public class SyslogCollector implements SpyCollector {
 
-    private SyslogLogger logger;
+    private SyslogTrapper trapper;
     private String expr;
     int severity, facility;
     private String tag, hostname;
@@ -31,9 +31,9 @@ public class SyslogCollector implements SpyCollector {
     private ObjectInspector inspector = new ObjectInspector();
 
 
-    public SyslogCollector(SyslogLogger logger, String expr,
+    public SyslogCollector(SyslogTrapper trapper, String expr,
                            int severity, int facility, String hostname, String tag) {
-        this.logger = logger;
+        this.trapper = trapper;
         this.expr = expr;
 
         this.severity = severity;
@@ -50,9 +50,9 @@ public class SyslogCollector implements SpyCollector {
         String msg = inspector.substitute(expr, vals);
 
         if (hostname != null) {
-            logger.log(severity, facility, hostname, tag, msg);
+            trapper.log(severity, facility, hostname, tag, msg);
         } else {
-            logger.log(severity,  facility, tag,  msg);
+            trapper.log(severity,  facility, tag,  msg);
         }
     }
 }

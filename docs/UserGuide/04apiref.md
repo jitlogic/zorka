@@ -90,10 +90,10 @@ multiple times (and do reconfiguration properly).
 
 ## Syslog functions
 
-### syslog.get()
+### syslog.trapper()
 
-    syslog.get(id)
-    syslog.get(id, syslogServer, defaultHost)
+    syslog.trapper(id)
+    syslog.trapper(id, syslogServer, defaultHost)
 
 Returns syslog logger object (and creates it if object doesn't exist). See logger objects methods to see what it can do.
 There are two variants of this method: first one only looks for already configured logger and returns `null` if it finds
@@ -158,20 +158,73 @@ method will be described in next section, yet this one is sufficient for most ca
 This is a more sophiscated discovery function that - in addition to listing mbeans themselves - can also dig deeper into
 mbean attributes.
 
-### zabbix.get()
+### zabbix.trapper()
 
-    zabbix.get(id)
-    zabbix.get(id, serverAddr, defaultHost)
-
-Returns (and eventually creates) zabbix trapper. Newly created trappers are registered in zabbix library and will be
-returned every time `get()` function with the same `id` will be called.
-
-### zabbix.remove()
-
+    zabbix.trapper(id)
+    zabbix.trapper(id, serverAddr, defaultHost)
     zabbix.remove(id)
 
-Stops and unregisters trapper registered in zabbix library.
+Returns (and eventually creates) zabbix trapper. Newly created trappers are registered in zabbix library and will be
+returned every time `trapper()` function with the same `id` will be called. Parameters:
 
+* `id` - arbitrary string identifying trapper; must be unique in `zabbix` library;
+
+* `serverAddr` - address of zabbix server (plus optional port number in `addr:port` form);
+
+* `defaultHost` - default host name - will be used as host name if no other has been passed;
+
+Last function stops and unregisters trapper registered in zabbix library.
+
+## SNMP functions
+
+Zorka provides SNMP library which currently only provides support for sending SNMP traps. SNMP agent functionality is
+not yet implemented albeit it is planned for the future.
+
+### snmp.trapper()
+
+    snmp.trapper(id)
+    snmp.trapper(id, snmpAddr, community, agentAddr)
+    snmp.trapper(id, snmpAddr, community, agentAddr, protocol)
+    snmp.remove(id)
+
+Returns (and eventually creates) SNMP trapper object. Newly created SNMP trappers are registered in `snmp` library and
+will be returned every time `trapper()` method with the same `id` will be called. Parameters:
+
+* `id` - arbitrary string that will identify trapper; must be unique in `snmp` library;
+
+* `snmpAddr` - address of SNMP server (and optionally port in `addr:port` form);
+
+* `community` - community ID (as configured in SNMP server);
+
+* `agentAddr` - (advertised) agent IP address;
+
+* `protocol` - SNMP protocol version: `snmp.SNMP_V1` and `snmp.SNMP_V2` are currently supported;
+
+Each created trapper will have its own UDP port and its own thread. Last function removes and stops trapper identified
+by `id`.
+
+### snmp.val()
+
+    snmp.val(type, value)
+
+Converts java object into SNMP typed object. The following SNMP types are valid: `snmp.INTEGER`, `snmp.BITSTRING`,
+`snmp.OCTETSTRING`, `snmp.NULL`, `snmp.OID`, `snmp.SEQUENCE`, `snmp.IPADDRESS`, `snmp.COUNTER32`, `snmp.GAUGE32`,
+`snmp.TIMETICKS`, `snmp.NSAPADDRESS`, `snmp.COUNTER64`, `snmp.UINTEGER32`.
+
+### snmp.oid()
+
+    snmp.oid(template, vals)
+
+Creates an SNMP OID object. Template is an OID string with optional placeholders in standard `${...}` form.
+Parameters passed as `vals` are used to fill placeholders.
+
+### snmp.bind()
+
+    snmp.bind(slot, type, oidSuffix)
+
+Creates spy record to trap variable binding object. It will map object from `slot` in `ON_COLLECT` buffer of spy record
+to a SNMP object of `type` tagged with `oidSuffix`. OID suffix will be added to base OID in traps sent by `SnmpCollector`
+component of Zorka Spy. See `sdef.toSnmp()` description below for more information about bindings.
 
 # Class and Method Instrumentation API
 
@@ -433,14 +486,21 @@ Presenting intercepted values as mbean attributes is possible with `toGetter()` 
 This will present intercepted object as ValGetter attribute. Each time attribute is accessed (eg. via jconsole),
 Zorka will fetch value using attribute chain `(attr1, attr2, ...)` as in `zorka.jmx()` call.
 
-#### Logging collected events via syslog
+#### Logging collected events via Syslog
 
-    sdef = sdef.toSyslog(logger, expr, severity, facility, hostname, tag)
+    sdef = sdef.toSyslog(trapper, expr, severity, facility, hostname, tag)
 
-Parameter `logger` must be a reference to logger object obtained using `syslog.get()`. Parameter `expr` is message
+Parameter `trapper` must be a reference to trapper object obtained using `syslog.trapper()`. Parameter `expr` is message
 template (analogous to `keyExpr` in other collectors). Remaining parameters - `severity`, `facility`, `hostname` and
 `tag` work in the same way as in `syslog.log()` method.
 
+#### Sending collected events as SNMP traps
+
+    sdef = sdef.toSnmp(trapper, oid, spcode, bindings)
+
+Parameter `trapper` must be a reference to trapper object obtained using `snmp.trapper()` function. Traps will have their
+`enterprise-oid` field set to `oid` and all variables will have their keys starting with `oid`. Traps will be of
+`enterpriseSpecific` (6) type and specific code will be set to `spcode`.
 
 #### Sending collected events to Zabbix
 

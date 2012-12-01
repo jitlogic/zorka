@@ -13,20 +13,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.agent.testinteg;
+package com.jitlogic.zorka.spy.processors;
 
-import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
-import com.jitlogic.zorka.integ.syslog.SyslogLib;
-import com.jitlogic.zorka.integ.syslog.SyslogTrapper;
-import org.junit.Test;
+import com.jitlogic.zorka.spy.SpyProcessor;
+import com.jitlogic.zorka.spy.SpyRecord;
 
-public class SyslogIntegTest extends ZorkaFixture {
+public class ConstPutProcessor implements SpyProcessor {
 
-    @Test
-    public void testTrivialSyslog() throws Exception{
-        SyslogTrapper trapper = syslogLib.trapper("test", "127.0.0.1", "test");
-        trapper.log(SyslogLib.S_ERROR, SyslogLib.F_LOCAL5, "test", "Some test message.");
-        Thread.sleep(10);
+    private int dst;
+    private Object val;
+
+    public ConstPutProcessor(int dst, Object val) {
+        this.dst = dst;
+        this.val = val;
     }
 
+    public SpyRecord process(int stage, SpyRecord record) {
+        record.put(stage, dst, val);
+        return record;
+    }
 }
