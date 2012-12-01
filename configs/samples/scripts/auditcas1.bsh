@@ -1,0 +1,116 @@
+/**
+ * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// This sample script (re)implements auditing subsystem for Jasig CAS server.
+// Audit records are sent to a syslog server (instead of being stored locally).
+
+__cas() {
+
+  severity = syslog.S_INFO;
+  facility = syslog.F_LOCAL5;
+  logger = syslog.trapper("audit", "127.0.0.1", "cas");
+
+  request = new ThreadLocal();
+
+  // Intercept request dispatcher and store request object for later use
+  spy.add(spy.instance()
+    .onEnter().withArguments(1).set(0, request)
+    .onReturn().withArguments(1).remove(request)
+    .onError().withArguments(1).remove(request)
+    .include("org.jasig.cas.web.init.SafeDispatcherServlet", "service"));
+
+
+  // Authentication attempts
+  spy.add(spy.instance()
+    .onReturn().withArguments(1).format(1,"AUTHENTICATION_SUCCESS").get(2, request)
+    .onError().withArguments(1).format(1,"AUTHENTICATION_FAILED").get(2, request)
+    .toSyslog(logger, "remote=${2.remoteAddr} local=${2.localAddr} action=${1} who=${0} what=${0}", 
+        severity, facility, "cas", "cas")
+    .include("org.jasig.cas.authentication.AbstractAuthenticationManager", "authenticate"));
+
+
+  // TGT-s created
+  spy.add(spy.instance()
+    .onReturn().withArguments(1).withRetVal().format(2, "TICKET_GRANTING_TICKET_CREATED").get(3, request)
+    .onError().withArguments(1).withError().format(2, "TICKET_GRANTING_TICKET_NOT_CREATED").get(3, request)
+    .toSyslog(logger, "remote=${3.remoteAddr} local=${3.localAddr} action=${2} who=${0} what=${1}", 
+        severity, facility, "cas", "cas")
+    .include("org.jasig.cas.CentralAuthenticationServiceImpl", "createTicketGrantingTicket"));
+
+
+  // TGT-s destroyed
+  spy.add(spy.instance()
+    .onReturn().withArguments(1).format(1, "?").format(2, "TICKET_GRANTING_TICKET_DESTROYED").get(3, request)
+    .onError().withArguments(1).withError().format(2, "TICKET_GRANTING_TICKET_NOT_DESTROYED").get(3, request)
+    .toSyslog(logger, "remote=${3.remoteAddr} local=${3.localAddr} action=${2} who=${0} what=${2}", 
+        severity, facility, "cas", "cas")
+    .include("org.jasig.cas.CentralAuthenticationServiceImpl", "destroyTicketGrantingTicket"));
+
+
+  // Service tickets granted
+  spy.add(spy.instance()
+    .onReturn().withArguments(1,2,3).withRetVal().format(4, "SERVICE_TICKET_GRANTED").get(5, request)
+    .onError().withArguments(1,2,3).withError().format(4, "SERVICE_TICKET_NOT_GRANTED").get(5, request)
+    .toSyslog(logger, "remote=${5.remoteAddr} local=${5.localAddr} action=${4} who=${2} service=${1} tgt=${0} what=${3}", 
+        severity, facility, "cas", "cas")
+    .include(1, "org.jasig.cas.CentralAuthenticationServiceImpl", "grantServiceTicket", 
+        "String", "org.jasig.cas.authentication.principal.Service", 
+        "org.jasig.cas.authentication.principal.Credentials"));
+
+
+  // Proxy granting ticket created
+  spy.add(spy.instance()
+    .onReturn().withArguments(1,2).withRetVal().format(3, "PROXY_GRANTING_TICKET_CREATED").get(4, request)
+    .onError().withArguments(1,2).withError().format(3, "PROXY_GRANTING_TICKET_NOT_CREATED").get(4, request)
+    .toSyslog(logger, "remote=${4.remoteAddr} local=${4.localAddr} action=${3} who=${1} what=${2} serviceTicket=${0}", 
+        severity, facility, "cas", "cas")
+    .include("org.jasig.cas.CentralAuthenticationServiceImpl", "delegateTicketGrantingTicket"));
+
+
+  // Validate service ticket
+  spy.add(spy.instance()
+    .onReturn().withArguments(1,2).withRetVal().format(3, "SERVICE_TICKET_VALIDATE_SUCCESS").get(4, request)
+    .onError().withArguments(1,2).withError().format(3, "SERVICE_TICKET_VALIDATE_FAILURE").get(4, request)
+    .toSyslog(logger, "remote=${4.remoteAddr} local=${4.localAddr} action=${3} who=? what=${2} serviceTicket=${0} service=${1}", 
+        severity, facility, "cas", "cas")
+    .include("org.jasig.cas.CentralAuthenticationServiceImpl", "validateServiceTicket"));
+
+
+  // Delete a service
+  spy.add(spy.instance()
+    .onReturn().withArguments(1).format(1, "OK").format(2, "DELETE_SERVICE_SUCCESS").get(3, request)
+    .onError().withArguments(1).withError().format(2, "DELETE_SERVICE_FAILURE").get(3, request)
+    .toSyslog(logger, "remote=${3.remoteAddr} local=${3.localAddr} action=${2} result=${1} id=${0}", 
+        severity, facility, "cas", "cas")
+    .include("org.jasig.cas.DefaultServicesManagerImpl", "delete"));
+
+
+  // Save a service
+  spy.add(spy.instance()
+    .onReturn().withArguments(1).withRetVal().format(2, "SAVE_SERVICE_SUCCESS").get(3, request)
+    .onError().withArguments(1).withError().format(2, "SAVE_SERVICE_FAILURE").get(3, request)
+    .toSyslog(logger, "remote=${3.remoteAddr} local=${3.localAddr} action=${2} service=${0} result=${1}", 
+        severity, facility, "cas", "cas")
+    .include("org.jasig.cas.DefaultServicesManagerImpl", "save"));
+
+
+  return this;
+}
+
+
+cas = __cas();
+

@@ -18,7 +18,11 @@ package com.jitlogic.zorka.spy;
 
 
 import bsh.This;
-import com.jitlogic.zorka.integ.syslog.SyslogLogger;
+import com.jitlogic.zorka.integ.snmp.SnmpLib;
+import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
+import com.jitlogic.zorka.integ.snmp.TrapVarBindDef;
+import com.jitlogic.zorka.integ.syslog.SyslogTrapper;
+import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
 import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.processors.*;
 import com.jitlogic.zorka.util.ZorkaUtil;
@@ -479,6 +483,48 @@ public class SpyDefinition {
 
 
     /**
+     *
+     * @param slot
+     * @param threadLocal
+     * @return
+     */
+    public SpyDefinition get(int slot, ThreadLocal<Object> threadLocal, Object...path) {
+        return withProcessor(new ThreadLocalProcessor(slot, ThreadLocalProcessor.GET, threadLocal, path));
+    }
+
+
+    /**
+     *
+     * @param slot
+     * @param val
+     * @return
+     */
+    public SpyDefinition put(int slot, Object val) {
+        return withProcessor(new ConstPutProcessor(slot, val));
+    }
+
+
+    /**
+     *
+     * @param slot
+     * @param threadLocal
+     * @return
+     */
+    public SpyDefinition set(int slot, ThreadLocal<Object> threadLocal) {
+        return withProcessor(new ThreadLocalProcessor(slot, ThreadLocalProcessor.SET, threadLocal));
+    }
+
+
+    /**
+     *
+     * @param threadLocal
+     * @return
+     */
+    public SpyDefinition remove(ThreadLocal<Object> threadLocal) {
+        return withProcessor(new ThreadLocalProcessor(0, ThreadLocalProcessor.REMOVE, threadLocal));
+    }
+
+    /**
      * Calculates time difference between in1 and in2 and stores result in out.
      *
      * @param tstart slot with tstart
@@ -612,9 +658,27 @@ public class SpyDefinition {
 
 
     /**
+     * Sends collected records as SNMP traps.
+     *
+     * @param trapper snmp trapper used to send traps;
+     *
+     * @param oid base OID - used as both enterprise OID in produced traps and prefix for variable OIDs;
+     *
+     * @param spcode - specific trap code; generic trap type is always enterpriseSpecific (6);
+     *
+     * @param bindings bindings defining additional variables attached to this trap;
+     *
+     * @return augmented spy definition
+     */
+    public SpyDefinition toSnmp(SnmpTrapper trapper, String oid, int spcode, TrapVarBindDef...bindings) {
+        return toCollector(new SnmpCollector(trapper, oid, SnmpLib.GT_SPECIFIC, spcode, oid, bindings));
+    }
+
+
+    /**
      * Instruct spy to send collected record to syslog.
      *
-     * @param logger logger (object returned by syslog.get())
+     * @param trapper logger (object returned by syslog.get())
      *
      * @param expr message template
      *
@@ -628,9 +692,44 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition toSyslog(SyslogLogger logger, String expr, int severity, int facility, String hostname, String tag) {
-        return toCollector(new SyslogCollector(logger, expr, severity, facility, hostname, tag));
+    public SpyDefinition toSyslog(SyslogTrapper trapper, String expr, int severity, int facility, String hostname, String tag) {
+        return toCollector(new SyslogCollector(trapper, expr, severity, facility, hostname, tag));
     }
+
+
+    /**
+     * Sends collected records to zabbix using zabbix trapper.
+     *
+     * @param trapper
+     *
+     * @param expr
+     *
+     * @param key
+     *
+     * @return
+     */
+    public SpyDefinition toZabbix(ZabbixTrapper trapper, String expr, String key) {
+        return toCollector(new ZabbixCollector(trapper, expr, null, key));
+    }
+
+
+    /**
+     * Sends collected records to zabbix using zabbix trapper
+     *
+     * @param trapper
+     *
+     * @param expr
+     *
+     * @param host
+     *
+     * @param key
+     *
+     * @return
+     */
+    public SpyDefinition toZabbix(ZabbixTrapper trapper, String expr, String host, String key) {
+        return toCollector(new ZabbixCollector(trapper, expr, host, key));
+    }
+
 
     // TODO toString() method
 

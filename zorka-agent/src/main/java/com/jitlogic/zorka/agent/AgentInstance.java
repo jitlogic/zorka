@@ -149,8 +149,6 @@ public class AgentInstance {
             zorkaAgent.installModule("snmp", snmpLib);
         }
 
-        zorkaAgent.loadScriptDir(props.getProperty(ZORKA_CONF_DIR), ".*\\.bsh$");
-
         if ("yes".equalsIgnoreCase(props.getProperty(ZABBIX_ENABLE))) {
             zabbixAgent = new ZabbixAgent(zorkaAgent);
             zabbixAgent.start();
@@ -162,6 +160,8 @@ public class AgentInstance {
             zorkaAgent.installModule("nagios", nagiosLib);
             nagiosAgent.start();
         }
+        zorkaAgent.loadScriptDir(props.getProperty(ZORKA_CONF_DIR), ".*\\.bsh$");
+
     }
 
 

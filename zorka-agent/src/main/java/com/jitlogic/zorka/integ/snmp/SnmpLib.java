@@ -35,8 +35,7 @@ public class SnmpLib {
     public final static int SNMP_V2 = 2;
 
     // Basic types
-    public final static String MIB_ISO      = "1";
-    public final static String MIB_INTERNET = "1.3.6.1";
+    public final static String MGMT_MIB = "1.3.6.1.2.1";
 
     // Basic types
     public static final int INTEGER     = 0;
@@ -54,6 +53,14 @@ public class SnmpLib {
     public static final int COUNTER64   = 12;
     public static final int UINTEGER32  = 13;
 
+    // Trap types
+    public final static int GT_COLDSTART = 0;
+    public final static int GT_WARMSTART = 1;
+    public final static int GT_LINKROWN = 2;
+    public final static int GT_LINKUP = 3;
+    public final static int GT_AUTHFAIL = 4;
+    public final static int GT_EGPLOSS = 5;
+    public final static int GT_SPECIFIC = 6;
 
     private ObjectInspector inspector = new ObjectInspector();
 
@@ -73,25 +80,25 @@ public class SnmpLib {
                     if (val instanceof byte[]) {
                         return new SNMPBitString((byte[])val);
                     } else {
-                        return new SNMPBitString((String)val);
+                        return new SNMPBitString(""+val);
                     }
                 case OCTETSTRING :
                     if (val instanceof byte[]) {
                         return new SNMPOctetString((byte[])val);
                     } else {
-                        return new SNMPOctetString((String)val);
+                        return new SNMPOctetString(""+val);
                     }
                 case NULL :
                     return new SNMPNull();
                 case OID:
-                    return new SNMPObjectIdentifier((String)val);
+                    return new SNMPObjectIdentifier(""+val);
                 case SEQUENCE:
                     return new SNMPSequence((Vector)val);
                 case IPADDRESS:
                     if (val instanceof byte[]) {
                         return new SNMPIPAddress((byte[])val);
                     } else {
-                        return new SNMPIPAddress((String)val);
+                        return new SNMPIPAddress(""+val);
                     }
                 case COUNTER32:
                     return new SNMPCounter32((Long)ZorkaUtil.coerce(val, Long.class));
@@ -141,4 +148,17 @@ public class SnmpLib {
         return trapper;
     }
 
+
+    public void remove(String id) {
+        SnmpTrapper trapper = trappers.remove(id);
+
+        if (trapper != null) {
+            trapper.stop();
+        }
+    }
+
+
+    public TrapVarBindDef bind(int slot, int type, String oidSuffix) {
+        return new TrapVarBindDef(slot, type, oidSuffix);
+    }
 }

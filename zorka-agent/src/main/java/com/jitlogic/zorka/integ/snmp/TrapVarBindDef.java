@@ -23,7 +23,7 @@ public class TrapVarBindDef {
     private int slot;
 
 
-    public TrapVarBindDef(int type, String oidSuffix, int slot) {
+    public TrapVarBindDef(int slot, int type, String oidSuffix) {
         this.type = type;
         this.slot = slot;
         this.oidSuffix = oidSuffix;
