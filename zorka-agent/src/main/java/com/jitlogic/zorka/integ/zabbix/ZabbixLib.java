@@ -11,6 +11,8 @@ import javax.management.ObjectName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -25,6 +27,8 @@ public class ZabbixLib {
     private ZorkaLib zorkaLib;
 
     private ObjectInspector inspector = new ObjectInspector();
+
+    private Map<String,ZabbixTrapper> trappers = new ConcurrentHashMap<String, ZabbixTrapper>();
 
     public ZabbixLib(ZorkaBshAgent bshAgent, ZorkaLib zorkaLib) {
         this.bshAgent = bshAgent;
@@ -140,5 +144,32 @@ public class ZabbixLib {
         obj.put("{#" + key.toUpperCase() + "}", val);
 
         return obj;
+    }
+
+
+    public ZabbixTrapper get(String id) {
+        return trappers.get(id);
+    }
+
+
+    public ZabbixTrapper get(String id, String serverAddr, String defaultHost) {
+        ZabbixTrapper trapper = trappers.get(id);
+
+        if (trapper == null) {
+            trapper = new ZabbixTrapper(serverAddr, defaultHost);
+            trappers.put(id, trapper);
+            trapper.start();
+        }
+
+        return trapper;
+    }
+
+
+    public void remove(String id) {
+        ZabbixTrapper trapper = trappers.remove(id);
+
+        if (trapper != null) {
+            trapper.stop();
+        }
     }
 }

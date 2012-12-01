@@ -15,14 +15,30 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
+//
 
 __cas() {
 
-  severity = syslog.S_INFO;
-  facility = syslog.F_LOCAL5;
-  logger = syslog.get("audit", "127.0.0.1", "cas");
+  useSyslog = true;
+  useZabbix = true;
 
   request = new ThreadLocal();
+
+  syslogLog = syslog.get("audit", "127.0.0.1", zorka.getHostname());
+  zabbixLog = zabbix.get("audit", "127.0.0.1", zorka.getHostname());
+
+
+  audit(sdef, expr) {
+    if (useSyslog)
+      sdef = sdef.toSyslog(syslogLog, expr, syslog.S_INFO, syslog.F_LOCAL5, 
+                               zorka.getHostname(), "cas.audit");
+
+    if (useZabbix)
+      sdef = sdef.toZabbix(zabbixLog, expr, "cas.audit");
+
+    spy.add(sdef);
+  }
+
 
   // Intercept request dispatcher and store request object for later use
   spy.add(spy.instance()
@@ -33,82 +49,80 @@ __cas() {
 
 
   // Authentication attempts
-  spy.add(spy.instance()
+  sdefAuth = spy.instance()
     .onReturn().withArguments(1).format(1,"AUTHENTICATION_SUCCESS").get(2, request)
     .onError().withArguments(1).format(1,"AUTHENTICATION_FAILED").get(2, request)
-    .toSyslog(logger, "remote=${2.remoteAddr} local=${2.localAddr} action=${1} who=${0} what=${0}", 
-        severity, facility, "cas", "cas")
-    .include("org.jasig.cas.authentication.AbstractAuthenticationManager", "authenticate"));
+    .include("org.jasig.cas.authentication.AbstractAuthenticationManager", "authenticate");
+
+  audit(sdefAuth, "remote=${2.remoteAddr} local=${2.localAddr} action=${1} who=${0} what=${0}");
 
 
   // TGT-s created
-  spy.add(spy.instance()
+  sdefTgtCreated = spy.instance()
     .onReturn().withArguments(1).withRetVal().format(2, "TICKET_GRANTING_TICKET_CREATED").get(3, request)
     .onError().withArguments(1).withError().format(2, "TICKET_GRANTING_TICKET_NOT_CREATED").get(3, request)
-    .toSyslog(logger, "remote=${3.remoteAddr} local=${3.localAddr} action=${2} who=${0} what=${1}", 
-        severity, facility, "cas", "cas")
-    .include("org.jasig.cas.CentralAuthenticationServiceImpl", "createTicketGrantingTicket"));
+    .include("org.jasig.cas.CentralAuthenticationServiceImpl", "createTicketGrantingTicket");
+
+  audit(sdefTgtCreated, "remote=${3.remoteAddr} local=${3.localAddr} action=${2} who=${0} what=${1}");
 
 
   // TGT-s destroyed
-  spy.add(spy.instance()
+  sdefTgtDestroyed = spy.instance()
     .onReturn().withArguments(1).format(1, "?").format(2, "TICKET_GRANTING_TICKET_DESTROYED").get(3, request)
     .onError().withArguments(1).withError().format(2, "TICKET_GRANTING_TICKET_NOT_DESTROYED").get(3, request)
-    .toSyslog(logger, "remote=${3.remoteAddr} local=${3.localAddr} action=${2} who=${0} what=${2}", 
-        severity, facility, "cas", "cas")
-    .include("org.jasig.cas.CentralAuthenticationServiceImpl", "destroyTicketGrantingTicket"));
+    .include("org.jasig.cas.CentralAuthenticationServiceImpl", "destroyTicketGrantingTicket");
+
+  audit(sdefTgtDestroyed, "remote=${3.remoteAddr} local=${3.localAddr} action=${2} who=${0} what=${2}");
 
 
   // Service tickets granted
-  spy.add(spy.instance()
+  sdefSvcGranted = spy.instance()
     .onReturn().withArguments(1,2,3).withRetVal().format(4, "SERVICE_TICKET_GRANTED").get(5, request)
     .onError().withArguments(1,2,3).withError().format(4, "SERVICE_TICKET_NOT_GRANTED").get(5, request)
-    .toSyslog(logger, "remote=${5.remoteAddr} local=${5.localAddr} action=${4} who=${2} service=${1} tgt=${0} what=${3}", 
-        severity, facility, "cas", "cas")
     .include(1, "org.jasig.cas.CentralAuthenticationServiceImpl", "grantServiceTicket", 
         "String", "org.jasig.cas.authentication.principal.Service", 
-        "org.jasig.cas.authentication.principal.Credentials"));
+        "org.jasig.cas.authentication.principal.Credentials");
+
+  audit(sdefSvcGranted, "remote=${5.remoteAddr} local=${5.localAddr} action=${4} who=${2} service=${1} tgt=${0} what=${3}");
 
 
   // Proxy granting ticket created
-  spy.add(spy.instance()
+  sdefProxyGranted = spy.instance()
     .onReturn().withArguments(1,2).withRetVal().format(3, "PROXY_GRANTING_TICKET_CREATED").get(4, request)
     .onError().withArguments(1,2).withError().format(3, "PROXY_GRANTING_TICKET_NOT_CREATED").get(4, request)
-    .toSyslog(logger, "remote=${4.remoteAddr} local=${4.localAddr} action=${3} who=${1} what=${2} serviceTicket=${0}", 
-        severity, facility, "cas", "cas")
-    .include("org.jasig.cas.CentralAuthenticationServiceImpl", "delegateTicketGrantingTicket"));
+    .include("org.jasig.cas.CentralAuthenticationServiceImpl", "delegateTicketGrantingTicket");
+
+  audit(sdefProxyGranted, "remote=${4.remoteAddr} local=${4.localAddr} action=${3} who=${1} what=${2} serviceTicket=${0}");
 
 
   // Validate service ticket
-  spy.add(spy.instance()
+  sdefSvcValidate = spy.instance()
     .onReturn().withArguments(1,2).withRetVal().format(3, "SERVICE_TICKET_VALIDATE_SUCCESS").get(4, request)
     .onError().withArguments(1,2).withError().format(3, "SERVICE_TICKET_VALIDATE_FAILURE").get(4, request)
-    .toSyslog(logger, "remote=${4.remoteAddr} local=${4.localAddr} action=${3} who=? what=${2} serviceTicket=${0} service=${1}", 
-        severity, facility, "cas", "cas")
-    .include("org.jasig.cas.CentralAuthenticationServiceImpl", "validateServiceTicket"));
+    .include("org.jasig.cas.CentralAuthenticationServiceImpl", "validateServiceTicket");
+
+  audit(sdefSvcValidate, "remote=${4.remoteAddr} local=${4.localAddr} action=${3} who=? what=${2} serviceTicket=${0} service=${1}");
 
 
   // Delete a service
-  spy.add(spy.instance()
+  sdefSvcDelete = spy.instance()
     .onReturn().withArguments(1).format(1, "OK").format(2, "DELETE_SERVICE_SUCCESS").get(3, request)
     .onError().withArguments(1).withError().format(2, "DELETE_SERVICE_FAILURE").get(3, request)
-    .toSyslog(logger, "remote=${3.remoteAddr} local=${3.localAddr} action=${2} result=${1} id=${0}", 
-        severity, facility, "cas", "cas")
-    .include("org.jasig.cas.DefaultServicesManagerImpl", "delete"));
+    .include("org.jasig.cas.DefaultServicesManagerImpl", "delete");
+
+  audit(sdefSvcDelete, "remote=${3.remoteAddr} local=${3.localAddr} action=${2} result=${1} id=${0}");
 
 
   // Save a service
-  spy.add(spy.instance()
+  sdefSvcSave = spy.instance()
     .onReturn().withArguments(1).withRetVal().format(2, "SAVE_SERVICE_SUCCESS").get(3, request)
     .onError().withArguments(1).withError().format(2, "SAVE_SERVICE_FAILURE").get(3, request)
-    .toSyslog(logger, "remote=${3.remoteAddr} local=${3.localAddr} action=${2} service=${0} result=${1}", 
-        severity, facility, "cas", "cas")
-    .include("org.jasig.cas.DefaultServicesManagerImpl", "save"));
+    .include("org.jasig.cas.DefaultServicesManagerImpl", "save");
 
+  audit(sdefSvcSave, "remote=${3.remoteAddr} local=${3.localAddr} action=${2} service=${0} result=${1}");
 
   return this;
 }
-
 
 cas = __cas();
 

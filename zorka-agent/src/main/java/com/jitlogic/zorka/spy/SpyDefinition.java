@@ -19,6 +19,7 @@ package com.jitlogic.zorka.spy;
 
 import bsh.This;
 import com.jitlogic.zorka.integ.syslog.SyslogLogger;
+import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
 import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.processors.*;
 import com.jitlogic.zorka.util.ZorkaUtil;
@@ -662,6 +663,41 @@ public class SpyDefinition {
     public SpyDefinition toSyslog(SyslogLogger logger, String expr, int severity, int facility, String hostname, String tag) {
         return toCollector(new SyslogCollector(logger, expr, severity, facility, hostname, tag));
     }
+
+
+    /**
+     * Sends collected records to zabbix using zabbix trapper.
+     *
+     * @param trapper
+     *
+     * @param expr
+     *
+     * @param key
+     *
+     * @return
+     */
+    public SpyDefinition toZabbix(ZabbixTrapper trapper, String expr, String key) {
+        return toCollector(new ZabbixCollector(trapper, expr, null, key));
+    }
+
+
+    /**
+     * Sends collected records to zabbix using zabbix trapper
+     *
+     * @param trapper
+     *
+     * @param expr
+     *
+     * @param host
+     *
+     * @param key
+     *
+     * @return
+     */
+    public SpyDefinition toZabbix(ZabbixTrapper trapper, String expr, String host, String key) {
+        return toCollector(new ZabbixCollector(trapper, expr, host, key));
+    }
+
 
     // TODO toString() method
 

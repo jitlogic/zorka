@@ -158,6 +158,21 @@ method will be described in next section, yet this one is sufficient for most ca
 This is a more sophiscated discovery function that - in addition to listing mbeans themselves - can also dig deeper into
 mbean attributes.
 
+### zabbix.get()
+
+    zabbix.get(id)
+    zabbix.get(id, serverAddr, defaultHost)
+
+Returns (and eventually creates) zabbix trapper. Newly created trappers are registered in zabbix library and will be
+returned every time `get()` function with the same `id` will be called.
+
+### zabbix.remove()
+
+    zabbix.remove(id)
+
+Stops and unregisters trapper registered in zabbix library.
+
+
 # Class and Method Instrumentation API
 
 Instrumentation part of Zorka agent is called Zorka Spy. With version 0.2 a fluent-style configuration API has been
@@ -327,6 +342,22 @@ into `dst`.
 
 It will take arguments from `in1` and `in2`, ensure that these are long integers and stores result at `out`.
 
+#### Storing data across method calls using ThreadLocal
+
+Sometimes it is useful to use data grabbed from some method and use it along with other method further down call stack.
+The following methods can be used with thread local objects:
+
+    sdef = sdef.set(src, threadLocal)
+    sdef = sdef.get(dst, threadLocal)
+    sdef = sdef.remove(threadLocal)
+
+Thread local object has to be declared in BSH script and is passed as `threadLocal` argument to each of these methods.
+Method `set()` stores value from slot `src` in `threadLocal`. Method `get()` reads value from `threadLocal` and stores
+it in slot `dst`. Last method clears `threadLocal`, so stored object can be garbage collected (granted there are no more
+references pointing to it).
+
+#### Using custom processors
+
 There is also a generic method for adding custom processors:
 
     sdef = sdef.withProcessor(processor);
@@ -407,8 +438,15 @@ Zorka will fetch value using attribute chain `(attr1, attr2, ...)` as in `zorka.
     sdef = sdef.toSyslog(logger, expr, severity, facility, hostname, tag)
 
 Parameter `logger` must be a reference to logger object obtained using `syslog.get()`. Parameter `expr` is message
-template (similiar to `keyExpr` in other collectors). Remaining parameters - `severity`, `facility`, `hostname` and
+template (analogous to `keyExpr` in other collectors). Remaining parameters - `severity`, `facility`, `hostname` and
 `tag` work in the same way as in `syslog.log()` method.
 
 
+#### Sending collected events to Zabbix
 
+    sdef = sdef.toZabbix(trapper, expr, key)
+    sdef = sdef.toZabbix(trapper, expr, host, key)
+
+Parameter `trapper` must be a reference to zabbix trapper obtained using `zabbix.get()` function. Parameter `expr` is
+message template (analogous to `keyExpr` in other collectors). Parametry `key' refers to zabbix item key that will be
+populated. Item must be of proper type (text or number depending on data that is submitted).
