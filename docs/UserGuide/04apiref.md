@@ -314,6 +314,7 @@ There are some special indexes that represent other data possible to fetch by in
 * `spy.FETCH_RET_VAL` (-2) - fetch return value (this is valid only on return points);
 * `spy.FETCH_ERROR` (-3) - fetch exception object (this is valid only on error points);
 * `spy.FETCH_THREAD` (-4) - fetch current thread;
+* `spy.FETCH_NULL` (-5) - fetch null constant (useful in some cases);
 
 It is also possible to fetch classes - just pass strings containing fully qualified class names instread of integers.
 
@@ -332,6 +333,7 @@ There are some convenience methods defined to grab special values:
     sdef = sdef.withError();
     sdef = sdef.withThread();
     sdef = sdef.withClass(className);
+    sdef = sdef.withNull();
 
 ### Looking for classes and methods to be instrumented
 

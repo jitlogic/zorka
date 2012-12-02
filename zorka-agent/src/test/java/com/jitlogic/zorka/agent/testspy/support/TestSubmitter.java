@@ -43,6 +43,10 @@ public class TestSubmitter implements SpySubmitter {
             return vals[idx];
         }
 
+        public int size() {
+            return vals != null ? vals.length : 0;
+        }
+
         public boolean nullVals() {
             return this.vals == null;
         }

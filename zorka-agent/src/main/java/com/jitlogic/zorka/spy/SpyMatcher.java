@@ -33,7 +33,7 @@ public class SpyMatcher {
     public static final int ACC_PKGPRIV = 0x10000;
 
     public static final int NULL_FILTER    = 0x0000;
-    public static final int DEFAULT_FILTER = ACC_PUBLIC;
+    public static final int DEFAULT_FILTER = ACC_PUBLIC|ACC_PKGPRIV;
     public static final int ANY_FILTER     = ACC_PUBLIC|ACC_PRIVATE|ACC_PROTECTED|ACC_PKGPRIV;
 
     private Pattern classMatch, methodMatch, descriptorMatch;
@@ -169,7 +169,8 @@ public class SpyMatcher {
 
 
     private boolean matches(int access) {
-        return 0 != (access & (ACC_PUBLIC|ACC_PRIVATE|ACC_PROTECTED)) ?
-                (0 != (access & this.access)) : (0 != (this.access & ACC_PKGPRIV));
+        return this.access == 0 ||
+          0 != (access & (ACC_PUBLIC|ACC_PRIVATE|ACC_PROTECTED)) ?
+            (0 != (access & this.access)) : (0 != (this.access & ACC_PKGPRIV));
     }
 }
