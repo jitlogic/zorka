@@ -75,6 +75,38 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     }
 
 
+//    @Test  TODO make this test working
+    public void testStaticNotPublicMethod() throws Exception {
+        engine.add(SpyDefinition.instance().onReturn().withNull().include(TCLASS1, "nonPublicStatic"));
+        Object obj = instantiate(engine, TCLASS1);
+
+        invoke(obj, "nonPublicStatic");
+
+        assertEquals(1, submitter.size());
+    }
+
+    @Test
+    public void testInstrumentWithNullProbe() throws Exception {
+        engine.add(SpyDefinition.instance().onEnter().withNull().include(TCLASS1, "trivialMethod"));
+        Object obj = instantiate(engine, TCLASS1);
+
+        invoke(obj, "trivialMethod");
+
+        assertEquals(1, submitter.size());
+        assertEquals(null, submitter.get(0).get(0));
+    }
+
+    //@Test  TODO make this test working
+    public void testInstrumentWithNoProbes() throws Exception {
+        engine.add(SpyDefinition.instance().onEnter().include(TCLASS1, "trivialMethod"));
+        Object obj = instantiate(engine, TCLASS1);
+
+        invoke(obj, "trivialMethod");
+
+        assertEquals(1, submitter.size());
+        assertEquals(0, submitter.get(0).size());
+    }
+
     @Test
     public void testTrivialInstrumentOnlyEntryPointWithCurrentTime() throws Exception {
         engine.add(SpyDefinition.instance().onEnter().withTime().include(TCLASS1, "trivialMethod"));

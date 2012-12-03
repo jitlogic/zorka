@@ -6,6 +6,10 @@ import com.jitlogic.zorka.mbeans.ZorkaStats;
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -23,6 +27,8 @@ import java.util.regex.Pattern;
 public class ObjectInspector {
 
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+
+    public final static String STACK_TRACE_KEY = "printStackTrace";
 
     // TODO multiargument get(), eg. getAll(Object obj, Object...path)  - there are several places it would be useful
 
@@ -62,6 +68,12 @@ public class ObjectInspector {
         if (key instanceof String && key.toString().startsWith(".")) {
             // Explicit field accesses for attributes starting with '.'
             return fetchFieldVal(obj, clazz, key.toString().substring(1));
+        }
+
+        if (obj instanceof Throwable && STACK_TRACE_KEY.equals(key)) {
+            Writer rslt = new StringWriter(512);
+            ((Throwable)obj).printStackTrace(new PrintWriter(rslt));
+            return rslt.toString();
         }
 
         if (obj instanceof Map<?, ?>) {

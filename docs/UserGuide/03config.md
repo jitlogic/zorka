@@ -46,6 +46,14 @@ Logging directives:
 
 * `zorka.log.exceptions = yes` - controls whether full stack traces of encountered exceptions will be logged;
 
+Logging directives related to syslog:
+
+* `zorka.syslog = no` - enables sending zorka logs to remote syslog server if set to `yes`;
+
+* `zorka.syslog.server` - IP address and (optional) port number of syslog server in `addr:port` form;
+
+* `zorka.syslog.facility` - syslog facility code each message will be tagged with (eg. `F_LOCAL0`);
+
 Directives useful for tuning (you propably don't need to change default values):
 
 * `zorka.req.threads = 4` - number of threads for processing requests;

@@ -371,6 +371,17 @@ public class SpyDefinition {
 
 
     /**
+     * Instruct spy to fetch null value. This is useful when you want
+     * to force spy to insert any probe but no actual values are needed.
+     *
+     * @return
+     */
+    public SpyDefinition withNull() {
+        return this.withArguments(FETCH_NULL);
+    }
+
+
+    /**
      * Instructs spy that a given class reference should be catched.
      * Reference to the class will be added at the end of current argument list.
      *

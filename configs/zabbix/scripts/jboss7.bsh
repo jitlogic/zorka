@@ -45,19 +45,19 @@ __jboss7() {
         }
 
         active(deployment) {
-            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment", "activeSessions");
+            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment, "activeSessions");
         }
 
         expired(deployment) {
-            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment", "expiredSessions");
+            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment, "expiredSessions");
         }
 
         created(deployment) {
-            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment", "createdSessions");
+            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment, "createdSessions");
         }
 
         duplicated(deployment) {
-            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment", "duplicateSessionIds");
+            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment, "duplicateSessionIds");
         }
 
         return this;
@@ -86,7 +86,47 @@ __jboss7() {
 
     datasources = __datasources();
 
+
+  __jpa() {
+
+    discovery(component) {
+      return zabbix.discovery("java", "jboss.as:subsystem=jpa,*", "deployment", "hibernate-persistence-unit");
+    }
+
+    hpu(deployment, unit, attr) {
+      return zorka.jmx("java", "jboss.as:subsystem=jpa,deployment="+deployment+",hibernate-persistence-unit="+unit, attr);
+    }
+
     return this;
+  }
+
+  jpa = __jpa();
+
+  // Catch MX mbean server initialization and register JBoss MBean Server here ...
+
+  __mbsRegister() {
+    jbossMbs = null;
+
+    collect(record) {
+      synchronized (super) {
+        if (super.jbossMbs == null) {
+          mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
+          zorka.registerMbs("java", mbs);
+          super.jbossMbs = mbs;
+          zorka.logInfo("Registered platform mbean server as 'java'");
+        }
+      }
+    }
+    return this;
+  }
+
+
+  spy.add(spy.instance().onReturn().withNull()
+    .include("org.jboss.modules.ModuleLoader", "installMBeanServer")
+    .toCollector((com.jitlogic.zorka.spy.SpyCollector)__mbsRegister()));
+
+
+  return this;
 }
 
 

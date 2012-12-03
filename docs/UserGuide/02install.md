@@ -31,11 +31,13 @@ means application server home (eg. `/opt/jboss-4.2`) and `<zorka-home>` means di
 Some application servers have been (preliminarily) tested and are described below but for other servers should work as
 well as long as application server does not perform too many wizardry on platform mbean server or class loaders.
 
+
+
 ### Tomcat 6.x, 7.x
 
 Only Sun JDK 6/5 is supported with Tomcat at the moment:
 
-* copy `samples/tomcat67/*` files to `<server-home>/zorka` directory (overwrite existing files if necessary);
+* copy `config/zabbix/tomcat.bsh` files to `<zorka-home>/conf` directory (overwrite existing files if necessary);
 
 * edit `<server-home>/bin/catalina.conf` and add the following line at the end:
 
@@ -49,7 +51,7 @@ Only Sun JDK 6/5 is supported with Tomcat at the moment:
 
 Only Sun JDK 5 and 6 are supported:
 
-* copy `samples/jboss456/*` files to `<server-home>/zorka` directory;
+* copy `config/zabbix/jboss.bsh` files to `<zorka-home>/conf` directory;
 
 * edit `<server-home>/bin/run.conf` and add the following line at the end:
 
@@ -67,9 +69,9 @@ Only Sun JDK 5 and 6 are supported:
 Following configuration steps have been tested in standalone mode but should work the same in both modes
 (edit `domain.conf` instead of `standalone.conf`).
 
-* copy `samples/jboss7/*` files to `<server-home>/zorka` directory;
+* copy `config/zabbix/scripts/jboss7.bsh` script to `<zorka-home>/conf` directory;
 
-* make sure that `zorka.mbs.autoregister = yes` is set in `zorka.properties` file;
+* make sure that `zorka.mbs.autoregister = no` is set in `zorka.properties` file;
 
 * edit `<server-home>/bin/standalone.conf` and add the following line:
 
