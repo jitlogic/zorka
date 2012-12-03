@@ -37,8 +37,8 @@ public class SyslogTrapper implements Runnable {
 
     public final static int DEFAULT_PORT = 514;
 
-    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
-    private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd HH:mm:ss");
+    private ZorkaLog log = null;
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd HH:mm:ss");
 
     private InetAddress syslogAddress;
     private int syslogPort = DEFAULT_PORT;
@@ -53,6 +53,10 @@ public class SyslogTrapper implements Runnable {
 
 
     public SyslogTrapper(String syslogServer, String defaultHost) {
+        this(syslogServer, defaultHost, false);
+    }
+
+    public SyslogTrapper(String syslogServer, String defaultHost, boolean quiet) {
 
         try {
             if (syslogServer.contains(":")) {
@@ -63,8 +67,14 @@ public class SyslogTrapper implements Runnable {
                 syslogAddress = InetAddress.getByName(syslogServer);
             }
 
+            if (!quiet) {
+                log  = ZorkaLogger.getLog(this.getClass());
+            }
+
         } catch (Exception e) {
-            log.error("Cannot configure syslog to " + syslogServer, e);
+            if (log != null) {
+                log.error("Cannot configure syslog to " + syslogServer, e);
+            }
         }
 
         this.defaultHost = defaultHost;
@@ -105,7 +115,9 @@ public class SyslogTrapper implements Runnable {
                 running = true;
                 thread.start();
             } catch (SocketException e) {
-                log.error("Cannot open UDP socket", e);
+                if (log != null) {
+                    log.error("Cannot open UDP socket", e);
+                }
             }
         }
     }
@@ -137,7 +149,9 @@ public class SyslogTrapper implements Runnable {
                 try {
                     socket.send(new DatagramPacket(buf, 0, buf.length, syslogAddress, syslogPort));
                 } catch (IOException e) {
-                    log.error("Cannot send syslog packet: " + msg);
+                    if (log != null) {
+                        log.error("Cannot send syslog packet: " + msg);
+                    }
                 }
             }
         } catch (InterruptedException e) { }

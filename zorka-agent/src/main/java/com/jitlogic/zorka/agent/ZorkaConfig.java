@@ -73,6 +73,10 @@ public class ZorkaConfig {
     public final static String ZORKA_LOG_SIZE = "zorka.log.size";
     public final static String ZORKA_LOG_EXCEPTIONS = "zorka.log.exceptions";
 
+    public final static String ZORKA_SYSLOG = "zorka.syslog";
+    public final static String ZORKA_SYSLOG_FACILITY = "zorka.syslog.facility";
+    public final static String ZORKA_SYSLOG_SERVER = "zorka.syslog.server";
+
 	private static Properties properties = null;
 	private static String homeDir = null;
 

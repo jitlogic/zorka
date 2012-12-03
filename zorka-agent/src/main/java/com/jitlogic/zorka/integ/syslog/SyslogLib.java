@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zorka.integ.syslog;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -62,6 +63,23 @@ public class SyslogLib {
     private Map<String,SyslogTrapper> trappers = new ConcurrentHashMap<String, SyslogTrapper>();
 
 
+    private static String[] facilities = {
+        "F_KERNEL", "F_USER",   "F_MAIL",   "F_SYSTEM", "F_AUTH1",  "F_SYSLOG", "F_PRINTER", "F_NETWORK", // 0..7
+        "F_UUCP",   "F_CLOCK1", "F_AHTN2",  "F_FTPD",   "F_NTPD",   "F_AUDIT",  "F_ALERT",   "F_CLOCK2",  // 8..15
+        "F_LOCAL0", "F_LOCAL1", "F_LOCAL2", "F_LOCAL3", "F_LOCAL4", "F_LOCAL5", "F_LOCAL6",  "F_LOCAL7"   // 16..23
+    };
+
+
+    public static int getFacility(String name) {
+        for (int i = 0; i < facilities.length; i++) {
+            if (facilities[i].equals(name))
+                return i;
+        }
+
+        return F_LOCAL0;
+    }
+
+
     public SyslogTrapper trapper(String id) {
         return trappers.get(id);
     }
@@ -94,5 +112,6 @@ public class SyslogLib {
             trapper.log(severity, facility,  tag,  content);
         }
     }
+
 
 }
