@@ -88,6 +88,15 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
         assertEquals("c", inspector.get(list, 0));
     }
 
+    @Test
+    public void testInspectExceptionStackTrace() {
+        Throwable e = new Exception().fillInStackTrace();
+
+        Object o = inspector.get(e, "printStackTrace");
+
+        assertTrue("should be a string", o instanceof String);
+        assertTrue("should contain multiple lines", ((String)o).split("\n").length > 1);
+    }
 
     @Test
     public void testListList() {
@@ -143,6 +152,8 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
 
         assertEquals("java.lang.String", obj2);
     }
+
+
 
     // TODO more tests for border cases of inspector.substitute()
 
