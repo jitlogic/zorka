@@ -87,6 +87,20 @@ __jboss7() {
     datasources = __datasources();
 
 
+  __jpa() {
+
+    discovery(component) {
+      return zabbix.discovery("java", "jboss.as:subsystem=jpa,*", "deployment", "hibernate-persistence-unit");
+    }
+
+    hpu(deployment, unit, attr) {
+      return zorka.jmx("java", "jboss.as:subsystem=jpa,deployment="+deployment+",hibernate-persistence-unit="+unit, attr);
+    }
+
+    return this;
+  }
+
+  jpa = __jpa();
 
   // Catch MX mbean server initialization and register JBoss MBean Server here ...
 
