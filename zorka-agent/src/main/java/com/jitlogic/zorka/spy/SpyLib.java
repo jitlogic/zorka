@@ -40,7 +40,26 @@ public class SpyLib {
     public static final int FETCH_ERROR  = -3;
     public static final int FETCH_THREAD = -4;
     public static final int FETCH_CLASS  = -5;
+    public static final int FETCH_NULL   = -6;
 
+    public static int AC_PUBLIC       = 0x0001;
+    public static int AC_PRIVATE      = 0x0002;
+    public static int AC_PROTECTED    = 0x0004;
+    public static int AC_STATIC       = 0x0008;
+    public static int AC_FINAL        = 0x0010;
+    public static int AC_SUPER        = 0x0020;
+    public static int AC_SYNCHRONIZED = 0x0020;
+    public static int AC_VOLATILE     = 0x0040;
+    public static int AC_BRIDGE       = 0x0040;
+    public static int AC_VARARGS      = 0x0080;
+    public static int AC_TRANSIENT    = 0x0080;
+    public static int AC_NATIVE       = 0x0100;
+    public static int AC_INTERFACE    = 0x0200;
+    public static int AC_ABSTRACT     = 0x0400;
+    public static int AC_STRICT       = 0x0800;
+    public static int AC_SYNTHETIC    = 0x1000;
+    public static int AC_ANNOTATION   = 0x2000;
+    public static int AC_ENUM         = 0x4000;
 
     private SpyInstance instance;
 

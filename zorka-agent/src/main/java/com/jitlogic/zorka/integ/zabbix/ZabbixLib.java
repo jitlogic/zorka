@@ -70,7 +70,7 @@ public class ZabbixLib {
                 for (String attr : oattrs) {
                     String atval = on.getKeyProperty(attr);
                     if (atval != null) {
-                        odo.put("{#" + attr.toUpperCase() + "}", atval);
+                        odo.put(toZabbixAttr(attr), atval);
                     } else {
                         // A bit of a hack - filter out all objects without all (queried) attributes
                         odo.clear();
@@ -136,12 +136,16 @@ public class ZabbixLib {
         return discoveries;
     } // discovery()
 
+    private String toZabbixAttr(String attr) {
+        return "{#" + attr.toUpperCase().replace("-","") + "}";
+    }
+
 
     private JSONObject extend(JSONObject src, String key, String val) {
         JSONObject obj = new JSONObject();
         obj.putAll(src);
 
-        obj.put("{#" + key.toUpperCase() + "}", val);
+        obj.put(toZabbixAttr(key), val);
 
         return obj;
     }

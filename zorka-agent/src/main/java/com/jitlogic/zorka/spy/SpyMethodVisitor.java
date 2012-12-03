@@ -216,6 +216,9 @@ public class SpyMethodVisitor extends MethodVisitor {
             case FETCH_RETVAL:
                 mv.visitVarInsn(ALOAD, retValProbeSlot);
                 break;
+            case FETCH_NULL:
+                mv.visitInsn(ACONST_NULL);
+                break;
             default:
                 if (stage == ON_ENTER && element.getArgType() == 0 && "<init>".equals(methodName)) {
                     // TODO log warning

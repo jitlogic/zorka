@@ -21,6 +21,7 @@ package com.jitlogic.zorka.agent.testspy.support;
 
 public class TestClass1 {
 
+    private static int scalls = 0;
     private int calls = 0;
     private int vals = 0;
 
@@ -33,6 +34,9 @@ public class TestClass1 {
         throw new NullPointerException("dUP!");
     }
 
+    static void nonPublicStatic() {
+        scalls++;
+    }
 
     public void paramMethod1(int i, long j, short s, byte b) {
         calls++;

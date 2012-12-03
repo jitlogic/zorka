@@ -1,6 +1,8 @@
 package com.jitlogic.zorka.util;
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.integ.syslog.SyslogLib;
+import com.jitlogic.zorka.integ.syslog.SyslogTrapper;
 
 import java.io.*;
 import java.util.Date;
@@ -60,6 +62,8 @@ public class ZorkaLogger {
     private OutputStream os = null;
     private int currentSize = 0;
 
+    private SyslogTrapper syslog = null;
+    private int syslogFacility = SyslogLib.F_LOCAL0;
 
     public ZorkaLogger() {
         logDir = ZorkaConfig.getLogDir();
@@ -72,6 +76,15 @@ public class ZorkaLogger {
             logThreshold = ZorkaLogLevel.valueOf (props.getProperty(ZORKA_LOG_LEVEL));
             maxSize = ZorkaUtil.parseIntSize(props.getProperty(ZORKA_LOG_SIZE).trim());
             maxLogs = ZorkaUtil.parseIntSize(props.getProperty(ZORKA_LOG_NUM).trim());
+
+            if ("yes".equalsIgnoreCase(props.getProperty(ZORKA_SYSLOG, "no").trim())) {
+                String server = props.getProperty(ZORKA_SYSLOG_SERVER, "127.0.0.1").trim();
+                String hostname = props.getProperty(ZORKA_HOSTNAME, "zorka").trim();
+                syslog = new SyslogTrapper(server, hostname, true);
+                syslogFacility = SyslogLib.getFacility(props.getProperty(ZORKA_SYSLOG_FACILITY, "F_LOCAL0").trim());
+                syslog.start();
+            }
+
         } catch (Exception e) {
             System.err.println("Error parsing logger arguments: " + e.getMessage());
             e.printStackTrace();
@@ -79,9 +92,9 @@ public class ZorkaLogger {
 
     }
 
-
     public synchronized void log(String tag, ZorkaLogLevel logLevel, String message, Throwable e, Object...args) {
         if (active && logLevel.getPriority() >= logThreshold.getPriority()) {
+
             if (out == null || currentSize >= maxSize) {
                 reopen();
             }
@@ -91,7 +104,8 @@ public class ZorkaLogger {
             sb.append(" ");
             sb.append(tag);
             sb.append(" ");
-            sb.append(format(message, args));
+            String fmsg = format(message, args);
+            sb.append(fmsg);
 
             if (e != null) {
                 sb.append(" [");
@@ -112,6 +126,11 @@ public class ZorkaLogger {
             if (out != null)
                 out.println(s);
             currentSize += s.getBytes().length + 1;
+
+            if (syslog != null) {
+                syslog.log(logLevel.getSeverity(), syslogFacility, tag, fmsg);
+            }
+
         }
     }
 
@@ -127,6 +146,7 @@ public class ZorkaLogger {
             }
         }
     }
+
 
 
     private void reopen() {
