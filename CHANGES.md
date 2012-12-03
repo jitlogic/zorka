@@ -2,8 +2,11 @@
 Zorka 0.5 (2012-12-07)
 ----------------------
 
- * syslog protocol support;
- * snmp protocol support (traps and value get interface);
+ * syslog trapper support;
+ * snmp trapper support (traps and value get interface);
+ * zabbix trapper;
+ * config scripts and zabbix templates for JBoss 7;
+ * documentation: converted to `md` format; more interesting examples (eg. CAS auditing);
 
 
 Zorka 0.4 (2012-11-26)

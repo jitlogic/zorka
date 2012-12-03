@@ -17,53 +17,41 @@
 
 __jboss7() {
 
-    // Basic servlet statistics
-    __servlet() {
+  // Basic servlet statistics
+  __servlets() {
 
-        discovery() {
-            return zabbix.discovery("java", "jboss.as:subsystem=web,*", "deployment", "servlet");
-        }
-
-        requests(deployment,servlet) {
-            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment+",servlet="+servlet, "requestCount");
-        }
-
-        time(deployment,servlet,horizon) {
-           return zorka.rate("java", "jboss.as:subsystem=web,deployment="+deployment+",servlet="+servlet, "processingTime", "requestCount", horizon);
-        }
-
-        return this;
+    discovery() {
+      return zabbix.discovery("java", "jboss.as:subsystem=web,*", "deployment", "servlet");
     }
 
-    servlet = __servlet();
-
-    // Basic session statistics
-    __sessions() {
-
-        discovery() {
-            return zabbix.discovery("java", "jboss.as:subsystem=web,deployment=*", "deployment");
-        }
-
-        active(deployment) {
-            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment, "activeSessions");
-        }
-
-        expired(deployment) {
-            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment, "expiredSessions");
-        }
-
-        created(deployment) {
-            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment, "createdSessions");
-        }
-
-        duplicated(deployment) {
-            return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment, "duplicateSessionIds");
-        }
-
-        return this;
+    requests(deployment,servlet) {
+      return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment+",servlet="+servlet, "requestCount");
     }
 
-    sessions = __sessions();
+    time(deployment,servlet,horizon) {
+      return zorka.rate("java", "jboss.as:subsystem=web,deployment="+deployment+",servlet="+servlet, "processingTime", "requestCount", horizon);
+    }
+
+    return this;
+  }
+
+  servlets = __servlets();
+
+  // Basic session statistics
+  __sessions() {
+
+    discovery() {
+      return zabbix.discovery("java", "jboss.as:subsystem=web,deployment=*", "deployment");
+    }
+
+    stat(deployment, attr) {
+       return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment, attr);
+    }
+
+    return this;
+  }
+
+  sessions = __sessions();
 
     // Basic data source statistics
     __datasources() {
@@ -87,6 +75,33 @@ __jboss7() {
     datasources = __datasources();
 
 
+  __ejb3() {
+
+    discovery(component) {
+      return zabbix.discovery("java", "jboss.as:subsystem=ejb3,*", "deployment", "stateless-session-bean");
+    }
+
+    slsb(deployment, bean, attr) {
+      return zorka.jmx("java", "jboss.as:subsystem=ejb3,deployment="+deployment+",stateless-session-bean="+bean, attr);
+    }
+
+    sls_time(deployment, bean, horiz) {
+      return zorka.rate("java", "jboss.as:subsystem=ejb3,deployment="+deployment+",stateless-session-bean="+bean, 
+        "executionTime", "invocations", horiz);
+    }
+
+    sls_wait(deployment, bean, horiz) {
+      return zorka.rate("java", "jboss.as:subsystem=ejb3,deployment="+deployment+",stateless-session-bean="+bean, 
+        "waitTime", "invocations", horiz);
+    }
+
+    return this;
+  }
+
+  ejb3 = __ejb3();
+
+
+
   __jpa() {
 
     discovery(component) {
@@ -101,6 +116,8 @@ __jboss7() {
   }
 
   jpa = __jpa();
+
+
 
   // Catch MX mbean server initialization and register JBoss MBean Server here ...
 
