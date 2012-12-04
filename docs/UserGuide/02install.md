@@ -1,12 +1,12 @@
 
-# Installation and configuration
+# Installation
 
 Unpack zorka archive into application server home directory (ex. `/opt/tomcat-7.0.29`).
 Zorka files will reside in `<server-home>/zorka` directory.  Unpacked directory contains
 the following things:
 
 
-* `agent.jar` - agent jar file (with all dependencies included);
+* `zorka.jar` - agent jar file (with all dependencies included);
 
 * `conf/*.bsh` - extension scripts;
 

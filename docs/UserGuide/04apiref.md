@@ -1,5 +1,5 @@
 
-# Generic API and Monitoring System Interface API
+# Zorka API Reference
 
 The API acronym might sound familiar to programmers, yet in this context it should be pronounced as *Agent Programming
 Interface* rather as Zorka beanshell scripts are not applications per se.
