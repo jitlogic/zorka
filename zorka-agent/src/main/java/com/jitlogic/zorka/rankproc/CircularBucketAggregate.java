@@ -124,6 +124,8 @@ public class CircularBucketAggregate implements BucketAggregate {
         int offset = stage * res;
         long window = windows[stage], sectn = window / res;
 
+        // TODO get rid of code below, use touch() method instead
+
         if (tstamp - ts[stage] < 0) {
             return;
         } else if (tstamp - ts[stage] > window) {
@@ -170,9 +172,40 @@ public class CircularBucketAggregate implements BucketAggregate {
     }
 
 
+    private void touch(long tstamp, int stage) {
+        int offset = stage * res;
+        long window = windows[stage], sectn = window / res;
+
+        if (tstamp - ts[stage] < 0) {
+            return;
+        } else if (tstamp - ts[stage] > window) {
+            cleanupStage(stage);
+            ts[stage] = tstamp - (tstamp % sectn);
+            values[offset] = 0;
+        } else if (tstamp - ts[stage] > window/res) {
+            long tss = tstamp % sectn;
+            while (tstamp > ts[stage] + sectn) {
+                for (int i = res-1; i > 0; i--) {
+                    tmin[offset+i] = tmin[offset+i-1];
+                    tmax[offset+i] = tmax[offset+i-1];
+                    values[offset+i] = values[offset+i-1];
+                }
+                ts[stage] += sectn;
+                tmin[offset] = ts[stage];
+                tmax[offset] = ts[stage] + res;
+                values[offset] = 0;
+            } // while ()
+            values[offset] = 0;
+            tmin[offset] = tmax[offset] = -1;
+        }
+    }
+
+
     public long getDeltaV(long tstamp, int stage) {
         int offset = stage * res;
         long v = 0;
+
+        touch(tstamp, stage);
 
         for (int i = offset; i < offset + res; i++) {
             v += values[i];
@@ -185,6 +218,8 @@ public class CircularBucketAggregate implements BucketAggregate {
     public long getDeltaT(long tstamp, int stage) {
         int offset = stage * res;
         long t1 = -1, t2 = -1;
+
+        touch(tstamp, stage);
 
         for (int i = offset; i < offset + res; i++) {
             if (t1 == -1) {

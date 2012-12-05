@@ -70,4 +70,11 @@ public class AggregateCountingTest {
 
         assertEquals(40, bag.getDeltaT(46, 0));
     }
+
+    @Test
+    public void testFeedSomeDataAndAskWayLater() {
+        BucketAggregate bag = new CircularBucketAggregate(1, 10, 60, 300, 900);
+
+        bag.feed(5, 1);
+    }
 }

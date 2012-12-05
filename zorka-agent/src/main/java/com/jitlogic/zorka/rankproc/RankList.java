@@ -68,9 +68,10 @@ public class RankList<T extends Rankable<?>> implements RankLister<T> {
 
 
     public synchronized int size() {
+        long tstamp = util.currentTimeMillis();
+        if (tstamp > lastTime + rerankTime) {
+            rerank(tstamp * BucketAggregate.MS);
 
-        if (util.currentTimeMillis() > lastTime + rerankTime) {
-            rerank(util.currentTimeMillis());
         }
 
         return rankList.size();

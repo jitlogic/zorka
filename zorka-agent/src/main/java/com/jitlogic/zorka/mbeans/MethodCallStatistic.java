@@ -68,15 +68,15 @@ public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatis
         switch (metric) {
             case CALLS_STAT: {
                 long delta = calls.getDeltaV(tstamp, average);
-                return 1000.0 * delta / (calls.getWindow(average) * MS);
+                return 1.0 * delta / (calls.getWindow(average) * MS);
             }
             case ERROR_STAT: {
                 long delta = errors.getDeltaV(tstamp, average);
-                return 1000.0 * delta / (errors.getWindow(average) * MS);
+                return 1.0 * delta / (errors.getWindow(average) * MS);
             }
             case TIMES_STAT: {
                 long dc = calls.getDeltaV(tstamp, average), dt = time.getDeltaV(tstamp, average);
-                return dc == 0 ? 0.0 : 1000.0 * dt / (dc * MS);
+                return dc == 0 ? 0.0 : 1.0 * dt / (dc * MS);
             }
         }
         return 0.0;
@@ -153,12 +153,12 @@ public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatis
 
     @Override
     public String toString() {
-        long tstamp = System.currentTimeMillis();
+        long tstamp = System.nanoTime();
         return "(calls=" + getCalls()
                 + ", errors=" + getErrors()
+                + ", time=" + getTime()
                 +", avg1=" + getAverage(tstamp, TIMES_STAT, 0)
                 + ", avg5=" + getAverage(tstamp, TIMES_STAT,  1)
-                + ", avg15=" + getAverage(tstamp, TIMES_STAT, 2)
-                + ")";
+                + ", avg15=" + getAverage(tstamp, TIMES_STAT, 2) + ")";
     }
 }
