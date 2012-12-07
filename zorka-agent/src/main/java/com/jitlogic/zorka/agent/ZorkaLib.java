@@ -410,4 +410,9 @@ public class ZorkaLib  {
 
         return threadRankLister;
     }
+
+
+    public EjbRankLister ejbRankLister(String mbsName, String objNames, String attr) {
+        return new EjbRankLister(mbsName, objNames, attr);
+    }
 }
