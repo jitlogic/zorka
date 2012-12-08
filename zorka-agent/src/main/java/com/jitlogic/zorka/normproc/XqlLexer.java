@@ -13,11 +13,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.xxlproc;
+package com.jitlogic.zorka.normproc;
 
 import java.util.*;
 
-import static com.jitlogic.zorka.xxlproc.XxLib.*;
+import static com.jitlogic.zorka.normproc.NormLib.*;
 
 /**
  * This is simplified DFA lexer for all *QL dialects. It is not very accurate,

@@ -15,10 +15,10 @@
  */
 package com.jitlogic.zorka.agent.unittest;
 
-import com.jitlogic.zorka.xxlproc.XqlLexer;
-import com.jitlogic.zorka.xxlproc.XqlToken;
+import com.jitlogic.zorka.normproc.XqlLexer;
+import com.jitlogic.zorka.normproc.XqlToken;
 
-import static com.jitlogic.zorka.xxlproc.XxLib.*;
+import static com.jitlogic.zorka.normproc.NormLib.*;
 
 import org.junit.Test;
 

@@ -13,8 +13,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.xxlproc;
+package com.jitlogic.zorka.normproc;
 
-public interface Normalizer {
-    String normalize(String input);
+import static com.jitlogic.zorka.normproc.XqlToken.*;
+
+public class NormLib {
+
+    public final static int NORM_STD = (1<<UNKNOWN)|(1<<WHITESPACE)|(1<<SYMBOL)|(1<<LITERAL)|(1<<COMMENT)|(1<<KEYWORD);
+
+    /**
+     * Generic SQL dialect (based on SQL99)
+     */
+    public final static int DIALECT_SQL99 = 0;
+
+    public Normalizer sqlNormalizer(int dialect) {
+        return new XqlNormalizer(dialect, NORM_STD);
+    }
 }

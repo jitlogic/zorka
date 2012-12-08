@@ -13,9 +13,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.xxlproc;
+package com.jitlogic.zorka.normproc;
 
-import static com.jitlogic.zorka.xxlproc.XqlToken.*;
+import static com.jitlogic.zorka.normproc.XqlToken.*;
 
 public class XqlNormalizer implements Normalizer {
 

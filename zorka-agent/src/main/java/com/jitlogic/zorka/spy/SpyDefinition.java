@@ -26,7 +26,7 @@ import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
 import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.processors.*;
 import com.jitlogic.zorka.util.ZorkaUtil;
-import com.jitlogic.zorka.xxlproc.Normalizer;
+import com.jitlogic.zorka.normproc.Normalizer;
 
 import java.util.*;
 
