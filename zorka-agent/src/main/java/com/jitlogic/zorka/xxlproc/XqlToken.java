@@ -26,8 +26,7 @@ public class XqlToken {
     public final static int KEYWORD     = 6;
     public final static int PLACEHOLDER = 7;
 
-
-    private final static String[] prefixes = { "U", "W", "S", "O", "L", "C", "K" };
+    private final static String[] prefixes = { "U", "W", "S", "O", "L", "C", "K", "P" };
 
     private int type;
     private String content;

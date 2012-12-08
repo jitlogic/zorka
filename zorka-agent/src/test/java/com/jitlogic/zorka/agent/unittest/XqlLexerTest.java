@@ -17,6 +17,9 @@ package com.jitlogic.zorka.agent.unittest;
 
 import com.jitlogic.zorka.xxlproc.XqlLexer;
 import com.jitlogic.zorka.xxlproc.XqlToken;
+
+import static com.jitlogic.zorka.xxlproc.XxLib.*;
+
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -54,7 +57,7 @@ public class XqlLexerTest {
 
     public List<XqlToken> lex(String input) {
         List<XqlToken> tokens = new ArrayList<XqlToken>();
-        for (XqlToken token : new XqlLexer(XqlLexer.D_SQL_99, input)) {
+        for (XqlToken token : new XqlLexer(DIALECT_SQL99, input)) {
             tokens.add(token);
         }
         return tokens;

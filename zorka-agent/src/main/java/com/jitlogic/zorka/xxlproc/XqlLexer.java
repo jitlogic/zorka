@@ -17,6 +17,8 @@ package com.jitlogic.zorka.xxlproc;
 
 import java.util.*;
 
+import static com.jitlogic.zorka.xxlproc.XxLib.*;
+
 /**
  * This is simplified DFA lexer for all *QL dialects. It is not very accurate,
  * so it can produce garbage in certain cases (albeit in predictable way ;) ), but for
@@ -30,10 +32,6 @@ public class XqlLexer implements Iterable<XqlToken>, Iterator<XqlToken> {
 
     // SQL/HQL dialects
 
-    /**
-     * Generic SQL dialect (based on SQL99)
-     */
-    public final static int D_SQL_99 = 0;
 
     // More dialects on the way
     //public final static int D_SQL92
@@ -88,7 +86,7 @@ public class XqlLexer implements Iterable<XqlToken>, Iterator<XqlToken> {
     }
 
 
-    private final static byte[] CHT_SQL_99 = initChTab(D_SQL_99);
+    private final static byte[] CHT_SQL_99 = initChTab(DIALECT_SQL99);
 
 
     private static byte[] lxtab(byte[] chtab, int...transitions) {
@@ -126,7 +124,7 @@ public class XqlLexer implements Iterable<XqlToken>, Iterator<XqlToken> {
     };
 
     private final static byte[][][] lextabs = {
-            new byte[][] { // D_SQL_99
+            new byte[][] { // DIALECT_SQL99
                            //         UNK WSP SYM DIG OP   -   .   '   \   +  eE
                     lxtab(CHT_SQL_99, -1,  1,  2,  4,  3,  3,  3,  6, -1,  3,  2), // 0 = S_START
                     lxtab(CHT_SQL_99, -1,  1, -1, -1, -1, -1, -1, -1, -1, -1, -1), // 1 = S_WHITESPACE
