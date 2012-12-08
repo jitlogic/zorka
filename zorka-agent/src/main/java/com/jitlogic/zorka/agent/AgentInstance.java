@@ -27,6 +27,7 @@ import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.integ.zabbix.ZabbixAgent;
+import com.jitlogic.zorka.xxlproc.XxLib;
 
 import javax.management.MBeanServerConnection;
 import java.lang.instrument.ClassFileTransformer;
@@ -87,6 +88,7 @@ public class AgentInstance {
 
     private SyslogLib syslogLib = null;
     private SnmpLib snmpLib = null;
+    private XxLib xxLib = null;
 
     private Properties props;
 
@@ -126,6 +128,9 @@ public class AgentInstance {
 
         zorkaAgent = new ZorkaBshAgent(executor);
 
+        xxLib = new XxLib();
+        zorkaAgent.installModule("normalizers", xxLib);
+
         if ("yes".equalsIgnoreCase(props.getProperty(SPY_ENABLE))) {
             log.info("Enabling Zorka SPY");
             spyInstance = SpyInstance.instance();
@@ -160,6 +165,8 @@ public class AgentInstance {
             zorkaAgent.installModule("nagios", nagiosLib);
             nagiosAgent.start();
         }
+
+
         zorkaAgent.loadScriptDir(props.getProperty(ZORKA_CONF_DIR), ".*\\.bsh$");
 
     }

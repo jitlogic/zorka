@@ -26,6 +26,7 @@ import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
 import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.processors.*;
 import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.xxlproc.Normalizer;
 
 import java.util.*;
 
@@ -475,6 +476,18 @@ public class SpyDefinition {
         return withProcessor(new RegexFilterProcessor(src, dst, regex, expr, filterOut));
     }
 
+
+    /**
+     * Normalizes a query string from src and puts result into dst.
+     *
+     * @param src
+     * @param dst
+     * @param normalizer
+     * @return
+     */
+    public SpyDefinition normalize(int src, int dst, Normalizer normalizer) {
+        return withProcessor(new NormalizingProcessor(src, dst, normalizer));
+    }
 
     /**
      * Gets slot number n, performs traditional get operation and stores
