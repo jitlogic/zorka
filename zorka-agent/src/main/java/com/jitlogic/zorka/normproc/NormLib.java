@@ -19,6 +19,14 @@ import static com.jitlogic.zorka.normproc.XqlToken.*;
 
 public class NormLib {
 
+    /**
+     * Normalize whitespaces, symbols and keywords. Remove comments and unknown tokens, leave literals.
+     */
+    public final static int NORM_MIN = (1<<UNKNOWN)|(1<<WHITESPACE)|(1<<SYMBOL)|(1<<COMMENT)|(1<<KEYWORD);
+
+    /**
+     * Normalize whitespaces, symbols and keywords. Remove comments and unknown tokens, replace literals with placeholders.
+     */
     public final static int NORM_STD = (1<<UNKNOWN)|(1<<WHITESPACE)|(1<<SYMBOL)|(1<<LITERAL)|(1<<COMMENT)|(1<<KEYWORD);
 
     /**
@@ -26,7 +34,8 @@ public class NormLib {
      */
     public final static int DIALECT_SQL99 = 0;
 
-    public Normalizer sqlNormalizer(int dialect) {
-        return new XqlNormalizer(dialect, NORM_STD);
+
+    public Normalizer sql(int dialect, int type) {
+        return new XqlNormalizer(dialect, type);
     }
 }

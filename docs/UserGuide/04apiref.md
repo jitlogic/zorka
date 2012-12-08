@@ -88,6 +88,23 @@ Reloads all configuration scripts in `$ZORKA_HOME/conf` directory matching given
 executing scripts once again. It is script implementer responsiblity to make sure that script is able to execute
 multiple times (and do reconfiguration properly).
 
+### zorka.fileTrapper()
+
+    zorka.fileTrapper(id)
+    zorka.rollingFileTrapper(id, path, maxFiles, maxSize, logExceptions)
+    zorka.dailyFileTrapper(id, path, logExceptions)
+    zorka.removeFileTrapper(id)
+
+These functions allow creating, accessing and removing file trappers (loggers). File trappers can be used to log arbitrary
+things to local files (spy events in particular). There are two types of file trappers: rolling file trapper (that keeps
+limited amount of log files of limited size. Rolling trappers can be created using `rollingFileTrapper()` function. Daily
+file trappers create files with `.YYYY-MM-DD` extension, so logs are split in daily basis. Daily trappers are created
+using `dailyFileTrapper()` function. Both functions register created trappers with `id` tag. Both functions return trapper
+created earlier if it has been registered with the same `id`. Using `fileTrapper()` function it is possible to access
+trappers created earlier without creating new ones (if none exists). Use `removeFileTrapper()` function to unregister
+and dispose file trappers.
+
+
 ## Syslog functions
 
 ### syslog.trapper()
@@ -225,6 +242,29 @@ Parameters passed as `vals` are used to fill placeholders.
 Creates spy record to trap variable binding object. It will map object from `slot` in `ON_COLLECT` buffer of spy record
 to a SNMP object of `type` tagged with `oidSuffix`. OID suffix will be added to base OID in traps sent by `SnmpCollector`
 component of Zorka Spy. See `sdef.toSnmp()` description below for more information about bindings.
+
+## Data normalization
+
+There are cases when intercepted data has to be normalized in some way. Removing data from intercepted SQL queries is
+one example but there are many types of data that should be stripped or simplified in some way. Data normalization
+framework functions are available via `normalizers` library. Objects created with those functions can be attached to
+spy processing chains using `normalize()` method of spy definition objects.
+
+### normalizers.sql()
+
+    normalizers.sql(dialect, type)
+
+Creates SQL normalizer that supports various SQL dialects and similiar languages (eg. hibernate HQL or JPA EQL). The
+following dialects are currently supported:
+
+* `normalizers.DIALECT_SQL99` - ANSI SQL-99;
+
+The second parameter determines what will be normalized. Available normalization modes:
+
+* `normalizers.NORM_MIN` - minimal normalizer (cut off white spaces and illegal tokens, normalize white spaces, symbols
+and keywords, leave values (literals) unchanged (and visible);
+
+* `normalizers.NORM_STD` - everything `NORM_MIN` does plus remove literals and replace them with `?` placeholders.
 
 # Class and Method Instrumentation API
 
@@ -410,6 +450,13 @@ Thread local object has to be declared in BSH script and is passed as `threadLoc
 Method `set()` stores value from slot `src` in `threadLocal`. Method `get()` reads value from `threadLocal` and stores
 it in slot `dst`. Last method clears `threadLocal`, so stored object can be garbage collected (granted there are no more
 references pointing to it).
+
+#### Normalizing data (eg. queries)
+
+    sdef = sdef.normalize(src, dst, normalizer);
+
+Plugs a normalizer into spy processing chain. Spy will take value from `src` slot, pass it through `normalizer` object
+and store result in `dst` slot.
 
 #### Using custom processors
 
