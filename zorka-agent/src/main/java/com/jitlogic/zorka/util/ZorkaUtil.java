@@ -218,6 +218,15 @@ public class ZorkaUtil {
         return false;
     }
 
+    public static byte[] copyArray(byte[] src) {
+        if (src == null) {
+            return null;
+        }
+
+        byte[] dst = new byte[src.length];
+        System.arraycopy(src, 0, dst, 0, src.length);
+        return dst;
+    }
 
     public static long[] copyArray(long[] src) {
         if (src == null) {

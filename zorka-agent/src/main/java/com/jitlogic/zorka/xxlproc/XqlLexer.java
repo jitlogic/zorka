@@ -1,0 +1,260 @@
+/**
+ * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * <p/>
+ * This is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * <p/>
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p/>
+ * You should have received a copy of the GNU General Public License
+ * along with this software. If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.jitlogic.zorka.xxlproc;
+
+import java.util.*;
+
+/**
+ * This is simplified DFA lexer for all *QL dialects. It is not very accurate,
+ * so it can produce garbage in certain cases (albeit in predictable way ;) ), but for
+ * query normalization purposes it is sufficient. On the other hand it should be pretty
+ * fast as lexer does not perform backtracking.
+ *
+ * @author Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ */
+public class XqlLexer implements Iterable<XqlToken>, Iterator<XqlToken> {
+
+    // SQL/HQL dialects
+
+    /**
+     * Generic SQL dialect (based on SQL99)
+     */
+    public final static int D_SQL_99 = 0;
+
+    // More dialects on the way
+    //public final static int D_SQL92
+    //public final static int D_SQL2003
+    //public final static int D_PGSQL
+    //public final static int D_MYSQL
+    //public final static int D_PLSQL
+    //public final static int D_DB2QL
+    //public final static int D_HQL
+    //public final static int D_EQL
+
+    // Character table definitions
+
+    public final static int CH_UNKNOWN    = 0;
+    public final static int CH_WHITESPACE = 1;
+    public final static int CH_SYMSTART   = 2;
+    public final static int CH_DIGIT      = 3;
+    public final static int CH_OPERATOR   = 4;
+    public final static int CH_MINUS      = 5;
+    public final static int CH_DOT        = 6;
+    public final static int CH_STRDELIM   = 7;
+    public final static int CH_STRQUOTE   = 8;
+    public final static int CH_PLUS       = 9;
+    public final static int CH_CHAR_E     = 10;
+
+
+    private final static List<String> operatorsSets =
+        Collections.unmodifiableList(Arrays.asList(
+                "!%&()*,/:;<=>?@[]^"    // D_SQL
+        ));
+
+
+    private static byte[] initChTab(int dialect) {
+        String operators = operatorsSets.get(dialect);
+        byte[] tab = new byte[128];
+
+        for (int i = 0; i < 128; i++) {
+            if (Character.isWhitespace(i)) tab[i]               = CH_WHITESPACE;
+            else if ((char)i == 'E') tab[i]                     = CH_CHAR_E;
+            else if (Character.isJavaIdentifierStart(i)) tab[i] = CH_SYMSTART;
+            else if (Character.isDigit(i)) tab[i]               = CH_DIGIT;
+            else if (operators.contains(""+((char)i))) tab[i]   = CH_OPERATOR;
+            else if ((char)i == '-') tab[i]                     = CH_MINUS;
+            else if ((char)i == '.') tab[i]                     = CH_DOT;
+            else if ((char)i == '\'') tab[i]                    = CH_STRDELIM;
+            else if ((char)i == '\\') tab[i]                    = CH_STRQUOTE;
+            else if ((char)i == '+') tab[i]                     = CH_PLUS;
+            else tab[i] = CH_UNKNOWN;
+        }
+
+        return tab;
+    }
+
+
+    private final static byte[] CHT_SQL_99 = initChTab(D_SQL_99);
+
+
+    private static byte[] lxtab(byte[] chtab, int...transitions) {
+        byte[] lxtab = new byte[chtab.length];
+
+        for (int i = 0; i < lxtab.length; i++) {
+            lxtab[i] = (byte)transitions[chtab[i]];
+        }
+
+        return lxtab;
+    }
+
+    private final static int S_START = 0;      // Starting point
+    private final static int S_WHITESPACE = 1;
+    private final static int S_SYMBOL     = 2;
+    private final static int S_OPERATOR   = 3;
+    private final static int S_INTEGER    = 4;
+    private final static int S_FLOAT      = 5;
+    private final static int S_STRING     = 6;
+    private final static int S_SQUOTE     = 7;  // Possible end of string
+    private final static int S_FLOAT_E    = 8;  // Floating point literal in expotential notation
+    private final static int S_KEYWORD    = 9;
+
+    private final static int[] tokenTypes = {
+            XqlToken.UNKNOWN,      // S_START
+            XqlToken.WHITESPACE,   // S_WHITESPACE
+            XqlToken.SYMBOL,       // S_SYMBOL
+            XqlToken.OPERATOR,     // S_OPERATOR
+            XqlToken.LITERAL,      // S_INTEGER
+            XqlToken.LITERAL,      // S_FLOAT
+            XqlToken.LITERAL,      // S_STRING
+            XqlToken.LITERAL,      // S_SQUOTE
+            XqlToken.LITERAL,      // S_FLOAT_E
+            XqlToken.KEYWORD,      // S_KEYWORD
+    };
+
+    private final static byte[][][] lextabs = {
+            new byte[][] { // D_SQL_99
+                           //         UNK WSP SYM DIG OP   -   .   '   \   +  eE
+                    lxtab(CHT_SQL_99, -1,  1,  2,  4,  3,  3,  3,  6, -1,  3,  2), // 0 = S_START
+                    lxtab(CHT_SQL_99, -1,  1, -1, -1, -1, -1, -1, -1, -1, -1, -1), // 1 = S_WHITESPACE
+                    lxtab(CHT_SQL_99, -1, -1,  2,  2, -1, -1, -1, -1, -1, -1,  2), // 2 = S_SYMBOL
+                    lxtab(CHT_SQL_99, -1, -1, -1,  4, -1, -1,  3, -1, -1, -1, -1), // 3 = S_OPERATOR
+                    lxtab(CHT_SQL_99, -1, -1, -1,  4, -1, -1,  5, -1, -1, -1, -1), // 4 = S_INTEGER
+                    lxtab(CHT_SQL_99, -1, -1, -1,  5, -1, -1, -1, -1, -1, -1,  8), // 5 = S_FLOAT
+                    lxtab(CHT_SQL_99,  6,  6,  6,  6,  6,  6,  6,  7,  6,  6,  6), // 6 = S_STRING
+                    lxtab(CHT_SQL_99, -1, -1, -1, -1, -1, -1, -1,  6, -1, -1, -1), // 7 = S_SQUOTE
+                    lxtab(CHT_SQL_99, -1, -1, -1,  8, -1, -1, -1, -1, -1,  8, -1), // 8 = S_FLOAT_E
+            },
+    };
+
+    // Keyword sets
+
+    private final static Set<String> SQL_99_KEYWORDS = strSet(
+            "ABSOLUTE", "ACTION", "ADD", "AFTER", "ALL", "ALLOCATE", "ALTER", "AND", "ANY", "ARE",
+            "ARRAY", "AS", "ASC", "ASENSITIVE", "ASSERTION", "ASYMMETRIC", "AT", "ATOMIC", "AUTHORIZATION",
+            "BEFORE", "BEGIN", "BETWEEN", "BINARY", "BIT", "BLOB", "BOOLEAN", "BOTH", "BREADTH", "BY", "CALL",
+            "CASCADE", "CASCADED", "CASE", "CAST", "CATALOG", "CHAR", "CHARACTER", "CHECK", "CLOB", "CLOSE",
+            "COLLATE", "COLLATION", "COLUMN", "COMMIT", "CONDITION", "CONNECT", "CONNECTION", "CONSTRAINT",
+            "CONSTRAINTS", "CONSTRUCTOR", "CONTINUE", "CORRESPONDING", "CREATE", "CROSS", "CUBE", "CURRENT",
+            "CURRENT_DATE", "CURRENT_DEFAULT_TRANSFORM_GROUP", "CURRENT_PATH", "CURRENT_ROLE", "CURRENT_TIME",
+            "CURRENT_TIMESTAMP", "CURRENT_TRANSFORM_GROUP_FOR_TYPE", "CURRENT_USER", "CURSOR", "CYCLE",
+            "DATA", "DATE", "DAY", "DEALLOCATE", "DEC", "DECIMAL", "DECLARE", "DEFAULT", "DEFERRABLE", "DEFERRED",
+            "DELETE", "DEPTH", "DEREF", "DESC", "DESCRIBE", "DESCRIPTOR", "DETERMINISTIC", "DIAGNOSTICS",
+            "DISCONNECT", "DISTINCT", "DO", "DOMAIN", "DOUBLE", "DROP", "DYNAMIC", "EACH", "ELSE", "ELSEIF",
+            "END", "EQUALS", "ESCAPE", "EXCEPT", "EXCEPTION", "EXEC", "EXECUTE", "EXISTS", "EXIT", "EXTERNAL",
+            "FALSE", "FETCH", "FILTER", "FIRST", "FLOAT", "FOR", "FOREIGN", "FOUND", "FREE", "FROM", "FULL",
+            "FUNCTION", "GENERAL", "GET", "GLOBAL", "GO", "GOTO", "GRANT", "GROUP", "GROUPING", "HANDLER",
+            "HAVING", "HOLD", "HOUR", "IDENTITY", "IF", "IMMEDIATE", "IN", "INDICATOR", "INITIALLY", "INNER",
+            "INOUT", "INPUT", "INSENSITIVE", "INSERT", "INT", "INTEGER", "INTERSECT", "INTERVAL", "INTO", "IS",
+            "ISOLATION", "ITERATE", "JOIN", "KEY", "LANGUAGE", "LARGE", "LAST", "LATERAL", "LEADING", "LEAVE",
+            "LEFT", "LEVEL", "LIKE", "LOCAL", "LOCALTIME", "LOCALTIMESTAMP", "LOCATOR", "LOOP", "MAP", "MATCH",
+            "METHOD", "MINUTE", "MODIFIES", "MODULE", "MONTH", "NAMES", "NATIONAL", "NATURAL", "NCHAR", "NCLOB",
+            "NEW", "NEXT", "NO", "NONE", "NOT", "NULL", "NUMERIC", "OBJECT", "OF", "OLD", "ON", "ONLY", "OPEN",
+            "OPTION", "OR", "ORDER", "ORDINALITY", "OUT", "OUTER", "OUTPUT", "OVER", "OVERLAPS", "PAD", "PARAMETER",
+            "PARTIAL", "PARTITION", "PATH", "PRECISION", "PREPARE", "PRESERVE", "PRIMARY", "PRIOR", "PRIVILEGES",
+            "PROCEDURE", "PUBLIC", "RANGE", "READ", "READS", "REAL", "RECURSIVE", "REF", "REFERENCES", "REFERENCING",
+            "RELATIVE", "RELEASE", "REPEAT", "RESIGNAL", "RESTRICT", "RESULT", "RETURN", "RETURNS", "REVOKE",
+            "RIGHT", "ROLE", "ROLLBACK", "ROLLUP", "ROUTINE", "ROW", "ROWS", "SAVEPOINT", "SCHEMA", "SCOPE",
+            "SCROLL", "SEARCH", "SECOND", "SECTION", "SELECT", "SENSITIVE", "SESSION", "SESSION_USER", "SET",
+            "SETS", "SIGNAL", "SIMILAR", "SIZE", "SMALLINT", "SOME", "SPACE", "SPECIFIC", "SPECIFICTYPE",
+            "SQL", "SQLEXCEPTION", "SQLSTATE", "SQLWARNING", "START", "STATE", "STATIC", "SYMMETRIC", "SYSTEM",
+            "SYSTEM_USER", "TABLE", "TEMPORARY", "THEN", "TIME", "TIMESTAMP", "TIMEZONE_HOUR", "TIMEZONE_MINUTE",
+            "TO", "TRAILING", "TRANSACTION", "TRANSLATION", "TREAT", "TRIGGER", "TRUE", "UNDER", "UNDO", "UNION",
+            "UNIQUE", "UNKNOWN", "UNNEST", "UNTIL", "UPDATE", "USAGE", "USER", "USING", "VALUE", "VALUES", "VARCHAR",
+            "VARYING", "VIEW", "WHEN", "WHENEVER", "WHERE", "WHILE", "WINDOW", "WITH", "WITHIN", "WITHOUT", "WORK",
+            "WRITE", "YEAR", "ZONE");
+
+
+    public static final List<Set<String>> keywordSets = Collections.unmodifiableList(Arrays.asList(
+            SQL_99_KEYWORDS
+    ));
+
+
+
+    private static Set<String> strSet(String...strings) {
+        Set<String> set = new HashSet<String>(strings.length * 2 + 1);
+        for (String s : strings) {
+            set.add(s.toLowerCase());
+        }
+
+        return Collections.unmodifiableSet(set);
+    }
+
+    private final Set<String> keywordSet;
+    private final byte[][] lextab;
+
+    private int pos = 0;
+    private String input;
+
+
+    public XqlLexer(int dialect, String input) {
+        this.input = input;
+        this.lextab = lextabs[dialect];
+        this.keywordSet = keywordSets.get(dialect);
+    }
+
+    public Iterator<XqlToken> iterator() {
+        return this;
+    }
+
+
+    public boolean hasNext() {
+        return pos < input.length();
+    }
+
+
+    private int getch(int pos) {
+
+        char ch = input.charAt(pos);
+
+        if (ch >= 128) {
+            return Character.isJavaIdentifierStart(ch) ? 65 : 0;
+        }
+
+        return (int)ch;
+    }
+
+
+
+    public XqlToken next() {
+
+        int cur = pos;
+        int type = lextab[S_START][getch(cur++)], state = type;
+
+        while (state >= 0 && cur < input.length()) {
+            state = lextab[state][getch(cur)];
+            type = state >= 0 ? state : type;
+            cur = state == -1 ? cur : cur + 1;
+        }
+
+        String s = input.substring(pos, cur); pos = cur;
+
+        if (type == S_SYMBOL && keywordSet.contains(s.toLowerCase())) {
+            type = S_KEYWORD;
+        }
+
+        if (type < 0) {
+            type = S_START;
+        }
+
+        return new XqlToken(tokenTypes[type], s);
+    }
+
+
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
+}
