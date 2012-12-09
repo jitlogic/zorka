@@ -18,6 +18,7 @@ package com.jitlogic.zorka.spy;
 
 
 import bsh.This;
+import com.jitlogic.zorka.agent.FileTrapper;
 import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
 import com.jitlogic.zorka.integ.snmp.TrapVarBindDef;
@@ -25,7 +26,9 @@ import com.jitlogic.zorka.integ.syslog.SyslogTrapper;
 import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
 import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.processors.*;
+import com.jitlogic.zorka.util.ZorkaLogLevel;
 import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.normproc.Normalizer;
 
 import java.util.*;
 
@@ -477,6 +480,18 @@ public class SpyDefinition {
 
 
     /**
+     * Normalizes a query string from src and puts result into dst.
+     *
+     * @param src
+     * @param dst
+     * @param normalizer
+     * @return
+     */
+    public SpyDefinition normalize(int src, int dst, Normalizer normalizer) {
+        return withProcessor(new NormalizingProcessor(src, dst, normalizer));
+    }
+
+    /**
      * Gets slot number n, performs traditional get operation and stores
      * results in the same slot.
      *
@@ -647,6 +662,22 @@ public class SpyDefinition {
      */
     public SpyDefinition toBsh(String ns) {
         return toCollector(new CallingBshCollector(ns));
+    }
+
+
+    /**
+     * Instruct spy to submit data to log file.
+     *
+     * @param trapper
+     *
+     * @param logLevel
+     *
+     * @param expr
+     *
+     * @return
+     */
+    public SpyDefinition toFile(FileTrapper trapper, String logLevel, String expr) {
+        return toCollector(new FileCollector(trapper, expr, ZorkaLogLevel.valueOf(logLevel), ""));
     }
 
 

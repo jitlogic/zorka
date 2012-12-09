@@ -17,8 +17,8 @@
 
 package com.jitlogic.zorka.agent;
 
-import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.*;
 
@@ -415,4 +415,49 @@ public class ZorkaLib  {
     public EjbRankLister ejbRankLister(String mbsName, String objNames, String attr) {
         return new EjbRankLister(mbsName, objNames, attr);
     }
+
+
+    private Map<String, FileTrapper> fileTrappers = new ConcurrentHashMap<String, FileTrapper>();
+
+
+    public FileTrapper fileTrapper(String id) {
+        return fileTrappers.get(id);
+    }
+
+
+    public FileTrapper rollingFileTrapper(String id, String path, int count, long maxSize, boolean logExceptions) {
+        FileTrapper trapper = fileTrappers.get(id);
+
+        if (trapper == null) {
+            trapper = FileTrapper.rolling(path, count, maxSize, logExceptions);
+            trapper.start();
+            fileTrappers.put(id, trapper);
+        }
+
+        return trapper;
+    }
+
+
+    public FileTrapper dailyFileTrapper(String id, String path, boolean logExceptions){
+        FileTrapper trapper = fileTrappers.get(id);
+
+        if (trapper == null) {
+            trapper = FileTrapper.daily(path, logExceptions);
+            trapper.start();
+            fileTrappers.put(id, trapper);
+        }
+
+        return trapper;
+    }
+
+
+    public void removeFileTrapper(String id) {
+        FileTrapper trapper = fileTrappers.get(id);
+
+        if (trapper != null) {
+            trapper.stop();
+        }
+    }
+
+
 }

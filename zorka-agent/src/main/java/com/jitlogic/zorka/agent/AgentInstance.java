@@ -20,6 +20,7 @@ import com.jitlogic.zorka.integ.nagios.NagiosAgent;
 import com.jitlogic.zorka.integ.nagios.NagiosLib;
 import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.syslog.SyslogLib;
+import com.jitlogic.zorka.normproc.NormLib;
 import com.jitlogic.zorka.spy.MainSubmitter;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyLib;
@@ -87,6 +88,7 @@ public class AgentInstance {
 
     private SyslogLib syslogLib = null;
     private SnmpLib snmpLib = null;
+    private NormLib normLib = null;
 
     private Properties props;
 
@@ -126,6 +128,9 @@ public class AgentInstance {
 
         zorkaAgent = new ZorkaBshAgent(executor);
 
+        normLib = new NormLib();
+        zorkaAgent.installModule("normalizers", normLib);
+
         if ("yes".equalsIgnoreCase(props.getProperty(SPY_ENABLE))) {
             log.info("Enabling Zorka SPY");
             spyInstance = SpyInstance.instance();
@@ -160,6 +165,8 @@ public class AgentInstance {
             zorkaAgent.installModule("nagios", nagiosLib);
             nagiosAgent.start();
         }
+
+
         zorkaAgent.loadScriptDir(props.getProperty(ZORKA_CONF_DIR), ".*\\.bsh$");
 
     }

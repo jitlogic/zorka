@@ -79,6 +79,8 @@ Zorka code). There are several library objects visible:
 
 * `nagios` - nagios-specific functions (available if nagios interface is enabled);
 
+* `normalizers` - data normalization framework functions;
+
 * `syslog` - functions for sending messages to log host using syslog protocol;
 
 All above things are visible Beanshell scripts from `$ZORKA_HOME/conf` directory. Interfaces to monitoring systems
