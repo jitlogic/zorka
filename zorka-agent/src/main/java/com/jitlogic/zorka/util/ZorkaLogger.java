@@ -176,6 +176,7 @@ public class ZorkaLogger {
 
 
     private void rotate() {
+        // TODO get rid of logging code, use FileTrapper instead
         File f = new File(logDir + "/" + logFileName + "." + maxLogs);
         if (f.exists()) {
             f.delete();

@@ -21,10 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -218,6 +215,15 @@ public class ZorkaUtil {
         return false;
     }
 
+    public static byte[] copyArray(byte[] src) {
+        if (src == null) {
+            return null;
+        }
+
+        byte[] dst = new byte[src.length];
+        System.arraycopy(src, 0, dst, 0, src.length);
+        return dst;
+    }
 
     public static long[] copyArray(long[] src) {
         if (src == null) {
@@ -313,5 +319,16 @@ public class ZorkaUtil {
         }
 
         return new String(vysl);
+    }
+
+
+    public static <K, V> Map<K,V> map(Object...data) {
+        Map<K,V> map = new HashMap<K, V>(data.length+2);
+
+        for (int i = 1; i < data.length; i+=2) {
+            map.put((K)data[i-1], (V)data[i]);
+        }
+
+        return map;
     }
 }
