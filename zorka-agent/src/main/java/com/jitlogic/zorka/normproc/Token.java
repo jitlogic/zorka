@@ -18,7 +18,7 @@ package com.jitlogic.zorka.normproc;
 public class Token {
 
 
-    private final static String[] prefixes = { "U", "W", "S", "O", "L", "C", "K", "P" };
+    private final static String[] prefixes = { "u", "w", "s", "o", "l", "c", "k", "p" };
 
     private int type;
     private String content;
@@ -51,6 +51,6 @@ public class Token {
     }
 
     public String toString() {
-        return prefixes[type] + "(" + content + ")";
+        return prefixes[type] + "(\"" + content + "\")";
     }
 }

@@ -15,46 +15,20 @@
  */
 package com.jitlogic.zorka.agent.unittest;
 
+import com.jitlogic.zorka.agent.testutil.LexerFixture;
 import com.jitlogic.zorka.normproc.Token;
 import com.jitlogic.zorka.normproc.XqlLexer;
 
 import static com.jitlogic.zorka.normproc.NormLib.*;
-import static com.jitlogic.zorka.normproc.XqlLexer.*;
 
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class XqlLexerTest {
-
-    public Token l(String content) {
-        return new Token(T_LITERAL, content);
-    }
-
-    public Token k(String content) {
-        return new Token(T_KEYWORD, content);
-    }
-
-    public Token o(String content) {
-        return new Token(T_OPERATOR, content);
-    }
-
-    public Token s(String content) {
-        return new Token(T_SYMBOL, content);
-    }
-
-    public Token w(String content) {
-        return new Token(T_WHITESPACE, content);
-    }
-
-
-    public List<Token> lst(Token...tokens) {
-        return Arrays.asList(tokens);
-    }
+public class XqlLexerTest extends LexerFixture {
 
     public List<Token> lex(String input) {
         List<Token> tokens = new ArrayList<Token>();
@@ -103,15 +77,15 @@ public class XqlLexerTest {
     @Test
     public void testLexOperators() {
         assertEquals(lst(o("+")), lex("+"));
-        assertEquals(lst(o("+"),o("+")), lex("++"));
-        assertEquals(lst(s("a"),o("."),s("b")), lex("a.b"));
+        assertEquals(lst(o("+"), o("+")), lex("++"));
+        assertEquals(lst(s("a"), o("."), s("b")), lex("a.b"));
     }
 
     @Test
     public void testLexSimpleStatememts() {
         assertEquals(
             lst(k("select"), w(" "), o("*"), w(" "), k("from"), w(" "), s("mytab"), w(" "),
-                k("where"), w(" "), s("myfield"), w(" "), o("="), w(" "), l("'abc'")),
+                    k("where"), w(" "), s("myfield"), w(" "), o("="), w(" "), l("'abc'")),
             lex("select * from mytab where myfield = 'abc'"));
     }
 }

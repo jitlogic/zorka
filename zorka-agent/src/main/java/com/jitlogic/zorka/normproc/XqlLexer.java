@@ -43,15 +43,6 @@ public class XqlLexer extends Lexer {
     //public final static int D_HQL
     //public final static int D_EQL
 
-    public final static int T_UNKNOWN     = 0;
-    public final static int T_WHITESPACE  = 1;
-    public final static int T_SYMBOL      = 2;
-    public final static int T_OPERATOR    = 3;
-    public final static int T_LITERAL     = 4;
-    public final static int T_COMMENT     = 5;
-    public final static int T_KEYWORD     = 6;
-    public final static int T_PLACEHOLDER = 7;
-
     // Character table definitions
 
     public final static int CH_UNKNOWN    = 0;
@@ -98,7 +89,6 @@ public class XqlLexer extends Lexer {
     private final static byte[] CHT_SQL_99 = initChTab(DIALECT_SQL99);
 
 
-    private final static int S_START = 0;      // Starting point
     private final static int S_WHITESPACE = 1;
     private final static int S_SYMBOL     = 2;
     private final static int S_OPERATOR   = 3;
@@ -184,7 +174,7 @@ public class XqlLexer extends Lexer {
 
 
     public XqlLexer(int dialect, String input) {
-        super(input, lextabs[dialect]);
+        super(input, lextabs[dialect], tokenTypes);
         this.keywordSet = keywordSets.get(dialect);
     }
 
@@ -192,13 +182,9 @@ public class XqlLexer extends Lexer {
     public Token next() {
         Token token = super.next();
 
-        int type = token.getType();
-
-        if (type == S_SYMBOL && keywordSet.contains(token.getContent().toLowerCase())) {
-            type = S_KEYWORD;
+        if (token.getType() == T_SYMBOL && keywordSet.contains(token.getContent().toLowerCase())) {
+            token.setType(T_KEYWORD);
         }
-
-        token.setType(tokenTypes[type]);
 
         return token;
     }
