@@ -30,6 +30,16 @@ public class DispatchingCollector implements SpyCollector {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
+    private SpyDefinition sdef = null;
+
+
+    public DispatchingCollector() {
+    }
+
+    public DispatchingCollector(SpyDefinition sdef) {
+        this.sdef = sdef;
+    }
+
     public synchronized  void collect(SpyRecord record) {
 
         if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
@@ -38,13 +48,13 @@ public class DispatchingCollector implements SpyCollector {
 
         SpyContext ctx = record.getContext();
 
-        SpyDefinition sdef = ctx.getSpyDefinition();
+        SpyDefinition sd = sdef != null ? sdef : ctx.getSpyDefinition();
 
-        if (null == (record = process(sdef, record))) {
+        if (null == (record = process(sd, record))) {
             return;
         }
 
-        for (SpyCollector collector : sdef.getCollectors()) {
+        for (SpyCollector collector : sd.getCollectors()) {
             try {
                 collector.collect(record);
             } catch (Throwable e) {

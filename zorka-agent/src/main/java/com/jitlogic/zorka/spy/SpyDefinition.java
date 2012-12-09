@@ -700,6 +700,19 @@ public class SpyDefinition {
 
 
     /**
+     * Sends collected records to another SpyDefinition chain. Records will be processed by all
+     * processors from ON_COLLECT chain and sent to collectors attached to it.
+     *
+     * @param sdef
+     *
+     * @return
+     */
+    public SpyDefinition toSdef(SpyDefinition sdef) {
+        return toCollector(new DispatchingCollector(sdef));
+    }
+
+
+    /**
      * Sends collected records as SNMP traps.
      *
      * @param trapper snmp trapper used to send traps;
