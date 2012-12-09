@@ -587,6 +587,38 @@ public class SpyDefinition {
 
 
     /**
+     * Passes only records where (a op b) is true.
+     *
+     * @param a
+     *
+     * @param op
+     *
+     * @param b
+     *
+     * @return
+     */
+    public SpyDefinition ifSlotCmp(int a, int op, int b) {
+        return withProcessor(ComparatorProcessor.scmp(a, op, b));
+    }
+
+
+    /**
+     * Passes only records where (a op v) is true.
+     *
+     * @param a
+     *
+     * @param op
+     *
+     * @param v
+     *
+     * @return
+     */
+    public SpyDefinition ifValueCmp(int a, int op, Object v) {
+        return withProcessor(ComparatorProcessor.vcmp(a, op, v));
+    }
+
+
+    /**
      * Instructs spy to submit data to a given submitter.
      *
      * @param collector
