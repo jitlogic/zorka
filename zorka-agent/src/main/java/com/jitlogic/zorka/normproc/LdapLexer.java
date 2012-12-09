@@ -101,4 +101,8 @@ public class LdapLexer extends Lexer {
     }
 
 
+    @Override
+    public Lexer lex(String input) {
+        return new LdapLexer(input);
+    }
 }

@@ -1,7 +1,9 @@
 Zorka 0.6 (2012-12-21)
 ----------------------
 
- * query normalization for SQL/HQL;
+ * normalization of SQL/HQL queries;
+ * normalization of LDAP search queries;
+ * file trapper (logs events to files instead of syslog/zabbix/SNMP);
 
 
 Zorka 0.5 (2012-12-07)

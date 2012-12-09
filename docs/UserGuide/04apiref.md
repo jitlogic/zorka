@@ -250,21 +250,30 @@ one example but there are many types of data that should be stripped or simplifi
 framework functions are available via `normalizers` library. Objects created with those functions can be attached to
 spy processing chains using `normalize()` method of spy definition objects.
 
+There are several predefined normalization modes, passed to normalizer constructors as `flags` parameter:
+
+* `normalizers.NORM_MIN` - minimal normalizer (cut off white spaces and illegal tokens, normalize white spaces, symbols
+and keywords, leave values (literals) unchanged (and visible);
+
+* `normalizers.NORM_STD` - everything `NORM_MIN` does plus remove literals and replace them with `?` placeholders.
+
 ### normalizers.sql()
 
-    normalizers.sql(dialect, type)
+    normalizers.sql(dialect, flags)
 
 Creates SQL normalizer that supports various SQL dialects and similiar languages (eg. hibernate HQL or JPA EQL). The
 following dialects are currently supported:
 
 * `normalizers.DIALECT_SQL99` - ANSI SQL-99;
 
-The second parameter determines what will be normalized. Available normalization modes:
+Use one of `normalizers.NORM_*` constants as `flags` parameter.
 
-* `normalizers.NORM_MIN` - minimal normalizer (cut off white spaces and illegal tokens, normalize white spaces, symbols
-and keywords, leave values (literals) unchanged (and visible);
 
-* `normalizers.NORM_STD` - everything `NORM_MIN` does plus remove literals and replace them with `?` placeholders.
+### normalizers.ldap()
+
+    normalizers.ldap(flags)
+
+Creates LDAP normalizer that processes LDAP search queries. Use one of `normalizers.NORM_*` constants as `flags` parameter.
 
 # Class and Method Instrumentation API
 

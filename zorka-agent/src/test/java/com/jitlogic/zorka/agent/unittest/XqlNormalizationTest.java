@@ -15,9 +15,9 @@
  */
 package com.jitlogic.zorka.agent.unittest;
 
+import com.jitlogic.zorka.normproc.GenericNormalizer;
 import com.jitlogic.zorka.normproc.NormLib;
 import com.jitlogic.zorka.normproc.Normalizer;
-import com.jitlogic.zorka.normproc.XqlNormalizer;
 
 import static com.jitlogic.zorka.normproc.NormLib.*;
 
@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 
 public class XqlNormalizationTest {
 
-    Normalizer normalizer = new XqlNormalizer(DIALECT_SQL99, NormLib.NORM_STD);
+    Normalizer normalizer = GenericNormalizer.xql(DIALECT_SQL99, NormLib.NORM_STD);
 
     @Test
     public void testNormalizeWhiteSpacesOnly() {

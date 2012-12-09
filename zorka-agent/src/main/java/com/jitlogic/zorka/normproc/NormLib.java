@@ -37,7 +37,11 @@ public class NormLib {
     public final static int DIALECT_SQL99 = 0;
 
 
-    public Normalizer sql(int dialect, int type) {
-        return new XqlNormalizer(dialect, type);
+    public Normalizer sql(int dialect, int flags) {
+        return GenericNormalizer.xql(dialect, flags);
+    }
+
+    public Normalizer ldap(int flags) {
+        return GenericNormalizer.ldap(flags);
     }
 }

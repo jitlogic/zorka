@@ -126,4 +126,5 @@ public abstract class Lexer implements Iterable<Token>, Iterator<Token> {
         throw new UnsupportedOperationException();
     }
 
+    public abstract Lexer lex(String input);
 }

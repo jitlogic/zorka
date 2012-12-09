@@ -171,11 +171,12 @@ public class XqlLexer extends Lexer {
 
 
     protected Set<String> keywordSet;
-
+    private int dialect;
 
     public XqlLexer(int dialect, String input) {
         super(input, lextabs[dialect], tokenTypes);
         this.keywordSet = keywordSets.get(dialect);
+        this.dialect = dialect;
     }
 
 
@@ -187,6 +188,11 @@ public class XqlLexer extends Lexer {
         }
 
         return token;
+    }
+
+    @Override
+    public Lexer lex(String input) {
+        return new XqlLexer(dialect, input);
     }
 
 }
