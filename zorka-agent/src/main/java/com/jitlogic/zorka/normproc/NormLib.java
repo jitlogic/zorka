@@ -15,19 +15,21 @@
  */
 package com.jitlogic.zorka.normproc;
 
-import static com.jitlogic.zorka.normproc.XqlToken.*;
+import static com.jitlogic.zorka.normproc.XqlLexer.*;
 
 public class NormLib {
 
     /**
      * Normalize whitespaces, symbols and keywords. Remove comments and unknown tokens, leave literals.
      */
-    public final static int NORM_MIN = (1<<UNKNOWN)|(1<<WHITESPACE)|(1<<SYMBOL)|(1<<COMMENT)|(1<<KEYWORD);
+    public final static int NORM_MIN =
+            (1<<T_UNKNOWN)|(1<<T_WHITESPACE)|(1<<T_SYMBOL)|(1<<T_COMMENT)|(1<<T_KEYWORD);
 
     /**
      * Normalize whitespaces, symbols and keywords. Remove comments and unknown tokens, replace literals with placeholders.
      */
-    public final static int NORM_STD = (1<<UNKNOWN)|(1<<WHITESPACE)|(1<<SYMBOL)|(1<<LITERAL)|(1<<COMMENT)|(1<<KEYWORD);
+    public final static int NORM_STD =
+            (1<<T_UNKNOWN)|(1<<T_WHITESPACE)|(1<<T_SYMBOL)|(1<<T_LITERAL)|(1<<T_COMMENT)|(1<<T_KEYWORD);
 
     /**
      * Generic SQL dialect (based on SQL99)

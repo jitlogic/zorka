@@ -28,7 +28,7 @@ import static com.jitlogic.zorka.normproc.NormLib.*;
  * @author Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  */
-public class XqlLexer implements Iterable<XqlToken>, Iterator<XqlToken> {
+public class XqlLexer extends Lexer {
 
     // SQL/HQL dialects
 
@@ -42,6 +42,15 @@ public class XqlLexer implements Iterable<XqlToken>, Iterator<XqlToken> {
     //public final static int D_DB2QL
     //public final static int D_HQL
     //public final static int D_EQL
+
+    public final static int T_UNKNOWN     = 0;
+    public final static int T_WHITESPACE  = 1;
+    public final static int T_SYMBOL      = 2;
+    public final static int T_OPERATOR    = 3;
+    public final static int T_LITERAL     = 4;
+    public final static int T_COMMENT     = 5;
+    public final static int T_KEYWORD     = 6;
+    public final static int T_PLACEHOLDER = 7;
 
     // Character table definitions
 
@@ -89,16 +98,6 @@ public class XqlLexer implements Iterable<XqlToken>, Iterator<XqlToken> {
     private final static byte[] CHT_SQL_99 = initChTab(DIALECT_SQL99);
 
 
-    private static byte[] lxtab(byte[] chtab, int...transitions) {
-        byte[] lxtab = new byte[chtab.length];
-
-        for (int i = 0; i < lxtab.length; i++) {
-            lxtab[i] = (byte)transitions[chtab[i]];
-        }
-
-        return lxtab;
-    }
-
     private final static int S_START = 0;      // Starting point
     private final static int S_WHITESPACE = 1;
     private final static int S_SYMBOL     = 2;
@@ -111,30 +110,30 @@ public class XqlLexer implements Iterable<XqlToken>, Iterator<XqlToken> {
     private final static int S_KEYWORD    = 9;
 
     private final static int[] tokenTypes = {
-            XqlToken.UNKNOWN,      // S_START
-            XqlToken.WHITESPACE,   // S_WHITESPACE
-            XqlToken.SYMBOL,       // S_SYMBOL
-            XqlToken.OPERATOR,     // S_OPERATOR
-            XqlToken.LITERAL,      // S_INTEGER
-            XqlToken.LITERAL,      // S_FLOAT
-            XqlToken.LITERAL,      // S_STRING
-            XqlToken.LITERAL,      // S_SQUOTE
-            XqlToken.LITERAL,      // S_FLOAT_E
-            XqlToken.KEYWORD,      // S_KEYWORD
+            T_UNKNOWN,      // S_START
+            T_WHITESPACE,   // S_WHITESPACE
+            T_SYMBOL,       // S_SYMBOL
+            T_OPERATOR,     // S_OPERATOR
+            T_LITERAL,      // S_INTEGER
+            T_LITERAL,      // S_FLOAT
+            T_LITERAL,      // S_STRING
+            T_LITERAL,      // S_SQUOTE
+            T_LITERAL,      // S_FLOAT_E
+            T_KEYWORD,      // S_KEYWORD
     };
 
     private final static byte[][][] lextabs = {
-            new byte[][] { // DIALECT_SQL99
-                           //         UNK WSP SYM DIG OP   -   .   '   \   +  eE
-                    lxtab(CHT_SQL_99, -1,  1,  2,  4,  3,  3,  3,  6, -1,  3,  2), // 0 = S_START
-                    lxtab(CHT_SQL_99, -1,  1, -1, -1, -1, -1, -1, -1, -1, -1, -1), // 1 = S_WHITESPACE
-                    lxtab(CHT_SQL_99, -1, -1,  2,  2, -1, -1, -1, -1, -1, -1,  2), // 2 = S_SYMBOL
-                    lxtab(CHT_SQL_99, -1, -1, -1,  4, -1, -1,  3, -1, -1, -1, -1), // 3 = S_OPERATOR
-                    lxtab(CHT_SQL_99, -1, -1, -1,  4, -1, -1,  5, -1, -1, -1, -1), // 4 = S_INTEGER
-                    lxtab(CHT_SQL_99, -1, -1, -1,  5, -1, -1, -1, -1, -1, -1,  8), // 5 = S_FLOAT
-                    lxtab(CHT_SQL_99,  6,  6,  6,  6,  6,  6,  6,  7,  6,  6,  6), // 6 = S_STRING
-                    lxtab(CHT_SQL_99, -1, -1, -1, -1, -1, -1, -1,  6, -1, -1, -1), // 7 = S_SQUOTE
-                    lxtab(CHT_SQL_99, -1, -1, -1,  8, -1, -1, -1, -1, -1,  8, -1), // 8 = S_FLOAT_E
+            new byte[][] {                                              // DIALECT_SQL99
+                           //         UN WS SY DI OP -  .  '  \  +  E
+                    lxtab(CHT_SQL_99, E, 1, 2, 4, 3, 3, 3, 6, E, 3, 2), // 0 = S_START
+                    lxtab(CHT_SQL_99, E, 1, E, E, E, E, E, E, E, E, E), // 1 = S_WHITESPACE
+                    lxtab(CHT_SQL_99, E, E, 2, 2, E, E, E, E, E, E, 2), // 2 = S_SYMBOL
+                    lxtab(CHT_SQL_99, E, E, E, 4, E, E, 3, E, E, E, E), // 3 = S_OPERATOR
+                    lxtab(CHT_SQL_99, E, E, E, 4, E, E, 5, E, E, E, E), // 4 = S_INTEGER
+                    lxtab(CHT_SQL_99, E, E, E, 5, E, E, E, E, E, E, 8), // 5 = S_FLOAT
+                    lxtab(CHT_SQL_99, 6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6), // 6 = S_STRING
+                    lxtab(CHT_SQL_99, E, E, E, E, E, E, E, 6, E, E, E), // 7 = S_SQUOTE
+                    lxtab(CHT_SQL_99, E, E, E, 8, E, E, E, E, E, 8, E), // 8 = S_FLOAT_E
             },
     };
 
@@ -181,78 +180,27 @@ public class XqlLexer implements Iterable<XqlToken>, Iterator<XqlToken> {
     ));
 
 
-
-    private static Set<String> strSet(String...strings) {
-        Set<String> set = new HashSet<String>(strings.length * 2 + 1);
-        for (String s : strings) {
-            set.add(s.toLowerCase());
-        }
-
-        return Collections.unmodifiableSet(set);
-    }
-
-    private final Set<String> keywordSet;
-    private final byte[][] lextab;
-
-    private int pos = 0;
-    private String input;
+    protected Set<String> keywordSet;
 
 
     public XqlLexer(int dialect, String input) {
-        this.input = input;
-        this.lextab = lextabs[dialect];
+        super(input, lextabs[dialect]);
         this.keywordSet = keywordSets.get(dialect);
     }
 
-    public Iterator<XqlToken> iterator() {
-        return this;
-    }
 
+    public Token next() {
+        Token token = super.next();
 
-    public boolean hasNext() {
-        return pos < input.length();
-    }
+        int type = token.getType();
 
-
-    private int getch(int pos) {
-
-        char ch = input.charAt(pos);
-
-        if (ch >= 128) {
-            return Character.isJavaIdentifierStart(ch) ? 65 : 0;
-        }
-
-        return (int)ch;
-    }
-
-
-
-    public XqlToken next() {
-
-        int cur = pos;
-        int type = lextab[S_START][getch(cur++)], state = type;
-
-        while (state >= 0 && cur < input.length()) {
-            state = lextab[state][getch(cur)];
-            type = state >= 0 ? state : type;
-            cur = state == -1 ? cur : cur + 1;
-        }
-
-        String s = input.substring(pos, cur); pos = cur;
-
-        if (type == S_SYMBOL && keywordSet.contains(s.toLowerCase())) {
+        if (type == S_SYMBOL && keywordSet.contains(token.getContent().toLowerCase())) {
             type = S_KEYWORD;
         }
 
-        if (type < 0) {
-            type = S_START;
-        }
+        token.setType(tokenTypes[type]);
 
-        return new XqlToken(tokenTypes[type], s);
+        return token;
     }
 
-
-    public void remove() {
-        throw new UnsupportedOperationException();
-    }
 }

@@ -15,10 +15,11 @@
  */
 package com.jitlogic.zorka.agent.unittest;
 
+import com.jitlogic.zorka.normproc.Token;
 import com.jitlogic.zorka.normproc.XqlLexer;
-import com.jitlogic.zorka.normproc.XqlToken;
 
 import static com.jitlogic.zorka.normproc.NormLib.*;
+import static com.jitlogic.zorka.normproc.XqlLexer.*;
 
 import org.junit.Test;
 
@@ -30,34 +31,34 @@ import static org.junit.Assert.*;
 
 public class XqlLexerTest {
 
-    public XqlToken l(String content) {
-        return new XqlToken(XqlToken.LITERAL, content);
+    public Token l(String content) {
+        return new Token(T_LITERAL, content);
     }
 
-    public XqlToken k(String content) {
-        return new XqlToken(XqlToken.KEYWORD, content);
+    public Token k(String content) {
+        return new Token(T_KEYWORD, content);
     }
 
-    public XqlToken o(String content) {
-        return new XqlToken(XqlToken.OPERATOR, content);
+    public Token o(String content) {
+        return new Token(T_OPERATOR, content);
     }
 
-    public XqlToken s(String content) {
-        return new XqlToken(XqlToken.SYMBOL, content);
+    public Token s(String content) {
+        return new Token(T_SYMBOL, content);
     }
 
-    public XqlToken w(String content) {
-        return new XqlToken(XqlToken.WHITESPACE, content);
+    public Token w(String content) {
+        return new Token(T_WHITESPACE, content);
     }
 
 
-    public List<XqlToken> lst(XqlToken...tokens) {
+    public List<Token> lst(Token...tokens) {
         return Arrays.asList(tokens);
     }
 
-    public List<XqlToken> lex(String input) {
-        List<XqlToken> tokens = new ArrayList<XqlToken>();
-        for (XqlToken token : new XqlLexer(DIALECT_SQL99, input)) {
+    public List<Token> lex(String input) {
+        List<Token> tokens = new ArrayList<Token>();
+        for (Token token : new XqlLexer(DIALECT_SQL99, input)) {
             tokens.add(token);
         }
         return tokens;

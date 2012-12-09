@@ -15,12 +15,12 @@
  */
 package com.jitlogic.zorka.normproc;
 
-import static com.jitlogic.zorka.normproc.XqlToken.*;
+import static com.jitlogic.zorka.normproc.XqlLexer.*;
 
 public class XqlNormalizer implements Normalizer {
 
     private static final boolean T = true, F = false;
-    private static XqlToken PHD_TOKEN = new XqlToken(PLACEHOLDER, "?");
+    private static Token PHD_TOKEN = new Token(T_PLACEHOLDER, "?");
     // U  W  S  O  L  C  K  P
 
     private static boolean[][] joints = {
@@ -56,17 +56,17 @@ public class XqlNormalizer implements Normalizer {
 
         StringBuffer sb = new StringBuffer(input.length()+2);
         XqlLexer lexer = new XqlLexer(dialect, input);
-        int last = UNKNOWN;
+        int last = T_UNKNOWN;
 
         while (lexer.hasNext()) {
-            XqlToken token = lexer.next();
+            Token token = lexer.next();
             int t = token.getType();
             String s = token.getContent();
 
             if (0 != (defaultFlags & (1<<t))) {
                 if (fcut[t]) { continue; }
                 if (fphd[t]) { token = PHD_TOKEN; }
-                if (fcas[t]) { token = new XqlToken(t, upcase ? s.toUpperCase() : s.toLowerCase()); }
+                if (fcas[t]) { token = new Token(t, upcase ? s.toUpperCase() : s.toLowerCase()); }
             }
 
             if (joints[last][t]) {

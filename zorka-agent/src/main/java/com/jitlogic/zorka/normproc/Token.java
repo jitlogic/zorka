@@ -15,29 +15,25 @@
  */
 package com.jitlogic.zorka.normproc;
 
-public class XqlToken {
+public class Token {
 
-    public final static int UNKNOWN     = 0;
-    public final static int WHITESPACE  = 1;
-    public final static int SYMBOL      = 2;
-    public final static int OPERATOR    = 3;
-    public final static int LITERAL     = 4;
-    public final static int COMMENT     = 5;
-    public final static int KEYWORD     = 6;
-    public final static int PLACEHOLDER = 7;
 
     private final static String[] prefixes = { "U", "W", "S", "O", "L", "C", "K", "P" };
 
     private int type;
     private String content;
 
-    public XqlToken(int type, String content) {
-        this.type = type >= 0 ? type : UNKNOWN;
+    public Token(int type, String content) {
+        this.type = type >= 0 ? type : 0;
         this.content = content != null ? content : "";
     }
 
     public int getType() {
         return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getContent() {
@@ -49,9 +45,9 @@ public class XqlToken {
     }
 
     public boolean equals(Object obj) {
-        return obj instanceof XqlToken &&
-                ((XqlToken)obj).type == type &&
-                ((XqlToken)obj).content.equals(content);
+        return obj instanceof Token &&
+                ((Token)obj).type == type &&
+                ((Token)obj).content.equals(content);
     }
 
     public String toString() {
