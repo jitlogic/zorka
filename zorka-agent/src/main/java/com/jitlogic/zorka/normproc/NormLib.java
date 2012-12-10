@@ -32,9 +32,18 @@ public class NormLib {
             (1<<T_UNKNOWN)|(1<<T_WHITESPACE)|(1<<T_SYMBOL)|(1<<T_LITERAL)|(1<<T_COMMENT)|(1<<T_KEYWORD);
 
     /**
-     * Generic SQL dialect (based on SQL99)
+     * Supported SQL dialects.
      */
-    public final static int DIALECT_SQL99 = 0;
+    public final static int DIALECT_SQL_92 = 0;
+    public final static int DIALECT_SQL_99 = 1;
+    public final static int DIALECT_SQL_03 = 2;
+    public final static int DIALECT_MSSQL  = 3;
+    public final static int DIALECT_PGSQL  = 4;
+    public final static int DIALECT_MYSQL  = 5;
+    public final static int DIALECT_DB2    = 6;
+    public final static int DIALECT_ORACLE = 7;
+    public final static int DIALECT_HQL    = 8;
+    public final static int DIALECT_JPA    = 9;
 
 
     public Normalizer sql(int dialect, int flags) {
