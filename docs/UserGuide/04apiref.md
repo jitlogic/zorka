@@ -460,6 +460,21 @@ Method `set()` stores value from slot `src` in `threadLocal`. Method `get()` rea
 it in slot `dst`. Last method clears `threadLocal`, so stored object can be garbage collected (granted there are no more
 references pointing to it).
 
+#### Filtering data using comparator
+
+    sdef = sdef.ifSlotCmp(a, op, b)
+    sdef = sdef.ifValueCmp(a, op, v)
+
+These two methods can be used to filter out unwanted records. First one compares values from two slots of a record,
+second one compares value from record slot with some constant. Arguments `a` and `b` are slot numbers, `v` is a constant
+value and `op` is one of operators: `spy.GT`, `spy.GE`, `spy.EQ`, `spy.LE`, `spy.LT`, `spy.NE`. Both functions will
+coerce input values to proper types in order to make comparison possible. Floating point values (`float` or `double`)
+are compared with `0.001` accuracy. For example:
+
+* `ifSlotCmp(0, spy.GT, 1)` will pass only records for whose value from slot 0 is greater than value from slot 1;
+
+* `ifValueCmp(0, spy.LT, 42)` will pass only records for whose value from slot 0 is less than 42;
+
 #### Normalizing data (eg. queries)
 
     sdef = sdef.normalize(src, dst, normalizer);

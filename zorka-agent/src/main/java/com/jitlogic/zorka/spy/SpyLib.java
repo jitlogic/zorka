@@ -29,6 +29,14 @@ import java.util.regex.Pattern;
  */
 public class SpyLib {
 
+    public final static int GT = 0;
+    public final static int GE = 1;
+    public final static int EQ = 2;
+    public final static int LE = 3;
+    public final static int LT = 4;
+    public final static int NE = 5;
+
+
     public static final int ON_ENTER   = 0;
     public static final int ON_RETURN  = 1;
     public static final int ON_ERROR   = 2;
