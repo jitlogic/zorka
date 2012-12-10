@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 
 public class XqlNormalizationTest {
 
-    Normalizer normalizer = GenericNormalizer.xql(DIALECT_SQL99, NormLib.NORM_STD);
+    Normalizer normalizer = GenericNormalizer.xql(DIALECT_SQL_99, NormLib.NORM_STD);
 
     @Test
     public void testNormalizeWhiteSpacesOnly() {

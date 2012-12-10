@@ -24,7 +24,7 @@ import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.spy.processors.*;
 
-import static com.jitlogic.zorka.spy.SpyLib.ON_ENTER;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -178,5 +178,55 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         record.feed(ON_ENTER, new Object[] { "xxx" });
         sp.process(ON_ENTER, record);
         assertEquals("???", record.get(ON_ENTER, 0));
+    }
+
+
+    private boolean scmp(Object a, int op, Object b) {
+        SpyProcessor sp = ComparatorProcessor.scmp(0, op, 1);
+        record.feed(ON_ENTER, new Object[] { a, b });
+        return null != sp.process(ON_ENTER, record);
+    }
+
+
+    @Test
+    public void testScmpProc() {
+        assertEquals(true,  scmp(1, EQ, 1));
+        assertEquals(false, scmp(1, NE, 1));
+        assertEquals(true,  scmp(null, EQ, null));
+        assertEquals(true,  scmp(1L, EQ, 1));
+        assertEquals(true,  scmp(2, GT, 1));
+        assertEquals(true,  scmp(1, LT, 2));
+        assertEquals(true,  scmp(1.0, GE, 1.0));
+        assertEquals(false, scmp(1.0011, EQ, 1.0));
+        assertEquals(true,  scmp(1.0011, GT, 1.0));
+        assertEquals(true,  scmp(1.0001, EQ, 1.0));
+
+        assertEquals(true,  scmp("oja!", EQ, "oja!"));
+        assertEquals(false, scmp("oja!", EQ, "oje!"));
+    }
+
+
+    private boolean vcmp(Object a, int op, Object v) {
+        SpyProcessor sp = ComparatorProcessor.vcmp(0, op, v);
+        record.feed(ON_ENTER, new Object[] { a });
+        return null != sp.process(ON_ENTER, record);
+    }
+
+
+    @Test
+    public void testVcmpProc() {
+        assertEquals(true,  vcmp(1, EQ, 1));
+        assertEquals(false, vcmp(1, NE, 1));
+        assertEquals(true,  vcmp(null, EQ, null));
+        assertEquals(true,  vcmp(1L, EQ, 1));
+        assertEquals(true,  vcmp(2, GT, 1));
+        assertEquals(true,  vcmp(1, LT, 2));
+        assertEquals(true,  vcmp(1.0, GE, 1.0));
+        assertEquals(false, vcmp(1.0011, EQ, 1.0));
+        assertEquals(true,  vcmp(1.0011, GT, 1.0));
+        assertEquals(true,  vcmp(1.0001, EQ, 1.0));
+
+        assertEquals(true,  vcmp("oja!", EQ, "oja!"));
+        assertEquals(false, vcmp("oja!", EQ, "oje!"));
     }
 }

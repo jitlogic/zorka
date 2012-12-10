@@ -32,7 +32,7 @@ public class XqlLexerTest extends LexerFixture {
 
     public List<Token> lex(String input) {
         List<Token> tokens = new ArrayList<Token>();
-        for (Token token : new XqlLexer(DIALECT_SQL99, input)) {
+        for (Token token : new XqlLexer(DIALECT_SQL_99, input)) {
             tokens.add(token);
         }
         return tokens;
