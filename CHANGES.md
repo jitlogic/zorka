@@ -1,7 +1,7 @@
 Zorka 0.6 (2012-12-21)
 ----------------------
 
- * normalization of xQL queries (all major languages);
+ * normalization of xQL queries (all major query languages);
  * normalization of LDAP search queries;
  * file trapper (logs events to files instead of syslog/zabbix/SNMP);
  * composite processing chains and comparator filters;
