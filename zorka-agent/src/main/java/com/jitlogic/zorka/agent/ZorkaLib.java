@@ -36,7 +36,14 @@ import com.jitlogic.zorka.util.*;
  *
  */
 public class ZorkaLib  {
-	
+
+    public final ZorkaLogLevel TRACE = ZorkaLogLevel.TRACE;
+    public final ZorkaLogLevel DEBUG = ZorkaLogLevel.DEBUG;
+    public final ZorkaLogLevel INFO  = ZorkaLogLevel.INFO;
+    public final ZorkaLogLevel WARN  = ZorkaLogLevel.WARN;
+    public final ZorkaLogLevel ERROR = ZorkaLogLevel.ERROR;
+    public final ZorkaLogLevel FATAL = ZorkaLogLevel.FATAL;
+
 	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
     private final ZorkaLogger logger = ZorkaLogger.getLogger();
 	

@@ -74,8 +74,8 @@ public class JmxAttrCollector implements SpyCollector {
             AttrGetter timeGetter = new AttrGetter(statistic, "time");
             AttrGetter lastGetter = new AttrGetter(statistic, "lastSample");
 
-            String beanName = subst(beanTemplate,  ctx);
-            String attrName = subst(attrTemplate, ctx);
+            String beanName = ctx.subst(beanTemplate);
+            String attrName = ctx.subst(attrTemplate);
 
             String desc = ctx.getClassName() + "." + ctx.getMethodName();
 
@@ -126,11 +126,4 @@ public class JmxAttrCollector implements SpyCollector {
         }
     }
 
-
-    private String subst(String template, SpyContext ctx) {
-        return template
-                .replace("${className}", ctx.getClassName())
-                .replace("${methodName}", ctx.getMethodName())
-                .replace("${shortClassName}", ctx.getShortClassName());
-    }
 }

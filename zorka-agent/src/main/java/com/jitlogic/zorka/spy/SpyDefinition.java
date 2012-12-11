@@ -708,8 +708,8 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition toFile(FileTrapper trapper, String logLevel, String expr) {
-        return toCollector(new FileCollector(trapper, expr, ZorkaLogLevel.valueOf(logLevel), ""));
+    public SpyDefinition toFile(FileTrapper trapper, String expr, ZorkaLogLevel logLevel) {
+        return toCollector(new FileCollector(trapper, expr, logLevel, ""));
     }
 
 

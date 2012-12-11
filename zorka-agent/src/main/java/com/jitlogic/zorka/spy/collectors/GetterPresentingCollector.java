@@ -57,8 +57,8 @@ public class GetterPresentingCollector implements SpyCollector {
 
     public void collect(SpyRecord record) {
         SpyContext ctx = record.getContext();
-        String mbeanName = subst(mbeanTemplate, ctx);
-        String attrName = subst(attrTemplate, ctx);
+        String mbeanName = ctx.subst(mbeanTemplate);
+        String attrName = ctx.subst(attrTemplate);
 
         Object obj1 = new AttrGetter(record.get(ON_COLLECT, src), path);
         Object obj2 = registry.getOrRegister(mbsName, mbeanName, attrName, obj1, desc);
@@ -66,13 +66,6 @@ public class GetterPresentingCollector implements SpyCollector {
         if (obj1.equals(obj2)) {
             log.warn("Attribute '" + attrName + "' of '" + mbeanName + "' is already used.");
         }
-    }
-
-    private String subst(String template, SpyContext ctx) {
-        return template
-                .replace("${className}", ctx.getClassName())
-                .replace("${methodName}", ctx.getMethodName())
-                .replace("${shortClassName}", ctx.getShortClassName());
     }
 
 }

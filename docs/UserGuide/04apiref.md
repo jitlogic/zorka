@@ -539,6 +539,8 @@ It is possible to use some substitution variables in `beanName`, `attrName` and 
 
 * `${shortClassName}` - will be substituted with short class name (without package);
 
+* `${packageName}` - package name of instrumented class;
+
 * `${methodName}` - will be substituted with method name;
 
 In addition `keyExpr` can contain expressions fetching record arguments `${n.attr1.attr2...}` the same form as in
@@ -583,3 +585,15 @@ Parameter `trapper` must be a reference to trapper object obtained using `snmp.t
 Parameter `trapper` must be a reference to zabbix trapper obtained using `zabbix.get()` function. Parameter `expr` is
 message template (analogous to `keyExpr` in other collectors). Parametry `key' refers to zabbix item key that will be
 populated. Item must be of proper type (text or number depending on data that is submitted).
+
+#### Sending collected records to log file
+
+    sdef = sdef.toFile(trapper, expr, logLevel)
+
+Parameter `trapper` must be a reference to file trapper obtained using `zorka.fileTrapper()`, `zorka.dailyFileTrapper()`
+or `zorka.rollingFileTrapper()`. Second parameter `expr` contains template string used to create log messages. Parameter
+`logLevel` must be one of: `zorka.TRACE`, `zorka.DEBUG`, `zorka.INFO`, `zorka.WARN`, `zorka.ERROR` and `zorka.FATAL`.
+
+
+
+

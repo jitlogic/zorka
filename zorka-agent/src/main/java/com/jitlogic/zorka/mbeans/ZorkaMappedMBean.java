@@ -69,15 +69,8 @@ public class ZorkaMappedMBean implements DynamicMBean {
 		}
 		
 		Object v = attrs.get(attribute).getValue();
-		
-		if (v instanceof ValGetter) {
-			v = ((ValGetter)v).get();
-			log.debug("Returning ValGetter value: " + v);
-			return v;
-		} else {
-			log.debug("Returning value: " + v);
-			return v;
-		}
+
+        return v instanceof ValGetter ? ((ValGetter)v).get() : v;
 	}
 	
 	

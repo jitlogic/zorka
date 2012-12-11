@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.agent.testspy;
 
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
+import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyLib;
 
@@ -35,6 +36,7 @@ public class SpyLibFunctionsTest extends ZorkaFixture {
         spyLib = new SpyLib(spyInstance);
     }
 
+
     @Test
     public void testSpyInstrumentConvenienceFn1() {
         SpyDefinition sdef = spyLib.instrument("test", "test:type=MyStats", "stats", "${0}");
@@ -46,6 +48,7 @@ public class SpyLibFunctionsTest extends ZorkaFixture {
         assertEquals(2, ((TimeDiffProcessor)sdef.getProcessors(SpyLib.ON_SUBMIT).get(0)).getResultSlot());
     }
 
+
     @Test
     public void testSpyInstrumentConvenienceFnWithActualRemap() {
         SpyDefinition sdef = spyLib.instrument("test", "test:type=MyStats", "stats", "${1}");
@@ -54,6 +57,7 @@ public class SpyLibFunctionsTest extends ZorkaFixture {
         assertEquals("${0}", ((ZorkaStatsCollector)sdef.getCollectors().get(0)).getKeyTemplate());
     }
 
+
     @Test
     public void testSpyInstrumentConvenienceFnWithSingleMultipartVar() {
         SpyDefinition sdef = spyLib.instrument("test", "test:type=MyStats", "stats", "${0.request.url}");
@@ -61,6 +65,7 @@ public class SpyLibFunctionsTest extends ZorkaFixture {
         assertEquals(1, sdef.getCollectors().size());
         assertEquals("${0.request.url}", ((ZorkaStatsCollector)sdef.getCollectors().get(0)).getKeyTemplate());
     }
+
 
     @Test
     public void testSpyInstrumentConvenienceFnWithNonTranslatedVar() {
@@ -71,5 +76,14 @@ public class SpyLibFunctionsTest extends ZorkaFixture {
     }
 
 
+    @Test
+    public void testCtxSubst() {
+        SpyContext ctx = new SpyContext(new SpyDefinition(), "some.pkg.TClass", "testMethod", "()V", 1);
+
+        assertEquals("some.pkg.TClass", ctx.subst("${className}"));
+        assertEquals("some.pkg", ctx.subst("${packageName}"));
+        assertEquals("TClass", ctx.subst("${shortClassName}"));
+        assertEquals("testMethod", ctx.subst("${methodName}"));
+    }
 
 }

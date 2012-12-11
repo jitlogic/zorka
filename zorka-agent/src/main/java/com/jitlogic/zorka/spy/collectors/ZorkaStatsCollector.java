@@ -69,11 +69,11 @@ public class ZorkaStatsCollector implements SpyCollector {
         MethodCallStatistics stats = statsCache.get(record.getContext());
 
         if (stats == null) {
-            stats = registry.getOrRegister(mbsName, subst(mbeanTemplate, ctx), subst(attrTemplate, ctx),
+            stats = registry.getOrRegister(mbsName, ctx.subst(mbeanTemplate), ctx.subst(attrTemplate),
                     new MethodCallStatistics(), "Method call statistics");
         }
 
-        String key = inspector.substitute(subst(keyTemplate, ctx), record.getVals(ON_COLLECT));
+        String key = inspector.substitute(ctx.subst(keyTemplate), record.getVals(ON_COLLECT));
 
         MethodCallStatistic statistic = (MethodCallStatistic)stats.getMethodCallStatistic(key);
 
@@ -101,14 +101,6 @@ public class ZorkaStatsCollector implements SpyCollector {
                 log.debug("Unknown type of time or tstamp object: " + timeObj);
             }
         }
-    }
-
-
-    private String subst(String template, SpyContext ctx) {
-        return template
-                .replace("${className}", ctx.getClassName())
-                .replace("${methodName}", ctx.getMethodName())
-                .replace("${shortClassName}", ctx.getShortClassName());
     }
 
 
