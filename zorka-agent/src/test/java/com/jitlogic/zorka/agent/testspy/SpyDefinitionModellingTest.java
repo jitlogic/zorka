@@ -78,7 +78,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
 
     @Test
     public void testCheckProperStateInTrivialInstrumentationAndTryExtension() throws Exception {
-        SpyDefinition sdef = SpyDefinition.instrument().withClass("com.jitlogic.test.SomeClass");
+        SpyDefinition sdef = SpyDefinition.instrument().onEnter("com.jitlogic.test.SomeClass");
 
         List<SpyProbeElement> probeElements = sdef.getProbes(ON_ENTER);
         assertEquals(2, probeElements.size());
@@ -94,7 +94,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testSwitchStageAndCheckImmutability() throws Exception {
         SpyDefinition sdef1 = SpyDefinition.instrument();
 
-        SpyDefinition sdef2 = sdef1.onReturn().withError();
+        SpyDefinition sdef2 = sdef1.onReturn(FETCH_ERROR);
         List<SpyProbeElement> probes2 = sdef2.getProbes(ON_RETURN);
 
         assertEquals(1, sdef1.getProbes(ON_RETURN).size());
@@ -119,8 +119,8 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     @Test
     public void testInstrumentWithGetterOnReturn() {
         SpyDefinition sdef = SpyDefinition.instance()
-            .onEnter().withTime()
-            .onReturn().withTime().onReturn(2).get(1, 1, "response", "status")
+            .onEnter(FETCH_TIME)
+            .onReturn(FETCH_TIME).onReturn(2).get(1, 1, "response", "status")
             .onSubmit().timeDiff(0,2,2);
 
         assertEquals(1, sdef.getProbes(ON_ENTER).size());
@@ -211,7 +211,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testInstrumentAndGetReturnValue() {
         SpyDefinition sdef =
             SpyDefinition.instrument().include("com.jitlogic.zorka.spy.unittest.SomeClass", "getTstCount")
-                .withRetVal().toBsh("someapp");
+                .onReturn(FETCH_RETVAL).toBsh("someapp");
 
     }
 
@@ -223,7 +223,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testInstrumentGetSomeArgsAndReturnValue() {
         SpyDefinition sdef =
             SpyDefinition.instrument().include("com.jitlogic.zorka.spy.unittest.SomeClass", "otherMethod")
-                .withRetVal().toBsh("someapp");
+                .onReturn(FETCH_RETVAL).toBsh("someapp");
     }
 
 
@@ -234,8 +234,8 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
      */
     public void testExposeStaticMethodFromSomeClassAtStartup() {
         SpyDefinition sdef =
-            SpyDefinition.instance().once().include("com.hp.ifc.bus.AppServer", "startup")
-                .withClass("com.hp.ifc.net.mq.AppMessageQueue")
+            SpyDefinition.instance().include("com.hp.ifc.bus.AppServer", "startup")
+                .onEnter("com.hp.ifc.net.mq.AppMessageQueue")
                 .toGetter("java", "hpsd:type=SDStats,name=AppMessageQueue", "size", "meh", 0, "getSize()");
     }
 
@@ -247,7 +247,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
      */
     public void testExposeSomeStaticMethodsOfAnObject() {
         SpyDefinition sdef =
-            SpyDefinition.instance().once().include("some.package.SomeBean", SM_CONSTRUCTOR)
+            SpyDefinition.instance().include("some.package.SomeBean", SM_CONSTRUCTOR)
                 .onEnter(0)
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "count", "meh", 0, "getCount()")
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "backlog", "meh", 0, "getBacklog()")
@@ -262,8 +262,8 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
      */
     //@Test
     public void testRegisterJBossMBeanServer() {
-        SpyDefinition.instance().once().include("org.jboss.mx.MBeanServerImpl", SM_CONSTRUCTOR)
-           .format(0, "jboss").onEnter(0).withThread()
+        SpyDefinition.instance().include("org.jboss.mx.MBeanServerImpl", SM_CONSTRUCTOR)
+           .format(0, "jboss").onEnter(0, FETCH_THREAD)
            .toBsh("jboss.register");
     }
 
@@ -274,7 +274,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     //@Test
     public void testExposeSomeHashMapAsMBeanAttribute() {
         SpyDefinition sdef =
-            SpyDefinition.instance().once().include("some.package.SingletonBean", SM_CONSTRUCTOR)
+            SpyDefinition.instance().include("some.package.SingletonBean", SM_CONSTRUCTOR)
                 .onEnter(0).get(0, 0, "someMap")
                 .toGetter("java", "SomeApp:type=SingletonType", "map", "Some map", 0);
     }

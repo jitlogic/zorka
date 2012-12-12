@@ -64,7 +64,7 @@ public class SpyDefinition {
     private boolean once = false;
 
     public static SpyDefinition instrument() {
-        return new SpyDefinition().withTime().onReturn().withTime().onError().withTime().onEnter();
+        return new SpyDefinition().onEnter(FETCH_TIME).onReturn(FETCH_TIME).onError(FETCH_TIME).onEnter();
     }
 
     public static SpyDefinition instance() {
@@ -292,13 +292,6 @@ public class SpyDefinition {
     }
 
 
-    public SpyDefinition once() {
-        SpyDefinition sdef = new SpyDefinition(this);
-        sdef.once = true;
-        return sdef;
-    }
-
-
     /**
      * Declares which arguments should be fetched by instrumenting code.
      * This method should generally be called once as arguments are fetched
@@ -328,72 +321,6 @@ public class SpyDefinition {
         sdef.probes[curStage] = Collections.unmodifiableList(lst);
 
         return sdef;
-    }
-
-
-    /**
-     * Fetches current time at current stage of execution.
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition withTime() {
-        return this.withArguments(FETCH_TIME);
-    }
-
-
-
-
-    /**
-     * Instructs spy that return value should also be catched.
-     * Return value will be added at the end of current argument list.
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition withRetVal() {
-        return this.withArguments(FETCH_RETVAL);
-    }
-
-
-    /**
-     * Fetches exception
-     * @return
-     */
-    public SpyDefinition withError() {
-        return this.withArguments(FETCH_ERROR);
-    }
-
-    /**
-     * Instructs spy that current thread should be catched.
-     * Reference to current thread will be added at the end of current argument list.
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition withThread() {
-        return this.withArguments(FETCH_THREAD);
-    }
-
-
-    /**
-     * Instruct spy to fetch null value. This is useful when you want
-     * to force spy to insert any probe but no actual values are needed.
-     *
-     * @return
-     */
-    public SpyDefinition withNull() {
-        return this.withArguments(FETCH_NULL);
-    }
-
-
-    /**
-     * Instructs spy that a given class reference should be catched.
-     * Reference to the class will be added at the end of current argument list.
-     *
-     * @param className full class name (along with package)
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition withClass(String className) {
-        return this.withArguments(className);
     }
 
 
