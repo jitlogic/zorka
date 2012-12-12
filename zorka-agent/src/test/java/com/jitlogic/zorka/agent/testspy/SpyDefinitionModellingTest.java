@@ -120,7 +120,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testInstrumentWithGetterOnReturn() {
         SpyDefinition sdef = SpyDefinition.instance()
             .onEnter().withTime()
-            .onReturn().withTime().withArguments(2).get(1, 1, "response", "status")
+            .onReturn().withTime().onReturn(2).get(1, 1, "response", "status")
             .onSubmit().timeDiff(0,2,2);
 
         assertEquals(1, sdef.getProbes(ON_ENTER).size());
@@ -185,7 +185,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testInstrumentWithCatchArgsOnExit() {
         SpyDefinition sdef =
             SpyDefinition.instrument().include("org.apache.catalina.core.StandardEngineValve", "invoke")
-                .withArguments(2).format(1, "${0.reply.replyCode}").onSubmit().timeDiff(0,2,2)
+                .onEnter(2).format(1, "${0.reply.replyCode}").onSubmit().timeDiff(0,2,2)
                 .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byCode", "${1}", 0, 2);
     }
 
@@ -197,7 +197,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testInstrumentTomcatWithPathAndCode() {
         SpyDefinition sdef =
             SpyDefinition.instrument().include("org.apache.catalina.core.StandardEngineValve", "invoke")
-                .onReturn().withArguments(1,2)
+                .onReturn(1,2)
                 .format(1, "${1.request.requestURI}").format(2, "${2.reply.replyCode}")
                 .callMethod(1, 1, "split", "\\?").get(1, 0).onSubmit().timeDiff(0, 1, 1)
                 .toStats("java", "Catalina:type=ZorkaStats,name=HttpRequests,httpCode=${1}", "stats", "${0}", 0, 1);
@@ -248,7 +248,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testExposeSomeStaticMethodsOfAnObject() {
         SpyDefinition sdef =
             SpyDefinition.instance().once().include("some.package.SomeBean", SM_CONSTRUCTOR)
-                .withArguments(0)
+                .onEnter(0)
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "count", "meh", 0, "getCount()")
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "backlog", "meh", 0, "getBacklog()")
                 .toGetter("java", "SomeApp:type=SomeType,name=${0.name}", "time", "meh", 0, "getProcessingTime()")
@@ -263,7 +263,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     //@Test
     public void testRegisterJBossMBeanServer() {
         SpyDefinition.instance().once().include("org.jboss.mx.MBeanServerImpl", SM_CONSTRUCTOR)
-           .format(0, "jboss").withArguments(0).withThread()
+           .format(0, "jboss").onEnter(0).withThread()
            .toBsh("jboss.register");
     }
 
@@ -275,7 +275,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testExposeSomeHashMapAsMBeanAttribute() {
         SpyDefinition sdef =
             SpyDefinition.instance().once().include("some.package.SingletonBean", SM_CONSTRUCTOR)
-                .withArguments(0).get(0, 0, "someMap")
+                .onEnter(0).get(0, 0, "someMap")
                 .toGetter("java", "SomeApp:type=SingletonType", "map", "Some map", 0);
     }
 }

@@ -204,8 +204,8 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition onEnter() {
-        return on(ON_ENTER);
+    public SpyDefinition onEnter(Object...args) {
+        return on(ON_ENTER).withArguments(args);
     }
 
 
@@ -214,8 +214,8 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition onReturn() {
-        return on(ON_RETURN);
+    public SpyDefinition onReturn(Object...args) {
+        return on(ON_RETURN).withArguments(args);
     }
 
 
@@ -224,8 +224,8 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition onError() {
-        return on(ON_ERROR);
+    public SpyDefinition onError(Object...args) {
+        return on(ON_ERROR).withArguments(args);
     }
 
 
@@ -315,7 +315,7 @@ public class SpyDefinition {
      *
      * @return spy definition with augmented fetched argument list;
      */
-    public SpyDefinition withArguments(Object... args) {
+    private SpyDefinition withArguments(Object... args) {
         SpyDefinition sdef = new SpyDefinition(this);
 
         List<SpyProbeElement> lst = new ArrayList<SpyProbeElement>(sdef.probes[curStage].size()+args.length+2);

@@ -132,7 +132,7 @@ public class SpyLib {
         int tidx = argList.size();
 
         return SpyDefinition.instance()
-                .onEnter().withArguments(argList.toArray()).withTime()
+                .onEnter(argList.toArray()).withTime()
                 .onReturn().withTime().onError().withTime()
                 .onSubmit().timeDiff(tidx, tidx+1, tidx+1)
                 .toStats(mbsName, mbeanName, attrName, sb.toString(), tidx, tidx+1);
