@@ -32,7 +32,7 @@ public class SpyInstanceIntegTest extends ZorkaFixture {
     public void testTrivialMethodRun() throws Exception {
         SpyDefinition sdef = SpyDefinition.instrument().onSubmit().timeDiff(0, 1, 1)
                 .include(spy.byMethod(TCLASS1, "trivialMethod"))
-                .toStats("test", "test:name=${shortClassName}", "stats", "${methodName}", 0, 1);
+                .to(spy.zorkaStats("test", "test:name=${shortClassName}", "stats", "${methodName}", 0, 1));
 
         spyInstance.add(sdef);
 

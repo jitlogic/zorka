@@ -17,7 +17,16 @@
 
 package com.jitlogic.zorka.spy;
 
+import bsh.This;
+import com.jitlogic.zorka.agent.FileTrapper;
+import com.jitlogic.zorka.integ.snmp.SnmpLib;
+import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
+import com.jitlogic.zorka.integ.snmp.TrapVarBindDef;
+import com.jitlogic.zorka.integ.syslog.SyslogTrapper;
+import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
+import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.util.ObjectInspector;
+import com.jitlogic.zorka.util.ZorkaLogLevel;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.*;
@@ -134,7 +143,7 @@ public class SpyLib {
                 .onEnter(argList.toArray(), FETCH_TIME)
                 .onReturn(FETCH_TIME).onError(FETCH_TIME)
                 .onSubmit().timeDiff(tidx, tidx+1, tidx+1)
-                .toStats(mbsName, mbeanName, attrName, sb.toString(), tidx, tidx+1);
+                .to(zorkaStats(mbsName, mbeanName, attrName, sb.toString(), tidx, tidx + 1));
     }
 
 
@@ -142,7 +151,176 @@ public class SpyLib {
         return new SpyMatcher(1, classPattern, methodPattern, null);
     }
 
+
     public SpyMatcher byMethod(int access, String classPattern, String methodPattern, String retType, String... argTypes) {
         return new SpyMatcher(access, classPattern,  methodPattern, retType, argTypes);
     }
+
+
+    /**
+     * Instructs spy to submit data to traditional Zorka Statistics object. Statistics
+     * will be organized by keyExpr having all its macros properly expanded.
+     *
+     * @param mbsName mbean server name
+     *
+     * @param beanName bean name
+     *
+     * @param attrName attribute name
+     *
+     * @param keyExpr key expression
+     *
+     * @return augmented spy definition
+     */
+    public SpyCollector zorkaStats(String mbsName, String beanName, String attrName, String keyExpr,
+                                   int tstampField, int timeField) {
+        return new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, tstampField, timeField);
+    }
+
+
+
+    /**
+     * Instructs spy to submit data to a single object of ZorkaStat object.
+     *
+     * @param mbsName mbean server name
+     *
+     * @param beanName mbean name
+     *
+     * @param attrName attribute name
+     *
+     * @return augmented spy definition
+     */
+    public SpyCollector zorkaStat(String mbsName, String beanName, String attrName, int tstampField, int timeField) {
+        return new JmxAttrCollector(mbsName, beanName, attrName, tstampField, timeField);
+    }
+
+
+    /**
+     * Instructs spy to submit data to a single BSH function.
+     *
+     * @param ns BSH namespace
+     *
+     * @param func function name
+     *
+     * @return augmented spy definition
+     */
+    public SpyCollector callingCollector(This ns, String func) {
+        return new CallingObjCollector(ns, func);
+    }
+
+
+    /**
+     * Instructs spy to submit data to a collect() function in a BSH namespace..
+     *
+     * @param ns BSH namespace
+     *
+     * @return augmented spy definition
+     */
+    public SpyCollector bshCollector(String ns) {
+        return new CallingBshCollector(ns);
+    }
+
+    /**
+     * Instruct spy to submit data to log file.
+     *
+     * @param trapper
+     *
+     * @param logLevel
+     *
+     * @param expr
+     *
+     * @return
+     */
+    public SpyCollector fileCollector(FileTrapper trapper, String expr, ZorkaLogLevel logLevel) {
+        return new FileCollector(trapper, expr, logLevel, "");
+    }
+
+
+    /**
+     * Instructs spy to present attribute as an getter object.
+     *
+     * @param mbsName mbean server name
+     *
+     * @param beanName mbean name
+     *
+     * @param attrName attribute name
+     *
+     * @param path which stat attr to present
+     *
+     * @return augmented spy definition
+     */
+    public SpyCollector getterCollector(String mbsName, String beanName, String attrName, String desc, int src, Object...path) {
+        return new GetterPresentingCollector(mbsName, beanName, attrName, desc, src, path);
+    }
+
+
+    /**
+     * Sends collected records to another SpyDefinition chain. Records will be processed by all
+     * processors from ON_COLLECT chain and sent to collectors attached to it.
+     *
+     * @param sdef
+     *
+     * @return
+     */
+    public SpyCollector sdefCollector(SpyDefinition sdef) {
+        return new DispatchingCollector(sdef);
+    }
+
+
+    /**
+     * Sends collected records as SNMP traps.
+     *
+     * @param trapper snmp trapper used to send traps;
+     *
+     * @param oid base OID - used as both enterprise OID in produced traps and prefix for variable OIDs;
+     *
+     * @param spcode - specific trap code; generic trap type is always enterpriseSpecific (6);
+     *
+     * @param bindings bindings defining additional variables attached to this trap;
+     *
+     * @return augmented spy definition
+     */
+    public SpyCollector snmpCollector(SnmpTrapper trapper, String oid, int spcode, TrapVarBindDef...bindings) {
+        return new SnmpCollector(trapper, oid, SnmpLib.GT_SPECIFIC, spcode, oid, bindings);
+    }
+
+
+    /**
+     * Instruct spy to send collected record to syslog.
+     *
+     * @param trapper logger (object returned by syslog.get())
+     *
+     * @param expr message template
+     *
+     * @param severity
+     *
+     * @param facility
+     *
+     * @param hostname
+     *
+     * @param tag
+     *
+     * @return
+     */
+    public SpyCollector syslogCollector(SyslogTrapper trapper, String expr, int severity, int facility, String hostname, String tag) {
+        return new SyslogCollector(trapper, expr, severity, facility, hostname, tag);
+    }
+
+
+    /**
+     * Sends collected records to zabbix using zabbix trapper.
+     *
+     * @param trapper
+     *
+     * @param expr
+     *
+     * @param key
+     *
+     * @return
+     */
+    public SpyCollector zabbixCollector(ZabbixTrapper trapper, String expr, String key) {
+        return new ZabbixCollector(trapper, expr, null, key);
+    }
+
+
+
 }
