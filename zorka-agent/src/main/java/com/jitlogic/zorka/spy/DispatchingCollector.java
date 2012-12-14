@@ -54,14 +54,6 @@ public class DispatchingCollector implements SpyProcessor {
             return null;
         }
 
-        for (SpyProcessor collector : sd.getCollectors()) {
-            try {
-                collector.process(SpyLib.ON_COLLECT, record);
-            } catch (Throwable e) {
-                log.error("Error collecting record " + record, e);
-            }
-        }
-
         return record;
     }
 

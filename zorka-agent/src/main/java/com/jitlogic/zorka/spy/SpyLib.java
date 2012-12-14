@@ -145,7 +145,7 @@ public class SpyLib {
                 .onEnter(argList.toArray(), FETCH_TIME)
                 .onReturn(FETCH_TIME).onError(FETCH_TIME)
                 .onSubmit(tdiff(tidx, tidx+1, tidx+1))
-                .to(zorkaStats(mbsName, mbeanName, attrName, sb.toString(), tidx, tidx + 1));
+                .onCollect(zorkaStats(mbsName, mbeanName, attrName, sb.toString(), tidx, tidx + 1));
     }
 
 

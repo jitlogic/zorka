@@ -36,8 +36,6 @@ public class SpyDefinition {
 
     private static final List<SpyProcessor> EMPTY_XF =
             Collections.unmodifiableList(Arrays.asList(new SpyProcessor[0]));
-    private static final List<SpyProcessor> EMPTY_DC =
-            Collections.unmodifiableList(Arrays.asList(new SpyProcessor[0]));
     private static final List<SpyMatcher> EMPTY_MATCHERS =
             Collections.unmodifiableList(Arrays.asList(new SpyMatcher[0]));
     private static final List<SpyProbeElement> EMPTY_AF =
@@ -46,7 +44,6 @@ public class SpyDefinition {
     private List<SpyProbeElement>[] probes;
     private List<SpyProcessor>[] processors;
 
-    private List<SpyProcessor> collectors = EMPTY_DC;
     private List<SpyMatcher> matchers = EMPTY_MATCHERS;
 
     private int curStage = ON_ENTER;
@@ -77,7 +74,6 @@ public class SpyDefinition {
     private SpyDefinition(SpyDefinition orig) {
         this.probes = ZorkaUtil.copyArray(orig.probes);
         this.processors = ZorkaUtil.copyArray(orig.processors);
-        this.collectors = orig.collectors;
         this.matchers = orig.matchers;
         this.curStage = orig.curStage;
         this.once = orig.once;
@@ -105,16 +101,6 @@ public class SpyDefinition {
      */
     public List<SpyProcessor> getProcessors(int stage) {
         return processors[stage];
-    }
-
-
-    /**
-     * Returns list of submitters definitions.
-     *
-     * @return
-     */
-    public List<SpyProcessor> getCollectors() {
-        return collectors;
     }
 
 
@@ -299,25 +285,6 @@ public class SpyDefinition {
         sdef.processors = ZorkaUtil.copyArray(processors);
         sdef.processors[curStage] = Collections.unmodifiableList(newProcessors);
 
-        return sdef;
-    }
-
-
-    /**
-     * Instructs spy to submit data to a given submitter.
-     *
-     * @param newCollectors
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition to(SpyProcessor...newCollectors) {
-        SpyDefinition sdef = new SpyDefinition(this);
-        List<SpyProcessor> lst = new ArrayList<SpyProcessor>(collectors.size()+2);
-        lst.addAll(collectors);
-        for (SpyProcessor collector : newCollectors) {
-            lst.add(collector);
-        }
-        sdef.collectors = lst;
         return sdef;
     }
 
