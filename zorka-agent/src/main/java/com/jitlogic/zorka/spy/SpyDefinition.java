@@ -17,16 +17,7 @@
 package com.jitlogic.zorka.spy;
 
 
-import bsh.This;
-import com.jitlogic.zorka.agent.FileTrapper;
-import com.jitlogic.zorka.integ.snmp.SnmpLib;
-import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
-import com.jitlogic.zorka.integ.snmp.TrapVarBindDef;
-import com.jitlogic.zorka.integ.syslog.SyslogTrapper;
-import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
-import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.processors.*;
-import com.jitlogic.zorka.util.ZorkaLogLevel;
 import com.jitlogic.zorka.util.ZorkaUtil;
 import com.jitlogic.zorka.normproc.Normalizer;
 
@@ -205,7 +196,7 @@ public class SpyDefinition {
      * @return
      */
     public SpyDefinition onEnter(Object...args) {
-        return on(ON_ENTER).withArguments(args);
+        return on(ON_ENTER).with(args);
     }
 
 
@@ -215,7 +206,7 @@ public class SpyDefinition {
      * @return
      */
     public SpyDefinition onReturn(Object...args) {
-        return on(ON_RETURN).withArguments(args);
+        return on(ON_RETURN).with(args);
     }
 
 
@@ -225,7 +216,7 @@ public class SpyDefinition {
      * @return
      */
     public SpyDefinition onError(Object...args) {
-        return on(ON_ERROR).withArguments(args);
+        return on(ON_ERROR).with(args);
     }
 
 
@@ -235,8 +226,8 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition onSubmit() {
-        return on(ON_SUBMIT);
+    public SpyDefinition onSubmit(Object...args) {
+        return on(ON_SUBMIT).with(args);
     }
 
 
@@ -247,8 +238,8 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition onCollect() {
-        return on(ON_COLLECT);
+    public SpyDefinition onCollect(Object...args) {
+        return on(ON_COLLECT).with(args);
     }
 
 
@@ -287,240 +278,30 @@ public class SpyDefinition {
      *
      * @return spy definition with augmented fetched argument list;
      */
-    private SpyDefinition withArguments(Object... args) {
+    private SpyDefinition with(Object... args) {
         SpyDefinition sdef = new SpyDefinition(this);
 
-        List<SpyProbeElement> lst = new ArrayList<SpyProbeElement>(sdef.probes[curStage].size()+args.length+2);
-        lst.addAll(sdef.probes[curStage]);
+        List<SpyProbeElement> newProbes = new ArrayList<SpyProbeElement>(sdef.probes[curStage].size()+args.length+2);
+        newProbes.addAll(sdef.probes[curStage]);
+
+        List<SpyProcessor> newProcessors = new ArrayList<SpyProcessor>(sdef.processors[curStage].size()+args.length+2);
+        newProcessors.addAll(sdef.processors[curStage]);
+
         for (Object arg : args) {
-            lst.add(new SpyProbeElement(arg));
+            if (arg instanceof SpyProcessor) {
+                newProcessors.add((SpyProcessor)arg);
+            } else {
+                newProbes.add(new SpyProbeElement(arg));
+            }
         }
 
         sdef.probes = ZorkaUtil.copyArray(probes);
-        sdef.probes[curStage] = Collections.unmodifiableList(lst);
+        sdef.probes[curStage] = Collections.unmodifiableList(newProbes);
 
-        return sdef;
-    }
-
-
-    /**
-     * Adds a custom transformer to process chain.
-     *
-     * @param processor
-     *
-     * @return
-     */
-    public SpyDefinition withProcessor(SpyProcessor processor) {
-        SpyDefinition sdef = new SpyDefinition(this);
-        List<SpyProcessor> lst = new ArrayList<SpyProcessor>(processors[curStage].size()+2);
-        lst.addAll(processors[curStage]);
-        lst.add(processor);
         sdef.processors = ZorkaUtil.copyArray(processors);
-        sdef.processors[curStage] = lst;
+        sdef.processors[curStage] = Collections.unmodifiableList(newProcessors);
+
         return sdef;
-    }
-
-    /**
-     * Formats arguments and passes an array of formatted strings.
-     * Format expression is generally a string with special marker for
-     * extracting previous arguments '${n.field1.field2...}' where n is argument
-     * number, field1,field2,... are (optional) fields used exactly as in
-     * zorkalib.get() function.
-     *
-     * @param expr format expressions.
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition format(int dst, String expr) {
-        return withProcessor(new StringFormatProcessor( dst, expr));
-    }
-
-
-
-    /**
-     * Add an regex filtering transformer to process chain.
-     *
-     * @param src argument number
-     *
-     * @param regex regular expression
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition filter(int src, String regex) {
-        return withProcessor(new RegexFilterProcessor(src, regex));
-    }
-
-
-    /**
-     * Add an regex filtering transformer to process chain that will exclude
-     * matching items.
-     *
-     * @param src argument number
-     *
-     * @param regex regular expression
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition filterOut(int src, String regex) {
-        return withProcessor(new RegexFilterProcessor(src, regex, true));
-    }
-
-
-    public SpyDefinition transform(int src, int dst, String regex, String expr) {
-        return transform(src, dst, regex, expr,  false);
-    }
-
-
-    /**
-     * Transforms data using regular expression and substitution.
-     *
-     * @param src
-     * @param dst
-     * @param regex
-     * @param expr
-     * @return
-     */
-    public SpyDefinition transform(int src, int dst, String regex, String expr, boolean filterOut) {
-        return withProcessor(new RegexFilterProcessor(src, dst, regex, expr, filterOut));
-    }
-
-
-    /**
-     * Normalizes a query string from src and puts result into dst.
-     *
-     * @param src
-     * @param dst
-     * @param normalizer
-     * @return
-     */
-    public SpyDefinition normalize(int src, int dst, Normalizer normalizer) {
-        return withProcessor(new NormalizingProcessor(src, dst, normalizer));
-    }
-
-    /**
-     * Gets slot number n, performs traditional get operation and stores
-     * results in the same slot.
-     *
-     * @param src
-     *
-     * @param dst
-     *
-     * @param path
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition get(int src, int dst, Object...path) {
-        return withProcessor(new GetterProcessor(src, dst, path));
-    }
-
-
-    /**
-     *
-     * @param slot
-     * @param threadLocal
-     * @return
-     */
-    public SpyDefinition get(int slot, ThreadLocal<Object> threadLocal, Object...path) {
-        return withProcessor(new ThreadLocalProcessor(slot, ThreadLocalProcessor.GET, threadLocal, path));
-    }
-
-
-    /**
-     *
-     * @param slot
-     * @param val
-     * @return
-     */
-    public SpyDefinition put(int slot, Object val) {
-        return withProcessor(new ConstPutProcessor(slot, val));
-    }
-
-
-    /**
-     *
-     * @param slot
-     * @param threadLocal
-     * @return
-     */
-    public SpyDefinition set(int slot, ThreadLocal<Object> threadLocal) {
-        return withProcessor(new ThreadLocalProcessor(slot, ThreadLocalProcessor.SET, threadLocal));
-    }
-
-
-    /**
-     *
-     * @param threadLocal
-     * @return
-     */
-    public SpyDefinition remove(ThreadLocal<Object> threadLocal) {
-        return withProcessor(new ThreadLocalProcessor(0, ThreadLocalProcessor.REMOVE, threadLocal));
-    }
-
-    /**
-     * Calculates time difference between in1 and in2 and stores result in out.
-     *
-     * @param tstart slot with tstart
-     *
-     * @param tstop slot with tstop
-     *
-     * @param dst destination slot
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition timeDiff(int tstart, int tstop, int dst) {
-        return withProcessor(new TimeDiffProcessor(tstart, tstop, dst));
-    }
-
-
-
-    /**
-     * Gets object from slot number arg, calls given method on this slot and
-     * if method returns some value, stores its result in this slot.
-     *
-     * @param src
-     *
-     * @param dst
-     *
-     * @param methodName
-     *
-     * @param methodArgs
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition callMethod(int src, int dst, String methodName, Object... methodArgs) {
-        return withProcessor(new MethodCallingProcessor(src, dst, methodName, methodArgs));
-    }
-
-
-    /**
-     * Passes only records where (a op b) is true.
-     *
-     * @param a
-     *
-     * @param op
-     *
-     * @param b
-     *
-     * @return
-     */
-    public SpyDefinition ifSlotCmp(int a, int op, int b) {
-        return withProcessor(ComparatorProcessor.scmp(a, op, b));
-    }
-
-
-    /**
-     * Passes only records where (a op v) is true.
-     *
-     * @param a
-     *
-     * @param op
-     *
-     * @param v
-     *
-     * @return
-     */
-    public SpyDefinition ifValueCmp(int a, int op, Object v) {
-        return withProcessor(ComparatorProcessor.vcmp(a, op, v));
     }
 
 

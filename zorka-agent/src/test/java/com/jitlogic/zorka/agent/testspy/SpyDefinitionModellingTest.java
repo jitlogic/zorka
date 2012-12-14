@@ -110,7 +110,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
         SpyDefinition sdef =
             SpyDefinition.instrument().include(spy.byMethod(SpyMatcher.DEFAULT_FILTER,
                     "com.jitlogic.zorka.spy.unittest.SomeClass", "someMethod", SM_ANY_TYPE, SM_NOARGS))
-                .onSubmit().timeDiff(0,1,1)
+                .onSubmit(spy.tdiff(0, 1, 1))
                 .to(spy.zorkaStats("java", "some.app:type=ZorkaStats,name=SomeClass", "stats", "${methodName}", 0, 1));
         assertEquals(1, sdef.getMatchers().size());
     }
@@ -120,8 +120,8 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testInstrumentWithGetterOnReturn() {
         SpyDefinition sdef = SpyDefinition.instance()
             .onEnter(FETCH_TIME)
-            .onReturn(FETCH_TIME).onReturn(2).get(1, 1, "response", "status")
-            .onSubmit().timeDiff(0,2,2);
+            .onReturn(FETCH_TIME).onReturn(2, spy.get(1, 1, "response", "status"))
+            .onSubmit(spy.tdiff(0,2,2));
 
         assertEquals(1, sdef.getProbes(ON_ENTER).size());
         assertEquals(2, sdef.getProbes(ON_RETURN).size());
@@ -136,8 +136,8 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     //@Test
     public void testDefineInstrumentationWithAntMasks() {
         SpyDefinition sdef =
-            SpyDefinition.instrument().include(spy.byMethod("com.jitlogic.zorka.spy.**", "*")).onSubmit().timeDiff(0,1,1)
-                .to(spy.zorkaStats("java", "some.app:type=ZorkaStats,name=${className}", "stats", "${methodName}", 0,1));
+            SpyDefinition.instrument().include(spy.byMethod("com.jitlogic.zorka.spy.**", "*")).onSubmit(spy.tdiff(0, 1, 1))
+                .to(spy.zorkaStats("java", "some.app:type=ZorkaStats,name=${className}", "stats", "${methodName}", 0, 1));
     }
 
 
@@ -147,7 +147,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     //@Test
     public void testInstrumentMethodWithArgProcAndTestAndShortMask() {
         SpyDefinition sdef =
-            SpyDefinition.instrument().include(spy.byMethod("com.jitlogic.zorka.spy.*", "*")).onSubmit().timeDiff(0,1,1)
+            SpyDefinition.instrument().include(spy.byMethod("com.jitlogic.zorka.spy.*", "*")).onSubmit(spy.tdiff(0, 1, 1))
                 .to(spy.zorkaStats("java", "some.app:type=ZorkaStats,name=${className}", "${methodName}", "method", 0, 1));
     }
 
@@ -159,7 +159,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testInstrumentWithFormatArgs() {
         SpyDefinition sdef =
             SpyDefinition.instrument().include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
-                .format(2, "${1.request.requestURI}").onSubmit().timeDiff(0,1,1)
+                .onEnter(spy.formatter(2, "${1.request.requestURI}")).onSubmit(spy.tdiff(0, 1, 1))
                 .to(spy.zorkaStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI", "${2}", 0, 1));
     }
 
@@ -171,8 +171,8 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testInstrumentWithFormatArgsAndTransformViaMethod() {
         SpyDefinition sdef =
             SpyDefinition.instrument().include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
-                .format(2, "${1.request.requestURI}").callMethod(0, 0, "split", "\\?").get(0, 0)
-                .onSubmit().timeDiff(0,1,1)
+                .onEnter(spy.formatter(2, "${1.request.requestURI}"), spy.call(0, 0, "split", "\\?"), spy.get(0, 0))
+                .onSubmit(spy.tdiff(0, 1, 1))
                 .to(spy.zorkaStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI", "${methodName}", 0, 1));
     }
 
@@ -185,7 +185,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testInstrumentWithCatchArgsOnExit() {
         SpyDefinition sdef =
             SpyDefinition.instrument().include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
-                .onEnter(2).format(1, "${0.reply.replyCode}").onSubmit().timeDiff(0,2,2)
+                .onEnter(2, spy.formatter(1, "${0.reply.replyCode}")).onSubmit(spy.tdiff(0, 2, 2))
                 .to(spy.zorkaStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byCode", "${1}", 0, 2));
     }
 
@@ -197,9 +197,12 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testInstrumentTomcatWithPathAndCode() {
         SpyDefinition sdef =
             SpyDefinition.instrument().include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
-                .onReturn(1,2)
-                .format(1, "${1.request.requestURI}").format(2, "${2.reply.replyCode}")
-                .callMethod(1, 1, "split", "\\?").get(1, 0).onSubmit().timeDiff(0, 1, 1)
+                .onReturn(1,2,
+                    spy.formatter(1, "${1.request.requestURI}"),
+                    spy.formatter(2, "${2.reply.replyCode}"),
+                    spy.call(1, 1, "split", "\\?"),
+                    spy.get(1, 0))
+                .onSubmit(spy.tdiff(0, 1, 1))
                 .to(spy.zorkaStats("java", "Catalina:type=ZorkaStats,name=HttpRequests,httpCode=${1}", "stats", "${0}", 0, 1));
     }
 
@@ -265,7 +268,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     //@Test
     public void testRegisterJBossMBeanServer() {
         SpyDefinition.instance().include(spy.byMethod("org.jboss.mx.MBeanServerImpl", SM_CONSTRUCTOR))
-           .format(0, "jboss").onEnter(0, FETCH_THREAD)
+           .onEnter(spy.formatter(0, "jboss")).onEnter(0, FETCH_THREAD)
            .to(spy.bshCollector("jboss.register"));
     }
 
@@ -277,7 +280,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testExposeSomeHashMapAsMBeanAttribute() {
         SpyDefinition sdef =
             SpyDefinition.instance().include(spy.byMethod("some.package.SingletonBean", SM_CONSTRUCTOR))
-                .onEnter(0).get(0, 0, "someMap")
+                .onEnter(0, spy.get(0, 0, "someMap"))
                 .to(spy.getterCollector("java", "SomeApp:type=SingletonType", "map", "Some map", 0));
     }
 }

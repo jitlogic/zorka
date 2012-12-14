@@ -24,7 +24,9 @@ import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
 import com.jitlogic.zorka.integ.snmp.TrapVarBindDef;
 import com.jitlogic.zorka.integ.syslog.SyslogTrapper;
 import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
+import com.jitlogic.zorka.normproc.Normalizer;
 import com.jitlogic.zorka.spy.collectors.*;
+import com.jitlogic.zorka.spy.processors.*;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLogLevel;
 import com.jitlogic.zorka.util.ZorkaUtil;
@@ -98,7 +100,7 @@ public class SpyLib {
 
 
     public SpyDefinition instrument() {
-        return SpyDefinition.instrument().onSubmit().timeDiff(0,1,1).onEnter();
+        return SpyDefinition.instrument().onSubmit(tdiff(0,1,1)).onEnter();
     }
 
 
@@ -142,7 +144,7 @@ public class SpyLib {
         return SpyDefinition.instance()
                 .onEnter(argList.toArray(), FETCH_TIME)
                 .onReturn(FETCH_TIME).onError(FETCH_TIME)
-                .onSubmit().timeDiff(tidx, tidx+1, tidx+1)
+                .onSubmit(tdiff(tidx, tidx+1, tidx+1))
                 .to(zorkaStats(mbsName, mbeanName, attrName, sb.toString(), tidx, tidx + 1));
     }
 
@@ -322,5 +324,222 @@ public class SpyLib {
     }
 
 
+    /**
+     * Formats arguments and passes an array of formatted strings.
+     * Format expression is generally a string with special marker for
+     * extracting previous arguments '${n.field1.field2...}' where n is argument
+     * number, field1,field2,... are (optional) fields used exactly as in
+     * zorkalib.get() function.
+     *
+     * @param expr format expressions.
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor formatter(int dst, String expr) {
+        return new StringFormatProcessor(dst, expr);
+    }
 
+
+    /**
+     * Add an regex filtering transformer to process chain.
+     *
+     * @param src argument number
+     *
+     * @param regex regular expression
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor regexFilter(int src, String regex) {
+        return new RegexFilterProcessor(src, regex);
+    }
+
+
+    /**
+     * Add an regex filtering transformer to process chain.
+     *
+     * @param src argument number
+     *
+     * @param regex regular expression
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor regexFilter(int src, String regex, boolean filterOut) {
+        return new RegexFilterProcessor(src, regex, filterOut);
+    }
+
+
+    /**
+     * Transforms data using regular expression and substitution.
+     *
+     * @param src
+     *
+     * @param dst
+     *
+     * @param regex
+     *
+     * @param expr
+     *
+     * @return
+     */
+    public SpyProcessor regexTransformer(int src, int dst, String regex, String expr) {
+        return regexTransformer(src, dst, regex, expr,  false);
+    }
+
+
+    /**
+     * Transforms data using regular expression and substitution.
+     *
+     * @param src
+     *
+     * @param dst
+     *
+     * @param regex
+     *
+     * @param expr
+     *
+     * @return
+     */
+    public SpyProcessor regexTransformer(int src, int dst, String regex, String expr, boolean filterOut) {
+        return new RegexFilterProcessor(src, dst, regex, expr, filterOut);
+    }
+
+
+    /**
+     * Normalizes a query string from src and puts result into dst.
+     *
+     * @param src
+     * @param dst
+     * @param normalizer
+     * @return
+     */
+    public SpyProcessor normalize(int src, int dst, Normalizer normalizer) {
+        return new NormalizingProcessor(src, dst, normalizer);
+    }
+
+
+    /**
+     * Gets slot number n, performs traditional get operation and stores
+     * results in the same slot.
+     *
+     * @param src
+     *
+     * @param dst
+     *
+     * @param path
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor get(int src, int dst, Object...path) {
+        return new GetterProcessor(src, dst, path);
+    }
+
+
+    /**
+     *
+     * @param slot
+     * @param threadLocal
+     * @return
+     */
+    public SpyProcessor get(int slot, ThreadLocal<Object> threadLocal, Object...path) {
+        return new ThreadLocalProcessor(slot, ThreadLocalProcessor.GET, threadLocal, path);
+    }
+
+
+    /**
+     *
+     * @param slot
+     * @param val
+     * @return
+     */
+    public SpyProcessor putConst(int slot, Object val) {
+        return new ConstPutProcessor(slot, val);
+    }
+
+
+    /**
+     *
+     * @param slot
+     * @param threadLocal
+     * @return
+     */
+    public SpyProcessor put(int slot, ThreadLocal<Object> threadLocal) {
+        return new ThreadLocalProcessor(slot, ThreadLocalProcessor.SET, threadLocal);
+    }
+
+
+    /**
+     *
+     * @param threadLocal
+     * @return
+     */
+    public SpyProcessor remove(ThreadLocal<Object> threadLocal) {
+        return new ThreadLocalProcessor(0, ThreadLocalProcessor.REMOVE, threadLocal);
+    }
+
+
+    /**
+     * Calculates time difference between in1 and in2 and stores result in out.
+     *
+     * @param tstart slot with tstart
+     *
+     * @param tstop slot with tstop
+     *
+     * @param dst destination slot
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor tdiff(int tstart, int tstop, int dst) {
+        return new TimeDiffProcessor(tstart, tstop, dst);
+    }
+
+
+    /**
+     * Gets object from slot number arg, calls given method on this slot and
+     * if method returns some value, stores its result in this slot.
+     *
+     * @param src
+     *
+     * @param dst
+     *
+     * @param methodName
+     *
+     * @param methodArgs
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor call(int src, int dst, String methodName, Object... methodArgs) {
+        return new MethodCallingProcessor(src, dst, methodName, methodArgs);
+    }
+
+
+    /**
+     * Passes only records where (a op b) is true.
+     *
+     * @param a
+     *
+     * @param op
+     *
+     * @param b
+     *
+     * @return
+     */
+    public SpyProcessor ifSlotCmp(int a, int op, int b) {
+        return ComparatorProcessor.scmp(a, op, b);
+    }
+
+
+    /**
+     * Passes only records where (a op v) is true.
+     *
+     * @param a
+     *
+     * @param op
+     *
+     * @param v
+     *
+     * @return
+     */
+    public SpyProcessor ifValueCmp(int a, int op, Object v) {
+        return ComparatorProcessor.vcmp(a, op, v);
+    }
 }
