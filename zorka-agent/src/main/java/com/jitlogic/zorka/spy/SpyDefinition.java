@@ -46,9 +46,6 @@ public class SpyDefinition {
 
     private List<SpyMatcher> matchers = EMPTY_MATCHERS;
 
-    private int curStage = ON_ENTER;
-    private boolean once = false;
-
     public static SpyDefinition instrument() {
         return new SpyDefinition().onEnter(FETCH_TIME).onReturn(FETCH_TIME).onError(FETCH_TIME).onEnter();
     }
@@ -75,8 +72,6 @@ public class SpyDefinition {
         this.probes = ZorkaUtil.copyArray(orig.probes);
         this.processors = ZorkaUtil.copyArray(orig.processors);
         this.matchers = orig.matchers;
-        this.curStage = orig.curStage;
-        this.once = orig.once;
     }
 
 
@@ -158,11 +153,6 @@ public class SpyDefinition {
     }
 
 
-    public boolean isOnce() {
-        return once;
-    }
-
-
     /**
      *
      * @param stage
@@ -170,7 +160,7 @@ public class SpyDefinition {
      */
     public SpyDefinition on(int stage) {
         SpyDefinition sdef = new SpyDefinition(this);
-        sdef.curStage = stage;
+        //sdef.curStage = stage;
         return sdef;
     }
 
@@ -180,7 +170,7 @@ public class SpyDefinition {
      * @return
      */
     public SpyDefinition onEnter(Object...args) {
-        return on(ON_ENTER).with(args);
+        return with(ON_ENTER, args);
     }
 
 
@@ -190,7 +180,7 @@ public class SpyDefinition {
      * @return
      */
     public SpyDefinition onReturn(Object...args) {
-        return on(ON_RETURN).with(args);
+        return with(ON_RETURN, args);
     }
 
 
@@ -200,7 +190,7 @@ public class SpyDefinition {
      * @return
      */
     public SpyDefinition onError(Object...args) {
-        return on(ON_ERROR).with(args);
+        return with(ON_ERROR, args);
     }
 
 
@@ -211,7 +201,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition onSubmit(Object...args) {
-        return on(ON_SUBMIT).with(args);
+        return with(ON_SUBMIT, args);
     }
 
 
@@ -223,7 +213,7 @@ public class SpyDefinition {
      * @return augmented spy definition
      */
     public SpyDefinition onCollect(Object...args) {
-        return on(ON_COLLECT).with(args);
+        return with(ON_COLLECT,  args);
     }
 
 
@@ -262,7 +252,7 @@ public class SpyDefinition {
      *
      * @return spy definition with augmented fetched argument list;
      */
-    private SpyDefinition with(Object... args) {
+    private SpyDefinition with(int curStage, Object... args) {
         SpyDefinition sdef = new SpyDefinition(this);
 
         List<SpyProbeElement> newProbes = new ArrayList<SpyProbeElement>(sdef.probes[curStage].size()+args.length+2);
