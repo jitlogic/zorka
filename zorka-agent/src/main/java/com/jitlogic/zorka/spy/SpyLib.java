@@ -173,7 +173,7 @@ public class SpyLib {
      *
      * @return augmented spy definition
      */
-    public SpyCollector zorkaStats(String mbsName, String beanName, String attrName, String keyExpr,
+    public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr,
                                    int tstampField, int timeField) {
         return new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, tstampField, timeField);
     }
@@ -191,7 +191,7 @@ public class SpyLib {
      *
      * @return augmented spy definition
      */
-    public SpyCollector zorkaStat(String mbsName, String beanName, String attrName, int tstampField, int timeField) {
+    public SpyProcessor zorkaStat(String mbsName, String beanName, String attrName, int tstampField, int timeField) {
         return new JmxAttrCollector(mbsName, beanName, attrName, tstampField, timeField);
     }
 
@@ -205,7 +205,7 @@ public class SpyLib {
      *
      * @return augmented spy definition
      */
-    public SpyCollector callingCollector(This ns, String func) {
+    public SpyProcessor callingCollector(This ns, String func) {
         return new CallingObjCollector(ns, func);
     }
 
@@ -217,7 +217,7 @@ public class SpyLib {
      *
      * @return augmented spy definition
      */
-    public SpyCollector bshCollector(String ns) {
+    public SpyProcessor bshCollector(String ns) {
         return new CallingBshCollector(ns);
     }
 
@@ -232,7 +232,7 @@ public class SpyLib {
      *
      * @return
      */
-    public SpyCollector fileCollector(FileTrapper trapper, String expr, ZorkaLogLevel logLevel) {
+    public SpyProcessor fileCollector(FileTrapper trapper, String expr, ZorkaLogLevel logLevel) {
         return new FileCollector(trapper, expr, logLevel, "");
     }
 
@@ -250,7 +250,7 @@ public class SpyLib {
      *
      * @return augmented spy definition
      */
-    public SpyCollector getterCollector(String mbsName, String beanName, String attrName, String desc, int src, Object...path) {
+    public SpyProcessor getterCollector(String mbsName, String beanName, String attrName, String desc, int src, Object...path) {
         return new GetterPresentingCollector(mbsName, beanName, attrName, desc, src, path);
     }
 
@@ -263,7 +263,7 @@ public class SpyLib {
      *
      * @return
      */
-    public SpyCollector sdefCollector(SpyDefinition sdef) {
+    public SpyProcessor sdefCollector(SpyDefinition sdef) {
         return new DispatchingCollector(sdef);
     }
 
@@ -281,7 +281,7 @@ public class SpyLib {
      *
      * @return augmented spy definition
      */
-    public SpyCollector snmpCollector(SnmpTrapper trapper, String oid, int spcode, TrapVarBindDef...bindings) {
+    public SpyProcessor snmpCollector(SnmpTrapper trapper, String oid, int spcode, TrapVarBindDef...bindings) {
         return new SnmpCollector(trapper, oid, SnmpLib.GT_SPECIFIC, spcode, oid, bindings);
     }
 
@@ -303,7 +303,7 @@ public class SpyLib {
      *
      * @return
      */
-    public SpyCollector syslogCollector(SyslogTrapper trapper, String expr, int severity, int facility, String hostname, String tag) {
+    public SpyProcessor syslogCollector(SyslogTrapper trapper, String expr, int severity, int facility, String hostname, String tag) {
         return new SyslogCollector(trapper, expr, severity, facility, hostname, tag);
     }
 
@@ -319,7 +319,7 @@ public class SpyLib {
      *
      * @return
      */
-    public SpyCollector zabbixCollector(ZabbixTrapper trapper, String expr, String key) {
+    public SpyProcessor zabbixCollector(ZabbixTrapper trapper, String expr, String key) {
         return new ZabbixCollector(trapper, expr, null, key);
     }
 

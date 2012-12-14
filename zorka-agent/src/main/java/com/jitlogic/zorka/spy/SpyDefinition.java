@@ -17,9 +17,7 @@
 package com.jitlogic.zorka.spy;
 
 
-import com.jitlogic.zorka.spy.processors.*;
 import com.jitlogic.zorka.util.ZorkaUtil;
-import com.jitlogic.zorka.normproc.Normalizer;
 
 import java.util.*;
 
@@ -38,8 +36,8 @@ public class SpyDefinition {
 
     private static final List<SpyProcessor> EMPTY_XF =
             Collections.unmodifiableList(Arrays.asList(new SpyProcessor[0]));
-    private static final List<SpyCollector> EMPTY_DC =
-            Collections.unmodifiableList(Arrays.asList(new SpyCollector[0]));
+    private static final List<SpyProcessor> EMPTY_DC =
+            Collections.unmodifiableList(Arrays.asList(new SpyProcessor[0]));
     private static final List<SpyMatcher> EMPTY_MATCHERS =
             Collections.unmodifiableList(Arrays.asList(new SpyMatcher[0]));
     private static final List<SpyProbeElement> EMPTY_AF =
@@ -48,7 +46,7 @@ public class SpyDefinition {
     private List<SpyProbeElement>[] probes;
     private List<SpyProcessor>[] processors;
 
-    private List<SpyCollector> collectors = EMPTY_DC;
+    private List<SpyProcessor> collectors = EMPTY_DC;
     private List<SpyMatcher> matchers = EMPTY_MATCHERS;
 
     private int curStage = ON_ENTER;
@@ -115,7 +113,7 @@ public class SpyDefinition {
      *
      * @return
      */
-    public List<SpyCollector> getCollectors() {
+    public List<SpyProcessor> getCollectors() {
         return collectors;
     }
 
@@ -312,11 +310,11 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition to(SpyCollector...newCollectors) {
+    public SpyDefinition to(SpyProcessor...newCollectors) {
         SpyDefinition sdef = new SpyDefinition(this);
-        List<SpyCollector> lst = new ArrayList<SpyCollector>(collectors.size()+2);
+        List<SpyProcessor> lst = new ArrayList<SpyProcessor>(collectors.size()+2);
         lst.addAll(collectors);
-        for (SpyCollector collector : newCollectors) {
+        for (SpyProcessor collector : newCollectors) {
             lst.add(collector);
         }
         sdef.collectors = lst;

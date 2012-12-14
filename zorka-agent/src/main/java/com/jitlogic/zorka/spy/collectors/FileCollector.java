@@ -16,13 +16,13 @@
 package com.jitlogic.zorka.spy.collectors;
 
 import com.jitlogic.zorka.agent.FileTrapper;
-import com.jitlogic.zorka.spy.SpyCollector;
 import com.jitlogic.zorka.spy.SpyLib;
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLogLevel;
 
-public class FileCollector implements SpyCollector {
+public class FileCollector implements SpyProcessor {
 
     private FileTrapper trapper;
     private String expr;
@@ -38,12 +38,14 @@ public class FileCollector implements SpyCollector {
         this.tag = tag;
     }
 
-    public void collect(SpyRecord record) {
+    public SpyRecord process(int stage, SpyRecord record) {
         Object[] vals = record.getVals(SpyLib.ON_COLLECT);
 
         String msg = inspector.substitute(expr, vals);
 
         trapper.log(tag, logLevel, msg, null);
+
+        return record;
     }
 
 }

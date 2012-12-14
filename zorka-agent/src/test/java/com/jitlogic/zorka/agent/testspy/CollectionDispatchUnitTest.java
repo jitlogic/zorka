@@ -20,11 +20,7 @@ import com.jitlogic.zorka.agent.testspy.support.TestCollector;
 import com.jitlogic.zorka.agent.testspy.support.TestSpyTransformer;
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 
-import com.jitlogic.zorka.spy.DispatchingCollector;
-import com.jitlogic.zorka.spy.SpyContext;
-import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.SpyRecord;
-import com.jitlogic.zorka.spy.SpyCollector;
+import com.jitlogic.zorka.spy.*;
 
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
@@ -36,7 +32,7 @@ import static org.junit.Assert.*;
 public class CollectionDispatchUnitTest extends ZorkaFixture {
 
     private TestSpyTransformer engine;
-    private SpyCollector collector;
+    private SpyProcessor collector;
 
     @Before
     public void setUp() {
@@ -55,7 +51,7 @@ public class CollectionDispatchUnitTest extends ZorkaFixture {
 
         SpyRecord sr = new SpyRecord(ctx);
 
-        collector.collect(sr);
+        collector.process(SpyLib.ON_COLLECT, sr);
 
         assertEquals(1, col1.size());
         assertEquals(1, col2.size());

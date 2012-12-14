@@ -17,10 +17,7 @@ package com.jitlogic.zorka.agent.testspy;
 
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 
-import com.jitlogic.zorka.spy.SpyCollector;
-import com.jitlogic.zorka.spy.SpyContext;
-import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.spy.*;
 
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
@@ -79,10 +76,10 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
     @Test
     public void testCollectRecordToPlainJavaObj() throws Exception {
-        SpyCollector col = new CallingObjCollector(this, "result");
+        SpyProcessor col = new CallingObjCollector(this, "result");
         record.feed(ON_COLLECT, new Object[] {1L, 2L, "abc"});
 
-        col.collect(record);
+        col.process(SpyLib.ON_COLLECT, record);
 
         assertEquals(1, results.size());
         assertEquals(record, results.get(0));
@@ -91,12 +88,12 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
     @Test
     public void testCollectRecordViaBshFuncManual() throws Exception {
-        zorkaAgent.eval("collect(obj) { test.result(obj); }");
-        SpyCollector col = (SpyCollector)zorkaAgent.eval(
-                "(com.jitlogic.zorka.spy.SpyCollector)this");
+        zorkaAgent.eval("process(slot, obj) { test.result(obj); }");
+        SpyProcessor col = (SpyProcessor)zorkaAgent.eval(
+                "(com.jitlogic.zorka.spy.SpyProcessor)this");
         record.feed(ON_COLLECT, new Object[] {1L, 2L});
 
-        col.collect(record);
+        col.process(SpyLib.ON_COLLECT, record);
 
         assertEquals(1, results.size());
         assertEquals(record, results.get(0));
@@ -105,11 +102,11 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
     @Test
     public void testCollectRecordViaBshFuncViaCallingBshCollector() throws Exception {
-        zorkaAgent.eval("collect(obj) { test.result(obj); }");
-        SpyCollector col = new CallingBshCollector("this");
+        zorkaAgent.eval("process(slot, obj) { test.result(obj); }");
+        SpyProcessor col = new CallingBshCollector("this");
         record.feed(ON_COLLECT, new Object[] {1L, 2L});
 
-        col.collect(record);
+        col.process(SpyLib.ON_COLLECT, record);
 
         assertEquals(1, results.size());
         assertEquals(record, results.get(0));
@@ -118,11 +115,11 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
     @Test
     public void testCollectRecordViaBshFuncInEmbeddedNamespace() throws Exception {
-        zorkaAgent.eval("__that() { collect (obj) { test.result(obj); } return this; } that = __that();");
-        SpyCollector col = new CallingBshCollector("that");
+        zorkaAgent.eval("__that() { process (slot, obj) { test.result(obj); } return this; } that = __that();");
+        SpyProcessor col = new CallingBshCollector("that");
         record.feed(ON_COLLECT, new Object[] {1L, 2L});
 
-        col.collect(record);
+        col.process(SpyLib.ON_COLLECT, record);
 
         assertEquals(1, results.size());
         assertEquals(record, results.get(0));
@@ -131,11 +128,11 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
     @Test
     public void testDefineCollectorFirstAndBshNamespaceAfterThat() throws Exception {
-        SpyCollector col = new CallingBshCollector("that");
-        zorkaAgent.eval("__that() { collect (obj) { test.result(obj); } return this; } that = __that();");
+        SpyProcessor col = new CallingBshCollector("that");
+        zorkaAgent.eval("__that() { process (slot, obj) { test.result(obj); } return this; } that = __that();");
         record.feed(ON_COLLECT, new Object[]{1L, 2L});
 
-        col.collect(record);
+        col.process(SpyLib.ON_COLLECT, record);
 
         assertEquals(1, results.size());
         assertEquals(record, results.get(0));
@@ -144,10 +141,10 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
     @Test
     public void testPublishObjectViaGetterCollector() throws Exception {
-        SpyCollector col = new GetterPresentingCollector("test", "test:name=TestObj", "testAttr", "meh", 2);
+        SpyProcessor col = new GetterPresentingCollector("test", "test:name=TestObj", "testAttr", "meh", 2);
         record.feed(ON_COLLECT, new Object[] {1L, 2L, "oja!"});
 
-        col.collect(record);
+        col.process(SpyLib.ON_COLLECT, record);
 
         Object obj = getAttr("test", "test:name=TestObj", "testAttr");
         assertEquals("oja!", obj);
@@ -156,10 +153,10 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
     @Test
     public void testPublishObjectViaGetterCollectorWithDispatch() throws Exception {
-        SpyCollector col = new GetterPresentingCollector("test", "test:name=TestObj", "testAttr", "meh", 2, "length()");
+        SpyProcessor col = new GetterPresentingCollector("test", "test:name=TestObj", "testAttr", "meh", 2, "length()");
         record.feed(ON_COLLECT, new Object[] {1L, 2L, "oja!"});
 
-        col.collect(record);
+        col.process(SpyLib.ON_COLLECT, record);
 
         Object obj = getAttr("test", "test:name=TestObj", "testAttr");
         assertEquals(4, obj);

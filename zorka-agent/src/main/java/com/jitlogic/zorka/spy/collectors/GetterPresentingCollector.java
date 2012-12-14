@@ -20,8 +20,8 @@ package com.jitlogic.zorka.spy.collectors;
 import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.mbeans.AttrGetter;
-import com.jitlogic.zorka.spy.SpyCollector;
 import com.jitlogic.zorka.spy.SpyContext;
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
@@ -31,7 +31,7 @@ import static com.jitlogic.zorka.spy.SpyLib.ON_COLLECT;
 /**
  * Presents object as mbean attribute using ValGetter object.
  */
-public class GetterPresentingCollector implements SpyCollector {
+public class GetterPresentingCollector implements SpyProcessor {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
@@ -55,7 +55,7 @@ public class GetterPresentingCollector implements SpyCollector {
     }
 
 
-    public void collect(SpyRecord record) {
+    public SpyRecord process(int stage, SpyRecord record) {
         SpyContext ctx = record.getContext();
         String mbeanName = ctx.subst(mbeanTemplate);
         String attrName = ctx.subst(attrTemplate);
@@ -66,6 +66,8 @@ public class GetterPresentingCollector implements SpyCollector {
         if (obj1.equals(obj2)) {
             log.warn("Attribute '" + attrName + "' of '" + mbeanName + "' is already used.");
         }
+
+        return record;
     }
 
 }

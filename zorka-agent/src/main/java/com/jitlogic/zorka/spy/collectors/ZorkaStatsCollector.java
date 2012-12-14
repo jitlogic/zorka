@@ -21,9 +21,9 @@ import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.mbeans.MethodCallStatistic;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
-import com.jitlogic.zorka.spy.SpyCollector;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyInstance;
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
@@ -36,7 +36,7 @@ import java.util.Map;
 import static com.jitlogic.zorka.spy.SpyConst.*;
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
-public class ZorkaStatsCollector implements SpyCollector {
+public class ZorkaStatsCollector implements SpyProcessor {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
@@ -59,7 +59,7 @@ public class ZorkaStatsCollector implements SpyCollector {
     }
 
 
-    public void collect(SpyRecord record) {
+    public SpyRecord process(int stage, SpyRecord record) {
 
         if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
             log.debug("Collecting record: [" + ZorkaUtil.join(",", record.getVals(ON_COLLECT)) + "]");
@@ -101,6 +101,8 @@ public class ZorkaStatsCollector implements SpyCollector {
                 log.debug("Unknown type of time or tstamp object: " + timeObj);
             }
         }
+
+        return record;
     }
 
 
