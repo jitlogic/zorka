@@ -35,6 +35,10 @@ public class LexerFixture {
         return new Token(T_OPERATOR, content);
     }
 
+    public Token p(String content) {
+        return new Token(T_PLACEHOLDER, content);
+    }
+
     public Token s(String content) {
         return new Token(T_SYMBOL, content);
     }

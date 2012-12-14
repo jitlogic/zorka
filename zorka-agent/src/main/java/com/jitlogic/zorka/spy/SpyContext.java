@@ -16,6 +16,8 @@
  */
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.util.ZorkaUtil;
+
 /**
  *
  */
@@ -24,7 +26,7 @@ public class SpyContext {
     private Integer id = null;
 
     private SpyDefinition spyDefinition;
-    private String className, shortClassName;
+    private String className, shortClassName, packageName;
     private String methodName;
     private String methodDesc;
     private int access;
@@ -40,6 +42,7 @@ public class SpyContext {
 
         String[] segs = className.split("\\.");
         this.shortClassName = segs[segs.length-1];
+        this.packageName = segs.length > 1 ?  ZorkaUtil.join(".", ZorkaUtil.clipArray(segs, segs.length-1)) : "";
     }
 
     public void setId(Integer id) {
@@ -66,6 +69,18 @@ public class SpyContext {
 
     public String getMethodName() {
         return methodName;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public String subst(String template) {
+        return template
+                .replace("${className}", className)
+                .replace("${methodName}", methodName)
+                .replace("${shortClassName}", shortClassName)
+                .replace("${packageName}", packageName);
     }
 
     @Override

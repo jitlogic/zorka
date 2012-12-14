@@ -20,15 +20,13 @@ import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
 import com.jitlogic.zorka.integ.snmp.TrapVarBindDef;
 import com.jitlogic.zorka.libsnmp.*;
 import com.jitlogic.zorka.spy.SpyLib;
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
-import com.jitlogic.zorka.spy.SpyCollector;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
-import java.io.IOException;
-
-public class SnmpCollector implements SpyCollector {
+public class SnmpCollector implements SpyProcessor {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
@@ -54,7 +52,7 @@ public class SnmpCollector implements SpyCollector {
 
 
 
-    public void collect(SpyRecord record) {
+    public SpyRecord process(int stage, SpyRecord record) {
         SNMPVariablePair[] vars = new SNMPVariablePair[varBindDefs.length];
 
         try {
@@ -69,6 +67,8 @@ public class SnmpCollector implements SpyCollector {
         } catch (SNMPBadValueException e) {
             log.error("Error submitting record to SNMP trapper", e);
         }
+
+        return record;
     }
 
 }

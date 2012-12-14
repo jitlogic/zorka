@@ -3,6 +3,7 @@ package com.jitlogic.zorka.util;
 /**
  */
 public enum ZorkaLogLevel {
+
     TRACE(0, 7),
     DEBUG(1, 7),
     INFO(2, 6),

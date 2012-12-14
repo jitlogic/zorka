@@ -18,6 +18,7 @@ package com.jitlogic.zorka.spy.processors;
 import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
+import static com.jitlogic.zorka.spy.SpyLib.fs;
 
 public class ComparatorProcessor implements SpyProcessor {
 
@@ -32,27 +33,30 @@ public class ComparatorProcessor implements SpyProcessor {
             { true,  false, true  }, // NE
     };
 
-    public static ComparatorProcessor scmp(int a, int op, int b) {
+    public static ComparatorProcessor scmp(int[] a, int op, int[] b) {
         return new ComparatorProcessor(a, op, b, null);
     }
 
-    public static ComparatorProcessor vcmp(int a, int op, Object v) {
-        return new ComparatorProcessor(a, op, -1, v);
+    public static ComparatorProcessor vcmp(int[] a, int op, Object v) {
+        return new ComparatorProcessor(a, op, new int[] { -1, -1 }, v);
     }
 
 
-    private int a, op, b;
+    private int ia, sa, op, ib, sb;
     private Object v;
 
 
-    public ComparatorProcessor(int a, int op, int b, Object v) {
-        this.a = a; this.op = op; this.b = b; this.v = v;
+    public ComparatorProcessor(int[] a, int op, int[] b, Object v) {
+        this.sa = a[0]; this.ia = a[1];
+        this.op = op;
+        this.sb = b[0]; this.ib = b[1];
+        this.v = v;
     }
 
 
     public SpyRecord process(int stage, SpyRecord record) {
-        Object va = record.get(stage, a);
-        Object vb = b >= 0 ? record.get(stage, b) : v;
+        Object va = record.get(fs(sa, stage), ia);
+        Object vb = (ib >= 0) ? record.get(fs(sb, stage), ib) : v;
 
         if (va instanceof Number && vb instanceof Number) {
             int rcmp;

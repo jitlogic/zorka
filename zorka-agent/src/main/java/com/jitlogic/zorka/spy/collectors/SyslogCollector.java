@@ -16,12 +16,12 @@
 package com.jitlogic.zorka.spy.collectors;
 
 import com.jitlogic.zorka.integ.syslog.SyslogTrapper;
-import com.jitlogic.zorka.spy.SpyCollector;
 import com.jitlogic.zorka.spy.SpyLib;
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 
-public class SyslogCollector implements SpyCollector {
+public class SyslogCollector implements SpyProcessor {
 
     private SyslogTrapper trapper;
     private String expr;
@@ -44,7 +44,7 @@ public class SyslogCollector implements SpyCollector {
     }
 
 
-    public void collect(SpyRecord record) {
+    public SpyRecord process(int stage, SpyRecord record) {
         Object[] vals = record.getVals(SpyLib.ON_COLLECT);
 
         String msg = inspector.substitute(expr, vals);
@@ -54,5 +54,7 @@ public class SyslogCollector implements SpyCollector {
         } else {
             trapper.log(severity,  facility, tag,  msg);
         }
+
+        return record;
     }
 }

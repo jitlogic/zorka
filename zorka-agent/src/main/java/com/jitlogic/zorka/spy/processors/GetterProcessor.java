@@ -22,6 +22,7 @@ import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
+import static com.jitlogic.zorka.spy.SpyLib.fs;
 
 import static com.jitlogic.zorka.spy.SpyConst.SPD_ARGPROC;
 
@@ -32,20 +33,20 @@ public class GetterProcessor implements SpyProcessor {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private int src, dst;
+    private int isrc, ssrc, idst, sdst;
     private Object[] path;
     private ObjectInspector inspector = new ObjectInspector();
 
 
-    public GetterProcessor(int src, int dst, Object... path) {
-        this.src = src;
-        this.dst = dst;
+    public GetterProcessor(int[] src, int[] dst, Object... path) {
+        this.isrc = src[1]; this.ssrc = src[0];
+        this.idst = dst[1]; this.sdst = dst[0];
         this.path = path;
     }
 
 
     public SpyRecord process(int stage, SpyRecord record) {
-        Object val = record.get(stage, src);
+        Object val = record.get(fs(ssrc, stage), isrc);
 
         for (Object obj : path) {
             if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
@@ -55,10 +56,10 @@ public class GetterProcessor implements SpyProcessor {
         }
 
         if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
-            log.debug("Final result: '" + val + "' stored to slot " + dst);
+            log.debug("Final result: '" + val + "' stored to slot " + idst);
         }
 
-        record.put(stage, dst, val);
+        record.put(fs(sdst, stage), idst, val);
 
         return record;
     }

@@ -20,18 +20,19 @@ package com.jitlogic.zorka.spy.collectors;
 import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.mbeans.AttrGetter;
-import com.jitlogic.zorka.spy.SpyCollector;
 import com.jitlogic.zorka.spy.SpyContext;
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 import static com.jitlogic.zorka.spy.SpyLib.ON_COLLECT;
+import static com.jitlogic.zorka.spy.SpyLib.fs;
 
 /**
  * Presents object as mbean attribute using ValGetter object.
  */
-public class GetterPresentingCollector implements SpyCollector {
+public class GetterPresentingCollector implements SpyProcessor {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
@@ -40,39 +41,35 @@ public class GetterPresentingCollector implements SpyCollector {
     private String mbsName;
     private String mbeanTemplate, attrTemplate;
     private String desc;
-    private int src;
+    private int isrc, ssrc;
     private Object[] path;
 
 
     public GetterPresentingCollector(String mbsName, String mbeanTemplate, String attrTemplate, String desc,
-                                     int src, Object...path) {
+                                     int[] src, Object...path) {
         this.mbsName = mbsName;
         this.mbeanTemplate = mbeanTemplate;
         this.attrTemplate = attrTemplate;
-        this.src = src;
+        this.ssrc = src[0];
+        this.isrc = src[1];
         this.desc = desc;
         this.path = path;
     }
 
 
-    public void collect(SpyRecord record) {
+    public SpyRecord process(int stage, SpyRecord record) {
         SpyContext ctx = record.getContext();
-        String mbeanName = subst(mbeanTemplate, ctx);
-        String attrName = subst(attrTemplate, ctx);
+        String mbeanName = ctx.subst(mbeanTemplate);
+        String attrName = ctx.subst(attrTemplate);
 
-        Object obj1 = new AttrGetter(record.get(ON_COLLECT, src), path);
+        Object obj1 = new AttrGetter(record.get(fs(ssrc, stage), isrc), path);
         Object obj2 = registry.getOrRegister(mbsName, mbeanName, attrName, obj1, desc);
 
         if (obj1.equals(obj2)) {
             log.warn("Attribute '" + attrName + "' of '" + mbeanName + "' is already used.");
         }
-    }
 
-    private String subst(String template, SpyContext ctx) {
-        return template
-                .replace("${className}", ctx.getClassName())
-                .replace("${methodName}", ctx.getMethodName())
-                .replace("${shortClassName}", ctx.getShortClassName());
+        return record;
     }
 
 }

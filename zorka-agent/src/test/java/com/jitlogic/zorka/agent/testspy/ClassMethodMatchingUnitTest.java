@@ -26,7 +26,7 @@ public class ClassMethodMatchingUnitTest {
 
     @Test
     public void testSimpleClassOnlyMatch() {
-        SpyMatcher cm = new SpyMatcher("com.jitlogic.zorka.spy.**", "*", null, 0xFF);
+        SpyMatcher cm = new SpyMatcher(0xFF, "com.jitlogic.zorka.spy.**", "*", null);
 
         Assert.assertTrue(cm.matches("com.jitlogic.zorka.spy.unittest.SomeClass"));
         Assert.assertTrue(cm.matches("com.jitlogic.zorka.spy.AClass"));
@@ -35,7 +35,7 @@ public class ClassMethodMatchingUnitTest {
 
     @Test
     public void testClassMatchWithSingleLevelWildcard() {
-        SpyMatcher cm = new SpyMatcher("com.jitlogic.zorka.spy.*", "*", null, 0xFF);
+        SpyMatcher cm = new SpyMatcher(0xFF, "com.jitlogic.zorka.spy.*", "*", null);
 
         Assert.assertFalse(cm.matches("com.jitlogic.zorka.spy.unittest.SomeClass"));
         Assert.assertTrue(cm.matches("com.jitlogic.zorka.spy.AClass"));
@@ -44,7 +44,7 @@ public class ClassMethodMatchingUnitTest {
 
     @Test
     public void testClassMethodMatch() {
-        SpyMatcher cm = new SpyMatcher("test.*", "get*", null, 0xFF);
+        SpyMatcher cm = new SpyMatcher(0xFF, "test.*", "get*", null);
 
         Assert.assertTrue(cm.matches("test.SomeClass", "getVal"));
         Assert.assertFalse(cm.matches("test.SomeClass", "setVal"));
@@ -52,7 +52,7 @@ public class ClassMethodMatchingUnitTest {
 
     @Test
     public void testClassMethodStrictMatch() {
-        SpyMatcher cm = new SpyMatcher("test.*", "get", null, 0xFF);
+        SpyMatcher cm = new SpyMatcher(0xFF, "test.*", "get", null);
 
         Assert.assertTrue(cm.matches("test.SomeClass", "get"));
         Assert.assertFalse(cm.matches("test.someClass", "getValAndSome"));
@@ -60,7 +60,7 @@ public class ClassMethodMatchingUnitTest {
 
     @Test
     public void testClassMatchSignatureWithoutTypes() {
-        SpyMatcher cm = new SpyMatcher("test.*", "get", null, 0xFF);
+        SpyMatcher cm = new SpyMatcher(0xFF, "test.*", "get", null);
 
         Assert.assertTrue(cm.matches("test.someClass", "get", "()V"));
         Assert.assertTrue(cm.matches("test.someClass", "get", "(II)V"));
@@ -69,7 +69,7 @@ public class ClassMethodMatchingUnitTest {
 
     @Test
     public void testClassMatchSignatureWithReturnVoidType() {
-        SpyMatcher cm = new SpyMatcher("test.*", "someMethod", "void", 0xFF);
+        SpyMatcher cm = new SpyMatcher(0xFF, "test.*", "someMethod", "void");
         Assert.assertTrue(cm.matches("test.SomeClass", "someMethod", "()V"));
         Assert.assertFalse(cm.matches("test.SomeClass", "someMethod", "()Void"));
         Assert.assertFalse(cm.matches("test.SomeClass", "someMethod", "()I"));
@@ -77,14 +77,14 @@ public class ClassMethodMatchingUnitTest {
 
     @Test
     public void testClassMatchSignatureReturnClassType() {
-        SpyMatcher cm = new SpyMatcher("test.*", "get", "java.lang.String", 0xFF);
+        SpyMatcher cm = new SpyMatcher(0xFF, "test.*", "get", "java.lang.String");
 
         Assert.assertTrue(cm.matches("test.SomeClass", "get", "()Ljava/lang/String;"));
     }
 
     @Test
     public void testClassMatchSignatureWithSimpleReturnAndArgumentType() {
-        SpyMatcher cm = new SpyMatcher("test.*", "frobnicate", "int", 0xFF, "int");
+        SpyMatcher cm = new SpyMatcher(0xFF, "test.*", "frobnicate", "int", "int");
 
         Assert.assertTrue(cm.matches("test.someClass", "frobnicate", "(I)I"));
         Assert.assertFalse(cm.matches("test.SomeClass", "frobnicate", "(J)I"));
@@ -93,7 +93,7 @@ public class ClassMethodMatchingUnitTest {
 
     @Test
     public void testClassMatchSignatureWithStringType() {
-        SpyMatcher cm = new SpyMatcher("test.*", "frobnicate", "String", 0xFF, "String");
+        SpyMatcher cm = new SpyMatcher(0xFF, "test.*", "frobnicate", "String", "String");
 
         Assert.assertTrue(cm.matches("test.someClass", "frobnicate", "(Ljava/lang/String;)Ljava/lang/String;"));
         Assert.assertFalse(cm.matches("test.SomeClass", "frobnicate", "(J)I"));
@@ -101,8 +101,8 @@ public class ClassMethodMatchingUnitTest {
 
     @Test
     public void testClassMatchWithVariousArgs() {
-        SpyMatcher cm = new SpyMatcher("test.*", "frobnicate",
-                "String", 0xFF, "int", "com.jitlogic.zorka.spy.CallInfo");
+        SpyMatcher cm = new SpyMatcher(0xFF, "test.*", "frobnicate",
+                "String", "int", "com.jitlogic.zorka.spy.CallInfo");
 
         Assert.assertTrue(cm.matches("test.SomeClass", "frobnicate",
                 "(ILcom/jitlogic/zorka/spy/CallInfo;)Ljava/lang/String;"));
@@ -110,7 +110,7 @@ public class ClassMethodMatchingUnitTest {
 
     @Test
     public void testClassMatchWithNoArgsMarker() {
-        SpyMatcher cm = new SpyMatcher("test.*", "frobnicate", null, 0xFF, SM_NOARGS);
+        SpyMatcher cm = new SpyMatcher(0xFF, "test.*", "frobnicate", null, SM_NOARGS);
 
         Assert.assertTrue(cm.matches("test.SomeClass", "frobnicate", "()V"));
         Assert.assertFalse(cm.matches("test.SomeClass", "frobnicate", "(I)V"));
@@ -118,7 +118,7 @@ public class ClassMethodMatchingUnitTest {
 
     @Test
     public void testMatchWithMoreAttributesAndNoArgsFlag() {
-        SpyMatcher cm = new SpyMatcher("test.*", "frobnicate", null, 0xFF, "int", SM_NOARGS);
+        SpyMatcher cm = new SpyMatcher(0xFF, "test.*", "frobnicate", null, "int", SM_NOARGS);
 
         Assert.assertTrue(cm.matches("test.SomeClass", "frobnicate", "(I)V"));
         Assert.assertFalse(cm.matches("test.SomeClass", "frobnicate", "(II)V"));
@@ -126,7 +126,7 @@ public class ClassMethodMatchingUnitTest {
 
     @Test
     public void testMatchWithJustSomeAttributes() {
-        SpyMatcher cm = new SpyMatcher("test.*", "frobnicate", null, 0xFF, "int");
+        SpyMatcher cm = new SpyMatcher(0xFF, "test.*", "frobnicate", null, "int");
 
         Assert.assertTrue(cm.matches("test.SomeClass", "frobnicate", "(I)V"));
         Assert.assertTrue(cm.matches("test.SomeClass", "frobnicate", "(II)V"));
@@ -134,7 +134,7 @@ public class ClassMethodMatchingUnitTest {
 
     @Test
     public void testMatchOnlyNames() {
-        SpyMatcher cm = new SpyMatcher("test.someClass", "trivialMethod", null, SpyMatcher.DEFAULT_FILTER);
+        SpyMatcher cm = new SpyMatcher(SpyMatcher.DEFAULT_FILTER, "test.someClass", "trivialMethod", null);
 
         Assert.assertTrue(cm.matches("test.someClass", "trivialMethod", "()V", 1));
         Assert.assertTrue(cm.matches("test.someClass", "trivialMethod", "(I)I", 1));

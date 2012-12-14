@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.agent.testspy;
 
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
+import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyLib;
 
@@ -35,41 +36,54 @@ public class SpyLibFunctionsTest extends ZorkaFixture {
         spyLib = new SpyLib(spyInstance);
     }
 
+
     @Test
     public void testSpyInstrumentConvenienceFn1() {
         SpyDefinition sdef = spyLib.instrument("test", "test:type=MyStats", "stats", "${0}");
 
-        assertEquals(1, sdef.getCollectors().size());
-        assertEquals("${0}", ((ZorkaStatsCollector)sdef.getCollectors().get(0)).getKeyTemplate());
+        assertEquals(1, sdef.getProcessors(SpyLib.ON_COLLECT).size());
+        assertEquals("${0}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_COLLECT).get(0)).getKeyTemplate());
         assertEquals(1, ((TimeDiffProcessor)sdef.getProcessors(SpyLib.ON_SUBMIT).get(0)).getStartSlot());
         assertEquals(2, ((TimeDiffProcessor)sdef.getProcessors(SpyLib.ON_SUBMIT).get(0)).getStopSlot());
         assertEquals(2, ((TimeDiffProcessor)sdef.getProcessors(SpyLib.ON_SUBMIT).get(0)).getResultSlot());
     }
 
+
     @Test
     public void testSpyInstrumentConvenienceFnWithActualRemap() {
         SpyDefinition sdef = spyLib.instrument("test", "test:type=MyStats", "stats", "${1}");
 
-        assertEquals(1, sdef.getCollectors().size());
-        assertEquals("${0}", ((ZorkaStatsCollector)sdef.getCollectors().get(0)).getKeyTemplate());
+        assertEquals(1, sdef.getProcessors(SpyLib.ON_COLLECT).size());
+        assertEquals("${0}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_COLLECT).get(0)).getKeyTemplate());
     }
+
 
     @Test
     public void testSpyInstrumentConvenienceFnWithSingleMultipartVar() {
         SpyDefinition sdef = spyLib.instrument("test", "test:type=MyStats", "stats", "${0.request.url}");
 
-        assertEquals(1, sdef.getCollectors().size());
-        assertEquals("${0.request.url}", ((ZorkaStatsCollector)sdef.getCollectors().get(0)).getKeyTemplate());
+        assertEquals(1, sdef.getProcessors(SpyLib.ON_COLLECT).size());
+        assertEquals("${0.request.url}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_COLLECT).get(0)).getKeyTemplate());
     }
+
 
     @Test
     public void testSpyInstrumentConvenienceFnWithNonTranslatedVar() {
         SpyDefinition sdef = spyLib.instrument("test", "test:type=MyStats", "stats", "${methodName}");
 
-        assertEquals(1, sdef.getCollectors().size());
-        assertEquals("${methodName}", ((ZorkaStatsCollector)sdef.getCollectors().get(0)).getKeyTemplate());
+        assertEquals(1, sdef.getProcessors(SpyLib.ON_COLLECT).size());
+        assertEquals("${methodName}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_COLLECT).get(0)).getKeyTemplate());
     }
 
 
+    @Test
+    public void testCtxSubst() {
+        SpyContext ctx = new SpyContext(new SpyDefinition(), "some.pkg.TClass", "testMethod", "()V", 1);
+
+        assertEquals("some.pkg.TClass", ctx.subst("${className}"));
+        assertEquals("some.pkg", ctx.subst("${packageName}"));
+        assertEquals("TClass", ctx.subst("${shortClassName}"));
+        assertEquals("testMethod", ctx.subst("${methodName}"));
+    }
 
 }

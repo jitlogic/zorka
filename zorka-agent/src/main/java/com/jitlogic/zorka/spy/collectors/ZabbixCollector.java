@@ -1,8 +1,8 @@
 package com.jitlogic.zorka.spy.collectors;
 
 import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
-import com.jitlogic.zorka.spy.SpyCollector;
 import com.jitlogic.zorka.spy.SpyLib;
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
@@ -23,9 +23,9 @@ import com.jitlogic.zorka.util.ZorkaLogger;
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-public class ZabbixCollector implements SpyCollector {
+public class ZabbixCollector implements SpyProcessor {
 
-    private ZorkaLog log = ZorkaLogger.getLog(SpyCollector.class);
+    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private ZabbixTrapper trapper;
     private String expr, host, key;
@@ -39,7 +39,7 @@ public class ZabbixCollector implements SpyCollector {
         this.key = key;
     }
 
-    public void collect(SpyRecord record) {
+    public SpyRecord process(int stage, SpyRecord record) {
         Object[] vals = record.getVals(SpyLib.ON_COLLECT);
 
         String data = inspector.substitute(expr, vals);
@@ -49,5 +49,7 @@ public class ZabbixCollector implements SpyCollector {
         } else {
             trapper.send(key, data);
         }
+
+        return record;
     }
 }

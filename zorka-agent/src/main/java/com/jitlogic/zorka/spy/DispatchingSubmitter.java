@@ -35,7 +35,7 @@ public class DispatchingSubmitter implements SpySubmitter {
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private SpyClassTransformer engine;
-    private SpyCollector collector;
+    private SpyProcessor collector;
 
     private ThreadLocal<Stack<SpyRecord>> submissionStack =
         new ThreadLocal<Stack<SpyRecord>>() {
@@ -46,7 +46,7 @@ public class DispatchingSubmitter implements SpySubmitter {
         };
 
 
-    public DispatchingSubmitter(SpyClassTransformer engine, SpyCollector collector) {
+    public DispatchingSubmitter(SpyClassTransformer engine, SpyProcessor collector) {
         this.engine = engine;
         this.collector = collector;
     }
@@ -86,7 +86,7 @@ public class DispatchingSubmitter implements SpySubmitter {
 
         record.beforeCollect();
 
-        collector.collect(record);
+        collector.process(SpyLib.ON_COLLECT, record);
     }
 
 
