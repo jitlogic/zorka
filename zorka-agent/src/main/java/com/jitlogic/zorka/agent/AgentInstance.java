@@ -189,6 +189,10 @@ public class AgentInstance {
         return syslogLib;
     }
 
+    public SpyLib getSpyLib() {
+        return spyLib;
+    }
+
     public SnmpLib getSnmpLib() {
         return snmpLib;
     }

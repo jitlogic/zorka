@@ -38,7 +38,7 @@ public class SpyMatcher {
 
     private Pattern classMatch, methodMatch, descriptorMatch;
 
-    public SpyMatcher(String className, String methodName, String retType, int access, String... argTypes) {
+    public SpyMatcher(int access, String className, String methodName, String retType, String... argTypes) {
         this.access = access;
         this.classMatch = toSymbolMatch(className);
         this.methodMatch = toSymbolMatch(methodName);

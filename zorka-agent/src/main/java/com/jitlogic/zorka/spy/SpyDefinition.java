@@ -251,42 +251,21 @@ public class SpyDefinition {
         return on(ON_COLLECT);
     }
 
+
     /**
-     * Instructs spy what methods (of what classes) this instrumentation
-     * definition should be applied on.
+     * Instructs spy what method to include.
      *
-     * @param classPattern
-     *
-     * @param methodPattern
+     * @param matchers
      *
      * @return
      */
-    public SpyDefinition include(String classPattern, String methodPattern) {
-        return include(SpyMatcher.DEFAULT_FILTER, classPattern, methodPattern, null);
-    }
-
-
-    /**
-     * Instructs spy what methods (of what classes) this instrumentation
-     * definition should be applied on.
-     *
-     * @param classPattern
-     *
-     * @param methodPattern
-     *
-     * @param retType
-     *
-     * @param access
-     *
-     * @param argTypes
-     *
-     * @return
-     */
-    public SpyDefinition include(int access, String classPattern, String methodPattern, String retType, String... argTypes) {
+    public SpyDefinition include(SpyMatcher...matchers) {
         SpyDefinition sdef = new SpyDefinition(this);
-        List<SpyMatcher> lst = new ArrayList<SpyMatcher>(sdef.matchers.size()+2);
+        List<SpyMatcher> lst = new ArrayList<SpyMatcher>(sdef.matchers.size()+1+matchers.length);
         lst.addAll(sdef.matchers);
-        lst.add(new SpyMatcher(classPattern, methodPattern, retType, access, argTypes));
+        for (SpyMatcher matcher : matchers) {
+            lst.add(matcher);
+        }
         sdef.matchers = lst;
         return sdef;
     }

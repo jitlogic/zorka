@@ -22,7 +22,6 @@ import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.*;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * This is API for zorka users.
@@ -138,4 +137,12 @@ public class SpyLib {
                 .toStats(mbsName, mbeanName, attrName, sb.toString(), tidx, tidx+1);
     }
 
+
+    public SpyMatcher byMethod(String classPattern, String methodPattern) {
+        return new SpyMatcher(1, classPattern, methodPattern, null);
+    }
+
+    public SpyMatcher byMethod(int access, String classPattern, String methodPattern, String retType, String... argTypes) {
+        return new SpyMatcher(access, classPattern,  methodPattern, retType, argTypes);
+    }
 }

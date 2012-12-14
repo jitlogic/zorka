@@ -19,6 +19,7 @@ import com.jitlogic.zorka.agent.*;
 import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.syslog.SyslogLib;
 import com.jitlogic.zorka.spy.SpyInstance;
+import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 import org.junit.After;
@@ -40,10 +41,12 @@ public class ZorkaFixture {
     protected SpyInstance spyInstance;
 
     protected SyslogLib syslogLib;
+    protected SpyLib spy;
     protected SnmpLib snmpLib;
 
     protected ZorkaBshAgent zorkaAgent;
     protected ZorkaLib zorka;
+
 
     @Before
     public void setUpFixture() {
@@ -80,7 +83,9 @@ public class ZorkaFixture {
 
         syslogLib = AgentInstance.instance().getSyslogLib();
         snmpLib = AgentInstance.instance().getSnmpLib();
+        spy = AgentInstance.instance().getSpyLib();
     }
+
 
     @After
     public void tearDownFixture() {
