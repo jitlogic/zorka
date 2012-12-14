@@ -28,6 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.jitlogic.zorka.spy.SpyConst.SPD_ARGPROC;
+import static com.jitlogic.zorka.spy.SpyLib.fs;
 
 /**
  * Filters records using regular expressions.
@@ -36,7 +37,7 @@ public class RegexFilterProcessor implements SpyProcessor {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private int src, dst;
+    private int isrc, ssrc, idst, sdst;
     private Pattern regex;
     private String expr = null, defval = null;
     private Boolean filterOut;
@@ -44,34 +45,36 @@ public class RegexFilterProcessor implements SpyProcessor {
     ObjectInspector inspector;
 
 
-    public RegexFilterProcessor(int src, String regex) {
+    public RegexFilterProcessor(int[] src, String regex) {
         this(src, regex, false);
     }
 
 
-    public RegexFilterProcessor(int src, String regex, Boolean filterOut) {
-        this.src = src;
+    public RegexFilterProcessor(int[] src, String regex, Boolean filterOut) {
+        this.ssrc = src[0];
+        this.isrc = src[1];
         this.regex = Pattern.compile(regex);
         this.filterOut = filterOut;
     }
 
 
-    public RegexFilterProcessor(int src, int dst, String regex, String expr, Boolean filterOut) {
+    public RegexFilterProcessor(int[] src, int[] dst, String regex, String expr, Boolean filterOut) {
         this(src, regex, filterOut);
-        this.dst = dst;
+        this.sdst = dst[0];
+        this.idst = dst[1];
         this.expr = expr;
         inspector = new ObjectInspector();
     }
 
 
-    public RegexFilterProcessor(int src, int dst, String regex, String expr, String defval) {
+    public RegexFilterProcessor(int[] src, int[] dst, String regex, String expr, String defval) {
         this(src, dst, regex, expr, (Boolean)null);
         this.defval = defval;
     }
 
 
     public SpyRecord process(int stage, SpyRecord record) {
-        Object val = record.get(stage, src);
+        Object val = record.get(fs(ssrc, stage), isrc);
 
         if (expr == null) {
             boolean matches = val != null && regex.matcher(val.toString()).matches();
@@ -89,12 +92,12 @@ public class RegexFilterProcessor implements SpyProcessor {
                     vals[i] = matcher.group(i);
                 }
                 String subst = inspector.substitute(expr, vals);
-                record.put(stage, dst, subst);
+                record.put(fs(sdst, stage), idst, subst);
                 if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
                     log.debug("Processed '" + val + "' to '" + subst + "' using pattern '" + regex.pattern() + "'");
                 }
             } else if (defval != null) {
-                record.put(stage, dst, defval);
+                record.put(fs(sdst, stage), idst, defval);
                 if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
                     log.debug("No value to be processed. Using default value of '" + defval + "'");
                 }

@@ -21,6 +21,8 @@ import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
+import static com.jitlogic.zorka.spy.SpyLib.fs;
+
 public class ThreadLocalProcessor implements SpyProcessor {
 
     public final static int GET = 1;
@@ -28,13 +30,14 @@ public class ThreadLocalProcessor implements SpyProcessor {
     public final static int REMOVE = 3;
 
     private Object[] path;
-    private int slot, operation;
+    private int islt, sslt, operation;
     private ThreadLocal<Object> threadLocal;
 
     private ObjectInspector inspector = new ObjectInspector();
 
-    public ThreadLocalProcessor(int slot, int operation, ThreadLocal<Object> threadLocal, Object...path) {
-        this.slot = slot;
+    public ThreadLocalProcessor(int[] slot, int operation, ThreadLocal<Object> threadLocal, Object...path) {
+        this.sslt = slot[0];
+        this.islt = slot[1];
         this.operation = operation;
         this.threadLocal = threadLocal;
         this.path = ZorkaUtil.copyArray(path);
@@ -49,11 +52,11 @@ public class ThreadLocalProcessor implements SpyProcessor {
                 for (Object key : path) {
                     v = inspector.get(v, key);
                 }
-                record.put(stage, slot, v);
+                record.put(fs(sslt, stage), islt, v);
             }
                 break;
             case SET:
-                threadLocal.set(record.get(stage, slot));
+                threadLocal.set(record.get(fs(sslt, stage), islt));
                 break;
             case REMOVE:
                 threadLocal.remove();

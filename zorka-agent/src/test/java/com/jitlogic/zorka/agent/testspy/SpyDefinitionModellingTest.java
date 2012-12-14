@@ -238,7 +238,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
         SpyDefinition sdef =
             SpyDefinition.instance().include(spy.byMethod("com.hp.ifc.bus.AppServer", "startup"))
                 .onEnter("com.hp.ifc.net.mq.AppMessageQueue")
-                .onCollect(spy.getterCollector("java", "hpsd:type=SDStats,name=AppMessageQueue", "size", "meh", 0, "getSize()"));
+                .onCollect(spy.getterCollector("java", "hpsd:type=SDStats,name=AppMessageQueue", "size", "meh", slot(0), "getSize()"));
     }
 
 
@@ -252,10 +252,10 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
             SpyDefinition.instance().include(spy.byMethod("some.package.SomeBean", SM_CONSTRUCTOR))
                 .onEnter(0)
                 .onCollect(
-                    spy.getterCollector("java", "SomeApp:type=SomeType,name=${0.name}", "count", "meh", 0, "getCount()"),
-                    spy.getterCollector("java", "SomeApp:type=SomeType,name=${0.name}", "backlog", "meh", 0, "getBacklog()"),
-                    spy.getterCollector("java", "SomeApp:type=SomeType,name=${0.name}", "time", "meh", 0, "getProcessingTime()"),
-                    spy.getterCollector("java", "SomeApp:type=SomeType,name=${0.name}", "url", "meh", 0, "getUrl()"));
+                    spy.getterCollector("java", "SomeApp:type=SomeType,name=${0.name}", "count", "meh", slot(0), "getCount()"),
+                    spy.getterCollector("java", "SomeApp:type=SomeType,name=${0.name}", "backlog", "meh", slot(0), "getBacklog()"),
+                    spy.getterCollector("java", "SomeApp:type=SomeType,name=${0.name}", "time", "meh", slot(0), "getProcessingTime()"),
+                    spy.getterCollector("java", "SomeApp:type=SomeType,name=${0.name}", "url", "meh", slot(0), "getUrl()"));
     }
 
     /**
@@ -279,6 +279,6 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
         SpyDefinition sdef =
             SpyDefinition.instance().include(spy.byMethod("some.package.SingletonBean", SM_CONSTRUCTOR))
                 .onEnter(0, spy.get(0, 0, "someMap"))
-                .onCollect(spy.getterCollector("java", "SomeApp:type=SingletonType", "map", "Some map", 0));
+                .onCollect(spy.getterCollector("java", "SomeApp:type=SingletonType", "map", "Some map", slot(0)));
     }
 }

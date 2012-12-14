@@ -32,9 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.jitlogic.zorka.spy.SpyConst.SPD_COLLECTORS;
-import static com.jitlogic.zorka.spy.SpyLib.ON_COLLECT;
-import static com.jitlogic.zorka.spy.SpyLib.ON_ERROR;
-import static com.jitlogic.zorka.spy.SpyLib.ON_RETURN;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class JmxAttrCollector implements SpyProcessor {
 
@@ -44,17 +42,19 @@ public class JmxAttrCollector implements SpyProcessor {
 
     private String mbsName;
     private String beanTemplate, attrTemplate;
-    private int timeField, tstampField;
+    private int itime, stime, istamp, sstamp;
 
     private Map<SpyContext,MethodCallStatistic> cachedStats = new HashMap<SpyContext, MethodCallStatistic>();
 
 
-    public JmxAttrCollector(String mbsName, String beanTemplate, String attrTemplate, int tstampField, int timeField) {
+    public JmxAttrCollector(String mbsName, String beanTemplate, String attrTemplate, int[] tstampField, int[] timeField) {
         this.mbsName = mbsName;
         this.beanTemplate = beanTemplate;
         this.attrTemplate = attrTemplate;
-        this.tstampField = tstampField;
-        this.timeField = timeField;
+        this.stime = timeField[0];
+        this.itime = timeField[1];
+        this.sstamp = tstampField[0];
+        this.istamp = tstampField[1];
     }
 
 
@@ -100,8 +100,8 @@ public class JmxAttrCollector implements SpyProcessor {
             }
         } // if (stats == null)
 
-        Object timeObj = record.get(ON_COLLECT, timeField);
-        Object tstampObj = record.get(ON_COLLECT, tstampField);
+        Object timeObj = record.get(fs(stime, stage), itime);
+        Object tstampObj = record.get(fs(sstamp, stage), istamp);
 
         if (timeObj instanceof Long && tstampObj instanceof Long) {
             if (record.gotStage(ON_RETURN)) {

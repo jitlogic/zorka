@@ -39,7 +39,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
     @Test
     public void testCollectToStatsMbeanWithoutPlaceholders() throws Exception {
-        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "test", 0, 0);
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "test", slot(0), slot(0));
         SpyContext ctx = new SpyContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
 
         SpyRecord sr = new SpyRecord(ctx);
@@ -55,7 +55,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
     @Test
     public void testCollectorToStatsMbeanWithMethodNamePlaceholder() throws Exception {
-        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "${methodName}", 0, 0);
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "${methodName}", slot(0), slot(0));
         SpyContext ctx = new SpyContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
 
         SpyRecord sr = new SpyRecord(ctx);
@@ -71,7 +71,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
     @Test
     public void testCollectoToStatsMbeanWithClassAndMethodNamePlaceholder() throws Exception {
-        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${methodName}", 0, 0);
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${methodName}", slot(0), slot(0));
         SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
 
         SpyRecord sr = new SpyRecord(ctx);
@@ -87,7 +87,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
     @Test
     public void testCollectToStatsWithKeyExpression() throws Exception {
-        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${1}", 0, 0);
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${1}", slot(0), slot(0));
         SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
 
         SpyRecord sr = new SpyRecord(ctx);
@@ -107,7 +107,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
     @Test
     public void testJmxAttrCollectorTrivialCall() throws Exception {
-        JmxAttrCollector collector = new JmxAttrCollector("test", "test:name=${shortClassName}", "${methodName}", 0, 1);
+        JmxAttrCollector collector = new JmxAttrCollector("test", "test:name=${shortClassName}", "${methodName}", slot(0), slot(1));
         SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
 
         SpyRecord record = new SpyRecord(ctx);
@@ -127,7 +127,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
     @Test
     public void testJmxAttrCollectorTrivialError() throws Exception {
-        JmxAttrCollector collector = new JmxAttrCollector("test", "test:name=${shortClassName}", "${methodName}", 0, 1);
+        JmxAttrCollector collector = new JmxAttrCollector("test", "test:name=${shortClassName}", "${methodName}", slot(0), slot(1));
         SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
 
         SpyRecord record = new SpyRecord(ctx);

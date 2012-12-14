@@ -42,20 +42,20 @@ public class ZorkaStatsCollector implements SpyProcessor {
 
     private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
     private String mbsName, mbeanTemplate, attrTemplate, keyTemplate;
-    private int timeField, tstampField;
+    private int stime, itime, sstamp, istamp;
 
     private Map<SpyContext,MethodCallStatistics> statsCache = new HashMap<SpyContext, MethodCallStatistics>();
 
     private ObjectInspector inspector = new ObjectInspector();
 
     public ZorkaStatsCollector(String mbsName, String mbeanTemplate, String attrTemplate,
-                               String keyTemplate, int tstampField, int timeField) {
+                               String keyTemplate, int[] tstampField, int[] timeField) {
         this.mbsName  = mbsName;
         this.mbeanTemplate = mbeanTemplate;
         this.attrTemplate = attrTemplate;
         this.keyTemplate = keyTemplate;
-        this.tstampField = tstampField;
-        this.timeField = timeField;
+        this.stime = timeField[0]; this.itime = timeField[1];
+        this.sstamp = tstampField[0]; this.istamp = tstampField[1];
     }
 
 
@@ -73,12 +73,12 @@ public class ZorkaStatsCollector implements SpyProcessor {
                     new MethodCallStatistics(), "Method call statistics");
         }
 
-        String key = inspector.substitute(ctx.subst(keyTemplate), record.getVals(ON_COLLECT));
+        String key = inspector.substitute(ctx.subst(keyTemplate), record.getVals(stage));
 
         MethodCallStatistic statistic = (MethodCallStatistic)stats.getMethodCallStatistic(key);
 
-        Object timeObj = timeField >= 0 ? record.get(ON_COLLECT, timeField) : 0L;
-        Object tstampObj = tstampField >= 0 ? record.get(ON_COLLECT, tstampField) : 0L;
+        Object timeObj = itime >= 0 ? record.get(fs(stime, stage), itime) : 0L;
+        Object tstampObj = istamp >= 0 ? record.get(fs(sstamp, stage), istamp) : 0L;
 
         if (timeObj instanceof Long && tstampObj instanceof Long) {
             if (record.gotStage(ON_RETURN)) {
@@ -120,15 +120,6 @@ public class ZorkaStatsCollector implements SpyProcessor {
         return attrTemplate;
     }
 
-
-    public int getTimeField() {
-        return timeField;
-    }
-
-
-    public int getTstampField() {
-        return tstampField;
-    }
 
 
     public String getKeyTemplate() {

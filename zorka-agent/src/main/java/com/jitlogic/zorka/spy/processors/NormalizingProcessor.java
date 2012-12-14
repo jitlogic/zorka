@@ -23,25 +23,26 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.normproc.Normalizer;
 
 import static com.jitlogic.zorka.spy.SpyConst.SPD_ARGPROC;
+import static com.jitlogic.zorka.spy.SpyLib.fs;
 
 public class NormalizingProcessor implements SpyProcessor {
 
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private int src, dst;
+    private int isrc, ssrc, idst, sdst;
     private Normalizer normalizer;
 
 
-    public NormalizingProcessor(int src, int dst, Normalizer normalizer) {
-        this.src = src;
-        this.dst = dst;
+    public NormalizingProcessor(int[] src, int[] dst, Normalizer normalizer) {
+        this.isrc = src[1]; this.ssrc = src[0];
+        this.idst = dst[1]; this.sdst = dst[0];
         this.normalizer = normalizer;
     }
 
 
     public SpyRecord process(int stage, SpyRecord record) {
 
-        Object v = record.get(stage, src);
+        Object v = record.get(fs(ssrc, stage), isrc);
 
         String s = (v instanceof String) ? normalizer.normalize((String)v) : null;
 
@@ -49,7 +50,7 @@ public class NormalizingProcessor implements SpyProcessor {
             log.debug("Normalizing: '" + v + "' -> '" + s + "'");
         }
 
-        record.put(stage, dst, s);
+        record.put(fs(sdst, stage), idst, s);
 
         return record;
     }

@@ -17,19 +17,21 @@ package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
+import static com.jitlogic.zorka.spy.SpyLib.fs;
 
 public class ConstPutProcessor implements SpyProcessor {
 
-    private int dst;
+    private int dstStage, dstSlot;
     private Object val;
 
-    public ConstPutProcessor(int dst, Object val) {
-        this.dst = dst;
+    public ConstPutProcessor(int[] dst, Object val) {
+        this.dstStage = dst[0];
+        this.dstSlot = dst[1];
         this.val = val;
     }
 
     public SpyRecord process(int stage, SpyRecord record) {
-        record.put(stage, dst, val);
+        record.put(fs(dstStage, stage), dstSlot, val);
         return record;
     }
 }

@@ -48,7 +48,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     @Test
     public void testTrivialStringFormatArgProcessing() throws Exception {
-        SpyProcessor proc = new StringFormatProcessor(0, "len=${0.length()}");
+        SpyProcessor proc = new StringFormatProcessor(slot(0), "len=${0.length()}");
         record.feed(ON_ENTER, new Object[] { "oja!"});
 
         proc.process(ON_ENTER, record);
@@ -59,7 +59,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     @Test
     public void testTrivialGetterArgProcessing() throws Exception {
-        SpyProcessor proc = new GetterProcessor(0, 0, "length()");
+        SpyProcessor proc = new GetterProcessor(slot(0), slot(0), "length()");
         record.feed(ON_ENTER, new Object[] { "oja!"});
 
         proc.process(ON_ENTER, record);
@@ -70,7 +70,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     @Test
     public void testFilterNullVal() throws Exception {
-        SpyProcessor proc = new RegexFilterProcessor(0, "[a-z]+");
+        SpyProcessor proc = new RegexFilterProcessor(slot(0), "[a-z]+");
         record.feed(ON_ENTER, new Object[] { null });
 
         assertNull(proc.process(ON_ENTER, record));
@@ -79,7 +79,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     @Test
     public void testFilterPositiveVal() throws Exception {
-        SpyProcessor proc = new RegexFilterProcessor(0, "[a-z]+");
+        SpyProcessor proc = new RegexFilterProcessor(slot(0), "[a-z]+");
         record.feed(ON_ENTER, new Object[] { "abc" });
 
         assertNotNull(proc.process(ON_ENTER, record));
@@ -88,7 +88,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     @Test
     public void testFilterNegativeVal() throws Exception {
-        SpyProcessor proc = new RegexFilterProcessor(0, "[a-z]+");
+        SpyProcessor proc = new RegexFilterProcessor(slot(0), "[a-z]+");
         record.feed(ON_ENTER, new Object[] { "123" });
 
         assertNull(proc.process(ON_ENTER, record));
@@ -97,7 +97,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     @Test
     public void testFilterOutPositiveVal()  throws Exception {
-        SpyProcessor proc = new RegexFilterProcessor(0, "[a-z]+", true);
+        SpyProcessor proc = new RegexFilterProcessor(slot(0), "[a-z]+", true);
         record.feed(ON_ENTER, new Object[] { "abc" });
 
         assertNull(proc.process(ON_ENTER, record));
@@ -106,7 +106,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     @Test
     public void testFilterOutNegativeVal() throws Exception {
-        SpyProcessor proc = new RegexFilterProcessor(0, "[a-z]+", true);
+        SpyProcessor proc = new RegexFilterProcessor(slot(0), "[a-z]+", true);
         record.feed(ON_ENTER, new Object[] { "123" });
 
         assertNotNull(proc.process(ON_ENTER, record));
@@ -115,7 +115,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     @Test
     public void testMethodCallProcessing() throws Exception {
-        SpyProcessor proc = new MethodCallingProcessor(0, 0, "length");
+        SpyProcessor proc = new MethodCallingProcessor(slot(0), slot(0), "length");
         record.feed(ON_ENTER, new Object[] { "oja!"});
 
         proc.process(ON_ENTER, record);
@@ -126,7 +126,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     @Test
     public void testMethodCallProcessingWithOneArg() throws Exception {
-        SpyProcessor proc = new MethodCallingProcessor(0, 0, "substring", 1);
+        SpyProcessor proc = new MethodCallingProcessor(slot(0), slot(0), "substring", 1);
         record.feed(ON_ENTER, new Object[] { "oja!"});
 
         proc.process(ON_ENTER, record);
@@ -137,7 +137,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     @Test
     public void testOverloadedMethodCallProcessingWithTwoArgs() throws Exception {
-        SpyProcessor proc = new MethodCallingProcessor(0, 0, "substring", 1, 3);
+        SpyProcessor proc = new MethodCallingProcessor(slot(0), slot(0), "substring", 1, 3);
         record.feed(ON_ENTER, new Object[] { "oja!"});
 
         proc.process(ON_ENTER, record);
@@ -146,7 +146,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
     }
 
     private void checkHRT(String expected, String url) {
-        SpyProcessor sp = new RegexFilterProcessor(0, 0, "^(https?://[^/]+/[^/]+).*$", "${1}", true);
+        SpyProcessor sp = new RegexFilterProcessor(slot(0), slot(0), "^(https?://[^/]+/[^/]+).*$", "${1}", true);
         record.feed(ON_ENTER, new Object[] { url });
         sp.process(ON_ENTER,  record);
         assertEquals(expected, record.get(ON_ENTER, 0));
@@ -173,7 +173,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     @Test
     public void testFilterNoMatchWithDefVal() {
-        SpyProcessor sp = new RegexFilterProcessor(0, 0, "^a(.*)", "${0}", "???");
+        SpyProcessor sp = new RegexFilterProcessor(slot(0), slot(0), "^a(.*)", "${0}", "???");
 
         record.feed(ON_ENTER, new Object[] { "xxx" });
         sp.process(ON_ENTER, record);
@@ -182,7 +182,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
 
     private boolean scmp(Object a, int op, Object b) {
-        SpyProcessor sp = ComparatorProcessor.scmp(0, op, 1);
+        SpyProcessor sp = ComparatorProcessor.scmp(slot(0), op, slot(1));
         record.feed(ON_ENTER, new Object[] { a, b });
         return null != sp.process(ON_ENTER, record);
     }
@@ -207,7 +207,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
 
     private boolean vcmp(Object a, int op, Object v) {
-        SpyProcessor sp = ComparatorProcessor.vcmp(0, op, v);
+        SpyProcessor sp = ComparatorProcessor.vcmp(slot(0), op, v);
         record.feed(ON_ENTER, new Object[] { a });
         return null != sp.process(ON_ENTER, record);
     }

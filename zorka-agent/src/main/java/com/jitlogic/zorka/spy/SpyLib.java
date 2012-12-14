@@ -100,7 +100,7 @@ public class SpyLib {
 
 
     public SpyDefinition instrument() {
-        return SpyDefinition.instrument().onSubmit(tdiff(0,1,1)).onEnter();
+        return SpyDefinition.instrument().onSubmit(tdiff(0, 1, 1)).onEnter();
     }
 
 
@@ -144,7 +144,7 @@ public class SpyLib {
         return SpyDefinition.instance()
                 .onEnter(argList.toArray(), FETCH_TIME)
                 .onReturn(FETCH_TIME).onError(FETCH_TIME)
-                .onSubmit(tdiff(tidx, tidx+1, tidx+1))
+                .onSubmit(tdiff(tidx, tidx + 1, tidx + 1))
                 .onCollect(zorkaStats(mbsName, mbeanName, attrName, sb.toString(), tidx, tidx + 1));
     }
 
@@ -174,8 +174,8 @@ public class SpyLib {
      * @return augmented spy definition
      */
     public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr,
-                                   int tstampField, int timeField) {
-        return new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, tstampField, timeField);
+                                   Object tstampField, Object timeField) {
+        return new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, slot(tstampField), slot(timeField));
     }
 
 
@@ -191,8 +191,8 @@ public class SpyLib {
      *
      * @return augmented spy definition
      */
-    public SpyProcessor zorkaStat(String mbsName, String beanName, String attrName, int tstampField, int timeField) {
-        return new JmxAttrCollector(mbsName, beanName, attrName, tstampField, timeField);
+    public SpyProcessor zorkaStat(String mbsName, String beanName, String attrName, Object tstampField, Object timeField) {
+        return new JmxAttrCollector(mbsName, beanName, attrName, slot(tstampField), slot(timeField));
     }
 
 
@@ -250,8 +250,8 @@ public class SpyLib {
      *
      * @return augmented spy definition
      */
-    public SpyProcessor getterCollector(String mbsName, String beanName, String attrName, String desc, int src, Object...path) {
-        return new GetterPresentingCollector(mbsName, beanName, attrName, desc, src, path);
+    public SpyProcessor getterCollector(String mbsName, String beanName, String attrName, String desc, int[] src, Object...path) {
+        return new GetterPresentingCollector(mbsName, beanName, attrName, desc, slot(src), path);
     }
 
 
@@ -335,8 +335,8 @@ public class SpyLib {
      *
      * @return augmented spy definition
      */
-    public SpyProcessor formatter(int dst, String expr) {
-        return new StringFormatProcessor(dst, expr);
+    public SpyProcessor formatter(Object dst, String expr) {
+        return new StringFormatProcessor(slot(dst), expr);
     }
 
 
@@ -349,8 +349,8 @@ public class SpyLib {
      *
      * @return augmented spy definition
      */
-    public SpyProcessor regexFilter(int src, String regex) {
-        return new RegexFilterProcessor(src, regex);
+    public SpyProcessor regexFilter(Object src, String regex) {
+        return new RegexFilterProcessor(slot(src), regex);
     }
 
 
@@ -363,8 +363,8 @@ public class SpyLib {
      *
      * @return augmented spy definition
      */
-    public SpyProcessor regexFilter(int src, String regex, boolean filterOut) {
-        return new RegexFilterProcessor(src, regex, filterOut);
+    public SpyProcessor regexFilter(Object src, String regex, boolean filterOut) {
+        return new RegexFilterProcessor(slot(src), regex, filterOut);
     }
 
 
@@ -399,8 +399,8 @@ public class SpyLib {
      *
      * @return
      */
-    public SpyProcessor regexTransformer(int src, int dst, String regex, String expr, boolean filterOut) {
-        return new RegexFilterProcessor(src, dst, regex, expr, filterOut);
+    public SpyProcessor regexTransformer(Object src, Object dst, String regex, String expr, boolean filterOut) {
+        return new RegexFilterProcessor(slot(src), slot(dst), regex, expr, filterOut);
     }
 
 
@@ -412,8 +412,8 @@ public class SpyLib {
      * @param normalizer
      * @return
      */
-    public SpyProcessor normalize(int src, int dst, Normalizer normalizer) {
-        return new NormalizingProcessor(src, dst, normalizer);
+    public SpyProcessor normalize(Object src, Object dst, Normalizer normalizer) {
+        return new NormalizingProcessor(slot(src), slot(dst), normalizer);
     }
 
 
@@ -429,8 +429,8 @@ public class SpyLib {
      *
      * @return augmented spy definition
      */
-    public SpyProcessor get(int src, int dst, Object...path) {
-        return new GetterProcessor(src, dst, path);
+    public SpyProcessor get(Object src, Object dst, Object...path) {
+        return new GetterProcessor(slot(src), slot(dst), path);
     }
 
 
@@ -440,8 +440,8 @@ public class SpyLib {
      * @param threadLocal
      * @return
      */
-    public SpyProcessor get(int slot, ThreadLocal<Object> threadLocal, Object...path) {
-        return new ThreadLocalProcessor(slot, ThreadLocalProcessor.GET, threadLocal, path);
+    public SpyProcessor get(Object slot, ThreadLocal<Object> threadLocal, Object...path) {
+        return new ThreadLocalProcessor(slot(slot), ThreadLocalProcessor.GET, threadLocal, path);
     }
 
 
@@ -451,8 +451,8 @@ public class SpyLib {
      * @param val
      * @return
      */
-    public SpyProcessor putConst(int slot, Object val) {
-        return new ConstPutProcessor(slot, val);
+    public SpyProcessor putConst(Object slot, Object val) {
+        return new ConstPutProcessor(slot(slot), val);
     }
 
 
@@ -462,8 +462,8 @@ public class SpyLib {
      * @param threadLocal
      * @return
      */
-    public SpyProcessor put(int slot, ThreadLocal<Object> threadLocal) {
-        return new ThreadLocalProcessor(slot, ThreadLocalProcessor.SET, threadLocal);
+    public SpyProcessor put(Object slot, ThreadLocal<Object> threadLocal) {
+        return new ThreadLocalProcessor(slot(slot), ThreadLocalProcessor.SET, threadLocal);
     }
 
 
@@ -473,7 +473,7 @@ public class SpyLib {
      * @return
      */
     public SpyProcessor remove(ThreadLocal<Object> threadLocal) {
-        return new ThreadLocalProcessor(0, ThreadLocalProcessor.REMOVE, threadLocal);
+        return new ThreadLocalProcessor(slot(0), ThreadLocalProcessor.REMOVE, threadLocal);
     }
 
 
@@ -488,8 +488,8 @@ public class SpyLib {
      *
      * @return augmented spy definition
      */
-    public SpyProcessor tdiff(int tstart, int tstop, int dst) {
-        return new TimeDiffProcessor(tstart, tstop, dst);
+    public SpyProcessor tdiff(Object tstart, Object tstop, Object dst) {
+        return new TimeDiffProcessor(slot(tstart), slot(tstop), slot(dst));
     }
 
 
@@ -507,8 +507,8 @@ public class SpyLib {
      *
      * @return augmented spy definition
      */
-    public SpyProcessor call(int src, int dst, String methodName, Object... methodArgs) {
-        return new MethodCallingProcessor(src, dst, methodName, methodArgs);
+    public SpyProcessor call(Object src, Object dst, String methodName, Object... methodArgs) {
+        return new MethodCallingProcessor(slot(src), slot(dst), methodName, methodArgs);
     }
 
 
@@ -523,8 +523,8 @@ public class SpyLib {
      *
      * @return
      */
-    public SpyProcessor ifSlotCmp(int a, int op, int b) {
-        return ComparatorProcessor.scmp(a, op, b);
+    public SpyProcessor ifSlotCmp(Object a, int op, Object b) {
+        return ComparatorProcessor.scmp(slot(a), op, slot(b));
     }
 
 
@@ -539,7 +539,36 @@ public class SpyLib {
      *
      * @return
      */
-    public SpyProcessor ifValueCmp(int a, int op, Object v) {
-        return ComparatorProcessor.vcmp(a, op, v);
+    public SpyProcessor ifValueCmp(Object a, int op, Object v) {
+        return ComparatorProcessor.vcmp(slot(a), op, v);
+    }
+
+
+    private static Map<Character,Integer> stages = ZorkaUtil.map(
+            'E', ON_ENTER, 'e', ON_ENTER,
+            'R', ON_RETURN, 'r', ON_RETURN,
+            'X', ON_ERROR, 'x', ON_ERROR,
+            'S', ON_SUBMIT, 's', ON_SUBMIT,
+            'C', ON_COLLECT, 's', ON_COLLECT
+    );
+
+
+    public static int[] slot(Object v) {
+        if (v instanceof Integer) {
+            return new int[] {-1, (Integer)v};
+        } else if (v instanceof String) {
+            String s = (String)v;
+            Integer stage = stages.get(s.charAt(0));
+            if (stage == null) {
+                throw new IllegalArgumentException("Invalid stage. Try using one of characters: EeRrXxSsCc");
+            }
+            return new int[] { stage, Integer.parseInt(s.substring(1))};
+        } else {
+            throw new IllegalArgumentException("Illegal slot argument: " + v);
+        }
+    } // slot()
+
+    public static int fs(int a, int b) {
+        return a != -1 ? a : b;
     }
 }
