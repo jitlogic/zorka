@@ -38,7 +38,7 @@ public class GenericNormalizer implements Normalizer {
     private static boolean[][] XQL_PROC = {
            // U  W  S  O  L  C  K  P
             { T, T, F, F, F, T, F, F }, // Tokens to be cut off;
-            { F, F, F, F, T, F, F, F }, // Tokens to be replaced by placeholders;
+            { F, F, F, F, T, F, F, T }, // Tokens to be replaced by placeholders;
             { F, F, T, F, F, F, T, F }, // Tokens to be converted to upper (lower) case;
             { F, F, F, F, F, F, F, F }, // Tokens to be trimmed;
     };
@@ -58,7 +58,7 @@ public class GenericNormalizer implements Normalizer {
     private static boolean[][] LDAP_PROC = {
            // U  W  S  O  L  C  K  P
             { T, T, F, F, F, T, F, F }, // Tokens to be cut off;
-            { F, F, F, F, T, F, F, F }, // Tokens to be replaced by placeholders;
+            { F, F, F, F, T, F, F, T }, // Tokens to be replaced by placeholders;
             { F, F, T, F, F, F, T, F }, // Tokens to be converted to upper (lower) case;
             { F, F, T, F, T, F, T, F }, // Tokens to be trimmed
     };

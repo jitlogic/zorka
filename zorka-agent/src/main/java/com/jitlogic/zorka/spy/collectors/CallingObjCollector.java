@@ -17,7 +17,7 @@
 
 package com.jitlogic.zorka.spy.collectors;
 
-import com.jitlogic.zorka.spy.SpyCollector;
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
@@ -25,7 +25,7 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class CallingObjCollector implements SpyCollector {
+public class CallingObjCollector implements SpyProcessor {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
@@ -38,7 +38,7 @@ public class CallingObjCollector implements SpyCollector {
     }
 
 
-    public void collect(SpyRecord record) {
+    public SpyRecord process(int stage, SpyRecord record) {
         if (nsObj != null) {
             // TODO better lookup here (for overloaded methods)
             Method method = null;
@@ -66,5 +66,7 @@ public class CallingObjCollector implements SpyCollector {
                 }
             }
         }
+
+        return record;
     }
 }

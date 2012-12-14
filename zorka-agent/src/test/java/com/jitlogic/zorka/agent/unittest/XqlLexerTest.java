@@ -31,12 +31,17 @@ import static org.junit.Assert.*;
 public class XqlLexerTest extends LexerFixture {
 
     public List<Token> lex(String input) {
+        return lex(DIALECT_SQL_99, input);
+    }
+
+    public List<Token> lex(int dialect, String input) {
         List<Token> tokens = new ArrayList<Token>();
-        for (Token token : new XqlLexer(DIALECT_SQL_99, input)) {
+        for (Token token : new XqlLexer(dialect, input)) {
             tokens.add(token);
         }
         return tokens;
     }
+
 
     @Test
     public void testLexBasicTokens() {
@@ -51,16 +56,17 @@ public class XqlLexerTest extends LexerFixture {
         assertEquals(lst(k("select")), lex("select"));
     }
 
+
     @Test
     public void testLexIntegerLiterals() {
         assertEquals(lst(l("1")), lex("1"));
         assertEquals(lst(l("-1")), lex("-1"));
     }
 
+
     @Test
     public void testLexStringLiterals() {
         assertEquals(lst(l("'abc'")), lex("'abc'"));
-        //assertEquals(lst(l("'a\\'b'")), lex("'a\\'b'")); this is NOT part of SQL-99 standard
         assertEquals(lst(l("'a''b'")), lex("'a''b'"));
     }
 
@@ -74,12 +80,39 @@ public class XqlLexerTest extends LexerFixture {
         assertEquals(lst(l("1.0E+3")), lex("1.0E+3"));
     }
 
+
     @Test
     public void testLexOperators() {
         assertEquals(lst(o("+")), lex("+"));
         assertEquals(lst(o("+"), o("+")), lex("++"));
         assertEquals(lst(s("a"), o("."), s("b")), lex("a.b"));
     }
+
+
+    @Test
+    public void testLexQuotedIdentifier() {
+        assertEquals(lst(s("\"select\"")), lex("\"select\""));
+        assertEquals(lst(w(" "), s("\"select\""), w(" ")), lex(" \"select\" "));
+    }
+
+    @Test
+    public void testLexQparam() {
+        assertEquals(lst(p("?")), lex("?"));
+        assertEquals(lst(k("where"), w(" "), p("?"), w(" "), o("="), w(" "), l("2")), lex("where ? = 2"));
+    }
+
+    @Test
+    public void testLexNParam() {
+        assertEquals(lst(p(":abc")), lex(":abc"));
+        assertEquals(lst(k("where"), w(" "), p(":12"), w(" "), o("="), w(" "), l("1")), lex("where :12 = 1"));
+    }
+
+    @Test
+    public void testLexMssqlQuotedIdentifier() {
+        assertEquals(lst(s("[select]")), lex(DIALECT_MSSQL, "[select]"));
+        assertEquals(lst(w(" "), s("[select]"), w(" ")), lex(DIALECT_MSSQL, " [select] "));
+    }
+
 
     @Test
     public void testLexSimpleStatememts() {

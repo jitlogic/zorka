@@ -25,20 +25,21 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import static com.jitlogic.zorka.spy.SpyLib.fs;
 
 public class MethodCallingProcessor implements SpyProcessor {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private int src, dst;
+    private int isrc, ssrc, idst, sdst;
     private String methodName;
     private Object[] args;
     private Class<?>[] argTypes;
 
 
-    public MethodCallingProcessor(int src, int dst, String methodName, Object... args) {
-        this.src = src;
-        this.dst = dst;
+    public MethodCallingProcessor(int[] src, int[] dst, String methodName, Object... args) {
+        this.isrc = src[1]; this.ssrc = src[0];
+        this.idst = dst[1]; this.sdst = dst[0];
         this.methodName = methodName;
         this.args = args;
 
@@ -51,7 +52,7 @@ public class MethodCallingProcessor implements SpyProcessor {
 
 
     public SpyRecord process(int stage, SpyRecord record) {
-        Object val = record.get(stage, src);
+        Object val = record.get(fs(ssrc, stage), isrc);
 
         if (val == null) {
             return record;
@@ -65,7 +66,7 @@ public class MethodCallingProcessor implements SpyProcessor {
 
         try {
             val = method.invoke(val, args);
-            record.put(stage, dst, val);
+            record.put(fs(sdst, stage), idst, val);
         } catch (Exception e) {
             log.error("Error processing record calling its method", e);
         }

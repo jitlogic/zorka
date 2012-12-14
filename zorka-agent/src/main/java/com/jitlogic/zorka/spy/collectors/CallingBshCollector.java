@@ -18,25 +18,28 @@ package com.jitlogic.zorka.spy.collectors;
 
 import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.spy.SpyCollector;
+import com.jitlogic.zorka.spy.SpyLib;
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 
-public class CallingBshCollector implements SpyCollector {
+public class CallingBshCollector implements SpyProcessor {
 
-    private SpyCollector collector = null;
+    private SpyProcessor collector = null;
     private String ns;
 
     public CallingBshCollector(String ns) {
         this.ns = ns;
     }
 
-    public void collect(SpyRecord record) {
+    public SpyRecord process(int stage, SpyRecord record) {
         if (collector == null) {
             ZorkaBshAgent agent = AgentInstance.instance().getZorkaAgent();
-            collector = (SpyCollector)agent.eval(
-                    "(com.jitlogic.zorka.spy.SpyCollector)"+ns);
+            collector = (SpyProcessor)agent.eval(
+                    "(com.jitlogic.zorka.spy.SpyProcessor)"+ns);
         }
 
-        collector.collect(record);
+        collector.process(SpyLib.ON_COLLECT, record);
+
+        return record;
     }
 }

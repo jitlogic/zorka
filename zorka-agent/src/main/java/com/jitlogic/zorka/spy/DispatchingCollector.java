@@ -26,7 +26,7 @@ import static com.jitlogic.zorka.spy.SpyConst.*;
 
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
-public class DispatchingCollector implements SpyCollector {
+public class DispatchingCollector implements SpyProcessor {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
@@ -40,7 +40,7 @@ public class DispatchingCollector implements SpyCollector {
         this.sdef = sdef;
     }
 
-    public synchronized  void collect(SpyRecord record) {
+    public synchronized SpyRecord process(int stage, SpyRecord record) {
 
         if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
             log.debug("Dispatching collector record: " + record);
@@ -51,16 +51,10 @@ public class DispatchingCollector implements SpyCollector {
         SpyDefinition sd = sdef != null ? sdef : ctx.getSpyDefinition();
 
         if (null == (record = process(sd, record))) {
-            return;
+            return null;
         }
 
-        for (SpyCollector collector : sd.getCollectors()) {
-            try {
-                collector.collect(record);
-            } catch (Throwable e) {
-                log.error("Error collecting record " + record, e);
-            }
-        }
+        return record;
     }
 
     private SpyRecord process(SpyDefinition sdef, SpyRecord record) {

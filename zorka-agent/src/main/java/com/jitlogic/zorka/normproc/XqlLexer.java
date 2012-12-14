@@ -15,6 +15,8 @@
  */
 package com.jitlogic.zorka.normproc;
 
+import com.jitlogic.zorka.util.ZorkaUtil;
+
 import java.util.*;
 
 import static com.jitlogic.zorka.normproc.NormLib.*;
@@ -32,43 +34,44 @@ public class XqlLexer extends Lexer {
 
     // Character table definitions
 
-    public final static int CH_UNKNOWN    = 0;
-    public final static int CH_WHITESPACE = 1;
-    public final static int CH_SYMSTART   = 2;
-    public final static int CH_DIGIT      = 3;
-    public final static int CH_OPERATOR   = 4;
-    public final static int CH_MINUS      = 5;
-    public final static int CH_DOT        = 6;
-    public final static int CH_STRDELIM   = 7;
-    public final static int CH_STRQUOTE   = 8;
-    public final static int CH_PLUS       = 9;
-    public final static int CH_CHAR_E     = 10;
+    public final static byte CH_UNKNOWN    = 0;
+    public final static byte CH_WHITESPACE = 1;
+    public final static byte CH_SYMSTART   = 2;
+    public final static byte CH_DIGIT      = 3;
+    public final static byte CH_OPERATOR   = 4;
+    public final static byte CH_MINUS      = 5;
+    public final static byte CH_DOT        = 6;
+    public final static byte CH_STRDELIM   = 7;
+    public final static byte CH_STRQUOTE   = 8;
+    public final static byte CH_PLUS       = 9;
+    public final static byte CH_CHAR_E     = 10;
+    public final static byte CH_IDQUOTE    = 11;
+    public final static byte CH_QMARK      = 12;
+    public final static byte CH_COLON      = 13;
 
-    private final static int S_WHITESPACE = 1;
-    private final static int S_SYMBOL     = 2;
-    private final static int S_OPERATOR   = 3;
-    private final static int S_INTEGER    = 4;
-    private final static int S_FLOAT      = 5;
-    private final static int S_STRING     = 6;
-    private final static int S_SQUOTE     = 7;  // Possible end of string
-    private final static int S_FLOAT_E    = 8;  // Floating point literal in expotential notation
-    private final static int S_KEYWORD    = 9;
+    private final static int S_WHITESPACE = 1;  // white space
+    private final static int S_SYMBOL     = 2;  // identifiers
+    private final static int S_OPERATOR   = 3;  // operators
+    private final static int S_INTEGER    = 4;  // integer literal
+    private final static int S_FLOAT      = 5;  // floating point number literal
+    private final static int S_STRING     = 6;  // string
+    private final static int S_SQUOTE     = 7;  // possible end of string or quoted character
+    private final static int S_FLOAT_E    = 8;  // floating point literal in expotential notation
+    private final static int S_QPARAM     = 9;  // unnamed query parameter (starting with '?')
+    private final static int S_NPARAM     = 10; // named query parameter (starting with ':')
+    private final static int S_KEYWORD    = 11; // keywords
 
 
-    private static byte[] initChTab(String operators) {
+    private static byte[] initChTab(String operators, Map<Character, Byte> chmap) {
         byte[] tab = new byte[128];
 
         for (int i = 0; i < 128; i++) {
-            if (Character.isWhitespace(i)) tab[i]               = CH_WHITESPACE;
-            else if ((char)i == 'E') tab[i]                     = CH_CHAR_E;
+            char ch = (char)i;
+            if (chmap.containsKey(ch)) tab[i] = chmap.get(ch);
+            else if (Character.isWhitespace(i)) tab[i]               = CH_WHITESPACE;
             else if (Character.isJavaIdentifierStart(i)) tab[i] = CH_SYMSTART;
             else if (Character.isDigit(i)) tab[i]               = CH_DIGIT;
             else if (operators.contains(""+((char)i))) tab[i]   = CH_OPERATOR;
-            else if ((char)i == '-') tab[i]                     = CH_MINUS;
-            else if ((char)i == '.') tab[i]                     = CH_DOT;
-            else if ((char)i == '\'') tab[i]                    = CH_STRDELIM;
-            else if ((char)i == '\\') tab[i]                    = CH_STRQUOTE;
-            else if ((char)i == '+') tab[i]                     = CH_PLUS;
             else tab[i] = CH_UNKNOWN;
         }
 
@@ -85,22 +88,79 @@ public class XqlLexer extends Lexer {
             T_LITERAL,      // S_STRING
             T_LITERAL,      // S_SQUOTE
             T_LITERAL,      // S_FLOAT_E
+            T_PLACEHOLDER,  // S_QPARAM
+            T_PLACEHOLDER,  // S_LPARAM
             T_KEYWORD,      // S_KEYWORD
     };
 
-    private final static byte[] CHT_SQL = initChTab("!%&()*,/:;<=>?@[]^");
+    private static Map<Character,Byte> CHM_SQL = ZorkaUtil.map(
+            'E', CH_CHAR_E, '-', CH_MINUS, '.', CH_DOT, '\'', CH_STRDELIM,
+            '\\', CH_STRQUOTE, '+', CH_PLUS, '"', CH_IDQUOTE, '?', CH_QMARK,
+            ':', CH_COLON
+    );
+
+    private final static byte[] CHT_SQL = initChTab("!%&()*,/;<=>@[]^", CHM_SQL);
 
     private final static byte[][] LEX_SQL = { // DIALECT_SQL99
-                   //         UN WS SY DI OP -  .  '  \  +  E
-            lxtab(CHT_SQL, E, 1, 2, 4, 3, 3, 3, 6, E, 3, 2), // 0 = S_START
-            lxtab(CHT_SQL, E, 1, E, E, E, E, E, E, E, E, E), // 1 = S_WHITESPACE
-            lxtab(CHT_SQL, E, E, 2, 2, E, E, E, E, E, E, 2), // 2 = S_SYMBOL
-            lxtab(CHT_SQL, E, E, E, 4, E, E, 3, E, E, E, E), // 3 = S_OPERATOR
-            lxtab(CHT_SQL, E, E, E, 4, E, E, 5, E, E, E, E), // 4 = S_INTEGER
-            lxtab(CHT_SQL, E, E, E, 5, E, E, E, E, E, E, 8), // 5 = S_FLOAT
-            lxtab(CHT_SQL, 6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6), // 6 = S_STRING
-            lxtab(CHT_SQL, E, E, E, E, E, E, E, 6, E, E, E), // 7 = S_SQUOTE
-            lxtab(CHT_SQL, E, E, E, 8, E, E, E, E, E, 8, E), // 8 = S_FLOAT_E
+                   //      UN WS SY DI OP -  .  '  \  +  E  "  ?  :
+            lxtab(CHT_SQL, E, 1, 2, 4, 3, 3, 3, 6, E, 3, 2, 2, 9,10), // 0 = S_START
+            lxtab(CHT_SQL, E, 1, E, E, E, E, E, E, E, E, E, E, E, E), // 1 = S_WHITESPACE
+            lxtab(CHT_SQL, E, E, 2, 2, E, E, E, E, E, E, 2, 2, E, E), // 2 = S_SYMBOL
+            lxtab(CHT_SQL, E, E, E, 4, E, E, 3, E, E, E, E, E, E, E), // 3 = S_OPERATOR
+            lxtab(CHT_SQL, E, E, E, 4, E, E, 5, E, E, E, E, E, E, E), // 4 = S_INTEGER
+            lxtab(CHT_SQL, E, E, E, 5, E, E, E, E, E, E, 8, E, E, E), // 5 = S_FLOAT
+            lxtab(CHT_SQL, 6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6, 6), // 6 = S_STRING
+            lxtab(CHT_SQL, E, E, E, E, E, E, E, 6, E, E, E, E, E, E), // 7 = S_SQUOTE
+            lxtab(CHT_SQL, E, E, E, 8, E, E, E, E, E, 8, E, 2, E, E), // 8 = S_FLOAT_E
+            lxtab(CHT_SQL, E, E, E, E, E, E, E, E, E, E, E, E, E, E), // 9 = S_QPARAM
+            lxtab(CHT_SQL, E, E,10,10, E, E, E, E, E, E, E, E, E, E), // 10 = S_NPARAM
+    };
+
+    private static Map<Character,Byte> CHM_MYSQL = ZorkaUtil.map(
+            'E', CH_CHAR_E, '-', CH_MINUS, '.', CH_DOT, '\'', CH_STRDELIM,
+            '\\', CH_STRQUOTE, '+', CH_PLUS, '`', CH_IDQUOTE, '?', CH_QMARK,
+            ':', CH_COLON
+    );
+
+    private final static byte[] CHT_MYSQL = initChTab("!%&()*,/;<=>@[]^", CHM_MYSQL);
+
+    private final static byte[][] LEX_MYSQL = { // DIALECT_SQL99
+                     //     UN WS SY DI OP -   .  '  \  +  E  "  ?  :
+            lxtab(CHT_MYSQL, E, 1, 2, 4, 3, 3, 3, 6, E, 3, 2, 2, 9,10), // 0 = S_START
+            lxtab(CHT_MYSQL, E, 1, E, E, E, E, E, E, E, E, E, E, E, E), // 1 = S_WHITESPACE
+            lxtab(CHT_MYSQL, E, E, 2, 2, E, E, E, E, E, E, 2, 2, E, E), // 2 = S_SYMBOL
+            lxtab(CHT_MYSQL, E, E, E, 4, E, E, 3, E, E, E, E, E, E, E), // 3 = S_OPERATOR
+            lxtab(CHT_MYSQL, E, E, E, 4, E, E, 5, E, E, E, E, E, E, E), // 4 = S_INTEGER
+            lxtab(CHT_MYSQL, E, E, E, 5, E, E, E, E, E, E, 8, E, E, E), // 5 = S_FLOAT
+            lxtab(CHT_MYSQL, 6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6, 6), // 6 = S_STRING
+            lxtab(CHT_MYSQL, E, E, E, E, E, E, E, 6, E, E, E, E, E, E), // 7 = S_SQUOTE
+            lxtab(CHT_MYSQL, E, E, E, 8, E, E, E, E, E, 8, E, 2, E, E), // 8 = S_FLOAT_E
+            lxtab(CHT_MYSQL, E, E, E, E, E, E, E, E, E, E, E, E, E, E), // 9 = S_QPARAM
+            lxtab(CHT_MYSQL, E, E,10,10, E, E, E, E, E, E, E, E, E, E), // 10 = S_NPARAM
+    };
+
+    private static Map<Character,Byte> CHM_MSSQL = ZorkaUtil.map(
+            'E', CH_CHAR_E, '-', CH_MINUS, '.', CH_DOT, '?', CH_QMARK,
+            '\'', CH_STRDELIM, '\\', CH_STRQUOTE, '+', CH_PLUS,
+            '`', CH_IDQUOTE, '[', CH_IDQUOTE, ']', CH_IDQUOTE,
+            '?', CH_QMARK, ':', CH_COLON
+    );
+
+    private final static byte[] CHT_MSSQL = initChTab("!%&()*,/;<=>@^", CHM_MSSQL);
+
+    private final static byte[][] LEX_MSSQL = { // DIALECT_SQL99
+                     //     UN WS SY DI OP  -  .  '  \  +  E  "  ?  :
+            lxtab(CHT_MSSQL, E, 1, 2, 4, 3, 3, 3, 6, E, 3, 2, 2, 9,10), // 0 = S_START
+            lxtab(CHT_MSSQL, E, 1, E, E, E, E, E, E, E, E, E, E, E, E), // 1 = S_WHITESPACE
+            lxtab(CHT_MSSQL, E, E, 2, 2, E, E, E, E, E, E, 2, 2, E, E), // 2 = S_SYMBOL
+            lxtab(CHT_MSSQL, E, E, E, 4, E, E, 3, E, E, E, E, E, E, E), // 3 = S_OPERATOR
+            lxtab(CHT_MSSQL, E, E, E, 4, E, E, 5, E, E, E, E, E, E, E), // 4 = S_INTEGER
+            lxtab(CHT_MSSQL, E, E, E, 5, E, E, E, E, E, E, 8, E, E, E), // 5 = S_FLOAT
+            lxtab(CHT_MSSQL, 6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6, 6), // 6 = S_STRING
+            lxtab(CHT_MSSQL, E, E, E, E, E, E, E, 6, E, E, E, E, E, E), // 7 = S_SQUOTE
+            lxtab(CHT_MSSQL, E, E, E, 8, E, E, E, E, E, 8, E, 2, E, E), // 8 = S_FLOAT_E
+            lxtab(CHT_MSSQL, E, E, E, E, E, E, E, E, E, E, E, E, E, E), // 9 = S_QPARAM
+            lxtab(CHT_MSSQL, E, E,10,10, E, E, E, E, E, E, E, E, E, E), // 10 = S_NPARAM
     };
 
     // Keyword sets
@@ -363,14 +423,16 @@ public class XqlLexer extends Lexer {
 
 
     private final static byte[][][] lextabs = {
-            LEX_SQL,
-            LEX_SQL,
-            LEX_SQL,
-            LEX_SQL,
-            LEX_SQL,
-            LEX_SQL,
-            LEX_SQL,
-            LEX_SQL,
+            LEX_SQL,     // SQL92
+            LEX_SQL,     // SQL99
+            LEX_SQL,     // SQL2003
+            LEX_MSSQL,   // MSSQL
+            LEX_SQL,     // PGSQL
+            LEX_MYSQL,   // MYSQL
+            LEX_SQL,     // DB2
+            LEX_SQL,     // ORACLE
+            LEX_SQL,     // HQL
+            LEX_SQL      // JPA
     };
 
 

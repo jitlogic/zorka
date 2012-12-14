@@ -17,12 +17,22 @@
 
 package com.jitlogic.zorka.spy;
 
+import bsh.This;
+import com.jitlogic.zorka.agent.FileTrapper;
+import com.jitlogic.zorka.integ.snmp.SnmpLib;
+import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
+import com.jitlogic.zorka.integ.snmp.TrapVarBindDef;
+import com.jitlogic.zorka.integ.syslog.SyslogTrapper;
+import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
+import com.jitlogic.zorka.normproc.Normalizer;
+import com.jitlogic.zorka.spy.collectors.*;
+import com.jitlogic.zorka.spy.processors.*;
 import com.jitlogic.zorka.util.ObjectInspector;
+import com.jitlogic.zorka.util.ZorkaLogLevel;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.*;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * This is API for zorka users.
@@ -90,7 +100,7 @@ public class SpyLib {
 
 
     public SpyDefinition instrument() {
-        return SpyDefinition.instrument().onSubmit().timeDiff(0,1,1).onEnter();
+        return SpyDefinition.instrument().onSubmit(tdiff(0, 1, 1)).onEnter();
     }
 
 
@@ -132,10 +142,433 @@ public class SpyLib {
         int tidx = argList.size();
 
         return SpyDefinition.instance()
-                .onEnter().withArguments(argList.toArray()).withTime()
-                .onReturn().withTime().onError().withTime()
-                .onSubmit().timeDiff(tidx, tidx+1, tidx+1)
-                .toStats(mbsName, mbeanName, attrName, sb.toString(), tidx, tidx+1);
+                .onEnter(argList.toArray(), FETCH_TIME)
+                .onReturn(FETCH_TIME).onError(FETCH_TIME)
+                .onSubmit(tdiff(tidx, tidx + 1, tidx + 1))
+                .onCollect(zorkaStats(mbsName, mbeanName, attrName, sb.toString(), tidx, tidx + 1));
     }
 
+
+    public SpyMatcher byMethod(String classPattern, String methodPattern) {
+        return new SpyMatcher(1, classPattern, methodPattern, null);
+    }
+
+
+    public SpyMatcher byMethod(int access, String classPattern, String methodPattern, String retType, String... argTypes) {
+        return new SpyMatcher(access, classPattern,  methodPattern, retType, argTypes);
+    }
+
+
+    /**
+     * Instructs spy to submit data to traditional Zorka Statistics object. Statistics
+     * will be organized by keyExpr having all its macros properly expanded.
+     *
+     * @param mbsName mbean server name
+     *
+     * @param beanName bean name
+     *
+     * @param attrName attribute name
+     *
+     * @param keyExpr key expression
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr,
+                                   Object tstampField, Object timeField) {
+        return new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, slot(tstampField), slot(timeField));
+    }
+
+
+
+    /**
+     * Instructs spy to submit data to a single object of ZorkaStat object.
+     *
+     * @param mbsName mbean server name
+     *
+     * @param beanName mbean name
+     *
+     * @param attrName attribute name
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor zorkaStat(String mbsName, String beanName, String attrName, Object tstampField, Object timeField) {
+        return new JmxAttrCollector(mbsName, beanName, attrName, slot(tstampField), slot(timeField));
+    }
+
+
+    /**
+     * Instructs spy to submit data to a single BSH function.
+     *
+     * @param ns BSH namespace
+     *
+     * @param func function name
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor callingCollector(This ns, String func) {
+        return new CallingObjCollector(ns, func);
+    }
+
+
+    /**
+     * Instructs spy to submit data to a collect() function in a BSH namespace..
+     *
+     * @param ns BSH namespace
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor bshCollector(String ns) {
+        return new CallingBshCollector(ns);
+    }
+
+    /**
+     * Instruct spy to submit data to log file.
+     *
+     * @param trapper
+     *
+     * @param logLevel
+     *
+     * @param expr
+     *
+     * @return
+     */
+    public SpyProcessor fileCollector(FileTrapper trapper, String expr, ZorkaLogLevel logLevel) {
+        return new FileCollector(trapper, expr, logLevel, "");
+    }
+
+
+    /**
+     * Instructs spy to present attribute as an getter object.
+     *
+     * @param mbsName mbean server name
+     *
+     * @param beanName mbean name
+     *
+     * @param attrName attribute name
+     *
+     * @param path which stat attr to present
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor getterCollector(String mbsName, String beanName, String attrName, String desc, int[] src, Object...path) {
+        return new GetterPresentingCollector(mbsName, beanName, attrName, desc, slot(src), path);
+    }
+
+
+    /**
+     * Sends collected records to another SpyDefinition chain. Records will be processed by all
+     * processors from ON_COLLECT chain and sent to collectors attached to it.
+     *
+     * @param sdef
+     *
+     * @return
+     */
+    public SpyProcessor sdefCollector(SpyDefinition sdef) {
+        return new DispatchingCollector(sdef);
+    }
+
+
+    /**
+     * Sends collected records as SNMP traps.
+     *
+     * @param trapper snmp trapper used to send traps;
+     *
+     * @param oid base OID - used as both enterprise OID in produced traps and prefix for variable OIDs;
+     *
+     * @param spcode - specific trap code; generic trap type is always enterpriseSpecific (6);
+     *
+     * @param bindings bindings defining additional variables attached to this trap;
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor snmpCollector(SnmpTrapper trapper, String oid, int spcode, TrapVarBindDef...bindings) {
+        return new SnmpCollector(trapper, oid, SnmpLib.GT_SPECIFIC, spcode, oid, bindings);
+    }
+
+
+    /**
+     * Instruct spy to send collected record to syslog.
+     *
+     * @param trapper logger (object returned by syslog.get())
+     *
+     * @param expr message template
+     *
+     * @param severity
+     *
+     * @param facility
+     *
+     * @param hostname
+     *
+     * @param tag
+     *
+     * @return
+     */
+    public SpyProcessor syslogCollector(SyslogTrapper trapper, String expr, int severity, int facility, String hostname, String tag) {
+        return new SyslogCollector(trapper, expr, severity, facility, hostname, tag);
+    }
+
+
+    /**
+     * Sends collected records to zabbix using zabbix trapper.
+     *
+     * @param trapper
+     *
+     * @param expr
+     *
+     * @param key
+     *
+     * @return
+     */
+    public SpyProcessor zabbixCollector(ZabbixTrapper trapper, String expr, String key) {
+        return new ZabbixCollector(trapper, expr, null, key);
+    }
+
+
+    /**
+     * Formats arguments and passes an array of formatted strings.
+     * Format expression is generally a string with special marker for
+     * extracting previous arguments '${n.field1.field2...}' where n is argument
+     * number, field1,field2,... are (optional) fields used exactly as in
+     * zorkalib.get() function.
+     *
+     * @param expr format expressions.
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor formatter(Object dst, String expr) {
+        return new StringFormatProcessor(slot(dst), expr);
+    }
+
+
+    /**
+     * Add an regex filtering transformer to process chain.
+     *
+     * @param src argument number
+     *
+     * @param regex regular expression
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor regexFilter(Object src, String regex) {
+        return new RegexFilterProcessor(slot(src), regex);
+    }
+
+
+    /**
+     * Add an regex filtering transformer to process chain.
+     *
+     * @param src argument number
+     *
+     * @param regex regular expression
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor regexFilter(Object src, String regex, boolean filterOut) {
+        return new RegexFilterProcessor(slot(src), regex, filterOut);
+    }
+
+
+    /**
+     * Transforms data using regular expression and substitution.
+     *
+     * @param src
+     *
+     * @param dst
+     *
+     * @param regex
+     *
+     * @param expr
+     *
+     * @return
+     */
+    public SpyProcessor regexTransformer(int src, int dst, String regex, String expr) {
+        return regexTransformer(src, dst, regex, expr,  false);
+    }
+
+
+    /**
+     * Transforms data using regular expression and substitution.
+     *
+     * @param src
+     *
+     * @param dst
+     *
+     * @param regex
+     *
+     * @param expr
+     *
+     * @return
+     */
+    public SpyProcessor regexTransformer(Object src, Object dst, String regex, String expr, boolean filterOut) {
+        return new RegexFilterProcessor(slot(src), slot(dst), regex, expr, filterOut);
+    }
+
+
+    /**
+     * Normalizes a query string from src and puts result into dst.
+     *
+     * @param src
+     * @param dst
+     * @param normalizer
+     * @return
+     */
+    public SpyProcessor normalize(Object src, Object dst, Normalizer normalizer) {
+        return new NormalizingProcessor(slot(src), slot(dst), normalizer);
+    }
+
+
+    /**
+     * Gets slot number n, performs traditional get operation and stores
+     * results in the same slot.
+     *
+     * @param src
+     *
+     * @param dst
+     *
+     * @param path
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor get(Object src, Object dst, Object...path) {
+        return new GetterProcessor(slot(src), slot(dst), path);
+    }
+
+
+    /**
+     *
+     * @param slot
+     * @param threadLocal
+     * @return
+     */
+    public SpyProcessor get(Object slot, ThreadLocal<Object> threadLocal, Object...path) {
+        return new ThreadLocalProcessor(slot(slot), ThreadLocalProcessor.GET, threadLocal, path);
+    }
+
+
+    /**
+     *
+     * @param slot
+     * @param val
+     * @return
+     */
+    public SpyProcessor putConst(Object slot, Object val) {
+        return new ConstPutProcessor(slot(slot), val);
+    }
+
+
+    /**
+     *
+     * @param slot
+     * @param threadLocal
+     * @return
+     */
+    public SpyProcessor put(Object slot, ThreadLocal<Object> threadLocal) {
+        return new ThreadLocalProcessor(slot(slot), ThreadLocalProcessor.SET, threadLocal);
+    }
+
+
+    /**
+     *
+     * @param threadLocal
+     * @return
+     */
+    public SpyProcessor remove(ThreadLocal<Object> threadLocal) {
+        return new ThreadLocalProcessor(slot(0), ThreadLocalProcessor.REMOVE, threadLocal);
+    }
+
+
+    /**
+     * Calculates time difference between in1 and in2 and stores result in out.
+     *
+     * @param tstart slot with tstart
+     *
+     * @param tstop slot with tstop
+     *
+     * @param dst destination slot
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor tdiff(Object tstart, Object tstop, Object dst) {
+        return new TimeDiffProcessor(slot(tstart), slot(tstop), slot(dst));
+    }
+
+
+    /**
+     * Gets object from slot number arg, calls given method on this slot and
+     * if method returns some value, stores its result in this slot.
+     *
+     * @param src
+     *
+     * @param dst
+     *
+     * @param methodName
+     *
+     * @param methodArgs
+     *
+     * @return augmented spy definition
+     */
+    public SpyProcessor call(Object src, Object dst, String methodName, Object... methodArgs) {
+        return new MethodCallingProcessor(slot(src), slot(dst), methodName, methodArgs);
+    }
+
+
+    /**
+     * Passes only records where (a op b) is true.
+     *
+     * @param a
+     *
+     * @param op
+     *
+     * @param b
+     *
+     * @return
+     */
+    public SpyProcessor ifSlotCmp(Object a, int op, Object b) {
+        return ComparatorProcessor.scmp(slot(a), op, slot(b));
+    }
+
+
+    /**
+     * Passes only records where (a op v) is true.
+     *
+     * @param a
+     *
+     * @param op
+     *
+     * @param v
+     *
+     * @return
+     */
+    public SpyProcessor ifValueCmp(Object a, int op, Object v) {
+        return ComparatorProcessor.vcmp(slot(a), op, v);
+    }
+
+
+    private static Map<Character,Integer> stages = ZorkaUtil.map(
+            'E', ON_ENTER, 'e', ON_ENTER,
+            'R', ON_RETURN, 'r', ON_RETURN,
+            'X', ON_ERROR, 'x', ON_ERROR,
+            'S', ON_SUBMIT, 's', ON_SUBMIT,
+            'C', ON_COLLECT, 's', ON_COLLECT
+    );
+
+
+    public static int[] slot(Object v) {
+        if (v instanceof Integer) {
+            return new int[] {-1, (Integer)v};
+        } else if (v instanceof String) {
+            String s = (String)v;
+            Integer stage = stages.get(s.charAt(0));
+            if (stage == null) {
+                throw new IllegalArgumentException("Invalid stage. Try using one of characters: EeRrXxSsCc");
+            }
+            return new int[] { stage, Integer.parseInt(s.substring(1))};
+        } else {
+            throw new IllegalArgumentException("Illegal slot argument: " + v);
+        }
+    } // slot()
+
+    public static int fs(int a, int b) {
+        return a != -1 ? a : b;
+    }
 }

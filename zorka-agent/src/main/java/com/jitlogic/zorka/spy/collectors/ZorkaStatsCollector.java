@@ -21,9 +21,9 @@ import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.mbeans.MethodCallStatistic;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
-import com.jitlogic.zorka.spy.SpyCollector;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyInstance;
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
@@ -36,30 +36,30 @@ import java.util.Map;
 import static com.jitlogic.zorka.spy.SpyConst.*;
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
-public class ZorkaStatsCollector implements SpyCollector {
+public class ZorkaStatsCollector implements SpyProcessor {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
     private String mbsName, mbeanTemplate, attrTemplate, keyTemplate;
-    private int timeField, tstampField;
+    private int stime, itime, sstamp, istamp;
 
     private Map<SpyContext,MethodCallStatistics> statsCache = new HashMap<SpyContext, MethodCallStatistics>();
 
     private ObjectInspector inspector = new ObjectInspector();
 
     public ZorkaStatsCollector(String mbsName, String mbeanTemplate, String attrTemplate,
-                               String keyTemplate, int tstampField, int timeField) {
+                               String keyTemplate, int[] tstampField, int[] timeField) {
         this.mbsName  = mbsName;
         this.mbeanTemplate = mbeanTemplate;
         this.attrTemplate = attrTemplate;
         this.keyTemplate = keyTemplate;
-        this.tstampField = tstampField;
-        this.timeField = timeField;
+        this.stime = timeField[0]; this.itime = timeField[1];
+        this.sstamp = tstampField[0]; this.istamp = tstampField[1];
     }
 
 
-    public void collect(SpyRecord record) {
+    public SpyRecord process(int stage, SpyRecord record) {
 
         if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
             log.debug("Collecting record: [" + ZorkaUtil.join(",", record.getVals(ON_COLLECT)) + "]");
@@ -69,16 +69,16 @@ public class ZorkaStatsCollector implements SpyCollector {
         MethodCallStatistics stats = statsCache.get(record.getContext());
 
         if (stats == null) {
-            stats = registry.getOrRegister(mbsName, subst(mbeanTemplate, ctx), subst(attrTemplate, ctx),
+            stats = registry.getOrRegister(mbsName, ctx.subst(mbeanTemplate), ctx.subst(attrTemplate),
                     new MethodCallStatistics(), "Method call statistics");
         }
 
-        String key = inspector.substitute(subst(keyTemplate, ctx), record.getVals(ON_COLLECT));
+        String key = inspector.substitute(ctx.subst(keyTemplate), record.getVals(stage));
 
         MethodCallStatistic statistic = (MethodCallStatistic)stats.getMethodCallStatistic(key);
 
-        Object timeObj = timeField >= 0 ? record.get(ON_COLLECT, timeField) : 0L;
-        Object tstampObj = tstampField >= 0 ? record.get(ON_COLLECT, tstampField) : 0L;
+        Object timeObj = itime >= 0 ? record.get(fs(stime, stage), itime) : 0L;
+        Object tstampObj = istamp >= 0 ? record.get(fs(sstamp, stage), istamp) : 0L;
 
         if (timeObj instanceof Long && tstampObj instanceof Long) {
             if (record.gotStage(ON_RETURN)) {
@@ -101,14 +101,8 @@ public class ZorkaStatsCollector implements SpyCollector {
                 log.debug("Unknown type of time or tstamp object: " + timeObj);
             }
         }
-    }
 
-
-    private String subst(String template, SpyContext ctx) {
-        return template
-                .replace("${className}", ctx.getClassName())
-                .replace("${methodName}", ctx.getMethodName())
-                .replace("${shortClassName}", ctx.getShortClassName());
+        return record;
     }
 
 
@@ -126,15 +120,6 @@ public class ZorkaStatsCollector implements SpyCollector {
         return attrTemplate;
     }
 
-
-    public int getTimeField() {
-        return timeField;
-    }
-
-
-    public int getTstampField() {
-        return tstampField;
-    }
 
 
     public String getKeyTemplate() {

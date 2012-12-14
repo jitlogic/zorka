@@ -17,18 +17,19 @@
 
 package com.jitlogic.zorka.agent.testspy.support;
 
+import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
-import com.jitlogic.zorka.spy.SpyCollector;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestCollector implements SpyCollector {
+public class TestCollector implements SpyProcessor {
 
     private List<SpyRecord> records = new ArrayList<SpyRecord>();
 
-    public void collect(SpyRecord record) {
+    public SpyRecord process(int stage, SpyRecord record) {
         records.add(record);
+        return record;
     }
 
     public int size() {

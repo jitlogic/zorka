@@ -80,7 +80,7 @@ public class SpyInstance {
 
     private SpyClassTransformer classTransformer;
     private SpySubmitter   submitter;
-    private SpyCollector   collector;
+    private SpyProcessor   collector;
 
 
     public SpyInstance(Properties props) {
