@@ -56,7 +56,6 @@ public class DispatchingSubmitter implements SpySubmitter {
 
         if (SpyInstance.isDebugEnabled(SPD_SUBMISSIONS)) {
             log.debug("Submitted: stage=" + stage + ", id=" + id + ", flags=" + submitFlags);
-            // TODO ewentualnie wyświetlić zasubmitowane wartości tutaj.
         }
 
         SpyContext ctx = engine.getContext(id);
@@ -78,13 +77,11 @@ public class DispatchingSubmitter implements SpySubmitter {
             return;
         }
 
-        record.beforeSubmit();
-
         if (null == (record = process(ON_SUBMIT, sdef, record))) {
             return;
         }
 
-        record.beforeCollect();
+        record.cleanup();
 
         collector.process(SpyLib.ON_COLLECT, record);
     }

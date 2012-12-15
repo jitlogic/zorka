@@ -49,25 +49,7 @@ public class SpyRecord {
     }
 
 
-    public void beforeSubmit() {
-
-        Object[] v = new Object[vals[ON_ENTER].length+vals[ON_RETURN].length+vals[ON_ERROR].length];
-
-        int offset = 0;
-
-        for (int stage = ON_ENTER; stage <= ON_ERROR; stage++) {
-            Object[] src = vals[stage];
-            for (int i = 0; i < src.length; i++) {
-                v[i+offset] = src[i];
-            }
-            offset += src.length;
-        }
-
-        vals[ON_SUBMIT] = v;
-    }
-
-    public void beforeCollect() {
-        vals[ON_COLLECT] = vals[ON_SUBMIT];
+    public void cleanup() {
         vals[ON_ENTER] = NO_VALS;
         vals[ON_RETURN] = NO_VALS;
         vals[ON_ERROR] = NO_VALS;

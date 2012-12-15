@@ -84,7 +84,7 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
         submitter.submit(ON_ENTER, ctx.getId(), SF_IMMEDIATE, new Object[] { 1L });
 
         assertEquals(1, collector.size());
-        assertEquals(1, collector.get(0).size(ON_COLLECT));
+        assertEquals(0, collector.get(0).size(ON_COLLECT));
     }
 
 
@@ -102,10 +102,7 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
 
         assertEquals(0, sr.size(ON_ENTER));
         assertEquals(0, sr.size(ON_RETURN));
-        assertEquals(2, sr.size(ON_COLLECT));
-
-        assertEquals(1L, sr.get(ON_COLLECT, 0));
-        assertEquals(2L, sr.get(ON_COLLECT, 1));
+        assertEquals(0, sr.size(ON_COLLECT));
     }
 
 
