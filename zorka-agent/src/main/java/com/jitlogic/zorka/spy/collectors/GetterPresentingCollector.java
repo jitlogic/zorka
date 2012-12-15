@@ -26,7 +26,6 @@ import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
-import static com.jitlogic.zorka.spy.SpyLib.ON_COLLECT;
 import static com.jitlogic.zorka.spy.SpyLib.fs;
 
 /**

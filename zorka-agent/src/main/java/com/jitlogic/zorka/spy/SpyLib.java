@@ -544,7 +544,7 @@ public class SpyLib {
     }
 
 
-    private static Map<Character,Integer> stages = ZorkaUtil.map(
+    public static Map<Character,Integer> stages = ZorkaUtil.constMap(
             'E', ON_ENTER, 'e', ON_ENTER,
             'R', ON_RETURN, 'r', ON_RETURN,
             'X', ON_ERROR, 'x', ON_ERROR,

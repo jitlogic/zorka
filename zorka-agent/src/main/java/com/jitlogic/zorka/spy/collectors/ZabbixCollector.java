@@ -40,9 +40,8 @@ public class ZabbixCollector implements SpyProcessor {
     }
 
     public SpyRecord process(int stage, SpyRecord record) {
-        Object[] vals = record.getVals(SpyLib.ON_COLLECT);
 
-        String data = inspector.substitute(expr, vals);
+        String data = inspector.substitute(expr, record, stage);
 
         if (host != null) {
             trapper.send(host, key, data);

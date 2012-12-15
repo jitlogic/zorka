@@ -20,18 +20,24 @@ import com.jitlogic.zorka.libsnmp.SNMPObjectIdentifier;
 public class TrapVarBindDef {
     private int type;
     private String oidSuffix;
+    private int stage;
     private int slot;
 
 
-    public TrapVarBindDef(int slot, int type, String oidSuffix) {
+    public TrapVarBindDef(int[] slot, int type, String oidSuffix) {
         this.type = type;
-        this.slot = slot;
+        this.stage = slot[0];
+        this.slot = slot[1];
         this.oidSuffix = oidSuffix;
     }
 
 
     public int getType() {
         return type;
+    }
+
+    public int getStage() {
+        return stage;
     }
 
 
