@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.integ.snmp;
 
 import com.jitlogic.zorka.libsnmp.*;
+import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
@@ -158,7 +159,7 @@ public class SnmpLib {
     }
 
 
-    public TrapVarBindDef bind(int slot, int type, String oidSuffix) {
-        return new TrapVarBindDef(slot, type, oidSuffix);
+    public TrapVarBindDef bind(Object slot, int type, String oidSuffix) {
+        return new TrapVarBindDef(SpyLib.slot(slot), type, oidSuffix);
     }
 }

@@ -2,6 +2,8 @@ package com.jitlogic.zorka.util;
 
 import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.mbeans.ZorkaStats;
+import com.jitlogic.zorka.spy.SpyLib;
+import com.jitlogic.zorka.spy.SpyRecord;
 
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
@@ -280,7 +282,43 @@ public class ObjectInspector {
         }
     }
 
+
+    public final static Pattern reInteger = Pattern.compile("^\\d+$");
+    public final static Pattern reStageSlot = Pattern.compile("^[EeRrXxSsCc]\\d+$");
     public final static Pattern reVarSubstPattern = Pattern.compile("\\$\\{([^\\}]+)\\}");
+
+
+    public String substitute(String input, SpyRecord record, int defStage) {
+        Matcher m = reVarSubstPattern.matcher(input);
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            String expr = m.group(1);
+            String[] segs = expr.split("\\.");
+            String s = segs[0];
+            int stage = defStage, slot = -1;
+
+            if (reStageSlot.matcher(s).matches()) {
+                stage = SpyLib.stages.get(s.charAt(0));
+                slot = Integer.parseInt(s.substring(1));
+            } else if (reInteger.matcher(s).matches()) {
+                stage = defStage;
+                slot = Integer.parseInt(s);
+            }
+
+            if (slot != -1) {
+                Object v = record.get(stage, slot);
+                for (int i = 1; i < segs.length; i++) {
+                    v = get(v, segs[i]);
+                }
+                m.appendReplacement(sb, ""+v);
+            }
+        }
+
+        m.appendTail(sb);
+
+        return sb.toString();
+    }
+
 
     public String substitute(String input, Object[] vals) {
         Matcher m = reVarSubstPattern.matcher(input);

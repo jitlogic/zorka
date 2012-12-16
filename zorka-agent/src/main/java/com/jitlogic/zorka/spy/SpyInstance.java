@@ -17,6 +17,7 @@ package com.jitlogic.zorka.spy;
 
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.spy.processors.CollectQueueProcessor;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
@@ -66,27 +67,28 @@ public class SpyInstance {
 
     public static synchronized void cleanup() {
         MainSubmitter.setSubmitter(null);
-        instance.shutdown();
+        instance.stop();
         instance = null;
     }
+
 
     public static int getDebugLevel() {
         return debugLevel;
     }
 
+
     public static boolean isDebugEnabled(int level) {
         return debugLevel >= level;
     }
 
+
     private SpyClassTransformer classTransformer;
-    private SpySubmitter   submitter;
-    private SpyProcessor   collector;
+    private DispatchingSubmitter   submitter;
 
 
     public SpyInstance(Properties props) {
         classTransformer = new SpyClassTransformer();
-        collector = new DispatchingCollector();
-        submitter = new DispatchingSubmitter(classTransformer, collector);
+        submitter = new DispatchingSubmitter(classTransformer, new CollectQueueProcessor());
     }
 
 
@@ -95,8 +97,15 @@ public class SpyInstance {
     }
 
 
-    private void shutdown() {
+    public void start() {
+        submitter.start();
+    }
 
+
+    public void stop() {
+        if (submitter != null) {
+            submitter.stop();
+        }
     }
 
 
@@ -105,7 +114,7 @@ public class SpyInstance {
     }
 
 
-    public SpySubmitter getSubmitter() {
+    public DispatchingSubmitter getSubmitter() {
         return submitter;
     }
 

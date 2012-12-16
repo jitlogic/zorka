@@ -38,7 +38,7 @@ public class CallingBshCollector implements SpyProcessor {
                     "(com.jitlogic.zorka.spy.SpyProcessor)"+ns);
         }
 
-        collector.process(SpyLib.ON_COLLECT, record);
+        collector.process(stage, record);
 
         return record;
     }
