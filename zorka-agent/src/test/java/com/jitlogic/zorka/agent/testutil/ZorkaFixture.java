@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.agent.testutil;
 
 import com.jitlogic.zorka.agent.*;
+import com.jitlogic.zorka.agent.testspy.support.TestCollectQueueProcessor;
 import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.syslog.SyslogLib;
 import com.jitlogic.zorka.spy.SpyInstance;
@@ -73,6 +74,8 @@ public class ZorkaFixture {
 
 
         spyInstance = agentInstance.getSpyInstance();
+        spyInstance.getSubmitter().setCollector(new TestCollectQueueProcessor());
+
         zorkaAgent = agentInstance.getZorkaAgent();
         zorka = zorkaAgent.getZorkaLib();
 

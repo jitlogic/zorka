@@ -8,44 +8,25 @@
  * <p/>
  * This software is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * <p/>
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.jitlogic.zorka.agent.testspy.support;
 
-import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.spy.processors.CollectQueueProcessor;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class TestCollector extends CollectQueueProcessor {
-
-    private List<SpyRecord> records = new ArrayList<SpyRecord>();
+public class TestCollectQueueProcessor extends CollectQueueProcessor {
 
     public SpyRecord process(int stage, SpyRecord record) {
-        records.add(record);
+        doProcess(record);
         return record;
-    }
-
-    public int size() {
-        return records.size();
-    }
-
-    public SpyRecord get(int i) {
-        return records.get(i);
     }
 
     public void start() {
 
     }
 
-    public void stop() {
-
-    }
 }

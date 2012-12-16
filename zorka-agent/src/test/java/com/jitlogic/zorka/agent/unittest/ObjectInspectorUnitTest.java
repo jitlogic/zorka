@@ -3,6 +3,10 @@ package com.jitlogic.zorka.agent.unittest;
 import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testutil.*;
+import com.jitlogic.zorka.spy.SpyContext;
+import com.jitlogic.zorka.spy.SpyDefinition;
+import com.jitlogic.zorka.spy.SpyLib;
+import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 
 import com.jitlogic.zorka.util.ZorkaLogger;
@@ -15,6 +19,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 import static org.junit.Assert.*;
 
@@ -166,6 +172,18 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
         return new JmxObject(on, testMbs, null);
     }
 
+
+    @Test
+    public void testRecordSubstitutions() {
+        SpyContext ctx = new SpyContext(SpyDefinition.instance(), "some.Class", "someMethod", "()V", 1);
+        SpyRecord rec = new SpyRecord(ctx);
+        rec.feed(ON_ENTER, new Object[] { "123", "4567" });
+        rec.feed(ON_RETURN, new Object[] { "aaa", "bbb" });
+
+        assertEquals("123!", inspector.substitute("${0}!", rec, ON_ENTER));
+        assertEquals("aaa", inspector.substitute("${R0}", rec, ON_ENTER));
+        assertEquals("4", inspector.substitute("${E1.length()}", rec, ON_COLLECT));
+    }
 
 
     // TODO tests for tabular data

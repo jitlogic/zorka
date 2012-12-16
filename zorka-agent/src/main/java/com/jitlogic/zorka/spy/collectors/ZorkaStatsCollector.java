@@ -62,7 +62,7 @@ public class ZorkaStatsCollector implements SpyProcessor {
     public SpyRecord process(int stage, SpyRecord record) {
 
         if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
-            log.debug("Collecting record: [" + ZorkaUtil.join(",", record.getVals(ON_COLLECT)) + "]");
+            log.debug("Collecting record: " + record);
         }
 
         SpyContext ctx = record.getContext();
@@ -73,7 +73,7 @@ public class ZorkaStatsCollector implements SpyProcessor {
                     new MethodCallStatistics(), "Method call statistics");
         }
 
-        String key = inspector.substitute(ctx.subst(keyTemplate), record.getVals(stage));
+        String key = inspector.substitute(ctx.subst(keyTemplate), record, stage);
 
         MethodCallStatistic statistic = (MethodCallStatistic)stats.getMethodCallStatistic(key);
 

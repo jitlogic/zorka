@@ -331,4 +331,10 @@ public class ZorkaUtil {
 
         return map;
     }
+
+    public static <K,V> Map<K,V> constMap(Object...data) {
+        Map<K,V> map = map(data);
+
+        return Collections.unmodifiableMap(map);
+    }
 }

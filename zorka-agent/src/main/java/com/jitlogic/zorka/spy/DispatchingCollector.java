@@ -50,19 +50,19 @@ public class DispatchingCollector implements SpyProcessor {
 
         SpyDefinition sd = sdef != null ? sdef : ctx.getSpyDefinition();
 
-        if (null == (record = process(sd, record))) {
+        if (null == (record = process(sd, record, stage))) {
             return null;
         }
 
         return record;
     }
 
-    private SpyRecord process(SpyDefinition sdef, SpyRecord record) {
-        List<SpyProcessor> processors = sdef.getProcessors(ON_COLLECT);
+    private SpyRecord process(SpyDefinition sdef, SpyRecord record, int stage) {
+        List<SpyProcessor> processors = sdef.getProcessors(stage);
 
         for (SpyProcessor processor : processors) {
             try {
-                if (null == (record = processor.process(ON_COLLECT, record))) {
+                if (null == (record = processor.process(stage, record))) {
                     break;
                 }
             } catch (Throwable e) {

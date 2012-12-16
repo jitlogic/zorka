@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.spy.processors.CollectQueueProcessor;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
@@ -35,7 +36,7 @@ public class DispatchingSubmitter implements SpySubmitter {
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private SpyClassTransformer engine;
-    private SpyProcessor collector;
+    private CollectQueueProcessor collector;
 
     private ThreadLocal<Stack<SpyRecord>> submissionStack =
         new ThreadLocal<Stack<SpyRecord>>() {
@@ -46,7 +47,7 @@ public class DispatchingSubmitter implements SpySubmitter {
         };
 
 
-    public DispatchingSubmitter(SpyClassTransformer engine, SpyProcessor collector) {
+    public DispatchingSubmitter(SpyClassTransformer engine, CollectQueueProcessor collector) {
         this.engine = engine;
         this.collector = collector;
     }
@@ -56,7 +57,6 @@ public class DispatchingSubmitter implements SpySubmitter {
 
         if (SpyInstance.isDebugEnabled(SPD_SUBMISSIONS)) {
             log.debug("Submitted: stage=" + stage + ", id=" + id + ", flags=" + submitFlags);
-            // TODO ewentualnie wyświetlić zasubmitowane wartości tutaj.
         }
 
         SpyContext ctx = engine.getContext(id);
@@ -78,15 +78,15 @@ public class DispatchingSubmitter implements SpySubmitter {
             return;
         }
 
-        record.beforeSubmit();
-
         if (null == (record = process(ON_SUBMIT, sdef, record))) {
             return;
         }
 
-        record.beforeCollect();
+        record.cleanup();
 
-        collector.process(SpyLib.ON_COLLECT, record);
+        if (sdef.getProcessors(SpyLib.ON_COLLECT).size() > 0) {
+            collector.process(SpyLib.ON_COLLECT, record);
+        }
     }
 
 
@@ -134,5 +134,18 @@ public class DispatchingSubmitter implements SpySubmitter {
         return record;
     }
 
+    public void setCollector(CollectQueueProcessor collector) {
+        if (collector != null) {
+            collector.stop();
+        }
+        this.collector = collector;
+    }
 
+    public void start() {
+        collector.start();
+    }
+
+    public void stop() {
+        collector.stop();
+    }
 }
