@@ -54,7 +54,7 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
 
     @Test
     public void testSubmitWithImmediateFlagAndCheckIfCollected() throws Exception {
-        SpyDefinition sdef = engine.add(SpyDefinition.instance().onEnter(FETCH_TIME));
+        SpyDefinition sdef = engine.add(SpyDefinition.instance().onEnter(FETCH_TIME)).onSubmit(collector);
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "com.TClass", "tMethod", "()V", 1));
 
         submitter.submit(ON_ENTER, ctx.getId(), SF_IMMEDIATE, new Object[] { 1L });
@@ -65,7 +65,7 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
 
     @Test
     public void testSubmitWithBufferAndFlush() throws Exception {
-        SpyDefinition sdef = engine.add(SpyDefinition.instrument());
+        SpyDefinition sdef = engine.add(SpyDefinition.instrument().onSubmit(collector));
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "Class", "method", "()V", 1));
 
         submitter.submit(ON_ENTER, ctx.getId(), SF_NONE, new Object[] { 1L });
@@ -78,7 +78,7 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
 
     @Test
     public void testSubmitAndCheckOnCollectBuf() throws Exception {
-        SpyDefinition sdef = engine.add(SpyDefinition.instance());
+        SpyDefinition sdef = engine.add(SpyDefinition.instance().onSubmit(collector));
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "Class", "method", "()V", 1));
 
         submitter.submit(ON_ENTER, ctx.getId(), SF_IMMEDIATE, new Object[] { 1L });
@@ -90,7 +90,7 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
 
     @Test
     public void testSubmitAndCheckSubmitBuffer() throws Exception {
-        SpyDefinition sdef = engine.add(SpyDefinition.instrument());
+        SpyDefinition sdef = engine.add(SpyDefinition.instrument().onSubmit(collector));
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "Class", "method", "()V", 1));
 
         submitter.submit(ON_ENTER, ctx.getId(), SF_NONE, new Object[] { 1L });
