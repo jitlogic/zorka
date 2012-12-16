@@ -19,6 +19,7 @@ import com.jitlogic.zorka.agent.*;
 import com.jitlogic.zorka.agent.testspy.support.TestCollectQueueProcessor;
 import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.syslog.SyslogLib;
+import com.jitlogic.zorka.logproc.LogProcLib;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.util.ZorkaLogger;
@@ -48,6 +49,7 @@ public class ZorkaFixture {
     protected ZorkaBshAgent zorkaAgent;
     protected ZorkaLib zorka;
 
+    protected LogProcLib logproc;
 
     @Before
     public void setUpFixture() {
@@ -84,9 +86,11 @@ public class ZorkaFixture {
 
         testUtil = ZorkaTestUtil.setUp();
 
-        syslogLib = AgentInstance.instance().getSyslogLib();
-        snmpLib = AgentInstance.instance().getSnmpLib();
-        spy = AgentInstance.instance().getSpyLib();
+        syslogLib = agentInstance.getSyslogLib();
+        snmpLib = agentInstance.getSnmpLib();
+        spy = agentInstance.getSpyLib();
+
+        logproc = agentInstance.getLogProcLib();
     }
 
 

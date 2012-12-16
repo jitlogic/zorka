@@ -20,6 +20,7 @@ import com.jitlogic.zorka.integ.nagios.NagiosAgent;
 import com.jitlogic.zorka.integ.nagios.NagiosLib;
 import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.syslog.SyslogLib;
+import com.jitlogic.zorka.logproc.LogProcLib;
 import com.jitlogic.zorka.normproc.NormLib;
 import com.jitlogic.zorka.spy.MainSubmitter;
 import com.jitlogic.zorka.spy.SpyInstance;
@@ -88,7 +89,9 @@ public class AgentInstance {
 
     private SyslogLib syslogLib = null;
     private SnmpLib snmpLib = null;
+
     private NormLib normLib = null;
+    private LogProcLib logProcLib = null;
 
     private Properties props;
 
@@ -130,6 +133,9 @@ public class AgentInstance {
 
         normLib = new NormLib();
         zorkaAgent.installModule("normalizers", normLib);
+
+        logProcLib = new LogProcLib();
+        zorkaAgent.installModule("logproc", logProcLib);
 
         if ("yes".equalsIgnoreCase(props.getProperty(SPY_ENABLE))) {
             log.info("Enabling Zorka SPY");
@@ -195,6 +201,14 @@ public class AgentInstance {
 
     public SnmpLib getSnmpLib() {
         return snmpLib;
+    }
+
+    public NormLib getNormLib() {
+        return normLib;
+    }
+
+    public LogProcLib getLogProcLib() {
+        return logProcLib;
     }
 
 }

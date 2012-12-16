@@ -32,7 +32,16 @@ public class ObjectInspector {
 
     public final static String STACK_TRACE_KEY = "printStackTrace";
 
-    // TODO multiargument get(), eg. getAll(Object obj, Object...path)  - there are several places it would be useful
+
+    public <T> T get(Object obj, Object...keys) {
+        Object cur = obj;
+
+        for (Object key : keys) {
+            cur = getAttr(cur, key);
+        }
+
+        return (T)cur;
+    }
 
     /**
      * Gets (logical) attribute from an object. Exact semantics may differ
@@ -46,7 +55,7 @@ public class ObjectInspector {
      *
      * @return attribute value or null if no matching attribute has been found
      */
-    public Object get(Object obj, Object key) {
+    private Object getAttr(Object obj, Object key) {
         if (obj == null) {
             return null;
         }
