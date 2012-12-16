@@ -17,6 +17,9 @@ package com.jitlogic.zorka.logproc;
 
 import com.jitlogic.zorka.util.ZorkaLogLevel;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Date;
 
 public class LogRecord {
@@ -26,6 +29,7 @@ public class LogRecord {
     private String originClass, originMethod;
     private String message;
     private Throwable exception;
+    private String excStr;
 
     public LogRecord(ZorkaLogLevel logLevel, String originClass, String originMethod, String message, Throwable exception) {
         this.logLevel = logLevel;
@@ -33,6 +37,14 @@ public class LogRecord {
         this.originMethod = originMethod;
         this.message = message;
         this.exception = exception;
+    }
+
+    public LogRecord(ZorkaLogLevel logLevel, String originClass, String originMethod, String message, String excStr) {
+        this.logLevel = logLevel;
+        this.originClass = originClass;
+        this.originMethod = originMethod;
+        this.message = message;
+        this.excStr = excStr;
     }
 
     public ZorkaLogLevel getLogLevel() {
@@ -57,5 +69,15 @@ public class LogRecord {
 
     public Throwable getException() {
         return exception;
+    }
+
+    public String strException() {
+        if (exception != null) {
+            Writer rslt = new StringWriter(512);
+            exception.printStackTrace(new PrintWriter(rslt));
+            return exception.toString() + "\n" + rslt.toString();
+
+        }
+        return excStr;
     }
 }
