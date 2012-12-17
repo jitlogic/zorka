@@ -52,6 +52,8 @@ public class LogFilter implements LogProcessor {
                 s = rec.getException() != null ? rec.getException().getClass().getName() : "";
         }
 
-        return pattern.matcher(s).matches() ? rec : null;
+        boolean matches = pattern.matcher(s).matches();
+
+        return matches ? rec : null;
     }
 }

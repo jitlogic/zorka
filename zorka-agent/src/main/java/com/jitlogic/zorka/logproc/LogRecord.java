@@ -23,13 +23,21 @@ import java.io.Writer;
 import java.util.Date;
 
 public class LogRecord {
-
     private ZorkaLogLevel logLevel;
     private Date timestamp;
     private String originClass, originMethod;
     private String message;
     private Throwable exception;
     private String excStr;
+
+    public LogRecord(ZorkaLogLevel logLevel, String originClass, String originMethod, String message) {
+        this.logLevel = logLevel;
+        this.originClass = originClass;
+        this.originMethod = originMethod;
+        this.message = message;
+        this.exception = null;
+    }
+
 
     public LogRecord(ZorkaLogLevel logLevel, String originClass, String originMethod, String message, Throwable exception) {
         this.logLevel = logLevel;

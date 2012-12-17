@@ -59,8 +59,11 @@ public class LogAdapter {
 
         ZorkaLogLevel logLevel = null;
 
-        for (int i = 0; i < jdkThresholds.length && level < jdkThresholds[i]; i++) {
+        for (int i = 0; i < jdkThresholds.length; i++) {
             logLevel = jdkLevels[i];
+            if (level <= jdkThresholds[i]) {
+                break;
+            }
         }
 
         if (logLevel == null) {
