@@ -106,3 +106,98 @@ Known names:
 
 MBean server name is passed in virtually all functions looking for object names or registering/manipulating
 objects/attributes in JMX.
+
+## Bytecode instrumentation
+
+Instrumentation part of Zorka agent is called Zorka Spy. With version 0.2 a fluent-style configuration API has been
+introduced. You can define spy configuration properties in fluent style using `SpyDefinition` object and then submit it
+to instrumentation engine. In order to be able to configure instrumentations, you need to understand structure of
+instrumentation engine and how events coming from instrumented methods are processed.
+
+
+`TODO Diagram 1: Zorka Spy processing scheme.`
+
+
+Zorka Spy will insert probes into certain points of instrumented methods. There are three kinds of points: entry points,
+return points and error points (when exception has been thrown). A probe can fetch some data, eg. current time, method
+argument, some class (method context) etc. All etched values are packed into a submission record (`SpyRecord` class) and
+processed by one of argument processing chains (`ON_ENTER`, `ON_RETURN` or `ON_ERROR` depending of probe type), then
+results of all probes from a method call are bound together and  processed by `ON_SUBMIT` chain. All these operations
+are performed in method calling thread context (so these processing stages must be thread safe). After that, record is
+passed to `ON_COLLECT` chain which is guaranteed to be single threaded. Finally records are dispatched into collectors
+(which is also done in a single thread). Collectors can do various things with records: update statistics in some mbean,
+call some BSH function, log it to file etc. New collector implementations can be added on the fly - either in Java or
+as BeanShell scripts.
+
+
+Spy definition example:
+
+    collect(record) {
+      mbs = record.get(4,0);
+      zorka.registerMbs("jboss", mbs);
+    }
+
+    sdef = spy.instance().onReturn().withArguments(0)
+       .lookFor("org.jboss.mx.server.MBeanServerImpl", "<init>")
+       .toBsh("jboss");
+
+    spy.add(sdef);
+
+This is part of Zorka configuration for JBoss 5.x. It intercepts instantiation of `MBeanServerImpl` (at the end of its
+constructor) and calls `collect()` function of jboss namespace (everything is declared in jboss namespace).
+`SpyDefinition` objects are immutable, so when tinkering with `sdef` multiple times, remember to assign result of last
+method call to some variable. Method `spy.instance()` returns empty (unconfigured) object of `SpyDefinition` type that
+can be further configured using methods described in next sections.
+
+For more examples see *Examples* section above.
+
+### Choosing processing stages
+
+Argument fetch and argument processing can be done in one of several points (see Diagram 1). Use the following functions
+to choose stage (or probe point):
+
+    sdef = sdef.onEnter(args...);
+    sdef = sdef.onExit(args...);
+    sdef = sdef.onSubmit(args...);
+    sdef = sdef.onCollect(args...);
+
+### Fetching arguments
+
+Data to be fetched by probes can be defined using `withArguments()` method:
+
+    sdef = sdef.onEnter(arg1, arg2, ...);
+
+Arguments can passed as numbers representing argument indexes or special data. For instance methods visible arguments
+start with number 1 at number 0 there is reference to object itself (`this`). For static methods arguments start with
+number 0.
+
+There are some special indexes that represent other data possible to fetch by instrumentation probes:
+
+* `spy.FETCH_TIME` (-1) - fetch current time;
+* `spy.FETCH_RET_VAL` (-2) - fetch return value (this is valid only on return points);
+* `spy.FETCH_ERROR` (-3) - fetch exception object (this is valid only on error points);
+* `spy.FETCH_THREAD` (-4) - fetch current thread;
+* `spy.FETCH_NULL` (-5) - fetch null constant (useful in some cases);
+
+It is also possible to fetch classes - just pass strings containing fully qualified class names instread of integers.
+
+Additional notes:
+
+* remember that argument fetch can be done in various points, use `sdef.onXXX()` method to select proper stage;
+
+* when instrumenting constructors, be sure that this reference (if used) can be fetched only at constructor return -
+this is because at the beginning of a constructor this points to an uninitialized block of memory that does not
+represent any object, so instrumented class won't load and will crash with class verifier error;
+
+### Looking for classes and methods to be instrumented
+
+    sdef = sdef.include(matcher1, matcher2, ...);
+
+Using `include()` method administrator can add matching rules filtering which methods are to be instrumented. Methods
+matching any of passed matchers will be included. Matchers can be defined using `spy.byXXX()` functions.
+
+### Access to data in spy records
+
+
+### Formatting strings
+

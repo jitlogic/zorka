@@ -32,11 +32,11 @@ public class LogFormattingCollector implements SpyProcessor {
 
     private LogProcessor processor;
 
-    public LogFormattingCollector(String levelTmpl, String msgTmpl) {
-        this(levelTmpl, msgTmpl, "${shortClassName}", "${methodName}", "");
+    public LogFormattingCollector(LogProcessor processor, String levelTmpl, String msgTmpl) {
+        this(processor, levelTmpl, msgTmpl, "${shortClassName}", "${methodName}", "");
     }
 
-    public LogFormattingCollector(String levelTmpl, String msgTmpl, String classTmpl, String methodTmpl, String excTmpl) {
+    public LogFormattingCollector(LogProcessor processor, String levelTmpl, String msgTmpl, String classTmpl, String methodTmpl, String excTmpl) {
         this.levelTmpl = levelTmpl;
         this.msgTmpl = msgTmpl;
         this.classTmpl = classTmpl;
