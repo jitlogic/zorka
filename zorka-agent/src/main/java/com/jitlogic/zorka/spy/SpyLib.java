@@ -24,6 +24,7 @@ import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
 import com.jitlogic.zorka.integ.snmp.TrapVarBindDef;
 import com.jitlogic.zorka.integ.syslog.SyslogTrapper;
 import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
+import com.jitlogic.zorka.logproc.LogProcessor;
 import com.jitlogic.zorka.normproc.Normalizer;
 import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.processors.*;
@@ -323,6 +324,27 @@ public class SpyLib {
         return new ZabbixCollector(trapper, expr, null, key);
     }
 
+
+    /**
+     *
+     * @param src
+     * @param processor
+     * @return
+     */
+    public SpyProcessor logAdapterCollector(Object src, LogProcessor processor) {
+        return new LogAdaptingCollector(slot(src), processor);
+    }
+
+
+    /**
+     *
+     * @param level
+     * @param msgTmpl
+     * @return
+     */
+    public SpyProcessor logFormatCollector(String level, String msgTmpl) {
+        return new LogFormattingCollector(level, msgTmpl);
+    }
 
     /**
      * Formats arguments and passes an array of formatted strings.
