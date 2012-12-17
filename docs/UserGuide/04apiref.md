@@ -243,7 +243,7 @@ Creates spy record to trap variable binding object. It will map object from `slo
 to a SNMP object of `type` tagged with `oidSuffix`. OID suffix will be added to base OID in traps sent by `SnmpCollector`
 component of Zorka Spy. See `sdef.toSnmp()` description below for more information about bindings.
 
-## Data normalization
+## Data normalization functions
 
 There are cases when intercepted data has to be normalized in some way. Removing data from intercepted SQL queries is
 one example but there are many types of data that should be stripped or simplified in some way. Data normalization
@@ -277,47 +277,6 @@ Creates LDAP normalizer that processes LDAP search queries. Use one of `normaliz
 
 # Class and Method Instrumentation API
 
-Instrumentation part of Zorka agent is called Zorka Spy. With version 0.2 a fluent-style configuration API has been
-introduced. You can define spy configuration properties in fluent style using `SpyDefinition` object and then submit it
-to instrumentation engine. In order to be able to configure instrumentations, you need to understand structure of
-instrumentation engine and how events coming from instrumented methods are processed.
-
-
-`TODO Diagram 1: Zorka Spy processing scheme.`
-
-
-Zorka Spy will insert probes into certain points of instrumented methods. There are three kinds of points: entry points,
-return points and error points (when exception has been thrown). A probe can fetch some data, eg. current time, method
-argument, some class (method context) etc. All etched values are packed into a submission record (`SpyRecord` class) and
-processed by one of argument processing chains (`ON_ENTER`, `ON_RETURN` or `ON_ERROR` depending of probe type), then
-results of all probes from a method call are bound together and  processed by `ON_SUBMIT` chain. All these operations
-are performed in method calling thread context (so these processing stages must be thread safe). After that, record is
-passed to `ON_COLLECT` chain which is guaranteed to be single threaded. Finally records are dispatched into collectors
-(which is also done in a single thread). Collectors can do various things with records: update statistics in some mbean,
-call some BSH function, log it to file etc. New collector implementations can be added on the fly - either in Java or
-as BeanShell scripts.
-
-
-Spy definition example:
-
-    collect(record) {
-      mbs = record.get(4,0);
-      zorka.registerMbs("jboss", mbs);
-    }
-
-    sdef = spy.instance().onReturn().withArguments(0)
-       .lookFor("org.jboss.mx.server.MBeanServerImpl", "<init>")
-       .toBsh("jboss");
-
-    spy.add(sdef);
-
-This is part of Zorka configuration for JBoss 5.x. It intercepts instantiation of `MBeanServerImpl` (at the end of its
-constructor) and calls `collect()` function of jboss namespace (everything is declared in jboss namespace).
-`SpyDefinition` objects are immutable, so when tinkering with `sdef` multiple times, remember to assign result of last
-method call to some variable. Method `spy.instance()` returns empty (unconfigured) object of `SpyDefinition` type that
-can be further configured using methods described in next sections.
-
-For more examples see *Examples* section above.
 
 ## Spy library functions
 
@@ -334,61 +293,16 @@ instrumented methods and calculate method execution times
 
 Will submit created configurations to instrumentation engine.
 
-## SpyDefinition methods
 
-### Choosing processing stages
+### Matching methods to be instrumented
 
-Argument fetch and argument processing can be done in one of several points (see Diagram 1). Use the following functions
-to choose stage (or probe point):
+Matchers that are passed as arguments to `include()` method of spy definition objects can be created using `spy.byXXX()`
+functions. There are several functions that can create various types of matchers.
 
-    sdef = sdef.onEnter();	or	sdef = sdef.on(spy.ON_ENTER);
-    sdef = sdef.onExit();		or	sdef = sdef.on(spy.ON_EXIT);
-    sdef = sdef.onSubmit();	or	sdef = sdef.on(spy.ON_SUBMIT);
-    sdef = sdef.onCollect();	or	sdef = sdef.on(spy.ON_COLLECT);
+#### spy.byMethod()
 
-
-### Fetching arguments
-
-Data to be fetched by probes can be defined using `withArguments()` method:
-
-    sdef = sdef.withArguments(arg1, arg2, ...);
-
-Arguments can passed as numbers representing argument indexes or special data. For instance methods visible arguments
-start with number 1 at number 0 there is reference to object itself (`this`). For static methods arguments start with
-number 0.
-
-There are some special indexes that represent other data possible to fetch by instrumentation probes:
-
-* `spy.FETCH_TIME` (-1) - fetch current time;
-* `spy.FETCH_RET_VAL` (-2) - fetch return value (this is valid only on return points);
-* `spy.FETCH_ERROR` (-3) - fetch exception object (this is valid only on error points);
-* `spy.FETCH_THREAD` (-4) - fetch current thread;
-* `spy.FETCH_NULL` (-5) - fetch null constant (useful in some cases);
-
-It is also possible to fetch classes - just pass strings containing fully qualified class names instread of integers.
-
-Additional notes:
-
-* remember that argument fetch can be done in various points, use `sdef.onXXX()` method to select proper stage;
-
-* when instrumenting constructors, be sure that this reference (if used) can be fetched only at constructor return -
-this is because at the beginning of a constructor this points to an uninitialized block of memory that does not
-represent any object, so instrumented class won't load and will crash with class verifier error;
-
-There are some convenience methods defined to grab special values:
-
-    sdef = sdef.withTime();
-    sdef = sdef.withRetVal();
-    sdef = sdef.withError();
-    sdef = sdef.withThread();
-    sdef = sdef.withClass(className);
-    sdef = sdef.withNull();
-
-### Looking for classes and methods to be instrumented
-
-    sdef = sdef.lookFor(classPattern, methodPattern);
-
-    sdef = sdef.lookFor(access, classPattern, methodPattern, retType, argType1, argType2, ...);
+    spy.byMethod(classPattern, methodPattern)
+    spy.byMethod(access, classPattern, methodPattern, returnType, String...argTypes)
 
 These methods will choose which classes and methods will be instrumented. Both `classPattern` and `methodPattern` can
 contain asterisk (`*`) or double asterisk (`**`) which has the same meaning as in Ant or Maven: single asterisk will
@@ -396,8 +310,8 @@ choose all classes in given package (eg. `org.jboss.*`), and double asterisk wil
 and all subpackages it contains. For method names single asterisk represents any sequence of characters (double asterisk
 makes no sense in method names).
 
-First (short) version of `lookFor()` will choose all public methods matching patterns passed as its arguments, full
-version of `lookFor()` allows for much finer control: it is possible to pass access flags (eg. choosing only static
+First (short) version of `byMethod()` will choose all public methods matching patterns passed as its arguments, full
+version of `byMethod()` allows for much finer control: it is possible to pass access flags (eg. choosing only static
 methods etc.) and define return type and types of arguments (as in java - eg. `int`, `void`, `String`,
 `com.mycompany.MyClass` etc.).
 
@@ -408,12 +322,12 @@ to spy configuration and some convenience methods attaching predefined processor
 
 #### Formatting strings
 
-    sdef = sdef.withFormat(dst, formatExpr);
+    spy.formatter(dst, formatExpr);
 
 Will evaluate `formatExpr`, substitute values (fetched in the same record) and store result at slot number `dst`.
 Format strings look like this:
 
-    "some${0}text${1.some.attr}"
+    "some${0}text${1.some.attr}and${E2.other.attr}"
 
 All substitution placeholders are marked with `${....}`. Inside it there is an index of (interesting) variable and
 optionally subsequent attributes that allow looking into it (using getters, indexing, keys etc. depending in object
@@ -421,28 +335,29 @@ type - as in `zorka.jmx()` function).
 
 #### Filtering records
 
-    sdef = sdef.filter(src, regex);
-    sdef = sdef.filterOut(src, regex);
+    spy.regexFilter(src, regex);
+    spu.regexFilter(src, regex. filterOut);
 
 These two methods allow filtering of records. First one will pass only records matching `regex` on argument number `src`.
-Second one will do exactly opposite thing.
+Second one will do exactly opposite thing if `filterOut` argument is `true` or behave as first one if `false`.
 
 #### Fetching attributes from arguments
 
-    sdef = sdef.get(src, dst, attr1, attr2, ...);
+    spy.get(src, dst, attr1, attr2, ...);
 
-This will fetch attribute chain `(attr1,attr2,...)` from argument `src` and store result into `dst`.
+This will fetch attribute chain `(attr1,attr2,...)` from `src` slot of passing spy records and store result into `dst`
+slot of spy records.
 
-Calling method of argument object:
+#### Calling method of argument object
 
-    sdef = sdef.callMethod(src, dst, methodName, arg1, arg2, ...);
+    spy.call(src, dst, methodName, arg1, arg2, ...);
 
 This will get argument at index `src`, call method named methodName with arguments `(arg1, arg2, ...)` and store result
 into `dst`.
 
 #### Calculating time difference between arguments
 
-    sdef = sdef.timeDiff(in1, in2, out);
+    spy.tdiff(in1, in2, out);
 
 It will take arguments from `in1` and `in2`, ensure that these are long integers and stores result at `out`.
 
@@ -451,19 +366,19 @@ It will take arguments from `in1` and `in2`, ensure that these are long integers
 Sometimes it is useful to use data grabbed from some method and use it along with other method further down call stack.
 The following methods can be used with thread local objects:
 
-    sdef = sdef.set(src, threadLocal)
-    sdef = sdef.get(dst, threadLocal)
-    sdef = sdef.remove(threadLocal)
+    spy.get(dst, threadLocal, path...)
+    spy.put(src, threadLocal)
+    spy.remove(threadLocal)
 
 Thread local object has to be declared in BSH script and is passed as `threadLocal` argument to each of these methods.
-Method `set()` stores value from slot `src` in `threadLocal`. Method `get()` reads value from `threadLocal` and stores
+Method `put()` stores value from slot `src` in `threadLocal`. Method `get()` reads value from `threadLocal` and stores
 it in slot `dst`. Last method clears `threadLocal`, so stored object can be garbage collected (granted there are no more
 references pointing to it).
 
 #### Filtering data using comparator
 
-    sdef = sdef.ifSlotCmp(a, op, b)
-    sdef = sdef.ifValueCmp(a, op, v)
+    spy.ifSlotCmp(a, op, b)
+    spy.ifValueCmp(a, op, v)
 
 These two methods can be used to filter out unwanted records. First one compares values from two slots of a record,
 second one compares value from record slot with some constant. Arguments `a` and `b` are slot numbers, `v` is a constant
@@ -477,16 +392,12 @@ are compared with `0.001` accuracy. For example:
 
 #### Normalizing data (eg. queries)
 
-    sdef = sdef.normalize(src, dst, normalizer);
+    spy.normalize(src, dst, normalizer)
 
 Plugs a normalizer into spy processing chain. Spy will take value from `src` slot, pass it through `normalizer` object
 and store result in `dst` slot.
 
 #### Using custom processors
-
-There is also a generic method for adding custom processors:
-
-    sdef = sdef.withProcessor(processor);
 
 Custom processors must implement `com.jitlogic.zorka.spy.processors.SpyArgProcessor` interface. It is possible to use
 Beanshell interface generation feature to integrate simple scripts into argument processing chain, for example:
@@ -500,12 +411,10 @@ Beanshell interface generation feature to integrate simple scripts into argument
 
     plus2Processor = __plus2Processor();
 
-    sdef = sdef.withProcessor(
+    sdef = sdef.onEnter(
       (com.jitlogic.zorka.spy.processors.SpyArgProcessor)plus2Processor);
 
-Additional notes:
-
-* be extremly careful when filtering out objects on `ON_ENTER`, `ON_RETURN` and `ON_ERROR` stages; records passed here
+Be extremly careful when filtering out objects on `ON_ENTER`, `ON_RETURN` and `ON_ERROR` stages; records passed here
 can have counterparts that will be matched later, by filtering one record and passing another it is possible to disrupt
 submitter matching them;
 
@@ -518,7 +427,7 @@ There is also a set of convenience methods useful to configure collector quickly
 
 #### Collecting to Zorka Stats
 
-    sdef = sdef.toStats(mbsName, beanName, attrName, keyExpr, tstampField, timeField);
+    spy.zorkaStats(mbsName, beanName, attrName, keyExpr, tstampField, timeField)
 
 This is collect method call statistics in `ZorkaStats` object visible via JMX as an attribute of some `MBean`.
 Method arguments:
@@ -548,7 +457,7 @@ In addition `keyExpr` can contain expressions fetching record arguments `${n.att
 
 It is also possible to attach single-method call statistic directly as mbean attribute:
 
-    sdef = sdef.toStat(mbsName, beanName, attrName, tstampField, timeField);
+    spy.zorkaStat(mbsName, beanName, attrName, tstampField, timeField);
 
 All parameters are the same as in `toStats()` method (except for `keyExpr` which is missing).
 
@@ -556,14 +465,14 @@ All parameters are the same as in `toStats()` method (except for `keyExpr` which
 
 Presenting intercepted values as mbean attributes is possible with `toGetter()` method:
 
-    sdef = sdef.toGetter(mbsName, beanName, attrName, attr1, attr2, ...);
+    spy.getterCollector(mbsName, beanName, attrName, attr1, attr2, ...)
 
 This will present intercepted object as ValGetter attribute. Each time attribute is accessed (eg. via jconsole),
 Zorka will fetch value using attribute chain `(attr1, attr2, ...)` as in `zorka.jmx()` call.
 
 #### Logging collected events via Syslog
 
-    sdef = sdef.toSyslog(trapper, expr, severity, facility, hostname, tag)
+    spy.syslogCollector(trapper, expr, severity, facility, hostname, tag)
 
 Parameter `trapper` must be a reference to trapper object obtained using `syslog.trapper()`. Parameter `expr` is message
 template (analogous to `keyExpr` in other collectors). Remaining parameters - `severity`, `facility`, `hostname` and
@@ -571,7 +480,7 @@ template (analogous to `keyExpr` in other collectors). Remaining parameters - `s
 
 #### Sending collected events as SNMP traps
 
-    sdef = sdef.toSnmp(trapper, oid, spcode, bindings)
+    spy.snmpCollector(trapper, oid, spcode, bindings)
 
 Parameter `trapper` must be a reference to trapper object obtained using `snmp.trapper()` function. Traps will have their
 `enterprise-oid` field set to `oid` and all variables will have their keys starting with `oid`. Traps will be of
@@ -579,8 +488,8 @@ Parameter `trapper` must be a reference to trapper object obtained using `snmp.t
 
 #### Sending collected events to Zabbix
 
-    sdef = sdef.toZabbix(trapper, expr, key)
-    sdef = sdef.toZabbix(trapper, expr, host, key)
+    spy.zabbixCollector(trapper, expr, key)
+    spy.zabbixCollector(trapper, expr, host, key)
 
 Parameter `trapper` must be a reference to zabbix trapper obtained using `zabbix.get()` function. Parameter `expr` is
 message template (analogous to `keyExpr` in other collectors). Parametry `key' refers to zabbix item key that will be
@@ -588,12 +497,28 @@ populated. Item must be of proper type (text or number depending on data that is
 
 #### Sending collected records to log file
 
-    sdef = sdef.toFile(trapper, expr, logLevel)
+    spy.fileCollector(trapper, expr, logLevel)
 
 Parameter `trapper` must be a reference to file trapper obtained using `zorka.fileTrapper()`, `zorka.dailyFileTrapper()`
 or `zorka.rollingFileTrapper()`. Second parameter `expr` contains template string used to create log messages. Parameter
 `logLevel` must be one of: `zorka.TRACE`, `zorka.DEBUG`, `zorka.INFO`, `zorka.WARN`, `zorka.ERROR` and `zorka.FATAL`.
 
+#### Passing records to another processing chain
 
+    spy.sdefCollector(sdef)
 
+Passes records to another processing chain. Processning chain object reference will be passed as `sdef`.
+
+#### Passing records to log processing chains
+
+    spy.logFormatCollector(processor, level, msgTemplate)
+    spy.logFormatCollector(processor, level, msgTemplate, classTempalte, methodTemplate, excTemplate)
+
+Creates log formatting collector - a collector which constructs log records from various bits of information passed by
+spy records and then passes is to a log processing chain referenced by `processor`.
+
+    spy.logAdapterCollector(processor, src)
+
+This function returns collector that will automatically convert other types of log records (eg. log4j, jdk logger,
+jboss 7 logger etc.) and pass them to log processing chain.
 
