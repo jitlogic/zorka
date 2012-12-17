@@ -251,7 +251,7 @@ public class SpyLib {
      *
      * @return augmented spy definition
      */
-    public SpyProcessor getterCollector(String mbsName, String beanName, String attrName, String desc, int[] src, Object...path) {
+    public SpyProcessor getterCollector(String mbsName, String beanName, String attrName, String desc, Object src, Object...path) {
         return new GetterPresentingCollector(mbsName, beanName, attrName, desc, slot(src), path);
     }
 
@@ -326,12 +326,27 @@ public class SpyLib {
 
 
     /**
+     * Sends collected records to zabbix using zabbix trapper.
+     *
+     * @param trapper
+     *
+     * @param expr
+     *
+     * @param key
+     *
+     * @return
+     */
+    public SpyProcessor zabbixCollector(ZabbixTrapper trapper, String expr, String host, String key) {
+        return new ZabbixCollector(trapper,  expr,  host,  key);
+    }
+
+    /**
      *
      * @param src
      * @param processor
      * @return
      */
-    public SpyProcessor logAdapterCollector(Object src, LogProcessor processor) {
+    public SpyProcessor logAdapterCollector(LogProcessor processor, Object src) {
         return new LogAdaptingCollector(slot(src), processor);
     }
 
@@ -342,8 +357,24 @@ public class SpyLib {
      * @param msgTmpl
      * @return
      */
-    public SpyProcessor logFormatCollector(String level, String msgTmpl) {
-        return new LogFormattingCollector(level, msgTmpl);
+    public SpyProcessor logFormatCollector(LogProcessor processor, String level, String msgTmpl) {
+        return new LogFormattingCollector(processor, level, msgTmpl);
+    }
+
+
+    /**
+     *
+     * @param processor
+     * @param levelTmpl
+     * @param msgTmpl
+     * @param classTmpl
+     * @param methodTmpl
+     * @param excTmpl
+     * @return
+     */
+    public SpyProcessor logFormatCollector(LogProcessor processor, String levelTmpl, String msgTmpl, String classTmpl,
+                                           String methodTmpl, String excTmpl) {
+        return new LogFormattingCollector(processor,  levelTmpl, msgTmpl, classTmpl, methodTmpl, excTmpl);
     }
 
     /**
