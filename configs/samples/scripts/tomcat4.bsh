@@ -18,14 +18,19 @@
 
   spy.add(
     spy.instance()
-      .onEnter().withTime().withArguments(1).get(1,1,"request","requestURI").transform(1,2,"^(\\/[^\\/]+).*$","${1}")
-      .onReturn().withTime().withArguments(2).get(1, 1, "response", "status")
-      .onSubmit().timeDiff(0,3,3)
-      .toStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byUri", "${1}", 0, 3)
-      .toStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byCtx", "${2}", 0, 3)
-      .toStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byStatus", "${4}", 0, 3)
-      .toStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byCtxStatus", "${2}|${4}", 0, 3)
-    .include("org.apache.catalina.core.StandardEngineValve", "invoke")
+      .onEnter(spy.FETCH_TIME, 1,
+        spy.get(1,1,"request","requestURI"),
+        spy.transform(1,2,"^(\\/[^\\/]+).*$","${1}"))
+      .onReturn(spy.FETCH_TIME, 2,
+        spy.get(1, 1, "response", "status"))
+      .onSubmit(
+        spy.tdiff("E0","R0","S1"),
+        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byUri", "${E1}", "R0", "S0"),
+        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byCtx", "${E2}", "R0", "S0"),
+        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byStatus", "${R1}", "R0", "S0"),
+        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byCtxStatus", "${E2}|${R1}", "R0", "S0"))
+    .include(
+        spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
   );
 
 

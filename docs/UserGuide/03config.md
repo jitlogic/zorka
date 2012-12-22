@@ -157,7 +157,8 @@ Argument fetch and argument processing can be done in one of several points (see
 to choose stage (or probe point):
 
     sdef = sdef.onEnter(args...);
-    sdef = sdef.onExit(args...);
+    sdef = sdef.onReturn(args...);
+    sdef = sdef.onError(args...);
     sdef = sdef.onSubmit(args...);
     sdef = sdef.onCollect(args...);
 
@@ -197,6 +198,22 @@ Using `include()` method administrator can add matching rules filtering which me
 matching any of passed matchers will be included. Matchers can be defined using `spy.byXXX()` functions.
 
 ### Access to data in spy records
+
+Spy processors and collectors access data stored in records using references that can have two forms:
+
+* simple indexes (numbers) - will always refer to slot in current processing stage (stage processor has been added to);
+these are simple integers; slot indexes start at 0;
+
+* full references - contain both stage identifier and slot  number; these are strings with first character indicating
+stage and followed by index, eg. `E0` means first slot in `ON_ENTER` stage;
+
+The following characters are legal:
+
+* `E` - `ON_ENTER`;
+* `R` - `ON_RETURN`;
+* `X` - `ON_EXCEPTION`;
+* `S` - `ON_SUBMIT`;
+* `C` - `ON_COLLECT`;
 
 
 ### Formatting strings

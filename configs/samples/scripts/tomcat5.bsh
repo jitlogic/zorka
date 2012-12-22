@@ -19,14 +19,23 @@
 
   spy.add(
     spy.instance()
-      .onEnter().withTime().withArguments(1).get(1,1,"request","requestURI")
-        .transform(1,1,"^.*loginform\\.jsp$","loginForm")
-        .transform(1,1,"^.*\\.jsp$","javaApps").transform(1,1,"^.*\\.do$","javaApps")
-        .transform(1,1,"^.*\\.html$","staticPages").transform(1,1,"^.*\\.css$","staticPages")
-        .transform(1,1,"^.*\\.gif$","images").transform(1,1,"^.*\\.jpg$","images")
-      .onReturn().withTime()
-      .onSubmit().timeDiff(0,2,2)
-      .toStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byTag", "${1}", 0, 2)
-    .include("org.apache.catalina.core.StandardEngineValve", "invoke")
+      .onEnter(spy.FETCH_TIME, 1,
+        spy.get(1,1,"request","requestURI"),
+        spy.transform("E1","E1","^.*\\.jsp$","javaApps"),
+        spy.transform("E1","E1","^.*\\.do$","javaApps"),
+        spy.transform("E1","E1","^.*\\.html$","staticPages"),
+        spy.transform("E1","E1","^.*\\.css$","staticPages"),
+        spy.transform("E1","E1","^.*\\.gif$","images"),
+        spy.transform("E1","E1","^.*\\.jpg$","images"),
+        spy.transform("E1","E1","^.*\\.png$","images"),
+        spy.transform("E1","E1","^.*\\.ico$","images"),
+        spy.transform("E1","E1","^.*loginform\\.jsp$","loginForm"),
+        spy.transform("E1","E1","^\\/.*", "other"))
+      .onReturn(spy.FETCH_TIME)
+      .onSubmit(
+        spy.tdiff("E0","R0","S0"),
+        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byTag", "${E1}", "E0", "S0"))
+    .include(
+        spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
   );
 
