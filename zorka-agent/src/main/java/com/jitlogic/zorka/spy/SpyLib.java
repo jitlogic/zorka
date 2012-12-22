@@ -388,7 +388,7 @@ public class SpyLib {
      *
      * @return augmented spy definition
      */
-    public SpyProcessor formatter(Object dst, String expr) {
+    public SpyProcessor format(Object dst, String expr) {
         return new StringFormatProcessor(slot(dst), expr);
     }
 
@@ -434,8 +434,8 @@ public class SpyLib {
      *
      * @return
      */
-    public SpyProcessor regexTransformer(int src, int dst, String regex, String expr) {
-        return regexTransformer(src, dst, regex, expr,  false);
+    public SpyProcessor transform(Object src, Object dst, String regex, String expr) {
+        return transform(src, dst, regex, expr, false);
     }
 
 
@@ -452,7 +452,7 @@ public class SpyLib {
      *
      * @return
      */
-    public SpyProcessor regexTransformer(Object src, Object dst, String regex, String expr, boolean filterOut) {
+    public SpyProcessor transform(Object src, Object dst, String regex, String expr, boolean filterOut) {
         return new RegexFilterProcessor(slot(src), slot(dst), regex, expr, filterOut);
     }
 
@@ -493,7 +493,7 @@ public class SpyLib {
      * @param threadLocal
      * @return
      */
-    public SpyProcessor get(Object slot, ThreadLocal<Object> threadLocal, Object...path) {
+    public SpyProcessor tlGet(Object slot, ThreadLocal<Object> threadLocal, Object...path) {
         return new ThreadLocalProcessor(slot(slot), ThreadLocalProcessor.GET, threadLocal, path);
     }
 
@@ -504,7 +504,7 @@ public class SpyLib {
      * @param val
      * @return
      */
-    public SpyProcessor putConst(Object slot, Object val) {
+    public SpyProcessor put(Object slot, Object val) {
         return new ConstPutProcessor(slot(slot), val);
     }
 
@@ -515,7 +515,7 @@ public class SpyLib {
      * @param threadLocal
      * @return
      */
-    public SpyProcessor put(Object slot, ThreadLocal<Object> threadLocal) {
+    public SpyProcessor tlSet(Object slot, ThreadLocal<Object> threadLocal) {
         return new ThreadLocalProcessor(slot(slot), ThreadLocalProcessor.SET, threadLocal);
     }
 
@@ -525,7 +525,7 @@ public class SpyLib {
      * @param threadLocal
      * @return
      */
-    public SpyProcessor remove(ThreadLocal<Object> threadLocal) {
+    public SpyProcessor tlRemove(ThreadLocal<Object> threadLocal) {
         return new ThreadLocalProcessor(slot(0), ThreadLocalProcessor.REMOVE, threadLocal);
     }
 

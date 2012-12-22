@@ -46,21 +46,27 @@ __cas() {
   audit(sdef, action) {
 
     // SUCCESS path ...
-    sdef = sdef.onReturn().put(2, action).put(3, SUCCESS)
-        .get(4, request, "remoteAddr").get(5, request, "localAddr");
+    sdef = sdef.onReturn(
+        spy.put("S2", action),
+        spy.put("S3", SUCCESS),
+        spy.tlGet("S4", request, "remoteAddr"),
+        spy.tlGet("S5", request, "localAddr"));
 
     // FAILURE path ...
-    sdef = sdef.onError().put(2, action).put(3, SUCCESS)
-        .get(4, request, "remoteAddr").get(5, request, "localAddr");
+    sdef = sdef.onError(
+        spy.put("S2", action),
+        spy.put("S3", FAILURE),
+        spy.tlGet("S4", request, "remoteAddr"),
+        spy.tlGet("S5", request, "localAddr"));
 
     // Configure SNMP trap collector
-    sdef = sdef.toSnmp(trapper, oid, 0,
+    sdef = sdef.onSubmit(spy.snmpCollector(trapper, oid, 0,
        snmp.bind(0, snmp.OCTETSTRING, "1"), // WHO  (String)
        snmp.bind(1, snmp.OCTETSTRING, "2"), // WHAT (String)
        snmp.bind(2, snmp.INTEGER, "3"),     // ACTION (int)
        snmp.bind(3, snmp.INTEGER, "4"),     // RESULT (int)
        snmp.bind(4, snmp.IPADDRESS, "5"),   // REMOTE (ip address)
-       snmp.bind(5, snmp.IPADDRESS, "6"));  // LOCAL (ip address)
+       snmp.bind(5, snmp.IPADDRESS, "6")));  // LOCAL (ip address)
 
     spy.add(sdef);
   }
@@ -68,75 +74,82 @@ __cas() {
 
   // Intercept request dispatcher and store request object for later use
   spy.add(spy.instance()
-    .onEnter().withArguments(1).set(0, request)
-    .onReturn().withArguments(1).remove(request)
-    .onError().withArguments(1).remove(request)
-    .include("org.jasig.cas.web.init.SafeDispatcherServlet", "service"));
+    .onEnter(1, spy.tlSet(0, request))
+    .onReturn(1, spy.tlRemove(request))
+    .onError(1, spy.tlRemove(request))
+    .include(
+      spy.byMethod("org.jasig.cas.web.init.SafeDispatcherServlet", "service")));
 
 
   // Authentication attempts
   sdefAuth = spy.instance()
-    .onReturn().withArguments(1,1)
-    .onError().withArguments(1,1)
-    .include("org.jasig.cas.authentication.AbstractAuthenticationManager", "authenticate");
+    .onReturn(1, 1, spy.get("S0", 0), spy.get("S1", 1))
+    .onError(1, 1, spy.get("S0", 0), spy.get("S1", 1))
+    .include(spy.byMethod("org.jasig.cas.authentication.AbstractAuthenticationManager", "authenticate"));
   audit(sdefAuth, AUTHENTICATION);
 
 
   // TGT-s created
   sdefTgtCreated = spy.instance()
-    .onReturn().withArguments(1).withRetVal()
-    .onError().withArguments(1).withError()
-    .include("org.jasig.cas.CentralAuthenticationServiceImpl", "createTicketGrantingTicket");
+    .onReturn(1, spy.FETCH_RETVAL, spy.get("S0", 0), spy.get("S1", 1))
+    .onError(1, spy.FETCH_ERROR, spy.get("S0", 0), spy.get("S1", 1))
+    .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "createTicketGrantingTicket"));
   audit(sdefTgtCreated, TGT_CREATED);
 
 
   // TGT-s destroyed
   sdefTgtDestroyed = spy.instance()
-    .onReturn().withArguments(1,1)
-    .onError().withArguments(1).withError()
-    .include("org.jasig.cas.CentralAuthenticationServiceImpl", "destroyTicketGrantingTicket");
+    .onReturn(1, 1, spy.get("S0", 0), spy.get("S1", 1))
+    .onError(1, spy.FETCH_ERROR, spy.get("S0", 0), spy.get("S1", 1))
+    .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "destroyTicketGrantingTicket"));
   audit(sdefTgtDestroyed, TGT_DESTROYED);
 
 
   // Service tickets granted
   sdefSvtGranted = spy.instance()
-    .onReturn().withArguments(3,2).withRetVal().format(1, "service=${1} ticket=${2}")
-    .onError().withArguments(3,2).withError().format(1, "service=${1} error=${2}")
-    .include(1, "org.jasig.cas.CentralAuthenticationServiceImpl", "grantServiceTicket", 
-        "String", "org.jasig.cas.authentication.principal.Service", 
-        "org.jasig.cas.authentication.principal.Credentials");
+    .onReturn(3,2, spy.FETCH_RETVAL,
+      spy.get("S0", 0), spy.format("S1", "service=${1} ticket=${2}"))
+    .onError(3,2, spy.FETCH_ERROR,
+      spy.get("S0", 0), spy.format("S1", "service=${1} error=${2}"))
+    .include(
+      spy.byMethod(1, "org.jasig.cas.CentralAuthenticationServiceImpl", "grantServiceTicket", 
+        "String", "org.jasig.cas.authentication.principal.Service", "org.jasig.cas.authentication.principal.Credentials"));
   audit(sdefSvtGranted, SVT_GRANTED);
 
 
   // Validate service ticket
   sdefSvtValidated = spy.instance()
-    .onReturn().withArguments(1,2).withRetVal().format(1, "service=${1} assertion=${2}")
-    .onError().withArguments(1,2).withError().format(1, "service=${1} error=${2}")
-    .include("org.jasig.cas.CentralAuthenticationServiceImpl", "validateServiceTicket");
+    .onReturn(1, 2, spy.FETCH_RETVAL,
+      spy.get("S0", 0), spy.format("S1", "service=${1} assertion=${2}"))
+    .onError(1, 2, spy.FETCH_ERROR,
+      spy.get("S0", 0), spy.format("S1", "service=${1} error=${2}"))
+    .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "validateServiceTicket"));
   audit(sdefSvtValidated, SVT_VALIDATED);
 
 
   // Proxy granting ticket created
   sdefProxyGranted = spy.instance()
-    .onReturn().withArguments(2,1).withRetVal().format(1, "serviceTicket=${1} proxy=${2}")
-    .onError().withArguments(2,1).withError().format(1, "serviceTicket=${1} error=${2}")
-    .include("org.jasig.cas.CentralAuthenticationServiceImpl", "delegateTicketGrantingTicket");
+    .onReturn(2, 1, spy.FETCH_RETVAL, 
+      spy.get("S0", 0), spy.format("S1", "serviceTicket=${1} proxy=${2}"))
+    .onError(2, 1, spy.FETCH_ERROR,
+      spy.get("S0", 0), spy.format(1, "serviceTicket=${1} error=${2}"))
+    .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "delegateTicketGrantingTicket"));
   audit(sdefProxyGranted, PROXY_GRANTED);
 
 
   // Delete a service
   sdefSvcDeleted = spy.instance()
-    .onReturn().withArguments(1).format(1, "OK")
-    .onError().withArguments(1).withError()
-    .include("org.jasig.cas.DefaultServicesManagerImpl", "delete");
+    .onReturn(1, spy.get("S0", 0), spy.format("S1", "OK"))
+    .onError(1, spy.FETCH_ERROR, spy.get("S0", 0), spy.get("S1", 1))
+    .include(spy.byMethod("org.jasig.cas.DefaultServicesManagerImpl", "delete"));
   audit(sdefSvcDeleted, SVC_DELETED);
 
 
   // Save a service
   sdefSvcSaved = spy.instance()
-    .onReturn().withArguments(1).withRetVal()
-    .onError().withArguments(1).withError()
-    .include("org.jasig.cas.DefaultServicesManagerImpl", "save");
+    .onReturn(1, spy.FETCH_RETVAL, spy.get("S0", 0), spy.get("S1", 1))
+    .onError(1, spy.FETCH_ERROR, spy.get("S0", 0), spy.get("S1", 1))
+    .include(spy.byMethod("org.jasig.cas.DefaultServicesManagerImpl", "save"));
   audit(sdefSvcSaved, SVC_SAVED);
 
   return this;

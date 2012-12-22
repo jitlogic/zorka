@@ -156,7 +156,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testInstrumentWithFormatArgs() {
         SpyDefinition sdef =
             SpyDefinition.instrument().include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
-                .onEnter(spy.formatter(2, "${1.request.requestURI}")).onSubmit(spy.tdiff(0, 1, 1))
+                .onEnter(spy.format(2, "${1.request.requestURI}")).onSubmit(spy.tdiff(0, 1, 1))
                 .onCollect(spy.zorkaStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI", "${2}", 0, 1));
     }
 
@@ -168,7 +168,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testInstrumentWithFormatArgsAndTransformViaMethod() {
         SpyDefinition sdef =
             SpyDefinition.instrument().include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
-                .onEnter(spy.formatter(2, "${1.request.requestURI}"), spy.call(0, 0, "split", "\\?"), spy.get(0, 0))
+                .onEnter(spy.format(2, "${1.request.requestURI}"), spy.call(0, 0, "split", "\\?"), spy.get(0, 0))
                 .onSubmit(spy.tdiff(0, 1, 1))
                 .onCollect(spy.zorkaStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byURI", "${methodName}", 0, 1));
     }
@@ -182,7 +182,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     public void testInstrumentWithCatchArgsOnExit() {
         SpyDefinition sdef =
             SpyDefinition.instrument().include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
-                .onEnter(2, spy.formatter(1, "${0.reply.replyCode}")).onSubmit(spy.tdiff(0, 2, 2))
+                .onEnter(2, spy.format(1, "${0.reply.replyCode}")).onSubmit(spy.tdiff(0, 2, 2))
                 .onCollect(spy.zorkaStats("java", "Catalina:type=ZorkaStats,name=HttpRequests", "byCode", "${1}", 0, 2));
     }
 
@@ -195,8 +195,8 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
         SpyDefinition sdef =
             SpyDefinition.instrument().include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
                 .onReturn(1,2,
-                    spy.formatter(1, "${1.request.requestURI}"),
-                    spy.formatter(2, "${2.reply.replyCode}"),
+                    spy.format(1, "${1.request.requestURI}"),
+                    spy.format(2, "${2.reply.replyCode}"),
                     spy.call(1, 1, "split", "\\?"),
                     spy.get(1, 0))
                 .onSubmit(spy.tdiff(0, 1, 1))
@@ -266,7 +266,7 @@ public class SpyDefinitionModellingTest extends ZorkaFixture {
     //@Test
     public void testRegisterJBossMBeanServer() {
         SpyDefinition.instance().include(spy.byMethod("org.jboss.mx.MBeanServerImpl", SM_CONSTRUCTOR))
-           .onEnter(spy.formatter(0, "jboss")).onEnter(0, FETCH_THREAD)
+           .onEnter(spy.format(0, "jboss")).onEnter(0, FETCH_THREAD)
            .onCollect(spy.bshCollector("jboss.register"));
     }
 

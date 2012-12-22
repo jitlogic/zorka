@@ -64,14 +64,15 @@ by application context paths (plus some root-level files/directories if `ROOT.wa
 
     spy.add(
       spy.instance()
-        .onEnter().withTime().withArguments(1)
-          .get(1,1,"request","requestURI")
-          .transform(1,1,"^(\\/[^\\/]+).*$","${1}")
-        .onReturn().withTime()
-        .onError().withTime()
-        .onSubmit().timeDiff(0,2,2)
-        .toStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byCtx", "${1}", 0, 2)
-      .include("org.apache.catalina.core.StandardEngineValve", "invoke")
+        .onEnter(spy.FETCH_TIME, 1,
+          spy.get(1,1,"request","requestURI"),
+          spy.transform(1,1,"^(\\/[^\\/]+).*$","${1}"))
+        .onReturn(spy.FETCH_TIME)
+        .onSubmit(
+          spy.tdiff("E0","R0","S0"),
+          spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byCtx", "${E1}", "R0", "S0"))
+      .include(
+        spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
     );
 
 This time using `spy.instrument()` function is not possible, so spy configuration had to be constructed manually.
@@ -93,11 +94,14 @@ Another example is collecting statistics sorted out by HTTP status code:
 
     spy.add(
       spy.instance()
-        .onEnter().withTime()
-        .onReturn().withTime().withArguments(2).get(1, 1, "response", "status")
-        .onSubmit().timeDiff(0,1,1)
-        .toStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byStatus", "${2}", 0, 1)
-      .include("org.apache.catalina.core.StandardEngineValve", "invoke")
+        .onEnter(spy.FETCH_TIME)
+        .onReturn(spy.FETCH_TIME, 2,
+          spy.get(1, 1, "response", "status"))
+        .onSubmit(
+          spy.tdiff("E0","R0","S0"),
+          spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byStatus", "${E1}", "R0", "S0"))
+      .include(
+        spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
     );
 
 Status code can be obtained by calling `getResponse().getStatus()` on second argument of `invoke()` method and it has
@@ -110,31 +114,44 @@ Example:
 
     spy.add(
       spy.instance()
-        .onEnter().withTime().withArguments(1)
-          .get(1,1,"request","requestURI").transform(1,2,"^(\\/[^\\/]+).*$","${1}")
-        .onReturn().withTime().withArguments(2).get(1, 1, "response", "status")
-        .onSubmit().timeDiff(0,3,3)
-        .toStats("java","zorka:type=ZorkaStats,name=HttpStats","byUri","${1}",0,3)
-        .toStats("java","zorka:type=ZorkaStats,name=HttpStats","byCtx","${2}",0,3)
-        .toStats("java","zorka:type=ZorkaStats,name=HttpStats","byRc","${4}",0,3)
-        .toStats("java","zorka:type=ZorkaStats,name=HttpStats","byCtRc",“${4}:${2}",0,3)
-        .include("org.apache.catalina.core.StandardEngineValve", "invoke")
-      );
+        .onEnter(spy.FETCH_TIME, 1,
+          spy.get(1,1,"request","requestURI"),
+          spy.transform(1,2,"^(\\/[^\\/]+).*$","${1}"))
+        .onReturn(spy.FETCH_TIME, 2,
+          spy.get(1, 1, "response", "status"))
+        .onSubmit(
+          spy.tdiff("E0","R0","S1"),
+          spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byUri", "${E1}", "R0", "S0"),
+          spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byCtx", "${E2}", "R0", "S0"),
+          spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byStatus", "${R1}", "R0", "S0"),
+          spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byCtxStatus", "${E2}|${R1}", "R0", "S0"))
+      .include(
+          spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
+    );
 
 
 Regex transformer (and optionally string formatter) can be used to create arbitrary rules to classify URIs. For example:
 
     spy.add(
       spy.instance()
-        .onEnter().withTime().withArguments(1).get(1,1,"request","requestURI")
-          .transform(1,1,"^.*loginform\\.jsp$","loginForm")
-          .transform(1,1,"^.*\\.jsp$","java").transform(1,1,"^.*\\.do$","java")
-          .transform(1,1,"^.*\\.html$","pages").transform(1,1,"^.*\\.css$","pages")
-          .transform(1,1,"^.*\\.gif$","images").transform(1,1,"^.*\\.jpg$","images")
-        .onReturn().withTime()
-        .onSubmit().timeDiff(0,2,2)
-        .toStats("java","zorka:type=ZorkaStats,name=HttpStats","byTag","${1}",0,2)
-      .include("org.apache.catalina.core.StandardEngineValve", "invoke")
+        .onEnter(spy.FETCH_TIME, 1,
+          spy.get(1,1,"request","requestURI"),
+          spy.transform("E1","E1","^.*\\.jsp$","javaApps"),
+          spy.transform("E1","E1","^.*\\.do$","javaApps"),
+          spy.transform("E1","E1","^.*\\.html$","staticPages"),
+          spy.transform("E1","E1","^.*\\.css$","staticPages"),
+          spy.transform("E1","E1","^.*\\.gif$","images"),
+          spy.transform("E1","E1","^.*\\.jpg$","images"),
+          spy.transform("E1","E1","^.*\\.png$","images"),
+          spy.transform("E1","E1","^.*\\.ico$","images"),
+          spy.transform("E1","E1","^.*loginform\\.jsp$","loginForm"),
+          spy.transform("E1","E1","^\\/.*", "other"))
+        .onReturn(spy.FETCH_TIME)
+        .onSubmit(
+          spy.tdiff("E0","R0","S0"),
+          spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byTag", "${E1}", "E0", "S0"))
+      .include(
+          spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
     );
 
 _TODO_ monitoring unhandled exceptions thrown by tomcat application;
@@ -148,34 +165,37 @@ Example below will count all exceptions logged by SLF4J and classify them by exc
 
     spy.add(
       spy.instance()
-        .onEnter().withArguments(2).get(0,0,"class","name")
-        .toStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${0}", -1, -1)
-      .include(1, "org.slf4j.impl.JCLLoggerAdapter", "trace", "void", "String", "Throwable")
-      .include(1, "org.slf4j.impl.JCLLoggerAdapter", "debug", "void", "String", "Throwable")
-      .include(1, "org.slf4j.impl.JCLLoggerAdapter", "info",  "void", "String", "Throwable")
-      .include(1, "org.slf4j.impl.JCLLoggerAdapter", "warn",  "void", "String", "Throwable")
-      .include(1, "org.slf4j.impl.JCLLoggerAdapter", "error", "void", "String", "Throwable")
-    );
+        .onEnter(2,
+          spy.get(0,0,"class","name"),
+          spy.zorkaStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${0}", -1, -1))
+      .include(
+        spy.byMethod(1, "org.slf4j.impl.JCLLoggerAdapter", "trace", "void", "String", "Throwable"),
+        spy.byMethod(1, "org.slf4j.impl.JCLLoggerAdapter", "debug", "void", "String", "Throwable"),
+        spy.byMethod(1, "org.slf4j.impl.JCLLoggerAdapter", "info",  "void", "String", "Throwable"),
+        spy.byMethod(1, "org.slf4j.impl.JCLLoggerAdapter", "warn",  "void", "String", "Throwable"),
+        spy.byMethod(1, "org.slf4j.impl.JCLLoggerAdapter", "error", "void", "String", "Throwable")));
 
     spy.add(
       spy.instance()
-        .onEnter().withArguments(3).get(0,0,"class","name")
-        .toStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${0}", -1, -1)
-      .include("org.slf4j.impl.SimpleLogger", "log")
-    );
+        .onEnter(3,
+          spy.get(0,0,"class","name"),
+          spy.zorkaStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${0}", -1, -1))
+      .include(
+        spy.byMethod("org.slf4j.impl.SimpleLogger", "log")));
+
+    spy.add(
+        spy.instance()
+        .onEnter(4,
+          spy.get(0,0,"class","name"),
+          spy.zorkaStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${0}", -1, -1)));
 
     spy.add(
       spy.instance()
-        .onEnter().withArguments(4).get(0,0,"class","name")
-        .toStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${0}", -1, -1)
-    );
-
-    spy.add(
-      spy.instance()
-        .onEnter().withArguments(6).get(0,0,"class","name")
-        .toStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${0}", -1, -1)
-      .include("org.slf4j.impl.Log4jLoggerAdapter", "log")
-    );
+        .onEnter(6,
+          spy.get(0,0,"class","name"),
+          spy.zorkaStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${0}", -1, -1))
+      .include(
+        spy.byMethod("org.slf4j.impl.Log4jLoggerAdapter", "log")));
 
 
 _TODO_ monitoring logs by message
@@ -190,26 +210,37 @@ application logs. CAS auditing configuration will be enclosed in its own namespa
 namespace:
 
     __cas() {
-        severity = syslog.S_INFO;
-        facility = syslog.F_LOCAL5;
-        logger = syslog.get("audit", "127.0.0.1", "cas");
 
-        request = new ThreadLocal();
+      severity = syslog.S_INFO;
+      facility = syslog.F_LOCAL5;
+      logger = syslog.trapper("audit", "127.0.0.1", "cas");
+
+      request = new ThreadLocal();
 
       // Intercept request dispatcher and store request object for later use
       spy.add(spy.instance()
-        .onEnter().withArguments(1).set(0, request)
-        .onReturn().withArguments(1).remove(request)
-        .onError().withArguments(1).remove(request)
-        .include("org.jasig.cas.web.init.SafeDispatcherServlet", "service"));
+        .onEnter(1, spy.tlSet(0, request))
+        .onReturn(1, spy.tlRemove(request))
+        .onError(1, spy.tlRemove(request))
+        .include(
+          spy.byMethod("org.jasig.cas.web.init.SafeDispatcherServlet", "service")));
 
-        // Authentication attempts
-        spy.add(spy.instance()
-          .onReturn().withArguments(1).format(1,"AUTHENTICATION_SUCCESS").get(2, request)
-          .onError().withArguments(1).format(1,"AUTHENTICATION_FAILED").get(2, request)
-          .toSyslog(logger, "remote=${2.remoteAddr} local=${2.localAddr} action=${1} who=${0} what=${0}",
-              severity, facility, "cas", "cas")
-          .include("org.jasig.cas.authentication.AbstractAuthenticationManager", "authenticate"));
+
+      // Authentication attempts
+      spy.add(spy.instance()
+        .onReturn(1,
+          spy.get("S0", "E0"),
+          spy.format("S1","AUTHENTICATION_SUCCESS"),
+          spy.tlGet("S2", request))
+        .onError(1,
+          spy.get("S0", "E0"),
+          spy.format("S1","AUTHENTICATION_FAILED"),
+          spy.tlGet("S2", request))
+        .onSubmit(
+          spy.syslogCollector(logger, "remote=${2.remoteAddr} local=${2.localAddr} action=${1} who=${0} what=${0}", severity, facility, "cas", "cas"))
+        .include(
+          spy.byMethod("org.jasig.cas.authentication.AbstractAuthenticationManager", "authenticate")));
+
 
         // ... (other methods instrumented) ...
 
@@ -271,22 +302,29 @@ As most of fields are the same for all messages a convention has been assumed in
 of work has been moved to common `audit()` function:
 
     audit(sdef, action) {
+
       // SUCCESS path ...
-      sdef = sdef.onReturn().put(2, action).put(3, SUCCESS)
-          .get(4, request, "remoteAddr").get(5, request, "localAddr");
+      sdef = sdef.onReturn(
+          spy.put("S2", action),
+          spy.put("S3", SUCCESS),
+          spy.tlGet("S4", request, "remoteAddr"),
+          spy.tlGet("S5", request, "localAddr"));
 
       // FAILURE path ...
-      sdef = sdef.onError().put(2, action).put(3, SUCCESS)
-          .get(4, request, "remoteAddr").get(5, request, "localAddr");
+      sdef = sdef.onError(
+          spy.put("S2", action),
+          spy.put("S3", FAILURE),
+          spy.tlGet("S4", request, "remoteAddr"),
+          spy.tlGet("S5", request, "localAddr"));
 
       // Configure SNMP trap collector
-      sdef = sdef.toSnmp(trapper, oid, 0,
+      sdef = sdef.onSubmit(spy.snmpCollector(trapper, oid, 0,
          snmp.bind(0, snmp.OCTETSTRING, "1"), // WHO  (String)
          snmp.bind(1, snmp.OCTETSTRING, "2"), // WHAT (String)
          snmp.bind(2, snmp.INTEGER, "3"),     // ACTION (int)
          snmp.bind(3, snmp.INTEGER, "4"),     // RESULT (int)
          snmp.bind(4, snmp.IPADDRESS, "5"),   // REMOTE (ip address)
-         snmp.bind(5, snmp.IPADDRESS, "6"));  // LOCAL (ip address)
+         snmp.bind(5, snmp.IPADDRESS, "6")));  // LOCAL (ip address)
 
       spy.add(sdef);
     }

@@ -18,10 +18,13 @@
 
   spy.add(
     spy.instance()
-      .onEnter().withTime()
-      .onReturn().withTime().withArguments(2).get(1, 1, "response", "status")
-      .onSubmit().timeDiff(0,1,1)
-      .toStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byStatus", "${2}", 0, 1)
-    .include("org.apache.catalina.core.StandardEngineValve", "invoke")
+      .onEnter(spy.FETCH_TIME)
+      .onReturn(spy.FETCH_TIME, 2,
+        spy.get(1, 1, "response", "status"))
+      .onSubmit(
+        spy.tdiff("E0","R0","S0"),
+        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byStatus", "${E1}", "R0", "S0"))
+    .include(
+      spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
   );
 
