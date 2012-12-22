@@ -1,11 +1,11 @@
-Zorka 0.6 (2012-12-21)
+Zorka 0.6 (2012-12-22)
 ----------------------
 
  * normalization of xQL queries (all major query languages);
  * normalization of LDAP search queries;
  * file trapper (logs events to files instead of syslog/zabbix/SNMP);
  * composite processing chains and comparator filters;
- * zorka API overhaul;
+ * zorka API overhaul (yet more refactoring are on the way);
 
 
 Zorka 0.5 (2012-12-07)

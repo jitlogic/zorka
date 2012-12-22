@@ -153,22 +153,27 @@ __jboss() {
 
   // Catch MX mbean server initialization and register JBoss MBean Server here ...
 
-  jbossMbs = null;
+  __mbsRegister() {
 
-  collect(record) {
-    synchronized (super) {
-      if (super.jbossMbs == null) {
-        mbs = record.get(spy.ON_COLLECT,0);
-        zorka.registerMbs("jboss", mbs);
-        super.jbossMbs = mbs;
-        zorka.log("jboss").debug("Registered JBoss MBean server as 'jboss'");
+    jbossMbs = null;
+
+    process(stage,record) {
+      synchronized (super) {
+        if (super.jbossMbs == null) {
+          mbs = record.get(spy.ON_RETURN,0);
+          zorka.registerMbs("jboss", mbs);
+          super.jbossMbs = mbs;
+          zorka.logInfo("Registered JBoss MBean server as 'jboss'");
+        }
       }
+      return record;
     }
-  }
+    return this;
+  } // __mbsRegister()
 
-
-  spy.add(spy.instance().onReturn().withArguments(0)
-     .lookFor("org.jboss.mx.server.MBeanServerImpl", "<init>").toBsh("jboss"));
+  spy.add(spy.instance()
+    .onReturn(0, (com.jitlogic.zorka.spy.SpyProcessor)__mbsRegister())
+    .include(spy.byMethod("org.jboss.mx.server.MBeanServerImpl", "<init>")));
 
   return this;
 }

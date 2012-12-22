@@ -124,7 +124,7 @@ __jboss7() {
   __mbsRegister() {
     jbossMbs = null;
 
-    collect(record) {
+    process(stage,record) {
       synchronized (super) {
         if (super.jbossMbs == null) {
           mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
@@ -133,14 +133,16 @@ __jboss7() {
           zorka.logInfo("Registered platform mbean server as 'java'");
         }
       }
+      return record;
     }
     return this;
   }
 
 
-  spy.add(spy.instance().onReturn().withNull()
-    .include("org.jboss.modules.ModuleLoader", "installMBeanServer")
-    .toCollector((com.jitlogic.zorka.spy.SpyCollector)__mbsRegister()));
+  spy.add(spy.instance()
+    .onReturn(spy.FETCH_NULL, (com.jitlogic.zorka.spy.SpyProcessor)__mbsRegister())
+    .include(spy.byMethod("org.jboss.modules.ModuleLoader", "installMBeanServer")));
+
 
 
   return this;
