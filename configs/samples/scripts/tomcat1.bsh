@@ -20,7 +20,8 @@
     spy.instrument(
       "java", "zorka:type=ZorkaStats,name=HttpStats",
       "byUrl", "${1.request.requestURI}")
-    .include("org.apache.catalina.core.StandardEngineValve", "invoke")
+    .include(
+      spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
   );
 
 
