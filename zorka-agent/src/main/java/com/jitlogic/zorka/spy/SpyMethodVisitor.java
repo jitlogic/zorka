@@ -17,10 +17,11 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.spy.probes.SpyProbe;
+import com.jitlogic.zorka.spy.probes.SpyReturnProbe;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
 
@@ -39,14 +40,13 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     private int access;
     private String methodName;
-    private String methodDesc;
 
     private Type[] argTypes;
     private Type returnType;
 
     private int retValProbeSlot = 0;   // for both returns and errors
 
-    private SpyProbe returnProbe, errorProbe;
+    private SpyProbe returnProbe;//, errorProbe;
 
     private List<SpyContext> ctxs;
 
@@ -61,7 +61,6 @@ public class SpyMethodVisitor extends MethodVisitor {
         super(V1_6, mv);
         this.access = access;
         this.methodName = methodName;
-        this.methodDesc = methodDesc;
         this.ctxs = ctxs;
 
         argTypes = Type.getArgumentTypes(methodDesc);
@@ -126,8 +125,8 @@ public class SpyMethodVisitor extends MethodVisitor {
         mv.visitLabel(l_try_to);
         mv.visitLabel(l_try_handler);
 
-        if (errorProbe != null) {
-            errorProbe.emitFetchRetVal(this, Type.getType(Object.class));
+        if (returnProbe != null) {
+            returnProbe.emitFetchRetVal(this, Type.getType(Object.class));
         }
 
         for (int i = ctxs.size()-1; i >= 0; i--) {
@@ -161,19 +160,14 @@ public class SpyMethodVisitor extends MethodVisitor {
         for (SpyContext ctx : ctxs) {
             for (int stage : new int[] { ON_ERROR, ON_RETURN }) {
                 for (SpyProbe spe : ctx.getSpyDefinition().getProbes(stage)) {
-                    switch (spe.getArgType()) {
-                        case FETCH_RETVAL:
-                            returnProbe = spe;
-                            break;
-                        case FETCH_ERROR:
-                            errorProbe = spe;
-                            break;
-                    } // switch()
+                    if (spe instanceof SpyReturnProbe) {
+                        returnProbe = spe;
+                    }
                 } // for (SpyProbeElement spe ....
             } // for (int stage ...
         } // for (SpyContext ctx ...
 
-        if (returnProbe != null || errorProbe != null) {
+        if (returnProbe != null) {
             retValProbeSlot = argTypes.length + 1;
         } //
 

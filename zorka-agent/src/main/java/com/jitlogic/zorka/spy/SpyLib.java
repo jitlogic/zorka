@@ -27,6 +27,7 @@ import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
 import com.jitlogic.zorka.logproc.LogProcessor;
 import com.jitlogic.zorka.normproc.Normalizer;
 import com.jitlogic.zorka.spy.collectors.*;
+import com.jitlogic.zorka.spy.probes.*;
 import com.jitlogic.zorka.spy.processors.*;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLogLevel;
@@ -145,14 +146,14 @@ public class SpyLib {
         List<SpyDefArg> sdaList = new ArrayList<SpyDefArg>(argList.size()+2);
 
         for (Integer arg : argList) {
-            sdaList.add(fetchArg(arg));
+            sdaList.add(fetchArg(arg, "E"+arg));
         }
 
-        sdaList.add(fetchTime());
+        sdaList.add(fetchTime("E"+(tidx+1)));
 
         return SpyDefinition.instance()
                 .onEnter(sdaList.toArray(new SpyDefArg[0]))
-                .onReturn(fetchTime()).onError(fetchTime())
+                .onReturn(fetchTime("R0")).onError(fetchTime("X0"))
                 .onSubmit(tdiff(tidx, tidx + 1, tidx + 1))
                 .onCollect(zorkaStats(mbsName, mbeanName, attrName, sb.toString(), tidx, tidx + 1));
     }
@@ -188,38 +189,38 @@ public class SpyLib {
     }
 
 
-    public SpyProbe fetchArg(int arg) {
-        return new SpyProbe(arg);
+    public SpyProbe fetchArg(int arg, String dstKey) {
+        return new SpyArgProbe(arg, dstKey);
     }
 
 
-    public SpyProbe fetchClass(String className) {
-        return new SpyProbeElement(className);
+    public SpyProbe fetchClass(String className, String dstKey) {
+        return new SpyClassProbe(className, dstKey);
     }
 
 
-    public SpyProbe fetchException() {
-        return new SpyProbe(FETCH_ERROR);
+    public SpyProbe fetchException(String dstKey) {
+        return new SpyReturnProbe(dstKey);
     }
 
 
-    public SpyProbe fetchNull() {
-        return new SpyProbe(FETCH_NULL);
+    public SpyProbe fetchNull(String dstKey) {
+        return new SpyConstProbe(null, dstKey);
     }
 
 
-    public SpyProbe fetchRetVal() {
-        return new SpyProbe(FETCH_RETVAL);
+    public SpyProbe fetchRetVal(String dstKey) {
+        return new SpyReturnProbe(dstKey);
     }
 
 
-    public SpyProbe fetchThread() {
-        return new SpyProbe(FETCH_THREAD);
+    public SpyProbe fetchThread(String dstKey) {
+        return new SpyThreadProbe(dstKey);
     }
 
 
-    public SpyProbe fetchTime() {
-        return new SpyProbe(FETCH_TIME);
+    public SpyProbe fetchTime(String dstKey) {
+        return new SpyTimeProbe(dstKey);
     }
 
 

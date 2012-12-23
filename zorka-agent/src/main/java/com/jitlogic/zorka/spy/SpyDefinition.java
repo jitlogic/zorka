@@ -17,6 +17,8 @@
 package com.jitlogic.zorka.spy;
 
 
+import com.jitlogic.zorka.spy.probes.SpyProbe;
+import com.jitlogic.zorka.spy.probes.SpyTimeProbe;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.*;
@@ -48,9 +50,9 @@ public class SpyDefinition {
 
     public static SpyDefinition instrument() {
         return new SpyDefinition()
-            .onEnter(new SpyProbe(FETCH_TIME))
-            .onReturn(new SpyProbe(FETCH_TIME))
-            .onError(new SpyProbe(FETCH_TIME))
+            .onEnter(new SpyTimeProbe("E0"))
+            .onReturn(new SpyTimeProbe("R0"))
+            .onError(new SpyTimeProbe("X0"))
             .onEnter();
     }
 

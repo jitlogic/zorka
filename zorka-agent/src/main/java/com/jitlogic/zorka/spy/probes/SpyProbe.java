@@ -13,100 +13,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.spy;
+package com.jitlogic.zorka.spy.probes;
 
-import org.objectweb.asm.MethodVisitor;
+import com.jitlogic.zorka.spy.SpyDefArg;
+import com.jitlogic.zorka.spy.SpyMethodVisitor;
 import org.objectweb.asm.Type;
 
-import static com.jitlogic.zorka.spy.SpyLib.*;
 import static org.objectweb.asm.Opcodes.*;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
-public class SpyProbe implements SpyDefArg {
+public abstract class SpyProbe implements SpyDefArg {
 
-    private int argType;
-    private String className;
+    private String dstKey;
 
-
-    public SpyProbe(Object arg) {
-        if (arg instanceof String) {
-            className = (String)arg;
-            argType = FETCH_CLASS;
-        } else if (arg instanceof Integer) {
-            argType = (Integer)arg;
-        }
-
+    public SpyProbe(String dstKey) {
+        this.dstKey = dstKey;
     }
 
 
-    public int getArgType() {
-        return argType;
-    }
-
-
-    public String getClassName() {
-        return className;
-    }
-
-
-    public int emit(SpyMethodVisitor mv, int stage, int opcode) {
-        switch (this.getArgType()) {
-            case FETCH_TIME:
-                mv.visitMethodInsn(INVOKESTATIC, "java/lang/System", "nanoTime", "()J");
-                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;");
-                break;
-            case FETCH_CLASS:
-                String cn = "L"+this.getClassName().replace(".", "/") + ";";
-                mv.visitLdcInsn(Type.getType(cn));
-                break;
-            case FETCH_THREAD:
-                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;");
-                break;
-            case FETCH_ERROR:
-            case FETCH_RETVAL:
-                mv.visitVarInsn(ALOAD, mv.getRetValProbeSlot());
-                break;
-            case FETCH_NULL:
-                mv.visitInsn(ACONST_NULL);
-                break;
-            default:
-                if (stage == ON_ENTER && this.getArgType() == 0 && "<init>".equals(mv.getMethodName())) {
-                    // TODO log warning
-                    mv.visitInsn(ACONST_NULL);
-                } else if (this.getArgType() >= 0) {
-                    return emitFetchArgument(mv);
-                } else {
-                    // TODO log warning
-                    mv.visitInsn(ACONST_NULL);
-                }
-                break;
-        }
-
-        return 1;
-    }
-
-
-    private int emitFetchArgument(SpyMethodVisitor mv) {
-
-        if ((mv.getAccess() & ACC_STATIC) == 0 && this.getArgType() == 0) {
-            mv.visitVarInsn(ALOAD, this.getArgType());
-            return 1;
-        }
-
-        int aoffs = (mv.getAccess() & ACC_STATIC) == 0 ? 1 : 0;
-        int aidx = this.getArgType() - aoffs;
-        Type type = mv.getArgType(aidx); //argTypes[aidx];
-        int insn = type.getOpcode(ILOAD);
-
-        for (int i = 0; i < aidx; i++) {
-            aoffs += mv.getArgType(i).getSize();
-        }
-
-        mv.visitVarInsn(insn, aoffs);
-        emitAutoboxing(mv, type);
-
-        return 1;
-    }
+    public abstract int emit(SpyMethodVisitor mv, int stage, int opcode);
 
 
     public int emitFetchRetVal(SpyMethodVisitor mv, Type type) {

@@ -65,7 +65,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testTrivialInstrumentOnlyEntryPointWithThisRef() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg(0))
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg(0, "E0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
         Object obj = instantiate(engine, TCLASS1);
 
@@ -78,7 +78,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
 //    @Test  TODO make this test working
     public void testStaticNotPublicMethod() throws Exception {
-        engine.add(SpyDefinition.instance().onReturn(spy.fetchNull())
+        engine.add(SpyDefinition.instance().onReturn(spy.fetchNull("R0"))
                 .include(spy.byMethod(TCLASS1, "nonPublicStatic")));
         Object obj = instantiate(engine, TCLASS1);
 
@@ -89,7 +89,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testInstrumentWithNullProbe() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchNull())
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchNull("E0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
         Object obj = instantiate(engine, TCLASS1);
 
@@ -112,7 +112,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testTrivialInstrumentOnlyEntryPointWithCurrentTime() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime())
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("E0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
         Object obj = instantiate(engine, TCLASS1);
 
@@ -153,7 +153,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     @Test
     public void testInstrumentWithTwoProbes() throws Exception {
         engine.add(SpyDefinition.instrument().include(spy.byMethod(TCLASS1, "trivialMethod")));
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg(0))
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg(0, "E0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -180,7 +180,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testInstrumentConstructorWithSelfRef() throws Exception {
-        engine.add(SpyDefinition.instance().onReturn(spy.fetchArg(0))
+        engine.add(SpyDefinition.instance().onReturn(spy.fetchArg(0, "R0"))
                 .include(spy.byMethod(TCLASS1, SM_CONSTRUCTOR)));
         //engine.enableDebug();
         Object obj = instantiate(engine, TCLASS1);
@@ -192,7 +192,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testInstrumentConstructorWithInvalidSelfRefOnBeginning() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg(0))
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg(0, "E0"))
                 .include(spy.byMethod(TCLASS1, SM_CONSTRUCTOR)));
         //engine.enableDebug();
         Object obj = instantiate(engine, TCLASS1);
@@ -205,7 +205,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testFetchClassFromInstrumentedCode() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchClass(TCLASS1))
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchClass(TCLASS1, "E0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
@@ -219,7 +219,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     @Test
     public void testFetchIntegerTypeArgument() throws Exception {
         engine.add(SpyDefinition.instance()
-            .onEnter(spy.fetchArg(1), spy.fetchArg(2), spy.fetchArg(3), spy.fetchArg(4))
+            .onEnter(spy.fetchArg(1, "E0"), spy.fetchArg(2, "E1"), spy.fetchArg(3, "E2"), spy.fetchArg(4, "E3"))
             .include(spy.byMethod(TCLASS1, "paramMethod1")));
         //engine.enableDebug();
         Object obj = instantiate(engine, TCLASS1);
@@ -235,7 +235,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testFetchBooleanCharTypeArgument() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg(1), spy.fetchArg(2))
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg(1, "E0"), spy.fetchArg(2, "E1"))
                 .include(spy.byMethod(TCLASS1, "paramMethod2")));
         //engine.enableDebug();
         Object obj = instantiate(engine, TCLASS1);
@@ -248,7 +248,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testFetchFloatingPointArgs() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg(1), spy.fetchArg(2))
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg(1, "E0"), spy.fetchArg(2, "E1"))
                 .include(spy.byMethod(TCLASS1, "paramMethod3")));
         //engine.enableDebug();
         Object obj = instantiate(engine, TCLASS1);
@@ -261,7 +261,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testCheckImmediateFlagInEntryPointOnlyProbe() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime())
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("E0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
@@ -285,7 +285,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testCheckNoProbeOnEnterAndImmediateFlagOnExit() throws Exception {
-        engine.add(SpyDefinition.instance().onReturn(spy.fetchTime())
+        engine.add(SpyDefinition.instance().onReturn(spy.fetchTime("R0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
@@ -297,7 +297,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testNoProbeOnExitButProbeOnErrorAndOnEnter() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime()).onError(spy.fetchTime())
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("E0")).onError(spy.fetchTime("X0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
         //engine.enableDebug();
         Object obj = instantiate(engine, TCLASS1);
@@ -312,7 +312,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testNoProbeOnErrorButProbeOnEnterAndExit() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime()).onReturn(spy.fetchTime())
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("E0")).onReturn(spy.fetchTime("X0"))
                 .include(spy.byMethod(TCLASS1, "errorMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -327,7 +327,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testIfContextIsTheSameForTheSameClassLoadedTwice() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime())
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("E0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         Object obj1 = instantiate(engine, TCLASS1);
@@ -379,7 +379,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testFetchArraysOfSimpleTypes() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg(1), spy.fetchArg(2), spy.fetchArg(3))
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg(1, "E0"), spy.fetchArg(2, "E1"), spy.fetchArg(3, "E2"))
                 .include(spy.byMethod(TCLASS1, "paramMethod4")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -394,7 +394,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testFetchReturnObject() throws Exception {
-        engine.add(SpyDefinition.instance().onReturn(spy.fetchRetVal())
+        engine.add(SpyDefinition.instance().onReturn(spy.fetchRetVal("R0"))
                 .include(spy.byMethod(TCLASS1, "strMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -409,7 +409,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testFetchReturnSimpleTypeObject() throws Exception {
-        engine.add(SpyDefinition.instance().onReturn(spy.fetchRetVal())
+        engine.add(SpyDefinition.instance().onReturn(spy.fetchRetVal("R0"))
                 .include(spy.byMethod(TCLASS1, "getUltimateQuestionOfLife")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -424,7 +424,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testFetchReturnValWithDirtyVariableStack() throws Exception {
-        engine.add(SpyDefinition.instance().onReturn(spy.fetchRetVal())
+        engine.add(SpyDefinition.instance().onReturn(spy.fetchRetVal("R0"))
                 .include(spy.byMethod(TCLASS1, "getUltimateQuestionWithLocalVars")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -439,7 +439,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testFetchCurrentThreadSubmission() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchThread())
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchThread("E0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -452,7 +452,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testFetchExceptionObject() throws Exception {
-        engine.add(SpyDefinition.instance().onError(spy.fetchException())
+        engine.add(SpyDefinition.instance().onError(spy.fetchException("X0"))
                 .include(spy.byMethod(TCLASS1, "errorMethod")));
 
         Object obj = instantiate(engine, TCLASS1);

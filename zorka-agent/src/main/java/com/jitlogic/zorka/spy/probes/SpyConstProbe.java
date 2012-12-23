@@ -8,30 +8,29 @@
  * <p/>
  * This software is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * <p/>
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.spy.probes;
 
-package com.jitlogic.zorka.spy;
+import com.jitlogic.zorka.spy.SpyLib;
+import com.jitlogic.zorka.spy.SpyMethodVisitor;
 
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
+import static org.objectweb.asm.Opcodes.ACONST_NULL;
 
-import static com.jitlogic.zorka.spy.SpyLib.*;
-import static org.objectweb.asm.Opcodes.*;
-import static org.objectweb.asm.Opcodes.ACC_STATIC;
-import static org.objectweb.asm.Opcodes.ILOAD;
+public class SpyConstProbe extends SpyProbe {
 
-/**
- *
- */
-public class SpyProbeElement extends SpyProbe {
+    private Object val;
 
+    public SpyConstProbe(Object val, String dstKey) {
+        super(dstKey);
+        this.val = val;
+    }
 
-    public SpyProbeElement(Object arg) {
-        super(arg);
+    public int emit(SpyMethodVisitor mv, int stage, int opcode) {
+        mv.visitInsn(ACONST_NULL);
+        return 1;
     }
 }
