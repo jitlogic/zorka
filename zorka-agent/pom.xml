@@ -6,7 +6,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
     <parent>
         <groupId>com.jitlogic.zorka</groupId>
         <artifactId>zorka</artifactId>
-        <version>0.6.0</version>
+        <version>0.6.1-SNAPSHOT</version>
     </parent>
     <dependencies>
         <dependency>
@@ -23,6 +23,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <groupId>com.jitlogic.zoola</groupId>
             <artifactId>zoola-core</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jitlogic.contrib</groupId>
+            <artifactId>libsnmp</artifactId>
+            <version>0.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.ow2.spec.ee</groupId>
@@ -77,6 +82,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                                 <include>com.googlecode.json-simple:json-simple</include>
                                 <include>org.ow2.asm:asm</include>
                                 <include>com.jitlogic.zoola:zoola-core</include>
+                                <include>com.jitlogic.contrib:libsnmp</include>
                             </includes>
                             <rules>
                                 <rule>
@@ -90,6 +96,10 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                                 <rule>
                                     <pattern>bsh.**</pattern>
                                     <result>com.jitlogic.zorka.deps.bsh.@1</result>
+                                </rule>
+                                <rule>
+                                    <pattern>com.jitlogic.contrib.**</pattern>
+                                    <result>com.jitlogic.zorka.deps.@1</result>
                                 </rule>
                             </rules>
                         </configuration>

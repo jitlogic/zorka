@@ -27,6 +27,7 @@ import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
 import com.jitlogic.zorka.logproc.LogProcessor;
 import com.jitlogic.zorka.normproc.Normalizer;
 import com.jitlogic.zorka.spy.collectors.*;
+import com.jitlogic.zorka.spy.probes.*;
 import com.jitlogic.zorka.spy.processors.*;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLogLevel;
@@ -142,9 +143,17 @@ public class SpyLib {
 
         int tidx = argList.size();
 
+        List<SpyDefArg> sdaList = new ArrayList<SpyDefArg>(argList.size()+2);
+
+        for (Integer arg : argList) {
+            sdaList.add(fetchArg(arg, "E"+arg));
+        }
+
+        sdaList.add(fetchTime("E"+(tidx+1)));
+
         return SpyDefinition.instance()
-                .onEnter(argList.toArray(), FETCH_TIME)
-                .onReturn(FETCH_TIME).onError(FETCH_TIME)
+                .onEnter(sdaList.toArray(new SpyDefArg[0]))
+                .onReturn(fetchTime("R0")).onError(fetchTime("X0"))
                 .onSubmit(tdiff(tidx, tidx + 1, tidx + 1))
                 .onCollect(zorkaStats(mbsName, mbeanName, attrName, sb.toString(), tidx, tidx + 1));
     }
@@ -179,6 +188,40 @@ public class SpyLib {
         return new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, slot(tstampField), slot(timeField));
     }
 
+
+    public SpyProbe fetchArg(int arg, String dstKey) {
+        return new SpyArgProbe(arg, dstKey);
+    }
+
+
+    public SpyProbe fetchClass(String className, String dstKey) {
+        return new SpyClassProbe(className, dstKey);
+    }
+
+
+    public SpyProbe fetchException(String dstKey) {
+        return new SpyReturnProbe(dstKey);
+    }
+
+
+    public SpyProbe fetchNull(String dstKey) {
+        return new SpyConstProbe(null, dstKey);
+    }
+
+
+    public SpyProbe fetchRetVal(String dstKey) {
+        return new SpyReturnProbe(dstKey);
+    }
+
+
+    public SpyProbe fetchThread(String dstKey) {
+        return new SpyThreadProbe(dstKey);
+    }
+
+
+    public SpyProbe fetchTime(String dstKey) {
+        return new SpyTimeProbe(dstKey);
+    }
 
 
     /**

@@ -13,26 +13,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.spy.probes;
 
-package com.jitlogic.zorka.agent.testinteg;
+import com.jitlogic.zorka.spy.SpyLib;
+import com.jitlogic.zorka.spy.SpyMethodVisitor;
+import org.objectweb.asm.Type;
 
-import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
-import com.jitlogic.zorka.integ.snmp.SnmpLib;
-import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
-import com.jitlogic.contrib.libsnmp.SNMPObjectIdentifier;
-import org.junit.Test;
+import static com.jitlogic.zorka.spy.SpyLib.*;
+import static org.objectweb.asm.Opcodes.ACONST_NULL;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
-public class SnmpIntegTest extends ZorkaFixture {
+public class SpyThreadProbe extends SpyProbe {
 
-    @Test
-    public void testSendSimpleTrap() throws Exception {
-        SnmpTrapper trapper = snmpLib.trapper("test", "127.0.0.1", "public", "127.0.0.1", SnmpLib.SNMP_V1);
+    public SpyThreadProbe(String dstKey) {
+        super(dstKey);
+    }
 
-        SNMPObjectIdentifier oid = snmpLib.oid("1.3.6.1.4.1.3.1.1");
-
-        trapper.trap(1, 1, oid);
-
-        Thread.sleep(100);
+    public int emit(SpyMethodVisitor mv, int stage, int opcode) {
+        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;");
+        return 1;
     }
 
 }

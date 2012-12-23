@@ -18,7 +18,7 @@ package com.jitlogic.zorka.spy.collectors;
 import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
 import com.jitlogic.zorka.integ.snmp.TrapVarBindDef;
-import com.jitlogic.zorka.libsnmp.*;
+import com.jitlogic.contrib.libsnmp.*;
 import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;

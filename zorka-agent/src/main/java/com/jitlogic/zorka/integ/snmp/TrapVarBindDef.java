@@ -15,8 +15,6 @@
  */
 package com.jitlogic.zorka.integ.snmp;
 
-import com.jitlogic.zorka.libsnmp.SNMPObjectIdentifier;
-
 public class TrapVarBindDef {
     private int type;
     private String oidSuffix;

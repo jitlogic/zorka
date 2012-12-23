@@ -54,7 +54,8 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
 
     @Test
     public void testSubmitWithImmediateFlagAndCheckIfCollected() throws Exception {
-        SpyDefinition sdef = engine.add(SpyDefinition.instance().onEnter(FETCH_TIME)).onSubmit(collector);
+        SpyDefinition sdef = engine.add(
+            SpyDefinition.instance().onEnter(spy.fetchTime("E0"))).onSubmit(collector);
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "com.TClass", "tMethod", "()V", 1));
 
         submitter.submit(ON_ENTER, ctx.getId(), SF_IMMEDIATE, new Object[] { 1L });

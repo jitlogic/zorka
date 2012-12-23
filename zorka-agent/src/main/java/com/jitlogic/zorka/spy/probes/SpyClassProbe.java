@@ -13,26 +13,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.spy.probes;
 
-package com.jitlogic.zorka.agent.testinteg;
+import com.jitlogic.zorka.spy.SpyLib;
+import com.jitlogic.zorka.spy.SpyMethodVisitor;
+import org.objectweb.asm.Type;
 
-import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
-import com.jitlogic.zorka.integ.snmp.SnmpLib;
-import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
-import com.jitlogic.contrib.libsnmp.SNMPObjectIdentifier;
-import org.junit.Test;
+public class SpyClassProbe extends SpyProbe {
 
-public class SnmpIntegTest extends ZorkaFixture {
+    private String className;
 
-    @Test
-    public void testSendSimpleTrap() throws Exception {
-        SnmpTrapper trapper = snmpLib.trapper("test", "127.0.0.1", "public", "127.0.0.1", SnmpLib.SNMP_V1);
-
-        SNMPObjectIdentifier oid = snmpLib.oid("1.3.6.1.4.1.3.1.1");
-
-        trapper.trap(1, 1, oid);
-
-        Thread.sleep(100);
+    public SpyClassProbe(String className, String dstKey) {
+        super(dstKey);
+        this.className = className;
     }
 
+    public int emit(SpyMethodVisitor mv, int stage, int opcode) {
+        String cn = "L"+this.className.replace(".", "/") + ";";
+        mv.visitLdcInsn(Type.getType(cn));
+        return 1;
+    }
 }
