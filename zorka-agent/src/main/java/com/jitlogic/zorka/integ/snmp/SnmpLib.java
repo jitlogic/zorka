@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.integ.snmp;
 
-import com.jitlogic.zorka.libsnmp.*;
+import com.jitlogic.contrib.libsnmp.*;
 import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;

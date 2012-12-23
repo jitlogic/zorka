@@ -25,6 +25,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>com.jitlogic.contrib</groupId>
+            <artifactId>libsnmp</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.ow2.spec.ee</groupId>
             <artifactId>ow2-jsr77-1.1-spec</artifactId>
             <version>1.0.10</version>
@@ -77,6 +82,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                                 <include>com.googlecode.json-simple:json-simple</include>
                                 <include>org.ow2.asm:asm</include>
                                 <include>com.jitlogic.zoola:zoola-core</include>
+                                <include>com.jitlogic.contrib:libsnmp</include>
                             </includes>
                             <rules>
                                 <rule>
@@ -90,6 +96,10 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                                 <rule>
                                     <pattern>bsh.**</pattern>
                                     <result>com.jitlogic.zorka.deps.bsh.@1</result>
+                                </rule>
+                                <rule>
+                                    <pattern>com.jitlogic.contrib.**</pattern>
+                                    <result>com.jitlogic.zorka.deps.@1</result>
                                 </rule>
                             </rules>
                         </configuration>
