@@ -48,9 +48,9 @@ public class SpyDefinition {
 
     public static SpyDefinition instrument() {
         return new SpyDefinition()
-            .onEnter(new SpyProbeElement(FETCH_TIME))
-            .onReturn(new SpyProbeElement(FETCH_TIME))
-            .onError(new SpyProbeElement(FETCH_TIME))
+            .onEnter(new SpyProbe(FETCH_TIME))
+            .onReturn(new SpyProbe(FETCH_TIME))
+            .onError(new SpyProbe(FETCH_TIME))
             .onEnter();
     }
 

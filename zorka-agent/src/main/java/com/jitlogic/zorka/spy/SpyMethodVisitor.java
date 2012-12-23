@@ -45,15 +45,16 @@ public class SpyMethodVisitor extends MethodVisitor {
     private Type returnType;
 
     private int retValProbeSlot = 0;   // for both returns and errors
-    private boolean hasReturnVal, hasErrorVal;
+
+    private SpyProbe returnProbe, errorProbe;
 
     private List<SpyContext> ctxs;
 
     private int stackDelta = 0;
 
-    Label l_try_from = new Label();
-    Label l_try_to = new Label();
-    Label l_try_handler = new Label();
+    private Label l_try_from = new Label();
+    private Label l_try_to = new Label();
+    private Label l_try_handler = new Label();
 
 
     public SpyMethodVisitor(int access, String methodName, String methodDesc, List<SpyContext> ctxs, MethodVisitor mv) {
@@ -105,8 +106,8 @@ public class SpyMethodVisitor extends MethodVisitor {
     public void visitInsn(int opcode) {
         if ((opcode >= IRETURN && opcode <= RETURN)) {
             // ON_RETURN probes are inserted here
-            if (hasReturnVal) {
-                SpyProbeElement.emitFetchRetVal(this, returnType);
+            if (returnProbe != null) {
+                returnProbe.emitFetchRetVal(this, returnType);
             }
             for (int i = ctxs.size()-1; i >= 0; i--) {
                 SpyContext ctx = ctxs.get(i);
@@ -125,8 +126,8 @@ public class SpyMethodVisitor extends MethodVisitor {
         mv.visitLabel(l_try_to);
         mv.visitLabel(l_try_handler);
 
-        if (hasErrorVal) {
-            SpyProbeElement.emitFetchRetVal(this, Type.getType(Object.class));
+        if (errorProbe != null) {
+            errorProbe.emitFetchRetVal(this, Type.getType(Object.class));
         }
 
         for (int i = ctxs.size()-1; i >= 0; i--) {
@@ -162,17 +163,17 @@ public class SpyMethodVisitor extends MethodVisitor {
                 for (SpyProbe spe : ctx.getSpyDefinition().getProbes(stage)) {
                     switch (spe.getArgType()) {
                         case FETCH_RETVAL:
-                            hasReturnVal = true;
+                            returnProbe = spe;
                             break;
                         case FETCH_ERROR:
-                            hasErrorVal = true;
+                            errorProbe = spe;
                             break;
                     } // switch()
                 } // for (SpyProbeElement spe ....
             } // for (int stage ...
         } // for (SpyContext ctx ...
 
-        if (hasReturnVal || hasErrorVal) {
+        if (returnProbe != null || errorProbe != null) {
             retValProbeSlot = argTypes.length + 1;
         } //
 

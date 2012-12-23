@@ -189,7 +189,7 @@ public class SpyLib {
 
 
     public SpyProbe fetchArg(int arg) {
-        return new SpyProbeElement(arg);
+        return new SpyProbe(arg);
     }
 
 
@@ -199,27 +199,27 @@ public class SpyLib {
 
 
     public SpyProbe fetchException() {
-        return new SpyProbeElement(FETCH_ERROR);
+        return new SpyProbe(FETCH_ERROR);
     }
 
 
     public SpyProbe fetchNull() {
-        return new SpyProbeElement(FETCH_NULL);
+        return new SpyProbe(FETCH_NULL);
     }
 
 
     public SpyProbe fetchRetVal() {
-        return new SpyProbeElement(FETCH_RETVAL);
+        return new SpyProbe(FETCH_RETVAL);
     }
 
 
     public SpyProbe fetchThread() {
-        return new SpyProbeElement(FETCH_THREAD);
+        return new SpyProbe(FETCH_THREAD);
     }
 
 
     public SpyProbe fetchTime() {
-        return new SpyProbeElement(FETCH_TIME);
+        return new SpyProbe(FETCH_TIME);
     }
 
 
