@@ -142,9 +142,17 @@ public class SpyLib {
 
         int tidx = argList.size();
 
+        List<SpyDefArg> sdaList = new ArrayList<SpyDefArg>(argList.size()+2);
+
+        for (Integer arg : argList) {
+            sdaList.add(fetchArg(arg));
+        }
+
+        sdaList.add(fetchTime());
+
         return SpyDefinition.instance()
-                .onEnter(argList.toArray(), FETCH_TIME)
-                .onReturn(FETCH_TIME).onError(FETCH_TIME)
+                .onEnter(sdaList.toArray(new SpyDefArg[0]))
+                .onReturn(fetchTime()).onError(fetchTime())
                 .onSubmit(tdiff(tidx, tidx + 1, tidx + 1))
                 .onCollect(zorkaStats(mbsName, mbeanName, attrName, sb.toString(), tidx, tidx + 1));
     }
@@ -179,6 +187,40 @@ public class SpyLib {
         return new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, slot(tstampField), slot(timeField));
     }
 
+
+    public SpyProbe fetchArg(int arg) {
+        return new SpyProbeElement(arg);
+    }
+
+
+    public SpyProbe fetchClass(String className) {
+        return new SpyProbeElement(className);
+    }
+
+
+    public SpyProbe fetchException() {
+        return new SpyProbeElement(FETCH_ERROR);
+    }
+
+
+    public SpyProbe fetchNull() {
+        return new SpyProbeElement(FETCH_NULL);
+    }
+
+
+    public SpyProbe fetchRetVal() {
+        return new SpyProbeElement(FETCH_RETVAL);
+    }
+
+
+    public SpyProbe fetchThread() {
+        return new SpyProbeElement(FETCH_THREAD);
+    }
+
+
+    public SpyProbe fetchTime() {
+        return new SpyProbeElement(FETCH_TIME);
+    }
 
 
     /**

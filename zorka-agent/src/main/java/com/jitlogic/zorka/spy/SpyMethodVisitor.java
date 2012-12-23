@@ -70,6 +70,22 @@ public class SpyMethodVisitor extends MethodVisitor {
     }
 
 
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public int getRetValProbeSlot() {
+        return retValProbeSlot;
+    }
+
+    public int getAccess() {
+        return access;
+    }
+
+    public Type getArgType(int idx) {
+        return argTypes[idx];
+    }
+
     @Override
     public void visitCode() {
         mv.visitCode();
@@ -90,7 +106,7 @@ public class SpyMethodVisitor extends MethodVisitor {
         if ((opcode >= IRETURN && opcode <= RETURN)) {
             // ON_RETURN probes are inserted here
             if (hasReturnVal) {
-                emitFetchRetVal(returnType);
+                SpyProbeElement.emitFetchRetVal(this, returnType);
             }
             for (int i = ctxs.size()-1; i >= 0; i--) {
                 SpyContext ctx = ctxs.get(i);
@@ -110,7 +126,7 @@ public class SpyMethodVisitor extends MethodVisitor {
         mv.visitLabel(l_try_handler);
 
         if (hasErrorVal) {
-            emitFetchRetVal(Type.getType(Object.class));
+            SpyProbeElement.emitFetchRetVal(this, Type.getType(Object.class));
         }
 
         for (int i = ctxs.size()-1; i >= 0; i--) {
@@ -143,7 +159,7 @@ public class SpyMethodVisitor extends MethodVisitor {
 
         for (SpyContext ctx : ctxs) {
             for (int stage : new int[] { ON_ERROR, ON_RETURN }) {
-                for (SpyProbeElement spe : ctx.getSpyDefinition().getProbes(stage)) {
+                for (SpyProbe spe : ctx.getSpyDefinition().getProbes(stage)) {
                     switch (spe.getArgType()) {
                         case FETCH_RETVAL:
                             hasReturnVal = true;
@@ -165,7 +181,7 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     private int emitProbe(int stage, SpyContext ctx) {
         SpyDefinition sdef = ctx.getSpyDefinition();
-        List<SpyProbeElement> probeElements = sdef.getProbes(stage);
+        List<SpyProbe> probeElements = sdef.getProbes(stage);
 
         int submitFlags = getSubmitFlags(stage, sdef);
 
@@ -181,10 +197,11 @@ public class SpyMethodVisitor extends MethodVisitor {
             emitLoadInt(probeElements.size());
             mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
             for (int i = 0; i < probeElements.size(); i++) {
-                SpyProbeElement element = probeElements.get(i);
+                SpyProbe element = probeElements.get(i);
                 mv.visitInsn(DUP);
                 emitLoadInt(i);
-                sd = max(sd, emitProbeElement(stage, 0, probeElements.get(i)) + 6);
+                //sd = max(sd, emitProbeElement(stage, 0, probeElements.get(i)) + 6);
+                sd = max(sd, probeElements.get(i).emit(this, stage, 0) + 6);
                 mv.visitInsn(AASTORE);
             }
         } else {
@@ -196,121 +213,6 @@ public class SpyMethodVisitor extends MethodVisitor {
         mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, SUBMIT_METHOD, SUBMIT_DESC);
 
         return sd;
-    }
-
-
-    private int emitProbeElement(int stage, int opcode, SpyProbeElement element) {
-        switch (element.getArgType()) {
-            case FETCH_TIME:
-                mv.visitMethodInsn(INVOKESTATIC, "java/lang/System", "nanoTime", "()J");
-                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;");
-                break;
-            case FETCH_CLASS:
-                String cn = "L"+element.getClassName().replace(".", "/") + ";";
-                mv.visitLdcInsn(Type.getType(cn));
-                break;
-            case FETCH_THREAD:
-                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;");
-                break;
-            case FETCH_ERROR:
-            case FETCH_RETVAL:
-                mv.visitVarInsn(ALOAD, retValProbeSlot);
-                break;
-            case FETCH_NULL:
-                mv.visitInsn(ACONST_NULL);
-                break;
-            default:
-                if (stage == ON_ENTER && element.getArgType() == 0 && "<init>".equals(methodName)) {
-                    // TODO log warning
-                    mv.visitInsn(ACONST_NULL);
-                } else if (element.getArgType() >= 0) {
-                    return emitFetchArgument(element);
-                } else {
-                    // TODO log warning
-                    mv.visitInsn(ACONST_NULL);
-                }
-                break;
-        }
-
-        return 1;
-    }
-
-
-    private int emitFetchArgument(SpyProbeElement element) {
-
-        if ((access & ACC_STATIC) == 0 && element.getArgType() == 0) {
-            mv.visitVarInsn(ALOAD, element.getArgType());
-            return 1;
-        }
-
-        int aoffs = (access & ACC_STATIC) == 0 ? 1 : 0;
-        int aidx = element.getArgType() - aoffs;
-        Type type = argTypes[aidx];
-        int insn = type.getOpcode(ILOAD);
-
-        for (int i = 0; i < aidx; i++) {
-            aoffs += argTypes[i].getSize();
-        }
-
-        mv.visitVarInsn(insn, aoffs);
-        emitAutoboxing(type);
-
-        return 1;
-    }
-
-
-    private int emitFetchRetVal(Type type) {
-
-        if (Type.VOID == type.getSort()) {
-            mv.visitInsn(ACONST_NULL);
-            return 1;
-        }
-
-        mv.visitInsn(DUP);
-        emitAutoboxing(type);
-        mv.visitVarInsn(ASTORE, retValProbeSlot);
-
-        return type.getSize();
-    }
-
-
-    private void emitAutoboxing(Type type) {
-        switch (type.getSort()) {
-            case Type.INT:
-                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer",
-                        "valueOf", "(I)Ljava/lang/Integer;");
-                break;
-            case Type.LONG:
-                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long",
-                        "valueOf", "(J)Ljava/lang/Long;");
-                break;
-            case Type.FLOAT:
-                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float",
-                        "valueOf", "(F)Ljava/lang/Float;");
-                break;
-            case Type.DOUBLE:
-                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double",
-                        "valueOf", "(D)Ljava/lang/Double;");
-                break;
-            case Type.SHORT:
-                mv.visitInsn(I2S);
-                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Short",
-                        "valueOf", "(S)Ljava/lang/Short;");
-                break;
-            case Type.BYTE:
-                mv.visitInsn(I2B);
-                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Byte",
-                        "valueOf", "(B)Ljava/lang/Byte;");
-                break;
-            case Type.BOOLEAN:
-                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Boolean",
-                        "valueOf", "(Z)Ljava/lang/Boolean;");
-                break;
-            case Type.CHAR:
-                mv.visitMethodInsn(INVOKESTATIC, "java/lang/Character",
-                        "valueOf", "(C)Ljava/lang/Character;");
-                break;
-        }
     }
 
 

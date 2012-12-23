@@ -38,16 +38,20 @@ public class SpyDefinition {
             Collections.unmodifiableList(Arrays.asList(new SpyProcessor[0]));
     private static final List<SpyMatcher> EMPTY_MATCHERS =
             Collections.unmodifiableList(Arrays.asList(new SpyMatcher[0]));
-    private static final List<SpyProbeElement> EMPTY_AF =
-            Collections.unmodifiableList(Arrays.asList(new SpyProbeElement[0]));
+    private static final List<SpyProbe> EMPTY_AF =
+            Collections.unmodifiableList(Arrays.asList(new SpyProbe[0]));
 
-    private List<SpyProbeElement>[] probes;
+    private List<SpyProbe>[] probes;
     private List<SpyProcessor>[] processors;
 
     private List<SpyMatcher> matchers = EMPTY_MATCHERS;
 
     public static SpyDefinition instrument() {
-        return new SpyDefinition().onEnter(FETCH_TIME).onReturn(FETCH_TIME).onError(FETCH_TIME).onEnter();
+        return new SpyDefinition()
+            .onEnter(new SpyProbeElement(FETCH_TIME))
+            .onReturn(new SpyProbeElement(FETCH_TIME))
+            .onError(new SpyProbeElement(FETCH_TIME))
+            .onEnter();
     }
 
     public static SpyDefinition instance() {
@@ -82,7 +86,7 @@ public class SpyDefinition {
      *
      * @return list of probes defined for this stage
      */
-    public List<SpyProbeElement> getProbes(int stage) {
+    public List<SpyProbe> getProbes(int stage) {
         return probes[stage];
     }
 
@@ -169,7 +173,7 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition onEnter(Object...args) {
+    public SpyDefinition onEnter(SpyDefArg...args) {
         return with(ON_ENTER, args);
     }
 
@@ -179,7 +183,7 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition onReturn(Object...args) {
+    public SpyDefinition onReturn(SpyDefArg...args) {
         return with(ON_RETURN, args);
     }
 
@@ -189,7 +193,7 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition onError(Object...args) {
+    public SpyDefinition onError(SpyDefArg...args) {
         return with(ON_ERROR, args);
     }
 
@@ -200,7 +204,7 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition onSubmit(Object...args) {
+    public SpyDefinition onSubmit(SpyDefArg...args) {
         return with(ON_SUBMIT, args);
     }
 
@@ -212,7 +216,7 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition onCollect(Object...args) {
+    public SpyDefinition onCollect(SpyDefArg...args) {
         return with(ON_COLLECT,  args);
     }
 
@@ -252,10 +256,10 @@ public class SpyDefinition {
      *
      * @return spy definition with augmented fetched argument list;
      */
-    private SpyDefinition with(int curStage, Object... args) {
+    private SpyDefinition with(int curStage, SpyDefArg...args) {
         SpyDefinition sdef = new SpyDefinition(this);
 
-        List<SpyProbeElement> newProbes = new ArrayList<SpyProbeElement>(sdef.probes[curStage].size()+args.length+2);
+        List<SpyProbe> newProbes = new ArrayList<SpyProbe>(sdef.probes[curStage].size()+args.length+2);
         newProbes.addAll(sdef.probes[curStage]);
 
         List<SpyProcessor> newProcessors = new ArrayList<SpyProcessor>(sdef.processors[curStage].size()+args.length+2);
@@ -264,8 +268,10 @@ public class SpyDefinition {
         for (Object arg : args) {
             if (arg instanceof SpyProcessor) {
                 newProcessors.add((SpyProcessor)arg);
+            } else if (arg instanceof SpyProbe) {
+                newProbes.add((SpyProbe)arg);
             } else {
-                newProbes.add(new SpyProbeElement(arg));
+                throw new IllegalArgumentException();
             }
         }
 

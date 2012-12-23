@@ -24,7 +24,7 @@ import com.jitlogic.zorka.spy.SpyRecord;
  * Note that beanshell scripts can also make use of it with interface creation
  * feature. See documentation for more details.
  */
-public interface SpyProcessor {
+public interface SpyProcessor extends SpyDefArg {
 
     /**
      * Transforms record passed by instrumentation engine.
