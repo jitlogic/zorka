@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.integ.snmp;
 
 import com.jitlogic.contrib.libsnmp.*;
+import com.jitlogic.zorka.agent.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
@@ -29,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 /**
  *
  */
-public class SnmpTrapper implements Runnable {
+public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> {
 
     public static final int DEFAULT_TRAP_PORT = 162;
 
@@ -43,13 +44,9 @@ public class SnmpTrapper implements Runnable {
     private SNMPIPAddress agentAddr;
     private String community;
 
-    private LinkedBlockingQueue<SNMPSequence> sendQueue = new LinkedBlockingQueue<SNMPSequence>(1024);
-
-    private volatile boolean running = false;
-    private Thread thread;
-
 
     public SnmpTrapper(String snmpAddr, String community, String agentAddr, int protocol) {
+        super("snmp-trapper");
         try {
             if (snmpAddr.contains(":")) {
                 String[] s = snmpAddr.split(":");
@@ -92,55 +89,31 @@ public class SnmpTrapper implements Runnable {
 
 
     protected void enqueue(SNMPSequence trap) {
+        submit(trap);
+    }
+
+    protected void open() {
         try {
-            sendQueue.offer(trap, 1, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) { }
-    }
-
-
-    public void start() {
-        if (!running) {
-            try {
-                running = true;
-                thread = new Thread(this);
-                thread.setDaemon(true);
-                thread.setName("ZORKA-SNMP-trapper");
-                this.trapper = new SNMPTrapSenderInterface(snmpPort);
-                thread.start();
-            } catch (SocketException e) {
-                log.error("Error starting SNMP trapper", e);
-            }
+            this.trapper = new SNMPTrapSenderInterface(snmpPort);
+        } catch (SocketException e) {
+            handleError("Cannot initialize trapper", e);
         }
     }
 
-
-    public void stop() {
-        running = false;
-    }
-
-
-    public void run() {
-
-        while (running) {
-            runCycle();
-        }
-
+    public void close() {
         trapper.close();
         trapper = null;
-        thread = null;
-
     }
 
 
-    private void runCycle() {
+    @Override
+    protected void process(SNMPSequence trap) {
         try {
-            SNMPSequence trap = sendQueue.poll(1, TimeUnit.MILLISECONDS);
             if (trap instanceof SNMPv1TrapPDU) {
                 trapper.sendTrap(snmpAddr, community, (SNMPv1TrapPDU)trap);
             } else if (trap instanceof SNMPv2TrapPDU) {
                 trapper.sendTrap(snmpAddr, community, (SNMPv2TrapPDU)trap);
             }
-        } catch (InterruptedException e) {
         } catch (IOException e) {
             log.error("Error sending SNMP trap", e);
         }
