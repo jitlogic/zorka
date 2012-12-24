@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.logproc;
 
-import com.jitlogic.zorka.agent.ZorkaTrapper;
+import com.jitlogic.zorka.agent.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogLevel;
 import com.jitlogic.zorka.util.ZorkaUtil;
@@ -24,7 +24,7 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class FileTrapper extends ZorkaTrapper<String> implements LogProcessor {
+public class FileTrapper extends ZorkaAsyncThread<String> implements LogProcessor {
 
     private final static int ROLLING = 1;
     private final static int DATED   = 2;

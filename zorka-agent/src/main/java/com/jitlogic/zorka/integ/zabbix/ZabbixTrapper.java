@@ -16,32 +16,24 @@
 
 package com.jitlogic.zorka.integ.zabbix;
 
+import com.jitlogic.zorka.agent.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.Base64;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
-public class ZabbixTrapper implements Runnable {
+public class ZabbixTrapper extends ZorkaAsyncThread<String> {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
-
-    private volatile boolean running = false;
-    private Thread thread = null;
 
     private String serverAddr = null;
     private int serverPort = 10051;
     private String defaultHost;
 
-    private LinkedBlockingQueue<String> sendQueue = new LinkedBlockingQueue<String>(1024);
-
-
     public ZabbixTrapper(String serverAddr, String defaultHost) {
+        super("zabbix-trapper");
         try {
             this.defaultHost = defaultHost;
             if (serverAddr.contains(":")) {
@@ -73,50 +65,18 @@ public class ZabbixTrapper implements Runnable {
         sb.append(Base64.encodeToString(value.toString().getBytes(), false));
         sb.append("</data></req>");
 
-        try {
-            sendQueue.offer(sb.toString(), 1, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-        }
+        submit(sb.toString());
     }
 
 
-    public void start() {
-        if (!running) {
-            running = true;
-            thread = new Thread(this);
-            thread.setName("ZORKA-zabbix-trapper");
-            thread.setDaemon(true);
-            thread.start();
-        }
-    }
-
-
-    public void stop() {
-        running = false;
-    }
-
-
-    public void run() {
-        while (running) {
-            runCycle();
-        }
-
-        thread = null;
-    }
-
-
-    private void runCycle() {
+    @Override
+    protected void process(String msg) {
         Socket socket = null;
         try {
-            String msg = sendQueue.poll(10, TimeUnit.MILLISECONDS);
-            if (msg != null) {
-                socket = new Socket(serverAddr, serverPort);
-                OutputStream os = socket.getOutputStream();
-                os.write(msg.getBytes());
-                os.flush();
-            }
-        } catch (InterruptedException e) {
-            // ignore this one
+            socket = new Socket(serverAddr, serverPort);
+            OutputStream os = socket.getOutputStream();
+            os.write(msg.getBytes());
+            os.flush();
         } catch (Exception e) {
             log.error("Error sending ");
         } finally {
@@ -128,5 +88,9 @@ public class ZabbixTrapper implements Runnable {
                 log.error("Error closing zabbix trapper socket. Open socket may leak.", e);
             }
         }
-    } // runCycle()
+    }
+
+    protected void handleError(String msg, Throwable e) {
+        log.error(msg, e);
+    }
 }
