@@ -91,7 +91,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
 
         SpyRecord sr = new SpyRecord(ctx);
-        sr.feed(ON_COLLECT, new Object[] { 10L, "oja" });
+        sr.put("C0", 10L); sr.put("C1", "oja");
         collector.process(SpyLib.ON_COLLECT, sr);
 
         MethodCallStatistics stats =  (MethodCallStatistics)getAttr("test", "test:name=TClass", "stats");
@@ -112,7 +112,8 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
         SpyRecord record = new SpyRecord(ctx);
         record.feed(ON_RETURN, new Object[]{});  // Mark proper return from method
-        record.feed(ON_COLLECT, new Object[]{BucketAggregate.SEC, BucketAggregate.SEC/2 });
+        record.put("C0", BucketAggregate.SEC);
+        record.put("C1", BucketAggregate.SEC/2);
         collector.process(SpyLib.ON_COLLECT, record);
 
         assertEquals(1L, getAttr("test", "test:name=TClass", "testMethod_calls"));
@@ -132,7 +133,9 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
         SpyRecord record = new SpyRecord(ctx);
         record.feed(ON_ERROR, new Object[]{});  // Mark proper return from method
-        record.feed(ON_COLLECT, new Object[]{BucketAggregate.SEC, BucketAggregate.SEC/2 });
+
+        record.put("C0", BucketAggregate.SEC);
+        record.put("C1", BucketAggregate.SEC/2);
         collector.process(SpyLib.ON_COLLECT, record);
 
         assertEquals(1L, getAttr("test", "test:name=TClass", "testMethod_calls"));

@@ -55,13 +55,6 @@ public class SpyLib {
     public static final int ON_SUBMIT  = 3;
     public static final int ON_COLLECT = 4;
 
-    public static final int FETCH_TIME   = -1;
-    public static final int FETCH_RETVAL = -2;
-    public static final int FETCH_ERROR  = -3;
-    public static final int FETCH_THREAD = -4;
-    public static final int FETCH_CLASS  = -5;
-    public static final int FETCH_NULL   = -6;
-
     public static int AC_PUBLIC       = 0x0001;
     public static int AC_PRIVATE      = 0x0002;
     public static int AC_PROTECTED    = 0x0004;
@@ -639,9 +632,4 @@ public class SpyLib {
         return ComparatorProcessor.vcmp(a, op, v);
     }
 
-
-
-    public static int fs(int a, int b) {
-        return a != -1 ? a : b;
-    }
 }

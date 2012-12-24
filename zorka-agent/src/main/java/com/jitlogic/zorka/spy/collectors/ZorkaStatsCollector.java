@@ -28,7 +28,6 @@ import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -84,12 +83,12 @@ public class ZorkaStatsCollector implements SpyProcessor {
         Object tstampObj = tstamp != null ? record.get(tstamp) : 0L;   // TODO WTF?
 
         if (timeObj instanceof Long && tstampObj instanceof Long) {
-            if (record.gotStage(ON_RETURN)) {
+            if (record.hasStage(ON_RETURN)) {
                 if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
                     log.debug("Logging record using logCall()");
                 }
                 statistic.logCall((Long)tstampObj, (Long)timeObj);
-            } else if (record.gotStage(ON_ERROR)) {
+            } else if (record.hasStage(ON_ERROR)) {
                 if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
                     log.debug("Logging record using logError()");
                 }

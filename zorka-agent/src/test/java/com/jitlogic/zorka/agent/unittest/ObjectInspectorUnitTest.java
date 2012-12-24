@@ -177,8 +177,8 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
     public void testRecordSubstitutions() {
         SpyContext ctx = new SpyContext(SpyDefinition.instance(), "some.Class", "someMethod", "()V", 1);
         SpyRecord rec = new SpyRecord(ctx);
-        rec.feed(ON_ENTER, new Object[] { "123", "4567" });
-        rec.feed(ON_RETURN, new Object[] { "aaa", "bbb" });
+        rec.put("E0", "123"); rec.put("E1", "4567");
+        rec.put("R0", "aaa"); rec.put("R1", "bbb");
 
         assertEquals("123!", inspector.substitute("${E0}!", rec, ON_ENTER));
         assertEquals("aaa", inspector.substitute("${R0}", rec, ON_ENTER));

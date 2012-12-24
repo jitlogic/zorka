@@ -17,19 +17,23 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.spy.probes.SpyProbe;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
+/**
+ * This class represents Spy data records.
+ */
 public class SpyRecord {
-
-    private final static Object[] NO_VALS = { };
 
     private SpyContext ctx;
 
-    private Object[][] vals = { NO_VALS, NO_VALS, NO_VALS, NO_VALS, NO_VALS };
+    private Map<String,Object> data = new HashMap<String, Object>();
 
     private int stages = 0;
 
@@ -40,7 +44,14 @@ public class SpyRecord {
 
 
     public SpyRecord feed(int stage, Object[] vals) {
-        this.vals[stage] = vals;
+        List<SpyProbe> probes = ctx.getSpyDefinition().getProbes(stage);
+
+        // TODO check if vals.length == probes.size() and log something here ...
+
+        for (int i = 0; i < probes.size(); i++) {
+            SpyProbe probe = probes.get(i);
+            data.put(probe.getKey(), probe.processVal(vals[i]));
+        }
 
         stages |= (1 << stage);
 
@@ -48,7 +59,7 @@ public class SpyRecord {
     }
 
 
-    public boolean gotStage(int stage) {
+    public boolean hasStage(int stage) {
         return 0 != (stages & (1 << stage));
     }
 
@@ -59,54 +70,17 @@ public class SpyRecord {
 
 
     public int size() {
-        int size = 0;
-        for (Object[] stv : vals) {
-            size += stv.length;
-        }
-        return size;
+        return data.size();
     }
 
 
     public Object get(String key) {
-        int[] slot = slot(key);
-        return vals[slot[0]][slot[1]];
+        return data.get(key);
     }
 
 
     public void put(String key, Object val) {
-        int[] slot = slot(key);
-        Object[] vs = vals[slot[0]];
-        if (slot[1] >= vs.length) {
-            vs = new Object[slot[1] +1];
-            System.arraycopy(vals[slot[0]], 0, vs, 0, vals[slot[0]].length);
-            vals[slot[0]] = vs;
-        }
-        vs[slot[1]] = val;
+        data.put(key, val);
     }
-
-
-    private static Map<Character,Integer> stageNames = ZorkaUtil.constMap(
-            'E', ON_ENTER, 'e', ON_ENTER,
-            'R', ON_RETURN, 'r', ON_RETURN,
-            'X', ON_ERROR, 'x', ON_ERROR,
-            'S', ON_SUBMIT, 's', ON_SUBMIT,
-            'C', ON_COLLECT, 's', ON_COLLECT
-    );
-
-
-    private static int[] slot(Object v) {
-        if (v instanceof Integer) {
-            return new int[] {-1, (Integer)v};
-        } else if (v instanceof String) {
-            String s = (String)v;
-            Integer stage = stageNames.get(s.charAt(0));
-            if (stage == null) {
-                throw new IllegalArgumentException("Invalid stage. Try using one of characters: EeRrXxSsCc");
-            }
-            return new int[] { stage, Integer.parseInt(s.substring(1))};
-        } else {
-            throw new IllegalArgumentException("Illegal slot argument: " + v);
-        }
-    } // slot()
 
 }

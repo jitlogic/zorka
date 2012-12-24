@@ -112,7 +112,8 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
 
         SpyRecord rec = new SpyRecord(ctx);
 
-        rec.feed(ON_ENTER, new Object[] { 1, 2 });
+        rec.put("E0", 1);
+        rec.put("E1", 2);
         rec.put("E2", 3);
 
         assertEquals(3, rec.size());
