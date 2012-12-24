@@ -18,7 +18,7 @@
 package com.jitlogic.zorka.spy;
 
 import bsh.This;
-import com.jitlogic.zorka.agent.FileTrapper;
+import com.jitlogic.zorka.logproc.FileTrapper;
 import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
 import com.jitlogic.zorka.integ.snmp.TrapVarBindDef;

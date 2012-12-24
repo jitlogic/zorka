@@ -22,12 +22,12 @@ import java.util.Map;
 
 public class LogProcLib {
 
-    private Map<String, FileLogger> fileLoggers = new HashMap<String, FileLogger>();
+    private Map<String, FileTrapper> fileLoggers = new HashMap<String, FileTrapper>();
 
     public LogProcessor dailyLog(ZorkaLogLevel logLevel, String path, boolean logExceptions) {
         synchronized (fileLoggers) {
             if (!fileLoggers.containsKey(path)) {
-                fileLoggers.put(path, FileLogger.daily(logLevel, path, logExceptions));
+                fileLoggers.put(path, FileTrapper.daily(logLevel, path, logExceptions));
             }
             return fileLoggers.get(path);
         }
@@ -36,7 +36,7 @@ public class LogProcLib {
     public LogProcessor rollingLog(ZorkaLogLevel logLevel, String path, int count, long size, boolean logExceptions) {
         synchronized (fileLoggers) {
             if (!fileLoggers.containsKey(path)) {
-                fileLoggers.put(path, FileLogger.rolling(logLevel, path,  count,  size,  logExceptions));
+                fileLoggers.put(path, FileTrapper.rolling(logLevel, path,  count,  size,  logExceptions));
             }
             return fileLoggers.get(path);
         }

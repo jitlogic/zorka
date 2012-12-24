@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.*;
 
+import com.jitlogic.zorka.logproc.FileTrapper;
 import com.jitlogic.zorka.rankproc.*;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
@@ -445,11 +446,11 @@ public class ZorkaLib  {
     }
 
 
-    public FileTrapper rollingFileTrapper(String id, String path, int count, long maxSize, boolean logExceptions) {
+    public FileTrapper rollingFileTrapper(String id, String logLevel, String path, int count, long maxSize, boolean logExceptions) {
         FileTrapper trapper = fileTrappers.get(id);
 
         if (trapper == null) {
-            trapper = FileTrapper.rolling(path, count, maxSize, logExceptions);
+            trapper = FileTrapper.rolling(ZorkaLogLevel.valueOf(logLevel), path, count, maxSize, logExceptions);
             trapper.start();
             fileTrappers.put(id, trapper);
         }
@@ -458,11 +459,11 @@ public class ZorkaLib  {
     }
 
 
-    public FileTrapper dailyFileTrapper(String id, String path, boolean logExceptions){
+    public FileTrapper dailyFileTrapper(String id, ZorkaLogLevel logLevel, String path, boolean logExceptions){
         FileTrapper trapper = fileTrappers.get(id);
 
         if (trapper == null) {
-            trapper = FileTrapper.daily(path, logExceptions);
+            trapper = FileTrapper.daily(logLevel, path, logExceptions);
             trapper.start();
             fileTrappers.put(id, trapper);
         }
