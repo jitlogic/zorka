@@ -97,7 +97,7 @@ public class BshAgentTest extends ZorkaFixture {
     @Test
     public void testObjectDumper() throws Exception {
         Object obj = query("zorka.jmx(\"java\",\"java.lang:type=Runtime\")");
-        String s = ObjectDumper.objectDump(obj);
+        String s = new ObjectDumper().objectDump(obj);
         assertTrue(s != null && s.length() > 100);
     }
 

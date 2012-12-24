@@ -40,6 +40,8 @@ public class ZorkaBshAgent {
 	private Executor executor;
 	private URL configDir = null;
 
+    private ObjectDumper dumper = new ObjectDumper();
+
 	public ZorkaBshAgent(Executor executor) {
 		this.interpreter = new Interpreter();
 		this.executor = executor;
@@ -64,7 +66,7 @@ public class ZorkaBshAgent {
 			return ""+interpreter.eval(expr); // TODO proper object-to-string conversion
 		} catch (EvalError e) {
 			log.error("Error evaluating '" + expr + "': ", e);
-			return ObjectDumper.errorDump(e);
+			return dumper.errorDump(e);
 		}
 	}
 	

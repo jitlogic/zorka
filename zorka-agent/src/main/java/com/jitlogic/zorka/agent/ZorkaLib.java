@@ -49,7 +49,9 @@ public class ZorkaLib  {
 	
 	private ZorkaBshAgent agent;
     private Set<JmxObject> registeredObjects = new HashSet<JmxObject>();
+
     private ObjectInspector inspector = new ObjectInspector();
+    private ObjectDumper dumper = new ObjectDumper();
 
     private MBeanServerRegistry mbsRegistry;
 
@@ -125,7 +127,18 @@ public class ZorkaLib  {
 		}
 		return objs;
 	} // jmxList()
-	
+
+
+    public String dump(Object...args) {
+
+        StringBuffer sb = new StringBuffer();
+
+        for (Object obj : jmxList(Arrays.asList(args))) {
+            sb.append(dumper.objectDump(obj));
+        }
+
+        return sb.toString();
+    } // dump()
 
 	
 	public Object jmx(Object...args) {

@@ -32,13 +32,6 @@ public class ZorkaBasicCallback implements ZorkaCallback {
 		this.error = e;
 	}
 	
-	@Override
-	public String toString() {
-		return error != null ? 
-				ObjectDumper.errorDump(error) :
-				ObjectDumper.objectDump(result);
-	}
-	
 	public Object getResult() {
 		return result;
 	}
