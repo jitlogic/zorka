@@ -33,4 +33,9 @@ public class SpyConstProbe extends SpyProbe {
         mv.visitInsn(ACONST_NULL);
         return 1;
     }
+
+    public Object processVal(Object val) {
+        return this.val;
+    }
+
 }

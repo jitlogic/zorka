@@ -197,8 +197,8 @@ public class SpyLib {
     }
 
 
-    public SpyProbe fetchNull(String dstKey) {
-        return new SpyConstProbe(null, dstKey);
+    public SpyProbe fetchConst(Object val, String dstKey) {
+        return new SpyConstProbe(val, dstKey);
     }
 
 
