@@ -159,7 +159,7 @@ public class SnmpLib {
     }
 
 
-    public TrapVarBindDef bind(Object slot, int type, String oidSuffix) {
-        return new TrapVarBindDef(SpyLib.slot(slot), type, oidSuffix);
+    public TrapVarBindDef bind(String slot, int type, String oidSuffix) {
+        return new TrapVarBindDef(slot, type, oidSuffix);
     }
 }

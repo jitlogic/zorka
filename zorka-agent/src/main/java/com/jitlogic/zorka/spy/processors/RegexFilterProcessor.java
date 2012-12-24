@@ -37,7 +37,7 @@ public class RegexFilterProcessor implements SpyProcessor {
 
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private int isrc, ssrc, idst, sdst;
+    private String src, dst;
     private Pattern regex;
     private String expr = null, defval = null;
     private Boolean filterOut;
@@ -45,36 +45,34 @@ public class RegexFilterProcessor implements SpyProcessor {
     ObjectInspector inspector;
 
 
-    public RegexFilterProcessor(int[] src, String regex) {
+    public RegexFilterProcessor(String src, String regex) {
         this(src, regex, false);
     }
 
 
-    public RegexFilterProcessor(int[] src, String regex, Boolean filterOut) {
-        this.ssrc = src[0];
-        this.isrc = src[1];
+    public RegexFilterProcessor(String src, String regex, Boolean filterOut) {
+        this.src = src;
         this.regex = Pattern.compile(regex);
         this.filterOut = filterOut;
     }
 
 
-    public RegexFilterProcessor(int[] src, int[] dst, String regex, String expr, Boolean filterOut) {
+    public RegexFilterProcessor(String src, String dst, String regex, String expr, Boolean filterOut) {
         this(src, regex, filterOut);
-        this.sdst = dst[0];
-        this.idst = dst[1];
+        this.dst = dst;
         this.expr = expr;
         inspector = new ObjectInspector();
     }
 
 
-    public RegexFilterProcessor(int[] src, int[] dst, String regex, String expr, String defval) {
+    public RegexFilterProcessor(String src, String dst, String regex, String expr, String defval) {
         this(src, dst, regex, expr, (Boolean)null);
         this.defval = defval;
     }
 
 
     public SpyRecord process(int stage, SpyRecord record) {
-        Object val = record.get(fs(ssrc, stage), isrc);
+        Object val = record.get(src);
 
         if (expr == null) {
             boolean matches = val != null && regex.matcher(val.toString()).matches();
@@ -92,12 +90,12 @@ public class RegexFilterProcessor implements SpyProcessor {
                     vals[i] = matcher.group(i);
                 }
                 String subst = inspector.substitute(expr, vals);
-                record.put(fs(sdst, stage), idst, subst);
+                record.put(dst, subst);
                 if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
                     log.debug("Processed '" + val + "' to '" + subst + "' using pattern '" + regex.pattern() + "'");
                 }
             } else if (defval != null) {
-                record.put(fs(sdst, stage), idst, defval);
+                record.put(dst, defval);
                 if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
                     log.debug("No value to be processed. Using default value of '" + defval + "'");
                 }

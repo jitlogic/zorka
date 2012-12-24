@@ -29,20 +29,19 @@ public class NormalizingProcessor implements SpyProcessor {
 
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private int isrc, ssrc, idst, sdst;
+    private String src, dst;
     private Normalizer normalizer;
 
 
-    public NormalizingProcessor(int[] src, int[] dst, Normalizer normalizer) {
-        this.isrc = src[1]; this.ssrc = src[0];
-        this.idst = dst[1]; this.sdst = dst[0];
+    public NormalizingProcessor(String src, String dst, Normalizer normalizer) {
+        this.src = src; this.dst = dst;
         this.normalizer = normalizer;
     }
 
 
     public SpyRecord process(int stage, SpyRecord record) {
 
-        Object v = record.get(fs(ssrc, stage), isrc);
+        Object v = record.get(src);
 
         String s = (v instanceof String) ? normalizer.normalize((String)v) : null;
 
@@ -50,7 +49,7 @@ public class NormalizingProcessor implements SpyProcessor {
             log.debug("Normalizing: '" + v + "' -> '" + s + "'");
         }
 
-        record.put(fs(sdst, stage), idst, s);
+        record.put(dst, s);
 
         return record;
     }

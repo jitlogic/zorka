@@ -304,23 +304,23 @@ public class ObjectInspector {
             String expr = m.group(1);
             String[] segs = expr.split("\\.");
             String s = segs[0];
-            int stage = defStage, slot = -1;
+//            int stage = defStage, slot = -1;
 
-            if (reStageSlot.matcher(s).matches()) {
-                stage = SpyLib.stages.get(s.charAt(0));
-                slot = Integer.parseInt(s.substring(1));
-            } else if (reInteger.matcher(s).matches()) {
-                stage = defStage;
-                slot = Integer.parseInt(s);
-            }
+//            if (reStageSlot.matcher(s).matches()) {
+//                stage = SpyRecord.stageNames.get(s.charAt(0));
+//                slot = Integer.parseInt(s.substring(1));
+//            } else if (reInteger.matcher(s).matches()) {
+//                stage = defStage;
+//                slot = Integer.parseInt(s);
+//            }
 
-            if (slot != -1) {
-                Object v = record.get(stage, slot);
+//            if (slot != -1) {
+                Object v = record.get(segs[0]);
                 for (int i = 1; i < segs.length; i++) {
                     v = get(v, segs[i]);
                 }
                 m.appendReplacement(sb, ""+v);
-            }
+//            }
         }
 
         m.appendTail(sb);

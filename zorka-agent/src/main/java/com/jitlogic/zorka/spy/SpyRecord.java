@@ -17,6 +17,10 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.util.ZorkaUtil;
+
+import java.util.Map;
+
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class SpyRecord {
@@ -49,38 +53,60 @@ public class SpyRecord {
     }
 
 
-    public void cleanup() {
-        vals[ON_ENTER] = NO_VALS;
-        vals[ON_RETURN] = NO_VALS;
-        vals[ON_ERROR] = NO_VALS;
-        vals[ON_SUBMIT] = NO_VALS;
-    }
-
     public SpyContext getContext() {
         return ctx;
     }
 
 
-    public int size(int stage) {
-        return vals[stage].length;
-    }
-
-
-    public Object get(int stage, int idx) {
-        return vals[stage][idx];
-    }
-
-    public Object[] getVals(int stage) {
-        return vals[stage];
-    }
-
-    public void put(int stage, int idx, Object v) {
-        Object[] vs = vals[stage];
-        if (idx >= vs.length) {
-            vs = new Object[idx+1];
-            System.arraycopy(vals[stage], 0, vs, 0, vals[stage].length);
-            vals[stage] = vs;
+    public int size() {
+        int size = 0;
+        for (Object[] stv : vals) {
+            size += stv.length;
         }
-        vs[idx] = v;
+        return size;
     }
+
+
+    public Object get(String key) {
+        int[] slot = slot(key);
+        return vals[slot[0]][slot[1]];
+    }
+
+
+    public void put(String key, Object val) {
+        int[] slot = slot(key);
+        Object[] vs = vals[slot[0]];
+        if (slot[1] >= vs.length) {
+            vs = new Object[slot[1] +1];
+            System.arraycopy(vals[slot[0]], 0, vs, 0, vals[slot[0]].length);
+            vals[slot[0]] = vs;
+        }
+        vs[slot[1]] = val;
+    }
+
+
+    private static Map<Character,Integer> stageNames = ZorkaUtil.constMap(
+            'E', ON_ENTER, 'e', ON_ENTER,
+            'R', ON_RETURN, 'r', ON_RETURN,
+            'X', ON_ERROR, 'x', ON_ERROR,
+            'S', ON_SUBMIT, 's', ON_SUBMIT,
+            'C', ON_COLLECT, 's', ON_COLLECT
+    );
+
+
+    private static int[] slot(Object v) {
+        if (v instanceof Integer) {
+            return new int[] {-1, (Integer)v};
+        } else if (v instanceof String) {
+            String s = (String)v;
+            Integer stage = stageNames.get(s.charAt(0));
+            if (stage == null) {
+                throw new IllegalArgumentException("Invalid stage. Try using one of characters: EeRrXxSsCc");
+            }
+            return new int[] { stage, Integer.parseInt(s.substring(1))};
+        } else {
+            throw new IllegalArgumentException("Illegal slot argument: " + v);
+        }
+    } // slot()
+
 }

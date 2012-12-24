@@ -29,15 +29,15 @@ public class ThreadLocalProcessor implements SpyProcessor {
     public final static int SET = 2;
     public final static int REMOVE = 3;
 
+    private String key;
     private Object[] path;
-    private int islt, sslt, operation;
+    private int operation;
     private ThreadLocal<Object> threadLocal;
 
     private ObjectInspector inspector = new ObjectInspector();
 
-    public ThreadLocalProcessor(int[] slot, int operation, ThreadLocal<Object> threadLocal, Object...path) {
-        this.sslt = slot[0];
-        this.islt = slot[1];
+    public ThreadLocalProcessor(String key, int operation, ThreadLocal<Object> threadLocal, Object...path) {
+        this.key = key;
         this.operation = operation;
         this.threadLocal = threadLocal;
         this.path = ZorkaUtil.copyArray(path);
@@ -52,11 +52,11 @@ public class ThreadLocalProcessor implements SpyProcessor {
                 for (Object key : path) {
                     v = inspector.get(v, key);
                 }
-                record.put(fs(sslt, stage), islt, v);
+                record.put(key, v);
             }
                 break;
             case SET:
-                threadLocal.set(record.get(fs(sslt, stage), islt));
+                threadLocal.set(record.get(key));
                 break;
             case REMOVE:
                 threadLocal.remove();

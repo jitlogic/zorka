@@ -40,17 +40,16 @@ public class GetterPresentingCollector implements SpyProcessor {
     private String mbsName;
     private String mbeanTemplate, attrTemplate;
     private String desc;
-    private int isrc, ssrc;
+    private String src;
     private Object[] path;
 
 
     public GetterPresentingCollector(String mbsName, String mbeanTemplate, String attrTemplate, String desc,
-                                     int[] src, Object...path) {
+                                     String src, Object...path) {
         this.mbsName = mbsName;
         this.mbeanTemplate = mbeanTemplate;
         this.attrTemplate = attrTemplate;
-        this.ssrc = src[0];
-        this.isrc = src[1];
+        this.src = src;
         this.desc = desc;
         this.path = path;
     }
@@ -61,7 +60,7 @@ public class GetterPresentingCollector implements SpyProcessor {
         String mbeanName = ctx.subst(mbeanTemplate);
         String attrName = ctx.subst(attrTemplate);
 
-        Object obj1 = new AttrGetter(record.get(fs(ssrc, stage), isrc), path);
+        Object obj1 = new AttrGetter(record.get(src), path);
         Object obj2 = registry.getOrRegister(mbsName, mbeanName, attrName, obj1, desc);
 
         if (obj1.equals(obj2)) {

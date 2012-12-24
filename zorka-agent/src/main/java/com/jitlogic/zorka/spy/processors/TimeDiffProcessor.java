@@ -22,23 +22,20 @@ import static com.jitlogic.zorka.spy.SpyLib.fs;
 
 public class TimeDiffProcessor implements SpyProcessor {
 
-    private int itStart, stStart, itStop, stStop, iRslt, sRslt;
+    private String tstart, tstop, rslt;
 
-
-    public TimeDiffProcessor(int[] tStart, int[] tStop, int[] rslt) {
-        this.stStart = tStart[0]; this.itStart = tStart[1];
-        this.stStop = tStop[0]; this.itStop = tStop[1];
-        this.sRslt = rslt[0]; this.iRslt = rslt[1];
+    public TimeDiffProcessor(String tstart, String tstop, String rslt) {
+        this.tstart = tstart; this.tstop = tstop;
     }
 
 
     public SpyRecord process(int stage, SpyRecord record) {
-        Object  v1 = record.get(fs(stStart, stage), itStart),
-                v2 = record.get(fs(stStop, stage), itStop);
+        Object  v1 = record.get(tstart),
+                v2 = record.get(tstop);
 
         if (v1 instanceof Long && v2 instanceof Long) {
             long l1 = (Long)v1, l2 = (Long)v2;
-            record.put(fs(sRslt, stage), iRslt, l2-l1);
+            record.put(rslt, l2-l1);
         } // TODO else (log something here ?)
 
         return record;
@@ -46,17 +43,17 @@ public class TimeDiffProcessor implements SpyProcessor {
 
     // TODO get rid of this
 
-    public int getStartSlot() {
-        return itStart;
+    public String getStartSlot() {
+        return tstart;
     }
 
 
-    public int getStopSlot() {
-        return itStop;
+    public String getStopSlot() {
+        return tstop;
     }
 
 
-    public int getResultSlot() {
-        return iRslt;
+    public String getResultSlot() {
+        return rslt;
     }
 }

@@ -141,7 +141,7 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
     @Test
     public void testPublishObjectViaGetterCollector() throws Exception {
-        SpyProcessor col = new GetterPresentingCollector("test", "test:name=TestObj", "testAttr", "meh", slot(2));
+        SpyProcessor col = new GetterPresentingCollector("test", "test:name=TestObj", "testAttr", "meh", "C2");
         record.feed(ON_COLLECT, new Object[] {1L, 2L, "oja!"});
 
         col.process(SpyLib.ON_COLLECT, record);
@@ -153,7 +153,7 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
     @Test
     public void testPublishObjectViaGetterCollectorWithDispatch() throws Exception {
-        SpyProcessor col = new GetterPresentingCollector("test", "test:name=TestObj", "testAttr", "meh", slot(2), "length()");
+        SpyProcessor col = new GetterPresentingCollector("test", "test:name=TestObj", "testAttr", "meh", "C2", "length()");
         record.feed(ON_COLLECT, new Object[] {1L, 2L, "oja!"});
 
         col.process(SpyLib.ON_COLLECT, record);
