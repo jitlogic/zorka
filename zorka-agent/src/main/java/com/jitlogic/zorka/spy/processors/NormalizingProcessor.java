@@ -23,7 +23,6 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.normproc.Normalizer;
 
 import static com.jitlogic.zorka.spy.SpyConst.SPD_ARGPROC;
-import static com.jitlogic.zorka.spy.SpyLib.fs;
 
 public class NormalizingProcessor implements SpyProcessor {
 

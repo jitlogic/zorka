@@ -13,12 +13,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.agent;
+package com.jitlogic.zorka.util;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public abstract class ZorkaAsyncThread<T> implements Runnable {
+
+    protected ZorkaLog log = null;
 
     private LinkedBlockingQueue<T> submitQueue = new LinkedBlockingQueue<T>(1024);
 
@@ -92,6 +94,8 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
     }
 
     protected void handleError(String message, Throwable obj) {
-
+        if (log != null) {
+            log.error(message, obj);
+        }
     }
 }

@@ -15,8 +15,7 @@
  */
 package com.jitlogic.zorka.integ.syslog;
 
-import com.jitlogic.zorka.agent.ZorkaAsyncThread;
-import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
+import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
@@ -28,16 +27,12 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 
 /**
  * Minimal syslog sender implementation.
  */
 public class SyslogTrapper extends ZorkaAsyncThread<String> {
-
-    private ZorkaLog log = null;
 
     public final static int DEFAULT_PORT = 514;
 
@@ -121,7 +116,7 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> {
             socket.send(new DatagramPacket(buf, 0, buf.length, syslogAddress, syslogPort));
         } catch (IOException e) {
             if (log != null) {
-                log.error("Cannot send syslog packet: " + msg);
+                handleError("Cannot send syslog packet: " + msg, e);
             }
         }
     }

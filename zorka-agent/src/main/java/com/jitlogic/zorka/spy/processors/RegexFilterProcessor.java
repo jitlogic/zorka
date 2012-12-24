@@ -28,7 +28,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.jitlogic.zorka.spy.SpyConst.SPD_ARGPROC;
-import static com.jitlogic.zorka.spy.SpyLib.fs;
 
 /**
  * Filters records using regular expressions.

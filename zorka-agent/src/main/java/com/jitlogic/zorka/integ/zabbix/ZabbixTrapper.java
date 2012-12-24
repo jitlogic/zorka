@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.integ.zabbix;
 
-import com.jitlogic.zorka.agent.ZorkaAsyncThread;
+import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.Base64;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;

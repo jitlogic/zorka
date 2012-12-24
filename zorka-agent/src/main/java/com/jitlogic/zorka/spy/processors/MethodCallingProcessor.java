@@ -25,7 +25,6 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import static com.jitlogic.zorka.spy.SpyLib.fs;
 
 public class MethodCallingProcessor implements SpyProcessor {
 

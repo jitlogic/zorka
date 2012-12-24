@@ -16,15 +16,13 @@
 package com.jitlogic.zorka.integ.snmp;
 
 import com.jitlogic.contrib.libsnmp.*;
-import com.jitlogic.zorka.agent.ZorkaAsyncThread;
+import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -33,8 +31,6 @@ import java.util.concurrent.TimeUnit;
 public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> {
 
     public static final int DEFAULT_TRAP_PORT = 162;
-
-    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private int snmpPort, protocol;
     private InetAddress snmpAddr;
@@ -63,6 +59,8 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> {
         } catch (Exception e) {
             log.error("Cannot initialize SNMP trapper", e);
         }
+
+        log = ZorkaLogger.getLog(this.getClass());
     }
 
 
@@ -76,9 +74,9 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> {
             }
 
             if (protocol == SnmpLib.SNMP_V1) {
-                enqueue(new SNMPv1TrapPDU(oid, agentAddr, gtrap, strap, timestamp, varBindList));
+                submit(new SNMPv1TrapPDU(oid, agentAddr, gtrap, strap, timestamp, varBindList));
             } else if (protocol == SnmpLib.SNMP_V2) {
-                enqueue(new SNMPv2TrapPDU(timestamp, oid, varBindList));
+                submit(new SNMPv2TrapPDU(timestamp, oid, varBindList));
             } else {
                 log.error("Unsupported SNMP protocol version: " + protocol);
             }
@@ -87,10 +85,6 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> {
         }
     }
 
-
-    protected void enqueue(SNMPSequence trap) {
-        submit(trap);
-    }
 
     protected void open() {
         try {
@@ -118,4 +112,5 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> {
             log.error("Error sending SNMP trap", e);
         }
     }
+
 }

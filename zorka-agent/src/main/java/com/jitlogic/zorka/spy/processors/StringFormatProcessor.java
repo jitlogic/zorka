@@ -20,8 +20,6 @@ import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 
-import static com.jitlogic.zorka.spy.SpyLib.fs;
-
 /**
  * Performs string formating using values from current stage.
  */

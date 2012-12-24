@@ -21,8 +21,6 @@ import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
-import static com.jitlogic.zorka.spy.SpyLib.fs;
-
 public class ThreadLocalProcessor implements SpyProcessor {
 
     public final static int GET = 1;

@@ -22,7 +22,6 @@ import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
-import static com.jitlogic.zorka.spy.SpyLib.fs;
 
 import static com.jitlogic.zorka.spy.SpyConst.SPD_ARGPROC;
 

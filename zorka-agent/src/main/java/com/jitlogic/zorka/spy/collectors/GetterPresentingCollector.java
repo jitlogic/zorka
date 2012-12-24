@@ -26,7 +26,6 @@ import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
-import static com.jitlogic.zorka.spy.SpyLib.fs;
 
 /**
  * Presents object as mbean attribute using ValGetter object.

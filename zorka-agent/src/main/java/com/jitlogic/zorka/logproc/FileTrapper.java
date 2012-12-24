@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.logproc;
 
-import com.jitlogic.zorka.agent.ZorkaAsyncThread;
+import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogLevel;
 import com.jitlogic.zorka.util.ZorkaUtil;
