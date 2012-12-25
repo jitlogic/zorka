@@ -18,7 +18,7 @@
 package com.jitlogic.zorka.spy;
 
 import bsh.This;
-import com.jitlogic.zorka.agent.FileTrapper;
+import com.jitlogic.zorka.logproc.FileTrapper;
 import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
 import com.jitlogic.zorka.integ.snmp.TrapVarBindDef;
@@ -37,7 +37,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 
 /**
- * This is API for zorka users.
+ * Spy library contains functions for configuring instrumentation engine. Spy definitions, matchers, probes, processors
+ * and collectors can be created using functions from this library. Spy library is registered as 'spy' namespace in BSH.
  */
 public class SpyLib {
 
@@ -54,13 +55,6 @@ public class SpyLib {
     public static final int ON_ERROR   = 2;
     public static final int ON_SUBMIT  = 3;
     public static final int ON_COLLECT = 4;
-
-    public static final int FETCH_TIME   = -1;
-    public static final int FETCH_RETVAL = -2;
-    public static final int FETCH_ERROR  = -3;
-    public static final int FETCH_THREAD = -4;
-    public static final int FETCH_CLASS  = -5;
-    public static final int FETCH_NULL   = -6;
 
     public static int AC_PUBLIC       = 0x0001;
     public static int AC_PRIVATE      = 0x0002;
@@ -89,6 +83,12 @@ public class SpyLib {
 	}
 
 
+    /**
+     * Registers spy definition(s) in Zorka Spy instrumentation engine. Only definitions registered using this function
+     * will be considered by class transformer when loading classes and thus can be instrumented.
+     *
+     * @param sdefs one or more spy definitions (created using spy.instance() or spy.instrument())
+     */
     public void add(SpyDefinition...sdefs) {
         for (SpyDefinition sdef : sdefs) {
             instance.add(sdef);
@@ -96,82 +96,207 @@ public class SpyLib {
     }
 
 
+    /**
+     * Created an empty (unconfigured) spy definition. Use created object's methods to configure it before registering
+     * with add() function.
+     *
+     * @return new spy definition
+     */
     public SpyDefinition instance() {
         return SpyDefinition.instance();
     }
 
 
     public SpyDefinition instrument() {
-        return SpyDefinition.instrument().onSubmit(tdiff(0, 1, 1)).onEnter();
+        return SpyDefinition.instrument().onSubmit(tdiff("T1", "T2", "T")).onEnter();
     }
 
 
-    // TODO instrument(String expr) convenience function;
+    /**
+     * This is convenience function for monitoring execution times of methods. Execution times are stored in ZorkaStats
+     * structure that is capable of storing statistics for multiple methods. Using expr argument it is possible to
+     * use arbitrary criteria for categorizing methods (eg. by method name, by URL etc.)
+     *
+     * @param mbsName mbean server new bean will be registered in (typically 'java');
+     *
+     * @param mbeanName mbean name (existing one will be picked up if it is Zorka mapped MBean);
+     *
+     * @param attrName attribute name new stats object will be registered under;
+     *
+     * @param expr expression template that will be used as key for categorizing methods;
+     *
+     * @return new spy definition object;
+     *
+     */
     public SpyDefinition instrument(String mbsName, String mbeanName, String attrName, String expr) {
-
-        List<Integer> argList = new ArrayList<Integer>();
 
         Matcher m = ObjectInspector.reVarSubstPattern.matcher(expr);
 
-        // Find out all used arguments
-        while (m.find()) {
-            String[] segs = m.group(1).split("\\.");
-            if (segs[0].matches("^[0-9]+$")) {
-                Integer arg = Integer.parseInt(segs[0]);
-                if (!argList.contains(arg)) {
-                    argList.add(arg);
-                }
-            }
-        }
-
         // Patch expression string to match argList data
         StringBuffer sb = new StringBuffer(expr.length()+4);
-        m = ObjectInspector.reVarSubstPattern.matcher(expr);
+        List<SpyDefArg> sdaList = new ArrayList<SpyDefArg>();
+        Set<String> usedArgs = new HashSet<String>();
 
         while (m.find()) {
             String[] segs = m.group(1).split("\\.");
             if (segs[0].matches("^[0-9]+$")) {
-                segs[0] = ""+argList.indexOf(Integer.parseInt(segs[0]));
-                m.appendReplacement(sb, "\\${" + ZorkaUtil.join(".", segs) + "}");
+                m.appendReplacement(sb, "\\${A" + ZorkaUtil.join(".", segs) + "}");
+                if (!usedArgs.contains(segs[0])) {
+                    usedArgs.add(segs[0]);
+                    sdaList.add(fetchArg(Integer.parseInt(segs[0]), "A"+segs[0]));
+                }
             }
         }
 
         m.appendTail(sb);
 
-
-        // Create and return spy definition
-
-        int tidx = argList.size();
-
-        List<SpyDefArg> sdaList = new ArrayList<SpyDefArg>(argList.size()+2);
-
-        for (Integer arg : argList) {
-            sdaList.add(fetchArg(arg, "E"+arg));
-        }
-
-        sdaList.add(fetchTime("E"+(tidx+1)));
+        sdaList.add(fetchTime("T1"));
 
         return SpyDefinition.instance()
                 .onEnter(sdaList.toArray(new SpyDefArg[0]))
-                .onReturn(fetchTime("R0")).onError(fetchTime("X0"))
-                .onSubmit(tdiff(tidx, tidx + 1, tidx + 1))
-                .onCollect(zorkaStats(mbsName, mbeanName, attrName, sb.toString(), tidx, tidx + 1));
+                .onReturn(fetchTime("T2")).onError(fetchTime("T2"))
+                .onSubmit(tdiff("T1", "T2", "T"))
+                .onCollect(zorkaStats(mbsName, mbeanName, attrName, sb.toString(), "T2", "T"));
     }
 
 
+    /**
+     * Creates new matcher object that will match methods by class name and method name.
+     *
+     * @param classPattern class name mask (where * matches arbitrary name and ** matches arbitrary path) or
+     *                     regular expression (if starts with '~' character);
+     *
+     * @param methodPattern method name mask (where '*' means arbitrary name part) or regular expression
+     *                      (if starts with '~' character);
+     *
+     * @return new matcher object
+     */
     public SpyMatcher byMethod(String classPattern, String methodPattern) {
         return new SpyMatcher(1, classPattern, methodPattern, null);
     }
 
 
+    /**
+     * Creates new matcher object that will match methods by class name, method name, access flags, return type and arguments.
+     *
+     * @param access access flags (use spy.ACC_* constants);
+     *
+     * @param classPattern class name mask (where * matches arbitrary name and ** matches arbitrary path) or
+     *                     regular expression (if starts with '~' character);
+     *
+     * @param methodPattern method name mask (where '*' means arbitrary string) or regular expression (if starts with '~' char);
+     *
+     * @param retType return type (eg. void, int, String, javax.servlet.HttpResponse etc.);
+     *
+     * @param argTypes types of consecutive arguments;
+     *
+     * @return new matcher object;
+     *
+     */
     public SpyMatcher byMethod(int access, String classPattern, String methodPattern, String retType, String... argTypes) {
         return new SpyMatcher(access, classPattern,  methodPattern, retType, argTypes);
     }
 
 
+
     /**
-     * Instructs spy to submit data to traditional Zorka Statistics object. Statistics
-     * will be organized by keyExpr having all its macros properly expanded.
+     * Creates argument fetching probe. When injected into method code by instrumentation engine, it will fetch argument
+     * selected by specific index `arg`.
+     *
+     * @param arg fetched argument index
+     *
+     * @param dst name (key) used to store fetched data
+     *
+     * @return new probe
+     */
+    public SpyProbe fetchArg(int arg, String dst) {
+        return new SpyArgProbe(arg, dst);
+    }
+
+
+    /**
+     * Creates class fetching probe. When injected into method code it will fetch class object of given name in context
+     * of method caller.
+     *
+     * @param className class name
+     *
+     * @param dst name (key) used to store fetched data
+     *
+     * @return class fetching probe
+     */
+    public SpyProbe fetchClass(String className, String dst) {
+        return new SpyClassProbe(className, dst);
+    }
+
+
+    /**
+     * Creates exception fetching probe. When injected into method code it will fetch exception object when exception is
+     * thrown out of method code.
+     *
+     * @param dst name (key) used to store fetched data
+     *
+     * @return exception fetching probe
+     */
+    public SpyProbe fetchException(String dst) {
+        return new SpyReturnProbe(dst);
+    }
+
+
+    /**
+     * Creates constant fetching probe. The actual probe injects null into method code but it is replaced by constant
+     * value passed as first argument.
+     *
+     * @param val value to be added to records
+     *
+     * @param dst name (key) used to store fetched data
+     *
+     * @return constant fetching probe
+     */
+    public SpyProbe fetchConst(Object val, String dst) {
+        return new SpyConstProbe(val, dst);
+    }
+
+
+    /**
+     * Creates return value fetching probe. When injected into method code it will fetch return value of instrumented
+     * method.
+     *
+     * @param dst name (key) used to store fetched data
+     *
+     * @return return value fetching probe
+     */
+    public SpyProbe fetchRetVal(String dst) {
+        return new SpyReturnProbe(dst);
+    }
+
+
+    /**
+     * Creates thread fetching probe. When injected into method code it will fetch current thread object.
+     *
+     * @param dst name (key) used to store fetched data
+     *
+     * @return thread fetching probe
+     */
+    public SpyProbe fetchThread(String dst) {
+        return new SpyThreadProbe(dst);
+    }
+
+
+    /**
+     * Creates time fetching probe. When injected into method code it will fetch current time.
+     *
+     * @param dst name (key) used to store fetched data
+     *
+     * @return time fetching probe
+     */
+    public SpyProbe fetchTime(String dst) {
+        return new SpyTimeProbe(dst);
+    }
+
+
+    /**
+     * Creates method call statistics collector object. It will maintain zorka call statistics and update them with
+     * incoming data.
      *
      * @param mbsName mbean server name
      *
@@ -181,51 +306,17 @@ public class SpyLib {
      *
      * @param keyExpr key expression
      *
-     * @return augmented spy definition
+     * @return collector object
      */
     public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr,
-                                   Object tstampField, Object timeField) {
-        return new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, slot(tstampField), slot(timeField));
-    }
-
-
-    public SpyProbe fetchArg(int arg, String dstKey) {
-        return new SpyArgProbe(arg, dstKey);
-    }
-
-
-    public SpyProbe fetchClass(String className, String dstKey) {
-        return new SpyClassProbe(className, dstKey);
-    }
-
-
-    public SpyProbe fetchException(String dstKey) {
-        return new SpyReturnProbe(dstKey);
-    }
-
-
-    public SpyProbe fetchNull(String dstKey) {
-        return new SpyConstProbe(null, dstKey);
-    }
-
-
-    public SpyProbe fetchRetVal(String dstKey) {
-        return new SpyReturnProbe(dstKey);
-    }
-
-
-    public SpyProbe fetchThread(String dstKey) {
-        return new SpyThreadProbe(dstKey);
-    }
-
-
-    public SpyProbe fetchTime(String dstKey) {
-        return new SpyTimeProbe(dstKey);
+                                   String tstampField, String timeField) {
+        return new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, tstampField, timeField);
     }
 
 
     /**
-     * Instructs spy to submit data to a single object of ZorkaStat object.
+     * Creates single method call statistics object. It will maintain zorka call statistics and update them with incoming
+     * data.
      *
      * @param mbsName mbean server name
      *
@@ -233,48 +324,23 @@ public class SpyLib {
      *
      * @param attrName attribute name
      *
-     * @return augmented spy definition
+     * @return collector object
      */
-    public SpyProcessor zorkaStat(String mbsName, String beanName, String attrName, Object tstampField, Object timeField) {
-        return new JmxAttrCollector(mbsName, beanName, attrName, slot(tstampField), slot(timeField));
+    public SpyProcessor zorkaStat(String mbsName, String beanName, String attrName, String tstampField, String timeField) {
+        return new JmxAttrCollector(mbsName, beanName, attrName, tstampField, timeField);
     }
 
 
     /**
-     * Instructs spy to submit data to a single BSH function.
+     * Creates file colllector object. It will store collected records as text messages in log file.
      *
-     * @param ns BSH namespace
+     * @param trapper file trapper to submit data to
      *
-     * @param func function name
+     * @param logLevel default log level
      *
-     * @return augmented spy definition
-     */
-    public SpyProcessor callingCollector(This ns, String func) {
-        return new CallingObjCollector(ns, func);
-    }
-
-
-    /**
-     * Instructs spy to submit data to a collect() function in a BSH namespace..
+     * @param expr message template expression
      *
-     * @param ns BSH namespace
-     *
-     * @return augmented spy definition
-     */
-    public SpyProcessor bshCollector(String ns) {
-        return new CallingBshCollector(ns);
-    }
-
-    /**
-     * Instruct spy to submit data to log file.
-     *
-     * @param trapper
-     *
-     * @param logLevel
-     *
-     * @param expr
-     *
-     * @return
+     * @return collector object
      */
     public SpyProcessor fileCollector(FileTrapper trapper, String expr, ZorkaLogLevel logLevel) {
         return new FileCollector(trapper, expr, logLevel, "");
@@ -282,7 +348,7 @@ public class SpyLib {
 
 
     /**
-     * Instructs spy to present attribute as an getter object.
+     * Creates getter collector object. It will present collected records as attributes via mbeans.
      *
      * @param mbsName mbean server name
      *
@@ -292,20 +358,20 @@ public class SpyLib {
      *
      * @param path which stat attr to present
      *
-     * @return augmented spy definition
+     * @return collector object
      */
-    public SpyProcessor getterCollector(String mbsName, String beanName, String attrName, String desc, Object src, Object...path) {
-        return new GetterPresentingCollector(mbsName, beanName, attrName, desc, slot(src), path);
+    public SpyProcessor getterCollector(String mbsName, String beanName, String attrName, String desc, String src, Object...path) {
+        return new GetterPresentingCollector(mbsName, beanName, attrName, desc, src, path);
     }
 
 
     /**
-     * Sends collected records to another SpyDefinition chain. Records will be processed by all
-     * processors from ON_COLLECT chain and sent to collectors attached to it.
+     * Creates chained collector. It sends collected records to another SpyDefinition chain. Records will be processed
+     * by all processors from ON_SUBMIT chain and sent to collectors attached to it.
      *
-     * @param sdef
+     * @param sdef new sdef that will perform furhter protessing
      *
-     * @return
+     * @return chained collector
      */
     public SpyProcessor sdefCollector(SpyDefinition sdef) {
         return new DispatchingCollector(sdef);
@@ -313,7 +379,7 @@ public class SpyLib {
 
 
     /**
-     * Sends collected records as SNMP traps.
+     * Creates SNMP collector object. It sends collected records as SNMP traps using SNMP trapper.
      *
      * @param trapper snmp trapper used to send traps;
      *
@@ -323,7 +389,7 @@ public class SpyLib {
      *
      * @param bindings bindings defining additional variables attached to this trap;
      *
-     * @return augmented spy definition
+     * @return SNMP collector object
      */
     public SpyProcessor snmpCollector(SnmpTrapper trapper, String oid, int spcode, TrapVarBindDef...bindings) {
         return new SnmpCollector(trapper, oid, SnmpLib.GT_SPECIFIC, spcode, oid, bindings);
@@ -331,21 +397,21 @@ public class SpyLib {
 
 
     /**
-     * Instruct spy to send collected record to syslog.
+     * Creates syslog collector object. It sends collected records to remote syslog server using syslog trapper.
      *
-     * @param trapper logger (object returned by syslog.get())
+     * @param trapper trapper object used to send logs
      *
      * @param expr message template
      *
-     * @param severity
+     * @param severity syslog serverity (see syslog.* constants)
      *
-     * @param facility
+     * @param facility syslog facility
      *
-     * @param hostname
+     * @param hostname hostname (as logged in syslog records)
      *
-     * @param tag
+     * @param tag syslog tag (typically program name, in our case component name)
      *
-     * @return
+     * @return syslog collector object
      */
     public SpyProcessor syslogCollector(SyslogTrapper trapper, String expr, int severity, int facility, String hostname, String tag) {
         return new SyslogCollector(trapper, expr, severity, facility, hostname, tag);
@@ -355,13 +421,13 @@ public class SpyLib {
     /**
      * Sends collected records to zabbix using zabbix trapper.
      *
-     * @param trapper
+     * @param trapper zabbix trapper object (as created by zabbix.trapper() function)
      *
-     * @param expr
+     * @param expr message template
      *
-     * @param key
+     * @param key zabbix key ID
      *
-     * @return
+     * @return zabbix collector object
      */
     public SpyProcessor zabbixCollector(ZabbixTrapper trapper, String expr, String key) {
         return new ZabbixCollector(trapper, expr, null, key);
@@ -371,34 +437,47 @@ public class SpyLib {
     /**
      * Sends collected records to zabbix using zabbix trapper.
      *
-     * @param trapper
+     * @param trapper zabbix trapper (as created by zabbix.trapper() function)
      *
-     * @param expr
+     * @param expr message template
      *
-     * @param key
+     * @param key zabbix key ID
      *
-     * @return
+     * @return zabbix collector object
      */
     public SpyProcessor zabbixCollector(ZabbixTrapper trapper, String expr, String host, String key) {
         return new ZabbixCollector(trapper,  expr,  host,  key);
     }
 
+
     /**
+     * Creates log adapter processor object. It converts log records of various types of logger frameworks to common
+     * zorka logproc structure and passes it to log processor object.
      *
-     * @param src
-     * @param processor
-     * @return
+     * @param src source field
+     *
+     * @param processor log processor object
+     *
+     * @return log adapter object
      */
-    public SpyProcessor logAdapterCollector(LogProcessor processor, Object src) {
-        return new LogAdaptingCollector(slot(src), processor);
+    public SpyProcessor logAdapterCollector(LogProcessor processor, String src) {
+        return new LogAdaptingCollector(src, processor);
     }
 
+    // TODO converge log records and spy records
+    // TODO converge log processors and spy processors
 
     /**
+     * Creates log formatter processor object. It constructs log records from arbitrary fields of spy records and passes
+     * them to a log processor.
      *
-     * @param level
-     * @param msgTmpl
-     * @return
+     * @param processor log processor
+     *
+     * @param level log level
+     *
+     * @param msgTmpl message template
+     *
+     * @return log formatter object
      */
     public SpyProcessor logFormatCollector(LogProcessor processor, String level, String msgTmpl) {
         return new LogFormattingCollector(processor, level, msgTmpl);
@@ -406,19 +485,28 @@ public class SpyLib {
 
 
     /**
+     * Creates log formatter object. It constructs log records from arbitrary fields of spy records and passes them to
+     * a log processor.
      *
-     * @param processor
-     * @param levelTmpl
-     * @param msgTmpl
-     * @param classTmpl
-     * @param methodTmpl
-     * @param excTmpl
-     * @return
+     * @param processor log processor
+     *
+     * @param levelTmpl log level (interpreted as template string)
+     *
+     * @param msgTmpl message template
+     *
+     * @param classTmpl class name template
+     *
+     * @param methodTmpl method name template
+     *
+     * @param excTmpl exception template
+     *
+     * @return log formatter object
      */
     public SpyProcessor logFormatCollector(LogProcessor processor, String levelTmpl, String msgTmpl, String classTmpl,
                                            String methodTmpl, String excTmpl) {
         return new LogFormattingCollector(processor,  levelTmpl, msgTmpl, classTmpl, methodTmpl, excTmpl);
     }
+
 
     /**
      * Formats arguments and passes an array of formatted strings.
@@ -429,55 +517,57 @@ public class SpyLib {
      *
      * @param expr format expressions.
      *
-     * @return augmented spy definition
+     * @return formatting processor object
      */
-    public SpyProcessor format(Object dst, String expr) {
-        return new StringFormatProcessor(slot(dst), expr);
+    public SpyProcessor format(String dst, String expr) {
+        return new StringFormatProcessor(dst, expr);
     }
 
 
     /**
-     * Add an regex filtering transformer to process chain.
+     * Filters records according to given regular expression.
      *
      * @param src argument number
      *
      * @param regex regular expression
      *
-     * @return augmented spy definition
+     * @return filtering processor object
      */
-    public SpyProcessor regexFilter(Object src, String regex) {
-        return new RegexFilterProcessor(slot(src), regex);
+    public SpyProcessor regexFilter(String src, String regex) {
+        return new RegexFilterProcessor(src, regex);
     }
 
 
     /**
-     * Add an regex filtering transformer to process chain.
+     * Filters record according to given regular expression.
      *
      * @param src argument number
      *
      * @param regex regular expression
      *
-     * @return augmented spy definition
+     * @param filterOut inversed filtering if true
+     *
+     * @return filtering processor object
      */
-    public SpyProcessor regexFilter(Object src, String regex, boolean filterOut) {
-        return new RegexFilterProcessor(slot(src), regex, filterOut);
+    public SpyProcessor regexFilter(String src, String regex, boolean filterOut) {
+        return new RegexFilterProcessor(src, regex, filterOut);
     }
 
 
     /**
      * Transforms data using regular expression and substitution.
      *
-     * @param src
+     * @param src source field name
      *
-     * @param dst
+     * @param dst destination field name
      *
-     * @param regex
+     * @param regex regular expression used to parse input
      *
-     * @param expr
+     * @param expr output value template (possibly using substrings taken from regex)
      *
-     * @return
+     * @return transforming processor object
      */
-    public SpyProcessor transform(Object src, Object dst, String regex, String expr) {
+    public SpyProcessor transform(String src, String dst, String regex, String expr) {
         return transform(src, dst, regex, expr, false);
     }
 
@@ -485,31 +575,36 @@ public class SpyLib {
     /**
      * Transforms data using regular expression and substitution.
      *
-     * @param src
+     * @param src source field name
      *
-     * @param dst
+     * @param dst destination field name
      *
-     * @param regex
+     * @param regex regular expression used to parse input
      *
-     * @param expr
+     * @param expr output value template (possibly using substrings taken from regex)
      *
-     * @return
+     * @param filterOut inverse regex treatment if true
+     *
+     * @return transforming processor object
      */
-    public SpyProcessor transform(Object src, Object dst, String regex, String expr, boolean filterOut) {
-        return new RegexFilterProcessor(slot(src), slot(dst), regex, expr, filterOut);
+    public SpyProcessor transform(String src, String dst, String regex, String expr, boolean filterOut) {
+        return new RegexFilterProcessor(src, dst, regex, expr, filterOut);
     }
 
 
     /**
      * Normalizes a query string from src and puts result into dst.
      *
-     * @param src
-     * @param dst
-     * @param normalizer
-     * @return
+     * @param src source field
+     *
+     * @param dst destination field
+     *
+     * @param normalizer normalizer object
+     *
+     * @return normalizing processor object
      */
-    public SpyProcessor normalize(Object src, Object dst, Normalizer normalizer) {
-        return new NormalizingProcessor(slot(src), slot(dst), normalizer);
+    public SpyProcessor normalize(String src, String dst, Normalizer normalizer) {
+        return new NormalizingProcessor(src, dst, normalizer);
     }
 
 
@@ -517,59 +612,70 @@ public class SpyLib {
      * Gets slot number n, performs traditional get operation and stores
      * results in the same slot.
      *
-     * @param src
+     * @param src source field
      *
-     * @param dst
+     * @param dst destination field
      *
-     * @param path
+     * @param path getter path
      *
-     * @return augmented spy definition
+     * @return getter processor object
      */
-    public SpyProcessor get(Object src, Object dst, Object...path) {
-        return new GetterProcessor(slot(src), slot(dst), path);
+    public SpyProcessor get(String src, String dst, Object...path) {
+        return new GetterProcessor(src, dst, path);
     }
 
 
     /**
+     * Creates thread local getter processor. It gets a value from thread local object and stores it into dst field.
      *
-     * @param slot
-     * @param threadLocal
-     * @return
+     * @param dst destination field
+     *
+     * @param threadLocal source thread local object
+     *
+     * @return thread local getter processor object
      */
-    public SpyProcessor tlGet(Object slot, ThreadLocal<Object> threadLocal, Object...path) {
-        return new ThreadLocalProcessor(slot(slot), ThreadLocalProcessor.GET, threadLocal, path);
+    public SpyProcessor tlGet(String dst, ThreadLocal<Object> threadLocal, Object...path) {
+        return new ThreadLocalProcessor(dst, ThreadLocalProcessor.GET, threadLocal, path);
     }
 
 
     /**
+     * Puts constant value into record.
      *
-     * @param slot
-     * @param val
-     * @return
+     * @param dst destination field
+     *
+     * @param val value
+     *
+     * @return constant value processor object
      */
-    public SpyProcessor put(Object slot, Object val) {
-        return new ConstPutProcessor(slot(slot), val);
+    public SpyProcessor put(String dst, Object val) {
+        return new ConstPutProcessor(dst, val);
     }
 
 
     /**
+     * Creates thread local setter processor. It will fetch a field from record and store it in thread local.
      *
-     * @param slot
-     * @param threadLocal
-     * @return
+     * @param src source field
+     *
+     * @param threadLocal destination thread local object
+     *
+     * @return thread local setter object
      */
-    public SpyProcessor tlSet(Object slot, ThreadLocal<Object> threadLocal) {
-        return new ThreadLocalProcessor(slot(slot), ThreadLocalProcessor.SET, threadLocal);
+    public SpyProcessor tlSet(String src, ThreadLocal<Object> threadLocal) {
+        return new ThreadLocalProcessor(src, ThreadLocalProcessor.SET, threadLocal);
     }
 
 
     /**
+     * Clears thread local object
      *
-     * @param threadLocal
-     * @return
+     * @param threadLocal thread local object to be cleaned up
+     *
+     * @return thread local cleaner object
      */
     public SpyProcessor tlRemove(ThreadLocal<Object> threadLocal) {
-        return new ThreadLocalProcessor(slot(0), ThreadLocalProcessor.REMOVE, threadLocal);
+        return new ThreadLocalProcessor(null, ThreadLocalProcessor.REMOVE, threadLocal);
     }
 
 
@@ -582,10 +688,10 @@ public class SpyLib {
      *
      * @param dst destination slot
      *
-     * @return augmented spy definition
+     * @return time diff calculator object
      */
-    public SpyProcessor tdiff(Object tstart, Object tstop, Object dst) {
-        return new TimeDiffProcessor(slot(tstart), slot(tstop), slot(dst));
+    public SpyProcessor tdiff(String tstart, String tstop, String dst) {
+        return new TimeDiffProcessor(tstart, tstop, dst);
     }
 
 
@@ -593,78 +699,50 @@ public class SpyLib {
      * Gets object from slot number arg, calls given method on this slot and
      * if method returns some value, stores its result in this slot.
      *
-     * @param src
+     * @param src source field
      *
-     * @param dst
+     * @param dst destination field
      *
-     * @param methodName
+     * @param methodName method name
      *
-     * @param methodArgs
+     * @param methodArgs method arguments
      *
-     * @return augmented spy definition
+     * @return method calling processor object
      */
-    public SpyProcessor call(Object src, Object dst, String methodName, Object... methodArgs) {
-        return new MethodCallingProcessor(slot(src), slot(dst), methodName, methodArgs);
+    public SpyProcessor call(String src, String dst, String methodName, Object... methodArgs) {
+        return new MethodCallingProcessor(src, dst, methodName, methodArgs);
     }
 
 
     /**
      * Passes only records where (a op b) is true.
      *
-     * @param a
+     * @param a field name
      *
-     * @param op
+     * @param op operator
      *
-     * @param b
+     * @param b field name
      *
-     * @return
+     * @return conditional filtering processor object
      */
-    public SpyProcessor ifSlotCmp(Object a, int op, Object b) {
-        return ComparatorProcessor.scmp(slot(a), op, slot(b));
+    public SpyProcessor ifSlotCmp(String a, int op, String b) {
+        return ComparatorProcessor.scmp(a, op, b);
     }
 
 
     /**
      * Passes only records where (a op v) is true.
      *
-     * @param a
+     * @param a field name
      *
-     * @param op
+     * @param op operator
      *
-     * @param v
+     * @param v reference value
      *
-     * @return
+     * @return conditional filtering processor object
      */
-    public SpyProcessor ifValueCmp(Object a, int op, Object v) {
-        return ComparatorProcessor.vcmp(slot(a), op, v);
+    public SpyProcessor ifValueCmp(String a, int op, Object v) {
+        return ComparatorProcessor.vcmp(a, op, v);
     }
 
-
-    public static Map<Character,Integer> stages = ZorkaUtil.constMap(
-            'E', ON_ENTER, 'e', ON_ENTER,
-            'R', ON_RETURN, 'r', ON_RETURN,
-            'X', ON_ERROR, 'x', ON_ERROR,
-            'S', ON_SUBMIT, 's', ON_SUBMIT,
-            'C', ON_COLLECT, 's', ON_COLLECT
-    );
-
-
-    public static int[] slot(Object v) {
-        if (v instanceof Integer) {
-            return new int[] {-1, (Integer)v};
-        } else if (v instanceof String) {
-            String s = (String)v;
-            Integer stage = stages.get(s.charAt(0));
-            if (stage == null) {
-                throw new IllegalArgumentException("Invalid stage. Try using one of characters: EeRrXxSsCc");
-            }
-            return new int[] { stage, Integer.parseInt(s.substring(1))};
-        } else {
-            throw new IllegalArgumentException("Illegal slot argument: " + v);
-        }
-    } // slot()
-
-    public static int fs(int a, int b) {
-        return a != -1 ? a : b;
-    }
 }

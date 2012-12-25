@@ -78,7 +78,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
 //    @Test  TODO make this test working
     public void testStaticNotPublicMethod() throws Exception {
-        engine.add(SpyDefinition.instance().onReturn(spy.fetchNull("R0"))
+        engine.add(SpyDefinition.instance().onReturn(spy.fetchConst(null, "R0"))
                 .include(spy.byMethod(TCLASS1, "nonPublicStatic")));
         Object obj = instantiate(engine, TCLASS1);
 
@@ -89,7 +89,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     @Test
     public void testInstrumentWithNullProbe() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchNull("E0"))
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchConst(null, "E0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
         Object obj = instantiate(engine, TCLASS1);
 
@@ -97,6 +97,18 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
         assertEquals(1, submitter.size());
         assertEquals(null, submitter.get(0).get(0));
+    }
+
+    @Test
+    public void testInstrumentWithConstProbe() throws Exception {
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchConst(42L, "E0"))
+                .include(spy.byMethod(TCLASS1, "trivialMethod")));
+        Object obj = instantiate(engine, TCLASS1);
+
+        invoke(obj, "trivialMethod");
+
+        assertEquals(1, submitter.size());
+        //assertEquals(42L, submitter.get(0).get(0));  TODO this test has to be performed with DispatchingSubmitter fully implemented (or: use feed() method directly
     }
 
     //@Test  TODO make this test working

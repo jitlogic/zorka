@@ -13,12 +13,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.agent;
+package com.jitlogic.zorka.util;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public abstract class ZorkaTrapper<T> implements Runnable {
+public abstract class ZorkaAsyncThread<T> implements Runnable {
+
+    protected ZorkaLog log = null;
 
     private LinkedBlockingQueue<T> submitQueue = new LinkedBlockingQueue<T>(1024);
 
@@ -27,8 +29,8 @@ public abstract class ZorkaTrapper<T> implements Runnable {
     private volatile Thread thread = null;
 
 
-    public ZorkaTrapper(String name) {
-        this.name = name;
+    public ZorkaAsyncThread(String name) {
+        this.name = "ZORKA-"+name;
     }
 
 
@@ -37,12 +39,12 @@ public abstract class ZorkaTrapper<T> implements Runnable {
             try {
                 open();
                 thread = new Thread(this);
-                thread.setName("ZORKA-trapper-");
+                thread.setName(name);
                 thread.setDaemon(true);
                 running = true;
                 thread.start();
             } catch (Exception e) {
-                // TODO
+                handleError("Error starting thread", e);
             }
         }
     }
@@ -74,7 +76,7 @@ public abstract class ZorkaTrapper<T> implements Runnable {
 
     public void submit(T obj) {
         try {
-            submitQueue.offer(obj, 1, TimeUnit.MILLISECONDS);
+            submitQueue.offer(obj, 0, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
         }
     }
@@ -82,9 +84,18 @@ public abstract class ZorkaTrapper<T> implements Runnable {
     protected abstract void process(T obj);
 
 
-    protected abstract void open();
+    protected void open() {
+
+    }
 
 
-    protected abstract void close();
+    protected void close() {
 
+    }
+
+    protected void handleError(String message, Throwable obj) {
+        if (log != null) {
+            log.error(message, obj);
+        }
+    }
 }

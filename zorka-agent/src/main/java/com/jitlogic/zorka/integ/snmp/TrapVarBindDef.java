@@ -18,14 +18,12 @@ package com.jitlogic.zorka.integ.snmp;
 public class TrapVarBindDef {
     private int type;
     private String oidSuffix;
-    private int stage;
-    private int slot;
+    private String src;
 
 
-    public TrapVarBindDef(int[] slot, int type, String oidSuffix) {
+    public TrapVarBindDef(String src, int type, String oidSuffix) {
         this.type = type;
-        this.stage = slot[0];
-        this.slot = slot[1];
+        this.src = src;
         this.oidSuffix = oidSuffix;
     }
 
@@ -34,13 +32,9 @@ public class TrapVarBindDef {
         return type;
     }
 
-    public int getStage() {
-        return stage;
-    }
 
-
-    public int getSlot() {
-        return slot;
+    public String getSlot() {
+        return src;
     }
 
 

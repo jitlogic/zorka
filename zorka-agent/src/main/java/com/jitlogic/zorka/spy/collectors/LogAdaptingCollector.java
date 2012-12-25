@@ -24,13 +24,13 @@ import com.jitlogic.zorka.spy.SpyRecord;
 
 public class LogAdaptingCollector implements SpyProcessor {
 
-    private int stage, slot;
+    private String src;
     private LogAdapter adapter;
     private LogProcessor processor;
 
 
-    public LogAdaptingCollector(int[] src, LogProcessor processor) {
-        stage = src[0]; slot = src[1];
+    public LogAdaptingCollector(String src, LogProcessor processor) {
+        this.src = src;
         this.adapter = new LogAdapter();
         this.processor = processor;
     }
@@ -38,7 +38,7 @@ public class LogAdaptingCollector implements SpyProcessor {
 
     public SpyRecord process(int stage, SpyRecord record) {
 
-        LogRecord rec = adapter.toLogRecord(record.get(SpyLib.fs(this.stage, stage), slot));
+        LogRecord rec = adapter.toLogRecord(record.get(src));
 
         processor.process(rec);
 

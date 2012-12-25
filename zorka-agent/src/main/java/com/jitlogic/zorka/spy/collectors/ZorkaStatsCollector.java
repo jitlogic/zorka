@@ -28,7 +28,6 @@ import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,20 +41,23 @@ public class ZorkaStatsCollector implements SpyProcessor {
 
     private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
     private String mbsName, mbeanTemplate, attrTemplate, keyTemplate;
-    private int stime, itime, sstamp, istamp;
+    //private int stime, itime, sstamp, istamp;
+    private String time, tstamp;
 
     private Map<SpyContext,MethodCallStatistics> statsCache = new HashMap<SpyContext, MethodCallStatistics>();
 
     private ObjectInspector inspector = new ObjectInspector();
 
     public ZorkaStatsCollector(String mbsName, String mbeanTemplate, String attrTemplate,
-                               String keyTemplate, int[] tstampField, int[] timeField) {
+                               String keyTemplate, String tstamp, String time) {
         this.mbsName  = mbsName;
         this.mbeanTemplate = mbeanTemplate;
         this.attrTemplate = attrTemplate;
         this.keyTemplate = keyTemplate;
-        this.stime = timeField[0]; this.itime = timeField[1];
-        this.sstamp = tstampField[0]; this.istamp = tstampField[1];
+        this.time = time;
+        this.tstamp = tstamp;
+        //this.stime = timeField[0]; this.itime = timeField[1];
+        //this.sstamp = tstampField[0]; this.istamp = tstampField[1];
     }
 
 
@@ -77,16 +79,16 @@ public class ZorkaStatsCollector implements SpyProcessor {
 
         MethodCallStatistic statistic = (MethodCallStatistic)stats.getMethodCallStatistic(key);
 
-        Object timeObj = itime >= 0 ? record.get(fs(stime, stage), itime) : 0L;
-        Object tstampObj = istamp >= 0 ? record.get(fs(sstamp, stage), istamp) : 0L;
+        Object timeObj = time != null ? record.get(time) : 0L;  // TODO WTF?
+        Object tstampObj = tstamp != null ? record.get(tstamp) : 0L;   // TODO WTF?
 
         if (timeObj instanceof Long && tstampObj instanceof Long) {
-            if (record.gotStage(ON_RETURN)) {
+            if (record.hasStage(ON_RETURN)) {
                 if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
                     log.debug("Logging record using logCall()");
                 }
                 statistic.logCall((Long)tstampObj, (Long)timeObj);
-            } else if (record.gotStage(ON_ERROR)) {
+            } else if (record.hasStage(ON_ERROR)) {
                 if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
                     log.debug("Logging record using logError()");
                 }
