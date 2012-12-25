@@ -108,7 +108,7 @@ public class SpyLib {
 
 
     public SpyDefinition instrument() {
-        return SpyDefinition.instrument().onSubmit(tdiff("E0", "S1", "S1")).onEnter(); // TODO fix this after full move to tags
+        return SpyDefinition.instrument().onSubmit(tdiff("T1", "T2", "T")).onEnter();
     }
 
 
@@ -130,53 +130,33 @@ public class SpyLib {
      */
     public SpyDefinition instrument(String mbsName, String mbeanName, String attrName, String expr) {
 
-        List<Integer> argList = new ArrayList<Integer>();
-
         Matcher m = ObjectInspector.reVarSubstPattern.matcher(expr);
-
-        // Find out all used arguments
-        while (m.find()) {
-            String[] segs = m.group(1).split("\\.");
-            if (segs[0].matches("^[0-9]+$")) {
-                Integer arg = Integer.parseInt(segs[0]);
-                if (!argList.contains(arg)) {
-                    argList.add(arg);
-                }
-            }
-        }
 
         // Patch expression string to match argList data
         StringBuffer sb = new StringBuffer(expr.length()+4);
-        m = ObjectInspector.reVarSubstPattern.matcher(expr);
+        List<SpyDefArg> sdaList = new ArrayList<SpyDefArg>();
+        Set<String> usedArgs = new HashSet<String>();
 
         while (m.find()) {
             String[] segs = m.group(1).split("\\.");
             if (segs[0].matches("^[0-9]+$")) {
-                segs[0] = ""+argList.indexOf(Integer.parseInt(segs[0]));
-                m.appendReplacement(sb, "\\${" + ZorkaUtil.join(".", segs) + "}");
+                m.appendReplacement(sb, "\\${A" + ZorkaUtil.join(".", segs) + "}");
+                if (!usedArgs.contains(segs[0])) {
+                    usedArgs.add(segs[0]);
+                    sdaList.add(fetchArg(Integer.parseInt(segs[0]), "A"+segs[0]));
+                }
             }
         }
 
         m.appendTail(sb);
 
-
-        // Create and return spy definition
-
-        int tidx = argList.size();
-
-        List<SpyDefArg> sdaList = new ArrayList<SpyDefArg>(argList.size()+2);
-
-        for (Integer arg : argList) {
-            sdaList.add(fetchArg(arg, "E"+arg));
-        }
-
-        sdaList.add(fetchTime("E"+(tidx+1)));
+        sdaList.add(fetchTime("T1"));
 
         return SpyDefinition.instance()
                 .onEnter(sdaList.toArray(new SpyDefArg[0]))
-                .onReturn(fetchTime("R0")).onError(fetchTime("X0"))
-                .onSubmit(tdiff("E"+tidx, "R0", "S0"))   // TODO fix this after full migration to string tags
-                .onCollect(zorkaStats(mbsName, mbeanName, attrName, sb.toString(), "S0", "R0"));
+                .onReturn(fetchTime("T2")).onError(fetchTime("T2"))
+                .onSubmit(tdiff("T1", "T2", "T"))
+                .onCollect(zorkaStats(mbsName, mbeanName, attrName, sb.toString(), "T2", "T"));
     }
 
 

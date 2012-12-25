@@ -50,9 +50,9 @@ public class SpyDefinition {
 
     public static SpyDefinition instrument() {
         return new SpyDefinition()
-            .onEnter(new SpyTimeProbe("E0"))
-            .onReturn(new SpyTimeProbe("R0"))
-            .onError(new SpyTimeProbe("X0"))
+            .onEnter(new SpyTimeProbe("T1"))
+            .onReturn(new SpyTimeProbe("T2"))
+            .onError(new SpyTimeProbe("T2"))
             .onEnter();
     }
 
