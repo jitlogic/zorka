@@ -31,7 +31,6 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.jitlogic.zorka.spy.SpyConst.SPD_COLLECTORS;
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class JmxAttrCollector implements SpyProcessor {

@@ -26,9 +26,9 @@ import java.util.Date;
 
 public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatistic> {
 
-    public final static int CALLS_STAT = 0;
-    public final static int TIMES_STAT = 1;
-    public final static int ERROR_STAT = 2;
+    public static final int CALLS_STAT = 0;
+    public static final int TIMES_STAT = 1;
+    public static final int ERROR_STAT = 2;
 
 	private String name;
 

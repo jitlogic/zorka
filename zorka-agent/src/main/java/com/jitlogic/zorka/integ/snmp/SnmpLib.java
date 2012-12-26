@@ -32,11 +32,11 @@ public class SnmpLib {
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     // Protocol versions
-    public final static int SNMP_V1 = 1;
-    public final static int SNMP_V2 = 2;
+    public static final int SNMP_V1 = 1;
+    public static final int SNMP_V2 = 2;
 
     // Basic types
-    public final static String MGMT_MIB = "1.3.6.1.2.1";
+    public static final String MGMT_MIB = "1.3.6.1.2.1";
 
     // Basic types
     public static final int INTEGER     = 0;
@@ -55,13 +55,13 @@ public class SnmpLib {
     public static final int UINTEGER32  = 13;
 
     // Trap types
-    public final static int GT_COLDSTART = 0;
-    public final static int GT_WARMSTART = 1;
-    public final static int GT_LINKROWN = 2;
-    public final static int GT_LINKUP = 3;
-    public final static int GT_AUTHFAIL = 4;
-    public final static int GT_EGPLOSS = 5;
-    public final static int GT_SPECIFIC = 6;
+    public static final int GT_COLDSTART = 0;
+    public static final int GT_WARMSTART = 1;
+    public static final int GT_LINKROWN = 2;
+    public static final int GT_LINKUP = 3;
+    public static final int GT_AUTHFAIL = 4;
+    public static final int GT_EGPLOSS = 5;
+    public static final int GT_SPECIFIC = 6;
 
     private ObjectInspector inspector = new ObjectInspector();
 

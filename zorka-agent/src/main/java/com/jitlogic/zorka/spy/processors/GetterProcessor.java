@@ -23,7 +23,7 @@ import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
-import static com.jitlogic.zorka.spy.SpyConst.SPD_ARGPROC;
+import static com.jitlogic.zorka.spy.SpyLib.SPD_ARGPROC;
 
 /**
  * Digs deeper into an object the same way zorka.jmx() does.

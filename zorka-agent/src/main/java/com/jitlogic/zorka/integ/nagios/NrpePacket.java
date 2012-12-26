@@ -24,10 +24,8 @@ import java.util.zip.CRC32;
 
 public class NrpePacket {
 
-    public final static short QUERY_PACKET = 1;
-    public final static short RESPONSE_PACKET = 2;
-
-    //public final static int RET_
+    public static final short QUERY_PACKET = 1;
+    public static final short RESPONSE_PACKET = 2;
 
     private int version, type, resultCode;
     private String data;

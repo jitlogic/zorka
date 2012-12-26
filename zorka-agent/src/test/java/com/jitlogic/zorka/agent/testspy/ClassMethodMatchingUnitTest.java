@@ -20,7 +20,7 @@ import com.jitlogic.zorka.spy.SpyMatcher;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static com.jitlogic.zorka.spy.SpyConst.*;
+import static com.jitlogic.zorka.spy.SpyLib.SM_NOARGS;
 
 public class ClassMethodMatchingUnitTest {
 

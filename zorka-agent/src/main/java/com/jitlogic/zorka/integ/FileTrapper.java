@@ -26,11 +26,11 @@ import java.util.Date;
 
 public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrapper {
 
-    private final static int ROLLING = 1;
-    private final static int DATED   = 2;
+    private static final int ROLLING = 1;
+    private static final int DATED   = 2;
 
-    private final static SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private final static SimpleDateFormat fformat = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat fformat = new SimpleDateFormat("yyyy-MM-dd");
 
     private final File logFile;
     private final int type;

@@ -41,12 +41,62 @@ import java.util.regex.Matcher;
  */
 public class SpyLib {
 
-    public final static int GT = 0;
-    public final static int GE = 1;
-    public final static int EQ = 2;
-    public final static int LE = 3;
-    public final static int LT = 4;
-    public final static int NE = 5;
+    public static final String SM_NOARGS      = "<no-args>";
+    public static final String SM_CONSTRUCTOR = "<init>";
+    public static final String SM_ANY_TYPE    = null;
+    public static final String SM_STATIC      = "<clinit>";
+
+
+    public static final int SF_NONE = 0;
+    public static final int SF_IMMEDIATE = 1;
+    public static final int SF_FLUSH = 2;
+
+
+    // Debug levels
+
+    /** Be quiet */
+    public static final int SPD_NONE = 0;
+
+    /** Basic status messages */
+    public static final int SPD_STATUS = 1;
+
+    /** Detailed configuration information */
+    public static final int SPD_CONFIG = 2;
+
+    /** Log transformed classes */
+    public static final int SPD_CLASSXFORM = 3;
+
+    /** Log transformed methods */
+    public static final int SPD_METHODXFORM = 4;
+
+    /** Log all collected records reaching collector dispatcher */
+    public static final int SPD_CDISPATCHES = 5;
+
+    /** Log all collected records on each collector */
+    public static final int SPD_COLLECTORS = 6;
+
+    /** Log all argument processing events */
+    public static final int SPD_ARGPROC = 7;
+
+    /** Log all submissions from instrumented code */
+    public static final int SPD_SUBMISSIONS = 8;
+
+    /** Log all encountered methods (only from transformed classes) */
+    public static final int SPD_METHODALL = 9;
+
+    /** Log all classes going through transformer */
+    public static final int SPD_CLASSALL = 10;
+
+    /** Maximum possible debug log level */
+    public static final int SPD_MAX = 10;
+
+
+    public static final int GT = 0;
+    public static final int GE = 1;
+    public static final int EQ = 2;
+    public static final int LE = 3;
+    public static final int LT = 4;
+    public static final int NE = 5;
 
 
     public static final int ON_ENTER   = 0;
@@ -55,24 +105,24 @@ public class SpyLib {
     public static final int ON_SUBMIT  = 3;
     public static final int ON_COLLECT = 4;
 
-    public static int AC_PUBLIC       = 0x0001;
-    public static int AC_PRIVATE      = 0x0002;
-    public static int AC_PROTECTED    = 0x0004;
-    public static int AC_STATIC       = 0x0008;
-    public static int AC_FINAL        = 0x0010;
-    public static int AC_SUPER        = 0x0020;
-    public static int AC_SYNCHRONIZED = 0x0020;
-    public static int AC_VOLATILE     = 0x0040;
-    public static int AC_BRIDGE       = 0x0040;
-    public static int AC_VARARGS      = 0x0080;
-    public static int AC_TRANSIENT    = 0x0080;
-    public static int AC_NATIVE       = 0x0100;
-    public static int AC_INTERFACE    = 0x0200;
-    public static int AC_ABSTRACT     = 0x0400;
-    public static int AC_STRICT       = 0x0800;
-    public static int AC_SYNTHETIC    = 0x1000;
-    public static int AC_ANNOTATION   = 0x2000;
-    public static int AC_ENUM         = 0x4000;
+    public static final int AC_PUBLIC       = 0x0001;
+    public static final int AC_PRIVATE      = 0x0002;
+    public static final int AC_PROTECTED    = 0x0004;
+    public static final int AC_STATIC       = 0x0008;
+    public static final int AC_FINAL        = 0x0010;
+    public static final int AC_SUPER        = 0x0020;
+    public static final int AC_SYNCHRONIZED = 0x0020;
+    public static final int AC_VOLATILE     = 0x0040;
+    public static final int AC_BRIDGE       = 0x0040;
+    public static final int AC_VARARGS      = 0x0080;
+    public static final int AC_TRANSIENT    = 0x0080;
+    public static final int AC_NATIVE       = 0x0100;
+    public static final int AC_INTERFACE    = 0x0200;
+    public static final int AC_ABSTRACT     = 0x0400;
+    public static final int AC_STRICT       = 0x0800;
+    public static final int AC_SYNTHETIC    = 0x1000;
+    public static final int AC_ANNOTATION   = 0x2000;
+    public static final int AC_ENUM         = 0x4000;
 
     private SpyInstance instance;
 

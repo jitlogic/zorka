@@ -30,7 +30,7 @@ public class ObjectInspector {
 
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    public final static String STACK_TRACE_KEY = "printStackTrace";
+    public static final String STACK_TRACE_KEY = "printStackTrace";
 
 
     public <T> T get(Object obj, Object...keys) {
@@ -292,9 +292,7 @@ public class ObjectInspector {
     }
 
 
-    public final static Pattern reInteger = Pattern.compile("^\\d+$");
-    public final static Pattern reStageSlot = Pattern.compile("^[EeRrXxSsCc]\\d+$");
-    public final static Pattern reVarSubstPattern = Pattern.compile("\\$\\{([^\\}]+)\\}");
+    public static final Pattern reVarSubstPattern = Pattern.compile("\\$\\{([^\\}]+)\\}");
 
 
     public String substitute(String input, SpyRecord record, int defStage) {
@@ -303,24 +301,11 @@ public class ObjectInspector {
         while (m.find()) {
             String expr = m.group(1);
             String[] segs = expr.split("\\.");
-            String s = segs[0];
-//            int stage = defStage, slot = -1;
-
-//            if (reStageSlot.matcher(s).matches()) {
-//                stage = SpyRecord.stageNames.get(s.charAt(0));
-//                slot = Integer.parseInt(s.substring(1));
-//            } else if (reInteger.matcher(s).matches()) {
-//                stage = defStage;
-//                slot = Integer.parseInt(s);
-//            }
-
-//            if (slot != -1) {
-                Object v = record.get(segs[0]);
-                for (int i = 1; i < segs.length; i++) {
-                    v = get(v, segs[i]);
-                }
-                m.appendReplacement(sb, ""+v);
-//            }
+            Object v = record.get(segs[0]);
+            for (int i = 1; i < segs.length; i++) {
+                v = get(v, segs[i]);
+            }
+            m.appendReplacement(sb, ""+v);
         }
 
         m.appendTail(sb);

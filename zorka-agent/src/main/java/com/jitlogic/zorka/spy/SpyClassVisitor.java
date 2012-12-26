@@ -28,7 +28,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.objectweb.asm.Opcodes.*;
-import static com.jitlogic.zorka.spy.SpyConst.*;
+import static com.jitlogic.zorka.spy.SpyLib.SPD_METHODALL;
+import static com.jitlogic.zorka.spy.SpyLib.SPD_METHODXFORM;
 
 public class SpyClassVisitor extends ClassVisitor {
 

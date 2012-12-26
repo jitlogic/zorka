@@ -22,7 +22,7 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import static com.jitlogic.zorka.spy.SpyConst.SPD_CDISPATCHES;
+import static com.jitlogic.zorka.spy.SpyLib.SPD_CDISPATCHES;
 
 public class CollectQueueProcessor implements SpyProcessor, Runnable {
 

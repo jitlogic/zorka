@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 
 import static org.objectweb.asm.Opcodes.*;
 
-import static com.jitlogic.zorka.spy.SpyConst.SM_NOARGS;
+import static com.jitlogic.zorka.spy.SpyLib.SM_NOARGS;
 
 public class SpyMatcher {
 
@@ -69,7 +69,7 @@ public class SpyMatcher {
     }
 
 
-    private final static Map<String,String> typeCodes = stringMap(
+    private static final Map<String,String> typeCodes = stringMap(
         "void", "V",   "boolean", "Z","byte", "B",   "char", "C",
         "short", "S",  "int", "I", "long", "J", "float", "F", "double", "D"
     );
@@ -108,7 +108,7 @@ public class SpyMatcher {
     }
 
 
-    private final static Map<String,String> regexChars = stringMap(
+    private static final Map<String,String> regexChars = stringMap(
         "[", "\\", "]", "\\]", ".", "\\.", ";", "\\;", "(", "\\(", ")", "\\)"
     );
 

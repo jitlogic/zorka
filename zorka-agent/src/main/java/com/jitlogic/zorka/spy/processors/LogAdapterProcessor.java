@@ -23,11 +23,11 @@ import com.jitlogic.zorka.util.ZorkaLogLevel;
 
 public class LogAdapterProcessor implements SpyProcessor {
 
-    public final static String TAG_LEVEL = "_LEVEL";
-    public final static String TAG_CLASS = "_CLASS";
-    public final static String TAG_METHOD = "_METHOD";
-    public final static String TAG_MESSAGE = "_MESSAGE";
-    public final static String TAG_EXCEPTION = "_EXCEPTION";
+    public static final String TAG_LEVEL = "_LEVEL";
+    public static final String TAG_CLASS = "_CLASS";
+    public static final String TAG_METHOD = "_METHOD";
+    public static final String TAG_MESSAGE = "_MESSAGE";
+    public static final String TAG_EXCEPTION = "_EXCEPTION";
 
     private ObjectInspector inspector = new ObjectInspector();
 

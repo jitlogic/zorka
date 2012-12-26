@@ -23,9 +23,9 @@ import com.jitlogic.zorka.util.ZorkaUtil;
 
 public class ThreadLocalProcessor implements SpyProcessor {
 
-    public final static int GET = 1;
-    public final static int SET = 2;
-    public final static int REMOVE = 3;
+    public static final int GET = 1;
+    public static final int SET = 2;
+    public static final int REMOVE = 3;
 
     private String key;
     private Object[] path;

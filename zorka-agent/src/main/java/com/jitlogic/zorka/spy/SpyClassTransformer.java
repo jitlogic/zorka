@@ -32,7 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.jitlogic.zorka.spy.SpyConst.*;
+import static com.jitlogic.zorka.spy.SpyLib.SPD_CLASSALL;
+import static com.jitlogic.zorka.spy.SpyLib.SPD_CLASSXFORM;
 
 public class SpyClassTransformer implements ClassFileTransformer {
 
