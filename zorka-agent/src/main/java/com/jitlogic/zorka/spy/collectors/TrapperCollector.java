@@ -22,9 +22,6 @@ import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 
-/**
- * @author RLE <rafal.lewczuk@gmail.com>
- */
 public class TrapperCollector implements SpyProcessor {
 
     private ZorkaTrapper trapper;
@@ -33,12 +30,12 @@ public class TrapperCollector implements SpyProcessor {
     private ObjectInspector inspector = new ObjectInspector();
 
 
-    public TrapperCollector(ZorkaTrapper trapper, String tagExpr, String stdExpr, String errExpr, String errSlot) {
+    public TrapperCollector(ZorkaTrapper trapper, String tagExpr, String stdExpr, String errExpr, String errField) {
         this.trapper = trapper;
         this.tagExpr = tagExpr;
         this.stdExpr = stdExpr;
         this.errExpr = errExpr;
-        this.errSlot = errSlot;
+        this.errSlot = errField;
     }
 
 

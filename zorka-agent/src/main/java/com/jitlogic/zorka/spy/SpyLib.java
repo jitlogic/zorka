@@ -18,6 +18,7 @@
 package com.jitlogic.zorka.spy;
 
 import bsh.This;
+import com.jitlogic.zorka.integ.ZorkaTrapper;
 import com.jitlogic.zorka.logproc.FileTrapper;
 import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
@@ -415,6 +416,27 @@ public class SpyLib {
      */
     public SpyProcessor syslogCollector(SyslogTrapper trapper, String expr, int severity, int facility, String hostname, String tag) {
         return new SyslogCollector(trapper, expr, severity, facility, hostname, tag);
+    }
+
+
+    /**
+     * Sends collected records to specific trapper.
+     *
+     * @param trapper trapper object (eg. zabbix trapper, syslog trapper, file trapper etc.)
+     *
+     * @param tagExpr tag template (eg. class name or component name)
+     *
+     * @param msgExpr message template (used if no exception has been caught)
+     *
+     * @param errExpr error message template (if an exception has been caught)
+     *
+     * @param errField error field name
+     *
+     * @return trapper collector object
+     *
+     */
+    public SpyProcessor trapperCollector(ZorkaTrapper trapper, String tagExpr, String msgExpr, String errExpr, String errField) {
+        return new TrapperCollector(trapper, tagExpr, msgExpr,  errExpr,  errField);
     }
 
 

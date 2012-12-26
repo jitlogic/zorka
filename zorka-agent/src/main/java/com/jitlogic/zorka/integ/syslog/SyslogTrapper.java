@@ -15,6 +15,8 @@
  */
 package com.jitlogic.zorka.integ.syslog;
 
+import com.jitlogic.zorka.integ.ZorkaTrapper;
+import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
@@ -32,7 +34,7 @@ import java.util.Date;
 /**
  * Minimal syslog sender implementation.
  */
-public class SyslogTrapper extends ZorkaAsyncThread<String> {
+public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrapper {
 
     public final static int DEFAULT_PORT = 514;
 
@@ -42,6 +44,9 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> {
     private int syslogPort = DEFAULT_PORT;
 
     private String defaultHost;
+
+    private int defaultFacility = SyslogLib.F_LOCAL0;
+    private int defaultSeverity = SyslogLib.S_INFO;
 
     private DatagramSocket socket = null;
 
@@ -118,6 +123,14 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> {
             if (log != null) {
                 handleError("Cannot send syslog packet: " + msg, e);
             }
+        }
+    }
+
+    public void trap(String tag, String msg, Throwable e) {
+        if (e == null) {
+            log(defaultSeverity, defaultFacility, tag, msg);
+        } else {
+            log(defaultSeverity, defaultFacility, tag, msg + ": " + e.getMessage());
         }
     }
 }
