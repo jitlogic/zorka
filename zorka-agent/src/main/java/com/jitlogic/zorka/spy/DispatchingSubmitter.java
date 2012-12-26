@@ -25,7 +25,6 @@ import com.jitlogic.zorka.util.ZorkaUtil;
 import java.util.List;
 import java.util.Stack;
 
-import static com.jitlogic.zorka.spy.SpyConst.*;
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
 /**
@@ -82,7 +81,7 @@ public class DispatchingSubmitter implements SpySubmitter {
             return;
         }
 
-        record.cleanup();
+        //record.cleanup();
 
         if (sdef.getProcessors(SpyLib.ON_COLLECT).size() > 0) {
             collector.process(SpyLib.ON_COLLECT, record);
@@ -116,8 +115,7 @@ public class DispatchingSubmitter implements SpySubmitter {
         List<SpyProcessor> processors = sdef.getProcessors(stage);
 
         if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
-            log.debug("Processing records (stage=" + stage + ") ["
-                + ZorkaUtil.join(",", record.getVals(stage)) + "]");
+            log.debug("Processing records (stage=" + stage + ")");
         }
 
         for (SpyProcessor processor : processors) {

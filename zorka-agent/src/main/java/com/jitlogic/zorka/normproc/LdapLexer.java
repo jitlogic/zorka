@@ -22,29 +22,29 @@ import java.util.Map;
 public class LdapLexer extends Lexer {
 
 
-    private final static byte CH_UNKNOWN     = 0;
-    private final static byte CH_WHITESPACE  = 1;
-    private final static byte CH_ALNUM       = 2;
-    private final static byte CH_LPAREN      = 3;
-    private final static byte CH_RPAREN      = 4;
-    private final static byte CH_EXCLAMATION = 5;
-    private final static byte CH_AMPERSAND   = 6;
-    private final static byte CH_VERTBAR     = 7;
-    private final static byte CH_EQUALS      = 8;
-    private final static byte CH_ANGLE       = 9;
+    private static final byte CH_UNKNOWN     = 0;
+    private static final byte CH_WHITESPACE  = 1;
+    private static final byte CH_ALNUM       = 2;
+    private static final byte CH_LPAREN      = 3;
+    private static final byte CH_RPAREN      = 4;
+    private static final byte CH_EXCLAMATION = 5;
+    private static final byte CH_AMPERSAND   = 6;
+    private static final byte CH_VERTBAR     = 7;
+    private static final byte CH_EQUALS      = 8;
+    private static final byte CH_ANGLE       = 9;
 
-    private final static int S_WHITESPACE = 1; // White space
-    private final static int S_FSTART     = 2; // filter starting delimiter
-    private final static int S_FSTOP      = 3; // filter ending delimiter
-    private final static int S_OPERATOR   = 4; // filter operator: '!', '~',
-    private final static int S_MATCHATTR  = 5; // matching attribute (plus rule)
-    private final static int S_MATCHOPER1 = 6; // matching operator (short)
-    private final static int S_MATCHOPER2 = 7; // matching operator (long)
-    private final static int S_MATCHVALUE = 8; // matching value
-    private final static int S_ERROR      = 9; // illegal character
+    //private static final int S_WHITESPACE = 1; // White space
+    //private static final int S_FSTART     = 2; // filter starting delimiter
+    //private static final int S_FSTOP      = 3; // filter ending delimiter
+    //private static final int S_OPERATOR   = 4; // filter operator: '!', '~',
+    //private static final int S_MATCHATTR  = 5; // matching attribute (plus rule)
+    //private static final int S_MATCHOPER1 = 6; // matching operator (short)
+    //private static final int S_MATCHOPER2 = 7; // matching operator (long)
+    //private static final int S_MATCHVALUE = 8; // matching value
+    //private static final int S_ERROR      = 9; // illegal character
 
 
-    private final static Map<Character, Byte> chmap = ZorkaUtil.map(
+    private static final Map<Character, Byte> chmap = ZorkaUtil.map(
             '(', CH_LPAREN, ')', CH_RPAREN, '~', CH_ANGLE,
             '!', CH_EXCLAMATION, '&', CH_AMPERSAND, '|', CH_VERTBAR,
             '=', CH_EQUALS, '<', CH_ANGLE, '>', CH_ANGLE
@@ -66,9 +66,9 @@ public class LdapLexer extends Lexer {
         return tab;
     }
 
-    private final static byte[] CHT_LDAP = initChTab();
+    private static final byte[] CHT_LDAP = initChTab();
 
-    private final static byte[][] LEX_LDAP = {
+    private static final byte[][] LEX_LDAP = {
                   //       UN WS AN  (  )  !  &  |  = <~>
             lxtab(CHT_LDAP, E, 1, E, 2, 2, E, E, E, E, E), // 0 = S_START
             lxtab(CHT_LDAP, E, 1, E,-2,-9, E, E, E, E, E), // 1 = S_WHITESPACE
@@ -82,7 +82,7 @@ public class LdapLexer extends Lexer {
             lxtab(CHT_LDAP, E, E, E, E, E, E, E, E, E, E), // 9 = S_ERROR
     };
 
-    private final static int[] tokenTypes = {
+    private static final int[] tokenTypes = {
             T_UNKNOWN,      // 0 = S_START
             T_WHITESPACE,   // 1 = S_WHITESPACE
             T_OPERATOR,     // 2 = S_FSTART

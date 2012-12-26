@@ -31,7 +31,6 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.jitlogic.zorka.spy.SpyConst.SPD_COLLECTORS;
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class JmxAttrCollector implements SpyProcessor {
@@ -42,19 +41,17 @@ public class JmxAttrCollector implements SpyProcessor {
 
     private String mbsName;
     private String beanTemplate, attrTemplate;
-    private int itime, stime, istamp, sstamp;
+    private String time, tstamp;
 
     private Map<SpyContext,MethodCallStatistic> cachedStats = new HashMap<SpyContext, MethodCallStatistic>();
 
 
-    public JmxAttrCollector(String mbsName, String beanTemplate, String attrTemplate, int[] tstampField, int[] timeField) {
+    public JmxAttrCollector(String mbsName, String beanTemplate, String attrTemplate, String tstamp, String time) {
         this.mbsName = mbsName;
         this.beanTemplate = beanTemplate;
         this.attrTemplate = attrTemplate;
-        this.stime = timeField[0];
-        this.itime = timeField[1];
-        this.sstamp = tstampField[0];
-        this.istamp = tstampField[1];
+        this.time = time;
+        this.tstamp = tstamp;
     }
 
 
@@ -100,16 +97,16 @@ public class JmxAttrCollector implements SpyProcessor {
             }
         } // if (stats == null)
 
-        Object timeObj = record.get(fs(stime, stage), itime);
-        Object tstampObj = record.get(fs(sstamp, stage), istamp);
+        Object timeObj = record.get(time);
+        Object tstampObj = record.get(tstamp);
 
         if (timeObj instanceof Long && tstampObj instanceof Long) {
-            if (record.gotStage(ON_RETURN)) {
+            if (record.hasStage(ON_RETURN)) {
                 if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
                     log.debug("Logging record using logCall()");
                 }
                 statistic.logCall((Long) tstampObj, (Long) timeObj);
-            } else if (record.gotStage(ON_ERROR)) {
+            } else if (record.hasStage(ON_ERROR)) {
                 if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
                     log.debug("Logging record using logError()");
                 }

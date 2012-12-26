@@ -43,39 +43,39 @@ import java.util.Properties;
  */
 public class ZorkaConfig {
 
-    public final static String ZORKA_VERSION = "zorka.version";
-    public final static String ZORKA_HOSTNAME = "zorka.hostname";
+    public static final String ZORKA_VERSION = "zorka.version";
+    public static final String ZORKA_HOSTNAME = "zorka.hostname";
 
-    public final static String ZORKA_REQ_TIMEOUT = "zorka.req.timeout";
-    public final static String ZORKA_REQ_THREADS = "zorka.req.threads";
-    public final static String ZORKA_REQ_QUEUE = "zorka.req.queue";
-    public final static String ZORKA_MBS_AUTOREG = "zorka.mbs.autoregister";
+    public static final String ZORKA_REQ_TIMEOUT = "zorka.req.timeout";
+    public static final String ZORKA_REQ_THREADS = "zorka.req.threads";
+    public static final String ZORKA_REQ_QUEUE = "zorka.req.queue";
+    public static final String ZORKA_MBS_AUTOREG = "zorka.mbs.autoregister";
 
-    public final static String SPY_ENABLE = "spy";
-    public final static String SPY_DEBUG = "spy.debug";
+    public static final String SPY_ENABLE = "spy";
+    public static final String SPY_DEBUG = "spy.debug";
 
-    public final static String SYSLOG_ENABLE = "syslog";
+    public static final String SYSLOG_ENABLE = "syslog";
 
-    public final static String SNMP_ENABLE = "snmp";
+    public static final String SNMP_ENABLE = "snmp";
 
-    public final static String ZABBIX_ENABLE = "zabbix";
+    public static final String ZABBIX_ENABLE = "zabbix";
 
-    public final static String NAGIOS_ENABLE = "nagios";
+    public static final String NAGIOS_ENABLE = "nagios";
 
-    public final static String ZORKA_HOME_DIR = "zorka.home.dir";
-    public final static String ZORKA_CONF_DIR = "zorka.config.dir";
-    public final static String ZORKA_LOG_DIR = "zorka.log.dir";
+    public static final String ZORKA_HOME_DIR = "zorka.home.dir";
+    public static final String ZORKA_CONF_DIR = "zorka.config.dir";
+    public static final String ZORKA_LOG_DIR = "zorka.log.dir";
 
-    public final static String ZORKA_LOG_NUM = "zorka.log.num";
-    public final static String ZORKA_LOG_FNAME = "zorka.log.fname";
-    public final static String ZORKA_LOG_TRACE = "zorka.log.trace";
-    public final static String ZORKA_LOG_LEVEL = "zorka.log.level";
-    public final static String ZORKA_LOG_SIZE = "zorka.log.size";
-    public final static String ZORKA_LOG_EXCEPTIONS = "zorka.log.exceptions";
+    public static final String ZORKA_LOG_NUM = "zorka.log.num";
+    public static final String ZORKA_LOG_FNAME = "zorka.log.fname";
+    public static final String ZORKA_LOG_TRACE = "zorka.log.trace";
+    public static final String ZORKA_LOG_LEVEL = "zorka.log.level";
+    public static final String ZORKA_LOG_SIZE = "zorka.log.size";
+    public static final String ZORKA_LOG_EXCEPTIONS = "zorka.log.exceptions";
 
-    public final static String ZORKA_SYSLOG = "zorka.syslog";
-    public final static String ZORKA_SYSLOG_FACILITY = "zorka.syslog.facility";
-    public final static String ZORKA_SYSLOG_SERVER = "zorka.syslog.server";
+    public static final String ZORKA_SYSLOG = "zorka.syslog";
+    public static final String ZORKA_SYSLOG_FACILITY = "zorka.syslog.facility";
+    public static final String ZORKA_SYSLOG_SERVER = "zorka.syslog.server";
 
 	private static Properties properties = null;
 	private static String homeDir = null;

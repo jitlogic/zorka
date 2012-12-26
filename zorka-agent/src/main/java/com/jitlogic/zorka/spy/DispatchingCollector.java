@@ -22,8 +22,6 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.util.List;
 
-import static com.jitlogic.zorka.spy.SpyConst.*;
-
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class DispatchingCollector implements SpyProcessor {

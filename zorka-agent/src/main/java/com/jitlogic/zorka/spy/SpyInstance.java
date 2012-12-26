@@ -23,7 +23,7 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.util.Properties;
 
-import static com.jitlogic.zorka.spy.SpyConst.*;
+import static com.jitlogic.zorka.spy.SpyLib.SPD_CONFIG;
 
 /**
  * This class binds all parts of spy together to make fully configured instrumentation

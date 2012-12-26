@@ -23,41 +23,41 @@ public class SyslogLib {
 
 
     // Severity codes
-    public final static int S_EMERGENCY = 0;
-    public final static int S_ALERT = 1;
-    public final static int S_CRITICAL = 2;
-    public final static int S_ERROR = 3;
-    public final static int S_WARNING = 4;
-    public final static int S_NOTICE = 5;
-    public final static int S_INFO = 6;
-    public final static int S_DEBUG = 7;
+    public static final int S_EMERGENCY = 0;
+    public static final int S_ALERT = 1;
+    public static final int S_CRITICAL = 2;
+    public static final int S_ERROR = 3;
+    public static final int S_WARNING = 4;
+    public static final int S_NOTICE = 5;
+    public static final int S_INFO = 6;
+    public static final int S_DEBUG = 7;
 
 
     // Facilities
-    public final static int F_KERNEL = 0;
-    public final static int F_USER = 1;
-    public final static int F_MAIL = 2;
-    public final static int F_SYSTEM = 3;
-    public final static int F_AUTH1 = 4;
-    public final static int F_SYSLOG = 5;
-    public final static int F_PRINTER = 6;
-    public final static int F_NETWORK = 7;
-    public final static int F_UUCP = 8;
-    public final static int F_CLOCK1 = 9;
-    public final static int F_AUTH2 = 10;
-    public final static int F_FTPD = 11;
-    public final static int F_NTPD = 12;
-    public final static int F_AUDIT = 13;
-    public final static int F_ALERT = 14;
-    public final static int F_CLOCK2 = 15;
-    public final static int F_LOCAL0 = 16;
-    public final static int F_LOCAL1 = 17;
-    public final static int F_LOCAL2 = 18;
-    public final static int F_LOCAL3 = 19;
-    public final static int F_LOCAL4 = 20;
-    public final static int F_LOCAL5 = 21;
-    public final static int F_LOCAL6 = 22;
-    public final static int F_LOCAL7 = 23;
+    public static final int F_KERNEL = 0;
+    public static final int F_USER = 1;
+    public static final int F_MAIL = 2;
+    public static final int F_SYSTEM = 3;
+    public static final int F_AUTH1 = 4;
+    public static final int F_SYSLOG = 5;
+    public static final int F_PRINTER = 6;
+    public static final int F_NETWORK = 7;
+    public static final int F_UUCP = 8;
+    public static final int F_CLOCK1 = 9;
+    public static final int F_AUTH2 = 10;
+    public static final int F_FTPD = 11;
+    public static final int F_NTPD = 12;
+    public static final int F_AUDIT = 13;
+    public static final int F_ALERT = 14;
+    public static final int F_CLOCK2 = 15;
+    public static final int F_LOCAL0 = 16;
+    public static final int F_LOCAL1 = 17;
+    public static final int F_LOCAL2 = 18;
+    public static final int F_LOCAL3 = 19;
+    public static final int F_LOCAL4 = 20;
+    public static final int F_LOCAL5 = 21;
+    public static final int F_LOCAL6 = 22;
+    public static final int F_LOCAL7 = 23;
 
 
     private Map<String,SyslogTrapper> trappers = new ConcurrentHashMap<String, SyslogTrapper>();

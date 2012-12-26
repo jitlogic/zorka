@@ -18,13 +18,14 @@
 
 package com.jitlogic.zorka.agent.testspy.support;
 
-
+@ClassAnnotation
 public class TestClass1 {
 
     private static int scalls = 0;
     private int calls = 0;
     private int vals = 0;
 
+    @TestAnnotation
     public void trivialMethod() {
         calls++;
     }

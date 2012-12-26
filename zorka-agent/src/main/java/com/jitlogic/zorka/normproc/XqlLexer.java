@@ -34,32 +34,32 @@ public class XqlLexer extends Lexer {
 
     // Character table definitions
 
-    public final static byte CH_UNKNOWN    = 0;
-    public final static byte CH_WHITESPACE = 1;
-    public final static byte CH_SYMSTART   = 2;
-    public final static byte CH_DIGIT      = 3;
-    public final static byte CH_OPERATOR   = 4;
-    public final static byte CH_MINUS      = 5;
-    public final static byte CH_DOT        = 6;
-    public final static byte CH_STRDELIM   = 7;
-    public final static byte CH_STRQUOTE   = 8;
-    public final static byte CH_PLUS       = 9;
-    public final static byte CH_CHAR_E     = 10;
-    public final static byte CH_IDQUOTE    = 11;
-    public final static byte CH_QMARK      = 12;
-    public final static byte CH_COLON      = 13;
+    public static final byte CH_UNKNOWN    = 0;
+    public static final byte CH_WHITESPACE = 1;
+    public static final byte CH_SYMSTART   = 2;
+    public static final byte CH_DIGIT      = 3;
+    public static final byte CH_OPERATOR   = 4;
+    public static final byte CH_MINUS      = 5;
+    public static final byte CH_DOT        = 6;
+    public static final byte CH_STRDELIM   = 7;
+    public static final byte CH_STRQUOTE   = 8;
+    public static final byte CH_PLUS       = 9;
+    public static final byte CH_CHAR_E     = 10;
+    public static final byte CH_IDQUOTE    = 11;
+    public static final byte CH_QMARK      = 12;
+    public static final byte CH_COLON      = 13;
 
-    private final static int S_WHITESPACE = 1;  // white space
-    private final static int S_SYMBOL     = 2;  // identifiers
-    private final static int S_OPERATOR   = 3;  // operators
-    private final static int S_INTEGER    = 4;  // integer literal
-    private final static int S_FLOAT      = 5;  // floating point number literal
-    private final static int S_STRING     = 6;  // string
-    private final static int S_SQUOTE     = 7;  // possible end of string or quoted character
-    private final static int S_FLOAT_E    = 8;  // floating point literal in expotential notation
-    private final static int S_QPARAM     = 9;  // unnamed query parameter (starting with '?')
-    private final static int S_NPARAM     = 10; // named query parameter (starting with ':')
-    private final static int S_KEYWORD    = 11; // keywords
+    //private final static int S_WHITESPACE = 1;  // white space
+    //private final static int S_SYMBOL     = 2;  // identifiers
+    //private final static int S_OPERATOR   = 3;  // operators
+    //private final static int S_INTEGER    = 4;  // integer literal
+    //private final static int S_FLOAT      = 5;  // floating point number literal
+    //private final static int S_STRING     = 6;  // string
+    //private final static int S_SQUOTE     = 7;  // possible end of string or quoted character
+    //private final static int S_FLOAT_E    = 8;  // floating point literal in expotential notation
+    //private final static int S_QPARAM     = 9;  // unnamed query parameter (starting with '?')
+    //private final static int S_NPARAM     = 10; // named query parameter (starting with ':')
+    //private final static int S_KEYWORD    = 11; // keywords
 
 
     private static byte[] initChTab(String operators, Map<Character, Byte> chmap) {
@@ -78,7 +78,7 @@ public class XqlLexer extends Lexer {
         return tab;
     }
 
-    private final static int[] tokenTypes = {
+    private static final int[] tokenTypes = {
             T_UNKNOWN,      // S_START
             T_WHITESPACE,   // S_WHITESPACE
             T_SYMBOL,       // S_SYMBOL
@@ -93,15 +93,15 @@ public class XqlLexer extends Lexer {
             T_KEYWORD,      // S_KEYWORD
     };
 
-    private static Map<Character,Byte> CHM_SQL = ZorkaUtil.map(
+    private static final Map<Character,Byte> CHM_SQL = ZorkaUtil.map(
             'E', CH_CHAR_E, '-', CH_MINUS, '.', CH_DOT, '\'', CH_STRDELIM,
             '\\', CH_STRQUOTE, '+', CH_PLUS, '"', CH_IDQUOTE, '?', CH_QMARK,
             ':', CH_COLON
     );
 
-    private final static byte[] CHT_SQL = initChTab("!%&()*,/;<=>@[]^", CHM_SQL);
+    private static final byte[] CHT_SQL = initChTab("!%&()*,/;<=>@[]^", CHM_SQL);
 
-    private final static byte[][] LEX_SQL = { // DIALECT_SQL99
+    private static final byte[][] LEX_SQL = { // DIALECT_SQL99
                    //      UN WS SY DI OP -  .  '  \  +  E  "  ?  :
             lxtab(CHT_SQL, E, 1, 2, 4, 3, 3, 3, 6, E, 3, 2, 2, 9,10), // 0 = S_START
             lxtab(CHT_SQL, E, 1, E, E, E, E, E, E, E, E, E, E, E, E), // 1 = S_WHITESPACE
@@ -116,15 +116,15 @@ public class XqlLexer extends Lexer {
             lxtab(CHT_SQL, E, E,10,10, E, E, E, E, E, E, E, E, E, E), // 10 = S_NPARAM
     };
 
-    private static Map<Character,Byte> CHM_MYSQL = ZorkaUtil.map(
+    private static final Map<Character,Byte> CHM_MYSQL = ZorkaUtil.map(
             'E', CH_CHAR_E, '-', CH_MINUS, '.', CH_DOT, '\'', CH_STRDELIM,
             '\\', CH_STRQUOTE, '+', CH_PLUS, '`', CH_IDQUOTE, '?', CH_QMARK,
             ':', CH_COLON
     );
 
-    private final static byte[] CHT_MYSQL = initChTab("!%&()*,/;<=>@[]^", CHM_MYSQL);
+    private static final byte[] CHT_MYSQL = initChTab("!%&()*,/;<=>@[]^", CHM_MYSQL);
 
-    private final static byte[][] LEX_MYSQL = { // DIALECT_SQL99
+    private static final byte[][] LEX_MYSQL = { // DIALECT_SQL99
                      //     UN WS SY DI OP -   .  '  \  +  E  "  ?  :
             lxtab(CHT_MYSQL, E, 1, 2, 4, 3, 3, 3, 6, E, 3, 2, 2, 9,10), // 0 = S_START
             lxtab(CHT_MYSQL, E, 1, E, E, E, E, E, E, E, E, E, E, E, E), // 1 = S_WHITESPACE
@@ -139,16 +139,16 @@ public class XqlLexer extends Lexer {
             lxtab(CHT_MYSQL, E, E,10,10, E, E, E, E, E, E, E, E, E, E), // 10 = S_NPARAM
     };
 
-    private static Map<Character,Byte> CHM_MSSQL = ZorkaUtil.map(
+    private static final Map<Character,Byte> CHM_MSSQL = ZorkaUtil.map(
             'E', CH_CHAR_E, '-', CH_MINUS, '.', CH_DOT, '?', CH_QMARK,
             '\'', CH_STRDELIM, '\\', CH_STRQUOTE, '+', CH_PLUS,
             '`', CH_IDQUOTE, '[', CH_IDQUOTE, ']', CH_IDQUOTE,
             '?', CH_QMARK, ':', CH_COLON
     );
 
-    private final static byte[] CHT_MSSQL = initChTab("!%&()*,/;<=>@^", CHM_MSSQL);
+    private static final byte[] CHT_MSSQL = initChTab("!%&()*,/;<=>@^", CHM_MSSQL);
 
-    private final static byte[][] LEX_MSSQL = { // DIALECT_SQL99
+    private static final byte[][] LEX_MSSQL = { // DIALECT_SQL99
                      //     UN WS SY DI OP  -  .  '  \  +  E  "  ?  :
             lxtab(CHT_MSSQL, E, 1, 2, 4, 3, 3, 3, 6, E, 3, 2, 2, 9,10), // 0 = S_START
             lxtab(CHT_MSSQL, E, 1, E, E, E, E, E, E, E, E, E, E, E, E), // 1 = S_WHITESPACE
@@ -165,7 +165,7 @@ public class XqlLexer extends Lexer {
 
     // Keyword sets
 
-    private final static Set<String> SQL_92_KEYWORDS = strSet(
+    private static final Set<String> SQL_92_KEYWORDS = strSet(
             "ABSOLUTE", "ACTION", "ADD", "ALL", "ALLOCATE", "ALTER", "AND", "ANY", "ARE", "AS", "ASC", "ASSERTION",
             "AT", "AUTHORIZATION", "AVG", "BEGIN", "BETWEEN", "BIT", "BIT_LENGTH", "BOTH", "BY", "CALL", "CASCADE",
             "CASCADED", "CASE", "CAST", "CATALOG", "CHAR", "CHARACTER", "CHARACTER_LENGTH", "CHAR_LENGTH", "CHECK",
@@ -193,7 +193,7 @@ public class XqlLexer extends Lexer {
             "UPPER", "USAGE", "USER", "USING", "VALUE", "VALUES", "VARCHAR", "VARYING", "VIEW", "WHEN", "WHENEVER",
             "WHERE", "WHILE", "WITH", "WORK", "WRITE", "YEAR", "ZONE");
 
-    private final static Set<String> SQL_99_KEYWORDS = strSet(
+    private static final Set<String> SQL_99_KEYWORDS = strSet(
             "ABSOLUTE", "ACTION", "ADD", "AFTER", "ALL", "ALLOCATE", "ALTER", "AND", "ANY", "ARE",
             "ARRAY", "AS", "ASC", "ASENSITIVE", "ASSERTION", "ASYMMETRIC", "AT", "ATOMIC", "AUTHORIZATION",
             "BEFORE", "BEGIN", "BETWEEN", "BINARY", "BIT", "BLOB", "BOOLEAN", "BOTH", "BREADTH", "BY", "CALL",
@@ -228,7 +228,7 @@ public class XqlLexer extends Lexer {
             "VARYING", "VIEW", "WHEN", "WHENEVER", "WHERE", "WHILE", "WINDOW", "WITH", "WITHIN", "WITHOUT", "WORK",
             "WRITE", "YEAR", "ZONE");
 
-    private final static Set<String> SQL_2003_KEYWORDS = strSet(
+    private static final Set<String> SQL_2003_KEYWORDS = strSet(
             "ADD", "ALL", "ALLOCATE", "ALTER", "AND", "ANY", "ARE", "ARRAY", "AS", "ASENSITIVE", "ASYMMETRIC",
             "AT", "ATOMIC", "AUTHORIZATION", "BEGIN", "BETWEEN", "BIGINT", "BINARY", "BLOB", "BOOLEAN", "BOTH",
             "BY", "CALL", "CALLED", "CASCADED", "CASE", "CAST", "CHAR", "CHARACTER", "CHECK", "CLOB", "CLOSE",
@@ -256,7 +256,7 @@ public class XqlLexer extends Lexer {
             "UPDATE", "USER", "USING", "VALUE", "VALUES", "VARCHAR", "VARYING", "WHEN", "WHENEVER", "WHERE",
             "WHILE", "WINDOW", "WITH", "WITHIN", "WITHOUT", "YEAR");
 
-    private final static Set<String> MSSQL_KEYWORDS = strSet(
+    private static final Set<String> MSSQL_KEYWORDS = strSet(
             "ADD", "ALL", "ALTER", "AND", "ANY", "AS", "ASC", "AUTHORIZATION", "BACKUP", "BEGIN", "BETWEEN",
             "BREAK", "BROWSE", "BULK", "BY", "CASCADE", "CASE", "CHECK", "CHECKPOINT", "CLOSE", "CLUSTERED",
             "COALESCE", "COLLATE", "COLUMN", "COMMIT", "COMPUTE", "CONSTRAINT", "CONTAINS", "CONTAINSTABLE",
@@ -278,7 +278,7 @@ public class XqlLexer extends Lexer {
             "UNIQUE", "UNPIVOT", "UPDATE", "UPDATETEXT", "USE", "USER", "VALUES", "VARYING", "VIEW", "WAITFOR",
             "WHEN", "WHERE", "WHILE", "WITH", "WITHIN", "GROUP", "WRITETEXT");
 
-    private final static Set<String> PGSQL_KEYWORDS = strSet(
+    private static final Set<String> PGSQL_KEYWORDS = strSet(
             "ALL", "ANALYSE", "ANALYZE", "AND", "ANY", "ARRAY", "AS", "ASC", "ASYMMETRIC", "AUTHORIZATION", "BETWEEN",
             "BINARY", "BOTH", "CASE", "CAST", "CHECK", "COLLATE", "COLUMN", "CONSTRAINT", "CREATE", "CROSS",
             "CURRENT_DATE", "CURRENT_ROLE", "CURRENT_TIME", "CURRENT_TIMESTAMP", "CURRENT_USER", "DEFAULT", "DEFERRABLE",
@@ -289,7 +289,7 @@ public class XqlLexer extends Lexer {
             "PRIMARY", "REFERENCES", "RIGHT", "SELECT", "SESSION_USER", "SIMILAR", "SOME", "SYMMETRIC", "TABLE",
             "THEN", "TO", "TRAILING", "TRUE", "UNION", "UNIQUE", "USER", "USING", "VERBOSE", "WHEN", "WHERE");
 
-    private final static Set<String> MYSQL_KEYWORDS = strSet(
+    private static final Set<String> MYSQL_KEYWORDS = strSet(
             "ACCESSIBLE", "ADD", "ALL", "ALTER", "ANALYZE", "AND", "AS", "ASC", "ASENSITIVE", "BEFORE", "BETWEEN",
             "BIGINT", "BINARY", "BLOB", "BOTH", "BY", "CALL", "CASCADE", "CASE", "CHANGE", "CHAR", "CHARACTER",
             "CHECK", "COLLATE", "COLUMN", "CONDITION", "CONSTRAINT", "CONTINUE", "CONVERT", "CREATE", "CROSS",
@@ -315,7 +315,7 @@ public class XqlLexer extends Lexer {
             "UTC_DATE", "UTC_TIME", "UTC_TIMESTAMP", "VALUES", "VARBINARY", "VARCHAR", "VARCHARACTER", "VARYING",
             "WHEN", "WHERE", "WHILE", "WITH", "WRITE", "XOR", "YEAR_MONTH", "ZEROFILL");
 
-    private final static Set<String> DB2_KEYWORDS = strSet(
+    private static final Set<String> DB2_KEYWORDS = strSet(
             "ABS", "ABSENT", "ABSOLUTE", "ACCESS", "ACCORDING", "ACTION", "ACTIVATE", "ADA", "ADD", "AFTER",
             "ALIAS", "ALL", "ALLOCATE", "ALLOW", "ALTER", "ALTERIN", "ALWAYS", "AND", "ANY", "APPEND", "ARE",
             "ARRAY", "AS", "ASC", "ASCII", "ASENSITIVE", "ASSERTION", "ASSOCIATE", "ASUTIME", "ASYMMETRIC", "AT",
@@ -393,7 +393,7 @@ public class XqlLexer extends Lexer {
             "XMLSCHEMA", "XMLSERIALIZE", "XMLTABLE", "XMLTEXT", "XMLVALIDATE", "XMLXSROBJECTID", "YEAR", "YEARS",
             "YES", "ZONE");
 
-    private final static Set<String> ORACLE_KEYWORDS = strSet(
+    private static final Set<String> ORACLE_KEYWORDS = strSet(
             "ACCESS", "ADD", "ALL", "ALTER", "AND", "ANY", "AS", "ASC", "AUDIT", "BETWEEN", "BY", "CHAR", "CHECK",
             "CLUSTER", "COLUMN", "COMMENT", "COMPRESS", "CONNECT", "CREATE", "CURRENT", "DATE", "DECIMAL", "DEFAULT",
             "DELETE", "DESC", "DISTINCT", "DROP", "ELSE", "EXCLUSIVE", "EXISTS", "FILE", "FLOAT", "FOR", "FROM",
@@ -405,7 +405,7 @@ public class XqlLexer extends Lexer {
             "START", "SUCCESSFUL", "SYNONYM", "SYSDATE", "TABLE", "THEN", "TO", "TRIGGER", "UID", "UNION", "UNIQUE",
             "UPDATE", "USER", "VALIDATE", "VALUES", "VARCHAR", "VARCHAR2", "VIEW", "WHENEVER", "WHERE", "WITH");
 
-    private final static Set<String> HQL_KEYWORDS = strSet(
+    private static final Set<String> HQL_KEYWORDS = strSet(
             "ALL", "AND", "ANY", "AS", "ASCENDING", "AVG", "BETWEEN", "BOTH", "CASE", "CLASS", "COUNT", "DELETE",
             "DESCENDING", "DISTINCT", "ELEMENTS", "ELSE", "EMPTY", "END", "ESCAPE", "EXISTS", "FALSE", "FETCH",
             "FROM", "FULL", "GROUP", "HAVING", "IN", "INDICES", "INNER", "INSERT", "INTO", "IS", "JOIN", "LEADING",
@@ -413,7 +413,7 @@ public class XqlLexer extends Lexer {
             "OUTER", "PROPERTIES", "RIGHT", "SELECT", "SET", "SOME", "SUM", "THEN", "TRAILING", "TRUE", "UNION",
             "UPDATE", "VERSIONED", "WHEN", "WHERE", "WITH");
 
-    private final static Set<String> JPA_KEYWORDS = strSet(
+    private static final Set<String> JPA_KEYWORDS = strSet(
             "ALL", "AND", "ANY", "AS", "ASC", "AVG", "BETWEEN", "BIT_LENGTH", "BY", "BY", "CHARACTER_LENGTH",
             "CHAR_LENGTH", "COUNT", "CURRENT_DATE", "CURRENT_TIME", "CURRENT_TIMESTAMP", "DELETE", "DESC", "DISTINCT",
             "EMPTY", "EXISTS", "FALSE", "FETCH", "FROM", "GROUP", "HAVING", "IN", "INNER", "IS", "JOIN", "LEFT",
@@ -422,7 +422,7 @@ public class XqlLexer extends Lexer {
 
 
 
-    private final static byte[][][] lextabs = {
+    private static final byte[][][] lextabs = {
             LEX_SQL,     // SQL92
             LEX_SQL,     // SQL99
             LEX_SQL,     // SQL2003

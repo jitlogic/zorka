@@ -30,9 +30,9 @@ public class AvgRateCounter {
 
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    public final static long AVG1  =      60 * 1000;
-    public final static long AVG5  =  5 * 60 * 1000;
-    public final static long AVG15 = 15 * 60 * 1000;
+    public static final long AVG1  =      60 * 1000;
+    public static final long AVG5  =  5 * 60 * 1000;
+    public static final long AVG15 = 15 * 60 * 1000;
 
     private ZorkaLib zorkaLib;
     private Map<String,RateAggregate> aggregates;

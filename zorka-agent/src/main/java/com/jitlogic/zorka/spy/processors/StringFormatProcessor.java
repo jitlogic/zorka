@@ -20,25 +20,23 @@ import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 
-import static com.jitlogic.zorka.spy.SpyLib.fs;
-
 /**
  * Performs string formating using values from current stage.
  */
 public class StringFormatProcessor implements SpyProcessor {
 
-    private int idst, sdst;
+    private String dst;
     private String expr;
 
     private ObjectInspector inspector = new ObjectInspector();
 
-    public StringFormatProcessor(int[] dst, String expr) {
-        this.sdst = dst[0]; this.idst = dst[1];
+    public StringFormatProcessor(String dst, String expr) {
+        this.dst = dst;
         this.expr = expr;
     }
 
     public SpyRecord process(int stage, SpyRecord record) {
-        record.put(fs(sdst, stage), idst, inspector.substitute(expr, record, stage));
+        record.put(dst, inspector.substitute(expr, record, stage));
         return record;
     }
 }

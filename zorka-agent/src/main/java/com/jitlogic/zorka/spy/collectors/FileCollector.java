@@ -15,8 +15,7 @@
  */
 package com.jitlogic.zorka.spy.collectors;
 
-import com.jitlogic.zorka.agent.FileTrapper;
-import com.jitlogic.zorka.spy.SpyLib;
+import com.jitlogic.zorka.integ.FileTrapper;
 import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
