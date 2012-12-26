@@ -16,9 +16,7 @@
  */
 package com.jitlogic.zorka.spy;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static org.objectweb.asm.Opcodes.*;
@@ -28,7 +26,10 @@ import static com.jitlogic.zorka.spy.SpyLib.SM_NOARGS;
 public class SpyMatcher {
 
     private String methodSignature;
-    private int access;
+    private int access, flags;
+
+    public static final int CLASS_ANNOTATION  = 0x01;
+    public static final int METHOD_ANNOTATION = 0x02;
 
     public static final int ACC_PKGPRIV = 0x10000;
 
@@ -38,7 +39,8 @@ public class SpyMatcher {
 
     private Pattern classMatch, methodMatch, descriptorMatch;
 
-    public SpyMatcher(int access, String className, String methodName, String retType, String... argTypes) {
+    public SpyMatcher(int flags, int access, String className, String methodName, String retType, String... argTypes) {
+        this.flags = flags;
         this.access = access;
         this.classMatch = toSymbolMatch(className);
         this.methodMatch = toSymbolMatch(methodName);
@@ -147,24 +149,36 @@ public class SpyMatcher {
         return Pattern.compile(sb.toString());
     }
 
+    public boolean hasClassAnnotation() {
+        return 0 != (flags & CLASS_ANNOTATION);
+    }
 
-    public boolean matches(String className) {
-        return classMatch.matcher(className).matches();
+    public boolean hasMethodAnnotation() {
+        return 0 != (flags & METHOD_ANNOTATION);
+    }
+
+    public boolean matches(List<String> classCandidates) {
+        for (String cm : classCandidates) {
+            if (classMatch.matcher(cm).matches()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
-    public boolean matches(String className, String methodName) {
-        return matches(className) && methodMatch.matcher(methodName).matches();
+    public boolean matches(List<String> classCandidates, String methodName) {
+        return matches(classCandidates) && methodMatch.matcher(methodName).matches();
     }
 
 
-    public boolean matches(String className, String methodName, String descriptor) {
-        return matches(className, methodName) && descriptorMatch.matcher(descriptor).matches();
+    public boolean matches(List<String> classCandidates, String methodName, String descriptor) {
+        return matches(classCandidates, methodName) && descriptorMatch.matcher(descriptor).matches();
     }
 
 
-    public boolean matches(String className, String methodName, String descriptor, int access) {
-        return matches(className, methodName, descriptor) && matches(access);
+    public boolean matches(List<String> classCandidates, String methodName, String descriptor, int access) {
+        return matches(classCandidates, methodName, descriptor) && matches(access);
     }
 
 

@@ -28,9 +28,6 @@ import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.spy.SpySubmitter;
 
-import static com.jitlogic.zorka.spy.SpyConst.*;
-
-import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.Before;
 import org.junit.Test;
 

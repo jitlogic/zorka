@@ -210,6 +210,33 @@ public class SpyLib {
 
 
     /**
+     * Creates new matcher object that will match classes by annotation.
+     *
+     * @param annotationName
+     *
+     * @return
+     */
+    public SpyMatcher byAnnotation(String annotationName) {
+        return new SpyMatcher(SpyMatcher.CLASS_ANNOTATION, 1,
+                "L" + annotationName + ";", "~[a-zA-Z_].*$", null);
+    }
+
+    /**
+     * Creates new matcher object that will match methods by class annotation and method name.
+     *
+     * @param annotationName
+     *
+     * @param methodPattern
+     *
+     * @return
+     */
+    public SpyMatcher byAnnotation(String annotationName, String methodPattern) {
+        return new SpyMatcher(SpyMatcher.CLASS_ANNOTATION, 1,
+                "L" + annotationName + ";", methodPattern, null);
+    }
+
+
+    /**
      * Creates new matcher object that will match methods by class name and method name.
      *
      * @param classPattern class name mask (where * matches arbitrary name and ** matches arbitrary path) or
@@ -221,7 +248,7 @@ public class SpyLib {
      * @return new matcher object
      */
     public SpyMatcher byMethod(String classPattern, String methodPattern) {
-        return new SpyMatcher(1, classPattern, methodPattern, null);
+        return new SpyMatcher(0, 1, classPattern, methodPattern, null);
     }
 
 
@@ -243,7 +270,7 @@ public class SpyLib {
      *
      */
     public SpyMatcher byMethod(int access, String classPattern, String methodPattern, String retType, String... argTypes) {
-        return new SpyMatcher(access, classPattern,  methodPattern, retType, argTypes);
+        return new SpyMatcher(0, access, classPattern,  methodPattern, retType, argTypes);
     }
 
 

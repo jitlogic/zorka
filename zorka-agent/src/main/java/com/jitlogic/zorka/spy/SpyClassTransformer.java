@@ -26,10 +26,7 @@ import org.objectweb.asm.ClassWriter;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.jitlogic.zorka.spy.SpyLib.SPD_CLASSALL;
@@ -81,7 +78,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
                 log.debug("Encountered class: " + className);
             }
 
-            if (sdef.match(clazzName)) {
+            if (sdef.match(Arrays.asList(clazzName)) || sdef.hasClassAnnotation()) {
 
                 if (SpyInstance.isDebugEnabled(SPD_CLASSXFORM)) {
                     log.debug("Transforming class: " + className);

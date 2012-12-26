@@ -26,7 +26,6 @@ import org.objectweb.asm.Type;
 import java.util.List;
 
 import static org.objectweb.asm.Opcodes.*;
-import static com.jitlogic.zorka.spy.SpyConst.*;
 import static com.jitlogic.zorka.spy.SpyLib.*;
 import static java.lang.Math.max;
 

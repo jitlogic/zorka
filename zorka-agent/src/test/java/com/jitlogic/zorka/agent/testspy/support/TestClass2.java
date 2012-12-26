@@ -8,16 +8,18 @@
  * <p/>
  * This software is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * <p/>
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.agent.testspy.support;
 
-package com.jitlogic.zorka.spy;
+public class TestClass2 {
 
-public interface SpyConst {
+    private int calls = 0;
 
-
+    public void trivialMethod() {
+        calls++;
+    }
 }

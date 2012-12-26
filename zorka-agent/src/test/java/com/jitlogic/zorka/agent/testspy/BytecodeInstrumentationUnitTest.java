@@ -28,7 +28,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import static com.jitlogic.zorka.spy.SpyConst.*;
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.*;
@@ -36,6 +35,8 @@ import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.*;
 public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     public final static String TCLASS1 = "com.jitlogic.zorka.agent.testspy.support.TestClass1";
+    public final static String TCLASS2 = "com.jitlogic.zorka.agent.testspy.support.TestClass2";
+    public final static String TACLASS = "com.jitlogic.zorka.agent.testspy.support.ClassAnnotation";
 
     private TestSpyTransformer engine;
     private TestSubmitter submitter;
@@ -475,6 +476,30 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         assertEquals(err, submitter.get(0).get(0));
         assertTrue("Should return an exception.", submitter.get(0).get(0) instanceof NullPointerException);
         assertEquals("dUP!", ((Exception)submitter.get(0).get(0)).getMessage());
+    }
+
+
+    @Test
+    public void testMatchClassByAnnotation() throws Exception {
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchConst(null, "X"))
+                .include(spy.byAnnotation(TACLASS)));
+
+        Object obj = instantiate(engine, TCLASS1);
+        invoke(obj, "trivialMethod");
+
+        assertEquals(1, submitter.size());
+    }
+
+
+    @Test
+    public void testNonMatchClassByAnnotation() throws Exception {
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchConst(null, "X"))
+                .include(spy.byAnnotation(TACLASS)));
+
+        Object obj = instantiate(engine, TCLASS2);
+        invoke(obj, "trivialMethod");
+
+        assertEquals(0, submitter.size());
     }
 
     // TODO test if stack traces in exceptions are the same with and without intercepting errors by instrumentation

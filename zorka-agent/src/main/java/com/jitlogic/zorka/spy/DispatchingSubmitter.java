@@ -25,7 +25,6 @@ import com.jitlogic.zorka.util.ZorkaUtil;
 import java.util.List;
 import java.util.Stack;
 
-import static com.jitlogic.zorka.spy.SpyConst.*;
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
 /**

@@ -20,6 +20,7 @@ package com.jitlogic.zorka.spy;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
+import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 
@@ -43,6 +44,7 @@ public class SpyClassVisitor extends ClassVisitor {
     private boolean isInterface;
     private String interfaces[];
 
+    private List<String> classAnnotations = new ArrayList<String>();
 
     public SpyClassVisitor(SpyClassTransformer engine, String className,
                            List<SpyDefinition> sdefs, ClassVisitor cv) {
@@ -62,6 +64,13 @@ public class SpyClassVisitor extends ClassVisitor {
 
 
     @Override
+    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+        classAnnotations.add(desc.replace("/", "."));
+        return super.visitAnnotation(desc, visible);
+    }
+
+
+    @Override
     public MethodVisitor visitMethod(int access, String methodName, String methodDesc,
                                      String methodSignature, String[] exceptions) {
 
@@ -73,7 +82,8 @@ public class SpyClassVisitor extends ClassVisitor {
         List<SpyContext> ctxs = new ArrayList<SpyContext>(sdefs.size()+2);
 
         for (SpyDefinition sdef : sdefs) {
-            if (sdef.match(className, methodName, methodDesc, access)) {
+            if (sdef.match(sdef.hasClassAnnotation() ? classAnnotations : Arrays.asList(className),
+                    methodName, methodDesc, access)) {
                 if (SpyInstance.isDebugEnabled(SPD_METHODXFORM)) {
                     log.debug("Instrumenting method: " + className + "." + methodName + " " + methodDesc);
                 }

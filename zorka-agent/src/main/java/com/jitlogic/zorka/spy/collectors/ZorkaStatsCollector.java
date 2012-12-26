@@ -32,7 +32,6 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.jitlogic.zorka.spy.SpyConst.*;
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class ZorkaStatsCollector implements SpyProcessor {
@@ -41,7 +40,6 @@ public class ZorkaStatsCollector implements SpyProcessor {
 
     private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
     private String mbsName, mbeanTemplate, attrTemplate, keyTemplate;
-    //private int stime, itime, sstamp, istamp;
     private String time, tstamp;
 
     private Map<SpyContext,MethodCallStatistics> statsCache = new HashMap<SpyContext, MethodCallStatistics>();
@@ -56,8 +54,6 @@ public class ZorkaStatsCollector implements SpyProcessor {
         this.keyTemplate = keyTemplate;
         this.time = time;
         this.tstamp = tstamp;
-        //this.stime = timeField[0]; this.itime = timeField[1];
-        //this.sstamp = tstampField[0]; this.istamp = tstampField[1];
     }
 
 
