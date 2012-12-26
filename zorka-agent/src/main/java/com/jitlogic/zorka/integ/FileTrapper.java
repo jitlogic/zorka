@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.logproc;
+package com.jitlogic.zorka.integ;
 
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.ZorkaLog;
@@ -24,7 +24,7 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class FileTrapper extends ZorkaAsyncThread<String> implements LogProcessor {
+public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrapper {
 
     private final static int ROLLING = 1;
     private final static int DATED   = 2;
@@ -46,6 +46,7 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements LogProcesso
     private String currentSuffix = null;
 
     private ZorkaLogLevel logLevel;
+    private ZorkaLogLevel defaultLogLevel = ZorkaLogLevel.INFO;
 
     public static FileTrapper rolling(ZorkaLogLevel logLevel, String path, int count, long size, boolean logExceptions) {
         return new FileTrapper(logLevel, new File(path), ROLLING, count, size, logExceptions);
@@ -263,11 +264,7 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements LogProcesso
         }
     }
 
-    public LogRecord process(LogRecord rec) {
-        if (logLevel == null || rec.getLogLevel().getPriority() >= logLevel.getPriority()) {
-            log(rec.getOriginClass(), rec.getLogLevel(), rec.getMessage(), rec.getException());
-        }
-
-        return rec;
+    public void trap(String tag, String msg, Throwable e) {
+        log(tag, defaultLogLevel, msg, e);
     }
 }

@@ -160,7 +160,7 @@ public class ZabbixLib {
         ZabbixTrapper trapper = trappers.get(id);
 
         if (trapper == null) {
-            trapper = new ZabbixTrapper(serverAddr, defaultHost);
+            trapper = new ZabbixTrapper(serverAddr, defaultHost, "traps");
             trappers.put(id, trapper);
             trapper.start();
         }

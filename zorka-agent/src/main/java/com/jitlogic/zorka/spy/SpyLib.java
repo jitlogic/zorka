@@ -17,15 +17,13 @@
 
 package com.jitlogic.zorka.spy;
 
-import bsh.This;
 import com.jitlogic.zorka.integ.ZorkaTrapper;
-import com.jitlogic.zorka.logproc.FileTrapper;
+import com.jitlogic.zorka.integ.FileTrapper;
 import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
 import com.jitlogic.zorka.integ.snmp.TrapVarBindDef;
 import com.jitlogic.zorka.integ.syslog.SyslogTrapper;
 import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
-import com.jitlogic.zorka.logproc.LogProcessor;
 import com.jitlogic.zorka.normproc.Normalizer;
 import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.probes.*;
@@ -469,64 +467,6 @@ public class SpyLib {
      */
     public SpyProcessor zabbixCollector(ZabbixTrapper trapper, String expr, String host, String key) {
         return new ZabbixCollector(trapper,  expr,  host,  key);
-    }
-
-
-    /**
-     * Creates log adapter processor object. It converts log records of various types of logger frameworks to common
-     * zorka logproc structure and passes it to log processor object.
-     *
-     * @param src source field
-     *
-     * @param processor log processor object
-     *
-     * @return log adapter object
-     */
-    public SpyProcessor logAdapterCollector(LogProcessor processor, String src) {
-        return new LogAdaptingCollector(src, processor);
-    }
-
-    // TODO converge log records and spy records
-    // TODO converge log processors and spy processors
-
-    /**
-     * Creates log formatter processor object. It constructs log records from arbitrary fields of spy records and passes
-     * them to a log processor.
-     *
-     * @param processor log processor
-     *
-     * @param level log level
-     *
-     * @param msgTmpl message template
-     *
-     * @return log formatter object
-     */
-    public SpyProcessor logFormatCollector(LogProcessor processor, String level, String msgTmpl) {
-        return new LogFormattingCollector(processor, level, msgTmpl);
-    }
-
-
-    /**
-     * Creates log formatter object. It constructs log records from arbitrary fields of spy records and passes them to
-     * a log processor.
-     *
-     * @param processor log processor
-     *
-     * @param levelTmpl log level (interpreted as template string)
-     *
-     * @param msgTmpl message template
-     *
-     * @param classTmpl class name template
-     *
-     * @param methodTmpl method name template
-     *
-     * @param excTmpl exception template
-     *
-     * @return log formatter object
-     */
-    public SpyProcessor logFormatCollector(LogProcessor processor, String levelTmpl, String msgTmpl, String classTmpl,
-                                           String methodTmpl, String excTmpl) {
-        return new LogFormattingCollector(processor,  levelTmpl, msgTmpl, classTmpl, methodTmpl, excTmpl);
     }
 
 

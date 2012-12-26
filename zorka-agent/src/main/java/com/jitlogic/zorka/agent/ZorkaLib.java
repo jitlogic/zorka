@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.*;
 
-import com.jitlogic.zorka.logproc.FileTrapper;
+import com.jitlogic.zorka.integ.FileTrapper;
 import com.jitlogic.zorka.rankproc.*;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
