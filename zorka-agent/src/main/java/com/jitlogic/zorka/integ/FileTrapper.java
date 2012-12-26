@@ -13,8 +13,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.agent;
+package com.jitlogic.zorka.integ;
 
+import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogLevel;
 import com.jitlogic.zorka.util.ZorkaUtil;
@@ -23,13 +24,13 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class FileTrapper extends ZorkaTrapper<String> {
+public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrapper {
 
-    private final static int ROLLING = 1;
-    private final static int DATED   = 2;
+    private static final int ROLLING = 1;
+    private static final int DATED   = 2;
 
-    private final static SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private final static SimpleDateFormat fformat = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat fformat = new SimpleDateFormat("yyyy-MM-dd");
 
     private final File logFile;
     private final int type;
@@ -44,19 +45,22 @@ public class FileTrapper extends ZorkaTrapper<String> {
     private long currentSize = 0;
     private String currentSuffix = null;
 
+    private ZorkaLogLevel logLevel;
+    private ZorkaLogLevel defaultLogLevel = ZorkaLogLevel.INFO;
 
-    public static FileTrapper rolling(String path, int count, long size, boolean logExceptions) {
-        return new FileTrapper(new File(path), ROLLING, count, size, logExceptions);
+    public static FileTrapper rolling(ZorkaLogLevel logLevel, String path, int count, long size, boolean logExceptions) {
+        return new FileTrapper(logLevel, new File(path), ROLLING, count, size, logExceptions);
     }
 
 
-    public static FileTrapper daily(String path, boolean logExceptions) {
-        return new FileTrapper(new File(path), DATED, 0, Long.MAX_VALUE, logExceptions);
+    public static FileTrapper daily(ZorkaLogLevel logLevel, String path, boolean logExceptions) {
+        return new FileTrapper(logLevel, new File(path), DATED, 0, Long.MAX_VALUE, logExceptions);
     }
 
 
-    private FileTrapper(File logFile, int type, int maxLogs, long size, boolean logExceptions) {
+    private FileTrapper(ZorkaLogLevel logLevel, File logFile, int type, int maxLogs, long size, boolean logExceptions) {
         super(logFile.getName());
+        this.logLevel = logLevel;
         this.logFile = logFile;
         this.type = type;
         this.maxLogs = maxLogs;
@@ -258,5 +262,9 @@ public class FileTrapper extends ZorkaTrapper<String> {
                 log.error("Cannot open log file " + f.getAbsolutePath(), e);
             }
         }
+    }
+
+    public void trap(String tag, String msg, Throwable e) {
+        log(tag, defaultLogLevel, msg, e);
     }
 }

@@ -24,12 +24,15 @@ import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
 public abstract class SpyProbe implements SpyDefArg {
 
-    private String dstKey;
+    private String key;
 
-    public SpyProbe(String dstKey) {
-        this.dstKey = dstKey;
+    public SpyProbe(String key) {
+        this.key = key;
     }
 
+    public String getKey() {
+        return key;
+    }
 
     public abstract int emit(SpyMethodVisitor mv, int stage, int opcode);
 
@@ -86,6 +89,10 @@ public abstract class SpyProbe implements SpyDefArg {
                         "valueOf", "(C)Ljava/lang/Character;");
                 break;
         }
+    }
+
+    public Object processVal(Object val) {
+        return val;
     }
 
 }

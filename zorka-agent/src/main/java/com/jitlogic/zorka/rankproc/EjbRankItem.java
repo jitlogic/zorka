@@ -19,8 +19,8 @@ import com.jitlogic.zorka.util.ObjectInspector;
  */
 public class EjbRankItem implements Rankable<Object> {
 
-    private final static int BY_CALLS = 0;
-    private final static int BY_TIME = 1;
+    private static final int BY_CALLS = 0;
+    private static final int BY_TIME = 1;
 
     private Object statObj;
     private ObjectInspector inspector;

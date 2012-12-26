@@ -15,6 +15,9 @@
  */
 package com.jitlogic.zorka.integ.syslog;
 
+import com.jitlogic.zorka.integ.ZorkaTrapper;
+import com.jitlogic.zorka.spy.SpyLib;
+import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
@@ -26,18 +29,15 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 
 /**
  * Minimal syslog sender implementation.
  */
-public class SyslogTrapper implements Runnable {
+public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrapper {
 
     public final static int DEFAULT_PORT = 514;
 
-    private ZorkaLog log = null;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd HH:mm:ss");
 
     private InetAddress syslogAddress;
@@ -45,19 +45,19 @@ public class SyslogTrapper implements Runnable {
 
     private String defaultHost;
 
-    private LinkedBlockingQueue<String> sendQueue = new LinkedBlockingQueue<String>(1024);
+    private int defaultFacility = SyslogLib.F_LOCAL0;
+    private int defaultSeverity = SyslogLib.S_INFO;
 
-    private volatile boolean running;
     private DatagramSocket socket = null;
-    private Thread thread = null;
 
 
     public SyslogTrapper(String syslogServer, String defaultHost) {
         this(syslogServer, defaultHost, false);
     }
 
-    public SyslogTrapper(String syslogServer, String defaultHost, boolean quiet) {
 
+    public SyslogTrapper(String syslogServer, String defaultHost, boolean quiet) {
+        super("syslog-trapper");
         try {
             if (syslogServer.contains(":")) {
                 String[] parts = syslogServer.split(":");
@@ -87,14 +87,8 @@ public class SyslogTrapper implements Runnable {
 
 
     public void log(int severity, int facility, String hostname, String tag, String content) {
-        synchronized (sendQueue) {
-            try {
-                if (running) {
-                    String s = format(severity, facility, new Date(), hostname, tag, content);
-                    sendQueue.offer(s, 1, TimeUnit.MILLISECONDS);
-                }
-            } catch (InterruptedException e) { }
-        }
+        String s = format(severity, facility, new Date(), hostname, tag, content);
+        submit(s);
     }
 
 
@@ -104,56 +98,39 @@ public class SyslogTrapper implements Runnable {
     }
 
 
-    public void start() {
-        if (thread == null) {
-            try {
-                socket = new DatagramSocket();
-                thread = new Thread(this);
-                thread.setName("ZORKA-syslog-sender");
-                thread.setDaemon(true);
-
-                running = true;
-                thread.start();
-            } catch (SocketException e) {
-                if (log != null) {
-                    log.error("Cannot open UDP socket", e);
-                }
-            }
+    public void open() {
+        try {
+            socket = new DatagramSocket();
+        } catch (SocketException e) {
+            handleError("Cannot open UDP socket", e);
         }
+
     }
 
 
-    public void stop() {
-        running = false;
-    }
-
-
-    public void run() {
-
-        while (running) {
-            runCycle();
-        }
-
-        // Shut down thread, socket etc.
+    public void close() {
         socket.close();
         socket = null;
-        thread = null;
     }
 
-    private void runCycle() {
-        String msg = null;
+
+    @Override
+    protected void process(String msg) {
+        byte[] buf = msg.getBytes();
         try {
-            msg = sendQueue.poll(1, TimeUnit.MILLISECONDS);
-            if (msg != null) {
-                byte[] buf = msg.getBytes();
-                try {
-                    socket.send(new DatagramPacket(buf, 0, buf.length, syslogAddress, syslogPort));
-                } catch (IOException e) {
-                    if (log != null) {
-                        log.error("Cannot send syslog packet: " + msg);
-                    }
-                }
+            socket.send(new DatagramPacket(buf, 0, buf.length, syslogAddress, syslogPort));
+        } catch (IOException e) {
+            if (log != null) {
+                handleError("Cannot send syslog packet: " + msg, e);
             }
-        } catch (InterruptedException e) { }
+        }
+    }
+
+    public void trap(String tag, String msg, Throwable e) {
+        if (e == null) {
+            log(defaultSeverity, defaultFacility, tag, msg);
+        } else {
+            log(defaultSeverity, defaultFacility, tag, msg + ": " + e.getMessage());
+        }
     }
 }

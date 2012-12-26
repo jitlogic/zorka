@@ -17,15 +17,23 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.spy.probes.SpyProbe;
+import com.jitlogic.zorka.util.ZorkaUtil;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
+/**
+ * This class represents Spy data records.
+ */
 public class SpyRecord {
-
-    private final static Object[] NO_VALS = { };
 
     private SpyContext ctx;
 
-    private Object[][] vals = { NO_VALS, NO_VALS, NO_VALS, NO_VALS, NO_VALS };
+    private Map<String,Object> data = new HashMap<String, Object>();
 
     private int stages = 0;
 
@@ -36,7 +44,14 @@ public class SpyRecord {
 
 
     public SpyRecord feed(int stage, Object[] vals) {
-        this.vals[stage] = vals;
+        List<SpyProbe> probes = ctx.getSpyDefinition().getProbes(stage);
+
+        // TODO check if vals.length == probes.size() and log something here ...
+
+        for (int i = 0; i < probes.size(); i++) {
+            SpyProbe probe = probes.get(i);
+            data.put(probe.getKey(), probe.processVal(vals[i]));
+        }
 
         stages |= (1 << stage);
 
@@ -44,43 +59,28 @@ public class SpyRecord {
     }
 
 
-    public boolean gotStage(int stage) {
+    public boolean hasStage(int stage) {
         return 0 != (stages & (1 << stage));
     }
 
-
-    public void cleanup() {
-        vals[ON_ENTER] = NO_VALS;
-        vals[ON_RETURN] = NO_VALS;
-        vals[ON_ERROR] = NO_VALS;
-        vals[ON_SUBMIT] = NO_VALS;
-    }
 
     public SpyContext getContext() {
         return ctx;
     }
 
 
-    public int size(int stage) {
-        return vals[stage].length;
+    public int size() {
+        return data.size();
     }
 
 
-    public Object get(int stage, int idx) {
-        return vals[stage][idx];
+    public Object get(String key) {
+        return data.get(key);
     }
 
-    public Object[] getVals(int stage) {
-        return vals[stage];
+
+    public void put(String key, Object val) {
+        data.put(key, val);
     }
 
-    public void put(int stage, int idx, Object v) {
-        Object[] vs = vals[stage];
-        if (idx >= vs.length) {
-            vs = new Object[idx+1];
-            System.arraycopy(vals[stage], 0, vs, 0, vals[stage].length);
-            vals[stage] = vs;
-        }
-        vs[idx] = v;
-    }
 }

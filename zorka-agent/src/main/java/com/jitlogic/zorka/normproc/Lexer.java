@@ -24,14 +24,14 @@ import java.util.Set;
 
 public abstract class Lexer implements Iterable<Token>, Iterator<Token> {
 
-    public final static int T_UNKNOWN     = 0;
-    public final static int T_WHITESPACE  = 1;
-    public final static int T_SYMBOL      = 2;
-    public final static int T_OPERATOR    = 3;
-    public final static int T_LITERAL     = 4;
-    public final static int T_COMMENT     = 5;
-    public final static int T_KEYWORD     = 6;
-    public final static int T_PLACEHOLDER = 7;
+    public static final int T_UNKNOWN     = 0;
+    public static final int T_WHITESPACE  = 1;
+    public static final int T_SYMBOL      = 2;
+    public static final int T_OPERATOR    = 3;
+    public static final int T_LITERAL     = 4;
+    public static final int T_COMMENT     = 5;
+    public static final int T_KEYWORD     = 6;
+    public static final int T_PLACEHOLDER = 7;
 
 
     protected final static int S_START = 0;      // Starting state

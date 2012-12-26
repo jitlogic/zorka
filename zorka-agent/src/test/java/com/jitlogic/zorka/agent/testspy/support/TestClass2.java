@@ -13,10 +13,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.logproc;
+package com.jitlogic.zorka.agent.testspy.support;
 
-public interface LogProcessor {
+public class TestClass2 {
 
-    LogRecord process(LogRecord rec);
+    private int calls = 0;
 
+    public void trivialMethod() {
+        calls++;
+    }
 }

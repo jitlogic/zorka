@@ -34,16 +34,16 @@ public class NormLib {
     /**
      * Supported SQL dialects.
      */
-    public final static int DIALECT_SQL_92 = 0;
-    public final static int DIALECT_SQL_99 = 1;
-    public final static int DIALECT_SQL_03 = 2;
-    public final static int DIALECT_MSSQL  = 3;
-    public final static int DIALECT_PGSQL  = 4;
-    public final static int DIALECT_MYSQL  = 5;
-    public final static int DIALECT_DB2    = 6;
-    public final static int DIALECT_ORACLE = 7;
-    public final static int DIALECT_HQL    = 8;
-    public final static int DIALECT_JPA    = 9;
+    public static final int DIALECT_SQL_92 = 0;
+    public static final int DIALECT_SQL_99 = 1;
+    public static final int DIALECT_SQL_03 = 2;
+    public static final int DIALECT_MSSQL  = 3;
+    public static final int DIALECT_PGSQL  = 4;
+    public static final int DIALECT_MYSQL  = 5;
+    public static final int DIALECT_DB2    = 6;
+    public static final int DIALECT_ORACLE = 7;
+    public static final int DIALECT_HQL    = 8;
+    public static final int DIALECT_JPA    = 9;
 
 
     public Normalizer sql(int dialect, int flags) {

@@ -50,9 +50,9 @@ public class SpyDefinition {
 
     public static SpyDefinition instrument() {
         return new SpyDefinition()
-            .onEnter(new SpyTimeProbe("E0"))
-            .onReturn(new SpyTimeProbe("R0"))
-            .onError(new SpyTimeProbe("X0"))
+            .onEnter(new SpyTimeProbe("T1"))
+            .onReturn(new SpyTimeProbe("T2"))
+            .onError(new SpyTimeProbe("T2"))
             .onEnter();
     }
 
@@ -108,14 +108,15 @@ public class SpyDefinition {
     /**
      * Returns true if given class name matches this sdef.
      *
-     * @param className
+     *
+     * @param classCandidates
      *
      * @return
      */
-    public boolean match(String className) {
+    public boolean match(List<String> classCandidates) {
 
         for (SpyMatcher matcher : matchers) {
-            if (matcher.matches(className)) {
+            if (matcher.matches(classCandidates)) {
                 return true;
             }
         }
@@ -123,12 +124,22 @@ public class SpyDefinition {
         return false;
     }
 
+    public boolean hasClassAnnotation() {
+        for (SpyMatcher matcher : matchers) {
+            if (matcher.hasClassAnnotation()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Returns true if given method (of given class) matches this spy definition.
      * Note that method signature and access bits are also checked.
      *
-     * @param className class name
+     *
+     * @param classCandidates
      *
      * @param methodName method name
      *
@@ -138,10 +149,10 @@ public class SpyDefinition {
      *
      * @return true if all arguments match properly.
      */
-    public boolean match(String className, String methodName, String methodDesc, int access) {
+    public boolean match(List<String> classCandidates, String methodName, String methodDesc, int access) {
 
         for (SpyMatcher matcher : matchers) {
-            if (matcher.matches(className, methodName, methodDesc, access)) {
+            if (matcher.matches(classCandidates, methodName, methodDesc, access)) {
                 return true;
             }
         }
