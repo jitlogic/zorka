@@ -81,19 +81,25 @@ public class SpyClassVisitor extends ClassVisitor {
         MethodVisitor mv = createVisitor(access, methodName, methodDesc, methodSignature, exceptions);
         List<SpyContext> ctxs = new ArrayList<SpyContext>(sdefs.size()+2);
 
+        boolean m = true;
+
         for (SpyDefinition sdef : sdefs) {
             if (sdef.match(sdef.hasClassAnnotation() ? classAnnotations : Arrays.asList(className),
-                    methodName, methodDesc, access)) {
+                    methodName, methodDesc, access) || sdef.hasMethodAnnotation()) {
                 if (SpyInstance.isDebugEnabled(SPD_METHODXFORM)) {
                     log.debug("Instrumenting method: " + className + "." + methodName + " " + methodDesc);
                 }
                 ctxs.add(engine.lookup(
                         new SpyContext(sdef, className, methodName, methodDesc, access)));
             }
+
+            if (sdef.hasMethodAnnotation()) {
+                m = false;
+            }
         }
 
         if (ctxs.size() > 0) {
-            return new SpyMethodVisitor(access, methodName, methodDesc, ctxs, mv);
+            return new SpyMethodVisitor(m, access, methodName, methodDesc, ctxs, mv);
         }
 
         return mv;

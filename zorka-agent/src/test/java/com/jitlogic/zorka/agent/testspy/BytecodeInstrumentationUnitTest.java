@@ -37,6 +37,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     public final static String TCLASS1 = "com.jitlogic.zorka.agent.testspy.support.TestClass1";
     public final static String TCLASS2 = "com.jitlogic.zorka.agent.testspy.support.TestClass2";
     public final static String TACLASS = "com.jitlogic.zorka.agent.testspy.support.ClassAnnotation";
+    public final static String TAMETHOD = "com.jitlogic.zorka.agent.testspy.support.TestAnnotation";
 
     private TestSpyTransformer engine;
     private TestSubmitter submitter;
@@ -480,7 +481,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testMatchClassByAnnotation() throws Exception {
+    public void testInstrumentClassByAnnotation() throws Exception {
         engine.add(SpyDefinition.instance().onEnter(spy.fetchConst(null, "X"))
                 .include(spy.byAnnotation(TACLASS)));
 
@@ -492,11 +493,33 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testNonMatchClassByAnnotation() throws Exception {
+    public void testNonInstrumentClassByAnnotation() throws Exception {
         engine.add(SpyDefinition.instance().onEnter(spy.fetchConst(null, "X"))
                 .include(spy.byAnnotation(TACLASS)));
 
         Object obj = instantiate(engine, TCLASS2);
+        invoke(obj, "trivialMethod");
+
+        assertEquals(0, submitter.size());
+    }
+
+    @Test
+    public void testMatchClassByMethodAnnotation() throws Exception {
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchConst(null, "X"))
+                .include(spy.byMethodAnnotation(TCLASS2, TAMETHOD)));
+
+        Object obj = instantiate(engine, TCLASS2);
+        invoke(obj, "trivialMethod");
+
+        assertEquals(1, submitter.size());
+    }
+
+    @Test
+    public void testNonMatchClassByMethodAnnotation() throws Exception {
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchConst(null, "X"))
+                .include(spy.byMethodAnnotation(TCLASS2, TAMETHOD)));
+
+        Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
 
         assertEquals(0, submitter.size());

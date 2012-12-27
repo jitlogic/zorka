@@ -19,6 +19,7 @@ package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.spy.probes.SpyProbe;
 import com.jitlogic.zorka.spy.probes.SpyReturnProbe;
+import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -55,9 +56,11 @@ public class SpyMethodVisitor extends MethodVisitor {
     private Label l_try_to = new Label();
     private Label l_try_handler = new Label();
 
+    private boolean matches;
 
-    public SpyMethodVisitor(int access, String methodName, String methodDesc, List<SpyContext> ctxs, MethodVisitor mv) {
+    public SpyMethodVisitor(boolean matches, int access, String methodName, String methodDesc, List<SpyContext> ctxs, MethodVisitor mv) {
         super(V1_6, mv);
+        this.matches = matches;
         this.access = access;
         this.methodName = methodName;
         this.ctxs = ctxs;
@@ -86,8 +89,29 @@ public class SpyMethodVisitor extends MethodVisitor {
     }
 
     @Override
+    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+        if (!matches) {
+            for (SpyContext ctx : ctxs) {
+                for (SpyMatcher matcher : ctx.getSpyDefinition().getMatchers()) {
+                    if (matcher.matchMethodAnnotation(desc.replace("/", "."))) {
+                        matches = true;
+                    }
+                }
+            }
+        }
+        return super.visitAnnotation(desc, visible);
+    }
+
+    @Override
     public void visitCode() {
         mv.visitCode();
+
+        if (!matches) {
+            return;
+        }
+
+        // TODO we have bug here: if single sdef matches, probes from all sdefs are inserted
+
         // ON_ENTER probes are inserted here
         for (SpyContext ctx : ctxs) {
             if (ctx.getSpyDefinition().getProbes(ON_ENTER).size() > 0) {
@@ -102,7 +126,7 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     @Override
     public void visitInsn(int opcode) {
-        if ((opcode >= IRETURN && opcode <= RETURN)) {
+        if (matches && opcode >= IRETURN && opcode <= RETURN) {
             // ON_RETURN probes are inserted here
             if (returnProbe != null) {
                 returnProbe.emitFetchRetVal(this, returnType);
@@ -121,6 +145,12 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     @Override
     public void visitMaxs(int maxStack, int maxLocals) {
+
+        if (!matches) {
+            mv.visitMaxs(maxStack,  maxLocals);
+            return;
+        }
+
         mv.visitLabel(l_try_to);
         mv.visitLabel(l_try_handler);
 

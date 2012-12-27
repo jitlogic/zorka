@@ -230,9 +230,22 @@ public class SpyLib {
      *
      * @return
      */
-    public SpyMatcher byAnnotation(String annotationName, String methodPattern) {
+    public SpyMatcher byClassAnnotation(String annotationName, String methodPattern) {
         return new SpyMatcher(SpyMatcher.CLASS_ANNOTATION, 1,
                 "L" + annotationName + ";", methodPattern, null);
+    }
+
+
+
+    public SpyMatcher byMethodAnnotation(String classPattern, String methodAnnotation) {
+        return new SpyMatcher(SpyMatcher.METHOD_ANNOTATION, 1,
+                classPattern, "L" + methodAnnotation + ";", null);
+    }
+
+
+    public SpyMatcher byClassMethodAnnotation(String classAnnotation, String methodAnnotation) {
+        return new SpyMatcher(SpyMatcher.CLASS_ANNOTATION|SpyMatcher.METHOD_ANNOTATION, 1,
+                "L" + classAnnotation + ";", "L" + methodAnnotation + ";", null);
     }
 
 

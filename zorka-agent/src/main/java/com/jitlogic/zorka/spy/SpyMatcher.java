@@ -149,13 +149,16 @@ public class SpyMatcher {
         return Pattern.compile(sb.toString());
     }
 
+
     public boolean hasClassAnnotation() {
         return 0 != (flags & CLASS_ANNOTATION);
     }
 
+
     public boolean hasMethodAnnotation() {
         return 0 != (flags & METHOD_ANNOTATION);
     }
+
 
     public boolean matches(List<String> classCandidates) {
         for (String cm : classCandidates) {
@@ -164,6 +167,11 @@ public class SpyMatcher {
             }
         }
         return false;
+    }
+
+
+    public boolean matchMethodAnnotation(String name) {
+        return hasMethodAnnotation() && methodMatch.matcher(name).matches();
     }
 
 

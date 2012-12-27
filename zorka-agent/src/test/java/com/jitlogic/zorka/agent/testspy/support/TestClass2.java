@@ -19,6 +19,7 @@ public class TestClass2 {
 
     private int calls = 0;
 
+    @TestAnnotation
     public void trivialMethod() {
         calls++;
     }
