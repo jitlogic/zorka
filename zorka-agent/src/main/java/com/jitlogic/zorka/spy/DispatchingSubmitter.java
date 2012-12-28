@@ -82,11 +82,6 @@ public class DispatchingSubmitter implements SpySubmitter {
             return;
         }
 
-        //record.cleanup();
-
-        if (sdef.getProcessors(SpyLib.ON_COLLECT).size() > 0) {
-            collector.process(SpyLib.ON_COLLECT, record);
-        }
     }
 
 

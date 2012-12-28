@@ -62,12 +62,12 @@ public class SpyDefinition {
 
     public SpyDefinition() {
 
-        probes = new List[5];
+        probes = new List[4];
         for (int i = 0; i < probes.length; i++) {
             probes[i] = EMPTY_AF;
         }
 
-        processors = new List[5];
+        processors = new List[4];
         for (int i = 0; i < processors.length; i++) {
             processors[i] = EMPTY_XF;
         }
@@ -190,17 +190,6 @@ public class SpyDefinition {
 
 
     /**
-     *
-     * @param stage
-     * @return
-     */
-    public SpyDefinition on(int stage) {
-        SpyDefinition sdef = new SpyDefinition(this);
-        //sdef.curStage = stage;
-        return sdef;
-    }
-
-    /**
      * Instructs spy what should be collected at the beginning of a method.
      *
      * @return
@@ -238,18 +227,6 @@ public class SpyDefinition {
      */
     public SpyDefinition onSubmit(SpyDefArg...args) {
         return with(ON_SUBMIT, args);
-    }
-
-
-    /**
-     * Instructs spy that subsequent transforms will be executed jest before passing
-     * data to collector objects. Transforms execution at this point is guaranteed to
-     * be single threaded and can execute asynchronously to instrumented methods.
-     *
-     * @return augmented spy definition
-     */
-    public SpyDefinition onCollect(SpyDefArg...args) {
-        return with(ON_COLLECT,  args);
     }
 
 

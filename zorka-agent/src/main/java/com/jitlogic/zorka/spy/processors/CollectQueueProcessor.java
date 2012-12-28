@@ -35,9 +35,12 @@ public class CollectQueueProcessor implements SpyProcessor, Runnable {
 
     private LinkedBlockingQueue<SpyRecord> procQueue = new LinkedBlockingQueue<SpyRecord>(1024);
 
+
     public SpyRecord process(int stage, SpyRecord record) {
 
         boolean submitted = false;
+
+        record.setStage(stage);
 
         try {
                 submitted = procQueue.offer(record, 0, TimeUnit.MILLISECONDS);
@@ -65,9 +68,9 @@ public class CollectQueueProcessor implements SpyProcessor, Runnable {
 
         SpyDefinition sdef = record.getContext().getSpyDefinition();
 
-        for (SpyProcessor processor : sdef.getProcessors(SpyLib.ON_COLLECT)) {
+        for (SpyProcessor processor : sdef.getProcessors(record.getStage())) {
             try {
-                if (null == (record = processor.process(SpyLib.ON_COLLECT, record))) {
+                if (null == (record = processor.process(record.getStage(), record))) {
                     break;
                 }
             } catch (Throwable e) {
@@ -102,4 +105,5 @@ public class CollectQueueProcessor implements SpyProcessor, Runnable {
             } catch (InterruptedException e) { }
         }
     }
+
 }

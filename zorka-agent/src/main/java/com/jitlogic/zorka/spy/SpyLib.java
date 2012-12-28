@@ -103,7 +103,7 @@ public class SpyLib {
     public static final int ON_RETURN  = 1;
     public static final int ON_ERROR   = 2;
     public static final int ON_SUBMIT  = 3;
-    public static final int ON_COLLECT = 4;
+    //public static final int ON_COLLECT = 4;
 
     public static final int AC_PUBLIC       = 0x000001;
     public static final int AC_PRIVATE      = 0x000002;
@@ -205,8 +205,8 @@ public class SpyLib {
         return SpyDefinition.instance()
                 .onEnter(sdaList.toArray(new SpyDefArg[0]))
                 .onReturn(fetchTime("T2")).onError(fetchTime("T2"))
-                .onSubmit(tdiff("T1", "T2", "T"))
-                .onCollect(zorkaStats(mbsName, mbeanName, attrName, sb.toString(), "T2", "T"));
+                .onSubmit(tdiff("T1", "T2", "T"),
+                          zorkaStats(mbsName, mbeanName, attrName, sb.toString(), "T2", "T"));
     }
 
 
