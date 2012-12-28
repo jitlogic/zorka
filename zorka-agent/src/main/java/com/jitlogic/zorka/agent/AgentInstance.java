@@ -20,6 +20,7 @@ import com.jitlogic.zorka.integ.nagios.NagiosAgent;
 import com.jitlogic.zorka.integ.nagios.NagiosLib;
 import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.syslog.SyslogLib;
+import com.jitlogic.zorka.integ.zabbix.ZabbixLib;
 import com.jitlogic.zorka.normproc.NormLib;
 import com.jitlogic.zorka.spy.MainSubmitter;
 import com.jitlogic.zorka.spy.SpyInstance;
@@ -80,7 +81,9 @@ public class AgentInstance {
 
     private Executor executor = null;
     private ZorkaBshAgent zorkaAgent = null;
+
     private ZabbixAgent zabbixAgent = null;
+    private ZabbixLib zabbixLib = null;
 
     private NagiosAgent nagiosAgent = null;
     private NagiosLib nagiosLib = null;
@@ -147,6 +150,14 @@ public class AgentInstance {
             log.info("Zorka SPY is diabled. No loaded classes will be transformed in any way.");
         }
 
+        if ("yes".equalsIgnoreCase(props.getProperty(ZABBIX_ENABLE))) {
+            log.info("Enabling ZABBIX subsystem ...");
+            zabbixAgent = new ZabbixAgent(zorkaAgent);
+            zabbixAgent.start();
+            zabbixLib = new ZabbixLib(zorkaAgent,  zorkaAgent.getZorkaLib());
+            zorkaAgent.installModule("zabbix", zabbixLib);
+        }
+
         if ("yes".equalsIgnoreCase(props.getProperty(SYSLOG_ENABLE))) {
             log.info("Enabling Syslog subsystem ....");
             syslogLib = new SyslogLib();
@@ -157,11 +168,6 @@ public class AgentInstance {
             log.info("Enabling SNMP subsystem ...");
             snmpLib = new SnmpLib();
             zorkaAgent.installModule("snmp", snmpLib);
-        }
-
-        if ("yes".equalsIgnoreCase(props.getProperty(ZABBIX_ENABLE))) {
-            zabbixAgent = new ZabbixAgent(zorkaAgent);
-            zabbixAgent.start();
         }
 
         if ("yes".equalsIgnoreCase(props.getProperty(NAGIOS_ENABLE))) {

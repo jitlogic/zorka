@@ -193,7 +193,7 @@ public class SpyLib {
                 m.appendReplacement(sb, "\\${A" + ZorkaUtil.join(".", segs) + "}");
                 if (!usedArgs.contains(segs[0])) {
                     usedArgs.add(segs[0]);
-                    sdaList.add(fetchArg(Integer.parseInt(segs[0]), "A"+segs[0]));
+                    sdaList.add(fetchArg("A"+segs[0], Integer.parseInt(segs[0])));
                 }
             }
         }
@@ -293,13 +293,14 @@ public class SpyLib {
      * Creates argument fetching probe. When injected into method code by instrumentation engine, it will fetch argument
      * selected by specific index `arg`.
      *
-     * @param arg fetched argument index
      *
      * @param dst name (key) used to store fetched data
      *
+     * @param arg fetched argument index
+     *
      * @return new probe
      */
-    public SpyProbe fetchArg(int arg, String dst) {
+    public SpyProbe fetchArg(String dst, int arg) {
         return new SpyArgProbe(arg, dst);
     }
 
@@ -308,13 +309,14 @@ public class SpyLib {
      * Creates class fetching probe. When injected into method code it will fetch class object of given name in context
      * of method caller.
      *
-     * @param className class name
      *
      * @param dst name (key) used to store fetched data
      *
+     * @param className class name
+     *
      * @return class fetching probe
      */
-    public SpyProbe fetchClass(String className, String dst) {
+    public SpyProbe fetchClass(String dst, String className) {
         return new SpyClassProbe(className, dst);
     }
 
@@ -327,23 +329,8 @@ public class SpyLib {
      *
      * @return exception fetching probe
      */
-    public SpyProbe fetchException(String dst) {
+    public SpyProbe fetchError(String dst) {
         return new SpyReturnProbe(dst);
-    }
-
-
-    /**
-     * Creates constant fetching probe. The actual probe injects null into method code but it is replaced by constant
-     * value passed as first argument.
-     *
-     * @param val value to be added to records
-     *
-     * @param dst name (key) used to store fetched data
-     *
-     * @return constant fetching probe
-     */
-    public SpyProbe fetchConst(Object val, String dst) {
-        return new SpyConstProbe(val, dst);
     }
 
 
