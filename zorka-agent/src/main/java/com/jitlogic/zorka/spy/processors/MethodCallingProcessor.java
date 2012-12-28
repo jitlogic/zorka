@@ -49,7 +49,7 @@ public class MethodCallingProcessor implements SpyProcessor {
     }
 
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
         Object val = record.get(src);
 
         if (val == null) {

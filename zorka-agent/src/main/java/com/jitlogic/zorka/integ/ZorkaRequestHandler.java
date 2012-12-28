@@ -13,23 +13,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.spy.processors;
+package com.jitlogic.zorka.integ;
 
-import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.agent.ZorkaCallback;
 
-public class ConstPutProcessor implements SpyProcessor {
+import java.io.IOException;
 
-    private String dst;
-    private Object val;
-
-    public ConstPutProcessor(String dst, Object val) {
-        this.dst = dst;
-        this.val = val;
-    }
-
-    public SpyRecord process(SpyRecord record) {
-        record.put(dst, val);
-        return record;
-    }
+public interface ZorkaRequestHandler extends ZorkaCallback {
+    public String getReq() throws IOException;
 }

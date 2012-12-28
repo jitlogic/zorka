@@ -31,14 +31,14 @@ public class CallingBshCollector implements SpyProcessor {
         this.ns = ns;
     }
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
         if (collector == null) {
             ZorkaBshAgent agent = AgentInstance.instance().getZorkaAgent();
             collector = (SpyProcessor)agent.eval(
                     "(com.jitlogic.zorka.spy.SpyProcessor)"+ns);
         }
 
-        collector.process(stage, record);
+        collector.process(record);
 
         return record;
     }

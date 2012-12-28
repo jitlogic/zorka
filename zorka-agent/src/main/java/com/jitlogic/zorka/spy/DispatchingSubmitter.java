@@ -35,7 +35,7 @@ public class DispatchingSubmitter implements SpySubmitter {
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private SpyClassTransformer engine;
-    private CollectQueueProcessor collector;
+    private SpyProcessor collector;
 
     private ThreadLocal<Stack<SpyRecord>> submissionStack =
         new ThreadLocal<Stack<SpyRecord>>() {
@@ -46,7 +46,7 @@ public class DispatchingSubmitter implements SpySubmitter {
         };
 
 
-    public DispatchingSubmitter(SpyClassTransformer engine, CollectQueueProcessor collector) {
+    public DispatchingSubmitter(SpyClassTransformer engine, SpyProcessor collector) {
         this.engine = engine;
         this.collector = collector;
     }
@@ -82,11 +82,6 @@ public class DispatchingSubmitter implements SpySubmitter {
             return;
         }
 
-        //record.cleanup();
-
-        if (sdef.getProcessors(SpyLib.ON_COLLECT).size() > 0) {
-            collector.process(SpyLib.ON_COLLECT, record);
-        }
     }
 
 
@@ -115,13 +110,15 @@ public class DispatchingSubmitter implements SpySubmitter {
     private SpyRecord process(int stage, SpyDefinition sdef, SpyRecord record) {
         List<SpyProcessor> processors = sdef.getProcessors(stage);
 
+        record.setStage(stage);
+
         if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
             log.debug("Processing records (stage=" + stage + ")");
         }
 
         for (SpyProcessor processor : processors) {
             try {
-                if (null == (record = processor.process(stage, record))) {
+                if (null == (record = processor.process(record))) {
                     break;
                 }
             } catch (Throwable e) {
@@ -141,10 +138,14 @@ public class DispatchingSubmitter implements SpySubmitter {
     }
 
     public void start() {
-        collector.start();
+        if (collector instanceof CollectQueueProcessor) {
+            ((CollectQueueProcessor)collector).start();
+        }
     }
 
     public void stop() {
-        collector.stop();
+        if (collector instanceof CollectQueueProcessor) {
+            ((CollectQueueProcessor)collector).stop();
+        }
     }
 }

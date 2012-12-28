@@ -24,11 +24,11 @@ import com.jitlogic.zorka.spy.processors.CollectQueueProcessor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestCollector extends CollectQueueProcessor {
+public class TestCollector implements SpyProcessor {
 
     private List<SpyRecord> records = new ArrayList<SpyRecord>();
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
         records.add(record);
         return record;
     }
