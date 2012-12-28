@@ -77,7 +77,8 @@ public class DispatchingSubmitter implements SpySubmitter {
             return;
         }
 
-        if (null == (record = process(ON_SUBMIT, sdef, record))) {
+
+        if (sdef.getProcessors(ON_SUBMIT).size() > 0 && null == (record = process(ON_SUBMIT, sdef, record))) {
             return;
         }
 

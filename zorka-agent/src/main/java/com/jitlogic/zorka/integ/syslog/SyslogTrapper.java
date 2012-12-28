@@ -16,9 +16,7 @@
 package com.jitlogic.zorka.integ.syslog;
 
 import com.jitlogic.zorka.integ.ZorkaTrapper;
-import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
-import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
@@ -37,8 +35,6 @@ import java.util.Date;
 public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrapper {
 
     public final static int DEFAULT_PORT = 514;
-
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd HH:mm:ss");
 
     private InetAddress syslogAddress;
     private int syslogPort = DEFAULT_PORT;
@@ -93,7 +89,7 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
 
 
     public String format(int severity, int facility, Date date, String hostname, String tag, String content) {
-        return "<" + (severity+facility*8) + ">" + dateFormat.format(date) + " "
+        return "<" + (severity+facility*8) + ">" + new SimpleDateFormat("MMM dd HH:mm:ss").format(date) + " "
                 + hostname + " " + tag + " " + ZorkaUtil.printableASCII7(content);
     }
 
@@ -125,6 +121,7 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
             }
         }
     }
+
 
     public void trap(String tag, String msg, Throwable e) {
         if (e == null) {

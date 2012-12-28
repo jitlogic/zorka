@@ -105,24 +105,25 @@ public class SpyLib {
     public static final int ON_SUBMIT  = 3;
     public static final int ON_COLLECT = 4;
 
-    public static final int AC_PUBLIC       = 0x0001;
-    public static final int AC_PRIVATE      = 0x0002;
-    public static final int AC_PROTECTED    = 0x0004;
-    public static final int AC_STATIC       = 0x0008;
-    public static final int AC_FINAL        = 0x0010;
-    public static final int AC_SUPER        = 0x0020;
-    public static final int AC_SYNCHRONIZED = 0x0020;
-    public static final int AC_VOLATILE     = 0x0040;
-    public static final int AC_BRIDGE       = 0x0040;
-    public static final int AC_VARARGS      = 0x0080;
-    public static final int AC_TRANSIENT    = 0x0080;
-    public static final int AC_NATIVE       = 0x0100;
-    public static final int AC_INTERFACE    = 0x0200;
-    public static final int AC_ABSTRACT     = 0x0400;
-    public static final int AC_STRICT       = 0x0800;
-    public static final int AC_SYNTHETIC    = 0x1000;
-    public static final int AC_ANNOTATION   = 0x2000;
-    public static final int AC_ENUM         = 0x4000;
+    public static final int AC_PUBLIC       = 0x000001;
+    public static final int AC_PRIVATE      = 0x000002;
+    public static final int AC_PROTECTED    = 0x000004;
+    public static final int AC_STATIC       = 0x000008;
+    public static final int AC_FINAL        = 0x000010;
+    public static final int AC_SUPER        = 0x000020;
+    public static final int AC_SYNCHRONIZED = 0x000020;
+    public static final int AC_VOLATILE     = 0x000040;
+    public static final int AC_BRIDGE       = 0x000040;
+    public static final int AC_VARARGS      = 0x000080;
+    public static final int AC_TRANSIENT    = 0x000080;
+    public static final int AC_NATIVE       = 0x000100;
+    public static final int AC_INTERFACE    = 0x000200;
+    public static final int AC_ABSTRACT     = 0x000400;
+    public static final int AC_STRICT       = 0x000800;
+    public static final int AC_SYNTHETIC    = 0x001000;
+    public static final int AC_ANNOTATION   = 0x002000;
+    public static final int AC_ENUM         = 0x004000;
+    public static final int AC_PKGPRIV      = 0x010000;
 
     private SpyInstance instance;
 
@@ -216,7 +217,7 @@ public class SpyLib {
      *
      * @return
      */
-    public SpyMatcher byAnnotation(String annotationName) {
+    public SpyMatcher byClassAnnotation(String annotationName) {
         return new SpyMatcher(SpyMatcher.CLASS_ANNOTATION, 1,
                 "L" + annotationName + ";", "~[a-zA-Z_].*$", null);
     }
@@ -230,9 +231,22 @@ public class SpyLib {
      *
      * @return
      */
-    public SpyMatcher byAnnotation(String annotationName, String methodPattern) {
+    public SpyMatcher byClassAnnotation(String annotationName, String methodPattern) {
         return new SpyMatcher(SpyMatcher.CLASS_ANNOTATION, 1,
                 "L" + annotationName + ";", methodPattern, null);
+    }
+
+
+
+    public SpyMatcher byMethodAnnotation(String classPattern, String methodAnnotation) {
+        return new SpyMatcher(SpyMatcher.METHOD_ANNOTATION, 1,
+                classPattern, "L" + methodAnnotation + ";", null);
+    }
+
+
+    public SpyMatcher byClassMethodAnnotation(String classAnnotation, String methodAnnotation) {
+        return new SpyMatcher(SpyMatcher.CLASS_ANNOTATION|SpyMatcher.METHOD_ANNOTATION, 1,
+                "L" + classAnnotation + ";", "L" + methodAnnotation + ";", null);
     }
 
 

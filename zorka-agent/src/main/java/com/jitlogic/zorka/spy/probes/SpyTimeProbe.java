@@ -29,6 +29,6 @@ public class SpyTimeProbe extends SpyProbe {
     public int emit(SpyMethodVisitor mv, int stage, int opcode) {
         mv.visitMethodInsn(INVOKESTATIC, "java/lang/System", "nanoTime", "()J");
         mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;");
-        return 1;
+        return 2;
     }
 }
