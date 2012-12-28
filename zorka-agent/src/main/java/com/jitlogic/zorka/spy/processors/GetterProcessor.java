@@ -33,20 +33,17 @@ public class GetterProcessor implements SpyProcessor {
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private String src, dst;
-    //private int isrc, ssrc, idst, sdst;
     private Object[] path;
     private ObjectInspector inspector = new ObjectInspector();
 
 
     public GetterProcessor(String src, String dst, Object... path) {
-        //this.isrc = src[1]; this.ssrc = src[0];
-        //this.idst = dst[1]; this.sdst = dst[0];
         this.src = src; this.dst = dst;
         this.path = path;
     }
 
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
         Object val = record.get(src);
 
         for (Object obj : path) {

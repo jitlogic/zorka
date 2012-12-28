@@ -42,6 +42,13 @@ public class SpyRecord {
         this.ctx = ctx;
     }
 
+    public SpyRecord(SpyRecord orig, String...attrsToCopy) {
+        this.ctx = orig.ctx;
+        this.stage = orig.stage;
+        for (String attr : attrsToCopy) {
+            data.put(attr, orig.data.get(attr));
+        }
+    }
 
     public SpyRecord feed(int stage, Object[] vals) {
         List<SpyProbe> probes = ctx.getSpyDefinition().getProbes(stage);

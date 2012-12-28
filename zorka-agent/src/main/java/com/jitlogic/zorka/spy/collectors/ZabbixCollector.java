@@ -39,9 +39,9 @@ public class ZabbixCollector implements SpyProcessor {
         this.key = key;
     }
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
 
-        String data = inspector.substitute(expr, record, stage);
+        String data = inspector.substitute(expr, record);
 
         if (host != null) {
             trapper.send(host, key, data);

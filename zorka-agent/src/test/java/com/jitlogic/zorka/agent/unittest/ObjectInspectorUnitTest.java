@@ -180,9 +180,9 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
         rec.put("E0", "123"); rec.put("E1", "4567");
         rec.put("R0", "aaa"); rec.put("R1", "bbb");
 
-        assertEquals("123!", inspector.substitute("${E0}!", rec, ON_ENTER));
-        assertEquals("aaa", inspector.substitute("${R0}", rec, ON_ENTER));
-        assertEquals("4", inspector.substitute("${E1.length()}", rec, ON_SUBMIT));
+        assertEquals("123!", inspector.substitute("${E0}!", rec));
+        assertEquals("aaa", inspector.substitute("${R0}", rec));
+        assertEquals("4", inspector.substitute("${E1.length()}", rec));
     }
 
 

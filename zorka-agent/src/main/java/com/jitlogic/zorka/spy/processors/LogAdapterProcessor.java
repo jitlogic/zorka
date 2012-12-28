@@ -40,7 +40,7 @@ public class LogAdapterProcessor implements SpyProcessor {
     }
 
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
         Object orig = record.get(src);
 
         if (orig != null && "java.util.logging.LogRecord".equals(orig.getClass().getName())) {

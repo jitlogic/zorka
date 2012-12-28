@@ -295,7 +295,7 @@ public class ObjectInspector {
     public static final Pattern reVarSubstPattern = Pattern.compile("\\$\\{([^\\}]+)\\}");
 
 
-    public String substitute(String input, SpyRecord record, int defStage) {
+    public String substitute(String input, SpyRecord record) {
         Matcher m = reVarSubstPattern.matcher(input);
         StringBuffer sb = new StringBuffer();
         while (m.find()) {

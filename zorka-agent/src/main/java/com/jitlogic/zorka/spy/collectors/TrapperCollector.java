@@ -39,10 +39,10 @@ public class TrapperCollector implements SpyProcessor {
     }
 
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
 
-        String tag = inspector.substitute(tagExpr, record, stage);
-        String msg = inspector.substitute(record.hasStage(SpyLib.ON_ERROR) ? errExpr : stdExpr, record, stage);
+        String tag = inspector.substitute(tagExpr, record);
+        String msg = inspector.substitute(record.hasStage(SpyLib.ON_ERROR) ? errExpr : stdExpr, record);
 
         trapper.trap(tag, msg, (Throwable)record.get(errSlot));
 

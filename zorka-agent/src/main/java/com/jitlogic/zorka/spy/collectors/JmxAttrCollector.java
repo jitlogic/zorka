@@ -55,7 +55,7 @@ public class JmxAttrCollector implements SpyProcessor {
     }
 
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
 
         if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
             log.debug("Collecting record: " + record);

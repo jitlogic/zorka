@@ -28,7 +28,7 @@ public class ConstPutProcessor implements SpyProcessor {
         this.val = val;
     }
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
         record.put(dst, val);
         return record;
     }

@@ -35,8 +35,8 @@ public class StringFormatProcessor implements SpyProcessor {
         this.expr = expr;
     }
 
-    public SpyRecord process(int stage, SpyRecord record) {
-        record.put(dst, inspector.substitute(expr, record, stage));
+    public SpyRecord process(SpyRecord record) {
+        record.put(dst, inspector.substitute(expr, record));
         return record;
     }
 }

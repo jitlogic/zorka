@@ -38,7 +38,7 @@ public class CallingObjCollector implements SpyProcessor {
     }
 
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
         if (nsObj != null) {
             // TODO better lookup here (for overloaded methods)
             Method method = null;

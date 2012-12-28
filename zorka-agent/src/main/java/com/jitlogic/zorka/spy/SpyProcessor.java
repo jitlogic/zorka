@@ -29,12 +29,10 @@ public interface SpyProcessor extends SpyDefArg {
     /**
      * Transforms record passed by instrumentation engine.
      *
-     * @param stage stage this record is processed at the moment.
-     *
      * @param record record to be processed
      *
      * @return processed record (can be the same as passed with record argument)
      *         or null to indicate that record should be dropped by instrumentation engine.
      */
-    public SpyRecord process(int stage, SpyRecord record);
+    public SpyRecord process(SpyRecord record);
 }

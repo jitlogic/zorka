@@ -42,7 +42,7 @@ public class ThreadLocalProcessor implements SpyProcessor {
     }
 
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
         switch (operation) {
             case GET:
             {

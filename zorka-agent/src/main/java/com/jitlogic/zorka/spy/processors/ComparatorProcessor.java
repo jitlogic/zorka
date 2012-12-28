@@ -54,7 +54,7 @@ public class ComparatorProcessor implements SpyProcessor {
     }
 
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
         Object va = record.get(a);
         Object vb = (b != null) ? record.get(b) : v;
 

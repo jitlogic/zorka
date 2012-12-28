@@ -18,6 +18,7 @@ package com.jitlogic.zorka.spy.processors;
 import com.jitlogic.zorka.spy.*;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -35,15 +36,22 @@ public class CollectQueueProcessor implements SpyProcessor, Runnable {
 
     private LinkedBlockingQueue<SpyRecord> procQueue = new LinkedBlockingQueue<SpyRecord>(1024);
 
+    private String[] attrs;
 
-    public SpyRecord process(int stage, SpyRecord record) {
+
+    public CollectQueueProcessor(String...attrs) {
+        this.attrs = ZorkaUtil.copyArray(attrs);
+    }
+
+
+    public SpyRecord process(SpyRecord record) {
 
         boolean submitted = false;
 
-        record.setStage(stage);
+        SpyRecord rec = new SpyRecord(record, attrs);
 
         try {
-                submitted = procQueue.offer(record, 0, TimeUnit.MILLISECONDS);
+                submitted = procQueue.offer(rec, 0, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) { }
 
         if (submitted) {
@@ -70,7 +78,7 @@ public class CollectQueueProcessor implements SpyProcessor, Runnable {
 
         for (SpyProcessor processor : sdef.getProcessors(record.getStage())) {
             try {
-                if (null == (record = processor.process(record.getStage(), record))) {
+                if (null == (record = processor.process(record))) {
                     break;
                 }
             } catch (Throwable e) {
