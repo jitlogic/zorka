@@ -16,12 +16,14 @@
  */
 package com.jitlogic.zorka.agent.testspy;
 
+import com.jitlogic.zorka.agent.testspy.support.TestCollector;
 import com.jitlogic.zorka.agent.testspy.support.TestSpyTransformer;
 import com.jitlogic.zorka.agent.testspy.support.TestSubmitter;
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.MainSubmitter;
 
+import com.jitlogic.zorka.spy.SpyProcessor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -535,6 +537,39 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         checkForError(invoke(obj, "echoInt", 10));
 
         assertEquals(2, submitter.size());
+    }
+
+    @Test
+    public void testInstrumentMethodEntryWithoutProbes() throws Exception {
+        SpyProcessor col = new TestCollector();
+        engine.add(SpyDefinition.instance().onEnter(col).include(spy.byMethod(TCLASS1, "trivialMethod")));
+
+        Object obj = instantiate(engine, TCLASS1);
+        checkForError(invoke(obj, "trivialMethod"));
+
+        assertEquals(1, submitter.size());
+    }
+
+    @Test
+    public void testInstrumentMethodReturnWithoutProbes() throws Exception {
+        SpyProcessor col = new TestCollector();
+        engine.add(SpyDefinition.instance().onReturn(col).include(spy.byMethod(TCLASS1, "trivialMethod")));
+
+        Object obj = instantiate(engine, TCLASS1);
+        checkForError(invoke(obj, "trivialMethod"));
+
+        assertEquals(1, submitter.size());
+    }
+
+    @Test
+    public void testInstrumentMethodErrorWithoutProbes() throws Exception {
+        SpyProcessor col = new TestCollector();
+        engine.add(SpyDefinition.instance().onError(col).include(spy.byMethod(TCLASS1, "errorMethod")));
+
+        Object obj = instantiate(engine, TCLASS1);
+        invoke(obj, "errorMethod");
+
+        assertEquals(1, submitter.size());
     }
 
     // TODO test if stack traces in exceptions are the same with and without intercepting errors by instrumentation
