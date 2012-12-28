@@ -483,7 +483,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     @Test
     public void testInstrumentClassByAnnotation() throws Exception {
         engine.add(SpyDefinition.instance().onEnter(spy.fetchConst(null, "X"))
-                .include(spy.byAnnotation(TACLASS)));
+                .include(spy.byClassAnnotation(TACLASS)));
 
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
@@ -495,7 +495,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     @Test
     public void testNonInstrumentClassByAnnotation() throws Exception {
         engine.add(SpyDefinition.instance().onEnter(spy.fetchConst(null, "X"))
-                .include(spy.byAnnotation(TACLASS)));
+                .include(spy.byClassAnnotation(TACLASS)));
 
         Object obj = instantiate(engine, TCLASS2);
         invoke(obj, "trivialMethod");
@@ -523,6 +523,18 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         invoke(obj, "trivialMethod");
 
         assertEquals(0, submitter.size());
+    }
+
+    @Test
+    public void testInstrumentClassWithNoStack() throws Exception {
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("T1")).onReturn(spy.fetchTime("T2"))
+                .include(spy.byMethod(TCLASS2, "echoInt")));
+
+        //engine.enableDebug();
+        Object obj = instantiate(engine, TCLASS2);
+        checkForError(invoke(obj, "echoInt", 10));
+
+        assertEquals(2, submitter.size());
     }
 
     // TODO test if stack traces in exceptions are the same with and without intercepting errors by instrumentation

@@ -23,4 +23,9 @@ public class TestClass2 {
     public void trivialMethod() {
         calls++;
     }
+
+    public int echoInt(int in) {
+        return in;
+    }
+
 }

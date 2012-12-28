@@ -145,7 +145,7 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testMatchAnnotationBits() {
-        SpyMatcher m = spy.byAnnotation("some.Annotation");
+        SpyMatcher m = spy.byClassAnnotation("some.Annotation");
 
         Assert.assertEquals(true, m.hasClassAnnotation());
         Assert.assertTrue(m.matches(Arrays.asList("Lsome.Annotation;"), "trivialMethod", "()V", 1));

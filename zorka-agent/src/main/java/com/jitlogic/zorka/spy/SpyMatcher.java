@@ -192,7 +192,7 @@ public class SpyMatcher {
 
     private boolean matches(int access) {
         return this.access == 0 ||
-          0 != (access & (ACC_PUBLIC|ACC_PRIVATE|ACC_PROTECTED)) ?
+          0 != (this.access & (ACC_PUBLIC|ACC_PRIVATE|ACC_PROTECTED)) ?
             (0 != (access & this.access)) : (0 != (this.access & ACC_PKGPRIV));
     }
 }
