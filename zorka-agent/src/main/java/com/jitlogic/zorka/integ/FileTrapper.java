@@ -29,9 +29,6 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
     private static final int ROLLING = 1;
     private static final int DATED   = 2;
 
-    private static final SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static final SimpleDateFormat fformat = new SimpleDateFormat("yyyy-MM-dd");
-
     private final File logFile;
     private final int type;
     private final int maxLogs;
@@ -119,7 +116,7 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
 
     public void log(String tag, ZorkaLogLevel logLevel, String message, Throwable e, Object...args) {
         StringBuilder sb = new StringBuilder();
-        sb.append(dformat.format(new Date()));
+        sb.append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         sb.append(" ");
         sb.append(tag);
         sb.append(" ");
@@ -166,7 +163,7 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
                 }
                 break;
             case DATED:
-                if (!fformat.format(new Date()).equals(currentSuffix)) {
+                if (!new SimpleDateFormat("yyyy-MM-dd").format(new Date()).equals(currentSuffix)) {
                     reset();
                 }
                 break;
@@ -251,7 +248,7 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
 
 
     private void reopen() {
-        currentSuffix = fformat.format(new Date());
+        currentSuffix = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         File f = new File(logFile.getAbsolutePath() + "." + currentSuffix);
         try {
             os = new FileOutputStream(f, true);
