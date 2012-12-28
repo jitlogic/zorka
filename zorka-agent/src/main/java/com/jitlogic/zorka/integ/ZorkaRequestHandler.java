@@ -13,25 +13,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.integ.nagios;
+package com.jitlogic.zorka.integ;
 
-import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.integ.ZorkaRequestHandler;
-import com.jitlogic.zorka.util.TcpServiceThread;
+import com.jitlogic.zorka.agent.ZorkaCallback;
 
-import java.net.Socket;
+import java.io.IOException;
 
-public class NagiosAgent extends TcpServiceThread {
-
-
-    public NagiosAgent(ZorkaBshAgent agent) {
-        super(agent, ZorkaConfig.getProperties(), "nagios", 5669);
-    }
-
-    @Override
-    protected ZorkaRequestHandler newRequest(Socket sock) {
-        return new NrpeRequestHandler(sock);
-    }
-
+public interface ZorkaRequestHandler extends ZorkaCallback {
+    public String getReq() throws IOException;
 }

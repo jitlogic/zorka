@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.integ.nagios;
 
-import com.jitlogic.zorka.agent.ZorkaCallback;
+import com.jitlogic.zorka.integ.ZorkaRequestHandler;
 import com.jitlogic.zorka.integ.zabbix.ZabbixRequestHandler;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
@@ -23,7 +23,7 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 import java.io.IOException;
 import java.net.Socket;
 
-public class NrpeRequestHandler implements ZorkaCallback {
+public class NrpeRequestHandler implements ZorkaRequestHandler {
 
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
