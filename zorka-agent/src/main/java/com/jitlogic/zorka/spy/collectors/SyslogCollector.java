@@ -44,9 +44,9 @@ public class SyslogCollector implements SpyProcessor {
     }
 
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
 
-        String msg = inspector.substitute(expr, record, stage);
+        String msg = inspector.substitute(expr, record);
 
         if (hostname != null) {
             trapper.log(severity, facility, hostname, tag, msg);

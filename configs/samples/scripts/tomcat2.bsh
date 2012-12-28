@@ -19,14 +19,12 @@
 
   spy.add(
     spy.instance()
-      .onEnter(spy.FETCH_TIME, 1, 
-        spy.get(1,1,"request","requestURI"),
-        spy.transform(1,1,"^(\\/[^\\/]+).*$","${1}"))
-      .onReturn(spy.FETCH_TIME)
-      .onSubmit(
-        spy.tdiff("E0","R0","S0"),
-        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byCtx", "${E1}", "R0", "S0"))
-    .include(
-      spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
+      .onEnter(spy.fetchTime("T1"), spy.fetchArg("REQ", 1),
+        spy.get("REQ","REQ","request","requestURI"),
+        spy.transform("REQ","REQ","^(\\/[^\\/]+).*$","${1}"))
+      .onReturn(spy.fetchTime("T2"))
+      .onSubmit(spy.tdiff("T1","T2","T"),
+        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byCtx", "${REQ}", "T2", "T"))
+    .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
   );
 

@@ -114,7 +114,8 @@ public class SpyMethodVisitor extends MethodVisitor {
 
         // ON_ENTER probes are inserted here
         for (SpyContext ctx : ctxs) {
-            if (ctx.getSpyDefinition().getProbes(ON_ENTER).size() > 0) {
+            SpyDefinition sdef = ctx.getSpyDefinition();
+            if (sdef.getProbes(ON_ENTER).size() > 0 || sdef.getProcessors(ON_ENTER).size() > 0) {
                 stackDelta = max(stackDelta, emitProbe(ON_ENTER, ctx));
             }
         }
@@ -133,8 +134,9 @@ public class SpyMethodVisitor extends MethodVisitor {
             }
             for (int i = ctxs.size()-1; i >= 0; i--) {
                 SpyContext ctx = ctxs.get(i);
+                SpyDefinition sdef = ctx.getSpyDefinition();
                 if (getSubmitFlags(ON_ENTER, ctx.getSpyDefinition()) == SF_NONE ||
-                    ctx.getSpyDefinition().getProbes(ON_RETURN).size() > 0) {
+                    sdef.getProbes(ON_RETURN).size() > 0 || sdef.getProcessors(ON_RETURN).size() > 0) {
                     stackDelta = max(stackDelta, emitProbe(ON_RETURN, ctx));
                 }
             }
@@ -160,8 +162,9 @@ public class SpyMethodVisitor extends MethodVisitor {
 
         for (int i = ctxs.size()-1; i >= 0; i--) {
             SpyContext ctx = ctxs.get(i);
+            SpyDefinition sdef = ctx.getSpyDefinition();
             if (getSubmitFlags(ON_ENTER, ctx.getSpyDefinition()) == SF_NONE ||
-                ctx.getSpyDefinition().getProbes(ON_ERROR).size() > 0) {
+                sdef.getProbes(ON_ERROR).size() > 0 || sdef.getProcessors(ON_ERROR).size() > 0) {
                 stackDelta = max(stackDelta, emitProbe(ON_ERROR, ctx));
             }
         }

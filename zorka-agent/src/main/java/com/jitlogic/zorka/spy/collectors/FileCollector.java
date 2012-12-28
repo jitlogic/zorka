@@ -37,9 +37,9 @@ public class FileCollector implements SpyProcessor {
         this.tag = tag;
     }
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
 
-        String msg = inspector.substitute(expr, record, stage);
+        String msg = inspector.substitute(expr, record);
 
         trapper.log(tag, logLevel, msg, null);
 

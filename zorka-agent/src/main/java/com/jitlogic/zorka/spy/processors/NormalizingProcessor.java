@@ -38,7 +38,7 @@ public class NormalizingProcessor implements SpyProcessor {
     }
 
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
 
         Object v = record.get(src);
 

@@ -52,7 +52,7 @@ public class SnmpCollector implements SpyProcessor {
 
 
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
         SNMPVariablePair[] vars = new SNMPVariablePair[varBindDefs.length];
 
         try {

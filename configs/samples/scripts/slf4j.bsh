@@ -17,35 +17,31 @@
 
   spy.add(
     spy.instance()
-      .onEnter(2,
-        spy.get(0,0,"class","name"),
-        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${0}", -1, -1))
+      .onEnter(spy.fetchArg("ERR", 2),
+        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${ERR.class.name}", null, null))
     .include(
-      spy.byMethod(1, "org.slf4j.impl.JCLLoggerAdapter", "trace", "void", "String", "Throwable"),
-      spy.byMethod(1, "org.slf4j.impl.JCLLoggerAdapter", "debug", "void", "String", "Throwable"),
-      spy.byMethod(1, "org.slf4j.impl.JCLLoggerAdapter", "info",  "void", "String", "Throwable"),
-      spy.byMethod(1, "org.slf4j.impl.JCLLoggerAdapter", "warn",  "void", "String", "Throwable"),
-      spy.byMethod(1, "org.slf4j.impl.JCLLoggerAdapter", "error", "void", "String", "Throwable")));
+      spy.byMethod(spy.AC_PUBLIC, "org.slf4j.impl.JCLLoggerAdapter", "trace", "void", "String", "Throwable"),
+      spy.byMethod(spy.AC_PUBLIC, "org.slf4j.impl.JCLLoggerAdapter", "debug", "void", "String", "Throwable"),
+      spy.byMethod(spy.AC_PUBLIC, "org.slf4j.impl.JCLLoggerAdapter", "info",  "void", "String", "Throwable"),
+      spy.byMethod(spy.AC_PUBLIC, "org.slf4j.impl.JCLLoggerAdapter", "warn",  "void", "String", "Throwable"),
+      spy.byMethod(spy.AC_PUBLIC, "org.slf4j.impl.JCLLoggerAdapter", "error", "void", "String", "Throwable")));
 
   spy.add(
     spy.instance()
-      .onEnter(3,
-        spy.get(0,0,"class","name"),
-        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${0}", -1, -1))
+      .onEnter(spy.fetchArg("ERR",3),
+        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${ERR.class.name}", null, null))
     .include(
       spy.byMethod("org.slf4j.impl.SimpleLogger", "log")));
 
   spy.add(
     spy.instance()
-      .onEnter(4,
-        spy.get(0,0,"class","name"),
-        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${0}", -1, -1)));
+      .onEnter(spy.fetchArg("ERR",4),
+        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${ERR.class.name}", null, null)));
 
   spy.add(
     spy.instance()
-      .onEnter(6,
-        spy.get(0,0,"class","name"),
-        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${0}", -1, -1))
+      .onEnter(spy.fetchArg("ERR",6),
+        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=LoggedErrors", "byException", "${ERR.class.name}", null, null))
     .include(
       spy.byMethod("org.slf4j.impl.Log4jLoggerAdapter", "log")));
 

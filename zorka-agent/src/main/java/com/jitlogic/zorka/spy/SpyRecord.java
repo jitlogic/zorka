@@ -35,13 +35,20 @@ public class SpyRecord {
 
     private Map<String,Object> data = new HashMap<String, Object>();
 
-    private int stages = 0;
+    private int stages = 0, stage = -1;
 
 
     public SpyRecord(SpyContext ctx) {
         this.ctx = ctx;
     }
 
+    public SpyRecord(SpyRecord orig, String...attrsToCopy) {
+        this.ctx = orig.ctx;
+        this.stage = orig.stage;
+        for (String attr : attrsToCopy) {
+            data.put(attr, orig.data.get(attr));
+        }
+    }
 
     public SpyRecord feed(int stage, Object[] vals) {
         List<SpyProbe> probes = ctx.getSpyDefinition().getProbes(stage);
@@ -54,6 +61,7 @@ public class SpyRecord {
         }
 
         stages |= (1 << stage);
+        this.stage = stage;
 
         return this;
     }
@@ -83,4 +91,11 @@ public class SpyRecord {
         data.put(key, val);
     }
 
+    public void setStage(int stage) {
+        this.stage = stage;
+    }
+
+    public int getStage() {
+        return stage;
+    }
 }

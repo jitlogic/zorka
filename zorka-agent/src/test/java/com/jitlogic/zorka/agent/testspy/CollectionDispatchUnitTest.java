@@ -46,12 +46,14 @@ public class CollectionDispatchUnitTest extends ZorkaFixture {
         TestCollector col1 = new TestCollector();
         TestCollector col2 = new TestCollector();
 
-        SpyDefinition sdef = SpyDefinition.instance().onEnter(spy.fetchTime("E0")).onCollect(col1, col2);
+        SpyDefinition sdef = SpyDefinition.instance().onEnter(spy.fetchTime("E0")).onSubmit(col1, col2);
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "TClass", "method", "()V", 1));
 
-        SpyRecord sr = new SpyRecord(ctx);
+        SpyRecord record = new SpyRecord(ctx);
 
-        collector.process(SpyLib.ON_COLLECT, sr);
+        record.setStage(SpyLib.ON_SUBMIT);
+
+        collector.process(record);
 
         assertEquals(1, col1.size());
         assertEquals(1, col2.size());

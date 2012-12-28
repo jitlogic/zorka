@@ -38,7 +38,7 @@ public class DispatchingCollector implements SpyProcessor {
         this.sdef = sdef;
     }
 
-    public synchronized SpyRecord process(int stage, SpyRecord record) {
+    public synchronized SpyRecord process(SpyRecord record) {
 
         if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
             log.debug("Dispatching collector record: " + record);
@@ -48,19 +48,19 @@ public class DispatchingCollector implements SpyProcessor {
 
         SpyDefinition sd = sdef != null ? sdef : ctx.getSpyDefinition();
 
-        if (null == (record = process(sd, record, stage))) {
+        if (null == (record = process(sd, record))) {
             return null;
         }
 
         return record;
     }
 
-    private SpyRecord process(SpyDefinition sdef, SpyRecord record, int stage) {
-        List<SpyProcessor> processors = sdef.getProcessors(stage);
+    private SpyRecord process(SpyDefinition sdef, SpyRecord record) {
+        List<SpyProcessor> processors = sdef.getProcessors(record.getStage());
 
         for (SpyProcessor processor : processors) {
             try {
-                if (null == (record = processor.process(stage, record))) {
+                if (null == (record = processor.process(record))) {
                     break;
                 }
             } catch (Throwable e) {

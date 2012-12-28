@@ -28,7 +28,7 @@ public class TimeDiffProcessor implements SpyProcessor {
     }
 
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
         Object  v1 = record.get(tstart),
                 v2 = record.get(tstop);
 

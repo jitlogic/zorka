@@ -293,6 +293,50 @@ instrumented methods and calculate method execution times
 
 Will submit created configurations to instrumentation engine.
 
+### Fetching arguments
+
+A set of functions has been defined to create spy probes that will can be injected into instrumented methods. All probes
+have `key` parameter that is used to store obtained values in fetch probes and some functions have additiona parameters.
+
+#### spy.fetchArg()
+
+    spy.fetchArg(key, num)
+
+Fetches `num`-th method argument. For instance method visible arguments start with 1 and argument number 0 contains
+reference to object instance on behalf of which method has been called (`this`). For static methods arguments start with
+0. Note that when instrumenting constructors, fetching reference to `this` is illegal at the beginning of constructor.
+You have to to this at return point of constructor.
+
+#### spy.fetchClass()
+
+    spy.fetchClass(key, name)
+
+Fetches class named `name` in the context of instrumented method (that is, with class loader of its parent class).
+Returns `java.lang.Class` object.
+
+#### spy.fetchError()
+
+    spy.fetchError(key)
+
+Fetches exception thrown out of method. This can be used only in error handling path (`.onError(...)`) of spy def.
+
+#### spy.fetchRetVal()
+
+    spy.fetchRetVal(key)
+
+Fetches return value of a method. This can be used only at return points (`.onReturn(...)`) of spy def.
+
+#### spy.fetchThread()
+
+    spy.fetchThread(key)
+
+Fetches thread executing method code. Returns `java.lang.Thread` object.
+
+#### spy.fetchTime()
+
+    spy.fetchTime(key)
+
+Fetches current time (`System.nanoTime()` result - nanoseconds since Epoch).
 
 ### Matching methods to be instrumented
 
@@ -304,7 +348,7 @@ functions. There are several functions that can create various types of matchers
     spy.byMethod(classPattern, methodPattern)
     spy.byMethod(access, classPattern, methodPattern, returnType, String...argTypes)
 
-These methods will choose which classes and methods will be instrumented. Both `classPattern` and `methodPattern` can
+These matchers will choose which classes and methods will be instrumented. Both `classPattern` and `methodPattern` can
 contain asterisk (`*`) or double asterisk (`**`) which has the same meaning as in Ant or Maven: single asterisk will
 choose all classes in given package (eg. `org.jboss.*`), and double asterisk will choose all classes in given package
 and all subpackages it contains. For method names single asterisk represents any sequence of characters (double asterisk
@@ -315,6 +359,19 @@ version of `byMethod()` allows for much finer control: it is possible to pass ac
 methods etc.) and define return type and types of arguments (as in java - eg. `int`, `void`, `String`,
 `com.mycompany.MyClass` etc.).
 
+#### spy.byClassAnnotation()
+
+    spy.byClassAnnotation(classAnnotation)
+    spy.byClassAnnotation(classAnnotation, methodPattern)
+    spy.byMethodAnnotation(classPattern, methodAnnotation)
+    spy.byClassMethodAnnotation(classAnnotation, methodAnnotation)
+
+These matchers will choose classes that are annotated by `classAnnotation` and methods matching `methodPattern` or
+all methods except constructors if method pattern has not been specified. Third and fourth variant allows matching
+also by method annotations. These matchers are useful in some cases, for example when looking for all EJB beans of
+certain type.
+
+
 ### Processing and filtering arguments
 
 Argument processor  There is a generic method `withProcessor(obj)` that allows attaching arbitrary argument processors
@@ -322,7 +379,7 @@ to spy configuration and some convenience methods attaching predefined processor
 
 #### Formatting strings
 
-    spy.formatter(dst, formatExpr);
+    spy.format(dst, formatExpr);
 
 Will evaluate `formatExpr`, substitute values (fetched in the same record) and store result at slot number `dst`.
 Format strings look like this:

@@ -28,143 +28,81 @@ __cas() {
 
   // Intercept request dispatcher and store request object for later use
   spy.add(spy.instance()
-    .onEnter(1, spy.tlSet(0, request))
-    .onReturn(1, spy.tlRemove(request))
-    .onError(1, spy.tlRemove(request))
-    .include(
-      spy.byMethod("org.jasig.cas.web.init.SafeDispatcherServlet", "service")));
+    .onEnter(spy.fetchArg("REQ", 1), spy.tlSet("REQ", request))
+    .onReturn(spy.tlRemove(request))
+    .onError(spy.tlRemove(request))
+    .include(spy.byMethod("org.jasig.cas.web.init.SafeDispatcherServlet", "service")));
 
 
   // Authentication attempts
   spy.add(spy.instance()
-    .onReturn(1,
-      spy.get("S0", "E0"),
-      spy.format("S1","AUTHENTICATION_SUCCESS"),
-      spy.tlGet("S2", request))
-    .onError(1,
-      spy.get("S0", "E0"),
-      spy.format("S1","AUTHENTICATION_FAILED"),
-      spy.tlGet("S2", request))
-    .onSubmit(
-      spy.syslogCollector(logger, "remote=${2.remoteAddr} local=${2.localAddr} action=${1} who=${0} what=${0}", severity, facility, "cas", "cas"))
-    .include(
-      spy.byMethod("org.jasig.cas.authentication.AbstractAuthenticationManager", "authenticate")));
-
+    .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request))
+    .onReturn(spy.put("ACTION", "AUTHENTICATION_SUCCESS"))
+    .onError(spy.put("ACTION", "AUTHENTICATION_FAILURE"))
+    .onSubmit(spy.syslogCollector(logger, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO}", severity, facility, "cas", "cas"))
+    .include(spy.byMethod("org.jasig.cas.authentication.AbstractAuthenticationManager", "authenticate")));
 
   // TGT-s created
   spy.add(spy.instance()
-    .onReturn(1, spy.FETCH_RETVAL,
-      spy.get("S0", 0), spy.get("S1", 1),
-      spy.format("S2", "TICKET_GRANTING_TICKET_CREATED"),
-      spy.tlGet("S3", request))
-    .onError(1, spy.FETCH_ERROR,
-      spy.get("S0", 0), spy.get("S1", 1),
-      spy.format("S2", "TICKET_GRANTING_TICKET_NOT_CREATED"),
-      spy.tlGet("S3", request))
-    .onSubmit(
-      spy.syslogCollector(logger, "remote=${3.remoteAddr} local=${3.localAddr} action=${2} who=${0} what=${1}", severity, facility, "cas", "cas"))
-    .include(
-      spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "createTicketGrantingTicket")));
+    .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request))
+    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_CREATED"))
+    .onError(spy.fetchError("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_NOT_CREATED"))
+    .onSubmit(spy.syslogCollector(logger, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT}", severity, facility, "cas", "cas"))
+    .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "createTicketGrantingTicket")));
 
 
   // TGT-s destroyed
   spy.add(spy.instance()
-    .onReturn(1,
-      spy.get("S0", 0),
-      spy.format("S1", ""),
-      spy.format("S2", "TICKET_GRANTING_TICKET_DESTROYED"),
-      spy.tlGet("S3", request))
-    .onError(1, spy.FETCH_ERROR,
-      spy.get("S0", 0), spy.get("S1", 1),
-      spy.format("S2", "TICKET_GRANTING_TICKET_NOT_DESTROYED"),
-      spy.tlGet("S3", request))
-    .onSubmit(
-      spy.syslogCollector(logger, "remote=${3.remoteAddr} local=${3.localAddr} action=${2} who=${0} what=${2}", severity, facility, "cas", "cas"))
-    .include(
-      spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "destroyTicketGrantingTicket")));
+    .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request))
+    .onReturn(spy.put("ACTION", "TICKET_GRANTING_TICKET_DESTROYED"), spy.put("WHAT", ""))
+    .onError(spy.put("ACTION", "TICKET_GRANTING_TICKET_NOT_DESTROYED"), spy.fetchError("WHAT"))
+    .onSubmit(spy.syslogCollector(logger, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT}", severity, facility, "cas", "cas"))
+    .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "destroyTicketGrantingTicket")));
 
 
   // Service tickets granted
   spy.add(spy.instance()
-    .onReturn(1, 2, 3, spy.FETCH_RETVAL,
-      spy.get("S0", 0), spy.get("S1", 1), spy.get("S2", 2), spy.get("S3", 3),
-      spy.format("S4", "SERVICE_TICKET_GRANTED"),
-      spy.tlGet("S5", request))
-    .onError(1, 2, 3, spy.FETCH_ERROR,
-      spy.get("S0", 0), spy.get("S1", 1), spy.get("S2", 2), spy.get("S3", 3),
-      spy.format("S4", "SERVICE_TICKET_NOT_GRANTED"),
-      spy.tlGet("S5", request))
-    .onSubmit(
-      spy.syslogCollector(logger, "remote=${5.remoteAddr} local=${5.localAddr} action=${4} who=${2} service=${1} tgt=${0} what=${3}", severity, facility, "cas", "cas"))
-    .include(
-      spy.byMethod(1, "org.jasig.cas.CentralAuthenticationServiceImpl", "grantServiceTicket", "String", 
+    .onEnter(spy.fetchArg("TGT", 1), spy.fetchArg("SERVICE", 2), spy.fetchArg("WHO", 3), spy.tlGet("REQ", request))
+    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "SERVICE_TICKET_GRANTED"))
+    .onError(spy.fetchError("WHAT"), spy.put("ACTION", "SERVICE_TICKET_NOT_GRANTED"))
+    .onSubmit(spy.syslogCollector(logger, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} service=${SERVICE} tgt=${TGT} what=${WHAT}", severity, facility, "cas", "cas"))
+    .include(spy.byMethod(1, "org.jasig.cas.CentralAuthenticationServiceImpl", "grantServiceTicket", "String", 
         "org.jasig.cas.authentication.principal.Service", "org.jasig.cas.authentication.principal.Credentials")));
 
 
   // Proxy granting ticket created
   spy.add(spy.instance()
-    .onReturn(1, 2, spy.FETCH_RETVAL,
-      spy.get("S0", 0), spy.get("S1", 1), spy.get("S2", 2),
-      spy.format("S3", "PROXY_GRANTING_TICKET_CREATED"),
-      spy.tlGet("S4", request))
-    .onError(1, 2, spy.FETCH_ERROR, 
-      spy.get("S0", 0), spy.get("S1", 1), spy.get("S2", 2),
-      spy.format("S3", "PROXY_GRANTING_TICKET_NOT_CREATED"),
-      spy.tlGet("S4", request))
-    .onSubmit(
-      spy.syslogCollector(logger, "remote=${4.remoteAddr} local=${4.localAddr} action=${3} who=${1} what=${2} serviceTicket=${0}", severity, facility, "cas", "cas"))
-    .include(
-      spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "delegateTicketGrantingTicket")));
+    .onEnter(spy.fetchArg("TICKET", 1), spy.fetchArg("WHO", 2), spy.tlGet("REQ", request))
+    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "PROXY_GRANTING_TICKET_CREATED"))
+    .onError(spy.fetchError("WHAT"), spy.put("ACTION", "PROXY_GRANTING_TICKET_NOT_CREATED"))
+    .onSubmit(spy.syslogCollector(logger, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT} serviceTicket=${TICKET}", severity, facility, "cas", "cas"))
+    .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "delegateTicketGrantingTicket")));
 
 
   // Validate service ticket
   spy.add(spy.instance()
-    .onReturn(1, 2, spy.FETCH_RETVAL,
-      spy.get("S0", 0), spy.get("S1", 1), spy.get("S2", 2),
-      spy.format("S3", "SERVICE_TICKET_VALIDATE_SUCCESS"),
-      spy.tlGet("S4", request))
-    .onError(1, 2, spy.FETCH_ERROR,
-      spy.get("S0", 0), spy.get("S1", 1), spy.get("S2", 2),
-      spy.format("S3", "SERVICE_TICKET_VALIDATE_FAILURE"),
-      spy.tlGet("S4", request))
-    .onSubmit(
-      spy.syslogCollector(logger, "remote=${4.remoteAddr} local=${4.localAddr} action=${3} who=? what=${2} serviceTicket=${0} service=${1}", severity, facility, "cas", "cas"))
-    .include(
-      spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "validateServiceTicket")));
+    .onEnter(spy.fetchArg("TICKET", 1), spy.fetchArg("SERVICE", 2), spy.tlGet("REQ", request))
+    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "SERVICE_TICKET_VALIDATE_SUCCESS"))
+    .onSubmit(spy.syslogCollector(logger, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} what=${WHAT} ticket=${TICKET} service=${SERVICE}", severity, facility, "cas", "cas"))
+    .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "validateServiceTicket")));
 
 
   // Delete a service
   spy.add(spy.instance()
-    .onReturn(1,
-      spy.get("S0", 0),
-      spy.format("S1", "OK"),
-      spy.format("S2", "DELETE_SERVICE_SUCCESS"),
-      spy.tlGet("S3", request))
-    .onError(1, spy.FETCH_ERROR,
-      spy.get("S0", 0), spy.get("S1", 1),
-      spy.format("S2", "DELETE_SERVICE_FAILURE"),
-      spy.tlGet("S3", request))
-    .onSubmit(
-      spy.syslogCollector(logger, "remote=${3.remoteAddr} local=${3.localAddr} action=${2} result=${1} id=${0}", severity, facility, "cas", "cas"))
-    .include(
-      spy.byMethod("org.jasig.cas.DefaultServicesManagerImpl", "delete")));
+    .onEnter(spy.fetchArg("ID", 1), spy.tlGet("REQ", request))
+    .onReturn(spy.put("RESULT", "OK"), spy.put("ACTION", "DELETE_SERVICE_SUCCESS"))
+    .onError(spy.fetchError("RESULT"), spy.put("ACTION", "DELETE_SERVICE_FAILURE"))
+    .onSubmit(spy.syslogCollector(logger, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} result=${RESULT} id=${ID}", severity, facility, "cas", "cas"))
+    .include(spy.byMethod("org.jasig.cas.DefaultServicesManagerImpl", "delete")));
 
 
   // Save a service
   spy.add(spy.instance()
-    .onReturn(1, spy.FETCH_RETVAL,
-      spy.get("S0", 0), spy.get("S1", 1),
-      spy.format("S2", "SAVE_SERVICE_SUCCESS"),
-      spy.tlGet("S3", request))
-    .onError(1, spy.FETCH_ERROR,
-      spy.get("S0", 0), spy.get("S1", 1),
-      spy.format("S2", "SAVE_SERVICE_FAILURE"),
-      spy.tlGet("S3", request))
-    .onSubmit(
-      spy.syslogCollector(logger, "remote=${3.remoteAddr} local=${3.localAddr} action=${2} service=${0} result=${1}", severity, facility, "cas", "cas"))
-    .include(
-      spy.byMethod("org.jasig.cas.DefaultServicesManagerImpl", "save")));
-
+    .onEnter(spy.fetchArg("SERVICE", 1), spy.tlGet("REQ", request))
+    .onReturn(spy.fetchRetVal("RESULT"), spy.put("ACTION", "SAVE_SERVICE_SUCCESS"))
+    .onError(spy.fetchError("RESULT"), spy.put("ACTION", "SAVE_SERVICE_FAILURE"))
+    .onSubmit(spy.syslogCollector(logger, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} service=${SERVICE} result=${RESULT}", severity, facility, "cas", "cas"))
+    .include(spy.byMethod("org.jasig.cas.DefaultServicesManagerImpl", "save")));
 
   return this;
 }

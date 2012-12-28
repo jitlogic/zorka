@@ -23,12 +23,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import com.jitlogic.zorka.agent.ZorkaCallback;
+import com.jitlogic.zorka.integ.ZorkaRequestHandler;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.json.simple.JSONAware;
 
-public class ZabbixRequestHandler implements ZorkaCallback {
+public class ZabbixRequestHandler implements ZorkaRequestHandler {
 
 	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 	
@@ -177,7 +177,6 @@ public class ZabbixRequestHandler implements ZorkaCallback {
 	public String getReq() throws IOException {
 		if (req == null) {
 			String s = decode(socket.getInputStream());
-			//log.debug("Incoming ZABBIX query: '" + s + "'"); // TODO avoid concatenation when log level > 0 (? on ZorkaLog level ?)
 			req = translate(s);
 		}
 		return req;

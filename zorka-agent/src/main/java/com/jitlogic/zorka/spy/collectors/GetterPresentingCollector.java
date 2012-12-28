@@ -54,7 +54,7 @@ public class GetterPresentingCollector implements SpyProcessor {
     }
 
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public SpyRecord process(SpyRecord record) {
         SpyContext ctx = record.getContext();
         String mbeanName = ctx.subst(mbeanTemplate);
         String attrName = ctx.subst(attrTemplate);
