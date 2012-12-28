@@ -65,6 +65,9 @@ and zorka will close connection abruply;
 
 * `syslog = yes` - controls whether enable (or disable) syslog support; syslog protocol is enabled by default;
 
+* `spy = yes` - enables or disables Zorka Spy (spy is enabled by default);
+
+* `spy.debug = 1` - sets verbosity for instrumentation engine;
 
 ## Basic API
 

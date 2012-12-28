@@ -1,0 +1,48 @@
+/**
+ * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+__wso2() {
+
+
+  // Script below configures OSGi container to make agent classes visible system wide.
+  // This is important when using Spy as instrumented code has to see agent classes.
+
+  __carbonOSGiConfigurer() {
+
+    process(stage, record) {
+      zorka.logInfo("(Re)Configuring OSGi parameters for Zorka Spy ...");
+
+      p = record.get("PARAM");
+      s = p.get("org.osgi.framework.system.packages");
+      s = s + ",com.jitlogic.zorka.spy";
+
+      p.put("org.osgi.framework.system.packages", s);
+      zorka.logInfo("Set org.osgi.framework.system.packages to: '" + s + "'");
+    }
+    return this;
+  }
+
+  spy.add(spy.instance()
+    .onReturn(spy.fetchRetVal("PARAM"),
+              (com.jitlogic.zorka.spy.SpyProcessor)__carbonOSGiConfigurer())
+    .include(spy.byMethod(spy.AC_PRIVATE, "org.wso2.carbon.server.CarbonLauncher",
+                          "buildInitialPropertyMap", "java.util.Map")));
+
+  return this;
+}
+
+wso2 = __wso2();

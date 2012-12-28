@@ -124,6 +124,11 @@ public class SpyDefinition {
         return false;
     }
 
+    /**
+     * Return true this spy def contains class annotation matcher(s).
+     *
+     * @return true if any of matchers contains class annotation match
+     */
     public boolean hasClassAnnotation() {
         for (SpyMatcher matcher : matchers) {
             if (matcher.hasClassAnnotation()) {
@@ -131,6 +136,20 @@ public class SpyDefinition {
             }
         }
 
+        return false;
+    }
+
+    /**
+     * Returns true if this spy def contains method annotation matcher(s).
+     *
+     * @return true if any of matchers contains method annotation match
+     */
+    public boolean hasMethodAnnotation() {
+        for (SpyMatcher matcher : matchers) {
+            if (matcher.hasMethodAnnotation()) {
+                return true;
+            }
+        }
         return false;
     }
 

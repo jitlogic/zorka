@@ -25,7 +25,6 @@ public class TestClass1 {
     private int calls = 0;
     private int vals = 0;
 
-    @TestAnnotation
     public void trivialMethod() {
         calls++;
     }

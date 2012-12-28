@@ -24,7 +24,6 @@ import com.jitlogic.zorka.normproc.NormLib;
 import com.jitlogic.zorka.spy.MainSubmitter;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyLib;
-import com.jitlogic.zorka.util.ClosingTimeoutExecutor;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.integ.zabbix.ZabbixAgent;
@@ -32,7 +31,10 @@ import com.jitlogic.zorka.integ.zabbix.ZabbixAgent;
 import javax.management.MBeanServerConnection;
 import java.lang.instrument.ClassFileTransformer;
 import java.util.Properties;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static com.jitlogic.zorka.agent.ZorkaConfig.*;
 
@@ -124,8 +126,10 @@ public class AgentInstance {
 
 
     public  void start() {
-        if (executor == null)
-            executor = new ClosingTimeoutExecutor(requestThreads, requestQueue, requestTimeout);
+        if (executor == null) {
+            executor = new ThreadPoolExecutor(requestThreads, requestThreads, 1000, TimeUnit.MILLISECONDS,
+                    new ArrayBlockingQueue<Runnable>(requestQueue));
+        }
 
         zorkaAgent = new ZorkaBshAgent(executor);
 
