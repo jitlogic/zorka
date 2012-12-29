@@ -45,13 +45,7 @@ public class ThreadLocalProcessor implements SpyProcessor {
     public SpyRecord process(SpyRecord record) {
         switch (operation) {
             case GET:
-            {
-                Object v = threadLocal.get();
-                for (Object key : path) {
-                    v = inspector.get(v, key);
-                }
-                record.put(key, v);
-            }
+                record.put(key, inspector.get(threadLocal.get(), path));
                 break;
             case SET:
                 threadLocal.set(record.get(key));

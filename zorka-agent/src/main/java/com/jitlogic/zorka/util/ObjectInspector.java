@@ -303,7 +303,7 @@ public class ObjectInspector {
             String[] segs = expr.split("\\.");
             Object v = record.get(segs[0]);
             for (int i = 1; i < segs.length; i++) {
-                v = get(v, segs[i]);
+                v = getAttr(v, segs[i]);
             }
             m.appendReplacement(sb, ""+v);
         }
@@ -322,7 +322,7 @@ public class ObjectInspector {
             String[] segs = expr.split("\\.");
             Object v = vals[Integer.parseInt(segs[0])];
             for (int i = 1; i < segs.length; i++) {
-                v = get(v, segs[i]);
+                v = getAttr(v, segs[i]);
             }
             m.appendReplacement(sb, ""+v);
         }

@@ -121,9 +121,7 @@ public class ZorkaLib  {
 				}
 
 				if (args.size() > 3) {
-					for (Object arg : args.subList(3, args.size())) {
-						obj = inspector.get(obj, arg);
-					}
+                    obj = inspector.get(obj, args.subList(3, args.size()).toArray(new Object[0]));
 				}
 				objs.add(obj);
 			}
@@ -199,9 +197,7 @@ public class ZorkaLib  {
         }
 		
 		if (argList.size() > 3 && obj != null) {
-			for (Object arg : argList.subList(3, argList.size())) {
-				obj = inspector.get(obj, arg);
-			}
+            obj = inspector.get(obj, argList.subList(3, argList.size()).toArray(new Object[0]));
 		}
 		
 		return obj;

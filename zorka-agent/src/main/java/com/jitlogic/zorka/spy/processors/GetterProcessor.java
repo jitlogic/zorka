@@ -44,14 +44,7 @@ public class GetterProcessor implements SpyProcessor {
 
 
     public SpyRecord process(SpyRecord record) {
-        Object val = record.get(src);
-
-        for (Object obj : path) {
-            if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
-                log.debug("Descending into '" + obj + "' of '" + val + "' ...");
-            }
-            val = inspector.get(val, obj);
-        }
+        Object val = inspector.get(record.get(src), path);
 
         if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
             log.debug("Final result: '" + val + "' stored to slot " + dst);

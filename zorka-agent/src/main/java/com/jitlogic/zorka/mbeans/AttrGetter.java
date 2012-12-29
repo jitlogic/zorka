@@ -32,12 +32,7 @@ public class AttrGetter implements ValGetter {
 	}
 	
 	public Object get() {
-		Object v = obj;
-		
-		for (Object attr : attrs)
-			v = inspector.get(v, attr);
-		
-		return v;
+		return inspector.get(obj, attrs);
 	}
 
 }
