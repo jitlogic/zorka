@@ -29,8 +29,6 @@ public class LogAdapterProcessor implements SpyProcessor {
     public static final String TAG_MESSAGE = "_MESSAGE";
     public static final String TAG_EXCEPTION = "_EXCEPTION";
 
-    private ObjectInspector inspector = new ObjectInspector();
-
     private String src, prefix;
 
 
@@ -71,7 +69,7 @@ public class LogAdapterProcessor implements SpyProcessor {
 
 
     private void adaptJdkRecord(Object orig, SpyRecord rec) {
-        Integer level = inspector.get(orig, "level", "intValue()");
+        Integer level = ObjectInspector.get(orig, "level", "intValue()");
 
         ZorkaLogLevel logLevel = null;
 
@@ -87,9 +85,9 @@ public class LogAdapterProcessor implements SpyProcessor {
         }
 
         rec.put(prefix+TAG_LEVEL, logLevel);
-        rec.put(prefix+TAG_CLASS,     inspector.get(orig, "sourceClassName"));
-        rec.put(prefix+TAG_METHOD,    inspector.get(orig, "sourceMethodName"));
-        rec.put(prefix+TAG_MESSAGE,   inspector.get(orig, "message"));
-        rec.put(prefix+TAG_EXCEPTION, inspector.get(orig, "thrown"));
+        rec.put(prefix+TAG_CLASS,     ObjectInspector.get(orig, "sourceClassName"));
+        rec.put(prefix+TAG_METHOD,    ObjectInspector.get(orig, "sourceMethodName"));
+        rec.put(prefix+TAG_MESSAGE,   ObjectInspector.get(orig, "message"));
+        rec.put(prefix+TAG_EXCEPTION, ObjectInspector.get(orig, "thrown"));
     }
 }

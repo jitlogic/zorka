@@ -81,7 +81,7 @@ public class CollectQueueProcessor implements SpyProcessor, Runnable {
                 if (null == (record = processor.process(record))) {
                     break;
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 log.error("Error transforming record: " + record + " (on processor " + processor + ")", e);
                 break;
             }

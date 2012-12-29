@@ -28,9 +28,6 @@ public class TrapperCollector implements SpyProcessor {
     private ZorkaTrapper trapper;
     private String tagExpr, stdExpr, errExpr, errSlot;
 
-    private ObjectInspector inspector = new ObjectInspector();
-
-
     public TrapperCollector(ZorkaTrapper trapper, String tagExpr, String stdExpr, String errExpr, String errField) {
         this.trapper = trapper;
         this.tagExpr = tagExpr;
@@ -42,8 +39,8 @@ public class TrapperCollector implements SpyProcessor {
 
     public SpyRecord process(SpyRecord record) {
 
-        String tag = inspector.substitute(tagExpr, record);
-        String msg = inspector.substitute(record.hasStage(SpyLib.ON_ERROR) ? errExpr : stdExpr, record);
+        String tag = ObjectInspector.substitute(tagExpr, record);
+        String msg = ObjectInspector.substitute(record.hasStage(SpyLib.ON_ERROR) ? errExpr : stdExpr, record);
 
         trapper.trap(ZorkaLogLevel.DEBUG, tag, msg, (Throwable)record.get(errSlot));
 

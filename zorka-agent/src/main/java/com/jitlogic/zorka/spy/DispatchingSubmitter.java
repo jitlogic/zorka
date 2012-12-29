@@ -120,7 +120,7 @@ public class DispatchingSubmitter implements SpySubmitter {
                 if (null == (record = processor.process(record))) {
                     break;
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 log.error("Error processing record " + record + " (on processor "
                             + processor + ", stage=" + stage + ")");
             }

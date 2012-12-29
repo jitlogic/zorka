@@ -35,15 +35,15 @@ import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class JmxAttrCollector implements SpyProcessor {
 
-    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
+    private final MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
 
-    private String mbsName;
-    private String beanTemplate, attrTemplate;
-    private String time, tstamp;
+    private final String mbsName;
+    private final String beanTemplate, attrTemplate;
+    private final String time, tstamp;
 
-    private Map<SpyContext,MethodCallStatistic> cachedStats = new HashMap<SpyContext, MethodCallStatistic>();
+    private final Map<SpyContext,MethodCallStatistic> cachedStats = new HashMap<SpyContext, MethodCallStatistic>();
 
 
     public JmxAttrCollector(String mbsName, String beanTemplate, String attrTemplate, String tstamp, String time) {

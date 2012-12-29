@@ -36,15 +36,13 @@ import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class ZorkaStatsCollector implements SpyProcessor {
 
-    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
-    private String mbsName, mbeanTemplate, attrTemplate, keyTemplate;
-    private String time, tstamp;
+    private final MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
+    private final String mbsName, mbeanTemplate, attrTemplate, keyTemplate;
+    private final String time, tstamp;
 
-    private Map<SpyContext,MethodCallStatistics> statsCache = new HashMap<SpyContext, MethodCallStatistics>();
-
-    private ObjectInspector inspector = new ObjectInspector();
+    private final Map<SpyContext,MethodCallStatistics> statsCache = new HashMap<SpyContext, MethodCallStatistics>();
 
     public ZorkaStatsCollector(String mbsName, String mbeanTemplate, String attrTemplate,
                                String keyTemplate, String tstamp, String time) {
@@ -71,7 +69,7 @@ public class ZorkaStatsCollector implements SpyProcessor {
                     new MethodCallStatistics(), "Method call statistics");
         }
 
-        String key = inspector.substitute(ctx.subst(keyTemplate), record);
+        String key = ObjectInspector.substitute(ctx.subst(keyTemplate), record);
 
         MethodCallStatistic statistic = (MethodCallStatistic)stats.getMethodCallStatistic(key);
 

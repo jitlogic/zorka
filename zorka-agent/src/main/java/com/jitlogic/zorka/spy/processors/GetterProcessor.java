@@ -34,7 +34,6 @@ public class GetterProcessor implements SpyProcessor {
 
     private String src, dst;
     private Object[] path;
-    private ObjectInspector inspector = new ObjectInspector();
 
 
     public GetterProcessor(String src, String dst, Object... path) {
@@ -44,7 +43,7 @@ public class GetterProcessor implements SpyProcessor {
 
 
     public SpyRecord process(SpyRecord record) {
-        Object val = inspector.get(record.get(src), path);
+        Object val = ObjectInspector.get(record.get(src), path);
 
         if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
             log.debug("Final result: '" + val + "' stored to slot " + dst);

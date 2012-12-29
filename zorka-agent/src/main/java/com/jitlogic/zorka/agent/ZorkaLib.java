@@ -48,21 +48,23 @@ public class ZorkaLib  {
     public static final ZorkaLogLevel ERROR = ZorkaLogLevel.ERROR;
     public static final ZorkaLogLevel FATAL = ZorkaLogLevel.FATAL;
 
-	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private static final int MINUTE = 60000;
+    private static final int SECOND = 1000;
+
+    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
     private final ZorkaLogger logger = ZorkaLogger.getLogger();
 	
-	private ZorkaBshAgent agent;
-    private Set<JmxObject> registeredObjects = new HashSet<JmxObject>();
+	private final ZorkaBshAgent agent;
+    private final Set<JmxObject> registeredObjects = new HashSet<JmxObject>();
 
-    private ObjectInspector inspector = new ObjectInspector();
-    private ObjectDumper dumper = new ObjectDumper();
+    private final ObjectDumper dumper = new ObjectDumper();
 
-    private MBeanServerRegistry mbsRegistry;
+    private final MBeanServerRegistry mbsRegistry;
 
     private String hostname = null;
 
-    private static final int MINUTE = 60000;
-    private static final int SECOND = 1000;
+    private final AvgRateCounter rateCounter = new AvgRateCounter(this);
+    private final Map<String, FileTrapper> fileTrappers = new ConcurrentHashMap<String, FileTrapper>();
 
     public ZorkaLib(ZorkaBshAgent agent) {
 		this.agent = agent;
@@ -99,7 +101,7 @@ public class ZorkaLib  {
 		}
         ClassLoader cl0 = Thread.currentThread().getContextClassLoader(), cl1 = mbsRegistry.getClassLoader(conname);
 
-        Set<ObjectName> names = inspector.queryNames(conn, args.get(1).toString());
+        Set<ObjectName> names = ObjectInspector.queryNames(conn, args.get(1).toString());
 		if (args.size() == 2) {
 			for (ObjectName name : names) {
 				objs.add(new JmxObject(name, conn, cl1));
@@ -121,7 +123,7 @@ public class ZorkaLib  {
 				}
 
 				if (args.size() > 3) {
-                    obj = inspector.get(obj, args.subList(3, args.size()).toArray(new Object[0]));
+                    obj = ObjectInspector.get(obj, args.subList(3, args.size()).toArray(new Object[0]));
 				}
 				objs.add(obj);
 			}
@@ -163,7 +165,7 @@ public class ZorkaLib  {
 			return null;
 		}
 
-        Set<ObjectName> names = inspector.queryNames(conn, argList.get(1).toString());
+        Set<ObjectName> names = ObjectInspector.queryNames(conn, argList.get(1).toString());
 		
 		if (names.isEmpty()) { 
 			return null;
@@ -197,7 +199,7 @@ public class ZorkaLib  {
         }
 		
 		if (argList.size() > 3 && obj != null) {
-            obj = inspector.get(obj, argList.subList(3, argList.size()).toArray(new Object[0]));
+            obj = ObjectInspector.get(obj, argList.subList(3, argList.size()).toArray(new Object[0]));
 		}
 		
 		return obj;
@@ -216,7 +218,7 @@ public class ZorkaLib  {
             return null;
         }
 
-        Set<ObjectName> names = inspector.queryNames(conn, objectMask);
+        Set<ObjectName> names = ObjectInspector.queryNames(conn, objectMask);
         List<String> rslt = new ArrayList<String>(32);
 
         ClassLoader cl0 = Thread.currentThread().getContextClassLoader(), cl1 = mbsRegistry.getClassLoader(mbsName);
@@ -241,13 +243,13 @@ public class ZorkaLib  {
 
                     if (args.length > 1) {
                         for (int i = 1; i < args.length; i++) {
-                            obj = inspector.get(obj, name);
+                            obj = ObjectInspector.get(obj, name);
                         }
                     }
 
 
-                    for (Object attr : inspector.list(obj)) {
-                        rslt.add(path + attr + " -> " + inspector.get(obj, attr));
+                    for (Object attr : ObjectInspector.list(obj)) {
+                        rslt.add(path + attr + " -> " + ObjectInspector.get(obj, attr));
                     }
 
                 } catch (Exception e) {
@@ -274,7 +276,7 @@ public class ZorkaLib  {
      * @return
      */
 	public Object get(Object obj, Object...args) {
-        return inspector.get(obj, args);
+        return ObjectInspector.get(obj, args);
 	}
 	
 	
@@ -314,8 +316,6 @@ public class ZorkaLib  {
         return new AttrGetter(obj, attrs);
     }
 
-
-    private AvgRateCounter rateCounter = new AvgRateCounter(this);
 
     public Double rate(Object...args) {
 
@@ -432,8 +432,6 @@ public class ZorkaLib  {
         return new EjbRankLister(mbsName, objNames, attr);
     }
 
-
-    private Map<String, FileTrapper> fileTrappers = new ConcurrentHashMap<String, FileTrapper>();
 
 
     public FileTrapper fileTrapper(String id) {

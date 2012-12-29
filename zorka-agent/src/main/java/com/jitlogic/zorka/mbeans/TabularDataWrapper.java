@@ -60,8 +60,6 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
 
     private TabularSetExtractor extractor;
 
-    private ObjectInspector inspector = new ObjectInspector();
-
 
     public TabularDataWrapper(Class<?> wrappedClass, Object data, String description,
                               String indexName, String[] attrNames, OpenType[] attrTypes)
@@ -153,7 +151,7 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
         Object[] fields = new Object[attrNames.length];
 
         for (int i = 0; i < attrNames.length; i++) {
-            fields[i] = inspector.get(obj, attrNames[i]);
+            fields[i] = ObjectInspector.get(obj, attrNames[i]);
         }
 
         try {
@@ -211,7 +209,7 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
 
         public boolean containsKey(String key) {
             for (Object obj : (Collection)data) {
-                if (key.equals(inspector.get(obj, indexName)))
+                if (key.equals(ObjectInspector.get(obj, indexName)))
                     return true;
             }
             return false;
@@ -221,14 +219,14 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
             Set<List<?>> keyset = new HashSet<List<?>>(size()*2);
 
             for (Object obj : (Collection)data)
-                keyset.add(Arrays.asList(inspector.get(obj, indexName)));
+                keyset.add(Arrays.asList(ObjectInspector.get(obj, indexName)));
 
             return keyset;
         }
 
         public Object get(String key) {
             for (Object obj : (Collection)data) {
-                if (key.equals(inspector.get(obj, indexName)))
+                if (key.equals(ObjectInspector.get(obj, indexName)))
                     return obj;
             }
             return null;
@@ -267,44 +265,6 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
             return ((Map)data).get(key);
         }
     }
-
-
-    /**
-     * Support for statistics as data sets
-     */
-//    private class StatsSetExtractor implements TabularSetExtractor {
-//
-//
-//        public int size() {
-//            return ((Stats)data).getStatistics().length;
-//        }
-//
-//        public Collection<?> values() {
-//            return Arrays.asList(((Stats)data).getStatistics());
-//        }
-//
-//        public boolean containsKey(String key) {
-//            for (String statName : ((Stats)data).getStatisticNames())
-//                if (statName.equals(key))
-//                    return true;
-//            return false;
-//        }
-//
-//        public Set<?> keySet() {
-//            String[] statNames = ((Stats)data).getStatisticNames();
-//            Set<List<?>> keyset = new HashSet<List<?>>(size()*2);
-//
-//            for (String statName : statNames) {
-//                keyset.add(Arrays.asList(statName));
-//            }
-//
-//            return keyset;
-//        }
-//
-//        public Object get(String key) {
-//            return ((Stats)data).getStatistic(key);
-//        }
-//    }
 
     // TODO toString()
 

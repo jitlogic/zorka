@@ -38,11 +38,11 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     private static boolean debug = false;
 
-    private int access;
-    private String methodName;
+    private final int access;
+    private final String methodName;
 
-    private Type[] argTypes;
-    private Type returnType;
+    private final Type[] argTypes;
+    private final Type returnType;
 
     private int retValProbeSlot = 0;   // for both returns and errors
 
@@ -52,9 +52,9 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     private int stackDelta = 0;
 
-    private Label l_try_from = new Label();
-    private Label l_try_to = new Label();
-    private Label l_try_handler = new Label();
+    private final Label lTryFrom = new Label();
+    private final Label lTryTo = new Label();
+    private final Label lTryHandler = new Label();
 
     private boolean matches;
 
@@ -120,8 +120,8 @@ public class SpyMethodVisitor extends MethodVisitor {
             }
         }
 
-        mv.visitTryCatchBlock(l_try_from, l_try_to, l_try_handler, null);
-        mv.visitLabel(l_try_from);
+        mv.visitTryCatchBlock(lTryFrom, lTryTo, lTryHandler, null);
+        mv.visitLabel(lTryFrom);
     }
 
 
@@ -153,8 +153,8 @@ public class SpyMethodVisitor extends MethodVisitor {
             return;
         }
 
-        mv.visitLabel(l_try_to);
-        mv.visitLabel(l_try_handler);
+        mv.visitLabel(lTryTo);
+        mv.visitLabel(lTryHandler);
 
         if (returnProbe != null) {
             returnProbe.emitFetchRetVal(this, Type.getType(Object.class));

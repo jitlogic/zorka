@@ -43,7 +43,6 @@ public class AgentInstance {
 
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    public static final long DEFAULT_TIMEOUT = 60000;
     private static MBeanServerRegistry mBeanServerRegistry;
 
     public synchronized static MBeanServerConnection lookupMBeanServer(String name) {
@@ -75,7 +74,6 @@ public class AgentInstance {
     }
 
 
-    private long requestTimeout = DEFAULT_TIMEOUT;
     private int requestThreads = 4;
     private int requestQueue = 64;
 
@@ -107,12 +105,6 @@ public class AgentInstance {
     public AgentInstance(Properties props, Executor executor) {
 
         this.props = props;
-
-        try {
-            requestTimeout = Long.parseLong(props.getProperty(ZORKA_REQ_TIMEOUT).trim());
-        } catch (NumberFormatException e) {
-            log.error("Invalid " + ZORKA_REQ_TIMEOUT +  " property: '" + props.getProperty(ZORKA_REQ_TIMEOUT).trim() + "'");
-        }
 
         try {
             requestThreads = Integer.parseInt(props.getProperty(ZORKA_REQ_THREADS).trim());

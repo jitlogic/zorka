@@ -41,8 +41,6 @@ public class RegexFilterProcessor implements SpyProcessor {
     private String expr = null, defval = null;
     private Boolean filterOut;
 
-    ObjectInspector inspector;
-
 
     public RegexFilterProcessor(String src, String regex) {
         this(src, regex, false);
@@ -60,7 +58,6 @@ public class RegexFilterProcessor implements SpyProcessor {
         this(src, regex, filterOut);
         this.dst = dst;
         this.expr = expr;
-        inspector = new ObjectInspector();
     }
 
 
@@ -88,7 +85,7 @@ public class RegexFilterProcessor implements SpyProcessor {
                 for (int i = 0; i < vals.length; i++) {
                     vals[i] = matcher.group(i);
                 }
-                String subst = inspector.substitute(expr, vals);
+                String subst = ObjectInspector.substitute(expr, vals);
                 record.put(dst, subst);
                 if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
                     log.debug("Processed '" + val + "' to '" + subst + "' using pattern '" + regex.pattern() + "'");

@@ -105,7 +105,7 @@ public class JmxTestUtil extends ClassLoader {
             }
         } catch (InvocationTargetException e) {
             return e.getCause();
-        } catch (Throwable e) {
+        } catch (Exception e) {
             return e;
         }
 

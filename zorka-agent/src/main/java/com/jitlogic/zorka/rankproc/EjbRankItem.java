@@ -23,14 +23,12 @@ public class EjbRankItem implements Rankable<Object> {
     private static final int BY_TIME = 1;
 
     private Object statObj;
-    private ObjectInspector inspector;
 
     private BucketAggregate byCalls, byTime;
 
 
     public EjbRankItem(Object statObj) {
         this.statObj = statObj;
-        this.inspector = new ObjectInspector();
 
         this.byCalls = new CircularBucketAggregate(BucketAggregate.SEC, 10, 60, 300, 900);
         this.byTime = new CircularBucketAggregate(BucketAggregate.SEC, 10, 60, 300, 900);
@@ -69,13 +67,13 @@ public class EjbRankItem implements Rankable<Object> {
 
 
     public String getName() {
-        return ""+inspector.get(statObj,  "name");
+        return ""+ObjectInspector.get(statObj,  "name");
     }
 
 
     public synchronized void feed(long tstamp) {
-        Object count = inspector.get(statObj, "count");
-        Object time = inspector.get(statObj, "totalTime");
+        Object count = ObjectInspector.get(statObj, "count");
+        Object time = ObjectInspector.get(statObj, "totalTime");
 
         if (count instanceof Long) {
             byCalls.feed(tstamp, (Long)count);

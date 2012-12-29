@@ -28,8 +28,6 @@ public class FileCollector implements SpyProcessor {
     private ZorkaLogLevel logLevel;
     private String tag;
 
-    private ObjectInspector inspector = new ObjectInspector();
-
     public FileCollector(FileTrapper trapper, String expr, ZorkaLogLevel logLevel, String tag) {
         this.trapper = trapper;
         this.expr = expr;
@@ -39,7 +37,7 @@ public class FileCollector implements SpyProcessor {
 
     public SpyRecord process(SpyRecord record) {
 
-        String msg = inspector.substitute(expr, record);
+        String msg = ObjectInspector.substitute(expr, record);
 
         trapper.log(logLevel, tag, msg, null);
 

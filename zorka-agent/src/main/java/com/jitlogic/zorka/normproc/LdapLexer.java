@@ -22,7 +22,7 @@ import java.util.Map;
 public class LdapLexer extends Lexer {
 
 
-    private static final byte CH_UNKNOWN     = 0;
+    //private static final byte CH_UNKNOWN     = 0;
     private static final byte CH_WHITESPACE  = 1;
     private static final byte CH_ALNUM       = 2;
     private static final byte CH_LPAREN      = 3;
@@ -44,7 +44,7 @@ public class LdapLexer extends Lexer {
     //private static final int S_ERROR      = 9; // illegal character
 
 
-    private static final Map<Character, Byte> chmap = ZorkaUtil.map(
+    private static final Map<Character, Byte> CHMAP = ZorkaUtil.map(
             '(', CH_LPAREN, ')', CH_RPAREN, '~', CH_ANGLE,
             '!', CH_EXCLAMATION, '&', CH_AMPERSAND, '|', CH_VERTBAR,
             '=', CH_EQUALS, '<', CH_ANGLE, '>', CH_ANGLE
@@ -54,8 +54,8 @@ public class LdapLexer extends Lexer {
         byte[] tab = new byte[128];
 
         for (int i = 0; i < 128; i++) {
-            if (chmap.containsKey((char)i)) {
-                tab[i] = chmap.get((char)i);
+            if (CHMAP.containsKey((char) i)) {
+                tab[i] = CHMAP.get((char)i);
             } else if (Character.isWhitespace(i)) {
                 tab[i] = CH_WHITESPACE;
             } else {

@@ -18,6 +18,7 @@ package com.jitlogic.zorka.mbeans;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.logproc.ZorkaLog;
 import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 import javax.management.openmbean.*;
 
@@ -31,15 +32,13 @@ public class TabularDataGetter implements ValGetter {
     private CompositeType rowType;
     private TabularType tableType;
 
-    private ObjectInspector inspector = new ObjectInspector();
-
     public TabularDataGetter(Object source, String typeName, String typeDesc, String indexField,
                              String[] itemNames, String[] itemDesc, OpenType[] itemTypes) {
 
         this.source = source;
         this.typeName = typeName;
         this.typeDesc = typeDesc;
-        this.itemNames = itemNames;
+        this.itemNames = ZorkaUtil.copyArray(itemNames);
 
         try {
             rowType = new CompositeType(typeName, typeDesc, itemNames, itemDesc, itemTypes);
@@ -53,12 +52,12 @@ public class TabularDataGetter implements ValGetter {
     public Object get() {
         TabularDataSupport table = new TabularDataSupport(tableType);
 
-        for (Object attr : inspector.list(source)) {
-            Object obj = inspector.get(source, attr);
+        for (Object attr : ObjectInspector.list(source)) {
+            Object obj = ObjectInspector.get(source, attr);
             Object[] values = new Object[itemNames.length];
 
             for (int i = 0; i < itemNames.length; i++) {
-                values[i] = inspector.get(obj, itemNames[i]);
+                values[i] = ObjectInspector.get(obj, itemNames[i]);
             }
 
             try {

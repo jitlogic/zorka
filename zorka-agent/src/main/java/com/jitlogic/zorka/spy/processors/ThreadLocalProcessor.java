@@ -32,8 +32,6 @@ public class ThreadLocalProcessor implements SpyProcessor {
     private int operation;
     private ThreadLocal<Object> threadLocal;
 
-    private ObjectInspector inspector = new ObjectInspector();
-
     public ThreadLocalProcessor(String key, int operation, ThreadLocal<Object> threadLocal, Object...path) {
         this.key = key;
         this.operation = operation;
@@ -45,7 +43,7 @@ public class ThreadLocalProcessor implements SpyProcessor {
     public SpyRecord process(SpyRecord record) {
         switch (operation) {
             case GET:
-                record.put(key, inspector.get(threadLocal.get(), path));
+                record.put(key, ObjectInspector.get(threadLocal.get(), path));
                 break;
             case SET:
                 threadLocal.set(record.get(key));

@@ -32,8 +32,6 @@ public class JmxAggregatingLister<T extends Rankable<?>> implements RankLister<T
     private MBeanServerConnection mbsConn;
     private String onMask;
 
-    private ObjectInspector inspector = new ObjectInspector();
-
 
     public JmxAggregatingLister(String mbsName, String onMask) {
         this.mbsConn = AgentInstance.getMBeanServerRegistry().lookup(mbsName);
@@ -49,7 +47,7 @@ public class JmxAggregatingLister<T extends Rankable<?>> implements RankLister<T
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(classLoader);
 
-        for (ObjectName on : inspector.queryNames(mbsConn, onMask)) {
+        for (ObjectName on : ObjectInspector.queryNames(mbsConn, onMask)) {
             try {
                 MBeanInfo mbi = mbsConn.getMBeanInfo(on);
                 for (MBeanAttributeInfo mba : mbi.getAttributes()) {

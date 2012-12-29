@@ -1,8 +1,6 @@
 package com.jitlogic.zorka.util;
 
 import com.jitlogic.zorka.agent.JmxObject;
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
 import com.jitlogic.zorka.mbeans.ZorkaStats;
 import com.jitlogic.zorka.spy.SpyRecord;
 
@@ -20,20 +18,30 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Tools for introspection of various objects.
+ * This utility class contains tools for introspection of various types of objects
+ * and string substutution with fields of those objects.
  *
- * TODO fix & describe get() semantics in more detail
- *
- * @author RLE <rafal.lewczuk@gmail.com>
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class ObjectInspector {
 
-    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
-
+    /** Special attribute name that will extract stack trace from throwable objects. */
     public static final String STACK_TRACE_KEY = "printStackTrace";
 
+    /** Private constructor to block instantiation of utility class. */
+    private ObjectInspector() {
+    }
 
-    public <T> T get(Object obj, Object...keys) {
+    /**
+     * Gets a chain of attributes from an object. That is, gets first attribute from obj, then
+     * gets second attribute from obtained object, then gets third attribute from second obtained object etc.
+     *
+     * @param obj source object
+     * @param keys chain of attribute names
+     * @param <T> result type
+     * @return final result
+     */
+    public static <T> T get(Object obj, Object...keys) {
         Object cur = obj;
 
         for (Object key : keys) {
@@ -55,7 +63,7 @@ public class ObjectInspector {
      *
      * @return attribute value or null if no matching attribute has been found
      */
-    private Object getAttr(Object obj, Object key) {
+    private static Object getAttr(Object obj, Object key) {
         if (obj == null) {
             return null;
         }
@@ -73,12 +81,12 @@ public class ObjectInspector {
                 method = lookupMethod((Class)obj, name);
             }
 
-            return fetchViaMethod(obj, clazz, method);
+            return fetchViaMethod(obj, method);
         }
 
         if (key instanceof String && key.toString().startsWith(".")) {
             // Explicit field accesses for attributes starting with '.'
-            return fetchFieldVal(obj, clazz, key.toString().substring(1));
+            return fetchFieldVal(obj, key.toString().substring(1));
         }
 
         if (obj instanceof Throwable && STACK_TRACE_KEY.equals(key)) {
@@ -110,7 +118,7 @@ public class ObjectInspector {
                     return m.invoke(obj, key);
                 }
             } catch (Exception e) {
-                log.error("Error invoking getStatistic('" + key + "')", e);
+                //log.error("Error invoking getStatistic('" + key + "')", e);
             }
         } else if (obj instanceof JmxObject) {
             return ((JmxObject)obj).get(key);
@@ -142,10 +150,10 @@ public class ObjectInspector {
             }
 
             if (method != null) {
-                return fetchViaMethod(obj, clazz, method);
+                return fetchViaMethod(obj, method);
             }
 
-            return fetchFieldVal(obj, clazz, name);
+            return fetchFieldVal(obj, name);
         }
 
         return null;
@@ -154,10 +162,11 @@ public class ObjectInspector {
 
     /**
      * Lists attributes of an object. Depending on object type,
-     * @param obj
-     * @return
+     *
+     * @param obj source object
+     * @return list of attributes (can be used to obtain their values)
      */
-    public List<?> list(Object obj) {
+    public static List<?> list(Object obj) {
         List<String> lst = new ArrayList<String>();
         if (obj instanceof Map) {
             for (Object key : ((Map<?,?>)obj).keySet()) {
@@ -194,7 +203,7 @@ public class ObjectInspector {
                     return Arrays.asList((Object[])m.invoke(obj));
                 }
             } catch (Exception e) {
-                log.error("Error invoking getStatisticNames()", e);
+                //log.error("Error invoking getStatisticNames()", e);
             }
         } else if (obj instanceof JmxObject) {
             try {
@@ -203,7 +212,7 @@ public class ObjectInspector {
                     lst.add(mba.getName());
                 }
             } catch (Exception e) {
-                log.error("Error fetching object attributes.");
+                //log.error("Error fetching object attributes.");
             }
         }
 
@@ -213,7 +222,14 @@ public class ObjectInspector {
     }
 
 
-    private Object fetchViaMethod(Object obj, Class<?> clazz, Method method) {
+    /**
+     * Fetches attribute value by calling getter method.
+     *
+     * @param obj source object
+     * @param method target method (method object)
+     * @return result of calling target method
+     */
+    private static Object fetchViaMethod(Object obj, Method method) {
         if (method != null) {
             try {
                 if (Modifier.isStatic(method.getModifiers())) {
@@ -221,7 +237,7 @@ public class ObjectInspector {
                 }
                 return method.invoke(obj);
             } catch (Exception e) {
-                log.error("Method '" + method.getName() + "' invocation failed", e);
+                //log.error("Method '" + method.getName() + "' invocation failed", e);
                 return null;
             }
         }
@@ -229,8 +245,18 @@ public class ObjectInspector {
     }
 
 
-    private Object fetchFieldVal(Object obj, Class<?> clazz, String name) {
+    /**
+     * Fetches attribute value by accessing field directly (and unlocking it
+     * for a moment if this is private field).
+     *
+     *
+     * @param obj source object
+     * @param name field name
+     * @return obtained value
+     */
+    private static Object fetchFieldVal(Object obj, String name) {
         try {
+            Class<?> clazz = obj.getClass();
             name = name.startsWith(".") ? name.substring(1) : name;
             Field field = lookupField(clazz, name);
             if (field == null && obj instanceof Class) {
@@ -245,12 +271,19 @@ public class ObjectInspector {
             if (!accessible) field.setAccessible(accessible);
             return ret;
         } catch (Exception e) {
-            log.error("Field '" + name + "' fetch failed", e);
+            //log.error("Field '" + name + "' fetch failed", e);
             return null;
         }
     }
 
-    public Field lookupField(Class<?> clazz, String name) {
+    /**
+     * Lookf for field of given name.
+     *
+     * @param clazz class of inspected object
+     * @param name field name
+     * @return field object of null if no such field exists
+     */
+    public static Field lookupField(Class<?> clazz, String name) {
         try {
             return clazz.getDeclaredField(name);
         } catch (NoSuchFieldException e) {
@@ -259,7 +292,15 @@ public class ObjectInspector {
     }
 
 
-    public Method lookupMethod(Class<?> clazz, String name) {
+    /**
+     * Looks for method identified with given name. It also recursively inspects all
+     * interfaces that given class implements.
+     *
+     * @param clazz class of inspected object
+     * @param name method name
+     * @return method object of null if no such method exists
+     */
+    public static Method lookupMethod(Class<?> clazz, String name) {
         try {
             return name != null ? clazz.getMethod(name) : null;
         } catch (NoSuchMethodException e) {
@@ -280,8 +321,15 @@ public class ObjectInspector {
         return null;
     }
 
+    /**
+     * Queries mbean server for all objects matching given query string.
+     *
+     * @param conn mbean server connection
+     * @param query query string
+     * @return set of object names (possibly empty set if no matching names have been found or error occured)
+     */
     @SuppressWarnings("unchecked")
-    public Set<ObjectName> queryNames(MBeanServerConnection conn, String query) {
+    public static Set<ObjectName> queryNames(MBeanServerConnection conn, String query) {
         try {
             ObjectName on = new ObjectName(query);
             return (Set<ObjectName>)conn.queryNames(on, null);
@@ -292,10 +340,21 @@ public class ObjectInspector {
     }
 
 
+    /** Regular expression for identifying substitution markers in strings. Used by substitute() methods. */
     public static final Pattern reVarSubstPattern = Pattern.compile("\\$\\{([^\\}]+)\\}");
 
 
-    public String substitute(String input, SpyRecord record) {
+    /**
+     * Substitutes marked variables in a string with record fields. Variables are marked with
+     * '${FIELD.attr1.attr2...}'. Fields are resolved directly from records passed as second
+     * parameter, subsequent attribute chains are used to obtain subsequent values as in
+     * ObjectInspector.get() method.
+     *
+     * @param input input (template) string
+     * @param record spy record to be substituted
+     * @return string with substitutions filled with values from record
+     */
+    public static String substitute(String input, SpyRecord record) {
         Matcher m = reVarSubstPattern.matcher(input);
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
@@ -314,7 +373,17 @@ public class ObjectInspector {
     }
 
 
-    public String substitute(String input, Object[] vals) {
+    /**
+     * Substitutes marked variables in a string with values from array. Variables are marked with
+     * '${N.attr1.attr2...}'. Values are resolved directly from array passed as second
+     * parameter, subsequent attribute chains are used to obtain subsequent values as in
+     * ObjectInspector.get() method.
+     *
+     * @param input input (template) string
+     * @param vals array of values
+     * @return string with substitutions filled with values from record
+     */
+    public static String substitute(String input, Object[] vals) {
         Matcher m = reVarSubstPattern.matcher(input);
         StringBuffer sb = new StringBuffer();
         while (m.find()) {

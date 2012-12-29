@@ -24,12 +24,8 @@ import com.jitlogic.zorka.logproc.ZorkaLogger;
  */
 public class ZabbixCollector implements SpyProcessor {
 
-    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
-
-    private ZabbixTrapper trapper;
-    private String expr, host, key;
-
-    private ObjectInspector inspector = new ObjectInspector();
+    private final ZabbixTrapper trapper;
+    private final String expr, host, key;
 
     public ZabbixCollector(ZabbixTrapper trapper, String expr, String host, String key) {
         this.trapper = trapper;
@@ -40,7 +36,7 @@ public class ZabbixCollector implements SpyProcessor {
 
     public SpyRecord process(SpyRecord record) {
 
-        String data = inspector.substitute(expr, record);
+        String data = ObjectInspector.substitute(expr, record);
 
         if (host != null) {
             trapper.send(host, key, data);
