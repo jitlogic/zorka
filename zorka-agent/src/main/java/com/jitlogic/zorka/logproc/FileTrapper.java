@@ -41,13 +41,13 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
     private String currentSuffix = null;
 
 
-    public static FileTrapper rolling(ZorkaLogLevel logLevel, String path, int count, long size, boolean logExceptions) {
-        return new FileTrapper(new File(path), ROLLING, count, size, logExceptions);
+    public static FileTrapper rolling(ZorkaLogLevel logLevel, String logPath, int maxLogs, long maxSize, boolean logExceptions) {
+        return new FileTrapper(new File(logPath), ROLLING, maxLogs, maxSize, logExceptions);
     }
 
 
-    public static FileTrapper daily(ZorkaLogLevel logLevel, String path, boolean logExceptions) {
-        return new FileTrapper(new File(path), DATED, 0, Long.MAX_VALUE, logExceptions);
+    public static FileTrapper daily(ZorkaLogLevel logLevel, String logPath, boolean logExceptions) {
+        return new FileTrapper(new File(logPath), DATED, 0, Long.MAX_VALUE, logExceptions);
     }
 
 
@@ -60,54 +60,6 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
         this.logExceptions = logExceptions;
     }
 
-
-    public void logTrace(String tag, String message, Object...args) {
-        logTrace(tag, message,  null, args);
-    }
-
-    public void logTrace(String tag, String message, Throwable e, Object...args) {
-        log(ZorkaLogLevel.TRACE, tag, message,  e, args);
-    }
-
-    public void logDebug(String tag, String message, Object...args) {
-        logDebug(tag, message,  null, args);
-    }
-
-    public void logDebug(String tag, String message, Throwable e, Object...args) {
-        log(ZorkaLogLevel.DEBUG, tag, message,  e, args);
-    }
-
-    public void logInfo(String tag, String message, Object...args) {
-        logInfo(tag, message,  null, args);
-    }
-
-    public void logInfo(String tag, String message, Throwable e, Object...args) {
-        log(ZorkaLogLevel.INFO, tag, message,  e, args);
-    }
-
-    public void logWarn(String tag, String message, Object...args) {
-        logWarn(tag, message,  null, args);
-    }
-
-    public void logWarn(String tag, String message, Throwable e, Object...args) {
-        log(ZorkaLogLevel.WARN, tag, message,  e, args);
-    }
-
-    public void logError(String tag, String message, Object...args) {
-        logError(tag, message,  null, args);
-    }
-
-    public void logError(String tag, String message, Throwable e, Object...args) {
-        log(ZorkaLogLevel.ERROR, tag, message,  e, args);
-    }
-
-    public void logFatal(String tag, String message, Object...args) {
-        logFatal(tag, message,  null, args);
-    }
-
-    public void logFatal(String tag, String message, Throwable e, Object...args) {
-        log(ZorkaLogLevel.FATAL, tag, message,  e, args);
-    }
 
     public void log(ZorkaLogLevel logLevel, String tag, String message, Throwable e, Object... args) {
         StringBuilder sb = new StringBuilder();
@@ -258,7 +210,7 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
         }
     }
 
-    public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e) {
+    public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e, Object... args) {
         log(logLevel, tag, msg, e);
     }
 }

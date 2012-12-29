@@ -85,10 +85,10 @@ public class SyslogLib {
     }
 
 
-    public SyslogTrapper trapper(String id, String syslogServer, String defaultHost) {
+    public SyslogTrapper trapper(String id, String syslogServer, String defaultHost, int defaultFacility) {
         SyslogTrapper trapper = trappers.get(id);
         if (trapper == null) {
-            trapper = new SyslogTrapper(syslogServer, defaultHost);
+            trapper = new SyslogTrapper(syslogServer, defaultHost, defaultFacility);
             trappers.put(id, trapper);
             trapper.start();
         }

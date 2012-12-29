@@ -24,7 +24,7 @@ public class SyslogIntegTest extends ZorkaFixture {
 
     @Test
     public void testTrivialSyslog() throws Exception{
-        SyslogTrapper trapper = syslogLib.trapper("test", "127.0.0.1", "test");
+        SyslogTrapper trapper = syslogLib.trapper("test", "127.0.0.1", "test", SyslogLib.F_LOCAL0);
         trapper.log(SyslogLib.S_ERROR, SyslogLib.F_LOCAL5, "test", "Some test message.");
         Thread.sleep(10);
     }

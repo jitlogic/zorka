@@ -379,7 +379,7 @@ public class ZorkaLib  {
             ex = (Throwable)args[args.length-1];
             args = ZorkaUtil.clipArray(args, -1);
         }
-        logger.log("<script>", level, message, ex, args);
+        logger.log(level, "<script>", message, ex, args);
     }
 
 

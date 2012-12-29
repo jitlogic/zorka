@@ -30,32 +30,32 @@ public class ZorkaLog {
     }
 
 	public void trace(String msg, Object...args) {
-		output.log(tag, ZorkaLogLevel.TRACE, msg, null, args);
+		output.log(ZorkaLogLevel.TRACE, tag, msg, null, args);
 	}
 
 
 	public void debug(String msg, Object...args) {
-        output.log(tag, ZorkaLogLevel.DEBUG, msg, null, args);
+        output.log( ZorkaLogLevel.DEBUG, tag, msg, null, args);
 	}
 
 
 	public void info(String msg, Object...args) {
-        output.log(tag, ZorkaLogLevel.INFO, msg, null, args);
+        output.log(ZorkaLogLevel.INFO, tag, msg, null, args);
 	}
 
 
 	public void warn(String msg, Object...args) {
-        output.log(tag, ZorkaLogLevel.WARN, msg, null, args);
+        output.log(ZorkaLogLevel.WARN, tag, msg, null, args);
 	}
 
 
 	public void error(String msg, Object...args) {
-        output.log(tag, ZorkaLogLevel.ERROR, msg, null, args);
+        output.log(ZorkaLogLevel.ERROR, tag, msg, null, args);
 	}
 	
 	
 	public void error(String msg, Throwable e, Object args) {
-        output.log(tag, ZorkaLogLevel.ERROR, msg, e, args);
+        output.log(ZorkaLogLevel.ERROR, tag, msg, e, args);
 	}
 
 }

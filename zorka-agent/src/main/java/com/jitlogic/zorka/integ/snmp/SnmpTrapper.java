@@ -116,7 +116,7 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
     }
 
 
-    public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e) {
+    public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e, Object... args) {
         // TODO implement this using some "standardized" OID
     }
 }

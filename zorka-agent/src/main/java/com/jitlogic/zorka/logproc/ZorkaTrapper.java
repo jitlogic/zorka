@@ -18,6 +18,6 @@ package com.jitlogic.zorka.logproc;
 
 public interface ZorkaTrapper {
 
-    public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e);
+    public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e, Object... args);
 
 }
