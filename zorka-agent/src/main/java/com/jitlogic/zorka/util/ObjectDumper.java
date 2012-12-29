@@ -18,6 +18,8 @@
 package com.jitlogic.zorka.util;
 
 import com.jitlogic.zorka.agent.JmxObject;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 import com.jitlogic.zorka.mbeans.ZorkaStat;
 import com.jitlogic.zorka.mbeans.ZorkaStats;
 

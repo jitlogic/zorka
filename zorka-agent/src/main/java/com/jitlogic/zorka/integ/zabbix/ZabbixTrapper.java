@@ -16,11 +16,11 @@
 
 package com.jitlogic.zorka.integ.zabbix;
 
-import com.jitlogic.zorka.integ.ZorkaTrapper;
-import com.jitlogic.zorka.util.ZorkaAsyncThread;
-import com.jitlogic.zorka.util.Base64;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogLevel;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaTrapper;
+import com.jitlogic.zorka.util.*;
 
 import java.io.OutputStream;
 import java.net.Socket;
@@ -96,7 +96,7 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
         log.error(msg, e);
     }
 
-    public void trap(String tag, String msg, Throwable e) {
+    public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e) {
         send(defaultItem, tag + " " + msg);
     }
 }

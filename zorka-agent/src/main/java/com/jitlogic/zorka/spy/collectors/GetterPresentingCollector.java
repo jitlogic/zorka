@@ -23,8 +23,8 @@ import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 
 
 /**

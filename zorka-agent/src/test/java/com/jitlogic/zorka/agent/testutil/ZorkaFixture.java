@@ -21,7 +21,7 @@ import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.syslog.SyslogLib;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyLib;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 
 import org.junit.After;
 import org.junit.Before;

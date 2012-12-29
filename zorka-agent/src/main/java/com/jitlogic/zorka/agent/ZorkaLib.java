@@ -22,7 +22,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.*;
 
-import com.jitlogic.zorka.integ.FileTrapper;
+import com.jitlogic.zorka.logproc.FileTrapper;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogLevel;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 import com.jitlogic.zorka.rankproc.*;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
@@ -58,10 +61,6 @@ public class ZorkaLib  {
 
     private String hostname = null;
 
-    private static final int JMX2ARGS = 2;
-    private static final int JMX3ARGS = 3;
-    private static final int JMX5ARGS = 5;
-
     private static final int MINUTE = 60000;
     private static final int SECOND = 1000;
 
@@ -88,7 +87,7 @@ public class ZorkaLib  {
 
 	public List<Object> jmxList(List<Object> args) {
 		List<Object> objs = new ArrayList<Object>();
-		if (args.size() < JMX2ARGS) {
+		if (args.size() < 2) {
 			log.error("Zorka JMX function takes at least 2 arguments.");
 			return objs;
 		}
@@ -101,7 +100,7 @@ public class ZorkaLib  {
         ClassLoader cl0 = Thread.currentThread().getContextClassLoader(), cl1 = mbsRegistry.getClassLoader(conname);
 
         Set<ObjectName> names = inspector.queryNames(conn, args.get(1).toString());
-		if (args.size() == JMX2ARGS) {
+		if (args.size() == 2) {
 			for (ObjectName name : names) {
 				objs.add(new JmxObject(name, conn, cl1));
 			}
@@ -121,7 +120,7 @@ public class ZorkaLib  {
 						+ "' from '" + conname + "|" + name + "'", e);
 				}
 
-				if (args.size() > JMX3ARGS) {
+				if (args.size() > 3) {
 					for (Object arg : args.subList(3, args.size())) {
 						obj = inspector.get(obj, arg);
 					}
@@ -152,7 +151,7 @@ public class ZorkaLib  {
 
         List<Object> argList = Arrays.asList(args);
 
-		if (argList.size() < JMX2ARGS) {
+		if (argList.size() < 2) {
 			log.error("zorka.jmx() function requires at least 2 arguments");
 			return null;
 		}
@@ -199,7 +198,7 @@ public class ZorkaLib  {
             }
         }
 		
-		if (argList.size() > JMX3ARGS && obj != null) {
+		if (argList.size() > 3 && obj != null) {
 			for (Object arg : argList.subList(3, argList.size())) {
 				obj = inspector.get(obj, arg);
 			}
@@ -324,7 +323,7 @@ public class ZorkaLib  {
 
     public Double rate(Object...args) {
 
-        if (args.length < JMX5ARGS) {
+        if (args.length < 5) {
             log.error("Too little arguments for zorka.rate(). At least 5 args are required");
             return null;
         }

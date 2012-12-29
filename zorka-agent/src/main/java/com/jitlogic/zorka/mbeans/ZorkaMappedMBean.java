@@ -37,8 +37,8 @@ import javax.management.openmbean.OpenMBeanAttributeInfoSupport;
 import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularType;
 
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 
 // TODO proper structure for supporting parallelism (in somewhat more elegant way)
 

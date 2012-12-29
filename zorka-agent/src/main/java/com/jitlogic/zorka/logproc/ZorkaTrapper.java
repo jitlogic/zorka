@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License along with
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.integ;
+package com.jitlogic.zorka.logproc;
 
 public interface ZorkaTrapper {
 
-    public void trap(String tag, String msg, Throwable e);
+    public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e);
 
 }

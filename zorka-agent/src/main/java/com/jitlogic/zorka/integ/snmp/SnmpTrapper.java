@@ -16,10 +16,10 @@
 package com.jitlogic.zorka.integ.snmp;
 
 import com.jitlogic.contrib.libsnmp.*;
-import com.jitlogic.zorka.integ.ZorkaTrapper;
+import com.jitlogic.zorka.logproc.ZorkaTrapper;
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLogLevel;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -116,7 +116,7 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
     }
 
 
-    public void trap(String tag, String msg, Throwable e) {
+    public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e) {
         // TODO implement this using some "standardized" OID
     }
 }

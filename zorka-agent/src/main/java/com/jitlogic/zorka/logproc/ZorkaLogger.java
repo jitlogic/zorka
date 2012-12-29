@@ -1,8 +1,9 @@
-package com.jitlogic.zorka.util;
+package com.jitlogic.zorka.logproc;
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.integ.syslog.SyslogLib;
 import com.jitlogic.zorka.integ.syslog.SyslogTrapper;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.io.*;
 import java.util.Date;

@@ -20,16 +20,14 @@ package com.jitlogic.zorka.agent;
 import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.Executor;
 
 import com.jitlogic.zorka.util.ObjectDumper;
-import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLog;
 
 import bsh.EvalError;
 import bsh.Interpreter;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 
 public class ZorkaBshAgent {
 

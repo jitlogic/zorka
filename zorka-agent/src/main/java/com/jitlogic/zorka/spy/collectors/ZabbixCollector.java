@@ -1,12 +1,11 @@
 package com.jitlogic.zorka.spy.collectors;
 
 import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
-import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>

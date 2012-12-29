@@ -25,8 +25,8 @@ import com.jitlogic.zorka.normproc.NormLib;
 import com.jitlogic.zorka.spy.MainSubmitter;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyLib;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 import com.jitlogic.zorka.integ.zabbix.ZabbixAgent;
 
 import javax.management.MBeanServerConnection;

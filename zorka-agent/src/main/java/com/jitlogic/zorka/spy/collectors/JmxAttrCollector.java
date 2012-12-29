@@ -25,8 +25,8 @@ import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -15,11 +15,11 @@
  */
 package com.jitlogic.zorka.spy.collectors;
 
-import com.jitlogic.zorka.integ.FileTrapper;
+import com.jitlogic.zorka.logproc.FileTrapper;
 import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.util.ZorkaLogLevel;
+import com.jitlogic.zorka.logproc.ZorkaLogLevel;
 
 public class FileCollector implements SpyProcessor {
 
@@ -41,7 +41,7 @@ public class FileCollector implements SpyProcessor {
 
         String msg = inspector.substitute(expr, record);
 
-        trapper.log(tag, logLevel, msg, null);
+        trapper.log(logLevel, tag, msg, null);
 
         return record;
     }

@@ -1,14 +1,14 @@
 package com.jitlogic.zorka.util;
 
 import com.jitlogic.zorka.agent.JmxObject;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 import com.jitlogic.zorka.mbeans.ZorkaStats;
-import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.spy.SpyRecord;
 
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;

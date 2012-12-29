@@ -15,9 +15,10 @@
  */
 package com.jitlogic.zorka.integ.syslog;
 
-import com.jitlogic.zorka.integ.ZorkaTrapper;
+import com.jitlogic.zorka.logproc.ZorkaTrapper;
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLogLevel;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.io.IOException;
@@ -123,7 +124,7 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
     }
 
 
-    public void trap(String tag, String msg, Throwable e) {
+    public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e) {
         if (e == null) {
             log(defaultSeverity, defaultFacility, tag, msg);
         } else {

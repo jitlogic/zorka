@@ -17,8 +17,8 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.integ.ZorkaTrapper;
-import com.jitlogic.zorka.integ.FileTrapper;
+import com.jitlogic.zorka.logproc.ZorkaTrapper;
+import com.jitlogic.zorka.logproc.FileTrapper;
 import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
 import com.jitlogic.zorka.integ.snmp.TrapVarBindDef;
@@ -29,7 +29,7 @@ import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.probes.*;
 import com.jitlogic.zorka.spy.processors.*;
 import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.util.ZorkaLogLevel;
+import com.jitlogic.zorka.logproc.ZorkaLogLevel;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.*;

@@ -19,8 +19,8 @@ package com.jitlogic.zorka.spy.collectors;
 
 import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

@@ -1,15 +1,12 @@
 package com.jitlogic.zorka.agent.unittest;
 
 import com.jitlogic.zorka.agent.JmxObject;
-import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testutil.*;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 
-import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,8 +16,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.jitlogic.zorka.spy.SpyLib.*;
 
 import static org.junit.Assert.*;
 
