@@ -17,10 +17,9 @@ package com.jitlogic.zorka.normproc;
 
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 
 public abstract class Lexer implements Iterable<Token>, Iterator<Token> {
 
@@ -39,10 +38,37 @@ public abstract class Lexer implements Iterable<Token>, Iterator<Token> {
     protected final static int E = -127;
 
 
+    protected static Map<String,Set<String>> readKeywordFile(String path) {
+
+        Properties props = new Properties();
+        InputStream is = Lexer.class.getResourceAsStream(path);
+
+        if (is != null) {
+            try {
+                props.load(is);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    is.close();
+                } catch (IOException e) { }
+            }
+        }
+
+        Map<String,Set<String>> kwmap = new HashMap<String, Set<String>>();
+
+        for (Object name : props.keySet()) {
+            kwmap.put(name.toString(), strSet(props.getProperty(name.toString()).split("\\,")));
+        }
+
+        return Collections.unmodifiableMap(kwmap);
+    }
+
+
     protected static Set<String> strSet(String...strings) {
         Set<String> set = new HashSet<String>(strings.length * 2 + 1);
         for (String s : strings) {
-            set.add(s.toLowerCase());
+            set.add(s.trim().toLowerCase());
         }
 
         return Collections.unmodifiableSet(set);

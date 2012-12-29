@@ -38,12 +38,12 @@ import com.jitlogic.zorka.util.*;
  */
 public class ZorkaLib  {
 
-    public final ZorkaLogLevel TRACE = ZorkaLogLevel.TRACE;
-    public final ZorkaLogLevel DEBUG = ZorkaLogLevel.DEBUG;
-    public final ZorkaLogLevel INFO  = ZorkaLogLevel.INFO;
-    public final ZorkaLogLevel WARN  = ZorkaLogLevel.WARN;
-    public final ZorkaLogLevel ERROR = ZorkaLogLevel.ERROR;
-    public final ZorkaLogLevel FATAL = ZorkaLogLevel.FATAL;
+    public static final ZorkaLogLevel TRACE = ZorkaLogLevel.TRACE;
+    public static final ZorkaLogLevel DEBUG = ZorkaLogLevel.DEBUG;
+    public static final ZorkaLogLevel INFO  = ZorkaLogLevel.INFO;
+    public static final ZorkaLogLevel WARN  = ZorkaLogLevel.WARN;
+    public static final ZorkaLogLevel ERROR = ZorkaLogLevel.ERROR;
+    public static final ZorkaLogLevel FATAL = ZorkaLogLevel.FATAL;
 
 	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
     private final ZorkaLogger logger = ZorkaLogger.getLogger();
@@ -58,6 +58,12 @@ public class ZorkaLib  {
 
     private String hostname = null;
 
+    private static final int JMX2ARGS = 2;
+    private static final int JMX3ARGS = 3;
+    private static final int JMX5ARGS = 5;
+
+    private static final int MINUTE = 60000;
+    private static final int SECOND = 1000;
 
     public ZorkaLib(ZorkaBshAgent agent) {
 		this.agent = agent;
@@ -82,7 +88,7 @@ public class ZorkaLib  {
 
 	public List<Object> jmxList(List<Object> args) {
 		List<Object> objs = new ArrayList<Object>();
-		if (args.size() < 2) {
+		if (args.size() < JMX2ARGS) {
 			log.error("Zorka JMX function takes at least 2 arguments.");
 			return objs;
 		}
@@ -95,7 +101,7 @@ public class ZorkaLib  {
         ClassLoader cl0 = Thread.currentThread().getContextClassLoader(), cl1 = mbsRegistry.getClassLoader(conname);
 
         Set<ObjectName> names = inspector.queryNames(conn, args.get(1).toString());
-		if (args.size() == 2) {
+		if (args.size() == JMX2ARGS) {
 			for (ObjectName name : names) {
 				objs.add(new JmxObject(name, conn, cl1));
 			}
@@ -115,7 +121,7 @@ public class ZorkaLib  {
 						+ "' from '" + conname + "|" + name + "'", e);
 				}
 
-				if (args.size() > 3) {
+				if (args.size() > JMX3ARGS) {
 					for (Object arg : args.subList(3, args.size())) {
 						obj = inspector.get(obj, arg);
 					}
@@ -146,7 +152,7 @@ public class ZorkaLib  {
 
         List<Object> argList = Arrays.asList(args);
 
-		if (argList.size() < 2) {
+		if (argList.size() < JMX2ARGS) {
 			log.error("zorka.jmx() function requires at least 2 arguments");
 			return null;
 		}
@@ -176,8 +182,9 @@ public class ZorkaLib  {
 		
 		Object obj = null;
 		try {
-            if (cl1 != null)
+            if (cl1 != null) {
                 Thread.currentThread().setContextClassLoader(cl1);
+            }
 			obj = conn.getAttribute(name, argList.get(2).toString());
 		} catch (AttributeNotFoundException e) {
 			log.error("Object '" + conname + "|" + name + 
@@ -187,11 +194,12 @@ public class ZorkaLib  {
 			log.error("Error getting attribute '" + argList.get(2)
 				+ "' from '" + conname + "|" + name + "'", e);
 		} finally {
-            if (cl1 != null)
+            if (cl1 != null) {
                 Thread.currentThread().setContextClassLoader(cl0);
+            }
         }
 		
-		if (argList.size() > 3 && obj != null) {
+		if (argList.size() > JMX3ARGS && obj != null) {
 			for (Object arg : argList.subList(3, argList.size())) {
 				obj = inspector.get(obj, arg);
 			}
@@ -201,10 +209,10 @@ public class ZorkaLib  {
 	} // jmx()
 
 
-    // TODO expand ls() functionality to filter over all arguments usign regex;
-    // TODO converge zorka.ls() and zabbix.discover() call conventions
-    // TODO converge zorka.jmxList() and zorka.list()
-    // TODO split zorka.ls() into zorka.ls() [returning list of strings] and zorka.list() [returning list of lists]
+    // TODO expand ls functionality to filter over all arguments usign regex;
+    // TODO converge zorka.ls and zabbix.discover call conventions
+    // TODO converge zorka.jmxList and zorka.list
+    // TODO split zorka.ls into zorka.ls [returning list of strings] and zorka.list() [returning list of lists]
     public String ls(String mbsName, String objectMask, Object...args) {
         MBeanServerConnection conn = mbsRegistry.lookup(mbsName);
 
@@ -247,7 +255,7 @@ public class ZorkaLib  {
                         rslt.add(path + attr + " -> " + inspector.get(obj, attr));
                     }
 
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     log.error("Cannot resolve '" + name + "." + args[0], e);
                 }
             }
@@ -271,10 +279,7 @@ public class ZorkaLib  {
      * @return
      */
 	public Object get(Object obj, Object...args) {
-		for (Object arg : args) {
-			obj = inspector.get(obj, arg);
-		}
-		return obj;
+        return inspector.get(obj, args);
 	}
 	
 	
@@ -319,7 +324,7 @@ public class ZorkaLib  {
 
     public Double rate(Object...args) {
 
-        if (args.length < 5) {
+        if (args.length < JMX5ARGS) {
             log.error("Too little arguments for zorka.rate(). At least 5 args are required");
             return null;
         }
@@ -328,9 +333,9 @@ public class ZorkaLib  {
         long horizon = 0;
 
         if (oh instanceof String && ((String) oh).matches("^AVG[0-9]+$")) {
-            horizon = Long.parseLong(oh.toString().substring(3)) * 60000;
+            horizon = Long.parseLong(oh.toString().substring(3)) * MINUTE;
         } else {
-            horizon = rateCounter.coerce(args[args.length-1]) * 1000;
+            horizon = rateCounter.coerce(args[args.length-1]) * SECOND;
         }
 
         if (horizon == 0) {
@@ -341,13 +346,7 @@ public class ZorkaLib  {
         String div = (String)args[args.length-2];
         String nom = (String)args[args.length-3];
 
-        List<Object> path = new ArrayList<Object>(args.length+2);
-
-        for (int i = 0; i < args.length-3; i++) {
-            path.add(args[i]);
-        }
-
-        return rateCounter.get(path, nom, div, horizon);
+        return rateCounter.get(Arrays.asList(ZorkaUtil.clipArray(args, args.length-3)), nom, div, horizon);
     }
 
 
@@ -374,8 +373,9 @@ public class ZorkaLib  {
     }
 
 
-    private void log(ZorkaLogLevel level, String message, Object...args) {
+    private void log(ZorkaLogLevel level, String message, Object...argv) {
         Throwable ex = null;
+        Object[] args = argv;
         if (args.length > 0 && args[args.length-1] instanceof Throwable) {
             ex = (Throwable)args[args.length-1];
             args = ZorkaUtil.clipArray(args, -1);
