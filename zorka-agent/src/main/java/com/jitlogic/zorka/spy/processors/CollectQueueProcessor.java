@@ -16,8 +16,8 @@
 package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.*;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.concurrent.LinkedBlockingQueue;
@@ -54,10 +54,12 @@ public class CollectQueueProcessor implements SpyProcessor, Runnable {
                 submitted = procQueue.offer(rec, 0, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) { }
 
-        if (submitted) {
-            submittedRecords++;
-        } else {
-            droppedRecords++;
+        synchronized(this) {
+            if (submitted) {
+                submittedRecords++;
+            } else {
+                droppedRecords++;
+            }
         }
 
         return record;
@@ -81,7 +83,7 @@ public class CollectQueueProcessor implements SpyProcessor, Runnable {
                 if (null == (record = processor.process(record))) {
                     break;
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 log.error("Error transforming record: " + record + " (on processor " + processor + ")", e);
                 break;
             }

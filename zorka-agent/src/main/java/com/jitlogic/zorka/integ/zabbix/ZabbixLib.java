@@ -26,8 +26,6 @@ public class ZabbixLib {
     private ZorkaBshAgent bshAgent;
     private ZorkaLib zorkaLib;
 
-    private ObjectInspector inspector = new ObjectInspector();
-
     private Map<String,ZabbixTrapper> trappers = new ConcurrentHashMap<String, ZabbixTrapper>();
 
     public ZabbixLib(ZorkaBshAgent bshAgent, ZorkaLib zorkaLib) {
@@ -102,9 +100,9 @@ public class ZabbixLib {
                 if (dstObj == null) continue;
 
                 if (pathItem.startsWith("~")) {
-                    for (Object attr : inspector.list(srcObj)) {
+                    for (Object attr : ObjectInspector.list(srcObj)) {
                         if (attr != null && attr.toString().matches(pathItem.substring(1))) {
-                            Object obj = inspector.get(srcObj, attr);
+                            Object obj = ObjectInspector.get(srcObj, attr);
                             if (obj != null) {
                                 JSONObject dsr = pathAttr == null ? dstObj
                                         : extend(dstObj, pathAttr, attr.toString());
@@ -113,7 +111,7 @@ public class ZabbixLib {
                         }
                     }
                 } else {
-                    Object obj = inspector.get(srcObj, pathItem);
+                    Object obj = ObjectInspector.get(srcObj, pathItem);
                     if (obj != null) {
                         JSONObject dsr = pathAttr == null ? dstObj
                             : extend(dstObj, pathAttr, pathItem);

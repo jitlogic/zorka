@@ -37,9 +37,9 @@ public class ThreadRankItem implements Rankable<ThreadRankInfo> {
 
         switch (metric) {
             case BY_CPU:
-                return 100.0 * byCpuTime.getDeltaV(tstamp, average) / byCpuTime.getWindow(average);
+                return 100.0 * byCpuTime.getDeltaV(average, tstamp) / byCpuTime.getWindow(average);
             case BY_BLOCK:
-                return 100.0 * byBlockedTime.getDeltaV(tstamp, average) / byBlockedTime.getWindow(average);
+                return 100.0 * byBlockedTime.getDeltaV(average, tstamp) / byBlockedTime.getWindow(average);
         }
 
         return 0.0;

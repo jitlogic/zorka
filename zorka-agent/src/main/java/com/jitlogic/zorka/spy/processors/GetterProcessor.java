@@ -20,8 +20,8 @@ import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 
 import static com.jitlogic.zorka.spy.SpyLib.SPD_ARGPROC;
 
@@ -34,7 +34,6 @@ public class GetterProcessor implements SpyProcessor {
 
     private String src, dst;
     private Object[] path;
-    private ObjectInspector inspector = new ObjectInspector();
 
 
     public GetterProcessor(String src, String dst, Object... path) {
@@ -44,14 +43,7 @@ public class GetterProcessor implements SpyProcessor {
 
 
     public SpyRecord process(SpyRecord record) {
-        Object val = record.get(src);
-
-        for (Object obj : path) {
-            if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
-                log.debug("Descending into '" + obj + "' of '" + val + "' ...");
-            }
-            val = inspector.get(val, obj);
-        }
+        Object val = ObjectInspector.get(record.get(src), path);
 
         if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
             log.debug("Final result: '" + val + "' stored to slot " + dst);

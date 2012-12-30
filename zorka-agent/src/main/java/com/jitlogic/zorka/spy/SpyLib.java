@@ -17,8 +17,8 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.integ.ZorkaTrapper;
-import com.jitlogic.zorka.integ.FileTrapper;
+import com.jitlogic.zorka.logproc.ZorkaTrapper;
+import com.jitlogic.zorka.logproc.FileTrapper;
 import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
 import com.jitlogic.zorka.integ.snmp.TrapVarBindDef;
@@ -29,7 +29,7 @@ import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.probes.*;
 import com.jitlogic.zorka.spy.processors.*;
 import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.util.ZorkaLogLevel;
+import com.jitlogic.zorka.logproc.ZorkaLogLevel;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.*;
@@ -98,12 +98,10 @@ public class SpyLib {
     public static final int LT = 4;
     public static final int NE = 5;
 
-
     public static final int ON_ENTER   = 0;
     public static final int ON_RETURN  = 1;
     public static final int ON_ERROR   = 2;
     public static final int ON_SUBMIT  = 3;
-    //public static final int ON_COLLECT = 4;
 
     public static final int AC_PUBLIC       = 0x000001;
     public static final int AC_PRIVATE      = 0x000002;
@@ -409,22 +407,6 @@ public class SpyLib {
 
 
     /**
-     * Creates file colllector object. It will store collected records as text messages in log file.
-     *
-     * @param trapper file trapper to submit data to
-     *
-     * @param logLevel default log level
-     *
-     * @param expr message template expression
-     *
-     * @return collector object
-     */
-    public SpyProcessor fileCollector(FileTrapper trapper, String expr, ZorkaLogLevel logLevel) {
-        return new FileCollector(trapper, expr, logLevel, "");
-    }
-
-
-    /**
      * Creates getter collector object. It will present collected records as attributes via mbeans.
      *
      * @param mbsName mbean server name
@@ -511,8 +493,9 @@ public class SpyLib {
      * @return trapper collector object
      *
      */
-    public SpyProcessor trapperCollector(ZorkaTrapper trapper, String tagExpr, String msgExpr, String errExpr, String errField) {
-        return new TrapperCollector(trapper, tagExpr, msgExpr,  errExpr,  errField);
+    public SpyProcessor trapperCollector(ZorkaTrapper trapper, ZorkaLogLevel logLevel,
+                                         String tagExpr, String msgExpr, String errExpr, String errField) {
+        return new TrapperCollector(trapper, logLevel, tagExpr, msgExpr,  errExpr,  errField);
     }
 
 

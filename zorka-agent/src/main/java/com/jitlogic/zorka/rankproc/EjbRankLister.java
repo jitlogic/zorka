@@ -16,8 +16,8 @@
 package com.jitlogic.zorka.rankproc;
 
 import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 
 import javax.management.*;
 import java.util.*;
@@ -32,8 +32,6 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
     private volatile Thread thread = null;
 
     private Map<String,EjbRankItem> stats = new HashMap<String, EjbRankItem>();
-
-    private ObjectInspector inspector = new ObjectInspector();
 
     private MBeanServerConnection mbs;
     private String objNames, attr;
@@ -56,15 +54,15 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
 
 
     public synchronized void discovery() {
-        Set<ObjectName> names = inspector.queryNames(mbs, objNames);
+        Set<ObjectName> names = ObjectInspector.queryNames(mbs, objNames);
 
         for (ObjectName name : names) {
             try {
                 Object statsObj = mbs.getAttribute(name, attr);
-                for (Object s : inspector.list(statsObj)) {
+                for (Object s : ObjectInspector.list(statsObj)) {
                     String tag = name + "|" + attr + "|" + s;
                     if (!stats.containsKey(tag)) {
-                        stats.put(tag, new EjbRankItem(inspector.get(statsObj, s)));
+                        stats.put(tag, new EjbRankItem(ObjectInspector.get(statsObj, s)));
                     }
                 }
             } catch (Exception e) {

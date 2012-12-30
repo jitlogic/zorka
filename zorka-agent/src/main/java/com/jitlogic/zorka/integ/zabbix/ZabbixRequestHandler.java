@@ -24,31 +24,65 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 import com.jitlogic.zorka.integ.ZorkaRequestHandler;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 import org.json.simple.JSONAware;
 
+/**
+ * Zabbix request handler is used by ZabbixAgent thread to parse queries from zabbix server and format responses.
+ * It handles single request, new instance of ZabbixRequestHandler is created for each new request.
+ */
 public class ZabbixRequestHandler implements ZorkaRequestHandler {
 
-	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
-	
+    /** Logger */
+	private static final ZorkaLog log = ZorkaLogger.getLog(ZabbixRequestHandler.class);
+
+    /** Socket with established server connection. */
 	private Socket socket;
+
+    /** Request string */
 	private String req = null;
+
+    /** Timestamps of beginning and end of request handling. */
     private volatile long tStart, tStop;
 
+    /** Value returned if inner agent (BSH) returns null or throws exception. */
 	public static final String ZBX_NOTSUPPORTED = "ZBX_NOTSUPPORTED";
-	
+
+
+    /**
+     * Standard constructor
+     *
+     * @param socket open socket (result from ServerSocket.accept())
+     */
 	public ZabbixRequestHandler(Socket socket) {
 		this.socket = socket;
         this.tStart = System.currentTimeMillis();
 	}
 	
-	
+
+
+    /** Zabbix protocol header magic number */
 	private static final byte[] header = { 0x5a, 0x42, 0x58, 0x44, 0x01 };
-	private static final int HDR_LEN = 13;	
+
+
+    /** Zabbix header length */
+	private static final int HDR_LEN = 13;
+
+
+    /** Maximum request length */
 	private static final int MAX_REQUEST_LENGTH = 1024;
-	
-	
+
+
+    /**
+     * Receives and decodes zabbix request
+     *
+     * @param in input stream (from connection socket)
+     *
+     * @return query string
+     *
+     * @throws IOException if I/O error occurs
+     */
 	public static String decode(InputStream in) throws IOException {
 		byte[] buf = new byte[MAX_REQUEST_LENGTH+HDR_LEN];  
 		int pos = 0;
@@ -112,10 +146,17 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
 		return sb.toString();
 	}
 	
-	
+	/** TODO remove either this or above header constant */
 	private static final byte[] zbx_hdr = { (byte)'Z', (byte)'B', (byte)'X', (byte)'D', 0x01 };
-	
-	
+
+
+    /**
+     * Translates zabbix query to beanshell call
+     *
+     * @param query zabbix query
+     *
+     * @return query ready to be passed to bsh agent
+     */
 	public static String translate(String query) {
 		StringBuilder sb = new StringBuilder(query.length());
 		int pos = 0;
@@ -149,8 +190,15 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
 		
 		return sb.toString();
 	}
-		
-	
+
+
+    /**
+     * Constructs and sends response
+     *
+     * @param resp response value
+     *
+     * @throws IOException if I/O error occurs
+     */
 	private void send(String resp) throws IOException {
 		byte[] buf = new byte[resp.length()+zbx_hdr.length+8];
 		
@@ -173,7 +221,8 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
 		out.write(buf); out.flush();
 	} // send()
 	
-	
+
+    @Override
 	public String getReq() throws IOException {
 		if (req == null) {
 			String s = decode(socket.getInputStream());
@@ -182,7 +231,8 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
 		return req;
 	} // getReq()
 
-	
+
+    @Override
 	public void handleResult(Object rslt) {
 		try {
             tStop = System.currentTimeMillis();
@@ -199,6 +249,16 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
         }
 	}
 
+
+    /**
+     * Serializes response. If it is JSON object, it will be serialized using toJSONString() method.
+     * If it is null, ZBX_NOTSUPPORTED will be returned instead. In all other cases toString() method
+     * will be used.
+     *
+     * @param obj arbitrary value
+     *
+     * @return serialized (stringified) value
+     */
     private String serialize(Object obj) {
         if (obj instanceof JSONAware) {
             return ((JSONAware)obj).toJSONString();
@@ -207,6 +267,7 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
     }
 
 
+    @Override
     public void handleError(Throwable e) {
 		try {
             this.tStop = System.currentTimeMillis();

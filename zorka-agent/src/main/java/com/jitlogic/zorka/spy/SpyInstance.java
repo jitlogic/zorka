@@ -18,8 +18,8 @@ package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.spy.processors.CollectQueueProcessor;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 
 import java.util.Properties;
 
@@ -59,7 +59,7 @@ public class SpyInstance {
 
         MainSubmitter.setSubmitter(instance.getSubmitter());
 
-        debugLevel = Integer.parseInt(ZorkaConfig.getProperties().getProperty(ZorkaConfig.SPY_DEBUG).trim());
+        debugLevel = Integer.parseInt(ZorkaConfig.getProperties().getProperty("spy.debug").trim());
 
         return instance;
     }

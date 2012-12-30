@@ -17,14 +17,28 @@
 
 package com.jitlogic.zorka.agent;
 
+/**
+ * Represents all error conditions originating from inside Zorka code.
+ */
 public class ZorkaException extends Exception {
 
 	private static final long serialVersionUID = 403339688211580095L;
 
+    /**
+     * Standard constructor.
+     * @param msg message
+     */
 	public ZorkaException(String msg) {
 		super(msg);
 	}
-	
+
+    /**
+     * Standard constructor
+     *
+     * @param msg message
+     *
+     * @param inner cause
+     */
 	public ZorkaException(String msg, Throwable inner) {
 		super(msg, inner); 
 	}

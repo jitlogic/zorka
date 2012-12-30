@@ -62,8 +62,8 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     @Test
     public void testClassWithoutAnyTransform() throws Exception{
         Object obj = instantiate(engine, TCLASS1);
-        assertNotNull(obj);
-        assertEquals(TCLASS1, obj.getClass().getName());
+        assertNotNull("should instantiate properly", obj);
+        assertEquals("should be of class " + TCLASS1, TCLASS1, obj.getClass().getName());
     }
 
 
@@ -75,8 +75,8 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
         invoke(obj, "trivialMethod");
 
-        assertEquals(1, submitter.size());
-        assertEquals(obj, submitter.get(0).get(0));
+        assertEquals("should submit once", 1, submitter.size());
+        assertEquals("probe should return reference to itself", obj, submitter.get(0).get(0));
     }
 
 
@@ -88,31 +88,22 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
         invoke(obj, "nonPublicStatic");
 
-        assertEquals(1, submitter.size());
+        assertEquals("should submit one record", 1, submitter.size());
     }
 
+
     @Test
-    public void testInstrumentWithConstProbe() throws Exception {
+    public void testInstrumentWithTimeProbe() throws Exception {
         engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("E0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
         Object obj = instantiate(engine, TCLASS1);
 
         invoke(obj, "trivialMethod");
 
-        assertEquals(1, submitter.size());
-        //assertEquals(42L, submitter.get(0).get(0));  TODO this test has to be performed with DispatchingSubmitter fully implemented (or: use feed() method directly
+        assertEquals("should return one object", 1, submitter.size());
+        assertTrue("should return value of type Long", submitter.get(0).get(0) instanceof Long);
     }
 
-    //@Test  TODO make this test working
-    public void testInstrumentWithNoProbes() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter().include(spy.byMethod(TCLASS1, "trivialMethod")));
-        Object obj = instantiate(engine, TCLASS1);
-
-        invoke(obj, "trivialMethod");
-
-        assertEquals(1, submitter.size());
-        assertEquals(0, submitter.get(0).size());
-    }
 
     @Test
     public void testTrivialInstrumentOnlyEntryPointWithCurrentTime() throws Exception {
@@ -175,10 +166,9 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     @Test
     public void testInstrumentConstructorWithTime() throws Exception {
         engine.add(SpyDefinition.instrument().include(spy.byMethod(TCLASS1, SM_CONSTRUCTOR)));
-        //engine.enableDebug();
         Object obj = instantiate(engine, TCLASS1);
 
-        assertEquals(2, submitter.size());
+        assertEquals("should submit two records", 2, submitter.size());
     }
 
 
@@ -186,10 +176,9 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     public void testInstrumentConstructorWithSelfRef() throws Exception {
         engine.add(SpyDefinition.instance().onReturn(spy.fetchArg("R0", 0))
                 .include(spy.byMethod(TCLASS1, SM_CONSTRUCTOR)));
-        //engine.enableDebug();
         Object obj = instantiate(engine, TCLASS1);
 
-        assertEquals(1, submitter.size());
+        assertEquals("should submit one record", 1, submitter.size());
         assertEquals("should return object itself", obj, submitter.get(0).get(0));
     }
 
@@ -198,11 +187,10 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     public void testInstrumentConstructorWithInvalidSelfRefOnBeginning() throws Exception {
         engine.add(SpyDefinition.instance().onEnter(spy.fetchArg("E0", 0))
                 .include(spy.byMethod(TCLASS1, SM_CONSTRUCTOR)));
-        //engine.enableDebug();
-        Object obj = instantiate(engine, TCLASS1);
 
-        assertEquals(1, submitter.size());
-        //assertEquals("should return object itself", obj, submitter.get(0).get(0));
+        instantiate(engine, TCLASS1);
+
+        assertEquals("should submit one record", 1, submitter.size());
         assertNull("should return null instead of ", submitter.get(0).get(0));
     }
 
@@ -214,9 +202,9 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
 
-        assertEquals(1, submitter.size());
-        assertTrue("Fetched object is a class", submitter.get(0).get(0) instanceof Class);
-        assertEquals(TCLASS1, ((Class)(submitter.get(0).get(0))).getName());
+        assertEquals("should submit one record", 1, submitter.size());
+        assertTrue("should fetch class object", submitter.get(0).get(0) instanceof Class);
+        assertEquals("class should be of " + TCLASS1, TCLASS1, ((Class)(submitter.get(0).get(0))).getName());
     }
 
 
@@ -225,15 +213,15 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         engine.add(SpyDefinition.instance()
             .onEnter(spy.fetchArg("E0", 1), spy.fetchArg("E1", 2), spy.fetchArg("E2", 3), spy.fetchArg("E3", 4))
             .include(spy.byMethod(TCLASS1, "paramMethod1")));
-        //engine.enableDebug();
+
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "paramMethod1", 10, 20L, (short) 30, (byte) 40));
 
-        assertEquals(1, submitter.size());
-        assertEquals(Integer.valueOf(10), submitter.get(0).get(0));
-        assertEquals(Long.valueOf(20), submitter.get(0).get(1));
-        assertEquals((short)30, submitter.get(0).get(2));
-        assertEquals((byte)40, submitter.get(0).get(3));
+        assertEquals("should submit one record", 1, submitter.size());
+        assertEquals("should fetch integer as first parameter", Integer.valueOf(10), submitter.get(0).get(0));
+        assertEquals("should fetch long as second parameter", Long.valueOf(20), submitter.get(0).get(1));
+        assertEquals("should fetch short as third parameter", (short)30, submitter.get(0).get(2));
+        assertEquals("should fetch byte as fourth parameter", (byte)40, submitter.get(0).get(3));
     }
 
 
@@ -241,12 +229,13 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     public void testFetchBooleanCharTypeArgument() throws Exception {
         engine.add(SpyDefinition.instance().onEnter(spy.fetchArg("E0", 1), spy.fetchArg("E1", 2))
                 .include(spy.byMethod(TCLASS1, "paramMethod2")));
-        //engine.enableDebug();
+
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "paramMethod2", true, 'A'));
-        assertEquals(1, submitter.size());
-        assertEquals(true, submitter.get(0).get(0));
-        assertEquals('A', submitter.get(0).get(1));
+
+        assertEquals("should submit one record", 1, submitter.size());
+        assertEquals("should submit boolean as first parameter", true, submitter.get(0).get(0));
+        assertEquals("should submit character as second parameter", 'A', submitter.get(0).get(1));
     }
 
 
@@ -254,12 +243,13 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     public void testFetchFloatingPointArgs() throws Exception {
         engine.add(SpyDefinition.instance().onEnter(spy.fetchArg("E0", 1), spy.fetchArg("E1", 2))
                 .include(spy.byMethod(TCLASS1, "paramMethod3")));
-        //engine.enableDebug();
+
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "paramMethod3", 1.23, (float) 2.34));
-        assertEquals(1, submitter.size());
-        assertEquals(1.23, (Double)(submitter.get(0).get(0)), 0.01);
-        assertEquals(2.34, (Float)(submitter.get(0).get(1)), 0.01);
+
+        assertEquals("should submit one record", 1, submitter.size());
+        assertEquals("should fetch double as first parameter", 1.23, (Double)(submitter.get(0).get(0)), 0.01);
+        assertEquals("should fetch float as second parameter", 2.34, (Float)(submitter.get(0).get(1)), 0.01);
     }
 
 
@@ -267,23 +257,25 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     public void testCheckImmediateFlagInEntryPointOnlyProbe() throws Exception {
         engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("E0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
+
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
 
-        assertEquals(1, submitter.size());
-        assertEquals(SF_IMMEDIATE, submitter.get(0).submitFlags);
+        assertEquals("should submit one record", 1, submitter.size());
+        assertEquals("record should be submitted with IMMEDIATE flag", SF_IMMEDIATE, submitter.get(0).submitFlags);
     }
 
 
     @Test
     public void testCheckNoFlagOnEnterAndFlushFlagOnExit() throws Exception {
         engine.add(SpyDefinition.instrument().include(spy.byMethod(TCLASS1, "trivialMethod")));
+
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
 
-        assertEquals(2, submitter.size());
-        assertEquals(SF_NONE, submitter.get(0).submitFlags);
-        assertEquals(SF_FLUSH, submitter.get(1).submitFlags);
+        assertEquals("should submit two records", 2, submitter.size());
+        assertEquals("first record should carry no flags", SF_NONE, submitter.get(0).submitFlags);
+        assertEquals("second record should carry FLUSH flag", SF_FLUSH, submitter.get(1).submitFlags);
     }
 
 
@@ -291,11 +283,12 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     public void testCheckNoProbeOnEnterAndImmediateFlagOnExit() throws Exception {
         engine.add(SpyDefinition.instance().onReturn(spy.fetchTime("R0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
+
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
 
-        assertEquals(1, submitter.size());
-        assertEquals(SF_IMMEDIATE, submitter.get(0).submitFlags);
+        assertEquals("should submit one record", 1, submitter.size());
+        assertEquals("record should carry IMMEDIATE flag", SF_IMMEDIATE, submitter.get(0).submitFlags);
     }
 
 
@@ -303,13 +296,13 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     public void testNoProbeOnExitButProbeOnErrorAndOnEnter() throws Exception {
         engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("E0")).onError(spy.fetchTime("X0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
-        //engine.enableDebug();
+
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
 
-        assertEquals(2, submitter.size());
-        assertEquals(SF_NONE, submitter.get(0).submitFlags);
-        assertEquals(SF_FLUSH, submitter.get(1).submitFlags);
+        assertEquals("should submit two records", 2, submitter.size());
+        assertEquals("first record should carry no flags", SF_NONE, submitter.get(0).submitFlags);
+        assertEquals("second record should carry FLUSH flag", SF_FLUSH, submitter.get(1).submitFlags);
         assertTrue("should pass no values", submitter.get(1).nullVals());
     }
 
@@ -322,9 +315,9 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "errorMethod");
 
-        assertEquals(2, submitter.size());
-        assertEquals(SF_NONE, submitter.get(0).submitFlags);
-        assertEquals(SF_FLUSH, submitter.get(1).submitFlags);
+        assertEquals("should submit two records", 2, submitter.size());
+        assertEquals("first record should carry no flags", SF_NONE, submitter.get(0).submitFlags);
+        assertEquals("second record should carry FLUSH flag", SF_FLUSH, submitter.get(1).submitFlags);
         assertTrue("should pass no values", submitter.get(1).nullVals());
     }
 
@@ -340,7 +333,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         checkForError(invoke(obj1, "trivialMethod"));
         checkForError(invoke(obj2, "trivialMethod"));
 
-        assertEquals(2, submitter.size());
+        assertEquals("should submit two records", 2, submitter.size());
         assertEquals("context IDs should be the same", submitter.get(0).id, submitter.get(1).id);
     }
 
@@ -353,7 +346,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
 
-        assertEquals(4, submitter.size());
+        assertEquals("should submit 4 records", 4, submitter.size());
 
         assertEquals("first and last submit should have the same context ID:",
                 submitter.get(0).id, submitter.get(3).id);
@@ -371,7 +364,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "errorMethod");
 
-        assertEquals(4, submitter.size());
+        assertEquals("should submit 4 records", 4, submitter.size());
 
         assertEquals("first and last submit should have the same context ID:",
                 submitter.get(0).id, submitter.get(3).id);
@@ -389,7 +382,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "paramMethod4", new int[]{1,2,3}, new byte[]{5,6,7}, new double[]{7,8,9}));
 
-        assertEquals(1, submitter.size());
+        assertEquals("should submit one record", 1, submitter.size());
         assertTrue("first parameter should be an array of integers", submitter.get(0).get(0) instanceof int[]);
         assertTrue("first parameter should be an array of integers", submitter.get(0).get(1) instanceof byte[]);
         assertTrue("first parameter should be an array of integers", submitter.get(0).get(2) instanceof double[]);
@@ -405,9 +398,9 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
         Object retVal = checkForError(invoke(obj, "strMethod"));
 
-        assertEquals(1, submitter.size());
-        assertEquals("oja!", submitter.get(0).get(0));
-        assertEquals(retVal, submitter.get(0).get(0));
+        assertEquals("should submit one record", 1, submitter.size());
+        assertEquals("should catch string return value", "oja!", submitter.get(0).get(0));
+        assertEquals("fetched value should be the same as returned", retVal, submitter.get(0).get(0));
     }
 
 
@@ -420,9 +413,9 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
         Object retVal = checkForError(invoke(obj, "getUltimateQuestionOfLife"));
 
-        assertEquals(1, submitter.size());
-        assertEquals(42, submitter.get(0).get(0));
-        assertEquals(retVal, submitter.get(0).get(0));
+        assertEquals("should submit one record", 1, submitter.size());
+        assertEquals("should return integer value", 42, submitter.get(0).get(0));
+        assertEquals("fetched value should be the same as returned", retVal, submitter.get(0).get(0));
     }
 
 
@@ -435,9 +428,9 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
         Object retVal = checkForError(invoke(obj, "getUltimateQuestionWithLocalVars"));
 
-        assertEquals(1, submitter.size());
-        assertEquals(42, submitter.get(0).get(0));
-        assertEquals(retVal, submitter.get(0).get(0));
+        assertEquals("should return one record", 1, submitter.size());
+        assertEquals("should return integer value", 42, submitter.get(0).get(0));
+        assertEquals("fetched value should be the same as returned", retVal, submitter.get(0).get(0));
     }
 
 
@@ -449,8 +442,8 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
 
-        assertEquals(1, submitter.size());
-        assertEquals(Thread.currentThread(), submitter.get(0).get(0));
+        assertEquals("should submit one record", 1, submitter.size());
+        assertEquals("should return current thread object", Thread.currentThread(), submitter.get(0).get(0));
     }
 
 
@@ -463,8 +456,8 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         Object err = invoke(obj, "errorMethod");
 
         // Check what instrumentation catched
-        assertEquals(1, submitter.size());
-        assertEquals(err, submitter.get(0).get(0));
+        assertEquals("should submit one record", 1, submitter.size());
+        assertEquals("fetched value should be the same as returned", err, submitter.get(0).get(0));
         assertTrue("Should return an exception.", submitter.get(0).get(0) instanceof NullPointerException);
         assertEquals("dUP!", ((Exception)submitter.get(0).get(0)).getMessage());
     }
@@ -490,7 +483,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         Object obj = instantiate(engine, TCLASS2);
         invoke(obj, "trivialMethod");
 
-        assertEquals(0, submitter.size());
+        assertEquals("should submit no records", 0, submitter.size());
     }
 
     @Test
@@ -501,7 +494,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         Object obj = instantiate(engine, TCLASS2);
         invoke(obj, "trivialMethod");
 
-        assertEquals(1, submitter.size());
+        assertEquals("should submit one record", 1, submitter.size());
     }
 
     @Test
@@ -512,7 +505,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
 
-        assertEquals(0, submitter.size());
+        assertEquals("should submit no records", 0, submitter.size());
     }
 
     @Test
@@ -520,11 +513,10 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("T1")).onReturn(spy.fetchTime("T2"))
                 .include(spy.byMethod(TCLASS2, "echoInt")));
 
-        //engine.enableDebug();
         Object obj = instantiate(engine, TCLASS2);
         checkForError(invoke(obj, "echoInt", 10));
 
-        assertEquals(2, submitter.size());
+        assertEquals("should submit two records", 2, submitter.size());
     }
 
     @Test
@@ -535,7 +527,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
 
-        assertEquals(1, submitter.size());
+        assertEquals("should submit one record", 1, submitter.size());
     }
 
     @Test
@@ -546,7 +538,8 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
 
-        assertEquals(1, submitter.size());
+        assertEquals("should submit one record", 1, submitter.size());
+        assertEquals("record should carry no values", 0, submitter.get(0).size());
     }
 
     @Test
@@ -557,7 +550,8 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "errorMethod");
 
-        assertEquals(1, submitter.size());
+        assertEquals("should submit one record", 1, submitter.size());
+        assertEquals("record should carry no values", 0, submitter.get(0).size());
     }
 
     // TODO test if stack traces in exceptions are the same with and without intercepting errors by instrumentation

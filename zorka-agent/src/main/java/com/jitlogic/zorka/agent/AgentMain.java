@@ -4,38 +4,40 @@ import java.lang.instrument.Instrumentation;
 
 /**
  * This class is responsible for bootstrapping zorka agent.
- * @author RLE <rafal.lewczuk@gmail.com>
+ *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class AgentMain {
 
+    /** Zorka home directory (passed as -javaagent argument) */
     private static String homeDir;
-    private static MBeanServerRegistry mBeanServerRegistry;
+
+    /** Agent instance */
     public static AgentInstance agent;
 
+    /**
+     * This is entry method of java agent.
+     *
+     * @param args arguments (supplied via -javaagent:/path/to/agent.jar=arguments)
+     *
+     * @param instr reference to JVM instrumentation interface
+     */
     public static void premain(String args, Instrumentation instr) {
         String[] argv = args.split(",");
         homeDir = argv[0];
 
         ZorkaConfig.loadProperties(homeDir);
 
-        startZorkaAgent();
+        MBeanServerRegistry mBeanServerRegistry = new MBeanServerRegistry(
+            "yes".equalsIgnoreCase(ZorkaConfig.getProperties().getProperty("zorka.mbs.autoregister")));
+        AgentInstance.setMBeanServerRegistry(mBeanServerRegistry);
+
+        agent = AgentInstance.instance();
 
         if (agent != null && agent.getSpyTransformer() != null) {
-            // TODO what about retransforming ? (call it with reflection?)
             instr.addTransformer(agent.getSpyTransformer());
 
             agent.getSpyInstance().start();
         }
     }
-
-    private static void startZorkaAgent() {
-
-
-        mBeanServerRegistry = new MBeanServerRegistry(
-            "yes".equalsIgnoreCase(ZorkaConfig.getProperties().getProperty(ZorkaConfig.ZORKA_MBS_AUTOREG)));
-        AgentInstance.setMBeanServerRegistry(mBeanServerRegistry);
-
-        agent = AgentInstance.instance();
-    }
-
 }

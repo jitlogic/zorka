@@ -19,18 +19,41 @@ import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.Map;
 
+/**
+ * Lexical analyzer for LDAP queries.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class LdapLexer extends Lexer {
 
-
+    /** Unknown character (possibly illegal) */
     private static final byte CH_UNKNOWN     = 0;
+
+    /** Whitespace character */
     private static final byte CH_WHITESPACE  = 1;
+
+    /** Alphanumeric character (parts of symbols) */
     private static final byte CH_ALNUM       = 2;
+
+    /** Left par (delimiters in LDAP queries) */
     private static final byte CH_LPAREN      = 3;
+
+    /** Right par (delimiters in LDAP queries) */
     private static final byte CH_RPAREN      = 4;
+
+    /** Exclamation mark (logical operator) */
     private static final byte CH_EXCLAMATION = 5;
+
+    /** Ampersand character (logical operator) */
     private static final byte CH_AMPERSAND   = 6;
+
+    /** Vertical bar (logical operator) */
     private static final byte CH_VERTBAR     = 7;
+
+    /* Equals character (comparison operator) */
     private static final byte CH_EQUALS      = 8;
+
+    /** Angle characters (comparison operator) */
     private static final byte CH_ANGLE       = 9;
 
     //private static final int S_WHITESPACE = 1; // White space
@@ -43,19 +66,20 @@ public class LdapLexer extends Lexer {
     //private static final int S_MATCHVALUE = 8; // matching value
     //private static final int S_ERROR      = 9; // illegal character
 
-
-    private static final Map<Character, Byte> chmap = ZorkaUtil.map(
+    /** Character map for LDAP queries */
+    private static final Map<Character, Byte> CHMAP = ZorkaUtil.map(
             '(', CH_LPAREN, ')', CH_RPAREN, '~', CH_ANGLE,
             '!', CH_EXCLAMATION, '&', CH_AMPERSAND, '|', CH_VERTBAR,
             '=', CH_EQUALS, '<', CH_ANGLE, '>', CH_ANGLE
     );
 
+    /** Initializes character tab for LDAP queries */
     private static byte[] initChTab() {
         byte[] tab = new byte[128];
 
         for (int i = 0; i < 128; i++) {
-            if (chmap.containsKey((char)i)) {
-                tab[i] = chmap.get((char)i);
+            if (CHMAP.containsKey((char) i)) {
+                tab[i] = CHMAP.get((char)i);
             } else if (Character.isWhitespace(i)) {
                 tab[i] = CH_WHITESPACE;
             } else {
@@ -66,8 +90,10 @@ public class LdapLexer extends Lexer {
         return tab;
     }
 
+    /** Character map for LDAP queries */
     private static final byte[] CHT_LDAP = initChTab();
 
+    /** Transition table for LDAP lexer */
     private static final byte[][] LEX_LDAP = {
                   //       UN WS AN  (  )  !  &  |  = <~>
             lxtab(CHT_LDAP, E, 1, E, 2, 2, E, E, E, E, E), // 0 = S_START
@@ -82,6 +108,7 @@ public class LdapLexer extends Lexer {
             lxtab(CHT_LDAP, E, E, E, E, E, E, E, E, E, E), // 9 = S_ERROR
     };
 
+    /** State-to-token-type map */
     private static final int[] tokenTypes = {
             T_UNKNOWN,      // 0 = S_START
             T_WHITESPACE,   // 1 = S_WHITESPACE
@@ -95,7 +122,11 @@ public class LdapLexer extends Lexer {
             T_UNKNOWN,      // 9 = S_ERROR
     };
 
-
+    /**
+     * Standard constructor
+     *
+     * @param input input string
+     */
     public LdapLexer(String input) {
         super(input, LEX_LDAP, tokenTypes);
     }

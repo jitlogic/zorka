@@ -23,11 +23,7 @@ import java.net.URL;
 
 
 import com.jitlogic.zorka.agent.*;
-import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
-import com.jitlogic.zorka.util.ZorkaLogger;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 public class BshAgentIntegTest extends ZorkaFixture {
@@ -64,7 +60,7 @@ public class BshAgentIntegTest extends ZorkaFixture {
 	@Test
 	public void testAgentFunctions() throws Exception {
 		assertEquals(
-                ZorkaConfig.getProperties().getProperty(ZorkaConfig.ZORKA_VERSION),
+                ZorkaConfig.getProperties().getProperty("zorka.version"),
                 execute("zorka.version()", 1000));
         AgentInstance.setMBeanServerRegistry(null);
 	}

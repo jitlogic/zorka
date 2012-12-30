@@ -15,40 +15,121 @@
  */
 package com.jitlogic.zorka.normproc;
 
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
 
+/**
+ * Implements simplified lexing algorithm useful for implementing normalizers.
+ * Note that this lexer has not backtracking, so concrete lexers (eg. for LDAP or SQL)
+ * are not always precise and can sometimes generate incorrect results. It isn't big issue
+ * for simple normalization purposes and speed/simplicity is priority here, so it is left
+ * this way and eventual fixes will be done only when needed.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public abstract class Lexer implements Iterable<Token>, Iterator<Token> {
 
+    /** Logger */
+    private static final ZorkaLog log = ZorkaLogger.getLog(Lexer.class);
+
+    /** Unknown token */
     public static final int T_UNKNOWN     = 0;
+
+    /** Whitespace token */
     public static final int T_WHITESPACE  = 1;
+
+    /** Symbol token */
     public static final int T_SYMBOL      = 2;
+
+    /** Operator token */
     public static final int T_OPERATOR    = 3;
+
+    /** Literal token */
     public static final int T_LITERAL     = 4;
+
+    /** Comment token */
     public static final int T_COMMENT     = 5;
+
+    /** Keyword token */
     public static final int T_KEYWORD     = 6;
+
+    /** Placeholder token */
     public static final int T_PLACEHOLDER = 7;
 
-
+    /** Start state */
     protected final static int S_START = 0;      // Starting state
 
+    /** End-of-token marker for lexer tabs */
     protected final static int E = -127;
 
+    /**
+     * Reads keyword files from classpath. Returns map of sets of strings (eg. map
+     * of sets of keyword files for various SQL dialects).
+     *
+     * @param path path to keyword file (it has to be classpath)
+     *
+     * @return map of keyword sets
+     */
+    protected static Map<String,Set<String>> readKeywordFile(String path) {
 
+        Properties props = new Properties();
+        InputStream is = Lexer.class.getResourceAsStream(path);
+
+        if (is != null) {
+            try {
+                props.load(is);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    log.error("Error closing property file '"+path+"':", e);
+                }
+            }
+        }
+
+        Map<String,Set<String>> kwmap = new HashMap<String, Set<String>>();
+
+        for (Object name : props.keySet()) {
+            kwmap.put(name.toString(), strSet(props.getProperty(name.toString()).split("\\,")));
+        }
+
+        return Collections.unmodifiableMap(kwmap);
+    }
+
+
+    /**
+     * Creates a set from supplied strings.
+     *
+     * @param strings members of newly formed set
+     *
+     * @return set of strings
+     */
     protected static Set<String> strSet(String...strings) {
         Set<String> set = new HashSet<String>(strings.length * 2 + 1);
         for (String s : strings) {
-            set.add(s.toLowerCase());
+            set.add(s.trim().toLowerCase());
         }
 
         return Collections.unmodifiableSet(set);
     }
 
 
+    /**
+     * Creates table of lexer tab from character map and transitions
+     *
+     * @param chtab character tab
+     *
+     * @param transitions transitions
+     *
+     * @return lexer tab
+     */
     protected static byte[] lxtab(byte[] chtab, int...transitions) {
         byte[] lxtab = new byte[chtab.length];
 
@@ -60,12 +141,31 @@ public abstract class Lexer implements Iterable<Token>, Iterator<Token> {
     }
 
 
+    /** Lexer tab */
     private byte[][] lextab;
+
+
+    /** Current position and state */
     private int pos = 0, state = S_START;
+
+
+    /** Input string */
     private String input;
+
+
+    /** State-to-token-types map */
     private int[] tokenTypes;
 
 
+    /**
+     * Standard constructor
+     *
+     * @param input input string
+     *
+     * @param lextab lexer tab
+     *
+     * @param tokenTypes state-to-token-type map
+     */
     protected Lexer(String input, byte[][] lextab, int[] tokenTypes) {
         this.input = input;
         this.lextab = lextab;
@@ -73,6 +173,13 @@ public abstract class Lexer implements Iterable<Token>, Iterator<Token> {
     }
 
 
+    /**
+     * Returns one character from input string. Handles special (unicode) characters.
+     *
+     * @param pos position in input string
+     *
+     * @return integer representation of a character
+     */
     protected int getch(int pos) {
 
         char ch = input.charAt(pos);
@@ -85,17 +192,19 @@ public abstract class Lexer implements Iterable<Token>, Iterator<Token> {
     }
 
 
-
+    @Override
     public Iterator<Token> iterator() {
         return this;
     }
 
 
+    @Override
     public boolean hasNext() {
         return pos < input.length();
     }
 
 
+    @Override
     public Token next() {
 
         int cur = pos, type = state == S_START ? lextab[state][getch(cur)] : state;
@@ -122,9 +231,19 @@ public abstract class Lexer implements Iterable<Token>, Iterator<Token> {
     }
 
 
+    @Override
     public void remove() {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Creates clone of lexer object with new input string (but clones configuration settings).
+     * This is used in normalizer that creates lexer template at construction time and then
+     * uses it as a template when processing data.
+     *
+     * @param input input string
+     *
+     * @return new lexer with new input but original configuration
+     */
     public abstract Lexer lex(String input);
 }

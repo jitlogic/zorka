@@ -35,7 +35,7 @@ public class BshAgentTest extends ZorkaFixture {
     @Before
     public void setUp() throws Exception {
         ZabbixLib zl = new ZabbixLib(zorkaAgent, zorkaAgent.getZorkaLib());
-        zorkaAgent.installModule("zabbix", zl);
+        zorkaAgent.install("zabbix", zl);
         zorkaAgent.loadScript(getClass().getResource("/unittest/BshAgentTest.bsh"));
     }
 
@@ -80,7 +80,7 @@ public class BshAgentTest extends ZorkaFixture {
 
     @Test
     public void testNewBshEllipsis() throws Exception {
-        zorkaAgent.installModule("test", new SomeTestLib());
+        zorkaAgent.install("test", new SomeTestLib());
         String rslt = zorkaAgent.query("test.join(\"a\", \"b\", \"c\")");
         assertEquals("a:bc", rslt);
     }
@@ -97,7 +97,7 @@ public class BshAgentTest extends ZorkaFixture {
     @Test
     public void testObjectDumper() throws Exception {
         Object obj = query("zorka.jmx(\"java\",\"java.lang:type=Runtime\")");
-        String s = new ObjectDumper().objectDump(obj);
+        String s = ObjectDumper.objectDump(obj);
         assertTrue(s != null && s.length() > 100);
     }
 

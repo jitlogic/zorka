@@ -16,7 +16,6 @@
 package com.jitlogic.zorka.agent.unittest;
 
 import com.jitlogic.zorka.rankproc.BucketAggregate;
-import static com.jitlogic.zorka.rankproc.BucketAggregate.*;
 
 import com.jitlogic.zorka.rankproc.CircularBucketAggregate;
 import org.junit.Test;
@@ -32,9 +31,9 @@ public class AggregateCountingTest {
         bag.feed(11, 10);
         bag.feed(12, 10);
 
-        assertEquals(30, bag.getDeltaV(13, 0));
-        assertEquals(30, bag.getDeltaV(14, 1));
-        assertEquals(30, bag.getDeltaV(15, 2));
+        assertEquals(30, bag.getDeltaV(0, 13));
+        assertEquals(30, bag.getDeltaV(1, 14));
+        assertEquals(30, bag.getDeltaV(2, 15));
     }
 
 
@@ -46,7 +45,7 @@ public class AggregateCountingTest {
         bag.feed(50, 10);
         bag.feed(90, 10);
 
-        assertEquals(20, bag.getDeltaV(91, 0));
+        assertEquals(20, bag.getDeltaV(0, 91));
     }
 
 
@@ -57,7 +56,7 @@ public class AggregateCountingTest {
         bag.feed(4, 1);
         bag.feed(11, 1);
 
-        assertEquals(7, bag.getDeltaT(12, 0));
+        assertEquals(7, bag.getDeltaT(0, 12));
     }
 
 
@@ -68,7 +67,7 @@ public class AggregateCountingTest {
         bag.feed(5, 1);
         bag.feed(45, 1);
 
-        assertEquals(40, bag.getDeltaT(46, 0));
+        assertEquals(40, bag.getDeltaT(0, 46));
     }
 
     @Test

@@ -21,13 +21,23 @@ package com.jitlogic.zorka.agent;
 /**
  * Callback for asynchronously called ZORKA queries.
  * 
- * @author RLE <rle@jitlogic.com>
+ * @author rafal.lewczuk@jitlogic.com
  *
  */
 public interface ZorkaCallback {
 
-	public void handleResult(Object rslt); 
-	
+    /**
+     * This method is called after successful execution.
+     *
+     * @param rslt execution result
+     */
+	public void handleResult(Object rslt);
+
+    /**
+     * This method is called when error occurs.
+     *
+     * @param e exception thrown while executing query
+     */
 	public void handleError(Throwable e);
 	
 }

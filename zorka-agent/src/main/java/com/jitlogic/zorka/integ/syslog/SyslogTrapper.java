@@ -15,9 +15,10 @@
  */
 package com.jitlogic.zorka.integ.syslog;
 
-import com.jitlogic.zorka.integ.ZorkaTrapper;
+import com.jitlogic.zorka.logproc.ZorkaTrapper;
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLogLevel;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.io.IOException;
@@ -42,18 +43,18 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
     private String defaultHost;
 
     private int defaultFacility = SyslogLib.F_LOCAL0;
-    private int defaultSeverity = SyslogLib.S_INFO;
 
     private DatagramSocket socket = null;
 
 
-    public SyslogTrapper(String syslogServer, String defaultHost) {
-        this(syslogServer, defaultHost, false);
+    public SyslogTrapper(String syslogServer, String defaultHost, int defaultFacility) {
+        this(syslogServer, defaultHost, defaultFacility, false);
     }
 
 
-    public SyslogTrapper(String syslogServer, String defaultHost, boolean quiet) {
+    public SyslogTrapper(String syslogServer, String defaultHost, int defaultFacility, boolean quiet) {
         super("syslog-trapper");
+        this.defaultFacility = defaultFacility;
         try {
             if (syslogServer.contains(":")) {
                 String[] parts = syslogServer.split(":");
@@ -123,11 +124,11 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
     }
 
 
-    public void trap(String tag, String msg, Throwable e) {
+    public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e, Object... args) {
         if (e == null) {
-            log(defaultSeverity, defaultFacility, tag, msg);
+            log(logLevel.getSeverity(), defaultFacility, tag, msg);
         } else {
-            log(defaultSeverity, defaultFacility, tag, msg + ": " + e.getMessage());
+            log(logLevel.getSeverity(), defaultFacility, tag, msg + ": " + e.getMessage());
         }
     }
 }

@@ -27,7 +27,7 @@ import java.util.concurrent.Executors;
 import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.testutil.TestLogger;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -81,7 +81,7 @@ public class ZabbixAgentIntegTest {
 	
 	@Test
 	public void testTrivialRequestAsync() throws Exception {
-		assertEquals(ZorkaConfig.getProperties().getProperty(ZorkaConfig.ZORKA_VERSION),
+		assertEquals(ZorkaConfig.getProperties().getProperty("zorka.version"),
                 query("zorka__version[]"));
 	}
 	

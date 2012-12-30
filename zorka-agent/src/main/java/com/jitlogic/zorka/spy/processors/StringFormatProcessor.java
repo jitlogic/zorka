@@ -28,15 +28,13 @@ public class StringFormatProcessor implements SpyProcessor {
     private String dst;
     private String expr;
 
-    private ObjectInspector inspector = new ObjectInspector();
-
     public StringFormatProcessor(String dst, String expr) {
         this.dst = dst;
         this.expr = expr;
     }
 
     public SpyRecord process(SpyRecord record) {
-        record.put(dst, inspector.substitute(expr, record));
+        record.put(dst, ObjectInspector.substitute(expr, record));
         return record;
     }
 }
