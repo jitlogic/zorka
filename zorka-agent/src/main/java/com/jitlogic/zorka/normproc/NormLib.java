@@ -17,6 +17,11 @@ package com.jitlogic.zorka.normproc;
 
 import static com.jitlogic.zorka.normproc.XqlLexer.*;
 
+/**
+ * Library with functions for handling normalizers.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class NormLib {
 
     /**
@@ -31,25 +36,56 @@ public class NormLib {
     public final static int NORM_STD =
             (1<<T_UNKNOWN)|(1<<T_WHITESPACE)|(1<<T_SYMBOL)|(1<<T_LITERAL)|(1<<T_COMMENT)|(1<<T_KEYWORD);
 
-    /**
-     * Supported SQL dialects.
-     */
+    /** ANSI SQL-92 standard */
     public static final int DIALECT_SQL_92 = 0;
+
+    /** ANSI SQL-99 standard */
     public static final int DIALECT_SQL_99 = 1;
+
+    /** ANSI SQL-2003 standard */
     public static final int DIALECT_SQL_03 = 2;
+
+    /** Microsoft T-SQL */
     public static final int DIALECT_MSSQL  = 3;
+
+    /** Postgres PSQL */
     public static final int DIALECT_PGSQL  = 4;
+
+    /** MySQL dialect */
     public static final int DIALECT_MYSQL  = 5;
+
+    /** IBM DB2 SQL dialect */
     public static final int DIALECT_DB2    = 6;
+
+    /** Oracle PL-SQL */
     public static final int DIALECT_ORACLE = 7;
+
+    /** Hibernate HQL */
     public static final int DIALECT_HQL    = 8;
+
+    /** Query language for JPA */
     public static final int DIALECT_JPA    = 9;
 
-
+    /**
+     * Creates SQL/*QL normalizer.
+     *
+     * @param dialect SQL dialect (see DIALECT_* constants)
+     *
+     * @param flags normalization flags (see NORM_* constants)
+     *
+     * @return normalizer object
+     */
     public Normalizer sql(int dialect, int flags) {
         return GenericNormalizer.xql(dialect, flags);
     }
 
+    /**
+     * Creates normalizer for LDAP queries.
+     *
+     * @param flags normalization flags (see NORM_* constants)
+     *
+     * @return normalizer object
+     */
     public Normalizer ldap(int flags) {
         return GenericNormalizer.ldap(flags);
     }

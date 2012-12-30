@@ -25,25 +25,44 @@ import java.util.concurrent.TimeUnit;
 
 import static com.jitlogic.zorka.spy.SpyLib.SPD_CDISPATCHES;
 
+/**
+ * Queues incoming records resumes processing in separate thread.
+ * Records are copied and only explicitly selected record attributes
+ * will be copied before queueing in order to minimize strain on
+ * garbage collector.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class CollectQueueProcessor implements SpyProcessor, Runnable {
 
+    /** Logger */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private volatile Thread thread;
+    /** Record processing thread */
+    private Thread thread;
+
+    /** Record processing thread will run as long as this attribute value is true */
     private volatile boolean running;
+
 
     private volatile long submittedRecords, droppedRecords;
 
+    /** Processing queue */
     private LinkedBlockingQueue<SpyRecord> procQueue = new LinkedBlockingQueue<SpyRecord>(1024);
 
-    private String[] attrs;
+    /** Records attributes to be copied */
+    private final String[] attrs;
 
-
+    /**
+     * Standard constructor.
+     *
+     * @param attrs attributes to be retained when passing records to submit queue.
+     */
     public CollectQueueProcessor(String...attrs) {
         this.attrs = ZorkaUtil.copyArray(attrs);
     }
 
-
+    @Override
     public SpyRecord process(SpyRecord record) {
 
         boolean submitted = false;
@@ -65,7 +84,12 @@ public class CollectQueueProcessor implements SpyProcessor, Runnable {
         return record;
     }
 
-
+    /**
+     * This method is called from processing thread main loop to perform
+     * actual processing on record obtained from queue.
+     *
+     * @param record record to be processed
+     */
     protected void doProcess(SpyRecord record) {
 
         if (record == null) {
@@ -90,7 +114,9 @@ public class CollectQueueProcessor implements SpyProcessor, Runnable {
         }
     }
 
-
+    /**
+     * Starts record processing thread.
+     */
     public void start() {
         if (thread == null) {
             thread = new Thread(this);
@@ -103,11 +129,14 @@ public class CollectQueueProcessor implements SpyProcessor, Runnable {
     }
 
 
+    /**
+     * Stops record processing thread.
+     */
     public void stop() {
         running = false;
     }
 
-
+    @Override
     public void run() {
         while (running) {
             try {

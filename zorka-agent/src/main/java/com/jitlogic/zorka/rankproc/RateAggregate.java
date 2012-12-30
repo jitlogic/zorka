@@ -21,7 +21,9 @@ import java.util.LinkedList;
 
 import com.jitlogic.zorka.util.ZorkaUtil;
 
-// TODO support for other values than long 
+/**
+ * This is old rate aggregate object.
+ */
 public class RateAggregate {
 	
 	private static class Sample {

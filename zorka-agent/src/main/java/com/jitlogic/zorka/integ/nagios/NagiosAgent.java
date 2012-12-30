@@ -18,11 +18,11 @@ package com.jitlogic.zorka.integ.nagios;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.integ.ZorkaRequestHandler;
-import com.jitlogic.zorka.util.TcpServiceThread;
+import com.jitlogic.zorka.util.AbstractTcpAgent;
 
 import java.net.Socket;
 
-public class NagiosAgent extends TcpServiceThread {
+public class NagiosAgent extends AbstractTcpAgent {
 
 
     public NagiosAgent(ZorkaBshAgent agent) {

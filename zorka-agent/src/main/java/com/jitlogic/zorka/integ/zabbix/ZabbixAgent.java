@@ -23,11 +23,11 @@ import java.net.Socket;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.integ.ZorkaRequestHandler;
-import com.jitlogic.zorka.util.TcpServiceThread;
+import com.jitlogic.zorka.util.AbstractTcpAgent;
 import com.jitlogic.zorka.logproc.ZorkaLog;
 import com.jitlogic.zorka.logproc.ZorkaLogger;
 
-public class ZabbixAgent extends TcpServiceThread {
+public class ZabbixAgent extends AbstractTcpAgent {
 	
 	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 

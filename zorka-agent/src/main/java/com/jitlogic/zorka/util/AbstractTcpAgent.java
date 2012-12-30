@@ -27,54 +27,84 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
-public abstract class TcpServiceThread implements Runnable {
+/**
+ * Abstract class that implements basic functionality of a service
+ * listening on TCP port, handling TCP connections and processing
+ * requests using ZorkaBshAgent.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
+public abstract class AbstractTcpAgent implements Runnable {
 
+    /** Logger */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
+    /** BSH agent */
     private ZorkaBshAgent agent;
 
-    private volatile Thread thread;
+    /** Connections accepting thread */
+    private Thread thread;
+
+    /** Thread main loop will run as long as this attribute is true */
     private volatile boolean running = false;
 
+    /** Name prefix (will appear in thread name, configuration properties will start with this prefix etc.) */
     private String prefix;
-    private int listenPort;
-    private InetAddress serverAddr = null, listenAddr;
 
+    /** TCP listen port */
+    private int listenPort;
+
+    /** TCP listen address */
+    private InetAddress listenAddr;
+
+    /** Agent will only accept connections coming from this address. */
+    private InetAddress serverAddr;
+
+    /** TCP server socket */
     private ServerSocket socket;
 
-
-    public TcpServiceThread(ZorkaBshAgent agent, Properties props, String prefix, int defaultPort) {
+    /**
+     * Standard constructor
+     * @param agent BSH agent
+     * @param props configuration properties
+     * @param prefix agent name prefix
+     * @param defaultPort agent default port
+     */
+    public AbstractTcpAgent(ZorkaBshAgent agent, Properties props, String prefix, int defaultPort) {
 
         this.agent = agent;
         this.prefix = prefix;
 
+        String la = props.getProperty(prefix+".listen.addr");
         try {
-            String la = props.getProperty(prefix+".listen.addr", "127.0.0.1");
             listenAddr = InetAddress.getByName(la.trim());
         } catch (UnknownHostException e) {
-            log.error("Cannot parse "+prefix+".server.addr in zorka.properties", e);
+            log.error("Cannot parse "+prefix+".listen.addr in zorka.properties", e);
         }
 
+        String lp = props.getProperty(prefix+".listen.port");
         try {
-            listenPort = Integer.parseInt(props.getProperty(prefix+".listen.port", ""+defaultPort));
-        } catch (Exception e) {
+            listenPort = Integer.parseInt(lp);
+        } catch (NumberFormatException e) {
             log.error("Invalid '"+prefix+".listen.port' setting in zorka.properties file. Was '" +
-                    props.getProperty(prefix+".listen.port", ""+defaultPort) + "', should be integer.");
+                    lp + "', should be integer.");
         }
 
         log.info("Zorka will listen for "+prefix+" connections on " + listenAddr + ":" + listenPort);
 
+        String sa = props.getProperty(prefix+".server.addr");
         try {
-            String sa = props.getProperty(prefix+".server.addr", "127.0.0.1");
             log.info("Zorka will accept "+prefix+" connections from '" + sa.trim() + "'.");
             serverAddr = InetAddress.getByName(sa.trim());
         } catch (UnknownHostException e) {
-            log.error("Cannot parse zabbix.server.addr in zorka.properties", e);
+            log.error("Cannot parse "+prefix+".server.addr in zorka.properties", e);
         }
 
     }
 
-
+    /**
+     * Opens socket and starts agent thread.
+     */
     public void start() {
         if (!running) {
             try {
@@ -92,6 +122,9 @@ public abstract class TcpServiceThread implements Runnable {
     }
 
 
+    /**
+     * Stops agent thread and closes socket.
+     */
     @SuppressWarnings("deprecation")
     public void stop() {
         if (running) {
@@ -120,25 +153,31 @@ public abstract class TcpServiceThread implements Runnable {
         }
     }
 
-
+    /**
+     * This abstract method creates new request handlers for accepted TCP connections.
+     *
+     * @param sock socket representing accepted connection
+     *
+     * @return request handler for new connection
+     */
     protected abstract ZorkaRequestHandler newRequest(Socket sock);
 
-
+    @Override
     public void run() {
 
         while (running) {
-            Socket sock = null;
+            Socket sock;
             ZorkaRequestHandler rh = null;
             try {
                 sock = socket.accept();
                 if (!sock.getInetAddress().equals(serverAddr)) {
                     log.warn("Illegal connection attempt from '" + socket.getInetAddress() + "'.");
                     sock.close();
-                    continue;
+                } else {
+                    rh = newRequest(sock);
+                    agent.exec(rh.getReq(), rh);
                 }
-                rh = newRequest(sock);
-                agent.exec(rh.getReq(), rh);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 if (running) {
                     log.error("Error occured when processing request.", e);
                 }
@@ -147,13 +186,12 @@ public abstract class TcpServiceThread implements Runnable {
                 }
             }
 
-            sock = null;
             rh = null;
 
-        } // while (running)
+        }
 
         thread = null;
 
-    } // run()
+    }
 
 }

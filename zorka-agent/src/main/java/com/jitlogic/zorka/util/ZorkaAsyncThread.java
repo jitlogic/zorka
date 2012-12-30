@@ -20,22 +20,40 @@ import com.jitlogic.zorka.logproc.ZorkaLog;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Implements asunchronous processing thread with submit queue.
+ *
+ * @param <T> type of elements in a queue
+ */
 public abstract class ZorkaAsyncThread<T> implements Runnable {
 
+    /** Logger */
     protected ZorkaLog log = null;
 
+    /** Submit queue */
     private LinkedBlockingQueue<T> submitQueue = new LinkedBlockingQueue<T>(1024);
 
+    /** Thred name (will be prefixed with ZORKA-) */
     private String name;
+
+    /** Processing thread will be working as long as this attribute value is true */
     private volatile boolean running;
+
+    /** Thread object representing actual processing thread. */
     private volatile Thread thread = null;
 
-
+    /**
+     * Standard constructor.
+     *
+     * @param name thread name
+     */
     public ZorkaAsyncThread(String name) {
         this.name = "ZORKA-"+name;
     }
 
-
+    /**
+     * This method starts thread.
+     */
     public synchronized void start() {
         if (thread == null) {
             try {
@@ -51,12 +69,14 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
         }
     }
 
-
+    /**
+     * This method causes thread to stop (soon).
+     */
     public synchronized void stop() {
         running = false;
     }
 
-
+    @Override
     public void run() {
         while (running) {
             runCycle();
@@ -66,6 +86,9 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
         thread = null;
     }
 
+    /**
+     * Processes single item from submit queue (if any).
+     */
     public synchronized void runCycle() {
         try {
             T obj = submitQueue.poll(10, TimeUnit.MILLISECONDS);
@@ -76,6 +99,11 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
         }
     }
 
+    /**
+     * Submits object to a queue.
+     *
+     * @param obj object to be submitted
+     */
     public void submit(T obj) {
         try {
             submitQueue.offer(obj, 0, TimeUnit.MILLISECONDS);
@@ -85,19 +113,32 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
 
     protected abstract void process(T obj);
 
-
+    /**
+     * Override this method if some resources have to be allocated
+     * before thread starts (eg. network socket).
+     */
     protected void open() {
 
     }
 
-
+    /**
+     * Override this method if some resources have to be disposed
+     * after thread stops (eg. network socket)
+     */
     protected void close() {
 
     }
 
-    protected void handleError(String message, Throwable obj) {
+    /**
+     * Error handling method - called when processing errors occur.
+     *
+     * @param message error message
+     *
+     * @param e exception object
+     */
+    protected void handleError(String message, Throwable e) {
         if (log != null) {
-            log.error(message, obj);
+            log.error(message, e);
         }
     }
 }
