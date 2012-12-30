@@ -17,8 +17,8 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 
 import java.util.List;
 
@@ -63,7 +63,7 @@ public class DispatchingCollector implements SpyProcessor {
                 if (null == (record = processor.process(record))) {
                     break;
                 }
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 log.error("Error transforming record: " + record + " (on processor " + processor + ")", e);
                 return null;
             }

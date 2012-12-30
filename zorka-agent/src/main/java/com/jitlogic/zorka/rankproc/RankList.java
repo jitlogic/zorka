@@ -23,15 +23,15 @@ import java.util.List;
 
 public class RankList<T extends Rankable<?>> implements RankLister<T> {
 
-    private RankLister<T> lister;
-    private int metric, average, maxSize;
-    private long rerankTime, lastTime = 0L;
+    private final RankLister<T> lister;
+    private final int metric, average, maxSize;
+    private final long rerankTime, lastTime = 0L;
 
     private int numReranks = 0;
 
     private List<T> rankList;
 
-    private ZorkaUtil util = ZorkaUtil.getInstance();
+    private final ZorkaUtil util = ZorkaUtil.getInstance();
 
     public RankList(RankLister<T> lister, int maxSize, int metric, int average, long rerankTime) {
         this.lister = lister;

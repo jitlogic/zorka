@@ -21,8 +21,6 @@ import com.jitlogic.zorka.spy.*;
 
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
-import com.jitlogic.zorka.spy.collectors.CallingBshCollector;
-import com.jitlogic.zorka.spy.collectors.CallingObjCollector;
 import com.jitlogic.zorka.spy.collectors.GetterPresentingCollector;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,7 +51,7 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
     @Before
     public void setUp() {
-        zorkaAgent.installModule("test", this);
+        zorkaAgent.install("test", this);
 
         testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
         mBeanServerRegistry.register("test", testMbs, null);
@@ -69,20 +67,8 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
     public void testFixtureIsWorkingProperly() throws Exception {
         zorkaAgent.eval("test.result(10)");
 
-        assertEquals(1, results.size());
-        assertEquals(10, results.get(0));
-    }
-
-
-    @Test
-    public void testCollectRecordToPlainJavaObj() throws Exception {
-        SpyProcessor col = new CallingObjCollector(this, "result");
-        record.feed(ON_SUBMIT, new Object[] {1L, 2L, "abc"});
-
-        col.process(record);
-
-        assertEquals(1, results.size());
-        assertEquals(record, results.get(0));
+        assertEquals("should find one result", 1, results.size());
+        assertEquals("result should be an integer", 10, results.get(0));
     }
 
 
@@ -95,47 +81,8 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
         col.process(record);
 
-        assertEquals(1, results.size());
-        assertEquals(record, results.get(0));
-    }
-
-
-    @Test
-    public void testCollectRecordViaBshFuncViaCallingBshCollector() throws Exception {
-        zorkaAgent.eval("process(obj) { test.result(obj); }");
-        SpyProcessor col = new CallingBshCollector("this");
-        record.feed(ON_SUBMIT, new Object[] {1L, 2L});
-
-        col.process(record);
-
-        assertEquals(1, results.size());
-        assertEquals(record, results.get(0));
-    }
-
-
-    @Test
-    public void testCollectRecordViaBshFuncInEmbeddedNamespace() throws Exception {
-        zorkaAgent.eval("__that() { process (obj) { test.result(obj); } return this; } that = __that();");
-        SpyProcessor col = new CallingBshCollector("that");
-        record.feed(ON_SUBMIT, new Object[] {1L, 2L});
-
-        col.process(record);
-
-        assertEquals(1, results.size());
-        assertEquals(record, results.get(0));
-    }
-
-
-    @Test
-    public void testDefineCollectorFirstAndBshNamespaceAfterThat() throws Exception {
-        SpyProcessor col = new CallingBshCollector("that");
-        zorkaAgent.eval("__that() { process (obj) { test.result(obj); } return this; } that = __that();");
-        record.feed(ON_SUBMIT, new Object[]{1L, 2L});
-
-        col.process(record);
-
-        assertEquals(1, results.size());
-        assertEquals(record, results.get(0));
+        assertEquals("should submit one result", 1, results.size());
+        assertEquals("result should be Spy record", record, results.get(0));
     }
 
 
@@ -149,7 +96,7 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
         col.process(record);
 
         Object obj = getAttr("test", "test:name=TestObj", "testAttr");
-        assertEquals("oja!", obj);
+        assertEquals("getter should return string passed via spy record", "oja!", obj);
     }
 
 
@@ -162,6 +109,6 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
         col.process(record);
 
         Object obj = getAttr("test", "test:name=TestObj", "testAttr");
-        assertEquals(4, obj);
+        assertEquals("getter should return length of string passed via spy record", 4, obj);
     }
 }

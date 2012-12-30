@@ -24,20 +24,13 @@ public class AttrGetter implements ValGetter {
 	private Object obj;
 	private Object[] attrs;
 
-    private ObjectInspector inspector = new ObjectInspector();
-	
 	public AttrGetter(Object obj, Object...attrs) {
 		this.obj = obj;
 		this.attrs = attrs;
 	}
 	
 	public Object get() {
-		Object v = obj;
-		
-		for (Object attr : attrs)
-			v = inspector.get(v, attr);
-		
-		return v;
+		return ObjectInspector.get(obj, attrs);
 	}
 
 }

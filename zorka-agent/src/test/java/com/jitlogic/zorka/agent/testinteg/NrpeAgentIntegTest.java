@@ -15,7 +15,6 @@
  */
 package com.jitlogic.zorka.agent.testinteg;
 
-import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.integ.nagios.NagiosAgent;
@@ -46,7 +45,7 @@ public class NrpeAgentIntegTest extends ZorkaFixture {
 
     @Test
     public void testTrivialRequest() throws Exception {
-        assertEquals(ZorkaConfig.getProperties().getProperty(ZorkaConfig.ZORKA_VERSION), query("zorka.version[]"));
+        assertEquals(ZorkaConfig.getProperties().getProperty("zorka.version"), query("zorka.version[]"));
     }
 
 

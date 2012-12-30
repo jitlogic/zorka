@@ -17,13 +17,13 @@ package com.jitlogic.zorka.normproc;
 
 import static com.jitlogic.zorka.normproc.XqlLexer.*;
 
-public class GenericNormalizer implements Normalizer {
+public final class GenericNormalizer implements Normalizer {
 
-    private static String PHD = "?";
+    private static final String PHD = "?";
     private static final boolean T = true, F = false;
 
 
-    private static boolean[][] XQL_JOINTS = {
+    private static final boolean[][] XQLJOINTS = {
            // U  W  S  O  L  C  K  P
             { F, F, F, F, F, F, F, F }, // U (UNKNOWN)
             { F, F, F, F, F, F, F, F }, // W (WHITESPACE)
@@ -35,7 +35,7 @@ public class GenericNormalizer implements Normalizer {
             { F, F, F, F, F, F, F, F }, // P (PLACEHOLDER)
     };
 
-    private static boolean[][] XQL_PROC = {
+    private static final boolean[][] XQLPROC = {
            // U  W  S  O  L  C  K  P
             { T, T, F, F, F, T, F, F }, // Tokens to be cut off;
             { F, F, F, F, T, F, F, T }, // Tokens to be replaced by placeholders;
@@ -43,7 +43,7 @@ public class GenericNormalizer implements Normalizer {
             { F, F, F, F, F, F, F, F }, // Tokens to be trimmed;
     };
 
-    private static boolean[][] LDAP_JOINTS = {
+    private static final boolean[][] LDAPJOINTS = {
            // U  W  S  O  L  C  K  P
             { F, F, F, F, F, F, F, F }, // U (UNKNOWN)
             { F, F, F, F, F, F, F, F }, // W (WHITESPACE)
@@ -55,7 +55,7 @@ public class GenericNormalizer implements Normalizer {
             { F, F, F, F, F, F, F, F }, // P (PLACEHOLDER)
     };
 
-    private static boolean[][] LDAP_PROC = {
+    private static final boolean[][] LDAPPROC = {
            // U  W  S  O  L  C  K  P
             { T, T, F, F, F, T, F, F }, // Tokens to be cut off;
             { F, F, F, F, T, F, F, T }, // Tokens to be replaced by placeholders;
@@ -66,26 +66,25 @@ public class GenericNormalizer implements Normalizer {
 
     private int flags;
     private Lexer template;
-    private boolean[][] joints;
+    private boolean[][] joints, proc;
     private boolean upcase = false;
-    private boolean[] fcut, fphd, fcas, ftrm;
+
 
     public static Normalizer xql(int dialect, int flags) {
-        return new GenericNormalizer(new XqlLexer(dialect, ""), flags, XQL_JOINTS, XQL_PROC);
+        return new GenericNormalizer(new XqlLexer(dialect, ""), flags, XQLJOINTS, XQLPROC);
     }
 
 
     public static Normalizer ldap(int flags) {
-        return new GenericNormalizer(new LdapLexer(""), flags, LDAP_JOINTS, LDAP_PROC);
+        return new GenericNormalizer(new LdapLexer(""), flags, LDAPJOINTS, LDAPPROC);
     }
 
 
     private GenericNormalizer(Lexer template, int flags, boolean[][] joints, boolean[][] proc) {
         this.template = template;
         this.flags = flags;
-        this.joints = XQL_JOINTS;
-        this.fcut = proc[0]; this.fphd = proc[1];
-        this.fcas = proc[2]; this.ftrm = proc[3];
+        this.joints = joints;
+        this.proc = proc;
     }
 
 
@@ -105,10 +104,10 @@ public class GenericNormalizer implements Normalizer {
             String s = token.getContent();
 
             if (0 != (flags & (1<<t))) {
-                if (fcut[t]) { continue; }
-                if (fphd[t]) { s = PHD; }
-                if (fcas[t]) { s = upcase ? s.toUpperCase() : s.toLowerCase(); }
-                if (ftrm[t]) { s = s.trim(); }
+                if (proc[0][t]) { continue; }
+                if (proc[1][t]) { s = PHD; }
+                if (proc[2][t]) { s = upcase ? s.toUpperCase() : s.toLowerCase(); }
+                if (proc[3][t]) { s = s.trim(); }
             }
 
             if (joints[last][t]) {

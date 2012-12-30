@@ -17,11 +17,10 @@ package com.jitlogic.zorka.rankproc;
 
 import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 
 import javax.management.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,8 +31,6 @@ public class JmxAggregatingLister<T extends Rankable<?>> implements RankLister<T
     private ClassLoader classLoader;
     private MBeanServerConnection mbsConn;
     private String onMask;
-
-    private ObjectInspector inspector = new ObjectInspector();
 
 
     public JmxAggregatingLister(String mbsName, String onMask) {
@@ -50,7 +47,7 @@ public class JmxAggregatingLister<T extends Rankable<?>> implements RankLister<T
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(classLoader);
 
-        for (ObjectName on : inspector.queryNames(mbsConn, onMask)) {
+        for (ObjectName on : ObjectInspector.queryNames(mbsConn, onMask)) {
             try {
                 MBeanInfo mbi = mbsConn.getMBeanInfo(on);
                 for (MBeanAttributeInfo mba : mbi.getAttributes()) {

@@ -25,11 +25,11 @@ public class SpyContext {
 
     private Integer id = null;
 
-    private SpyDefinition spyDefinition;
-    private String className, shortClassName, packageName;
-    private String methodName;
-    private String methodDesc;
-    private int access;
+    private final SpyDefinition spyDefinition;
+    private final String className, shortClassName, packageName;
+    private final String methodName;
+    private final String methodDesc;
+    private final int access;
 
     public SpyContext(SpyDefinition spyDefinition, String className,
                       String methodName, String methodDesc, int access) {

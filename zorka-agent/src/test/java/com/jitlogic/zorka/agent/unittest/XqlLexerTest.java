@@ -25,6 +25,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -120,5 +121,12 @@ public class XqlLexerTest extends LexerFixture {
             lst(k("select"), w(" "), o("*"), w(" "), k("from"), w(" "), s("mytab"), w(" "),
                     k("where"), w(" "), s("myfield"), w(" "), o("="), w(" "), l("'abc'")),
             lex("select * from mytab where myfield = 'abc'"));
+    }
+
+    @Test
+    public void testXqlKeywordSets() {
+        for (Set<String> kwset : XqlLexer.keywordSets) {
+
+        }
     }
 }

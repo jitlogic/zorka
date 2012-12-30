@@ -23,8 +23,8 @@ import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 
 
 /**
@@ -32,15 +32,15 @@ import com.jitlogic.zorka.util.ZorkaLogger;
  */
 public class GetterPresentingCollector implements SpyProcessor {
 
-    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
+    private final MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
 
-    private String mbsName;
-    private String mbeanTemplate, attrTemplate;
-    private String desc;
-    private String src;
-    private Object[] path;
+    private final String mbsName;
+    private final String mbeanTemplate, attrTemplate;
+    private final String desc;
+    private final String src;
+    private final Object[] path;
 
 
     public GetterPresentingCollector(String mbsName, String mbeanTemplate, String attrTemplate, String desc,

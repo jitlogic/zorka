@@ -1,4 +1,4 @@
-package com.jitlogic.zorka.util;
+package com.jitlogic.zorka.logproc;
 
 /**
  */

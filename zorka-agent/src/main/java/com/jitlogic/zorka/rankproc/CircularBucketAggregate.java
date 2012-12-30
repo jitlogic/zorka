@@ -15,59 +15,81 @@
  */
 package com.jitlogic.zorka.rankproc;
 
+/**
+ * Default implementation of CircularBucketAggregate.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class CircularBucketAggregate implements BucketAggregate {
 
-    private long base, total, tstart, tlast;
+    /** Base unit */
+    private long base;
+
+    /** Sum of all submitted values */
+    private long total;
+
+    /** Timestamp of first and last value submitted */
+    private long tfirst, tlast;
+
+    /** Resolution of aggregate calculations */
     private int res;
 
 
-    /**
-     * Length of each section.  [stages.length]
-     */
-    private long[] windows;
+    /** Length of each average (in base unit).  [averages.length] */
+    private long[] averages;
 
 
-    /**
-     * Timestamps of the beggining of each window.   [stages.length]
-     */
+    /** Timestamps of the beggining of each window.[averages.length] */
     private long[] ts;
 
 
     /**
-     * Fist and last sample timestamp in each section. Initially tmin = tmax = -1.
+     * Fist and last sample timestamp in each average. Initially tmin = tmax = -1.
      * For sections with  tmin points to the end of the section 1 and tmax points to the beginning.
-     *
      */
-    private long[] tmin, tmax;               // stages.length * res
+    private long[] tmin, tmax;  // averages.length * res
+
+
+    /** Collected data (length=stages.length*res). */
+    private long[] values;
 
 
     /**
-     * Collected data.
+     * Standard constructor.
+     *
+     * @param base base unit (eg. 1000000000 if time is passed in nanoseconds but averages are defined in seconds)
+     *
+     * @param res resolution of each average window
+     *
+     * @param averages lengths of calculated averages (defined in base units)
      */
-    private long[] values;               // stages.length * res
-
-
-    public CircularBucketAggregate(long base, int res, int...stages) {
+    public CircularBucketAggregate(long base, int res, int...averages) {
         this.base = base;
         this.res = res;
 
-        this.windows = new long[stages.length];
+        this.averages = new long[averages.length];
 
-        this.ts = new long[stages.length];
-        this.tmin = new long[stages.length * res];
-        this.tmax = new long[stages.length * res];
-        this.values = new long[stages.length * res];
+        this.ts = new long[averages.length];
+        this.tmin = new long[averages.length * res];
+        this.tmax = new long[averages.length * res];
+        this.values = new long[averages.length * res];
 
-        for (int i = 0; i < windows.length; i++) {
+        for (int i = 0; i < this.averages.length; i++) {
             // TODO check if resolution fits
-            windows[i] = base * stages[i];
+            this.averages[i] = base * averages[i];
             ts[i] = 0;
-            cleanupStage(i);
+            cleanup(i);
         }
     }
 
-    private void cleanupStage(int stage) {
-        int offs = stage * this.res;
+
+    /**
+     * Cleans up given average aggregate
+     *
+     * @param averageIdx average index
+     */
+    private void cleanup(int averageIdx) {
+        int offs = averageIdx * this.res;
         for (int j = offs; j < offs + this.res; j++) {
             tmin[j] = tmax[j] = -1;
             values[j] = 0;
@@ -75,75 +97,90 @@ public class CircularBucketAggregate implements BucketAggregate {
     }
 
 
+    @Override
     public int size() {
-        return windows.length;
+        return averages.length;
     }
 
 
-    public long getWindow(int stage) {
-        return windows[stage];
+    @Override
+    public long getWindow(int averageIdx) {
+        return averages[averageIdx];
     }
 
 
+    @Override
     public int getStage(long window) {
-        for (int i = 0; i < windows.length; i++) {
-            if (windows[i] == window) {
+        for (int i = 0; i < averages.length; i++) {
+            if (averages[i] == window) {
                 return i;
             }
 
-            if (windows[i] > window) {
-                return (i > 0 && window-windows[i-1] < windows[i]-window) ? i-1 : i;
+            if (averages[i] > window) {
+                return (i > 0 && window- averages[i-1] < averages[i]-window) ? i-1 : i;
             }
         }
 
-        return window < windows[windows.length-1] * 2 ? windows.length-1 : -1;
+        return window < averages[averages.length-1] * 2 ? averages.length-1 : -1;
     }
 
 
+    @Override
     public long getTime() {
-        return tlast - tstart;
+        return tlast - tfirst;
     }
 
 
+    @Override
     public long getLast() {
         return tlast;
     }
 
 
+    @Override
     public long getTotal() {
         return total;
     }
 
 
+    @Override
     public long getStart() {
-        return tstart;
+        return tfirst;
     }
 
 
-    private void feedWindow(int stage, long tstamp, long value) {
-        int offset = stage * res;
-        long window = windows[stage], sectn = window / res;
+    /**
+     * Submits value to a specific average
+     *
+     * @param averageIdx average index
+     *
+     * @param tstamp timestamp of submitted value
+     *
+     * @param value submitted value
+     */
+    private void feedAverage(int averageIdx, long tstamp, long value) {
+        int offset = averageIdx * res;
+        long window = averages[averageIdx], sectn = window / res;
 
         // TODO get rid of code below, use touch() method instead
 
-        if (tstamp - ts[stage] < 0) {
+        if (tstamp - ts[averageIdx] < 0) {
             return;
-        } else if (tstamp - ts[stage] > window) {
-            cleanupStage(stage);
-            ts[stage] = tstamp - (tstamp % sectn);
+        } else if (tstamp - ts[averageIdx] > window) {
+            cleanup(averageIdx);
+            ts[averageIdx] = tstamp - (tstamp % sectn);
             tmin[offset] = tmax[offset] = tstamp;
             values[offset] = value;
-        } else if (tstamp - ts[stage] > window/res) {
-            long tss = tstamp % sectn;
-            while (tstamp > ts[stage] + sectn) {
+        } else if (tstamp - ts[averageIdx] > window/res) {
+            while (tstamp > ts[averageIdx] + sectn) {
                 for (int i = res-1; i > 0; i--) {
                     tmin[offset+i] = tmin[offset+i-1];
                     tmax[offset+i] = tmax[offset+i-1];
                     values[offset+i] = values[offset+i-1];
                 }
-                ts[stage] += sectn;
-                tmin[offset] = ts[stage];
-                tmax[offset] = ts[stage] + res;
+                ts[averageIdx] += sectn;
+                tmin[offset] = ts[averageIdx];
+                tmax[offset] = ts[averageIdx] + res;
                 values[offset] = 0;
             } // while ()
             values[offset] = value;
@@ -157,42 +194,51 @@ public class CircularBucketAggregate implements BucketAggregate {
     }
 
 
+    @Override
     public void feed(long tstamp, long value) {
-        for (int i = 0; i < windows.length; i++) {
-            feedWindow(i, tstamp, value);
+        for (int i = 0; i < averages.length; i++) {
+            feedAverage(i, tstamp, value);
         }
 
         total += value;
 
-        if (tstart == -1) {
-            tstart = tstamp;
+        if (tfirst == -1) {
+            tfirst = tstamp;
         }
 
         tlast = Math.max(tlast, tstamp);
     }
 
 
-    private void touch(long tstamp, int stage) {
-        int offset = stage * res;
-        long window = windows[stage], sectn = window / res;
+    /**
+     * Ensures that given average is in sync with timestamp. This is used to ensure that
+     * readings of averages is accurate even if there is no
+     *
+     * @param averageIdx average index
+     *
+     * @param tstamp timestamp
+     *
+     */
+    private void touch(int averageIdx, long tstamp) {
+        int offset = averageIdx * res;
+        long window = averages[averageIdx], sectn = window / res;
 
-        if (tstamp - ts[stage] < 0) {
+        if (tstamp - ts[averageIdx] < 0) {
             return;
-        } else if (tstamp - ts[stage] > window) {
-            cleanupStage(stage);
-            ts[stage] = tstamp - (tstamp % sectn);
+        } else if (tstamp - ts[averageIdx] > window) {
+            cleanup(averageIdx);
+            ts[averageIdx] = tstamp - (tstamp % sectn);
             values[offset] = 0;
-        } else if (tstamp - ts[stage] > window/res) {
-            long tss = tstamp % sectn;
-            while (tstamp > ts[stage] + sectn) {
+        } else if (tstamp - ts[averageIdx] > window/res) {
+            while (tstamp > ts[averageIdx] + sectn) {
                 for (int i = res-1; i > 0; i--) {
                     tmin[offset+i] = tmin[offset+i-1];
                     tmax[offset+i] = tmax[offset+i-1];
                     values[offset+i] = values[offset+i-1];
                 }
-                ts[stage] += sectn;
-                tmin[offset] = ts[stage];
-                tmax[offset] = ts[stage] + res;
+                ts[averageIdx] += sectn;
+                tmin[offset] = ts[averageIdx];
+                tmax[offset] = ts[averageIdx] + res;
                 values[offset] = 0;
             } // while ()
             values[offset] = 0;
@@ -201,11 +247,12 @@ public class CircularBucketAggregate implements BucketAggregate {
     }
 
 
-    public long getDeltaV(long tstamp, int stage) {
-        int offset = stage * res;
+    @Override
+    public long getDeltaV(int averageIdx, long tstamp) {
+        int offset = averageIdx * res;
         long v = 0;
 
-        touch(tstamp, stage);
+        touch(averageIdx, tstamp);
 
         for (int i = offset; i < offset + res; i++) {
             v += values[i];
@@ -215,11 +262,12 @@ public class CircularBucketAggregate implements BucketAggregate {
     }
 
 
-    public long getDeltaT(long tstamp, int stage) {
-        int offset = stage * res;
+    @Override
+    public long getDeltaT(int averageIdx, long tstamp) {
+        int offset = averageIdx * res;
         long t1 = -1, t2 = -1;
 
-        touch(tstamp, stage);
+        touch(averageIdx, tstamp);
 
         for (int i = offset; i < offset + res; i++) {
             if (t1 == -1) {

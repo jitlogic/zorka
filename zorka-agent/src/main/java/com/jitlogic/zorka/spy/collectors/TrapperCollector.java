@@ -16,35 +16,47 @@
  */
 package com.jitlogic.zorka.spy.collectors;
 
-import com.jitlogic.zorka.integ.ZorkaTrapper;
+import com.jitlogic.zorka.logproc.ZorkaLogLevel;
+import com.jitlogic.zorka.logproc.ZorkaTrapper;
 import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 
+/**
+ * Logs incoming records using trapper.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class TrapperCollector implements SpyProcessor {
 
+    /** Trapper object. */
     private ZorkaTrapper trapper;
-    private String tagExpr, stdExpr, errExpr, errSlot;
 
-    private ObjectInspector inspector = new ObjectInspector();
+    /** Log level */
+    private ZorkaLogLevel logLevel;
 
+    /** Tag, message, error templates and error field */
+    private String tagExpr, stdExpr, errExpr, errField;
 
-    public TrapperCollector(ZorkaTrapper trapper, String tagExpr, String stdExpr, String errExpr, String errField) {
+    public TrapperCollector(ZorkaTrapper trapper, ZorkaLogLevel logLevel,
+                            String tagExpr, String stdExpr, String errExpr, String errField) {
+
         this.trapper = trapper;
+        this.logLevel = logLevel;
         this.tagExpr = tagExpr;
         this.stdExpr = stdExpr;
         this.errExpr = errExpr;
-        this.errSlot = errField;
+        this.errField = errField;
     }
 
-
+    @Override
     public SpyRecord process(SpyRecord record) {
 
-        String tag = inspector.substitute(tagExpr, record);
-        String msg = inspector.substitute(record.hasStage(SpyLib.ON_ERROR) ? errExpr : stdExpr, record);
+        String tag = ObjectInspector.substitute(tagExpr, record);
+        String msg = ObjectInspector.substitute(record.hasStage(SpyLib.ON_ERROR) ? errExpr : stdExpr, record);
 
-        trapper.trap(tag, msg, (Throwable)record.get(errSlot));
+        trapper.trap(logLevel, tag, msg, (Throwable)record.get(errField));
 
         return record;
     }

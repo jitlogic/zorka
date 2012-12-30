@@ -17,20 +17,20 @@
 
 package com.jitlogic.zorka.spy;
 
+import bsh.EvalError;
+
 public class MainSubmitter {
 
     private static SpySubmitter submitter = null;
-    private static long errorCount = 0;
+    private static volatile long errorCount = 0;
 
     public static void submit(int stage, int id, int submitFlags, Object[] vals) {
         try {
             if (submitter != null) {
                 submitter.submit(stage, id, submitFlags, vals);
             }
-        } catch (Throwable e) {
-            synchronized (MainSubmitter.class) {
-                errorCount++;
-            }
+        } catch (Exception e) {
+            errorCount++;
         }
     }
 

@@ -17,6 +17,8 @@
 
 package com.jitlogic.zorka.agent;
 
+import bsh.EvalError;
+
 import java.io.Closeable;
 import java.io.IOException;
 
@@ -38,9 +40,9 @@ public class ZorkaBshWorker implements Runnable, Closeable {
 	public void run() {
 		try {
 			callback.handleResult(agent.eval(expr));
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			callback.handleError(e);
-		} 
+		}
 	}
 
     public void close() throws IOException {

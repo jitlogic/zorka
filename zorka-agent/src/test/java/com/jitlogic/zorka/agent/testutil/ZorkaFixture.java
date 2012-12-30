@@ -21,7 +21,7 @@ import com.jitlogic.zorka.integ.snmp.SnmpLib;
 import com.jitlogic.zorka.integ.syslog.SyslogLib;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyLib;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 
 import org.junit.After;
 import org.junit.Before;
@@ -67,7 +67,7 @@ public class ZorkaFixture {
         mBeanServerRegistry = new MBeanServerRegistry(true);
         AgentInstance.setMBeanServerRegistry(mBeanServerRegistry);
 
-        agentInstance = new AgentInstance(configProperties, new TestExecutor());
+        agentInstance = new AgentInstance(configProperties);
         AgentInstance.setInstance(agentInstance);
         agentInstance.start();
 

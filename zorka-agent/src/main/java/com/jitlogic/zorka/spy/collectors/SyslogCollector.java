@@ -28,8 +28,6 @@ public class SyslogCollector implements SpyProcessor {
     int severity, facility;
     private String tag, hostname;
 
-    private ObjectInspector inspector = new ObjectInspector();
-
 
     public SyslogCollector(SyslogTrapper trapper, String expr,
                            int severity, int facility, String hostname, String tag) {
@@ -46,7 +44,7 @@ public class SyslogCollector implements SpyProcessor {
 
     public SpyRecord process(SpyRecord record) {
 
-        String msg = inspector.substitute(expr, record);
+        String msg = ObjectInspector.substitute(expr, record);
 
         if (hostname != null) {
             trapper.log(severity, facility, hostname, tag, msg);
