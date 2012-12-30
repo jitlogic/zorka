@@ -60,7 +60,7 @@ public class BshAgentIntegTest extends ZorkaFixture {
 	@Test
 	public void testAgentFunctions() throws Exception {
 		assertEquals(
-                ZorkaConfig.getProperties().getProperty(ZorkaConfig.ZORKA_VERSION),
+                ZorkaConfig.getProperties().getProperty("zorka.version"),
                 execute("zorka.version()", 1000));
         AgentInstance.setMBeanServerRegistry(null);
 	}

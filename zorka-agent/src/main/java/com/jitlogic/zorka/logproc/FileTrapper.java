@@ -22,35 +22,100 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * File trapper implements trapper interface that logs messages to local file.
+ * Two kinds of log files are defined: rolling (rotating) log and daily log
+ * (with yyyy-mm-dd suffixes).
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrapper {
 
+    /** Rolling (rotating) file trapper maintains limited numebr of archived logs. */
     private static final int ROLLING = 1;
-    private static final int DATED   = 2;
 
+    /** Daily file trapper mainatains log files by date (yyyy-mm-dd) */
+    private static final int DAILY = 2;
+
+    /** Base log file */
     private final File logFile;
+
+    /** Trapper type */
     private final int type;
+
+    /** Maximum number of logs (only for rolling trappers) */
     private final int maxLogs;
+
+    /** Maximum log size (only for rolling trappers) */
     private final long maxSize;
+
+    /** Logs stack traces of exceptions if set to true */
     private boolean logExceptions = true;
 
+    /** Backup logger where trapper can log its own events */
     private final ZorkaLog log = null;
 
+    /** Output (as print stream) */
     private PrintStream out = null;
+
+    /** Output (as output stream) */
     private OutputStream os = null;
+
+    /** Current log size (for rolling trappers) */
     private long currentSize = 0;
+
+    /** Current suffix (for daily trappers) */
     private String currentSuffix = null;
 
-
+    /**
+     * Creates new rolling trapper.
+     *
+     * @param logLevel log level
+     *
+     * @param logPath path to log file
+     *
+     * @param maxLogs maximum number of archived logs
+     *
+     * @param maxSize maximum log file size
+     *
+     * @param logExceptions logs stack traces of exceptions if true
+     *
+     * @return new file trapper
+     */
     public static FileTrapper rolling(ZorkaLogLevel logLevel, String logPath, int maxLogs, long maxSize, boolean logExceptions) {
         return new FileTrapper(new File(logPath), ROLLING, maxLogs, maxSize, logExceptions);
     }
 
 
+    /**
+     * Creates new daily trapper
+     *
+     * @param logLevel log level
+     *
+     * @param logPath path to log file
+     *
+     * @param logExceptions log stack traces of exceptions if true
+     *
+     * @return new file trapper
+     */
     public static FileTrapper daily(ZorkaLogLevel logLevel, String logPath, boolean logExceptions) {
-        return new FileTrapper(new File(logPath), DATED, 0, Long.MAX_VALUE, logExceptions);
+        return new FileTrapper(new File(logPath), DAILY, 0, Long.MAX_VALUE, logExceptions);
     }
 
 
+    /**
+     * Standard constructor (not publicly available - use static methods instead).
+     *
+     * @param logFile log file path (as File object)
+     *
+     * @param type trapper type
+     *
+     * @param maxLogs max number of logs (irrelevant for daily trappers)
+     *
+     * @param size log size (irrelevant for daily trappers)
+     *
+     * @param logExceptions log stack traces of exceptions if true
+     */
     private FileTrapper(File logFile, int type, int maxLogs, long size, boolean logExceptions) {
         super(logFile.getName());
         this.logFile = logFile;
@@ -61,7 +126,8 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
     }
 
 
-    public void log(ZorkaLogLevel logLevel, String tag, String message, Throwable e, Object... args) {
+    @Override
+    public void trap(ZorkaLogLevel logLevel, String tag, String message, Throwable e, Object... args) {
         StringBuilder sb = new StringBuilder();
         sb.append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         sb.append(" ");
@@ -89,6 +155,17 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
     }
 
 
+    /**
+     * Formats string. Used by other trapper functions. If there are no arguments, string formatting
+     * is skipped and message string (template) is returned right away. See String.format() description
+     * for more information about string formatting.
+     *
+     * @param message message string (template)
+     *
+     * @param args arguments for String.format() function
+     *
+     * @return formatted string
+     */
     public String format(String message, Object...args) {
         if (args.length == 0) {
             return message;
@@ -111,7 +188,7 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
                     reset();
                 }
                 break;
-            case DATED:
+            case DAILY:
                 if (!new SimpleDateFormat("yyyy-MM-dd").format(new Date()).equals(currentSuffix)) {
                     reset();
                 }
@@ -151,6 +228,10 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
     }
 
 
+    /**
+     * Resets trapper. That means closing log file and opening it again (or a new one).
+     * Depending on trapper type, rotation or reopening (possibly with new date suffix) is performed.
+     */
     private void reset() {
 
         close();
@@ -158,15 +239,16 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
         switch (type) {
             case ROLLING:
                 roll(); break;
-            case DATED:
+            case DAILY:
                 reopen(); break;
         }
     }
 
 
+    /**
+     * Performs log file rotation for rolling trappers.
+     */
     private void roll() {
-        String logDir = logFile.getParent(), logFileName = logFile.getName();
-
         File f = new File(logFile.getPath() + "." + maxLogs);
         if (f.exists()) {
             f.delete();
@@ -196,6 +278,9 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
     }
 
 
+    /**
+     * Performs file reopen for daily trappers.
+     */
     private void reopen() {
         currentSuffix = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         File f = new File(logFile.getAbsolutePath() + "." + currentSuffix);
@@ -208,9 +293,5 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
                 log.error("Cannot open log file " + f.getAbsolutePath(), e);
             }
         }
-    }
-
-    public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e, Object... args) {
-        log(logLevel, tag, msg, e);
     }
 }

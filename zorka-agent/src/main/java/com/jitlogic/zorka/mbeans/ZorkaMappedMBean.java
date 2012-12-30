@@ -40,11 +40,13 @@ import javax.management.openmbean.TabularType;
 import com.jitlogic.zorka.logproc.ZorkaLog;
 import com.jitlogic.zorka.logproc.ZorkaLogger;
 
-// TODO proper structure for supporting parallelism (in somewhat more elegant way)
 
+/**
+ * Zorka mapped (dynamic) mbean can be used to implement
+ */
 public class ZorkaMappedMBean implements DynamicMBean {
 
-	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+	private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaMappedMBean.class);
 	
 	private String description;
 	private Map<String,Attribute> attrs = new HashMap<String, Attribute>();
@@ -55,7 +57,8 @@ public class ZorkaMappedMBean implements DynamicMBean {
 	public ZorkaMappedMBean(String description) {
 		this.description = description;
 	}
-	
+
+    @Override
 	public synchronized Object getAttribute(String attribute)
 			throws AttributeNotFoundException, MBeanException,
 			ReflectionException {
@@ -73,7 +76,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
         return v instanceof ValGetter ? ((ValGetter)v).get() : v;
 	}
 	
-	
+	@Override
 	public synchronized void setAttribute(Attribute attribute)
 			throws AttributeNotFoundException, InvalidAttributeValueException,
 			MBeanException, ReflectionException {
@@ -82,7 +85,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
 	}
 	
 	
-	@SuppressWarnings("unchecked")
+	@Override @SuppressWarnings("unchecked")
 	public synchronized AttributeList getAttributes(String[] attributes) {
 		AttributeList lst = new AttributeList(attributes.length);
 		for (String attr : attributes) {
@@ -90,14 +93,15 @@ public class ZorkaMappedMBean implements DynamicMBean {
 				final Object val = getAttribute(attr);
 				lst.add(val);
 			} catch (Exception e) {
-				// Nothing to do here, move along !
+				log.error("Error getting attribute '"+attr+"':", e);
 			}
 		}
 
 		return lst;
 	}
 	
-	
+
+    @Override
 	public synchronized AttributeList setAttributes(AttributeList attributes) {
 		AttributeList lst = new AttributeList(attributes.size());
 		for (Object attrObj : attributes) {
@@ -106,14 +110,15 @@ public class ZorkaMappedMBean implements DynamicMBean {
 				setAttribute(attr);
 				lst.add(new Attribute(attr.getName(), attr.getValue()));
 			} catch (Exception e) {
-				// Nothing to do here, move along !
+				log.error("Error setting attribute '" + e + "'", e);
 			}
 		}
 
 		return lst;
 	}
 	
-	
+
+    @Override
 	public Object invoke(String actionName, Object[] params, String[] signature)
 			throws MBeanException, ReflectionException {
 		// TODO setAttribute()/getAttribute() ?  
@@ -164,7 +169,8 @@ public class ZorkaMappedMBean implements DynamicMBean {
 		mbeanInfoChanged = false;
 	}  // 
 	
-	
+
+    @Override
 	public synchronized MBeanInfo getMBeanInfo() {
 		if (mbeanInfoChanged)
 			refreshMBeanInfo();
@@ -176,19 +182,22 @@ public class ZorkaMappedMBean implements DynamicMBean {
 			Attribute attr = new Attribute(name, value);
 			setAttribute(attr);
 		} catch (Exception e) {
-			// TODO obsluzyc i zalogowac problem
+			log.error("Error setting attribute '"+name+"':", e);
 		}
 	}
-	
+
+
 	public synchronized Object get(String name) {
 		Attribute attr = attrs.get(name);
 		return attr != null ? attr.getValue() : null;
 	}
-	
+
+
 	public synchronized boolean hasAttribute(String name) {
 		return attrs.containsKey(name);
 	}
-	
+
+
 	@Override
 	public String toString() {
 		return "ZorkaMappedMBean(" + description + ")";

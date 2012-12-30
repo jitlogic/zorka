@@ -34,17 +34,54 @@ import java.util.*;
  * Performance note: this wrapper is intended for jconsole and similiar interactive tools.
  * Do not use it for automated monitoring, use bare objects to obtain better performance.
  *
- * @author RLE <rafal.lewczuk@gmail.com>
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class TabularDataWrapper<V> implements TabularData, Serializable {
 
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
+    /**
+     * This interface binds tabular data wrapper with undelying data structures.
+     */
     private static interface TabularSetExtractor {
+
+        /**
+         * Returns set size (number of objects in a set).
+         *
+         * @return tabular set size
+         */
         public int size();
+
+        /**
+         * Returns values representing table rows.
+         *
+         * @return collection of rows
+         */
         public Collection<?> values();
+
+        /**
+         * Returns true if set contains row identified by given key.
+         *
+         * @param key key identifying single object
+         *
+         * @return true if set contains given row
+         */
         boolean containsKey(String key);
+
+        /**
+         * Returns keys identifying all records in a set.
+         *
+         * @return key set
+         */
         Set<?> keySet();
+
+        /**
+         * Returns object from a set identified by given key.
+         *
+         * @param key key identifying single object
+         *
+         * @return object identified by given key or null if not found
+         */
         Object get(String key);
     }
 
@@ -56,25 +93,42 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
     private TabularType tabularType;
     private Object data;
 
-    private Class<?> wrappedClass;
-
     private TabularSetExtractor extractor;
 
 
+    /**
+     * Creates tabular data wrapper.
+     * @param wrappedClass class of wrapped objects
+     * @param data object containing set of wrapped objects
+     * @param description table description
+     * @param indexName attribute used as key in data set
+     * @param attrNames displayed attribute names
+     * @param attrTypes types of displayed attributes (columns in resulting table)
+     * @throws OpenDataException thrown from JMX Open Data code
+     */
     public TabularDataWrapper(Class<?> wrappedClass, Object data, String description,
                               String indexName, String[] attrNames, OpenType[] attrTypes)
         throws OpenDataException {
         this(wrappedClass, data, description, indexName, attrNames, attrTypes, attrNames);
     }
 
+    /**
+     * Creates tabular data wrapper.
+     * @param wrappedClass class of wrapped objects
+     * @param data object containing set of wrapped objects
+     * @param description table description
+     * @param indexName attribute used as key in data set
+     * @param attrNames displayed attribute names
+     * @param attrTypes types of displayed attributes (columns in resulting table)
+     * @param attrDescriptions descriptions of displayed attributes
+     * @throws OpenDataException thrown from JMX Open Data code
+     */
     public TabularDataWrapper(Class<?> wrappedClass, Object data, String description,
             String indexName, String[] attrNames, OpenType[] attrTypes, String[] attrDescriptions)
             throws OpenDataException {
 
         this.data = data;
         this.indexName = indexName;
-
-        this.wrappedClass = wrappedClass;
 
         if (data == null) {
             throw new IllegalArgumentException("Wrapped data set cannot be null.");
@@ -99,27 +153,27 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
 
     }
 
-
+    @Override
     public TabularType getTabularType() {
         return tabularType;
     }
 
-
+    @Override
     public Object[] calculateIndex(CompositeData value) {
         return new Object[] { value.get(indexName) };
     }
 
-
+    @Override
     public int size() {
         return extractor.size();
     }
 
-
+    @Override
     public boolean isEmpty() {
         return size() == 0;
     }
 
-
+    @Override
     public boolean containsKey(Object[] key) {
 
         if (key.length != 1 || !(key[0] instanceof String))
@@ -128,14 +182,14 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
         return extractor.containsKey((String)key[0]);
     }
 
-
+    @Override
     public boolean containsValue(CompositeData value) {
         CompositeData found = get(new Object[]{value.get(indexName)});
 
         return found != null && found.equals(value);
     }
 
-
+    @Override
     public CompositeData get(Object[] key) {
 
         if (key.length != 1 || !(key[0] instanceof String))
@@ -163,32 +217,32 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
         return null;
     }
 
-
+    @Override
     public void put(CompositeData value) {
         throw new UnsupportedOperationException("This read-only view.");
     }
 
-
+    @Override
     public CompositeData remove(Object[] key) {
         throw new UnsupportedOperationException("This is read-only view.");
     }
 
-
+    @Override
     public void putAll(CompositeData[] values) {
         throw new UnsupportedOperationException("This is read-only view.");
     }
 
-
+    @Override
     public void clear() {
         throw new UnsupportedOperationException("This is read-only view.");
     }
 
-
+    @Override
     public Set<?> keySet() {
         return extractor.keySet();
     }
 
-
+    @Override
     public Collection<?> values() {
         return extractor.values();
     }
@@ -199,14 +253,17 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
      */
     public class CollectionSetExtractor implements TabularSetExtractor {
 
+        @Override
         public int size() {
             return ((Collection)data).size();
         }
 
+        @Override
         public Collection<?> values() {
             return (Collection)data;
         }
 
+        @Override
         public boolean containsKey(String key) {
             for (Object obj : (Collection)data) {
                 if (key.equals(ObjectInspector.get(obj, indexName)))
@@ -215,6 +272,7 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
             return false;
         }
 
+        @Override
         public Set<?> keySet() {
             Set<List<?>> keyset = new HashSet<List<?>>(size()*2);
 
@@ -224,6 +282,7 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
             return keyset;
         }
 
+        @Override
         public Object get(String key) {
             for (Object obj : (Collection)data) {
                 if (key.equals(ObjectInspector.get(obj, indexName)))
@@ -239,18 +298,22 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
      */
     private class MapSetExtractor implements TabularSetExtractor {
 
+        @Override
         public int size() {
             return ((Map)data).size();
         }
 
+        @Override
         public Collection<?> values() {
             return ((Map)data).values();
         }
 
+        @Override
         public boolean containsKey(String key) {
             return ((Map)data).containsKey(key);
         }
 
+        @Override
         public Set<?> keySet() {
             Set<List<?>> keyset = new HashSet<List<?>>(size()*2);
 
@@ -261,12 +324,10 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
             return keyset;
         }
 
+        @Override
         public Object get(String key) {
             return ((Map)data).get(key);
         }
     }
 
-    // TODO toString()
-
-    // TODO hashCode()
 }

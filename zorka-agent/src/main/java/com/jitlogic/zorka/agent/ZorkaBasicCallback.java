@@ -17,25 +17,33 @@
 
 package com.jitlogic.zorka.agent;
 
-import com.jitlogic.zorka.util.ObjectDumper;
-
+/**
+ * This is default implementation of ZorkaCallback interface.
+ */
 public class ZorkaBasicCallback implements ZorkaCallback {
 
+    /** Stored result */
 	private Object result = null;
+
+    /** Stored error */
 	private Throwable error = null;
-	
+
+    @Override
 	public void handleResult(Object result) {
 		this.result = result;
 	}
 
+    @Override
 	public void handleError(Throwable e) {
 		this.error = e;
 	}
-	
+
+    /** Returns result */
 	public Object getResult() {
 		return result;
 	}
-	
+
+    /** Returns error */
 	public Throwable getError() {
 		return error;
 	}

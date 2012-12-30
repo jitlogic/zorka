@@ -67,7 +67,7 @@ public class ZorkaFixture {
         mBeanServerRegistry = new MBeanServerRegistry(true);
         AgentInstance.setMBeanServerRegistry(mBeanServerRegistry);
 
-        agentInstance = new AgentInstance(configProperties, new TestExecutor());
+        agentInstance = new AgentInstance(configProperties);
         AgentInstance.setInstance(agentInstance);
         agentInstance.start();
 

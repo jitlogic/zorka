@@ -24,11 +24,8 @@ import java.net.Socket;
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
 import static org.junit.Assert.*;
-
-import com.jitlogic.zorka.agent.ZorkaBshAgent;
 
 public class JavaAgentIntegTest {
 
@@ -67,7 +64,7 @@ public class JavaAgentIntegTest {
 	//@Test
 	public void testStartAndStopTibcoAgent() throws Exception {
 		assertEquals(
-                ZorkaConfig.getProperties().getProperty(ZorkaConfig.ZORKA_VERSION),
+                ZorkaConfig.getProperties().getProperty("zorka.version"),
                 query("zorka__version[]"));
 	}
 

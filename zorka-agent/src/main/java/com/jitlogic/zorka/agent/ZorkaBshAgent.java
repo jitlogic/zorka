@@ -29,65 +29,121 @@ import bsh.EvalError;
 import bsh.Interpreter;
 import com.jitlogic.zorka.logproc.ZorkaLogger;
 
+/**
+ * This is central part of Zorka agent - it processes actual queries and executes BSH scripts.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class ZorkaBshAgent {
 
+    /** Logger */
 	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
+    /** Beanshell interpreter */
 	private Interpreter interpreter;
+
+    /** Zorka standard library */
 	private ZorkaLib zorkaLib;
+
+    /** Executor for asynchronous processing queries */
 	private Executor executor;
-	private URL configDir = null;
 
-    private ObjectDumper dumper = new ObjectDumper();
-
+    /**
+     * Standard constructor.
+     *
+     * @param executor executor for asynchronous processing queries
+     */
 	public ZorkaBshAgent(Executor executor) {
 		this.interpreter = new Interpreter();
 		this.executor = executor;
 
 		zorkaLib = new ZorkaLib(this);
-
-        installModule("zorka", zorkaLib);
+        install("zorka", zorkaLib);
     }
 
 
-    public void installModule(String name, Object module) {
+    /**
+     * Installs object in beanshell namespace. Typically used to install
+     * objects as function libraries.
+     *
+     * @param name name in beanshell namespace
+     *
+     * @param obj object
+     */
+    public void install(String name, Object obj) {
         try {
-            interpreter.set(name, module);
+            interpreter.set(name, obj);
         } catch (EvalError e) {
             log.error("Error adding module '" + name + "' to global namespace", e);
         }
     }
 
 
+    /**
+     * Evaluates BSH query. If error occurs, it returns exception text with stack dump.
+     *
+     * @param expr query string
+     *
+     * @return response string
+     */
     public String query(String expr) {
 		try {
 			return ""+interpreter.eval(expr); // TODO proper object-to-string conversion
 		} catch (EvalError e) {
 			log.error("Error evaluating '" + expr + "': ", e);
-			return dumper.errorDump(e);
+			return ObjectDumper.errorDump(e);
 		}
 	}
-	
-	
+
+
+    /**
+     * Evaluates BSH query. If evaluation error occurs, it is thrown out as EvalError.
+     *
+     * @param expr query string
+     *
+     * @return evaluation result
+     *
+     * @throws EvalError
+     */
 	public Object eval(String expr) throws EvalError {
 		return interpreter.eval(expr);
 	}
-	
-	
+
+
+    /**
+     * Executes query asynchronously. Result is returned via callback object.
+     *
+     * @param expr BSH expression
+     *
+     * @param callback callback object
+     */
 	public void exec(String expr, ZorkaCallback callback) {
 		ZorkaBshWorker worker = new ZorkaBshWorker(this, expr, callback);
 		executor.execute(worker);
 	}
-	
-	
+
+
+    /**
+     * Loads and executes beanshell script.
+     *
+     * @param url path to script
+     */
 	public void loadScript(URL url) {
 		try {
 			interpreter.source(url.getPath());
 		} catch (Exception e) {
 			log.error("Error loading script " + url, e);
-		}
+		} catch (EvalError e) {
+            log.error("Error executing script " + url, e);
+        }
 	}
 
+
+    /**
+     * Loads and executes beanshell script.
+     *
+     * @param path path to script
+     */
     public void loadScript(String path) {
         try {
             interpreter.source(path);
@@ -97,9 +153,14 @@ public class ZorkaBshAgent {
     }
 
 
+    /**
+     * Loads and executes all .bsh files from given directory.
+     * Scripts are executed in alphabetical order.
+     *
+     * @param url url to script directory
+     */
     public void loadScriptDir(URL url) {
 		try {
-			configDir = url;
 			File dir = new File(url.getPath());
             log.debug("Listing directory: " + url.getPath());
 			String[] files = dir.list();
@@ -121,10 +182,15 @@ public class ZorkaBshAgent {
 	}
 
 
+    /**
+     * Loads and executes all script in given directory matching given mask.
+     *
+     * @param path path to directory
+     *
+     * @param mask file mas (eg. *.bsh)
+     */
     public void loadScriptDir(String path, String mask) {
         try {
-            //configDir = url;
-            configDir = new URL("file://" + path);
             File dir = new File(path);
             log.debug("Listing directory: " + path);
             String[] files = dir.list();
@@ -136,7 +202,6 @@ public class ZorkaBshAgent {
                 if (!fname.matches(mask)) {
                     continue;
                 }
-                //URL scrUrl = new URL(url + "/" + fname);
                 String scrPath = path + "/" + fname;
                 log.debug("Loading file: " + scrPath);
                 File scrFile = new File(scrPath);
@@ -149,9 +214,14 @@ public class ZorkaBshAgent {
         }
     }
 
+
+    /**
+     * Returns zorka standard library.
+     *
+     * @return zorka library instance.
+     */
     public ZorkaLib getZorkaLib() {
 		return zorkaLib;
 	}
-	
-	
+
 }

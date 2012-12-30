@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import static com.jitlogic.zorka.agent.ZorkaConfig.*;
-
 /**
  * This has been written from scratch in order to not interfere with
  * other logging frameworks.
@@ -51,23 +49,22 @@ public class ZorkaLogger {
     private List<ZorkaTrapper> trappers = new ArrayList<ZorkaTrapper>();
 
     public ZorkaLogger() {
-        Properties props = ZorkaConfig.getProperties();
-
-        initFileTrapper(props);
-
-        if ("yes".equalsIgnoreCase(props.getProperty(ZORKA_SYSLOG, "no").trim())) {
-            initSyslogTrapper(props);
-        }
-
 
     }
 
+    public void init(Properties props) {
+        initFileTrapper(props);
+
+        if ("yes".equalsIgnoreCase(props.getProperty("zorka.syslog", "no").trim())) {
+            initSyslogTrapper(props);
+        }
+    }
 
     private void initSyslogTrapper(Properties props) {
         try {
-            String server = props.getProperty(ZORKA_SYSLOG_SERVER, "127.0.0.1").trim();
-            String hostname = props.getProperty(ZORKA_HOSTNAME, "zorka").trim();
-            int syslogFacility = SyslogLib.getFacility(props.getProperty(ZORKA_SYSLOG_FACILITY, "F_LOCAL0").trim());
+            String server = props.getProperty("zorka.syslog.server", "127.0.0.1").trim();
+            String hostname = props.getProperty("zorka.hostname", "zorka").trim();
+            int syslogFacility = SyslogLib.getFacility(props.getProperty("zorka.syslog.facility", "F_LOCAL0").trim());
 
             SyslogTrapper syslog = new SyslogTrapper(server, hostname, syslogFacility, true);
             syslog.start();
@@ -83,16 +80,16 @@ public class ZorkaLogger {
 
     private void initFileTrapper(Properties props) {
         String logDir = ZorkaConfig.getLogDir();
-        boolean logExceptions = "yes".equalsIgnoreCase(props.getProperty(ZORKA_LOG_EXCEPTIONS));
-        String logFileName = props.getProperty(ZORKA_LOG_FNAME).trim();
+        boolean logExceptions = "yes".equalsIgnoreCase(props.getProperty("zorka.log.exceptions"));
+        String logFileName = props.getProperty("zorka.log.fname").trim();
         ZorkaLogLevel logThreshold = ZorkaLogLevel.DEBUG;
 
         int maxSize = 4*1024*1024, maxLogs = 4;
 
         try {
-            logThreshold = ZorkaLogLevel.valueOf (props.getProperty(ZORKA_LOG_LEVEL));
-            maxSize = ZorkaUtil.parseIntSize(props.getProperty(ZORKA_LOG_SIZE).trim());
-            maxLogs = ZorkaUtil.parseIntSize(props.getProperty(ZORKA_LOG_NUM).trim());
+            logThreshold = ZorkaLogLevel.valueOf (props.getProperty("zorka.log.level"));
+            maxSize = (int)ZorkaUtil.parseIntSize(props.getProperty("zorka.log.size").trim());
+            maxLogs = (int)ZorkaUtil.parseIntSize(props.getProperty("zorka.log.num").trim());
         } catch (Exception e) {
             System.err.println("Error parsing logger arguments: " + e.getMessage());
             e.printStackTrace();

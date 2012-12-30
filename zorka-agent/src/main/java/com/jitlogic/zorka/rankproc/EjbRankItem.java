@@ -1,5 +1,7 @@
 package com.jitlogic.zorka.rankproc;
 
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 import com.jitlogic.zorka.util.ObjectInspector;
 
 /**
@@ -18,6 +20,8 @@ import com.jitlogic.zorka.util.ObjectInspector;
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 public class EjbRankItem implements Rankable<Object> {
+
+    private static final ZorkaLog log = ZorkaLogger.getLog(EjbRankItem.class);
 
     private static final int BY_CALLS = 0;
     private static final int BY_TIME = 1;
@@ -38,13 +42,16 @@ public class EjbRankItem implements Rankable<Object> {
     public double getAverage(long tstamp, int metric, int average) {
         switch (metric) {
             case BY_CALLS: {
-                long dt = byCalls.getDeltaT(tstamp, average);
-                return dt > 0 ? (1.0 * byCalls.getDeltaV(tstamp, average) / dt) : 0.0;
+                long dt = byCalls.getDeltaT(average, tstamp);
+                return dt > 0 ? (1.0 * byCalls.getDeltaV(average, tstamp) / dt) : 0.0;
             }
             case BY_TIME: {
-                long dt = byTime.getDeltaT(tstamp, average);
-                return 1.0 * byTime.getDeltaV(tstamp, average) / dt;
+                long dt = byTime.getDeltaT(average, tstamp);
+                return 1.0 * byTime.getDeltaV(average, tstamp) / dt;
             }
+            default:
+                log.error("Invalid metric passed to getAverage(): " + metric);
+                break;
         }
 
         return 0.0;

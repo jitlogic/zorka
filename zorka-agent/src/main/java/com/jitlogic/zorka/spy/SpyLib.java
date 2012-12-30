@@ -407,22 +407,6 @@ public class SpyLib {
 
 
     /**
-     * Creates file colllector object. It will store collected records as text messages in log file.
-     *
-     * @param trapper file trapper to submit data to
-     *
-     * @param logLevel default log level
-     *
-     * @param expr message template expression
-     *
-     * @return collector object
-     */
-    public SpyProcessor fileCollector(FileTrapper trapper, String expr, ZorkaLogLevel logLevel) {
-        return new FileCollector(trapper, expr, logLevel, "");
-    }
-
-
-    /**
      * Creates getter collector object. It will present collected records as attributes via mbeans.
      *
      * @param mbsName mbean server name
@@ -509,8 +493,9 @@ public class SpyLib {
      * @return trapper collector object
      *
      */
-    public SpyProcessor trapperCollector(ZorkaTrapper trapper, String tagExpr, String msgExpr, String errExpr, String errField) {
-        return new TrapperCollector(trapper, tagExpr, msgExpr,  errExpr,  errField);
+    public SpyProcessor trapperCollector(ZorkaTrapper trapper, ZorkaLogLevel logLevel,
+                                         String tagExpr, String msgExpr, String errExpr, String errField) {
+        return new TrapperCollector(trapper, logLevel, tagExpr, msgExpr,  errExpr,  errField);
     }
 
 

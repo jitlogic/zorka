@@ -29,7 +29,6 @@ import com.jitlogic.zorka.logproc.ZorkaLog;
 import com.jitlogic.zorka.logproc.ZorkaLogger;
 import com.jitlogic.zorka.integ.zabbix.ZabbixAgent;
 
-import javax.management.MBeanServerConnection;
 import java.lang.instrument.ClassFileTransformer;
 import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -37,29 +36,50 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static com.jitlogic.zorka.agent.ZorkaConfig.*;
-
+/**
+ * This method binds together all components to create fuunctional Zorka agent. It is responsible for
+ * initializing all subsystems (according to property values in zorka configuration file) and starting
+ * all service threads if necessary. It retains references to created components and maintains reference
+ * to MBean server registry and its own instance singletons.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class AgentInstance {
 
+    /** Logger */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
+    /** MBean server registry */
     private static MBeanServerRegistry mBeanServerRegistry;
 
-    public synchronized static MBeanServerConnection lookupMBeanServer(String name) {
-        return mBeanServerRegistry != null ? mBeanServerRegistry.lookup(name) : null;
-    }
-
+    /**
+     * Returns reference to mbean server registry.
+     *
+     * @return mbean server registry reference of null (if not yet initialized)
+     */
     public synchronized static MBeanServerRegistry getMBeanServerRegistry() {
         return mBeanServerRegistry;
     }
 
+    /**
+     * Sets mbean server registry.
+     * @param registry registry
+     */
     public synchronized static void setMBeanServerRegistry(MBeanServerRegistry registry) {
         mBeanServerRegistry = registry;
     }
 
+    /**
+     * Agent instance (singleton)
+     */
     private static AgentInstance instance = null;
 
-    public static AgentInstance instance() {
+    /**
+     * Returns agent instance (creates one if not done it yet).
+     *
+     * @return agent instance
+     */
+    public synchronized static AgentInstance instance() {
         if (null == instance) {
             instance = new AgentInstance(ZorkaConfig.getProperties());
             instance.start();
@@ -69,139 +89,194 @@ public class AgentInstance {
     }
 
 
+    /**
+     * TODO this is used only in test scenarios, get rid of it.
+     *
+     * Sets (preconfigured) agent instance.
+     *
+     * @param newInstance agent instance to be set
+     */
     public static void setInstance(AgentInstance newInstance) {
         instance = newInstance;
     }
 
-
+    /** Number of threads handling requests */
     private int requestThreads = 4;
+
+    /** Size of request queue */
     private int requestQueue = 64;
 
+    /** Executor managing threads that handle requests */
     private Executor executor = null;
+
+    /** Main zorka agent object - one that executes actual requests */
     private ZorkaBshAgent zorkaAgent = null;
 
+    /** Reference to zabbix agent object - one that handles zabbix requests and passes them to BSH agent */
     private ZabbixAgent zabbixAgent = null;
+
+    /** Reference to zabbix library - available to zorka scripts as 'zabbix.*' functions */
     private ZabbixLib zabbixLib = null;
 
+    /** Reference to nagios agents - one that handles nagios NRPE requests and passes them to BSH agent */
     private NagiosAgent nagiosAgent = null;
+
+    /** Reference to nagios library - available to zorka scripts as 'nagios.*' functions */
     private NagiosLib nagiosLib = null;
 
-    private SpyLib spyLib = null;
+    /** Reference to Spy instrumentation engine object */
     private SpyInstance spyInstance = null;
 
+    /** Reference to spy library - available to zorka scripts as 'spy.*' functions */
+    private SpyLib spyLib = null;
+
+    /** Reference to syslog library - available to zorka scripts as 'syslog.*' functions */
     private SyslogLib syslogLib = null;
+
+    /** Reference to SNMP library - available to zorka scripts as 'snmp.*' functions */
     private SnmpLib snmpLib = null;
 
+    /** Reference to normalizers library - available to zorka scripts as 'normalizers.*' function */
     private NormLib normLib = null;
 
+    /** Agent configuration properties */
     private Properties props;
 
-
+    /**
+     * Standard constructor. It only reads some configuration properties, no real startup is actually done.
+     *
+     * @param props configuration properties
+     */
     public AgentInstance(Properties props) {
-        this(props, null);
-    }
-
-
-    public AgentInstance(Properties props, Executor executor) {
 
         this.props = props;
 
         try {
-            requestThreads = Integer.parseInt(props.getProperty(ZORKA_REQ_THREADS).trim());
+            requestThreads = Integer.parseInt(props.getProperty("zorka.req.threads").trim());
         } catch (NumberFormatException e) {
-            log.error("Invalid " + ZORKA_REQ_THREADS + " setting: '" + props.getProperty(ZORKA_REQ_THREADS).trim() + "'");
+            log.error("Invalid " + "zorka.req.threads" + " setting: '" + props.getProperty("zorka.req.threads").trim() + "'");
         }
 
         try {
-            requestQueue = Integer.parseInt(props.getProperty(ZORKA_REQ_QUEUE).trim());
+            requestQueue = Integer.parseInt(props.getProperty("zorka.req.queue").trim());
         } catch (NumberFormatException e) {
-            log.error("Invalid " + ZORKA_REQ_QUEUE + "setting: '" + props.getProperty(ZORKA_REQ_QUEUE).trim() + "'");
+            log.error("Invalid " + "zorka.req.queue" + "setting: '" + props.getProperty("zorka.req.queue").trim() + "'");
         }
     }
 
 
+    /**
+     * Starts agent. Real startup sequence is performed here.
+     */
     public  void start() {
         if (executor == null) {
             executor = new ThreadPoolExecutor(requestThreads, requestThreads, 1000, TimeUnit.MILLISECONDS,
                     new ArrayBlockingQueue<Runnable>(requestQueue));
         }
 
+        ZorkaLogger.getLogger().init(props);
+
         zorkaAgent = new ZorkaBshAgent(executor);
 
         normLib = new NormLib();
-        zorkaAgent.installModule("normalizers", normLib);
+        zorkaAgent.install("normalizers", normLib);
 
-        if ("yes".equalsIgnoreCase(props.getProperty(SPY_ENABLE))) {
+        if ("yes".equalsIgnoreCase(props.getProperty("spy"))) {
             log.info("Enabling Zorka SPY");
             spyInstance = SpyInstance.instance();
             spyLib = new SpyLib(spyInstance);
-            zorkaAgent.installModule("spy", spyLib);
+            zorkaAgent.install("spy", spyLib);
             MainSubmitter.setSubmitter(spyInstance.getSubmitter());
             log.debug("Installed submitter: " + spyInstance.getSubmitter());
         } else {
             log.info("Zorka SPY is diabled. No loaded classes will be transformed in any way.");
         }
 
-        if ("yes".equalsIgnoreCase(props.getProperty(ZABBIX_ENABLE))) {
+        if ("yes".equalsIgnoreCase(props.getProperty("zabbix"))) {
             log.info("Enabling ZABBIX subsystem ...");
             zabbixAgent = new ZabbixAgent(zorkaAgent);
             zabbixAgent.start();
             zabbixLib = new ZabbixLib(zorkaAgent,  zorkaAgent.getZorkaLib());
-            zorkaAgent.installModule("zabbix", zabbixLib);
+            zorkaAgent.install("zabbix", zabbixLib);
         }
 
-        if ("yes".equalsIgnoreCase(props.getProperty(SYSLOG_ENABLE))) {
+        if ("yes".equalsIgnoreCase(props.getProperty("syslog"))) {
             log.info("Enabling Syslog subsystem ....");
             syslogLib = new SyslogLib();
-            zorkaAgent.installModule("syslog", syslogLib);
+            zorkaAgent.install("syslog", syslogLib);
         }
 
-        if ("yes".equalsIgnoreCase(props.getProperty(SNMP_ENABLE))) {
+        if ("yes".equalsIgnoreCase(props.getProperty("snmp"))) {
             log.info("Enabling SNMP subsystem ...");
             snmpLib = new SnmpLib();
-            zorkaAgent.installModule("snmp", snmpLib);
+            zorkaAgent.install("snmp", snmpLib);
         }
 
-        if ("yes".equalsIgnoreCase(props.getProperty(NAGIOS_ENABLE))) {
+        if ("yes".equalsIgnoreCase(props.getProperty("nagios"))) {
             nagiosAgent = new NagiosAgent(zorkaAgent);
             nagiosLib = new NagiosLib();
-            zorkaAgent.installModule("nagios", nagiosLib);
+            zorkaAgent.install("nagios", nagiosLib);
             nagiosAgent.start();
         }
 
 
-        zorkaAgent.loadScriptDir(props.getProperty(ZORKA_CONF_DIR), ".*\\.bsh$");
+        zorkaAgent.loadScriptDir(props.getProperty("zorka.config.dir"), ".*\\.bsh$");
 
     }
 
 
+    /**
+     * Return class file transformer of Spy instrumentation engine or null if spy is disabled.
+     *
+     * @return class file transformer
+     */
     public ClassFileTransformer getSpyTransformer() {
         return spyInstance != null ? spyInstance.getClassTransformer() : null;
     }
 
 
+    /**
+     * Returns reference to Spy instrumentation engine.
+     *
+     * @return instance of spy instrumentation engine
+     */
     public SpyInstance getSpyInstance() {
         return spyInstance;
     }
 
+    /**
+     * Returns reference to BSH agent.
+     * @return instance of Zorka BSH agent
+     */
     public ZorkaBshAgent getZorkaAgent() {
         return zorkaAgent;
     }
 
+    /**
+     * Returns reference to syslog library.
+     *
+     * @return instance of syslog library
+     */
     public SyslogLib getSyslogLib() {
         return syslogLib;
     }
 
+    /**
+     * Returns reference to Spy library
+     *
+     * @return instance of spy library
+     */
     public SpyLib getSpyLib() {
         return spyLib;
     }
 
+    /**
+     * Returns reference to SNMP library
+     *
+     * @return instance of snmp library
+     */
     public SnmpLib getSnmpLib() {
         return snmpLib;
-    }
-
-    public NormLib getNormLib() {
-        return normLib;
     }
 
 }

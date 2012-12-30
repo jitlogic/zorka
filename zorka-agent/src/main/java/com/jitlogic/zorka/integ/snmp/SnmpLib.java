@@ -35,6 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SnmpLib {
 
+    private static final ZorkaLog log = ZorkaLogger.getLog(SnmpLib.class);
+
     /** SNMPv1 protocol version */
     public static final int SNMP_V1 = 1;
 
@@ -161,9 +163,12 @@ public class SnmpLib {
                     }
                 case UINTEGER32:
                     return new SNMPUInteger32((Long)ZorkaUtil.coerce(val, Long.class));
+                default:
+                    log.error("Invalid type code passed to val(): " + type);
+                    break;
             }
         } catch (SNMPBadValueException e) {
-            //log.error("Error creating value", e);
+            log.error("Error creating value", e);
         }
         return null;
     }

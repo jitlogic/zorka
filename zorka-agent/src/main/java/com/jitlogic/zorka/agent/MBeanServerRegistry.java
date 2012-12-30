@@ -29,23 +29,41 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * MBeanServerRegistry maintains all mbean servers seen by zorka agent. Typically there is only
+ * platform mbean server (registered as 'java'), but some application servers instantiate their
+ * own mbean servers. For example JBoss AS versions 4,5 or 6 maintain additional mbean server
+ * (registered as 'jboss' in zorka agent).
+ *
+ * @author rafal.lewczuk@gmail.com
+ */
 public class MBeanServerRegistry {
 
+    /** Logger */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
+    /** If set to true, platform mbean server will be autmatically registered when referenced for first time. */
     private boolean autoRegister = true;
 
+    /** Represents deferred registration of mbean attributes for not yet registered mbean servers. */
     private static class DeferredRegistration {
+        /** mbean server name, object name, attribute name, attribute description */
         public final String name, bean, attr, desc;
+        /** Attribute value */
         public final Object obj;
+        /** Standard constructor */
         public DeferredRegistration(String name, String bean, String attr, Object obj, String desc) {
             this.name = name; this.bean = bean; this.attr = attr; this.obj = obj; this.desc = desc;
         }
     }
 
+    /** Mbean server connections map */
     private Map<String,MBeanServerConnection> conns = new ConcurrentHashMap<String, MBeanServerConnection>();
+
+    /** Accompanying class loaders map */
     private Map<String,ClassLoader> classLoaders = new ConcurrentHashMap<String, ClassLoader>();
 
+    /** Deferred registrations queue */
     private List<DeferredRegistration> deferredRegistrations = new ArrayList<DeferredRegistration>();
 
 
@@ -58,8 +76,9 @@ public class MBeanServerRegistry {
     /**
      * Looks for a given MBean server. java and jboss mbean servers are currently available.
      *
-     * @param name
-     * @return
+     * @param name mbean server name
+     *
+     * @return mbean server connection
      */
     public MBeanServerConnection lookup(String name) {
         MBeanServerConnection conn = conns.get(name);
@@ -74,10 +93,28 @@ public class MBeanServerRegistry {
         return conn;
     }
 
+    /**
+     * Looks for class loader associated with registered mbean server
+     * or null if no class loader is needed.
+     *
+     * @param name mbean server name
+     *
+     * @return class loader associated with mbean server or null
+     */
     public ClassLoader getClassLoader(String name) {
         return classLoaders.get(name);
     }
 
+
+    /**
+     * Registers mbean server. Any deferred registrations to this mbean server will be performed.
+     *
+     * @param mbsName mbean server name
+     *
+     * @param mbsConn mbean server connection
+     *
+     * @param classLoader class loader associated with mbean server connection (or null)
+     */
     public synchronized void register(String mbsName, MBeanServerConnection mbsConn, ClassLoader classLoader) {
         if (!conns.containsKey(mbsName)) {
             conns.put(mbsName, mbsConn);
@@ -93,6 +130,11 @@ public class MBeanServerRegistry {
     }
 
 
+    /**
+     * Unregisters mbean server.
+     *
+     * @param name mbean server name
+     */
     public synchronized void unregister(String name) {
         if (conns.containsKey(name)) {
             conns.remove(name);
@@ -104,11 +146,43 @@ public class MBeanServerRegistry {
     }
 
 
+    /**
+     * Registers object as mbean server attribute (or return existing one if already registered)
+     *
+     * @param mbsName mbean server name
+     *
+     * @param beanName bean name (object name)
+     *
+     * @param attrName attribtue name
+     *
+     * @param obj attribute value
+     *
+     * @param <T> type of attribute value
+     *
+     * @return attribute value (if any)
+     */
     public <T> T getOrRegister(String mbsName, String beanName, String attrName, T obj) {
         return getOrRegister(mbsName, beanName, attrName, obj, attrName);
     }
 
 
+    /**
+     * Registers object as mbean server attribute (or return existing one if already registered)
+     *
+     * @param mbsName mbean server name
+     *
+     * @param beanName bean name (object name)
+     *
+     * @param attrName attribtue name
+     *
+     * @param desc
+     *
+     * @param obj attribute value
+     *
+     * @param <T> type of attribute value
+     *
+     * @return attribute value (if any)
+     */
     public <T> T getOrRegister(String mbsName, String beanName, String attrName, T obj, String desc) {
         MBeanServerConnection mbs = lookup(mbsName);
 
@@ -141,6 +215,21 @@ public class MBeanServerRegistry {
     }
 
 
+    /**
+     * Registers attribute in mbean server
+     *
+     * @param conn mbean server connection
+     *
+     * @param bean bean name (object name)
+     *
+     * @param attr attribute name
+     *
+     * @param obj attribute value
+     *
+     * @param <T> attribute type
+     *
+     * @return value
+     */
     private <T> T registerAttr(MBeanServerConnection conn, String bean, String attr, T obj) {
         try {
             conn.setAttribute(new ObjectName(bean), new Attribute(attr, obj));
@@ -151,6 +240,23 @@ public class MBeanServerRegistry {
     }
 
 
+    /**
+     * Registers attribute in mbean server.
+     *
+     * @param conn mbean server connection
+     *
+     * @param bean bean name (object name)
+     *
+     * @param attr attribute name
+     *
+     * @param obj attribute value
+     *
+     * @param desc attribute description
+     *
+     * @param <T> attribute type
+     *
+     * @return value
+     */
     private <T> T registerBeanAttr(MBeanServerConnection conn, String bean, String attr, T obj, String desc) {
         ZorkaMappedMBean mbean = new ZorkaMappedMBean(desc);
         mbean.put(attr, obj);
@@ -164,6 +270,11 @@ public class MBeanServerRegistry {
     }
 
 
+    /**
+     * Registers all deferred attributes in an mbean server
+     *
+     * @param name mbean server name
+     */
     private void registerDeferred(String name) {
         if (deferredRegistrations.size() > 0 && conns.containsKey(name)) {
             List<DeferredRegistration> dregs = deferredRegistrations;

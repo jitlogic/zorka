@@ -54,10 +54,12 @@ public class CollectQueueProcessor implements SpyProcessor, Runnable {
                 submitted = procQueue.offer(rec, 0, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) { }
 
-        if (submitted) {
-            submittedRecords++;
-        } else {
-            droppedRecords++;
+        synchronized(this) {
+            if (submitted) {
+                submittedRecords++;
+            } else {
+                droppedRecords++;
+            }
         }
 
         return record;

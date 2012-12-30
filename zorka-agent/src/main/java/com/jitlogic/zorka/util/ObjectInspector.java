@@ -1,6 +1,8 @@
 package com.jitlogic.zorka.util;
 
 import com.jitlogic.zorka.agent.JmxObject;
+import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.logproc.ZorkaLogger;
 import com.jitlogic.zorka.mbeans.ZorkaStats;
 import com.jitlogic.zorka.spy.SpyRecord;
 
@@ -24,6 +26,8 @@ import java.util.regex.Pattern;
  * @author rafal.lewczuk@jitlogic.com
  */
 public class ObjectInspector {
+
+    private static final ZorkaLog log = ZorkaLogger.getLog(ObjectInspector.class);
 
     /** Special attribute name that will extract stack trace from throwable objects. */
     public static final String STACK_TRACE_KEY = "printStackTrace";
@@ -118,7 +122,7 @@ public class ObjectInspector {
                     return m.invoke(obj, key);
                 }
             } catch (Exception e) {
-                //log.error("Error invoking getStatistic('" + key + "')", e);
+                log.error("Error invoking getStatistic('" + key + "')", e);
             }
         } else if (obj instanceof JmxObject) {
             return ((JmxObject)obj).get(key);
@@ -203,7 +207,7 @@ public class ObjectInspector {
                     return Arrays.asList((Object[])m.invoke(obj));
                 }
             } catch (Exception e) {
-                //log.error("Error invoking getStatisticNames()", e);
+                log.error("Error invoking getStatisticNames()", e);
             }
         } else if (obj instanceof JmxObject) {
             try {
@@ -212,7 +216,7 @@ public class ObjectInspector {
                     lst.add(mba.getName());
                 }
             } catch (Exception e) {
-                //log.error("Error fetching object attributes.");
+                log.error("Error fetching object attributes.");
             }
         }
 
@@ -271,7 +275,7 @@ public class ObjectInspector {
             if (!accessible) field.setAccessible(accessible);
             return ret;
         } catch (Exception e) {
-            //log.error("Field '" + name + "' fetch failed", e);
+            log.error("Field '" + name + "' fetch failed", e);
             return null;
         }
     }
@@ -334,7 +338,7 @@ public class ObjectInspector {
             ObjectName on = new ObjectName(query);
             return (Set<ObjectName>)conn.queryNames(on, null);
         } catch (Exception e) {
-            //log.error("Error resolving object names.", e);
+            log.error("Error resolving object names.", e);
             return new HashSet<ObjectName>();
         }
     }

@@ -81,7 +81,7 @@ public class ZabbixAgentIntegTest {
 	
 	@Test
 	public void testTrivialRequestAsync() throws Exception {
-		assertEquals(ZorkaConfig.getProperties().getProperty(ZorkaConfig.ZORKA_VERSION),
+		assertEquals(ZorkaConfig.getProperties().getProperty("zorka.version"),
                 query("zorka__version[]"));
 	}
 	

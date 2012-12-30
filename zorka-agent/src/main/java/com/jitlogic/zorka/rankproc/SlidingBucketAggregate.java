@@ -63,8 +63,8 @@ public class SlidingBucketAggregate implements BucketAggregate {
     }
 
 
-    public long getWindow(int stage) {
-        return windows[stage];
+    public long getWindow(int idx) {
+        return windows[idx];
     }
 
     public int getStage(long window) {
@@ -150,7 +150,7 @@ public class SlidingBucketAggregate implements BucketAggregate {
     }
 
 
-    public long getDeltaV(long tstamp, int stage) {
+    public long getDeltaV(int stage, long tstamp) {
 
         if (stage < 0 || stage >= stages.length) {
             return 0L;
@@ -168,7 +168,7 @@ public class SlidingBucketAggregate implements BucketAggregate {
     }
 
 
-    public long getDeltaT(long tstamp, int stage) {
+    public long getDeltaT(int stage, long tstamp) {
         return 0;  //To change body of implemented methods use File | Settings | File Templates.
     }
 

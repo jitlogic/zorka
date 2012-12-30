@@ -16,6 +16,8 @@
  */
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.util.ZorkaUtil;
+
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -23,22 +25,66 @@ import static org.objectweb.asm.Opcodes.*;
 
 import static com.jitlogic.zorka.spy.SpyLib.SM_NOARGS;
 
+/**
+ * This class is used to match class and method that have to be instrumented.
+ * Spy matcher can use class patterns (names, ant-style masks or regexps),
+ * method patterns, class annotation patterns and method annotation patterns.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class SpyMatcher {
 
-    private String methodSignature;
+    /** Maps primitive types to type codes used by JVM */
+    private static final Map<String,String> typeCodes = ZorkaUtil.constMap(
+            "void", "V", "boolean", "Z", "byte", "B", "char", "C",
+            "short", "S", "int", "I", "long", "J", "float", "F", "double", "D"
+    );
+
+    /** Maps regular expression special characters (sequences) to escaped sequences. */
+    private static final Map<String,String> regexChars = ZorkaUtil.constMap(
+            "[", "\\]", "]", "\\]", ".", "\\.", ";", "\\;", "(", "\\(", ")", "\\)"
+    );
+
+
+    /** Access bits and custom matcher flags */
     private int access, flags;
 
+    /** Flag that marks classPattern as class annotation rather than class name */
     public static final int CLASS_ANNOTATION  = 0x01;
+
+    /** Flag that marks methodPattern as method annotation rather than method name */
     public static final int METHOD_ANNOTATION = 0x02;
 
+    /** Special access bit - package private */
     public static final int ACC_PKGPRIV = 0x10000;
 
+    /** No methods will regarding access bits */
     public static final int NULL_FILTER    = 0x0000;
+
+    /** Default filter: public and package private methods match */
     public static final int DEFAULT_FILTER = ACC_PUBLIC|ACC_PKGPRIV;
+
+    /** Public, private, protected and package private methods will match */
     public static final int ANY_FILTER     = ACC_PUBLIC|ACC_PRIVATE|ACC_PROTECTED|ACC_PKGPRIV;
 
+    /** Regexps for matching class name/annotation, method name/annotation and method descriptor */
     private Pattern classMatch, methodMatch, descriptorMatch;
 
+    /**
+     * Standard constructor
+     *
+     * @param flags custom matcher flags
+     *
+     * @param access java accessibility flags
+     *
+     * @param className class name/annotation pattern
+     *
+     * @param methodName method name/annotation pattern
+     *
+     * @param retType return type
+     *
+     * @param argTypes argument types
+     */
     public SpyMatcher(int flags, int access, String className, String methodName, String retType, String... argTypes) {
         this.flags = flags;
         this.access = access;
@@ -48,6 +94,13 @@ public class SpyMatcher {
     }
 
 
+    /**
+     * Converts symbol match pattern (string) to regular expression object.
+     *
+     * @param symbolName symbol match pattern
+     *
+     * @return regular expression pattern
+     */
     private Pattern toSymbolMatch(String symbolName) {
         if (symbolName == null) {
             return Pattern.compile(".*");
@@ -60,32 +113,34 @@ public class SpyMatcher {
     }
 
 
-    private static Map<String,String> stringMap(String...vals) {
-        Map<String,String> map = new HashMap<String, String>(vals.length);
-
-        for (int i = 1; i < vals.length; i += 2) {
-            map.put(vals[i-1], vals[i]);
-        }
-
-        return Collections.unmodifiableMap(map);
-    }
-
-
-    private static final Map<String,String> typeCodes = stringMap(
-        "void", "V",   "boolean", "Z","byte", "B",   "char", "C",
-        "short", "S",  "int", "I", "long", "J", "float", "F", "double", "D"
-    );
-
-
+    /**
+     * Returns true if class of given name actually exists. As it prompts class loader
+     * to load class, it shouldn't be used for anything else than standard JDK provided
+     * classes.
+     *
+     * @param className full name (with package prefix)
+     *
+     * @return true if such class exists
+     */
     private static boolean probeClass(String className) {
         try {
-            return Class.forName(className) != null;
+            Class.forName(className);
         } catch (ClassNotFoundException e) {
             return false;
         }
+        return true;
     }
 
 
+    /**
+     * Converts java-like data type to JVM type string. Basic types and classes from java.lang
+     * package can be passed in short form (eg. int, String). Other types have to be passed with
+     * their full name (package "." className).
+     *
+     * @param type type (java language form)
+     *
+     * @return type descriptor (JVM form)
+     */
     private static String toTypeCode(String type) {
         StringBuilder sb = new StringBuilder();
 
@@ -110,11 +165,13 @@ public class SpyMatcher {
     }
 
 
-    private static final Map<String,String> regexChars = stringMap(
-        "[", "\\", "]", "\\]", ".", "\\.", ";", "\\;", "(", "\\(", ")", "\\)"
-    );
-
-
+    /**
+     * Converts string to regular expression. Special characters will be automatically escaped.
+     *
+     * @param str string to be converted
+     *
+     * @return regular expression (still string form)
+     */
     private static String strToRegex(String str) {
         StringBuilder sb = new StringBuilder(str.length()+32);
         for (char ch : str.toCharArray()) {
@@ -124,6 +181,16 @@ public class SpyMatcher {
     }
 
 
+    /**
+     * Creates method descriptor from return type and argument types. Descriptor be a regexp
+     * pattern matching strings in form '(argTypeDescriptors)retTypeDescriptor'.
+     *
+     * @param retType return type
+     *
+     * @param argTypes argument types
+     *
+     * @return regexp pattern suitable to match method descriptors
+     */
     private Pattern toDescriptorMatch(String retType, String... argTypes) {
         String retCode = retType != null ? strToRegex(toTypeCode(retType)) : ".*";
         StringBuilder sb = new StringBuilder(128);
@@ -150,16 +217,34 @@ public class SpyMatcher {
     }
 
 
+    /**
+     * Returns true if matcher contains class annotation (instead of class name pattern)
+     *
+     * @return true if matcher contains class annotation
+     */
     public boolean hasClassAnnotation() {
         return 0 != (flags & CLASS_ANNOTATION);
     }
 
 
+    /**
+     * Returns true if matcher contains method annotation istead of method name pattern
+     *
+     * @return true or false
+     */
     public boolean hasMethodAnnotation() {
         return 0 != (flags & METHOD_ANNOTATION);
     }
 
 
+    /**
+     * Returns true if any of candidate strings matches class pattern (be it single class name or
+     * multiple class annotation names)
+     *
+     * @param classCandidates list of className candidates
+     *
+     * @return true if any candidate matches
+     */
     public boolean matches(List<String> classCandidates) {
         for (String cm : classCandidates) {
             if (classMatch.matcher(cm).matches()) {
@@ -170,26 +255,75 @@ public class SpyMatcher {
     }
 
 
+    /**
+     * Returns true if given method annotation matches
+     *
+     * @param name methnod annotation name (full name with package prefix)
+     *
+     * @return true if METHOD_ANNOTATION flag is on and passed name matches methodPattern
+     */
     public boolean matchMethodAnnotation(String name) {
         return hasMethodAnnotation() && methodMatch.matcher(name).matches();
     }
 
 
+    /**
+     * Returns true if any of candidate class names matches classPattern and methodName matches methodPattern.
+     *
+     * @param classCandidates list containing class name or names of class annotations
+     *
+     * @param methodName method name
+     *
+     * @return true or false
+     */
     public boolean matches(List<String> classCandidates, String methodName) {
         return matches(classCandidates) && methodMatch.matcher(methodName).matches();
     }
 
 
+    /**
+     * Returns true if any of candudate class names matches classPattern, methodName matches methodPattern
+     * and methodDescriptor matches method descriptor pattern.
+     *
+     * @param classCandidates list containing class name or names of class annotations
+     *
+     * @param methodName method name
+     *
+     * @param descriptor method descriptor (JVM form)
+     *
+     * @return true or false
+     */
     public boolean matches(List<String> classCandidates, String methodName, String descriptor) {
         return matches(classCandidates, methodName) && descriptorMatch.matcher(descriptor).matches();
     }
 
 
+    /**
+     * Returns true if any of candidate class names matches classPattern, methodName matches methodPattern,
+     * methodDescriptor matches method descriptor pattern and access flags match
+     *
+     * @param classCandidates list containing class name or names of class annotations
+     *
+     * @param methodName method name
+     *
+     * @param descriptor method descriptor (JVM form)
+     *
+     * @param access method access flags
+     *
+     * @return true or false
+     */
     public boolean matches(List<String> classCandidates, String methodName, String descriptor, int access) {
         return matches(classCandidates, methodName, descriptor) && matches(access);
     }
 
 
+    /**
+     * Returns true if access flags match
+     *
+     * @param access method access flags
+     *
+     * @return true or false
+     */
     private boolean matches(int access) {
         return this.access == 0 ||
           0 != (this.access & (ACC_PUBLIC|ACC_PRIVATE|ACC_PROTECTED)) ?

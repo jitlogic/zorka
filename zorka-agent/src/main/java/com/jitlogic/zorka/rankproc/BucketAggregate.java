@@ -17,76 +17,89 @@ package com.jitlogic.zorka.rankproc;
 
 
 /**
- * Represents aggregate values.
- * TODO clean up words and symbols (eg. stage-window)
+ * Represents averages aggregators. Typically aggregators are used with nanosecond resolution,
+ * so there are some constants representing time durations in nanoseconds.
+ *
+ * @author rafal.lewczuk@gmail.com
  */
 public interface BucketAggregate {
 
+    /** One nanosecond */
     long NS   = 1L;
+
+    /** One miliseccond (in nanoseconds) */
     long MS   = NS * 1000000;
+
+    /** One second (in nanoseconds) */
     long SEC  = MS * 1000;
+
+    /** One minute (in nanoseconds)*/
     long MIN  = SEC * 60;
+
+    /** One hour (in nanseconds) */
     long HOUR = MIN * 60;
+
+    /** One day (in nanoseconds) */
     long DAY  = HOUR * 24;
 
 
     /**
      * Returns number of time windows (stages) this aggregate tracks.
      *
-     * @return
+     * @return number of calculated aggregates
      */
     int size();
 
 
     /**
-     * Returns window length on particular stage.
+     * Returns window length on particular aggregate.
      *
-     * @param stage
+     * @param idx aggregate index
      *
-     * @return
+     * @return window length
      */
-    long getWindow(int stage);
+    long getWindow(int idx);
 
 
     /**
      * Returns stage number (based on window length).
      *
-     * @param window
+     * @param window window length
      *
-     * @return
+     * @return aggregate index
      */
     int getStage(long window);
 
 
     /**
-     * Returns total time this aggregate is up and logging samples (that is, time
-     * elapsed between
+     * Returns total time this aggregate is up and logging values (that is, time
+     * elapsed between first and last value.
      *
-     * @return
+     * @return aggregate uptime
      */
     long getTime();
 
 
     /**
-     * Returns timestamp of last sample.
+     * Returns timestamp of last submitted value.
      *
-     * @return
+     * @return timestamp of last submitted value
      */
     long getLast();
 
 
     /**
-     * Return sum of all submitted samples.
+     * Return sum of all submitted values.
      *
-     * @return
+     * @return sum of all submitted values
      */
     long getTotal();
 
 
     /**
-     * Returns timestamp of first submitted sample.
+     * Returns timestamp of first submitted value.
      *
-     * @return
+     * @return timestamp of first submitted value
      */
     long getStart();
 
@@ -94,22 +107,36 @@ public interface BucketAggregate {
     /**
      * Submits (tstamp,value) pair to aggregate.
      *
-     * @param tstamp
+     * @param tstamp timestamp
      *
-     * @param value
+     * @param value actual value
      */
     void feed(long tstamp, long value);
 
 
     /**
      * Returns value delta in given stage
-     * @param tstamp
-     * @param stage
-     * @return
+     *
+     *
+     * @param stage stage
+     *
+     * @param tstamp timestamp
+     *
+     * @return value delta
      */
-    long getDeltaV(long tstamp, int stage);
+    long getDeltaV(int stage, long tstamp);
 
 
-    long getDeltaT(long tstamp, int stage);
+    /**
+     * Returns time delta in given stage
+     *
+     *
+     * @param stage stage
+     *
+     * @param tstamp timestamp
+     *
+     * @return time delta
+     */
+    long getDeltaT(int stage, long tstamp);
 }
 
