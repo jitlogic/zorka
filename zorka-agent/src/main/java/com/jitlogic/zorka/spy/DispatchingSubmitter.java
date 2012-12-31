@@ -17,11 +17,9 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.spy.processors.CollectQueueProcessor;
+import com.jitlogic.zorka.spy.collectors.QueuedProcCollector;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
-import com.jitlogic.zorka.spy.processors.SpyProcessor;
-import com.jitlogic.zorka.spy.processors.SpyRecord;
 
 import java.util.List;
 import java.util.Stack;
@@ -131,7 +129,7 @@ public class DispatchingSubmitter implements SpySubmitter {
         return record;
     }
 
-    public void setCollector(CollectQueueProcessor collector) {
+    public void setCollector(QueuedProcCollector collector) {
         if (collector != null) {
             collector.stop();
         }
@@ -139,14 +137,14 @@ public class DispatchingSubmitter implements SpySubmitter {
     }
 
     public void start() {
-        if (collector instanceof CollectQueueProcessor) {
-            ((CollectQueueProcessor)collector).start();
+        if (collector instanceof QueuedProcCollector) {
+            ((QueuedProcCollector)collector).start();
         }
     }
 
     public void stop() {
-        if (collector instanceof CollectQueueProcessor) {
-            ((CollectQueueProcessor)collector).stop();
+        if (collector instanceof QueuedProcCollector) {
+            ((QueuedProcCollector)collector).stop();
         }
     }
 }

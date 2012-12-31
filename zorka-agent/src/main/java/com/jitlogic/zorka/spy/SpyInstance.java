@@ -17,7 +17,7 @@ package com.jitlogic.zorka.spy;
 
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.spy.processors.CollectQueueProcessor;
+import com.jitlogic.zorka.spy.collectors.QueuedProcCollector;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 
@@ -88,7 +88,7 @@ public class SpyInstance {
 
     public SpyInstance(Properties props) {
         classTransformer = new SpyClassTransformer();
-        submitter = new DispatchingSubmitter(classTransformer, new CollectQueueProcessor());
+        submitter = new DispatchingSubmitter(classTransformer, new QueuedProcCollector());
     }
 
 

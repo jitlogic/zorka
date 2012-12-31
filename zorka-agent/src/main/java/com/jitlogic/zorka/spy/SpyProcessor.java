@@ -15,9 +15,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.processors;
-
-import com.jitlogic.zorka.spy.SpyDefArg;
+package com.jitlogic.zorka.spy;
 
 /**
  * Spy Argument Processor interface. All argument processors must implement it.

@@ -16,6 +16,8 @@
  */
 package com.jitlogic.zorka.spy.processors;
 
+import com.jitlogic.zorka.spy.SpyProcessor;
+import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.integ.ZorkaLogLevel;
 

@@ -23,8 +23,9 @@ import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.api.SpyLib;
 import com.jitlogic.zorka.spy.*;
 
-import com.jitlogic.zorka.spy.processors.SpyProcessor;
-import com.jitlogic.zorka.spy.processors.SpyRecord;
+import com.jitlogic.zorka.spy.collectors.DispatchingCollector;
+import com.jitlogic.zorka.spy.SpyProcessor;
+import com.jitlogic.zorka.spy.SpyRecord;
 import org.junit.Before;
 import org.junit.Test;
 

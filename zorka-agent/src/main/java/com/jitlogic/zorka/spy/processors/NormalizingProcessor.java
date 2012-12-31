@@ -19,6 +19,8 @@ import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.normproc.Normalizer;
+import com.jitlogic.zorka.spy.SpyProcessor;
+import com.jitlogic.zorka.spy.SpyRecord;
 
 import static com.jitlogic.zorka.api.SpyLib.SPD_ARGPROC;
 

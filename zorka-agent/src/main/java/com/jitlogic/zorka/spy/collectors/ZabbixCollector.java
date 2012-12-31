@@ -1,3 +1,10 @@
+package com.jitlogic.zorka.spy.collectors;
+
+import com.jitlogic.zorka.integ.ZabbixTrapper;
+import com.jitlogic.zorka.spy.SpyProcessor;
+import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.util.ObjectInspector;
+
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -13,40 +20,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.spy.processors;
+public class ZabbixCollector implements SpyProcessor {
 
-import com.jitlogic.zorka.integ.SyslogTrapper;
-import com.jitlogic.zorka.util.ObjectInspector;
+    private final ZabbixTrapper trapper;
+    private final String expr, host, key;
 
-public class SyslogCollector implements SpyProcessor {
-
-    private SyslogTrapper trapper;
-    private String expr;
-    int severity, facility;
-    private String tag, hostname;
-
-
-    public SyslogCollector(SyslogTrapper trapper, String expr,
-                           int severity, int facility, String hostname, String tag) {
+    public ZabbixCollector(ZabbixTrapper trapper, String expr, String host, String key) {
         this.trapper = trapper;
         this.expr = expr;
-
-        this.severity = severity;
-        this.facility = facility;
-
-        this.tag = tag;
-        this.hostname = hostname;
+        this.host = host;
+        this.key = key;
     }
-
 
     public SpyRecord process(SpyRecord record) {
 
-        String msg = ObjectInspector.substitute(expr, record);
+        String data = ObjectInspector.substitute(expr, record);
 
-        if (hostname != null) {
-            trapper.log(severity, facility, hostname, tag, msg);
+        if (host != null) {
+            trapper.send(host, key, data);
         } else {
-            trapper.log(severity,  facility, tag,  msg);
+            trapper.send(key, data);
         }
 
         return record;

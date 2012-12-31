@@ -15,9 +15,8 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.processors;
+package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.probes.SpyProbe;
 
 import java.util.HashMap;
@@ -25,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This class represents Spy data records.
+ * This class represents Spy data records. It is basically a wrapper for Map object
+ * with some extra (spy-specific) features.
  */
 public class SpyRecord {
 

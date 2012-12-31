@@ -15,12 +15,15 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy;
+package com.jitlogic.zorka.spy.collectors;
 
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
-import com.jitlogic.zorka.spy.processors.SpyProcessor;
-import com.jitlogic.zorka.spy.processors.SpyRecord;
+import com.jitlogic.zorka.spy.SpyContext;
+import com.jitlogic.zorka.spy.SpyDefinition;
+import com.jitlogic.zorka.spy.SpyInstance;
+import com.jitlogic.zorka.spy.SpyProcessor;
+import com.jitlogic.zorka.spy.SpyRecord;
 
 import java.util.List;
 

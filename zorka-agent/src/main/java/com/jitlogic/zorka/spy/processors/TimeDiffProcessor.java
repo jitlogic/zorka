@@ -16,6 +16,9 @@
 
 package com.jitlogic.zorka.spy.processors;
 
+import com.jitlogic.zorka.spy.SpyProcessor;
+import com.jitlogic.zorka.spy.SpyRecord;
+
 public class TimeDiffProcessor implements SpyProcessor {
 
     private String tstart, tstop, rslt;

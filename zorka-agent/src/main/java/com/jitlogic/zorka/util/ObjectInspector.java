@@ -4,7 +4,7 @@ import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.mbeans.ZorkaStats;
-import com.jitlogic.zorka.spy.processors.SpyRecord;
+import com.jitlogic.zorka.spy.SpyRecord;
 
 import javax.management.*;
 import javax.management.openmbean.CompositeData;

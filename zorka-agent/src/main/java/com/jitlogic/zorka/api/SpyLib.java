@@ -24,6 +24,7 @@ import com.jitlogic.zorka.integ.SyslogTrapper;
 import com.jitlogic.zorka.integ.ZabbixTrapper;
 import com.jitlogic.zorka.normproc.Normalizer;
 import com.jitlogic.zorka.spy.*;
+import com.jitlogic.zorka.spy.collectors.*;
 import com.jitlogic.zorka.spy.probes.*;
 import com.jitlogic.zorka.spy.processors.*;
 import com.jitlogic.zorka.util.ObjectInspector;

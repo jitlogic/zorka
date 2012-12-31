@@ -15,7 +15,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.processors;
+package com.jitlogic.zorka.spy.collectors;
 
 import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
@@ -23,6 +23,8 @@ import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.spy.SpyProcessor;
+import com.jitlogic.zorka.spy.SpyRecord;
 
 
 /**

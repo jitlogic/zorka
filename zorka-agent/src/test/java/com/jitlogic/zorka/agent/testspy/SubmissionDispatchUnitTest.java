@@ -23,7 +23,7 @@ import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.spy.DispatchingSubmitter;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.processors.SpyRecord;
+import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.spy.SpySubmitter;
 
 import org.junit.Before;
