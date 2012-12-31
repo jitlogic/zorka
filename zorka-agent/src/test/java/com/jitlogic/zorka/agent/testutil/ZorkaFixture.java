@@ -16,7 +16,7 @@
 package com.jitlogic.zorka.agent.testutil;
 
 import com.jitlogic.zorka.agent.*;
-import com.jitlogic.zorka.agent.testspy.support.TestQueuedProcCollector;
+import com.jitlogic.zorka.agent.testspy.support.TestAsyncQueueCollector;
 import com.jitlogic.zorka.api.SnmpLib;
 import com.jitlogic.zorka.api.SyslogLib;
 import com.jitlogic.zorka.spy.SpyInstance;
@@ -73,7 +73,7 @@ public class ZorkaFixture {
 
 
         spyInstance = agentInstance.getSpyInstance();
-        spyInstance.getSubmitter().setCollector(new TestQueuedProcCollector());
+        spyInstance.getSubmitter().setCollector(new TestAsyncQueueCollector());
 
         zorkaAgent = agentInstance.getZorkaAgent();
         zorka = zorkaAgent.getZorkaLib();

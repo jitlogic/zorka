@@ -21,23 +21,47 @@ import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.integ.ZorkaLogLevel;
 
+/**
+ * Extracts interesting values from log records of various types (JDK, Log4j, JBoss etc.).
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class LogAdapterProcessor implements SpyProcessor {
 
+    /** Log level field suffix */
     public static final String TAG_LEVEL = "_LEVEL";
+
+    /** Source class field suffix */
     public static final String TAG_CLASS = "_CLASS";
+
+    /** Source method field suffix */
     public static final String TAG_METHOD = "_METHOD";
+
+    /** Log message field suffix */
     public static final String TAG_MESSAGE = "_MESSAGE";
+
+    /** Exception object */
     public static final String TAG_EXCEPTION = "_EXCEPTION";
 
-    private String src, prefix;
+    /** Spy record field containing log record */
+    private String src;
 
+    /** Prefix for output fields */
+    private String prefix;
 
+    /**
+     * Standard constructor.
+     *
+     * @param src field containing log record
+     *
+     * @param prefix prefix for output fields
+     */
     public LogAdapterProcessor(String src, String prefix) {
         this.src = src;
         this.prefix = prefix;
     }
 
-
+    @Override
     public SpyRecord process(SpyRecord record) {
         Object orig = record.get(src);
 
@@ -48,7 +72,7 @@ public class LogAdapterProcessor implements SpyProcessor {
         return record;
     }
 
-
+    /** Thresholds for mapping JDK log levels to ZorkaLogLevel */
     private static int[] jdkThresholds = {
             300,                  // FINEST
             500,                  // FINER, FINE
@@ -58,6 +82,7 @@ public class LogAdapterProcessor implements SpyProcessor {
     };
 
 
+    /** JDK to Zorka log level thresholds map */
     private static ZorkaLogLevel[] jdkLevels = {
             ZorkaLogLevel.TRACE,  // FINEST
             ZorkaLogLevel.DEBUG,  // FINER, FINE
@@ -68,6 +93,13 @@ public class LogAdapterProcessor implements SpyProcessor {
     };
 
 
+    /**
+     * Extracts data from Zorka log records
+     *
+     * @param orig JDK log record
+     *
+     * @param rec spy record to be populated
+     */
     private void adaptJdkRecord(Object orig, SpyRecord rec) {
         Integer level = ObjectInspector.get(orig, "level", "intValue()");
 

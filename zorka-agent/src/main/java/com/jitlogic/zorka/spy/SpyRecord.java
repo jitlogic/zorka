@@ -29,8 +29,10 @@ import java.util.Map;
  */
 public class SpyRecord {
 
+    /** Spy context this record belongs to */
     private SpyContext ctx;
 
+    /** Actual data */
     private Map<String,Object> data = new HashMap<String, Object>();
 
     private int stages = 0, stage = -1;

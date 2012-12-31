@@ -90,12 +90,12 @@ public class SpyLib {
     public static final int SPD_MAX = 10;
 
 
-    public static final int GT = 0;
-    public static final int GE = 1;
-    public static final int EQ = 2;
-    public static final int LE = 3;
-    public static final int LT = 4;
-    public static final int NE = 5;
+    public static final String GT = ">";
+    public static final String GE = ">=";
+    public static final String EQ = "==";
+    public static final String LE = "<=";
+    public static final String LT = "<";
+    public static final String NE = "!=";
 
     public static final int ON_ENTER   = 0;
     public static final int ON_RETURN  = 1;
@@ -455,28 +455,6 @@ public class SpyLib {
 
 
     /**
-     * Creates syslog collector object. It sends collected records to remote syslog server using syslog trapper.
-     *
-     * @param trapper trapper object used to send logs
-     *
-     * @param expr message template
-     *
-     * @param severity syslog serverity (see syslog.* constants)
-     *
-     * @param facility syslog facility
-     *
-     * @param hostname hostname (as logged in syslog records)
-     *
-     * @param tag syslog tag (typically program name, in our case component name)
-     *
-     * @return syslog collector object
-     */
-    public SpyProcessor syslogCollector(SyslogTrapper trapper, String expr, int severity, int facility, String hostname, String tag) {
-        return new SyslogCollector(trapper, expr, severity, facility, hostname, tag);
-    }
-
-
-    /**
      * Sends collected records to specific trapper.
      *
      * @param trapper trapper object (eg. zabbix trapper, syslog trapper, file trapper etc.)
@@ -495,38 +473,6 @@ public class SpyLib {
     public SpyProcessor trapperCollector(ZorkaTrapper trapper, ZorkaLogLevel logLevel,
                                          String tagExpr, String msgExpr, String errExpr, String errField) {
         return new TrapperCollector(trapper, logLevel, tagExpr, msgExpr,  errExpr,  errField);
-    }
-
-
-    /**
-     * Sends collected records to zabbix using zabbix trapper.
-     *
-     * @param trapper zabbix trapper object (as created by zabbix.trapper() function)
-     *
-     * @param expr message template
-     *
-     * @param key zabbix key ID
-     *
-     * @return zabbix collector object
-     */
-    public SpyProcessor zabbixCollector(ZabbixTrapper trapper, String expr, String key) {
-        return new ZabbixCollector(trapper, expr, null, key);
-    }
-
-
-    /**
-     * Sends collected records to zabbix using zabbix trapper.
-     *
-     * @param trapper zabbix trapper (as created by zabbix.trapper() function)
-     *
-     * @param expr message template
-     *
-     * @param key zabbix key ID
-     *
-     * @return zabbix collector object
-     */
-    public SpyProcessor zabbixCollector(ZabbixTrapper trapper, String expr, String host, String key) {
-        return new ZabbixCollector(trapper,  expr,  host,  key);
     }
 
 
@@ -747,7 +693,7 @@ public class SpyLib {
      *
      * @return conditional filtering processor object
      */
-    public SpyProcessor ifSlotCmp(String a, int op, String b) {
+    public SpyProcessor ifSlotCmp(String a, String op, String b) {
         return ComparatorProcessor.scmp(a, op, b);
     }
 
@@ -763,7 +709,7 @@ public class SpyLib {
      *
      * @return conditional filtering processor object
      */
-    public SpyProcessor ifValueCmp(String a, int op, Object v) {
+    public SpyProcessor ifValueCmp(String a, String op, Object v) {
         return ComparatorProcessor.vcmp(a, op, v);
     }
 

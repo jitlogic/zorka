@@ -35,7 +35,7 @@ import static com.jitlogic.zorka.api.SpyLib.SPD_CDISPATCHES;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class QueuedProcCollector implements SpyProcessor, Runnable {
+public class AsyncQueueCollector implements SpyProcessor, Runnable {
 
     /** Logger */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
@@ -60,7 +60,7 @@ public class QueuedProcCollector implements SpyProcessor, Runnable {
      *
      * @param attrs attributes to be retained when passing records to submit queue.
      */
-    public QueuedProcCollector(String... attrs) {
+    public AsyncQueueCollector(String... attrs) {
         this.attrs = ZorkaUtil.copyArray(attrs);
     }
 

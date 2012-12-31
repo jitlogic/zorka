@@ -205,7 +205,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
     }
 
 
-    private boolean scmp(Object a, int op, Object b) {
+    private boolean scmp(Object a, String op, Object b) {
         SpyProcessor sp = ComparatorProcessor.scmp("E0", op, "E1");
         record.feed(ON_ENTER, new Object[] { a, b });
         record.put("E0", a); record.put("E1", b);
@@ -232,7 +232,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
     }
 
 
-    private boolean vcmp(Object a, int op, Object v) {
+    private boolean vcmp(Object a, String op, Object v) {
         SpyProcessor sp = ComparatorProcessor.vcmp("E0", op, v);
         record.put("E0", a);
         record.setStage(SpyLib.ON_ENTER);

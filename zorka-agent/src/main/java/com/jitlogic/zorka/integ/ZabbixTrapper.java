@@ -56,11 +56,11 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
 
         StringBuilder sb = new StringBuilder(384);
         sb.append("<req><host>");
-        sb.append(Base64.encodeToString(host.getBytes(), false));
+        sb.append(Base64.encode(host.getBytes(), false));
         sb.append("</host><key>");
-        sb.append(Base64.encodeToString(item.getBytes(), false));
+        sb.append(Base64.encode(item.getBytes(), false));
         sb.append("</key><data>");
-        sb.append(Base64.encodeToString(value.toString().getBytes(), false));
+        sb.append(Base64.encode(value.toString().getBytes(), false));
         sb.append("</data></req>");
 
         submit(sb.toString());

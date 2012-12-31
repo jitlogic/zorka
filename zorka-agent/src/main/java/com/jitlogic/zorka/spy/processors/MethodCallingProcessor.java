@@ -26,16 +26,43 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Calls a method of object identified as 'src' in spy record and stores result in 'dst' field.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class MethodCallingProcessor implements SpyProcessor {
 
+    /** Logger */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private String src, dst;
+    /** Source field */
+    private String src;
+
+    /** Destination field */
+    private String dst;
+
+    /** Method name */
     private String methodName;
+
+    /** Method arguments */
     private Object[] args;
+
+    /** Argument types */
     private Class<?>[] argTypes;
 
 
+    /**
+     * Standard constructor
+     *
+     * @param src source field
+     *
+     * @param dst destination field
+     *
+     * @param methodName method name
+     *
+     * @param args argument types
+     */
     public MethodCallingProcessor(String src, String dst, String methodName, Object... args) {
         this.src = src; this.dst = dst;
         this.methodName = methodName;
@@ -49,6 +76,7 @@ public class MethodCallingProcessor implements SpyProcessor {
     }
 
 
+    @Override
     public SpyRecord process(SpyRecord record) {
         Object val = record.get(src);
 
@@ -72,7 +100,19 @@ public class MethodCallingProcessor implements SpyProcessor {
         return record;
     }
 
-    // TODO move this method to ObjectInspector
+    /**
+     * Looks for method matching given name and argument types
+     *
+     * TODO move this to ObjectInspector
+     *
+     * @param clazz introspected class
+     *
+     * @param methodName method name
+     *
+     * @param argTypes argument types
+     *
+     * @return method object or null
+     */
     public Method lookupMethod(Class<?> clazz, String methodName, Class<?>...argTypes) {
         for (Method m : clazz.getMethods()) {
             if (methodName.equals(m.getName())) {
@@ -110,6 +150,7 @@ public class MethodCallingProcessor implements SpyProcessor {
         return null;
     }
 
+    /** Primitive types to classes map */
     private static Map<String,Class<?>> primitives;
 
     static {

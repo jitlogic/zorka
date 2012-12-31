@@ -32,21 +32,43 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.jitlogic.zorka.api.SpyLib.SPD_CLASSALL;
 import static com.jitlogic.zorka.api.SpyLib.SPD_CLASSXFORM;
 
+/**
+ * This is main class transformer installed in JVM by Zorka agent (see premain() method).
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class SpyClassTransformer implements ClassFileTransformer {
 
+    /** Logger */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
+    /** All spy defs configured */
     private List<SpyDefinition> sdefs = new ArrayList<SpyDefinition>();
 
+    /** SpyContext counter. */
     private int nextId = 1;
+
+    /** Map of spy contexts (by ID) */
     private Map<Integer, SpyContext> ctxById = new ConcurrentHashMap<Integer, SpyContext>();
+
+    /** Map of spy contexts (by instance) */
     private Map<SpyContext, SpyContext> ctxInstances = new HashMap<SpyContext, SpyContext>();
 
+    /**
+     * Returns context by its ID
+     */
     public SpyContext getContext(int id) {
         return ctxById.get(id);
     }
 
-
+    /**
+     * Looks up for a spy context with the same configuration. If there is one, it will be returned.
+     * If there is none, supplied context will be registered and will have an  ID assigned.
+     *
+     * @param keyCtx sample (possibly unregistered) context
+     *
+     * @return registered context
+     */
     public synchronized SpyContext lookup(SpyContext keyCtx) {
         SpyContext ctx = ctxInstances.get(keyCtx);
         if (ctx == null) {
@@ -59,12 +81,21 @@ public class SpyClassTransformer implements ClassFileTransformer {
     }
 
 
+    /**
+     * Adds sdef configuration to transformer. For all subsequent classes pushed through transformer,
+     * it will look if this sdef matches and possibly instrument methods according to sdef.
+     *
+     * @param sdef spy definition
+     *
+     * @return
+     */
     public SpyDefinition add(SpyDefinition sdef) {
         sdefs.add(sdef);
         return sdef;
     }
 
 
+    @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
         ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
 
@@ -99,7 +130,18 @@ public class SpyClassTransformer implements ClassFileTransformer {
         return classfileBuffer;
     }
 
-    protected ClassVisitor createVisitor(String clazzName, List<SpyDefinition> found, ClassWriter cw) {
-        return new SpyClassVisitor(this, clazzName, found, cw);
+    /**
+     * Spawn class visitor for transformed class.
+     *
+     * @param className class name
+     *
+     * @param found spy definitions that match
+     *
+     * @param cw output (class writer)
+     *
+     * @return class visitor for instrumenting this class
+     */
+    protected ClassVisitor createVisitor(String className, List<SpyDefinition> found, ClassWriter cw) {
+        return new SpyClassVisitor(this, className, found, cw);
     }
 }

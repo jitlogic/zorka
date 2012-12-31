@@ -15,10 +15,10 @@
  */
 package com.jitlogic.zorka.agent.testspy.support;
 
-import com.jitlogic.zorka.spy.collectors.QueuedProcCollector;
+import com.jitlogic.zorka.spy.collectors.AsyncQueueCollector;
 import com.jitlogic.zorka.spy.SpyRecord;
 
-public class TestQueuedProcCollector extends QueuedProcCollector {
+public class TestAsyncQueueCollector extends AsyncQueueCollector {
 
     public SpyRecord process(int stage, SpyRecord record) {
         doProcess(record);

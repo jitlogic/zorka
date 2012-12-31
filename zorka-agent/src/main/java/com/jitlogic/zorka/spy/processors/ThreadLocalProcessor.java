@@ -21,32 +21,61 @@ import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
+/**
+ * Allows using ThreadLocal objects to transfer data across instrumented methods.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class ThreadLocalProcessor implements SpyProcessor {
 
+    /** Command that calls ThreadLocal.get() method. */
     public static final int GET = 1;
+
+    /** Command that calls ThreadLocal.set() method. */
     public static final int SET = 2;
+
+    /** Command that calls ThreadLocal.remove() method. */
     public static final int REMOVE = 3;
 
-    private String key;
+    /** Record field that will be used to transfer value between record and thread local */
+    private String field;
+
+    /** Attribute chain - use if value accessed is reachable indirectly from spy record */
     private Object[] path;
+
+    /** Thread local operation (see above constants) */
     private int operation;
+
+    /** Thread local object */
     private ThreadLocal<Object> threadLocal;
 
-    public ThreadLocalProcessor(String key, int operation, ThreadLocal<Object> threadLocal, Object...path) {
-        this.key = key;
+    /**
+     * Constructs thread local processor.
+     *
+     * @param field record field that will be accessed
+     *
+     * @param operation thread local operation
+     *
+     * @param threadLocal thread local object
+     *
+     * @param path attribute chain
+     */
+    public ThreadLocalProcessor(String field, int operation, ThreadLocal<Object> threadLocal, Object...path) {
+        this.field = field;
         this.operation = operation;
         this.threadLocal = threadLocal;
         this.path = ZorkaUtil.copyArray(path);
     }
 
 
+    @Override
     public SpyRecord process(SpyRecord record) {
         switch (operation) {
             case GET:
-                record.put(key, ObjectInspector.get(threadLocal.get(), path));
+                record.put(field, ObjectInspector.get(threadLocal.get(), path));
                 break;
             case SET:
-                threadLocal.set(record.get(key));
+                threadLocal.set(record.get(field));
                 break;
             case REMOVE:
                 threadLocal.remove();

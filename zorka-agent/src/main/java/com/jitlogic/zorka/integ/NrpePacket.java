@@ -22,23 +22,61 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.zip.CRC32;
 
+/**
+ * Represents Nagios NRPE packet. Implements parsing and encoding methods.
+ */
 public class NrpePacket {
 
+    /** NRPE query */
     public static final short QUERY_PACKET = 1;
+
+    /** NRPE response */
     public static final short RESPONSE_PACKET = 2;
 
-    private int version, type, resultCode;
+    /** Protocol version */
+    private int version;
+
+    /** Packet type */
+    private int type;
+
+    /** Result code */
+    private int resultCode;
+
+    /** Payload data */
     private String data;
 
-    public static NrpePacket newInstance(int version, int type, int resultCode, String message) {
+    /**
+     * Creates new NRPE packet object.
+     *
+     * @param version protocol version
+     *
+     * @param type packet type
+     *
+     * @param resultCode result code
+     *
+     * @param data payload data
+     *
+     * @return NRPE packet
+     */
+    public static NrpePacket newInstance(int version, int type, int resultCode, String data) {
         NrpePacket pkt = new NrpePacket();
 
         pkt.version = version; pkt.type = type;
-        pkt.resultCode = resultCode; pkt.data = message;
+        pkt.resultCode = resultCode; pkt.data = data;
 
         return pkt;
     }
 
+
+    /**
+     * Reads data from input stream and creates NRPE packet out of it.
+     *
+     * @param is input stream
+     *
+     * @return NRPE packet
+     *
+     * @throws IOException it I/O error occurs
+     */
     public static NrpePacket fromStream(InputStream is) throws IOException {
         NrpePacket pkt = new NrpePacket();
         pkt.decode(is);
@@ -46,9 +84,17 @@ public class NrpePacket {
     }
 
 
+    /** Hidden constructor. Use newInstance() or fromStream() method instead. */
     private NrpePacket() { }
 
 
+    /**
+     * Reads data from input stream and populates fields with parsed values
+     *
+     * @param is input stream
+     *
+     * @throws IOException if I/O error occurs
+     */
     public void decode(InputStream is) throws IOException {
         byte[] buf = new byte[1036];
         int len = is.read(buf);
@@ -84,6 +130,13 @@ public class NrpePacket {
     }
 
 
+    /**
+     * Encodes packet and writes it to output stream.
+     *
+     * @param os output stream
+     *
+     * @throws IOException when I/O error occurs
+     */
     public void encode(OutputStream os) throws IOException {
         ByteBuffer bb = ByteBuffer.allocate(10).order(ByteOrder.BIG_ENDIAN);
         bb.putShort((short)version).putShort((short)type).putInt(0).putShort((short)resultCode);
@@ -106,26 +159,35 @@ public class NrpePacket {
     }
 
 
-    public NrpePacket createResponse(int resultCode, String message) {
-        return newInstance(version, type == QUERY_PACKET ? RESPONSE_PACKET : QUERY_PACKET, resultCode, message);
+    /**
+     * Creates response packet.
+     *
+     * @param resultCode response result code
+     *
+     * @param data response payload
+     *
+     * @return response packet
+     */
+    public NrpePacket createResponse(int resultCode, String data) {
+        return newInstance(version, type == QUERY_PACKET ? RESPONSE_PACKET : QUERY_PACKET, resultCode, data);
     }
 
-
+    /** Returns packet version */
     public int getVersion() {
         return version;
     }
 
-
+    /** Returns packet type */
     public int getType() {
         return type;
     }
 
-
+    /** Returns packet result code */
     public int getResultCode() {
         return resultCode;
     }
 
-
+    /** Returns payload data */
     public String getData() {
         return data;
     }
