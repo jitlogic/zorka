@@ -17,9 +17,8 @@
 
 package com.jitlogic.zorka.agent.testspy.support;
 
-import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
-import com.jitlogic.zorka.spy.processors.CollectQueueProcessor;
+import com.jitlogic.zorka.spy.processors.SpyProcessor;
+import com.jitlogic.zorka.spy.processors.SpyRecord;
 
 import java.util.ArrayList;
 import java.util.List;

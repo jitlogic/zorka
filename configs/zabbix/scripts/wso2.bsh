@@ -38,7 +38,7 @@ __wso2() {
 
   spy.add(spy.instance()
     .onReturn(spy.fetchRetVal("PARAM"),
-              (com.jitlogic.zorka.spy.SpyProcessor)__carbonOSGiConfigurer())
+              (com.jitlogic.zorka.spy.processors.SpyProcessor)__carbonOSGiConfigurer())
     .include(spy.byMethod(spy.AC_PRIVATE, "org.wso2.carbon.server.CarbonLauncher",
                           "buildInitialPropertyMap", "java.util.Map")));
 

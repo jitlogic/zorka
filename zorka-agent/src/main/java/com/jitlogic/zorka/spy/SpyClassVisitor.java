@@ -17,8 +17,8 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
@@ -29,8 +29,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.objectweb.asm.Opcodes.*;
-import static com.jitlogic.zorka.spy.SpyLib.SPD_METHODALL;
-import static com.jitlogic.zorka.spy.SpyLib.SPD_METHODXFORM;
+import static com.jitlogic.zorka.api.SpyLib.SPD_METHODALL;
+import static com.jitlogic.zorka.api.SpyLib.SPD_METHODXFORM;
 
 public class SpyClassVisitor extends ClassVisitor {
 

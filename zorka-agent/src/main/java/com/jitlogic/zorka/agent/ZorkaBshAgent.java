@@ -23,11 +23,11 @@ import java.util.Arrays;
 import java.util.concurrent.Executor;
 
 import com.jitlogic.zorka.util.ObjectDumper;
-import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLog;
 
 import bsh.EvalError;
 import bsh.Interpreter;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 
 /**
  * This is central part of Zorka agent - it processes actual queries and executes BSH scripts.

@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 
 import static org.objectweb.asm.Opcodes.*;
 
-import static com.jitlogic.zorka.spy.SpyLib.SM_NOARGS;
+import static com.jitlogic.zorka.api.SpyLib.SM_NOARGS;
 
 /**
  * This class is used to match class and method that have to be instrumented.

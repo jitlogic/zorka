@@ -20,8 +20,8 @@ package com.jitlogic.zorka.agent;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 
 public class JmxObject {
 	

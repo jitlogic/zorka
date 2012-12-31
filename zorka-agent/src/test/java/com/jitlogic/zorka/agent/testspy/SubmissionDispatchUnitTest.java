@@ -17,22 +17,20 @@
 
 package com.jitlogic.zorka.agent.testspy;
 
-import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.testspy.support.TestCollector;
 import com.jitlogic.zorka.agent.testspy.support.TestSpyTransformer;
-import com.jitlogic.zorka.agent.testutil.TestLogger;
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.spy.DispatchingSubmitter;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.spy.processors.SpyRecord;
 import com.jitlogic.zorka.spy.SpySubmitter;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-import static com.jitlogic.zorka.spy.SpyLib.*;
+import static com.jitlogic.zorka.api.SpyLib.*;
 
 
 public class SubmissionDispatchUnitTest extends ZorkaFixture {

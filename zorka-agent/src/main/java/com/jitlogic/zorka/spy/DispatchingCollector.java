@@ -17,12 +17,14 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.spy.processors.SpyProcessor;
+import com.jitlogic.zorka.spy.processors.SpyRecord;
 
 import java.util.List;
 
-import static com.jitlogic.zorka.spy.SpyLib.*;
+import static com.jitlogic.zorka.api.SpyLib.*;
 
 public class DispatchingCollector implements SpyProcessor {
 

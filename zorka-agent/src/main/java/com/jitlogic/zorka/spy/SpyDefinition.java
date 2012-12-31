@@ -19,11 +19,12 @@ package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.spy.probes.SpyProbe;
 import com.jitlogic.zorka.spy.probes.SpyTimeProbe;
+import com.jitlogic.zorka.spy.processors.SpyProcessor;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.*;
 
-import static com.jitlogic.zorka.spy.SpyLib.*;
+import static com.jitlogic.zorka.api.SpyLib.*;
 
 /**
  * This class defines mini-DSL for configuring instrumentation. Language allows for

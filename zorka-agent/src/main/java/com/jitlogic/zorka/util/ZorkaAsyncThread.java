@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.util;
 
-import com.jitlogic.zorka.logproc.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLog;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;

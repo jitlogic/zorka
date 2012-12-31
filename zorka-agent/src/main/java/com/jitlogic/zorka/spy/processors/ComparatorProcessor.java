@@ -15,9 +15,7 @@
  */
 package com.jitlogic.zorka.spy.processors;
 
-import com.jitlogic.zorka.spy.SpyLib;
-import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.api.SpyLib;
 
 public class ComparatorProcessor implements SpyProcessor {
 

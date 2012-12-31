@@ -16,14 +16,14 @@
 package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.*;
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import static com.jitlogic.zorka.spy.SpyLib.SPD_CDISPATCHES;
+import static com.jitlogic.zorka.api.SpyLib.SPD_CDISPATCHES;
 
 /**
  * Queues incoming records resumes processing in separate thread.

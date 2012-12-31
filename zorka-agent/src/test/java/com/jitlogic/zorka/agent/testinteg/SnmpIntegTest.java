@@ -17,8 +17,8 @@
 package com.jitlogic.zorka.agent.testinteg;
 
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
-import com.jitlogic.zorka.integ.snmp.SnmpLib;
-import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
+import com.jitlogic.zorka.api.SnmpLib;
+import com.jitlogic.zorka.integ.SnmpTrapper;
 import com.jitlogic.contrib.libsnmp.SNMPObjectIdentifier;
 import org.junit.Test;
 

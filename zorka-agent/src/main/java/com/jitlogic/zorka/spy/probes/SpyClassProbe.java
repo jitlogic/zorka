@@ -15,7 +15,6 @@
  */
 package com.jitlogic.zorka.spy.probes;
 
-import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.spy.SpyMethodVisitor;
 import org.objectweb.asm.Type;
 

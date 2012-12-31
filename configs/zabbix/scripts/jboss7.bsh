@@ -140,7 +140,7 @@ __jboss7() {
 
 
   spy.add(spy.instance()
-    .onReturn(spy.FETCH_NULL, (com.jitlogic.zorka.spy.SpyProcessor)__mbsRegister())
+    .onReturn(spy.FETCH_NULL, (com.jitlogic.zorka.spy.processors.SpyProcessor)__mbsRegister())
     .include(spy.byMethod("org.jboss.modules.ModuleLoader", "installMBeanServer")));
 
 

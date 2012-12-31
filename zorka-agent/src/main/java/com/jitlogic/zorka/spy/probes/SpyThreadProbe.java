@@ -15,12 +15,8 @@
  */
 package com.jitlogic.zorka.spy.probes;
 
-import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.spy.SpyMethodVisitor;
-import org.objectweb.asm.Type;
 
-import static com.jitlogic.zorka.spy.SpyLib.*;
-import static org.objectweb.asm.Opcodes.ACONST_NULL;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
 public class SpyThreadProbe extends SpyProbe {

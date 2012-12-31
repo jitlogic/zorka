@@ -16,13 +16,11 @@
 package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.SpyInstance;
-import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.normproc.Normalizer;
 
-import static com.jitlogic.zorka.spy.SpyLib.SPD_ARGPROC;
+import static com.jitlogic.zorka.api.SpyLib.SPD_ARGPROC;
 
 public class NormalizingProcessor implements SpyProcessor {
 

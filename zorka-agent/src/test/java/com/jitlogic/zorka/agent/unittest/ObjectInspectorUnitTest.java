@@ -4,7 +4,7 @@ import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.agent.testutil.*;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.spy.processors.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 
 import org.junit.Before;

@@ -19,8 +19,6 @@ import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.*;
 
-import static com.jitlogic.zorka.normproc.NormLib.*;
-
 /**
  * This is simplified DFA lexer for all *QL dialects. It is not very accurate,
  * so it can produce garbage in certain cases (albeit in predictable way ;) ), but for

@@ -18,8 +18,8 @@
 package com.jitlogic.zorka.agent;
 
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 
 import javax.management.*;
 import java.io.IOException;

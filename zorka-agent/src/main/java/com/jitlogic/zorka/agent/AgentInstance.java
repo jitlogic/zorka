@@ -16,18 +16,18 @@
 
 package com.jitlogic.zorka.agent;
 
-import com.jitlogic.zorka.integ.nagios.NagiosAgent;
-import com.jitlogic.zorka.integ.nagios.NagiosLib;
-import com.jitlogic.zorka.integ.snmp.SnmpLib;
-import com.jitlogic.zorka.integ.syslog.SyslogLib;
-import com.jitlogic.zorka.integ.zabbix.ZabbixLib;
-import com.jitlogic.zorka.normproc.NormLib;
+import com.jitlogic.zorka.integ.NagiosAgent;
+import com.jitlogic.zorka.api.NagiosLib;
+import com.jitlogic.zorka.api.SnmpLib;
+import com.jitlogic.zorka.api.SyslogLib;
+import com.jitlogic.zorka.api.ZabbixLib;
+import com.jitlogic.zorka.api.NormLib;
 import com.jitlogic.zorka.spy.MainSubmitter;
 import com.jitlogic.zorka.spy.SpyInstance;
-import com.jitlogic.zorka.spy.SpyLib;
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
-import com.jitlogic.zorka.integ.zabbix.ZabbixAgent;
+import com.jitlogic.zorka.api.SpyLib;
+import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.integ.ZabbixAgent;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.util.Properties;

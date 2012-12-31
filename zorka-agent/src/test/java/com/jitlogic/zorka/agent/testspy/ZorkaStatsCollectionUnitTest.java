@@ -21,10 +21,10 @@ import com.jitlogic.zorka.mbeans.MethodCallStatistics;
 import com.jitlogic.zorka.rankproc.BucketAggregate;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.SpyLib;
-import com.jitlogic.zorka.spy.SpyRecord;
-import com.jitlogic.zorka.spy.collectors.JmxAttrCollector;
-import com.jitlogic.zorka.spy.collectors.ZorkaStatsCollector;
+import com.jitlogic.zorka.api.SpyLib;
+import com.jitlogic.zorka.spy.processors.SpyRecord;
+import com.jitlogic.zorka.spy.processors.JmxAttrCollector;
+import com.jitlogic.zorka.spy.processors.ZorkaStatsCollector;
 
 import org.junit.Test;
 
@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
 import java.util.Date;
 
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.getAttr;
-import static com.jitlogic.zorka.spy.SpyLib.*;
+import static com.jitlogic.zorka.api.SpyLib.*;
 
 public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 

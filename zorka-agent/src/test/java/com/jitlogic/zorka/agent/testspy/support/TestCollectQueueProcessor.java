@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.agent.testspy.support;
 
-import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.spy.processors.SpyRecord;
 import com.jitlogic.zorka.spy.processors.CollectQueueProcessor;
 
 public class TestCollectQueueProcessor extends CollectQueueProcessor {

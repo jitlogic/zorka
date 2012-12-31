@@ -17,11 +17,11 @@ package com.jitlogic.zorka.agent.testutil;
 
 import com.jitlogic.zorka.agent.*;
 import com.jitlogic.zorka.agent.testspy.support.TestCollectQueueProcessor;
-import com.jitlogic.zorka.integ.snmp.SnmpLib;
-import com.jitlogic.zorka.integ.syslog.SyslogLib;
+import com.jitlogic.zorka.api.SnmpLib;
+import com.jitlogic.zorka.api.SyslogLib;
 import com.jitlogic.zorka.spy.SpyInstance;
-import com.jitlogic.zorka.spy.SpyLib;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.api.SpyLib;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 
 import org.junit.After;
 import org.junit.Before;

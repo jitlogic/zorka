@@ -17,8 +17,8 @@
 
 package com.jitlogic.zorka.util;
 
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 
 import java.util.*;
 import java.util.regex.Matcher;

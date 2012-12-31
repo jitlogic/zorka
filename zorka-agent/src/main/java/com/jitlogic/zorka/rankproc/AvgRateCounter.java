@@ -18,14 +18,17 @@
 package com.jitlogic.zorka.rankproc;
 
 import com.jitlogic.zorka.agent.ZorkaLib;
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Some old stuff to calculate average rates. To be removed soon.
+ */
 public class AvgRateCounter {
 
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());

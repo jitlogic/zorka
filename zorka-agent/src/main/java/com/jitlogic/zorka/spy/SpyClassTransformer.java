@@ -17,8 +17,8 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -29,8 +29,8 @@ import java.security.ProtectionDomain;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.jitlogic.zorka.spy.SpyLib.SPD_CLASSALL;
-import static com.jitlogic.zorka.spy.SpyLib.SPD_CLASSXFORM;
+import static com.jitlogic.zorka.api.SpyLib.SPD_CLASSALL;
+import static com.jitlogic.zorka.api.SpyLib.SPD_CLASSXFORM;
 
 public class SpyClassTransformer implements ClassFileTransformer {
 

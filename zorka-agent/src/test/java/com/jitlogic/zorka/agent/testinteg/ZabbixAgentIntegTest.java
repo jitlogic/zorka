@@ -27,14 +27,14 @@ import java.util.concurrent.Executors;
 import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.testutil.TestLogger;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.integ.zabbix.ZabbixAgent;
-import com.jitlogic.zorka.integ.zabbix.ZabbixRequestHandler;
+import com.jitlogic.zorka.integ.ZabbixAgent;
+import com.jitlogic.zorka.integ.ZabbixRequestHandler;
 import com.jitlogic.zorka.agent.ZorkaConfig;
 
 public class ZabbixAgentIntegTest {
