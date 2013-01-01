@@ -1,9 +1,3 @@
-package com.jitlogic.zorka.rankproc;
-
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogger;
-import com.jitlogic.zorka.util.ObjectInspector;
-
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -19,18 +13,40 @@ import com.jitlogic.zorka.util.ObjectInspector;
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.rankproc;
+
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.util.ObjectInspector;
+
+/**
+ * Wraps EJB statistic to be suitable to use with rank lists and maintains average statistics for wrapped object.
+ */
 public class EjbRankItem implements Rankable<Object> {
 
+    /** Logger. */
     private static final ZorkaLog log = ZorkaLogger.getLog(EjbRankItem.class);
 
+    /** Number of calls metric */
     private static final int BY_CALLS = 0;
+
+    /** Execution time metric */
     private static final int BY_TIME = 1;
 
+    /** Wrapped object */
     private Object statObj;
 
-    private BucketAggregate byCalls, byTime;
+    /** Call counting aggregate */
+    private BucketAggregate byCalls;
 
+    /** Execution time aggregate */
+    private BucketAggregate byTime;
 
+    /**
+     * Creates new wrapper object
+     *
+     * @param statObj wrapped EJB statistic object
+     */
     public EjbRankItem(Object statObj) {
         this.statObj = statObj;
 
@@ -39,6 +55,7 @@ public class EjbRankItem implements Rankable<Object> {
     }
 
 
+    @Override
     public double getAverage(long tstamp, int metric, int average) {
         switch (metric) {
             case BY_CALLS: {
@@ -58,26 +75,35 @@ public class EjbRankItem implements Rankable<Object> {
     }
 
 
+    @Override
     public String[] getMetrics() {
         return new String[] { "CALLS", "TIME" };
     }
 
 
+    @Override
     public String[] getAverages() {
         return new String[] { "AVG1", "AVG5", "AVG15" };
     }
 
 
+    @Override
     public Object getWrapped() {
         return statObj;
     }
 
 
+    @Override
     public String getName() {
         return ""+ObjectInspector.get(statObj,  "name");
     }
 
 
+    /**
+     * Updates averages maintained by this wrapper object.
+     *
+     * @param tstamp current time
+     */
     public synchronized void feed(long tstamp) {
         Object count = ObjectInspector.get(statObj, "count");
         Object time = ObjectInspector.get(statObj, "totalTime");

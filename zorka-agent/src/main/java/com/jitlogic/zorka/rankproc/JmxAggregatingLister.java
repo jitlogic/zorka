@@ -24,22 +24,40 @@ import javax.management.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Aggregates many listers available via JMX into one.
+ *
+ * @param <T>
+ */
 public class JmxAggregatingLister<T extends Rankable<?>> implements RankLister<T> {
 
+    /** Logger. */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
+    /** Class loader lister switches to to when performing listing. */
     private ClassLoader classLoader;
+
+    /** MBean server connection */
     private MBeanServerConnection mbsConn;
-    private String onMask;
 
+    /** Object name (or mask) */
+    private String objectName;
 
-    public JmxAggregatingLister(String mbsName, String onMask) {
+    /**
+     * Creates Creates JXM aggregating lister.
+     *
+     * @param mbsName mbean server name
+     *
+     * @param objectName object name (or mask)
+     */
+    public JmxAggregatingLister(String mbsName, String objectName) {
         this.mbsConn = AgentInstance.getMBeanServerRegistry().lookup(mbsName);
         this.classLoader = AgentInstance.getMBeanServerRegistry().getClassLoader(mbsName);
-        this.onMask = onMask;
+        this.objectName = objectName;
     }
 
 
+    @Override
     public List<T> list() {
 
         List<T> lst = new ArrayList<T>();
@@ -47,7 +65,7 @@ public class JmxAggregatingLister<T extends Rankable<?>> implements RankLister<T
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(classLoader);
 
-        for (ObjectName on : ObjectInspector.queryNames(mbsConn, onMask)) {
+        for (ObjectName on : ObjectInspector.queryNames(mbsConn, objectName)) {
             try {
                 MBeanInfo mbi = mbsConn.getMBeanInfo(on);
                 for (MBeanAttributeInfo mba : mbi.getAttributes()) {

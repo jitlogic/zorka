@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class ObjectInspector {
+public final class ObjectInspector {
 
     /** Special attribute name that will extract stack trace from throwable objects. */
     public static final String STACK_TRACE_KEY = "printStackTrace";
@@ -105,7 +105,6 @@ public class ObjectInspector {
             return ((CompositeData)obj).get(""+key);
         } else if (obj instanceof TabularData) {
             String[] keys = key.toString().split("\\,");
-            // TODO coerce keys to proper data types
             obj = ((TabularData)obj).get(keys);
         } else if (obj instanceof ZorkaStats) {
             return ((ZorkaStats)obj).getStatistic(key.toString());

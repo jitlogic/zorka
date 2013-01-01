@@ -208,7 +208,7 @@ public class XqlLexer extends Lexer {
     public Token next() {
         Token token = super.next();
 
-        if (token.getType() == T_SYMBOL && keywordSet.contains(token.getContent().toLowerCase())) {
+        if (token.getType() == T_SYMBOL && keywordSet.contains(token.getText().toLowerCase())) {
             token.setType(T_KEYWORD);
         }
 

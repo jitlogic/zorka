@@ -15,28 +15,66 @@
  */
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.spy.SpyDefArg;
-import com.jitlogic.zorka.spy.SpyMethodVisitor;
 import org.objectweb.asm.Type;
 
 import static org.objectweb.asm.Opcodes.*;
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
+/**
+ * Abstract class representing spy probe. Implements common methods used by probes.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public abstract class SpyProbe implements SpyDefArg {
 
-    private String key;
 
-    public SpyProbe(String key) {
-        this.key = key;
+    /** Field name fetched value will be saved in spy record */
+    private String fieldName;
+
+
+    /**
+     * Creates new spy probe.
+     *
+     * @param fieldName field name
+     */
+    public SpyProbe(String fieldName) {
+        this.fieldName = fieldName;
     }
 
-    public String getKey() {
-        return key;
+
+    /**
+     * Returns name fetched data will be saved as
+     *
+     * @return field name
+     */
+    public String getFieldName() {
+        return fieldName;
     }
 
+
+    /**
+     * Emits probe bytecode.
+     *
+     * @param mv output method visitor
+     *
+     * @param stage point in method code probe is being inserted (entry point,
+     *
+     * @param opcode
+     *
+     * @return number of JVM stack slots emitted code consumes
+     */
     public abstract int emit(SpyMethodVisitor mv, int stage, int opcode);
 
 
+    /**
+     * Fetches return value or thrown exception. If return value is of basic type, it is automatically boxed.
+     *
+     * @param mv output method visitor
+     *
+     * @param type return data type
+     *
+     * @return number of JVM stack slots emitted code consumes
+     */
     public int emitFetchRetVal(SpyMethodVisitor mv, Type type) {
 
         if (Type.VOID == type.getSort()) {
@@ -52,6 +90,13 @@ public abstract class SpyProbe implements SpyDefArg {
     }
 
 
+    /**
+     * Emits code boxing value of basic type.
+     *
+     * @param mv output method visitor
+     *
+     * @param type input data type (must be basic type!)
+     */
     public void emitAutoboxing(SpyMethodVisitor mv, Type type) {
         switch (type.getSort()) {
             case Type.INT:

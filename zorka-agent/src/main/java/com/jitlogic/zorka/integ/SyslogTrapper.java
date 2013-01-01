@@ -28,6 +28,8 @@ import java.util.Date;
 
 /**
  * Minimal syslog sender implementation.
+ *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrapper {
 
@@ -50,11 +52,32 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
     private DatagramSocket socket = null;
 
 
+    /**
+     * Creates new syslog trapper.
+     *
+     * @param syslogServer syslog server IP address
+     *
+     * @param defaultHost default host name added to syslog messages
+     *
+     * @param defaultFacility default facility code added to syslog messages
+     */
     public SyslogTrapper(String syslogServer, String defaultHost, int defaultFacility) {
         this(syslogServer, defaultHost, defaultFacility, false);
     }
 
 
+    /**
+     * Creates new syslog trapper.
+     *
+     * @param syslogServer syslog server IP address
+     *
+     * @param defaultHost default host name
+     *
+     * @param defaultFacility default facility code
+     *
+     * @param quiet if true, trapper will not its own errors to zorka logger
+     *              TODO get rid of this 'quiet' feature after refactoring
+     */
     public SyslogTrapper(String syslogServer, String defaultHost, int defaultFacility, boolean quiet) {
         super("syslog-trapper");
         this.defaultFacility = defaultFacility;
@@ -81,23 +104,65 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
     }
 
 
-    public void log(int severity, int facility, String tag, String content) {
-        log(severity, facility, defaultHost, tag, content);
+    /**
+     * Logs a message.
+     *
+     * @param severity syslog severity code
+     *
+     * @param facility syslog facility code
+     *
+     * @param tag tag (eg. component name)
+     *
+     * @param message log message
+     */
+    public void log(int severity, int facility, String tag, String message) {
+        log(severity, facility, defaultHost, tag, message);
     }
 
 
-    public void log(int severity, int facility, String hostname, String tag, String content) {
-        String s = format(severity, facility, new Date(), hostname, tag, content);
+    /**
+     * Logs a message.
+     *
+     * @param severity syslog severity code
+     *
+     * @param facility syslog facility code
+     *
+     * @param hostname host name (as syslog protocol mandates)
+     *
+     * @param tag tag (eg. component name)
+     *
+     * @param message log message
+     */
+    public void log(int severity, int facility, String hostname, String tag, String message) {
+        String s = format(severity, facility, new Date(), hostname, tag, message);
         submit(s);
     }
 
 
-    public String format(int severity, int facility, Date date, String hostname, String tag, String content) {
+    /**
+     * Formats syslog message packet.
+     *
+     * @param severity message severity
+     *
+     * @param facility facility code
+     *
+     * @param date message timestamp
+     *
+     * @param hostname host name
+     *
+     * @param tag tag (eg.component name)
+     *
+     * @param message log message
+     *
+     * @return proper syslog message
+     */
+    public String format(int severity, int facility, Date date, String hostname, String tag, String message) {
         return "<" + (severity+facility*8) + ">" + new SimpleDateFormat("MMM dd HH:mm:ss").format(date) + " "
-                + hostname + " " + tag + " " + ZorkaUtil.printableASCII7(content);
+                + hostname + " " + tag + " " + ZorkaUtil.printableASCII7(message);
     }
 
 
+    @Override
     public void open() {
         try {
             socket = new DatagramSocket();
@@ -108,6 +173,7 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
     }
 
 
+    @Override
     public void close() {
         socket.close();
         socket = null;
@@ -127,6 +193,7 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
     }
 
 
+    @Override
     public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e, Object... args) {
         if (e == null) {
             log(logLevel.getSeverity(), defaultFacility, tag, msg);

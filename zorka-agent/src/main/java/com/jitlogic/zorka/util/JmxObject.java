@@ -20,18 +20,45 @@ package com.jitlogic.zorka.util;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
+/**
+ * Client-side MBean representation used by various components of Zorka agent.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class JmxObject {
-	
+
+    /** MBean object name */
 	private final ObjectName name;
+
+    /** MBean server object belongs to */
 	private final MBeanServerConnection conn;
+
+    /** Class loader zorka agent switches to when accessing mbean attributes */
     private final ClassLoader classLoader;
 
+    /**
+     * Creates new JmxObject
+     *
+     * @param name JMX object name
+     *
+     * @param conn MBean server connection
+     *
+     * @param classLoader class loader zorka agent switches to when accessing mbean attributes
+     */
     public JmxObject(ObjectName name, MBeanServerConnection conn, ClassLoader classLoader) {
 		this.name = name;
 		this.conn = conn;
         this.classLoader = classLoader;
 	}
-	
+
+
+    /**
+     * Gets named attribute value.
+     *
+     * @param key attribute name
+     *
+     * @return retrieved attribute value
+     */
 	public Object get(Object key) {
         ClassLoader cl0 = null;
         Object ret = null;
@@ -51,11 +78,22 @@ public class JmxObject {
 
         return ret;
 	}
-	
+
+
+    /**
+     * Returns JMX object name
+     *
+     * @return object name
+     */
 	public ObjectName getName() {
 		return name;
 	}
-	
+
+
+    /**
+     * Returns JMX mbean server connection
+     * @return
+     */
 	public MBeanServerConnection getConn() {
 		return conn;
 	}

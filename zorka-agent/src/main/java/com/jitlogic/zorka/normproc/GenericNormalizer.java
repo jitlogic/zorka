@@ -140,7 +140,7 @@ public class GenericNormalizer implements Normalizer {
         while (lexer.hasNext()) {
             Token token = lexer.next();
             int t = token.getType();
-            String s = token.getContent();
+            String s = token.getText();
 
             if (0 != (flags & (1<<t))) {
                 if (proc[0][t]) { continue; }

@@ -30,27 +30,67 @@ import java.util.Map;
 
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
+/**
+ * Maintains statistics about method calls and updates them using data from incoming records.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class ZorkaStatsCollector implements SpyProcessor {
 
-    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    /** Logger */
+    private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaStatsCollector.class);
 
-    private final MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
-    private final String mbsName, mbeanTemplate, attrTemplate, keyTemplate;
-    private final String time, tstamp;
+    /** MBean server registry */
+    private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
 
-    private final Map<SpyContext,MethodCallStatistics> statsCache = new HashMap<SpyContext, MethodCallStatistics>();
+    /** MBean server name */
+    private String mbsName;
 
+    /** MBean name template (object name) */
+    private String mbeanTemplate;
+
+    /** Attribute name template */
+    private String attrTemplate;
+
+    /** Statistic name tmeplate */
+    private String statisticTemplate;
+
+    /** Execution time field */
+    private String timeField;
+
+    /** Timestamp field */
+    private String tstamp;
+
+    /** Cache mapping spy contexts to statistics */
+    private Map<SpyContext,MethodCallStatistics> statsCache = new HashMap<SpyContext, MethodCallStatistics>();
+
+    /**
+     * Creates new method call statistics collector.
+     *
+     * @param mbsName mbean server name
+     *
+     * @param mbeanTemplate mbean name template (object name)
+     *
+     * @param attrTemplate attribute name template
+     *
+     * @param statisticTemplate statistic name template
+     *
+     * @param tstamp timestamp field name
+     *
+     * @param timeField execution time field name
+     */
     public ZorkaStatsCollector(String mbsName, String mbeanTemplate, String attrTemplate,
-                               String keyTemplate, String tstamp, String time) {
+                               String statisticTemplate, String tstamp, String timeField) {
         this.mbsName  = mbsName;
         this.mbeanTemplate = mbeanTemplate;
         this.attrTemplate = attrTemplate;
-        this.keyTemplate = keyTemplate;
-        this.time = time;
+        this.statisticTemplate = statisticTemplate;
+        this.timeField = timeField;
         this.tstamp = tstamp;
     }
 
 
+    @Override
     public Map<String,Object> process(Map<String,Object> record) {
 
         if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
@@ -65,11 +105,11 @@ public class ZorkaStatsCollector implements SpyProcessor {
                     new MethodCallStatistics(), "Method call statistics");
         }
 
-        String key = ObjectInspector.substitute(ctx.subst(keyTemplate), record);
+        String key = ObjectInspector.substitute(ctx.subst(statisticTemplate), record);
 
         MethodCallStatistic statistic = (MethodCallStatistic)stats.getMethodCallStatistic(key);
 
-        Object timeObj = time != null ? record.get(time) : 0L;  // TODO WTF?
+        Object timeObj = timeField != null ? record.get(timeField) : 0L;  // TODO WTF?
         Object tstampObj = tstamp != null ? record.get(tstamp) : 0L;   // TODO WTF?
 
         if (timeObj instanceof Long && tstampObj instanceof Long) {
@@ -90,31 +130,16 @@ public class ZorkaStatsCollector implements SpyProcessor {
             }
         } else {
             if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
-                log.debug("Unknown type of time or tstamp object: " + timeObj);
+                log.debug("Unknown type of timeField or tstamp object: " + timeObj);
             }
         }
 
         return record;
     }
 
-
-    public String getMbsName() {
-        return mbsName;
-    }
-
-
-    public String getMbeanTemplate() {
-        return mbeanTemplate;
-    }
-
-
-    public String getAttrTemplate() {
-        return attrTemplate;
-    }
-
-
-
-    public String getKeyTemplate() {
-        return keyTemplate;
+    /** Returns statistic template */
+    public String getStatisticTemplate() {
+        // TODO get rid of this method, use introspection in unit tests
+        return statisticTemplate;
     }
 }

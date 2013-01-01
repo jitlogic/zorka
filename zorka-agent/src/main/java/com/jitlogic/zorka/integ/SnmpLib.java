@@ -30,10 +30,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * and set of SNMP-specific constants.
  *
  * @author rafal.lewczuk@jitlogic.com
- *
  */
 public class SnmpLib {
 
+    /** Logger. */
     private static final ZorkaLog log = ZorkaLogger.getLog(SnmpLib.class);
 
     /** SNMPv1 protocol version */
@@ -108,13 +108,31 @@ public class SnmpLib {
     /** Application-specific trap types (propably most useful for java applications) */
     public static final int GT_SPECIFIC = 6;
 
+    /** SNMP trappers registered */
     private Map<String,SnmpTrapper> trappers = new ConcurrentHashMap<String, SnmpTrapper>();
 
+    /**
+     * Creates SNMP object identifier using template and supplied values.
+     *
+     * @param template OID template
+     * @param vals values to be
+     * @return
+     * @throws SNMPBadValueException
+     */
     public SNMPObjectIdentifier oid(String template, Object...vals) throws SNMPBadValueException {
         return new SNMPObjectIdentifier(template.contains("$") ? ObjectInspector.substitute(template, vals) : template);
     }
 
 
+    /**
+     * Creates SNMP value object
+     *
+     * @param type object type
+     *
+     * @param val object value
+     *
+     * @return SNMP value
+     */
     public static SNMPObject val(int type, Object val) {
         try {
             switch (type) {
@@ -173,16 +191,51 @@ public class SnmpLib {
     }
 
 
+    /**
+     * Looks for registered SNMP trapper
+     *
+     * @param id trapper identifier
+     *
+     * @return SNMP trapper or null
+     */
     public SnmpTrapper trapper(String id) {
         return trappers.get(id);
     }
 
 
+    /**
+     * Looks for registered SNMP trapper. Starts and registers SNMPv1 trapper if none has been registered yet.
+     *
+     * @param id trapper ID
+     *
+     * @param addr IP address of device receiving traps
+     *
+     * @param community community ID
+     *
+     * @param agentAddr SNMP agent address (added to SNMP trap packet)
+     *
+     * @return SNMP trapper
+     */
     public SnmpTrapper trapper(String id, String addr, String community, String agentAddr) {
         return trapper(id, addr, community, agentAddr, SNMP_V1);
     }
 
 
+    /**
+     * Looks for registered SNMP trapper. Starts and registers SNMPv1 trapper if none has been registered yet.
+     *
+     * @param id trapper ID
+     *
+     * @param addr IP address of device receiving traps
+     *
+     * @param community community ID
+     *
+     * @param agentAddr SNMP agent address (added to SNMP trap packet)
+     *
+     * @param protocol protocol version (SNMPv1 or SNMPv2)
+     *
+     * @return SNMP trapper
+     */
     public SnmpTrapper trapper(String id, String addr, String community, String agentAddr, int protocol) {
         SnmpTrapper trapper = trappers.get(id);
 
@@ -196,6 +249,11 @@ public class SnmpLib {
     }
 
 
+    /**
+     * Stops and removes SNMP trapper.
+     *
+     * @param id trapper ID
+     */
     public void remove(String id) {
         SnmpTrapper trapper = trappers.remove(id);
 
@@ -205,7 +263,18 @@ public class SnmpLib {
     }
 
 
-    public TrapVarBindDef bind(String slot, int type, String oidSuffix) {
-        return new TrapVarBindDef(slot, type, oidSuffix);
+    /**
+     * Creates new spy record field to SNMP trap attribute binding.
+     *
+     * @param field field name in spy record
+     *
+     * @param type SNMP data type
+     *
+     * @param oidSuffix suffix added to attribute OID
+     *
+     * @return binding object
+     */
+    public TrapVarBindDef bind(String field, int type, String oidSuffix) {
+        return new TrapVarBindDef(field, type, oidSuffix);
     }
 }

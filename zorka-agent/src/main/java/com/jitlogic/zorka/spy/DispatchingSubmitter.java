@@ -108,7 +108,7 @@ public class DispatchingSubmitter implements SpySubmitter {
 
         for (int i = 0; i < probes.size(); i++) {
             SpyProbe probe = probes.get(i);
-            record.put(probe.getKey(), vals[i]);
+            record.put(probe.getFieldName(), vals[i]);
         }
 
         record.put(".STAGES", (Integer)record.get(".STAGES") | (1 << stage));

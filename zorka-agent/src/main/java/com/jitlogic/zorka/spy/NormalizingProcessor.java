@@ -23,20 +23,40 @@ import java.util.Map;
 
 import static com.jitlogic.zorka.spy.SpyLib.SPD_ARGPROC;
 
+/**
+ * Normalizes value of a field from a record and saves it in another field (eg. SQL or LDAP query).
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class NormalizingProcessor implements SpyProcessor {
 
-    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    /** Logger */
+    private static final ZorkaLog log = ZorkaLogger.getLog(NormalizingProcessor.class);
 
-    private String src, dst;
+    /** Source field */
+    private String src;
+
+    /** Destination field */
+    private String dst;
+
+    /** Normalizer */
     private Normalizer normalizer;
 
 
+    /**
+     * Creates normalizing record processor.
+     *
+     * @param src source field
+     * @param dst destination field
+     * @param normalizer normalizer object
+     */
     public NormalizingProcessor(String src, String dst, Normalizer normalizer) {
         this.src = src; this.dst = dst;
         this.normalizer = normalizer;
     }
 
 
+    @Override
     public Map<String,Object> process(Map<String,Object> record) {
 
         Object v = record.get(src);

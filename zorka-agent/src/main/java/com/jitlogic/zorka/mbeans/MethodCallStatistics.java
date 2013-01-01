@@ -24,16 +24,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Groups statistics for multiple monitored methods.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class MethodCallStatistics implements ZorkaStats, RankLister<MethodCallStatistic> {
 
+    /** Map of method call statistics objects. */
 	private HashMap<String, MethodCallStatistic> stats = new HashMap<String, MethodCallStatistic>();
 
-	
+	@Override
 	public synchronized ZorkaStat getStatistic(String statisticName) {
 		return stats.get(statisticName);
 	}
 	
-	
+	@Override
 	public synchronized String[] getStatisticNames() {
 		String[] names = new String[stats.size()];
 		
@@ -46,7 +52,13 @@ public class MethodCallStatistics implements ZorkaStats, RankLister<MethodCallSt
 		return names;
 	}
 
-
+    /**
+     * Returns named statistic. If there is no such statistic, a new one is created and registered.
+     *
+     * @param name statistic (method) name
+     *
+     * @return method call statistic
+     */
 	public synchronized MethodCallStatistic getMethodCallStatistic(String name) {
 		MethodCallStatistic ret = stats.get(name);
 		
@@ -59,6 +71,7 @@ public class MethodCallStatistics implements ZorkaStats, RankLister<MethodCallSt
 	}
 
 
+    @Override
     public synchronized List<MethodCallStatistic> list() {
         ArrayList<MethodCallStatistic> lst = new ArrayList<MethodCallStatistic>(stats.size()+2);
 
