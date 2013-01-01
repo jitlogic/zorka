@@ -15,9 +15,8 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy.processors;
+package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License along with
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.spy.processors;
+package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.integ.ZorkaLogLevel;
 import com.jitlogic.zorka.integ.ZorkaTrapper;

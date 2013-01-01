@@ -8,33 +8,27 @@
  * <p/>
  * This software is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * <p/>
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.spy.processors;
-
-import com.jitlogic.zorka.util.ObjectInspector;
+package com.jitlogic.zorka.spy;
 
 import java.util.Map;
 
-/**
- * Performs string formating using values from current stage.
- */
-public class StringFormatProcessor implements SpyProcessor {
+public class ConstPutProcessor implements SpyProcessor {
 
     private String dst;
-    private String expr;
+    private Object val;
 
-    public StringFormatProcessor(String dst, String expr) {
+    public ConstPutProcessor(String dst, Object val) {
         this.dst = dst;
-        this.expr = expr;
+        this.val = val;
     }
 
     public Map<String,Object> process(Map<String,Object> record) {
-        record.put(dst, ObjectInspector.substitute(expr, record));
+        record.put(dst, val);
         return record;
     }
 }

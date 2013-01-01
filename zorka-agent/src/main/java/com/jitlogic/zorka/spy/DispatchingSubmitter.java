@@ -17,10 +17,8 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.spy.processors.AsyncQueueCollector;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
-import com.jitlogic.zorka.spy.processors.SpyProcessor;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.List;

@@ -20,7 +20,7 @@ import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.api.SpyLib;
 
-import com.jitlogic.zorka.spy.processors.ZorkaStatsCollector;
+import com.jitlogic.zorka.spy.ZorkaStatsCollector;
 import org.junit.Before;
 import org.junit.Test;
 
