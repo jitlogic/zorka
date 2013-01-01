@@ -22,8 +22,8 @@ import com.jitlogic.zorka.rankproc.BucketAggregate;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.api.SpyLib;
-import com.jitlogic.zorka.spy.collectors.JmxAttrCollector;
-import com.jitlogic.zorka.spy.collectors.ZorkaStatsCollector;
+import com.jitlogic.zorka.spy.processors.JmxAttrCollector;
+import com.jitlogic.zorka.spy.processors.ZorkaStatsCollector;
 
 import com.jitlogic.zorka.util.ZorkaUtil;
 import org.junit.Test;

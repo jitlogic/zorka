@@ -23,7 +23,7 @@ import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.MainSubmitter;
 
-import com.jitlogic.zorka.spy.SpyProcessor;
+import com.jitlogic.zorka.spy.processors.SpyProcessor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

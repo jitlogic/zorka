@@ -16,8 +16,6 @@
 
 package com.jitlogic.zorka.spy.processors;
 
-import com.jitlogic.zorka.spy.SpyProcessor;
-
 import java.util.Map;
 
 public class TimeDiffProcessor implements SpyProcessor {

@@ -13,16 +13,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.spy.collectors;
+package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.*;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
-import com.jitlogic.zorka.spy.SpyProcessor;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
