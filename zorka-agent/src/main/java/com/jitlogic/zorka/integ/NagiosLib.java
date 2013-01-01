@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.api;
+package com.jitlogic.zorka.integ;
 
 import com.jitlogic.zorka.integ.NrpePacket;
 

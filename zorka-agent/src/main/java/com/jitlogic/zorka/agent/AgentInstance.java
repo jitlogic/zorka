@@ -17,14 +17,14 @@
 package com.jitlogic.zorka.agent;
 
 import com.jitlogic.zorka.integ.NagiosAgent;
-import com.jitlogic.zorka.api.NagiosLib;
-import com.jitlogic.zorka.api.SnmpLib;
-import com.jitlogic.zorka.api.SyslogLib;
-import com.jitlogic.zorka.api.ZabbixLib;
-import com.jitlogic.zorka.api.NormLib;
+import com.jitlogic.zorka.integ.NagiosLib;
+import com.jitlogic.zorka.integ.SnmpLib;
+import com.jitlogic.zorka.integ.SyslogLib;
+import com.jitlogic.zorka.integ.ZabbixLib;
+import com.jitlogic.zorka.normproc.NormLib;
 import com.jitlogic.zorka.spy.MainSubmitter;
 import com.jitlogic.zorka.spy.SpyInstance;
-import com.jitlogic.zorka.api.SpyLib;
+import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.integ.ZabbixAgent;

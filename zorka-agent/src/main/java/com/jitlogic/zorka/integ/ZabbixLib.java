@@ -1,4 +1,4 @@
-package com.jitlogic.zorka.api;
+package com.jitlogic.zorka.integ;
 
 import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;

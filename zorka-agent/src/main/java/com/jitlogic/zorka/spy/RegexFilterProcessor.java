@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.jitlogic.zorka.api.SpyLib.SPD_ARGPROC;
+import static com.jitlogic.zorka.spy.SpyLib.SPD_ARGPROC;
 
 /**
  * Filters records using regular expressions.

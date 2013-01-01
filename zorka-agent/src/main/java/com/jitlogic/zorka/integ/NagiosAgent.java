@@ -17,7 +17,6 @@ package com.jitlogic.zorka.integ;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.util.AbstractTcpAgent;
 
 import java.net.Socket;
 

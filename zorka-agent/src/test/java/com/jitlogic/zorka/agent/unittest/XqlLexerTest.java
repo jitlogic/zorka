@@ -19,7 +19,7 @@ import com.jitlogic.zorka.agent.testutil.LexerFixture;
 import com.jitlogic.zorka.normproc.Token;
 import com.jitlogic.zorka.normproc.XqlLexer;
 
-import static com.jitlogic.zorka.api.NormLib.*;
+import static com.jitlogic.zorka.normproc.NormLib.*;
 
 import org.junit.Test;
 

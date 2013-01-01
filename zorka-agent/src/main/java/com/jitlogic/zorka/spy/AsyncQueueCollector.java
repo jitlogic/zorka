@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import static com.jitlogic.zorka.api.SpyLib.SPD_CDISPATCHES;
+import static com.jitlogic.zorka.spy.SpyLib.SPD_CDISPATCHES;
 
 /**
  * Queues incoming records resumes processing in separate thread.

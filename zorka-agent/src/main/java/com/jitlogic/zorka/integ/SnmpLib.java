@@ -14,14 +14,10 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.api;
+package com.jitlogic.zorka.integ;
 
 import com.jitlogic.contrib.libsnmp.*;
-import com.jitlogic.zorka.integ.SnmpTrapper;
-import com.jitlogic.zorka.integ.TrapVarBindDef;
 import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.integ.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.Map;

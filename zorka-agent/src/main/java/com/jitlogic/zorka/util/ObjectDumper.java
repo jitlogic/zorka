@@ -18,8 +18,6 @@
 package com.jitlogic.zorka.util;
 
 import com.jitlogic.zorka.agent.JmxObject;
-import com.jitlogic.zorka.integ.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.mbeans.ZorkaStat;
 import com.jitlogic.zorka.mbeans.ZorkaStats;
 
@@ -48,9 +46,6 @@ import javax.management.openmbean.TabularData;
  * @author rafal.lewczuk@jitlogic.com
  */
 public class ObjectDumper {
-
-    /** Logger */
-    private static final ZorkaLog log = ZorkaLogger.getLog(ObjectDumper.class);
 
     /** Classes that won't be recursively traversed */
     private static final Map<String,Integer> filteredClasses;
@@ -176,7 +171,6 @@ public class ObjectDumper {
 				dump(lead + LEAD, o, sb, depth + 1);
 			} catch (Exception e) {
 				sb.append("<error: " + e.getMessage() + ">");
-                log.error("Error invoking method " + m + " on object " + obj + ": ", e);
 			}
 		}
 	}
@@ -257,7 +251,7 @@ public class ObjectDumper {
                 dump(lead + LEAD, o, sb, depth + 1);
             }
         } catch (Exception e) {
-            log.error("Error serializing java stats: ", e);
+            sb.append("<error " + e.getMessage() + ">");
         }
     }
 

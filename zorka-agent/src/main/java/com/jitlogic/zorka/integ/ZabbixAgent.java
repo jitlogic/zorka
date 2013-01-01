@@ -22,7 +22,6 @@ import java.net.Socket;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.util.AbstractTcpAgent;
 
 public class ZabbixAgent extends AbstractTcpAgent {
 	

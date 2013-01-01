@@ -17,7 +17,7 @@ package com.jitlogic.zorka.agent.testspy;
 
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 
-import com.jitlogic.zorka.api.SpyLib;
+import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.spy.*;
 
 import com.jitlogic.zorka.spy.GetterPresentingCollector;

@@ -21,7 +21,7 @@ import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.*;
 
-import static com.jitlogic.zorka.api.SpyLib.*;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 /**
  * This class defines mini-DSL for configuring instrumentation. Language allows for

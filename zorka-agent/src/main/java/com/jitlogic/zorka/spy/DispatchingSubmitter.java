@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import static com.jitlogic.zorka.api.SpyLib.*;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 /**
  *

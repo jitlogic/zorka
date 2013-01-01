@@ -15,13 +15,13 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.api;
+package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.integ.SnmpLib;
 import com.jitlogic.zorka.integ.ZorkaTrapper;
 import com.jitlogic.zorka.integ.SnmpTrapper;
 import com.jitlogic.zorka.integ.TrapVarBindDef;
 import com.jitlogic.zorka.normproc.Normalizer;
-import com.jitlogic.zorka.spy.*;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.integ.ZorkaLogLevel;
 import com.jitlogic.zorka.util.ZorkaUtil;

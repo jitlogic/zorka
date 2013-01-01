@@ -16,10 +16,10 @@
 package com.jitlogic.zorka.agent.unittest;
 
 import com.jitlogic.zorka.normproc.GenericNormalizer;
-import com.jitlogic.zorka.api.NormLib;
+import com.jitlogic.zorka.normproc.NormLib;
 import com.jitlogic.zorka.normproc.Normalizer;
 
-import static com.jitlogic.zorka.api.NormLib.*;
+import static com.jitlogic.zorka.normproc.NormLib.*;
 
 import org.junit.Test;
 

@@ -31,7 +31,7 @@ import org.junit.Test;
 import java.util.Map;
 
 import static org.junit.Assert.*;
-import static com.jitlogic.zorka.api.SpyLib.*;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 
 public class SubmissionDispatchUnitTest extends ZorkaFixture {

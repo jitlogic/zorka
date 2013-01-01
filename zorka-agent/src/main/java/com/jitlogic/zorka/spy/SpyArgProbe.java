@@ -17,7 +17,7 @@ package com.jitlogic.zorka.spy;
 
 import org.objectweb.asm.Type;
 
-import static com.jitlogic.zorka.api.SpyLib.ON_ENTER;
+import static com.jitlogic.zorka.spy.SpyLib.ON_ENTER;
 import static org.objectweb.asm.Opcodes.*;
 
 public class SpyArgProbe extends SpyProbe {

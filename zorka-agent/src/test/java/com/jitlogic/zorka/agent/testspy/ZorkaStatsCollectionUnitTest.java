@@ -22,7 +22,7 @@ import com.jitlogic.zorka.rankproc.BucketAggregate;
 import com.jitlogic.zorka.spy.JmxAttrCollector;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.api.SpyLib;
+import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.spy.ZorkaStatsCollector;
 
 import com.jitlogic.zorka.util.ZorkaUtil;
@@ -34,7 +34,7 @@ import java.util.Date;
 import java.util.Map;
 
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.getAttr;
-import static com.jitlogic.zorka.api.SpyLib.*;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 

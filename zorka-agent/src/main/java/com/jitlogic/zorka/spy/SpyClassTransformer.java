@@ -29,8 +29,8 @@ import java.security.ProtectionDomain;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.jitlogic.zorka.api.SpyLib.SPD_CLASSALL;
-import static com.jitlogic.zorka.api.SpyLib.SPD_CLASSXFORM;
+import static com.jitlogic.zorka.spy.SpyLib.SPD_CLASSALL;
+import static com.jitlogic.zorka.spy.SpyLib.SPD_CLASSXFORM;
 
 /**
  * This is main class transformer installed in JVM by Zorka agent (see premain() method).

@@ -16,8 +16,6 @@
 package com.jitlogic.zorka.integ;
 
 import com.jitlogic.contrib.libsnmp.*;
-import com.jitlogic.zorka.api.SnmpLib;
-import com.jitlogic.zorka.util.ZorkaAsyncThread;
 
 import java.io.IOException;
 import java.net.InetAddress;

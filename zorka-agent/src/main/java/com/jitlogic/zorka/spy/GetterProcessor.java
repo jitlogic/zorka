@@ -22,7 +22,7 @@ import com.jitlogic.zorka.integ.ZorkaLogger;
 
 import java.util.Map;
 
-import static com.jitlogic.zorka.api.SpyLib.SPD_ARGPROC;
+import static com.jitlogic.zorka.spy.SpyLib.SPD_ARGPROC;
 
 /**
  * Digs deeper into an object the same way zorka.jmx() does.

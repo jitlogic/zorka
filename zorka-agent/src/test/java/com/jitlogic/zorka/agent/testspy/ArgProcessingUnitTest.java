@@ -18,10 +18,10 @@ package com.jitlogic.zorka.agent.testspy;
 
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 
-import com.jitlogic.zorka.api.SpyLib;
+import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.spy.*;
 
-import static com.jitlogic.zorka.api.SpyLib.*;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 import com.jitlogic.zorka.util.ZorkaUtil;
 import org.junit.Before;

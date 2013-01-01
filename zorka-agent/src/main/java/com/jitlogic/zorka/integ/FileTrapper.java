@@ -15,7 +15,6 @@
  */
 package com.jitlogic.zorka.integ;
 
-import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.io.*;

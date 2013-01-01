@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static com.jitlogic.zorka.api.SpyLib.SM_NOARGS;
+import static com.jitlogic.zorka.spy.SpyLib.SM_NOARGS;
 
 public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 

@@ -1,7 +1,6 @@
 package com.jitlogic.zorka.integ;
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.api.SyslogLib;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.io.*;

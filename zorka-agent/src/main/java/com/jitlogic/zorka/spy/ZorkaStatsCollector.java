@@ -28,7 +28,7 @@ import com.jitlogic.zorka.integ.ZorkaLogger;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.jitlogic.zorka.api.SpyLib.*;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class ZorkaStatsCollector implements SpyProcessor {
 

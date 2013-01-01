@@ -18,7 +18,6 @@ package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.integ.ZorkaLogLevel;
 import com.jitlogic.zorka.integ.ZorkaTrapper;
-import com.jitlogic.zorka.api.SpyLib;
 import com.jitlogic.zorka.util.ObjectInspector;
 
 import java.util.Map;

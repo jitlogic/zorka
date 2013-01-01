@@ -30,7 +30,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import static com.jitlogic.zorka.api.SpyLib.*;
+import static com.jitlogic.zorka.spy.SpyLib.*;
 
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.*;
 

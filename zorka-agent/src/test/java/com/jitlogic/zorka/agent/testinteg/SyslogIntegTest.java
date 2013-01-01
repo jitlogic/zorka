@@ -16,7 +16,7 @@
 package com.jitlogic.zorka.agent.testinteg;
 
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
-import com.jitlogic.zorka.api.SyslogLib;
+import com.jitlogic.zorka.integ.SyslogLib;
 import com.jitlogic.zorka.integ.SyslogTrapper;
 import org.junit.Test;
 
