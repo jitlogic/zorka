@@ -91,8 +91,4 @@ public abstract class SpyProbe implements SpyDefArg {
         }
     }
 
-    public Object processVal(Object val) {
-        return val;
-    }
-
 }
