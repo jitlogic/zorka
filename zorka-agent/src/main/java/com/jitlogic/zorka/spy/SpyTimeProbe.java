@@ -13,23 +13,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.spy.probes;
+package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.spy.SpyMethodVisitor;
-import org.objectweb.asm.Type;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
-public class SpyClassProbe extends SpyProbe {
+public class SpyTimeProbe extends SpyProbe {
 
-    private String className;
-
-    public SpyClassProbe(String className, String dstKey) {
+    public SpyTimeProbe(String dstKey) {
         super(dstKey);
-        this.className = className;
     }
 
     public int emit(SpyMethodVisitor mv, int stage, int opcode) {
-        String cn = "L"+this.className.replace(".", "/") + ";";
-        mv.visitLdcInsn(Type.getType(cn));
-        return 1;
+        mv.visitMethodInsn(INVOKESTATIC, "java/lang/System", "nanoTime", "()J");
+        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;");
+        return 2;
     }
 }

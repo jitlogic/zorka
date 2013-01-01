@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.spy.probes;
+package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.spy.SpyDefArg;
 import com.jitlogic.zorka.spy.SpyMethodVisitor;

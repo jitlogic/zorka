@@ -22,7 +22,6 @@ import com.jitlogic.zorka.integ.SnmpTrapper;
 import com.jitlogic.zorka.integ.TrapVarBindDef;
 import com.jitlogic.zorka.normproc.Normalizer;
 import com.jitlogic.zorka.spy.*;
-import com.jitlogic.zorka.spy.probes.*;
 import com.jitlogic.zorka.spy.processors.*;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.integ.ZorkaLogLevel;

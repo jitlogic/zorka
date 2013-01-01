@@ -13,9 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.spy.probes;
-
-import com.jitlogic.zorka.spy.SpyMethodVisitor;
+package com.jitlogic.zorka.spy;
 
 import static org.objectweb.asm.Opcodes.ACONST_NULL;
 
