@@ -37,7 +37,7 @@ import javax.management.openmbean.OpenMBeanAttributeInfoSupport;
 import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularType;
 
-import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 
 
@@ -144,6 +144,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
 
             Object attrVal = attr.getValue();
 
+            // TODO get rid of it, create something like TypedGetter so it can return proper types here
             if (attrVal instanceof TabularDataGetter) {
                 TabularDataGetter getter = (TabularDataGetter)attrVal;
                 attrInfo[i] = new OpenMBeanAttributeInfoSupport(getter.getTypeName(), getter.getTypeDesc(),

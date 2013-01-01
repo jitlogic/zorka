@@ -1,6 +1,6 @@
 package com.jitlogic.zorka.agent.unittest;
 
-import com.jitlogic.zorka.agent.JmxObject;
+import com.jitlogic.zorka.util.JmxObject;
 import com.jitlogic.zorka.agent.testutil.*;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;

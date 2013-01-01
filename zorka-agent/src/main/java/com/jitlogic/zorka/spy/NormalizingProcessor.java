@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.normproc.Normalizer;
 

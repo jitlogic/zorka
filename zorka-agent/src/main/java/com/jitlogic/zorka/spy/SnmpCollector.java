@@ -19,23 +19,56 @@ import com.jitlogic.zorka.integ.SnmpLib;
 import com.jitlogic.zorka.integ.SnmpTrapper;
 import com.jitlogic.zorka.integ.TrapVarBindDef;
 import com.jitlogic.contrib.libsnmp.*;
-import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.Map;
 
+/**
+ * This collector sends SNMP trap for each processed record. As SNMP traps can be structured,
+ * this cannot be done using ordinary trapper collector.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class SnmpCollector implements SpyProcessor {
 
+    /** Logger object */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
+    /** SNMP trapper */
     private SnmpTrapper trapper;
+
+    /** Enterprise OID */
     private SNMPObjectIdentifier oid;
-    private int gtrap, strap;
+
+    /** Trap type group */
+    private int gtrap;
+
+    /** Trap type */
+    private int strap;
+
+    /** OID prefix for trap attributes */
     private String oprefix;
 
+    /** Record fields - trap attributes map. */
     private TrapVarBindDef[] varBindDefs;
 
+    /**
+     * Creates SNMP collector.
+     *
+     * @param trapper SNMP trapper
+     *
+     * @param oid enterprise OID
+     *
+     * @param gtrap trap type group
+     *
+     * @param strap trap type
+     *
+     * @param oprefix OID prefix for attributes
+     *
+     * @param varBindDefs mappings from record fields to trap attributes
+     */
     public SnmpCollector(SnmpTrapper trapper, String oid, int gtrap, int strap,
                          String oprefix, TrapVarBindDef...varBindDefs) {
         try {
@@ -50,7 +83,7 @@ public class SnmpCollector implements SpyProcessor {
     }
 
 
-
+    @Override
     public Map<String,Object> process(Map<String,Object> record) {
         SNMPVariablePair[] vars = new SNMPVariablePair[varBindDefs.length];
 

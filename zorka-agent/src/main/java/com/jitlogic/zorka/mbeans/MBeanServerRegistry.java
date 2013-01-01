@@ -15,10 +15,9 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent;
+package com.jitlogic.zorka.mbeans;
 
-import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
-import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 
 import javax.management.*;

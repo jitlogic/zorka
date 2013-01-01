@@ -21,14 +21,38 @@ import com.jitlogic.zorka.util.*;
 import java.io.OutputStream;
 import java.net.Socket;
 
+/**
+ * Zabbix trapper sends traps to zabbix server.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrapper {
 
+    /** Logger */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
+    /** Zabbix server IP address */
     private String serverAddr = null;
-    private int serverPort = 10051;
-    private String defaultHost, defaultItem;
 
+    /** Zabbix server TCP port */
+    private int serverPort = 10051;
+
+    /** Default host (as presented to zabbix) */
+    private String defaultHost;
+
+    /** Default item name (as presented to zabbix) */
+    private String defaultItem;
+
+
+    /**
+     * Creates zabbix trapper. Note that in order to actually send traps, it also must be started using start() method.
+     *
+     * @param serverAddr zabbix server address
+     *
+     * @param defaultHost default host name (as presented to zabbix)
+     *
+     * @param defaultItem default item name (as presented to zabbix)
+     */
     public ZabbixTrapper(String serverAddr, String defaultHost, String defaultItem) {
         super("zabbix-trapper");
         try {
@@ -47,11 +71,37 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
     }
 
 
+    /**
+     * Sends trap with default host name and default item name.
+     *
+     * @param value item value
+     */
+    public void send(Object value) {
+        send(defaultHost, value);
+    }
+
+
+    /**
+     * Sends trap with default host name and supplied item name.
+     *
+     * @param item item name
+     *
+     * @param value item value
+     */
     public void send(String item, Object value) {
         send(defaultHost, item, value);
     }
 
 
+    /**
+     * Send trap with supplied host name and item name.
+     *
+     * @param host host name
+     *
+     * @param item item name
+     *
+     * @param value item value
+     */
     public void send(String host, String item, Object value) {
 
         StringBuilder sb = new StringBuilder(384);
@@ -88,10 +138,19 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
         }
     }
 
+
+    /**
+     * Logs occuring errors.
+     *
+     * @param msg error message
+     * @param e exception object
+     */
     protected void handleError(String msg, Throwable e) {
         log.error(msg, e);
     }
 
+
+    @Override
     public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e, Object... args) {
         send(defaultItem, tag + " " + msg);
     }

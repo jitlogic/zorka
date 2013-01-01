@@ -1,6 +1,6 @@
 package com.jitlogic.zorka.rankproc;
 
-import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.util.ObjectInspector;
 

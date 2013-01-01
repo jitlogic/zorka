@@ -17,9 +17,6 @@
 
 package com.jitlogic.zorka.util;
 
-import com.jitlogic.zorka.integ.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogger;
-
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,9 +27,6 @@ import java.util.regex.Pattern;
  * instance methods.
  */
 public class ZorkaUtil {
-
-    /** Logger */
-	public final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     /** Singleton instance */
 	protected static ZorkaUtil instance;

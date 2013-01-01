@@ -1,5 +1,7 @@
 package com.jitlogic.zorka.agent;
 
+import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
+
 import java.lang.instrument.Instrumentation;
 
 /**

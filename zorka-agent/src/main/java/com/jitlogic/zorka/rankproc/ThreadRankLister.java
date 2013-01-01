@@ -16,8 +16,7 @@
 package com.jitlogic.zorka.rankproc;
 
 import com.jitlogic.zorka.agent.AgentInstance;
-import com.jitlogic.zorka.agent.MBeanServerRegistry;
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;

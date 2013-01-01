@@ -18,10 +18,10 @@
 package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.agent.AgentInstance;
-import com.jitlogic.zorka.agent.MBeanServerRegistry;
+import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.MethodCallStatistic;
-import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 
 import java.util.HashMap;
@@ -29,6 +29,9 @@ import java.util.Map;
 
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
+/**
+ * Collects  method call statistics and
+ */
 public class JmxAttrCollector implements SpyProcessor {
 
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
@@ -36,7 +39,8 @@ public class JmxAttrCollector implements SpyProcessor {
     private final MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
 
     private final String mbsName;
-    private final String beanTemplate, attrTemplate;
+    private final String beanTemplate;
+    private final String attrTemplate;
     private final String time, tstamp;
 
     private final Map<SpyContext,MethodCallStatistic> cachedStats = new HashMap<SpyContext, MethodCallStatistic>();
@@ -50,7 +54,7 @@ public class JmxAttrCollector implements SpyProcessor {
         this.tstamp = tstamp;
     }
 
-
+    @Override
     public Map<String,Object> process(Map<String,Object> record) {
 
         if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {

@@ -16,9 +16,7 @@
 package com.jitlogic.zorka.integ;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.integ.ZorkaRequestHandler;
-import com.jitlogic.zorka.integ.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLog;
 
 import java.io.IOException;
 import java.net.InetAddress;

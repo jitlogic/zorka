@@ -15,40 +15,93 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.integ;
+package com.jitlogic.zorka.util;
 
+import com.jitlogic.zorka.integ.ZorkaLogLevel;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 
+/**
+ * ZorkaLog objects are used internally as loggers. Zorka agent avoids using
+ * standard logger implementation in order to not interfere with monitored
+ * applications.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class ZorkaLog {
 
+    /** Custom tag (eg. component name) */
     private String tag;
+
+    /** Output logger */
     private ZorkaLogger output;
 
 
-    ZorkaLog(String tag, ZorkaLogger output) {
+    /**
+     * Creates logger object.
+     *
+     * @param tag custom tag
+     *
+     * @param output output logger
+     */
+    public ZorkaLog(String tag, ZorkaLogger output) {
         this.tag = tag;
         this.output = output;
     }
 
+
+    /**
+     * Logs message with TRACE level
+     *
+     * @param msg message text
+     *
+     * @param args optional arguments
+     */
 	public void trace(String msg, Object...args) {
 		output.log(ZorkaLogLevel.TRACE, tag, msg, null, args);
 	}
 
 
+    /**
+     * Logs message with DEBUG level
+     *
+     * @param msg message text
+     * @param args optional arguments
+     */
 	public void debug(String msg, Object...args) {
         output.log( ZorkaLogLevel.DEBUG, tag, msg, null, args);
 	}
 
 
+    /**
+     * Logs message with INFO level
+     *
+     * @param msg message text
+     *
+     * @param args optional arguments
+     */
 	public void info(String msg, Object...args) {
         output.log(ZorkaLogLevel.INFO, tag, msg, null, args);
 	}
 
 
+    /**
+     * Logs message with WARNING level
+     *
+     * @param msg message text
+     *
+     * @param args optional arguments
+     */
 	public void warn(String msg, Object...args) {
         output.log(ZorkaLogLevel.WARN, tag, msg, null, args);
 	}
 
 
+    /**
+     * Logs message with ERROR level
+     *
+     * @param msg message text
+     * @param args optional arguments
+     */
 	public void error(String msg, Object...args) {
         output.log(ZorkaLogLevel.ERROR, tag, msg, null, args);
 	}

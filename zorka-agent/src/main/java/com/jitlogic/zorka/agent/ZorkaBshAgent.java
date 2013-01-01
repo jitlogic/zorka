@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.concurrent.Executor;
 
 import com.jitlogic.zorka.util.ObjectDumper;
-import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLog;
 
 import bsh.EvalError;
 import bsh.Interpreter;

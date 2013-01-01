@@ -15,25 +15,43 @@
  */
 package com.jitlogic.zorka.integ;
 
+import com.jitlogic.zorka.util.ZorkaLog;
+
 import java.io.IOException;
 import java.net.Socket;
 
+/**
+ * Handles Nagios NRPE requests and passes them to BSH agent.
+ */
 public class NrpeRequestHandler implements ZorkaRequestHandler {
 
-    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    /** Logger */
+    private static final ZorkaLog log = ZorkaLogger.getLog(NrpeRequestHandler.class);
 
+    /** Request packet */
     private NrpePacket req = null;
+
+    /** Accepted connection socket */
     private Socket socket;
-    private volatile long tStart, tStop;
 
+    /** Request handling start timestamp. */
+    private long tStart;
 
+    /** Request handling finish timestamp */
+    private long tStop;
+
+    /**
+     * Creates NRPE request handler object
+     *
+     * @param socket accepted connection socket
+     */
     public NrpeRequestHandler(Socket socket) {
         this.socket = socket;
         this.tStart = System.currentTimeMillis();
 
     }
 
-
+    @Override
     public void handleResult(Object rslt) {
         tStop = System.currentTimeMillis();
         log.debug("OK [t=" + (tStop-tStart) + "ms] '" + req + "' -> '" + rslt + "'");
@@ -60,7 +78,7 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
         }
     }
 
-
+    @Override
     public void handleError(Throwable e) {
         tStop = System.currentTimeMillis();
         log.debug("OK [t=" + (tStop-tStart) + "ms] '" + req + "' -> '", e);
@@ -80,6 +98,7 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
     }
 
 
+    @Override
     public String getReq() {
 
         if (req == null) {

@@ -19,7 +19,7 @@ package com.jitlogic.zorka.mbeans;
 
 import static com.jitlogic.zorka.rankproc.BucketAggregate.MS;
 
-import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.rankproc.BucketAggregate;
 import com.jitlogic.zorka.rankproc.CircularBucketAggregate;

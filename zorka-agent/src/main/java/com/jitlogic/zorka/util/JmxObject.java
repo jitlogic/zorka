@@ -15,18 +15,13 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent;
+package com.jitlogic.zorka.util;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 
-import com.jitlogic.zorka.integ.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogger;
-
 public class JmxObject {
 	
-	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
-
 	private final ObjectName name;
 	private final MBeanServerConnection conn;
     private final ClassLoader classLoader;
@@ -47,7 +42,7 @@ public class JmxObject {
             }
 			ret = conn.getAttribute(name, key.toString());
 		} catch (Exception e) {
-			log.error("Cannot get attribute '" + key + "' of '" + name + "'", e);
+            return "<error: " + e.getMessage() + ">";
 		} finally {
             if (cl0 != null) {
                 Thread.currentThread().setContextClassLoader(cl0);

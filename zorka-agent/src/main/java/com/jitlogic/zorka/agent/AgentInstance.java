@@ -21,11 +21,12 @@ import com.jitlogic.zorka.integ.NagiosLib;
 import com.jitlogic.zorka.integ.SnmpLib;
 import com.jitlogic.zorka.integ.SyslogLib;
 import com.jitlogic.zorka.integ.ZabbixLib;
+import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.normproc.NormLib;
 import com.jitlogic.zorka.spy.MainSubmitter;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyLib;
-import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.integ.ZabbixAgent;
 

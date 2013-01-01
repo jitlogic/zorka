@@ -18,9 +18,9 @@
 package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.agent.AgentInstance;
-import com.jitlogic.zorka.agent.MBeanServerRegistry;
+import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.mbeans.AttrGetter;
-import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 
 import java.util.Map;

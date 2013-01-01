@@ -16,26 +16,62 @@
 package com.jitlogic.zorka.mbeans;
 
 import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.integ.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import javax.management.openmbean.*;
 
+/**
+ * Wraps iterable data and presents it as tabular data type. Instances of this class
+ * are to be registered as ZorkaMappedBean attributes.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class TabularDataGetter implements ValGetter {
 
+    /** Logger */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private Object source;
-    private String typeName, typeDesc;
+    /** Source field */
+    private Object wrappedObject;
+
+    /** Object type name */
+    private String typeName;
+
+    /** Object description */
+    private String typeDesc;
+
+    /** Item names (field names) */
     private String[] itemNames;
+
+    /** Composite row type */
     private CompositeType rowType;
+
+    /** Tabular type of returned objects */
     private TabularType tableType;
 
-    public TabularDataGetter(Object source, String typeName, String typeDesc, String indexField,
+    /**
+     * Creates tabular data getter wrapping a type.
+     *
+     * @param wrappedObject wrapped object
+     *
+     * @param typeName tabular type name
+     *
+     * @param typeDesc tabular type description
+     *
+     * @param indexField index field
+     *
+     * @param itemNames field names
+     *
+     * @param itemDesc field descriptions
+     *
+     * @param itemTypes field types
+     */
+    public TabularDataGetter(Object wrappedObject, String typeName, String typeDesc, String indexField,
                              String[] itemNames, String[] itemDesc, OpenType[] itemTypes) {
 
-        this.source = source;
+        this.wrappedObject = wrappedObject;
         this.typeName = typeName;
         this.typeDesc = typeDesc;
         this.itemNames = ZorkaUtil.copyArray(itemNames);
@@ -49,11 +85,12 @@ public class TabularDataGetter implements ValGetter {
     }
 
 
+    @Override
     public Object get() {
         TabularDataSupport table = new TabularDataSupport(tableType);
 
-        for (Object attr : ObjectInspector.list(source)) {
-            Object obj = ObjectInspector.get(source, attr);
+        for (Object attr : ObjectInspector.list(wrappedObject)) {
+            Object obj = ObjectInspector.get(wrappedObject, attr);
             Object[] values = new Object[itemNames.length];
 
             for (int i = 0; i < itemNames.length; i++) {
@@ -70,14 +107,30 @@ public class TabularDataGetter implements ValGetter {
         return table;
     }
 
+
+    /**
+     * Returns  Tabular data type
+     *
+     * @return tabular data type
+     */
     public TabularType getTableType() {
         return tableType;
     }
 
+    /**
+     * Returns type name
+     *
+     * @return tabular data type name
+     */
     public String getTypeName() {
         return typeName;
     }
 
+    /**
+     * Return type description
+     *
+     * @return type description
+     */
     public String getTypeDesc() {
         return typeDesc;
     }

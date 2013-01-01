@@ -18,6 +18,7 @@ package com.jitlogic.zorka.integ;
 
 import com.jitlogic.contrib.libsnmp.*;
 import com.jitlogic.zorka.util.ObjectInspector;
+import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.Map;
