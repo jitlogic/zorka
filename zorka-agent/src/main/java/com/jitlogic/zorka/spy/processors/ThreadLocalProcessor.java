@@ -17,9 +17,10 @@
 package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaUtil;
+
+import java.util.Map;
 
 /**
  * Allows using ThreadLocal objects to transfer data across instrumented methods.
@@ -69,7 +70,7 @@ public class ThreadLocalProcessor implements SpyProcessor {
 
 
     @Override
-    public SpyRecord process(SpyRecord record) {
+    public Map<String,Object> process(Map<String,Object> record) {
         switch (operation) {
             case GET:
                 record.put(field, ObjectInspector.get(threadLocal.get(), path));

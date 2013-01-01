@@ -23,9 +23,9 @@ import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.jitlogic.zorka.api.SpyLib.*;
 
@@ -43,13 +43,13 @@ public class DispatchingCollector implements SpyProcessor {
         this.sdef = sdef;
     }
 
-    public synchronized SpyRecord process(SpyRecord record) {
+    public synchronized Map<String,Object> process(Map<String,Object> record) {
 
         if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
             log.debug("Dispatching collector record: " + record);
         }
 
-        SpyContext ctx = record.getContext();
+        SpyContext ctx = (SpyContext) record.get(".CTX");
 
         SpyDefinition sd = sdef != null ? sdef : ctx.getSpyDefinition();
 
@@ -60,8 +60,8 @@ public class DispatchingCollector implements SpyProcessor {
         return record;
     }
 
-    private SpyRecord process(SpyDefinition sdef, SpyRecord record) {
-        List<SpyProcessor> processors = sdef.getProcessors(record.getStage());
+    private Map<String,Object> process(SpyDefinition sdef, Map<String,Object> record) {
+        List<SpyProcessor> processors = sdef.getProcessors((Integer) record.get(".STAGE"));
 
         for (SpyProcessor processor : processors) {
             try {

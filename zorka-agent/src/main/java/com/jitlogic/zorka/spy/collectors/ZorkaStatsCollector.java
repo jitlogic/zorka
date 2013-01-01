@@ -24,7 +24,6 @@ import com.jitlogic.zorka.mbeans.MethodCallStatistics;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
@@ -55,14 +54,14 @@ public class ZorkaStatsCollector implements SpyProcessor {
     }
 
 
-    public SpyRecord process(SpyRecord record) {
+    public Map<String,Object> process(Map<String,Object> record) {
 
         if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
             log.debug("Collecting record: " + record);
         }
 
-        SpyContext ctx = record.getContext();
-        MethodCallStatistics stats = statsCache.get(record.getContext());
+        SpyContext ctx = (SpyContext) record.get(".CTX");
+        MethodCallStatistics stats = statsCache.get((SpyContext) record.get(".CTX"));
 
         if (stats == null) {
             stats = registry.getOrRegister(mbsName, ctx.subst(mbeanTemplate), ctx.subst(attrTemplate),
@@ -77,12 +76,12 @@ public class ZorkaStatsCollector implements SpyProcessor {
         Object tstampObj = tstamp != null ? record.get(tstamp) : 0L;   // TODO WTF?
 
         if (timeObj instanceof Long && tstampObj instanceof Long) {
-            if (record.hasStage(ON_RETURN)) {
+            if (0 != ((Integer) record.get(".STAGES") & (1 << ON_RETURN))) {
                 if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
                     log.debug("Logging record using logCall()");
                 }
                 statistic.logCall((Long)tstampObj, (Long)timeObj);
-            } else if (record.hasStage(ON_ERROR)) {
+            } else if (0 != ((Integer) record.get(".STAGES") & (1 << ON_ERROR))) {
                 if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
                     log.debug("Logging record using logError()");
                 }

@@ -17,9 +17,10 @@
 package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.integ.ZorkaLogLevel;
+
+import java.util.Map;
 
 /**
  * Extracts interesting values from log records of various types (JDK, Log4j, JBoss etc.).
@@ -62,7 +63,7 @@ public class LogAdapterProcessor implements SpyProcessor {
     }
 
     @Override
-    public SpyRecord process(SpyRecord record) {
+    public Map<String,Object> process(Map<String,Object> record) {
         Object orig = record.get(src);
 
         if (orig != null && "java.util.logging.LogRecord".equals(orig.getClass().getName())) {
@@ -100,7 +101,7 @@ public class LogAdapterProcessor implements SpyProcessor {
      *
      * @param rec spy record to be populated
      */
-    private void adaptJdkRecord(Object orig, SpyRecord rec) {
+    private void adaptJdkRecord(Object orig, Map<String,Object> rec) {
         Integer level = ObjectInspector.get(orig, "level", "intValue()");
 
         ZorkaLogLevel logLevel = null;

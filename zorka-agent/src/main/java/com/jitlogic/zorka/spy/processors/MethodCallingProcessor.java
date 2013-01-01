@@ -19,7 +19,6 @@ package com.jitlogic.zorka.spy.processors;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -77,7 +76,7 @@ public class MethodCallingProcessor implements SpyProcessor {
 
 
     @Override
-    public SpyRecord process(SpyRecord record) {
+    public Map<String,Object> process(Map<String,Object> record) {
         Object val = record.get(src);
 
         if (val == null) {

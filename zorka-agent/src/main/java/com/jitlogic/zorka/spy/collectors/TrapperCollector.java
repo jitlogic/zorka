@@ -20,8 +20,9 @@ import com.jitlogic.zorka.integ.ZorkaLogLevel;
 import com.jitlogic.zorka.integ.ZorkaTrapper;
 import com.jitlogic.zorka.api.SpyLib;
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
+
+import java.util.Map;
 
 /**
  * Logs incoming records using trapper.
@@ -51,10 +52,10 @@ public class TrapperCollector implements SpyProcessor {
     }
 
     @Override
-    public SpyRecord process(SpyRecord record) {
+    public Map<String,Object> process(Map<String,Object> record) {
 
         String tag = ObjectInspector.substitute(tagExpr, record);
-        String msg = ObjectInspector.substitute(record.hasStage(SpyLib.ON_ERROR) ? errExpr : stdExpr, record);
+        String msg = ObjectInspector.substitute(0 != ((Integer) record.get(".STAGES") & (1 << SpyLib.ON_ERROR)) ? errExpr : stdExpr, record);
 
         trapper.trap(logLevel, tag, msg, (Throwable)record.get(errField));
 

@@ -20,7 +20,8 @@ import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.normproc.Normalizer;
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
+
+import java.util.Map;
 
 import static com.jitlogic.zorka.api.SpyLib.SPD_ARGPROC;
 
@@ -38,7 +39,7 @@ public class NormalizingProcessor implements SpyProcessor {
     }
 
 
-    public SpyRecord process(SpyRecord record) {
+    public Map<String,Object> process(Map<String,Object> record) {
 
         Object v = record.get(src);
 

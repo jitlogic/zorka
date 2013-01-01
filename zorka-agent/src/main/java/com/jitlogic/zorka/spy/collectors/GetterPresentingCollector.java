@@ -24,7 +24,8 @@ import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
+
+import java.util.Map;
 
 
 /**
@@ -54,8 +55,8 @@ public class GetterPresentingCollector implements SpyProcessor {
     }
 
 
-    public SpyRecord process(SpyRecord record) {
-        SpyContext ctx = record.getContext();
+    public Map<String,Object> process(Map<String,Object> record) {
+        SpyContext ctx = (SpyContext) record.get(".CTX");
         String mbeanName = ctx.subst(mbeanTemplate);
         String attrName = ctx.subst(attrTemplate);
 

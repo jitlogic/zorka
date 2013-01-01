@@ -20,11 +20,9 @@ import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.api.SpyLib;
 import com.jitlogic.zorka.spy.*;
 
-import static com.jitlogic.zorka.api.SpyLib.*;
-
 import com.jitlogic.zorka.spy.collectors.GetterPresentingCollector;
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.util.ZorkaUtil;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,6 +33,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.getAttr;
 
@@ -49,7 +48,7 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
     protected SpyContext ctx;
     protected SpyDefinition sdef;
-    protected SpyRecord record;
+    protected Map<String,Object> record;
     protected MBeanServer testMbs;
 
     @Before
@@ -62,7 +61,7 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
         sdef = SpyDefinition.instance();
         ctx = new SpyContext(sdef, "some.Class", "someMethod", "()V", 1);
 
-        record = new SpyRecord(ctx);
+        record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
     }
 
 
@@ -80,7 +79,6 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
         zorkaAgent.eval("process(obj) { test.result(obj); }");
         SpyProcessor col = (SpyProcessor)zorkaAgent.eval(
                 "(com.jitlogic.zorka.spy.SpyProcessor)this");
-        record.feed(ON_SUBMIT, new Object[] {1L, 2L});
 
         col.process(record);
 
@@ -94,7 +92,8 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
         SpyProcessor col = new GetterPresentingCollector("test", "test:name=TestObj", "testAttr", "meh", "C2");
         record.put("C0", 1L); record.put("C1", 1L); record.put("C2", "oja!");
 
-        record.setStage(SpyLib.ON_SUBMIT);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_SUBMIT));
+        record.put(".STAGE", SpyLib.ON_SUBMIT);
 
         col.process(record);
 
@@ -108,7 +107,8 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
         SpyProcessor col = new GetterPresentingCollector("test", "test:name=TestObj", "testAttr", "meh", "C2", "length()");
         record.put("C0", 1L); record.put("C1", 1L); record.put("C2", "oja!");
 
-        record.setStage(SpyLib.ON_SUBMIT);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_SUBMIT));
+        record.put(".STAGE", SpyLib.ON_SUBMIT);
         col.process(record);
 
         Object obj = getAttr("test", "test:name=TestObj", "testAttr");

@@ -20,8 +20,11 @@ package com.jitlogic.zorka.spy;
 import com.jitlogic.zorka.spy.collectors.AsyncQueueCollector;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.spy.probes.SpyProbe;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import static com.jitlogic.zorka.api.SpyLib.*;
@@ -36,11 +39,11 @@ public class DispatchingSubmitter implements SpySubmitter {
     private SpyClassTransformer engine;
     private SpyProcessor collector;
 
-    private ThreadLocal<Stack<SpyRecord>> submissionStack =
-        new ThreadLocal<Stack<SpyRecord>>() {
+    private ThreadLocal<Stack<Map<String,Object>>> submissionStack =
+        new ThreadLocal<Stack<Map<String,Object>>>() {
             @Override
-            public Stack<SpyRecord> initialValue() {
-                return new Stack<SpyRecord>();
+            public Stack<Map<String,Object>> initialValue() {
+                return new Stack<Map<String,Object>>();
             }
         };
 
@@ -63,7 +66,7 @@ public class DispatchingSubmitter implements SpySubmitter {
             return;
         }
 
-        SpyRecord record = getRecord(stage, ctx, submitFlags, vals);
+        Map<String,Object> record = getRecord(stage, ctx, submitFlags, vals);
 
         SpyDefinition sdef = ctx.getSpyDefinition();
 
@@ -84,32 +87,43 @@ public class DispatchingSubmitter implements SpySubmitter {
     }
 
 
-    private SpyRecord getRecord(int stage, SpyContext ctx, int submitFlags, Object[] vals) {
+    private Map<String,Object> getRecord(int stage, SpyContext ctx, int submitFlags, Object[] vals) {
 
-        SpyRecord record = null;
+        Map<String,Object> record = null;
 
         switch (submitFlags) {
             case SF_IMMEDIATE:
             case SF_NONE:
-                record = new SpyRecord(ctx);
+                record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
                 break;
             case SF_FLUSH:
-                Stack<SpyRecord> stack = submissionStack.get();
+                Stack<Map<String,Object>> stack = submissionStack.get();
                 if (stack.size() > 0) {
                     record = stack.pop();
                     // TODO check if record belongs to proper frame, warn if not
                 } // TODO warn if there was no record on stack
         }
 
-        record.feed(stage, vals);
+        List<SpyProbe> probes = ((SpyContext)record.get(".CTX")).getSpyDefinition().getProbes(stage);
+
+        // TODO check if vals.length == probes.size() and log something here ...
+
+        for (int i = 0; i < probes.size(); i++) {
+            SpyProbe probe = probes.get(i);
+            record.put(probe.getKey(), probe.processVal(vals[i]));
+        }
+
+        record.put(".STAGES", (Integer)record.get(".STAGES") | (1 << stage));
+        record.put(".STAGE", stage);
 
         return record;
     }
 
-    private SpyRecord process(int stage, SpyDefinition sdef, SpyRecord record) {
+    private Map<String,Object> process(int stage, SpyDefinition sdef, Map<String,Object> record) {
         List<SpyProcessor> processors = sdef.getProcessors(stage);
 
-        record.setStage(stage);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << stage));
+        record.put(".STAGE", stage);
 
         if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
             log.debug("Processing records (stage=" + stage + ")");

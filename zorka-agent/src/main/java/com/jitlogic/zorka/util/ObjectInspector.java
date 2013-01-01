@@ -4,7 +4,6 @@ import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.mbeans.ZorkaStats;
-import com.jitlogic.zorka.spy.SpyRecord;
 
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
@@ -358,7 +357,7 @@ public class ObjectInspector {
      * @param record spy record to be substituted
      * @return string with substitutions filled with values from record
      */
-    public static String substitute(String input, SpyRecord record) {
+    public static String substitute(String input, Map<String,Object> record) {
         Matcher m = reVarSubstPattern.matcher(input);
         StringBuffer sb = new StringBuffer();
         while (m.find()) {

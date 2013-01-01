@@ -18,10 +18,11 @@ package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
+
+import java.util.Map;
 
 import static com.jitlogic.zorka.api.SpyLib.SPD_ARGPROC;
 
@@ -42,7 +43,7 @@ public class GetterProcessor implements SpyProcessor {
     }
 
 
-    public SpyRecord process(SpyRecord record) {
+    public Map<String,Object> process(Map<String,Object> record) {
         Object val = ObjectInspector.get(record.get(src), path);
 
         if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {

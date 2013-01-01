@@ -16,7 +16,6 @@
 package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.Map;
@@ -117,7 +116,7 @@ public class ComparatorProcessor implements SpyProcessor {
 
 
     @Override
-    public SpyRecord process(SpyRecord record) {
+    public Map<String,Object> process(Map<String,Object> record) {
         Object va = record.get(a);
         Object vb = (b != null) ? record.get(b) : v;
 

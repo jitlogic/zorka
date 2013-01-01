@@ -17,8 +17,9 @@
 package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
+
+import java.util.Map;
 
 /**
  * Performs string formating using values from current stage.
@@ -33,7 +34,7 @@ public class StringFormatProcessor implements SpyProcessor {
         this.expr = expr;
     }
 
-    public SpyRecord process(SpyRecord record) {
+    public Map<String,Object> process(Map<String,Object> record) {
         record.put(dst, ObjectInspector.substitute(expr, record));
         return record;
     }

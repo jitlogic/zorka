@@ -19,9 +19,10 @@ import com.jitlogic.zorka.spy.*;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -50,7 +51,7 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
     private volatile long submittedRecords, droppedRecords;
 
     /** Processing queue */
-    private LinkedBlockingQueue<SpyRecord> procQueue = new LinkedBlockingQueue<SpyRecord>(1024);
+    private LinkedBlockingQueue<Map<String,Object>> procQueue = new LinkedBlockingQueue<Map<String,Object>>(1024);
 
     /** Records attributes to be copied */
     private final String[] attrs;
@@ -65,11 +66,24 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
     }
 
     @Override
-    public SpyRecord process(SpyRecord record) {
+    public Map<String,Object> process(Map<String,Object> record) {
 
         boolean submitted = false;
 
-        SpyRecord rec = new SpyRecord(record, attrs);
+        Map<String,Object> rec = ZorkaUtil.map(
+                ".CTX", record.get(".CTX"),
+                ".STAGE", record.get(".STAGE"),
+                ".STAGES", record.get(".STAGES"));
+
+        for (String attr : attrs) {
+            rec.put(attr, record.get(attr));
+        }
+
+        for (Map.Entry e : record.entrySet()) {
+            if (e.getKey().toString().startsWith(".")) {
+                rec.put(e.getKey().toString(), e.getValue());
+            }
+        }
 
         try {
                 submitted = procQueue.offer(rec, 0, TimeUnit.MILLISECONDS);
@@ -92,7 +106,7 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
      *
      * @param record record to be processed
      */
-    protected void doProcess(SpyRecord record) {
+    protected void doProcess(Map<String,Object> record) {
 
         if (record == null) {
             return;
@@ -102,9 +116,9 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
             log.debug("Dispatching collector record: " + record);
         }
 
-        SpyDefinition sdef = record.getContext().getSpyDefinition();
+        SpyDefinition sdef = ((SpyContext) record.get(".CTX")).getSpyDefinition();
 
-        for (SpyProcessor processor : sdef.getProcessors(record.getStage())) {
+        for (SpyProcessor processor : sdef.getProcessors((Integer) record.get(".STAGE"))) {
             try {
                 if (null == (record = processor.process(record))) {
                     break;

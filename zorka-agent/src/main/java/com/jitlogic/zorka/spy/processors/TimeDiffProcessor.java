@@ -17,7 +17,8 @@
 package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
+
+import java.util.Map;
 
 public class TimeDiffProcessor implements SpyProcessor {
 
@@ -28,7 +29,7 @@ public class TimeDiffProcessor implements SpyProcessor {
     }
 
 
-    public SpyRecord process(SpyRecord record) {
+    public Map<String,Object> process(Map<String,Object> record) {
         Object  v1 = record.get(tstart),
                 v2 = record.get(tstop);
 

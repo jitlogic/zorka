@@ -4,9 +4,9 @@ import com.jitlogic.zorka.agent.JmxObject;
 import com.jitlogic.zorka.agent.testutil.*;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ObjectInspector;
 
+import com.jitlogic.zorka.util.ZorkaUtil;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -168,9 +168,7 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
     @Test
     public void testRecordSubstitutions() {
         SpyContext ctx = new SpyContext(SpyDefinition.instance(), "some.Class", "someMethod", "()V", 1);
-        SpyRecord rec = new SpyRecord(ctx);
-        rec.put("E0", "123"); rec.put("E1", "4567");
-        rec.put("R0", "aaa"); rec.put("R1", "bbb");
+        Map<String,Object> rec = ZorkaUtil.map(".CTX", ctx, "E0", "123", "E1", "4567", "R0", "aaa", "R1", "bbb");
 
         assertEquals("123!", ObjectInspector.substitute("${E0}!", rec));
         assertEquals("aaa", ObjectInspector.substitute("${R0}", rec));

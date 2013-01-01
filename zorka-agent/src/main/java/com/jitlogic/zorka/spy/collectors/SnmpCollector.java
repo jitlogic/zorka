@@ -22,8 +22,9 @@ import com.jitlogic.contrib.libsnmp.*;
 import com.jitlogic.zorka.integ.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.util.ZorkaUtil;
+
+import java.util.Map;
 
 public class SnmpCollector implements SpyProcessor {
 
@@ -51,7 +52,7 @@ public class SnmpCollector implements SpyProcessor {
 
 
 
-    public SpyRecord process(SpyRecord record) {
+    public Map<String,Object> process(Map<String,Object> record) {
         SNMPVariablePair[] vars = new SNMPVariablePair[varBindDefs.length];
 
         try {

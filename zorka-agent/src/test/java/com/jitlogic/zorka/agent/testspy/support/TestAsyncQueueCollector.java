@@ -16,11 +16,12 @@
 package com.jitlogic.zorka.agent.testspy.support;
 
 import com.jitlogic.zorka.spy.collectors.AsyncQueueCollector;
-import com.jitlogic.zorka.spy.SpyRecord;
+
+import java.util.Map;
 
 public class TestAsyncQueueCollector extends AsyncQueueCollector {
 
-    public SpyRecord process(int stage, SpyRecord record) {
+    public Map<String,Object> process(int stage, Map<String,Object> record) {
         doProcess(record);
         return record;
     }

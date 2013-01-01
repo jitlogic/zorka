@@ -23,11 +23,12 @@ import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.spy.DispatchingSubmitter;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.SpyRecord;
 import com.jitlogic.zorka.spy.SpySubmitter;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static com.jitlogic.zorka.api.SpyLib.*;
@@ -94,25 +95,11 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
 
         assertEquals(1, collector.size());
 
-        SpyRecord sr = collector.get(0);
+        Map<String,Object> sr = collector.get(0);
 
         assertEquals(0, sr.size());
     }
 
-
-    @Test
-    public void testExtendSpyDefRecordValArray() throws Exception {
-        SpyDefinition sdef = engine.add(SpyDefinition.instrument());
-        SpyContext ctx = engine.lookup(new SpyContext(sdef, "Class", "method", "()V", 1));
-
-        SpyRecord rec = new SpyRecord(ctx);
-
-        rec.put("E0", 1);
-        rec.put("E1", 2);
-        rec.put("E2", 3);
-
-        assertEquals(3, rec.size());
-    }
 
     // TODO test if SpyRecord marks stages properly
 

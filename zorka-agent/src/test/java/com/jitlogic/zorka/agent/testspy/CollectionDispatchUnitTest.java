@@ -25,9 +25,11 @@ import com.jitlogic.zorka.spy.*;
 
 import com.jitlogic.zorka.spy.collectors.DispatchingCollector;
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.util.ZorkaUtil;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -51,9 +53,10 @@ public class CollectionDispatchUnitTest extends ZorkaFixture {
         SpyDefinition sdef = SpyDefinition.instance().onEnter(spy.fetchTime("E0")).onSubmit(col1, col2);
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "TClass", "method", "()V", 1));
 
-        SpyRecord record = new SpyRecord(ctx);
+        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
 
-        record.setStage(SpyLib.ON_SUBMIT);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_SUBMIT));
+        record.put(".STAGE", SpyLib.ON_SUBMIT);
 
         collector.process(record);
 

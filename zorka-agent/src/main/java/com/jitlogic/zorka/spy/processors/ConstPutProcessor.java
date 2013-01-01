@@ -16,7 +16,8 @@
 package com.jitlogic.zorka.spy.processors;
 
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
+
+import java.util.Map;
 
 public class ConstPutProcessor implements SpyProcessor {
 
@@ -28,7 +29,7 @@ public class ConstPutProcessor implements SpyProcessor {
         this.val = val;
     }
 
-    public SpyRecord process(SpyRecord record) {
+    public Map<String,Object> process(Map<String,Object> record) {
         record.put(dst, val);
         return record;
     }
