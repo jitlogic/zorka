@@ -16,9 +16,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
- * This library module
+ * Zabbix functions library.
  *
- * @author RLE <rle@jitlogic.com>
+ * @author rafal.lewczuk@jitlogic.com
  *
  */
 public class ZabbixLib {
@@ -28,18 +28,29 @@ public class ZabbixLib {
 
     private Map<String,ZabbixTrapper> trappers = new ConcurrentHashMap<String, ZabbixTrapper>();
 
+    /**
+     * Creates  new zabbix library module
+     *
+     * @param bshAgent zorka BSH agents
+     *
+     * @param zorkaLib zorka library
+     */
     public ZabbixLib(ZorkaBshAgent bshAgent, ZorkaLib zorkaLib) {
         this.bshAgent = bshAgent;
         this.zorkaLib = zorkaLib;
     }
 
     /**
+     * Simplified zabbix discovery function usable directly from zabbix.
      *
-     * @param mbs
-     * @param filter
-     * @param attrs
      *
-     * @return
+     * @param mbs mbean server name
+     *
+     * @param filter object name filter
+     *
+     * @param attrs attribute chain
+     *
+     * @return JSON string describing discovered objects.
      */
     public JSONObject discovery(String mbs, String filter, String...attrs) {
         return discovery(mbs,filter, attrs, new String[0], new String[0]);
@@ -47,15 +58,20 @@ public class ZabbixLib {
 
 
     /**
+     * Full-fledged zabbix discovery function.
      *
-     * @param mbs
-     * @param filter
-     * @param oattrs
-     * @param path
+     * @param mbs mbean server connection name
+     *
+     * @param filter object name filter
+     *
+     * @param oattrs object name attributes to be included in discovery result
+     *
+     * @param attrs attribute chain to interesting attribute (can be
+     *
      * @param pattrs
      * @return
      */
-    public JSONObject discovery(String mbs, String filter, String[] oattrs, String[] path, String[] pattrs) {
+    public JSONObject discovery(String mbs, String filter, String[] oattrs, String[] attrs, String[] pattrs) {
 
         List<Object> osrc = zorkaLib.jmxList(Arrays.asList((Object)mbs, filter));
         JSONArray    dsrc = new JSONArray();
@@ -68,7 +84,7 @@ public class ZabbixLib {
                 for (String attr : oattrs) {
                     String atval = on.getKeyProperty(attr);
                     if (atval != null) {
-                        odo.put(toZabbixAttr(attr), atval);
+                        odo.put("{#" + attr.toUpperCase().replace("-", "") + "}", atval);
                     } else {
                         // A bit of a hack - filter out all objects without all (queried) attributes
                         odo.clear();
@@ -86,11 +102,11 @@ public class ZabbixLib {
         }
 
         // Iterate over fetched list, resolve path and add attributes
-        for (int pidx = 0; pidx < path.length; pidx++) {
+        for (int pidx = 0; pidx < attrs.length; pidx++) {
             List<Object> odst = new ArrayList<Object>(osrc.size()+2);
             JSONArray ddst = new JSONArray();
 
-            String pathItem = path[pidx], pathAttr = pattrs[pidx];
+            String pathItem = attrs[pidx], pathAttr = pattrs[pidx];
 
             for (int oidx = 0; oidx < osrc.size(); oidx++) {
 
@@ -134,26 +150,47 @@ public class ZabbixLib {
         return discoveries;
     } // discovery()
 
-    private String toZabbixAttr(String attr) {
-        return "{#" + attr.toUpperCase().replace("-","") + "}";
-    }
 
-
+    /**
+     * Adds key-value pair to JSON object
+     *
+     * @param src existing JSON object
+     *
+     * @param key key
+     *
+     * @param val value
+     *
+     * @return extended JSON object
+     */
     private JSONObject extend(JSONObject src, String key, String val) {
         JSONObject obj = new JSONObject();
         obj.putAll(src);
 
-        obj.put(toZabbixAttr(key), val);
+        obj.put("{#" + key.toUpperCase().replace("-", "") + "}", val);
 
         return obj;
     }
 
 
+    /**
+     * Returns zabbix trapper registered as id or null.
+     *
+     * @param id trapper ID
+     *
+     * @return zabbix trapper or null
+     */
     public ZabbixTrapper trapper(String id) {
         return trappers.get(id);
     }
 
 
+    /**
+     * Returns zabbix trapper or creates a new one (if not created already)
+     * @param id trapper ID
+     * @param serverAddr server address
+     * @param defaultHost default host name
+     * @return zabbix trapper
+     */
     public ZabbixTrapper trapper(String id, String serverAddr, String defaultHost) {
         ZabbixTrapper trapper = trappers.get(id);
 
@@ -167,6 +204,10 @@ public class ZabbixLib {
     }
 
 
+    /**
+     * Stops and removes zabbix trapper
+     * @param id trapper id
+     */
     public void remove(String id) {
         ZabbixTrapper trapper = trappers.remove(id);
 

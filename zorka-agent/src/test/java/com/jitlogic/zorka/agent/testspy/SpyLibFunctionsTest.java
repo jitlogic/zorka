@@ -43,7 +43,7 @@ public class SpyLibFunctionsTest extends ZorkaFixture {
         assertEquals(2, sdef.getProcessors(SpyLib.ON_SUBMIT).size());
         assertEquals("${A0}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getStatisticTemplate());
         assertEquals(2, sdef.getProbes(SpyLib.ON_ENTER).size());
-        assertEquals("A0", sdef.getProbes(SpyLib.ON_ENTER).get(0).getFieldName());
+        assertEquals("A0", sdef.getProbes(SpyLib.ON_ENTER).get(0).getDstField());
     }
 
 

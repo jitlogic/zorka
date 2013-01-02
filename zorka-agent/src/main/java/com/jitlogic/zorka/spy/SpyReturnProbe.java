@@ -17,12 +17,21 @@ package com.jitlogic.zorka.spy;
 
 import static org.objectweb.asm.Opcodes.ALOAD;
 
+/**
+ * Fetches return value or exception object.
+ */
 public class SpyReturnProbe extends SpyProbe {
 
-    public SpyReturnProbe(String dstKey) {
-        super(dstKey);
+    /**
+     * Creates new spy return probe
+     *
+     * @param dstField destination field
+     */
+    public SpyReturnProbe(String dstField) {
+        super(dstField);
     }
 
+    @Override
     public int emit(SpyMethodVisitor mv, int stage, int opcode) {
         mv.visitVarInsn(ALOAD, mv.getRetValProbeSlot());
         return 1;

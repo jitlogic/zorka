@@ -17,7 +17,12 @@ package com.jitlogic.zorka.rankproc;
 
 import java.util.List;
 
-
+/**
+ * Rank listers are used to scan for monitored objects and wrap them
+ * into Rankable wrappers, so they can be used to construct rank lists.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public interface RankLister<T extends Rankable<?>> {
 
     /**

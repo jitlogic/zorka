@@ -20,47 +20,57 @@ import org.objectweb.asm.Type;
 import static com.jitlogic.zorka.spy.SpyLib.ON_ENTER;
 import static org.objectweb.asm.Opcodes.*;
 
+/**
+ * Fetches method argument.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class SpyArgProbe extends SpyProbe {
 
-    private int argType;
+    /** Argument index */
+    private int argIndex;
 
-    public SpyArgProbe(int arg, String dstKey) {
-        super(dstKey);
-        this.argType = arg;
+    /**
+     * Creates new argument fetching probe
+     *
+     * @param argIdx argument index
+     *
+     * @param dstField destination field
+     */
+    public SpyArgProbe(int argIdx, String dstField) {
+        super(dstField);
+        this.argIndex = argIdx;
     }
 
+    @Override
     public int emit(SpyMethodVisitor mv, int stage, int opcode) {
-        if (stage == ON_ENTER && argType == 0 && "<init>".equals(mv.getMethodName())) {
+        if (stage == ON_ENTER && argIndex == 0 && "<init>".equals(mv.getMethodName())) {
             // TODO log warning
             mv.visitInsn(ACONST_NULL);
-        } else if (argType >= 0) {
-            return emitFetchArgument(mv);
+        } else if (argIndex >= 0) {
+
+            if ((mv.getAccess() & ACC_STATIC) == 0 && argIndex == 0) {
+                mv.visitVarInsn(ALOAD, argIndex);
+                return 1;
+            }
+
+            int aoffs = (mv.getAccess() & ACC_STATIC) == 0 ? 1 : 0;
+            int aidx = argIndex - aoffs;
+            Type type = mv.getArgType(aidx);
+            int insn = type.getOpcode(ILOAD);
+
+            for (int i = 0; i < aidx; i++) {
+                aoffs += mv.getArgType(i).getSize();
+            }
+
+            mv.visitVarInsn(insn, aoffs);
+            emitAutoboxing(mv, type);
+
+            return 1;
         } else {
             // TODO log warning
             mv.visitInsn(ACONST_NULL);
         }
-
-        return 1;
-    }
-
-    protected int emitFetchArgument(SpyMethodVisitor mv) {
-
-        if ((mv.getAccess() & ACC_STATIC) == 0 && argType == 0) {
-            mv.visitVarInsn(ALOAD, argType);
-            return 1;
-        }
-
-        int aoffs = (mv.getAccess() & ACC_STATIC) == 0 ? 1 : 0;
-        int aidx = argType - aoffs;
-        Type type = mv.getArgType(aidx);
-        int insn = type.getOpcode(ILOAD);
-
-        for (int i = 0; i < aidx; i++) {
-            aoffs += mv.getArgType(i).getSize();
-        }
-
-        mv.visitVarInsn(insn, aoffs);
-        emitAutoboxing(mv, type);
 
         return 1;
     }

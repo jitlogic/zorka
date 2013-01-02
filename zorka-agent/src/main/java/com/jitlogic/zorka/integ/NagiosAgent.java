@@ -20,9 +20,19 @@ import com.jitlogic.zorka.agent.ZorkaConfig;
 
 import java.net.Socket;
 
+/**
+ * Nagios agent integrates Zorka with Nagios server. It handles incoming NRPE
+ * requests, forwards them to BSH agent.
+ *
+ * @author rafal.lewczuk@jtlogic.com
+ */
 public class NagiosAgent extends AbstractTcpAgent {
 
-
+    /**
+     * Creates new Nagios agent.
+     *
+     * @param agent bsh agent
+     */
     public NagiosAgent(ZorkaBshAgent agent) {
         super(agent, ZorkaConfig.getProperties(), "nagios", 5669);
     }

@@ -114,7 +114,7 @@ public class DispatchingSubmitter implements SpySubmitter {
      */
     private Map<String,Object> getRecord(int stage, SpyContext ctx, int submitFlags, Object[] vals) {
 
-        Map<String,Object> record = null;
+        Map<String,Object> record;
 
         switch (submitFlags) {
             case SF_IMMEDIATE:
@@ -126,7 +126,16 @@ public class DispatchingSubmitter implements SpySubmitter {
                 if (stack.size() > 0) {
                     record = stack.pop();
                     // TODO check if record belongs to proper frame, warn if not
-                } // TODO warn if there was no record on stack
+                } else {
+                    log.error("Submission thread local stack mismatch (ctx=" + ctx
+                        + ", stage=" + stage + ", submitFlags=" + submitFlags + ")");
+                    record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
+                }
+                break;
+            default:
+                log.error("Illegal submission flag: " + submitFlags + ". Creating empty records.");
+                record =  ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
+                break;
         }
 
         SpyContext context =((SpyContext)record.get(".CTX"));
@@ -136,7 +145,7 @@ public class DispatchingSubmitter implements SpySubmitter {
 
         for (int i = 0; i < probes.size(); i++) {
             SpyProbe probe = probes.get(i);
-            record.put(probe.getFieldName(), vals[i]);
+            record.put(probe.getDstField(), vals[i]);
         }
 
         record.put(".STAGES", (Integer)record.get(".STAGES") | (1 << stage));

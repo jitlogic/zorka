@@ -22,19 +22,32 @@ import java.util.Map;
 
 /**
  * Performs string formating using values from current stage.
+ *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class StringFormatProcessor implements SpyProcessor {
 
-    private String dst;
+    /** Destination field */
+    private String dstField;
+
+    /** Format expression */
     private String expr;
 
-    public StringFormatProcessor(String dst, String expr) {
-        this.dst = dst;
+    /**
+     * Creates new string format processor.
+     *
+     * @param dstField destination field
+     *
+     * @param expr expression
+     */
+    public StringFormatProcessor(String dstField, String expr) {
+        this.dstField = dstField;
         this.expr = expr;
     }
 
+    @Override
     public Map<String,Object> process(Map<String,Object> record) {
-        record.put(dst, ObjectInspector.substitute(expr, record));
+        record.put(dstField, ObjectInspector.substitute(expr, record));
         return record;
     }
 }

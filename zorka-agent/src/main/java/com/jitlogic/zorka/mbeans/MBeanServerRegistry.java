@@ -66,6 +66,11 @@ public class MBeanServerRegistry {
     private List<DeferredRegistration> deferredRegistrations = new ArrayList<DeferredRegistration>();
 
 
+    /**
+     * Creates new MBeanServerRegistry object.
+     *
+     * @param autoRegister platform mbean server will be automatically registered when used for the first time
+     */
     public MBeanServerRegistry(boolean autoRegister) {
         log.info("Initializing MBeanServerRegistry with autoRegister=" + autoRegister);
         this.autoRegister = autoRegister;

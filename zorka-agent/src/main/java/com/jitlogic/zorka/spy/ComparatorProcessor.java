@@ -72,13 +72,24 @@ public class ComparatorProcessor implements SpyProcessor {
      *
      * @param b second field name
      *
-     * @return
+     * @return comparator filtering processor
      */
     public static ComparatorProcessor scmp(String a, String op, String b) {
         return new ComparatorProcessor(a, operators.get(op), b, null);
     }
 
 
+    /**
+     * Creates comparator that compares field with a constant: a op v
+     *
+     * @param a first field name
+     *
+     * @param op operator
+     *
+     * @param v constant value
+     *
+     * @return comparator filtering processor
+     */
     public static ComparatorProcessor vcmp(String a, String op, Object v) {
         return new ComparatorProcessor(a, operators.get(op), null, v);
     }
