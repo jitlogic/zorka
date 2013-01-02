@@ -28,37 +28,68 @@ import java.util.Map;
 
 /**
  * Presents object as mbean attribute using ValGetter object.
+ *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class GetterPresentingCollector implements SpyProcessor {
 
+    /** Logger */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private final MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
+    /** MBean server registry */
+    private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
 
-    private final String mbsName;
-    private final String mbeanTemplate, attrTemplate;
-    private final String desc;
-    private final String src;
-    private final Object[] path;
+    /** MBean server name */
+    private String mbsName;
+
+    /** MBean object name (or format template) */
+    private String mbeanTemplate;
+
+    /** Attribute name (or format template) */
+    private String attrTemplate;
+
+    /** Presented object description. */
+    private String desc;
+
+    /** Source field */
+    private String srcField;
+
+    /** Attribute chain used by ValGetter */
+    private Object[] attrChain;
 
 
+    /**
+     * Creates presenting collector
+     *
+     * @param mbsName mbean server name
+     *
+     * @param mbeanTemplate object name
+     *
+     * @param attrTemplate attribute
+     *
+     * @param desc description
+     *
+     * @param srcField source field
+     *
+     * @param attrChain attribute chain
+     */
     public GetterPresentingCollector(String mbsName, String mbeanTemplate, String attrTemplate, String desc,
-                                     String src, Object...path) {
+                                     String srcField, Object... attrChain) {
         this.mbsName = mbsName;
         this.mbeanTemplate = mbeanTemplate;
         this.attrTemplate = attrTemplate;
-        this.src = src;
+        this.srcField = srcField;
         this.desc = desc;
-        this.path = path;
+        this.attrChain = attrChain;
     }
 
-
+    @Override
     public Map<String,Object> process(Map<String,Object> record) {
         SpyContext ctx = (SpyContext) record.get(".CTX");
         String mbeanName = ctx.subst(mbeanTemplate);
         String attrName = ctx.subst(attrTemplate);
 
-        Object obj1 = new AttrGetter(record.get(src), path);
+        Object obj1 = new AttrGetter(record.get(srcField), attrChain);
         Object obj2 = registry.getOrRegister(mbsName, mbeanName, attrName, obj1, desc);
 
         if (obj1.equals(obj2)) {

@@ -19,6 +19,20 @@ import com.jitlogic.zorka.agent.ZorkaCallback;
 
 import java.io.IOException;
 
+/**
+ * Zorka request handler receives, parses incoming requests and sends replies.
+ * Implementations of this interface handle specific protocols, eg. Zabbix or Nagios.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public interface ZorkaRequestHandler extends ZorkaCallback {
+
+    /**
+     * Reads, parses and returns request string
+     *
+     * @return request (translated to BSH)
+     *
+     * @throws IOException if I/O error occurs
+     */
     public String getReq() throws IOException;
 }

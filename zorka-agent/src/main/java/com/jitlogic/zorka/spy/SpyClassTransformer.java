@@ -68,6 +68,9 @@ public class SpyClassTransformer implements ClassFileTransformer {
      * @param keyCtx sample (possibly unregistered) context
      *
      * @return registered context
+     *
+     * TODO get rid of this crap, use strings to find already created contexts for a method
+     * TODO BUG one context ID refers only to one sdef, so using multiple sdefs on a single method will result errors (submitting data from all probes only to first one)
      */
     public synchronized SpyContext lookup(SpyContext keyCtx) {
         SpyContext ctx = ctxInstances.get(keyCtx);

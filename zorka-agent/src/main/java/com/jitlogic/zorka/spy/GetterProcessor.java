@@ -25,30 +25,49 @@ import java.util.Map;
 import static com.jitlogic.zorka.spy.SpyLib.SPD_ARGPROC;
 
 /**
- * Digs deeper into an object the same way zorka.jmx() does.
+ * Recursively fetches object attribute according to predefined attribute chain
+ * using ObjectInspector.get() method.
+ *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class GetterProcessor implements SpyProcessor {
 
+    /** Logger */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private String src, dst;
-    private Object[] path;
+    /** Source field */
+    private String srcField;
 
+    /** Destination field */
+    private String dstField;
 
-    public GetterProcessor(String src, String dst, Object... path) {
-        this.src = src; this.dst = dst;
-        this.path = path;
+    /** Attribute chain */
+    private Object[] attrChain;
+
+    /**
+     * Creates new getter processor.
+     *
+     * @param srcField source field
+     *
+     * @param dstField destination field
+     *
+     * @param attrChain attribute chain
+     */
+    public GetterProcessor(String srcField, String dstField, Object... attrChain) {
+        this.srcField = srcField; this.dstField = dstField;
+        this.attrChain = attrChain;
     }
 
 
+    @Override
     public Map<String,Object> process(Map<String,Object> record) {
-        Object val = ObjectInspector.get(record.get(src), path);
+        Object val = ObjectInspector.get(record.get(srcField), attrChain);
 
         if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
-            log.debug("Final result: '" + val + "' stored to slot " + dst);
+            log.debug("Final result: '" + val + "' stored to slot " + dstField);
         }
 
-        record.put(dst, val);
+        record.put(dstField, val);
 
         return record;
     }

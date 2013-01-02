@@ -17,12 +17,23 @@ package com.jitlogic.zorka.spy;
 
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
+/**
+ * Fetches current time by calling System.nanoTime() method.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class SpyTimeProbe extends SpyProbe {
 
-    public SpyTimeProbe(String dstKey) {
-        super(dstKey);
+    /**
+     * Creates spy time probe
+     *
+     * @param dstField destination field
+     */
+    public SpyTimeProbe(String dstField) {
+        super(dstField);
     }
 
+    @Override
     public int emit(SpyMethodVisitor mv, int stage, int opcode) {
         mv.visitMethodInsn(INVOKESTATIC, "java/lang/System", "nanoTime", "()J");
         mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;");

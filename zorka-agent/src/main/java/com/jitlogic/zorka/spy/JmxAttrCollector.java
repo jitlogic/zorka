@@ -26,26 +26,57 @@ import com.jitlogic.zorka.integ.ZorkaLogger;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
 /**
- * Collects  method call statistics and
+ * Collects data to method call statistics and presents them as ordinary JMX attributes.
+ *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class JmxAttrCollector implements SpyProcessor {
 
+    /** Logger */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private final MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
+    /** MBean server registry */
+    private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
 
-    private final String mbsName;
-    private final String beanTemplate;
-    private final String attrTemplate;
-    private final String time, tstamp;
+    /** MBean server name */
+    private String mbsName;
 
-    private final Map<SpyContext,MethodCallStatistic> cachedStats = new HashMap<SpyContext, MethodCallStatistic>();
+    /** Object name template */
+    private String beanTemplate;
 
+    /** Attribute name template */
+    private String attrTemplate;
 
+    /** Execution time field */
+    private String time;
+
+    /** Timestamp field */
+    private String tstamp;
+
+    /** Cached statistics */
+    private final Map<SpyContext,MethodCallStatistic> cachedStats
+            = new ConcurrentHashMap<SpyContext, com.jitlogic.zorka.mbeans.MethodCallStatistic>();
+
+    // TODO verify thread safety of this collector ...
+
+    /**
+     * Creates new JmxAttrCollector
+     *
+     * @param mbsName mbean server name
+     *
+     * @param beanTemplate mbean object name
+     *
+     * @param attrTemplate mbean attribute name
+     *
+     * @param tstamp timestamp field
+     *
+     * @param time execution time field
+     */
     public JmxAttrCollector(String mbsName, String beanTemplate, String attrTemplate, String tstamp, String time) {
         this.mbsName = mbsName;
         this.beanTemplate = beanTemplate;

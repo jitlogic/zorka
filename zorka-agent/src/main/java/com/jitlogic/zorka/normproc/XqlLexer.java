@@ -32,19 +32,46 @@ public class XqlLexer extends Lexer {
 
     // Character table definitions
 
+    /** Unknown character */
     public static final byte CH_UNKNOWN    = 0;
+
+    /** Whitespace character */
     public static final byte CH_WHITESPACE = 1;
+
+    /** First character of a symbol (letters + underscore) */
     public static final byte CH_SYMSTART   = 2;
+
+    /** Digit character */
     public static final byte CH_DIGIT      = 3;
+
+    /** Most of characters operators consists of (except few exceptions below) */
     public static final byte CH_OPERATOR   = 4;
+
+    /** '-' character (can be beginning of numeric literal or independent operator) */
     public static final byte CH_MINUS      = 5;
+
+    /** '.' can be used in numeric literals or as independent operator */
     public static final byte CH_DOT        = 6;
+
+    /** String delimiter, typically "'" character */
     public static final byte CH_STRDELIM   = 7;
+
+    /** Backslash character used to quote special characters in strings */
     public static final byte CH_STRQUOTE   = 8;
+
+    /** '+' character can be used in numeric literals or as independent operator */
     public static final byte CH_PLUS       = 9;
+
+    /** 'E' character can be used in numeric literals or as independent operator */
     public static final byte CH_CHAR_E     = 10;
+
+    /** Identifier quote is used to symbols to be identifiers, not keywords */
     public static final byte CH_IDQUOTE    = 11;
+
+    /** '?' character */
     public static final byte CH_QMARK      = 12;
+
+    /** ',' character */
     public static final byte CH_COLON      = 13;
 
     //private final static int S_WHITESPACE = 1;  // white space
@@ -59,7 +86,15 @@ public class XqlLexer extends Lexer {
     //private final static int S_NPARAM     = 10; // named query parameter (starting with ':')
     //private final static int S_KEYWORD    = 11; // keywords
 
-
+    /**
+     * Initializes character tab for xQL lexer
+     *
+     * @param operators operator characters
+     *
+     * @param chmap character map
+     *
+     * @return character tab
+     */
     private static byte[] initChTab(String operators, Map<Character, Byte> chmap) {
         byte[] tab = new byte[128];
 
@@ -76,6 +111,9 @@ public class XqlLexer extends Lexer {
         return tab;
     }
 
+    /**
+     * Default state-to-token type map
+     */
     private static final int[] tokenTypes = {
             T_UNKNOWN,
             T_WHITESPACE,
@@ -91,14 +129,17 @@ public class XqlLexer extends Lexer {
             T_KEYWORD,
     };
 
+    /** Default character map for SQL */
     private static final Map<Character,Byte> CHM_SQL = ZorkaUtil.map(
             'E', CH_CHAR_E, '-', CH_MINUS, '.', CH_DOT, '\'', CH_STRDELIM,
             '\\', CH_STRQUOTE, '+', CH_PLUS, '"', CH_IDQUOTE, '?', CH_QMARK,
             ':', CH_COLON
     );
 
+    /** Default character tab for SQL */
     private static final byte[] CHT_SQL = initChTab("!%&()*,/;<=>@[]^", CHM_SQL);
 
+    /** Default lexer tab for SQL */
     private static final byte[][] LEX_SQL = {
                    //      UN WS SY DI OP -  .  '  \  +  E  "  ?  :
             lxtab(CHT_SQL, E, 1, 2, 4, 3, 3, 3, 6, E, 3, 2, 2, 9,10),
@@ -114,14 +155,17 @@ public class XqlLexer extends Lexer {
             lxtab(CHT_SQL, E, E,10,10, E, E, E, E, E, E, E, E, E, E),
     };
 
+    /** Character map for MySQL */
     private static final Map<Character,Byte> CHM_MYSQL = ZorkaUtil.map(
             'E', CH_CHAR_E, '-', CH_MINUS, '.', CH_DOT, '\'', CH_STRDELIM,
             '\\', CH_STRQUOTE, '+', CH_PLUS, '`', CH_IDQUOTE, '?', CH_QMARK,
             ':', CH_COLON
     );
 
+    /** Character tab for MySQL */
     private static final byte[] CHT_MYSQL = initChTab("!%&()*,/;<=>@[]^", CHM_MYSQL);
 
+    /** Lexer tab for MySQL */
     private static final byte[][] LEX_MYSQL = {
                      //     UN WS SY DI OP -   .  '  \  +  E  "  ?  :
             lxtab(CHT_MYSQL, E, 1, 2, 4, 3, 3, 3, 6, E, 3, 2, 2, 9,10),
@@ -137,6 +181,7 @@ public class XqlLexer extends Lexer {
             lxtab(CHT_MYSQL, E, E,10,10, E, E, E, E, E, E, E, E, E, E),
     };
 
+    /** Character map for MSSQL */
     private static final Map<Character,Byte> CHM_MSSQL = ZorkaUtil.map(
             'E', CH_CHAR_E, '-', CH_MINUS, '.', CH_DOT, '?', CH_QMARK,
             '\'', CH_STRDELIM, '\\', CH_STRQUOTE, '+', CH_PLUS,
@@ -144,8 +189,10 @@ public class XqlLexer extends Lexer {
             '?', CH_QMARK, ':', CH_COLON
     );
 
+    /** Character tab for MSSQL */
     private static final byte[] CHT_MSSQL = initChTab("!%&()*,/;<=>@^", CHM_MSSQL);
 
+    /** Lexer tab for MSSQL */
     private static final byte[][] LEX_MSSQL = {
                      //     UN WS SY DI OP  -  .  '  \  +  E  "  ?  :
             lxtab(CHT_MSSQL, E, 1, 2, 4, 3, 3, 3, 6, E, 3, 2, 2, 9,10),
@@ -163,18 +210,18 @@ public class XqlLexer extends Lexer {
 
     // Keyword sets
 
-
+    /** Lexer tabs for all dialects */
     private static final byte[][][] lextabs = {
-            LEX_SQL,
-            LEX_SQL,
-            LEX_SQL,
-            LEX_MSSQL,
-            LEX_SQL,
-            LEX_MYSQL,
-            LEX_SQL,
-            LEX_SQL,
-            LEX_SQL,
-            LEX_SQL
+            LEX_SQL,   // SQL-92
+            LEX_SQL,   // SQL-99
+            LEX_SQL,   // SQL-2003
+            LEX_MSSQL, // MSSQL
+            LEX_SQL,   // PGSQL
+            LEX_MYSQL, // MYSQL
+            LEX_SQL,   // DB2
+            LEX_SQL,   // ORACLE
+            LEX_SQL,   // HQL
+            LEX_SQL    // JPA
     };
 
 
@@ -194,10 +241,20 @@ public class XqlLexer extends Lexer {
     ));
 
 
-
+    /** Keyword set used to differentiate keywords and symbols */
     protected Set<String> keywordSet;
+
+    /** Current dialect */
     private int dialect;
 
+
+    /**
+     * Creates xQL lexer.
+     *
+     * @param dialect xQL dialect
+     *
+     * @param input input string
+     */
     public XqlLexer(int dialect, String input) {
         super(input, lextabs[dialect], tokenTypes);
         this.keywordSet = keywordSets.get(dialect);
@@ -205,6 +262,7 @@ public class XqlLexer extends Lexer {
     }
 
 
+    @Override
     public Token next() {
         Token token = super.next();
 
