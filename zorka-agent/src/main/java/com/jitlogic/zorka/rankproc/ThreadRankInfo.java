@@ -15,13 +15,36 @@
  */
 package com.jitlogic.zorka.rankproc;
 
+/**
+ * Stripped down version of standard ThreadInfo.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class ThreadRankInfo {
 
+    /** Thread ID */
     private final long id;
+
+    /** Thread name */
     private final String name;
+
+    /** CPU time */
     private final long cpuTime;
+
+    /** Blocked time */
     private final long blockedTime;
 
+    /**
+     * Creates new ThreadRankInfo object.
+     *
+     * @param id thread ID
+     *
+     * @param name thread name
+     *
+     * @param cpuTime thread CPU time
+     *
+     * @param blockedTime thread blocked time
+     */
     public ThreadRankInfo(long id, String name, long cpuTime, long blockedTime) {
         this.id = id;
         this.name = name;
@@ -29,18 +52,22 @@ public class ThreadRankInfo {
         this.blockedTime = blockedTime;
     }
 
+    /** Returns thread ID */
     public long getId() {
         return id;
     }
 
+    /** Returns thread name */
     public String getName() {
         return name;
     }
 
+    /** Returns thread CPU time */
     public long getCpuTime() {
         return cpuTime;
     }
 
+    /** Returns thread blocked time */
     public long getBlockedTime() {
         return blockedTime;
     }

@@ -18,17 +18,16 @@
 package com.jitlogic.zorka.agent.testspy.support;
 
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.spy.SpyRecord;
-import com.jitlogic.zorka.spy.processors.CollectQueueProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class TestCollector implements SpyProcessor {
 
-    private List<SpyRecord> records = new ArrayList<SpyRecord>();
+    private List<Map<String,Object>> records = new ArrayList<Map<String,Object>>();
 
-    public SpyRecord process(SpyRecord record) {
+    public Map<String,Object> process(Map<String,Object> record) {
         records.add(record);
         return record;
     }
@@ -37,7 +36,7 @@ public class TestCollector implements SpyProcessor {
         return records.size();
     }
 
-    public SpyRecord get(int i) {
+    public Map<String,Object> get(int i) {
         return records.get(i);
     }
 

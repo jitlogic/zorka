@@ -17,7 +17,9 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.spy.SpyRecord;
+import com.jitlogic.zorka.spy.SpyDefArg;
+
+import java.util.Map;
 
 /**
  * Spy Argument Processor interface. All argument processors must implement it.
@@ -34,5 +36,5 @@ public interface SpyProcessor extends SpyDefArg {
      * @return processed record (can be the same as passed with record argument)
      *         or null to indicate that record should be dropped by instrumentation engine.
      */
-    public SpyRecord process(SpyRecord record);
+    public Map<String,Object> process(Map<String,Object> record);
 }

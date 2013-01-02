@@ -17,8 +17,6 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.spy.probes.SpyProbe;
-import com.jitlogic.zorka.spy.probes.SpyReturnProbe;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;

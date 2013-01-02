@@ -34,13 +34,13 @@ public class TestSpyTransformer extends SpyClassTransformer {
         this.debug = true;
     }
 
-    protected ClassVisitor createVisitor(String clazzName, List<SpyDefinition> found, ClassWriter cw) {
+    protected ClassVisitor createVisitor(String className, List<SpyDefinition> found, ClassWriter cw) {
 
         if (debug) {
-            return new SpyClassVisitor(this, clazzName, found,
+            return new SpyClassVisitor(this, className, found,
                     new TraceClassVisitor(cw, new PrintWriter(System.out, true)));
         } else {
-            return new SpyClassVisitor(this, clazzName, found, cw);
+            return new SpyClassVisitor(this, className, found, cw);
         }
 
     }

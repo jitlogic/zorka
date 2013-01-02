@@ -17,8 +17,8 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
@@ -32,24 +32,43 @@ import static org.objectweb.asm.Opcodes.*;
 import static com.jitlogic.zorka.spy.SpyLib.SPD_METHODALL;
 import static com.jitlogic.zorka.spy.SpyLib.SPD_METHODXFORM;
 
+/**
+ * Traverses class file and instruments selected method according to supplied spy definitions.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class SpyClassVisitor extends ClassVisitor {
 
+    /** Logger */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private SpyClassTransformer engine;
+    /** Parent class transformer  */
+    private SpyClassTransformer transformer;
+
+    /** List of spy definitions to be applied (visitor will only check for method matches, not class matches!) */
     private List<SpyDefinition> sdefs;
+
+    /** Name of instrumented class */
     private String className;
 
-
-    private boolean isInterface;
-    private String interfaces[];
-
+    /** List of class annotations encountered when traversing class */
     private List<String> classAnnotations = new ArrayList<String>();
 
-    public SpyClassVisitor(SpyClassTransformer engine, String className,
+    /**
+     * Creates Spy class visitor
+     *
+     * @param transformer parent class transformer
+     *
+     * @param className class name
+     *
+     * @param sdefs list of spy definitions to be applied
+     *
+     * @param cv output class visitor (typically ClassWriter)
+     */
+    public SpyClassVisitor(SpyClassTransformer transformer, String className,
                            List<SpyDefinition> sdefs, ClassVisitor cv) {
         super(V1_6, cv);
-        this.engine = engine;
+        this.transformer = transformer;
         this.className = className;
         this.sdefs = sdefs;
     }
@@ -58,8 +77,6 @@ public class SpyClassVisitor extends ClassVisitor {
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         cv.visit(version, access, name, signature, superName, interfaces);
-        isInterface = (access & ACC_INTERFACE) != 0;
-        this.interfaces = ZorkaUtil.copyArray(interfaces);
     }
 
 
@@ -89,7 +106,7 @@ public class SpyClassVisitor extends ClassVisitor {
                 if (SpyInstance.isDebugEnabled(SPD_METHODXFORM)) {
                     log.debug("Instrumenting method: " + className + "." + methodName + " " + methodDesc);
                 }
-                ctxs.add(engine.lookup(
+                ctxs.add(transformer.lookup(
                         new SpyContext(sdef, className, methodName, methodDesc, access)));
             }
 
@@ -105,7 +122,21 @@ public class SpyClassVisitor extends ClassVisitor {
         return mv;
     }
 
-
+    /**
+     * Creates method visitor for given method.
+     *
+     * @param access method access flags
+     *
+     * @param name method name
+     *
+     * @param desc method descriptor
+     *
+     * @param signature method signature
+     *
+     * @param exceptions names of thrown exceptions
+     *
+     * @return method visitor
+     */
     protected MethodVisitor createVisitor(int access, String name, String desc, String signature, String[] exceptions) {
         return cv.visitMethod(access, name, desc, signature, exceptions);
     }

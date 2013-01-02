@@ -16,7 +16,7 @@
 package com.jitlogic.zorka.agent.unittest;
 
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
-import com.jitlogic.zorka.integ.nagios.NrpePacket;
+import com.jitlogic.zorka.integ.NrpePacket;
 
 import org.junit.Test;
 

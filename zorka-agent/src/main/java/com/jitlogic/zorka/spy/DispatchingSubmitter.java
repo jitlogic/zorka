@@ -17,53 +17,67 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.spy.processors.CollectQueueProcessor;
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
 /**
+ * Dispatching submitter receives submissions from probes, groups them (if needed) and sends through proper processing
+ * chains defined in associated sdefs.
  *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class DispatchingSubmitter implements SpySubmitter {
 
+    /** Logger */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private SpyClassTransformer engine;
-    private SpyProcessor collector;
+    /** Spy class transformer */
+    private SpyClassTransformer transformer;
 
-    private ThreadLocal<Stack<SpyRecord>> submissionStack =
-        new ThreadLocal<Stack<SpyRecord>>() {
+    /**
+     * Submission stack is used to associate results from method entry probes with results from return/error probes.
+     */
+    private ThreadLocal<Stack<Map<String,Object>>> submissionStack =
+        new ThreadLocal<Stack<Map<String,Object>>>() {
             @Override
-            public Stack<SpyRecord> initialValue() {
-                return new Stack<SpyRecord>();
+            public Stack<Map<String,Object>> initialValue() {
+                return new Stack<Map<String,Object>>();
             }
         };
 
 
-    public DispatchingSubmitter(SpyClassTransformer engine, SpyProcessor collector) {
-        this.engine = engine;
-        this.collector = collector;
+    /**
+     * Creates dispatching submitter.
+     *
+     * @param transformer class file transformer containing defined spy contexts
+     *                    // TODO move spy context map out of class file transformer
+     */
+    public DispatchingSubmitter(SpyClassTransformer transformer) {
+        this.transformer = transformer;
     }
 
 
+    @Override
     public void submit(int stage, int id, int submitFlags, Object[] vals) {
 
         if (SpyInstance.isDebugEnabled(SPD_SUBMISSIONS)) {
             log.debug("Submitted: stage=" + stage + ", id=" + id + ", flags=" + submitFlags);
         }
 
-        SpyContext ctx = engine.getContext(id);
+        SpyContext ctx = transformer.getContext(id);
 
         if (ctx == null) {
             return;
         }
 
-        SpyRecord record = getRecord(stage, ctx, submitFlags, vals);
+        Map<String,Object> record = getRecord(stage, ctx, submitFlags, vals);
 
         SpyDefinition sdef = ctx.getSpyDefinition();
 
@@ -84,32 +98,70 @@ public class DispatchingSubmitter implements SpySubmitter {
     }
 
 
-    private SpyRecord getRecord(int stage, SpyContext ctx, int submitFlags, Object[] vals) {
+    /**
+     * Retrieves or creates spy record for probe submission purposes.
+     *
+     * @param stage method bytecode point where probe has been installed (entry, return, error)
+     *
+     * @param ctx spy context associated with submitting probe
+     *
+     * @param submitFlags controls whether SUBMIT chain should be immediately processed or record should be
+     *                    stored in thread local stack (and wait for another probe submission)
+     *
+     * @param vals submitted values
+     *
+     * @return spy record
+     */
+    private Map<String,Object> getRecord(int stage, SpyContext ctx, int submitFlags, Object[] vals) {
 
-        SpyRecord record = null;
+        Map<String,Object> record = null;
 
         switch (submitFlags) {
             case SF_IMMEDIATE:
             case SF_NONE:
-                record = new SpyRecord(ctx);
+                record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
                 break;
             case SF_FLUSH:
-                Stack<SpyRecord> stack = submissionStack.get();
+                Stack<Map<String,Object>> stack = submissionStack.get();
                 if (stack.size() > 0) {
                     record = stack.pop();
                     // TODO check if record belongs to proper frame, warn if not
                 } // TODO warn if there was no record on stack
         }
 
-        record.feed(stage, vals);
+        SpyContext context =((SpyContext)record.get(".CTX"));
+        List<SpyProbe> probes = context.getSpyDefinition().getProbes(stage);
+
+        // TODO check if vals.length == probes.size() and log something here ...
+
+        for (int i = 0; i < probes.size(); i++) {
+            SpyProbe probe = probes.get(i);
+            record.put(probe.getFieldName(), vals[i]);
+        }
+
+        record.put(".STAGES", (Integer)record.get(".STAGES") | (1 << stage));
+        record.put(".STAGE", stage);
 
         return record;
     }
 
-    private SpyRecord process(int stage, SpyDefinition sdef, SpyRecord record) {
+
+    /**
+     * Processes specified processing chain of sdef in record
+     *
+     * @param stage chain ID
+     *
+     * @param sdef spy definition with configured processing chains
+     *
+     * @param record spy record (input)
+     *
+     * @return spy record (output) or null if record should not be further processed
+     */
+    private Map<String,Object> process(int stage, SpyDefinition sdef, Map<String,Object> record) {
         List<SpyProcessor> processors = sdef.getProcessors(stage);
 
-        record.setStage(stage);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << stage));
+        record.put(".STAGE", stage);
 
         if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
             log.debug("Processing records (stage=" + stage + ")");
@@ -129,22 +181,4 @@ public class DispatchingSubmitter implements SpySubmitter {
         return record;
     }
 
-    public void setCollector(CollectQueueProcessor collector) {
-        if (collector != null) {
-            collector.stop();
-        }
-        this.collector = collector;
-    }
-
-    public void start() {
-        if (collector instanceof CollectQueueProcessor) {
-            ((CollectQueueProcessor)collector).start();
-        }
-    }
-
-    public void stop() {
-        if (collector instanceof CollectQueueProcessor) {
-            ((CollectQueueProcessor)collector).stop();
-        }
-    }
 }

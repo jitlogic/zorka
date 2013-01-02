@@ -17,12 +17,19 @@ package com.jitlogic.zorka.normproc;
 
 import static com.jitlogic.zorka.normproc.XqlLexer.*;
 
-public final class GenericNormalizer implements Normalizer {
+/**
+ * Generic normalizer. It works by transforming known token types in known ways.
+ * It abstracts from type of normalized data as it does not parse input data and
+ * lexical analysis is done by lexical analyzer.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
+public class GenericNormalizer implements Normalizer {
 
     private static final String PHD = "?";
     private static final boolean T = true, F = false;
 
-
+    /** SQL/HQL token concatenation rules */
     private static final boolean[][] XQLJOINTS = {
            // U  W  S  O  L  C  K  P
             { F, F, F, F, F, F, F, F }, // U (UNKNOWN)
@@ -35,6 +42,7 @@ public final class GenericNormalizer implements Normalizer {
             { F, F, F, F, F, F, F, F }, // P (PLACEHOLDER)
     };
 
+    /** SQL/HQL token processing rules */
     private static final boolean[][] XQLPROC = {
            // U  W  S  O  L  C  K  P
             { T, T, F, F, F, T, F, F }, // Tokens to be cut off;
@@ -43,6 +51,7 @@ public final class GenericNormalizer implements Normalizer {
             { F, F, F, F, F, F, F, F }, // Tokens to be trimmed;
     };
 
+    /** LDAP token concatenation rules */
     private static final boolean[][] LDAPJOINTS = {
            // U  W  S  O  L  C  K  P
             { F, F, F, F, F, F, F, F }, // U (UNKNOWN)
@@ -55,6 +64,7 @@ public final class GenericNormalizer implements Normalizer {
             { F, F, F, F, F, F, F, F }, // P (PLACEHOLDER)
     };
 
+    /** LDAP token processing rules */
     private static final boolean[][] LDAPPROC = {
            // U  W  S  O  L  C  K  P
             { T, T, F, F, F, T, F, F }, // Tokens to be cut off;
@@ -63,23 +73,51 @@ public final class GenericNormalizer implements Normalizer {
             { F, F, T, F, T, F, T, F }, // Tokens to be trimmed
     };
 
-
+    /** Normalizer flags */
     private int flags;
+
+    /** Lexical analyzer template. */
     private Lexer template;
+
+    /** Token concatenation and processing rules */
     private boolean[][] joints, proc;
+
+    /** Case alignment direction (to uppercase or to lowercase) */
     private boolean upcase = false;
 
-
+    /**
+     * Creates SQL/HQL normalizer.
+     *
+     * @param dialect SQL/HQL dialect
+     *
+     * @param flags normalizer flags
+     *
+     * @return xSQL normalizer
+     */
     public static Normalizer xql(int dialect, int flags) {
         return new GenericNormalizer(new XqlLexer(dialect, ""), flags, XQLJOINTS, XQLPROC);
     }
 
-
+    /**
+     * Creates LDAP normalizer.
+     *
+     * @param flags normalizer flags
+     *
+     * @return LDAP normalizer
+     */
     public static Normalizer ldap(int flags) {
         return new GenericNormalizer(new LdapLexer(""), flags, LDAPJOINTS, LDAPPROC);
     }
 
 
+    /**
+     * Standard constructor (not publicly available - use xql() and ldap() functions).
+     *
+     * @param template lexer template
+     * @param flags normalization flags
+     * @param joints token concatenation rules
+     * @param proc token processing rules
+     */
     private GenericNormalizer(Lexer template, int flags, boolean[][] joints, boolean[][] proc) {
         this.template = template;
         this.flags = flags;
@@ -88,6 +126,7 @@ public final class GenericNormalizer implements Normalizer {
     }
 
 
+    @Override
     public String normalize(String input) {
 
         if (input == null) {
@@ -101,7 +140,7 @@ public final class GenericNormalizer implements Normalizer {
         while (lexer.hasNext()) {
             Token token = lexer.next();
             int t = token.getType();
-            String s = token.getContent();
+            String s = token.getText();
 
             if (0 != (flags & (1<<t))) {
                 if (proc[0][t]) { continue; }

@@ -37,23 +37,37 @@ import javax.management.openmbean.OpenMBeanAttributeInfoSupport;
 import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularType;
 
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 
 
 /**
- * Zorka mapped (dynamic) mbean can be used to implement
+ * Zorka mapped (dynamic) mbean can be used to implement.
+ *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class ZorkaMappedMBean implements DynamicMBean {
 
+    /** Logger */
 	private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaMappedMBean.class);
-	
+
+    /** Bean description (presented by JMX) */
 	private String description;
+
+    /** Attributes */
 	private Map<String,Attribute> attrs = new HashMap<String, Attribute>();
-	
+
+    /** If true, mbean info will be rebuilt at nearest occasion. */
 	private boolean mbeanInfoChanged = true;
+
+    /** MBean info */
 	private MBeanInfo mbeanInfo = null;
-	
+
+    /**
+     * Creates mapped mbean
+     *
+     * @param description bean description
+     */
 	public ZorkaMappedMBean(String description) {
 		this.description = description;
 	}
@@ -124,8 +138,10 @@ public class ZorkaMappedMBean implements DynamicMBean {
 		// TODO setAttribute()/getAttribute() ?  
 		throw new MBeanException(new Exception("This object has no invokable methods."));
 	}
-	
-	
+
+    /**
+     * Rebuilds mbean info
+     */
 	private void refreshMBeanInfo() {
 		int i = 0;
 		
@@ -144,6 +160,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
 
             Object attrVal = attr.getValue();
 
+            // TODO get rid of it, create something like TypedGetter so it can return proper types here
             if (attrVal instanceof TabularDataGetter) {
                 TabularDataGetter getter = (TabularDataGetter)attrVal;
                 attrInfo[i] = new OpenMBeanAttributeInfoSupport(getter.getTypeName(), getter.getTypeDesc(),
@@ -177,6 +194,14 @@ public class ZorkaMappedMBean implements DynamicMBean {
 		return mbeanInfo;
 	}
 
+    /**
+     * Sets attribute value but behaves pretty much like
+     * java.util.Map.put() method.
+     *
+     * @param name attribute name
+     *
+     * @param value attribute value
+     */
 	public synchronized void put(String name, Object value) {
 		try {
 			Attribute attr = new Attribute(name, value);
@@ -187,14 +212,17 @@ public class ZorkaMappedMBean implements DynamicMBean {
 	}
 
 
+    /**
+     * Returns attribute value but behaves pretty much like
+     * java.util.Map.get() method.
+     *
+     * @param name attribute name
+     *
+     * @return attribute value
+     */
 	public synchronized Object get(String name) {
 		Attribute attr = attrs.get(name);
 		return attr != null ? attr.getValue() : null;
-	}
-
-
-	public synchronized boolean hasAttribute(String name) {
-		return attrs.containsKey(name);
 	}
 
 

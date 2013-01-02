@@ -19,18 +19,19 @@ package com.jitlogic.zorka.agent.testspy;
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
 import com.jitlogic.zorka.rankproc.BucketAggregate;
+import com.jitlogic.zorka.spy.JmxAttrCollector;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyLib;
-import com.jitlogic.zorka.spy.SpyRecord;
-import com.jitlogic.zorka.spy.collectors.JmxAttrCollector;
-import com.jitlogic.zorka.spy.collectors.ZorkaStatsCollector;
+import com.jitlogic.zorka.spy.ZorkaStatsCollector;
 
+import com.jitlogic.zorka.util.ZorkaUtil;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 import java.util.Date;
+import java.util.Map;
 
 import static com.jitlogic.zorka.agent.testutil.JmxTestUtil.getAttr;
 import static com.jitlogic.zorka.spy.SpyLib.*;
@@ -42,8 +43,10 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "test", "C0", "C0");
         SpyContext ctx = new SpyContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
 
-        SpyRecord record = new SpyRecord(ctx);
-        record.feed(ON_SUBMIT, new Object[]{10L});
+        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
+        record.put("S0",10L);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << ON_SUBMIT));
+        record.put(".STAGE", ON_SUBMIT);
         collector.process(record);
 
         MethodCallStatistics stats =  (MethodCallStatistics)getAttr("test", "test:name=Test", "stats");
@@ -55,11 +58,14 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
     @Test
     public void testCollectorToStatsMbeanWithMethodNamePlaceholder() throws Exception {
-        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "${methodName}", "C0", "C0");
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats",
+                "${methodName}", "S0", "S0");
         SpyContext ctx = new SpyContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
 
-        SpyRecord record = new SpyRecord(ctx);
-        record.feed(ON_SUBMIT, new Object[]{10L});
+        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << ON_SUBMIT));
+        record.put(".STAGE", ON_SUBMIT);
+        record.put("S0", 10L);
         collector.process(record);
 
         MethodCallStatistics stats =  (MethodCallStatistics)getAttr("test", "test:name=Test", "stats");
@@ -71,11 +77,14 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
     @Test
     public void testCollectoToStatsMbeanWithClassAndMethodNamePlaceholder() throws Exception {
-        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${methodName}", "C0", "C0");
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats",
+                "${methodName}", "S0", "S0");
         SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
 
-        SpyRecord record = new SpyRecord(ctx);
-        record.feed(ON_SUBMIT, new Object[]{10L});
+        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << ON_SUBMIT));
+        record.put(".STAGE", ON_SUBMIT);
+        record.put("S0", 10L);
         collector.process(record);
 
         MethodCallStatistics stats =  (MethodCallStatistics)getAttr("test", "test:name=TClass", "stats");
@@ -90,9 +99,10 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${C1}", "C0", "C0");
         SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
 
-        SpyRecord record = new SpyRecord(ctx);
+        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
         record.put("C0", 10L); record.put("C1", "oja");
-        record.setStage(SpyLib.ON_SUBMIT);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_SUBMIT));
+        record.put(".STAGE", SpyLib.ON_SUBMIT);
 
         collector.process(record);
 
@@ -112,11 +122,13 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         JmxAttrCollector collector = new JmxAttrCollector("test", "test:name=${shortClassName}", "${methodName}", "C0", "C1");
         SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
 
-        SpyRecord record = new SpyRecord(ctx);
-        record.feed(ON_RETURN, new Object[]{});  // Mark proper return from method
+        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << ON_RETURN));
+        record.put(".STAGE", ON_RETURN);
         record.put("C0", BucketAggregate.SEC);
         record.put("C1", BucketAggregate.SEC/2);
-        record.setStage(SpyLib.ON_SUBMIT);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_SUBMIT));
+        record.put(".STAGE", SpyLib.ON_SUBMIT);
         collector.process(record);
 
         assertEquals(1L, getAttr("test", "test:name=TClass", "testMethod_calls"));
@@ -134,12 +146,14 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         JmxAttrCollector collector = new JmxAttrCollector("test", "test:name=${shortClassName}", "${methodName}", "C0", "C1");
         SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
 
-        SpyRecord record = new SpyRecord(ctx);
-        record.feed(ON_ERROR, new Object[]{});  // Mark proper return from method
+        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << ON_ERROR));
+        record.put(".STAGE", ON_ERROR);
 
         record.put("C0", BucketAggregate.SEC);
         record.put("C1", BucketAggregate.SEC/2);
-        record.setStage(SpyLib.ON_SUBMIT);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_SUBMIT));
+        record.put(".STAGE", SpyLib.ON_SUBMIT);
         collector.process(record);
 
         assertEquals(1L, getAttr("test", "test:name=TClass", "testMethod_calls"));
