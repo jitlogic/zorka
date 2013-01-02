@@ -30,7 +30,9 @@ public class RateAggregate {
 	private static class Sample {
 		private final long nom, div, time;
 		public Sample(long nom, long div, long time) {
-			this.nom = nom; this.div = div; this.time = time;
+			this.nom = nom;
+            this.div = div;
+            this.time = time;
 		}
 	}
 

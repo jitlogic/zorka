@@ -74,7 +74,8 @@ public class SnmpCollector implements SpyProcessor {
         try {
             this.trapper = trapper;
             this.oprefix = oprefix;
-            this.gtrap = gtrap; this.strap = strap;
+            this.gtrap = gtrap;
+            this.strap = strap;
             this.varBindDefs = ZorkaUtil.copyArray(varBindDefs);
             this.oid = new SNMPObjectIdentifier(oid);
         } catch (Exception e) {

@@ -163,8 +163,11 @@ public class ObjectDumper {
 			if (cm != null && cm.equals(OMIT)) { continue; }
 			name = name.startsWith("get") ? name.substring(3) : name.substring(2);
 			name = name.substring(0,1).toLowerCase() + name.substring(1);
-			sb.append(lead); sb.append(name); sb.append(" : "); 
-			sb.append(m.getReturnType().getName()); sb.append(" = ");
+			sb.append(lead);
+            sb.append(name);
+            sb.append(" : ");
+			sb.append(m.getReturnType().getName());
+            sb.append(" = ");
 			try {
 				Object o = m.invoke(obj);
 				dump(lead + LEAD, o, sb, depth + 1);
@@ -214,7 +217,9 @@ public class ObjectDumper {
 		for (Object o : type.keySet()) {
 			String name = o.toString();
 			Object value = data.get(name);
-			sb.append(lead); sb.append(name); sb.append(" : ");
+			sb.append(lead);
+            sb.append(name);
+            sb.append(" : ");
 			if (value != null) {
 				sb.append(value.getClass().getName());
 				sb.append(" = ");
@@ -245,8 +250,11 @@ public class ObjectDumper {
                 if (o == null) { continue; }
                 Method m2 = o.getClass().getMethod("getName");
                 String name = (String)m2.invoke(obj);
-                sb.append(lead); sb.append(name); sb.append(" : ");
-                sb.append(o.getClass().getName()); sb.append(" = ");
+                sb.append(lead);
+                sb.append(name);
+                sb.append(" : ");
+                sb.append(o.getClass().getName());
+                sb.append(" = ");
                 dump(lead + LEAD, o, sb, depth + 1);
             }
         } catch (Exception e) {
@@ -270,8 +278,11 @@ public class ObjectDumper {
 		ZorkaStats stats = (ZorkaStats)obj;
 		for (String sn : stats.getStatisticNames()) {
             ZorkaStat s = stats.getStatistic(sn);
-			sb.append(lead); sb.append(s.getName()); sb.append(" : ");
-			sb.append(s.getClass().getName()); sb.append(" = ");
+			sb.append(lead);
+            sb.append(s.getName());
+            sb.append(" : ");
+			sb.append(s.getClass().getName());
+            sb.append(" = ");
 			dump(lead + LEAD, s, sb, depth + 1);
 		}
 	}
@@ -345,8 +356,11 @@ public class ObjectDumper {
 			for (MBeanAttributeInfo mbi : mi.getAttributes()) {
 				try {
 					Object o = jmx.getConn().getAttribute(jmx.getName(), mbi.getName());
-					sb.append(lead); sb.append(mbi.getName()); sb.append(" : ");
-					sb.append(mbi.getType()); sb.append(" = ");
+					sb.append(lead);
+                    sb.append(mbi.getName());
+                    sb.append(" : ");
+					sb.append(mbi.getType());
+                    sb.append(" = ");
 					if (o != obj) {
 						dump(lead + LEAD, o, sb, depth + 1);
 					} else {

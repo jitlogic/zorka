@@ -143,14 +143,14 @@ public abstract class Lexer implements Iterable<Token>, Iterator<Token> {
     /** Lexer tab */
     private byte[][] lextab;
 
+    /** Current position */
+    private int pos = 0;
 
-    /** Current position and state */
-    private int pos = 0, state = S_START;
-
+    /** Current state */
+    private int state = S_START;
 
     /** Input string */
     private String input;
-
 
     /** State-to-token-types map */
     private int[] tokenTypes;

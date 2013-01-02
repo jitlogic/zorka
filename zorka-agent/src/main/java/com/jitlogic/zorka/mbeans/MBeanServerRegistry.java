@@ -52,7 +52,11 @@ public class MBeanServerRegistry {
         public final Object obj;
         /** Standard constructor */
         public DeferredRegistration(String name, String bean, String attr, Object obj, String desc) {
-            this.name = name; this.bean = bean; this.attr = attr; this.obj = obj; this.desc = desc;
+            this.name = name;
+            this.bean = bean;
+            this.attr = attr;
+            this.obj = obj;
+            this.desc = desc;
         }
     }
 

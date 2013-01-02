@@ -120,22 +120,23 @@ public class ZabbixLib {
                         if (attr != null && attr.toString().matches(pathItem.substring(1))) {
                             Object obj = ObjectInspector.get(srcObj, attr);
                             if (obj != null) {
-                                JSONObject dsr = pathAttr == null ? dstObj
-                                        : extend(dstObj, pathAttr, attr.toString());
-                                odst.add(obj); ddst.add(dsr);
+                                JSONObject dsr = pathAttr == null ? dstObj : extend(dstObj, pathAttr, attr.toString());
+                                odst.add(obj);
+                                ddst.add(dsr);
                             }
                         }
                     }
                 } else {
                     Object obj = ObjectInspector.get(srcObj, pathItem);
                     if (obj != null) {
-                        JSONObject dsr = pathAttr == null ? dstObj
-                            : extend(dstObj, pathAttr, pathItem);
-                        odst.add(obj); ddst.add(dsr);
+                        JSONObject dsr = pathAttr == null ? dstObj : extend(dstObj, pathAttr, pathItem);
+                        odst.add(obj);
+                        ddst.add(dsr);
                     }
                 } //
             } // for (int oidx = 0 ...
-            osrc = odst; dsrc = ddst;
+            osrc = odst;
+            dsrc = ddst;
         } // for (int pidx = 0 ...
 
         JSONObject discoveries = new JSONObject();

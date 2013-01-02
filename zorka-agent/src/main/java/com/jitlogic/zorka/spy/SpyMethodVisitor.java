@@ -80,8 +80,14 @@ public class SpyMethodVisitor extends MethodVisitor {
     /** How many elements have to be added to JVM stack by instrumented code. Used in visitMaxs() method. */
     private int stackDelta = 0;
 
-    /** Labels used for enclosing method code into try..finally block to intercept thrown exceptions. */
-    private final Label lTryFrom = new Label(), lTryTo = new Label(), lTryHandler = new Label();
+    /** Label used for enclosing method code into try..finally block to intercept thrown exceptions. */
+    private final Label lTryFrom = new Label();
+
+    /** Label used for enclosing method code into try..finally block to intercept thrown exceptions. */
+    private final Label lTryTo = new Label();
+
+    /** Label used for enclosing method code into try..finally block to intercept thrown exceptions. */
+    private final Label lTryHandler = new Label();
 
     /** Boolean flag used when method annotation matching is required */
     private boolean matches;

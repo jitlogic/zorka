@@ -54,7 +54,8 @@ public class GetterProcessor implements SpyProcessor {
      * @param attrChain attribute chain
      */
     public GetterProcessor(String srcField, String dstField, Object... attrChain) {
-        this.srcField = srcField; this.dstField = dstField;
+        this.srcField = srcField;
+        this.dstField = dstField;
         this.attrChain = attrChain;
     }
 

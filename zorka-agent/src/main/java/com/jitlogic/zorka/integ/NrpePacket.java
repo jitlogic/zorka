@@ -61,8 +61,10 @@ public class NrpePacket {
     public static NrpePacket newInstance(int version, int type, int resultCode, String data) {
         NrpePacket pkt = new NrpePacket();
 
-        pkt.version = version; pkt.type = type;
-        pkt.resultCode = resultCode; pkt.data = data;
+        pkt.version = version;
+        pkt.type = type;
+        pkt.resultCode = resultCode;
+        pkt.data = data;
 
         return pkt;
     }
@@ -101,14 +103,17 @@ public class NrpePacket {
 
         // Extract packet header
         ByteBuffer bb = ByteBuffer.wrap(buf).order(ByteOrder.BIG_ENDIAN);
-        version = bb.getShort(); type = bb.getShort();
-        byte[] crcBuf = new byte[8]; bb.get(crcBuf, 4, 4);
+        version = bb.getShort();
+        type = bb.getShort();
+        byte[] crcBuf = new byte[8];
+        bb.get(crcBuf, 4, 4);
         long origCrc = ByteBuffer.wrap(crcBuf).order(ByteOrder.BIG_ENDIAN).getLong();
         resultCode = bb.getShort();
 
         System.arraycopy(crcBuf, 0, buf, 4, 4);
 
-        CRC32 crc = new CRC32(); crc.update(buf, 0, len);
+        CRC32 crc = new CRC32();
+        crc.update(buf, 0, len);
 
         if (crc.getValue() != origCrc) {
             throw new IOException("CRC error in received NRPE packet.");

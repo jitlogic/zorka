@@ -97,7 +97,8 @@ public class AvgRateCounter {
         StringBuilder sb = new StringBuilder(128);
 
         for (Object s : path) {
-            sb.append(s); sb.append("::");
+            sb.append(s);
+            sb.append("::");
         }
 
         sb.append(nomAttr);

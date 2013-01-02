@@ -62,7 +62,8 @@ public class MethodCallingProcessor implements SpyProcessor {
      * @param args argument types
      */
     public MethodCallingProcessor(String src, String dst, String methodName, Object... args) {
-        this.src = src; this.dst = dst;
+        this.src = src;
+        this.dst = dst;
         this.methodName = methodName;
         this.args = args;
 

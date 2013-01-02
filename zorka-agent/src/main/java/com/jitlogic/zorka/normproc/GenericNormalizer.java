@@ -27,7 +27,8 @@ import static com.jitlogic.zorka.normproc.XqlLexer.*;
 public class GenericNormalizer implements Normalizer {
 
     private static final String PHD = "?";
-    private static final boolean T = true, F = false;
+    private static final boolean T = true;
+    private static final boolean F = false;
 
     /** SQL/HQL token concatenation rules */
     private static final boolean[][] XQLJOINTS = {
