@@ -28,15 +28,22 @@ import java.util.Stack;
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
 /**
+ * Dispatching submitter receives submissions from probes, groups them (if needed) and sends through proper processing
+ * chains defined in associated sdefs.
  *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class DispatchingSubmitter implements SpySubmitter {
 
+    /** Logger */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private SpyClassTransformer engine;
-    private SpyProcessor collector;
+    /** Spy class transformer */
+    private SpyClassTransformer transformer;
 
+    /**
+     * Submission stack is used to associate results from method entry probes with results from return/error probes.
+     */
     private ThreadLocal<Stack<Map<String,Object>>> submissionStack =
         new ThreadLocal<Stack<Map<String,Object>>>() {
             @Override
@@ -46,19 +53,25 @@ public class DispatchingSubmitter implements SpySubmitter {
         };
 
 
-    public DispatchingSubmitter(SpyClassTransformer engine, SpyProcessor collector) {
-        this.engine = engine;
-        this.collector = collector;
+    /**
+     * Creates dispatching submitter.
+     *
+     * @param transformer class file transformer containing defined spy contexts
+     *                    // TODO move spy context map out of class file transformer
+     */
+    public DispatchingSubmitter(SpyClassTransformer transformer) {
+        this.transformer = transformer;
     }
 
 
+    @Override
     public void submit(int stage, int id, int submitFlags, Object[] vals) {
 
         if (SpyInstance.isDebugEnabled(SPD_SUBMISSIONS)) {
             log.debug("Submitted: stage=" + stage + ", id=" + id + ", flags=" + submitFlags);
         }
 
-        SpyContext ctx = engine.getContext(id);
+        SpyContext ctx = transformer.getContext(id);
 
         if (ctx == null) {
             return;
@@ -85,6 +98,20 @@ public class DispatchingSubmitter implements SpySubmitter {
     }
 
 
+    /**
+     * Retrieves or creates spy record for probe submission purposes.
+     *
+     * @param stage method bytecode point where probe has been installed (entry, return, error)
+     *
+     * @param ctx spy context associated with submitting probe
+     *
+     * @param submitFlags controls whether SUBMIT chain should be immediately processed or record should be
+     *                    stored in thread local stack (and wait for another probe submission)
+     *
+     * @param vals submitted values
+     *
+     * @return spy record
+     */
     private Map<String,Object> getRecord(int stage, SpyContext ctx, int submitFlags, Object[] vals) {
 
         Map<String,Object> record = null;
@@ -102,7 +129,8 @@ public class DispatchingSubmitter implements SpySubmitter {
                 } // TODO warn if there was no record on stack
         }
 
-        List<SpyProbe> probes = ((SpyContext)record.get(".CTX")).getSpyDefinition().getProbes(stage);
+        SpyContext context =((SpyContext)record.get(".CTX"));
+        List<SpyProbe> probes = context.getSpyDefinition().getProbes(stage);
 
         // TODO check if vals.length == probes.size() and log something here ...
 
@@ -117,6 +145,18 @@ public class DispatchingSubmitter implements SpySubmitter {
         return record;
     }
 
+
+    /**
+     * Processes specified processing chain of sdef in record
+     *
+     * @param stage chain ID
+     *
+     * @param sdef spy definition with configured processing chains
+     *
+     * @param record spy record (input)
+     *
+     * @return spy record (output) or null if record should not be further processed
+     */
     private Map<String,Object> process(int stage, SpyDefinition sdef, Map<String,Object> record) {
         List<SpyProcessor> processors = sdef.getProcessors(stage);
 
@@ -141,22 +181,4 @@ public class DispatchingSubmitter implements SpySubmitter {
         return record;
     }
 
-    public void setCollector(AsyncQueueCollector collector) {
-        if (collector != null) {
-            collector.stop();
-        }
-        this.collector = collector;
-    }
-
-    public void start() {
-        if (collector instanceof AsyncQueueCollector) {
-            ((AsyncQueueCollector)collector).start();
-        }
-    }
-
-    public void stop() {
-        if (collector instanceof AsyncQueueCollector) {
-            ((AsyncQueueCollector)collector).stop();
-        }
-    }
 }

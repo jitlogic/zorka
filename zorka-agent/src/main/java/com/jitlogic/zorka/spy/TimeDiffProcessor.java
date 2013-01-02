@@ -18,15 +18,37 @@ package com.jitlogic.zorka.spy;
 
 import java.util.Map;
 
+/**
+ * Calculates time difference between time stamps
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class TimeDiffProcessor implements SpyProcessor {
 
-    private String tstart, tstop, rslt;
+    /** Field containing start timestamp */
+    private String tstart;
 
+    /** Field containing stop timestamp */
+    private String tstop;
+
+    /** Field containing result timestamp */
+    private String rslt;
+
+    /**
+     * Creates time difference calculating processor
+     *
+     * @param tstart start timestamp field
+     *
+     * @param tstop stop timestamp field
+     *
+     * @param rslt result field
+     */
     public TimeDiffProcessor(String tstart, String tstop, String rslt) {
-        this.tstart = tstart; this.tstop = tstop;
+        this.tstart = tstart; this.tstop = tstop; //this.rslt = rslt;  TODO first write unit test exposing this bug
     }
 
 
+    @Override
     public Map<String,Object> process(Map<String,Object> record) {
         Object  v1 = record.get(tstart),
                 v2 = record.get(tstop);
@@ -39,19 +61,4 @@ public class TimeDiffProcessor implements SpyProcessor {
         return record;
     }
 
-    // TODO get rid of this
-
-    public String getStartSlot() {
-        return tstart;
-    }
-
-
-    public String getStopSlot() {
-        return tstop;
-    }
-
-
-    public String getResultSlot() {
-        return rslt;
-    }
 }

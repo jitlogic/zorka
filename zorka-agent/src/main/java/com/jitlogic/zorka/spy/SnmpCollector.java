@@ -91,7 +91,7 @@ public class SnmpCollector implements SpyProcessor {
             for (int i = 0; i < vars.length; i++) {
                 TrapVarBindDef vbd = varBindDefs[i];
                 SNMPObjectIdentifier oid = new SNMPObjectIdentifier(oprefix + "." + vbd.getOidSuffix());
-                SNMPObject val = SnmpLib.val(vbd.getType(), record.get(vbd.getSlot()));
+                SNMPObject val = SnmpLib.val(vbd.getSnmpDataType(), record.get(vbd.getSourceField()));
                 val = val != null ? val : new SNMPNull();
                 vars[i] = new SNMPVariablePair(oid, val);
             }

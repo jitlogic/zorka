@@ -40,9 +40,6 @@ import java.util.Properties;
  */
 public class ZorkaConfig {
 
-    /** Logger */
-    private final static ZorkaLog log = ZorkaLogger.getLog(ZorkaConfig.class);
-
     /** Configuration properties */
     private static Properties properties = null;
 
@@ -129,13 +126,11 @@ public class ZorkaConfig {
             props.load(is);
             is.close();
         } catch (IOException e) {
-            log.error("Error loading default properties", e);
         } finally {
             if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    log.error("Error closing default properties file", e);
                 }
                 is = null;
             }
@@ -157,13 +152,11 @@ public class ZorkaConfig {
 			is = new FileInputStream(getHomeDir("zorka.properties"));
 			properties.load(is);
 		} catch (IOException e) {
-			log.error("Error loading zorka.properties");
 		} finally {
 			if (is != null)
 				try {
 					is.close();
 				} catch (IOException e) {
-                    log.error("Error closing zorka.properties file", e);
                 }
 		}
 

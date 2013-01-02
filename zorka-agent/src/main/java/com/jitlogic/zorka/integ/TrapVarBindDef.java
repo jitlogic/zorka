@@ -15,29 +15,64 @@
  */
 package com.jitlogic.zorka.integ;
 
+/**
+ * Contains information used to bind record fields to SNMP trap attributes.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class TrapVarBindDef {
-    private int type;
+
+    /** SNMP data snmpDataType */
+    private int snmpDataType;
+
+    /** OID suffix */
     private String oidSuffix;
-    private String src;
+
+    /** Source field name */
+    private String sourceField;
 
 
-    public TrapVarBindDef(String src, int type, String oidSuffix) {
-        this.type = type;
-        this.src = src;
+    /**
+     * Creates record attribute to snmp trap attribute binding.
+     *
+     * @param sourceField source field
+     *
+     * @param snmpDataType SNMP data snmpDataType
+     *
+     * @param oidSuffix OID suffix
+     */
+    public TrapVarBindDef(String sourceField, int snmpDataType, String oidSuffix) {
+        this.snmpDataType = snmpDataType;
+        this.sourceField = sourceField;
         this.oidSuffix = oidSuffix;
     }
 
 
-    public int getType() {
-        return type;
+    /**
+     * Returns SNMP data snmpDataType
+     *
+     * @return SNMP data snmpDataType
+     */
+    public int getSnmpDataType() {
+        return snmpDataType;
     }
 
 
-    public String getSlot() {
-        return src;
+    /**
+     * Returns source field name
+     *
+     * @return source field name
+     */
+    public String getSourceField() {
+        return sourceField;
     }
 
 
+    /**
+     * Returns OID suffix.
+     *
+     * @return OID suffix
+     */
     public String getOidSuffix() {
         return oidSuffix;
     }

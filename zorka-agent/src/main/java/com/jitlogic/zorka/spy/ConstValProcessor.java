@@ -17,16 +17,33 @@ package com.jitlogic.zorka.spy;
 
 import java.util.Map;
 
-public class ConstPutProcessor implements SpyProcessor {
+/**
+ * Inserts constant to specified record field.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
+public class ConstValProcessor implements SpyProcessor {
 
+    /** Destination field */
     private String dst;
+
+    /** Value be put into destination field */
     private Object val;
 
-    public ConstPutProcessor(String dst, Object val) {
+    /**
+     * Creates constant value processor
+     *
+     * @param dst destination field
+     *
+     * @param val value to put into destination field
+     */
+    public ConstValProcessor(String dst, Object val) {
         this.dst = dst;
         this.val = val;
     }
 
+
+    @Override
     public Map<String,Object> process(Map<String,Object> record) {
         record.put(dst, val);
         return record;

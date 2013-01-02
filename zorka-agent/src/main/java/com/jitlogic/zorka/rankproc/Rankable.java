@@ -16,19 +16,53 @@
 package com.jitlogic.zorka.rankproc;
 
 /**
+ * Interface implemented by all wrappers used to present various types of data in rank lists.
  *
- * @param <T>
+ * @param <T> wrapped type
  */
 public interface Rankable<T> {
 
+    /**
+     * Returns given average of given metric at given time.
+     *
+     * @param tstamp current time
+     *
+     * @param metric metric index
+     *
+     * @param average average index
+     *
+     * @return average value
+     */
     public double getAverage(long tstamp, int metric, int average);
 
+    /**
+     * Lists all metrics by name. Indexes of metrics in returned array can be used in all
+     * methods requesting integer argument that identifies metric.
+     *
+     * @return metrics tracked by item
+     */
     public String[] getMetrics();
 
+    /**
+     * Returns all averages tracked by item. Indexes of averages in returned array can be used in all
+     * methods requesting integer argument that identifies metfic.
+     *
+     * @return averages tracked by item
+     */
     public String[] getAverages();
 
+    /**
+     * Returns reference to wrapped object
+     *
+     * @return reference to wrapped object
+     */
     public T getWrapped();
 
+    /**
+     * Returns visible item name.
+     *
+     * @return item name
+     */
     public String getName();
 
 }

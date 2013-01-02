@@ -84,7 +84,6 @@ public class SpyInstance {
      */
     public static synchronized void cleanup() {
         MainSubmitter.setSubmitter(null);
-        instance.stop();
         instance = null;
     }
 
@@ -108,7 +107,7 @@ public class SpyInstance {
      */
     public SpyInstance(Properties props) {
         classTransformer = new SpyClassTransformer();
-        submitter = new DispatchingSubmitter(classTransformer, new AsyncQueueCollector());
+        submitter = new DispatchingSubmitter(classTransformer);
     }
 
 
@@ -119,24 +118,6 @@ public class SpyInstance {
      */
     public void add(SpyDefinition sdef) {
         classTransformer.add(sdef);
-    }
-
-
-    /**
-     * Starts instance.
-     */
-    public void start() {
-        submitter.start();
-    }
-
-
-    /**
-     * Stops instance.
-     */
-    public void stop() {
-        if (submitter != null) {
-            submitter.stop();
-        }
     }
 
 

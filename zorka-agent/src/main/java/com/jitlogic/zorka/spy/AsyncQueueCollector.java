@@ -22,6 +22,7 @@ import com.jitlogic.zorka.util.ZorkaUtil;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static com.jitlogic.zorka.spy.SpyLib.SPD_CDISPATCHES;
 
@@ -44,8 +45,8 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
     /** Record processing thread will run as long as this attribute value is true */
     private volatile boolean running;
 
-
-    private volatile long submittedRecords, droppedRecords;
+    private AtomicLong submittedRecords, droppedRecords;
+    //private volatile long submittedRecords, droppedRecords;
 
     /** Processing queue */
     private LinkedBlockingQueue<Map<String,Object>> procQueue = new LinkedBlockingQueue<Map<String,Object>>(1024);
@@ -60,6 +61,8 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
      */
     public AsyncQueueCollector(String... attrs) {
         this.attrs = ZorkaUtil.copyArray(attrs);
+        this.submittedRecords = new AtomicLong(0);
+        this.droppedRecords = new AtomicLong(0);
     }
 
     @Override
@@ -88,9 +91,9 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
 
         synchronized(this) {
             if (submitted) {
-                submittedRecords++;
+                submittedRecords.incrementAndGet();
             } else {
-                droppedRecords++;
+                droppedRecords.incrementAndGet();
             }
         }
 
@@ -158,4 +161,21 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
         }
     }
 
+    /**
+     * Returns number of successfully submitted records.
+     *
+     * @return number of submitted records
+     */
+    public long getSubmittedRecords() {
+        return submittedRecords.longValue();
+    }
+
+    /**
+     * Returns number of records dropped due to queue overflow.
+     *
+     * @return number of dropped records
+     */
+    public long getDroppedRecords() {
+        return droppedRecords.longValue();
+    }
 }

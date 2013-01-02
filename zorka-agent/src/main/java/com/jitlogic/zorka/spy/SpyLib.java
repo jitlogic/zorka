@@ -119,7 +119,11 @@ public class SpyLib {
 
     private SpyInstance instance;
 
-
+    /**
+     * Creates spy library object
+     *
+     * @param instance spy instance
+     */
 	public SpyLib(SpyInstance instance) {
         this.instance = instance;
 	}
@@ -149,6 +153,11 @@ public class SpyLib {
     }
 
 
+    /**
+     * Returns partially configured time-measuring spy def
+     *
+     * @return partially configured psy def
+     */
     public SpyDefinition instrument() {
         return SpyDefinition.instrument().onSubmit(tdiff("T1", "T2", "T")).onEnter();
     }
@@ -205,9 +214,9 @@ public class SpyLib {
     /**
      * Creates new matcher object that will match classes by annotation.
      *
-     * @param annotationName
+     * @param annotationName class annotation pattern
      *
-     * @return
+     * @return spy matcher object
      */
     public SpyMatcher byClassAnnotation(String annotationName) {
         return new SpyMatcher(SpyMatcher.CLASS_ANNOTATION, 1,
@@ -217,11 +226,11 @@ public class SpyLib {
     /**
      * Creates new matcher object that will match methods by class annotation and method name.
      *
-     * @param annotationName
+     * @param annotationName class annotation pattern
      *
-     * @param methodPattern
+     * @param methodPattern method name pattern
      *
-     * @return
+     * @return spy matcher object
      */
     public SpyMatcher byClassAnnotation(String annotationName, String methodPattern) {
         return new SpyMatcher(SpyMatcher.CLASS_ANNOTATION, 1,
@@ -229,13 +238,30 @@ public class SpyLib {
     }
 
 
-
+    /**
+     * Creates new matcher that will match methods by method annotation.
+     *
+     * @param classPattern class name pattern
+     *
+     * @param methodAnnotation method annotation patten
+     *
+     * @return spy matcher object
+     */
     public SpyMatcher byMethodAnnotation(String classPattern, String methodAnnotation) {
         return new SpyMatcher(SpyMatcher.METHOD_ANNOTATION, 1,
                 classPattern, "L" + methodAnnotation + ";", null);
     }
 
 
+    /**
+     * Creates new matcher that will match methods by class and method annotations
+     *
+     * @param classAnnotation class annotation pattern
+     *
+     * @param methodAnnotation method annotation pattern
+     *
+     * @return spy matcher object
+     */
     public SpyMatcher byClassMethodAnnotation(String classAnnotation, String methodAnnotation) {
         return new SpyMatcher(SpyMatcher.CLASS_ANNOTATION|SpyMatcher.METHOD_ANNOTATION, 1,
                 "L" + classAnnotation + ";", "L" + methodAnnotation + ";", null);
@@ -419,17 +445,15 @@ public class SpyLib {
 
 
     /**
-     * Creates chained collector. It sends collected records to another SpyDefinition chain. Records will be processed
-     * by all processors from ON_SUBMIT chain and sent to collectors attached to it.
+     * Creates asynchronous queuing collector
      *
-     * @param sdef new sdef that will perform furhter protessing
+     * @param attrs attributes to retain
      *
-     * @return chained collector
+     * @return asynchronous queued collector
      */
-    public SpyProcessor sdefCollector(SpyDefinition sdef) {
-        return new DispatchingCollector(sdef);
+    public SpyProcessor asyncQueueCollector(String...attrs) {
+        return new AsyncQueueCollector(attrs);
     }
-
 
     /**
      * Creates SNMP collector object. It sends collected records as SNMP traps using SNMP trapper.
@@ -612,7 +636,7 @@ public class SpyLib {
      * @return constant value processor object
      */
     public SpyProcessor put(String dst, Object val) {
-        return new ConstPutProcessor(dst, val);
+        return new ConstValProcessor(dst, val);
     }
 
 

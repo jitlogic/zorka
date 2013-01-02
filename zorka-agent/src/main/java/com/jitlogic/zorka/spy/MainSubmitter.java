@@ -19,27 +19,63 @@ package com.jitlogic.zorka.spy;
 
 import bsh.EvalError;
 
+import java.util.concurrent.atomic.AtomicLong;
+
+/**
+ * Main submitter contains static methods that can be called directly by
+ * instrumentation probes. It forwards requests to actual submitter that
+ * can be configured using setSubmitter() method.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class MainSubmitter {
 
+    /** Submitter receiving actual submissions */
     private static SpySubmitter submitter = null;
-    private static volatile long errorCount = 0;
 
+    /** Error counter */
+    private static AtomicLong errorCount = new AtomicLong(0);
+
+    /**
+     * This method is called by spy probes.
+     *
+     * @param stage entry, return point or error handling point of spy probe
+     *
+     * @param id spy context ID
+     *
+     * @param submitFlags submit flags
+     *
+     * @param vals values fetched by probe
+     */
     public static void submit(int stage, int id, int submitFlags, Object[] vals) {
         try {
             if (submitter != null) {
                 submitter.submit(stage, id, submitFlags, vals);
             }
+        } catch (EvalError e) {
+            errorCount.incrementAndGet();
         } catch (Exception e) {
-            errorCount++;
+            errorCount.incrementAndGet();
         }
     }
 
+    /**
+     * Sets backing spy submitter
+     *
+     * @param submitter spy submitter
+     */
     public static void setSubmitter(SpySubmitter submitter) {
         MainSubmitter.submitter = submitter;
     }
 
+
+    /**
+     * Returns error count.
+     *
+     * @return error count
+     */
     public static long getErrorCount() {
-        return errorCount;
+        return errorCount.longValue();
     }
 
 }

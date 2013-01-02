@@ -19,16 +19,34 @@ package com.jitlogic.zorka.mbeans;
 
 import com.jitlogic.zorka.util.ObjectInspector;
 
+/**
+ * Variant of AttrGetter that recursively fetches attribute from an object.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class AttrGetter implements ValGetter {
 
+    /** This object attribute will be presented. */
 	private Object obj;
+
+    /** Attribute chain */
 	private Object[] attrs;
 
+
+    /**
+     * Creates value getter.
+     *
+     * @param obj object
+     *
+     * @param attrs attribute chain
+     */
 	public AttrGetter(Object obj, Object...attrs) {
 		this.obj = obj;
 		this.attrs = attrs;
 	}
-	
+
+
+    @Override
 	public Object get() {
 		return ObjectInspector.get(obj, attrs);
 	}

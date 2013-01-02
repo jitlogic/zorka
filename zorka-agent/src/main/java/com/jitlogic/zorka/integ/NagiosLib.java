@@ -16,38 +16,44 @@
 
 package com.jitlogic.zorka.integ;
 
-import com.jitlogic.zorka.integ.NrpePacket;
-
 import java.util.Date;
 
+/**
+ * Nagios library functions.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class NagiosLib {
 
+    /** OK status */
+    public static final int OK = 0;
 
+    /** WARNING status */
+    public static final int WARN = 1;
+
+    /** ERROR status */
+    public static final int ERROR = 2;
+
+    /** UNKNOWN status */
+    public static final int UNKNOWN = 3;
+
+    /**
+     * Creates reply packet.
+     *
+     * @param resultCode result code
+     *
+     * @param title title
+     *
+     * @param format message template
+     *
+     * @param vals values used to fill template placeholders
+     *
+     * @return NRPE packet object
+     */
     private NrpePacket reply(int resultCode, String title, String format, Object... vals) {
         String msg = "" + title + new Date() + "|" + String.format(format, vals);
         NrpePacket reply = NrpePacket.newInstance(2, NrpePacket.RESPONSE_PACKET, resultCode, msg);
         return reply;
     }
-
-
-    public NrpePacket ok(String title, String format, Object...vals) {
-        return reply(0, title, format, vals);
-    }
-
-
-    public NrpePacket warn(String title, String format, Object...vals) {
-        return reply(1, title, format, vals);
-    }
-
-
-    public NrpePacket error(String title, String format, Object...vals) {
-        return reply(2, title, format, vals);
-    }
-
-
-    public NrpePacket unknown(String title, String format, Object...vals) {
-        return reply(3, title, format, vals);
-    }
-
 
 }

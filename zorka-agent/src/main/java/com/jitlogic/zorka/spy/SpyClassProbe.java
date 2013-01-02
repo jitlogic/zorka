@@ -17,15 +17,30 @@ package com.jitlogic.zorka.spy;
 
 import org.objectweb.asm.Type;
 
+/**
+ * Fetches class in context of instrumented method called by application itself.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class SpyClassProbe extends SpyProbe {
 
+    /** Class name */
     private String className;
 
-    public SpyClassProbe(String className, String dstKey) {
-        super(dstKey);
+    /**
+     * Creates spy class probe
+     *
+     * @param className class name
+     *
+     * @param dstField destination field
+     */
+    public SpyClassProbe(String className, String dstField) {
+        super(dstField);
         this.className = className;
     }
 
+
+    @Override
     public int emit(SpyMethodVisitor mv, int stage, int opcode) {
         String cn = "L"+this.className.replace(".", "/") + ";";
         mv.visitLdcInsn(Type.getType(cn));

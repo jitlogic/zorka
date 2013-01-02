@@ -74,7 +74,6 @@ public class ZorkaFixture {
 
 
         spyInstance = agentInstance.getSpyInstance();
-        spyInstance.getSubmitter().setCollector(new TestAsyncQueueCollector());
 
         zorkaAgent = agentInstance.getZorkaAgent();
         zorka = zorkaAgent.getZorkaLib();

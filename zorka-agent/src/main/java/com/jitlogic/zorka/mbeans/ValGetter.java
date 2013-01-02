@@ -17,8 +17,18 @@
 
 package com.jitlogic.zorka.mbeans;
 
+/**
+ * Value getter interface. Objects implementing this interface can be registered as
+ * attributes to ZorkaMappedBean objects. When client request attribute value, mbean
+ * will call get() method and return result to client.
+ */
 public interface ValGetter {
-	
+
+    /**
+     * This method is called when JMX client fetches attribute value.
+     *
+     * @return
+     */
 	public Object get();
 	
 }

@@ -37,16 +37,22 @@ public class AvgRateCounter {
     public static final long AVG5  =  5 * 60 * 1000;
     public static final long AVG15 = 15 * 60 * 1000;
 
+    /** Zorka library reference */
     private ZorkaLib zorkaLib;
+
+    /** All maintained aggregates */
     private Map<String,RateAggregate> aggregates;
 
-
+    /**
+     * Creates rate counter
+     * @param zorkaLib
+     */
 	public AvgRateCounter(ZorkaLib zorkaLib) {
         this.zorkaLib = zorkaLib;
 		aggregates = new ConcurrentHashMap<String, RateAggregate>();
 	}
 
-
+    /** Returns calculated average */
     public double get(List<Object> path, String nomAttr, String divAttr, long horizon) {
 
         String tag = makeTag(path, nomAttr, divAttr, horizon);
@@ -69,7 +75,7 @@ public class AvgRateCounter {
         }
     }
 
-
+    /** Coerces values */
     public long coerce(Object val) {
         if (val instanceof Long) {
             return (Long)val;
@@ -86,7 +92,7 @@ public class AvgRateCounter {
         }
     }
 
-
+    /** Generates identifier for aggregates map */
     private String makeTag(List<Object> path, String nomAttr, String divAttr, long horizon) {
         StringBuilder sb = new StringBuilder(128);
 
@@ -104,6 +110,7 @@ public class AvgRateCounter {
     }
 
 
+    /** Creates a list of strings */
     public List<Object> list(Object...strings) {
         List<Object> lst = new ArrayList<Object>(strings.length+2);
         for (Object s : strings) {

@@ -29,22 +29,52 @@ import static com.jitlogic.zorka.spy.SpyLib.SPD_ARGPROC;
 
 /**
  * Filters records using regular expressions.
+ *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class RegexFilterProcessor implements SpyProcessor {
 
+    /** Logger */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    private String src, dst;
+    /** Source field */
+    private String src;
+
+    /** Destination field */
+    private String dst;
+
+    /** Regular expression */
     private Pattern regex;
-    private String expr = null, defval = null;
+
+    /** Substitution expression */
+    private String expr = null;
+
+    /** Default value */
+    private String defval = null;
+
+    /** Inverse filter flag */
     private Boolean filterOut;
 
-
+    /**
+     * Creates regex filter that filters records based on supplied regular expression.
+     *
+     * @param src source field
+     *
+     * @param regex regular expression
+     */
     public RegexFilterProcessor(String src, String regex) {
         this(src, regex, false);
     }
 
-
+    /**
+     * Creates regex filter that filters records based on supplied regular expression.
+     *
+     * @param src source field
+     *
+     * @param regex filter regular expression
+     *
+     * @param filterOut inverse filtering if true
+     */
     public RegexFilterProcessor(String src, String regex, Boolean filterOut) {
         this.src = src;
         this.regex = Pattern.compile(regex);
@@ -52,6 +82,19 @@ public class RegexFilterProcessor implements SpyProcessor {
     }
 
 
+    /**
+     * Creates regex filter that transforms records based on supplied regular expression.
+     *
+     * @param src source field
+     *
+     * @param dst destination field
+     *
+     * @param regex filter regular expression
+     *
+     * @param expr substitution regular expression (with ${n} marking matches from filter expression)
+     *
+     * @param filterOut inverse filtering if true
+     */
     public RegexFilterProcessor(String src, String dst, String regex, String expr, Boolean filterOut) {
         this(src, regex, filterOut);
         this.dst = dst;
@@ -59,12 +102,26 @@ public class RegexFilterProcessor implements SpyProcessor {
     }
 
 
+    /**
+     * Creates regex filter that transforms records based on supplied regular expression.
+     *
+     * @param src source field
+     *
+     * @param dst destination field
+     *
+     * @param regex filter regular expression
+     *
+     * @param expr substitution regular expression (with ${n} marking matches from filter expression)
+     *
+     * @param defval default value
+     */
     public RegexFilterProcessor(String src, String dst, String regex, String expr, String defval) {
         this(src, dst, regex, expr, (Boolean)null);
         this.defval = defval;
     }
 
 
+    @Override
     public Map<String,Object> process(Map<String,Object> record) {
         Object val = record.get(src);
 
