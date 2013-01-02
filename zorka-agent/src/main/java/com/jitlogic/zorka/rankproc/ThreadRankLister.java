@@ -39,25 +39,13 @@ public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
     /** Map of tracked threads. */
     private Map<Long,ThreadRankItem> threads = new HashMap<Long, ThreadRankItem>();
 
-    /** Rescan interval */
-    private long interval;
-
     /**
-     * Constructor with default interval.
+     * Creates thread rank lister
      */
     public ThreadRankLister() {
-        this(14000);
-    }
-
-    /**
-     * Constructor with custom interval
-     *
-     * @param interval interval in milliseconds
-     */
-    public ThreadRankLister(long interval) {
-        this.interval = interval;
         this.mBeanServerRegistry = AgentInstance.getMBeanServerRegistry();
     }
+
 
     @Override
     public synchronized List<ThreadRankItem> list() {
@@ -69,6 +57,7 @@ public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
 
         return Collections.unmodifiableList(lst);
     }
+
 
     /**
      * Return current (raw) list of thread info objects wrapped in ThreadRankInfo type.
@@ -103,69 +92,36 @@ public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
      *
      * @param tstamp current time (milliseconds since Epoch)
      */
-    public synchronized void runCycle(long tstamp) {
+    public void runCycle(long tstamp) {
         List<ThreadRankInfo> raw = rawList();
-        int sz = Math.max(raw.size(), threads.size());
+        int sz = Math.max(raw.size(), raw.size());
         Map<Long,ThreadRankItem> newThreads = new HashMap<Long, ThreadRankItem>(sz*2+10, 0.5f);
 
-        for (ThreadRankInfo threadInfo : raw) {
-            if (threadInfo == null) {
-                continue;
+        synchronized (this) {
+            for (ThreadRankInfo threadInfo : raw) {
+                if (threadInfo == null) {
+                    continue;
+                }
+
+                long tid = threadInfo.getId();
+
+                ThreadRankItem threadItem = threads.get(threadInfo.getId());
+                if (threadItem == null) {
+                    threadItem = new ThreadRankItem(threadInfo);
+                }
+
+                threadItem.feed(tstamp, threadInfo);
+                newThreads.put(threadInfo.getId(), threadItem);
             }
 
-            long tid = threadInfo.getId();
-
-            ThreadRankItem threadItem = threads.get(threadInfo.getId());
-            if (threadItem == null) {
-                threadItem = new ThreadRankItem(threadInfo);
-            }
-
-            threadItem.feed(tstamp, threadInfo);
-            newThreads.put(threadInfo.getId(), threadItem);
+            threads = newThreads;
         }
-
-        threads = newThreads;
-
     }
-
-
-    private volatile boolean started = false;
-    private volatile Thread thread = null;
 
 
     @Override
     public void run() {
-        while (started) {
-            runCycle(System.currentTimeMillis());
-            try {
-                Thread.sleep(interval);
-            } catch (InterruptedException e) { }
-
-        }
-
-        thread = null;
-    }
-
-    /**
-     * Starts lister thread.
-     */
-    public synchronized void start() {
-        if (!started) {
-            thread = new Thread(this);
-            thread.setDaemon(true);
-            thread.setName("Zorka-thread-lister");
-            thread.start();
-        }
-    }
-
-    /**
-     * Stops lister thread.
-     */
-    public synchronized void stop() {
-        if (started) {
-            thread.interrupt();
-            started = false;
-        }
+        runCycle(System.currentTimeMillis());
     }
 
 }

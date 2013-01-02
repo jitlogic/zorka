@@ -43,6 +43,8 @@ import com.jitlogic.zorka.util.*;
  */
 public class ZorkaLib  {
 
+    private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaLogger.class);
+
     public static final ZorkaLogLevel TRACE = ZorkaLogLevel.TRACE;
     public static final ZorkaLogLevel DEBUG = ZorkaLogLevel.DEBUG;
     public static final ZorkaLogLevel INFO  = ZorkaLogLevel.INFO;
@@ -53,18 +55,19 @@ public class ZorkaLib  {
     private static final int MINUTE = 60000;
     private static final int SECOND = 1000;
 
-    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
-    private final ZorkaLogger logger = ZorkaLogger.getLogger();
+    private ZorkaLogger logger = ZorkaLogger.getLogger();
 	
-	private final ZorkaBshAgent agent;
-    private final Set<JmxObject> registeredObjects = new HashSet<JmxObject>();
+	private ZorkaBshAgent agent;
+    private Set<JmxObject> registeredObjects = new HashSet<JmxObject>();
 
-    private final MBeanServerRegistry mbsRegistry;
+    private MBeanServerRegistry mbsRegistry;
 
     private String hostname = null;
 
-    private final AvgRateCounter rateCounter = new AvgRateCounter(this);
-    private final Map<String, FileTrapper> fileTrappers = new ConcurrentHashMap<String, FileTrapper>();
+    private AvgRateCounter rateCounter = new AvgRateCounter(this);
+    private Map<String, FileTrapper> fileTrappers = new ConcurrentHashMap<String, FileTrapper>();
+
+    private TaskScheduler scheduler = TaskScheduler.instance();
 
     /**
      * Standard constructor
@@ -578,7 +581,8 @@ public class ZorkaLib  {
      * @return JMX rank lister object
      */
     public <T extends Rankable<?>> RankLister<T> jmxLister(String mbsName, String onMask) {
-        return new JmxAggregatingLister<T>(mbsName, onMask);
+        JmxAggregatingLister<T> lister = new JmxAggregatingLister<T>(mbsName, onMask);
+        return lister;
     }
 
 
@@ -595,7 +599,7 @@ public class ZorkaLib  {
     public synchronized ThreadRankLister threadRankLister() {
         if (threadRankLister == null) {
             threadRankLister = new ThreadRankLister();
-            threadRankLister.start();
+            scheduler.schedule(threadRankLister, 15000);
         }
 
         return threadRankLister;
@@ -614,7 +618,9 @@ public class ZorkaLib  {
      * @return EJB rank lister object
      */
     public EjbRankLister ejbRankLister(String mbsName, String objNames, String attr) {
-        return new EjbRankLister(mbsName, objNames, attr);
+        EjbRankLister lister = new EjbRankLister(mbsName, objNames, attr);
+        scheduler.schedule(lister, 15000);
+        return lister;
     }
 
 
@@ -700,4 +706,14 @@ public class ZorkaLib  {
     }
 
 
+    /**
+     * Schedules a task.
+     *
+     * @param task task (must be Runnable)
+     *
+     * @param interval run interval (in milliseconds)
+     */
+    public void schedule(Runnable task, long interval) {
+
+    }
 }
