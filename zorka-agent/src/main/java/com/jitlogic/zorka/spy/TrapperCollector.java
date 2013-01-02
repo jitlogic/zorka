@@ -29,31 +29,46 @@ import java.util.Map;
  */
 public class TrapperCollector implements SpyProcessor {
 
+
     /** Trapper object. */
     private ZorkaTrapper trapper;
+
 
     /** Log level */
     private ZorkaLogLevel logLevel;
 
-    /** Tag, message, error templates and error field */
-    private String tagExpr, stdExpr, errExpr, errField;
 
+    /** Tag, message, error templates and error field */
+    private String tag, message, errExpr, errField;
+
+
+    /**
+     * Creates new trapper collector
+     * @param trapper output trapper
+     * @param logLevel log level
+     * @param tag log tag
+     * @param message log message
+     * @param errExpr error expression
+     * @param errField error field
+     */
     public TrapperCollector(ZorkaTrapper trapper, ZorkaLogLevel logLevel,
-                            String tagExpr, String stdExpr, String errExpr, String errField) {
+                            String tag, String message, String errExpr, String errField) {
 
         this.trapper = trapper;
         this.logLevel = logLevel;
-        this.tagExpr = tagExpr;
-        this.stdExpr = stdExpr;
+        this.tag = tag;
+        this.message = message;
         this.errExpr = errExpr;
         this.errField = errField;
     }
 
+
     @Override
     public Map<String,Object> process(Map<String,Object> record) {
 
-        String tag = ObjectInspector.substitute(tagExpr, record);
-        String msg = ObjectInspector.substitute(0 != ((Integer) record.get(".STAGES") & (1 << SpyLib.ON_ERROR)) ? errExpr : stdExpr, record);
+        String tag = ObjectInspector.substitute(this.tag, record);
+        String msg = ObjectInspector.substitute(
+                0 != ((Integer) record.get(".STAGES") & (1 << SpyLib.ON_ERROR)) ? errExpr : message, record);
 
         trapper.trap(logLevel, tag, msg, (Throwable)record.get(errField));
 

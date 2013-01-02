@@ -17,12 +17,24 @@ package com.jitlogic.zorka.spy;
 
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
+/**
+ * Fetches current thread object in context of method called by application code
+ * (that is, application thread).
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class SpyThreadProbe extends SpyProbe {
 
-    public SpyThreadProbe(String dstKey) {
-        super(dstKey);
+    /**
+     * Creates spy thread probe
+     *
+     * @param dstField destination field
+     */
+    public SpyThreadProbe(String dstField) {
+        super(dstField);
     }
 
+    @Override
     public int emit(SpyMethodVisitor mv, int stage, int opcode) {
         mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;");
         return 1;

@@ -1,3 +1,19 @@
+/**
+ * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * <p/>
+ * This is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * <p/>
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * <p/>
+ * You should have received a copy of the GNU General Public License
+ * along with this software. If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.jitlogic.zorka.integ;
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
@@ -13,19 +29,35 @@ import java.util.Properties;
  * This has been written from scratch in order to not interfere with
  * other logging frameworks.
  *
- * @author RLE <rafal.lewczuk@gmail.com>
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class ZorkaLogger {
 
+
+    /** Logger */
     private static ZorkaLogger logger = null;
 
 
+    /**
+     *  Returns client-side logger object
+     *
+     * @param clazz source class
+     *
+     * @return ZorkaLog object
+     */
     public static ZorkaLog getLog(Class<?> clazz) {
         String[] segs = clazz.getName().split("\\.");
         return getLog(segs[segs.length-1]);
     }
 
 
+    /**
+     *  Returns client-side logger object
+     *
+     * @param tag log tag
+     *
+     * @return ZorkaLog object
+     */
     public synchronized  static ZorkaLog getLog(String tag) {
         if (logger == null) {
             logger = new ZorkaLogger();
@@ -35,22 +67,42 @@ public class ZorkaLogger {
     }
 
 
+    /**
+     * Returns logger instance
+     *
+     * @return logger
+     */
     public synchronized static ZorkaLogger getLogger() {
         return logger;
     }
 
 
+    /**
+     * Sets logger instance.
+     *
+     * @param newLogger new logger
+     */
     public synchronized static void setLogger(ZorkaLogger newLogger) {
         logger = newLogger;
     }
 
 
+    /** List of trappers that will receive log messages */
     private List<ZorkaTrapper> trappers = new ArrayList<ZorkaTrapper>();
 
-    public ZorkaLogger() {
 
+    /**
+     * Limits instantiations of this singleton class
+     */
+    protected ZorkaLogger() {
     }
 
+
+    /**
+     * Adds and configures standard loggers.
+     *
+     * @param props configuration properties
+     */
     public void init(Properties props) {
         initFileTrapper(props);
 
@@ -59,6 +111,11 @@ public class ZorkaLogger {
         }
     }
 
+    /**
+     * Creates and configures syslog trapper according to configuration properties
+     *
+     * @param props configuration properties
+     */
     private void initSyslogTrapper(Properties props) {
         try {
             String server = props.getProperty("zorka.syslog.server", "127.0.0.1").trim();
@@ -77,6 +134,11 @@ public class ZorkaLogger {
     }
 
 
+    /**
+     * Creates and configures file trapper according to configuration properties
+     *
+     * @param props configuration properties
+     */
     private void initFileTrapper(Properties props) {
         String logDir = ZorkaConfig.getLogDir();
         boolean logExceptions = "yes".equalsIgnoreCase(props.getProperty("zorka.log.exceptions"));
@@ -103,6 +165,19 @@ public class ZorkaLogger {
     }
 
 
+    /**
+     * Logs a message. Log message is sent to all registered trappers.
+     *
+     * @param logLevel log level
+     *
+     * @param tag log message tag (eg. component name)
+     *
+     * @param message message text (optionally format string)
+     *
+     * @param e exception thrown (if any)
+     *
+     * @param args optional argument used when message text is a format string
+     */
     public void log(ZorkaLogLevel logLevel, String tag, String message, Throwable e, Object... args) {
         for (ZorkaTrapper trapper : trappers) {
             trapper.trap(logLevel, tag, message, e, args);

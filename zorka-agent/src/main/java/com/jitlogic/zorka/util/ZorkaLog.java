@@ -100,14 +100,24 @@ public class ZorkaLog {
      * Logs message with ERROR level
      *
      * @param msg message text
+     *
      * @param args optional arguments
      */
 	public void error(String msg, Object...args) {
         output.log(ZorkaLogLevel.ERROR, tag, msg, null, args);
 	}
-	
-	
-	public void error(String msg, Throwable e, Object args) {
+
+
+    /**
+     * Logs message with ERROR level
+     *
+     * @param msg message text
+     *
+     * @param e exception to log
+     *
+     * @param args optional arguments
+     */
+    public void error(String msg, Throwable e, Object args) {
         output.log(ZorkaLogLevel.ERROR, tag, msg, e, args);
 	}
 

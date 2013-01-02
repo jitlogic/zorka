@@ -23,23 +23,46 @@ import java.net.SocketException;
 
 
 /**
+ * Sends SNMP traps to remote server.
  *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements ZorkaTrapper {
 
+    /** Default UDP port to send traps to */
     public static final int DEFAULT_TRAP_PORT = 162;
 
-    private int snmpPort, protocol;
+    /** UDP port traps will be sent to */
+    private int snmpPort;
+
+    /** IP address SNMP will be sent to */
     private InetAddress snmpAddr;
 
-    private SNMPTrapSenderInterface trapper;
+    /** Protocol version (SNMP_v1 or SNMP_v2). */
+    private int protocol;
 
+    /** SNMP sender (from SNMP library) */
+    private SNMPTrapSenderInterface sender;
+
+    /** IP address agent advertises itself as */
     private SNMPIPAddress agentAddr;
+
+    /** Community ID */
     private String community;
 
-
+    /**
+     * Creates SNMP trapper.
+     *
+     * @param snmpAddr IP address traps will be sent to
+     *
+     * @param community community ID
+     *
+     * @param agentAddr IP address agent advertises itself as
+     *
+     * @param protocol SNMP protocol version
+     */
     public SnmpTrapper(String snmpAddr, String community, String agentAddr, int protocol) {
-        super("snmp-trapper");
+        super("snmp-sender");
         try {
             if (snmpAddr.contains(":")) {
                 String[] s = snmpAddr.split(":");
@@ -54,13 +77,24 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
             this.agentAddr = new SNMPIPAddress(agentAddr);
             this.protocol = protocol;
         } catch (Exception e) {
-            log.error("Cannot initialize SNMP trapper", e);
+            log.error("Cannot initialize SNMP sender", e);
         }
 
         log = ZorkaLogger.getLog(this.getClass());
     }
 
 
+    /**
+     * Sends an SNMP tra
+     *
+     * @param gtrap general trap type
+     *
+     * @param strap specific trap type
+     *
+     * @param oid enterprise OID
+     *
+     * @param vars additional (named) attributes
+     */
     public void trap(int gtrap, int strap, SNMPObjectIdentifier oid, SNMPVariablePair...vars) {
         try {
             SNMPTimeTicks timestamp = new SNMPTimeTicks((long)(System.currentTimeMillis()/10));
@@ -83,18 +117,20 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
     }
 
 
+    @Override
     protected void open() {
         try {
-            this.trapper = new SNMPTrapSenderInterface(snmpPort);
+            this.sender = new SNMPTrapSenderInterface(snmpPort);
         } catch (SocketException e) {
-            handleError("Cannot initialize trapper", e);
+            handleError("Cannot initialize sender", e);
         }
     }
 
 
+    @Override
     public void close() {
-        trapper.close();
-        trapper = null;
+        sender.close();
+        sender = null;
     }
 
 
@@ -102,9 +138,9 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
     protected void process(SNMPSequence trap) {
         try {
             if (trap instanceof SNMPv1TrapPDU) {
-                trapper.sendTrap(snmpAddr, community, (SNMPv1TrapPDU)trap);
+                sender.sendTrap(snmpAddr, community, (SNMPv1TrapPDU) trap);
             } else if (trap instanceof SNMPv2TrapPDU) {
-                trapper.sendTrap(snmpAddr, community, (SNMPv2TrapPDU)trap);
+                sender.sendTrap(snmpAddr, community, (SNMPv2TrapPDU) trap);
             }
         } catch (IOException e) {
             log.error("Error sending SNMP trap", e);
@@ -112,6 +148,7 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
     }
 
 
+    @Override
     public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e, Object... args) {
         // TODO implement this using some "standardized" OID
     }

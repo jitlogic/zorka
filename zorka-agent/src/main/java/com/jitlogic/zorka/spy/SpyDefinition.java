@@ -16,7 +16,6 @@
  */
 package com.jitlogic.zorka.spy;
 
-
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.*;
@@ -24,13 +23,16 @@ import java.util.*;
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
 /**
- * This class defines mini-DSL for configuring instrumentation. Language allows for
- * choosing classes and methods to instrument, extracting parameters, return values,
- * transforming/filtering intercepted values and presenting them via JMX in various
- * ways.
+ * Spy definition contains complete set of information on how to instrument a specific
+ * aspect of monitored application. Think of it as 'spy configuration' for some set of
+ * methods you're interested in.
  *
- * TODO better description of this class
+ * Along with spy library functions it defines mini-DSL for configuring instrumentation.
+ * Language allows for choosing classes and methods to instrument, extracting parameters,
+ * return values, transforming/filtering intercepted values and presenting them via
+ * JMX in various ways.
  *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class SpyDefinition {
 
@@ -41,11 +43,21 @@ public class SpyDefinition {
     private static final List<SpyProbe> EMPTY_AF =
             Collections.unmodifiableList(Arrays.asList(new SpyProbe[0]));
 
+    /** Spy probes for various places in method bytecode */
     private List<SpyProbe>[] probes;
+
+    /** Lists of spy record processors and collectors (for various stages) */
     private List<SpyProcessor>[] processors;
 
+    /** List of matchers defining that classes/methods this sdef looks for */
     private List<SpyMatcher> matchers = EMPTY_MATCHERS;
 
+    /**
+     * Creates partially configured spy definition that is suitable for measuring
+     * method execution times.
+     *
+     * @return spy definition
+     */
     public static SpyDefinition instrument() {
         return new SpyDefinition()
             .onEnter(new SpyTimeProbe("T1"))
@@ -54,10 +66,19 @@ public class SpyDefinition {
             .onEnter();
     }
 
+    /**
+     * Creates unconfigured spy definition
+     *
+     * @return spy definition
+     */
     public static SpyDefinition instance() {
         return new SpyDefinition();
     }
 
+    /**
+     * Creates empty (unconfigured) spy definition.
+     *
+     */
     public SpyDefinition() {
 
         probes = new List[4];

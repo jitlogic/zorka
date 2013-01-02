@@ -22,12 +22,22 @@ import java.net.Socket;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaConfig;
+
 import com.jitlogic.zorka.util.ZorkaLog;
 
+/**
+ * Zabbix agent integrates Zorka with Zabbix server. It handles incoming zabbix
+ * requests and forwards to BSH agent.
+ *
+ * @author rafal.lewczuk@jtlogic.com
+ */
 public class ZabbixAgent extends AbstractTcpAgent {
-	
-	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
+    /**
+     * Creates zabbix agent.
+     *
+     * @param agent BSH agent
+     */
 	public ZabbixAgent(ZorkaBshAgent agent) {
         super(agent, ZorkaConfig.getProperties(), "zabbix", 10055);
     }
