@@ -15,13 +15,13 @@
  */
 package com.jitlogic.zorka.agent.testrank;
 
+import com.jitlogic.zorka.agent.testrank.support.TestRankItem;
+import com.jitlogic.zorka.agent.testrank.support.TestRankLister;
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
-import com.jitlogic.zorka.agent.testutil.ZorkaTestUtil;
 
 import com.jitlogic.zorka.rankproc.RankList;
 import com.jitlogic.zorka.rankproc.RankLister;
 
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

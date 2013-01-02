@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LdapLexerTest extends LexerFixture {
+public class LdapLexerUnitTest extends LexerFixture {
 
     public List<Token> lex(String input) {
         List<Token> tokens = new ArrayList<Token>();

@@ -29,7 +29,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class XqlLexerTest extends LexerFixture {
+public class XqlLexerUnitTest extends LexerFixture {
 
     public List<Token> lex(String input) {
         return lex(DIALECT_SQL_99, input);

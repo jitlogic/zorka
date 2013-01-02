@@ -13,13 +13,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.agent.testrank;
+package com.jitlogic.zorka.agent.testrank.support;
 
 import com.jitlogic.zorka.rankproc.BucketAggregate;
 import com.jitlogic.zorka.rankproc.ThreadRankInfo;
 import com.jitlogic.zorka.rankproc.ThreadRankLister;
 
-import java.lang.management.ThreadInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

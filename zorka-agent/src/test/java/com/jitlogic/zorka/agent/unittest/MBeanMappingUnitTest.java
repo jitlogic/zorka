@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
 
-public class MBeanMappingTest extends ZorkaFixture {
+public class MBeanMappingUnitTest extends ZorkaFixture {
 
 	private ZorkaMappedMBean bean;
 

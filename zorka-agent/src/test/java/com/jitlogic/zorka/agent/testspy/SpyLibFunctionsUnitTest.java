@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class SpyLibFunctionsTest extends ZorkaFixture {
+public class SpyLibFunctionsUnitTest extends ZorkaFixture {
 
     private SpyLib spyLib;
 

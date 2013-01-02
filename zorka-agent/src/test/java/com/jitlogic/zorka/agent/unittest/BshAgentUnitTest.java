@@ -30,7 +30,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
-public class BshAgentTest extends ZorkaFixture {
+public class BshAgentUnitTest extends ZorkaFixture {
 
     @Before
     public void setUp() throws Exception {

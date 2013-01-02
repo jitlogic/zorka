@@ -26,7 +26,7 @@ import com.jitlogic.zorka.integ.ZabbixRequestHandler;
 
 import static org.junit.Assert.*;
 
-public class ZabbixAgentTest {
+public class ZabbixAgentUnitTest {
 
 	private String tr(String src) {
 		return ZabbixRequestHandler.translate(src);

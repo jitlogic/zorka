@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 
 import com.jitlogic.zorka.agent.testutil.ZorkaTestUtil;
 
-public class SlidingWindowTest extends ZorkaFixture {
+public class SlidingWindowUnitTest extends ZorkaFixture {
 
 	private ZorkaTestUtil testUtil;
 

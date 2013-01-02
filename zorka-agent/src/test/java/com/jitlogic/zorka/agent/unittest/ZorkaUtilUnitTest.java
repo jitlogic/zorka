@@ -22,7 +22,7 @@ import com.jitlogic.zorka.util.ZorkaUtil;
 import junit.framework.Assert;
 import org.junit.Test;
 
-public class ZorkaUtilTest {
+public class ZorkaUtilUnitTest {
 
     public static class TestCallStatistic extends MethodCallStatistic {
         public TestCallStatistic(String name) { super(name, BucketAggregate.SEC * 10, 6, 5, 3); }

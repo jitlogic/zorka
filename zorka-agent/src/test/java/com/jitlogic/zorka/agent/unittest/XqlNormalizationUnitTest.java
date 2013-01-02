@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class XqlNormalizationTest {
+public class XqlNormalizationUnitTest {
 
     Normalizer normalizer = GenericNormalizer.xql(DIALECT_SQL_99, NormLib.NORM_STD);
 

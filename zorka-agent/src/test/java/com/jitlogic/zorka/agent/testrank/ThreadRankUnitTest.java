@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zorka.agent.testrank;
 
+import com.jitlogic.zorka.agent.testrank.support.TestThreadRankLister;
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 
 import com.jitlogic.zorka.rankproc.ThreadRankItem;

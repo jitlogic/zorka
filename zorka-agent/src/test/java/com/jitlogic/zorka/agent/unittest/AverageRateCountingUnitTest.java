@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * @author RLE <rafal.lewczuk@gmail.com>
  */
-public class AverageRateCountingTest extends ZorkaFixture {
+public class AverageRateCountingUnitTest extends ZorkaFixture {
 
     private AvgRateCounter counter;
 

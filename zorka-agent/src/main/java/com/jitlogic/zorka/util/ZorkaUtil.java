@@ -241,31 +241,6 @@ public class ZorkaUtil {
     /** Placeholder for substitution macro  */
     private final static Pattern rePropVar = Pattern.compile("\\$\\{([^\\}]+)\\}");
 
-    /**
-     * Looks for substitution macros in input string and substitutes them with values from properties collection.
-     *
-     * @param input input string
-     *
-     * @param props properties
-     *
-     * @return substituted string
-     */
-    public static String evalPropStr(String input, Properties props){
-        StringBuffer sb = new StringBuffer(input.length()+50);
-
-        Matcher matcher = rePropVar.matcher(input);
-
-        while (matcher.find()) {
-            String var = matcher.group(1);
-            if (props.containsKey(var)) {
-                matcher.appendReplacement(sb, props.get(var).toString());
-            }
-        }
-        matcher.appendTail(sb);
-
-        return sb.toString();
-    }
-
 
     /**
      * Checks if given class instance of given type. Check is done only by name, so if two classes of the same

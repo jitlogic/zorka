@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 /**
  * @author RLE <rafal.lewczuk@gmail.com>
  */
-public class ZabbixDiscoveryTest extends ZorkaFixture {
+public class ZabbixDiscoveryUnitTest extends ZorkaFixture {
 
     private ZorkaLib zorkaLib;
     private ZabbixLib zabbixLib;

@@ -21,7 +21,7 @@ import com.jitlogic.zorka.rankproc.CircularBucketAggregate;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class AggregateCountingTest {
+public class AggregateCountingUnitTest {
 
     @Test
     public void testCircularV1() {
