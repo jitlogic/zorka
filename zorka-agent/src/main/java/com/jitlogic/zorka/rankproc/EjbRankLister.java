@@ -15,33 +15,59 @@
  */
 package com.jitlogic.zorka.rankproc;
 
+import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 
 import javax.management.*;
 import java.util.*;
 
+/**
+ * EJB Rank lister supplies EJB statistics to rank list objects.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
 
-    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    /** Logger */
+    private static final ZorkaLog log = ZorkaLogger.getLog(EjbRankLister.class);
 
+    /** Data collection interval */
     private long interval;
 
+    /** If set to false, scanning thread will end. */
     private volatile boolean started = false;
+
+    /** Thread reference. */
     private volatile Thread thread = null;
 
+    /** Tracked EJB statistics */
     private Map<String,EjbRankItem> stats = new HashMap<String, EjbRankItem>();
 
+    /** MBean server connection */
     private MBeanServerConnection mbs;
-    private String objNames, attr;
 
+    /** Object name(s) that will be scanned for EJB statistics */
+    private String objNames;
+
+    /** Attribute name (typically 'stats') */
+    private String attr;
+
+    /**
+     *
+     * @param mbsName
+     * @param objNames
+     * @param attr
+     */
     public EjbRankLister(String mbsName, String objNames, String attr) {
+        this.mbs = AgentInstance.getMBeanServerRegistry().lookup(mbsName);
         this.objNames = objNames;
         this.attr = attr;
         this.interval = 14000;
     }
 
+    @Override
     public synchronized List<EjbRankItem> list() {
         List<EjbRankItem> lst = new ArrayList<EjbRankItem>(stats.size()+1);
 
@@ -52,7 +78,9 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
         return lst;
     }
 
-
+    /**
+     * Performs discovery of new EJB statistics objects.
+     */
     public synchronized void discovery() {
         Set<ObjectName> names = ObjectInspector.queryNames(mbs, objNames);
 
@@ -73,6 +101,11 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
     }
 
 
+    /**
+     * Performs one discovery&update cycle
+     *
+     * @param tstamp current time
+     */
     private void runCycle(long tstamp) {
         discovery();
 
@@ -84,6 +117,7 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
     }
 
 
+    @Override
     public void run() {
         while (started) {
             runCycle(System.currentTimeMillis());
@@ -96,6 +130,9 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
         thread = null;
     }
 
+    /**
+     * Starts discovery&update thread.
+     */
     public synchronized void start() {
         if (!started) {
             thread = new Thread(this);
@@ -106,6 +143,9 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
     }
 
 
+    /**
+     * Stops discovery&update thread.
+     */
     public synchronized void stop() {
         if (started) {
             thread.interrupt();

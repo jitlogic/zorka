@@ -22,7 +22,7 @@ import java.io.InputStream;
 
 import org.junit.Test;
 
-import com.jitlogic.zorka.integ.zabbix.ZabbixRequestHandler;
+import com.jitlogic.zorka.integ.ZabbixRequestHandler;
 
 import static org.junit.Assert.*;
 

@@ -16,34 +16,50 @@
 package com.jitlogic.zorka.rankproc;
 
 import com.jitlogic.zorka.agent.AgentInstance;
-import com.jitlogic.zorka.agent.MBeanServerRegistry;
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.*;
 
+/**
+ * Maintains information about running thread in a form suitable for creating rankings.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
 
+    /** MBean server registry (used only to check if obtaining ThreadMXBean is possible) */
     private MBeanServerRegistry mBeanServerRegistry;
+
+    /** Thread MX bean implements methods useful for obtaining information about running threads. */
     private ThreadMXBean threadMXBean;
+
+    /** Map of tracked threads. */
     private Map<Long,ThreadRankItem> threads = new HashMap<Long, ThreadRankItem>();
 
+    /** Rescan interval */
     private long interval;
 
-
+    /**
+     * Constructor with default interval.
+     */
     public ThreadRankLister() {
         this(14000);
     }
 
-
+    /**
+     * Constructor with custom interval
+     *
+     * @param interval interval in milliseconds
+     */
     public ThreadRankLister(long interval) {
         this.interval = interval;
         this.mBeanServerRegistry = AgentInstance.getMBeanServerRegistry();
     }
 
-
+    @Override
     public synchronized List<ThreadRankItem> list() {
         List<ThreadRankItem> lst = new ArrayList<ThreadRankItem>(threads.size()+2)     ;
 
@@ -54,7 +70,11 @@ public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
         return Collections.unmodifiableList(lst);
     }
 
-
+    /**
+     * Return current (raw) list of thread info objects wrapped in ThreadRankInfo type.
+     *
+     * @return list of threads
+     */
     protected List<ThreadRankInfo> rawList() {
         // Platform MBean Server startup might be suspended (eg. for JBoss AS);
         if (threadMXBean == null) {
@@ -79,8 +99,9 @@ public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
 
 
     /**
+     * Performs single cycle. Invoked from main loop in run() method.
      *
-     * @param tstamp
+     * @param tstamp current time (milliseconds since Epoch)
      */
     public synchronized void runCycle(long tstamp) {
         List<ThreadRankInfo> raw = rawList();
@@ -124,7 +145,9 @@ public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
         thread = null;
     }
 
-
+    /**
+     * Starts lister thread.
+     */
     public synchronized void start() {
         if (!started) {
             thread = new Thread(this);
@@ -134,7 +157,9 @@ public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
         }
     }
 
-
+    /**
+     * Stops lister thread.
+     */
     public synchronized void stop() {
         if (started) {
             thread.interrupt();

@@ -1,10 +1,6 @@
 package com.jitlogic.zorka.util;
 
-import com.jitlogic.zorka.agent.JmxObject;
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
 import com.jitlogic.zorka.mbeans.ZorkaStats;
-import com.jitlogic.zorka.spy.SpyRecord;
 
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
@@ -25,9 +21,7 @@ import java.util.regex.Pattern;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class ObjectInspector {
-
-    private static final ZorkaLog log = ZorkaLogger.getLog(ObjectInspector.class);
+public final class ObjectInspector {
 
     /** Special attribute name that will extract stack trace from throwable objects. */
     public static final String STACK_TRACE_KEY = "printStackTrace";
@@ -111,7 +105,6 @@ public class ObjectInspector {
             return ((CompositeData)obj).get(""+key);
         } else if (obj instanceof TabularData) {
             String[] keys = key.toString().split("\\,");
-            // TODO coerce keys to proper data types
             obj = ((TabularData)obj).get(keys);
         } else if (obj instanceof ZorkaStats) {
             return ((ZorkaStats)obj).getStatistic(key.toString());
@@ -122,7 +115,7 @@ public class ObjectInspector {
                     return m.invoke(obj, key);
                 }
             } catch (Exception e) {
-                log.error("Error invoking getStatistic('" + key + "')", e);
+                return "Error invoking getStatistic('" + key + "'): " + e.getMessage();
             }
         } else if (obj instanceof JmxObject) {
             return ((JmxObject)obj).get(key);
@@ -207,7 +200,7 @@ public class ObjectInspector {
                     return Arrays.asList((Object[])m.invoke(obj));
                 }
             } catch (Exception e) {
-                log.error("Error invoking getStatisticNames()", e);
+                return new ArrayList<String>(1);
             }
         } else if (obj instanceof JmxObject) {
             try {
@@ -216,7 +209,7 @@ public class ObjectInspector {
                     lst.add(mba.getName());
                 }
             } catch (Exception e) {
-                log.error("Error fetching object attributes.");
+                return new ArrayList<String>(1);
             }
         }
 
@@ -275,7 +268,6 @@ public class ObjectInspector {
             if (!accessible) field.setAccessible(accessible);
             return ret;
         } catch (Exception e) {
-            log.error("Field '" + name + "' fetch failed", e);
             return null;
         }
     }
@@ -338,7 +330,6 @@ public class ObjectInspector {
             ObjectName on = new ObjectName(query);
             return (Set<ObjectName>)conn.queryNames(on, null);
         } catch (Exception e) {
-            log.error("Error resolving object names.", e);
             return new HashSet<ObjectName>();
         }
     }
@@ -358,7 +349,7 @@ public class ObjectInspector {
      * @param record spy record to be substituted
      * @return string with substitutions filled with values from record
      */
-    public static String substitute(String input, SpyRecord record) {
+    public static String substitute(String input, Map<String,Object> record) {
         Matcher m = reVarSubstPattern.matcher(input);
         StringBuffer sb = new StringBuffer();
         while (m.find()) {

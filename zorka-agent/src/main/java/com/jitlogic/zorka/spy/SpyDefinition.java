@@ -17,8 +17,6 @@
 package com.jitlogic.zorka.spy;
 
 
-import com.jitlogic.zorka.spy.probes.SpyProbe;
-import com.jitlogic.zorka.spy.probes.SpyTimeProbe;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.*;

@@ -17,19 +17,13 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.logproc.ZorkaTrapper;
-import com.jitlogic.zorka.logproc.FileTrapper;
-import com.jitlogic.zorka.integ.snmp.SnmpLib;
-import com.jitlogic.zorka.integ.snmp.SnmpTrapper;
-import com.jitlogic.zorka.integ.snmp.TrapVarBindDef;
-import com.jitlogic.zorka.integ.syslog.SyslogTrapper;
-import com.jitlogic.zorka.integ.zabbix.ZabbixTrapper;
+import com.jitlogic.zorka.integ.SnmpLib;
+import com.jitlogic.zorka.integ.ZorkaTrapper;
+import com.jitlogic.zorka.integ.SnmpTrapper;
+import com.jitlogic.zorka.integ.TrapVarBindDef;
 import com.jitlogic.zorka.normproc.Normalizer;
-import com.jitlogic.zorka.spy.collectors.*;
-import com.jitlogic.zorka.spy.probes.*;
-import com.jitlogic.zorka.spy.processors.*;
 import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.logproc.ZorkaLogLevel;
+import com.jitlogic.zorka.integ.ZorkaLogLevel;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.*;
@@ -91,12 +85,12 @@ public class SpyLib {
     public static final int SPD_MAX = 10;
 
 
-    public static final int GT = 0;
-    public static final int GE = 1;
-    public static final int EQ = 2;
-    public static final int LE = 3;
-    public static final int LT = 4;
-    public static final int NE = 5;
+    public static final String GT = ">";
+    public static final String GE = ">=";
+    public static final String EQ = "==";
+    public static final String LE = "<=";
+    public static final String LT = "<";
+    public static final String NE = "!=";
 
     public static final int ON_ENTER   = 0;
     public static final int ON_RETURN  = 1;
@@ -125,7 +119,11 @@ public class SpyLib {
 
     private SpyInstance instance;
 
-
+    /**
+     * Creates spy library object
+     *
+     * @param instance spy instance
+     */
 	public SpyLib(SpyInstance instance) {
         this.instance = instance;
 	}
@@ -155,6 +153,11 @@ public class SpyLib {
     }
 
 
+    /**
+     * Returns partially configured time-measuring spy def
+     *
+     * @return partially configured psy def
+     */
     public SpyDefinition instrument() {
         return SpyDefinition.instrument().onSubmit(tdiff("T1", "T2", "T")).onEnter();
     }
@@ -211,9 +214,9 @@ public class SpyLib {
     /**
      * Creates new matcher object that will match classes by annotation.
      *
-     * @param annotationName
+     * @param annotationName class annotation pattern
      *
-     * @return
+     * @return spy matcher object
      */
     public SpyMatcher byClassAnnotation(String annotationName) {
         return new SpyMatcher(SpyMatcher.CLASS_ANNOTATION, 1,
@@ -223,11 +226,11 @@ public class SpyLib {
     /**
      * Creates new matcher object that will match methods by class annotation and method name.
      *
-     * @param annotationName
+     * @param annotationName class annotation pattern
      *
-     * @param methodPattern
+     * @param methodPattern method name pattern
      *
-     * @return
+     * @return spy matcher object
      */
     public SpyMatcher byClassAnnotation(String annotationName, String methodPattern) {
         return new SpyMatcher(SpyMatcher.CLASS_ANNOTATION, 1,
@@ -235,13 +238,30 @@ public class SpyLib {
     }
 
 
-
+    /**
+     * Creates new matcher that will match methods by method annotation.
+     *
+     * @param classPattern class name pattern
+     *
+     * @param methodAnnotation method annotation patten
+     *
+     * @return spy matcher object
+     */
     public SpyMatcher byMethodAnnotation(String classPattern, String methodAnnotation) {
         return new SpyMatcher(SpyMatcher.METHOD_ANNOTATION, 1,
                 classPattern, "L" + methodAnnotation + ";", null);
     }
 
 
+    /**
+     * Creates new matcher that will match methods by class and method annotations
+     *
+     * @param classAnnotation class annotation pattern
+     *
+     * @param methodAnnotation method annotation pattern
+     *
+     * @return spy matcher object
+     */
     public SpyMatcher byClassMethodAnnotation(String classAnnotation, String methodAnnotation) {
         return new SpyMatcher(SpyMatcher.CLASS_ANNOTATION|SpyMatcher.METHOD_ANNOTATION, 1,
                 "L" + classAnnotation + ";", "L" + methodAnnotation + ";", null);
@@ -425,17 +445,15 @@ public class SpyLib {
 
 
     /**
-     * Creates chained collector. It sends collected records to another SpyDefinition chain. Records will be processed
-     * by all processors from ON_SUBMIT chain and sent to collectors attached to it.
+     * Creates asynchronous queuing collector
      *
-     * @param sdef new sdef that will perform furhter protessing
+     * @param attrs attributes to retain
      *
-     * @return chained collector
+     * @return asynchronous queued collector
      */
-    public SpyProcessor sdefCollector(SpyDefinition sdef) {
-        return new DispatchingCollector(sdef);
+    public SpyProcessor asyncQueueCollector(String...attrs) {
+        return new AsyncQueueCollector(attrs);
     }
-
 
     /**
      * Creates SNMP collector object. It sends collected records as SNMP traps using SNMP trapper.
@@ -452,28 +470,6 @@ public class SpyLib {
      */
     public SpyProcessor snmpCollector(SnmpTrapper trapper, String oid, int spcode, TrapVarBindDef...bindings) {
         return new SnmpCollector(trapper, oid, SnmpLib.GT_SPECIFIC, spcode, oid, bindings);
-    }
-
-
-    /**
-     * Creates syslog collector object. It sends collected records to remote syslog server using syslog trapper.
-     *
-     * @param trapper trapper object used to send logs
-     *
-     * @param expr message template
-     *
-     * @param severity syslog serverity (see syslog.* constants)
-     *
-     * @param facility syslog facility
-     *
-     * @param hostname hostname (as logged in syslog records)
-     *
-     * @param tag syslog tag (typically program name, in our case component name)
-     *
-     * @return syslog collector object
-     */
-    public SpyProcessor syslogCollector(SyslogTrapper trapper, String expr, int severity, int facility, String hostname, String tag) {
-        return new SyslogCollector(trapper, expr, severity, facility, hostname, tag);
     }
 
 
@@ -496,38 +492,6 @@ public class SpyLib {
     public SpyProcessor trapperCollector(ZorkaTrapper trapper, ZorkaLogLevel logLevel,
                                          String tagExpr, String msgExpr, String errExpr, String errField) {
         return new TrapperCollector(trapper, logLevel, tagExpr, msgExpr,  errExpr,  errField);
-    }
-
-
-    /**
-     * Sends collected records to zabbix using zabbix trapper.
-     *
-     * @param trapper zabbix trapper object (as created by zabbix.trapper() function)
-     *
-     * @param expr message template
-     *
-     * @param key zabbix key ID
-     *
-     * @return zabbix collector object
-     */
-    public SpyProcessor zabbixCollector(ZabbixTrapper trapper, String expr, String key) {
-        return new ZabbixCollector(trapper, expr, null, key);
-    }
-
-
-    /**
-     * Sends collected records to zabbix using zabbix trapper.
-     *
-     * @param trapper zabbix trapper (as created by zabbix.trapper() function)
-     *
-     * @param expr message template
-     *
-     * @param key zabbix key ID
-     *
-     * @return zabbix collector object
-     */
-    public SpyProcessor zabbixCollector(ZabbixTrapper trapper, String expr, String host, String key) {
-        return new ZabbixCollector(trapper,  expr,  host,  key);
     }
 
 
@@ -672,7 +636,7 @@ public class SpyLib {
      * @return constant value processor object
      */
     public SpyProcessor put(String dst, Object val) {
-        return new ConstPutProcessor(dst, val);
+        return new ConstValProcessor(dst, val);
     }
 
 
@@ -748,7 +712,7 @@ public class SpyLib {
      *
      * @return conditional filtering processor object
      */
-    public SpyProcessor ifSlotCmp(String a, int op, String b) {
+    public SpyProcessor ifSlotCmp(String a, String op, String b) {
         return ComparatorProcessor.scmp(a, op, b);
     }
 
@@ -764,7 +728,7 @@ public class SpyLib {
      *
      * @return conditional filtering processor object
      */
-    public SpyProcessor ifValueCmp(String a, int op, Object v) {
+    public SpyProcessor ifValueCmp(String a, String op, Object v) {
         return ComparatorProcessor.vcmp(a, op, v);
     }
 

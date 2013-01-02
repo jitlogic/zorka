@@ -20,8 +20,7 @@ import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyLib;
 
-import com.jitlogic.zorka.spy.collectors.ZorkaStatsCollector;
-import com.jitlogic.zorka.spy.processors.TimeDiffProcessor;
+import com.jitlogic.zorka.spy.ZorkaStatsCollector;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,9 +41,9 @@ public class SpyLibFunctionsTest extends ZorkaFixture {
         SpyDefinition sdef = spyLib.instrument("test", "test:type=MyStats", "stats", "${0}");
 
         assertEquals(2, sdef.getProcessors(SpyLib.ON_SUBMIT).size());
-        assertEquals("${A0}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getKeyTemplate());
+        assertEquals("${A0}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getStatisticTemplate());
         assertEquals(2, sdef.getProbes(SpyLib.ON_ENTER).size());
-        assertEquals("A0", sdef.getProbes(SpyLib.ON_ENTER).get(0).getKey());
+        assertEquals("A0", sdef.getProbes(SpyLib.ON_ENTER).get(0).getFieldName());
     }
 
 
@@ -53,7 +52,7 @@ public class SpyLibFunctionsTest extends ZorkaFixture {
         SpyDefinition sdef = spyLib.instrument("test", "test:type=MyStats", "stats", "${1}");
 
         assertEquals(2, sdef.getProcessors(SpyLib.ON_SUBMIT).size());
-        assertEquals("${A1}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getKeyTemplate());
+        assertEquals("${A1}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getStatisticTemplate());
     }
 
 
@@ -62,7 +61,7 @@ public class SpyLibFunctionsTest extends ZorkaFixture {
         SpyDefinition sdef = spyLib.instrument("test", "test:type=MyStats", "stats", "${0.request.url}");
 
         assertEquals(2, sdef.getProcessors(SpyLib.ON_SUBMIT).size());
-        assertEquals("${A0.request.url}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getKeyTemplate());
+        assertEquals("${A0.request.url}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getStatisticTemplate());
     }
 
 
@@ -71,7 +70,7 @@ public class SpyLibFunctionsTest extends ZorkaFixture {
         SpyDefinition sdef = spyLib.instrument("test", "test:type=MyStats", "stats", "${methodName}");
 
         assertEquals(2, sdef.getProcessors(SpyLib.ON_SUBMIT).size());
-        assertEquals("${methodName}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getKeyTemplate());
+        assertEquals("${methodName}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getStatisticTemplate());
     }
 
 

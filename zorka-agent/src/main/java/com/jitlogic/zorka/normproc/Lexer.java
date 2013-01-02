@@ -15,9 +15,8 @@
  */
 package com.jitlogic.zorka.normproc;
 
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 
 import java.io.IOException;
 import java.io.InputStream;

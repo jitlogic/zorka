@@ -41,8 +41,8 @@ public class SpyMatcher {
     );
 
     /** Maps regular expression special characters (sequences) to escaped sequences. */
-    private static final Map<String,String> regexChars = ZorkaUtil.constMap(
-            "[", "\\]", "]", "\\]", ".", "\\.", ";", "\\;", "(", "\\(", ")", "\\)"
+    private static final Map<Character,String> regexChars = ZorkaUtil.constMap(
+            '[', "\\]", ']', "\\]", '.', "\\.", ';', "\\;", '(', "\\(", ')', "\\)"
     );
 
 

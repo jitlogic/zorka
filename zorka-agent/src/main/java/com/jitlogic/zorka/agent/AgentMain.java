@@ -1,5 +1,7 @@
 package com.jitlogic.zorka.agent;
 
+import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
+
 import java.lang.instrument.Instrumentation;
 
 /**
@@ -37,7 +39,6 @@ public class AgentMain {
         if (agent != null && agent.getSpyTransformer() != null) {
             instr.addTransformer(agent.getSpyTransformer());
 
-            agent.getSpyInstance().start();
         }
     }
 }

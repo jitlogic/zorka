@@ -17,22 +17,38 @@ package com.jitlogic.zorka.rankproc;
 
 import static com.jitlogic.zorka.rankproc.BucketAggregate.*;
 
+/**
+ * Tracks a thread and retains information in form suitable for rank lists.
+ */
 public class ThreadRankItem implements Rankable<ThreadRankInfo> {
 
+    /** thread info (assigned every time thread list is refreshed) */
     private ThreadRankInfo threadInfo;
 
+    /** by cpu time metric */
     private final static int BY_CPU = 0;
+
+    /** by blocked time metric */
     private final static int BY_BLOCK = 1;
 
-    private BucketAggregate byCpuTime, byBlockedTime;
+    /** Maintains CPU time averages for thread */
+    private BucketAggregate byCpuTime;
 
+    /** Maintains blocked time averages for thread */
+    private BucketAggregate byBlockedTime;
+
+    /**
+     * Creates new thread rank item
+     *
+     * @param threadInfo thread information this item will wrap
+     */
     public ThreadRankItem(ThreadRankInfo threadInfo) {
         this.threadInfo = threadInfo;
         byCpuTime = new CircularBucketAggregate(SEC, 30, 60, 300, 900);
         byBlockedTime = new CircularBucketAggregate(SEC, 30, 60, 300, 900);
     }
 
-
+    @Override
     public synchronized double getAverage(long tstamp, int metric, int average) {
 
         switch (metric) {
@@ -45,31 +61,33 @@ public class ThreadRankItem implements Rankable<ThreadRankInfo> {
         return 0.0;
     }
 
-
+    @Override
     public String[] getMetrics() {
         return new String[] { "CPU", "BLOCK" };
     }
 
-
+    @Override
     public String[] getAverages() {
         return new String[] { "30s", "AVG1", "AVG5", "AVG15" };
     }
 
-
+    @Override
     public ThreadRankInfo getWrapped() {
         return threadInfo;
     }
 
-
+    @Override
     public String getName() {
         return threadInfo.getName();
     }
 
 
     /**
+     * This method is used by thread rank lister to update information about tracked thread.
      *
-     * @param tstamp
-     * @param threadInfo
+     * @param tstamp time stamp
+     *
+     * @param threadInfo thread info object (as from ThreadMXBean)
      */
     public synchronized void feed(long tstamp, ThreadRankInfo threadInfo) {
 

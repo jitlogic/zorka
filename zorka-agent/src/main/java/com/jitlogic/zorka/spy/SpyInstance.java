@@ -17,9 +17,8 @@ package com.jitlogic.zorka.spy;
 
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.spy.processors.CollectQueueProcessor;
-import com.jitlogic.zorka.logproc.ZorkaLog;
-import com.jitlogic.zorka.logproc.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.integ.ZorkaLogger;
 
 import java.util.Properties;
 
@@ -27,16 +26,31 @@ import static com.jitlogic.zorka.spy.SpyLib.SPD_CONFIG;
 
 /**
  * This class binds all parts of spy together to make fully configured instrumentation
- * engine.
+ * engine. This is singleton object.
  */
 public class SpyInstance {
 
+    /** Debug level for spy components.  */
     private static int debugLevel = 0;
-    private static ZorkaLog log = null;
 
+    /** Logger */
+    private static ZorkaLog log;
+
+    /** Spy instance reference */
     private static SpyInstance instance = null;
 
+    /** Reference to instance's class transformer */
+    private SpyClassTransformer classTransformer;
 
+    /** Reference to instance's main submitter (installed in MainSubmitter when instance starts) */
+    private DispatchingSubmitter   submitter;
+
+    /**
+     * Returns spy instance. Creates one if called for the first time.
+     * Configures MainSubmitter to submit values to newly created instance.
+     *
+     * @return spy instance
+     */
     public static synchronized SpyInstance instance() {
 
         if (null == log) {
@@ -65,55 +79,63 @@ public class SpyInstance {
     }
 
 
+    /**
+     * Stops spy instance and deconfigures MainSubmitter.
+     */
     public static synchronized void cleanup() {
         MainSubmitter.setSubmitter(null);
-        instance.stop();
         instance = null;
     }
 
 
-    public static int getDebugLevel() {
-        return debugLevel;
-    }
-
-
+    /**
+     * Returns true if log level is higher or equal to that passed with argument.
+     *
+     * @param level log level compared to configuration setting
+     *
+     * @return true or false
+     */
     public static boolean isDebugEnabled(int level) {
         return debugLevel >= level;
     }
 
 
-    private SpyClassTransformer classTransformer;
-    private DispatchingSubmitter   submitter;
-
-
+    /**
+     * Creates new instance.
+     *
+     * @param props configuration properties.
+     */
     public SpyInstance(Properties props) {
         classTransformer = new SpyClassTransformer();
-        submitter = new DispatchingSubmitter(classTransformer, new CollectQueueProcessor());
+        submitter = new DispatchingSubmitter(classTransformer);
     }
 
 
+    /**
+     * Registers new sdef in spy instance.
+     *
+     * @param sdef spy definition
+     */
     public void add(SpyDefinition sdef) {
         classTransformer.add(sdef);
     }
 
 
-    public void start() {
-        submitter.start();
-    }
-
-
-    public void stop() {
-        if (submitter != null) {
-            submitter.stop();
-        }
-    }
-
-
+    /**
+     * Returns instance's class transformer.
+     *
+     * @return class transformer
+     */
     public SpyClassTransformer getClassTransformer() {
         return classTransformer;
     }
 
 
+    /**
+     * Returns instance's submitter.
+     *
+     * @return main submitter
+     */
     public DispatchingSubmitter getSubmitter() {
         return submitter;
     }

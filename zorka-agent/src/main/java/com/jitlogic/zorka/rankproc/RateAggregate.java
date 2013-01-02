@@ -21,48 +21,63 @@ import java.util.LinkedList;
 
 import com.jitlogic.zorka.util.ZorkaUtil;
 
-// TODO support for other values than long 
+/**
+ * This is old rate aggregate object.
+ */
 public class RateAggregate {
-	
+
+    /** To be removed */
 	private static class Sample {
 		private final long nom, div, time;
 		public Sample(long nom, long div, long time) {
 			this.nom = nom; this.div = div; this.time = time;
 		}
 	}
-	
-	private final long horizon;
-	private final LinkedList<Sample> samples;
-	
-	private final double defVal;
-	private final double multiplier;
-	
-	private ZorkaUtil util = ZorkaUtil.getInstance();
-	
-	public RateAggregate(long horizon, double defVal) {
+
+    /** To be removed */
+    private final long horizon;
+
+    /** To be removed */
+    private final LinkedList<Sample> samples;
+
+    /** To be removed */
+    private final double defVal;
+
+    /** To be removed */
+    private final double multiplier;
+
+    /** To be removed */
+    private ZorkaUtil util = ZorkaUtil.getInstance();
+
+    /** To be removed */
+    public RateAggregate(long horizon, double defVal) {
 		this(horizon, defVal, 1.0);
 	}
-	
-	public RateAggregate(long horizon, double defVal, double multiplier) {
+
+    /** To be removed */
+    public RateAggregate(long horizon, double defVal, double multiplier) {
 		this.horizon = horizon;
 		this.samples = new LinkedList<Sample>();
 		this.defVal = defVal;
 		this.multiplier = multiplier;
 	}
-	
-	
-	public void feed(long v) {
+
+
+    /** To be removed */
+    public void feed(long v) {
 		feed(v, 0);
 	}
-	
-	
-	public void feed(long nom, long div) {
+
+
+    /** To be removed */
+    public void feed(long nom, long div) {
 		slide();
 		samples.addLast(new Sample(nom, div, util.currentTimeMillis()));
 	}
-	
-	
-	public double rate() {
+
+
+    /** To be removed */
+    public double rate() {
 		slide();
 		
 		if (samples.size() == 0) {
@@ -74,9 +89,10 @@ public class RateAggregate {
 		
 		return multiplier * (div != 0 ? 1.0 * nom / div : nom); 
 	}
-	
-	
-	public void slide() {
+
+
+    /** To be removed */
+    public void slide() {
 		long tst = util.currentTimeMillis() - horizon;		
 		
 		for (;;) {

@@ -18,20 +18,24 @@ package com.jitlogic.zorka.agent.testspy;
 
 import com.jitlogic.zorka.agent.testutil.ZorkaFixture;
 
+import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.spy.*;
-import com.jitlogic.zorka.spy.processors.*;
 
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
+import com.jitlogic.zorka.util.ZorkaUtil;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Map;
+
 import static org.junit.Assert.*;
 
 public class ArgProcessingUnitTest extends ZorkaFixture {
 
     protected SpyContext ctx;
     protected SpyDefinition sdef;
-    protected SpyRecord record;
+    protected Map<String,Object> record;
 
     @Before
     public void setUp() {
@@ -39,7 +43,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
         sdef = SpyDefinition.instance();
         ctx = new SpyContext(sdef, "some.Class", "someMethod", "()V", 1);
-        record = new SpyRecord(ctx);
+        record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
     }
 
 
@@ -48,7 +52,8 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         SpyProcessor proc = new StringFormatProcessor("E0", "len=${E0.length()}");
         record.put("E0", "oja!");
 
-        record.setStage(SpyLib.ON_ENTER);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_ENTER));
+        record.put(".STAGE", SpyLib.ON_ENTER);
 
         proc.process(record);
 
@@ -61,7 +66,8 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         SpyProcessor proc = new GetterProcessor("E0", "E0", "length()");
         record.put("E0", "oja!");
 
-        record.setStage(SpyLib.ON_ENTER);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_ENTER));
+        record.put(".STAGE", SpyLib.ON_ENTER);
 
         proc.process(record);
 
@@ -74,7 +80,8 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         SpyProcessor proc = new RegexFilterProcessor("E0", "[a-z]+");
         record.put("E0", null);
 
-        record.setStage(SpyLib.ON_ENTER);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_ENTER));
+        record.put(".STAGE", SpyLib.ON_ENTER);
 
         assertNull(proc.process(record));
     }
@@ -85,7 +92,8 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         SpyProcessor proc = new RegexFilterProcessor("E0", "[a-z]+");
         record.put("E0", "abc");
 
-        record.setStage(SpyLib.ON_ENTER);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_ENTER));
+        record.put(".STAGE", SpyLib.ON_ENTER);
 
         assertNotNull(proc.process(record));
     }
@@ -96,7 +104,8 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         SpyProcessor proc = new RegexFilterProcessor("E0", "[a-z]+");
         record.put("E0", "123");
 
-        record.setStage(SpyLib.ON_ENTER);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_ENTER));
+        record.put(".STAGE", SpyLib.ON_ENTER);
 
         assertNull(proc.process(record));
     }
@@ -107,7 +116,8 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         SpyProcessor proc = new RegexFilterProcessor("E0", "[a-z]+", true);
         record.put("E0", "abc");
 
-        record.setStage(SpyLib.ON_ENTER);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_ENTER));
+        record.put(".STAGE", SpyLib.ON_ENTER);
 
         assertNull(proc.process(record));
     }
@@ -118,7 +128,8 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         SpyProcessor proc = new RegexFilterProcessor("E0", "[a-z]+", true);
         record.put("E0", "123");
 
-        record.setStage(SpyLib.ON_ENTER);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_ENTER));
+        record.put(".STAGE", SpyLib.ON_ENTER);
 
         assertNotNull(proc.process(record));
     }
@@ -129,7 +140,8 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         SpyProcessor proc = new MethodCallingProcessor("E0", "E0", "length");
         record.put("E0", "oja!");
 
-        record.setStage(SpyLib.ON_ENTER);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_ENTER));
+        record.put(".STAGE", SpyLib.ON_ENTER);
 
         proc.process(record);
 
@@ -142,7 +154,8 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         SpyProcessor proc = new MethodCallingProcessor("E0", "E0", "substring", 1);
         record.put("E0", "oja!");
 
-        record.setStage(SpyLib.ON_ENTER);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_ENTER));
+        record.put(".STAGE", SpyLib.ON_ENTER);
 
         proc.process(record);
 
@@ -155,7 +168,8 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         SpyProcessor proc = new MethodCallingProcessor("E0", "E0", "substring", 1, 3);
         record.put("E0", "oja!");
 
-        record.setStage(SpyLib.ON_ENTER);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_ENTER));
+        record.put(".STAGE", SpyLib.ON_ENTER);
 
         proc.process(record);
 
@@ -166,7 +180,8 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         SpyProcessor sp = new RegexFilterProcessor("E0", "E0", "^(https?://[^/]+/[^/]+).*$", "${1}", true);
         record.put("E0", url);
 
-        record.setStage(SpyLib.ON_ENTER);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_ENTER));
+        record.put(".STAGE", SpyLib.ON_ENTER);
 
         sp.process(record);
 
@@ -197,18 +212,19 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         SpyProcessor sp = new RegexFilterProcessor("E0", "E0", "^a(.*)", "${0}", "???");
 
         record.put("E0", "xxx");
-        record.setStage(SpyLib.ON_ENTER);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_ENTER));
+        record.put(".STAGE", SpyLib.ON_ENTER);
 
         sp.process(record);
         assertEquals("???", record.get("E0"));
     }
 
 
-    private boolean scmp(Object a, int op, Object b) {
+    private boolean scmp(Object a, String op, Object b) {
         SpyProcessor sp = ComparatorProcessor.scmp("E0", op, "E1");
-        record.feed(ON_ENTER, new Object[] { a, b });
         record.put("E0", a); record.put("E1", b);
-        record.setStage(SpyLib.ON_ENTER);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_ENTER));
+        record.put(".STAGE", SpyLib.ON_ENTER);
         return null != sp.process(record);
     }
 
@@ -231,10 +247,11 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
     }
 
 
-    private boolean vcmp(Object a, int op, Object v) {
+    private boolean vcmp(Object a, String op, Object v) {
         SpyProcessor sp = ComparatorProcessor.vcmp("E0", op, v);
         record.put("E0", a);
-        record.setStage(SpyLib.ON_ENTER);
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_ENTER));
+        record.put(".STAGE", SpyLib.ON_ENTER);
 
         return null != sp.process(record);
     }
