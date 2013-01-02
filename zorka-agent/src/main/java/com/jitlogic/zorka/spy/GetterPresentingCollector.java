@@ -21,7 +21,7 @@ import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.util.Map;
 

@@ -25,7 +25,7 @@ import javax.management.*;
 import com.jitlogic.zorka.integ.FileTrapper;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogLevel;
-import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.rankproc.*;
 import com.jitlogic.zorka.mbeans.AttrGetter;
@@ -507,7 +507,7 @@ public class ZorkaLib  {
             ex = (Throwable)args[args.length-1];
             args = ZorkaUtil.clipArray(args, -1);
         }
-        logger.log(level, "<script>", message, ex, args);
+        logger.trap(level, "<script>", message, ex, args);
     }
 
 
@@ -519,7 +519,7 @@ public class ZorkaLib  {
      */
     public void reload(String mask) {
         agent.loadScriptDir(ZorkaConfig.getConfDir(),
-            "^"+mask.replace("\\.", "\\\\.").replace("*", ".*")+"$");
+                "^" + mask.replace("\\.", "\\\\.").replace("*", ".*") + "$");
     }
 
     /**

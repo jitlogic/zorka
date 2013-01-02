@@ -14,7 +14,9 @@
  * You should have received a copy of the GNU General Public License along with
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.integ;
+package com.jitlogic.zorka.util;
+
+import com.jitlogic.zorka.integ.ZorkaLogLevel;
 
 /**
  * Zorka trapper interface. Objects implementing this interface can accept traps (logs)

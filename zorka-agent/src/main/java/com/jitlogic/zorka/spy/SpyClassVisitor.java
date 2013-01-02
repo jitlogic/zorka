@@ -18,8 +18,7 @@
 package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogger;
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.util.ZorkaLogger;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
