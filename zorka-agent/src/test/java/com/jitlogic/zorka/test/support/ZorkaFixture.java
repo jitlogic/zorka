@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.test.util;
+package com.jitlogic.zorka.test.support;
 
 import com.jitlogic.zorka.agent.*;
 import com.jitlogic.zorka.integ.SnmpLib;

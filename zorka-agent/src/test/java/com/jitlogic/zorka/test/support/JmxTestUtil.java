@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.test.util;
+package com.jitlogic.zorka.test.support;
 
 import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;

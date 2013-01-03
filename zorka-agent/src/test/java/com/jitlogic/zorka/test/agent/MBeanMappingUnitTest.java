@@ -15,9 +15,9 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.test.mbeans;
+package com.jitlogic.zorka.test.agent;
 
-import com.jitlogic.zorka.test.util.ZorkaFixture;
+import com.jitlogic.zorka.test.support.ZorkaFixture;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;

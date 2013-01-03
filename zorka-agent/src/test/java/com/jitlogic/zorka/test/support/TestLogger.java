@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.test.util;
+package com.jitlogic.zorka.test.support;
 
 import com.jitlogic.zorka.integ.ZorkaLogLevel;
 import com.jitlogic.zorka.util.ZorkaLogger;

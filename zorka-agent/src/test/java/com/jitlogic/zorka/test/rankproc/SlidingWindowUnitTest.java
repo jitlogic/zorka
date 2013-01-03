@@ -17,14 +17,14 @@
 
 package com.jitlogic.zorka.test.rankproc;
 
-import com.jitlogic.zorka.test.util.ZorkaFixture;
+import com.jitlogic.zorka.test.support.ZorkaFixture;
 import com.jitlogic.zorka.rankproc.RateAggregate;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import com.jitlogic.zorka.test.util.ZorkaTestUtil;
+import com.jitlogic.zorka.test.support.ZorkaTestUtil;
 
 public class SlidingWindowUnitTest extends ZorkaFixture {
 

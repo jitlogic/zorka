@@ -20,7 +20,7 @@ package com.jitlogic.zorka.test.agent;
 import java.net.URL;
 
 import com.jitlogic.zorka.agent.*;
-import com.jitlogic.zorka.test.util.ZorkaFixture;
+import com.jitlogic.zorka.test.support.ZorkaFixture;
 import com.jitlogic.zorka.util.ObjectDumper;
 import com.jitlogic.zorka.integ.ZabbixLib;
 import org.json.simple.JSONArray;

@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.test.normproc;
 
-import com.jitlogic.zorka.test.util.LexerFixture;
+import com.jitlogic.zorka.test.normproc.support.LexerFixture;
 import com.jitlogic.zorka.normproc.LdapLexer;
 import com.jitlogic.zorka.normproc.Token;
 

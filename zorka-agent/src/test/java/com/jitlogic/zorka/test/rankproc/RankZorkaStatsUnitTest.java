@@ -17,7 +17,7 @@ package com.jitlogic.zorka.test.rankproc;
 
 import static com.jitlogic.zorka.rankproc.BucketAggregate.MS;
 
-import com.jitlogic.zorka.test.util.ZorkaFixture;
+import com.jitlogic.zorka.test.support.ZorkaFixture;
 import com.jitlogic.zorka.mbeans.MethodCallStatistic;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
 

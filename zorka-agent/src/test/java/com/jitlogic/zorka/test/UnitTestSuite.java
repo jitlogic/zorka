@@ -22,7 +22,7 @@ import com.jitlogic.zorka.test.agent.ZorkaUtilUnitTest;
 import com.jitlogic.zorka.test.integ.NagiosAgentUnitTest;
 import com.jitlogic.zorka.test.integ.ZabbixAgentUnitTest;
 import com.jitlogic.zorka.test.integ.ZabbixDiscoveryUnitTest;
-import com.jitlogic.zorka.test.mbeans.MBeanMappingUnitTest;
+import com.jitlogic.zorka.test.agent.MBeanMappingUnitTest;
 import com.jitlogic.zorka.test.normproc.LdapLexerUnitTest;
 import com.jitlogic.zorka.test.normproc.XqlLexerUnitTest;
 import com.jitlogic.zorka.test.normproc.XqlNormalizationUnitTest;

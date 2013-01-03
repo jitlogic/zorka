@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.test.spy;
 
-import com.jitlogic.zorka.test.util.ZorkaFixture;
+import com.jitlogic.zorka.test.support.ZorkaFixture;
 import com.jitlogic.zorka.spy.SpyDefinition;
 
 import org.junit.Test;
@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 
 import static com.jitlogic.zorka.test.spy.BytecodeInstrumentationUnitTest.*;
 
-import static com.jitlogic.zorka.test.util.JmxTestUtil.*;
+import static com.jitlogic.zorka.test.support.JmxTestUtil.*;
 
 public class SpyInstanceIntegTest extends ZorkaFixture {
 

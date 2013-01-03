@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.test.integ;
 
-import com.jitlogic.zorka.test.util.ZorkaFixture;
+import com.jitlogic.zorka.test.support.ZorkaFixture;
 import com.jitlogic.zorka.integ.NrpePacket;
 
 import org.junit.Test;

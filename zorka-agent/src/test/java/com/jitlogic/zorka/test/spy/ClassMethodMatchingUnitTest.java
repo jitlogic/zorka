@@ -16,7 +16,7 @@
  */
 package com.jitlogic.zorka.test.spy;
 
-import com.jitlogic.zorka.test.util.ZorkaFixture;
+import com.jitlogic.zorka.test.support.ZorkaFixture;
 import com.jitlogic.zorka.spy.SpyMatcher;
 import org.junit.Assert;
 import org.junit.Test;

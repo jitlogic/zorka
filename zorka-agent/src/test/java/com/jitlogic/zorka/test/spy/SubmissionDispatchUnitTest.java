@@ -19,7 +19,7 @@ package com.jitlogic.zorka.test.spy;
 
 import com.jitlogic.zorka.test.spy.support.TestCollector;
 import com.jitlogic.zorka.test.spy.support.TestSpyTransformer;
-import com.jitlogic.zorka.test.util.ZorkaFixture;
+import com.jitlogic.zorka.test.support.ZorkaFixture;
 import com.jitlogic.zorka.spy.DispatchingSubmitter;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;

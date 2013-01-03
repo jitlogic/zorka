@@ -28,8 +28,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.jitlogic.zorka.test.spy.BytecodeInstrumentationUnitTest.TCLASS1;
-import static com.jitlogic.zorka.test.util.JmxTestUtil.instantiate;
-import static com.jitlogic.zorka.test.util.JmxTestUtil.invoke;
+import static com.jitlogic.zorka.test.support.JmxTestUtil.instantiate;
+import static com.jitlogic.zorka.test.support.JmxTestUtil.invoke;
 
 public class SubmissionAndPreliminaryDispatchStressTest extends StressTestFixture {
 

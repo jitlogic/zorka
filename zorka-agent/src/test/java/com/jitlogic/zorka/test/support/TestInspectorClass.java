@@ -1,4 +1,4 @@
-package com.jitlogic.zorka.test.util;
+package com.jitlogic.zorka.test.support;
 
 /**
  * @author RLE <rafal.lewczuk@gmail.com>

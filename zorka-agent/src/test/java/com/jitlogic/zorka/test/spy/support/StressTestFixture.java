@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.test.spy.support;
 
-import com.jitlogic.zorka.test.util.ZorkaFixture;
+import com.jitlogic.zorka.test.support.ZorkaFixture;
 
 public class StressTestFixture extends ZorkaFixture {
 

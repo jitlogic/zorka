@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.test.spy;
 
-import com.jitlogic.zorka.test.util.ZorkaFixture;
+import com.jitlogic.zorka.test.support.ZorkaFixture;
 
 import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.spy.*;
@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.jitlogic.zorka.test.util.JmxTestUtil.getAttr;
+import static com.jitlogic.zorka.test.support.JmxTestUtil.getAttr;
 
 
 public class StandardCollectorsUnitTest extends ZorkaFixture {

@@ -19,7 +19,7 @@ package com.jitlogic.zorka.test.spy;
 import com.jitlogic.zorka.test.spy.support.TestCollector;
 import com.jitlogic.zorka.test.spy.support.TestSpyTransformer;
 import com.jitlogic.zorka.test.spy.support.TestSubmitter;
-import com.jitlogic.zorka.test.util.ZorkaFixture;
+import com.jitlogic.zorka.test.support.ZorkaFixture;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.MainSubmitter;
 
@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
 
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
-import static com.jitlogic.zorka.test.util.JmxTestUtil.*;
+import static com.jitlogic.zorka.test.support.JmxTestUtil.*;
 
 public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 

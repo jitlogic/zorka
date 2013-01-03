@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 
 import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.test.util.TestLogger;
+import com.jitlogic.zorka.test.support.TestLogger;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.junit.After;
 import org.junit.Before;

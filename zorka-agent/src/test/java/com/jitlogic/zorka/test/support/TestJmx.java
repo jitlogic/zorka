@@ -15,14 +15,36 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.test.util;
+package com.jitlogic.zorka.test.support;
 
-import java.util.concurrent.Executor;
+import java.util.HashMap;
+import java.util.Map;
 
-public class TestExecutor implements Executor {
+/**
+ * @author RLE <rafal.lewczuk@gmail.com>
+ */
+public class TestJmx implements TestJmxMBean {
 
-	public void execute(Runnable command) {
-		command.run();
-	}
+    public long nom, div;
+    private Map<String,String> strMap = new HashMap<String, String>();
 
+    public long getNom() {
+        return nom;
+    }
+
+    public long getDiv() {
+        return div;
+    }
+
+    public Map<String, String> getStrMap() {
+        return strMap;
+    }
+
+    public void setNom(long nom) {
+        this.nom = nom;
+    }
+
+    public void setDiv(long div) {
+        this.div = div;
+    }
 }

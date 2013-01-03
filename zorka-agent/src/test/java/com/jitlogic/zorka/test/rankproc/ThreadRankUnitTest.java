@@ -16,7 +16,7 @@
 package com.jitlogic.zorka.test.rankproc;
 
 import com.jitlogic.zorka.test.rankproc.support.TestThreadRankLister;
-import com.jitlogic.zorka.test.util.ZorkaFixture;
+import com.jitlogic.zorka.test.support.ZorkaFixture;
 
 import com.jitlogic.zorka.rankproc.ThreadRankItem;
 import com.jitlogic.zorka.rankproc.ThreadRankLister;
