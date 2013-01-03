@@ -20,7 +20,7 @@ import com.jitlogic.zorka.integ.SnmpTrapper;
 import com.jitlogic.zorka.integ.TrapVarBindDef;
 import com.jitlogic.contrib.libsnmp.*;
 import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.Map;
@@ -74,7 +74,8 @@ public class SnmpCollector implements SpyProcessor {
         try {
             this.trapper = trapper;
             this.oprefix = oprefix;
-            this.gtrap = gtrap; this.strap = strap;
+            this.gtrap = gtrap;
+            this.strap = strap;
             this.varBindDefs = ZorkaUtil.copyArray(varBindDefs);
             this.oid = new SNMPObjectIdentifier(oid);
         } catch (Exception e) {

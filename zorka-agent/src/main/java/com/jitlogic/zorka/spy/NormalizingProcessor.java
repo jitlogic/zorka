@@ -16,7 +16,7 @@
 package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.normproc.Normalizer;
 
 import java.util.Map;
@@ -47,11 +47,14 @@ public class NormalizingProcessor implements SpyProcessor {
      * Creates normalizing record processor.
      *
      * @param src source field
+     *
      * @param dst destination field
+     *
      * @param normalizer normalizer object
      */
     public NormalizingProcessor(String src, String dst, Normalizer normalizer) {
-        this.src = src; this.dst = dst;
+        this.src = src;
+        this.dst = dst;
         this.normalizer = normalizer;
     }
 

@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.integ;
 
 import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.io.IOException;
 import java.net.Socket;

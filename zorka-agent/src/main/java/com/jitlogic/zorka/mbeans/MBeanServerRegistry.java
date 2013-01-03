@@ -18,7 +18,7 @@
 package com.jitlogic.zorka.mbeans;
 
 import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 import javax.management.*;
 import java.io.IOException;
@@ -52,7 +52,11 @@ public class MBeanServerRegistry {
         public final Object obj;
         /** Standard constructor */
         public DeferredRegistration(String name, String bean, String attr, Object obj, String desc) {
-            this.name = name; this.bean = bean; this.attr = attr; this.obj = obj; this.desc = desc;
+            this.name = name;
+            this.bean = bean;
+            this.attr = attr;
+            this.obj = obj;
+            this.desc = desc;
         }
     }
 

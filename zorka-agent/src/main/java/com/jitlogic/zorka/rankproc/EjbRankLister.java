@@ -18,7 +18,7 @@ package com.jitlogic.zorka.rankproc;
 import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 import javax.management.*;
 import java.util.*;
@@ -32,15 +32,6 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
 
     /** Logger */
     private static final ZorkaLog log = ZorkaLogger.getLog(EjbRankLister.class);
-
-    /** Data collection interval */
-    private long interval;
-
-    /** If set to false, scanning thread will end. */
-    private volatile boolean started = false;
-
-    /** Thread reference. */
-    private volatile Thread thread = null;
 
     /** Tracked EJB statistics */
     private Map<String,EjbRankItem> stats = new HashMap<String, EjbRankItem>();
@@ -64,8 +55,8 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
         this.mbs = AgentInstance.getMBeanServerRegistry().lookup(mbsName);
         this.objNames = objNames;
         this.attr = attr;
-        this.interval = 14000;
     }
+
 
     @Override
     public synchronized List<EjbRankItem> list() {
@@ -119,38 +110,7 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
 
     @Override
     public void run() {
-        while (started) {
-            runCycle(System.currentTimeMillis());
-            try {
-                Thread.sleep(interval);
-            } catch (InterruptedException e) { }
-
-        }
-
-        thread = null;
-    }
-
-    /**
-     * Starts discovery&update thread.
-     */
-    public synchronized void start() {
-        if (!started) {
-            thread = new Thread(this);
-            thread.setDaemon(true);
-            thread.setName("Zorka-thread-lister");
-            thread.start();
-        }
-    }
-
-
-    /**
-     * Stops discovery&update thread.
-     */
-    public synchronized void stop() {
-        if (started) {
-            thread.interrupt();
-            started = false;
-        }
+        runCycle(System.currentTimeMillis());
     }
 
 }
