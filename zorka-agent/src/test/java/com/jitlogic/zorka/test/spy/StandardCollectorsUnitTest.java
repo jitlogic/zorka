@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.jitlogic.zorka.test.support.JmxTestUtil.getAttr;
+import static com.jitlogic.zorka.test.support.TestUtil.getAttr;
 
 
 public class StandardCollectorsUnitTest extends ZorkaFixture {

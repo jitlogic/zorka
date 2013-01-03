@@ -22,45 +22,17 @@ import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.spy.SpyClassTransformer;
 
 import javax.management.MBeanServer;
-import javax.management.MBeanServerBuilder;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-/**
- * @author RLE <rafal.lewczuk@gmail.com>
- */
-public class JmxTestUtil extends ClassLoader {
-
-    private MBeanServer mbs;
-    private ZorkaBshAgent agent;
-
-
-    public void setUp(ZorkaBshAgent agent) {
-        mbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
-        this.agent = agent;
-        AgentInstance.getMBeanServerRegistry().register("test", mbs, null);
-    }
-
-
-    public void tearDown() {
-        AgentInstance.getMBeanServerRegistry().unregister("test");
-    }
-
-
-    public TestJmx makeTestJmx(String name, long nom, long div) throws Exception {
-        TestJmx bean = new TestJmx();
-        bean.setNom(nom); bean.setDiv(div);
-
-        mbs.registerMBean(bean, new ObjectName(name));
-
-        return bean;
-    }
+public class TestUtil extends ClassLoader {
 
     public static byte[] readResource(String name) throws Exception {
-        InputStream is = JmxTestUtil.class.getResourceAsStream("/"+name);
+        InputStream is = TestUtil.class.getResourceAsStream("/"+name);
         byte[] buf = new byte[65536];
         int len = is.read(buf);
         is.close();
@@ -73,11 +45,27 @@ public class JmxTestUtil extends ClassLoader {
     public static Object instantiate(SpyClassTransformer engine, String clazzName) throws Exception {
         String className = clazzName.replace(".", "/");
         byte[] classBytes = readResource(className + ".class");
-        byte[] transformed = engine.transform(JmxTestUtil.getSystemClassLoader(), className, null, null, classBytes);
+        byte[] transformed = engine.transform(TestUtil.getSystemClassLoader(), className, null, null, classBytes);
 
-        Class<?> clazz = new JmxTestUtil().defineClass(clazzName, transformed, 0, transformed.length);
+        Class<?> clazz = new TestUtil().defineClass(clazzName, transformed, 0, transformed.length);
 
         return clazz.newInstance();
+    }
+
+
+    public static Object getField(Object obj, String fieldName) throws Exception {
+        Class<?> clazz = obj.getClass();
+        Field field = clazz.getField(fieldName);
+        boolean accessible = field.isAccessible();
+
+        if (!accessible) {
+            field.setAccessible(true);
+        }
+
+        Object retVal = field.get(obj);
+        field.setAccessible(accessible);
+
+        return retVal;
     }
 
 

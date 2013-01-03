@@ -19,6 +19,7 @@ import com.jitlogic.zorka.agent.*;
 import com.jitlogic.zorka.integ.SnmpLib;
 import com.jitlogic.zorka.integ.SyslogLib;
 import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
+import com.jitlogic.zorka.spy.SpyClassTransformer;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.util.ZorkaLogger;
@@ -40,6 +41,7 @@ public class ZorkaFixture {
 
     protected AgentInstance agentInstance;
     protected SpyInstance spyInstance;
+    protected SpyClassTransformer spyTransformer;
 
     protected SyslogLib syslogLib;
     protected SpyLib spy;
@@ -85,6 +87,8 @@ public class ZorkaFixture {
         syslogLib = agentInstance.getSyslogLib();
         snmpLib = agentInstance.getSnmpLib();
         spy = agentInstance.getSpyLib();
+
+        spyTransformer = spyInstance.getClassTransformer();
     }
 
 

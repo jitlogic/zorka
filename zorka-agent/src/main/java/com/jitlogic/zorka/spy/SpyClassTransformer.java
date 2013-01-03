@@ -97,6 +97,16 @@ public class SpyClassTransformer implements ClassFileTransformer {
         return sdef;
     }
 
+    /**
+     * Resets spy transformer. Removes all added spy definitions.
+     * All submissions coming from existing probes will be ignored.
+     */
+    public void reset() {
+        sdefs.clear();
+        ctxById.clear();
+        ctxInstances.clear();
+    }
+
 
     @Override
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,

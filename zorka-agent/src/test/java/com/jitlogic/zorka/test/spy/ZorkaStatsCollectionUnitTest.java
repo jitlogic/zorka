@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
 import java.util.Date;
 import java.util.Map;
 
-import static com.jitlogic.zorka.test.support.JmxTestUtil.getAttr;
+import static com.jitlogic.zorka.test.support.TestUtil.getAttr;
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
 public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {

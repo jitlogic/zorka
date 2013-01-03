@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.test.spy.support;
+package com.jitlogic.zorka.test.stress.support;
 
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 

@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
 
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
-import static com.jitlogic.zorka.test.support.JmxTestUtil.*;
+import static com.jitlogic.zorka.test.support.TestUtil.*;
 
 public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
