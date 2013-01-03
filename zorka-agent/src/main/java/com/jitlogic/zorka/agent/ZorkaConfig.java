@@ -18,7 +18,7 @@
 package com.jitlogic.zorka.agent;
 
 import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.io.File;
 import java.io.FileInputStream;

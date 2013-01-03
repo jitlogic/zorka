@@ -16,7 +16,7 @@
 package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 import java.util.Map;
@@ -45,8 +45,11 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
     /** Record processing thread will run as long as this attribute value is true */
     private volatile boolean running;
 
-    private AtomicLong submittedRecords, droppedRecords;
-    //private volatile long submittedRecords, droppedRecords;
+    /** Counts submitted records */
+    private AtomicLong submittedRecords;
+
+    /** Counts dropped records */
+    private AtomicLong droppedRecords;
 
     /** Processing queue */
     private LinkedBlockingQueue<Map<String,Object>> procQueue = new LinkedBlockingQueue<Map<String,Object>>(1024);

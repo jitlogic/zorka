@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -62,7 +62,8 @@ public class MethodCallingProcessor implements SpyProcessor {
      * @param args argument types
      */
     public MethodCallingProcessor(String src, String dst, String methodName, Object... args) {
-        this.src = src; this.dst = dst;
+        this.src = src;
+        this.dst = dst;
         this.methodName = methodName;
         this.args = args;
 

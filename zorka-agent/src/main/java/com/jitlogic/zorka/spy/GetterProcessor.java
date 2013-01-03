@@ -18,7 +18,7 @@ package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.util.ObjectInspector;
 import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.util.Map;
 
@@ -54,7 +54,8 @@ public class GetterProcessor implements SpyProcessor {
      * @param attrChain attribute chain
      */
     public GetterProcessor(String srcField, String dstField, Object... attrChain) {
-        this.srcField = srcField; this.dstField = dstField;
+        this.srcField = srcField;
+        this.dstField = dstField;
         this.attrChain = attrChain;
     }
 

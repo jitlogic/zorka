@@ -27,7 +27,7 @@ import com.jitlogic.zorka.util.ZorkaLog;
 
 import bsh.EvalError;
 import bsh.Interpreter;
-import com.jitlogic.zorka.integ.ZorkaLogger;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 /**
  * This is central part of Zorka agent - it processes actual queries and executes BSH scripts.

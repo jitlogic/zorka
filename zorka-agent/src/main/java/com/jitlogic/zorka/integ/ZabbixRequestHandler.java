@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 import org.json.simple.JSONAware;
 
 /**
@@ -169,7 +170,8 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
 			return sb.toString();
 		}
 		
-		sb.append('('); pos++;
+		sb.append('(');
+        pos++;
 				
 		while (pos < query.length() && query.charAt(pos) != ']') {
 			if (query.charAt(pos) == '"') {
@@ -216,7 +218,8 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
 		}
 		
 		OutputStream out = socket.getOutputStream();
-		out.write(buf); out.flush();
+		out.write(buf);
+        out.flush();
 	} // send()
 	
 

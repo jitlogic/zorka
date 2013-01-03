@@ -18,7 +18,6 @@
 package com.jitlogic.zorka.util;
 
 import com.jitlogic.zorka.integ.ZorkaLogLevel;
-import com.jitlogic.zorka.integ.ZorkaLogger;
 
 /**
  * ZorkaLog objects are used internally as loggers. Zorka agent avoids using
@@ -57,7 +56,7 @@ public class ZorkaLog {
      * @param args optional arguments
      */
 	public void trace(String msg, Object...args) {
-		output.log(ZorkaLogLevel.TRACE, tag, msg, null, args);
+		output.trap(ZorkaLogLevel.TRACE, tag, msg, null, args);
 	}
 
 
@@ -68,7 +67,7 @@ public class ZorkaLog {
      * @param args optional arguments
      */
 	public void debug(String msg, Object...args) {
-        output.log( ZorkaLogLevel.DEBUG, tag, msg, null, args);
+        output.trap( ZorkaLogLevel.DEBUG, tag, msg, null, args);
 	}
 
 
@@ -80,7 +79,7 @@ public class ZorkaLog {
      * @param args optional arguments
      */
 	public void info(String msg, Object...args) {
-        output.log(ZorkaLogLevel.INFO, tag, msg, null, args);
+        output.trap(ZorkaLogLevel.INFO, tag, msg, null, args);
 	}
 
 
@@ -92,7 +91,7 @@ public class ZorkaLog {
      * @param args optional arguments
      */
 	public void warn(String msg, Object...args) {
-        output.log(ZorkaLogLevel.WARN, tag, msg, null, args);
+        output.trap(ZorkaLogLevel.WARN, tag, msg, null, args);
 	}
 
 
@@ -104,7 +103,7 @@ public class ZorkaLog {
      * @param args optional arguments
      */
 	public void error(String msg, Object...args) {
-        output.log(ZorkaLogLevel.ERROR, tag, msg, null, args);
+        output.trap(ZorkaLogLevel.ERROR, tag, msg, null, args);
 	}
 
 
@@ -118,7 +117,7 @@ public class ZorkaLog {
      * @param args optional arguments
      */
     public void error(String msg, Throwable e, Object args) {
-        output.log(ZorkaLogLevel.ERROR, tag, msg, e, args);
+        output.trap(ZorkaLogLevel.ERROR, tag, msg, e, args);
 	}
 
 }
