@@ -22,6 +22,7 @@ import com.jitlogic.zorka.spy.SpyProcessor;
 import org.junit.Test;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class SpyEngineMicroBenchmarks extends StressTestFixture {
 
@@ -36,8 +37,24 @@ public class SpyEngineMicroBenchmarks extends StressTestFixture {
                 }
             });
 
-        runBenchmark("trivialMethod", sdef, System.out, "Test run");
+        runBenchmark("trivialMethod", sdef, System.out, "Null processor on method entry");
     }
 
+    @Test
+    public void benchmarkInstrumentationWithSingleSyncOperation() throws Exception {
+
+        final AtomicLong counter = new AtomicLong(0);
+
+        SpyDefinition sdef = SpyDefinition.instance()
+                .onEnter(new SpyProcessor() {
+                    @Override
+                    public Map<String, Object> process(Map<String, Object> record) {
+                        counter.incrementAndGet();
+                        return record;
+                    }
+                });
+
+        runBenchmark("trivialMethod", sdef, System.out, "Single atomic  operation on method entry");
+    }
 
 }

@@ -141,7 +141,7 @@ public class StressTestFixture extends ZorkaFixture {
         result.put("THREADS", numThreads);
 
         for (String attr : data.get(0).keySet()) {
-            String fmin = "MIN(" + attr + ")", fmax =  "MAX(" + attr + ")", favg = attr;
+            String fmin = "MIN(" + attr + ")", fmax =  "MAX(" + attr + ")";
             long tmin = Long.MAX_VALUE,  tmax = Long.MIN_VALUE, tavg = 0L;
 
             for (Map<String,Long> m : data) {
@@ -151,7 +151,8 @@ public class StressTestFixture extends ZorkaFixture {
                 tavg += t;
             }
 
-            result.put(favg, tavg/data.size());
+            result.put(attr, tavg/data.size());
+            result.put("T("+attr+")", 1000000L*tavg/(NUM_ITERATIONS*numThreads*data.size()));
             result.put(fmin, tmin);
             result.put(fmax, tmax);
         }
