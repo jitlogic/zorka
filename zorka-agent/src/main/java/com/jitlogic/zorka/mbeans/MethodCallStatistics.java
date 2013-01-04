@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Groups statistics for multiple monitored methods.
@@ -32,15 +33,15 @@ import java.util.Map;
 public class MethodCallStatistics implements ZorkaStats, RankLister<MethodCallStatistic> {
 
     /** Map of method call statistics objects. */
-	private HashMap<String, MethodCallStatistic> stats = new HashMap<String, MethodCallStatistic>();
+	private ConcurrentHashMap<String, MethodCallStatistic> stats = new ConcurrentHashMap<String, MethodCallStatistic>();
 
 	@Override
-	public synchronized ZorkaStat getStatistic(String statisticName) {
+	public ZorkaStat getStatistic(String statisticName) {
 		return stats.get(statisticName);
 	}
 	
 	@Override
-	public synchronized String[] getStatisticNames() {
+	public String[] getStatisticNames() {
 		String[] names = new String[stats.size()];
 		
 		int i = 0; 
@@ -59,12 +60,11 @@ public class MethodCallStatistics implements ZorkaStats, RankLister<MethodCallSt
      *
      * @return method call statistic
      */
-	public synchronized MethodCallStatistic getMethodCallStatistic(String name) {
+	public MethodCallStatistic getMethodCallStatistic(String name) {
 		MethodCallStatistic ret = stats.get(name);
 		
 		if (ret == null) {
-			ret = MethodCallStatistic.newStatAvg15(name);  // TODO make it configurable somewhere ...
-			stats.put(name,  ret);
+            ret = stats.putIfAbsent(name, MethodCallStatistic.newStatAvg15(name));
 		}
 		
 		return ret;
@@ -72,7 +72,7 @@ public class MethodCallStatistics implements ZorkaStats, RankLister<MethodCallSt
 
 
     @Override
-    public synchronized List<MethodCallStatistic> list() {
+    public List<MethodCallStatistic> list() {
         ArrayList<MethodCallStatistic> lst = new ArrayList<MethodCallStatistic>(stats.size()+2);
 
         for (Map.Entry<String, MethodCallStatistic> entry : stats.entrySet()) {
@@ -83,7 +83,7 @@ public class MethodCallStatistics implements ZorkaStats, RankLister<MethodCallSt
     }
 
     @Override
-    public synchronized String toString() {
+    public String toString() {
         return stats.toString();
     }
 }
