@@ -26,35 +26,108 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class SpyEngineMicroBenchmarks extends StressTestFixture {
 
+    private SpyProcessor nullProcessor = new SpyProcessor() {
+        @Override
+        public Map<String, Object> process(Map<String, Object> record) {
+            return record;
+        }
+    };
+
+
+    private AtomicLong counter = new AtomicLong(0);
+
+    private SpyProcessor counterProcessor = new SpyProcessor() {
+        @Override
+        public Map<String, Object> process(Map<String, Object> record) {
+            counter.incrementAndGet();
+            return record;
+        }
+    };
+
+
+    private long synCounter = 0L;
+
+    private SpyProcessor synchronizedCounterProcessor = new SpyProcessor() {
+        @Override
+        public synchronized Map<String, Object> process(Map<String, Object> record) {
+            synCounter++;
+            return record;
+        }
+    };
+
+
+    private AtomicLong tstamp = new AtomicLong(0);
+
+    private SpyProcessor lastTstampProcessor = new SpyProcessor() {
+        @Override
+        public Map<String, Object> process(Map<String, Object> record) {
+            tstamp.set((Long)record.get("T"));
+            return record;
+        }
+    };
+
+
     @Test
     public void benchmarkInstrumentationWithNullProcessor() throws Exception {
 
-        SpyDefinition sdef = SpyDefinition.instance()
-            .onEnter(new SpyProcessor() {
-                @Override
-                public Map<String, Object> process(Map<String, Object> record) {
-                    return record;
-                }
-            });
+        SpyDefinition sdef = spy.instance().onEnter(nullProcessor);
 
         runBenchmark("trivialMethod", sdef, System.out, "Null processor on method entry");
     }
 
+
     @Test
     public void benchmarkInstrumentationWithSingleSyncOperation() throws Exception {
 
-        final AtomicLong counter = new AtomicLong(0);
-
-        SpyDefinition sdef = SpyDefinition.instance()
-                .onEnter(new SpyProcessor() {
-                    @Override
-                    public Map<String, Object> process(Map<String, Object> record) {
-                        counter.incrementAndGet();
-                        return record;
-                    }
-                });
+        SpyDefinition sdef = spy.instance().onEnter(counterProcessor);
 
         runBenchmark("trivialMethod", sdef, System.out, "Single atomic  operation on method entry");
     }
 
+    @Test
+    public void benchmarkInstrumentationWithCallingSynchronizedMethod() throws Exception {
+
+        SpyDefinition sdef = spy.instance().onEnter(synchronizedCounterProcessor);
+
+        runBenchmark("trivialMethod", sdef, System.out, "Synchronized method call");
+
+        System.out.println("\nCounter = " + synCounter);
+    }
+
+
+    @Test
+    public void benchmarkSimpleArgumentFetch() throws Exception {
+
+        SpyDefinition sdef = spy.instance().onEnter(spy.fetchArg("THIS", 0), nullProcessor);
+
+        runBenchmark("trivialMethod", sdef, System.out, "Simple argument fetch");
+    }
+
+
+    @Test
+    public void benchmarkSingleTimestampFetch() throws Exception {
+
+        SpyDefinition sdef = spy.instance().onEnter(spy.fetchTime("T"), nullProcessor);
+
+        runBenchmark("trivialMethod", sdef, System.out, "Simple argument fetch");
+    }
+
+
+    @Test
+    public void benchmarkFullExecutionTimeCalculation() throws Exception {
+        SpyDefinition sdef = spy.instrument().onEnter(nullProcessor);
+
+        runBenchmark("trivialMethod", sdef, System.out, "Full execution time calculation");
+    }
+
+
+    @Test
+    public void benchmarkFullExecutionTimeCalculationWithZorkaStatsCollector() throws Exception {
+        SpyDefinition sdef = spy.instrument().onSubmit(
+                spy.zorkaStats("java", "zorka:type=ZorkaStats,name=Benchmark1", "stats", "${methodName}", "T2", "T"));
+
+        MAX_THREADS = 1; // TODO performance issue in MethodCallStats code (propably aggregate value calculation)
+
+        runBenchmark("trivialMethod", sdef, System.out, "Full execution time calculation");
+    }
 }
