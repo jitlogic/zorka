@@ -41,7 +41,7 @@ public class SpyLibFunctionsUnitTest extends ZorkaFixture {
         SpyDefinition sdef = spyLib.instrument("test", "test:type=MyStats", "stats", "${0}");
 
         assertEquals(2, sdef.getProcessors(SpyLib.ON_SUBMIT).size());
-        assertEquals("${A0}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getStatisticTemplate());
+        assertEquals("${A0}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getStatTemplate());
         assertEquals(2, sdef.getProbes(SpyLib.ON_ENTER).size());
         assertEquals("A0", sdef.getProbes(SpyLib.ON_ENTER).get(0).getDstField());
     }
@@ -52,7 +52,7 @@ public class SpyLibFunctionsUnitTest extends ZorkaFixture {
         SpyDefinition sdef = spyLib.instrument("test", "test:type=MyStats", "stats", "${1}");
 
         assertEquals(2, sdef.getProcessors(SpyLib.ON_SUBMIT).size());
-        assertEquals("${A1}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getStatisticTemplate());
+        assertEquals("${A1}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getStatTemplate());
     }
 
 
@@ -61,7 +61,7 @@ public class SpyLibFunctionsUnitTest extends ZorkaFixture {
         SpyDefinition sdef = spyLib.instrument("test", "test:type=MyStats", "stats", "${0.request.url}");
 
         assertEquals(2, sdef.getProcessors(SpyLib.ON_SUBMIT).size());
-        assertEquals("${A0.request.url}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getStatisticTemplate());
+        assertEquals("${A0.request.url}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getStatTemplate());
     }
 
 
@@ -70,7 +70,7 @@ public class SpyLibFunctionsUnitTest extends ZorkaFixture {
         SpyDefinition sdef = spyLib.instrument("test", "test:type=MyStats", "stats", "${methodName}");
 
         assertEquals(2, sdef.getProcessors(SpyLib.ON_SUBMIT).size());
-        assertEquals("${methodName}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getStatisticTemplate());
+        assertEquals("${methodName}", ((ZorkaStatsCollector)sdef.getProcessors(SpyLib.ON_SUBMIT).get(1)).getStatTemplate());
     }
 
 

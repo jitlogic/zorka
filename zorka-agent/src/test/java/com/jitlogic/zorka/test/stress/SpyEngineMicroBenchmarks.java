@@ -126,7 +126,7 @@ public class SpyEngineMicroBenchmarks extends StressTestFixture {
         SpyDefinition sdef = spy.instrument().onSubmit(
                 spy.zorkaStats("java", "zorka:type=ZorkaStats,name=Benchmark1", "stats", "${methodName}", "T2", "T"));
 
-        MAX_THREADS = 1; // TODO performance issue in MethodCallStats code (propably aggregate value calculation)
+        //MAX_THREADS = 1; // TODO performance issue in MethodCallStats code (propably aggregate value calculation)
 
         runBenchmark("trivialMethod", sdef, System.out, "Full execution time calculation");
     }
