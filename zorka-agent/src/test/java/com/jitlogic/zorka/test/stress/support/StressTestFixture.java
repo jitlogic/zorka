@@ -124,6 +124,8 @@ public class StressTestFixture extends ZorkaFixture {
         if (verbosity >= 2) {
             System.out.print("" + new Date() + " Running " + methodName
                 + " (iters=" + NUM_ITERATIONS + ", threads=" + numThreads + ") ");
+        } else if (verbosity >= 1) {
+            System.out.print(" " + numThreads + " ");
         }
 
         for (int i = 0; i < NUM_RERUNS; i++) {
@@ -210,7 +212,7 @@ public class StressTestFixture extends ZorkaFixture {
         result.put("TAVG", tavg/times.size());
         result.put("TMIN", tmin);
         result.put("TMAX", tmax);
-        //result.put("TUSR", (t2-t1));
+        result.put("TUSR", (t2-t1));
 
         return result;
     }
