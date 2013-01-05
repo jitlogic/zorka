@@ -96,7 +96,9 @@ public class ZorkaStatsCollector implements SpyProcessor {
     /** This flag determines whether statsCache is actually usable for us */
     private boolean statsCacheEnabled;
 
+    private MethodCallStatistic cachedStatistic;
 
+    private MethodCallStatistics cachedStatistics;
 
     /** MBean server registry */
     private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
@@ -152,7 +154,13 @@ public class ZorkaStatsCollector implements SpyProcessor {
         statsCacheEnabled = !(0 != ((mbeanFlags|attrFlags) & HAS_OTHER_NAME));
 
         if (mbeanFlags == 0 && attrFlags == 0) {
+            // Object name and attribute name are constant ...
+            cachedStatistics = registry.getOrRegister(mbsName, mbeanTemplate, attrTemplate,
+                new MethodCallStatistics(), "Call stats");
 
+            if (statFlags == 0) {
+                cachedStatistic = cachedStatistics.getMethodCallStatistic(statTemplate);
+            }
         }
 
     }
@@ -165,26 +173,35 @@ public class ZorkaStatsCollector implements SpyProcessor {
             log.debug("Collecting record: " + record);
         }
 
-        SpyContext ctx = (SpyContext) record.get(".CTX");
+        MethodCallStatistic statistic = cachedStatistic;
 
-        prefetch(record, ctx);
+        if (statistic == null) {
 
-        MethodCallStatistics stats = statsCacheEnabled ? statsCache.get(ctx) : null;
+            MethodCallStatistics statistics = cachedStatistics;
+            SpyContext ctx = (SpyContext) record.get(".CTX");
 
-        if (stats == null) {
-            String mbeanName = subst(mbeanTemplate, record, ctx, mbeanFlags);
-            String attrName = subst(attrTemplate, record, ctx, attrFlags);
-            stats = registry.getOrRegister(mbsName, mbeanName, attrName, new MethodCallStatistics(), "Call stats");
-            if (statsCacheEnabled) {
-                statsCache.putIfAbsent(ctx, stats);
+            if (statistics == null) {
+                prefetch(record, ctx);
+
+                statistics = statsCacheEnabled ? statsCache.get(ctx) : null;
+
+                if (statistics == null) {
+                    String mbeanName = subst(mbeanTemplate, record, ctx, mbeanFlags);
+                    String attrName = subst(attrTemplate, record, ctx, attrFlags);
+                    statistics = registry.getOrRegister(mbsName, mbeanName, attrName,
+                        new MethodCallStatistics(), "Call stats");
+                    if (statsCacheEnabled) {
+                        statsCache.putIfAbsent(ctx, statistics);
+                    }
+                }
             }
+
+            String key = statFlags != 0 ? subst(statTemplate, record,  ctx,  statFlags) : statTemplate;
+
+            statistic = (MethodCallStatistic) statistics.getMethodCallStatistic(key);
         }
 
-        String key = statFlags != 0 ? subst(statTemplate, record,  ctx,  statFlags) : statTemplate;
-
-        MethodCallStatistic stat = (MethodCallStatistic) stats.getMethodCallStatistic(key);
-
-        submit(record, stat);
+        submit(record, statistic);
 
         return record;
     }

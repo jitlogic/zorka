@@ -96,7 +96,7 @@ public class StressTestFixture extends ZorkaFixture {
 
         List<Map<String, Object>> results = runAllStress(methodName, sdef);
 
-        out.println(" DONE\n");
+        out.println(" DONE " + new Date() + "\n");
 
         printStress(out, results);
     }
