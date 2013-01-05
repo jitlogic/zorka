@@ -410,23 +410,6 @@ public class SpyLib {
 
 
     /**
-     * Creates single method call statistics object. It will maintain zorka call statistics and update them with incoming
-     * data.
-     *
-     * @param mbsName mbean server name
-     *
-     * @param beanName mbean name
-     *
-     * @param attrName attribute name
-     *
-     * @return collector object
-     */
-    public SpyProcessor zorkaStat(String mbsName, String beanName, String attrName, String tstampField, String timeField) {
-        return new JmxAttrCollector(mbsName, beanName, attrName, tstampField, timeField);
-    }
-
-
-    /**
      * Creates getter collector object. It will present collected records as attributes via mbeans.
      *
      * @param mbsName mbean server name
