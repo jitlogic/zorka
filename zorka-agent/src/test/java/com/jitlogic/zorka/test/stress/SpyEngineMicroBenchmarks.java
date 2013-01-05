@@ -15,6 +15,8 @@
  */
 package com.jitlogic.zorka.test.stress;
 
+import com.jitlogic.zorka.spy.MainSubmitter;
+import com.jitlogic.zorka.spy.SpySubmitter;
 import com.jitlogic.zorka.test.stress.support.StressTestFixture;
 
 import com.jitlogic.zorka.spy.SpyDefinition;
@@ -124,7 +126,7 @@ public class SpyEngineMicroBenchmarks extends StressTestFixture {
     @Test
     public void benchmarkFullExecutionTimeCalculationWithZorkaStatsCollector() throws Exception {
         SpyDefinition sdef = spy.instrument().onSubmit(
-                spy.zorkaStats("java", "zorka:type=ZorkaStats,name=Benchmark1", "stats", "${methodName}", "T2", "T"));
+                spy.zorkaStats("java", "zorka:type=ZorkaStats,name=Benchmark1", "stats", "trivialMethod", "T2", "T"));
 
         //MAX_THREADS = 1; // TODO performance issue in MethodCallStats code (propably aggregate value calculation)
 

@@ -26,13 +26,14 @@ import com.jitlogic.zorka.rankproc.CircularBucketAggregate;
 import com.jitlogic.zorka.rankproc.Rankable;
 
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Represents statistics of calls to a single method.
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatistic> {
+public class MethodCallStatistic implements ZorkaStat {
 
     /** Logger */
     private static final ZorkaLog log = ZorkaLogger.getLog(MethodCallStatistic.class);
@@ -46,11 +47,11 @@ public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatis
     /** Number of errors metric ID */
     public static final int ERROR_STAT = 2;
 
-    /** Method name */
-	private String name;
+    /** Statistic name */
+    private String name;
 
-    /** Aggregates */
-    private BucketAggregate calls, errors, time;
+    /** Summary data. */
+    private AtomicLong calls, errors, time;
 
     /**
      * Creates statistic maintaining standard AVG1, AVG5 and AVG15 aggregates.
@@ -78,74 +79,9 @@ public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatis
      */
     public MethodCallStatistic(String name, long base, int res, int...stages) {
         this.name = name;
-        this.calls = new CircularBucketAggregate(base, res, stages);
-        this.errors = new CircularBucketAggregate(base, res, stages);
-        this.time = new CircularBucketAggregate(base, res, stages);
-    }
-
-
-    /**
-     * Returns total aggregated value (sum of all submissions) for given metric
-     *
-     * @param metric metric to be retrieved
-     *
-     * @return total aggregated value
-     */
-    public synchronized long getTotal(int metric) {
-        switch (metric) {
-            case CALLS_STAT:
-                return calls.getTotal();
-            case ERROR_STAT:
-                return errors.getTotal();
-            case TIMES_STAT:
-                return time.getTotal() / MS;
-            default:
-                log.error("Invalid metric passed to getTotal(): " + metric);
-                break;
-        }
-
-        return -1;
-    }
-
-
-    @Override
-    public synchronized double getAverage(long tstamp, int metric, int average) {
-        switch (metric) {
-            case CALLS_STAT: {
-                long delta = calls.getDeltaV(average, tstamp);
-                return 1.0 * delta / (calls.getWindow(average) * MS);
-            }
-            case ERROR_STAT: {
-                long delta = errors.getDeltaV(average, tstamp);
-                return 1.0 * delta / (errors.getWindow(average) * MS);
-            }
-            case TIMES_STAT: {
-                long dc = calls.getDeltaV(average, tstamp), dt = time.getDeltaV(average, tstamp);
-                return dc == 0 ? 0.0 : 1.0 * dt / (dc * MS);
-            }
-            default:
-                log.error("Invalid metric passed to getAverage(): " + metric);
-                break;
-        }
-        return 0.0;
-    }
-
-
-    @Override
-    public String[] getMetrics() {
-        return new String[] { "calls", "time", "errors" };
-    }
-
-
-    @Override
-    public String[] getAverages() {
-        return new String[]  { "CUR", "AVG1", "AVG5", "AVG15" };
-    }
-
-
-    @Override
-    public MethodCallStatistic getWrapped() {
-        return this;
+        this.calls = new AtomicLong(0);
+        this.errors = new AtomicLong(0);
+        this.time = new AtomicLong(0);
     }
 
 
@@ -168,24 +104,12 @@ public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatis
 
 
     /**
-     * Returns aggregate index based on (approximate) time window caller is interested in
-     *
-     * @param window time window (in base units)
-     *
-     * @return integer that can be used to retrieve specific aggregate for all metrics
-     */
-    public int getStage(long window) {
-        return calls.getStage(window);
-    }
-
-
-    /**
      * Returns total number of calls to a method
      *
      * @return number of calls
      */
-	public synchronized long getCalls() {
-		return calls.getTotal();
+	public long getCalls() {
+		return calls.longValue();
 	}
 
 
@@ -194,8 +118,8 @@ public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatis
      *
      * @return number of errors
      */
-	public synchronized long getErrors() {
-		return errors.getTotal();
+	public long getErrors() {
+		return errors.longValue();
 	}
 
 
@@ -204,19 +128,10 @@ public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatis
      *
      * @return total execution time
      */
-	public synchronized long getTime() {
-		return time.getTotal()/MS;
+	public long getTime() {
+		return time.longValue()/MS;
 	}
 
-
-    /**
-     * Returns timestamp of last call to a method
-     *
-     * @return timestamp
-     */
-    public synchronized Date lastSample() {
-        return new Date(calls.getLast()/MS);
-    }
 
 
     /**
@@ -226,9 +141,9 @@ public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatis
      *
      * @param time execution time
      */
-	public synchronized void logCall(long tstamp, long time) {
-        this.calls.feed(tstamp, 1);
-        this.time.feed(tstamp, time);
+	public void logCall(long tstamp, long time) {
+        this.calls.incrementAndGet();
+        this.time.addAndGet(time);
 	}
 
 
@@ -240,21 +155,17 @@ public class MethodCallStatistic implements ZorkaStat, Rankable<MethodCallStatis
      *
      * @param time execution time
      */
-	public synchronized void logError(long tstamp, long time) {
-        this.calls.feed(tstamp, 1);
-        this.errors.feed(tstamp, 1);
-        this.time.feed(tstamp, time);
+	public void logError(long tstamp, long time) {
+        this.errors.incrementAndGet();
+        this.calls.incrementAndGet();
+        this.time.addAndGet(time);
     }
 
 
     @Override
     public String toString() {
-        long tstamp = System.nanoTime();
         return "(calls=" + getCalls()
                 + ", errors=" + getErrors()
-                + ", time=" + getTime()
-                +", avg1=" + getAverage(tstamp, TIMES_STAT, 0)
-                + ", avg5=" + getAverage(tstamp, TIMES_STAT,  1)
-                + ", avg15=" + getAverage(tstamp, TIMES_STAT, 2) + ")";
+                + ", time=" + getTime() + ")";
     }
 }

@@ -38,11 +38,26 @@ import static com.jitlogic.zorka.spy.SpyLib.*;
  */
 public class ZorkaStatsCollector implements SpyProcessor {
 
-    /** Logger */
-    private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaStatsCollector.class);
 
-    /** MBean server registry */
-    private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
+    public static final String CLASS_NAME = "className";
+    public static final String METHOD_NAME = "methodName";
+    public static final String CLASS_SNAME = "shortClassName";
+    public static final String PACKAGE_NAME = "packageName";
+
+    protected static final String M_CLASS_NAME = "${className}";
+    protected static final String M_METHOD_NAME = "${methodName}";
+    protected static final String M_CLASS_SNAME = "${shortClassName}";
+    protected static final String M_PACKAGE_NAME = "${packageName}";
+
+    protected static final int HAS_CLASS_NAME       = 0x01;
+    protected static final int HAS_METHOD_NAME      = 0x02;
+    protected static final int HAS_CLASS_SNAME      = 0x04;
+    protected static final int HAS_PACKAGE_NAME     = 0x08;
+    protected static final int HAS_OTHER_NAME       = 0x10;
+    protected static final int HAS_SINGLE_MACRO     = 0x20;
+
+    /** Logger */
+    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     /** MBean server name */
     private String mbsName;
@@ -62,35 +77,31 @@ public class ZorkaStatsCollector implements SpyProcessor {
     /** Timestamp field */
     private String tstamp;
 
-    /** String substitution flags */
+    /** Object Name substitution flags */
     private int mbeanFlags;
 
+    /** MBean Attribute substitution flags */
     private int attrFlags;
 
+    /** Statistic name substitution flags */
     private int statFlags;
 
-    private int prefetch;
-
-    protected static final String CLASS_NAME = "className";
-    protected static final String METHOD_NAME = "methodName";
-    protected static final String CLASS_SNAME = "shortClassName";
-    protected static final String PACKAGE_NAME = "packageName";
-
-    protected static final String M_CLASS_NAME = "${className}";
-    protected static final String M_METHOD_NAME = "${methodName}";
-    protected static final String M_CLASS_SNAME = "${shortClassName}";
-    protected static final String M_PACKAGE_NAME = "${packageName}";
-
-    protected static final int HAS_CLASS_NAME       = 0x01;
-    protected static final int HAS_METHOD_NAME      = 0x02;
-    protected static final int HAS_CLASS_SNAME      = 0x04;
-    protected static final int HAS_PACKAGE_NAME     = 0x08;
-    protected static final int HAS_OTHER_NAME       = 0x10;
-    protected static final int SINGLE_MACRO         = 0x20;
+    /** Context attributes prefetch flags (marks context attributes that will be added to processed records) */
+    private int prefetchFlags;
 
     /** Cache mapping spy contexts to statistics */
     private ConcurrentHashMap<SpyContext,MethodCallStatistics> statsCache
             = new ConcurrentHashMap<SpyContext, MethodCallStatistics>();
+
+    /** This flag determines whether statsCache is actually usable for us */
+    private boolean statsCacheEnabled;
+
+    private MethodCallStatistic cachedStatistic;
+
+    private MethodCallStatistics cachedStatistics;
+
+    /** MBean server registry */
+    private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
 
     /**
      * Creates new method call statistics collector.
@@ -109,31 +120,47 @@ public class ZorkaStatsCollector implements SpyProcessor {
      */
     public ZorkaStatsCollector(String mbsName, String mbeanTemplate, String attrTemplate,
                                String statTemplate, String tstamp, String timeField) {
+
+        // Some strings are intern()ed immediately, so
+
         this.mbsName  = mbsName;
         this.mbeanTemplate = mbeanTemplate.intern();
         this.attrTemplate = attrTemplate.intern();
         this.statTemplate = statTemplate.intern();
-        this.timeField = timeField;
+
         this.tstamp = tstamp;
+        this.timeField = timeField;
 
         this.mbeanFlags = templateFlags(mbeanTemplate);
         this.attrFlags = templateFlags(attrTemplate);
         this.statFlags = templateFlags(statTemplate);
 
         if (needsCtxAttr(HAS_CLASS_NAME)) {
-            prefetch |= HAS_CLASS_NAME;
+            prefetchFlags |= HAS_CLASS_NAME;
         }
 
         if (needsCtxAttr(HAS_METHOD_NAME)) {
-            prefetch |= HAS_METHOD_NAME;
+            prefetchFlags |= HAS_METHOD_NAME;
         }
 
         if (needsCtxAttr(HAS_CLASS_SNAME)) {
-            prefetch |= HAS_CLASS_SNAME;
+            prefetchFlags |= HAS_CLASS_SNAME;
         }
 
         if (needsCtxAttr(HAS_PACKAGE_NAME)) {
-            prefetch |= HAS_PACKAGE_NAME;
+            prefetchFlags |= HAS_PACKAGE_NAME;
+        }
+
+        statsCacheEnabled = !(0 != ((mbeanFlags|attrFlags) & HAS_OTHER_NAME));
+
+        if (mbeanFlags == 0 && attrFlags == 0) {
+            // Object name and attribute name are constant ...
+            cachedStatistics = registry.getOrRegister(mbsName, mbeanTemplate, attrTemplate,
+                new MethodCallStatistics(), "Call stats");
+
+            if (statFlags == 0) {
+                cachedStatistic = cachedStatistics.getMethodCallStatistic(statTemplate);
+            }
         }
 
     }
@@ -146,102 +173,51 @@ public class ZorkaStatsCollector implements SpyProcessor {
             log.debug("Collecting record: " + record);
         }
 
-        SpyContext ctx = (SpyContext) record.get(".CTX");
+        MethodCallStatistic statistic = cachedStatistic;
 
-        if (0 !=  (prefetch & HAS_CLASS_NAME)) {
-            record.put(CLASS_NAME, ctx.getClassName());
-        }
+        if (statistic == null) {
 
-        if (0 !=  (prefetch & HAS_METHOD_NAME)) {
-            record.put(METHOD_NAME, ctx.getMethodName());
-        }
+            MethodCallStatistics statistics = cachedStatistics;
+            SpyContext ctx = (SpyContext) record.get(".CTX");
 
-        if (0 !=  (prefetch & HAS_CLASS_SNAME)) {
-            record.put(CLASS_SNAME, ctx.getShortClassName());
-        }
+            if (statistics == null) {
+                prefetch(record, ctx);
 
-        if (0 !=  (prefetch & HAS_PACKAGE_NAME)) {
-            record.put(PACKAGE_NAME, ctx.getPackageName());
-        }
+                statistics = statsCacheEnabled ? statsCache.get(ctx) : null;
 
-        boolean cacheStats = !(0 != ((mbeanFlags|attrFlags) & HAS_OTHER_NAME));
-
-        MethodCallStatistics stats = cacheStats ? statsCache.get(ctx) : null;
-
-        if (stats == null) {
-            stats =
-                registry.getOrRegister(mbsName,
-                        subst(mbeanTemplate, record, ctx, mbeanFlags),
-                        subst(attrTemplate, record, ctx, attrFlags),
-                        new MethodCallStatistics(), "Method call statistics");
-            if (cacheStats) {
-                statsCache.putIfAbsent(ctx, stats);
-            }
-        }
-
-        String key = statFlags != 0 ? subst(statTemplate, record,  ctx,  statFlags) : statTemplate;
-
-        MethodCallStatistic statistic = (MethodCallStatistic)stats.getMethodCallStatistic(key);
-
-        Object timeObj = timeField != null ? record.get(timeField) : 0L;  // TODO WTF?
-        Object tstampObj = tstamp != null ? record.get(tstamp) : 0L;   // TODO WTF?
-
-        if (timeObj instanceof Long && tstampObj instanceof Long) {
-            if (0 != ((Integer) record.get(".STAGES") & (1 << ON_RETURN))) {
-                if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
-                    log.debug("Logging record using logCall()");
-                }
-                statistic.logCall((Long) tstampObj, (Long) timeObj);
-            } else if (0 != ((Integer) record.get(".STAGES") & (1 << ON_ERROR))) {
-                if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
-                    log.debug("Logging record using logError()");
-                }
-                statistic.logError((Long)tstampObj, (Long)timeObj);
-            } else {
-                if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
-                    log.debug("No ON_RETURN nor ON_ERROR marked on record " + record);
+                if (statistics == null) {
+                    String mbeanName = subst(mbeanTemplate, record, ctx, mbeanFlags);
+                    String attrName = subst(attrTemplate, record, ctx, attrFlags);
+                    statistics = registry.getOrRegister(mbsName, mbeanName, attrName,
+                        new MethodCallStatistics(), "Call stats");
+                    if (statsCacheEnabled) {
+                        statsCache.putIfAbsent(ctx, statistics);
+                    }
                 }
             }
-        } else {
-            if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
-                log.debug("Unknown type of timeField or tstamp object: " + timeObj);
-            }
+
+            String key = statFlags != 0 ? subst(statTemplate, record,  ctx,  statFlags) : statTemplate;
+
+            statistic = (MethodCallStatistic) statistics.getMethodCallStatistic(key);
         }
+
+        submit(record, statistic);
 
         return record;
     }
 
 
-    protected String subst(String input, Map<String,Object> record, SpyContext ctx, int flags) {
-
-        if (flags == 0) {
-            return input;
-        }
-
-        if (0 != (flags & SINGLE_MACRO)) {
-            switch (flags & (~SINGLE_MACRO)) {
-                case HAS_CLASS_NAME:
-                    return ctx.getClassName();
-                case HAS_METHOD_NAME:
-                    return ctx.getMethodName();
-                case HAS_CLASS_SNAME:
-                    return ctx.getShortClassName();
-                case HAS_PACKAGE_NAME:
-                    return ctx.getPackageName();
-                default:
-                    // TODO internal error - should be logged somewhere ...
-                    break;
-            }
-            return input;
-        } else {
-            return ObjectInspector.substitute(input, record);
-        }
-    }
-
-
-    protected boolean needsCtxAttr(int ref) {
-        for (int flag : new int[] { mbeanFlags, attrFlags, statFlags }) {
-            if (0 == (flag & HAS_OTHER_NAME) && 0 != (flag & ref)) {
+    /**
+     * Returns true if given context attribute is needed to format at least one string.
+     * Strings that consist solely of context attribute macro are not counted.
+     *
+     * @param attr attribute bit (see HAS_* constants)
+     *
+     * @return true if used (thus should be added to spy record)
+     */
+    private boolean needsCtxAttr(int attr) {
+        for (int flags : new int[] { mbeanFlags, attrFlags, statFlags }) {
+            if (0 == (flags & HAS_OTHER_NAME) && 0 != (flags & attr)) {
                 return true;
             }
         }
@@ -250,7 +226,14 @@ public class ZorkaStatsCollector implements SpyProcessor {
     }
 
 
-    protected int templateFlags(String input) {
+    /**
+     * Determines what kinds of attributes are used in template string
+     *
+     * @param input template string
+     *
+     * @return integer flags (see HAS_* constants)
+     */
+    private int templateFlags(String input) {
         int rv = 0;
 
         Matcher m = ObjectInspector.reVarSubstPattern.matcher(input);
@@ -271,17 +254,118 @@ public class ZorkaStatsCollector implements SpyProcessor {
         }
 
         if (M_CLASS_NAME.equals(input) || M_METHOD_NAME.equals(input) ||
-            M_CLASS_SNAME.equals(input) || M_PACKAGE_NAME.equals(input)) {
-            rv |= SINGLE_MACRO;
+                M_CLASS_SNAME.equals(input) || M_PACKAGE_NAME.equals(input)) {
+            rv |= HAS_SINGLE_MACRO;
         }
 
         return rv;
     }
 
 
+    /**
+     * Fetches required spy context attributes (method name, class name etc.)
+     * and stores them in spy record.
+     *
+     * @param record spy record
+     *
+     * @param ctx spy context
+     */
+    private void prefetch(Map<String, Object> record, SpyContext ctx) {
+        if (0 !=  (prefetchFlags & HAS_CLASS_NAME)) {
+            record.put(CLASS_NAME, ctx.getClassName());
+        }
+
+        if (0 !=  (prefetchFlags & HAS_METHOD_NAME)) {
+            record.put(METHOD_NAME, ctx.getMethodName());
+        }
+
+        if (0 !=  (prefetchFlags & HAS_CLASS_SNAME)) {
+            record.put(CLASS_SNAME, ctx.getShortClassName());
+        }
+
+        if (0 !=  (prefetchFlags & HAS_PACKAGE_NAME)) {
+            record.put(PACKAGE_NAME, ctx.getPackageName());
+        }
+    }
+
+
+    /**
+     * Performs string substitution. Chooses the fastest possible way to do so.
+     *
+     * @param input template string
+     *
+     * @param record spy record (with attributes used to do substitution)
+     *
+     * @param ctx spy context
+     *
+     * @param flags template flags.
+     *
+     * @return
+     */
+    private String subst(String input, Map<String,Object> record, SpyContext ctx, int flags) {
+
+        if (flags == 0) {
+            return input;
+        }
+
+        if (0 != (flags & HAS_SINGLE_MACRO)) {
+            switch (flags & (~HAS_SINGLE_MACRO)) {
+                case HAS_CLASS_NAME:
+                    return ctx.getClassName();
+                case HAS_METHOD_NAME:
+                    return ctx.getMethodName();
+                case HAS_CLASS_SNAME:
+                    return ctx.getShortClassName();
+                case HAS_PACKAGE_NAME:
+                    return ctx.getPackageName();
+                default:
+                    // TODO internal error - should be logged somewhere ...
+                    break;
+            }
+            return input;
+        } else {
+            return ObjectInspector.substitute(input, record);
+        }
+    }
+
     /** Returns statistic template */
     public String getStatTemplate() {
         // TODO get rid of this method, use introspection in unit tests
         return statTemplate;
+    }
+
+
+    /**
+     * Submits value to method call statistics.
+     *
+     * @param record spy record
+     *
+     * @param statistic statistic used to
+     */
+    private void submit(Map<String, Object> record, MethodCallStatistic statistic) {
+        Object executionTime = record.get(timeField);
+        Object timeStamp = record.get(tstamp);
+
+        if (executionTime instanceof Long && timeStamp instanceof Long) {
+            if (0 != ((Integer) record.get(".STAGES") & (1 << ON_RETURN))) {
+                if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
+                    log.debug("Logging record using logCall()");
+                }
+                statistic.logCall((Long) timeStamp, (Long) executionTime);
+            } else if (0 != ((Integer) record.get(".STAGES") & (1 << ON_ERROR))) {
+                if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
+                    log.debug("Logging record using logError()");
+                }
+                statistic.logError((Long)timeStamp, (Long)executionTime);
+            } else {
+                if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
+                    log.debug("No ON_RETURN nor ON_ERROR marked on record " + record);
+                }
+            }
+        } else {
+            if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
+                log.debug("Unknown type of timeField or tstamp object: " + executionTime);
+            }
+        }
     }
 }
