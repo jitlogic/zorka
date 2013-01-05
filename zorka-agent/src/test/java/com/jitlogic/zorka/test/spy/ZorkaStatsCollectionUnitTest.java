@@ -18,8 +18,6 @@ package com.jitlogic.zorka.test.spy;
 
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
-import com.jitlogic.zorka.rankproc.BucketAggregate;
-import com.jitlogic.zorka.spy.JmxAttrCollector;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyLib;
@@ -30,7 +28,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import java.util.Date;
 import java.util.Map;
 
 import static com.jitlogic.zorka.test.support.TestUtil.getAttr;
@@ -117,51 +114,4 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
     // TODO test if ctx<->stats pair is properly cached
 
 
-    @Test
-    public void testJmxAttrCollectorTrivialCall() throws Exception {
-        JmxAttrCollector collector = new JmxAttrCollector("test", "test:name=${shortClassName}", "${methodName}", "C0", "C1");
-        SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
-
-        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
-        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << ON_RETURN));
-        record.put(".STAGE", ON_RETURN);
-        record.put("C0", BucketAggregate.SEC);
-        record.put("C1", BucketAggregate.SEC/2);
-        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_SUBMIT));
-        record.put(".STAGE", SpyLib.ON_SUBMIT);
-        collector.process(record);
-
-        assertEquals(1L, getAttr("test", "test:name=TClass", "testMethod_calls"));
-        assertEquals(0L, getAttr("test", "test:name=TClass", "testMethod_errors"));
-        assertEquals(500L, getAttr("test", "test:name=TClass", "testMethod_time"));
-
-        Object date = getAttr("test", "test:name=TClass", "testMethod_last");
-        assertTrue("Should return java.util.Date object", date instanceof Date);
-        assertEquals(1000L, ((Date)date).getTime());
-    }
-
-
-    @Test
-    public void testJmxAttrCollectorTrivialError() throws Exception {
-        JmxAttrCollector collector = new JmxAttrCollector("test", "test:name=${shortClassName}", "${methodName}", "C0", "C1");
-        SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
-
-        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
-        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << ON_ERROR));
-        record.put(".STAGE", ON_ERROR);
-
-        record.put("C0", BucketAggregate.SEC);
-        record.put("C1", BucketAggregate.SEC/2);
-        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_SUBMIT));
-        record.put(".STAGE", SpyLib.ON_SUBMIT);
-        collector.process(record);
-
-        assertEquals(1L, getAttr("test", "test:name=TClass", "testMethod_calls"));
-        assertEquals(1L, getAttr("test", "test:name=TClass", "testMethod_errors"));
-        assertEquals(500L, getAttr("test", "test:name=TClass", "testMethod_time"));
-
-        Object date = getAttr("test", "test:name=TClass", "testMethod_last");
-        assertTrue("Should return java.util.Date object", date instanceof Date);
-        assertEquals(1000L, ((Date)date).getTime());
-    }
 }

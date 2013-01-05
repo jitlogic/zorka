@@ -17,12 +17,6 @@
 
 package com.jitlogic.zorka.mbeans;
 
-import com.jitlogic.zorka.rankproc.RankLister;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -30,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class MethodCallStatistics implements ZorkaStats, RankLister<MethodCallStatistic> {
+public class MethodCallStatistics implements ZorkaStats {
 
     /** Map of method call statistics objects. */
 	private ConcurrentHashMap<String, MethodCallStatistic> stats = new ConcurrentHashMap<String, MethodCallStatistic>();
@@ -70,17 +64,6 @@ public class MethodCallStatistics implements ZorkaStats, RankLister<MethodCallSt
 		return ret;
 	}
 
-
-    @Override
-    public List<MethodCallStatistic> list() {
-        ArrayList<MethodCallStatistic> lst = new ArrayList<MethodCallStatistic>(stats.size()+2);
-
-        for (Map.Entry<String, MethodCallStatistic> entry : stats.entrySet()) {
-            lst.add(entry.getValue());
-        }
-
-        return lst;
-    }
 
     @Override
     public String toString() {

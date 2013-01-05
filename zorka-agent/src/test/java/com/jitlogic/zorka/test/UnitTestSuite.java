@@ -38,7 +38,7 @@ import org.junit.runners.Suite;
         ZabbixAgentUnitTest.class,
 
         // testrank
-        RankProcUnitTest.class, RankZorkaStatsUnitTest.class, ThreadRankUnitTest.class,
+        RankProcUnitTest.class, ThreadRankUnitTest.class,
 
         // testspy
         ArgProcessingUnitTest.class, BytecodeInstrumentationUnitTest.class, ClassMethodMatchingUnitTest.class,
