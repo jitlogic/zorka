@@ -29,7 +29,7 @@ import com.jitlogic.zorka.util.ZorkaUtil;
 public class SpyContext {
 
     /** Context ID */
-    private Integer id = null;
+    private Integer id;
 
     /** Spy definition */
     private final SpyDefinition spyDefinition;

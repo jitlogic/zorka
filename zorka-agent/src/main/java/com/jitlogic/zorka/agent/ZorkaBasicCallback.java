@@ -23,10 +23,10 @@ package com.jitlogic.zorka.agent;
 public class ZorkaBasicCallback implements ZorkaCallback {
 
     /** Stored result */
-	private Object result = null;
+	private Object result;
 
     /** Stored error */
-	private Throwable error = null;
+	private Throwable error;
 
     @Override
 	public void handleResult(Object result) {

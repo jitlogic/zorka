@@ -48,7 +48,7 @@ public class SpyMethodVisitor extends MethodVisitor {
     private final static String SUBMIT_DESC = "(III[Ljava/lang/Object;)V";
 
     /** Debug mode */
-    private static boolean debug = false;
+    private static boolean debug;
 
     /** Access flags of (instrumented) method */
     private final int access;
@@ -63,7 +63,7 @@ public class SpyMethodVisitor extends MethodVisitor {
     private final Type returnType;
 
     /** Slot in method stack for retaining return values (or exception objects) */
-    private int retValProbeSlot = 0;
+    private int retValProbeSlot;
 
     /** Return probe (error probe) found in any of supplied contexts. It is actually only needed to
      *  mark if return/error value is actually neede and generate parts of error/return fetch code that
@@ -78,7 +78,7 @@ public class SpyMethodVisitor extends MethodVisitor {
     private List<SpyContext> ctxs;
 
     /** How many elements have to be added to JVM stack by instrumented code. Used in visitMaxs() method. */
-    private int stackDelta = 0;
+    private int stackDelta;
 
     /** Label used for enclosing method code into try..finally block to intercept thrown exceptions. */
     private final Label lTryFrom = new Label();

@@ -84,7 +84,7 @@ public class GenericNormalizer implements Normalizer {
     private boolean[][] joints, proc;
 
     /** Case alignment direction (to uppercase or to lowercase) */
-    private boolean upcase = false;
+    private boolean upcase;
 
     /**
      * Creates SQL/HQL normalizer.
@@ -124,6 +124,7 @@ public class GenericNormalizer implements Normalizer {
         this.flags = flags;
         this.joints = joints;
         this.proc = proc;
+        this.upcase = false;
     }
 
 

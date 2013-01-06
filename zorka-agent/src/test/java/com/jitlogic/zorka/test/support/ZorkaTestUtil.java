@@ -36,12 +36,13 @@ public class ZorkaTestUtil extends ZorkaUtil {
 	}
 	
 	public static ZorkaTestUtil setUp() {
-		instance = new ZorkaTestUtil();
+		ZorkaTestUtil instance = new ZorkaTestUtil();
+        instanceRef.set(instance);
 		return (ZorkaTestUtil)instance;
 	}
 	
 	public static void tearDown() {
-		instance = null;
+		instanceRef.set(null);
 	}
 	
 	public long currentTimeMillis() {

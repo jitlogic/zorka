@@ -192,11 +192,11 @@ public class ZabbixLib {
      * @param defaultHost default host name
      * @return zabbix trapper
      */
-    public ZabbixTrapper trapper(String id, String serverAddr, String defaultHost) {
+    public ZabbixTrapper trapper(String id, String serverAddr, String defaultHost, String defaultItem) {
         ZabbixTrapper trapper = trappers.get(id);
 
         if (trapper == null) {
-            trapper = new ZabbixTrapper(serverAddr, defaultHost, "traps");
+            trapper = new ZabbixTrapper(serverAddr, defaultHost, defaultItem);
             trappers.put(id, trapper);
             trapper.start();
         }

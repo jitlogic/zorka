@@ -1,3 +1,18 @@
+Zorka 0.7 (2013-01-06)
+----------------------
+
+ * refactor spy API to use string keys (instead of convoluted stage-slot convention);
+ * get rid od ON_COLLECT stage, use asynchronous queue collector;
+ * refactor logger to act as aggregator of (attachable) trappers, remove loggger <-> file trapper redundancies;
+ * lots of redundant code eliminated (eg. threading code in trappers, rank listers, agent integrations etc.)
+ * lots of cleanups, javadocs, bugfixes, simplify package structure and limit inter-package dependencies;
+ * performance optimization of ZorkaStatsCollector (and removal of JmxAttrCollector);
+ * rudimentary stress testing / microbenchmarking framework implemented;
+ * spy now supports OSGi-based frameworks (eg. WSO2 Carbon, see sample script on how to configure it);
+ * remove custom pool executors, use standard ThreadPoolExecutor instead;
+ * support for matching classes and methods by annotations;
+
+
 Zorka 0.6 (2012-12-22)
 ----------------------
 

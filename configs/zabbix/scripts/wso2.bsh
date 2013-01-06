@@ -23,7 +23,7 @@ __wso2() {
 
   __carbonOSGiConfigurer() {
 
-    process(stage, record) {
+    process(record) {
       zorka.logInfo("(Re)Configuring OSGi parameters for Zorka Spy ...");
 
       p = record.get("PARAM");

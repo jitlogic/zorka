@@ -16,9 +16,11 @@
 package com.jitlogic.zorka.integ;
 
 import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Implements asunchronous processing thread with submit queue.
@@ -28,19 +30,19 @@ import java.util.concurrent.TimeUnit;
 public abstract class ZorkaAsyncThread<T> implements Runnable {
 
     /** Logger */
-    protected ZorkaLog log = null;
+    protected final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     /** Submit queue */
-    private LinkedBlockingQueue<T> submitQueue = new LinkedBlockingQueue<T>(1024);
+    private final LinkedBlockingQueue<T> submitQueue = new LinkedBlockingQueue<T>(1024);
 
     /** Thred name (will be prefixed with ZORKA-) */
-    private String name;
+    private final String name;
 
     /** Processing thread will be working as long as this attribute value is true */
-    private volatile boolean running;
+    private final AtomicBoolean running = new AtomicBoolean(false);
 
     /** Thread object representing actual processing thread. */
-    private volatile Thread thread = null;
+    private Thread thread = null;
 
     /**
      * Standard constructor.
@@ -54,17 +56,19 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
     /**
      * This method starts thread.
      */
-    public synchronized void start() {
-        if (thread == null) {
-            try {
-                open();
-                thread = new Thread(this);
-                thread.setName(name);
-                thread.setDaemon(true);
-                running = true;
-                thread.start();
-            } catch (Exception e) {
-                handleError("Error starting thread", e);
+    public void start() {
+        synchronized (this) {
+            if (thread == null) {
+                try {
+                    open();
+                    thread = new Thread(this);
+                    thread.setName(name);
+                    thread.setDaemon(true);
+                    running.set(true);
+                    thread.start();
+                } catch (Exception e) {
+                    handleError("Error starting thread", e);
+                }
             }
         }
     }
@@ -72,24 +76,26 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
     /**
      * This method causes thread to stop (soon).
      */
-    public synchronized void stop() {
-        running = false;
+    public void stop() {
+        running.set(false);
     }
 
     @Override
     public void run() {
-        while (running) {
+        while (running.get()) {
             runCycle();
         }
 
-        close();
-        thread = null;
+        synchronized (this) {
+            close();
+            thread = null;
+        }
     }
 
     /**
      * Processes single item from submit queue (if any).
      */
-    public synchronized void runCycle() {
+    private void runCycle() {
         try {
             T obj = submitQueue.poll(10, TimeUnit.MILLISECONDS);
             if (obj != null) {
@@ -113,6 +119,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
 
     protected abstract void process(T obj);
 
+
     /**
      * Override this method if some resources have to be allocated
      * before thread starts (eg. network socket).
@@ -121,6 +128,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
 
     }
 
+
     /**
      * Override this method if some resources have to be disposed
      * after thread stops (eg. network socket)
@@ -128,6 +136,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
     protected void close() {
 
     }
+
 
     /**
      * Error handling method - called when processing errors occur.

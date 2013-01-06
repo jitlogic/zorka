@@ -10,7 +10,8 @@ implemented at first):
 
 * programmability - zorka can be extended using BeanShell scripts;
 
-* bytecode instrumentation - zorka can instrument your code in several ways and present collected values via JMX Beans;
+* bytecode instrumentation - zorka can instrument your code in several ways and perform arbitrary actions with collected
+data, eg. present them as statistics via JMX, send to file, syslog, as SNMP traps or execute arbitrary beanshell script;
 
 * mapped mbeans - user can map calcluated values from some mbeans into other mbeans (on attribute basis);
 standard JMX clients can fetch these values;

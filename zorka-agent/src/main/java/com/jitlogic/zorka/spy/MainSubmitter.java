@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MainSubmitter {
 
     /** Submitter receiving actual submissions */
-    private static SpySubmitter submitter = null;
+    private static SpySubmitter submitter;
 
     /** Error counter */
     private static AtomicLong errorCount = new AtomicLong(0);

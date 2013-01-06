@@ -18,7 +18,7 @@
 package com.jitlogic.zorka.util;
 
 import java.util.*;
-import java.util.regex.Matcher;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
 
@@ -29,18 +29,25 @@ import java.util.regex.Pattern;
 public class ZorkaUtil {
 
     /** Singleton instance */
-	protected static ZorkaUtil instance;
+    protected final static AtomicReference<ZorkaUtil> instanceRef = new AtomicReference<ZorkaUtil>(null);
 
     /** Returns singleton ZorkaUtil instance (and creates if needed) */
-	public static synchronized ZorkaUtil getInstance() {
-		
-		if (instance == null)
-			instance = new ZorkaUtil();
+	public static ZorkaUtil getInstance() {
+
+        ZorkaUtil instance = instanceRef.get();
+
+		if (instance == null) {
+            instanceRef.compareAndSet(null, new ZorkaUtil());
+            instance = instanceRef.get();
+        }
 		
 		return instance;
 	}
 
 
+    /**
+     * Hidden to block direct instantiations of this class.
+     */
 	protected ZorkaUtil() {
 	}
 
@@ -56,41 +63,62 @@ public class ZorkaUtil {
      */
 	public static Object coerce(Object val, Class<?> c) {
 		
-		if (val == null || c == null) { return null; }
-		if (val.getClass() == c) { return val; }
-		
-		if (c == Long.class)    {
-            return (val instanceof String) ?
-                    Long.parseLong(val.toString().trim()) :
-                    ((Number)val).longValue();
+		if (val == null || c == null) {
+            return null;
+        } else  if (val.getClass() == c) {
+            return val;
+        } else if (c == String.class)  {
+            return castString(val);
+        } else if (c == Boolean.class) {
+            return coerceBool(val);
+        } else if (c == Long.class) {
+            return castLong(val);
+        } else if (c == Integer.class) {
+            return castInteger(val);
+        } else if (c == Double.class) {
+            return castDouble(val);
+        } else if (c == Short.class) {
+            return castShort(val);
+        } else if (c == Float.class) {
+            return castFloat(val);
         }
 
-		if (c == Integer.class) {
-            return (val instanceof String) ?
-                    Integer.parseInt(val.toString().trim()) :
-                    ((Number)val).intValue();
-        }
-
-		if (c == Double.class)  { return (val instanceof String) ?
-                Double.parseDouble(val.toString().trim()) :
-                ((Number)val).doubleValue();
-        }
-
-		if (c == Short.class)   { return (val instanceof String) ?
-                Short.parseShort(val.toString().trim()) :
-                ((Number)val).shortValue();
-        }
-
-		if (c == Float.class)   { return (val instanceof String) ?
-                Float.parseFloat(val.toString().trim()) :
-                ((Number)val).floatValue();
-        }
-
-		if (c == String.class)  { return ""+val; }
-		if (c == Boolean.class) { return coerceBool(val); }
-		
 		return null; 
 	}
+
+    private static String castString(Object val) {
+        return val != null ? val.toString() : "null";
+    }
+
+    private static float castFloat(Object val) {
+        return (val instanceof String)
+            ? Float.parseFloat(val.toString().trim())
+            : ((Number)val).floatValue();
+    }
+
+    private static short castShort(Object val) {
+        return (val instanceof String)
+            ? Short.parseShort(val.toString().trim())
+            : ((Number)val).shortValue();
+    }
+
+    private static double castDouble(Object val) {
+        return (val instanceof String)
+            ? Double.parseDouble(val.toString().trim())
+            : ((Number)val).doubleValue();
+    }
+
+    private static int castInteger(Object val) {
+        return (val instanceof String)
+                ? Integer.parseInt(val.toString().trim())
+                : ((Number)val).intValue();
+    }
+
+    private static long castLong(Object val) {
+        return (val instanceof String)
+                ? Long.parseLong(val.toString().trim())
+                : ((Number)val).longValue();
+    }
 
 
     /**
@@ -169,7 +197,7 @@ public class ZorkaUtil {
 
         for (Object val : col) {
             if (sb.length() > 0) sb.append(sep);
-            sb.append(val != null ? val.toString() : "null");
+            sb.append(castString(val));
         }
 
         return sb.toString();
@@ -190,7 +218,7 @@ public class ZorkaUtil {
 		
 		for (Object val : vals) {
 			if (sb.length() > 0) sb.append(sep);
-			sb.append(val != null ? val.toString() : "null");
+			sb.append(castString(val));
 		}
 		
 		return sb.toString();

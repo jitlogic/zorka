@@ -59,12 +59,16 @@ public class EjbRankItem implements Rankable<Object> {
     public double getAverage(long tstamp, int metric, int average) {
         switch (metric) {
             case BY_CALLS: {
-                long dt = byCalls.getDeltaT(average, tstamp);
-                return dt > 0 ? (1.0 * byCalls.getDeltaV(average, tstamp) / dt) : 0.0;
+                synchronized (byCalls) {
+                    long dt = byCalls.getDeltaT(average, tstamp);
+                    return dt > 0 ? (1.0 * byCalls.getDeltaV(average, tstamp) / dt) : 0.0;
+                }
             }
             case BY_TIME: {
-                long dt = byTime.getDeltaT(average, tstamp);
-                return 1.0 * byTime.getDeltaV(average, tstamp) / dt;
+                synchronized (byTime) {
+                    long dt = byTime.getDeltaT(average, tstamp);
+                    return 1.0 * byTime.getDeltaV(average, tstamp) / dt;
+                }
             }
             default:
                 log.error("Invalid metric passed to getAverage(): " + metric);
@@ -104,16 +108,20 @@ public class EjbRankItem implements Rankable<Object> {
      *
      * @param tstamp current time
      */
-    public synchronized void feed(long tstamp) {
+    public void feed(long tstamp) {
         Object count = ObjectInspector.get(statObj, "count");
         Object time = ObjectInspector.get(statObj, "totalTime");
 
         if (count instanceof Long) {
-            byCalls.feed(tstamp, (Long)count);
+            synchronized (byCalls) {
+                byCalls.feed(tstamp, (Long)count);
+            }
         }
 
         if (time instanceof Long) {
-            byTime.feed(tstamp, (Long)time);
+            synchronized (byTime) {
+                byTime.feed(tstamp, (Long)time);
+            }
         }
     }
 }

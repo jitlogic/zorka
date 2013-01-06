@@ -31,13 +31,13 @@ import static com.jitlogic.zorka.spy.SpyLib.SPD_CONFIG;
 public class SpyInstance {
 
     /** Debug level for spy components.  */
-    private static int debugLevel = 0;
+    private static volatile int debugLevel;
 
     /** Logger */
-    private static ZorkaLog log;
+    private static ZorkaLog log = ZorkaLogger.getLog(SpyInstance.class);
 
     /** Spy instance reference */
-    private static SpyInstance instance = null;
+    private static volatile SpyInstance instance;
 
     /** Reference to instance's class transformer */
     private SpyClassTransformer classTransformer;
@@ -51,29 +51,26 @@ public class SpyInstance {
      *
      * @return spy instance
      */
-    public static synchronized SpyInstance instance() {
-
-        if (null == log) {
-            log = ZorkaLogger.getLog(SpyInstance.class);
-        }
+    public static SpyInstance instance() {
 
         if (isDebugEnabled(SPD_CONFIG)) {
             log.debug("Requested a submitter instance.");
         }
 
-        if (null == instance) {
+        synchronized (SpyInstance.class) {
+            if (null == instance) {
+                instance = new SpyInstance(ZorkaConfig.getProperties());
 
-            instance = new SpyInstance(ZorkaConfig.getProperties());
+                if (isDebugEnabled(SPD_CONFIG)) {
+                    log.debug("Setting up submitter: " + instance.getSubmitter());
+                }
+
+                MainSubmitter.setSubmitter(instance.getSubmitter());
+
+                debugLevel = Integer.parseInt(ZorkaConfig.getProperties().getProperty("spy.debug").trim());
+            }
 
         }
-
-        if (isDebugEnabled(SPD_CONFIG)) {
-            log.debug("Setting up submitter: " + instance.getSubmitter());
-        }
-
-        MainSubmitter.setSubmitter(instance.getSubmitter());
-
-        debugLevel = Integer.parseInt(ZorkaConfig.getProperties().getProperty("spy.debug").trim());
 
         return instance;
     }
@@ -82,9 +79,11 @@ public class SpyInstance {
     /**
      * Stops spy instance and deconfigures MainSubmitter.
      */
-    public static synchronized void cleanup() {
-        MainSubmitter.setSubmitter(null);
-        instance = null;
+    public static void cleanup() {
+        synchronized (SpyInstance.class) {
+            MainSubmitter.setSubmitter(null);
+            instance = null;
+        }
     }
 
 
