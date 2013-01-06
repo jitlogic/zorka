@@ -514,10 +514,6 @@ In addition `keyExpr` can contain expressions fetching record arguments `${n.att
 
 It is also possible to attach single-method call statistic directly as mbean attribute:
 
-    spy.zorkaStat(mbsName, beanName, attrName, tstampField, timeField);
-
-All parameters are the same as in `toStats()` method (except for `keyExpr` which is missing).
-
 #### Intercepting and presenting objects via Zorka Getter
 
 Presenting intercepted values as mbean attributes is possible with `toGetter()` method:
@@ -527,14 +523,6 @@ Presenting intercepted values as mbean attributes is possible with `toGetter()` 
 This will present intercepted object as ValGetter attribute. Each time attribute is accessed (eg. via jconsole),
 Zorka will fetch value using attribute chain `(attr1, attr2, ...)` as in `zorka.jmx()` call.
 
-#### Logging collected events via Syslog
-
-    spy.syslogCollector(trapper, expr, severity, facility, hostname, tag)
-
-Parameter `trapper` must be a reference to trapper object obtained using `syslog.trapper()`. Parameter `expr` is message
-template (analogous to `keyExpr` in other collectors). Remaining parameters - `severity`, `facility`, `hostname` and
-`tag` work in the same way as in `syslog.log()` method.
-
 #### Sending collected events as SNMP traps
 
     spy.snmpCollector(trapper, oid, spcode, bindings)
@@ -543,22 +531,24 @@ Parameter `trapper` must be a reference to trapper object obtained using `snmp.t
 `enterprise-oid` field set to `oid` and all variables will have their keys starting with `oid`. Traps will be of
 `enterpriseSpecific` (6) type and specific code will be set to `spcode`.
 
-#### Sending collected events to Zabbix
+#### Using trappers with spy
 
-    spy.zabbixCollector(trapper, expr, key)
-    spy.zabbixCollector(trapper, expr, host, key)
+    spy.trapperCollector(trapper, logLevel, tagExpr, msgExpr, errExpr, errField)
 
-Parameter `trapper` must be a reference to zabbix trapper obtained using `zabbix.get()` function. Parameter `expr` is
-message template (analogous to `keyExpr` in other collectors). Parametry `key' refers to zabbix item key that will be
-populated. Item must be of proper type (text or number depending on data that is submitted).
+This function creates collector that will send messages via trapper. Several trapper types are available:
 
-#### Sending collected records to log file
+* file trappers - trappers that log messages to log file;
+* syslog trappers - trappers that send syslog messages;
+* zabbix trappers - trappers that send traps directly to zabbix;
 
-    spy.fileCollector(trapper, expr, logLevel)
+Arguments:
 
-Parameter `trapper` must be a reference to file trapper obtained using `zorka.fileTrapper()`, `zorka.dailyFileTrapper()`
-or `zorka.rollingFileTrapper()`. Second parameter `expr` contains template string used to create log messages. Parameter
-`logLevel` must be one of: `zorka.TRACE`, `zorka.DEBUG`, `zorka.INFO`, `zorka.WARN`, `zorka.ERROR` and `zorka.FATAL`.
+* `trapper` - configured and started trapper object;
+* `logLevel` - log level (ZorkaLogLevel constant);
+* `tagExpr` - log tag;
+* `msgExpr` - log message (if call succeeds);
+* `errExpr` - log message (if error occurs);
+* `errField` - spy record field that contains intercepted exception object;
 
 #### Passing records to another processing chain
 

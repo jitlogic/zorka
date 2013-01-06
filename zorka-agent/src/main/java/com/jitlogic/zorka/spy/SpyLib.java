@@ -116,6 +116,7 @@ public class SpyLib {
     public static final int AC_ANNOTATION   = 0x002000;
     public static final int AC_ENUM         = 0x004000;
     public static final int AC_PKGPRIV      = 0x010000;
+    public static final int AC_ANY          = 0x000000;
 
     private SpyInstance instance;
 
@@ -434,7 +435,7 @@ public class SpyLib {
      *
      * @return asynchronous queued collector
      */
-    public SpyProcessor asyncQueueCollector(String...attrs) {
+    public SpyProcessor asyncCollector(String...attrs) {
         return new AsyncQueueCollector(attrs);
     }
 
@@ -453,6 +454,24 @@ public class SpyLib {
      */
     public SpyProcessor snmpCollector(SnmpTrapper trapper, String oid, int spcode, TrapVarBindDef...bindings) {
         return new SnmpCollector(trapper, oid, SnmpLib.GT_SPECIFIC, spcode, oid, bindings);
+    }
+
+
+    /**
+     * Sends collected records to specific trapper.
+     *
+     * @param trapper trapper object (eg. zabbix trapper, syslog trapper, file trapper etc.)
+     *
+     * @param tagExpr tag template (eg. class name or component name)
+     *
+     * @param msgExpr message template (used if no exception has been caught)
+     *
+     * @return trapper collector object
+     *
+     */
+    public SpyProcessor trapperCollector(ZorkaTrapper trapper, ZorkaLogLevel logLevel,
+                                         String tagExpr, String msgExpr) {
+        return new TrapperCollector(trapper, logLevel, tagExpr, msgExpr,  null, null);
     }
 
 

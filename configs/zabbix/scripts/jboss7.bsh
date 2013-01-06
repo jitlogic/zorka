@@ -124,7 +124,7 @@ __jboss7() {
   __mbsRegister() {
     jbossMbs = null;
 
-    process(stage,record) {
+    process(record) {
       synchronized (super) {
         if (super.jbossMbs == null) {
           mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
@@ -140,8 +140,8 @@ __jboss7() {
 
 
   spy.add(spy.instance()
-    .onReturn(spy.FETCH_NULL, (com.jitlogic.zorka.spy.SpyProcessor)__mbsRegister())
-    .include(spy.byMethod("org.jboss.modules.ModuleLoader", "installMBeanServer")));
+    .onReturn((com.jitlogic.zorka.spy.SpyProcessor)__mbsRegister())
+    .include(spy.byMethod(spy.AC_STATIC, "org.jboss.modules.ModuleLoader", "installMBeanServer", "void")));
 
 
 

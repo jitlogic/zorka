@@ -152,6 +152,6 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
 
     @Override
     public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e, Object... args) {
-        send(defaultItem, tag + " " + msg);
+        send(tag, msg);
     }
 }

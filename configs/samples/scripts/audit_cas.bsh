@@ -19,24 +19,16 @@
 
 __cas() {
 
-  useSyslog = true;
-  useZabbix = true;
-
   request = new ThreadLocal();
 
-  syslogTrapper = useSyslog ? syslog.trapper("audit", "127.0.0.1", zorka.getHostname()) : null;
-  zabbixTrapper = useZabbix ? zabbix.trapper("audit", "127.0.0.1", zorka.getHostname()) : null;
+  syslogTrapper = syslog.trapper("audit", "127.0.0.1", zorka.getHostname(), syslog.F_AUDIT);
+  zabbixTrapper = zabbix.trapper("audit", "127.0.0.1", zorka.getHostname(), "cas.audit");
 
   audit(sdef, expr) {
-    if (useSyslog)
-      sdef = sdef.onSubmit(
-        spy.syslogCollector(syslogTrapper, expr, syslog.S_INFO, syslog.F_LOCAL5, zorka.getHostname(), "cas.audit"));
-
-    if (useZabbix)
-      sdef = sdef.onSubmit(
-        spy.zabbixCollector(zabbixTrapper, expr, "cas.audit"));
-
-    spy.add(sdef);
+    spy.add(sdef.onSubmit(
+      spy.trapperCollector(syslogTrapper, zorka.INFO, "cas", expr),
+      spy.trapperCollector(zabbixTrapper, zorka.INFO, "cas", expr)
+    ));
   }
 
 

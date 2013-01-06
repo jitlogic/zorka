@@ -46,7 +46,7 @@ public class TimeDiffProcessor implements SpyProcessor {
     public TimeDiffProcessor(String tstart, String tstop, String rslt) {
         this.tstart = tstart;
         this.tstop = tstop;
-        //this.rslt = rslt;  TODO first write unit test exposing this bug
+        this.rslt = rslt;
     }
 
 

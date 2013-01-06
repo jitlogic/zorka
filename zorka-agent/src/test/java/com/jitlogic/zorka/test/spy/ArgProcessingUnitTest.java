@@ -273,4 +273,13 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         assertEquals(true,  vcmp("oja!", EQ, "oja!"));
         assertEquals(false, vcmp("oja!", EQ, "oje!"));
     }
+
+    @Test
+    public void testTdiffProc() {
+        SpyProcessor sp = new TimeDiffProcessor("T1", "T2", "T");
+        Map<String,Object> in = ZorkaUtil.map("T1", 10L, "T2", 30L);
+        Map<String,Object> out = sp.process(in);
+
+        assertEquals(20L, out.get("T"));
+    }
 }

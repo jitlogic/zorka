@@ -67,8 +67,14 @@ public class TrapperCollector implements SpyProcessor {
     public Map<String,Object> process(Map<String,Object> record) {
 
         String tag = ObjectInspector.substitute(this.tag, record);
-        String msg = ObjectInspector.substitute(
-                0 != ((Integer) record.get(".STAGES") & (1 << SpyLib.ON_ERROR)) ? errExpr : message, record);
+        String msg;
+
+        if (errExpr != null) {
+            msg = ObjectInspector.substitute(
+                    0 != ((Integer) record.get(".STAGES") & (1 << SpyLib.ON_ERROR)) ? errExpr : message, record);
+        } else {
+            msg = ObjectInspector.substitute(message, record);
+        }
 
         trapper.trap(logLevel, tag, msg, (Throwable)record.get(errField));
 
