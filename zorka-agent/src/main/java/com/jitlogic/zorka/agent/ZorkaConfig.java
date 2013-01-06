@@ -44,10 +44,10 @@ public class ZorkaConfig {
     private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaConfig.class);
 
     /** Configuration properties */
-    private static Properties properties = null;
+    private static Properties properties;
 
     /** Home directory */
-	private static String homeDir = null;
+	private static String homeDir;
 
     /** Path to config defaults (always in classpath) */
     public final static String DEFAULT_CONF_PATH = "/com/jitlogic/zorka/agent/zorka.properties";
@@ -108,7 +108,7 @@ public class ZorkaConfig {
      * @param suffix
      * @return
      */
-	private synchronized static String getHomeDir(String suffix) {
+	private static String getHomeDir(String suffix) {
 		return homeDir.endsWith(File.separator) ? homeDir + suffix : homeDir + File.separator + suffix;
 	}
 

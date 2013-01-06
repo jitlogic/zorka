@@ -20,6 +20,7 @@ import com.jitlogic.zorka.util.ZorkaUtil;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Maintains rank lists of objects of various types. This can be used to monitor
@@ -43,16 +44,16 @@ public class RankList<T extends Rankable<?>> implements RankLister<T> {
     private int maxSize;
 
     /** How often items should be reranked */
-    private long rerankTime;
+    private volatile long rerankTime;
 
     /** Last rank cycle time */
-    private long lastTime;
+    private volatile long lastTime;
 
     /** Number of reranks (since ranking was created and started) */
-    private int numReranks;
+    private AtomicInteger numReranks = new AtomicInteger(0);
 
     /** List of (ranked) objects */
-    private List<T> rankList;
+    private volatile List<T> rankList;
 
     /** Utility class (to be made fully static at some point) */
     private final ZorkaUtil util = ZorkaUtil.getInstance();
@@ -87,11 +88,9 @@ public class RankList<T extends Rankable<?>> implements RankLister<T> {
      *
      * @return item
      */
-    public synchronized T get(int n) {
+    public T get(int n) {
 
-        if (util.currentTimeMillis() > lastTime + rerankTime) {
-            rerank(util.currentTimeMillis());
-        }
+        checkRerank();
 
         try {
             return rankList.get(n);
@@ -107,11 +106,9 @@ public class RankList<T extends Rankable<?>> implements RankLister<T> {
      *
      * @return list of ranked items
      */
-    public synchronized List<T> list() {
+    public List<T> list() {
 
-        if (util.currentTimeMillis() > lastTime + rerankTime) {
-            rerank(util.currentTimeMillis());
-        }
+        checkRerank();
 
         return rankList;
     }
@@ -122,14 +119,18 @@ public class RankList<T extends Rankable<?>> implements RankLister<T> {
      *
      * @return number of items in ranking
      */
-    public synchronized int size() {
-        long tstamp = util.currentTimeMillis();
-        if (tstamp > lastTime + rerankTime) {
-            rerank(tstamp * BucketAggregate.MS);
+    public int size() {
 
-        }
+        checkRerank();
 
         return rankList.size();
+    }
+
+    private void checkRerank() {
+        long tstamp = System.currentTimeMillis();
+        if (tstamp > lastTime + rerankTime) {
+            rerank(tstamp);
+        }
     }
 
 
@@ -139,7 +140,13 @@ public class RankList<T extends Rankable<?>> implements RankLister<T> {
      * @param tstamp current time
      */
     private void rerank(final long tstamp) {
-        List<T> lst = lister.list();
+
+        List<T> lst;
+
+        synchronized (lister) {
+            lst = lister.list();
+        }
+
         Collections.sort(lst, new Comparator<T>() {
             public int compare(T o1, T o2) {
                 double dd = o2.getAverage(tstamp, metric, average) - o1.getAverage(tstamp, metric, average);
@@ -149,7 +156,8 @@ public class RankList<T extends Rankable<?>> implements RankLister<T> {
 
         rankList = Collections.unmodifiableList(ZorkaUtil.clip(lst, maxSize));
 
-        numReranks++;
+        lastTime = tstamp;
+        numReranks.incrementAndGet();
     }
 
 
@@ -158,7 +166,7 @@ public class RankList<T extends Rankable<?>> implements RankLister<T> {
      *
      * @return number of reranks
      */
-    public synchronized int getNumReranks() {
-        return numReranks;
+    public int getNumReranks() {
+        return numReranks.intValue();
     }
 }

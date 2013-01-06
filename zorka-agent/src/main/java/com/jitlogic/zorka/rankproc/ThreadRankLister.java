@@ -22,6 +22,9 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicMarkableReference;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 /**
  * Maintains information about running thread in a form suitable for creating rankings.
@@ -37,7 +40,8 @@ public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
     private ThreadMXBean threadMXBean;
 
     /** Map of tracked threads. */
-    private Map<Long,ThreadRankItem> threads = new HashMap<Long, ThreadRankItem>();
+    // TODO use AtomicReference for all such volatile fields
+    private volatile Map<Long,ThreadRankItem> threads = new HashMap<Long, ThreadRankItem>();
 
     /**
      * Creates thread rank lister
@@ -48,7 +52,7 @@ public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
 
 
     @Override
-    public synchronized List<ThreadRankItem> list() {
+    public List<ThreadRankItem> list() {
         List<ThreadRankItem> lst = new ArrayList<ThreadRankItem>(threads.size()+2)     ;
 
         for (Map.Entry<Long,ThreadRankItem> e : threads.entrySet()) {

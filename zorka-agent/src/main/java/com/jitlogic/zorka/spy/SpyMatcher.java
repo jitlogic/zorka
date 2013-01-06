@@ -325,8 +325,6 @@ public class SpyMatcher {
      * @return true or false
      */
     private boolean matches(int access) {
-        return this.access == 0 ||
-          0 != (this.access & (ACC_PUBLIC|ACC_PRIVATE|ACC_PROTECTED)) ?
-            (0 != (access & this.access)) : (0 != (this.access & ACC_PKGPRIV));
+        return this.access == 0 ||  (this.access & access) != 0;
     }
 }

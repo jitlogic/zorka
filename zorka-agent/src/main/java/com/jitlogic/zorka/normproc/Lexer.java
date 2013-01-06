@@ -144,7 +144,7 @@ public abstract class Lexer implements Iterable<Token>, Iterator<Token> {
     private byte[][] lextab;
 
     /** Current position */
-    private int pos = 0;
+    private int pos;
 
     /** Current state */
     private int state = S_START;

@@ -48,14 +48,14 @@ public class AgentInstance {
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     /** MBean server registry */
-    private static MBeanServerRegistry mBeanServerRegistry;
+    private static volatile MBeanServerRegistry mBeanServerRegistry;
 
     /**
      * Returns reference to mbean server registry.
      *
      * @return mbean server registry reference of null (if not yet initialized)
      */
-    public synchronized static MBeanServerRegistry getMBeanServerRegistry() {
+    public static MBeanServerRegistry getMBeanServerRegistry() {
         return mBeanServerRegistry;
     }
 
@@ -63,7 +63,7 @@ public class AgentInstance {
      * Sets mbean server registry.
      * @param registry registry
      */
-    public synchronized static void setMBeanServerRegistry(MBeanServerRegistry registry) {
+    public static void setMBeanServerRegistry(MBeanServerRegistry registry) {
         mBeanServerRegistry = registry;
     }
 
@@ -77,10 +77,13 @@ public class AgentInstance {
      *
      * @return agent instance
      */
-    public synchronized static AgentInstance instance() {
-        if (null == instance) {
-            instance = new AgentInstance(ZorkaConfig.getProperties());
-            instance.start();
+    public static AgentInstance instance() {
+
+        synchronized (AgentInstance.class) {
+            if (null == instance) {
+                instance = new AgentInstance(ZorkaConfig.getProperties());
+                instance.start();
+            }
         }
 
         return instance;
@@ -105,37 +108,37 @@ public class AgentInstance {
     private int requestQueue = 64;
 
     /** Executor managing threads that handle requests */
-    private Executor executor = null;
+    private Executor executor;
 
     /** Main zorka agent object - one that executes actual requests */
-    private ZorkaBshAgent zorkaAgent = null;
+    private ZorkaBshAgent zorkaAgent;
 
     /** Reference to zabbix agent object - one that handles zabbix requests and passes them to BSH agent */
-    private ZabbixAgent zabbixAgent = null;
+    private ZabbixAgent zabbixAgent;
 
     /** Reference to zabbix library - available to zorka scripts as 'zabbix.*' functions */
-    private ZabbixLib zabbixLib = null;
+    private ZabbixLib zabbixLib;
 
     /** Reference to nagios agents - one that handles nagios NRPE requests and passes them to BSH agent */
-    private NagiosAgent nagiosAgent = null;
+    private NagiosAgent nagiosAgent;
 
     /** Reference to nagios library - available to zorka scripts as 'nagios.*' functions */
-    private NagiosLib nagiosLib = null;
+    private NagiosLib nagiosLib;
 
     /** Reference to Spy instrumentation engine object */
-    private SpyInstance spyInstance = null;
+    private SpyInstance spyInstance;
 
     /** Reference to spy library - available to zorka scripts as 'spy.*' functions */
-    private SpyLib spyLib = null;
+    private SpyLib spyLib;
 
     /** Reference to syslog library - available to zorka scripts as 'syslog.*' functions */
-    private SyslogLib syslogLib = null;
+    private SyslogLib syslogLib;
 
     /** Reference to SNMP library - available to zorka scripts as 'snmp.*' functions */
-    private SnmpLib snmpLib = null;
+    private SnmpLib snmpLib;
 
     /** Reference to normalizers library - available to zorka scripts as 'normalizers.*' function */
-    private NormLib normLib = null;
+    private NormLib normLib;
 
     /** Agent configuration properties */
     private Properties props;

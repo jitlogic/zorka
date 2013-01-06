@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.integ;
 
 import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaTrapper;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
@@ -53,20 +54,17 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
     /** Logs stack traces of exceptions if set to true */
     private boolean logExceptions = true;
 
-    /** Backup logger where trapper can log its own events */
-    private final ZorkaLog log = null;
-
     /** Output (as print stream) */
-    private PrintStream out = null;
+    private PrintStream out;
 
     /** Output (as output stream) */
-    private OutputStream os = null;
+    private OutputStream os;
 
     /** Current log size (for rolling trappers) */
-    private long currentSize = 0;
+    private long currentSize;
 
     /** Current suffix (for daily trappers) */
-    private String currentSuffix = null;
+    private String currentSuffix;
 
     /**
      * Creates new rolling trapper.

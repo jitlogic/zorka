@@ -157,10 +157,10 @@ __jboss() {
 
     jbossMbs = null;
 
-    process(stage,record) {
+    process(record) {
       synchronized (super) {
         if (super.jbossMbs == null) {
-          mbs = record.get(spy.ON_RETURN,0);
+          mbs = record.get("MBS");
           zorka.registerMbs("jboss", mbs);
           super.jbossMbs = mbs;
           zorka.logInfo("Registered JBoss MBean server as 'jboss'");
@@ -172,7 +172,7 @@ __jboss() {
   } // __mbsRegister()
 
   spy.add(spy.instance()
-    .onReturn(0, (com.jitlogic.zorka.spy.SpyProcessor)__mbsRegister())
+    .onReturn(spy.fetchArg("MBS", 0), (com.jitlogic.zorka.spy.SpyProcessor)__mbsRegister())
     .include(spy.byMethod("org.jboss.mx.server.MBeanServerImpl", "<init>")));
 
   return this;

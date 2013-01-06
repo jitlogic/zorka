@@ -135,7 +135,7 @@ as BeanShell scripts.
 
 Spy definition example:
 
-    collect(record) {
+    process(record) {
       mbs = record.get(4,0);
       zorka.registerMbs("jboss", mbs);
     }
@@ -163,33 +163,22 @@ to choose stage (or probe point):
     sdef = sdef.onReturn(args...);
     sdef = sdef.onError(args...);
     sdef = sdef.onSubmit(args...);
-    sdef = sdef.onCollect(args...);
 
-### Fetching arguments
+### Fetching, processing and collecting data
 
 Data to be fetched by probes can be defined using `withArguments()` method:
 
     sdef = sdef.onEnter(arg1, arg2, ...);
 
-Arguments can passed as numbers representing argument indexes or special data. For instance methods visible arguments
-start with number 1 at number 0 there is reference to object itself (`this`). For static methods arguments start with
-number 0.
-
-There are some special indexes that represent other data possible to fetch by instrumentation probes:
-
-* `spy.FETCH_TIME` (-1) - fetch current time;
-* `spy.FETCH_RET_VAL` (-2) - fetch return value (this is valid only on return points);
-* `spy.FETCH_ERROR` (-3) - fetch exception object (this is valid only on error points);
-* `spy.FETCH_THREAD` (-4) - fetch current thread;
-* `spy.FETCH_NULL` (-5) - fetch null constant (useful in some cases);
-
-It is also possible to fetch classes - just pass strings containing fully qualified class names instread of integers.
+Fetch probes, processors and collectors can be used as arguments (see spy library functions). Fetch probes produce data
+that are passed through processors to collectors as dictionary objects (`Map<String,Object>`). Data are accessed using
+string keys as in ordinary hash maps. Processors can get named values from map objects or write other values to passed
+maps. Processors can also filter out records. Collectors are just special kinds of processors that have some side
+effects. >Collector can update statistics, write to logs, send messages via syslog etc.
 
 Additional notes:
 
-* remember that argument fetch can be done in various points, use `sdef.onXXX()` method to select proper stage;
-
-* when instrumenting constructors, be sure that this reference (if used) can be fetched only at constructor return -
+* when instrumenting constructors, be sure that `this` reference (if used) can be fetched only at constructor return -
 this is because at the beginning of a constructor this points to an uninitialized block of memory that does not
 represent any object, so instrumented class won't load and will crash with class verifier error;
 
@@ -199,25 +188,4 @@ represent any object, so instrumented class won't load and will crash with class
 
 Using `include()` method administrator can add matching rules filtering which methods are to be instrumented. Methods
 matching any of passed matchers will be included. Matchers can be defined using `spy.byXXX()` functions.
-
-### Access to data in spy records
-
-Spy processors and collectors access data stored in records using references that can have two forms:
-
-* simple indexes (numbers) - will always refer to slot in current processing stage (stage processor has been added to);
-these are simple integers; slot indexes start at 0;
-
-* full references - contain both stage identifier and slot  number; these are strings with first character indicating
-stage and followed by index, eg. `E0` means first slot in `ON_ENTER` stage;
-
-The following characters are legal:
-
-* `E` - `ON_ENTER`;
-* `R` - `ON_RETURN`;
-* `X` - `ON_EXCEPTION`;
-* `S` - `ON_SUBMIT`;
-* `C` - `ON_COLLECT`;
-
-
-### Formatting strings
 

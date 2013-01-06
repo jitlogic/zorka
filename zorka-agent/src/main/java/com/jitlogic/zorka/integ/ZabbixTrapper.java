@@ -32,7 +32,7 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     /** Zabbix server IP address */
-    private String serverAddr = null;
+    private String serverAddr;
 
     /** Zabbix server TCP port */
     private int serverPort = 10051;
@@ -152,6 +152,6 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
 
     @Override
     public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e, Object... args) {
-        send(defaultItem, tag + " " + msg);
+        send(tag, msg);
     }
 }
