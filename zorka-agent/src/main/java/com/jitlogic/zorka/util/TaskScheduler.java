@@ -27,13 +27,10 @@ import java.util.concurrent.TimeUnit;
 public class TaskScheduler {
 
     /** Scheduler instance. */
-    protected static TaskScheduler instance;
+    protected static TaskScheduler instance = new TaskScheduler();
 
     /** Returns task scheduler instance. */
-    public static synchronized TaskScheduler instance() {
-        if (null == instance) {
-            instance = new TaskScheduler();
-        }
+    public static TaskScheduler instance() {
         return instance;
     }
 

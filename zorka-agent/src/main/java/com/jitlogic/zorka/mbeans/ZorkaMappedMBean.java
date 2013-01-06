@@ -20,6 +20,8 @@ package com.jitlogic.zorka.mbeans;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.Attribute;
 import javax.management.AttributeList;
@@ -55,13 +57,13 @@ public class ZorkaMappedMBean implements DynamicMBean {
 	private String description;
 
     /** Attributes */
-	private Map<String,Attribute> attrs = new HashMap<String, Attribute>();
+	private ConcurrentHashMap<String,Attribute> attrs = new ConcurrentHashMap<String, Attribute>();
 
     /** If true, mbean info will be rebuilt at nearest occasion. */
-	private boolean mbeanInfoChanged = true;
+    private AtomicInteger mbeanInfoChanges = new AtomicInteger(0);
 
     /** MBean info */
-	private MBeanInfo mbeanInfo;
+	private volatile MBeanInfo mbeanInfo;
 
     /**
      * Creates mapped mbean
@@ -73,9 +75,9 @@ public class ZorkaMappedMBean implements DynamicMBean {
 	}
 
     @Override
-	public synchronized Object getAttribute(String attribute)
-			throws AttributeNotFoundException, MBeanException,
-			ReflectionException {
+	public Object getAttribute(String attribute) throws AttributeNotFoundException,
+                                                        MBeanException, ReflectionException {
+
 		if (!attrs.containsKey(attribute)) {
 			throw new AttributeNotFoundException("This MBean has no '" + attribute + "' attribute.");
 		}
@@ -91,17 +93,20 @@ public class ZorkaMappedMBean implements DynamicMBean {
 	}
 	
 	@Override
-	public synchronized void setAttribute(Attribute attribute)
-			throws AttributeNotFoundException, InvalidAttributeValueException,
-			MBeanException, ReflectionException {
-		mbeanInfoChanged = true;
-		attrs.put(attribute.getName(), attribute);
+	public void setAttribute(Attribute attribute) throws AttributeNotFoundException, InvalidAttributeValueException,
+			                                            MBeanException, ReflectionException {
+
+        synchronized (mbeanInfoChanges) {
+            mbeanInfoChanges.incrementAndGet();
+		    attrs.put(attribute.getName(), attribute);
+            refreshMBeanInfo();
+        }
 	}
 	
 	
 	@Override @SuppressWarnings("unchecked")
-	public synchronized AttributeList getAttributes(String[] attributes) {
-		AttributeList lst = new AttributeList(attributes.length);
+	public AttributeList getAttributes(String[] attributes) {
+		AttributeList lst = new AttributeList(attributes.length + 2);
 		for (String attr : attributes) {
 			try {
 				final Object val = getAttribute(attr);
@@ -116,7 +121,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
 	
 
     @Override
-	public synchronized AttributeList setAttributes(AttributeList attributes) {
+	public AttributeList setAttributes(AttributeList attributes) {
 		AttributeList lst = new AttributeList(attributes.size());
 		for (Object attrObj : attributes) {
 			Attribute attr = (Attribute)attrObj;
@@ -135,7 +140,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
     @Override
 	public Object invoke(String actionName, Object[] params, String[] signature)
 			throws MBeanException, ReflectionException {
-		// TODO setAttribute()/getAttribute() ?  
+
 		throw new MBeanException(new Exception("This object has no invokable methods."));
 	}
 
@@ -183,14 +188,11 @@ public class ZorkaMappedMBean implements DynamicMBean {
 				new MBeanConstructorInfo[0], 
 				new MBeanOperationInfo[0], 
 				new MBeanNotificationInfo[0]);
-		mbeanInfoChanged = false;
-	}  // 
+	}  //
 	
 
     @Override
-	public synchronized MBeanInfo getMBeanInfo() {
-		if (mbeanInfoChanged)
-			refreshMBeanInfo();
+	public MBeanInfo getMBeanInfo() {
 		return mbeanInfo;
 	}
 
@@ -202,7 +204,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
      *
      * @param value attribute value
      */
-	public synchronized void put(String name, Object value) {
+	public void put(String name, Object value) {
 		try {
 			Attribute attr = new Attribute(name, value);
 			setAttribute(attr);
@@ -220,7 +222,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
      *
      * @return attribute value
      */
-	public synchronized Object get(String name) {
+	public Object get(String name) {
 		Attribute attr = attrs.get(name);
 		return attr != null ? attr.getValue() : null;
 	}

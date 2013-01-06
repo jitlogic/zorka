@@ -123,18 +123,18 @@ public class MBeanServerRegistry {
      *
      * @param classLoader class loader associated with mbean server connection (or null)
      */
-    public synchronized void register(String mbsName, MBeanServerConnection mbsConn, ClassLoader classLoader) {
-        if (!conns.containsKey(mbsName)) {
-            conns.put(mbsName, mbsConn);
-            if (classLoader != null) {
-                classLoaders.put(mbsName, classLoader);
+    public void register(String mbsName, MBeanServerConnection mbsConn, ClassLoader classLoader) {
+        synchronized (this) {
+            if (!conns.containsKey(mbsName)) {
+                conns.put(mbsName, mbsConn);
+                if (classLoader != null) {
+                    classLoaders.put(mbsName, classLoader);
+                }
+                registerDeferred(mbsName);
+            } else {
+                log.error("MBean server '" + mbsName + "' is already registered.");
             }
-            registerDeferred(mbsName);
-        } else {
-            log.error("MBean server '" + mbsName + "' is already registered.");
         }
-
-
     }
 
 
@@ -143,14 +143,14 @@ public class MBeanServerRegistry {
      *
      * @param name mbean server name
      */
-    public synchronized void unregister(String name) {
-        if (conns.containsKey(name)) {
-            conns.remove(name);
-        } else {
+    public void unregister(String name) {
+
+        classLoaders.remove(name);
+
+        if (conns.remove(name) == null) {
             log.error("Trying to unregister non-existent MBean server '" + name + "'");
         }
 
-        classLoaders.remove(name);
     }
 
 

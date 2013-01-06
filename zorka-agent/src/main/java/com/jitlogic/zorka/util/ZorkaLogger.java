@@ -31,7 +31,7 @@ public class ZorkaLogger implements ZorkaTrapper {
 
 
     /** Logger */
-    private static ZorkaLogger logger;
+    private static ZorkaLogger logger = new ZorkaLogger();
 
 
     /**
@@ -54,11 +54,7 @@ public class ZorkaLogger implements ZorkaTrapper {
      *
      * @return ZorkaLog object
      */
-    public synchronized  static ZorkaLog getLog(String tag) {
-        if (logger == null) {
-            logger = new ZorkaLogger();
-        }
-
+    public static ZorkaLog getLog(String tag) {
         return new ZorkaLog(tag, logger);
     }
 
@@ -68,17 +64,18 @@ public class ZorkaLogger implements ZorkaTrapper {
      *
      * @return logger
      */
-    public synchronized static ZorkaLogger getLogger() {
+    public static ZorkaLogger getLogger() {
         return logger;
     }
 
 
     /**
      * Sets logger instance.
+     * TODO remove this method, it is only used by unit tests
      *
      * @param newLogger new logger
      */
-    public synchronized static void setLogger(ZorkaLogger newLogger) {
+    public static void setLogger(ZorkaLogger newLogger) {
         logger = newLogger;
     }
 

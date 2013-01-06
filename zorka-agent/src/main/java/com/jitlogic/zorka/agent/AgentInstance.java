@@ -48,14 +48,14 @@ public class AgentInstance {
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     /** MBean server registry */
-    private static MBeanServerRegistry mBeanServerRegistry;
+    private static volatile MBeanServerRegistry mBeanServerRegistry;
 
     /**
      * Returns reference to mbean server registry.
      *
      * @return mbean server registry reference of null (if not yet initialized)
      */
-    public synchronized static MBeanServerRegistry getMBeanServerRegistry() {
+    public static MBeanServerRegistry getMBeanServerRegistry() {
         return mBeanServerRegistry;
     }
 
@@ -63,7 +63,7 @@ public class AgentInstance {
      * Sets mbean server registry.
      * @param registry registry
      */
-    public synchronized static void setMBeanServerRegistry(MBeanServerRegistry registry) {
+    public static void setMBeanServerRegistry(MBeanServerRegistry registry) {
         mBeanServerRegistry = registry;
     }
 
@@ -77,10 +77,13 @@ public class AgentInstance {
      *
      * @return agent instance
      */
-    public synchronized static AgentInstance instance() {
-        if (null == instance) {
-            instance = new AgentInstance(ZorkaConfig.getProperties());
-            instance.start();
+    public static AgentInstance instance() {
+
+        synchronized (AgentInstance.class) {
+            if (null == instance) {
+                instance = new AgentInstance(ZorkaConfig.getProperties());
+                instance.start();
+            }
         }
 
         return instance;

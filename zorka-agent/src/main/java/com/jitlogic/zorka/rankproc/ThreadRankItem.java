@@ -23,7 +23,7 @@ import static com.jitlogic.zorka.rankproc.BucketAggregate.*;
 public class ThreadRankItem implements Rankable<ThreadRankInfo> {
 
     /** thread info (assigned every time thread list is refreshed) */
-    private ThreadRankInfo threadInfo;
+    private volatile ThreadRankInfo threadInfo;
 
     /** by cpu time metric */
     private final static int BY_CPU = 0;
@@ -48,14 +48,19 @@ public class ThreadRankItem implements Rankable<ThreadRankInfo> {
         byBlockedTime = new CircularBucketAggregate(SEC, 30, 60, 300, 900);
     }
 
+
     @Override
-    public synchronized double getAverage(long tstamp, int metric, int average) {
+    public double getAverage(long tstamp, int metric, int average) {
 
         switch (metric) {
             case BY_CPU:
-                return 100.0 * byCpuTime.getDeltaV(average, tstamp) / byCpuTime.getWindow(average);
+                synchronized (byCpuTime) {
+                    return 100.0 * byCpuTime.getDeltaV(average, tstamp) / byCpuTime.getWindow(average);
+                }
             case BY_BLOCK:
-                return 100.0 * byBlockedTime.getDeltaV(average, tstamp) / byBlockedTime.getWindow(average);
+                synchronized (byBlockedTime) {
+                    return 100.0 * byBlockedTime.getDeltaV(average, tstamp) / byBlockedTime.getWindow(average);
+                }
         }
 
         return 0.0;
@@ -89,15 +94,19 @@ public class ThreadRankItem implements Rankable<ThreadRankInfo> {
      *
      * @param threadInfo thread info object (as from ThreadMXBean)
      */
-    public synchronized void feed(long tstamp, ThreadRankInfo threadInfo) {
+    public void feed(long tstamp, ThreadRankInfo threadInfo) {
 
         this.threadInfo = threadInfo; // TODO copy only required values to avoid memory spill
 
         if (threadInfo.getCpuTime() >= 0) {
-            byCpuTime.feed(tstamp * MS, threadInfo.getCpuTime());
+            synchronized (byCpuTime) {
+                byCpuTime.feed(tstamp * MS, threadInfo.getCpuTime());
+            }
         }
 
-        byBlockedTime.feed(tstamp * MS, threadInfo.getBlockedTime());
+        synchronized (byBlockedTime) {
+            byBlockedTime.feed(tstamp * MS, threadInfo.getBlockedTime());
+        }
     }
 
 }

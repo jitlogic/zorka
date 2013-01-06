@@ -29,13 +29,14 @@ import java.util.regex.Pattern;
 public class ZorkaUtil {
 
     /** Singleton instance */
-	protected static ZorkaUtil instance;
+	protected static volatile ZorkaUtil instance;
 
     /** Returns singleton ZorkaUtil instance (and creates if needed) */
-	public static synchronized ZorkaUtil getInstance() {
+	public static ZorkaUtil getInstance() {
 		
-		if (instance == null)
+		if (instance == null) {
 			instance = new ZorkaUtil();
+        }
 		
 		return instance;
 	}

@@ -72,15 +72,17 @@ public class SpyClassTransformer implements ClassFileTransformer {
      * TODO get rid of this crap, use strings to find already created contexts for a method
      * TODO BUG one context ID refers only to one sdef, so using multiple sdefs on a single method will result errors (submitting data from all probes only to first one)
      */
-    public synchronized SpyContext lookup(SpyContext keyCtx) {
-        SpyContext ctx = ctxInstances.get(keyCtx);
-        if (ctx == null) {
-            ctx = keyCtx;
-            ctx.setId(nextId++);
-            ctxInstances.put(ctx, ctx);
-            ctxById.put(ctx.getId(), ctx);
+    public SpyContext lookup(SpyContext keyCtx) {
+        synchronized (this) { // TODO get rid of synchronized, use
+            SpyContext ctx = ctxInstances.get(keyCtx);
+            if (ctx == null) {
+                ctx = keyCtx;
+                ctx.setId(nextId++);
+                ctxInstances.put(ctx, ctx);
+                ctxById.put(ctx.getId(), ctx);
+            }
+            return ctx;
         }
-        return ctx;
     }
 
 

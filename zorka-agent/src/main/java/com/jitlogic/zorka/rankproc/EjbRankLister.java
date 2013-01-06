@@ -34,7 +34,7 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
     private static final ZorkaLog log = ZorkaLogger.getLog(EjbRankLister.class);
 
     /** Tracked EJB statistics */
-    private Map<String,EjbRankItem> stats = new HashMap<String, EjbRankItem>();
+    private volatile Map<String,EjbRankItem> stats = new HashMap<String, EjbRankItem>();
 
     /** MBean server connection */
     private MBeanServerConnection mbs;
@@ -59,7 +59,7 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
 
 
     @Override
-    public synchronized List<EjbRankItem> list() {
+    public List<EjbRankItem> list() {
         List<EjbRankItem> lst = new ArrayList<EjbRankItem>(stats.size()+1);
 
         for (Map.Entry<String,EjbRankItem> e : stats.entrySet()) {
@@ -72,7 +72,7 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
     /**
      * Performs discovery of new EJB statistics objects.
      */
-    public synchronized void discovery() {
+    private void discovery() {
         Set<ObjectName> names = ObjectInspector.queryNames(mbs, objNames);
 
         for (ObjectName name : names) {
@@ -98,9 +98,10 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
      * @param tstamp current time
      */
     private void runCycle(long tstamp) {
-        discovery();
 
         synchronized (this) {
+            discovery();
+
             for (Map.Entry<String,EjbRankItem> e : stats.entrySet()) {
                 e.getValue().feed(tstamp);
             }

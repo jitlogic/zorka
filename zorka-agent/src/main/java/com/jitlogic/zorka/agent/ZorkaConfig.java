@@ -108,7 +108,7 @@ public class ZorkaConfig {
      * @param suffix
      * @return
      */
-	private synchronized static String getHomeDir(String suffix) {
+	private static String getHomeDir(String suffix) {
 		return homeDir.endsWith(File.separator) ? homeDir + suffix : homeDir + File.separator + suffix;
 	}
 
