@@ -30,7 +30,7 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
     private static final ZorkaLog log = ZorkaLogger.getLog(NrpeRequestHandler.class);
 
     /** Request packet */
-    private NrpePacket req = null;
+    private NrpePacket req;
 
     /** Accepted connection socket */
     private Socket socket;

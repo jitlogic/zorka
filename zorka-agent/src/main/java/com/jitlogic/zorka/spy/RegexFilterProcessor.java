@@ -47,10 +47,10 @@ public class RegexFilterProcessor implements SpyProcessor {
     private Pattern regex;
 
     /** Substitution expression */
-    private String expr = null;
+    private String expr;
 
     /** Default value */
-    private String defval = null;
+    private String defval;
 
     /** Inverse filter flag */
     private Boolean filterOut;

@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.integ;
 
 import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class ZorkaAsyncThread<T> implements Runnable {
 
     /** Logger */
-    protected ZorkaLog log = null;
+    protected final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     /** Submit queue */
     private LinkedBlockingQueue<T> submitQueue = new LinkedBlockingQueue<T>(1024);

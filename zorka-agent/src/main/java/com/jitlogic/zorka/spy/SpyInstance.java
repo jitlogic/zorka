@@ -31,13 +31,13 @@ import static com.jitlogic.zorka.spy.SpyLib.SPD_CONFIG;
 public class SpyInstance {
 
     /** Debug level for spy components.  */
-    private static int debugLevel = 0;
+    private static int debugLevel;
 
     /** Logger */
     private static ZorkaLog log;
 
     /** Spy instance reference */
-    private static SpyInstance instance = null;
+    private static SpyInstance instance;
 
     /** Reference to instance's class transformer */
     private SpyClassTransformer classTransformer;

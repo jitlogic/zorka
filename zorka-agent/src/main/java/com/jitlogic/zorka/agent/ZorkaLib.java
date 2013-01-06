@@ -62,7 +62,7 @@ public class ZorkaLib  {
 
     private MBeanServerRegistry mbsRegistry;
 
-    private String hostname = null;
+    private String hostname;
 
     private AvgRateCounter rateCounter = new AvgRateCounter(this);
     private Map<String, FileTrapper> fileTrappers = new ConcurrentHashMap<String, FileTrapper>();
@@ -587,7 +587,7 @@ public class ZorkaLib  {
 
 
     /** Thread rank lister (if it has been created) */
-    private ThreadRankLister threadRankLister = null;
+    private ThreadRankLister threadRankLister;
 
 
     /**

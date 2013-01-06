@@ -40,7 +40,7 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
 	private Socket socket;
 
     /** Request string */
-	private String req = null;
+	private String req;
 
     /** Timestamps of beginning and end of request handling. */
     private volatile long tStart, tStop;

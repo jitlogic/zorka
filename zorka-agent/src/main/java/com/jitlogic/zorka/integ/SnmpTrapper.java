@@ -81,8 +81,6 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
         } catch (Exception e) {
             log.error("Cannot initialize SNMP sender", e);
         }
-
-        log = ZorkaLogger.getLog(this.getClass());
     }
 
 

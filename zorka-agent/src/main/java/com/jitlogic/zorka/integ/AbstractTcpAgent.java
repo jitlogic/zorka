@@ -45,7 +45,7 @@ public abstract class AbstractTcpAgent implements Runnable {
     private Thread thread;
 
     /** Thread main loop will run as long as this attribute is true */
-    private volatile boolean running = false;
+    private volatile boolean running;
 
     /** Name prefix (will appear in thread name, configuration properties will start with this prefix etc.) */
     private String prefix;

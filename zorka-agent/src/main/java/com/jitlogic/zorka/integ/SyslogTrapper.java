@@ -51,7 +51,7 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
     private int defaultFacility = SyslogLib.F_LOCAL0;
 
     /** UDP socket used to send packet to syslog server */
-    private DatagramSocket socket = null;
+    private DatagramSocket socket;
 
 
     /**
@@ -90,10 +90,6 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
                 syslogPort = Integer.parseInt(parts[1]);
             } else {
                 syslogAddress = InetAddress.getByName(syslogServer);
-            }
-
-            if (!quiet) {
-                log  = ZorkaLogger.getLog(this.getClass());
             }
 
         } catch (Exception e) {

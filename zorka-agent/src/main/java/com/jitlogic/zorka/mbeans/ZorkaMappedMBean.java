@@ -61,7 +61,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
 	private boolean mbeanInfoChanged = true;
 
     /** MBean info */
-	private MBeanInfo mbeanInfo = null;
+	private MBeanInfo mbeanInfo;
 
     /**
      * Creates mapped mbean

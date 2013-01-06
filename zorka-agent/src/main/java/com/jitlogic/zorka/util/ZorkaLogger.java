@@ -31,7 +31,7 @@ public class ZorkaLogger implements ZorkaTrapper {
 
 
     /** Logger */
-    private static ZorkaLogger logger = null;
+    private static ZorkaLogger logger;
 
 
     /**
