@@ -43,5 +43,5 @@ Interesting links:
 
 * [Changelog](https://github.com/jitlogic/zorka/wiki/CHANGES)
 
-* [Downloads](https://github.com/jitlogic/zorka/downloads)
+* [Downloads](http://code.google.com/zorka/downloads/list)
 
