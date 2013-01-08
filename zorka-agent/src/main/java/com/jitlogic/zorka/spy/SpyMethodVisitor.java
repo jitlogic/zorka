@@ -262,10 +262,13 @@ public class SpyMethodVisitor extends MethodVisitor {
 
         if (stage == ON_ENTER) {
             return (sdef.getProbes(ON_RETURN).size() == 0
-                    && sdef.getProbes(ON_ERROR).size() == 0)
+                    && sdef.getProcessors(ON_RETURN).size() == 0
+                    && sdef.getProbes(ON_ERROR).size() == 0
+                    && sdef.getProcessors(ON_ERROR).size() == 0)
                     ? SF_IMMEDIATE : SF_NONE;
         } else {
-            return (sdef.getProbes(ON_ENTER).size() == 0)
+            return (sdef.getProbes(ON_ENTER).size() == 0
+                    && sdef.getProcessors(ON_ENTER).size() == 0)
                     ? SF_IMMEDIATE : SF_FLUSH;
         }
     }
