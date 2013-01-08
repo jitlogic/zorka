@@ -16,6 +16,7 @@
  */
 package com.jitlogic.zorka.test.spy;
 
+import com.jitlogic.zorka.spy.DispatchingSubmitter;
 import com.jitlogic.zorka.test.spy.support.TestCollector;
 import com.jitlogic.zorka.test.spy.support.TestSpyTransformer;
 import com.jitlogic.zorka.test.spy.support.TestSubmitter;
@@ -166,7 +167,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     @Test
     public void testInstrumentConstructorWithTime() throws Exception {
         engine.add(SpyDefinition.instrument().include(spy.byMethod(TCLASS1, SM_CONSTRUCTOR)));
-        Object obj = instantiate(engine, TCLASS1);
+        instantiate(engine, TCLASS1);
 
         assertEquals("should submit two records", 2, submitter.size());
     }
@@ -552,6 +553,21 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
         assertEquals("should submit one record", 1, submitter.size());
         assertEquals("record should carry no values", 0, submitter.get(0).size());
+    }
+
+    @Test
+    public void testInstrumentWithAssymetricProbePlacements() throws Exception {
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("ENTER"))
+                .onReturn(spy.put("RETURN", 1)).onError(spy.put("ERROR", 1))
+                .include(spy.byMethod(TCLASS1, "trivialMethod")));
+
+        Object obj = instantiate(engine, TCLASS1);
+        invoke(obj, "trivialMethod");
+
+        assertEquals(2, submitter.size());
+        assertEquals(SF_NONE, submitter.get(0).submitFlags);
+        assertEquals(SF_FLUSH, submitter.get(1).submitFlags);
+
     }
 
     // TODO test if stack traces in exceptions are the same with and without intercepting errors by instrumentation
