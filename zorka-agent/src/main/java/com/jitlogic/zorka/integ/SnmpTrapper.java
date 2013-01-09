@@ -16,7 +16,6 @@
 package com.jitlogic.zorka.integ;
 
 import com.jitlogic.contrib.libsnmp.*;
-import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaTrapper;
 
 import java.io.IOException;
