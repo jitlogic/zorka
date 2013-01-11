@@ -45,6 +45,12 @@ public class SpyClassTransformer implements ClassFileTransformer {
     /** All spy defs configured */
     private List<SpyDefinition> sdefs = new ArrayList<SpyDefinition>();
 
+    /** Defines which classes and methods should be traced. */
+    private List<SpyMatcher> traceMatchers = new ArrayList<SpyMatcher>();
+
+    /** Symbol registry for tracer */
+    private SymbolRegistry symbolRegistry = new SymbolRegistry();
+
     /** SpyContext counter. */
     private int nextId = 1;
 
@@ -99,6 +105,16 @@ public class SpyClassTransformer implements ClassFileTransformer {
         return sdef;
     }
 
+
+    /**
+     * Adds trace matcher.
+     *
+     * @param matcher matcher
+     */
+    public void add(SpyMatcher matcher) {
+        traceMatchers.add(matcher);
+    }
+
     /**
      * Resets spy transformer. Removes all added spy definitions.
      * All submissions coming from existing probes will be ignored.
@@ -134,10 +150,20 @@ public class SpyClassTransformer implements ClassFileTransformer {
             }
         }
 
-        if (found.size() > 0) {
+        List<SpyMatcher> foundTraceMatchers = new ArrayList<SpyMatcher>();
+
+        for (SpyMatcher matcher : traceMatchers) {
+            if (matcher.matches(Arrays.asList(clazzName))) {
+                if (matcher.matches(Arrays.asList(clazzName))) {
+                    foundTraceMatchers.add(matcher);
+                }
+            }
+        }
+
+        if (found.size() > 0 || foundTraceMatchers.size() > 0) {
             ClassReader cr = new ClassReader(classfileBuffer);
             ClassWriter cw = new ClassWriter(cr, 0);
-            ClassVisitor scv = createVisitor(clazzName, found, cw);
+            ClassVisitor scv = createVisitor(clazzName, found, foundTraceMatchers, cw);
             cr.accept(scv, 0);
             return cw.toByteArray();
         }
@@ -156,7 +182,17 @@ public class SpyClassTransformer implements ClassFileTransformer {
      *
      * @return class visitor for instrumenting this class
      */
-    protected ClassVisitor createVisitor(String className, List<SpyDefinition> found, ClassWriter cw) {
-        return new SpyClassVisitor(this, className, found, cw);
+    protected ClassVisitor createVisitor(String className, List<SpyDefinition> found, List<SpyMatcher> foundTraceMatchers, ClassWriter cw) {
+        return new SpyClassVisitor(this, className, found, foundTraceMatchers, cw);
+    }
+
+
+    /**
+     * Returns symbol registry.
+     *
+     * @return symbol registry
+     */
+    public SymbolRegistry getSymbolRegistry() {
+        return symbolRegistry;
     }
 }

@@ -374,7 +374,7 @@ public class ZorkaUtil {
     /**
      * Clips or extends array of objects of type T. If passed length is less than length of original array,
      * only so many elements of original array will be copied. If passed length is more than length of original
-     * array, new elements will be filled with null values. If passsed length is the same as length of original
+     * array, new elements will be filled with null values. If passed length is the same as length of original
      * array, it is equivalent to copyArray() method.
      *
      * @param src source array
@@ -406,6 +406,70 @@ public class ZorkaUtil {
 
         return dst;
 
+    }
+
+
+    /**
+     * Clips or extends array of objects of bytes. If passed length is less than length of original array,
+     * only so many elements of original array will be copied. If passed length is more than length of original
+     * array, new elements will be filled with zeros. If passed length is the same as length of original
+     * array, it is equivalent to copyArray() method.
+     *
+     * @param src source array
+     *
+     * @param offs source offset
+     *
+     * @param len target length
+     *
+     * @return shortened/cloned/enlarged array
+     */
+    public static byte[] clipArray(byte[] src, int offs, int len) {
+        if (src == null) {
+            return null;
+        }
+
+        if (len < 0) {
+            len = src.length - len > offs ? src.length - len - offs : 0;
+        }
+
+        byte[] dst = new byte[len];
+
+        if (len > 0) {
+            System.arraycopy(src, offs, dst, 0, len);
+        }
+
+        return dst;
+    }
+
+
+    /**
+     * Clips or extends array of objects of bytes. If passed length is less than length of original array,
+     * only so many elements of original array will be copied. If passed length is more than length of original
+     * array, new elements will be filled with zeros. If passed length is the same as length of original
+     * array, it is equivalent to copyArray() method.
+     *
+     * @param src source array
+     *
+     * @param len target length
+     *
+     * @return shortened/cloned/enlarged array
+     */
+    public static byte[] clipArray(byte[] src, int len) {
+        if (src == null) {
+            return null;
+        }
+
+        if (len < 0) {
+            len = src.length - len > 0 ? src.length - len : 0;
+        }
+
+        byte[] dst = new byte[len];
+
+        if (len > 0) {
+            System.arraycopy(src, 0, dst, 0, len);
+        }
+
+        return dst;
     }
 
 

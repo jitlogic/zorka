@@ -20,6 +20,7 @@ import com.jitlogic.zorka.spy.DispatchingSubmitter;
 import com.jitlogic.zorka.test.spy.support.TestCollector;
 import com.jitlogic.zorka.test.spy.support.TestSpyTransformer;
 import com.jitlogic.zorka.test.spy.support.TestSubmitter;
+import com.jitlogic.zorka.test.spy.support.TestTracer;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.MainSubmitter;
@@ -44,6 +45,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     private TestSpyTransformer engine;
     private TestSubmitter submitter;
+    private TestTracer tracer;
 
 
     @Before
@@ -51,6 +53,8 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         engine = new TestSpyTransformer();
         submitter = new TestSubmitter();
         MainSubmitter.setSubmitter(submitter);
+        tracer = new TestTracer();
+        MainSubmitter.setTracer(tracer);
     }
 
 
@@ -578,4 +582,26 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     // TODO check if stack traces for instrumented and non-instrumented method are the same if method throws an exception
 
+    @Test
+    public void testTraceSingleTrivialMethod() throws Exception {
+        engine.add(spy.byMethod(TCLASS1, "trivialMethod"));
+
+        Object obj = instantiate(engine, TCLASS1);
+        invoke(obj, "trivialMethod");
+
+        assertEquals(2, tracer.getData().size());
+    }
+
+    @Test
+    public void testTraceAndInstrumentSingleTrivialMethod() throws Exception {
+        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg("E0", 0))
+                .include(spy.byMethod(TCLASS1, "trivialMethod")));
+        engine.add(spy.byMethod(TCLASS1, "trivialMethod"));
+
+        Object obj = instantiate(engine, TCLASS1);
+        invoke(obj, "trivialMethod");
+
+        assertEquals(2, tracer.getData().size());
+        assertEquals(1, submitter.size());
+    }
 }

@@ -19,6 +19,7 @@ package com.jitlogic.zorka.test.spy.support;
 import com.jitlogic.zorka.spy.SpyClassTransformer;
 import com.jitlogic.zorka.spy.SpyClassVisitor;
 import com.jitlogic.zorka.spy.SpyDefinition;
+import com.jitlogic.zorka.spy.SpyMatcher;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.util.TraceClassVisitor;
@@ -34,13 +35,14 @@ public class TestSpyTransformer extends SpyClassTransformer {
         this.debug = true;
     }
 
-    protected ClassVisitor createVisitor(String className, List<SpyDefinition> found, ClassWriter cw) {
+    @Override
+    protected ClassVisitor createVisitor(String className, List<SpyDefinition> found, List<SpyMatcher> foundTraceMatchers, ClassWriter cw) {
 
         if (debug) {
             return new SpyClassVisitor(this, className, found,
-                    new TraceClassVisitor(cw, new PrintWriter(System.out, true)));
+                    foundTraceMatchers, new TraceClassVisitor(cw, new PrintWriter(System.out, true)));
         } else {
-            return new SpyClassVisitor(this, className, found, cw);
+            return new SpyClassVisitor(this, className, found, foundTraceMatchers, cw);
         }
 
     }

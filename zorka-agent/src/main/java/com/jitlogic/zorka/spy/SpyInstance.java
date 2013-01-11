@@ -121,6 +121,16 @@ public class SpyInstance {
 
 
     /**
+     * Adds new matcher for tracer.
+     *
+     * @param matcher matcher
+     */
+    public void add(SpyMatcher matcher) {
+        classTransformer.add(matcher);
+    }
+
+
+    /**
      * Returns instance's class transformer.
      *
      * @return class transformer
@@ -138,5 +148,4 @@ public class SpyInstance {
     public DispatchingSubmitter getSubmitter() {
         return submitter;
     }
-
 }

@@ -30,11 +30,15 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class MainSubmitter {
 
-    /** Submitter receiving actual submissions */
+    /** Submitter receiving full submissions */
     private static SpySubmitter submitter;
+
+    /** Tracer receiving trace events */
+    private static TraceEventHandler tracer;
 
     /** Error counter */
     private static AtomicLong errorCount = new AtomicLong(0);
+
 
     /**
      * This method is called by spy probes.
@@ -59,6 +63,51 @@ public class MainSubmitter {
         }
     }
 
+
+    /**
+     * This method is called by tracer probes at method start.
+     *
+     * @param classId class ID (registered)
+     *
+     * @param methodId method ID (registered)
+     */
+    public static void traceEnter(int classId, int methodId, int signatureId) {
+
+        if (tracer != null) {
+            long t = System.nanoTime();
+            tracer.traceEnter(classId, methodId, signatureId, t);
+        }
+
+    }
+
+
+    /**
+     * This method is called by tracer probes at method exit.
+     */
+    public static void traceReturn() {
+
+        if (tracer != null) {
+            long t = System.nanoTime();
+            tracer.traceReturn(t);
+        }
+
+    }
+
+
+    /**
+     * This method is called by tracer probes at method error point.
+     *
+     * @param e exception thrown
+     */
+    public static void traceError(Throwable e) {
+
+        if (tracer != null) {
+            long t = System.nanoTime();
+            tracer.traceError(e, t);
+        }
+
+    }
+
     /**
      * Sets backing spy submitter
      *
@@ -66,6 +115,16 @@ public class MainSubmitter {
      */
     public static void setSubmitter(SpySubmitter submitter) {
         MainSubmitter.submitter = submitter;
+    }
+
+
+    /**
+     * Sets backing trace event handler.
+     *
+     * @param tracer
+     */
+    public static void setTracer(TraceEventHandler tracer) {
+        MainSubmitter.tracer = tracer;
     }
 
 
