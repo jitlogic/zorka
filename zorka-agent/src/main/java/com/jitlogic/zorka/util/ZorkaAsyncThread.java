@@ -15,9 +15,6 @@
  */
 package com.jitlogic.zorka.util;
 
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
-
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -42,7 +39,9 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     /** Thread object representing actual processing thread. */
-    private Thread thread = null;
+    private Thread thread;
+
+    private boolean flushNeeded;
 
     /**
      * Standard constructor.
@@ -100,8 +99,15 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
             T obj = submitQueue.poll(10, TimeUnit.MILLISECONDS);
             if (obj != null) {
                 process(obj);
+                flushNeeded = true;
+            } else {
+                if (flushNeeded) {
+                    flush();
+                    flushNeeded = false;
+                }
             }
         } catch (InterruptedException e) {
+            log.error("Cannot perform run cycle", e);
         }
     }
 
@@ -137,6 +143,13 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
 
     }
 
+
+    /**
+     * Flushes unwritten data to disk if necessary.
+     */
+    protected void flush() {
+
+    }
 
     /**
      * Error handling method - called when processing errors occur.
