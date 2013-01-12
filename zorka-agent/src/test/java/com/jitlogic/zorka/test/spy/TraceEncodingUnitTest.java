@@ -16,10 +16,10 @@
 
 package com.jitlogic.zorka.test.spy;
 
-import com.jitlogic.zorka.spy.*;
-
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 
+import com.jitlogic.zorka.tracer.*;
+import com.jitlogic.zorka.util.ByteBuffer;
 import org.junit.Assert;
 import org.junit.Test;
 

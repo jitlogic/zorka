@@ -16,9 +16,9 @@
 
 package com.jitlogic.zorka.test.spy;
 
-import com.jitlogic.zorka.spy.SymbolRegistry;
-import com.jitlogic.zorka.spy.TraceBuilder;
-import com.jitlogic.zorka.spy.WrappedException;
+import com.jitlogic.zorka.tracer.SymbolRegistry;
+import com.jitlogic.zorka.tracer.TraceBuilder;
+import com.jitlogic.zorka.tracer.WrappedException;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 
 import org.junit.Assert;

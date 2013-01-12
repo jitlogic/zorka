@@ -23,6 +23,8 @@ import com.jitlogic.zorka.test.spy.support.TestSubmitter;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 
+import com.jitlogic.zorka.tracer.SymbolRegistry;
+import com.jitlogic.zorka.tracer.WrappedException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

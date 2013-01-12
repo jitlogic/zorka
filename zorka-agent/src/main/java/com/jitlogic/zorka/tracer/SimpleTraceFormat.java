@@ -14,8 +14,10 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy;
+package com.jitlogic.zorka.tracer;
 
+
+import com.jitlogic.zorka.util.ByteBuffer;
 
 public class SimpleTraceFormat implements TraceEventHandler {
 

@@ -18,6 +18,8 @@
 package com.jitlogic.zorka.spy;
 
 import bsh.EvalError;
+import com.jitlogic.zorka.tracer.TraceEventHandler;
+import com.jitlogic.zorka.tracer.WrappedException;
 
 import java.util.concurrent.atomic.AtomicLong;
 

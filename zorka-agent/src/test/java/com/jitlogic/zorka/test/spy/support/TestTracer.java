@@ -16,8 +16,8 @@
 
 package com.jitlogic.zorka.test.spy.support;
 
-import com.jitlogic.zorka.spy.TraceEventHandler;
-import com.jitlogic.zorka.spy.TracedException;
+import com.jitlogic.zorka.tracer.TraceEventHandler;
+import com.jitlogic.zorka.tracer.TracedException;
 import com.jitlogic.zorka.util.ZorkaUtil;
 import org.junit.Assert;
 
