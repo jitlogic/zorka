@@ -18,8 +18,10 @@ package com.jitlogic.zorka.test.spy.support;
 
 import com.jitlogic.zorka.spy.TraceEventHandler;
 import com.jitlogic.zorka.util.ZorkaUtil;
+import org.junit.Assert;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -28,51 +30,49 @@ public class TestTracer implements TraceEventHandler {
     private List<Map<Object,Object>> data = new ArrayList<Map<Object, Object>>();
 
     @Override
-    public void newTrace(int traceId, long tstamp) {
-        data.add(ZorkaUtil.map("type", "newTrace", "traceId", traceId, "tstamp", tstamp));
+    public void traceBegin(int traceId) {
+        data.add(ZorkaUtil.map("action", "traceBegin", "traceId", traceId));
     }
 
     @Override
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
-        data.add(ZorkaUtil.map("type", "traceEnter", "classId", classId, "methodId", methodId, "signatureId", signatureId, "tstamp", tstamp));
+        data.add(ZorkaUtil.map("action", "traceEnter", "classId", classId, "methodId", methodId, "signatureId", signatureId, "tstamp", tstamp));
     }
 
     @Override
     public void traceReturn(long tstamp) {
-        data.add(ZorkaUtil.map("type", "traceReturn", "tstamp", tstamp));
+        data.add(ZorkaUtil.map("action", "traceReturn", "tstamp", tstamp));
     }
 
     @Override
     public void traceError(Throwable exception, long tstamp) {
-        data.add(ZorkaUtil.map("type", "traceError", "exception", exception, "tstamp", tstamp));
+        data.add(ZorkaUtil.map("action", "traceError", "exception", exception, "tstamp", tstamp));
+    }
+
+    @Override
+    public void traceStats(long calls, long errors) {
+        data.add(ZorkaUtil.map("action", "traceStats", "calls", calls, "errors", errors));
     }
 
     @Override
     public void newSymbol(int symbolId, String symbolText) {
-        data.add(ZorkaUtil.map("type", "newSymbol", "symbolId", symbolId, "symbolText", symbolText));
+        data.add(ZorkaUtil.map("action", "newSymbol", "symbolId", symbolId, "symbolText", symbolText));
     }
 
     @Override
-    public void newParam(int parId, String val) {
-        data.add(ZorkaUtil.map("type", "newParam", "parId", parId, "val", val));
-    }
-
-    @Override
-    public void newParam(int parId, int val) {
-        data.add(ZorkaUtil.map("type", "newParam", "parId", parId, "val", val));
-    }
-
-    @Override
-    public void newParam(int parId, long val) {
-        data.add(ZorkaUtil.map("type", "newParam", "parId", parId, "val", val));
-    }
-
-    @Override
-    public void newParam(int parId, double val) {
-        data.add(ZorkaUtil.map("type", "newParam", "parId", parId, "val", val));
+    public void newAttr(int parId, Object val) {
+        data.add(ZorkaUtil.map("action", "newAttr", "parId", parId, "val", val));
     }
 
     public List<Map<Object,Object>> getData() {
         return data;
+    }
+
+    public <T> List<T> listAttr(Object key) {
+        List<T> lst = new ArrayList<T>();
+        for (Map<Object,Object> datum : data) {
+            lst.add((T)datum.get(key));
+        }
+        return lst;
     }
 }

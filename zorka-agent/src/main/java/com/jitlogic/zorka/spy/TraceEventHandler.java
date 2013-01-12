@@ -35,13 +35,11 @@ public interface TraceEventHandler {
 
 
     /**
-     * Records beginning of new trace.
+     * Records beginning of a trace. Not that sometimes traces can be recursive.
      *
-     * @param traceId trace ID
-     *
-     * @param tstamp timestamp
+     * @param traceId trace ID (symbol)
      */
-    void newTrace(int traceId, long tstamp);
+    void traceBegin(int traceId);
 
 
     /**
@@ -77,6 +75,16 @@ public interface TraceEventHandler {
 
 
     /**
+     * Records trace statistics.
+     *
+     * @param calls number of (recursive, traced) calls
+     *
+     * @param errors number of errors
+     */
+    void traceStats(long calls, long errors);
+
+
+    /**
      * Records symbol (to be later used as class/method/parameter ID).
      * Note that symbols are mostly generated at config / class loading time
      * and are not normally emitted from instrumented code.
@@ -89,42 +97,12 @@ public interface TraceEventHandler {
 
 
     /**
-     * Records string parameter
+     * Records a parameter.
      *
      * @param parId parametr ID
      *
      * @param val parameter value
      */
-    void newParam(int parId, String val);
-
-
-    /**
-     * Records integer parameter
-     *
-     * @param parId parameter ID
-     *
-     * @param val parameter value
-     */
-    void newParam(int parId, int val);
-
-
-    /**
-     * Records long integer parameter
-     *
-     * @param parId parameter ID
-     *
-     * @param val parameter value
-     */
-    void newParam(int parId, long val);
-
-
-    /**
-     * Records double number parameter
-     *
-     * @param parId parameter ID
-     *
-     * @param val parameter value
-     */
-    void newParam(int parId, double val);
+    void newAttr(int parId, Object val);
 
 }

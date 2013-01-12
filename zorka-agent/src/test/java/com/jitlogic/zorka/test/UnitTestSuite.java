@@ -42,7 +42,7 @@ import org.junit.runners.Suite;
 
         // testspy
         ArgProcessingUnitTest.class, BytecodeInstrumentationUnitTest.class, ClassMethodMatchingUnitTest.class,
-        SpyLibFunctionsUnitTest.class, StandardCollectorsUnitTest.class,
+        SpyLibFunctionsUnitTest.class, StandardCollectorsUnitTest.class, TraceBuilderUnitTest.class,
         SubmissionDispatchUnitTest.class, ZorkaStatsCollectionUnitTest.class,
 
         // teststress

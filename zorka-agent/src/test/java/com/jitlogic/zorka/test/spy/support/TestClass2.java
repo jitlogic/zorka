@@ -28,4 +28,9 @@ public class TestClass2 {
         return in;
     }
 
+    public void recursiveMethod() {
+        calls++;
+        trivialMethod();
+        calls++;
+    }
 }

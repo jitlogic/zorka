@@ -16,19 +16,19 @@
  */
 package com.jitlogic.zorka.test.spy;
 
-import com.jitlogic.zorka.spy.DispatchingSubmitter;
+import com.jitlogic.zorka.spy.*;
 import com.jitlogic.zorka.test.spy.support.TestCollector;
 import com.jitlogic.zorka.test.spy.support.TestSpyTransformer;
 import com.jitlogic.zorka.test.spy.support.TestSubmitter;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
-import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.MainSubmitter;
 
-import com.jitlogic.zorka.spy.SpyProcessor;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -44,6 +44,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
     public final static String TAMETHOD = "com.jitlogic.zorka.test.spy.support.TestAnnotation";
 
     private TestSpyTransformer engine;
+    private SymbolRegistry symbols;
     private TestSubmitter submitter;
     private TestTracer tracer;
 
@@ -55,6 +56,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         MainSubmitter.setSubmitter(submitter);
         tracer = new TestTracer();
         MainSubmitter.setTracer(tracer);
+        symbols = engine.getSymbolRegistry();
     }
 
 
@@ -582,6 +584,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
     // TODO check if stack traces for instrumented and non-instrumented method are the same if method throws an exception
 
+
     @Test
     public void testTraceSingleTrivialMethod() throws Exception {
         engine.add(spy.byMethod(TCLASS1, "trivialMethod"));
@@ -591,6 +594,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
         assertEquals(2, tracer.getData().size());
     }
+
 
     @Test
     public void testTraceAndInstrumentSingleTrivialMethod() throws Exception {
@@ -603,5 +607,32 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
         assertEquals(2, tracer.getData().size());
         assertEquals(1, submitter.size());
+        assertEquals("errorMethod", symbols.symbolName((Integer)tracer.getData().get(0).get("methodId")));
     }
+
+
+    @Test
+    public void testTraceAndInstrumentRecursiveMethods() throws Exception {
+        engine.add(spy.byMethod(TCLASS2, "~^[a-zA-Z_].*"));
+
+        Object obj = instantiate(engine, TCLASS2);
+        invoke(obj, "recursiveMethod");
+
+        Assert.assertEquals("Output actions mismatch.", Arrays.asList("traceEnter", "traceEnter", "traceReturn", "traceReturn"), tracer.listAttr("action"));
+    }
+
+
+    @Test
+    public void testTraceError() throws Exception {
+        engine.add(spy.byMethod(TCLASS1, "~^[a-zA-Z_].*"));
+
+        Object obj = instantiate(engine, TCLASS1);
+        Object rslt = invoke(obj, "errorMethod");
+
+        assertEquals(2, tracer.getData().size());
+        assertEquals(rslt, tracer.getData().get(1).get("exception"));
+        assertEquals("errorMethod", symbols.symbolName((Integer)tracer.getData().get(0).get("methodId")));
+    }
+
+    // TODO check if ID of method with the same name is the same for two different classes
 }

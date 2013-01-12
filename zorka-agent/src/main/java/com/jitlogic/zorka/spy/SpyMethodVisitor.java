@@ -222,10 +222,6 @@ public class SpyMethodVisitor extends MethodVisitor {
     public void visitInsn(int opcode) {
         if (matches && opcode >= IRETURN && opcode <= RETURN) {
 
-            if (symbolRegistry != null) {
-                stackDelta = max(stackDelta, emitTraceReturn());
-            }
-
             // ON_RETURN probes are inserted here
             if (returnProbe != null) {
                 returnProbe.emitFetchRetVal(this, returnType);
@@ -238,6 +234,10 @@ public class SpyMethodVisitor extends MethodVisitor {
                     sdef.getProbes(ON_RETURN).size() > 0 || sdef.getProcessors(ON_RETURN).size() > 0) {
                     stackDelta = max(stackDelta, emitProbes(ON_RETURN, ctx));
                 }
+            }
+
+            if (symbolRegistry != null) {
+                stackDelta = max(stackDelta, emitTraceReturn());
             }
         }
 
@@ -256,10 +256,6 @@ public class SpyMethodVisitor extends MethodVisitor {
         mv.visitLabel(lTryTo);
         mv.visitLabel(lTryHandler);
 
-        if (symbolRegistry != null) {
-            stackDelta = max(stackDelta, emitTraceError());
-        }
-
         if (returnProbe != null) {
             returnProbe.emitFetchRetVal(this, Type.getType(Object.class));
         }
@@ -271,6 +267,10 @@ public class SpyMethodVisitor extends MethodVisitor {
                 sdef.getProbes(ON_ERROR).size() > 0 || sdef.getProcessors(ON_ERROR).size() > 0) {
                 stackDelta = max(stackDelta, emitProbes(ON_ERROR, ctx));
             }
+        }
+
+        if (symbolRegistry != null) {
+            stackDelta = max(stackDelta, emitTraceError());
         }
 
         mv.visitInsn(ATHROW);
