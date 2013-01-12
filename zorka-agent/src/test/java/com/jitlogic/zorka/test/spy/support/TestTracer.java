@@ -95,4 +95,8 @@ public class TestTracer implements TraceEventHandler {
             Assert.assertEquals("Attribute " + kv[i-1], kv[i], rec.get(kv[i-1]));
         }
     }
+
+    public int size() {
+        return data.size();
+    }
 }

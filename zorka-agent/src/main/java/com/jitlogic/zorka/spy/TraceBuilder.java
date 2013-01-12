@@ -96,8 +96,8 @@ public class TraceBuilder implements TraceEventHandler {
 
 
     @Override
-    public void newAttr(int parId, Object val) {
-        top.newAttr(parId, val);
+    public void newAttr(int attrId, Object attrVal) {
+        top.newAttr(attrId, attrVal);
     }
 
 

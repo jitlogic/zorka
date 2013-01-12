@@ -434,6 +434,10 @@ public class ZorkaUtil {
 
         byte[] dst = new byte[len];
 
+        if (len > src.length) {
+            len = src.length;
+        }
+
         if (len > 0) {
             System.arraycopy(src, offs, dst, 0, len);
         }
@@ -465,6 +469,10 @@ public class ZorkaUtil {
 
         byte[] dst = new byte[len];
 
+        if (len > src.length) {
+            len = src.length;
+        }
+
         if (len > 0) {
             System.arraycopy(src, 0, dst, 0, len);
         }
@@ -472,6 +480,40 @@ public class ZorkaUtil {
         return dst;
     }
 
+
+    /**
+     * Clips or extends array of objects of bytes. If passed length is less than length of original array,
+     * only so many elements of original array will be copied. If passed length is more than length of original
+     * array, new elements will be filled with zeros. If passed length is the same as length of original
+     * array, it is equivalent to copyArray() method.
+     *
+     * @param src source array
+     *
+     * @param len target length
+     *
+     * @return shortened/cloned/enlarged array
+     */
+    public static long[] clipArray(long[] src, int len) {
+        if (src == null) {
+            return null;
+        }
+
+        if (len < 0) {
+            len = src.length - len > 0 ? src.length - len : 0;
+        }
+
+        long[] dst = new long[len];
+
+        if (len > src.length) {
+            len = src.length;
+        }
+
+        if (len > 0) {
+            System.arraycopy(src, 0, dst, 0, len);
+        }
+
+        return dst;
+    }
 
     /**
      * Clips list if necessary. Contrasted to subList() method it creates copy of a list,

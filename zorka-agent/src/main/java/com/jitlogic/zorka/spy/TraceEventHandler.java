@@ -88,10 +88,10 @@ public interface TraceEventHandler {
     /**
      * Records a parameter.
      *
-     * @param parId parametr ID
+     * @param attrId parametr ID
      *
-     * @param val parameter value
+     * @param attrVal parameter value
      */
-    void newAttr(int parId, Object val);
+    void newAttr(int attrId, Object attrVal);
 
 }

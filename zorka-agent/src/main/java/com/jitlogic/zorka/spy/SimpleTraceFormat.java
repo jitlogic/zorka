@@ -99,27 +99,27 @@ public class SimpleTraceFormat implements TraceEventHandler {
 
 
     @Override
-    public void newAttr(int attrId, Object val) {
-        if (val instanceof String) {
+    public void newAttr(int attrId, Object attrVal) {
+        if (attrVal instanceof String) {
             buf.putByte(STRING_ATTR);
             buf.putInt(attrId);
-            buf.putString(val.toString());
-        } else if (val instanceof Long) {
+            buf.putString(attrVal.toString());
+        } else if (attrVal instanceof Long) {
             buf.putByte(LONG_ATTR);
             buf.putInt(attrId);
-            buf.putLong((Long)val);
-        } else if (val instanceof Integer) {
+            buf.putLong((Long) attrVal);
+        } else if (attrVal instanceof Integer) {
             buf.putByte(INTEGER_ATTR);
             buf.putInt(attrId);
-            buf.putInt((Integer)val);
-        } else if (val instanceof Byte) {
+            buf.putInt((Integer) attrVal);
+        } else if (attrVal instanceof Byte) {
             buf.putByte(BYTE_ATTR);
             buf.putInt(attrId);
-            buf.putByte((Byte)val);
-        } else if (val instanceof Short) {
+            buf.putByte((Byte) attrVal);
+        } else if (attrVal instanceof Short) {
             buf.putByte(SHORT_ATTR);
             buf.putInt(attrId);
-            buf.putShort((Short)val);
+            buf.putShort((Short) attrVal);
         } else {
             buf.putByte(NULL_ATTR);
             buf.putInt(attrId);

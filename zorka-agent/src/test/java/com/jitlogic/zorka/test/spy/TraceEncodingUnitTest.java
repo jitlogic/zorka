@@ -29,8 +29,9 @@ public class TraceEncodingUnitTest {
 
 
     private ByteBuffer buf = new ByteBuffer();;
-    private SimpleTraceFormat encoder = new SimpleTraceFormat(buf);;
+    private SimpleTraceFormat encoder = new SimpleTraceFormat(buf);
     private TestTracer output = new TestTracer();
+    private SymbolEnricher enricher = new SymbolEnricher(symbols, output);
 
 
     private int t1 = symbols.symbolId("some.trace");
@@ -145,5 +146,36 @@ public class TraceEncodingUnitTest {
         decode();
 
         Assert.assertEquals("Should read 5 records.", 5, output.getData().size());
+    }
+
+
+    @Test
+    public void testEnrichTraceEnterCall() {
+        enricher.traceEnter(c1, m1, s1, 100L);
+
+        Assert.assertEquals("should receive three symbols and traceEnter", 4, output.size());
+        output.check(0, "action", "newSymbol", "symbolId", c1, "symbolName", "some.Class");
+        output.check(1, "action", "newSymbol", "symbolId", m1, "symbolName", "someMethod");
+    }
+
+
+    @Test
+    public void testEnrichTraceEnterCallTwice() {
+        enricher.traceEnter(c1, m1, s1, 100L);
+        enricher.traceEnter(c1, m1, s1, 200L);
+
+        Assert.assertEquals("should receive three symbols and traceEnter", 5, output.size());
+    }
+
+
+    @Test
+    public void testEnrichTraceError() {
+        enricher.traceError(new WrappedException(new Exception("oja!")), 100);
+
+        output.check(0, "action", "newSymbol", "symbolId",
+                symbols.symbolId("java.lang.Exception"), "symbolName", "java.lang.Exception");
+
+        output.check(1, "action", "traceError", "exception",
+                new SymbolicException(new Exception("oja!"), symbols), "tstamp", 100L);
     }
 }

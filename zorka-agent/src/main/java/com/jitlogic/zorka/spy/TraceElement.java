@@ -81,11 +81,11 @@ public class TraceElement implements TraceEventHandler {
 
 
     @Override
-    public void newAttr(int parId, Object val) {
+    public void newAttr(int attrId, Object attrVal) {
         if (attrs == null) {
             attrs = new HashMap<Integer,Object>();
         }
-        attrs.put(parId, val);
+        attrs.put(attrId, attrVal);
     }
 
 
