@@ -18,6 +18,7 @@ package com.jitlogic.zorka.test.spy;
 
 import com.jitlogic.zorka.spy.SymbolRegistry;
 import com.jitlogic.zorka.spy.TraceBuilder;
+import com.jitlogic.zorka.spy.WrappedException;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 
 import org.junit.Assert;
@@ -95,7 +96,7 @@ public class TraceBuilderUnitTest {
     public void testTraceWithErrorElement() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
         builder.traceBegin(t1);
-        builder.traceError(new Exception("oja!"), 200*MS);
+        builder.traceError(new WrappedException(new Exception("oja!")), 200*MS);
 
         Assert.assertEquals("Output actions mismatch.",
             Arrays.asList("traceBegin", "traceEnter", "traceStats", "traceError"),
@@ -108,7 +109,7 @@ public class TraceBuilderUnitTest {
         builder.traceEnter(c1, m1, s1, 100*MS);
         builder.traceBegin(t1);
         builder.traceEnter(c1, m2, s1, 200 * MS);
-        builder.traceError(new Exception("oja!"), 200 * MS + 100);
+        builder.traceError(new WrappedException(new Exception("oja!")), 200 * MS + 100);
         builder.traceReturn(400 * MS);
 
         Assert.assertEquals("Output actions mismatch.",

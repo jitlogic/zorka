@@ -17,23 +17,30 @@
 package com.jitlogic.zorka.spy;
 
 
-import java.util.List;
-
 /**
- * This class receives submissions from single thread and constructs traces.
+ * This class receives loose tracer submissions from single thread
+ * and constructs traces.
  *
  *
  */
 public class TraceBuilder implements TraceEventHandler {
 
+    private long methodTime = 250000;
+
     private TraceEventHandler output;
 
     private TraceElement top = new TraceElement(null);
 
-    private long methodTime = 250000, traceTime = 1000;
+
 
     public TraceBuilder(TraceEventHandler output) {
         this.output = output;
+    }
+
+
+    public TraceBuilder(TraceEventHandler output, long methodTime) {
+        this.output = output;
+        this.methodTime = methodTime;
     }
 
 
@@ -65,7 +72,7 @@ public class TraceBuilder implements TraceEventHandler {
 
 
     @Override
-    public void traceError(Throwable exception, long tstamp) {
+    public void traceError(TracedException exception, long tstamp) {
 
         while (!top.isBusy() && top.getParent() != null) {
             top = top.getParent();
@@ -95,7 +102,7 @@ public class TraceBuilder implements TraceEventHandler {
 
 
     private void pop() {
-        if (top.isTrace() && top.getTime() > traceTime) {
+        if (top.isTrace() && top.getTime() > methodTime) {
             top.traverse(output);
         }
 

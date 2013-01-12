@@ -28,7 +28,7 @@ public class TraceElement implements TraceEventHandler {
     private long tstart, tstop;
     private long calls, errors;
 
-    private Throwable exception;
+    private TracedException exception;
     private TraceElement parent;
     private Map<Integer,Object> attrs;
     private List<TraceElement> children;
@@ -68,7 +68,7 @@ public class TraceElement implements TraceEventHandler {
 
 
     @Override
-    public void traceError(Throwable exception, long tstamp) {
+    public void traceError(TracedException exception, long tstamp) {
         this.tstop = tstamp;
         this.exception = exception;
         this.errors++;

@@ -72,6 +72,25 @@ public class ByteBuffer {
     }
 
 
+    public short getShort() {
+        if (pos < len-1) {
+            return (short)(((buf[pos++] & 0xff) << 8) | ((buf[pos++] & 0xff) << 0));
+        } else {
+            throw new ArrayIndexOutOfBoundsException("Trying to read past the end of buffer.");
+        }
+    }
+
+
+    public void putShort(int x) {
+        if (pos >= len-1) {
+            overflow();
+        }
+
+        buf[pos++] = (byte) (x >> 8);
+        buf[pos++] = (byte) (x >> 0);
+    }
+
+
     public int getInt() {
         if (pos < len-3) {
             return ((buf[pos++] & 0xff) << 24)
@@ -198,5 +217,9 @@ public class ByteBuffer {
 
         overflows.add(ZorkaUtil.clipArray(buf, pos));
         pos = 0;
+    }
+
+    public boolean eof() {
+        return pos >= len;
     }
 }

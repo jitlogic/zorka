@@ -23,17 +23,6 @@ package com.jitlogic.zorka.spy;
  */
 public interface TraceEventHandler {
 
-    public static final byte NEW_TRACE = 0x00;
-    public static final byte ENTER_METHOD  = 0x01;
-    public static final byte RETURN_METHOD = 0x02;
-    public static final byte ERROR_METHOD  = 0x03;
-    public static final byte SYMBOL = 0x04;
-    public static final byte S_PARAM = 0x05;
-    public static final byte I_PARAM = 0x06;
-    public static final byte L_PARAM = 0x07;
-    public static final byte D_PARAM = 0x08;
-
-
     /**
      * Records beginning of a trace. Not that sometimes traces can be recursive.
      *
@@ -67,11 +56,11 @@ public interface TraceEventHandler {
     /**
      * Records method error (exception thrown from method).
      *
+     * @param exception exception object (wrapped or unserialized)
      * @param tstamp timestamp (in nanoseconds since Epoch - see System.nanoTime())
      *
-     * @param exception exception object
      */
-    void traceError(Throwable exception, long tstamp);
+    void traceError(TracedException exception, long tstamp);
 
 
     /**

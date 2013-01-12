@@ -568,6 +568,30 @@ public class ZorkaUtil {
         return map;
     }
 
+
+    /**
+     * This is useful to create a map of object in declarative way. Key-value pairs
+     * are passed as arguments to this method, so call will look like this:
+     * ZorkaUtil.map(k1, v1, k2, v2, ...)
+     *
+     * @param data keys and values (in pairs)
+     *
+     * @param <K> type of keys
+     *
+     * @param <V> type of values
+     *
+     * @return mutable map
+     */
+    public static <K, V> Map<K,V> lmap(Object...data) {
+        Map<K,V> map = new LinkedHashMap<K, V>(data.length+2);
+
+        for (int i = 1; i < data.length; i+=2) {
+            map.put((K)data[i-1], (V)data[i]);
+        }
+
+        return map;
+    }
+
     /**
      * Equivalent of map(k1, v1, ...) that returns constant (unmodifiable) map.
      *

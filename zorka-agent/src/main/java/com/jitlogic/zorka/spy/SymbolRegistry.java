@@ -21,6 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SymbolRegistry {
 
+    public static final int NULL_SYMBOL = 0;
+
     private AtomicInteger idCounter = new AtomicInteger(0);
 
     private ConcurrentHashMap<String,Integer> symbols = new ConcurrentHashMap<String, Integer>();

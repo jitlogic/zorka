@@ -17,11 +17,11 @@
 package com.jitlogic.zorka.test.spy.support;
 
 import com.jitlogic.zorka.spy.TraceEventHandler;
+import com.jitlogic.zorka.spy.TracedException;
 import com.jitlogic.zorka.util.ZorkaUtil;
 import org.junit.Assert;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +45,7 @@ public class TestTracer implements TraceEventHandler {
     }
 
     @Override
-    public void traceError(Throwable exception, long tstamp) {
+    public void traceError(TracedException exception, long tstamp) {
         data.add(ZorkaUtil.map("action", "traceError", "exception", exception, "tstamp", tstamp));
     }
 
@@ -55,18 +55,19 @@ public class TestTracer implements TraceEventHandler {
     }
 
     @Override
-    public void newSymbol(int symbolId, String symbolText) {
-        data.add(ZorkaUtil.map("action", "newSymbol", "symbolId", symbolId, "symbolText", symbolText));
+    public void newSymbol(int symbolId, String symbolName) {
+        data.add(ZorkaUtil.map("action", "newSymbol", "symbolId", symbolId, "symbolName", symbolName));
     }
 
     @Override
-    public void newAttr(int parId, Object val) {
-        data.add(ZorkaUtil.map("action", "newAttr", "parId", parId, "val", val));
+    public void newAttr(int attrId, Object attrVal) {
+        data.add(ZorkaUtil.map("action", "newAttr", "attrId", attrId, "val", attrVal));
     }
 
     public List<Map<Object,Object>> getData() {
         return data;
     }
+
 
     public <T> List<T> listAttr(Object key) {
         List<T> lst = new ArrayList<T>();
@@ -74,5 +75,24 @@ public class TestTracer implements TraceEventHandler {
             lst.add((T)datum.get(key));
         }
         return lst;
+    }
+
+
+    public Object get(int idx, Object key) {
+        return idx < data.size() ?  data.get(idx).get(key) : null;
+    }
+
+
+    public void check(int idx, Object... kv) {
+
+        if (idx >= data.size()) {
+            Assert.fail("Requested slot " + idx + " but only " + data.size() + " have been recorded.");
+        }
+
+        Map<Object,Object> rec = data.get(idx);
+
+        for (int i = 1; i < kv.length; i += 2) {
+            Assert.assertEquals("Attribute " + kv[i-1], kv[i], rec.get(kv[i-1]));
+        }
     }
 }

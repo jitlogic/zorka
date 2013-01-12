@@ -607,7 +607,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
 
         assertEquals(2, tracer.getData().size());
         assertEquals(1, submitter.size());
-        assertEquals("errorMethod", symbols.symbolName((Integer)tracer.getData().get(0).get("methodId")));
+        assertEquals("trivialMethod", symbols.symbolName((Integer)tracer.getData().get(0).get("methodId")));
     }
 
 
@@ -630,7 +630,7 @@ public class BytecodeInstrumentationUnitTest extends ZorkaFixture {
         Object rslt = invoke(obj, "errorMethod");
 
         assertEquals(2, tracer.getData().size());
-        assertEquals(rslt, tracer.getData().get(1).get("exception"));
+        assertEquals(new WrappedException((Throwable)rslt), tracer.getData().get(1).get("exception"));
         assertEquals("errorMethod", symbols.symbolName((Integer)tracer.getData().get(0).get("methodId")));
     }
 

@@ -103,9 +103,8 @@ public class MainSubmitter {
 
         if (tracer != null) {
             long t = System.nanoTime();
-            tracer.traceError(e, t);
+            tracer.traceError(new WrappedException(e), t);
         }
-
     }
 
     /**
