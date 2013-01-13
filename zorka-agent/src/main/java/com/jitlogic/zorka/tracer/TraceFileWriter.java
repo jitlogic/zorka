@@ -28,17 +28,20 @@ public class TraceFileWriter extends ZorkaAsyncThread<TraceElement> {
     private SimpleTraceFormat encoder;
     private ByteBuffer buffer;
 
-    private int maxFiles = 8;
-    private long maxFileSize = 8 * 1024 * 1024;
+    private int maxFiles;
+    private long maxFileSize;
 
     private File traceFile;
     private OutputStream stream;
     private long curSize;
 
-    /**
-     * Creates trace writer object.
-     */
+
     public TraceFileWriter(String path, SymbolRegistry symbols) {
+        this(path, symbols, 8, 4 * 1024 * 1024);
+    }
+
+
+    public TraceFileWriter(String path, SymbolRegistry symbols, int maxFiles, long maxSize) {
         super("trace-writer");
         this.symbols = symbols;
         this.buffer = new ByteBuffer(2048);

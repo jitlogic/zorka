@@ -99,7 +99,7 @@ public class TraceEncodingUnitTest {
     public void traceStringAttr() {
         encoder.newAttr(a1, "oja!");
         decode();
-        output.check(0, "action", "newAttr", "attrId", a1, "val", "oja!");
+        output.check(0, "action", "newAttr", "attrId", a1, "attrVal", "oja!");
     }
 
 
@@ -107,7 +107,7 @@ public class TraceEncodingUnitTest {
     public void traceLongAttr() {
         encoder.newAttr(a1, 100L);
         decode();
-        output.check(0, "action", "newAttr", "attrId", a1, "val", 100L);
+        output.check(0, "action", "newAttr", "attrId", a1, "attrVal", 100L);
     }
 
 
@@ -115,7 +115,7 @@ public class TraceEncodingUnitTest {
     public void testIntegerAttr() {
         encoder.newAttr(a1, 100);
         decode();
-        output.check(0, "action", "newAttr", "attrId", a1, "val", 100);
+        output.check(0, "action", "newAttr", "attrId", a1, "attrVal", 100);
     }
 
 
@@ -123,7 +123,7 @@ public class TraceEncodingUnitTest {
     public void testByteAttr() {
         encoder.newAttr(a1, (byte)10);
         decode();
-        output.check(0, "action", "newAttr", "attrId", a1, "val", (byte)10);
+        output.check(0, "action", "newAttr", "attrId", a1, "attrVal", (byte)10);
     }
 
 
@@ -131,7 +131,7 @@ public class TraceEncodingUnitTest {
     public void testShortAttr() {
         encoder.newAttr(a1, (short)200);
         decode();
-        output.check(0, "action", "newAttr", "attrId", a1, "val", (short)200);
+        output.check(0, "action", "newAttr", "attrId", a1, "attrVal", (short)200);
     }
 
 

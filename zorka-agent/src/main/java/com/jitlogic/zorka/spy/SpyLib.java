@@ -18,7 +18,10 @@
 package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.integ.SnmpLib;
+import com.jitlogic.zorka.tracer.TraceElement;
 import com.jitlogic.zorka.tracer.TraceEventHandler;
+import com.jitlogic.zorka.tracer.TraceFileWriter;
+import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.ZorkaTrapper;
 import com.jitlogic.zorka.integ.SnmpTrapper;
 import com.jitlogic.zorka.integ.TrapVarBindDef;
@@ -144,15 +147,8 @@ public class SpyLib {
     }
 
 
-    /**
-     * Adds output handlers to
-     *
-     * @param handlers
-     */
-    public void add(TraceEventHandler...handlers) {
-        for (TraceEventHandler handler : handlers) {
-            instance.getTracer().add(handler);
-        }
+    public void tracerOutput(ZorkaAsyncThread<TraceElement> output) {
+        instance.getTracer().setOutput(output);
     }
 
 
@@ -437,6 +433,13 @@ public class SpyLib {
         return new TraceAttrProcessor(instance.getTracer(), srcField, dstAttr);
     }
 
+
+
+    public ZorkaAsyncThread<TraceElement> traceFile(String path, int maxFiles, long maxSize) {
+        TraceFileWriter writer = new TraceFileWriter(path, instance.getTracer().getSymbolRegistry(), maxFiles, maxSize);
+        writer.start();
+        return writer;
+    }
 
 
     /**

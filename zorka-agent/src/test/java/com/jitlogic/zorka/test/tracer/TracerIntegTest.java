@@ -19,8 +19,8 @@ package com.jitlogic.zorka.test.tracer;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.tracer.SymbolRegistry;
-import com.jitlogic.zorka.tracer.Tracer;
+import com.jitlogic.zorka.tracer.TraceElement;
+import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -30,12 +30,24 @@ import static com.jitlogic.zorka.test.support.TestUtil.*;
 
 public class TracerIntegTest extends ZorkaFixture {
 
-    private TestTracer output = new TestTracer();
+    private TestTracer rslt = new TestTracer();
+
+    private ZorkaAsyncThread<TraceElement> output;
 
     private int sym(String s) {
         return spyInstance.getTracer().getSymbolRegistry().symbolId(s);
     }
 
+    @Before
+    public void initOutput() {
+        rslt = new TestTracer();
+        output = new ZorkaAsyncThread<TraceElement>("test") {
+            @Override public void submit(TraceElement obj) {
+                obj.traverse(rslt);
+            }
+            @Override protected void process(TraceElement obj) { }
+        };
+    }
 
     @Test
     public void testSimpleTooShortTrace() throws Exception {
@@ -43,12 +55,12 @@ public class TracerIntegTest extends ZorkaFixture {
         spy.add(
                 spy.instance().onEnter(spy.traceBegin("TEST"))
                         .include(spy.byMethod(TCLASS1, "trivialMethod")));
-        spy.add(output);
+        spy.tracerOutput(output);
 
         Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS1);
         invoke(obj, "trivialMethod");
 
-        assertEquals("should return traceBegin, trace", 0, output.size());
+        assertEquals("should return traceBegin, trace", 0, rslt.size());
     }
 
 
@@ -58,17 +70,18 @@ public class TracerIntegTest extends ZorkaFixture {
         spy.add(
             spy.instance().onEnter(spy.traceBegin("TEST"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
+
         spyInstance.getTracer().setMethodTime(0); // Catch everything
-        spy.add(output);
+        spy.tracerOutput(output);
 
         Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS1);
         invoke(obj, "trivialMethod");
 
-        assertEquals("should return traceBegin, trace", 4, output.size());
-        output.check(0, "action", "traceBegin", "traceId", sym("TEST"));
-        output.check(1, "action", "traceEnter", "classId", sym(TCLASS1), "methodId", sym("trivialMethod"));
-        output.check(2, "action", "traceStats", "calls", 1L, "errors", 0L);
-        output.check(3, "action", "traceReturn");
+        assertEquals("should return traceBegin, trace", 4, rslt.size());
+        rslt.check(0, "action", "traceBegin", "traceId", sym("TEST"));
+        rslt.check(1, "action", "traceEnter", "classId", sym(TCLASS1), "methodId", sym("trivialMethod"));
+        rslt.check(2, "action", "traceStats", "calls", 1L, "errors", 0L);
+        rslt.check(3, "action", "traceReturn");
     }
 
 
@@ -77,19 +90,20 @@ public class TracerIntegTest extends ZorkaFixture {
         spy.include(spy.byMethod(TCLASS1, "trivialMethod"));
         spy.add(spy.instance().onEnter(
                 spy.traceBegin("TEST"), spy.put("URL", "http://some.url"), spy.traceAttr("URL", "URL")
-            ).include(spy.byMethod(TCLASS1, "trivialMethod")));
+        ).include(spy.byMethod(TCLASS1, "trivialMethod")));
+
         spyInstance.getTracer().setMethodTime(0); // Catch everything
-        spy.add(output);
+        spy.tracerOutput(output);
 
         Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS1);
         invoke(obj, "trivialMethod");
 
-        assertEquals("should return traceBegin, trace", 5, output.size());
-        output.check(0, "action", "traceBegin", "traceId", sym("TEST"));
-        output.check(1, "action", "traceEnter", "classId", sym(TCLASS1), "methodId", sym("trivialMethod"));
-        output.check(2, "action", "traceStats", "calls", 1L, "errors", 0L);
-        output.check(3, "action", "newAttr", "attrId", sym("URL"), "attrVal", "http://some.url");
-        output.check(4, "action", "traceReturn");
+        assertEquals("should return traceBegin, trace", 5, rslt.size());
+        rslt.check(0, "action", "traceBegin", "traceId", sym("TEST"));
+        rslt.check(1, "action", "traceEnter", "classId", sym(TCLASS1), "methodId", sym("trivialMethod"));
+        rslt.check(2, "action", "traceStats", "calls", 1L, "errors", 0L);
+        rslt.check(3, "action", "newAttr", "attrId", sym("URL"), "attrVal", "http://some.url");
+        rslt.check(4, "action", "traceReturn");
     }
 
 }

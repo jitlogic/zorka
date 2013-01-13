@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.tracer;
 
 import com.jitlogic.zorka.spy.SpyMatcher;
+import com.jitlogic.zorka.util.ZorkaAsyncThread;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,12 +34,12 @@ public class Tracer {
     private SymbolRegistry symbolRegistry = new SymbolRegistry();
 
     /** Output handler is initially set to null implementation. */
-    private TraceEventHandler outputHandler = new TraceEventHandler();
+    private ZorkaAsyncThread<TraceElement> output;
 
     private ThreadLocal<TraceEventHandler> localHandlers =
         new ThreadLocal<TraceEventHandler>() {
             public TraceEventHandler initialValue() {
-                return new TraceBuilder(outputHandler, methodTime);
+                return new TraceBuilder(output, methodTime);
             }
         };
 
@@ -58,9 +59,10 @@ public class Tracer {
     }
 
 
-    public void add(TraceEventHandler handler) {
-        outputHandler = handler;
+    public void setOutput(ZorkaAsyncThread<TraceElement> output) {
+        this.output = output;
     }
+
 
     public void setMethodTime(long methodTime) {
         this.methodTime = methodTime;

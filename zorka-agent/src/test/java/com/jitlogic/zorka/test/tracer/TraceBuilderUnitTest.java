@@ -18,9 +18,11 @@ package com.jitlogic.zorka.test.tracer;
 
 import com.jitlogic.zorka.tracer.SymbolRegistry;
 import com.jitlogic.zorka.tracer.TraceBuilder;
+import com.jitlogic.zorka.tracer.TraceElement;
 import com.jitlogic.zorka.tracer.WrappedException;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 
+import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,9 +32,14 @@ import static org.junit.Assert.*;
 
 public class TraceBuilderUnitTest {
 
-    private SymbolRegistry symbols = new SymbolRegistry();
     private TestTracer output = new TestTracer();
-    private TraceBuilder builder = new TraceBuilder(output);
+    private SymbolRegistry symbols = new SymbolRegistry();
+
+    private TraceBuilder builder = new TraceBuilder(
+        new ZorkaAsyncThread<TraceElement>("test") {
+            @Override public void submit(TraceElement obj) { obj.traverse(output); }
+            @Override protected void process(TraceElement obj) {  }
+        });
 
     private static final int MS = 1000000;
 

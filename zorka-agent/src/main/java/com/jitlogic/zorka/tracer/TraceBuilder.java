@@ -17,6 +17,8 @@
 package com.jitlogic.zorka.tracer;
 
 
+import com.jitlogic.zorka.util.ZorkaAsyncThread;
+
 /**
  * This class receives loose tracer submissions from single thread
  * and constructs traces.
@@ -27,18 +29,18 @@ public class TraceBuilder extends TraceEventHandler {
 
     private long methodTime = 250000;
 
-    private TraceEventHandler output;
+    private ZorkaAsyncThread<TraceElement> output;
 
     private TraceElement top = new TraceElement(null);
 
 
 
-    public TraceBuilder(TraceEventHandler output) {
+    public TraceBuilder(ZorkaAsyncThread<TraceElement> output) {
         this.output = output;
     }
 
 
-    public TraceBuilder(TraceEventHandler output, long methodTime) {
+    public TraceBuilder(ZorkaAsyncThread<TraceElement> output, long methodTime) {
         this.output = output;
         this.methodTime = methodTime;
     }
@@ -102,11 +104,10 @@ public class TraceBuilder extends TraceEventHandler {
 
 
     private void pop() {
-        if (top.isTrace() && top.getTime() > methodTime) {
-            synchronized (output) {
-                // TODO not a good solution, we need second interface here ...
-                top.traverse(output);
-            }
+        boolean clean = true;
+        if (top.isTrace() && top.getTime() >= methodTime) {
+            output.submit(top);
+            clean = false;
         }
 
         TraceElement parent = top.getParent();
@@ -114,14 +115,17 @@ public class TraceBuilder extends TraceEventHandler {
         if (parent != null) {
             if (top.getTime() > methodTime || top.getErrors() > 0) {
                 parent.addChild(top);
-                top = parent;
+                clean = false;
             } else {
                 parent.mergeChild(top);
-                top.clean();
             }
-        } else {
-            top.clean();
         }
-    }
+
+        if (clean) {
+            top.clean();
+        } else {
+            top = parent != null ? parent : new TraceElement(null);
+        }
+    } // pop()
 
 }
