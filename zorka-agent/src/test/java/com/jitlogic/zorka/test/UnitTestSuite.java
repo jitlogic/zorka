@@ -28,11 +28,14 @@ import com.jitlogic.zorka.test.normproc.XqlLexerUnitTest;
 import com.jitlogic.zorka.test.normproc.XqlNormalizationUnitTest;
 import com.jitlogic.zorka.test.rankproc.*;
 import com.jitlogic.zorka.test.spy.*;
-import org.junit.experimental.categories.Categories;
+import com.jitlogic.zorka.test.tracer.TraceBuilderUnitTest;
+import com.jitlogic.zorka.test.tracer.TraceEncodingUnitTest;
+import com.jitlogic.zorka.test.tracer.TracerInstrumentationUnitTest;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-@RunWith(Categories.class)
+@RunWith(Suite.class)
 @Suite.SuiteClasses({
         // testinteg
         ZabbixAgentUnitTest.class,
@@ -42,11 +45,14 @@ import org.junit.runners.Suite;
 
         // testspy
         ArgProcessingUnitTest.class, BytecodeInstrumentationUnitTest.class, ClassMethodMatchingUnitTest.class,
-        SpyLibFunctionsUnitTest.class, StandardCollectorsUnitTest.class, TraceBuilderUnitTest.class,
-        SubmissionDispatchUnitTest.class, ZorkaStatsCollectionUnitTest.class, TraceEncodingUnitTest.class,
+        SpyLibFunctionsUnitTest.class, StandardCollectorsUnitTest.class, SubmissionDispatchUnitTest.class,
+        ZorkaStatsCollectionUnitTest.class,
 
         // teststress
         SubmissionDispatchUnitTest.class,
+
+        // tracer
+        TracerInstrumentationUnitTest.class, TraceBuilderUnitTest.class, TraceEncodingUnitTest.class,
 
         // unittest
         AggregateCountingUnitTest.class, AverageRateCountingUnitTest.class, BshAgentUnitTest.class,

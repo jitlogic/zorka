@@ -17,6 +17,8 @@
 package com.jitlogic.zorka.tracer;
 
 import java.io.PrintStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,7 +57,7 @@ public class TracePrinter implements TraceEventHandler {
 
 
     private String time(long tstamp) {
-        return "??";
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date(tstamp));
     }
 
 
