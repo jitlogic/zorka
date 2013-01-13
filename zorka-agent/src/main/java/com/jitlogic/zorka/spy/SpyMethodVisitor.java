@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.tracer.SymbolRegistry;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -41,11 +42,16 @@ public class SpyMethodVisitor extends MethodVisitor {
     /** Class that receives data from probes */
     private final static String SUBMIT_CLASS = "com/jitlogic/zorka/spy/MainSubmitter";
 
-    /** Name of a method that will be called from probes */
+    /** Method used by various probes */
     private final static String SUBMIT_METHOD = "submit";
+    private final static String SUBMIT_SIGNATURE = "(III[Ljava/lang/Object;)V";
+    private static final String ENTER_METHOD = "traceEnter";
+    private static final String ENTER_SIGNATURE = "(III)V";
+    private static final String RETURN_METHOD = "traceReturn";
+    private static final String RETURN_SIGNATURE = "()V";
+    private static final String ERROR_METHOD = "traceError";
+    private static final String ERROR_SIGNATURE = "(Ljava/lang/Throwable;)V";
 
-    /** Descriptor of a method that will be called from probes */
-    private final static String SUBMIT_DESC = "(III[Ljava/lang/Object;)V";
 
     /** Debug mode */
     private static boolean debug;
@@ -53,8 +59,12 @@ public class SpyMethodVisitor extends MethodVisitor {
     /** Access flags of (instrumented) method */
     private final int access;
 
+    private final String className;
+
     /** Name of (instrumented) metod */
     private final String methodName;
+
+    private final String methodSignature;
 
     /** Argument types of (instrumented) method */
     private final Type[] argTypes;
@@ -92,30 +102,35 @@ public class SpyMethodVisitor extends MethodVisitor {
     /** Boolean flag used when method annotation matching is required */
     private boolean matches;
 
+    /** Boolean flag indicating if tracer code should be injected. */
+    private SymbolRegistry symbolRegistry;
+
     /**
      * Standard constructor.
      *
      * @param matches true if visitor should always instrument or false if it should check for annotations
      *
      * @param access method access flags
-     *
      * @param methodName method name
-     *
-     * @param methodDesc method descriptor
-     *
+     * @param methodSignature method descriptor
      * @param ctxs spy contexts interested in receiving data from this visitor
-     *
      * @param mv method visitor (next in processing chain)
      */
-    public SpyMethodVisitor(boolean matches, int access, String methodName, String methodDesc, List<SpyContext> ctxs, MethodVisitor mv) {
+    public SpyMethodVisitor(boolean matches, SymbolRegistry symbolRegistry,
+                            String className, int access, String methodName, String methodSignature,
+                            List<SpyContext> ctxs, MethodVisitor mv) {
         super(V1_6, mv);
         this.matches = matches;
+        this.symbolRegistry = symbolRegistry;
+        this.className = className;
         this.access = access;
         this.methodName = methodName;
+        this.methodSignature = methodSignature;
         this.ctxs = ctxs;
 
-        argTypes = Type.getArgumentTypes(methodDesc);
-        returnType = Type.getReturnType(methodDesc);
+
+        argTypes = Type.getArgumentTypes(methodSignature);
+        returnType = Type.getReturnType(methodSignature);
 
         checkReturnVals();
     }
@@ -181,6 +196,14 @@ public class SpyMethodVisitor extends MethodVisitor {
             return;
         }
 
+        // Add trace probe if required
+        if (symbolRegistry != null) {
+            stackDelta = max(stackDelta, emitTraceEnter(
+                    symbolRegistry.symbolId(className),
+                    symbolRegistry.symbolId(methodName),
+                    symbolRegistry.symbolId(methodSignature)));
+        }
+
         // TODO we have bug here: if single sdef matches, probes from all sdefs are inserted
 
         // ON_ENTER probes are inserted here
@@ -199,10 +222,12 @@ public class SpyMethodVisitor extends MethodVisitor {
     @Override
     public void visitInsn(int opcode) {
         if (matches && opcode >= IRETURN && opcode <= RETURN) {
+
             // ON_RETURN probes are inserted here
             if (returnProbe != null) {
                 returnProbe.emitFetchRetVal(this, returnType);
             }
+
             for (int i = ctxs.size()-1; i >= 0; i--) {
                 SpyContext ctx = ctxs.get(i);
                 SpyDefinition sdef = ctx.getSpyDefinition();
@@ -211,7 +236,12 @@ public class SpyMethodVisitor extends MethodVisitor {
                     stackDelta = max(stackDelta, emitProbes(ON_RETURN, ctx));
                 }
             }
+
+            if (symbolRegistry != null) {
+                stackDelta = max(stackDelta, emitTraceReturn());
+            }
         }
+
         mv.visitInsn(opcode);
     }
 
@@ -240,8 +270,12 @@ public class SpyMethodVisitor extends MethodVisitor {
             }
         }
 
+        if (symbolRegistry != null) {
+            stackDelta = max(stackDelta, emitTraceError());
+        }
+
         mv.visitInsn(ATHROW);
-        mv.visitMaxs(maxStack + stackDelta, max(maxLocals, retValProbeSlot+1));
+        mv.visitMaxs(maxStack + stackDelta, max(maxLocals, retValProbeSlot + 1));
     }
 
 
@@ -299,6 +333,48 @@ public class SpyMethodVisitor extends MethodVisitor {
 
 
     /**
+     * Emits tracer code on method entry.
+     *
+     * @param classId class name (symbol ID)
+     * @param methodId method name (symbol ID)
+     * @param signatureId method signature (symbolID)
+     * @return number of JVM stack slots consumed
+     */
+    private int emitTraceEnter(int classId, int methodId, int signatureId) {
+
+        emitLoadInt(classId);
+        emitLoadInt(methodId);
+        emitLoadInt(signatureId);
+
+        mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, ENTER_METHOD, ENTER_SIGNATURE);
+
+        return 3;
+    }
+
+
+    /**
+     * Emits tracer code on method return.
+     *
+     * @return number of JVM stack slots consumed
+     */
+    private int emitTraceReturn() {
+        mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, RETURN_METHOD, RETURN_SIGNATURE);
+        return 0;
+    }
+
+
+    /**
+     * Emits tracer code on method error
+     *
+     * @return number of JVM stack slots consumed
+     */
+    private int emitTraceError() {
+        mv.visitInsn(DUP);
+        mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, ERROR_METHOD, ERROR_SIGNATURE);
+        return 1;
+    }
+
+    /**
      * Emits bytecode of all probes of given context in given stage (entry point, return, error handling).
      * This method has to be called for each spy context separately. Spy contexts on return/error handling
      * have to be called in reverse order.
@@ -340,7 +416,7 @@ public class SpyMethodVisitor extends MethodVisitor {
         }
 
         // Call MainSubmitter.submit()
-        mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, SUBMIT_METHOD, SUBMIT_DESC);
+        mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, SUBMIT_METHOD, SUBMIT_SIGNATURE);
 
         return sd;
     }

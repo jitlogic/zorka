@@ -16,13 +16,12 @@
 
 package com.jitlogic.zorka.test.spy;
 
+import com.jitlogic.zorka.test.support.BytecodeInstrumentationFixture;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 import com.jitlogic.zorka.spy.SpyDefinition;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-
-import static com.jitlogic.zorka.test.spy.BytecodeInstrumentationUnitTest.*;
 
 import static com.jitlogic.zorka.test.support.TestUtil.*;
 
@@ -31,12 +30,12 @@ public class SpyInstanceIntegTest extends ZorkaFixture {
     @Test
     public void testTrivialMethodRun() throws Exception {
         SpyDefinition sdef = SpyDefinition.instrument().onSubmit(spy.tdiff("E0", "R0", "S0"))
-                .include(spy.byMethod(TCLASS1, "trivialMethod"))
+                .include(spy.byMethod(BytecodeInstrumentationFixture.TCLASS1, "trivialMethod"))
                 .onSubmit(spy.zorkaStats("test", "test:name=${shortClassName}", "stats", "${methodName}", "R0", "S0"));
 
         spyInstance.add(sdef);
 
-        Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS1);
+        Object obj = instantiate(spyInstance.getClassTransformer(), BytecodeInstrumentationFixture.TCLASS1);
         invoke(obj, "trivialMethod");
 
         Object stats = getAttr("test", "test:name=TestClass1", "stats");

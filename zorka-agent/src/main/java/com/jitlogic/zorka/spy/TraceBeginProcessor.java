@@ -13,24 +13,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.test.spy.support;
 
-public class TestClass2 {
+package com.jitlogic.zorka.spy;
 
-    private int calls = 0;
+import com.jitlogic.zorka.tracer.Tracer;
 
-    @TestAnnotation
-    public void trivialMethod() {
-        calls++;
+import java.util.Map;
+
+public class TraceBeginProcessor implements SpyProcessor {
+
+    private Tracer tracer;
+    private int traceId;
+
+    public TraceBeginProcessor(Tracer tracer, String traceName) {
+        this.tracer = tracer;
+        this.traceId = tracer.getSymbolRegistry().symbolId(traceName);
     }
 
-    public int echoInt(int in) {
-        return in;
-    }
-
-    public void recursiveMethod() {
-        calls++;
-        trivialMethod();
-        calls++;
+    @Override
+    public Map<String, Object> process(Map<String, Object> record) {
+        tracer.getHandler().traceBegin(traceId);
+        return record;
     }
 }

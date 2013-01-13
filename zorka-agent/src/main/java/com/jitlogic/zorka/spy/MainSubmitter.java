@@ -18,6 +18,8 @@
 package com.jitlogic.zorka.spy;
 
 import bsh.EvalError;
+import com.jitlogic.zorka.tracer.Tracer;
+import com.jitlogic.zorka.tracer.WrappedException;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -30,11 +32,15 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class MainSubmitter {
 
-    /** Submitter receiving actual submissions */
+    /** Submitter receiving full submissions */
     private static SpySubmitter submitter;
+
+    /** Tracer receiving trace events */
+    private static Tracer tracer;
 
     /** Error counter */
     private static AtomicLong errorCount = new AtomicLong(0);
+
 
     /**
      * This method is called by spy probes.
@@ -59,6 +65,59 @@ public class MainSubmitter {
         }
     }
 
+
+    /**
+     * This method is called by tracer probes at method start.
+     *
+     * @param classId class ID (registered)
+     *
+     * @param methodId method ID (registered)
+     */
+    public static void traceEnter(int classId, int methodId, int signatureId) {
+
+        if (tracer != null) {
+            try {
+                tracer.getHandler().traceEnter(classId, methodId, signatureId, System.nanoTime());
+            } catch (Exception e) {
+                errorCount.incrementAndGet();
+            }
+        }
+
+    }
+
+
+    /**
+     * This method is called by tracer probes at method exit.
+     */
+    public static void traceReturn() {
+
+        if (tracer != null) {
+            try {
+                tracer.getHandler().traceReturn(System.nanoTime());
+            } catch (Exception e) {
+                errorCount.incrementAndGet();
+            }
+        }
+
+    }
+
+
+    /**
+     * This method is called by tracer probes at method error point.
+     *
+     * @param exception exception thrown
+     */
+    public static void traceError(Throwable exception) {
+
+        if (tracer != null) {
+            try {
+                tracer.getHandler().traceError(new WrappedException(exception), System.nanoTime());
+            } catch (Exception e1) {
+                errorCount.incrementAndGet();
+            }
+        }
+    }
+
     /**
      * Sets backing spy submitter
      *
@@ -66,6 +125,16 @@ public class MainSubmitter {
      */
     public static void setSubmitter(SpySubmitter submitter) {
         MainSubmitter.submitter = submitter;
+    }
+
+
+    /**
+     * Sets backing trace event handler.
+     *
+     * @param tracer
+     */
+    public static void setTracer(Tracer tracer) {
+        MainSubmitter.tracer = tracer;
     }
 
 

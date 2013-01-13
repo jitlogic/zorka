@@ -13,24 +13,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.test.spy.support;
 
-public class TestClass2 {
+package com.jitlogic.zorka.test;
 
-    private int calls = 0;
+import com.jitlogic.zorka.test.agent.BshAgentIntegTest;
+import com.jitlogic.zorka.test.integ.NrpeAgentIntegTest;
+import com.jitlogic.zorka.test.integ.SnmpIntegTest;
+import com.jitlogic.zorka.test.integ.SyslogIntegTest;
+import com.jitlogic.zorka.test.integ.ZabbixAgentIntegTest;
 
-    @TestAnnotation
-    public void trivialMethod() {
-        calls++;
-    }
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
-    public int echoInt(int in) {
-        return in;
-    }
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+        // agent
+        BshAgentIntegTest.class,
 
-    public void recursiveMethod() {
-        calls++;
-        trivialMethod();
-        calls++;
-    }
+        // integ
+        NrpeAgentIntegTest.class, SnmpIntegTest.class, SyslogIntegTest.class, ZabbixAgentIntegTest.class,
+})
+public class IntegTestSuite {
 }

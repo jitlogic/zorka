@@ -369,7 +369,7 @@ public class ZorkaLib  {
 			ZorkaMappedMBean mbean = new ZorkaMappedMBean(desc);
 			MBeanServer conn = (MBeanServer) mbsRegistry.lookup(mbs);
 			if (conn == null) {
-				throw new ZorkaException("There is no mbean server named '" + mbs + "'");
+				throw new IllegalArgumentException("There is no mbean server named '" + mbs + "'");
 			}
 			
 			ObjectName on = new ObjectName(name);

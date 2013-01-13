@@ -27,6 +27,8 @@ import com.jitlogic.zorka.util.ZorkaUtil;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.naming.event.ObjectChangeListener;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -274,6 +276,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         assertEquals(false, vcmp("oja!", EQ, "oje!"));
     }
 
+
     @Test
     public void testTdiffProc() {
         SpyProcessor sp = new TimeDiffProcessor("T1", "T2", "T");
@@ -281,5 +284,34 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         Map<String,Object> out = sp.process(in);
 
         assertEquals(20L, out.get("T"));
+    }
+
+
+    @Test
+    public void testThreadLocalSet() {
+        ThreadLocal tl = new ThreadLocal();
+        ThreadLocalProcessor tp = new ThreadLocalProcessor("S", ThreadLocalProcessor.SET, tl);
+        Map<String,Object> rec = ZorkaUtil.map("S", "abc");
+        assertEquals("processor should pass record without changes", rec, tp.process(rec));
+        assertEquals("abc", tl.get());
+    }
+
+
+    @Test
+    public void testThreadLocalGet() {
+        ThreadLocal tl = new ThreadLocal();
+        tl.set("abc");
+        ThreadLocalProcessor tp = new ThreadLocalProcessor("S", ThreadLocalProcessor.GET, tl, "length()");
+        Map<String,Object> rec = tp.process(new HashMap<String,Object>());
+        assertEquals(3, rec.get("S"));
+    }
+
+    @Test
+    public void testThreadLocalReset() {
+        ThreadLocal tl = new ThreadLocal();
+        tl.set("abc");
+        ThreadLocalProcessor tp = new ThreadLocalProcessor(null, ThreadLocalProcessor.REMOVE, tl);
+        tp.process(new HashMap<String,Object>());
+        assertNull(tl.get());
     }
 }

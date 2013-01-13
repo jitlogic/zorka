@@ -17,6 +17,8 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.tracer.SymbolRegistry;
+import com.jitlogic.zorka.tracer.Tracer;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.objectweb.asm.ClassReader;
@@ -53,6 +55,14 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
     /** Map of spy contexts (by instance) */
     private Map<SpyContext, SpyContext> ctxInstances = new HashMap<SpyContext, SpyContext>();
+
+    /** Reference to tracer instance. */
+    Tracer tracer;
+
+
+    public SpyClassTransformer(Tracer tracer) {
+        this.tracer = tracer;
+    }
 
     /**
      * Returns context by its ID
@@ -99,6 +109,16 @@ public class SpyClassTransformer implements ClassFileTransformer {
         return sdef;
     }
 
+
+    /**
+     * Adds trace matcher.
+     *
+     * @param matcher matcher
+     */
+    public void add(SpyMatcher matcher) {
+        tracer.add(matcher);
+    }
+
     /**
      * Resets spy transformer. Removes all added spy definitions.
      * All submissions coming from existing probes will be ignored.
@@ -134,10 +154,13 @@ public class SpyClassTransformer implements ClassFileTransformer {
             }
         }
 
-        if (found.size() > 0) {
+        List<SpyMatcher> foundTraceMatchers = tracer.findMatchers(clazzName);
+
+
+        if (found.size() > 0 || foundTraceMatchers.size() > 0) {
             ClassReader cr = new ClassReader(classfileBuffer);
             ClassWriter cw = new ClassWriter(cr, 0);
-            ClassVisitor scv = createVisitor(clazzName, found, cw);
+            ClassVisitor scv = createVisitor(clazzName, found, foundTraceMatchers, cw);
             cr.accept(scv, 0);
             return cw.toByteArray();
         }
@@ -156,7 +179,17 @@ public class SpyClassTransformer implements ClassFileTransformer {
      *
      * @return class visitor for instrumenting this class
      */
-    protected ClassVisitor createVisitor(String className, List<SpyDefinition> found, ClassWriter cw) {
-        return new SpyClassVisitor(this, className, found, cw);
+    protected ClassVisitor createVisitor(String className, List<SpyDefinition> found, List<SpyMatcher> foundTraceMatchers, ClassWriter cw) {
+        return new SpyClassVisitor(this, className, found, foundTraceMatchers, cw);
+    }
+
+
+    /**
+     * Returns symbol registry.
+     *
+     * @return symbol registry
+     */
+    public SymbolRegistry getSymbolRegistry() {
+        return tracer.getSymbolRegistry();
     }
 }
