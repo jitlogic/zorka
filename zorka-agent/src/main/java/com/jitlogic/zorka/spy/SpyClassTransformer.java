@@ -18,6 +18,7 @@
 package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.tracer.SymbolRegistry;
+import com.jitlogic.zorka.tracer.Tracer;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.objectweb.asm.ClassReader;
@@ -46,12 +47,6 @@ public class SpyClassTransformer implements ClassFileTransformer {
     /** All spy defs configured */
     private List<SpyDefinition> sdefs = new ArrayList<SpyDefinition>();
 
-    /** Defines which classes and methods should be traced. */
-    private List<SpyMatcher> traceMatchers = new ArrayList<SpyMatcher>();
-
-    /** Symbol registry for tracer */
-    private SymbolRegistry symbolRegistry = new SymbolRegistry();
-
     /** SpyContext counter. */
     private int nextId = 1;
 
@@ -60,6 +55,14 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
     /** Map of spy contexts (by instance) */
     private Map<SpyContext, SpyContext> ctxInstances = new HashMap<SpyContext, SpyContext>();
+
+    /** Reference to tracer instance. */
+    Tracer tracer;
+
+
+    public SpyClassTransformer(Tracer tracer) {
+        this.tracer = tracer;
+    }
 
     /**
      * Returns context by its ID
@@ -113,7 +116,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
      * @param matcher matcher
      */
     public void add(SpyMatcher matcher) {
-        traceMatchers.add(matcher);
+        tracer.add(matcher);
     }
 
     /**
@@ -151,15 +154,8 @@ public class SpyClassTransformer implements ClassFileTransformer {
             }
         }
 
-        List<SpyMatcher> foundTraceMatchers = new ArrayList<SpyMatcher>();
+        List<SpyMatcher> foundTraceMatchers = tracer.findMatchers(clazzName);
 
-        for (SpyMatcher matcher : traceMatchers) {
-            if (matcher.matches(Arrays.asList(clazzName))) {
-                if (matcher.matches(Arrays.asList(clazzName))) {
-                    foundTraceMatchers.add(matcher);
-                }
-            }
-        }
 
         if (found.size() > 0 || foundTraceMatchers.size() > 0) {
             ClassReader cr = new ClassReader(classfileBuffer);
@@ -194,6 +190,6 @@ public class SpyClassTransformer implements ClassFileTransformer {
      * @return symbol registry
      */
     public SymbolRegistry getSymbolRegistry() {
-        return symbolRegistry;
+        return tracer.getSymbolRegistry();
     }
 }

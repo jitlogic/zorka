@@ -17,18 +17,21 @@
 package com.jitlogic.zorka.tracer;
 
 /**
- * Handles trace events. This is
+ * Handles trace events. For performance reasons this is class, not interface
+ * (and null implementation is useful anyway).
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public interface TraceEventHandler {
+public class TraceEventHandler {
 
     /**
      * Records beginning of a trace. Not that sometimes traces can be recursive.
      *
      * @param traceId trace ID (symbol)
      */
-    void traceBegin(int traceId);
+    public void traceBegin(int traceId) {
+
+    }
 
 
     /**
@@ -42,7 +45,9 @@ public interface TraceEventHandler {
      *
      * @param signatureId signature ID (method signature symbol ID)
      */
-    void traceEnter(int classId, int methodId, int signatureId, long tstamp);
+    public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
+
+    }
 
 
     /**
@@ -50,7 +55,9 @@ public interface TraceEventHandler {
      *
      * @param tstamp timestamp (in nanoseconds since Epoch - see System.nanoTime())
      */
-    void traceReturn(long tstamp);
+    public void traceReturn(long tstamp) {
+
+    }
 
 
     /**
@@ -60,7 +67,9 @@ public interface TraceEventHandler {
      * @param tstamp timestamp (in nanoseconds since Epoch - see System.nanoTime())
      *
      */
-    void traceError(TracedException exception, long tstamp);
+    public void traceError(TracedException exception, long tstamp) {
+
+    }
 
 
     /**
@@ -70,7 +79,9 @@ public interface TraceEventHandler {
      *
      * @param errors number of errors
      */
-    void traceStats(long calls, long errors);
+    public void traceStats(long calls, long errors) {
+
+    }
 
 
     /**
@@ -82,7 +93,9 @@ public interface TraceEventHandler {
      *
      * @param symbolText symbol text
      */
-    void newSymbol(int symbolId, String symbolText);
+    public void newSymbol(int symbolId, String symbolText) {
+
+    }
 
 
     /**
@@ -92,6 +105,8 @@ public interface TraceEventHandler {
      *
      * @param attrVal parameter value
      */
-    void newAttr(int attrId, Object attrVal);
+    public void newAttr(int attrId, Object attrVal) {
+
+    }
 
 }

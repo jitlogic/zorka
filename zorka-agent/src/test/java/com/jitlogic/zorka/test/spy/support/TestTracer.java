@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class TestTracer implements TraceEventHandler {
+public class TestTracer extends TraceEventHandler {
 
     private List<Map<Object,Object>> data = new ArrayList<Map<Object, Object>>();
 

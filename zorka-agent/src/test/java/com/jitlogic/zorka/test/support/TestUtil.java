@@ -21,6 +21,8 @@ import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.spy.SpyClassTransformer;
 
+import static org.junit.Assert.fail;
+
 import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
@@ -53,19 +55,47 @@ public class TestUtil extends ClassLoader {
     }
 
 
-    public static Object getField(Object obj, String fieldName) throws Exception {
-        Class<?> clazz = obj.getClass();
-        Field field = clazz.getField(fieldName);
-        boolean accessible = field.isAccessible();
+    private static Field lookupField(Class<?> clazz, String fieldName) {
 
-        if (!accessible) {
-            field.setAccessible(true);
+        for (Field f : clazz.getFields()) {
+            if (fieldName.equals(f.getName())) {
+                return f;
+            }
         }
 
+        for (Field f : clazz.getDeclaredFields()) {
+            if (fieldName.equals(f.getName())) {
+                return f;
+            }
+        }
+
+        fail("Cannot find field " + fieldName + " in class " + clazz.getName());
+        return null;
+    }
+
+
+
+    public static Object getField(Object obj, String fieldName) throws Exception {
+
+        Field field = lookupField(obj.getClass(), fieldName);
+        boolean accessible = field.isAccessible();
+
         Object retVal = field.get(obj);
+
         field.setAccessible(accessible);
 
         return retVal;
+    }
+
+
+    public static void setField(Object obj, String fieldName, Object val) throws Exception {
+
+        Field field = lookupField(obj.getClass(), fieldName);
+        boolean accessible = field.isAccessible();
+
+        field.set(obj, val);
+
+        field.setAccessible(accessible);
     }
 
 

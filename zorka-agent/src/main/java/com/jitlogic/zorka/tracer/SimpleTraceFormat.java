@@ -19,7 +19,7 @@ package com.jitlogic.zorka.tracer;
 
 import com.jitlogic.zorka.util.ByteBuffer;
 
-public class SimpleTraceFormat implements TraceEventHandler {
+public class SimpleTraceFormat extends TraceEventHandler {
 
     public static final int MAGIC_V1=0x57aace01;
 

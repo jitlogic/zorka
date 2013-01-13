@@ -23,7 +23,7 @@ package com.jitlogic.zorka.tracer;
  *
  *
  */
-public class TraceBuilder implements TraceEventHandler {
+public class TraceBuilder extends TraceEventHandler {
 
     private long methodTime = 250000;
 
@@ -103,7 +103,10 @@ public class TraceBuilder implements TraceEventHandler {
 
     private void pop() {
         if (top.isTrace() && top.getTime() > methodTime) {
-            top.traverse(output);
+            synchronized (output) {
+                // TODO not a good solution, we need second interface here ...
+                top.traverse(output);
+            }
         }
 
         TraceElement parent = top.getParent();

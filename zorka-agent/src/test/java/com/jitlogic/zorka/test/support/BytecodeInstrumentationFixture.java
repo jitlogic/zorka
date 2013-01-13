@@ -5,6 +5,8 @@ import com.jitlogic.zorka.test.spy.support.TestSpyTransformer;
 import com.jitlogic.zorka.test.spy.support.TestSubmitter;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 import com.jitlogic.zorka.tracer.SymbolRegistry;
+import com.jitlogic.zorka.tracer.TraceEventHandler;
+import com.jitlogic.zorka.tracer.Tracer;
 import org.junit.After;
 import org.junit.Before;
 
@@ -18,15 +20,21 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
     public TestSpyTransformer engine;
     public SymbolRegistry symbols;
     public TestSubmitter submitter;
-    public TestTracer tracer;
+    public TestTracer output;
+    public Tracer t;
 
     @Before
     public void setUp() throws Exception {
         engine = new TestSpyTransformer();
         submitter = new TestSubmitter();
         MainSubmitter.setSubmitter(submitter);
-        tracer = new TestTracer();
-        MainSubmitter.setTracer(tracer);
+        output = new TestTracer();
+        t = new Tracer() {
+            public TraceEventHandler getHandler() {
+                return output;
+            }
+        };
+        MainSubmitter.setTracer(t);
         symbols = engine.getSymbolRegistry();
     }
 

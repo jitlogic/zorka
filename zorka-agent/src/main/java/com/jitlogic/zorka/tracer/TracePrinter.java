@@ -28,7 +28,7 @@ import java.util.Map;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TracePrinter implements TraceEventHandler {
+public class TracePrinter extends TraceEventHandler {
 
     private PrintStream out;
 

@@ -20,6 +20,7 @@ import com.jitlogic.zorka.spy.SpyClassTransformer;
 import com.jitlogic.zorka.spy.SpyClassVisitor;
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.spy.SpyMatcher;
+import com.jitlogic.zorka.tracer.Tracer;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.util.TraceClassVisitor;
@@ -30,6 +31,10 @@ import java.util.List;
 public class TestSpyTransformer extends SpyClassTransformer {
 
     private boolean debug = false;
+
+    public TestSpyTransformer() {
+        super(new Tracer());
+    }
 
     public void enableDebug() {
         this.debug = true;

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class TraceElement implements TraceEventHandler {
+public class TraceElement extends TraceEventHandler {
 
     private int traceId, classId, methodId, signatureId;
     private long tstart, tstop;

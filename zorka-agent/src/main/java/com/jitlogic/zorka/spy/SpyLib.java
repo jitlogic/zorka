@@ -18,6 +18,7 @@
 package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.integ.SnmpLib;
+import com.jitlogic.zorka.tracer.TraceEventHandler;
 import com.jitlogic.zorka.util.ZorkaTrapper;
 import com.jitlogic.zorka.integ.SnmpTrapper;
 import com.jitlogic.zorka.integ.TrapVarBindDef;
@@ -144,6 +145,18 @@ public class SpyLib {
 
 
     /**
+     * Adds output handlers to
+     *
+     * @param handlers
+     */
+    public void add(TraceEventHandler...handlers) {
+        for (TraceEventHandler handler : handlers) {
+            instance.getTracer().add(handler);
+        }
+    }
+
+
+    /**
      * Created an empty (unconfigured) spy definition. Use created object's methods to configure it before registering
      * with add() function.
      *
@@ -209,6 +222,18 @@ public class SpyLib {
                 .onReturn(fetchTime("T2")).onError(fetchTime("T2"))
                 .onSubmit(tdiff("T1", "T2", "T"),
                           zorkaStats(mbsName, mbeanName, attrName, sb.toString(), "T2", "T"));
+    }
+
+
+    /**
+     * Adds matching method to tracer.
+     *
+     * @param matchers
+     */
+    public void include(SpyMatcher...matchers) {
+        for (SpyMatcher matcher : matchers) {
+            instance.getTracer().add(matcher);
+        }
     }
 
 
@@ -388,6 +413,19 @@ public class SpyLib {
     public SpyProbe fetchTime(String dst) {
         return new SpyTimeProbe(dst);
     }
+
+
+    /**
+     * Starta a new trace.
+     *
+     * @param name
+     *
+     * @return
+     */
+    public SpyProcessor traceBegin(String name) {
+        return new TraceBeginProcessor(instance.getTracer(), name);
+    }
+
 
 
     /**
@@ -733,5 +771,7 @@ public class SpyLib {
     public SpyProcessor ifValueCmp(String a, String op, Object v) {
         return ComparatorProcessor.vcmp(a, op, v);
     }
+
+
 
 }

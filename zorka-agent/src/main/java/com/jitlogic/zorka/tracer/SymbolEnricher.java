@@ -19,7 +19,7 @@ package com.jitlogic.zorka.tracer;
 
 import com.jitlogic.zorka.util.ZorkaUtil;
 
-public class SymbolEnricher implements TraceEventHandler {
+public class SymbolEnricher extends TraceEventHandler {
 
     private long[] mask;
 

@@ -18,7 +18,7 @@
 package com.jitlogic.zorka.spy;
 
 import bsh.EvalError;
-import com.jitlogic.zorka.tracer.TraceEventHandler;
+import com.jitlogic.zorka.tracer.Tracer;
 import com.jitlogic.zorka.tracer.WrappedException;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -36,7 +36,7 @@ public class MainSubmitter {
     private static SpySubmitter submitter;
 
     /** Tracer receiving trace events */
-    private static TraceEventHandler tracer;
+    private static Tracer tracer;
 
     /** Error counter */
     private static AtomicLong errorCount = new AtomicLong(0);
@@ -76,8 +76,11 @@ public class MainSubmitter {
     public static void traceEnter(int classId, int methodId, int signatureId) {
 
         if (tracer != null) {
-            long t = System.nanoTime();
-            tracer.traceEnter(classId, methodId, signatureId, t);
+            try {
+                tracer.getHandler().traceEnter(classId, methodId, signatureId, System.nanoTime());
+            } catch (Exception e) {
+                errorCount.incrementAndGet();
+            }
         }
 
     }
@@ -89,8 +92,11 @@ public class MainSubmitter {
     public static void traceReturn() {
 
         if (tracer != null) {
-            long t = System.nanoTime();
-            tracer.traceReturn(t);
+            try {
+                tracer.getHandler().traceReturn(System.nanoTime());
+            } catch (Exception e) {
+                errorCount.incrementAndGet();
+            }
         }
 
     }
@@ -99,13 +105,16 @@ public class MainSubmitter {
     /**
      * This method is called by tracer probes at method error point.
      *
-     * @param e exception thrown
+     * @param exception exception thrown
      */
-    public static void traceError(Throwable e) {
+    public static void traceError(Throwable exception) {
 
         if (tracer != null) {
-            long t = System.nanoTime();
-            tracer.traceError(new WrappedException(e), t);
+            try {
+                tracer.getHandler().traceError(new WrappedException(exception), System.nanoTime());
+            } catch (Exception e1) {
+                errorCount.incrementAndGet();
+            }
         }
     }
 
@@ -124,7 +133,7 @@ public class MainSubmitter {
      *
      * @param tracer
      */
-    public static void setTracer(TraceEventHandler tracer) {
+    public static void setTracer(Tracer tracer) {
         MainSubmitter.tracer = tracer;
     }
 

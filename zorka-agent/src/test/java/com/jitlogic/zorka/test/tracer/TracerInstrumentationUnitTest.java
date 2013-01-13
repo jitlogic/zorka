@@ -42,7 +42,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
 
-        assertEquals(2, tracer.getData().size());
+        assertEquals(2, output.size());
     }
 
 
@@ -55,9 +55,9 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
 
-        assertEquals(2, tracer.getData().size());
+        assertEquals(2, output.size());
         assertEquals(1, submitter.size());
-        assertEquals("trivialMethod", symbols.symbolName((Integer)tracer.getData().get(0).get("methodId")));
+        assertEquals("trivialMethod", symbols.symbolName((Integer)output.getData().get(0).get("methodId")));
     }
 
 
@@ -68,7 +68,8 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         Object obj = instantiate(engine, TCLASS2);
         invoke(obj, "recursiveMethod");
 
-        Assert.assertEquals("Output actions mismatch.", Arrays.asList("traceEnter", "traceEnter", "traceReturn", "traceReturn"), tracer.listAttr("action"));
+        Assert.assertEquals("Output actions mismatch.",
+            Arrays.asList("traceEnter", "traceEnter", "traceReturn", "traceReturn"), output.listAttr("action"));
     }
 
 
@@ -79,9 +80,9 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         Object obj = instantiate(engine, TCLASS1);
         Object rslt = invoke(obj, "errorMethod");
 
-        assertEquals(2, tracer.getData().size());
-        assertEquals(new WrappedException((Throwable)rslt), tracer.getData().get(1).get("exception"));
-        assertEquals("errorMethod", symbols.symbolName((Integer)tracer.getData().get(0).get("methodId")));
+        assertEquals(2, output.getData().size());
+        assertEquals(new WrappedException((Throwable)rslt), output.getData().get(1).get("exception"));
+        assertEquals("errorMethod", symbols.symbolName((Integer)output.getData().get(0).get("methodId")));
     }
 
 

@@ -16,5 +16,36 @@
 
 package com.jitlogic.zorka.test.tracer;
 
-public class TracerIntegTest {
+import com.jitlogic.zorka.test.spy.support.TestTracer;
+import com.jitlogic.zorka.test.support.ZorkaFixture;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+import static com.jitlogic.zorka.test.support.BytecodeInstrumentationFixture.*;
+import static com.jitlogic.zorka.test.support.TestUtil.*;
+
+public class TracerIntegTest extends ZorkaFixture {
+
+    private TestTracer output = new TestTracer();
+
+    @Test
+    public void testSimpleTrace() throws Exception {
+        spy.include(spy.byMethod(TCLASS1, "trivialMethod"));
+        spy.add(
+            spy.instance().onEnter(spy.traceBegin("TEST"))
+                .include(spy.byMethod(TCLASS1, "trivialMethod")));
+        spyInstance.getTracer().setMethodTime(0); // Catch everything
+        spy.add(output);
+
+        Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS1);
+        invoke(obj, "trivialMethod");
+
+        assertEquals("should return traceBegin, trace", 4, output.size());
+        output.check(0, "action", "traceBegin");
+        output.check(1, "action", "traceEnter");
+        output.check(2, "action", "traceStats", "calls", 1L, "errors", 0L);
+        output.check(3, "action", "traceReturn");
+    }
+
 }
