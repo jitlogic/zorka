@@ -13,24 +13,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.test.spy.support;
 
-public class TestClass2 {
+package com.jitlogic.zorka.tracer;
 
-    private int calls = 0;
+/**
+ * Represents exceptions
+ */
+public class WrappedException implements TracedException {
 
-    @TestAnnotation
-    public void trivialMethod() {
-        calls++;
+    private Throwable exception;
+
+    public WrappedException(Throwable exception) {
+        this.exception = exception;
     }
 
-    public int echoInt(int in) {
-        return in;
+
+    public Throwable getException() {
+        return exception;
     }
 
-    public void recursiveMethod() {
-        calls++;
-        trivialMethod();
-        calls++;
+    @Override
+    public String toString() {
+        return exception.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return exception.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof WrappedException &&
+            exception.equals(((WrappedException)obj).exception);
     }
 }

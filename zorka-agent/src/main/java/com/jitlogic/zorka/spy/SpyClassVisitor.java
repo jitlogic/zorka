@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.jitlogic.zorka.spy.SpyLib.AC_PRIVATE;
 import static org.objectweb.asm.Opcodes.*;
 import static com.jitlogic.zorka.spy.SpyLib.SPD_METHODALL;
 import static com.jitlogic.zorka.spy.SpyLib.SPD_METHODXFORM;
@@ -47,6 +48,9 @@ public class SpyClassVisitor extends ClassVisitor {
     /** List of spy definitions to be applied (visitor will only check for method matches, not class matches!) */
     private List<SpyDefinition> sdefs;
 
+    /** List of matchers used by tracer generation code. */
+    private List<SpyMatcher> matchers;
+
     /** Name of instrumented class */
     private String className;
 
@@ -54,21 +58,20 @@ public class SpyClassVisitor extends ClassVisitor {
     private List<String> classAnnotations = new ArrayList<String>();
 
     /**
-     * Creates Spy class visitor
+     * Creates Spy class visitor.
      *
      * @param transformer parent class transformer
-     *
      * @param className class name
-     *
      * @param sdefs list of spy definitions to be applied
-     *
+     * @param matchers
      * @param cv output class visitor (typically ClassWriter)
      */
     public SpyClassVisitor(SpyClassTransformer transformer, String className,
-                           List<SpyDefinition> sdefs, ClassVisitor cv) {
+                           List<SpyDefinition> sdefs, List<SpyMatcher> matchers, ClassVisitor cv) {
         super(V1_6, cv);
         this.transformer = transformer;
         this.className = className;
+        this.matchers = matchers;
         this.sdefs = sdefs;
     }
 
@@ -114,8 +117,16 @@ public class SpyClassVisitor extends ClassVisitor {
             }
         }
 
-        if (ctxs.size() > 0) {
-            return new SpyMethodVisitor(m, access, methodName, methodDesc, ctxs, mv);
+        boolean doTrace = false;
+
+        for (SpyMatcher matcher : matchers) {
+            if (matcher.matches(Arrays.asList(className), methodName, methodDesc, access)) {
+                doTrace = true;
+            }
+        }
+
+        if (ctxs.size() > 0 || doTrace) {
+            return new SpyMethodVisitor(m, doTrace ? transformer.getSymbolRegistry() : null, className, access, methodName, methodDesc, ctxs, mv);
         }
 
         return mv;
@@ -125,15 +136,10 @@ public class SpyClassVisitor extends ClassVisitor {
      * Creates method visitor for given method.
      *
      * @param access method access flags
-     *
      * @param name method name
-     *
      * @param desc method descriptor
-     *
      * @param signature method signature
-     *
      * @param exceptions names of thrown exceptions
-     *
      * @return method visitor
      */
     protected MethodVisitor createVisitor(int access, String name, String desc, String signature, String[] exceptions) {

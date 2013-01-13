@@ -13,24 +13,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.test.spy.support;
 
-public class TestClass2 {
+package com.jitlogic.zorka.test;
 
-    private int calls = 0;
+import com.jitlogic.zorka.test.stress.SpyEngineMicroBenchmarks;
+import com.jitlogic.zorka.test.stress.SubmitPhaseMicrobenchmarks;
 
-    @TestAnnotation
-    public void trivialMethod() {
-        calls++;
-    }
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
-    public int echoInt(int in) {
-        return in;
-    }
-
-    public void recursiveMethod() {
-        calls++;
-        trivialMethod();
-        calls++;
-    }
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+        SpyEngineMicroBenchmarks.class, SubmitPhaseMicrobenchmarks.class,
+})
+public class StressTestSuite {
 }

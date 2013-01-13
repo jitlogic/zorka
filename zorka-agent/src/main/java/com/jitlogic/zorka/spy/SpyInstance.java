@@ -17,6 +17,7 @@ package com.jitlogic.zorka.spy;
 
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.tracer.Tracer;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
@@ -45,6 +46,9 @@ public class SpyInstance {
     /** Reference to instance's main submitter (installed in MainSubmitter when instance starts) */
     private DispatchingSubmitter   submitter;
 
+    /** Tracer */
+    private Tracer tracer;
+
     /**
      * Returns spy instance. Creates one if called for the first time.
      * Configures MainSubmitter to submit values to newly created instance.
@@ -66,6 +70,7 @@ public class SpyInstance {
                 }
 
                 MainSubmitter.setSubmitter(instance.getSubmitter());
+                MainSubmitter.setTracer(instance().getTracer());
 
                 debugLevel = Integer.parseInt(ZorkaConfig.getProperties().getProperty("spy.debug").trim());
             }
@@ -105,7 +110,8 @@ public class SpyInstance {
      * @param props configuration properties.
      */
     public SpyInstance(Properties props) {
-        classTransformer = new SpyClassTransformer();
+        tracer = new Tracer();
+        classTransformer = new SpyClassTransformer(tracer);
         submitter = new DispatchingSubmitter(classTransformer);
     }
 
@@ -117,6 +123,16 @@ public class SpyInstance {
      */
     public void add(SpyDefinition sdef) {
         classTransformer.add(sdef);
+    }
+
+
+    /**
+     * Adds new matcher for tracer.
+     *
+     * @param matcher matcher
+     */
+    public void include(SpyMatcher matcher) {
+        classTransformer.add(matcher);
     }
 
 
@@ -139,4 +155,10 @@ public class SpyInstance {
         return submitter;
     }
 
+    /**
+     *
+     */
+    public Tracer getTracer() {
+        return tracer;
+    }
 }

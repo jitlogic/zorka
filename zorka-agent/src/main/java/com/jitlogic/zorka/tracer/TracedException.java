@@ -13,24 +13,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.test.spy.support;
 
-public class TestClass2 {
+package com.jitlogic.zorka.tracer;
 
-    private int calls = 0;
+/**
+ * This is just marker interface to pass exceptions via tracer components.
+ */
+public interface TracedException {
 
-    @TestAnnotation
-    public void trivialMethod() {
-        calls++;
-    }
-
-    public int echoInt(int in) {
-        return in;
-    }
-
-    public void recursiveMethod() {
-        calls++;
-        trivialMethod();
-        calls++;
-    }
 }
