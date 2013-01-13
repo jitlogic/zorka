@@ -61,7 +61,7 @@ public class TestTracer extends TraceEventHandler {
 
     @Override
     public void newAttr(int attrId, Object attrVal) {
-        data.add(ZorkaUtil.map("action", "newAttr", "attrId", attrId, "val", attrVal));
+        data.add(ZorkaUtil.map("action", "newAttr", "attrId", attrId, "attrVal", attrVal));
     }
 
     public List<Map<Object,Object>> getData() {

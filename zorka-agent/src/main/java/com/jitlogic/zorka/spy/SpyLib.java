@@ -416,14 +416,25 @@ public class SpyLib {
 
 
     /**
-     * Starta a new trace.
+     * Starts a new (named) trace.
      *
-     * @param name
-     *
-     * @return
+     * @param name trace name
+     * @return spy processor object triggering new trace
      */
     public SpyProcessor traceBegin(String name) {
         return new TraceBeginProcessor(instance.getTracer(), name);
+    }
+
+
+    /**
+     * Attaches attribute to trace record.
+     *
+     * @param srcField source field name (from spy record)
+     * @param dstAttr destination attribute name (in trace data)
+     * @return spy processor object adding new trace attribute
+     */
+    public SpyProcessor traceAttr(String srcField, String dstAttr) {
+        return new TraceAttrProcessor(instance.getTracer(), srcField, dstAttr);
     }
 
 

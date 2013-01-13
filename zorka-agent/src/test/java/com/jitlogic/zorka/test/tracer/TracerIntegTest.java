@@ -19,6 +19,9 @@ package com.jitlogic.zorka.test.tracer;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 
+import com.jitlogic.zorka.tracer.SymbolRegistry;
+import com.jitlogic.zorka.tracer.Tracer;
+import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -28,6 +31,26 @@ import static com.jitlogic.zorka.test.support.TestUtil.*;
 public class TracerIntegTest extends ZorkaFixture {
 
     private TestTracer output = new TestTracer();
+
+    private int sym(String s) {
+        return spyInstance.getTracer().getSymbolRegistry().symbolId(s);
+    }
+
+
+    @Test
+    public void testSimpleTooShortTrace() throws Exception {
+        spy.include(spy.byMethod(TCLASS1, "trivialMethod"));
+        spy.add(
+                spy.instance().onEnter(spy.traceBegin("TEST"))
+                        .include(spy.byMethod(TCLASS1, "trivialMethod")));
+        spy.add(output);
+
+        Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS1);
+        invoke(obj, "trivialMethod");
+
+        assertEquals("should return traceBegin, trace", 0, output.size());
+    }
+
 
     @Test
     public void testSimpleTrace() throws Exception {
@@ -42,10 +65,31 @@ public class TracerIntegTest extends ZorkaFixture {
         invoke(obj, "trivialMethod");
 
         assertEquals("should return traceBegin, trace", 4, output.size());
-        output.check(0, "action", "traceBegin");
-        output.check(1, "action", "traceEnter");
+        output.check(0, "action", "traceBegin", "traceId", sym("TEST"));
+        output.check(1, "action", "traceEnter", "classId", sym(TCLASS1), "methodId", sym("trivialMethod"));
         output.check(2, "action", "traceStats", "calls", 1L, "errors", 0L);
         output.check(3, "action", "traceReturn");
+    }
+
+
+    @Test
+    public void testSimpleTraceWithAttr() throws Exception {
+        spy.include(spy.byMethod(TCLASS1, "trivialMethod"));
+        spy.add(spy.instance().onEnter(
+                spy.traceBegin("TEST"), spy.put("URL", "http://some.url"), spy.traceAttr("URL", "URL")
+            ).include(spy.byMethod(TCLASS1, "trivialMethod")));
+        spyInstance.getTracer().setMethodTime(0); // Catch everything
+        spy.add(output);
+
+        Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS1);
+        invoke(obj, "trivialMethod");
+
+        assertEquals("should return traceBegin, trace", 5, output.size());
+        output.check(0, "action", "traceBegin", "traceId", sym("TEST"));
+        output.check(1, "action", "traceEnter", "classId", sym(TCLASS1), "methodId", sym("trivialMethod"));
+        output.check(2, "action", "traceStats", "calls", 1L, "errors", 0L);
+        output.check(3, "action", "newAttr", "attrId", sym("URL"), "attrVal", "http://some.url");
+        output.check(4, "action", "traceReturn");
     }
 
 }
