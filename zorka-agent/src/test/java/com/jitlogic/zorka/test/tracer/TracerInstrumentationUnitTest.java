@@ -37,7 +37,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
     @Test
     public void testTraceSingleTrivialMethod() throws Exception {
-        engine.add(spy.byMethod(TCLASS1, "trivialMethod"));
+        spy.include(spy.byMethod(TCLASS1, "trivialMethod"));
 
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
@@ -50,7 +50,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
     public void testTraceAndInstrumentSingleTrivialMethod() throws Exception {
         engine.add(SpyDefinition.instance().onEnter(spy.fetchArg("E0", 0))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
-        engine.add(spy.byMethod(TCLASS1, "trivialMethod"));
+        spy.include(spy.byMethod(TCLASS1, "trivialMethod"));
 
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
@@ -63,7 +63,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
     @Test
     public void testTraceAndInstrumentRecursiveMethods() throws Exception {
-        engine.add(spy.byMethod(TCLASS2, "~^[a-zA-Z_].*"));
+        spy.include(spy.byMethod(TCLASS2, "~^[a-zA-Z_].*"));
 
         Object obj = instantiate(engine, TCLASS2);
         invoke(obj, "recursiveMethod");
@@ -75,7 +75,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
     @Test
     public void testTraceError() throws Exception {
-        engine.add(spy.byMethod(TCLASS1, "~^[a-zA-Z_].*"));
+        spy.include(spy.byMethod(TCLASS1, "~^[a-zA-Z_].*"));
 
         Object obj = instantiate(engine, TCLASS1);
         Object rslt = invoke(obj, "errorMethod");

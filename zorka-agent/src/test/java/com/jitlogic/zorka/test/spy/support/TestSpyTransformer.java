@@ -32,8 +32,8 @@ public class TestSpyTransformer extends SpyClassTransformer {
 
     private boolean debug = false;
 
-    public TestSpyTransformer() {
-        super(new Tracer());
+    public TestSpyTransformer(Tracer tracer) {
+        super(tracer);
     }
 
     public void enableDebug() {

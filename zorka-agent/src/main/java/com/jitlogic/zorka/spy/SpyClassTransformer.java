@@ -110,15 +110,15 @@ public class SpyClassTransformer implements ClassFileTransformer {
     }
 
 
-    /**
-     * Adds trace matcher.
-     *
-     * @param matcher matcher
-     */
-    public void add(SpyMatcher matcher) {
-        tracer.add(matcher);
-    }
-
+//    /**
+//     * Adds trace matcher.
+//     *
+//     * @param matcher matcher
+//     */
+//    public void add(SpyMatcher matcher) {
+//        tracer.add(matcher);
+//    }
+//
     /**
      * Resets spy transformer. Removes all added spy definitions.
      * All submissions coming from existing probes will be ignored.

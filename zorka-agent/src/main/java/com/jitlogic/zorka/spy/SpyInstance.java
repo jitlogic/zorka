@@ -132,7 +132,7 @@ public class SpyInstance {
      * @param matcher matcher
      */
     public void include(SpyMatcher matcher) {
-        classTransformer.add(matcher);
+        tracer.add(matcher);
     }
 
 
