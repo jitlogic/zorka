@@ -38,8 +38,6 @@ public class SpyDefinition {
 
     private static final List<SpyProcessor> EMPTY_XF =
             Collections.unmodifiableList(Arrays.asList(new SpyProcessor[0]));
-    private static final List<SpyMatcher> EMPTY_MATCHERS =
-            Collections.unmodifiableList(Arrays.asList(new SpyMatcher[0]));
     private static final List<SpyProbe> EMPTY_AF =
             Collections.unmodifiableList(Arrays.asList(new SpyProbe[0]));
 
@@ -50,7 +48,7 @@ public class SpyDefinition {
     private List<SpyProcessor>[] processors;
 
     /** List of matchers defining that classes/methods this sdef looks for */
-    private List<SpyMatcher> matchers = EMPTY_MATCHERS;
+    private SpyMatcherSet matcherSet = new SpyMatcherSet();
 
     /**
      * Creates partially configured spy definition that is suitable for measuring
@@ -96,7 +94,7 @@ public class SpyDefinition {
     private SpyDefinition(SpyDefinition orig) {
         this.probes = ZorkaUtil.copyArray(orig.probes);
         this.processors = ZorkaUtil.copyArray(orig.processors);
-        this.matchers = orig.matchers;
+        this.matcherSet = new SpyMatcherSet(orig.matcherSet);
     }
 
 
@@ -124,79 +122,12 @@ public class SpyDefinition {
     }
 
 
-    /**
-     * Returns true if given class name matches this sdef.
-     *
-     *
-     * @param classCandidates
-     *
-     * @return
-     */
-    public boolean match(List<String> classCandidates) {
 
-        for (SpyMatcher matcher : matchers) {
-            if (matcher.matches(classCandidates)) {
-                return true;
-            }
-        }
-
-        return false;
+    public SpyMatcherSet getMatcherSet() {
+        return matcherSet;
     }
 
-    /**
-     * Return true this spy def contains class annotation matcher(s).
-     *
-     * @return true if any of matchers contains class annotation match
-     */
-    public boolean hasClassAnnotation() {
-        for (SpyMatcher matcher : matchers) {
-            if (matcher.hasClassAnnotation()) {
-                return true;
-            }
-        }
 
-        return false;
-    }
-
-    /**
-     * Returns true if this spy def contains method annotation matcher(s).
-     *
-     * @return true if any of matchers contains method annotation match
-     */
-    public boolean hasMethodAnnotation() {
-        for (SpyMatcher matcher : matchers) {
-            if (matcher.hasMethodAnnotation()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns true if given method (of given class) matches this spy definition.
-     * Note that method signature and access bits are also checked.
-     *
-     *
-     * @param classCandidates
-     *
-     * @param methodName method name
-     *
-     * @param methodDesc method descriptor (as in classfile)
-     *
-     * @param access access bits (as in classfile)
-     *
-     * @return true if all arguments match properly.
-     */
-    public boolean match(List<String> classCandidates, String methodName, String methodDesc, int access) {
-
-        for (SpyMatcher matcher : matchers) {
-            if (matcher.matches(classCandidates, methodName, methodDesc, access)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     /**
      * Returns list of matchers declared SpyDefinition.
@@ -204,7 +135,7 @@ public class SpyDefinition {
      * @return list of matchers
      */
     public List<SpyMatcher> getMatchers() {
-        return matchers;
+        return matcherSet.getMatchers();
     }
 
 
@@ -258,12 +189,7 @@ public class SpyDefinition {
      */
     public SpyDefinition include(SpyMatcher...matchers) {
         SpyDefinition sdef = new SpyDefinition(this);
-        List<SpyMatcher> lst = new ArrayList<SpyMatcher>(sdef.matchers.size()+1+matchers.length);
-        lst.addAll(sdef.matchers);
-        for (SpyMatcher matcher : matchers) {
-            lst.add(matcher);
-        }
-        sdef.matchers = lst;
+        sdef.matcherSet = new SpyMatcherSet(sdef.matcherSet, matchers);
         return sdef;
     }
 

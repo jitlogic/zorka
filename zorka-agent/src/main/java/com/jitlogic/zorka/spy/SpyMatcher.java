@@ -49,17 +49,20 @@ public class SpyMatcher {
     /** Access bits and custom matcher flags */
     private int access, flags;
 
-    /** Flag that marks classPattern as class annotation rather than class name */
-    public static final int CLASS_ANNOTATION  = 0x01;
 
-    /** Flag that marks methodPattern as method annotation rather than method name */
-    public static final int METHOD_ANNOTATION = 0x02;
+    public static final int BY_CLASS_NAME = 0x01;
+    public static final int BY_CLASS_ANNOTATION  = 0x02;
+    public static final int BY_INTERFACE         = 0x04;
+    public static final int BY_METHOD_NAME       = 0x08;
+    public static final int BY_METHOD_SIGNATURE  = 0x10;
+    public static final int BY_METHOD_ANNOTATION = 0x20;
+    public static final int INVERT_MATCH         = 0x40;
 
     /** Special access bit - package private */
     public static final int ACC_PKGPRIV = 0x10000;
 
     /** No methods will regarding access bits */
-    public static final int NULL_FILTER    = 0x0000;
+    public static final int NULL_FILTER = 0x0000;
 
     /** Default filter: public and package private methods match */
     public static final int DEFAULT_FILTER = ACC_PUBLIC|ACC_PKGPRIV;
@@ -217,114 +220,27 @@ public class SpyMatcher {
     }
 
 
-    /**
-     * Returns true if matcher contains class annotation (instead of class name pattern)
-     *
-     * @return true if matcher contains class annotation
-     */
-    public boolean hasClassAnnotation() {
-        return 0 != (flags & CLASS_ANNOTATION);
+    public int getFlags() {
+        return flags;
     }
 
 
-    /**
-     * Returns true if matcher contains method annotation istead of method name pattern
-     *
-     * @return true or false
-     */
-    public boolean hasMethodAnnotation() {
-        return 0 != (flags & METHOD_ANNOTATION);
+    public int getAccess() {
+        return access;
     }
 
 
-    /**
-     * Returns true if any of candidate strings matches class pattern (be it single class name or
-     * multiple class annotation names)
-     *
-     * @param classCandidates list of className candidates
-     *
-     * @return true if any candidate matches
-     */
-    public boolean matches(List<String> classCandidates) {
-        for (String cm : classCandidates) {
-            if (classMatch.matcher(cm).matches()) {
-                return true;
-            }
-        }
-        return false;
+    public Pattern getClassPattern() {
+        return classMatch;
     }
 
 
-    /**
-     * Returns true if given method annotation matches
-     *
-     * @param name methnod annotation name (full name with package prefix)
-     *
-     * @return true if METHOD_ANNOTATION flag is on and passed name matches methodPattern
-     */
-    public boolean matchMethodAnnotation(String name) {
-        return hasMethodAnnotation() && methodMatch.matcher(name).matches();
+    public Pattern getMethodPattern() {
+        return methodMatch;
     }
 
 
-    /**
-     * Returns true if any of candidate class names matches classPattern and methodName matches methodPattern.
-     *
-     * @param classCandidates list containing class name or names of class annotations
-     *
-     * @param methodName method name
-     *
-     * @return true or false
-     */
-    public boolean matches(List<String> classCandidates, String methodName) {
-        return matches(classCandidates) && methodMatch.matcher(methodName).matches();
-    }
-
-
-    /**
-     * Returns true if any of candudate class names matches classPattern, methodName matches methodPattern
-     * and methodDescriptor matches method descriptor pattern.
-     *
-     * @param classCandidates list containing class name or names of class annotations
-     *
-     * @param methodName method name
-     *
-     * @param descriptor method descriptor (JVM form)
-     *
-     * @return true or false
-     */
-    public boolean matches(List<String> classCandidates, String methodName, String descriptor) {
-        return matches(classCandidates, methodName) && descriptorMatch.matcher(descriptor).matches();
-    }
-
-
-    /**
-     * Returns true if any of candidate class names matches classPattern, methodName matches methodPattern,
-     * methodDescriptor matches method descriptor pattern and access flags match
-     *
-     * @param classCandidates list containing class name or names of class annotations
-     *
-     * @param methodName method name
-     *
-     * @param descriptor method descriptor (JVM form)
-     *
-     * @param access method access flags
-     *
-     * @return true or false
-     */
-    public boolean matches(List<String> classCandidates, String methodName, String descriptor, int access) {
-        return matches(classCandidates, methodName, descriptor) && matches(access);
-    }
-
-
-    /**
-     * Returns true if access flags match
-     *
-     * @param access method access flags
-     *
-     * @return true or false
-     */
-    private boolean matches(int access) {
-        return this.access == 0 ||  (this.access & access) != 0;
+    public Pattern getSignaturePattern() {
+        return descriptorMatch;
     }
 }

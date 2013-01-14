@@ -445,7 +445,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
 
-        assertEquals(1, submitter.size());
+        assertEquals(2, submitter.size());
     }
 
 

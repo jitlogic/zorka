@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.tracer.Tracer;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.objectweb.asm.AnnotationVisitor;
@@ -49,10 +50,12 @@ public class SpyClassVisitor extends ClassVisitor {
     private List<SpyDefinition> sdefs;
 
     /** List of matchers used by tracer generation code. */
-    private List<SpyMatcher> matchers;
+    private Tracer tracer;
 
     /** Name of instrumented class */
     private String className;
+
+    private List<String> classInterfaces;
 
     /** List of class annotations encountered when traversing class */
     private List<String> classAnnotations = new ArrayList<String>();
@@ -63,22 +66,23 @@ public class SpyClassVisitor extends ClassVisitor {
      * @param transformer parent class transformer
      * @param className class name
      * @param sdefs list of spy definitions to be applied
-     * @param matchers
+     * @param tracer reference to tracer
      * @param cv output class visitor (typically ClassWriter)
      */
     public SpyClassVisitor(SpyClassTransformer transformer, String className,
-                           List<SpyDefinition> sdefs, List<SpyMatcher> matchers, ClassVisitor cv) {
+                           List<SpyDefinition> sdefs, Tracer tracer, ClassVisitor cv) {
         super(V1_6, cv);
         this.transformer = transformer;
         this.className = className;
-        this.matchers = matchers;
         this.sdefs = sdefs;
+        this.tracer = tracer;
     }
 
 
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         cv.visit(version, access, name, signature, superName, interfaces);
+        this.classInterfaces = Arrays.asList(interfaces);
     }
 
 
@@ -103,8 +107,8 @@ public class SpyClassVisitor extends ClassVisitor {
         boolean m = true;
 
         for (SpyDefinition sdef : sdefs) {
-            if (sdef.match(sdef.hasClassAnnotation() ? classAnnotations : Arrays.asList(className),
-                    methodName, methodDesc, access) || sdef.hasMethodAnnotation()) {
+            if (sdef.getMatcherSet().methodMatch(className, classAnnotations, classInterfaces,
+                    access, methodName, methodDesc, null)) {
                 if (SpyInstance.isDebugEnabled(SPD_METHODXFORM)) {
                     log.debug("Instrumenting method: " + className + "." + methodName + " " + methodDesc);
                 }
@@ -112,21 +116,17 @@ public class SpyClassVisitor extends ClassVisitor {
                         new SpyContext(sdef, className, methodName, methodDesc, access)));
             }
 
-            if (sdef.hasMethodAnnotation()) {
+            if (sdef.getMatcherSet().hasMethodAnnotations()) {
                 m = false;
             }
         }
 
-        boolean doTrace = false;
-
-        for (SpyMatcher matcher : matchers) {
-            if (matcher.matches(Arrays.asList(className), methodName, methodDesc, access)) {
-                doTrace = true;
-            }
-        }
+        boolean doTrace = tracer.getMatcherSet()
+            .methodMatch(className, classAnnotations, classInterfaces, access, methodName, methodDesc, null);
 
         if (ctxs.size() > 0 || doTrace) {
-            return new SpyMethodVisitor(m, doTrace ? transformer.getSymbolRegistry() : null, className, access, methodName, methodDesc, ctxs, mv);
+            return new SpyMethodVisitor(m, doTrace ? transformer.getSymbolRegistry() : null, className,
+                    classAnnotations, classInterfaces, access, methodName, methodDesc, ctxs, mv);
         }
 
         return mv;

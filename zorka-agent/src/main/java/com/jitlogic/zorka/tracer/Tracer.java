@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.tracer;
 
 import com.jitlogic.zorka.spy.SpyMatcher;
+import com.jitlogic.zorka.spy.SpyMatcherSet;
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
 
 import java.util.ArrayList;
@@ -28,7 +29,8 @@ public class Tracer {
     private long methodTime = 250000;
 
     /** Defines which classes and methods should be traced. */
-    private List<SpyMatcher> traceMatchers = new ArrayList<SpyMatcher>();
+    //private List<SpyMatcher> includes = new ArrayList<SpyMatcher>();
+    private SpyMatcherSet matcherSet = new SpyMatcherSet();
 
     /** Symbol registry for tracer */
     private SymbolRegistry symbolRegistry = new SymbolRegistry();
@@ -54,8 +56,8 @@ public class Tracer {
     }
 
 
-    public void add(SpyMatcher matcher) {
-        traceMatchers.add(matcher);
+    public void include(SpyMatcher matcher) {
+        matcherSet.include(matcher);
     }
 
 
@@ -68,18 +70,21 @@ public class Tracer {
         this.methodTime = methodTime;
     }
 
-
-    public List<SpyMatcher> findMatchers(String clazzName) {
-        List<SpyMatcher> foundTraceMatchers = new ArrayList<SpyMatcher>();
-
-        for (SpyMatcher matcher : traceMatchers) {
-            if (matcher.matches(Arrays.asList(clazzName))) {
-                if (matcher.matches(Arrays.asList(clazzName))) {
-                    foundTraceMatchers.add(matcher);
-                }
-            }
-        }
-
-        return foundTraceMatchers;
+    public SpyMatcherSet getMatcherSet() {
+        return matcherSet;
     }
+
+//    public List<SpyMatcher> findMatchers(String clazzName) {
+//        List<SpyMatcher> foundTraceMatchers = new ArrayList<SpyMatcher>();
+//
+//        for (SpyMatcher matcher : matcherSet.getMatchers()) {
+//            if (matcher.matches(Arrays.asList(clazzName))) {
+//                if (matcher.matches(Arrays.asList(clazzName))) {
+//                    foundTraceMatchers.add(matcher);
+//                }
+//            }
+//        }
+//
+//        return foundTraceMatchers;
+//    }
 }
