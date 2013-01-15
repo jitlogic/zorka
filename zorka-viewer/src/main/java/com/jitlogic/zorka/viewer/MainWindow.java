@@ -44,7 +44,7 @@ public class MainWindow extends JFrame {
 
         @Override public Object getValueAt(int rowIndex, int columnIndex) {
             NamedTraceElement el = traceSet.get(rowIndex);
-            return el.getTraceName() + " " + el.getTstartDt();
+            return el.getTraceName() + " " + el.getClockDt();
         }
     };
 

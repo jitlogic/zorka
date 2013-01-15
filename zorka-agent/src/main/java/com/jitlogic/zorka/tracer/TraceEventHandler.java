@@ -29,7 +29,7 @@ public class TraceEventHandler {
      *
      * @param traceId trace ID (symbol)
      */
-    public void traceBegin(int traceId) {
+    public void traceBegin(int traceId, long clock) {
     }
 
 

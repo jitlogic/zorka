@@ -49,9 +49,10 @@ public class SimpleTraceFormat extends TraceEventHandler {
 
 
     @Override
-    public void traceBegin(int traceId) {
+    public void traceBegin(int traceId, long clock) {
         buf.putByte(TRACE_BEGIN);
         buf.putInt(traceId);
+        buf.putLong(clock);
     }
 
 
@@ -134,7 +135,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
             byte cmd = buf.getByte();
             switch (cmd) {
                 case TRACE_BEGIN:
-                    output.traceBegin(buf.getInt());
+                    output.traceBegin(buf.getInt(), buf.getLong());
                     break;
                 case TRACE_ENTER:
                     output.traceEnter(buf.getInt(), buf.getInt(), buf.getInt(), buf.getLong());

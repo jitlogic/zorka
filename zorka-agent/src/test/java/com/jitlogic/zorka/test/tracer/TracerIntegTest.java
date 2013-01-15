@@ -82,6 +82,8 @@ public class TracerIntegTest extends ZorkaFixture {
         rslt.check(1, "action", "traceEnter", "classId", sym(TCLASS1), "methodId", sym("trivialMethod"));
         rslt.check(2, "action", "traceStats", "calls", 1L, "errors", 0L);
         rslt.check(3, "action", "traceReturn");
+
+        assertTrue("clock time should be set to non-zero value", (Long)rslt.get(0, "clock") > 0);
     }
 
 

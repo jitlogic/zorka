@@ -32,7 +32,7 @@ public class TraceBeginProcessor implements SpyProcessor {
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
-        tracer.getHandler().traceBegin(traceId);
+        tracer.getHandler().traceBegin(traceId, System.currentTimeMillis());
         return record;
     }
 }

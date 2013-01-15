@@ -62,8 +62,8 @@ public class TracePrinter extends TraceEventHandler {
 
 
     @Override
-    public void traceBegin(int traceId) {
-        out.println(spc(level) + "TRACE_BEGIN: " + sym(traceId));
+    public void traceBegin(int traceId, long clock) {
+        out.println(spc(level) + "TRACE_BEGIN: " + sym(traceId) + " clock=" + new Date(clock));
     }
 
 

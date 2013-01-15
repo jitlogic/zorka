@@ -47,8 +47,9 @@ public class TraceBuilder extends TraceEventHandler {
 
 
     @Override
-    public void traceBegin(int traceId) {
-        top.traceBegin(traceId);
+    public void traceBegin(int traceId, long clock) {
+        top.setTraceId(traceId);
+        top.setClock(clock);
     }
 
 
@@ -57,7 +58,12 @@ public class TraceBuilder extends TraceEventHandler {
         if (top.isBusy()) {
             top = new TraceElement(top);
         }
-        top.traceEnter(classId, methodId, signatureId, tstamp);
+
+        top.setClassId(classId);
+        top.setMethodId(methodId);
+        top.setSignatureId(signatureId);
+        top.setTstart(tstamp);
+        top.setCalls(top.getCalls() + 1);
     }
 
 
@@ -68,7 +74,7 @@ public class TraceBuilder extends TraceEventHandler {
             top = top.getParent();
         }
 
-        top.traceReturn(tstamp);
+        top.setTstop(tstamp);
         pop();
     }
 
@@ -80,26 +86,17 @@ public class TraceBuilder extends TraceEventHandler {
             top = top.getParent();
         }
 
-        top.traceError(exception, tstamp);
+        top.setException(exception);
+        top.setTstop(tstamp);
+        top.setErrors(top.getErrors() + 1);
+
         pop();
     }
 
 
     @Override
-    public void traceStats(long calls, long errors) {
-        // Ignore this
-    }
-
-
-    @Override
-    public void newSymbol(int symbolId, String symbolText) {
-        // Ignore this
-    }
-
-
-    @Override
     public void newAttr(int attrId, Object attrVal) {
-        top.newAttr(attrId, attrVal);
+        top.setAttr(attrId, attrVal);
     }
 
 
@@ -117,7 +114,8 @@ public class TraceBuilder extends TraceEventHandler {
                 parent.addChild(top);
                 clean = false;
             }
-            parent.mergeChild(top);
+            parent.setCalls(parent.getCalls() + top.getCalls());
+            parent.setErrors(parent.getErrors() + top.getErrors());
         }
 
         if (clean) {

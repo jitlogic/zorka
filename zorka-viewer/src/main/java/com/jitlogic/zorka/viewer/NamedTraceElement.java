@@ -50,7 +50,7 @@ public class NamedTraceElement extends TraceElement {
         return symbols.symbolName(getSignatureId());
     }
 
-    public Date getTstartDt() {
-        return new Date(getTstart()/1000000L);
+    public Date getClockDt() {
+        return new Date(getClock());
     }
 }

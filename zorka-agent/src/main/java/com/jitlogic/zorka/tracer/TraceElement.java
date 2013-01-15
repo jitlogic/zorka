@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 
-public class TraceElement extends TraceEventHandler {
+public class TraceElement {
 
     private int traceId, classId, methodId, signatureId;
-    private long tstart, tstop;
+    private long clock, tstart, tstop;
     private long calls, errors;
 
     private TracedException exception;
@@ -38,52 +38,6 @@ public class TraceElement extends TraceEventHandler {
         this.parent = parent;
     }
 
-
-    @Override
-    public void traceBegin(int traceId) {
-        this.traceId = traceId;
-    }
-
-
-    @Override
-    public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
-        this.classId = classId;
-        this.methodId = methodId;
-        this.signatureId = signatureId;
-        this.tstart = tstamp;
-        this.calls++;
-    }
-
-
-    @Override
-    public void traceReturn(long tstamp) {
-        this.tstop = tstamp;
-    }
-
-    @Override
-    public void traceStats(long calls, long errors) {
-        this.calls = calls;
-        this.errors = errors;
-    }
-
-
-    @Override
-    public void traceError(TracedException exception, long tstamp) {
-        this.tstop = tstamp;
-        this.exception = exception;
-        this.errors++;
-    }
-
-
-    @Override
-    public void newSymbol(int symbolId, String symbolText) {
-    }
-
-
-    @Override
-    public void newAttr(int attrId, Object attrVal) {
-        setAttr(attrId, attrVal);
-    }
 
     public Object getAttr(int attrId) {
         if (attrs != null) {
@@ -106,12 +60,6 @@ public class TraceElement extends TraceEventHandler {
             children = new ArrayList<TraceElement>();
         }
         children.add(child);
-    }
-
-
-    public void mergeChild(TraceElement child) {
-        calls += child.calls;
-        errors += child.errors;
     }
 
 
@@ -206,6 +154,16 @@ public class TraceElement extends TraceEventHandler {
     }
 
 
+    public long getClock() {
+        return clock;
+    }
+
+
+    public void setClock(long clock) {
+        this.clock = clock;
+    }
+
+
     public void setSignatureId(int signatureId) {
         this.signatureId = signatureId;
     }
@@ -238,7 +196,7 @@ public class TraceElement extends TraceEventHandler {
 
     public void traverse(TraceEventHandler output) {
         if (traceId != 0) {
-            output.traceBegin(traceId);
+            output.traceBegin(traceId, clock);
         }
 
         output.traceEnter(classId, methodId, signatureId, tstart);
