@@ -62,7 +62,7 @@ public class TraceBuilder extends TraceEventHandler {
         top.setClassId(classId);
         top.setMethodId(methodId);
         top.setSignatureId(signatureId);
-        top.setTstart(tstamp);
+        top.setTime(tstamp);
         top.setCalls(top.getCalls() + 1);
     }
 
@@ -74,7 +74,7 @@ public class TraceBuilder extends TraceEventHandler {
             top = top.getParent();
         }
 
-        top.setTstop(tstamp);
+        top.setTime(tstamp-top.getTime());
         pop();
     }
 
@@ -87,7 +87,7 @@ public class TraceBuilder extends TraceEventHandler {
         }
 
         top.setException(exception);
-        top.setTstop(tstamp);
+        top.setTime(tstamp-top.getTime());
         top.setErrors(top.getErrors() + 1);
 
         pop();

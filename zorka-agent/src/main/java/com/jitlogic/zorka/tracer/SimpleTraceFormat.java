@@ -62,7 +62,6 @@ public class SimpleTraceFormat extends TraceEventHandler {
         buf.putInt(classId);
         buf.putInt(methodId);
         buf.putInt(signatureId);
-        buf.putLong(tstamp);
     }
 
 
@@ -138,7 +137,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
                     output.traceBegin(buf.getInt(), buf.getLong());
                     break;
                 case TRACE_ENTER:
-                    output.traceEnter(buf.getInt(), buf.getInt(), buf.getInt(), buf.getLong());
+                    output.traceEnter(buf.getInt(), buf.getInt(), buf.getInt(), 0);
                     break;
                 case TRACE_RETURN:
                     output.traceReturn(buf.getLong());

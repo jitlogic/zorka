@@ -67,7 +67,7 @@ public class TraceEncodingUnitTest {
     public void testTraceEnterCmd() {
         encoder.traceEnter(c1, m1, s1, 100);
         decode();
-        output.check(0, "action", "traceEnter", "classId", c1, "methodId", m1, "signatureId", s1, "tstamp", 100L);
+        output.check(0, "action", "traceEnter", "classId", c1, "methodId", m1, "signatureId", s1, "tstamp", 0L);
     }
 
 

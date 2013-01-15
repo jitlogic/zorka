@@ -50,13 +50,13 @@ public class TraceSet extends TraceEventHandler {
         top.setClassId(classId);
         top.setMethodId(methodId);
         top.setSignatureId(signatureId);
-        top.setTstart(tstamp);
+        top.setTime(tstamp);
     }
 
 
     @Override
     public void traceReturn(long tstamp) {
-        top.setTstop(tstamp);
+        top.setTime(tstamp-top.getTime());
         pop();
     }
 
@@ -64,7 +64,7 @@ public class TraceSet extends TraceEventHandler {
     @Override
     public void traceError(TracedException exception, long tstamp) {
         top.setException(exception);
-        top.setTstop(tstamp);
+        top.setTime(tstamp-top.getTime());
         pop();
     }
 
@@ -121,16 +121,16 @@ public class TraceSet extends TraceEventHandler {
                 SimpleTraceFormat stf = new SimpleTraceFormat(buf);
                 stf.decode(this);
             } catch (FileNotFoundException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
                 return;
             } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             } finally {
                 if (is != null) {
                     try {
                         is.close();
                     } catch (IOException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                        e.printStackTrace();
                     }
                 }
             }

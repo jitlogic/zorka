@@ -25,7 +25,7 @@ import java.util.Map;
 public class TraceElement {
 
     private int traceId, classId, methodId, signatureId;
-    private long clock, tstart, tstop;
+    private long clock, time;
     private long calls, errors;
 
     private TracedException exception;
@@ -64,7 +64,7 @@ public class TraceElement {
 
 
     public void clean() {
-        tstart = tstop = 0;
+        time = 0;
         classId = methodId = signatureId = traceId = 0;
         attrs = null;
         children = null;
@@ -78,7 +78,7 @@ public class TraceElement {
 
 
     public boolean isBusy() {
-        return tstart > 0;
+        return classId != 0;
     }
 
 
@@ -104,6 +104,7 @@ public class TraceElement {
     public long getErrors() {
         return errors;
     }
+
 
     public void setErrors(long errors) {
         this.errors = errors;
@@ -134,25 +135,6 @@ public class TraceElement {
     }
 
 
-    public long getTstart() {
-        return tstart;
-    }
-
-
-    public void setTstart(long tstart) {
-        this.tstart = tstart;
-    }
-
-
-    public long getTstop() {
-        return tstop;
-    }
-
-
-    public void setTstop(long tstop) {
-        this.tstop = tstop;
-    }
-
 
     public long getClock() {
         return clock;
@@ -180,7 +162,11 @@ public class TraceElement {
 
 
     public long getTime() {
-        return tstop > 0 ? tstop - tstart : 0;
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
     }
 
 
@@ -199,7 +185,7 @@ public class TraceElement {
             output.traceBegin(traceId, clock);
         }
 
-        output.traceEnter(classId, methodId, signatureId, tstart);
+        output.traceEnter(classId, methodId, signatureId, 0);
         output.traceStats(calls, errors);
 
         if (attrs != null) {
@@ -215,9 +201,9 @@ public class TraceElement {
         }
 
         if (exception != null) {
-            output.traceError(exception, tstop);
+            output.traceError(exception, time);
         } else {
-            output.traceReturn(tstop);
+            output.traceReturn(time);
         }
     }
 }
