@@ -18,10 +18,14 @@ package com.jitlogic.zorka.tracer;
 
 import com.jitlogic.zorka.util.ByteBuffer;
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.io.*;
 
 public class TraceFileWriter extends ZorkaAsyncThread<TraceElement> {
+
+    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private SymbolRegistry symbols;
     private SymbolEnricher enricher;
@@ -41,13 +45,15 @@ public class TraceFileWriter extends ZorkaAsyncThread<TraceElement> {
     }
 
 
-    public TraceFileWriter(String path, SymbolRegistry symbols, int maxFiles, long maxSize) {
+    public TraceFileWriter(String path, SymbolRegistry symbols, int maxFiles, long maxFileSize) {
         super("trace-writer");
         this.symbols = symbols;
         this.buffer = new ByteBuffer(2048);
         this.encoder = new SimpleTraceFormat(buffer);
         this.enricher = new SymbolEnricher(symbols, encoder);
         this.traceFile = new File(path);
+        this.maxFiles = maxFiles;
+        this.maxFileSize = maxFileSize;
     }
 
 
@@ -55,6 +61,11 @@ public class TraceFileWriter extends ZorkaAsyncThread<TraceElement> {
     protected void process(TraceElement obj) {
         obj.traverse(enricher);
         byte[] buf = buffer.getContent();
+
+        if (buf.length > maxFileSize) {
+            log.error("Skipping too big trace: size=" + buf.length + ", maxSize=" + maxFileSize);
+            return;
+        }
 
         curSize += buf.length;
 
@@ -70,6 +81,9 @@ public class TraceFileWriter extends ZorkaAsyncThread<TraceElement> {
                 log.error("Cannot write to trace file " + traceFile, e);
             }
         }
+
+        // TODO implement unit test exposing lack of reset() call
+        buffer.reset();
     }
 
 
@@ -104,6 +118,8 @@ public class TraceFileWriter extends ZorkaAsyncThread<TraceElement> {
         } catch (FileNotFoundException e) {
             log.error("Cannot open trace file " + traceFile, e);
         }
+
+        enricher.reset();
     }
 
 

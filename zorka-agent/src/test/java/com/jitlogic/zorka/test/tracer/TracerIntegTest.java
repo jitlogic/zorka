@@ -51,7 +51,7 @@ public class TracerIntegTest extends ZorkaFixture {
 
     @Test
     public void testSimpleTooShortTrace() throws Exception {
-        spy.include(spy.byMethod(TCLASS1, "trivialMethod"));
+        spy.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
         spy.add(
                 spy.instance().onEnter(spy.traceBegin("TEST"))
                         .include(spy.byMethod(TCLASS1, "trivialMethod")));
@@ -66,7 +66,7 @@ public class TracerIntegTest extends ZorkaFixture {
 
     @Test
     public void testSimpleTrace() throws Exception {
-        spy.include(spy.byMethod(TCLASS1, "trivialMethod"));
+        spy.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
         spy.add(
             spy.instance().onEnter(spy.traceBegin("TEST"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
@@ -87,7 +87,7 @@ public class TracerIntegTest extends ZorkaFixture {
 
     @Test
     public void testSimpleTraceWithAttr() throws Exception {
-        spy.include(spy.byMethod(TCLASS1, "trivialMethod"));
+        spy.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
         spy.add(spy.instance().onEnter(
                 spy.traceBegin("TEST"), spy.put("URL", "http://some.url"), spy.traceAttr("URL", "URL")
         ).include(spy.byMethod(TCLASS1, "trivialMethod")));

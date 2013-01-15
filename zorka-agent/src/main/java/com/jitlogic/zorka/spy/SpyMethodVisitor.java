@@ -18,6 +18,8 @@
 package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.tracer.SymbolRegistry;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -39,6 +41,8 @@ import static java.lang.Math.max;
  * @author rafal.lewczuk@jitlogic.com
  */
 public class SpyMethodVisitor extends MethodVisitor {
+
+    private static final ZorkaLog log = ZorkaLogger.getLog(SpyMethodVisitor.class);
 
     /** Class that receives data from probes */
     private final static String SUBMIT_CLASS = "com/jitlogic/zorka/spy/MainSubmitter";
@@ -204,6 +208,9 @@ public class SpyMethodVisitor extends MethodVisitor {
 
         // Add trace probe if required
         if (symbolRegistry != null) {
+            if (SpyInstance.isDebugEnabled(SPD_METHODXFORM)) {
+                log.debug("Will trace method: " + methodName);
+            }
             stackDelta = max(stackDelta, emitTraceEnter(
                     symbolRegistry.symbolId(className),
                     symbolRegistry.symbolId(methodName),

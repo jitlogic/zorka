@@ -49,7 +49,7 @@ public class SpyMatcher {
 
 
     /** List of common methods (typically omitted by instrumentation) */
-    public static final Set<String> COMMON_METHODS = ZorkaUtil.set("toString", "equals", "hashCode");
+    public static final Set<String> COMMON_METHODS = ZorkaUtil.set("toString", "equals", "hashCode", "valueOf");
 
 
     public static final int BY_CLASS_NAME        = 0x001;
@@ -281,7 +281,7 @@ public class SpyMatcher {
         return new SpyMatcher(flags | NO_COMMONS, access, classPattern, methodPattern, signaturePattern);
     }
 
-    public SpyMatcher noTrivials() {
+    public SpyMatcher forTrace() {
         return new SpyMatcher(flags|NO_CONSTRUCTORS|NO_ACCESSORS|NO_COMMONS, access, classPattern, methodPattern, signaturePattern);
     }
 }

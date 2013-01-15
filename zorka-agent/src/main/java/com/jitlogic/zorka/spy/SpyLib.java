@@ -78,14 +78,20 @@ public class SpyLib {
     /** Log all submissions from instrumented code */
     public static final int SPD_SUBMISSIONS = 8;
 
+    /** Tracer debug messages */
+    public static final int SPD_TRACE_DEBUG = 9;
+
+    /** All possible tracer messages */
+    public static final int SPD_TRACE_ALL = 10;
+
     /** Log all encountered methods (only from transformed classes) */
-    public static final int SPD_METHODALL = 9;
+    public static final int SPD_METHODALL = 11;
 
     /** Log all classes going through transformer */
-    public static final int SPD_CLASSALL = 10;
+    public static final int SPD_CLASSALL = 12;
 
     /** Maximum possible debug log level */
-    public static final int SPD_MAX = 10;
+    public static final int SPD_MAX = 13;
 
 
     public static final String GT = ">";
@@ -172,6 +178,11 @@ public class SpyLib {
     }
 
 
+    public SpyInstance getInstance() {
+        return instance;
+    }
+
+
     /**
      * This is convenience function for monitoring execution times of methods. Execution times are stored in ZorkaStats
      * structure that is capable of storing statistics for multiple methods. Using expr argument it is possible to
@@ -225,7 +236,7 @@ public class SpyLib {
      *
      * @param matchers
      */
-    public void include(SpyMatcher...matchers) {
+    public void traceInclude(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
             instance.getTracer().include(matcher);
         }

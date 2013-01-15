@@ -29,7 +29,6 @@ public class Tracer {
     private long methodTime = 250000;
 
     /** Defines which classes and methods should be traced. */
-    //private List<SpyMatcher> includes = new ArrayList<SpyMatcher>();
     private SpyMatcherSet matcherSet = new SpyMatcherSet();
 
     /** Symbol registry for tracer */
@@ -74,17 +73,4 @@ public class Tracer {
         return matcherSet;
     }
 
-//    public List<SpyMatcher> findMatchers(String clazzName) {
-//        List<SpyMatcher> foundTraceMatchers = new ArrayList<SpyMatcher>();
-//
-//        for (SpyMatcher matcher : matcherSet.getMatchers()) {
-//            if (matcher.matches(Arrays.asList(clazzName))) {
-//                if (matcher.matches(Arrays.asList(clazzName))) {
-//                    foundTraceMatchers.add(matcher);
-//                }
-//            }
-//        }
-//
-//        return foundTraceMatchers;
-//    }
 }

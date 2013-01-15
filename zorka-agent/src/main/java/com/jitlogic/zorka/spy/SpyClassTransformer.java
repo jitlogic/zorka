@@ -137,9 +137,6 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
             if (sdef.getMatcherSet().classMatch(clazzName)) {
 
-                if (SpyInstance.isDebugEnabled(SPD_CLASSXFORM)) {
-                    log.debug("Transforming class: " + className);
-                }
 
                 found.add(sdef);
             }
@@ -148,6 +145,11 @@ public class SpyClassTransformer implements ClassFileTransformer {
         boolean classMatch = tracer.getMatcherSet().classMatch(clazzName);
 
         if (found.size() > 0 || classMatch) {
+
+            if (SpyInstance.isDebugEnabled(SPD_CLASSXFORM)) {
+                log.debug("Transforming class: " + className);
+            }
+
             ClassReader cr = new ClassReader(classfileBuffer);
             ClassWriter cw = new ClassWriter(cr, 0);
             ClassVisitor scv = createVisitor(clazzName, found, tracer, cw);
