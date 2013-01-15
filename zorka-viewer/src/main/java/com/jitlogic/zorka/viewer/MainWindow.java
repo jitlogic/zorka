@@ -21,6 +21,8 @@ import javax.swing.*;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
@@ -118,15 +120,22 @@ public class MainWindow extends JFrame {
         tblTraces = new JTable(tbmTraces);
         tblTraces.setTableHeader(null);
 
+        tblTraces.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                displayTrace(tblTraces.getSelectedRow());
+            }
+        });
+
         scrTraces.setMinimumSize(new Dimension(200, 384));
         scrTraces.setViewportView(tblTraces);
 
         JScrollPane scrTraceDetail = new JScrollPane();
+        splitPane.setRightComponent(scrTraceDetail);
 
         txtTrace = new JTextArea();
-        splitPane.setRightComponent(txtTrace);
-
         txtTrace.setMinimumSize(new Dimension(640, 384));
+        scrTraceDetail.setViewportView(txtTrace);
+
 
         splitPane.setResizeWeight(0.2);
     }
@@ -138,6 +147,8 @@ public class MainWindow extends JFrame {
         getRootPane().getActionMap().put(action,action);
     }
 
-
+    private void displayTrace(int idx) {
+        txtTrace.setText(new TraceToTextConverter(traceSet.get(idx)).toString());
+    }
 
 }

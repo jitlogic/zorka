@@ -53,4 +53,8 @@ public class NamedTraceElement extends TraceElement {
     public Date getClockDt() {
         return new Date(getClock());
     }
+
+    public SymbolRegistry getSymbols() {
+        return symbols;
+    }
 }
