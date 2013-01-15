@@ -116,9 +116,8 @@ public class TraceBuilder extends TraceEventHandler {
             if (top.getTime() > methodTime || top.getErrors() > 0) {
                 parent.addChild(top);
                 clean = false;
-            } else {
-                parent.mergeChild(top);
             }
+            parent.mergeChild(top);
         }
 
         if (clean) {

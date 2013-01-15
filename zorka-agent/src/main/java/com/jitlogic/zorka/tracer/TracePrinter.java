@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This is simple trace printer. It receives stream of trace events
+ * This is simple standalone trace printer. It receives stream of trace events
  * and prints them in human-readable form to a print stream.
  *
  * @author rafal.lewczuk@jitlogic.com

@@ -82,6 +82,18 @@ public class TraceElement extends TraceEventHandler {
 
     @Override
     public void newAttr(int attrId, Object attrVal) {
+        setAttr(attrId, attrVal);
+    }
+
+    public Object getAttr(int attrId) {
+        if (attrs != null) {
+            return attrs.get(attrId);
+        } else {
+            return null;
+        }
+    }
+
+    public void setAttr(int attrId, Object attrVal) {
         if (attrs == null) {
             attrs = new HashMap<Integer,Object>();
         }
@@ -89,14 +101,13 @@ public class TraceElement extends TraceEventHandler {
     }
 
 
-
     public void addChild(TraceElement child) {
         if (children == null) {
             children = new ArrayList<TraceElement>();
         }
         children.add(child);
-        mergeChild(child);
     }
+
 
     public void mergeChild(TraceElement child) {
         calls += child.calls;
@@ -127,6 +138,7 @@ public class TraceElement extends TraceEventHandler {
         return traceId > 0;
     }
 
+
     public boolean hasAttrs() {
         return attrs != null;
     }
@@ -136,14 +148,91 @@ public class TraceElement extends TraceEventHandler {
         return calls;
     }
 
+    public void setCalls(long calls) {
+        this.calls = calls;
+    }
+
 
     public long getErrors() {
         return errors;
     }
 
+    public void setErrors(long errors) {
+        this.errors = errors;
+    }
+
+    public int getClassId() {
+        return classId;
+    }
+
+
+    public void setClassId(int classId) {
+        this.classId = classId;
+    }
+
+
+    public int getMethodId() {
+        return methodId;
+    }
+
+
+    public void setMethodId(int methodId) {
+        this.methodId = methodId;
+    }
+
+
+    public int getSignatureId() {
+        return signatureId;
+    }
+
+
+    public long getTstart() {
+        return tstart;
+    }
+
+
+    public void setTstart(long tstart) {
+        this.tstart = tstart;
+    }
+
+
+    public long getTstop() {
+        return tstop;
+    }
+
+
+    public void setTstop(long tstop) {
+        this.tstop = tstop;
+    }
+
+
+    public void setSignatureId(int signatureId) {
+        this.signatureId = signatureId;
+    }
+
+
+    public int getTraceId() {
+        return traceId;
+    }
+
+
+    public void setTraceId(int traceId) {
+        this.traceId = traceId;
+    }
+
 
     public long getTime() {
         return tstop > 0 ? tstop - tstart : 0;
+    }
+
+
+    public TracedException getException() {
+        return exception;
+    }
+
+
+    public void setException(TracedException exception) {
+        this.exception = exception;
     }
 
 

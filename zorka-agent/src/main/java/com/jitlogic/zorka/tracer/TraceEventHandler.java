@@ -30,7 +30,6 @@ public class TraceEventHandler {
      * @param traceId trace ID (symbol)
      */
     public void traceBegin(int traceId) {
-
     }
 
 
@@ -46,7 +45,6 @@ public class TraceEventHandler {
      * @param signatureId signature ID (method signature symbol ID)
      */
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
-
     }
 
 
@@ -56,7 +54,6 @@ public class TraceEventHandler {
      * @param tstamp timestamp (in nanoseconds since Epoch - see System.nanoTime())
      */
     public void traceReturn(long tstamp) {
-
     }
 
 
@@ -68,7 +65,6 @@ public class TraceEventHandler {
      *
      */
     public void traceError(TracedException exception, long tstamp) {
-
     }
 
 
@@ -80,7 +76,6 @@ public class TraceEventHandler {
      * @param errors number of errors
      */
     public void traceStats(long calls, long errors) {
-
     }
 
 
@@ -94,7 +89,6 @@ public class TraceEventHandler {
      * @param symbolText symbol text
      */
     public void newSymbol(int symbolId, String symbolText) {
-
     }
 
 
@@ -106,7 +100,6 @@ public class TraceEventHandler {
      * @param attrVal parameter value
      */
     public void newAttr(int attrId, Object attrVal) {
-
     }
 
 }

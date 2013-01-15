@@ -51,6 +51,17 @@ public class SymbolRegistry {
     }
 
 
+    public void put(int symbolId, String symbol) {
+        symbols.put(symbol, symbolId);
+        idents.put(symbolId, symbol);
+
+        // TODO not thread safe !
+        if (symbolId > idCounter.get()) {
+            idCounter.set(symbolId);
+        }
+    }
+
+
     public int lastId() {
         return idCounter.get();
     }

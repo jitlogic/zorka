@@ -78,6 +78,14 @@ public class TraceEncodingUnitTest {
         output.check(0, "action", "traceReturn", "tstamp", 200L);
     }
 
+    @Test
+    public void testTraceBigLongNum() {
+        long l = System.nanoTime();
+        System.out.println(l);
+        encoder.traceReturn(l);
+        decode();
+        output.check(0, "tstamp", l);
+    }
 
     @Test
     public void traceErrorCmd() {
