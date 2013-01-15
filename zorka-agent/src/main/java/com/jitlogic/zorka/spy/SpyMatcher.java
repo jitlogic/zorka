@@ -34,11 +34,13 @@ import static com.jitlogic.zorka.spy.SpyLib.SM_NOARGS;
  */
 public class SpyMatcher {
 
+
     /** Maps primitive types to type codes used by JVM */
     private static final Map<String,String> typeCodes = ZorkaUtil.constMap(
             "void", "V", "boolean", "Z", "byte", "B", "char", "C",
             "short", "S", "int", "I", "long", "J", "float", "F", "double", "D"
     );
+
 
     /** Maps regular expression special characters (sequences) to escaped sequences. */
     private static final Map<Character,String> regexChars = ZorkaUtil.constMap(
@@ -46,17 +48,20 @@ public class SpyMatcher {
     );
 
 
-    /** Access bits and custom matcher flags */
-    private int access, flags;
+    /** List of common methods (typically omitted by instrumentation) */
+    public static final Set<String> COMMON_METHODS = ZorkaUtil.set("toString", "equals", "hashCode");
 
 
-    public static final int BY_CLASS_NAME = 0x01;
-    public static final int BY_CLASS_ANNOTATION  = 0x02;
-    public static final int BY_INTERFACE         = 0x04;
-    public static final int BY_METHOD_NAME       = 0x08;
-    public static final int BY_METHOD_SIGNATURE  = 0x10;
-    public static final int BY_METHOD_ANNOTATION = 0x20;
-    public static final int INVERT_MATCH         = 0x40;
+    public static final int BY_CLASS_NAME        = 0x001;
+    public static final int BY_CLASS_ANNOTATION  = 0x002;
+    public static final int BY_INTERFACE         = 0x004;
+    public static final int BY_METHOD_NAME       = 0x008;
+    public static final int BY_METHOD_SIGNATURE  = 0x010;
+    public static final int BY_METHOD_ANNOTATION = 0x020;
+    public static final int NO_CONSTRUCTORS      = 0x040;
+    public static final int NO_ACCESSORS         = 0x080;
+    public static final int NO_COMMONS           = 0x100;
+    public static final int EXCLUDE_MATCH        = 0x800;
 
     /** Special access bit - package private */
     public static final int ACC_PKGPRIV = 0x10000;
@@ -70,8 +75,12 @@ public class SpyMatcher {
     /** Public, private, protected and package private methods will match */
     public static final int ANY_FILTER     = ACC_PUBLIC|ACC_PRIVATE|ACC_PROTECTED|ACC_PKGPRIV;
 
+    /** Access bits and custom matcher flags */
+    private int access, flags;
+
     /** Regexps for matching class name/annotation, method name/annotation and method descriptor */
-    private Pattern classMatch, methodMatch, descriptorMatch;
+    private Pattern classPattern, methodPattern, signaturePattern;
+
 
     /**
      * Standard constructor
@@ -91,11 +100,19 @@ public class SpyMatcher {
     public SpyMatcher(int flags, int access, String className, String methodName, String retType, String... argTypes) {
         this.flags = flags;
         this.access = access;
-        this.classMatch = toSymbolMatch(className);
-        this.methodMatch = toSymbolMatch(methodName);
-        this.descriptorMatch = toDescriptorMatch(retType, argTypes);
+        this.classPattern = toSymbolMatch(className);
+        this.methodPattern = toSymbolMatch(methodName);
+        this.signaturePattern = toDescriptorMatch(retType, argTypes);
     }
 
+
+    private SpyMatcher(int flags, int access, Pattern classPattern, Pattern methodPattern, Pattern signaturePattern) {
+        this.access = access;
+        this.flags = flags;
+        this.classPattern = classPattern;
+        this.methodPattern = methodPattern;
+        this.signaturePattern = signaturePattern;
+    }
 
     /**
      * Converts symbol match pattern (string) to regular expression object.
@@ -231,16 +248,40 @@ public class SpyMatcher {
 
 
     public Pattern getClassPattern() {
-        return classMatch;
+        return classPattern;
     }
 
 
     public Pattern getMethodPattern() {
-        return methodMatch;
+        return methodPattern;
     }
 
 
     public Pattern getSignaturePattern() {
-        return descriptorMatch;
+        return signaturePattern;
+    }
+
+
+    public SpyMatcher exclude() {
+        return new SpyMatcher(flags | EXCLUDE_MATCH, access, classPattern, methodPattern, signaturePattern);
+    }
+
+
+    public SpyMatcher noConstructors() {
+        return new SpyMatcher(flags | NO_CONSTRUCTORS, access, classPattern, methodPattern, signaturePattern);
+    }
+
+
+    public SpyMatcher noAccessors() {
+        return new SpyMatcher(flags | NO_ACCESSORS, access, classPattern, methodPattern, signaturePattern);
+    }
+
+
+    public SpyMatcher noCommons() {
+        return new SpyMatcher(flags | NO_COMMONS, access, classPattern, methodPattern, signaturePattern);
+    }
+
+    public SpyMatcher noTrivials() {
+        return new SpyMatcher(flags|NO_CONSTRUCTORS|NO_ACCESSORS|NO_COMMONS, access, classPattern, methodPattern, signaturePattern);
     }
 }

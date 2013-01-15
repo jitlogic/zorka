@@ -130,16 +130,6 @@ public class SpyDefinition {
 
 
     /**
-     * Returns list of matchers declared SpyDefinition.
-     *
-     * @return list of matchers
-     */
-    public List<SpyMatcher> getMatchers() {
-        return matcherSet.getMatchers();
-    }
-
-
-    /**
      * Instructs spy what should be collected at the beginning of a method.
      *
      * @return

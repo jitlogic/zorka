@@ -61,7 +61,7 @@ public class SpyMatcherSet {
             int flags = matcher.getFlags();
             if ((0 != (flags & BY_CLASS_NAME)) && match(matcher.getClassPattern(), className)) {
                 // Return true or false depending on whether this is normal or inverted match
-                return 0 == (flags & INVERT_MATCH);
+                return 0 == (flags & EXCLUDE_MATCH);
             }
 
             if (0 != (flags & (BY_CLASS_ANNOTATION|BY_INTERFACE|BY_METHOD_ANNOTATION))) {
@@ -83,6 +83,12 @@ public class SpyMatcherSet {
              || (0 != (flags & BY_CLASS_ANNOTATION) && match(matcher.getClassPattern(), classAnnotations))
              || (0 != (flags & BY_INTERFACE) && match(matcher.getClassPattern(), classInterfaces))) {
 
+                if ((0 != (flags & NO_CONSTRUCTORS) && ("<init>".equals(methodName) || "<clinit>".equals(methodName)))
+                 || (0 != (flags & NO_ACCESSORS) && isAccessor(methodName, methodSignature))
+                 || (0 != (flags & NO_COMMONS) && COMMON_METHODS.contains(methodName))) {
+                    return false;
+                }
+
                 // Method access-name-signature check
                 if ((0 == matcher.getAccess() || 0 != (access & matcher.getAccess()))
                  && (0 == (flags & BY_METHOD_NAME) || match(matcher.getMethodPattern(), methodName))
@@ -103,6 +109,15 @@ public class SpyMatcherSet {
 
         return false;
     }
+
+
+    private boolean isAccessor(String methodName, String methodSignature) {
+        return (methodName.startsWith("set") && methodSignature.endsWith(")V"))
+            || (methodName.startsWith("get") && methodSignature.startsWith("()"))
+            || (methodName.startsWith("is") && methodSignature.startsWith("()"))
+            || (methodName.startsWith("has") && methodSignature.startsWith("()"));
+    }
+
 
 
     public boolean hasMethodAnnotations() {
@@ -128,12 +143,6 @@ public class SpyMatcherSet {
             }
         }
         return false;
-    }
-
-
-    // TODO temporary method, to be removed later
-    public List<SpyMatcher> getMatchers() {
-        return matchers;
     }
 
 
