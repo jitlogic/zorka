@@ -4,9 +4,9 @@ import com.jitlogic.zorka.spy.MainSubmitter;
 import com.jitlogic.zorka.test.spy.support.TestSpyTransformer;
 import com.jitlogic.zorka.test.spy.support.TestSubmitter;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
-import com.jitlogic.zorka.tracer.SymbolRegistry;
-import com.jitlogic.zorka.tracer.TraceEventHandler;
-import com.jitlogic.zorka.tracer.Tracer;
+import com.jitlogic.zorka.spy.SymbolRegistry;
+import com.jitlogic.zorka.spy.TraceEventHandler;
+import com.jitlogic.zorka.spy.Tracer;
 import org.junit.After;
 import org.junit.Before;
 

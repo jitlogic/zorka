@@ -14,11 +14,11 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.test.tracer;
+package com.jitlogic.zorka.test.spy;
 
 import com.jitlogic.zorka.spy.SpyDefinition;
 import com.jitlogic.zorka.test.support.BytecodeInstrumentationFixture;
-import com.jitlogic.zorka.tracer.WrappedException;
+import com.jitlogic.zorka.spy.WrappedException;
 import org.junit.Assert;
 import org.junit.Test;
 

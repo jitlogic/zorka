@@ -14,12 +14,12 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.test.tracer;
+package com.jitlogic.zorka.test.spy;
 
-import com.jitlogic.zorka.tracer.SymbolRegistry;
-import com.jitlogic.zorka.tracer.TraceBuilder;
-import com.jitlogic.zorka.tracer.TraceElement;
-import com.jitlogic.zorka.tracer.WrappedException;
+import com.jitlogic.zorka.spy.SymbolRegistry;
+import com.jitlogic.zorka.spy.TraceBuilder;
+import com.jitlogic.zorka.spy.TraceElement;
+import com.jitlogic.zorka.spy.WrappedException;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 
 import com.jitlogic.zorka.util.ZorkaAsyncThread;

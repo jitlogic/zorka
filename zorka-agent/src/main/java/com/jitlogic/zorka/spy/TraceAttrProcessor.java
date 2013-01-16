@@ -16,8 +16,6 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.tracer.Tracer;
-
 import java.util.Map;
 
 public class TraceAttrProcessor implements SpyProcessor {

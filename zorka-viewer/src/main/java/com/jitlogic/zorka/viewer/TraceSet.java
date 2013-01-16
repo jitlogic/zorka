@@ -16,10 +16,10 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.tracer.SimpleTraceFormat;
-import com.jitlogic.zorka.tracer.SymbolRegistry;
-import com.jitlogic.zorka.tracer.TraceEventHandler;
-import com.jitlogic.zorka.tracer.TracedException;
+import com.jitlogic.zorka.spy.SimpleTraceFormat;
+import com.jitlogic.zorka.spy.SymbolRegistry;
+import com.jitlogic.zorka.spy.TraceEventHandler;
+import com.jitlogic.zorka.spy.TracedException;
 
 import java.io.*;
 import java.util.ArrayList;

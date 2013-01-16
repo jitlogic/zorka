@@ -18,8 +18,6 @@
 package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.integ.SnmpLib;
-import com.jitlogic.zorka.tracer.TraceElement;
-import com.jitlogic.zorka.tracer.TraceFileWriter;
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.ZorkaTrapper;
 import com.jitlogic.zorka.integ.SnmpTrapper;

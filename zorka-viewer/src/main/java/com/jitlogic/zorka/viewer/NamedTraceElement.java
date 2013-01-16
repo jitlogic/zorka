@@ -16,8 +16,8 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.tracer.SymbolRegistry;
-import com.jitlogic.zorka.tracer.TraceElement;
+import com.jitlogic.zorka.spy.SymbolRegistry;
+import com.jitlogic.zorka.spy.TraceElement;
 
 import java.util.Date;
 

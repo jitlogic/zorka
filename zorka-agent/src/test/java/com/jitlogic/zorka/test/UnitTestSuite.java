@@ -28,9 +28,9 @@ import com.jitlogic.zorka.test.normproc.XqlLexerUnitTest;
 import com.jitlogic.zorka.test.normproc.XqlNormalizationUnitTest;
 import com.jitlogic.zorka.test.rankproc.*;
 import com.jitlogic.zorka.test.spy.*;
-import com.jitlogic.zorka.test.tracer.TraceBuilderUnitTest;
-import com.jitlogic.zorka.test.tracer.TraceEncodingUnitTest;
-import com.jitlogic.zorka.test.tracer.TracerInstrumentationUnitTest;
+import com.jitlogic.zorka.test.spy.TraceBuilderUnitTest;
+import com.jitlogic.zorka.test.spy.TraceEncodingUnitTest;
+import com.jitlogic.zorka.test.spy.TracerInstrumentationUnitTest;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

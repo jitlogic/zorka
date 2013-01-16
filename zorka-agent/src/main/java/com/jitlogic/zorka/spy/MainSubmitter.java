@@ -18,15 +18,12 @@
 package com.jitlogic.zorka.spy;
 
 import bsh.EvalError;
-import com.jitlogic.zorka.tracer.Tracer;
-import com.jitlogic.zorka.tracer.WrappedException;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.jitlogic.zorka.spy.SpyLib.SPD_CDISPATCHES;
-import static com.jitlogic.zorka.spy.SpyLib.SPD_METHODXFORM;
 
 /**
  * Main submitter contains static methods that can be called directly by
