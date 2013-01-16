@@ -229,7 +229,7 @@ public class SpyMethodVisitor extends MethodVisitor {
             }
         }
 
-        mv.visitTryCatchBlock(lTryFrom, lTryTo, lTryHandler, null);
+        //mv.visitTryCatchBlock(lTryFrom, lTryTo, lTryHandler, null);
         mv.visitLabel(lTryFrom);
     }
 
@@ -291,6 +291,7 @@ public class SpyMethodVisitor extends MethodVisitor {
         }
 
         mv.visitInsn(ATHROW);
+        mv.visitTryCatchBlock(lTryFrom, lTryTo, lTryHandler, null);
         mv.visitMaxs(maxStack + stackDelta, max(maxLocals, retValProbeSlot + 1));
     }
 

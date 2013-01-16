@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static com.jitlogic.zorka.test.support.TestUtil.getField;
 import static com.jitlogic.zorka.test.support.TestUtil.instantiate;
 import static com.jitlogic.zorka.test.support.TestUtil.invoke;
 import static org.junit.Assert.assertEquals;
@@ -81,5 +82,51 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         assertEquals("errorMethod", symbols.symbolName((Integer)output.getData().get(0).get("methodId")));
     }
 
+
+    @Test
+    public void testTryCatchSimpleCatch() throws Exception {
+        spy.traceInclude(spy.byMethod(TCLASS3, "tryCatchFinally0"));
+
+        engine.enableDebug();
+
+        Object obj = instantiate(engine, TCLASS3);
+        invoke(obj, "tryCatchFinally0", true);
+
+        assertEquals("Outer try { } block didn't execute.", 1, getField(obj, "calls"));
+        assertEquals("Inner catch { } block didn't execute.", 1, getField(obj, "catches"));
+        //assertEquals(2, output.size());
+    }
+
+
+    @Test
+    public void testTryCatchFinallyWithEmbeddedCatch() throws Exception {
+        spy.traceInclude(spy.byMethod(TCLASS3, "tryCatchFinally1"));
+
+        engine.enableDebug();
+
+        Object obj = instantiate(engine, TCLASS3);
+        invoke(obj, "tryCatchFinally1", true);
+
+        assertEquals("Outer try { } block didn't execute.", 1, getField(obj, "calls"));
+        assertEquals("Inner catch { } block didn't execute.", 1, getField(obj, "catches"));
+        assertEquals("Outer finally { } block didn't execute.", 1, getField(obj, "finals"));
+        //assertEquals(2, output.size());
+    }
+
+
+    @Test
+    public void testTryCatchEmbeddedCatch() throws Exception {
+        //spy.traceInclude(spy.byMethod(TCLASS3, "tryCatchFinally2"));
+
+        engine.enableDebug();
+
+        Object obj = instantiate(engine, TCLASS3);
+        invoke(obj, "tryCatchFinally2", true);
+
+        assertEquals("Outer try { } block didn't execute.", 1, getField(obj, "calls"));
+        assertEquals("Inner catch { } block didn't execute.", 1, getField(obj, "catches"));
+        assertEquals("Outer finally { } block didn't execute.", 0, getField(obj, "finals"));
+        //assertEquals(2, output.size());
+    }
 
 }

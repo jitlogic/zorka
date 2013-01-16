@@ -79,6 +79,7 @@ public class TestUtil extends ClassLoader {
 
         Field field = lookupField(obj.getClass(), fieldName);
         boolean accessible = field.isAccessible();
+        field.setAccessible(true);
 
         Object retVal = field.get(obj);
 

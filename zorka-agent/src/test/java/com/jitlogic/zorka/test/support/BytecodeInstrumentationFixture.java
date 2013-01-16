@@ -14,6 +14,8 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
 
     public final static String TCLASS1 = "com.jitlogic.zorka.test.spy.support.TestClass1";
     public final static String TCLASS2 = "com.jitlogic.zorka.test.spy.support.TestClass2";
+    public final static String TCLASS3 = "com.jitlogic.zorka.test.spy.support.TestClass3";
+
     public final static String TACLASS = "com.jitlogic.zorka.test.spy.support.ClassAnnotation";
     public final static String TAMETHOD = "com.jitlogic.zorka.test.spy.support.TestAnnotation";
 
