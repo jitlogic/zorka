@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.tracer;
+package com.jitlogic.zorka.spy;
 
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * This is simple trace printer. It receives stream of trace events
+ * This is simple standalone trace printer. It receives stream of trace events
  * and prints them in human-readable form to a print stream.
  *
  * @author rafal.lewczuk@jitlogic.com
@@ -62,8 +62,8 @@ public class TracePrinter extends TraceEventHandler {
 
 
     @Override
-    public void traceBegin(int traceId) {
-        out.println(spc(level) + "TRACE_BEGIN: " + sym(traceId));
+    public void traceBegin(int traceId, long clock) {
+        out.println(spc(level) + "TRACE_BEGIN: " + sym(traceId) + " clock=" + new Date(clock));
     }
 
 

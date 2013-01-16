@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.tracer;
+package com.jitlogic.zorka.spy;
 
 
 import com.jitlogic.zorka.util.ByteBuffer;
@@ -49,9 +49,10 @@ public class SimpleTraceFormat extends TraceEventHandler {
 
 
     @Override
-    public void traceBegin(int traceId) {
+    public void traceBegin(int traceId, long clock) {
         buf.putByte(TRACE_BEGIN);
         buf.putInt(traceId);
+        buf.putLong(clock);
     }
 
 
@@ -61,7 +62,6 @@ public class SimpleTraceFormat extends TraceEventHandler {
         buf.putInt(classId);
         buf.putInt(methodId);
         buf.putInt(signatureId);
-        buf.putLong(tstamp);
     }
 
 
@@ -134,10 +134,10 @@ public class SimpleTraceFormat extends TraceEventHandler {
             byte cmd = buf.getByte();
             switch (cmd) {
                 case TRACE_BEGIN:
-                    output.traceBegin(buf.getInt());
+                    output.traceBegin(buf.getInt(), buf.getLong());
                     break;
                 case TRACE_ENTER:
-                    output.traceEnter(buf.getInt(), buf.getInt(), buf.getInt(), buf.getLong());
+                    output.traceEnter(buf.getInt(), buf.getInt(), buf.getInt(), 0);
                     break;
                 case TRACE_RETURN:
                     output.traceReturn(buf.getLong());

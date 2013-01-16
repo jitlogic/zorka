@@ -16,8 +16,8 @@
 
 package com.jitlogic.zorka.test.spy.support;
 
-import com.jitlogic.zorka.tracer.TraceEventHandler;
-import com.jitlogic.zorka.tracer.TracedException;
+import com.jitlogic.zorka.spy.TraceEventHandler;
+import com.jitlogic.zorka.spy.TracedException;
 import com.jitlogic.zorka.util.ZorkaUtil;
 import org.junit.Assert;
 
@@ -30,8 +30,8 @@ public class TestTracer extends TraceEventHandler {
     private List<Map<Object,Object>> data = new ArrayList<Map<Object, Object>>();
 
     @Override
-    public void traceBegin(int traceId) {
-        data.add(ZorkaUtil.map("action", "traceBegin", "traceId", traceId));
+    public void traceBegin(int traceId, long clock) {
+        data.add(ZorkaUtil.map("action", "traceBegin", "traceId", traceId, "clock", clock));
     }
 
     @Override

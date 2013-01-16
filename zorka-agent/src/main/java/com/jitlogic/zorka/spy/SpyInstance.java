@@ -17,7 +17,6 @@ package com.jitlogic.zorka.spy;
 
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.tracer.Tracer;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
@@ -132,7 +131,7 @@ public class SpyInstance {
      * @param matcher matcher
      */
     public void include(SpyMatcher matcher) {
-        classTransformer.add(matcher);
+        tracer.include(matcher);
     }
 
 

@@ -14,11 +14,11 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.test.tracer;
+package com.jitlogic.zorka.test.spy;
 
+import com.jitlogic.zorka.spy.*;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 
-import com.jitlogic.zorka.tracer.*;
 import com.jitlogic.zorka.util.ByteBuffer;
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,9 +57,9 @@ public class TraceEncodingUnitTest {
 
     @Test
     public void testTraceBeginCmd() {
-        encoder.traceBegin(t1);
+        encoder.traceBegin(t1, 100L);
         decode();
-        output.check(0, "action", "traceBegin", "traceId", t1);
+        output.check(0, "action", "traceBegin", "traceId", t1, "clock", 100L);
     }
 
 
@@ -67,7 +67,7 @@ public class TraceEncodingUnitTest {
     public void testTraceEnterCmd() {
         encoder.traceEnter(c1, m1, s1, 100);
         decode();
-        output.check(0, "action", "traceEnter", "classId", c1, "methodId", m1, "signatureId", s1, "tstamp", 100L);
+        output.check(0, "action", "traceEnter", "classId", c1, "methodId", m1, "signatureId", s1, "tstamp", 0L);
     }
 
 
@@ -78,6 +78,14 @@ public class TraceEncodingUnitTest {
         output.check(0, "action", "traceReturn", "tstamp", 200L);
     }
 
+    @Test
+    public void testTraceBigLongNum() {
+        long l = System.nanoTime();
+        System.out.println(l);
+        encoder.traceReturn(l);
+        decode();
+        output.check(0, "tstamp", l);
+    }
 
     @Test
     public void traceErrorCmd() {
@@ -137,7 +145,7 @@ public class TraceEncodingUnitTest {
 
     @Test
     public void testSimpleTraceDecodeEncode() {
-        encoder.traceBegin(t1);
+        encoder.traceBegin(t1, 500L);
         encoder.traceEnter(c1, m1, s1, 100L);
         encoder.traceStats(10, 5);
         encoder.newAttr(a1, "http://some/ctx");

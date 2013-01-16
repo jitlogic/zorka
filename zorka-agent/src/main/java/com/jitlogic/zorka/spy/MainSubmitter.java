@@ -18,10 +18,12 @@
 package com.jitlogic.zorka.spy;
 
 import bsh.EvalError;
-import com.jitlogic.zorka.tracer.Tracer;
-import com.jitlogic.zorka.tracer.WrappedException;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.util.concurrent.atomic.AtomicLong;
+
+import static com.jitlogic.zorka.spy.SpyLib.SPD_CDISPATCHES;
 
 /**
  * Main submitter contains static methods that can be called directly by
@@ -31,6 +33,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author rafal.lewczuk@jitlogic.com
  */
 public class MainSubmitter {
+
+    private static final ZorkaLog log = ZorkaLogger.getLog(MainSubmitter.class);
 
     /** Submitter receiving full submissions */
     private static SpySubmitter submitter;
@@ -60,7 +64,10 @@ public class MainSubmitter {
             }
         } catch (EvalError e) {
             errorCount.incrementAndGet();
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
+                log.debug("Error submitting value from instrumented code: ", e);
+            }
             errorCount.incrementAndGet();
         }
     }
@@ -77,8 +84,15 @@ public class MainSubmitter {
 
         if (tracer != null) {
             try {
+                if (SpyInstance.isDebugEnabled(SpyLib.SPD_TRACE_ALL)) {
+                    log.debug("traceEnter(classId=" + classId + ", methodId="
+                            + methodId + ", signatureId=" + signatureId + ")");
+                }
                 tracer.getHandler().traceEnter(classId, methodId, signatureId, System.nanoTime());
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
+                    log.debug("Error executing traceEnter: ", e);
+                }
                 errorCount.incrementAndGet();
             }
         }
@@ -93,8 +107,14 @@ public class MainSubmitter {
 
         if (tracer != null) {
             try {
+                if (SpyInstance.isDebugEnabled(SpyLib.SPD_TRACE_ALL)) {
+                    log.debug("traceReturn()");
+                }
                 tracer.getHandler().traceReturn(System.nanoTime());
-            } catch (Exception e) {
+            } catch (Throwable e) {
+                if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
+                    log.debug("Error executing traceReturn: ", e);
+                }
                 errorCount.incrementAndGet();
             }
         }
@@ -111,8 +131,14 @@ public class MainSubmitter {
 
         if (tracer != null) {
             try {
+                if (SpyInstance.isDebugEnabled(SpyLib.SPD_TRACE_ALL)) {
+                    log.debug("traceError()", exception);
+                }
                 tracer.getHandler().traceError(new WrappedException(exception), System.nanoTime());
-            } catch (Exception e1) {
+            } catch (Throwable e) {
+                if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
+                    log.debug("Error executing traceError: ", e);
+                }
                 errorCount.incrementAndGet();
             }
         }

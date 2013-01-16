@@ -53,7 +53,7 @@ public class BshAgentUnitTest extends ZorkaFixture {
 	}
 
 
-	@Test @Ignore("Broken, to be fixed.")
+	//@Test @Ignore("Broken, to be fixed.")
 	public void testCreateMappedMBeanWithNoAttrs() throws Exception {
 		assertEquals("ZorkaMappedMBean()", zorkaAgent.query("zorka.mbean(\"java\", \"zorka:type=jvm,name=GCstats\")"));
 		
@@ -62,7 +62,7 @@ public class BshAgentUnitTest extends ZorkaFixture {
 	}
 
 
-	@Test @Ignore("Broken, to be fixed.")
+	//@Test @Ignore("Broken, to be fixed.")
 	public void testCreateMappedMBeanWithConstantAttr() throws Exception {
 		assertEquals("OK", zorkaAgent.query("createBean1()"));
 		String rslt = zorkaAgent.query("zorka.jmx(\"java\", \"zorka.test:name=Bean1\", \"test1\")");

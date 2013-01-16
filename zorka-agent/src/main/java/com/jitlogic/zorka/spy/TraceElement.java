@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.tracer;
+package com.jitlogic.zorka.spy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 
-public class TraceElement extends TraceEventHandler {
+public class TraceElement {
 
     private int traceId, classId, methodId, signatureId;
-    private long tstart, tstop;
+    private long clock, time;
     private long calls, errors;
 
     private TracedException exception;
@@ -39,49 +39,15 @@ public class TraceElement extends TraceEventHandler {
     }
 
 
-    @Override
-    public void traceBegin(int traceId) {
-        this.traceId = traceId;
+    public Object getAttr(int attrId) {
+        if (attrs != null) {
+            return attrs.get(attrId);
+        } else {
+            return null;
+        }
     }
 
-
-    @Override
-    public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
-        this.classId = classId;
-        this.methodId = methodId;
-        this.signatureId = signatureId;
-        this.tstart = tstamp;
-        this.calls++;
-    }
-
-
-    @Override
-    public void traceReturn(long tstamp) {
-        this.tstop = tstamp;
-    }
-
-    @Override
-    public void traceStats(long calls, long errors) {
-        this.calls = calls;
-        this.errors = errors;
-    }
-
-
-    @Override
-    public void traceError(TracedException exception, long tstamp) {
-        this.tstop = tstamp;
-        this.exception = exception;
-        this.errors++;
-    }
-
-
-    @Override
-    public void newSymbol(int symbolId, String symbolText) {
-    }
-
-
-    @Override
-    public void newAttr(int attrId, Object attrVal) {
+    public void setAttr(int attrId, Object attrVal) {
         if (attrs == null) {
             attrs = new HashMap<Integer,Object>();
         }
@@ -89,23 +55,16 @@ public class TraceElement extends TraceEventHandler {
     }
 
 
-
     public void addChild(TraceElement child) {
         if (children == null) {
             children = new ArrayList<TraceElement>();
         }
         children.add(child);
-        mergeChild(child);
-    }
-
-    public void mergeChild(TraceElement child) {
-        calls += child.calls;
-        errors += child.errors;
     }
 
 
     public void clean() {
-        tstart = tstop = 0;
+        time = 0;
         classId = methodId = signatureId = traceId = 0;
         attrs = null;
         children = null;
@@ -119,13 +78,14 @@ public class TraceElement extends TraceEventHandler {
 
 
     public boolean isBusy() {
-        return tstart > 0;
+        return classId != 0;
     }
 
 
     public boolean isTrace() {
         return traceId > 0;
     }
+
 
     public boolean hasAttrs() {
         return attrs != null;
@@ -136,23 +96,96 @@ public class TraceElement extends TraceEventHandler {
         return calls;
     }
 
+    public void setCalls(long calls) {
+        this.calls = calls;
+    }
+
 
     public long getErrors() {
         return errors;
     }
 
 
+    public void setErrors(long errors) {
+        this.errors = errors;
+    }
+
+    public int getClassId() {
+        return classId;
+    }
+
+
+    public void setClassId(int classId) {
+        this.classId = classId;
+    }
+
+
+    public int getMethodId() {
+        return methodId;
+    }
+
+
+    public void setMethodId(int methodId) {
+        this.methodId = methodId;
+    }
+
+
+    public int getSignatureId() {
+        return signatureId;
+    }
+
+
+
+    public long getClock() {
+        return clock;
+    }
+
+
+    public void setClock(long clock) {
+        this.clock = clock;
+    }
+
+
+    public void setSignatureId(int signatureId) {
+        this.signatureId = signatureId;
+    }
+
+
+    public int getTraceId() {
+        return traceId;
+    }
+
+
+    public void setTraceId(int traceId) {
+        this.traceId = traceId;
+    }
+
+
     public long getTime() {
-        return tstop > 0 ? tstop - tstart : 0;
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
+    }
+
+
+    public TracedException getException() {
+        return exception;
+    }
+
+
+    public void setException(TracedException exception) {
+        this.exception = exception;
     }
 
 
     public void traverse(TraceEventHandler output) {
         if (traceId != 0) {
-            output.traceBegin(traceId);
+            output.traceBegin(traceId, clock);
         }
 
-        output.traceEnter(classId, methodId, signatureId, tstart);
+        output.traceEnter(classId, methodId, signatureId, 0);
         output.traceStats(calls, errors);
 
         if (attrs != null) {
@@ -168,9 +201,9 @@ public class TraceElement extends TraceEventHandler {
         }
 
         if (exception != null) {
-            output.traceError(exception, tstop);
+            output.traceError(exception, time);
         } else {
-            output.traceReturn(tstop);
+            output.traceReturn(time);
         }
     }
 }

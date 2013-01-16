@@ -14,12 +14,12 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.test.tracer;
+package com.jitlogic.zorka.test.spy;
 
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.tracer.TraceElement;
+import com.jitlogic.zorka.spy.TraceElement;
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,7 +51,7 @@ public class TracerIntegTest extends ZorkaFixture {
 
     @Test
     public void testSimpleTooShortTrace() throws Exception {
-        spy.include(spy.byMethod(TCLASS1, "trivialMethod"));
+        spy.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
         spy.add(
                 spy.instance().onEnter(spy.traceBegin("TEST"))
                         .include(spy.byMethod(TCLASS1, "trivialMethod")));
@@ -66,7 +66,7 @@ public class TracerIntegTest extends ZorkaFixture {
 
     @Test
     public void testSimpleTrace() throws Exception {
-        spy.include(spy.byMethod(TCLASS1, "trivialMethod"));
+        spy.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
         spy.add(
             spy.instance().onEnter(spy.traceBegin("TEST"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
@@ -82,12 +82,14 @@ public class TracerIntegTest extends ZorkaFixture {
         rslt.check(1, "action", "traceEnter", "classId", sym(TCLASS1), "methodId", sym("trivialMethod"));
         rslt.check(2, "action", "traceStats", "calls", 1L, "errors", 0L);
         rslt.check(3, "action", "traceReturn");
+
+        assertTrue("clock time should be set to non-zero value", (Long)rslt.get(0, "clock") > 0);
     }
 
 
     @Test
     public void testSimpleTraceWithAttr() throws Exception {
-        spy.include(spy.byMethod(TCLASS1, "trivialMethod"));
+        spy.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
         spy.add(spy.instance().onEnter(
                 spy.traceBegin("TEST"), spy.put("URL", "http://some.url"), spy.traceAttr("URL", "URL")
         ).include(spy.byMethod(TCLASS1, "trivialMethod")));

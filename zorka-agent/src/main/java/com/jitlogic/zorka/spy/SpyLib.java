@@ -18,9 +18,6 @@
 package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.integ.SnmpLib;
-import com.jitlogic.zorka.tracer.TraceElement;
-import com.jitlogic.zorka.tracer.TraceEventHandler;
-import com.jitlogic.zorka.tracer.TraceFileWriter;
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.ZorkaTrapper;
 import com.jitlogic.zorka.integ.SnmpTrapper;
@@ -79,14 +76,20 @@ public class SpyLib {
     /** Log all submissions from instrumented code */
     public static final int SPD_SUBMISSIONS = 8;
 
+    /** Tracer debug messages */
+    public static final int SPD_TRACE_DEBUG = 9;
+
+    /** All possible tracer messages */
+    public static final int SPD_TRACE_ALL = 10;
+
     /** Log all encountered methods (only from transformed classes) */
-    public static final int SPD_METHODALL = 9;
+    public static final int SPD_METHODALL = 11;
 
     /** Log all classes going through transformer */
-    public static final int SPD_CLASSALL = 10;
+    public static final int SPD_CLASSALL = 12;
 
     /** Maximum possible debug log level */
-    public static final int SPD_MAX = 10;
+    public static final int SPD_MAX = 13;
 
 
     public static final String GT = ">";
@@ -173,6 +176,11 @@ public class SpyLib {
     }
 
 
+    public SpyInstance getInstance() {
+        return instance;
+    }
+
+
     /**
      * This is convenience function for monitoring execution times of methods. Execution times are stored in ZorkaStats
      * structure that is capable of storing statistics for multiple methods. Using expr argument it is possible to
@@ -226,9 +234,9 @@ public class SpyLib {
      *
      * @param matchers
      */
-    public void include(SpyMatcher...matchers) {
+    public void traceInclude(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
-            instance.getTracer().add(matcher);
+            instance.getTracer().include(matcher);
         }
     }
 
@@ -241,7 +249,7 @@ public class SpyLib {
      * @return spy matcher object
      */
     public SpyMatcher byClassAnnotation(String annotationName) {
-        return new SpyMatcher(SpyMatcher.CLASS_ANNOTATION, 1,
+        return new SpyMatcher(SpyMatcher.BY_CLASS_ANNOTATION, 1,
                 "L" + annotationName + ";", "~[a-zA-Z_].*$", null);
     }
 
@@ -255,7 +263,7 @@ public class SpyLib {
      * @return spy matcher object
      */
     public SpyMatcher byClassAnnotation(String annotationName, String methodPattern) {
-        return new SpyMatcher(SpyMatcher.CLASS_ANNOTATION, 1,
+        return new SpyMatcher(SpyMatcher.BY_CLASS_ANNOTATION |SpyMatcher.BY_METHOD_NAME, 1,
                 "L" + annotationName + ";", methodPattern, null);
     }
 
@@ -270,7 +278,7 @@ public class SpyLib {
      * @return spy matcher object
      */
     public SpyMatcher byMethodAnnotation(String classPattern, String methodAnnotation) {
-        return new SpyMatcher(SpyMatcher.METHOD_ANNOTATION, 1,
+        return new SpyMatcher(SpyMatcher.BY_CLASS_NAME|SpyMatcher.BY_METHOD_ANNOTATION, 1,
                 classPattern, "L" + methodAnnotation + ";", null);
     }
 
@@ -285,7 +293,7 @@ public class SpyLib {
      * @return spy matcher object
      */
     public SpyMatcher byClassMethodAnnotation(String classAnnotation, String methodAnnotation) {
-        return new SpyMatcher(SpyMatcher.CLASS_ANNOTATION|SpyMatcher.METHOD_ANNOTATION, 1,
+        return new SpyMatcher(SpyMatcher.BY_CLASS_ANNOTATION |SpyMatcher.BY_METHOD_ANNOTATION, 1,
                 "L" + classAnnotation + ";", "L" + methodAnnotation + ";", null);
     }
 
@@ -302,7 +310,7 @@ public class SpyLib {
      * @return new matcher object
      */
     public SpyMatcher byMethod(String classPattern, String methodPattern) {
-        return new SpyMatcher(0, 1, classPattern, methodPattern, null);
+        return new SpyMatcher(SpyMatcher.BY_CLASS_NAME|SpyMatcher.BY_METHOD_NAME, 1, classPattern, methodPattern, null);
     }
 
 
@@ -324,7 +332,8 @@ public class SpyLib {
      *
      */
     public SpyMatcher byMethod(int access, String classPattern, String methodPattern, String retType, String... argTypes) {
-        return new SpyMatcher(0, access, classPattern,  methodPattern, retType, argTypes);
+        return new SpyMatcher(SpyMatcher.BY_CLASS_NAME|SpyMatcher.BY_METHOD_NAME|SpyMatcher.BY_METHOD_SIGNATURE,
+                access, classPattern,  methodPattern, retType, argTypes);
     }
 
 

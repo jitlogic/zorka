@@ -16,6 +16,7 @@
  */
 package com.jitlogic.zorka.test.spy;
 
+import com.jitlogic.zorka.spy.SpyMatcherSet;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 import com.jitlogic.zorka.spy.SpyMatcher;
 import org.junit.Assert;
@@ -29,126 +30,110 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testSimpleClassOnlyMatch() {
-        SpyMatcher cm = new SpyMatcher(0, 0xFF, "com.jitlogic.zorka.spy.**", "*", null);
+        SpyMatcherSet sms = new SpyMatcherSet(new SpyMatcher(SpyMatcher.BY_CLASS_NAME, 0xFF, "com.jitlogic.zorka.spy.**", "*", null));
 
-        Assert.assertTrue(cm.matches(Arrays.asList("com.jitlogic.zorka.spy.unittest.SomeClass")));
-        Assert.assertTrue(cm.matches(Arrays.asList("com.jitlogic.zorka.spy.AClass")));
-        Assert.assertFalse(cm.matches(Arrays.asList("comXjitlogicXzorkaXspyXAClass")));
+        Assert.assertTrue(sms.classMatch("com.jitlogic.zorka.spy.unittest.SomeClass"));
+        Assert.assertTrue(sms.classMatch("com.jitlogic.zorka.spy.AClass"));
+        Assert.assertFalse(sms.classMatch("comXjitlogicXzorkaXspyXAClass"));
     }
 
     @Test
     public void testClassMatchWithSingleLevelWildcard() {
-        SpyMatcher cm = new SpyMatcher(0, 0xFF, "com.jitlogic.zorka.spy.*", "*", null);
-
-        Assert.assertFalse(cm.matches(Arrays.asList("com.jitlogic.zorka.spy.unittest.SomeClass")));
-        Assert.assertTrue(cm.matches(Arrays.asList("com.jitlogic.zorka.spy.AClass")));
-
+        SpyMatcherSet sms = new SpyMatcherSet(new SpyMatcher(SpyMatcher.BY_CLASS_NAME, 0xFF, "com.jitlogic.zorka.spy.*", "*", null));
+        Assert.assertFalse(sms.classMatch("com.jitlogic.zorka.spy.unittest.SomeClass"));
+        Assert.assertTrue(sms.classMatch("com.jitlogic.zorka.spy.AClass"));
     }
 
     @Test
     public void testClassMethodMatch() {
-        SpyMatcher cm = new SpyMatcher(0, 0xFF, "test.*", "get*", null);
-
-        Assert.assertTrue(cm.matches(Arrays.asList("test.SomeClass"), "getVal"));
-        Assert.assertFalse(cm.matches(Arrays.asList("test.SomeClass"), "setVal"));
+        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod("test.SomeClass", "get*"));
+        Assert.assertTrue(sms.methodMatch("test.SomeClass", null, null, 1, "getVal", "()I", null));
+        Assert.assertFalse(sms.methodMatch("test.SomeClass", null, null, 1, "setVal", "(I)V", null));
     }
 
     @Test
     public void testClassMethodStrictMatch() {
-        SpyMatcher cm = new SpyMatcher(0, 0xFF, "test.*", "get", null);
-
-        Assert.assertTrue(cm.matches(Arrays.asList("test.SomeClass"), "get"));
-        Assert.assertFalse(cm.matches(Arrays.asList("test.someClass"), "getValAndSome"));
+        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod("test.SomeClass", "get"));
+        Assert.assertTrue(sms.methodMatch("test.SomeClass", null, null, 1, "get", "()I", null));
+        Assert.assertFalse(sms.methodMatch("test.SomeClass", null, null, 1, "getVal", "()I", null));
     }
 
     @Test
     public void testClassMatchSignatureWithoutTypes() {
-        SpyMatcher cm = new SpyMatcher(0, 0xFF, "test.*", "get", null);
-
-        Assert.assertTrue(cm.matches(Arrays.asList("test.someClass"), "get", "()V"));
-        Assert.assertTrue(cm.matches(Arrays.asList("test.someClass"), "get", "(II)V"));
-        Assert.assertFalse(cm.matches(Arrays.asList("test.someClass"), "get", "malformed"));
+        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0, "test.*", "get", null));
+        Assert.assertTrue(sms.methodMatch("test.SomeClass", null, null, 1, "get", "()V", null));
+        Assert.assertTrue(sms.methodMatch("test.SomeClass", null, null, 1, "get", "(II)V", null));
+        Assert.assertFalse(sms.methodMatch("test.SomeClass", null, null, 1, "get", "malformed", null));
     }
 
     @Test
     public void testClassMatchSignatureWithReturnVoidType() {
-        SpyMatcher cm = new SpyMatcher(0, 0xFF, "test.*", "someMethod", "void");
-        Assert.assertTrue(cm.matches(Arrays.asList("test.SomeClass"), "someMethod", "()V"));
-        Assert.assertFalse(cm.matches(Arrays.asList("test.SomeClass"), "someMethod", "()Void"));
-        Assert.assertFalse(cm.matches(Arrays.asList("test.SomeClass"), "someMethod", "()I"));
+        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xff, "test.*", "someMethod", "void"));
+        Assert.assertTrue(sms.methodMatch("test.SomeClass", null, null, 1, "someMethod", "()V", null));
+        Assert.assertFalse(sms.methodMatch("test.SomeClass", null, null, 1, "someMethod", "()Void", null));
+        Assert.assertFalse(sms.methodMatch("test.SomeClass", null, null, 1, "someMethod", "()I", null));
     }
 
     @Test
     public void testClassMatchSignatureReturnClassType() {
-        SpyMatcher cm = new SpyMatcher(0, 0xFF, "test.*", "get", "java.lang.String");
-
-        Assert.assertTrue(cm.matches(Arrays.asList("test.SomeClass"), "get", "()Ljava/lang/String;"));
+        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xff, "test.*", "get", "java.lang.String"));
+        Assert.assertTrue(sms.methodMatch("test.someClass", null, null, 1, "get", "()Ljava/lang/String;", null));
     }
 
     @Test
     public void testClassMatchSignatureWithSimpleReturnAndArgumentType() {
+        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xff, "test.*", "frobnicate", "int", "int"));
         SpyMatcher cm = new SpyMatcher(0, 0xFF, "test.*", "frobnicate", "int", "int");
-
-        Assert.assertTrue(cm.matches(Arrays.asList("test.someClass"), "frobnicate", "(I)I"));
-        Assert.assertFalse(cm.matches(Arrays.asList("test.SomeClass"), "frobnicate", "(J)I"));
+        Assert.assertTrue(sms.methodMatch("test.someClass", null, null, 1, "frobnicate", "(I)I", null));
+        Assert.assertFalse(sms.methodMatch("test.someClass", null, null, 1, "frobnicate", "(J)I", null));
     }
 
 
     @Test
     public void testClassMatchSignatureWithStringType() {
-        SpyMatcher cm = new SpyMatcher(0, 0xFF, "test.*", "frobnicate", "String", "String");
-
-        Assert.assertTrue(cm.matches(Arrays.asList("test.someClass"), "frobnicate", "(Ljava/lang/String;)Ljava/lang/String;"));
-        Assert.assertFalse(cm.matches(Arrays.asList("test.SomeClass"), "frobnicate", "(J)I"));
+        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xff, "test.*", "frobnicate", "String", "String"));
+        Assert.assertTrue(sms.methodMatch("test.someClass", null, null, 1, "frobnicate", "(Ljava/lang/String;)Ljava/lang/String;", null));
+        Assert.assertFalse(sms.methodMatch("test.someClass", null, null, 1, "frobnicate", "(J)I", null));
     }
 
     @Test
     public void testClassMatchWithVariousArgs() {
-        SpyMatcher cm = new SpyMatcher(0, 0xFF, "test.*", "frobnicate",
-                "String", "int", "com.jitlogic.zorka.spy.CallInfo");
-
-        Assert.assertTrue(cm.matches(Arrays.asList("test.SomeClass"), "frobnicate",
-                "(ILcom/jitlogic/zorka/spy/CallInfo;)Ljava/lang/String;"));
+        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xff, "test.*", "frobnicate", "String", "int", "com.jitlogic.zorka.spy.CallInfo"));
+        Assert.assertTrue(sms.methodMatch("test.SomeClass", null, null, 1, "frobnicate", "(ILcom/jitlogic/zorka/spy/CallInfo;)Ljava/lang/String;", null));
     }
 
     @Test
     public void testClassMatchWithNoArgsMarker() {
-        SpyMatcher cm = new SpyMatcher(0, 0xFF, "test.*", "frobnicate", null, SM_NOARGS);
-
-        Assert.assertTrue(cm.matches(Arrays.asList("test.SomeClass"), "frobnicate", "()V"));
-        Assert.assertFalse(cm.matches(Arrays.asList("test.SomeClass"), "frobnicate", "(I)V"));
+        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xFF, "test.*", "frobnicate", null, SM_NOARGS));
+        Assert.assertTrue(sms.methodMatch("test.someClass", null, null, 1, "frobnicate", "()V", null));
+        Assert.assertFalse(sms.methodMatch("test.someClass", null, null, 1, "frobnicate", "(I)V", null));
     }
 
     @Test
     public void testMatchWithMoreAttributesAndNoArgsFlag() {
-        SpyMatcher cm = new SpyMatcher(0, 0xFF, "test.*", "frobnicate", null, "int", SM_NOARGS);
-
-        Assert.assertTrue(cm.matches(Arrays.asList("test.SomeClass"), "frobnicate", "(I)V"));
-        Assert.assertFalse(cm.matches(Arrays.asList("test.SomeClass"), "frobnicate", "(II)V"));
+        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xff, "test.*", "frobnicate", null, "int", SM_NOARGS));
+        Assert.assertTrue(sms.methodMatch("test.someClass", null, null, 1, "frobnicate", "(I)V", null));
+        Assert.assertFalse(sms.methodMatch("test.someClass", null, null, 1, "frobnicate", "(II)V", null));
     }
 
     @Test
     public void testMatchWithJustSomeAttributes() {
-        SpyMatcher cm = new SpyMatcher(0, 0xFF, "test.*", "frobnicate", null, "int");
-
-        Assert.assertTrue(cm.matches(Arrays.asList("test.SomeClass"), "frobnicate", "(I)V"));
-        Assert.assertTrue(cm.matches(Arrays.asList("test.SomeClass"), "frobnicate", "(II)V"));
+        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xFF, "test.*", "frobnicate", null, "int"));
+        Assert.assertTrue(sms.methodMatch("test.SomeClass", null, null, 1, "frobnicate", "(I)V", null));
+        Assert.assertTrue(sms.methodMatch("test.someClass", null, null, 1, "frobnicate", "(II)V", null));
     }
 
     @Test
     public void testMatchOnlyNames() {
-        SpyMatcher cm = new SpyMatcher(0, SpyMatcher.DEFAULT_FILTER, "test.someClass", "trivialMethod", null);
-
-        Assert.assertTrue(cm.matches(Arrays.asList("test.someClass"), "trivialMethod", "()V", 1));
-        Assert.assertTrue(cm.matches(Arrays.asList("test.someClass"), "trivialMethod", "(I)I", 1));
+        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod("test.someClass", "trivialMethod"));
+        Assert.assertTrue(sms.methodMatch("test.someClass", null, null, 1, "trivialMethod", "()V", null));
+        Assert.assertTrue(sms.methodMatch("test.someClass", null, null, 1, "trivialMethod", "(II)V", null));
     }
 
     @Test
     public void testMatchAnnotationBits() {
-        SpyMatcher m = spy.byClassAnnotation("some.Annotation");
-
-        Assert.assertEquals(true, m.hasClassAnnotation());
-        Assert.assertTrue(m.matches(Arrays.asList("Lsome.Annotation;"), "trivialMethod", "()V", 1));
+        SpyMatcherSet sms = new SpyMatcherSet(spy.byClassAnnotation("some.Annotation"));
+        Assert.assertTrue(sms.methodMatch(null, Arrays.asList("Lsome.Annotation;"), null, 1, "trivialMethod", "()V", null));
     }
 
 

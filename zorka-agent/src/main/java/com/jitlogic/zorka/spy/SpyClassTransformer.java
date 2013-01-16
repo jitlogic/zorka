@@ -17,8 +17,6 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.tracer.SymbolRegistry;
-import com.jitlogic.zorka.tracer.Tracer;
 import com.jitlogic.zorka.util.ZorkaLog;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import org.objectweb.asm.ClassReader;
@@ -111,15 +109,6 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
 
     /**
-     * Adds trace matcher.
-     *
-     * @param matcher matcher
-     */
-    public void add(SpyMatcher matcher) {
-        tracer.add(matcher);
-    }
-
-    /**
      * Resets spy transformer. Removes all added spy definitions.
      * All submissions coming from existing probes will be ignored.
      */
@@ -144,23 +133,24 @@ public class SpyClassTransformer implements ClassFileTransformer {
                 log.debug("Encountered class: " + className);
             }
 
-            if (sdef.match(Arrays.asList(clazzName)) || sdef.hasClassAnnotation()) {
+            if (sdef.getMatcherSet().classMatch(clazzName)) {
 
-                if (SpyInstance.isDebugEnabled(SPD_CLASSXFORM)) {
-                    log.debug("Transforming class: " + className);
-                }
 
                 found.add(sdef);
             }
         }
 
-        List<SpyMatcher> foundTraceMatchers = tracer.findMatchers(clazzName);
+        boolean classMatch = tracer.getMatcherSet().classMatch(clazzName);
 
+        if (found.size() > 0 || classMatch) {
 
-        if (found.size() > 0 || foundTraceMatchers.size() > 0) {
+            if (SpyInstance.isDebugEnabled(SPD_CLASSXFORM)) {
+                log.debug("Transforming class: " + className);
+            }
+
             ClassReader cr = new ClassReader(classfileBuffer);
             ClassWriter cw = new ClassWriter(cr, 0);
-            ClassVisitor scv = createVisitor(clazzName, found, foundTraceMatchers, cw);
+            ClassVisitor scv = createVisitor(clazzName, found, tracer, cw);
             cr.accept(scv, 0);
             return cw.toByteArray();
         }
@@ -179,8 +169,8 @@ public class SpyClassTransformer implements ClassFileTransformer {
      *
      * @return class visitor for instrumenting this class
      */
-    protected ClassVisitor createVisitor(String className, List<SpyDefinition> found, List<SpyMatcher> foundTraceMatchers, ClassWriter cw) {
-        return new SpyClassVisitor(this, className, found, foundTraceMatchers, cw);
+    protected ClassVisitor createVisitor(String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
+        return new SpyClassVisitor(this, className, found, tracer, cw);
     }
 
 

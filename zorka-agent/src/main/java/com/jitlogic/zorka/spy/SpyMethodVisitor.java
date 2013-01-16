@@ -17,12 +17,14 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.tracer.SymbolRegistry;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.objectweb.asm.Opcodes.*;
@@ -39,6 +41,8 @@ import static java.lang.Math.max;
  */
 public class SpyMethodVisitor extends MethodVisitor {
 
+    private static final ZorkaLog log = ZorkaLogger.getLog(SpyMethodVisitor.class);
+
     /** Class that receives data from probes */
     private final static String SUBMIT_CLASS = "com/jitlogic/zorka/spy/MainSubmitter";
 
@@ -51,10 +55,6 @@ public class SpyMethodVisitor extends MethodVisitor {
     private static final String RETURN_SIGNATURE = "()V";
     private static final String ERROR_METHOD = "traceError";
     private static final String ERROR_SIGNATURE = "(Ljava/lang/Throwable;)V";
-
-
-    /** Debug mode */
-    private static boolean debug;
 
     /** Access flags of (instrumented) method */
     private final int access;
@@ -100,10 +100,18 @@ public class SpyMethodVisitor extends MethodVisitor {
     private final Label lTryHandler = new Label();
 
     /** Boolean flag used when method annotation matching is required */
-    private boolean matches;
+    private boolean matches = false;
 
     /** Boolean flag indicating if tracer code should be injected. */
     private SymbolRegistry symbolRegistry;
+
+    private List<String> annotations =  new ArrayList<String>();
+
+    private List<String> classAnnotations;
+
+    private List<String> classInterfaces;
+
+    private List<Boolean> ctxMatches = new ArrayList<Boolean>();
 
     /**
      * Standard constructor.
@@ -117,16 +125,20 @@ public class SpyMethodVisitor extends MethodVisitor {
      * @param mv method visitor (next in processing chain)
      */
     public SpyMethodVisitor(boolean matches, SymbolRegistry symbolRegistry,
-                            String className, int access, String methodName, String methodSignature,
+                            String className, List<String> classAnnotations, List<String> classInterfaces,
+                            int access, String methodName, String methodSignature,
                             List<SpyContext> ctxs, MethodVisitor mv) {
         super(V1_6, mv);
         this.matches = matches;
         this.symbolRegistry = symbolRegistry;
         this.className = className;
+        this.classAnnotations = classAnnotations;
+        this.classInterfaces = classInterfaces;
         this.access = access;
         this.methodName = methodName;
         this.methodSignature = methodSignature;
         this.ctxs = ctxs;
+
 
 
         argTypes = Type.getArgumentTypes(methodSignature);
@@ -176,52 +188,55 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     @Override
     public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-        if (!matches) {
-            for (SpyContext ctx : ctxs) {
-                for (SpyMatcher matcher : ctx.getSpyDefinition().getMatchers()) {
-                    if (matcher.matchMethodAnnotation(desc.replace("/", "."))) {
-                        matches = true;
-                    }
-                }
-            }
-        }
+        annotations.add(desc.replace("/", "."));
         return super.visitAnnotation(desc, visible);
     }
+
+
 
     @Override
     public void visitCode() {
         mv.visitCode();
 
-        if (!matches) {
-            return;
+        for (SpyContext ctx : ctxs) {
+            SpyMatcherSet sms = ctx.getSpyDefinition().getMatcherSet();
+            ctxMatches.add((!sms.hasMethodAnnotations()) || sms.methodMatch(className, classAnnotations, classInterfaces,
+                    access, methodName, methodSignature, annotations));
         }
+
 
         // Add trace probe if required
         if (symbolRegistry != null) {
+            if (SpyInstance.isDebugEnabled(SPD_METHODXFORM)) {
+                log.debug("Will trace method: " + methodName);
+            }
             stackDelta = max(stackDelta, emitTraceEnter(
                     symbolRegistry.symbolId(className),
                     symbolRegistry.symbolId(methodName),
                     symbolRegistry.symbolId(methodSignature)));
         }
 
-        // TODO we have bug here: if single sdef matches, probes from all sdefs are inserted
 
         // ON_ENTER probes are inserted here
-        for (SpyContext ctx : ctxs) {
+        for (int i = 0; i < ctxs.size(); i++) {
+            if (!ctxMatches.get(i)) {
+                continue;
+            }
+            SpyContext ctx = ctxs.get(i);
             SpyDefinition sdef = ctx.getSpyDefinition();
             if (sdef.getProbes(ON_ENTER).size() > 0 || sdef.getProcessors(ON_ENTER).size() > 0) {
                 stackDelta = max(stackDelta, emitProbes(ON_ENTER, ctx));
             }
         }
 
-        mv.visitTryCatchBlock(lTryFrom, lTryTo, lTryHandler, null);
+        //mv.visitTryCatchBlock(lTryFrom, lTryTo, lTryHandler, null);
         mv.visitLabel(lTryFrom);
     }
 
 
     @Override
     public void visitInsn(int opcode) {
-        if (matches && opcode >= IRETURN && opcode <= RETURN) {
+        if (opcode >= IRETURN && opcode <= RETURN) {
 
             // ON_RETURN probes are inserted here
             if (returnProbe != null) {
@@ -229,6 +244,9 @@ public class SpyMethodVisitor extends MethodVisitor {
             }
 
             for (int i = ctxs.size()-1; i >= 0; i--) {
+                if (!ctxMatches.get(i)) {
+                    continue;
+                }
                 SpyContext ctx = ctxs.get(i);
                 SpyDefinition sdef = ctx.getSpyDefinition();
                 if (getSubmitFlags(ctx.getSpyDefinition(), ON_ENTER) == SF_NONE ||
@@ -249,11 +267,6 @@ public class SpyMethodVisitor extends MethodVisitor {
     @Override
     public void visitMaxs(int maxStack, int maxLocals) {
 
-        if (!matches) {
-            mv.visitMaxs(maxStack,  maxLocals);
-            return;
-        }
-
         mv.visitLabel(lTryTo);
         mv.visitLabel(lTryHandler);
 
@@ -262,6 +275,9 @@ public class SpyMethodVisitor extends MethodVisitor {
         }
 
         for (int i = ctxs.size()-1; i >= 0; i--) {
+            if (!ctxMatches.get(i)) {
+                continue;
+            }
             SpyContext ctx = ctxs.get(i);
             SpyDefinition sdef = ctx.getSpyDefinition();
             if (getSubmitFlags(ctx.getSpyDefinition(), ON_ENTER) == SF_NONE ||
@@ -275,6 +291,7 @@ public class SpyMethodVisitor extends MethodVisitor {
         }
 
         mv.visitInsn(ATHROW);
+        mv.visitTryCatchBlock(lTryFrom, lTryTo, lTryHandler, null);
         mv.visitMaxs(maxStack + stackDelta, max(maxLocals, retValProbeSlot + 1));
     }
 
@@ -406,7 +423,6 @@ public class SpyMethodVisitor extends MethodVisitor {
                 SpyProbe element = probeElements.get(i);
                 mv.visitInsn(DUP);
                 emitLoadInt(i);
-                //sd = max(sd, emitProbeElement(stage, 0, probeElements.get(i)) + 6);
                 sd = max(sd, probeElements.get(i).emit(this, stage, 0) + 6);
                 mv.visitInsn(AASTORE);
             }
@@ -438,24 +454,5 @@ public class SpyMethodVisitor extends MethodVisitor {
             mv.visitLdcInsn(new Integer(v));
         }
     }
-
-
-    /**
-     * Injects debug messages into instrumented method. This is sometimes useful to debug
-     * instrumentation engine.
-     *
-     * @param msg message to be injected.
-     */
-    private void emitDebugPrint(String msg) {
-        if (debug) {
-            mv.visitFieldInsn(GETSTATIC,
-                    "java/lang/System", "out", "Ljava/io/PrintStream;");
-            mv.visitLdcInsn(msg);
-            mv.visitMethodInsn(INVOKEVIRTUAL,
-                    "java/io/PrintStream", "println", "(Ljava/lang/String;)V");
-        }
-    }
-
-    // TODO consider using LDC instruction to pass spy contexts directly instead of using concurrent context map in dispatcher
 
 }
