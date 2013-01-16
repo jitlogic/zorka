@@ -14,12 +14,16 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.tracer;
+package com.jitlogic.zorka.spy;
 
 
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
 public class SymbolEnricher extends TraceEventHandler {
+
+    private static final ZorkaLog log = ZorkaLogger.getLog(SymbolEnricher.class);
 
     private long[] mask;
 
@@ -44,7 +48,11 @@ public class SymbolEnricher extends TraceEventHandler {
         }
 
         if (0 == (mask[idx] & (1 << bit))) {
-            output.newSymbol(id, symbols.symbolName(id));
+            String sym = symbols.symbolName(id);
+            if (SpyInstance.isDebugEnabled(SpyLib.SPD_TRACE_DEBUG)) {
+                log.debug("Adding symbol '" + sym + "' <- " + id);
+            }
+            output.newSymbol(id, sym);
             mask[idx] |= (1 << bit);
         }
 
@@ -52,6 +60,9 @@ public class SymbolEnricher extends TraceEventHandler {
 
 
     public void reset() {
+        if (SpyInstance.isDebugEnabled(SpyLib.SPD_TRACE_DEBUG)) {
+            log.debug("Resetting symbol enricher.");
+        }
         for (int i = 0; i < mask.length; i++) {
             mask[i] = 0;
         }
@@ -59,9 +70,9 @@ public class SymbolEnricher extends TraceEventHandler {
 
 
     @Override
-    public void traceBegin(int traceId) {
+    public void traceBegin(int traceId, long clock) {
         check(traceId);
-        output.traceBegin(traceId);
+        output.traceBegin(traceId, clock);
     }
 
 

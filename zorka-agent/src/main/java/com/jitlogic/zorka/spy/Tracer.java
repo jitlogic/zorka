@@ -14,21 +14,16 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.tracer;
+package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.spy.SpyMatcher;
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class Tracer {
 
     private long methodTime = 250000;
 
     /** Defines which classes and methods should be traced. */
-    private List<SpyMatcher> traceMatchers = new ArrayList<SpyMatcher>();
+    private SpyMatcherSet matcherSet = new SpyMatcherSet();
 
     /** Symbol registry for tracer */
     private SymbolRegistry symbolRegistry = new SymbolRegistry();
@@ -54,8 +49,8 @@ public class Tracer {
     }
 
 
-    public void add(SpyMatcher matcher) {
-        traceMatchers.add(matcher);
+    public void include(SpyMatcher matcher) {
+        matcherSet.include(matcher);
     }
 
 
@@ -68,18 +63,8 @@ public class Tracer {
         this.methodTime = methodTime;
     }
 
-
-    public List<SpyMatcher> findMatchers(String clazzName) {
-        List<SpyMatcher> foundTraceMatchers = new ArrayList<SpyMatcher>();
-
-        for (SpyMatcher matcher : traceMatchers) {
-            if (matcher.matches(Arrays.asList(clazzName))) {
-                if (matcher.matches(Arrays.asList(clazzName))) {
-                    foundTraceMatchers.add(matcher);
-                }
-            }
-        }
-
-        return foundTraceMatchers;
+    public SpyMatcherSet getMatcherSet() {
+        return matcherSet;
     }
+
 }

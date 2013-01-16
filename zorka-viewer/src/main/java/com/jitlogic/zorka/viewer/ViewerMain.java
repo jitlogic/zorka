@@ -14,25 +14,28 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy;
+package com.jitlogic.zorka.viewer;
 
-import java.util.Map;
+import javax.swing.*;
+import java.awt.*;
 
-public class TraceAttrProcessor implements SpyProcessor {
+public class ViewerMain {
 
-    private Tracer tracer;
-    private String srcField;
-    private int attrId;
+    public static void main(String[] args) throws Exception {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-    public TraceAttrProcessor(Tracer tracer, String srcField, String traceAttr) {
-        this.tracer = tracer;
-        this.srcField = srcField;
-        this.attrId = tracer.getSymbolRegistry().symbolId(traceAttr);
+        EventQueue.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    MainWindow window = new MainWindow();
+                    window.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
-    @Override
-    public Map<String, Object> process(Map<String, Object> record) {
-        tracer.getHandler().newAttr(attrId, record.get(srcField));
-        return record;
-    }
 }

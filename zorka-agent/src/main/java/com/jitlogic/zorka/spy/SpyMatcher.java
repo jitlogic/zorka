@@ -34,11 +34,13 @@ import static com.jitlogic.zorka.spy.SpyLib.SM_NOARGS;
  */
 public class SpyMatcher {
 
+
     /** Maps primitive types to type codes used by JVM */
     private static final Map<String,String> typeCodes = ZorkaUtil.constMap(
             "void", "V", "boolean", "Z", "byte", "B", "char", "C",
             "short", "S", "int", "I", "long", "J", "float", "F", "double", "D"
     );
+
 
     /** Maps regular expression special characters (sequences) to escaped sequences. */
     private static final Map<Character,String> regexChars = ZorkaUtil.constMap(
@@ -46,20 +48,26 @@ public class SpyMatcher {
     );
 
 
-    /** Access bits and custom matcher flags */
-    private int access, flags;
+    /** List of common methods (typically omitted by instrumentation) */
+    public static final Set<String> COMMON_METHODS = ZorkaUtil.set("toString", "equals", "hashCode", "valueOf");
 
-    /** Flag that marks classPattern as class annotation rather than class name */
-    public static final int CLASS_ANNOTATION  = 0x01;
 
-    /** Flag that marks methodPattern as method annotation rather than method name */
-    public static final int METHOD_ANNOTATION = 0x02;
+    public static final int BY_CLASS_NAME        = 0x001;
+    public static final int BY_CLASS_ANNOTATION  = 0x002;
+    public static final int BY_INTERFACE         = 0x004;
+    public static final int BY_METHOD_NAME       = 0x008;
+    public static final int BY_METHOD_SIGNATURE  = 0x010;
+    public static final int BY_METHOD_ANNOTATION = 0x020;
+    public static final int NO_CONSTRUCTORS      = 0x040;
+    public static final int NO_ACCESSORS         = 0x080;
+    public static final int NO_COMMONS           = 0x100;
+    public static final int EXCLUDE_MATCH        = 0x800;
 
     /** Special access bit - package private */
     public static final int ACC_PKGPRIV = 0x10000;
 
     /** No methods will regarding access bits */
-    public static final int NULL_FILTER    = 0x0000;
+    public static final int NULL_FILTER = 0x0000;
 
     /** Default filter: public and package private methods match */
     public static final int DEFAULT_FILTER = ACC_PUBLIC|ACC_PKGPRIV;
@@ -67,8 +75,12 @@ public class SpyMatcher {
     /** Public, private, protected and package private methods will match */
     public static final int ANY_FILTER     = ACC_PUBLIC|ACC_PRIVATE|ACC_PROTECTED|ACC_PKGPRIV;
 
+    /** Access bits and custom matcher flags */
+    private int access, flags;
+
     /** Regexps for matching class name/annotation, method name/annotation and method descriptor */
-    private Pattern classMatch, methodMatch, descriptorMatch;
+    private Pattern classPattern, methodPattern, signaturePattern;
+
 
     /**
      * Standard constructor
@@ -88,11 +100,19 @@ public class SpyMatcher {
     public SpyMatcher(int flags, int access, String className, String methodName, String retType, String... argTypes) {
         this.flags = flags;
         this.access = access;
-        this.classMatch = toSymbolMatch(className);
-        this.methodMatch = toSymbolMatch(methodName);
-        this.descriptorMatch = toDescriptorMatch(retType, argTypes);
+        this.classPattern = toSymbolMatch(className);
+        this.methodPattern = toSymbolMatch(methodName);
+        this.signaturePattern = toDescriptorMatch(retType, argTypes);
     }
 
+
+    private SpyMatcher(int flags, int access, Pattern classPattern, Pattern methodPattern, Pattern signaturePattern) {
+        this.access = access;
+        this.flags = flags;
+        this.classPattern = classPattern;
+        this.methodPattern = methodPattern;
+        this.signaturePattern = signaturePattern;
+    }
 
     /**
      * Converts symbol match pattern (string) to regular expression object.
@@ -217,114 +237,51 @@ public class SpyMatcher {
     }
 
 
-    /**
-     * Returns true if matcher contains class annotation (instead of class name pattern)
-     *
-     * @return true if matcher contains class annotation
-     */
-    public boolean hasClassAnnotation() {
-        return 0 != (flags & CLASS_ANNOTATION);
+    public int getFlags() {
+        return flags;
     }
 
 
-    /**
-     * Returns true if matcher contains method annotation istead of method name pattern
-     *
-     * @return true or false
-     */
-    public boolean hasMethodAnnotation() {
-        return 0 != (flags & METHOD_ANNOTATION);
+    public int getAccess() {
+        return access;
     }
 
 
-    /**
-     * Returns true if any of candidate strings matches class pattern (be it single class name or
-     * multiple class annotation names)
-     *
-     * @param classCandidates list of className candidates
-     *
-     * @return true if any candidate matches
-     */
-    public boolean matches(List<String> classCandidates) {
-        for (String cm : classCandidates) {
-            if (classMatch.matcher(cm).matches()) {
-                return true;
-            }
-        }
-        return false;
+    public Pattern getClassPattern() {
+        return classPattern;
     }
 
 
-    /**
-     * Returns true if given method annotation matches
-     *
-     * @param name methnod annotation name (full name with package prefix)
-     *
-     * @return true if METHOD_ANNOTATION flag is on and passed name matches methodPattern
-     */
-    public boolean matchMethodAnnotation(String name) {
-        return hasMethodAnnotation() && methodMatch.matcher(name).matches();
+    public Pattern getMethodPattern() {
+        return methodPattern;
     }
 
 
-    /**
-     * Returns true if any of candidate class names matches classPattern and methodName matches methodPattern.
-     *
-     * @param classCandidates list containing class name or names of class annotations
-     *
-     * @param methodName method name
-     *
-     * @return true or false
-     */
-    public boolean matches(List<String> classCandidates, String methodName) {
-        return matches(classCandidates) && methodMatch.matcher(methodName).matches();
+    public Pattern getSignaturePattern() {
+        return signaturePattern;
     }
 
 
-    /**
-     * Returns true if any of candudate class names matches classPattern, methodName matches methodPattern
-     * and methodDescriptor matches method descriptor pattern.
-     *
-     * @param classCandidates list containing class name or names of class annotations
-     *
-     * @param methodName method name
-     *
-     * @param descriptor method descriptor (JVM form)
-     *
-     * @return true or false
-     */
-    public boolean matches(List<String> classCandidates, String methodName, String descriptor) {
-        return matches(classCandidates, methodName) && descriptorMatch.matcher(descriptor).matches();
+    public SpyMatcher exclude() {
+        return new SpyMatcher(flags | EXCLUDE_MATCH, access, classPattern, methodPattern, signaturePattern);
     }
 
 
-    /**
-     * Returns true if any of candidate class names matches classPattern, methodName matches methodPattern,
-     * methodDescriptor matches method descriptor pattern and access flags match
-     *
-     * @param classCandidates list containing class name or names of class annotations
-     *
-     * @param methodName method name
-     *
-     * @param descriptor method descriptor (JVM form)
-     *
-     * @param access method access flags
-     *
-     * @return true or false
-     */
-    public boolean matches(List<String> classCandidates, String methodName, String descriptor, int access) {
-        return matches(classCandidates, methodName, descriptor) && matches(access);
+    public SpyMatcher noConstructors() {
+        return new SpyMatcher(flags | NO_CONSTRUCTORS, access, classPattern, methodPattern, signaturePattern);
     }
 
 
-    /**
-     * Returns true if access flags match
-     *
-     * @param access method access flags
-     *
-     * @return true or false
-     */
-    private boolean matches(int access) {
-        return this.access == 0 ||  (this.access & access) != 0;
+    public SpyMatcher noAccessors() {
+        return new SpyMatcher(flags | NO_ACCESSORS, access, classPattern, methodPattern, signaturePattern);
+    }
+
+
+    public SpyMatcher noCommons() {
+        return new SpyMatcher(flags | NO_COMMONS, access, classPattern, methodPattern, signaturePattern);
+    }
+
+    public SpyMatcher forTrace() {
+        return new SpyMatcher(flags|NO_CONSTRUCTORS|NO_ACCESSORS|NO_COMMONS, access, classPattern, methodPattern, signaturePattern);
     }
 }

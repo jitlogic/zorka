@@ -650,4 +650,21 @@ public class ZorkaUtil {
 
         return Collections.unmodifiableMap(map);
     }
+
+    /**
+     * Creates a set from supplied strings.
+     *
+     * @param objs members of newly formed set
+     *
+     * @return set of strings
+     */
+    public static <T> Set<T> set(T...objs) {
+        Set<T> set = new HashSet<T>(objs.length * 2 + 1);
+        for (T s : objs) {
+            set.add(s);
+        }
+
+        return Collections.unmodifiableSet(set);
+    }
+
 }

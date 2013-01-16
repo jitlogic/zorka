@@ -14,12 +14,12 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.test.tracer;
+package com.jitlogic.zorka.test.spy;
 
-import com.jitlogic.zorka.tracer.SymbolRegistry;
-import com.jitlogic.zorka.tracer.TraceBuilder;
-import com.jitlogic.zorka.tracer.TraceElement;
-import com.jitlogic.zorka.tracer.WrappedException;
+import com.jitlogic.zorka.spy.SymbolRegistry;
+import com.jitlogic.zorka.spy.TraceBuilder;
+import com.jitlogic.zorka.spy.TraceElement;
+import com.jitlogic.zorka.spy.WrappedException;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
@@ -64,7 +64,7 @@ public class TraceBuilderUnitTest {
     @Test
     public void testSingleTraceWithOneShortElement() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
-        builder.traceBegin(t1);
+        builder.traceBegin(t1, 100L);
         builder.traceReturn(100*MS+100);
 
         assertEquals("Nothing should be sent to output", 0, output.getData().size());
@@ -74,7 +74,7 @@ public class TraceBuilderUnitTest {
     @Test
     public void testSingleOneElementTrace() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
-        builder.traceBegin(t1);
+        builder.traceBegin(t1, 200L);
         builder.traceReturn(200*MS);
 
         Assert.assertEquals("Output actions mismatch.",
@@ -86,7 +86,7 @@ public class TraceBuilderUnitTest {
     @Test
     public void testSingleTraceWithOneChildElement() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
-        builder.traceBegin(t1);
+        builder.traceBegin(t1, 300L);
         builder.traceEnter(c1, m2, s1, 200*MS);
         builder.traceReturn(300*MS);
         builder.traceReturn(400*MS);
@@ -102,7 +102,7 @@ public class TraceBuilderUnitTest {
     @Test
     public void testTraceWithErrorElement() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
-        builder.traceBegin(t1);
+        builder.traceBegin(t1, 400L);
         builder.traceError(new WrappedException(new Exception("oja!")), 200*MS);
 
         Assert.assertEquals("Output actions mismatch.",
@@ -114,7 +114,7 @@ public class TraceBuilderUnitTest {
     @Test
     public void testTraceWithShortErrorChildElement() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
-        builder.traceBegin(t1);
+        builder.traceBegin(t1, 500L);
         builder.traceEnter(c1, m2, s1, 200 * MS);
         builder.traceError(new WrappedException(new Exception("oja!")), 200 * MS + 100);
         builder.traceReturn(400 * MS);
@@ -129,7 +129,7 @@ public class TraceBuilderUnitTest {
     @Test
     public void testMixedTraceWithSomeShortElementsAndSomeErrors() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
-        builder.traceBegin(t1);
+        builder.traceBegin(t1, 600L);
         builder.traceEnter(c1, m2, s1, 110*MS);
         builder.traceReturn(110 * MS + 100);
         builder.traceEnter(c1, m2, s1, 120*MS);
@@ -146,7 +146,7 @@ public class TraceBuilderUnitTest {
     @Test
     public void testAttrsEncode() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
-        builder.traceBegin(t1);
+        builder.traceBegin(t1, 700L);
         builder.newAttr(a1, "some val");
         builder.newAttr(a2, "other val");
         builder.traceReturn(110*MS);

@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.tracer;
+package com.jitlogic.zorka.spy;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -48,6 +48,17 @@ public class SymbolRegistry {
 
     public String symbolName(int symbolId) {
         return idents.get(symbolId);
+    }
+
+
+    public void put(int symbolId, String symbol) {
+        symbols.put(symbol, symbolId);
+        idents.put(symbolId, symbol);
+
+        // TODO not thread safe !
+        if (symbolId > idCounter.get()) {
+            idCounter.set(symbolId);
+        }
     }
 
 

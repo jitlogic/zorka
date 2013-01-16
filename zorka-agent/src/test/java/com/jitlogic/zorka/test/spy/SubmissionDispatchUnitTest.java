@@ -43,7 +43,7 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
 
     @Before
     public void initEngine() {
-        engine = new TestSpyTransformer();
+        engine = new TestSpyTransformer(spyInstance.getTracer());
         collector = new TestCollector();
         submitter = new DispatchingSubmitter(engine);
     }
