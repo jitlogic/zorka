@@ -32,8 +32,7 @@ public class TraceSet extends TraceEventHandler {
 
     @Override
     public void traceBegin(int traceId, long clock) {
-        top.setMarker(new TraceMarker(top, traceId, top.getClock()));
-        top.setMarker(new TraceMarker(top, top.getTraceId(), clock));
+        top.setMarker(new TraceMarker(null, top, traceId, clock));
     }
 
 

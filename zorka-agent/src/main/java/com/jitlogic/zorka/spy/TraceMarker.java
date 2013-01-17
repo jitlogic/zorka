@@ -20,15 +20,23 @@ public class TraceMarker {
 
     private int traceId;
     private long clock;
+
+    private TraceMarker parent;
     private TraceRecord root;
 
-    private long minimumTime = 1;
+    private long minimumTime;
 
 
-    public TraceMarker(TraceRecord root, int traceId, long clock) {
+    public TraceMarker(TraceMarker parent, TraceRecord root, int traceId, long clock) {
+        this.parent = parent;
         this.root = root;
         this.traceId = traceId;
         this.clock = clock;
+    }
+
+
+    public TraceMarker getParent() {
+        return parent;
     }
 
 
