@@ -32,6 +32,7 @@ public class TraceBuilder extends TraceEventHandler {
     private final static ZorkaLog log = ZorkaLogger.getLog(TraceBuilder.class);
 
     private long methodTime = 250000;
+    private long defaultTraceTime = 50000000;
 
     /** Output */
     private ZorkaAsyncThread<TraceRecord> output;
@@ -68,7 +69,7 @@ public class TraceBuilder extends TraceEventHandler {
         }
 
         mtop = new TraceMarker(mtop, ttop, traceId, clock);
-        mtop.setMinimumTime(methodTime);
+        mtop.setMinimumTime(defaultTraceTime);
         ttop.setMarker(mtop);
     }
 
@@ -153,6 +154,14 @@ public class TraceBuilder extends TraceEventHandler {
         } else {
             ttop = parent != null ? parent : new TraceRecord(null);
         }
+
     } // pop()
+
+
+    public void setMinimumTraceTime(long minimumTraceTime) {
+        if (mtop != null) {
+            mtop.setMinimumTime(minimumTraceTime);
+        }
+    }
 
 }

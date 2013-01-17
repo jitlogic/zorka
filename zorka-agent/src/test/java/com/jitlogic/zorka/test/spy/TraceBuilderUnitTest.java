@@ -130,6 +130,7 @@ public class TraceBuilderUnitTest {
     public void testMixedTraceWithSomeShortElementsAndSomeErrors() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
         builder.traceBegin(t1, 600L);
+        builder.setMinimumTraceTime(0);
         builder.traceEnter(c1, m2, s1, 110*MS);
         builder.traceReturn(110 * MS + 100);
         builder.traceEnter(c1, m2, s1, 120*MS);
@@ -143,10 +144,12 @@ public class TraceBuilderUnitTest {
         assertEquals("Number of recorded calls.", 3L, output.getData().get(2).get("calls"));
     }
 
+
     @Test
     public void testAttrsEncode() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
         builder.traceBegin(t1, 700L);
+        builder.setMinimumTraceTime(0);
         builder.newAttr(a1, "some val");
         builder.newAttr(a2, "other val");
         builder.traceReturn(110*MS);

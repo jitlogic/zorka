@@ -1,12 +1,9 @@
 package com.jitlogic.zorka.test.support;
 
-import com.jitlogic.zorka.spy.MainSubmitter;
+import com.jitlogic.zorka.spy.*;
 import com.jitlogic.zorka.test.spy.support.TestSpyTransformer;
 import com.jitlogic.zorka.test.spy.support.TestSubmitter;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
-import com.jitlogic.zorka.spy.SymbolRegistry;
-import com.jitlogic.zorka.spy.TraceEventHandler;
-import com.jitlogic.zorka.spy.Tracer;
 import org.junit.After;
 import org.junit.Before;
 

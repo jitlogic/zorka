@@ -427,9 +427,14 @@ public class SpyLib {
      * @return spy processor object triggering new trace
      */
     public SpyProcessor traceBegin(String name) {
-        return new TraceBeginProcessor(instance.getTracer(), name);
+        return new TraceBeginProcessor(instance.getTracer(), name, -1);
     }
 
+
+
+    public SpyProcessor traceBegin(String name, long minimumTraceTime) {
+        return new TraceBeginProcessor(instance.getTracer(), name, minimumTraceTime * 1000000L);
+    }
 
     /**
      * Attaches attribute to trace record.

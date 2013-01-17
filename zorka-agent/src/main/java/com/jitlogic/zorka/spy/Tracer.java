@@ -31,9 +31,10 @@ public class Tracer {
     /** Output handler is initially set to null implementation. */
     private ZorkaAsyncThread<TraceRecord> output;
 
-    private ThreadLocal<TraceEventHandler> localHandlers =
-        new ThreadLocal<TraceEventHandler>() {
-            public TraceEventHandler initialValue() {
+
+    private ThreadLocal<TraceBuilder> localHandlers =
+        new ThreadLocal<TraceBuilder>() {
+            public TraceBuilder initialValue() {
                 return new TraceBuilder(output, methodTime);
             }
         };
@@ -62,6 +63,7 @@ public class Tracer {
     public void setMethodTime(long methodTime) {
         this.methodTime = methodTime;
     }
+
 
     public SpyMatcherSet getMatcherSet() {
         return matcherSet;
