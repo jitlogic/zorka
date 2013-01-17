@@ -29,7 +29,7 @@ public class TraceToTextConverter extends TraceEventHandler {
     private int spaces = 0;
 
 
-    public TraceToTextConverter(NamedTraceElement trace) {
+    public TraceToTextConverter(NamedTraceRecord trace) {
         this.symbols = trace.getSymbols();
         trace.traverse(this);
     }

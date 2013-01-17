@@ -29,7 +29,7 @@ public class Tracer {
     private SymbolRegistry symbolRegistry = new SymbolRegistry();
 
     /** Output handler is initially set to null implementation. */
-    private ZorkaAsyncThread<TraceElement> output;
+    private ZorkaAsyncThread<TraceRecord> output;
 
     private ThreadLocal<TraceEventHandler> localHandlers =
         new ThreadLocal<TraceEventHandler>() {
@@ -54,7 +54,7 @@ public class Tracer {
     }
 
 
-    public void setOutput(ZorkaAsyncThread<TraceElement> output) {
+    public void setOutput(ZorkaAsyncThread<TraceRecord> output) {
         this.output = output;
     }
 

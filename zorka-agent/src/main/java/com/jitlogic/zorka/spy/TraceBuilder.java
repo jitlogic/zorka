@@ -29,18 +29,18 @@ public class TraceBuilder extends TraceEventHandler {
 
     private long methodTime = 250000;
 
-    private ZorkaAsyncThread<TraceElement> output;
+    private ZorkaAsyncThread<TraceRecord> output;
 
-    private TraceElement top = new TraceElement(null);
+    private TraceRecord top = new TraceRecord(null);
 
 
 
-    public TraceBuilder(ZorkaAsyncThread<TraceElement> output) {
+    public TraceBuilder(ZorkaAsyncThread<TraceRecord> output) {
         this.output = output;
     }
 
 
-    public TraceBuilder(ZorkaAsyncThread<TraceElement> output, long methodTime) {
+    public TraceBuilder(ZorkaAsyncThread<TraceRecord> output, long methodTime) {
         this.output = output;
         this.methodTime = methodTime;
     }
@@ -48,15 +48,15 @@ public class TraceBuilder extends TraceEventHandler {
 
     @Override
     public void traceBegin(int traceId, long clock) {
-        top.setTraceMarker(new TraceMarker(top, traceId, top.getClock()));
-        top.setTraceMarker(new TraceMarker(top, top.getTraceId(), clock));
+        top.setMarker(new TraceMarker(top, traceId, top.getClock()));
+        top.setMarker(new TraceMarker(top, top.getTraceId(), clock));
     }
 
 
     @Override
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
         if (top.getClassId() != 0) {
-            top = new TraceElement(top);
+            top = new TraceRecord(top);
         }
 
         top.setClassId(classId);
@@ -102,12 +102,12 @@ public class TraceBuilder extends TraceEventHandler {
 
     private void pop() {
         boolean clean = true;
-        if (top.getTraceMarker() != null && top.getTime() >= methodTime) {
+        if (top.getMarker() != null && top.getTime() >= methodTime) {
             output.submit(top);
             clean = false;
         }
 
-        TraceElement parent = top.getParent();
+        TraceRecord parent = top.getParent();
 
         if (parent != null) {
             if (top.getTime() > methodTime || top.getErrors() > 0) {
@@ -121,7 +121,7 @@ public class TraceBuilder extends TraceEventHandler {
         if (clean) {
             top.clean();
         } else {
-            top = parent != null ? parent : new TraceElement(null);
+            top = parent != null ? parent : new TraceRecord(null);
         }
     } // pop()
 

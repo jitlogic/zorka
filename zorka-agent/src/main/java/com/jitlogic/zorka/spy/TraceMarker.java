@@ -20,19 +20,19 @@ public class TraceMarker {
 
     private int traceId;
     private long clock;
-    private TraceElement root;
+    private TraceRecord root;
 
     private long minimumTime = 1;
 
 
-    public TraceMarker(TraceElement root, int traceId, long clock) {
+    public TraceMarker(TraceRecord root, int traceId, long clock) {
         this.root = root;
         this.traceId = traceId;
         this.clock = clock;
     }
 
 
-    public TraceElement getRoot() {
+    public TraceRecord getRoot() {
         return root;
     }
 

@@ -28,20 +28,20 @@ import java.util.Map;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TraceElement {
+public class TraceRecord {
 
     private int classId, methodId, signatureId;
     private long time;
     private long calls, errors;
 
-    private TraceMarker traceMarker;
+    private TraceMarker marker;
     private TracedException exception;
-    private TraceElement parent;
+    private TraceRecord parent;
     private Map<Integer,Object> attrs;
-    private List<TraceElement> children;
+    private List<TraceRecord> children;
 
 
-    public TraceElement(TraceElement parent) {
+    public TraceRecord(TraceRecord parent) {
         this.parent = parent;
     }
 
@@ -63,15 +63,15 @@ public class TraceElement {
     }
 
 
-    public void addChild(TraceElement child) {
+    public void addChild(TraceRecord child) {
         if (children == null) {
-            children = new ArrayList<TraceElement>();
+            children = new ArrayList<TraceRecord>();
         }
         children.add(child);
     }
 
 
-    public TraceElement getChild(int i) {
+    public TraceRecord getChild(int i) {
         if (children != null && i < children.size()) {
             return children.get(i);
         } else {
@@ -80,7 +80,7 @@ public class TraceElement {
     }
 
 
-    public TraceElement getParent() {
+    public TraceRecord getParent() {
         return parent;
     }
 
@@ -136,7 +136,7 @@ public class TraceElement {
 
 
     public long getClock() {
-        return traceMarker != null ? traceMarker.getClock() : 0L;
+        return marker != null ? marker.getClock() : 0L;
     }
 
 
@@ -146,7 +146,7 @@ public class TraceElement {
 
 
     public int getTraceId() {
-        return traceMarker != null ? traceMarker.getTraceId() : 0;
+        return marker != null ? marker.getTraceId() : 0;
     }
 
 
@@ -170,19 +170,19 @@ public class TraceElement {
     }
 
 
-    public TraceMarker getTraceMarker() {
-        return traceMarker;
+    public TraceMarker getMarker() {
+        return marker;
     }
 
 
-    public void setTraceMarker(TraceMarker traceMarker) {
-        this.traceMarker = traceMarker;
+    public void setMarker(TraceMarker marker) {
+        this.marker = marker;
     }
 
 
     public void traverse(TraceEventHandler output) {
-        if (traceMarker != null) {
-            output.traceBegin(traceMarker.getTraceId(), getClock());
+        if (marker != null) {
+            output.traceBegin(marker.getTraceId(), getClock());
         }
 
         output.traceEnter(classId, methodId, signatureId, 0);
@@ -195,7 +195,7 @@ public class TraceElement {
         }
 
         if (children != null) {
-            for (TraceElement child : children) {
+            for (TraceRecord child : children) {
                 child.traverse(output);
             }
         }
@@ -218,7 +218,7 @@ public class TraceElement {
         classId = methodId = signatureId = 0;
         attrs = null;
         children = null;
-        traceMarker = null;
+        marker = null;
         calls = errors = 0;
     }
 

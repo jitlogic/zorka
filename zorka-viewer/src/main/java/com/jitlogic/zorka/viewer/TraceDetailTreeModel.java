@@ -35,7 +35,7 @@ public class TraceDetailTreeModel extends AbstractTreeTableModel {
     }
 
 
-    public void setRoot(NamedTraceElement root) {
+    public void setRoot(NamedTraceRecord root) {
         this.root = root != null ? root : new JXFrame();
         modelSupport.fireTreeStructureChanged(new TreePath(root));
     }
@@ -60,13 +60,13 @@ public class TraceDetailTreeModel extends AbstractTreeTableModel {
     @Override
     public Object getValueAt(Object o, int i) {
 
-        if (o instanceof NamedTraceElement) {
-            NamedTraceElement el = (NamedTraceElement)o;
+        if (o instanceof NamedTraceRecord) {
+            NamedTraceRecord el = (NamedTraceRecord)o;
             switch (i) {
                 case 0:
                     return ViewerUtil.nanoSeconds(el.getTime());
                 case 1:
-                    return ViewerUtil.percent(el.getTime(), ((NamedTraceElement)root).getTime());
+                    return ViewerUtil.percent(el.getTime(), ((NamedTraceRecord) root).getTime());
                 case 2:
                     return el.getCalls();
                 case 3:
@@ -82,8 +82,8 @@ public class TraceDetailTreeModel extends AbstractTreeTableModel {
 
     @Override
     public Object getChild(Object parent, int index) {
-        if (parent instanceof NamedTraceElement) {
-            NamedTraceElement el = (NamedTraceElement)parent;
+        if (parent instanceof NamedTraceRecord) {
+            NamedTraceRecord el = (NamedTraceRecord)parent;
             return el.getChild(index);
         }
 
@@ -93,15 +93,15 @@ public class TraceDetailTreeModel extends AbstractTreeTableModel {
 
     @Override
     public int getChildCount(Object parent) {
-        return parent instanceof NamedTraceElement ? ((NamedTraceElement)parent).childCount() : 0;
+        return parent instanceof NamedTraceRecord ? ((NamedTraceRecord)parent).childCount() : 0;
     }
 
 
     @Override
     public int getIndexOfChild(Object parent, Object child) {
-        if (parent instanceof NamedTraceElement && child instanceof NamedTraceElement) {
-            NamedTraceElement p = (NamedTraceElement)parent;
-            NamedTraceElement c = (NamedTraceElement)child;
+        if (parent instanceof NamedTraceRecord && child instanceof NamedTraceRecord) {
+            NamedTraceRecord p = (NamedTraceRecord)parent;
+            NamedTraceRecord c = (NamedTraceRecord)child;
 
             for (int i = 0; i < p.childCount(); i++) {
                 if (c.equals(p.getChild(i))) {

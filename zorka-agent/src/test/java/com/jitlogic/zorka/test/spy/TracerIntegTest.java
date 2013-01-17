@@ -19,7 +19,7 @@ package com.jitlogic.zorka.test.spy;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.spy.TraceElement;
+import com.jitlogic.zorka.spy.TraceRecord;
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +32,7 @@ public class TracerIntegTest extends ZorkaFixture {
 
     private TestTracer rslt = new TestTracer();
 
-    private ZorkaAsyncThread<TraceElement> output;
+    private ZorkaAsyncThread<TraceRecord> output;
 
     private int sym(String s) {
         return spyInstance.getTracer().getSymbolRegistry().symbolId(s);
@@ -41,11 +41,11 @@ public class TracerIntegTest extends ZorkaFixture {
     @Before
     public void initOutput() {
         rslt = new TestTracer();
-        output = new ZorkaAsyncThread<TraceElement>("test") {
-            @Override public void submit(TraceElement obj) {
+        output = new ZorkaAsyncThread<TraceRecord>("test") {
+            @Override public void submit(TraceRecord obj) {
                 obj.traverse(rslt);
             }
-            @Override protected void process(TraceElement obj) { }
+            @Override protected void process(TraceRecord obj) { }
         };
     }
 

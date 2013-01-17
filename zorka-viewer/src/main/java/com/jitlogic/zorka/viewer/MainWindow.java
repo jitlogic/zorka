@@ -65,7 +65,7 @@ public class MainWindow extends JFrame {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            NamedTraceElement el = traceSet.get(rowIndex);
+            NamedTraceRecord el = traceSet.get(rowIndex);
 
             switch (columnIndex) {
                 case 0:

@@ -25,15 +25,15 @@ import java.util.List;
 public class TraceSet extends TraceEventHandler {
 
     private SymbolRegistry symbols = new SymbolRegistry();
-    private List<NamedTraceElement> traces = new ArrayList<NamedTraceElement>();
+    private List<NamedTraceRecord> traces = new ArrayList<NamedTraceRecord>();
 
-    private NamedTraceElement top = new NamedTraceElement(symbols, null);
+    private NamedTraceRecord top = new NamedTraceRecord(symbols, null);
 
 
     @Override
     public void traceBegin(int traceId, long clock) {
-        top.setTraceMarker(new TraceMarker(top, traceId, top.getClock()));
-        top.setTraceMarker(new TraceMarker(top, top.getTraceId(), clock));
+        top.setMarker(new TraceMarker(top, traceId, top.getClock()));
+        top.setMarker(new TraceMarker(top, top.getTraceId(), clock));
     }
 
 
@@ -41,7 +41,7 @@ public class TraceSet extends TraceEventHandler {
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
 
         if (top.getClassId() != 0) {
-            top = new NamedTraceElement(symbols, top);
+            top = new NamedTraceRecord(symbols, top);
         }
 
         top.setClassId(classId);
@@ -91,7 +91,7 @@ public class TraceSet extends TraceEventHandler {
             top = top.getParent();
         } else {
             traces.add(top);
-            top = new NamedTraceElement(symbols, null);
+            top = new NamedTraceRecord(symbols, null);
         }
     }
 
@@ -101,7 +101,7 @@ public class TraceSet extends TraceEventHandler {
     }
 
 
-    public NamedTraceElement get(int i) {
+    public NamedTraceRecord get(int i) {
         return traces.get(i);
     }
 

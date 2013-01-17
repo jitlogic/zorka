@@ -150,7 +150,7 @@ public class SpyLib {
     }
 
 
-    public void tracerOutput(ZorkaAsyncThread<TraceElement> output) {
+    public void tracerOutput(ZorkaAsyncThread<TraceRecord> output) {
         instance.getTracer().setOutput(output);
     }
 
@@ -444,7 +444,7 @@ public class SpyLib {
 
 
 
-    public ZorkaAsyncThread<TraceElement> traceFile(String path, int maxFiles, long maxSize) {
+    public ZorkaAsyncThread<TraceRecord> traceFile(String path, int maxFiles, long maxSize) {
         TraceFileWriter writer = new TraceFileWriter(path, instance.getTracer().getSymbolRegistry(), maxFiles, maxSize);
         writer.start();
         return writer;
