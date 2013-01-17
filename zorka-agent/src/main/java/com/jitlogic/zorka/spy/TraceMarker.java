@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.spy;
 
-public class TraceRecord {
+public class TraceMarker {
 
     private int traceId;
     private long clock;
@@ -25,7 +25,7 @@ public class TraceRecord {
     private long minimumTime = 1;
 
 
-    public TraceRecord(TraceElement root, int traceId, long clock) {
+    public TraceMarker(TraceElement root, int traceId, long clock) {
         this.root = root;
         this.traceId = traceId;
         this.clock = clock;

@@ -48,14 +48,14 @@ public class TraceBuilder extends TraceEventHandler {
 
     @Override
     public void traceBegin(int traceId, long clock) {
-        top.setTraceRecord(new TraceRecord(top, traceId, top.getClock()));
-        top.setTraceRecord(new TraceRecord(top, top.getTraceId(), clock));
+        top.setTraceMarker(new TraceMarker(top, traceId, top.getClock()));
+        top.setTraceMarker(new TraceMarker(top, top.getTraceId(), clock));
     }
 
 
     @Override
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
-        if (top.isBusy()) {
+        if (top.getClassId() != 0) {
             top = new TraceElement(top);
         }
 
@@ -70,7 +70,7 @@ public class TraceBuilder extends TraceEventHandler {
     @Override
     public void traceReturn(long tstamp) {
 
-        while (!top.isBusy() && top.getParent() != null) {
+        while (!(top.getClassId() != 0) && top.getParent() != null) {
             top = top.getParent();
         }
 
@@ -82,7 +82,7 @@ public class TraceBuilder extends TraceEventHandler {
     @Override
     public void traceError(TracedException exception, long tstamp) {
 
-        while (!top.isBusy() && top.getParent() != null) {
+        while (!(top.getClassId() != 0) && top.getParent() != null) {
             top = top.getParent();
         }
 
@@ -102,7 +102,7 @@ public class TraceBuilder extends TraceEventHandler {
 
     private void pop() {
         boolean clean = true;
-        if (top.isTrace() && top.getTime() >= methodTime) {
+        if (top.getTraceMarker() != null && top.getTime() >= methodTime) {
             output.submit(top);
             clean = false;
         }

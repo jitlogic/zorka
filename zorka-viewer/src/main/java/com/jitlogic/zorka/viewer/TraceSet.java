@@ -32,15 +32,15 @@ public class TraceSet extends TraceEventHandler {
 
     @Override
     public void traceBegin(int traceId, long clock) {
-        top.setTraceRecord(new TraceRecord(top, traceId, top.getClock()));
-        top.setTraceRecord(new TraceRecord(top, top.getTraceId(), clock));
+        top.setTraceMarker(new TraceMarker(top, traceId, top.getClock()));
+        top.setTraceMarker(new TraceMarker(top, top.getTraceId(), clock));
     }
 
 
     @Override
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
 
-        if (top.isBusy()) {
+        if (top.getClassId() != 0) {
             top = new NamedTraceElement(symbols, top);
         }
 
