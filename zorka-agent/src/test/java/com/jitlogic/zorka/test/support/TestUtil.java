@@ -75,7 +75,7 @@ public class TestUtil extends ClassLoader {
 
 
 
-    public static Object getField(Object obj, String fieldName) throws Exception {
+    public static <T> T getField(Object obj, String fieldName) throws Exception {
 
         Field field = lookupField(obj.getClass(), fieldName);
         boolean accessible = field.isAccessible();
@@ -85,7 +85,7 @@ public class TestUtil extends ClassLoader {
 
         field.setAccessible(accessible);
 
-        return retVal;
+        return (T)retVal;
     }
 
 

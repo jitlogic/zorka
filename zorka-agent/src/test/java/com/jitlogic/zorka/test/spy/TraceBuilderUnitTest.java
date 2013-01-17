@@ -22,6 +22,7 @@ import com.jitlogic.zorka.spy.TraceRecord;
 import com.jitlogic.zorka.spy.WrappedException;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 
+import com.jitlogic.zorka.test.support.TestUtil;
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import org.junit.Assert;
 import org.junit.Test;
@@ -157,5 +158,14 @@ public class TraceBuilderUnitTest {
         Assert.assertEquals("Output actions mismatch.",
             Arrays.asList("traceBegin", "traceEnter", "traceStats", "newAttr", "newAttr", "traceReturn"),
             output.listAttr("action"));
+    }
+
+    @Test
+    public void testSkipTraceRecordsIfNoMarkerIsSet() throws Exception {
+        builder.traceEnter(c1, m1, s1, 100*MS);
+        builder.traceEnter(c1, m2, s1, 100*MS);
+
+        TraceRecord top = TestUtil.getField(builder, "ttop");
+        Assert.assertTrue("Trace record top should have no parent.", top.getParent() == null);
     }
 }

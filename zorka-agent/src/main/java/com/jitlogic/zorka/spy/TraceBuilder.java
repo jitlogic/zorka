@@ -77,7 +77,11 @@ public class TraceBuilder extends TraceEventHandler {
     @Override
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
         if (ttop.getClassId() != 0) {
-            ttop = new TraceRecord(ttop);
+            if (mtop != null) {
+                ttop = new TraceRecord(ttop);
+            } else {
+                ttop.clean();
+            }
         }
 
         ttop.setClassId(classId);
