@@ -87,14 +87,11 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
     public void testTryCatchSimpleCatch() throws Exception {
         spy.traceInclude(spy.byMethod(TCLASS3, "tryCatchFinally0"));
 
-        engine.enableDebug();
-
         Object obj = instantiate(engine, TCLASS3);
         invoke(obj, "tryCatchFinally0", true);
 
         assertEquals("Outer try { } block didn't execute.", 1, getField(obj, "calls"));
         assertEquals("Inner catch { } block didn't execute.", 1, getField(obj, "catches"));
-        //assertEquals(2, output.size());
     }
 
 
@@ -102,23 +99,18 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
     public void testTryCatchFinallyWithEmbeddedCatch() throws Exception {
         spy.traceInclude(spy.byMethod(TCLASS3, "tryCatchFinally1"));
 
-        engine.enableDebug();
-
         Object obj = instantiate(engine, TCLASS3);
         invoke(obj, "tryCatchFinally1", true);
 
         assertEquals("Outer try { } block didn't execute.", 1, getField(obj, "calls"));
         assertEquals("Inner catch { } block didn't execute.", 1, getField(obj, "catches"));
         assertEquals("Outer finally { } block didn't execute.", 1, getField(obj, "finals"));
-        //assertEquals(2, output.size());
     }
 
 
     @Test
     public void testTryCatchEmbeddedCatch() throws Exception {
-        //spy.traceInclude(spy.byMethod(TCLASS3, "tryCatchFinally2"));
-
-        engine.enableDebug();
+        spy.traceInclude(spy.byMethod(TCLASS3, "tryCatchFinally2"));
 
         Object obj = instantiate(engine, TCLASS3);
         invoke(obj, "tryCatchFinally2", true);
@@ -126,7 +118,6 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         assertEquals("Outer try { } block didn't execute.", 1, getField(obj, "calls"));
         assertEquals("Inner catch { } block didn't execute.", 1, getField(obj, "catches"));
         assertEquals("Outer finally { } block didn't execute.", 0, getField(obj, "finals"));
-        //assertEquals(2, output.size());
     }
 
 }

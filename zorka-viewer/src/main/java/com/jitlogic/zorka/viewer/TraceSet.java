@@ -16,10 +16,7 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.spy.SimpleTraceFormat;
-import com.jitlogic.zorka.spy.SymbolRegistry;
-import com.jitlogic.zorka.spy.TraceEventHandler;
-import com.jitlogic.zorka.spy.TracedException;
+import com.jitlogic.zorka.spy.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -35,8 +32,8 @@ public class TraceSet extends TraceEventHandler {
 
     @Override
     public void traceBegin(int traceId, long clock) {
-        top.setTraceId(traceId);
-        top.setClock(clock);
+        top.setTraceRecord(new TraceRecord(top, traceId, top.getClock()));
+        top.setTraceRecord(new TraceRecord(top, top.getTraceId(), clock));
     }
 
 

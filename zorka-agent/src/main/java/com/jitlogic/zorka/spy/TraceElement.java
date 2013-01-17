@@ -24,10 +24,11 @@ import java.util.Map;
 
 public class TraceElement {
 
-    private int traceId, classId, methodId, signatureId;
-    private long clock, time;
+    private int classId, methodId, signatureId;
+    private long time;
     private long calls, errors;
 
+    private TraceRecord traceRecord;
     private TracedException exception;
     private TraceElement parent;
     private Map<Integer,Object> attrs;
@@ -79,9 +80,10 @@ public class TraceElement {
 
     public void clean() {
         time = 0;
-        classId = methodId = signatureId = traceId = 0;
+        classId = methodId = signatureId = 0;
         attrs = null;
         children = null;
+        traceRecord = null;
         calls = errors = 0;
     }
 
@@ -97,7 +99,7 @@ public class TraceElement {
 
 
     public boolean isTrace() {
-        return traceId > 0;
+        return traceRecord != null;
     }
 
 
@@ -151,12 +153,7 @@ public class TraceElement {
 
 
     public long getClock() {
-        return clock;
-    }
-
-
-    public void setClock(long clock) {
-        this.clock = clock;
+        return traceRecord != null ? traceRecord.getClock() : 0L;
     }
 
 
@@ -166,12 +163,7 @@ public class TraceElement {
 
 
     public int getTraceId() {
-        return traceId;
-    }
-
-
-    public void setTraceId(int traceId) {
-        this.traceId = traceId;
+        return traceRecord != null ? traceRecord.getTraceId() : 0;
     }
 
 
@@ -194,9 +186,19 @@ public class TraceElement {
     }
 
 
+    public TraceRecord getTraceRecord() {
+        return traceRecord;
+    }
+
+
+    public void setTraceRecord(TraceRecord traceRecord) {
+        this.traceRecord = traceRecord;
+    }
+
+
     public void traverse(TraceEventHandler output) {
-        if (traceId != 0) {
-            output.traceBegin(traceId, clock);
+        if (traceRecord != null) {
+            output.traceBegin(traceRecord.getTraceId(), getClock());
         }
 
         output.traceEnter(classId, methodId, signatureId, 0);

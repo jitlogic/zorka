@@ -23,7 +23,7 @@ import com.jitlogic.zorka.util.ZorkaAsyncThread;
  * This class receives loose tracer submissions from single thread
  * and constructs traces.
  *
- *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class TraceBuilder extends TraceEventHandler {
 
@@ -48,8 +48,8 @@ public class TraceBuilder extends TraceEventHandler {
 
     @Override
     public void traceBegin(int traceId, long clock) {
-        top.setTraceId(traceId);
-        top.setClock(clock);
+        top.setTraceRecord(new TraceRecord(top, traceId, top.getClock()));
+        top.setTraceRecord(new TraceRecord(top, top.getTraceId(), clock));
     }
 
 
