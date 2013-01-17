@@ -47,6 +47,7 @@ public class TraceElement {
         }
     }
 
+
     public void setAttr(int attrId, Object attrVal) {
         if (attrs == null) {
             attrs = new HashMap<Integer,Object>();
@@ -60,6 +61,19 @@ public class TraceElement {
             children = new ArrayList<TraceElement>();
         }
         children.add(child);
+    }
+
+
+    public TraceElement getChild(int i) {
+        if (children != null && i < children.size()) {
+            return children.get(i);
+        } else {
+            return null;
+        }
+    }
+
+    public int childCount() {
+        return children != null ? children.size() : 0;
     }
 
 
