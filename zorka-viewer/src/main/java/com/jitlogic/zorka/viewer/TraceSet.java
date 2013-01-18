@@ -66,7 +66,7 @@ public class TraceSet extends TraceEventHandler {
 
 
     @Override
-    public void traceStats(long calls, long errors) {
+    public void traceStats(long calls, long errors, int flags) {
         top.setCalls(calls);
         top.setErrors(errors);
     }

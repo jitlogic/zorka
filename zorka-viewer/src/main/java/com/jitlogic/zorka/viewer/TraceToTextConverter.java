@@ -40,36 +40,46 @@ public class TraceToTextConverter extends TraceEventHandler {
         }
     }
 
+    @Override
     public void traceBegin(int traceId, long clock) {
         spc(spaces);
         sb.append("BEGIN " + symbols.symbolName(traceId) + " (" + new Date(clock) + ")" + "\n");
     }
 
 
+    @Override
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
         spc(spaces); spaces += 2;
         sb.append("ENTER " + symbols.symbolName(classId) + "." + symbols.symbolName(methodId) + " " + symbols.symbolName(signatureId) + "\n");
     }
 
 
+    @Override
     public void traceReturn(long tstamp) {
         spc(spaces); spaces -= 2;
         sb.append("RETURN (t=" + tstamp + ")" + "\n");
     }
 
 
+    @Override
     public void traceError(TracedException exception, long tstamp) {
         spc(spaces); spaces -= 2;
         sb.append("ERROR (t=" + tstamp + ") " + exception + "\n");
     }
 
 
-    public void traceStats(long calls, long errors) {
+    @Override
+    public void traceStats(long calls, long errors, int flags) {
         spc(spaces);
-        sb.append("STATS calls=" + calls + ", errors=" + errors + "\n");
+        sb.append("STATS calls=" + calls + ", errors=" + errors + ", flags=" + flags + "\n");
+    }
+
+    @Override
+    public void newSymbol(int symbolId, String symbolText) {
     }
 
 
+    @Override
     public void newAttr(int attrId, Object attrVal) {
         spc(spaces);
         sb.append("ATTR " + symbols.symbolName(attrId) + " -> " + attrVal + "\n") ;

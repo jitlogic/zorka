@@ -97,9 +97,9 @@ public class TraceEncodingUnitTest {
 
     @Test
     public void traceStatsCmd() {
-        encoder.traceStats(100, 50);
+        encoder.traceStats(100, 50, 1);
         decode();
-        output.check(0, "action", "traceStats", "calls", 100L, "errors", 50L);
+        output.check(0, "action", "traceStats", "calls", 100L, "errors", 50L, "flags", 1);
     }
 
 
@@ -147,7 +147,7 @@ public class TraceEncodingUnitTest {
     public void testSimpleTraceDecodeEncode() {
         encoder.traceBegin(t1, 500L);
         encoder.traceEnter(c1, m1, s1, 100L);
-        encoder.traceStats(10, 5);
+        encoder.traceStats(10, 5, 1);
         encoder.newAttr(a1, "http://some/ctx");
         encoder.traceReturn(200L);
 

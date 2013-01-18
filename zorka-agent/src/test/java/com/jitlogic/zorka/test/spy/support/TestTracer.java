@@ -50,8 +50,8 @@ public class TestTracer extends TraceEventHandler {
     }
 
     @Override
-    public void traceStats(long calls, long errors) {
-        data.add(ZorkaUtil.map("action", "traceStats", "calls", calls, "errors", errors));
+    public void traceStats(long calls, long errors, int flags) {
+        data.add(ZorkaUtil.map("action", "traceStats", "calls", calls, "errors", errors, "flags", flags));
     }
 
     @Override

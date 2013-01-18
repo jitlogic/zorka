@@ -104,8 +104,8 @@ public class SymbolEnricher extends TraceEventHandler {
 
 
     @Override
-    public void traceStats(long calls, long errors) {
-        output.traceStats(calls, errors);
+    public void traceStats(long calls, long errors, int flags) {
+        output.traceStats(calls, errors, flags);
     }
 
 

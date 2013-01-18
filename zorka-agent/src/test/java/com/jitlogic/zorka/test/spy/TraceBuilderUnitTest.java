@@ -169,10 +169,10 @@ public class TraceBuilderUnitTest {
     @Test
     public void testTraceRecordLimitHorizontal() throws Exception {
         Tracer.setDefaultTraceSize(3);
-        builder.setMinimumTraceTime(0);
 
         builder.traceEnter(c1, m1, s1, 1*MS);
         builder.traceBegin(t1, 2*MS);
+        builder.setMinimumTraceTime(0);
 
         builder.traceEnter(c1, m2, s1, 3*MS);
         builder.traceReturn(4*MS);
@@ -184,7 +184,7 @@ public class TraceBuilderUnitTest {
         builder.traceReturn(10*MS);
 
         TraceRecord top = TestUtil.getField(builder, "ttop");
-        assertEquals("Should limit to 3 children (and have empty record on top of stack)",
+        assertEquals("Should limit to 4 children (and have empty record on top of stack)",
                         3, top.getParent().childCount());
 
         builder.traceReturn(11*MS);
@@ -219,5 +219,8 @@ public class TraceBuilderUnitTest {
         builder.traceReturn(16*MS);
 
         Assert.assertEquals("Should record traceBegin and 4 full records", 1 +5*3, output.size());
+
+        output.check(2, "flags", TraceMarker.OVERFLOW_FLAG);
+
     }
 }

@@ -186,7 +186,7 @@ public class TraceRecord {
         }
 
         output.traceEnter(classId, methodId, signatureId, 0);
-        output.traceStats(calls, errors);
+        output.traceStats(calls, errors, marker != null ? marker.getFlags() : 0);
 
         if (attrs != null) {
             for (Map.Entry<Integer,Object> entry : attrs.entrySet()) {

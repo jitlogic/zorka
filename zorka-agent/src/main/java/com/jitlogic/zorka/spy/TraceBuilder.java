@@ -112,6 +112,16 @@ public class TraceBuilder extends TraceEventHandler {
 
 
     @Override
+    public void traceStats(long calls, long errors, int flags) {
+    }
+
+
+    @Override
+    public void newSymbol(int symbolId, String symbolText) {
+    }
+
+
+    @Override
     public void newAttr(int attrId, Object attrVal) {
         ttop.setAttr(attrId, attrVal);
     }
@@ -137,13 +147,16 @@ public class TraceBuilder extends TraceEventHandler {
         TraceRecord parent = ttop.getParent();
 
         if (parent != null) {
-            if ((ttop.getTime() > Tracer.getDefaultMethodTime() || ttop.getErrors() > 0)
-              && (mtop.getCurRecords() < mtop.getMaxRecords() || ttop.childCount() > 0)) {
-                // Attach current record under its parent. Marker top should be
-                // always here as ttop stack won't grow unless there is a marker.
-                parent.addChild(ttop);
-                mtop.addCurRecords(1);
-                clean = false;
+            if ((ttop.getTime() > Tracer.getDefaultMethodTime() || ttop.getErrors() > 0)) {
+                if (mtop.getCurRecords() < mtop.getMaxRecords() || ttop.childCount() > 0) {
+                    // Attach current record under its parent. Marker top should be
+                    // always here as ttop stack won't grow unless there is a marker.
+                    parent.addChild(ttop);
+                    mtop.addCurRecords(1);
+                    clean = false;
+                } else {
+                    mtop.markOverflow();
+                }
             }
             parent.setCalls(parent.getCalls() + ttop.getCalls());
             parent.setErrors(parent.getErrors() + ttop.getErrors());

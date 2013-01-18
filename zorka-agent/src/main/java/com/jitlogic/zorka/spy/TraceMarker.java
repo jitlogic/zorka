@@ -18,6 +18,8 @@ package com.jitlogic.zorka.spy;
 
 public class TraceMarker {
 
+    public static final int OVERFLOW_FLAG = 0x01;
+
     private int traceId;
     private long clock;
 
@@ -26,6 +28,7 @@ public class TraceMarker {
 
     private long minimumTime;
     private long curRecords, maxRecords;
+    private int flags;
 
 
     public TraceMarker(TraceMarker parent, TraceRecord root, int traceId, long clock) {
@@ -68,15 +71,33 @@ public class TraceMarker {
         this.minimumTime = minimumTime;
     }
 
+
     public long getCurRecords() {
         return curRecords;
     }
+
 
     public void addCurRecords(long num) {
         curRecords += num;
     }
 
+
     public long getMaxRecords() {
         return maxRecords;
+    }
+
+
+    public int getFlags() {
+        return flags;
+    }
+
+
+    public void setFlags(int flags) {
+        this.flags = flags;
+    }
+
+
+    public void markOverflow() {
+        flags |= OVERFLOW_FLAG;
     }
 }
