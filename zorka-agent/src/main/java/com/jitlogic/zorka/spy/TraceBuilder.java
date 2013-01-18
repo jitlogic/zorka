@@ -18,63 +18,90 @@ package com.jitlogic.zorka.spy;
 
 
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogger;
 
 /**
  * This class receives loose tracer submissions from single thread
  * and constructs traces.
  *
- *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class TraceBuilder extends TraceEventHandler {
 
-    private long methodTime = 250000;
+    private final static ZorkaLog log = ZorkaLogger.getLog(TraceBuilder.class);
 
-    private ZorkaAsyncThread<TraceElement> output;
+    /** Output */
+    private ZorkaAsyncThread<TraceRecord> output;
 
-    private TraceElement top = new TraceElement(null);
+    /** Top of trace markers stack. */
+    private TraceMarker mtop = null;
 
+    /** Top of trace records stack. */
+    private TraceRecord ttop = new TraceRecord(null);
 
+    private int numRecords = 0;
 
-    public TraceBuilder(ZorkaAsyncThread<TraceElement> output) {
+    public TraceBuilder(ZorkaAsyncThread<TraceRecord> output) {
         this.output = output;
-    }
-
-
-    public TraceBuilder(ZorkaAsyncThread<TraceElement> output, long methodTime) {
-        this.output = output;
-        this.methodTime = methodTime;
     }
 
 
     @Override
     public void traceBegin(int traceId, long clock) {
-        top.setTraceId(traceId);
-        top.setClock(clock);
+
+        if (ttop == null) {
+            log.error("Attempt to set trace marker on an non-traced method.");
+            return;
+        }
+
+        if (mtop != null && mtop.getRoot().equals(ttop)) {
+            log.error("Trace marker already set on current frame. Skipping.");
+            return;
+        }
+
+        mtop = new TraceMarker(mtop, ttop, traceId, clock);
+        ttop.setMarker(mtop);
     }
 
 
     @Override
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
-        if (top.isBusy()) {
-            top = new TraceElement(top);
+
+        if (ttop.getClassId() != 0) {
+            if (mtop != null) {
+                ttop = new TraceRecord(ttop);
+                numRecords++;
+            } else {
+                ttop.clean();
+                numRecords = 0;
+            }
+        } else {
+            numRecords++;
         }
 
-        top.setClassId(classId);
-        top.setMethodId(methodId);
-        top.setSignatureId(signatureId);
-        top.setTime(tstamp);
-        top.setCalls(top.getCalls() + 1);
+        ttop.setClassId(classId);
+        ttop.setMethodId(methodId);
+        ttop.setSignatureId(signatureId);
+        ttop.setTime(tstamp);
+        ttop.setCalls(ttop.getCalls() + 1);
+
+        if (numRecords > Tracer.getDefaultTraceSize()) {
+            ttop.markOverflow();
+        }
+
     }
 
 
     @Override
     public void traceReturn(long tstamp) {
 
-        while (!top.isBusy() && top.getParent() != null) {
-            top = top.getParent();
+        while (!(ttop.getClassId() != 0) && ttop.getParent() != null) {
+            ttop = ttop.getParent();
         }
 
-        top.setTime(tstamp-top.getTime());
+        ttop.setTime(tstamp - ttop.getTime());
+
         pop();
     }
 
@@ -82,47 +109,81 @@ public class TraceBuilder extends TraceEventHandler {
     @Override
     public void traceError(TracedException exception, long tstamp) {
 
-        while (!top.isBusy() && top.getParent() != null) {
-            top = top.getParent();
+        while (!(ttop.getClassId() != 0) && ttop.getParent() != null) {
+            ttop = ttop.getParent();
         }
 
-        top.setException(exception);
-        top.setTime(tstamp-top.getTime());
-        top.setErrors(top.getErrors() + 1);
+        ttop.setException(exception);
+        ttop.setTime(tstamp - ttop.getTime());
+        ttop.setErrors(ttop.getErrors() + 1);
 
         pop();
     }
 
 
     @Override
+    public void traceStats(long calls, long errors, int flags) {
+    }
+
+
+    @Override
+    public void newSymbol(int symbolId, String symbolText) {
+    }
+
+
+    @Override
     public void newAttr(int attrId, Object attrVal) {
-        top.setAttr(attrId, attrVal);
+        ttop.setAttr(attrId, attrVal);
     }
 
 
     private void pop() {
+
         boolean clean = true;
-        if (top.isTrace() && top.getTime() >= methodTime) {
-            output.submit(top);
-            clean = false;
-        }
 
-        TraceElement parent = top.getParent();
-
-        if (parent != null) {
-            if (top.getTime() > methodTime || top.getErrors() > 0) {
-                parent.addChild(top);
+        if (ttop.getMarker() != null) {
+            if (ttop.getTime() >= ttop.getMarker().getMinimumTime()) {
+                output.submit(ttop);
                 clean = false;
             }
-            parent.setCalls(parent.getCalls() + top.getCalls());
-            parent.setErrors(parent.getErrors() + top.getErrors());
+
+            if (ttop.getMarker().equals(mtop)) {
+                mtop = mtop.pop();
+            } else {
+                log.error("Markers didn't match on tracer stack pop.");
+            }
+        }
+
+        TraceRecord parent = ttop.getParent();
+
+        if (parent != null) {
+            if ((ttop.getTime() > Tracer.getDefaultMethodTime() || ttop.getErrors() > 0)) {
+                if (!ttop.hasOverflow()) {
+                    parent.addChild(ttop);
+                    clean = false;
+                } else {
+                    mtop.markOverflow();
+                    clean = false;
+                }
+            }
+            parent.setCalls(parent.getCalls() + ttop.getCalls());
+            parent.setErrors(parent.getErrors() + ttop.getErrors());
         }
 
         if (clean) {
-            top.clean();
+            ttop.clean();
+            numRecords--;
         } else {
-            top = parent != null ? parent : new TraceElement(null);
+            ttop = parent != null ? parent : new TraceRecord(null);
         }
+
     } // pop()
+
+
+    public void setMinimumTraceTime(long minimumTraceTime) {
+        if (mtop != null) {
+            mtop.setMinimumTime(minimumTraceTime);
+        }
+    }
 
 }

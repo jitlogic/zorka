@@ -17,6 +17,11 @@
             <artifactId>zorka-agent</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.swinglabs.swingx</groupId>
+            <artifactId>swingx-core</artifactId>
+            <version>1.6.4</version>
+        </dependency>
     </dependencies>
 
 </project>

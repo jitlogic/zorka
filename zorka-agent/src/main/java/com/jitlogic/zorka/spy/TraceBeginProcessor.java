@@ -22,15 +22,23 @@ public class TraceBeginProcessor implements SpyProcessor {
 
     private Tracer tracer;
     private int traceId;
+    private long minimumTraceTime;
 
-    public TraceBeginProcessor(Tracer tracer, String traceName) {
+    public TraceBeginProcessor(Tracer tracer, String traceName, long minimumTraceTime) {
         this.tracer = tracer;
         this.traceId = tracer.getSymbolRegistry().symbolId(traceName);
+        this.minimumTraceTime = minimumTraceTime;
     }
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
-        tracer.getHandler().traceBegin(traceId, System.currentTimeMillis());
+        TraceEventHandler traceBuilder = tracer.getHandler();
+
+        traceBuilder.traceBegin(traceId, System.currentTimeMillis());
+        if (minimumTraceTime >= 0 && traceBuilder instanceof TraceBuilder) {
+            ((TraceBuilder)traceBuilder).setMinimumTraceTime(minimumTraceTime);
+        }
+
         return record;
     }
 }
