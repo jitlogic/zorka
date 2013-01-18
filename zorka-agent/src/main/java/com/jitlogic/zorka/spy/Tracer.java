@@ -20,7 +20,40 @@ import com.jitlogic.zorka.util.ZorkaAsyncThread;
 
 public class Tracer {
 
-    private long methodTime = 250000;
+    private static long defaultMethodTime = 250000;
+    private static long defaultTraceTime = 50000000;
+    private static long defaultTraceSize = 4096;
+
+
+    public static long getDefaultMethodTime() {
+        return defaultMethodTime;
+    }
+
+
+    public static void setDefaultMethodTime(long methodTime) {
+        defaultMethodTime = methodTime;
+    }
+
+
+    public static long getDefaultTraceTime() {
+        return defaultTraceTime;
+    }
+
+
+    public static void setDefaultTraceTime(long traceTime) {
+        defaultTraceTime = traceTime;
+    }
+
+
+    public static long getDefaultTraceSize() {
+        return defaultTraceSize;
+    }
+
+
+    public static void setDefaultTraceSize(long traceSize) {
+        defaultTraceSize = traceSize;
+    }
+
 
     /** Defines which classes and methods should be traced. */
     private SpyMatcherSet matcherSet = new SpyMatcherSet();
@@ -35,7 +68,7 @@ public class Tracer {
     private ThreadLocal<TraceBuilder> localHandlers =
         new ThreadLocal<TraceBuilder>() {
             public TraceBuilder initialValue() {
-                return new TraceBuilder(output, methodTime);
+                return new TraceBuilder(output);
             }
         };
 
@@ -59,10 +92,6 @@ public class Tracer {
         this.output = output;
     }
 
-
-    public void setMethodTime(long methodTime) {
-        this.methodTime = methodTime;
-    }
 
 
     public SpyMatcherSet getMatcherSet() {

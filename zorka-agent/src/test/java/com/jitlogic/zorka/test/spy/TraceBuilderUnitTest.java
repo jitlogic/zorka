@@ -16,10 +16,7 @@
 
 package com.jitlogic.zorka.test.spy;
 
-import com.jitlogic.zorka.spy.SymbolRegistry;
-import com.jitlogic.zorka.spy.TraceBuilder;
-import com.jitlogic.zorka.spy.TraceRecord;
-import com.jitlogic.zorka.spy.WrappedException;
+import com.jitlogic.zorka.spy.*;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 
 import com.jitlogic.zorka.test.support.TestUtil;
@@ -167,5 +164,60 @@ public class TraceBuilderUnitTest {
 
         TraceRecord top = TestUtil.getField(builder, "ttop");
         Assert.assertTrue("Trace record top should have no parent.", top.getParent() == null);
+    }
+
+    @Test
+    public void testTraceRecordLimitHorizontal() throws Exception {
+        Tracer.setDefaultTraceSize(3);
+        builder.setMinimumTraceTime(0);
+
+        builder.traceEnter(c1, m1, s1, 1*MS);
+        builder.traceBegin(t1, 2*MS);
+
+        builder.traceEnter(c1, m2, s1, 3*MS);
+        builder.traceReturn(4*MS);
+        builder.traceEnter(c1, m2, s1, 5*MS);
+        builder.traceReturn(6*MS);
+        builder.traceEnter(c1, m2, s1, 7*MS);
+        builder.traceReturn(8*MS);
+        builder.traceEnter(c1, m2, s1, 9*MS);
+        builder.traceReturn(10*MS);
+
+        TraceRecord top = TestUtil.getField(builder, "ttop");
+        assertEquals("Should limit to 3 children (and have empty record on top of stack)",
+                        3, top.getParent().childCount());
+
+        builder.traceReturn(11*MS);
+
+        Assert.assertEquals("Should record traceBegin and 4 full records", 1 +4*3, output.size());
+    }
+
+    @Test
+    public void testTraceRecordLimitVertical() throws Exception {
+        Tracer.setDefaultTraceSize(3);
+
+        builder.traceEnter(c1, m1, s1, 1*MS);
+        builder.traceBegin(t1, 2*MS);
+        builder.setMinimumTraceTime(0);
+
+        builder.traceEnter(c1, m2, s1, 3*MS);
+        builder.traceEnter(c1, m2, s1, 4*MS);
+        builder.traceEnter(c1, m2, s1, 5*MS);
+        builder.traceReturn(8*MS);
+        builder.traceReturn(9*MS);
+        builder.traceEnter(c1, m2, s1, 10*MS);
+        builder.traceReturn(11*MS);
+        builder.traceEnter(c1, m2, s1, 11*MS);
+        builder.traceReturn(12*MS);
+        builder.traceEnter(c1, m2, s1, 13*MS);
+        builder.traceReturn(14*MS);
+        builder.traceReturn(15*MS);
+
+        TraceRecord top = TestUtil.getField(builder, "ttop");
+        assertEquals(1, top.childCount());
+
+        builder.traceReturn(16*MS);
+
+        Assert.assertEquals("Should record traceBegin and 4 full records", 1 +5*3, output.size());
     }
 }

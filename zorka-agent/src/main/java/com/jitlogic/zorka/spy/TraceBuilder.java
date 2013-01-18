@@ -31,9 +31,6 @@ public class TraceBuilder extends TraceEventHandler {
 
     private final static ZorkaLog log = ZorkaLogger.getLog(TraceBuilder.class);
 
-    private long methodTime = 250000;
-    private long defaultTraceTime = 50000000;
-
     /** Output */
     private ZorkaAsyncThread<TraceRecord> output;
 
@@ -46,12 +43,6 @@ public class TraceBuilder extends TraceEventHandler {
 
     public TraceBuilder(ZorkaAsyncThread<TraceRecord> output) {
         this.output = output;
-    }
-
-
-    public TraceBuilder(ZorkaAsyncThread<TraceRecord> output, long methodTime) {
-        this.output = output;
-        this.methodTime = methodTime;
     }
 
 
@@ -69,13 +60,13 @@ public class TraceBuilder extends TraceEventHandler {
         }
 
         mtop = new TraceMarker(mtop, ttop, traceId, clock);
-        mtop.setMinimumTime(defaultTraceTime);
         ttop.setMarker(mtop);
     }
 
 
     @Override
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
+
         if (ttop.getClassId() != 0) {
             if (mtop != null) {
                 ttop = new TraceRecord(ttop);
@@ -99,7 +90,8 @@ public class TraceBuilder extends TraceEventHandler {
             ttop = ttop.getParent();
         }
 
-        ttop.setTime(tstamp- ttop.getTime());
+        ttop.setTime(tstamp - ttop.getTime());
+
         pop();
     }
 
@@ -112,7 +104,7 @@ public class TraceBuilder extends TraceEventHandler {
         }
 
         ttop.setException(exception);
-        ttop.setTime(tstamp- ttop.getTime());
+        ttop.setTime(tstamp - ttop.getTime());
         ttop.setErrors(ttop.getErrors() + 1);
 
         pop();
@@ -145,8 +137,12 @@ public class TraceBuilder extends TraceEventHandler {
         TraceRecord parent = ttop.getParent();
 
         if (parent != null) {
-            if (ttop.getTime() > methodTime || ttop.getErrors() > 0) {
+            if ((ttop.getTime() > Tracer.getDefaultMethodTime() || ttop.getErrors() > 0)
+              && (mtop.getCurRecords() < mtop.getMaxRecords() || ttop.childCount() > 0)) {
+                // Attach current record under its parent. Marker top should be
+                // always here as ttop stack won't grow unless there is a marker.
                 parent.addChild(ttop);
+                mtop.addCurRecords(1);
                 clean = false;
             }
             parent.setCalls(parent.getCalls() + ttop.getCalls());
