@@ -22,7 +22,8 @@ public class Tracer {
 
     private static long defaultMethodTime = 250000;
     private static long defaultTraceTime = 50000000;
-    private static long defaultTraceSize = 4096;
+
+    private static int defaultTraceSize = 4096;
 
 
     public static long getDefaultMethodTime() {
@@ -45,12 +46,12 @@ public class Tracer {
     }
 
 
-    public static long getDefaultTraceSize() {
+    public static int getDefaultTraceSize() {
         return defaultTraceSize;
     }
 
 
-    public static void setDefaultTraceSize(long traceSize) {
+    public static void setDefaultTraceSize(int traceSize) {
         defaultTraceSize = traceSize;
     }
 

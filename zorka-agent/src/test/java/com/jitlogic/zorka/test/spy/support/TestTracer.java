@@ -99,4 +99,8 @@ public class TestTracer extends TraceEventHandler {
     public int size() {
         return data.size();
     }
+
+    public void clear() {
+        data.clear();
+    }
 }

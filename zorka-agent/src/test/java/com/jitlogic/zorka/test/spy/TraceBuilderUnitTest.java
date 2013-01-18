@@ -21,6 +21,7 @@ import com.jitlogic.zorka.test.spy.support.TestTracer;
 
 import com.jitlogic.zorka.test.support.TestUtil;
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -46,9 +47,16 @@ public class TraceBuilderUnitTest {
     private int m2 = symbols.symbolId("otherMethod");
     private int s1 = symbols.symbolId("()V");
     private int t1 = symbols.symbolId("TRACE1");
+    private int t2 = symbols.symbolId("TRACE2");
     private int a1 = symbols.symbolId("ATTR1");
     private int a2 = symbols.symbolId("ATTR2");
 
+    @After
+    public void tearDown() {
+        Tracer.setDefaultTraceSize(4096);
+        Tracer.setDefaultMethodTime(250000);
+        Tracer.setDefaultTraceTime(50 * MS);
+    }
 
     @Test
     public void testStrayTraceFragment() throws Exception {
@@ -157,6 +165,7 @@ public class TraceBuilderUnitTest {
             output.listAttr("action"));
     }
 
+
     @Test
     public void testSkipTraceRecordsIfNoMarkerIsSet() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
@@ -166,13 +175,14 @@ public class TraceBuilderUnitTest {
         Assert.assertTrue("Trace record top should have no parent.", top.getParent() == null);
     }
 
+
     @Test
     public void testTraceRecordLimitHorizontal() throws Exception {
         Tracer.setDefaultTraceSize(3);
         Tracer.setDefaultTraceTime(0);
 
-        builder.traceEnter(c1, m1, s1, 1*MS);
-        builder.traceBegin(t1, 2*MS);
+        builder.traceEnter(c1, m1, s1, 1 * MS);
+        builder.traceBegin(t1, 2 * MS);
 
         builder.traceEnter(c1, m2, s1, 3*MS);
         builder.traceReturn(4*MS);
@@ -183,15 +193,17 @@ public class TraceBuilderUnitTest {
         builder.traceEnter(c1, m2, s1, 9*MS);
         builder.traceReturn(10*MS);
 
+
         TraceRecord top = TestUtil.getField(builder, "ttop");
-        assertEquals("Should limit to 4 children (and have empty record on top of stack)",
-                        3, top.getParent().childCount());
+        assertEquals("Should limit to 2 children (plus parent)",
+                2, top.childCount());
 
-        builder.traceReturn(11*MS);
+        builder.traceReturn(11 * MS);
 
-        Assert.assertEquals("Should record traceBegin and 4 full records", 1 +4*3, output.size());
-        output.check(2, "flags", TraceMarker.OVERFLOW_FLAG);
+        Assert.assertEquals("Should record traceBegin and 3 full records", 1 +3*3, output.size());
+        output.check(2, "calls", 5L, "flags", TraceMarker.OVERFLOW_FLAG);
     }
+
 
     @Test
     public void testTraceRecordLimitVertical() throws Exception {
@@ -199,38 +211,33 @@ public class TraceBuilderUnitTest {
         Tracer.setDefaultTraceTime(0);
 
         // Start new trace
-        builder.traceEnter(c1, m1, s1, 1*MS);
-        builder.traceBegin(t1, 2*MS);
+        builder.traceEnter(c1, m1, s1, 1 * MS);
+        builder.traceBegin(t1, 2 * MS);
 
         // Recursively enter 3 times
-        builder.traceEnter(c1, m2, s1, 3*MS);
-        builder.traceEnter(c1, m2, s1, 4*MS);
-        builder.traceEnter(c1, m2, s1, 5*MS);
-        builder.traceReturn(8*MS);
+        builder.traceEnter(c1, m2, s1, 3 * MS);
+        builder.traceEnter(c1, m2, s1, 4 * MS);
+        builder.traceEnter(c1, m2, s1, 5 * MS);
+        builder.traceEnter(c1, m2, s1, 6 * MS);
+        builder.traceReturn(7*MS);
+        builder.traceReturn(8 * MS);
         builder.traceReturn(9*MS);
-
-        // All subsequent records should be dropped
-        builder.traceEnter(c1, m2, s1, 10*MS);
-        builder.traceReturn(11*MS);
-        builder.traceEnter(c1, m2, s1, 11*MS);
-        builder.traceReturn(12*MS);
-        builder.traceEnter(c1, m2, s1, 13*MS);
-        builder.traceReturn(14*MS);
-        builder.traceReturn(15*MS);
+        builder.traceReturn(10*MS);
 
         TraceRecord top = TestUtil.getField(builder, "ttop");
         assertEquals("Root record of a trace should have one child.", 1, top.childCount());
 
-        builder.traceReturn(16*MS);
+        builder.traceReturn(11*MS);
 
-        Assert.assertEquals("Should record traceBegin and 4 full records", 1 +5*3, output.size());
+        Assert.assertEquals("Should record traceBegin and 3 full records", 1 +3*3, output.size());
 
         output.check(2, "flags", TraceMarker.OVERFLOW_FLAG);
     }
 
+
     @Test
     public void testTraceRecordLimitCrossingMarkers() throws Exception {
-        Tracer.setDefaultTraceSize(3);
+        Tracer.setDefaultTraceSize(4);
         Tracer.setDefaultTraceTime(0);
 
         // Start new trace
@@ -239,7 +246,7 @@ public class TraceBuilderUnitTest {
 
         // Start subsequent trace
         builder.traceEnter(c1, m2, s1, 3*MS);
-        builder.traceBegin(t1, 4*MS);
+        builder.traceBegin(t2, 4*MS);
 
         // Submit some records, so builder will reach limit
         builder.traceEnter(c1, m2, s1, 5*MS);
@@ -252,25 +259,87 @@ public class TraceBuilderUnitTest {
         // Return back to trace root frame
         builder.traceReturn(11*MS);
 
-        // Submit some more records (all should be ignored)
-        builder.traceEnter(c1, m2, s1, 12*MS);
-        builder.traceReturn(13*MS);
-        builder.traceEnter(c1, m2, s1, 14*MS);
-        builder.traceReturn(15*MS);
-        builder.traceEnter(c1, m2, s1, 14*MS);
-        builder.traceReturn(15*MS);
-        builder.traceEnter(c1, m2, s1, 14*MS);
-        builder.traceReturn(15*MS);
-        builder.traceEnter(c1, m2, s1, 14*MS);
-        builder.traceReturn(15*MS);
-
+        // Check inner trace
         TraceRecord top = TestUtil.getField(builder, "ttop");
-        assertEquals("Root record of a trace should have only one child.", 1, top.getParent().childCount());
+        assertEquals("Root record of a trace should have only one child.", 1, top.childCount());
+        Assert.assertEquals("Should record traceBegin and 3 full frames (3 records each)",
+                1 + 3 * 3, output.size());
+
+        output.clear();
 
         builder.traceReturn(16*MS);
 
-        Assert.assertEquals("Should record traceBegin and 4 full records", 30, output.size()); // TODO this is broken
+        Assert.assertEquals("Should record 2 times traceBegin and 4 full frames (3 records each)",
+                2 + 4 * 3, output.size());
 
-        //output.check(2, "flags", TraceMarker.OVERFLOW_FLAG);
+        output.check(2, "flags", TraceMarker.OVERFLOW_FLAG);
     }
+
+
+    @Test
+    public void testTraceWithMultipleBeginFlags() throws Exception {
+        Tracer.setDefaultTraceTime(0);
+
+        builder.traceEnter(c1, m1, s1, 1*MS);
+        builder.traceBegin(t1, 2*MS);
+        builder.traceBegin(t2, 2*MS);
+        builder.traceReturn(3*MS);
+
+        Assert.assertEquals("Should record one traceBegin event and one full frame (3 records)", 1 + 3, output.size());
+        output.check(0, "action", "traceBegin", "traceId", t1);
+    }
+
+
+    @Test
+    public void testTraceWithTooManyReturns() throws Exception {
+        Tracer.setDefaultTraceTime(0);
+
+        // Submit one frame
+        builder.traceEnter(c1, m1, s1, 1*MS);
+        builder.traceBegin(t1, 2*MS);
+        builder.traceReturn(3*MS);
+
+        // Malicious traceReturn event
+        builder.traceReturn(4*MS);
+
+        // Submit another frame
+        builder.traceEnter(c1, m1, s1, 5*MS);
+        builder.traceBegin(t1, 6*MS);
+        builder.traceReturn(7*MS);
+
+        Assert.assertEquals("Should record one traceBegin event and one full frame (3 records)", 2 * (1 + 3), output.size());
+    }
+
+
+    @Test
+    public void testSingleTraceWithMultipleEmbeddedTracesInside() throws Exception {
+        Tracer.setDefaultTraceTime(0);
+
+        // Submit one frame
+        builder.traceEnter(c1, m1, s1, 1*MS);
+        builder.traceBegin(t1, 2*MS);
+
+        // Start subsequent trace
+        builder.traceEnter(c1, m2, s1, 3*MS);
+        builder.traceBegin(t2, 4*MS);
+        builder.traceReturn(5*MS);
+
+        // Single trace should appear on output
+        Assert.assertEquals(4, output.size());
+        output.clear();
+
+        // Start subsequent trace
+        builder.traceEnter(c1, m2, s1, 6*MS);
+        builder.traceBegin(t2, 7*MS);
+        builder.traceReturn(8*MS);
+
+        Assert.assertEquals(4, output.size());
+        output.clear();
+
+        // Return from main frame
+        builder.traceReturn(9*MS);
+
+        Assert.assertEquals(3+3*3, output.size());
+    }
+
 }

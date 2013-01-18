@@ -27,7 +27,6 @@ public class TraceMarker {
     private TraceRecord root;
 
     private long minimumTime;
-    private long curRecords, maxRecords;
     private int flags;
 
 
@@ -37,8 +36,6 @@ public class TraceMarker {
         this.traceId = traceId;
         this.clock = clock;
         this.minimumTime = Tracer.getDefaultTraceTime();
-        this.curRecords = parent != null ? parent.getCurRecords() : 0;
-        this.maxRecords = Tracer.getDefaultTraceSize();
         this.flags = parent != null ? parent.getFlags() : 0;
     }
 
@@ -73,28 +70,8 @@ public class TraceMarker {
     }
 
 
-    public long getCurRecords() {
-        return curRecords;
-    }
-
-
-    public void addCurRecords(long num) {
-        curRecords += num;
-    }
-
-
-    public long getMaxRecords() {
-        return maxRecords;
-    }
-
-
     public int getFlags() {
         return flags;
-    }
-
-
-    public void setFlags(int flags) {
-        this.flags = flags;
     }
 
 
@@ -106,7 +83,6 @@ public class TraceMarker {
     public TraceMarker pop() {
         if (parent != null) {
             parent.flags = flags;
-            parent.curRecords = curRecords;
             return parent;
         } else {
             return null;

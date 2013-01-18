@@ -40,6 +40,7 @@ public class TraceBuilder extends TraceEventHandler {
     /** Top of trace records stack. */
     private TraceRecord ttop = new TraceRecord(null);
 
+    private int numRecords = 0;
 
     public TraceBuilder(ZorkaAsyncThread<TraceRecord> output) {
         this.output = output;
@@ -70,9 +71,13 @@ public class TraceBuilder extends TraceEventHandler {
         if (ttop.getClassId() != 0) {
             if (mtop != null) {
                 ttop = new TraceRecord(ttop);
+                numRecords++;
             } else {
                 ttop.clean();
+                numRecords = 0;
             }
+        } else {
+            numRecords++;
         }
 
         ttop.setClassId(classId);
@@ -80,6 +85,11 @@ public class TraceBuilder extends TraceEventHandler {
         ttop.setSignatureId(signatureId);
         ttop.setTime(tstamp);
         ttop.setCalls(ttop.getCalls() + 1);
+
+        if (numRecords > Tracer.getDefaultTraceSize()) {
+            ttop.markOverflow();
+        }
+
     }
 
 
@@ -148,14 +158,12 @@ public class TraceBuilder extends TraceEventHandler {
 
         if (parent != null) {
             if ((ttop.getTime() > Tracer.getDefaultMethodTime() || ttop.getErrors() > 0)) {
-                if (mtop.getCurRecords() < mtop.getMaxRecords() || ttop.childCount() > 0) {
-                    // Attach current record under its parent. Marker top should be
-                    // always here as ttop stack won't grow unless there is a marker.
+                if (!ttop.hasOverflow()) {
                     parent.addChild(ttop);
-                    mtop.addCurRecords(1);
                     clean = false;
                 } else {
                     mtop.markOverflow();
+                    clean = false;
                 }
             }
             parent.setCalls(parent.getCalls() + ttop.getCalls());
@@ -164,6 +172,7 @@ public class TraceBuilder extends TraceEventHandler {
 
         if (clean) {
             ttop.clean();
+            numRecords--;
         } else {
             ttop = parent != null ? parent : new TraceRecord(null);
         }

@@ -30,7 +30,9 @@ import java.util.Map;
  */
 public class TraceRecord {
 
-    private int classId, methodId, signatureId;
+    private static final int OVERFLOW_FLAG = 1;
+
+    private int classId, methodId, signatureId, flags;
     private long time;
     private long calls, errors;
 
@@ -68,6 +70,7 @@ public class TraceRecord {
             children = new ArrayList<TraceRecord>();
         }
         children.add(child);
+        child.parent = this;
     }
 
 
@@ -220,6 +223,15 @@ public class TraceRecord {
         children = null;
         marker = null;
         calls = errors = 0;
+        flags = 0;
+    }
+
+    public void markOverflow() {
+        flags |= OVERFLOW_FLAG;
+    }
+
+    public boolean hasOverflow() {
+        return 0 != (flags & OVERFLOW_FLAG);
     }
 
 }
