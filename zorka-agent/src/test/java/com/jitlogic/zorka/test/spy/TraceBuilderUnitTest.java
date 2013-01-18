@@ -169,10 +169,10 @@ public class TraceBuilderUnitTest {
     @Test
     public void testTraceRecordLimitHorizontal() throws Exception {
         Tracer.setDefaultTraceSize(3);
+        Tracer.setDefaultTraceTime(0);
 
         builder.traceEnter(c1, m1, s1, 1*MS);
         builder.traceBegin(t1, 2*MS);
-        builder.setMinimumTraceTime(0);
 
         builder.traceEnter(c1, m2, s1, 3*MS);
         builder.traceReturn(4*MS);
@@ -190,21 +190,26 @@ public class TraceBuilderUnitTest {
         builder.traceReturn(11*MS);
 
         Assert.assertEquals("Should record traceBegin and 4 full records", 1 +4*3, output.size());
+        output.check(2, "flags", TraceMarker.OVERFLOW_FLAG);
     }
 
     @Test
     public void testTraceRecordLimitVertical() throws Exception {
         Tracer.setDefaultTraceSize(3);
+        Tracer.setDefaultTraceTime(0);
 
+        // Start new trace
         builder.traceEnter(c1, m1, s1, 1*MS);
         builder.traceBegin(t1, 2*MS);
-        builder.setMinimumTraceTime(0);
 
+        // Recursively enter 3 times
         builder.traceEnter(c1, m2, s1, 3*MS);
         builder.traceEnter(c1, m2, s1, 4*MS);
         builder.traceEnter(c1, m2, s1, 5*MS);
         builder.traceReturn(8*MS);
         builder.traceReturn(9*MS);
+
+        // All subsequent records should be dropped
         builder.traceEnter(c1, m2, s1, 10*MS);
         builder.traceReturn(11*MS);
         builder.traceEnter(c1, m2, s1, 11*MS);
@@ -214,13 +219,58 @@ public class TraceBuilderUnitTest {
         builder.traceReturn(15*MS);
 
         TraceRecord top = TestUtil.getField(builder, "ttop");
-        assertEquals(1, top.childCount());
+        assertEquals("Root record of a trace should have one child.", 1, top.childCount());
 
         builder.traceReturn(16*MS);
 
         Assert.assertEquals("Should record traceBegin and 4 full records", 1 +5*3, output.size());
 
         output.check(2, "flags", TraceMarker.OVERFLOW_FLAG);
+    }
 
+    @Test
+    public void testTraceRecordLimitCrossingMarkers() throws Exception {
+        Tracer.setDefaultTraceSize(3);
+        Tracer.setDefaultTraceTime(0);
+
+        // Start new trace
+        builder.traceEnter(c1, m1, s1, 1*MS);
+        builder.traceBegin(t1, 2*MS);
+
+        // Start subsequent trace
+        builder.traceEnter(c1, m2, s1, 3*MS);
+        builder.traceBegin(t1, 4*MS);
+
+        // Submit some records, so builder will reach limit
+        builder.traceEnter(c1, m2, s1, 5*MS);
+        builder.traceReturn(6*MS);
+        builder.traceEnter(c1, m2, s1, 7*MS);
+        builder.traceReturn(8*MS);
+        builder.traceEnter(c1, m2, s1, 9*MS);
+        builder.traceReturn(10*MS);
+
+        // Return back to trace root frame
+        builder.traceReturn(11*MS);
+
+        // Submit some more records (all should be ignored)
+        builder.traceEnter(c1, m2, s1, 12*MS);
+        builder.traceReturn(13*MS);
+        builder.traceEnter(c1, m2, s1, 14*MS);
+        builder.traceReturn(15*MS);
+        builder.traceEnter(c1, m2, s1, 14*MS);
+        builder.traceReturn(15*MS);
+        builder.traceEnter(c1, m2, s1, 14*MS);
+        builder.traceReturn(15*MS);
+        builder.traceEnter(c1, m2, s1, 14*MS);
+        builder.traceReturn(15*MS);
+
+        TraceRecord top = TestUtil.getField(builder, "ttop");
+        assertEquals("Root record of a trace should have only one child.", 1, top.getParent().childCount());
+
+        builder.traceReturn(16*MS);
+
+        Assert.assertEquals("Should record traceBegin and 4 full records", 30, output.size()); // TODO this is broken
+
+        //output.check(2, "flags", TraceMarker.OVERFLOW_FLAG);
     }
 }

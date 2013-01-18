@@ -138,7 +138,7 @@ public class TraceBuilder extends TraceEventHandler {
             }
 
             if (ttop.getMarker().equals(mtop)) {
-                mtop = mtop.getParent();
+                mtop = mtop.pop();
             } else {
                 log.error("Markers didn't match on tracer stack pop.");
             }

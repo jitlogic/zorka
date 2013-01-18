@@ -39,6 +39,7 @@ public class TraceMarker {
         this.minimumTime = Tracer.getDefaultTraceTime();
         this.curRecords = parent != null ? parent.getCurRecords() : 0;
         this.maxRecords = Tracer.getDefaultTraceSize();
+        this.flags = parent != null ? parent.getFlags() : 0;
     }
 
 
@@ -99,5 +100,16 @@ public class TraceMarker {
 
     public void markOverflow() {
         flags |= OVERFLOW_FLAG;
+    }
+
+
+    public TraceMarker pop() {
+        if (parent != null) {
+            parent.flags = flags;
+            parent.curRecords = curRecords;
+            return parent;
+        } else {
+            return null;
+        }
     }
 }
