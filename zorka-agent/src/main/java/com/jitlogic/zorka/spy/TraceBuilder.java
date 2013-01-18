@@ -91,7 +91,7 @@ public class TraceBuilder extends TraceEventHandler {
         ttop.setTime(tstamp);
         ttop.setCalls(ttop.getCalls() + 1);
 
-        if (numRecords > Tracer.getDefaultTraceSize()) {
+        if (numRecords > Tracer.getMaxTraceRecords()) {
             ttop.markOverflow();
         }
 
@@ -164,7 +164,7 @@ public class TraceBuilder extends TraceEventHandler {
         TraceRecord parent = ttop.getParent();
 
         if (parent != null) {
-            if ((ttop.getTime() > Tracer.getDefaultMethodTime() || ttop.getErrors() > 0)) {
+            if ((ttop.getTime() > Tracer.getMinMethodTime() || ttop.getErrors() > 0)) {
                 if (!ttop.hasOverflow()) {
                     parent.addChild(ttop);
                     clean = false;

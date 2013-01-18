@@ -20,39 +20,39 @@ import com.jitlogic.zorka.util.ZorkaAsyncThread;
 
 public class Tracer {
 
-    private static long defaultMethodTime = 250000;
-    private static long defaultTraceTime = 50000000;
+    private static long minMethodTime = 250000;
+    private static long minTraceTime = 50000000;
 
-    private static int defaultTraceSize = 4096;
+    private static int maxTraceRecords = 4096;
 
 
-    public static long getDefaultMethodTime() {
-        return defaultMethodTime;
+    public static long getMinMethodTime() {
+        return minMethodTime;
     }
 
 
-    public static void setDefaultMethodTime(long methodTime) {
-        defaultMethodTime = methodTime;
+    public static void setMinMethodTime(long methodTime) {
+        minMethodTime = methodTime;
     }
 
 
-    public static long getDefaultTraceTime() {
-        return defaultTraceTime;
+    public static long getMinTraceTime() {
+        return minTraceTime;
     }
 
 
-    public static void setDefaultTraceTime(long traceTime) {
-        defaultTraceTime = traceTime;
+    public static void setMinTraceTime(long traceTime) {
+        minTraceTime = traceTime;
     }
 
 
-    public static int getDefaultTraceSize() {
-        return defaultTraceSize;
+    public static int getMaxTraceRecords() {
+        return maxTraceRecords;
     }
 
 
-    public static void setDefaultTraceSize(int traceSize) {
-        defaultTraceSize = traceSize;
+    public static void setMaxTraceRecords(int traceSize) {
+        maxTraceRecords = traceSize;
     }
 
 

@@ -35,7 +35,7 @@ public class TraceMarker {
         this.root = root;
         this.traceId = traceId;
         this.clock = clock;
-        this.minimumTime = Tracer.getDefaultTraceTime();
+        this.minimumTime = Tracer.getMinTraceTime();
         this.flags = parent != null ? parent.getFlags() : 0;
     }
 

@@ -176,10 +176,6 @@ public class SpyLib {
     }
 
 
-    public SpyInstance getInstance() {
-        return instance;
-    }
-
 
     /**
      * This is convenience function for monitoring execution times of methods. Execution times are stored in ZorkaStats
@@ -801,5 +797,39 @@ public class SpyLib {
     }
 
 
+    /**
+     * Sets minimum traced method execution time. Methods that took less time
+     * will be discarded from traces and will only reflect in summary call/error counters.
+     *
+     * @param methodTime minimum execution time (in nanoseconds, 250 microseconds by default)
+     */
+    public void setTracerMinMethodTime(long methodTime) {
+        Tracer.setMinMethodTime(methodTime);
+    }
+
+    /**
+     * Sets minimum trace execution time. Traces that laster for shorted period
+     * of time will be discarded. Not that this is default setting that can be
+     * overridden with spy.traceBegin() method.
+     *
+     * @param traceTime minimum trace execution time (50 milliseconds by default)
+     */
+    public void setTracerMinTraceTime(long traceTime) {
+        Tracer.setMinTraceTime(traceTime);
+    }
+
+
+    /**
+     * Sets maximum number of records that will be stored in a single trace.
+     * This setting prevents agent from overrunning memory when instrumented
+     * code has very long (and complex) execution path. After maximum number
+     * is reached, all remaining records will be discarded but numbers of calls
+     * and errors of discarded methods will be reflected in summary data.
+     *
+     * @param maxRecords maximum numbner of trace records
+     */
+    public void setTracerMaxTraceRecords(int maxRecords) {
+        Tracer.setMaxTraceRecords(maxRecords);
+    }
 
 }

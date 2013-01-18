@@ -55,9 +55,9 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @After
     public void tearDown() {
-        Tracer.setDefaultTraceSize(4096);
-        Tracer.setDefaultMethodTime(250000);
-        Tracer.setDefaultTraceTime(50 * MS);
+        spy.setTracerMaxTraceRecords(4096);
+        spy.setTracerMinMethodTime(250000);
+        spy.setTracerMinTraceTime(50*MS);
     }
 
     @Test
@@ -180,8 +180,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testTraceRecordLimitHorizontal() throws Exception {
-        Tracer.setDefaultTraceSize(3);
-        Tracer.setDefaultTraceTime(0);
+        spy.setTracerMaxTraceRecords(3);
+        spy.setTracerMinTraceTime(0);
 
         builder.traceEnter(c1, m1, s1, 1 * MS);
         builder.traceBegin(t1, 2 * MS);
@@ -209,8 +209,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testTraceRecordLimitVertical() throws Exception {
-        Tracer.setDefaultTraceSize(3);
-        Tracer.setDefaultTraceTime(0);
+        spy.setTracerMaxTraceRecords(3);
+        spy.setTracerMinTraceTime(0);
 
         // Start new trace
         builder.traceEnter(c1, m1, s1, 1 * MS);
@@ -239,8 +239,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testTraceRecordLimitCrossingMarkers() throws Exception {
-        Tracer.setDefaultTraceSize(4);
-        Tracer.setDefaultTraceTime(0);
+        spy.setTracerMaxTraceRecords(4);
+        spy.setTracerMinTraceTime(0);
 
         // Start new trace
         builder.traceEnter(c1, m1, s1, 1*MS);
@@ -280,7 +280,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testTraceWithMultipleBeginFlags() throws Exception {
-        Tracer.setDefaultTraceTime(0);
+        spy.setTracerMinTraceTime(0);
         ZorkaLogConfig.setTracerLevel(0); // TODO check why ZorkaLog objects are not constructed correctly in this test
 
         builder.traceEnter(c1, m1, s1, 1*MS);
@@ -295,7 +295,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testTraceWithTooManyReturns() throws Exception {
-        Tracer.setDefaultTraceTime(0);
+        spy.setTracerMinTraceTime(0);
 
         // Submit one frame
         builder.traceEnter(c1, m1, s1, 1*MS);
@@ -316,7 +316,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testSingleTraceWithMultipleEmbeddedTracesInside() throws Exception {
-        Tracer.setDefaultTraceTime(0);
+        spy.setTracerMinTraceTime(0);
 
         // Submit one frame
         builder.traceEnter(c1, m1, s1, 1*MS);
