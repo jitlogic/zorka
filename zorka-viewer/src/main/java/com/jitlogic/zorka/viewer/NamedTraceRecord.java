@@ -17,21 +17,21 @@
 package com.jitlogic.zorka.viewer;
 
 import com.jitlogic.zorka.spy.SymbolRegistry;
-import com.jitlogic.zorka.spy.TraceElement;
+import com.jitlogic.zorka.spy.TraceRecord;
 
 import java.util.Date;
 
-public class NamedTraceElement extends TraceElement {
+public class NamedTraceRecord extends TraceRecord {
 
     private SymbolRegistry symbols;
 
-    public NamedTraceElement(SymbolRegistry symbols, NamedTraceElement parent) {
+    public NamedTraceRecord(SymbolRegistry symbols, NamedTraceRecord parent) {
         super(parent);
         this.symbols = symbols;
     }
 
-    public NamedTraceElement getParent() {
-        return (NamedTraceElement)super.getParent();
+    public NamedTraceRecord getParent() {
+        return (NamedTraceRecord)super.getParent();
     }
 
     public String getTraceName() {

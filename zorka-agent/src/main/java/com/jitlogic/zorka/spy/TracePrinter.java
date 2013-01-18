@@ -93,8 +93,8 @@ public class TracePrinter extends TraceEventHandler {
 
 
     @Override
-    public void traceStats(long calls, long errors) {
-        out.println(spc(level) + "calls=" + calls + ", errors=" + errors);
+    public void traceStats(long calls, long errors, int flags) {
+        out.println(spc(level) + "calls=" + calls + ", errors=" + errors + ", flags=" + flags);
     }
 
 

@@ -85,10 +85,11 @@ public class SimpleTraceFormat extends TraceEventHandler {
 
 
     @Override
-    public void traceStats(long calls, long errors) {
+    public void traceStats(long calls, long errors, int flags) {
         buf.putByte(TRACE_STATS);
         buf.putLong(calls);
         buf.putLong(errors);
+        buf.putInt(flags);
     }
 
 
@@ -146,7 +147,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
                     output.traceError(decodeException(), buf.getLong());
                     break;
                 case TRACE_STATS:
-                    output.traceStats(buf.getLong(), buf.getLong());
+                    output.traceStats(buf.getLong(), buf.getLong(), buf.getInt());
                     break;
                 case NEW_SYMBOL:
                     output.newSymbol(buf.getInt(), buf.getString());

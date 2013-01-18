@@ -22,19 +22,28 @@ import java.util.List;
 import java.util.Map;
 
 
-public class TraceElement {
+/**
+ * Represents trace information about single method call.
+ * May contain references to information about calls from this method.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
+public class TraceRecord {
 
-    private int traceId, classId, methodId, signatureId;
-    private long clock, time;
+    private static final int OVERFLOW_FLAG = 1;
+
+    private int classId, methodId, signatureId, flags;
+    private long time;
     private long calls, errors;
 
+    private TraceMarker marker;
     private TracedException exception;
-    private TraceElement parent;
+    private TraceRecord parent;
     private Map<Integer,Object> attrs;
-    private List<TraceElement> children;
+    private List<TraceRecord> children;
 
 
-    public TraceElement(TraceElement parent) {
+    public TraceRecord(TraceRecord parent) {
         this.parent = parent;
     }
 
@@ -47,6 +56,7 @@ public class TraceElement {
         }
     }
 
+
     public void setAttr(int attrId, Object attrVal) {
         if (attrs == null) {
             attrs = new HashMap<Integer,Object>();
@@ -55,35 +65,26 @@ public class TraceElement {
     }
 
 
-    public void addChild(TraceElement child) {
+    public void addChild(TraceRecord child) {
         if (children == null) {
-            children = new ArrayList<TraceElement>();
+            children = new ArrayList<TraceRecord>();
         }
         children.add(child);
+        child.parent = this;
     }
 
 
-    public void clean() {
-        time = 0;
-        classId = methodId = signatureId = traceId = 0;
-        attrs = null;
-        children = null;
-        calls = errors = 0;
+    public TraceRecord getChild(int i) {
+        if (children != null && i < children.size()) {
+            return children.get(i);
+        } else {
+            return null;
+        }
     }
 
 
-    public TraceElement getParent() {
+    public TraceRecord getParent() {
         return parent;
-    }
-
-
-    public boolean isBusy() {
-        return classId != 0;
-    }
-
-
-    public boolean isTrace() {
-        return traceId > 0;
     }
 
 
@@ -95,6 +96,7 @@ public class TraceElement {
     public long getCalls() {
         return calls;
     }
+
 
     public void setCalls(long calls) {
         this.calls = calls;
@@ -109,6 +111,7 @@ public class TraceElement {
     public void setErrors(long errors) {
         this.errors = errors;
     }
+
 
     public int getClassId() {
         return classId;
@@ -135,14 +138,8 @@ public class TraceElement {
     }
 
 
-
     public long getClock() {
-        return clock;
-    }
-
-
-    public void setClock(long clock) {
-        this.clock = clock;
+        return marker != null ? marker.getClock() : 0L;
     }
 
 
@@ -152,18 +149,14 @@ public class TraceElement {
 
 
     public int getTraceId() {
-        return traceId;
-    }
-
-
-    public void setTraceId(int traceId) {
-        this.traceId = traceId;
+        return marker != null ? marker.getTraceId() : 0;
     }
 
 
     public long getTime() {
         return time;
     }
+
 
     public void setTime(long time) {
         this.time = time;
@@ -180,13 +173,23 @@ public class TraceElement {
     }
 
 
+    public TraceMarker getMarker() {
+        return marker;
+    }
+
+
+    public void setMarker(TraceMarker marker) {
+        this.marker = marker;
+    }
+
+
     public void traverse(TraceEventHandler output) {
-        if (traceId != 0) {
-            output.traceBegin(traceId, clock);
+        if (marker != null) {
+            output.traceBegin(marker.getTraceId(), getClock());
         }
 
         output.traceEnter(classId, methodId, signatureId, 0);
-        output.traceStats(calls, errors);
+        output.traceStats(calls, errors, marker != null ? marker.getFlags() : 0);
 
         if (attrs != null) {
             for (Map.Entry<Integer,Object> entry : attrs.entrySet()) {
@@ -195,7 +198,7 @@ public class TraceElement {
         }
 
         if (children != null) {
-            for (TraceElement child : children) {
+            for (TraceRecord child : children) {
                 child.traverse(output);
             }
         }
@@ -206,4 +209,29 @@ public class TraceElement {
             output.traceReturn(time);
         }
     }
+
+
+    public int childCount() {
+        return children != null ? children.size() : 0;
+    }
+
+
+    public void clean() {
+        time = 0;
+        classId = methodId = signatureId = 0;
+        attrs = null;
+        children = null;
+        marker = null;
+        calls = errors = 0;
+        flags = 0;
+    }
+
+    public void markOverflow() {
+        flags |= OVERFLOW_FLAG;
+    }
+
+    public boolean hasOverflow() {
+        return 0 != (flags & OVERFLOW_FLAG);
+    }
+
 }

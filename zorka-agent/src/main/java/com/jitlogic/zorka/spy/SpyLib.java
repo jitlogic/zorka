@@ -150,7 +150,7 @@ public class SpyLib {
     }
 
 
-    public void tracerOutput(ZorkaAsyncThread<TraceElement> output) {
+    public void tracerOutput(ZorkaAsyncThread<TraceRecord> output) {
         instance.getTracer().setOutput(output);
     }
 
@@ -427,9 +427,14 @@ public class SpyLib {
      * @return spy processor object triggering new trace
      */
     public SpyProcessor traceBegin(String name) {
-        return new TraceBeginProcessor(instance.getTracer(), name);
+        return new TraceBeginProcessor(instance.getTracer(), name, -1);
     }
 
+
+
+    public SpyProcessor traceBegin(String name, long minimumTraceTime) {
+        return new TraceBeginProcessor(instance.getTracer(), name, minimumTraceTime * 1000000L);
+    }
 
     /**
      * Attaches attribute to trace record.
@@ -444,7 +449,7 @@ public class SpyLib {
 
 
 
-    public ZorkaAsyncThread<TraceElement> traceFile(String path, int maxFiles, long maxSize) {
+    public ZorkaAsyncThread<TraceRecord> traceFile(String path, int maxFiles, long maxSize) {
         TraceFileWriter writer = new TraceFileWriter(path, instance.getTracer().getSymbolRegistry(), maxFiles, maxSize);
         writer.start();
         return writer;

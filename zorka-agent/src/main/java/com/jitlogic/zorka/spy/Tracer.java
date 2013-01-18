@@ -20,7 +20,41 @@ import com.jitlogic.zorka.util.ZorkaAsyncThread;
 
 public class Tracer {
 
-    private long methodTime = 250000;
+    private static long defaultMethodTime = 250000;
+    private static long defaultTraceTime = 50000000;
+
+    private static int defaultTraceSize = 4096;
+
+
+    public static long getDefaultMethodTime() {
+        return defaultMethodTime;
+    }
+
+
+    public static void setDefaultMethodTime(long methodTime) {
+        defaultMethodTime = methodTime;
+    }
+
+
+    public static long getDefaultTraceTime() {
+        return defaultTraceTime;
+    }
+
+
+    public static void setDefaultTraceTime(long traceTime) {
+        defaultTraceTime = traceTime;
+    }
+
+
+    public static int getDefaultTraceSize() {
+        return defaultTraceSize;
+    }
+
+
+    public static void setDefaultTraceSize(int traceSize) {
+        defaultTraceSize = traceSize;
+    }
+
 
     /** Defines which classes and methods should be traced. */
     private SpyMatcherSet matcherSet = new SpyMatcherSet();
@@ -29,12 +63,13 @@ public class Tracer {
     private SymbolRegistry symbolRegistry = new SymbolRegistry();
 
     /** Output handler is initially set to null implementation. */
-    private ZorkaAsyncThread<TraceElement> output;
+    private ZorkaAsyncThread<TraceRecord> output;
 
-    private ThreadLocal<TraceEventHandler> localHandlers =
-        new ThreadLocal<TraceEventHandler>() {
-            public TraceEventHandler initialValue() {
-                return new TraceBuilder(output, methodTime);
+
+    private ThreadLocal<TraceBuilder> localHandlers =
+        new ThreadLocal<TraceBuilder>() {
+            public TraceBuilder initialValue() {
+                return new TraceBuilder(output);
             }
         };
 
@@ -54,14 +89,11 @@ public class Tracer {
     }
 
 
-    public void setOutput(ZorkaAsyncThread<TraceElement> output) {
+    public void setOutput(ZorkaAsyncThread<TraceRecord> output) {
         this.output = output;
     }
 
 
-    public void setMethodTime(long methodTime) {
-        this.methodTime = methodTime;
-    }
 
     public SpyMatcherSet getMatcherSet() {
         return matcherSet;
