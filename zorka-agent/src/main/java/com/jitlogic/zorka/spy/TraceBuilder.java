@@ -19,6 +19,7 @@ package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogConfig;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 /**
@@ -51,12 +52,16 @@ public class TraceBuilder extends TraceEventHandler {
     public void traceBegin(int traceId, long clock) {
 
         if (ttop == null) {
-            log.error("Attempt to set trace marker on an non-traced method.");
+            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_TRACE_ERRORS)) {
+                log.error("Attempt to set trace marker on an non-traced method.");
+            }
             return;
         }
 
         if (mtop != null && mtop.getRoot().equals(ttop)) {
-            log.error("Trace marker already set on current frame. Skipping.");
+            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_TRACE_ERRORS)) {
+                log.error("Trace marker already set on current frame. Skipping.");
+            }
             return;
         }
 
@@ -150,7 +155,9 @@ public class TraceBuilder extends TraceEventHandler {
             if (ttop.getMarker().equals(mtop)) {
                 mtop = mtop.pop();
             } else {
-                log.error("Markers didn't match on tracer stack pop.");
+                if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_TRACE_ERRORS)) {
+                    log.error("Markers didn't match on tracer stack pop.");
+                }
             }
         }
 

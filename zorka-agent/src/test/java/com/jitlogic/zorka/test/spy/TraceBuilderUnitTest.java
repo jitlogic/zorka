@@ -20,7 +20,9 @@ import com.jitlogic.zorka.spy.*;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 
 import com.jitlogic.zorka.test.support.TestUtil;
+import com.jitlogic.zorka.test.support.ZorkaFixture;
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.util.ZorkaLogConfig;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,7 +31,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
-public class TraceBuilderUnitTest {
+public class TraceBuilderUnitTest extends ZorkaFixture {
 
     private TestTracer output = new TestTracer();
     private SymbolRegistry symbols = new SymbolRegistry();
@@ -279,6 +281,7 @@ public class TraceBuilderUnitTest {
     @Test
     public void testTraceWithMultipleBeginFlags() throws Exception {
         Tracer.setDefaultTraceTime(0);
+        ZorkaLogConfig.setTracerLevel(0); // TODO check why ZorkaLog objects are not constructed correctly in this test
 
         builder.traceEnter(c1, m1, s1, 1*MS);
         builder.traceBegin(t1, 2*MS);

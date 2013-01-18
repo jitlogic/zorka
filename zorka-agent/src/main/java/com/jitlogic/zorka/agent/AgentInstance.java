@@ -23,6 +23,7 @@ import com.jitlogic.zorka.spy.MainSubmitter;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyLib;
 import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogConfig;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
@@ -237,6 +238,8 @@ public class AgentInstance {
         if ("yes".equalsIgnoreCase(props.getProperty("zorka.syslog", "no").trim())) {
             initSyslogTrapper(props);
         }
+
+        ZorkaLogConfig.configure(props);
     }
 
     /**

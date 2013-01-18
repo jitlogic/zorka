@@ -18,6 +18,7 @@ package com.jitlogic.zorka.spy;
 
 
 import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogConfig;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
@@ -49,8 +50,8 @@ public class SymbolEnricher extends TraceEventHandler {
 
         if (0 == (mask[idx] & (1 << bit))) {
             String sym = symbols.symbolName(id);
-            if (SpyInstance.isDebugEnabled(SpyLib.SPD_TRACE_DEBUG)) {
-                log.debug("Adding symbol '" + sym + "' <- " + id);
+            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
+                log.debug("Enriching output stream with symbol '" + sym + "', id=" + id);
             }
             output.newSymbol(id, sym);
             mask[idx] |= (1 << bit);
@@ -60,7 +61,7 @@ public class SymbolEnricher extends TraceEventHandler {
 
 
     public void reset() {
-        if (SpyInstance.isDebugEnabled(SpyLib.SPD_TRACE_DEBUG)) {
+        if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
             log.debug("Resetting symbol enricher.");
         }
         for (int i = 0; i < mask.length; i++) {

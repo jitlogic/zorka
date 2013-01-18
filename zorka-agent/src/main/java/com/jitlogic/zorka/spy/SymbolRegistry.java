@@ -16,12 +16,16 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogConfig;
+import com.jitlogic.zorka.util.ZorkaLogger;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SymbolRegistry {
 
-    public static final int NULL_SYMBOL = 0;
+    private static final ZorkaLog log = ZorkaLogger.getLog(SymbolRegistry.class);
 
     private AtomicInteger idCounter = new AtomicInteger(0);
 
@@ -35,6 +39,11 @@ public class SymbolRegistry {
 
         if (id == null) {
             int newid = idCounter.incrementAndGet();
+
+            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_REGISTRY)) {
+                log.debug("Adding symbol '" + symbol + "', newid=" + newid);
+            }
+
             id = symbols.putIfAbsent(symbol, newid);
             if (id == null) {
                 idents.put(newid, symbol);
@@ -52,6 +61,11 @@ public class SymbolRegistry {
 
 
     public void put(int symbolId, String symbol) {
+
+        if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_REGISTRY)) {
+            log.debug("Putting symbol '" + symbol + "', newid=" + symbolId);
+        }
+
         symbols.put(symbol, symbolId);
         idents.put(symbolId, symbol);
 

@@ -15,14 +15,10 @@
  */
 package com.jitlogic.zorka.test;
 
-import com.jitlogic.zorka.test.agent.BshAgentUnitTest;
-import com.jitlogic.zorka.test.agent.ObjectInspectorUnitTest;
-import com.jitlogic.zorka.test.agent.ZorkaLibUnitTest;
-import com.jitlogic.zorka.test.agent.ZorkaUtilUnitTest;
+import com.jitlogic.zorka.test.agent.*;
 import com.jitlogic.zorka.test.integ.NagiosAgentUnitTest;
 import com.jitlogic.zorka.test.integ.ZabbixAgentUnitTest;
 import com.jitlogic.zorka.test.integ.ZabbixDiscoveryUnitTest;
-import com.jitlogic.zorka.test.agent.MBeanMappingUnitTest;
 import com.jitlogic.zorka.test.normproc.LdapLexerUnitTest;
 import com.jitlogic.zorka.test.normproc.XqlLexerUnitTest;
 import com.jitlogic.zorka.test.normproc.XqlNormalizationUnitTest;
@@ -58,7 +54,7 @@ import org.junit.runners.Suite;
         AggregateCountingUnitTest.class, AverageRateCountingUnitTest.class, BshAgentUnitTest.class,
         LdapLexerUnitTest.class, MBeanMappingUnitTest.class, NagiosAgentUnitTest.class, ObjectInspectorUnitTest.class,
         SlidingWindowUnitTest.class, XqlLexerUnitTest.class, XqlNormalizationUnitTest.class, ZabbixAgentUnitTest.class,
-        ZabbixDiscoveryUnitTest.class, ZorkaLibUnitTest.class, ZorkaUtilUnitTest.class
+        ZabbixDiscoveryUnitTest.class, ZorkaLibUnitTest.class, ZorkaUtilUnitTest.class, LogConfigUnitTest.class
 })
 public class UnitTestSuite {
 }
