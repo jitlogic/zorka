@@ -23,5 +23,55 @@
             <version>1.6.4</version>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Main-Class>com.jitlogic.zorka.viewer.ViewerMain</Main-Class>
+                            <Premain-Class>com.jitlogic.zorka.agent.AgentMain</Premain-Class>
+                            <Can-Redefine-Classes>true</Can-Redefine-Classes>
+                            <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>jarjar-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jarjar</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>com.jitlogic.zorka:zorka-agent</include>
+                                <include>org.swinglabs.swingx:swingx-core</include>
+                                <include>org.swinglabs.swingx:swingx-plaf</include>
+                                <include>org.swinglabs.swingx:swingx-action</include>
+                                <include>org.swinglabs.swingx:swingx-common</include>
+                                <include>org.swinglabs.swingx:swingx-autocomplete</include>
+                                <include>org.swinglabs.swingx:swingx-painters</include>
+                            </includes>
+                            <rules>
+                                <keep>
+                                    <pattern>org.jdesktop.swingx.**</pattern>
+                                </keep>
+                                <keep>
+                                    <pattern>com.jitlogic.zorka.**</pattern>
+                                </keep>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
+        </plugins>
+    </build>
 </project>

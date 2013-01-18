@@ -2,7 +2,8 @@ Zorka 0.8 (2013-01-20)
 ---------------------
 
  * rudimentary method call tracer implemented;
- * zorka-viewer: trace viewer and analysis tool;
+ * zorka-viewer: trace files viewer;
+
 
 Zorka 0.7 (2013-01-06)
 ----------------------
