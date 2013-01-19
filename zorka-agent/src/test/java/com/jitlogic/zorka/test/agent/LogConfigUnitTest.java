@@ -13,22 +13,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.test.stress.support;
 
-public class TestClass3 {
+package com.jitlogic.zorka.test.agent;
 
-    public int counter;
+import com.jitlogic.zorka.util.ZorkaLogConfig;
+import org.junit.Test;
+import org.junit.Assert;
 
-    public void trivialMethod() {
-        counter++;
-    }
+public class LogConfigUnitTest {
 
-    public void run(String name, long ntimes) {
-        if ("trivialMethod".equals(name)) {
-            for (long l = 0; l < ntimes; l++) {
-                trivialMethod();
-            }
-        }
+    @Test
+    public void testParseSimpleLogConfigStrings() {
+        Assert.assertEquals(ZorkaLogConfig.ZTR_CONFIG, ZorkaLogConfig.parse("", "ZTR", "CONFIG"));
+        Assert.assertEquals(ZorkaLogConfig.ZTR_CONFIG|ZorkaLogConfig.ZTR_TRACE_CALLS,
+                ZorkaLogConfig.parse("", "ZTR", "CONFIG,TRACE_CALLS"));
+        Assert.assertEquals(ZorkaLogConfig.ZTR_CONFIG|ZorkaLogConfig.ZTR_TRACE_CALLS,
+                ZorkaLogConfig.parse("", "ZTR", "config, trace_calls"));
     }
 
 }

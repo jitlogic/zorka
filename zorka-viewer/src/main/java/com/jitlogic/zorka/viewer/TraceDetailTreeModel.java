@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -93,7 +93,7 @@ public class TraceDetailTreeModel extends AbstractTreeTableModel {
 
     @Override
     public int getChildCount(Object parent) {
-        return parent instanceof NamedTraceRecord ? ((NamedTraceRecord)parent).childCount() : 0;
+        return parent instanceof NamedTraceRecord ? ((NamedTraceRecord)parent).numChildren() : 0;
     }
 
 
@@ -103,7 +103,7 @@ public class TraceDetailTreeModel extends AbstractTreeTableModel {
             NamedTraceRecord p = (NamedTraceRecord)parent;
             NamedTraceRecord c = (NamedTraceRecord)child;
 
-            for (int i = 0; i < p.childCount(); i++) {
+            for (int i = 0; i < p.numChildren(); i++) {
                 if (c.equals(p.getChild(i))) {
                     return i;
                 }

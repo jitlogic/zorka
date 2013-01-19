@@ -569,3 +569,53 @@ spy records and then passes is to a log processing chain referenced by `processo
 This function returns collector that will automatically convert other types of log records (eg. log4j, jdk logger,
 jboss 7 logger etc.) and pass them to log processing chain.
 
+### Collecting method traces
+
+
+#### Selecting classes and method for trace
+
+    spy.traceInclude(matcher, matcher, ....)
+    spy.traceExclude(matcher, matcher, ....)
+
+First function adds matcher that will include classes (methods), second adds matcher that will exclude classes (or
+methods). Note that added matcher are evaluated in order they've been added, so you may consider adding general
+exclusions first and add "everything" after that.
+
+#### Marking trace beginning
+
+    spy.traceBegin(label)
+    spy.traceBegin(label, minExecutionTime)
+
+This processor marks beginning of a trace. Tracer will start collecting method call data when it application enters to
+an instrumented method that has `traceBegin()` in its processing chain and will submit collected data at method exit.
+
+Traces are submitted only when execution took more than predefined time. This minimum time can be passed as an argument
+of `traceBegin()` or some system-wide default value can be used.
+
+#### Adding attributes
+
+    spy.traceAttr(fieldName, attrName)
+
+This processor will add value from given spy record field as a named attribute to a trace. It can be invoked at any
+method not only trace beginning. Attributes will be attached to this method's trace record (so the same attribute can
+appear at many records in the same trace).
+
+#### Configuring tracer output
+
+    spy.traceFile(path, maxFiles, maxSize)
+    spy.traceOutput(output)
+
+First function creates trace file writer object that can be installed into tracer using second function.
+
+#### Global tracer options
+
+    spy.setTracerMinMethodTime(nanoseconds);
+    spy.setTracerMinTraceTime(milliseconds);
+    spy.setTracerMaxTraceRecords(nrecords);
+
+First function sets default minimum execution time for a method to be included into trace. Note that due to required
+resolution, passed time parameter is in nanoseconds (not milliseconds as usual). Second function sets default minimum
+execution time for a trace to be further processed after completion. Third function sets limit for a number of records
+included in a single trace. This limit is necessary to prevent tracer from overruning host memory in cases there traced
+method calls lots and lots of other traced methods (and all become logged for some reason).
+

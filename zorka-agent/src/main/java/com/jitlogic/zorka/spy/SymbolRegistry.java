@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -16,25 +16,53 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogConfig;
+import com.jitlogic.zorka.util.ZorkaLogger;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Tracks information on all symbol strings used by tracer. These are mainly trace names,
+ * class names, method names and method signature strings. Maintains name-to-ID maps, so
+ * tracer can use just integer IDs internally but present human-readable names when necessary.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class SymbolRegistry {
 
-    public static final int NULL_SYMBOL = 0;
+    /** Logger */
+    private static final ZorkaLog log = ZorkaLogger.getLog(SymbolRegistry.class);
 
-    private AtomicInteger idCounter = new AtomicInteger(0);
+    /** ID of last symbol added to registry. */
+    private AtomicInteger lastId = new AtomicInteger(0);
 
+    /** Symbol name to ID map */
     private ConcurrentHashMap<String,Integer> symbols = new ConcurrentHashMap<String, Integer>();
 
+    /** Symbol ID to name map */
     private ConcurrentHashMap<Integer,String> idents = new ConcurrentHashMap<Integer,String>();
 
 
+    /**
+     * Returns ID of named symbol. If symbol hasn't been registered yet,
+     * it will be and new ID will be assigned for it.
+     *
+     * @param symbol symbol name
+     *
+     * @return symbol ID (integer)
+     */
     public int symbolId(String symbol) {
         Integer id = symbols.get(symbol);
 
         if (id == null) {
-            int newid = idCounter.incrementAndGet();
+            int newid = lastId.incrementAndGet();
+
+            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_REGISTRY)) {
+                log.debug("Adding symbol '" + symbol + "', newid=" + newid);
+            }
+
             id = symbols.putIfAbsent(symbol, newid);
             if (id == null) {
                 idents.put(newid, symbol);
@@ -46,23 +74,47 @@ public class SymbolRegistry {
     }
 
 
+    /**
+     * Returns symbol name based on ID or null if no such symbol has been registered.
+     *
+     * @param symbolId symbol ID
+     *
+     * @return symbol name
+     */
     public String symbolName(int symbolId) {
         return idents.get(symbolId);
     }
 
 
+    /**
+     * Adds new symbol to registry (with predefined ID).
+     *
+     * @param symbolId symbol ID
+     *
+     * @param symbol symbol name
+     */
     public void put(int symbolId, String symbol) {
+
+        if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_REGISTRY)) {
+            log.debug("Putting symbol '" + symbol + "', newid=" + symbolId);
+        }
+
         symbols.put(symbol, symbolId);
         idents.put(symbolId, symbol);
 
         // TODO not thread safe !
-        if (symbolId > idCounter.get()) {
-            idCounter.set(symbolId);
+        if (symbolId > lastId.get()) {
+            lastId.set(symbolId);
         }
     }
 
 
+    /**
+     * Returns ID of last registered symbol.
+     *
+     * @return last symbol ID
+     */
     public int lastId() {
-        return idCounter.get();
+        return lastId.get();
     }
 }

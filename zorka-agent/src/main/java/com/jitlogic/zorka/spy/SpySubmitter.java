@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -17,8 +17,23 @@
 
 package com.jitlogic.zorka.spy;
 
+/**
+ * Objects implementing this interface are capable of receiving and processing
+ * unprocessed submission events coming directly from spy probes.
+ */
 public interface SpySubmitter {
 
+    /**
+     * Receives spy probe submission.
+     *
+     * @param stage determines if submission comes from method entry, method return or method error handling code
+     *
+     * @param id spy context ID
+     *
+     * @param submitFlags submission flags
+     *
+     * @param vals fetched values (or null if no values are fetched)
+     */
     void submit(int stage, int id, int submitFlags, Object[] vals);
 
 }

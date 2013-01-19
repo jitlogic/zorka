@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -36,7 +36,11 @@ public class TracePrinter extends TraceEventHandler {
 
     private int level;
 
-
+    /**
+     * Creates new trace printer object.
+     *
+     * @param out output stream
+     */
     public TracePrinter(PrintStream out) {
         this.out = out;
     }

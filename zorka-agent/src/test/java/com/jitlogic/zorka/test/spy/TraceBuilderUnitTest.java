@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,9 @@ import com.jitlogic.zorka.spy.*;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 
 import com.jitlogic.zorka.test.support.TestUtil;
+import com.jitlogic.zorka.test.support.ZorkaFixture;
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.util.ZorkaLogConfig;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,7 +31,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
-public class TraceBuilderUnitTest {
+public class TraceBuilderUnitTest extends ZorkaFixture {
 
     private TestTracer output = new TestTracer();
     private SymbolRegistry symbols = new SymbolRegistry();
@@ -53,9 +55,9 @@ public class TraceBuilderUnitTest {
 
     @After
     public void tearDown() {
-        Tracer.setDefaultTraceSize(4096);
-        Tracer.setDefaultMethodTime(250000);
-        Tracer.setDefaultTraceTime(50 * MS);
+        spy.setTracerMaxTraceRecords(4096);
+        spy.setTracerMinMethodTime(250000);
+        spy.setTracerMinTraceTime(50);
     }
 
     @Test
@@ -178,8 +180,8 @@ public class TraceBuilderUnitTest {
 
     @Test
     public void testTraceRecordLimitHorizontal() throws Exception {
-        Tracer.setDefaultTraceSize(3);
-        Tracer.setDefaultTraceTime(0);
+        spy.setTracerMaxTraceRecords(3);
+        spy.setTracerMinTraceTime(0);
 
         builder.traceEnter(c1, m1, s1, 1 * MS);
         builder.traceBegin(t1, 2 * MS);
@@ -196,7 +198,7 @@ public class TraceBuilderUnitTest {
 
         TraceRecord top = TestUtil.getField(builder, "ttop");
         assertEquals("Should limit to 2 children (plus parent)",
-                2, top.childCount());
+                2, top.numChildren());
 
         builder.traceReturn(11 * MS);
 
@@ -207,8 +209,8 @@ public class TraceBuilderUnitTest {
 
     @Test
     public void testTraceRecordLimitVertical() throws Exception {
-        Tracer.setDefaultTraceSize(3);
-        Tracer.setDefaultTraceTime(0);
+        spy.setTracerMaxTraceRecords(3);
+        spy.setTracerMinTraceTime(0);
 
         // Start new trace
         builder.traceEnter(c1, m1, s1, 1 * MS);
@@ -225,7 +227,7 @@ public class TraceBuilderUnitTest {
         builder.traceReturn(10*MS);
 
         TraceRecord top = TestUtil.getField(builder, "ttop");
-        assertEquals("Root record of a trace should have one child.", 1, top.childCount());
+        assertEquals("Root record of a trace should have one child.", 1, top.numChildren());
 
         builder.traceReturn(11*MS);
 
@@ -237,8 +239,8 @@ public class TraceBuilderUnitTest {
 
     @Test
     public void testTraceRecordLimitCrossingMarkers() throws Exception {
-        Tracer.setDefaultTraceSize(4);
-        Tracer.setDefaultTraceTime(0);
+        spy.setTracerMaxTraceRecords(4);
+        spy.setTracerMinTraceTime(0);
 
         // Start new trace
         builder.traceEnter(c1, m1, s1, 1*MS);
@@ -261,7 +263,7 @@ public class TraceBuilderUnitTest {
 
         // Check inner trace
         TraceRecord top = TestUtil.getField(builder, "ttop");
-        assertEquals("Root record of a trace should have only one child.", 1, top.childCount());
+        assertEquals("Root record of a trace should have only one child.", 1, top.numChildren());
         Assert.assertEquals("Should record traceBegin and 3 full frames (3 records each)",
                 1 + 3 * 3, output.size());
 
@@ -278,7 +280,8 @@ public class TraceBuilderUnitTest {
 
     @Test
     public void testTraceWithMultipleBeginFlags() throws Exception {
-        Tracer.setDefaultTraceTime(0);
+        spy.setTracerMinTraceTime(0);
+        ZorkaLogConfig.setTracerLevel(0); // TODO check why ZorkaLog objects are not constructed correctly in this test
 
         builder.traceEnter(c1, m1, s1, 1*MS);
         builder.traceBegin(t1, 2*MS);
@@ -292,7 +295,7 @@ public class TraceBuilderUnitTest {
 
     @Test
     public void testTraceWithTooManyReturns() throws Exception {
-        Tracer.setDefaultTraceTime(0);
+        spy.setTracerMinTraceTime(0);
 
         // Submit one frame
         builder.traceEnter(c1, m1, s1, 1*MS);
@@ -313,7 +316,7 @@ public class TraceBuilderUnitTest {
 
     @Test
     public void testSingleTraceWithMultipleEmbeddedTracesInside() throws Exception {
-        Tracer.setDefaultTraceTime(0);
+        spy.setTracerMinTraceTime(0);
 
         // Submit one frame
         builder.traceEnter(c1, m1, s1, 1*MS);
