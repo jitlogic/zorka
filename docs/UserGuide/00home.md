@@ -6,7 +6,8 @@ instrumentation and beanshell scripting. With all these things it is possible to
 haven't been implemented with monitoring in mind with arbitrary granularity. Even monolithic applications
 (with no application server infrastructure at all) can be instrumented and monitored in detail. With Zorka
 you can step out of traditional monitoring limitations and do things that normally have to be implemented by
-application developers, for example auditing.
+application developers, for example auditing. Zorka also provides tracer that can be used to locate sources
+of problems haunting your application.
 
 User Guide:
 

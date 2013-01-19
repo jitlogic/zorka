@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -71,7 +71,7 @@ public class TracerIntegTest extends ZorkaFixture {
             spy.instance().onEnter(spy.traceBegin("TEST"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
-        spyInstance.getTracer().setDefaultMethodTime(0); // Catch everything
+        spyInstance.getTracer().setMinMethodTime(0); // Catch everything
         spy.tracerOutput(output);
 
         Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS1);
@@ -94,7 +94,7 @@ public class TracerIntegTest extends ZorkaFixture {
                 spy.traceBegin("TEST"), spy.put("URL", "http://some.url"), spy.traceAttr("URL", "URL")
         ).include(spy.byMethod(TCLASS1, "trivialMethod")));
 
-        spyInstance.getTracer().setDefaultMethodTime(0); // Catch everything
+        spyInstance.getTracer().setMinMethodTime(0); // Catch everything
         spy.tracerOutput(output);
 
         Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS1);

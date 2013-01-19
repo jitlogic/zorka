@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.util.ZorkaLogConfig;
 import com.jitlogic.zorka.util.ZorkaLogger;
 
 /**
@@ -40,8 +41,15 @@ public class TraceBuilder extends TraceEventHandler {
     /** Top of trace records stack. */
     private TraceRecord ttop = new TraceRecord(null);
 
+    /** Number of records collected so far */
     private int numRecords = 0;
 
+
+    /**
+     * Creates new trace builder object.
+     *
+     * @param output object completed traces will be submitted to
+     */
     public TraceBuilder(ZorkaAsyncThread<TraceRecord> output) {
         this.output = output;
     }
@@ -51,12 +59,16 @@ public class TraceBuilder extends TraceEventHandler {
     public void traceBegin(int traceId, long clock) {
 
         if (ttop == null) {
-            log.error("Attempt to set trace marker on an non-traced method.");
+            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_TRACE_ERRORS)) {
+                log.error("Attempt to set trace marker on an non-traced method.");
+            }
             return;
         }
 
         if (mtop != null && mtop.getRoot().equals(ttop)) {
-            log.error("Trace marker already set on current frame. Skipping.");
+            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_TRACE_ERRORS)) {
+                log.error("Trace marker already set on current frame. Skipping.");
+            }
             return;
         }
 
@@ -86,7 +98,7 @@ public class TraceBuilder extends TraceEventHandler {
         ttop.setTime(tstamp);
         ttop.setCalls(ttop.getCalls() + 1);
 
-        if (numRecords > Tracer.getDefaultTraceSize()) {
+        if (numRecords > Tracer.getMaxTraceRecords()) {
             ttop.markOverflow();
         }
 
@@ -137,6 +149,13 @@ public class TraceBuilder extends TraceEventHandler {
     }
 
 
+    /**
+     * This method it called at method return (normal or error). In general it pops current
+     * trace record from top of stack but it also implements quite a bit of logic handling
+     * various aspects of handling trace records (filtering, limiting number of records in one
+     * frame, reusing trace record if suitable etc.).
+     *
+     */
     private void pop() {
 
         boolean clean = true;
@@ -150,14 +169,16 @@ public class TraceBuilder extends TraceEventHandler {
             if (ttop.getMarker().equals(mtop)) {
                 mtop = mtop.pop();
             } else {
-                log.error("Markers didn't match on tracer stack pop.");
+                if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_TRACE_ERRORS)) {
+                    log.error("Markers didn't match on tracer stack pop.");
+                }
             }
         }
 
         TraceRecord parent = ttop.getParent();
 
         if (parent != null) {
-            if ((ttop.getTime() > Tracer.getDefaultMethodTime() || ttop.getErrors() > 0)) {
+            if ((ttop.getTime() > Tracer.getMinMethodTime() || ttop.getErrors() > 0)) {
                 if (!ttop.hasOverflow()) {
                     parent.addChild(ttop);
                     clean = false;
@@ -177,9 +198,16 @@ public class TraceBuilder extends TraceEventHandler {
             ttop = parent != null ? parent : new TraceRecord(null);
         }
 
-    } // pop()
+    }
 
 
+    /**
+     * Sets minimum trace execution time for currently recorded trace.
+     * If there is no trace being recorded just yet, this method will
+     * have no effect.
+     *
+     * @param minimumTraceTime (in nanoseconds)
+     */
     public void setMinimumTraceTime(long minimumTraceTime) {
         if (mtop != null) {
             mtop.setMinimumTime(minimumTraceTime);

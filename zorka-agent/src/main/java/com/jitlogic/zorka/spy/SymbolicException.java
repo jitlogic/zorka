@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -18,18 +18,44 @@ package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.util.ZorkaUtil;
 
+/**
+ * Represents exception in symbolic form (suitable to be saved into trace file
+ * and restored by trace reader without need to actually have this exact exception
+ * class in trace reader classpath).
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class SymbolicException implements TracedException {
 
+
+    /** Exception class name symbol ID */
     private int classId;
+
+
+    /** Exception message text */
     private String message;
 
 
+    /**
+     * Creates new symbolic exception object.
+     *
+     * @param classId class ID
+     *
+     * @param message error message
+     */
     public SymbolicException(int classId, String message) {
         this.classId = classId;
         this.message = message;
     }
 
 
+    /**
+     * Creates new symbolic exception object from local throwable object.
+     *
+     * @param exception
+     *
+     * @param symbols
+     */
     public SymbolicException(Throwable exception, SymbolRegistry symbols) {
         this.classId = symbols.symbolId(exception.getClass().getName());
         this.message = exception.getMessage();

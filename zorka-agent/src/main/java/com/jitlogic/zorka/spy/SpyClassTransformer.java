@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -58,6 +58,11 @@ public class SpyClassTransformer implements ClassFileTransformer {
     Tracer tracer;
 
 
+    /**
+     * Creates new spy class transformer
+     *
+     * @param tracer reference to tracer engine object
+     */
     public SpyClassTransformer(Tracer tracer) {
         this.tracer = tracer;
     }

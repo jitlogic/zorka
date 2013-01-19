@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -17,12 +17,20 @@
 package com.jitlogic.zorka.spy;
 
 /**
- * Represents exceptions
+ * Represents wrapped exceptions in a form that is compatible with symbolic
+ * exceptions.
+ *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class WrappedException implements TracedException {
 
     private Throwable exception;
 
+    /**
+     * Creates new wrapper around exception.
+     *
+     * @param exception exception to be wrapper.
+     */
     public WrappedException(Throwable exception) {
         this.exception = exception;
     }
