@@ -17,12 +17,20 @@
 package com.jitlogic.zorka.spy;
 
 /**
- * Represents exceptions
+ * Represents wrapped exceptions in a form that is compatible with symbolic
+ * exceptions.
+ *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class WrappedException implements TracedException {
 
     private Throwable exception;
 
+    /**
+     * Creates new wrapper around exception.
+     *
+     * @param exception exception to be wrapper.
+     */
     public WrappedException(Throwable exception) {
         this.exception = exception;
     }

@@ -150,6 +150,11 @@ public class SpyLib {
     }
 
 
+    /**
+     * Configures tracer output.
+     *
+     * @param output trace processing object
+     */
     public void tracerOutput(ZorkaAsyncThread<TraceRecord> output) {
         instance.getTracer().setOutput(output);
     }
@@ -228,11 +233,22 @@ public class SpyLib {
     /**
      * Adds matching method to tracer.
      *
-     * @param matchers
+     * @param matchers spy matcher objects (created using spy.byXxxx() functions)
      */
-    public void traceInclude(SpyMatcher... matchers) {
+    public void traceInclude(SpyMatcher...matchers) {
         for (SpyMatcher matcher : matchers) {
             instance.getTracer().include(matcher);
+        }
+    }
+
+    /**
+     * Exclude classes/methods from tracer.
+     *
+     * @param matchers spy matcher objects (created using spy.byXxxx() functions)
+     */
+    public void traceExclude(SpyMatcher...matchers) {
+        for (SpyMatcher matcher : matchers) {
+            instance.getTracer().include(matcher.exclude());
         }
     }
 
@@ -420,17 +436,27 @@ public class SpyLib {
      * Starts a new (named) trace.
      *
      * @param name trace name
-     * @return spy processor object triggering new trace
+     *
+     * @return spy processor object marking new trace
      */
     public SpyProcessor traceBegin(String name) {
         return new TraceBeginProcessor(instance.getTracer(), name, -1);
     }
 
 
-
+    /**
+     * Starts new trace.
+     *
+     * @param name trace name
+     *
+     * @param minimumTraceTime minimum trace time
+     *
+     * @return spy processor object marking new trace
+     */
     public SpyProcessor traceBegin(String name, long minimumTraceTime) {
         return new TraceBeginProcessor(instance.getTracer(), name, minimumTraceTime * 1000000L);
     }
+
 
     /**
      * Attaches attribute to trace record.
@@ -444,7 +470,17 @@ public class SpyLib {
     }
 
 
-
+    /**
+     * Creates trace file writer object. Trace writer can receive traces and store them in a file.
+     *
+     * @param path path to a file
+     *
+     * @param maxFiles maximum number of archived files
+     *
+     * @param maxSize maximum file size
+     *
+     * @return trace file writer
+     */
     public ZorkaAsyncThread<TraceRecord> traceFile(String path, int maxFiles, long maxSize) {
         TraceFileWriter writer = new TraceFileWriter(path, instance.getTracer().getSymbolRegistry(), maxFiles, maxSize);
         writer.start();
@@ -815,7 +851,7 @@ public class SpyLib {
      * @param traceTime minimum trace execution time (50 milliseconds by default)
      */
     public void setTracerMinTraceTime(long traceTime) {
-        Tracer.setMinTraceTime(traceTime);
+        Tracer.setMinTraceTime(traceTime * 1000000L);
     }
 
 

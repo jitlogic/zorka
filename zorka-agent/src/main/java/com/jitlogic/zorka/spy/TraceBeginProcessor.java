@@ -18,17 +18,41 @@ package com.jitlogic.zorka.spy;
 
 import java.util.Map;
 
+/**
+ * Marks beginning of a trace.
+ *
+ * @author rafal.lewczuk
+ */
 public class TraceBeginProcessor implements SpyProcessor {
 
+
+    /** Tracer object */
     private Tracer tracer;
+
+
+    /** Trace name symbol ID */
     private int traceId;
+
+
+    /** Minimum trace execution time */
     private long minimumTraceTime;
 
+
+    /**
+     * Creates new trace begin marking processsor.
+     *
+     * @param tracer tracer object
+     *
+     * @param traceName trace name (label)
+     *
+     * @param minimumTraceTime minimum trace execution time
+     */
     public TraceBeginProcessor(Tracer tracer, String traceName, long minimumTraceTime) {
         this.tracer = tracer;
         this.traceId = tracer.getSymbolRegistry().symbolId(traceName);
         this.minimumTraceTime = minimumTraceTime;
     }
+
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {

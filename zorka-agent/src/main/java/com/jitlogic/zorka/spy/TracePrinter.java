@@ -36,7 +36,11 @@ public class TracePrinter extends TraceEventHandler {
 
     private int level;
 
-
+    /**
+     * Creates new trace printer object.
+     *
+     * @param out output stream
+     */
     public TracePrinter(PrintStream out) {
         this.out = out;
     }

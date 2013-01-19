@@ -189,3 +189,55 @@ represent any object, so instrumented class won't load and will crash with class
 Using `include()` method administrator can add matching rules filtering which methods are to be instrumented. Methods
 matching any of passed matchers will be included. Matchers can be defined using `spy.byXXX()` functions.
 
+## Configuring tracer
+
+Tracer saves exact execution paths of instrumented methods and stores them in a file, so traces can be viewed at later
+time. There are two things that need to be set up when configuring tracer: selecting classes (and methods) tracer will
+instrument and defining entry points - methods at which traces will begin.
+
+### Selecting classes (and methods) to instrument for trace
+
+For tracer purposes classes and methods are instrumented en masse - that's because you don't know where your application
+can experience problems. Some packages (like: `java.**`) should be excluded in most (if not all) cases.
+
+Selecting classes (method) for trace can be done using `spy.traceInclude()` and `spy.traceExclude()` methods.
+It accepts standard `spyMatcher` objects (the same as for spy definitions). Note that spy matchers have some special
+methods altering them that are even more suitable when choosing classes for tracer (notably `forTracer()` method that
+will automatically exclude constructors, accessor methods and some common methods, like `equals()`, `toString()` etc.
+
+For example:
+
+      spy.traceInclude(spy.byMethod("org.apache.catalina.**", "*").forTrace());
+
+Will add Tomcat methods to tracer.
+
+### Selecting trace entry points
+
+Tracer will start collecting information when application reaches a method that has been marked as trace beginning.
+This can be done instrumenting method in a standard way (create and add sdef) and using one of `spy.traceBegin()`
+functions to mark trace beginning. Function takes trace name (label) as mandatory argument and minimum trace execution
+time as optional argument. For example tracing HTTP requests in Tomcat can be configured like this:
+
+    spy.add(spy.instance()
+      .onEnter(spy.traceBegin("HTTP_REQ", 100))
+      .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
+
+All requests that took longer than 100 milliseconds will be saved in trace file.
+
+
+### Adding custom attributes to traces
+
+Custom attributes can be useful. For example, when tracing execution of HTTP request it might be suitable to add request
+URL (any maybe some POST parameters as well). When instrumenting SQL queries, posting normalized SQL query is necessary.
+Adding custom attributes can be done by instrumenting method in a standard way (create and add sdef) and using
+`spy.traceAttr()` functions to post (previously fetched and possibly normalized) attributes. Trace attributes can be
+added to any instrumented method, not just the beginning of a trace. They'll appear i proper places in method call tree,
+so it is possible for example to trace HTTP requests and add SQL queries to them (if needed).
+
+### Configuring tracer output
+
+Current implementation can write trace information to local files. Use `spy.traceFile()` function to create trace writer
+object and install it in tracer using `spy.traceOutput()` function. For example:
+
+    spy.tracerOutput(spy.traceFile("/tmp/trace.trc", 4, 4*1024*1024));
+

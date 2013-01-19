@@ -93,7 +93,7 @@ public class TraceDetailTreeModel extends AbstractTreeTableModel {
 
     @Override
     public int getChildCount(Object parent) {
-        return parent instanceof NamedTraceRecord ? ((NamedTraceRecord)parent).childCount() : 0;
+        return parent instanceof NamedTraceRecord ? ((NamedTraceRecord)parent).numChildren() : 0;
     }
 
 
@@ -103,7 +103,7 @@ public class TraceDetailTreeModel extends AbstractTreeTableModel {
             NamedTraceRecord p = (NamedTraceRecord)parent;
             NamedTraceRecord c = (NamedTraceRecord)child;
 
-            for (int i = 0; i < p.childCount(); i++) {
+            for (int i = 0; i < p.numChildren(); i++) {
                 if (c.equals(p.getChild(i))) {
                     return i;
                 }

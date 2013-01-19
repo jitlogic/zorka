@@ -19,30 +19,71 @@ package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.util.ByteBuffer;
 
+/**
+ * Implements simple trace encoder/decoder. Uses simple, uncompressed binary format.
+ * It basically reads/writes stream of commands that correspond to methods of
+ * TraceEventHandler interface.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class SimpleTraceFormat extends TraceEventHandler {
 
+    /** Simple format version 1 magic number */
     public static final int MAGIC_V1=0x57aace01;
 
+    /** traceBegin() call */
     public static final byte TRACE_BEGIN  = 0x01;
+
+    /** traceEnter() call */
     public static final byte TRACE_ENTER  = 0x02;
+
+    /** traceReturn() call */
     public static final byte TRACE_RETURN = 0x03;
+
+    /** traceError() call */
     public static final byte TRACE_ERROR  = 0x04;
+
+    /** traceStats() call */
     public static final byte TRACE_STATS  = 0x05;
+
+    /** newSymbol() call */
     public static final byte NEW_SYMBOL   = 0x06;
 
+    /** newAttr(key, null) call */
     public static final byte NULL_ATTR    = 0x40;
+
+    /** newAttr(key, byteVal) call */
     public static final byte BYTE_ATTR    = 0x41;
+
+    /** newAttr(key, shortVal) call */
     public static final byte SHORT_ATTR   = 0x42;
+
+    /** newAttr(key, intVal) call */
     public static final byte INTEGER_ATTR = 0x43;
+
+    /** newAttr(key, longVal) call */
     public static final byte LONG_ATTR    = 0x44;
+
+    /** newAttr(key, stringVal) call */
     public static final byte STRING_ATTR  = 0x45;
 
+    /** Input/output buffer */
     private ByteBuffer buf;
 
+    /**
+     * Creates simple trace encoder.
+     *
+     * @param buf output buffer
+     */
     public SimpleTraceFormat(ByteBuffer buf) {
         this.buf = buf;
     }
 
+    /**
+     * Creates simple trace decoder.
+     *
+     * @param buf input buffer
+     */
     public SimpleTraceFormat(byte[] buf) {
         this.buf = new ByteBuffer(buf);
     }
@@ -130,6 +171,12 @@ public class SimpleTraceFormat extends TraceEventHandler {
     }
 
 
+    /**
+     * Decodes buffer content. Decoded elements are transformed
+     * into calls to supplied trace event handler.
+     *
+     * @param output handler that will receive decoded events
+     */
     public void decode(TraceEventHandler output) {
         while (!buf.eof()) {
             byte cmd = buf.getByte();
@@ -177,12 +224,22 @@ public class SimpleTraceFormat extends TraceEventHandler {
     }
 
 
+    /**
+     * Encodes exception object.
+     *
+     * @param ex (wrapped or synthetic) symbolic exception representation.
+     */
     public void encodeException(SymbolicException ex) {
         buf.putInt(ex.getClassId());
         buf.putString(ex.getMessage());
     }
 
 
+    /**
+     * Decodes exception object.
+     *
+     * @return (synthetic) symbolic exception representation.
+     */
     public SymbolicException decodeException() {
         return new SymbolicException(buf.getInt(), buf.getString());
     }

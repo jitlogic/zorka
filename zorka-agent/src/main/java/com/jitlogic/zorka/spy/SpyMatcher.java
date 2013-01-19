@@ -83,7 +83,7 @@ public class SpyMatcher {
 
 
     /**
-     * Standard constructor
+     * Creates spy matcher
      *
      * @param flags custom matcher flags
      *
@@ -106,6 +106,19 @@ public class SpyMatcher {
     }
 
 
+    /**
+     * Copy constructor (for trace alteration methods below)
+     *
+     * @param flags custom matcher flags
+     *
+     * @param access accessibility flags
+     *
+     * @param classPattern class name/annotation pattern
+     *
+     * @param methodPattern method name/annotation pattern
+     *
+     * @param signaturePattern signature pattern
+     */
     private SpyMatcher(int flags, int access, Pattern classPattern, Pattern methodPattern, Pattern signaturePattern) {
         this.access = access;
         this.flags = flags;
@@ -113,6 +126,7 @@ public class SpyMatcher {
         this.methodPattern = methodPattern;
         this.signaturePattern = signaturePattern;
     }
+
 
     /**
      * Converts symbol match pattern (string) to regular expression object.
@@ -262,25 +276,50 @@ public class SpyMatcher {
     }
 
 
+    /**
+     * Marks trace as inverted trace (matching methods will be excluded rathern than included).
+     *
+     * @return altered spy matcher
+     */
     public SpyMatcher exclude() {
         return new SpyMatcher(flags | EXCLUDE_MATCH, access, classPattern, methodPattern, signaturePattern);
     }
 
 
+    /**
+     * Excludes constructors and static constructors.
+     *
+     * @return altered spy matcher
+     */
     public SpyMatcher noConstructors() {
         return new SpyMatcher(flags | NO_CONSTRUCTORS, access, classPattern, methodPattern, signaturePattern);
     }
 
 
+    /**
+     * Excludes accessor methods (that is, getters and setters)
+     *
+     * @return altered spy matcher
+     */
     public SpyMatcher noAccessors() {
         return new SpyMatcher(flags | NO_ACCESSORS, access, classPattern, methodPattern, signaturePattern);
     }
 
 
+    /**
+     * Excludes some commony used methods, like equals(), toString(), hashCode() etc.
+     *
+     * @return altered spy matcher
+     */
     public SpyMatcher noCommons() {
         return new SpyMatcher(flags | NO_COMMONS, access, classPattern, methodPattern, signaturePattern);
     }
 
+    /**
+     * Excludes typical methods not suitable for tracer (constructors, accessors, some common methods).
+     *
+     * @return altered spy matcher
+     */
     public SpyMatcher forTrace() {
         return new SpyMatcher(flags|NO_CONSTRUCTORS|NO_ACCESSORS|NO_COMMONS, access, classPattern, methodPattern, signaturePattern);
     }

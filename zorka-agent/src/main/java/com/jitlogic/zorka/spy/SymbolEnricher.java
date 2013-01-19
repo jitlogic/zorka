@@ -22,16 +22,36 @@ import com.jitlogic.zorka.util.ZorkaLogConfig;
 import com.jitlogic.zorka.util.ZorkaLogger;
 import com.jitlogic.zorka.util.ZorkaUtil;
 
+/**
+ * This trace event handler can be plugged between trace event sender and receiver.
+ * It will check if symbol IDs in trace events coming from sender are known to receiver.
+ * If not, it will send newSymbol() event with proper symbol name and ID prior to sending
+ * event containing such unknown symbol ID.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class SymbolEnricher extends TraceEventHandler {
 
+    /** Logger object */
     private static final ZorkaLog log = ZorkaLogger.getLog(SymbolEnricher.class);
 
+    /** Symbol ID bit mask. Zeroed bits in this mask mark symbols that are not yet known to receiver. */
     private long[] mask;
 
+    /** Symbol registry used by event sender. */
     private SymbolRegistry symbols;
+
+    /** Event receiver (output) object. */
     private TraceEventHandler output;
 
 
+    /**
+     * Creates new symbol enricher object.
+     *
+     * @param symbols symbol registry used by event sender
+     *
+     * @param output event receiver object
+     */
     public SymbolEnricher(SymbolRegistry symbols, TraceEventHandler output) {
         this.symbols = symbols;
         this.output = output;
@@ -40,6 +60,11 @@ public class SymbolEnricher extends TraceEventHandler {
     }
 
 
+    /**
+     * Checks if symbol of given ID has been sent to receiver. If not, proper symbol is sent.
+     *
+     * @param id symbol ID
+     */
     private void check(int id) {
         int idx = id >> 6;
         int bit = id & 63;
@@ -60,6 +85,10 @@ public class SymbolEnricher extends TraceEventHandler {
     }
 
 
+    /**
+     * Resets enricher. Since reset enricher will forget about all sent symbol IDs
+     * and will start sending (and memoizing) symbols once again.
+     */
     public void reset() {
         if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
             log.debug("Resetting symbol enricher.");

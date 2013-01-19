@@ -41,8 +41,15 @@ public class TraceBuilder extends TraceEventHandler {
     /** Top of trace records stack. */
     private TraceRecord ttop = new TraceRecord(null);
 
+    /** Number of records collected so far */
     private int numRecords = 0;
 
+
+    /**
+     * Creates new trace builder object.
+     *
+     * @param output object completed traces will be submitted to
+     */
     public TraceBuilder(ZorkaAsyncThread<TraceRecord> output) {
         this.output = output;
     }
@@ -142,6 +149,13 @@ public class TraceBuilder extends TraceEventHandler {
     }
 
 
+    /**
+     * This method it called at method return (normal or error). In general it pops current
+     * trace record from top of stack but it also implements quite a bit of logic handling
+     * various aspects of handling trace records (filtering, limiting number of records in one
+     * frame, reusing trace record if suitable etc.).
+     *
+     */
     private void pop() {
 
         boolean clean = true;
@@ -184,9 +198,16 @@ public class TraceBuilder extends TraceEventHandler {
             ttop = parent != null ? parent : new TraceRecord(null);
         }
 
-    } // pop()
+    }
 
 
+    /**
+     * Sets minimum trace execution time for currently recorded trace.
+     * If there is no trace being recorded just yet, this method will
+     * have no effect.
+     *
+     * @param minimumTraceTime (in nanoseconds)
+     */
     public void setMinimumTraceTime(long minimumTraceTime) {
         if (mtop != null) {
             mtop.setMinimumTime(minimumTraceTime);

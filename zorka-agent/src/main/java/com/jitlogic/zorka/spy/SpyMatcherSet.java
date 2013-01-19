@@ -22,28 +22,48 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * Groups all matchers and provides methods for matching that query all
+ * matchers it contains.
+ */
 public class SpyMatcherSet {
 
+    /** List of (included) matchers. */
     private List<SpyMatcher> matchers = new ArrayList<SpyMatcher>();
 
 
+    /**
+     * Creates new matcher set (with empty list of matchers).
+     */
     public SpyMatcherSet() {
-
     }
 
+
+    /**
+     * Creates new matcher set and populates it with supplied matchers.
+     *
+     * @param matchers initial matchers
+     */
     public SpyMatcherSet(SpyMatcher...matchers) {
         for (SpyMatcher matcher : matchers) {
             this.matchers.add(matcher);
         }
     }
 
+
+    /**
+     * Creates new matcher set and populates it with matchers from original matcher set and additional supplied matchers.
+     *
+     * @param orig original matcher set
+     *
+     * @param matchers supplied matchers
+     */
     public SpyMatcherSet(SpyMatcherSet orig, SpyMatcher...matchers) {
         this.matchers.addAll(orig.matchers);
         for (SpyMatcher matcher : matchers) {
             this.matchers.add(matcher);
         }
     }
-
 
 
     /**
@@ -73,6 +93,26 @@ public class SpyMatcherSet {
     }
 
 
+    /**
+     * Checks whetner given method matches any of included matchers. If passed method annotations list is null
+     * and any of included matchers looks for mathod annotations, this method will return true.
+     *
+     * @param className class name
+     *
+     * @param classAnnotations list of class names of class annotations
+     *
+     * @param classInterfaces list of class names of interfaces directly implemented by this class
+     *
+     * @param access method access flags
+     *
+     * @param methodName method name
+     *
+     * @param methodSignature method signature string
+     *
+     * @param methodAnnotations list of class names of method annotations
+     *
+     * @return true if method matches
+     */
     public boolean methodMatch(String className, List<String> classAnnotations, List<String> classInterfaces,
         int access, String methodName, String methodSignature, List<String> methodAnnotations) {
 
@@ -119,7 +159,11 @@ public class SpyMatcherSet {
     }
 
 
-
+    /**
+     * Returns true if any of included matchers looks for method annotations.
+     *
+     * @return true if any matcher looks for method annotations
+     */
     public boolean hasMethodAnnotations() {
         for (SpyMatcher matcher : matchers) {
             if (0 != (matcher.getFlags() & SpyMatcher.BY_METHOD_ANNOTATION)) {
@@ -130,12 +174,29 @@ public class SpyMatcherSet {
     }
 
 
-
+    /**
+     * Returns true supplied string matches given regular expression pattern.
+     *
+     * @param pattern regular expression pattern
+     *
+     * @param candidate candidate
+     *
+     * @return true if candidate matches
+     */
     private boolean match(Pattern pattern, String candidate) {
         return pattern.matcher(candidate).matches();
     }
 
 
+    /**
+     * Returns true if any of supplied strings matches given pattern.
+     *
+     * @param pattern regular expression pattern
+     *
+     * @param candidates candidates
+     *
+     * @return true if any candidate matches
+     */
     private boolean match(Pattern pattern, List<String> candidates) {
         for (String candidate : candidates) {
             if (pattern.matcher(candidate).matches()) {
@@ -146,6 +207,11 @@ public class SpyMatcherSet {
     }
 
 
+    /**
+     * Adds new matchers to matcher set. New matchers are appended at the end of list (and thus will be checked last).
+     *
+     * @param matchers appended matchers
+     */
     public void  include(SpyMatcher...matchers) {
 
         for (SpyMatcher matcher : matchers) {

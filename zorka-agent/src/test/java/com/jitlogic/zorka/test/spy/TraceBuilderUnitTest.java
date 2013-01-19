@@ -57,7 +57,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     public void tearDown() {
         spy.setTracerMaxTraceRecords(4096);
         spy.setTracerMinMethodTime(250000);
-        spy.setTracerMinTraceTime(50*MS);
+        spy.setTracerMinTraceTime(50);
     }
 
     @Test
@@ -198,7 +198,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         TraceRecord top = TestUtil.getField(builder, "ttop");
         assertEquals("Should limit to 2 children (plus parent)",
-                2, top.childCount());
+                2, top.numChildren());
 
         builder.traceReturn(11 * MS);
 
@@ -227,7 +227,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         builder.traceReturn(10*MS);
 
         TraceRecord top = TestUtil.getField(builder, "ttop");
-        assertEquals("Root record of a trace should have one child.", 1, top.childCount());
+        assertEquals("Root record of a trace should have one child.", 1, top.numChildren());
 
         builder.traceReturn(11*MS);
 
@@ -263,7 +263,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         // Check inner trace
         TraceRecord top = TestUtil.getField(builder, "ttop");
-        assertEquals("Root record of a trace should have only one child.", 1, top.childCount());
+        assertEquals("Root record of a trace should have only one child.", 1, top.numChildren());
         Assert.assertEquals("Should record traceBegin and 3 full frames (3 records each)",
                 1 + 3 * 3, output.size());
 

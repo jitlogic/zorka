@@ -16,31 +16,49 @@
 
 package com.jitlogic.zorka.util;
 
-import com.jitlogic.zorka.util.ZorkaUtil;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Fast and "extensible" byte buffer. It implements fast serialization functions
+ * for all major integer types and strings (big-endian variant only).
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class ByteBuffer {
 
+    /** Default initial buffer size */
     public static final int DEFAULT_BUFSZ = 1024;
 
+    /** COunts overflow occurantes. Overflows are transparent for buffer writers but can be monitored. */
     private static final AtomicLong overflowCount = new AtomicLong(0);
-    private static final AtomicLong overflowLength = new AtomicLong(0);
 
+    /** Allocated bute buffer */
     private final byte[] buf;
+
+    /** Length of allocated byte buffer. */
     private final int len;
+
+    /** Current position inside the buffer. */
     private int pos;
 
+    /** Overflow buffer chunks. */
     private List<byte[]> overflows = new ArrayList<byte[]>();
 
 
+    /**
+     * Creates byte buffer of default initial length.
+     */
     public ByteBuffer() {
         this(DEFAULT_BUFSZ);
     }
 
-
+    /**
+     * Creates byte buffer of specified length.
+     *
+     * @param len buffer length
+     */
     public ByteBuffer(int len) {
         this.buf = new byte[len];
         this.len = len;
@@ -48,6 +66,12 @@ public class ByteBuffer {
     }
 
 
+    /**
+     * Creates byte buffer wrapped around passed byte array.
+     * This is mostly used for reading data.
+     *
+     * @param buf byte array
+     */
     public ByteBuffer(byte[] buf) {
         this.buf = buf;
         this.len = buf.length;
@@ -55,6 +79,11 @@ public class ByteBuffer {
     }
 
 
+    /**
+     * Reads single byte from buffer.
+     *
+     * @return byte read
+     */
     public byte getByte() {
         if (pos < len) {
             return buf[pos++];
@@ -64,6 +93,11 @@ public class ByteBuffer {
     }
 
 
+    /**
+     * Writes single byte to buffer.
+     *
+     * @param b value to be written
+     */
     public void putByte(byte b) {
         if (pos >= len) {
             overflow();
@@ -72,6 +106,11 @@ public class ByteBuffer {
     }
 
 
+    /**
+     * Reads 16-bit integer value from a buffer.
+     *
+     * @return value read
+     */
     public short getShort() {
         if (pos < len-1) {
             return (short)(((buf[pos++] & 0xff) << 8) | ((buf[pos++] & 0xff) << 0));
@@ -81,6 +120,11 @@ public class ByteBuffer {
     }
 
 
+    /**
+     * Writes 16-bit integer to a buffer.
+     *
+     * @param x value to be written.
+     */
     public void putShort(int x) {
         if (pos >= len-1) {
             overflow();
@@ -91,6 +135,11 @@ public class ByteBuffer {
     }
 
 
+    /**
+     * Reads 32-bit value from a buffer.
+     *
+     * @return value read
+     */
     public int getInt() {
         if (pos < len-3) {
             return ((buf[pos++] & 0xff) << 24)
@@ -103,6 +152,11 @@ public class ByteBuffer {
     }
 
 
+    /**
+     * Writes 32-bit value to a buffer.
+     *
+     * @param i value to be written.
+     */
     public void putInt(int i) {
         if (pos >= len-3) {
             overflow();
@@ -115,6 +169,11 @@ public class ByteBuffer {
     }
 
 
+    /**
+     * Reads 64-bit value from a buffer.
+     *
+     * @return value to be read.
+     */
     public long getLong() {
         if (pos < len-7) {
             return ((buf[pos++] & 0xffL) << 56)
@@ -131,6 +190,11 @@ public class ByteBuffer {
     }
 
 
+    /**
+     * Writes 64-bit value to a buffer.
+     *
+     * @param l value to be written.
+     */
     public void putLong(long l) {
         if (pos >= len-7) {
             overflow();
@@ -147,6 +211,12 @@ public class ByteBuffer {
     }
 
 
+    /**
+     * Reads string from a buffer. String is written and null
+     * byte is appended at the end.
+     *
+     * @return string read.
+     */
     public String getString() {
         if (pos < len) {
             int end = pos;
@@ -166,6 +236,11 @@ public class ByteBuffer {
     }
 
 
+    /**
+     * Writes string to a buffer. String is written and null byte is appended at the end.
+     *
+     * @param s string to be written.
+     */
     public void putString(String s) {
         byte[] bstr = s != null ? s.getBytes() : new byte[0];
 
@@ -183,6 +258,12 @@ public class ByteBuffer {
     }
 
 
+    /**
+     * Returns content from beginning of the buffer to current
+     * position. Any overflows stored aside are appended.
+     *
+     * @return buffer content
+     */
     public byte[] getContent() {
         int blen = pos;
 
@@ -205,20 +286,34 @@ public class ByteBuffer {
     }
 
 
+    /**
+     * Cleans up buffer.
+     */
     public void reset() {
         overflows.clear();
         pos = 0;
     }
 
 
+    /**
+     * This method is invoked when overflow occurs.
+     * It copies written content aside and resets
+     * cursor position.
+     *
+     */
     private void overflow() {
         overflowCount.incrementAndGet();
-        overflowLength.addAndGet(pos);
 
         overflows.add(ZorkaUtil.clipArray(buf, pos));
         pos = 0;
     }
 
+
+    /**
+     * Returns true if cursor position is at the end of buffer.
+     *
+     * @return true if cursor position is at the end of buffer.
+     */
     public boolean eof() {
         return pos >= len;
     }

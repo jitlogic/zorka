@@ -58,6 +58,11 @@ public class SpyClassTransformer implements ClassFileTransformer {
     Tracer tracer;
 
 
+    /**
+     * Creates new spy class transformer
+     *
+     * @param tracer reference to tracer engine object
+     */
     public SpyClassTransformer(Tracer tracer) {
         this.tracer = tracer;
     }

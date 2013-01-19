@@ -23,34 +23,74 @@ import com.jitlogic.zorka.util.ZorkaLogger;
 
 import java.io.*;
 
+/**
+ * This class implements worker thread that receives traces submitted
+ * by (instrumented) application threads, adds symbols and writes
+ * to local files. Files are rotated, maximum number of files and
+ * maximum file size are configurable.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class TraceFileWriter extends ZorkaAsyncThread<TraceRecord> {
 
+    /** Logger object. */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
+    /** Symbol registry containing symbols for incoming traces. */
     private SymbolRegistry symbols;
+
+    /** Symbol enricher responsible for adding missing symbols to generated files. */
     private SymbolEnricher enricher;
+
+    /** Trace encoder. Simple uncompressed binary format is used at the moment. */
     private SimpleTraceFormat encoder;
+
+    /** Working byte buffer. */
     private ByteBuffer buffer;
 
+    /** Maximum number of archived files. */
     private int maxFiles;
+
+    /** Maximum file size. */
     private long maxFileSize;
 
+    /** Path to trace file. */
     private File traceFile;
+
+    /** Currently opened trace file. */
     private OutputStream stream;
+
+    /** Current trace file size. */
     private long curSize;
 
-
+    /**
+     * Creates trace file writer.
+     *
+     * @param path path to trace file
+     *
+     * @param symbols symbol registry containing symbols from incoming traces
+     */
     public TraceFileWriter(String path, SymbolRegistry symbols) {
-        this(path, symbols, 8, 4 * 1024 * 1024);
+        this(path, symbols, 8, 8 * 1024 * 1024);
     }
 
-
+    /**
+     * Creates trace file writer.
+     *
+     * @param path path to trace file
+     *
+     * @param symbols symbol registry containing symbols from incoming traces
+     *
+     * @param maxFiles max number of archived trace files
+     *
+     * @param maxFileSize maximum trace file size
+     */
     public TraceFileWriter(String path, SymbolRegistry symbols, int maxFiles, long maxFileSize) {
         super("trace-writer");
         this.symbols = symbols;
         this.buffer = new ByteBuffer(2048);
         this.encoder = new SimpleTraceFormat(buffer);
-        this.enricher = new SymbolEnricher(symbols, encoder);
+        this.enricher = new SymbolEnricher(this.symbols, encoder);
         this.traceFile = new File(path);
         this.maxFiles = maxFiles;
         this.maxFileSize = maxFileSize;
@@ -87,11 +127,15 @@ public class TraceFileWriter extends ZorkaAsyncThread<TraceRecord> {
     }
 
 
+    @Override
     protected void open() {
         roll();
     }
 
 
+    /**
+     * Rotates and reopens trace file.
+     */
     private void roll() {
 
         if (stream != null) {
@@ -123,6 +167,7 @@ public class TraceFileWriter extends ZorkaAsyncThread<TraceRecord> {
     }
 
 
+    @Override
     protected void close() {
         try {
             if (stream != null) {
@@ -135,6 +180,7 @@ public class TraceFileWriter extends ZorkaAsyncThread<TraceRecord> {
     }
 
 
+    @Override
     protected void flush() {
         try {
             stream.flush();

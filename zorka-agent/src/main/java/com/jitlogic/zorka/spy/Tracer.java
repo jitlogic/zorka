@@ -18,11 +18,20 @@ package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.util.ZorkaAsyncThread;
 
+/**
+ * Groups all tracer engine components and global settings.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class Tracer {
 
+    /** Minimum default method execution time required to attach method to trace. */
     private static long minMethodTime = 250000;
+
+    /** Minimum trace exetuion time required to further process trace */
     private static long minTraceTime = 50000000;
 
+    /** Maximum number of records inside trace */
     private static int maxTraceRecords = 4096;
 
 
@@ -59,13 +68,13 @@ public class Tracer {
     /** Defines which classes and methods should be traced. */
     private SpyMatcherSet matcherSet = new SpyMatcherSet();
 
-    /** Symbol registry for tracer */
+    /** Symbol registry containing names of all symbols tracer knows about. */
     private SymbolRegistry symbolRegistry = new SymbolRegistry();
 
     /** Output handler is initially set to null implementation. */
     private ZorkaAsyncThread<TraceRecord> output;
 
-
+    /** Thread local serving trace builder objects for application threads */
     private ThreadLocal<TraceBuilder> localHandlers =
         new ThreadLocal<TraceBuilder>() {
             public TraceBuilder initialValue() {
@@ -73,7 +82,11 @@ public class Tracer {
             }
         };
 
-
+    /**
+     * Returns trace even handler receiving events from local application thread.
+     *
+     * @return trace event handler (trace builder object)
+     */
     public TraceEventHandler getHandler() {
         return localHandlers.get();
     }
@@ -84,11 +97,23 @@ public class Tracer {
     }
 
 
+    /**
+     * Adds new matcher that includes (or excludes) classes and method to be traced.
+     *
+     * @param matcher spy matcher to be added
+     */
     public void include(SpyMatcher matcher) {
         matcherSet.include(matcher);
     }
 
 
+    /**
+     * Sets output trace event handler tracer will submit completed traces to.
+     * Note that submit() method of supplied handler is called from application
+     * threads, so it must be thread safe.
+     *
+     * @param output trace event handler
+     */
     public void setOutput(ZorkaAsyncThread<TraceRecord> output) {
         this.output = output;
     }
