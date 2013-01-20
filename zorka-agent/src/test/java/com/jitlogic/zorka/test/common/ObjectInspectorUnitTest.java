@@ -39,9 +39,7 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-/**
- * @author RLE <rafal.lewczuk@gmail.com>
- */
+// TODO move this test to zorka-common some day
 public class ObjectInspectorUnitTest extends ZorkaFixture {
 
     @Before

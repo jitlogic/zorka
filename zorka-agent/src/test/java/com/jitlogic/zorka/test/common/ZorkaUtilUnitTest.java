@@ -22,6 +22,8 @@ import com.jitlogic.zorka.common.ZorkaUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
+// TODO move this test to zorka-common some day
+
 public class ZorkaUtilUnitTest {
 
     public static class TestCallStatistic extends MethodCallStatistic {

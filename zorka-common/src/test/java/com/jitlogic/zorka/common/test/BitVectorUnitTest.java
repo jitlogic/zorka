@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.test.common;
+package com.jitlogic.zorka.common.test;
 
 import com.jitlogic.zorka.common.BitVector;
 
