@@ -176,6 +176,8 @@ public class MainWindow extends JFrame {
         tbmTraceDetail = new TraceDetailTreeModel();
         tblTraceDetail = new JXTreeTable(tbmTraceDetail);
         tbmTraceDetail.adjustColumns(tblTraceDetail);
+        tblTraceDetail.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        tblTraceDetail.setAutoCreateColumnsFromModel(false);
         scrTraceDetail.setViewportView(tblTraceDetail);
 
         splitPane.setResizeWeight(0.2);

@@ -72,7 +72,7 @@ public class TraceDetailTreeModel extends AbstractTreeTableModel {
                 case 3:
                     return el.getErrors();
                 case 4:
-                    return ViewerUtil.methodString(el.getClassName(), el.getMethodName(), el.getSignature());
+                    return ViewerUtil.methodString(el);
             }
         }
 

@@ -1,4 +1,4 @@
-package com.jitlogic.zorka.test.agent;
+package com.jitlogic.zorka.test.util;
 
 /**
  * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>

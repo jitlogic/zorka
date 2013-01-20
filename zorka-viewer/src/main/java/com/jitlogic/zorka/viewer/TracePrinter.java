@@ -14,7 +14,10 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy;
+package com.jitlogic.zorka.viewer;
+
+import com.jitlogic.zorka.spy.TraceEventHandler;
+import com.jitlogic.zorka.spy.TracedException;
 
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
@@ -47,7 +50,7 @@ public class TracePrinter extends TraceEventHandler {
 
 
     private String sym(int id) {
-        return symbols.containsKey(id) ? symbols.get(id) : "<?>";
+        return symbols.containsKey(id) ? symbols.get(id) : "<? id=" + id + ">";
     }
 
 
@@ -73,7 +76,7 @@ public class TracePrinter extends TraceEventHandler {
 
     @Override
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
-        out.println(spc(level) + "ENTER (" + time(tstamp) + "): " + sym(classId) + "." + sym(methodId));
+        out.println(spc(level) + "ENTER (" + time(tstamp) + "): " + ViewerUtil.methodString(sym(classId), sym(methodId), sym(signatureId)));
         level++;
     }
 
@@ -104,6 +107,7 @@ public class TracePrinter extends TraceEventHandler {
 
     @Override
     public void newSymbol(int symbolId, String symbolText) {
+        out.println("SYMBOL: symbolId=" + symbolId + ", text='" + symbolText + "'");
         symbols.put(symbolId, symbolText);
     }
 

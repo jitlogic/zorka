@@ -28,6 +28,8 @@ import com.jitlogic.zorka.test.spy.TraceBuilderUnitTest;
 import com.jitlogic.zorka.test.spy.TraceEncodingUnitTest;
 import com.jitlogic.zorka.test.spy.TracerInstrumentationUnitTest;
 
+import com.jitlogic.zorka.test.util.ObjectInspectorUnitTest;
+import com.jitlogic.zorka.test.util.ZorkaUtilUnitTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 

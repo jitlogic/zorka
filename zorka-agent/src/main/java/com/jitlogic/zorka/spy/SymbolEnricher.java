@@ -17,10 +17,7 @@
 package com.jitlogic.zorka.spy;
 
 
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogConfig;
-import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.util.*;
 
 /**
  * This trace event handler can be plugged between trace event sender and receiver.
@@ -36,7 +33,7 @@ public class SymbolEnricher extends TraceEventHandler {
     private static final ZorkaLog log = ZorkaLogger.getLog(SymbolEnricher.class);
 
     /** Symbol ID bit mask. Zeroed bits in this mask mark symbols that are not yet known to receiver. */
-    private long[] mask;
+    BitVector bitVector = new BitVector();
 
     /** Symbol registry used by event sender. */
     private SymbolRegistry symbols;
@@ -55,8 +52,6 @@ public class SymbolEnricher extends TraceEventHandler {
     public SymbolEnricher(SymbolRegistry symbols, TraceEventHandler output) {
         this.symbols = symbols;
         this.output = output;
-
-        mask = new long[(symbols.lastId()+63)>>6];
     }
 
 
@@ -66,22 +61,15 @@ public class SymbolEnricher extends TraceEventHandler {
      * @param id symbol ID
      */
     private void check(int id) {
-        int idx = id >> 6;
-        int bit = id & 63;
 
-        if (idx >= mask.length) {
-            mask = ZorkaUtil.clipArray(mask, idx+1);
-        }
-
-        if (0 == (mask[idx] & (1 << bit))) {
+        if (!bitVector.get(id)) {
             String sym = symbols.symbolName(id);
             if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
                 log.debug("Enriching output stream with symbol '" + sym + "', id=" + id);
             }
             output.newSymbol(id, sym);
-            mask[idx] |= (1 << bit);
+            bitVector.set(id);
         }
-
     }
 
 
@@ -93,9 +81,7 @@ public class SymbolEnricher extends TraceEventHandler {
         if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
             log.debug("Resetting symbol enricher.");
         }
-        for (int i = 0; i < mask.length; i++) {
-            mask[i] = 0;
-        }
+        bitVector.reset();
     }
 
 
