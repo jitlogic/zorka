@@ -15,9 +15,9 @@
  */
 package com.jitlogic.zorka.test.rankproc.support;
 
-import com.jitlogic.zorka.rankproc.BucketAggregate;
-import com.jitlogic.zorka.rankproc.ThreadRankInfo;
-import com.jitlogic.zorka.rankproc.ThreadRankLister;
+import com.jitlogic.zorka.agent.rankproc.BucketAggregate;
+import com.jitlogic.zorka.agent.rankproc.ThreadRankInfo;
+import com.jitlogic.zorka.agent.rankproc.ThreadRankLister;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -16,8 +16,8 @@ package com.jitlogic.zorka.test.common;
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-import com.jitlogic.zorka.mbeans.MethodCallStatistic;
-import com.jitlogic.zorka.rankproc.BucketAggregate;
+import com.jitlogic.zorka.agent.mbeans.MethodCallStatistic;
+import com.jitlogic.zorka.agent.rankproc.BucketAggregate;
 import com.jitlogic.zorka.common.ZorkaUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,7 +57,7 @@ public class ZorkaUtilUnitTest {
     @Test
     public void testInstanceOf5() throws Exception {
         Assert.assertTrue("immediate implements",
-                ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.mbeans.MethodCallStatistic"));
+                ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.agent.mbeans.MethodCallStatistic"));
     }
 
 }

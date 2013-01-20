@@ -16,11 +16,11 @@
 package com.jitlogic.zorka.test.spy;
 
 import com.jitlogic.zorka.test.support.ZorkaFixture;
-import com.jitlogic.zorka.spy.SpyContext;
-import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.SpyLib;
+import com.jitlogic.zorka.agent.spy.SpyContext;
+import com.jitlogic.zorka.agent.spy.SpyDefinition;
+import com.jitlogic.zorka.agent.spy.SpyLib;
 
-import com.jitlogic.zorka.spy.ZorkaStatsCollector;
+import com.jitlogic.zorka.agent.spy.ZorkaStatsCollector;
 import org.junit.Before;
 import org.junit.Test;
 

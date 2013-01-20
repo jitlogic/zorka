@@ -16,9 +16,9 @@
 
 package com.jitlogic.zorka.test.spy;
 
-import com.jitlogic.zorka.spy.SpyDefinition;
+import com.jitlogic.zorka.agent.spy.SpyDefinition;
 import com.jitlogic.zorka.test.support.BytecodeInstrumentationFixture;
-import com.jitlogic.zorka.spy.WrappedException;
+import com.jitlogic.zorka.agent.spy.WrappedException;
 import org.junit.Assert;
 import org.junit.Test;
 

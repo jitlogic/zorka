@@ -16,18 +16,15 @@
  */
 package com.jitlogic.zorka.test.spy;
 
-import com.jitlogic.zorka.spy.*;
+import com.jitlogic.zorka.agent.spy.*;
 import com.jitlogic.zorka.test.spy.support.TestCollector;
 import com.jitlogic.zorka.test.support.BytecodeInstrumentationFixture;
-import com.jitlogic.zorka.test.support.ZorkaFixture;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import static com.jitlogic.zorka.spy.SpyLib.*;
+import static com.jitlogic.zorka.agent.spy.SpyLib.*;
 
 import static com.jitlogic.zorka.test.support.TestUtil.*;
 

@@ -16,9 +16,9 @@
 
 package com.jitlogic.zorka.test.stress;
 
-import com.jitlogic.zorka.spy.MainSubmitter;
-import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.SpySubmitter;
+import com.jitlogic.zorka.agent.spy.MainSubmitter;
+import com.jitlogic.zorka.agent.spy.SpyDefinition;
+import com.jitlogic.zorka.agent.spy.SpySubmitter;
 import com.jitlogic.zorka.test.stress.support.StressTestFixture;
 
 import org.junit.Test;

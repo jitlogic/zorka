@@ -17,9 +17,9 @@ package com.jitlogic.zorka.test.integ;
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
-import com.jitlogic.zorka.integ.NagiosAgent;
+import com.jitlogic.zorka.agent.integ.NagiosAgent;
 
-import com.jitlogic.zorka.integ.NrpePacket;
+import com.jitlogic.zorka.agent.integ.NrpePacket;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

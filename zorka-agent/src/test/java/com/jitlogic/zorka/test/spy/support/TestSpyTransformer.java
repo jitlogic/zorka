@@ -16,10 +16,10 @@
  */
 package com.jitlogic.zorka.test.spy.support;
 
-import com.jitlogic.zorka.spy.SpyClassTransformer;
-import com.jitlogic.zorka.spy.SpyClassVisitor;
-import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.Tracer;
+import com.jitlogic.zorka.agent.spy.SpyClassTransformer;
+import com.jitlogic.zorka.agent.spy.SpyClassVisitor;
+import com.jitlogic.zorka.agent.spy.SpyDefinition;
+import com.jitlogic.zorka.agent.spy.Tracer;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.util.TraceClassVisitor;

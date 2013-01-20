@@ -18,8 +18,8 @@
 package com.jitlogic.zorka.test.integ;
 
 import com.jitlogic.zorka.agent.*;
-import com.jitlogic.zorka.rankproc.AvgRateCounter;
-import com.jitlogic.zorka.integ.ZabbixLib;
+import com.jitlogic.zorka.agent.rankproc.AvgRateCounter;
+import com.jitlogic.zorka.agent.integ.ZabbixLib;
 import com.jitlogic.zorka.test.support.TestJmx;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 import org.json.simple.JSONArray;

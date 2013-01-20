@@ -15,9 +15,9 @@
  */
 package com.jitlogic.zorka.test.rankproc;
 
-import com.jitlogic.zorka.rankproc.BucketAggregate;
+import com.jitlogic.zorka.agent.rankproc.BucketAggregate;
 
-import com.jitlogic.zorka.rankproc.CircularBucketAggregate;
+import com.jitlogic.zorka.agent.rankproc.CircularBucketAggregate;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

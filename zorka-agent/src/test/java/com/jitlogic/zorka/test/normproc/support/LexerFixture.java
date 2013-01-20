@@ -15,12 +15,12 @@
  */
 package com.jitlogic.zorka.test.normproc.support;
 
-import com.jitlogic.zorka.normproc.Token;
+import com.jitlogic.zorka.agent.normproc.Token;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static com.jitlogic.zorka.normproc.XqlLexer.*;
+import static com.jitlogic.zorka.agent.normproc.XqlLexer.*;
 
 public class LexerFixture {
     public Token l(String content) {

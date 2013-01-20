@@ -17,11 +17,11 @@
 package com.jitlogic.zorka.test.spy;
 
 import com.jitlogic.zorka.test.support.ZorkaFixture;
-import com.jitlogic.zorka.mbeans.MethodCallStatistics;
-import com.jitlogic.zorka.spy.SpyContext;
-import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.SpyLib;
-import com.jitlogic.zorka.spy.ZorkaStatsCollector;
+import com.jitlogic.zorka.agent.mbeans.MethodCallStatistics;
+import com.jitlogic.zorka.agent.spy.SpyContext;
+import com.jitlogic.zorka.agent.spy.SpyDefinition;
+import com.jitlogic.zorka.agent.spy.SpyLib;
+import com.jitlogic.zorka.agent.spy.ZorkaStatsCollector;
 
 import com.jitlogic.zorka.common.ZorkaUtil;
 import org.junit.Test;
@@ -31,7 +31,7 @@ import static org.junit.Assert.*;
 import java.util.Map;
 
 import static com.jitlogic.zorka.test.support.TestUtil.getAttr;
-import static com.jitlogic.zorka.spy.SpyLib.*;
+import static com.jitlogic.zorka.agent.spy.SpyLib.*;
 
 public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 

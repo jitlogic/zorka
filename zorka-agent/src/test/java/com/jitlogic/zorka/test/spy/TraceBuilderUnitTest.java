@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.test.spy;
 
 import com.jitlogic.zorka.common.SymbolRegistry;
-import com.jitlogic.zorka.spy.*;
+import com.jitlogic.zorka.agent.spy.*;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 
 import com.jitlogic.zorka.test.support.TestUtil;

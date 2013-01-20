@@ -22,8 +22,8 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import com.jitlogic.zorka.mbeans.AttrGetter;
-import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
+import com.jitlogic.zorka.agent.mbeans.AttrGetter;
+import com.jitlogic.zorka.agent.mbeans.ZorkaMappedMBean;
 
 public class MBeanMappingUnitTest extends ZorkaFixture {
 

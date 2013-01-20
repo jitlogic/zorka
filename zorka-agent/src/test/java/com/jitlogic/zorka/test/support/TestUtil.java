@@ -18,12 +18,10 @@
 package com.jitlogic.zorka.test.support;
 
 import com.jitlogic.zorka.agent.AgentInstance;
-import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.spy.SpyClassTransformer;
+import com.jitlogic.zorka.agent.spy.SpyClassTransformer;
 
 import static org.junit.Assert.fail;
 
-import javax.management.MBeanServer;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import java.io.InputStream;

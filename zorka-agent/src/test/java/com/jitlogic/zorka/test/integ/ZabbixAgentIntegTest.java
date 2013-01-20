@@ -25,7 +25,7 @@ import java.net.Socket;
 import java.util.concurrent.Executors;
 
 import com.jitlogic.zorka.agent.AgentInstance;
-import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
+import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.test.support.TestLogger;
 import com.jitlogic.zorka.common.ZorkaLogger;
 import org.junit.After;
@@ -33,8 +33,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.integ.ZabbixAgent;
-import com.jitlogic.zorka.integ.ZabbixRequestHandler;
+import com.jitlogic.zorka.agent.integ.ZabbixAgent;
+import com.jitlogic.zorka.agent.integ.ZabbixRequestHandler;
 import com.jitlogic.zorka.agent.ZorkaConfig;
 
 public class ZabbixAgentIntegTest {

@@ -18,8 +18,8 @@ package com.jitlogic.zorka.test.spy.support;
 
 import com.jitlogic.contrib.libsnmp.SNMPObjectIdentifier;
 import com.jitlogic.contrib.libsnmp.SNMPVariablePair;
-import com.jitlogic.zorka.integ.SnmpLib;
-import com.jitlogic.zorka.integ.SnmpTrapper;
+import com.jitlogic.zorka.agent.integ.SnmpLib;
+import com.jitlogic.zorka.agent.integ.SnmpTrapper;
 
 import java.util.ArrayList;
 import java.util.List;

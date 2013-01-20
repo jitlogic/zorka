@@ -18,7 +18,7 @@
 package com.jitlogic.zorka.test.rankproc;
 
 import com.jitlogic.zorka.test.support.ZorkaFixture;
-import com.jitlogic.zorka.rankproc.RateAggregate;
+import com.jitlogic.zorka.agent.rankproc.RateAggregate;
 import org.junit.Before;
 import org.junit.Test;
 

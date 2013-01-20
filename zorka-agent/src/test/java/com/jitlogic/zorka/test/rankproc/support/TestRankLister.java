@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.test.rankproc.support;
 
-import com.jitlogic.zorka.rankproc.RankLister;
+import com.jitlogic.zorka.agent.rankproc.RankLister;
 
 import java.util.*;
 

@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.test.spy.support;
 
-import com.jitlogic.zorka.spy.AsyncQueueCollector;
+import com.jitlogic.zorka.agent.spy.AsyncQueueCollector;
 
 import java.util.Map;
 

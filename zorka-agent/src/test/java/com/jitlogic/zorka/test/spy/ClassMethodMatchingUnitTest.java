@@ -16,32 +16,32 @@
  */
 package com.jitlogic.zorka.test.spy;
 
-import com.jitlogic.zorka.spy.SpyMatcherSet;
+import com.jitlogic.zorka.agent.spy.SpyMatcherSet;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
-import com.jitlogic.zorka.spy.SpyMatcher;
+import com.jitlogic.zorka.agent.spy.SpyMatcher;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
 
-import static com.jitlogic.zorka.spy.SpyLib.SM_NOARGS;
+import static com.jitlogic.zorka.agent.spy.SpyLib.SM_NOARGS;
 
 public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testSimpleClassOnlyMatch() {
-        SpyMatcherSet sms = new SpyMatcherSet(new SpyMatcher(SpyMatcher.BY_CLASS_NAME, 0xFF, "com.jitlogic.zorka.spy.**", "*", null));
+        SpyMatcherSet sms = new SpyMatcherSet(new SpyMatcher(SpyMatcher.BY_CLASS_NAME, 0xFF, "com.jitlogic.zorka.agent.spy.**", "*", null));
 
-        Assert.assertTrue(sms.classMatch("com.jitlogic.zorka.spy.unittest.SomeClass"));
-        Assert.assertTrue(sms.classMatch("com.jitlogic.zorka.spy.AClass"));
+        Assert.assertTrue(sms.classMatch("com.jitlogic.zorka.agent.spy.unittest.SomeClass"));
+        Assert.assertTrue(sms.classMatch("com.jitlogic.zorka.agent.spy.AClass"));
         Assert.assertFalse(sms.classMatch("comXjitlogicXzorkaXspyXAClass"));
     }
 
     @Test
     public void testClassMatchWithSingleLevelWildcard() {
-        SpyMatcherSet sms = new SpyMatcherSet(new SpyMatcher(SpyMatcher.BY_CLASS_NAME, 0xFF, "com.jitlogic.zorka.spy.*", "*", null));
-        Assert.assertFalse(sms.classMatch("com.jitlogic.zorka.spy.unittest.SomeClass"));
-        Assert.assertTrue(sms.classMatch("com.jitlogic.zorka.spy.AClass"));
+        SpyMatcherSet sms = new SpyMatcherSet(new SpyMatcher(SpyMatcher.BY_CLASS_NAME, 0xFF, "com.jitlogic.zorka.agent.spy.*", "*", null));
+        Assert.assertFalse(sms.classMatch("com.jitlogic.zorka.agent.spy.unittest.SomeClass"));
+        Assert.assertTrue(sms.classMatch("com.jitlogic.zorka.agent.spy.AClass"));
     }
 
     @Test

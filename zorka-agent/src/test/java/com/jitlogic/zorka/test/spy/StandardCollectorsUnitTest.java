@@ -17,11 +17,11 @@ package com.jitlogic.zorka.test.spy;
 
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.spy.SpyLib;
-import com.jitlogic.zorka.spy.*;
+import com.jitlogic.zorka.agent.spy.SpyLib;
+import com.jitlogic.zorka.agent.spy.*;
 
-import com.jitlogic.zorka.spy.GetterPresentingCollector;
-import com.jitlogic.zorka.spy.SpyProcessor;
+import com.jitlogic.zorka.agent.spy.GetterPresentingCollector;
+import com.jitlogic.zorka.agent.spy.SpyProcessor;
 import com.jitlogic.zorka.common.ZorkaUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -78,7 +78,7 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
     public void testCollectRecordViaBshFuncManual() throws Exception {
         zorkaAgent.eval("process(obj) { test.result(obj); }");
         SpyProcessor col = (SpyProcessor)zorkaAgent.eval(
-                "(com.jitlogic.zorka.spy.SpyProcessor)this");
+                "(com.jitlogic.zorka.agent.spy.SpyProcessor)this");
 
         col.process(record);
 

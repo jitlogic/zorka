@@ -19,8 +19,8 @@ import com.jitlogic.zorka.test.rankproc.support.TestRankItem;
 import com.jitlogic.zorka.test.rankproc.support.TestRankLister;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.rankproc.RankList;
-import com.jitlogic.zorka.rankproc.RankLister;
+import com.jitlogic.zorka.agent.rankproc.RankList;
+import com.jitlogic.zorka.agent.rankproc.RankLister;
 
 import org.junit.Test;
 import static org.junit.Assert.*;

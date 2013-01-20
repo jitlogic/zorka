@@ -15,11 +15,11 @@
  */
 package com.jitlogic.zorka.test.normproc;
 
-import com.jitlogic.zorka.normproc.GenericNormalizer;
-import com.jitlogic.zorka.normproc.NormLib;
-import com.jitlogic.zorka.normproc.Normalizer;
+import com.jitlogic.zorka.agent.normproc.GenericNormalizer;
+import com.jitlogic.zorka.agent.normproc.NormLib;
+import com.jitlogic.zorka.agent.normproc.Normalizer;
 
-import static com.jitlogic.zorka.normproc.NormLib.*;
+import static com.jitlogic.zorka.agent.normproc.NormLib.*;
 
 import org.junit.Test;
 

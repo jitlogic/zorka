@@ -16,10 +16,10 @@
 package com.jitlogic.zorka.test.normproc;
 
 import com.jitlogic.zorka.test.normproc.support.LexerFixture;
-import com.jitlogic.zorka.normproc.Token;
-import com.jitlogic.zorka.normproc.XqlLexer;
+import com.jitlogic.zorka.agent.normproc.Token;
+import com.jitlogic.zorka.agent.normproc.XqlLexer;
 
-import static com.jitlogic.zorka.normproc.NormLib.*;
+import static com.jitlogic.zorka.agent.normproc.NormLib.*;
 
 import org.junit.Test;
 

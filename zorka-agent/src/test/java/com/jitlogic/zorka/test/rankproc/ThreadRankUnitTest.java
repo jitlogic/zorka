@@ -18,8 +18,8 @@ package com.jitlogic.zorka.test.rankproc;
 import com.jitlogic.zorka.test.rankproc.support.TestThreadRankLister;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.rankproc.ThreadRankItem;
-import com.jitlogic.zorka.rankproc.ThreadRankLister;
+import com.jitlogic.zorka.agent.rankproc.ThreadRankItem;
+import com.jitlogic.zorka.agent.rankproc.ThreadRankLister;
 
 import org.junit.Test;
 import static org.junit.Assert.*;

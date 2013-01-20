@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.test.rankproc.support;
 
-import com.jitlogic.zorka.rankproc.Rankable;
+import com.jitlogic.zorka.agent.rankproc.Rankable;
 import com.jitlogic.zorka.common.ZorkaUtil;
 
 public class TestRankItem implements Rankable<TestRankItem> {

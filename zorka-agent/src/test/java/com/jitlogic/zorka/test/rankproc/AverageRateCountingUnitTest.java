@@ -17,7 +17,7 @@
 
 package com.jitlogic.zorka.test.rankproc;
 
-import com.jitlogic.zorka.rankproc.AvgRateCounter;
+import com.jitlogic.zorka.agent.rankproc.AvgRateCounter;
 import com.jitlogic.zorka.test.support.TestJmx;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 import org.junit.Before;

@@ -20,10 +20,10 @@ package com.jitlogic.zorka.test.spy;
 import com.jitlogic.zorka.test.spy.support.TestCollector;
 import com.jitlogic.zorka.test.spy.support.TestSpyTransformer;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
-import com.jitlogic.zorka.spy.DispatchingSubmitter;
-import com.jitlogic.zorka.spy.SpyContext;
-import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.spy.SpySubmitter;
+import com.jitlogic.zorka.agent.spy.DispatchingSubmitter;
+import com.jitlogic.zorka.agent.spy.SpyContext;
+import com.jitlogic.zorka.agent.spy.SpyDefinition;
+import com.jitlogic.zorka.agent.spy.SpySubmitter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +31,7 @@ import org.junit.Test;
 import java.util.Map;
 
 import static org.junit.Assert.*;
-import static com.jitlogic.zorka.spy.SpyLib.*;
+import static com.jitlogic.zorka.agent.spy.SpyLib.*;
 
 
 public class SubmissionDispatchUnitTest extends ZorkaFixture {

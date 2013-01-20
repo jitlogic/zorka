@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.test.stress.support;
 
-import com.jitlogic.zorka.spy.SpyDefinition;
+import com.jitlogic.zorka.agent.spy.SpyDefinition;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 
 import java.io.PrintStream;

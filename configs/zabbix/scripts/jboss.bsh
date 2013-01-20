@@ -172,7 +172,7 @@ __jboss() {
   } // __mbsRegister()
 
   spy.add(spy.instance()
-    .onReturn(spy.fetchArg("MBS", 0), (com.jitlogic.zorka.spy.SpyProcessor)__mbsRegister())
+    .onReturn(spy.fetchArg("MBS", 0), (com.jitlogic.zorka.agent.spy.SpyProcessor)__mbsRegister())
     .include(spy.byMethod("org.jboss.mx.server.MBeanServerImpl", "<init>")));
 
   return this;
