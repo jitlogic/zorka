@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.common.SymbolRegistry;
 import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogger;
 import org.objectweb.asm.ClassReader;

@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.common.SymbolRegistry;
 import com.jitlogic.zorka.common.TraceEventHandler;
 import com.jitlogic.zorka.common.ZorkaAsyncThread;
 

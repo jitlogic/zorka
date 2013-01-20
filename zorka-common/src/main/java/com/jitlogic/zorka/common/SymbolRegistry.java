@@ -14,11 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy;
-
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogConfig;
-import com.jitlogic.zorka.common.ZorkaLogger;
+package com.jitlogic.zorka.common;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;

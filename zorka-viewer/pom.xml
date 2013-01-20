@@ -5,7 +5,7 @@
     <parent>
         <artifactId>zorka</artifactId>
         <groupId>com.jitlogic.zorka</groupId>
-        <version>0.8.0</version>
+        <version>0.8.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,14 +13,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.jitlogic.zorka</groupId>
-            <artifactId>zorka-agent</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>4.0</version>
         </dependency>
         <dependency>
             <groupId>org.swinglabs.swingx</groupId>
             <artifactId>swingx-core</artifactId>
             <version>1.6.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jitlogic.zorka</groupId>
+            <artifactId>zorka-common</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -51,7 +56,7 @@
                         </goals>
                         <configuration>
                             <includes>
-                                <include>com.jitlogic.zorka:zorka-agent</include>
+                                <include>com.jitlogic.zorka:zorka-common</include>
                                 <include>org.swinglabs.swingx:swingx-core</include>
                                 <include>org.swinglabs.swingx:swingx-plaf</include>
                                 <include>org.swinglabs.swingx:swingx-action</include>
@@ -64,7 +69,7 @@
                                     <pattern>org.jdesktop.swingx.**</pattern>
                                 </keep>
                                 <keep>
-                                    <pattern>com.jitlogic.zorka.**</pattern>
+                                    <pattern>com.jitlogic.zorka.common.**</pattern>
                                 </keep>
                             </rules>
                         </configuration>

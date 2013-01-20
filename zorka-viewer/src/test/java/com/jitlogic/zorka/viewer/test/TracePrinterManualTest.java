@@ -24,22 +24,21 @@ import java.io.*;
 
 public class TracePrinterManualTest {
 
-    @Test
+    //@Test
     public void testReadAndPrintTrace() throws Exception {
-        File f = new File("/tmp/trace.trc");
-        InputStream is = new FileInputStream(f);
-        byte[] buf = new byte[(int)f.length()];
-        is.read(buf);
-        is.close();
-
-        OutputStream os = new BufferedOutputStream(new FileOutputStream("/tmp/trace.txt"));
-        PrintStream ps = new PrintStream(os);
-
-        TracePrinter printer = new TracePrinter(ps);
-        new SimpleTraceFormat(buf).decode(printer);
-        ps.flush();
-        ps.close();
-
+//        File f = new File("/tmp/trace.trc");
+//        InputStream is = new FileInputStream(f);
+//        byte[] buf = new byte[(int)f.length()];
+//        is.read(buf);
+//        is.close();
+//
+//        OutputStream os = new BufferedOutputStream(new FileOutputStream("/tmp/trace.txt"));
+//        PrintStream ps = new PrintStream(os);
+//
+//        TracePrinter printer = new TracePrinter(ps);
+//        new SimpleTraceFormat(buf).decode(printer);
+//        ps.flush();
+//        ps.close();
     }
 
 }
