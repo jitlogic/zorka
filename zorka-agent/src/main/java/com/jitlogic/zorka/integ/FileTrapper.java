@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.integ;
 
-import com.jitlogic.zorka.util.*;
+import com.jitlogic.zorka.common.*;
 
 import java.io.*;
 import java.text.SimpleDateFormat;

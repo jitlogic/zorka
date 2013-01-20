@@ -19,7 +19,7 @@ package com.jitlogic.zorka.rankproc;
 
 import java.util.LinkedList;
 
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.common.ZorkaUtil;
 
 /**
  * This is old rate aggregate object.

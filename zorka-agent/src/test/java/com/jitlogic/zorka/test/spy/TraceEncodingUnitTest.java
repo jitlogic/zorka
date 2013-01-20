@@ -19,7 +19,7 @@ package com.jitlogic.zorka.test.spy;
 import com.jitlogic.zorka.spy.*;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 
-import com.jitlogic.zorka.util.ByteBuffer;
+import com.jitlogic.zorka.common.ByteBuffer;
 import org.junit.Assert;
 import org.junit.Test;
 

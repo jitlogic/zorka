@@ -16,7 +16,7 @@
  */
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.common.ZorkaUtil;
 
 /**
  * Spy context links instrumented methods with spy definitions. New spy context

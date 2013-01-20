@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.normproc;
 
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.common.ZorkaUtil;
 
 import java.util.Map;
 

@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.spy;
 
 
-import com.jitlogic.zorka.util.*;
+import com.jitlogic.zorka.common.*;
 
 /**
  * This trace event handler can be plugged between trace event sender and receiver.

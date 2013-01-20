@@ -22,12 +22,12 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
 
-import com.jitlogic.zorka.util.ObjectDumper;
-import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.common.ObjectDumper;
+import com.jitlogic.zorka.common.ZorkaLog;
 
 import bsh.EvalError;
 import bsh.Interpreter;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.common.ZorkaLogger;
 
 /**
  * This is central part of Zorka agent - it processes actual queries and executes BSH scripts.

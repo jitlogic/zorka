@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.common.ZorkaUtil;
 
 /**
  * Represents exception in symbolic form (suitable to be saved into trace file

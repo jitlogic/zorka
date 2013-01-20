@@ -22,10 +22,10 @@ import com.jitlogic.zorka.normproc.NormLib;
 import com.jitlogic.zorka.spy.MainSubmitter;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyLib;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogConfig;
-import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLogConfig;
+import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.common.ZorkaUtil;
 
 import java.io.File;
 import java.lang.instrument.ClassFileTransformer;

@@ -21,8 +21,8 @@ import com.jitlogic.zorka.test.spy.support.TestTracer;
 
 import com.jitlogic.zorka.test.support.TestUtil;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
-import com.jitlogic.zorka.util.ZorkaAsyncThread;
-import com.jitlogic.zorka.util.ZorkaLogConfig;
+import com.jitlogic.zorka.common.ZorkaAsyncThread;
+import com.jitlogic.zorka.common.ZorkaLogConfig;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;

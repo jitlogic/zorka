@@ -193,7 +193,6 @@ public class MainWindow extends JFrame {
 
     private void displayTrace(int idx) {
         tbmTraceDetail.setRoot(traceSet.get(idx));
-        //tbmTraceDetail.adjustColumns(tblTraceDetail);
         tblTraceDetail.expandAll();
     }
 

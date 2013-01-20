@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.test.agent;
 
-import com.jitlogic.zorka.util.ZorkaLogConfig;
+import com.jitlogic.zorka.common.ZorkaLogConfig;
 import org.junit.Test;
 import org.junit.Assert;
 

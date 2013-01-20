@@ -18,8 +18,8 @@
 package com.jitlogic.zorka.spy;
 
 import bsh.EvalError;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLogger;
 
 import java.util.concurrent.atomic.AtomicLong;
 

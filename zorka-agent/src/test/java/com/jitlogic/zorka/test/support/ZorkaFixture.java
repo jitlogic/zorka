@@ -22,7 +22,7 @@ import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.spy.SpyClassTransformer;
 import com.jitlogic.zorka.spy.SpyInstance;
 import com.jitlogic.zorka.spy.SpyLib;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.common.ZorkaLogger;
 
 import org.junit.After;
 import org.junit.Before;

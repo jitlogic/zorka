@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.test.util;
 
-import com.jitlogic.zorka.util.BitVector;
+import com.jitlogic.zorka.common.BitVector;
 
 import org.junit.Assert;
 import org.junit.Test;

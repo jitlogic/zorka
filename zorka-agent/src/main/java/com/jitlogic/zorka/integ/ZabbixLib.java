@@ -17,10 +17,10 @@
 
 package com.jitlogic.zorka.integ;
 
-import com.jitlogic.zorka.util.JmxObject;
+import com.jitlogic.zorka.common.JmxObject;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaLib;
-import com.jitlogic.zorka.util.ObjectInspector;
+import com.jitlogic.zorka.common.ObjectInspector;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 

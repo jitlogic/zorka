@@ -15,9 +15,9 @@
  */
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.common.ZorkaUtil;
 
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;

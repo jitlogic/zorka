@@ -23,15 +23,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.management.*;
 
 import com.jitlogic.zorka.integ.FileTrapper;
-import com.jitlogic.zorka.util.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.integ.ZorkaLogLevel;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.common.ZorkaLogger;
 import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.rankproc.*;
 import com.jitlogic.zorka.mbeans.AttrGetter;
 import com.jitlogic.zorka.mbeans.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
-import com.jitlogic.zorka.util.*;
+import com.jitlogic.zorka.common.*;
 
 
 /**

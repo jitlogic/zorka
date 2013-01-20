@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.spy;
 
 
-import com.jitlogic.zorka.util.ByteBuffer;
+import com.jitlogic.zorka.common.ByteBuffer;
 
 /**
  * Implements simple trace encoder/decoder. Uses simple, uncompressed binary format.

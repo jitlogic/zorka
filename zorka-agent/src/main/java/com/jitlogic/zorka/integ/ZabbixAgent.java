@@ -23,8 +23,6 @@ import java.net.Socket;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaConfig;
 
-import com.jitlogic.zorka.util.ZorkaLog;
-
 /**
  * Zabbix agent integrates Zorka with Zabbix server. It handles incoming zabbix
  * requests and forwards to BSH agent.

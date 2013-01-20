@@ -20,7 +20,7 @@ import com.jitlogic.zorka.test.spy.support.TestTracer;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
 
 import com.jitlogic.zorka.spy.TraceRecord;
-import com.jitlogic.zorka.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.common.ZorkaAsyncThread;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;

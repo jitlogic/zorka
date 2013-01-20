@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.common.ZorkaAsyncThread;
 
 /**
  * Groups all tracer engine components and global settings.

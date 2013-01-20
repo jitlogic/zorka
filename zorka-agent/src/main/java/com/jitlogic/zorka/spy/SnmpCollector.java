@@ -19,9 +19,9 @@ import com.jitlogic.zorka.integ.SnmpLib;
 import com.jitlogic.zorka.integ.SnmpTrapper;
 import com.jitlogic.zorka.integ.TrapVarBindDef;
 import com.jitlogic.contrib.libsnmp.*;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.common.ZorkaUtil;
 
 import java.util.Map;
 

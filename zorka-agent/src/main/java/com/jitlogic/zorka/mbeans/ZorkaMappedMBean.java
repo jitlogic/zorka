@@ -18,8 +18,6 @@
 package com.jitlogic.zorka.mbeans;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -39,8 +37,8 @@ import javax.management.openmbean.OpenMBeanAttributeInfoSupport;
 import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularType;
 
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLogger;
 
 
 /**
@@ -198,7 +196,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
 
     /**
      * Sets attribute value but behaves pretty much like
-     * java.util.Map.put() method.
+     * java.common.Map.put() method.
      *
      * @param name attribute name
      *
@@ -216,7 +214,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
 
     /**
      * Returns attribute value but behaves pretty much like
-     * java.util.Map.get() method.
+     * java.common.Map.get() method.
      *
      * @param name attribute name
      *

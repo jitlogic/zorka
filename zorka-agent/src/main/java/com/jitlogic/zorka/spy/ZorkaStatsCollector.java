@@ -21,9 +21,9 @@ import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.mbeans.MethodCallStatistic;
 import com.jitlogic.zorka.mbeans.MethodCallStatistics;
-import com.jitlogic.zorka.util.ObjectInspector;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.common.ObjectInspector;
+import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLogger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

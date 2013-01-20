@@ -18,8 +18,8 @@
 package com.jitlogic.zorka.rankproc;
 
 import com.jitlogic.zorka.agent.ZorkaLib;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLogger;
 
 import java.util.ArrayList;
 import java.util.List;

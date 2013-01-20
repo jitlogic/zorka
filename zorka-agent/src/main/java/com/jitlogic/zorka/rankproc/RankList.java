@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.rankproc;
 
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.common.ZorkaUtil;
 
 import java.util.Collections;
 import java.util.Comparator;

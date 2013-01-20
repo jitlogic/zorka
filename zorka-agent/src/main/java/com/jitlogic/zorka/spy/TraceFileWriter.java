@@ -16,10 +16,10 @@
 
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.util.ByteBuffer;
-import com.jitlogic.zorka.util.ZorkaAsyncThread;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.common.ByteBuffer;
+import com.jitlogic.zorka.common.ZorkaAsyncThread;
+import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLogger;
 
 import java.io.*;
 

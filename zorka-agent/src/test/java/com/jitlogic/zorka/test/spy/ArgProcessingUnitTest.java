@@ -23,11 +23,10 @@ import com.jitlogic.zorka.spy.*;
 
 import static com.jitlogic.zorka.spy.SpyLib.*;
 
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.common.ZorkaUtil;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.naming.event.ObjectChangeListener;
 import java.util.HashMap;
 import java.util.Map;
 

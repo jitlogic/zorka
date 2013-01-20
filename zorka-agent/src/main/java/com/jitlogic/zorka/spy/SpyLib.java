@@ -18,14 +18,14 @@
 package com.jitlogic.zorka.spy;
 
 import com.jitlogic.zorka.integ.SnmpLib;
-import com.jitlogic.zorka.util.ZorkaAsyncThread;
-import com.jitlogic.zorka.util.ZorkaTrapper;
+import com.jitlogic.zorka.common.ZorkaAsyncThread;
+import com.jitlogic.zorka.common.ZorkaTrapper;
 import com.jitlogic.zorka.integ.SnmpTrapper;
 import com.jitlogic.zorka.integ.TrapVarBindDef;
 import com.jitlogic.zorka.normproc.Normalizer;
-import com.jitlogic.zorka.util.ObjectInspector;
+import com.jitlogic.zorka.common.ObjectInspector;
 import com.jitlogic.zorka.integ.ZorkaLogLevel;
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.common.ZorkaUtil;
 
 import java.util.*;
 import java.util.regex.Matcher;

@@ -21,12 +21,12 @@ import com.jitlogic.zorka.test.support.TestInspectorClass;
 import com.jitlogic.zorka.test.support.TestJmx;
 import com.jitlogic.zorka.test.support.TestStats;
 import com.jitlogic.zorka.test.support.ZorkaFixture;
-import com.jitlogic.zorka.util.JmxObject;
+import com.jitlogic.zorka.common.JmxObject;
 import com.jitlogic.zorka.spy.SpyContext;
 import com.jitlogic.zorka.spy.SpyDefinition;
-import com.jitlogic.zorka.util.ObjectInspector;
+import com.jitlogic.zorka.common.ObjectInspector;
 
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.common.ZorkaUtil;
 import org.junit.Before;
 import org.junit.Test;
 

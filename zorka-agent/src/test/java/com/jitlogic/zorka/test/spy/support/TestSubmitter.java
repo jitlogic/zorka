@@ -18,7 +18,7 @@
 package com.jitlogic.zorka.test.spy.support;
 
 import com.jitlogic.zorka.spy.SpySubmitter;
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.common.ZorkaUtil;
 
 import java.util.ArrayList;
 import java.util.List;

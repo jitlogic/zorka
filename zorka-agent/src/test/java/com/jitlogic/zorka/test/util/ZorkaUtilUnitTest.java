@@ -18,7 +18,7 @@ package com.jitlogic.zorka.test.util;
  */
 import com.jitlogic.zorka.mbeans.MethodCallStatistic;
 import com.jitlogic.zorka.rankproc.BucketAggregate;
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.common.ZorkaUtil;
 import org.junit.Assert;
 import org.junit.Test;
 

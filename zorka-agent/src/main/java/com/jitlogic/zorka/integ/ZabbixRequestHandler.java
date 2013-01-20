@@ -23,8 +23,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLogger;
 import org.json.simple.JSONAware;
 
 /**

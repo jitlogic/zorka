@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.util;
+package com.jitlogic.zorka.common;
 
 import java.util.ArrayList;
 import java.util.List;

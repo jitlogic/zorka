@@ -22,7 +22,7 @@ import com.jitlogic.zorka.spy.*;
 
 import com.jitlogic.zorka.spy.GetterPresentingCollector;
 import com.jitlogic.zorka.spy.SpyProcessor;
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.common.ZorkaUtil;
 import org.junit.Before;
 import org.junit.Test;
 
