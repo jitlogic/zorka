@@ -16,8 +16,8 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.spy.TraceEventHandler;
-import com.jitlogic.zorka.spy.TracedException;
+import com.jitlogic.zorka.common.TraceEventHandler;
+import com.jitlogic.zorka.common.TracedException;
 
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;

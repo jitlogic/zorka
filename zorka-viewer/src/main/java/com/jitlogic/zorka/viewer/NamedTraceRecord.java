@@ -16,9 +16,7 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.spy.SymbolRegistry;
-import com.jitlogic.zorka.spy.TraceRecord;
-import com.jitlogic.zorka.spy.TracedException;
+import com.jitlogic.zorka.common.TracedException;
 import org.objectweb.asm.Type;
 
 import java.text.SimpleDateFormat;

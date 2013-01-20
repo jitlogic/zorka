@@ -16,6 +16,9 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.common.TraceEventHandler;
+import com.jitlogic.zorka.common.TracedException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -14,9 +14,9 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy;
+package com.jitlogic.zorka.common;
 
-import com.jitlogic.zorka.common.ZorkaUtil;
+import com.jitlogic.zorka.spy.SymbolRegistry;
 
 /**
  * Represents exception in symbolic form (suitable to be saved into trace file

@@ -16,7 +16,9 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.spy.*;
+import com.jitlogic.zorka.common.SimpleTraceFormat;
+import com.jitlogic.zorka.common.TraceEventHandler;
+import com.jitlogic.zorka.common.TracedException;
 
 import java.io.*;
 import java.util.ArrayList;

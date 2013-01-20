@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.viewer.test;
 
-import com.jitlogic.zorka.spy.SimpleTraceFormat;
+import com.jitlogic.zorka.common.SimpleTraceFormat;
 import com.jitlogic.zorka.viewer.TracePrinter;
 import org.junit.Test;
 

@@ -16,6 +16,9 @@
 
 package com.jitlogic.zorka.test.spy;
 
+import com.jitlogic.zorka.common.SimpleTraceFormat;
+import com.jitlogic.zorka.common.SymbolicException;
+import com.jitlogic.zorka.common.TracedException;
 import com.jitlogic.zorka.spy.*;
 import com.jitlogic.zorka.test.spy.support.TestTracer;
 

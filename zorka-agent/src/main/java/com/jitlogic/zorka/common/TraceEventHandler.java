@@ -14,7 +14,9 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.spy;
+package com.jitlogic.zorka.common;
+
+import com.jitlogic.zorka.common.TracedException;
 
 /**
  * Handles trace events. For performance reasons this is class, not interface

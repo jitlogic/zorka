@@ -17,10 +17,7 @@
 package com.jitlogic.zorka.spy;
 
 
-import com.jitlogic.zorka.common.ZorkaAsyncThread;
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogConfig;
-import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.common.*;
 
 /**
  * This class receives loose tracer submissions from single thread

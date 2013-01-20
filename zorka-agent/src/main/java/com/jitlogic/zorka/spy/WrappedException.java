@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.spy;
 
+import com.jitlogic.zorka.common.TracedException;
+
 /**
  * Represents wrapped exceptions in a form that is compatible with symbolic
  * exceptions.

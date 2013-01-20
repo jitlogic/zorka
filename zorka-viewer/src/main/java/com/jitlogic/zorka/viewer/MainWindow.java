@@ -25,7 +25,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.text.SimpleDateFormat;
 
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
