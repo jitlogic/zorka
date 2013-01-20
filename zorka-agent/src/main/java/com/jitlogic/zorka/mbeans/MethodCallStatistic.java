@@ -21,6 +21,7 @@ import static com.jitlogic.zorka.rankproc.BucketAggregate.MS;
 
 import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.common.ZorkaStat;
 import com.jitlogic.zorka.rankproc.BucketAggregate;
 
 import java.util.concurrent.atomic.AtomicLong;

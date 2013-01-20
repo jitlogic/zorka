@@ -16,7 +16,7 @@
  */
 package com.jitlogic.zorka.spy;
 
-import com.jitlogic.zorka.integ.ZorkaLogLevel;
+import com.jitlogic.zorka.common.ZorkaLogLevel;
 import com.jitlogic.zorka.common.ZorkaTrapper;
 import com.jitlogic.zorka.common.ObjectInspector;
 

@@ -19,8 +19,6 @@ package com.jitlogic.zorka.common;
 import java.util.List;
 import java.util.ArrayList;
 
-import com.jitlogic.zorka.integ.ZorkaLogLevel;
-
 /**
  * This has been written from scratch in order to not interfere with
  * other logging frameworks.

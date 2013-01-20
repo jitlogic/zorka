@@ -24,12 +24,12 @@ import javax.management.*;
 
 import com.jitlogic.zorka.integ.FileTrapper;
 import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogLevel;
+import com.jitlogic.zorka.common.ZorkaLogLevel;
 import com.jitlogic.zorka.common.ZorkaLogger;
 import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.rankproc.*;
 import com.jitlogic.zorka.mbeans.AttrGetter;
-import com.jitlogic.zorka.mbeans.ValGetter;
+import com.jitlogic.zorka.common.ValGetter;
 import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
 import com.jitlogic.zorka.common.*;
 

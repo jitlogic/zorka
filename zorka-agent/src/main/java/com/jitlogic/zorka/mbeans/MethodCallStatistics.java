@@ -17,6 +17,9 @@
 
 package com.jitlogic.zorka.mbeans;
 
+import com.jitlogic.zorka.common.ZorkaStat;
+import com.jitlogic.zorka.common.ZorkaStats;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

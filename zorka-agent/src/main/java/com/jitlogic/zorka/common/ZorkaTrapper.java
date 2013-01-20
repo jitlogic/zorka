@@ -16,8 +16,6 @@
  */
 package com.jitlogic.zorka.common;
 
-import com.jitlogic.zorka.integ.ZorkaLogLevel;
-
 /**
  * Zorka trapper interface. Objects implementing this interface can accept traps (logs)
  * and process them in arbitrary way.

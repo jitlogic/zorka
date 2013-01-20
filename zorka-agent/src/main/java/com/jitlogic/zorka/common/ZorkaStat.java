@@ -16,7 +16,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package com.jitlogic.zorka.mbeans;
+package com.jitlogic.zorka.common;
 
 /**
  * Base interface for all statistics reported by Zorka.

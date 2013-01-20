@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.test.util;
+package com.jitlogic.zorka.test.common;
 
 import com.jitlogic.zorka.test.support.TestInspectorClass;
 import com.jitlogic.zorka.test.support.TestJmx;

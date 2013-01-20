@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.integ;
 
 import com.jitlogic.zorka.common.ZorkaAsyncThread;
+import com.jitlogic.zorka.common.ZorkaLogLevel;
 import com.jitlogic.zorka.common.ZorkaTrapper;
 import com.jitlogic.zorka.common.ZorkaUtil;
 

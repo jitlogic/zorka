@@ -17,8 +17,6 @@
 
 package com.jitlogic.zorka.common;
 
-import com.jitlogic.zorka.integ.ZorkaLogLevel;
-
 /**
  * ZorkaLog objects are used internally as loggers. Zorka agent avoids using
  * standard logger implementation in order to not interfere with monitored

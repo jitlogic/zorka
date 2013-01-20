@@ -18,6 +18,7 @@
 package com.jitlogic.zorka.mbeans;
 
 import com.jitlogic.zorka.common.ObjectInspector;
+import com.jitlogic.zorka.common.ValGetter;
 
 /**
  * Variant of AttrGetter that recursively fetches attribute from an object.

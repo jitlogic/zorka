@@ -17,8 +17,6 @@
 
 package com.jitlogic.zorka.common;
 
-import com.jitlogic.zorka.mbeans.ZorkaStats;
-
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;

@@ -17,9 +17,6 @@
 
 package com.jitlogic.zorka.common;
 
-import com.jitlogic.zorka.mbeans.ZorkaStat;
-import com.jitlogic.zorka.mbeans.ZorkaStats;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
