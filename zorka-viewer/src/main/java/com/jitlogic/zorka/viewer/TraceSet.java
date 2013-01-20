@@ -20,32 +20,35 @@ import com.jitlogic.zorka.spy.*;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TraceSet extends TraceEventHandler {
 
-    private SymbolRegistry symbols = new SymbolRegistry();
+    private Map<Integer,String> symbols = new HashMap<Integer, String>(4096);
     private List<NamedTraceRecord> traces = new ArrayList<NamedTraceRecord>();
 
-    private NamedTraceRecord top = new NamedTraceRecord(symbols, null);
+    private NamedTraceRecord top = new NamedTraceRecord(null);
 
 
     @Override
     public void traceBegin(int traceId, long clock) {
-        top.setMarker(new TraceMarker(null, top, traceId, clock));
+        top.setTraceName(symbols.get(traceId));
+        top.setClock(clock);
     }
 
 
     @Override
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
 
-        if (top.getClassId() != 0) {
-            top = new NamedTraceRecord(symbols, top);
+        if (top.getClassName() != null) {
+            top = new NamedTraceRecord(top);
         }
 
-        top.setClassId(classId);
-        top.setMethodId(methodId);
-        top.setSignatureId(signatureId);
+        top.setClassName(symbols.get(classId));
+        top.setMethodName(symbols.get(methodId));
+        top.setMethodSignature(symbols.get(signatureId));
         top.setTime(tstamp);
     }
 
@@ -69,6 +72,7 @@ public class TraceSet extends TraceEventHandler {
     public void traceStats(long calls, long errors, int flags) {
         top.setCalls(calls);
         top.setErrors(errors);
+        top.setFlags(flags);
     }
 
 
@@ -80,7 +84,7 @@ public class TraceSet extends TraceEventHandler {
 
     @Override
     public void newAttr(int attrId, Object attrVal) {
-        top.setAttr(attrId, attrVal);
+        top.setAttr(symbols.get(attrId), attrVal);
     }
 
 
@@ -90,7 +94,7 @@ public class TraceSet extends TraceEventHandler {
             top = top.getParent();
         } else {
             traces.add(top);
-            top = new NamedTraceRecord(symbols, null);
+            top = new NamedTraceRecord(null);
         }
     }
 

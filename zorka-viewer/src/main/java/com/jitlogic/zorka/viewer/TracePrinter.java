@@ -76,7 +76,7 @@ public class TracePrinter extends TraceEventHandler {
 
     @Override
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
-        out.println(spc(level) + "ENTER (" + time(tstamp) + "): " + ViewerUtil.methodString(sym(classId), sym(methodId), sym(signatureId)));
+        out.println(spc(level) + "ENTER (" + time(tstamp) + "): " + sym(classId) + "." + sym(methodId) + "()");
         level++;
     }
 

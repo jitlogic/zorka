@@ -69,7 +69,7 @@ public class MainWindow extends JFrame {
 
             switch (columnIndex) {
                 case 0:
-                    return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(el.getClockDt());
+                    return el.prettyClock();
                 case 1:
                     return ViewerUtil.nanoSeconds(el.getTime());
                 case 2:
@@ -193,7 +193,7 @@ public class MainWindow extends JFrame {
 
     private void displayTrace(int idx) {
         tbmTraceDetail.setRoot(traceSet.get(idx));
-        tbmTraceDetail.adjustColumns(tblTraceDetail);
+        //tbmTraceDetail.adjustColumns(tblTraceDetail);
         tblTraceDetail.expandAll();
     }
 

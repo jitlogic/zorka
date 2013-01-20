@@ -18,6 +18,8 @@ package com.jitlogic.zorka.viewer;
 
 import org.objectweb.asm.Type;
 
+import java.util.regex.Pattern;
+
 public class ViewerUtil {
 
     public static String nanoSeconds(long ns) {
@@ -35,51 +37,58 @@ public class ViewerUtil {
         return String.format(t >= 10.0 ? "%.0f" : "%.2f", t);
     }
 
-    public static String methodString(NamedTraceRecord record) {
-        String className = record.getClassName(), methodName = record.getMethodName(), methodSignature = record.getSignature();
+//    public static String methodString(NamedTraceRecord record) {
+//        String className = record.getClassName(), methodName = record.getMethodName(), methodSignature = record.getSignature();
+//
+//
+//
+//        String s = methodString(record.getClassName(), record.getMethodName(), record.getSignature());
+//
+//        if (s == null) {
+//            return "!!! " + record.getClassName() != null ? record.getClassName() : "[classId=" + record.getClassId() + "]"
+//              + "." + record.getMethodName() != null ? record.getMethodName() : "[methodId=" + record.getMethodId() + "]"
+//              + "|" + record.getSignature() != null ? record.getSignature() : "[signatureId=" + record.getSignatureId() + "]";
+//        } else {
+//            return s;
+//        }
+//    }
 
+//    public static String methodString(String className, String methodName, String methodSignature) {
+//
+//        if (className == null || methodName == null || methodSignature == null) {
+//            return "??";
+//        }
+//
+//        Type[] argTypes = new Type[0];
+//
+//        try {
+//            argTypes = Type.getArgumentTypes(methodSignature);
+//        } catch (Exception e) {
+//            return "ZESRALO SIE: signature='" + methodSignature + "'";
+//        }
+//        String[] classComponents = className.split("\\.");
+//
+//        StringBuilder sb = new StringBuilder();
+//
+//        sb.append(classComponents[classComponents.length-1]);
+//        sb.append(".");
+//        sb.append(methodName);
+//        sb.append("(");
+//        for (int i = 0; i < argTypes.length; i++) {
+//            if (i > 0) {
+//                sb.append(",");
+//            }
+//            sb.append(argTypes[i].getClassName());
+//        }
+//        sb.append(")");
+//        return sb.toString();
+//    }
 
+    private static final Pattern RE_DOT = Pattern.compile("\\.");
 
-        String s = methodString(record.getClassName(), record.getMethodName(), record.getSignature());
-
-        if (s == null) {
-            return "!!! " + record.getClassName() != null ? record.getClassName() : "[classId=" + record.getClassId() + "]"
-              + "." + record.getMethodName() != null ? record.getMethodName() : "[methodId=" + record.getMethodId() + "]"
-              + "|" + record.getSignature() != null ? record.getSignature() : "[signatureId=" + record.getSignatureId() + "]";
-        } else {
-            return s;
-        }
-    }
-
-    public static String methodString(String className, String methodName, String methodSignature) {
-
-        if (className == null || methodName == null || methodSignature == null) {
-            return "??";
-        }
-
-        Type[] argTypes = new Type[0];
-
-        try {
-            argTypes = Type.getArgumentTypes(methodSignature);
-        } catch (Exception e) {
-            return "ZESRALO SIE: signature='" + methodSignature + "'";
-        }
-        String[] classComponents = className.split("\\.");
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(classComponents[classComponents.length-1]);
-        sb.append(".");
-        sb.append(methodName);
-        sb.append("(");
-        for (int i = 0; i < argTypes.length; i++) {
-            if (i > 0) {
-                sb.append(",");
-            }
-            sb.append(argTypes[i].getClassName());
-        }
-        sb.append(")");
-        return sb.toString();
+    public static String shortClassName(String className) {
+        String[] segs = RE_DOT.split(className != null ? className : "");
+        return segs[segs.length-1];
     }
 
 }
