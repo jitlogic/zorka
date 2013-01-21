@@ -659,7 +659,7 @@ public class ZorkaLib  {
         FileTrapper trapper = fileTrappers.get(id);
 
         if (trapper == null) {
-            trapper = FileTrapper.rolling(ZorkaLogLevel.valueOf(logLevel), path, count, maxSize, logExceptions);
+            trapper = FileTrapper.rolling(ZorkaLogLevel.valueOf(logLevel), propFormat(path), count, maxSize, logExceptions);
             trapper.start();
             fileTrappers.put(id, trapper);
         }
@@ -685,7 +685,7 @@ public class ZorkaLib  {
         FileTrapper trapper = fileTrappers.get(id);
 
         if (trapper == null) {
-            trapper = FileTrapper.daily(logLevel, path, logExceptions);
+            trapper = FileTrapper.daily(logLevel, propFormat(path), logExceptions);
             trapper.start();
             fileTrappers.put(id, trapper);
         }
@@ -706,6 +706,19 @@ public class ZorkaLib  {
             trapper.stop();
         }
     }
+
+
+    /**
+     * Formats string containing references to zorka properties.
+     *
+     * @param input zorka properties
+     *
+     * @return
+     */
+    public String propFormat(String input) {
+        return ZorkaConfig.propFormat(input);
+    }
+
 
 
     /**

@@ -15,6 +15,8 @@
  */
 package com.jitlogic.zorka.agent.integ;
 
+import com.jitlogic.zorka.agent.ZorkaConfig;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -169,7 +171,8 @@ public class SyslogLib {
     public SyslogTrapper trapper(String id, String syslogServer, String defaultHost, int defaultFacility) {
         SyslogTrapper trapper = trappers.get(id);
         if (trapper == null) {
-            trapper = new SyslogTrapper(syslogServer, defaultHost, defaultFacility);
+            trapper = new SyslogTrapper(ZorkaConfig.propFormat(syslogServer),
+                                ZorkaConfig.propFormat(defaultHost), defaultFacility);
             trappers.put(id, trapper);
             trapper.start();
         }

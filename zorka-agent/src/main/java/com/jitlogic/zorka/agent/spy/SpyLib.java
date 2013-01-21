@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.agent.spy;
 
+import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.integ.SnmpLib;
 import com.jitlogic.zorka.common.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.ZorkaTrapper;
@@ -482,7 +483,8 @@ public class SpyLib {
      * @return trace file writer
      */
     public ZorkaAsyncThread<TraceRecord> traceFile(String path, int maxFiles, long maxSize) {
-        TraceFileWriter writer = new TraceFileWriter(path, instance.getTracer().getSymbolRegistry(), maxFiles, maxSize);
+        TraceFileWriter writer = new TraceFileWriter(ZorkaConfig.propFormat(path),
+                                                instance.getTracer().getSymbolRegistry(), maxFiles, maxSize);
         writer.start();
         return writer;
     }

@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.agent.integ;
 
+import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.common.JmxObject;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaLib;
@@ -213,7 +214,8 @@ public class ZabbixLib {
         ZabbixTrapper trapper = trappers.get(id);
 
         if (trapper == null) {
-            trapper = new ZabbixTrapper(serverAddr, defaultHost, defaultItem);
+            trapper = new ZabbixTrapper(ZorkaConfig.propFormat(serverAddr),
+                                        ZorkaConfig.propFormat(defaultHost), defaultItem);
             trappers.put(id, trapper);
             trapper.start();
         }

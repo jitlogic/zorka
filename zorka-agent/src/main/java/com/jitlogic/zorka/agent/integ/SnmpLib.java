@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.agent.integ;
 
 import com.jitlogic.contrib.libsnmp.*;
+import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.common.ObjectInspector;
 import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogger;
@@ -241,7 +242,8 @@ public class SnmpLib {
         SnmpTrapper trapper = trappers.get(id);
 
         if (trapper == null) {
-            trapper = new SnmpTrapper(addr, community, agentAddr, protocol);
+            trapper = new SnmpTrapper(ZorkaConfig.propFormat(addr), ZorkaConfig.propFormat(community),
+                                        ZorkaConfig.propFormat(agentAddr), protocol);
             trappers.put(id, trapper);
             trapper.start();
         }

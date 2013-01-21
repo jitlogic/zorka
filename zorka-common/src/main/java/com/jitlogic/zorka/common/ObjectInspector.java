@@ -367,6 +367,7 @@ public final class ObjectInspector {
     public static String substitute(String input, Map<String,Object> record) {
         Matcher m = reVarSubstPattern.matcher(input);
         StringBuffer sb = new StringBuffer();
+
         while (m.find()) {
             String expr = m.group(1);
             String[] segs = expr.split("\\.");
@@ -375,6 +376,38 @@ public final class ObjectInspector {
                 v = getAttr(v, segs[i]);
             }
             m.appendReplacement(sb, ""+v);
+        }
+
+        m.appendTail(sb);
+
+        return sb.toString();
+    }
+
+
+    /**
+     * Substitutes marked variables in a string with property strings.
+     *
+     * @param input input (template) string
+     * @param properties spy record to be substituted
+     * @return string with substitutions filled with values from record
+     */
+    public static String substitute(String input, Properties properties) {
+        Matcher m = reVarSubstPattern.matcher(input);
+        StringBuffer sb = new StringBuffer();
+
+        while (m.find()) {
+            String key = m.group(1), def = null;
+            if (key.contains(":")) {
+                String[] s = key.split(":");
+                key = s[0];
+                def = s[1];
+            }
+            String val = properties.getProperty(key);
+            if (val != null) {
+                m.appendReplacement(sb, val);
+            } else if (def != null) {
+                m.appendReplacement(sb, def);
+            }
         }
 
         m.appendTail(sb);
