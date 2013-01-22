@@ -37,6 +37,7 @@ public class NamedTraceRecord {
 
     private TracedException exception;
 
+    private double timePct;
 
     public NamedTraceRecord(NamedTraceRecord parent) {
         this.parent = parent;
@@ -148,6 +149,11 @@ public class NamedTraceRecord {
     }
 
 
+    public double getTimePct() {
+        return timePct;
+    }
+
+
     public Object getAttr(String attrName) {
         return attrs != null ? attrs.get(attrName) : null;
     }
@@ -244,4 +250,13 @@ public class NamedTraceRecord {
         return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(getClock());
     }
 
+    public void fixupTimePct(long total) {
+        timePct = 100.0 * this.time / total;
+
+        if (children != null) {
+            for (NamedTraceRecord child : children) {
+                child.fixupTimePct(total);
+            }
+        }
+    }
 }

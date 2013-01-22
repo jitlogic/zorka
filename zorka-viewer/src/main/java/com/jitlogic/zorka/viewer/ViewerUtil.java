@@ -30,11 +30,6 @@ public class ViewerUtil {
         return String.format(t > 10 ? "%.0f" : "%.2f", t) + u;
     }
 
-    public static String percent(long nom, long div) {
-        double t = 100.0 * nom / div;
-        return String.format(t >= 10.0 ? "%.0f" : "%.2f", t);
-    }
-
     private static final Pattern RE_DOT = Pattern.compile("\\.");
 
     public static String shortClassName(String className) {

@@ -36,7 +36,18 @@ public class TraceDetailTreeModel extends AbstractTreeTableModel {
 
 
     public void setRoot(NamedTraceRecord root) {
-        this.root = root != null ? root : new JXFrame();
+        if (root != null) {
+            NamedTraceRecord el = new NamedTraceRecord(null);
+            el.addChild(root);
+            el.setMethodName(root.getMethodName());
+            el.setClassName(root.getClassName());
+            el.setMethodSignature(root.getMethodSignature());
+            el.setTime(el.getTime());
+            this.root = el;
+        } else {
+            this.root = new JXFrame();
+        }
+        //this.root = root != null ? root : new JXFrame();
         modelSupport.fireTreeStructureChanged(new TreePath(root));
     }
 
@@ -66,7 +77,7 @@ public class TraceDetailTreeModel extends AbstractTreeTableModel {
                 case 0:
                     return ViewerUtil.nanoSeconds(el.getTime());
                 case 1:
-                    return ViewerUtil.percent(el.getTime(), ((NamedTraceRecord) root).getTime());
+                    return String.format(el.getTimePct() >= 10.0 ? "%.0f" : "%.2f", el.getTimePct());
                 case 2:
                     return el.getCalls();
                 case 3:
