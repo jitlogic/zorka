@@ -243,6 +243,21 @@ public class NamedTraceRecord {
 
         sb.append(")");
 
+        if (attrs != null) {
+            List<String> keys = new ArrayList<String>(attrs.size()+2);
+            for (Map.Entry<String,Object> e : attrs.entrySet()) {
+                keys.add(e.getKey());
+            }
+            Collections.sort(keys);
+
+            for (String key : keys) {
+                sb.append('\n');
+                sb.append(key);
+                sb.append('=');
+                sb.append(attrs.get(key));
+            }
+        }
+
         return sb.toString();
     }
 
@@ -256,6 +271,20 @@ public class NamedTraceRecord {
         if (children != null) {
             for (NamedTraceRecord child : children) {
                 child.fixupTimePct(total);
+            }
+        }
+    }
+
+    public void scanAttrs(List<String[]> result) {
+        if (attrs != null) {
+            for (Map.Entry e : attrs.entrySet()) {
+                result.add(new String[] { e.getKey().toString(), ""+e.getValue()});
+            }
+        }
+
+        if (children != null) {
+            for (NamedTraceRecord rec : children) {
+                rec.scanAttrs(result);
             }
         }
     }

@@ -47,7 +47,6 @@ public class TraceDetailTreeModel extends AbstractTreeTableModel {
         } else {
             this.root = new JXFrame();
         }
-        //this.root = root != null ? root : new JXFrame();
         modelSupport.fireTreeStructureChanged(new TreePath(root));
     }
 
