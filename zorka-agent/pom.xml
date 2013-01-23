@@ -6,7 +6,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
     <parent>
         <groupId>com.jitlogic.zorka</groupId>
         <artifactId>zorka</artifactId>
-        <version>0.8.0</version>
+        <version>0.8.1-SNAPSHOT</version>
     </parent>
     <dependencies>
         <dependency>
@@ -28,6 +28,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <groupId>com.jitlogic.contrib</groupId>
             <artifactId>libsnmp</artifactId>
             <version>0.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jitlogic.zorka</groupId>
+            <artifactId>zorka-common</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.ow2.spec.ee</groupId>

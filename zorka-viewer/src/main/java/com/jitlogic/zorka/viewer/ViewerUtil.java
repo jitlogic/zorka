@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.viewer;
 
-import org.objectweb.asm.Type;
+import java.util.regex.Pattern;
 
 public class ViewerUtil {
 
@@ -30,34 +30,11 @@ public class ViewerUtil {
         return String.format(t > 10 ? "%.0f" : "%.2f", t) + u;
     }
 
-    public static String percent(long nom, long div) {
-        double t = 100.0 * nom / div;
-        return String.format(t >= 10.0 ? "%.0f" : "%.2f", t);
-    }
+    private static final Pattern RE_DOT = Pattern.compile("\\.");
 
-    public static String methodString(String className, String methodName, String methodSignature) {
-
-        if (className == null || methodName == null || methodSignature == null) {
-            return "?";
-        }
-
-        Type[] argTypes = Type.getArgumentTypes(methodSignature);
-        String[] classComponents = className.split("\\.");
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(classComponents[classComponents.length-1]);
-        sb.append(".");
-        sb.append(methodName);
-        sb.append("(");
-        for (int i = 0; i < argTypes.length; i++) {
-            if (i > 0) {
-                sb.append(",");
-            }
-            sb.append(argTypes[i].getClassName());
-        }
-        sb.append(")");
-        return sb.toString();
+    public static String shortClassName(String className) {
+        String[] segs = RE_DOT.split(className != null ? className : "");
+        return segs[segs.length-1];
     }
 
 }
