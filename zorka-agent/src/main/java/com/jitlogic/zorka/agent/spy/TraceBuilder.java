@@ -68,7 +68,7 @@ public class TraceBuilder extends TraceEventHandler {
             }
             return;
         } else {
-            ttop.setMarker(new TraceMarker(ttop.getMarker(), ttop, traceId, clock));
+            ttop.setMarker(new TraceMarker(ttop, traceId, clock));
             ttop.markFlag(TraceRecord.TRACE_BEGIN);
         }
     }
@@ -96,7 +96,7 @@ public class TraceBuilder extends TraceEventHandler {
         ttop.setCalls(ttop.getCalls() + 1);
 
         if (numRecords > Tracer.getMaxTraceRecords()) {
-            ttop.markOverflow();
+            ttop.markFlag(TraceRecord.OVERFLOW_FLAG);
         }
 
     }
@@ -171,14 +171,13 @@ public class TraceBuilder extends TraceEventHandler {
             }
         }
 
-
         if (parent != null) {
             if ((ttop.getTime() > Tracer.getMinMethodTime() || ttop.getErrors() > 0)) {
-                if (!ttop.hasOverflow()) {
+                if (!ttop.hasFlag(TraceRecord.OVERFLOW_FLAG)) {
                     parent.addChild(ttop);
                     clean = false;
                 } else {
-                    parent.getMarker().markOverflow();
+                    parent.getMarker().markFlag(TraceMarker.OVERFLOW_FLAG);
                     clean = false;
                 }
             }

@@ -278,6 +278,7 @@ public class TraceRecord {
      * @param output output handler object
      */
     public void traverse(TraceEventHandler output) {
+
         if (hasFlag(TRACE_BEGIN)) {
             output.traceBegin(marker.getTraceId(), getClock());
         }
@@ -323,21 +324,6 @@ public class TraceRecord {
         flags = 0;
     }
 
-    /**
-     * Sets overflow flag on this record.
-     */
-    public void markOverflow() {
-        flags |= OVERFLOW_FLAG;
-    }
-
-    /**
-     * Returns true if this record has overflow flag set.
-     * @return
-     */
-    public boolean hasOverflow() {
-        return 0 != (flags & OVERFLOW_FLAG);
-    }
-
     public void markFlag(int flag) {
         flags |= flag;
     }
@@ -346,10 +332,27 @@ public class TraceRecord {
         return 0 != (flags & flag);
     }
 
+
+    /**
+     * Returns true if record is part of recorded trace.
+     * This method is implemented for readability purposes,
+     * so algorithmic code like TraceBuilder will be easier
+     * to understand. Do not factor it out.
+     *
+     * @return true if record is part of recorded trace
+     */
     public boolean inTrace() {
         return marker != null;
     }
 
+    /**
+     * Returns true if record is empty (no actual frame has been
+     * recorded in it). This method is implemented for readability
+     * purposes, so algorithmic code like TraceBuilder will be easier
+     * to understand. Do not factor it out.
+     *
+     * @return true if record is empty
+     */
     public boolean isEmpty() {
         return classId == 0;
     }
