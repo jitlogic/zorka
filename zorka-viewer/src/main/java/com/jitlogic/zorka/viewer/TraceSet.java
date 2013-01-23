@@ -95,7 +95,7 @@ public class TraceSet extends TraceEventHandler {
             top.getParent().addChild(top);
             top = top.getParent();
         } else {
-            top.fixupTimePct(top.getTime());
+            top.fixup(top.getTime(), 0);
             traces.add(top);
             top = new NamedTraceRecord(null);
         }

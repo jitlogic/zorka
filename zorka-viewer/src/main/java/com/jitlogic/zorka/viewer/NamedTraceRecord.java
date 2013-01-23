@@ -29,7 +29,7 @@ public class NamedTraceRecord {
 
     private long time;
     private long errors, calls;
-    private int flags;
+    private int flags, level, records;
 
     private NamedTraceRecord parent;
     private List<NamedTraceRecord> children;
@@ -138,6 +138,13 @@ public class NamedTraceRecord {
         this.flags = flags;
     }
 
+    public int getLevel() {
+        return level;
+    }
+
+    public int getRecords() {
+        return records;
+    }
 
     public TracedException getException() {
         return exception;
@@ -199,9 +206,11 @@ public class NamedTraceRecord {
     public static final int PS_SHORT_ARGS  = 0x04;
     public static final int PS_NO_ARGS     = 0x08;
 
+
     public String prettyPrint() {
         return prettyPrint(PS_RESULT_TYPE|PS_SHORT_ARGS);
     }
+
 
     public String prettyPrint(int style) {
         StringBuffer sb = new StringBuffer(128);
@@ -261,19 +270,25 @@ public class NamedTraceRecord {
         return sb.toString();
     }
 
+
     public String prettyClock() {
         return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(getClock());
     }
 
-    public void fixupTimePct(long total) {
+
+    public void fixup(long total, int level) {
         timePct = 100.0 * this.time / total;
+        this.level = level;
+        this.records = 1;
 
         if (children != null) {
             for (NamedTraceRecord child : children) {
-                child.fixupTimePct(total);
+                child.fixup(total, level+1);
+                records += child.records;
             }
         }
     }
+
 
     public void scanAttrs(List<String[]> result) {
         if (attrs != null) {
@@ -285,6 +300,16 @@ public class NamedTraceRecord {
         if (children != null) {
             for (NamedTraceRecord rec : children) {
                 rec.scanAttrs(result);
+            }
+        }
+    }
+
+    public void scanRecords(List<NamedTraceRecord> result) {
+        result.add(this);
+
+        if (children != null) {
+            for (NamedTraceRecord child : children) {
+                child.scanRecords(result);
             }
         }
     }

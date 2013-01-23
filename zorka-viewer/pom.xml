@@ -18,11 +18,6 @@
             <version>4.0</version>
         </dependency>
         <dependency>
-            <groupId>org.swinglabs.swingx</groupId>
-            <artifactId>swingx-core</artifactId>
-            <version>1.6.4</version>
-        </dependency>
-        <dependency>
             <groupId>com.jitlogic.zorka</groupId>
             <artifactId>zorka-common</artifactId>
             <version>${project.version}</version>
@@ -57,12 +52,7 @@
                         <configuration>
                             <includes>
                                 <include>com.jitlogic.zorka:zorka-common</include>
-                                <include>org.swinglabs.swingx:swingx-core</include>
-                                <include>org.swinglabs.swingx:swingx-plaf</include>
-                                <include>org.swinglabs.swingx:swingx-action</include>
-                                <include>org.swinglabs.swingx:swingx-common</include>
-                                <include>org.swinglabs.swingx:swingx-autocomplete</include>
-                                <include>org.swinglabs.swingx:swingx-painters</include>
+                                <include>org.ow2.asm:asm</include>
                             </includes>
                             <rules>
                                 <keep>
@@ -70,6 +60,12 @@
                                 </keep>
                                 <keep>
                                     <pattern>com.jitlogic.zorka.common.**</pattern>
+                                </keep>
+                                <keep>
+                                    <pattern>com.jitlogic.zorka.viewer.**</pattern>
+                                </keep>
+                                <keep>
+                                    <pattern>org.ow2.asm.**</pattern>
                                 </keep>
                             </rules>
                         </configuration>

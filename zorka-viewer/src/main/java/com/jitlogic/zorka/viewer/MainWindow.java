@@ -16,8 +16,6 @@
 
 package com.jitlogic.zorka.viewer;
 
-import org.jdesktop.swingx.JXTreeTable;
-
 import java.util.List;
 import java.awt.*;
 import javax.swing.*;
@@ -40,8 +38,8 @@ public class MainWindow extends JFrame {
     private int[]    colWidth = { 75, 50, 50, 50, 150 };
 
 
-    private JXTreeTable tblTraceDetail;
-    private TraceDetailTreeModel tbmTraceDetail;
+    private JTable tblTraceDetail;
+    private TraceDetailTableModel tbmTraceDetail;
 
     private JTable tblTraceAttr;
     private TraceAttrTableModel tbmTraceAttr;
@@ -179,8 +177,8 @@ public class MainWindow extends JFrame {
 
         JScrollPane scrTraceDetail = new JScrollPane();
 
-        tbmTraceDetail = new TraceDetailTreeModel();
-        tblTraceDetail = new JXTreeTable(tbmTraceDetail);
+        tbmTraceDetail = new TraceDetailTableModel();
+        tblTraceDetail = new JTable(tbmTraceDetail);
         tbmTraceDetail.adjustColumns(tblTraceDetail);
         tblTraceDetail.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         tblTraceDetail.setAutoCreateColumnsFromModel(false);
@@ -212,7 +210,7 @@ public class MainWindow extends JFrame {
     private void displayTrace(int idx) {
         NamedTraceRecord root = traceSet.get(idx);
         tbmTraceDetail.setRoot(root);
-        tblTraceDetail.expandAll();
+        //tblTraceDetail.expandAll();
         List<String[]> rows = new ArrayList<String[]>();
         root.scanAttrs(rows);
         tbmTraceAttr.setRows(rows);
