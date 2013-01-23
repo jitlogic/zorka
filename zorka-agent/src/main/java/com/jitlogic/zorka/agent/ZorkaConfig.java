@@ -17,8 +17,9 @@
 
 package com.jitlogic.zorka.agent;
 
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogger;
+import com.jitlogic.zorka.common.ObjectInspector;
+import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLogger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -171,6 +172,16 @@ public class ZorkaConfig {
         properties.put("zorka.config.dir", getHomeDir("conf"));
         properties.put("zorka.log.dir", getHomeDir("log"));
 	}
-	
+
+    /**
+     * Formats string containing references to zorka properties.
+     *
+     * @param input zorka properties
+     *
+     * @return
+     */
+    public static String propFormat(String input) {
+        return properties == null ? input : ObjectInspector.substitute(input, properties);
+    }
 
 }

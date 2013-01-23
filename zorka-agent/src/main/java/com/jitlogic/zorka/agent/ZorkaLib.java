@@ -22,16 +22,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.*;
 
-import com.jitlogic.zorka.integ.FileTrapper;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.integ.ZorkaLogLevel;
-import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.rankproc.*;
-import com.jitlogic.zorka.mbeans.AttrGetter;
-import com.jitlogic.zorka.mbeans.ValGetter;
-import com.jitlogic.zorka.mbeans.ZorkaMappedMBean;
-import com.jitlogic.zorka.util.*;
+import com.jitlogic.zorka.agent.integ.FileTrapper;
+import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLogLevel;
+import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
+import com.jitlogic.zorka.agent.rankproc.*;
+import com.jitlogic.zorka.agent.mbeans.AttrGetter;
+import com.jitlogic.zorka.common.ValGetter;
+import com.jitlogic.zorka.agent.mbeans.ZorkaMappedMBean;
+import com.jitlogic.zorka.common.*;
 
 
 /**
@@ -659,7 +659,7 @@ public class ZorkaLib  {
         FileTrapper trapper = fileTrappers.get(id);
 
         if (trapper == null) {
-            trapper = FileTrapper.rolling(ZorkaLogLevel.valueOf(logLevel), path, count, maxSize, logExceptions);
+            trapper = FileTrapper.rolling(ZorkaLogLevel.valueOf(logLevel), propFormat(path), count, maxSize, logExceptions);
             trapper.start();
             fileTrappers.put(id, trapper);
         }
@@ -685,7 +685,7 @@ public class ZorkaLib  {
         FileTrapper trapper = fileTrappers.get(id);
 
         if (trapper == null) {
-            trapper = FileTrapper.daily(logLevel, path, logExceptions);
+            trapper = FileTrapper.daily(logLevel, propFormat(path), logExceptions);
             trapper.start();
             fileTrappers.put(id, trapper);
         }
@@ -706,6 +706,19 @@ public class ZorkaLib  {
             trapper.stop();
         }
     }
+
+
+    /**
+     * Formats string containing references to zorka properties.
+     *
+     * @param input zorka properties
+     *
+     * @return
+     */
+    public String propFormat(String input) {
+        return ZorkaConfig.propFormat(input);
+    }
+
 
 
     /**

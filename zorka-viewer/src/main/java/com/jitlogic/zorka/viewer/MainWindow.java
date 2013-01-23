@@ -16,8 +16,7 @@
 
 package com.jitlogic.zorka.viewer;
 
-import org.jdesktop.swingx.JXTreeTable;
-
+import java.util.List;
 import java.awt.*;
 import javax.swing.*;
 
@@ -25,7 +24,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
@@ -39,8 +38,11 @@ public class MainWindow extends JFrame {
     private int[]    colWidth = { 75, 50, 50, 50, 150 };
 
 
-    private JXTreeTable tblTraceDetail;
-    private TraceDetailTreeModel tbmTraceDetail;
+    private JTable tblTraceDetail;
+    private TraceDetailTableModel tbmTraceDetail;
+
+    private JTable tblTraceAttr;
+    private TraceAttrTableModel tbmTraceAttr;
 
     private TraceSet traceSet = new TraceSet();
 
@@ -69,7 +71,7 @@ public class MainWindow extends JFrame {
 
             switch (columnIndex) {
                 case 0:
-                    return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(el.getClockDt());
+                    return el.prettyClock();
                 case 1:
                     return ViewerUtil.nanoSeconds(el.getTime());
                 case 2:
@@ -91,7 +93,7 @@ public class MainWindow extends JFrame {
     };
 
 
-    private Action actOpen = new AbstractAction("Open [F3]", ResourceManager.getIcon24x24("open")) {
+    private Action actOpen = new AbstractAction("Open [F3]", ResourceManager.getIcon16x16("file-open")) {
         @Override public void actionPerformed(ActionEvent e) {
             JFileChooser chooser = new JFileChooser();
             chooser.setDialogTitle("Open trace file");
@@ -104,7 +106,7 @@ public class MainWindow extends JFrame {
     };
 
 
-    private Action actQuit = new AbstractAction("Quit [F10]", ResourceManager.getIcon24x24("quit")) {
+    private Action actQuit = new AbstractAction("Quit [F3]", ResourceManager.getIcon16x16("file-quit")) {
         @Override public void actionPerformed(ActionEvent e) {
             MainWindow.this.setVisible(false);
             System.exit(0);
@@ -170,13 +172,29 @@ public class MainWindow extends JFrame {
         scrTraces.setMinimumSize(new Dimension(200, 384));
         scrTraces.setViewportView(tblTraces);
 
-        JScrollPane scrTraceDetail = new JScrollPane();
-        splitPane.setRightComponent(scrTraceDetail);
+        //
+        JSplitPane splitDetail = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
-        tbmTraceDetail = new TraceDetailTreeModel();
-        tblTraceDetail = new JXTreeTable(tbmTraceDetail);
+        JScrollPane scrTraceDetail = new JScrollPane();
+
+        tbmTraceDetail = new TraceDetailTableModel();
+        tblTraceDetail = new JTable(tbmTraceDetail);
         tbmTraceDetail.adjustColumns(tblTraceDetail);
+        tblTraceDetail.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        tblTraceDetail.setAutoCreateColumnsFromModel(false);
         scrTraceDetail.setViewportView(tblTraceDetail);
+        splitDetail.setTopComponent(scrTraceDetail);
+
+        JScrollPane scrTraceAttrs = new JScrollPane();
+        tbmTraceAttr = new TraceAttrTableModel();
+        tblTraceAttr = new JTable(tbmTraceAttr);
+        tbmTraceAttr.adjustColumns(tblTraceAttr);
+        tblTraceAttr.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        scrTraceAttrs.setViewportView(tblTraceAttr);
+        splitDetail.setBottomComponent(scrTraceAttrs);
+        splitDetail.setResizeWeight(0.85);
+
+        splitPane.setRightComponent(splitDetail);
 
         splitPane.setResizeWeight(0.2);
     }
@@ -190,9 +208,12 @@ public class MainWindow extends JFrame {
 
 
     private void displayTrace(int idx) {
-        tbmTraceDetail.setRoot(traceSet.get(idx));
-        tbmTraceDetail.adjustColumns(tblTraceDetail);
-        tblTraceDetail.expandAll();
+        NamedTraceRecord root = traceSet.get(idx);
+        tbmTraceDetail.setRoot(root);
+        //tblTraceDetail.expandAll();
+        List<String[]> rows = new ArrayList<String[]>();
+        root.scanAttrs(rows);
+        tbmTraceAttr.setRows(rows);
     }
 
 }

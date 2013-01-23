@@ -16,16 +16,13 @@
 
 package com.jitlogic.zorka.agent;
 
-import com.jitlogic.zorka.integ.*;
-import com.jitlogic.zorka.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.normproc.NormLib;
-import com.jitlogic.zorka.spy.MainSubmitter;
-import com.jitlogic.zorka.spy.SpyInstance;
-import com.jitlogic.zorka.spy.SpyLib;
-import com.jitlogic.zorka.util.ZorkaLog;
-import com.jitlogic.zorka.util.ZorkaLogConfig;
-import com.jitlogic.zorka.util.ZorkaLogger;
-import com.jitlogic.zorka.util.ZorkaUtil;
+import com.jitlogic.zorka.common.*;
+import com.jitlogic.zorka.agent.integ.*;
+import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
+import com.jitlogic.zorka.agent.normproc.NormLib;
+import com.jitlogic.zorka.agent.spy.MainSubmitter;
+import com.jitlogic.zorka.agent.spy.SpyInstance;
+import com.jitlogic.zorka.agent.spy.SpyLib;
 
 import java.io.File;
 import java.lang.instrument.ClassFileTransformer;
