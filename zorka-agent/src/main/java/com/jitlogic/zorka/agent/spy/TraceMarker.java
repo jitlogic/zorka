@@ -99,6 +99,9 @@ public class TraceMarker {
         return flags;
     }
 
+    public void setFlags(int flags) {
+        this.flags = flags;
+    }
 
     /**
      * Sets OVERFLOW flag.

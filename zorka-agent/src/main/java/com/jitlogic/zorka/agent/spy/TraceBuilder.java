@@ -29,14 +29,14 @@ public class TraceBuilder extends TraceEventHandler {
 
     private final static ZorkaLog log = ZorkaLogger.getLog(TraceBuilder.class);
 
+
     /** Output */
     private ZorkaAsyncThread<TraceRecord> output;
 
-    /** Top of trace markers stack. */
-    private TraceMarker mtop = null;
 
     /** Top of trace records stack. */
     private TraceRecord ttop = new TraceRecord(null);
+
 
     /** Number of records collected so far */
     private int numRecords = 0;
@@ -62,23 +62,23 @@ public class TraceBuilder extends TraceEventHandler {
             return;
         }
 
-        if (mtop != null && mtop.getRoot().equals(ttop)) {
+        if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {
             if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_TRACE_ERRORS)) {
                 log.error("Trace marker already set on current frame. Skipping.");
             }
             return;
+        } else {
+            ttop.setMarker(new TraceMarker(ttop.getMarker(), ttop, traceId, clock));
+            ttop.markFlag(TraceRecord.TRACE_BEGIN);
         }
-
-        mtop = new TraceMarker(mtop, ttop, traceId, clock);
-        ttop.setMarker(mtop);
     }
 
 
     @Override
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
 
-        if (ttop.getClassId() != 0) {
-            if (mtop != null) {
+        if (!ttop.isEmpty()) {
+            if (ttop.inTrace()) {
                 ttop = new TraceRecord(ttop);
                 numRecords++;
             } else {
@@ -157,22 +157,20 @@ public class TraceBuilder extends TraceEventHandler {
 
         boolean clean = true;
 
-        if (ttop.getMarker() != null) {
+        TraceRecord parent = ttop.getParent();
+
+        if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {
             if (ttop.getTime() >= ttop.getMarker().getMinimumTime()) {
                 output.submit(ttop);
                 clean = false;
             }
 
-            if (ttop.getMarker().equals(mtop)) {
-                mtop = mtop.pop();
-            } else {
-                if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_TRACE_ERRORS)) {
-                    log.error("Markers didn't match on tracer stack pop.");
-                }
+
+            if (parent != null) {
+                parent.getMarker().setFlags(ttop.getMarker().getFlags());
             }
         }
 
-        TraceRecord parent = ttop.getParent();
 
         if (parent != null) {
             if ((ttop.getTime() > Tracer.getMinMethodTime() || ttop.getErrors() > 0)) {
@@ -180,7 +178,7 @@ public class TraceBuilder extends TraceEventHandler {
                     parent.addChild(ttop);
                     clean = false;
                 } else {
-                    mtop.markOverflow();
+                    parent.getMarker().markOverflow();
                     clean = false;
                 }
             }
@@ -206,8 +204,8 @@ public class TraceBuilder extends TraceEventHandler {
      * @param minimumTraceTime (in nanoseconds)
      */
     public void setMinimumTraceTime(long minimumTraceTime) {
-        if (mtop != null) {
-            mtop.setMinimumTime(minimumTraceTime);
+        if (ttop.inTrace()) {
+            ttop.getMarker().setMinimumTime(minimumTraceTime);
         }
     }
 

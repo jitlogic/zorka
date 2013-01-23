@@ -34,7 +34,8 @@ import java.util.Map;
 public class TraceRecord {
 
     /** Overflow record will be discarded regardless of method execution time and other conditions. */
-    private static final int OVERFLOW_FLAG = 1;
+    public static final int OVERFLOW_FLAG = 0x0001;
+    public static final int TRACE_BEGIN   = 0x0002;
 
     /** Class ID refers to class name in symbol registry. */
     private int classId;
@@ -80,6 +81,10 @@ public class TraceRecord {
      */
     public TraceRecord(TraceRecord parent) {
         this.parent = parent;
+
+        if (parent != null) {
+            this.marker = parent.getMarker();
+        }
     }
 
 
@@ -273,7 +278,7 @@ public class TraceRecord {
      * @param output output handler object
      */
     public void traverse(TraceEventHandler output) {
-        if (marker != null) {
+        if (hasFlag(TRACE_BEGIN)) {
             output.traceBegin(marker.getTraceId(), getClock());
         }
 
@@ -333,4 +338,19 @@ public class TraceRecord {
         return 0 != (flags & OVERFLOW_FLAG);
     }
 
+    public void markFlag(int flag) {
+        flags |= flag;
+    }
+
+    public boolean hasFlag(int flag) {
+        return 0 != (flags & flag);
+    }
+
+    public boolean inTrace() {
+        return marker != null;
+    }
+
+    public boolean isEmpty() {
+        return classId == 0;
+    }
 }
