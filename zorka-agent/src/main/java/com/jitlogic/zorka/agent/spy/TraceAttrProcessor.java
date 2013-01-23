@@ -53,7 +53,11 @@ public class TraceAttrProcessor implements SpyProcessor {
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
-        tracer.getHandler().newAttr(attrId, record.get(srcField));
+        Object val = record.get(srcField);
+
+        if (val != null) {
+            tracer.getHandler().newAttr(attrId, val);
+        }
         return record;
     }
 }
