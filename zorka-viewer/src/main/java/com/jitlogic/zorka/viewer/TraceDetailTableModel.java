@@ -35,6 +35,7 @@ public class TraceDetailTableModel extends AbstractTableModel {
         }
 
         table.getColumnModel().getColumn(1).setCellRenderer(new PercentColumnRenderer());
+        table.getColumnModel().getColumn(4).setCellRenderer(new TraceMethodRenderer());
     }
 
 
@@ -77,7 +78,7 @@ public class TraceDetailTableModel extends AbstractTableModel {
                 case 3:
                     return el.getErrors();
                 case 4:
-                    return spc(el.getLevel()) + el.prettyPrint();
+                    return el;
 
             }
         }
@@ -85,17 +86,4 @@ public class TraceDetailTableModel extends AbstractTableModel {
         return "?";
     }
 
-
-    private static final String SPC = "    ";
-
-
-    private String spc(int n) {
-        StringBuilder sb = new StringBuilder(n * SPC.length() + 2);
-
-        for (int i = 0; i < n; i++) {
-            sb.append(SPC);
-        }
-
-        return sb.toString();
-    }
 }
