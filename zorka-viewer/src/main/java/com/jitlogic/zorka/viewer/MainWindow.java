@@ -41,9 +41,6 @@ public class MainWindow extends JFrame {
     private JTable tblTraceDetail;
     private TraceDetailTableModel tbmTraceDetail;
 
-    private JTable tblTraceAttr;
-    private TraceAttrTableModel tbmTraceAttr;
-
     private TraceSet traceSet = new TraceSet();
 
 
@@ -172,8 +169,6 @@ public class MainWindow extends JFrame {
         scrTraces.setMinimumSize(new Dimension(200, 384));
         scrTraces.setViewportView(tblTraces);
 
-        //
-        JSplitPane splitDetail = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 
         JScrollPane scrTraceDetail = new JScrollPane();
 
@@ -183,18 +178,8 @@ public class MainWindow extends JFrame {
         tblTraceDetail.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         tblTraceDetail.setAutoCreateColumnsFromModel(false);
         scrTraceDetail.setViewportView(tblTraceDetail);
-        splitDetail.setTopComponent(scrTraceDetail);
 
-        JScrollPane scrTraceAttrs = new JScrollPane();
-        tbmTraceAttr = new TraceAttrTableModel();
-        tblTraceAttr = new JTable(tbmTraceAttr);
-        tbmTraceAttr.adjustColumns(tblTraceAttr);
-        tblTraceAttr.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-        scrTraceAttrs.setViewportView(tblTraceAttr);
-        splitDetail.setBottomComponent(scrTraceAttrs);
-        splitDetail.setResizeWeight(0.85);
-
-        splitPane.setRightComponent(splitDetail);
+        splitPane.setRightComponent(scrTraceDetail);
 
         splitPane.setResizeWeight(0.2);
     }
@@ -210,10 +195,8 @@ public class MainWindow extends JFrame {
     private void displayTrace(int idx) {
         NamedTraceRecord root = traceSet.get(idx);
         tbmTraceDetail.setRoot(root);
-        //tblTraceDetail.expandAll();
         List<String[]> rows = new ArrayList<String[]>();
         root.scanAttrs(rows);
-        tbmTraceAttr.setRows(rows);
     }
 
 }
