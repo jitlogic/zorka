@@ -441,7 +441,7 @@ public class SpyLib {
      * @return spy processor object marking new trace
      */
     public SpyProcessor traceBegin(String name) {
-        return new TraceBeginProcessor(instance.getTracer(), name, -1);
+        return traceBegin(name, -1);
     }
 
 
@@ -455,9 +455,24 @@ public class SpyLib {
      * @return spy processor object marking new trace
      */
     public SpyProcessor traceBegin(String name, long minimumTraceTime) {
-        return new TraceBeginProcessor(instance.getTracer(), name, minimumTraceTime * 1000000L);
+        return traceBegin(name, minimumTraceTime, 0);
     }
 
+
+    /**
+     * Starts new trace.
+     *
+     * @param name trace name
+     *
+     * @param minimumTraceTime minimum trace time
+     *
+     * @param flags initial flags
+     *
+     * @return spy processor object marking new trace
+     */
+    public SpyProcessor traceBegin(String name, long minimumTraceTime, int flags) {
+        return new TraceBeginProcessor(instance.getTracer(), name, minimumTraceTime * 1000000L, flags);
+    }
 
     /**
      * Attaches attribute to trace record.
@@ -468,6 +483,16 @@ public class SpyLib {
      */
     public SpyProcessor traceAttr(String srcField, String dstAttr) {
         return new TraceAttrProcessor(instance.getTracer(), srcField, dstAttr);
+    }
+
+
+    public SpyProcessor traceFlags(int flags) {
+        return new TraceFlagsProcessor(instance.getTracer(), null, flags);
+    }
+
+
+    public SpyProcessor traceFLags(String srcField, int flags) {
+        return new TraceFlagsProcessor(instance.getTracer(), srcField, flags);
     }
 
 

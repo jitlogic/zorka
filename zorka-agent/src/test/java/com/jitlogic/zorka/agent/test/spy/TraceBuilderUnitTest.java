@@ -81,6 +81,35 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
+    public void testSingleTraceWithOneShortElementAndAlwaysSubmitFlag() throws Exception {
+        builder.traceEnter(c1, m1, s1, 10*MS);
+        builder.traceBegin(t1, 100L);
+        builder.markTraceFlag(TraceMarker.ALWAYS_SUBMIT);
+        builder.traceReturn(20*MS);
+
+        Assert.assertEquals("Output actions mismatch.",
+                Arrays.asList("traceBegin", "traceEnter", "traceStats", "traceReturn"),
+                output.listAttr("action"));
+    }
+
+
+    @Test
+    public void testAllMethodsSubmitFlag() throws Exception {
+        builder.traceEnter(c1, m1, s1, 10*MS);
+        builder.traceBegin(t1, 100L);
+        builder.markTraceFlag(TraceMarker.ALL_METHODS);
+        builder.traceEnter(c1, m1, s1, 20*MS);
+        builder.traceReturn(20*MS+10);
+        builder.traceReturn(200*MS);
+
+        Assert.assertEquals("Output actions mismatch.",
+                Arrays.asList("traceBegin", "traceEnter", "traceStats", "traceEnter", "traceStats",
+                        "traceReturn", "traceReturn"), output.listAttr("action"));
+
+    }
+
+
+    @Test
     public void testSingleOneElementTrace() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
         builder.traceBegin(t1, 200L);

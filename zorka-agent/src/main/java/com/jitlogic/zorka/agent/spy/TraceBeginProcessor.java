@@ -28,16 +28,20 @@ import java.util.Map;
 public class TraceBeginProcessor implements SpyProcessor {
 
 
-    /** Tracer object */
+    /** Tracer object. */
     private Tracer tracer;
 
 
-    /** Trace name symbol ID */
+    /** Trace name symbol ID. */
     private int traceId;
 
 
-    /** Minimum trace execution time */
+    /** Minimum trace execution time. */
     private long minimumTraceTime;
+
+
+    /** Flags set in trace marker. */
+    private int flags;
 
 
     /**
@@ -49,20 +53,25 @@ public class TraceBeginProcessor implements SpyProcessor {
      *
      * @param minimumTraceTime minimum trace execution time
      */
-    public TraceBeginProcessor(Tracer tracer, String traceName, long minimumTraceTime) {
+    public TraceBeginProcessor(Tracer tracer, String traceName, long minimumTraceTime, int flags) {
         this.tracer = tracer;
         this.traceId = tracer.getSymbolRegistry().symbolId(traceName);
         this.minimumTraceTime = minimumTraceTime;
+        this.flags = flags;
     }
 
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
-        TraceEventHandler traceBuilder = tracer.getHandler();
+        TraceBuilder traceBuilder = (TraceBuilder)tracer.getHandler();
 
         traceBuilder.traceBegin(traceId, System.currentTimeMillis());
         if (minimumTraceTime >= 0 && traceBuilder instanceof TraceBuilder) {
-            ((TraceBuilder)traceBuilder).setMinimumTraceTime(minimumTraceTime);
+            traceBuilder.setMinimumTraceTime(minimumTraceTime);
+        }
+
+        if (flags != 0) {
+            traceBuilder.markTraceFlag(flags);
         }
 
         return record;

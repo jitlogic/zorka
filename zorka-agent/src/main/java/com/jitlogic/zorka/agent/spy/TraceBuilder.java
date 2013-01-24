@@ -160,19 +160,21 @@ public class TraceBuilder extends TraceEventHandler {
         TraceRecord parent = ttop.getParent();
 
         if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {
-            if (ttop.getTime() >= ttop.getMarker().getMinimumTime()) {
+            if (ttop.getTime() >= ttop.getMarker().getMinimumTime()
+                    || 0 != (ttop.getMarker().getFlags() & TraceMarker.ALWAYS_SUBMIT)) {
                 output.submit(ttop);
                 clean = false;
             }
 
 
             if (parent != null) {
-                parent.getMarker().setFlags(ttop.getMarker().getFlags());
+                parent.getMarker().inheritFlags(ttop.getMarker().getFlags());
             }
         }
 
         if (parent != null) {
-            if ((ttop.getTime() > Tracer.getMinMethodTime() || ttop.getErrors() > 0)) {
+            if ((ttop.getTime() > Tracer.getMinMethodTime() || ttop.getErrors() > 0)
+                    || 0 != (ttop.getMarker().getFlags() & TraceMarker.ALL_METHODS)) {
                 if (!ttop.hasFlag(TraceRecord.OVERFLOW_FLAG)) {
                     parent.addChild(ttop);
                     clean = false;
@@ -205,6 +207,13 @@ public class TraceBuilder extends TraceEventHandler {
     public void setMinimumTraceTime(long minimumTraceTime) {
         if (ttop.inTrace()) {
             ttop.getMarker().setMinimumTime(minimumTraceTime);
+        }
+    }
+
+
+    public void markTraceFlag(int flag) {
+        if (ttop.getMarker() != null) {
+            ttop.getMarker().markFlag(flag);
         }
     }
 
