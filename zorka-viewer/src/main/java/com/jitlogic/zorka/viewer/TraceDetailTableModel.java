@@ -33,6 +33,8 @@ public class TraceDetailTableModel extends AbstractTableModel {
         for (int i = 0; i < colWidth.length; i++) {
             table.getColumnModel().getColumn(i).setPreferredWidth(colWidth[i]);
         }
+
+        table.getColumnModel().getColumn(1).setCellRenderer(new PercentColumnRenderer());
     }
 
 
@@ -69,7 +71,7 @@ public class TraceDetailTableModel extends AbstractTableModel {
                 case 0:
                     return ViewerUtil.nanoSeconds(el.getTime());
                 case 1:
-                    return String.format(el.getTimePct() >= 10.0 ? "%.0f" : "%.2f", el.getTimePct());
+                    return el.getTimePct();
                 case 2:
                     return el.getCalls();
                 case 3:
