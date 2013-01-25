@@ -34,6 +34,14 @@ public class SymbolicException implements TracedException {
     private String message;
 
 
+    /** Stack trace consists of (class-name),(method-name),(line-number) triples. */
+    private SymbolicStackElement[] stackTrace;
+
+
+    /** Cause (inner exception) */
+    private SymbolicException cause;
+
+
     /**
      * Creates new symbolic exception object.
      *
@@ -41,9 +49,11 @@ public class SymbolicException implements TracedException {
      *
      * @param message error message
      */
-    public SymbolicException(int classId, String message) {
+    public SymbolicException(int classId, String message, SymbolicStackElement[] stackTrace, SymbolicException cause) {
         this.classId = classId;
         this.message = message;
+        this.stackTrace = ZorkaUtil.copyArray(stackTrace);
+        this.cause = cause;
     }
 
 
@@ -54,9 +64,28 @@ public class SymbolicException implements TracedException {
      *
      * @param symbols
      */
-    public SymbolicException(Throwable exception, SymbolRegistry symbols) {
+    public SymbolicException(Throwable exception, SymbolRegistry symbols, SymbolicException cause) {
         this.classId = symbols.symbolId(exception.getClass().getName());
         this.message = exception.getMessage();
+
+        StackTraceElement[] orig = exception.getStackTrace();
+
+        if (orig != null && orig.length > 0) {
+            stackTrace = new SymbolicStackElement[orig.length];
+            for (int i = 0; i < orig.length; i++) {
+                stackTrace[i] = new SymbolicStackElement(orig[i], symbols);
+            }
+        } else {
+            stackTrace = new SymbolicStackElement[0];
+        }
+
+        if (cause != null) {
+            this.cause = cause;
+        } else {
+            if (exception.getCause() != null) {
+                this.cause = new SymbolicException(exception.getCause(), symbols, null);
+            }
+        }
     }
 
 
@@ -78,14 +107,40 @@ public class SymbolicException implements TracedException {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof SymbolicException
-            && ((SymbolicException)obj).classId == classId
-            && ZorkaUtil.objEquals(message, ((SymbolicException)obj).message);
+        if (obj instanceof SymbolicException) {
+            SymbolicException sex = (SymbolicException)obj;
+
+            if (sex.classId != classId || !ZorkaUtil.objEquals(sex.message,  message) ||
+                    !ZorkaUtil.objEquals(sex.cause, cause) || sex.stackTrace.length != stackTrace.length) {
+                return false;
+            }
+
+            for (int i = 0; i < stackTrace.length; i++) {
+                if (!ZorkaUtil.objEquals(sex.stackTrace[i], stackTrace[i])) {
+                    return false;
+                }
+            }
+
+            return true;
+
+        } else {
+            return false;
+        }
     }
 
 
     @Override
     public String toString() {
         return "" + classId + ": " + message;
+    }
+
+
+    public SymbolicException getCause() {
+        return cause;
+    }
+
+
+    public SymbolicStackElement[] getStackTrace() {
+        return stackTrace;
     }
 }

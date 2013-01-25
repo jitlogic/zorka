@@ -65,6 +65,11 @@ public class SimpleTraceFormat extends TraceEventHandler {
     /** newAttr(key, stringVal) call */
     public static final byte STRING_ATTR  = 0x45;
 
+    public static final byte NO_EXCEPTION = 0x50;
+
+    public static final byte CAUSE_EXCEPTION = 0x51;
+
+
     /** Input/output buffer */
     private ByteBuffer buf;
 
@@ -230,6 +235,23 @@ public class SimpleTraceFormat extends TraceEventHandler {
     public void encodeException(SymbolicException ex) {
         buf.putInt(ex.getClassId());
         buf.putString(ex.getMessage());
+
+        SymbolicStackElement[] stackTrace = ex.getStackTrace();
+        buf.putShort(stackTrace.length);
+
+        for (SymbolicStackElement el : stackTrace) {
+            buf.putInt(el.getClassId());
+            buf.putInt(el.getMethodId());
+            buf.putInt(el.getFileId());
+            buf.putInt(el.getLineNum());
+        }
+
+        if (ex.getCause() != null) {
+            buf.putByte(CAUSE_EXCEPTION);
+            encodeException(ex.getCause());
+        } else {
+            buf.putByte(NO_EXCEPTION);
+        }
     }
 
 
@@ -239,6 +261,26 @@ public class SimpleTraceFormat extends TraceEventHandler {
      * @return (synthetic) symbolic exception representation.
      */
     public SymbolicException decodeException() {
-        return new SymbolicException(buf.getInt(), buf.getString());
+        int classId = buf.getInt();
+        String message = buf.getString();
+
+        int stackLen = buf.getShort();
+        SymbolicStackElement[] stack = new SymbolicStackElement[stackLen];
+
+        for (int i = 0; i < stackLen; i++) {
+            stack[i] = new SymbolicStackElement(buf.getInt(), buf.getInt(), buf.getInt(), buf.getInt());
+        }
+
+        int stop = buf.getByte();
+
+        SymbolicException cause;
+
+        if (stop == CAUSE_EXCEPTION) {
+            cause = decodeException();
+        } else {
+            cause = null;
+        }
+
+        return new SymbolicException(classId, message, stack, cause);
     }
 }

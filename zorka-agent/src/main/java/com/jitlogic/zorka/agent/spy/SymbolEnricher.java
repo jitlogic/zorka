@@ -29,14 +29,18 @@ import com.jitlogic.zorka.common.*;
  */
 public class SymbolEnricher extends TraceEventHandler {
 
+
     /** Logger object */
     private static final ZorkaLog log = ZorkaLogger.getLog(SymbolEnricher.class);
+
 
     /** Symbol ID bit mask. Zeroed bits in this mask mark symbols that are not yet known to receiver. */
     BitVector bitVector = new BitVector();
 
+
     /** Symbol registry used by event sender. */
     private SymbolRegistry symbols;
+
 
     /** Event receiver (output) object. */
     private TraceEventHandler output;
@@ -110,11 +114,25 @@ public class SymbolEnricher extends TraceEventHandler {
     @Override
     public void traceError(TracedException exception, long tstamp) {
         if (exception instanceof WrappedException) {
-            SymbolicException sex = new SymbolicException(((WrappedException) exception).getException(), symbols);
-            check(sex.getClassId());
+            SymbolicException sex = new SymbolicException(((WrappedException) exception).getException(), symbols, null);
+            checkSymbolicException(sex);
             output.traceError(sex, tstamp);
         } else {
+            checkSymbolicException((SymbolicException)exception);
             output.traceError(exception, tstamp);
+        }
+    }
+
+    private void checkSymbolicException(SymbolicException sex) {
+        check(sex.getClassId());
+        for (SymbolicStackElement sse : sex.getStackTrace()) {
+            check(sse.getClassId());
+            check(sse.getMethodId());
+            check(sse.getFileId());
+        }
+
+        if (sex.getCause() != null) {
+            checkSymbolicException(sex.getCause());
         }
     }
 
