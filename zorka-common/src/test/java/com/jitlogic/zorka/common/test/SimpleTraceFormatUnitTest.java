@@ -149,7 +149,7 @@ public class SimpleTraceFormatUnitTest {
     @Test
     public void testTraceEncodeDecodeRealException() {
         Exception ex = new Exception("oja!");
-        SymbolicException e = new SymbolicException(ex, symbols, null);
+        SymbolicException e = new SymbolicException(ex, symbols, true);
 
         encoder.traceError(e, 200);
         decode();
@@ -160,7 +160,7 @@ public class SimpleTraceFormatUnitTest {
     public void testTraceEncodeDecodeRealExceptionWithCause() {
         Exception ex1 = new Exception("oja!");
         Exception ex2 = new Exception("OJA!", ex1);
-        SymbolicException e = new SymbolicException(ex2, symbols, null);
+        SymbolicException e = new SymbolicException(ex2, symbols, true);
 
         encoder.traceError(e, 200);
         decode();

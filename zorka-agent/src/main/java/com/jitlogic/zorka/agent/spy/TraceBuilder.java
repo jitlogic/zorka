@@ -33,6 +33,7 @@ public class TraceBuilder extends TraceEventHandler {
     /** Output */
     private ZorkaAsyncThread<TraceRecord> output;
 
+    private SymbolRegistry symbols;
 
     /** Top of trace records stack. */
     private TraceRecord ttop = new TraceRecord(null);
@@ -47,8 +48,9 @@ public class TraceBuilder extends TraceEventHandler {
      *
      * @param output object completed traces will be submitted to
      */
-    public TraceBuilder(ZorkaAsyncThread<TraceRecord> output) {
+    public TraceBuilder(ZorkaAsyncThread<TraceRecord> output, SymbolRegistry symbols) {
         this.output = output;
+        this.symbols = symbols;
     }
 
 
@@ -174,7 +176,7 @@ public class TraceBuilder extends TraceEventHandler {
         if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {
             if (ttop.getTime() >= ttop.getMarker().getMinimumTime()
                     || 0 != (ttop.getMarker().getFlags() & TraceMarker.ALWAYS_SUBMIT)) {
-                output.submit(ttop);
+                submit(ttop);
                 clean = false;
             }
 
@@ -207,6 +209,12 @@ public class TraceBuilder extends TraceEventHandler {
             ttop = parent != null ? parent : new TraceRecord(null);
         }
 
+    }
+
+
+    private void submit(TraceRecord record) {
+        record.fixup(symbols);
+        output.submit(record);
     }
 
 

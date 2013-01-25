@@ -60,7 +60,7 @@ public class TraceEnrichmentUnitTest {
     @Test
     public void testEnrichTraceError() {
         Exception e = new Exception("oja!");
-        enricher.traceError(e, 100);
+        enricher.traceError(new SymbolicException(e, symbols, true), 100);
 
         output.check(0, "action", "newSymbol", "symbolId",
                 symbols.symbolId("java.lang.Exception"), "symbolName", "java.lang.Exception");
@@ -68,6 +68,6 @@ public class TraceEnrichmentUnitTest {
         Assert.assertTrue("Should emit lots of other symbols.", output.size() > 10);
 
         output.check(output.size()-1, "action", "traceError", "exception",
-                new SymbolicException(e, symbols, null), "tstamp", 100L);
+                new SymbolicException(e, symbols, true), "tstamp", 100L);
     }
 }

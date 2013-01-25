@@ -80,7 +80,7 @@ public class Tracer {
     private ThreadLocal<TraceBuilder> localHandlers =
         new ThreadLocal<TraceBuilder>() {
             public TraceBuilder initialValue() {
-                return new TraceBuilder(output);
+                return new TraceBuilder(output, symbolRegistry);
             }
         };
 

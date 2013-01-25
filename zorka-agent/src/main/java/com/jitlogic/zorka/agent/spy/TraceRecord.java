@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.agent.spy;
 
+import com.jitlogic.zorka.common.SymbolRegistry;
+import com.jitlogic.zorka.common.SymbolicException;
 import com.jitlogic.zorka.common.TraceEventHandler;
 
 import java.util.ArrayList;
@@ -362,5 +364,18 @@ public class TraceRecord {
      */
     public boolean isEmpty() {
         return classId == 0;
+    }
+
+    public void fixup(SymbolRegistry symbols) {
+
+        if (children != null) {
+            for (TraceRecord child : children) {
+                child.fixup(symbols);
+            }
+        }
+
+        if (exception instanceof Throwable) {
+            exception = new SymbolicException((Throwable)exception, symbols, 0 == (flags & EXCEPTION_WRAP));
+        }
     }
 }

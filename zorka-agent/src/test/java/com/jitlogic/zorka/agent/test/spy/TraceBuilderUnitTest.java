@@ -22,6 +22,7 @@ import com.jitlogic.zorka.agent.test.spy.support.TestTracer;
 
 import com.jitlogic.zorka.agent.test.support.TestUtil;
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
+import com.jitlogic.zorka.common.SymbolicException;
 import com.jitlogic.zorka.common.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.ZorkaLogConfig;
 import org.junit.After;
@@ -41,7 +42,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         new ZorkaAsyncThread<TraceRecord>("test") {
             @Override public void submit(TraceRecord obj) { obj.traverse(output); }
             @Override protected void process(TraceRecord obj) {  }
-        });
+        }, symbols);
 
     private static final int MS = 1000000;
 
@@ -395,7 +396,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         Assert.assertEquals(7, output.size());
 
         // Exception of inner method
-        output.check(5, "exception", e);
+        output.check(5, "exception", new SymbolicException(e, symbols, true));
 
         // Exception of outer method
         output.check(6, "exception", null);
@@ -424,10 +425,10 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         Assert.assertEquals(7, output.size());
 
         // Exception of inner method
-        output.check(5, "exception", e1);
+        output.check(5, "exception", new SymbolicException(e1, symbols, true));
 
         // Exception of outer method
-        output.check(6, "exception", e2);
+        output.check(6, "exception", new SymbolicException(e2, symbols, false));
 
         // Flags of outer method
         output.check(2, "flags", TraceRecord.EXCEPTION_WRAP|TraceRecord.TRACE_BEGIN);

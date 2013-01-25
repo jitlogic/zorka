@@ -64,7 +64,23 @@ public class SymbolicException {
      *
      * @param symbols
      */
-    public SymbolicException(Throwable exception, SymbolRegistry symbols, SymbolicException cause) {
+    private SymbolicException(Throwable exception, SymbolRegistry symbols, SymbolicException cause) {
+        init(exception, symbols);
+
+        if (cause != null) {
+            this.cause = cause;
+        }
+    }
+
+    public SymbolicException(Throwable exception, SymbolRegistry symbols, boolean withCause) {
+        init(exception, symbols);
+
+        if (exception.getCause() != null && withCause) {
+            this.cause = new SymbolicException(exception.getCause(), symbols, null);
+        }
+    }
+
+    private void init(Throwable exception, SymbolRegistry symbols) {
         this.classId = symbols.symbolId(exception.getClass().getName());
         this.message = exception.getMessage();
 
@@ -77,14 +93,6 @@ public class SymbolicException {
             }
         } else {
             stackTrace = new SymbolicStackElement[0];
-        }
-
-        if (cause != null) {
-            this.cause = cause;
-        } else {
-            if (exception.getCause() != null) {
-                this.cause = new SymbolicException(exception.getCause(), symbols, null);
-            }
         }
     }
 
