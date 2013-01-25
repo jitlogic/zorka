@@ -160,10 +160,15 @@ public class TraceBuilder extends TraceEventHandler {
 
         TraceRecord parent = ttop.getParent();
 
-        if (ttop.getException() != null && ttop.numChildren() > 0 &&
-                ttop.getChild(ttop.numChildren()-1).getException() == ttop.getException()) {
-            ttop.setException(null);
-            ttop.markFlag(TraceRecord.EXCEPTION_PASS);
+        if (ttop.getException() != null && ttop.numChildren() > 0) {
+            Throwable tex = (Throwable)ttop.getException();
+            Throwable cex = (Throwable)ttop.getChild(ttop.numChildren()-1).getException();
+            if (cex == tex) {
+                ttop.setException(null);
+                ttop.markFlag(TraceRecord.EXCEPTION_PASS);
+            } else if (cex == tex.getCause()) {
+                ttop.markFlag(TraceRecord.EXCEPTION_WRAP);
+            }
         }
 
         if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {

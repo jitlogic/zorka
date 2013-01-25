@@ -348,6 +348,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     @Test
     public void testSingleTraceWithMultipleEmbeddedTracesInside() throws Exception {
         spy.setTracerMinTraceTime(0);
+        spy.setTracerMinMethodTime(0);
 
         // Submit one frame
         builder.traceEnter(c1, m1, s1, 1*MS);
@@ -379,9 +380,10 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testExceptionObjectCleanupAndMarkIfPassedThrough() throws Exception {
-        Exception e = new Exception("oja!");
-
         spy.setTracerMinTraceTime(0);
+        spy.setTracerMinMethodTime(0);
+
+        Exception e = new Exception("oja!");
 
         builder.traceEnter(c1, m1, s1, 1*MS);
         builder.traceBegin(t1, 2*MS, 0);
@@ -401,6 +403,34 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         // Flags of outer method
         output.check(2, "flags", TraceRecord.EXCEPTION_PASS|TraceRecord.TRACE_BEGIN);
 
+    }
+
+
+    @Test
+    public void testThrowAndWrapExceptionCheckIfWrappingExceptionIsMarked() throws Exception {
+        spy.setTracerMinTraceTime(0);
+        spy.setTracerMinMethodTime(0);
+
+        Exception e1 = new Exception("oja!");
+        Exception e2 = new Exception("OJA!", e1);
+
+        builder.traceEnter(c1, m1, s1, 1*MS);
+        builder.traceBegin(t1, 2*MS, 0);
+        builder.traceEnter(c1, m2, s1, 3*MS);
+
+        builder.traceError(e1, 4*MS);
+        builder.traceError(e2, 5*MS);
+
+        Assert.assertEquals(7, output.size());
+
+        // Exception of inner method
+        output.check(5, "exception", e1);
+
+        // Exception of outer method
+        output.check(6, "exception", e2);
+
+        // Flags of outer method
+        output.check(2, "flags", TraceRecord.EXCEPTION_WRAP|TraceRecord.TRACE_BEGIN);
     }
 
 }

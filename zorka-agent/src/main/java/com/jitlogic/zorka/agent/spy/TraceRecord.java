@@ -38,8 +38,11 @@ public class TraceRecord {
     /** Indicates that new trace has been started from here. */
     public static final int TRACE_BEGIN   = 0x0002;
 
-    /** Exception thrown from method called from current method hasn't been handled and has been thrown out of current method. */
+    /** Exception thrown from method called from frame hasn't been handled and has been thrown out of current frame. */
     public static final int EXCEPTION_PASS = 0x0004;
+
+    /** Exception thrown from method called current frame has been wrapped and thrown out of current frame. */
+    public static final int EXCEPTION_WRAP = 0x0008;
 
     /** Class ID refers to class name in symbol registry. */
     private int classId;
