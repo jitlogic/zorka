@@ -17,7 +17,6 @@
 package com.jitlogic.zorka.common.test.support;
 
 import com.jitlogic.zorka.common.TraceEventHandler;
-import com.jitlogic.zorka.common.TracedException;
 import com.jitlogic.zorka.common.ZorkaUtil;
 import org.junit.Assert;
 
@@ -45,7 +44,7 @@ public class TestTracer extends TraceEventHandler {
     }
 
     @Override
-    public void traceError(TracedException exception, long tstamp) {
+    public void traceError(Object exception, long tstamp) {
         data.add(ZorkaUtil.map("action", "traceError", "exception", exception, "tstamp", tstamp));
     }
 

@@ -134,7 +134,7 @@ public class MainSubmitter {
                 if (SpyInstance.isDebugEnabled(SpyLib.SPD_TRACE_ALL)) {
                     log.debug("traceError()", exception);
                 }
-                tracer.getHandler().traceError(new WrappedException(exception), System.nanoTime());
+                tracer.getHandler().traceError(exception, System.nanoTime());
             } catch (Throwable e) {
                 if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
                     log.debug("Error executing traceError: ", e);

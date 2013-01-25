@@ -112,12 +112,12 @@ public class SymbolEnricher extends TraceEventHandler {
 
 
     @Override
-    public void traceError(TracedException exception, long tstamp) {
-        if (exception instanceof WrappedException) {
-            SymbolicException sex = new SymbolicException(((WrappedException) exception).getException(), symbols, null);
+    public void traceError(Object exception, long tstamp) {
+        if (exception instanceof Throwable) {
+            SymbolicException sex = new SymbolicException((Throwable)exception, symbols, null);
             checkSymbolicException(sex);
             output.traceError(sex, tstamp);
-        } else {
+        } else if (exception instanceof SymbolicException) {
             checkSymbolicException((SymbolicException)exception);
             output.traceError(exception, tstamp);
         }

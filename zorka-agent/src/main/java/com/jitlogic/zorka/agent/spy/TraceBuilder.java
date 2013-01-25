@@ -116,7 +116,7 @@ public class TraceBuilder extends TraceEventHandler {
 
 
     @Override
-    public void traceError(TracedException exception, long tstamp) {
+    public void traceError(Object exception, long tstamp) {
 
         while (!(ttop.getClassId() != 0) && ttop.getParent() != null) {
             ttop = ttop.getParent();

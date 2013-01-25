@@ -60,7 +60,7 @@ public class TraceEnrichmentUnitTest {
     @Test
     public void testEnrichTraceError() {
         Exception e = new Exception("oja!");
-        enricher.traceError(new WrappedException(e), 100);
+        enricher.traceError(e, 100);
 
         output.check(0, "action", "newSymbol", "symbolId",
                 symbols.symbolId("java.lang.Exception"), "symbolName", "java.lang.Exception");

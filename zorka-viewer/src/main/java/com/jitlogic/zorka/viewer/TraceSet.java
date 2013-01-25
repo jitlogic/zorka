@@ -18,7 +18,6 @@ package com.jitlogic.zorka.viewer;
 
 import com.jitlogic.zorka.common.SimpleTraceFormat;
 import com.jitlogic.zorka.common.TraceEventHandler;
-import com.jitlogic.zorka.common.TracedException;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -63,7 +62,7 @@ public class TraceSet extends TraceEventHandler {
 
 
     @Override
-    public void traceError(TracedException exception, long tstamp) {
+    public void traceError(Object exception, long tstamp) {
         top.setException(exception);
         top.setTime(tstamp-top.getTime());
         pop();

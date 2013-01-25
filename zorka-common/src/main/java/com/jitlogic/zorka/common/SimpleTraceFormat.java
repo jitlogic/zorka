@@ -117,7 +117,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
 
 
     @Override
-    public void traceError(TracedException exception, long tstamp) {
+    public void traceError(Object exception, long tstamp) {
         buf.putByte(TRACE_ERROR);
         if (exception instanceof SymbolicException) {
             encodeException((SymbolicException)exception);

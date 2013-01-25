@@ -18,7 +18,6 @@ package com.jitlogic.zorka.agent.test.spy;
 
 import com.jitlogic.zorka.agent.spy.SpyDefinition;
 import com.jitlogic.zorka.agent.test.support.BytecodeInstrumentationFixture;
-import com.jitlogic.zorka.agent.spy.WrappedException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -78,7 +77,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         Object rslt = invoke(obj, "errorMethod");
 
         assertEquals(2, output.getData().size());
-        assertEquals(new WrappedException((Throwable)rslt), output.getData().get(1).get("exception"));
+        assertEquals(rslt, output.getData().get(1).get("exception"));
         assertEquals("errorMethod", symbols.symbolName((Integer)output.getData().get(0).get("methodId")));
     }
 

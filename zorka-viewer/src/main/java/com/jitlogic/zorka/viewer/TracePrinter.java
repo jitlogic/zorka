@@ -17,7 +17,6 @@
 package com.jitlogic.zorka.viewer;
 
 import com.jitlogic.zorka.common.TraceEventHandler;
-import com.jitlogic.zorka.common.TracedException;
 
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
@@ -91,7 +90,7 @@ public class TracePrinter extends TraceEventHandler {
 
 
     @Override
-    public void traceError(TracedException exception, long tstamp) {
+    public void traceError(Object exception, long tstamp) {
         out.println(spc(level) + "ERROR (" + time(tstamp) + "): " + exception);
         if (level > 0) {
             level--;

@@ -81,7 +81,7 @@ public class SimpleTraceFormatUnitTest {
 
     @Test
     public void traceErrorCmd() {
-        TracedException e = new SymbolicException(e1, "oja!", new SymbolicStackElement[0], null);
+        SymbolicException e = new SymbolicException(e1, "oja!", new SymbolicStackElement[0], null);
         encoder.traceError(e, 200);
         decode();
         output.check(0, "action", "traceError", "tstamp", 200L, "exception", e);
@@ -149,7 +149,7 @@ public class SimpleTraceFormatUnitTest {
     @Test
     public void testTraceEncodeDecodeRealException() {
         Exception ex = new Exception("oja!");
-        TracedException e = new SymbolicException(ex, symbols, null);
+        SymbolicException e = new SymbolicException(ex, symbols, null);
 
         encoder.traceError(e, 200);
         decode();
@@ -160,7 +160,7 @@ public class SimpleTraceFormatUnitTest {
     public void testTraceEncodeDecodeRealExceptionWithCause() {
         Exception ex1 = new Exception("oja!");
         Exception ex2 = new Exception("OJA!", ex1);
-        TracedException e = new SymbolicException(ex2, symbols, null);
+        SymbolicException e = new SymbolicException(ex2, symbols, null);
 
         encoder.traceError(e, 200);
         decode();

@@ -16,7 +16,6 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.common.TracedException;
 import org.objectweb.asm.Type;
 
 import java.text.SimpleDateFormat;
@@ -35,7 +34,7 @@ public class NamedTraceRecord {
     private List<NamedTraceRecord> children;
     private Map<String,Object> attrs;
 
-    private TracedException exception;
+    private Object exception;
 
     private double timePct;
 
@@ -146,12 +145,12 @@ public class NamedTraceRecord {
         return records;
     }
 
-    public TracedException getException() {
+    public Object getException() {
         return exception;
     }
 
 
-    public void setException(TracedException exception) {
+    public void setException(Object exception) {
         this.exception = exception;
     }
 

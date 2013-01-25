@@ -17,7 +17,6 @@
 package com.jitlogic.zorka.agent.spy;
 
 import com.jitlogic.zorka.common.TraceEventHandler;
-import com.jitlogic.zorka.common.TracedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,7 +62,7 @@ public class TraceRecord {
     private TraceMarker marker;
 
     /** Exception caught on method exit (if any) */
-    private TracedException exception;
+    private Object exception;
 
     /** Parent trace record represents information about method execution from which current method execution was called. */
     private TraceRecord parent;
@@ -225,12 +224,12 @@ public class TraceRecord {
     }
 
 
-    public TracedException getException() {
+    public Object getException() {
         return exception;
     }
 
 
-    public void setException(TracedException exception) {
+    public void setException(Object exception) {
         this.exception = exception;
     }
 

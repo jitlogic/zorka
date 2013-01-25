@@ -16,7 +16,6 @@
 
 package com.jitlogic.zorka.common;
 
-import com.jitlogic.zorka.common.TracedException;
 
 /**
  * Handles trace events. For performance reasons this is class, not interface
@@ -63,7 +62,7 @@ public abstract class TraceEventHandler {
      * @param tstamp timestamp (in nanoseconds since Epoch - see System.nanoTime())
      *
      */
-    public abstract  void traceError(TracedException exception, long tstamp);
+    public abstract  void traceError(Object exception, long tstamp);
 
 
     /**

@@ -141,7 +141,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     public void testTraceWithErrorElement() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
         builder.traceBegin(t1, 400L);
-        builder.traceError(new WrappedException(new Exception("oja!")), 200*MS);
+        builder.traceError(new Exception("oja!"), 200*MS);
 
         Assert.assertEquals("Output actions mismatch.",
             Arrays.asList("traceBegin", "traceEnter", "traceStats", "traceError"),
@@ -154,7 +154,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         builder.traceEnter(c1, m1, s1, 100*MS);
         builder.traceBegin(t1, 500L);
         builder.traceEnter(c1, m2, s1, 200 * MS);
-        builder.traceError(new WrappedException(new Exception("oja!")), 200 * MS + 100);
+        builder.traceError(new Exception("oja!"), 200 * MS + 100);
         builder.traceReturn(400 * MS);
 
         Assert.assertEquals("Output actions mismatch.",

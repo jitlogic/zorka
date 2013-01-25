@@ -23,7 +23,7 @@ package com.jitlogic.zorka.common;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class SymbolicException implements TracedException {
+public class SymbolicException {
 
 
     /** Exception class name symbol ID */
