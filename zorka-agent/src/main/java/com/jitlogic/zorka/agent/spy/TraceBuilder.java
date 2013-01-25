@@ -53,7 +53,7 @@ public class TraceBuilder extends TraceEventHandler {
 
 
     @Override
-    public void traceBegin(int traceId, long clock) {
+    public void traceBegin(int traceId, long clock, int flags) {
 
         if (ttop == null) {
             if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_TRACE_ERRORS)) {
@@ -70,6 +70,7 @@ public class TraceBuilder extends TraceEventHandler {
         } else {
             ttop.setMarker(new TraceMarker(ttop, traceId, clock));
             ttop.markFlag(TraceRecord.TRACE_BEGIN);
+            ttop.getMarker().markFlag(flags);
         }
     }
 
@@ -159,6 +160,12 @@ public class TraceBuilder extends TraceEventHandler {
 
         TraceRecord parent = ttop.getParent();
 
+        if (ttop.getException() != null && ttop.numChildren() > 0 &&
+                ttop.getChild(ttop.numChildren()-1).getException() == ttop.getException()) {
+            ttop.setException(null);
+            ttop.markFlag(TraceRecord.EXCEPTION_PASS);
+        }
+
         if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {
             if (ttop.getTime() >= ttop.getMarker().getMinimumTime()
                     || 0 != (ttop.getMarker().getFlags() & TraceMarker.ALWAYS_SUBMIT)) {
@@ -175,13 +182,14 @@ public class TraceBuilder extends TraceEventHandler {
         if (parent != null) {
             if ((ttop.getTime() > Tracer.getMinMethodTime() || ttop.getErrors() > 0)
                     || 0 != (ttop.getMarker().getFlags() & TraceMarker.ALL_METHODS)) {
+
+
                 if (!ttop.hasFlag(TraceRecord.OVERFLOW_FLAG)) {
                     parent.addChild(ttop);
-                    clean = false;
                 } else {
                     parent.getMarker().markFlag(TraceMarker.OVERFLOW_FLAG);
-                    clean = false;
                 }
+                clean = false;
             }
             parent.setCalls(parent.getCalls() + ttop.getCalls());
             parent.setErrors(parent.getErrors() + ttop.getErrors());

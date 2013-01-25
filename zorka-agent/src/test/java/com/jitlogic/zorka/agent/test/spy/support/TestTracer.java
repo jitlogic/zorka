@@ -29,8 +29,8 @@ public class TestTracer extends TraceEventHandler {
     private List<Map<Object,Object>> data = new ArrayList<Map<Object, Object>>();
 
     @Override
-    public void traceBegin(int traceId, long clock) {
-        data.add(ZorkaUtil.map("action", "traceBegin", "traceId", traceId, "clock", clock));
+    public void traceBegin(int traceId, long clock, int flags) {
+        data.add(ZorkaUtil.map("action", "traceBegin", "traceId", traceId, "clock", clock, "flags", flags));
     }
 
     @Override

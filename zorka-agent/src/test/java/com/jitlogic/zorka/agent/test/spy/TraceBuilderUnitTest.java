@@ -73,7 +73,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     @Test
     public void testSingleTraceWithOneShortElement() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
-        builder.traceBegin(t1, 100L);
+        builder.traceBegin(t1, 100L, 0);
         builder.traceReturn(100*MS+100);
 
         assertEquals("Nothing should be sent to output", 0, output.getData().size());
@@ -83,7 +83,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     @Test
     public void testSingleTraceWithOneShortElementAndAlwaysSubmitFlag() throws Exception {
         builder.traceEnter(c1, m1, s1, 10*MS);
-        builder.traceBegin(t1, 100L);
+        builder.traceBegin(t1, 100L, 0);
         builder.markTraceFlag(TraceMarker.ALWAYS_SUBMIT);
         builder.traceReturn(20*MS);
 
@@ -96,7 +96,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     @Test
     public void testAllMethodsSubmitFlag() throws Exception {
         builder.traceEnter(c1, m1, s1, 10*MS);
-        builder.traceBegin(t1, 100L);
+        builder.traceBegin(t1, 100L, 0);
         builder.markTraceFlag(TraceMarker.ALL_METHODS);
         builder.traceEnter(c1, m1, s1, 20*MS);
         builder.traceReturn(20*MS+10);
@@ -112,7 +112,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     @Test
     public void testSingleOneElementTrace() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
-        builder.traceBegin(t1, 200L);
+        builder.traceBegin(t1, 200L, 0);
         builder.traceReturn(200*MS);
 
         Assert.assertEquals("Output actions mismatch.",
@@ -124,7 +124,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     @Test
     public void testSingleTraceWithOneChildElement() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
-        builder.traceBegin(t1, 300L);
+        builder.traceBegin(t1, 300L, 0);
         builder.traceEnter(c1, m2, s1, 200*MS);
         builder.traceReturn(300*MS);
         builder.traceReturn(400*MS);
@@ -140,7 +140,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     @Test
     public void testTraceWithErrorElement() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
-        builder.traceBegin(t1, 400L);
+        builder.traceBegin(t1, 400L, 0);
         builder.traceError(new Exception("oja!"), 200*MS);
 
         Assert.assertEquals("Output actions mismatch.",
@@ -152,7 +152,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     @Test
     public void testTraceWithShortErrorChildElement() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
-        builder.traceBegin(t1, 500L);
+        builder.traceBegin(t1, 500L, 0);
         builder.traceEnter(c1, m2, s1, 200 * MS);
         builder.traceError(new Exception("oja!"), 200 * MS + 100);
         builder.traceReturn(400 * MS);
@@ -167,7 +167,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     @Test
     public void testMixedTraceWithSomeShortElementsAndSomeErrors() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
-        builder.traceBegin(t1, 600L);
+        builder.traceBegin(t1, 600L, 0);
         builder.setMinimumTraceTime(0);
         builder.traceEnter(c1, m2, s1, 110*MS);
         builder.traceReturn(110 * MS + 100);
@@ -186,7 +186,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     @Test
     public void testAttrsEncode() throws Exception {
         builder.traceEnter(c1, m1, s1, 100*MS);
-        builder.traceBegin(t1, 700L);
+        builder.traceBegin(t1, 700L, 0);
         builder.setMinimumTraceTime(0);
         builder.newAttr(a1, "some val");
         builder.newAttr(a2, "other val");
@@ -214,7 +214,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         spy.setTracerMinTraceTime(0);
 
         builder.traceEnter(c1, m1, s1, 1 * MS);
-        builder.traceBegin(t1, 2 * MS);
+        builder.traceBegin(t1, 2 * MS, 0);
 
         builder.traceEnter(c1, m2, s1, 3*MS);
         builder.traceReturn(4*MS);
@@ -233,7 +233,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         builder.traceReturn(11 * MS);
 
         Assert.assertEquals("Should record traceBegin and 3 full records", 1 +3*3, output.size());
-        output.check(2, "calls", 5L, "flags", TraceMarker.OVERFLOW_FLAG);
+        output.check(2, "calls", 5L);
+        output.check(0, "flags", TraceMarker.OVERFLOW_FLAG);
     }
 
 
@@ -244,7 +245,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         // Start new trace
         builder.traceEnter(c1, m1, s1, 1 * MS);
-        builder.traceBegin(t1, 2 * MS);
+        builder.traceBegin(t1, 2 * MS, 0);
 
         // Recursively enter 3 times
         builder.traceEnter(c1, m2, s1, 3 * MS);
@@ -263,7 +264,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         Assert.assertEquals("Should record traceBegin and 3 full records", 1 +3*3, output.size());
 
-        output.check(2, "flags", TraceMarker.OVERFLOW_FLAG);
+        output.check(0, "flags", TraceMarker.OVERFLOW_FLAG);
     }
 
 
@@ -274,11 +275,11 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         // Start new trace
         builder.traceEnter(c1, m1, s1, 1*MS);
-        builder.traceBegin(t1, 2*MS);
+        builder.traceBegin(t1, 2*MS, 0);
 
         // Start subsequent trace
         builder.traceEnter(c1, m2, s1, 3*MS);
-        builder.traceBegin(t2, 4*MS);
+        builder.traceBegin(t2, 4*MS, 0);
 
         // Submit some records, so builder will reach limit
         builder.traceEnter(c1, m2, s1, 5*MS);
@@ -304,7 +305,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         Assert.assertEquals("Should record 2 times traceBegin and 4 full frames (3 records each)",
                 2 + 4 * 3, output.size());
 
-        output.check(2, "flags", TraceMarker.OVERFLOW_FLAG);
+        output.check(0, "flags", TraceMarker.OVERFLOW_FLAG);
     }
 
 
@@ -314,8 +315,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         ZorkaLogConfig.setTracerLevel(0); // TODO check why ZorkaLog objects are not constructed correctly in this test
 
         builder.traceEnter(c1, m1, s1, 1*MS);
-        builder.traceBegin(t1, 2*MS);
-        builder.traceBegin(t2, 2*MS);
+        builder.traceBegin(t1, 2*MS, 0);
+        builder.traceBegin(t2, 2*MS, 0);
         builder.traceReturn(3*MS);
 
         Assert.assertEquals("Should record one traceBegin event and one full frame (3 records)", 1 + 3, output.size());
@@ -329,7 +330,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         // Submit one frame
         builder.traceEnter(c1, m1, s1, 1*MS);
-        builder.traceBegin(t1, 2*MS);
+        builder.traceBegin(t1, 2*MS, 0);
         builder.traceReturn(3*MS);
 
         // Malicious traceReturn event
@@ -337,7 +338,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         // Submit another frame
         builder.traceEnter(c1, m1, s1, 5*MS);
-        builder.traceBegin(t1, 6*MS);
+        builder.traceBegin(t1, 6*MS, 0);
         builder.traceReturn(7*MS);
 
         Assert.assertEquals("Should record one traceBegin event and one full frame (3 records)", 2 * (1 + 3), output.size());
@@ -350,11 +351,11 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         // Submit one frame
         builder.traceEnter(c1, m1, s1, 1*MS);
-        builder.traceBegin(t1, 2*MS);
+        builder.traceBegin(t1, 2*MS, 0);
 
         // Start subsequent trace
         builder.traceEnter(c1, m2, s1, 3*MS);
-        builder.traceBegin(t2, 4*MS);
+        builder.traceBegin(t2, 4*MS, 0);
         builder.traceReturn(5*MS);
 
         // Single trace should appear on output
@@ -363,7 +364,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         // Start subsequent trace
         builder.traceEnter(c1, m2, s1, 6*MS);
-        builder.traceBegin(t2, 7*MS);
+        builder.traceBegin(t2, 7*MS, 0);
         builder.traceReturn(8*MS);
 
         Assert.assertEquals(4, output.size());
@@ -373,6 +374,33 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         builder.traceReturn(9*MS);
 
         Assert.assertEquals(3+3*3, output.size());
+    }
+
+
+    @Test
+    public void testExceptionObjectCleanupAndMarkIfPassedThrough() throws Exception {
+        Exception e = new Exception("oja!");
+
+        spy.setTracerMinTraceTime(0);
+
+        builder.traceEnter(c1, m1, s1, 1*MS);
+        builder.traceBegin(t1, 2*MS, 0);
+        builder.traceEnter(c1, m2, s1, 3*MS);
+
+        builder.traceError(e, 4*MS);
+        builder.traceError(e, 5*MS);
+
+        Assert.assertEquals(7, output.size());
+
+        // Exception of inner method
+        output.check(5, "exception", e);
+
+        // Exception of outer method
+        output.check(6, "exception", null);
+
+        // Flags of outer method
+        output.check(2, "flags", TraceRecord.EXCEPTION_PASS|TraceRecord.TRACE_BEGIN);
+
     }
 
 }

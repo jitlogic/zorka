@@ -34,7 +34,12 @@ public class TraceRecord {
 
     /** Overflow record will be discarded regardless of method execution time and other conditions. */
     public static final int OVERFLOW_FLAG = 0x0001;
+
+    /** Indicates that new trace has been started from here. */
     public static final int TRACE_BEGIN   = 0x0002;
+
+    /** Exception thrown from method called from current method hasn't been handled and has been thrown out of current method. */
+    public static final int EXCEPTION_PASS = 0x0004;
 
     /** Class ID refers to class name in symbol registry. */
     private int classId;
@@ -279,11 +284,11 @@ public class TraceRecord {
     public void traverse(TraceEventHandler output) {
 
         if (hasFlag(TRACE_BEGIN)) {
-            output.traceBegin(marker.getTraceId(), getClock());
+            output.traceBegin(marker.getTraceId(), getClock(), marker != null ? marker.getFlags() : 0);
         }
 
         output.traceEnter(classId, methodId, signatureId, 0);
-        output.traceStats(calls, errors, marker != null ? marker.getFlags() : 0);
+        output.traceStats(calls, errors, flags);
 
         if (attrs != null) {
             for (Map.Entry<Integer,Object> entry : attrs.entrySet()) {

@@ -29,6 +29,7 @@ public class NamedTraceRecord {
     private long time;
     private long errors, calls;
     private int flags, level, records;
+    private int traceFlags;
 
     private NamedTraceRecord parent;
     private List<NamedTraceRecord> children;
@@ -154,6 +155,14 @@ public class NamedTraceRecord {
         this.exception = exception;
     }
 
+
+    public int getTraceFlags() {
+        return traceFlags;
+    }
+
+    public void setTraceFlags(int traceFlags) {
+        this.traceFlags = traceFlags;
+    }
 
     public double getTimePct() {
         return timePct;

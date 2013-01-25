@@ -49,9 +49,9 @@ public class SimpleTraceFormatUnitTest {
 
     @Test
     public void testTraceBeginCmd() {
-        encoder.traceBegin(t1, 100L);
+        encoder.traceBegin(t1, 100L, 8);
         decode();
-        output.check(0, "action", "traceBegin", "traceId", t1, "clock", 100L);
+        output.check(0, "action", "traceBegin", "traceId", t1, "clock", 100L, "flags", 8);
     }
 
 
@@ -135,7 +135,7 @@ public class SimpleTraceFormatUnitTest {
 
     @Test
     public void testSimpleTraceDecodeEncode() {
-        encoder.traceBegin(t1, 500L);
+        encoder.traceBegin(t1, 500L, 2);
         encoder.traceEnter(c1, m1, s1, 100L);
         encoder.traceStats(10, 5, 1);
         encoder.newAttr(a1, "http://some/ctx");

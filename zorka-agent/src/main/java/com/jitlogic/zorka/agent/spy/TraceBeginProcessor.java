@@ -65,11 +65,12 @@ public class TraceBeginProcessor implements SpyProcessor {
     public Map<String, Object> process(Map<String, Object> record) {
         TraceBuilder traceBuilder = (TraceBuilder)tracer.getHandler();
 
-        traceBuilder.traceBegin(traceId, System.currentTimeMillis());
+        traceBuilder.traceBegin(traceId, System.currentTimeMillis(), flags);
         if (minimumTraceTime >= 0 && traceBuilder instanceof TraceBuilder) {
             traceBuilder.setMinimumTraceTime(minimumTraceTime);
         }
 
+        // TODO this is now obsolete
         if (flags != 0) {
             traceBuilder.markTraceFlag(flags);
         }

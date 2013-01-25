@@ -30,7 +30,7 @@ public abstract class TraceEventHandler {
      *
      * @param traceId trace ID (symbol)
      */
-    public abstract void traceBegin(int traceId, long clock);
+    public abstract void traceBegin(int traceId, long clock, int flags);
 
 
     /**

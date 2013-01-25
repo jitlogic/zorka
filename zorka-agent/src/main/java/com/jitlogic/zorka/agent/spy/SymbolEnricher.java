@@ -90,9 +90,9 @@ public class SymbolEnricher extends TraceEventHandler {
 
 
     @Override
-    public void traceBegin(int traceId, long clock) {
+    public void traceBegin(int traceId, long clock, int flags) {
         check(traceId);
-        output.traceBegin(traceId, clock);
+        output.traceBegin(traceId, clock, flags);
     }
 
 
