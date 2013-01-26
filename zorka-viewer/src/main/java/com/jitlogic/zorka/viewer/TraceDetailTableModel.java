@@ -87,4 +87,9 @@ public class TraceDetailTableModel extends AbstractTableModel {
         return "?";
     }
 
+
+    public NamedTraceRecord getRecord(int idx) {
+        return data.get(idx);
+    }
+
 }

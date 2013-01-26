@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.viewer;
 
 import com.jitlogic.zorka.common.SimpleTraceFormat;
+import com.jitlogic.zorka.common.SymbolRegistry;
 import com.jitlogic.zorka.common.TraceEventHandler;
 
 import java.io.*;
@@ -153,5 +154,9 @@ public class TraceSet extends TraceEventHandler {
                 }
             }
         }
+    }
+
+    public Map<Integer,String> getSymbols() {
+        return symbols;
     }
 }

@@ -40,6 +40,7 @@ public class MainWindow extends JFrame {
     private JTable tblTraceDetail;
     private TraceDetailTableModel tbmTraceDetail;
 
+    private ErrorDetailView pnlStackTrace;
 
     private Action actHelp = new AbstractAction("Help [F1]",  ResourceManager.getIcon16x16("help")) {
         @Override public void actionPerformed(ActionEvent e) {
@@ -67,6 +68,7 @@ public class MainWindow extends JFrame {
             System.exit(0);
         }
     };
+    private JTabbedPane tabDetail;
 
 
     public MainWindow() {
@@ -134,7 +136,19 @@ public class MainWindow extends JFrame {
         tblTraceDetail.setAutoCreateColumnsFromModel(false);
         scrTraceDetail.setViewportView(tblTraceDetail);
 
-        splitPane.setRightComponent(scrTraceDetail);
+        tblTraceDetail.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                displayMethod(tblTraceDetail.getSelectedRow(), e.getClickCount() > 1);
+            }
+        });
+
+        tabDetail = new JTabbedPane();
+        tabDetail.addTab("Trace details", scrTraceDetail);
+
+        pnlStackTrace = new ErrorDetailView();
+        tabDetail.addTab("Call details", pnlStackTrace);
+
+        splitPane.setRightComponent(tabDetail);
 
         splitPane.setResizeWeight(0.2);
     }
@@ -154,4 +168,10 @@ public class MainWindow extends JFrame {
         root.scanAttrs(rows);
     }
 
+    private void displayMethod(int idx, boolean sw) {
+        pnlStackTrace.update(traceSet.getSymbols(), tbmTraceDetail.getRecord(idx));
+        if (sw) {
+            tabDetail.setSelectedComponent(pnlStackTrace);
+        }
+    }
 }

@@ -82,10 +82,10 @@ public class MethodCellRenderer extends JLabel implements TableCellRenderer {
 
         int offs = record.getLevel() * 16 + 4;
 
-//        if (0 != (record.getFlags() & NamedTraceRecord.TRACE_BEGIN)) {
-//            g.drawImage(icnTraceBegin.getImage(), offs-4, -1, null);
-//            offs += 16;
-//        }
+        if (0 != (record.getFlags() & NamedTraceRecord.TRACE_BEGIN)) {
+            g.drawImage(icnTraceBegin.getImage(), offs-4, -1, null);
+            offs += 16;
+        }
 
         if (0 != (record.getFlags() & NamedTraceRecord.EXCEPTION_PASS) || record.getException() != null) {
             g.drawImage(icnException.getImage(), offs-4, -1, null);
