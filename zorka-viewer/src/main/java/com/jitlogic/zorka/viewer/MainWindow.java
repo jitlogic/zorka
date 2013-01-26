@@ -41,7 +41,7 @@ public class MainWindow extends JFrame {
     private TraceDetailTableModel tbmTraceDetail;
 
 
-    private Action actHelp = new AbstractAction("Help [F1]",  ResourceManager.getIcon24x24("help")) {
+    private Action actHelp = new AbstractAction("Help [F1]",  ResourceManager.getIcon16x16("help")) {
         @Override public void actionPerformed(ActionEvent e) {
 
         }

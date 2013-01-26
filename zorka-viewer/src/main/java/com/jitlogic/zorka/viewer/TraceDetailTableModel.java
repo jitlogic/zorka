@@ -35,7 +35,8 @@ public class TraceDetailTableModel extends AbstractTableModel {
         }
 
         table.getColumnModel().getColumn(1).setCellRenderer(new PercentColumnRenderer());
-        table.getColumnModel().getColumn(4).setCellRenderer(new TraceMethodRenderer());
+        //table.getColumnModel().getColumn(4).setCellRenderer(new TraceMethodRenderer());
+        table.getColumnModel().getColumn(4).setCellRenderer(new MethodCellRenderer());
     }
 
 

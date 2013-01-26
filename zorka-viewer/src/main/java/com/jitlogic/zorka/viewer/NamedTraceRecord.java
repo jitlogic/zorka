@@ -23,6 +23,18 @@ import java.util.*;
 
 public class NamedTraceRecord {
 
+    /** Overflow record will be discarded regardless of method execution time and other conditions. */
+    public static final int OVERFLOW_FLAG = 0x0001;
+
+    /** Indicates that new trace has been started from here. */
+    public static final int TRACE_BEGIN   = 0x0002;
+
+    /** Exception thrown from method called from frame hasn't been handled and has been thrown out of current frame. */
+    public static final int EXCEPTION_PASS = 0x0004;
+
+    /** Exception thrown from method called current frame has been wrapped and thrown out of current frame. */
+    public static final int EXCEPTION_WRAP = 0x0008;
+
     private String traceName, className, methodName, methodSignature;
     private long clock;
 
@@ -186,6 +198,10 @@ public class NamedTraceRecord {
         return Collections.unmodifiableMap(attrs != null ? attrs : new HashMap<String, Object>());
     }
 
+    public int numAttrs() {
+        return attrs != null ? attrs.size() : 0;
+    }
+
 
     public void addChild(NamedTraceRecord child) {
         if (children == null) {
@@ -259,21 +275,6 @@ public class NamedTraceRecord {
         }
 
         sb.append(")");
-
-        if (attrs != null) {
-            List<String> keys = new ArrayList<String>(attrs.size()+2);
-            for (Map.Entry<String,Object> e : attrs.entrySet()) {
-                keys.add(e.getKey());
-            }
-            Collections.sort(keys);
-
-            for (String key : keys) {
-                sb.append('\n');
-                sb.append(key);
-                sb.append('=');
-                sb.append(attrs.get(key));
-            }
-        }
 
         return sb.toString();
     }
