@@ -167,4 +167,66 @@ public class SimpleTraceFormatUnitTest {
         output.check(0, "action", "traceError", "tstamp", 200L, "exception", e);
     }
 
+    @Test
+    public void testTraceEncodeDecodeLongVals() {
+        int[]  c1 = { 1, 2, 3, 4 };
+        long[] v1 = { 2, 4, 6, 8 };
+
+        encoder.longVals(100, 10, c1, v1);
+        decode();
+        output.check(0, "action", "longVals", "clock", 100L, "objId", 10);
+
+        int[]  c2 = (int[])output.get(0, "components");
+        long[] v2 = (long[])output.get(0, "values");
+
+        Assert.assertEquals(c1.length, c2.length);
+        Assert.assertEquals(v1.length, v2.length);
+
+        for (int i = 0; i < c1.length; i++) {
+            Assert.assertEquals("components[" + i + "]", c1[i], c2[i]);
+            Assert.assertEquals("values[" + i + "]", v1[i], v2[i]);
+        }
+    }
+
+    @Test
+    public void testTraceEncodeDecodeIntVals() {
+        int[]  c1 = { 1, 2, 3, 4 };
+        int[] v1 = { 2, 4, 6, 8 };
+
+        encoder.intVals(100, 10, c1, v1);
+        decode();
+        output.check(0, "action", "intVals", "clock", 100L, "objId", 10);
+
+        int[]  c2 = (int[])output.get(0, "components");
+        int[] v2 = (int[])output.get(0, "values");
+
+        Assert.assertEquals(c1.length, c2.length);
+        Assert.assertEquals(v1.length, v2.length);
+
+        for (int i = 0; i < c1.length; i++) {
+            Assert.assertEquals("components[" + i + "]", c1[i], c2[i]);
+            Assert.assertEquals("values[" + i + "]", v1[i], v2[i]);
+        }
+    }
+
+    @Test
+    public void testTraceEncodeDecodeDoubleVals() {
+        int[]  c1 = { 1, 2, 3, 4 };
+        double[] v1 = { 2, 4, 6, 8 };
+
+        encoder.doubleVals(100, 10, c1, v1);
+        decode();
+        output.check(0, "action", "doubleVals", "clock", 100L, "objId", 10);
+
+        int[]  c2 = (int[])output.get(0, "components");
+        double[] v2 = (double[])output.get(0, "values");
+
+        Assert.assertEquals(c1.length, c2.length);
+        Assert.assertEquals(v1.length, v2.length);
+
+        for (int i = 0; i < c1.length; i++) {
+            Assert.assertEquals("components[" + i + "]", c1[i], c2[i]);
+            Assert.assertEquals("values[" + i + "]", v1[i], v2[i], 0.001);
+        }
+    }
 }

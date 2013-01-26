@@ -27,8 +27,6 @@ public class TraceEnrichmentUnitTest {
 
     private SymbolRegistry symbols = new SymbolRegistry();
 
-
-    private ByteBuffer buf = new ByteBuffer();;
     private TestTracer output = new TestTracer();
     private SymbolEnricher enricher = new SymbolEnricher(symbols, output);
 

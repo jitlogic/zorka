@@ -63,6 +63,22 @@ public class TestTracer extends TraceEventHandler {
         data.add(ZorkaUtil.map("action", "newAttr", "attrId", attrId, "attrVal", attrVal));
     }
 
+    @Override
+    public void longVals(long clock, int objId, int[] components, long[] values) {
+        data.add(ZorkaUtil.map("action", "longVals", "clock", clock, "objId", objId, "components", components, "values", values));
+    }
+
+    @Override
+    public void intVals(long clock, int objId, int[] components, int[] values) {
+        data.add(ZorkaUtil.map("action", "intVals", "clock", clock, "objId", objId, "components", components, "values", values));
+    }
+
+    @Override
+    public void doubleVals(long clock, int objId, int[] components, double[] values) {
+        data.add(ZorkaUtil.map("action", "doubleVals", "clock", clock, "objId", objId, "components", components, "values", values));
+    }
+
+
     public List<Map<Object,Object>> getData() {
         return data;
     }

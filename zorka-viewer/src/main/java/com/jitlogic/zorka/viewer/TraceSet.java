@@ -89,6 +89,21 @@ public class TraceSet extends TraceEventHandler {
         top.setAttr(symbols.get(attrId), attrVal);
     }
 
+    @Override
+    public void longVals(long clock, int objId, int[] components, long[] values) {
+        // TODO store this data
+    }
+
+    @Override
+    public void intVals(long clock, int objId, int[] components, int[] values) {
+        // TODO store this data
+    }
+
+    @Override
+    public void doubleVals(long clock, int objId, int[] components, double[] values) {
+        // TODO store this data
+    }
+
 
     private void pop() {
         if (top.getParent() != null) {
