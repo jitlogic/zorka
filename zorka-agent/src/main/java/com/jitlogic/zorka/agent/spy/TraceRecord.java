@@ -328,7 +328,7 @@ public class TraceRecord {
         classId = methodId = signatureId = 0;
         attrs = null;
         children = null;
-        marker = null;
+        marker = parent != null ? parent.getMarker() : null;
         calls = errors = 0;
         flags = 0;
     }

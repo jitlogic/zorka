@@ -33,7 +33,10 @@ public class PercentColumnRenderer extends JLabel implements TableCellRenderer {
         Double percent = (Double)value;
 
         if (value != null) {
-            Color newColor = new Color(255, 255-(int)(percent*2.5), 255-(int)(percent*2.5));
+            int g = 255 - (int) (percent * 2.49);
+            if (g < 0) { g = 0; }
+            if (g > 255) { g = 255; }
+            Color newColor = new Color(255, g, g);
             setBackground(newColor);
             setText(String.format(percent >= 10.0 ? "%.0f" : "%.2f", percent));
         }

@@ -174,6 +174,7 @@ public class TraceBuilder extends TraceEventHandler {
 
         TraceRecord parent = ttop.getParent();
 
+        // Get rid of redundant exception object
         if (ttop.getException() != null && ttop.numChildren() > 0) {
             Throwable tex = (Throwable)ttop.getException();
             Throwable cex = (Throwable)ttop.getChild(ttop.numChildren()-1).getException();
@@ -185,6 +186,7 @@ public class TraceBuilder extends TraceEventHandler {
             }
         }
 
+        // Submit data if trace marker found
         if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {
             if (ttop.getTime() >= ttop.getMarker().getMinimumTime()
                     || 0 != (ttop.getMarker().getFlags() & TraceMarker.ALWAYS_SUBMIT)) {
@@ -198,6 +200,7 @@ public class TraceBuilder extends TraceEventHandler {
             }
         }
 
+        // Determine how the top of stack should be rolled back
         if (parent != null) {
             if ((ttop.getTime() > Tracer.getMinMethodTime() || ttop.getErrors() > 0)
                     || 0 != (ttop.getMarker().getFlags() & TraceMarker.ALL_METHODS)) {
@@ -214,11 +217,17 @@ public class TraceBuilder extends TraceEventHandler {
             parent.setErrors(parent.getErrors() + ttop.getErrors());
         }
 
+
         if (clean) {
             ttop.clean();
             numRecords--;
         } else {
-            ttop = parent != null ? parent : new TraceRecord(null);
+            if (parent != null) {
+                ttop = parent;
+            } else {
+                ttop = new TraceRecord(null);
+                numRecords = 0;
+            }
         }
 
     }

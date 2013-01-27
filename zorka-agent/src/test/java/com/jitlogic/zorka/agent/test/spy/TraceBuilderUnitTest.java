@@ -434,4 +434,84 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         output.check(2, "flags", TraceRecord.EXCEPTION_WRAP|TraceRecord.TRACE_BEGIN);
     }
 
+
+    @Test
+    public void testTimeCalculationAfterShortMethodDrop() throws Exception {
+        spy.setTracerMinTraceTime(0);
+        spy.setTracerMinMethodTime(10);
+
+        builder.traceEnter(c1, m1, s1, 1);
+        builder.traceBegin(t1, 2, 0);
+
+        builder.traceEnter(c1, m2, s1, 3);
+        builder.traceReturn(4);
+
+        builder.traceEnter(c1, m2, s1, 10);
+        builder.traceReturn(25);
+
+        builder.traceReturn(26);
+
+        output.check(2, "action", "traceStats", "calls", 3L);
+        output.check(3, "action", "traceEnter", "tstamp", 0L);
+        output.check(5, "action", "traceReturn", "tstamp", 15L);
+    }
+
+
+    @Test
+    public void testTimeCalculationAfterShortInnerMethodDrop() throws Exception {
+        spy.setTracerMinTraceTime(0);
+        spy.setTracerMinMethodTime(10);
+
+        builder.traceEnter(c1, m1, s1, 1);
+        builder.traceBegin(t1, 2, 0);
+
+        builder.traceEnter(c1, m2, s1, 2);
+        builder.traceReturn(3);
+
+        builder.traceEnter(c1, m2, s1, 4);
+        builder.traceEnter(c1, m2, s1, 5);
+        builder.traceReturn(6);
+        builder.traceReturn(20);
+
+        builder.traceReturn(30);
+
+        output.check(3, "action", "traceEnter", "tstamp", 0L);
+        output.check(5, "action", "traceReturn", "tstamp", 16L);
+    }
+
+
+    @Test
+    public void testMaintainRecordNumCounter() throws Exception {
+        spy.setTracerMinTraceTime(0);
+        spy.setTracerMinMethodTime(10);
+
+        builder.traceEnter(c1, m1, s1, 1);
+        builder.traceBegin(t1, 2, 0);
+        assertEquals(1, TestUtil.getField(builder, "numRecords"));
+
+        builder.traceEnter(c1, m2, s1, 2);
+        assertEquals(2, TestUtil.getField(builder, "numRecords"));
+
+        builder.traceReturn(3);
+        assertEquals(1, TestUtil.getField(builder, "numRecords"));
+
+        builder.traceEnter(c1, m2, s1, 4);
+        assertEquals(2, TestUtil.getField(builder, "numRecords"));
+
+        builder.traceEnter(c1, m2, s1, 5);
+        assertEquals(3, TestUtil.getField(builder, "numRecords"));
+
+        builder.traceReturn(6);
+        assertEquals(2, TestUtil.getField(builder, "numRecords"));
+
+        builder.traceReturn(20);
+        assertEquals(2, TestUtil.getField(builder, "numRecords"));
+
+        builder.traceReturn(30);
+        assertEquals(0, TestUtil.getField(builder, "numRecords"));
+
+        builder.traceEnter(c1,m1, s1, 31);
+        assertEquals(1, TestUtil.getField(builder, "numRecords"));
+    }
+
 }

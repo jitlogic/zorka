@@ -23,8 +23,8 @@ import java.util.List;
 
 public class TraceDetailTableModel extends AbstractTableModel {
 
-    private String[] colNames = { "Time", "Pct", "Calls", "Err", "Method" };
-    private int[] colWidth    = { 75, 75, 50, 50, 640 };
+    private String[] colNames = { "Time", "Calls", "Err", "Pct", "Method" };
+    private int[] colWidth    = { 75, 50, 50, 50, 640 };
 
     private List<NamedTraceRecord> data = new ArrayList<NamedTraceRecord>(1);
 
@@ -34,7 +34,7 @@ public class TraceDetailTableModel extends AbstractTableModel {
             table.getColumnModel().getColumn(i).setPreferredWidth(colWidth[i]);
         }
 
-        table.getColumnModel().getColumn(1).setCellRenderer(new PercentColumnRenderer());
+        table.getColumnModel().getColumn(3).setCellRenderer(new PercentColumnRenderer());
         //table.getColumnModel().getColumn(4).setCellRenderer(new TraceMethodRenderer());
         table.getColumnModel().getColumn(4).setCellRenderer(new MethodCellRenderer());
     }
@@ -73,11 +73,11 @@ public class TraceDetailTableModel extends AbstractTableModel {
                 case 0:
                     return ViewerUtil.nanoSeconds(el.getTime());
                 case 1:
-                    return el.getTimePct();
-                case 2:
                     return el.getCalls();
-                case 3:
+                case 2:
                     return el.getErrors();
+                case 3:
+                    return el.getTimePct();
                 case 4:
                     return el;
 
