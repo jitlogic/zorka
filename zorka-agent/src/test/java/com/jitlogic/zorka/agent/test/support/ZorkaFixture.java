@@ -22,6 +22,7 @@ import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.spy.SpyClassTransformer;
 import com.jitlogic.zorka.agent.spy.SpyInstance;
 import com.jitlogic.zorka.agent.spy.SpyLib;
+import com.jitlogic.zorka.agent.spy.TracerLib;
 import com.jitlogic.zorka.common.ZorkaLogger;
 
 import org.junit.After;
@@ -45,6 +46,7 @@ public class ZorkaFixture {
 
     protected SyslogLib syslogLib;
     protected SpyLib spy;
+    protected TracerLib tracer;
     protected SnmpLib snmpLib;
 
     protected ZorkaBshAgent zorkaAgent;
@@ -87,6 +89,7 @@ public class ZorkaFixture {
         syslogLib = agentInstance.getSyslogLib();
         snmpLib = agentInstance.getSnmpLib();
         spy = agentInstance.getSpyLib();
+        tracer = agentInstance.getTracerLib();
 
         spyTransformer = spyInstance.getClassTransformer();
     }

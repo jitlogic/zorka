@@ -51,11 +51,11 @@ public class TracerIntegTest extends ZorkaFixture {
 
     @Test
     public void testSimpleTooShortTrace() throws Exception {
-        spy.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
+        tracer.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
         spy.add(
-                spy.instance().onEnter(spy.traceBegin("TEST"))
+                spy.instance().onEnter(tracer.traceBegin("TEST"))
                         .include(spy.byMethod(TCLASS1, "trivialMethod")));
-        spy.tracerOutput(output);
+        tracer.tracerOutput(output);
 
         Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS1);
         invoke(obj, "trivialMethod");
@@ -66,13 +66,13 @@ public class TracerIntegTest extends ZorkaFixture {
 
     @Test
     public void testSimpleTrace() throws Exception {
-        spy.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
+        tracer.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
         spy.add(
-            spy.instance().onEnter(spy.traceBegin("TEST"))
+            spy.instance().onEnter(tracer.traceBegin("TEST"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         spyInstance.getTracer().setMinMethodTime(0); // Catch everything
-        spy.tracerOutput(output);
+        tracer.tracerOutput(output);
 
         Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS1);
         invoke(obj, "trivialMethod");
@@ -89,13 +89,13 @@ public class TracerIntegTest extends ZorkaFixture {
 
     @Test
     public void testSimpleTraceWithAttr() throws Exception {
-        spy.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
+        tracer.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
         spy.add(spy.instance().onEnter(
-                spy.traceBegin("TEST"), spy.put("URL", "http://some.url"), spy.traceAttr("URL", "URL")
+                tracer.traceBegin("TEST"), spy.put("URL", "http://some.url"), tracer.traceAttr("URL", "URL")
         ).include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         spyInstance.getTracer().setMinMethodTime(0); // Catch everything
-        spy.tracerOutput(output);
+        tracer.tracerOutput(output);
 
         Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS1);
         invoke(obj, "trivialMethod");
