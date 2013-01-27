@@ -16,15 +16,12 @@
 
 package com.jitlogic.zorka.agent.test.spy;
 
-import com.jitlogic.zorka.common.SymbolRegistry;
+import com.jitlogic.zorka.common.*;
 import com.jitlogic.zorka.agent.spy.*;
 import com.jitlogic.zorka.agent.test.spy.support.TestTracer;
 
 import com.jitlogic.zorka.agent.test.support.TestUtil;
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
-import com.jitlogic.zorka.common.SymbolicException;
-import com.jitlogic.zorka.common.ZorkaAsyncThread;
-import com.jitlogic.zorka.common.ZorkaLogConfig;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,9 +36,9 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     private SymbolRegistry symbols = new SymbolRegistry();
 
     private TraceBuilder builder = new TraceBuilder(
-        new ZorkaAsyncThread<TraceRecord>("test") {
-            @Override public void submit(TraceRecord obj) { obj.traverse(output); }
-            @Override protected void process(TraceRecord obj) {  }
+        new ZorkaAsyncThread<Submittable>("test") {
+            @Override public void submit(Submittable obj) { obj.traverse(output); }
+            @Override protected void process(Submittable obj) {  }
         }, symbols);
 
     private static final int MS = 1000000;

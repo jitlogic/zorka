@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.agent.spy;
 
+import com.jitlogic.zorka.common.Submittable;
 import com.jitlogic.zorka.common.SymbolRegistry;
 import com.jitlogic.zorka.common.SymbolicException;
 import com.jitlogic.zorka.common.TraceEventHandler;
@@ -32,7 +33,7 @@ import java.util.Map;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TraceRecord {
+public class TraceRecord implements Submittable {
 
     /** Overflow record will be discarded regardless of method execution time and other conditions. */
     public static final int OVERFLOW_FLAG = 0x0001;
@@ -286,6 +287,7 @@ public class TraceRecord {
      *
      * @param output output handler object
      */
+    @Override
     public void traverse(TraceEventHandler output) {
 
         if (hasFlag(TRACE_BEGIN)) {

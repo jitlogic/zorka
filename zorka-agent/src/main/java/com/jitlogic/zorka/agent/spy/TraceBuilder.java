@@ -31,7 +31,7 @@ public class TraceBuilder extends TraceEventHandler {
 
 
     /** Output */
-    private ZorkaAsyncThread<TraceRecord> output;
+    private ZorkaAsyncThread<Submittable> output;
 
     private SymbolRegistry symbols;
 
@@ -48,7 +48,7 @@ public class TraceBuilder extends TraceEventHandler {
      *
      * @param output object completed traces will be submitted to
      */
-    public TraceBuilder(ZorkaAsyncThread<TraceRecord> output, SymbolRegistry symbols) {
+    public TraceBuilder(ZorkaAsyncThread<Submittable> output, SymbolRegistry symbols) {
         this.output = output;
         this.symbols = symbols;
     }

@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.agent.spy;
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.common.Submittable;
 import com.jitlogic.zorka.common.ZorkaAsyncThread;
 
 public class TracerLib {
@@ -36,7 +37,7 @@ public class TracerLib {
      *
      * @param output trace processing object
      */
-    public void tracerOutput(ZorkaAsyncThread<TraceRecord> output) {
+    public void tracerOutput(ZorkaAsyncThread<Submittable> output) {
         instance.getTracer().setOutput(output);
     }
 
@@ -138,7 +139,7 @@ public class TracerLib {
      *
      * @return trace file writer
      */
-    public ZorkaAsyncThread<TraceRecord> traceFile(String path, int maxFiles, long maxSize) {
+    public ZorkaAsyncThread<Submittable> traceFile(String path, int maxFiles, long maxSize) {
         TraceFileWriter writer = new TraceFileWriter(ZorkaConfig.propFormat(path),
                 instance.getTracer().getSymbolRegistry(), maxFiles, maxSize);
         writer.start();
