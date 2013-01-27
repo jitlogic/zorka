@@ -281,7 +281,7 @@ public class NamedTraceRecord {
 
 
     public String prettyClock() {
-        return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(getClock());
+        return new SimpleDateFormat("hh:mm:ss.SSS").format(getClock());
     }
 
 

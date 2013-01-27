@@ -151,7 +151,8 @@ public class SpyClassTransformer implements ClassFileTransformer {
         if (found.size() > 0 || classMatch) {
 
             if (SpyInstance.isDebugEnabled(SPD_CLASSXFORM)) {
-                log.debug("Transforming class: " + className);
+                log.debug("Transforming class: " + className
+                        + "(sdefs found: " + found.size() + "; tracer match: " + classMatch + ")");
             }
 
             ClassReader cr = new ClassReader(classfileBuffer);

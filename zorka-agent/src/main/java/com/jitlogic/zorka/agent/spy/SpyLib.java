@@ -282,6 +282,18 @@ public class SpyLib {
 
 
     /**
+     * Creates new matcher that will match all methods of given class.
+     *
+     * @param className class name (or mask)
+     *
+     * @return spy matched object
+     */
+    public SpyMatcher byClass(String className) {
+        return byMethod(className, "*");
+    }
+
+
+    /**
      * Creates new matcher that will match methods by method annotation.
      *
      * @param classPattern class name pattern

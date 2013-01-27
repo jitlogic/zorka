@@ -91,7 +91,7 @@ public class MainSubmitter {
                 tracer.getHandler().traceEnter(classId, methodId, signatureId, System.nanoTime());
             } catch (Throwable e) {
                 if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
-                    log.debug("Error executing traceEnter: ", e);
+                    log.debug("Error executing traceEnter", e);
                 }
                 errorCount.incrementAndGet();
             }
@@ -113,7 +113,7 @@ public class MainSubmitter {
                 tracer.getHandler().traceReturn(System.nanoTime());
             } catch (Throwable e) {
                 if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
-                    log.debug("Error executing traceReturn: ", e);
+                    log.debug("Error executing traceReturn", e);
                 }
                 errorCount.incrementAndGet();
             }
@@ -137,7 +137,7 @@ public class MainSubmitter {
                 tracer.getHandler().traceError(exception, System.nanoTime());
             } catch (Throwable e) {
                 if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
-                    log.debug("Error executing traceError: ", e);
+                    log.debug("Error executing traceError", e);
                 }
                 errorCount.incrementAndGet();
             }
