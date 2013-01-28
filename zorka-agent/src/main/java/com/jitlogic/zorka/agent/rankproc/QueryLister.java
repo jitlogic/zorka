@@ -134,7 +134,7 @@ public class QueryLister {
 
     private List<QueryResult> refineResults(List<QueryResult> input, QuerySegment seg) {
         for (QueryResult res : input) {
-            res.setResult(ObjectInspector.get(res.getResult(), seg.getAttr()));
+            res.setValue(ObjectInspector.get(res.getValue(), seg.getAttr()));
             if (seg.getName() != null) {
                 res.setAttr(seg.getName(), seg.getAttr()); // This attribute fetch is really trivial ...
             }
@@ -148,9 +148,9 @@ public class QueryLister {
         List<QueryResult> results = new ArrayList<QueryResult>(input.size() * 2 + 1);
 
         for (QueryResult res : input) {
-            for (Object attr : ObjectInspector.list(res.getResult())) {
+            for (Object attr : ObjectInspector.list(res.getValue())) {
                 if (seg.matches(attr)) {
-                    QueryResult result = new QueryResult(res, ObjectInspector.get(res.getResult(), attr));
+                    QueryResult result = new QueryResult(res, ObjectInspector.get(res.getValue(), attr));
                     if (seg.getName() != null) {
                         result.setAttr(seg.getName(), attr);
                     }

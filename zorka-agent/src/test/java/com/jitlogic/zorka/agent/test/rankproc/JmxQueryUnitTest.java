@@ -16,12 +16,17 @@
 
 package com.jitlogic.zorka.agent.test.rankproc;
 
+import com.jitlogic.zorka.agent.rankproc.JmxAttrScanner;
 import com.jitlogic.zorka.agent.rankproc.QueryDef;
 import com.jitlogic.zorka.agent.rankproc.QueryLister;
 import com.jitlogic.zorka.agent.rankproc.QueryResult;
+import com.jitlogic.zorka.agent.spy.Tracer;
+import com.jitlogic.zorka.agent.test.spy.support.TestTracer;
 import com.jitlogic.zorka.agent.test.support.TestJmx;
+import com.jitlogic.zorka.agent.test.support.TestUtil;
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 
+import com.jitlogic.zorka.common.SymbolRegistry;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,7 +69,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
         Assert.assertEquals(2, results.size());
 
         Assert.assertEquals("Nom", results.get(0).getAttr("Nom"));
-        Assert.assertEquals(10L, results.get(0).getResult());
+        Assert.assertEquals(10L, results.get(0).getValue());
     }
 
 
@@ -79,7 +84,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
 
         Assert.assertEquals("Nom", results.get(0).getAttr("Attr"));
         Assert.assertEquals("Div", results.get(1).getAttr("Attr"));
-        Assert.assertEquals(10L, results.get(0).getResult());
+        Assert.assertEquals(10L, results.get(0).getValue());
     }
 
 
@@ -108,6 +113,25 @@ public class JmxQueryUnitTest extends ZorkaFixture {
 
         Assert.assertEquals("oja", results.get(0).getAttr("Attr"));
         Assert.assertEquals("oja", results.get(1).getAttr("Attr"));
+    }
+
+
+    @Test
+    public void testJmxAttrScannerSimpleRun() throws Exception {
+        TestTracer output = new TestTracer();
+        JmxAttrScanner scanner = tracer.jmxScanner("TEST", output,
+            new QueryLister(mBeanServerRegistry, new QueryDef("test", "test:type=TestJmx,*", "name").list("*", "Attr")));
+        scanner.runCycle(100);
+        Assert.assertEquals(1, output.size());
+        int[] ids = (int[])output.get(0, "components");
+
+        SymbolRegistry sr = ((Tracer)TestUtil.getField(tracer, "tracer")).getSymbolRegistry();
+
+        Assert.assertEquals("TEST", sr.symbolName((Integer)output.get(0, "objId")));
+        Assert.assertEquals("bean1.Nom", sr.symbolName(ids[0]));
+        Assert.assertEquals("bean1.Div", sr.symbolName(ids[1]));
+        Assert.assertEquals("bean2.Nom", sr.symbolName(ids[2]));
+        Assert.assertEquals("bean2.Div", sr.symbolName(ids[3]));
     }
 
 

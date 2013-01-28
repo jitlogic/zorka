@@ -515,6 +515,40 @@ public class ZorkaUtil {
         return dst;
     }
 
+
+    public static int[] intArray(List<Integer> l) {
+        int[] a = new int[l.size()];
+
+        for (int i = 0; i < l.size(); i++) {
+            a[i] = l.get(i);
+        }
+
+        return a;
+    }
+
+
+    public static long[] longArray(List<Long> l) {
+        long[] a = new long[l.size()];
+
+        for (int i = 0; i < l.size(); i++) {
+            a[i] = l.get(i);
+        }
+
+        return a;
+    }
+
+
+    public static double[] doubleArray(List<Double> l) {
+        double[] a = new double[l.size()];
+
+        for (int i = 0; i < l.size(); i++) {
+            a[i] = l.get(i);
+        }
+
+        return a;
+    }
+
+
     /**
      * Clips list if necessary. Contrasted to subList() method it creates copy of a list,
      * so all objects not copied will be garbage collected if all references to original

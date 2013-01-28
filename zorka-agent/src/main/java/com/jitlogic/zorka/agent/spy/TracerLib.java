@@ -17,18 +17,24 @@
 package com.jitlogic.zorka.agent.spy;
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.agent.rankproc.JmxAttrScanner;
+import com.jitlogic.zorka.agent.rankproc.QueryLister;
 import com.jitlogic.zorka.common.Submittable;
+import com.jitlogic.zorka.common.SymbolRegistry;
+import com.jitlogic.zorka.common.TraceEventHandler;
 import com.jitlogic.zorka.common.ZorkaAsyncThread;
 
 public class TracerLib {
 
     private SpyInstance instance;
     private Tracer tracer;
+    private SymbolRegistry symbols;
 
 
     public TracerLib(SpyInstance instance) {
         this.instance = instance;
         this.tracer = this.instance.getTracer();
+        symbols = this.tracer.getSymbolRegistry();
     }
 
 
@@ -181,6 +187,11 @@ public class TracerLib {
      */
     public void setTracerMaxTraceRecords(int maxRecords) {
         Tracer.setMaxTraceRecords(maxRecords);
+    }
+
+
+    public JmxAttrScanner jmxScanner(String name, TraceEventHandler output, QueryLister...listers) {
+        return new JmxAttrScanner(symbols, name, output, listers);
     }
 
 }

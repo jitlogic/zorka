@@ -16,55 +16,75 @@
 
 package com.jitlogic.zorka.agent.rankproc;
 
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.common.SymbolRegistry;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class QueryResult {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(QueryResult.class);
+    private Object value;
 
-    private Object result;
-
-    private Map<String,Object> objAttrs;
+    private Map<String,Object> attrs;
 
 
-    public QueryResult(Object result) {
-        this.result = result;
+    public QueryResult(Object value) {
+        this.value = value;
     }
 
 
-    public QueryResult(QueryResult orig, Object result) {
-        this.result = result;
-        if (orig.objAttrs != null) {
-            objAttrs = new LinkedHashMap<String, Object>();
-            objAttrs.putAll(orig.objAttrs);
+    public QueryResult(QueryResult orig, Object value) {
+        this.value = value;
+        if (orig.attrs != null) {
+            attrs = new LinkedHashMap<String, Object>();
+            attrs.putAll(orig.attrs);
         }
     }
 
 
     public void setAttr(String key, Object val) {
-        if (objAttrs == null) {
-            objAttrs = new LinkedHashMap<String, Object>();
+        if (attrs == null) {
+            attrs = new LinkedHashMap<String, Object>();
         }
-        objAttrs.put(key, val);
+        attrs.put(key, val);
     }
 
 
     public Object getAttr(String key) {
-        return objAttrs != null ? objAttrs.get(key) : null;
+        return attrs != null ? attrs.get(key) : null;
     }
 
 
-    public void setResult(Object result) {
-        this.result = result;
+    public int getComponentId(SymbolRegistry symbols) {
+        String path = getAttrPath();
+
+        return symbols.symbolId(path);
     }
 
 
-    public Object getResult() {
-        return result;
+    public String getAttrPath() {
+        StringBuilder sb = new StringBuilder();
+
+        if (attrs != null) {
+            for (Map.Entry<String,Object> e : attrs.entrySet()) {
+                if (sb.length() != 0) {
+                    sb.append('.');
+                }
+                sb.append(e.getValue());
+            }
+        }
+
+        return sb.toString();
+    }
+
+
+    public void setValue(Object value) {
+        this.value = value;
+    }
+
+
+    public Object getValue() {
+        return value;
     }
 
 
