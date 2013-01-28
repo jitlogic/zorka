@@ -27,12 +27,14 @@ import com.jitlogic.zorka.agent.test.support.TestUtil;
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 
 import com.jitlogic.zorka.common.SymbolRegistry;
+import com.jitlogic.zorka.common.ZorkaUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.management.ObjectName;
 import java.util.List;
+import java.util.Set;
 
 public class JmxQueryUnitTest extends ZorkaFixture {
 
@@ -82,9 +84,10 @@ public class JmxQueryUnitTest extends ZorkaFixture {
 
         Assert.assertEquals(6, results.size());
 
-        Assert.assertEquals("Nom", results.get(0).getAttr("Attr"));
-        Assert.assertEquals("Div", results.get(1).getAttr("Attr"));
-        Assert.assertEquals(10L, results.get(0).getValue());
+        Set<String> attrs = ZorkaUtil.set("Nom", "Div", "StrMap");
+
+        Assert.assertTrue(attrs.contains(results.get(0).getAttr("Attr")));
+        Assert.assertTrue(attrs.contains(results.get(1).getAttr("Attr")));
     }
 
 
@@ -97,8 +100,10 @@ public class JmxQueryUnitTest extends ZorkaFixture {
 
         Assert.assertEquals(6, results.size());
 
-        Assert.assertEquals("aja", results.get(0).getAttr("Attr"));
-        Assert.assertEquals("oja", results.get(1).getAttr("Attr"));
+        Set<String> attrs = ZorkaUtil.set("oja", "aja", "uja", "eja");
+
+        Assert.assertTrue(attrs.contains(results.get(0).getAttr("Attr")));
+        Assert.assertTrue(attrs.contains(results.get(1).getAttr("Attr")));
     }
 
 
@@ -111,8 +116,10 @@ public class JmxQueryUnitTest extends ZorkaFixture {
 
         Assert.assertEquals(2, results.size());
 
-        Assert.assertEquals("oja", results.get(0).getAttr("Attr"));
-        Assert.assertEquals("oja", results.get(1).getAttr("Attr"));
+        Set<String> attrs = ZorkaUtil.set("oja", "aja", "uja", "eja");
+
+        Assert.assertTrue(attrs.contains(results.get(0).getAttr("Attr")));
+        Assert.assertTrue(attrs.contains(results.get(1).getAttr("Attr")));
     }
 
 
