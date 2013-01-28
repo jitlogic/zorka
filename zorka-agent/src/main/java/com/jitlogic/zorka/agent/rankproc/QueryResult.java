@@ -29,7 +29,6 @@ public class QueryResult {
     private Object result;
 
     private Map<String,Object> objAttrs;
-    private Map<String,Object> comAttrs;
 
 
     public QueryResult(Object result) {
@@ -43,48 +42,19 @@ public class QueryResult {
             objAttrs = new LinkedHashMap<String, Object>();
             objAttrs.putAll(orig.objAttrs);
         }
-        if (orig.comAttrs != null) {
-            comAttrs = new LinkedHashMap<String, Object>();
-            comAttrs.putAll(orig.comAttrs);
-        }
     }
 
 
-    public void setAttr(int part, String key, Object val) {
-        switch (part) {
-            case QuerySegment.OBJECT_PART:
-                setObjAttr(key, val);
-                break;
-            case QuerySegment.COMPONENT_PART:
-                setComAttr(key, val);
-                break;
-        }
-    }
-
-
-    public Object getComAttr(String key) {
-        return comAttrs != null ? comAttrs.get(key) : null;
-    }
-
-
-    public void setComAttr(String key, Object val) {
-        if (comAttrs == null) {
-            comAttrs = new LinkedHashMap<String, Object>();
-        }
-        comAttrs.put(key, val);
-    }
-
-
-    public Object getObjAttr(String key) {
-        return objAttrs != null ? objAttrs.get(key) : null;
-    }
-
-
-    public void setObjAttr(String key, Object val) {
+    public void setAttr(String key, Object val) {
         if (objAttrs == null) {
             objAttrs = new LinkedHashMap<String, Object>();
         }
         objAttrs.put(key, val);
+    }
+
+
+    public Object getAttr(String key) {
+        return objAttrs != null ? objAttrs.get(key) : null;
     }
 
 

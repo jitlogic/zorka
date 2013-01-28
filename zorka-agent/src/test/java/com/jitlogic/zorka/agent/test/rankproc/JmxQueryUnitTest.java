@@ -50,7 +50,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
 
         Assert.assertEquals(2, results.size());
 
-        Assert.assertEquals("bean1", results.get(0).getObjAttr("name"));
+        Assert.assertEquals("bean1", results.get(0).getAttr("name"));
     }
 
 
@@ -63,7 +63,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
 
         Assert.assertEquals(2, results.size());
 
-        Assert.assertEquals("Nom", results.get(0).getObjAttr("Nom"));
+        Assert.assertEquals("Nom", results.get(0).getAttr("Nom"));
         Assert.assertEquals(10L, results.get(0).getResult());
     }
 
@@ -77,8 +77,8 @@ public class JmxQueryUnitTest extends ZorkaFixture {
 
         Assert.assertEquals(6, results.size());
 
-        Assert.assertEquals("Nom", results.get(0).getObjAttr("Attr"));
-        Assert.assertEquals("Div", results.get(1).getObjAttr("Attr"));
+        Assert.assertEquals("Nom", results.get(0).getAttr("Attr"));
+        Assert.assertEquals("Div", results.get(1).getAttr("Attr"));
         Assert.assertEquals(10L, results.get(0).getResult());
     }
 
@@ -92,8 +92,8 @@ public class JmxQueryUnitTest extends ZorkaFixture {
 
         Assert.assertEquals(6, results.size());
 
-        Assert.assertEquals("aja", results.get(0).getObjAttr("Attr"));
-        Assert.assertEquals("oja", results.get(1).getObjAttr("Attr"));
+        Assert.assertEquals("aja", results.get(0).getAttr("Attr"));
+        Assert.assertEquals("oja", results.get(1).getAttr("Attr"));
     }
 
 
@@ -106,8 +106,8 @@ public class JmxQueryUnitTest extends ZorkaFixture {
 
         Assert.assertEquals(2, results.size());
 
-        Assert.assertEquals("oja", results.get(0).getObjAttr("Attr"));
-        Assert.assertEquals("oja", results.get(1).getObjAttr("Attr"));
+        Assert.assertEquals("oja", results.get(0).getAttr("Attr"));
+        Assert.assertEquals("oja", results.get(1).getAttr("Attr"));
     }
 
 

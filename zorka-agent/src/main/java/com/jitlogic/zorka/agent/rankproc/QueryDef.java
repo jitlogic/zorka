@@ -24,12 +24,9 @@ import java.util.regex.Pattern;
 
 public class QueryDef {
 
-
     private static final List<QuerySegment> EMPTY_SEG
                 = Collections.unmodifiableList(new ArrayList<QuerySegment>(1));
 
-
-    private int part;
     private String mbsName;
     private String query;
     private List<String> attributes;
@@ -37,7 +34,6 @@ public class QueryDef {
 
 
     public QueryDef(String mbsName, String query, String... attrs) {
-        this.part = QuerySegment.OBJECT_PART;
         this.mbsName = mbsName;
         this.query = query;
         this.attributes = Collections.unmodifiableList(Arrays.asList(attrs));
@@ -46,7 +42,6 @@ public class QueryDef {
 
 
     private QueryDef(QueryDef orig) {
-        this.part = orig.part;
         this.mbsName = orig.mbsName;
         this.query = orig.query;
         this.attributes = orig.attributes;
@@ -70,7 +65,7 @@ public class QueryDef {
         QuerySegment[] segs = new QuerySegment[args.length];
 
         for (int i = 0 ; i < args.length; i++) {
-            segs[i] = new QuerySegment(part, args[i], null);
+            segs[i] = new QuerySegment(args[i]);
         }
 
         return withSegs(segs);
@@ -78,7 +73,7 @@ public class QueryDef {
 
 
     public QueryDef get(String arg, String name) {
-        return withSegs(new QuerySegment(part, arg, name));
+        return withSegs(new QuerySegment(arg, name));
     }
 
 
@@ -86,7 +81,7 @@ public class QueryDef {
         Pattern pattern = regex.startsWith("~") ? Pattern.compile(regex.substring(1))
                 : Pattern.compile("^"+regex.replace("**", "[^\\.]+").replace("*", ".+")+"$");
 
-        return withSegs(new QuerySegment(part, pattern, null));
+        return withSegs(new QuerySegment(pattern));
     }
 
 
@@ -94,20 +89,7 @@ public class QueryDef {
         Pattern pattern = regex.startsWith("~") ? Pattern.compile(regex.substring(1))
                 : Pattern.compile("^"+regex.replace("**", "[^\\.]+").replace("*", ".+")+"$");
 
-        return withSegs(new QuerySegment(part, pattern, template));
-    }
-
-    public QueryDef slash() {
-        QueryDef qdef = new QueryDef(this);
-
-        qdef.part = QuerySegment.COMPONENT_PART;
-
-        return qdef;
-    }
-
-
-    public int getPart() {
-        return part;
+        return withSegs(new QuerySegment(pattern, template));
     }
 
 

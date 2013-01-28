@@ -21,26 +21,16 @@ import java.util.regex.Pattern;
 
 public class QuerySegment {
 
-    public static final int OBJECT_PART    = 0;
-    public static final int COMPONENT_PART = 1;
-
-    private int part;
     private Object attr;
     private String name;
 
-    public QuerySegment(int part, Object attr) {
-        this(part, attr, null);
+    public QuerySegment(Object attr) {
+        this(attr, null);
     }
 
-    public QuerySegment(int part, Object attr, String name) {
-        this.part = part;
+    public QuerySegment(Object attr, String name) {
         this.attr = attr;
         this.name = name;
-    }
-
-
-    public int getPart() {
-        return part;
     }
 
 
