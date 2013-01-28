@@ -17,7 +17,7 @@
 
 package com.jitlogic.zorka.agent.test.support;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -26,7 +26,7 @@ import java.util.Map;
 public class TestJmx implements TestJmxMBean {
 
     public long nom, div;
-    private Map<String,String> strMap = new HashMap<String, String>();
+    private Map<String,String> strMap = new LinkedHashMap<String, String>();
 
     public long getNom() {
         return nom;
@@ -38,6 +38,10 @@ public class TestJmx implements TestJmxMBean {
 
     public Map<String, String> getStrMap() {
         return strMap;
+    }
+
+    public void put(String key, String val) {
+        strMap.put(key, val);
     }
 
     public void setNom(long nom) {
