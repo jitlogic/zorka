@@ -27,66 +27,22 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import javax.swing.border.EmptyBorder;
-import javax.swing.table.AbstractTableModel;
 
 public class MainWindow extends JFrame {
+
+    private TraceSet traceSet = new TraceSet();
 
     private JPanel contentPane;
 
     private JTable tblTraces;
-    private String[] colNames = { "Date", "Time", "Calls", "Err", "Label" };
-    private int[]    colWidth = { 75, 50, 50, 50, 150 };
-
+    private TraceTableModel tbmTraces = new TraceTableModel();
 
     private JTable tblTraceDetail;
     private TraceDetailTableModel tbmTraceDetail;
 
-    private JTable tblTraceAttr;
-    private TraceAttrTableModel tbmTraceAttr;
+    private ErrorDetailView pnlStackTrace;
 
-    private TraceSet traceSet = new TraceSet();
-
-
-
-    private AbstractTableModel tbmTraces = new AbstractTableModel() {
-
-        @Override
-        public String getColumnName(int idx) {
-            return colNames[idx];
-        }
-
-        @Override
-        public int getRowCount() {
-            return traceSet.size();
-        }
-
-        @Override
-        public int getColumnCount() {
-            return colWidth.length;
-        }
-
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            NamedTraceRecord el = traceSet.get(rowIndex);
-
-            switch (columnIndex) {
-                case 0:
-                    return el.prettyClock();
-                case 1:
-                    return ViewerUtil.nanoSeconds(el.getTime());
-                case 2:
-                    return el.getCalls();
-                case 3:
-                    return el.getErrors();
-                case 4:
-                    return el.getTraceName();
-            }
-            return "?";
-        }
-    };
-
-
-    private Action actHelp = new AbstractAction("Help [F1]",  ResourceManager.getIcon24x24("help")) {
+    private Action actHelp = new AbstractAction("Help [F1]",  ResourceManager.getIcon16x16("help")) {
         @Override public void actionPerformed(ActionEvent e) {
 
         }
@@ -100,7 +56,7 @@ public class MainWindow extends JFrame {
             int rv = chooser.showOpenDialog(contentPane);
             if (rv == JFileChooser.APPROVE_OPTION) {
                 traceSet.load(chooser.getSelectedFile());
-                tbmTraces.fireTableDataChanged();
+                tbmTraces.setTraceSet(traceSet);
             }
         }
     };
@@ -112,6 +68,7 @@ public class MainWindow extends JFrame {
             System.exit(0);
         }
     };
+    private JTabbedPane tabDetail;
 
 
     public MainWindow() {
@@ -159,9 +116,7 @@ public class MainWindow extends JFrame {
         splitPane.setLeftComponent(scrTraces);
 
         tblTraces = new JTable(tbmTraces);
-        for (int i = 0; i < colWidth.length; i++) {
-            tblTraces.getColumnModel().getColumn(i).setPreferredWidth(colWidth[i]);
-        }
+        tbmTraces.adjustColumns(tblTraces);
 
         tblTraces.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
@@ -172,9 +127,6 @@ public class MainWindow extends JFrame {
         scrTraces.setMinimumSize(new Dimension(200, 384));
         scrTraces.setViewportView(tblTraces);
 
-        //
-        JSplitPane splitDetail = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-
         JScrollPane scrTraceDetail = new JScrollPane();
 
         tbmTraceDetail = new TraceDetailTableModel();
@@ -183,18 +135,20 @@ public class MainWindow extends JFrame {
         tblTraceDetail.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         tblTraceDetail.setAutoCreateColumnsFromModel(false);
         scrTraceDetail.setViewportView(tblTraceDetail);
-        splitDetail.setTopComponent(scrTraceDetail);
 
-        JScrollPane scrTraceAttrs = new JScrollPane();
-        tbmTraceAttr = new TraceAttrTableModel();
-        tblTraceAttr = new JTable(tbmTraceAttr);
-        tbmTraceAttr.adjustColumns(tblTraceAttr);
-        tblTraceAttr.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-        scrTraceAttrs.setViewportView(tblTraceAttr);
-        splitDetail.setBottomComponent(scrTraceAttrs);
-        splitDetail.setResizeWeight(0.85);
+        tblTraceDetail.addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                displayMethod(tblTraceDetail.getSelectedRow(), e.getClickCount() > 1);
+            }
+        });
 
-        splitPane.setRightComponent(splitDetail);
+        tabDetail = new JTabbedPane();
+        tabDetail.addTab("Trace details", scrTraceDetail);
+
+        pnlStackTrace = new ErrorDetailView();
+        tabDetail.addTab("Call details", pnlStackTrace);
+
+        splitPane.setRightComponent(tabDetail);
 
         splitPane.setResizeWeight(0.2);
     }
@@ -210,10 +164,14 @@ public class MainWindow extends JFrame {
     private void displayTrace(int idx) {
         NamedTraceRecord root = traceSet.get(idx);
         tbmTraceDetail.setRoot(root);
-        //tblTraceDetail.expandAll();
         List<String[]> rows = new ArrayList<String[]>();
         root.scanAttrs(rows);
-        tbmTraceAttr.setRows(rows);
     }
 
+    private void displayMethod(int idx, boolean sw) {
+        pnlStackTrace.update(traceSet.getSymbols(), tbmTraceDetail.getRecord(idx));
+        if (sw) {
+            tabDetail.setSelectedComponent(pnlStackTrace);
+        }
+    }
 }

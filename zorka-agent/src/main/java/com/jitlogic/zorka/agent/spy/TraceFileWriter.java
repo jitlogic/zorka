@@ -28,7 +28,7 @@ import java.io.*;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TraceFileWriter extends ZorkaAsyncThread<TraceRecord> {
+public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
 
     /** Logger object. */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
@@ -95,7 +95,7 @@ public class TraceFileWriter extends ZorkaAsyncThread<TraceRecord> {
 
 
     @Override
-    protected void process(TraceRecord obj) {
+    protected void process(Submittable obj) {
         obj.traverse(enricher);
         byte[] buf = buffer.getContent();
 

@@ -28,7 +28,7 @@ import com.jitlogic.zorka.agent.test.normproc.XqlNormalizationUnitTest;
 import com.jitlogic.zorka.agent.test.rankproc.*;
 import com.jitlogic.zorka.agent.test.spy.*;
 import com.jitlogic.zorka.agent.test.spy.TraceBuilderUnitTest;
-import com.jitlogic.zorka.agent.test.spy.TraceEncodingUnitTest;
+import com.jitlogic.zorka.agent.test.spy.TraceEnrichmentUnitTest;
 import com.jitlogic.zorka.agent.test.spy.TracerInstrumentationUnitTest;
 
 import com.jitlogic.zorka.agent.test.common.ObjectInspectorUnitTest;
@@ -53,7 +53,7 @@ import org.junit.runners.Suite;
         SubmissionDispatchUnitTest.class,
 
         // tracer
-        TracerInstrumentationUnitTest.class, TraceBuilderUnitTest.class, TraceEncodingUnitTest.class,
+        TracerInstrumentationUnitTest.class, TraceBuilderUnitTest.class, TraceEnrichmentUnitTest.class,
 
         // unittest
         AggregateCountingUnitTest.class, AverageRateCountingUnitTest.class, BshAgentUnitTest.class,

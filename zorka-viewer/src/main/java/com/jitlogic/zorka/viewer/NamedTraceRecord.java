@@ -16,7 +16,6 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.common.TracedException;
 import org.objectweb.asm.Type;
 
 import java.text.SimpleDateFormat;
@@ -24,18 +23,31 @@ import java.util.*;
 
 public class NamedTraceRecord {
 
+    /** Overflow record will be discarded regardless of method execution time and other conditions. */
+    public static final int OVERFLOW_FLAG = 0x0001;
+
+    /** Indicates that new trace has been started from here. */
+    public static final int TRACE_BEGIN   = 0x0002;
+
+    /** Exception thrown from method called from frame hasn't been handled and has been thrown out of current frame. */
+    public static final int EXCEPTION_PASS = 0x0004;
+
+    /** Exception thrown from method called current frame has been wrapped and thrown out of current frame. */
+    public static final int EXCEPTION_WRAP = 0x0008;
+
     private String traceName, className, methodName, methodSignature;
     private long clock;
 
     private long time;
     private long errors, calls;
     private int flags, level, records;
+    private int traceFlags;
 
     private NamedTraceRecord parent;
     private List<NamedTraceRecord> children;
     private Map<String,Object> attrs;
 
-    private TracedException exception;
+    private Object exception;
 
     private double timePct;
 
@@ -146,15 +158,23 @@ public class NamedTraceRecord {
         return records;
     }
 
-    public TracedException getException() {
+    public Object getException() {
         return exception;
     }
 
 
-    public void setException(TracedException exception) {
+    public void setException(Object exception) {
         this.exception = exception;
     }
 
+
+    public int getTraceFlags() {
+        return traceFlags;
+    }
+
+    public void setTraceFlags(int traceFlags) {
+        this.traceFlags = traceFlags;
+    }
 
     public double getTimePct() {
         return timePct;
@@ -176,6 +196,10 @@ public class NamedTraceRecord {
 
     public Map<String,Object> getAttrs() {
         return Collections.unmodifiableMap(attrs != null ? attrs : new HashMap<String, Object>());
+    }
+
+    public int numAttrs() {
+        return attrs != null ? attrs.size() : 0;
     }
 
 
@@ -252,27 +276,12 @@ public class NamedTraceRecord {
 
         sb.append(")");
 
-        if (attrs != null) {
-            List<String> keys = new ArrayList<String>(attrs.size()+2);
-            for (Map.Entry<String,Object> e : attrs.entrySet()) {
-                keys.add(e.getKey());
-            }
-            Collections.sort(keys);
-
-            for (String key : keys) {
-                sb.append('\n');
-                sb.append(key);
-                sb.append('=');
-                sb.append(attrs.get(key));
-            }
-        }
-
         return sb.toString();
     }
 
 
     public String prettyClock() {
-        return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(getClock());
+        return new SimpleDateFormat("hh:mm:ss.SSS").format(getClock());
     }
 
 

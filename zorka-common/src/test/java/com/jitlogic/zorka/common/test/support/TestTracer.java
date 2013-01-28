@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.test.spy.support;
+package com.jitlogic.zorka.common.test.support;
 
 import com.jitlogic.zorka.common.TraceEventHandler;
 import com.jitlogic.zorka.common.ZorkaUtil;
@@ -77,7 +77,6 @@ public class TestTracer extends TraceEventHandler {
     public void doubleVals(long clock, int objId, int[] components, double[] values) {
         data.add(ZorkaUtil.map("action", "doubleVals", "clock", clock, "objId", objId, "components", components, "values", values));
     }
-
 
     public List<Map<Object,Object>> getData() {
         return data;

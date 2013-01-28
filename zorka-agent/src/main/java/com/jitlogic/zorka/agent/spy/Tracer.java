@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.agent.spy;
 
+import com.jitlogic.zorka.common.Submittable;
 import com.jitlogic.zorka.common.SymbolRegistry;
 import com.jitlogic.zorka.common.TraceEventHandler;
 import com.jitlogic.zorka.common.ZorkaAsyncThread;
@@ -74,13 +75,13 @@ public class Tracer {
     private SymbolRegistry symbolRegistry = new SymbolRegistry();
 
     /** Output handler is initially set to null implementation. */
-    private ZorkaAsyncThread<TraceRecord> output;
+    private ZorkaAsyncThread<Submittable> output;
 
     /** Thread local serving trace builder objects for application threads */
     private ThreadLocal<TraceBuilder> localHandlers =
         new ThreadLocal<TraceBuilder>() {
             public TraceBuilder initialValue() {
-                return new TraceBuilder(output);
+                return new TraceBuilder(output, symbolRegistry);
             }
         };
 
@@ -116,7 +117,7 @@ public class Tracer {
      *
      * @param output trace event handler
      */
-    public void setOutput(ZorkaAsyncThread<TraceRecord> output) {
+    public void setOutput(ZorkaAsyncThread<Submittable> output) {
         this.output = output;
     }
 

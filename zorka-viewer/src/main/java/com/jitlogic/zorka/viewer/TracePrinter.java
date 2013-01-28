@@ -17,7 +17,6 @@
 package com.jitlogic.zorka.viewer;
 
 import com.jitlogic.zorka.common.TraceEventHandler;
-import com.jitlogic.zorka.common.TracedException;
 
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
@@ -69,8 +68,8 @@ public class TracePrinter extends TraceEventHandler {
 
 
     @Override
-    public void traceBegin(int traceId, long clock) {
-        out.println(spc(level) + "TRACE_BEGIN: " + sym(traceId) + " clock=" + new Date(clock));
+    public void traceBegin(int traceId, long clock, int flags) {
+        out.println(spc(level) + "TRACE_BEGIN: " + sym(traceId) + " clock=" + new Date(clock) + ", flags=" + flags);
     }
 
 
@@ -91,7 +90,7 @@ public class TracePrinter extends TraceEventHandler {
 
 
     @Override
-    public void traceError(TracedException exception, long tstamp) {
+    public void traceError(Object exception, long tstamp) {
         out.println(spc(level) + "ERROR (" + time(tstamp) + "): " + exception);
         if (level > 0) {
             level--;
@@ -115,5 +114,38 @@ public class TracePrinter extends TraceEventHandler {
     @Override
     public void newAttr(int attrId, Object attrVal) {
         out.println(spc(level) + sym(attrId) + "=" + attrVal);
+    }
+
+    @Override
+    public void longVals(long clock, int objId, int[] components, long[] values) {
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("VALS(" + time(clock) + "): objId=" + objId + ", data=(");
+        for (int i = 0; i < components.length; i++) {
+            sb.append("[" + components[i] + "," + values[i] + "]");
+        }
+        sb.append(")");
+        out.println(sb.toString());
+    }
+
+    @Override
+    public void intVals(long clock, int objId, int[] components, int[] values) {
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("VALS(" + time(clock) + "): objId=" + objId + ", data=(");
+        for (int i = 0; i < components.length; i++) {
+            sb.append("[" + components[i] + "," + values[i] + "]");
+        }
+        sb.append(")");
+        out.println(sb.toString());
+    }
+
+    @Override
+    public void doubleVals(long clock, int objId, int[] components, double[] values) {
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("VALS(" + time(clock) + "): objId=" + objId + ", data=(");
+        for (int i = 0; i < components.length; i++) {
+            sb.append("[" + components[i] + "," + values[i] + "]");
+        }
+        sb.append(")");
+        out.println(sb.toString());
     }
 }

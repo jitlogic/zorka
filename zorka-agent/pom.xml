@@ -98,6 +98,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                                 <include>org.ow2.asm:asm</include>
                                 <include>com.jitlogic.zoola:zoola-core</include>
                                 <include>com.jitlogic.contrib:libsnmp</include>
+                                <include>com.jitlogic.zorka:zorka-common</include>
                             </includes>
                             <rules>
                                 <rule>
@@ -116,6 +117,9 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
                                     <pattern>com.jitlogic.contrib.**</pattern>
                                     <result>com.jitlogic.zorka.deps.@1</result>
                                 </rule>
+                                <keep>
+                                    <pattern>com.jitlogic.zorka.**</pattern>
+                                </keep>
                             </rules>
                         </configuration>
                     </execution>

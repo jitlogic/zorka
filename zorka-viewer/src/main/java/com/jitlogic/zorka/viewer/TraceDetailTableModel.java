@@ -23,8 +23,8 @@ import java.util.List;
 
 public class TraceDetailTableModel extends AbstractTableModel {
 
-    private String[] colNames = { "Time", "Pct", "Calls", "Err", "Method" };
-    private int[] colWidth    = { 75, 75, 50, 50, 640 };
+    private String[] colNames = { "Time", "Calls", "Err", "Pct", "Method" };
+    private int[] colWidth    = { 75, 50, 50, 50, 640 };
 
     private List<NamedTraceRecord> data = new ArrayList<NamedTraceRecord>(1);
 
@@ -33,6 +33,10 @@ public class TraceDetailTableModel extends AbstractTableModel {
         for (int i = 0; i < colWidth.length; i++) {
             table.getColumnModel().getColumn(i).setPreferredWidth(colWidth[i]);
         }
+
+        table.getColumnModel().getColumn(3).setCellRenderer(new PercentColumnRenderer());
+        //table.getColumnModel().getColumn(4).setCellRenderer(new TraceMethodRenderer());
+        table.getColumnModel().getColumn(4).setCellRenderer(new MethodCellRenderer());
     }
 
 
@@ -69,13 +73,13 @@ public class TraceDetailTableModel extends AbstractTableModel {
                 case 0:
                     return ViewerUtil.nanoSeconds(el.getTime());
                 case 1:
-                    return String.format(el.getTimePct() >= 10.0 ? "%.0f" : "%.2f", el.getTimePct());
-                case 2:
                     return el.getCalls();
-                case 3:
+                case 2:
                     return el.getErrors();
+                case 3:
+                    return el.getTimePct();
                 case 4:
-                    return spc(el.getLevel()) + el.prettyPrint();
+                    return el;
 
             }
         }
@@ -84,16 +88,8 @@ public class TraceDetailTableModel extends AbstractTableModel {
     }
 
 
-    private static final String SPC = "    ";
-
-
-    private String spc(int n) {
-        StringBuilder sb = new StringBuilder(n * SPC.length() + 2);
-
-        for (int i = 0; i < n; i++) {
-            sb.append(SPC);
-        }
-
-        return sb.toString();
+    public NamedTraceRecord getRecord(int idx) {
+        return data.get(idx);
     }
+
 }

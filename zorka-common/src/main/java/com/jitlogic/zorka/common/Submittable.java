@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -16,9 +16,8 @@
 
 package com.jitlogic.zorka.common;
 
-/**
- * This is just marker interface to pass exceptions via tracer components.
- */
-public interface TracedException {
+public interface Submittable {
+
+    public void traverse(TraceEventHandler output);
 
 }

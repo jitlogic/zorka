@@ -70,6 +70,20 @@ public class ZorkaLog {
 
 
     /**
+     * Logs message with DEBUG level
+     *
+     * @param msg message text
+     *
+     * @param e exception object
+     *
+     * @param args optional arguments
+     */
+    public void debug(String msg, Throwable e, Object...args) {
+        output.trap(ZorkaLogLevel.DEBUG, tag, msg, e, args);
+    }
+
+
+    /**
      * Logs message with INFO level
      *
      * @param msg message text
@@ -114,7 +128,7 @@ public class ZorkaLog {
      *
      * @param args optional arguments
      */
-    public void error(String msg, Throwable e, Object args) {
+    public void error(String msg, Throwable e, Object...args) {
         output.trap(ZorkaLogLevel.ERROR, tag, msg, e, args);
 	}
 

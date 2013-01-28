@@ -17,8 +17,8 @@
 package com.jitlogic.zorka.viewer;
 
 import com.jitlogic.zorka.common.SimpleTraceFormat;
+import com.jitlogic.zorka.common.SymbolRegistry;
 import com.jitlogic.zorka.common.TraceEventHandler;
-import com.jitlogic.zorka.common.TracedException;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -35,9 +35,10 @@ public class TraceSet extends TraceEventHandler {
 
 
     @Override
-    public void traceBegin(int traceId, long clock) {
+    public void traceBegin(int traceId, long clock, int flags) {
         top.setTraceName(symbols.get(traceId));
         top.setClock(clock);
+        top.setTraceFlags(flags);
     }
 
 
@@ -63,7 +64,7 @@ public class TraceSet extends TraceEventHandler {
 
 
     @Override
-    public void traceError(TracedException exception, long tstamp) {
+    public void traceError(Object exception, long tstamp) {
         top.setException(exception);
         top.setTime(tstamp-top.getTime());
         pop();
@@ -87,6 +88,21 @@ public class TraceSet extends TraceEventHandler {
     @Override
     public void newAttr(int attrId, Object attrVal) {
         top.setAttr(symbols.get(attrId), attrVal);
+    }
+
+    @Override
+    public void longVals(long clock, int objId, int[] components, long[] values) {
+        // TODO store this data
+    }
+
+    @Override
+    public void intVals(long clock, int objId, int[] components, int[] values) {
+        // TODO store this data
+    }
+
+    @Override
+    public void doubleVals(long clock, int objId, int[] components, double[] values) {
+        // TODO store this data
     }
 
 
@@ -138,5 +154,9 @@ public class TraceSet extends TraceEventHandler {
                 }
             }
         }
+    }
+
+    public Map<Integer,String> getSymbols() {
+        return symbols;
     }
 }

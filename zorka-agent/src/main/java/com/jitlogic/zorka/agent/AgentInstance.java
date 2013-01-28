@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.agent;
 
+import com.jitlogic.zorka.agent.spy.TracerLib;
 import com.jitlogic.zorka.common.*;
 import com.jitlogic.zorka.agent.integ.*;
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
@@ -129,6 +130,9 @@ public class AgentInstance {
     /** Reference to spy library - available to zorka scripts as 'spy.*' functions */
     private SpyLib spyLib;
 
+    /** Tracer library */
+    private TracerLib tracerLib;
+
     /** Reference to syslog library - available to zorka scripts as 'syslog.*' functions */
     private SyslogLib syslogLib;
 
@@ -185,6 +189,8 @@ public class AgentInstance {
             spyInstance = SpyInstance.instance();
             spyLib = new SpyLib(spyInstance);
             zorkaAgent.install("spy", spyLib);
+            tracerLib = new TracerLib(spyInstance);
+            zorkaAgent.install("tracer", tracerLib);
             MainSubmitter.setSubmitter(spyInstance.getSubmitter());
             log.debug("Installed submitter: " + spyInstance.getSubmitter());
         } else {
@@ -339,6 +345,15 @@ public class AgentInstance {
      */
     public SpyLib getSpyLib() {
         return spyLib;
+    }
+
+    /**
+     * Returns reference to tracer library.
+     *
+     * @return instance of tracer library
+     */
+    public TracerLib getTracerLib() {
+        return tracerLib;
     }
 
     /**
