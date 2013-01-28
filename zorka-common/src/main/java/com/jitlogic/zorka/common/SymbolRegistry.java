@@ -50,6 +50,11 @@ public class SymbolRegistry {
      * @return symbol ID (integer)
      */
     public int symbolId(String symbol) {
+
+        if (symbol == null) {
+            return 0;
+        }
+
         Integer id = symbols.get(symbol);
 
         if (id == null) {
@@ -78,6 +83,9 @@ public class SymbolRegistry {
      * @return symbol name
      */
     public String symbolName(int symbolId) {
+        if (symbolId == 0) {
+            return "<null>";
+        }
         return idents.get(symbolId);
     }
 

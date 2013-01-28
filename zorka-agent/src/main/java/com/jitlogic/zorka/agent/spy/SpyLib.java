@@ -152,16 +152,6 @@ public class SpyLib {
 
 
     /**
-     * Configures tracer output.
-     *
-     * @param output trace processing object
-     */
-    public void tracerOutput(ZorkaAsyncThread<TraceRecord> output) {
-        instance.getTracer().setOutput(output);
-    }
-
-
-    /**
      * Created an empty (unconfigured) spy definition. Use created object's methods to configure it before registering
      * with add() function.
      *
@@ -231,28 +221,6 @@ public class SpyLib {
     }
 
 
-    /**
-     * Adds matching method to tracer.
-     *
-     * @param matchers spy matcher objects (created using spy.byXxxx() functions)
-     */
-    public void traceInclude(SpyMatcher...matchers) {
-        for (SpyMatcher matcher : matchers) {
-            instance.getTracer().include(matcher);
-        }
-    }
-
-    /**
-     * Exclude classes/methods from tracer.
-     *
-     * @param matchers spy matcher objects (created using spy.byXxxx() functions)
-     */
-    public void traceExclude(SpyMatcher...matchers) {
-        for (SpyMatcher matcher : matchers) {
-            instance.getTracer().include(matcher.exclude());
-        }
-    }
-
 
     /**
      * Creates new matcher object that will match classes by annotation.
@@ -278,6 +246,18 @@ public class SpyLib {
     public SpyMatcher byClassAnnotation(String annotationName, String methodPattern) {
         return new SpyMatcher(SpyMatcher.BY_CLASS_ANNOTATION |SpyMatcher.BY_METHOD_NAME, 1,
                 "L" + annotationName + ";", methodPattern, null);
+    }
+
+
+    /**
+     * Creates new matcher that will match all methods of given class.
+     *
+     * @param className class name (or mask)
+     *
+     * @return spy matched object
+     */
+    public SpyMatcher byClass(String className) {
+        return byMethod(className, "*");
     }
 
 
@@ -430,63 +410,6 @@ public class SpyLib {
      */
     public SpyProbe fetchTime(String dst) {
         return new SpyTimeProbe(dst);
-    }
-
-
-    /**
-     * Starts a new (named) trace.
-     *
-     * @param name trace name
-     *
-     * @return spy processor object marking new trace
-     */
-    public SpyProcessor traceBegin(String name) {
-        return new TraceBeginProcessor(instance.getTracer(), name, -1);
-    }
-
-
-    /**
-     * Starts new trace.
-     *
-     * @param name trace name
-     *
-     * @param minimumTraceTime minimum trace time
-     *
-     * @return spy processor object marking new trace
-     */
-    public SpyProcessor traceBegin(String name, long minimumTraceTime) {
-        return new TraceBeginProcessor(instance.getTracer(), name, minimumTraceTime * 1000000L);
-    }
-
-
-    /**
-     * Attaches attribute to trace record.
-     *
-     * @param srcField source field name (from spy record)
-     * @param dstAttr destination attribute name (in trace data)
-     * @return spy processor object adding new trace attribute
-     */
-    public SpyProcessor traceAttr(String srcField, String dstAttr) {
-        return new TraceAttrProcessor(instance.getTracer(), srcField, dstAttr);
-    }
-
-
-    /**
-     * Creates trace file writer object. Trace writer can receive traces and store them in a file.
-     *
-     * @param path path to a file
-     *
-     * @param maxFiles maximum number of archived files
-     *
-     * @param maxSize maximum file size
-     *
-     * @return trace file writer
-     */
-    public ZorkaAsyncThread<TraceRecord> traceFile(String path, int maxFiles, long maxSize) {
-        TraceFileWriter writer = new TraceFileWriter(ZorkaConfig.propFormat(path),
-                                                instance.getTracer().getSymbolRegistry(), maxFiles, maxSize);
-        writer.start();
-        return writer;
     }
 
 
@@ -834,40 +757,5 @@ public class SpyLib {
         return ComparatorProcessor.vcmp(a, op, v);
     }
 
-
-    /**
-     * Sets minimum traced method execution time. Methods that took less time
-     * will be discarded from traces and will only reflect in summary call/error counters.
-     *
-     * @param methodTime minimum execution time (in nanoseconds, 250 microseconds by default)
-     */
-    public void setTracerMinMethodTime(long methodTime) {
-        Tracer.setMinMethodTime(methodTime);
-    }
-
-    /**
-     * Sets minimum trace execution time. Traces that laster for shorted period
-     * of time will be discarded. Not that this is default setting that can be
-     * overridden with spy.traceBegin() method.
-     *
-     * @param traceTime minimum trace execution time (50 milliseconds by default)
-     */
-    public void setTracerMinTraceTime(long traceTime) {
-        Tracer.setMinTraceTime(traceTime * 1000000L);
-    }
-
-
-    /**
-     * Sets maximum number of records that will be stored in a single trace.
-     * This setting prevents agent from overrunning memory when instrumented
-     * code has very long (and complex) execution path. After maximum number
-     * is reached, all remaining records will be discarded but numbers of calls
-     * and errors of discarded methods will be reflected in summary data.
-     *
-     * @param maxRecords maximum numbner of trace records
-     */
-    public void setTracerMaxTraceRecords(int maxRecords) {
-        Tracer.setMaxTraceRecords(maxRecords);
-    }
 
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -14,24 +14,19 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.test.spy;
+package com.jitlogic.zorka.common.test;
 
 import com.jitlogic.zorka.common.*;
-import com.jitlogic.zorka.agent.spy.*;
-import com.jitlogic.zorka.agent.test.spy.support.TestTracer;
-
+import com.jitlogic.zorka.common.test.support.TestTracer;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TraceEncodingUnitTest {
+public class SimpleTraceFormatUnitTest {
 
     private SymbolRegistry symbols = new SymbolRegistry();
-
-
     private ByteBuffer buf = new ByteBuffer();;
     private SimpleTraceFormat encoder = new SimpleTraceFormat(buf);
     private TestTracer output = new TestTracer();
-    private SymbolEnricher enricher = new SymbolEnricher(symbols, output);
 
 
     private int t1 = symbols.symbolId("some.trace");
@@ -41,11 +36,9 @@ public class TraceEncodingUnitTest {
     private int e1 = symbols.symbolId("some.Exception");
     private int a1 = symbols.symbolId("someAttr");
 
-
     private void decode() {
         new SimpleTraceFormat(buf.getContent()).decode(output);
     }
-
 
     @Test
     public void testSymbolCmd() {
@@ -54,12 +47,11 @@ public class TraceEncodingUnitTest {
         output.check(0, "action", "newSymbol", "symbolId", c1, "symbolName", "some.Class");
     }
 
-
     @Test
     public void testTraceBeginCmd() {
-        encoder.traceBegin(t1, 100L);
+        encoder.traceBegin(t1, 100L, 8);
         decode();
-        output.check(0, "action", "traceBegin", "traceId", t1, "clock", 100L);
+        output.check(0, "action", "traceBegin", "traceId", t1, "clock", 100L, "flags", 8);
     }
 
 
@@ -89,7 +81,7 @@ public class TraceEncodingUnitTest {
 
     @Test
     public void traceErrorCmd() {
-        TracedException e = new SymbolicException(e1, "oja!");
+        SymbolicException e = new SymbolicException(e1, "oja!", new SymbolicStackElement[0], null);
         encoder.traceError(e, 200);
         decode();
         output.check(0, "action", "traceError", "tstamp", 200L, "exception", e);
@@ -109,7 +101,6 @@ public class TraceEncodingUnitTest {
         decode();
         output.check(0, "action", "newAttr", "attrId", a1, "attrVal", "oja!");
     }
-
 
     @Test
     public void traceLongAttr() {
@@ -142,10 +133,9 @@ public class TraceEncodingUnitTest {
         output.check(0, "action", "newAttr", "attrId", a1, "attrVal", (short)200);
     }
 
-
     @Test
     public void testSimpleTraceDecodeEncode() {
-        encoder.traceBegin(t1, 500L);
+        encoder.traceBegin(t1, 500L, 2);
         encoder.traceEnter(c1, m1, s1, 100L);
         encoder.traceStats(10, 5, 1);
         encoder.newAttr(a1, "http://some/ctx");
@@ -156,34 +146,87 @@ public class TraceEncodingUnitTest {
         Assert.assertEquals("Should read 5 records.", 5, output.getData().size());
     }
 
-
     @Test
-    public void testEnrichTraceEnterCall() {
-        enricher.traceEnter(c1, m1, s1, 100L);
+    public void testTraceEncodeDecodeRealException() {
+        Exception ex = new Exception("oja!");
+        SymbolicException e = new SymbolicException(ex, symbols, true);
 
-        Assert.assertEquals("should receive three symbols and traceEnter", 4, output.size());
-        output.check(0, "action", "newSymbol", "symbolId", c1, "symbolName", "some.Class");
-        output.check(1, "action", "newSymbol", "symbolId", m1, "symbolName", "someMethod");
+        encoder.traceError(e, 200);
+        decode();
+        output.check(0, "action", "traceError", "tstamp", 200L, "exception", e);
     }
 
-
     @Test
-    public void testEnrichTraceEnterCallTwice() {
-        enricher.traceEnter(c1, m1, s1, 100L);
-        enricher.traceEnter(c1, m1, s1, 200L);
+    public void testTraceEncodeDecodeRealExceptionWithCause() {
+        Exception ex1 = new Exception("oja!");
+        Exception ex2 = new Exception("OJA!", ex1);
+        SymbolicException e = new SymbolicException(ex2, symbols, true);
 
-        Assert.assertEquals("should receive three symbols and traceEnter", 5, output.size());
+        encoder.traceError(e, 200);
+        decode();
+        output.check(0, "action", "traceError", "tstamp", 200L, "exception", e);
     }
 
+    @Test
+    public void testTraceEncodeDecodeLongVals() {
+        int[]  c1 = { 1, 2, 3, 4 };
+        long[] v1 = { 2, 4, 6, 8 };
+
+        encoder.longVals(100, 10, c1, v1);
+        decode();
+        output.check(0, "action", "longVals", "clock", 100L, "objId", 10);
+
+        int[]  c2 = (int[])output.get(0, "components");
+        long[] v2 = (long[])output.get(0, "values");
+
+        Assert.assertEquals(c1.length, c2.length);
+        Assert.assertEquals(v1.length, v2.length);
+
+        for (int i = 0; i < c1.length; i++) {
+            Assert.assertEquals("components[" + i + "]", c1[i], c2[i]);
+            Assert.assertEquals("values[" + i + "]", v1[i], v2[i]);
+        }
+    }
 
     @Test
-    public void testEnrichTraceError() {
-        enricher.traceError(new WrappedException(new Exception("oja!")), 100);
+    public void testTraceEncodeDecodeIntVals() {
+        int[]  c1 = { 1, 2, 3, 4 };
+        int[] v1 = { 2, 4, 6, 8 };
 
-        output.check(0, "action", "newSymbol", "symbolId",
-                symbols.symbolId("java.lang.Exception"), "symbolName", "java.lang.Exception");
+        encoder.intVals(100, 10, c1, v1);
+        decode();
+        output.check(0, "action", "intVals", "clock", 100L, "objId", 10);
 
-        output.check(1, "action", "traceError", "exception",
-                new SymbolicException(new Exception("oja!"), symbols), "tstamp", 100L);
+        int[]  c2 = (int[])output.get(0, "components");
+        int[] v2 = (int[])output.get(0, "values");
+
+        Assert.assertEquals(c1.length, c2.length);
+        Assert.assertEquals(v1.length, v2.length);
+
+        for (int i = 0; i < c1.length; i++) {
+            Assert.assertEquals("components[" + i + "]", c1[i], c2[i]);
+            Assert.assertEquals("values[" + i + "]", v1[i], v2[i]);
+        }
+    }
+
+    @Test
+    public void testTraceEncodeDecodeDoubleVals() {
+        int[]  c1 = { 1, 2, 3, 4 };
+        double[] v1 = { 2, 4, 6, 8 };
+
+        encoder.doubleVals(100, 10, c1, v1);
+        decode();
+        output.check(0, "action", "doubleVals", "clock", 100L, "objId", 10);
+
+        int[]  c2 = (int[])output.get(0, "components");
+        double[] v2 = (double[])output.get(0, "values");
+
+        Assert.assertEquals(c1.length, c2.length);
+        Assert.assertEquals(v1.length, v2.length);
+
+        for (int i = 0; i < c1.length; i++) {
+            Assert.assertEquals("components[" + i + "]", c1[i], c2[i]);
+            Assert.assertEquals("values[" + i + "]", v1[i], v2[i], 0.001);
+        }
     }
 }

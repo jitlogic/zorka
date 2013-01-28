@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class ViewerUtil {
 
     public static String nanoSeconds(long ns) {
-        double t = 1.0 * ns / 1000000;
+        double t = 1.0 * ns / 1000000.0;
         String u = "ms";
         if (t > 1000.0) {
             t /= 1000.0;

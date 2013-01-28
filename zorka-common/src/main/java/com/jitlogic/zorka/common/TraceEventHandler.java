@@ -16,7 +16,6 @@
 
 package com.jitlogic.zorka.common;
 
-import com.jitlogic.zorka.common.TracedException;
 
 /**
  * Handles trace events. For performance reasons this is class, not interface
@@ -31,7 +30,7 @@ public abstract class TraceEventHandler {
      *
      * @param traceId trace ID (symbol)
      */
-    public abstract void traceBegin(int traceId, long clock);
+    public abstract void traceBegin(int traceId, long clock, int flags);
 
 
     /**
@@ -63,7 +62,7 @@ public abstract class TraceEventHandler {
      * @param tstamp timestamp (in nanoseconds since Epoch - see System.nanoTime())
      *
      */
-    public abstract  void traceError(TracedException exception, long tstamp);
+    public abstract  void traceError(Object exception, long tstamp);
 
 
     /**
@@ -97,4 +96,45 @@ public abstract class TraceEventHandler {
      */
     public abstract void newAttr(int attrId, Object attrVal);
 
+
+    /**
+     * Records a collection of long integer samples.
+     *
+     * @param clock wall clock time
+     *
+     * @param objId object ID
+     *
+     * @param components symbol IDs
+     *
+     * @param values values
+     */
+    public abstract void longVals(long clock, int objId, int[] components, long[] values);
+
+
+    /**
+     * Records a collection of integer samples.
+     *
+     * @param clock wall clock time
+     *
+     * @param objId object ID
+     *
+     * @param components symbol IDs
+     *
+     * @param values values
+     */
+    public abstract void intVals(long clock, int objId, int[] components, int[] values);
+
+
+    /**
+     * Records a collection of floating point samples.
+     *
+     * @param clock wall clock time
+     *
+     * @param objId object ID
+     *
+     * @param components symbol IDs
+     *
+     * @param values values
+     */
+    public abstract void doubleVals(long clock, int objId, int[] components, double[] values);
 }

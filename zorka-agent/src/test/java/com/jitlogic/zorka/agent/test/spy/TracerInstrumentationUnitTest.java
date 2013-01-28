@@ -18,7 +18,6 @@ package com.jitlogic.zorka.agent.test.spy;
 
 import com.jitlogic.zorka.agent.spy.SpyDefinition;
 import com.jitlogic.zorka.agent.test.support.BytecodeInstrumentationFixture;
-import com.jitlogic.zorka.agent.spy.WrappedException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,7 +33,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
     @Test
     public void testTraceSingleTrivialMethod() throws Exception {
-        spy.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
+        tracer.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
 
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
@@ -47,7 +46,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
     public void testTraceAndInstrumentSingleTrivialMethod() throws Exception {
         engine.add(SpyDefinition.instance().onEnter(spy.fetchArg("E0", 0))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
-        spy.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
+        tracer.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
 
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
@@ -60,7 +59,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
     @Test
     public void testTraceAndInstrumentRecursiveMethods() throws Exception {
-        spy.traceInclude(spy.byMethod(TCLASS2, "~^[a-zA-Z_].*"));
+        tracer.traceInclude(spy.byMethod(TCLASS2, "~^[a-zA-Z_].*"));
 
         Object obj = instantiate(engine, TCLASS2);
         invoke(obj, "recursiveMethod");
@@ -72,20 +71,20 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
     @Test
     public void testTraceError() throws Exception {
-        spy.traceInclude(spy.byMethod(TCLASS1, "~^[a-zA-Z_].*"));
+        tracer.traceInclude(spy.byMethod(TCLASS1, "~^[a-zA-Z_].*"));
 
         Object obj = instantiate(engine, TCLASS1);
         Object rslt = invoke(obj, "errorMethod");
 
         assertEquals(2, output.getData().size());
-        assertEquals(new WrappedException((Throwable)rslt), output.getData().get(1).get("exception"));
+        assertEquals(rslt, output.getData().get(1).get("exception"));
         assertEquals("errorMethod", symbols.symbolName((Integer)output.getData().get(0).get("methodId")));
     }
 
 
     @Test
     public void testTryCatchSimpleCatch() throws Exception {
-        spy.traceInclude(spy.byMethod(TCLASS3, "tryCatchFinally0"));
+        tracer.traceInclude(spy.byMethod(TCLASS3, "tryCatchFinally0"));
 
         Object obj = instantiate(engine, TCLASS3);
         invoke(obj, "tryCatchFinally0", true);
@@ -97,7 +96,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
     @Test
     public void testTryCatchFinallyWithEmbeddedCatch() throws Exception {
-        spy.traceInclude(spy.byMethod(TCLASS3, "tryCatchFinally1"));
+        tracer.traceInclude(spy.byMethod(TCLASS3, "tryCatchFinally1"));
 
         Object obj = instantiate(engine, TCLASS3);
         invoke(obj, "tryCatchFinally1", true);
@@ -110,7 +109,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
     @Test
     public void testTryCatchEmbeddedCatch() throws Exception {
-        spy.traceInclude(spy.byMethod(TCLASS3, "tryCatchFinally2"));
+        tracer.traceInclude(spy.byMethod(TCLASS3, "tryCatchFinally2"));
 
         Object obj = instantiate(engine, TCLASS3);
         invoke(obj, "tryCatchFinally2", true);

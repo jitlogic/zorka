@@ -47,6 +47,15 @@ public class SimpleTraceFormat extends TraceEventHandler {
     /** newSymbol() call */
     public static final byte NEW_SYMBOL   = 0x06;
 
+    /** longVal() call */
+    public static final byte LONG_VAL     = 0x30;
+
+    /** intVal() call */
+    public static final byte INT_VAL      = 0x31;
+
+    /** doubleVal() call */
+    public static final byte DOUBLE_VAL   = 0x32;
+
     /** newAttr(key, null) call */
     public static final byte NULL_ATTR    = 0x40;
 
@@ -64,6 +73,11 @@ public class SimpleTraceFormat extends TraceEventHandler {
 
     /** newAttr(key, stringVal) call */
     public static final byte STRING_ATTR  = 0x45;
+
+    public static final byte NO_EXCEPTION = 0;
+
+    public static final byte CAUSE_EXCEPTION = 1;
+
 
     /** Input/output buffer */
     private ByteBuffer buf;
@@ -88,10 +102,11 @@ public class SimpleTraceFormat extends TraceEventHandler {
 
 
     @Override
-    public void traceBegin(int traceId, long clock) {
+    public void traceBegin(int traceId, long clock, int flags) {
         buf.putByte(TRACE_BEGIN);
         buf.putInt(traceId);
         buf.putLong(clock);
+        buf.putInt(flags);
     }
 
 
@@ -112,7 +127,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
 
 
     @Override
-    public void traceError(TracedException exception, long tstamp) {
+    public void traceError(Object exception, long tstamp) {
         buf.putByte(TRACE_ERROR);
         if (exception instanceof SymbolicException) {
             encodeException((SymbolicException)exception);
@@ -168,6 +183,42 @@ public class SimpleTraceFormat extends TraceEventHandler {
         }
     }
 
+    @Override
+    public void longVals(long clock, int objId, int[] components, long[] values) {
+        buf.putByte(LONG_VAL);
+        buf.putLong(clock);
+        buf.putInt(objId);
+        buf.putInt(components.length);
+        for (int i = 0; i < components.length; i++) {
+            buf.putInt(components[i]);
+            buf.putLong(values[i]);
+        }
+    }
+
+    @Override
+    public void intVals(long clock, int objId, int[] components, int[] values) {
+        buf.putByte(INT_VAL);
+        buf.putLong(clock);
+        buf.putInt(objId);
+        buf.putInt(components.length);
+        for (int i = 0; i < components.length; i++) {
+            buf.putInt(components[i]);
+            buf.putInt(values[i]);
+        }
+    }
+
+    @Override
+    public void doubleVals(long clock, int objId, int[] components, double[] values) {
+        buf.putByte(DOUBLE_VAL);
+        buf.putLong(clock);
+        buf.putInt(objId);
+        buf.putInt(components.length);
+        for (int i = 0; i < components.length; i++) {
+            buf.putInt(components[i]);
+            buf.putDouble(values[i]);
+        }
+    }
+
 
     /**
      * Decodes buffer content. Decoded elements are transformed
@@ -180,7 +231,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
             byte cmd = buf.getByte();
             switch (cmd) {
                 case TRACE_BEGIN:
-                    output.traceBegin(buf.getInt(), buf.getLong());
+                    output.traceBegin(buf.getInt(), buf.getLong(), buf.getInt());
                     break;
                 case TRACE_ENTER:
                     output.traceEnter(buf.getInt(), buf.getInt(), buf.getInt(), 0);
@@ -196,6 +247,15 @@ public class SimpleTraceFormat extends TraceEventHandler {
                     break;
                 case NEW_SYMBOL:
                     output.newSymbol(buf.getInt(), buf.getString());
+                    break;
+                case LONG_VAL:
+                    decodeLongVals(output);
+                    break;
+                case INT_VAL:
+                    decodeIntVals(output);
+                    break;
+                case DOUBLE_VAL:
+                    decodeDoubleVals(output);
                     break;
                 case NULL_ATTR:
                     output.newAttr(buf.getInt(), null);
@@ -223,6 +283,62 @@ public class SimpleTraceFormat extends TraceEventHandler {
 
 
     /**
+     * Decodes a set of long values
+     *
+     * @param output
+     */
+    private void decodeLongVals(TraceEventHandler output) {
+        long clock = buf.getLong();
+        int objId = buf.getInt();
+        int len = buf.getInt();
+
+        int[] components = new int[len];
+        long[] values = new long[len];
+
+        for (int i = 0; i < len; i++) {
+            components[i] = buf.getInt();
+            values[i] = buf.getLong();
+        }
+
+        output.longVals(clock, objId, components, values);
+    }
+
+
+    private void decodeIntVals(TraceEventHandler output) {
+        long clock = buf.getLong();
+        int objId = buf.getInt();
+        int len = buf.getInt();
+
+        int[] components = new int[len];
+        int[] values = new int[len];
+
+        for (int i = 0; i < len; i++) {
+            components[i] = buf.getInt();
+            values[i] = buf.getInt();
+        }
+
+        output.intVals(clock, objId, components, values);
+    }
+
+
+    private void decodeDoubleVals(TraceEventHandler output) {
+        long clock = buf.getLong();
+        int objId = buf.getInt();
+        int len = buf.getInt();
+
+        int[] components = new int[len];
+        double[] values = new double[len];
+
+        for (int i = 0; i < len; i++) {
+            components[i] = buf.getInt();
+            values[i] = buf.getDouble();
+        }
+
+        output.doubleVals(clock, objId, components, values);
+    }
+
+
+    /**
      * Encodes exception object.
      *
      * @param ex (wrapped or synthetic) symbolic exception representation.
@@ -230,6 +346,23 @@ public class SimpleTraceFormat extends TraceEventHandler {
     public void encodeException(SymbolicException ex) {
         buf.putInt(ex.getClassId());
         buf.putString(ex.getMessage());
+
+        SymbolicStackElement[] stackTrace = ex.getStackTrace();
+        buf.putShort(stackTrace.length);
+
+        for (SymbolicStackElement el : stackTrace) {
+            buf.putInt(el.getClassId());
+            buf.putInt(el.getMethodId());
+            buf.putInt(el.getFileId());
+            buf.putInt(el.getLineNum());
+        }
+
+        if (ex.getCause() != null) {
+            buf.putByte(CAUSE_EXCEPTION);
+            encodeException(ex.getCause());
+        } else {
+            buf.putByte(NO_EXCEPTION);
+        }
     }
 
 
@@ -239,6 +372,26 @@ public class SimpleTraceFormat extends TraceEventHandler {
      * @return (synthetic) symbolic exception representation.
      */
     public SymbolicException decodeException() {
-        return new SymbolicException(buf.getInt(), buf.getString());
+        int classId = buf.getInt();
+        String message = buf.getString();
+
+        int stackLen = buf.getShort();
+        SymbolicStackElement[] stack = new SymbolicStackElement[stackLen];
+
+        for (int i = 0; i < stackLen; i++) {
+            stack[i] = new SymbolicStackElement(buf.getInt(), buf.getInt(), buf.getInt(), buf.getInt());
+        }
+
+        int stop = buf.getByte();
+
+        SymbolicException cause;
+
+        if (stop == CAUSE_EXCEPTION) {
+            cause = decodeException();
+        } else {
+            cause = null;
+        }
+
+        return new SymbolicException(classId, message, stack, cause);
     }
 }

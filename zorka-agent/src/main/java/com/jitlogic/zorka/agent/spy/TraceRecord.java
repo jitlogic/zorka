@@ -16,8 +16,10 @@
 
 package com.jitlogic.zorka.agent.spy;
 
+import com.jitlogic.zorka.common.Submittable;
+import com.jitlogic.zorka.common.SymbolRegistry;
+import com.jitlogic.zorka.common.SymbolicException;
 import com.jitlogic.zorka.common.TraceEventHandler;
-import com.jitlogic.zorka.common.TracedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,11 +33,19 @@ import java.util.Map;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TraceRecord {
+public class TraceRecord implements Submittable {
 
     /** Overflow record will be discarded regardless of method execution time and other conditions. */
     public static final int OVERFLOW_FLAG = 0x0001;
+
+    /** Indicates that new trace has been started from here. */
     public static final int TRACE_BEGIN   = 0x0002;
+
+    /** Exception thrown from method called from frame hasn't been handled and has been thrown out of current frame. */
+    public static final int EXCEPTION_PASS = 0x0004;
+
+    /** Exception thrown from method called current frame has been wrapped and thrown out of current frame. */
+    public static final int EXCEPTION_WRAP = 0x0008;
 
     /** Class ID refers to class name in symbol registry. */
     private int classId;
@@ -63,7 +73,7 @@ public class TraceRecord {
     private TraceMarker marker;
 
     /** Exception caught on method exit (if any) */
-    private TracedException exception;
+    private Object exception;
 
     /** Parent trace record represents information about method execution from which current method execution was called. */
     private TraceRecord parent;
@@ -225,12 +235,12 @@ public class TraceRecord {
     }
 
 
-    public TracedException getException() {
+    public Object getException() {
         return exception;
     }
 
 
-    public void setException(TracedException exception) {
+    public void setException(Object exception) {
         this.exception = exception;
     }
 
@@ -277,14 +287,15 @@ public class TraceRecord {
      *
      * @param output output handler object
      */
+    @Override
     public void traverse(TraceEventHandler output) {
 
         if (hasFlag(TRACE_BEGIN)) {
-            output.traceBegin(marker.getTraceId(), getClock());
+            output.traceBegin(marker.getTraceId(), getClock(), marker != null ? marker.getFlags() : 0);
         }
 
         output.traceEnter(classId, methodId, signatureId, 0);
-        output.traceStats(calls, errors, marker != null ? marker.getFlags() : 0);
+        output.traceStats(calls, errors, flags);
 
         if (attrs != null) {
             for (Map.Entry<Integer,Object> entry : attrs.entrySet()) {
@@ -319,7 +330,7 @@ public class TraceRecord {
         classId = methodId = signatureId = 0;
         attrs = null;
         children = null;
-        marker = null;
+        marker = parent != null ? parent.getMarker() : null;
         calls = errors = 0;
         flags = 0;
     }
@@ -355,5 +366,18 @@ public class TraceRecord {
      */
     public boolean isEmpty() {
         return classId == 0;
+    }
+
+    public void fixup(SymbolRegistry symbols) {
+
+        if (children != null) {
+            for (TraceRecord child : children) {
+                child.fixup(symbols);
+            }
+        }
+
+        if (exception instanceof Throwable) {
+            exception = new SymbolicException((Throwable)exception, symbols, 0 == (flags & EXCEPTION_WRAP));
+        }
     }
 }

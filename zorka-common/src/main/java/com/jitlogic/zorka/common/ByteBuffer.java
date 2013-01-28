@@ -191,7 +191,7 @@ public class ByteBuffer {
 
 
     /**
-     * Writes 64-bit value to a buffer.
+     * Writes 64-bit value to the buffer.
      *
      * @param l value to be written.
      */
@@ -208,6 +208,46 @@ public class ByteBuffer {
         buf[pos++] = (byte) (l >> 16);
         buf[pos++] = (byte) (l >> 8);
         buf[pos++] = (byte) (l >> 0);
+    }
+
+
+    /**
+     * Reads single precision floating point value.
+     *
+     * @return double value
+     */
+    public float getFloat() {
+        return Float.intBitsToFloat(getInt());
+    }
+
+
+    /**
+     * Writes double precision floating point value the buffer.
+     *
+     * @param f value to be written
+     */
+    public void putFloat(float f) {
+        putInt(Float.floatToIntBits(f));
+    }
+
+
+    /**
+     * Reads double precision floating point value.
+     *
+     * @return double value
+     */
+    public double getDouble() {
+        return Double.longBitsToDouble(getLong());
+    }
+
+
+    /**
+     * Writes double precision floating point value the buffer.
+     *
+     * @param d double
+     */
+    public void putDouble(double d) {
+        putLong(Double.doubleToLongBits(d));
     }
 
 

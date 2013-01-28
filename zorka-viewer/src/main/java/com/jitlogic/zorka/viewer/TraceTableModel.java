@@ -18,25 +18,23 @@ package com.jitlogic.zorka.viewer;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import java.util.ArrayList;
-import java.util.List;
 
-public class TraceAttrTableModel extends AbstractTableModel {
+public class TraceTableModel extends AbstractTableModel {
 
-    private List<String[]> rows = new ArrayList<String[]>();
+    private String[] colNames = { "Date", "Time", "Calls", "Err", "Label" };
+    private int[]    colWidth = { 75, 50, 50, 50, 150 };
 
-    private String[] colNames = { "Key", "Value" };
-    private int[] colWidth    = { 150, 1000 };
+    private TraceSet traceSet = new TraceSet();
+
+    public void setTraceSet(TraceSet traceSet) {
+        this.traceSet = traceSet;
+        fireTableDataChanged();
+    }
 
     public void adjustColumns(JTable table) {
         for (int i = 0; i < colWidth.length; i++) {
             table.getColumnModel().getColumn(i).setPreferredWidth(colWidth[i]);
         }
-    }
-
-    public void setRows(List<String[]> rows) {
-        this.rows = rows;
-        fireTableDataChanged();
     }
 
     @Override
@@ -46,16 +44,30 @@ public class TraceAttrTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return rows.size();
+        return traceSet.size();
     }
 
     @Override
     public int getColumnCount() {
-        return colNames.length;
+        return colWidth.length;
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        return rows.get(rowIndex)[columnIndex];
+        NamedTraceRecord el = traceSet.get(rowIndex);
+
+        switch (columnIndex) {
+            case 0:
+                return el.prettyClock();
+            case 1:
+                return ViewerUtil.nanoSeconds(el.getTime());
+            case 2:
+                return el.getCalls();
+            case 3:
+                return el.getErrors();
+            case 4:
+                return el.getTraceName();
+        }
+        return "?";
     }
 }

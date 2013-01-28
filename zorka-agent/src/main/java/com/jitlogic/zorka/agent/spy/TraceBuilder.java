@@ -31,8 +31,9 @@ public class TraceBuilder extends TraceEventHandler {
 
 
     /** Output */
-    private ZorkaAsyncThread<TraceRecord> output;
+    private ZorkaAsyncThread<Submittable> output;
 
+    private SymbolRegistry symbols;
 
     /** Top of trace records stack. */
     private TraceRecord ttop = new TraceRecord(null);
@@ -47,13 +48,14 @@ public class TraceBuilder extends TraceEventHandler {
      *
      * @param output object completed traces will be submitted to
      */
-    public TraceBuilder(ZorkaAsyncThread<TraceRecord> output) {
+    public TraceBuilder(ZorkaAsyncThread<Submittable> output, SymbolRegistry symbols) {
         this.output = output;
+        this.symbols = symbols;
     }
 
 
     @Override
-    public void traceBegin(int traceId, long clock) {
+    public void traceBegin(int traceId, long clock, int flags) {
 
         if (ttop == null) {
             if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_TRACE_ERRORS)) {
@@ -70,6 +72,7 @@ public class TraceBuilder extends TraceEventHandler {
         } else {
             ttop.setMarker(new TraceMarker(ttop, traceId, clock));
             ttop.markFlag(TraceRecord.TRACE_BEGIN);
+            ttop.getMarker().markFlag(flags);
         }
     }
 
@@ -116,7 +119,7 @@ public class TraceBuilder extends TraceEventHandler {
 
 
     @Override
-    public void traceError(TracedException exception, long tstamp) {
+    public void traceError(Object exception, long tstamp) {
 
         while (!(ttop.getClassId() != 0) && ttop.getParent() != null) {
             ttop = ttop.getParent();
@@ -145,6 +148,18 @@ public class TraceBuilder extends TraceEventHandler {
         ttop.setAttr(attrId, attrVal);
     }
 
+    @Override
+    public void longVals(long clock, int objId, int[] components, long[] values) {
+    }
+
+    @Override
+    public void intVals(long clock, int objId, int[] components, int[] values) {
+    }
+
+    @Override
+    public void doubleVals(long clock, int objId, int[] components, double[] values) {
+    }
+
 
     /**
      * This method it called at method return (normal or error). In general it pops current
@@ -159,39 +174,68 @@ public class TraceBuilder extends TraceEventHandler {
 
         TraceRecord parent = ttop.getParent();
 
+        // Get rid of redundant exception object
+        if (ttop.getException() != null && ttop.numChildren() > 0) {
+            Throwable tex = (Throwable)ttop.getException();
+            Throwable cex = (Throwable)ttop.getChild(ttop.numChildren()-1).getException();
+            if (cex == tex) {
+                ttop.setException(null);
+                ttop.markFlag(TraceRecord.EXCEPTION_PASS);
+            } else if (cex == tex.getCause()) {
+                ttop.markFlag(TraceRecord.EXCEPTION_WRAP);
+            }
+        }
+
+        // Submit data if trace marker found
         if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {
-            if (ttop.getTime() >= ttop.getMarker().getMinimumTime()) {
-                output.submit(ttop);
+            if (ttop.getTime() >= ttop.getMarker().getMinimumTime()
+                    || 0 != (ttop.getMarker().getFlags() & TraceMarker.ALWAYS_SUBMIT)) {
+                submit(ttop);
                 clean = false;
             }
 
 
             if (parent != null) {
-                parent.getMarker().setFlags(ttop.getMarker().getFlags());
+                parent.getMarker().inheritFlags(ttop.getMarker().getFlags());
             }
         }
 
+        // Determine how the top of stack should be rolled back
         if (parent != null) {
-            if ((ttop.getTime() > Tracer.getMinMethodTime() || ttop.getErrors() > 0)) {
+            if ((ttop.getTime() > Tracer.getMinMethodTime() || ttop.getErrors() > 0)
+                    || 0 != (ttop.getMarker().getFlags() & TraceMarker.ALL_METHODS)) {
+
+
                 if (!ttop.hasFlag(TraceRecord.OVERFLOW_FLAG)) {
                     parent.addChild(ttop);
-                    clean = false;
                 } else {
                     parent.getMarker().markFlag(TraceMarker.OVERFLOW_FLAG);
-                    clean = false;
                 }
+                clean = false;
             }
             parent.setCalls(parent.getCalls() + ttop.getCalls());
             parent.setErrors(parent.getErrors() + ttop.getErrors());
         }
 
+
         if (clean) {
             ttop.clean();
             numRecords--;
         } else {
-            ttop = parent != null ? parent : new TraceRecord(null);
+            if (parent != null) {
+                ttop = parent;
+            } else {
+                ttop = new TraceRecord(null);
+                numRecords = 0;
+            }
         }
 
+    }
+
+
+    private void submit(TraceRecord record) {
+        record.fixup(symbols);
+        output.submit(record);
     }
 
 
@@ -205,6 +249,13 @@ public class TraceBuilder extends TraceEventHandler {
     public void setMinimumTraceTime(long minimumTraceTime) {
         if (ttop.inTrace()) {
             ttop.getMarker().setMinimumTime(minimumTraceTime);
+        }
+    }
+
+
+    public void markTraceFlag(int flag) {
+        if (ttop.getMarker() != null) {
+            ttop.getMarker().markFlag(flag);
         }
     }
 

@@ -29,14 +29,18 @@ import com.jitlogic.zorka.common.*;
  */
 public class SymbolEnricher extends TraceEventHandler {
 
+
     /** Logger object */
     private static final ZorkaLog log = ZorkaLogger.getLog(SymbolEnricher.class);
+
 
     /** Symbol ID bit mask. Zeroed bits in this mask mark symbols that are not yet known to receiver. */
     BitVector bitVector = new BitVector();
 
+
     /** Symbol registry used by event sender. */
     private SymbolRegistry symbols;
+
 
     /** Event receiver (output) object. */
     private TraceEventHandler output;
@@ -86,9 +90,9 @@ public class SymbolEnricher extends TraceEventHandler {
 
 
     @Override
-    public void traceBegin(int traceId, long clock) {
+    public void traceBegin(int traceId, long clock, int flags) {
         check(traceId);
-        output.traceBegin(traceId, clock);
+        output.traceBegin(traceId, clock, flags);
     }
 
 
@@ -108,13 +112,21 @@ public class SymbolEnricher extends TraceEventHandler {
 
 
     @Override
-    public void traceError(TracedException exception, long tstamp) {
-        if (exception instanceof WrappedException) {
-            SymbolicException sex = new SymbolicException(((WrappedException) exception).getException(), symbols);
-            check(sex.getClassId());
-            output.traceError(sex, tstamp);
-        } else {
+    public void traceError(Object exception, long tstamp) {
+            checkSymbolicException((SymbolicException)exception);
             output.traceError(exception, tstamp);
+    }
+
+    private void checkSymbolicException(SymbolicException sex) {
+        check(sex.getClassId());
+        for (SymbolicStackElement sse : sex.getStackTrace()) {
+            check(sse.getClassId());
+            check(sse.getMethodId());
+            check(sse.getFileId());
+        }
+
+        if (sex.getCause() != null) {
+            checkSymbolicException(sex.getCause());
         }
     }
 
@@ -135,5 +147,29 @@ public class SymbolEnricher extends TraceEventHandler {
     public void newAttr(int attrId, Object attrVal) {
         check(attrId);
         output.newAttr(attrId, attrVal);
+    }
+
+    @Override
+    public void longVals(long clock, int objId, int[] components, long[] values) {
+        check(objId);
+        for (int component : components) {
+            check(component);
+        }
+    }
+
+    @Override
+    public void intVals(long clock, int objId, int[] components, int[] values) {
+        check(objId);
+        for (int component : components) {
+            check(component);
+        }
+    }
+
+    @Override
+    public void doubleVals(long clock, int objId, int[] components, double[] values) {
+        check(objId);
+        for (int component : components) {
+            check(component);
+        }
     }
 }

@@ -25,6 +25,12 @@ public class TraceMarker {
     /** Overflow flag (set if some records in current trace have been skipped). */
     public static final int OVERFLOW_FLAG = 0x01;
 
+    public static final int ALWAYS_SUBMIT = 0x02;
+
+    public static final int ALL_METHODS = 0x04;
+
+    public static final int ALL_ON_EXCEPTION = 0x08;
+
     /** Trace ID (refers to symbol containing trace name) */
     private int traceId;
 
@@ -84,8 +90,14 @@ public class TraceMarker {
         return flags;
     }
 
+
     public void setFlags(int flags) {
         this.flags = flags;
+    }
+
+
+    public void inheritFlags(int flags) {
+        this.flags |= flags & OVERFLOW_FLAG;
     }
 
 
