@@ -17,7 +17,12 @@
 
 package com.jitlogic.zorka.agent.integ;
 
+import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
+import com.jitlogic.zorka.agent.rankproc.QueryDef;
+import com.jitlogic.zorka.agent.rankproc.QueryLister;
+import com.jitlogic.zorka.agent.rankproc.QueryResult;
 import com.jitlogic.zorka.common.JmxObject;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaLib;
@@ -46,6 +51,7 @@ public class ZabbixLib {
 
     private Map<String,ZabbixTrapper> trappers = new ConcurrentHashMap<String, ZabbixTrapper>();
 
+
     /**
      * Creates  new zabbix library module
      *
@@ -56,6 +62,33 @@ public class ZabbixLib {
     public ZabbixLib(ZorkaBshAgent bshAgent, ZorkaLib zorkaLib) {
         this.bshAgent = bshAgent;
         this.zorkaLib = zorkaLib;
+    }
+
+
+    /**
+     * Zabbix discovery function using JMX query framework
+     *
+     * @param qdefs queries
+     *
+     * @return JSON object describing discovered objects
+     */
+    public JSONObject discovery(QueryDef...qdefs) {
+        JSONArray data = new JSONArray();
+        MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
+
+        for (QueryDef qdef : qdefs) {
+            for (QueryResult result : new QueryLister(registry, qdef).list()) {
+                JSONObject item = new JSONObject();
+                for (Map.Entry<String,Object> e : result.attrSet()) {
+                    item.put("{#" + e.getKey().toUpperCase().replace("-", "") + "}", e.getValue().toString());
+                }
+                data.add(item);
+            }
+        }
+
+        JSONObject discoveries = new JSONObject();
+        discoveries.put("data", data);
+        return discoveries;
     }
 
     /**

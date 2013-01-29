@@ -18,8 +18,8 @@ package com.jitlogic.zorka.agent.rankproc;
 
 import com.jitlogic.zorka.common.SymbolRegistry;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
+
 
 public class QueryResult {
 
@@ -54,6 +54,10 @@ public class QueryResult {
         return attrs != null ? attrs.get(key) : null;
     }
 
+
+    public Set<Map.Entry<String,Object>> attrSet() {
+        return attrs != null ? attrs.entrySet() : new HashSet<Map.Entry<String, Object>>(1);
+    }
 
     public int getComponentId(SymbolRegistry symbols) {
         String path = getAttrPath();

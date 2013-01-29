@@ -101,6 +101,16 @@ public class ZabbixDiscoveryUnitTest extends ZorkaFixture {
 
     // TODO zabbix discovery algorithm is quite complicated and thus it must be tested thoroughly.
 
+    @Test
+    public void testDiscoveryUsingQueryFramework() throws Exception {
+        makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
+        makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);
+
+        JSONObject obj = zabbixLib.discovery(zorka.jmxQuery("test", "test:type=TestJmx,*","name"));
+        assertTrue("Must return JSONObject", obj instanceof JSONObject);
+        JSONArray data = (JSONArray)obj.get("data");
+        assertTrue("Must return more than 1 item", data.size() > 1);
+    }
 
     private TestJmx makeTestJmx(String name, long nom, long div) throws Exception {
         TestJmx bean = new TestJmx();

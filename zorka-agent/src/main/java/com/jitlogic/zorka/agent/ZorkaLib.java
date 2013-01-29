@@ -729,6 +729,12 @@ public class ZorkaLib  {
      * @param interval run interval (in milliseconds)
      */
     public void schedule(Runnable task, long interval) {
+        // TODO
+    }
 
+
+
+    public QueryDef jmxQuery(String mbsName, String query, String... attrs) {
+        return new QueryDef(mbsName, query, attrs);
     }
 }
