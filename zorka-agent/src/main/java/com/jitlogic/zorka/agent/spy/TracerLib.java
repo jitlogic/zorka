@@ -30,6 +30,8 @@ public class TracerLib {
     private Tracer tracer;
     private SymbolRegistry symbols;
 
+    private int defaultTraceFlags = TraceMarker.DROP_INTERIM;
+
 
     public TracerLib(SpyInstance instance) {
         this.instance = instance;
@@ -92,7 +94,7 @@ public class TracerLib {
      * @return spy processor object marking new trace
      */
     public SpyProcessor traceBegin(String name, long minimumTraceTime) {
-        return traceBegin(name, minimumTraceTime, TraceMarker.DROP_INTERIM);
+        return traceBegin(name, minimumTraceTime, defaultTraceFlags);
     }
 
 
@@ -189,6 +191,10 @@ public class TracerLib {
         Tracer.setMaxTraceRecords(maxRecords);
     }
 
+
+    public void setDefaultTraceFlags(int flags) {
+        this.defaultTraceFlags = flags;
+    }
 
     public JmxAttrScanner jmxScanner(String name, TraceEventHandler output, QueryLister...listers) {
         return new JmxAttrScanner(symbols, name, output, listers);
