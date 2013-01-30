@@ -35,6 +35,9 @@ public class NamedTraceRecord {
     /** Exception thrown from method called current frame has been wrapped and thrown out of current frame. */
     public static final int EXCEPTION_WRAP = 0x0008;
 
+    /** Indicates that parent method has been dropped due to short execution time. */
+    public static final int DROPPED_PARENT = 0x0010;
+
     private String traceName, className, methodName, methodSignature;
     private long clock;
 
