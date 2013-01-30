@@ -207,7 +207,17 @@ public class TraceBuilder extends TraceEventHandler {
 
 
                 if (!ttop.hasFlag(TraceRecord.OVERFLOW_FLAG)) {
-                    parent.addChild(ttop);
+                    // Drop interim record if necessary
+                    if (ttop.getMarker().hasFlag(TraceMarker.DROP_INTERIM) && ttop.isSafeInterim()
+                        && ttop.getTime() - ttop.getChild(0).getTime() < Tracer.getMinMethodTime()) {
+                        TraceRecord child = ttop.getChild(0);
+                        child.setCalls(ttop.getCalls());
+                        child.setErrors(ttop.getErrors());
+                        child.markFlag(TraceRecord.DROPPED_PARENT);
+                        parent.addChild(child);
+                    } else {
+                        parent.addChild(ttop);
+                    }
                 } else {
                     parent.getMarker().markFlag(TraceMarker.OVERFLOW_FLAG);
                 }

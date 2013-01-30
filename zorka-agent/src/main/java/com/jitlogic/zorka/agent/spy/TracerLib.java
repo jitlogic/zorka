@@ -92,7 +92,7 @@ public class TracerLib {
      * @return spy processor object marking new trace
      */
     public SpyProcessor traceBegin(String name, long minimumTraceTime) {
-        return traceBegin(name, minimumTraceTime, 0);
+        return traceBegin(name, minimumTraceTime, TraceMarker.DROP_INTERIM);
     }
 
 
