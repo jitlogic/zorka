@@ -201,7 +201,7 @@ public class AgentInstance {
             log.info("Enabling ZABBIX subsystem ...");
             zabbixAgent = new ZabbixAgent(zorkaAgent);
             zabbixAgent.start();
-            zabbixLib = new ZabbixLib(zorkaAgent,  zorkaAgent.getZorkaLib());
+            zabbixLib = new ZabbixLib();
             zorkaAgent.install("zabbix", zabbixLib);
         }
 
