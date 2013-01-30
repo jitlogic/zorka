@@ -79,7 +79,7 @@ public class QueryDef {
 
     public QueryDef list(String regex) {
         Pattern pattern = regex.startsWith("~") ? Pattern.compile(regex.substring(1))
-                : Pattern.compile("^"+regex.replace("**", "[^\\.]+").replace("*", ".+")+"$");
+                : Pattern.compile("^"+regex.replace("**", ".+").replace("*", "[^\\.]+")+"$");
 
         return withSegs(new QuerySegment(pattern));
     }
@@ -87,7 +87,7 @@ public class QueryDef {
 
     public QueryDef list(String regex, String template) {
         Pattern pattern = regex.startsWith("~") ? Pattern.compile(regex.substring(1))
-                : Pattern.compile("^"+regex.replace("**", "[^\\.]+").replace("*", ".+")+"$");
+                : Pattern.compile("^"+regex.replace("**", ".+").replace("*", "[^\\.]+")+"$");
 
         return withSegs(new QuerySegment(pattern, template));
     }
