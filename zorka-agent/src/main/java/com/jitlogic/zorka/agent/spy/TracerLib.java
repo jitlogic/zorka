@@ -16,8 +16,10 @@
 
 package com.jitlogic.zorka.agent.spy;
 
+import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.rankproc.JmxAttrScanner;
+import com.jitlogic.zorka.agent.rankproc.QueryDef;
 import com.jitlogic.zorka.agent.rankproc.QueryLister;
 import com.jitlogic.zorka.common.Submittable;
 import com.jitlogic.zorka.common.SymbolRegistry;
@@ -240,13 +242,15 @@ public class TracerLib {
      * Creates new JMX metrics scanner object. Scanner objects are responsible for scanning
      * selected values accessible via JMX and
      *
-     * @param name
-     * @param output
-     * @param listers
+     * @param name scanner name
+     *
+     * @param output output handler (eg. file)
+     *
+     * @param qdefs queries
      * @return
      */
-    public JmxAttrScanner jmxScanner(String name, TraceEventHandler output, QueryLister...listers) {
-        return new JmxAttrScanner(symbols, name, output, listers);
+    public JmxAttrScanner jmxScanner(String name, TraceEventHandler output, QueryDef...qdefs) {
+        return new JmxAttrScanner(symbols, name, output, AgentInstance.getMBeanServerRegistry(), qdefs);
     }
 
 }

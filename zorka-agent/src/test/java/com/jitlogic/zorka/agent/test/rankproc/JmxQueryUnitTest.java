@@ -127,7 +127,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     public void testJmxAttrScannerSimpleRun() throws Exception {
         TestTracer output = new TestTracer();
         JmxAttrScanner scanner = tracer.jmxScanner("TEST", output,
-            new QueryLister(mBeanServerRegistry, new QueryDef("test", "test:type=TestJmx,*", "name").list("*", "Attr")));
+            new QueryDef("test", "test:type=TestJmx,*", "name"));
         scanner.runCycle(100);
         Assert.assertEquals(1, output.size());
         int[] ids = (int[])output.get(0, "components");
