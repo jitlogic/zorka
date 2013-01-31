@@ -24,15 +24,30 @@ import com.jitlogic.zorka.common.SymbolRegistry;
 import com.jitlogic.zorka.common.TraceEventHandler;
 import com.jitlogic.zorka.common.ZorkaAsyncThread;
 
+/**
+ * Tracer library contains functions for configuring and using tracer.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class TracerLib {
 
+    /** Reference to spy instance */
     private SpyInstance instance;
+
+    /** Reference to tracer instance */
     private Tracer tracer;
+
+    /** Reference to symbol registry */
     private SymbolRegistry symbols;
 
+    /** Default trace flags */
     private int defaultTraceFlags = TraceMarker.DROP_INTERIM;
 
-
+    /**
+     * Creates tracer library object.
+     *
+     * @param instance reference to spy instance
+     */
     public TracerLib(SpyInstance instance) {
         this.instance = instance;
         this.tracer = this.instance.getTracer();
@@ -115,10 +130,12 @@ public class TracerLib {
 
 
     /**
-     * Attaches attribute to trace record.
+     * Creates spy processor that attaches attribute to trace record.
      *
      * @param srcField source field name (from spy record)
+     *
      * @param dstAttr destination attribute name (in trace data)
+     *
      * @return spy processor object adding new trace attribute
      */
     public SpyProcessor traceAttr(String srcField, String dstAttr) {
@@ -126,12 +143,28 @@ public class TracerLib {
     }
 
 
+    /**
+     * Creates spy processor that sets flags in trace marker.
+     *
+     * @param flags flags to set
+     *
+     * @return spy processor object
+     */
     public SpyProcessor traceFlags(int flags) {
         return new TraceFlagsProcessor(instance.getTracer(), null, flags);
     }
 
 
-    public SpyProcessor traceFLags(String srcField, int flags) {
+    /**
+     * Creates spy processor that sets flags in trace marker only if given record field is null.
+     *
+     * @param srcField spy record field to be checked
+     *
+     * @param flags flags to set
+     *
+     * @return spy processor object
+     */
+    public SpyProcessor traceFlags(String srcField, int flags) {
         return new TraceFlagsProcessor(instance.getTracer(), srcField, flags);
     }
 
@@ -192,10 +225,26 @@ public class TracerLib {
     }
 
 
+    /**
+     * Sets default trace marker flags. This setting will be used when beginning new traces
+     * without supplying initial flags.
+     *
+     * @param flags trace flags
+     */
     public void setDefaultTraceFlags(int flags) {
         this.defaultTraceFlags = flags;
     }
 
+
+    /**
+     * Creates new JMX metrics scanner object. Scanner objects are responsible for scanning
+     * selected values accessible via JMX and
+     *
+     * @param name
+     * @param output
+     * @param listers
+     * @return
+     */
     public JmxAttrScanner jmxScanner(String name, TraceEventHandler output, QueryLister...listers) {
         return new JmxAttrScanner(symbols, name, output, listers);
     }

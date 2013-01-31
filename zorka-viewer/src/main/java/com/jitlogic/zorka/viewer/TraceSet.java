@@ -18,6 +18,7 @@ package com.jitlogic.zorka.viewer;
 
 import com.jitlogic.zorka.common.SimpleTraceFormat;
 import com.jitlogic.zorka.common.SymbolRegistry;
+import com.jitlogic.zorka.common.SymbolicException;
 import com.jitlogic.zorka.common.TraceEventHandler;
 
 import java.io.*;
@@ -26,11 +27,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Represents set of traces read from single trace file.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class TraceSet extends TraceEventHandler {
 
+    /** Symbol map */
     private Map<Integer,String> symbols = new HashMap<Integer, String>(4096);
+
+    /** List of root records of all traces */
     private List<NamedTraceRecord> traces = new ArrayList<NamedTraceRecord>();
 
+    /** Top of record stack (used by loading process, obsolete after load process ends) */
     private NamedTraceRecord top = new NamedTraceRecord(null);
 
 
@@ -65,7 +75,7 @@ public class TraceSet extends TraceEventHandler {
 
     @Override
     public void traceError(Object exception, long tstamp) {
-        top.setException(exception);
+        top.setException((SymbolicException)exception);
         top.setTime(tstamp-top.getTime());
         pop();
     }
@@ -106,6 +116,10 @@ public class TraceSet extends TraceEventHandler {
     }
 
 
+    /**
+     * Pops record from loader stack. Adds record to its parent child list
+     * or adds record to list of loaded traces and calculates missing parameters.
+     */
     private void pop() {
         if (top.getParent() != null) {
             top.getParent().addChild(top);
@@ -118,18 +132,36 @@ public class TraceSet extends TraceEventHandler {
     }
 
 
+    /**
+     * Returns number of loaded traces.
+     *
+     * @return number of loaded traces
+     */
     public int size() {
         return traces.size();
     }
 
 
+    /**
+     * Returns root record of i-th trace.
+     *
+     * @param i trace index
+     *
+     * @return root record of i-th trace
+     */
     public NamedTraceRecord get(int i) {
         return traces.get(i);
     }
 
 
+    /**
+     * Loads data from trace file.
+     *
+     * @param f file path
+     */
     public void load(File f) {
         traces.clear();
+        symbols.clear();
         if (f.canRead()) {
             InputStream is = null;
             try {
@@ -156,6 +188,11 @@ public class TraceSet extends TraceEventHandler {
         }
     }
 
+    /**
+     * Returns symbol map.
+     *
+     * @return symbol map
+     */
     public Map<Integer,String> getSymbols() {
         return symbols;
     }

@@ -16,11 +16,17 @@
 
 package com.jitlogic.zorka.viewer;
 
+import com.jitlogic.zorka.common.SymbolicException;
 import org.objectweb.asm.Type;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * Trace record representation used by viewer application.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class NamedTraceRecord {
 
     /** Overflow record will be discarded regardless of method execution time and other conditions. */
@@ -38,26 +44,42 @@ public class NamedTraceRecord {
     /** Indicates that parent method has been dropped due to short execution time. */
     public static final int DROPPED_PARENT = 0x0010;
 
+    /** Trace and method info */
     private String traceName, className, methodName, methodSignature;
+
+    /** Wall clock time (set only in records marking beginning of a trace. */
     private long clock;
 
+    /** Execution time (in nanoseconds) */
     private long time;
+
+    /** Number of subordinate method calls (and errors) */
     private long errors, calls;
+
+    /** Record flags and additional information (added by viewer loader) */
     private int flags, level, records;
+
+    /** Trace marker flags */
     private int traceFlags;
 
+    /** Parent record */
     private NamedTraceRecord parent;
+
+    /** Subordinate method call records */
     private List<NamedTraceRecord> children;
+
+    /** Additional attributes */
     private Map<String,Object> attrs;
 
-    private Object exception;
+    /** Exception object (if any) */
+    private SymbolicException exception;
 
+    /** Execution time percentage (of whole trace) */
     private double timePct;
 
     public NamedTraceRecord(NamedTraceRecord parent) {
         this.parent = parent;
     }
-
 
     public NamedTraceRecord getParent() {
         return parent;
@@ -166,7 +188,7 @@ public class NamedTraceRecord {
     }
 
 
-    public void setException(Object exception) {
+    public void setException(SymbolicException exception) {
         this.exception = exception;
     }
 
@@ -184,11 +206,25 @@ public class NamedTraceRecord {
     }
 
 
+    /**
+     * Returns attribute value (and guards against null attribute dictionary)
+     *
+     * @param attrName attribute name
+     *
+     * @return attribute value
+     */
     public Object getAttr(String attrName) {
         return attrs != null ? attrs.get(attrName) : null;
     }
 
 
+    /**
+     * Sets attribute value (and guards against null attribute dictionary)
+     *
+     * @param attrName attribute name
+     *
+     * @param attrVal attribute value
+     */
     public void setAttr(String attrName, Object attrVal) {
         if (attrs == null) {
             attrs = new HashMap<String,Object>();
@@ -197,15 +233,30 @@ public class NamedTraceRecord {
     }
 
 
+    /**
+     * Returns attribute map (or empty map if attribute dictionary is null)
+     *
+     * @return attribute map
+     */
     public Map<String,Object> getAttrs() {
         return Collections.unmodifiableMap(attrs != null ? attrs : new HashMap<String, Object>());
     }
 
+    /**
+     * Returns number of attached attributes
+     *
+     * @return number of attached attributes
+     */
     public int numAttrs() {
         return attrs != null ? attrs.size() : 0;
     }
 
 
+    /**
+     * Adds child record (and creates list of children if null)
+     *
+     * @param child child record
+     */
     public void addChild(NamedTraceRecord child) {
         if (children == null) {
             children = new ArrayList<NamedTraceRecord>();
@@ -214,31 +265,66 @@ public class NamedTraceRecord {
     }
 
 
+    /**
+     * Returns child record (or null if none exists)
+     *
+     * @param n index
+     *
+     * @return child trace record
+     */
     public NamedTraceRecord getChild(int n) {
         return (children != null && n < children.size()) ? children.get(n) : null;
     }
 
 
+    /**
+     * Returns number of child trace records
+     *
+     * @return number of child trace records
+     */
     public int numChildren() {
         return children != null ? children.size() : 0;
     }
 
 
+    /**
+     * Returns list of child trace records (or empty list if none found)
+     *
+     * @return list of child trace records
+     */
     public List<NamedTraceRecord> getChildren() {
         return Collections.unmodifiableList(children != null ? children : new ArrayList<NamedTraceRecord>(1));
     }
 
+    /** Print short class name */
     public static final int PS_SHORT_CLASS = 0x01;
+
+    /** Print result type */
     public static final int PS_RESULT_TYPE = 0x02;
+
+    /** Print short argument types */
     public static final int PS_SHORT_ARGS  = 0x04;
+
+    /** Omits arguments overall in pretty pring */
     public static final int PS_NO_ARGS     = 0x08;
 
-
+    /**
+     * Returns human readable method description (with default flags)
+     *
+     * @return method description string
+     */
     public String prettyPrint() {
         return prettyPrint(PS_RESULT_TYPE|PS_SHORT_ARGS);
     }
 
 
+    /**
+     * Returns human readable method description (configurable with supplied flags)
+     *
+     * @param style style flags (see PS_* constants)
+     *
+     * @return method description string
+     */
     public String prettyPrint(int style) {
         StringBuffer sb = new StringBuffer(128);
 
@@ -283,11 +369,24 @@ public class NamedTraceRecord {
     }
 
 
+    /**
+     * Returns human readable version of clock attribute
+     *
+     * @return human readable trace begin time
+     */
     public String prettyClock() {
         return new SimpleDateFormat("hh:mm:ss.SSS").format(getClock());
     }
 
 
+    /**
+     * Calculates method execution time percentage and recursion level
+     * for this record and all children recursively
+     *
+     * @param total total trace execution time
+     *
+     * @param level recursion level of parent method
+     */
     public void fixup(long total, int level) {
         timePct = 100.0 * this.time / total;
         this.level = level;
@@ -302,20 +401,11 @@ public class NamedTraceRecord {
     }
 
 
-    public void scanAttrs(List<String[]> result) {
-        if (attrs != null) {
-            for (Map.Entry e : attrs.entrySet()) {
-                result.add(new String[] { e.getKey().toString(), ""+e.getValue()});
-            }
-        }
-
-        if (children != null) {
-            for (NamedTraceRecord rec : children) {
-                rec.scanAttrs(result);
-            }
-        }
-    }
-
+    /**
+     * Creates flat-list representation of trace record tree.
+     *
+     * @param result list object to be populated
+     */
     public void scanRecords(List<NamedTraceRecord> result) {
         result.add(this);
 

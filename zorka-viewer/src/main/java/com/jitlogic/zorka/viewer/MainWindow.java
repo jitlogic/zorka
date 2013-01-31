@@ -16,7 +16,6 @@
 
 package com.jitlogic.zorka.viewer;
 
-import java.util.List;
 import java.awt.*;
 import javax.swing.*;
 
@@ -24,31 +23,48 @@ import java.awt.event.KeyEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 import javax.swing.border.EmptyBorder;
 
+/**
+ * Zorka Viewer main window.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class MainWindow extends JFrame {
 
+    /** Contains loaded traces */
     private TraceSet traceSet = new TraceSet();
 
+    /** Content pane */
     private JPanel contentPane;
 
+    /** This table lists loaded traces. */
     private JTable tblTraces;
+
+    /** Table model for tblTraces */
     private TraceTableModel tbmTraces = new TraceTableModel();
 
+    /** Tabbed pane containing various views depicting trace details. */
+    private JTabbedPane tabDetail;
+
+    /** This table lists method call tree of a selected trace. */
     private JTable tblTraceDetail;
+
+    /** Table model for tblTraceDetail */
     private TraceDetailTableModel tbmTraceDetail;
 
+    /** This view contains stack trace of currently selected method call trace record */
     private ErrorDetailView pnlStackTrace;
 
+    /** Help action: displays help window. */
     private Action actHelp = new AbstractAction("Help [F1]",  ResourceManager.getIcon16x16("help")) {
         @Override public void actionPerformed(ActionEvent e) {
 
         }
     };
 
-
+    /** Open action: opens file chooser dialog and loads trace file (if user selects and chooses to open it) */
     private Action actOpen = new AbstractAction("Open [F3]", ResourceManager.getIcon16x16("file-open")) {
         @Override public void actionPerformed(ActionEvent e) {
             JFileChooser chooser = new JFileChooser();
@@ -61,22 +77,27 @@ public class MainWindow extends JFrame {
         }
     };
 
-
+    /** Quit action: closes viewer */
     private Action actQuit = new AbstractAction("Quit [F3]", ResourceManager.getIcon16x16("file-quit")) {
         @Override public void actionPerformed(ActionEvent e) {
             MainWindow.this.setVisible(false);
             System.exit(0);
         }
     };
-    private JTabbedPane tabDetail;
 
 
+    /**
+     * Creates main window.
+     */
     public MainWindow() {
         createMenuBar();
         createUI();
     }
 
 
+    /**
+     * Creates menu bar.
+     */
     private void createMenuBar() {
         JMenuBar bar = new JMenuBar();
         setJMenuBar(bar);
@@ -99,6 +120,9 @@ public class MainWindow extends JFrame {
     }
 
 
+    /**
+     * Creates all widgets of main window (except for menu bar)
+     */
     private void createUI() {
         setTitle("ZORKA viewer");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -131,7 +155,7 @@ public class MainWindow extends JFrame {
 
         tbmTraceDetail = new TraceDetailTableModel();
         tblTraceDetail = new JTable(tbmTraceDetail);
-        tbmTraceDetail.adjustColumns(tblTraceDetail);
+        tbmTraceDetail.configure(tblTraceDetail);
         tblTraceDetail.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         tblTraceDetail.setAutoCreateColumnsFromModel(false);
         scrTraceDetail.setViewportView(tblTraceDetail);
@@ -154,6 +178,13 @@ public class MainWindow extends JFrame {
     }
 
 
+    /**
+     * Binds a key to an action
+     *
+     * @param key key code
+     *
+     * @param action action
+     */
     private void bindKey(int key, Action action) {
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(KeyStroke.getKeyStroke(key,0),action);
@@ -161,13 +192,25 @@ public class MainWindow extends JFrame {
     }
 
 
+    /**
+     * This method is called when user selects trace from trace table.
+     * Updates trace detail widgets.
+     *
+     * @param idx trace index (in traces table)
+     */
     private void displayTrace(int idx) {
         NamedTraceRecord root = traceSet.get(idx);
-        tbmTraceDetail.setRoot(root);
-        List<String[]> rows = new ArrayList<String[]>();
-        root.scanAttrs(rows);
+        tbmTraceDetail.setTrace(root);
     }
 
+
+    /**
+     * This method is called when user double clicks on a method in trace detail tree.
+     *
+     * @param idx method index (in trace detail method table)
+     *
+     * @param sw whether to switch to method/error detail tab
+     */
     private void displayMethod(int idx, boolean sw) {
         pnlStackTrace.update(traceSet.getSymbols(), tbmTraceDetail.getRecord(idx));
         if (sw) {

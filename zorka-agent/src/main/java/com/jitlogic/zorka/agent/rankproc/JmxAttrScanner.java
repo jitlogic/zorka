@@ -16,35 +16,63 @@
 
 package com.jitlogic.zorka.agent.rankproc;
 
+import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.common.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * JMX Attribute Scanner is responsible for traversing JMX (using supplied queries) and
+ * submitting obtained metric data to tracer output. Results will be sorted into categories
+ * (integers, long integers, double precision FP), attribute sets will be concatenated and
+ * converted to symbols, data of each category will be submitted.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class JmxAttrScanner implements Runnable {
 
+    /** Logger */
     private static final ZorkaLog log = ZorkaLogger.getLog(JmxAttrScanner.class);
 
+    /** Scanner ID (attached to every packet of sample data) */
     private int id;
+
+    /** Symbol registry */
     private SymbolRegistry symbols;
+
+    /** Output handler - handles generated data (eg. saves them to trace files). */
     private TraceEventHandler output;
 
+    /** Query listers representing queries supplied at scanner construction time */
     private List<QueryLister> listers = new ArrayList<QueryLister>();
 
 
-    public JmxAttrScanner(SymbolRegistry symbols, String name, TraceEventHandler output, QueryLister...listers) {
+    /**
+     * Creates new JMX attribute scanner object.
+     *
+     * @param symbols symbol registry
+     *
+     * @param name scanner name (converted to ID using symbol registry and attached to every emitted packet of data).
+     *
+     * @param output tracer output
+     *
+     * @param registry MBean server registry object
+     *
+     * @param qdefs JMX queries
+     */
+    public JmxAttrScanner(SymbolRegistry symbols, String name, TraceEventHandler output, MBeanServerRegistry registry, QueryDef...qdefs) {
         this.symbols = symbols;
         this.id = symbols.symbolId(name);
         this.output = output;
 
-        add(listers);
+        for (QueryDef qdef : qdefs) {
+            this.listers.add(new QueryLister(registry, qdef));
+        }
     }
 
 
-    public void add(QueryLister...listers) {
-        this.listers.addAll(Arrays.asList(listers));
-    }
 
 
     @Override
@@ -53,6 +81,11 @@ public class JmxAttrScanner implements Runnable {
     }
 
 
+    /**
+     * Performs one scan-submit cycle.
+     *
+     * @param tstamp current time (milliseconds since Epoch)
+     */
     public void runCycle(long tstamp) {
         List<Integer> longIds = new ArrayList<Integer>(128);
         List<Long> longVals = new ArrayList<Long>(128);

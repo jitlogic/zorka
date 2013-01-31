@@ -21,18 +21,37 @@ import com.jitlogic.zorka.common.SymbolRegistry;
 import java.util.*;
 
 
+/**
+ * Represents one item of JMX query result set.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class QueryResult {
 
+    /** Final result value */
     private Object value;
 
+    /** Attribute map */
     private Map<String,Object> attrs;
 
 
+    /**
+     * Wrapss value into query result object.
+     *
+     * @param value wrapped value
+     */
     public QueryResult(Object value) {
         this.value = value;
     }
 
 
+    /**
+     * Creates new variant of query result (with new result value)
+     *
+     * @param orig original result
+     *
+     * @param value new value
+     */
     public QueryResult(QueryResult orig, Object value) {
         this.value = value;
         if (orig.attrs != null) {
@@ -42,6 +61,13 @@ public class QueryResult {
     }
 
 
+    /**
+     * Sets result attribute
+     *
+     * @param key attribute key
+     *
+     * @param val attribute value
+     */
     public void setAttr(String key, Object val) {
         if (attrs == null) {
             attrs = new LinkedHashMap<String, Object>();
@@ -50,15 +76,35 @@ public class QueryResult {
     }
 
 
+    /**
+     * Returns result attribute
+     *
+     * @param key attribute key
+     *
+     * @return attribute value or null
+     */
     public Object getAttr(String key) {
         return attrs != null ? attrs.get(key) : null;
     }
 
 
+    /**
+     * Returns attribute map (or empty map if object has no attributes)
+     *
+     * @return result attribute map
+     */
     public Set<Map.Entry<String,Object>> attrSet() {
         return attrs != null ? attrs.entrySet() : new HashSet<Map.Entry<String, Object>>(1);
     }
 
+
+    /**
+     * Creates a string by concatenating all attribute values and registers it as a symbol.
+     *
+     * @param symbols symbol registry
+     *
+     * @return symbol ID
+     */
     public int getComponentId(SymbolRegistry symbols) {
         String path = getAttrPath();
 
@@ -66,6 +112,10 @@ public class QueryResult {
     }
 
 
+    /**
+     * Returns "attribute path" - all attribute values concatenated using '.' character.
+     * @return
+     */
     public String getAttrPath() {
         StringBuilder sb = new StringBuilder();
 
@@ -90,6 +140,5 @@ public class QueryResult {
     public Object getValue() {
         return value;
     }
-
 
 }
