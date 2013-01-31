@@ -47,6 +47,9 @@ public class TraceRecord implements Submittable {
     /** Exception thrown from method called current frame has been wrapped and thrown out of current frame. */
     public static final int EXCEPTION_WRAP = 0x0008;
 
+    /** Indicates that parent method has been dropped due to short execution time. */
+    public static final int DROPPED_PARENT = 0x0010;
+
     /** Class ID refers to class name in symbol registry. */
     private int classId;
 
@@ -379,5 +382,13 @@ public class TraceRecord implements Submittable {
         if (exception instanceof Throwable) {
             exception = new SymbolicException((Throwable)exception, symbols, 0 == (flags & EXCEPTION_WRAP));
         }
+    }
+
+
+    public boolean isSafeInterim() {
+        return exception == null
+                && attrs == null
+                && 0 == (flags & TRACE_BEGIN)
+                && children != null && children.size() == 1;
     }
 }

@@ -24,18 +24,39 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ImageIcon;
 
+/**
+ * Manages access to various resources contained in viewer jar file.
+ * Currently only icons are supported but other resource types can
+ * be added as well.
+ */
 public class ResourceManager {
-    
+
+    /** Used to load files from classpath */
     private final Class<?> clazz;
-    
-    public ResourceManager(){
+
+    /** Creates new resource manager. Marked private to prevent instantiation of this object by client code. */
+    private ResourceManager(){
         this.clazz = this.getClass();
     }
     
-    
+    /** Icon cache - contains references to all loaded icons. */
     private Map<String, ImageIcon> iconCache = new HashMap<String, ImageIcon>();
-    
-    // TODO zero ochrony przed bledami - dopisac jakies checki + stosowne logi (oraz "awaryjna" ikonke)
+
+
+    /**
+     * Returns icon of given name and dimensions. A file with the same name
+     * and .png extension has to exist somewhere in /icons/WWxHH in classpath.
+     * If no icon of specified size has been found, method will try to find
+     * icon of generic size and scale it.
+     *
+     * @param name icon name
+     *
+     * @param w width
+     *
+     * @param h height
+     *
+     * @return icon object
+     */
     private synchronized ImageIcon getIcon(String name, int w, int h) {
     	String key = "" + w + "x" + h + ":" + name;
     	
@@ -47,13 +68,10 @@ public class ResourceManager {
     	}
     	
     	if (!iconCache.containsKey(key)) {
-    		// TODO czy to bedzie dzialac po zapaczkowaniu calego projektu w .jar ??
     		ImageIcon icon = new ImageIcon(clazz.getResource("/icons/" + name + ".png"));
     		if (icon.getIconWidth() == w && icon.getIconHeight() == h) {
-    			// Nie potrzeba skalowania
     			iconCache.put(key, icon);
     		} else {
-    			// Musimy przeskalowac
     			Image img = icon.getImage();
     			BufferedImage bi = new BufferedImage(w, h, 
     				BufferedImage.TYPE_INT_ARGB);
@@ -65,22 +83,33 @@ public class ResourceManager {
     	
     	return iconCache.get(key);
     }
-    
+
+    /** Singleton instance of resource manager */
 	private static ResourceManager resourceManager;
-    
+
+
+    /**
+     * Returns instance of resource manager. Creates new instance if necessary.
+     *
+     * @return resource manager instance
+     */
     public static synchronized ResourceManager getInstance() {
     	if (null == resourceManager)
     		resourceManager = new ResourceManager();
     	return resourceManager;
     }
-    
+
+
+    /**
+     * Returns standard 16x16 icon.
+     *
+     * @param name icon name
+     *
+     * @return icon object.
+     */
     public static ImageIcon getIcon16x16(String name) {
     	return getInstance().getIcon(name, 16, 16);
     }
     
 
-    public static ImageIcon getIcon24x24(String name) {
-    	return getInstance().getIcon(name, 24, 24);
-    }
-    
 }

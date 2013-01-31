@@ -34,7 +34,7 @@ public class BshAgentUnitTest extends ZorkaFixture {
 
     @Before
     public void setUp() throws Exception {
-        ZabbixLib zl = new ZabbixLib(zorkaAgent, zorkaAgent.getZorkaLib());
+        ZabbixLib zl = new ZabbixLib();
         zorkaAgent.install("zabbix", zl);
         zorkaAgent.loadScript(getClass().getResource("/unittest/BshAgentTest.bsh"));
     }

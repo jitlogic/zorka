@@ -25,7 +25,7 @@ import java.util.Map;
 public class MethodCellRenderer extends JLabel implements TableCellRenderer {
 
     private NamedTraceRecord record;
-    private ImageIcon icnException, icnOverflow, icnTraceBegin;
+    private ImageIcon icnException, icnOverflow, icnTraceBegin, icnDroppedParent;
 
 
     public MethodCellRenderer() {
@@ -33,6 +33,7 @@ public class MethodCellRenderer extends JLabel implements TableCellRenderer {
         icnException = ResourceManager.getIcon16x16("exception-mark");
         icnOverflow = ResourceManager.getIcon16x16("flag");
         icnTraceBegin = ResourceManager.getIcon16x16("trace-begin");
+        icnDroppedParent = ResourceManager.getIcon16x16("dropped-parent");
     }
 
 
@@ -94,6 +95,11 @@ public class MethodCellRenderer extends JLabel implements TableCellRenderer {
 
         if (0 != (record.getFlags() & NamedTraceRecord.OVERFLOW_FLAG)) {
             g.drawImage(icnOverflow.getImage(), offs-4, 0, null);
+            offs += 16;
+        }
+
+        if (0 != (record.getFlags() & NamedTraceRecord.DROPPED_PARENT)) {
+            g.drawImage(icnDroppedParent.getImage(), offs-4, 0, null);
             offs += 16;
         }
 
