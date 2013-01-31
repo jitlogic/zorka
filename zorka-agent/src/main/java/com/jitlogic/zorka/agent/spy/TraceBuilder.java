@@ -174,17 +174,8 @@ public class TraceBuilder extends TraceEventHandler {
 
         TraceRecord parent = ttop.getParent();
 
-        // Get rid of redundant exception object
-        if (ttop.getException() != null && ttop.numChildren() > 0) {
-            Throwable tex = (Throwable)ttop.getException();
-            Throwable cex = (Throwable)ttop.getChild(ttop.numChildren()-1).getException();
-            if (cex == tex) {
-                ttop.setException(null);
-                ttop.markFlag(TraceRecord.EXCEPTION_PASS);
-            } else if (cex == tex.getCause()) {
-                ttop.markFlag(TraceRecord.EXCEPTION_WRAP);
-            }
-        }
+        popException();
+
 
         // Submit data if trace marker found
         if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {
@@ -207,7 +198,8 @@ public class TraceBuilder extends TraceEventHandler {
 
 
                 if (!ttop.hasFlag(TraceRecord.OVERFLOW_FLAG)) {
-                    parent.addChild(ttop);
+                    reparentTop(parent);
+
                 } else {
                     parent.getMarker().markFlag(TraceMarker.OVERFLOW_FLAG);
                 }
@@ -230,6 +222,37 @@ public class TraceBuilder extends TraceEventHandler {
             }
         }
 
+    }
+
+
+    private void popException() {
+        // Get rid of redundant exception object
+        if (ttop.getException() != null && ttop.numChildren() > 0) {
+            Throwable tex = (Throwable)ttop.getException();
+            Throwable cex = (Throwable)ttop.getChild(ttop.numChildren()-1).getException();
+            if (cex == tex) {
+                ttop.setException(null);
+                ttop.markFlag(TraceRecord.EXCEPTION_PASS);
+            } else if (cex == tex.getCause()) {
+                ttop.markFlag(TraceRecord.EXCEPTION_WRAP);
+            }
+        }
+    }
+
+
+    private void reparentTop(TraceRecord parent) {
+        // Drop interim record if necessary
+        if (ttop.getMarker().hasFlag(TraceMarker.DROP_INTERIM) && ttop.isSafeInterim()
+                && ttop.getTime() - ttop.getChild(0).getTime() < Tracer.getMinMethodTime()) {
+            TraceRecord child = ttop.getChild(0);
+            child.setCalls(ttop.getCalls());
+            child.setErrors(ttop.getErrors());
+            child.markFlag(TraceRecord.DROPPED_PARENT);
+            numRecords--;
+            parent.addChild(child);
+        } else {
+            parent.addChild(ttop);
+        }
     }
 
 

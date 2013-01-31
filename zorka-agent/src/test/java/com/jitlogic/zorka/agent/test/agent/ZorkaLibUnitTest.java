@@ -36,8 +36,8 @@ public class ZorkaLibUnitTest extends ZorkaFixture {
         String[] s = zorka.ls("test", "test:type=ZorkaLib,*").split("\n");
 
         assertEquals(2, s.length);
-        assertEquals("test:type=ZorkaLib,name=test1", s[0]);
-        assertEquals("test:type=ZorkaLib,name=test2", s[1]);
+        assertEquals("test:type=ZorkaLib,name=test1 -> test:type=ZorkaLib,name=test1", s[0]);
+        assertEquals("test:type=ZorkaLib,name=test2 -> test:type=ZorkaLib,name=test2", s[1]);
     }
 
     @Test
@@ -58,7 +58,7 @@ public class ZorkaLibUnitTest extends ZorkaFixture {
         map.put("a", "aaa"); map.put("b", "bbb");
         zorka.registerAttr("test", "test:type=ZorkaLib,name=test1", "map", map, "Some map.");
 
-        String[] s = zorka.ls("test", "test:type=ZorkaLib,*", "map").split("\n");
+        String[] s = zorka.ls("test", "test:type=ZorkaLib,*", "map", "**").split("\n");
 
         assertEquals(2, s.length);
         assertEquals("test:type=ZorkaLib,name=test1: map.a -> aaa", s[0]);
@@ -70,7 +70,7 @@ public class ZorkaLibUnitTest extends ZorkaFixture {
         List<String> lst = Arrays.asList("aaa", "bbb");
         zorka.registerAttr("test", "test:type=ZorkaLib,name=test1", "lst", lst, "Some list.");
 
-        String[] s = zorka.ls("test", "test:type=ZorkaLib,*", "lst").split("\n");
+        String[] s = zorka.ls("test", "test:type=ZorkaLib,*", "lst", "*").split("\n");
 
         assertEquals(2, s.length);
         assertEquals("test:type=ZorkaLib,name=test1: lst.0 -> aaa", s[0]);

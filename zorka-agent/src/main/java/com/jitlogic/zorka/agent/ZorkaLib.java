@@ -249,11 +249,6 @@ public class ZorkaLib  {
 	} // jmx()
 
 
-    // TODO expand ls functionality to filter over all arguments usign regex;
-    // TODO converge zorka.ls and zabbix.discover call conventions
-    // TODO converge zorka.jmxList and zorka.list
-    // TODO split zorka.ls into zorka.ls [returning list of strings] and zorka.list() [returning list of lists]
-
     /**
      * Lists attributes of given object(s)
      *
@@ -266,61 +261,33 @@ public class ZorkaLib  {
      * @return string listing attributes and their values
      */
     public String ls(String mbsName, String objectName, Object...args) {
-        MBeanServerConnection conn = mbsRegistry.lookup(mbsName);
+        QueryDef qdef = new QueryDef(mbsName, objectName, "*");
 
-        if (conn == null) {
-            log.error("MBean server named '" + mbsName + "' is not registered.");
-            return null;
+        for (int i = 0; i < args.length; i++) {
+            qdef = qdef.list(args[i].toString(), "ARG"+i);
         }
 
-        Set<ObjectName> names = ObjectInspector.queryNames(conn, objectName);
-        List<String> rslt = new ArrayList<String>(32);
+        List<QueryResult> results = new QueryLister(mbsRegistry, qdef).list();
+        List<String> lst = new ArrayList<String>(results.size()+1);
 
-        ClassLoader cl0 = Thread.currentThread().getContextClassLoader(), cl1 = mbsRegistry.getClassLoader(mbsName);
-
-        if (cl1 != null) {
-            Thread.currentThread().setContextClassLoader(cl1);
-        }
-
-        for (ObjectName name : names) {
-            if (args.length == 0) {
-                rslt.add(name.toString());
-            } else {
-                try {
-                    Object obj = null;
-                    String path = name.toString() + ": ";
-                    if (args.length == 1 && "*".equals(args[0])) {
-                        obj = new JmxObject(name, conn, cl1);
-                    } else {
-                        obj = conn.getAttribute(name, args[0].toString());
-                        path =  path + ZorkaUtil.join(".", Arrays.asList(args)) + ".";
-                    }
-
-                    if (args.length > 1) {
-                        for (int i = 1; i < args.length; i++) {
-                            obj = ObjectInspector.get(obj, name);
-                        }
-                    }
-
-
-                    for (Object attr : ObjectInspector.list(obj)) {
-                        rslt.add(path + attr + " -> " + ObjectInspector.get(obj, attr));
-                    }
-
-                } catch (Exception e) {
-                    log.error("Cannot resolve '" + name + "." + args[0], e);
+        for (QueryResult result : results) {
+            StringBuilder sb = new StringBuilder();
+            int n = 0;
+            for (Map.Entry<String,Object> e : result.attrSet()) {
+                if (n > 0) {
+                    sb.append(n == 1 ? ": " : ".");
                 }
+                n++;
+                sb.append(e.getValue());
             }
+            sb.append(" -> ");
+            sb.append(result.getValue());
+            lst.add(sb.toString());
         }
 
-        if (cl1 != null) {
-            Thread.currentThread().setContextClassLoader(cl0);
-        }
-
-        Collections.sort(rslt);
-
-        return ZorkaUtil.join("\n", rslt) + "\n";
-    } // ls()
+        Collections.sort(lst);
+        return ZorkaUtil.join("\n", lst);
+    }
 
 
     /**
@@ -729,6 +696,12 @@ public class ZorkaLib  {
      * @param interval run interval (in milliseconds)
      */
     public void schedule(Runnable task, long interval) {
+        scheduler.schedule(task, interval);
+    }
 
+
+
+    public QueryDef jmxQuery(String mbsName, String query, String... attrs) {
+        return new QueryDef(mbsName, query, attrs);
     }
 }

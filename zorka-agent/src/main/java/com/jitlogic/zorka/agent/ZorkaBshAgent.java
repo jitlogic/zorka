@@ -149,6 +149,8 @@ public class ZorkaBshAgent {
             interpreter.source(path);
         } catch (Exception e) {
             log.error("Error loading script " + path, e);
+        } catch (EvalError e) {
+            log.error("Error executing script " + path, e);
         }
     }
 

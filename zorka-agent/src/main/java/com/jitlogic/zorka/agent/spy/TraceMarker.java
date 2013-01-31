@@ -29,7 +29,10 @@ public class TraceMarker {
 
     public static final int ALL_METHODS = 0x04;
 
-    public static final int ALL_ON_EXCEPTION = 0x08;
+    /** This flag instructs trace builder algorithm to drop frames whose execution time is too small */
+    public static final int DROP_INTERIM = 0x08;
+    //public static final int ALL_ON_EXCEPTION = 0x08;
+
 
     /** Trace ID (refers to symbol containing trace name) */
     private int traceId;
@@ -90,6 +93,9 @@ public class TraceMarker {
         return flags;
     }
 
+    public boolean hasFlag(int flag) {
+        return 0 != (flags & flag);
+    }
 
     public void setFlags(int flags) {
         this.flags = flags;

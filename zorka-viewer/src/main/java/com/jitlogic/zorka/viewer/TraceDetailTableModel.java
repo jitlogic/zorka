@@ -21,26 +21,45 @@ import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Table model for table showing all method calls in a trace.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class TraceDetailTableModel extends AbstractTableModel {
 
+    /** Table column names */
     private String[] colNames = { "Time", "Calls", "Err", "Pct", "Method" };
+
+    /** Preferred table column widths */
     private int[] colWidth    = { 75, 50, 50, 50, 640 };
 
+    /** Current data ("flattened" method call tree representing single trace) */
     private List<NamedTraceRecord> data = new ArrayList<NamedTraceRecord>(1);
 
 
-    public void adjustColumns(JTable table) {
+    /**
+     * Configures supplied table. Sets colum names, preferred columns widths,
+     * renders etc. Supplied table should use this model to present data.
+     *
+     * @param table table to be configure
+     */
+    public void configure(JTable table) {
         for (int i = 0; i < colWidth.length; i++) {
             table.getColumnModel().getColumn(i).setPreferredWidth(colWidth[i]);
         }
 
         table.getColumnModel().getColumn(3).setCellRenderer(new PercentColumnRenderer());
-        //table.getColumnModel().getColumn(4).setCellRenderer(new TraceMethodRenderer());
         table.getColumnModel().getColumn(4).setCellRenderer(new MethodCellRenderer());
     }
 
 
-    public void setRoot(NamedTraceRecord root) {
+    /**
+     * Sets trace root record for this table model. Triggers redraw od associated table.
+     *
+     * @param root new trace root record.
+     */
+    public void setTrace(NamedTraceRecord root) {
         data = new ArrayList<NamedTraceRecord>(root.getRecords()+2);
         root.scanRecords(data);
         fireTableDataChanged();
@@ -88,8 +107,16 @@ public class TraceDetailTableModel extends AbstractTableModel {
     }
 
 
-    public NamedTraceRecord getRecord(int idx) {
-        return data.get(idx);
+    /**
+     * Returns i-th trace record of this model. Record corresponds to i-th
+     * item in associated table displaying trace.
+     *
+     * @param i trace record index
+     *
+     * @return trace record
+     */
+    public NamedTraceRecord getRecord(int i) {
+        return data.get(i);
     }
 
 }
