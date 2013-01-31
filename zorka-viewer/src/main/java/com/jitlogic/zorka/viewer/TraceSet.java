@@ -43,6 +43,9 @@ public class TraceSet extends TraceEventHandler {
     /** Top of record stack (used by loading process, obsolete after load process ends) */
     private NamedTraceRecord top = new NamedTraceRecord(null);
 
+    /** Collected metrics. */
+    private Map<Integer,Map<Integer,List<DataSample>>> mgroups = new HashMap<Integer, Map<Integer,List<DataSample>>>();
+
 
     @Override
     public void traceBegin(int traceId, long clock, int flags) {
@@ -100,21 +103,58 @@ public class TraceSet extends TraceEventHandler {
         top.setAttr(symbols.get(attrId), attrVal);
     }
 
+
     @Override
     public void longVals(long clock, int objId, int[] components, long[] values) {
-        // TODO store this data
+        Map<Integer, List<DataSample>> metrics = getMetrics(objId);
+
+        for (int i = 0; i < components.length; i++) {
+            List<DataSample> data = getDataSamples(components[i], metrics);
+            data.add(new LongDataSample(clock, values[i]));
+        }
     }
+
 
     @Override
     public void intVals(long clock, int objId, int[] components, int[] values) {
-        // TODO store this data
+        Map<Integer, List<DataSample>> metrics = getMetrics(objId);
+
+        for (int i = 0; i < components.length; i++) {
+            List<DataSample> data = getDataSamples(components[i], metrics);
+            data.add(new IntegerDataSample(clock, values[i]));
+        }
     }
+
 
     @Override
     public void doubleVals(long clock, int objId, int[] components, double[] values) {
-        // TODO store this data
+        Map<Integer, List<DataSample>> metrics = getMetrics(objId);
+
+        for (int i = 0; i < components.length; i++) {
+            List<DataSample> data = getDataSamples(components[i], metrics);
+            data.add(new DoubleDataSample(clock, values[i]));
+        }
     }
 
+
+    private Map<Integer, List<DataSample>> getMetrics(int objId) {
+        Map<Integer,List<DataSample>> metrics = mgroups.get(objId);
+        if (metrics == null) {
+            metrics = new HashMap<Integer, List<DataSample>>();
+            mgroups.put(objId, metrics);
+        }
+        return metrics;
+    }
+
+
+    private List<DataSample> getDataSamples(int component, Map<Integer, List<DataSample>> metrics) {
+        List<DataSample> data = metrics.get(component);
+        if (data == null) {
+            data = new ArrayList<DataSample>();
+            metrics.put(component, data);
+        }
+        return data;
+    }
 
     /**
      * Pops record from loader stack. Adds record to its parent child list
