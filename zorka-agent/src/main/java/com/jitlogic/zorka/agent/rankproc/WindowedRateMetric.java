@@ -30,10 +30,9 @@ public class WindowedRateMetric extends Metric {
     }
 
     @Override
-    public Number getValue(long clock, QueryResult result) {
-        Object valObj = result.getValue();
-        long curNom = ((Number)ObjectInspector.get(valObj, getTemplate().getNomField())).longValue();
-        long curDiv = ((Number)ObjectInspector.get(valObj, getTemplate().getDivField())).longValue();
+    public Number getValue(long clock, Number value) {
+        long curNom = ((Number)ObjectInspector.get(value, getTemplate().getNomField())).longValue();
+        long curDiv = ((Number)ObjectInspector.get(value, getTemplate().getDivField())).longValue();
 
         Double rslt = 0.0;
 

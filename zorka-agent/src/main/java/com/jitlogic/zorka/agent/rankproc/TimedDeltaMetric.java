@@ -28,8 +28,8 @@ public class TimedDeltaMetric extends RawDeltaMetric {
     }
 
     @Override
-    public Number getValue(long clock, QueryResult result) {
-        Number val = super.getValue(clock, result);
+    public Number getValue(long clock, Number value) {
+        Number val = super.getValue(clock, value);
 
         long dclock = clock - lastClock;
 

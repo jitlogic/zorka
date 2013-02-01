@@ -28,8 +28,8 @@ public class RawDeltaMetric extends RawDataMetric {
     }
 
     @Override
-    public Number getValue(long clock, QueryResult result) {
-        Number cur = super.getValue(clock, result), rslt;
+    public Number getValue(long clock, Number value) {
+        Number cur = super.getValue(clock, value), rslt;
 
         if (cur instanceof Double || cur instanceof Float || last instanceof Double) {
             rslt = last != null ? cur.doubleValue() - last.doubleValue() : 0.0;

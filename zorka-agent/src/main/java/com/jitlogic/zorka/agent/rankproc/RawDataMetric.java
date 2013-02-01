@@ -27,17 +27,17 @@ public class RawDataMetric extends Metric {
     }
 
 
-    public Number getValue(long clock, QueryResult result) {
+    @Override
+    public Number getValue(long clock, Number value) {
         Double multiplier = getTemplate().getMultiplier();
         if (multiplier != null) {
-            Number rslt = (Number)result.getValue();
-            if (rslt instanceof Double || Math.floor(multiplier) != multiplier) {
-                return multiplier * rslt.doubleValue();
+            if (value instanceof Double || Math.floor(multiplier) != multiplier) {
+                return multiplier * value.doubleValue();
             } else {
-                return multiplier.longValue() * rslt.longValue();
+                return multiplier.longValue() * value.longValue();
             }
         } else {
-            return (Number)result.getValue();
+            return value;
         }
     }
 

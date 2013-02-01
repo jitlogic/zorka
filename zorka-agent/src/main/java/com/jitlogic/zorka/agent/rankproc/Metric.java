@@ -43,7 +43,7 @@ public abstract class Metric {
     }
 
 
-    public abstract Number getValue(long clock, QueryResult result);
+    public abstract Number getValue(long clock, Number value);
 
 
     public MetricTemplate getTemplate() {

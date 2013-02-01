@@ -73,6 +73,33 @@ public class JmxAttrScanner implements Runnable {
     }
 
 
+    public Metric getMetric(MetricTemplate template, QueryResult result) {
+        String key = result.getKey(template.getDynamicAttrs());
+
+        Metric metric = template.getMetric(key);
+        if (metric == null) {
+            switch (template.getType()) {
+                case MetricTemplate.RAW_DATA:
+                    metric = new RawDataMetric(template, result.attrSet());
+                    break;
+                case MetricTemplate.RAW_DELTA:
+                    metric = new RawDeltaMetric(template, result.attrSet());
+                    break;
+                case MetricTemplate.TIMED_DELTA:
+                    metric = new TimedDeltaMetric(template, result.attrSet());
+                    break;
+                case MetricTemplate.WINDOWED_RATE:
+                    metric = new WindowedRateMetric(template, result.attrSet());
+                    break;
+                default:
+                    return null;
+            }
+            template.putMetric(key, metric);
+        }
+
+        return metric;
+    }
+
 
 
     @Override

@@ -19,6 +19,7 @@ package com.jitlogic.zorka.agent.test.rankproc;
 import com.jitlogic.zorka.agent.rankproc.*;
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 
+import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -32,22 +33,29 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
         return result;
     }
 
+    private JmxAttrScanner scanner;
+
+    @Before
+    public void setScanner() {
+        scanner = tracer.jmxScanner("test", null);
+    }
+
 
     @Test
     public void testConstructMetricsOfVariousTypes() throws Exception {
         QueryResult qr = qr(10L, "name", "SomeObject", "type", "SomeType");
 
         assertTrue("Should return RawDataMetric object.",
-                rankproc.rawDataMetric("test", "test").getMetric(qr) instanceof RawDataMetric);
+                scanner.getMetric(rankproc.rawDataMetric("test", "test"), qr) instanceof RawDataMetric);
 
         assertTrue("Should return RawDeltaMetric object.",
-                rankproc.rawDeltaMetric("test", "test").getMetric(qr) instanceof RawDeltaMetric);
+                scanner.getMetric(rankproc.rawDeltaMetric("test", "test"), qr) instanceof RawDeltaMetric);
 
         assertTrue("Expected TimerDeltaMetric object.",
-                rankproc.timedDeltaMetric("test", "test").getMetric(qr) instanceof TimedDeltaMetric);
+                scanner.getMetric(rankproc.timedDeltaMetric("test", "test"), qr) instanceof TimedDeltaMetric);
 
         assertTrue("Expected WindowedRateMetric",
-                rankproc.windowedRateMetric("t", "t", "nom", "nom").getMetric(qr) instanceof WindowedRateMetric);
+                scanner.getMetric(rankproc.windowedRateMetric("t", "t", "nom", "nom"), qr) instanceof WindowedRateMetric);
     }
 
 
@@ -55,9 +63,9 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
     public void testConstructSameAndUniqueMetrics() throws Exception {
         MetricTemplate mt = rankproc.rawDataMetric("test", "test");
 
-        Metric m1 = mt.getMetric(qr(10L, "name", "SomeObject", "type", "SomeType"));
-        Metric m2 = mt.getMetric(qr(20L, "name", "SomeObject", "type", "SomeType"));
-        Metric m3 = mt.getMetric(qr(10L, "name", "OtherObject", "type", "SomeType"));
+        Metric m1 = scanner.getMetric(mt, qr(10L, "name", "SomeObject", "type", "SomeType"));
+        Metric m2 = scanner.getMetric(mt, qr(20L, "name", "SomeObject", "type", "SomeType"));
+        Metric m3 = scanner.getMetric(mt, qr(10L, "name", "OtherObject", "type", "SomeType"));
 
         assertEquals("Should return the same metric", m1, m2);
         assertNotEquals("Should create new metric. ", m1, m3);
@@ -68,9 +76,9 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
     public void testConstructSameAndUniqueMetricsWithDynamicAttr() throws Exception {
         MetricTemplate mt = rankproc.rawDataMetric("test", "test").withDynamicAttr("name");
 
-        Metric m1 = mt.getMetric(qr(10L, "name", "SomeObject", "type", "SomeType"));
-        Metric m2 = mt.getMetric(qr(20L, "name", "OtherObject", "type", "SomeType"));
-        Metric m3 = mt.getMetric(qr(30L, "name", "SomeObject", "type", "OtherType"));
+        Metric m1 = scanner.getMetric(mt, qr(10L, "name", "SomeObject", "type", "SomeType"));
+        Metric m2 = scanner.getMetric(mt, qr(20L, "name", "OtherObject", "type", "SomeType"));
+        Metric m3 = scanner.getMetric(mt, qr(30L, "name", "SomeObject", "type", "OtherType"));
 
         assertEquals("Should return the same metric regarless of 'name' attribute.", m1, m2);
         assertNotEquals("Should create new metric", m1, m3);
@@ -81,7 +89,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
     public void testConstructMetricAndCheckForProperStringTemplating() throws Exception {
         MetricTemplate mt = rankproc.rawDataMetric("Very important ${name} metric.", "MT/s");
 
-        Metric m = mt.getMetric(qr(10L, "name", "SomeObject"));
+        Metric m = scanner.getMetric(mt, qr(10L, "name", "SomeObject"));
 
         assertEquals("Very important SomeObject metric.", m.getName());
     }
@@ -93,7 +101,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
         MetricTemplate mt = rankproc.rawDataMetric("test", "req");
 
-        assertEquals(10L, mt.getMetric(qr).getValue(0L, qr));
+        assertEquals(10L, scanner.getMetric(mt, qr).getValue(0L, (Number)qr.getValue()));
     }
 
 
@@ -103,7 +111,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
         MetricTemplate mt = rankproc.rawDataMetric("test", "req").withMultiplier(2);
 
-        assertEquals(20L, mt.getMetric(qr).getValue(0L, qr));
+        assertEquals(20L, scanner.getMetric(mt, qr).getValue(0L, (Number)qr.getValue()));
     }
 
 
@@ -113,7 +121,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
         MetricTemplate mt = rankproc.rawDataMetric("test", "req").withMultiplier(1.23);
 
-        assertEquals(12.3, (Double)mt.getMetric(qr).getValue(0L, qr), 0.001);
+        assertEquals(12.3, (Double)scanner.getMetric(mt, qr).getValue(0L, (Number)qr.getValue()), 0.001);
     }
 
     // TODO test raw delta cases

@@ -123,4 +123,7 @@ public abstract class TraceEventHandler {
      * @param values values
      */
     public abstract void doubleVals(long clock, int objId, int[] components, double[] values);
+
+
+    //public abstract void newMetricTemplate(MetricTemplate mt);
 }

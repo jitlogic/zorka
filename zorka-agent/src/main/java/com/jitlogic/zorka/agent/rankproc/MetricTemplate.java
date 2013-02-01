@@ -130,30 +130,13 @@ public class MetricTemplate {
     }
 
 
-    public Metric getMetric(QueryResult result) {
-        String key = result.getKey(dynamicAttrs);
-
-        Metric metric = metrics.get(key);
-        if (metric == null) {
-            switch (type) {
-                case RAW_DATA:
-                    metric = new RawDataMetric(this, result.attrSet());
-                    break;
-                case RAW_DELTA:
-                    metric = new RawDeltaMetric(this, result.attrSet());
-                    break;
-                case TIMED_DELTA:
-                    metric = new TimedDeltaMetric(this, result.attrSet());
-                    break;
-                case WINDOWED_RATE:
-                    metric = new WindowedRateMetric(this, result.attrSet());
-                    break;
-                default:
-                    return null;
-            }
-            metrics.put(key, metric);
-        }
-
-        return metric;
+    public Metric getMetric(String key) {
+        return metrics.get(key);
     }
+
+
+    public void putMetric(String key, Metric metric) {
+        metrics.put(key, metric);
+    }
+
 }
