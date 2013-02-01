@@ -14,36 +14,31 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.rankproc;
-
-import com.jitlogic.zorka.common.ObjectInspector;
+package com.jitlogic.zorka.common;
 
 import java.util.Map;
 import java.util.Set;
 
-public class WindowedRateMetric extends Metric {
+public class RawDataMetric extends Metric {
 
-    private long lastNom, lastDiv;
 
-    public WindowedRateMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
+    public RawDataMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
         super(template, attrSet);
     }
 
+
     @Override
     public Number getValue(long clock, Number value) {
-        long curNom = ((Number)ObjectInspector.get(value, getTemplate().getNomField())).longValue();
-        long curDiv = ((Number)ObjectInspector.get(value, getTemplate().getDivField())).longValue();
-
-        Double rslt = 0.0;
-
-        if (curDiv - lastDiv > 0) {
-            rslt = ((double)(curNom-lastNom)) / ((double)(curDiv-lastDiv));
-        }
-
-        lastNom = curNom;
-        lastDiv = curDiv;
-
         Double multiplier = getTemplate().getMultiplier();
-        return multiplier != null ? multiplier * rslt : rslt;
+        if (multiplier != null) {
+            if (value instanceof Double || Math.floor(multiplier) != multiplier) {
+                return multiplier * value.doubleValue();
+            } else {
+                return multiplier.longValue() * value.longValue();
+            }
+        } else {
+            return value;
+        }
     }
+
 }

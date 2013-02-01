@@ -19,6 +19,7 @@ package com.jitlogic.zorka.agent.test.rankproc;
 import com.jitlogic.zorka.agent.rankproc.*;
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 
+import com.jitlogic.zorka.common.*;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;

@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.agent.rankproc;
 
+import com.jitlogic.zorka.common.MetricTemplate;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

@@ -20,7 +20,6 @@ import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.common.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**

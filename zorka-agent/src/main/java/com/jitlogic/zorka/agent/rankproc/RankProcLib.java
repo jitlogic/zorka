@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.agent.rankproc;
 
+import com.jitlogic.zorka.common.MetricTemplate;
+
 public class RankProcLib {
 
 

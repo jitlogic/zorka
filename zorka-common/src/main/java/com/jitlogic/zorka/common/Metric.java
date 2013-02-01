@@ -14,9 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.rankproc;
-
-import com.jitlogic.zorka.common.ObjectInspector;
+package com.jitlogic.zorka.common;
 
 import java.util.HashMap;
 import java.util.Map;

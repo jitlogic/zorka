@@ -14,31 +14,34 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.rankproc;
+package com.jitlogic.zorka.common;
 
 import java.util.Map;
 import java.util.Set;
 
-public class RawDeltaMetric extends RawDataMetric {
+public class WindowedRateMetric extends Metric {
 
-    private Number last;
+    private long lastNom, lastDiv;
 
-    public RawDeltaMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
+    public WindowedRateMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
         super(template, attrSet);
     }
 
     @Override
     public Number getValue(long clock, Number value) {
-        Number cur = super.getValue(clock, value), rslt;
+        long curNom = ((Number)ObjectInspector.get(value, getTemplate().getNomField())).longValue();
+        long curDiv = ((Number)ObjectInspector.get(value, getTemplate().getDivField())).longValue();
 
-        if (cur instanceof Double || cur instanceof Float || last instanceof Double) {
-            rslt = last != null ? cur.doubleValue() - last.doubleValue() : 0.0;
-            last = cur.doubleValue();
-        } else {
-            rslt = last != null ? cur.longValue() - last.longValue() : 0L;
-            last = cur.longValue();
+        Double rslt = 0.0;
+
+        if (curDiv - lastDiv > 0) {
+            rslt = ((double)(curNom-lastNom)) / ((double)(curDiv-lastDiv));
         }
 
-        return rslt;
+        lastNom = curNom;
+        lastDiv = curDiv;
+
+        Double multiplier = getTemplate().getMultiplier();
+        return multiplier != null ? multiplier * rslt : rslt;
     }
 }

@@ -14,31 +14,31 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.agent.rankproc;
+package com.jitlogic.zorka.common;
 
 import java.util.Map;
 import java.util.Set;
 
-public class RawDataMetric extends Metric {
+public class RawDeltaMetric extends RawDataMetric {
 
+    private Number last;
 
-    public RawDataMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
+    public RawDeltaMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
         super(template, attrSet);
     }
 
-
     @Override
     public Number getValue(long clock, Number value) {
-        Double multiplier = getTemplate().getMultiplier();
-        if (multiplier != null) {
-            if (value instanceof Double || Math.floor(multiplier) != multiplier) {
-                return multiplier * value.doubleValue();
-            } else {
-                return multiplier.longValue() * value.longValue();
-            }
-        } else {
-            return value;
-        }
-    }
+        Number cur = super.getValue(clock, value), rslt;
 
+        if (cur instanceof Double || cur instanceof Float || last instanceof Double) {
+            rslt = last != null ? cur.doubleValue() - last.doubleValue() : 0.0;
+            last = cur.doubleValue();
+        } else {
+            rslt = last != null ? cur.longValue() - last.longValue() : 0L;
+            last = cur.longValue();
+        }
+
+        return rslt;
+    }
 }
