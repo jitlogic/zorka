@@ -24,11 +24,16 @@ public abstract class Metric {
 
     private MetricTemplate template;
 
-    private int id;
+    private int id, templateId;
     private String name;
 
     private Map<String,Object> attrs = new HashMap<String, Object>();
 
+    public Metric(int id, String name, Map<String,Object> attrs) {
+        this.id = id;
+        this.name = name;
+        this.attrs = attrs;
+    }
 
     public Metric(MetricTemplate template, Set<Map.Entry<String,Object>> attrSet) {
         this.template = template;
@@ -49,6 +54,11 @@ public abstract class Metric {
     }
 
 
+    public void setTemplate(MetricTemplate template) {
+        this.template = template;
+    }
+
+
     public int getId() {
         return id;
     }
@@ -56,6 +66,16 @@ public abstract class Metric {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+
+    public int getTemplateId() {
+        return templateId;
+    }
+
+
+    public void setTemplateId(int templateId) {
+        this.templateId = templateId;
     }
 
 

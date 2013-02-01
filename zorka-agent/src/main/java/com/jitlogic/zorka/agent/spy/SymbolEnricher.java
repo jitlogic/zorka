@@ -35,8 +35,11 @@ public class SymbolEnricher extends TraceEventHandler {
 
 
     /** Symbol ID bit mask. Zeroed bits in this mask mark symbols that are not yet known to receiver. */
-    BitVector bitVector = new BitVector();
+    BitVector symbolsSent = new BitVector();
 
+    BitVector templatesSent = new BitVector(16);
+
+    BitVector metricsSent = new BitVector(16);
 
     /** Symbol registry used by event sender. */
     private SymbolRegistry symbols;
@@ -66,13 +69,13 @@ public class SymbolEnricher extends TraceEventHandler {
      */
     private void check(int id) {
 
-        if (!bitVector.get(id)) {
+        if (!symbolsSent.get(id)) {
             String sym = symbols.symbolName(id);
             if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
                 log.debug("Enriching output stream with symbol '" + sym + "', id=" + id);
             }
             output.newSymbol(id, sym);
-            bitVector.set(id);
+            symbolsSent.set(id);
         }
     }
 
@@ -85,7 +88,7 @@ public class SymbolEnricher extends TraceEventHandler {
         if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
             log.debug("Resetting symbol enricher.");
         }
-        bitVector.reset();
+        symbolsSent.reset();
     }
 
 
@@ -164,6 +167,19 @@ public class SymbolEnricher extends TraceEventHandler {
         check(objId);
         for (int component : components) {
             check(component);
+        }
+    }
+
+    @Override
+    public void newMetricTemplate(MetricTemplate template) {
+        // Nothing interesting (yet)
+    }
+
+    @Override
+    public void newMetric(Metric metric) {
+        if (!templatesSent.get(metric.getTemplate().getId())) {
+            //this.newMetricTemplate(metric.getTemplate()); TODO rething symbol/metric registry visibility in various objects
+            output.newMetricTemplate(metric.getTemplate());
         }
     }
 }

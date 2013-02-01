@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.viewer;
 
+import com.jitlogic.zorka.common.Metric;
+import com.jitlogic.zorka.common.MetricTemplate;
 import com.jitlogic.zorka.common.TraceEventHandler;
 
 import java.io.PrintStream;
@@ -138,5 +140,17 @@ public class TracePrinter extends TraceEventHandler {
         }
         sb.append(")");
         out.println(sb.toString());
+    }
+
+
+    @Override
+    public void newMetricTemplate(MetricTemplate template) {
+        out.println("TEMPLATE: " + template);
+    }
+
+
+    @Override
+    public void newMetric(Metric metric) {
+        out.println("METRIC: " + metric);
     }
 }

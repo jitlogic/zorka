@@ -17,6 +17,9 @@
 package com.jitlogic.zorka.common;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Implements simple trace encoder/decoder. Uses simple, uncompressed binary format.
  * It basically reads/writes stream of commands that correspond to methods of
@@ -47,11 +50,14 @@ public class SimpleTraceFormat extends TraceEventHandler {
     /** newSymbol() call */
     public static final byte NEW_SYMBOL   = 0x06;
 
+    /** newMetricTemplate() call */
+    public static final byte NEW_TEMPLATE = 0x07;
+
+    /** newTemplate() call */
+    public static final byte NEW_METRIC   = 0x08;
+
     /** longVal() call */
     public static final byte LONG_VAL     = 0x30;
-
-    /** intVal() call */
-    public static final byte INT_VAL      = 0x31;
 
     /** doubleVal() call */
     public static final byte DOUBLE_VAL   = 0x32;
@@ -209,6 +215,70 @@ public class SimpleTraceFormat extends TraceEventHandler {
         }
     }
 
+    @Override
+    public void newMetricTemplate(MetricTemplate template) {
+        buf.putByte(NEW_TEMPLATE);
+        buf.putInt(template.getId());
+        buf.putByte((byte) template.getType());
+        buf.putString(template.getName());
+        buf.putString(template.getUnits());
+        buf.putString(template.getNomField());
+        buf.putString(template.getDivField());
+        buf.putDouble(template.getMultiplier());
+        buf.putByte((byte) template.getDynamicAttrs().size());
+
+        for (String attr : template.getDynamicAttrs()) {
+            buf.putString(attr);
+        }
+
+    }
+
+    @Override
+    public void newMetric(Metric metric) {
+        buf.putByte(NEW_METRIC);
+        buf.putByte((byte) metric.getTemplate().getType());
+        buf.putInt(metric.getId());
+        buf.putInt(metric.getTemplate().getId());
+        buf.putString(metric.getName());
+        buf.putByte((byte)metric.getAttrs().size());
+
+        for (Map.Entry<String,Object> e : metric.getAttrs().entrySet()) {
+            buf.putString(e.getKey());
+            buf.putString(e.getValue().toString());
+        }
+    }
+
+
+    private void decodeMetric(TraceEventHandler output) {
+        int type = buf.getByte(), id = buf.getInt(), tid = buf.getInt();
+        String name = buf.getString();
+        int nattr = buf.getByte();
+
+        Map<String,Object> attrs = new HashMap<String,Object>();
+        for (int i = 0; i < nattr; i++) {
+            attrs.put(buf.getString(), buf.getString());
+        }
+
+        Metric metric = null;
+
+        switch (type) {
+            case MetricTemplate.RAW_DATA:
+                metric = new RawDataMetric(id, name, attrs);
+                break;
+            case MetricTemplate.RAW_DELTA:
+                metric = new RawDeltaMetric(id, name, attrs);
+                break;
+            case MetricTemplate.TIMED_DELTA:
+                metric = new TimedDeltaMetric(id, name, attrs);
+                break;
+            case MetricTemplate.WINDOWED_RATE:
+                metric = new WindowedRateMetric(id, name, attrs);
+                break;
+        }
+
+        output.newMetric(metric);
+    }
+
 
     /**
      * Decodes buffer content. Decoded elements are transformed
@@ -238,6 +308,12 @@ public class SimpleTraceFormat extends TraceEventHandler {
                 case NEW_SYMBOL:
                     output.newSymbol(buf.getInt(), buf.getString());
                     break;
+                case NEW_TEMPLATE:
+                    decodeTemplate(output);
+                    break;
+                case NEW_METRIC:
+                    decodeMetric(output);
+                    break;
                 case LONG_VAL:
                     decodeLongVals(output);
                     break;
@@ -265,6 +341,23 @@ public class SimpleTraceFormat extends TraceEventHandler {
                 default:
                     throw new IllegalArgumentException("Invalid prefix: " + cmd);
             }
+        }
+    }
+
+
+    private void decodeTemplate(TraceEventHandler output) {
+        int id = buf.getInt(), type = buf.getByte();
+        String name = buf.getString(), units = buf.getString(), nom = buf.getString(), div = buf.getString();
+        double multiplier = buf.getDouble();
+
+        MetricTemplate mt = new MetricTemplate(type, name, units, nom, div);
+        mt.setId(id);
+        mt = mt.withMultiplier(multiplier);
+
+        int nattr = buf.getByte();
+
+        for (int i = 0; i < nattr; i++) {
+            mt = mt.withDynamicAttr(buf.getString());
         }
     }
 

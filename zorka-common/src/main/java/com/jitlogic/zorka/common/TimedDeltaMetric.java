@@ -23,6 +23,10 @@ public class TimedDeltaMetric extends RawDeltaMetric {
 
     private long lastClock;
 
+    public TimedDeltaMetric(int id, String name, Map<String, Object> attrs) {
+        super(id, name, attrs);
+    }
+
     public TimedDeltaMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
         super(template, attrSet);
     }

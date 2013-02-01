@@ -23,6 +23,10 @@ public class RawDeltaMetric extends RawDataMetric {
 
     private Number last;
 
+    public RawDeltaMetric(int id, String name, Map<String, Object> attrs) {
+        super(id, name, attrs);
+    }
+
     public RawDeltaMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
         super(template, attrSet);
     }

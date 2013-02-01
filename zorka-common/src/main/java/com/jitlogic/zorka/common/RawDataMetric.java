@@ -21,6 +21,9 @@ import java.util.Set;
 
 public class RawDataMetric extends Metric {
 
+    public RawDataMetric(int id, String name, Map<String, Object> attrs) {
+        super(id, name, attrs);
+    }
 
     public RawDataMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
         super(template, attrSet);

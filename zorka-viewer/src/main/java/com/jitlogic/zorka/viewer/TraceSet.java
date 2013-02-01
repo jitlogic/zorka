@@ -16,10 +16,7 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.common.SimpleTraceFormat;
-import com.jitlogic.zorka.common.SymbolRegistry;
-import com.jitlogic.zorka.common.SymbolicException;
-import com.jitlogic.zorka.common.TraceEventHandler;
+import com.jitlogic.zorka.common.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -46,6 +43,9 @@ public class TraceSet extends TraceEventHandler {
     /** Collected metrics. */
     private Map<Integer,Map<Integer,List<DataSample>>> mgroups = new HashMap<Integer, Map<Integer,List<DataSample>>>();
 
+    private Map<Integer,MetricTemplate> metricTemplates = new HashMap<Integer, MetricTemplate>();
+
+    private Map<Integer,Metric> metrics = new HashMap<Integer, Metric>();
 
     @Override
     public void traceBegin(int traceId, long clock, int flags) {
@@ -78,8 +78,8 @@ public class TraceSet extends TraceEventHandler {
 
     @Override
     public void traceError(Object exception, long tstamp) {
-        top.setException((SymbolicException)exception);
-        top.setTime(tstamp-top.getTime());
+        top.setException((SymbolicException) exception);
+        top.setTime(tstamp - top.getTime());
         pop();
     }
 
@@ -123,6 +123,18 @@ public class TraceSet extends TraceEventHandler {
             List<DataSample> data = getDataSamples(components[i], metrics);
             data.add(new DoubleDataSample(clock, values[i]));
         }
+    }
+
+    @Override
+    public void newMetricTemplate(MetricTemplate template) {
+        metricTemplates.put(template.getId(), template);
+    }
+
+    @Override
+    public void newMetric(Metric metric) {
+        metric.setTemplate(metricTemplates.get(metric.getTemplateId()));
+        metrics.put(metric.getId(), metric);
+        // TODO add metric object to metric template hash map
     }
 
 

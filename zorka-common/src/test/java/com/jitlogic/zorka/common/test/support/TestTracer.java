@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.common.test.support;
 
+import com.jitlogic.zorka.common.Metric;
+import com.jitlogic.zorka.common.MetricTemplate;
 import com.jitlogic.zorka.common.TraceEventHandler;
 import com.jitlogic.zorka.common.ZorkaUtil;
 import org.junit.Assert;
@@ -71,6 +73,16 @@ public class TestTracer extends TraceEventHandler {
     @Override
     public void doubleVals(long clock, int objId, int[] components, double[] values) {
         data.add(ZorkaUtil.map("action", "doubleVals", "clock", clock, "objId", objId, "components", components, "values", values));
+    }
+
+    @Override
+    public void newMetricTemplate(MetricTemplate template) {
+        data.add(ZorkaUtil.map("action", "newMetricTemplate", "mt", template));
+    }
+
+    @Override
+    public void newMetric(Metric metric) {
+        data.add(ZorkaUtil.map("action", "newMetric", "metric", metric));
     }
 
     public List<Map<Object,Object>> getData() {

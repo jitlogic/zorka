@@ -23,6 +23,10 @@ public class WindowedRateMetric extends Metric {
 
     private long lastNom, lastDiv;
 
+    public WindowedRateMetric(int id, String name, Map<String, Object> attrs) {
+        super(id, name, attrs);
+    }
+
     public WindowedRateMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
         super(template, attrSet);
     }

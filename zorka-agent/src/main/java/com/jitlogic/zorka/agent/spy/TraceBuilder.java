@@ -158,6 +158,14 @@ public class TraceBuilder extends TraceEventHandler {
     public void doubleVals(long clock, int objId, int[] components, double[] values) {
     }
 
+    @Override
+    public void newMetricTemplate(MetricTemplate template) {
+    }
+
+    @Override
+    public void newMetric(Metric metric) {
+    }
+
 
     /**
      * This method it called at method return (normal or error). In general it pops current
