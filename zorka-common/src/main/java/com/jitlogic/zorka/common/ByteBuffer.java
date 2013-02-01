@@ -258,18 +258,20 @@ public class ByteBuffer {
      * @return string read.
      */
     public String getString() {
-        if (pos < len) {
-            int end = pos;
+        if (pos <= len-2) {
+            short strlen = getShort();
 
-            while (end < len && buf[end] != 0) {
-                end++;
+            if (strlen > 0) {
+                if (pos+strlen <= len) {
+                    byte[] bytes = ZorkaUtil.clipArray(buf, pos, strlen);
+                    pos += strlen;
+                    return new String(bytes);
+                } else {
+                    throw new ArrayIndexOutOfBoundsException("Trying to read past the end of buffer.");
+                }
+            } else {
+                return strlen == 0 ? "" : null;
             }
-
-            byte[] bstr = ZorkaUtil.clipArray(buf, pos, end-pos);
-
-            pos = end+1;
-
-            return new String(bstr);
         } else {
             throw new ArrayIndexOutOfBoundsException("Trying to read past the end of buffer.");
         }
@@ -282,18 +284,21 @@ public class ByteBuffer {
      * @param s string to be written.
      */
     public void putString(String s) {
-        byte[] bstr = s != null ? s.getBytes() : new byte[0];
 
-        if (pos >= len-bstr.length) {
-            overflow();
-        }
+        byte[] bytes = s != null ? s.getBytes() : new byte[0];
 
-        if (bstr.length >= len) {
-            overflows.add(bstr);
-        } else {
-            System.arraycopy(bstr, 0, buf, pos, bstr.length);
-            pos += bstr.length;
-            buf[pos++] = 0;
+        if (pos >= len-1) overflow();
+
+        putShort(s != null ? bytes.length : -1);
+
+        if (bytes.length > 0) {
+            if (pos >= len-bytes.length) overflow();
+            if (bytes.length >= len) {
+                overflows.add(bytes);
+            } else {
+                System.arraycopy(bytes, 0, buf, pos, bytes.length);
+                pos += bytes.length;
+            }
         }
     }
 
