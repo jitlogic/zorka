@@ -38,27 +38,28 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        // testinteg
+        // TODO testinteg
         ZabbixAgentUnitTest.class,
 
-        // testrank
-        RankProcUnitTest.class, ThreadRankUnitTest.class,
+        // rankproc
+        AggregateCountingUnitTest.class, AverageRateCountingUnitTest.class, JmxQueryUnitTest.class,
+        MetricsFrameworkUnitTest.class, RankProcUnitTest.class, SlidingWindowUnitTest.class, ThreadRankUnitTest.class,
 
-        // testspy
+        // TODO testspy
         ArgProcessingUnitTest.class, BytecodeInstrumentationUnitTest.class, ClassMethodMatchingUnitTest.class,
         SpyLibFunctionsUnitTest.class, StandardCollectorsUnitTest.class, SubmissionDispatchUnitTest.class,
         ZorkaStatsCollectionUnitTest.class,
 
-        // teststress
+        // TODO teststress
         SubmissionDispatchUnitTest.class,
 
-        // tracer
+        // TODO tracer
         TracerInstrumentationUnitTest.class, TraceBuilderUnitTest.class, TraceEnrichmentUnitTest.class,
 
-        // unittest
-        AggregateCountingUnitTest.class, AverageRateCountingUnitTest.class, BshAgentUnitTest.class,
+        // TODO unittest
+        BshAgentUnitTest.class,
         LdapLexerUnitTest.class, MBeanMappingUnitTest.class, NagiosAgentUnitTest.class, ObjectInspectorUnitTest.class,
-        SlidingWindowUnitTest.class, XqlLexerUnitTest.class, XqlNormalizationUnitTest.class, ZabbixAgentUnitTest.class,
+        XqlLexerUnitTest.class, XqlNormalizationUnitTest.class, ZabbixAgentUnitTest.class,
         ZabbixDiscoveryUnitTest.class, ZorkaLibUnitTest.class, ZorkaUtilUnitTest.class, LogConfigUnitTest.class
 })
 public class UnitTestSuite {

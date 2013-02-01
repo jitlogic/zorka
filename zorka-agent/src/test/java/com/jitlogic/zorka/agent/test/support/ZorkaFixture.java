@@ -19,6 +19,7 @@ import com.jitlogic.zorka.agent.*;
 import com.jitlogic.zorka.agent.integ.SnmpLib;
 import com.jitlogic.zorka.agent.integ.SyslogLib;
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
+import com.jitlogic.zorka.agent.rankproc.RankProcLib;
 import com.jitlogic.zorka.agent.spy.SpyClassTransformer;
 import com.jitlogic.zorka.agent.spy.SpyInstance;
 import com.jitlogic.zorka.agent.spy.SpyLib;
@@ -52,6 +53,8 @@ public class ZorkaFixture {
     protected ZorkaBshAgent zorkaAgent;
     protected ZorkaLib zorka;
 
+    protected RankProcLib rankproc;
+
     @Before
     public void setUpFixture() {
         configProperties = setProps(
@@ -75,6 +78,7 @@ public class ZorkaFixture {
         AgentInstance.setInstance(agentInstance);
         agentInstance.start();
 
+        AgentInstance.setMBeanServerRegistry(mBeanServerRegistry);
 
         spyInstance = agentInstance.getSpyInstance();
 
@@ -90,6 +94,7 @@ public class ZorkaFixture {
         snmpLib = agentInstance.getSnmpLib();
         spy = agentInstance.getSpyLib();
         tracer = agentInstance.getTracerLib();
+        rankproc = agentInstance.getRankProcLib();
 
         spyTransformer = spyInstance.getClassTransformer();
     }

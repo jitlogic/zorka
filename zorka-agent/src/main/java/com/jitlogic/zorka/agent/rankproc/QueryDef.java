@@ -52,6 +52,9 @@ public class QueryDef {
     /** List of query segments (describing traversal into subsequent object attributes) */
     private List<QuerySegment> segments;
 
+    /** Template for generated metrics (used by some clients) */
+    private MetricTemplate metricTemplate;
+
     /**
      * Creates new query
      *
@@ -79,6 +82,7 @@ public class QueryDef {
         this.query = orig.query;
         this.attributes = orig.attributes;
         this.segments = orig.segments;
+        this.metricTemplate = orig.metricTemplate;
     }
 
 
@@ -158,6 +162,21 @@ public class QueryDef {
                 : Pattern.compile("^"+regex.replace("**", ".+").replace("*", "[^\\.]+")+"$");
 
         return withSegs(new QuerySegment(pattern, name));
+    }
+
+
+    /**
+     * Attaches metric template to query def. Metric templates are used by JMX attribute scanners
+     * to present generated data with metrics.
+     *
+     * @param metricTemplate metric template object
+     *
+     * @returnaugmented query definition
+     */
+    public QueryDef withMetric(MetricTemplate metricTemplate) {
+        QueryDef qdef = new QueryDef(this);
+        qdef.metricTemplate = metricTemplate;
+        return qdef;
     }
 
 

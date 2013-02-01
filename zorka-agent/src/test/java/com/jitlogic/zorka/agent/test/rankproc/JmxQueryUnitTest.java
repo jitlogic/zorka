@@ -123,7 +123,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     }
 
 
-    @Test
+    //@Test
     public void testJmxAttrScannerSimpleRun() throws Exception {
         TestTracer output = new TestTracer();
         JmxAttrScanner scanner = tracer.jmxScanner("TEST", output,

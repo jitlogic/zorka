@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.agent;
 
+import com.jitlogic.zorka.agent.rankproc.RankProcLib;
 import com.jitlogic.zorka.agent.spy.TracerLib;
 import com.jitlogic.zorka.common.*;
 import com.jitlogic.zorka.agent.integ.*;
@@ -142,6 +143,9 @@ public class AgentInstance {
     /** Reference to normalizers library - available to zorka scripts as 'normalizers.*' function */
     private NormLib normLib;
 
+    /** Reference to ranking and metrics processing library. */
+    private RankProcLib rankProcLib;
+
     /** Agent configuration properties */
     private Properties props;
 
@@ -183,6 +187,9 @@ public class AgentInstance {
 
         normLib = new NormLib();
         zorkaAgent.install("normalizers", normLib);
+
+        rankProcLib = new RankProcLib();
+        zorkaAgent.install("rankproc", rankProcLib);
 
         if ("yes".equalsIgnoreCase(props.getProperty("spy"))) {
             log.info("Enabling Zorka SPY");
@@ -363,6 +370,15 @@ public class AgentInstance {
      */
     public SnmpLib getSnmpLib() {
         return snmpLib;
+    }
+
+    /**
+     * Returns reference to rank processing & metrics library
+     *
+     * @return instance of rankproc library
+     */
+    public RankProcLib getRankProcLib() {
+        return rankProcLib;
     }
 
 }
