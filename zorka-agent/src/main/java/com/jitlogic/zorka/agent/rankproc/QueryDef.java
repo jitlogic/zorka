@@ -175,7 +175,7 @@ public class QueryDef {
      *
      * @returnaugmented query definition
      */
-    public QueryDef withMetric(MetricTemplate metricTemplate) {
+    public QueryDef withMetricTemplate(MetricTemplate metricTemplate) {
         QueryDef qdef = new QueryDef(this);
         qdef.metricTemplate = metricTemplate;
         return qdef;
@@ -199,5 +199,10 @@ public class QueryDef {
 
     public List<QuerySegment> getSegments() {
         return segments;
+    }
+
+
+    public MetricTemplate getMetricTemplate() {
+        return metricTemplate;
     }
 }

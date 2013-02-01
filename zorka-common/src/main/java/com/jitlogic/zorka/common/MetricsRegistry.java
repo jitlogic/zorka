@@ -41,6 +41,10 @@ public class MetricsRegistry {
     }
 
 
+    public MetricTemplate getTemplate(int id) {
+        return templateById.get(id);
+    }
+
 
     public int metricId(Metric metric) {
         if (metric.getId() == 0) {
@@ -50,4 +54,8 @@ public class MetricsRegistry {
         return metric.getId();
     }
 
+
+    public Metric getMetric(int id) {
+        return metricById.get(id);
+    }
 }

@@ -41,6 +41,8 @@ public class JmxAttrScanner implements Runnable {
     /** Symbol registry */
     private SymbolRegistry symbols;
 
+    private MetricsRegistry metricsRegistry;
+
     /** Output handler - handles generated data (eg. saves them to trace files). */
     private TraceEventHandler output;
 
@@ -54,15 +56,14 @@ public class JmxAttrScanner implements Runnable {
      * @param symbols symbol registry
      *
      * @param name scanner name (converted to ID using symbol registry and attached to every emitted packet of data).
-     *
-     * @param output tracer output
-     *
-     * @param registry MBean server registry object
-     *
-     * @param qdefs JMX queries
+     *@param registry MBean server registry object
+     *@param output tracer output
+     *@param qdefs JMX queries
      */
-    public JmxAttrScanner(SymbolRegistry symbols, String name, TraceEventHandler output, MBeanServerRegistry registry, QueryDef...qdefs) {
+    public JmxAttrScanner(SymbolRegistry symbols, MetricsRegistry metricRegistry, String name,
+                          MBeanServerRegistry registry, TraceEventHandler output, QueryDef... qdefs) {
         this.symbols = symbols;
+        this.metricsRegistry = metricRegistry;
         this.id = symbols.symbolId(name);
         this.output = output;
 
@@ -94,6 +95,7 @@ public class JmxAttrScanner implements Runnable {
                     return null;
             }
             template.putMetric(key, metric);
+            metricsRegistry.metricId(metric);
         }
 
         return metric;
@@ -120,18 +122,22 @@ public class JmxAttrScanner implements Runnable {
         List<Double> doubleVals = new ArrayList<Double>(128);
 
         for (QueryLister lister : listers) {
-            for (QueryResult result : lister.list()) {
-                if (result.getValue() instanceof Number) {
-                    Number val = (Number)result.getValue();
-                    if (val instanceof Double || val instanceof Float) {
-                        doubleIds.add(result.getComponentId(symbols));
-                        doubleVals.add(val.doubleValue());
+            MetricTemplate template = lister.getMetricTemplate();
+            if (template != null) {
+                for (QueryResult result : lister.list()) {
+                    if (result.getValue() instanceof Number) {
+                        Metric metric = getMetric(template, result);
+                        Number val = metric.getValue(tstamp, (Number)result.getValue());
+                        if (val instanceof Double || val instanceof Float) {
+                            doubleIds.add(metric.getId());
+                            doubleVals.add(val.doubleValue());
+                        } else {
+                            longIds.add(metric.getId());
+                            longVals.add(val.longValue());
+                        }
                     } else {
-                        longIds.add(result.getComponentId(symbols));
-                        longVals.add(val.longValue());
+                        log.warn("Trying to submit non-numeric metric value for " + result.getAttrPath() + ": " + result.getValue());
                     }
-                } else {
-                    log.warn("Trying to submit non-numeric metric value for " + result.getAttrPath() + ": " + result.getValue());
                 }
             }
         } // for ()

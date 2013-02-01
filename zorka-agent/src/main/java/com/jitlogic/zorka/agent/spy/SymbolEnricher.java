@@ -44,6 +44,7 @@ public class SymbolEnricher extends TraceEventHandler {
     /** Symbol registry used by event sender. */
     private SymbolRegistry symbols;
 
+    private MetricsRegistry metricRegistry;
 
     /** Event receiver (output) object. */
     private TraceEventHandler output;
@@ -56,8 +57,9 @@ public class SymbolEnricher extends TraceEventHandler {
      *
      * @param output event receiver object
      */
-    public SymbolEnricher(SymbolRegistry symbols, TraceEventHandler output) {
+    public SymbolEnricher(SymbolRegistry symbols, MetricsRegistry metricRegistry, TraceEventHandler output) {
         this.symbols = symbols;
+        this.metricRegistry = metricRegistry;
         this.output = output;
     }
 
@@ -79,6 +81,17 @@ public class SymbolEnricher extends TraceEventHandler {
         }
     }
 
+
+    private void checkMetric(int id) {
+        if (!metricsSent.get(id)) {
+            Metric metric = metricRegistry.getMetric(id);
+            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
+                log.debug("Enriching output stream with metric '" + metric + "', id=" + id);
+            }
+            this.newMetric(metric);
+            metricsSent.set(id);
+        }
+    }
 
     /**
      * Resets enricher. Since reset enricher will forget about all sent symbol IDs
@@ -157,7 +170,7 @@ public class SymbolEnricher extends TraceEventHandler {
     public void longVals(long clock, int objId, int[] components, long[] values) {
         check(objId);
         for (int component : components) {
-            check(component);
+            checkMetric(component);
         }
     }
 
@@ -166,20 +179,26 @@ public class SymbolEnricher extends TraceEventHandler {
     public void doubleVals(long clock, int objId, int[] components, double[] values) {
         check(objId);
         for (int component : components) {
-            check(component);
+            checkMetric(component);
         }
     }
+
 
     @Override
     public void newMetricTemplate(MetricTemplate template) {
         // Nothing interesting (yet)
     }
 
+
     @Override
     public void newMetric(Metric metric) {
         if (!templatesSent.get(metric.getTemplate().getId())) {
-            //this.newMetricTemplate(metric.getTemplate()); TODO rething symbol/metric registry visibility in various objects
+            // TODO rething symbol/metric registry visibility in various objects
+            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
+                log.debug("Enriching output stream with metric template '" + metric.getTemplate() + "'");
+            }
             output.newMetricTemplate(metric.getTemplate());
+            templatesSent.set(metric.getTemplate().getId());
         }
     }
 }
