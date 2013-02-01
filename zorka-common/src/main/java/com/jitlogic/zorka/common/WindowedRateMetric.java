@@ -46,6 +46,6 @@ public class WindowedRateMetric extends Metric {
         lastDiv = curDiv;
 
         Double multiplier = getTemplate().getMultiplier();
-        return multiplier != null ? multiplier * rslt : rslt;
+        return multiplier != 1.0 ? multiplier * rslt : rslt;
     }
 }

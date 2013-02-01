@@ -87,4 +87,17 @@ public abstract class Metric {
     public Map<String, Object> getAttrs() {
         return attrs;
     }
+
+    protected Number multiply(Number value) {
+        Double multiplier = getTemplate().getMultiplier();
+        if (multiplier != 1.0) {
+            if (value instanceof Double || Math.floor(multiplier) != multiplier) {
+                return multiplier * value.doubleValue();
+            } else {
+                return multiplier.longValue() * value.longValue();
+            }
+        } else {
+            return value;
+        }
+    }
 }

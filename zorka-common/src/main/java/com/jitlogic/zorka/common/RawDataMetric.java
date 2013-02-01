@@ -21,9 +21,11 @@ import java.util.Set;
 
 public class RawDataMetric extends Metric {
 
+
     public RawDataMetric(int id, String name, Map<String, Object> attrs) {
         super(id, name, attrs);
     }
+
 
     public RawDataMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
         super(template, attrSet);
@@ -32,16 +34,7 @@ public class RawDataMetric extends Metric {
 
     @Override
     public Number getValue(long clock, Number value) {
-        Double multiplier = getTemplate().getMultiplier();
-        if (multiplier != null) {
-            if (value instanceof Double || Math.floor(multiplier) != multiplier) {
-                return multiplier * value.doubleValue();
-            } else {
-                return multiplier.longValue() * value.longValue();
-            }
-        } else {
-            return value;
-        }
+        return multiply(value);
     }
 
 }

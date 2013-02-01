@@ -37,7 +37,7 @@ public class MetricTemplate {
 
     private String nomField, divField;
 
-    private Double multiplier;
+    private double multiplier = 1.0;
 
     /** Names of dynamic attributes */
     private Set<String> dynamicAttrs = new HashSet<String>();
@@ -96,7 +96,7 @@ public class MetricTemplate {
     }
 
 
-    public Double getMultiplier() {
+    public double getMultiplier() {
         return multiplier;
     }
 
