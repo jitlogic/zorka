@@ -116,17 +116,6 @@ public class TraceSet extends TraceEventHandler {
 
 
     @Override
-    public void intVals(long clock, int objId, int[] components, int[] values) {
-        Map<Integer, List<DataSample>> metrics = getMetrics(objId);
-
-        for (int i = 0; i < components.length; i++) {
-            List<DataSample> data = getDataSamples(components[i], metrics);
-            data.add(new IntegerDataSample(clock, values[i]));
-        }
-    }
-
-
-    @Override
     public void doubleVals(long clock, int objId, int[] components, double[] values) {
         Map<Integer, List<DataSample>> metrics = getMetrics(objId);
 

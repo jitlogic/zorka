@@ -149,6 +149,7 @@ public class SymbolEnricher extends TraceEventHandler {
         output.newAttr(attrId, attrVal);
     }
 
+
     @Override
     public void longVals(long clock, int objId, int[] components, long[] values) {
         check(objId);
@@ -157,13 +158,6 @@ public class SymbolEnricher extends TraceEventHandler {
         }
     }
 
-    @Override
-    public void intVals(long clock, int objId, int[] components, int[] values) {
-        check(objId);
-        for (int component : components) {
-            check(component);
-        }
-    }
 
     @Override
     public void doubleVals(long clock, int objId, int[] components, double[] values) {

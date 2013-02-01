@@ -112,20 +112,6 @@ public abstract class TraceEventHandler {
 
 
     /**
-     * Records a collection of integer samples.
-     *
-     * @param clock wall clock time
-     *
-     * @param objId object ID
-     *
-     * @param components symbol IDs
-     *
-     * @param values values
-     */
-    public abstract void intVals(long clock, int objId, int[] components, int[] values);
-
-
-    /**
      * Records a collection of floating point samples.
      *
      * @param clock wall clock time

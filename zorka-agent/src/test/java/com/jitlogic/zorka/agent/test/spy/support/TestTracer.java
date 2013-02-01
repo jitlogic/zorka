@@ -69,11 +69,6 @@ public class TestTracer extends TraceEventHandler {
     }
 
     @Override
-    public void intVals(long clock, int objId, int[] components, int[] values) {
-        data.add(ZorkaUtil.map("action", "intVals", "clock", clock, "objId", objId, "components", components, "values", values));
-    }
-
-    @Override
     public void doubleVals(long clock, int objId, int[] components, double[] values) {
         data.add(ZorkaUtil.map("action", "doubleVals", "clock", clock, "objId", objId, "components", components, "values", values));
     }

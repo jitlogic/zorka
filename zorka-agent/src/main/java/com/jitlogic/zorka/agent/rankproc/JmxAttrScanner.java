@@ -90,43 +90,28 @@ public class JmxAttrScanner implements Runnable {
         List<Integer> longIds = new ArrayList<Integer>(128);
         List<Long> longVals = new ArrayList<Long>(128);
 
-        List<Integer> intIds = new ArrayList<Integer>(128);
-        List<Integer> intVals = new ArrayList<Integer>(128);
-
         List<Integer> doubleIds = new ArrayList<Integer>(128);
         List<Double> doubleVals = new ArrayList<Double>(128);
 
         for (QueryLister lister : listers) {
             for (QueryResult result : lister.list()) {
-                Object val = result.getValue();
-                if (val instanceof Long) {
-                    longIds.add(result.getComponentId(symbols));
-                    longVals.add((Long)val);
-                } else if (val instanceof Integer) {
-                    intIds.add(result.getComponentId(symbols));
-                    intVals.add((Integer)val);
-                } else if (val instanceof Double) {
-                    doubleIds.add(result.getComponentId(symbols));
-                    doubleVals.add((Double)val);
-                } else if (val instanceof Short) {
-                    intIds.add(result.getComponentId(symbols));
-                    intVals.add((int)(Short)val);
-                } else if (val instanceof Byte) {
-                    intIds.add(result.getComponentId(symbols));
-                    intVals.add((int)(Byte)val);
-                } else if (val instanceof Float) {
-                    doubleIds.add(result.getComponentId(symbols));
-                    doubleVals.add((double)(Float)val);
+                if (result.getValue() instanceof Number) {
+                    Number val = (Number)result.getValue();
+                    if (val instanceof Double || val instanceof Float) {
+                        doubleIds.add(result.getComponentId(symbols));
+                        doubleVals.add(val.doubleValue());
+                    } else {
+                        longIds.add(result.getComponentId(symbols));
+                        longVals.add(val.longValue());
+                    }
+                } else {
+                    log.warn("Trying to submit non-numeric metric value for " + result.getAttrPath() + ": " + result.getValue());
                 }
             }
         } // for ()
 
         if (longIds.size() > 0) {
             output.longVals(tstamp, id, ZorkaUtil.intArray(longIds), ZorkaUtil.longArray(longVals));
-        }
-
-        if (intIds.size() > 0) {
-            output.intVals(tstamp, id, ZorkaUtil.intArray(intIds), ZorkaUtil.intArray(intVals));
         }
 
         if (doubleIds.size() > 0) {

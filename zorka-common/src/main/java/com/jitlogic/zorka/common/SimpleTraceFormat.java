@@ -183,6 +183,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
         }
     }
 
+
     @Override
     public void longVals(long clock, int objId, int[] components, long[] values) {
         buf.putByte(LONG_VAL);
@@ -195,17 +196,6 @@ public class SimpleTraceFormat extends TraceEventHandler {
         }
     }
 
-    @Override
-    public void intVals(long clock, int objId, int[] components, int[] values) {
-        buf.putByte(INT_VAL);
-        buf.putLong(clock);
-        buf.putInt(objId);
-        buf.putInt(components.length);
-        for (int i = 0; i < components.length; i++) {
-            buf.putInt(components[i]);
-            buf.putInt(values[i]);
-        }
-    }
 
     @Override
     public void doubleVals(long clock, int objId, int[] components, double[] values) {
@@ -250,9 +240,6 @@ public class SimpleTraceFormat extends TraceEventHandler {
                     break;
                 case LONG_VAL:
                     decodeLongVals(output);
-                    break;
-                case INT_VAL:
-                    decodeIntVals(output);
                     break;
                 case DOUBLE_VAL:
                     decodeDoubleVals(output);
@@ -301,23 +288,6 @@ public class SimpleTraceFormat extends TraceEventHandler {
         }
 
         output.longVals(clock, objId, components, values);
-    }
-
-
-    private void decodeIntVals(TraceEventHandler output) {
-        long clock = buf.getLong();
-        int objId = buf.getInt();
-        int len = buf.getInt();
-
-        int[] components = new int[len];
-        int[] values = new int[len];
-
-        for (int i = 0; i < len; i++) {
-            components[i] = buf.getInt();
-            values[i] = buf.getInt();
-        }
-
-        output.intVals(clock, objId, components, values);
     }
 
 

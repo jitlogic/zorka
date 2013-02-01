@@ -148,13 +148,11 @@ public class TraceBuilder extends TraceEventHandler {
         ttop.setAttr(attrId, attrVal);
     }
 
+
     @Override
     public void longVals(long clock, int objId, int[] components, long[] values) {
     }
 
-    @Override
-    public void intVals(long clock, int objId, int[] components, int[] values) {
-    }
 
     @Override
     public void doubleVals(long clock, int objId, int[] components, double[] values) {

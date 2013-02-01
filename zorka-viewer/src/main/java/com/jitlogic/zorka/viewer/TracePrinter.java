@@ -116,6 +116,7 @@ public class TracePrinter extends TraceEventHandler {
         out.println(spc(level) + sym(attrId) + "=" + attrVal);
     }
 
+
     @Override
     public void longVals(long clock, int objId, int[] components, long[] values) {
         StringBuilder sb = new StringBuilder(128);
@@ -127,16 +128,6 @@ public class TracePrinter extends TraceEventHandler {
         out.println(sb.toString());
     }
 
-    @Override
-    public void intVals(long clock, int objId, int[] components, int[] values) {
-        StringBuilder sb = new StringBuilder(128);
-        sb.append("VALS(" + time(clock) + "): objId=" + objId + ", data=(");
-        for (int i = 0; i < components.length; i++) {
-            sb.append("[" + components[i] + "," + values[i] + "]");
-        }
-        sb.append(")");
-        out.println(sb.toString());
-    }
 
     @Override
     public void doubleVals(long clock, int objId, int[] components, double[] values) {
