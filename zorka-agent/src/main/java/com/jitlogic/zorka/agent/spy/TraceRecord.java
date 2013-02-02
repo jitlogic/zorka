@@ -16,10 +16,10 @@
 
 package com.jitlogic.zorka.agent.spy;
 
+import com.jitlogic.zorka.common.PerfEventStreamHandler;
 import com.jitlogic.zorka.common.Submittable;
 import com.jitlogic.zorka.common.SymbolRegistry;
 import com.jitlogic.zorka.common.SymbolicException;
-import com.jitlogic.zorka.common.TraceEventHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -291,7 +291,7 @@ public class TraceRecord implements Submittable {
      * @param output output handler object
      */
     @Override
-    public void traverse(TraceEventHandler output) {
+    public void traverse(PerfEventStreamHandler output) {
 
         if (hasFlag(TRACE_BEGIN)) {
             output.traceBegin(marker.getTraceId(), getClock(), marker != null ? marker.getFlags() : 0);

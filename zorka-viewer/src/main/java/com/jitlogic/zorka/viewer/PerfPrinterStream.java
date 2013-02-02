@@ -18,7 +18,7 @@ package com.jitlogic.zorka.viewer;
 
 import com.jitlogic.zorka.common.Metric;
 import com.jitlogic.zorka.common.MetricTemplate;
-import com.jitlogic.zorka.common.TraceEventHandler;
+import com.jitlogic.zorka.common.PerfEventStreamHandler;
 
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
@@ -32,7 +32,7 @@ import java.util.Map;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TracePrinter extends TraceEventHandler {
+public class PerfPrinterStream extends PerfEventStreamHandler {
 
     private PrintStream out;
 
@@ -45,7 +45,7 @@ public class TracePrinter extends TraceEventHandler {
      *
      * @param out output stream
      */
-    public TracePrinter(PrintStream out) {
+    public PerfPrinterStream(PrintStream out) {
         this.out = out;
     }
 

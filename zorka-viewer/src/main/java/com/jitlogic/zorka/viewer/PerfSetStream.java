@@ -29,7 +29,7 @@ import java.util.Map;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TraceSet extends TraceEventHandler {
+public class PerfSetStream extends PerfEventStreamHandler {
 
     /** Symbol map */
     private Map<Integer,String> symbols = new HashMap<Integer, String>(4096);
@@ -210,7 +210,7 @@ public class TraceSet extends TraceEventHandler {
                 long len = f.length();
                 byte[] buf = new byte[(int)len];
                 is.read(buf);
-                SimpleTraceFormat stf = new SimpleTraceFormat(buf);
+                SimplePerfDataFormat stf = new SimplePerfDataFormat(buf);
                 stf.decode(this);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

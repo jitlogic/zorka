@@ -23,11 +23,11 @@ import java.util.Map;
 /**
  * Implements simple trace encoder/decoder. Uses simple, uncompressed binary format.
  * It basically reads/writes stream of commands that correspond to methods of
- * TraceEventHandler interface.
+ * PerfEventStreamHandler interface.
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class SimpleTraceFormat extends TraceEventHandler {
+public class SimplePerfDataFormat extends PerfEventStreamHandler {
 
     /** Simple format version 1 magic number */
     public static final int MAGIC_V1=0x57aace01;
@@ -93,7 +93,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
      *
      * @param buf output buffer
      */
-    public SimpleTraceFormat(ByteBuffer buf) {
+    public SimplePerfDataFormat(ByteBuffer buf) {
         this.buf = buf;
     }
 
@@ -102,7 +102,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
      *
      * @param buf input buffer
      */
-    public SimpleTraceFormat(byte[] buf) {
+    public SimplePerfDataFormat(byte[] buf) {
         this.buf = new ByteBuffer(buf);
     }
 
@@ -249,7 +249,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
     }
 
 
-    private void decodeMetric(TraceEventHandler output) {
+    private void decodeMetric(PerfEventStreamHandler output) {
         int type = buf.getByte(), id = buf.getInt(), tid = buf.getInt();
         String name = buf.getString();
         int nattr = buf.getByte();
@@ -286,7 +286,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
      *
      * @param output handler that will receive decoded events
      */
-    public void decode(TraceEventHandler output) {
+    public void decode(PerfEventStreamHandler output) {
         while (!buf.eof()) {
             byte cmd = buf.getByte();
             switch (cmd) {
@@ -345,7 +345,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
     }
 
 
-    private void decodeTemplate(TraceEventHandler output) {
+    private void decodeTemplate(PerfEventStreamHandler output) {
         int id = buf.getInt(), type = buf.getByte();
         String name = buf.getString(), units = buf.getString(), nom = buf.getString(), div = buf.getString();
         double multiplier = buf.getDouble();
@@ -367,7 +367,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
      *
      * @param output
      */
-    private void decodeLongVals(TraceEventHandler output) {
+    private void decodeLongVals(PerfEventStreamHandler output) {
         long clock = buf.getLong();
         int objId = buf.getInt();
         int len = buf.getInt();
@@ -384,7 +384,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
     }
 
 
-    private void decodeDoubleVals(TraceEventHandler output) {
+    private void decodeDoubleVals(PerfEventStreamHandler output) {
         long clock = buf.getLong();
         int objId = buf.getInt();
         int len = buf.getInt();

@@ -25,7 +25,7 @@ public class SimpleTraceFormatUnitTest {
 
     private SymbolRegistry symbols = new SymbolRegistry();
     private ByteBuffer buf = new ByteBuffer();;
-    private SimpleTraceFormat encoder = new SimpleTraceFormat(buf);
+    private SimplePerfDataFormat encoder = new SimplePerfDataFormat(buf);
     private TestTracer output = new TestTracer();
 
 
@@ -37,7 +37,7 @@ public class SimpleTraceFormatUnitTest {
     private int a1 = symbols.symbolId("someAttr");
 
     private void decode() {
-        new SimpleTraceFormat(buf.getContent()).decode(output);
+        new SimplePerfDataFormat(buf.getContent()).decode(output);
     }
 
     @Test

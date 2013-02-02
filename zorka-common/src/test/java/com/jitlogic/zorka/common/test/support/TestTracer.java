@@ -18,7 +18,7 @@ package com.jitlogic.zorka.common.test.support;
 
 import com.jitlogic.zorka.common.Metric;
 import com.jitlogic.zorka.common.MetricTemplate;
-import com.jitlogic.zorka.common.TraceEventHandler;
+import com.jitlogic.zorka.common.PerfEventStreamHandler;
 import com.jitlogic.zorka.common.ZorkaUtil;
 import org.junit.Assert;
 
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class TestTracer extends TraceEventHandler {
+public class TestTracer extends PerfEventStreamHandler {
 
     private List<Map<Object,Object>> data = new ArrayList<Map<Object, Object>>();
 

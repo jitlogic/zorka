@@ -23,7 +23,7 @@ package com.jitlogic.zorka.common;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public abstract class TraceEventHandler extends TraceBuilder {
+public abstract class PerfEventStreamHandler extends TraceBuilder {
 
     /**
      * Records trace statistics.

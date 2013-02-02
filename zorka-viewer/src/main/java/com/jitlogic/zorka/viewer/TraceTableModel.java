@@ -24,9 +24,9 @@ public class TraceTableModel extends AbstractTableModel {
     private String[] colNames = { "Date", "Time", "Calls", "Err", "Label" };
     private int[]    colWidth = { 75, 50, 50, 50, 150 };
 
-    private TraceSet traceSet = new TraceSet();
+    private PerfSetStream traceSet = new PerfSetStream();
 
-    public void setTraceSet(TraceSet traceSet) {
+    public void setTraceSet(PerfSetStream traceSet) {
         this.traceSet = traceSet;
         fireTableDataChanged();
     }

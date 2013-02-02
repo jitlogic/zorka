@@ -44,7 +44,7 @@ public class JmxAttrScanner implements Runnable {
     private MetricsRegistry metricsRegistry;
 
     /** Output handler - handles generated data (eg. saves them to trace files). */
-    private TraceEventHandler output;
+    private PerfEventStreamHandler output;
 
     /** Query listers representing queries supplied at scanner construction time */
     private List<QueryLister> listers = new ArrayList<QueryLister>();
@@ -61,7 +61,7 @@ public class JmxAttrScanner implements Runnable {
      *@param qdefs JMX queries
      */
     public JmxAttrScanner(SymbolRegistry symbols, MetricsRegistry metricRegistry, String name,
-                          MBeanServerRegistry registry, TraceEventHandler output, QueryDef... qdefs) {
+                          MBeanServerRegistry registry, PerfEventStreamHandler output, QueryDef... qdefs) {
         this.symbols = symbols;
         this.metricsRegistry = metricRegistry;
         this.id = symbols.symbolId(name);

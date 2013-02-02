@@ -40,7 +40,7 @@ public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
     private SymbolEnricher enricher;
 
     /** Trace encoder. Simple uncompressed binary format is used at the moment. */
-    private SimpleTraceFormat encoder;
+    private SimplePerfDataFormat encoder;
 
     /** Working byte buffer. */
     private ByteBuffer buffer;
@@ -86,7 +86,7 @@ public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
         super("trace-writer");
         this.symbols = symbols;
         this.buffer = new ByteBuffer(2048);
-        this.encoder = new SimpleTraceFormat(buffer);
+        this.encoder = new SimplePerfDataFormat(buffer);
         this.enricher = new SymbolEnricher(this.symbols, metricsRegistry, encoder);
         this.traceFile = new File(path);
         this.maxFiles = maxFiles;

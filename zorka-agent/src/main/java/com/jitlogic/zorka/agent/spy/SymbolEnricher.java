@@ -27,7 +27,7 @@ import com.jitlogic.zorka.common.*;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class SymbolEnricher extends TraceEventHandler {
+public class SymbolEnricher extends PerfEventStreamHandler {
 
 
     /** Logger object */
@@ -47,7 +47,7 @@ public class SymbolEnricher extends TraceEventHandler {
     private MetricsRegistry metricRegistry;
 
     /** Event receiver (output) object. */
-    private TraceEventHandler output;
+    private PerfEventStreamHandler output;
 
 
     /**
@@ -57,7 +57,7 @@ public class SymbolEnricher extends TraceEventHandler {
      *
      * @param output event receiver object
      */
-    public SymbolEnricher(SymbolRegistry symbols, MetricsRegistry metricRegistry, TraceEventHandler output) {
+    public SymbolEnricher(SymbolRegistry symbols, MetricsRegistry metricRegistry, PerfEventStreamHandler output) {
         this.symbols = symbols;
         this.metricRegistry = metricRegistry;
         this.output = output;

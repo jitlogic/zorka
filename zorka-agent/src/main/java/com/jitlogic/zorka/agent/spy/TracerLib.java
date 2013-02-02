@@ -249,7 +249,7 @@ public class TracerLib {
      * @param qdefs queries
      * @return
      */
-    public JmxAttrScanner jmxScanner(String name, TraceEventHandler output, QueryDef...qdefs) {
+    public JmxAttrScanner jmxScanner(String name, PerfEventStreamHandler output, QueryDef...qdefs) {
         return new JmxAttrScanner(symbolRegistry, metricsRegistry, name, AgentInstance.getMBeanServerRegistry(), output, qdefs);
     }
 
