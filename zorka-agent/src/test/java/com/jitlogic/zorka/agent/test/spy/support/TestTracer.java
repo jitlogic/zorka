@@ -66,12 +66,12 @@ public class TestTracer extends PerfDataEventHandler {
     }
 
     @Override
-    public void longVals(long clock, int objId, int[] components, long[] values) {
+    public void longVals(long clock, int objId, List<Integer> components, List<Long> values) {
         data.add(ZorkaUtil.map("action", "longVals", "clock", clock, "objId", objId, "components", components, "values", values));
     }
 
     @Override
-    public void doubleVals(long clock, int objId, int[] components, double[] values) {
+    public void doubleVals(long clock, int objId, List<Integer> components, List<Double> values) {
         data.add(ZorkaUtil.map("action", "doubleVals", "clock", clock, "objId", objId, "components", components, "values", values));
     }
 

@@ -105,23 +105,23 @@ public class PerfDataSet extends PerfDataEventHandler {
 
 
     @Override
-    public void longVals(long clock, int objId, int[] components, long[] values) {
+    public void longVals(long clock, int objId, List<Integer> components, List<Long> values) {
         Map<Integer, List<DataSample>> metrics = getMetrics(objId);
 
-        for (int i = 0; i < components.length; i++) {
-            List<DataSample> data = getDataSamples(components[i], metrics);
-            data.add(new LongDataSample(clock, values[i]));
+        for (int i = 0; i < components.size(); i++) {
+            List<DataSample> data = getDataSamples(components.get(i), metrics);
+            data.add(new LongDataSample(clock, values.get(i)));
         }
     }
 
 
     @Override
-    public void doubleVals(long clock, int objId, int[] components, double[] values) {
+    public void doubleVals(long clock, int objId, List<Integer> components, List<Double> values) {
         Map<Integer, List<DataSample>> metrics = getMetrics(objId);
 
-        for (int i = 0; i < components.length; i++) {
-            List<DataSample> data = getDataSamples(components[i], metrics);
-            data.add(new DoubleDataSample(clock, values[i]));
+        for (int i = 0; i < components.size(); i++) {
+            List<DataSample> data = getDataSamples(components.get(i), metrics);
+            data.add(new DoubleDataSample(clock, values.get(i)));
         }
     }
 

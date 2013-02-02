@@ -143,11 +143,11 @@ public class JmxAttrScanner implements Runnable {
         } // for ()
 
         if (longIds.size() > 0) {
-            output.longVals(tstamp, id, ZorkaUtil.intArray(longIds), ZorkaUtil.longArray(longVals));
+            output.longVals(tstamp, id, longIds, longVals);
         }
 
         if (doubleIds.size() > 0) {
-            output.doubleVals(tstamp, id, ZorkaUtil.intArray(doubleIds), ZorkaUtil.doubleArray(doubleVals));
+            output.doubleVals(tstamp, id, doubleIds, doubleVals);
         }
     }
 

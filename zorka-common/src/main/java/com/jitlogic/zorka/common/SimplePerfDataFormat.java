@@ -17,7 +17,9 @@
 package com.jitlogic.zorka.common;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -191,29 +193,30 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
 
 
     @Override
-    public void longVals(long clock, int objId, int[] components, long[] values) {
+    public void longVals(long clock, int objId, List<Integer> components, List<Long> values) {
         buf.putByte(LONG_VAL);
         buf.putLong(clock);
         buf.putInt(objId);
-        buf.putInt(components.length);
-        for (int i = 0; i < components.length; i++) {
-            buf.putInt(components[i]);
-            buf.putLong(values[i]);
+        buf.putInt(components.size());
+        for (int i = 0; i < components.size(); i++) {
+            buf.putInt(components.get(i));
+            buf.putLong(values.get(i));
         }
     }
 
 
     @Override
-    public void doubleVals(long clock, int objId, int[] components, double[] values) {
+    public void doubleVals(long clock, int objId, List<Integer> components, List<Double> values) {
         buf.putByte(DOUBLE_VAL);
         buf.putLong(clock);
         buf.putInt(objId);
-        buf.putInt(components.length);
-        for (int i = 0; i < components.length; i++) {
-            buf.putInt(components[i]);
-            buf.putDouble(values[i]);
+        buf.putInt(components.size());
+        for (int i = 0; i < components.size(); i++) {
+            buf.putInt(components.get(i));
+            buf.putDouble(values.get(i));
         }
     }
+
 
     @Override
     public void newMetricTemplate(MetricTemplate template) {
@@ -372,12 +375,12 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
         int objId = buf.getInt();
         int len = buf.getInt();
 
-        int[] components = new int[len];
-        long[] values = new long[len];
+        List<Integer> components = new ArrayList<Integer>(len+1);
+        List<Long> values = new ArrayList<Long>(len+1);
 
         for (int i = 0; i < len; i++) {
-            components[i] = buf.getInt();
-            values[i] = buf.getLong();
+            components.add(buf.getInt());
+            values.add(buf.getLong());
         }
 
         output.longVals(clock, objId, components, values);
@@ -389,12 +392,12 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
         int objId = buf.getInt();
         int len = buf.getInt();
 
-        int[] components = new int[len];
-        double[] values = new double[len];
+        List<Integer> components = new ArrayList<Integer>(len+1);
+        List<Double> values = new ArrayList<Double>(len+1);
 
         for (int i = 0; i < len; i++) {
-            components[i] = buf.getInt();
-            values[i] = buf.getDouble();
+            components.add(buf.getInt());
+            values.add( buf.getDouble());
         }
 
         output.doubleVals(clock, objId, components, values);

@@ -24,6 +24,7 @@ import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -120,11 +121,11 @@ public class PerfPrinterStream extends PerfDataEventHandler {
 
 
     @Override
-    public void longVals(long clock, int objId, int[] components, long[] values) {
+    public void longVals(long clock, int objId, List<Integer> components, List<Long> values) {
         StringBuilder sb = new StringBuilder(128);
         sb.append("VALS(" + time(clock) + "): objId=" + objId + ", data=(");
-        for (int i = 0; i < components.length; i++) {
-            sb.append("[" + components[i] + "," + values[i] + "]");
+        for (int i = 0; i < components.size(); i++) {
+            sb.append("[" + components.get(i) + "," + values.get(i) + "]");
         }
         sb.append(")");
         out.println(sb.toString());
@@ -132,11 +133,11 @@ public class PerfPrinterStream extends PerfDataEventHandler {
 
 
     @Override
-    public void doubleVals(long clock, int objId, int[] components, double[] values) {
+    public void doubleVals(long clock, int objId, List<Integer> components, List<Double> values) {
         StringBuilder sb = new StringBuilder(128);
         sb.append("VALS(" + time(clock) + "): objId=" + objId + ", data=(");
-        for (int i = 0; i < components.length; i++) {
-            sb.append("[" + components[i] + "," + values[i] + "]");
+        for (int i = 0; i < components.size(); i++) {
+            sb.append("[" + components.get(i) + "," + values.get(i) + "]");
         }
         sb.append(")");
         out.println(sb.toString());

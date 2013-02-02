@@ -19,6 +19,8 @@ package com.jitlogic.zorka.agent.spy;
 
 import com.jitlogic.zorka.common.*;
 
+import java.util.List;
+
 /**
  * This trace event handler can be plugged between trace event sender and receiver.
  * It will check if symbol IDs in trace events coming from sender are known to receiver.
@@ -167,7 +169,7 @@ public class SymbolEnricher extends PerfDataEventHandler {
 
 
     @Override
-    public void longVals(long clock, int objId, int[] components, long[] values) {
+    public void longVals(long clock, int objId, List<Integer> components, List<Long> values) {
         check(objId);
         for (int component : components) {
             checkMetric(component);
@@ -176,7 +178,7 @@ public class SymbolEnricher extends PerfDataEventHandler {
 
 
     @Override
-    public void doubleVals(long clock, int objId, int[] components, double[] values) {
+    public void doubleVals(long clock, int objId, List<Integer> components, List<Double> values) {
         check(objId);
         for (int component : components) {
             checkMetric(component);

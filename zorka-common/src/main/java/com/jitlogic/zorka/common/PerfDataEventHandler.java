@@ -17,6 +17,8 @@
 package com.jitlogic.zorka.common;
 
 
+import java.util.List;
+
 /**
  * Handles trace events. For performance reasons this is class, not interface
  * (and null implementation is useful anyway).
@@ -58,7 +60,7 @@ public abstract class PerfDataEventHandler extends TraceEventHandler {
      *
      * @param values values
      */
-    public abstract void longVals(long clock, int objId, int[] components, long[] values);
+    public abstract void longVals(long clock, int objId, List<Integer> components, List<Long> values);
 
 
     /**
@@ -72,7 +74,7 @@ public abstract class PerfDataEventHandler extends TraceEventHandler {
      *
      * @param values values
      */
-    public abstract void doubleVals(long clock, int objId, int[] components, double[] values);
+    public abstract void doubleVals(long clock, int objId, List<Integer> components, List<Double> values);
 
 
     /**
