@@ -25,6 +25,10 @@ public class PerfSample {
     public static final byte DOUBLE_SAMPLE = 2;
 
     private int metricId;
+
+    /** Clock normally isn't used by agent nor encoded in trace files. */
+    private transient long clock;
+
     private Number value;
 
     private Map<Integer,String> attrs;
@@ -89,5 +93,13 @@ public class PerfSample {
         } else {
             return false;
         }
+    }
+
+    public long getClock() {
+        return clock;
+    }
+
+    public void setClock(long clock) {
+        this.clock = clock;
     }
 }
