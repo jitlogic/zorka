@@ -19,6 +19,9 @@ package com.jitlogic.zorka.agent.spy;
 
 import com.jitlogic.zorka.common.*;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * This trace event handler can be plugged between trace event sender and receiver.
  * It will check if symbol IDs in trace events coming from sender are known to receiver.
@@ -27,7 +30,7 @@ import com.jitlogic.zorka.common.*;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class SymbolEnricher extends TraceEventHandler {
+public class SymbolEnricher extends PerfDataEventHandler {
 
 
     /** Logger object */
@@ -35,15 +38,19 @@ public class SymbolEnricher extends TraceEventHandler {
 
 
     /** Symbol ID bit mask. Zeroed bits in this mask mark symbols that are not yet known to receiver. */
-    BitVector bitVector = new BitVector();
+    BitVector symbolsSent = new BitVector();
 
+    BitVector templatesSent = new BitVector(16);
+
+    BitVector metricsSent = new BitVector(16);
 
     /** Symbol registry used by event sender. */
     private SymbolRegistry symbols;
 
+    private MetricsRegistry metricRegistry;
 
     /** Event receiver (output) object. */
-    private TraceEventHandler output;
+    private PerfDataEventHandler output;
 
 
     /**
@@ -53,8 +60,9 @@ public class SymbolEnricher extends TraceEventHandler {
      *
      * @param output event receiver object
      */
-    public SymbolEnricher(SymbolRegistry symbols, TraceEventHandler output) {
+    public SymbolEnricher(SymbolRegistry symbols, MetricsRegistry metricRegistry, PerfDataEventHandler output) {
         this.symbols = symbols;
+        this.metricRegistry = metricRegistry;
         this.output = output;
     }
 
@@ -66,16 +74,27 @@ public class SymbolEnricher extends TraceEventHandler {
      */
     private void check(int id) {
 
-        if (!bitVector.get(id)) {
+        if (!symbolsSent.get(id)) {
             String sym = symbols.symbolName(id);
             if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
                 log.debug("Enriching output stream with symbol '" + sym + "', id=" + id);
             }
             output.newSymbol(id, sym);
-            bitVector.set(id);
+            symbolsSent.set(id);
         }
     }
 
+
+    private void checkMetric(int id) {
+        if (!metricsSent.get(id)) {
+            Metric metric = metricRegistry.getMetric(id);
+            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
+                log.debug("Enriching output stream with metric '" + metric + "', id=" + id);
+            }
+            this.newMetric(metric);
+            metricsSent.set(id);
+        }
+    }
 
     /**
      * Resets enricher. Since reset enricher will forget about all sent symbol IDs
@@ -85,7 +104,7 @@ public class SymbolEnricher extends TraceEventHandler {
         if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
             log.debug("Resetting symbol enricher.");
         }
-        bitVector.reset();
+        symbolsSent.reset();
     }
 
 
@@ -149,27 +168,36 @@ public class SymbolEnricher extends TraceEventHandler {
         output.newAttr(attrId, attrVal);
     }
 
+
     @Override
-    public void longVals(long clock, int objId, int[] components, long[] values) {
-        check(objId);
-        for (int component : components) {
-            check(component);
+    public void perfData(long clock, int scannerId, List<PerfSample> samples) {
+        check(scannerId);
+        for (PerfSample sample : samples) {
+            checkMetric(sample.getMetricId());
+            if (sample.getAttrs() != null) {
+                for (Map.Entry<Integer,String> e : sample.getAttrs().entrySet()) {
+                    check(e.getKey());
+                }
+            }
         }
     }
 
-    @Override
-    public void intVals(long clock, int objId, int[] components, int[] values) {
-        check(objId);
-        for (int component : components) {
-            check(component);
-        }
-    }
 
     @Override
-    public void doubleVals(long clock, int objId, int[] components, double[] values) {
-        check(objId);
-        for (int component : components) {
-            check(component);
+    public void newMetricTemplate(MetricTemplate template) {
+        // Nothing interesting (yet)
+    }
+
+
+    @Override
+    public void newMetric(Metric metric) {
+        if (!templatesSent.get(metric.getTemplate().getId())) {
+            // TODO rething symbol/metric registry visibility in various objects
+            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
+                log.debug("Enriching output stream with metric template '" + metric.getTemplate() + "'");
+            }
+            output.newMetricTemplate(metric.getTemplate());
+            templatesSent.set(metric.getTemplate().getId());
         }
     }
 }

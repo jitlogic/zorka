@@ -16,8 +16,6 @@
 
 package com.jitlogic.zorka.agent.spy;
 
-import com.jitlogic.zorka.common.TraceEventHandler;
-
 import java.util.Map;
 
 /**

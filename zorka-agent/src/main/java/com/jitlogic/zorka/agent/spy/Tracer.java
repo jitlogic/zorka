@@ -16,10 +16,7 @@
 
 package com.jitlogic.zorka.agent.spy;
 
-import com.jitlogic.zorka.common.Submittable;
-import com.jitlogic.zorka.common.SymbolRegistry;
-import com.jitlogic.zorka.common.TraceEventHandler;
-import com.jitlogic.zorka.common.ZorkaAsyncThread;
+import com.jitlogic.zorka.common.*;
 
 /**
  * Groups all tracer engine components and global settings.
@@ -74,13 +71,15 @@ public class Tracer {
     /** Symbol registry containing names of all symbols tracer knows about. */
     private SymbolRegistry symbolRegistry = new SymbolRegistry();
 
+    private MetricsRegistry metricsRegistry = new MetricsRegistry();
+
     /** Output handler is initially set to null implementation. */
     private ZorkaAsyncThread<Submittable> output;
 
     /** Thread local serving trace builder objects for application threads */
-    private ThreadLocal<TraceBuilder> localHandlers =
-        new ThreadLocal<TraceBuilder>() {
-            public TraceBuilder initialValue() {
+    private ThreadLocal<TraceEventHandler> localHandlers =
+        new ThreadLocal<TraceEventHandler>() {
+            public TraceEventHandler initialValue() {
                 return new TraceBuilder(output, symbolRegistry);
             }
         };
@@ -99,6 +98,15 @@ public class Tracer {
         return symbolRegistry;
     }
 
+
+    public MetricsRegistry getMetricsRegistry() {
+        return metricsRegistry;
+    }
+
+
+    public ZorkaAsyncThread<Submittable> getOutput() {
+        return output;
+    }
 
     /**
      * Adds new matcher that includes (or excludes) classes and method to be traced.

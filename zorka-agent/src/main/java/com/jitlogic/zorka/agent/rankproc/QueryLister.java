@@ -17,10 +17,7 @@
 package com.jitlogic.zorka.agent.rankproc;
 
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.common.JmxObject;
-import com.jitlogic.zorka.common.ObjectInspector;
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.common.*;
 
 import javax.management.*;
 import java.util.ArrayList;
@@ -162,4 +159,7 @@ public class QueryLister {
         return  results;
     }
 
+    public MetricTemplate getMetricTemplate() {
+        return query.getMetricTemplate();
+    }
 }

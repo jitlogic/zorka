@@ -16,12 +16,6 @@
 
 package com.jitlogic.zorka.viewer.test;
 
-import com.jitlogic.zorka.common.SimpleTraceFormat;
-import com.jitlogic.zorka.viewer.TracePrinter;
-import org.junit.Test;
-
-import java.io.*;
-
 public class TracePrinterManualTest {
 
     //@Test
@@ -35,8 +29,8 @@ public class TracePrinterManualTest {
 //        OutputStream os = new BufferedOutputStream(new FileOutputStream("/tmp/trace.txt"));
 //        PrintStream ps = new PrintStream(os);
 //
-//        TracePrinter printer = new TracePrinter(ps);
-//        new SimpleTraceFormat(buf).decode(printer);
+//        PerfPrinterStream printer = new PerfPrinterStream(ps);
+//        new SimplePerfDataFormat(buf).decode(printer);
 //        ps.flush();
 //        ps.close();
     }

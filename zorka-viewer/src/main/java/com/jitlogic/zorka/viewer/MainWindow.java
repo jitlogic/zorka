@@ -34,7 +34,7 @@ import javax.swing.border.EmptyBorder;
 public class MainWindow extends JFrame {
 
     /** Contains loaded traces */
-    private TraceSet traceSet = new TraceSet();
+    private PerfDataSet traceSet = new PerfDataSet();
 
     /** Content pane */
     private JPanel contentPane;

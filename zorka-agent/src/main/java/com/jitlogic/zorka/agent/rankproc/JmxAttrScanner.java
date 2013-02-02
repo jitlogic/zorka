@@ -20,8 +20,9 @@ import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.common.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * JMX Attribute Scanner is responsible for traversing JMX (using supplied queries) and
@@ -42,8 +43,10 @@ public class JmxAttrScanner implements Runnable {
     /** Symbol registry */
     private SymbolRegistry symbols;
 
+    private MetricsRegistry metricsRegistry;
+
     /** Output handler - handles generated data (eg. saves them to trace files). */
-    private TraceEventHandler output;
+    private PerfDataEventHandler output;
 
     /** Query listers representing queries supplied at scanner construction time */
     private List<QueryLister> listers = new ArrayList<QueryLister>();
@@ -55,15 +58,14 @@ public class JmxAttrScanner implements Runnable {
      * @param symbols symbol registry
      *
      * @param name scanner name (converted to ID using symbol registry and attached to every emitted packet of data).
-     *
-     * @param output tracer output
-     *
-     * @param registry MBean server registry object
-     *
-     * @param qdefs JMX queries
+     *@param registry MBean server registry object
+     *@param output tracer output
+     *@param qdefs JMX queries
      */
-    public JmxAttrScanner(SymbolRegistry symbols, String name, TraceEventHandler output, MBeanServerRegistry registry, QueryDef...qdefs) {
+    public JmxAttrScanner(SymbolRegistry symbols, MetricsRegistry metricRegistry, String name,
+                          MBeanServerRegistry registry, PerfDataEventHandler output, QueryDef... qdefs) {
         this.symbols = symbols;
+        this.metricsRegistry = metricRegistry;
         this.id = symbols.symbolId(name);
         this.output = output;
 
@@ -72,6 +74,42 @@ public class JmxAttrScanner implements Runnable {
         }
     }
 
+
+    public Metric getMetric(MetricTemplate template, QueryResult result) {
+        String key = result.getKey(template.getDynamicAttrs());
+
+        Metric metric = template.getMetric(key);
+        if (metric == null) {
+            switch (template.getType()) {
+                case MetricTemplate.RAW_DATA:
+                    metric = new RawDataMetric(template, result.attrSet());
+                    break;
+                case MetricTemplate.RAW_DELTA:
+                    metric = new RawDeltaMetric(template, result.attrSet());
+                    break;
+                case MetricTemplate.TIMED_DELTA:
+                    metric = new TimedDeltaMetric(template, result.attrSet());
+                    break;
+                case MetricTemplate.WINDOWED_RATE:
+                    metric = new WindowedRateMetric(template, result.attrSet());
+                    break;
+                default:
+                    return null;
+            }
+            template.putMetric(key, metric);
+            metricsRegistry.metricId(metric);
+
+            if (template.getDynamicAttrs().size() > 0) {
+                Map<String,Integer> dynamicAttrs = new HashMap<String,Integer>();
+                for (String attr : template.getDynamicAttrs()) {
+                    dynamicAttrs.put(attr, symbols.symbolId(attr));
+                }
+                metric.setDynamicAttrs(dynamicAttrs);
+            }
+        }
+
+        return metric;
+    }
 
 
 
@@ -84,55 +122,40 @@ public class JmxAttrScanner implements Runnable {
     /**
      * Performs one scan-submit cycle.
      *
-     * @param tstamp current time (milliseconds since Epoch)
+     * @param clock current time (milliseconds since Epoch)
      */
-    public void runCycle(long tstamp) {
-        List<Integer> longIds = new ArrayList<Integer>(128);
-        List<Long> longVals = new ArrayList<Long>(128);
-
-        List<Integer> intIds = new ArrayList<Integer>(128);
-        List<Integer> intVals = new ArrayList<Integer>(128);
-
-        List<Integer> doubleIds = new ArrayList<Integer>(128);
-        List<Double> doubleVals = new ArrayList<Double>(128);
+    public void runCycle(long clock) {
+        List<PerfSample> samples = new ArrayList<PerfSample>();
 
         for (QueryLister lister : listers) {
-            for (QueryResult result : lister.list()) {
-                Object val = result.getValue();
-                if (val instanceof Long) {
-                    longIds.add(result.getComponentId(symbols));
-                    longVals.add((Long)val);
-                } else if (val instanceof Integer) {
-                    intIds.add(result.getComponentId(symbols));
-                    intVals.add((Integer)val);
-                } else if (val instanceof Double) {
-                    doubleIds.add(result.getComponentId(symbols));
-                    doubleVals.add((Double)val);
-                } else if (val instanceof Short) {
-                    intIds.add(result.getComponentId(symbols));
-                    intVals.add((int)(Short)val);
-                } else if (val instanceof Byte) {
-                    intIds.add(result.getComponentId(symbols));
-                    intVals.add((int)(Byte)val);
-                } else if (val instanceof Float) {
-                    doubleIds.add(result.getComponentId(symbols));
-                    doubleVals.add((double)(Float)val);
+            MetricTemplate template = lister.getMetricTemplate();
+            if (template != null) {
+                for (QueryResult result : lister.list()) {
+                    if (result.getValue() instanceof Number) {
+                        Metric metric = getMetric(template, result);
+                        Number val = metric.getValue(clock, (Number)result.getValue());
+                        PerfSample sample = new PerfSample(metric.getId(),
+                            val instanceof Double || val instanceof Float ? val.doubleValue() : val.longValue());
+                        // Add dynamic attributes if necessary
+                        if (metric.getDynamicAttrs() != null) {
+                            Map<Integer,String> attrs = new HashMap<Integer, String>();
+                            for (Map.Entry<String,Integer> e : metric.getDynamicAttrs().entrySet()) {
+                                attrs.put(e.getValue(), result.getAttr(e.getKey()).toString());
+                            }
+                            sample.setAttrs(attrs);
+                        }
+                        samples.add(sample);
+                    } else {
+                        // TODO Log only when logging of this particular message is enabled
+                        log.warn("Trying to submit non-numeric metric value for " + result.getAttrPath() + ": " + result.getValue());
+                    }
                 }
             }
-        } // for ()
-
-        if (longIds.size() > 0) {
-            output.longVals(tstamp, id, ZorkaUtil.intArray(longIds), ZorkaUtil.longArray(longVals));
         }
 
-        if (intIds.size() > 0) {
-            output.intVals(tstamp, id, ZorkaUtil.intArray(intIds), ZorkaUtil.intArray(intVals));
-        }
-
-        if (doubleIds.size() > 0) {
-            output.doubleVals(tstamp, id, ZorkaUtil.intArray(doubleIds), ZorkaUtil.doubleArray(doubleVals));
+        if (samples.size() > 0) {
+            output.perfData(clock, id, samples);
         }
     }
-
 
 }

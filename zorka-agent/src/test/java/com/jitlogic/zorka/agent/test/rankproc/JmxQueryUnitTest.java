@@ -123,25 +123,6 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     }
 
 
-    @Test
-    public void testJmxAttrScannerSimpleRun() throws Exception {
-        TestTracer output = new TestTracer();
-        JmxAttrScanner scanner = tracer.jmxScanner("TEST", output,
-            new QueryLister(mBeanServerRegistry, new QueryDef("test", "test:type=TestJmx,*", "name").list("*", "Attr")));
-        scanner.runCycle(100);
-        Assert.assertEquals(1, output.size());
-        int[] ids = (int[])output.get(0, "components");
-
-        SymbolRegistry sr = ((Tracer)TestUtil.getField(tracer, "tracer")).getSymbolRegistry();
-
-        Assert.assertEquals("TEST", sr.symbolName((Integer)output.get(0, "objId")));
-        Assert.assertEquals("bean1.Nom", sr.symbolName(ids[0]));
-        Assert.assertEquals("bean1.Div", sr.symbolName(ids[1]));
-        Assert.assertEquals("bean2.Nom", sr.symbolName(ids[2]));
-        Assert.assertEquals("bean2.Div", sr.symbolName(ids[3]));
-    }
-
-
     private TestJmx makeTestJmx(String name, long nom, long div, String...md) throws Exception {
         TestJmx bean = new TestJmx();
 

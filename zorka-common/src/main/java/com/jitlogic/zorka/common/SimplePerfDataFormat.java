@@ -17,17 +17,19 @@
 package com.jitlogic.zorka.common;
 
 
+import java.util.*;
+
 /**
  * Implements simple trace encoder/decoder. Uses simple, uncompressed binary format.
  * It basically reads/writes stream of commands that correspond to methods of
- * TraceEventHandler interface.
+ * PerfDataEventHandler interface.
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class SimpleTraceFormat extends TraceEventHandler {
+public class SimplePerfDataFormat extends PerfDataEventHandler {
 
     /** Simple format version 1 magic number */
-    public static final int MAGIC_V1=0x57aace01;
+    public static final int MAGIC = 0xcafeb1ba;
 
     /** traceBegin() call */
     public static final byte TRACE_BEGIN  = 0x01;
@@ -47,15 +49,15 @@ public class SimpleTraceFormat extends TraceEventHandler {
     /** newSymbol() call */
     public static final byte NEW_SYMBOL   = 0x06;
 
+    /** newMetricTemplate() call */
+    public static final byte NEW_TEMPLATE = 0x07;
+
+    /** newTemplate() call */
+    public static final byte NEW_METRIC   = 0x08;
+
+    public static final byte PERF_DATA    = 0x09;
+
     /** longVal() call */
-    public static final byte LONG_VAL     = 0x30;
-
-    /** intVal() call */
-    public static final byte INT_VAL      = 0x31;
-
-    /** doubleVal() call */
-    public static final byte DOUBLE_VAL   = 0x32;
-
     /** newAttr(key, null) call */
     public static final byte NULL_ATTR    = 0x40;
 
@@ -78,7 +80,6 @@ public class SimpleTraceFormat extends TraceEventHandler {
 
     public static final byte CAUSE_EXCEPTION = 1;
 
-
     /** Input/output buffer */
     private ByteBuffer buf;
 
@@ -87,7 +88,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
      *
      * @param buf output buffer
      */
-    public SimpleTraceFormat(ByteBuffer buf) {
+    public SimplePerfDataFormat(ByteBuffer buf) {
         this.buf = buf;
     }
 
@@ -96,7 +97,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
      *
      * @param buf input buffer
      */
-    public SimpleTraceFormat(byte[] buf) {
+    public SimplePerfDataFormat(byte[] buf) {
         this.buf = new ByteBuffer(buf);
     }
 
@@ -183,40 +184,107 @@ public class SimpleTraceFormat extends TraceEventHandler {
         }
     }
 
+
     @Override
-    public void longVals(long clock, int objId, int[] components, long[] values) {
-        buf.putByte(LONG_VAL);
+    public void perfData(long clock, int scannerId, List<PerfSample> samples) {
+        buf.putByte(PERF_DATA);
         buf.putLong(clock);
-        buf.putInt(objId);
-        buf.putInt(components.length);
-        for (int i = 0; i < components.length; i++) {
-            buf.putInt(components[i]);
-            buf.putLong(values[i]);
+        buf.putInt(scannerId);
+        buf.putInt(samples.size());
+
+        for (PerfSample sample : samples) {
+            int type = sample.getType();
+
+            buf.putByte((byte)type);
+            buf.putInt(sample.getMetricId());
+
+            switch (type) {
+                case PerfSample.LONG_SAMPLE:
+                    buf.putLong((Long)sample.getValue());
+                    break;
+                case PerfSample.DOUBLE_SAMPLE:
+                    buf.putDouble((Double)sample.getValue());
+                    break;
+            }
+
+            Map<Integer, String> attrs = sample.getAttrs();
+            if (attrs != null) {
+                buf.putByte((byte) attrs.size());
+                for (Map.Entry<Integer,String> e : attrs.entrySet()) {
+                    buf.putInt(e.getKey());
+                    buf.putString(e.getValue());
+                }
+            } else {
+                buf.putByte((byte)0);
+            }
         }
     }
 
+
+
     @Override
-    public void intVals(long clock, int objId, int[] components, int[] values) {
-        buf.putByte(INT_VAL);
-        buf.putLong(clock);
-        buf.putInt(objId);
-        buf.putInt(components.length);
-        for (int i = 0; i < components.length; i++) {
-            buf.putInt(components[i]);
-            buf.putInt(values[i]);
+    public void newMetricTemplate(MetricTemplate template) {
+        buf.putByte(NEW_TEMPLATE);
+        buf.putInt(template.getId());
+        buf.putByte((byte) template.getType());
+        buf.putString(template.getName());
+        buf.putString(template.getUnits());
+        buf.putString(template.getNomField());
+        buf.putString(template.getDivField());
+        buf.putDouble(template.getMultiplier());
+        buf.putByte((byte) template.getDynamicAttrs().size());
+
+        for (String attr : template.getDynamicAttrs()) {
+            buf.putString(attr);
         }
+
     }
 
     @Override
-    public void doubleVals(long clock, int objId, int[] components, double[] values) {
-        buf.putByte(DOUBLE_VAL);
-        buf.putLong(clock);
-        buf.putInt(objId);
-        buf.putInt(components.length);
-        for (int i = 0; i < components.length; i++) {
-            buf.putInt(components[i]);
-            buf.putDouble(values[i]);
+    public void newMetric(Metric metric) {
+        buf.putByte(NEW_METRIC);
+        buf.putByte((byte) metric.getTemplate().getType());
+        buf.putInt(metric.getId());
+        buf.putInt(metric.getTemplate().getId());
+        buf.putString(metric.getName());
+        buf.putByte((byte)metric.getAttrs().size());
+
+        for (Map.Entry<String,Object> e : metric.getAttrs().entrySet()) {
+            buf.putString(e.getKey());
+            buf.putString(e.getValue().toString());
         }
+    }
+
+
+
+    private void decodeMetric(PerfDataEventHandler output) {
+        int type = buf.getByte(), id = buf.getInt(), tid = buf.getInt();
+        String name = buf.getString();
+        int nattr = buf.getByte();
+
+        Map<String,Object> attrs = new HashMap<String,Object>();
+        for (int i = 0; i < nattr; i++) {
+            attrs.put(buf.getString(), buf.getString());
+        }
+
+        Metric metric = null;
+
+        switch (type) {
+            case MetricTemplate.RAW_DATA:
+                metric = new RawDataMetric(id, name, attrs);
+                break;
+            case MetricTemplate.RAW_DELTA:
+                metric = new RawDeltaMetric(id, name, attrs);
+                break;
+            case MetricTemplate.TIMED_DELTA:
+                metric = new TimedDeltaMetric(id, name, attrs);
+                break;
+            case MetricTemplate.WINDOWED_RATE:
+                metric = new WindowedRateMetric(id, name, attrs);
+                break;
+        }
+
+        output.newMetric(metric);
     }
 
 
@@ -226,7 +294,7 @@ public class SimpleTraceFormat extends TraceEventHandler {
      *
      * @param output handler that will receive decoded events
      */
-    public void decode(TraceEventHandler output) {
+    public void decode(PerfDataEventHandler output) {
         while (!buf.eof()) {
             byte cmd = buf.getByte();
             switch (cmd) {
@@ -248,14 +316,14 @@ public class SimpleTraceFormat extends TraceEventHandler {
                 case NEW_SYMBOL:
                     output.newSymbol(buf.getInt(), buf.getString());
                     break;
-                case LONG_VAL:
-                    decodeLongVals(output);
+                case NEW_TEMPLATE:
+                    decodeTemplate(output);
                     break;
-                case INT_VAL:
-                    decodeIntVals(output);
+                case NEW_METRIC:
+                    decodeMetric(output);
                     break;
-                case DOUBLE_VAL:
-                    decodeDoubleVals(output);
+                case PERF_DATA:
+                    decodePerfData(output);
                     break;
                 case NULL_ATTR:
                     output.newAttr(buf.getInt(), null);
@@ -282,59 +350,49 @@ public class SimpleTraceFormat extends TraceEventHandler {
     }
 
 
-    /**
-     * Decodes a set of long values
-     *
-     * @param output
-     */
-    private void decodeLongVals(TraceEventHandler output) {
-        long clock = buf.getLong();
-        int objId = buf.getInt();
-        int len = buf.getInt();
+    private void decodeTemplate(PerfDataEventHandler output) {
+        int id = buf.getInt(), type = buf.getByte();
+        String name = buf.getString(), units = buf.getString(), nom = buf.getString(), div = buf.getString();
+        double multiplier = buf.getDouble();
 
-        int[] components = new int[len];
-        long[] values = new long[len];
+        MetricTemplate mt = new MetricTemplate(type, name, units, nom, div);
+        mt.setId(id);
+        mt = mt.withMultiplier(multiplier);
 
-        for (int i = 0; i < len; i++) {
-            components[i] = buf.getInt();
-            values[i] = buf.getLong();
+        int nattr = buf.getByte();
+
+        for (int i = 0; i < nattr; i++) {
+            mt = mt.withDynamicAttr(buf.getString());
         }
-
-        output.longVals(clock, objId, components, values);
     }
 
 
-    private void decodeIntVals(TraceEventHandler output) {
+    private void decodePerfData(PerfDataEventHandler output) {
         long clock = buf.getLong();
-        int objId = buf.getInt();
-        int len = buf.getInt();
+        int scannerId = buf.getInt(), nsamples = buf.getInt();
 
-        int[] components = new int[len];
-        int[] values = new int[len];
+        List<PerfSample> samples = new ArrayList<PerfSample>(nsamples);
+        for (int i = 0; i < nsamples; i++) {
+            int type = buf.getByte(), metricId = buf.getInt();
+            PerfSample sample;
 
-        for (int i = 0; i < len; i++) {
-            components[i] = buf.getInt();
-            values[i] = buf.getInt();
+            if (type == PerfSample.LONG_SAMPLE) {
+                sample = new PerfSample(metricId, buf.getLong());
+            } else {
+                sample = new PerfSample(metricId, buf.getDouble());
+            }
+            int nattrs = buf.getByte();
+            if (nattrs > 0) {
+                Map<Integer,String> attrs = new LinkedHashMap<Integer, String>();
+                for (int j = 0; j < nattrs; j++) {
+                    attrs.put(buf.getInt(), buf.getString());
+                }
+                sample.setAttrs(attrs);
+            }
+            samples.add(sample);
         }
 
-        output.intVals(clock, objId, components, values);
-    }
-
-
-    private void decodeDoubleVals(TraceEventHandler output) {
-        long clock = buf.getLong();
-        int objId = buf.getInt();
-        int len = buf.getInt();
-
-        int[] components = new int[len];
-        double[] values = new double[len];
-
-        for (int i = 0; i < len; i++) {
-            components[i] = buf.getInt();
-            values[i] = buf.getDouble();
-        }
-
-        output.doubleVals(clock, objId, components, values);
+        output.perfData(clock, scannerId, samples);
     }
 
 

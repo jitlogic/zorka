@@ -16,13 +16,11 @@
 
 package com.jitlogic.zorka.agent.spy;
 
+import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.rankproc.JmxAttrScanner;
-import com.jitlogic.zorka.agent.rankproc.QueryLister;
-import com.jitlogic.zorka.common.Submittable;
-import com.jitlogic.zorka.common.SymbolRegistry;
-import com.jitlogic.zorka.common.TraceEventHandler;
-import com.jitlogic.zorka.common.ZorkaAsyncThread;
+import com.jitlogic.zorka.agent.rankproc.QueryDef;
+import com.jitlogic.zorka.common.*;
 
 /**
  * Tracer library contains functions for configuring and using tracer.
@@ -38,7 +36,9 @@ public class TracerLib {
     private Tracer tracer;
 
     /** Reference to symbol registry */
-    private SymbolRegistry symbols;
+    private SymbolRegistry symbolRegistry;
+
+    private MetricsRegistry metricsRegistry;
 
     /** Default trace flags */
     private int defaultTraceFlags = TraceMarker.DROP_INTERIM;
@@ -51,7 +51,8 @@ public class TracerLib {
     public TracerLib(SpyInstance instance) {
         this.instance = instance;
         this.tracer = this.instance.getTracer();
-        symbols = this.tracer.getSymbolRegistry();
+        symbolRegistry = this.tracer.getSymbolRegistry();
+        metricsRegistry = this.tracer.getMetricsRegistry();
     }
 
 
@@ -182,7 +183,8 @@ public class TracerLib {
      */
     public ZorkaAsyncThread<Submittable> traceFile(String path, int maxFiles, long maxSize) {
         TraceFileWriter writer = new TraceFileWriter(ZorkaConfig.propFormat(path),
-                instance.getTracer().getSymbolRegistry(), maxFiles, maxSize);
+                instance.getTracer().getSymbolRegistry(), instance.getTracer().getMetricsRegistry(),
+                maxFiles, maxSize);
         writer.start();
         return writer;
     }
@@ -240,13 +242,15 @@ public class TracerLib {
      * Creates new JMX metrics scanner object. Scanner objects are responsible for scanning
      * selected values accessible via JMX and
      *
-     * @param name
-     * @param output
-     * @param listers
+     * @param name scanner name
+     *
+     * @param output output handler (eg. file)
+     *
+     * @param qdefs queries
      * @return
      */
-    public JmxAttrScanner jmxScanner(String name, TraceEventHandler output, QueryLister...listers) {
-        return new JmxAttrScanner(symbols, name, output, listers);
+    public JmxAttrScanner jmxScanner(String name, PerfDataEventHandler output, QueryDef...qdefs) {
+        return new JmxAttrScanner(symbolRegistry, metricsRegistry, name, AgentInstance.getMBeanServerRegistry(), output, qdefs);
     }
 
 }

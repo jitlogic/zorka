@@ -16,15 +16,14 @@
 
 package com.jitlogic.zorka.agent.test.spy.support;
 
-import com.jitlogic.zorka.common.TraceEventHandler;
-import com.jitlogic.zorka.common.ZorkaUtil;
+import com.jitlogic.zorka.common.*;
 import org.junit.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class TestTracer extends TraceEventHandler {
+public class TestTracer extends PerfDataEventHandler {
 
     private List<Map<Object,Object>> data = new ArrayList<Map<Object, Object>>();
 
@@ -64,18 +63,18 @@ public class TestTracer extends TraceEventHandler {
     }
 
     @Override
-    public void longVals(long clock, int objId, int[] components, long[] values) {
-        data.add(ZorkaUtil.map("action", "longVals", "clock", clock, "objId", objId, "components", components, "values", values));
+    public void perfData(long clock, int scannerId, List<PerfSample> samples) {
+        data.add(ZorkaUtil.map("action", "perfData", "clock", clock, "scannerId", scannerId, "samples", samples));
     }
 
     @Override
-    public void intVals(long clock, int objId, int[] components, int[] values) {
-        data.add(ZorkaUtil.map("action", "intVals", "clock", clock, "objId", objId, "components", components, "values", values));
+    public void newMetricTemplate(MetricTemplate template) {
+        data.add(ZorkaUtil.map("action", "newMetricTemplate", "mt", template));
     }
 
     @Override
-    public void doubleVals(long clock, int objId, int[] components, double[] values) {
-        data.add(ZorkaUtil.map("action", "doubleVals", "clock", clock, "objId", objId, "components", components, "values", values));
+    public void newMetric(Metric metric) {
+        data.add(ZorkaUtil.map("action", "newMetric", "metric", metric));
     }
 
 
@@ -93,8 +92,8 @@ public class TestTracer extends TraceEventHandler {
     }
 
 
-    public Object get(int idx, Object key) {
-        return idx < data.size() ?  data.get(idx).get(key) : null;
+    public <T> T get(int idx, Object key) {
+        return idx < data.size() ?  (T)data.get(idx).get(key) : null;
     }
 
 

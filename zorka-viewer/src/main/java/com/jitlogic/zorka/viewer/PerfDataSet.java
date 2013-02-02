@@ -16,10 +16,7 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.common.SimpleTraceFormat;
-import com.jitlogic.zorka.common.SymbolRegistry;
-import com.jitlogic.zorka.common.SymbolicException;
-import com.jitlogic.zorka.common.TraceEventHandler;
+import com.jitlogic.zorka.common.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -32,7 +29,7 @@ import java.util.Map;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TraceSet extends TraceEventHandler {
+public class PerfDataSet extends PerfDataEventHandler {
 
     /** Symbol map */
     private Map<Integer,String> symbols = new HashMap<Integer, String>(4096);
@@ -46,6 +43,9 @@ public class TraceSet extends TraceEventHandler {
     /** Collected metrics. */
     private Map<Integer,Map<Integer,List<DataSample>>> mgroups = new HashMap<Integer, Map<Integer,List<DataSample>>>();
 
+    private Map<Integer,MetricTemplate> metricTemplates = new HashMap<Integer, MetricTemplate>();
+
+    private Map<Integer,Metric> metrics = new HashMap<Integer, Metric>();
 
     @Override
     public void traceBegin(int traceId, long clock, int flags) {
@@ -78,8 +78,8 @@ public class TraceSet extends TraceEventHandler {
 
     @Override
     public void traceError(Object exception, long tstamp) {
-        top.setException((SymbolicException)exception);
-        top.setTime(tstamp-top.getTime());
+        top.setException((SymbolicException) exception);
+        top.setTime(tstamp - top.getTime());
         pop();
     }
 
@@ -105,35 +105,30 @@ public class TraceSet extends TraceEventHandler {
 
 
     @Override
-    public void longVals(long clock, int objId, int[] components, long[] values) {
-        Map<Integer, List<DataSample>> metrics = getMetrics(objId);
+    public void perfData(long clock, int scannerId, List<PerfSample> samples) {
+        Map<Integer, List<DataSample>> metrics = getMetrics(scannerId);
 
-        for (int i = 0; i < components.length; i++) {
-            List<DataSample> data = getDataSamples(components[i], metrics);
-            data.add(new LongDataSample(clock, values[i]));
+        for (PerfSample sample : samples) {
+            List<DataSample> data = getDataSamples(sample.getMetricId(), metrics);
+            if (sample.getValue() instanceof Long) {
+                data.add(new LongDataSample(clock, (Long)sample.getValue()));
+            } else {
+                data.add(new DoubleDataSample(clock, (Double)sample.getValue()));
+            }
         }
+
     }
 
-
     @Override
-    public void intVals(long clock, int objId, int[] components, int[] values) {
-        Map<Integer, List<DataSample>> metrics = getMetrics(objId);
-
-        for (int i = 0; i < components.length; i++) {
-            List<DataSample> data = getDataSamples(components[i], metrics);
-            data.add(new IntegerDataSample(clock, values[i]));
-        }
+    public void newMetricTemplate(MetricTemplate template) {
+        metricTemplates.put(template.getId(), template);
     }
 
-
     @Override
-    public void doubleVals(long clock, int objId, int[] components, double[] values) {
-        Map<Integer, List<DataSample>> metrics = getMetrics(objId);
-
-        for (int i = 0; i < components.length; i++) {
-            List<DataSample> data = getDataSamples(components[i], metrics);
-            data.add(new DoubleDataSample(clock, values[i]));
-        }
+    public void newMetric(Metric metric) {
+        metric.setTemplate(metricTemplates.get(metric.getTemplateId()));
+        metrics.put(metric.getId(), metric);
+        // TODO add metric object to metric template hash map
     }
 
 
@@ -209,7 +204,7 @@ public class TraceSet extends TraceEventHandler {
                 long len = f.length();
                 byte[] buf = new byte[(int)len];
                 is.read(buf);
-                SimpleTraceFormat stf = new SimpleTraceFormat(buf);
+                SimplePerfDataFormat stf = new SimplePerfDataFormat(buf);
                 stf.decode(this);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

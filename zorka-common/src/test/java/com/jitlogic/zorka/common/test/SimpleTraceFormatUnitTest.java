@@ -21,11 +21,30 @@ import com.jitlogic.zorka.common.test.support.TestTracer;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class SimpleTraceFormatUnitTest {
+
+    private PerfSample sample(int metricId, Number value, Object...attrv) {
+        PerfSample sample = new PerfSample(metricId, value);
+
+        if (attrv.length > 0) {
+            Map<Integer,String> attrs = new HashMap<Integer, String>();
+            for (int i = 1; i < attrv.length; i += 2) {
+                attrs.put((Integer)attrv[i-1], (String)attrv[i]);
+            }
+            sample.setAttrs(attrs);
+        }
+
+        return sample;
+    }
 
     private SymbolRegistry symbols = new SymbolRegistry();
     private ByteBuffer buf = new ByteBuffer();;
-    private SimpleTraceFormat encoder = new SimpleTraceFormat(buf);
+    private SimplePerfDataFormat encoder = new SimplePerfDataFormat(buf);
     private TestTracer output = new TestTracer();
 
 
@@ -37,8 +56,9 @@ public class SimpleTraceFormatUnitTest {
     private int a1 = symbols.symbolId("someAttr");
 
     private void decode() {
-        new SimpleTraceFormat(buf.getContent()).decode(output);
+        new SimplePerfDataFormat(buf.getContent()).decode(output);
     }
+
 
     @Test
     public void testSymbolCmd() {
@@ -46,6 +66,7 @@ public class SimpleTraceFormatUnitTest {
         decode();
         output.check(0, "action", "newSymbol", "symbolId", c1, "symbolName", "some.Class");
     }
+
 
     @Test
     public void testTraceBeginCmd() {
@@ -70,6 +91,7 @@ public class SimpleTraceFormatUnitTest {
         output.check(0, "action", "traceReturn", "tstamp", 200L);
     }
 
+
     @Test
     public void testTraceBigLongNum() {
         long l = System.nanoTime();
@@ -79,6 +101,7 @@ public class SimpleTraceFormatUnitTest {
         output.check(0, "tstamp", l);
     }
 
+
     @Test
     public void traceErrorCmd() {
         SymbolicException e = new SymbolicException(e1, "oja!", new SymbolicStackElement[0], null);
@@ -86,6 +109,7 @@ public class SimpleTraceFormatUnitTest {
         decode();
         output.check(0, "action", "traceError", "tstamp", 200L, "exception", e);
     }
+
 
     @Test
     public void traceStatsCmd() {
@@ -101,6 +125,7 @@ public class SimpleTraceFormatUnitTest {
         decode();
         output.check(0, "action", "newAttr", "attrId", a1, "attrVal", "oja!");
     }
+
 
     @Test
     public void traceLongAttr() {
@@ -133,6 +158,7 @@ public class SimpleTraceFormatUnitTest {
         output.check(0, "action", "newAttr", "attrId", a1, "attrVal", (short)200);
     }
 
+
     @Test
     public void testSimpleTraceDecodeEncode() {
         encoder.traceBegin(t1, 500L, 2);
@@ -146,6 +172,7 @@ public class SimpleTraceFormatUnitTest {
         Assert.assertEquals("Should read 5 records.", 5, output.getData().size());
     }
 
+
     @Test
     public void testTraceEncodeDecodeRealException() {
         Exception ex = new Exception("oja!");
@@ -155,6 +182,7 @@ public class SimpleTraceFormatUnitTest {
         decode();
         output.check(0, "action", "traceError", "tstamp", 200L, "exception", e);
     }
+
 
     @Test
     public void testTraceEncodeDecodeRealExceptionWithCause() {
@@ -167,66 +195,19 @@ public class SimpleTraceFormatUnitTest {
         output.check(0, "action", "traceError", "tstamp", 200L, "exception", e);
     }
 
-    @Test
-    public void testTraceEncodeDecodeLongVals() {
-        int[]  c1 = { 1, 2, 3, 4 };
-        long[] v1 = { 2, 4, 6, 8 };
-
-        encoder.longVals(100, 10, c1, v1);
-        decode();
-        output.check(0, "action", "longVals", "clock", 100L, "objId", 10);
-
-        int[]  c2 = (int[])output.get(0, "components");
-        long[] v2 = (long[])output.get(0, "values");
-
-        Assert.assertEquals(c1.length, c2.length);
-        Assert.assertEquals(v1.length, v2.length);
-
-        for (int i = 0; i < c1.length; i++) {
-            Assert.assertEquals("components[" + i + "]", c1[i], c2[i]);
-            Assert.assertEquals("values[" + i + "]", v1[i], v2[i]);
-        }
-    }
 
     @Test
-    public void testTraceEncodeDecodeIntVals() {
-        int[]  c1 = { 1, 2, 3, 4 };
-        int[] v1 = { 2, 4, 6, 8 };
+    public void testEncodeDecodePerfData() {
+        List<PerfSample> samples = Arrays.asList(
+            sample(1, 1L, 1, "a", 2, "b"),
+            sample(2, 2L, 2, "c", 3, "d"));
 
-        encoder.intVals(100, 10, c1, v1);
+        encoder.perfData(1L, 1, samples);
         decode();
-        output.check(0, "action", "intVals", "clock", 100L, "objId", 10);
+        output.check(0, "action", "perfData", "clock", 1L, "scannerId", 1);
 
-        int[]  c2 = (int[])output.get(0, "components");
-        int[] v2 = (int[])output.get(0, "values");
+        List<PerfSample> ret = (List<PerfSample>)output.get(0, "samples");
 
-        Assert.assertEquals(c1.length, c2.length);
-        Assert.assertEquals(v1.length, v2.length);
-
-        for (int i = 0; i < c1.length; i++) {
-            Assert.assertEquals("components[" + i + "]", c1[i], c2[i]);
-            Assert.assertEquals("values[" + i + "]", v1[i], v2[i]);
-        }
-    }
-
-    @Test
-    public void testTraceEncodeDecodeDoubleVals() {
-        int[]  c1 = { 1, 2, 3, 4 };
-        double[] v1 = { 2, 4, 6, 8 };
-
-        encoder.doubleVals(100, 10, c1, v1);
-        decode();
-        output.check(0, "action", "doubleVals", "clock", 100L, "objId", 10);
-
-        int[]  c2 = (int[])output.get(0, "components");
-        double[] v2 = (double[])output.get(0, "values");
-
-        Assert.assertEquals(c1.length, c2.length);
-        Assert.assertEquals(v1.length, v2.length);
-
-        for (int i = 0; i < c1.length; i++) {
-            Assert.assertEquals("components[" + i + "]", c1[i], c2[i]);
-            Assert.assertEquals("values[" + i + "]", v1[i], v2[i], 0.001);
-        }
+        Assert.assertEquals(samples, ret);
     }
 }
