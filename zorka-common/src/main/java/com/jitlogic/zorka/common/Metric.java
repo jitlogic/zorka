@@ -29,6 +29,9 @@ public abstract class Metric {
 
     private Map<String,Object> attrs = new HashMap<String, Object>();
 
+    /** Maps dynamic attributes to their symbol IDs */
+    private Map<String,Integer> dynamicAttrs;
+
     public Metric(int id, String name, Map<String,Object> attrs) {
         this.id = id;
         this.name = name;
@@ -76,6 +79,16 @@ public abstract class Metric {
 
     public void setTemplateId(int templateId) {
         this.templateId = templateId;
+    }
+
+
+    public Map<String, Integer> getDynamicAttrs() {
+        return dynamicAttrs;
+    }
+
+
+    public void setDynamicAttrs(Map<String, Integer> dynamicAttrs) {
+        this.dynamicAttrs = dynamicAttrs;
     }
 
 

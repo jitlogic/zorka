@@ -34,7 +34,6 @@ public class MetricTemplate {
     private String name;
     private String units;
 
-
     private String nomField, divField;
 
     private double multiplier = 1.0;

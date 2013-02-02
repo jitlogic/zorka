@@ -78,7 +78,27 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
     }
 
 
-    // TODO check for attributes being passed and attached correctly
+    // TODO check for dynamic attributes being passed and attached correctly
+
+    @Test
+    public void testCheckIfDynamicAttributesArePassedCorrectly() {
+        TestTracer output = new TestTracer();
+        JmxAttrScanner scanner = tracer.jmxScanner("TEST", output,
+            new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom", "ATTR")
+                .withMetricTemplate(
+                    rankproc.rawDataMetric("test", "test").withDynamicAttr("ATTR")));
+
+        scanner.runCycle(100);
+        List<PerfSample> samples = output.get(0, "samples");
+
+        Assert.assertNotNull(samples);
+        Assert.assertEquals(2, samples.size());
+
+        for (PerfSample sample : samples) {
+            Assert.assertNotNull(sample.getAttrs());
+            Assert.assertEquals(1, sample.getAttrs().size());
+        }
+    }
 
 
     private TestJmx makeTestJmx(String name, long nom, long div, String...md) throws Exception {
