@@ -25,9 +25,9 @@ import com.jitlogic.zorka.common.*;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TraceBuilder extends TraceEventHandler {
+public class TraceBuilderImpl extends TraceBuilder {
 
-    private final static ZorkaLog log = ZorkaLogger.getLog(TraceBuilder.class);
+    private final static ZorkaLog log = ZorkaLogger.getLog(TraceBuilderImpl.class);
 
 
     /** Output */
@@ -48,7 +48,7 @@ public class TraceBuilder extends TraceEventHandler {
      *
      * @param output object completed traces will be submitted to
      */
-    public TraceBuilder(ZorkaAsyncThread<Submittable> output, SymbolRegistry symbols) {
+    public TraceBuilderImpl(ZorkaAsyncThread<Submittable> output, SymbolRegistry symbols) {
         this.output = output;
         this.symbols = symbols;
     }
@@ -133,38 +133,12 @@ public class TraceBuilder extends TraceEventHandler {
     }
 
 
-    @Override
-    public void traceStats(long calls, long errors, int flags) {
-    }
-
-
-    @Override
-    public void newSymbol(int symbolId, String symbolText) {
-    }
-
 
     @Override
     public void newAttr(int attrId, Object attrVal) {
         ttop.setAttr(attrId, attrVal);
     }
 
-
-    @Override
-    public void longVals(long clock, int objId, int[] components, long[] values) {
-    }
-
-
-    @Override
-    public void doubleVals(long clock, int objId, int[] components, double[] values) {
-    }
-
-    @Override
-    public void newMetricTemplate(MetricTemplate template) {
-    }
-
-    @Override
-    public void newMetric(Metric metric) {
-    }
 
 
     /**

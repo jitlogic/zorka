@@ -39,7 +39,7 @@ public class TraceFlagsProcessor implements SpyProcessor {
     public Map<String, Object> process(Map<String, Object> record) {
 
         if (checkField == null || record.get(checkField) != null) {
-            ((TraceBuilder)(tracer.getHandler())).markTraceFlag(flags);
+            ((TraceBuilderImpl)(tracer.getHandler())).markTraceFlag(flags);
         }
 
         return record;

@@ -23,47 +23,7 @@ package com.jitlogic.zorka.common;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public abstract class TraceEventHandler {
-
-    /**
-     * Records beginning of a trace. Not that sometimes traces can be recursive.
-     *
-     * @param traceId trace ID (symbol)
-     */
-    public abstract void traceBegin(int traceId, long clock, int flags);
-
-
-    /**
-     * Records metod entry.
-     *
-     * @param tstamp timestamp (in nanoseconds since Epoch - see System.nanoTime())
-     *
-     * @param classId class ID (class name symbol ID)
-     *
-     * @param methodId method ID (method name symbol ID)
-     *
-     * @param signatureId signature ID (method signature symbol ID)
-     */
-    public abstract void traceEnter(int classId, int methodId, int signatureId, long tstamp);
-
-
-    /**
-     * Records method return.
-     *
-     * @param tstamp timestamp (in nanoseconds since Epoch - see System.nanoTime())
-     */
-    public abstract void traceReturn(long tstamp);
-
-
-    /**
-     * Records method error (exception thrown from method).
-     *
-     * @param exception exception object (wrapped or unserialized)
-     * @param tstamp timestamp (in nanoseconds since Epoch - see System.nanoTime())
-     *
-     */
-    public abstract  void traceError(Object exception, long tstamp);
-
+public abstract class TraceEventHandler extends TraceBuilder {
 
     /**
      * Records trace statistics.
@@ -85,16 +45,6 @@ public abstract class TraceEventHandler {
      * @param symbolText symbol text
      */
     public abstract void newSymbol(int symbolId, String symbolText);
-
-
-    /**
-     * Records a parameter.
-     *
-     * @param attrId parametr ID
-     *
-     * @param attrVal parameter value
-     */
-    public abstract void newAttr(int attrId, Object attrVal);
 
 
     /**

@@ -16,8 +16,6 @@
 
 package com.jitlogic.zorka.agent.spy;
 
-import com.jitlogic.zorka.common.TraceEventHandler;
-
 import java.util.Map;
 
 /**
@@ -63,10 +61,10 @@ public class TraceBeginProcessor implements SpyProcessor {
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
-        TraceBuilder traceBuilder = (TraceBuilder)tracer.getHandler();
+        TraceBuilderImpl traceBuilder = (TraceBuilderImpl)tracer.getHandler();
 
         traceBuilder.traceBegin(traceId, System.currentTimeMillis(), flags);
-        if (minimumTraceTime >= 0 && traceBuilder instanceof TraceBuilder) {
+        if (minimumTraceTime >= 0 && traceBuilder instanceof TraceBuilderImpl) {
             traceBuilder.setMinimumTraceTime(minimumTraceTime);
         }
 

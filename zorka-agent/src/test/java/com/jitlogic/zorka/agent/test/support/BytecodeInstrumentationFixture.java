@@ -18,7 +18,7 @@
 package com.jitlogic.zorka.agent.test.support;
 
 import com.jitlogic.zorka.common.SymbolRegistry;
-import com.jitlogic.zorka.common.TraceEventHandler;
+import com.jitlogic.zorka.common.TraceBuilder;
 import com.jitlogic.zorka.agent.spy.*;
 import com.jitlogic.zorka.agent.test.spy.support.TestSpyTransformer;
 import com.jitlogic.zorka.agent.test.spy.support.TestSubmitter;
@@ -48,7 +48,7 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
         MainSubmitter.setSubmitter(submitter);
         output = new TestTracer();
         t = new Tracer() {
-            public TraceEventHandler getHandler() {
+            public TraceBuilder getHandler() {
                 return output;
             }
         };

@@ -80,7 +80,7 @@ public class Tracer {
     private ThreadLocal<TraceBuilder> localHandlers =
         new ThreadLocal<TraceBuilder>() {
             public TraceBuilder initialValue() {
-                return new TraceBuilder(output, symbolRegistry);
+                return new TraceBuilderImpl(output, symbolRegistry);
             }
         };
 
@@ -89,7 +89,7 @@ public class Tracer {
      *
      * @return trace event handler (trace builder object)
      */
-    public TraceEventHandler getHandler() {
+    public TraceBuilder getHandler() {
         return localHandlers.get();
     }
 
