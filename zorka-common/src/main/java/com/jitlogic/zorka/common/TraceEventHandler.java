@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.common;
 
-public abstract class TraceBuilder {
+public abstract class TraceEventHandler {
 
     /**
      * Records beginning of a trace. Not that sometimes traces can be recursive.

@@ -350,7 +350,7 @@ public class TraceRecord implements Submittable {
     /**
      * Returns true if record is part of recorded trace.
      * This method is implemented for readability purposes,
-     * so algorithmic code like TraceBuilder will be easier
+     * so algorithmic code like TraceEventHandler will be easier
      * to understand. Do not factor it out.
      *
      * @return true if record is part of recorded trace
@@ -362,7 +362,7 @@ public class TraceRecord implements Submittable {
     /**
      * Returns true if record is empty (no actual frame has been
      * recorded in it). This method is implemented for readability
-     * purposes, so algorithmic code like TraceBuilder will be easier
+     * purposes, so algorithmic code like TraceEventHandler will be easier
      * to understand. Do not factor it out.
      *
      * @return true if record is empty

@@ -77,10 +77,10 @@ public class Tracer {
     private ZorkaAsyncThread<Submittable> output;
 
     /** Thread local serving trace builder objects for application threads */
-    private ThreadLocal<TraceBuilder> localHandlers =
-        new ThreadLocal<TraceBuilder>() {
-            public TraceBuilder initialValue() {
-                return new TraceBuilderImpl(output, symbolRegistry);
+    private ThreadLocal<TraceEventHandler> localHandlers =
+        new ThreadLocal<TraceEventHandler>() {
+            public TraceEventHandler initialValue() {
+                return new TraceBuilder(output, symbolRegistry);
             }
         };
 
@@ -89,7 +89,7 @@ public class Tracer {
      *
      * @return trace event handler (trace builder object)
      */
-    public TraceBuilder getHandler() {
+    public TraceEventHandler getHandler() {
         return localHandlers.get();
     }
 

@@ -61,10 +61,10 @@ public class TraceBeginProcessor implements SpyProcessor {
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
-        TraceBuilderImpl traceBuilder = (TraceBuilderImpl)tracer.getHandler();
+        TraceBuilder traceBuilder = (TraceBuilder)tracer.getHandler();
 
         traceBuilder.traceBegin(traceId, System.currentTimeMillis(), flags);
-        if (minimumTraceTime >= 0 && traceBuilder instanceof TraceBuilderImpl) {
+        if (minimumTraceTime >= 0 && traceBuilder instanceof TraceBuilder) {
             traceBuilder.setMinimumTraceTime(minimumTraceTime);
         }
 

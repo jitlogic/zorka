@@ -25,9 +25,9 @@ import com.jitlogic.zorka.common.*;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TraceBuilderImpl extends TraceBuilder {
+public class TraceBuilder extends TraceEventHandler {
 
-    private final static ZorkaLog log = ZorkaLogger.getLog(TraceBuilderImpl.class);
+    private final static ZorkaLog log = ZorkaLogger.getLog(TraceBuilder.class);
 
 
     /** Output */
@@ -48,7 +48,7 @@ public class TraceBuilderImpl extends TraceBuilder {
      *
      * @param output object completed traces will be submitted to
      */
-    public TraceBuilderImpl(ZorkaAsyncThread<Submittable> output, SymbolRegistry symbols) {
+    public TraceBuilder(ZorkaAsyncThread<Submittable> output, SymbolRegistry symbols) {
         this.output = output;
         this.symbols = symbols;
     }
