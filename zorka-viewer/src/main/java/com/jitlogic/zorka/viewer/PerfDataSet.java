@@ -29,7 +29,7 @@ import java.util.Map;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class PerfSetStream extends PerfEventStreamHandler {
+public class PerfDataSet extends PerfDataEventHandler {
 
     /** Symbol map */
     private Map<Integer,String> symbols = new HashMap<Integer, String>(4096);

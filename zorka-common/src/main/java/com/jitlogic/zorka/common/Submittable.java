@@ -18,6 +18,6 @@ package com.jitlogic.zorka.common;
 
 public interface Submittable {
 
-    public void traverse(PerfEventStreamHandler output);
+    public void traverse(PerfDataEventHandler output);
 
 }

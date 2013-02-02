@@ -18,7 +18,7 @@ package com.jitlogic.zorka.agent.test.spy.support;
 
 import com.jitlogic.zorka.common.Metric;
 import com.jitlogic.zorka.common.MetricTemplate;
-import com.jitlogic.zorka.common.PerfEventStreamHandler;
+import com.jitlogic.zorka.common.PerfDataEventHandler;
 import com.jitlogic.zorka.common.ZorkaUtil;
 import org.junit.Assert;
 
@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class TestTracer extends PerfEventStreamHandler {
+public class TestTracer extends PerfDataEventHandler {
 
     private List<Map<Object,Object>> data = new ArrayList<Map<Object, Object>>();
 

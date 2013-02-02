@@ -23,11 +23,11 @@ import java.util.Map;
 /**
  * Implements simple trace encoder/decoder. Uses simple, uncompressed binary format.
  * It basically reads/writes stream of commands that correspond to methods of
- * PerfEventStreamHandler interface.
+ * PerfDataEventHandler interface.
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class SimplePerfDataFormat extends PerfEventStreamHandler {
+public class SimplePerfDataFormat extends PerfDataEventHandler {
 
     /** Simple format version 1 magic number */
     public static final int MAGIC_V1=0x57aace01;
@@ -249,7 +249,7 @@ public class SimplePerfDataFormat extends PerfEventStreamHandler {
     }
 
 
-    private void decodeMetric(PerfEventStreamHandler output) {
+    private void decodeMetric(PerfDataEventHandler output) {
         int type = buf.getByte(), id = buf.getInt(), tid = buf.getInt();
         String name = buf.getString();
         int nattr = buf.getByte();
@@ -286,7 +286,7 @@ public class SimplePerfDataFormat extends PerfEventStreamHandler {
      *
      * @param output handler that will receive decoded events
      */
-    public void decode(PerfEventStreamHandler output) {
+    public void decode(PerfDataEventHandler output) {
         while (!buf.eof()) {
             byte cmd = buf.getByte();
             switch (cmd) {
@@ -345,7 +345,7 @@ public class SimplePerfDataFormat extends PerfEventStreamHandler {
     }
 
 
-    private void decodeTemplate(PerfEventStreamHandler output) {
+    private void decodeTemplate(PerfDataEventHandler output) {
         int id = buf.getInt(), type = buf.getByte();
         String name = buf.getString(), units = buf.getString(), nom = buf.getString(), div = buf.getString();
         double multiplier = buf.getDouble();
@@ -367,7 +367,7 @@ public class SimplePerfDataFormat extends PerfEventStreamHandler {
      *
      * @param output
      */
-    private void decodeLongVals(PerfEventStreamHandler output) {
+    private void decodeLongVals(PerfDataEventHandler output) {
         long clock = buf.getLong();
         int objId = buf.getInt();
         int len = buf.getInt();
@@ -384,7 +384,7 @@ public class SimplePerfDataFormat extends PerfEventStreamHandler {
     }
 
 
-    private void decodeDoubleVals(PerfEventStreamHandler output) {
+    private void decodeDoubleVals(PerfDataEventHandler output) {
         long clock = buf.getLong();
         int objId = buf.getInt();
         int len = buf.getInt();
