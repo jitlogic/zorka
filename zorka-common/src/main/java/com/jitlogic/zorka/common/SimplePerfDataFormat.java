@@ -374,8 +374,13 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
         List<PerfSample> samples = new ArrayList<PerfSample>(nsamples);
         for (int i = 0; i < nsamples; i++) {
             int type = buf.getByte(), metricId = buf.getInt();
-            PerfSample sample = new PerfSample(metricId,
-                    type == PerfSample.LONG_SAMPLE ? buf.getLong() : buf.getDouble());
+            PerfSample sample;
+
+            if (type == PerfSample.LONG_SAMPLE) {
+                sample = new PerfSample(metricId, buf.getLong());
+            } else {
+                sample = new PerfSample(metricId, buf.getDouble());
+            }
             int nattrs = buf.getByte();
             if (nattrs > 0) {
                 Map<Integer,String> attrs = new LinkedHashMap<Integer, String>();
