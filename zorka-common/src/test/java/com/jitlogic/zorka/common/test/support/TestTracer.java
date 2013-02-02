@@ -73,7 +73,7 @@ public class TestTracer extends PerfDataEventHandler {
     }
 
     @Override
-    public void perfData(long clock, int scannerId, List<PerfSample<?>> samples) {
+    public void perfData(long clock, int scannerId, List<PerfSample> samples) {
         data.add(ZorkaUtil.map("action", "perfData", "clock", clock, "scannerId", scannerId, "samples", samples));
     }
 

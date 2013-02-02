@@ -146,10 +146,10 @@ public class PerfPrinterStream extends PerfDataEventHandler {
 
 
     @Override
-    public void perfData(long clock, int scannerId, List<PerfSample<?>> samples) {
+    public void perfData(long clock, int scannerId, List<PerfSample> samples) {
         StringBuilder sb = new StringBuilder(128);
         sb.append("PERF(" + time(clock) + "): scannerId = " + scannerId + ", data=(");
-        for (PerfSample<?> sample : samples) {
+        for (PerfSample sample : samples) {
             sb.append(sample);
         }
         sb.append(")");

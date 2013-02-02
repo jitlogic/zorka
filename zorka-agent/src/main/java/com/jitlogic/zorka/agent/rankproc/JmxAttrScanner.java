@@ -152,7 +152,7 @@ public class JmxAttrScanner implements Runnable {
     }
 
     public void runCycle(long clock) {
-        List<PerfSample<?>> samples = new ArrayList<PerfSample<?>>();
+        List<PerfSample> samples = new ArrayList<PerfSample>();
 
         for (QueryLister lister : listers) {
             MetricTemplate template = lister.getMetricTemplate();
@@ -161,12 +161,8 @@ public class JmxAttrScanner implements Runnable {
                     if (result.getValue() instanceof Number) {
                         Metric metric = getMetric(template, result);
                         Number val = metric.getValue(clock, (Number)result.getValue());
-                        PerfSample<?> sample;
-                        if (val instanceof Double || val instanceof Float) {
-                            sample = new PerfSample<Double>(metric.getId(), val.doubleValue());
-                        } else {
-                            sample = new PerfSample<Long>(metric.getId(), val.longValue());
-                        }
+                        PerfSample sample = new PerfSample(metric.getId(),
+                            val instanceof Double || val instanceof Float ? val.doubleValue() : val.longValue());
                         // TODO add dynamic attributes here
                         samples.add(sample);
                     } else {

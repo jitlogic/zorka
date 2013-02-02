@@ -42,7 +42,7 @@ import org.junit.runners.Suite;
         ZabbixAgentUnitTest.class,
 
         // rankproc
-        AggregateCountingUnitTest.class, AverageRateCountingUnitTest.class, JmxQueryUnitTest.class,
+        AggregateCountingUnitTest.class, AverageRateCountingUnitTest.class, JmxQueryUnitTest.class, JmxAttrScanUnitTest.class,
         MetricsFrameworkUnitTest.class, RankProcUnitTest.class, SlidingWindowUnitTest.class, ThreadRankUnitTest.class,
 
         // TODO testspy

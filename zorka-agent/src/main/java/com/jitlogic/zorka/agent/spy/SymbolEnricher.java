@@ -188,9 +188,9 @@ public class SymbolEnricher extends PerfDataEventHandler {
 
 
     @Override
-    public void perfData(long clock, int scannerId, List<PerfSample<?>> samples) {
+    public void perfData(long clock, int scannerId, List<PerfSample> samples) {
         check(scannerId);
-        for (PerfSample<?> sample : samples) {
+        for (PerfSample sample : samples) {
             checkMetric(sample.getMetricId());
             if (sample.getAttrs() != null) {
                 for (Map.Entry<Integer,String> e : sample.getAttrs().entrySet()) {

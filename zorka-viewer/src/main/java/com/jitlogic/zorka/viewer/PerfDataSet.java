@@ -126,10 +126,10 @@ public class PerfDataSet extends PerfDataEventHandler {
     }
 
     @Override
-    public void perfData(long clock, int scannerId, List<PerfSample<?>> samples) {
+    public void perfData(long clock, int scannerId, List<PerfSample> samples) {
         Map<Integer, List<DataSample>> metrics = getMetrics(scannerId);
 
-        for (PerfSample<?> sample : samples) {
+        for (PerfSample sample : samples) {
             List<DataSample> data = getDataSamples(sample.getMetricId(), metrics);
             if (sample.getValue() instanceof Long) {
                 data.add(new LongDataSample(clock, (Long)sample.getValue()));

@@ -18,24 +18,24 @@ package com.jitlogic.zorka.common;
 
 import java.util.Map;
 
-public class PerfSample<T extends Number> {
+public class PerfSample {
 
     public static final byte LONG_SAMPLE = 1;
 
     public static final byte DOUBLE_SAMPLE = 2;
 
     private int metricId;
-    private T value;
+    private Number value;
 
     private Map<Integer,String> attrs;
 
 
-    public PerfSample(int metricId, T value) {
+    public PerfSample(int metricId, Number value) {
         this(metricId, value, null);
     }
 
 
-    public PerfSample(int metricId, T value, Map<Integer,String> attrs) {
+    public PerfSample(int metricId, Number value, Map<Integer,String> attrs) {
         this.metricId = metricId;
         this.value = value;
         this.attrs = attrs;
@@ -47,7 +47,7 @@ public class PerfSample<T extends Number> {
     }
 
 
-    public T getValue() {
+    public Number getValue() {
         return value;
     }
 
@@ -82,7 +82,7 @@ public class PerfSample<T extends Number> {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof PerfSample) {
-            PerfSample<?> sample = (PerfSample)obj;
+            PerfSample sample = (PerfSample)obj;
             return metricId == sample.metricId
                 && ZorkaUtil.objEquals(value, sample.value)
                 && ZorkaUtil.objEquals(attrs, sample.attrs);

@@ -28,8 +28,8 @@ import java.util.Map;
 
 public class SimpleTraceFormatUnitTest {
 
-    private <T extends Number> PerfSample<T> sample(int metricId, T value, Object...attrv) {
-        PerfSample<T> sample = new PerfSample<T>(metricId, value);
+    private PerfSample sample(int metricId, Number value, Object...attrv) {
+        PerfSample sample = new PerfSample(metricId, value);
 
         if (attrv.length > 0) {
             Map<Integer,String> attrs = new HashMap<Integer, String>();
@@ -221,7 +221,7 @@ public class SimpleTraceFormatUnitTest {
 
     @Test
     public void testEncodeDecodePerfData() {
-        List<PerfSample<?>> samples = Arrays.asList((PerfSample<?>)
+        List<PerfSample> samples = Arrays.asList(
             sample(1, 1L, 1, "a", 2, "b"),
             sample(2, 2L, 2, "c", 3, "d"));
 
@@ -229,7 +229,7 @@ public class SimpleTraceFormatUnitTest {
         decode();
         output.check(0, "action", "perfData", "clock", 1L, "scannerId", 1);
 
-        List<PerfSample<?>> ret = (List<PerfSample<?>>)output.get(0, "samples");
+        List<PerfSample> ret = (List<PerfSample>)output.get(0, "samples");
 
         Assert.assertEquals(samples, ret);
     }

@@ -67,12 +67,12 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
                 new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom")
                         .withMetricTemplate(rankproc.rawDataMetric("test", "test")));
         scanner.runCycle(100);
-        List<PerfSample<?>> samples = output.get(0, "samples");
+        List<PerfSample> samples = output.get(0, "samples");
 
         Assert.assertNotNull(samples);
         Assert.assertEquals(2, samples.size());
 
-        for (PerfSample<?> sample : samples) {
+        for (PerfSample sample : samples) {
             Assert.assertTrue("Should have non-zero metric ID", sample.getMetricId() > 0);
         }
     }

@@ -86,7 +86,7 @@ public abstract class PerfDataEventHandler extends TraceEventHandler {
      *
      * @param samples samples
      */
-    public abstract void perfData(long clock, int scannerId, List<PerfSample<?>> samples);
+    public abstract void perfData(long clock, int scannerId, List<PerfSample> samples);
 
 
     /**

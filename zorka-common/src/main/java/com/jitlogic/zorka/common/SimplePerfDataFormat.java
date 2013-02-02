@@ -216,13 +216,13 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
     }
 
     @Override
-    public void perfData(long clock, int scannerId, List<PerfSample<?>> samples) {
+    public void perfData(long clock, int scannerId, List<PerfSample> samples) {
         buf.putByte(PERF_DATA);
         buf.putLong(clock);
         buf.putInt(scannerId);
         buf.putInt(samples.size());
 
-        for (PerfSample<?> sample : samples) {
+        for (PerfSample sample : samples) {
             int type = sample.getType();
 
             buf.putByte((byte)type);
@@ -446,12 +446,11 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
         long clock = buf.getLong();
         int scannerId = buf.getInt(), nsamples = buf.getInt();
 
-        List<PerfSample<?>> samples = new ArrayList<PerfSample<?>>(nsamples);
+        List<PerfSample> samples = new ArrayList<PerfSample>(nsamples);
         for (int i = 0; i < nsamples; i++) {
             int type = buf.getByte(), metricId = buf.getInt();
-            PerfSample<?> sample = type == PerfSample.LONG_SAMPLE
-                    ? new PerfSample<Long>(metricId, buf.getLong())
-                    : new PerfSample<Double>(metricId, buf.getDouble());
+            PerfSample sample = new PerfSample(metricId,
+                    type == PerfSample.LONG_SAMPLE ? buf.getLong() : buf.getDouble());
             int nattrs = buf.getByte();
             if (nattrs > 0) {
                 Map<Integer,String> attrs = new LinkedHashMap<Integer, String>();
