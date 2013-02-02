@@ -102,8 +102,8 @@ public class TestTracer extends PerfDataEventHandler {
     }
 
 
-    public Object get(int idx, Object key) {
-        return idx < data.size() ?  data.get(idx).get(key) : null;
+    public <T> T get(int idx, Object key) {
+        return idx < data.size() ?  (T)data.get(idx).get(key) : null;
     }
 
 

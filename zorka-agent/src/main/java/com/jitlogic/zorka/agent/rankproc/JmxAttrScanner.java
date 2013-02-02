@@ -114,7 +114,7 @@ public class JmxAttrScanner implements Runnable {
      *
      * @param tstamp current time (milliseconds since Epoch)
      */
-    public void runCycle(long tstamp) {
+    public void runCycleOld(long tstamp) {
         List<Integer> longIds = new ArrayList<Integer>(128);
         List<Long> longVals = new ArrayList<Long>(128);
 
@@ -151,5 +151,34 @@ public class JmxAttrScanner implements Runnable {
         }
     }
 
+    public void runCycle(long clock) {
+        List<PerfSample<?>> samples = new ArrayList<PerfSample<?>>();
+
+        for (QueryLister lister : listers) {
+            MetricTemplate template = lister.getMetricTemplate();
+            if (template != null) {
+                for (QueryResult result : lister.list()) {
+                    if (result.getValue() instanceof Number) {
+                        Metric metric = getMetric(template, result);
+                        Number val = metric.getValue(clock, (Number)result.getValue());
+                        PerfSample<?> sample;
+                        if (val instanceof Double || val instanceof Float) {
+                            sample = new PerfSample<Double>(metric.getId(), val.doubleValue());
+                        } else {
+                            sample = new PerfSample<Long>(metric.getId(), val.longValue());
+                        }
+                        // TODO add dynamic attributes here
+                        samples.add(sample);
+                    } else {
+                        log.warn("Trying to submit non-numeric metric value for " + result.getAttrPath() + ": " + result.getValue());
+                    }
+                }
+            }
+        }
+
+        if (samples.size() > 0) {
+            output.perfData(clock, id, samples);
+        }
+    }
 
 }
