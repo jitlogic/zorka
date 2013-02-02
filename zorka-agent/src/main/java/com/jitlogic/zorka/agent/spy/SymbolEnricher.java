@@ -170,24 +170,6 @@ public class SymbolEnricher extends PerfDataEventHandler {
 
 
     @Override
-    public void longVals(long clock, int objId, List<Integer> components, List<Long> values) {
-        check(objId);
-        for (int component : components) {
-            checkMetric(component);
-        }
-    }
-
-
-    @Override
-    public void doubleVals(long clock, int objId, List<Integer> components, List<Double> values) {
-        check(objId);
-        for (int component : components) {
-            checkMetric(component);
-        }
-    }
-
-
-    @Override
     public void perfData(long clock, int scannerId, List<PerfSample> samples) {
         check(scannerId);
         for (PerfSample sample : samples) {

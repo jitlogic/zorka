@@ -59,12 +59,14 @@ public class SimpleTraceFormatUnitTest {
         new SimplePerfDataFormat(buf.getContent()).decode(output);
     }
 
+
     @Test
     public void testSymbolCmd() {
         encoder.newSymbol(c1, "some.Class");
         decode();
         output.check(0, "action", "newSymbol", "symbolId", c1, "symbolName", "some.Class");
     }
+
 
     @Test
     public void testTraceBeginCmd() {
@@ -89,6 +91,7 @@ public class SimpleTraceFormatUnitTest {
         output.check(0, "action", "traceReturn", "tstamp", 200L);
     }
 
+
     @Test
     public void testTraceBigLongNum() {
         long l = System.nanoTime();
@@ -98,6 +101,7 @@ public class SimpleTraceFormatUnitTest {
         output.check(0, "tstamp", l);
     }
 
+
     @Test
     public void traceErrorCmd() {
         SymbolicException e = new SymbolicException(e1, "oja!", new SymbolicStackElement[0], null);
@@ -105,6 +109,7 @@ public class SimpleTraceFormatUnitTest {
         decode();
         output.check(0, "action", "traceError", "tstamp", 200L, "exception", e);
     }
+
 
     @Test
     public void traceStatsCmd() {
@@ -120,6 +125,7 @@ public class SimpleTraceFormatUnitTest {
         decode();
         output.check(0, "action", "newAttr", "attrId", a1, "attrVal", "oja!");
     }
+
 
     @Test
     public void traceLongAttr() {
@@ -152,6 +158,7 @@ public class SimpleTraceFormatUnitTest {
         output.check(0, "action", "newAttr", "attrId", a1, "attrVal", (short)200);
     }
 
+
     @Test
     public void testSimpleTraceDecodeEncode() {
         encoder.traceBegin(t1, 500L, 2);
@@ -165,6 +172,7 @@ public class SimpleTraceFormatUnitTest {
         Assert.assertEquals("Should read 5 records.", 5, output.getData().size());
     }
 
+
     @Test
     public void testTraceEncodeDecodeRealException() {
         Exception ex = new Exception("oja!");
@@ -175,6 +183,7 @@ public class SimpleTraceFormatUnitTest {
         output.check(0, "action", "traceError", "tstamp", 200L, "exception", e);
     }
 
+
     @Test
     public void testTraceEncodeDecodeRealExceptionWithCause() {
         Exception ex1 = new Exception("oja!");
@@ -184,38 +193,6 @@ public class SimpleTraceFormatUnitTest {
         encoder.traceError(e, 200);
         decode();
         output.check(0, "action", "traceError", "tstamp", 200L, "exception", e);
-    }
-
-    @Test
-    public void testTraceEncodeDecodeLongVals() {
-        List<Integer> c1 = Arrays.asList(new Integer[]{ 1, 2, 3, 4 });
-        List<Long>    v1 = Arrays.asList(new Long[]{ 2L, 4L, 6L, 8L });
-
-        encoder.longVals(100, 10, c1, v1);
-        decode();
-        output.check(0, "action", "longVals", "clock", 100L, "objId", 10);
-
-        List<Integer>  c2 = (List<Integer>)output.get(0, "components");
-        List<Long>     v2 = (List<Long>)output.get(0, "values");
-
-        Assert.assertEquals(c1, c2);
-        Assert.assertEquals(v1, v2);
-    }
-
-    @Test
-    public void testTraceEncodeDecodeDoubleVals() {
-        List<Integer>  c1 = Arrays.asList(new Integer[]{ 1, 2, 3, 4 });
-        List<Double>   v1 = Arrays.asList(new Double[]{ 2.0, 4.0, 6.0, 8.0 });
-
-        encoder.doubleVals(100, 10, c1, v1);
-        decode();
-        output.check(0, "action", "doubleVals", "clock", 100L, "objId", 10);
-
-        int[]  c2 = (int[])output.get(0, "components");
-        double[] v2 = (double[])output.get(0, "values");
-
-        Assert.assertEquals(c1, c2);
-        Assert.assertEquals(v1, v2);
     }
 
 

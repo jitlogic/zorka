@@ -112,45 +112,8 @@ public class JmxAttrScanner implements Runnable {
     /**
      * Performs one scan-submit cycle.
      *
-     * @param tstamp current time (milliseconds since Epoch)
+     * @param clock current time (milliseconds since Epoch)
      */
-    public void runCycleOld(long tstamp) {
-        List<Integer> longIds = new ArrayList<Integer>(128);
-        List<Long> longVals = new ArrayList<Long>(128);
-
-        List<Integer> doubleIds = new ArrayList<Integer>(128);
-        List<Double> doubleVals = new ArrayList<Double>(128);
-
-        for (QueryLister lister : listers) {
-            MetricTemplate template = lister.getMetricTemplate();
-            if (template != null) {
-                for (QueryResult result : lister.list()) {
-                    if (result.getValue() instanceof Number) {
-                        Metric metric = getMetric(template, result);
-                        Number val = metric.getValue(tstamp, (Number)result.getValue());
-                        if (val instanceof Double || val instanceof Float) {
-                            doubleIds.add(metric.getId());
-                            doubleVals.add(val.doubleValue());
-                        } else {
-                            longIds.add(metric.getId());
-                            longVals.add(val.longValue());
-                        }
-                    } else {
-                        log.warn("Trying to submit non-numeric metric value for " + result.getAttrPath() + ": " + result.getValue());
-                    }
-                }
-            }
-        } // for ()
-
-        if (longIds.size() > 0) {
-            output.longVals(tstamp, id, longIds, longVals);
-        }
-
-        if (doubleIds.size() > 0) {
-            output.doubleVals(tstamp, id, doubleIds, doubleVals);
-        }
-    }
-
     public void runCycle(long clock) {
         List<PerfSample> samples = new ArrayList<PerfSample>();
 

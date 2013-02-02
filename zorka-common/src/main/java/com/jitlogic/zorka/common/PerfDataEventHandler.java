@@ -50,34 +50,6 @@ public abstract class PerfDataEventHandler extends TraceEventHandler {
 
 
     /**
-     * Records a collection of long integer samples.
-     *
-     * @param clock wall clock time
-     *
-     * @param objId object ID
-     *
-     * @param components symbol IDs
-     *
-     * @param values values
-     */
-    public abstract void longVals(long clock, int objId, List<Integer> components, List<Long> values);
-
-
-    /**
-     * Records a collection of floating point samples.
-     *
-     * @param clock wall clock time
-     *
-     * @param objId object ID
-     *
-     * @param components symbol IDs
-     *
-     * @param values values
-     */
-    public abstract void doubleVals(long clock, int objId, List<Integer> components, List<Double> values);
-
-
-    /**
      * Records set of performance data samples.
      *
      * @param clock wall clock time

@@ -29,7 +29,7 @@ import java.util.*;
 public class SimplePerfDataFormat extends PerfDataEventHandler {
 
     /** Simple format version 1 magic number */
-    public static final int MAGIC_V1=0x57aace01;
+    public static final int MAGIC = 0xcafeb1ba;
 
     /** traceBegin() call */
     public static final byte TRACE_BEGIN  = 0x01;
@@ -58,11 +58,6 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
     public static final byte PERF_DATA    = 0x09;
 
     /** longVal() call */
-    public static final byte LONG_VAL     = 0x30;
-
-    /** doubleVal() call */
-    public static final byte DOUBLE_VAL   = 0x32;
-
     /** newAttr(key, null) call */
     public static final byte NULL_ATTR    = 0x40;
 
@@ -189,31 +184,6 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
         }
     }
 
-
-    @Override
-    public void longVals(long clock, int objId, List<Integer> components, List<Long> values) {
-        buf.putByte(LONG_VAL);
-        buf.putLong(clock);
-        buf.putInt(objId);
-        buf.putInt(components.size());
-        for (int i = 0; i < components.size(); i++) {
-            buf.putInt(components.get(i));
-            buf.putLong(values.get(i));
-        }
-    }
-
-
-    @Override
-    public void doubleVals(long clock, int objId, List<Integer> components, List<Double> values) {
-        buf.putByte(DOUBLE_VAL);
-        buf.putLong(clock);
-        buf.putInt(objId);
-        buf.putInt(components.size());
-        for (int i = 0; i < components.size(); i++) {
-            buf.putInt(components.get(i));
-            buf.putDouble(values.get(i));
-        }
-    }
 
     @Override
     public void perfData(long clock, int scannerId, List<PerfSample> samples) {
@@ -355,12 +325,6 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
                 case PERF_DATA:
                     decodePerfData(output);
                     break;
-                case LONG_VAL:
-                    decodeLongVals(output);
-                    break;
-                case DOUBLE_VAL:
-                    decodeDoubleVals(output);
-                    break;
                 case NULL_ATTR:
                     output.newAttr(buf.getInt(), null);
                     break;
@@ -400,45 +364,6 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
         for (int i = 0; i < nattr; i++) {
             mt = mt.withDynamicAttr(buf.getString());
         }
-    }
-
-
-    /**
-     * Decodes a set of long values
-     *
-     * @param output
-     */
-    private void decodeLongVals(PerfDataEventHandler output) {
-        long clock = buf.getLong();
-        int objId = buf.getInt();
-        int len = buf.getInt();
-
-        List<Integer> components = new ArrayList<Integer>(len+1);
-        List<Long> values = new ArrayList<Long>(len+1);
-
-        for (int i = 0; i < len; i++) {
-            components.add(buf.getInt());
-            values.add(buf.getLong());
-        }
-
-        output.longVals(clock, objId, components, values);
-    }
-
-
-    private void decodeDoubleVals(PerfDataEventHandler output) {
-        long clock = buf.getLong();
-        int objId = buf.getInt();
-        int len = buf.getInt();
-
-        List<Integer> components = new ArrayList<Integer>(len+1);
-        List<Double> values = new ArrayList<Double>(len+1);
-
-        for (int i = 0; i < len; i++) {
-            components.add(buf.getInt());
-            values.add(buf.getDouble());
-        }
-
-        output.doubleVals(clock, objId, components, values);
     }
 
 
