@@ -32,14 +32,13 @@ public class SymbolRegistry {
     private static final ZorkaLog log = ZorkaLogger.getLog(SymbolRegistry.class);
 
     /** ID of last symbol added to registry. */
-    private AtomicInteger lastId = new AtomicInteger(0);
+    private AtomicInteger lastSymbolId = new AtomicInteger(0);
 
     /** Symbol name to ID map */
-    private ConcurrentHashMap<String,Integer> symbols = new ConcurrentHashMap<String, Integer>();
+    private ConcurrentHashMap<String,Integer> symbolIds = new ConcurrentHashMap<String, Integer>();
 
     /** Symbol ID to name map */
-    private ConcurrentHashMap<Integer,String> idents = new ConcurrentHashMap<Integer,String>();
-
+    private ConcurrentHashMap<Integer,String> symbolNames = new ConcurrentHashMap<Integer,String>();
 
     /**
      * Returns ID of named symbol. If symbol hasn't been registered yet,
@@ -55,18 +54,18 @@ public class SymbolRegistry {
             return 0;
         }
 
-        Integer id = symbols.get(symbol);
+        Integer id = symbolIds.get(symbol);
 
         if (id == null) {
-            int newid = lastId.incrementAndGet();
+            int newid = lastSymbolId.incrementAndGet();
 
             if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_REGISTRY)) {
                 log.debug("Adding symbol '" + symbol + "', newid=" + newid);
             }
 
-            id = symbols.putIfAbsent(symbol, newid);
+            id = symbolIds.putIfAbsent(symbol, newid);
             if (id == null) {
-                idents.put(newid, symbol);
+                symbolNames.put(newid, symbol);
                 id = newid;
             }
         }
@@ -86,7 +85,7 @@ public class SymbolRegistry {
         if (symbolId == 0) {
             return "<null>";
         }
-        return idents.get(symbolId);
+        return symbolNames.get(symbolId);
     }
 
 
@@ -103,12 +102,12 @@ public class SymbolRegistry {
             log.debug("Putting symbol '" + symbol + "', newid=" + symbolId);
         }
 
-        symbols.put(symbol, symbolId);
-        idents.put(symbolId, symbol);
+        symbolIds.put(symbol, symbolId);
+        symbolNames.put(symbolId, symbol);
 
         // TODO not thread safe !
-        if (symbolId > lastId.get()) {
-            lastId.set(symbolId);
+        if (symbolId > lastSymbolId.get()) {
+            lastSymbolId.set(symbolId);
         }
     }
 
@@ -119,6 +118,6 @@ public class SymbolRegistry {
      * @return last symbol ID
      */
     public int lastId() {
-        return lastId.get();
+        return lastSymbolId.get();
     }
 }

@@ -16,10 +16,10 @@
 
 package com.jitlogic.zorka.agent.spy;
 
+import com.jitlogic.zorka.common.PerfDataEventHandler;
 import com.jitlogic.zorka.common.Submittable;
 import com.jitlogic.zorka.common.SymbolRegistry;
 import com.jitlogic.zorka.common.SymbolicException;
-import com.jitlogic.zorka.common.TraceEventHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -291,7 +291,7 @@ public class TraceRecord implements Submittable {
      * @param output output handler object
      */
     @Override
-    public void traverse(TraceEventHandler output) {
+    public void traverse(PerfDataEventHandler output) {
 
         if (hasFlag(TRACE_BEGIN)) {
             output.traceBegin(marker.getTraceId(), getClock(), marker != null ? marker.getFlags() : 0);
@@ -350,7 +350,7 @@ public class TraceRecord implements Submittable {
     /**
      * Returns true if record is part of recorded trace.
      * This method is implemented for readability purposes,
-     * so algorithmic code like TraceBuilder will be easier
+     * so algorithmic code like TraceEventHandler will be easier
      * to understand. Do not factor it out.
      *
      * @return true if record is part of recorded trace
@@ -362,7 +362,7 @@ public class TraceRecord implements Submittable {
     /**
      * Returns true if record is empty (no actual frame has been
      * recorded in it). This method is implemented for readability
-     * purposes, so algorithmic code like TraceBuilder will be easier
+     * purposes, so algorithmic code like TraceEventHandler will be easier
      * to understand. Do not factor it out.
      *
      * @return true if record is empty

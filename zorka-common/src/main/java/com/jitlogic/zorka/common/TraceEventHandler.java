@@ -16,13 +16,6 @@
 
 package com.jitlogic.zorka.common;
 
-
-/**
- * Handles trace events. For performance reasons this is class, not interface
- * (and null implementation is useful anyway).
- *
- * @author rafal.lewczuk@jitlogic.com
- */
 public abstract class TraceEventHandler {
 
     /**
@@ -31,7 +24,6 @@ public abstract class TraceEventHandler {
      * @param traceId trace ID (symbol)
      */
     public abstract void traceBegin(int traceId, long clock, int flags);
-
 
     /**
      * Records metod entry.
@@ -46,14 +38,12 @@ public abstract class TraceEventHandler {
      */
     public abstract void traceEnter(int classId, int methodId, int signatureId, long tstamp);
 
-
     /**
      * Records method return.
      *
      * @param tstamp timestamp (in nanoseconds since Epoch - see System.nanoTime())
      */
     public abstract void traceReturn(long tstamp);
-
 
     /**
      * Records method error (exception thrown from method).
@@ -62,30 +52,7 @@ public abstract class TraceEventHandler {
      * @param tstamp timestamp (in nanoseconds since Epoch - see System.nanoTime())
      *
      */
-    public abstract  void traceError(Object exception, long tstamp);
-
-
-    /**
-     * Records trace statistics.
-     *
-     * @param calls number of (recursive, traced) calls
-     *
-     * @param errors number of errors
-     */
-    public abstract  void traceStats(long calls, long errors, int flags);
-
-
-    /**
-     * Records symbol (to be later used as class/method/parameter ID).
-     * Note that symbols are mostly generated at config / class loading time
-     * and are not normally emitted from instrumented code.
-     *
-     * @param symbolId numeric symbol ID
-     *
-     * @param symbolText symbol text
-     */
-    public abstract void newSymbol(int symbolId, String symbolText);
-
+    public abstract void traceError(Object exception, long tstamp);
 
     /**
      * Records a parameter.
@@ -95,46 +62,4 @@ public abstract class TraceEventHandler {
      * @param attrVal parameter value
      */
     public abstract void newAttr(int attrId, Object attrVal);
-
-
-    /**
-     * Records a collection of long integer samples.
-     *
-     * @param clock wall clock time
-     *
-     * @param objId object ID
-     *
-     * @param components symbol IDs
-     *
-     * @param values values
-     */
-    public abstract void longVals(long clock, int objId, int[] components, long[] values);
-
-
-    /**
-     * Records a collection of integer samples.
-     *
-     * @param clock wall clock time
-     *
-     * @param objId object ID
-     *
-     * @param components symbol IDs
-     *
-     * @param values values
-     */
-    public abstract void intVals(long clock, int objId, int[] components, int[] values);
-
-
-    /**
-     * Records a collection of floating point samples.
-     *
-     * @param clock wall clock time
-     *
-     * @param objId object ID
-     *
-     * @param components symbol IDs
-     *
-     * @param values values
-     */
-    public abstract void doubleVals(long clock, int objId, int[] components, double[] values);
 }
