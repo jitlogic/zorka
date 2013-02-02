@@ -20,6 +20,7 @@ package com.jitlogic.zorka.agent.spy;
 import com.jitlogic.zorka.common.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * This trace event handler can be plugged between trace event sender and receiver.
@@ -182,6 +183,20 @@ public class SymbolEnricher extends PerfDataEventHandler {
         check(objId);
         for (int component : components) {
             checkMetric(component);
+        }
+    }
+
+
+    @Override
+    public void perfData(long clock, int scannerId, List<PerfSample<?>> samples) {
+        check(scannerId);
+        for (PerfSample<?> sample : samples) {
+            checkMetric(sample.getMetricId());
+            if (sample.getAttrs() != null) {
+                for (Map.Entry<Integer,String> e : sample.getAttrs().entrySet()) {
+                    check(e.getKey());
+                }
+            }
         }
     }
 

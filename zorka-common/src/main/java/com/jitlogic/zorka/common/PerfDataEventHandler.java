@@ -78,6 +78,18 @@ public abstract class PerfDataEventHandler extends TraceEventHandler {
 
 
     /**
+     * Records set of performance data samples.
+     *
+     * @param clock wall clock time
+     *
+     * @param scannerId scanner ID (scanner name)
+     *
+     * @param samples samples
+     */
+    public abstract void perfData(long clock, int scannerId, List<PerfSample<?>> samples);
+
+
+    /**
      * Records newly defined metrics template
      *
      * @param template

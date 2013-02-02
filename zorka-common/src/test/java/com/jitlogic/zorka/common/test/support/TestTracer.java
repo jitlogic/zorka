@@ -16,10 +16,7 @@
 
 package com.jitlogic.zorka.common.test.support;
 
-import com.jitlogic.zorka.common.Metric;
-import com.jitlogic.zorka.common.MetricTemplate;
-import com.jitlogic.zorka.common.PerfDataEventHandler;
-import com.jitlogic.zorka.common.ZorkaUtil;
+import com.jitlogic.zorka.common.*;
 import org.junit.Assert;
 
 import java.util.ArrayList;
@@ -73,6 +70,11 @@ public class TestTracer extends PerfDataEventHandler {
     @Override
     public void doubleVals(long clock, int objId, List<Integer> components, List<Double> values) {
         data.add(ZorkaUtil.map("action", "doubleVals", "clock", clock, "objId", objId, "components", components, "values", values));
+    }
+
+    @Override
+    public void perfData(long clock, int scannerId, List<PerfSample<?>> samples) {
+        data.add(ZorkaUtil.map("action", "perfData", "clock", clock, "scannerId", scannerId, "samples", samples));
     }
 
     @Override

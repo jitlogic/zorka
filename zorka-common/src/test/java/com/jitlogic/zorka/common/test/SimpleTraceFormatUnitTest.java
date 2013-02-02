@@ -22,9 +22,25 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SimpleTraceFormatUnitTest {
+
+    private <T extends Number> PerfSample<T> sample(int metricId, T value, Object...attrv) {
+        PerfSample<T> sample = new PerfSample<T>(metricId, value);
+
+        if (attrv.length > 0) {
+            Map<Integer,String> attrs = new HashMap<Integer, String>();
+            for (int i = 1; i < attrv.length; i += 2) {
+                attrs.put((Integer)attrv[i-1], (String)attrv[i]);
+            }
+            sample.setAttrs(attrs);
+        }
+
+        return sample;
+    }
 
     private SymbolRegistry symbols = new SymbolRegistry();
     private ByteBuffer buf = new ByteBuffer();;
@@ -200,5 +216,21 @@ public class SimpleTraceFormatUnitTest {
 
         Assert.assertEquals(c1, c2);
         Assert.assertEquals(v1, v2);
+    }
+
+
+    @Test
+    public void testEncodeDecodePerfData() {
+        List<PerfSample<?>> samples = Arrays.asList((PerfSample<?>)
+            sample(1, 1L, 1, "a", 2, "b"),
+            sample(2, 2L, 2, "c", 3, "d"));
+
+        encoder.perfData(1L, 1, samples);
+        decode();
+        output.check(0, "action", "perfData", "clock", 1L, "scannerId", 1);
+
+        List<PerfSample<?>> ret = (List<PerfSample<?>>)output.get(0, "samples");
+
+        Assert.assertEquals(samples, ret);
     }
 }

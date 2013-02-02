@@ -17,10 +17,7 @@
 package com.jitlogic.zorka.common;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Implements simple trace encoder/decoder. Uses simple, uncompressed binary format.
@@ -58,6 +55,8 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
     /** newTemplate() call */
     public static final byte NEW_METRIC   = 0x08;
 
+    public static final byte PERF_DATA    = 0x09;
+
     /** longVal() call */
     public static final byte LONG_VAL     = 0x30;
 
@@ -85,7 +84,6 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
     public static final byte NO_EXCEPTION = 0;
 
     public static final byte CAUSE_EXCEPTION = 1;
-
 
     /** Input/output buffer */
     private ByteBuffer buf;
@@ -217,6 +215,42 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
         }
     }
 
+    @Override
+    public void perfData(long clock, int scannerId, List<PerfSample<?>> samples) {
+        buf.putByte(PERF_DATA);
+        buf.putLong(clock);
+        buf.putInt(scannerId);
+        buf.putInt(samples.size());
+
+        for (PerfSample<?> sample : samples) {
+            int type = sample.getType();
+
+            buf.putByte((byte)type);
+            buf.putInt(sample.getMetricId());
+
+            switch (type) {
+                case PerfSample.LONG_SAMPLE:
+                    buf.putLong((Long)sample.getValue());
+                    break;
+                case PerfSample.DOUBLE_SAMPLE:
+                    buf.putDouble((Double)sample.getValue());
+                    break;
+            }
+
+            Map<Integer, String> attrs = sample.getAttrs();
+            if (attrs != null) {
+                buf.putByte((byte) attrs.size());
+                for (Map.Entry<Integer,String> e : attrs.entrySet()) {
+                    buf.putInt(e.getKey());
+                    buf.putString(e.getValue());
+                }
+            } else {
+                buf.putByte((byte)0);
+            }
+        }
+    }
+
+
 
     @Override
     public void newMetricTemplate(MetricTemplate template) {
@@ -250,6 +284,7 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
             buf.putString(e.getValue().toString());
         }
     }
+
 
 
     private void decodeMetric(PerfDataEventHandler output) {
@@ -316,6 +351,9 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
                     break;
                 case NEW_METRIC:
                     decodeMetric(output);
+                    break;
+                case PERF_DATA:
+                    decodePerfData(output);
                     break;
                 case LONG_VAL:
                     decodeLongVals(output);
@@ -397,10 +435,35 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
 
         for (int i = 0; i < len; i++) {
             components.add(buf.getInt());
-            values.add( buf.getDouble());
+            values.add(buf.getDouble());
         }
 
         output.doubleVals(clock, objId, components, values);
+    }
+
+
+    private void decodePerfData(PerfDataEventHandler output) {
+        long clock = buf.getLong();
+        int scannerId = buf.getInt(), nsamples = buf.getInt();
+
+        List<PerfSample<?>> samples = new ArrayList<PerfSample<?>>(nsamples);
+        for (int i = 0; i < nsamples; i++) {
+            int type = buf.getByte(), metricId = buf.getInt();
+            PerfSample<?> sample = type == PerfSample.LONG_SAMPLE
+                    ? new PerfSample<Long>(metricId, buf.getLong())
+                    : new PerfSample<Double>(metricId, buf.getDouble());
+            int nattrs = buf.getByte();
+            if (nattrs > 0) {
+                Map<Integer,String> attrs = new LinkedHashMap<Integer, String>();
+                for (int j = 0; j < nattrs; j++) {
+                    attrs.put(buf.getInt(), buf.getString());
+                }
+                sample.setAttrs(attrs);
+            }
+            samples.add(sample);
+        }
+
+        output.perfData(clock, scannerId, samples);
     }
 
 

@@ -19,6 +19,7 @@ package com.jitlogic.zorka.viewer;
 import com.jitlogic.zorka.common.Metric;
 import com.jitlogic.zorka.common.MetricTemplate;
 import com.jitlogic.zorka.common.PerfDataEventHandler;
+import com.jitlogic.zorka.common.PerfSample;
 
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
@@ -138,6 +139,18 @@ public class PerfPrinterStream extends PerfDataEventHandler {
         sb.append("VALS(" + time(clock) + "): objId=" + objId + ", data=(");
         for (int i = 0; i < components.size(); i++) {
             sb.append("[" + components.get(i) + "," + values.get(i) + "]");
+        }
+        sb.append(")");
+        out.println(sb.toString());
+    }
+
+
+    @Override
+    public void perfData(long clock, int scannerId, List<PerfSample<?>> samples) {
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("PERF(" + time(clock) + "): scannerId = " + scannerId + ", data=(");
+        for (PerfSample<?> sample : samples) {
+            sb.append(sample);
         }
         sb.append(")");
         out.println(sb.toString());
