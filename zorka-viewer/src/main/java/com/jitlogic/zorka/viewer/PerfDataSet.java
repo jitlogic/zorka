@@ -43,6 +43,7 @@ public class PerfDataSet extends PerfDataEventHandler {
     /** Collected performance metric data. */
     private Map<Integer,Map<Integer,List<PerfSample>>> mdata = new HashMap<Integer, Map<Integer, List<PerfSample>>>();
 
+
     private Map<Integer,MetricTemplate> metricTemplates = new HashMap<Integer, MetricTemplate>();
 
     private Map<Integer,Metric> metrics = new HashMap<Integer, Metric>();
@@ -227,4 +228,20 @@ public class PerfDataSet extends PerfDataEventHandler {
     public Map<Integer,String> getSymbols() {
         return symbols;
     }
+
+
+    public Map<Integer, Map<Integer, List<PerfSample>>> getMdata() {
+        return mdata;
+    }
+
+    public String getSymbol(int id) {
+        return symbols.get(id);
+    }
+
+    public Metric getMetric(int id) {
+        return metrics.get(id);
+    }
+
+
+
 }

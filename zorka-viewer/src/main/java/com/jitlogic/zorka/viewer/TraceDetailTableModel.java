@@ -29,10 +29,10 @@ import java.util.List;
 public class TraceDetailTableModel extends AbstractTableModel {
 
     /** Table column names */
-    private String[] colNames = { "Time", "Calls", "Err", "Pct", "Method" };
+    private static final String[] colNames = { "Time", "Calls", "Err", "Pct", "Method" };
 
     /** Preferred table column widths */
-    private int[] colWidth    = { 75, 50, 50, 50, 640 };
+    private static final int[] colWidth    = { 75, 50, 50, 50, 640 };
 
     /** Current data ("flattened" method call tree representing single trace) */
     private List<NamedTraceRecord> data = new ArrayList<NamedTraceRecord>(1);
