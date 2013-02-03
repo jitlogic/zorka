@@ -38,7 +38,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Before
     public void setScanner() {
-        scanner = tracer.jmxScanner("test", null);
+        scanner = perfmon.scanner("test", (PerfDataEventHandler)null);
     }
 
 
@@ -47,22 +47,22 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
         QueryResult qr = qr(10L, "name", "SomeObject", "type", "SomeType");
 
         assertTrue("Should return RawDataMetric object.",
-                scanner.getMetric(rankproc.rawDataMetric("test", "test"), qr) instanceof RawDataMetric);
+                scanner.getMetric(perfmon.rawDataMetric("test", "test"), qr) instanceof RawDataMetric);
 
         assertTrue("Should return RawDeltaMetric object.",
-                scanner.getMetric(rankproc.rawDeltaMetric("test", "test"), qr) instanceof RawDeltaMetric);
+                scanner.getMetric(perfmon.rawDeltaMetric("test", "test"), qr) instanceof RawDeltaMetric);
 
         assertTrue("Expected TimerDeltaMetric object.",
-                scanner.getMetric(rankproc.timedDeltaMetric("test", "test"), qr) instanceof TimedDeltaMetric);
+                scanner.getMetric(perfmon.timedDeltaMetric("test", "test"), qr) instanceof TimedDeltaMetric);
 
         assertTrue("Expected WindowedRateMetric",
-                scanner.getMetric(rankproc.windowedRateMetric("t", "t", "nom", "nom"), qr) instanceof WindowedRateMetric);
+                scanner.getMetric(perfmon.windowedRateMetric("t", "t", "nom", "nom"), qr) instanceof WindowedRateMetric);
     }
 
 
     @Test
     public void testConstructSameAndUniqueMetrics() throws Exception {
-        MetricTemplate mt = rankproc.rawDataMetric("test", "test");
+        MetricTemplate mt = perfmon.rawDataMetric("test", "test");
 
         Metric m1 = scanner.getMetric(mt, qr(10L, "name", "SomeObject", "type", "SomeType"));
         Metric m2 = scanner.getMetric(mt, qr(20L, "name", "SomeObject", "type", "SomeType"));
@@ -75,7 +75,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Test
     public void testConstructSameAndUniqueMetricsWithDynamicAttr() throws Exception {
-        MetricTemplate mt = rankproc.rawDataMetric("test", "test").withDynamicAttr("name");
+        MetricTemplate mt = perfmon.rawDataMetric("test", "test").withDynamicAttr("name");
 
         Metric m1 = scanner.getMetric(mt, qr(10L, "name", "SomeObject", "type", "SomeType"));
         Metric m2 = scanner.getMetric(mt, qr(20L, "name", "OtherObject", "type", "SomeType"));
@@ -88,7 +88,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Test
     public void testConstructMetricAndCheckForProperStringTemplating() throws Exception {
-        MetricTemplate mt = rankproc.rawDataMetric("Very important ${name} metric.", "MT/s");
+        MetricTemplate mt = perfmon.rawDataMetric("Very important ${name} metric.", "MT/s");
 
         Metric m = scanner.getMetric(mt, qr(10L, "name", "SomeObject"));
 
@@ -100,7 +100,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
     public void testRawDataMetricWithoutMultiplierRetVal() throws Exception {
         QueryResult qr = qr(10L, "a", 1, "b", 2);
 
-        MetricTemplate mt = rankproc.rawDataMetric("test", "req");
+        MetricTemplate mt = perfmon.rawDataMetric("test", "req");
 
         assertEquals(10L, scanner.getMetric(mt, qr).getValue(0L, (Number)qr.getValue()));
     }
@@ -110,7 +110,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
     public void testRawDataMetricsWithRoundedMultiplier() throws Exception {
         QueryResult qr = qr(10L, "a", 1);
 
-        MetricTemplate mt = rankproc.rawDataMetric("test", "req").withMultiplier(2);
+        MetricTemplate mt = perfmon.rawDataMetric("test", "req").withMultiplier(2);
 
         assertEquals(20L, scanner.getMetric(mt, qr).getValue(0L, (Number)qr.getValue()));
     }
@@ -120,7 +120,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
     public void testRawDataMetricWithUnroundedMultiplier() throws Exception {
         QueryResult qr = qr(10L, "a", 1);
 
-        MetricTemplate mt = rankproc.rawDataMetric("test", "req").withMultiplier(1.23);
+        MetricTemplate mt = perfmon.rawDataMetric("test", "req").withMultiplier(1.23);
 
         assertEquals(12.3, (Double)scanner.getMetric(mt, qr).getValue(0L, (Number)qr.getValue()), 0.001);
     }

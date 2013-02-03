@@ -188,9 +188,6 @@ public class AgentInstance {
         normLib = new NormLib();
         zorkaAgent.install("normalizers", normLib);
 
-        rankProcLib = new RankProcLib();
-        zorkaAgent.install("rankproc", rankProcLib);
-
         if ("yes".equalsIgnoreCase(props.getProperty("spy"))) {
             log.info("Enabling Zorka SPY");
             spyInstance = SpyInstance.instance();
@@ -203,6 +200,10 @@ public class AgentInstance {
         } else {
             log.info("Zorka SPY is diabled. No loaded classes will be transformed in any way.");
         }
+
+        rankProcLib = new RankProcLib(spyInstance);
+        zorkaAgent.install("perfmon", rankProcLib);
+
 
         if ("yes".equalsIgnoreCase(props.getProperty("zabbix"))) {
             log.info("Enabling ZABBIX subsystem ...");
@@ -375,7 +376,7 @@ public class AgentInstance {
     /**
      * Returns reference to rank processing & metrics library
      *
-     * @return instance of rankproc library
+     * @return instance of perfmon library
      */
     public RankProcLib getRankProcLib() {
         return rankProcLib;

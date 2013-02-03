@@ -35,11 +35,6 @@ public class TracerLib {
     /** Reference to tracer instance */
     private Tracer tracer;
 
-    /** Reference to symbol registry */
-    private SymbolRegistry symbolRegistry;
-
-    private MetricsRegistry metricsRegistry;
-
     /** Default trace flags */
     private int defaultTraceFlags = TraceMarker.DROP_INTERIM;
 
@@ -51,8 +46,6 @@ public class TracerLib {
     public TracerLib(SpyInstance instance) {
         this.instance = instance;
         this.tracer = this.instance.getTracer();
-        symbolRegistry = this.tracer.getSymbolRegistry();
-        metricsRegistry = this.tracer.getMetricsRegistry();
     }
 
 
@@ -237,20 +230,5 @@ public class TracerLib {
         this.defaultTraceFlags = flags;
     }
 
-
-    /**
-     * Creates new JMX metrics scanner object. Scanner objects are responsible for scanning
-     * selected values accessible via JMX and
-     *
-     * @param name scanner name
-     *
-     * @param output output handler (eg. file)
-     *
-     * @param qdefs queries
-     * @return
-     */
-    public JmxAttrScanner jmxScanner(String name, PerfDataEventHandler output, QueryDef...qdefs) {
-        return new JmxAttrScanner(symbolRegistry, metricsRegistry, name, AgentInstance.getMBeanServerRegistry(), output, qdefs);
-    }
 
 }

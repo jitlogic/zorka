@@ -22,6 +22,11 @@
             <artifactId>zorka-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>1.0.14</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

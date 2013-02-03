@@ -567,7 +567,7 @@ public class ZorkaLib  {
         synchronized (this) {
             if (threadRankLister == null) {
                 threadRankLister = new ThreadRankLister();
-                scheduler.schedule(threadRankLister, 15000);
+                scheduler.schedule(threadRankLister, 15000, 0);
             }
         }
 
@@ -588,7 +588,7 @@ public class ZorkaLib  {
      */
     public EjbRankLister ejbRankLister(String mbsName, String objNames, String attr) {
         EjbRankLister lister = new EjbRankLister(mbsName, objNames, attr);
-        scheduler.schedule(lister, 15000);
+        scheduler.schedule(lister, 15000, 0);
         return lister;
     }
 
@@ -695,13 +695,8 @@ public class ZorkaLib  {
      *
      * @param interval run interval (in milliseconds)
      */
-    public void schedule(Runnable task, long interval) {
-        scheduler.schedule(task, interval);
+    public void schedule(Runnable task, long interval, long delay) {
+        scheduler.schedule(task, interval, delay);
     }
 
-
-
-    public QueryDef jmxQuery(String mbsName, String query, String... attrs) {
-        return new QueryDef(mbsName, query, attrs);
-    }
 }

@@ -32,7 +32,6 @@ import java.util.Map;
  */
 public class SymbolEnricher extends PerfDataEventHandler {
 
-
     /** Logger object */
     private static final ZorkaLog log = ZorkaLogger.getLog(SymbolEnricher.class);
 
@@ -95,6 +94,19 @@ public class SymbolEnricher extends PerfDataEventHandler {
             metricsSent.set(id);
         }
     }
+
+
+    private void checkMetricTemplate(int id) {
+        if (!templatesSent.get(id)) {
+            MetricTemplate template = metricRegistry.getTemplate(id);
+            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
+                log.debug("Enriching output stream with metric '" + template + "', id=" + id);
+            }
+            this.newMetricTemplate(template);
+            templatesSent.set(id);
+        }
+    }
+
 
     /**
      * Resets enricher. Since reset enricher will forget about all sent symbol IDs
@@ -180,24 +192,19 @@ public class SymbolEnricher extends PerfDataEventHandler {
                 }
             }
         }
+        output.perfData(clock, scannerId, samples);
     }
 
 
     @Override
     public void newMetricTemplate(MetricTemplate template) {
-        // Nothing interesting (yet)
+        output.newMetricTemplate(template);
     }
 
 
     @Override
     public void newMetric(Metric metric) {
-        if (!templatesSent.get(metric.getTemplate().getId())) {
-            // TODO rething symbol/metric registry visibility in various objects
-            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
-                log.debug("Enriching output stream with metric template '" + metric.getTemplate() + "'");
-            }
-            output.newMetricTemplate(metric.getTemplate());
-            templatesSent.set(metric.getTemplate().getId());
-        }
+        checkMetricTemplate(metric.getTemplate().getId());
+        output.newMetric(metric);
     }
 }

@@ -39,6 +39,7 @@ public class JmxAttrScanner implements Runnable {
 
     /** Scanner ID (attached to every packet of sample data) */
     private int id;
+    private String name;
 
     /** Symbol registry */
     private SymbolRegistry symbols;
@@ -67,6 +68,7 @@ public class JmxAttrScanner implements Runnable {
         this.symbols = symbols;
         this.metricsRegistry = metricRegistry;
         this.id = symbols.symbolId(name);
+        this.name = name;
         this.output = output;
 
         for (QueryDef qdef : qdefs) {
@@ -96,6 +98,11 @@ public class JmxAttrScanner implements Runnable {
                 default:
                     return null;
             }
+
+            if (template.getId() == 0) {
+                metricsRegistry.templateId(template);
+            }
+
             template.putMetric(key, metric);
             metricsRegistry.metricId(metric);
 
@@ -106,6 +113,11 @@ public class JmxAttrScanner implements Runnable {
                 }
                 metric.setDynamicAttrs(dynamicAttrs);
             }
+
+            if (ZorkaLogConfig.isPerfMonLevel(ZorkaLogConfig.ZPM_RUN_DEBUG)) {
+                log.debug("Created new metric: " + metric);
+            }
+
         }
 
         return metric;
@@ -115,7 +127,11 @@ public class JmxAttrScanner implements Runnable {
 
     @Override
     public void run() {
-        runCycle(System.currentTimeMillis());
+        try {
+            runCycle(System.currentTimeMillis());
+        } catch (Error e) {
+            log.error("Error executing scanner '" + name + "'", e);
+        }
     }
 
 
@@ -127,15 +143,38 @@ public class JmxAttrScanner implements Runnable {
     public void runCycle(long clock) {
         List<PerfSample> samples = new ArrayList<PerfSample>();
 
+        if (ZorkaLogConfig.isPerfMonLevel(ZorkaLogConfig.ZPM_RUNS)) {
+            log.info("Running scanner " + name + " (scannerId=" + id + ")");
+        }
+
         for (QueryLister lister : listers) {
             MetricTemplate template = lister.getMetricTemplate();
             if (template != null) {
+
+                if (ZorkaLogConfig.isPerfMonLevel(ZorkaLogConfig.ZPM_RUN_DEBUG)) {
+                    log.debug("Scanning query: " + lister);
+                }
+
                 for (QueryResult result : lister.list()) {
                     if (result.getValue() instanceof Number) {
                         Metric metric = getMetric(template, result);
                         Number val = metric.getValue(clock, (Number)result.getValue());
-                        PerfSample sample = new PerfSample(metric.getId(),
-                            val instanceof Double || val instanceof Float ? val.doubleValue() : val.longValue());
+
+                        if (val == null) {
+                            if (ZorkaLogConfig.isPerfMonLevel(ZorkaLogConfig.ZPM_RUN_DEBUG)) {
+                                log.debug("Obtained null value for metric " + metric + ". Skipping. ");
+                            }
+                            continue;
+                        }
+
+                        if (val instanceof Double || val instanceof Float) {
+                            val = val.doubleValue();
+                        } else {
+                            val = val.longValue();
+                        }
+
+                        PerfSample sample = new PerfSample(metric.getId(), val);
+
                         // Add dynamic attributes if necessary
                         if (metric.getDynamicAttrs() != null) {
                             Map<Integer,String> attrs = new HashMap<Integer, String>();
@@ -144,10 +183,17 @@ public class JmxAttrScanner implements Runnable {
                             }
                             sample.setAttrs(attrs);
                         }
+
+                        if (ZorkaLogConfig.isPerfMonLevel(ZorkaLogConfig.ZPM_RUN_TRACE)) {
+                            log.trace("Submitting sample: " + sample);
+                        }
+
                         samples.add(sample);
                     } else {
                         // TODO Log only when logging of this particular message is enabled
-                        log.warn("Trying to submit non-numeric metric value for " + result.getAttrPath() + ": " + result.getValue());
+                        if (ZorkaLogConfig.isPerfMonLevel(ZorkaLogConfig.ZPM_RUN_DEBUG)) {
+                            log.debug("Trying to submit non-numeric metric value for " + result.getAttrPath() + ": " + result.getValue());
+                        }
                     }
                 }
             }

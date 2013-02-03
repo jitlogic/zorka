@@ -93,7 +93,7 @@ public class QueryDef {
      *
      * @param segs list of segments to add
      *
-     * @return
+     * @return adds new segments to a query
      */
     private QueryDef withSegs(QuerySegment...segs) {
         QueryDef qdef = new QueryDef(this);
@@ -173,9 +173,9 @@ public class QueryDef {
      *
      * @param metricTemplate metric template object
      *
-     * @returnaugmented query definition
+     * @return augmented query definition
      */
-    public QueryDef withMetricTemplate(MetricTemplate metricTemplate) {
+    public QueryDef metric(MetricTemplate metricTemplate) {
         QueryDef qdef = new QueryDef(this);
         qdef.metricTemplate = metricTemplate;
         return qdef;

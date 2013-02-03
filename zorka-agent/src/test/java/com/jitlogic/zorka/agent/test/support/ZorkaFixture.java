@@ -53,7 +53,7 @@ public class ZorkaFixture {
     protected ZorkaBshAgent zorkaAgent;
     protected ZorkaLib zorka;
 
-    protected RankProcLib rankproc;
+    protected RankProcLib perfmon;
 
     @Before
     public void setUpFixture() {
@@ -94,7 +94,7 @@ public class ZorkaFixture {
         snmpLib = agentInstance.getSnmpLib();
         spy = agentInstance.getSpyLib();
         tracer = agentInstance.getTracerLib();
-        rankproc = agentInstance.getRankProcLib();
+        perfmon = agentInstance.getRankProcLib();
 
         spyTransformer = spyInstance.getClassTransformer();
     }
