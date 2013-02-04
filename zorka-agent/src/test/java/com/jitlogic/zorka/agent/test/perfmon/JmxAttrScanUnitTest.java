@@ -56,7 +56,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
     public void testSimpleNullScan() throws Exception {
         JmxAttrScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=XXX,*", "name").get("Nom")
-                        .metric(perfmon.rawDataMetric("test", "test")));
+                        .metric(perfmon.metric("test", "test")));
         TestUtil.setField(scanner, "output", out);
         scanner.runCycle(100);
         Assert.assertEquals(0, output.size());
@@ -67,7 +67,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
     public void testSimpleScanWithOneResult() throws Exception {
         JmxAttrScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom")
-                        .metric(perfmon.rawDataMetric("test", "test")));
+                        .metric(perfmon.metric("test", "test")));
         TestUtil.setField(scanner, "output", out);
         scanner.runCycle(100);
         Assert.assertEquals(1, output.size());
@@ -78,7 +78,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
     public void testCheckIfMetricObjectsAreRegisteredAndHaveIds() throws Exception {
         JmxAttrScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom")
-                        .metric(perfmon.rawDataMetric("test", "test")));
+                        .metric(perfmon.metric("test", "test")));
         TestUtil.setField(scanner, "output", out);
         scanner.runCycle(100);
         List<PerfSample> samples = output.get(0, "samples");
@@ -101,7 +101,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
         JmxAttrScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom", "ATTR")
                         .metric(
-                                perfmon.rawDataMetric("test", "test").withDynamicAttr("ATTR")));
+                                perfmon.metric("test", "test").dynamicAttrs("ATTR")));
         TestUtil.setField(scanner, "output", out);
 
         scanner.runCycle(100);
@@ -122,7 +122,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
         JmxAttrScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom", "ATTR")
                         .metric(
-                                perfmon.rawDataMetric("test", "test").withDynamicAttr("ATTR")));
+                                perfmon.metric("test", "test").dynamicAttrs("ATTR")));
         TestUtil.setField(scanner, "output", out);
 
         scanner.runCycle(100);

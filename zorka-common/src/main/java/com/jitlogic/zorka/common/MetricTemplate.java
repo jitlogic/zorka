@@ -100,7 +100,7 @@ public class MetricTemplate {
     }
 
 
-    public MetricTemplate withMultiplier(double multiplier) {
+    public MetricTemplate multiply(double multiplier) {
         MetricTemplate mt = new MetricTemplate(this);
         mt.multiplier = multiplier;
         return mt;
@@ -112,9 +112,11 @@ public class MetricTemplate {
     }
 
 
-    public MetricTemplate withDynamicAttr(String attr) {
+    public MetricTemplate dynamicAttrs(String...attrs) {
         MetricTemplate mt = new MetricTemplate(this);
-        mt.dynamicAttrs.add(attr);
+        for (String attr : attrs) {
+            mt.dynamicAttrs.add(attr);
+        }
         return mt;
     }
 

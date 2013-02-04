@@ -60,7 +60,7 @@ public class ZabbixDiscoveryUnitTest extends ZorkaFixture {
         makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
         makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);
 
-        JSONObject obj = zabbixLib.discovery(perfmon.query("test", "test:type=TestJmx,*", "name"));
+        JSONObject obj = zabbixLib.discovery(zorka.query("test", "test:type=TestJmx,*", "name"));
         assertTrue("Must return JSONObject", obj instanceof JSONObject);
         JSONArray data = (JSONArray)obj.get("data");
         assertTrue("Must return more than 1 item", data.size() > 1);

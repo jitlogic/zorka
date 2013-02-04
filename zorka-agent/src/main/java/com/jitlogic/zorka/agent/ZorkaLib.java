@@ -699,4 +699,11 @@ public class ZorkaLib  {
         scheduler.schedule(task, interval, delay);
     }
 
+
+    public QueryDef query(String mbsName, String query, String... attrs) {
+        return new QueryDef(mbsName, query, attrs);
+    }
+
+
+
 }

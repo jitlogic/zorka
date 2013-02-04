@@ -26,6 +26,13 @@ import com.jitlogic.zorka.common.*;
  */
 public class TracerLib {
 
+    public static final int ALWAYS_SUBMIT = TraceMarker.ALWAYS_SUBMIT;
+
+    public static final int ALL_METHODS = TraceMarker.ALL_METHODS;
+
+    public static final int DROP_INTERIM = TraceMarker.DROP_INTERIM;
+
+
     /** Reference to spy instance */
     private SpyInstance instance;
 

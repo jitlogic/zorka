@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.agent;
 
-import com.jitlogic.zorka.agent.perfmon.RankProcLib;
+import com.jitlogic.zorka.agent.perfmon.PerfMonLib;
 import com.jitlogic.zorka.agent.spy.TracerLib;
 import com.jitlogic.zorka.common.*;
 import com.jitlogic.zorka.agent.integ.*;
@@ -144,7 +144,7 @@ public class AgentInstance {
     private NormLib normLib;
 
     /** Reference to ranking and metrics processing library. */
-    private RankProcLib rankProcLib;
+    private PerfMonLib perfMonLib;
 
     /** Agent configuration properties */
     private Properties props;
@@ -201,8 +201,8 @@ public class AgentInstance {
             log.info("Zorka SPY is diabled. No loaded classes will be transformed in any way.");
         }
 
-        rankProcLib = new RankProcLib(spyInstance);
-        zorkaAgent.install("perfmon", rankProcLib);
+        perfMonLib = new PerfMonLib(spyInstance);
+        zorkaAgent.install("perfmon", perfMonLib);
 
 
         if ("yes".equalsIgnoreCase(props.getProperty("zabbix"))) {
@@ -378,8 +378,8 @@ public class AgentInstance {
      *
      * @return instance of perfmon library
      */
-    public RankProcLib getRankProcLib() {
-        return rankProcLib;
+    public PerfMonLib getPerfMonLib() {
+        return perfMonLib;
     }
 
 }

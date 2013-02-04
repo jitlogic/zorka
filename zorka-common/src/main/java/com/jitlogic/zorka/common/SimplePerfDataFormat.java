@@ -357,12 +357,12 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
 
         MetricTemplate mt = new MetricTemplate(type, name, units, nom, div);
         mt.setId(id);
-        mt = mt.withMultiplier(multiplier);
+        mt = mt.multiply(multiplier);
 
         int nattr = buf.getByte();
 
         for (int i = 0; i < nattr; i++) {
-            mt = mt.withDynamicAttr(buf.getString());
+            mt = mt.dynamicAttrs(buf.getString());
         }
     }
 

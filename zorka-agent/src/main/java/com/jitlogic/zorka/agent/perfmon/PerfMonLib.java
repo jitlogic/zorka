@@ -21,7 +21,7 @@ import com.jitlogic.zorka.agent.spy.SpyInstance;
 import com.jitlogic.zorka.agent.spy.Tracer;
 import com.jitlogic.zorka.common.*;
 
-public class RankProcLib {
+public class PerfMonLib {
 
     /** Reference to symbol registry */
     private SymbolRegistry symbolRegistry;
@@ -31,35 +31,30 @@ public class RankProcLib {
 
     private Tracer tracer;
 
-    public RankProcLib(SpyInstance instance) {
+    public PerfMonLib(SpyInstance instance) {
         this.symbolRegistry = instance.getTracer().getSymbolRegistry();
         this.metricsRegistry = instance.getTracer().getMetricsRegistry();
         this.tracer = instance.getTracer();
     }
 
 
-    public MetricTemplate rawDataMetric(String name, String units) {
+    public MetricTemplate metric(String name, String units) {
         return new MetricTemplate(MetricTemplate.RAW_DATA, name, units);
     }
 
 
-    public MetricTemplate timedDeltaMetric(String name, String units) {
+    public MetricTemplate timedDelta(String name, String units) {
         return new MetricTemplate(MetricTemplate.TIMED_DELTA, name, units);
     }
 
 
-    public MetricTemplate rawDeltaMetric(String name, String units) {
+    public MetricTemplate delta(String name, String units) {
         return new MetricTemplate(MetricTemplate.RAW_DELTA, name, units);
     }
 
 
-    public MetricTemplate windowedRateMetric(String name, String units, String nom, String div) {
+    public MetricTemplate rate(String name, String units, String nom, String div) {
         return new MetricTemplate(MetricTemplate.WINDOWED_RATE, name, units, nom, div);
-    }
-
-
-    public QueryDef query(String mbsName, String query, String... attrs) {
-        return new QueryDef(mbsName, query, attrs);
     }
 
 
