@@ -36,9 +36,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     private SymbolRegistry symbols = new SymbolRegistry();
 
     private TraceBuilder b = new TraceBuilder(
-        new ZorkaAsyncThread<Submittable>("test") {
+        new TracerOutput() {
             @Override public void submit(Submittable obj) { obj.traverse(output); }
-            @Override protected void process(Submittable obj) {  }
         }, symbols);
 
     private static final int MS = 1000000;

@@ -18,12 +18,15 @@ package com.jitlogic.zorka.agent.spy;
 
 import com.jitlogic.zorka.common.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Groups all tracer engine components and global settings.
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class Tracer {
+public class Tracer implements TracerOutput {
 
     /** Minimum default method execution time required to attach method to trace. */
     private static long minMethodTime = 250000;
@@ -34,6 +37,8 @@ public class Tracer {
     /** Maximum number of records inside trace */
     private static int maxTraceRecords = 4096;
 
+
+    private List<ZorkaAsyncThread<Submittable>> outputs = new ArrayList<ZorkaAsyncThread<Submittable>>();
 
     public static long getMinMethodTime() {
         return minMethodTime;
@@ -73,14 +78,12 @@ public class Tracer {
 
     private MetricsRegistry metricsRegistry = new MetricsRegistry();
 
-    /** Output handler is initially set to null implementation. */
-    private ZorkaAsyncThread<Submittable> output;
 
     /** Thread local serving trace builder objects for application threads */
     private ThreadLocal<TraceEventHandler> localHandlers =
         new ThreadLocal<TraceEventHandler>() {
             public TraceEventHandler initialValue() {
-                return new TraceBuilder(output, symbolRegistry);
+                return new TraceBuilder(Tracer.this, symbolRegistry);
             }
         };
 
@@ -104,10 +107,6 @@ public class Tracer {
     }
 
 
-    public ZorkaAsyncThread<Submittable> getOutput() {
-        return output;
-    }
-
     /**
      * Adds new matcher that includes (or excludes) classes and method to be traced.
      *
@@ -118,6 +117,14 @@ public class Tracer {
     }
 
 
+
+    public void submit(Submittable record) {
+        for (ZorkaAsyncThread<Submittable> output : outputs) {
+            output.submit(record);
+        }
+    }
+
+
     /**
      * Sets output trace event handler tracer will submit completed traces to.
      * Note that submit() method of supplied handler is called from application
@@ -125,8 +132,8 @@ public class Tracer {
      *
      * @param output trace event handler
      */
-    public void setOutput(ZorkaAsyncThread<Submittable> output) {
-        this.output = output;
+    public void addOutput(ZorkaAsyncThread<Submittable> output) {
+        outputs.add(output);
     }
 
 

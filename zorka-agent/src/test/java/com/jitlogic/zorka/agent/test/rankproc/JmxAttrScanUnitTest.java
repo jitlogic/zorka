@@ -18,11 +18,14 @@ package com.jitlogic.zorka.agent.test.rankproc;
 
 import com.jitlogic.zorka.agent.rankproc.JmxAttrScanner;
 import com.jitlogic.zorka.agent.rankproc.QueryDef;
+import com.jitlogic.zorka.agent.spy.TracerOutput;
 import com.jitlogic.zorka.agent.test.spy.support.TestTracer;
 import com.jitlogic.zorka.agent.test.support.TestJmx;
+import com.jitlogic.zorka.agent.test.support.TestUtil;
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 import com.jitlogic.zorka.common.Metric;
 import com.jitlogic.zorka.common.PerfSample;
+import com.jitlogic.zorka.common.Submittable;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,42 +35,51 @@ import java.util.List;
 
 public class JmxAttrScanUnitTest extends ZorkaFixture {
 
+    TestTracer output;
+    TracerOutput out;
 
     @Before
     public void createSomeMBeans() throws Exception {
         makeTestJmx("test:name=bean1,type=TestJmx", 10, 10, "oja", "woja", "aja", "waja", "uja", "wuja");
         makeTestJmx("test:name=bean2,type=TestJmx", 10, 10, "oja", "woja", "aja", "waja", "eja", "weja");
+        output = new TestTracer();
+        out  = new TracerOutput() {
+            @Override
+            public void submit(Submittable record) {
+                record.traverse(output);
+            }
+        };
     }
 
 
     @Test
-    public void testSimpleNullScan() {
-        TestTracer output = new TestTracer();
-        JmxAttrScanner scanner = perfmon.scanner("TEST", output,
+    public void testSimpleNullScan() throws Exception {
+        JmxAttrScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=XXX,*", "name").get("Nom")
                         .metric(perfmon.rawDataMetric("test", "test")));
+        TestUtil.setField(scanner, "output", out);
         scanner.runCycle(100);
         Assert.assertEquals(0, output.size());
     }
 
 
     @Test
-    public void testSimpleScanWithOneResult() {
-        TestTracer output = new TestTracer();
-        JmxAttrScanner scanner = perfmon.scanner("TEST", output,
+    public void testSimpleScanWithOneResult() throws Exception {
+        JmxAttrScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom")
                         .metric(perfmon.rawDataMetric("test", "test")));
+        TestUtil.setField(scanner, "output", out);
         scanner.runCycle(100);
         Assert.assertEquals(1, output.size());
     }
 
 
     @Test
-    public void testCheckIfMetricObjectsAreRegisteredAndHaveIds() {
-        TestTracer output = new TestTracer();
-        JmxAttrScanner scanner = perfmon.scanner("TEST", output,
+    public void testCheckIfMetricObjectsAreRegisteredAndHaveIds() throws Exception {
+        JmxAttrScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom")
                         .metric(perfmon.rawDataMetric("test", "test")));
+        TestUtil.setField(scanner, "output", out);
         scanner.runCycle(100);
         List<PerfSample> samples = output.get(0, "samples");
 
@@ -85,12 +97,12 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
     // TODO check for dynamic attributes being passed and attached correctly
 
     @Test
-    public void testCheckIfDynamicAttributesArePassedCorrectly() {
-        TestTracer output = new TestTracer();
-        JmxAttrScanner scanner = perfmon.scanner("TEST", output,
+    public void testCheckIfDynamicAttributesArePassedCorrectly() throws Exception {
+        JmxAttrScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom", "ATTR")
                         .metric(
                                 perfmon.rawDataMetric("test", "test").withDynamicAttr("ATTR")));
+        TestUtil.setField(scanner, "output", out);
 
         scanner.runCycle(100);
         List<PerfSample> samples = output.get(0, "samples");
@@ -104,13 +116,14 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
         }
     }
 
+
     @Test
-    public void testCheckIfOutputDataIsProperlyCast() {
-        TestTracer output = new TestTracer();
-        JmxAttrScanner scanner = perfmon.scanner("TEST", output,
+    public void testCheckIfOutputDataIsProperlyCast() throws Exception {
+        JmxAttrScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom", "ATTR")
                         .metric(
                                 perfmon.rawDataMetric("test", "test").withDynamicAttr("ATTR")));
+        TestUtil.setField(scanner, "output", out);
 
         scanner.runCycle(100);
         List<PerfSample> samples = output.get(0, "samples");
@@ -123,6 +136,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
             Assert.assertEquals(Long.class, sample.getValue().getClass());
         }
     }
+
 
     private TestJmx makeTestJmx(String name, long nom, long div, String...md) throws Exception {
         TestJmx bean = new TestJmx();

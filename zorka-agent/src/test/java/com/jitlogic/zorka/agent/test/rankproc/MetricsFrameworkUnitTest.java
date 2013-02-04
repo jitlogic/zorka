@@ -38,7 +38,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Before
     public void setScanner() {
-        scanner = perfmon.scanner("test", (PerfDataEventHandler)null);
+        scanner = perfmon.scanner("test");
     }
 
 

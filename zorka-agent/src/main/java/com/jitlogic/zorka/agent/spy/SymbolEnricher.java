@@ -117,6 +117,8 @@ public class SymbolEnricher extends PerfDataEventHandler {
             log.debug("Resetting symbol enricher.");
         }
         symbolsSent.reset();
+        templatesSent.reset();
+        metricsSent.reset();
     }
 
 

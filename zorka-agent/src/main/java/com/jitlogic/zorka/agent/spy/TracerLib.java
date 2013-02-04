@@ -16,10 +16,7 @@
 
 package com.jitlogic.zorka.agent.spy;
 
-import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.agent.rankproc.JmxAttrScanner;
-import com.jitlogic.zorka.agent.rankproc.QueryDef;
 import com.jitlogic.zorka.common.*;
 
 /**
@@ -32,9 +29,6 @@ public class TracerLib {
     /** Reference to spy instance */
     private SpyInstance instance;
 
-    /** Reference to tracer instance */
-    private Tracer tracer;
-
     /** Default trace flags */
     private int defaultTraceFlags = TraceMarker.DROP_INTERIM;
 
@@ -45,7 +39,6 @@ public class TracerLib {
      */
     public TracerLib(SpyInstance instance) {
         this.instance = instance;
-        this.tracer = this.instance.getTracer();
     }
 
 
@@ -55,7 +48,7 @@ public class TracerLib {
      * @param output trace processing object
      */
     public void tracerOutput(ZorkaAsyncThread<Submittable> output) {
-        instance.getTracer().setOutput(output);
+        instance.getTracer().addOutput(output);
     }
 
 

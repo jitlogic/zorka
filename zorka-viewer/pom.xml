@@ -58,11 +58,10 @@
                             <includes>
                                 <include>com.jitlogic.zorka:zorka-common</include>
                                 <include>org.ow2.asm:asm</include>
+                                <include>org.jfree:jcommon</include>
+                                <include>org.jfree:jfreechart</include>
                             </includes>
                             <rules>
-                                <keep>
-                                    <pattern>org.jdesktop.swingx.**</pattern>
-                                </keep>
                                 <keep>
                                     <pattern>com.jitlogic.zorka.common.**</pattern>
                                 </keep>
@@ -71,6 +70,9 @@
                                 </keep>
                                 <keep>
                                     <pattern>org.ow2.asm.**</pattern>
+                                </keep>
+                                <keep>
+                                    <pattern>org.jfree.**</pattern>
                                 </keep>
                             </rules>
                         </configuration>
