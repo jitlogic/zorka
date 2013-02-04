@@ -27,7 +27,7 @@ import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogLevel;
 import com.jitlogic.zorka.common.ZorkaLogger;
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.agent.rankproc.*;
+import com.jitlogic.zorka.agent.perfmon.*;
 import com.jitlogic.zorka.agent.mbeans.AttrGetter;
 import com.jitlogic.zorka.common.ValGetter;
 import com.jitlogic.zorka.agent.mbeans.ZorkaMappedMBean;

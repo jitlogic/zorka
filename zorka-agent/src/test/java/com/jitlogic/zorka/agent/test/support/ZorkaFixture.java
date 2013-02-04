@@ -19,7 +19,7 @@ import com.jitlogic.zorka.agent.*;
 import com.jitlogic.zorka.agent.integ.SnmpLib;
 import com.jitlogic.zorka.agent.integ.SyslogLib;
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.agent.rankproc.RankProcLib;
+import com.jitlogic.zorka.agent.perfmon.RankProcLib;
 import com.jitlogic.zorka.agent.spy.SpyClassTransformer;
 import com.jitlogic.zorka.agent.spy.SpyInstance;
 import com.jitlogic.zorka.agent.spy.SpyLib;

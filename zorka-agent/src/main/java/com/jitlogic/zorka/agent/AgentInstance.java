@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.agent;
 
-import com.jitlogic.zorka.agent.rankproc.RankProcLib;
+import com.jitlogic.zorka.agent.perfmon.RankProcLib;
 import com.jitlogic.zorka.agent.spy.TracerLib;
 import com.jitlogic.zorka.common.*;
 import com.jitlogic.zorka.agent.integ.*;
