@@ -47,7 +47,7 @@ public class TracerLib {
      *
      * @param output trace processing object
      */
-    public void tracerOutput(ZorkaAsyncThread<Submittable> output) {
+    public void output(ZorkaAsyncThread<Submittable> output) {
         instance.getTracer().addOutput(output);
     }
 
@@ -57,7 +57,7 @@ public class TracerLib {
      *
      * @param matchers spy matcher objects (created using spy.byXxxx() functions)
      */
-    public void traceInclude(SpyMatcher...matchers) {
+    public void include(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
             instance.getTracer().include(matcher);
         }
@@ -68,7 +68,7 @@ public class TracerLib {
      *
      * @param matchers spy matcher objects (created using spy.byXxxx() functions)
      */
-    public void traceExclude(SpyMatcher...matchers) {
+    public void exclude(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
             instance.getTracer().include(matcher.exclude());
         }
@@ -81,8 +81,8 @@ public class TracerLib {
      *
      * @return spy processor object marking new trace
      */
-    public SpyProcessor traceBegin(String name) {
-        return traceBegin(name, -1);
+    public SpyProcessor begin(String name) {
+        return begin(name, -1);
     }
 
 
@@ -95,8 +95,8 @@ public class TracerLib {
      *
      * @return spy processor object marking new trace
      */
-    public SpyProcessor traceBegin(String name, long minimumTraceTime) {
-        return traceBegin(name, minimumTraceTime, defaultTraceFlags);
+    public SpyProcessor begin(String name, long minimumTraceTime) {
+        return begin(name, minimumTraceTime, defaultTraceFlags);
     }
 
 
@@ -111,7 +111,7 @@ public class TracerLib {
      *
      * @return spy processor object marking new trace
      */
-    public SpyProcessor traceBegin(String name, long minimumTraceTime, int flags) {
+    public SpyProcessor begin(String name, long minimumTraceTime, int flags) {
         return new TraceBeginProcessor(instance.getTracer(), name, minimumTraceTime * 1000000L, flags);
     }
 
@@ -125,7 +125,7 @@ public class TracerLib {
      *
      * @return spy processor object adding new trace attribute
      */
-    public SpyProcessor traceAttr(String srcField, String dstAttr) {
+    public SpyProcessor attr(String srcField, String dstAttr) {
         return new TraceAttrProcessor(instance.getTracer(), srcField, dstAttr);
     }
 
@@ -137,7 +137,7 @@ public class TracerLib {
      *
      * @return spy processor object
      */
-    public SpyProcessor traceFlags(int flags) {
+    public SpyProcessor flags(int flags) {
         return new TraceFlagsProcessor(instance.getTracer(), null, flags);
     }
 
@@ -151,7 +151,7 @@ public class TracerLib {
      *
      * @return spy processor object
      */
-    public SpyProcessor traceFlags(String srcField, int flags) {
+    public SpyProcessor flags(String srcField, int flags) {
         return new TraceFlagsProcessor(instance.getTracer(), srcField, flags);
     }
 
@@ -167,7 +167,7 @@ public class TracerLib {
      *
      * @return trace file writer
      */
-    public ZorkaAsyncThread<Submittable> traceFile(String path, int maxFiles, long maxSize) {
+    public ZorkaAsyncThread<Submittable> toFile(String path, int maxFiles, long maxSize) {
         TraceFileWriter writer = new TraceFileWriter(ZorkaConfig.propFormat(path),
                 instance.getTracer().getSymbolRegistry(), instance.getTracer().getMetricsRegistry(),
                 maxFiles, maxSize);
@@ -190,7 +190,7 @@ public class TracerLib {
     /**
      * Sets minimum trace execution time. Traces that laster for shorted period
      * of time will be discarded. Not that this is default setting that can be
-     * overridden with spy.traceBegin() method.
+     * overridden with spy.begin() method.
      *
      * @param traceTime minimum trace execution time (50 milliseconds by default)
      */

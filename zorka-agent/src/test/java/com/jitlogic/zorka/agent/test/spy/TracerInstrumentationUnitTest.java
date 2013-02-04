@@ -33,7 +33,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
     @Test
     public void testTraceSingleTrivialMethod() throws Exception {
-        tracer.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
+        tracer.include(spy.byMethod(TCLASS1, "trivialMethod"));
 
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
@@ -46,7 +46,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
     public void testTraceAndInstrumentSingleTrivialMethod() throws Exception {
         engine.add(SpyDefinition.instance().onEnter(spy.fetchArg("E0", 0))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
-        tracer.traceInclude(spy.byMethod(TCLASS1, "trivialMethod"));
+        tracer.include(spy.byMethod(TCLASS1, "trivialMethod"));
 
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
@@ -59,7 +59,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
     @Test
     public void testTraceAndInstrumentRecursiveMethods() throws Exception {
-        tracer.traceInclude(spy.byMethod(TCLASS2, "~^[a-zA-Z_].*"));
+        tracer.include(spy.byMethod(TCLASS2, "~^[a-zA-Z_].*"));
 
         Object obj = instantiate(engine, TCLASS2);
         invoke(obj, "recursiveMethod");
@@ -71,7 +71,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
     @Test
     public void testTraceError() throws Exception {
-        tracer.traceInclude(spy.byMethod(TCLASS1, "~^[a-zA-Z_].*"));
+        tracer.include(spy.byMethod(TCLASS1, "~^[a-zA-Z_].*"));
 
         Object obj = instantiate(engine, TCLASS1);
         Object rslt = invoke(obj, "errorMethod");
@@ -84,7 +84,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
     @Test
     public void testTryCatchSimpleCatch() throws Exception {
-        tracer.traceInclude(spy.byMethod(TCLASS3, "tryCatchFinally0"));
+        tracer.include(spy.byMethod(TCLASS3, "tryCatchFinally0"));
 
         Object obj = instantiate(engine, TCLASS3);
         invoke(obj, "tryCatchFinally0", true);
@@ -96,7 +96,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
     @Test
     public void testTryCatchFinallyWithEmbeddedCatch() throws Exception {
-        tracer.traceInclude(spy.byMethod(TCLASS3, "tryCatchFinally1"));
+        tracer.include(spy.byMethod(TCLASS3, "tryCatchFinally1"));
 
         Object obj = instantiate(engine, TCLASS3);
         invoke(obj, "tryCatchFinally1", true);
@@ -109,7 +109,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
     @Test
     public void testTryCatchEmbeddedCatch() throws Exception {
-        tracer.traceInclude(spy.byMethod(TCLASS3, "tryCatchFinally2"));
+        tracer.include(spy.byMethod(TCLASS3, "tryCatchFinally2"));
 
         Object obj = instantiate(engine, TCLASS3);
         invoke(obj, "tryCatchFinally2", true);

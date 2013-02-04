@@ -25,21 +25,52 @@ __tracerTest() {
   // This is for demonstration purposes BUT in production it will cause a
   // lot of strain in your application. Be sure to fine tune tracer to 
   // generate only relevant information for your application.
-  
-  spy.setTracerMinMethodTime(0);
-  spy.setTracerMinTraceTime(0);
-  spy.setTracerMaxTraceRecords(65536);
 
-  spy.traceInclude(spy.byMethod("org.apache.catalina.**", "*").forTrace());
+  tracer.setTracerMinMethodTime(50000);
+  tracer.setTracerMinTraceTime(0);
+  tracer.setTracerMaxTraceRecords(65536);
+
+  output = tracer.traceFile("${zorka.log.dir}/trace.trc", 16, 8*1024*1024);
+  tracer.tracerOutput(output);
+
+  tracer.traceExclude(
+    spy.byClass("sun.**"),
+    spy.byClass("java.**"),
+    spy.byClass("javax.**"),
+    spy.byClass("com.sun.**"),
+    spy.byClass("com.jitlogic.zorka.**"),
+    spy.byClass("org.xml.sax.**"),
+    spy.byClass("org.jcp.**"),
+    spy.byClass("~^\\$Proxy.*$")
+  );
+
+
+  tracer.traceInclude(
+    spy.byClass("**").forTrace()
+    //spy.byClass("org.**").forTrace(),
+    //spy.byClass("com.**").forTrace()
+  );
+
 
   spy.add(spy.instance()
     .onEnter(spy.fetchArg("REQ", 1), 
-        spy.format("URL", "${REQ.request.requestURI}"), 
-        spy.traceBegin("HTTP_REQ"), 
-        spy.traceAttr("URL", "URL"))
+        spy.format("URI", "${REQ.request.requestURI}"), 
+        tracer.traceBegin("HTTP_REQ"), 
+        tracer.traceAttr("URI", "URI"))
     .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
 
-  spy.tracerOutput(spy.traceFile("/tmp/trace.trc", 4, 4*1024*1024));
+
+//  spy.add(spy.instance()
+//    .onEnter(spy.fetchArg("CLASS", 1), tracer.traceAttr("CLASS", "CLASS"))
+//    .include(spy.byMethod("org.apache.catalina.loader.WebappClassLoader", "loadClass")));
+
+
+  bytesMetric = perfmon.rawDataMetric("${name} memory usage.", "B");
+  query = perfmon.query("java", "java.lang:type=MemoryPool,*", "name").get("Usage").get("used").metric(bytesMetric);
+
+  scanner = perfmon.scanner("JVM", query);
+
+  zorka.schedule(scanner, 10000, 10000);
 
   return this;
 }
