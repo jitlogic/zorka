@@ -739,7 +739,11 @@ public class ZorkaLib  {
         String s = ZorkaConfig.getProperties().getProperty(key);
 
         try {
-            return s != null ? Integer.parseInt(s.trim()) : defval;
+            if (s != null) {
+                return Integer.parseInt(s.trim());
+            } else {
+                return defval;
+            }
         } catch (NumberFormatException e) {
             log.error("Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
             return defval;
@@ -756,7 +760,11 @@ public class ZorkaLib  {
         String s = ZorkaConfig.getProperties().getProperty(key);
 
         try {
-            return s != null ? Long.parseLong(s.trim()) : defval;
+            if (s != null) {
+                return Long.parseLong(s.trim());
+            } else {
+                return defval;
+            }
         } catch (NumberFormatException e) {
             log.error("Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
             return defval;
@@ -765,7 +773,7 @@ public class ZorkaLib  {
 
 
     public String stringCfg(String key) {
-        return stringCfg(null);
+        return stringCfg(key, null);
     }
 
 
@@ -783,7 +791,10 @@ public class ZorkaLib  {
             String[] ss = s.split(",");
             List<String> lst = new ArrayList<String>(ss.length);
             for (String str : ss) {
-                lst.add(str.trim());
+                str = str.trim();
+                if (str.length() > 0) {
+                    lst.add(str);
+                }
             }
             return lst;
         } else {
