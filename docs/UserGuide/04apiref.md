@@ -104,6 +104,33 @@ created earlier if it has been registered with the same `id`. Using `fileTrapper
 trappers created earlier without creating new ones (if none exists). Use `removeFileTrapper()` function to unregister
 and dispose file trappers.
 
+### Configuration access
+
+    zorka.hasCfg(key)
+
+    zorka.boolCfg(key)
+    zorka.boolCfg(key, defval)
+
+    zorka.intCfg(key)
+    zorka.intCfg(key, defval)
+
+    zorka.longCfg(key)
+    zorka.longCfg(key, defval)
+
+    zorka.stringCfg(key)
+    zorka.stringCfg(key, defval)
+
+    zorka.listCfg(key, defv1, defv2, ...)
+
+These are convenience functions for accessing configuration settings from `zorka.properties` file. Adminstrator can
+place arbitrary configuration settings into `zorka.properties` and then use them in BSH scripts. First function
+`hasCfg()` checks if given setting exists in `zorka.properties` and is contains non-empty string - returns true
+if so, or false if not. There are three sets of functions for parsing boolean, integer and long and string settings.
+Those functions return parsed values or supplied values if valid settings in `zorka.properties` do not exist or are
+not parsable. Boolean parsing `boolCfg()` functions recognize `true`/`false` and `yes`/`no` values (case-insensitive).
+
+List parsing function `listCfg()` parses string containing comma-separated values and returns it as list of strings
+containing (trimmed) values.
 
 ## Syslog functions
 
@@ -170,10 +197,11 @@ for every name found returns a map of attributes (attr1, attr2) mapped onto thei
 attribute names in zabbix-compatible form, eg. `j2eeServer` maps to `{#J2EESERVER}`. More sophiscated version of this
 method will be described in next section, yet this one is sufficient for most cases.
 
-    zabbix.discovery(<mbs>, <object-widcard>,  oattrs, path, attrs)
+    zabbix.discovery(query1, query2, ...)
 
 This is a more sophiscated discovery function that - in addition to listing mbeans themselves - can also dig deeper into
-mbean attributes.
+mbean attributes. It uses JMX query objects that can be defined by `zorka.query()` function.
+
 
 ### zabbix.trapper()
 
@@ -469,7 +497,7 @@ Beanshell interface generation feature to integrate simple scripts into argument
     plus2Processor = __plus2Processor();
 
     sdef = sdef.onEnter(
-      (com.jitlogic.zorka.spy.processors.SpyArgProcessor)plus2Processor);
+      (com.jitlogic.zorka.agent.spy.SpyProcessor)plus2Processor);
 
 Be extremly careful when filtering out objects on `ON_ENTER`, `ON_RETURN` and `ON_ERROR` stages; records passed here
 can have counterparts that will be matched later, by filtering one record and passing another it is possible to disrupt
@@ -574,8 +602,8 @@ jboss 7 logger etc.) and pass them to log processing chain.
 
 #### Selecting classes and method for trace
 
-    spy.traceInclude(matcher, matcher, ....)
-    spy.traceExclude(matcher, matcher, ....)
+    tracer.include(matcher, matcher, ....)
+    tracer.exclude(matcher, matcher, ....)
 
 First function adds matcher that will include classes (methods), second adds matcher that will exclude classes (or
 methods). Note that added matcher are evaluated in order they've been added, so you may consider adding general
@@ -583,35 +611,53 @@ exclusions first and add "everything" after that.
 
 #### Marking trace beginning
 
-    spy.traceBegin(label)
-    spy.traceBegin(label, minExecutionTime)
+    tracer.begin(label)
+    tracer.begin(label, minExecutionTime)
+    tracer.begin(label, minExecutionTime, flags)
 
 This processor marks beginning of a trace. Tracer will start collecting method call data when it application enters to
-an instrumented method that has `traceBegin()` in its processing chain and will submit collected data at method exit.
+an instrumented method that has `tracer.begin()` in its processing chain and will submit collected data at method exit.
 
 Traces are submitted only when execution took more than predefined time. This minimum time can be passed as an argument
-of `traceBegin()` or some system-wide default value can be used.
+of `tracer.begin()` or some system-wide default value can be used. Third variant of this functions allows for setting
+additional flags to trace (see `tracer.flags()` for more details).
 
 #### Adding attributes
 
-    spy.traceAttr(fieldName, attrName)
+    tracer.attr(fieldName, attrName)
 
 This processor will add value from given spy record field as a named attribute to a trace. It can be invoked at any
 method not only trace beginning. Attributes will be attached to this method's trace record (so the same attribute can
 appear at many records in the same trace).
 
+#### Marking trace flags
+
+    tracer.flags(flags)
+    tracer.flags(srcField, flags)
+
+This function sets flags altering tracer behavior. First variant sets flags unconditionally. Second variant sets
+flags only if given field of spy record contains non-null value. Only currently started trace is marked.
+The following flags are avaiable:
+
+* `tracer.ALWAYS_SUBMIT` - forces submission of current trace regardless of other conditions;
+
+* `tracer.ALL_METHODS` - records all method calls of current trace regardless of other conditions;
+
+* `tracer.DROP_INTERIM` - drops interim methods if their execution time is too short;
+
 #### Configuring tracer output
 
-    spy.traceFile(path, maxFiles, maxSize)
-    spy.traceOutput(output)
+    tracer.toFile(path, maxFiles, maxSize)
+    tracer.output(output)
 
 First function creates trace file writer object that can be installed into tracer using second function.
 
 #### Global tracer options
 
-    spy.setTracerMinMethodTime(nanoseconds);
-    spy.setTracerMinTraceTime(milliseconds);
-    spy.setTracerMaxTraceRecords(nrecords);
+    tracer.setTracerMinMethodTime(nanoseconds);
+    tracer.setTracerMinTraceTime(milliseconds);
+    tracer.setTracerMaxTraceRecords(nrecords);
+    tracer.setDefaultTraceFlags(flags);
 
 First function sets default minimum execution time for a method to be included into trace. Note that due to required
 resolution, passed time parameter is in nanoseconds (not milliseconds as usual). Second function sets default minimum
@@ -619,3 +665,95 @@ execution time for a trace to be further processed after completion. Third funct
 included in a single trace. This limit is necessary to prevent tracer from overruning host memory in cases there traced
 method calls lots and lots of other traced methods (and all become logged for some reason).
 
+
+## Collecting performance metrics
+
+Functions for performance metrics are available via `perfmon` library. There are several aspects of configuring it:
+
+* what objects are to be scanned and collected;
+
+* how collected metrics should be preprocessed and described;
+
+* how often metrics should be collected;
+
+
+### Querying JMX object graph
+
+JMX object graph query consists of JMX object name mask, list of object name attributes to be fetched and sets of
+rules defining how to traverse fetched objects. Query result is a list of objects containing finally reached object
+(or value) and map of all attributes (explicitly) fetched while traversing object graph. Query definition objects
+are immutable but offer some methods that create altered variants.
+
+Simplest query object can be created using `zorka.query()` function:
+
+    zorka.query(mbsName, objectName, attr1, attr2, ....)
+
+Query rule that will descend into selected attribute of a method (and optionally remember its name) can be added using
+`get()` method:
+
+     query = query.get(attr)
+     query = query.get(attr, name)
+
+First variant of this method will simply descend into objects, second one will also add attribute name to query result.
+When interpreting `get()` rule, agent will use `ObjectInspector.get()` method to descend.
+
+Query rule that will list object attributes and descend into matching ones can be defined using `list()` method:
+
+    query = query.list(regex)
+    query = query.list(regex, name)
+
+When interpreting `list()` fule, agent will use `ObjectInspector.list()` method to list all attributes and then
+`ObjectInspector.get()` method to descend into matching attributes. For each matching attribute, separate result
+is created and (optionally) attribute name is stored.
+
+Metric templates are used by permon scanners and can be assigned to queries using `metric()` method:
+
+    query = query.metric(template)
+
+Created (and configured) query objects can be supplied to metrics scanners or discovery functions (eg. for zabbix).
+
+### Defining metric templates
+
+Metric templates define how metrics should be preprocessed and how should metrics present themselves. There are several
+kinds of metrics:
+
+    perfmon.metric(name, units)
+
+Creates metric that will simply pass obtained values without preprocessing. Metric name will be visible in trace viewer
+and can contain macros referring to attributes attached to query results (in usual form `${attributeName}`). Second
+parameters describes measurement units as displayed in trace viewer.
+
+    perfmon.delta(name, units)
+
+Creates metric that will calculate simple delta of obtained values. Supplied parameters have the same meaning as above.
+
+    perfmon.timedDelta(name, units)
+
+Creates metric that will calculate delta per second of obtained values. Supplied parameters have the same meaning as
+above.
+
+    perfmon.rate(name, units, nom, div)
+
+This metric tracks two attributes of obtained object at once and calculates rate as delta of `nom` attribute divided
+by delta of `div` attribute.
+
+Metric template objects created by above functions are immutable objects that can be altered in the following ways:
+
+    template = template.multiply(multiplier)
+
+This causes metric results to be multiplied by given multiplier.
+
+    template = template.dynamicAttrs(attr, attr, ...)
+
+Marks some query result attributes as dynamic. Dynamic attributes are passed with each metric instance and do not impose
+stress on symbol registry nor metric registry.
+
+### Defining metric scanners
+
+    scanner = perfmon.scanner(name, query1, query2, ...)
+
+Creates scanner object that will periodically execute all queries and process their results accordingly. All resulting
+metrics are grouped under single scanner name. Note that queries that have no metric templates assigned will be ignored.
+
+Scanner objects implement `Runnable` interface and can be supplied to all kinds of schedulers of executors (eg. using
+`zorka.schedule()` function).

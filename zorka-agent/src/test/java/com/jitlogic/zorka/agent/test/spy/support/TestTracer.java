@@ -29,7 +29,7 @@ public class TestTracer extends PerfDataEventHandler {
 
     @Override
     public void traceBegin(int traceId, long clock, int flags) {
-        data.add(ZorkaUtil.map("action", "traceBegin", "traceId", traceId, "clock", clock, "flags", flags));
+        data.add(ZorkaUtil.map("action", "begin", "traceId", traceId, "clock", clock, "flags", flags));
     }
 
     @Override

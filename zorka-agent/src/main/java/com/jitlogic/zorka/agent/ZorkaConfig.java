@@ -180,7 +180,7 @@ public class ZorkaConfig {
      *
      * @return
      */
-    public static String propFormat(String input) {
+    public static String formatCfg(String input) {
         return properties == null ? input : ObjectInspector.substitute(input, properties);
     }
 

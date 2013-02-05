@@ -171,8 +171,8 @@ public class SyslogLib {
     public SyslogTrapper trapper(String id, String syslogServer, String defaultHost, int defaultFacility) {
         SyslogTrapper trapper = trappers.get(id);
         if (trapper == null) {
-            trapper = new SyslogTrapper(ZorkaConfig.propFormat(syslogServer),
-                                ZorkaConfig.propFormat(defaultHost), defaultFacility);
+            trapper = new SyslogTrapper(ZorkaConfig.formatCfg(syslogServer),
+                                ZorkaConfig.formatCfg(defaultHost), defaultFacility);
             trappers.put(id, trapper);
             trapper.start();
         }

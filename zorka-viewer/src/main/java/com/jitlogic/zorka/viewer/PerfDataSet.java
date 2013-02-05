@@ -40,8 +40,9 @@ public class PerfDataSet extends PerfDataEventHandler {
     /** Top of record stack (used by loading process, obsolete after load process ends) */
     private NamedTraceRecord top = new NamedTraceRecord(null);
 
-    /** Collected metrics. */
-    private Map<Integer,Map<Integer,List<DataSample>>> mgroups = new HashMap<Integer, Map<Integer,List<DataSample>>>();
+    /** Collected performance metric data. */
+    private Map<Integer,Map<Integer,List<PerfSample>>> mdata = new HashMap<Integer, Map<Integer, List<PerfSample>>>();
+
 
     private Map<Integer,MetricTemplate> metricTemplates = new HashMap<Integer, MetricTemplate>();
 
@@ -106,15 +107,12 @@ public class PerfDataSet extends PerfDataEventHandler {
 
     @Override
     public void perfData(long clock, int scannerId, List<PerfSample> samples) {
-        Map<Integer, List<DataSample>> metrics = getMetrics(scannerId);
+        Map<Integer,List<PerfSample>> mdata = getMData(scannerId);
 
         for (PerfSample sample : samples) {
-            List<DataSample> data = getDataSamples(sample.getMetricId(), metrics);
-            if (sample.getValue() instanceof Long) {
-                data.add(new LongDataSample(clock, (Long)sample.getValue()));
-            } else {
-                data.add(new DoubleDataSample(clock, (Double)sample.getValue()));
-            }
+            List<PerfSample> data = getSamples(sample.getMetricId(), mdata);
+            sample.setClock(clock);
+            data.add(sample);
         }
 
     }
@@ -132,23 +130,22 @@ public class PerfDataSet extends PerfDataEventHandler {
     }
 
 
-    private Map<Integer, List<DataSample>> getMetrics(int objId) {
-        Map<Integer,List<DataSample>> metrics = mgroups.get(objId);
-        if (metrics == null) {
-            metrics = new HashMap<Integer, List<DataSample>>();
-            mgroups.put(objId, metrics);
+    private Map<Integer,List<PerfSample>> getMData(int scannerId) {
+        Map<Integer,List<PerfSample>> samples = mdata.get(scannerId);
+        if (samples == null) {
+            samples = new HashMap<Integer, List<PerfSample>>();
+            mdata.put(scannerId, samples);
         }
-        return metrics;
+        return samples;
     }
 
-
-    private List<DataSample> getDataSamples(int component, Map<Integer, List<DataSample>> metrics) {
-        List<DataSample> data = metrics.get(component);
-        if (data == null) {
-            data = new ArrayList<DataSample>();
-            metrics.put(component, data);
+    private List<PerfSample> getSamples(int metricId, Map<Integer,List<PerfSample>> mdata) {
+        List<PerfSample> samples = mdata.get(metricId);
+        if (samples == null) {
+            samples = new ArrayList<PerfSample>();
+            mdata.put(metricId, samples);
         }
-        return data;
+        return samples;
     }
 
     /**
@@ -231,4 +228,20 @@ public class PerfDataSet extends PerfDataEventHandler {
     public Map<Integer,String> getSymbols() {
         return symbols;
     }
+
+
+    public Map<Integer, Map<Integer, List<PerfSample>>> getMdata() {
+        return mdata;
+    }
+
+    public String getSymbol(int id) {
+        return symbols.get(id);
+    }
+
+    public Metric getMetric(int id) {
+        return metrics.get(id);
+    }
+
+
+
 }

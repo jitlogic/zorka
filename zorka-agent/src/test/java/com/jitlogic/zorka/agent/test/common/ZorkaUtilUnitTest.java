@@ -17,7 +17,7 @@ package com.jitlogic.zorka.agent.test.common;
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 import com.jitlogic.zorka.agent.mbeans.MethodCallStatistic;
-import com.jitlogic.zorka.agent.rankproc.BucketAggregate;
+import com.jitlogic.zorka.agent.perfmon.BucketAggregate;
 import com.jitlogic.zorka.common.ZorkaUtil;
 import org.junit.Assert;
 import org.junit.Test;

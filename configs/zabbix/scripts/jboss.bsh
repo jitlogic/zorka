@@ -59,10 +59,9 @@ __jboss() {
 
     // Discover EJB3 beans
     discovery() {
-      String[] names = { "ear", "jar", "name" };
-      String[] path  = { "InvokeStats", "Stats", "~.*" };
-      String[] attrs = { null, null, "method" };
-      return zabbix.discovery("jboss", "jboss.j2ee:service=EJB3,*", names, path, attrs);
+      return zabbix.discovery(
+        zorka.query("jboss", "jboss.j2ee:service=EJB3,*", "ear", "jar", "name")
+          .get("InvokeStats").get("Stats").list("**", "method"));
     }
 
     // Returns number of calls of an EJB method

@@ -48,8 +48,9 @@ public class TaskScheduler {
      * @param runnable runnable task
      *
      * @param interval interval
+     * @param delay
      */
-    public void schedule(Runnable runnable, long interval) {
-        executor.scheduleAtFixedRate(runnable, 1, interval, TimeUnit.MILLISECONDS);
+    public void schedule(Runnable runnable, long interval, long delay) {
+        executor.scheduleAtFixedRate(runnable, delay, interval, TimeUnit.MILLISECONDS);
     }
 }
