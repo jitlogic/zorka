@@ -38,7 +38,7 @@ be set explicitly);
 
 Logging directives:
 
-* `zorka.log.level = TRACE` - log level (`TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL` are allowed);
+* `zorka.log.level = TRACE` - overall log level (`TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL` are allowed);
 
 * `zorka.log.size = 4m` - maximum size of log files (in megabytes if `m` is added as a suffix);
 
@@ -68,6 +68,69 @@ and zorka will close connection abruply;
 * `spy = yes` - enables or disables Zorka Spy (spy is enabled by default);
 
 * `spy.debug = 1` - sets verbosity for instrumentation engine;
+
+### Logging directives
+
+Zorka allows for more precise logging configuration. Selected aspects of various subsystems can be turned on or off.
+Supply comma-separated flags in configuration file to configure logging of some subsystem in a precise way.
+
+#### Tracer log flags
+
+    zorka.log.tracer = INFO
+
+This configures tracer logging flags. The following flags are available:
+
+* `NONE` - turn off all log messages related to tracer;
+
+* `CONFIG` - tracer configuration information;
+
+* `INSTRUMENT_CLASS` - class-level messages from instrumentation engine;
+
+* `INSTRUMENT_METHOD` - method-level messages from instrumentation engine;
+
+* `SYMBOL_REGISTRY` - log changes in symbol registry;
+
+* `SYMBOL_ENRICHMENT` - log which symbols are to be sent to output trace file;
+
+* `TRACE_ERRORS` - log internal errors of tracer engine;
+
+* `TRACE_CALLS` - log each and every call of tracer engine (from instrumented methods);
+
+Some additional grouping flags have been added for convenience:
+
+* `INFO` = `CONFIG`, `TRACE_ERRORS`
+
+* `DEBUG` = `INFO`, `INSTRUMENT_CLASS`, `INSTRUMENT_METHOD`
+
+* `TRACE` = `DEBUG`, `SYMBOL_REGISTRY`, `SYMBOL_ENRICHMENT`
+
+* `TRACE_FULL` = `TRACE`, `TRACE_CALLS`
+
+#### Performance monitor flags
+
+    zorka.log.perfmon = INFO
+
+This configures performance monitor flags. The following flags are available:
+
+* `NONE` - turn off all logging related to performance monitor;
+
+* `CONFIG` - performance monitor configuration information;
+
+* `RUNS` - logs a message every time some performance monitor starts new data collection cycle;
+
+* `RUN_DEBUG` - logs more debug information on performance monitor run cycles;
+
+* `RUN_TRACE` - logs all information on performance monitor run cycles (including collected samples);
+
+* `ERRORS` - logs errors that occur while running performance monitor;
+
+Additional grouping flags have been added for convenience:
+
+* `INFO` = `CONFIG`, `ERRORS`
+
+* `DEBUG` = `INFO`, `RUNS`, `RUN_DEBUG`
+
+* `TRACE` = `DEBUG`, `RUN_TRACE`
 
 ## Basic API
 

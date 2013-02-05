@@ -39,11 +39,17 @@ public class MainWindow extends JFrame {
     /** Content pane */
     private JPanel contentPane;
 
+    private JTabbedPane tabTraces;
+
     /** This table lists loaded traces. */
     private JTable tblTraces;
 
     /** Table model for tblTraces */
     private TraceTableModel tbmTraces = new TraceTableModel();
+
+    private JTable tblMetrics;
+
+    private PerfMetricsTableModel tbmMetrics = new PerfMetricsTableModel();
 
     /** Tabbed pane containing various views depicting trace details. */
     private JTabbedPane tabDetail;
@@ -56,6 +62,9 @@ public class MainWindow extends JFrame {
 
     /** This view contains stack trace of currently selected method call trace record */
     private ErrorDetailView pnlStackTrace;
+
+    /** Performance metric panel */
+    private PerfMetricView pnlPerfMetric;
 
     /** Help action: displays help window. */
     private Action actHelp = new AbstractAction("Help [F1]",  ResourceManager.getIcon16x16("help")) {
@@ -73,6 +82,7 @@ public class MainWindow extends JFrame {
             if (rv == JFileChooser.APPROVE_OPTION) {
                 traceSet.load(chooser.getSelectedFile());
                 tbmTraces.setTraceSet(traceSet);
+                tbmMetrics.setData(traceSet);
             }
         }
     };
@@ -84,6 +94,7 @@ public class MainWindow extends JFrame {
             System.exit(0);
         }
     };
+    private JSplitPane splitPane;
 
 
     /**
@@ -133,11 +144,24 @@ public class MainWindow extends JFrame {
         contentPane.setLayout(new BorderLayout(0,0));
         setContentPane(contentPane);
 
-        JSplitPane splitPane = new JSplitPane();
+
+        splitPane = new JSplitPane();
         contentPane.add(splitPane, BorderLayout.CENTER);
 
+        createLeftPanel();
+
+        createDetailUI();
+
+        splitPane.setResizeWeight(0.2);
+    }
+
+
+    private void createLeftPanel() {
+        tabTraces = new JTabbedPane();
+        splitPane.setLeftComponent(tabTraces);
+
         JScrollPane scrTraces = new JScrollPane();
-        splitPane.setLeftComponent(scrTraces);
+        tabTraces.add("Traces", scrTraces);
 
         tblTraces = new JTable(tbmTraces);
         tbmTraces.adjustColumns(tblTraces);
@@ -151,6 +175,25 @@ public class MainWindow extends JFrame {
         scrTraces.setMinimumSize(new Dimension(200, 384));
         scrTraces.setViewportView(tblTraces);
 
+
+        JScrollPane scrMetrics = new JScrollPane();
+        tabTraces.add("Metrics", scrMetrics);
+
+        tblMetrics = new JTable(tbmMetrics);
+        tbmMetrics.configure(tblMetrics);
+
+        tblMetrics.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                displayMetric(tblMetrics.getSelectedRow());
+            }
+        });
+
+        scrMetrics.setViewportView(tblMetrics);
+    }
+
+
+    private void createDetailUI() {
         JScrollPane scrTraceDetail = new JScrollPane();
 
         tbmTraceDetail = new TraceDetailTableModel();
@@ -172,9 +215,10 @@ public class MainWindow extends JFrame {
         pnlStackTrace = new ErrorDetailView();
         tabDetail.addTab("Call details", pnlStackTrace);
 
-        splitPane.setRightComponent(tabDetail);
+        pnlPerfMetric = new PerfMetricView();
+        tabDetail.addTab("Performance data", pnlPerfMetric);
 
-        splitPane.setResizeWeight(0.2);
+        splitPane.setRightComponent(tabDetail);
     }
 
 
@@ -216,5 +260,9 @@ public class MainWindow extends JFrame {
         if (sw) {
             tabDetail.setSelectedComponent(pnlStackTrace);
         }
+    }
+
+    private void displayMetric(int idx) {
+        tbmMetrics.feed(pnlPerfMetric, idx);
     }
 }

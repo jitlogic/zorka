@@ -25,7 +25,7 @@ import com.jitlogic.zorka.agent.test.integ.ZabbixDiscoveryUnitTest;
 import com.jitlogic.zorka.agent.test.normproc.LdapLexerUnitTest;
 import com.jitlogic.zorka.agent.test.normproc.XqlLexerUnitTest;
 import com.jitlogic.zorka.agent.test.normproc.XqlNormalizationUnitTest;
-import com.jitlogic.zorka.agent.test.rankproc.*;
+import com.jitlogic.zorka.agent.test.perfmon.*;
 import com.jitlogic.zorka.agent.test.spy.*;
 import com.jitlogic.zorka.agent.test.spy.TraceBuilderUnitTest;
 import com.jitlogic.zorka.agent.test.spy.TraceEnrichmentUnitTest;
@@ -41,7 +41,7 @@ import org.junit.runners.Suite;
         // TODO testinteg
         ZabbixAgentUnitTest.class,
 
-        // rankproc
+        // perfmon
         AggregateCountingUnitTest.class, AverageRateCountingUnitTest.class, JmxQueryUnitTest.class, JmxAttrScanUnitTest.class,
         MetricsFrameworkUnitTest.class, RankProcUnitTest.class, SlidingWindowUnitTest.class, ThreadRankUnitTest.class,
 

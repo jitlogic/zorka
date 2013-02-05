@@ -64,7 +64,7 @@ public abstract class PerfDataEventHandler extends TraceEventHandler {
     /**
      * Records newly defined metrics template
      *
-     * @param template
+     * @param template submitted metric template
      */
     public abstract void newMetricTemplate(MetricTemplate template);
 

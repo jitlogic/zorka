@@ -5,7 +5,7 @@
     <parent>
         <artifactId>zorka</artifactId>
         <groupId>com.jitlogic.zorka</groupId>
-        <version>0.8.1-SNAPSHOT</version>
+        <version>0.9.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -21,6 +21,11 @@
             <groupId>com.jitlogic.zorka</groupId>
             <artifactId>zorka-common</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>1.0.14</version>
         </dependency>
     </dependencies>
     <build>
@@ -53,11 +58,10 @@
                             <includes>
                                 <include>com.jitlogic.zorka:zorka-common</include>
                                 <include>org.ow2.asm:asm</include>
+                                <include>org.jfree:jcommon</include>
+                                <include>org.jfree:jfreechart</include>
                             </includes>
                             <rules>
-                                <keep>
-                                    <pattern>org.jdesktop.swingx.**</pattern>
-                                </keep>
                                 <keep>
                                     <pattern>com.jitlogic.zorka.common.**</pattern>
                                 </keep>
@@ -66,6 +70,9 @@
                                 </keep>
                                 <keep>
                                     <pattern>org.ow2.asm.**</pattern>
+                                </keep>
+                                <keep>
+                                    <pattern>org.jfree.**</pattern>
                                 </keep>
                             </rules>
                         </configuration>

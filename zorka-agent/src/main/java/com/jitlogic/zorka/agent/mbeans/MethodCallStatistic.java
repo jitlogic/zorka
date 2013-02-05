@@ -17,12 +17,12 @@
 
 package com.jitlogic.zorka.agent.mbeans;
 
-import static com.jitlogic.zorka.agent.rankproc.BucketAggregate.MS;
+import static com.jitlogic.zorka.agent.perfmon.BucketAggregate.MS;
 
 import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogger;
 import com.jitlogic.zorka.common.ZorkaStat;
-import com.jitlogic.zorka.agent.rankproc.BucketAggregate;
+import com.jitlogic.zorka.agent.perfmon.BucketAggregate;
 
 import java.util.concurrent.atomic.AtomicLong;
 

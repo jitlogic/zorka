@@ -70,6 +70,40 @@ public class ZorkaLogConfig {
     /** Maximum verbosity (all possible tracer messages) */
     public static final int ZTR_TRACE_FULL = ZTR_TRACE | ZTR_TRACE_CALLS;
 
+    /** Performance metrics log flags: none */
+    public static final int ZPM_NONE = 0x00;
+
+    /** Performance monitor configuration information */
+    public static final int ZPM_CONFIG = 0x01;
+
+    /** Performance monitor run cycles: information */
+    public static final int ZPM_RUNS = 0x02;
+
+    /** Performance monitor run cycles: debug */
+    public static final int ZPM_RUN_DEBUG = 0x04;
+
+    /** Performance monitor run cycles: trace */
+    public static final int ZPM_RUN_TRACE = 0x08;
+
+    /** Performance monitor: errors */
+    public static final int ZPM_ERRORS = 0x10;
+
+    /** Performance monitor overall: information */
+    public static final int ZPM_INFO = ZPM_CONFIG | ZPM_ERRORS;
+
+    /** Performance monitor overall: debug */
+    public static final int ZPM_DEBUG = ZPM_INFO | ZPM_RUNS | ZPM_RUN_DEBUG;
+
+    /** Performance monitor overall: trace */
+    public static final int ZPM_TRACE = ZPM_DEBUG | ZPM_RUN_TRACE;
+
+    private static int perfMonLevel = ZPM_INFO;
+
+    /** Returns performance monitoring mask */
+    public static int getPerfMonLevel() {
+        return perfMonLevel;
+    }
+
     /** Default tracer log verbosity */
     private static int tracerLevel = ZTR_INFO;
 
@@ -89,6 +123,16 @@ public class ZorkaLogConfig {
         return 0 != (tracerLevel & level);
     }
 
+    /**
+     *
+     *
+     * @param level
+     *
+     * @return
+     */
+    public static boolean isPerfMonLevel(int level) {
+        return 0 != (perfMonLevel & level);
+    }
 
     /**
      * Sets tracer log mask.
@@ -144,7 +188,8 @@ public class ZorkaLogConfig {
      * @param properties configuration properties (read from zorka.properties file).
      */
     public static void configure(Properties properties) {
-        tracerLevel = parse("zorka.log.tracer", "ZTR", properties.getProperty("zorka.log.tracer", "ZTR_INFO"));
+        tracerLevel  = parse("zorka.log.tracer", "ZTR", properties.getProperty("zorka.log.tracer", "ZTR_INFO"));
+        perfMonLevel = parse("zorka.log.perfmon", "ZPM", properties.getProperty("zorka.log.perfmon", "ZPM_INFO"));
     }
 
 

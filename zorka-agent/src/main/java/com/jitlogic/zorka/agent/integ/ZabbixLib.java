@@ -20,20 +20,12 @@ package com.jitlogic.zorka.agent.integ;
 import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.agent.rankproc.QueryDef;
-import com.jitlogic.zorka.agent.rankproc.QueryLister;
-import com.jitlogic.zorka.agent.rankproc.QueryResult;
-import com.jitlogic.zorka.common.JmxObject;
-import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.agent.ZorkaLib;
-import com.jitlogic.zorka.common.ObjectInspector;
+import com.jitlogic.zorka.agent.perfmon.QueryDef;
+import com.jitlogic.zorka.agent.perfmon.QueryLister;
+import com.jitlogic.zorka.agent.perfmon.QueryResult;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import javax.management.ObjectName;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -117,8 +109,8 @@ public class ZabbixLib {
         ZabbixTrapper trapper = trappers.get(id);
 
         if (trapper == null) {
-            trapper = new ZabbixTrapper(ZorkaConfig.propFormat(serverAddr),
-                                        ZorkaConfig.propFormat(defaultHost), defaultItem);
+            trapper = new ZabbixTrapper(ZorkaConfig.formatCfg(serverAddr),
+                                        ZorkaConfig.formatCfg(defaultHost), defaultItem);
             trappers.put(id, trapper);
             trapper.start();
         }
