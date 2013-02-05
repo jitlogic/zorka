@@ -20,11 +20,12 @@ way with Beanshell; instrumentation can be used for other tasks than basic monit
 can be analyzed by simple viewer application; tracer integrates well with rest of instrumentation engine, giving
 lots of options of capturing various types of data and filtering information that is logged to trace files;
 
-* mapped mbeans - user can map calcluated values from anywhere into arbitrary mbean attributes; for example, you can
+* performance metrics - very configurable metrics collector that offers sophiscated object tree traversal functionality
+and rich metric descriptions and preprocessing capabilities;
+
+* mapped mbeans - user can map calculated values from anywhere into arbitrary mbean attributes; for example, you can
 fetch some collection (list) anywhere from your application and present its size() function as some mbean attribute;
 standard JMX clients can fetch these values (monitor presented collection length in our example);
-
-* rank lists - customizable thread ranks, mbean ranks and ranks of methods instrumented by zorka;
 
 
 Note that this is development snapshot of Zorka agent. While it works fairly well on author's production workloads,

@@ -701,13 +701,17 @@ public class ZorkaLib  {
     }
 
 
+    public Boolean boolCfg(String key) {
+        return boolCfg(key, null);
+    }
+
     /**
      *
      * @param key
      * @param defval
      * @return
      */
-    public boolean boolCfg(String key, boolean defval) {
+    public Boolean boolCfg(String key, Boolean defval) {
         String s = ZorkaConfig.getProperties().getProperty(key);
 
         if (s != null) {
@@ -726,7 +730,12 @@ public class ZorkaLib  {
     }
 
 
-    public int intCfg(String key, int defval) {
+    public Integer intCfg(String key) {
+        return intCfg(key, null);
+    }
+
+
+    public Integer intCfg(String key, Integer defval) {
         String s = ZorkaConfig.getProperties().getProperty(key);
 
         try {
@@ -738,7 +747,12 @@ public class ZorkaLib  {
     }
 
 
-    public long longCfg(String key, long defval) {
+    public Long longCfg(String key) {
+        return longCfg(key, null);
+    }
+
+
+    public Long longCfg(String key, Long defval) {
         String s = ZorkaConfig.getProperties().getProperty(key);
 
         try {
@@ -747,6 +761,18 @@ public class ZorkaLib  {
             log.error("Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
             return defval;
         }
+    }
+
+
+    public String stringCfg(String key) {
+        return stringCfg(null);
+    }
+
+
+    public String stringCfg(String key, String defval) {
+        String s = ZorkaConfig.getProperties().getProperty(key);
+
+        return s != null ? s.trim() : defval;
     }
 
 

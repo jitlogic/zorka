@@ -1,3 +1,13 @@
+Zorka 0.9 (2013-02-05)
+----------------------
+
+ * tracer enhancements and bugfixes;
+ * performance metrics collector that adds collected data to tracer files;
+ * new JMX query / object graph traversal DSL;
+ * `zabbix.discovery()` now uses JMX query DSL;
+ * convenient API for accessing `zorka.properties` settings from BSH scripts;
+
+
 Zorka 0.8 (2013-01-20)
 ---------------------
 

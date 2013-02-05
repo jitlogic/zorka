@@ -104,6 +104,33 @@ created earlier if it has been registered with the same `id`. Using `fileTrapper
 trappers created earlier without creating new ones (if none exists). Use `removeFileTrapper()` function to unregister
 and dispose file trappers.
 
+### Configuration access
+
+    zorka.hasCfg(key)
+
+    zorka.boolCfg(key)
+    zorka.boolCfg(key, defval)
+
+    zorka.intCfg(key)
+    zorka.intCfg(key, defval)
+
+    zorka.longCfg(key)
+    zorka.longCfg(key, defval)
+
+    zorka.stringCfg(key)
+    zorka.stringCfg(key, defval)
+
+    zorka.listCfg(key, defv1, defv2, ...)
+
+These are convenience functions for accessing configuration settings from `zorka.properties` file. Adminstrator can
+place arbitrary configuration settings into `zorka.properties` and then use them in BSH scripts. First function
+`hasCfg()` checks if given setting exists in `zorka.properties` and is contains non-empty string - returns true
+if so, or false if not. There are three sets of functions for parsing boolean, integer and long and string settings.
+Those functions return parsed values or supplied values if valid settings in `zorka.properties` do not exist or are
+not parsable. Boolean parsing `boolCfg()` functions recognize `true`/`false` and `yes`/`no` values (case-insensitive).
+
+List parsing function `listCfg()` parses string containing comma-separated values and returns it as list of strings
+containing (trimmed) values.
 
 ## Syslog functions
 
