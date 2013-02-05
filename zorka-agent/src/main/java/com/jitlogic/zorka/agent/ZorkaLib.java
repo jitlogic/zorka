@@ -626,7 +626,7 @@ public class ZorkaLib  {
         FileTrapper trapper = fileTrappers.get(id);
 
         if (trapper == null) {
-            trapper = FileTrapper.rolling(ZorkaLogLevel.valueOf(logLevel), propFormat(path), count, maxSize, logExceptions);
+            trapper = FileTrapper.rolling(ZorkaLogLevel.valueOf(logLevel), formatCfg(path), count, maxSize, logExceptions);
             trapper.start();
             fileTrappers.put(id, trapper);
         }
@@ -652,7 +652,7 @@ public class ZorkaLib  {
         FileTrapper trapper = fileTrappers.get(id);
 
         if (trapper == null) {
-            trapper = FileTrapper.daily(logLevel, propFormat(path), logExceptions);
+            trapper = FileTrapper.daily(logLevel, formatCfg(path), logExceptions);
             trapper.start();
             fileTrappers.put(id, trapper);
         }
@@ -682,10 +682,88 @@ public class ZorkaLib  {
      *
      * @return
      */
-    public String propFormat(String input) {
-        return ZorkaConfig.propFormat(input);
+    public String formatCfg(String input) {
+        return ZorkaConfig.formatCfg(input);
     }
 
+
+    /**
+     * Returns true if given config property is set in zorka.properties file and has non-zero length
+     *
+     * @param key property key
+     *
+     * @return true if entry exists and is non-empty
+     */
+    public boolean hasCfg(String key) {
+        String s = ZorkaConfig.getProperties().getProperty(key);
+
+        return s != null && s.trim().length() > 0;
+    }
+
+
+    /**
+     *
+     * @param key
+     * @param defval
+     * @return
+     */
+    public boolean boolCfg(String key, boolean defval) {
+        String s = ZorkaConfig.getProperties().getProperty(key);
+
+        if (s != null) {
+            s = s.trim();
+
+            if (s.equalsIgnoreCase("true") || s.equalsIgnoreCase(("yes"))) {
+                return true;
+            } else if (s.equalsIgnoreCase("false") || s.equalsIgnoreCase("no")) {
+                return false;
+            } else {
+                log.error("Invalid value for '" + key + "' -> '" + s + "'. Setting default value of '" + defval);
+            }
+        }
+
+        return defval;
+    }
+
+
+    public int intCfg(String key, int defval) {
+        String s = ZorkaConfig.getProperties().getProperty(key);
+
+        try {
+            return s != null ? Integer.parseInt(s.trim()) : defval;
+        } catch (NumberFormatException e) {
+            log.error("Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
+            return defval;
+        }
+    }
+
+
+    public long longCfg(String key, long defval) {
+        String s = ZorkaConfig.getProperties().getProperty(key);
+
+        try {
+            return s != null ? Long.parseLong(s.trim()) : defval;
+        } catch (NumberFormatException e) {
+            log.error("Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
+            return defval;
+        }
+    }
+
+
+    public List<String> listCfg(String key, String...defVals) {
+        String s = ZorkaConfig.getProperties().getProperty(key);
+
+        if (s != null) {
+            String[] ss = s.split(",");
+            List<String> lst = new ArrayList<String>(ss.length);
+            for (String str : ss) {
+                lst.add(str.trim());
+            }
+            return lst;
+        } else {
+            return Arrays.asList(defVals);
+        }
+    }
 
 
     /**

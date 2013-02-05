@@ -242,8 +242,8 @@ public class SnmpLib {
         SnmpTrapper trapper = trappers.get(id);
 
         if (trapper == null) {
-            trapper = new SnmpTrapper(ZorkaConfig.propFormat(addr), ZorkaConfig.propFormat(community),
-                                        ZorkaConfig.propFormat(agentAddr), protocol);
+            trapper = new SnmpTrapper(ZorkaConfig.formatCfg(addr), ZorkaConfig.formatCfg(community),
+                                        ZorkaConfig.formatCfg(agentAddr), protocol);
             trappers.put(id, trapper);
             trapper.start();
         }

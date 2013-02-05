@@ -47,17 +47,34 @@ public class QueryLister {
             return new ArrayList<QueryResult>(1);
         }
 
-        List<QueryResult> results = getResults(conn);
+        ClassLoader cl0 = Thread.currentThread().getContextClassLoader();
+        ClassLoader cl1 = registry.getClassLoader(query.getMbsName());
 
-        List<QuerySegment> segments = query.getSegments();
-        if (segments.size() > 1) {
-            for (int i = 1; i < segments.size(); i++) {
-                QuerySegment seg = segments.get(i);
-                if (seg.getAttr() instanceof Pattern) {
-                    results = expandResults(results, seg);
-                } else {
-                    results = refineResults(results, seg);
+        if (cl1 != null) {
+            Thread.currentThread().setContextClassLoader(cl1);
+        }
+
+        List<QueryResult> results;
+
+        try {
+
+            results =  getResults(conn);
+
+            List<QuerySegment> segments = query.getSegments();
+            if (segments.size() > 1) {
+                for (int i = 1; i < segments.size(); i++) {
+                    QuerySegment seg = segments.get(i);
+                    if (seg.getAttr() instanceof Pattern) {
+                        results = expandResults(results, seg);
+                    } else {
+                        results = refineResults(results, seg);
+                    }
                 }
+            }
+
+        } finally {
+            if (cl1 != null) {
+                Thread.currentThread().setContextClassLoader(cl0);
             }
         }
 

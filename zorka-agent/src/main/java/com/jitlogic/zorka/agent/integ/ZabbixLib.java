@@ -109,8 +109,8 @@ public class ZabbixLib {
         ZabbixTrapper trapper = trappers.get(id);
 
         if (trapper == null) {
-            trapper = new ZabbixTrapper(ZorkaConfig.propFormat(serverAddr),
-                                        ZorkaConfig.propFormat(defaultHost), defaultItem);
+            trapper = new ZabbixTrapper(ZorkaConfig.formatCfg(serverAddr),
+                                        ZorkaConfig.formatCfg(defaultHost), defaultItem);
             trappers.put(id, trapper);
             trapper.start();
         }

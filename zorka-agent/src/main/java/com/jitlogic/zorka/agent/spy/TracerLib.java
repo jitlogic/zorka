@@ -175,7 +175,7 @@ public class TracerLib {
      * @return trace file writer
      */
     public ZorkaAsyncThread<Submittable> toFile(String path, int maxFiles, long maxSize) {
-        TraceFileWriter writer = new TraceFileWriter(ZorkaConfig.propFormat(path),
+        TraceFileWriter writer = new TraceFileWriter(ZorkaConfig.formatCfg(path),
                 instance.getTracer().getSymbolRegistry(), instance.getTracer().getMetricsRegistry(),
                 maxFiles, maxSize);
         writer.start();
