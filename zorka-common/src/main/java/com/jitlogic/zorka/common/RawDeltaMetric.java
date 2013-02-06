@@ -32,7 +32,7 @@ public class RawDeltaMetric extends RawDataMetric {
     }
 
     @Override
-    public Number getValue(long clock, Number value) {
+    public Number getValue(long clock, Object value) {
         Number cur = super.getValue(clock, value), rslt;
 
         if (cur instanceof Double || cur instanceof Float || last instanceof Double) {
