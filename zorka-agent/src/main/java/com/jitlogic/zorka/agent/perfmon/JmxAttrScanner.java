@@ -115,9 +115,7 @@ public class JmxAttrScanner implements Runnable {
                 metric.setDynamicAttrs(dynamicAttrs);
             }
 
-            if (ZorkaLogConfig.isPerfMonLevel(ZorkaLogConfig.ZPM_RUN_DEBUG)) {
-                log.debug("Created new metric: " + metric);
-            }
+            log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Created new metric: " + metric);
 
         }
 
@@ -131,7 +129,7 @@ public class JmxAttrScanner implements Runnable {
         try {
             runCycle(System.currentTimeMillis());
         } catch (Error e) {
-            log.error("Error executing scanner '" + name + "'", e);
+            log.error(ZorkaLogger.ZPM_ERRORS, "Error executing scanner '" + name + "'", e);
         }
     }
 
@@ -144,17 +142,13 @@ public class JmxAttrScanner implements Runnable {
     public void runCycle(long clock) {
         List<PerfSample> samples = new ArrayList<PerfSample>();
 
-        if (ZorkaLogConfig.isPerfMonLevel(ZorkaLogConfig.ZPM_RUNS)) {
-            log.info("Running scanner " + name + " (scannerId=" + id + ")");
-        }
+        log.info(ZorkaLogger.ZPM_RUNS, "Running scanner %s (scannerId=%d)", name, id);
 
         for (QueryLister lister : listers) {
             MetricTemplate template = lister.getMetricTemplate();
             if (template != null) {
 
-                if (ZorkaLogConfig.isPerfMonLevel(ZorkaLogConfig.ZPM_RUN_DEBUG)) {
-                    log.debug("Scanning query: " + lister);
-                }
+                log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Scanning query: %s", lister);
 
                 for (QueryResult result : lister.list()) {
                     if (result.getValue() instanceof Number) {
@@ -162,9 +156,7 @@ public class JmxAttrScanner implements Runnable {
                         Number val = metric.getValue(clock, (Number)result.getValue());
 
                         if (val == null) {
-                            if (ZorkaLogConfig.isPerfMonLevel(ZorkaLogConfig.ZPM_RUN_DEBUG)) {
-                                log.debug("Obtained null value for metric " + metric + ". Skipping. ");
-                            }
+                            log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Obtained null value for metric '%s'. Skipping. ", metric);
                             continue;
                         }
 
@@ -185,16 +177,13 @@ public class JmxAttrScanner implements Runnable {
                             sample.setAttrs(attrs);
                         }
 
-                        if (ZorkaLogConfig.isPerfMonLevel(ZorkaLogConfig.ZPM_RUN_TRACE)) {
-                            log.trace("Submitting sample: " + sample);
-                        }
+                        log.trace(ZorkaLogger.ZPM_RUN_TRACE, "Submitting sample: %s", sample);
 
                         samples.add(sample);
                     } else {
                         // TODO Log only when logging of this particular message is enabled
-                        if (ZorkaLogConfig.isPerfMonLevel(ZorkaLogConfig.ZPM_RUN_DEBUG)) {
-                            log.debug("Trying to submit non-numeric metric value for " + result.getAttrPath() + ": " + result.getValue());
-                        }
+                        log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Trying to submit non-numeric metric value for %s: %s",
+                            result.getAttrPath(), result.getValue());
                     }
                 }
             }

@@ -17,6 +17,7 @@ package com.jitlogic.zorka.agent.integ;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLogConfig;
 import com.jitlogic.zorka.common.ZorkaLogger;
 
 import java.io.IOException;
@@ -78,25 +79,24 @@ public abstract class AbstractTcpAgent implements Runnable {
         try {
             listenAddr = InetAddress.getByName(la.trim());
         } catch (UnknownHostException e) {
-            log.error("Cannot parse "+prefix+".listen.addr in zorka.properties", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse "+prefix+".listen.addr in zorka.properties", e);
         }
 
         String lp = props.getProperty(prefix+".listen.port");
         try {
             listenPort = Integer.parseInt(lp);
         } catch (NumberFormatException e) {
-            log.error("Invalid '"+prefix+".listen.port' setting in zorka.properties file. Was '" +
-                    lp + "', should be integer.");
+            log.error(ZorkaLogger.ZAG_ERRORS, "Invalid '"+prefix+".listen.port' setting in zorka.properties file. Was '" + lp + "', should be integer.");
         }
 
-        log.info("Zorka will listen for "+prefix+" connections on " + listenAddr + ":" + listenPort);
+        log.info(ZorkaLogger.ZAG_ERRORS, "Zorka will listen for "+prefix+" connections on " + listenAddr + ":" + listenPort);
 
         String sa = props.getProperty(prefix+".server.addr");
         try {
-            log.info("Zorka will accept "+prefix+" connections from '" + sa.trim() + "'.");
+            log.info(ZorkaLogger.ZAG_ERRORS, "Zorka will accept "+prefix+" connections from '" + sa.trim() + "'.");
             serverAddr = InetAddress.getByName(sa.trim());
         } catch (UnknownHostException e) {
-            log.error("Cannot parse "+prefix+".server.addr in zorka.properties", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse "+prefix+".server.addr in zorka.properties", e);
         }
 
     }
@@ -113,9 +113,9 @@ public abstract class AbstractTcpAgent implements Runnable {
                 thread.setName("ZORKA-"+prefix+"-main");
                 thread.setDaemon(true);
                 thread.start();
-                log.info("ZORKA-"+prefix+" agent is listening at " + listenAddr + ":" + listenPort + ".");
+                log.info(ZorkaLogger.ZAG_CONFIG, "ZORKA-"+prefix+" agent is listening at " + listenAddr + ":" + listenPort + ".");
             } catch (IOException e) {
-                log.error("I/O error while starting "+prefix+" agent:" + e.getMessage());
+                log.error(ZorkaLogger.ZAG_ERRORS, "I/O error while starting "+prefix+" agent:" + e.getMessage());
             }
         }
     }
@@ -142,12 +142,12 @@ public abstract class AbstractTcpAgent implements Runnable {
                     }
                 }
 
-                log.warn("WARNING: ZORKA-main thread didn't stop " +
-                        "after 1000 milliseconds. Shutting down forcibly.");
+                log.warn(ZorkaLogger.ZAG_WARNINGS, "ZORKA-" + prefix + " thread didn't stop after 1000 milliseconds. Shutting down forcibly.");
+
                 thread.stop();
                 thread = null;
             } catch (IOException e) {
-                log.error("I/O error in zabbix agent main loop: " + e.getMessage());
+                log.error(ZorkaLogger.ZAG_ERRORS, "I/O error in zabbix agent main loop: " + e.getMessage());
             }
         }
     }
@@ -170,7 +170,7 @@ public abstract class AbstractTcpAgent implements Runnable {
             try {
                 sock = socket.accept();
                 if (!sock.getInetAddress().equals(serverAddr)) {
-                    log.warn("Illegal connection attempt from '" + socket.getInetAddress() + "'.");
+                    log.warn(ZorkaLogger.ZAG_WARNINGS, "Illegal connection attempt from '" + socket.getInetAddress() + "'.");
                     sock.close();
                 } else {
                     rh = newRequest(sock);
@@ -178,7 +178,7 @@ public abstract class AbstractTcpAgent implements Runnable {
                 }
             } catch (IOException e) {
                 if (running) {
-                    log.error("Error occured when processing request.", e);
+                    log.error(ZorkaLogger.ZAG_ERRORS, "Error occured when processing request.", e);
                 }
                 if (running && rh != null) {
                     rh.handleError(e);

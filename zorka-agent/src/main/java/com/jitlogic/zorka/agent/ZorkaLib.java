@@ -118,13 +118,13 @@ public class ZorkaLib  {
 	public List<Object> jmxList(List<Object> args) {
 		List<Object> objs = new ArrayList<Object>();
 		if (args.size() < 2) {
-			log.error("Zorka JMX function takes at least 2 arguments.");
+            log.error(ZorkaLogger.ZAG_ERRORS, "Zorka JMX function takes at least 2 arguments.");
 			return objs;
 		}
         String conname = args.get(0).toString();
         MBeanServerConnection conn = mbsRegistry.lookup(conname);
 		if (conn == null) {
-			log.error("MBean server named '" + args.get(0) + "' is not registered.");
+	        log.error(ZorkaLogger.ZAG_ERRORS, "MBean server named '" + args.get(0) + "' is not registered.");
 			return objs;
 		}
         ClassLoader cl0 = Thread.currentThread().getContextClassLoader(), cl1 = mbsRegistry.getClassLoader(conname);
@@ -143,11 +143,9 @@ public class ZorkaLib  {
 				try {
 					obj = conn.getAttribute(name, args.get(2).toString());
 				} catch (AttributeNotFoundException e) {
-					log.error("Object '" + conname + "|" + name + 
-						"' has no attribute '" + args.get(2) + "'.", e);
+			        log.error(ZorkaLogger.ZAG_ERRORS, "Object '" + conname + "|" + name + "' has no attribute '" + args.get(2) + "'.", e);
 				} catch (Exception e) {
-					log.error("Error getting attribute '" + args.get(2) 
-						+ "' from '" + conname + "|" + name + "'", e);
+				    log.error(ZorkaLogger.ZAG_ERRORS, "Error getting attribute '" + args.get(2)	+ "' from '" + conname + "|" + name + "'", e);
 				}
 
 				if (args.size() > 3) {
@@ -195,7 +193,7 @@ public class ZorkaLib  {
         List<Object> argList = Arrays.asList(args);
 
 		if (argList.size() < 2) {
-			log.error("zorka.jmx() function requires at least 2 arguments");
+		    log.error(ZorkaLogger.ZAG_ERRORS, "zorka.jmx() function requires at least 2 arguments");
 			return null;
 		}
 		
@@ -204,7 +202,7 @@ public class ZorkaLib  {
         MBeanServerConnection conn = mbsRegistry.lookup(conname);
 
         if (conn == null) {
-			log.error("MBean server named '" + argList.get(0) + "' is not registered.");
+            log.error(ZorkaLogger.ZAG_ERRORS, "MBean server named '" + argList.get(0) + "' is not registered.");
 			return null;
 		}
 
@@ -229,12 +227,10 @@ public class ZorkaLib  {
             }
 			obj = conn.getAttribute(name, argList.get(2).toString());
 		} catch (AttributeNotFoundException e) {
-			log.error("Object '" + conname + "|" + name + 
-						"' has no attribute '" + argList.get(2) + "'.");
+   			log.error(ZorkaLogger.ZAG_ERRORS, "Object '" + conname + "|" + name + "' has no attribute '" + argList.get(2) + "'.");
 			return null;
 		} catch (Exception e) {
-			log.error("Error getting attribute '" + argList.get(2)
-				+ "' from '" + conname + "|" + name + "'", e);
+		    log.error(ZorkaLogger.ZAG_ERRORS, "Error getting attribute '" + argList.get(2) + "' from '" + conname + "|" + name + "'", e);
 		} finally {
             if (cl1 != null) {
                 Thread.currentThread().setContextClassLoader(cl0);
@@ -378,7 +374,7 @@ public class ZorkaLib  {
     public Double rate(Object...args) {
 
         if (args.length < 5) {
-            log.error("Too little arguments for zorka.rate(). At least 5 args are required");
+            log.error(ZorkaLogger.ZAG_ERRORS, "Too little arguments for zorka.rate(). At least 5 args are required");
             return null;
         }
 
@@ -392,7 +388,7 @@ public class ZorkaLib  {
         }
 
         if (horizon == 0) {
-            log.error("Invalid time horizon in zorka.rate()");
+            log.error(ZorkaLogger.ZAG_ERRORS, "Invalid time horizon in zorka.rate()");
             return null;
         }
 
@@ -474,7 +470,7 @@ public class ZorkaLib  {
             ex = (Throwable)args[args.length-1];
             args = ZorkaUtil.clipArray(args, -1);
         }
-        logger.trap(level, "<script>", message, ex, args);
+        logger.trap(level, "bsh", message, ex, args);
     }
 
 
@@ -722,7 +718,7 @@ public class ZorkaLib  {
             } else if (s.equalsIgnoreCase("false") || s.equalsIgnoreCase("no")) {
                 return false;
             } else {
-                log.error("Invalid value for '" + key + "' -> '" + s + "'. Setting default value of '" + defval);
+                log.error(ZorkaLogger.ZAG_ERRORS, "Invalid value for '" + key + "' -> '" + s + "'. Setting default value of '" + defval);
             }
         }
 
@@ -745,7 +741,7 @@ public class ZorkaLib  {
                 return defval;
             }
         } catch (NumberFormatException e) {
-            log.error("Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
             return defval;
         }
     }
@@ -766,7 +762,7 @@ public class ZorkaLib  {
                 return defval;
             }
         } catch (NumberFormatException e) {
-            log.error("Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
             return defval;
         }
     }

@@ -66,7 +66,7 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
                 this.serverAddr = serverAddr;
             }
         } catch (Exception e) {
-            log.error("Cannot initialize zabbix trapper object.", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot initialize zabbix trapper object.", e);
         }
     }
 
@@ -126,14 +126,14 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
             os.write(msg.getBytes());
             os.flush();
         } catch (Exception e) {
-            log.error("Error sending ");
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error sending packet", e);
         } finally {
             try {
                 if (socket != null) {
                     socket.close();
                 }
             } catch (Exception e) {
-                log.error("Error closing zabbix trapper socket. Open socket may leak.", e);
+                log.error(ZorkaLogger.ZAG_ERRORS, "Error closing zabbix trapper socket. Possible leak.", e);
             }
         }
     }
@@ -146,7 +146,7 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
      * @param e exception object
      */
     protected void handleError(String msg, Throwable e) {
-        log.error(msg, e);
+        log.error(ZorkaLogger.ZAG_ERRORS, msg, e);
     }
 
 

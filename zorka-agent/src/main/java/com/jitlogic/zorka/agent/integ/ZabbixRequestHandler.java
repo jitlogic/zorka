@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLogConfig;
 import com.jitlogic.zorka.common.ZorkaLogger;
 import org.json.simple.JSONAware;
 
@@ -237,15 +238,15 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
 	public void handleResult(Object rslt) {
 		try {
             tStop = System.currentTimeMillis();
-            log.debug("OK [t=" + (tStop-tStart) + "ms] '" + req + "' -> '" + rslt + "'");
+            log.debug(ZorkaLogger.ZAG_QUERIES, "OK [t=" + (tStop-tStart) + "ms] '" + req + "' -> '" + rslt + "'");
 			send(serialize(rslt));
 		} catch (IOException e) {
-			log.error("I/O error returning result: " + e.getMessage());
+	        log.error(ZorkaLogger.ZAG_ERRORS, "I/O error returning result: " + e.getMessage());
 		} finally {
             try {
                 socket.close();
             } catch (IOException e) {
-                log.error("I/O error closing socket.", e);
+                log.error(ZorkaLogger.ZAG_ERRORS, "I/O error closing socket.", e);
             }
         }
 	}
@@ -258,7 +259,7 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
      *
      * @param obj arbitrary value
      *
-     * @return serialized (stringified) value
+     * @return serialized (string) value
      */
     private String serialize(Object obj) {
         if (obj instanceof JSONAware) {
@@ -272,15 +273,15 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
     public void handleError(Throwable e) {
 		try {
             this.tStop = System.currentTimeMillis();
-			log.error("ERROR [t=" + (tStop=tStart) + "ms] + '" + req + "'", e);
+  			log.error(ZorkaLogger.ZAG_QUERIES, "ERROR [t=" + (tStop=tStart) + "ms] + '" + req + "'", e);
 			send(ZBX_NOTSUPPORTED);
 		} catch (IOException e1) {
-			log.error("I/O Error returning (error) result: " + e.getMessage());
+		    log.error(ZorkaLogger.ZAG_ERRORS, "I/O Error returning (error) result: " + e.getMessage());
 		} finally {
             try {
                 socket.close();
             } catch (IOException e2) {
-                log.error("I/O error closing socker.", e2);
+                log.error(ZorkaLogger.ZAG_ERRORS, "I/O error closing socker.", e2);
             }
         }
 	}

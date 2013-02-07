@@ -115,8 +115,8 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
             return;
         }
 
-        if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
-            log.debug("Dispatching collector record: " + record);
+        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+            log.debug(ZorkaLogger.ZSP_ARGPROC, "Dispatching collector record: " + record);
         }
 
         SpyDefinition sdef = ((SpyContext) record.get(".CTX")).getSpyDefinition();
@@ -127,7 +127,7 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
                     break;
                 }
             } catch (Exception e) {
-                log.error("Error transforming record: " + record + " (on processor " + processor + ")", e);
+                log.error(ZorkaLogger.ZSP_ERRORS, "Error transforming record: " + record + " (on processor " + processor + ")", e);
                 break;
             }
         }

@@ -107,7 +107,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
                 }
             }
         } catch (InterruptedException e) {
-            log.error("Cannot perform run cycle", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot perform run cycle", e);
         }
     }
 
@@ -160,7 +160,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
      */
     protected void handleError(String message, Throwable e) {
         if (log != null) {
-            log.error(message, e);
+            log.error(ZorkaLogger.ZAG_ERRORS, message, e);
         }
     }
 }

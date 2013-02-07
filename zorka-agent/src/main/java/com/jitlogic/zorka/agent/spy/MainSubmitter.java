@@ -63,11 +63,10 @@ public class MainSubmitter {
                 submitter.submit(stage, id, submitFlags, vals);
             }
         } catch (EvalError e) {
+            log.debug(ZorkaLogger.ZSP_ERRORS, "Error submitting value from instrumented code: ", e);
             errorCount.incrementAndGet();
         } catch (Throwable e) {
-            if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
-                log.debug("Error submitting value from instrumented code: ", e);
-            }
+            log.debug(ZorkaLogger.ZSP_ERRORS, "Error submitting value from instrumented code: ", e);
             errorCount.incrementAndGet();
         }
     }
@@ -84,15 +83,13 @@ public class MainSubmitter {
 
         if (tracer != null) {
             try {
-                if (SpyInstance.isDebugEnabled(SpyLib.SPD_TRACE_ALL)) {
-                    log.debug("traceEnter(classId=" + classId + ", methodId="
+                if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS)) {
+                    log.debug(ZorkaLogger.ZSP_SUBMIT, "traceEnter(classId=" + classId + ", methodId="
                             + methodId + ", signatureId=" + signatureId + ")");
                 }
                 tracer.getHandler().traceEnter(classId, methodId, signatureId, System.nanoTime());
             } catch (Throwable e) {
-                if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
-                    log.debug("Error executing traceEnter", e);
-                }
+                log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceEnter", e);
                 errorCount.incrementAndGet();
             }
         }
@@ -107,14 +104,10 @@ public class MainSubmitter {
 
         if (tracer != null) {
             try {
-                if (SpyInstance.isDebugEnabled(SpyLib.SPD_TRACE_ALL)) {
-                    log.debug("traceReturn()");
-                }
+                log.debug(ZorkaLogger.ZTR_TRACE_CALLS, "traceReturn()");
                 tracer.getHandler().traceReturn(System.nanoTime());
             } catch (Throwable e) {
-                if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
-                    log.debug("Error executing traceReturn", e);
-                }
+               log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceReturn", e);
                 errorCount.incrementAndGet();
             }
         }
@@ -131,14 +124,10 @@ public class MainSubmitter {
 
         if (tracer != null) {
             try {
-                if (SpyInstance.isDebugEnabled(SpyLib.SPD_TRACE_ALL)) {
-                    log.debug("traceError()", exception);
-                }
+                log.debug(ZorkaLogger.ZTR_TRACE_CALLS, "traceError()", exception);
                 tracer.getHandler().traceError(exception, System.nanoTime());
             } catch (Throwable e) {
-                if (SpyInstance.isDebugEnabled(SPD_CDISPATCHES)) {
-                    log.debug("Error executing traceError", e);
-                }
+                log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceError", e);
                 errorCount.incrementAndGet();
             }
         }

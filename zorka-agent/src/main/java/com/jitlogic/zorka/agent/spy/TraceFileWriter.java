@@ -117,7 +117,7 @@ public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
                 stream.write(buf);
             }
         } catch (IOException e) {
-            log.error("Cannot write to trace file " + traceFile, e);
+            log.error(ZorkaLogger.ZTR_ERRORS, "Cannot write to trace file " + traceFile, e);
             roll();
         }
     }
@@ -156,7 +156,7 @@ public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
         try {
             stream = new BufferedOutputStream(new FileOutputStream(traceFile));
         } catch (FileNotFoundException e) {
-            log.error("Cannot open trace file " + traceFile, e);
+            log.error(ZorkaLogger.ZTR_ERRORS, "Cannot open trace file " + traceFile, e);
         }
 
         enricher.reset();
@@ -172,7 +172,7 @@ public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
                 stream = null;
             }
         } catch (IOException e) {
-            log.error("Cannot close trace file " + traceFile, e);
+            log.error(ZorkaLogger.ZTR_ERRORS, "Cannot close trace file " + traceFile, e);
         }
     }
 
@@ -182,7 +182,7 @@ public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
         try {
             stream.flush();
         } catch (IOException e) {
-            log.error("Cannot flush trace file " + traceFile, e);
+            log.error(ZorkaLogger.ZTR_ERRORS, "Cannot flush trace file " + traceFile, e);
         }
     }
 }

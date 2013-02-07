@@ -67,8 +67,8 @@ public class DispatchingSubmitter implements SpySubmitter {
     @Override
     public void submit(int stage, int id, int submitFlags, Object[] vals) {
 
-        if (SpyInstance.isDebugEnabled(SPD_SUBMISSIONS)) {
-            log.debug("Submitted: stage=" + stage + ", id=" + id + ", flags=" + submitFlags);
+        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_SUBMIT)) {
+            log.debug(ZorkaLogger.ZSP_SUBMIT, "Submitted: stage=" + stage + ", id=" + id + ", flags=" + submitFlags);
         }
 
         SpyContext ctx = transformer.getContext(id);
@@ -127,13 +127,13 @@ public class DispatchingSubmitter implements SpySubmitter {
                     record = stack.pop();
                     // TODO check if record belongs to proper frame, warn if not
                 } else {
-                    log.error("Submission thread local stack mismatch (ctx=" + ctx
+                    log.error(ZorkaLogger.ZSP_ERRORS, "Submission thread local stack mismatch (ctx=" + ctx
                         + ", stage=" + stage + ", submitFlags=" + submitFlags + ")");
                     record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
                 }
                 break;
             default:
-                log.error("Illegal submission flag: " + submitFlags + ". Creating empty records.");
+                log.error(ZorkaLogger.ZSP_ERRORS, "Illegal submission flag: " + submitFlags + ". Creating empty records.");
                 record =  ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
                 break;
         }
@@ -172,8 +172,8 @@ public class DispatchingSubmitter implements SpySubmitter {
         record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << stage));
         record.put(".STAGE", stage);
 
-        if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
-            log.debug("Processing records (stage=" + stage + ")");
+        if (ZorkaLogger.isAgentLevel(ZorkaLogger.ZSP_ARGPROC)) {
+            log.debug(ZorkaLogger.ZSP_ARGPROC, "Processing records (stage=" + stage + ")");
         }
 
         for (SpyProcessor processor : processors) {
@@ -182,8 +182,8 @@ public class DispatchingSubmitter implements SpySubmitter {
                     break;
                 }
             } catch (Exception e) {
-                log.error("Error processing record " + record + " (on processor "
-                            + processor + ", stage=" + stage + ")");
+                log.error(ZorkaLogger.ZSP_ERRORS, "Error processing record %s (on processor %s, stage=%s)",
+                    record, processor, stage);
             }
         }
 

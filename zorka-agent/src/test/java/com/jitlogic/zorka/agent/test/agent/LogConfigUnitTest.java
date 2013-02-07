@@ -20,6 +20,7 @@ import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 import com.jitlogic.zorka.common.ZorkaLogConfig;
 
+import com.jitlogic.zorka.common.ZorkaLogger;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,11 +42,11 @@ public class LogConfigUnitTest extends ZorkaFixture {
 
     @Test
     public void testParseSimpleLogConfigStrings() {
-        assertEquals(ZorkaLogConfig.ZTR_CONFIG, ZorkaLogConfig.parse("", "ZTR", "CONFIG"));
-        assertEquals(ZorkaLogConfig.ZTR_CONFIG | ZorkaLogConfig.ZTR_TRACE_CALLS,
-                ZorkaLogConfig.parse("", "ZTR", "CONFIG,TRACE_CALLS"));
-        assertEquals(ZorkaLogConfig.ZTR_CONFIG | ZorkaLogConfig.ZTR_TRACE_CALLS,
-                ZorkaLogConfig.parse("", "ZTR", "config, trace_calls"));
+        assertEquals(ZorkaLogger.ZTR_CONFIG, ZorkaLogger.parse("", "ZTR", "CONFIG"));
+        assertEquals(ZorkaLogger.ZTR_CONFIG | ZorkaLogger.ZTR_TRACE_CALLS,
+                ZorkaLogger.parse("", "ZTR", "CONFIG,TRACE_CALLS"));
+        assertEquals(ZorkaLogger.ZTR_CONFIG | ZorkaLogger.ZTR_TRACE_CALLS,
+                ZorkaLogger.parse("", "ZTR", "config, trace_calls"));
     }
 
 
