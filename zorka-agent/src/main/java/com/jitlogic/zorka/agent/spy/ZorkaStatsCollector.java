@@ -169,8 +169,8 @@ public class ZorkaStatsCollector implements SpyProcessor {
     @Override
     public Map<String,Object> process(Map<String,Object> record) {
 
-        if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
-            log.debug("Collecting record: " + record);
+        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+            log.debug(ZorkaLogger.ZSP_ARGPROC, "Collecting record: " + record);
         }
 
         MethodCallStatistic statistic = cachedStatistic;
@@ -348,23 +348,23 @@ public class ZorkaStatsCollector implements SpyProcessor {
 
         if (executionTime instanceof Long && timeStamp instanceof Long) {
             if (0 != ((Integer) record.get(".STAGES") & (1 << ON_RETURN))) {
-                if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
-                    log.debug("Logging record using logCall()");
+                if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                    log.debug(ZorkaLogger.ZSP_ARGPROC, "Logging record using logCall()");
                 }
                 statistic.logCall((Long) timeStamp, (Long) executionTime);
             } else if (0 != ((Integer) record.get(".STAGES") & (1 << ON_ERROR))) {
-                if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
-                    log.debug("Logging record using logError()");
+                if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                    log.debug(ZorkaLogger.ZSP_ARGPROC, "Logging record using logError()");
                 }
                 statistic.logError((Long)timeStamp, (Long)executionTime);
             } else {
-                if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
-                    log.debug("No ON_RETURN nor ON_ERROR marked on record " + record);
+                if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                    log.debug(ZorkaLogger.ZSP_ARGPROC, "No ON_RETURN nor ON_ERROR marked on record " + record);
                 }
             }
         } else {
-            if (SpyInstance.isDebugEnabled(SPD_COLLECTORS)) {
-                log.debug("Unknown type of timeField or tstamp object: " + executionTime);
+            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                log.debug(ZorkaLogger.ZSP_ARGPROC, "Unknown type of timeField or tstamp object: " + executionTime);
             }
         }
     }

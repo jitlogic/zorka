@@ -79,7 +79,7 @@ public class SnmpCollector implements SpyProcessor {
             this.varBindDefs = ZorkaUtil.copyArray(varBindDefs);
             this.oid = new SNMPObjectIdentifier(oid);
         } catch (Exception e) {
-            log.error("Error initializing SNMP-trap sending collector", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error initializing SNMP-trap sending collector", e);
         }
     }
 
@@ -98,7 +98,7 @@ public class SnmpCollector implements SpyProcessor {
             }
             trapper.trap(gtrap, strap, oid, vars);
         } catch (SNMPBadValueException e) {
-            log.error("Error submitting record to SNMP trapper", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error submitting record to SNMP trapper", e);
         }
 
         return record;

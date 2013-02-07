@@ -33,8 +33,8 @@ public class RawDataMetric extends Metric {
 
 
     @Override
-    public Number getValue(long clock, Number value) {
-        return multiply(value);
+    public Number getValue(long clock, Object value) {
+        return multiply((Number)value);
     }
 
 }

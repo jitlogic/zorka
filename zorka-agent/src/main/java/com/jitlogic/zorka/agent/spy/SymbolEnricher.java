@@ -75,9 +75,7 @@ public class SymbolEnricher extends PerfDataEventHandler {
 
         if (!symbolsSent.get(id)) {
             String sym = symbols.symbolName(id);
-            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
-                log.debug("Enriching output stream with symbol '" + sym + "', id=" + id);
-            }
+            log.debug(ZorkaLogger.ZTR_SYMBOL_ENRICHMENT, "Enriching output stream with symbol '%s', id=%s", sym, id);
             output.newSymbol(id, sym);
             symbolsSent.set(id);
         }
@@ -87,9 +85,7 @@ public class SymbolEnricher extends PerfDataEventHandler {
     private void checkMetric(int id) {
         if (!metricsSent.get(id)) {
             Metric metric = metricRegistry.getMetric(id);
-            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
-                log.debug("Enriching output stream with metric '" + metric + "', id=" + id);
-            }
+            log.debug(ZorkaLogger.ZTR_SYMBOL_ENRICHMENT, "Enriching output stream with metric '" + metric + "', id=" + id);
             this.newMetric(metric);
             metricsSent.set(id);
         }
@@ -99,9 +95,7 @@ public class SymbolEnricher extends PerfDataEventHandler {
     private void checkMetricTemplate(int id) {
         if (!templatesSent.get(id)) {
             MetricTemplate template = metricRegistry.getTemplate(id);
-            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
-                log.debug("Enriching output stream with metric '" + template + "', id=" + id);
-            }
+            log.debug(ZorkaLogger.ZTR_SYMBOL_ENRICHMENT, "Enriching output stream with metric '" + template + "', id=" + id);
             this.newMetricTemplate(template);
             templatesSent.set(id);
         }
@@ -113,9 +107,7 @@ public class SymbolEnricher extends PerfDataEventHandler {
      * and will start sending (and memoizing) symbols once again.
      */
     public void reset() {
-        if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_ENRICHMENT)) {
-            log.debug("Resetting symbol enricher.");
-        }
+        log.debug(ZorkaLogger.ZTR_SYMBOL_ENRICHMENT, "Resetting symbol enricher.");
         symbolsSent.reset();
         templatesSent.reset();
         metricsSent.reset();

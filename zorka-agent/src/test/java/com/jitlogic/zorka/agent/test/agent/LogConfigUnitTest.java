@@ -16,19 +16,74 @@
 
 package com.jitlogic.zorka.agent.test.agent;
 
+import com.jitlogic.zorka.agent.ZorkaConfig;
+import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 import com.jitlogic.zorka.common.ZorkaLogConfig;
-import org.junit.Test;
-import org.junit.Assert;
 
-public class LogConfigUnitTest {
+import com.jitlogic.zorka.common.ZorkaLogger;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import  static org.junit.Assert.*;
+
+public class LogConfigUnitTest extends ZorkaFixture {
+
+    @Before
+    public void setTestProps() {
+        ZorkaConfig.getProperties().setProperty("test.int", " 10 ");
+        ZorkaConfig.getProperties().setProperty("test.broken", "oja!");
+        ZorkaConfig.getProperties().setProperty("test.space", "  ");
+        ZorkaConfig.getProperties().setProperty("test.lst", "  oja!,  oje! ");
+    }
+
 
     @Test
     public void testParseSimpleLogConfigStrings() {
-        Assert.assertEquals(ZorkaLogConfig.ZTR_CONFIG, ZorkaLogConfig.parse("", "ZTR", "CONFIG"));
-        Assert.assertEquals(ZorkaLogConfig.ZTR_CONFIG|ZorkaLogConfig.ZTR_TRACE_CALLS,
-                ZorkaLogConfig.parse("", "ZTR", "CONFIG,TRACE_CALLS"));
-        Assert.assertEquals(ZorkaLogConfig.ZTR_CONFIG|ZorkaLogConfig.ZTR_TRACE_CALLS,
-                ZorkaLogConfig.parse("", "ZTR", "config, trace_calls"));
+        assertEquals(ZorkaLogger.ZTR_CONFIG, ZorkaLogger.parse("", "ZTR", "CONFIG"));
+        assertEquals(ZorkaLogger.ZTR_CONFIG | ZorkaLogger.ZTR_TRACE_CALLS,
+                ZorkaLogger.parse("", "ZTR", "CONFIG,TRACE_CALLS"));
+        assertEquals(ZorkaLogger.ZTR_CONFIG | ZorkaLogger.ZTR_TRACE_CALLS,
+                ZorkaLogger.parse("", "ZTR", "config, trace_calls"));
+    }
+
+
+    @Test
+    public void testParseIntPropsViaZorkaLib() {
+        assertEquals((Integer) 10, zorka.intCfg("test.int"));
+        assertEquals((Integer)10, zorka.intCfg("test.int", 30));
+        assertEquals(null, zorka.intCfg("test.broken"));
+        assertEquals((Integer)20, zorka.intCfg("test.broken", 20));
+        assertEquals(null, zorka.intCfg("test.missing"));
+    }
+
+
+    @Test
+    public void testParseLongPropsViaZorkaLib() {
+        assertEquals((Long)10L, zorka.longCfg("test.int"));
+        assertEquals((Long)10L, zorka.longCfg("test.int", 30L));
+        assertEquals(null, zorka.longCfg("test.broken"));
+        assertEquals((Long)20L, zorka.longCfg("test.broken", 20L));
+        assertEquals(null, zorka.longCfg("test.missing"));
+    }
+
+
+    @Test
+    public void testParseStringPropsViaZorkaLib() {
+        assertEquals(null, zorka.stringCfg("test.missing"));
+        assertEquals("", zorka.stringCfg("test.space"));
+        assertEquals("oja!", zorka.stringCfg("test.missing", "oja!"));
+    }
+
+
+    @Test
+    public void testParseListPropsViaZorkaLib() {
+        assertEquals(new ArrayList<String>(), zorka.listCfg("test.missing"));
+        assertEquals(new ArrayList<String>(), zorka.listCfg("test.space"));
+        assertEquals(Arrays.asList("oja!"), zorka.listCfg("test.broken"));
+        assertEquals(Arrays.asList("oja!", "oje!"), zorka.listCfg("test.lst"));
     }
 
 }

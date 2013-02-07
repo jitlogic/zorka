@@ -60,6 +60,7 @@ public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
     /** Current trace file size. */
     private long curSize;
 
+
     /**
      * Creates trace file writer.
      *
@@ -67,9 +68,10 @@ public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
      *
      * @param symbols symbol registry containing symbols from incoming traces
      */
-    public TraceFileWriter(String path, SymbolRegistry symbols, MetricsRegistry metricsRegistry) {
-        this(path, symbols, metricsRegistry, 8, 8 * 1024 * 1024);
-    }
+//    public TraceFileWriter(String path, SymbolRegistry symbols, MetricsRegistry metricsRegistry) {
+//        this(path, symbols, metricsRegistry, 8, 8 * 1024 * 1024);
+//    }
+
 
     /**
      * Creates trace file writer.
@@ -85,7 +87,7 @@ public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
     public TraceFileWriter(String path, SymbolRegistry symbols, MetricsRegistry metricsRegistry, int maxFiles, long maxFileSize) {
         super("trace-writer");
         this.symbols = symbols;
-        this.buffer = new ByteBuffer(2048);
+        this.buffer = new ByteBuffer(4096);
         this.encoder = new SimplePerfDataFormat(buffer);
         this.enricher = new SymbolEnricher(this.symbols, metricsRegistry, encoder);
         this.traceFile = new File(path);
@@ -96,31 +98,28 @@ public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
 
     @Override
     protected void process(Submittable obj) {
-        obj.traverse(enricher);
-        byte[] buf = buffer.getContent();
 
-        if (buf.length > maxFileSize) {
-            log.error("Skipping too big trace: size=" + buf.length + ", maxSize=" + maxFileSize);
-            return;
-        }
-
-        curSize += buf.length;
+        // TODO make sure this buffer won't grow too big ...
+        // TODO reengineer to make it testable
 
         if (curSize > maxFileSize) {
             roll();
-            process(obj);
-        } else {
-            try {
-                if (stream != null) {
-                    stream.write(buf);
-                }
-            } catch (IOException e) {
-                log.error("Cannot write to trace file " + traceFile, e);
-            }
         }
 
-        // TODO implement unit test exposing lack of reset() call
         buffer.reset();
+        obj.traverse(enricher);
+        byte[] buf = buffer.getContent();
+
+        curSize += buf.length;
+
+        try {
+            if (stream != null) {
+                stream.write(buf);
+            }
+        } catch (IOException e) {
+            log.error(ZorkaLogger.ZTR_ERRORS, "Cannot write to trace file " + traceFile, e);
+            roll();
+        }
     }
 
 
@@ -157,10 +156,11 @@ public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
         try {
             stream = new BufferedOutputStream(new FileOutputStream(traceFile));
         } catch (FileNotFoundException e) {
-            log.error("Cannot open trace file " + traceFile, e);
+            log.error(ZorkaLogger.ZTR_ERRORS, "Cannot open trace file " + traceFile, e);
         }
 
         enricher.reset();
+        curSize = 0; // TODO unit test exposing lack of this line
     }
 
 
@@ -172,7 +172,7 @@ public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
                 stream = null;
             }
         } catch (IOException e) {
-            log.error("Cannot close trace file " + traceFile, e);
+            log.error(ZorkaLogger.ZTR_ERRORS, "Cannot close trace file " + traceFile, e);
         }
     }
 
@@ -182,8 +182,7 @@ public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
         try {
             stream.flush();
         } catch (IOException e) {
-            log.error("Cannot flush trace file " + traceFile, e);
+            log.error(ZorkaLogger.ZTR_ERRORS, "Cannot flush trace file " + traceFile, e);
         }
-        ;
     }
 }

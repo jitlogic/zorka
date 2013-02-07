@@ -86,7 +86,7 @@ public class AvgRateCounter {
         } else if (val instanceof Byte) {
             return (long)(Byte)val;
         } else {
-            log.error("Cannot coerce object of type '"
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot coerce object of type '"
                     + (val != null ? val.getClass().getName() : "null") + "' to Long.");
             return 0;
         }

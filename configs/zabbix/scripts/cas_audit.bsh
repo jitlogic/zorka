@@ -1,0 +1,181 @@
+/**
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+/**
+ * CAS audit script
+ *
+ * The following settings (and default values) can be set in zorka.properties:
+ *
+ * - cas.audit = no             enables while CAS auditing fuctionality
+ * - cas.audit.zabbix = no      enables sending audit information to zabbix server
+ * - cas.audit.syslog = no      enables sending audit information to syslog server
+ * - cas.audit.file = yes       enables logging audit information to local file
+ * - cas.audit.tag = cas.audit  zabbix item or syslog tag audit records will be marked with
+ * - cas.audit.syslog.addr = ${zorka.syslog.server}   syslog server address
+ * - cas.audit.file.path = ${zorka.log.dir}/cas_audit.log  path to log file
+ * - cas.audit.zabbix.host = ${zorka.hostname}
+ */
+
+__cas_audit() {
+
+  zorka.logInfo("Enabling Audit logging for CAS ...");
+
+  tag = zorka.stringCfg("cas.audit.tag", "cas.audit");
+
+  enableSyslog = zorka.boolCfg("cas.audit.syslog", false);
+  enableZabbix = zorka.boolCfg("cas.audit.zabbix", false);
+  enableFile   = zorka.boolCfg("cas.audit.file", false);
+
+
+  if (enableSyslog) {
+    syslogAddr = zorka.stringCfg("cas.audit.syslog.addr", zorka.stringCfg("zorka.syslog.server", "127.0.0.1"));
+    syslogTrapper = syslog.trapper("audit", syslogAddr, zorka.getHostname(), syslog.F_AUDIT);
+    zorka.logInfo("CAS Audit logs will be sent to remote syslog server: " + syslogAddr);
+  }
+
+
+  if (enableZabbix) {
+    zabbixHost = zorka.stringCfg("cas.audit.zabbix.host", zorka.getHostname());
+    zabbixTrapper = zabbix.trapper("cas.audit", "${zabbix.server.addr}", zabbixHost, tag);
+    zorka.logInfo("CAS Audit logs will be sent to zabbix server.");
+  }
+
+
+  if (enableFile) {
+    filePath = zorka.stringCfg("cas.audit.file.path", zorka.formatCfg("${zorka.log.dir}/cas_audit.log"));
+    zorka.logInfo("CAS Audit logs will be logged to local file: " + filePath);
+    fileTrapper = zorka.dailyFileTrapper("cas.audit", zorka.INFO, filePath, false);
+  }
+
+
+  audit(sdef, expr) {
+    if (enableSyslog) {
+      sdef = sdef.onSubmit(spy.trapperCollector(syslogTrapper, zorka.INFO, tag, expr));
+    }
+
+    if (enableZabbix) {
+      sdef = sdef.onSubmit(spy.trapperCollector(zabbixTrapper, zorka.INFO, tag, expr));
+    }
+
+    if (enableFile) {
+      sdef = sdef.onSubmit(spy.trapperCollector(fileTrapper, zorka.INFO, tag, expr));
+    }
+
+    spy.add(sdef);
+  }
+
+
+  request = new ThreadLocal();
+
+  // Intercept request dispatcher and store request object for later use
+  spy.add(spy.instance()
+    .onEnter(spy.fetchArg("REQ", 1), spy.tlSet("REQ", request))
+    .onReturn(spy.tlRemove(request))
+    .onError(spy.tlRemove(request))
+    .include(spy.byMethod("org.jasig.cas.web.init.SafeDispatcherServlet", "service")));
+
+
+  // Authentication attempts
+  sdefAuth = spy.instance()
+    .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request))
+    .onReturn(spy.put("ACTION", "AUTHENTICATION_SUCCESS"))
+    .onError(spy.put("ACTION", "AUTHENTICATION_FAILED"))
+    .include(spy.byMethod("org.jasig.cas.authentication.AbstractAuthenticationManager", "authenticate"));
+
+
+  audit(sdefAuth, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO}");
+
+
+  // TGT-s created
+  sdefTgtCreated = spy.instance()
+    .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request))
+    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_CREATED"))
+    .onError(spy.fetchError("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_NOT_CREATED"))
+    .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "createTicketGrantingTicket"));
+
+  audit(sdefTgtCreated, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT}");
+
+
+  // TGT-s destroyed
+  sdefTgtDestroyed = spy.instance()
+    .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request))
+    .onReturn(spy.put("WHAT", ""), spy.put("ACTION", "TICKET_GRANTING_TICKET_DESTROYED"))
+    .onError(spy.fetchError("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_NOT_DESTROYED"))
+    .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "destroyTicketGrantingTicket"));
+
+  audit(sdefTgtDestroyed, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT}");
+
+
+  // Service tickets granted
+  sdefSvcGranted = spy.instance()
+    .onEnter(spy.fetchArg("TGT", 1), spy.fetchArg("SERVICE", 2), spy.fetchArg("WHO", 2), spy.tlGet("REQ", request))
+    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "SERVICE_TICKET_GRANTED"))
+    .onError(spy.fetchError("WHAT"), spy.put("ACTION", "SERVICE_TICKET_NOT_GRANTED"))
+    .include(spy.byMethod(1, "org.jasig.cas.CentralAuthenticationServiceImpl", "grantServiceTicket", 
+        "String", "org.jasig.cas.authentication.principal.Service", "org.jasig.cas.authentication.principal.Credentials"));
+
+  audit(sdefSvcGranted, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} service=${SERVICE} tgt=${TGT} what=${WHAT}");
+
+
+  // Proxy granting ticket created
+  sdefProxyGranted = spy.instance()
+    .onEnter(spy.fetchArg("TICKET", 1), spy.fetchArg("WHO", 2), spy.tlGet("REQ", request))
+    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "PROXY_GRANTING_TICKET_CREATED"))
+    .onError(spy.fetchError("WHAT"), spy.put("ACTION", "PROXY_GRANTING_TICKET_NOT_CREATED"))
+    .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "delegateTicketGrantingTicket"));
+
+  audit(sdefProxyGranted, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT} serviceTicket=${TICKET}");
+
+
+  // Validate service ticket
+  sdefSvcValidate = spy.instance()
+    .onEnter(spy.fetchArg("TICKET", 1), spy.fetchArg("SERVICE", 1), spy.tlGet("REQ", request))
+    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "SERVICE_TICKET_VALIDATE_SUCCESS"))
+    .onError(spy.fetchError("WHAT"), spy.put("ACTION", "SERVICE_TICKET_VALIDATE_FAILURE"))
+    .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "validateServiceTicket"));
+
+  audit(sdefSvcValidate, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} what=${WHAT} serviceTicket=${TICKET} service=${SERVICE}");
+
+
+  // Delete a service
+  sdefSvcDelete = spy.instance()
+    .onEnter(spy.fetchArg("ID", 1), spy.tlGet("REQ", request))
+    .onReturn(spy.put("RESULT", "OK"), spy.put("ACTION", "DELETE_SERVICE_SUCCESS"))
+    .onError(spy.fetchError("RESULT"), spy.put("ACTION", "DELETE_SERVICE_FAILURE"))
+    .include(spy.byMethod("org.jasig.cas.DefaultServicesManagerImpl", "delete"));
+
+  audit(sdefSvcDelete, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} result=${RESULT} id=${ID}");
+
+  // Save a service
+  sdefSvcSave = spy.instance()
+    .onEnter(spy.fetchArg("SERVICE", 1), spy.tlGet("REQ", request))
+    .onReturn(spy.fetchRetVal("RESULT"), spy.put("ACTION", "SAVE_SERVICE_SUCCESS"))
+    .onError(spy.fetchError("RESULT"), spy.put("ACTION", "SAVE_SERVICE_FAILURE"))
+    .include(spy.byMethod("org.jasig.cas.DefaultServicesManagerImpl", "save"));
+
+  audit(sdefSvcSave, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} service=${SERVICE} result=${RESULT}");
+
+  return this;
+}
+
+
+if (zorka.boolCfg("cas.audit", false)) {
+    cas_audit = __cas_audit();
+}
+
+

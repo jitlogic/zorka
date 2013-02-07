@@ -58,16 +58,12 @@ public class TraceBuilder extends TraceEventHandler {
     public void traceBegin(int traceId, long clock, int flags) {
 
         if (ttop == null) {
-            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_TRACE_ERRORS)) {
-                log.error("Attempt to set trace marker on an non-traced method.");
-            }
+            log.error(ZorkaLogger.ZTR_TRACE_ERRORS, "Attempt to set trace marker on an non-traced method.");
             return;
         }
 
         if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {
-            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_TRACE_ERRORS)) {
-                log.error("Trace marker already set on current frame. Skipping.");
-            }
+            log.error(ZorkaLogger.ZTR_TRACE_ERRORS, "Trace marker already set on current frame. Skipping.");
             return;
         } else {
             ttop.setMarker(new TraceMarker(ttop, traceId, clock));

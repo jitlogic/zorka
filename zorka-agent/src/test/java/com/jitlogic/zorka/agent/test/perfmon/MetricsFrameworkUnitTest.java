@@ -22,17 +22,12 @@ import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 import com.jitlogic.zorka.common.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Map;
+
 import static org.junit.Assert.*;
 
 public class MetricsFrameworkUnitTest extends ZorkaFixture {
-
-    private QueryResult qr(Object val, Object...attrs) {
-        QueryResult result = new QueryResult(val);
-        for (int i = 1; i < attrs.length; i += 2) {
-            result.setAttr(attrs[i-1].toString(), attrs[i]);
-        }
-        return result;
-    }
 
     private JmxAttrScanner scanner;
 
@@ -43,7 +38,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testConstructMetricsOfVariousTypes() throws Exception {
+    public void testConstructMetricsOfVariousTypes() {
         QueryResult qr = qr(10L, "name", "SomeObject", "type", "SomeType");
 
         assertTrue("Should return RawDataMetric object.",
@@ -61,7 +56,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testConstructSameAndUniqueMetrics() throws Exception {
+    public void testConstructSameAndUniqueMetrics() {
         MetricTemplate mt = perfmon.metric("test", "test");
 
         Metric m1 = scanner.getMetric(mt, qr(10L, "name", "SomeObject", "type", "SomeType"));
@@ -74,7 +69,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testConstructSameAndUniqueMetricsWithDynamicAttr() throws Exception {
+    public void testConstructSameAndUniqueMetricsWithDynamicAttr() {
         MetricTemplate mt = perfmon.metric("test", "test").dynamicAttrs("name");
 
         Metric m1 = scanner.getMetric(mt, qr(10L, "name", "SomeObject", "type", "SomeType"));
@@ -87,7 +82,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testConstructMetricAndCheckForProperStringTemplating() throws Exception {
+    public void testConstructMetricAndCheckForProperStringTemplating() {
         MetricTemplate mt = perfmon.metric("Very important ${name} metric.", "MT/s");
 
         Metric m = scanner.getMetric(mt, qr(10L, "name", "SomeObject"));
@@ -97,37 +92,122 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testRawDataMetricWithoutMultiplierRetVal() throws Exception {
-        QueryResult qr = qr(10L, "a", 1, "b", 2);
+    public void testRawMetricWithoutMultiplierRetVal() {
+        Metric m = metric(perfmon.metric("", ""));
 
-        MetricTemplate mt = perfmon.metric("test", "req");
-
-        assertEquals(10L, scanner.getMetric(mt, qr).getValue(0L, (Number)qr.getValue()));
+        assertEquals(10L, m.getValue(0L, 10L));
     }
 
 
     @Test
-    public void testRawDataMetricsWithRoundedMultiplier() throws Exception {
-        QueryResult qr = qr(10L, "a", 1);
+    public void testRawMetricsWithRoundedMultiplier() {
+        Metric m = metric(perfmon.metric("", "").multiply(2));
 
-        MetricTemplate mt = perfmon.metric("test", "req").multiply(2);
-
-        assertEquals(20L, scanner.getMetric(mt, qr).getValue(0L, (Number)qr.getValue()));
+        assertEquals(20L, m.getValue(0L, 10L));
     }
 
 
     @Test
-    public void testRawDataMetricWithUnroundedMultiplier() throws Exception {
-        QueryResult qr = qr(10L, "a", 1);
+    public void testRawMetricWithUnRoundedMultiplier() {
+        Metric m = metric(perfmon.metric("", "").multiply(1.23));
 
-        MetricTemplate mt = perfmon.metric("test", "req").multiply(1.23);
-
-        assertEquals(12.3, (Double)scanner.getMetric(mt, qr).getValue(0L, (Number)qr.getValue()), 0.001);
+        assertEquals(12.3, (Double)m.getValue(0L, 10L), 0.001);
     }
 
-    // TODO test raw delta cases
 
-    // TODO test timed delta cases
+    @Test
+    public void testDeltaMetric() {
+        Metric m = metric(perfmon.delta("", ""));
 
-    // TODO test windowed delta cases
+        assertEquals(0L, m.getValue(0L, 10L));
+        assertEquals(5L, m.getValue(10L, 15L));
+    }
+
+
+    @Test
+    public void testDeltaMetricWithRoundedMultiplier() {
+        Metric m = metric(perfmon.delta("", "").multiply(2));
+
+        assertEquals(0L, m.getValue(0L, 10L));
+        assertEquals(10L, m.getValue(10L, 15L));
+    }
+
+
+    @Test
+    public void testDeltaMetricWithUnRoundedMultiplier() {
+        Metric m = metric(perfmon.delta("", "").multiply(2.5));
+
+        assertEquals(0.0, (Double)m.getValue(0L, 10L), 0.001);
+        assertEquals(12.5, (Double)m.getValue(10L, 15L), 0.001);
+    }
+
+
+    @Test
+    public void testTimedDeltaMetric() {
+        Metric m = metric(perfmon.timedDelta("", ""));
+
+        assertEquals(0.0, (Double)m.getValue(0L, 10L), 0.001);
+        assertEquals(2.0, (Double)m.getValue(5000L, 20L), 0.001);
+    }
+
+
+    @Test
+    public void testTimedDeltaMetricWithMultiplier() {
+        Metric m = metric(perfmon.timedDelta("", "").multiply(1.5));
+
+        assertEquals(0.0, (Double)m.getValue(0L, 10L), 0.001);
+        assertEquals(3.0, (Double)m.getValue(5000L, 20L), 0.001);
+    }
+
+
+    @Test
+    public void testRateMetric() {
+        Metric m = metric(perfmon.rate("", "", "a", "b"));
+
+        Map<String,Long> v1 = ZorkaUtil.map("a", 0L, "b", 0L);
+        Map<String,Long> v2 = ZorkaUtil.map("a", 10L, "b", 2L);
+
+        assertEquals(0.0, (Double)m.getValue(0L, v1), 0.001);
+        assertEquals(5.0, (Double)m.getValue(1L, v2), 0.001);
+    }
+
+
+    @Test
+    public void testRateMetricWithMultiplier() {
+        Metric m = metric(perfmon.rate("", "", "a", "b").multiply(0.2));
+
+        Map<String,Long> v1 = ZorkaUtil.map("a", 0L, "b", 0L);
+        Map<String,Long> v2 = ZorkaUtil.map("a", 10L, "b", 2L);
+
+        assertEquals(0.0, (Double)m.getValue(0L, v1), 0.001);
+        assertEquals(1.0, (Double)m.getValue(1L, v2), 0.001);
+
+    }
+
+
+    @Test
+    public void testRateMetricWithNullValues() {
+        Metric m = metric(perfmon.rate("", "", "a", "c"));
+
+        Map<String,Long> v1 = ZorkaUtil.map("a", 0L, "b", 0L);
+        Map<String,Long> v2 = ZorkaUtil.map("a", 10L, "b", 2L);
+
+        assertEquals(0.0, (Double)m.getValue(0L, v1), 0.001);
+        assertEquals(0.0, (Double)m.getValue(1L, v2), 0.001);
+    }
+
+
+    private QueryResult qr(Object val, Object...attrs) {
+        QueryResult result = new QueryResult(val);
+        for (int i = 1; i < attrs.length; i += 2) {
+            result.setAttr(attrs[i-1].toString(), attrs[i]);
+        }
+        return result;
+    }
+
+    private Metric metric(MetricTemplate template) {
+        return scanner.getMetric(template, qr(10L, "a", "a"));
+    }
+
+
 }

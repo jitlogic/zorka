@@ -15,10 +15,7 @@
  */
 package com.jitlogic.zorka.agent.integ;
 
-import com.jitlogic.zorka.common.ZorkaAsyncThread;
-import com.jitlogic.zorka.common.ZorkaLogLevel;
-import com.jitlogic.zorka.common.ZorkaTrapper;
-import com.jitlogic.zorka.common.ZorkaUtil;
+import com.jitlogic.zorka.common.*;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -95,7 +92,7 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
 
         } catch (Exception e) {
             if (log != null) {
-                log.error("Cannot configure syslog to " + syslogServer, e);
+                log.error(ZorkaLogger.ZAG_ERRORS, "Cannot configure syslog to " + syslogServer, e);
             }
         }
 

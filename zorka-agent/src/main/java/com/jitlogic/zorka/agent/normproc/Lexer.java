@@ -88,7 +88,7 @@ public abstract class Lexer implements Iterable<Token>, Iterator<Token> {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    log.error("Error closing property file '"+path+"':", e);
+                    log.error(ZorkaLogger.ZAG_ERRORS, "Error closing property file '"+path+"':", e);
                 }
             }
         }

@@ -77,7 +77,7 @@ public class JmxAggregatingLister<T extends Rankable<?>> implements RankLister<T
                     }
                 }
             } catch (Exception e) {
-                log.error("Error processing name '" + on + "'", e);
+                log.error(ZorkaLogger.ZSP_ERRORS, "Error processing name '" + on + "'", e);
             }
         }
 

@@ -71,7 +71,7 @@ public class EjbRankItem implements Rankable<Object> {
                 }
             }
             default:
-                log.error("Invalid metric passed to getAverage(): " + metric);
+                log.error(ZorkaLogger.ZAG_ERRORS, "Invalid metric passed to getAverage(): " + metric);
                 break;
         }
 

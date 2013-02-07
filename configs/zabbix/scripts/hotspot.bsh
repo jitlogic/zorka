@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -17,22 +17,35 @@
 
 __hotspot() {
 
-	memutil(name) {
-		mem_used = zorka.jmx("java", "java.lang:name="+name+",type=MemoryPool", "Usage", "used");
-		mem_max = zorka.jmx("java", "java.lang:name="+name+",type=MemoryPool", "PeakUsage", "max");
-		if (mem_used == null || mem_max == null) return null;
-		if (mem_used.equals(0L) || mem_max.equals(0L)) return 0.0;
-		return 100.0 * mem_used.longValue() / mem_max.longValue();
-	}
+  memutil(name) {
+    mem_used = zorka.jmx("java", "java.lang:name="+name+",type=MemoryPool", "Usage", "used");
+    mem_max = zorka.jmx("java", "java.lang:name="+name+",type=MemoryPool", "PeakUsage", "max");
+    if (mem_used == null || mem_max == null) return null;
+    if (mem_used.equals(0L) || mem_max.equals(0L)) return 0.0;
+    return 100.0 * mem_used.longValue() / mem_max.longValue();
+  }
 
-	heaputil(name) {
-		mem_used = zorka.jmx("java", "java.lang:type=Memory",name, "used");
-		mem_max = zorka.jmx("java", "java.lang:type=Memory",name, "max");
-		if (mem_used == null || mem_max == null) return null;
-		if (mem_used.equals(0L) || mem_max.equals(0L)) return 0.0;
-		return 100.0 * mem_used.longValue() / mem_max.longValue();
-	}
-	return this;
+  heaputil(name) {
+    mem_used = zorka.jmx("java", "java.lang:type=Memory",name, "used");
+    mem_max = zorka.jmx("java", "java.lang:type=Memory",name, "max");
+    if (mem_used == null || mem_max == null) return null;
+    if (mem_used.equals(0L) || mem_max.equals(0L)) return 0.0;
+    return 100.0 * mem_used.longValue() / mem_max.longValue();
+  }
+
+
+  if (zorka.boolCfg("hotspot.perf", false)) {
+    qMemUsed = zorka.query("java", "java.lang:type=MemoryPool,*", "name")
+      .get("Usage").get("used")
+      .metric(perfmon.metric("${name} memory usage.", "B"));
+
+    scanner = perfmon.scanner("JVM", qMemUsed);
+
+    zorka.schedule(scanner, 10000, 10000);
+  }
+
+
+  return this;
 }
 
 
