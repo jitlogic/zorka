@@ -43,7 +43,7 @@ public class QueryLister {
         MBeanServerConnection conn = registry.lookup(query.getMbsName());
 
         if (conn == null) {
-            log.warn("Trying to query non-existent MBS: " + query.getMbsName());
+            log.warn(ZorkaLogger.ZAG_WARNINGS, "Trying to query non-existent MBS: " + query.getMbsName());
             return new ArrayList<QueryResult>(1);
         }
 
@@ -96,7 +96,7 @@ public class QueryLister {
                     getSingleResult(conn, seg, results, on);
                 }
             } catch (Exception e) {
-                log.error("Error listing results of " + query, e);
+                log.error(ZorkaLogger.ZAG_ERRORS, "Error listing results of " + query, e);
             }
         }
         return results;
@@ -112,7 +112,7 @@ public class QueryLister {
                 }
             }
         } catch (Exception e) {
-            log.error("Error listing attributes of: " + on, e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error listing attributes of: " + on, e);
         }
     }
 
@@ -124,7 +124,7 @@ public class QueryLister {
                 : new JmxObject(on, conn, null),
                     seg != null ? seg.getAttr() : null);
         } catch (Exception e) {
-            log.error("Error listing results of " + query, e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error listing results of " + query, e);
         }
     }
 

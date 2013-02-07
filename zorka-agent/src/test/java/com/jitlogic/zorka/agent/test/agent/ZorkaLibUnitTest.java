@@ -40,6 +40,7 @@ public class ZorkaLibUnitTest extends ZorkaFixture {
         assertEquals("test:type=ZorkaLib,name=test2 -> test:type=ZorkaLib,name=test2", s[1]);
     }
 
+
     @Test
     public void testRegisterOneNameWithTwoAttributesAndListThem() throws Exception {
         zorka.registerAttr("test", "test:type=ZorkaLib,name=test1", "a", "aaa");
@@ -51,6 +52,7 @@ public class ZorkaLibUnitTest extends ZorkaFixture {
 
         assertEquals("test:type=ZorkaLib,name=test1: a -> aaa", s[0]);
     }
+
 
     @Test
     public void testRegisterAndListKeyValueHashMap() throws Exception {
@@ -64,6 +66,7 @@ public class ZorkaLibUnitTest extends ZorkaFixture {
         assertEquals("test:type=ZorkaLib,name=test1: map.a -> aaa", s[0]);
         assertEquals("test:type=ZorkaLib,name=test1: map.b -> bbb", s[1]);
     }
+
 
     @Test
     public void testRegisterAndListListItems() throws Exception {

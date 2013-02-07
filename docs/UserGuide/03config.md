@@ -293,14 +293,12 @@ All requests that took longer than 100 milliseconds will be saved in trace file.
 Custom attributes can be useful. For example, when tracing execution of HTTP request it might be suitable to add request
 URL (any maybe some POST parameters as well). When instrumenting SQL queries, posting normalized SQL query is necessary.
 Adding custom attributes can be done by instrumenting method in a standard way (create and add sdef) and using
-`spy.traceAttr()` functions to post (previously fetched and possibly normalized) attributes. Trace attributes can be
+`tracer.attr()` functions to post (previously fetched and possibly normalized) attributes. Trace attributes can be
 added to any instrumented method, not just the beginning of a trace. They'll appear i proper places in method call tree,
 so it is possible for example to trace HTTP requests and add SQL queries to them (if needed).
 
 ### Configuring tracer output
 
-Current implementation can write trace information to local files. Use `spy.traceFile()` function to create trace writer
-object and install it in tracer using `spy.traceOutput()` function. For example:
-
-    spy.tracerOutput(spy.traceFile("/tmp/trace.trc", 4, 4*1024*1024));
+Current implementation can write trace information to local files. Use `tracer.toFile()` function to create trace writer
+object and install it in tracer using `tracer.output()` function.
 

@@ -16,22 +16,14 @@
 package com.jitlogic.zorka.agent.spy;
 
 
-import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogger;
-
-import java.util.Properties;
-
-import static com.jitlogic.zorka.agent.spy.SpyLib.SPD_CONFIG;
 
 /**
  * This class binds all parts of spy together to make fully configured instrumentation
  * engine. This is singleton object.
  */
 public class SpyInstance {
-
-    /** Debug level for spy components.  */
-    private static volatile int debugLevel;
 
     /** Logger */
     private static ZorkaLog log = ZorkaLogger.getLog(SpyInstance.class);
@@ -56,22 +48,16 @@ public class SpyInstance {
      */
     public static SpyInstance instance() {
 
-        if (isDebugEnabled(SPD_CONFIG)) {
-            log.debug("Requested a submitter instance.");
-        }
+        log.debug(ZorkaLogger.ZSP_CONFIG, "Requested a submitter instance.");
 
         synchronized (SpyInstance.class) {
             if (null == instance) {
-                instance = new SpyInstance(ZorkaConfig.getProperties());
+                instance = new SpyInstance();
 
-                if (isDebugEnabled(SPD_CONFIG)) {
-                    log.debug("Setting up submitter: " + instance.getSubmitter());
-                }
+                log.debug(ZorkaLogger.ZSP_CONFIG, "Setting up submitter: " + instance.getSubmitter());
 
                 MainSubmitter.setSubmitter(instance.getSubmitter());
                 MainSubmitter.setTracer(instance().getTracer());
-
-                debugLevel = Integer.parseInt(ZorkaConfig.getProperties().getProperty("spy.debug").trim());
             }
 
         }
@@ -92,23 +78,10 @@ public class SpyInstance {
 
 
     /**
-     * Returns true if log level is higher or equal to that passed with argument.
-     *
-     * @param level log level compared to configuration setting
-     *
-     * @return true or false
-     */
-    public static boolean isDebugEnabled(int level) {
-        return debugLevel >= level;
-    }
-
-
-    /**
      * Creates new instance.
      *
-     * @param props configuration properties.
      */
-    public SpyInstance(Properties props) {
+    public SpyInstance() {
         tracer = new Tracer();
         classTransformer = new SpyClassTransformer(tracer);
         submitter = new DispatchingSubmitter(classTransformer);

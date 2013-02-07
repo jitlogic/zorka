@@ -49,7 +49,7 @@ public abstract class Metric {
     }
 
 
-    public abstract Number getValue(long clock, Number value);
+    public abstract Number getValue(long clock, Object value);
 
 
     public MetricTemplate getTemplate() {

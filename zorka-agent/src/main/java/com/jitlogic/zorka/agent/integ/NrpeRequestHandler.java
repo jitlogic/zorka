@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.agent.integ;
 
 import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLogConfig;
 import com.jitlogic.zorka.common.ZorkaLogger;
 
 import java.io.IOException;
@@ -41,6 +42,7 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
     /** Request handling finish timestamp */
     private long tStop;
 
+
     /**
      * Creates NRPE request handler object
      *
@@ -52,10 +54,11 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
 
     }
 
+
     @Override
     public void handleResult(Object rslt) {
         tStop = System.currentTimeMillis();
-        log.debug("OK [t=" + (tStop-tStart) + "ms] '" + req + "' -> '" + rslt + "'");
+        log.debug(ZorkaLogger.ZAG_QUERIES, "OK [t=" + (tStop-tStart) + "ms] '" + req + "' -> '" + rslt + "'");
 
         NrpePacket resp = null;
         if (rslt instanceof NrpePacket) {
@@ -69,31 +72,32 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
             resp.encode(socket.getOutputStream());
             socket.getOutputStream().flush();
         } catch (IOException e) {
-            log.error("Error sending NRPE response", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error sending NRPE response", e);
         } finally {
             try {
                 socket.close();
             } catch (IOException e) {
-                log.error("Error closing network socket", e);
+                log.error(ZorkaLogger.ZAG_ERRORS, "Error closing network socket", e);
             }
         }
     }
 
+
     @Override
     public void handleError(Throwable e) {
         tStop = System.currentTimeMillis();
-        log.debug("OK [t=" + (tStop-tStart) + "ms] '" + req + "' -> '", e);
+        log.debug(ZorkaLogger.ZAG_QUERIES, "ERROR [t=" + (tStop-tStart) + "ms] '" + req + "' -> '", e);
         NrpePacket resp = req.createResponse(3, "Error: " + e);
 
         try {
             resp.encode(socket.getOutputStream());
         } catch (IOException e1) {
-            log.error("Error sending NRPE response", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error sending NRPE response", e);
         } finally {
             try {
                 socket.close();
             } catch (IOException e2) {
-                log.error("Error closing network socket", e);
+                log.error(ZorkaLogger.ZAG_ERRORS, "Error closing network socket", e);
             }
         }
     }

@@ -18,6 +18,7 @@ package com.jitlogic.zorka.agent.integ;
 import com.jitlogic.contrib.libsnmp.*;
 import com.jitlogic.zorka.common.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.ZorkaLogLevel;
+import com.jitlogic.zorka.common.ZorkaLogger;
 import com.jitlogic.zorka.common.ZorkaTrapper;
 
 import java.io.IOException;
@@ -80,7 +81,7 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
             this.agentAddr = new SNMPIPAddress(agentAddr);
             this.protocol = protocol;
         } catch (Exception e) {
-            log.error("Cannot initialize SNMP sender", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot initialize SNMP sender", e);
         }
     }
 
@@ -110,10 +111,10 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
             } else if (protocol == SnmpLib.SNMP_V2) {
                 submit(new SNMPv2TrapPDU(timestamp, oid, varBindList));
             } else {
-                log.error("Unsupported SNMP protocol version: " + protocol);
+                log.error(ZorkaLogger.ZAG_ERRORS, "Unsupported SNMP protocol version: " + protocol);
             }
         } catch (Exception e) {
-            log.error("Error creating trap object", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error creating trap object", e);
         }
     }
 
@@ -144,7 +145,7 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
                 sender.sendTrap(snmpAddr, community, (SNMPv2TrapPDU) trap);
             }
         } catch (IOException e) {
-            log.error("Error sending SNMP trap", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error sending SNMP trap", e);
         }
     }
 

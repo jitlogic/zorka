@@ -59,9 +59,7 @@ public class SymbolRegistry {
         if (id == null) {
             int newid = lastSymbolId.incrementAndGet();
 
-            if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_REGISTRY)) {
-                log.debug("Adding symbol '" + symbol + "', newid=" + newid);
-            }
+            log.debug(ZorkaLogger.ZTR_SYMBOL_REGISTRY, "Adding symbol '%s', newid=%s", symbol, newid);
 
             id = symbolIds.putIfAbsent(symbol, newid);
             if (id == null) {
@@ -98,9 +96,7 @@ public class SymbolRegistry {
      */
     public void put(int symbolId, String symbol) {
 
-        if (ZorkaLogConfig.isTracerLevel(ZorkaLogConfig.ZTR_SYMBOL_REGISTRY)) {
-            log.debug("Putting symbol '" + symbol + "', newid=" + symbolId);
-        }
+        log.debug(ZorkaLogger.ZTR_SYMBOL_REGISTRY, "Putting symbol '%s', newid=%s", symbol, symbolId);
 
         symbolIds.put(symbol, symbolId);
         symbolNames.put(symbolId, symbol);

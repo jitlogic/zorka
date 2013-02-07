@@ -128,8 +128,8 @@ public class RegexFilterProcessor implements SpyProcessor {
         if (expr == null) {
             boolean matches = val != null && regex.matcher(val.toString()).matches();
 
-            if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
-                log.debug("Filtering '" + val + "' through '" + regex.pattern() + "': " + matches);
+            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                log.debug(ZorkaLogger.ZSP_ARGPROC, "Filtering '" + val + "' through '" + regex.pattern() + "': " + matches);
             }
 
             return matches^filterOut ? record : null;
@@ -142,23 +142,23 @@ public class RegexFilterProcessor implements SpyProcessor {
                 }
                 String subst = ObjectInspector.substitute(expr, vals);
                 record.put(dst, subst);
-                if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
-                    log.debug("Processed '" + val + "' to '" + subst + "' using pattern '" + regex.pattern() + "'");
+                if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                    log.debug(ZorkaLogger.ZSP_ARGPROC, "Processed '" + val + "' to '" + subst + "' using pattern '" + regex.pattern() + "'");
                 }
             } else if (defval != null) {
                 record.put(dst, defval);
-                if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
-                    log.debug("No value to be processed. Using default value of '" + defval + "'");
+                if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                    log.debug(ZorkaLogger.ZSP_ARGPROC, "No value to be processed. Using default value of '" + defval + "'");
                 }
             } else if (Boolean.TRUE.equals(filterOut)) {
-                if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
-                    log.debug("No value to be processed. Filtering out.");
+                if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                    log.debug(ZorkaLogger.ZSP_ARGPROC, "No value to be processed. Filtering out.");
                 }
                 return null;
             }
         } else {
-            if (SpyInstance.isDebugEnabled(SPD_ARGPROC)) {
-                log.debug("No value to be processed. Leaving record unprocessed.");
+            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                log.debug(ZorkaLogger.ZSP_ARGPROC, "No value to be processed. Leaving record unprocessed.");
             }
         }
         return record;

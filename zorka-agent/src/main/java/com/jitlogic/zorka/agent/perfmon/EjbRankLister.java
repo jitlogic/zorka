@@ -85,7 +85,7 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
                     }
                 }
             } catch (Exception e) {
-                log.error("Cannot perform discovery on " + name, e);
+                log.error(ZorkaLogger.ZAG_ERRORS, "Cannot perform discovery on " + name, e);
             }
         }
 

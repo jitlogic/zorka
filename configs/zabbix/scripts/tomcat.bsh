@@ -83,6 +83,31 @@ __tomcat() {
 
   jsp = __jsp();
 
+
+  if (zorka.boolCfg("tomcat.trace", false)) {
+
+    tracer.exclude(
+      spy.byClass("sun.**"),
+      spy.byClass("java.**"),
+      spy.byClass("javax.**"),
+      spy.byClass("com.sun.**"),
+      spy.byClass("com.jitlogic.zorka.**"),
+      spy.byClass("org.xml.sax.**"),
+      spy.byClass("org.jcp.**"),
+      spy.byClass("~^\\$Proxy.*$")
+    );
+
+    tracer.include(spy.byClass("**").forTrace());
+
+    spy.add(spy.instance()
+      .onEnter(spy.fetchArg("REQ", 1), 
+          spy.format("URI", "${REQ.request.requestURI}"), 
+          tracer.begin("HTTP_REQ"), 
+          tracer.attr("URI", "URI"))
+      .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
+
+  }
+
   return this;
 
 }

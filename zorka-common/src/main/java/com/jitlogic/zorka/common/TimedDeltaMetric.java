@@ -32,13 +32,13 @@ public class TimedDeltaMetric extends RawDeltaMetric {
     }
 
     @Override
-    public Number getValue(long clock, Number value) {
-        Number val = super.getValue(clock, value);
+    public Number getValue(long clock, Object value) {
+        Number val = super.getValue(clock, (Number)value);
 
         long dclock = clock - lastClock;
 
         lastClock = clock;
 
-        return 1000.0 * val.doubleValue() / dclock;
+        return dclock > 0 ?  1000.0 * val.doubleValue() / dclock : 0.0;
     }
 }

@@ -77,7 +77,7 @@ public class TabularDataGetter implements ValGetter {
             rowType = new CompositeType(typeName, typeDesc, itemNames, itemDesc, itemTypes);
             tableType = new TabularType(typeName + "Table", typeDesc + " table", rowType, new String[] { indexField });
         } catch (OpenDataException e) {
-            log.error("Error creating row type or table type", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error creating row type or table type", e);
         }
     }
 
@@ -97,7 +97,7 @@ public class TabularDataGetter implements ValGetter {
             try {
                 table.put(new CompositeDataSupport(rowType, itemNames, values));
             } catch (OpenDataException e) {
-                log.error("Error creating composite data.", e);
+                log.error(ZorkaLogger.ZAG_ERRORS, "Error creating composite data.", e);
             }
         }
 

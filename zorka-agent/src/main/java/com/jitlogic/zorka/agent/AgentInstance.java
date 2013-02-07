@@ -161,13 +161,13 @@ public class AgentInstance {
         try {
             requestThreads = Integer.parseInt(props.getProperty("zorka.req.threads").trim());
         } catch (NumberFormatException e) {
-            log.error("Invalid " + "zorka.req.threads" + " setting: '" + props.getProperty("zorka.req.threads").trim() + "'");
+            log.error(ZorkaLogger.ZAG_ERRORS, "Invalid " + "zorka.req.threads" + " setting: '" + props.getProperty("zorka.req.threads").trim() + "'");
         }
 
         try {
             requestQueue = Integer.parseInt(props.getProperty("zorka.req.queue").trim());
         } catch (NumberFormatException e) {
-            log.error("Invalid " + "zorka.req.queue" + "setting: '" + props.getProperty("zorka.req.queue").trim() + "'");
+            log.error(ZorkaLogger.ZAG_ERRORS, "Invalid " + "zorka.req.queue" + "setting: '" + props.getProperty("zorka.req.queue").trim() + "'");
         }
     }
 
@@ -189,16 +189,15 @@ public class AgentInstance {
         zorkaAgent.install("normalizers", normLib);
 
         if ("yes".equalsIgnoreCase(props.getProperty("spy"))) {
-            log.info("Enabling Zorka SPY");
+            log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Zorka SPY");
             spyInstance = SpyInstance.instance();
             spyLib = new SpyLib(spyInstance);
             zorkaAgent.install("spy", spyLib);
             tracerLib = new TracerLib(spyInstance);
             zorkaAgent.install("tracer", tracerLib);
             MainSubmitter.setSubmitter(spyInstance.getSubmitter());
-            log.debug("Installed submitter: " + spyInstance.getSubmitter());
         } else {
-            log.info("Zorka SPY is diabled. No loaded classes will be transformed in any way.");
+            log.info(ZorkaLogger.ZAG_CONFIG, "Zorka SPY is diabled. No loaded classes will be transformed in any way.");
         }
 
         perfMonLib = new PerfMonLib(spyInstance);
@@ -206,7 +205,7 @@ public class AgentInstance {
 
 
         if ("yes".equalsIgnoreCase(props.getProperty("zabbix"))) {
-            log.info("Enabling ZABBIX subsystem ...");
+            log.info(ZorkaLogger.ZAG_CONFIG, "Enabling ZABBIX subsystem ...");
             zabbixAgent = new ZabbixAgent(zorkaAgent);
             zabbixAgent.start();
             zabbixLib = new ZabbixLib();
@@ -214,18 +213,19 @@ public class AgentInstance {
         }
 
         if ("yes".equalsIgnoreCase(props.getProperty("syslog"))) {
-            log.info("Enabling Syslog subsystem ....");
+            log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Syslog subsystem ....");
             syslogLib = new SyslogLib();
             zorkaAgent.install("syslog", syslogLib);
         }
 
         if ("yes".equalsIgnoreCase(props.getProperty("snmp"))) {
-            log.info("Enabling SNMP subsystem ...");
+            log.info(ZorkaLogger.ZAG_CONFIG, "Enabling SNMP subsystem ...");
             snmpLib = new SnmpLib();
             zorkaAgent.install("snmp", snmpLib);
         }
 
         if ("yes".equalsIgnoreCase(props.getProperty("nagios"))) {
+            log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Nagios support.");
             nagiosAgent = new NagiosAgent(zorkaAgent);
             nagiosLib = new NagiosLib();
             zorkaAgent.install("nagios", nagiosLib);
@@ -250,7 +250,7 @@ public class AgentInstance {
             initSyslogTrapper(props);
         }
 
-        ZorkaLogConfig.configure(props);
+        ZorkaLogger.configure(props);
     }
 
     /**
@@ -269,9 +269,8 @@ public class AgentInstance {
 
             ZorkaLogger.getLogger().addTrapper(syslog);
         } catch (Exception e) {
-            System.err.println("Error parsing logger arguments: " + e.getMessage());
-            e.printStackTrace();
-            System.err.println("Syslog trapper will be disabled.");
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing logger arguments", e);
+            log.info(ZorkaLogger.ZAG_ERRORS, "Syslog trapper will be disabled.");
         }
     }
 
@@ -294,8 +293,8 @@ public class AgentInstance {
             maxSize = (int) ZorkaUtil.parseIntSize(props.getProperty("zorka.log.size").trim());
             maxLogs = (int)ZorkaUtil.parseIntSize(props.getProperty("zorka.log.num").trim());
         } catch (Exception e) {
-            System.err.println("Error parsing logger arguments: " + e.getMessage());
-            e.printStackTrace();
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing logger arguments", e);
+            log.info(ZorkaLogger.ZAG_ERRORS, "File trapper will be disabled.");
         }
 
 
@@ -306,8 +305,6 @@ public class AgentInstance {
 
         ZorkaLogger.getLogger().addTrapper(trapper);
     }
-
-
 
 
     /**

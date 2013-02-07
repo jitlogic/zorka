@@ -93,7 +93,7 @@ public class MethodCallingProcessor implements SpyProcessor {
             val = method.invoke(val, args);
             record.put(dst, val);
         } catch (Exception e) {
-            log.error("Error processing record calling its method", e);
+            log.error(ZorkaLogger.ZSP_ARGPROC, "Error processing record calling its method", e);
         }
 
         return record;

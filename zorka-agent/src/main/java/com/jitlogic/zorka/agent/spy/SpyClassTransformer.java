@@ -135,13 +135,9 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
         for (SpyDefinition sdef : sdefs) {
 
-            if (SpyInstance.isDebugEnabled(SPD_CLASSALL)) {
-                log.debug("Encountered class: " + className);
-            }
+            log.debug(ZorkaLogger.ZSP_CLASS_TRC, "Encountered class: %s", className);
 
             if (sdef.getMatcherSet().classMatch(clazzName)) {
-
-
                 found.add(sdef);
             }
         }
@@ -150,9 +146,10 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
         if (found.size() > 0 || classMatch) {
 
-            if (SpyInstance.isDebugEnabled(SPD_CLASSXFORM)) {
-                log.debug("Transforming class: " + className
-                        + "(sdefs found: " + found.size() + "; tracer match: " + classMatch + ")");
+            if (ZorkaLogger.isAgentLevel(ZorkaLogger.ZSP_CLASS_DBG)) {
+
+                log.debug(ZorkaLogger.ZSP_CLASS_TRC, "Transforming class: %s (sdefs found: %d; tracer match: %b)",
+                        className, found.size(), classMatch);
             }
 
             ClassReader cr = new ClassReader(classfileBuffer);

@@ -198,7 +198,7 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
         Object obj = extractor.get((String)key[0]);
 
         if (obj == null) {
-            log.warn("Cannot find element '" + key[0] + "'");
+            log.warn(ZorkaLogger.ZAG_ERRORS, "Cannot find element '" + key[0] + "'");
             return null;
         }
 
@@ -211,7 +211,7 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
         try {
             return new CompositeDataSupport(rowType, attrNames, fields);
         } catch (OpenDataException e) {
-            log.error("Error creating CompositeData element", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error creating CompositeData element", e);
         }
 
         return null;

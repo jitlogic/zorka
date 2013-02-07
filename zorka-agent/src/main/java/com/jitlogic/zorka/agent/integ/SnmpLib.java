@@ -18,10 +18,7 @@ package com.jitlogic.zorka.agent.integ;
 
 import com.jitlogic.contrib.libsnmp.*;
 import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.common.ObjectInspector;
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogger;
-import com.jitlogic.zorka.common.ZorkaUtil;
+import com.jitlogic.zorka.common.*;
 
 import java.util.Map;
 import java.util.Vector;
@@ -183,11 +180,11 @@ public class SnmpLib {
                 case UINTEGER32:
                     return new SNMPUInteger32((Long)ZorkaUtil.coerce(val, Long.class));
                 default:
-                    log.error("Invalid type code passed to val(): " + type);
+                    log.error(ZorkaLogger.ZAG_ERRORS, "Invalid type code passed to val(): " + type);
                     break;
             }
         } catch (SNMPBadValueException e) {
-            log.error("Error creating value", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error creating value", e);
         }
         return null;
     }

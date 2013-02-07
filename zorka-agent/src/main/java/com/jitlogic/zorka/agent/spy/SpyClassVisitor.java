@@ -95,9 +95,7 @@ public class SpyClassVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String methodName, String methodDesc,
                                      String methodSignature, String[] exceptions) {
 
-        if (SpyInstance.isDebugEnabled(SPD_METHODALL)) {
-            log.debug("Encountered method: " + className + "." + methodName + " " + methodDesc);
-        }
+        log.debug(ZorkaLogger.ZSP_METHOD_TRC, "Encountered method: " + className + "." + methodName + " " + methodDesc);
 
         MethodVisitor mv = createVisitor(access, methodName, methodDesc, methodSignature, exceptions);
         List<SpyContext> ctxs = new ArrayList<SpyContext>(sdefs.size()+2);
@@ -107,9 +105,7 @@ public class SpyClassVisitor extends ClassVisitor {
         for (SpyDefinition sdef : sdefs) {
             if (sdef.getMatcherSet().methodMatch(className, classAnnotations, classInterfaces,
                     access, methodName, methodDesc, null)) {
-                if (SpyInstance.isDebugEnabled(SPD_METHODXFORM)) {
-                    log.debug("Instrumenting method: " + className + "." + methodName + " " + methodDesc);
-                }
+                log.debug(ZorkaLogger.ZSP_METHOD_DBG, "Instrumenting method: " + className + "." + methodName + " " + methodDesc);
                 ctxs.add(transformer.lookup(
                         new SpyContext(sdef, className, methodName, methodDesc, access)));
             }

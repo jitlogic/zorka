@@ -130,13 +130,13 @@ public class ZorkaConfig {
             props.load(is);
             is.close();
         } catch (IOException e) {
-            log.error("Error loading property file", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error loading property file", e);
         } finally {
             if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    log.error("Error closing property file", e);
+                    log.error(ZorkaLogger.ZAG_ERRORS, "Error closing property file", e);
                 }
                 is = null;
             }
@@ -158,13 +158,13 @@ public class ZorkaConfig {
 			is = new FileInputStream(getHomeDir("zorka.properties"));
 			properties.load(is);
 		} catch (IOException e) {
-            log.error("Error loading property file", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error loading property file", e);
 		} finally {
 			if (is != null)
 				try {
 					is.close();
 				} catch (IOException e) {
-                    log.error("Error closing property file", e);
+                    log.error(ZorkaLogger.ZAG_ERRORS, "Error closing property file", e);
                 }
 		}
 
