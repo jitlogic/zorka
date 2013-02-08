@@ -42,6 +42,13 @@ public class QueryDef {
     private static final List<QuerySegment> EMPTY_SEG
                 = Collections.unmodifiableList(new ArrayList<QuerySegment>(1));
 
+    public static final int NO_NULL_VALS = 0x01;
+
+    public static final int NO_NULL_ATTRS = 0x02;
+
+    /** Flags altering query execution. */
+    private int flags;
+
     /** MBean Server name */
     private String mbsName;
 
@@ -179,6 +186,29 @@ public class QueryDef {
         QueryDef qdef = new QueryDef(this);
         qdef.metricTemplate = metricTemplate;
         return qdef;
+    }
+
+
+    /**
+     * Sets additional flags for query.
+     *
+     * @param flags additional flags to be set
+     *
+     * @return augmented query definition
+     */
+    public QueryDef with(int...flags) {
+        QueryDef qdef = new QueryDef(this);
+
+        for (int flag : flags) {
+            qdef.flags |= flag;
+        }
+
+        return qdef;
+    }
+
+
+    public boolean hasFlags(int flags) {
+        return 0 != (this.flags & flags);
     }
 
 

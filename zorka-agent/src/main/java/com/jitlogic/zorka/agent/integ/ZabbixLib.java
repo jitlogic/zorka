@@ -54,6 +54,7 @@ public class ZabbixLib {
         MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
 
         for (QueryDef qdef : qdefs) {
+            qdef = qdef.with(QueryDef.NO_NULL_ATTRS);
             for (QueryResult result : new QueryLister(registry, qdef).list()) {
                 JSONObject item = new JSONObject();
                 for (Map.Entry<String,Object> e : result.attrSet()) {

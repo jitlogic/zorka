@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.agent.test.perfmon;
 
+import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.perfmon.QueryDef;
 import com.jitlogic.zorka.agent.perfmon.QueryLister;
 import com.jitlogic.zorka.agent.perfmon.QueryResult;
@@ -33,20 +34,17 @@ import java.util.Set;
 
 public class JmxQueryUnitTest extends ZorkaFixture {
 
-    private TestJmx jmx1;
-    private TestJmx jmx2;
-
     @Before
     public void createSomeMBeans() throws Exception {
-        jmx1 = makeTestJmx("test:name=bean1,type=TestJmx", 10, 10, "oja", "woja", "aja", "waja", "uja", "wuja");
-        jmx2 = makeTestJmx("test:name=bean2,type=TestJmx", 10, 10, "oja", "woja", "aja", "waja", "eja", "weja");
+        makeTestJmx("test:name=bean1,type=TestJmx", 10, 10, "oja", "woja", "aja", "waja", "uja", "wuja");
+        makeTestJmx("test:name=bean2,type=TestJmx", 10, 10, "oja", "woja", "aja", "waja", "eja", "weja");
     }
 
 
     @Test
     public void testTrivialSearchAttrOnly() {
         QueryLister lister = new QueryLister(mBeanServerRegistry,
-                new QueryDef("test", "test:type=TestJmx,*", "name"));
+            new QueryDef("test", "test:type=TestJmx,*", "name"));
 
         List<QueryResult> results = lister.list();
 
@@ -59,7 +57,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     @Test
     public void testTrivialSearchAndGetSingleAttr() {
         QueryLister lister = new QueryLister(mBeanServerRegistry,
-                new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom", "Nom"));
+            new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom", "Nom"));
 
         List<QueryResult> results = lister.list();
 
@@ -73,7 +71,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     @Test
     public void testSearchAndGetMultipleAttrs() {
         QueryLister lister = new QueryLister(mBeanServerRegistry,
-                new QueryDef("test", "test:type=TestJmx,*", "name").list("*", "Attr"));
+            new QueryDef("test", "test:type=TestJmx,*", "name").list("*", "Attr"));
 
         List<QueryResult> results = lister.list();
 
@@ -89,7 +87,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     @Test
     public void testSearchAndGetMultiSecondLevelAttr() {
         QueryLister lister = new QueryLister(mBeanServerRegistry,
-                new QueryDef("test", "test:type=TestJmx,*", "name").get("StrMap").list("*", "Attr"));
+            new QueryDef("test", "test:type=TestJmx,*", "name").get("StrMap").list("*", "Attr"));
 
         List<QueryResult> results = lister.list();
 
@@ -105,7 +103,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     @Test
     public void testSearchAndGetMultipleSecondLevelAttr() {
         QueryLister lister = new QueryLister(mBeanServerRegistry,
-                new QueryDef("test", "test:type=TestJmx,*", "name").get("StrMap").get("oja", "Attr"));
+            new QueryDef("test", "test:type=TestJmx,*", "name").get("StrMap").get("oja", "Attr"));
 
         List<QueryResult> results = lister.list();
 
@@ -115,6 +113,29 @@ public class JmxQueryUnitTest extends ZorkaFixture {
 
         Assert.assertTrue(attrs.contains(results.get(0).getAttr("Attr")));
         Assert.assertTrue(attrs.contains(results.get(1).getAttr("Attr")));
+    }
+
+
+    @Test
+    public void testSearchWithSomeRecordsHavingNoSuchAttr() {
+        QueryLister lister = new QueryLister(mBeanServerRegistry,
+             new QueryDef("test", "test:type=TestJmx,*", "name").get("StrMap").get("uja").with(QueryDef.NO_NULL_VALS));
+
+        List<QueryResult> results = lister.list();
+
+        Assert.assertEquals(1, results.size());
+    }
+
+
+    @Test
+    public void testSearchWithNullAttrsInObjectName() throws Exception {
+        QueryLister lister = new QueryLister(mBeanServerRegistry,
+            new QueryDef("test", "test:*", "name").with(QueryDef.NO_NULL_ATTRS));
+        makeTestJmx("test:name=oja", 10, 10);
+
+        List<QueryResult> results = lister.list();
+
+        Assert.assertEquals(1, results.size());
     }
 
 
