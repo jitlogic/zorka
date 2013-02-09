@@ -57,6 +57,9 @@ public class PerfMonLib {
         return new MetricTemplate(MetricTemplate.WINDOWED_RATE, name, units, nom, div);
     }
 
+    public MetricTemplate util(String name, String units, String nom, String div) {
+        return new MetricTemplate(MetricTemplate.UTILIZATION, name, units, nom, div);
+    }
 
     /**
      * Creates new JMX metrics scanner object. Scanner objects are responsible for scanning
