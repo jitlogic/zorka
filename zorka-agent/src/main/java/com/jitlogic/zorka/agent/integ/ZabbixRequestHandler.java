@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogConfig;
 import com.jitlogic.zorka.common.ZorkaLogger;
@@ -57,7 +58,9 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
      */
 	public ZabbixRequestHandler(Socket socket) {
 		this.socket = socket;
-        this.tStart = System.currentTimeMillis();
+        this.tStart = System.nanoTime();
+
+        AgentDiagnostics.inc(AgentDiagnostics.ZABBIX_REQUESTS);
 	}
 	
 
@@ -237,8 +240,9 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
     @Override
 	public void handleResult(Object rslt) {
 		try {
-            tStop = System.currentTimeMillis();
-            log.debug(ZorkaLogger.ZAG_QUERIES, "OK [t=" + (tStop-tStart) + "ms] '" + req + "' -> '" + rslt + "'");
+            tStop = System.nanoTime();
+            log.debug(ZorkaLogger.ZAG_QUERIES, "OK [t=" + (tStop-tStart)/1000000L + "ms] '" + req + "' -> '" + rslt + "'");
+            AgentDiagnostics.inc(AgentDiagnostics.ZABBIX_TIME, tStop-tStart);
 			send(serialize(rslt));
 		} catch (IOException e) {
 	        log.error(ZorkaLogger.ZAG_ERRORS, "I/O error returning result: " + e.getMessage());
@@ -271,9 +275,11 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
 
     @Override
     public void handleError(Throwable e) {
+        AgentDiagnostics.inc(AgentDiagnostics.ZABBIX_ERRORS);
 		try {
-            this.tStop = System.currentTimeMillis();
-  			log.error(ZorkaLogger.ZAG_QUERIES, "ERROR [t=" + (tStop=tStart) + "ms] + '" + req + "'", e);
+            this.tStop = System.nanoTime();
+  			log.error(ZorkaLogger.ZAG_QUERIES, "ERROR [t=" + (tStop-tStart)/1000000L + "ms] + '" + req + "'", e);
+            AgentDiagnostics.inc(AgentDiagnostics.ZABBIX_TIME, tStop-tStart);
 			send(ZBX_NOTSUPPORTED);
 		} catch (IOException e1) {
 		    log.error(ZorkaLogger.ZAG_ERRORS, "I/O Error returning (error) result: " + e.getMessage());

@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zorka.agent.integ;
 
+import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogConfig;
 import com.jitlogic.zorka.common.ZorkaLogger;
@@ -50,15 +51,18 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
      */
     public NrpeRequestHandler(Socket socket) {
         this.socket = socket;
-        this.tStart = System.currentTimeMillis();
+        this.tStart = System.nanoTime();
 
+        AgentDiagnostics.inc(AgentDiagnostics.NAGIOS_REQUESTS);
     }
 
 
     @Override
     public void handleResult(Object rslt) {
-        tStop = System.currentTimeMillis();
-        log.debug(ZorkaLogger.ZAG_QUERIES, "OK [t=" + (tStop-tStart) + "ms] '" + req + "' -> '" + rslt + "'");
+        tStop = System.nanoTime();
+        log.debug(ZorkaLogger.ZAG_QUERIES, "OK [t=" + (tStop-tStart)/1000000L + "ms] '" + req + "' -> '" + rslt + "'");
+
+        AgentDiagnostics.inc(AgentDiagnostics.NAGIOS_TIME, tStop-tStart);
 
         NrpePacket resp = null;
         if (rslt instanceof NrpePacket) {
@@ -85,10 +89,13 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
 
     @Override
     public void handleError(Throwable e) {
-        tStop = System.currentTimeMillis();
-        log.debug(ZorkaLogger.ZAG_QUERIES, "ERROR [t=" + (tStop-tStart) + "ms] '" + req + "' -> '", e);
-        NrpePacket resp = req.createResponse(3, "Error: " + e);
+        AgentDiagnostics.inc(AgentDiagnostics.NAGIOS_ERRORS);
+        tStop = System.nanoTime();
+        log.debug(ZorkaLogger.ZAG_QUERIES, "ERROR [t=" + (tStop-tStart)/1000000L + "ms] '" + req + "' -> '", e);
 
+        AgentDiagnostics.inc(AgentDiagnostics.NAGIOS_TIME, tStop-tStart);
+
+        NrpePacket resp = req.createResponse(3, "Error: " + e);
         try {
             resp.encode(socket.getOutputStream());
         } catch (IOException e1) {

@@ -196,6 +196,7 @@ __jboss() {
       spy.byClass("org.apache.xml.**"),
       spy.byClass("org.apache.xpath.**"),
       spy.byClass("org.w3c.**"),
+      spy.byClass("org.omg.**"),
       spy.byClass("org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate")
     );
 

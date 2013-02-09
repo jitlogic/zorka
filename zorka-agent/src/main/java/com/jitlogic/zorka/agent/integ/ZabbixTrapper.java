@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.agent.integ;
 
+import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.common.*;
 
 import java.io.OutputStream;
@@ -76,8 +77,8 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
      *
      * @param value item value
      */
-    public void send(Object value) {
-        send(defaultHost, value);
+    public boolean send(Object value) {
+        return send(defaultHost, value);
     }
 
 
@@ -88,8 +89,8 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
      *
      * @param value item value
      */
-    public void send(String item, Object value) {
-        send(defaultHost, item, value);
+    public boolean send(String item, Object value) {
+        return send(defaultHost, item, value);
     }
 
 
@@ -102,7 +103,7 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
      *
      * @param value item value
      */
-    public void send(String host, String item, Object value) {
+    public boolean send(String host, String item, Object value) {
 
         StringBuilder sb = new StringBuilder(384);
         sb.append("<req><host>");
@@ -113,7 +114,7 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
         sb.append(Base64.encode(value.toString().getBytes(), false));
         sb.append("</data></req>");
 
-        submit(sb.toString());
+        return submit(sb.toString());
     }
 
 
@@ -125,6 +126,7 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
             OutputStream os = socket.getOutputStream();
             os.write(msg.getBytes());
             os.flush();
+            AgentDiagnostics.inc(AgentDiagnostics.TRAPS_SENT);
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error sending packet", e);
         } finally {
@@ -152,6 +154,9 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
 
     @Override
     public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e, Object... args) {
-        send(tag, msg);
+        AgentDiagnostics.inc(AgentDiagnostics.TRAPS_SUBMITTED);
+        if (!send(tag, msg)) {
+            AgentDiagnostics.inc(AgentDiagnostics.TRAPS_DROPPED);
+        }
     }
 }

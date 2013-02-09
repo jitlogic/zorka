@@ -116,10 +116,11 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
      *
      * @param obj object to be submitted
      */
-    public void submit(T obj) {
+    public boolean submit(T obj) {
         try {
-            submitQueue.offer(obj, 0, TimeUnit.MILLISECONDS);
+            return submitQueue.offer(obj, 0, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
+            return false;
         }
     }
 

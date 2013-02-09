@@ -780,6 +780,15 @@ public class ZorkaLib  {
     }
 
 
+    /**
+     * Parses comma-separated configuration setting and returns it as list of strings.
+     *
+     * @param key key in zorka.properties file
+     *
+     * @param defVals set of default values (if key is missing)
+     *
+     * @return parsed list
+     */
     public List<String> listCfg(String key, String...defVals) {
         String s = ZorkaConfig.getProperties().getProperty(key);
 

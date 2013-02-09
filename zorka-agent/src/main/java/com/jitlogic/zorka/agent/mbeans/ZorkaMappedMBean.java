@@ -34,6 +34,7 @@ import javax.management.MBeanNotificationInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.ReflectionException;
 import javax.management.openmbean.OpenMBeanAttributeInfoSupport;
+import javax.management.openmbean.OpenType;
 import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularType;
 
@@ -164,8 +165,10 @@ public class ZorkaMappedMBean implements DynamicMBean {
 
             Object attrVal = attr.getValue();
 
-            // TODO get rid of it, create something like TypedGetter so it can return proper types here
-            if (attrVal instanceof TabularDataGetter) {
+            if (attrVal instanceof TypedValGetter) {
+                String typeName = ((TypedValGetter) attrVal).getType().getTypeName();
+                attrInfo[i] = new MBeanAttributeInfo(attrNames[i], typeName, attrNames[i], true, false, false);
+            } else if (attrVal instanceof TabularDataGetter) {
                 TabularDataGetter getter = (TabularDataGetter)attrVal;
                 attrInfo[i] = new OpenMBeanAttributeInfoSupport(getter.getTypeName(), getter.getTypeDesc(),
                                                                 getter.getTableType(), true, false, false);

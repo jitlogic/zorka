@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.agent.spy;
 
+import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.common.SymbolRegistry;
 import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogger;
@@ -114,6 +115,8 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     private List<Boolean> ctxMatches = new ArrayList<Boolean>();
 
+    private int spyProbesEmitted = 0, tracerProbesEmitted = 0;
+
     /**
      * Standard constructor.
      *
@@ -139,8 +142,6 @@ public class SpyMethodVisitor extends MethodVisitor {
         this.methodName = methodName;
         this.methodSignature = methodSignature;
         this.ctxs = ctxs;
-
-
 
         argTypes = Type.getArgumentTypes(methodSignature);
         returnType = Type.getReturnType(methodSignature);
@@ -228,7 +229,6 @@ public class SpyMethodVisitor extends MethodVisitor {
             }
         }
 
-        //mv.visitTryCatchBlock(lTryFrom, lTryTo, lTryHandler, null);
         mv.visitLabel(lTryFrom);
     }
 
@@ -292,6 +292,10 @@ public class SpyMethodVisitor extends MethodVisitor {
         mv.visitInsn(ATHROW);
         mv.visitTryCatchBlock(lTryFrom, lTryTo, lTryHandler, null);
         mv.visitMaxs(maxStack + stackDelta, max(maxLocals, retValProbeSlot + 1));
+
+        if (spyProbesEmitted > 0 || tracerProbesEmitted > 0) {
+            AgentDiagnostics.inc(AgentDiagnostics.METHODS_INSTRUMENTED);
+        }
     }
 
 
@@ -364,6 +368,8 @@ public class SpyMethodVisitor extends MethodVisitor {
 
         mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, ENTER_METHOD, ENTER_SIGNATURE);
 
+        tracerProbesEmitted++;
+
         return 3;
     }
 
@@ -375,6 +381,9 @@ public class SpyMethodVisitor extends MethodVisitor {
      */
     private int emitTraceReturn() {
         mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, RETURN_METHOD, RETURN_SIGNATURE);
+
+        tracerProbesEmitted++;
+
         return 0;
     }
 
@@ -387,6 +396,9 @@ public class SpyMethodVisitor extends MethodVisitor {
     private int emitTraceError() {
         mv.visitInsn(DUP);
         mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, ERROR_METHOD, ERROR_SIGNATURE);
+
+        tracerProbesEmitted++;
+
         return 1;
     }
 
@@ -432,6 +444,8 @@ public class SpyMethodVisitor extends MethodVisitor {
 
         // Call MainSubmitter.submit()
         mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, SUBMIT_METHOD, SUBMIT_SIGNATURE);
+
+        spyProbesEmitted++;
 
         return sd;
     }

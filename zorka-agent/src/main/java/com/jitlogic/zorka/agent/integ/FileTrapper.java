@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zorka.agent.integ;
 
+import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.common.*;
 
 import java.io.*;
@@ -147,7 +148,10 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
             }
         }
 
-        submit(sb.toString());
+        AgentDiagnostics.inc(AgentDiagnostics.TRAPS_SUBMITTED);
+        if (!submit(sb.toString())) {
+            AgentDiagnostics.inc(AgentDiagnostics.TRAPS_DROPPED);
+        }
     }
 
 
@@ -194,6 +198,7 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
         if (out != null) {
             out.println(msg);
             currentSize += msg.getBytes().length + 1;
+            AgentDiagnostics.inc(AgentDiagnostics.TRAPS_SENT);
         }
     }
 
