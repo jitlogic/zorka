@@ -260,7 +260,7 @@ public class ZorkaLib  {
         QueryDef qdef = new QueryDef(mbsName, objectName, "*");
 
         for (int i = 0; i < args.length; i++) {
-            qdef = qdef.list(args[i].toString(), "ARG"+i);
+            qdef = qdef.listAs(args[i].toString(), "ARG"+i);
         }
 
         List<QueryResult> results = new QueryLister(mbsRegistry, qdef).list();

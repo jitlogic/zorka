@@ -118,12 +118,18 @@ public class QueryDef {
      * Fetches attribute defined by arg parameter.
      *
      *
-     * @param arg attribute (as for ObjectInspector.get() method)
+     * @param args attributes (as for ObjectInspector.get() method)
      *
      * @return augmented query
      */
-    public QueryDef get(Object arg) {
-        return withSegs(new QuerySegment(arg));
+    public QueryDef get(Object...args) {
+        QueryDef qdef = this;
+
+        for (Object arg : args) {
+            qdef = qdef.withSegs(new QuerySegment(arg));
+        }
+
+        return qdef;
     }
 
 
@@ -137,7 +143,7 @@ public class QueryDef {
      *
      * @return augmented query definition
      */
-    public QueryDef get(Object arg, String name) {
+    public QueryDef getAs(Object arg, String name) {
         return withSegs(new QuerySegment(arg, name));
     }
 
@@ -166,7 +172,7 @@ public class QueryDef {
      *
      * @return augmented query definition
      */
-    public QueryDef list(String regex, String name) {
+    public QueryDef listAs(String regex, String name) {
         Pattern pattern = regex.startsWith("~") ? Pattern.compile(regex.substring(1))
                 : Pattern.compile("^"+regex.replace("**", ".+").replace("*", "[^\\.]+")+"$");
 

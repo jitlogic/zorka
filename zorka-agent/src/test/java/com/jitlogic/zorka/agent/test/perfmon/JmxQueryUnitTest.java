@@ -57,7 +57,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     @Test
     public void testTrivialSearchAndGetSingleAttr() {
         QueryLister lister = new QueryLister(mBeanServerRegistry,
-            new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom", "Nom"));
+            new QueryDef("test", "test:type=TestJmx,*", "name").getAs("Nom", "Nom"));
 
         List<QueryResult> results = lister.list();
 
@@ -71,7 +71,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     @Test
     public void testSearchAndGetMultipleAttrs() {
         QueryLister lister = new QueryLister(mBeanServerRegistry,
-            new QueryDef("test", "test:type=TestJmx,*", "name").list("*", "Attr"));
+            new QueryDef("test", "test:type=TestJmx,*", "name").listAs("*", "Attr"));
 
         List<QueryResult> results = lister.list();
 
@@ -87,7 +87,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     @Test
     public void testSearchAndGetMultiSecondLevelAttr() {
         QueryLister lister = new QueryLister(mBeanServerRegistry,
-            new QueryDef("test", "test:type=TestJmx,*", "name").get("StrMap").list("*", "Attr"));
+            new QueryDef("test", "test:type=TestJmx,*", "name").get("StrMap").listAs("*", "Attr"));
 
         List<QueryResult> results = lister.list();
 
@@ -103,7 +103,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     @Test
     public void testSearchAndGetMultipleSecondLevelAttr() {
         QueryLister lister = new QueryLister(mBeanServerRegistry,
-            new QueryDef("test", "test:type=TestJmx,*", "name").get("StrMap").get("oja", "Attr"));
+            new QueryDef("test", "test:type=TestJmx,*", "name").get("StrMap").getAs("oja", "Attr"));
 
         List<QueryResult> results = lister.list();
 
