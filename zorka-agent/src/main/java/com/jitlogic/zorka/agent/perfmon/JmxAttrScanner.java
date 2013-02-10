@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.agent.perfmon;
 
+import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.spy.TracerOutput;
 import com.jitlogic.zorka.common.*;
@@ -96,6 +97,9 @@ public class JmxAttrScanner implements Runnable {
                 case MetricTemplate.WINDOWED_RATE:
                     metric = new WindowedRateMetric(template, result.attrSet());
                     break;
+                case MetricTemplate.UTILIZATION:
+                    metric = new UtilizationMetric(template, result.attrSet());
+                    break;
                 default:
                     return null;
             }
@@ -116,7 +120,7 @@ public class JmxAttrScanner implements Runnable {
             }
 
             log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Created new metric: " + metric);
-
+            AgentDiagnostics.inc(AgentDiagnostics.METRICS_CREATED);
         }
 
         return metric;
@@ -130,6 +134,7 @@ public class JmxAttrScanner implements Runnable {
             runCycle(System.currentTimeMillis());
         } catch (Error e) {
             log.error(ZorkaLogger.ZPM_ERRORS, "Error executing scanner '" + name + "'", e);
+            AgentDiagnostics.inc(AgentDiagnostics.PMON_ERRORS);
         }
     }
 
@@ -142,52 +147,58 @@ public class JmxAttrScanner implements Runnable {
     public void runCycle(long clock) {
         List<PerfSample> samples = new ArrayList<PerfSample>();
 
-        log.info(ZorkaLogger.ZPM_RUNS, "Running scanner %s (scannerId=%d)", name, id);
+        AgentDiagnostics.inc(AgentDiagnostics.PMON_CYCLES);
+
+        long t1 = System.nanoTime();
 
         for (QueryLister lister : listers) {
             MetricTemplate template = lister.getMetricTemplate();
             if (template != null) {
 
                 log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Scanning query: %s", lister);
+                AgentDiagnostics.inc(AgentDiagnostics.PMON_QUERIES);
 
                 for (QueryResult result : lister.list()) {
-                    if (result.getValue() instanceof Number) {
-                        Metric metric = getMetric(template, result);
-                        Number val = metric.getValue(clock, (Number)result.getValue());
+                    Metric metric = getMetric(template, result);
+                    Number val = metric.getValue(clock, result.getValue());
 
-                        if (val == null) {
-                            log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Obtained null value for metric '%s'. Skipping. ", metric);
-                            continue;
-                        }
-
-                        if (val instanceof Double || val instanceof Float) {
-                            val = val.doubleValue();
-                        } else {
-                            val = val.longValue();
-                        }
-
-                        PerfSample sample = new PerfSample(metric.getId(), val);
-
-                        // Add dynamic attributes if necessary
-                        if (metric.getDynamicAttrs() != null) {
-                            Map<Integer,String> attrs = new HashMap<Integer, String>();
-                            for (Map.Entry<String,Integer> e : metric.getDynamicAttrs().entrySet()) {
-                                attrs.put(e.getValue(), result.getAttr(e.getKey()).toString());
-                            }
-                            sample.setAttrs(attrs);
-                        }
-
-                        log.trace(ZorkaLogger.ZPM_RUN_TRACE, "Submitting sample: %s", sample);
-
-                        samples.add(sample);
-                    } else {
-                        // TODO Log only when logging of this particular message is enabled
-                        log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Trying to submit non-numeric metric value for %s: %s",
-                            result.getAttrPath(), result.getValue());
+                    if (val == null) {
+                        log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Obtained null value for metric '%s'. Skipping. ", metric);
+                        AgentDiagnostics.inc(AgentDiagnostics.PMON_NULLS);
+                        continue;
                     }
+
+                    if (val instanceof Double || val instanceof Float) {
+                        val = val.doubleValue();
+                    } else {
+                        val = val.longValue();
+                    }
+
+                    PerfSample sample = new PerfSample(metric.getId(), val);
+
+                    // Add dynamic attributes if necessary
+                    if (metric.getDynamicAttrs() != null) {
+                        Map<Integer,String> attrs = new HashMap<Integer, String>();
+                        for (Map.Entry<String,Integer> e : metric.getDynamicAttrs().entrySet()) {
+                            attrs.put(e.getValue(), result.getAttr(e.getKey()).toString());
+                        }
+                        sample.setAttrs(attrs);
+                    }
+
+                    log.trace(ZorkaLogger.ZPM_RUN_TRACE, "Submitting sample: %s", sample);
+                    samples.add(sample);
                 }
             }
         }
+
+        long t2 = System.nanoTime();
+
+        log.info(ZorkaLogger.ZPM_RUNS, "Scanner %s execution took " + (t2-t1)/1000000L + " milliseconds to execute. "
+                    + "Collected samples: " + samples.size());
+
+        AgentDiagnostics.inc(AgentDiagnostics.PMON_TIME, t2-t1);
+        AgentDiagnostics.inc(AgentDiagnostics.PMON_PACKETS_SENT);
+        AgentDiagnostics.inc(AgentDiagnostics.PMON_SAMPLES_SENT, samples.size());
 
         if (samples.size() > 0) {
             output.submit(new PerfRecord(clock, id, samples));

@@ -19,6 +19,8 @@ package com.jitlogic.zorka.agent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.management.*;
 
@@ -260,7 +262,7 @@ public class ZorkaLib  {
         QueryDef qdef = new QueryDef(mbsName, objectName, "*");
 
         for (int i = 0; i < args.length; i++) {
-            qdef = qdef.list(args[i].toString(), "ARG"+i);
+            qdef = qdef.listAs(args[i].toString(), "ARG"+i);
         }
 
         List<QueryResult> results = new QueryLister(mbsRegistry, qdef).list();
@@ -767,6 +769,45 @@ public class ZorkaLib  {
         }
     }
 
+    private static Map<String,Long> kilos = ZorkaUtil.map(
+            "k", 1024L, "K", 1024L,
+            "m", 1024*1024L, "M", 1024*1024L,
+            "g", 1024*1024*1024L, "G", 1024*1024*1024L,
+            "t", 1024*1024*1024*1024L, "T", 1024*1024*1024*1024L);
+
+    Pattern kiloRe = Pattern.compile("^([0-9]+)([kKmMgGtT])$");
+
+
+    public Long kiloCfg(String key) {
+        return kiloCfg(key, null);
+    }
+
+    public Long kiloCfg(String key, Long defval) {
+        String s = ZorkaConfig.getProperties().getProperty(key);
+
+        long multi = 1L;
+
+        if (s != null) {
+            Matcher matcher = kiloRe.matcher(s);
+
+            if (matcher.matches()) {
+                s = matcher.group(1);
+                multi = kilos.get(matcher.group(2));
+            }
+        }
+
+        try {
+            if (s != null) {
+                return Long.parseLong(s.trim()) * multi;
+            } else {
+                return defval;
+            }
+        } catch (NumberFormatException e) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
+            return defval;
+        }
+    }
+
 
     public String stringCfg(String key) {
         return stringCfg(key, null);
@@ -780,6 +821,15 @@ public class ZorkaLib  {
     }
 
 
+    /**
+     * Parses comma-separated configuration setting and returns it as list of strings.
+     *
+     * @param key key in zorka.properties file
+     *
+     * @param defVals set of default values (if key is missing)
+     *
+     * @return parsed list
+     */
     public List<String> listCfg(String key, String...defVals) {
         String s = ZorkaConfig.getProperties().getProperty(key);
 

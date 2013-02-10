@@ -27,7 +27,6 @@ import com.jitlogic.zorka.common.ZorkaLog;
 
 import bsh.EvalError;
 import bsh.Interpreter;
-import com.jitlogic.zorka.common.ZorkaLogConfig;
 import com.jitlogic.zorka.common.ZorkaLogger;
 
 /**

@@ -99,7 +99,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
     @Test
     public void testCheckIfDynamicAttributesArePassedCorrectly() throws Exception {
         JmxAttrScanner scanner = perfmon.scanner("TEST",
-                new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom", "ATTR")
+                new QueryDef("test", "test:type=TestJmx,*", "name").getAs("Nom", "ATTR")
                         .metric(
                                 perfmon.metric("test", "test").dynamicAttrs("ATTR")));
         TestUtil.setField(scanner, "output", out);
@@ -120,7 +120,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
     @Test
     public void testCheckIfOutputDataIsProperlyCast() throws Exception {
         JmxAttrScanner scanner = perfmon.scanner("TEST",
-                new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom", "ATTR")
+                new QueryDef("test", "test:type=TestJmx,*", "name").getAs("Nom", "ATTR")
                         .metric(
                                 perfmon.metric("test", "test").dynamicAttrs("ATTR")));
         TestUtil.setField(scanner, "output", out);

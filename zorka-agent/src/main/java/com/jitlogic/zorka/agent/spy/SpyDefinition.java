@@ -214,7 +214,7 @@ public class SpyDefinition {
                 newProcessors.add((SpyProcessor)arg);
             } else if (arg instanceof SpyProbe) {
                 newProbes.add((SpyProbe)arg);
-            } else {
+            } else if (arg != null) {
                 throw new IllegalArgumentException();
             }
         }

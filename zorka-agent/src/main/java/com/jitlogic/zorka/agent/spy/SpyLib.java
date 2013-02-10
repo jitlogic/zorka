@@ -520,6 +520,25 @@ public class SpyLib {
     }
 
 
+    public SpyProcessor zorkaLog(String logLevel, String tag, String message) {
+        return new ZorkaLogCollector(ZorkaLogLevel.valueOf(logLevel), tag, message, null, null);
+    }
+
+
+    public SpyProcessor zorkaLog(String logLevel, String tag, String message, String fErr) {
+        return new ZorkaLogCollector(ZorkaLogLevel.valueOf(logLevel), tag, message, null, fErr);
+    }
+
+
+    public SpyProcessor zorkaLogCond(String logLevel, String tag, String message, String fCond) {
+        return new ZorkaLogCollector(ZorkaLogLevel.valueOf(logLevel), tag, message, fCond, null);
+    }
+
+
+    public SpyProcessor zorkaLogCond(String logLevel, String tag, String message, String fCond, String fErr) {
+        return new ZorkaLogCollector(ZorkaLogLevel.valueOf(logLevel), tag, message, fCond, fErr);
+    }
+
     /**
      * Formats arguments and passes an array of formatted strings.
      * Format expression is generally a string with special marker for

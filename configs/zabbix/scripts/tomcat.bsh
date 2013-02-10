@@ -84,7 +84,7 @@ __tomcat() {
   jsp = __jsp();
 
 
-  if (zorka.boolCfg("tomcat.trace", false)) {
+  if (zorka.boolCfg("tracer", false)) {
 
     tracer.exclude(
       spy.byClass("sun.**"),
@@ -103,10 +103,16 @@ __tomcat() {
       .onEnter(spy.fetchArg("REQ", 1), 
           spy.format("URI", "${REQ.request.requestURI}"), 
           tracer.begin("HTTP_REQ"), 
+          zorka.boolCfg("tracer.verbose", false) ? spy.zorkaLog("INFO", "HTTP_REQ", "URI=${URI}") : null,
           tracer.attr("URI", "URI"))
       .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
 
-  }
+    tracer.output(tracer.toFile(
+      zorka.stringCfg("tracer.log.path", "${zorka.log.dir}/trace.trc"),
+      zorka.intCfg("tracer.log.fnum", 8),
+      zorka.kiloCfg("tracer.log.size", 128*1024*1024)));
+
+  }  // tracer
 
   return this;
 
