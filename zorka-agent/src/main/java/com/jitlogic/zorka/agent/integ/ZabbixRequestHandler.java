@@ -25,7 +25,6 @@ import java.net.Socket;
 
 import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogConfig;
 import com.jitlogic.zorka.common.ZorkaLogger;
 import org.json.simple.JSONAware;
 

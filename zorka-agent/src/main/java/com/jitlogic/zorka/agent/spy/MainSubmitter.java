@@ -78,7 +78,7 @@ public class MainSubmitter {
         if (tracer != null) {
             try {
                 if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS)) {
-                    log.debug(ZorkaLogger.ZSP_SUBMIT, "traceEnter(classId=" + classId + ", methodId="
+                    log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceEnter(classId=" + classId + ", methodId="
                             + methodId + ", signatureId=" + signatureId + ")");
                 }
                 tracer.getHandler().traceEnter(classId, methodId, signatureId, System.nanoTime());
@@ -98,7 +98,7 @@ public class MainSubmitter {
 
         if (tracer != null) {
             try {
-                log.debug(ZorkaLogger.ZTR_TRACE_CALLS, "traceReturn()");
+                log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceReturn()");
                 tracer.getHandler().traceReturn(System.nanoTime());
             } catch (Throwable e) {
                log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceReturn", e);
@@ -118,7 +118,7 @@ public class MainSubmitter {
 
         if (tracer != null) {
             try {
-                log.debug(ZorkaLogger.ZTR_TRACE_CALLS, "traceError()", exception);
+                log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceError()", exception);
                 tracer.getHandler().traceError(exception, System.nanoTime());
             } catch (Throwable e) {
                 log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceError", e);
