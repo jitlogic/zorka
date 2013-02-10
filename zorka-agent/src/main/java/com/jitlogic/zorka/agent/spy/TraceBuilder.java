@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.agent.spy;
 
 
+import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.common.*;
 
 /**
@@ -158,7 +159,10 @@ public class TraceBuilder extends TraceEventHandler {
             if (ttop.getTime() >= ttop.getMarker().getMinimumTime()
                     || 0 != (ttop.getMarker().getFlags() & TraceMarker.ALWAYS_SUBMIT)) {
                 submit(ttop);
+                AgentDiagnostics.inc(AgentDiagnostics.TRACES_SUBMITTED);
                 clean = false;
+            } else {
+                AgentDiagnostics.inc(AgentDiagnostics.TRACES_DROPPED);
             }
 
 

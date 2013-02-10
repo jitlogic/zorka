@@ -196,6 +196,17 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
         assertEquals(0.0, (Double)m.getValue(1L, v2), 0.001);
     }
 
+    @Test
+    public void testUtilizationMetric() {
+        Metric m = metric(perfmon.util("", "", "a", "b"));
+
+        Map<String,Long> v1 = ZorkaUtil.map("a", 5L, "b", 10L);
+        Map<String,Long> v2 = ZorkaUtil.map("a", 1L, "b", 1L);
+
+        assertEquals(50.0, (Double)m.getValue(0, v1), 0.001);
+        assertEquals(100.0, (Double)m.getValue(0, v2), 0.001);
+    }
+
 
     private QueryResult qr(Object val, Object...attrs) {
         QueryResult result = new QueryResult(val);

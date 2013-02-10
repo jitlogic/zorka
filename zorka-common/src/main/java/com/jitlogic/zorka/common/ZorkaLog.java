@@ -61,6 +61,22 @@ public class ZorkaLog {
 
 
     /**
+     * Logs message with TRACE level
+     *
+     * @param msg message text
+     *
+     * @param e exception thrown
+     *
+     * @param args optional arguments
+     */
+    public void trace(long level, String msg, Throwable e, Object...args) {
+        if (ZorkaLogger.isLogLevel(level)) {
+            output.trap(ZorkaLogLevel.TRACE, tag, msg, e, args);
+        }
+    }
+
+
+    /**
      * Logs message with DEBUG level
      *
      * @param msg message text

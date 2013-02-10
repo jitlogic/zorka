@@ -145,6 +145,56 @@ __jboss7() {
 
 
 
+  if (zorka.boolCfg("tracer", false)) {
+
+    if (zorka.boolCfg("tracer.hires", false)) {
+      tracer.setTracerMinMethodTime(1000000);
+      tracer.setTracerMinTraceTime(0);
+      tracer.setTracerMaxTraceRecords(4096);
+    }
+
+    tracer.exclude(
+      spy.byClass("sun.**"),
+      spy.byClass("java.**"),
+      spy.byClass("javax.**"),
+      spy.byClass("com.sun.**"),
+      spy.byClass("com.jitlogic.zorka.**"),
+      spy.byClass("org.xml.sax.**"),
+      spy.byClass("org.jcp.**"),
+      spy.byClass("~^\\$Proxy.*$"),
+      spy.byClass("org.apache.xerces.**"),
+      spy.byClass("org.apache.xalan.**"),
+      spy.byClass("org.apache.xml.**"),
+      spy.byClass("org.apache.xpath.**"),
+      spy.byClass("org.w3c.**"),
+      spy.byClass("org.omg.**")
+    );
+
+    tracer.include(spy.byClass("**").forTrace());
+
+    spy.add(spy.instance()
+      .onEnter(spy.fetchArg("REQ", 1),
+        spy.format("URI", "${REQ.request.requestURI}"),
+        tracer.begin("HTTP_REQ"),
+        tracer.attr("URI", "URI"))
+      .onReturn(spy.fetchArg("RESP", 2),
+        spy.get("RESP", "STATUS", "response", "status"),
+        zorka.boolCfg("tracer.verbose", false) ? spy.zorkaLog("INFO", "HTTP/OK", "URI=${URI} STATUS=${STATUS}") : null,
+        tracer.attr("STATUS", "STATUS"))
+      .onError(spy.fetchError("EX"),
+        spy.format("ERR", "${EX}"),
+        zorka.boolCfg("tracer.verbose", false) ? spy.zorkaLog("ERROR", "HTTP/ERROR", "URI=${URI} ERR=${ERR}") : null,
+        tracer.attr("ERR", "ERR"))
+      .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
+
+
+    tracer.output(tracer.toFile(
+      zorka.stringCfg("tracer.log.path", "${zorka.log.dir}/trace.trc"),
+      zorka.intCfg("tracer.log.fnum", 16),
+      zorka.kiloCfg("tracer.log.size", 128*1024*1024)));
+
+  }
+
   return this;
 }
 

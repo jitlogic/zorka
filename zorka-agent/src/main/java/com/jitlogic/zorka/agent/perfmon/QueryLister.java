@@ -78,7 +78,15 @@ public class QueryLister {
             }
         }
 
-        return results;
+        List<QueryResult> rslt = new ArrayList<QueryResult>(results.size());
+
+        for (QueryResult result : results) {
+            if (!query.hasFlags(QueryDef.NO_NULL_VALS) || result.getValue() != null) {
+                rslt.add(result);
+            }
+        }
+
+        return rslt;
     }
 
 
@@ -89,6 +97,11 @@ public class QueryLister {
         List<QueryResult> results = new ArrayList(objNames.size()+1);
 
         for (ObjectName on : objNames) {
+
+            if (query.hasFlags(QueryDef.NO_NULL_ATTRS) && on.getKeyPropertyList().size() > query.getAttributes().size()) {
+                continue;
+            }
+
             try {
                 if (seg != null && seg.getAttr() instanceof Pattern) {
                     getMultiResult(conn, seg, results, on);
@@ -99,7 +112,9 @@ public class QueryLister {
                 log.error(ZorkaLogger.ZAG_ERRORS, "Error listing results of " + query, e);
             }
         }
+
         return results;
+
     }
 
 
@@ -146,6 +161,13 @@ public class QueryLister {
     }
 
 
+    /**
+     * Executes getter query segment.
+     *
+     * @param input
+     * @param seg
+     * @return
+     */
     private List<QueryResult> refineResults(List<QueryResult> input, QuerySegment seg) {
         for (QueryResult res : input) {
             res.setValue(ObjectInspector.get(res.getValue(), seg.getAttr()));

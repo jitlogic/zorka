@@ -14,25 +14,28 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.common;
+package com.jitlogic.zorka.agent.mbeans;
+
+import javax.management.openmbean.OpenType;
+
+public class TypedValGetter<T> extends AttrGetter {
+
+    private OpenType<T> type;
+
+    /**
+     * Creates value getter.
+     *
+     * @param obj   object
+     * @param attrs attribute chain
+     */
+    public TypedValGetter(OpenType<T> type, Object obj, Object... attrs) {
+        super(obj, attrs);
+        this.type = type;
+    }
 
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
-/**
- * Maintains zorka log filtering configuration. It allows for
- * fine tuning of which things are to be logged (useful when
- * developing/debugging more sophiscated configuration scripts.
- *
- * @author rafal.lewczuk@jitlogic.com
- */
-public class ZorkaLogConfig {
-
-    /** Logger object */
-    private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaLogConfig.class);
-
+    public OpenType<T> getType() {
+        return type;
+    }
 
 }

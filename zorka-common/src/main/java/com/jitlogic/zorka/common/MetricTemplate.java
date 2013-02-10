@@ -27,6 +27,7 @@ public class MetricTemplate {
     public static final int RAW_DELTA      = 2;
     public static final int TIMED_DELTA    = 3;
     public static final int WINDOWED_RATE  = 4;
+    public static final int UTILIZATION    = 5;
 
     private int id;
     private int type;

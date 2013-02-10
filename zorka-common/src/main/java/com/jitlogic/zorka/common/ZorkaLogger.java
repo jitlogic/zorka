@@ -38,9 +38,8 @@ public class ZorkaLogger implements ZorkaTrapper {
     public static final long ZTR_TRACE_CALLS        = 0x40;
     public static final long ZTR_ERRORS             = 0x80;
     public static final long ZTR_INFO               = ZTR_CONFIG | ZTR_TRACE_ERRORS;
-    public static final long ZTR_DEBUG              = ZTR_INFO | ZTR_INSTRUMENT_CLASS | ZTR_INSTRUMENT_METHOD;
-    public static final long ZTR_TRACE              = ZTR_DEBUG | ZTR_SYMBOL_REGISTRY | ZTR_SYMBOL_ENRICHMENT;
-    public static final long ZTR_TRACE_FULL         = ZTR_TRACE | ZTR_TRACE_CALLS;
+    public static final long ZTR_DEBUG              = ZTR_INFO | ZTR_INSTRUMENT_CLASS | ZTR_INSTRUMENT_METHOD | ZTR_SYMBOL_REGISTRY | ZTR_SYMBOL_ENRICHMENT;
+    public static final long ZTR_TRACE              = ZTR_DEBUG | ZTR_TRACE_CALLS;
 
     /** Performance metrics log flags */
     public static final long ZPM_NONE       = 0x0000;

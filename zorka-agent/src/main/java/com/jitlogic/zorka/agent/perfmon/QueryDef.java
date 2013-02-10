@@ -42,6 +42,13 @@ public class QueryDef {
     private static final List<QuerySegment> EMPTY_SEG
                 = Collections.unmodifiableList(new ArrayList<QuerySegment>(1));
 
+    public static final int NO_NULL_VALS = 0x01;
+
+    public static final int NO_NULL_ATTRS = 0x02;
+
+    /** Flags altering query execution. */
+    private int flags;
+
     /** MBean Server name */
     private String mbsName;
 
@@ -111,12 +118,18 @@ public class QueryDef {
      * Fetches attribute defined by arg parameter.
      *
      *
-     * @param arg attribute (as for ObjectInspector.get() method)
+     * @param args attributes (as for ObjectInspector.get() method)
      *
      * @return augmented query
      */
-    public QueryDef get(Object arg) {
-        return withSegs(new QuerySegment(arg));
+    public QueryDef get(Object...args) {
+        QueryDef qdef = this;
+
+        for (Object arg : args) {
+            qdef = qdef.withSegs(new QuerySegment(arg));
+        }
+
+        return qdef;
     }
 
 
@@ -130,7 +143,7 @@ public class QueryDef {
      *
      * @return augmented query definition
      */
-    public QueryDef get(Object arg, String name) {
+    public QueryDef getAs(Object arg, String name) {
         return withSegs(new QuerySegment(arg, name));
     }
 
@@ -159,7 +172,7 @@ public class QueryDef {
      *
      * @return augmented query definition
      */
-    public QueryDef list(String regex, String name) {
+    public QueryDef listAs(String regex, String name) {
         Pattern pattern = regex.startsWith("~") ? Pattern.compile(regex.substring(1))
                 : Pattern.compile("^"+regex.replace("**", ".+").replace("*", "[^\\.]+")+"$");
 
@@ -179,6 +192,29 @@ public class QueryDef {
         QueryDef qdef = new QueryDef(this);
         qdef.metricTemplate = metricTemplate;
         return qdef;
+    }
+
+
+    /**
+     * Sets additional flags for query.
+     *
+     * @param flags additional flags to be set
+     *
+     * @return augmented query definition
+     */
+    public QueryDef with(int...flags) {
+        QueryDef qdef = new QueryDef(this);
+
+        for (int flag : flags) {
+            qdef.flags |= flag;
+        }
+
+        return qdef;
+    }
+
+
+    public boolean hasFlags(int flags) {
+        return 0 != (this.flags & flags);
     }
 
 

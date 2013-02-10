@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.agent.spy;
 
+import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.common.SymbolRegistry;
 import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogger;
@@ -29,9 +30,6 @@ import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static com.jitlogic.zorka.agent.spy.SpyLib.SPD_CLASSALL;
-import static com.jitlogic.zorka.agent.spy.SpyLib.SPD_CLASSXFORM;
 
 /**
  * This is main class transformer installed in JVM by Zorka agent (see premain() method).
@@ -146,11 +144,10 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
         if (found.size() > 0 || classMatch) {
 
-            if (ZorkaLogger.isAgentLevel(ZorkaLogger.ZSP_CLASS_DBG)) {
+            log.debug(ZorkaLogger.ZSP_CLASS_TRC, "Transforming class: %s (sdefs found: %d; tracer match: %b)",
+                    className, found.size(), classMatch);
 
-                log.debug(ZorkaLogger.ZSP_CLASS_TRC, "Transforming class: %s (sdefs found: %d; tracer match: %b)",
-                        className, found.size(), classMatch);
-            }
+            AgentDiagnostics.inc(AgentDiagnostics.CLASSES_TRANSFORMED);
 
             ClassReader cr = new ClassReader(classfileBuffer);
             ClassWriter cw = new ClassWriter(cr, 0);

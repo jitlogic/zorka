@@ -58,13 +58,21 @@ public class ZorkaBshWorker implements Runnable, Closeable {
 
     @Override
 	public void run() {
+        long t1 = System.nanoTime();
+
 		try {
+            AgentDiagnostics.inc(AgentDiagnostics.AGENT_REQUESTS);
 			callback.handleResult(agent.eval(expr));
 		} catch (EvalError e) {
             callback.handleError(e);
+            AgentDiagnostics.inc(AgentDiagnostics.AGENT_ERRORS);
         } catch (Exception e) {
             callback.handleError(e);
+            AgentDiagnostics.inc(AgentDiagnostics.AGENT_ERRORS);
         }
+
+        long t2 = System.nanoTime();
+        AgentDiagnostics.inc(AgentDiagnostics.AGENT_TIME, t2-t1);
 	}
 
 

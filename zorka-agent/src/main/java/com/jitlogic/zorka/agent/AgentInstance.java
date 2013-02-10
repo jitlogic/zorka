@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.agent;
 
+import com.jitlogic.zorka.agent.mbeans.TypedValGetter;
 import com.jitlogic.zorka.agent.perfmon.PerfMonLib;
 import com.jitlogic.zorka.agent.spy.TracerLib;
 import com.jitlogic.zorka.common.*;
@@ -26,6 +27,7 @@ import com.jitlogic.zorka.agent.spy.MainSubmitter;
 import com.jitlogic.zorka.agent.spy.SpyInstance;
 import com.jitlogic.zorka.agent.spy.SpyLib;
 
+import javax.management.openmbean.SimpleType;
 import java.io.File;
 import java.lang.instrument.ClassFileTransformer;
 import java.util.Properties;
@@ -149,6 +151,7 @@ public class AgentInstance {
     /** Agent configuration properties */
     private Properties props;
 
+
     /**
      * Standard constructor. It only reads some configuration properties, no real startup is actually done.
      *
@@ -203,7 +206,17 @@ public class AgentInstance {
         perfMonLib = new PerfMonLib(spyInstance);
         zorkaAgent.install("perfmon", perfMonLib);
 
+        initIntegrationLibs();
 
+        zorkaAgent.loadScriptDir(props.getProperty("zorka.config.dir"), ".*\\.bsh$");
+
+        if ("yes".equalsIgnoreCase(props.getProperty("zorka.diagnostics"))) {
+            createZorkaDiagMBean();
+        }
+    }
+
+
+    private void initIntegrationLibs() {
         if ("yes".equalsIgnoreCase(props.getProperty("zabbix"))) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling ZABBIX subsystem ...");
             zabbixAgent = new ZabbixAgent(zorkaAgent);
@@ -231,10 +244,6 @@ public class AgentInstance {
             zorkaAgent.install("nagios", nagiosLib);
             nagiosAgent.start();
         }
-
-
-        zorkaAgent.loadScriptDir(props.getProperty("zorka.config.dir"), ".*\\.bsh$");
-
     }
 
 
@@ -252,6 +261,7 @@ public class AgentInstance {
 
         ZorkaLogger.configure(props);
     }
+
 
     /**
      * Creates and configures syslog trapper according to configuration properties
@@ -304,6 +314,16 @@ public class AgentInstance {
         trapper.start();
 
         ZorkaLogger.getLogger().addTrapper(trapper);
+    }
+
+
+    public void createZorkaDiagMBean() {
+        String mbeanName = props.getProperty("zorka.diagnostics.mbean").trim();
+
+        mBeanServerRegistry.getOrRegister("java", mbeanName, "Version",
+            props.getProperty("zorka.version"), "Agent Diagnostics");
+
+        AgentDiagnostics.initMBean(mBeanServerRegistry, mbeanName);
     }
 
 

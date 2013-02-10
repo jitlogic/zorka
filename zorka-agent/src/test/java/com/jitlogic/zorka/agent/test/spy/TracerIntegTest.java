@@ -42,8 +42,9 @@ public class TracerIntegTest extends ZorkaFixture {
     public void initOutput() {
         rslt = new TestTracer();
         output = new ZorkaAsyncThread<Submittable>("test") {
-            @Override public void submit(Submittable obj) {
+            @Override public boolean submit(Submittable obj) {
                 obj.traverse(rslt);
+                return true;
             }
             @Override protected void process(Submittable obj) { }
         };

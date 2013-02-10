@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.agent.test.stress;
 
+import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.agent.spy.MainSubmitter;
 import com.jitlogic.zorka.agent.spy.SpyDefinition;
 import com.jitlogic.zorka.agent.spy.SpySubmitter;
@@ -57,7 +58,7 @@ public class SubmitPhaseMicrobenchmarks extends StressTestFixture {
 
         runBenchmark("trivialMethod", sdef, System.out, "Null submitter and argument probe");
 
-        System.out.println("Submitter_errors=" + MainSubmitter.getErrorCount());
+        System.out.println("Submitter_errors=" + AgentDiagnostics.get(AgentDiagnostics.SPY_ERRORS));
     }
 
 
@@ -86,7 +87,7 @@ public class SubmitPhaseMicrobenchmarks extends StressTestFixture {
 
         runBenchmark("trivialMethod", sdef, System.out, "Unsynchronized submitter and argument probe");
 
-        System.out.println("errors=" + MainSubmitter.getErrorCount());
+        System.out.println("errors=" + AgentDiagnostics.get(AgentDiagnostics.SPY_ERRORS));
     }
 
 
@@ -135,7 +136,7 @@ public class SubmitPhaseMicrobenchmarks extends StressTestFixture {
 
         runBenchmark("trivialMethod", sdef, System.out, "Thread local submitter and argument probe");
 
-        System.out.println("Submitter errors: " + MainSubmitter.getErrorCount());
+        System.out.println("Submitter errors: " + AgentDiagnostics.get(AgentDiagnostics.SPY_ERRORS));
     }
 
 
@@ -174,7 +175,7 @@ public class SubmitPhaseMicrobenchmarks extends StressTestFixture {
 
         runBenchmark("trivialMethod", sdef, System.out, "Thread local semi-atomic submitter and argument probe");
 
-        System.out.println("Submitter errors: " + MainSubmitter.getErrorCount());
+        System.out.println("Submitter errors: " + AgentDiagnostics.get(AgentDiagnostics.SPY_ERRORS));
         System.out.println("Final counter: " + tlaCounter.longValue());
     }
 
@@ -203,11 +204,11 @@ public class SubmitPhaseMicrobenchmarks extends StressTestFixture {
     public void testThreadLocalTstampSubmitter() throws Exception {
         SpyDefinition sdef = spy.instance().onEnter(spy.fetchTime("T"));
 
-        MainSubmitter.setSubmitter(threadLocalSemiAtomicSubmitter);
+        MainSubmitter.setSubmitter(threadLocalTstampSubmitter);
 
         runBenchmark("trivialMethod", sdef, System.out, "Thread local submitter and timestamp probe");
 
-        System.out.println("Submitter errors: " + MainSubmitter.getErrorCount());
+        System.out.println("Submitter errors: " + AgentDiagnostics.get(AgentDiagnostics.SPY_ERRORS));
         System.out.println("Final counter: " + tlaCounter.longValue());
     }
 
@@ -229,7 +230,7 @@ public class SubmitPhaseMicrobenchmarks extends StressTestFixture {
 
         runBenchmark("trivialMethod", sdef, System.out, "Atomic submitter and argument probe");
 
-        System.out.println("errors=" + MainSubmitter.getErrorCount());
+        System.out.println("errors=" + AgentDiagnostics.get(AgentDiagnostics.SPY_ERRORS));
     }
 
 

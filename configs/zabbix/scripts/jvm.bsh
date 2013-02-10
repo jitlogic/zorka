@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-__hotspot() {
+__jvm() {
 
   memutil(name) {
     mem_used = zorka.jmx("java", "java.lang:name="+name+",type=MemoryPool", "Usage", "used");
@@ -34,19 +34,34 @@ __hotspot() {
   }
 
 
-  if (zorka.boolCfg("hotspot.perf", false)) {
-    qMemUsed = zorka.query("java", "java.lang:type=MemoryPool,*", "name")
-      .get("Usage").get("used")
-      .metric(perfmon.metric("${name} memory usage.", "B"));
+  if (zorka.boolCfg("perfmon", false)) {
 
-    scanner = perfmon.scanner("JVM", qMemUsed);
+    qmpUsed = zorka.query("java", "java.lang:type=MemoryPool,*", "name").get("Usage", "used")
+      .metric(perfmon.metric("MP ${name} usage", "B"));
 
+    qmpUtil = zorka.query("java", "java.lang:type=MemoryPool,*", "name").get("Usage")
+      .metric(perfmon.util("MP ${name} utilization", "%", "used", "max"));
+
+    qgcCycles = zorka.query("java", "java.lang:type=GarbageCollector,*", "name").get("CollectionCount")
+      .metric(perfmon.timedDelta("GC ${name} cycles per minute", "cycles/min").multiply(60));
+
+    qgcUtil = zorka.query("java", "java.lang:type=GarbageCollector,*", "name").get("CollectionTime")
+      .metric(perfmon.delta("GC ${name} CPU utilization", "%").multiply(0.1));
+
+    qmhUsed = zorka.query("java", "java.lang:type=Memory").listAs("~.*MemoryUsage$", "name").get("used")
+      .metric(perfmon.metric("MH ${name} usage", "B"));
+
+    qmhUtil = zorka.query("java", "java.lang:type=Memory").listAs("~.*MemoryUsage$", "name")
+      .metric(perfmon.util("MH ${name} utilization", "%", "used", "max"));
+
+    scanner = perfmon.scanner("JVM", qmpUsed, qmpUtil, qgcCycles, qgcUtil, qmhUsed, qmhUtil);
     zorka.schedule(scanner, 10000, 10000);
-  }
+
+  } // perfmon
 
 
   return this;
 }
 
 
-hotspot = __hotspot();
+jvm = __jvm();

@@ -18,12 +18,9 @@
 package com.jitlogic.zorka.agent.spy;
 
 import bsh.EvalError;
+import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogger;
-
-import java.util.concurrent.atomic.AtomicLong;
-
-import static com.jitlogic.zorka.agent.spy.SpyLib.SPD_CDISPATCHES;
 
 /**
  * Main submitter contains static methods that can be called directly by
@@ -41,9 +38,6 @@ public class MainSubmitter {
 
     /** Tracer receiving trace events */
     private static Tracer tracer;
-
-    /** Error counter */
-    private static AtomicLong errorCount = new AtomicLong(0);
 
 
     /**
@@ -64,10 +58,10 @@ public class MainSubmitter {
             }
         } catch (EvalError e) {
             log.debug(ZorkaLogger.ZSP_ERRORS, "Error submitting value from instrumented code: ", e);
-            errorCount.incrementAndGet();
+            AgentDiagnostics.inc(AgentDiagnostics.SPY_ERRORS);
         } catch (Throwable e) {
             log.debug(ZorkaLogger.ZSP_ERRORS, "Error submitting value from instrumented code: ", e);
-            errorCount.incrementAndGet();
+            AgentDiagnostics.inc(AgentDiagnostics.SPY_ERRORS);
         }
     }
 
@@ -84,13 +78,13 @@ public class MainSubmitter {
         if (tracer != null) {
             try {
                 if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS)) {
-                    log.debug(ZorkaLogger.ZSP_SUBMIT, "traceEnter(classId=" + classId + ", methodId="
+                    log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceEnter(classId=" + classId + ", methodId="
                             + methodId + ", signatureId=" + signatureId + ")");
                 }
                 tracer.getHandler().traceEnter(classId, methodId, signatureId, System.nanoTime());
             } catch (Throwable e) {
                 log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceEnter", e);
-                errorCount.incrementAndGet();
+                AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
             }
         }
 
@@ -104,11 +98,11 @@ public class MainSubmitter {
 
         if (tracer != null) {
             try {
-                log.debug(ZorkaLogger.ZTR_TRACE_CALLS, "traceReturn()");
+                log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceReturn()");
                 tracer.getHandler().traceReturn(System.nanoTime());
             } catch (Throwable e) {
                log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceReturn", e);
-                errorCount.incrementAndGet();
+               AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
             }
         }
 
@@ -124,11 +118,11 @@ public class MainSubmitter {
 
         if (tracer != null) {
             try {
-                log.debug(ZorkaLogger.ZTR_TRACE_CALLS, "traceError()", exception);
+                log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceError()", exception);
                 tracer.getHandler().traceError(exception, System.nanoTime());
             } catch (Throwable e) {
                 log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceError", e);
-                errorCount.incrementAndGet();
+                AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
             }
         }
     }
@@ -150,16 +144,6 @@ public class MainSubmitter {
      */
     public static void setTracer(Tracer tracer) {
         MainSubmitter.tracer = tracer;
-    }
-
-
-    /**
-     * Returns error count.
-     *
-     * @return error count
-     */
-    public static long getErrorCount() {
-        return errorCount.longValue();
     }
 
 }
