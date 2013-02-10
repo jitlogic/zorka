@@ -174,13 +174,7 @@ __jboss() {
     .onReturn(spy.fetchArg("MBS", 0), (com.jitlogic.zorka.agent.spy.SpyProcessor)__mbsRegister())
     .include(spy.byMethod("org.jboss.mx.server.MBeanServerImpl", "<init>")));
 
-  if (zorka.boolCfg("jboss.trace", false)) {
-
-    if (zorka.boolCfg("jboss.trace.hires", false)) {
-      tracer.setTracerMinMethodTime(1000000);
-      tracer.setTracerMinTraceTime(0);
-      tracer.setTracerMaxTraceRecords(4096);
-    }
+  if (zorka.boolCfg("tracer", false)) {
 
     tracer.exclude(
       spy.byClass("sun.**"),
@@ -200,21 +194,21 @@ __jboss() {
       spy.byClass("org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate")
     );
 
-
     tracer.include(spy.byClass("**").forTrace());
-
 
     spy.add(spy.instance()
       .onEnter(spy.fetchArg("REQ", 1), 
           spy.format("URI", "${REQ.request.requestURI}"), 
           tracer.begin("HTTP_REQ"), 
+          zorka.boolCfg("tracer.verbose", false) ? spy.zorkaLog("INFO", "HTTP_REQ", "URI=${URI}") : null,
           tracer.attr("URI", "URI"))
       .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
 
-
-    // Set tracer output 
     tracer.output(tracer.toFile(
-      zorka.stringCfg("trace.file", "${zorka.log.dir}/trace.trc"), 16, 128*1024*1024));
+      zorka.stringCfg("tracer.log.path", "${zorka.log.dir}/trace.trc"),
+      zorka.intCfg("tracer.log.fnum", 8),
+      zorka.kiloCfg("tracer.log.size", 128*1024*1024)));
+
   }
 
   return this;
