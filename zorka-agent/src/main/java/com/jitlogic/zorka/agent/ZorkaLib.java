@@ -19,6 +19,8 @@ package com.jitlogic.zorka.agent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.management.*;
 
@@ -758,6 +760,45 @@ public class ZorkaLib  {
         try {
             if (s != null) {
                 return Long.parseLong(s.trim());
+            } else {
+                return defval;
+            }
+        } catch (NumberFormatException e) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
+            return defval;
+        }
+    }
+
+    private static Map<String,Long> kilos = ZorkaUtil.map(
+            "k", 1024L, "K", 1024L,
+            "m", 1024*1024L, "M", 1024*1024L,
+            "g", 1024*1024*1024L, "G", 1024*1024*1024L,
+            "t", 1024*1024*1024*1024L, "T", 1024*1024*1024*1024L);
+
+    Pattern kiloRe = Pattern.compile("^([0-9]+)([kKmMgGtT])$");
+
+
+    public Long kiloCfg(String key) {
+        return kiloCfg(key, null);
+    }
+
+    public Long kiloCfg(String key, Long defval) {
+        String s = ZorkaConfig.getProperties().getProperty(key);
+
+        long multi = 1L;
+
+        if (s != null) {
+            Matcher matcher = kiloRe.matcher(s);
+
+            if (matcher.matches()) {
+                s = matcher.group(1);
+                multi = kilos.get(matcher.group(2));
+            }
+        }
+
+        try {
+            if (s != null) {
+                return Long.parseLong(s.trim()) * multi;
             } else {
                 return defval;
             }

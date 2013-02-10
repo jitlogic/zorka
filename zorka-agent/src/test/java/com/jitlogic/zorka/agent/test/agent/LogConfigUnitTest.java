@@ -36,6 +36,9 @@ public class LogConfigUnitTest extends ZorkaFixture {
         ZorkaConfig.getProperties().setProperty("test.broken", "oja!");
         ZorkaConfig.getProperties().setProperty("test.space", "  ");
         ZorkaConfig.getProperties().setProperty("test.lst", "  oja!,  oje! ");
+        ZorkaConfig.getProperties().setProperty("ten.bytes", "10");
+        ZorkaConfig.getProperties().setProperty("one.kilobyte", "1k");
+        ZorkaConfig.getProperties().setProperty("ten.megabytes", "10M");
     }
 
 
@@ -85,4 +88,10 @@ public class LogConfigUnitTest extends ZorkaFixture {
         assertEquals(Arrays.asList("oja!", "oje!"), zorka.listCfg("test.lst"));
     }
 
+    @Test
+    public void testParseKiloProps() {
+        assertEquals((Long)10L, zorka.kiloCfg("ten.bytes"));
+        assertEquals((Long)1024L, zorka.kiloCfg("one.kilobyte"));
+        assertEquals((Long)10485760L, zorka.kiloCfg("ten.megabytes"));
+    }
 }
