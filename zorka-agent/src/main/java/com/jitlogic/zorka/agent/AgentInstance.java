@@ -165,12 +165,14 @@ public class AgentInstance {
             requestThreads = Integer.parseInt(props.getProperty("zorka.req.threads").trim());
         } catch (NumberFormatException e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Invalid " + "zorka.req.threads" + " setting: '" + props.getProperty("zorka.req.threads").trim() + "'");
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         }
 
         try {
             requestQueue = Integer.parseInt(props.getProperty("zorka.req.queue").trim());
         } catch (NumberFormatException e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Invalid " + "zorka.req.queue" + "setting: '" + props.getProperty("zorka.req.queue").trim() + "'");
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         }
     }
 
@@ -281,6 +283,7 @@ public class AgentInstance {
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing logger arguments", e);
             log.info(ZorkaLogger.ZAG_ERRORS, "Syslog trapper will be disabled.");
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         }
     }
 
@@ -305,6 +308,7 @@ public class AgentInstance {
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing logger arguments", e);
             log.info(ZorkaLogger.ZAG_ERRORS, "File trapper will be disabled.");
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         }
 
 

@@ -189,8 +189,31 @@ public class TracerLib {
      *
      * @param methodTime minimum execution time (in nanoseconds, 250 microseconds by default)
      */
+    public void setTracerMinMethodTime(int methodTime) {
+        Tracer.setMinMethodTime(methodTime);
+    }
+
+
+    /**
+     * Sets minimum traced method execution time. Methods that took less time
+     * will be discarded from traces and will only reflect in summary call/error counters.
+     *
+     * @param methodTime minimum execution time (in nanoseconds, 250 microseconds by default)
+     */
     public void setTracerMinMethodTime(long methodTime) {
         Tracer.setMinMethodTime(methodTime);
+    }
+
+
+    /**
+     * Sets minimum trace execution time. Traces that laster for shorted period
+     * of time will be discarded. Not that this is default setting that can be
+     * overridden with spy.begin() method.
+     *
+     * @param traceTime minimum trace execution time (50 milliseconds by default)
+     */
+    public void setTracerMinTraceTime(int traceTime) {
+        Tracer.setMinTraceTime(traceTime * 1000000L);
     }
 
 

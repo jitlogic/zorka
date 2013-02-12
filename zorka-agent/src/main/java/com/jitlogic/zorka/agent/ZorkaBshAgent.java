@@ -133,8 +133,10 @@ public class ZorkaBshAgent {
 			interpreter.source(url.getPath());
 		} catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error loading script " + url, e);
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
 		} catch (EvalError e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error executing script " + url, e);
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         }
 	}
 
@@ -149,8 +151,10 @@ public class ZorkaBshAgent {
             interpreter.source(path);
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error loading script " + path, e);
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         } catch (EvalError e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error executing script " + path, e);
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         }
     }
 
