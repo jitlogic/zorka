@@ -120,6 +120,12 @@ public class AgentDiagnostics {
         counters[counter].incrementAndGet();
     }
 
+    public static void inc(boolean cond, int counter) {
+        if (cond) {
+            counters[counter].incrementAndGet();
+        }
+    }
+
 
     public static void inc(int counter, long delta) {
         counters[counter].addAndGet(delta);

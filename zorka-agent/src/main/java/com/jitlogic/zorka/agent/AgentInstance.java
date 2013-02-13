@@ -16,7 +16,6 @@
 
 package com.jitlogic.zorka.agent;
 
-import com.jitlogic.zorka.agent.mbeans.TypedValGetter;
 import com.jitlogic.zorka.agent.perfmon.PerfMonLib;
 import com.jitlogic.zorka.agent.spy.TracerLib;
 import com.jitlogic.zorka.common.*;
@@ -27,7 +26,6 @@ import com.jitlogic.zorka.agent.spy.MainSubmitter;
 import com.jitlogic.zorka.agent.spy.SpyInstance;
 import com.jitlogic.zorka.agent.spy.SpyLib;
 
-import javax.management.openmbean.SimpleType;
 import java.io.File;
 import java.lang.instrument.ClassFileTransformer;
 import java.util.Properties;
@@ -277,6 +275,7 @@ public class AgentInstance {
             int syslogFacility = SyslogLib.getFacility(props.getProperty("zorka.syslog.facility", "F_LOCAL0").trim());
 
             SyslogTrapper syslog = new SyslogTrapper(server, hostname, syslogFacility, true);
+            syslog.disableTrapCounter();
             syslog.start();
 
             ZorkaLogger.getLogger().addTrapper(syslog);
@@ -314,7 +313,7 @@ public class AgentInstance {
 
         FileTrapper trapper = FileTrapper.rolling(logThreshold,
                 new File(logDir, logFileName).getPath(), maxLogs, maxSize, logExceptions);
-
+        trapper.disableTrapCounter();
         trapper.start();
 
         ZorkaLogger.getLogger().addTrapper(trapper);

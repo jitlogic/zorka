@@ -126,7 +126,7 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
             OutputStream os = socket.getOutputStream();
             os.write(msg.getBytes());
             os.flush();
-            AgentDiagnostics.inc(AgentDiagnostics.TRAPS_SENT);
+            AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SENT);
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error sending packet", e);
         } finally {
@@ -154,9 +154,9 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
 
     @Override
     public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e, Object... args) {
-        AgentDiagnostics.inc(AgentDiagnostics.TRAPS_SUBMITTED);
+        AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SUBMITTED);
         if (!send(tag, msg)) {
-            AgentDiagnostics.inc(AgentDiagnostics.TRAPS_DROPPED);
+            AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_DROPPED);
         }
     }
 }
