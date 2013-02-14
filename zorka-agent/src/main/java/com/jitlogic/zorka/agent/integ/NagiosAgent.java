@@ -16,7 +16,6 @@
 package com.jitlogic.zorka.agent.integ;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
-import com.jitlogic.zorka.agent.ZorkaConfig;
 
 import java.net.Socket;
 
@@ -34,7 +33,7 @@ public class NagiosAgent extends AbstractTcpAgent {
      * @param agent bsh agent
      */
     public NagiosAgent(ZorkaBshAgent agent) {
-        super(agent, ZorkaConfig.getProperties(), "nagios", 5669);
+        super(agent, "nagios", "127.0.0.1", 5669);
     }
 
     @Override

@@ -102,10 +102,10 @@ public class AgentInstance {
     }
 
     /** Number of threads handling requests */
-    private int requestThreads = 4;
+    private int requestThreads;
 
     /** Size of request queue */
-    private int requestQueue = 64;
+    private int requestQueue;
 
     /** Executor managing threads that handle requests */
     private Executor executor;
@@ -156,22 +156,10 @@ public class AgentInstance {
      * @param props configuration properties
      */
     public AgentInstance(Properties props) {
-
         this.props = props;
 
-        try {
-            requestThreads = Integer.parseInt(props.getProperty("zorka.req.threads").trim());
-        } catch (NumberFormatException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Invalid " + "zorka.req.threads" + " setting: '" + props.getProperty("zorka.req.threads").trim() + "'");
-            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
-        }
-
-        try {
-            requestQueue = Integer.parseInt(props.getProperty("zorka.req.queue").trim());
-        } catch (NumberFormatException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Invalid " + "zorka.req.queue" + "setting: '" + props.getProperty("zorka.req.queue").trim() + "'");
-            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
-        }
+        requestThreads = ZorkaConfig.intCfg("zorka.req.threads", 4);
+        requestQueue = ZorkaConfig.intCfg("zorka.req.queue", 64);
     }
 
 
@@ -191,7 +179,7 @@ public class AgentInstance {
         normLib = new NormLib();
         zorkaAgent.install("normalizers", normLib);
 
-        if ("yes".equalsIgnoreCase(props.getProperty("spy"))) {
+        if (ZorkaConfig.boolCfg("spy", true)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Zorka SPY");
             spyInstance = SpyInstance.instance();
             spyLib = new SpyLib(spyInstance);
@@ -217,7 +205,7 @@ public class AgentInstance {
 
 
     private void initIntegrationLibs() {
-        if ("yes".equalsIgnoreCase(props.getProperty("zabbix"))) {
+        if (ZorkaConfig.boolCfg("zabbix", true)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling ZABBIX subsystem ...");
             zabbixAgent = new ZabbixAgent(zorkaAgent);
             zabbixAgent.start();
@@ -225,19 +213,19 @@ public class AgentInstance {
             zorkaAgent.install("zabbix", zabbixLib);
         }
 
-        if ("yes".equalsIgnoreCase(props.getProperty("syslog"))) {
+        if (ZorkaConfig.boolCfg("syslog", true)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Syslog subsystem ....");
             syslogLib = new SyslogLib();
             zorkaAgent.install("syslog", syslogLib);
         }
 
-        if ("yes".equalsIgnoreCase(props.getProperty("snmp"))) {
+        if (ZorkaConfig.boolCfg("snmp", true)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling SNMP subsystem ...");
             snmpLib = new SnmpLib();
             zorkaAgent.install("snmp", snmpLib);
         }
 
-        if ("yes".equalsIgnoreCase(props.getProperty("nagios"))) {
+        if (ZorkaConfig.boolCfg("nagios", false)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Nagios support.");
             nagiosAgent = new NagiosAgent(zorkaAgent);
             nagiosLib = new NagiosLib();
@@ -253,10 +241,10 @@ public class AgentInstance {
      * @param props configuration properties
      */
     public void initLoggers(Properties props) {
-        initFileTrapper(props);
+        initFileTrapper();
 
-        if ("yes".equalsIgnoreCase(props.getProperty("zorka.syslog", "no").trim())) {
-            initSyslogTrapper(props);
+        if (ZorkaConfig.boolCfg("zorka.syslog", false)) {
+            initSyslogTrapper();
         }
 
         ZorkaLogger.configure(props);
@@ -264,15 +252,13 @@ public class AgentInstance {
 
 
     /**
-     * Creates and configures syslog trapper according to configuration properties
-     *
-     * @param props configuration properties
+     * Creates and configures syslogt trapper according to configuration properties
      */
-    private void initSyslogTrapper(Properties props) {
+    private void initSyslogTrapper() {
         try {
-            String server = props.getProperty("zorka.syslog.server", "127.0.0.1").trim();
-            String hostname = props.getProperty("zorka.hostname", "zorka").trim();
-            int syslogFacility = SyslogLib.getFacility(props.getProperty("zorka.syslog.facility", "F_LOCAL0").trim());
+            String server = ZorkaConfig.stringCfg("zorka.syslog.server", "127.0.0.1");
+            String hostname = ZorkaConfig.stringCfg("zorka.hostname", "zorka");
+            int syslogFacility = SyslogLib.getFacility(ZorkaConfig.stringCfg("zorka.syslog.facility", "F_LOCAL0"));
 
             SyslogTrapper syslog = new SyslogTrapper(server, hostname, syslogFacility, true);
             syslog.disableTrapCounter();
@@ -290,20 +276,19 @@ public class AgentInstance {
     /**
      * Creates and configures file trapper according to configuration properties
      *
-     * @param props configuration properties
      */
-    private void initFileTrapper(Properties props) {
+    private void initFileTrapper() {
         String logDir = ZorkaConfig.getLogDir();
-        boolean logExceptions = "yes".equalsIgnoreCase(props.getProperty("zorka.log.exceptions"));
-        String logFileName = props.getProperty("zorka.log.fname").trim();
+        boolean logExceptions = ZorkaConfig.boolCfg("zorka.log.exceptions", true);
+        String logFileName = ZorkaConfig.stringCfg("zorka.log.fname", "zorka.log");
         ZorkaLogLevel logThreshold = ZorkaLogLevel.DEBUG;
 
         int maxSize = 4*1024*1024, maxLogs = 4;
 
         try {
-            logThreshold = ZorkaLogLevel.valueOf (props.getProperty("zorka.log.level"));
-            maxSize = (int) ZorkaUtil.parseIntSize(props.getProperty("zorka.log.size").trim());
-            maxLogs = (int)ZorkaUtil.parseIntSize(props.getProperty("zorka.log.num").trim());
+            logThreshold = ZorkaLogLevel.valueOf(ZorkaConfig.stringCfg("zorka.log.level", "INFO"));
+            maxSize = (int)(long)ZorkaConfig.kiloCfg("zorka.log.size", 4L*1024*1024);
+            maxLogs = ZorkaConfig.intCfg("zorka.log.num", 8);
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing logger arguments", e);
             log.info(ZorkaLogger.ZAG_ERRORS, "File trapper will be disabled.");
