@@ -282,6 +282,9 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
             case MetricTemplate.WINDOWED_RATE:
                 metric = new WindowedRateMetric(id, name, attrs);
                 break;
+            case MetricTemplate.UTILIZATION:
+                metric = new UtilizationMetric(id, name, attrs);
+                break;
         }
 
         output.newMetric(metric);
