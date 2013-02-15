@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.agent;
 
+import com.jitlogic.zorka.agent.mbeans.AttrGetter;
 import com.jitlogic.zorka.agent.perfmon.PerfMonLib;
 import com.jitlogic.zorka.agent.spy.TracerLib;
 import com.jitlogic.zorka.common.*;
@@ -312,6 +313,9 @@ public class AgentInstance {
             props.getProperty("zorka.version"), "Agent Diagnostics");
 
         AgentDiagnostics.initMBean(mBeanServerRegistry, mbeanName);
+
+        mBeanServerRegistry.getOrRegister("java", mbeanName, "SymbolsCreated",
+            new AttrGetter(spyInstance.getTracer().getSymbolRegistry(), "size()"));
     }
 
 

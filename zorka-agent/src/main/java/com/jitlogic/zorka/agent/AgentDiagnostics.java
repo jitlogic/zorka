@@ -56,6 +56,7 @@ public class AgentDiagnostics {
     public static final int AVG_CNT_CREATED      = 28;
     public static final int CONFIG_ERRORS        = 29;
     public static final int SPY_SUBMISSIONS      = 30;
+    public static final int ZORKA_STATS_CREATED  = 31;
 
     //public static final int SYMBOLS_CREATED      = 27; // TODO make this metric appear
 
@@ -92,6 +93,7 @@ public class AgentDiagnostics {
             "AvgCountersCreated",   // AVG_CNT_CREATED      = 28
             "ConfigErrors",         // CONFIG_ERRORS        = 29
             "SpySubmissions",       // SPY_SUBMISSIONS      = 30
+            "ZorkaStatsCreated",    // ZORKA_STATS_CREATED  = 31
             //"SymbolsCreated",       // SYMBOLS_CREATED      = 27    TODO make this metric appear
     };
 
