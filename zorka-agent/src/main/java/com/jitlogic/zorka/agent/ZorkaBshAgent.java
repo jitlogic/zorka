@@ -198,7 +198,7 @@ public class ZorkaBshAgent {
     public void loadScriptDir(String path, String mask) {
         try {
             File dir = new File(path);
-            log.debug(ZorkaLogger.ZAG_CONFIG, "Listing directory: " + path);
+            log.info(ZorkaLogger.ZAG_CONFIG, "Listing directory: " + path);
             String[] files = dir.list();
             if (files == null || files.length == 0) {
                 return;
@@ -209,7 +209,7 @@ public class ZorkaBshAgent {
                     continue;
                 }
                 String scrPath = path + "/" + fname;
-                log.debug(ZorkaLogger.ZAG_CONFIG, "Loading file: " + scrPath);
+                log.info(ZorkaLogger.ZAG_CONFIG, "Loading file: " + scrPath);
                 File scrFile = new File(scrPath);
                 if (fname.endsWith(".bsh") && scrFile.isFile()) {
                     loadScript(scrPath);
