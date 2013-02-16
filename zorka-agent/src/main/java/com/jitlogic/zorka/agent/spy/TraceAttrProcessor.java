@@ -16,6 +16,9 @@
 
 package com.jitlogic.zorka.agent.spy;
 
+import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLogger;
+
 import java.util.Map;
 
 /**
@@ -25,6 +28,9 @@ import java.util.Map;
  * @author rafal.lewczuk@jitlogic.com
  */
 public class TraceAttrProcessor implements SpyProcessor {
+
+    /** Logger */
+    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     /** Tracer object */
     private Tracer tracer;
@@ -55,9 +61,25 @@ public class TraceAttrProcessor implements SpyProcessor {
     public Map<String, Object> process(Map<String, Object> record) {
         Object val = record.get(srcField);
 
+
         if (val != null) {
+            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                TraceRecord top = ((TraceBuilder)tracer.getHandler()).getTTop();
+                log.debug(ZorkaLogger.ZSP_ARGPROC, "Value: '" + val + "' stored as trace attribute "
+                    + sym(attrId) + " (classId= " + top.getClassId() + " methodId=" + top.getMethodId()
+                    + " signatureId=" + top.getSignatureId() + ")");
+            }
             tracer.getHandler().newAttr(attrId, val);
+        } else {
+            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                log.debug(ZorkaLogger.ZSP_ARGPROC, "Null value received. ");
+            }
         }
+
         return record;
+    }
+
+    private String sym(int id) {
+        return tracer.getSymbolRegistry().symbolName(id);
     }
 }

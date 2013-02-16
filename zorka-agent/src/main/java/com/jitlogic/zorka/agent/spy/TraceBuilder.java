@@ -39,6 +39,7 @@ public class TraceBuilder extends TraceEventHandler {
     /** Top of trace records stack. */
     private TraceRecord ttop = new TraceRecord(null);
 
+    private boolean disabled;
 
     /** Number of records collected so far */
     private int numRecords = 0;
@@ -77,6 +78,14 @@ public class TraceBuilder extends TraceEventHandler {
     @Override
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
 
+        if (disabled) {
+            return;
+        }
+
+        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS)) {
+            log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceEnter(classId=" + classId + ", methodId="
+                    + methodId + ", signatureId=" + signatureId + ")");
+        }
         if (!ttop.isEmpty()) {
             if (ttop.inTrace()) {
                 ttop = new TraceRecord(ttop);
@@ -105,6 +114,15 @@ public class TraceBuilder extends TraceEventHandler {
     @Override
     public void traceReturn(long tstamp) {
 
+        if (disabled) {
+            return;
+        }
+
+        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS)) {
+            log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceReturn(classId=" + ttop.getClassId()
+                    + " methodId=" + ttop.getMethodId() + " signatureId=" + ttop.getSignatureId() + ")");
+        }
+
         while (!(ttop.getClassId() != 0) && ttop.getParent() != null) {
             ttop = ttop.getParent();
         }
@@ -117,6 +135,15 @@ public class TraceBuilder extends TraceEventHandler {
 
     @Override
     public void traceError(Object exception, long tstamp) {
+
+        if (disabled) {
+            return;
+        }
+
+        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS)) {
+            log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceError(classId=" + ttop.getClassId()
+                    + " methodId=" + ttop.getMethodId() + " signatureId=" + ttop.getSignatureId() + ")", exception);
+        }
 
         while (!(ttop.getClassId() != 0) && ttop.getParent() != null) {
             ttop = ttop.getParent();
@@ -136,6 +163,15 @@ public class TraceBuilder extends TraceEventHandler {
         ttop.setAttr(attrId, attrVal);
     }
 
+    @Override
+    public void disable() {
+        disabled = true;
+    }
+
+    @Override
+    public void enable() {
+        disabled = false;
+    }
 
 
     /**
@@ -239,6 +275,11 @@ public class TraceBuilder extends TraceEventHandler {
     private void submit(TraceRecord record) {
         record.fixup(symbols);
         output.submit(record);
+    }
+
+
+    public TraceRecord getTTop() {
+        return ttop;
     }
 
 

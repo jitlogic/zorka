@@ -53,6 +53,7 @@ public class MainSubmitter {
      */
     public static void submit(int stage, int id, int submitFlags, Object[] vals) {
         try {
+            tracer.getHandler().disable();
             if (submitter != null) {
                 submitter.submit(stage, id, submitFlags, vals);
             }
@@ -62,6 +63,8 @@ public class MainSubmitter {
         } catch (Throwable e) {
             log.debug(ZorkaLogger.ZSP_ERRORS, "Error submitting value from instrumented code: ", e);
             AgentDiagnostics.inc(AgentDiagnostics.SPY_ERRORS);
+        } finally {
+            tracer.getHandler().enable();
         }
     }
 
@@ -77,10 +80,6 @@ public class MainSubmitter {
 
         if (tracer != null) {
             try {
-                if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS)) {
-                    log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceEnter(classId=" + classId + ", methodId="
-                            + methodId + ", signatureId=" + signatureId + ")");
-                }
                 tracer.getHandler().traceEnter(classId, methodId, signatureId, System.nanoTime());
             } catch (Throwable e) {
                 log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceEnter", e);
@@ -98,7 +97,6 @@ public class MainSubmitter {
 
         if (tracer != null) {
             try {
-                log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceReturn()");
                 tracer.getHandler().traceReturn(System.nanoTime());
             } catch (Throwable e) {
                log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceReturn", e);
@@ -118,7 +116,6 @@ public class MainSubmitter {
 
         if (tracer != null) {
             try {
-                log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceError()", exception);
                 tracer.getHandler().traceError(exception, System.nanoTime());
             } catch (Throwable e) {
                 log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceError", e);

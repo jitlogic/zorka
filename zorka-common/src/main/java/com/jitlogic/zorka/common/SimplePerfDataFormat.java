@@ -184,6 +184,14 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
         }
     }
 
+    @Override
+    public void disable() {
+    }
+
+    @Override
+    public void enable() {
+    }
+
 
     @Override
     public void perfData(long clock, int scannerId, List<PerfSample> samples) {
