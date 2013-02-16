@@ -32,7 +32,7 @@ public class TraceDetailTableModel extends AbstractTableModel {
     private static final String[] colNames = { "Time", "Calls", "Err", "Pct", "Method" };
 
     /** Preferred table column widths */
-    private static final int[] colWidth    = { 75, 50, 50, 50, 640 };
+    private static final int[] colWidth    = { 75, 50, 50, 50, 1640 };
 
     /** Current data ("flattened" method call tree representing single trace) */
     private List<NamedTraceRecord> data = new ArrayList<NamedTraceRecord>(1);
