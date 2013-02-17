@@ -86,6 +86,8 @@ __tomcat() {
 
   if (zorka.boolCfg("tracer", false)) {
 
+    zorka.logInfo("Enabling tracer Tomcat configuration.");
+
     tracer.exclude(
       spy.byClass("sun.**"),
       spy.byClass("java.**"),
@@ -105,12 +107,22 @@ __tomcat() {
           tracer.begin("HTTP_REQ"), 
           zorka.boolCfg("tracer.verbose", false) ? spy.zorkaLog("INFO", "HTTP_REQ", "URI=${URI}") : null,
           tracer.attr("URI", "URI"))
+      .onReturn(spy.fetchArg("RESP", 2),
+          spy.get("RESP", "STATUS", "response", "status"),
+          tracer.attr("STATUS", "STATUS"))
       .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
 
     tracer.output(tracer.toFile(
       zorka.stringCfg("tracer.log.path", "${zorka.log.dir}/trace.trc"),
       zorka.intCfg("tracer.log.fnum", 8),
       zorka.kiloCfg("tracer.log.size", 128*1024*1024)));
+
+    if (zorka.boolCfg("tracer.verbose", false)) {
+      zorka.logInfo("Tracer set in VERBOSE mode. Trace files can grow quite big though.");
+      tracer.setTracerMinMethodTime(0);
+      tracer.setTracerMinTraceTime(0);
+      tracer.setTracerMaxTraceRecords(65536);
+    }
 
   }  // tracer
 
