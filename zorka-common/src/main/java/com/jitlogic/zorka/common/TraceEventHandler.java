@@ -62,4 +62,8 @@ public abstract class TraceEventHandler {
      * @param attrVal parameter value
      */
     public abstract void newAttr(int attrId, Object attrVal);
+
+    public abstract void disable();
+
+    public abstract void enable();
 }

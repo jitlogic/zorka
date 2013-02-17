@@ -58,4 +58,8 @@ public class MetricsRegistry {
     public Metric getMetric(int id) {
         return metricById.get(id);
     }
+
+    public int size() {
+        return metricById.size();
+    }
 }

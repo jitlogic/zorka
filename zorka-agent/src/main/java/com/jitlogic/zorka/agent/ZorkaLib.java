@@ -693,9 +693,7 @@ public class ZorkaLib  {
      * @return true if entry exists and is non-empty
      */
     public boolean hasCfg(String key) {
-        String s = ZorkaConfig.getProperties().getProperty(key);
-
-        return s != null && s.trim().length() > 0;
+        return ZorkaConfig.hasCfg(key);
     }
 
 
@@ -710,21 +708,7 @@ public class ZorkaLib  {
      * @return
      */
     public Boolean boolCfg(String key, Boolean defval) {
-        String s = ZorkaConfig.getProperties().getProperty(key);
-
-        if (s != null) {
-            s = s.trim();
-
-            if (s.equalsIgnoreCase("true") || s.equalsIgnoreCase(("yes"))) {
-                return true;
-            } else if (s.equalsIgnoreCase("false") || s.equalsIgnoreCase("no")) {
-                return false;
-            } else {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Invalid value for '" + key + "' -> '" + s + "'. Setting default value of '" + defval);
-            }
-        }
-
-        return defval;
+        return ZorkaConfig.boolCfg(key, defval);
     }
 
 
@@ -734,18 +718,7 @@ public class ZorkaLib  {
 
 
     public Integer intCfg(String key, Integer defval) {
-        String s = ZorkaConfig.getProperties().getProperty(key);
-
-        try {
-            if (s != null) {
-                return Integer.parseInt(s.trim());
-            } else {
-                return defval;
-            }
-        } catch (NumberFormatException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
-            return defval;
-        }
+        return ZorkaConfig.intCfg(key, defval);
     }
 
 
@@ -755,57 +728,17 @@ public class ZorkaLib  {
 
 
     public Long longCfg(String key, Long defval) {
-        String s = ZorkaConfig.getProperties().getProperty(key);
-
-        try {
-            if (s != null) {
-                return Long.parseLong(s.trim());
-            } else {
-                return defval;
-            }
-        } catch (NumberFormatException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
-            return defval;
-        }
+        return ZorkaConfig.longCfg(key, defval);
     }
-
-    private static Map<String,Long> kilos = ZorkaUtil.map(
-            "k", 1024L, "K", 1024L,
-            "m", 1024*1024L, "M", 1024*1024L,
-            "g", 1024*1024*1024L, "G", 1024*1024*1024L,
-            "t", 1024*1024*1024*1024L, "T", 1024*1024*1024*1024L);
-
-    Pattern kiloRe = Pattern.compile("^([0-9]+)([kKmMgGtT])$");
 
 
     public Long kiloCfg(String key) {
         return kiloCfg(key, null);
     }
 
+
     public Long kiloCfg(String key, Long defval) {
-        String s = ZorkaConfig.getProperties().getProperty(key);
-
-        long multi = 1L;
-
-        if (s != null) {
-            Matcher matcher = kiloRe.matcher(s);
-
-            if (matcher.matches()) {
-                s = matcher.group(1);
-                multi = kilos.get(matcher.group(2));
-            }
-        }
-
-        try {
-            if (s != null) {
-                return Long.parseLong(s.trim()) * multi;
-            } else {
-                return defval;
-            }
-        } catch (NumberFormatException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
-            return defval;
-        }
+        return ZorkaConfig.kiloCfg(key, defval);
     }
 
 
@@ -815,9 +748,7 @@ public class ZorkaLib  {
 
 
     public String stringCfg(String key, String defval) {
-        String s = ZorkaConfig.getProperties().getProperty(key);
-
-        return s != null ? s.trim() : defval;
+        return ZorkaConfig.stringCfg(key, defval);
     }
 
 
@@ -831,21 +762,7 @@ public class ZorkaLib  {
      * @return parsed list
      */
     public List<String> listCfg(String key, String...defVals) {
-        String s = ZorkaConfig.getProperties().getProperty(key);
-
-        if (s != null) {
-            String[] ss = s.split(",");
-            List<String> lst = new ArrayList<String>(ss.length);
-            for (String str : ss) {
-                str = str.trim();
-                if (str.length() > 0) {
-                    lst.add(str);
-                }
-            }
-            return lst;
-        } else {
-            return Arrays.asList(defVals);
-        }
+        return ZorkaConfig.listCfg(key, defVals);
     }
 
 

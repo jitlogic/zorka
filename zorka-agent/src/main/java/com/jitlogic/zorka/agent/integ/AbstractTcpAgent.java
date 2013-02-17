@@ -15,7 +15,9 @@
  */
 package com.jitlogic.zorka.agent.integ;
 
+import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
+import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogger;
 
@@ -24,6 +26,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -56,49 +60,47 @@ public abstract class AbstractTcpAgent implements Runnable {
     /** TCP listen address */
     private InetAddress listenAddr;
 
-    /** Agent will only accept connections coming from this address. */
-    private InetAddress serverAddr;
+    /** List of addresses from which agent will accept connections. */
+    private List<InetAddress> allowedAddrs = new ArrayList<InetAddress>();
 
     /** TCP server socket */
     private ServerSocket socket;
 
+
     /**
      * Standard constructor
      * @param agent BSH agent
-     * @param props configuration properties
      * @param prefix agent name prefix
+     * @param defaultAddr
      * @param defaultPort agent default port
      */
-    public AbstractTcpAgent(ZorkaBshAgent agent, Properties props, String prefix, int defaultPort) {
+    public AbstractTcpAgent(ZorkaBshAgent agent, String prefix, String defaultAddr, int defaultPort) {
 
         this.agent = agent;
         this.prefix = prefix;
 
-        String la = props.getProperty(prefix+".listen.addr");
+        String la = ZorkaConfig.stringCfg(prefix+".listen.addr", defaultAddr);
         try {
             listenAddr = InetAddress.getByName(la.trim());
         } catch (UnknownHostException e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse "+prefix+".listen.addr in zorka.properties", e);
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         }
 
-        String lp = props.getProperty(prefix+".listen.port");
-        try {
-            listenPort = Integer.parseInt(lp);
-        } catch (NumberFormatException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Invalid '"+prefix+".listen.port' setting in zorka.properties file. Was '" + lp + "', should be integer.");
-        }
+        listenPort = ZorkaConfig.intCfg(prefix+".listen.port", defaultPort);
 
         log.info(ZorkaLogger.ZAG_ERRORS, "Zorka will listen for "+prefix+" connections on " + listenAddr + ":" + listenPort);
 
-        String sa = props.getProperty(prefix+".server.addr");
-        try {
-            log.info(ZorkaLogger.ZAG_ERRORS, "Zorka will accept "+prefix+" connections from '" + sa.trim() + "'.");
-            serverAddr = InetAddress.getByName(sa.trim());
-        } catch (UnknownHostException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse "+prefix+".server.addr in zorka.properties", e);
+        for (String sa : ZorkaConfig.listCfg(prefix+".server.addr", "127.0.0.1")) {
+            try {
+                log.info(ZorkaLogger.ZAG_ERRORS, "Zorka will accept "+prefix+" connections from '" + sa.trim() + "'.");
+                allowedAddrs.add(InetAddress.getByName(sa.trim()));
+            } catch (UnknownHostException e) {
+                log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse "+prefix+".server.addr in zorka.properties", e);
+            }
         }
-
     }
+
 
     /**
      * Opens socket and starts agent thread.
@@ -168,7 +170,7 @@ public abstract class AbstractTcpAgent implements Runnable {
             ZorkaRequestHandler rh = null;
             try {
                 sock = socket.accept();
-                if (!sock.getInetAddress().equals(serverAddr)) {
+                if (!allowedAddr(sock)) {
                     log.warn(ZorkaLogger.ZAG_WARNINGS, "Illegal connection attempt from '" + socket.getInetAddress() + "'.");
                     sock.close();
                 } else {
@@ -190,6 +192,18 @@ public abstract class AbstractTcpAgent implements Runnable {
 
         thread = null;
 
+    }
+
+
+    private boolean allowedAddr(Socket sock) {
+
+        for (InetAddress addr : allowedAddrs) {
+            if (addr.equals(sock.getInetAddress())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

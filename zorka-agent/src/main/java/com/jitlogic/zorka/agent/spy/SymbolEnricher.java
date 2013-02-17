@@ -174,6 +174,16 @@ public class SymbolEnricher extends PerfDataEventHandler {
         output.newAttr(attrId, attrVal);
     }
 
+    @Override
+    public void disable() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void enable() {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
 
     @Override
     public void perfData(long clock, int scannerId, List<PerfSample> samples) {

@@ -1,0 +1,22 @@
+
+__j2ee() {
+
+  if (zorka.boolCfg("tracer", false)) {
+
+    spy.add(spy.instance()
+      .onEnter(tracer.begin("EJB"))
+      .include(
+        spy.byAnnotation("javax.ejb.Stateless"),
+        spy.byAnnotation("javax.ejb.Stateful")));
+
+    spy.add(spy.instance()
+      .onEnter(tracer.begin("JMS"))
+      .include(
+        spy.byInterface("javax.jms.MessageListener", "onMessage"),
+        spy.byInterface("javax.jms.TopicPublisher", "publish"),
+        spy.byInterface("javax.jms.QueueSender", "send")));
+
+  return this;
+}
+
+j2ee = __j2ee();

@@ -184,6 +184,14 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
         }
     }
 
+    @Override
+    public void disable() {
+    }
+
+    @Override
+    public void enable() {
+    }
+
 
     @Override
     public void perfData(long clock, int scannerId, List<PerfSample> samples) {
@@ -281,6 +289,9 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
                 break;
             case MetricTemplate.WINDOWED_RATE:
                 metric = new WindowedRateMetric(id, name, attrs);
+                break;
+            case MetricTemplate.UTILIZATION:
+                metric = new UtilizationMetric(id, name, attrs);
                 break;
         }
 

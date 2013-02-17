@@ -148,10 +148,12 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
             }
         }
 
-        AgentDiagnostics.inc(AgentDiagnostics.TRAPS_SUBMITTED);
+        AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SUBMITTED);
+
         if (!submit(sb.toString())) {
-            AgentDiagnostics.inc(AgentDiagnostics.TRAPS_DROPPED);
+                AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_DROPPED);
         }
+
     }
 
 
@@ -198,7 +200,7 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
         if (out != null) {
             out.println(msg);
             currentSize += msg.getBytes().length + 1;
-            AgentDiagnostics.inc(AgentDiagnostics.TRAPS_SENT);
+            AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SENT);
         }
     }
 

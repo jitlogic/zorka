@@ -43,6 +43,8 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
 
     private boolean flushNeeded;
 
+    protected boolean countTraps = true;
+
     /**
      * Standard constructor.
      *
@@ -163,5 +165,9 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
         if (log != null) {
             log.error(ZorkaLogger.ZAG_ERRORS, message, e);
         }
+    }
+
+    public void disableTrapCounter() {
+        countTraps = false;
     }
 }

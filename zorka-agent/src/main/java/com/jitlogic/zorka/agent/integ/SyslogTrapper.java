@@ -132,9 +132,9 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
      */
     public void log(int severity, int facility, String hostname, String tag, String message) {
         String s = format(severity, facility, new Date(), hostname, tag, message);
-        AgentDiagnostics.inc(AgentDiagnostics.TRAPS_SUBMITTED);
+        AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SUBMITTED);
         if (!submit(s)) {
-            AgentDiagnostics.inc(AgentDiagnostics.TRAPS_DROPPED);
+            AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_DROPPED);
         }
     }
 
@@ -185,7 +185,7 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
         byte[] buf = msg.getBytes();
         try {
             socket.send(new DatagramPacket(buf, 0, buf.length, syslogAddress, syslogPort));
-            AgentDiagnostics.inc(AgentDiagnostics.TRAPS_SENT);
+            AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SENT);
         } catch (IOException e) {
             if (log != null) {
                 handleError("Cannot send syslog packet: " + msg, e);

@@ -172,6 +172,8 @@ public class MainWindow extends JFrame {
             }
         });
 
+        tblTraces.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
         scrTraces.setMinimumSize(new Dimension(200, 384));
         scrTraces.setViewportView(tblTraces);
 
@@ -199,7 +201,7 @@ public class MainWindow extends JFrame {
         tbmTraceDetail = new TraceDetailTableModel();
         tblTraceDetail = new JTable(tbmTraceDetail);
         tbmTraceDetail.configure(tblTraceDetail);
-        tblTraceDetail.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        tblTraceDetail.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         tblTraceDetail.setAutoCreateColumnsFromModel(false);
         scrTraceDetail.setViewportView(tblTraceDetail);
 

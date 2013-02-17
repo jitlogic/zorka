@@ -117,9 +117,9 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
             }
 
             if (trap != null) {
-                AgentDiagnostics.inc(AgentDiagnostics.TRAPS_SUBMITTED);
+                AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SUBMITTED);
                 if (!submit(trap)) {
-                    AgentDiagnostics.inc(AgentDiagnostics.TRAPS_DROPPED);
+                    AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_DROPPED);
                 }
             }
 
@@ -154,7 +154,7 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
             } else if (trap instanceof SNMPv2TrapPDU) {
                 sender.sendTrap(snmpAddr, community, (SNMPv2TrapPDU) trap);
             }
-            AgentDiagnostics.inc(AgentDiagnostics.TRAPS_SENT);
+            AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SENT);
         } catch (IOException e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error sending SNMP trap", e);
         }

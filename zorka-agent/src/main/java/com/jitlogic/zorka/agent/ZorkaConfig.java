@@ -20,12 +20,15 @@ package com.jitlogic.zorka.agent;
 import com.jitlogic.zorka.common.ObjectInspector;
 import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.common.ZorkaUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Zorka Configuration handling class. 
@@ -182,6 +185,127 @@ public class ZorkaConfig {
      */
     public static String formatCfg(String input) {
         return properties == null ? input : ObjectInspector.substitute(input, properties);
+    }
+
+    public static List<String> listCfg(String key, String...defVals) {
+        String s = properties.getProperty(key);
+
+        if (s != null) {
+            String[] ss = s.split(",");
+            List<String> lst = new ArrayList<String>(ss.length);
+            for (String str : ss) {
+                str = str.trim();
+                if (str.length() > 0) {
+                    lst.add(str);
+                }
+            }
+            return lst;
+        } else {
+            return Arrays.asList(defVals);
+        }
+    }
+
+    private static Map<String,Long> kilos = ZorkaUtil.map(
+            "k", 1024L, "K", 1024L,
+            "m", 1024 * 1024L, "M", 1024 * 1024L,
+            "g", 1024 * 1024 * 1024L, "G", 1024 * 1024 * 1024L,
+            "t", 1024 * 1024 * 1024 * 1024L, "T", 1024 * 1024 * 1024 * 1024L);
+
+    private static Pattern kiloRe = Pattern.compile("^([0-9]+)([kKmMgGtT])$");
+
+
+    public static Long kiloCfg(String key, Long defval) {
+        String s = properties.getProperty(key);
+
+        long multi = 1L;
+
+        if (s != null) {
+            Matcher matcher = kiloRe.matcher(s);
+
+            if (matcher.matches()) {
+                s = matcher.group(1);
+                multi = kilos.get(matcher.group(2));
+            }
+        }
+
+        try {
+            if (s != null) {
+                return Long.parseLong(s.trim()) * multi;
+            } else {
+                return defval;
+            }
+        } catch (NumberFormatException e) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
+            return defval;
+        }
+    }
+
+
+    public static String stringCfg(String key, String defval) {
+        String s = properties.getProperty(key);
+
+        return s != null ? s.trim() : defval;
+    }
+
+
+    public static Long longCfg(String key, Long defval) {
+        String s = properties.getProperty(key);
+
+        try {
+            if (s != null) {
+                return Long.parseLong(s.trim());
+            } else {
+                return defval;
+            }
+        } catch (NumberFormatException e) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
+            return defval;
+        }
+    }
+
+
+    public static Integer intCfg(String key, Integer defval) {
+        String s = properties.getProperty(key);
+
+        try {
+            if (s != null) {
+                return Integer.parseInt(s.trim());
+            } else {
+                return defval;
+            }
+        } catch (NumberFormatException e) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
+            return defval;
+        }
+    }
+
+
+    public static Boolean boolCfg(String key, Boolean defval) {
+        String s = properties.getProperty(key);
+
+        if (s != null) {
+            s = s.trim();
+
+            if (s.equalsIgnoreCase("true") || s.equalsIgnoreCase(("yes"))) {
+                return true;
+            } else if (s.equalsIgnoreCase("false") || s.equalsIgnoreCase("no")) {
+                return false;
+            } else {
+                log.error(ZorkaLogger.ZAG_ERRORS, "Invalid value for '" + key + "' -> '" + s + "'. Setting default value of '" + defval);
+                AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
+            }
+        }
+
+        return defval;
+    }
+
+    public static boolean hasCfg(String key) {
+        String s = properties.getProperty(key);
+
+        return s != null && s.trim().length() > 0;
     }
 
 }

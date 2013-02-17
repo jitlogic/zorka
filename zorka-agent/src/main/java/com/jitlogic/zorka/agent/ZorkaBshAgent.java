@@ -133,8 +133,10 @@ public class ZorkaBshAgent {
 			interpreter.source(url.getPath());
 		} catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error loading script " + url, e);
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
 		} catch (EvalError e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error executing script " + url, e);
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         }
 	}
 
@@ -149,8 +151,10 @@ public class ZorkaBshAgent {
             interpreter.source(path);
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error loading script " + path, e);
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         } catch (EvalError e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error executing script " + path, e);
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         }
     }
 
@@ -194,7 +198,7 @@ public class ZorkaBshAgent {
     public void loadScriptDir(String path, String mask) {
         try {
             File dir = new File(path);
-            log.debug(ZorkaLogger.ZAG_CONFIG, "Listing directory: " + path);
+            log.info(ZorkaLogger.ZAG_CONFIG, "Listing directory: " + path);
             String[] files = dir.list();
             if (files == null || files.length == 0) {
                 return;
@@ -205,7 +209,7 @@ public class ZorkaBshAgent {
                     continue;
                 }
                 String scrPath = path + "/" + fname;
-                log.debug(ZorkaLogger.ZAG_CONFIG, "Loading file: " + scrPath);
+                log.info(ZorkaLogger.ZAG_CONFIG, "Loading file: " + scrPath);
                 File scrFile = new File(scrPath);
                 if (fname.endsWith(".bsh") && scrFile.isFile()) {
                     loadScript(scrPath);
