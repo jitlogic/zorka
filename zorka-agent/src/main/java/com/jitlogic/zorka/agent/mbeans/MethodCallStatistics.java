@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.agent.mbeans;
 
+import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.common.ZorkaStat;
 import com.jitlogic.zorka.common.ZorkaStats;
 
@@ -62,6 +63,7 @@ public class MethodCallStatistics implements ZorkaStats {
 		
 		if (ret == null) {
             ret = stats.putIfAbsent(name, MethodCallStatistic.newStatAvg15(name));
+            AgentDiagnostics.inc(AgentDiagnostics.ZORKA_STATS_CREATED);
 		}
 		
 		return ret;

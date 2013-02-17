@@ -18,11 +18,12 @@ package com.jitlogic.zorka.viewer;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
+import java.util.Map;
 
 public class TraceTableModel extends AbstractTableModel {
 
-    private String[] colNames = { "Date", "Time", "Calls", "Err", "Label" };
-    private int[]    colWidth = { 75, 50, 50, 50, 150 };
+    private String[] colNames = { "Date", "Time", "Calls", "Err", "Recs", "Label" };
+    private int[]    colWidth = { 75, 50, 50, 50, 50, 550 };
 
     private PerfDataSet traceSet = new PerfDataSet();
 
@@ -66,8 +67,23 @@ public class TraceTableModel extends AbstractTableModel {
             case 3:
                 return el.getErrors();
             case 4:
-                return el.getTraceName();
+                return el.getRecords();
+            case 5:
+                return traceLabel(el);
         }
         return "?";
+    }
+
+
+    private String traceLabel(NamedTraceRecord rec) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(rec.getTraceName());
+        if (rec.getAttrs() != null) {
+            for (Map.Entry<String,Object> e : rec.getAttrs().entrySet()) {
+                sb.append('|');
+                sb.append(e.getValue());
+            }
+        }
+        return sb.toString();
     }
 }

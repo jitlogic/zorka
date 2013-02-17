@@ -18,6 +18,9 @@
 package com.jitlogic.zorka.agent;
 
 import bsh.EvalError;
+import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.common.ZorkaLogLevel;
+import com.jitlogic.zorka.common.ZorkaLogger;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -29,7 +32,7 @@ import java.io.IOException;
  */
 public class ZorkaBshWorker implements Runnable, Closeable {
 
-    // TODO integrate with ZorkaCallback, create single interface representing zorka query execution task;
+    private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaBshWorker.class);
 
     /** Reference to Zorka BSH agent */
 	private final ZorkaBshAgent agent;
@@ -66,9 +69,11 @@ public class ZorkaBshWorker implements Runnable, Closeable {
 		} catch (EvalError e) {
             callback.handleError(e);
             AgentDiagnostics.inc(AgentDiagnostics.AGENT_ERRORS);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error evaluating expression '" + expr + "'", e);
         } catch (Exception e) {
             callback.handleError(e);
             AgentDiagnostics.inc(AgentDiagnostics.AGENT_ERRORS);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error evaluating expression '" + expr + "'", e);
         }
 
         long t2 = System.nanoTime();

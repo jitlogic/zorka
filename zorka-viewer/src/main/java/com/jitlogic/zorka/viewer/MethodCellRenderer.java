@@ -117,6 +117,7 @@ public class MethodCellRenderer extends JLabel implements TableCellRenderer {
             g.setColor(Color.BLUE);
             for (Map.Entry<String,Object> e : record.getAttrs().entrySet()) {
                 g.drawString(e.getKey() + "=" + e.getValue(), offs + 8, 13 + line*16);
+                line++;
             }
         }
 

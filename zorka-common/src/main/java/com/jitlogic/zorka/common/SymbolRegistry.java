@@ -107,13 +107,8 @@ public class SymbolRegistry {
         }
     }
 
-
-    /**
-     * Returns ID of last registered symbol.
-     *
-     * @return last symbol ID
-     */
-    public int lastId() {
-        return lastSymbolId.get();
+    public int size() {
+        return symbolIds.size();
     }
+
 }

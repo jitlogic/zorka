@@ -52,6 +52,12 @@ public class AgentDiagnostics {
     public static final int TRACES_SUBMITTED     = 24;
     public static final int TRACES_DROPPED       = 25;
     public static final int METRICS_CREATED      = 26;
+    public static final int AVG_CNT_ERRORS       = 27;
+    public static final int AVG_CNT_CREATED      = 28;
+    public static final int CONFIG_ERRORS        = 29;
+    public static final int SPY_SUBMISSIONS      = 30;
+    public static final int ZORKA_STATS_CREATED  = 31;
+
     //public static final int SYMBOLS_CREATED      = 27; // TODO make this metric appear
 
 
@@ -83,6 +89,11 @@ public class AgentDiagnostics {
             "TracesSubmitted",      // TRACES_SUBMITTED     = 24
             "TracesDropped",        // TRACES_DROPPED       = 25
             "MetricsCreated",       // METRICS_CREATED      = 26
+            "AvgCounterErrors",     // AVG_CNT_ERRORS       = 27
+            "AvgCountersCreated",   // AVG_CNT_CREATED      = 28
+            "ConfigErrors",         // CONFIG_ERRORS        = 29
+            "SpySubmissions",       // SPY_SUBMISSIONS      = 30
+            "ZorkaStatsCreated",    // ZORKA_STATS_CREATED  = 31
             //"SymbolsCreated",       // SYMBOLS_CREATED      = 27    TODO make this metric appear
     };
 
@@ -109,6 +120,12 @@ public class AgentDiagnostics {
 
     public static void inc(int counter) {
         counters[counter].incrementAndGet();
+    }
+
+    public static void inc(boolean cond, int counter) {
+        if (cond) {
+            counters[counter].incrementAndGet();
+        }
     }
 
 

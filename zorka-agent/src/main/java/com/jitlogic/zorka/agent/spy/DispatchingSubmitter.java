@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.agent.spy;
 
+import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogger;
 import com.jitlogic.zorka.common.ZorkaUtil;
@@ -90,6 +91,7 @@ public class DispatchingSubmitter implements SpySubmitter {
             return;
         }
 
+        AgentDiagnostics.inc(AgentDiagnostics.SPY_SUBMISSIONS);
 
         if (sdef.getProcessors(ON_SUBMIT).size() > 0 && null == (record = process(ON_SUBMIT, sdef, record))) {
             return;

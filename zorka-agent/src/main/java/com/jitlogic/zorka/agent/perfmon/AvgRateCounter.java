@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.agent.perfmon;
 
+import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.agent.ZorkaLib;
 import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogger;
@@ -62,6 +63,7 @@ public class AvgRateCounter {
         if (aggregate == null) {
             aggregate = new RateAggregate(horizon, 0.0);
             aggregates.put(tag, aggregate);
+            AgentDiagnostics.inc(AgentDiagnostics.AVG_CNT_CREATED);
         }
 
         synchronized(aggregate) {
@@ -88,6 +90,7 @@ public class AvgRateCounter {
         } else {
             log.error(ZorkaLogger.ZAG_ERRORS, "Cannot coerce object of type '"
                     + (val != null ? val.getClass().getName() : "null") + "' to Long.");
+            AgentDiagnostics.inc(AgentDiagnostics.AVG_CNT_ERRORS);
             return 0;
         }
     }
