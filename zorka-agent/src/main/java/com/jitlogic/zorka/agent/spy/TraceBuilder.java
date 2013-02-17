@@ -83,8 +83,8 @@ public class TraceBuilder extends TraceEventHandler {
         }
 
         if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS)) {
-            log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceEnter(classId=" + classId + ", methodId="
-                    + methodId + ", signatureId=" + signatureId + ")");
+            log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceEnter("
+                + symbols.symbolName(classId) + "." + symbols.symbolName(methodId) + ")");
         }
         if (!ttop.isEmpty()) {
             if (ttop.inTrace()) {
@@ -119,8 +119,10 @@ public class TraceBuilder extends TraceEventHandler {
         }
 
         if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS)) {
-            log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceReturn(classId=" + ttop.getClassId()
-                    + " methodId=" + ttop.getMethodId() + " signatureId=" + ttop.getSignatureId() + ")");
+            TraceRecord tr = ttop;
+            if (tr.getClassId() == 0 && tr.getParent() != null) { tr = tr.getParent(); }
+            log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceReturn("
+                + symbols.symbolName(tr.getClassId()) + "." + symbols.symbolName(tr.getMethodId()) + ")");
         }
 
         while (!(ttop.getClassId() != 0) && ttop.getParent() != null) {
@@ -141,8 +143,10 @@ public class TraceBuilder extends TraceEventHandler {
         }
 
         if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS)) {
-            log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceError(classId=" + ttop.getClassId()
-                    + " methodId=" + ttop.getMethodId() + " signatureId=" + ttop.getSignatureId() + ")", exception);
+            TraceRecord tr = ttop;
+            if (tr.getClassId() == 0 && tr.getParent() != null) { tr = tr.getParent(); }
+            log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceError(" + symbols.symbolName(tr.getClassId()) +
+                "." + symbols.symbolName(tr.getMethodId()) + ")", (Throwable)exception);
         }
 
         while (!(ttop.getClassId() != 0) && ttop.getParent() != null) {
