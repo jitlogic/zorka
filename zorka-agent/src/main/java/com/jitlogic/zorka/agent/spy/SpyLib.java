@@ -17,9 +17,7 @@
 
 package com.jitlogic.zorka.agent.spy;
 
-import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.integ.SnmpLib;
-import com.jitlogic.zorka.common.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.ZorkaTrapper;
 import com.jitlogic.zorka.agent.integ.SnmpTrapper;
 import com.jitlogic.zorka.agent.integ.TrapVarBindDef;
@@ -168,7 +166,11 @@ public class SpyLib {
      * @return partially configured psy def
      */
     public SpyDefinition instrument() {
-        return SpyDefinition.instrument().onSubmit(tdiff("T1", "T2", "T")).onEnter();
+        return SpyDefinition.instance()
+                .onEnter(fetchTime("T1"))
+                .onReturn(fetchTime("T2"))
+                .onError(fetchTime("T2"))
+                .onSubmit(tdiff("T1", "T2", "T"));
     }
 
 
