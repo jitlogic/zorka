@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.agent.test.spy;
 
+import com.jitlogic.zorka.agent.mbeans.MethodCallStatistic;
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 import com.jitlogic.zorka.agent.mbeans.MethodCallStatistics;
 import com.jitlogic.zorka.agent.spy.SpyContext;
@@ -40,53 +41,42 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "test", "C0", "C0");
         SpyContext ctx = new SpyContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
 
-        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
-        record.put("S0",10L);
-        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << ON_SUBMIT));
-        record.put(".STAGE", ON_SUBMIT);
+        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1<<ON_RETURN), "S0", 10L);
+
         collector.process(record);
 
         MethodCallStatistics stats =  (MethodCallStatistics)getAttr("test", "test:name=Test", "stats");
 
-        assertNotNull("", stats);
         assertNotNull(stats.getStatistic("test"));
     }
 
 
     @Test
     public void testCollectorToStatsMbeanWithMethodNamePlaceholder() throws Exception {
-        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats",
-                "${methodName}", "S0", "S0");
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "${methodName}", "S0", "S0");
         SpyContext ctx = new SpyContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
 
-        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
-        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << ON_SUBMIT));
-        record.put(".STAGE", ON_SUBMIT);
-        record.put("S0", 10L);
+        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1<<ON_RETURN), "S0", 10L);
+
         collector.process(record);
 
         MethodCallStatistics stats =  (MethodCallStatistics)getAttr("test", "test:name=Test", "stats");
 
-        assertNotNull("", stats);
         assertNotNull(stats.getStatistic("testMethod"));
     }
 
 
     @Test
     public void testCollectoToStatsMbeanWithClassAndMethodNamePlaceholder() throws Exception {
-        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats",
-                "${methodName}", "S0", "S0");
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${methodName}", "S0", "S0");
         SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
 
-        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
-        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << ON_SUBMIT));
-        record.put(".STAGE", ON_SUBMIT);
-        record.put("S0", 10L);
+        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1<<ON_RETURN), "S0", 10L);
+
         collector.process(record);
 
         MethodCallStatistics stats =  (MethodCallStatistics)getAttr("test", "test:name=TClass", "stats");
 
-        assertNotNull("", stats);
         assertNotNull(stats.getStatistic("testMethod"));
     }
 
@@ -96,22 +86,39 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${C1}", "C0", "C0");
         SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
 
-        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
-        record.put("C0", 10L); record.put("C1", "oja");
-        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_SUBMIT));
-        record.put(".STAGE", SpyLib.ON_SUBMIT);
+        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1<<ON_RETURN), "C0", 10L, "C1", "oja");
 
         collector.process(record);
 
         MethodCallStatistics stats =  (MethodCallStatistics)getAttr("test", "test:name=TClass", "stats");
 
-        assertNotNull("", stats);
         assertNotNull(stats.getStatistic("oja"));
     }
 
-    // TODO test for actual calls/errors collection
 
-    // TODO test if ctx<->stats pair is properly cached
+    @Test
+    public void testTwoCollectorsReportingToIndependentItemsInSingleZorkaStatsObject() throws Exception {
+        new ZorkaStatsCollector("test", "test:name=SomeBean", "stats", "AAA", "C0", "C0");
+        new ZorkaStatsCollector("test", "test:name=SomeBean", "stats", "BBB", "C0", "C0");
+
+        MethodCallStatistics stats = (MethodCallStatistics)getAttr("test", "test:name=SomeBean", "stats");
+        assertEquals(2, stats.getStatisticNames().length);
+    }
+
+    @Test
+    public void testTwoCollectorsReportingToSingleZorkaStat() throws Exception {
+        ZorkaStatsCollector c1 = new ZorkaStatsCollector("test", "test:name=SomeBean", "stats", "AAA", "C0", "C0");
+        ZorkaStatsCollector c2 = new ZorkaStatsCollector("test", "test:name=SomeBean", "stats", "AAA", "C0", "C0");
+
+        SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
+        Map<String,Object> rec = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1<<ON_RETURN), "C0", 1L);
+
+        c1.process(rec);
+        c2.process(rec);
+
+        MethodCallStatistics stats = (MethodCallStatistics)getAttr("test", "test:name=SomeBean", "stats");
+        assertEquals(2L, ((MethodCallStatistic)stats.getStatistic("AAA")).getCalls());
+    }
 
 
 }

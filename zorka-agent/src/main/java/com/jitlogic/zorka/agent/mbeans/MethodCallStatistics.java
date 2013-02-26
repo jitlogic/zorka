@@ -62,7 +62,10 @@ public class MethodCallStatistics implements ZorkaStats {
 		MethodCallStatistic ret = stats.get(name);
 		
 		if (ret == null) {
-            ret = stats.putIfAbsent(name, MethodCallStatistic.newStatAvg15(name));
+            MethodCallStatistic st = stats.putIfAbsent(name, ret = MethodCallStatistic.newStatAvg15(name));
+            if (st != null) {
+                ret = st;
+            }
             AgentDiagnostics.inc(AgentDiagnostics.ZORKA_STATS_CREATED);
 		}
 		
