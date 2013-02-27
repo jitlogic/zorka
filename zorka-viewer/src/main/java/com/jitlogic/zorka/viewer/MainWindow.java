@@ -26,6 +26,8 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * Zorka Viewer main window.
@@ -52,14 +54,11 @@ public class MainWindow extends JFrame {
 
     private PerfMetricsTableModel tbmMetrics = new PerfMetricsTableModel();
 
+
+    private TraceDetailPanel pnlTraceDetail;
+
     /** Tabbed pane containing various views depicting trace details. */
     private JTabbedPane tabDetail;
-
-    /** This table lists method call tree of a selected trace. */
-    private JTable tblTraceDetail;
-
-    /** Table model for tblTraceDetail */
-    private TraceDetailTableModel tbmTraceDetail;
 
     /** This view contains stack trace of currently selected method call trace record */
     private ErrorDetailView pnlStackTrace;
@@ -81,6 +80,7 @@ public class MainWindow extends JFrame {
         @Override public void actionPerformed(ActionEvent e) {
             JFileChooser chooser = new JFileChooser(ViewerUtil.usableDir(
                     new File(viewerState.get(ViewerState.STATE_CWD, System.getProperty("user.home")))));
+            chooser.setFileFilter(new FileNameExtensionFilter("Zorka Trace files", "trc"));
             chooser.setDialogTitle("Open trace file");
 
             int rv = chooser.showOpenDialog(contentPane);
@@ -175,7 +175,7 @@ public class MainWindow extends JFrame {
 
         tblTraces.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
-                displayTrace(tblTraces.getSelectedRow());
+                pnlTraceDetail.setTrace(traceSet, tblTraces.getSelectedRow());
             }
         });
 
@@ -203,25 +203,19 @@ public class MainWindow extends JFrame {
 
 
     private void createDetailUI() {
-        JScrollPane scrTraceDetail = new JScrollPane();
-
-        tbmTraceDetail = new TraceDetailTableModel();
-        tblTraceDetail = new JTable(tbmTraceDetail);
-        tbmTraceDetail.configure(tblTraceDetail);
-        tblTraceDetail.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tblTraceDetail.setAutoCreateColumnsFromModel(false);
-        scrTraceDetail.setViewportView(tblTraceDetail);
-
-        tblTraceDetail.addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent e) {
-                displayMethod(tblTraceDetail.getSelectedRow(), e.getClickCount() > 1);
+        pnlStackTrace = new ErrorDetailView();
+        pnlTraceDetail = new TraceDetailPanel(pnlStackTrace, new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() > 1) {
+                    tabDetail.setSelectedComponent(pnlStackTrace);
+                }
             }
         });
 
         tabDetail = new JTabbedPane();
-        tabDetail.addTab("Trace details", scrTraceDetail);
+        tabDetail.addTab("Trace details", pnlTraceDetail);
 
-        pnlStackTrace = new ErrorDetailView();
         tabDetail.addTab("Call details", pnlStackTrace);
 
         pnlPerfMetric = new PerfMetricView();
@@ -229,6 +223,7 @@ public class MainWindow extends JFrame {
 
         splitPane.setRightComponent(tabDetail);
     }
+
 
 
     /**
@@ -244,32 +239,6 @@ public class MainWindow extends JFrame {
         getRootPane().getActionMap().put(action,action);
     }
 
-
-    /**
-     * This method is called when user selects trace from trace table.
-     * Updates trace detail widgets.
-     *
-     * @param idx trace index (in traces table)
-     */
-    private void displayTrace(int idx) {
-        NamedTraceRecord root = traceSet.get(idx);
-        tbmTraceDetail.setTrace(root);
-    }
-
-
-    /**
-     * This method is called when user double clicks on a method in trace detail tree.
-     *
-     * @param idx method index (in trace detail method table)
-     *
-     * @param sw whether to switch to method/error detail tab
-     */
-    private void displayMethod(int idx, boolean sw) {
-        pnlStackTrace.update(traceSet.getSymbols(), tbmTraceDetail.getRecord(idx));
-        if (sw) {
-            tabDetail.setSelectedComponent(pnlStackTrace);
-        }
-    }
 
     private void displayMetric(int idx) {
         tbmMetrics.feed(pnlPerfMetric, idx);

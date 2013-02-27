@@ -406,12 +406,14 @@ public class NamedTraceRecord {
      *
      * @param result list object to be populated
      */
-    public void scanRecords(List<NamedTraceRecord> result) {
-        result.add(this);
+    public void scanRecords(List<NamedTraceRecord> result, NamedRecordFilter filter) {
+        if (filter == null || filter.matches(this)) {
+            result.add(this);
+        }
 
         if (children != null) {
             for (NamedTraceRecord child : children) {
-                child.scanRecords(result);
+                child.scanRecords(result, filter);
             }
         }
     }
