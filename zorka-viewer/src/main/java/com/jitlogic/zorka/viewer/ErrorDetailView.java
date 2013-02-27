@@ -49,7 +49,9 @@ public class ErrorDetailView extends JPanel {
         if (0 != (record.getFlags() & NamedTraceRecord.EXCEPTION_WRAP) && record.numChildren() > 0) {
             // Identify cause of wrapped exception)
             NamedTraceRecord child = record.getChild(record.numChildren()-1);
-            cause = ((SymbolicException)child.getException()).getCause();
+            if (child.getException() != null) {
+                cause = ((SymbolicException)child.getException()).getCause();
+            }
         }
 
         if (record.getException() != null) {

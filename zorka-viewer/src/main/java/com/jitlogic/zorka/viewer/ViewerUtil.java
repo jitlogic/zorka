@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.viewer;
 
+import java.io.File;
 import java.util.regex.Pattern;
 
 public class ViewerUtil {
@@ -37,4 +38,17 @@ public class ViewerUtil {
         return segs[segs.length-1];
     }
 
+    public static File usableDir(File path) {
+
+        while (!path.isDirectory()) {
+            File newPath = new File(path.getParent());
+            if (newPath.equals(path)) {
+                return new File(System.getProperty("user.home"));
+            } else {
+                path = newPath;
+            }
+        }
+
+        return path;
+    }
 }

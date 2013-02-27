@@ -23,6 +23,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 
 import javax.swing.border.EmptyBorder;
 
@@ -66,6 +67,8 @@ public class MainWindow extends JFrame {
     /** Performance metric panel */
     private PerfMetricView pnlPerfMetric;
 
+    private ViewerState viewerState = new ViewerState();
+
     /** Help action: displays help window. */
     private Action actHelp = new AbstractAction("Help [F1]",  ResourceManager.getIcon16x16("help")) {
         @Override public void actionPerformed(ActionEvent e) {
@@ -76,11 +79,15 @@ public class MainWindow extends JFrame {
     /** Open action: opens file chooser dialog and loads trace file (if user selects and chooses to open it) */
     private Action actOpen = new AbstractAction("Open [F3]", ResourceManager.getIcon16x16("file-open")) {
         @Override public void actionPerformed(ActionEvent e) {
-            JFileChooser chooser = new JFileChooser();
+            JFileChooser chooser = new JFileChooser(ViewerUtil.usableDir(
+                    new File(viewerState.get(ViewerState.STATE_CWD, System.getProperty("user.home")))));
             chooser.setDialogTitle("Open trace file");
+
             int rv = chooser.showOpenDialog(contentPane);
             if (rv == JFileChooser.APPROVE_OPTION) {
-                traceSet.load(chooser.getSelectedFile());
+                File selectedFile = chooser.getSelectedFile();
+                viewerState.put(ViewerState.STATE_CWD, selectedFile.getParent());
+                traceSet.load(selectedFile);
                 tbmTraces.setTraceSet(traceSet);
                 tbmMetrics.setData(traceSet);
             }
