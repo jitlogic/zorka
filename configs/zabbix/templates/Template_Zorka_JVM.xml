@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2013-02-23T18:19:07Z</date>
+    <date>2013-02-26T16:04:46Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -1094,7 +1094,7 @@
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix.discovery[&quot;java&quot;, &quot;java.lang:type=GarbageCollector,*&quot;, &quot;name&quot;]</key>
+                    <key>zabbix.discovery[&quot;java&quot;, &quot;java.lang:type=GarbageCollector,*&quot;, &quot;name&quot;, &quot;*&quot;]</key>
                     <delay>360</delay>
                     <status>0</status>
                     <allowed_hosts/>
@@ -1221,7 +1221,7 @@
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix.discovery[&quot;java&quot;, &quot;java.lang:type=MemoryPool,*&quot;, &quot;name&quot;]</key>
+                    <key>zabbix.discovery[&quot;java&quot;, &quot;java.lang:type=MemoryPool,*&quot;, &quot;name&quot;, &quot;*&quot;]</key>
                     <delay>360</delay>
                     <status>0</status>
                     <allowed_hosts/>
