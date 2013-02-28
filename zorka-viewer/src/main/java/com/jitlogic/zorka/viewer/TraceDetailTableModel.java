@@ -37,6 +37,9 @@ public class TraceDetailTableModel extends AbstractTableModel {
     /** Current data ("flattened" method call tree representing single trace) */
     private List<NamedTraceRecord> data = new ArrayList<NamedTraceRecord>(1);
 
+    private NamedTraceRecord root;
+
+    private NamedRecordFilter filter;
 
     /**
      * Configures supplied table. Sets colum names, preferred columns widths,
@@ -54,15 +57,34 @@ public class TraceDetailTableModel extends AbstractTableModel {
     }
 
 
+    public void filterOut(final double minPct, final boolean errOnly) {
+        filter = new NamedRecordFilter() {
+            @Override
+            public boolean matches(NamedTraceRecord record) {
+                return record != null && record.getTimePct() >= minPct &&
+                    (!errOnly || (0 != (record.getFlags() & NamedTraceRecord.EXCEPTION_PASS) || record.getException() != null));
+            }
+        };
+        refresh();
+    }
+
+
     /**
      * Sets trace root record for this table model. Triggers redraw od associated table.
      *
      * @param root new trace root record.
      */
     public void setTrace(NamedTraceRecord root) {
-        data = new ArrayList<NamedTraceRecord>(root.getRecords()+2);
-        root.scanRecords(data);
-        fireTableDataChanged();
+        this.root = root;
+        refresh();
+    }
+
+    private void refresh() {
+        if (root != null) {
+            data = new ArrayList<NamedTraceRecord>(root.getRecords()+2);
+            root.scanRecords(data, filter);
+            fireTableDataChanged();
+        }
     }
 
 
