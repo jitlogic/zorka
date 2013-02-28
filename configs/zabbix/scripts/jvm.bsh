@@ -59,33 +59,6 @@ __jvm() {
 
   } // perfmon
 
-
-  if (zorka.boolCfg("tracer", false)) {
-
-    spy.add(spy.instance()
-      .onEnter(spy.fetchArg("DN", 1), spy.fetchArg("SCOPE", 2), spy.fetchArg("FILTER", 8),
-        zorka.boolCfg("tracer.verbose", false) ? tracer.begin("LDAP") : null,
-        tracer.attr("DN", "DN"), tracer.attr("SCOPE", "SCOPE"), tracer.attr("FILTER", "FILTER"))
-      .include(spy.byMethod("com.sun.jndi.ldap.LdapClient", "search")));
-
-    traceSql(className, methodName, dialect) {
-      spy.add(spy.instance()
-        .onEnter(spy.fetchArg("SQL", 1), 
-          spy.normalize("SQL", "SQL", normalizers.sql(dialect, normalizers.NORM_STD))
-          trace.begin("SQL"), trace.attr("SQL", "SQL"))
-        .include(spy.byInterface(spy.AC_PUBLIC, stmtClass, "execut*", null, "String")));
-    }
-
-    traceSql("java.sql.Connection", "prepare*", normalizers.DIALECT_SQL_99);
-
-    // TODO na puste metody execute() w statementach
-
-    traceSql("org.postgresql.core.BaseStatement", "execut*", normalizers.DIALECT_PGSQL);
-    traceSql("com.ibm.db2.jcc.DB2Statement", "execut*", normalizers.DIALECT_DB2);
-    // oracle, mysql, mssql, derby, hsqldb, h2
-
-  } // tracer
-
   return this;
 }
 

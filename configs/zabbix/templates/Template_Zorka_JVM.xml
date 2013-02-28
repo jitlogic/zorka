@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2012-09-08T10:17:35Z</date>
+    <date>2013-02-26T16:04:46Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template_Zorka_Hotspot</template>
-            <name>Template_Zorka_Hotspot</name>
+            <template>Template_Zorka_JVM</template>
+            <name>Template_Zorka_JVM</name>
             <groups>
                 <group>
                     <name>Templates</name>
@@ -232,10 +232,10 @@
                 <item>
                     <name>Heap Memory Utilization</name>
                     <type>0</type>
-                    <snmp_community>public</snmp_community>
+                    <snmp_community/>
                     <multiplier>0</multiplier>
-                    <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>hotspot.heaputil[&quot;HeapMemoryUsage&quot;]</key>
+                    <snmp_oid/>
+                    <key>jvm.heaputil[&quot;HeapMemoryUsage&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -583,10 +583,10 @@
                 <item>
                     <name>Non-Heap Memory Utilization</name>
                     <type>0</type>
-                    <snmp_community>public</snmp_community>
+                    <snmp_community/>
                     <multiplier>0</multiplier>
-                    <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>hotspot.heaputil[&quot;NonHeapMemoryUsage&quot;]</key>
+                    <snmp_oid/>
+                    <key>jvm.heaputil[&quot;NonHeapMemoryUsage&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -934,10 +934,10 @@
                 <item>
                     <name>Perm Gen utilization</name>
                     <type>0</type>
-                    <snmp_community>public</snmp_community>
+                    <snmp_community/>
                     <multiplier>0</multiplier>
-                    <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>hotspot.memutil[&quot;Perm Gen&quot;]</key>
+                    <snmp_oid/>
+                    <key>jvm.memutil[&quot;Perm Gen&quot;]</key>
                     <delay>300</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -1094,8 +1094,8 @@
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix.discovery[&quot;java&quot;, &quot;java.lang:type=GarbageCollector,*&quot;, &quot;name&quot;]</key>
-                    <delay>3600</delay>
+                    <key>zabbix.discovery[&quot;java&quot;, &quot;java.lang:type=GarbageCollector,*&quot;, &quot;name&quot;, &quot;*&quot;]</key>
+                    <delay>360</delay>
                     <status>0</status>
                     <allowed_hosts/>
                     <snmpv3_securityname/>
@@ -1196,11 +1196,20 @@
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Template_Zorka_Hotspot:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].last(0)}&gt;25</expression>
+                            <expression>{Template_Zorka_JVM:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].last(0)}&gt;25</expression>
                             <name>{HOSTNAME} {#NAME} GC overload</name>
                             <url/>
                             <status>0</status>
                             <priority>2</priority>
+                            <description/>
+                            <type>0</type>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>({Template_Zorka_JVM:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].last(0)}&gt;50)&amp;({$PROD}=1)</expression>
+                            <name>{HOSTNAME} {#NAME} severe GC overload</name>
+                            <url/>
+                            <status>0</status>
+                            <priority>3</priority>
                             <description/>
                             <type>0</type>
                         </trigger_prototype>
@@ -1212,8 +1221,8 @@
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix.discovery[&quot;java&quot;, &quot;java.lang:type=MemoryPool,*&quot;, &quot;name&quot;]</key>
-                    <delay>3600</delay>
+                    <key>zabbix.discovery[&quot;java&quot;, &quot;java.lang:type=MemoryPool,*&quot;, &quot;name&quot;, &quot;*&quot;]</key>
+                    <delay>360</delay>
                     <status>0</status>
                     <allowed_hosts/>
                     <snmpv3_securityname/>
@@ -1240,7 +1249,7 @@
                             <multiplier>0</multiplier>
                             <snmp_oid/>
                             <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=MemoryPool&quot;,&quot;Usage&quot;,&quot;used&quot;]</key>
-                            <delay>300</delay>
+                            <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
                             <status>0</status>
@@ -1396,7 +1405,7 @@
                             <multiplier>0</multiplier>
                             <snmp_oid/>
                             <key>hotspot.memutil[&quot;{#NAME}&quot;]</key>
-                            <delay>300</delay>
+                            <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
                             <status>0</status>
@@ -1449,7 +1458,7 @@
             </macros>
             <templates>
                 <template>
-                    <name>Template App Zabbix Agent</name>
+                    <name>Template_Core_ZabbixAgent</name>
                 </template>
             </templates>
             <screens/>
@@ -1457,17 +1466,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template_Zorka_Hotspot:zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Runtime&quot;,&quot;Uptime&quot;].nodata(200)}=1</expression>
-            <name>{HOSTNAME} is unavailable</name>
-            <url/>
-            <status>0</status>
-            <priority>4</priority>
-            <description/>
-            <type>0</type>
-            <dependencies/>
-        </trigger>
-        <trigger>
-            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_Hotspot:hotspot.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_H})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_Hotspot:hotspot.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})</expression>
+            <expression>(({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_H})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M}))&amp;({$PROD}=1)</expression>
             <name>{HOSTNAME} memory usage too high</name>
             <url/>
             <status>0</status>
@@ -1477,7 +1476,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_Hotspot:hotspot.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_Hotspot:hotspot.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_L})</expression>
+            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_L})</expression>
             <name>{HOSTNAME} memory usage too high</name>
             <url/>
             <status>0</status>
@@ -1487,17 +1486,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_Hotspot:hotspot.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_H})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_Hotspot:hotspot.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})</expression>
-            <name>{HOSTNAME} NonHeap memory usage to high</name>
-            <url/>
-            <status>0</status>
-            <priority>3</priority>
-            <description/>
-            <type>0</type>
-            <dependencies/>
-        </trigger>
-        <trigger>
-            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_Hotspot:hotspot.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_Hotspot:hotspot.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_L})</expression>
+            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM:jvm.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM:jvm.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_L})</expression>
             <name>{HOSTNAME} NonHeap memory usage to high</name>
             <url/>
             <status>0</status>
@@ -1507,7 +1496,17 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_Hotspot:hotspot.memutil[&quot;Perm Gen&quot;].last(0)}&gt;90.0</expression>
+            <expression>(({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM:jvm.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_H})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM:jvm.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M}))&amp;({$PROD}=1)</expression>
+            <name>{HOSTNAME} NonHeap memory usage to high</name>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <dependencies/>
+        </trigger>
+        <trigger>
+            <expression>({Template_Zorka_JVM:jvm.memutil[&quot;Perm Gen&quot;].last(0)}&gt;90.0)&amp;({$PROD}=1)</expression>
             <name>{HOSTNAME} PermGen utilization is &gt; 90%</name>
             <url/>
             <status>0</status>

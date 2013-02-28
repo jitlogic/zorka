@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class ErrorDetailView extends JPanel {
 
-     private JTextArea exceptionDisplay;
+    private JTextArea exceptionDisplay;
 
     public ErrorDetailView() {
         setBorder(new EmptyBorder(3,3,3,3));
@@ -42,21 +42,34 @@ public class ErrorDetailView extends JPanel {
         add(scrExceptionDisplay, BorderLayout.CENTER);
     }
 
+
     public void update(Map<Integer,String> symbols, NamedTraceRecord record) {
         StringBuilder sb = new StringBuilder();
-        SymbolicException cause = null;
-
-        if (0 != (record.getFlags() & NamedTraceRecord.EXCEPTION_WRAP) && record.numChildren() > 0) {
-            // Identify cause of wrapped exception)
-            NamedTraceRecord child = record.getChild(record.numChildren()-1);
-            cause = ((SymbolicException)child.getException()).getCause();
-        }
+        SymbolicException cause = findCause(record);
 
         if (record.getException() != null) {
             exceptionDisplay.setText(printException(symbols, (SymbolicException)record.getException(), cause, sb));
         } else {
             exceptionDisplay.setText("<no exception>");
         }
+    }
+
+
+    private SymbolicException findCause(NamedTraceRecord record) {
+
+        SymbolicException cause = null;
+
+        if (0 != (record.getFlags() & NamedTraceRecord.EXCEPTION_WRAP) && record.numChildren() > 0) {
+            // Identify cause of wrapped exception)
+            NamedTraceRecord child = record.getChild(record.numChildren()-1);
+            if (child.getException() != null) {
+                cause = ((SymbolicException)child.getException()).getCause();
+            } else {
+                return findCause(child);
+            }
+        }
+
+        return cause;
     }
 
 
