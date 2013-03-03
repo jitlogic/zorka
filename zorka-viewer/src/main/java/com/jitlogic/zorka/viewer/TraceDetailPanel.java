@@ -22,6 +22,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.regex.Pattern;
 
 public class TraceDetailPanel extends JPanel {
 
@@ -34,6 +35,8 @@ public class TraceDetailPanel extends JPanel {
 
     /** Table model for tblTraceDetail */
     private TraceDetailTableModel tbmTraceDetail;
+
+    private JTextField txtSearch;
 
     private double minPct;
     private boolean errOnly;
@@ -55,6 +58,7 @@ public class TraceDetailPanel extends JPanel {
         }
     }
 
+
     private class ErrFilterAction extends AbstractAction {
 
         private boolean err;
@@ -71,11 +75,31 @@ public class TraceDetailPanel extends JPanel {
         }
     }
 
+
+    private class SearchAction extends AbstractAction {
+
+        public SearchAction(String title, boolean forward) {
+            super(title);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Pattern pattern = Pattern.compile(txtSearch.getText().trim().length() > 0 ? ".*"+txtSearch.getText().trim()+".*" : ".*");
+
+            for (int i = tblTraceDetail.getSelectedRow() + 1; i < tbmTraceDetail.getRowCount(); i++) {
+                NamedTraceRecord rec = tbmTraceDetail.getRecord(i);
+                if (pattern.matcher(rec.getClassName()).matches() || pattern.matcher(rec.getMethodName()).matches()) {
+                    tblTraceDetail.getSelectionModel().setSelectionInterval(i, i);
+                    return;
+                }
+            }
+        }
+    }
+
+
     public TraceDetailPanel(ErrorDetailView pnlStackTrace, MouseListener listener) {
         this.pnlStackTrace = pnlStackTrace;
-
         this.setLayout(new BorderLayout(0,0));
-
 
         JToolBar tbDetailFilters = new JToolBar();
         tbDetailFilters.add(new JButton(new PctFilterAction("All", 0.0)));
@@ -85,14 +109,18 @@ public class TraceDetailPanel extends JPanel {
         tbDetailFilters.addSeparator();
         tbDetailFilters.add(new JButton(new ErrFilterAction("All", false)));
         tbDetailFilters.add(new JButton(new ErrFilterAction("Errors", true)));
+        tbDetailFilters.addSeparator();
 
+        txtSearch = new JTextField(32);
+        //txtSearch.setSize(150, 16);
+        //txtSearch.setMinimumSize(new Dimension(150, 16));
 
-
+        tbDetailFilters.add(new JButton(new SearchAction("Search", true)));
+        tbDetailFilters.add(new JButton(new SearchAction("Prev", false)));
+        tbDetailFilters.add(txtSearch);
         this.add(tbDetailFilters, BorderLayout.NORTH);
 
-
         JScrollPane scrTraceDetail = new JScrollPane();
-
         this.add(scrTraceDetail, BorderLayout.CENTER);
 
         tbmTraceDetail = new TraceDetailTableModel();

@@ -140,5 +140,4 @@ public class TraceDetailTableModel extends AbstractTableModel {
     public NamedTraceRecord getRecord(int i) {
         return data.get(i);
     }
-
 }
