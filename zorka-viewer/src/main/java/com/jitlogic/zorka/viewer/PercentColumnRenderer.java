@@ -22,6 +22,8 @@ import java.awt.*;
 
 public class PercentColumnRenderer extends JLabel implements TableCellRenderer {
 
+    private static final Color BLACK = new Color(0,0,0);
+
     public PercentColumnRenderer() {
         setOpaque(true);
     }
@@ -32,12 +34,22 @@ public class PercentColumnRenderer extends JLabel implements TableCellRenderer {
 
         Double percent = (Double)value;
 
+        int g = 255 - (int) (percent * 2.49);
+        if (g < 0) { g = 0; }
+        if (g > 255) { g = 255; }
+
         if (value != null) {
-            int g = 255 - (int) (percent * 2.49);
-            if (g < 0) { g = 0; }
-            if (g > 255) { g = 255; }
-            Color newColor = new Color(255, g, g);
-            setBackground(newColor);
+            if (isSelected) {
+                setForeground(UIManager.getColor("Table.selectionForeground"));
+                setBackground(UIManager.getColor("Table.selectionBackground"));
+            } else if (hasFocus) {
+                setForeground(UIManager.getColor("Table.focusCellForeground"));
+                setBackground(UIManager.getColor("Table.focusCellBackground"));
+            } else {
+                setForeground(BLACK);
+                setBackground(new Color(255, g, g));
+            }
+
             setText(String.format(percent >= 10.0 ? "%.0f" : "%.2f", percent));
         }
 

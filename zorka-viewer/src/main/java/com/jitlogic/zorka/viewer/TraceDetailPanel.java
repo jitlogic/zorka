@@ -128,18 +128,37 @@ public class TraceDetailPanel extends JPanel {
         tbmTraceDetail.configure(tblTraceDetail);
         tblTraceDetail.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         tblTraceDetail.setAutoCreateColumnsFromModel(false);
+        tblTraceDetail.setAutoscrolls(false);
         scrTraceDetail.setViewportView(tblTraceDetail);
 
         tblTraceDetail.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
+                int selectedRow = tblTraceDetail.getSelectedRow();
                 TraceDetailPanel.this.pnlStackTrace.update(traceSet.getSymbols(),
-                    tbmTraceDetail.getRecord(tblTraceDetail.getSelectedRow()));
+                    tbmTraceDetail.getRecord(selectedRow));
+                NamedTraceRecord record = tbmTraceDetail.getRecord(selectedRow);
+                int x = e.getX()  - getMethodCellOffset();
+                System.out.println("X = " + x);
+                int refX = record.getLevel() * MethodCellRenderer.SINGLE_LEVEL;
+                if (x >= refX && x <= refX+16) {
+                    System.out.println("Bingo: rec=" + selectedRow);
+                    record.toggleExpanded();
+                    tbmTraceDetail.refresh();
+                }
             }
         });
 
         if (listener != null) {
             tblTraceDetail.addMouseListener(listener);
         }
+    }
+
+    private int getMethodCellOffset() {
+        int offs = 0;
+        for (int i = 0; i < TraceDetailTableModel.METHOD_COLUMN; i++) {
+            offs += tblTraceDetail.getColumnModel().getColumn(i).getWidth();
+        }
+        return offs;
     }
 
     public void setTrace(PerfDataSet traceSet, int i) {

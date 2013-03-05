@@ -23,7 +23,7 @@ import java.util.Map;
 public class TraceTableModel extends AbstractTableModel {
 
     private String[] colNames = { "Date", "Time", "Calls", "Err", "Recs", "Label" };
-    private int[]    colWidth = { 75, 50, 50, 50, 50, 550 };
+    private int[]    colWidth = { 90, 50, 60, 40, 40, 550 };
 
     private PerfDataSet traceSet = new PerfDataSet();
 

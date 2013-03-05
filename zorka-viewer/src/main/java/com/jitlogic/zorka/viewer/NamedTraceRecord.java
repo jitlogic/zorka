@@ -62,6 +62,8 @@ public class NamedTraceRecord {
     /** Trace marker flags */
     private int traceFlags;
 
+    private boolean expanded = true;
+
     /** Parent record */
     private NamedTraceRecord parent;
 
@@ -197,12 +199,24 @@ public class NamedTraceRecord {
         return traceFlags;
     }
 
+
     public void setTraceFlags(int traceFlags) {
         this.traceFlags = traceFlags;
     }
 
+
     public double getTimePct() {
         return timePct;
+    }
+
+
+    public boolean isExpanded() {
+        return expanded;
+    }
+
+    public boolean toggleExpanded() {
+        expanded = !expanded;
+        return expanded;
     }
 
 
@@ -241,6 +255,7 @@ public class NamedTraceRecord {
     public Map<String,Object> getAttrs() {
         return Collections.unmodifiableMap(attrs != null ? attrs : new HashMap<String, Object>());
     }
+
 
     /**
      * Returns number of attached attributes
@@ -411,7 +426,7 @@ public class NamedTraceRecord {
             result.add(this);
         }
 
-        if (children != null) {
+        if (children != null && expanded) {
             for (NamedTraceRecord child : children) {
                 child.scanRecords(result, filter);
             }

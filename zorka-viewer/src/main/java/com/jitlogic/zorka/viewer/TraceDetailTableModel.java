@@ -34,6 +34,8 @@ public class TraceDetailTableModel extends AbstractTableModel {
     /** Preferred table column widths */
     private static final int[] colWidth    = { 75, 50, 50, 50, 1640 };
 
+    public static final int METHOD_COLUMN = 4;
+
     /** Current data ("flattened" method call tree representing single trace) */
     private List<NamedTraceRecord> data = new ArrayList<NamedTraceRecord>(1);
 
@@ -79,7 +81,7 @@ public class TraceDetailTableModel extends AbstractTableModel {
         refresh();
     }
 
-    private void refresh() {
+    public void refresh() {
         if (root != null) {
             data = new ArrayList<NamedTraceRecord>(root.getRecords()+2);
             root.scanRecords(data, filter);
