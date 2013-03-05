@@ -20,6 +20,7 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Table model for table showing all method calls in a trace.
@@ -59,12 +60,20 @@ public class TraceDetailTableModel extends AbstractTableModel {
     }
 
 
-    public void filterOut(final double minPct, final boolean errOnly) {
+    public void filterOut(final double minPct, final boolean errOnly, final Set<String> omits) {
         filter = new NamedRecordFilter() {
             @Override
             public boolean matches(NamedTraceRecord record) {
-                return record != null && record.getTimePct() >= minPct &&
-                    (!errOnly || (0 != (record.getFlags() & NamedTraceRecord.EXCEPTION_PASS) || record.getException() != null));
+                return record != null && record.getTimePct() >= minPct
+                    && (!errOnly
+                        || (0 != (record.getFlags() & NamedTraceRecord.EXCEPTION_PASS)
+                        || record.getException() != null))
+                    && !omits.contains(record.getClassName() + "." + record.getMethodName());
+            }
+
+            @Override
+            public boolean recurse(NamedTraceRecord record) {
+                return !omits.contains(record.getClassName() + "." + record.getMethodName());
             }
         };
         refresh();

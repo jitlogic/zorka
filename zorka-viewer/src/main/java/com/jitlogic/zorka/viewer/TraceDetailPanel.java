@@ -22,6 +22,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class TraceDetailPanel extends JPanel {
@@ -40,6 +42,7 @@ public class TraceDetailPanel extends JPanel {
 
     private double minPct;
     private boolean errOnly;
+    private Set<String> omits = new HashSet<String>();
 
 
     private class PctFilterAction extends AbstractAction {
@@ -54,7 +57,7 @@ public class TraceDetailPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             minPct = pct;
-            tbmTraceDetail.filterOut(minPct, errOnly);
+            tbmTraceDetail.filterOut(minPct, errOnly, omits);
         }
     }
 
@@ -71,7 +74,7 @@ public class TraceDetailPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             errOnly = err;
-            tbmTraceDetail.filterOut(minPct, errOnly);
+            tbmTraceDetail.filterOut(minPct, errOnly, omits);
         }
     }
 
@@ -96,6 +99,18 @@ public class TraceDetailPanel extends JPanel {
         }
     }
 
+    private class ClearFiltersAction extends AbstractAction {
+
+        public ClearFiltersAction() {
+            super("Clear");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            omits.clear();
+            tbmTraceDetail.filterOut(minPct, errOnly, omits);
+        }
+    }
 
     public TraceDetailPanel(ErrorDetailView pnlStackTrace, MouseListener listener) {
         this.pnlStackTrace = pnlStackTrace;
@@ -109,6 +124,8 @@ public class TraceDetailPanel extends JPanel {
         tbDetailFilters.addSeparator();
         tbDetailFilters.add(new JButton(new ErrFilterAction("All", false)));
         tbDetailFilters.add(new JButton(new ErrFilterAction("Errors", true)));
+        tbDetailFilters.addSeparator();
+        tbDetailFilters.add(new JButton(new ClearFiltersAction()));
         tbDetailFilters.addSeparator();
 
         txtSearch = new JTextField(32);
@@ -134,16 +151,38 @@ public class TraceDetailPanel extends JPanel {
         tblTraceDetail.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 int selectedRow = tblTraceDetail.getSelectedRow();
-                TraceDetailPanel.this.pnlStackTrace.update(traceSet.getSymbols(),
-                    tbmTraceDetail.getRecord(selectedRow));
-                NamedTraceRecord record = tbmTraceDetail.getRecord(selectedRow);
-                int x = e.getX()  - getMethodCellOffset();
-                System.out.println("X = " + x);
-                int refX = record.getLevel() * MethodCellRenderer.SINGLE_LEVEL;
-                if (x >= refX && x <= refX+16) {
-                    System.out.println("Bingo: rec=" + selectedRow);
-                    record.toggleExpanded();
-                    tbmTraceDetail.refresh();
+                if (selectedRow >= 0) {
+                    TraceDetailPanel.this.pnlStackTrace.update(traceSet.getSymbols(),
+                        tbmTraceDetail.getRecord(selectedRow));
+                    NamedTraceRecord record = tbmTraceDetail.getRecord(selectedRow);
+                    switch (e.getButton()) {
+                        case MouseEvent.BUTTON1: {
+                            int x = e.getX()  - getMethodCellOffset();
+                            int refX = record.getLevel() * MethodCellRenderer.SINGLE_LEVEL;
+                            if (x >= refX && x <= refX+16) {
+                                record.toggleExpanded();
+                                tbmTraceDetail.refresh();
+                            }
+                        }
+                        break;
+                        case MouseEvent.BUTTON2: {
+                            omits.add(record.getClassName() + "." + record.getMethodName());
+                            tbmTraceDetail.filterOut(minPct, errOnly, omits);
+                        }
+                        break;
+                        case MouseEvent.BUTTON3: {
+                            System.out.println("TODO implement popup menu");
+                        }
+                        break;
+                    }
+                }
+            }
+            @Override public void mouseReleased(MouseEvent e) {
+                int r = tblTraceDetail.rowAtPoint(e.getPoint());
+                if (r >= 0 && r < tblTraceDetail.getRowCount()) {
+                    tblTraceDetail.setRowSelectionInterval(r, r);
+                } else {
+                    tblTraceDetail.clearSelection();
                 }
             }
         });

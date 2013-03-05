@@ -426,7 +426,7 @@ public class NamedTraceRecord {
             result.add(this);
         }
 
-        if (children != null && expanded) {
+        if (children != null && expanded && (filter == null || filter.recurse(this))) {
             for (NamedTraceRecord child : children) {
                 child.scanRecords(result, filter);
             }

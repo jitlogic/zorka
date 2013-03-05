@@ -20,4 +20,5 @@ public interface NamedRecordFilter {
 
     public boolean matches(NamedTraceRecord record);
 
+    public boolean recurse(NamedTraceRecord record);
 }

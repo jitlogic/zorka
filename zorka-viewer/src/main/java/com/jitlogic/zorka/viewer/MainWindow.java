@@ -184,9 +184,8 @@ public class MainWindow extends JFrame {
         scrTraces.setMinimumSize(new Dimension(200, 384));
         scrTraces.setViewportView(tblTraces);
 
-
         JScrollPane scrMetrics = new JScrollPane();
-        tabTraces.add("Metrics", scrMetrics);
+        //tabTraces.add("Metrics", scrMetrics);
 
         tblMetrics = new JTable(tbmMetrics);
         tbmMetrics.configure(tblMetrics);
@@ -219,7 +218,7 @@ public class MainWindow extends JFrame {
         tabDetail.addTab("Call details", pnlStackTrace);
 
         pnlPerfMetric = new PerfMetricView();
-        tabDetail.addTab("Performance data", pnlPerfMetric);
+        //tabDetail.addTab("Performance data", pnlPerfMetric);
 
         splitPane.setRightComponent(tabDetail);
     }
