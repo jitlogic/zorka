@@ -18,6 +18,8 @@ package com.jitlogic.zorka.viewer;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class TraceTableModel extends AbstractTableModel {
@@ -25,10 +27,23 @@ public class TraceTableModel extends AbstractTableModel {
     private String[] colNames = { "Date", "Time", "Calls", "Err", "Recs", "Label" };
     private int[]    colWidth = { 90, 50, 60, 40, 40, 550 };
 
-    private PerfDataSet traceSet = new PerfDataSet();
+    //private PerfDataSet traceSet = new PerfDataSet();
+    private List<NamedTraceRecord> records = new ArrayList<NamedTraceRecord>();
 
-    public void setTraceSet(PerfDataSet traceSet) {
-        this.traceSet = traceSet;
+    public void setTraceSet(PerfDataSet traceSet, NamedRecordFilter filter) {
+        //this.traceSet = traceSet;
+        if (traceSet != null) {
+            records = new ArrayList<NamedTraceRecord>(traceSet.getTraces().size());
+
+            for (NamedTraceRecord record : traceSet.getTraces()) {
+                if (filter == null || filter.matches(record)) {
+                    records.add(record);
+                }
+            }
+        } else {
+            records = new ArrayList<NamedTraceRecord>(1);
+        }
+
         fireTableDataChanged();
     }
 
@@ -45,7 +60,7 @@ public class TraceTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return traceSet.size();
+        return records.size();
     }
 
     @Override
@@ -55,7 +70,7 @@ public class TraceTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        NamedTraceRecord el = traceSet.get(rowIndex);
+        NamedTraceRecord el = records.get(rowIndex);
 
         switch (columnIndex) {
             case 0:
@@ -85,5 +100,9 @@ public class TraceTableModel extends AbstractTableModel {
             }
         }
         return sb.toString();
+    }
+
+    public NamedTraceRecord get(int i) {
+        return records.get(i);
     }
 }

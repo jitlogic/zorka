@@ -247,9 +247,9 @@ public class TraceDetailPanel extends JPanel {
         return offs;
     }
 
-    public void setTrace(PerfDataSet traceSet, int i) {
+    public void setTrace(PerfDataSet traceSet, NamedTraceRecord record) {
         this.traceSet = traceSet;
-        tbmTraceDetail.setTrace(traceSet.get(i));
+        tbmTraceDetail.setTrace(record);
     }
 
 }

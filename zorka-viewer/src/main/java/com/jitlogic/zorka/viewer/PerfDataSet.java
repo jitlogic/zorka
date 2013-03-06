@@ -250,6 +250,8 @@ public class PerfDataSet extends PerfDataEventHandler {
         return metrics.get(id);
     }
 
-
+    public List<NamedTraceRecord> getTraces() {
+        return traces;
+    }
 
 }
