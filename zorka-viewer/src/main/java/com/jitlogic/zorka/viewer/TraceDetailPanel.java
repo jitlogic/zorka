@@ -43,14 +43,15 @@ public class TraceDetailPanel extends JPanel {
     private double minPct;
     private boolean errOnly;
     private Set<String> omits = new HashSet<String>();
+    private JButton btnErrorFilterErrors;
 
 
     private class PctFilterAction extends AbstractAction {
 
         private double pct;
 
-        public PctFilterAction(String title, double pct) {
-            super(title);
+        public PctFilterAction(String icon, double pct) {
+            super("", ResourceManager.getIcon16x16("filter-pct-"+icon));
             this.pct = pct;
         }
 
@@ -64,16 +65,14 @@ public class TraceDetailPanel extends JPanel {
 
     private class ErrFilterAction extends AbstractAction {
 
-        private boolean err;
-
-        public ErrFilterAction(String title, boolean err) {
-            super(title);
-            this.err = err;
+        public ErrFilterAction(String title, String icon) {
+            super(title, ResourceManager.getIcon16x16(icon));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            errOnly = err;
+            errOnly = !errOnly;
+            btnErrorFilterErrors.setSelected(errOnly);
             tbmTraceDetail.filterOut(minPct, errOnly, omits);
         }
     }
@@ -81,8 +80,8 @@ public class TraceDetailPanel extends JPanel {
 
     private class SearchAction extends AbstractAction {
 
-        public SearchAction(String title, boolean forward) {
-            super(title);
+        public SearchAction(String title, String icon, boolean forward) {
+            super(title, ResourceManager.getIcon16x16(icon));
         }
 
         @Override
@@ -102,7 +101,7 @@ public class TraceDetailPanel extends JPanel {
     private class ClearFiltersAction extends AbstractAction {
 
         public ClearFiltersAction() {
-            super("Clear");
+            super("", ResourceManager.getIcon16x16("clear"));
         }
 
         @Override
@@ -116,27 +115,15 @@ public class TraceDetailPanel extends JPanel {
         this.pnlStackTrace = pnlStackTrace;
         this.setLayout(new BorderLayout(0,0));
 
-        JToolBar tbDetailFilters = new JToolBar();
-        tbDetailFilters.add(new JButton(new PctFilterAction("All", 0.0)));
-        tbDetailFilters.add(new JButton(new PctFilterAction(">0.1%", 0.1)));
-        tbDetailFilters.add(new JButton(new PctFilterAction(">1%", 1.0)));
-        tbDetailFilters.add(new JButton(new PctFilterAction(">10%", 10.0)));
-        tbDetailFilters.addSeparator();
-        tbDetailFilters.add(new JButton(new ErrFilterAction("All", false)));
-        tbDetailFilters.add(new JButton(new ErrFilterAction("Errors", true)));
-        tbDetailFilters.addSeparator();
-        tbDetailFilters.add(new JButton(new ClearFiltersAction()));
-        tbDetailFilters.addSeparator();
+        initToolbar();
+        initTable();
 
-        txtSearch = new JTextField(32);
-        //txtSearch.setSize(150, 16);
-        //txtSearch.setMinimumSize(new Dimension(150, 16));
+        if (listener != null) {
+            tblTraceDetail.addMouseListener(listener);
+        }
+    }
 
-        tbDetailFilters.add(new JButton(new SearchAction("Search", true)));
-        tbDetailFilters.add(new JButton(new SearchAction("Prev", false)));
-        tbDetailFilters.add(txtSearch);
-        this.add(tbDetailFilters, BorderLayout.NORTH);
-
+    private void initTable() {
         JScrollPane scrTraceDetail = new JScrollPane();
         this.add(scrTraceDetail, BorderLayout.CENTER);
 
@@ -186,10 +173,70 @@ public class TraceDetailPanel extends JPanel {
                 }
             }
         });
+    }
 
-        if (listener != null) {
-            tblTraceDetail.addMouseListener(listener);
-        }
+    private void initToolbar() {
+        JToolBar tbDetailFilters = new JToolBar();
+        tbDetailFilters.setFloatable(false);
+        tbDetailFilters.setRollover(true);
+
+        ButtonGroup grpPctFilterButtons = new ButtonGroup();
+
+        JToggleButton btnPctFilterAll = new JToggleButton(new PctFilterAction("0", 0.0));
+        btnPctFilterAll.setFocusable(false);
+        btnPctFilterAll.setToolTipText("Show all method calls");
+        grpPctFilterButtons.add(btnPctFilterAll);
+        tbDetailFilters.add(btnPctFilterAll);
+
+        JToggleButton btnPctFilter01 = new JToggleButton(new PctFilterAction("01", 0.1));
+        btnPctFilter01.setFocusable(false);
+        btnPctFilter01.setToolTipText("Show calls that took > 0.1% of trace execution time");
+        grpPctFilterButtons.add(btnPctFilter01);
+        tbDetailFilters.add(btnPctFilter01);
+
+        JToggleButton btnPctFilter1 = new JToggleButton(new PctFilterAction("1", 1.0));
+        btnPctFilter1.setFocusable(false);
+        btnPctFilter1.setToolTipText("Show calls that took > 1% of trace execution time");
+        grpPctFilterButtons.add(btnPctFilter1);
+        tbDetailFilters.add(btnPctFilter1);
+
+        JToggleButton btnPctFilter10 = new JToggleButton(new PctFilterAction("10", 10.0));
+        btnPctFilter10.setFocusable(false);
+        btnPctFilter10.setToolTipText("Show calls that took > 10% of trace execution time");
+        grpPctFilterButtons.add(btnPctFilter10);
+        tbDetailFilters.add(btnPctFilter10);
+
+        tbDetailFilters.addSeparator();
+
+        ButtonGroup grpErrFilterButtons = new ButtonGroup();
+
+        btnErrorFilterErrors = new JButton(new ErrFilterAction("", "exception-thrown"));
+        btnErrorFilterErrors.setToolTipText("Show only methods with exceptions thrown");
+        btnErrorFilterErrors.setFocusable(false);
+        tbDetailFilters.add(btnErrorFilterErrors);
+        grpErrFilterButtons.add(btnErrorFilterErrors);
+
+        JButton btnClearFilters = new JButton(new ClearFiltersAction());
+        btnClearFilters.setToolTipText("Clear all exclusions (show all methods once again)");
+        btnClearFilters.setFocusable(false);
+        tbDetailFilters.add(btnClearFilters);
+
+        tbDetailFilters.addSeparator();
+
+        JButton btnSearchPrev = new JButton(new SearchAction("", "arrow-left-4", true));
+        btnSearchPrev.setFocusable(false);
+        btnSearchPrev.setToolTipText("Search previous occurence");
+        tbDetailFilters.add(btnSearchPrev);
+
+        JButton btnSearchNext = new JButton(new SearchAction("", "arrow-right-4", true));
+        btnSearchNext.setFocusable(false);
+        btnSearchNext.setToolTipText("Search previous occurence");
+        tbDetailFilters.add(btnSearchNext);
+
+        txtSearch = new JTextField(32);
+
+        tbDetailFilters.add(txtSearch);
+        this.add(tbDetailFilters, BorderLayout.NORTH);
     }
 
     private int getMethodCellOffset() {

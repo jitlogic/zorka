@@ -33,7 +33,7 @@ public class TraceDetailTableModel extends AbstractTableModel {
     private static final String[] colNames = { "Time", "Calls", "Err", "Pct", "Method" };
 
     /** Preferred table column widths */
-    private static final int[] colWidth    = { 75, 50, 50, 50, 1640 };
+    private static final int[] colWidth    = { 75, 65, 50, 50, 1640 };
 
     public static final int METHOD_COLUMN = 4;
 

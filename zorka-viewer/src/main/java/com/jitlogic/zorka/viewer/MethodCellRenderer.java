@@ -33,7 +33,7 @@ public class MethodCellRenderer extends JLabel implements TableCellRenderer {
 
     public MethodCellRenderer() {
         setOpaque(true);
-        icnException = ResourceManager.getIcon16x16("exception-mark");
+        icnException = ResourceManager.getIcon16x16("error-mark");
         icnOverflow = ResourceManager.getIcon16x16("flag");
         icnTraceBegin = ResourceManager.getIcon16x16("trace-begin");
         //icnDroppedParent = ResourceManager.getIcon16x16("dropped-parent");
