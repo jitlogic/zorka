@@ -26,7 +26,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 
 import javax.swing.border.EmptyBorder;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -44,16 +43,10 @@ public class MainWindow extends JFrame {
 
     private JTabbedPane tabTraces;
 
-    /** This table lists loaded traces. */
-    private JTable tblTraces;
+    //private JTable tblMetrics;
+    //private PerfMetricsTableModel tbmMetrics = new PerfMetricsTableModel();
 
-    /** Table model for tblTraces */
-    private TraceTableModel tbmTraces = new TraceTableModel();
-
-    private JTable tblMetrics;
-
-    private PerfMetricsTableModel tbmMetrics = new PerfMetricsTableModel();
-
+    private TracePanel pnlTraces;
 
     private TraceDetailPanel pnlTraceDetail;
 
@@ -64,7 +57,7 @@ public class MainWindow extends JFrame {
     private ErrorDetailView pnlStackTrace;
 
     /** Performance metric panel */
-    private PerfMetricView pnlPerfMetric;
+    //private PerfMetricView pnlPerfMetric;
 
     private ViewerState viewerState = new ViewerState();
 
@@ -88,8 +81,8 @@ public class MainWindow extends JFrame {
                 File selectedFile = chooser.getSelectedFile();
                 viewerState.put(ViewerState.STATE_CWD, selectedFile.getParent());
                 traceSet.load(selectedFile);
-                tbmTraces.setTraceSet(traceSet);
-                tbmMetrics.setData(traceSet);
+                pnlTraces.setData(traceSet);
+                //tbmMetrics.setData(traceSet);
             }
         }
     };
@@ -155,54 +148,8 @@ public class MainWindow extends JFrame {
         splitPane = new JSplitPane();
         contentPane.add(splitPane, BorderLayout.CENTER);
 
-        createLeftPanel();
-
-        createDetailUI();
-
-        splitPane.setResizeWeight(0.2);
-    }
-
-
-    private void createLeftPanel() {
-        tabTraces = new JTabbedPane();
-        splitPane.setLeftComponent(tabTraces);
-
-        JScrollPane scrTraces = new JScrollPane();
-        tabTraces.add("Traces", scrTraces);
-
-        tblTraces = new JTable(tbmTraces);
-        tbmTraces.adjustColumns(tblTraces);
-
-        tblTraces.addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent e) {
-                pnlTraceDetail.setTrace(traceSet, tblTraces.getSelectedRow());
-            }
-        });
-
-        tblTraces.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
-        scrTraces.setMinimumSize(new Dimension(200, 384));
-        scrTraces.setViewportView(tblTraces);
-
-        JScrollPane scrMetrics = new JScrollPane();
-        //tabTraces.add("Metrics", scrMetrics);
-
-        tblMetrics = new JTable(tbmMetrics);
-        tbmMetrics.configure(tblMetrics);
-
-        tblMetrics.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                displayMetric(tblMetrics.getSelectedRow());
-            }
-        });
-
-        scrMetrics.setViewportView(tblMetrics);
-    }
-
-
-    private void createDetailUI() {
         pnlStackTrace = new ErrorDetailView();
+
         pnlTraceDetail = new TraceDetailPanel(pnlStackTrace, new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -212,17 +159,40 @@ public class MainWindow extends JFrame {
             }
         });
 
+
+        tabTraces = new JTabbedPane();
+        splitPane.setLeftComponent(tabTraces);
+
+        pnlTraces = new TracePanel(pnlTraceDetail);
+        tabTraces.add("Traces", pnlTraces);
+
+
+        JScrollPane scrMetrics = new JScrollPane();
+        //tabTraces.add("Metrics", scrMetrics);
+
+        //tblMetrics = new JTable(tbmMetrics);
+        //tbmMetrics.configure(tblMetrics);
+
+        //tblMetrics.addMouseListener(new MouseAdapter() {
+        //    @Override
+        //    public void mouseClicked(MouseEvent e) {
+        //        displayMetric(tblMetrics.getSelectedRow());
+        //    }
+        //});
+        //scrMetrics.setViewportView(tblMetrics);
+
         tabDetail = new JTabbedPane();
         tabDetail.addTab("Trace details", pnlTraceDetail);
 
         tabDetail.addTab("Call details", pnlStackTrace);
 
-        pnlPerfMetric = new PerfMetricView();
+        //pnlPerfMetric = new PerfMetricView();
         //tabDetail.addTab("Performance data", pnlPerfMetric);
 
         splitPane.setRightComponent(tabDetail);
-    }
 
+        splitPane.setResizeWeight(0.2);
+    }
 
 
     /**
@@ -239,7 +209,7 @@ public class MainWindow extends JFrame {
     }
 
 
-    private void displayMetric(int idx) {
-        tbmMetrics.feed(pnlPerfMetric, idx);
-    }
+//    private void displayMetric(int idx) {
+//        tbmMetrics.feed(pnlPerfMetric, idx);
+//    }
 }
