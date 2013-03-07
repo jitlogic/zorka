@@ -131,6 +131,7 @@ public class TracePanel extends JPanel {
         tbTraceFilters.setFloatable(false);
         tbTraceFilters.setRollover(true);
 
+        tbTraceFilters.add(new JLabel("Min time:"));
         txtMinTime = new JTextField(4);
         tbTraceFilters.add(txtMinTime);
 
