@@ -77,8 +77,8 @@ public class ZabbixDiscoveryUnitTest extends ZorkaFixture {
 
         testMbs.registerMBean(mbean, new ObjectName("test:type=ZorkaStats"));
 
-        stats.getMethodCallStatistic("A").logCall(4L, 4L);
-        stats.getMethodCallStatistic("B").logCall(1L, 1L);
+        stats.getMethodCallStatistic("A").logCall(4L);
+        stats.getMethodCallStatistic("B").logCall(1L);
 
         QueryDef query1 = zorka.query("test", "test:type=ZorkaStats", "type").get("stats").listAs("**", "PAR");
         JSONObject obj1 = zabbixLib.discovery(query1);

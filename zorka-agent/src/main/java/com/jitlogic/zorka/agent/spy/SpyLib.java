@@ -431,7 +431,7 @@ public class SpyLib {
      */
     public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr,
                                    String tstampField, String timeField) {
-        return new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, tstampField, timeField);
+        return new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, timeField);
     }
 
 
