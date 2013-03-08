@@ -28,6 +28,7 @@ import com.jitlogic.zorka.common.ZorkaLog;
 import bsh.EvalError;
 import bsh.Interpreter;
 import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.common.ZorkaUtil;
 
 /**
  * This is central part of Zorka agent - it processes actual queries and executes BSH scripts.
@@ -148,6 +149,7 @@ public class ZorkaBshAgent {
      */
     public void loadScript(String path) {
         try {
+            log.info(ZorkaLogger.ZAG_CONFIG, "Executing script: " + path);
             interpreter.source(path);
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error loading script " + path, e);
@@ -175,7 +177,7 @@ public class ZorkaBshAgent {
 			}
 			Arrays.sort(files);
 			for (String fname : files) {
-				URL scrUrl = new URL(url + "/" + fname);
+				URL scrUrl = new URL(ZorkaUtil.path(url.toString(), fname));
                 log.info(ZorkaLogger.ZAG_CONFIG, "Loading file: " + scrUrl.getPath());
 				File scrFile = new File(scrUrl.getPath());
 				if (fname.endsWith(".bsh") && scrFile.isFile()) {
@@ -208,11 +210,13 @@ public class ZorkaBshAgent {
                 if (!fname.matches(mask)) {
                     continue;
                 }
-                String scrPath = path + "/" + fname;
+                String scrPath = ZorkaUtil.path(path, fname);
                 log.info(ZorkaLogger.ZAG_CONFIG, "Loading file: " + scrPath);
                 File scrFile = new File(scrPath);
                 if (fname.endsWith(".bsh") && scrFile.isFile()) {
                     loadScript(scrPath);
+                } else {
+                    log.info(ZorkaLogger.ZAG_CONFIG, "Skipped file '" + scrPath + ": isFile=" + scrFile.isFile());
                 }
             }
         } catch (Exception e) {

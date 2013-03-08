@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.common;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
@@ -668,6 +669,7 @@ public class ZorkaUtil {
         return map;
     }
 
+
     /**
      * Equivalent of map(k1, v1, ...) that returns constant (unmodifiable) map.
      *
@@ -685,6 +687,7 @@ public class ZorkaUtil {
         return Collections.unmodifiableMap(map);
     }
 
+
     /**
      * Creates a set from supplied strings.
      *
@@ -699,6 +702,33 @@ public class ZorkaUtil {
         }
 
         return Collections.unmodifiableSet(set);
+    }
+
+    public static String path(String...components) {
+        StringBuilder sb = new StringBuilder();
+
+        for (String s : components) {
+
+            if (File.separatorChar == '\\') {
+                s = s.replace("/", "\\");
+            }
+
+            if (s.endsWith(File.separator)) {
+                s = s.substring(0, s.length()-1);
+            }
+
+            if (sb.length() == 0) {
+                sb.append(s);
+            } else {
+                if (s.startsWith(File.separator)) {
+                    s = s.substring(1);
+                }
+                sb.append(File.separator);
+                sb.append(s);
+            }
+        }
+
+        return sb.toString();
     }
 
 }
