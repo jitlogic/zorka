@@ -94,35 +94,12 @@ public class MethodCellRenderer extends JLabel implements TableCellRenderer {
         if (0 != record.numChildren()) {
             ImageIcon icon = record.isExpanded() ? icnTreeMinus : icnTreePlus;
             g.drawImage(icon.getImage(), offs - 14, 2, null);
-            //offs += 2;
         }
-
-        if (0 != (record.getFlags() & NamedTraceRecord.TRACE_BEGIN)) {
-            g.drawImage(icnTraceBegin.getImage(), offs-4, -1, null);
-            offs += 16;
-        }
-
-        if (0 != (record.getFlags() & NamedTraceRecord.EXCEPTION_PASS) || record.getException() != null) {
-            g.drawImage(icnException.getImage(), offs-4, -1, null);
-            offs += 16;
-        }
-
-        if (0 != (record.getFlags() & NamedTraceRecord.OVERFLOW_FLAG)) {
-            g.drawImage(icnOverflow.getImage(), offs-4, 0, null);
-            offs += 16;
-        }
-
-//        if (0 != (record.getFlags() & NamedTraceRecord.DROPPED_PARENT)) {
-//            g.drawImage(icnDroppedParent.getImage(), offs-4, 0, null);
-//            offs += 16;
-//        }
 
         Graphics2D g2 = (Graphics2D)g;
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
-        g.setFont(getFont());
-
-        g.setColor(Color.BLACK);
+        g.setFont(record.hasFlag(NamedTraceRecord.TRACE_BEGIN) ? getFont().deriveFont(Font.BOLD) : getFont());
+        g.setColor(record.hasError() ? Color.RED : Color.BLACK);
         g.drawString(record.prettyPrint(), offs, 13);
 
         if (record.numAttrs() > 0) {

@@ -51,6 +51,7 @@ public class TraceTableModel extends AbstractTableModel {
         for (int i = 0; i < colWidth.length; i++) {
             table.getColumnModel().getColumn(i).setPreferredWidth(colWidth[i]);
         }
+        table.getColumnModel().getColumn(5).setCellRenderer(new TraceCellRenderer());
     }
 
     @Override
@@ -84,23 +85,12 @@ public class TraceTableModel extends AbstractTableModel {
             case 4:
                 return el.getRecords();
             case 5:
-                return traceLabel(el);
+                return el;
         }
         return "?";
     }
 
 
-    private String traceLabel(NamedTraceRecord rec) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(rec.getTraceName());
-        if (rec.getAttrs() != null) {
-            for (Map.Entry<String,Object> e : rec.getAttrs().entrySet()) {
-                sb.append('|');
-                sb.append(e.getValue());
-            }
-        }
-        return sb.toString();
-    }
 
     public NamedTraceRecord get(int i) {
         return records.get(i);

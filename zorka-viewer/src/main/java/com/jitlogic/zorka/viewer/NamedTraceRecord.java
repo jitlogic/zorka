@@ -210,9 +210,20 @@ public class NamedTraceRecord {
     }
 
 
+    public boolean hasError() {
+        return hasFlag(NamedTraceRecord.EXCEPTION_PASS) || this.getException() != null;
+    }
+
+
+    public boolean hasFlag(int flag) {
+        return 0 != (flags & flag);
+    }
+
+
     public boolean isExpanded() {
         return expanded;
     }
+
 
     public boolean toggleExpanded() {
         expanded = !expanded;

@@ -110,6 +110,7 @@ public class TracePanel extends JPanel {
 
         tblTraces = new JTable(tbmTraces);
         tbmTraces.adjustColumns(tblTraces);
+        tblTraces.setAutoscrolls(false);
 
         tblTraces.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
