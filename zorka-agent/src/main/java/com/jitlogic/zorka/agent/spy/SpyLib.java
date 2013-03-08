@@ -218,8 +218,7 @@ public class SpyLib {
         return SpyDefinition.instance()
                 .onEnter(sdaList.toArray(new SpyDefArg[0]))
                 .onReturn(fetchTime("T2")).onError(fetchTime("T2"))
-                .onSubmit(tdiff("T1", "T2", "T"),
-                          zorkaStats(mbsName, mbeanName, attrName, sb.toString(), "T2", "T"));
+                .onSubmit(tdiff("T1", "T2", "T"), zorkaStats(mbsName, mbeanName, attrName, sb.toString(), "T"));
     }
 
 
@@ -429,8 +428,28 @@ public class SpyLib {
      *
      * @return collector object
      */
-    public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr,
-                                   String tstampField, String timeField) {
+    public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr) {
+        return zorkaStats(mbsName, beanName, attrName, keyExpr, "T");
+    }
+
+
+    /**
+     * Creates method call statistics collector object. It will maintain zorka call statistics and update them with
+     * incoming data.
+     *
+     * @param mbsName mbean server name
+     *
+     * @param beanName bean name
+     *
+     * @param attrName attribute name
+     *
+     * @param keyExpr key expression
+     *
+     * @param timeField field containing execution time (in nanoseconds)
+     *
+     * @return collector object
+     */
+    public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr, String timeField) {
         return new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, timeField);
     }
 
