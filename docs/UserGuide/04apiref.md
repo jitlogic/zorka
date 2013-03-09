@@ -1,8 +1,179 @@
 
-# Zorka API Reference
+# API Reference
 
 The API acronym might sound familiar to programmers, yet in this context it should be pronounced as *Agent Programming
 Interface* rather as Zorka beanshell scripts are not applications per se.
+
+## Basic API
+
+Zorka exposes standard BeanShell environment (with access to all classes visible from system class loader plus all
+Zorka code). There are several library objects visible:
+
+* `zorka` - zorka-specific library functions (logging, JMX access etc., always available);
+
+* `spy` - functions for configuring instrumentation engine (available if spy is enabled);
+
+* `zabbix` - zabbix-specific functions (available if zabbix interface is enabled);
+
+* `nagios` - nagios-specific functions (available if nagios interface is enabled);
+
+* `normalizers` - data normalization framework functions;
+
+* `syslog` - functions for sending messages to log host using syslog protocol;
+
+All above things are visible Beanshell scripts from `$ZORKA_HOME/conf` directory. Interfaces to monitoring systems
+(zabbix, nagios etc.) can call Beanshell functions as well (both built-in and user-defined) but due to their syntax
+are typically limited to simple calls. For example:
+
+    zorka.jmx["java","java.lang:type=OperatingSystem","Arch"]
+
+is equivalent to:
+
+    zorka.jmx("java","java.lang:type=OperatingSystem","Arch");
+
+
+## MBean servers
+
+Zorka can track many mbean servers at once. This is useful for example in JBoss 4/5/6 which have two mbean servers:
+platform specific (JVM) and application server specific (JBoss). Each mbean server is available at some name.
+Known names:
+
+* `java` - standard plaform mbean server;
+
+* `jboss` - JBoss JMX kernel mbean server;
+
+MBean server name is passed in virtually all functions looking for object names or registering/manipulating
+objects/attributes in JMX.
+
+## Bytecode instrumentation
+
+Instrumentation part of Zorka agent is called Zorka Spy. With version 0.2 a fluent-style configuration API has been
+introduced. You can define spy configuration properties in fluent style using `SpyDefinition` object and then submit it
+to instrumentation engine. In order to be able to configure instrumentations, you need to understand structure of
+instrumentation engine and how events coming from instrumented methods are processed.
+
+
+`TODO Diagram 1: Zorka Spy processing scheme.`
+
+
+Zorka Spy will insert probes into certain points of instrumented methods. There are three kinds of points: entry points,
+return points and error points (when exception has been thrown). A probe can fetch some data, eg. current time, method
+argument, some class (method context) etc. All etched values are packed into a submission record (`SpyRecord` class) and
+processed by one of argument processing chains (`ON_ENTER`, `ON_RETURN` or `ON_ERROR` depending of probe type), then
+results of all probes from a method call are bound together and  processed by `ON_SUBMIT` chain. All these operations
+are performed in method calling thread context (so these processing stages must be thread safe). After that, record is
+passed to `ON_COLLECT` chain which is guaranteed to be single threaded. Finally records are dispatched into collectors
+(which is also done in a single thread). Collectors can do various things with records: update statistics in some mbean,
+call some BSH function, log it to file etc. New collector implementations can be added on the fly - either in Java or
+as BeanShell scripts.
+
+
+Spy definition example:
+
+    process(record) {
+      mbs = record.get(4,0);
+      zorka.registerMbs("jboss", mbs);
+    }
+
+    sdef = spy.instance().onReturn().withArguments(0)
+       .lookFor("org.jboss.mx.server.MBeanServerImpl", "<init>")
+       .toBsh("jboss");
+
+    spy.add(sdef);
+
+This is part of Zorka configuration for JBoss 5.x. It intercepts instantiation of `MBeanServerImpl` (at the end of its
+constructor) and calls `collect()` function of jboss namespace (everything is declared in jboss namespace).
+`SpyDefinition` objects are immutable, so when tinkering with `sdef` multiple times, remember to assign result of last
+method call to some variable. Method `spy.instance()` returns empty (unconfigured) object of `SpyDefinition` type that
+can be further configured using methods described in next sections.
+
+For more examples see *Examples* section above.
+
+### Choosing processing stages
+
+Argument fetch and argument processing can be done in one of several points (see Diagram 1). Use the following functions
+to choose stage (or probe point):
+
+    sdef = sdef.onEnter(args...);
+    sdef = sdef.onReturn(args...);
+    sdef = sdef.onError(args...);
+    sdef = sdef.onSubmit(args...);
+
+### Fetching, processing and collecting data
+
+Data to be fetched by probes can be defined using `withArguments()` method:
+
+    sdef = sdef.onEnter(arg1, arg2, ...);
+
+Fetch probes, processors and collectors can be used as arguments (see spy library functions). Fetch probes produce data
+that are passed through processors to collectors as dictionary objects (`Map<String,Object>`). Data are accessed using
+string keys as in ordinary hash maps. Processors can get named values from map objects or write other values to passed
+maps. Processors can also filter out records. Collectors are just special kinds of processors that have some side
+effects. >Collector can update statistics, write to logs, send messages via syslog etc.
+
+Additional notes:
+
+* when instrumenting constructors, be sure that `this` reference (if used) can be fetched only at constructor return -
+this is because at the beginning of a constructor this points to an uninitialized block of memory that does not
+represent any object, so instrumented class won't load and will crash with class verifier error;
+
+### Looking for classes and methods to be instrumented
+
+    sdef = sdef.include(matcher1, matcher2, ...);
+
+Using `include()` method administrator can add matching rules filtering which methods are to be instrumented. Methods
+matching any of passed matchers will be included. Matchers can be defined using `spy.byXXX()` functions.
+
+## Configuring tracer
+
+Tracer saves exact execution paths of instrumented methods and stores them in a file, so traces can be viewed at later
+time. There are two things that need to be set up when configuring tracer: selecting classes (and methods) tracer will
+instrument and defining entry points - methods at which traces will begin.
+
+### Selecting classes (and methods) to instrument for trace
+
+For tracer purposes classes and methods are instrumented en masse - that's because you don't know where your application
+can experience problems. Some packages (like: `java.**`) should be excluded in most (if not all) cases.
+
+Selecting classes (method) for trace can be done using `spy.traceInclude()` and `spy.traceExclude()` methods.
+It accepts standard `spyMatcher` objects (the same as for spy definitions). Note that spy matchers have some special
+methods altering them that are even more suitable when choosing classes for tracer (notably `forTracer()` method that
+will automatically exclude constructors, accessor methods and some common methods, like `equals()`, `toString()` etc.
+
+For example:
+
+      spy.traceInclude(spy.byMethod("org.apache.catalina.**", "*").forTrace());
+
+Will add Tomcat methods to tracer.
+
+### Selecting trace entry points
+
+Tracer will start collecting information when application reaches a method that has been marked as trace beginning.
+This can be done instrumenting method in a standard way (create and add sdef) and using one of `spy.traceBegin()`
+functions to mark trace beginning. Function takes trace name (label) as mandatory argument and minimum trace execution
+time as optional argument. For example tracing HTTP requests in Tomcat can be configured like this:
+
+    spy.add(spy.instance()
+      .onEnter(spy.traceBegin("HTTP_REQ", 100))
+      .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
+
+All requests that took longer than 100 milliseconds will be saved in trace file.
+
+
+### Adding custom attributes to traces
+
+Custom attributes can be useful. For example, when tracing execution of HTTP request it might be suitable to add request
+URL (any maybe some POST parameters as well). When instrumenting SQL queries, posting normalized SQL query is necessary.
+Adding custom attributes can be done by instrumenting method in a standard way (create and add sdef) and using
+`tracer.attr()` functions to post (previously fetched and possibly normalized) attributes. Trace attributes can be
+added to any instrumented method, not just the beginning of a trace. They'll appear i proper places in method call tree,
+so it is possible for example to trace HTTP requests and add SQL queries to them (if needed).
+
+### Configuring tracer output
+
+Current implementation can write trace information to local files. Use `tracer.toFile()` function to create trace writer
+object and install it in tracer using `tracer.output()` function.
+
 
 ## General purpose functions
 
