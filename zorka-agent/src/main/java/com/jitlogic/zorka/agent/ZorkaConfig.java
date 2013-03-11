@@ -82,7 +82,7 @@ public class ZorkaConfig {
      * @param props new properties
      */
     public static void setProperties(Properties props) {
-        homeDir = props.getProperty("zorka.home.dir", "/opt/zorka");
+        homeDir = props.getProperty("zorka.home.dir", File.separatorChar == '/' ? "/opt/zorka" : "C:\\zorka");
         properties = props;
     }
 
@@ -93,8 +93,8 @@ public class ZorkaConfig {
      * @return directory where agent will write its logs.
      */
     public static String getLogDir() {
-		return getHomeDir("log");
-	}
+        return ZorkaUtil.path(homeDir, "log");
+    }
 
 
     /**
@@ -103,18 +103,8 @@ public class ZorkaConfig {
      * @return directory from which agent reads BSH configuration scripts.
      */
 	public static String getConfDir() {
-		return getHomeDir("conf");
-	}
-
-
-    /**
-     * Returns home directory plus suffix.
-     * @param suffix
-     * @return
-     */
-	private static String getHomeDir(String suffix) {
-		return homeDir.endsWith(File.separator) ? homeDir + suffix : homeDir + File.separator + suffix;
-	}
+        return ZorkaUtil.path(homeDir, "conf");
+    }
 
 
     /**
@@ -158,7 +148,7 @@ public class ZorkaConfig {
 		properties = defaultProperties();
 		InputStream is = null;
 		try {
-			is = new FileInputStream(getHomeDir("zorka.properties"));
+            is = new FileInputStream(ZorkaUtil.path(homeDir, "zorka.properties"));
 			properties.load(is);
 		} catch (IOException e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error loading property file", e);
@@ -172,8 +162,8 @@ public class ZorkaConfig {
 		}
 
         properties.put("zorka.home.dir", homeDir);
-        properties.put("zorka.config.dir", getHomeDir("conf"));
-        properties.put("zorka.log.dir", getHomeDir("log"));
+        properties.put("zorka.config.dir", ZorkaUtil.path(homeDir, "conf"));
+        properties.put("zorka.log.dir", ZorkaUtil.path(homeDir, "log"));
 	}
 
     /**

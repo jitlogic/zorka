@@ -14,11 +14,24 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.viewer;
+package com.jitlogic.zorka.common.test;
 
-public interface NamedRecordFilter {
+import com.jitlogic.zorka.common.ZorkaUtil;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
-    public boolean matches(NamedTraceRecord record);
+import java.io.File;
 
-    public boolean recurse(NamedTraceRecord record);
+public class UtilFunctionsUnitTest {
+
+    private String _(String path) {
+        return path.replace("/", File.separator);
+    }
+
+    @Test
+    public void testUtilPathFn() {
+        assertEquals(_("/tmp/asd"), _(ZorkaUtil.path(_("/tmp"), "asd")));
+        assertEquals(_("/tmp/asd"), _(ZorkaUtil.path(_("/tmp/"), "/asd/")));
+    }
+
 }

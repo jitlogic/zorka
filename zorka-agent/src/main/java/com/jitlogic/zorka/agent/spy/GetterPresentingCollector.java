@@ -92,7 +92,7 @@ public class GetterPresentingCollector implements SpyProcessor {
         Object obj1 = new AttrGetter(record.get(srcField), attrChain);
         Object obj2 = registry.getOrRegister(mbsName, mbeanName, attrName, obj1, desc);
 
-        if (obj1.equals(obj2)) {
+        if (!obj1.equals(obj2)) {
             log.warn(ZorkaLogger.ZSP_ERRORS, "Attribute '" + attrName + "' of '" + mbeanName + "' is already used.");
         }
 

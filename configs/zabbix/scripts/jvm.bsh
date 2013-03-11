@@ -55,7 +55,10 @@ __jvm() {
       .metric(perfmon.util("MH ${name} utilization", "%", "used", "max"));
 
     scanner = perfmon.scanner("JVM", qmpUsed, qmpUtil, qgcCycles, qgcUtil, qmhUsed, qmhUtil);
-    zorka.schedule(scanner, 10000, 10000);
+
+    interval = zorka.longCfg("perfmon.interval", 10000L);
+
+    zorka.schedule(scanner, interval, interval);
 
   } // perfmon
 

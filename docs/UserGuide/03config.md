@@ -1,20 +1,15 @@
 
 # Configuring Zorka
 
-Zorka exposes its API as modules with functions in a Beanshell interpreter. Zabbix server can call these functions
-directly (with slightly different syntax), extension scripts can use them as well (and define their own functions
-that will be visible for Zabbix or other monitoring system.
+Zorka agent can be configured using `zorka.properties` file and by beanshell scripts placed in `$ZORKA_HOME/conf`
+directory. Common agent settings and supplied scripts (with their specific settings) have been described in this
+section. For more information about implementing your own BSH scripts, see `API Reference` section.
 
-Beanshell scripts are primary way to configure and extend agent. Zorka executes all beanshell scripts from
-`$ZORKA_HOME/conf` directory at startup (in alphabetical order). All elements declared in those scripts will
-be visible via queries from monitoring servers. User can define his own namespaces, functions. Declaring which
-elements should be instrumented (and how) is also possible via `.bsh` scripts.
+## Basic configuration settings
 
-## zorka.properties configuration file
+Core agent configuration settings from `zorka.properties` are described below (along with some sample values).
 
-Interesting configuration directives in zorka.properties are described below (along with some sample values).
-
-Zorka agent general directives:
+### General agent settings
 
 * `zorka.mbs.autoregister = yes` - this setting controls whether standard platform mbean server should be automatically
 registered at first use (or startup time): this is useful when application server substitutes mbean server at startup
@@ -69,10 +64,72 @@ and zorka will close connection abruply;
 
 * `spy.debug = 1` - sets verbosity for instrumentation engine;
 
+* `tracer = yes` - enables tracer;
+
+* `perfmon = yes` - enables
+
 ### Logging directives
 
 Zorka allows for more precise logging configuration. Selected aspects of various subsystems can be turned on or off.
 Supply comma-separated flags in configuration file to configure logging of some subsystem in a precise way.
+
+#### Agent core log flags
+
+    zorka.log.agent = INFO
+
+The following flags are available:
+
+* `NONE` - turn off all messages from agent core;
+
+* `CONFIG` - agent configuration information;
+
+* `QUERIES` - logs every query handled (and its result);
+
+* `TRACES` - logs detailed (trace) messages from agent core;
+
+* `WARNINGS` - logs warning messages from agent core;
+
+* `ERRORS` - logs error messages from agent core;
+
+Additional grouping flags have been added for convenience:
+
+* `INFO` = `CONFIG`, `ERRORS`      (default setting)
+
+* `DEBUG` = `INFO`, `QUERIES`
+
+* `TRACE` = `DEBUG`, `TRACES`
+
+#### Spy engine log flags
+
+    zorka.log.spy = INFO
+
+The following flags are available:
+
+* `NONE` - turn off all messages from spy engine;
+
+* `ARGPROC` - argument processing information (for instrumented code);
+
+* `CONFIG` - spy configuration information;
+
+* `SUBMIT` - argument fetch and submission information (for instrumented code);
+
+* `ERRORS` - tracer errors
+
+* `CLASS_DBG` - class-level debug information;
+
+* `METHOD_DBG` - method-level debug information;
+
+* `CLASS_TRC` - class-level trace information;
+
+* `METHOD_TRC` - method-level trace information;
+
+Additional grouping flags have been added for convenience:
+
+* `INFO` = `CONFIG`, `ERRORS`      (default setting)
+
+* `DEBUG` = `INFO`, `CLASS_DBG`, `METHOD_DBG`
+
+* `TRACE` = `DEBUG`, `SUBMIT`, `ARGPROC`, `CLASS_TRC`, `METHOD_TRC`
 
 #### Tracer log flags
 
@@ -96,7 +153,7 @@ This configures tracer logging flags. The following flags are available:
 
 * `TRACE_CALLS` - log each and every call of tracer engine (from instrumented methods);
 
-Some additional grouping flags have been added for convenience:
+Additional grouping flags have been added for convenience:
 
 * `INFO` = `CONFIG`, `TRACE_ERRORS`
 
@@ -132,173 +189,114 @@ Additional grouping flags have been added for convenience:
 
 * `TRACE` = `DEBUG`, `RUN_TRACE`
 
-## Basic API
-
-Zorka exposes standard BeanShell environment (with access to all classes visible from system class loader plus all
-Zorka code). There are several library objects visible:
-
-* `zorka` - zorka-specific library functions (logging, JMX access etc., always available);
-
-* `spy` - functions for configuring instrumentation engine (available if spy is enabled);
-
-* `zabbix` - zabbix-specific functions (available if zabbix interface is enabled);
-
-* `nagios` - nagios-specific functions (available if nagios interface is enabled);
-
-* `normalizers` - data normalization framework functions;
-
-* `syslog` - functions for sending messages to log host using syslog protocol;
-
-All above things are visible Beanshell scripts from `$ZORKA_HOME/conf` directory. Interfaces to monitoring systems
-(zabbix, nagios etc.) can call Beanshell functions as well (both built-in and user-defined) but due to their syntax
-are typically limited to simple calls. For example:
-
-    zorka.jmx["java","java.lang:type=OperatingSystem","Arch"]
-
-is equivalent to:
-
-    zorka.jmx("java","java.lang:type=OperatingSystem","Arch");
 
 
-## MBean servers
+## Extension scripts & Zabbix templates
 
-Zorka can track many mbean servers at once. This is useful for example in JBoss 4/5/6 which have two mbean servers:
-platform specific (JVM) and application server specific (JBoss). Each mbean server is available at some name.
-Known names:
+With no configuration, agent has fairly limited capabilities as most of its functionality is configured via extension
+scripts. While writing extension scripts requires fair amount of knowledge about agent internals, there is a bunch
+of ready to use scripts distributed with agent. Scripts may (but don't have to) use configuration parameters that can
+be set in `zorka.properties` file. In order to enable an extension script, copy it to `${zorka.home.dir}/conf` directory.
 
-* `java` - standard plaform mbean server;
+Some configuration parameters are used across many scripts (and some are even used by agent core):
 
-* `jboss` - JBoss JMX kernel mbean server;
+* `tracer` - enables or disables method call tracing configuration, if given script contains one; it is also used by
+agent core to enable or disable tracer subsystem itself;
 
-MBean server name is passed in virtually all functions looking for object names or registering/manipulating
-objects/attributes in JMX.
+* `tracer.verbose = no` - increases tracer verbosity; eg. all started traces can be logged in zorka log;
 
-## Bytecode instrumentation
+* `tracer.log.path = ${zorka.log.dir}/trace.trc` - path to tracer files;
 
-Instrumentation part of Zorka agent is called Zorka Spy. With version 0.2 a fluent-style configuration API has been
-introduced. You can define spy configuration properties in fluent style using `SpyDefinition` object and then submit it
-to instrumentation engine. In order to be able to configure instrumentations, you need to understand structure of
-instrumentation engine and how events coming from instrumented methods are processed.
+* `tracer.log.fnum = 8` - number of archive files (trace files are rotated to keep local filesystem from overflow);
 
+* `tracer.log.size = 128M` - maximum size of single trace file;
 
-`TODO Diagram 1: Zorka Spy processing scheme.`
+* `tracer.min.method.time` - minimum time method must execute to be included in trace;
 
+* `tracer.min.trace.time` - minimum time trace must execute to be logged;
 
-Zorka Spy will insert probes into certain points of instrumented methods. There are three kinds of points: entry points,
-return points and error points (when exception has been thrown). A probe can fetch some data, eg. current time, method
-argument, some class (method context) etc. All etched values are packed into a submission record (`SpyRecord` class) and
-processed by one of argument processing chains (`ON_ENTER`, `ON_RETURN` or `ON_ERROR` depending of probe type), then
-results of all probes from a method call are bound together and  processed by `ON_SUBMIT` chain. All these operations
-are performed in method calling thread context (so these processing stages must be thread safe). After that, record is
-passed to `ON_COLLECT` chain which is guaranteed to be single threaded. Finally records are dispatched into collectors
-(which is also done in a single thread). Collectors can do various things with records: update statistics in some mbean,
-call some BSH function, log it to file etc. New collector implementations can be added on the fly - either in Java or
-as BeanShell scripts.
+* `tracer.max.trace.records` - maximum number of method execution records to be included in a single trace;
 
+* `perfmon` - enables or disables recording of performance metrics;
 
-Spy definition example:
+* `perfmon.interval` - interval between performance monitor cycles;
 
-    process(record) {
-      mbs = record.get(4,0);
-      zorka.registerMbs("jboss", mbs);
-    }
+### jvm.bsh - basic JVM parameters and monitoring
 
-    sdef = spy.instance().onReturn().withArguments(0)
-       .lookFor("org.jboss.mx.server.MBeanServerImpl", "<init>")
-       .toBsh("jboss");
+This script defines `jvm` namespace with the following helper functions:
 
-    spy.add(sdef);
+* `jvm.memutil(name)` - memory pool utilization (by name);
 
-This is part of Zorka configuration for JBoss 5.x. It intercepts instantiation of `MBeanServerImpl` (at the end of its
-constructor) and calls `collect()` function of jboss namespace (everything is declared in jboss namespace).
-`SpyDefinition` objects are immutable, so when tinkering with `sdef` multiple times, remember to assign result of last
-method call to some variable. Method `spy.instance()` returns empty (unconfigured) object of `SpyDefinition` type that
-can be further configured using methods described in next sections.
+* `jvm.heaputil(name)` - memory heap utilization (by name);
 
-For more examples see *Examples* section above.
+If `perfmon` is enabled, basic JVM performance metrics will be collected. Tracer output has to be configured in order
+to save those metrics to a file. With zabbix, this script can be used with `Template_Zorka_JVM.xml` template.
 
-### Choosing processing stages
+### zabbix.bsh - Zabbix support
 
-Argument fetch and argument processing can be done in one of several points (see Diagram 1). Use the following functions
-to choose stage (or probe point):
+This script defines basic items emulating zabbix agent, so standard `Template Zabbix Agent` will work properly.
 
-    sdef = sdef.onEnter(args...);
-    sdef = sdef.onReturn(args...);
-    sdef = sdef.onError(args...);
-    sdef = sdef.onSubmit(args...);
+### tomcat.bsh - Apache Tomcat support
 
-### Fetching, processing and collecting data
+This script defines `tomcat` namespace containing set of helper functions that can be used in conjunction with the
+following zabbix templates:
 
-Data to be fetched by probes can be defined using `withArguments()` method:
+* `Template_Zorka_Tomcat_RequestProcessors` - request processing metrics;
 
-    sdef = sdef.onEnter(arg1, arg2, ...);
+* `Template_Zorka_Tomcat_Servlets` - servlet execution metrics;
 
-Fetch probes, processors and collectors can be used as arguments (see spy library functions). Fetch probes produce data
-that are passed through processors to collectors as dictionary objects (`Map<String,Object>`). Data are accessed using
-string keys as in ordinary hash maps. Processors can get named values from map objects or write other values to passed
-maps. Processors can also filter out records. Collectors are just special kinds of processors that have some side
-effects. >Collector can update statistics, write to logs, send messages via syslog etc.
+* `Template_Zorka_Tomcat_JSP` - information about JSP (statuses, reloads);
 
-Additional notes:
+* `Template_Zorka_Tomcat_ThreadPools` - thread pools utilization metrics;
 
-* when instrumenting constructors, be sure that `this` reference (if used) can be fetched only at constructor return -
-this is because at the beginning of a constructor this points to an uninitialized block of memory that does not
-represent any object, so instrumented class won't load and will crash with class verifier error;
+This script will also configure tracer for Tomcat, if `tracer` parameter is set to `yes` in `zorka.properties`.
+Additional `tracer.*` parameters are also in effect.
 
-### Looking for classes and methods to be instrumented
+### jboss.bsh - JBoss 4/5/6 support
 
-    sdef = sdef.include(matcher1, matcher2, ...);
+This script defines `jboss` namespace containing set of helper functions that are used in conjunction with the following
+zabbix templates:
 
-Using `include()` method administrator can add matching rules filtering which methods are to be instrumented. Methods
-matching any of passed matchers will be included. Matchers can be defined using `spy.byXXX()` functions.
+* `Template_Zorka_JBoss` - basic information about JBoss;
 
-## Configuring tracer
+* `Template_Zorka_JBoss_EJB3` - EJB3 metrics;
 
-Tracer saves exact execution paths of instrumented methods and stores them in a file, so traces can be viewed at later
-time. There are two things that need to be set up when configuring tracer: selecting classes (and methods) tracer will
-instrument and defining entry points - methods at which traces will begin.
+* `Template_Zorka_JBoss_JCA` - JCA metrics;
 
-### Selecting classes (and methods) to instrument for trace
+* `Template_Zorka_JBoss_MQ` - MQ metrics;
 
-For tracer purposes classes and methods are instrumented en masse - that's because you don't know where your application
-can experience problems. Some packages (like: `java.**`) should be excluded in most (if not all) cases.
+* `Template_Zorka_JBoss_RequestProcessors` - request processing metrics;
 
-Selecting classes (method) for trace can be done using `spy.traceInclude()` and `spy.traceExclude()` methods.
-It accepts standard `spyMatcher` objects (the same as for spy definitions). Note that spy matchers have some special
-methods altering them that are even more suitable when choosing classes for tracer (notably `forTracer()` method that
-will automatically exclude constructors, accessor methods and some common methods, like `equals()`, `toString()` etc.
+* `Template_Zorka_JBoss_Servlets` - servlet execution metrics;
 
-For example:
+This script will also configure tracer for Tomcat, if `tracer` parameter is set to `yes` in `zorka.properties`.
+Additional `tracer.*` parameters are also in effect.
 
-      spy.traceInclude(spy.byMethod("org.apache.catalina.**", "*").forTrace());
+### jboss7.bsh - JBoss 7.x support
 
-Will add Tomcat methods to tracer.
+This script defines `jboss7` namespace containing set of helper functions that are used in conjunction with the following
+zabbix templates:
 
-### Selecting trace entry points
+* `Template_Zorka_JBoss7_Ejb3Stateless` - EJB3 metrics;
 
-Tracer will start collecting information when application reaches a method that has been marked as trace beginning.
-This can be done instrumenting method in a standard way (create and add sdef) and using one of `spy.traceBegin()`
-functions to mark trace beginning. Function takes trace name (label) as mandatory argument and minimum trace execution
-time as optional argument. For example tracing HTTP requests in Tomcat can be configured like this:
+* `Template_Zorka_JBoss7_JpaPersistence` - Hibernate persistence metrics;
 
-    spy.add(spy.instance()
-      .onEnter(spy.traceBegin("HTTP_REQ", 100))
-      .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
+* `Template_Zorka_JBoss7_RequestProcessors` - request processing metrics;
 
-All requests that took longer than 100 milliseconds will be saved in trace file.
+* `Template_Zorka_JBoss7_Servlets` - setvlet execution metrics;
 
+* `Template_Zorka_JBoss7_Sessions` - http session statistics;
 
-### Adding custom attributes to traces
+This script will also configure tracer for Tomcat, if `tracer` parameter is set to `yes` in `zorka.properties`.
+Additional `tracer.*` parameters are also in effect.
 
-Custom attributes can be useful. For example, when tracing execution of HTTP request it might be suitable to add request
-URL (any maybe some POST parameters as well). When instrumenting SQL queries, posting normalized SQL query is necessary.
-Adding custom attributes can be done by instrumenting method in a standard way (create and add sdef) and using
-`tracer.attr()` functions to post (previously fetched and possibly normalized) attributes. Trace attributes can be
-added to any instrumented method, not just the beginning of a trace. They'll appear i proper places in method call tree,
-so it is possible for example to trace HTTP requests and add SQL queries to them (if needed).
+### Other templates
 
-### Configuring tracer output
+The following zabbix templates don't require extension scripts:
 
-Current implementation can write trace information to local files. Use `tracer.toFile()` function to create trace writer
-object and install it in tracer using `tracer.output()` function.
+* `Template_Zorka_Diagnostics` - useful template monitoring zorka agent itself; it collects statistics about various
+agent subsystems and defines some triggers alerting if something in the agent goes wrong;
+
+* `Template_Zorka_ActiveMQ`, `Template_Zorka_ApacheSynapse`, `Template_Zorka_Mule` - templates for Apache ActiveMQ,
+Apache Synapse and Mule ESB;
 

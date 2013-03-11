@@ -61,6 +61,7 @@ import org.junit.runners.Suite;
         LdapLexerUnitTest.class, MBeanMappingUnitTest.class, NagiosAgentUnitTest.class, ObjectInspectorUnitTest.class,
         XqlLexerUnitTest.class, XqlNormalizationUnitTest.class, ZabbixAgentUnitTest.class,
         ZabbixDiscoveryUnitTest.class, ZorkaLibUnitTest.class, ZorkaUtilUnitTest.class, LogConfigUnitTest.class
+
 })
 public class UnitTestSuite {
 }

@@ -20,6 +20,7 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Table model for table showing all method calls in a trace.
@@ -32,7 +33,9 @@ public class TraceDetailTableModel extends AbstractTableModel {
     private static final String[] colNames = { "Time", "Calls", "Err", "Pct", "Method" };
 
     /** Preferred table column widths */
-    private static final int[] colWidth    = { 75, 50, 50, 50, 1640 };
+    private static final int[] colWidth    = { 75, 65, 50, 50, 1640 };
+
+    public static final int METHOD_COLUMN = 4;
 
     /** Current data ("flattened" method call tree representing single trace) */
     private List<NamedTraceRecord> data = new ArrayList<NamedTraceRecord>(1);
@@ -57,12 +60,20 @@ public class TraceDetailTableModel extends AbstractTableModel {
     }
 
 
-    public void filterOut(final double minPct, final boolean errOnly) {
+    public void filterOut(final double minPct, final boolean errOnly, final Set<String> omits) {
         filter = new NamedRecordFilter() {
             @Override
             public boolean matches(NamedTraceRecord record) {
-                return record != null && record.getTimePct() >= minPct &&
-                    (!errOnly || (0 != (record.getFlags() & NamedTraceRecord.EXCEPTION_PASS) || record.getException() != null));
+                return record != null && record.getTimePct() >= minPct
+                    && (!errOnly
+                        || (0 != (record.getFlags() & NamedTraceRecord.EXCEPTION_PASS)
+                        || record.getException() != null))
+                    && !omits.contains(record.getClassName() + "." + record.getMethodName());
+            }
+
+            @Override
+            public boolean recurse(NamedTraceRecord record) {
+                return !omits.contains(record.getClassName() + "." + record.getMethodName());
             }
         };
         refresh();
@@ -79,7 +90,7 @@ public class TraceDetailTableModel extends AbstractTableModel {
         refresh();
     }
 
-    private void refresh() {
+    public void refresh() {
         if (root != null) {
             data = new ArrayList<NamedTraceRecord>(root.getRecords()+2);
             root.scanRecords(data, filter);
@@ -140,5 +151,4 @@ public class TraceDetailTableModel extends AbstractTableModel {
     public NamedTraceRecord getRecord(int i) {
         return data.get(i);
     }
-
 }

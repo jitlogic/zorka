@@ -36,7 +36,7 @@ public class BshAgentUnitTest extends ZorkaFixture {
     public void setUp() throws Exception {
         ZabbixLib zl = new ZabbixLib();
         zorkaAgent.install("zabbix", zl);
-        zorkaAgent.loadScript(getClass().getResource("/unittest/BshAgentTest.bsh"));
+        zorkaAgent.loadScript(getClass().getResource("/unittest/BshAgentTest.bsh").getPath());
     }
 
 
@@ -89,7 +89,7 @@ public class BshAgentUnitTest extends ZorkaFixture {
     @Test
     public void testStartAndLoadScripts() throws Exception {
         URL url = this.getClass().getResource("/cfg1");
-        zorkaAgent.loadScriptDir(url);
+        zorkaAgent.loadScriptDir(url.getPath(), ".*.bsh");
         assertEquals("oja! right!", query("testLoadScriptDir()"));
     }
 

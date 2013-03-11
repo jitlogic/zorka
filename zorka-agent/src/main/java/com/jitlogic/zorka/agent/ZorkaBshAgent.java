@@ -28,6 +28,7 @@ import com.jitlogic.zorka.common.ZorkaLog;
 import bsh.EvalError;
 import bsh.Interpreter;
 import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.common.ZorkaUtil;
 
 /**
  * This is central part of Zorka agent - it processes actual queries and executes BSH scripts.
@@ -123,23 +124,6 @@ public class ZorkaBshAgent {
 	}
 
 
-    /**
-     * Loads and executes beanshell script.
-     *
-     * @param url path to script
-     */
-	public void loadScript(URL url) {
-		try {
-			interpreter.source(url.getPath());
-		} catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error loading script " + url, e);
-            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
-		} catch (EvalError e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error executing script " + url, e);
-            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
-        }
-	}
-
 
     /**
      * Loads and executes beanshell script.
@@ -148,6 +132,7 @@ public class ZorkaBshAgent {
      */
     public void loadScript(String path) {
         try {
+            log.info(ZorkaLogger.ZAG_CONFIG, "Executing script: " + path);
             interpreter.source(path);
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error loading script " + path, e);
@@ -158,34 +143,6 @@ public class ZorkaBshAgent {
         }
     }
 
-
-    /**
-     * Loads and executes all .bsh files from given directory.
-     * Scripts are executed in alphabetical order.
-     *
-     * @param url url to script directory
-     */
-    public void loadScriptDir(URL url) {
-		try {
-			File dir = new File(url.getPath());
-            log.info(ZorkaLogger.ZAG_CONFIG, "Listing directory: " + url.getPath());
-			String[] files = dir.list();
-			if (files == null || files.length == 0) {
-				return;
-			}
-			Arrays.sort(files);
-			for (String fname : files) {
-				URL scrUrl = new URL(url + "/" + fname);
-                log.info(ZorkaLogger.ZAG_CONFIG, "Loading file: " + scrUrl.getPath());
-				File scrFile = new File(scrUrl.getPath());
-				if (fname.endsWith(".bsh") && scrFile.isFile()) {
-					loadScript(scrUrl);
-				}
-			}
-		} catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot open directory: " + url, e);
-		}
-	}
 
 
     /**
@@ -208,11 +165,13 @@ public class ZorkaBshAgent {
                 if (!fname.matches(mask)) {
                     continue;
                 }
-                String scrPath = path + "/" + fname;
-                log.info(ZorkaLogger.ZAG_CONFIG, "Loading file: " + scrPath);
+                String scrPath = ZorkaUtil.path(path, fname);
+                log.info(ZorkaLogger.ZAG_CONFIG, "Examining file: " + scrPath);
                 File scrFile = new File(scrPath);
                 if (fname.endsWith(".bsh") && scrFile.isFile()) {
                     loadScript(scrPath);
+                } else {
+                    log.info(ZorkaLogger.ZAG_CONFIG, "Skipping file '" + scrPath + ": isFile=" + scrFile.isFile());
                 }
             }
         } catch (Exception e) {

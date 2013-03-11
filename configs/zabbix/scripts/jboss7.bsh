@@ -193,6 +193,27 @@ __jboss7() {
       zorka.intCfg("tracer.log.fnum", 16),
       zorka.kiloCfg("tracer.log.size", 128*1024*1024)));
 
+
+    if (zorka.hasCfg("tracer.min.method.time")) {
+      mmt = zorka.longCfg("tracer.min.method.time", 250000);
+      zorka.logInfo("Setting tracer minimum method time to " + mmt + " ns");
+      tracer.setTracerMinMethodTime(mmt);
+    }
+
+
+    if (zorka.hasCfg("tracer.min.trace.time")) {
+      mtt = zorka.longCfg("tracer.min.trace.time", 100);
+      zorka.logInfo("Settting tracer minimum trace time to " + mtt + " ms");
+      tracer.setTraceMinTraceTime(mtt);
+    }
+
+
+    if (zorka.hasCfg("tracer.max.trace.records")) {
+      mtr = zorka.longCfg("tracer.min.trace.records", 4096);
+      zorka.logInfo("Setting maximum records per trace to " + mtr + ".");
+      tracer.setTraceMaxTraceRecords(mtr);
+    }
+
   }
 
   return this;

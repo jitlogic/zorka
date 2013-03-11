@@ -17,7 +17,6 @@ package com.jitlogic.zorka.agent.test.common;
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 import com.jitlogic.zorka.agent.mbeans.MethodCallStatistic;
-import com.jitlogic.zorka.agent.perfmon.BucketAggregate;
 import com.jitlogic.zorka.common.ZorkaUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,7 +26,7 @@ import org.junit.Test;
 public class ZorkaUtilUnitTest {
 
     public static class TestCallStatistic extends MethodCallStatistic {
-        public TestCallStatistic(String name) { super(name, BucketAggregate.SEC * 10, 6, 5, 3); }
+        public TestCallStatistic(String name) { super(name); }
     }
 
     @Test

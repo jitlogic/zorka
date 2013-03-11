@@ -1,3 +1,15 @@
+Zorka 0.9.2 (2013-03-15)
+------------------------
+
+ * 
+
+Zorka 0.9.1 (2013-02-28)
+------------------------
+
+ * zorka diagnostics (with zabbix template) - mbean for monitoring agent health
+ * lots of fixes for viewer and agent itself;
+
+
 Zorka 0.9 (2013-02-05)
 ----------------------
 

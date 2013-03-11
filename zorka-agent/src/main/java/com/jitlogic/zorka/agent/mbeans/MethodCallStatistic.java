@@ -19,10 +19,7 @@ package com.jitlogic.zorka.agent.mbeans;
 
 import static com.jitlogic.zorka.agent.perfmon.BucketAggregate.MS;
 
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogger;
 import com.jitlogic.zorka.common.ZorkaStat;
-import com.jitlogic.zorka.agent.perfmon.BucketAggregate;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -33,35 +30,11 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class MethodCallStatistic implements ZorkaStat {
 
-    /** Logger */
-    private static final ZorkaLog log = ZorkaLogger.getLog(MethodCallStatistic.class);
-
-    /** Number of calls metric ID */
-    public static final int CALLS_STAT = 0;
-
-    /** Execution times metric ID */
-    public static final int TIMES_STAT = 1;
-
-    /** Number of errors metric ID */
-    public static final int ERROR_STAT = 2;
-
     /** Statistic name */
     private String name;
 
     /** Summary data. */
-    private AtomicLong calls, errors, time;
-
-    /**
-     * Creates statistic maintaining standard AVG1, AVG5 and AVG15 aggregates.
-     * This method assumes that time ticks passed to aggregation methods are in nanoseconds.
-     *
-     * @param name method name
-     *
-     * @return instance of method statistic object
-     */
-    public static MethodCallStatistic newStatAvg15(String name) {
-        return new MethodCallStatistic(name, BucketAggregate.SEC, 10, 60, 300, 900);
-    }
+    private AtomicLong calls, errors, time, maxTime;
 
 
     /**
@@ -69,17 +42,14 @@ public class MethodCallStatistic implements ZorkaStat {
      *
      * @param name statistic name
      *
-     * @param base base period (in units passed via tstamp argument, eg. nanoseconds)
      *
-     * @param res aggregate resolution
-     *
-     * @param stages aggregate periods to maintain
      */
-    public MethodCallStatistic(String name, long base, int res, int...stages) {
+    public MethodCallStatistic(String name) {
         this.name = name;
         this.calls = new AtomicLong(0);
         this.errors = new AtomicLong(0);
         this.time = new AtomicLong(0);
+        this.maxTime = new AtomicLong(0);
     }
 
 
@@ -131,17 +101,59 @@ public class MethodCallStatistic implements ZorkaStat {
 	}
 
 
+    /**
+     * Returns maximum execution time (since last maxTimeCLR);
+     *
+     * @return maximum execution time (in milliseconds)
+     */
+    public long getMaxTime() {
+        return maxTime.longValue()/MS;
+    }
+
+
+    /**
+     * Returns maximum execution time and zeroes maxTime field
+     * in thread safe manner.
+     *
+     * @return maximum execution time (in milliseconds)
+     */
+    public long getMaxTimeCLR() {
+        long t = maxTime.longValue();
+
+        while (!maxTime.compareAndSet(t, 0)) {
+            t = maxTime.longValue();
+        }
+
+        return t/MS;
+    }
+
+    /**
+     * Sets maximum time to atomic variable
+     * in thread safe manner.
+     *
+     * @param t max time candidate
+     */
+    private void setMaxTime(long t) {
+        long t2 = maxTime.longValue();
+
+        while (t > t2) {
+            if (!maxTime.compareAndSet(t2, t)) {
+                t2 = maxTime.longValue();
+            } else {
+                return;
+            }
+        }
+    }
 
     /**
      * Logs successful method call
      *
-     * @param tstamp method call timestamp
-     *
      * @param time execution time
      */
-	public void logCall(long tstamp, long time) {
+	public void logCall(long time) {
         this.calls.incrementAndGet();
         this.time.addAndGet(time);
+        this.setMaxTime(time);
 	}
 
 
@@ -149,14 +161,13 @@ public class MethodCallStatistic implements ZorkaStat {
      * Logs unsucessful method call (with error thrown out of method).
      * Note that you don't need to
      *
-     * @param tstamp method call timestamp
-     *
      * @param time execution time
      */
-	public void logError(long tstamp, long time) {
+	public void logError(long time) {
         this.errors.incrementAndGet();
         this.calls.incrementAndGet();
         this.time.addAndGet(time);
+        this.setMaxTime(time);
     }
 
 

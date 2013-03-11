@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -19,12 +19,11 @@ package com.jitlogic.zorka.viewer;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.util.Map;
 
-public class PercentColumnRenderer extends JLabel implements TableCellRenderer {
+public class TraceCellRenderer extends JLabel implements TableCellRenderer {
 
-    private static final Color BLACK = new Color(0,0,0);
-
-    public PercentColumnRenderer() {
+    public TraceCellRenderer() {
         setOpaque(true);
     }
 
@@ -32,28 +31,35 @@ public class PercentColumnRenderer extends JLabel implements TableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value,
                                                    boolean isSelected, boolean hasFocus, int row, int column) {
 
-        Double percent = (Double)value;
+        NamedTraceRecord record = (NamedTraceRecord)value;
 
-        int g = 255 - (int) (percent * 2.49);
-        if (g < 0) { g = 0; }
-        if (g > 255) { g = 255; }
-        Color bgColor = new Color(255, g, g);
-
-        if (value != null) {
+        if (record != null) {
             if (isSelected) {
-                setForeground(bgColor);
+                setForeground(record.hasError() ? Color.RED : UIManager.getColor("Table.selectionForeground"));
                 setBackground(UIManager.getColor("Table.selectionBackground"));
             } else if (hasFocus) {
-                setForeground(bgColor);
+                setForeground(record.hasError() ? Color.RED : UIManager.getColor("Table.focusCellForeground"));
                 setBackground(UIManager.getColor("Table.focusCellBackground"));
             } else {
-                setForeground(BLACK);
-                setBackground(bgColor);
+                setForeground(record.hasError() ? Color.RED : UIManager.getColor("Table.foreground"));
+                setBackground(UIManager.getColor("Table.background"));
             }
-
-            setText(String.format(percent >= 10.0 ? "%.0f" : "%.2f", percent));
+            setText(traceLabel(record));
         }
 
         return this;
     }
+
+    private String traceLabel(NamedTraceRecord rec) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(rec.getTraceName());
+        if (rec.getAttrs() != null) {
+            for (Map.Entry<String,Object> e : rec.getAttrs().entrySet()) {
+                sb.append('|');
+                sb.append(e.getValue());
+            }
+        }
+        return sb.toString();
+    }
+
 }

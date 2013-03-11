@@ -24,21 +24,28 @@ import java.util.Map;
 
 public class MethodCellRenderer extends JLabel implements TableCellRenderer {
 
+    public static final int SINGLE_LEVEL = 12;
+
     private NamedTraceRecord record;
-    private ImageIcon icnException, icnOverflow, icnTraceBegin, icnDroppedParent;
+    private ImageIcon icnException, icnOverflow, icnTraceBegin; //, icnDroppedParent;
+    private ImageIcon icnTreePlus, icnTreeMinus;
 
 
     public MethodCellRenderer() {
         setOpaque(true);
-        icnException = ResourceManager.getIcon16x16("exception-mark");
+        icnException = ResourceManager.getIcon16x16("error-mark");
         icnOverflow = ResourceManager.getIcon16x16("flag");
         icnTraceBegin = ResourceManager.getIcon16x16("trace-begin");
-        icnDroppedParent = ResourceManager.getIcon16x16("dropped-parent");
+        //icnDroppedParent = ResourceManager.getIcon16x16("dropped-parent");
+        icnTreePlus = ResourceManager.getIcon12x12("tree-plus");
+        icnTreeMinus = ResourceManager.getIcon12x12("tree-minus");
     }
 
 
     @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+    public Component getTableCellRendererComponent(JTable table, Object value,
+                                                   boolean isSelected, boolean hasFocus,
+                                                   int row, int column) {
 
         if (isSelected) {
             setForeground(table.getSelectionForeground());
@@ -76,39 +83,23 @@ public class MethodCellRenderer extends JLabel implements TableCellRenderer {
 
     public void paint(Graphics g) {
 
+        super.paint(g);
 
         if (record == null) {
             return;
         }
 
-        int offs = record.getLevel() * 16 + 4;
+        int offs = record.getLevel() * SINGLE_LEVEL + 16;
 
-        if (0 != (record.getFlags() & NamedTraceRecord.TRACE_BEGIN)) {
-            g.drawImage(icnTraceBegin.getImage(), offs-4, -1, null);
-            offs += 16;
-        }
-
-        if (0 != (record.getFlags() & NamedTraceRecord.EXCEPTION_PASS) || record.getException() != null) {
-            g.drawImage(icnException.getImage(), offs-4, -1, null);
-            offs += 16;
-        }
-
-        if (0 != (record.getFlags() & NamedTraceRecord.OVERFLOW_FLAG)) {
-            g.drawImage(icnOverflow.getImage(), offs-4, 0, null);
-            offs += 16;
-        }
-
-        if (0 != (record.getFlags() & NamedTraceRecord.DROPPED_PARENT)) {
-            g.drawImage(icnDroppedParent.getImage(), offs-4, 0, null);
-            offs += 16;
+        if (0 != record.numChildren()) {
+            ImageIcon icon = record.isExpanded() ? icnTreeMinus : icnTreePlus;
+            g.drawImage(icon.getImage(), offs - 14, 2, null);
         }
 
         Graphics2D g2 = (Graphics2D)g;
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
-        g.setFont(getFont());
-
-        g.setColor(Color.BLACK);
+        g.setFont(record.hasFlag(NamedTraceRecord.TRACE_BEGIN) ? getFont().deriveFont(Font.BOLD) : getFont());
+        g.setColor(record.hasError() ? Color.RED : Color.BLACK);
         g.drawString(record.prettyPrint(), offs, 13);
 
         if (record.numAttrs() > 0) {

@@ -18,6 +18,9 @@
 package com.jitlogic.zorka.agent.test.integ;
 
 import com.jitlogic.zorka.agent.integ.ZabbixLib;
+import com.jitlogic.zorka.agent.mbeans.MethodCallStatistics;
+import com.jitlogic.zorka.agent.mbeans.ZorkaMappedMBean;
+import com.jitlogic.zorka.agent.perfmon.QueryDef;
 import com.jitlogic.zorka.agent.test.support.TestJmx;
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 import org.json.simple.JSONArray;
@@ -65,6 +68,28 @@ public class ZabbixDiscoveryUnitTest extends ZorkaFixture {
         JSONArray data = (JSONArray)obj.get("data");
         assertTrue("Must return more than 1 item", data.size() > 1);
     }
+
+    @Test
+    public void testDiscoveryZorkaStats() throws Exception {
+        ZorkaMappedMBean mbean = new ZorkaMappedMBean("test");
+        MethodCallStatistics stats = new MethodCallStatistics();
+        mbean.put("stats", stats);
+
+        testMbs.registerMBean(mbean, new ObjectName("test:type=ZorkaStats"));
+
+        stats.getMethodCallStatistic("A").logCall(4L);
+        stats.getMethodCallStatistic("B").logCall(1L);
+
+        QueryDef query1 = zorka.query("test", "test:type=ZorkaStats", "type").get("stats").listAs("**", "PAR");
+        JSONObject obj1 = zabbixLib.discovery(query1);
+        assertEquals("query with exact attrs should return data", 2, ((JSONArray)obj1.get("data")).size());
+
+
+        QueryDef query2 = zorka.query("test", "test:type=ZorkaStats").get("stats").listAs("**", "PAR");
+        JSONObject obj2 = zabbixLib.discovery(query2);
+        assertEquals("query with redundant attrs should return no data", 0, ((JSONArray)obj2.get("data")).size());
+    }
+
 
     private TestJmx makeTestJmx(String name, long nom, long div) throws Exception {
         TestJmx bean = new TestJmx();
