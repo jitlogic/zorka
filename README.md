@@ -44,8 +44,6 @@ Interesting links:
 
 * [Zorka API Reference](https://github.com/jitlogic/zorka/wiki/Zorka-API-reference)
 
-* [Examples](https://github.com/jitlogic/zorka/wiki/Examples)
-
 * [Changelog](https://github.com/jitlogic/zorka/wiki/CHANGES)
 
 * [Downloads](http://code.google.com/p/zorka/downloads/list)
