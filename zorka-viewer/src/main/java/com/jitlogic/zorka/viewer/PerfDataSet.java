@@ -40,13 +40,10 @@ public class PerfDataSet extends PerfDataEventHandler {
     /** Top of record stack (used by loading process, obsolete after load process ends) */
     private NamedTraceRecord top = new NamedTraceRecord(null);
 
-    /** Collected performance metric data. */
-    private Map<Integer,Map<Integer,List<PerfSample>>> mdata = new HashMap<Integer, Map<Integer, List<PerfSample>>>();
-
+    /** Collected performance metric data (indexed by metric ID). */
+    private Map<Integer,PerfMetricData>  metricData = new HashMap<Integer, PerfMetricData>();
 
     private Map<Integer,MetricTemplate> metricTemplates = new HashMap<Integer, MetricTemplate>();
-
-    private Map<Integer,Metric> metrics = new HashMap<Integer, Metric>();
 
     @Override
     public void traceBegin(int traceId, long clock, int flags) {
@@ -115,14 +112,15 @@ public class PerfDataSet extends PerfDataEventHandler {
 
     @Override
     public void perfData(long clock, int scannerId, List<PerfSample> samples) {
-        Map<Integer,List<PerfSample>> mdata = getMData(scannerId);
-
         for (PerfSample sample : samples) {
-            List<PerfSample> data = getSamples(sample.getMetricId(), mdata);
-            sample.setClock(clock);
-            data.add(sample);
+            PerfMetricData pmd = metricData.get(sample.getMetricId());
+            pmd.setScannerId(scannerId);
+            if (sample.getValue() instanceof Long) {
+                pmd.addL(sample.getClock(), sample.getValue().longValue());
+            } else if (sample.getValue() instanceof Double) {
+                pmd.addD(sample.getClock(), sample.getValue().doubleValue());
+            }
         }
-
     }
 
     @Override
@@ -133,19 +131,12 @@ public class PerfDataSet extends PerfDataEventHandler {
     @Override
     public void newMetric(Metric metric) {
         metric.setTemplate(metricTemplates.get(metric.getTemplateId()));
-        metrics.put(metric.getId(), metric);
+        PerfMetricData pmd = new PerfMetricData(metric);
+        metricData.put(metric.getId(), pmd);
+        //metrics.put(metric.getId(), metric);
         // TODO add metric object to metric template hash map
     }
 
-
-    private Map<Integer,List<PerfSample>> getMData(int scannerId) {
-        Map<Integer,List<PerfSample>> samples = mdata.get(scannerId);
-        if (samples == null) {
-            samples = new HashMap<Integer, List<PerfSample>>();
-            mdata.put(scannerId, samples);
-        }
-        return samples;
-    }
 
     private List<PerfSample> getSamples(int metricId, Map<Integer,List<PerfSample>> mdata) {
         List<PerfSample> samples = mdata.get(metricId);
@@ -238,16 +229,12 @@ public class PerfDataSet extends PerfDataEventHandler {
     }
 
 
-    public Map<Integer, Map<Integer, List<PerfSample>>> getMdata() {
-        return mdata;
-    }
-
     public String getSymbol(int id) {
         return symbols.get(id);
     }
 
-    public Metric getMetric(int id) {
-        return metrics.get(id);
+    public Map<Integer,PerfMetricData> getMetricData() {
+        return metricData;
     }
 
     public List<NamedTraceRecord> getTraces() {

@@ -43,8 +43,8 @@ public class MainWindow extends JFrame {
 
     private JTabbedPane tabTraces;
 
-    //private JTable tblMetrics;
-    //private PerfMetricsTableModel tbmMetrics = new PerfMetricsTableModel();
+    private JTable tblMetrics;
+    private PerfMetricsTableModel tbmMetrics = new PerfMetricsTableModel();
 
     private TracePanel pnlTraces;
 
@@ -82,7 +82,7 @@ public class MainWindow extends JFrame {
                 viewerState.put(ViewerState.STATE_CWD, selectedFile.getParent());
                 traceSet.load(selectedFile);
                 pnlTraces.setData(traceSet);
-                //tbmMetrics.setData(traceSet);
+                tbmMetrics.setData(traceSet);
             }
         }
     };
@@ -168,18 +168,18 @@ public class MainWindow extends JFrame {
 
 
         JScrollPane scrMetrics = new JScrollPane();
-        //tabTraces.add("Metrics", scrMetrics);
+        tabTraces.add("Metrics", scrMetrics);
 
-        //tblMetrics = new JTable(tbmMetrics);
-        //tbmMetrics.configure(tblMetrics);
+        tblMetrics = new JTable(tbmMetrics);
+        tbmMetrics.configure(tblMetrics);
 
-        //tblMetrics.addMouseListener(new MouseAdapter() {
-        //    @Override
-        //    public void mouseClicked(MouseEvent e) {
-        //        displayMetric(tblMetrics.getSelectedRow());
-        //    }
-        //});
-        //scrMetrics.setViewportView(tblMetrics);
+        tblMetrics.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                displayMetric(tblMetrics.getSelectedRow());
+            }
+        });
+        scrMetrics.setViewportView(tblMetrics);
 
         tabDetail = new JTabbedPane();
         tabDetail.addTab("Trace details", pnlTraceDetail);
@@ -209,7 +209,7 @@ public class MainWindow extends JFrame {
     }
 
 
-//    private void displayMetric(int idx) {
-//        tbmMetrics.feed(pnlPerfMetric, idx);
-//    }
+    private void displayMetric(int idx) {
+        //tbmMetrics.feed(pnlPerfMetric, idx);
+    }
 }

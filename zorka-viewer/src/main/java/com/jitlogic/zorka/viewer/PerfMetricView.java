@@ -19,14 +19,6 @@ package com.jitlogic.zorka.viewer;
 import com.jitlogic.zorka.common.Metric;
 import com.jitlogic.zorka.common.PerfSample;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.FixedMillisecond;
-import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesCollection;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -37,38 +29,34 @@ import java.util.List;
 
 public class PerfMetricView extends JPanel {
 
-    private JFreeChart chart;
+    //private JFreeChart chart;
 
-    private TimeSeriesCollection dataset;
+    //private TimeSeriesCollection dataset;
 
     public PerfMetricView() {
         setBorder(new EmptyBorder(3,3,3,3));
         setLayout(new BorderLayout(0, 0));
-
-        dataset = new TimeSeriesCollection();
-
-        chart = ChartFactory.createTimeSeriesChart("Performance: ", "Time", "", dataset, true, true, false);
-
-        XYPlot plot = chart.getXYPlot();
-        DateAxis axis = (DateAxis)plot.getDomainAxis();
-        axis.setDateFormatOverride(new SimpleDateFormat("HH:mm:ss.SSS"));
-
-        add(new ChartPanel(chart), BorderLayout.CENTER);
+//        dataset = new TimeSeriesCollection();
+//
+//        chart = ChartFactory.createTimeSeriesChart("Performance: ", "Time", "", dataset, true, true, false);
+//
+//        XYPlot plot = chart.getXYPlot();
+//        DateAxis axis = (DateAxis)plot.getDomainAxis();
+//        axis.setDateFormatOverride(new SimpleDateFormat("HH:mm:ss.SSS"));
+//
+//        add(new ChartPanel(chart), BorderLayout.CENTER);
     }
 
-    public void setData(String scanner, Metric metric, List<PerfSample> samples) {
-
-        chart.setTitle("Performance: " + scanner);
-
-        TimeSeries series = new TimeSeries(metric.getName());
-
-        for (PerfSample sample : samples) {
-            series.add(new FixedMillisecond(sample.getClock()), sample.getValue());
-        }
-
-        dataset.removeAllSeries();
-        dataset.addSeries(series);
-
-
+    public void addMetric(String scanner, Metric metric, List<PerfSample> samples) {
+//        chart.setTitle("Performance: " + scanner);
+//
+//        TimeSeries series = new TimeSeries(metric.getName());
+//
+//        for (PerfSample sample : samples) {
+//            series.add(new FixedMillisecond(sample.getClock()), sample.getValue());
+//        }
+//
+//        dataset.removeAllSeries();
+//        dataset.addSeries(series);
     }
 }
