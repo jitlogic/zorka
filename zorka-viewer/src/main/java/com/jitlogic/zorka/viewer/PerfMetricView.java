@@ -16,59 +16,47 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.common.Metric;
-import com.jitlogic.zorka.common.PerfSample;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.time.FixedMillisecond;
-import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesCollection;
+
+//import info.monitorenter.gui.chart.Chart2D;
+//import info.monitorenter.gui.chart.ITrace2D;
+//import info.monitorenter.gui.chart.traces.Trace2DSimple;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
-import java.text.SimpleDateFormat;
-import java.util.List;
-
 public class PerfMetricView extends JPanel {
 
-    private JFreeChart chart;
+//    Chart2D chart;
 
-    private TimeSeriesCollection dataset;
+//    private SimpleLinearGraph graph;
+
+    //private JFreeChart chart;
+
+    //private TimeSeriesCollection dataset;
+
+    //private Map<Integer, ITrace2D>
 
     public PerfMetricView() {
         setBorder(new EmptyBorder(3,3,3,3));
         setLayout(new BorderLayout(0, 0));
 
-        dataset = new TimeSeriesCollection();
-
-        chart = ChartFactory.createTimeSeriesChart("Performance: ", "Time", "", dataset, true, true, false);
-
-        XYPlot plot = chart.getXYPlot();
-        DateAxis axis = (DateAxis)plot.getDomainAxis();
-        axis.setDateFormatOverride(new SimpleDateFormat("HH:mm:ss.SSS"));
-
-        add(new ChartPanel(chart), BorderLayout.CENTER);
+//        chart = new Chart2D();
+//        add(chart, BorderLayout.CENTER);
     }
 
-    public void setData(String scanner, Metric metric, List<PerfSample> samples) {
-
-        chart.setTitle("Performance: " + scanner);
-
-        TimeSeries series = new TimeSeries(metric.getName());
-
-        for (PerfSample sample : samples) {
-            series.add(new FixedMillisecond(sample.getClock()), sample.getValue());
-        }
-
-        dataset.removeAllSeries();
-        dataset.addSeries(series);
 
 
+
+    public void toggle(PerfMetricData pmd) {
+//        ITrace2D trace = new Trace2DSimple();
+//        chart.addTrace(trace);
+//        trace.setColor(Color.RED);
+//
+//        for (int i = 0; i < pmd.size(); i++) {
+//            trace.addPoint(pmd.getT(i), pmd.getV(i));
+//        }
     }
+
 }

@@ -22,6 +22,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 public class TraceDetailPanel extends JPanel {
 
@@ -35,64 +38,93 @@ public class TraceDetailPanel extends JPanel {
     /** Table model for tblTraceDetail */
     private TraceDetailTableModel tbmTraceDetail;
 
+    private JTextField txtSearch;
+
     private double minPct;
     private boolean errOnly;
+    private Set<String> omits = new HashSet<String>();
+    private JButton btnErrorFilterErrors;
 
 
     private class PctFilterAction extends AbstractAction {
 
         private double pct;
 
-        public PctFilterAction(String title, double pct) {
-            super(title);
+        public PctFilterAction(String icon, double pct) {
+            super("", ResourceManager.getIcon16x16("filter-pct-"+icon));
             this.pct = pct;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             minPct = pct;
-            tbmTraceDetail.filterOut(minPct, errOnly);
+            tbmTraceDetail.filterOut(minPct, errOnly, omits);
         }
     }
 
+
     private class ErrFilterAction extends AbstractAction {
 
-        private boolean err;
-
-        public ErrFilterAction(String title, boolean err) {
-            super(title);
-            this.err = err;
+        public ErrFilterAction(String title, String icon) {
+            super(title, ResourceManager.getIcon16x16(icon));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            errOnly = err;
-            tbmTraceDetail.filterOut(minPct, errOnly);
+            errOnly = !errOnly;
+            btnErrorFilterErrors.setSelected(errOnly);
+            tbmTraceDetail.filterOut(minPct, errOnly, omits);
+        }
+    }
+
+
+    private class SearchAction extends AbstractAction {
+
+        public SearchAction(String title, String icon, boolean forward) {
+            super(title, ResourceManager.getIcon16x16(icon));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Pattern pattern = Pattern.compile(txtSearch.getText().trim().length() > 0 ? ".*"+txtSearch.getText().trim()+".*" : ".*");
+
+            for (int i = tblTraceDetail.getSelectedRow() + 1; i < tbmTraceDetail.getRowCount(); i++) {
+                NamedTraceRecord rec = tbmTraceDetail.getRecord(i);
+                if (pattern.matcher(rec.getClassName()).matches() || pattern.matcher(rec.getMethodName()).matches()) {
+                    tblTraceDetail.getSelectionModel().setSelectionInterval(i, i);
+                    return;
+                }
+            }
+        }
+    }
+
+    private class ClearFiltersAction extends AbstractAction {
+
+        public ClearFiltersAction() {
+            super("", ResourceManager.getIcon16x16("clear"));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            omits.clear();
+            tbmTraceDetail.filterOut(minPct, errOnly, omits);
         }
     }
 
     public TraceDetailPanel(ErrorDetailView pnlStackTrace, MouseListener listener) {
         this.pnlStackTrace = pnlStackTrace;
-
         this.setLayout(new BorderLayout(0,0));
 
+        initToolbar();
+        initTable();
 
-        JToolBar tbDetailFilters = new JToolBar();
-        tbDetailFilters.add(new JButton(new PctFilterAction("All", 0.0)));
-        tbDetailFilters.add(new JButton(new PctFilterAction(">0.1%", 0.1)));
-        tbDetailFilters.add(new JButton(new PctFilterAction(">1%", 1.0)));
-        tbDetailFilters.add(new JButton(new PctFilterAction(">10%", 10.0)));
-        tbDetailFilters.addSeparator();
-        tbDetailFilters.add(new JButton(new ErrFilterAction("All", false)));
-        tbDetailFilters.add(new JButton(new ErrFilterAction("Errors", true)));
+        if (listener != null) {
+            tblTraceDetail.addMouseListener(listener);
+        }
+    }
 
-
-
-        this.add(tbDetailFilters, BorderLayout.NORTH);
-
-
+    private void initTable() {
         JScrollPane scrTraceDetail = new JScrollPane();
-
         this.add(scrTraceDetail, BorderLayout.CENTER);
 
         tbmTraceDetail = new TraceDetailTableModel();
@@ -100,23 +132,124 @@ public class TraceDetailPanel extends JPanel {
         tbmTraceDetail.configure(tblTraceDetail);
         tblTraceDetail.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         tblTraceDetail.setAutoCreateColumnsFromModel(false);
+        tblTraceDetail.setAutoscrolls(false);
         scrTraceDetail.setViewportView(tblTraceDetail);
 
         tblTraceDetail.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
-                TraceDetailPanel.this.pnlStackTrace.update(traceSet.getSymbols(),
-                    tbmTraceDetail.getRecord(tblTraceDetail.getSelectedRow()));
+                int selectedRow = tblTraceDetail.getSelectedRow();
+                if (selectedRow >= 0) {
+                    TraceDetailPanel.this.pnlStackTrace.update(traceSet.getSymbols(),
+                        tbmTraceDetail.getRecord(selectedRow));
+                    NamedTraceRecord record = tbmTraceDetail.getRecord(selectedRow);
+                    switch (e.getButton()) {
+                        case MouseEvent.BUTTON1: {
+                            int x = e.getX()  - getMethodCellOffset();
+                            int refX = record.getLevel() * MethodCellRenderer.SINGLE_LEVEL;
+                            if (x >= refX && x <= refX+16) {
+                                record.toggleExpanded();
+                                tbmTraceDetail.refresh();
+                            }
+                        }
+                        break;
+                        case MouseEvent.BUTTON2: {
+                            omits.add(record.getClassName() + "." + record.getMethodName());
+                            tbmTraceDetail.filterOut(minPct, errOnly, omits);
+                        }
+                        break;
+                        case MouseEvent.BUTTON3: {
+                            System.out.println("TODO implement popup menu");
+                        }
+                        break;
+                    }
+                }
+            }
+            @Override public void mouseReleased(MouseEvent e) {
+                int r = tblTraceDetail.rowAtPoint(e.getPoint());
+                if (r >= 0 && r < tblTraceDetail.getRowCount()) {
+                    tblTraceDetail.setRowSelectionInterval(r, r);
+                } else {
+                    tblTraceDetail.clearSelection();
+                }
             }
         });
-
-        if (listener != null) {
-            tblTraceDetail.addMouseListener(listener);
-        }
     }
 
-    public void setTrace(PerfDataSet traceSet, int i) {
+    private void initToolbar() {
+        JToolBar tbDetailFilters = new JToolBar();
+        tbDetailFilters.setFloatable(false);
+        tbDetailFilters.setRollover(true);
+
+        ButtonGroup grpPctFilterButtons = new ButtonGroup();
+
+        JToggleButton btnPctFilterAll = new JToggleButton(new PctFilterAction("0", 0.0));
+        btnPctFilterAll.setFocusable(false);
+        btnPctFilterAll.setToolTipText("Show all method calls");
+        grpPctFilterButtons.add(btnPctFilterAll);
+        tbDetailFilters.add(btnPctFilterAll);
+
+        JToggleButton btnPctFilter01 = new JToggleButton(new PctFilterAction("01", 0.1));
+        btnPctFilter01.setFocusable(false);
+        btnPctFilter01.setToolTipText("Show calls that took > 0.1% of trace execution time");
+        grpPctFilterButtons.add(btnPctFilter01);
+        tbDetailFilters.add(btnPctFilter01);
+
+        JToggleButton btnPctFilter1 = new JToggleButton(new PctFilterAction("1", 1.0));
+        btnPctFilter1.setFocusable(false);
+        btnPctFilter1.setToolTipText("Show calls that took > 1% of trace execution time");
+        grpPctFilterButtons.add(btnPctFilter1);
+        tbDetailFilters.add(btnPctFilter1);
+
+        JToggleButton btnPctFilter10 = new JToggleButton(new PctFilterAction("10", 10.0));
+        btnPctFilter10.setFocusable(false);
+        btnPctFilter10.setToolTipText("Show calls that took > 10% of trace execution time");
+        grpPctFilterButtons.add(btnPctFilter10);
+        tbDetailFilters.add(btnPctFilter10);
+
+        tbDetailFilters.addSeparator();
+
+        ButtonGroup grpErrFilterButtons = new ButtonGroup();
+
+        btnErrorFilterErrors = new JButton(new ErrFilterAction("", "exception-thrown"));
+        btnErrorFilterErrors.setToolTipText("Show only methods with exceptions thrown");
+        btnErrorFilterErrors.setFocusable(false);
+        tbDetailFilters.add(btnErrorFilterErrors);
+        grpErrFilterButtons.add(btnErrorFilterErrors);
+
+        JButton btnClearFilters = new JButton(new ClearFiltersAction());
+        btnClearFilters.setToolTipText("Clear all exclusions (show all methods once again)");
+        btnClearFilters.setFocusable(false);
+        tbDetailFilters.add(btnClearFilters);
+
+        tbDetailFilters.addSeparator();
+
+        JButton btnSearchPrev = new JButton(new SearchAction("", "arrow-left-4", true));
+        btnSearchPrev.setFocusable(false);
+        btnSearchPrev.setToolTipText("Search previous occurence");
+        tbDetailFilters.add(btnSearchPrev);
+
+        JButton btnSearchNext = new JButton(new SearchAction("", "arrow-right-4", true));
+        btnSearchNext.setFocusable(false);
+        btnSearchNext.setToolTipText("Search previous occurence");
+        tbDetailFilters.add(btnSearchNext);
+
+        txtSearch = new JTextField(32);
+
+        tbDetailFilters.add(txtSearch);
+        this.add(tbDetailFilters, BorderLayout.NORTH);
+    }
+
+    private int getMethodCellOffset() {
+        int offs = 0;
+        for (int i = 0; i < TraceDetailTableModel.METHOD_COLUMN; i++) {
+            offs += tblTraceDetail.getColumnModel().getColumn(i).getWidth();
+        }
+        return offs;
+    }
+
+    public void setTrace(PerfDataSet traceSet, NamedTraceRecord record) {
         this.traceSet = traceSet;
-        tbmTraceDetail.setTrace(traceSet.get(i));
+        tbmTraceDetail.setTrace(record);
     }
 
 }

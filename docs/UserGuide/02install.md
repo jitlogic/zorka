@@ -123,3 +123,6 @@ architecture are you running for:
 * import `Template_Zorka_ActiveMQ*.xml` templates into Zabbix;
 
 
+## Zorka Viewer
+
+Zorka viewer is useful for analyzing data produced by Zorka Tracer. Viewer is standalone executable jar with swing GUI.

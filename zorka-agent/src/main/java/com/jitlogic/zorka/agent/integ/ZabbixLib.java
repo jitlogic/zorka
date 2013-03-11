@@ -42,6 +42,10 @@ public class ZabbixLib {
     private Map<String,ZabbixTrapper> trappers = new ConcurrentHashMap<String, ZabbixTrapper>();
 
 
+    public JSONObject discovery(QueryDef...qdefs) {
+        return discovery(QueryDef.NO_NULL_ATTRS, qdefs);
+    }
+
     /**
      * Zabbix discovery function using JMX query framework
      *
@@ -49,12 +53,12 @@ public class ZabbixLib {
      *
      * @return JSON object describing discovered objects
      */
-    public JSONObject discovery(QueryDef...qdefs) {
+    public JSONObject discovery(int flags, QueryDef...qdefs) {
         JSONArray data = new JSONArray();
         MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
 
         for (QueryDef qdef : qdefs) {
-            qdef = qdef.with(QueryDef.NO_NULL_ATTRS);
+            qdef = qdef.with(flags);
             for (QueryResult result : new QueryLister(registry, qdef).list()) {
                 JSONObject item = new JSONObject();
                 for (Map.Entry<String,Object> e : result.attrSet()) {

@@ -111,5 +111,7 @@ public class ResourceManager {
     	return getInstance().getIcon(name, 16, 16);
     }
     
-
+    public static ImageIcon getIcon12x12(String name) {
+        return getInstance().getIcon(name, 12, 12);
+    }
 }

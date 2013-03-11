@@ -1458,7 +1458,7 @@
             </macros>
             <templates>
                 <template>
-                    <name>Template_Core_ZabbixAgent</name>
+                    <name>Template App Zabbix Agent</name>
                 </template>
             </templates>
             <screens/>

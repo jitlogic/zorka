@@ -52,7 +52,7 @@ public class ZorkaLogger implements ZorkaTrapper {
     public static final long ZPM_DEBUG      = ZPM_INFO | ZPM_RUNS | ZPM_RUN_DEBUG;
     public static final long ZPM_TRACE      = ZPM_DEBUG | ZPM_RUN_TRACE;
 
-
+    /** Zorka Spy log flags */
     public static final long ZSP_NONE       = 0x000000;
     public static final long ZSP_CONFIG     = 0x010000;
     public static final long ZSP_CLASS_DBG  = 0x020000;
@@ -69,6 +69,7 @@ public class ZorkaLogger implements ZorkaTrapper {
     public static final long ZSP_TRACE      = ZSP_DEBUG|ZSP_CLASS_TRC|ZSP_SUBMIT|ZSP_ARGPROC|ZSP_METHOD_TRC;
 
 
+    /** Agent core log flags */
     public static final long ZAG_NONE       = 0x00000000;
     public static final long ZAG_CONFIG     = 0x01000000;
     public static final long ZAG_QUERIES    = 0x02000000;
@@ -77,6 +78,7 @@ public class ZorkaLogger implements ZorkaTrapper {
     public static final long ZAG_ERRORS     = 0x10000000;
     public static final long ZAG_INFO       = ZAG_CONFIG | ZAG_ERRORS;
     public static final long ZAG_DEBUG      = ZAG_INFO | ZAG_QUERIES;
+    public static final long ZAG_TRACE      = ZAG_DEBUG | ZAG_TRACES;
 
     /** Default perfmon log verbosity */
     private static long logLevel = ZTR_INFO | ZPM_INFO | ZSP_INFO | ZAG_INFO;

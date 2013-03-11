@@ -752,6 +752,11 @@ public class ZorkaLib  {
     }
 
 
+    public String path(String...components) {
+        return ZorkaUtil.path(components);
+    }
+
+
     /**
      * Parses comma-separated configuration setting and returns it as list of strings.
      *

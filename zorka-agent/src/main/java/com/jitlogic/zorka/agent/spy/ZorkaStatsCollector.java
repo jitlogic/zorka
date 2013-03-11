@@ -74,9 +74,6 @@ public class ZorkaStatsCollector implements SpyProcessor {
     /** Execution time field */
     private String timeField;
 
-    /** Timestamp field */
-    private String tstamp;
-
     /** Object Name substitution flags */
     private int mbeanFlags;
 
@@ -109,17 +106,12 @@ public class ZorkaStatsCollector implements SpyProcessor {
      * @param mbsName mbean server name
      *
      * @param mbeanTemplate mbean name template (object name)
-     *
-     * @param attrTemplate attribute name template
-     *
-     * @param statTemplate statistic name template
-     *
-     * @param tstamp timestamp field name
-     *
-     * @param timeField execution time field name
+     *@param attrTemplate attribute name template
+     *@param statTemplate statistic name template
+     *@param timeField execution time field name
      */
     public ZorkaStatsCollector(String mbsName, String mbeanTemplate, String attrTemplate,
-                               String statTemplate, String tstamp, String timeField) {
+                               String statTemplate, String timeField) {
 
         // Some strings are intern()ed immediately, so
 
@@ -128,7 +120,6 @@ public class ZorkaStatsCollector implements SpyProcessor {
         this.attrTemplate = attrTemplate.intern();
         this.statTemplate = statTemplate.intern();
 
-        this.tstamp = tstamp;
         this.timeField = timeField;
 
         this.mbeanFlags = templateFlags(mbeanTemplate);
@@ -198,7 +189,7 @@ public class ZorkaStatsCollector implements SpyProcessor {
 
             String key = statFlags != 0 ? subst(statTemplate, record,  ctx,  statFlags) : statTemplate;
 
-            statistic = (MethodCallStatistic) statistics.getMethodCallStatistic(key);
+            statistic = statistics.getMethodCallStatistic(key);
         }
 
         submit(record, statistic);
@@ -344,19 +335,18 @@ public class ZorkaStatsCollector implements SpyProcessor {
      */
     private void submit(Map<String, Object> record, MethodCallStatistic statistic) {
         Object executionTime = record.get(timeField);
-        Object timeStamp = record.get(tstamp);
 
-        if (executionTime instanceof Long && timeStamp instanceof Long) {
+        if (executionTime instanceof Long) {
             if (0 != ((Integer) record.get(".STAGES") & (1 << ON_RETURN))) {
                 if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
                     log.debug(ZorkaLogger.ZSP_ARGPROC, "Logging record using logCall()");
                 }
-                statistic.logCall((Long) timeStamp, (Long) executionTime);
+                statistic.logCall((Long) executionTime);
             } else if (0 != ((Integer) record.get(".STAGES") & (1 << ON_ERROR))) {
                 if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
                     log.debug(ZorkaLogger.ZSP_ARGPROC, "Logging record using logError()");
                 }
-                statistic.logError((Long)timeStamp, (Long)executionTime);
+                statistic.logError((Long)executionTime);
             } else {
                 if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
                     log.debug(ZorkaLogger.ZSP_ARGPROC, "No ON_RETURN nor ON_ERROR marked on record " + record);

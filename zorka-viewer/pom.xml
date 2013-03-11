@@ -5,7 +5,7 @@
     <parent>
         <artifactId>zorka</artifactId>
         <groupId>com.jitlogic.zorka</groupId>
-        <version>0.9.1</version>
+        <version>0.9.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -22,11 +22,23 @@
             <artifactId>zorka-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <!--
+
+            Performance metrics have been disabled due to lack of interest
+            and being redundant (most monitoring systems have such functionality).
+
+            Implementation hasn't been removed from codebase, just disabled,
+            so works can be resumed as soon as metrics will prove useful for
+            someone.
+
         <dependency>
-            <groupId>org.jfree</groupId>
-            <artifactId>jfreechart</artifactId>
-            <version>1.0.14</version>
+            <groupId>net.sf.jchart2d</groupId>
+            <artifactId>jchart2d</artifactId>
+            <version>3.3.2</version>
         </dependency>
+        -->
+
     </dependencies>
     <build>
         <plugins>
@@ -58,8 +70,6 @@
                             <includes>
                                 <include>com.jitlogic.zorka:zorka-common</include>
                                 <include>org.ow2.asm:asm</include>
-                                <include>org.jfree:jcommon</include>
-                                <include>org.jfree:jfreechart</include>
                             </includes>
                             <rules>
                                 <keep>
@@ -70,9 +80,6 @@
                                 </keep>
                                 <keep>
                                     <pattern>org.ow2.asm.**</pattern>
-                                </keep>
-                                <keep>
-                                    <pattern>org.jfree.**</pattern>
                                 </keep>
                             </rules>
                         </configuration>

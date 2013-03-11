@@ -30,9 +30,8 @@ public class PerfMetricsTableModel extends AbstractTableModel {
     private static final String[] colNames = { "Scanner", "Metric" };
     private static final int[]    colWidth = { 50, 150 };
 
-    private List<List<PerfSample>> series = new ArrayList<List<PerfSample>>();
-    private List<Metric> metrics = new ArrayList<Metric>();
-    private List<String> scanners = new ArrayList<String>();
+    private PerfDataSet dataSet;
+    private List<PerfMetricData> performanceMetrics = new ArrayList<PerfMetricData>();
 
 
     /**
@@ -48,18 +47,12 @@ public class PerfMetricsTableModel extends AbstractTableModel {
     }
 
 
-    public void setData(PerfDataSet dataset) {
-        series.clear();
-        metrics.clear();
-        scanners.clear();
-
-        for (Map.Entry<Integer,Map<Integer,List<PerfSample>>> e1 : dataset.getMdata().entrySet()) {
-            for (Map.Entry<Integer,List<PerfSample>> e2 : e1.getValue().entrySet()) {
-                series.add(e2.getValue());
-                metrics.add(dataset.getMetric(e2.getKey()));
-                scanners.add(dataset.getSymbol(e1.getKey()));
-            }
+    public void setData(PerfDataSet dataSet) {
+        this.dataSet = dataSet;
+        for (Map.Entry<Integer,PerfMetricData> e : dataSet.getMetricData().entrySet()) {
+            performanceMetrics.add(e.getValue());
         }
+
         fireTableDataChanged();
     }
 
@@ -72,7 +65,7 @@ public class PerfMetricsTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return series.size();
+        return performanceMetrics.size();
     }
 
 
@@ -86,15 +79,15 @@ public class PerfMetricsTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch (columnIndex) {
             case 0:
-                return scanners.get(rowIndex);
+                return dataSet.getSymbol(performanceMetrics.get(rowIndex).getScannerId());
             case 1:
-                return metrics.get(rowIndex).getName();
+                return performanceMetrics.get(rowIndex).getMetric().getName();
         }
 
         return "?";
     }
 
     public void feed(PerfMetricView view, int idx) {
-        view.setData(scanners.get(idx), metrics.get(idx), series.get(idx));
+        view.toggle(performanceMetrics.get(idx));
     }
 }

@@ -21,7 +21,6 @@ import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 import com.jitlogic.zorka.agent.mbeans.MethodCallStatistics;
 import com.jitlogic.zorka.agent.spy.SpyContext;
 import com.jitlogic.zorka.agent.spy.SpyDefinition;
-import com.jitlogic.zorka.agent.spy.SpyLib;
 import com.jitlogic.zorka.agent.spy.ZorkaStatsCollector;
 
 import com.jitlogic.zorka.common.ZorkaUtil;
@@ -32,13 +31,14 @@ import static org.junit.Assert.*;
 import java.util.Map;
 
 import static com.jitlogic.zorka.agent.test.support.TestUtil.getAttr;
+import static com.jitlogic.zorka.agent.perfmon.BucketAggregate.MS;
 import static com.jitlogic.zorka.agent.spy.SpyLib.*;
 
 public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
     @Test
     public void testCollectToStatsMbeanWithoutPlaceholders() throws Exception {
-        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "test", "C0", "C0");
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "test", "C0");
         SpyContext ctx = new SpyContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
 
         Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1<<ON_RETURN), "S0", 10L);
@@ -53,7 +53,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
     @Test
     public void testCollectorToStatsMbeanWithMethodNamePlaceholder() throws Exception {
-        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "${methodName}", "S0", "S0");
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=Test", "stats", "${methodName}", "S0");
         SpyContext ctx = new SpyContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
 
         Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1<<ON_RETURN), "S0", 10L);
@@ -68,7 +68,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
     @Test
     public void testCollectoToStatsMbeanWithClassAndMethodNamePlaceholder() throws Exception {
-        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${methodName}", "S0", "S0");
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${methodName}", "S0");
         SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
 
         Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1<<ON_RETURN), "S0", 10L);
@@ -83,7 +83,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
     @Test
     public void testCollectToStatsWithKeyExpression() throws Exception {
-        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${C1}", "C0", "C0");
+        ZorkaStatsCollector collector = new ZorkaStatsCollector("test", "test:name=${shortClassName}", "stats", "${C1}", "C0");
         SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
 
         Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1<<ON_RETURN), "C0", 10L, "C1", "oja");
@@ -98,8 +98,8 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
     @Test
     public void testTwoCollectorsReportingToIndependentItemsInSingleZorkaStatsObject() throws Exception {
-        new ZorkaStatsCollector("test", "test:name=SomeBean", "stats", "AAA", "C0", "C0");
-        new ZorkaStatsCollector("test", "test:name=SomeBean", "stats", "BBB", "C0", "C0");
+        new ZorkaStatsCollector("test", "test:name=SomeBean", "stats", "AAA", "C0");
+        new ZorkaStatsCollector("test", "test:name=SomeBean", "stats", "BBB", "C0");
 
         MethodCallStatistics stats = (MethodCallStatistics)getAttr("test", "test:name=SomeBean", "stats");
         assertEquals(2, stats.getStatisticNames().length);
@@ -107,8 +107,8 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
     @Test
     public void testTwoCollectorsReportingToSingleZorkaStat() throws Exception {
-        ZorkaStatsCollector c1 = new ZorkaStatsCollector("test", "test:name=SomeBean", "stats", "AAA", "C0", "C0");
-        ZorkaStatsCollector c2 = new ZorkaStatsCollector("test", "test:name=SomeBean", "stats", "AAA", "C0", "C0");
+        ZorkaStatsCollector c1 = new ZorkaStatsCollector("test", "test:name=SomeBean", "stats", "AAA", "C0");
+        ZorkaStatsCollector c2 = new ZorkaStatsCollector("test", "test:name=SomeBean", "stats", "AAA", "C0");
 
         SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
         Map<String,Object> rec = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1<<ON_RETURN), "C0", 1L);
@@ -120,5 +120,20 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         assertEquals(2L, ((MethodCallStatistic)stats.getStatistic("AAA")).getCalls());
     }
 
+    @Test
+    public void testMaxTimeCLR() throws Exception {
+        MethodCallStatistic stat = new MethodCallStatistic("A");
 
+        stat.logCall(10L*MS);
+        stat.logCall(20L*MS);
+
+        assertEquals(20L, stat.getMaxTime());
+        assertEquals(20L, stat.getMaxTimeCLR());
+        assertEquals(0L, stat.getMaxTime());
+
+        stat.logError(11L*MS);
+
+        assertEquals(11L, stat.getMaxTimeCLR());
+        assertEquals(0L, stat.getMaxTimeCLR());
+    }
 }
