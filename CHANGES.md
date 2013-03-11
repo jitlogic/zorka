@@ -1,7 +1,9 @@
-Zorka 0.9.2 (2013-03-15)
+Zorka 0.9.2 (2013-03-11)
 ------------------------
 
- * 
+ * enhance trace viewer, get rid of unnecessary dependencies;
+ * new 'local max' attribute maintained by method call statistics;
+
 
 Zorka 0.9.1 (2013-02-28)
 ------------------------
