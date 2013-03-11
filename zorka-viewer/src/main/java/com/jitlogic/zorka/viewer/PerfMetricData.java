@@ -81,6 +81,16 @@ public class PerfMetricData {
         return dvals != null && idx < dvals.length && idx >= 0 ? dvals[idx] : 0;
     }
 
+    public double getV(int idx) {
+        if (dvals != null) {
+            return idx < dvals.length && idx >= 0 ? dvals[idx] : 0;
+        } else if (lvals != null) {
+            return idx < lvals.length && idx >= 0 ? lvals[idx] : 0;
+        } else {
+            return 0.0;
+        }
+    }
+
     public boolean isL() {
         return lvals != null;
     }

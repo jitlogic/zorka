@@ -22,6 +22,23 @@
             <artifactId>zorka-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <!--
+
+            Performance metrics have been disabled due to lack of interest
+            and being redundant (most monitoring systems have such functionality).
+
+            Implementation hasn't been removed from codebase, just disabled,
+            so works can be resumed as soon as metrics will prove useful for
+            someone.
+
+        <dependency>
+            <groupId>net.sf.jchart2d</groupId>
+            <artifactId>jchart2d</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+        -->
+
     </dependencies>
     <build>
         <plugins>

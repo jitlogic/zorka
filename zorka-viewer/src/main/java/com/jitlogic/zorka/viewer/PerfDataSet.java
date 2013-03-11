@@ -116,9 +116,9 @@ public class PerfDataSet extends PerfDataEventHandler {
             PerfMetricData pmd = metricData.get(sample.getMetricId());
             pmd.setScannerId(scannerId);
             if (sample.getValue() instanceof Long) {
-                pmd.addL(sample.getClock(), sample.getValue().longValue());
+                pmd.addL(clock, sample.getValue().longValue());
             } else if (sample.getValue() instanceof Double) {
-                pmd.addD(sample.getClock(), sample.getValue().doubleValue());
+                pmd.addD(clock, sample.getValue().doubleValue());
             }
         }
     }

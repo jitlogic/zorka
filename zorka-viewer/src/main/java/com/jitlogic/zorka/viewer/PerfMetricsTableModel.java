@@ -88,7 +88,6 @@ public class PerfMetricsTableModel extends AbstractTableModel {
     }
 
     public void feed(PerfMetricView view, int idx) {
-        //view.addMetric(scanners.get(idx), metrics.get(idx), series.get(idx));
-        // TODO
+        view.toggle(performanceMetrics.get(idx));
     }
 }

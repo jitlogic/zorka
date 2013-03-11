@@ -18,48 +18,45 @@ package com.jitlogic.zorka.viewer;
 
 
 
+//import info.monitorenter.gui.chart.Chart2D;
+//import info.monitorenter.gui.chart.ITrace2D;
+//import info.monitorenter.gui.chart.traces.Trace2DSimple;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class PerfMetricView extends JPanel {
 
-    private SimpleLinearGraph graph;
+//    Chart2D chart;
+
+//    private SimpleLinearGraph graph;
 
     //private JFreeChart chart;
 
     //private TimeSeriesCollection dataset;
 
+    //private Map<Integer, ITrace2D>
+
     public PerfMetricView() {
         setBorder(new EmptyBorder(3,3,3,3));
         setLayout(new BorderLayout(0, 0));
 
-        graph = new SimpleLinearGraph();
-        add(graph,  BorderLayout.CENTER);
+//        chart = new Chart2D();
+//        add(chart, BorderLayout.CENTER);
     }
 
 
 
-//        dataset = new TimeSeriesCollection();
+
+    public void toggle(PerfMetricData pmd) {
+//        ITrace2D trace = new Trace2DSimple();
+//        chart.addTrace(trace);
+//        trace.setColor(Color.RED);
 //
-//        chart = ChartFactory.createTimeSeriesChart("Performance: ", "Time", "", dataset, true, true, false);
-//
-//        XYPlot plot = chart.getXYPlot();
-//        DateAxis axis = (DateAxis)plot.getDomainAxis();
-//        axis.setDateFormatOverride(new SimpleDateFormat("HH:mm:ss.SSS"));
-//
-//        add(new ChartPanel(chart), BorderLayout.CENTER);
-//
-//    public void addMetric(String scanner, Metric metric, List<PerfSample> samples) {
-//        chart.setTitle("Performance: " + scanner);
-//
-//        TimeSeries series = new TimeSeries(metric.getName());
-//
-//        for (PerfSample sample : samples) {
-//            series.add(new FixedMillisecond(sample.getClock()), sample.getValue());
+//        for (int i = 0; i < pmd.size(); i++) {
+//            trace.addPoint(pmd.getT(i), pmd.getV(i));
 //        }
-//
-//        dataset.removeAllSeries();
-//        dataset.addSeries(series);
+    }
 
 }
