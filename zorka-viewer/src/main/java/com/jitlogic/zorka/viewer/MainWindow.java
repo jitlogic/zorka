@@ -57,7 +57,7 @@ public class MainWindow extends JFrame {
     private ErrorDetailView pnlStackTrace;
 
     /** Performance metric panel */
-    //private PerfMetricView pnlPerfMetric;
+    private PerfMetricView pnlPerfMetric;
 
     private ViewerState viewerState = new ViewerState();
 

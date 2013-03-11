@@ -16,18 +16,15 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.common.Metric;
-import com.jitlogic.zorka.common.PerfSample;
 
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
-import java.text.SimpleDateFormat;
-import java.util.List;
-
 public class PerfMetricView extends JPanel {
+
+    private SimpleLinearGraph graph;
 
     //private JFreeChart chart;
 
@@ -36,6 +33,13 @@ public class PerfMetricView extends JPanel {
     public PerfMetricView() {
         setBorder(new EmptyBorder(3,3,3,3));
         setLayout(new BorderLayout(0, 0));
+
+        graph = new SimpleLinearGraph();
+        add(graph,  BorderLayout.CENTER);
+    }
+
+
+
 //        dataset = new TimeSeriesCollection();
 //
 //        chart = ChartFactory.createTimeSeriesChart("Performance: ", "Time", "", dataset, true, true, false);
@@ -45,9 +49,8 @@ public class PerfMetricView extends JPanel {
 //        axis.setDateFormatOverride(new SimpleDateFormat("HH:mm:ss.SSS"));
 //
 //        add(new ChartPanel(chart), BorderLayout.CENTER);
-    }
-
-    public void addMetric(String scanner, Metric metric, List<PerfSample> samples) {
+//
+//    public void addMetric(String scanner, Metric metric, List<PerfSample> samples) {
 //        chart.setTitle("Performance: " + scanner);
 //
 //        TimeSeries series = new TimeSeries(metric.getName());
@@ -58,5 +61,5 @@ public class PerfMetricView extends JPanel {
 //
 //        dataset.removeAllSeries();
 //        dataset.addSeries(series);
-    }
+
 }
