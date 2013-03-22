@@ -91,30 +91,69 @@ __tomcat() {
 
   if (zorka.boolCfg("tracer", false)) {
 
-    zorka.logInfo("Enabling tracer Tomcat configuration.");
+    zorka.logInfo("Enabling tracer for Tomcat.");
 
-    tracer.exclude(
-      spy.byClass("sun.**"),
-      spy.byClass("java.**"),
-      spy.byClass("javax.**"),
-      spy.byClass("com.sun.**"),
-      spy.byClass("com.jitlogic.zorka.**"),
-      spy.byClass("org.xml.sax.**"),
-      spy.byClass("org.jcp.**"),
-      spy.byClass("~^\\$Proxy.*$")
-    );
+    for (String pkg : zorka.listCfg("tracer.include.extra")) {
+      if (pkg.contains("/")) {
+        cm = pkg.split("/");
+        zorka.logInfo("Include methods for trace: '" + cm[0] + "' / '" + cm[1] + "'");
+        tracer.include(spy.byMethod(cm[0].trim(),cm[1].trim()));
+      } else {
+        zorka.logInfo("Include classes for trace: '" + pkg + "'");
+        tracer.include(spy.byClass(pkg).forTrace());
+      }
+    }
 
-    tracer.include(spy.byClass("**").forTrace());
+    for (String pkg : zorka.listCfg("tracer.exclude", 
+        "sun.**", "java.**", "javax.**", "com.sun.**", "com.jitlogic.zorka.**", 
+        "org.xml.sax.**", "org.jcp.**", "~^\\$Proxy.*$",
+        "org.apache.catalina.loader.**/~[lf].*Class",
+        "org.apache.naming.resources.*Context/lookup")) {
+      if (pkg.contains("/")) {
+        cm = pkg.split("/");
+        zorka.logInfo("Exclude methods from trace: '" + cm[0] + "' / '" + cm[1] + "'");
+        tracer.exclude(spy.byMethod(cm[0].trim(),cm[1].trim()));
+      } else {
+        zorka.logInfo("Exclude classes from trace: '" + pkg + "'");
+        tracer.exclude(spy.byClass(pkg));
+      }
+    }
+
+    for (String pkg : zorka.listCfg("tracer.exclude.extra")) {
+      if (pkg.contains("/")) {
+        cm = pkg.split("/");
+        zorka.logInfo("Exclude methods from trace: '" + cm[0] + "' / '" + cm[1] + "'");
+        tracer.exclude(spy.byMethod(cm[0].trim(),cm[1].trim()));
+      } else {
+        zorka.logInfo("Exclude clases from trace: '" + pkg + "'");
+        tracer.exclude(spy.byClass(pkg));
+      }
+    }
+
+    for (String pkg : zorka.listCfg("tracer.include", "**")) {
+      if (pkg.contains("/")) {
+        cm = pkg.split("/");
+        zorka.logInfo("Include methods for trace: '" + cm[0] + "' / '" + cm[1] + "'");
+        tracer.include(spy.byMethod(cm[0].trim(),cm[1].trim()));
+      } else {
+        zorka.logInfo("Include classes for trace: '" + pkg + "'");
+        tracer.include(spy.byClass(pkg).forTrace());
+      }
+    }
 
     spy.add(spy.instance()
       .onEnter(spy.fetchArg("REQ", 1), 
-          spy.format("URI", "${REQ.request.requestURI}"), 
-          tracer.begin("HTTP_REQ"), 
-          zorka.boolCfg("tracer.verbose", false) ? spy.zorkaLog("INFO", "HTTP_REQ", "URI=${URI}") : null,
-          tracer.attr("URI", "URI"))
+        spy.format("URI", "${REQ.request.requestURI}"), 
+        tracer.begin("HTTP_REQ"), 
+        zorka.boolCfg("tracer.verbose", false) ? spy.zorkaLog("INFO", "HTTP_REQ", "URI=${URI}") : null,
+        tracer.attr("URI", "URI"))
       .onReturn(spy.fetchArg("RESP", 2),
-          spy.get("RESP", "STATUS", "response", "status"),
-          tracer.attr("STATUS", "STATUS"))
+        spy.get("RESP", "STATUS", "response", "status"),
+        tracer.attr("STATUS", "STATUS"))
+      .onError(spy.fetchError("EX"),
+        spy.format("ERR", "${EX}"),
+        zorka.boolCfg("tracer.verbose", false) ? spy.zorkaLog("ERROR", "HTTP/ERROR", "URI=${URI} ERR=${ERR}") : null,
+        tracer.attr("ERR", "ERR"))
       .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
 
     tracer.output(tracer.toFile(
@@ -122,20 +161,17 @@ __tomcat() {
       zorka.intCfg("tracer.log.fnum", 8),
       zorka.kiloCfg("tracer.log.size", 128*1024*1024)));
 
-
     if (zorka.hasCfg("tracer.min.method.time")) {
-      mmt = zorka.longCfg("tracer.min.method.time", 250000);
+      mmt = zorka.longCfg("tracer.min.method.time", 1000000);
       zorka.logInfo("Setting tracer minimum method time to " + mmt + " ns");
       tracer.setTracerMinMethodTime(mmt);
     }
-
 
     if (zorka.hasCfg("tracer.min.trace.time")) {
       mtt = zorka.longCfg("tracer.min.trace.time", 100);
       zorka.logInfo("Settting tracer minimum trace time to " + mtt + " ms");
       tracer.setTracerMinTraceTime(mtt);
     }
-
 
     if (zorka.hasCfg("tracer.max.trace.records")) {
       mtr = zorka.longCfg("tracer.min.trace.records", 4096);
