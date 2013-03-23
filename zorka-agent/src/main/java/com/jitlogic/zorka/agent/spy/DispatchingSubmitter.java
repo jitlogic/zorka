@@ -184,7 +184,7 @@ public class DispatchingSubmitter implements SpySubmitter {
                     break;
                 }
             } catch (Exception e) {
-                log.error(ZorkaLogger.ZSP_ERRORS, "Error processing record %s (on processor %s, stage=%s)",
+                log.error(ZorkaLogger.ZSP_ERRORS, "Error processing record %s (on processor %s, stage=%s)", e,
                     record, processor, stage);
             }
         }

@@ -17,8 +17,6 @@
 
 // This sample instruments WSO2 ESB Echo web service.
 
-spy.add(spy.instance()
-  .onEnter(spy.fetchTime("T1")).onReturn(spy.fetchTime("T2"))
-  .onSubmit(spy.tdiff("T1", "T2", "T"),
-    spy.zorkaStats("java", "zorka:type=ZorkaStats,name=EchoService", "stats", "${methodName}", "T", "T2"))
+spy.add(spy.instrument()
+  .onSubmit(spy.zorkaStats("java", "zorka:type=ZorkaStats,name=EchoService", "stats", "${methodName}"))
   .include(spy.byMethod("org.wso2.carbon.core.services.echo.Echo", "echo*")));

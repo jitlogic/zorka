@@ -17,13 +17,10 @@
 
 
   spy.add(
-    spy.instance()
-      .onEnter(spy.fetchTime("T1"))
-      .onReturn(spy.fetchTime("T2"), spy.fetchArg("RES", 2),
-        spy.get("RES", "STATUS", "response", "status"))
-      .onSubmit(spy.tdiff("T1","T2","T"),
-        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byStatus", "${STATUS}", "T2", "T"))
-    .include(
-      spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
+    spy.instrument()
+      .onReturn(spy.fetchArg("RES", 2),
+        spy.get("STATUS", "RES", "response", "status"))
+      .onSubmit(spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byStatus", "${STATUS}"))
+    .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
   );
 
