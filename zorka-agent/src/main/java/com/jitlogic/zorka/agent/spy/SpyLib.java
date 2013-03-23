@@ -170,7 +170,7 @@ public class SpyLib {
                 .onEnter(fetchTime("T1"))
                 .onReturn(fetchTime("T2"))
                 .onError(fetchTime("T2"))
-                .onSubmit(tdiff("T1", "T2", "T"));
+                .onSubmit(tdiff("T", "T1", "T2"));
     }
 
 
@@ -218,7 +218,7 @@ public class SpyLib {
         return SpyDefinition.instance()
                 .onEnter(sdaList.toArray(new SpyDefArg[0]))
                 .onReturn(fetchTime("T2")).onError(fetchTime("T2"))
-                .onSubmit(tdiff("T1", "T2", "T"), zorkaStats(mbsName, mbeanName, attrName, sb.toString(), "T"));
+                .onSubmit(tdiff("T", "T1", "T2"), zorkaStats(mbsName, mbeanName, attrName, sb.toString(), "T"));
     }
 
 
@@ -541,16 +541,54 @@ public class SpyLib {
     }
 
 
+    /**
+     * Logs record occurence in zorka log. This is useful for debug purposes.
+     *
+     * @param logLevel log level
+     *
+     * @param tag tag
+     *
+     * @param message message template (will be filled with record fields if necessary)
+     *
+     * @return logger collector object
+     */
     public SpyProcessor zorkaLog(String logLevel, String tag, String message) {
         return new ZorkaLogCollector(ZorkaLogLevel.valueOf(logLevel), tag, message, null, null);
     }
 
 
+    /**
+     * Logs record occurence in zorka log. This is useful for debug purposes.
+     *
+     * @param logLevel log level
+     *
+     * @param tag tag
+     *
+     * @param message message template (will be filled with record fields if necessary)
+     *
+     * @param fErr
+     *
+     * @return logger collector object
+     */
     public SpyProcessor zorkaLog(String logLevel, String tag, String message, String fErr) {
         return new ZorkaLogCollector(ZorkaLogLevel.valueOf(logLevel), tag, message, null, fErr);
     }
 
 
+    /**
+     * Logs record occurence in zorka log. This is useful for debug purposes.
+     *
+     * @param logLevel log level
+     *
+     * @param tag tag
+     *
+     * @param message message template (will be filled with record fields if necessary)
+     *
+     * @param fCond condition field - record will be logged if
+     *
+     *
+     * @return logger collector object
+     */
     public SpyProcessor zorkaLogCond(String logLevel, String tag, String message, String fCond) {
         return new ZorkaLogCollector(ZorkaLogLevel.valueOf(logLevel), tag, message, fCond, null);
     }
@@ -579,21 +617,21 @@ public class SpyLib {
     /**
      * Filters records according to given regular expression.
      *
-     * @param src argument number
+     * @param dst destination slot
      *
      * @param regex regular expression
      *
      * @return filtering processor object
      */
-    public SpyProcessor regexFilter(String src, String regex) {
-        return new RegexFilterProcessor(src, regex);
+    public SpyProcessor regexFilter(String dst, String regex) {
+        return new RegexFilterProcessor(dst, regex);
     }
 
 
     /**
      * Filters record according to given regular expression.
      *
-     * @param src argument number
+     * @param dst destination slot
      *
      * @param regex regular expression
      *
@@ -601,17 +639,18 @@ public class SpyLib {
      *
      * @return filtering processor object
      */
-    public SpyProcessor regexFilter(String src, String regex, boolean filterOut) {
-        return new RegexFilterProcessor(src, regex, filterOut);
+    public SpyProcessor regexFilter(String dst, String regex, boolean filterOut) {
+        return new RegexFilterProcessor(dst, regex, filterOut);
     }
 
 
     /**
      * Transforms data using regular expression and substitution.
      *
-     * @param src source field name
      *
      * @param dst destination field name
+     *
+     * @param src source field name
      *
      * @param regex regular expression used to parse input
      *
@@ -619,17 +658,18 @@ public class SpyLib {
      *
      * @return transforming processor object
      */
-    public SpyProcessor transform(String src, String dst, String regex, String expr) {
-        return transform(src, dst, regex, expr, false);
+    public SpyProcessor transform(String dst, String src, String regex, String expr) {
+        return transform(dst, src, regex, expr, false);
     }
 
 
     /**
      * Transforms data using regular expression and substitution.
      *
-     * @param src source field name
      *
      * @param dst destination field name
+     *
+     * @param src source field name
      *
      * @param regex regular expression used to parse input
      *
@@ -639,7 +679,7 @@ public class SpyLib {
      *
      * @return transforming processor object
      */
-    public SpyProcessor transform(String src, String dst, String regex, String expr, boolean filterOut) {
+    public SpyProcessor transform(String dst, String src, String regex, String expr, boolean filterOut) {
         return new RegexFilterProcessor(src, dst, regex, expr, filterOut);
     }
 
@@ -647,15 +687,16 @@ public class SpyLib {
     /**
      * Normalizes a query string from src and puts result into dst.
      *
-     * @param src source field
      *
      * @param dst destination field
+     *
+     * @param src source field
      *
      * @param normalizer normalizer object
      *
      * @return normalizing processor object
      */
-    public SpyProcessor normalize(String src, String dst, Normalizer normalizer) {
+    public SpyProcessor normalize(String dst, String src, Normalizer normalizer) {
         return new NormalizingProcessor(src, dst, normalizer);
     }
 
@@ -664,15 +705,16 @@ public class SpyLib {
      * Gets slot number n, performs traditional get operation and stores
      * results in the same slot.
      *
-     * @param src source field
      *
      * @param dst destination field
+     *
+     * @param src source field
      *
      * @param path getter path
      *
      * @return getter processor object
      */
-    public SpyProcessor get(String src, String dst, Object...path) {
+    public SpyProcessor get(String dst, String src, Object... path) {
         return new GetterProcessor(src, dst, path);
     }
 
@@ -734,15 +776,16 @@ public class SpyLib {
     /**
      * Calculates time difference between in1 and in2 and stores result in out.
      *
+     *
+     * @param dst destination slot
+     *
      * @param tstart slot with tstart
      *
      * @param tstop slot with tstop
      *
-     * @param dst destination slot
-     *
      * @return time diff calculator object
      */
-    public SpyProcessor tdiff(String tstart, String tstop, String dst) {
+    public SpyProcessor tdiff(String dst, String tstart, String tstop) {
         return new TimeDiffProcessor(tstart, tstop, dst);
     }
 
@@ -751,9 +794,10 @@ public class SpyLib {
      * Gets object from slot number arg, calls given method on this slot and
      * if method returns some value, stores its result in this slot.
      *
-     * @param src source field
      *
      * @param dst destination field
+     *
+     * @param src source field
      *
      * @param methodName method name
      *
@@ -761,7 +805,7 @@ public class SpyLib {
      *
      * @return method calling processor object
      */
-    public SpyProcessor call(String src, String dst, String methodName, Object... methodArgs) {
+    public SpyProcessor call(String dst, String src, String methodName, Object... methodArgs) {
         return new MethodCallingProcessor(src, dst, methodName, methodArgs);
     }
 
@@ -777,7 +821,7 @@ public class SpyLib {
      *
      * @return conditional filtering processor object
      */
-    public SpyProcessor ifSlotCmp(String a, String op, String b) {
+    public SpyProcessor scmp(String a, String op, String b) {
         return ComparatorProcessor.scmp(a, op, b);
     }
 
@@ -793,8 +837,35 @@ public class SpyLib {
      *
      * @return conditional filtering processor object
      */
-    public SpyProcessor ifValueCmp(String a, String op, Object v) {
+    public SpyProcessor vcmp(String a, String op, Object v) {
         return ComparatorProcessor.vcmp(a, op, v);
+    }
+
+
+    /**
+     * Passes only records of method calls that took longer than specified interval.
+     * Execution time is taken from default slot called "T".
+     *
+     * @param interval minimum execution interval (milliseconds)
+     *
+     * @return
+     */
+    public SpyProcessor longerThan(long interval) {
+        return longerThan("T", interval);
+    }
+
+
+    /**
+     * Passes only records of method calls that took longer than specified interval.
+     *
+     * @param dst slot where execution time value is stored
+     *
+     * @param interval minimum execution interval (milliseconds)
+     *
+     * @return
+     */
+    public SpyProcessor longerThan(String dst, long interval) {
+        return ComparatorProcessor.vcmp(dst, ">", interval * 1000000L);
     }
 
 

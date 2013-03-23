@@ -18,9 +18,9 @@
 
 
   spy.add(
-    spy.instance()
-      .onEnter(spy.fetchTime("T1"), spy.fetchArg("REQ",1),
-        spy.get("REQ","E","request","requestURI"),
+    spy.instrument()
+      .onEnter(spy.fetchArg("REQ",1),
+        spy.get("E","REQ","request","requestURI"),
         spy.transform("E","E","^.*\\.jsp$","javaApps"),
         spy.transform("E","E","^.*\\.do$","javaApps"),
         spy.transform("E","E","^.*\\.html$","staticPages"),
@@ -31,9 +31,7 @@
         spy.transform("E","E","^.*\\.ico$","images"),
         spy.transform("E","E","^.*loginform\\.jsp$","loginForm"),
         spy.transform("E","E","^\\/.*", "other"))
-      .onReturn(spy.fetchTime("T2"))
-      .onSubmit(spy.tdiff("T1","T2","T"),
-        spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byTag", "${E}", "T2", "T"))
+      .onSubmit(spy.zorkaStats("java", "zorka:type=ZorkaStats,name=HttpStats", "byTag", "${E}"))
     .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke"))
   );
 

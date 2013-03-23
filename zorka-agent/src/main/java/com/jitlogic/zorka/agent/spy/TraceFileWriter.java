@@ -93,6 +93,8 @@ public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
         this.traceFile = new File(path);
         this.maxFiles = maxFiles;
         this.maxFileSize = maxFileSize;
+
+        log.info(ZorkaLogger.ZTR_CONFIG, "Initialized trace file writer: path=" + path);
     }
 
 
