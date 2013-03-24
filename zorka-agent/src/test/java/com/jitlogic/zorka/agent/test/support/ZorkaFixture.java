@@ -36,9 +36,7 @@ import java.util.Properties;
 public class ZorkaFixture {
 
     protected Properties configProperties;
-    protected TestLogger testLogger;
     protected MBeanServer testMbs;
-    private ZorkaTestUtil testUtil;
     protected MBeanServerRegistry mBeanServerRegistry;
 
     protected AgentInstance agentInstance;
@@ -56,29 +54,26 @@ public class ZorkaFixture {
     protected PerfMonLib perfmon;
 
     @Before
-    public void setUpFixture() {
+    public void setUpFixture() throws Exception {
+
         configProperties = setProps(
                 ZorkaConfig.defaultProperties(),
                 "zorka.home.dir", "/tmp",
                 "zabbix.enabled", "no",
                 "zorka.hostname", "test",
+                "zorka.filelog", "no",
+                "zorka.mbs.autoregister", "yes",
                 "spy", "yes"
                 );
 
         ZorkaConfig.setProperties(configProperties);
 
-        testLogger = new TestLogger();
-        ZorkaLogger.setLogger(testLogger);
-
         configProperties = ZorkaConfig.getProperties();
-        mBeanServerRegistry = new MBeanServerRegistry(true);
-        AgentInstance.setMBeanServerRegistry(mBeanServerRegistry);
 
         agentInstance = new AgentInstance(configProperties);
-        AgentInstance.setInstance(agentInstance);
+        mBeanServerRegistry = agentInstance.getMBeanServerRegistry();
+        TestUtil.setField(agentInstance, "instance", agentInstance);
         agentInstance.start();
-
-        AgentInstance.setMBeanServerRegistry(mBeanServerRegistry);
 
         spyInstance = agentInstance.getSpyInstance();
 
@@ -87,8 +82,6 @@ public class ZorkaFixture {
 
         testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
         mBeanServerRegistry.register("test", testMbs, testMbs.getClass().getClassLoader());
-
-        testUtil = ZorkaTestUtil.setUp();
 
         syslogLib = agentInstance.getSyslogLib();
         snmpLib = agentInstance.getSnmpLib();
@@ -102,9 +95,9 @@ public class ZorkaFixture {
 
     @After
     public void tearDownFixture() {
-        AgentInstance.setMBeanServerRegistry(null);
         ZorkaLogger.setLogger(null);
         ZorkaConfig.cleanup();
+        mBeanServerRegistry.unregister("test");
     }
 
 

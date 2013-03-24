@@ -51,8 +51,8 @@ public class JmxAggregatingLister<T extends Rankable<?>> implements RankLister<T
      * @param objectName object name (or mask)
      */
     public JmxAggregatingLister(String mbsName, String objectName) {
-        this.mbsConn = AgentInstance.getMBeanServerRegistry().lookup(mbsName);
-        this.classLoader = AgentInstance.getMBeanServerRegistry().getClassLoader(mbsName);
+        this.mbsConn = AgentInstance.instance().getMBeanServerRegistry().lookup(mbsName);
+        this.classLoader = AgentInstance.instance().getMBeanServerRegistry().getClassLoader(mbsName);
         this.objectName = objectName;
     }
 

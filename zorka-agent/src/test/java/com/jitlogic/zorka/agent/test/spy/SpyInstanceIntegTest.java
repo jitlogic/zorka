@@ -33,7 +33,7 @@ public class SpyInstanceIntegTest extends ZorkaFixture {
                 .include(spy.byMethod(BytecodeInstrumentationFixture.TCLASS1, "trivialMethod"))
                 .onSubmit(spy.zorkaStats("test", "test:name=${shortClassName}", "stats", "${methodName}", "S0"));
 
-        spyInstance.add(sdef);
+        spyInstance.getClassTransformer().add(sdef);
 
         Object obj = instantiate(spyInstance.getClassTransformer(), BytecodeInstrumentationFixture.TCLASS1);
         invoke(obj, "trivialMethod");

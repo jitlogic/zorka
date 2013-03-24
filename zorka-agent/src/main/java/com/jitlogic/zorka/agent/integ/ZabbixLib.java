@@ -55,7 +55,7 @@ public class ZabbixLib {
      */
     public JSONObject discovery(int flags, QueryDef...qdefs) {
         JSONArray data = new JSONArray();
-        MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
+        MBeanServerRegistry registry = AgentInstance.instance().getMBeanServerRegistry();
 
         for (QueryDef qdef : qdefs) {
             qdef = qdef.with(flags);

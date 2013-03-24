@@ -63,7 +63,7 @@ public class ZabbixAgentIntegTest {
 	public void setUp() throws Exception {
         ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
         ZorkaLogger.setLogger(new TestLogger());
-        AgentInstance.setMBeanServerRegistry(new MBeanServerRegistry(true));
+        //AgentInstance.setMBeanServerRegistry(new MBeanServerRegistry(true));
 		agent = new ZorkaBshAgent(Executors.newSingleThreadExecutor());
 		ZorkaConfig.getProperties().put ("zabbix.listen.addr", "127.0.0.1");
 		ZorkaConfig.getProperties().put("zabbix.listen.port", "10066");
@@ -74,7 +74,7 @@ public class ZabbixAgentIntegTest {
 	@After
 	public void tearDown() {
 		service.stop();
-        AgentInstance.setMBeanServerRegistry(null);
+        //AgentInstance.setMBeanServerRegistry(null);
         ZorkaLogger.setLogger(null);
         ZorkaConfig.cleanup();
 	}

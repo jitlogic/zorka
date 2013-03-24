@@ -169,7 +169,7 @@ public class StressTestFixture extends ZorkaFixture {
         }
 
         spyTransformer.reset();
-        spyInstance.add(sdef.include(spy.byMethod(TCLASS3, methodName)));
+        spyInstance.getClassTransformer().add(sdef.include(spy.byMethod(TCLASS3, methodName)));
 
         final Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS3);
         final Map<Integer,Long> times = new ConcurrentHashMap<Integer, Long>();

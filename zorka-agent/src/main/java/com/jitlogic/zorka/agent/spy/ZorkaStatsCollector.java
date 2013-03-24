@@ -98,7 +98,7 @@ public class ZorkaStatsCollector implements SpyProcessor {
     private MethodCallStatistics cachedStatistics;
 
     /** MBean server registry */
-    private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
+    private MBeanServerRegistry registry = AgentInstance.instance().getMBeanServerRegistry();
 
     /**
      * Creates new method call statistics collector.

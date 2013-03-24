@@ -17,8 +17,7 @@
 
 package com.jitlogic.zorka.agent;
 
-import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
-
+import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 
 /**
@@ -28,12 +27,6 @@ import java.lang.instrument.Instrumentation;
  */
 public class AgentMain {
 
-    /** Zorka home directory (passed as -javaagent argument) */
-    private static String homeDir;
-
-    /** Agent instance */
-    public static AgentInstance agent;
-
     /**
      * This is entry method of java agent.
      *
@@ -42,19 +35,13 @@ public class AgentMain {
      * @param instr reference to JVM instrumentation interface
      */
     public static void premain(String args, Instrumentation instr) {
-        String[] argv = args.split(",");
-        homeDir = argv[0];
 
-        ZorkaConfig.loadProperties(homeDir);
+        ZorkaConfig.loadProperties(args);
 
-        MBeanServerRegistry mBeanServerRegistry = new MBeanServerRegistry(
-            "yes".equalsIgnoreCase(ZorkaConfig.getProperties().getProperty("zorka.mbs.autoregister")));
-        AgentInstance.setMBeanServerRegistry(mBeanServerRegistry);
+        ClassFileTransformer transformer = AgentInstance.instance().getSpyTransformer();
 
-        agent = AgentInstance.instance();
-
-        if (agent != null && agent.getSpyTransformer() != null) {
-            instr.addTransformer(agent.getSpyTransformer());
+        if (transformer != null) {
+            instr.addTransformer(transformer);
 
         }
     }

@@ -52,7 +52,7 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
      * @param attr
      */
     public EjbRankLister(String mbsName, String objNames, String attr) {
-        this.mbs = AgentInstance.getMBeanServerRegistry().lookup(mbsName);
+        this.mbs = AgentInstance.instance().getMBeanServerRegistry().lookup(mbsName);
         this.objNames = objNames;
         this.attr = attr;
     }

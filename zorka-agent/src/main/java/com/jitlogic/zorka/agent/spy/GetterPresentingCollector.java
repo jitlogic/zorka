@@ -37,7 +37,7 @@ public class GetterPresentingCollector implements SpyProcessor {
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     /** MBean server registry */
-    private MBeanServerRegistry registry = AgentInstance.getMBeanServerRegistry();
+    private MBeanServerRegistry registry = AgentInstance.instance().getMBeanServerRegistry();
 
     /** MBean server name */
     private String mbsName;

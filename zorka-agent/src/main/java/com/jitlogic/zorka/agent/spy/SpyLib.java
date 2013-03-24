@@ -144,7 +144,7 @@ public class SpyLib {
      */
     public void add(SpyDefinition...sdefs) {
         for (SpyDefinition sdef : sdefs) {
-            instance.add(sdef);
+            instance.getClassTransformer().add(sdef);
         }
     }
 

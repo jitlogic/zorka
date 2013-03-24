@@ -197,7 +197,7 @@ public class ZorkaLogger implements ZorkaTrapper {
     }
 
     /** Logger */
-    private static ZorkaLogger logger = new ZorkaLogger();
+    private static ZorkaLogger logger;
 
 
     /**
@@ -221,7 +221,7 @@ public class ZorkaLogger implements ZorkaTrapper {
      * @return ZorkaLog object
      */
     public static ZorkaLog getLog(String tag) {
-        return new ZorkaLog(tag, logger);
+        return new ZorkaLog(tag, getLogger());
     }
 
 
@@ -230,7 +230,10 @@ public class ZorkaLogger implements ZorkaTrapper {
      *
      * @return logger
      */
-    public static ZorkaLogger getLogger() {
+    public static synchronized ZorkaLogger getLogger() {
+        if (logger == null) {
+            logger = new ZorkaLogger();
+        }
         return logger;
     }
 

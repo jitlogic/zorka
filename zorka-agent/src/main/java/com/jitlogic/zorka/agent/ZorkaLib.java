@@ -19,8 +19,6 @@ package com.jitlogic.zorka.agent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.management.*;
 
@@ -78,7 +76,7 @@ public class ZorkaLib  {
      */
     public ZorkaLib(ZorkaBshAgent agent) {
 		this.agent = agent;
-        this.mbsRegistry = AgentInstance.getMBeanServerRegistry();
+        this.mbsRegistry = AgentInstance.instance().getMBeanServerRegistry();
         this.hostname = ZorkaConfig.getProperties().getProperty("zorka.hostname").trim();
 	}
 

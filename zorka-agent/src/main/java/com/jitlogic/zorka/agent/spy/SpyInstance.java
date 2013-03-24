@@ -28,8 +28,6 @@ public class SpyInstance {
     /** Logger */
     private static ZorkaLog log = ZorkaLogger.getLog(SpyInstance.class);
 
-    /** Spy instance reference */
-    private static volatile SpyInstance instance;
 
     /** Reference to instance's class transformer */
     private SpyClassTransformer classTransformer;
@@ -39,43 +37,6 @@ public class SpyInstance {
 
     /** Tracer */
     private Tracer tracer;
-
-    /**
-     * Returns spy instance. Creates one if called for the first time.
-     * Configures MainSubmitter to submit values to newly created instance.
-     *
-     * @return spy instance
-     */
-    public static SpyInstance instance() {
-
-        log.debug(ZorkaLogger.ZSP_CONFIG, "Requested a submitter instance.");
-
-        synchronized (SpyInstance.class) {
-            if (null == instance) {
-                instance = new SpyInstance();
-
-                log.debug(ZorkaLogger.ZSP_CONFIG, "Setting up submitter: " + instance.getSubmitter());
-
-                MainSubmitter.setSubmitter(instance.getSubmitter());
-                MainSubmitter.setTracer(instance().getTracer());
-            }
-
-        }
-
-        return instance;
-    }
-
-
-    /**
-     * Stops spy instance and deconfigures MainSubmitter.
-     */
-    public static void cleanup() {
-        synchronized (SpyInstance.class) {
-            MainSubmitter.setSubmitter(null);
-            instance = null;
-        }
-    }
-
 
     /**
      * Creates new instance.

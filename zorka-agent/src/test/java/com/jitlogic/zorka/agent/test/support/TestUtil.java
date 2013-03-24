@@ -138,7 +138,7 @@ public class TestUtil extends ClassLoader {
     }
 
     public static Object getAttr(String mbsName, String mbeanName, String attr) throws Exception{
-        MBeanServerConnection mbs = AgentInstance.getMBeanServerRegistry().lookup(mbsName);
+        MBeanServerConnection mbs = AgentInstance.instance().getMBeanServerRegistry().lookup(mbsName);
         return mbs.getAttribute(new ObjectName(mbeanName), attr);
     }
 }

@@ -73,7 +73,7 @@ public class PerfMonLib {
      */
     public JmxAttrScanner scanner(String name, QueryDef... qdefs) {
         return new JmxAttrScanner(symbolRegistry, metricsRegistry, name,
-                AgentInstance.getMBeanServerRegistry(), tracer, qdefs);
+                AgentInstance.instance().getMBeanServerRegistry(), tracer, qdefs);
     }
 
 }
