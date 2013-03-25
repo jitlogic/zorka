@@ -34,6 +34,7 @@ public class TracerLib {
 
 
     private Tracer tracer;
+    private ZorkaConfig config;
 
     /** Default trace flags */
     private int defaultTraceFlags = TraceMarker.DROP_INTERIM;
@@ -43,8 +44,9 @@ public class TracerLib {
      *
      * @param tracer reference to spy instance
      */
-    public TracerLib(Tracer tracer) {
+    public TracerLib(Tracer tracer, ZorkaConfig config) {
         this.tracer = tracer;
+        this.config = config;
     }
 
 
@@ -174,7 +176,7 @@ public class TracerLib {
      * @return trace file writer
      */
     public ZorkaAsyncThread<Submittable> toFile(String path, int maxFiles, long maxSize) {
-        TraceFileWriter writer = new TraceFileWriter(ZorkaConfig.formatCfg(path),
+        TraceFileWriter writer = new TraceFileWriter(config.formatCfg(path),
                 tracer.getSymbolRegistry(), tracer.getMetricsRegistry(),
                 maxFiles, maxSize);
         writer.start();

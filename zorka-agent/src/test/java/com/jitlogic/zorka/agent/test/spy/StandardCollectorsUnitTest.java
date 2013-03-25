@@ -42,6 +42,7 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
     private List<Object> results = new ArrayList<Object>();
 
+    // Don't remove. This is used from test BSH scripts.
     public void result(Object result) {
         results.add(result);
     }
@@ -49,14 +50,10 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
     protected SpyContext ctx;
     protected SpyDefinition sdef;
     protected Map<String,Object> record;
-    protected MBeanServer testMbs;
 
     @Before
     public void setUp() {
         zorkaAgent.install("test", this);
-
-        testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
-        mBeanServerRegistry.register("test", testMbs, null);
 
         sdef = SpyDefinition.instance();
         ctx = new SpyContext(sdef, "some.Class", "someMethod", "()V", 1);
@@ -89,7 +86,7 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
     @Test
     public void testPublishObjectViaGetterCollector() throws Exception {
-        SpyProcessor col = new GetterPresentingCollector("test", "test:name=TestObj", "testAttr", "meh", "C2");
+        SpyProcessor col = new GetterPresentingCollector(mBeanServerRegistry, "test", "test:name=TestObj", "testAttr", "meh", "C2");
         record.put("C0", 1L); record.put("C1", 1L); record.put("C2", "oja!");
 
         record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_SUBMIT));
@@ -97,21 +94,21 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
         col.process(record);
 
-        Object obj = getAttr("test", "test:name=TestObj", "testAttr");
+        Object obj = getAttr(testMbs, "test:name=TestObj", "testAttr");
         assertEquals("getter should return string passed via spy record", "oja!", obj);
     }
 
 
     @Test
     public void testPublishObjectViaGetterCollectorWithDispatch() throws Exception {
-        SpyProcessor col = new GetterPresentingCollector("test", "test:name=TestObj", "testAttr", "meh", "C2", "length()");
+        SpyProcessor col = new GetterPresentingCollector(mBeanServerRegistry, "test", "test:name=TestObj", "testAttr", "meh", "C2", "length()");
         record.put("C0", 1L); record.put("C1", 1L); record.put("C2", "oja!");
 
         record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_SUBMIT));
         record.put(".STAGE", SpyLib.ON_SUBMIT);
         col.process(record);
 
-        Object obj = getAttr("test", "test:name=TestObj", "testAttr");
+        Object obj = getAttr(testMbs, "test:name=TestObj", "testAttr");
         assertEquals("getter should return length of string passed via spy record", 4, obj);
     }
 }

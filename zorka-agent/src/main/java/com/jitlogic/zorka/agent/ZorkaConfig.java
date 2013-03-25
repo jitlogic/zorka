@@ -48,10 +48,10 @@ public class ZorkaConfig {
     private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaConfig.class);
 
     /** Configuration properties */
-    private static Properties properties;
+    private Properties properties;
 
     /** Home directory */
-	private static String homeDir;
+	private String homeDir;
 
     /** Path to config defaults (always in classpath) */
     public final static String DEFAULT_CONF_PATH = "/com/jitlogic/zorka/agent/zorka.properties";
@@ -64,34 +64,14 @@ public class ZorkaConfig {
         properties = props;
     }
 
-    /**
-     * Clears static agent configuration. This is mainly useful for tests,
-     * but it might be also useful for online agent reload feature (which
-     * might be implemented some time in the future).
-     */
-    public static void cleanup() {
-        properties = null;
-        homeDir = null;
-    }
-
 
     /**
      * Returns configuration properties.
      *
      * @return configuration properties
      */
-    public static Properties getProperties() {
+    public Properties getProperties() {
         return properties;
-    }
-
-    /**
-     * Set configuration properties manually. This is useful mainly for testing.
-     *
-     * @param props new properties
-     */
-    public static void setProperties(Properties props) {
-        homeDir = props.getProperty("zorka.home.dir", File.separatorChar == '/' ? "/opt/zorka" : "C:\\zorka");
-        properties = props;
     }
 
 
@@ -100,7 +80,7 @@ public class ZorkaConfig {
      *
      * @return directory where agent will write its logs.
      */
-    public static String getLogDir() {
+    public String getLogDir() {
         return ZorkaUtil.path(homeDir, "log");
     }
 
@@ -110,7 +90,7 @@ public class ZorkaConfig {
      *
      * @return directory from which agent reads BSH configuration scripts.
      */
-	public static String getConfDir() {
+	public String getConfDir() {
         return ZorkaUtil.path(homeDir, "conf");
     }
 
@@ -139,19 +119,19 @@ public class ZorkaConfig {
                 } catch (IOException e) {
                     log.error(ZorkaLogger.ZAG_ERRORS, "Error closing property file", e);
                 }
-                is = null;
             }
         }
 
         return props;
     }
 
+
     /**
      * Sets agent home directory and load zorka.properties file from it.
      *
      * @param home home directory for zorka agent
      */
-	public static void loadProperties(String home) {
+	private void loadProperties(String home) {
         homeDir = home;
 		properties = defaultProperties();
 		InputStream is = null;
@@ -174,6 +154,7 @@ public class ZorkaConfig {
         properties.put("zorka.log.dir", ZorkaUtil.path(homeDir, "log"));
 	}
 
+
     /**
      * Formats string containing references to zorka properties.
      *
@@ -181,11 +162,11 @@ public class ZorkaConfig {
      *
      * @return
      */
-    public static String formatCfg(String input) {
+    public String formatCfg(String input) {
         return properties == null ? input : ObjectInspector.substitute(input, properties);
     }
 
-    public static List<String> listCfg(String key, String...defVals) {
+    public List<String> listCfg(String key, String...defVals) {
         String s = properties.getProperty(key);
 
         if (s != null) {
@@ -203,16 +184,18 @@ public class ZorkaConfig {
         }
     }
 
+
     private static Map<String,Long> kilos = ZorkaUtil.map(
             "k", 1024L, "K", 1024L,
             "m", 1024 * 1024L, "M", 1024 * 1024L,
             "g", 1024 * 1024 * 1024L, "G", 1024 * 1024 * 1024L,
             "t", 1024 * 1024 * 1024 * 1024L, "T", 1024 * 1024 * 1024 * 1024L);
 
+
     private static Pattern kiloRe = Pattern.compile("^([0-9]+)([kKmMgGtT])$");
 
 
-    public static Long kiloCfg(String key, Long defval) {
+    public Long kiloCfg(String key, Long defval) {
         String s = properties.getProperty(key);
 
         long multi = 1L;
@@ -240,14 +223,14 @@ public class ZorkaConfig {
     }
 
 
-    public static String stringCfg(String key, String defval) {
+    public String stringCfg(String key, String defval) {
         String s = properties.getProperty(key);
 
         return s != null ? s.trim() : defval;
     }
 
 
-    public static Long longCfg(String key, Long defval) {
+    public Long longCfg(String key, Long defval) {
         String s = properties.getProperty(key);
 
         try {
@@ -264,7 +247,7 @@ public class ZorkaConfig {
     }
 
 
-    public static Integer intCfg(String key, Integer defval) {
+    public Integer intCfg(String key, Integer defval) {
         String s = properties.getProperty(key);
 
         try {
@@ -281,7 +264,7 @@ public class ZorkaConfig {
     }
 
 
-    public static Boolean boolCfg(String key, Boolean defval) {
+    public Boolean boolCfg(String key, Boolean defval) {
         String s = properties.getProperty(key);
 
         if (s != null) {
@@ -300,7 +283,8 @@ public class ZorkaConfig {
         return defval;
     }
 
-    public static boolean hasCfg(String key) {
+
+    public boolean hasCfg(String key) {
         String s = properties.getProperty(key);
 
         return s != null && s.trim().length() > 0;

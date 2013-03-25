@@ -18,6 +18,7 @@
 package com.jitlogic.zorka.agent.spy;
 
 import com.jitlogic.zorka.agent.integ.SnmpLib;
+import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.common.ZorkaTrapper;
 import com.jitlogic.zorka.agent.integ.SnmpTrapper;
 import com.jitlogic.zorka.agent.integ.TrapVarBindDef;
@@ -125,14 +126,16 @@ public class SpyLib {
     public static final int AC_ANY          = 0x000000;
 
     private SpyClassTransformer classTransformer;
+    private MBeanServerRegistry mbsRegistry;
 
     /**
      * Creates spy library object
      *
      * @param classTransformer spy transformer
      */
-	public SpyLib(SpyClassTransformer classTransformer) {
+	public SpyLib(SpyClassTransformer classTransformer, MBeanServerRegistry mbsRegistry) {
         this.classTransformer = classTransformer;
+        this.mbsRegistry = mbsRegistry;
 	}
 
 
@@ -450,7 +453,7 @@ public class SpyLib {
      * @return collector object
      */
     public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr, String timeField) {
-        return new ZorkaStatsCollector(mbsName, beanName, attrName, keyExpr, timeField);
+        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr, timeField);
     }
 
 
@@ -468,7 +471,7 @@ public class SpyLib {
      * @return collector object
      */
     public SpyProcessor getterCollector(String mbsName, String beanName, String attrName, String desc, String src, Object...path) {
-        return new GetterPresentingCollector(mbsName, beanName, attrName, desc, src, path);
+        return new GetterPresentingCollector(mbsRegistry, mbsName, beanName, attrName, desc, src, path);
     }
 
 

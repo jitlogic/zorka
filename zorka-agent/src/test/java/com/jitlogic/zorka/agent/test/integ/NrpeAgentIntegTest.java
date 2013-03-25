@@ -34,7 +34,7 @@ public class NrpeAgentIntegTest extends ZorkaFixture {
 
     @Before
     public void setUp() {
-        nagiosAgent = new NagiosAgent(zorkaAgent);
+        nagiosAgent = new NagiosAgent(config,  zorkaAgent);
         nagiosAgent.start();
     }
 
@@ -45,7 +45,7 @@ public class NrpeAgentIntegTest extends ZorkaFixture {
 
     @Test
     public void testTrivialRequest() throws Exception {
-        assertEquals(ZorkaConfig.getProperties().getProperty("zorka.version"), query("zorka.version[]"));
+        assertEquals(configProperties.getProperty("zorka.version"), query("zorka.version[]"));
     }
 
 

@@ -17,7 +17,6 @@
 
 package com.jitlogic.zorka.agent.test.integ;
 
-import com.jitlogic.zorka.agent.integ.ZabbixLib;
 import com.jitlogic.zorka.agent.mbeans.MethodCallStatistics;
 import com.jitlogic.zorka.agent.mbeans.ZorkaMappedMBean;
 import com.jitlogic.zorka.agent.perfmon.QueryDef;
@@ -25,7 +24,6 @@ import com.jitlogic.zorka.agent.test.support.TestJmx;
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 
 import javax.management.ObjectName;
@@ -36,15 +34,6 @@ import static org.junit.Assert.*;
  * @author RLE <rafal.lewczuk@gmail.com>
  */
 public class ZabbixDiscoveryUnitTest extends ZorkaFixture {
-
-    private ZabbixLib zabbixLib;
-
-
-    @Before
-    public void setUp() {
-        zabbixLib = new ZabbixLib();
-    }
-
 
     @Test
     public void testSimpleDiscovery() throws Exception {

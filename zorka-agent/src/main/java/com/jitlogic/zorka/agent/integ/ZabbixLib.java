@@ -17,7 +17,6 @@
 
 package com.jitlogic.zorka.agent.integ;
 
-import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.perfmon.QueryDef;
@@ -41,6 +40,13 @@ public class ZabbixLib {
 
     private Map<String,ZabbixTrapper> trappers = new ConcurrentHashMap<String, ZabbixTrapper>();
 
+    private MBeanServerRegistry mbsRegistry;
+    private ZorkaConfig config;
+
+    public ZabbixLib(MBeanServerRegistry mbsRegistry, ZorkaConfig config) {
+        this.mbsRegistry = mbsRegistry;
+        this.config = config;
+    }
 
     public JSONObject discovery(QueryDef...qdefs) {
         return discovery(QueryDef.NO_NULL_ATTRS, qdefs);
@@ -55,11 +61,10 @@ public class ZabbixLib {
      */
     public JSONObject discovery(int flags, QueryDef...qdefs) {
         JSONArray data = new JSONArray();
-        MBeanServerRegistry registry = AgentInstance.instance().getMBeanServerRegistry();
 
         for (QueryDef qdef : qdefs) {
             qdef = qdef.with(flags);
-            for (QueryResult result : new QueryLister(registry, qdef).list()) {
+            for (QueryResult result : new QueryLister(mbsRegistry, qdef).list()) {
                 JSONObject item = new JSONObject();
                 for (Map.Entry<String,Object> e : result.attrSet()) {
                     item.put("{#" + e.getKey().toUpperCase().replace("-", "") + "}", e.getValue().toString());
@@ -114,8 +119,8 @@ public class ZabbixLib {
         ZabbixTrapper trapper = trappers.get(id);
 
         if (trapper == null) {
-            trapper = new ZabbixTrapper(ZorkaConfig.formatCfg(serverAddr),
-                                        ZorkaConfig.formatCfg(defaultHost), defaultItem);
+            trapper = new ZabbixTrapper(config.formatCfg(serverAddr),
+                                        config.formatCfg(defaultHost), defaultItem);
             trappers.put(id, trapper);
             trapper.start();
         }

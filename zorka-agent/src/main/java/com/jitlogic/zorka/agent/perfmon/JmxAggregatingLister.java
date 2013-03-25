@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.agent.perfmon;
 
 import com.jitlogic.zorka.agent.AgentInstance;
+import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.common.ObjectInspector;
 import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogger;
@@ -50,9 +51,9 @@ public class JmxAggregatingLister<T extends Rankable<?>> implements RankLister<T
      *
      * @param objectName object name (or mask)
      */
-    public JmxAggregatingLister(String mbsName, String objectName) {
-        this.mbsConn = AgentInstance.instance().getMBeanServerRegistry().lookup(mbsName);
-        this.classLoader = AgentInstance.instance().getMBeanServerRegistry().getClassLoader(mbsName);
+    public JmxAggregatingLister(MBeanServerRegistry mbsRegistry, String mbsName, String objectName) {
+        this.mbsConn = mbsRegistry.lookup(mbsName);
+        this.classLoader = mbsRegistry.getClassLoader(mbsName);
         this.objectName = objectName;
     }
 

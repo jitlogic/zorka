@@ -58,31 +58,28 @@ public class ZabbixAgentIntegTest {
 	
 	private ZorkaBshAgent agent = null;
 	private ZabbixAgent service = null;
+    private ZorkaConfig config;
 	
 	@Before
 	public void setUp() throws Exception {
-        ZorkaConfig.loadProperties(this.getClass().getResource("/conf").getPath());
+        config = new ZorkaConfig(this.getClass().getResource("/conf").getPath());
         ZorkaLogger.setLogger(new TestLogger());
-        //AgentInstance.setMBeanServerRegistry(new MBeanServerRegistry(true));
-		agent = new ZorkaBshAgent(Executors.newSingleThreadExecutor());
-		ZorkaConfig.getProperties().put ("zabbix.listen.addr", "127.0.0.1");
-		ZorkaConfig.getProperties().put("zabbix.listen.port", "10066");
-		service = new ZabbixAgent(agent);
+		agent = new ZorkaBshAgent(Executors.newSingleThreadExecutor(), new MBeanServerRegistry(true), config);
+		config.getProperties().put ("zabbix.listen.addr", "127.0.0.1");
+		config.getProperties().put("zabbix.listen.port", "10066");
+		service = new ZabbixAgent(config,  agent);
 		service.start();
 	}
 	
 	@After
 	public void tearDown() {
 		service.stop();
-        //AgentInstance.setMBeanServerRegistry(null);
-        ZorkaLogger.setLogger(null);
-        ZorkaConfig.cleanup();
 	}
 	
 	@Test
 	public void testTrivialRequestAsync() throws Exception {
-		assertEquals(ZorkaConfig.getProperties().getProperty("zorka.version"),
-                query("zorka__version[]"));
+		assertEquals(config.getProperties().getProperty("zorka.version"),
+                query("zorka.version[]"));
 	}
 	
 	@Test

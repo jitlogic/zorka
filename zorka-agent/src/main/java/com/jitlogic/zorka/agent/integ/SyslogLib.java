@@ -151,6 +151,12 @@ public class SyslogLib {
         return F_LOCAL0;
     }
 
+    private ZorkaConfig config;
+
+    public SyslogLib(ZorkaConfig config) {
+        this.config = config;
+    }
+
     /**
      * Returns syslog trapper (if already created and registered).
      * @param id trapper unique ID (name)
@@ -171,8 +177,7 @@ public class SyslogLib {
     public SyslogTrapper trapper(String id, String syslogServer, String defaultHost, int defaultFacility) {
         SyslogTrapper trapper = trappers.get(id);
         if (trapper == null) {
-            trapper = new SyslogTrapper(ZorkaConfig.formatCfg(syslogServer),
-                                ZorkaConfig.formatCfg(defaultHost), defaultFacility);
+            trapper = new SyslogTrapper(config.formatCfg(syslogServer), config.formatCfg(defaultHost), defaultFacility);
             trappers.put(id, trapper);
             trapper.start();
         }

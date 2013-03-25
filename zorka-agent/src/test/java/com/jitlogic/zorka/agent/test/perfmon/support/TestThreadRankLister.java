@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zorka.agent.test.perfmon.support;
 
+import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.perfmon.BucketAggregate;
 import com.jitlogic.zorka.agent.perfmon.ThreadRankInfo;
 import com.jitlogic.zorka.agent.perfmon.ThreadRankLister;
@@ -27,6 +28,10 @@ import java.util.Map;
 public class TestThreadRankLister extends ThreadRankLister {
 
     private Map<Long,ThreadRankInfo> testInfos = new HashMap<Long, ThreadRankInfo>();
+
+    public TestThreadRankLister(MBeanServerRegistry registry) {
+        super(registry);
+    }
 
     public TestThreadRankLister clear() {
         testInfos.clear();

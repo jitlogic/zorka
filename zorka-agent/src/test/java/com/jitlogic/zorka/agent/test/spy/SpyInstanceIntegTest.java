@@ -38,7 +38,7 @@ public class SpyInstanceIntegTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), BytecodeInstrumentationFixture.TCLASS1);
         invoke(obj, "trivialMethod");
 
-        Object stats = getAttr("test", "test:name=TestClass1", "stats");
+        Object stats = getAttr(testMbs, "test:name=TestClass1", "stats");
         assertNotNull(stats);
     }
 

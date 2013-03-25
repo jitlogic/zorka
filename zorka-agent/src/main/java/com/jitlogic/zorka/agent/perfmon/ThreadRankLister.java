@@ -43,8 +43,8 @@ public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
     /**
      * Creates thread rank lister
      */
-    public ThreadRankLister() {
-        this.mBeanServerRegistry = AgentInstance.instance().getMBeanServerRegistry();
+    public ThreadRankLister(MBeanServerRegistry registry) {
+        this.mBeanServerRegistry = registry;
     }
 
 

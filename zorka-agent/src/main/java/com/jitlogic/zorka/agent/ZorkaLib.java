@@ -69,15 +69,22 @@ public class ZorkaLib  {
 
     private TaskScheduler scheduler = TaskScheduler.instance();
 
+    private String version;
+
+    private ZorkaConfig config;
+
     /**
      * Standard constructor
      *
      * @param agent reference to Zorka BSH agent object
      */
-    public ZorkaLib(ZorkaBshAgent agent) {
+    public ZorkaLib(ZorkaBshAgent agent, MBeanServerRegistry registry, ZorkaConfig config) {
 		this.agent = agent;
-        this.mbsRegistry = AgentInstance.instance().getMBeanServerRegistry();
-        this.hostname = ZorkaConfig.getProperties().getProperty("zorka.hostname").trim();
+        this.mbsRegistry = registry;
+        this.config = config;
+
+        this.hostname = config.getProperties().getProperty("zorka.hostname").trim();
+        this.version = config.getProperties().getProperty("zorka.version").trim();
 	}
 
 
@@ -87,7 +94,7 @@ public class ZorkaLib  {
      * @return string containing agent version
      */
 	public String version() {
-		return ZorkaConfig.getProperties().getProperty("zorka.version").trim();
+		return version;
 	}
 
 
@@ -481,7 +488,7 @@ public class ZorkaLib  {
      * @param mask file name or file mask.
      */
     public void reload(String mask) {
-        agent.loadScriptDir(ZorkaConfig.getConfDir(),
+        agent.loadScriptDir(config.getConfDir(),
                 "^" + mask.replace("\\.", "\\\\.").replace("*", ".*") + "$");
     }
 
@@ -544,7 +551,7 @@ public class ZorkaLib  {
      * @return JMX rank lister object
      */
     public <T extends Rankable<?>> RankLister<T> jmxLister(String mbsName, String onMask) {
-        JmxAggregatingLister<T> lister = new JmxAggregatingLister<T>(mbsName, onMask);
+        JmxAggregatingLister<T> lister = new JmxAggregatingLister<T>(mbsRegistry, mbsName, onMask);
         return lister;
     }
 
@@ -562,7 +569,7 @@ public class ZorkaLib  {
     public ThreadRankLister threadRankLister() {
         synchronized (this) {
             if (threadRankLister == null) {
-                threadRankLister = new ThreadRankLister();
+                threadRankLister = new ThreadRankLister(mbsRegistry);
                 scheduler.schedule(threadRankLister, 15000, 0);
             }
         }
@@ -583,7 +590,7 @@ public class ZorkaLib  {
      * @return EJB rank lister object
      */
     public EjbRankLister ejbRankLister(String mbsName, String objNames, String attr) {
-        EjbRankLister lister = new EjbRankLister(mbsName, objNames, attr);
+        EjbRankLister lister = new EjbRankLister(mbsRegistry,  mbsName, objNames, attr);
         scheduler.schedule(lister, 15000, 0);
         return lister;
     }
@@ -679,7 +686,7 @@ public class ZorkaLib  {
      * @return
      */
     public String formatCfg(String input) {
-        return ZorkaConfig.formatCfg(input);
+        return config.formatCfg(input);
     }
 
 
@@ -691,7 +698,7 @@ public class ZorkaLib  {
      * @return true if entry exists and is non-empty
      */
     public boolean hasCfg(String key) {
-        return ZorkaConfig.hasCfg(key);
+        return config.hasCfg(key);
     }
 
 
@@ -699,14 +706,9 @@ public class ZorkaLib  {
         return boolCfg(key, null);
     }
 
-    /**
-     *
-     * @param key
-     * @param defval
-     * @return
-     */
+
     public Boolean boolCfg(String key, Boolean defval) {
-        return ZorkaConfig.boolCfg(key, defval);
+        return config.boolCfg(key, defval);
     }
 
 
@@ -716,7 +718,7 @@ public class ZorkaLib  {
 
 
     public Integer intCfg(String key, Integer defval) {
-        return ZorkaConfig.intCfg(key, defval);
+        return config.intCfg(key, defval);
     }
 
 
@@ -726,7 +728,7 @@ public class ZorkaLib  {
 
 
     public Long longCfg(String key, Long defval) {
-        return ZorkaConfig.longCfg(key, defval);
+        return config.longCfg(key, defval);
     }
 
 
@@ -736,7 +738,7 @@ public class ZorkaLib  {
 
 
     public Long kiloCfg(String key, Long defval) {
-        return ZorkaConfig.kiloCfg(key, defval);
+        return config.kiloCfg(key, defval);
     }
 
 
@@ -746,7 +748,7 @@ public class ZorkaLib  {
 
 
     public String stringCfg(String key, String defval) {
-        return ZorkaConfig.stringCfg(key, defval);
+        return config.stringCfg(key, defval);
     }
 
 
@@ -765,7 +767,7 @@ public class ZorkaLib  {
      * @return parsed list
      */
     public List<String> listCfg(String key, String...defVals) {
-        return ZorkaConfig.listCfg(key, defVals);
+        return config.listCfg(key, defVals);
     }
 
 

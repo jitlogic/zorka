@@ -26,6 +26,8 @@ import java.lang.instrument.Instrumentation;
  */
 public class AgentMain {
 
+    private static AgentInstance instance;
+
     /**
      * This is entry method of java agent.
      *
@@ -35,10 +37,13 @@ public class AgentMain {
      */
     public static void premain(String args, Instrumentation instr) {
 
-        ZorkaConfig.loadProperties(args);
+        //ZorkaConfig.loadProperties(args);
 
-        if (ZorkaConfig.boolCfg("spy", true)) {
-            instr.addTransformer(AgentInstance.instance().getClassTransformer());
+        instance = new AgentInstance(new ZorkaConfig(args));
+        instance.start();
+
+        if (instance.getConfig().boolCfg("spy", true)) {
+            instr.addTransformer(instance.getClassTransformer());
         }
 
     }

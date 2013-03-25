@@ -16,7 +16,6 @@
 
 package com.jitlogic.zorka.agent.test.agent;
 
-import com.jitlogic.zorka.agent.ZorkaConfig;
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 
 import com.jitlogic.zorka.common.ZorkaLogger;
@@ -32,13 +31,13 @@ public class LogConfigUnitTest extends ZorkaFixture {
 
     @Before
     public void setTestProps() {
-        ZorkaConfig.getProperties().setProperty("test.int", " 10 ");
-        ZorkaConfig.getProperties().setProperty("test.broken", "oja!");
-        ZorkaConfig.getProperties().setProperty("test.space", "  ");
-        ZorkaConfig.getProperties().setProperty("test.lst", "  oja!,  oje! ");
-        ZorkaConfig.getProperties().setProperty("ten.bytes", "10");
-        ZorkaConfig.getProperties().setProperty("one.kilobyte", "1k");
-        ZorkaConfig.getProperties().setProperty("ten.megabytes", "10M");
+        config.getProperties().setProperty("test.int", " 10 ");
+        config.getProperties().setProperty("test.broken", "oja!");
+        config.getProperties().setProperty("test.space", "  ");
+        config.getProperties().setProperty("test.lst", "  oja!,  oje! ");
+        config.getProperties().setProperty("ten.bytes", "10");
+        config.getProperties().setProperty("one.kilobyte", "1k");
+        config.getProperties().setProperty("ten.megabytes", "10M");
     }
 
 

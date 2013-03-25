@@ -32,7 +32,7 @@ public class ThreadRankUnitTest extends ZorkaFixture {
 
     @Test
     public void testListSinglePass() {
-        ThreadRankLister lister = new TestThreadRankLister()
+        ThreadRankLister lister = new TestThreadRankLister(mBeanServerRegistry)
                 .feed(1, "Thread-1", 100, 0)
                 .feed(2, "Thread-2", 100, 0);
 
@@ -45,7 +45,7 @@ public class ThreadRankUnitTest extends ZorkaFixture {
 
     @Test
     public void testTwoPassesAndCheckIfNonExistentThreadsAreRemoved() {
-        TestThreadRankLister lister = new TestThreadRankLister()
+        TestThreadRankLister lister = new TestThreadRankLister(mBeanServerRegistry)
                 .feed(1, "Thread-1", 100, 0)
                 .feed(2, "Thread-2", 100, 0);
 
@@ -65,7 +65,7 @@ public class ThreadRankUnitTest extends ZorkaFixture {
 
     @Test
     public void testTwoPassesAndCheckAverages() {
-        TestThreadRankLister lister = new TestThreadRankLister().feed(1, "Thread-1", 1000, 500);
+        TestThreadRankLister lister = new TestThreadRankLister(mBeanServerRegistry).feed(1, "Thread-1", 1000, 500);
         lister.runCycle(1000);
         lister.clear().feed(1, "Thread-1", 2000, 1500);
         lister.runCycle(2000);
@@ -77,7 +77,7 @@ public class ThreadRankUnitTest extends ZorkaFixture {
 
     @Test
     public void testTwoPassesWithWindowShift() {
-        TestThreadRankLister lister = new TestThreadRankLister().feed(1, "Thread-1", 6000, 0);
+        TestThreadRankLister lister = new TestThreadRankLister(mBeanServerRegistry).feed(1, "Thread-1", 6000, 0);
         lister.runCycle(1000);
 
         assertEquals(10.0, lister.list().get(0).getAverage(0L, 0,0), 0.001);

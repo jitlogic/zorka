@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.agent.perfmon;
 
 import com.jitlogic.zorka.agent.AgentInstance;
+import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.spy.Tracer;
 import com.jitlogic.zorka.common.*;
 
@@ -30,8 +31,11 @@ public class PerfMonLib {
 
     private Tracer tracer;
 
-    public PerfMonLib(Tracer tracer) {
+    private MBeanServerRegistry mbsRegistry;
+
+    public PerfMonLib(Tracer tracer, MBeanServerRegistry mbsRegistry) {
         this.tracer = tracer;
+        this.mbsRegistry = mbsRegistry;
         this.symbolRegistry = tracer.getSymbolRegistry();
         this.metricsRegistry = tracer.getMetricsRegistry();
     }
@@ -71,8 +75,7 @@ public class PerfMonLib {
      * @return scanner object
      */
     public JmxAttrScanner scanner(String name, QueryDef... qdefs) {
-        return new JmxAttrScanner(symbolRegistry, metricsRegistry, name,
-                AgentInstance.instance().getMBeanServerRegistry(), tracer, qdefs);
+        return new JmxAttrScanner(symbolRegistry, metricsRegistry, name, mbsRegistry, tracer, qdefs);
     }
 
 }

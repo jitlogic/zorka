@@ -110,6 +110,12 @@ public class SnmpLib {
     /** SNMP trappers registered */
     private Map<String,SnmpTrapper> trappers = new ConcurrentHashMap<String, SnmpTrapper>();
 
+    private ZorkaConfig config;
+
+    public SnmpLib(ZorkaConfig config) {
+        this.config = config;
+    }
+
     /**
      * Creates SNMP object identifier using template and supplied values.
      *
@@ -239,8 +245,8 @@ public class SnmpLib {
         SnmpTrapper trapper = trappers.get(id);
 
         if (trapper == null) {
-            trapper = new SnmpTrapper(ZorkaConfig.formatCfg(addr), ZorkaConfig.formatCfg(community),
-                                        ZorkaConfig.formatCfg(agentAddr), protocol);
+            trapper = new SnmpTrapper(config.formatCfg(addr), config.formatCfg(community),
+                                      config.formatCfg(agentAddr), protocol);
             trappers.put(id, trapper);
             trapper.start();
         }

@@ -74,12 +74,12 @@ public abstract class AbstractTcpAgent implements Runnable {
      * @param defaultAddr
      * @param defaultPort agent default port
      */
-    public AbstractTcpAgent(ZorkaBshAgent agent, String prefix, String defaultAddr, int defaultPort) {
+    public AbstractTcpAgent(ZorkaConfig config, ZorkaBshAgent agent, String prefix, String defaultAddr, int defaultPort) {
 
         this.agent = agent;
         this.prefix = prefix;
 
-        String la = ZorkaConfig.stringCfg(prefix+".listen.addr", defaultAddr);
+        String la = config.stringCfg(prefix+".listen.addr", defaultAddr);
         try {
             listenAddr = InetAddress.getByName(la.trim());
         } catch (UnknownHostException e) {
@@ -87,11 +87,11 @@ public abstract class AbstractTcpAgent implements Runnable {
             AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         }
 
-        listenPort = ZorkaConfig.intCfg(prefix+".listen.port", defaultPort);
+        listenPort = config.intCfg(prefix+".listen.port", defaultPort);
 
         log.info(ZorkaLogger.ZAG_ERRORS, "Zorka will listen for "+prefix+" connections on " + listenAddr + ":" + listenPort);
 
-        for (String sa : ZorkaConfig.listCfg(prefix+".server.addr", "127.0.0.1")) {
+        for (String sa : config.listCfg(prefix+".server.addr", "127.0.0.1")) {
             try {
                 log.info(ZorkaLogger.ZAG_ERRORS, "Zorka will accept "+prefix+" connections from '" + sa.trim() + "'.");
                 allowedAddrs.add(InetAddress.getByName(sa.trim()));

@@ -18,6 +18,7 @@ package com.jitlogic.zorka.agent.test.support;
 import com.jitlogic.zorka.agent.*;
 import com.jitlogic.zorka.agent.integ.SnmpLib;
 import com.jitlogic.zorka.agent.integ.SyslogLib;
+import com.jitlogic.zorka.agent.integ.ZabbixLib;
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.perfmon.PerfMonLib;
 import com.jitlogic.zorka.agent.spy.SpyClassTransformer;
@@ -50,7 +51,9 @@ public class ZorkaFixture {
     protected ZorkaLib zorka;
 
     protected PerfMonLib perfmon;
+    protected ZorkaConfig config;
 
+    protected ZabbixLib zabbixLib;
 
     @Before
     public void setUpFixture() throws Exception {
@@ -67,8 +70,9 @@ public class ZorkaFixture {
                 "spy", "yes"
                 );
 
-        ZorkaConfig.setProperties(configProperties);
-        agentInstance = AgentInstance.instance();
+        config = new ZorkaConfig(configProperties);
+        agentInstance = new AgentInstance(config); //AgentInstance.instance();
+        agentInstance.start();
 
         // Get all agent components used by tests
 
@@ -81,6 +85,7 @@ public class ZorkaFixture {
         tracer = agentInstance.getTracerLib();
         perfmon = agentInstance.getPerfMonLib();
         spyTransformer = agentInstance.getClassTransformer();
+        zabbixLib = agentInstance.getZabbixLib();
 
         // Install test MBean server
 

@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
 
+import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.common.ObjectDumper;
 import com.jitlogic.zorka.common.ZorkaLog;
 
@@ -54,11 +55,12 @@ public class ZorkaBshAgent {
      *
      * @param executor executor for asynchronous processing queries
      */
-	public ZorkaBshAgent(Executor executor) {
+	public ZorkaBshAgent(Executor executor, MBeanServerRegistry mbsRegistry, ZorkaConfig config) {
 		this.interpreter = new Interpreter();
 		this.executor = executor;
 
-		zorkaLib = new ZorkaLib(this);
+
+		zorkaLib = new ZorkaLib(this, mbsRegistry, config);
         install("zorka", zorkaLib);
     }
 

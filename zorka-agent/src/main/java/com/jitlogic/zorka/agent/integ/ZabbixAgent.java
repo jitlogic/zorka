@@ -21,6 +21,7 @@ package com.jitlogic.zorka.agent.integ;
 import java.net.Socket;
 
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
+import com.jitlogic.zorka.agent.ZorkaConfig;
 
 /**
  * Zabbix agent integrates Zorka with Zabbix server. It handles incoming zabbix
@@ -35,8 +36,8 @@ public class ZabbixAgent extends AbstractTcpAgent {
      *
      * @param agent BSH agent
      */
-	public ZabbixAgent(ZorkaBshAgent agent) {
-        super(agent, "zabbix", "127.0.0.1", 10055);
+	public ZabbixAgent(ZorkaConfig config, ZorkaBshAgent agent) {
+        super(config, agent, "zabbix", "127.0.0.1", 10055);
     }
 
 

@@ -18,6 +18,7 @@
 package com.jitlogic.zorka.agent.test.support;
 
 import com.jitlogic.zorka.agent.AgentInstance;
+import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.spy.SpyClassTransformer;
 
 import static org.junit.Assert.fail;
@@ -137,8 +138,7 @@ public class TestUtil extends ClassLoader {
         return obj;
     }
 
-    public static Object getAttr(String mbsName, String mbeanName, String attr) throws Exception{
-        MBeanServerConnection mbs = AgentInstance.instance().getMBeanServerRegistry().lookup(mbsName);
+    public static Object getAttr(MBeanServerConnection mbs, String mbeanName, String attr) throws Exception{
         return mbs.getAttribute(new ObjectName(mbeanName), attr);
     }
 }

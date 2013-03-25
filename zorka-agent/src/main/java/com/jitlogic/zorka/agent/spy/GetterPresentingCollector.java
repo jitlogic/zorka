@@ -37,7 +37,7 @@ public class GetterPresentingCollector implements SpyProcessor {
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     /** MBean server registry */
-    private MBeanServerRegistry registry = AgentInstance.instance().getMBeanServerRegistry();
+    private MBeanServerRegistry registry;
 
     /** MBean server name */
     private String mbsName;
@@ -73,8 +73,9 @@ public class GetterPresentingCollector implements SpyProcessor {
      *
      * @param attrChain attribute chain
      */
-    public GetterPresentingCollector(String mbsName, String mbeanTemplate, String attrTemplate, String desc,
-                                     String srcField, Object... attrChain) {
+    public GetterPresentingCollector(MBeanServerRegistry mbsRegistry, String mbsName, String mbeanTemplate,
+                                     String attrTemplate, String desc, String srcField, Object... attrChain) {
+        this.registry = mbsRegistry;
         this.mbsName = mbsName;
         this.mbeanTemplate = mbeanTemplate;
         this.attrTemplate = attrTemplate;

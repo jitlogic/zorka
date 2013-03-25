@@ -98,7 +98,7 @@ public class ZorkaStatsCollector implements SpyProcessor {
     private MethodCallStatistics cachedStatistics;
 
     /** MBean server registry */
-    private MBeanServerRegistry registry = AgentInstance.instance().getMBeanServerRegistry();
+    private MBeanServerRegistry registry;
 
     /**
      * Creates new method call statistics collector.
@@ -110,11 +110,12 @@ public class ZorkaStatsCollector implements SpyProcessor {
      *@param statTemplate statistic name template
      *@param timeField execution time field name
      */
-    public ZorkaStatsCollector(String mbsName, String mbeanTemplate, String attrTemplate,
-                               String statTemplate, String timeField) {
+    public ZorkaStatsCollector(MBeanServerRegistry mbsRegistry, String mbsName, String mbeanTemplate,
+                               String attrTemplate, String statTemplate, String timeField) {
 
         // Some strings are intern()ed immediately, so
 
+        this.registry = mbsRegistry;
         this.mbsName  = mbsName;
         this.mbeanTemplate = mbeanTemplate.intern();
         this.attrTemplate = attrTemplate.intern();

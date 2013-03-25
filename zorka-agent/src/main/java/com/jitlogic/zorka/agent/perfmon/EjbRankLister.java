@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.agent.perfmon;
 
 import com.jitlogic.zorka.agent.AgentInstance;
+import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.common.ObjectInspector;
 import com.jitlogic.zorka.common.ZorkaLog;
 import com.jitlogic.zorka.common.ZorkaLogger;
@@ -51,8 +52,8 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
      * @param objNames
      * @param attr
      */
-    public EjbRankLister(String mbsName, String objNames, String attr) {
-        this.mbs = AgentInstance.instance().getMBeanServerRegistry().lookup(mbsName);
+    public EjbRankLister(MBeanServerRegistry registry, String mbsName, String objNames, String attr) {
+        this.mbs = registry.lookup(mbsName);
         this.objNames = objNames;
         this.attr = attr;
     }
