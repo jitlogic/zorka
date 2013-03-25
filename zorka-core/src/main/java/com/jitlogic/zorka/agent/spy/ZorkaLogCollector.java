@@ -16,9 +16,9 @@
 
 package com.jitlogic.zorka.agent.spy;
 
-import com.jitlogic.zorka.common.ObjectInspector;
-import com.jitlogic.zorka.common.ZorkaLogLevel;
-import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ObjectInspector;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaLogLevel;
 
 import java.util.Map;
 
@@ -55,7 +55,7 @@ public class ZorkaLogCollector implements SpyProcessor {
             e = (Throwable)record.get(fErr);
         }
 
-        logger.trap(logLevel, tag, ObjectInspector.substitute(message,  record), e);
+        logger.trap(logLevel, tag, ObjectInspector.substitute(message, record), e);
 
         return record;
     }

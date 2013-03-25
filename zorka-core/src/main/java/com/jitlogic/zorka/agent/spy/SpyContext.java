@@ -16,7 +16,7 @@
  */
 package com.jitlogic.zorka.agent.spy;
 
-import com.jitlogic.zorka.common.ZorkaUtil;
+import com.jitlogic.zorka.agent.util.ZorkaUtil;
 
 /**
  * Spy context links instrumented methods with spy definitions. New spy context
@@ -76,7 +76,7 @@ public class SpyContext {
 
         String[] segs = className.split("\\.");
         this.shortClassName = segs[segs.length-1];
-        this.packageName = segs.length > 1 ?  ZorkaUtil.join(".", ZorkaUtil.clipArray(segs, segs.length-1)) : "";
+        this.packageName = segs.length > 1 ?  ZorkaUtil.join(".", ZorkaUtil.clipArray(segs, segs.length - 1)) : "";
     }
 
     /**

@@ -16,10 +16,10 @@
 
 package com.jitlogic.zorka.agent.spy;
 
-import com.jitlogic.zorka.common.PerfDataEventHandler;
-import com.jitlogic.zorka.common.Submittable;
-import com.jitlogic.zorka.common.SymbolRegistry;
-import com.jitlogic.zorka.common.SymbolicException;
+import com.jitlogic.zorka.agent.util.PerfDataEventHandler;
+import com.jitlogic.zorka.agent.util.Submittable;
+import com.jitlogic.zorka.agent.util.SymbolRegistry;
+import com.jitlogic.zorka.agent.util.SymbolicException;
 
 import java.util.ArrayList;
 import java.util.HashMap;

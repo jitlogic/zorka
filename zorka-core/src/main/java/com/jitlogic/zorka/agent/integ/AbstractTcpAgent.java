@@ -18,8 +18,8 @@ package com.jitlogic.zorka.agent.integ;
 import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.agent.ZorkaBshAgent;
 import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaLog;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -28,7 +28,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Abstract class that implements basic functionality of a service

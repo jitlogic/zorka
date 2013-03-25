@@ -18,7 +18,10 @@ package com.jitlogic.zorka.agent.integ;
 
 import com.jitlogic.contrib.libsnmp.*;
 import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.common.*;
+import com.jitlogic.zorka.agent.util.ObjectInspector;
+import com.jitlogic.zorka.agent.util.ZorkaLog;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaUtil;
 
 import java.util.Map;
 import java.util.Vector;
@@ -174,7 +177,7 @@ public class SnmpLib {
                 case GAUGE32:
                     return new SNMPGauge32((Long)ZorkaUtil.coerce(val, Long.class));
                 case TIMETICKS:
-                    return new SNMPTimeTicks((Long)ZorkaUtil.coerce(val, Long.class));
+                    return new SNMPTimeTicks((Long) ZorkaUtil.coerce(val, Long.class));
                 case OPAQUE:
                     return null;
                 case NSAPADDRESS:

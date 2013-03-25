@@ -17,10 +17,10 @@
 
 package com.jitlogic.zorka.agent.mbeans;
 
-import com.jitlogic.zorka.common.ObjectInspector;
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogger;
-import com.jitlogic.zorka.common.ZorkaUtil;
+import com.jitlogic.zorka.agent.util.ZorkaLog;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaUtil;
+import com.jitlogic.zorka.agent.util.ObjectInspector;
 
 import javax.management.openmbean.*;
 import java.io.Serializable;

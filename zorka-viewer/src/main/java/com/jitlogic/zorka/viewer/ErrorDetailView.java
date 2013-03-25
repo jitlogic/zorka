@@ -17,8 +17,8 @@
 package com.jitlogic.zorka.viewer;
 
 
-import com.jitlogic.zorka.common.SymbolicException;
-import com.jitlogic.zorka.common.SymbolicStackElement;
+import com.jitlogic.zorka.agent.util.SymbolicException;
+import com.jitlogic.zorka.agent.util.SymbolicStackElement;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

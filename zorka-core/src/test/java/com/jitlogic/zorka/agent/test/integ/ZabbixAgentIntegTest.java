@@ -24,10 +24,9 @@ import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.concurrent.Executors;
 
-import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.test.support.TestLogger;
-import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

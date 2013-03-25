@@ -16,8 +16,8 @@
 package com.jitlogic.zorka.agent.integ;
 
 import com.jitlogic.zorka.agent.AgentDiagnostics;
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaLog;
 
 import java.io.IOException;
 import java.net.Socket;

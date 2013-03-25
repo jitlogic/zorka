@@ -15,16 +15,14 @@
  */
 package com.jitlogic.zorka.agent.spy;
 
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogger;
-import com.jitlogic.zorka.common.ZorkaUtil;
+import com.jitlogic.zorka.agent.util.ZorkaLog;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaUtil;
 
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-
-import static com.jitlogic.zorka.agent.spy.SpyLib.SPD_CDISPATCHES;
 
 /**
  * Queues incoming records resumes processing in separate thread.

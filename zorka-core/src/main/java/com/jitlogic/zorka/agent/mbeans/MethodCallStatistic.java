@@ -19,7 +19,7 @@ package com.jitlogic.zorka.agent.mbeans;
 
 import static com.jitlogic.zorka.agent.perfmon.BucketAggregate.MS;
 
-import com.jitlogic.zorka.common.ZorkaStat;
+import com.jitlogic.zorka.agent.util.ZorkaStat;
 
 import java.util.concurrent.atomic.AtomicLong;
 

@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.agent.perfmon;
 
-import com.jitlogic.zorka.common.MetricTemplate;
+import com.jitlogic.zorka.agent.util.MetricTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;

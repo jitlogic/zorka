@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.agent.mbeans;
 
-import com.jitlogic.zorka.common.*;
+import com.jitlogic.zorka.agent.util.*;
 
 import javax.management.openmbean.*;
 

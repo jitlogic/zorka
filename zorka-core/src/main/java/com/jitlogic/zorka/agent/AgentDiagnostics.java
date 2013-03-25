@@ -17,8 +17,8 @@
 package com.jitlogic.zorka.agent;
 
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.common.ValGetter;
-import com.jitlogic.zorka.common.ZorkaUtil;
+import com.jitlogic.zorka.agent.util.ValGetter;
+import com.jitlogic.zorka.agent.util.ZorkaUtil;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;

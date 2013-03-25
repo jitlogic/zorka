@@ -18,18 +18,17 @@
 package com.jitlogic.zorka.agent;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
 
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.common.ObjectDumper;
-import com.jitlogic.zorka.common.ZorkaLog;
+import com.jitlogic.zorka.agent.util.ObjectDumper;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaUtil;
+import com.jitlogic.zorka.agent.util.ZorkaLog;
 
 import bsh.EvalError;
 import bsh.Interpreter;
-import com.jitlogic.zorka.common.ZorkaLogger;
-import com.jitlogic.zorka.common.ZorkaUtil;
 
 /**
  * This is central part of Zorka agent - it processes actual queries and executes BSH scripts.

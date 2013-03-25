@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.agent.test.spy.support;
 
-import com.jitlogic.zorka.common.*;
+import com.jitlogic.zorka.agent.util.*;
 import org.junit.Assert;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class TestTracer extends PerfDataEventHandler {
 
     @Override
     public void traceBegin(int traceId, long clock, int flags) {
-        data.add(ZorkaUtil.map("action", "begin", "traceId", traceId, "clock", clock, "flags", flags));
+        data.add(ZorkaUtil.map("action", "traceBegin", "traceId", traceId, "clock", clock, "flags", flags));
     }
 
     @Override

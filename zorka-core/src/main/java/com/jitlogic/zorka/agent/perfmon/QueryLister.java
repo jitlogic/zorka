@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.agent.perfmon;
 
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.common.*;
+import com.jitlogic.zorka.agent.util.*;
 
 import javax.management.*;
 import java.util.ArrayList;

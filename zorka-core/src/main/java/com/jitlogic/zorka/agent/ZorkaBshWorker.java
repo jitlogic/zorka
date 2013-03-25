@@ -18,9 +18,8 @@
 package com.jitlogic.zorka.agent;
 
 import bsh.EvalError;
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogLevel;
-import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaLog;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
 
 import java.io.Closeable;
 import java.io.IOException;

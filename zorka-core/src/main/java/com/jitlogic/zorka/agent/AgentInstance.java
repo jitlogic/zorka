@@ -19,13 +19,14 @@ package com.jitlogic.zorka.agent;
 import com.jitlogic.zorka.agent.mbeans.AttrGetter;
 import com.jitlogic.zorka.agent.perfmon.PerfMonLib;
 import com.jitlogic.zorka.agent.spy.*;
-import com.jitlogic.zorka.common.*;
+import com.jitlogic.zorka.agent.util.ZorkaLog;
+import com.jitlogic.zorka.agent.util.ZorkaLogLevel;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
 import com.jitlogic.zorka.agent.integ.*;
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.normproc.NormLib;
 
 import java.io.File;
-import java.lang.instrument.ClassFileTransformer;
 import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executor;

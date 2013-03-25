@@ -19,7 +19,7 @@ package com.jitlogic.zorka.agent.perfmon;
 import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.spy.TracerOutput;
-import com.jitlogic.zorka.common.*;
+import com.jitlogic.zorka.agent.util.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;

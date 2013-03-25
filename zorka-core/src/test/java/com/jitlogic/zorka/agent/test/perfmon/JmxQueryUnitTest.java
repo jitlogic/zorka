@@ -16,14 +16,13 @@
 
 package com.jitlogic.zorka.agent.test.perfmon;
 
-import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.perfmon.QueryDef;
 import com.jitlogic.zorka.agent.perfmon.QueryLister;
 import com.jitlogic.zorka.agent.perfmon.QueryResult;
 import com.jitlogic.zorka.agent.test.support.TestJmx;
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.common.ZorkaUtil;
+import com.jitlogic.zorka.agent.util.ZorkaUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

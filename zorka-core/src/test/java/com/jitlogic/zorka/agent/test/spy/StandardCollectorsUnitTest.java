@@ -22,12 +22,9 @@ import com.jitlogic.zorka.agent.spy.*;
 
 import com.jitlogic.zorka.agent.spy.GetterPresentingCollector;
 import com.jitlogic.zorka.agent.spy.SpyProcessor;
-import com.jitlogic.zorka.common.ZorkaUtil;
+import com.jitlogic.zorka.agent.util.ZorkaUtil;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.management.MBeanServer;
-import javax.management.MBeanServerBuilder;
 
 import static org.junit.Assert.*;
 

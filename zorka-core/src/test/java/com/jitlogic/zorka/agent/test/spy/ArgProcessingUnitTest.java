@@ -23,7 +23,7 @@ import com.jitlogic.zorka.agent.spy.*;
 
 import static com.jitlogic.zorka.agent.spy.SpyLib.*;
 
-import com.jitlogic.zorka.common.ZorkaUtil;
+import com.jitlogic.zorka.agent.util.ZorkaUtil;
 import org.junit.Before;
 import org.junit.Test;
 

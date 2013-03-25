@@ -16,8 +16,8 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.common.Metric;
-import com.jitlogic.zorka.common.ZorkaUtil;
+import com.jitlogic.zorka.agent.util.Metric;
+import com.jitlogic.zorka.agent.util.ZorkaUtil;
 
 public class PerfMetricData {
 

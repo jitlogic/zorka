@@ -15,13 +15,11 @@
  */
 package com.jitlogic.zorka.agent.spy;
 
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaLog;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
 import com.jitlogic.zorka.agent.normproc.Normalizer;
 
 import java.util.Map;
-
-import static com.jitlogic.zorka.agent.spy.SpyLib.SPD_ARGPROC;
 
 /**
  * Normalizes value of a field from a record and saves it in another field (eg. SQL or LDAP query).

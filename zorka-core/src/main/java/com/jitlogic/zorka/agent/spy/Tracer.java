@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.agent.spy;
 
-import com.jitlogic.zorka.common.*;
+import com.jitlogic.zorka.agent.util.*;
 
 import java.util.ArrayList;
 import java.util.List;

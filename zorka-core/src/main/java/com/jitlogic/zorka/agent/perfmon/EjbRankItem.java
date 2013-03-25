@@ -15,9 +15,9 @@
  */
 package com.jitlogic.zorka.agent.perfmon;
 
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogger;
-import com.jitlogic.zorka.common.ObjectInspector;
+import com.jitlogic.zorka.agent.util.ZorkaLog;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ObjectInspector;
 
 /**
  * Wraps EJB statistic to be suitable to use with rank lists and maintains average statistics for wrapped object.

@@ -22,7 +22,6 @@
 
 
     <modules>
-        <module>zorka-common</module>
         <module>zorka-core</module>
         <module>zorka-viewer</module>
     </modules>

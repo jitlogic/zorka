@@ -18,9 +18,9 @@
 package com.jitlogic.zorka.agent.spy;
 
 import com.jitlogic.zorka.agent.AgentDiagnostics;
-import com.jitlogic.zorka.common.SymbolRegistry;
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.SymbolRegistry;
+import com.jitlogic.zorka.agent.util.ZorkaLog;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;

@@ -19,8 +19,8 @@ package com.jitlogic.zorka.agent.perfmon;
 
 import com.jitlogic.zorka.agent.AgentDiagnostics;
 import com.jitlogic.zorka.agent.ZorkaLib;
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaLog;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
 
 import java.util.ArrayList;
 import java.util.List;

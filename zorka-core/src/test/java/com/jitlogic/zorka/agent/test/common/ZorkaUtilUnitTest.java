@@ -17,7 +17,7 @@ package com.jitlogic.zorka.agent.test.common;
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 import com.jitlogic.zorka.agent.mbeans.MethodCallStatistic;
-import com.jitlogic.zorka.common.ZorkaUtil;
+import com.jitlogic.zorka.agent.util.ZorkaUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,25 +32,25 @@ public class ZorkaUtilUnitTest {
     @Test
     public void testInstanceOf1() throws Exception {
         Assert.assertTrue("immediate implements",
-            ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.common.ZorkaStat"));
+            ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.agent.util.ZorkaStat"));
     }
 
     @Test
     public void testInstanceOf2() throws Exception {
         Assert.assertTrue("subinterface implements",   // TODO find better example (as this one doesn't matter anymore)
-                ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.common.ZorkaStat"));
+                ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.agent.util.ZorkaStat"));
     }
 
     @Test
     public void testInstanceOf3() throws Exception {
         Assert.assertTrue("superclass implements subinterface", // TODO find better example (as this one doesn't matter anymore)
-                ZorkaUtil.instanceOf(TestCallStatistic.class, "com.jitlogic.zorka.common.ZorkaStat"));
+                ZorkaUtil.instanceOf(TestCallStatistic.class, "com.jitlogic.zorka.agent.util.ZorkaStat"));
     }
 
     @Test
     public void testInstanceOf4() throws Exception {
         Assert.assertFalse("should not implement",
-                ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.common.ValGetter"));
+                ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.agent.util.ValGetter"));
     }
 
     @Test

@@ -18,8 +18,8 @@
 package com.jitlogic.zorka.agent.mbeans;
 
 import com.jitlogic.zorka.agent.AgentDiagnostics;
-import com.jitlogic.zorka.common.ZorkaStat;
-import com.jitlogic.zorka.common.ZorkaStats;
+import com.jitlogic.zorka.agent.util.ZorkaStat;
+import com.jitlogic.zorka.agent.util.ZorkaStats;
 
 import java.util.concurrent.ConcurrentHashMap;
 

@@ -17,13 +17,12 @@
 
 package com.jitlogic.zorka.agent.spy;
 
-import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.mbeans.MethodCallStatistic;
 import com.jitlogic.zorka.agent.mbeans.MethodCallStatistics;
-import com.jitlogic.zorka.common.ObjectInspector;
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ObjectInspector;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaLog;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

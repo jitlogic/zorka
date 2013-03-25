@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.agent.perfmon;
 
-import com.jitlogic.zorka.common.ZorkaUtil;
+import com.jitlogic.zorka.agent.util.ZorkaUtil;
 
 import java.util.Collections;
 import java.util.Comparator;

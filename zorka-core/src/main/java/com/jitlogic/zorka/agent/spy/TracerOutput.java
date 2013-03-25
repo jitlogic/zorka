@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.agent.spy;
 
-import com.jitlogic.zorka.common.Submittable;
+import com.jitlogic.zorka.agent.util.Submittable;
 
 public interface TracerOutput {
 

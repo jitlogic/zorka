@@ -16,7 +16,7 @@
  */
 package com.jitlogic.zorka.agent.spy;
 
-import com.jitlogic.zorka.common.ObjectInspector;
+import com.jitlogic.zorka.agent.util.ObjectInspector;
 
 import java.util.Map;
 

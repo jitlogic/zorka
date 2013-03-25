@@ -15,11 +15,10 @@
  */
 package com.jitlogic.zorka.agent.perfmon;
 
-import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.common.ObjectInspector;
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ObjectInspector;
+import com.jitlogic.zorka.agent.util.ZorkaLog;
 
 import javax.management.*;
 import java.util.ArrayList;

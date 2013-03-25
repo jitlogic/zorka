@@ -19,7 +19,7 @@ package com.jitlogic.zorka.agent.test.perfmon;
 import com.jitlogic.zorka.agent.perfmon.*;
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.common.*;
+import com.jitlogic.zorka.agent.util.*;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -18,7 +18,10 @@ package com.jitlogic.zorka.agent.spy;
 
 
 import com.jitlogic.zorka.agent.AgentDiagnostics;
-import com.jitlogic.zorka.common.*;
+import com.jitlogic.zorka.agent.util.SymbolRegistry;
+import com.jitlogic.zorka.agent.util.TraceEventHandler;
+import com.jitlogic.zorka.agent.util.ZorkaLog;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
 
 /**
  * This class receives loose tracer submissions from single thread

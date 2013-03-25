@@ -16,8 +16,8 @@
 
 package com.jitlogic.zorka.agent.test.support;
 
-import com.jitlogic.zorka.common.ZorkaLogLevel;
-import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaLogLevel;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
 
 import java.util.ArrayList;
 import java.util.List;

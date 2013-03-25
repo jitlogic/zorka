@@ -19,8 +19,8 @@ package com.jitlogic.zorka.agent.test.spy;
 import com.jitlogic.zorka.agent.test.spy.support.TestTracer;
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.common.Submittable;
-import com.jitlogic.zorka.common.ZorkaAsyncThread;
+import com.jitlogic.zorka.agent.util.Submittable;
+import com.jitlogic.zorka.agent.util.ZorkaAsyncThread;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;

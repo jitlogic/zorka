@@ -16,7 +16,7 @@
 package com.jitlogic.zorka.agent.integ;
 
 import com.jitlogic.zorka.agent.AgentDiagnostics;
-import com.jitlogic.zorka.common.*;
+import com.jitlogic.zorka.agent.util.*;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

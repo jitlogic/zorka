@@ -18,7 +18,7 @@ package com.jitlogic.zorka.agent.test.agent;
 
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
 import org.junit.Before;
 import org.junit.Test;
 

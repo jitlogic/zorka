@@ -24,7 +24,6 @@ import com.jitlogic.zorka.agent.perfmon.PerfMonLib;
 import com.jitlogic.zorka.agent.spy.SpyClassTransformer;
 import com.jitlogic.zorka.agent.spy.SpyLib;
 import com.jitlogic.zorka.agent.spy.TracerLib;
-import com.jitlogic.zorka.common.ZorkaLogger;
 
 import org.junit.After;
 import org.junit.Before;

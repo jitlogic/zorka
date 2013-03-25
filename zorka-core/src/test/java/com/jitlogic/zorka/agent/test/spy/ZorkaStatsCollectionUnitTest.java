@@ -23,7 +23,7 @@ import com.jitlogic.zorka.agent.spy.SpyContext;
 import com.jitlogic.zorka.agent.spy.SpyDefinition;
 import com.jitlogic.zorka.agent.spy.ZorkaStatsCollector;
 
-import com.jitlogic.zorka.common.ZorkaUtil;
+import com.jitlogic.zorka.agent.util.ZorkaUtil;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -41,7 +41,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         ZorkaStatsCollector collector = new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=Test", "stats", "test", "C0");
         SpyContext ctx = new SpyContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
 
-        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1<<ON_RETURN), "S0", 10L);
+        Map<String,Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1 << ON_RETURN), "S0", 10L);
 
         collector.process(record);
 

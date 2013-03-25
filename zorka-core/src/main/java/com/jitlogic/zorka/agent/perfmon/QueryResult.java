@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.agent.perfmon;
 
-import com.jitlogic.zorka.common.SymbolRegistry;
+import com.jitlogic.zorka.agent.util.SymbolRegistry;
 
 import java.util.*;
 

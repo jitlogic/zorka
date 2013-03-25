@@ -17,10 +17,10 @@ package com.jitlogic.zorka.agent.integ;
 
 import com.jitlogic.contrib.libsnmp.*;
 import com.jitlogic.zorka.agent.AgentDiagnostics;
-import com.jitlogic.zorka.common.ZorkaAsyncThread;
-import com.jitlogic.zorka.common.ZorkaLogLevel;
-import com.jitlogic.zorka.common.ZorkaLogger;
-import com.jitlogic.zorka.common.ZorkaTrapper;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.agent.util.ZorkaLogLevel;
+import com.jitlogic.zorka.agent.util.ZorkaTrapper;
 
 import java.io.IOException;
 import java.net.InetAddress;

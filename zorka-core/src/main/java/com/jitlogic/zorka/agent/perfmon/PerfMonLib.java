@@ -16,10 +16,11 @@
 
 package com.jitlogic.zorka.agent.perfmon;
 
-import com.jitlogic.zorka.agent.AgentInstance;
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.spy.Tracer;
-import com.jitlogic.zorka.common.*;
+import com.jitlogic.zorka.agent.util.MetricTemplate;
+import com.jitlogic.zorka.agent.util.MetricsRegistry;
+import com.jitlogic.zorka.agent.util.SymbolRegistry;
 
 public class PerfMonLib {
 

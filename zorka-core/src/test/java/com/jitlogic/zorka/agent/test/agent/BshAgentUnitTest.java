@@ -21,7 +21,7 @@ import java.net.URL;
 
 import com.jitlogic.zorka.agent.*;
 import com.jitlogic.zorka.agent.test.support.ZorkaFixture;
-import com.jitlogic.zorka.common.ObjectDumper;
+import com.jitlogic.zorka.agent.util.ObjectDumper;
 import com.jitlogic.zorka.agent.integ.ZabbixLib;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

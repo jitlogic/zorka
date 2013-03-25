@@ -17,7 +17,8 @@
 package com.jitlogic.zorka.agent.spy;
 
 import com.jitlogic.zorka.agent.ZorkaConfig;
-import com.jitlogic.zorka.common.*;
+import com.jitlogic.zorka.agent.util.Submittable;
+import com.jitlogic.zorka.agent.util.ZorkaAsyncThread;
 
 /**
  * Tracer library contains functions for configuring and using tracer.

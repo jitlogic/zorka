@@ -15,8 +15,8 @@
  */
 package com.jitlogic.zorka.agent.normproc;
 
-import com.jitlogic.zorka.common.ZorkaLog;
-import com.jitlogic.zorka.common.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaLogger;
+import com.jitlogic.zorka.agent.util.ZorkaLog;
 
 import java.io.IOException;
 import java.io.InputStream;
