@@ -23,7 +23,7 @@
 
     <modules>
         <module>zorka-common</module>
-        <module>zorka-agent</module>
+        <module>zorka-core</module>
         <module>zorka-viewer</module>
     </modules>
 
