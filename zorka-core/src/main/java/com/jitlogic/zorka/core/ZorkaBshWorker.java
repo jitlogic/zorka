@@ -23,6 +23,7 @@ import com.jitlogic.zorka.core.util.ZorkaLogger;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.concurrent.Executor;
 
 /**
  * Represents runnable task performing BSH query.
@@ -42,6 +43,9 @@ public class ZorkaBshWorker implements Runnable, Closeable {
     /** Callback object (to report query result) */
 	private final ZorkaCallback callback;
 
+    /** Executor to run real work. */
+    private Executor executor;
+
     /**
      * Creates new BSH worker object.
      *
@@ -51,10 +55,11 @@ public class ZorkaBshWorker implements Runnable, Closeable {
      *
      * @param callback callback used to report query result
      */
-	public ZorkaBshWorker(ZorkaBshAgent agent, String expr, ZorkaCallback callback) {
+	public ZorkaBshWorker(Executor executor, ZorkaBshAgent agent, String expr, ZorkaCallback callback) {
 		this.agent = agent;
 		this.expr = expr;
 		this.callback = callback;
+        this.executor = executor;
 	}
 
 

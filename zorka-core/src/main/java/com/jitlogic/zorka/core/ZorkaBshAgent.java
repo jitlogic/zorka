@@ -120,7 +120,7 @@ public class ZorkaBshAgent {
      * @param callback callback object
      */
 	public void exec(String expr, ZorkaCallback callback) {
-		ZorkaBshWorker worker = new ZorkaBshWorker(this, expr, callback);
+		ZorkaBshWorker worker = new ZorkaBshWorker(executor, this, expr, callback);
 		executor.execute(worker);
 	}
 

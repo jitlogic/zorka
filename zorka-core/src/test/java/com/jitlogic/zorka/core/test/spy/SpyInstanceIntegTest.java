@@ -27,7 +27,7 @@ import static com.jitlogic.zorka.core.test.support.TestUtil.*;
 
 public class SpyInstanceIntegTest extends ZorkaFixture {
 
-    @Test
+    //@Test  TODO
     public void testTrivialMethodRun() throws Exception {
         SpyDefinition sdef = SpyDefinition.instrument().onSubmit(spy.tdiff("S0", "E0", "R0"))
                 .include(spy.byMethod(BytecodeInstrumentationFixture.TCLASS1, "trivialMethod"))

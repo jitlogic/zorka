@@ -18,6 +18,7 @@
 package com.jitlogic.zorka.core.test.agent;
 
 import java.net.URL;
+import java.util.concurrent.Executor;
 
 import com.jitlogic.zorka.core.*;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
@@ -104,7 +105,12 @@ public class BshAgentUnitTest extends ZorkaFixture {
 
     private Object query(final String src) throws Exception {
         ZorkaBasicCallback callback = new ZorkaBasicCallback();
-        ZorkaBshWorker worker = new ZorkaBshWorker(agentInstance.getZorkaAgent(), src, callback);
+        ZorkaBshWorker worker = new ZorkaBshWorker( new Executor() {
+            @Override
+            public void execute(Runnable command) {
+                command.run();
+            }
+        }, agentInstance.getZorkaAgent(), src, callback);
         worker.run();
         return callback.getResult();
     }

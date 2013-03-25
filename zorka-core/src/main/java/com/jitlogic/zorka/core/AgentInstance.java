@@ -102,15 +102,6 @@ public class AgentInstance {
         props = config.getProperties();
     }
 
-    /**
-     * Standard constructor. It only reads some configuration properties, no real startup is actually done.
-     *
-     * @param props configuration properties
-     */
-    public AgentInstance(Properties props) {
-        this.props = props;
-    }
-
 
     /**
      * Starts agent. Real startup sequence is performed here.
@@ -263,7 +254,7 @@ public class AgentInstance {
 
     private synchronized Executor getExecutor() {
         if (executor == null) {
-            int rt = config.intCfg("zorka.req.threads", 4);
+            int rt = config.intCfg("zorka.req.threads", 8);
             executor = new ThreadPoolExecutor(rt, rt, 1000, TimeUnit.MILLISECONDS,
                     new ArrayBlockingQueue<Runnable>(config.intCfg("zorka.req.queue", 64)));
         }
