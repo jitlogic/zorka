@@ -35,7 +35,7 @@ public class TracerIntegTest extends ZorkaFixture {
     private ZorkaAsyncThread<Submittable> output;
 
     private int sym(String s) {
-        return spyInstance.getTracer().getSymbolRegistry().symbolId(s);
+        return agentInstance.getTracer().getSymbolRegistry().symbolId(s);
     }
 
     @Before
@@ -58,7 +58,7 @@ public class TracerIntegTest extends ZorkaFixture {
                         .include(spy.byMethod(TCLASS1, "trivialMethod")));
         tracer.output(output);
 
-        Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS1);
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS1);
         invoke(obj, "trivialMethod");
 
         assertEquals("should return begin, trace", 0, rslt.size());
@@ -72,10 +72,10 @@ public class TracerIntegTest extends ZorkaFixture {
             spy.instance().onEnter(tracer.begin("TEST"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
-        spyInstance.getTracer().setMinMethodTime(0); // Catch everything
+        agentInstance.getTracer().setMinMethodTime(0); // Catch everything
         tracer.output(output);
 
-        Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS1);
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS1);
         invoke(obj, "trivialMethod");
 
         assertEquals("should return begin, trace", 4, rslt.size());
@@ -95,10 +95,10 @@ public class TracerIntegTest extends ZorkaFixture {
                 tracer.begin("TEST"), spy.put("URL", "http://some.url"), tracer.attr("URL", "URL")
         ).include(spy.byMethod(TCLASS1, "trivialMethod")));
 
-        spyInstance.getTracer().setMinMethodTime(0); // Catch everything
+        agentInstance.getTracer().setMinMethodTime(0); // Catch everything
         tracer.output(output);
 
-        Object obj = instantiate(spyInstance.getClassTransformer(), TCLASS1);
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS1);
         invoke(obj, "trivialMethod");
 
         assertEquals("should return begin, trace", 5, rslt.size());

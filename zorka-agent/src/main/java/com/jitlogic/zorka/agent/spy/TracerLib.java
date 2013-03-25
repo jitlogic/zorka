@@ -33,8 +33,7 @@ public class TracerLib {
     public static final int DROP_INTERIM = TraceMarker.DROP_INTERIM;
 
 
-    /** Reference to spy instance */
-    private SpyInstance instance;
+    private Tracer tracer;
 
     /** Default trace flags */
     private int defaultTraceFlags = TraceMarker.DROP_INTERIM;
@@ -42,10 +41,10 @@ public class TracerLib {
     /**
      * Creates tracer library object.
      *
-     * @param instance reference to spy instance
+     * @param tracer reference to spy instance
      */
-    public TracerLib(SpyInstance instance) {
-        this.instance = instance;
+    public TracerLib(Tracer tracer) {
+        this.tracer = tracer;
     }
 
 
@@ -55,7 +54,7 @@ public class TracerLib {
      * @param output trace processing object
      */
     public void output(ZorkaAsyncThread<Submittable> output) {
-        instance.getTracer().addOutput(output);
+        tracer.addOutput(output);
     }
 
 
@@ -66,7 +65,7 @@ public class TracerLib {
      */
     public void include(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
-            instance.getTracer().include(matcher);
+            tracer.include(matcher);
         }
     }
 
@@ -77,7 +76,7 @@ public class TracerLib {
      */
     public void exclude(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
-            instance.getTracer().include(matcher.exclude());
+            tracer.include(matcher.exclude());
         }
     }
 
@@ -119,7 +118,7 @@ public class TracerLib {
      * @return spy processor object marking new trace
      */
     public SpyProcessor begin(String name, long minimumTraceTime, int flags) {
-        return new TraceBeginProcessor(instance.getTracer(), name, minimumTraceTime * 1000000L, flags);
+        return new TraceBeginProcessor(tracer, name, minimumTraceTime * 1000000L, flags);
     }
 
 
@@ -133,7 +132,7 @@ public class TracerLib {
      * @return spy processor object adding new trace attribute
      */
     public SpyProcessor attr(String srcField, String dstAttr) {
-        return new TraceAttrProcessor(instance.getTracer(), srcField, dstAttr);
+        return new TraceAttrProcessor(tracer, srcField, dstAttr);
     }
 
 
@@ -145,7 +144,7 @@ public class TracerLib {
      * @return spy processor object
      */
     public SpyProcessor flags(int flags) {
-        return new TraceFlagsProcessor(instance.getTracer(), null, flags);
+        return new TraceFlagsProcessor(tracer, null, flags);
     }
 
 
@@ -159,7 +158,7 @@ public class TracerLib {
      * @return spy processor object
      */
     public SpyProcessor flags(String srcField, int flags) {
-        return new TraceFlagsProcessor(instance.getTracer(), srcField, flags);
+        return new TraceFlagsProcessor(tracer, srcField, flags);
     }
 
 
@@ -176,7 +175,7 @@ public class TracerLib {
      */
     public ZorkaAsyncThread<Submittable> toFile(String path, int maxFiles, long maxSize) {
         TraceFileWriter writer = new TraceFileWriter(ZorkaConfig.formatCfg(path),
-                instance.getTracer().getSymbolRegistry(), instance.getTracer().getMetricsRegistry(),
+                tracer.getSymbolRegistry(), tracer.getMetricsRegistry(),
                 maxFiles, maxSize);
         writer.start();
         return writer;

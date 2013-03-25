@@ -17,7 +17,6 @@
 
 package com.jitlogic.zorka.agent;
 
-import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 
 /**
@@ -38,11 +37,9 @@ public class AgentMain {
 
         ZorkaConfig.loadProperties(args);
 
-        ClassFileTransformer transformer = AgentInstance.instance().getSpyTransformer();
-
-        if (transformer != null) {
-            instr.addTransformer(transformer);
-
+        if (ZorkaConfig.boolCfg("spy", true)) {
+            instr.addTransformer(AgentInstance.instance().getClassTransformer());
         }
+
     }
 }

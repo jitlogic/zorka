@@ -124,15 +124,15 @@ public class SpyLib {
     public static final int AC_PKGPRIV      = 0x010000;
     public static final int AC_ANY          = 0x000000;
 
-    private SpyInstance instance;
+    private SpyClassTransformer classTransformer;
 
     /**
      * Creates spy library object
      *
-     * @param instance spy instance
+     * @param classTransformer spy transformer
      */
-	public SpyLib(SpyInstance instance) {
-        this.instance = instance;
+	public SpyLib(SpyClassTransformer classTransformer) {
+        this.classTransformer = classTransformer;
 	}
 
 
@@ -144,7 +144,7 @@ public class SpyLib {
      */
     public void add(SpyDefinition...sdefs) {
         for (SpyDefinition sdef : sdefs) {
-            instance.getClassTransformer().add(sdef);
+            classTransformer.add(sdef);
         }
     }
 

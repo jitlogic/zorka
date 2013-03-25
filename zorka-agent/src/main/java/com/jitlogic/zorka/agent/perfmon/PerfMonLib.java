@@ -17,7 +17,6 @@
 package com.jitlogic.zorka.agent.perfmon;
 
 import com.jitlogic.zorka.agent.AgentInstance;
-import com.jitlogic.zorka.agent.spy.SpyInstance;
 import com.jitlogic.zorka.agent.spy.Tracer;
 import com.jitlogic.zorka.common.*;
 
@@ -31,10 +30,10 @@ public class PerfMonLib {
 
     private Tracer tracer;
 
-    public PerfMonLib(SpyInstance instance) {
-        this.symbolRegistry = instance.getTracer().getSymbolRegistry();
-        this.metricsRegistry = instance.getTracer().getMetricsRegistry();
-        this.tracer = instance.getTracer();
+    public PerfMonLib(Tracer tracer) {
+        this.tracer = tracer;
+        this.symbolRegistry = tracer.getSymbolRegistry();
+        this.metricsRegistry = tracer.getMetricsRegistry();
     }
 
 

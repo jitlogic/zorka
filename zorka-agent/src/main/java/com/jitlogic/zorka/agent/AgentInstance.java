@@ -18,14 +18,11 @@ package com.jitlogic.zorka.agent;
 
 import com.jitlogic.zorka.agent.mbeans.AttrGetter;
 import com.jitlogic.zorka.agent.perfmon.PerfMonLib;
-import com.jitlogic.zorka.agent.spy.TracerLib;
+import com.jitlogic.zorka.agent.spy.*;
 import com.jitlogic.zorka.common.*;
 import com.jitlogic.zorka.agent.integ.*;
 import com.jitlogic.zorka.agent.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.agent.normproc.NormLib;
-import com.jitlogic.zorka.agent.spy.MainSubmitter;
-import com.jitlogic.zorka.agent.spy.SpyInstance;
-import com.jitlogic.zorka.agent.spy.SpyLib;
 
 import java.io.File;
 import java.lang.instrument.ClassFileTransformer;
@@ -72,9 +69,6 @@ public class AgentInstance {
     /** Reference to nagios library - available to zorka scripts as 'nagios.*' functions */
     private NagiosLib nagiosLib;
 
-    /** Reference to Spy instrumentation engine object */
-    private SpyInstance spyInstance;
-
     /** Reference to spy library - available to zorka scripts as 'spy.*' functions */
     private SpyLib spyLib;
 
@@ -96,6 +90,11 @@ public class AgentInstance {
     /** Agent configuration properties */
     private Properties props;
 
+    private Tracer tracer;
+
+    private SpyClassTransformer classTransformer;
+
+    private DispatchingSubmitter submitter;
 
     /**
      * Returns agent instance (creates one if not done it yet).
@@ -150,6 +149,11 @@ public class AgentInstance {
         if (ZorkaConfig.boolCfg("zorka.diagnostics", true)) {
             createZorkaDiagMBean();
         }
+    }
+
+
+    public void stop() {
+        instance = null;
     }
 
 
@@ -260,7 +264,7 @@ public class AgentInstance {
         AgentDiagnostics.initMBean(getMBeanServerRegistry(), mbeanName);
 
         getMBeanServerRegistry().getOrRegister("java", mbeanName, "SymbolsCreated",
-            new AttrGetter(spyInstance.getTracer().getSymbolRegistry(), "size()"));
+            new AttrGetter(getTracer().getSymbolRegistry(), "size()"));
     }
 
 
@@ -275,30 +279,28 @@ public class AgentInstance {
 
 
 
-    /**
-     * Return class file transformer of Spy instrumentation engine or null if spy is disabled.
-     *
-     * @return class file transformer
-     */
-    public ClassFileTransformer getSpyTransformer() {
-        return spyInstance != null ? spyInstance.getClassTransformer() : null;
-    }
-
-
-    /**
-     * Returns reference to Spy instrumentation engine.
-     *
-     * @return instance of spy instrumentation engine
-     */
-    public synchronized SpyInstance getSpyInstance() {
-        if (spyInstance == null) {
-            spyInstance = new SpyInstance();
-            MainSubmitter.setSubmitter(spyInstance.getSubmitter());
-            MainSubmitter.setTracer(spyInstance.getTracer());
+    public synchronized Tracer getTracer() {
+        if (tracer == null) {
+            tracer = new Tracer();
+            MainSubmitter.setTracer(getTracer());
         }
-        return spyInstance;
+        return tracer;
     }
 
+
+    public synchronized SpyClassTransformer getClassTransformer() {
+        if (classTransformer == null) {
+            classTransformer = new SpyClassTransformer(getTracer());
+        }
+        return classTransformer;
+    }
+
+    public synchronized DispatchingSubmitter getSubmitter() {
+        if (submitter == null) {
+            submitter = new DispatchingSubmitter(getClassTransformer());
+        }
+        return submitter;
+    }
 
     /**
      * Returns reference to BSH agent.
@@ -348,7 +350,7 @@ public class AgentInstance {
      */
     public synchronized SpyLib getSpyLib() {
         if (spyLib == null) {
-            spyLib = new SpyLib(getSpyInstance());
+            spyLib = new SpyLib(getClassTransformer());
         }
         return spyLib;
     }
@@ -361,7 +363,7 @@ public class AgentInstance {
      */
     public synchronized TracerLib getTracerLib() {
         if (tracerLib == null) {
-            tracerLib = new TracerLib(getSpyInstance());
+            tracerLib = new TracerLib(getTracer());
         }
         return tracerLib;
     }
@@ -403,7 +405,7 @@ public class AgentInstance {
      */
     public synchronized PerfMonLib getPerfMonLib() {
         if (perfMonLib == null) {
-            perfMonLib = new PerfMonLib(getSpyInstance());
+            perfMonLib = new PerfMonLib(getTracer());
         }
         return perfMonLib;
     }
@@ -419,15 +421,6 @@ public class AgentInstance {
             mBeanServerRegistry = new MBeanServerRegistry(ZorkaConfig.boolCfg("zorka.mbs.autoregister", true));
         }
         return mBeanServerRegistry;
-    }
-
-
-    /**
-     * Sets mbean server registry.
-     * @param registry registry
-     */
-    public void setMBeanServerRegistry(MBeanServerRegistry registry) {
-        mBeanServerRegistry = registry;
     }
 
 }

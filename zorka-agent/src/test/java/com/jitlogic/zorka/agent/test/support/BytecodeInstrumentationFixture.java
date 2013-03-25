@@ -43,7 +43,7 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
 
     @Before
     public void setUp() throws Exception {
-        engine = new TestSpyTransformer(spyInstance.getTracer());
+        engine = new TestSpyTransformer(agentInstance.getTracer());
         submitter = new TestSubmitter();
         MainSubmitter.setSubmitter(submitter);
         output = new TestTracer();
