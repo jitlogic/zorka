@@ -17,6 +17,10 @@
 
 package com.jitlogic.zorka.agent;
 
+import com.jitlogic.zorka.core.AgentInstance;
+import com.jitlogic.zorka.core.ZorkaConfig;
+import com.jitlogic.zorka.core.spy.MainSubmitter;
+
 import java.lang.instrument.Instrumentation;
 
 /**
@@ -44,7 +48,11 @@ public class AgentMain {
 
         if (instance.getConfig().boolCfg("spy", true)) {
             instr.addTransformer(instance.getClassTransformer());
+            MainSubmitter.setSubmitter(instance.getSubmitter());
+            MainSubmitter.setTracer(instance.getTracer());
         }
+
+
 
     }
 }

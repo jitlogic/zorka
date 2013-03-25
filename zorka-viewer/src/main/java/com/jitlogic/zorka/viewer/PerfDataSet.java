@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.agent.util.*;
+import com.jitlogic.zorka.core.util.*;
 
 import java.io.*;
 import java.util.ArrayList;
