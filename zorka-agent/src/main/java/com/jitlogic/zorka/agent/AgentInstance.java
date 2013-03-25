@@ -96,6 +96,8 @@ public class AgentInstance {
 
     private DispatchingSubmitter submitter;
 
+    private ZorkaConfig config;
+
     /**
      * Returns agent instance (creates one if not done it yet).
      *
@@ -113,6 +115,11 @@ public class AgentInstance {
         return instance;
     }
 
+
+    public AgentInstance(ZorkaConfig config) {
+        this.config = config;
+        props = ZorkaConfig.getProperties();
+    }
 
     /**
      * Standard constructor. It only reads some configuration properties, no real startup is actually done.
@@ -265,6 +272,11 @@ public class AgentInstance {
 
         getMBeanServerRegistry().getOrRegister("java", mbeanName, "SymbolsCreated",
             new AttrGetter(getTracer().getSymbolRegistry(), "size()"));
+    }
+
+
+    public ZorkaConfig getConfig() {
+        return config;
     }
 
 

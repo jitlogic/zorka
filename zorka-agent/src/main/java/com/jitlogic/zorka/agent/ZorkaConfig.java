@@ -56,6 +56,14 @@ public class ZorkaConfig {
     /** Path to config defaults (always in classpath) */
     public final static String DEFAULT_CONF_PATH = "/com/jitlogic/zorka/agent/zorka.properties";
 
+    public ZorkaConfig(String home) {
+        loadProperties(home);
+    }
+
+    public ZorkaConfig(Properties props) {
+        properties = props;
+    }
+
     /**
      * Clears static agent configuration. This is mainly useful for tests,
      * but it might be also useful for online agent reload feature (which
