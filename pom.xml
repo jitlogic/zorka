@@ -24,6 +24,7 @@
     <modules>
         <module>zorka-core</module>
         <module>zorka-viewer</module>
+        <module>zorka-agent</module>
     </modules>
 
 </project>

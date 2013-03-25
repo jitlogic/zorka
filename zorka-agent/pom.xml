@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>zorka</artifactId>
+        <groupId>com.jitlogic.zorka</groupId>
+        <version>0.9.4-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>zorka-agent</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.jitlogic.zorka</groupId>
+            <artifactId>zorka-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Premain-Class>com.jitlogic.zorka.agent.AgentMain</Premain-Class>
+                            <Can-Redefine-Classes>true</Can-Redefine-Classes>
+                            <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>jarjar-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jarjar</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>com.googlecode.json-simple:json-simple</include>
+                                <include>org.ow2.asm:asm</include>
+                                <include>com.jitlogic.zoola:zoola-core</include>
+                                <include>com.jitlogic.contrib:libsnmp</include>
+                                <include>com.jitlogic.zorka:zorka-core</include>
+                            </includes>
+                            <rules>
+                                <rule>
+                                    <pattern>org.json.simple.**</pattern>
+                                    <result>com.jitlogic.zorka.deps.json.@1</result>
+                                </rule>
+                                <rule>
+                                    <pattern>org.objectweb.asm.**</pattern>
+                                    <result>com.jitlogic.zorka.deps.asm.@1</result>
+                                </rule>
+                                <rule>
+                                    <pattern>bsh.**</pattern>
+                                    <result>com.jitlogic.zorka.deps.bsh.@1</result>
+                                </rule>
+                                <rule>
+                                    <pattern>com.jitlogic.contrib.**</pattern>
+                                    <result>com.jitlogic.zorka.deps.@1</result>
+                                </rule>
+                                <keep>
+                                    <pattern>com.jitlogic.zorka.**</pattern>
+                                </keep>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>
