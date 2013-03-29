@@ -71,7 +71,6 @@ public class TestUtil extends ClassLoader {
     }
 
 
-
     public static <T> T getField(Object obj, String fieldName) throws Exception {
 
         Field field = lookupField(obj.getClass(), fieldName);
@@ -135,6 +134,7 @@ public class TestUtil extends ClassLoader {
         }
         return obj;
     }
+
 
     public static Object getAttr(MBeanServerConnection mbs, String mbeanName, String attr) throws Exception{
         return mbs.getAttribute(new ObjectName(mbeanName), attr);

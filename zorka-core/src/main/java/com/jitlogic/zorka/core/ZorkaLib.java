@@ -263,6 +263,14 @@ public class ZorkaLib  {
      * @return string listing attributes and their values
      */
     public String ls(String mbsName, String objectName, Object...args) {
+
+        MBeanServerConnection conn = mbsRegistry.lookup(mbsName);
+
+        if (conn == null) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "MBean server named '" + mbsName + "' is not registered.");
+            return null;
+        }
+
         QueryDef qdef = new QueryDef(mbsName, objectName, "*");
 
         for (int i = 0; i < args.length; i++) {
@@ -272,19 +280,30 @@ public class ZorkaLib  {
         List<QueryResult> results = new QueryLister(mbsRegistry, qdef).list();
         List<String> lst = new ArrayList<String>(results.size()+1);
 
-        for (QueryResult result : results) {
-            StringBuilder sb = new StringBuilder();
-            int n = 0;
-            for (Map.Entry<String,Object> e : result.attrSet()) {
-                if (n > 0) {
-                    sb.append(n == 1 ? ": " : ".");
-                }
-                n++;
-                sb.append(e.getValue());
+        ClassLoader cl0 = Thread.currentThread().getContextClassLoader(), cl1 = mbsRegistry.getClassLoader(mbsName);
+
+        try {
+            if (cl1 != null) {
+                Thread.currentThread().setContextClassLoader(cl1);
             }
-            sb.append(" -> ");
-            sb.append(result.getValue());
-            lst.add(sb.toString());
+            for (QueryResult result : results) {
+                StringBuilder sb = new StringBuilder();
+                int n = 0;
+                for (Map.Entry<String,Object> e : result.attrSet()) {
+                    if (n > 0) {
+                        sb.append(n == 1 ? ": " : ".");
+                    }
+                    n++;
+                    sb.append(e.getValue());
+                }
+                sb.append(" -> ");
+                sb.append(result.getValue());
+                lst.add(sb.toString());
+            }
+        } finally {
+            if (cl1 != null) {
+                Thread.currentThread().setContextClassLoader(cl0);
+            }
         }
 
         Collections.sort(lst);
