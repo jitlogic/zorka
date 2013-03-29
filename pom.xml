@@ -3,7 +3,7 @@
     <groupId>com.jitlogic.zorka</groupId>
     <artifactId>zorka</artifactId>
     <packaging>pom</packaging>
-    <version>0.9.3</version>
+    <version>0.9.4-SNAPSHOT</version>
     <name>zorka: parent aggregator</name>
     <url>http://www.jitlogic.com/zorka</url>
 
@@ -22,9 +22,9 @@
 
 
     <modules>
-        <module>zorka-common</module>
-        <module>zorka-agent</module>
+        <module>zorka-core</module>
         <module>zorka-viewer</module>
+        <module>zorka-agent</module>
     </modules>
 
 </project>

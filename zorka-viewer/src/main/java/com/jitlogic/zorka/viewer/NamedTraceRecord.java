@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.common.SymbolicException;
+import com.jitlogic.zorka.core.util.SymbolicException;
 import org.objectweb.asm.Type;
 
 import java.text.SimpleDateFormat;

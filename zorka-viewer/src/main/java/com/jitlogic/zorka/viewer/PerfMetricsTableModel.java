@@ -16,9 +16,6 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.common.Metric;
-import com.jitlogic.zorka.common.PerfSample;
-
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
