@@ -5,7 +5,7 @@
     <parent>
         <artifactId>zorka</artifactId>
         <groupId>com.jitlogic.zorka</groupId>
-        <version>0.9.4-SNAPSHOT</version>
+        <version>0.9.4</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -19,31 +19,9 @@
         </dependency>
         <dependency>
             <groupId>com.jitlogic.zorka</groupId>
-            <artifactId>zorka-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.jitlogic.zorka</groupId>
             <artifactId>zorka-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        <!--
-
-            Performance metrics have been disabled due to lack of interest
-            and being redundant (most monitoring systems have such functionality).
-
-            Implementation hasn't been removed from codebase, just disabled,
-            so works can be resumed as soon as metrics will prove useful for
-            someone.
-
-        <dependency>
-            <groupId>net.sf.jchart2d</groupId>
-            <artifactId>jchart2d</artifactId>
-            <version>3.3.2</version>
-        </dependency>
-        -->
-
     </dependencies>
     <build>
         <plugins>
@@ -73,12 +51,12 @@
                         </goals>
                         <configuration>
                             <includes>
-                                <include>com.jitlogic.zorka:zorka-common</include>
+                                <include>com.jitlogic.zorka:zorka-core</include>
                                 <include>org.ow2.asm:asm</include>
                             </includes>
                             <rules>
                                 <keep>
-                                    <pattern>com.jitlogic.zorka.common.**</pattern>
+                                    <pattern>com.jitlogic.zorka.core.**</pattern>
                                 </keep>
                                 <keep>
                                     <pattern>com.jitlogic.zorka.viewer.**</pattern>

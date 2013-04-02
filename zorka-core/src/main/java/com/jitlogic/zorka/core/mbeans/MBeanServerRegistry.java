@@ -58,6 +58,21 @@ public class MBeanServerRegistry {
             this.obj = obj;
             this.desc = desc;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof DeferredRegistration) {
+                DeferredRegistration reg = (DeferredRegistration)obj;
+                return name.equals(reg.name) && bean.equals(reg.bean) && attr.equals(reg.attr);
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return name.hashCode() + 17 * bean.hashCode() + 31 * attr.hashCode();
+        }
     }
 
     /** Mbean server connections map */
@@ -215,11 +230,22 @@ public class MBeanServerRegistry {
                 log.error(ZorkaLogger.ZAG_ERRORS, "Object '" + beanName + "'.'" + attrName + "' of invalid type'", e);
             }
         } else {
-            deferredRegistrations.add(new DeferredRegistration(mbsName, beanName, attrName, obj, desc));
-            return obj;
+            DeferredRegistration reg = new DeferredRegistration(mbsName, beanName, attrName, obj, desc);
+            return defer(reg);
         }
 
         return null;
+    }
+
+    private <T> T defer(DeferredRegistration reg) {
+        for (DeferredRegistration dr : deferredRegistrations) {
+            if (reg.equals(dr)) {
+                return (T)dr.obj;
+            }
+        }
+
+        deferredRegistrations.add(reg);
+        return (T)reg.obj;
     }
 
 

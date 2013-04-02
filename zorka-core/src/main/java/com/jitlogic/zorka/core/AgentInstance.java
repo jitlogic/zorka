@@ -28,10 +28,7 @@ import com.jitlogic.zorka.core.normproc.NormLib;
 
 import java.io.File;
 import java.util.Properties;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * This method binds together all components to create fuunctional Zorka agent. It is responsible for
@@ -49,8 +46,11 @@ public class AgentInstance {
     /** MBean server registry */
     private MBeanServerRegistry mBeanServerRegistry;
 
-    /** Executor managing threads that handle requests */
-    private Executor executor;
+    /** Handles accepted connections. */
+    private Executor connExecutor;
+
+    /** Handles BSH requests (called from connection handlers). */
+    private ExecutorService mainExecutor;
 
     /** Main zorka agent object - one that executes actual requests */
     private ZorkaBshAgent zorkaAgent;
@@ -252,15 +252,24 @@ public class AgentInstance {
     }
 
 
-    private synchronized Executor getExecutor() {
-        if (executor == null) {
+    private synchronized Executor getConnExecutor() {
+        if (connExecutor == null) {
             int rt = config.intCfg("zorka.req.threads", 8);
-            executor = new ThreadPoolExecutor(rt, rt, 1000, TimeUnit.MILLISECONDS,
+            connExecutor = new ThreadPoolExecutor(rt, rt, 1000, TimeUnit.MILLISECONDS,
                     new ArrayBlockingQueue<Runnable>(config.intCfg("zorka.req.queue", 64)));
         }
-        return executor;
+        return connExecutor;
     }
 
+
+    private synchronized ExecutorService getMainExecutor() {
+        if (mainExecutor == null) {
+            int rt = config.intCfg("zorka.req.threads", 8);
+            mainExecutor = new ThreadPoolExecutor(rt, rt, 1000, TimeUnit.MILLISECONDS,
+                    new ArrayBlockingQueue<Runnable>(config.intCfg("zorka.req.queue", 64)));
+        }
+        return mainExecutor;
+    }
 
 
     public synchronized Tracer getTracer() {
@@ -292,7 +301,8 @@ public class AgentInstance {
      */
     public synchronized ZorkaBshAgent getZorkaAgent() {
         if (zorkaAgent == null) {
-            zorkaAgent = new ZorkaBshAgent(getExecutor(), getMBeanServerRegistry(), config);
+            long timeout = config.longCfg("zorka.req.timeout", 5000L);
+            zorkaAgent = new ZorkaBshAgent(getConnExecutor(), getMainExecutor(), timeout, getMBeanServerRegistry(), config);
         }
         return zorkaAgent;
     }

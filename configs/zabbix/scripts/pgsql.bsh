@@ -1,0 +1,64 @@
+
+/**
+ * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+__pgsql() {
+
+  lq = zorka.boolCfg("jdbc.lq", false);
+  lqt = zorka.boolCfg("jdbc.lq.trace", zorka.boolCfg("tracer", false));
+
+  lqtime = zorka.longCfg("jdbc.lq.time", 5000);
+  mbean = zorka.stringCfg("jdbc.mbean", "zorka:type=ZorkaStats,name=PgsqlStats");
+
+  discovery() {
+      return zabbix.discovery(zorka.query("java", mbean, "name", "type").get("stats").listAs("**", "DB"));
+  }
+
+  lqTrapper = zorka.rollingFileTrapper("jdbc.lq", "INFO", 
+    zorka.stringCfg("jdbc.lq.path", zorka.path("${zorka.log.dir}", "long_query.log")),
+    zorka.intCfg("jdbc.lq.fnum", 8), zorka.kiloCfg("jdbc.lq.size", 8*1024*1024), true);
+
+  spy.add(spy.instrument()
+    .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("SQL", 1), lqt ? tracer.attr("SQL", "SQL") : null)
+    .onError(spy.fetchError("E"))
+    .onSubmit(spy.zorkaStats("java", mbean, "stats", "${THIS.connection.creatingURL}"),
+      spy.longerThan(lqtime), 
+      lq ? spy.trapperCollector(lqTrapper, zorka.INFO, "${THIS.connection.creatingURL}", 
+        "OK [E] [T=${T}] SQL=${SQL}", "ERROR [E] [T=${T}] SQL=${SQL}\n${E}", "E") : null)
+    .include(
+      spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, "String"),
+      spy.byMethod(0, "org.postgresql.jdbc3.AbstractJdbc3Statement", "execute*", null, "String")));
+
+
+  spy.add(spy.instrument()
+    .onEnter(spy.fetchArg("THIS", 0), spy.format("SQL", "${THIS.preparedQuery}"), lqt ? tracer.attr("SQL", "SQL") : null)
+    .onError(spy.fetchError("E"))
+    .onSubmit(spy.zorkaStats("java", mbean, "stats", "${THIS.connection.creatingURL}"),
+      spy.longerThan(lqtime), 
+      lq ? spy.trapperCollector(lqTrapper, zorka.INFO, "${THIS.connection.creatingURL}", 
+        "OK [E] [T=${T}] SQL=${SQL}", "ERROR [E] [T=${T}] SQL=${SQL}\n${E}", "E") : null)
+    .include(
+      spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, spy.SM_NOARGS),
+      spy.byMethod(0, "org.postgresql.jdbc3.AbstractJdbc3Statement", "execute*", null, spy.SM_NOARGS)
+  ));
+
+  return this;
+}
+
+
+pgsql = __pgsql();
+
