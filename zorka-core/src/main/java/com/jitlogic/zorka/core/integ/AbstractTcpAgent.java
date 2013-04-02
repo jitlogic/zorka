@@ -176,7 +176,7 @@ public abstract class AbstractTcpAgent implements Runnable {
                     rh = newRequest(sock);
                     agent.exec(rh.getReq(), rh);
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 if (running) {
                     log.error(ZorkaLogger.ZAG_ERRORS, "Error occured when processing request.", e);
                 }
