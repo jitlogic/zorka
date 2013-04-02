@@ -20,6 +20,7 @@ package com.jitlogic.zorka.core;
 import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.util.ObjectDumper;
@@ -47,16 +48,23 @@ public class ZorkaBshAgent {
 	private ZorkaLib zorkaLib;
 
     /** Executor for asynchronous processing queries */
-	private Executor executor;
+	private Executor connExecutor;
+
+    private ExecutorService mainExecutor;
+
+    private long timeout;
 
     /**
      * Standard constructor.
      *
-     * @param executor executor for asynchronous processing queries
+     * @param connExecutor connExecutor for asynchronous processing queries
      */
-	public ZorkaBshAgent(Executor executor, MBeanServerRegistry mbsRegistry, ZorkaConfig config) {
+	public ZorkaBshAgent(Executor connExecutor, ExecutorService mainExecutor, long timeout, MBeanServerRegistry mbsRegistry, ZorkaConfig config) {
 		this.interpreter = new Interpreter();
-		this.executor = executor;
+
+		this.connExecutor = connExecutor;
+        this.mainExecutor = mainExecutor;
+        this.timeout = timeout;
 
 
 		zorkaLib = new ZorkaLib(this, mbsRegistry, config);
@@ -120,8 +128,8 @@ public class ZorkaBshAgent {
      * @param callback callback object
      */
 	public void exec(String expr, ZorkaCallback callback) {
-		ZorkaBshWorker worker = new ZorkaBshWorker(executor, this, expr, callback);
-		executor.execute(worker);
+		ZorkaBshWorker worker = new ZorkaBshWorker(mainExecutor, timeout, this, expr, callback);
+		connExecutor.execute(worker);
 	}
 
 

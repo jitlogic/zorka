@@ -23,7 +23,7 @@ import com.jitlogic.zorka.core.util.ZorkaLogger;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.concurrent.Executor;
+import java.util.concurrent.*;
 
 /**
  * Represents runnable task performing BSH query.
@@ -44,7 +44,10 @@ public class ZorkaBshWorker implements Runnable, Closeable {
 	private final ZorkaCallback callback;
 
     /** Executor to run real work. */
-    private Executor executor;
+    private ExecutorService executor;
+
+    /** Request handling timeout. */
+    private long timeout;
 
     /**
      * Creates new BSH worker object.
@@ -55,16 +58,54 @@ public class ZorkaBshWorker implements Runnable, Closeable {
      *
      * @param callback callback used to report query result
      */
-	public ZorkaBshWorker(Executor executor, ZorkaBshAgent agent, String expr, ZorkaCallback callback) {
+	public ZorkaBshWorker(ExecutorService executor, long timeout, ZorkaBshAgent agent, String expr, ZorkaCallback callback) {
+        this.executor = executor;
+        this.timeout = timeout;
 		this.agent = agent;
 		this.expr = expr;
 		this.callback = callback;
-        this.executor = executor;
 	}
 
 
     @Override
-	public void run() {
+    public void run() {
+
+        long t1 = System.nanoTime();
+
+        Callable<Object> task = new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                return agent.eval(expr);
+            }
+        };
+
+        Future<Object> future = executor.submit(task);
+
+        try {
+            AgentDiagnostics.inc(AgentDiagnostics.AGENT_REQUESTS);
+            callback.handleResult(future.get(timeout, TimeUnit.MILLISECONDS));
+        } catch (InterruptedException e) {
+            AgentDiagnostics.inc(AgentDiagnostics.AGENT_ERRORS);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Executing expression '" + expr + "' has been interrupted.");
+            callback.handleError(new RuntimeException("Request has been interrupted."));
+            future.cancel(true);
+        } catch (ExecutionException e) {
+            AgentDiagnostics.inc(AgentDiagnostics.AGENT_ERRORS);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error evaluating expression '" + expr + "'", e);
+            callback.handleError(e.getCause());
+        } catch (TimeoutException e) {
+            AgentDiagnostics.inc(AgentDiagnostics.AGENT_ERRORS);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Timeout executing expression '" + expr + "'.");
+            callback.handleError(e);
+            future.cancel(true);
+        }
+
+        long t2 = System.nanoTime();
+        AgentDiagnostics.inc(AgentDiagnostics.AGENT_TIME, t2-t1);
+    }
+
+    //@Override
+	public void runOld() {
         long t1 = System.nanoTime();
 
 		try {
