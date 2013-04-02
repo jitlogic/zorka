@@ -1,3 +1,11 @@
+Zorka 0.9.4 (2013-04-02)
+------------------------
+
+ * unify argument ordering of Spy;
+ * sample JDBC script for PostgreSQL (long queries, trace attrs, stats);
+ * refactor zorka-common+zorka-agent -> zorka-core+zorka-agent;
+ * bugfixes;
+
 Zorka 0.9.3 (2013-03-23)
 ------------------------
 
