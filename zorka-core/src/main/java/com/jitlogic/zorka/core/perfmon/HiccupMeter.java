@@ -125,6 +125,7 @@ public class HiccupMeter implements Runnable {
         tstamp = t;
     }
 
+
     private void sleep() {
         try {
             Thread.sleep(resolution);
