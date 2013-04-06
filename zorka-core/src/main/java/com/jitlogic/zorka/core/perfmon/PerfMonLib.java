@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
+import com.jitlogic.zorka.core.mbeans.MethodCallStatistic;
 import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.util.MetricTemplate;
 import com.jitlogic.zorka.core.util.MetricsRegistry;
@@ -77,6 +78,42 @@ public class PerfMonLib {
      */
     public JmxAttrScanner scanner(String name, QueryDef... qdefs) {
         return new JmxAttrScanner(symbolRegistry, metricsRegistry, name, mbsRegistry, tracer, qdefs);
+    }
+
+
+    public HiccupMeter cpuHiccup(String mbsName, String mbeanName, String attr) {
+        return cpuHiccup(mbsName, mbeanName, attr, 1, 30000);
+    }
+
+
+    public HiccupMeter cpuHiccup(String mbsName, String mbeanName, String attr, long resolution, long delay) {
+        MethodCallStatistic mcs = mbsRegistry.getOrRegister(mbsName, mbeanName, attr, new MethodCallStatistic("cpuHiccup"));
+        HiccupMeter meter = HiccupMeter.cpuMeter(resolution, delay, mcs);
+        return meter;
+    }
+
+
+    public HiccupMeter memHiccup(String mbsName, String mbeanName, String attr) {
+        return memHiccup(mbsName, mbeanName, attr, 10, 30000);
+    }
+
+
+    public HiccupMeter memHiccup(String mbsName, String mbeanName, String attr, long resolution, long delay) {
+        MethodCallStatistic mcs = mbsRegistry.getOrRegister(mbsName, mbeanName, attr, new MethodCallStatistic("memHiccup"));
+        HiccupMeter meter = HiccupMeter.memMeter(resolution, delay, mcs);
+        return meter;
+    }
+
+
+    public HiccupMeter dskHiccup(String mbsName, String mbeanName, String attr, String path) {
+        return dskHiccup(mbsName, mbeanName, attr, 1000, 30000, path);
+    }
+
+
+    public HiccupMeter dskHiccup(String mbsName, String mbeanName, String attr, long resolution, long delay, String path) {
+        MethodCallStatistic mcs = mbsRegistry.getOrRegister(mbsName, mbeanName, attr, new MethodCallStatistic("dskHiccup"));
+        HiccupMeter meter = HiccupMeter.dskMeter(resolution, delay, path, mcs);
+        return meter;
     }
 
 }
