@@ -145,10 +145,10 @@ public class TraceBuilder extends TraceEventHandler {
             return;
         }
 
-        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS)) {
+        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_EXCEPTIONS)) {
             TraceRecord tr = ttop;
             if (tr.getClassId() == 0 && tr.getParent() != null) { tr = tr.getParent(); }
-            log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceError(" + symbols.symbolName(tr.getClassId()) +
+            log.trace(ZorkaLogger.ZTR_TRACE_EXCEPTIONS, "traceError(" + symbols.symbolName(tr.getClassId()) +
                 "." + symbols.symbolName(tr.getMethodId()) + ")", (Throwable)exception);
         }
 

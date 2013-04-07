@@ -24,15 +24,27 @@ __wso2() {
   __carbonOSGiConfigurer() {
 
     process(record) {
+      zorka.logInfo("Initial properties map: " + record.get("PARAM"));
       zorka.logInfo("(Re)Configuring OSGi parameters for Zorka Spy ...");
 
       p = record.get("PARAM");
       s = p.get("org.osgi.framework.system.packages");
-      s = s + ",com.jitlogic.zorka.spy";
+      s = s + ",com.jitlogic.zorka.core.spy";
 
       p.put("org.osgi.framework.system.packages", s);
       zorka.logInfo("Set org.osgi.framework.system.packages to: '" + s + "'");
+
+      s2 = p.get("org.osgi.framework.bootdelegation");
+      if (s2 != null && s2.length() > 0) {
+        s2 = s2 + ",com.jitlogic.zorka.core.*";
+      } else {
+        s2 = "com.jitlogic.zorka.core.*";
+      }
+
+      p.put("org.osgi.framework.bootdelegation", s2);
+      zorka.logInfo("Set org.osgi.framework.bootdelegation to: '" + s2 + "'");
     }
+
     return this;
   }
 
@@ -41,6 +53,76 @@ __wso2() {
               (com.jitlogic.zorka.core.spy.SpyProcessor)__carbonOSGiConfigurer())
     .include(spy.byMethod(spy.AC_PRIVATE, "org.wso2.carbon.server.CarbonLauncher",
                           "buildInitialPropertyMap", "java.util.Map")));
+
+
+  if (zorka.boolCfg("tracer", false)) {
+
+    __osgiBaseAdaptorConfigurer() {
+      process(record) {
+        zorka.logInfo("Swapping BaseAdaptor classloader with overlay ...");
+
+        try {
+          clazz = record.get("THIS").getClass();
+          oldCL = zorka.getField(clazz, "bundleClassLoaderParent");
+          newCL = zorka.overlayClassLoader(oldCL, "com.jitlogic.zorka.**", ClassLoader.getSystemClassLoader());
+          zorka.setField(clazz, "bundleClassLoaderParent", newCL);
+        } catch (Exception e) {
+          zorka.logError("Error swapping class loader" + e);
+        }
+
+        return record;
+      }
+
+      return this;
+    }
+
+    spy.add(spy.instance()
+      .onReturn(spy.fetchArg("THIS", 0), (com.jitlogic.zorka.core.spy.SpyProcessor)__osgiBaseAdaptorConfigurer())
+      .include(spy.byMethod("org.eclipse.osgi.baseadaptor.BaseAdaptor", "<init>")));
+
+
+    if (zorka.boolCfg("tracer.hires", false)) {
+      tracer.setTracerMinMethodTime(1000000);
+      tracer.setTracerMinTraceTime(0);
+      tracer.setTracerMaxTraceRecords(4096);
+    }
+
+    tracer.exclude(
+      spy.byClass("sun.**"),
+      spy.byClass("java.**"),
+      spy.byClass("javax.**"),
+      spy.byClass("com.sun.**"),
+      spy.byClass("com.jitlogic.zorka.**"),
+      spy.byClass("org.xml.sax.**"),
+      spy.byClass("org.jcp.**"),
+      spy.byClass("~^\\$Proxy.*$"),
+      spy.byClass("org.apache.xerces.**"),
+      spy.byClass("org.apache.xalan.**"),
+      spy.byClass("org.apache.xml.**"),
+      spy.byClass("org.apache.xpath.**"),
+      spy.byClass("org.w3c.**"),
+      spy.byClass("net.sf.saxon.**"),
+      spy.byClass("org.wso2.carbon.ndatasource.**"),
+      spy.byClass("org.omg.**")
+    );
+
+
+    tracer.include(spy.byClass("**").forTrace());
+
+
+    spy.add(spy.instance()
+      .onEnter(spy.fetchArg("CTX", 1), tracer.begin("AXIS_REQ"))
+      .include(spy.byMethod("org.apache.axis2.transport.http.HTTPTransportUtils", "processHTTPPostRequest")));
+
+          //spy.format("ACTION", "${CTX.soapAction}"),
+          //tracer.attr("ACTION", "ACTION"))
+
+    // Set tracer output 
+    tracer.output(tracer.toFile(
+      zorka.stringCfg("tracer.file", "${zorka.log.dir}/trace.trc"), 16, 128*1024*1024));
+
+  }
+
 
   return this;
 }

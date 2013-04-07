@@ -21,23 +21,34 @@ import java.util.regex.Pattern;
 
 public class OverlayClassLoader extends ClassLoader {
 
+    private static final ZorkaLog log = ZorkaLogger.getLog(OverlayClassLoader.class);
+
     private ClassLoader overlay;
     private Pattern pattern;
 
     public OverlayClassLoader(ClassLoader parent, String pattern, ClassLoader overlay) {
         super(parent);
-        this.pattern = Pattern.compile(pattern.replace("**", ".+").replace("*", "[^\\.]+"));
+        this.pattern = Pattern.compile("^"+pattern.replace("**", ".+").replace("*", "[^\\.]+"));
         this.overlay = overlay;
     }
 
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        return pattern.matcher(name).matches() ? overlay.loadClass(name) : super.loadClass(name, resolve);
+        if (pattern.matcher(name).matches()) {
+            log.info(ZorkaLogger.ZAG_TRACE, "Loading class " + name + " via overlay.");
+            return overlay.loadClass(name);
+        } else {
+            return super.loadClass(name, resolve);
+        }
     }
 
     @Override
     public URL getResource(String path) {
-        return pattern.matcher(path).matches() ? overlay.getResource(path) : super.getResource(path);
+        if (pattern.matcher(path).matches()) {
+            return overlay.getResource(path);
+        } else {
+            return super.getResource(path);
+        }
     }
 
 }
