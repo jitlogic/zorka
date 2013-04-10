@@ -27,8 +27,10 @@ public interface BucketAggregate {
     /** One nanosecond */
     long NS   = 1L;
 
+    long US   = NS * 1000;
+
     /** One miliseccond (in nanoseconds) */
-    long MS   = NS * 1000000;
+    long MS   = US * 1000;
 
     /** One second (in nanoseconds) */
     long SEC  = MS * 1000;

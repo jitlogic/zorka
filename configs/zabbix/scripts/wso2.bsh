@@ -24,15 +24,27 @@ __wso2() {
   __carbonOSGiConfigurer() {
 
     process(record) {
+      zorka.logInfo("Initial properties map: " + record.get("PARAM"));
       zorka.logInfo("(Re)Configuring OSGi parameters for Zorka Spy ...");
 
       p = record.get("PARAM");
       s = p.get("org.osgi.framework.system.packages");
-      s = s + ",com.jitlogic.zorka.spy";
+      s = s + ",com.jitlogic.zorka.core.spy";
 
       p.put("org.osgi.framework.system.packages", s);
       zorka.logInfo("Set org.osgi.framework.system.packages to: '" + s + "'");
+
+      s2 = p.get("org.osgi.framework.bootdelegation");
+      if (s2 != null && s2.length() > 0) {
+        s2 = s2 + ",com.jitlogic.zorka.core.*";
+      } else {
+        s2 = "com.jitlogic.zorka.core.*";
+      }
+
+      p.put("org.osgi.framework.bootdelegation", s2);
+      zorka.logInfo("Set org.osgi.framework.bootdelegation to: '" + s2 + "'");
     }
+
     return this;
   }
 
@@ -41,6 +53,119 @@ __wso2() {
               (com.jitlogic.zorka.core.spy.SpyProcessor)__carbonOSGiConfigurer())
     .include(spy.byMethod(spy.AC_PRIVATE, "org.wso2.carbon.server.CarbonLauncher",
                           "buildInitialPropertyMap", "java.util.Map")));
+
+
+  if (zorka.boolCfg("tracer", false)) {
+
+    if (zorka.boolCfg("tracer.osgi.overlay", true)) {
+
+      __osgiBaseAdaptorConfigurer() {
+        process(record) {
+          zorka.logInfo("Swapping BaseAdaptor classloader with overlay ...");
+          clazz = record.get("THIS").getClass();
+          oldCL = zorka.getField(clazz, "bundleClassLoaderParent");
+          newCL = zorka.overlayClassLoader(oldCL, "com.jitlogic.zorka.**", ClassLoader.getSystemClassLoader());
+          zorka.setField(clazz, "bundleClassLoaderParent", newCL);
+          return record;
+        }
+
+        return this;
+      }
+
+      spy.add(spy.instance()
+        .onReturn(spy.fetchArg("THIS", 0), (com.jitlogic.zorka.core.spy.SpyProcessor)__osgiBaseAdaptorConfigurer())
+        .include(spy.byMethod("org.eclipse.osgi.baseadaptor.BaseAdaptor", "<init>")));
+
+    } // tracer.osgi.overlay = yes
+
+
+    for (String pkg : zorka.listCfg("tracer.include.extra")) {
+      if (pkg.contains("/")) {
+        cm = pkg.split("/");
+        zorka.logInfo("Include methods for trace: '" + cm[0] + "' / '" + cm[1] + "'");
+        tracer.include(spy.byMethod(cm[0].trim(),cm[1].trim()));
+      } else {
+        zorka.logInfo("Include classes for trace: '" + pkg + "'");
+        tracer.include(spy.byClass(pkg).forTrace());
+      }
+    }
+
+
+    for (String pkg : zorka.listCfg("tracer.exclude", 
+        "sun.**", "java.**", "javax.**", "com.sun.**", "com.jitlogic.zorka.**", 
+        "org.xml.sax.**", "org.jcp.**", "~^\\$Proxy.*$",
+        "org.apache.xerces.**", "org.apache.xalan.**", "org.apache.xml.**",
+        "org.apache.xpath.**", "org.w3c.**", "net.sf.saxon.**",
+        "org.wso2.carbon.ndatasource.**", "org.omg.**")) {
+      if (pkg.contains("/")) {
+        cm = pkg.split("/");
+        zorka.logInfo("Exclude methods from trace: '" + cm[0] + "' / '" + cm[1] + "'");
+        tracer.exclude(spy.byMethod(cm[0].trim(),cm[1].trim()));
+      } else {
+        zorka.logInfo("Exclude classes from trace: '" + pkg + "'");
+        tracer.exclude(spy.byClass(pkg));
+      }
+    }
+
+
+    for (String pkg : zorka.listCfg("tracer.exclude.extra")) {
+      if (pkg.contains("/")) {
+        cm = pkg.split("/");
+        zorka.logInfo("Exclude methods from trace: '" + cm[0] + "' / '" + cm[1] + "'");
+        tracer.exclude(spy.byMethod(cm[0].trim(),cm[1].trim()));
+      } else {
+        zorka.logInfo("Exclude clases from trace: '" + pkg + "'");
+        tracer.exclude(spy.byClass(pkg));
+      }
+    }
+
+
+    for (String pkg : zorka.listCfg("tracer.include", "**")) {
+      if (pkg.contains("/")) {
+        cm = pkg.split("/");
+        zorka.logInfo("Include methods for trace: '" + cm[0] + "' / '" + cm[1] + "'");
+        tracer.include(spy.byMethod(cm[0].trim(),cm[1].trim()));
+      } else {
+        zorka.logInfo("Include classes for trace: '" + pkg + "'");
+        tracer.include(spy.byClass(pkg).forTrace());
+      }
+    }
+
+
+    // Entry point: AXIS web services
+    spy.add(spy.instance()
+      .onEnter(spy.fetchArg("CTX", 1), tracer.begin("AXIS_REQ"), spy.format("ACTION", "${CTX.soapAction}"), tracer.attr("ACTION", "ACTION"))
+      .include(spy.byMethod("org.apache.axis2.transport.http.HTTPTransportUtils", "processHTTPPostRequest")));
+
+
+    tracer.output(tracer.toFile(
+      zorka.stringCfg("tracer.log.path", zorka.path("${zorka.log.dir}", "trace.trc")),
+      zorka.intCfg("tracer.log.fnum", 8),
+      zorka.kiloCfg("tracer.log.size", 128*1024*1024)));
+
+
+    if (zorka.hasCfg("tracer.min.method.time")) {
+      mmt = zorka.longCfg("tracer.min.method.time", 1000000);
+      zorka.logInfo("Setting tracer minimum method time to " + mmt + " ns");
+      tracer.setTracerMinMethodTime(mmt);
+    }
+
+
+    if (zorka.hasCfg("tracer.min.trace.time")) {
+      mtt = zorka.longCfg("tracer.min.trace.time", 100);
+      zorka.logInfo("Settting tracer minimum trace time to " + mtt + " ms");
+      tracer.setTracerMinTraceTime(mtt);
+    }
+
+
+    if (zorka.hasCfg("tracer.max.trace.records")) {
+      mtr = zorka.longCfg("tracer.min.trace.records", 4096);
+      zorka.logInfo("Setting maximum records per trace to " + mtr + ".");
+      tracer.setTracerMaxTraceRecords(mtr);
+    }
+
+  } // tracer = yes
+
 
   return this;
 }

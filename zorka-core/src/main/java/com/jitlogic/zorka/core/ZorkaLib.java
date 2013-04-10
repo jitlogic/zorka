@@ -806,5 +806,16 @@ public class ZorkaLib  {
     }
 
 
+    public Object getField(Object obj, String name) {
+        return ObjectInspector.getField(obj, name);
+    }
 
+
+    public void setField(Object obj, String name, Object value) {
+        ObjectInspector.setField(obj, name, value);
+    }
+
+    public ClassLoader overlayClassLoader(ClassLoader parent, String pattern, ClassLoader overlay) {
+        return new OverlayClassLoader(parent, pattern, overlay);
+    }
 }
