@@ -18,6 +18,7 @@
 package com.jitlogic.zorka.core.mbeans;
 
 import static com.jitlogic.zorka.core.perfmon.BucketAggregate.MS;
+import static com.jitlogic.zorka.core.perfmon.BucketAggregate.US;
 
 import com.jitlogic.zorka.core.util.ZorkaStat;
 
@@ -101,6 +102,11 @@ public class MethodCallStatistic implements ZorkaStat {
 	}
 
 
+    public long getTimeUs() {
+        return time.longValue()/US;
+    }
+
+
     /**
      * Returns maximum execution time (since last maxTimeCLR);
      *
@@ -108,6 +114,11 @@ public class MethodCallStatistic implements ZorkaStat {
      */
     public long getMaxTime() {
         return maxTime.longValue()/MS;
+    }
+
+
+    public long getMaxTimeUs() {
+        return maxTime.longValue()/US;
     }
 
 
@@ -125,6 +136,17 @@ public class MethodCallStatistic implements ZorkaStat {
         }
 
         return t/MS;
+    }
+
+
+    public long getMaxTimeUsCLR() {
+        long t = maxTime.longValue();
+
+        while (!maxTime.compareAndSet(t, 0)) {
+            t = maxTime.longValue();
+        }
+
+        return t/US;
     }
 
     /**

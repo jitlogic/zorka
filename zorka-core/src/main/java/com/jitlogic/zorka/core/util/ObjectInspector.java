@@ -38,6 +38,8 @@ import java.util.regex.Pattern;
  */
 public final class ObjectInspector {
 
+    private static final ZorkaLog log = ZorkaLogger.getLog(ObjectInspector.class);
+
     /** Special attribute name that will extract stack trace from throwable objects. */
     public static final String STACK_TRACE_KEY = "printStackTrace";
 
@@ -444,4 +446,53 @@ public final class ObjectInspector {
         return sb.toString();
     }
 
+
+    public static Object getField(Object obj, String fieldName) {
+        if (obj != null) {
+            Field field = lookupField(obj instanceof Class ? (Class)obj : obj.getClass(), fieldName);
+            boolean accessible = field.isAccessible();
+
+            if (!accessible) {
+                field.setAccessible(true);
+            }
+
+            Object ret = null;
+
+            try {
+                ret = field.get(obj);
+            } catch (IllegalAccessException e) {
+                log.error(ZorkaLogger.ZAG_ERRORS, "Cannot get field '" + fieldName + "' of object " + obj, e);
+            }
+
+            if (!accessible) {
+                field.setAccessible(accessible);
+            }
+
+            return ret;
+        } else {
+            return null;
+        }
+    }
+
+
+    public static void setField(Object obj, String fieldName, Object value) {
+        if (obj != null) {
+            Field field = lookupField(obj instanceof Class ? (Class)obj : obj.getClass(), fieldName);
+            boolean accessible = field.isAccessible();
+
+            if (!accessible) {
+                field.setAccessible(true);
+            }
+
+            try {
+                field.set(obj, value);
+            } catch (IllegalAccessException e) {
+                log.error(ZorkaLogger.ZAG_ERRORS, "Cannot set field '" + fieldName + "' of object " + obj, e);
+            }
+
+            if (!accessible) {
+                field.setAccessible(accessible);
+            }
+        }
+    }
 }
