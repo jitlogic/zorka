@@ -82,7 +82,7 @@ public class PerfMonLib {
 
 
     public HiccupMeter cpuHiccup(String mbsName, String mbeanName, String attr) {
-        return cpuHiccup(mbsName, mbeanName, attr, 1, 30000);
+        return cpuHiccup(mbsName, mbeanName, attr, 10, 30000);
     }
 
 

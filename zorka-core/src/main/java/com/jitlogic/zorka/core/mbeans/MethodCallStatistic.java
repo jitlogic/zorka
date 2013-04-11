@@ -95,15 +95,30 @@ public class MethodCallStatistic implements ZorkaStat {
     /**
      * Returns total execution time (sum of execution times of all calls to a method)
      *
-     * @return total execution time
+     * @return total execution time (milliseconds)
      */
 	public long getTime() {
 		return time.longValue()/MS;
 	}
 
 
+    /**
+     * Returns total execution time (sum of execution times of all calls to a method)
+     *
+     * @return total execution time (microseconds)
+     */
     public long getTimeUs() {
         return time.longValue()/US;
+    }
+
+
+    /**
+     * Returns total execution time (sum of execution times of all calls to a method)
+     *
+     * @return total execution time (nanoseconds)
+     */
+    public long getTimeNs() {
+        return time.longValue();
     }
 
 
@@ -117,8 +132,44 @@ public class MethodCallStatistic implements ZorkaStat {
     }
 
 
+    /**
+     * Returns maximum execution time (since last maxTimeCLR);
+     *
+     * @return maximum execution time (in microseconds)
+     */
     public long getMaxTimeUs() {
         return maxTime.longValue()/US;
+    }
+
+
+    /**
+     * Returns maximum execution time (since last maxTimeCLR);
+     *
+     * @return maximum execution time (in nanoseconds)
+     */
+    public long getMaxTimeNs() {
+        return maxTime.longValue();
+    }
+
+    /**
+     * Returns maximum execution time and zeroes maxTime field
+     * in thread safe manner.
+     *
+     * @return maximum execution time (in milliseconds)
+     */
+    public long getMaxTimeCLR() {
+        return getMaxTimeNsCLR()/MS;
+    }
+
+
+    /**
+     * Returns maximum execution time and zeroes maxTime field
+     * in thread safe manner.
+     *
+     * @return maximum execution time (in microseconds)
+     */
+    public long getMaxTimeUsCLR() {
+        return getMaxTimeNsCLR()/US;
     }
 
 
@@ -128,25 +179,14 @@ public class MethodCallStatistic implements ZorkaStat {
      *
      * @return maximum execution time (in milliseconds)
      */
-    public long getMaxTimeCLR() {
+    public long getMaxTimeNsCLR() {
         long t = maxTime.longValue();
 
         while (!maxTime.compareAndSet(t, 0)) {
             t = maxTime.longValue();
         }
 
-        return t/MS;
-    }
-
-
-    public long getMaxTimeUsCLR() {
-        long t = maxTime.longValue();
-
-        while (!maxTime.compareAndSet(t, 0)) {
-            t = maxTime.longValue();
-        }
-
-        return t/US;
+        return t;
     }
 
     /**
