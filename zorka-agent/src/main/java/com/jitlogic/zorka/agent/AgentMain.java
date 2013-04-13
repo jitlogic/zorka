@@ -41,9 +41,9 @@ public class AgentMain {
      */
     public static void premain(String args, Instrumentation instr) {
 
-        //ZorkaConfig.loadProperties(args);
+        String home = System.getProperties().getProperty("zorka.home.dir", args);
 
-        instance = new AgentInstance(new ZorkaConfig(args));
+        instance = new AgentInstance(new ZorkaConfig(home));
         instance.start();
 
         if (instance.getConfig().boolCfg("spy", true)) {

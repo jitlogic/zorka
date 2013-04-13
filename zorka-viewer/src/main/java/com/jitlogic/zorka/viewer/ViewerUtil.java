@@ -21,16 +21,6 @@ import java.util.regex.Pattern;
 
 public class ViewerUtil {
 
-    public static String nanoSeconds(long ns) {
-        double t = 1.0 * ns / 1000000.0;
-        String u = "ms";
-        if (t > 1000.0) {
-            t /= 1000.0;
-            u = "s";
-        }
-        return String.format(t > 10 ? "%.0f" : "%.2f", t) + u;
-    }
-
     private static final Pattern RE_DOT = Pattern.compile("\\.");
 
     public static String shortClassName(String className) {

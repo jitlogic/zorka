@@ -587,7 +587,7 @@ public class SpyLib {
      *
      * @param message message template (will be filled with record fields if necessary)
      *
-     * @param fCond condition field - record will be logged if
+     * @param fCond condition field - record will be logged if condition is not null and not equal to Boolean.FALSE
      *
      *
      * @return logger collector object
@@ -597,6 +597,21 @@ public class SpyLib {
     }
 
 
+    /**
+     * Logs record occurence in zorka log. This is useful for debug purposes.
+     *
+     * @param logLevel log level
+     *
+     * @param tag tag
+     *
+     * @param message message template (return path, will be filled with record fields if necessary)
+     *
+     * @param fCond condition field - record will be logged if condition is not null and not equal to Boolean.FALSE
+     *
+     * @param fErr message tempalte (error path, will be filled with record field if necessary)
+     *
+     * @return logger collector object
+     */
     public SpyProcessor zorkaLogCond(String logLevel, String tag, String message, String fCond, String fErr) {
         return new ZorkaLogCollector(ZorkaLogLevel.valueOf(logLevel), tag, message, fCond, fErr);
     }
@@ -851,7 +866,7 @@ public class SpyLib {
      *
      * @param interval minimum execution interval (milliseconds)
      *
-     * @return
+     * @return conditional spy processor
      */
     public SpyProcessor longerThan(long interval) {
         return longerThan("T", interval);
@@ -865,11 +880,34 @@ public class SpyLib {
      *
      * @param interval minimum execution interval (milliseconds)
      *
-     * @return
+     * @return conditional spy processor
      */
     public SpyProcessor longerThan(String dst, long interval) {
         return ComparatorProcessor.vcmp(dst, ">", interval * 1000000L);
     }
 
 
+    /**
+     * Return time in human readable form. Time is taken from "T" field.
+     *
+     * @param dst destination field
+     *
+     * @return strTime function spy processor
+     */
+    public SpyProcessor strTime(String dst) {
+        return strTime(dst, "T");
+    }
+
+    /**
+     * Return time in human readable form.
+     *
+     * @param dst destination field
+     *
+     * @param src source field (must be Long, time in nanoseconds)
+     *
+     * @return strTime function spy processor
+     */
+    public SpyProcessor strTime(String dst, String src) {
+        return UtilFnProcessor.strTimeFn(dst, src);
+    }
 }

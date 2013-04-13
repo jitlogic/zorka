@@ -123,7 +123,7 @@ public class AgentInstance {
 
         getZorkaAgent().install("normalizers", getNormLib());
 
-        zorkaAgent.loadScriptDir(props.getProperty("zorka.config.dir"), ".*\\.bsh$");
+        zorkaAgent.initialize(props.getProperty("zorka.config.dir"));
 
         if (config.boolCfg("zorka.diagnostics", true)) {
             createZorkaDiagMBean();

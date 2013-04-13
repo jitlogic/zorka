@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.viewer;
 
+import com.jitlogic.zorka.core.util.ZorkaUtil;
+
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
@@ -77,7 +79,7 @@ public class TraceTableModel extends AbstractTableModel {
             case 0:
                 return el.prettyClock();
             case 1:
-                return ViewerUtil.nanoSeconds(el.getTime());
+                return ZorkaUtil.strTime(el.getTime());
             case 2:
                 return el.getCalls();
             case 3:

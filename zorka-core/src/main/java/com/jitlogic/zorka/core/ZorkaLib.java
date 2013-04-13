@@ -511,6 +511,16 @@ public class ZorkaLib  {
     }
 
     /**
+     * Returns true if agent has been initialized (i.e. executing BSH code is
+     * executing after initial execution of configuration scripts
+     *
+     * @return true if agent has been initialized
+     */
+    public boolean isInitialized() {
+        return agent.isInitialized();
+    }
+
+    /**
      * Registers mbean server in agent mbean server registry. It is useful for some
      * application servers that have non-standard (additional) mbean servers or when
      * agent cannot access platform mbean server at start up time (notably JBoss 4/5/6/7).
