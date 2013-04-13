@@ -54,6 +54,8 @@ public class ZorkaBshAgent {
 
     private long timeout;
 
+    private boolean initialized;
+
     /**
      * Standard constructor.
      *
@@ -186,6 +188,17 @@ public class ZorkaBshAgent {
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Cannot open directory: " + path, e);
         }
+    }
+
+
+    public void initialize(String configDir) {
+        loadScriptDir(configDir, ".*\\.bsh$");
+        initialized = true;
+    }
+
+
+    public boolean isInitialized() {
+        return initialized;
     }
 
 

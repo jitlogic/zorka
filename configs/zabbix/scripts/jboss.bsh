@@ -227,20 +227,23 @@ __jboss() {
       }
     }
 
-    spy.add(spy.instance()
-      .onEnter(spy.fetchArg("REQ", 1), 
-        spy.format("URI", "${REQ.request.requestURI}"), 
-        tracer.begin("HTTP_REQ"), 
-        zorka.boolCfg("tracer.verbose", false) ? spy.zorkaLog("INFO", "HTTP_REQ", "URI=${URI}") : null,
-        tracer.attr("URI", "URI"))
-      .onReturn(spy.fetchArg("RESP", 2),
-        spy.get("RESP", "STATUS", "response", "status"),
-        tracer.attr("STATUS", "STATUS"))
-      .onError(spy.fetchError("EX"),
-        spy.format("ERR", "${EX}"),
-        zorka.boolCfg("tracer.verbose", false) ? spy.zorkaLog("ERROR", "HTTP/ERROR", "URI=${URI} ERR=${ERR}") : null,
-        tracer.attr("ERR", "ERR"))
-      .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
+
+    if (zorka.boolCfg("tracer.entry.enable", true)) {
+      spy.add(spy.instance()
+        .onEnter(spy.fetchArg("REQ", 1),
+          spy.format("URI", "${REQ.request.requestURI}"),
+          tracer.begin("HTTP_REQ"),
+          zorka.boolCfg("tracer.verbose", false) ? spy.zorkaLog("INFO", "HTTP_REQ", "URI=${URI}") : null,
+          tracer.attr("URI", "URI"))
+        .onReturn(spy.fetchArg("RESP", 2),
+          spy.get("RESP", "STATUS", "response", "status"),
+          tracer.attr("STATUS", "STATUS"))
+        .onError(spy.fetchError("EX"),
+          spy.format("ERR", "${EX}"),
+          zorka.boolCfg("tracer.verbose", false) ? spy.zorkaLog("ERROR", "HTTP/ERROR", "URI=${URI} ERR=${ERR}") : null,
+          tracer.attr("ERR", "ERR"))
+        .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
+    }
 
     tracer.output(tracer.toFile(
       zorka.stringCfg("tracer.log.path", "${zorka.log.dir}/trace.trc"),
