@@ -16,9 +16,7 @@
 
 package com.jitlogic.zorka.core.perfmon;
 
-import com.jitlogic.zorka.core.util.PerfDataEventHandler;
 import com.jitlogic.zorka.core.util.PerfSample;
-import com.jitlogic.zorka.core.util.Submittable;
 
 import java.util.List;
 

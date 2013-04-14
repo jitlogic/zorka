@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.test.util;
 
+import com.jitlogic.zorka.core.perfmon.SimplePerfDataFormat;
 import com.jitlogic.zorka.core.test.spy.support.TestTracer;
 import com.jitlogic.zorka.core.util.*;
 import org.junit.Assert;
