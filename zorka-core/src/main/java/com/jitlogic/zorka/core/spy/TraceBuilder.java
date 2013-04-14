@@ -85,10 +85,14 @@ public class TraceBuilder extends TraceEventHandler {
             return;
         }
 
-        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS)) {
-            log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceEnter("
-                + symbols.symbolName(classId) + "." + symbols.symbolName(methodId) + ")");
+        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACER_DBG)) {
+            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS) ||
+                 (ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
+                 log.trace(ZorkaLogger.ZTR_TRACER_DBG, "traceEnter("
+                     + symbols.symbolName(classId) + "." + symbols.symbolName(methodId) + ")");
+             }
         }
+
         if (!ttop.isEmpty()) {
             if (ttop.inTrace()) {
                 ttop = new TraceRecord(ttop);
@@ -121,11 +125,14 @@ public class TraceBuilder extends TraceEventHandler {
             return;
         }
 
-        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS)) {
-            TraceRecord tr = ttop;
-            if (tr.getClassId() == 0 && tr.getParent() != null) { tr = tr.getParent(); }
-            log.trace(ZorkaLogger.ZTR_TRACE_CALLS, "traceReturn("
-                + symbols.symbolName(tr.getClassId()) + "." + symbols.symbolName(tr.getMethodId()) + ")");
+        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACER_DBG)) {
+            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS) ||
+                (ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
+                TraceRecord tr = ttop;
+                if (tr.getClassId() == 0 && tr.getParent() != null) { tr = tr.getParent(); }
+                log.trace(ZorkaLogger.ZTR_TRACER_DBG, "traceReturn("
+                    + symbols.symbolName(tr.getClassId()) + "." + symbols.symbolName(tr.getMethodId()) + ")");
+            }
         }
 
         while (!(ttop.getClassId() != 0) && ttop.getParent() != null) {
@@ -145,11 +152,14 @@ public class TraceBuilder extends TraceEventHandler {
             return;
         }
 
-        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_EXCEPTIONS)) {
-            TraceRecord tr = ttop;
-            if (tr.getClassId() == 0 && tr.getParent() != null) { tr = tr.getParent(); }
-            log.trace(ZorkaLogger.ZTR_TRACE_EXCEPTIONS, "traceError(" + symbols.symbolName(tr.getClassId()) +
-                "." + symbols.symbolName(tr.getMethodId()) + ")", (Throwable)exception);
+        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACER_DBG)) {
+            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_EXCEPTIONS) ||
+                (ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
+                TraceRecord tr = ttop;
+                if (tr.getClassId() == 0 && tr.getParent() != null) { tr = tr.getParent(); }
+                log.trace(ZorkaLogger.ZTR_TRACER_DBG, "traceError(" + symbols.symbolName(tr.getClassId()) +
+                    "." + symbols.symbolName(tr.getMethodId()) + ")", (Throwable)exception);
+            }
         }
 
         while (!(ttop.getClassId() != 0) && ttop.getParent() != null) {

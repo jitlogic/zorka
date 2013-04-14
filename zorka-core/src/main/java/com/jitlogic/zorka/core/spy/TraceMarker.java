@@ -31,8 +31,9 @@ public class TraceMarker {
 
     /** This flag instructs trace builder algorithm to drop frames whose execution time is too small */
     public static final int DROP_INTERIM = 0x08;
-    //public static final int ALL_ON_EXCEPTION = 0x08;
 
+    /** This flag instructs trace builder to log all method calls (on entry and on return/error) */
+    public static final int TRACE_CALLS = 0x10;
 
     /** Trace ID (refers to symbol containing trace name) */
     private int traceId;
