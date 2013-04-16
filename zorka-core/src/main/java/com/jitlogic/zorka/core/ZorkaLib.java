@@ -493,7 +493,7 @@ public class ZorkaLib  {
         Object[] args = argv;
         if (args.length > 0 && args[args.length-1] instanceof Throwable) {
             ex = (Throwable)args[args.length-1];
-            args = ZorkaUtil.clipArray(args, -1);
+            args = args.length > 1 ? ZorkaUtil.clipArray(args, -1) : new Object[0];
         }
         logger.trap(level, "bsh", message, ex, args);
     }
@@ -825,7 +825,4 @@ public class ZorkaLib  {
         ObjectInspector.setField(obj, name, value);
     }
 
-    public ClassLoader overlayClassLoader(ClassLoader parent, String pattern, ClassLoader overlay) {
-        return new OverlayClassLoader(parent, pattern, overlay);
-    }
 }

@@ -5,7 +5,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
     <parent>
         <groupId>com.jitlogic.zorka</groupId>
         <artifactId>zorka</artifactId>
-        <version>0.9.4</version>
+        <version>0.9.5</version>
     </parent>
     <dependencies>
         <dependency>
@@ -39,6 +39,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <artifactId>asm-util</artifactId>
             <version>4.0</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easytesting</groupId>
+            <artifactId>fest-assert</artifactId>
+            <version>1.4</version>
         </dependency>
     </dependencies>
     <build>

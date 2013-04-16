@@ -33,6 +33,13 @@ __jvm() {
     return 100.0 * mem_used.longValue() / mem_max.longValue();
   }
 
+  fdutil() {
+    fd_used = zorka.jmx("java", "java.lang:type=OperatingSystem", "OpenFileDescriptorCount");
+    fd_max = zorka.jmx("java", "java.lang:type=OperatingSystem", "MaxFileDescriptorCount");
+    if (fd_used == null || fd_max == null) return null;
+    if (fd_used.equals(0L) || fd_max.equals(0L)) return 0.0;
+    return 100.0 * fd_used.longValue() / fd_max.longValue();
+  }
 
   if (zorka.boolCfg("perfmon", false)) {
 
@@ -60,7 +67,15 @@ __jvm() {
 
     zorka.schedule(scanner, interval, interval);
 
-  } // perfmon
+  } // perfmon = yes
+
+
+  if (zorka.boolCfg("perfmon.hiccup", true)) {
+    mbean = zorka.stringCfg("perfmon.hiccup.mbean", "zorka:type=ZorkaStats,name=Hiccup");
+    perfmon.cpuHiccup("java", mbean, "CPU", 10, 30000).start();
+    perfmon.memHiccup("java", mbean, "MEM").start();
+  } // hiccup = yes
+
 
   return this;
 }

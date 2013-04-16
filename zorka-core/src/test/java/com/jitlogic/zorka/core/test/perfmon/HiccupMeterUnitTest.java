@@ -33,4 +33,31 @@ public class HiccupMeterUnitTest extends ZorkaFixture {
         assertEquals(1, meter.getStats().getCalls());
     }
 
+
+    @Test
+    public void testSimpleCpuHiccupRunAndCheckFirstResult() throws Exception {
+        HiccupMeter meter = perfmon.cpuHiccup("test", "zorka:name=TestHiccup", "CPU", 1, 1);
+        meter.cycle(10);
+        meter.cycle(1000100);
+        assertEquals(90, meter.getStats().getMaxTimeNs());
+    }
+
+
+    @Test
+    public void testSimpleCpuHiccupRunAndCheckResultInUs() throws Exception {
+        HiccupMeter meter = perfmon.cpuHiccup("test", "zorka:name=TestHiccup", "CPU", 1, 1);
+        meter.cycle(10);
+        meter.cycle(1001010);
+        assertEquals(1, meter.getStats().getMaxTimeUsCLR());
+    }
+
+    @Test
+    public void testTwoHiccupRuns() throws Exception {
+        HiccupMeter meter = perfmon.cpuHiccup("test", "zorka:name=TestHiccup", "CPU", 1, 1);
+        meter.cycle(10);
+        meter.cycle(1000100);
+        assertEquals(90, meter.getStats().getMaxTimeNsCLR());
+        meter.cycle(2001000);
+        assertEquals(900, meter.getStats().getMaxTimeNsCLR());
+    }
 }

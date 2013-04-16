@@ -17,7 +17,8 @@
 package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.core.ZorkaConfig;
-import com.jitlogic.zorka.core.util.Submittable;
+import com.jitlogic.zorka.core.perfmon.Submittable;
+import com.jitlogic.zorka.core.util.OverlayClassLoader;
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 
 /**
@@ -28,10 +29,9 @@ import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 public class TracerLib {
 
     public static final int ALWAYS_SUBMIT = TraceMarker.ALWAYS_SUBMIT;
-
     public static final int ALL_METHODS = TraceMarker.ALL_METHODS;
-
     public static final int DROP_INTERIM = TraceMarker.DROP_INTERIM;
+    public static final int TRACE_CALLS = TraceMarker.TRACE_CALLS;
 
 
     private Tracer tracer;
@@ -255,5 +255,8 @@ public class TracerLib {
         this.defaultTraceFlags = flags;
     }
 
+    public ClassLoader overlayClassLoader(ClassLoader parent, String pattern, ClassLoader overlay) {
+        return new OverlayClassLoader(parent, pattern, overlay);
+    }
 
 }

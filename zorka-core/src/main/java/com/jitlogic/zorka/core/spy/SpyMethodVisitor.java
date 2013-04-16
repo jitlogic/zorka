@@ -209,7 +209,7 @@ public class SpyMethodVisitor extends MethodVisitor {
 
         // Add trace probe if required
         if (symbolRegistry != null) {
-            log.debug(ZorkaLogger.ZTR_INSTRUMENT_METHOD, "Will trace method: %s", methodName);
+            log.debug(ZorkaLogger.ZTR_INSTRUMENT_METHOD, "Will trace method: %s.%s", className, methodName);
             stackDelta = max(stackDelta, emitTraceEnter(
                     symbolRegistry.symbolId(className),
                     symbolRegistry.symbolId(methodName),

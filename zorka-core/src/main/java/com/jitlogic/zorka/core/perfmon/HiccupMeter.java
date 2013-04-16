@@ -108,8 +108,6 @@ public class HiccupMeter implements Runnable {
 
 
     public void cycle(long t) {
-        sleep();
-
         if (memEnabled) {
             memCycle(t);
         }
@@ -140,6 +138,7 @@ public class HiccupMeter implements Runnable {
 
         while (running) {
             cycle(System.nanoTime());
+            sleep();
         }
     }
 

@@ -13,6 +13,8 @@ Zorka code). There are several library objects visible:
 
 * `spy` - functions for configuring instrumentation engine (available if spy is enabled);
 
+* `tracer` - functions for configuring method call tracer;
+
 * `zabbix` - zabbix-specific functions (available if zabbix interface is enabled);
 
 * `nagios` - nagios-specific functions (available if nagios interface is enabled);
@@ -302,6 +304,18 @@ not parsable. Boolean parsing `boolCfg()` functions recognize `true`/`false` and
 
 List parsing function `listCfg()` parses string containing comma-separated values and returns it as list of strings
 containing (trimmed) values.
+
+    zorka.isInitialized()
+
+This function returns true if agent has finished its initialization phase (and initial execution of configuration
+scripts). This function can be useful for reload-aware scripts.
+
+### Reflection support
+
+    zorka.getField(obj, name)
+    zorka.setField(obj, name, value)
+
+These functions can be used to directly access object fields. Both private and public fields can be accessed.
 
 ## Syslog functions
 
@@ -836,6 +850,13 @@ execution time for a trace to be further processed after completion. Third funct
 included in a single trace. This limit is necessary to prevent tracer from overruning host memory in cases there traced
 method calls lots and lots of other traced methods (and all become logged for some reason).
 
+#### Overlay classloader
+
+    tracer.overlayClassLoader(parent, pattern, overlay)
+
+This functions creates overlay classloader that will pass all requests to `parent` - except for those matching
+`pattern` that will be passed to `overlay`. This is useful in containers that have strict class isolation (eg. OSGi).
+See `wso2.bsh` script for more details on how and why it is used.
 
 ## Collecting performance metrics
 
