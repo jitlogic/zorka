@@ -19,6 +19,7 @@ package com.jitlogic.zorka.core.test.util;
 import com.jitlogic.zorka.core.util.ZorkaUtil;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.File;
 
@@ -32,6 +33,13 @@ public class UtilFunctionsUnitTest {
     public void testUtilPathFn() {
         assertEquals(_("/tmp/asd"), _(ZorkaUtil.path(_("/tmp"), "asd")));
         assertEquals(_("/tmp/asd"), _(ZorkaUtil.path(_("/tmp/"), "/asd/")));
+    }
+
+
+    @Test
+    public void testUtilClipArray() {
+        assertThat(ZorkaUtil.clipArray(new String[]{"a", "b"}, -1))
+                .isEqualTo(new String[]{"a"});
     }
 
 }

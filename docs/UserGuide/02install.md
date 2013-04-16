@@ -66,6 +66,13 @@ Only Sun JDK 5 and 6 are supported:
 
 ### JBoss 7.x
 
+JBoss 7 can run in two modes: standalone and domain, so there are two different configurations for both modes.
+
+Templates from `Template_Zorka_JBoss7_*.xml` files fit for various subsystems of JBoss 7.
+
+
+#### Standalone mode
+
 Following configuration steps have been tested in standalone mode but should work the same in both modes
 (edit `domain.conf` instead of `standalone.conf`).
 
@@ -79,14 +86,64 @@ Following configuration steps have been tested in standalone mode but should wor
     JAVA_OPTS="$JAVA_OPTS -javaagent:<zorka-home>/agent.jar=<zorka-home>"
 
 
-* add zorka's bootstrap package to JBoss system modules - find and change the setting in `standalone.conf` file:
+* add zorka bootstrap package to JBoss system modules - find and change the setting in `standalone.conf` file:
 
 
     if [ "x$JBOSS_MODULES_SYSTEM_PKGS" = "x" ]; then
-       JBOSS_MODULES_SYSTEM_PKGS="org.jboss.byteman,com.jitlogic.zorka.spy"
+       JBOSS_MODULES_SYSTEM_PKGS="org.jboss.byteman,com.jitlogic.zorka.core.spy"
     fi
 
-* import `Template_Zorka_JBoss7_*.xml` templates into Zabbix;
+
+#### Domain mode
+
+In domain mode administrator needs to create separate zorka home directory for every server VM. Each agent instance has
+to listen on separate port(s) and use separate log/trace files.
+
+* copy `config/zabbix/scripts/jboss7.bsh` script to `<zorka-home>/conf` directory;
+
+* make sure that `zorka.mbs.autoregister = no` is set in `zorka.properties` file;
+
+* edit `<server-home>/bin/standalone.conf` and add the following line:
+
+* add zorka bootstrap package to JBoss system modules - find and change the setting in `domain.conf` file:
+
+
+    if [ "x$JBOSS_MODULES_SYSTEM_PKGS" = "x" ]; then
+       JBOSS_MODULES_SYSTEM_PKGS="org.jboss.byteman,com.jitlogic.zorka.core.spy"
+    fi
+
+* add java agent option to default JVM configuration in `host.xml`:
+
+
+    <jvms>
+        <jvm name="default">
+            <jvm-options>
+                <option value="-server"/>
+                <option value="-javaagent:<zorka-root>/zorka.jar=<zorka-root>/zorka"/>
+            </jvm-options>
+        </jvm>
+    </jvms>
+
+
+* add `zorka.home.dir` system property to each server JVM:
+
+
+    <servers>
+        <server name="server-one" group="main-server-group" auto-start="true">
+            <system-properties>
+                <property name="zorka.home.dir" value="<zorka-root>/server1"/>
+            </system-properties>
+        </server>
+        <server name="server-two" group="main-server-group" auto-start="true">
+            <system-properties>
+                <property name="zorka.home.dir" value="<zorka-root>/server2"/>
+            </system-properties>
+            <socket-bindings port-offset="150"/>
+        </server>
+        <server name="server-three" group="other-server-group" auto-start="false">
+            <socket-bindings port-offset="250"/>
+        </server>
+    </servers>
 
 
 ### Mule ESB

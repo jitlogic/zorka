@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.util;
+package com.jitlogic.zorka.core.perfmon;
 
 import java.util.HashMap;
 import java.util.HashSet;

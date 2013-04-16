@@ -16,6 +16,9 @@
 
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.core.perfmon.MetricsRegistry;
+import com.jitlogic.zorka.core.perfmon.SimplePerfDataFormat;
+import com.jitlogic.zorka.core.perfmon.Submittable;
 import com.jitlogic.zorka.core.util.*;
 
 import java.io.*;

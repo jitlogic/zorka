@@ -14,8 +14,14 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.util;
+package com.jitlogic.zorka.core.perfmon;
 
+
+import com.jitlogic.zorka.core.perfmon.*;
+import com.jitlogic.zorka.core.util.ByteBuffer;
+import com.jitlogic.zorka.core.util.PerfSample;
+import com.jitlogic.zorka.core.util.SymbolicException;
+import com.jitlogic.zorka.core.util.SymbolicStackElement;
 
 import java.util.*;
 

@@ -394,7 +394,7 @@ public class ZorkaUtil {
 
 
         if (len < 0) {
-            len = src.length - len > 0 ? src.length - len : 0;
+            len = src.length + len > 0 ? src.length + len : 0;
         }
 
 
@@ -430,7 +430,7 @@ public class ZorkaUtil {
         }
 
         if (len < 0) {
-            len = src.length - len > offs ? src.length - len - offs : 0;
+            len = src.length + len > offs ? src.length - len + offs : 0;
         }
 
         byte[] dst = new byte[len];
@@ -465,7 +465,7 @@ public class ZorkaUtil {
         }
 
         if (len < 0) {
-            len = src.length - len > 0 ? src.length - len : 0;
+            len = src.length + len > 0 ? src.length + len : 0;
         }
 
         byte[] dst = new byte[len];
@@ -500,7 +500,7 @@ public class ZorkaUtil {
         }
 
         if (len < 0) {
-            len = src.length - len > 0 ? src.length - len : 0;
+            len = src.length + len > 0 ? src.length + len : 0;
         }
 
         double[] dst = new double[len];
@@ -534,7 +534,7 @@ public class ZorkaUtil {
         }
 
         if (len < 0) {
-            len = src.length - len > 0 ? src.length - len : 0;
+            len = src.length + len > 0 ? src.length + len : 0;
         }
 
         long[] dst = new long[len];

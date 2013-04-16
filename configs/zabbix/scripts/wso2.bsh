@@ -64,7 +64,7 @@ __wso2() {
           zorka.logInfo("Swapping BaseAdaptor classloader with overlay ...");
           clazz = record.get("THIS").getClass();
           oldCL = zorka.getField(clazz, "bundleClassLoaderParent");
-          newCL = zorka.overlayClassLoader(oldCL, "com.jitlogic.zorka.**", ClassLoader.getSystemClassLoader());
+          newCL = tracer.overlayClassLoader(oldCL, "com.jitlogic.zorka.**", ClassLoader.getSystemClassLoader());
           zorka.setField(clazz, "bundleClassLoaderParent", newCL);
           return record;
         }

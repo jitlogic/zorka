@@ -14,40 +14,34 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.util;
+package com.jitlogic.zorka.core.perfmon;
+
+import com.jitlogic.zorka.core.perfmon.MetricTemplate;
+import com.jitlogic.zorka.core.perfmon.RawDeltaMetric;
 
 import java.util.Map;
 import java.util.Set;
 
-public class UtilizationMetric extends Metric {
+public class TimedDeltaMetric extends RawDeltaMetric {
 
-    public UtilizationMetric(int id, String name, Map<String, Object> attrs) {
+    private long lastClock;
+
+    public TimedDeltaMetric(int id, String name, Map<String, Object> attrs) {
         super(id, name, attrs);
     }
 
-    public UtilizationMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
+    public TimedDeltaMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
         super(template, attrSet);
     }
 
     @Override
     public Number getValue(long clock, Object value) {
-        Number rawNom = (Number) ObjectInspector.get(value, getTemplate().getNomField());
-        Number rawDiv = (Number) ObjectInspector.get(value, getTemplate().getDivField());
+        Number val = super.getValue(clock, (Number)value);
 
-        if (rawNom == null || rawDiv == null) {
-            return 0.0;
-        }
+        long dclock = clock - lastClock;
 
-        double curNom = rawNom.longValue();
-        double curDiv = rawDiv.longValue();
+        lastClock = clock;
 
-        Double rslt = 0.0;
-
-        if (curDiv != 0) {
-            rslt = 100.0 * curNom / curDiv;
-        }
-
-        Double multiplier = getTemplate().getMultiplier();
-        return multiplier != 1.0 ? multiplier * rslt : rslt;
+        return dclock > 0 ?  1000.0 * val.doubleValue() / dclock : 0.0;
     }
 }
