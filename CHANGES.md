@@ -1,8 +1,12 @@
 Zorka 0.9.5 (2013-04-15)
 ------------------------
 
- * java hiccup metrics;
- *
+ * hiccup meter (based on Azul's hiccup metering utility);
+ * tracer support for WSO2;
+ * JBoss7 domain mode support (zorka home dir now can be passed as system property);
+ * microsecond and nanosecond resolution for MethodCallStats;
+ * proper query execution timeout handling in BSH agent;
+
 
 Zorka 0.9.4 (2013-04-02)
 ------------------------
