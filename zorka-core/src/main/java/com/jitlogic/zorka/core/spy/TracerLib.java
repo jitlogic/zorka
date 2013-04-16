@@ -18,6 +18,7 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.core.ZorkaConfig;
 import com.jitlogic.zorka.core.perfmon.Submittable;
+import com.jitlogic.zorka.core.util.OverlayClassLoader;
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 
 /**
@@ -254,5 +255,8 @@ public class TracerLib {
         this.defaultTraceFlags = flags;
     }
 
+    public ClassLoader overlayClassLoader(ClassLoader parent, String pattern, ClassLoader overlay) {
+        return new OverlayClassLoader(parent, pattern, overlay);
+    }
 
 }

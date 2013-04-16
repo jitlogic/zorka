@@ -825,7 +825,4 @@ public class ZorkaLib  {
         ObjectInspector.setField(obj, name, value);
     }
 
-    public ClassLoader overlayClassLoader(ClassLoader parent, String pattern, ClassLoader overlay) {
-        return new OverlayClassLoader(parent, pattern, overlay);
-    }
 }
