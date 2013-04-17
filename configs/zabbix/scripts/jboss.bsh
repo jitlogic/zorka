@@ -24,7 +24,7 @@ __jboss() {
 
     discovery() {
       return zabbix.discovery("jboss", "jboss.web:j2eeType=Servlet,*",
-                 "name", "WebModule", "J2EEServer", "J2EEApplication");
+                 "name", "WebModule", "J2EEServer", "J2EEApplication", "j2eeType");
     }
 
     // Request count
@@ -59,10 +59,10 @@ __jboss() {
 
     // Discover EJB3 beans
     discovery() {
-      return zabbix.discovery(
-        zorka.query("jboss", "jboss.j2ee:service=EJB3,*", "ear", "jar", "name")
-          .get("InvokeStats").get("Stats").list("**", "method"));
+      return zabbix.discovery(zorka.query("jboss", "jboss.j2ee:service=EJB3,*", "ear", "jar", "name", "service")
+          .get("InvokeStats").get("Stats").listAs("**", "method"));
     }
+
 
     // Returns number of calls of an EJB method
     calls(ear, jar, name, method) {
@@ -72,6 +72,7 @@ __jboss() {
       return ret != null ? ret : 0.0;
     }
 
+
     // Average processing time 
     time(ear, jar, name, method, horizon) {
       ret = zorka.rate("jboss",
@@ -79,6 +80,7 @@ __jboss() {
         "InvokeStats", "stats", method, "totalTime", "count", horizon);
       return ret != null ? ret : 0.0;
     }
+
 
     return this;
 
@@ -92,7 +94,7 @@ __jboss() {
 
     discovery() {
       return zabbix.discovery("jboss", "jboss.management.local:j2eeType=JCAResource,*", 
-        "J2EEServer", "ResourceAdapter", "name");
+        "J2EEServer", "ResourceAdapter", "name", "j2eeType");
     }
 
     conn_created(server, adapter, name) {
@@ -159,8 +161,11 @@ __jboss() {
     process(record) {
       synchronized (super) {
         if (super.jbossMbs == null) {
-          mbs = record.get("MBS");
-          zorka.registerMbs("jboss", mbs);
+          mbs = record.get("THIS").getServer();
+          //mbs = record.get("MBS");
+          ccl = Thread.currentThread().getContextClassLoader();
+          zorka.logInfo("Found classloader: " + ccl);
+          zorka.registerMbs("jboss", mbs, ccl);
           super.jbossMbs = mbs;
           zorka.logInfo("Registered JBoss MBean server as 'jboss'");
         }
@@ -171,8 +176,8 @@ __jboss() {
   } // __mbsRegister()
 
   spy.add(spy.instance()
-    .onReturn(spy.fetchArg("MBS", 0), (com.jitlogic.zorka.core.spy.SpyProcessor)__mbsRegister())
-    .include(spy.byMethod("org.jboss.mx.server.MBeanServerImpl", "<init>")));
+    .onReturn(spy.fetchArg("THIS", 0), (com.jitlogic.zorka.core.spy.SpyProcessor)__mbsRegister())
+    .include(spy.byMethod(0, "org.jboss.naming.NamingService", "startService", null)));
 
   if (zorka.boolCfg("tracer", false)) {
 

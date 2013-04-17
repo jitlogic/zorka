@@ -52,6 +52,7 @@ public class QueryLister {
 
         if (cl1 != null) {
             Thread.currentThread().setContextClassLoader(cl1);
+            log.debug(ZorkaLogger.ZAG_DEBUG, "Switching to MBS class loader ...");
         }
 
         List<QueryResult> results;
@@ -75,6 +76,7 @@ public class QueryLister {
         } finally {
             if (cl1 != null) {
                 Thread.currentThread().setContextClassLoader(cl0);
+                log.debug(ZorkaLogger.ZAG_DEBUG, "Switching back from MBS class loader ...");
             }
         }
 
