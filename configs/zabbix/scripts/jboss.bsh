@@ -264,13 +264,13 @@ __jboss() {
     if (zorka.hasCfg("tracer.min.trace.time")) {
       mtt = zorka.longCfg("tracer.min.trace.time", 100);
       zorka.logInfo("Settting tracer minimum trace time to " + mtt + " ms");
-      tracer.setTraceMinTraceTime(mtt);
+      tracer.setTracerMinTraceTime(mtt);
     }
 
     if (zorka.hasCfg("tracer.max.trace.records")) {
       mtr = zorka.longCfg("tracer.min.trace.records", 4096);
       zorka.logInfo("Setting maximum records per trace to " + mtr + ".");
-      tracer.setTraceMaxTraceRecords(mtr);
+      tracer.setTracerMaxTraceRecords(mtr);
     }
 
   }
