@@ -160,11 +160,7 @@ __jboss7() {
       }
     }
 
-    for (String pkg : zorka.listCfg("tracer.exclude", 
-        "sun.**", "java.**", "javax.**", "com.sun.**", "com.jitlogic.zorka.**", 
-        "org.xml.sax.**", "org.jcp.**", "~^\\$Proxy.*$", "org.apache.xerces.**",
-        "org.apache.xalan.**", "org.apache.xml.**", "org.apache.xpath.**",
-        "org.w3c.**", "org.omg.**")) {
+    for (String pkg : zorka.listCfg("tracer.exclude", "com.jitlogic.zorka.**")) {
       if (pkg.contains("/")) {
         cm = pkg.split("/");
         zorka.logInfo("Exclude methods from trace: '" + cm[0] + "' / '" + cm[1] + "'");
@@ -226,13 +222,13 @@ __jboss7() {
     if (zorka.hasCfg("tracer.min.trace.time")) {
       mtt = zorka.longCfg("tracer.min.trace.time", 100);
       zorka.logInfo("Settting tracer minimum trace time to " + mtt + " ms");
-      tracer.setTraceMinTraceTime(mtt);
+      tracer.setTracerMinTraceTime(mtt);
     }
 
     if (zorka.hasCfg("tracer.max.trace.records")) {
-      mtr = zorka.longCfg("tracer.min.trace.records", 4096);
+      mtr = zorka.intCfg("tracer.max.trace.records", 4096);
       zorka.logInfo("Setting maximum records per trace to " + mtr + ".");
-      tracer.setTraceMaxTraceRecords(mtr);
+      tracer.setTracerMaxTraceRecords(mtr);
     }
 
   }

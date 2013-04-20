@@ -245,6 +245,11 @@ public class TracerLib {
     }
 
 
+    public void setTracerMaxTraceRecords(long maxRecords) {
+        Tracer.setMaxTraceRecords((int)maxRecords);
+    }
+
+
     /**
      * Sets default trace marker flags. This setting will be used when beginning new traces
      * without supplying initial flags.
