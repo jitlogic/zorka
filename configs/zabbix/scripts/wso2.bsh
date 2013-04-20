@@ -18,67 +18,7 @@
 __wso2() {
 
 
-  // Script below configures OSGi container to make agent classes visible system wide.
-  // This is important when using Spy as instrumented code has to see agent classes.
-
-  __carbonOSGiConfigurer() {
-
-    process(record) {
-      zorka.logInfo("Initial properties map: " + record.get("PARAM"));
-      zorka.logInfo("(Re)Configuring OSGi parameters for Zorka Spy ...");
-
-      p = record.get("PARAM");
-      s = p.get("org.osgi.framework.system.packages");
-      s = s + ",com.jitlogic.zorka.core.spy";
-
-      p.put("org.osgi.framework.system.packages", s);
-      zorka.logInfo("Set org.osgi.framework.system.packages to: '" + s + "'");
-
-      s2 = p.get("org.osgi.framework.bootdelegation");
-      if (s2 != null && s2.length() > 0) {
-        s2 = s2 + ",com.jitlogic.zorka.core.*";
-      } else {
-        s2 = "com.jitlogic.zorka.core.*";
-      }
-
-      p.put("org.osgi.framework.bootdelegation", s2);
-      zorka.logInfo("Set org.osgi.framework.bootdelegation to: '" + s2 + "'");
-    }
-
-    return this;
-  }
-
-  spy.add(spy.instance()
-    .onReturn(spy.fetchRetVal("PARAM"),
-              (com.jitlogic.zorka.core.spy.SpyProcessor)__carbonOSGiConfigurer())
-    .include(spy.byMethod(spy.AC_PRIVATE, "org.wso2.carbon.server.CarbonLauncher",
-                          "buildInitialPropertyMap", "java.util.Map")));
-
-
   if (zorka.boolCfg("tracer", false)) {
-
-    if (zorka.boolCfg("tracer.osgi.overlay", true)) {
-
-      __osgiBaseAdaptorConfigurer() {
-        process(record) {
-          zorka.logInfo("Swapping BaseAdaptor classloader with overlay ...");
-          clazz = record.get("THIS").getClass();
-          oldCL = zorka.getField(clazz, "bundleClassLoaderParent");
-          newCL = tracer.overlayClassLoader(oldCL, "com.jitlogic.zorka.**", ClassLoader.getSystemClassLoader());
-          zorka.setField(clazz, "bundleClassLoaderParent", newCL);
-          return record;
-        }
-
-        return this;
-      }
-
-      spy.add(spy.instance()
-        .onReturn(spy.fetchArg("THIS", 0), (com.jitlogic.zorka.core.spy.SpyProcessor)__osgiBaseAdaptorConfigurer())
-        .include(spy.byMethod("org.eclipse.osgi.baseadaptor.BaseAdaptor", "<init>")));
-
-    } // tracer.osgi.overlay = yes
-
-
     for (String pkg : zorka.listCfg("tracer.include.extra")) {
       if (pkg.contains("/")) {
         cm = pkg.split("/");
@@ -92,11 +32,8 @@ __wso2() {
 
 
     for (String pkg : zorka.listCfg("tracer.exclude", 
-        "sun.**", "java.**", "javax.**", "com.sun.**", "com.jitlogic.zorka.**", 
-        "org.xml.sax.**", "org.jcp.**", "~^\\$Proxy.*$",
-        "org.apache.xerces.**", "org.apache.xalan.**", "org.apache.xml.**",
-        "org.apache.xpath.**", "org.w3c.**", "net.sf.saxon.**",
-        "org.wso2.carbon.ndatasource.**", "org.omg.**")) {
+        "com.jitlogic.zorka.**", "net.sf.saxon.**", "org.wso2.carbon.ndatasource.**", 
+        "sun.security.ec.**", "com.sun.crypto.provider.**")) {
       if (pkg.contains("/")) {
         cm = pkg.split("/");
         zorka.logInfo("Exclude methods from trace: '" + cm[0] + "' / '" + cm[1] + "'");
@@ -159,7 +96,7 @@ __wso2() {
 
 
     if (zorka.hasCfg("tracer.max.trace.records")) {
-      mtr = zorka.longCfg("tracer.min.trace.records", 4096);
+      mtr = zorka.intCfg("tracer.max.trace.records", 4096);
       zorka.logInfo("Setting maximum records per trace to " + mtr + ".");
       tracer.setTracerMaxTraceRecords(mtr);
     }

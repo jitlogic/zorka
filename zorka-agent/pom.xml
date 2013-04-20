@@ -29,8 +29,11 @@
                     <archive>
                         <manifestEntries>
                             <Premain-Class>com.jitlogic.zorka.agent.AgentMain</Premain-Class>
+                            <!-- <Agent-Class>com.jitlogic.zorka.agent.AgentMain</Agent-Class> -->
+                            <Boot-Class-Path>zorka.jar</Boot-Class-Path>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
+                            <Can-Set-Native-Method-Prefix>true</Can-Set-Native-Method-Prefix>
                         </manifestEntries>
                     </archive>
                 </configuration>

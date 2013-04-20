@@ -97,11 +97,7 @@ __jboss() {
     }
 
     for (String pkg : zorka.listCfg("tracer.exclude", 
-        "sun.**", "java.**", "javax.**", "com.sun.**", "com.jitlogic.zorka.**", 
-        "org.xml.sax.**", "org.jcp.**", "~^\\$Proxy.*$", "org.apache.xerces.**",
-        "org.apache.xalan.**", "org.apache.xml.**", "org.apache.xpath.**",
-        "org.w3c.**", "org.omg.**",
-        "org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate")) {
+        "com.jitlogic.zorka.**",  "org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate")) {
       if (pkg.contains("/")) {
         cm = pkg.split("/");
         zorka.logInfo("Exclude methods from trace: '" + cm[0] + "' / '" + cm[1] + "'");
