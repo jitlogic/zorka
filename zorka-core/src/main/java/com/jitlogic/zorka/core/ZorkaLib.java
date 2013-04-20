@@ -277,15 +277,20 @@ public class ZorkaLib  {
             qdef = qdef.listAs(args[i].toString(), "ARG"+i);
         }
 
-        List<QueryResult> results = new QueryLister(mbsRegistry, qdef).list();
-        List<String> lst = new ArrayList<String>(results.size()+1);
-
         ClassLoader cl0 = Thread.currentThread().getContextClassLoader(), cl1 = mbsRegistry.getClassLoader(mbsName);
 
+        List<String> lst = new ArrayList<String>();
+
         try {
+
             if (cl1 != null) {
                 Thread.currentThread().setContextClassLoader(cl1);
+                log.debug(ZorkaLogger.ZAG_DEBUG, "Switching to MBS class loader ...");
             }
+
+            List<QueryResult> results = new QueryLister(mbsRegistry, qdef).list();
+
+
             for (QueryResult result : results) {
                 StringBuilder sb = new StringBuilder();
                 int n = 0;
@@ -300,9 +305,11 @@ public class ZorkaLib  {
                 sb.append(result.getValue());
                 lst.add(sb.toString());
             }
+
         } finally {
             if (cl1 != null) {
                 Thread.currentThread().setContextClassLoader(cl0);
+                log.debug(ZorkaLogger.ZAG_DEBUG, "Switching back from class loader ...");
             }
         }
 
@@ -510,6 +517,7 @@ public class ZorkaLib  {
                 "^" + mask.replace("\\.", "\\\\.").replace("*", ".*") + "$");
     }
 
+
     /**
      * Returns true if agent has been initialized (i.e. executing BSH code is
      * executing after initial execution of configuration scripts
@@ -519,6 +527,7 @@ public class ZorkaLib  {
     public boolean isInitialized() {
         return agent.isInitialized();
     }
+
 
     /**
      * Registers mbean server in agent mbean server registry. It is useful for some
@@ -531,6 +540,22 @@ public class ZorkaLib  {
      */
     public void registerMbs(String name, MBeanServerConnection mbs) {
         mbsRegistry.register(name, mbs, mbs.getClass().getClassLoader());
+    }
+
+
+    /**
+     * Registers mbean server in agent mbean server registry. It is useful for some
+     * application servers that have non-standard (additional) mbean servers or when
+     * agent cannot access platform mbean server at start up time (notably JBoss 4/5/6/7).
+     *
+     * @param name name at which mbean server will be registered
+     *
+     * @param mbs reference to mbean server connection
+     *
+     * @param classLoader context class loader
+     */
+    public void registerMbs(String name, MBeanServerConnection mbs, ClassLoader classLoader) {
+        mbsRegistry.register(name, mbs, classLoader);
     }
 
 

@@ -31,15 +31,17 @@
  * - cas.audit.zabbix.host = ${zorka.hostname}
  */
 
-__cas_audit() {
+__cas() {
 
   zorka.logInfo("Enabling Audit logging for CAS ...");
 
   tag = zorka.stringCfg("cas.audit.tag", "cas.audit");
+  mbean = zorka.stringCfg("cas.mbean", "cas:name=CasAudit,type=ZorkaStats");
 
-  enableSyslog = zorka.boolCfg("cas.audit.syslog", false);
-  enableZabbix = zorka.boolCfg("cas.audit.zabbix", false);
-  enableFile   = zorka.boolCfg("cas.audit.file", false);
+  enableAudit = zorka.boolCfg("cas.audit", false);
+  enableSyslog = zorka.boolCfg("cas.audit.syslog", false) && enableAudit;
+  enableZabbix = zorka.boolCfg("cas.audit.zabbix", false) && enableAudit;
+  enableFile   = zorka.boolCfg("cas.audit.file", false) && enableAudit;
 
 
   if (enableSyslog) {
@@ -91,10 +93,11 @@ __cas_audit() {
 
 
   // Authentication attempts
-  sdefAuth = spy.instance()
+  sdefAuth = spy.instrument()
     .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request))
     .onReturn(spy.put("ACTION", "AUTHENTICATION_SUCCESS"))
     .onError(spy.put("ACTION", "AUTHENTICATION_FAILED"))
+    .onSubmit(spy.zorkaStats("java", mbean, "stats", "AUTHENTICATION"))
     .include(spy.byMethod("org.jasig.cas.authentication.AbstractAuthenticationManager", "authenticate"));
 
 
@@ -102,30 +105,33 @@ __cas_audit() {
 
 
   // TGT-s created
-  sdefTgtCreated = spy.instance()
+  sdefTgtCreated = spy.instrument()
     .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request))
     .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_CREATED"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_NOT_CREATED"))
+    .onSubmit(spy.zorkaStats("java", mbean, "stats", "TGT_CREATE"))
     .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "createTicketGrantingTicket"));
 
   audit(sdefTgtCreated, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT}");
 
 
   // TGT-s destroyed
-  sdefTgtDestroyed = spy.instance()
+  sdefTgtDestroyed = spy.instrument()
     .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request))
     .onReturn(spy.put("WHAT", ""), spy.put("ACTION", "TICKET_GRANTING_TICKET_DESTROYED"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_NOT_DESTROYED"))
+    .onSubmit(spy.zorkaStats("java", mbean, "stats", "TGT_DESTROY"))
     .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "destroyTicketGrantingTicket"));
 
   audit(sdefTgtDestroyed, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT}");
 
 
   // Service tickets granted
-  sdefSvcGranted = spy.instance()
+  sdefSvcGranted = spy.instrument()
     .onEnter(spy.fetchArg("TGT", 1), spy.fetchArg("SERVICE", 2), spy.fetchArg("WHO", 2), spy.tlGet("REQ", request))
     .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "SERVICE_TICKET_GRANTED"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "SERVICE_TICKET_NOT_GRANTED"))
+    .onSubmit(spy.zorkaStats("java", mbean, "stats", "SVT_GRANT"))
     .include(spy.byMethod(1, "org.jasig.cas.CentralAuthenticationServiceImpl", "grantServiceTicket", 
         "String", "org.jasig.cas.authentication.principal.Service", "org.jasig.cas.authentication.principal.Credentials"));
 
@@ -133,49 +139,56 @@ __cas_audit() {
 
 
   // Proxy granting ticket created
-  sdefProxyGranted = spy.instance()
+  sdefProxyGranted = spy.instrument()
     .onEnter(spy.fetchArg("TICKET", 1), spy.fetchArg("WHO", 2), spy.tlGet("REQ", request))
     .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "PROXY_GRANTING_TICKET_CREATED"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "PROXY_GRANTING_TICKET_NOT_CREATED"))
+    .onSubmit(spy.zorkaStats("java", mbean, "stats", "PROXY_CREATE"))
     .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "delegateTicketGrantingTicket"));
 
   audit(sdefProxyGranted, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT} serviceTicket=${TICKET}");
 
 
   // Validate service ticket
-  sdefSvcValidate = spy.instance()
+  sdefSvcValidate = spy.instrument()
     .onEnter(spy.fetchArg("TICKET", 1), spy.fetchArg("SERVICE", 1), spy.tlGet("REQ", request))
     .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "SERVICE_TICKET_VALIDATE_SUCCESS"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "SERVICE_TICKET_VALIDATE_FAILURE"))
+    .onSubmit(spy.zorkaStats("java", mbean, "stats", "SVT_VALIDATE"))
     .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "validateServiceTicket"));
 
   audit(sdefSvcValidate, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} what=${WHAT} serviceTicket=${TICKET} service=${SERVICE}");
 
 
   // Delete a service
-  sdefSvcDelete = spy.instance()
+  sdefSvcDelete = spy.instrument()
     .onEnter(spy.fetchArg("ID", 1), spy.tlGet("REQ", request))
     .onReturn(spy.put("RESULT", "OK"), spy.put("ACTION", "DELETE_SERVICE_SUCCESS"))
     .onError(spy.fetchError("RESULT"), spy.put("ACTION", "DELETE_SERVICE_FAILURE"))
+    .onSubmit(spy.zorkaStats("java", mbean, "stats", "SERVICE_DELETE"))
     .include(spy.byMethod("org.jasig.cas.DefaultServicesManagerImpl", "delete"));
 
   audit(sdefSvcDelete, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} result=${RESULT} id=${ID}");
 
+
   // Save a service
-  sdefSvcSave = spy.instance()
+  sdefSvcSave = spy.instrument()
     .onEnter(spy.fetchArg("SERVICE", 1), spy.tlGet("REQ", request))
     .onReturn(spy.fetchRetVal("RESULT"), spy.put("ACTION", "SAVE_SERVICE_SUCCESS"))
     .onError(spy.fetchError("RESULT"), spy.put("ACTION", "SAVE_SERVICE_FAILURE"))
+    .onSubmit(spy.zorkaStats("java", mbean, "stats", "SERVICE_SAVE"))
     .include(spy.byMethod("org.jasig.cas.DefaultServicesManagerImpl", "save"));
 
   audit(sdefSvcSave, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} service=${SERVICE} result=${RESULT}");
 
+
+  discovery() {
+    return zabbix.discovery(zorka.query("java", mbean, "name", "type").get("stats").listAs("**", "ACTION"));
+  }
+
   return this;
 }
 
-
-if (zorka.boolCfg("cas.audit", false)) {
-    cas_audit = __cas_audit();
-}
+cas = __cas();
 
 

@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template_Zorka_JBoss_JCA</template>
-            <name>Template_Zorka_JBoss_JCA</name>
+            <template>Template_Zorka_JBoss4_JCA</template>
+            <name>Template_Zorka_JBoss4_JCA</name>
             <groups>
                 <group>
                     <name>Templates</name>
@@ -442,7 +442,7 @@
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Template_Zorka_JBoss_JCA:jboss.jca.wait_count[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;].last(0)}&gt;10</expression>
+                            <expression>{Template_Zorka_JBoss4_JCA:jboss.jca.wait_count[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;].last(0)}&gt;10</expression>
                             <name>{HOST.NAME}/{#NAME} has too many waiting threads.</name>
                             <url/>
                             <status>0</status>
@@ -451,7 +451,7 @@
                             <type>0</type>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template_Zorka_JBoss_JCA:jboss.jca.wait_time[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;, &quot;AVG5&quot;].last(0)}&gt;3</expression>
+                            <expression>{Template_Zorka_JBoss4_JCA:jboss.jca.wait_time[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;, &quot;AVG5&quot;].last(0)}&gt;3</expression>
                             <name>{HOST.NAME}/{#NAME} threads are waiting too long for connections.</name>
                             <url/>
                             <status>0</status>
