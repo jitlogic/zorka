@@ -74,6 +74,10 @@ public class ZorkaConfig {
     }
 
 
+    public String getHomeDir() {
+        return homeDir;
+    }
+
     /**
      * Returns path to log directory.
      *
@@ -133,25 +137,38 @@ public class ZorkaConfig {
 	private void loadProperties(String home) {
         homeDir = home;
 		properties = defaultProperties();
-		InputStream is = null;
-		try {
-            is = new FileInputStream(ZorkaUtil.path(homeDir, "zorka.properties"));
-			properties.load(is);
-		} catch (IOException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error loading property file", e);
-		} finally {
-			if (is != null)
-				try {
-					is.close();
-				} catch (IOException e) {
-                    log.error(ZorkaLogger.ZAG_ERRORS, "Error closing property file", e);
-                }
-		}
+        String propPath = ZorkaUtil.path(homeDir, "zorka.properties");
+        loadCfg(properties, propPath, true);
 
         properties.put("zorka.home.dir", homeDir);
         properties.put("zorka.config.dir", ZorkaUtil.path(homeDir, "conf"));
         properties.put("zorka.log.dir", ZorkaUtil.path(homeDir, "log"));
 	}
+
+
+    public Properties loadCfg(Properties properties, String propPath, boolean verbose) {
+        InputStream is = null;
+        try {
+            is = new FileInputStream(propPath);
+            properties.load(is);
+            return properties;
+        } catch (IOException e) {
+            if (verbose) {
+                log.error(ZorkaLogger.ZAG_ERRORS, "Error loading property file", e);
+            }
+        } finally {
+            if (is != null)
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    if (verbose) {
+                        log.error(ZorkaLogger.ZAG_ERRORS, "Error closing property file", e);
+                    }
+                }
+        }
+
+        return null;
+    }
 
 
     /**

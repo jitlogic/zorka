@@ -19,6 +19,10 @@ __wso2() {
 
 
   if (zorka.boolCfg("tracer", false)) {
+
+    zorka.logInfo("Enabling tracer for WSO2.");
+    zorka.loadCfg("tracer.properties");
+
     for (String pkg : zorka.listCfg("tracer.include.extra")) {
       if (pkg.contains("/")) {
         cm = pkg.split("/");

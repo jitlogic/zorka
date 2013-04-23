@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zorka.core.test.agent;
 
+import com.jitlogic.zorka.core.test.support.TestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
 import org.junit.Test;
@@ -78,5 +79,13 @@ public class ZorkaLibUnitTest extends ZorkaFixture {
         assertEquals(2, s.length);
         assertEquals("test:type=ZorkaLib,name=test1: lst.0 -> aaa", s[0]);
         assertEquals("test:type=ZorkaLib,name=test1: lst.1 -> bbb", s[1]);
+    }
+
+
+    @Test
+    public void testLoadCfgZorkaFn() throws Exception {
+        TestUtil.setField(config, "homeDir", getClass().getResource("/conf").getPath());
+        zorka.loadCfg("test.properties");
+        assertEquals("oja", config.getProperties().getProperty("test.prop"));
     }
 }

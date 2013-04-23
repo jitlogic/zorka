@@ -84,6 +84,7 @@ __jboss() {
   if (zorka.boolCfg("tracer", false)) {
 
     zorka.logInfo("Enabling tracer for JBoss.");
+    zorka.loadCfg("tracer.properties");
 
     for (String pkg : zorka.listCfg("tracer.include.extra")) {
       if (pkg.contains("/")) {

@@ -96,7 +96,6 @@ public class SimpleTraceFormatUnitTest {
     @Test
     public void testTraceBigLongNum() {
         long l = System.nanoTime();
-        System.out.println(l);
         encoder.traceReturn(l);
         decode();
         output.check(0, "tstamp", l);
