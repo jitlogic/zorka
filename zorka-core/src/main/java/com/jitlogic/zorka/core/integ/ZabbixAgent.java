@@ -36,14 +36,14 @@ public class ZabbixAgent extends AbstractTcpAgent {
      *
      * @param agent BSH agent
      */
-	public ZabbixAgent(ZorkaConfig config, ZorkaBshAgent agent) {
-        super(config, agent, "zabbix", "127.0.0.1", 10055);
+	public ZabbixAgent(ZorkaConfig config, ZorkaBshAgent agent, QueryTranslator translator) {
+        super(config, agent, translator, "zabbix", "127.0.0.1", 10055);
     }
 
 
     @Override
     protected ZorkaRequestHandler newRequest(Socket sock) {
-        return new ZabbixRequestHandler(sock);
+        return new ZabbixRequestHandler(sock, translator);
     }
 
 }

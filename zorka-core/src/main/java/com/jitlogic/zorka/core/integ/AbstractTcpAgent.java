@@ -65,6 +65,8 @@ public abstract class AbstractTcpAgent implements Runnable {
     /** TCP server socket */
     private ServerSocket socket;
 
+    /** Query translator */
+    protected QueryTranslator translator;
 
     /**
      * Standard constructor
@@ -73,10 +75,12 @@ public abstract class AbstractTcpAgent implements Runnable {
      * @param defaultAddr
      * @param defaultPort agent default port
      */
-    public AbstractTcpAgent(ZorkaConfig config, ZorkaBshAgent agent, String prefix, String defaultAddr, int defaultPort) {
+    public AbstractTcpAgent(ZorkaConfig config, ZorkaBshAgent agent, QueryTranslator translator,
+                            String prefix, String defaultAddr, int defaultPort) {
 
         this.agent = agent;
         this.prefix = prefix;
+        this.translator = translator;
 
         String la = config.stringCfg(prefix+".listen.addr", defaultAddr);
         try {

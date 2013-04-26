@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.core.test.support;
 
 import com.jitlogic.zorka.core.*;
+import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.core.integ.SnmpLib;
 import com.jitlogic.zorka.core.integ.SyslogLib;
 import com.jitlogic.zorka.core.integ.ZabbixLib;
@@ -55,6 +56,8 @@ public class ZorkaFixture {
 
     protected ZabbixLib zabbixLib;
 
+    protected QueryTranslator translator;
+
     @Before
     public void setUpFixture() throws Exception {
 
@@ -86,6 +89,7 @@ public class ZorkaFixture {
         perfmon = agentInstance.getPerfMonLib();
         spyTransformer = agentInstance.getClassTransformer();
         zabbixLib = agentInstance.getZabbixLib();
+        translator = agentInstance.getTranslator();
 
         // Install test MBean server
 

@@ -88,4 +88,16 @@ public class ZorkaLibUnitTest extends ZorkaFixture {
         zorka.loadCfg("test.properties");
         assertEquals("oja", config.getProperties().getProperty("test.prop"));
     }
+
+    @Test
+    public void testTranslateAllowedFn() {
+        zorka.allow("zorka.jmx");
+        assertEquals("zorka.jmx()", translator.translate("zorka.jmx[]"));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testTranslateNotAllowedFn() {
+        zorka.allow("zorka.jmx");
+        translator.translate("zorka.rate[]");
+    }
 }

@@ -24,6 +24,7 @@ import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.concurrent.Executors;
 
+import com.jitlogic.zorka.core.integ.ZabbixQueryTranslator;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.test.support.TestLogger;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
@@ -35,10 +36,13 @@ import com.jitlogic.zorka.core.ZorkaBshAgent;
 import com.jitlogic.zorka.core.integ.ZabbixAgent;
 import com.jitlogic.zorka.core.integ.ZabbixRequestHandler;
 import com.jitlogic.zorka.core.ZorkaConfig;
+import static org.fest.assertions.Assertions.assertThat;
 
 public class ZabbixAgentIntegTest {
 
-	private String query(String qry) throws Exception {
+    private ZabbixQueryTranslator translator;
+
+    private String query(String qry) throws Exception {
 		Socket client = new Socket("127.0.0.1", 10066);
 		
 		DataOutputStream out = new DataOutputStream(client.getOutputStream());
@@ -63,11 +67,12 @@ public class ZabbixAgentIntegTest {
 	public void setUp() throws Exception {
         config = new ZorkaConfig(this.getClass().getResource("/conf").getPath());
         ZorkaLogger.setLogger(new TestLogger());
-		agent = new ZorkaBshAgent(Executors.newSingleThreadExecutor(), Executors.newSingleThreadExecutor(), 5000,
-                new MBeanServerRegistry(true), config);
+        translator = new ZabbixQueryTranslator();
+        agent = new ZorkaBshAgent(Executors.newSingleThreadExecutor(), Executors.newSingleThreadExecutor(), 5000,
+                new MBeanServerRegistry(true), config, translator);
 		config.getProperties().put ("zabbix.listen.addr", "127.0.0.1");
 		config.getProperties().put("zabbix.listen.port", "10066");
-		service = new ZabbixAgent(config,  agent);
+		service = new ZabbixAgent(config,  agent, translator);
 		service.start();
 	}
 	
@@ -84,10 +89,21 @@ public class ZabbixAgentIntegTest {
 	
 	@Test
 	public void testJavaQuery() throws Exception {
-		String rslt = query("zorka__jmx[\"java\", \"java.lang:type=OperatingSystem\", \"Arch\"]");
-		assertFalse("Query has crashed.", 
-			ZabbixRequestHandler.ZBX_NOTSUPPORTED.equals(rslt));
+		assertThat(query("zorka__jmx[\"java\", \"java.lang:type=OperatingSystem\", \"Arch\"]"))
+                .isNotEqualTo(ZabbixRequestHandler.ZBX_NOTSUPPORTED);
 	}
 
-	
+    @Test
+	public void testNonAllowedFn() throws Exception {
+        translator.allow("zorka.version");
+
+        assertThat(query("zorka.version[]"))
+                .isNotEqualTo(ZabbixRequestHandler.ZBX_NOTSUPPORTED);
+
+        assertThat(query("zorka__jmx[\"java\", \"java.lang:type=OperatingSystem\", \"Arch\"]"))
+            .isEqualTo(ZabbixRequestHandler.ZBX_NOTSUPPORTED);
+
+        assertThat(query("zorka.version[]"))
+            .isNotEqualTo(ZabbixRequestHandler.ZBX_NOTSUPPORTED);
+    }
 }

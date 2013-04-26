@@ -43,6 +43,8 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
     /** Request string */
 	private String req;
 
+    private QueryTranslator translator;
+
     /** Timestamps of beginning and end of request handling. */
     private volatile long tStart, tStop;
 
@@ -55,8 +57,9 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
      *
      * @param socket open socket (result from ServerSocket.accept())
      */
-	public ZabbixRequestHandler(Socket socket) {
+	public ZabbixRequestHandler(Socket socket, QueryTranslator translator) {
 		this.socket = socket;
+        this.translator = translator;
         this.tStart = System.nanoTime();
 
         AgentDiagnostics.inc(AgentDiagnostics.ZABBIX_REQUESTS);
@@ -159,40 +162,40 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
      *
      * @return query ready to be passed to bsh agent
      */
-	public static String translate(String query) {
-		StringBuilder sb = new StringBuilder(query.length());
-		int pos = 0;
-		
-		while (pos < query.length() && query.charAt(pos) != '[') {
-			pos++;
-		}
-		
-		sb.append(query.substring(0, pos).replace("__", "."));
-		
-		if (pos >= query.length()) {
-			return sb.toString();
-		}
-		
-		sb.append('(');
-        pos++;
-				
-		while (pos < query.length() && query.charAt(pos) != ']') {
-			if (query.charAt(pos) == '"') {
-				int pstart = pos++;
-				while (pos < query.length() && query.charAt(pos) != '"') {
-					pos++;
-				}
-				sb.append(query.substring(pstart, pos+1));
-			} else {
-				sb.append(query.charAt(pos));
-			}
-			pos++;
-		}
-		
-		sb.append(')');
-		
-		return sb.toString();
-	}
+//	public static String translate(String query) {
+//		StringBuilder sb = new StringBuilder(query.length());
+//		int pos = 0;
+//
+//		while (pos < query.length() && query.charAt(pos) != '[') {
+//			pos++;
+//		}
+//
+//		sb.append(query.substring(0, pos).replace("__", "."));
+//
+//		if (pos >= query.length()) {
+//			return sb.toString();
+//		}
+//
+//		sb.append('(');
+//        pos++;
+//
+//		while (pos < query.length() && query.charAt(pos) != ']') {
+//			if (query.charAt(pos) == '"') {
+//				int pstart = pos++;
+//				while (pos < query.length() && query.charAt(pos) != '"') {
+//					pos++;
+//				}
+//				sb.append(query.substring(pstart, pos+1));
+//			} else {
+//				sb.append(query.charAt(pos));
+//			}
+//			pos++;
+//		}
+//
+//		sb.append(')');
+//
+//		return sb.toString();
+//	}
 
 
     /**
@@ -230,7 +233,7 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
 	public String getReq() throws IOException {
 		if (req == null) {
 			String s = decode(socket.getInputStream());
-			req = translate(s);
+			req = translator.translate(s);
 		}
 		return req;
 	} // getReq()
