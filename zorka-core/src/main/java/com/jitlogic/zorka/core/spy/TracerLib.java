@@ -19,6 +19,7 @@ package com.jitlogic.zorka.core.spy;
 import com.jitlogic.zorka.core.ZorkaConfig;
 import com.jitlogic.zorka.core.perfmon.Submittable;
 import com.jitlogic.zorka.core.util.OverlayClassLoader;
+import com.jitlogic.zorka.core.util.SymbolRegistry;
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 
 /**
@@ -138,6 +139,17 @@ public class TracerLib {
         return new TraceAttrProcessor(tracer, srcField, dstAttr);
     }
 
+
+    /**
+     * Adds trace attribute to trace record immediately. This is useful for programmatic attribute setting.
+     *
+     * @param name attribute name
+     *
+     * @param value attribute value
+     */
+    public void newAttr(String name, Object value) {
+        tracer.getHandler().newAttr(tracer.getSymbolRegistry().symbolId(name), value);
+    }
 
     /**
      * Creates spy processor that sets flags in trace marker.

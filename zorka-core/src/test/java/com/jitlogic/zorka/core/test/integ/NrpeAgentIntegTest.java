@@ -33,7 +33,7 @@ public class NrpeAgentIntegTest extends ZorkaFixture {
 
     @Before
     public void setUp() {
-        nagiosAgent = new NagiosAgent(config,  zorkaAgent);
+        nagiosAgent = new NagiosAgent(config,  zorkaAgent, translator);
         nagiosAgent.start();
     }
 

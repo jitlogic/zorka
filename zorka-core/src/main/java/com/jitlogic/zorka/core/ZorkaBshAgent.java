@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
+import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.util.ObjectDumper;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
@@ -61,7 +62,8 @@ public class ZorkaBshAgent {
      *
      * @param connExecutor connExecutor for asynchronous processing queries
      */
-	public ZorkaBshAgent(Executor connExecutor, ExecutorService mainExecutor, long timeout, MBeanServerRegistry mbsRegistry, ZorkaConfig config) {
+	public ZorkaBshAgent(Executor connExecutor, ExecutorService mainExecutor, long timeout, MBeanServerRegistry mbsRegistry,
+                         ZorkaConfig config, QueryTranslator translator) {
 		this.interpreter = new Interpreter();
 
 		this.connExecutor = connExecutor;
@@ -69,7 +71,7 @@ public class ZorkaBshAgent {
         this.timeout = timeout;
 
 
-		zorkaLib = new ZorkaLib(this, mbsRegistry, config);
+		zorkaLib = new ZorkaLib(this, mbsRegistry, config, translator);
         install("zorka", zorkaLib);
     }
 

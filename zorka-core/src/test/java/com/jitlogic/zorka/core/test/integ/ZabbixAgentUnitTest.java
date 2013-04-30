@@ -20,6 +20,7 @@ package com.jitlogic.zorka.core.test.integ;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+import com.jitlogic.zorka.core.integ.ZabbixQueryTranslator;
 import org.junit.Test;
 
 import com.jitlogic.zorka.core.integ.ZabbixRequestHandler;
@@ -29,7 +30,7 @@ import static org.junit.Assert.*;
 public class ZabbixAgentUnitTest {
 
 	private String tr(String src) {
-		return ZabbixRequestHandler.translate(src);
+		return new ZabbixQueryTranslator().translate(src);
 	}
 	
 	

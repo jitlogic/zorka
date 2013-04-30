@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.management.*;
 
 import com.jitlogic.zorka.core.integ.FileTrapper;
+import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.core.util.*;
 import com.jitlogic.zorka.core.util.ZorkaLog;
 import com.jitlogic.zorka.core.util.ZorkaLogLevel;
@@ -72,15 +73,18 @@ public class ZorkaLib  {
 
     private ZorkaConfig config;
 
+    private QueryTranslator translator;
+
     /**
      * Standard constructor
      *
      * @param agent reference to Zorka BSH agent object
      */
-    public ZorkaLib(ZorkaBshAgent agent, MBeanServerRegistry registry, ZorkaConfig config) {
+    public ZorkaLib(ZorkaBshAgent agent, MBeanServerRegistry registry, ZorkaConfig config, QueryTranslator translator) {
 		this.agent = agent;
         this.mbsRegistry = registry;
         this.config = config;
+        this.translator = translator;
 
         this.hostname = config.getProperties().getProperty("zorka.hostname").trim();
         this.version = config.getProperties().getProperty("zorka.version").trim();
@@ -805,6 +809,30 @@ public class ZorkaLib  {
     }
 
 
+    public Properties loadCfg(String fname) {
+        String path = path(config.getHomeDir(), fname);
+        Properties props = config.loadCfg(config.getProperties(), path, false);
+        if (props != null) {
+            log.info(ZorkaLogger.ZAG_INFO, "Loaded property file: " + path);
+        } else {
+            log.info(ZorkaLogger.ZAG_INFO, "Property file not found: " + path);
+        }
+        return props;
+    }
+
+
+    public Properties loadCfg(Properties properties, String fname, boolean verbose) {
+        String path = path(config.getHomeDir(), fname);
+        Properties props = config.loadCfg(properties, path, verbose);
+        if (props != null) {
+            log.info(ZorkaLogger.ZAG_INFO, "Loaded property file: " + path);
+        } else {
+            log.info(ZorkaLogger.ZAG_INFO, "Property file not found: " + path);
+        }
+        return props;
+    }
+
+
     public String path(String...components) {
         return ZorkaUtil.path(components);
     }
@@ -848,6 +876,12 @@ public class ZorkaLib  {
 
     public void setField(Object obj, String name, Object value) {
         ObjectInspector.setField(obj, name, value);
+    }
+
+    public void allow(String...funcs) {
+        for (String func : funcs) {
+            translator.allow(func);
+        }
     }
 
 }

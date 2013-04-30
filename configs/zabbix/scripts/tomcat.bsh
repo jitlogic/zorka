@@ -92,7 +92,7 @@ __tomcat() {
   if (zorka.boolCfg("tracer", false)) {
 
     zorka.logInfo("Enabling tracer Tomcat.");
-
+    zorka.loadCfg("tracer.properties");
 
     for (String pkg : zorka.listCfg("tracer.include.extra")) {
       if (pkg.contains("/")) {
