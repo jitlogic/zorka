@@ -21,10 +21,7 @@ import com.jitlogic.zorka.core.perfmon.Submittable;
 import com.jitlogic.zorka.core.util.SymbolRegistry;
 import com.jitlogic.zorka.core.util.SymbolicException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -126,7 +123,7 @@ public class TraceRecord implements Submittable {
      */
     public void setAttr(int attrId, Object attrVal) {
         if (attrs == null) {
-            attrs = new HashMap<Integer,Object>();
+            attrs = new LinkedHashMap<Integer,Object>();
         }
         attrs.put(attrId, attrVal);
     }

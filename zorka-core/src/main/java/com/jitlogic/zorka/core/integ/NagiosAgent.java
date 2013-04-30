@@ -33,13 +33,13 @@ public class NagiosAgent extends AbstractTcpAgent {
      *
      * @param agent bsh agent
      */
-    public NagiosAgent(ZorkaConfig config, ZorkaBshAgent agent) {
-        super(config, agent, "nagios", "127.0.0.1", 5669);
+    public NagiosAgent(ZorkaConfig config, ZorkaBshAgent agent, QueryTranslator translator) {
+        super(config, agent, translator, "nagios", "127.0.0.1", 5669);
     }
 
     @Override
     protected ZorkaRequestHandler newRequest(Socket sock) {
-        return new NrpeRequestHandler(sock);
+        return new NrpeRequestHandler(sock, translator);
     }
 
 }

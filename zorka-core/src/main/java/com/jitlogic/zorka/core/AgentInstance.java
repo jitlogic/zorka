@@ -96,6 +96,7 @@ public class AgentInstance {
 
     private ZorkaConfig config;
 
+    private ZabbixQueryTranslator translator;
 
     public AgentInstance(ZorkaConfig config) {
         this.config = config;
@@ -155,7 +156,7 @@ public class AgentInstance {
 
         if (config.boolCfg("nagios", false)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Nagios support.");
-            nagiosAgent = new NagiosAgent(config,  zorkaAgent);
+            getNagiosAgent().start();
             nagiosAgent.start();
             zorkaAgent.install("nagios", getNagiosLib());
         }
@@ -252,6 +253,14 @@ public class AgentInstance {
     }
 
 
+    public synchronized QueryTranslator getTranslator() {
+        if (translator == null) {
+            translator = new ZabbixQueryTranslator();
+        }
+        return translator;
+    }
+
+
     private synchronized Executor getConnExecutor() {
         if (connExecutor == null) {
             int rt = config.intCfg("zorka.req.threads", 8);
@@ -302,15 +311,24 @@ public class AgentInstance {
     public synchronized ZorkaBshAgent getZorkaAgent() {
         if (zorkaAgent == null) {
             long timeout = config.longCfg("zorka.req.timeout", 5000L);
-            zorkaAgent = new ZorkaBshAgent(getConnExecutor(), getMainExecutor(), timeout, getMBeanServerRegistry(), config);
+            zorkaAgent = new ZorkaBshAgent(getConnExecutor(), getMainExecutor(), timeout, getMBeanServerRegistry(),
+                    config, getTranslator());
         }
         return zorkaAgent;
     }
 
 
+    public synchronized NagiosAgent getNagiosAgent() {
+        if (nagiosAgent == null) {
+            nagiosAgent = new NagiosAgent(config, getZorkaAgent(), getTranslator());
+        }
+        return nagiosAgent;
+    }
+
+
     public synchronized ZabbixAgent getZabbixAgent() {
         if (zabbixAgent == null) {
-            zabbixAgent = new ZabbixAgent(config,  getZorkaAgent());
+            zabbixAgent = new ZabbixAgent(config,  getZorkaAgent(), getTranslator());
         }
         return zabbixAgent;
     }

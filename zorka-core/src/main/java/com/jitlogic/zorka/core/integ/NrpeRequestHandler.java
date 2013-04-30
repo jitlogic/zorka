@@ -42,15 +42,18 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
     /** Request handling finish timestamp */
     private long tStop;
 
+    /** Query translator */
+    private QueryTranslator translator;
 
     /**
      * Creates NRPE request handler object
      *
      * @param socket accepted connection socket
      */
-    public NrpeRequestHandler(Socket socket) {
+    public NrpeRequestHandler(Socket socket, QueryTranslator translator) {
         this.socket = socket;
         this.tStart = System.nanoTime();
+        this.translator = translator;
 
         AgentDiagnostics.inc(AgentDiagnostics.NAGIOS_REQUESTS);
     }
@@ -120,6 +123,6 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
             }
         }
 
-        return ZabbixRequestHandler.translate(req.getData());
+        return translator.translate(req.getData());
     }
 }
