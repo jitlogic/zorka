@@ -33,11 +33,11 @@ public class PerfMonLib {
 
     private MBeanServerRegistry mbsRegistry;
 
-    public PerfMonLib(Tracer tracer, MBeanServerRegistry mbsRegistry) {
+    public PerfMonLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, MBeanServerRegistry mbsRegistry) {
         this.tracer = tracer;
         this.mbsRegistry = mbsRegistry;
-        this.symbolRegistry = tracer.getSymbolRegistry();
-        this.metricsRegistry = tracer.getMetricsRegistry();
+        this.symbolRegistry = symbolRegistry;
+        this.metricsRegistry = metricsRegistry;
     }
 
 

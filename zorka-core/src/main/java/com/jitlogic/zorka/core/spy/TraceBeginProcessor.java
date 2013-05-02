@@ -47,13 +47,13 @@ public class TraceBeginProcessor implements SpyProcessor {
      *
      * @param tracer tracer object
      *
-     * @param traceName trace name (label)
+     * @param traceId trace id (symbol)
      *
      * @param minimumTraceTime minimum trace execution time
      */
-    public TraceBeginProcessor(Tracer tracer, String traceName, long minimumTraceTime, int flags) {
+    public TraceBeginProcessor(Tracer tracer, int traceId, long minimumTraceTime, int flags) {
         this.tracer = tracer;
-        this.traceId = tracer.getSymbolRegistry().symbolId(traceName);
+        this.traceId = traceId;
         this.minimumTraceTime = minimumTraceTime;
         this.flags = flags;
     }

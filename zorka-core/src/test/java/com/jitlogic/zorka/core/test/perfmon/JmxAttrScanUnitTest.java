@@ -88,7 +88,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
 
         for (PerfSample sample : samples) {
             Assert.assertTrue("Should have non-zero metric ID", sample.getMetricId() > 0);
-            Metric metric = agentInstance.getTracer().getMetricsRegistry().getMetric(sample.getMetricId());
+            Metric metric = agentInstance.getMetricsRegistry().getMetric(sample.getMetricId());
             Assert.assertTrue("Template should have non-zero metric ID", metric.getTemplate().getId() > 0);
         }
     }

@@ -43,7 +43,7 @@ public class SimpleTraceFormatUnitTest {
         return sample;
     }
 
-    private SymbolRegistry symbols = new SymbolRegistry();
+    private SymbolRegistry symbols = new SimpleSymbolRegistry();
     private ByteBuffer buf = new ByteBuffer();;
     private SimplePerfDataFormat encoder = new SimplePerfDataFormat(buf);
     private TestTracer output = new TestTracer();

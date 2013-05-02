@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.core.util.SymbolRegistry;
 import com.jitlogic.zorka.core.util.ZorkaLog;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 import org.objectweb.asm.AnnotationVisitor;
@@ -56,6 +57,8 @@ public class SpyClassVisitor extends ClassVisitor {
     /** List of class annotations encountered when traversing class */
     private List<String> classAnnotations = new ArrayList<String>();
 
+    private SymbolRegistry symbolRegistry;
+
     /**
      * Creates Spy class visitor.
      *
@@ -65,10 +68,11 @@ public class SpyClassVisitor extends ClassVisitor {
      * @param tracer reference to tracer
      * @param cv output class visitor (typically ClassWriter)
      */
-    public SpyClassVisitor(SpyClassTransformer transformer, String className,
+    public SpyClassVisitor(SpyClassTransformer transformer, SymbolRegistry symbolRegistry, String className,
                            List<SpyDefinition> sdefs, Tracer tracer, ClassVisitor cv) {
         super(V1_6, cv);
         this.transformer = transformer;
+        this.symbolRegistry = symbolRegistry;
         this.className = className;
         this.sdefs = sdefs;
         this.tracer = tracer;
@@ -117,7 +121,7 @@ public class SpyClassVisitor extends ClassVisitor {
             .methodMatch(className, classAnnotations, classInterfaces, access, methodName, methodDesc, null);
 
         if (ctxs.size() > 0 || doTrace) {
-            return new SpyMethodVisitor(m, doTrace ? transformer.getSymbolRegistry() : null, className,
+            return new SpyMethodVisitor(m, doTrace ? symbolRegistry : null, className,
                     classAnnotations, classInterfaces, access, methodName, methodDesc, ctxs, mv);
         }
 

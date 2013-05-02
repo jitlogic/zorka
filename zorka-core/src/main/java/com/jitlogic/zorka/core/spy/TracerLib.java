@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.core.ZorkaConfig;
+import com.jitlogic.zorka.core.perfmon.MetricsRegistry;
 import com.jitlogic.zorka.core.perfmon.Submittable;
 import com.jitlogic.zorka.core.util.OverlayClassLoader;
 import com.jitlogic.zorka.core.util.SymbolRegistry;
@@ -34,8 +35,11 @@ public class TracerLib {
     public static final int DROP_INTERIM = TraceMarker.DROP_INTERIM;
     public static final int TRACE_CALLS = TraceMarker.TRACE_CALLS;
 
-
     private Tracer tracer;
+
+    private SymbolRegistry symbolRegistry;
+    private MetricsRegistry metricsRegistry;
+
     private ZorkaConfig config;
 
     /** Default trace flags */
@@ -46,7 +50,9 @@ public class TracerLib {
      *
      * @param tracer reference to spy instance
      */
-    public TracerLib(Tracer tracer, ZorkaConfig config) {
+    public TracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config) {
+        this.symbolRegistry = symbolRegistry;
+        this.metricsRegistry = metricsRegistry;
         this.tracer = tracer;
         this.config = config;
     }
@@ -122,7 +128,7 @@ public class TracerLib {
      * @return spy processor object marking new trace
      */
     public SpyProcessor begin(String name, long minimumTraceTime, int flags) {
-        return new TraceBeginProcessor(tracer, name, minimumTraceTime * 1000000L, flags);
+        return new TraceBeginProcessor(tracer, symbolRegistry.symbolId(name), minimumTraceTime * 1000000L, flags);
     }
 
 
@@ -136,7 +142,7 @@ public class TracerLib {
      * @return spy processor object adding new trace attribute
      */
     public SpyProcessor attr(String srcField, String dstAttr) {
-        return new TraceAttrProcessor(tracer, srcField, dstAttr);
+        return new TraceAttrProcessor(symbolRegistry, tracer, srcField, dstAttr);
     }
 
 
@@ -148,7 +154,7 @@ public class TracerLib {
      * @param value attribute value
      */
     public void newAttr(String name, Object value) {
-        tracer.getHandler().newAttr(tracer.getSymbolRegistry().symbolId(name), value);
+        tracer.getHandler().newAttr(symbolRegistry.symbolId(name), value);
     }
 
     /**
@@ -190,8 +196,7 @@ public class TracerLib {
      */
     public ZorkaAsyncThread<Submittable> toFile(String path, int maxFiles, long maxSize) {
         TraceFileWriter writer = new TraceFileWriter(config.formatCfg(path),
-                tracer.getSymbolRegistry(), tracer.getMetricsRegistry(),
-                maxFiles, maxSize);
+                symbolRegistry, metricsRegistry, maxFiles, maxSize);
         writer.start();
         return writer;
     }
