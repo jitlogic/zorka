@@ -1,3 +1,11 @@
+Zorka 0.9.6 (2013-05-01)
+------------------------
+
+ * better security with zorka.allow() function;
+ * load additional property files with zorka.loadCfg() function;
+ * programmatic tracer attribute setting with tracer.newAttr() function;
+ * lots ot fixes
+
 Zorka 0.9.5 (2013-04-15)
 ------------------------
 
