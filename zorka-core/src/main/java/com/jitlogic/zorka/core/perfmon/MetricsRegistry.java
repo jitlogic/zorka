@@ -16,53 +16,14 @@
 
 package com.jitlogic.zorka.core.perfmon;
 
-import com.jitlogic.zorka.core.util.ZorkaLog;
-import com.jitlogic.zorka.core.util.ZorkaLogger;
+public interface MetricsRegistry {
+    int templateId(MetricTemplate template);
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+    MetricTemplate getTemplate(int id);
 
-public class MetricsRegistry {
+    int metricId(Metric metric);
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(MetricsRegistry.class);
+    Metric getMetric(int id);
 
-    private AtomicInteger lastTemplateId = new AtomicInteger(0);
-    private Map<Integer,MetricTemplate> templateById = new ConcurrentHashMap<Integer, MetricTemplate>();
-
-    private AtomicInteger lastMetricId = new AtomicInteger(0);
-    private Map<Integer,Metric> metricById = new ConcurrentHashMap<Integer, Metric>();
-
-
-
-    public int templateId(MetricTemplate template) {
-        if (template.getId() == 0) {
-            template.setId(lastTemplateId.incrementAndGet());
-            templateById.put(template.getId(), template);
-        }
-        return template.getId();
-    }
-
-
-    public MetricTemplate getTemplate(int id) {
-        return templateById.get(id);
-    }
-
-
-    public int metricId(Metric metric) {
-        if (metric.getId() == 0) {
-            metric.setId(lastMetricId.incrementAndGet());
-            metricById.put(metric.getId(), metric);
-        }
-        return metric.getId();
-    }
-
-
-    public Metric getMetric(int id) {
-        return metricById.get(id);
-    }
-
-    public int size() {
-        return metricById.size();
-    }
+    int size();
 }
