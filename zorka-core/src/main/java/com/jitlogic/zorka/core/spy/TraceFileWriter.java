@@ -70,18 +70,6 @@ public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
      * @param path path to trace file
      *
      * @param symbols symbol registry containing symbols from incoming traces
-     */
-//    public TraceFileWriter(String path, SymbolRegistry symbols, MetricsRegistry metricsRegistry) {
-//        this(path, symbols, metricsRegistry, 8, 8 * 1024 * 1024);
-//    }
-
-
-    /**
-     * Creates trace file writer.
-     *
-     * @param path path to trace file
-     *
-     * @param symbols symbol registry containing symbols from incoming traces
      *
      * @param maxFiles max number of archived trace files
      *

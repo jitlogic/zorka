@@ -8,6 +8,7 @@
     <url>http://www.jitlogic.com/zorka</url>
 
     <properties>
+        <fest.version>1.4</fest.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

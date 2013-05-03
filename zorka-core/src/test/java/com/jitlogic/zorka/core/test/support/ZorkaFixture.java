@@ -32,6 +32,7 @@ import org.junit.Before;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerBuilder;
+import java.io.File;
 import java.util.Properties;
 
 public class ZorkaFixture {
@@ -57,6 +58,8 @@ public class ZorkaFixture {
     protected ZabbixLib zabbixLib;
 
     protected QueryTranslator translator;
+
+    private String tmpDir;
 
     @Before
     public void setUpFixture() throws Exception {
@@ -98,11 +101,15 @@ public class ZorkaFixture {
 
         MainSubmitter.setSubmitter(agentInstance.getSubmitter());
         MainSubmitter.setTracer(agentInstance.getTracer());
+
+        tmpDir = "/tmp" + File.separatorChar + "zorka-unit-test";
+        TestUtil.rmrf(tmpDir);
+        new File(tmpDir).mkdirs();
     }
 
 
     @After
-    public void tearDownFixture() {
+    public void tearDownFixture() throws Exception {
 
         // Uninstall test MBean server
         mBeanServerRegistry.unregister("test");
@@ -114,6 +121,9 @@ public class ZorkaFixture {
         MainSubmitter.setTracer(null);
     }
 
+    public String getTmpDir() {
+        return tmpDir;
+    }
 
     private static Properties setProps(Properties props, String...data) {
 
