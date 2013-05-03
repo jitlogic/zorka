@@ -17,10 +17,11 @@
 package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.core.ZorkaConfig;
-import com.jitlogic.zorka.core.perfmon.MetricsRegistry;
+import com.jitlogic.zorka.core.store.MetricsRegistry;
 import com.jitlogic.zorka.core.perfmon.Submittable;
+import com.jitlogic.zorka.core.store.TraceFileWriter;
 import com.jitlogic.zorka.core.util.OverlayClassLoader;
-import com.jitlogic.zorka.core.util.SymbolRegistry;
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 
 /**

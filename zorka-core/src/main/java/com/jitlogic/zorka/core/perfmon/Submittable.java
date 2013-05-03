@@ -16,8 +16,6 @@
 
 package com.jitlogic.zorka.core.perfmon;
 
-import com.jitlogic.zorka.core.perfmon.PerfDataEventHandler;
-
 public interface Submittable {
 
     public void traverse(PerfDataEventHandler output);

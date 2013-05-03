@@ -18,7 +18,7 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.core.perfmon.PerfDataEventHandler;
 import com.jitlogic.zorka.core.perfmon.Submittable;
-import com.jitlogic.zorka.core.util.SymbolRegistry;
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.SymbolicException;
 
 import java.util.*;

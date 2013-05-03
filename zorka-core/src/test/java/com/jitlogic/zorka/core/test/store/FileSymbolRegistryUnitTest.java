@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.core.test.store;
 
 import com.jitlogic.zorka.core.store.file.FileSymbolRegistry;
-import com.jitlogic.zorka.core.util.SymbolRegistry;
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 

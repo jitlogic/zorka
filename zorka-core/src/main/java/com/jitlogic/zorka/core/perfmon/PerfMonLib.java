@@ -19,7 +19,8 @@ package com.jitlogic.zorka.core.perfmon;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.mbeans.MethodCallStatistic;
 import com.jitlogic.zorka.core.spy.Tracer;
-import com.jitlogic.zorka.core.util.SymbolRegistry;
+import com.jitlogic.zorka.core.store.MetricsRegistry;
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 
 public class PerfMonLib {
 

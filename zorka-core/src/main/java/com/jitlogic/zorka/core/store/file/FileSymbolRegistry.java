@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.core.store.file;
 
 import com.jitlogic.zorka.core.util.ByteBuffer;
-import com.jitlogic.zorka.core.util.SymbolRegistry;
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 

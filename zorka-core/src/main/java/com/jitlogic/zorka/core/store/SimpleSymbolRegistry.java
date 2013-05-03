@@ -14,7 +14,10 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.util;
+package com.jitlogic.zorka.core.store;
+
+import com.jitlogic.zorka.core.util.ZorkaLog;
+import com.jitlogic.zorka.core.util.ZorkaLogger;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
