@@ -28,5 +28,5 @@ public interface MetricsRegistry {
 
     Metric getMetric(int id);
 
-    int size();
+    int metricsCount();
 }

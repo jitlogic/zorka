@@ -36,7 +36,6 @@ public class SimpleMetricsRegistry implements MetricsRegistry {
     private Map<Integer,Metric> metricById = new ConcurrentHashMap<Integer, Metric>();
 
 
-
     @Override
     public int templateId(MetricTemplate template) {
         if (template.getId() == 0) {
@@ -68,8 +67,9 @@ public class SimpleMetricsRegistry implements MetricsRegistry {
         return metricById.get(id);
     }
 
+
     @Override
-    public int size() {
+    public int metricsCount() {
         return metricById.size();
     }
 }

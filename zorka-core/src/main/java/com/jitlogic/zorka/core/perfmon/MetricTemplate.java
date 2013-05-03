@@ -71,6 +71,19 @@ public class MetricTemplate {
     }
 
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof MetricTemplate) {
+            MetricTemplate mt = (MetricTemplate)obj;
+            return type == mt.type && name.equals(mt.name)
+                && nomField.equals(mt.nomField) && divField.equals(mt.divField);
+        } else {
+            return false;
+        }
+    }
+
+
+
     public int getType() {
         return type;
     }
