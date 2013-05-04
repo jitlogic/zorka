@@ -37,7 +37,7 @@ import static org.junit.Assert.*;
 public class TraceBuilderUnitTest extends ZorkaFixture {
 
     private TestTracer output = new TestTracer();
-    private SymbolRegistry symbols = new SimpleSymbolRegistry();
+    private SymbolRegistry symbols = new SimpleSymbolRegistry(null);
 
     private TraceBuilder b = new TraceBuilder(
         new TracerOutput() {

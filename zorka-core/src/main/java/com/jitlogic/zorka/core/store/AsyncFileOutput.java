@@ -14,13 +14,8 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.store.file;
+package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.perfmon.Metric;
-import com.jitlogic.zorka.core.perfmon.MetricTemplate;
-import com.jitlogic.zorka.core.store.MetricsRegistry;
-import com.jitlogic.zorka.core.store.SimplePerfDataFormat;
-import com.jitlogic.zorka.core.util.ByteBuffer;
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 
@@ -28,11 +23,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
-public class FileMetricsRegistry extends ZorkaAsyncThread<byte[]> implements MetricsRegistry {
+public class AsyncFileOutput extends ZorkaAsyncThread<byte[]> {
 
     /** Output file path */
     private String path;
@@ -40,72 +32,19 @@ public class FileMetricsRegistry extends ZorkaAsyncThread<byte[]> implements Met
     /** Output file */
     private OutputStream output;
 
-    private AtomicInteger lastTemplateId = new AtomicInteger(0);
-    private Map<Integer,MetricTemplate> templateById = new ConcurrentHashMap<Integer, MetricTemplate>();
-
-    private AtomicInteger lastMetricId = new AtomicInteger(0);
-    private Map<Integer,Metric> metricById = new ConcurrentHashMap<Integer, Metric>();
-
-
-    public FileMetricsRegistry(String path) {
-        super("file-metrics-registry");
+    public AsyncFileOutput(String path) {
+        super("async-file-output");
         this.path = path;
     }
 
 
     @Override
-    public void add(MetricTemplate template) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public int templateId(MetricTemplate template) {
-
-        if (template.getId() == 0) {
-            template.setId(lastTemplateId.incrementAndGet());
-            templateById.put(template.getId(), template);
-            ByteBuffer buf = new ByteBuffer(128);
-            new SimplePerfDataFormat(buf).newMetricTemplate(template);
-            submit(buf.getContent());
+    public boolean submit(byte[] data) {
+        if (output != null) {
+            return super.submit(data);
+        } else {
+            return true;
         }
-
-        return template.getId();
-    }
-
-
-    @Override
-    public MetricTemplate getTemplate(int id) {
-        return templateById.get(id);
-    }
-
-    @Override
-    public void add(Metric metric) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-
-    @Override
-    public int metricId(Metric metric) {
-        if (metric.getId() == 0) {
-            metric.setId(lastMetricId.incrementAndGet());
-            metricById.put(metric.getId(), metric);
-            ByteBuffer buf = new ByteBuffer(128);
-            new SimplePerfDataFormat(buf).newMetric(metric);
-            submit(buf.getContent());
-        }
-        return metric.getId();
-    }
-
-
-    @Override
-    public Metric getMetric(int id) {
-        return metricById.get(id);
-    }
-
-
-    @Override
-    public int metricsCount() {
-        return metricById.size();
     }
 
 
@@ -124,11 +63,13 @@ public class FileMetricsRegistry extends ZorkaAsyncThread<byte[]> implements Met
         }
     }
 
+
     private void reopen() {
         log.info(ZorkaLogger.ZCL_CONFIG, "Reopening symbols file: " + path);
         close();
         open();
     }
+
 
     @Override
     protected synchronized void open() {

@@ -277,7 +277,7 @@ public class AgentInstance {
 
     public synchronized  MetricsRegistry getMetricsRegistry() {
         if (metricsRegistry == null) {
-            metricsRegistry = new SimpleMetricsRegistry();
+            metricsRegistry = new SimpleMetricsRegistry(null);
         }
         return metricsRegistry;
     }
@@ -287,7 +287,7 @@ public class AgentInstance {
 
     public synchronized SymbolRegistry getSymbolRegistry() {
         if (symbolRegistry == null) {
-            symbolRegistry = new SimpleSymbolRegistry();
+            symbolRegistry = new SimpleSymbolRegistry(null);
         }
         return symbolRegistry;
     }

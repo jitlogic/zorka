@@ -18,6 +18,8 @@ package com.jitlogic.zorka.core.store;
 
 import com.jitlogic.zorka.core.perfmon.Metric;
 import com.jitlogic.zorka.core.perfmon.MetricTemplate;
+import com.jitlogic.zorka.core.util.ByteBuffer;
+import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.core.util.ZorkaLog;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 
@@ -35,12 +37,37 @@ public class SimpleMetricsRegistry implements MetricsRegistry {
     private AtomicInteger lastMetricId = new AtomicInteger(0);
     private Map<Integer,Metric> metricById = new ConcurrentHashMap<Integer, Metric>();
 
+    private ZorkaAsyncThread<byte[]> output;
+
+    public SimpleMetricsRegistry(ZorkaAsyncThread<byte[]> output) {
+        this.output = output;
+    }
+
+
+    @Override
+    public void add(MetricTemplate template) {
+        int id = template.getId();
+        if (id != 0) {
+            templateById.put(id, template);
+            if (id > lastTemplateId.get()) {
+                lastTemplateId.set(id);
+            }
+        } else {
+            templateId(template);
+        }
+    }
+
 
     @Override
     public int templateId(MetricTemplate template) {
         if (template.getId() == 0) {
             template.setId(lastTemplateId.incrementAndGet());
             templateById.put(template.getId(), template);
+            if (output != null) {
+                ByteBuffer buf = new ByteBuffer(128);
+                new SimplePerfDataFormat(buf).newMetricTemplate(template);
+                while (!output.submit(buf.getContent()));
+            }
         }
         return template.getId();
     }
@@ -53,10 +80,27 @@ public class SimpleMetricsRegistry implements MetricsRegistry {
 
 
     @Override
+    public void add(Metric metric) {
+        int id = metric.getId();
+        if (id != 0) {
+            metricById.put(id, metric);
+            if (id > lastMetricId.get()) {
+                lastMetricId.set(id);
+            }
+        }
+    }
+
+
+    @Override
     public int metricId(Metric metric) {
         if (metric.getId() == 0) {
             metric.setId(lastMetricId.incrementAndGet());
             metricById.put(metric.getId(), metric);
+            if (output != null) {
+                ByteBuffer buf = new ByteBuffer(128);
+                new SimplePerfDataFormat(buf).newMetric(metric);
+                while (!output.submit(buf.getContent()));
+            }
         }
         return metric.getId();
     }

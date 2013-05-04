@@ -20,9 +20,14 @@ import com.jitlogic.zorka.core.perfmon.Metric;
 import com.jitlogic.zorka.core.perfmon.MetricTemplate;
 
 public interface MetricsRegistry {
+
+    public void add(MetricTemplate template);
+
     int templateId(MetricTemplate template);
 
     MetricTemplate getTemplate(int id);
+
+    public void add(Metric metric);
 
     int metricId(Metric metric);
 

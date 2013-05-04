@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.core.store;
 
+import com.jitlogic.zorka.core.util.ByteBuffer;
+import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.core.util.ZorkaLog;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 
@@ -43,6 +45,13 @@ public class SimpleSymbolRegistry implements SymbolRegistry {
     /** Symbol ID to name map */
     private ConcurrentHashMap<Integer,String> symbolNames = new ConcurrentHashMap<Integer,String>();
 
+    private ZorkaAsyncThread<byte[]> output;
+
+
+    public SimpleSymbolRegistry(ZorkaAsyncThread<byte[]> output) {
+        this.output = output;
+    }
+
     /**
      * Returns ID of named symbol. If symbol hasn't been registered yet,
      * it will be and new ID will be assigned for it.
@@ -68,6 +77,11 @@ public class SimpleSymbolRegistry implements SymbolRegistry {
             id = symbolIds.putIfAbsent(symbol, newid);
             if (id == null) {
                 symbolNames.put(newid, symbol);
+                if (output != null) {
+                    ByteBuffer buf = new ByteBuffer(128);
+                    new SimplePerfDataFormat(buf).newSymbol(newid, symbol);
+                    output.submit(buf.getContent());
+                }
                 id = newid;
             }
         }
@@ -106,6 +120,12 @@ public class SimpleSymbolRegistry implements SymbolRegistry {
 
         symbolIds.put(symbol, symbolId);
         symbolNames.put(symbolId, symbol);
+
+        if (output != null) {
+            ByteBuffer buf = new ByteBuffer(128);
+            new SimplePerfDataFormat(buf).newSymbol(symbolId, symbol);
+            output.submit(buf.getContent());
+        }
 
         // TODO not thread safe !
         if (symbolId > lastSymbolId.get()) {

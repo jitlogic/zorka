@@ -29,8 +29,8 @@ import org.junit.Test;
 
 public class TraceEnrichmentUnitTest {
 
-    private SymbolRegistry symbols = new SimpleSymbolRegistry();
-    private MetricsRegistry metricsRegistry = new SimpleMetricsRegistry();
+    private SymbolRegistry symbols = new SimpleSymbolRegistry(null);
+    private MetricsRegistry metricsRegistry = new SimpleMetricsRegistry(null);
 
     private TestTracer output = new TestTracer();
     private SymbolEnricher enricher = new SymbolEnricher(symbols, metricsRegistry, output);
