@@ -381,6 +381,8 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
         for (int i = 0; i < nattr; i++) {
             mt = mt.dynamicAttrs(buf.getString());
         }
+
+        output.newMetricTemplate(mt);
     }
 
 

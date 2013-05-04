@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.core.perfmon;
 
+import com.jitlogic.zorka.core.util.ZorkaUtil;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -60,12 +62,12 @@ public class MetricTemplate {
 
 
     private MetricTemplate(MetricTemplate orig) {
+        this.id = orig.id;
         this.type = orig.type;
         this.name = orig.name;
         this.nomField = orig.nomField;
         this.divField = orig.divField;
         this.multiplier = orig.getMultiplier();
-
         this.dynamicAttrs = new HashSet<String>();
         this.dynamicAttrs.addAll(orig.getDynamicAttrs());
     }
@@ -75,13 +77,26 @@ public class MetricTemplate {
     public boolean equals(Object obj) {
         if (obj instanceof MetricTemplate) {
             MetricTemplate mt = (MetricTemplate)obj;
-            return type == mt.type && name.equals(mt.name)
-                && nomField.equals(mt.nomField) && divField.equals(mt.divField);
+            return type == mt.type
+                && ZorkaUtil.objEquals(name, mt.name)
+                && ZorkaUtil.objEquals(nomField, mt.nomField)
+                && ZorkaUtil.objEquals(divField, mt.divField);
         } else {
             return false;
         }
     }
 
+
+    @Override
+    public int hashCode() {
+        return (1117*type) ^ (name != null ? name.hashCode() : 0);
+    }
+
+
+    @Override
+    public String toString() {
+        return "MT(type=" + type + ", name=" + name + ")";
+    }
 
 
     public int getType() {

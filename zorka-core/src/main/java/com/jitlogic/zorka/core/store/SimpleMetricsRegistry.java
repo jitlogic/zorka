@@ -33,6 +33,7 @@ public class SimpleMetricsRegistry implements MetricsRegistry {
 
     private AtomicInteger lastTemplateId = new AtomicInteger(0);
     private Map<Integer,MetricTemplate> templateById = new ConcurrentHashMap<Integer, MetricTemplate>();
+    private Map<MetricTemplate,MetricTemplate> templates = new ConcurrentHashMap<MetricTemplate, MetricTemplate>();
 
     private AtomicInteger lastMetricId = new AtomicInteger(0);
     private Map<Integer,Metric> metricById = new ConcurrentHashMap<Integer, Metric>();
@@ -49,27 +50,35 @@ public class SimpleMetricsRegistry implements MetricsRegistry {
         int id = template.getId();
         if (id != 0) {
             templateById.put(id, template);
+            templates.put(template, template);
             if (id > lastTemplateId.get()) {
                 lastTemplateId.set(id);
             }
         } else {
-            templateId(template);
+            getTemplate(template);
         }
     }
 
 
     @Override
-    public int templateId(MetricTemplate template) {
+    public MetricTemplate getTemplate(MetricTemplate template) {
+
+        MetricTemplate mt = templates.get(template);
+        if (mt != null) {
+            return mt;
+        }
+
         if (template.getId() == 0) {
             template.setId(lastTemplateId.incrementAndGet());
             templateById.put(template.getId(), template);
+            templates.put(template, template);
             if (output != null) {
                 ByteBuffer buf = new ByteBuffer(128);
                 new SimplePerfDataFormat(buf).newMetricTemplate(template);
                 while (!output.submit(buf.getContent()));
             }
         }
-        return template.getId();
+        return template;
     }
 
 
@@ -92,7 +101,7 @@ public class SimpleMetricsRegistry implements MetricsRegistry {
 
 
     @Override
-    public int metricId(Metric metric) {
+    public Metric getMetric(Metric metric) {
         if (metric.getId() == 0) {
             metric.setId(lastMetricId.incrementAndGet());
             metricById.put(metric.getId(), metric);
@@ -102,7 +111,7 @@ public class SimpleMetricsRegistry implements MetricsRegistry {
                 while (!output.submit(buf.getContent()));
             }
         }
-        return metric.getId();
+        return metric;
     }
 
 
@@ -113,7 +122,13 @@ public class SimpleMetricsRegistry implements MetricsRegistry {
 
 
     @Override
-    public int metricsCount() {
+    public int numMetrics() {
         return metricById.size();
+    }
+
+
+    @Override
+    public int numTemplates() {
+        return templateById.size();
     }
 }

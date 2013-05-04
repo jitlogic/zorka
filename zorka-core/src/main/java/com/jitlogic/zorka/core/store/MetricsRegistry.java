@@ -23,15 +23,17 @@ public interface MetricsRegistry {
 
     public void add(MetricTemplate template);
 
-    int templateId(MetricTemplate template);
+    MetricTemplate getTemplate(MetricTemplate template);
 
     MetricTemplate getTemplate(int id);
 
     public void add(Metric metric);
 
-    int metricId(Metric metric);
+    Metric getMetric(Metric metric);
 
     Metric getMetric(int id);
 
-    int metricsCount();
+    int numMetrics();
+
+    int numTemplates();
 }
