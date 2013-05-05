@@ -29,7 +29,7 @@ import com.jitlogic.zorka.core.util.ZorkaLogger;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TraceBuilder extends TraceEventHandler {
+public class TraceBuilder implements TraceEventHandler {
 
     private final static ZorkaLog log = ZorkaLogger.getLog(TraceBuilder.class);
 

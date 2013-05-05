@@ -16,5 +16,17 @@
 
 package com.jitlogic.zorka.core.store;
 
-public class Store {
+import com.jitlogic.zorka.core.perfmon.Submittable;
+import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
+
+public class Store extends ZorkaAsyncThread<Submittable> {
+
+    public Store() {
+        super("local-store");
+    }
+
+    @Override
+    protected void process(Submittable obj) {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

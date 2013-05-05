@@ -26,7 +26,7 @@ import com.jitlogic.zorka.core.util.ZorkaLogger;
 import java.io.*;
 import java.util.List;
 
-public class MetadataLoader extends PerfDataEventHandler {
+public class MetadataLoader implements PerfDataEventHandler {
 
     private static ZorkaLog log = ZorkaLogger.getLog(MetadataLoader.class);
 

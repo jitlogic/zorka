@@ -32,7 +32,7 @@ import java.util.*;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class SimplePerfDataFormat extends PerfDataEventHandler {
+public class SimplePerfDataFormat implements PerfDataEventHandler {
 
     /** Simple format version 1 magic number */
     public static final int MAGIC = 0xcafeb1ba;

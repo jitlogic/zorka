@@ -33,7 +33,7 @@ import java.util.Map;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class PerfDataSet extends PerfDataEventHandler {
+public class PerfDataSet implements PerfDataEventHandler {
 
     /** Symbol map */
     private Map<Integer,String> symbols = new HashMap<Integer, String>(4096);

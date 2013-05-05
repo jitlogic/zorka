@@ -35,7 +35,7 @@ import java.util.Map;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class SymbolEnricher extends PerfDataEventHandler {
+public class SymbolEnricher implements PerfDataEventHandler {
 
     /** Logger object */
     private static final ZorkaLog log = ZorkaLogger.getLog(SymbolEnricher.class);
