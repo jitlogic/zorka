@@ -16,17 +16,127 @@
 
 package com.jitlogic.zorka.core.store;
 
+import com.jitlogic.zorka.core.perfmon.PerfRecord;
 import com.jitlogic.zorka.core.perfmon.Submittable;
+import com.jitlogic.zorka.core.spy.TraceRecord;
+import com.jitlogic.zorka.core.util.ByteBuffer;
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.core.util.ZorkaLogger;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class Store extends ZorkaAsyncThread<Submittable> {
 
-    public Store() {
+    private String path;
+
+    private ByteBuffer buf;
+    private SimplePerfDataFormat format;
+
+    private FileOutputStream traceDataFile, traceIndexFile;
+
+    private SymbolRegistry symbols;
+
+    private long maxSize = 64*1024*1024;
+
+    public Store(SymbolRegistry symbols) {
         super("local-store");
+        buf = new ByteBuffer(16384);
+        format = new SimplePerfDataFormat(buf);
+        this.symbols = symbols;
     }
+
 
     @Override
     protected void process(Submittable obj) {
-        //To change body of implemented methods use File | Settings | File Templates.
+
+        try {
+            if (obj instanceof TraceRecord) {
+                processTraceRecord((TraceRecord) obj);
+            }
+
+            if (obj instanceof PerfRecord) {
+                // TODO save performance metrics
+            }
+        } catch (IOException e) {
+            log.error(ZorkaLogger.ZCL_ERRORS, "Problem collecting data record for '" + path + "' store.", e);
+        }
+
     }
+
+    private void processTraceRecord(TraceRecord tr) throws IOException {
+        if (traceDataFile != null && traceIndexFile != null) {
+            buf.reset();
+            tr.traverse(format);
+
+            long start = traceDataFile.getChannel().position();
+            byte[] data = buf.getContent();
+
+            if (start+data.length > maxSize) {
+                reopen(true);
+            }
+
+            TraceEntry entry = new TraceEntry(0, start, data.length, tr, symbols);
+            byte[] index = entry.serialize();
+
+            traceDataFile.write(data);
+            traceIndexFile.write(index);
+        }
+    }
+
+    private void reopen(boolean rotate) {
+        String tag = ""+System.currentTimeMillis();
+
+        try {
+            traceDataFile = new FileOutputStream(path + File.separatorChar + "trace-" + tag + ".dat");
+            traceIndexFile = new FileOutputStream(path + File.separatorChar + "trace-" + tag + ".idx");
+        } catch (IOException e) {
+            log.error(ZorkaLogger.ZCL_ERRORS, "Cannot open trace file: ", e);
+        }
+    }
+
+    @Override
+    protected synchronized void open() {
+        reopen(false);
+    }
+
+    @Override
+    protected synchronized void close() {
+        if (traceDataFile != null) {
+            try {
+                traceDataFile.close();
+            } catch (IOException e) {
+                log.error(ZorkaLogger.ZCL_ERRORS, "Error closing trace data file.", e);
+            }
+        }
+        if (traceIndexFile != null) {
+            try {
+                traceIndexFile.close();
+            } catch (IOException e) {
+                log.error(ZorkaLogger.ZCL_ERRORS, "Error closing trace index file.", e);
+            }
+        }
+    } // close()
+
+
+    @Override
+    protected void flush() {
+        if (traceDataFile != null) {
+            try {
+                traceDataFile.flush();
+            } catch (IOException e) {
+                log.error(ZorkaLogger.ZCL_ERRORS, "Error flushing trace data file.", e);
+            }
+        }
+
+        if (traceIndexFile != null) {
+            try {
+                traceIndexFile.flush();
+            } catch (IOException e) {
+                log.error(ZorkaLogger.ZCL_ERRORS, "Error flushing trace data file.", e);
+            }
+        }
+    } // flush()
 }

@@ -114,6 +114,12 @@ public class TraceRecord implements Submittable {
     }
 
 
+    public Map<Integer,Object> getAttrs() {
+        return attrs;
+    }
+
+
+
     /**
      * Sets custom attribute value.
      *
