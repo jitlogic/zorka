@@ -24,7 +24,6 @@ import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -39,13 +38,16 @@ public class Store extends ZorkaAsyncThread<Submittable> {
 
     private SymbolRegistry symbols;
 
-    private long maxSize = 64*1024*1024;
+    private long maxSize;
+    private long maxArchiveSize;
 
-    public Store(SymbolRegistry symbols) {
+    public Store(SymbolRegistry symbols, long maxSize, long maxArchiveSize) {
         super("local-store");
+        this.symbols = symbols;
+        this.maxSize = maxSize;
+        this.maxArchiveSize = maxArchiveSize;
         buf = new ByteBuffer(16384);
         format = new SimplePerfDataFormat(buf);
-        this.symbols = symbols;
     }
 
 
@@ -54,11 +56,12 @@ public class Store extends ZorkaAsyncThread<Submittable> {
 
         try {
             if (obj instanceof TraceRecord) {
-                processTraceRecord((TraceRecord) obj);
+                saveTraceRecord((TraceRecord) obj);
             }
 
             if (obj instanceof PerfRecord) {
                 // TODO save performance metrics
+                log.warn(ZorkaLogger.ZCL_WARNINGS, "Performance data collection not implemented.");
             }
         } catch (IOException e) {
             log.error(ZorkaLogger.ZCL_ERRORS, "Problem collecting data record for '" + path + "' store.", e);
@@ -66,7 +69,7 @@ public class Store extends ZorkaAsyncThread<Submittable> {
 
     }
 
-    private void processTraceRecord(TraceRecord tr) throws IOException {
+    private void saveTraceRecord(TraceRecord tr) throws IOException {
         if (traceDataFile != null && traceIndexFile != null) {
             buf.reset();
             tr.traverse(format);
@@ -81,9 +84,13 @@ public class Store extends ZorkaAsyncThread<Submittable> {
             TraceEntry entry = new TraceEntry(0, start, data.length, tr, symbols);
             byte[] index = entry.serialize();
 
-            traceDataFile.write(data);
-            traceIndexFile.write(index);
+            write(data, index);
         }
+    }
+
+    private void write(byte[] data, byte[] index) throws IOException {
+        traceDataFile.write(data);
+        traceIndexFile.write(index);
     }
 
     private void reopen(boolean rotate) {
