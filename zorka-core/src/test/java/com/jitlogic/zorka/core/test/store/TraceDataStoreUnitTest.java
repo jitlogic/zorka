@@ -16,8 +16,8 @@
 
 package com.jitlogic.zorka.core.test.store;
 
-import com.jitlogic.zorka.core.store.ChunkedDataFile;
-import com.jitlogic.zorka.core.store.ChunkedDataStore;
+import com.jitlogic.zorka.core.store.TraceDataFile;
+import com.jitlogic.zorka.core.store.TraceDataStore;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.junit.After;
 import org.junit.Test;
@@ -29,12 +29,12 @@ import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
 
-public class ChunkedStorageUnitTest extends ZorkaFixture {
+public class TraceDataStoreUnitTest extends ZorkaFixture {
 
-    private static final long HL = ChunkedDataFile.HEADER_LENGTH;
+    private static final long HL = TraceDataFile.HEADER_LENGTH;
 
-    ChunkedDataFile f1, f2;
-    ChunkedDataStore s1, s2;
+    TraceDataFile f1, f2;
+    TraceDataStore s1, s2;
 
 
     @After
@@ -49,8 +49,8 @@ public class ChunkedStorageUnitTest extends ZorkaFixture {
     @Test
     public void testCreateAndReopenEmptyChunkFile() throws Exception {
         String fname = zorka.path(getTmpDir(), "test.dat");
-        f1 = new ChunkedDataFile(fname, 1, 1234);
-        f2 = new ChunkedDataFile(fname, 1, 0);
+        f1 = new TraceDataFile(fname, 1, 1234);
+        f2 = new TraceDataFile(fname, 1, 0);
 
         assertThat(new File(fname).exists()).isEqualTo(true);
         assertThat(new File(fname).length()).isEqualTo(HL);
@@ -63,10 +63,10 @@ public class ChunkedStorageUnitTest extends ZorkaFixture {
     public void testReadWriteDataOnOpenFile() throws Exception {
         String fname = zorka.path(getTmpDir(), "test.dat");
 
-        f1 = new ChunkedDataFile(fname, 1, 0);
+        f1 = new TraceDataFile(fname, 1, 0);
         f1.write("ABCD".getBytes()); f1.flush();
 
-        f2 = new ChunkedDataFile(fname, 1, 0);
+        f2 = new TraceDataFile(fname, 1, 0);
 
         assertThat(f2.getLogicalSize()).isEqualTo(4);
         assertThat(f2.getPhysicalSize()).isEqualTo(HL+4);
@@ -81,7 +81,7 @@ public class ChunkedStorageUnitTest extends ZorkaFixture {
     public void testCreateWriteRemoveReadFile() throws Exception {
         String fname = zorka.path(getTmpDir(), "test.dat");
 
-        f1 = new ChunkedDataFile(fname, 1, 0);
+        f1 = new TraceDataFile(fname, 1, 0);
         f1.write("ABCD".getBytes());
 
         f1.remove();
@@ -94,10 +94,10 @@ public class ChunkedStorageUnitTest extends ZorkaFixture {
     public void testSortFiles() throws Exception {
         String fname = zorka.path(getTmpDir(), "test.dat");
 
-        f1 = new ChunkedDataFile(fname, 2, 0);
-        f2 = new ChunkedDataFile(fname, 1, 0);
+        f1 = new TraceDataFile(fname, 2, 0);
+        f2 = new TraceDataFile(fname, 1, 0);
 
-        List<ChunkedDataFile> lst = Arrays.asList(f1, f2);
+        List<TraceDataFile> lst = Arrays.asList(f1, f2);
         Collections.sort(lst);
 
         assertThat(lst.get(0).getIndex()).isLessThan(lst.get(1).getIndex());
@@ -107,9 +107,9 @@ public class ChunkedStorageUnitTest extends ZorkaFixture {
     @Test
     public void testReopenAndWriteSomething() throws Exception {
         String fname = zorka.path(getTmpDir(), "test.dat");
-        f1 = new ChunkedDataFile(fname, 1, 0); f1.write("ABCD".getBytes()); f1.close();
-        f1 = new ChunkedDataFile(fname, 1, 0); f1.write("EFGH".getBytes()); f1.close();
-        f2 = new ChunkedDataFile(fname, 1, 0);
+        f1 = new TraceDataFile(fname, 1, 0); f1.write("ABCD".getBytes()); f1.close();
+        f1 = new TraceDataFile(fname, 1, 0); f1.write("EFGH".getBytes()); f1.close();
+        f2 = new TraceDataFile(fname, 1, 0);
 
         assertThat(f2.read(2, 4)).isEqualTo("CDEF".getBytes());
         assertThat(f2.getLogicalSize()).isEqualTo(8);
@@ -118,10 +118,10 @@ public class ChunkedStorageUnitTest extends ZorkaFixture {
 
     @Test
     public void testCreateWriteReadTrivialStore() throws Exception {
-        s1 = new ChunkedDataStore(getTmpDir(), "test", "dat", 1024, 1024*1024);
+        s1 = new TraceDataStore(getTmpDir(), "test", "dat", 1024, 1024*1024);
         s1.write("ABCD".getBytes()); s1.flush();
 
-        s2 = new ChunkedDataStore(getTmpDir(), "test", "dat", 1024, 1024*1024);
+        s2 = new TraceDataStore(getTmpDir(), "test", "dat", 1024, 1024*1024);
 
         File f = new File(getTmpDir() + File.separatorChar + "test_00000001.dat");
 
@@ -134,7 +134,7 @@ public class ChunkedStorageUnitTest extends ZorkaFixture {
 
     @Test
     public void testSingleRotation() throws Exception {
-        s1 = new ChunkedDataStore(getTmpDir(), "test", "dat", HL+4, 1024*1024);
+        s1 = new TraceDataStore(getTmpDir(), "test", "dat", HL+4, 1024*1024);
         s1.write("ABCD".getBytes());
         s1.write("EFGH".getBytes());
         s1.flush();
@@ -151,19 +151,19 @@ public class ChunkedStorageUnitTest extends ZorkaFixture {
 
     @Test
     public void testReadAfterSingleRotation() throws Exception {
-        s1 = new ChunkedDataStore(getTmpDir(), "test", "dat", HL+4, 1024*1024);
+        s1 = new TraceDataStore(getTmpDir(), "test", "dat", HL+4, 1024*1024);
         s1.write("ABCD".getBytes());
         s1.write("EFGH".getBytes());
         s1.flush();
 
-        s2 = new ChunkedDataStore(getTmpDir(), "test", "dat", HL+4, 1024*1024);
+        s2 = new TraceDataStore(getTmpDir(), "test", "dat", HL+4, 1024*1024);
         assertThat(s2.read(0, 4)).isEqualTo("ABCD".getBytes());
         assertThat(s2.read(4, 4)).isEqualTo("EFGH".getBytes());
     }
 
     @Test
     public void testRotateAndRemoveOldFiles() throws Exception {
-        s1 = new ChunkedDataStore(getTmpDir(), "test", "dat", HL+4, 4*(HL+4));
+        s1 = new TraceDataStore(getTmpDir(), "test", "dat", HL+4, 4*(HL+4));
         s1.write("ABCD".getBytes());
         s1.write("EFGH".getBytes());
         s1.write("IJKM".getBytes());

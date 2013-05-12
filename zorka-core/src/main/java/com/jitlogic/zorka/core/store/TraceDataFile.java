@@ -20,7 +20,7 @@ import com.jitlogic.zorka.core.util.ByteBuffer;
 
 import java.io.*;
 
-public class ChunkedDataFile implements Closeable, Comparable<ChunkedDataFile> {
+public class TraceDataFile implements Closeable, Comparable<TraceDataFile> {
 
     public static final int HEADER_LENGTH = 16;
 
@@ -32,7 +32,7 @@ public class ChunkedDataFile implements Closeable, Comparable<ChunkedDataFile> {
     private FileOutputStream output;
 
 
-    public ChunkedDataFile(String fname, int index, long startPos) throws IOException {
+    public TraceDataFile(String fname, int index, long startPos) throws IOException {
         this.fname = fname;
         this.index = index;
         this.startPos = startPos;
@@ -157,7 +157,7 @@ public class ChunkedDataFile implements Closeable, Comparable<ChunkedDataFile> {
 
 
     @Override
-    public int compareTo(ChunkedDataFile o) {
+    public int compareTo(TraceDataFile o) {
         return this.index - o.index;
     }
 }

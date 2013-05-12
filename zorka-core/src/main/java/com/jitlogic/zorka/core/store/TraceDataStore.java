@@ -25,15 +25,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ChunkedDataStore implements Closeable {
+public class TraceDataStore implements Closeable {
 
     private String path, prefix, suffix;
     private long maxFileSize, maxPhysSize;
-    private List<ChunkedDataFile> files = new ArrayList<ChunkedDataFile>();
+    private List<TraceDataFile> files = new ArrayList<TraceDataFile>();
 
     private Pattern fpattern;
 
-    public ChunkedDataStore(String path, String prefix, String suffix, long maxFileSize, long maxPhysSize) throws IOException {
+    public TraceDataStore(String path, String prefix, String suffix, long maxFileSize, long maxPhysSize) throws IOException {
         this.path = path;
         this.prefix = prefix;
         this.suffix = suffix;
@@ -51,14 +51,14 @@ public class ChunkedDataStore implements Closeable {
 
 
     public synchronized long getEndPos() {
-        ChunkedDataFile f = files.get(files.size()-1);
+        TraceDataFile f = files.get(files.size()-1);
         return f.getStartPos()+f.getLogicalSize();
     }
 
     public synchronized long getPhysSize() {
         long size = 0;
 
-        for (ChunkedDataFile f : files) {
+        for (TraceDataFile f : files) {
             size += f.getPhysicalSize();
         }
 
@@ -68,7 +68,7 @@ public class ChunkedDataStore implements Closeable {
     // TODO writes cannot span over many files
 
     public synchronized long write(byte[] chunk) throws IOException {
-        ChunkedDataFile file = files.get(files.size() - 1);
+        TraceDataFile file = files.get(files.size() - 1);
         long pos = file.write(chunk);
 
         if (file.getPhysicalSize() >= maxFileSize) {
@@ -88,10 +88,10 @@ public class ChunkedDataStore implements Closeable {
         }
 
         int idx;
-        ChunkedDataFile file = null;
+        TraceDataFile file = null;
 
         for (idx = 0; idx < files.size(); idx++) {
-            ChunkedDataFile f = files.get(idx);
+            TraceDataFile f = files.get(idx);
             if (pos >= f.getStartPos() && pos < f.getStartPos()+f.getLogicalSize()) {
                 file = f;
                 break;
@@ -119,13 +119,13 @@ public class ChunkedDataStore implements Closeable {
             Matcher m = fpattern.matcher(f.getName());
             if (m.matches() && f.isFile() && f.canRead()) {
                 int idx = Integer.parseInt(m.group(1));
-                files.add(new ChunkedDataFile(f.getPath(), idx, 0L));
+                files.add(new TraceDataFile(f.getPath(), idx, 0L));
             }
         }
 
         if (files.size() == 0) {
             String fname = String.format("%s_%08d.%s", prefix, 1, suffix);
-            files.add(new ChunkedDataFile(path + File.separatorChar + fname, 1, 0));
+            files.add(new TraceDataFile(path + File.separatorChar + fname, 1, 0));
         } else {
             Collections.sort(files);
         }
@@ -139,15 +139,15 @@ public class ChunkedDataStore implements Closeable {
 
 
     private void rotate() throws IOException {
-        ChunkedDataFile lastf = files.get(files.size()-1);
+        TraceDataFile lastf = files.get(files.size()-1);
         String fname = String.format("%s_%08d.%s", prefix, lastf.getIndex()+1, suffix);
         lastf.close();
-        files.add(new ChunkedDataFile(path + File.separatorChar + fname, lastf.getIndex() + 1, getEndPos()));
+        files.add(new TraceDataFile(path + File.separatorChar + fname, lastf.getIndex() + 1, getEndPos()));
 
         long size = getPhysSize();
 
         while (size > maxPhysSize-maxFileSize && files.size() > 1) {
-            ChunkedDataFile f = files.get(0);
+            TraceDataFile f = files.get(0);
             size -= f.getPhysicalSize();
             f.close();
             f.remove();
@@ -159,7 +159,7 @@ public class ChunkedDataStore implements Closeable {
 
     @Override
     public void close() throws IOException {
-        for (ChunkedDataFile f : files) {
+        for (TraceDataFile f : files) {
             f.close();
         }
     }

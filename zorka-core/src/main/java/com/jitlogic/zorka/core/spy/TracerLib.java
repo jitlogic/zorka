@@ -20,9 +20,12 @@ import com.jitlogic.zorka.core.ZorkaConfig;
 import com.jitlogic.zorka.core.store.MetricsRegistry;
 import com.jitlogic.zorka.core.perfmon.Submittable;
 import com.jitlogic.zorka.core.store.TraceFileWriter;
+import com.jitlogic.zorka.core.store.ZorkaStore;
 import com.jitlogic.zorka.core.util.OverlayClassLoader;
 import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
+
+import java.io.IOException;
 
 /**
  * Tracer library contains functions for configuring and using tracer.
@@ -201,6 +204,18 @@ public class TracerLib {
         writer.start();
         return writer;
     }
+
+
+    public ZorkaAsyncThread<Submittable> toStore(String path, long maxSize) {
+        try {
+            ZorkaStore store = new ZorkaStore(path, maxSize >> 4, maxSize, symbolRegistry);
+            store.start();
+            return store;
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
 
 
     /**

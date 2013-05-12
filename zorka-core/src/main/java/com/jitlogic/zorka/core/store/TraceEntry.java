@@ -16,91 +16,55 @@
 
 package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.spy.TraceMarker;
-import com.jitlogic.zorka.core.spy.TraceRecord;
-import com.jitlogic.zorka.core.util.ByteBuffer;
 
-import java.util.Map;
+import java.io.Serializable;
 
-public class TraceEntry {
+public class TraceEntry implements Serializable {
 
-    private long sid, pos, len;
+    public static final int FORMAT_NULL     = 0;
+    public static final int FORMAT_SIMPLE   = 1;
+    public static final int FORMAT_ASN1_BER = 2;
+    public static final int FORMAT_ASN1_PER = 3;
+
+    private int format;
+    private long pos, len;
     private long tstamp, time;
     private long calls, errors, recs;
 
     private String label;
 
 
-    public TraceEntry(long sid, long pos, long len, TraceRecord record, SymbolRegistry symbols) {
-        this.sid = sid;
+    public TraceEntry() {
+    }
+
+
+    public TraceEntry(int format, long pos, long len, long tstamp, long time, long calls, long errors, long recs, String label) {
+        this.format = format;
         this.pos = pos;
         this.len = len;
+        this.tstamp = tstamp;
+        this.time = time;
+        this.calls = calls;
+        this.errors = errors;
+        this.recs = recs;
+        this.label = label;
 
-
-        this.time = record.getTime();
-        this.calls = record.getCalls();
-        this.errors = record.getErrors();
-        this.recs = countRecords(record);
-
-        TraceMarker marker = record.getMarker();
-
-        if (marker != null) {
-            this.tstamp = marker.getClock();
-            StringBuilder sb = new StringBuilder(96);
-            sb.append(symbols.symbolName(marker.getTraceId()));
-            if (record.getAttrs() != null) {
-                for (Map.Entry<Integer,Object> e : record.getAttrs().entrySet()) {
-                    sb.append('|');
-                    Object v = e.getValue();
-                    sb.append(v != null ? v.toString() : "<null>");
-                }
-            }
-            label = sb.toString();
-
-            if (label.length() > 64) {
-                label = label.substring(0,61) + "...";
-            }
-        }
     }
 
 
-    private int countRecords(TraceRecord record) {
-        int ret = 1;
-
-        for (int i = 0; i < record.numChildren(); i++) {
-            ret += countRecords(record.getChild(i));
-        }
-
-        return ret;
+    public int getFormat() {
+        return format;
     }
 
 
-    public byte[] serialize() {
-        ByteBuffer buf = new ByteBuffer(96);
-
-        buf.putLong(sid); buf.putLong(pos); buf.putLong(len);
-        buf.putLong(tstamp); buf.putLong(time);
-        buf.putLong(calls); buf.putLong(errors); buf.putLong(recs);
-        buf.putString(label);
-
-        return buf.getContent();
-    }
-
-
-    public long getSid() {
-        return sid;
-    }
-
-
-    public void setSid(long sid) {
-        this.sid = sid;
+    public void setFormat(int format) {
+        this.format = format;
     }
 
 
     public long getPos() {
         return pos;
     }
-
 
     public void setPos(long pos) {
         this.pos = pos;
