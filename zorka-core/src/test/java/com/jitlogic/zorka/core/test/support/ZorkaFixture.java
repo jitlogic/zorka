@@ -27,6 +27,7 @@ import com.jitlogic.zorka.core.spy.SpyClassTransformer;
 import com.jitlogic.zorka.core.spy.SpyLib;
 import com.jitlogic.zorka.core.spy.TracerLib;
 
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 import org.junit.After;
 import org.junit.Before;
 
@@ -54,6 +55,8 @@ public class ZorkaFixture {
 
     protected PerfMonLib perfmon;
     protected ZorkaConfig config;
+
+    protected SymbolRegistry symbols;
 
     protected ZabbixLib zabbixLib;
 
@@ -101,6 +104,8 @@ public class ZorkaFixture {
 
         MainSubmitter.setSubmitter(agentInstance.getSubmitter());
         MainSubmitter.setTracer(agentInstance.getTracer());
+
+        symbols = agentInstance.getSymbolRegistry();
 
         tmpDir = "/tmp" + File.separatorChar + "zorka-unit-test";
         TestUtil.rmrf(tmpDir);

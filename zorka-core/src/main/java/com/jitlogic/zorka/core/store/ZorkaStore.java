@@ -22,20 +22,22 @@ import com.jitlogic.zorka.core.spy.TraceMarker;
 import com.jitlogic.zorka.core.spy.TraceRecord;
 import com.jitlogic.zorka.core.util.ByteBuffer;
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.core.util.ZorkaLog;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
-import org.mapdb.BTreeMap;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-import org.mapdb.HTreeMap;
+import org.mapdb.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 
-public class ZorkaStore extends ZorkaAsyncThread<Submittable> {
+public class ZorkaStore {
+
+    private ZorkaLog log = ZorkaLogger.getLog(ZorkaStore.class);
 
     private String path;
     private SymbolRegistry symbols;
@@ -44,12 +46,11 @@ public class ZorkaStore extends ZorkaAsyncThread<Submittable> {
     private DB traceDB;
     private TraceDataStore traceData;
 
-    private ConcurrentMap<Long,TraceEntry> traces;
-    private ConcurrentNavigableMap<Long,Long> tracesByTstamp;
+    private ConcurrentNavigableMap<Long,TraceEntry> tracesByPos;
+    private ConcurrentNavigableMap<Long,TraceEntry> tracesByTstamp;
 
 
     public ZorkaStore(String path, long maxFileSize, long maxPhysicalSize, SymbolRegistry symbols) throws IOException {
-        super("local-store");
 
         this.path = path;
         this.maxFileSize = maxFileSize;
@@ -68,28 +69,24 @@ public class ZorkaStore extends ZorkaAsyncThread<Submittable> {
 
     }
 
-
-    @Override
-    protected void process(Submittable obj) {
-
-        try {
-            if (obj instanceof TraceRecord) {
-                saveTraceRecord((TraceRecord) obj);
-            }
-
-            if (obj instanceof PerfRecord) {
-                // TODO save performance metrics
-                log.warn(ZorkaLogger.ZCL_WARNINGS, "Performance data collection not implemented. Skipping.");
-            }
-        } catch (IOException e) {
-
-        }
-
+    public Long firstTs() {
+        return tracesByTstamp.firstKey();
     }
 
 
-    private void saveTraceRecord(TraceRecord tr) throws IOException {
-        if (traceData == null || traces == null) {
+    public Long lastTs() {
+        return tracesByTstamp.lastKey();
+    }
+
+
+    public ConcurrentNavigableMap<Long,TraceEntry> findByTs(long from, long to) {
+        return tracesByTstamp.subMap(from, true, to, true);
+    }
+
+
+
+    public void add(TraceRecord tr) throws IOException {
+        if (traceData == null || tracesByPos == null) {
             return;
         }
 
@@ -108,8 +105,8 @@ public class ZorkaStore extends ZorkaAsyncThread<Submittable> {
             TraceEntry entry = new TraceEntry(TraceEntry.FORMAT_SIMPLE, pos, b1.length,
                 marker.getClock(), tr.getTime(), tr.getCalls(), tr.getErrors(), traceRecords(tr), traceLabel(tr));
 
-            traces.put(pos, entry);
-            tracesByTstamp.put(marker.getClock(), pos);
+            tracesByPos.put(pos, entry);
+            tracesByTstamp.put(marker.getClock(), entry);
         } else {
             log.error(ZorkaLogger.ZCL_ERRORS, "Received trace without marker. Skipping.");
         }
@@ -144,8 +141,7 @@ public class ZorkaStore extends ZorkaAsyncThread<Submittable> {
     }
 
 
-    @Override
-    protected synchronized void open() {
+    public synchronized void open() {
         if (traceData == null) {
             try {
                 traceData = new TraceDataStore(path, "trace", "dat", maxFileSize, maxPhysicalSize);
@@ -156,17 +152,20 @@ public class ZorkaStore extends ZorkaAsyncThread<Submittable> {
 
         if (traceDB == null) {
             traceDB = DBMaker.newFileDB(new File(path, "traces.db"))
-                    .cacheLRUEnable().cacheSize(16384).asyncFlushDelay(1).make();
-            traces = traceDB.getHashMap("traces");
+                    .randomAccessFileEnable()
+                    .cacheLRUEnable()
+                    .cacheSize(16384)
+                    .asyncFlushDelay(1)
+                    .make();
+            tracesByPos = traceDB.getTreeMap("traces");
             tracesByTstamp = traceDB.getTreeMap("tracesByTstamp");
         }
     }
 
 
-    @Override
-    protected synchronized void close() {
+    public synchronized void close() {
         flush();
-        traces = null;
+        tracesByPos = null;
         tracesByTstamp = null;
         traceDB.close();
         traceDB = null;
@@ -179,14 +178,35 @@ public class ZorkaStore extends ZorkaAsyncThread<Submittable> {
     }
 
 
-    @Override
-    protected void flush() {
+    public void flush() {
         try {
+            cleanOldEntries();
+
             traceData.flush();
             traceDB.commit();
             // TODO remove records from tables if traceData has been truncated
         } catch (IOException e) {
             log.error(ZorkaLogger.ZCL_ERRORS, "Cannot flush trace data set", e);
+        }
+    }
+
+    private void cleanOldEntries() {
+        long pos = traceData.getStartPos();
+        if (tracesByPos.firstKey() < pos) {
+            Set<Long> keys = new HashSet<Long>(), tstamps = new HashSet<Long>();
+
+            for (Map.Entry<Long,TraceEntry> e : tracesByPos.headMap(pos, false).entrySet()) {
+                keys.add(e.getKey());
+                tstamps.add(e.getValue().getTstamp());
+            }
+
+            for (Long key : keys) {
+                tracesByPos.remove(key);
+            }
+
+            for (Long tstamp : tstamps) {
+                tracesByTstamp.remove(tstamp);
+            }
         }
     }
 }

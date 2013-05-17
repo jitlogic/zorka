@@ -17,6 +17,8 @@
 package com.jitlogic.zorka.core.store;
 
 
+import com.jitlogic.zorka.core.util.ZorkaUtil;
+
 import java.io.Serializable;
 
 public class TraceEntry implements Serializable {
@@ -49,6 +51,24 @@ public class TraceEntry implements Serializable {
         this.recs = recs;
         this.label = label;
 
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof TraceEntry) {
+            TraceEntry e = (TraceEntry)obj;
+            return format == e.format && pos == e.pos && len == e.len
+                    &&  tstamp == e.tstamp && time == e.time
+                    && calls == e.calls && errors == e.errors
+                    && recs == e.recs && ZorkaUtil.objEquals(label, e.label);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return (int)(format + pos * 17 + len * 31 + tstamp * 41);
     }
 
 
