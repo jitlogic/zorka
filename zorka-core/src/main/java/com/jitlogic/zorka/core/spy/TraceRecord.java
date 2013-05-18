@@ -342,6 +342,7 @@ public class TraceRecord implements Submittable {
         marker = parent != null ? parent.getMarker() : null;
         calls = errors = 0;
         flags = 0;
+        exception = null;
     }
 
     public void markFlag(int flag) {

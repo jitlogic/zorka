@@ -30,18 +30,22 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.fest.assertions.Assertions.assertThat;
 
 public class TraceBuilderUnitTest extends ZorkaFixture {
 
     private TestTracer output = new TestTracer();
     private SymbolRegistry symbols = new SimpleSymbolRegistry(null);
+    private List<TraceRecord> records = new ArrayList<TraceRecord>();
 
     private TraceBuilder b = new TraceBuilder(
         new TracerOutput() {
-            @Override public void submit(Submittable obj) { obj.traverse(output); }
+            @Override public void submit(Submittable obj) { obj.traverse(output); records.add((TraceRecord)obj); }
         }, symbols);
 
     private static final int MS = 1000000;
@@ -538,6 +542,21 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         assertEquals("should record 3 calls", 3L, output.getData().get(2).get("calls"));
         assertEquals("should mark dropped record", TraceRecord.DROPPED_PARENT, output.getData().get(4).get("flags"));
+    }
+
+    @Test
+    public void testProperExceptionCleanupAfterTraceExit() throws Exception {
+
+        tracer.setTracerMinTraceTime(0);
+        tracer.setTracerMinMethodTime(10);
+
+        b.traceError(new Exception("oja!"), 300);
+        b.traceEnter(c1, m1, s1, 100);
+        b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
+        b.traceReturn(200);
+
+        assertThat(records.size()).isEqualTo(1);
+        assertThat(records.get(0).getException()).isNull();
     }
 
 }
