@@ -24,6 +24,7 @@ import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 import java.util.concurrent.ConcurrentNavigableMap;
 
@@ -55,26 +56,33 @@ public class ZorkaStoreUnitTest extends ZorkaFixture {
     public TraceRecord mktrace(String name, long clock, int levels) {
         TraceRecord tr = mktr(null, name, 0, levels);
         TraceMarker tm = new TraceMarker(tr, symbols.symbolId(name), clock);
+        tr.markFlag(TraceRecord.TRACE_BEGIN);
         tr.setMarker(tm);
 
         return tr;
     }
 
 
-    @Test
-    public void testStoreReopenAndRetreiveTrace() throws Exception {
-        String fname = zorka.path(getTmpDir(), "store");
+    private void wrtrace(String fname, int levels) throws IOException {
         store1 = new ZorkaStore(fname, 1024, 1024, symbols);
-        TraceRecord tr = mktrace("TEST", 100, 1);
+        TraceRecord tr = mktrace("TEST", 100, levels);
 
         store1.open();
         store1.add(tr);
         store1.flush();
 
-        assertThat(new File(fname).exists());
-
         store1.close();
         store1 = null;
+    }
+
+
+    @Test
+    public void testStoreReopenAndRetreiveTrace() throws Exception {
+        String fname = zorka.path(getTmpDir(), "store");
+        wrtrace(fname, 1);
+
+        assertThat(new File(fname).exists());
+
 
         store2 = new ZorkaStore(fname, 1024, 1024, symbols);
         store2.open();
@@ -89,8 +97,12 @@ public class ZorkaStoreUnitTest extends ZorkaFixture {
         assertThat(entry.getTstamp()).isEqualTo(100L);
         assertThat(entry.getPos()).isEqualTo(0);
         assertThat(entry.getLen()).isGreaterThan(0);
-    }
 
+        TraceRecord rec = store2.getTrace(entry);
+        assertThat(rec).isNotNull();
+        assertThat(rec.getMarker()).isNotNull();
+        assertThat(rec.getMarker().getClock()).isEqualTo(100L);
+    }
 
     // TODO test for removal of old items
 

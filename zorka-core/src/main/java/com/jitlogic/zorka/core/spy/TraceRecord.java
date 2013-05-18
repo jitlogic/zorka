@@ -190,6 +190,9 @@ public class TraceRecord implements Submittable {
         this.calls = calls;
     }
 
+    public void setFlags(int flags) {
+        this.flags = flags;
+    }
 
     public long getErrors() {
         return errors;

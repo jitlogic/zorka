@@ -84,6 +84,16 @@ public class ZorkaStore {
     }
 
 
+    public TraceRecord getTrace(TraceEntry entry) throws IOException {
+        byte[] blob = traceData.read(entry.getPos(), entry.getLen());
+        ByteBuffer buf = new ByteBuffer(blob);
+
+        TraceReader reader = new TraceReader();
+        new SimplePerfDataFormat(buf).decode(reader);
+
+        return reader.getRoot();
+    }
+
 
     public void add(TraceRecord tr) throws IOException {
         if (traceData == null || tracesByPos == null) {
