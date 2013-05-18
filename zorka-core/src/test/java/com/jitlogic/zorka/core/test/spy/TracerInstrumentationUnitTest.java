@@ -22,11 +22,15 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import static com.jitlogic.zorka.core.test.support.TestUtil.getField;
 import static com.jitlogic.zorka.core.test.support.TestUtil.instantiate;
 import static com.jitlogic.zorka.core.test.support.TestUtil.invoke;
 import static org.junit.Assert.assertEquals;
+
+import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.reflect.core.Reflection.field;
 
 public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixture {
 
@@ -39,6 +43,19 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         invoke(obj, "trivialMethod");
 
         assertEquals(2, output.size());
+    }
+
+
+    @Test
+    public void testInstrumentMethodForTraceAndCheckIfSpyContextHasBeenCreated() throws Exception {
+        tracer.include(spy.byMethod(TCLASS1, "trivialMethod"));
+        spy.add(spy.instance().include(spy.byMethodAnnotation(TCLASS1, "com.SomeTestAnnotation")));
+
+        Object obj = instantiate(engine, TCLASS1);
+        invoke(obj, "trivialMethod");
+
+        assertThat(field("ctxInstances").ofType(Map.class).in(engine).get().size()).isEqualTo(0);
+        assertThat(field("ctxById").ofType(Map.class).in(engine).get().size()).isEqualTo(0);
     }
 
 
