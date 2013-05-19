@@ -20,6 +20,7 @@ import com.jitlogic.zorka.core.spy.SpyClassTransformer;
 import com.jitlogic.zorka.core.spy.SpyClassVisitor;
 import com.jitlogic.zorka.core.spy.SpyDefinition;
 import com.jitlogic.zorka.core.spy.Tracer;
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.util.TraceClassVisitor;
@@ -31,8 +32,11 @@ public class TestSpyTransformer extends SpyClassTransformer {
 
     private boolean debug = false;
 
-    public TestSpyTransformer(Tracer tracer) {
-        super(tracer);
+    private SymbolRegistry sreg;
+
+    public TestSpyTransformer(SymbolRegistry symbolRegistry, Tracer tracer) {
+        super(symbolRegistry, tracer);
+        sreg = symbolRegistry;
     }
 
     public void enableDebug() {
@@ -43,10 +47,10 @@ public class TestSpyTransformer extends SpyClassTransformer {
     protected ClassVisitor createVisitor(String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
 
         if (debug) {
-            return new SpyClassVisitor(this, className, found,
+            return new SpyClassVisitor(this, sreg, className, found,
                     tracer, new TraceClassVisitor(cw, new PrintWriter(System.out, true)));
         } else {
-            return new SpyClassVisitor(this, className, found, tracer, cw);
+            return new SpyClassVisitor(this, sreg, className, found, tracer, cw);
         }
 
     }

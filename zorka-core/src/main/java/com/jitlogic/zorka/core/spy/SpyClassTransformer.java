@@ -18,7 +18,7 @@
 package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.core.AgentDiagnostics;
-import com.jitlogic.zorka.core.util.SymbolRegistry;
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 import com.jitlogic.zorka.core.util.ZorkaLog;
 import org.objectweb.asm.ClassReader;
@@ -53,6 +53,8 @@ public class SpyClassTransformer implements ClassFileTransformer {
     /** Map of spy contexts (by instance) */
     private Map<SpyContext, SpyContext> ctxInstances = new HashMap<SpyContext, SpyContext>();
 
+    private SymbolRegistry symbolRegistry;
+
     /** Reference to tracer instance. */
     Tracer tracer;
 
@@ -62,7 +64,8 @@ public class SpyClassTransformer implements ClassFileTransformer {
      *
      * @param tracer reference to tracer engine object
      */
-    public SpyClassTransformer(Tracer tracer) {
+    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer) {
+        this.symbolRegistry = symbolRegistry;
         this.tracer = tracer;
     }
 
@@ -171,16 +174,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
      * @return class visitor for instrumenting this class
      */
     protected ClassVisitor createVisitor(String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
-        return new SpyClassVisitor(this, className, found, tracer, cw);
+        return new SpyClassVisitor(this, symbolRegistry, className, found, tracer, cw);
     }
 
-
-    /**
-     * Returns symbol registry.
-     *
-     * @return symbol registry
-     */
-    public SymbolRegistry getSymbolRegistry() {
-        return tracer.getSymbolRegistry();
-    }
 }

@@ -143,16 +143,19 @@ public class ZorkaBshAgent {
      *
      * @param path path to script
      */
-    public void loadScript(String path) {
+    public String loadScript(String path) {
         try {
             log.info(ZorkaLogger.ZAG_CONFIG, "Executing script: " + path);
             interpreter.source(path);
+            return "OK";
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error loading script " + path, e);
             AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
+            return "Error: " + e.getMessage();
         } catch (EvalError e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error executing script " + path, e);
             AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
+            return "Error: " + e.getMessage();
         }
     }
 
@@ -165,13 +168,14 @@ public class ZorkaBshAgent {
      *
      * @param mask file mas (eg. *.bsh)
      */
-    public void loadScriptDir(String path, String mask) {
+    public String loadScriptDir(String path, String mask) {
+        StringBuilder sb = new StringBuilder();
         try {
             File dir = new File(path);
             log.info(ZorkaLogger.ZAG_CONFIG, "Listing directory: " + path);
             String[] files = dir.list();
             if (files == null || files.length == 0) {
-                return;
+                return "No files in " + path + " directory.\n";
             }
             Arrays.sort(files);
             for (String fname : files) {
@@ -179,17 +183,19 @@ public class ZorkaBshAgent {
                     continue;
                 }
                 String scrPath = ZorkaUtil.path(path, fname);
-                log.info(ZorkaLogger.ZAG_CONFIG, "Examining file: " + scrPath);
                 File scrFile = new File(scrPath);
                 if (fname.endsWith(".bsh") && scrFile.isFile()) {
-                    loadScript(scrPath);
+                    sb.append("Executed " + fname + ": " + loadScript(scrPath) + "\n");
                 } else {
                     log.info(ZorkaLogger.ZAG_CONFIG, "Skipping file '" + scrPath + ": isFile=" + scrFile.isFile());
+                    sb.append("Skipped " + fname + "." + "\n");
                 }
             }
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Cannot open directory: " + path, e);
         }
+
+        return sb.toString();
     }
 
 

@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 import com.jitlogic.zorka.core.util.ZorkaLog;
 
@@ -35,6 +36,8 @@ public class TraceAttrProcessor implements SpyProcessor {
     /** Tracer object */
     private Tracer tracer;
 
+    private SymbolRegistry symbolRegistry;
+
     /** source field name */
     private String srcField;
 
@@ -50,10 +53,11 @@ public class TraceAttrProcessor implements SpyProcessor {
      *
      * @param traceAttr attribute ID
      */
-    public TraceAttrProcessor(Tracer tracer, String srcField, String traceAttr) {
+    public TraceAttrProcessor(SymbolRegistry symbolRegistry, Tracer tracer, String srcField, String traceAttr) {
         this.tracer = tracer;
         this.srcField = srcField;
-        this.attrId = tracer.getSymbolRegistry().symbolId(traceAttr);
+        this.symbolRegistry = symbolRegistry;
+        this.attrId = symbolRegistry.symbolId(traceAttr);
     }
 
 
@@ -66,7 +70,7 @@ public class TraceAttrProcessor implements SpyProcessor {
             if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
                 TraceRecord top = ((TraceBuilder)tracer.getHandler()).getTTop();
                 log.debug(ZorkaLogger.ZSP_ARGPROC, "Value: '" + val + "' stored as trace attribute "
-                    + sym(attrId) + " (classId= " + top.getClassId() + " methodId=" + top.getMethodId()
+                    + symbolRegistry.symbolName(attrId) + " (classId= " + top.getClassId() + " methodId=" + top.getMethodId()
                     + " signatureId=" + top.getSignatureId() + ")");
             }
             tracer.getHandler().newAttr(attrId, val);
@@ -79,7 +83,4 @@ public class TraceAttrProcessor implements SpyProcessor {
         return record;
     }
 
-    private String sym(int id) {
-        return tracer.getSymbolRegistry().symbolName(id);
-    }
 }

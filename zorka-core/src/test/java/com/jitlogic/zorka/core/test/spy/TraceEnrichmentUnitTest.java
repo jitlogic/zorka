@@ -16,8 +16,10 @@
 
 package com.jitlogic.zorka.core.test.spy;
 
-import com.jitlogic.zorka.core.perfmon.MetricsRegistry;
-import com.jitlogic.zorka.core.util.SymbolRegistry;
+import com.jitlogic.zorka.core.store.MetricsRegistry;
+import com.jitlogic.zorka.core.store.SimpleMetricsRegistry;
+import com.jitlogic.zorka.core.store.SimpleSymbolRegistry;
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.SymbolicException;
 import com.jitlogic.zorka.core.spy.*;
 import com.jitlogic.zorka.core.test.spy.support.TestTracer;
@@ -27,8 +29,8 @@ import org.junit.Test;
 
 public class TraceEnrichmentUnitTest {
 
-    private SymbolRegistry symbols = new SymbolRegistry();
-    private MetricsRegistry metricsRegistry = new MetricsRegistry();
+    private SymbolRegistry symbols = new SimpleSymbolRegistry(null);
+    private MetricsRegistry metricsRegistry = new SimpleMetricsRegistry(null);
 
     private TestTracer output = new TestTracer();
     private SymbolEnricher enricher = new SymbolEnricher(symbols, metricsRegistry, output);

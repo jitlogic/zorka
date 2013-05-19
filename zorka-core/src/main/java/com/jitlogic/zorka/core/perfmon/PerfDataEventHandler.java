@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public abstract class PerfDataEventHandler extends TraceEventHandler {
+public interface PerfDataEventHandler extends TraceEventHandler {
 
     /**
      * Records trace statistics.

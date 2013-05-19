@@ -23,6 +23,8 @@ import static org.junit.Assert.fail;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -138,5 +140,22 @@ public class TestUtil extends ClassLoader {
 
     public static Object getAttr(MBeanServerConnection mbs, String mbeanName, String attr) throws Exception{
         return mbs.getAttribute(new ObjectName(mbeanName), attr);
+    }
+
+
+    public static void rmrf(String path) throws IOException {
+        rmrf(new File(path));
+    }
+
+
+    public static void rmrf(File f) throws IOException {
+        if (f.exists()) {
+            if (f.isDirectory()) {
+                for (File c : f.listFiles()) {
+                    rmrf(c);
+                }
+            }
+            f.delete();
+        }
     }
 }

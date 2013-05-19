@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -14,10 +14,14 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.perfmon;
+package com.jitlogic.zorka.core.store;
 
-public interface Submittable {
+public interface SymbolRegistry {
+    int symbolId(String symbol);
 
-    public void traverse(PerfDataEventHandler output);
+    String symbolName(int symbolId);
 
+    void put(int symbolId, String symbol);
+
+    int size();
 }

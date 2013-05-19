@@ -19,8 +19,9 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.core.perfmon.Metric;
 import com.jitlogic.zorka.core.perfmon.MetricTemplate;
-import com.jitlogic.zorka.core.perfmon.MetricsRegistry;
+import com.jitlogic.zorka.core.store.MetricsRegistry;
 import com.jitlogic.zorka.core.perfmon.PerfDataEventHandler;
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.*;
 
 import java.util.List;
@@ -34,7 +35,7 @@ import java.util.Map;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class SymbolEnricher extends PerfDataEventHandler {
+public class SymbolEnricher implements PerfDataEventHandler {
 
     /** Logger object */
     private static final ZorkaLog log = ZorkaLogger.getLog(SymbolEnricher.class);

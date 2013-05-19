@@ -18,7 +18,7 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.core.perfmon.PerfDataEventHandler;
 import com.jitlogic.zorka.core.perfmon.Submittable;
-import com.jitlogic.zorka.core.util.SymbolRegistry;
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.SymbolicException;
 
 import java.util.*;
@@ -114,6 +114,12 @@ public class TraceRecord implements Submittable {
     }
 
 
+    public Map<Integer,Object> getAttrs() {
+        return attrs;
+    }
+
+
+
     /**
      * Sets custom attribute value.
      *
@@ -184,6 +190,9 @@ public class TraceRecord implements Submittable {
         this.calls = calls;
     }
 
+    public void setFlags(int flags) {
+        this.flags = flags;
+    }
 
     public long getErrors() {
         return errors;
@@ -333,6 +342,7 @@ public class TraceRecord implements Submittable {
         marker = parent != null ? parent.getMarker() : null;
         calls = errors = 0;
         flags = 0;
+        exception = null;
     }
 
     public void markFlag(int flag) {

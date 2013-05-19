@@ -17,7 +17,8 @@
 package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.core.perfmon.Submittable;
-import com.jitlogic.zorka.core.util.SymbolRegistry;
+import com.jitlogic.zorka.core.store.SimpleSymbolRegistry;
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.SymbolicException;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 import com.jitlogic.zorka.core.spy.*;
@@ -29,18 +30,22 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.fest.assertions.Assertions.assertThat;
 
 public class TraceBuilderUnitTest extends ZorkaFixture {
 
     private TestTracer output = new TestTracer();
-    private SymbolRegistry symbols = new SymbolRegistry();
+    private SymbolRegistry symbols = new SimpleSymbolRegistry(null);
+    private List<TraceRecord> records = new ArrayList<TraceRecord>();
 
     private TraceBuilder b = new TraceBuilder(
         new TracerOutput() {
-            @Override public void submit(Submittable obj) { obj.traverse(output); }
+            @Override public void submit(Submittable obj) { obj.traverse(output); records.add((TraceRecord)obj); }
         }, symbols);
 
     private static final int MS = 1000000;
@@ -85,7 +90,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     public void testSingleTraceWithOneShortElementAndAlwaysSubmitFlag() throws Exception {
         b.traceEnter(c1, m1, s1, 10 * MS);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
-        b.markTraceFlag(TraceMarker.ALWAYS_SUBMIT);
+        b.markTraceFlag(TraceMarker.SUBMIT_TRACE);
         b.traceReturn(20 * MS);
 
         Assert.assertEquals("Output actions mismatch.",
@@ -537,6 +542,31 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         assertEquals("should record 3 calls", 3L, output.getData().get(2).get("calls"));
         assertEquals("should mark dropped record", TraceRecord.DROPPED_PARENT, output.getData().get(4).get("flags"));
+    }
+
+    @Test
+    public void testProperExceptionCleanupAfterTraceExit() throws Exception {
+
+        tracer.setTracerMinTraceTime(0);
+        tracer.setTracerMinMethodTime(10);
+
+        b.traceError(new Exception("oja!"), 300);
+        b.traceEnter(c1, m1, s1, 100);
+        b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
+        b.traceReturn(200);
+
+        assertThat(records.size()).isEqualTo(1);
+        assertThat(records.get(0).getException()).isNull();
+    }
+
+    @Test
+    public void testTraceDropFlag() throws Exception {
+        b.traceEnter(c1, m1, s1, 10 * MS);
+        b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
+        b.markTraceFlag(TraceMarker.DROP_TRACE);
+        b.traceReturn(20 * MS);
+
+        assertThat(records.size()).isEqualTo(0);
     }
 
 }

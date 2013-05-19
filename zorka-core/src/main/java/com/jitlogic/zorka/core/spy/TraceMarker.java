@@ -25,7 +25,8 @@ public class TraceMarker {
     /** Overflow flag (set if some records in current trace have been skipped). */
     public static final int OVERFLOW_FLAG = 0x01;
 
-    public static final int ALWAYS_SUBMIT = 0x02;
+    /** Always submit trace (regardless of trace execution time etc.). */
+    public static final int SUBMIT_TRACE = 0x02;
 
     public static final int ALL_METHODS = 0x04;
 
@@ -34,6 +35,9 @@ public class TraceMarker {
 
     /** This flag instructs trace builder to log all method calls (on entry and on return/error) */
     public static final int TRACE_CALLS = 0x10;
+
+    /** Always drop trace (regardless of trace execution time etc.). */
+    public static final int DROP_TRACE = 0x20;
 
     /** Trace ID (refers to symbol containing trace name) */
     private int traceId;

@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class TestTracer extends PerfDataEventHandler {
+public class TestTracer implements PerfDataEventHandler {
 
     private List<Map<Object,Object>> data = new ArrayList<Map<Object, Object>>();
 

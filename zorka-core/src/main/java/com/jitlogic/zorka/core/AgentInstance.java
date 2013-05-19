@@ -17,11 +17,13 @@
 package com.jitlogic.zorka.core;
 
 import com.jitlogic.zorka.core.mbeans.AttrGetter;
+import com.jitlogic.zorka.core.store.MetricsRegistry;
 import com.jitlogic.zorka.core.perfmon.PerfMonLib;
+import com.jitlogic.zorka.core.store.SimpleMetricsRegistry;
 import com.jitlogic.zorka.core.spy.*;
-import com.jitlogic.zorka.core.util.ZorkaLog;
-import com.jitlogic.zorka.core.util.ZorkaLogLevel;
-import com.jitlogic.zorka.core.util.ZorkaLogger;
+import com.jitlogic.zorka.core.store.SimpleSymbolRegistry;
+import com.jitlogic.zorka.core.store.SymbolRegistry;
+import com.jitlogic.zorka.core.util.*;
 import com.jitlogic.zorka.core.integ.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.normproc.NormLib;
@@ -244,7 +246,7 @@ public class AgentInstance {
         AgentDiagnostics.initMBean(getMBeanServerRegistry(), mbeanName);
 
         getMBeanServerRegistry().getOrRegister("java", mbeanName, "SymbolsCreated",
-            new AttrGetter(getTracer().getSymbolRegistry(), "size()"));
+            new AttrGetter(getSymbolRegistry(), "size()"));
     }
 
 
@@ -258,6 +260,36 @@ public class AgentInstance {
             translator = new ZabbixQueryTranslator();
         }
         return translator;
+    }
+
+
+    private SpyMatcherSet tracerMatcherSet;
+
+    public synchronized SpyMatcherSet getTracerMatcherSet() {
+        if (tracerMatcherSet == null) {
+            tracerMatcherSet = new SpyMatcherSet();
+        }
+        return tracerMatcherSet;
+    }
+
+
+    private MetricsRegistry metricsRegistry;
+
+    public synchronized  MetricsRegistry getMetricsRegistry() {
+        if (metricsRegistry == null) {
+            metricsRegistry = new SimpleMetricsRegistry(null);
+        }
+        return metricsRegistry;
+    }
+
+
+    private SymbolRegistry symbolRegistry;
+
+    public synchronized SymbolRegistry getSymbolRegistry() {
+        if (symbolRegistry == null) {
+            symbolRegistry = new SimpleSymbolRegistry(null);
+        }
+        return symbolRegistry;
     }
 
 
@@ -283,7 +315,7 @@ public class AgentInstance {
 
     public synchronized Tracer getTracer() {
         if (tracer == null) {
-            tracer = new Tracer();
+            tracer = new Tracer(getTracerMatcherSet(), getSymbolRegistry(), getMetricsRegistry());
             MainSubmitter.setTracer(getTracer());
         }
         return tracer;
@@ -292,7 +324,7 @@ public class AgentInstance {
 
     public synchronized SpyClassTransformer getClassTransformer() {
         if (classTransformer == null) {
-            classTransformer = new SpyClassTransformer(getTracer());
+            classTransformer = new SpyClassTransformer(getSymbolRegistry(), getTracer());
         }
         return classTransformer;
     }
@@ -375,7 +407,7 @@ public class AgentInstance {
      */
     public synchronized TracerLib getTracerLib() {
         if (tracerLib == null) {
-            tracerLib = new TracerLib(getTracer(), config);
+            tracerLib = new TracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config);
         }
         return tracerLib;
     }
@@ -417,7 +449,7 @@ public class AgentInstance {
      */
     public synchronized PerfMonLib getPerfMonLib() {
         if (perfMonLib == null) {
-            perfMonLib = new PerfMonLib(getTracer(), getMBeanServerRegistry());
+            perfMonLib = new PerfMonLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), getMBeanServerRegistry());
         }
         return perfMonLib;
     }

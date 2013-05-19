@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.perfmon;
+package com.jitlogic.zorka.core.store;
 
 
 import com.jitlogic.zorka.core.perfmon.*;
@@ -32,7 +32,7 @@ import java.util.*;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class SimplePerfDataFormat extends PerfDataEventHandler {
+public class SimplePerfDataFormat implements PerfDataEventHandler {
 
     /** Simple format version 1 magic number */
     public static final int MAGIC = 0xcafeb1ba;
@@ -86,25 +86,45 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
 
     public static final byte CAUSE_EXCEPTION = 1;
 
+    public static final int TRACE_MASK   = 0x0001;
+    public static final int SYMBOLS_MASK = 0x0002;
+    public static final int METRICS_MASK = 0x0003;
+
+    public static final int ALL_MASK     = TRACE_MASK | SYMBOLS_MASK | METRICS_MASK;
+
     /** Input/output buffer */
     private ByteBuffer buf;
+
+    private int mask;
+
+    public SimplePerfDataFormat(ByteBuffer buf) {
+        this(buf, ALL_MASK);
+    }
 
     /**
      * Creates simple trace encoder.
      *
      * @param buf output buffer
      */
-    public SimplePerfDataFormat(ByteBuffer buf) {
+    public SimplePerfDataFormat(ByteBuffer buf, int mask) {
         this.buf = buf;
+        this.mask = mask;
     }
+
+
+    public SimplePerfDataFormat(byte[] buf) {
+        this(buf, ALL_MASK);
+    }
+
 
     /**
      * Creates simple trace decoder.
      *
      * @param buf input buffer
      */
-    public SimplePerfDataFormat(byte[] buf) {
+    public SimplePerfDataFormat(byte[] buf, int mask) {
         this.buf = new ByteBuffer(buf);
+        this.mask = mask;
     }
 
 
@@ -119,80 +139,94 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
 
     @Override
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
-        buf.putByte(TRACE_ENTER);
-        buf.putInt(classId);
-        buf.putInt(methodId);
-        buf.putInt(signatureId);
+        if (0 != (mask & TRACE_MASK)) {
+            buf.putByte(TRACE_ENTER);
+            buf.putInt(classId);
+            buf.putInt(methodId);
+            buf.putInt(signatureId);
+        }
     }
 
 
     @Override
     public void traceReturn(long tstamp) {
-        buf.putByte(TRACE_RETURN);
-        buf.putLong(tstamp);
+        if (0 != (mask & TRACE_MASK)) {
+            buf.putByte(TRACE_RETURN);
+            buf.putLong(tstamp);
+        }
     }
 
 
     @Override
     public void traceError(Object exception, long tstamp) {
-        buf.putByte(TRACE_ERROR);
-        if (exception instanceof SymbolicException) {
-            encodeException((SymbolicException)exception);
-        } else {
-            throw new IllegalStateException("Cannot serialize local exception");
+        if (0 != (mask & TRACE_MASK)) {
+            buf.putByte(TRACE_ERROR);
+            if (exception instanceof SymbolicException) {
+                encodeException((SymbolicException)exception);
+            } else {
+                throw new IllegalStateException("Cannot serialize local exception");
+            }
+            buf.putLong(tstamp);
         }
-        buf.putLong(tstamp);
     }
 
 
     @Override
     public void traceStats(long calls, long errors, int flags) {
-        buf.putByte(TRACE_STATS);
-        buf.putLong(calls);
-        buf.putLong(errors);
-        buf.putInt(flags);
+        if (0 != (mask & TRACE_MASK)) {
+            buf.putByte(TRACE_STATS);
+            buf.putLong(calls);
+            buf.putLong(errors);
+            buf.putInt(flags);
+        }
     }
 
 
     @Override
     public void newSymbol(int symbolId, String symbolText) {
-        buf.putByte(NEW_SYMBOL);
-        buf.putInt(symbolId);
-        buf.putString(symbolText);
+        if (0 != (mask & SYMBOLS_MASK)) {
+            buf.putByte(NEW_SYMBOL);
+            buf.putInt(symbolId);
+            buf.putString(symbolText);
+        }
     }
 
 
     @Override
     public void newAttr(int attrId, Object attrVal) {
-        if (attrVal instanceof String) {
-            buf.putByte(STRING_ATTR);
-            buf.putInt(attrId);
-            buf.putString(attrVal.toString());
-        } else if (attrVal instanceof Long) {
-            buf.putByte(LONG_ATTR);
-            buf.putInt(attrId);
-            buf.putLong((Long) attrVal);
-        } else if (attrVal instanceof Integer) {
-            buf.putByte(INTEGER_ATTR);
-            buf.putInt(attrId);
-            buf.putInt((Integer) attrVal);
-        } else if (attrVal instanceof Byte) {
-            buf.putByte(BYTE_ATTR);
-            buf.putInt(attrId);
-            buf.putByte((Byte) attrVal);
-        } else if (attrVal instanceof Short) {
-            buf.putByte(SHORT_ATTR);
-            buf.putInt(attrId);
-            buf.putShort((Short) attrVal);
-        } else {
-            buf.putByte(NULL_ATTR);
-            buf.putInt(attrId);
+        if (0 != (mask & TRACE_MASK)) {
+            if (attrVal instanceof String) {
+                buf.putByte(STRING_ATTR);
+                buf.putInt(attrId);
+                buf.putString(attrVal.toString());
+            } else if (attrVal instanceof Long) {
+                buf.putByte(LONG_ATTR);
+                buf.putInt(attrId);
+                buf.putLong((Long) attrVal);
+            } else if (attrVal instanceof Integer) {
+                buf.putByte(INTEGER_ATTR);
+                buf.putInt(attrId);
+                buf.putInt((Integer) attrVal);
+            } else if (attrVal instanceof Byte) {
+                buf.putByte(BYTE_ATTR);
+                buf.putInt(attrId);
+                buf.putByte((Byte) attrVal);
+            } else if (attrVal instanceof Short) {
+                buf.putByte(SHORT_ATTR);
+                buf.putInt(attrId);
+                buf.putShort((Short) attrVal);
+            } else {
+                buf.putByte(NULL_ATTR);
+                buf.putInt(attrId);
+            }
         }
     }
+
 
     @Override
     public void disable() {
     }
+
 
     @Override
     public void enable() {
@@ -201,71 +235,75 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
 
     @Override
     public void perfData(long clock, int scannerId, List<PerfSample> samples) {
-        buf.putByte(PERF_DATA);
-        buf.putLong(clock);
-        buf.putInt(scannerId);
-        buf.putInt(samples.size());
+        if (0 != (mask & METRICS_MASK)) {
+            buf.putByte(PERF_DATA);
+            buf.putLong(clock);
+            buf.putInt(scannerId);
+            buf.putInt(samples.size());
 
-        for (PerfSample sample : samples) {
-            int type = sample.getType();
+            for (PerfSample sample : samples) {
+                int type = sample.getType();
 
-            buf.putByte((byte)type);
-            buf.putInt(sample.getMetricId());
+                buf.putByte((byte)type);
+                buf.putInt(sample.getMetricId());
 
-            switch (type) {
-                case PerfSample.LONG_SAMPLE:
-                    buf.putLong((Long)sample.getValue());
-                    break;
-                case PerfSample.DOUBLE_SAMPLE:
-                    buf.putDouble((Double)sample.getValue());
-                    break;
-            }
-
-            Map<Integer, String> attrs = sample.getAttrs();
-            if (attrs != null) {
-                buf.putByte((byte) attrs.size());
-                for (Map.Entry<Integer,String> e : attrs.entrySet()) {
-                    buf.putInt(e.getKey());
-                    buf.putString(e.getValue());
+                switch (type) {
+                    case PerfSample.LONG_SAMPLE:
+                        buf.putLong((Long)sample.getValue());
+                        break;
+                    case PerfSample.DOUBLE_SAMPLE:
+                        buf.putDouble((Double)sample.getValue());
+                        break;
                 }
-            } else {
-                buf.putByte((byte)0);
+
+                Map<Integer, String> attrs = sample.getAttrs();
+                if (attrs != null) {
+                    buf.putByte((byte) attrs.size());
+                    for (Map.Entry<Integer,String> e : attrs.entrySet()) {
+                        buf.putInt(e.getKey());
+                        buf.putString(e.getValue());
+                    }
+                } else {
+                    buf.putByte((byte)0);
+                }
             }
         }
     }
-
 
 
     @Override
     public void newMetricTemplate(MetricTemplate template) {
-        buf.putByte(NEW_TEMPLATE);
-        buf.putInt(template.getId());
-        buf.putByte((byte) template.getType());
-        buf.putString(template.getName());
-        buf.putString(template.getUnits());
-        buf.putString(template.getNomField());
-        buf.putString(template.getDivField());
-        buf.putDouble(template.getMultiplier());
-        buf.putByte((byte) template.getDynamicAttrs().size());
+        if (0 != (mask & METRICS_MASK)) {
+            buf.putByte(NEW_TEMPLATE);
+            buf.putInt(template.getId());
+            buf.putByte((byte) template.getType());
+            buf.putString(template.getName());
+            buf.putString(template.getUnits());
+            buf.putString(template.getNomField());
+            buf.putString(template.getDivField());
+            buf.putDouble(template.getMultiplier());
+            buf.putByte((byte) template.getDynamicAttrs().size());
 
-        for (String attr : template.getDynamicAttrs()) {
-            buf.putString(attr);
+            for (String attr : template.getDynamicAttrs()) {
+                buf.putString(attr);
+            }
         }
-
     }
 
     @Override
     public void newMetric(Metric metric) {
-        buf.putByte(NEW_METRIC);
-        buf.putByte((byte) metric.getTemplate().getType());
-        buf.putInt(metric.getId());
-        buf.putInt(metric.getTemplate().getId());
-        buf.putString(metric.getName());
-        buf.putByte((byte)metric.getAttrs().size());
+        if (0 != (mask & METRICS_MASK)) {
+            buf.putByte(NEW_METRIC);
+            buf.putByte((byte) metric.getTemplate().getType());
+            buf.putInt(metric.getId());
+            buf.putInt(metric.getTemplate().getId());
+            buf.putString(metric.getName());
+            buf.putByte((byte)metric.getAttrs().size());
 
-        for (Map.Entry<String,Object> e : metric.getAttrs().entrySet()) {
-            buf.putString(e.getKey());
-            buf.putString(e.getValue().toString());
+            for (Map.Entry<String,Object> e : metric.getAttrs().entrySet()) {
+                buf.putString(e.getKey());
+                buf.putString(e.getValue().toString());
+            }
         }
     }
 
@@ -301,7 +339,9 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
                 break;
         }
 
-        output.newMetric(metric);
+        if (0 != (mask & METRICS_MASK)) {
+            output.newMetric(metric);
+        }
     }
 
 
@@ -315,24 +355,56 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
         while (!buf.eof()) {
             byte cmd = buf.getByte();
             switch (cmd) {
-                case TRACE_BEGIN:
-                    output.traceBegin(buf.getInt(), buf.getLong(), buf.getInt());
+                case TRACE_BEGIN: {
+                    int traceId = buf.getInt();
+                    long clock = buf.getLong();
+                    int flags = buf.getInt();
+                    if (0 != (mask & TRACE_MASK)) {
+                        output.traceBegin(traceId, clock, flags);
+                    }
                     break;
-                case TRACE_ENTER:
-                    output.traceEnter(buf.getInt(), buf.getInt(), buf.getInt(), 0);
+                }
+                case TRACE_ENTER: {
+                    int classId = buf.getInt();
+                    int methodId = buf.getInt();
+                    int signatureId = buf.getInt();
+                    if (0 != (mask & TRACE_MASK)) {
+                        output.traceEnter(classId, methodId, signatureId, 0);
+                    }
                     break;
-                case TRACE_RETURN:
-                    output.traceReturn(buf.getLong());
+                }
+                case TRACE_RETURN: {
+                    long tstamp = buf.getLong();
+                    if (0 != (mask & TRACE_MASK)) {
+                        output.traceReturn(tstamp);
+                    }
                     break;
-                case TRACE_ERROR:
-                    output.traceError(decodeException(), buf.getLong());
+                }
+                case TRACE_ERROR: {
+                    SymbolicException exception = decodeException();
+                    long tstamp = buf.getLong();
+                    if (0 != (mask & TRACE_MASK)) {
+                        output.traceError(exception, tstamp);
+                    }
                     break;
-                case TRACE_STATS:
-                    output.traceStats(buf.getLong(), buf.getLong(), buf.getInt());
+                }
+                case TRACE_STATS: {
+                    long calls = buf.getLong();
+                    long errors = buf.getLong();
+                    int flags = buf.getInt();
+                    if (0 != (mask & TRACE_MASK)) {
+                        output.traceStats(calls, errors, flags);
+                    }
                     break;
-                case NEW_SYMBOL:
-                    output.newSymbol(buf.getInt(), buf.getString());
+                }
+                case NEW_SYMBOL: {
+                    int symbolId = buf.getInt();
+                    String symbolText = buf.getString();
+                    if (0 != (mask & SYMBOLS_MASK)) {
+                        output.newSymbol(symbolId, symbolText);
+                    }
                     break;
+                }
                 case NEW_TEMPLATE:
                     decodeTemplate(output);
                     break;
@@ -342,24 +414,53 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
                 case PERF_DATA:
                     decodePerfData(output);
                     break;
-                case NULL_ATTR:
-                    output.newAttr(buf.getInt(), null);
+                case NULL_ATTR: {
+                    int attrId = buf.getInt();
+                    if (0 != (mask & TRACE_MASK)) {
+                        output.newAttr(attrId, null);
+                    }
                     break;
-                case BYTE_ATTR:
-                    output.newAttr(buf.getInt(), buf.getByte());
+                }
+                case BYTE_ATTR: {
+                    int attrId = buf.getInt();
+                    byte attrVal = buf.getByte();
+                    if (0 != (mask & TRACE_MASK)) {
+                        output.newAttr(attrId, attrVal);
+                    }
                     break;
-                case SHORT_ATTR:
-                    output.newAttr(buf.getInt(), buf.getShort());
+                }
+                case SHORT_ATTR: {
+                    int attrId = buf.getInt();
+                    short attrVal = buf.getShort();
+                    if (0 != (mask & TRACE_MASK)) {
+                        output.newAttr(attrId, attrVal);
+                    }
                     break;
-                case INTEGER_ATTR:
-                    output.newAttr(buf.getInt(), buf.getInt());
+                }
+                case INTEGER_ATTR: {
+                    int attrId = buf.getInt();
+                    int attrVal = buf.getInt();
+                    if (0 != (mask & TRACE_MASK)) {
+                        output.newAttr(attrId, attrVal);
+                    }
                     break;
-                case LONG_ATTR:
-                    output.newAttr(buf.getInt(), buf.getLong());
+                }
+                case LONG_ATTR: {
+                    int attrId = buf.getInt();
+                    long attrVal = buf.getLong();
+                    if (0 != (mask & TRACE_MASK)) {
+                        output.newAttr(attrId, attrVal);
+                    }
                     break;
-                case STRING_ATTR:
-                    output.newAttr(buf.getInt(), buf.getString());
+                }
+                case STRING_ATTR: {
+                    int attrId = buf.getInt();
+                    String attrVal = buf.getString();
+                    if (0 != (mask & TRACE_MASK)) {
+                        output.newAttr(attrId, attrVal);
+                    }
                     break;
+                }
                 default:
                     throw new IllegalArgumentException("Invalid prefix: " + cmd);
             }
@@ -380,6 +481,10 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
 
         for (int i = 0; i < nattr; i++) {
             mt = mt.dynamicAttrs(buf.getString());
+        }
+
+        if (0 != (mask & METRICS_MASK)) {
+            output.newMetricTemplate(mt);
         }
     }
 
@@ -409,7 +514,9 @@ public class SimplePerfDataFormat extends PerfDataEventHandler {
             samples.add(sample);
         }
 
-        output.perfData(clock, scannerId, samples);
+        if (0 != (mask & METRICS_MASK)) {
+            output.perfData(clock, scannerId, samples);
+        }
     }
 
 

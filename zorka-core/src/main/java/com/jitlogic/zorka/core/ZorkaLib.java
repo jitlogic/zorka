@@ -516,8 +516,8 @@ public class ZorkaLib  {
      *
      * @param mask file name or file mask.
      */
-    public void reload(String mask) {
-        agent.loadScriptDir(config.getConfDir(),
+    public String reload(String mask) {
+        return agent.loadScriptDir(config.getConfDir(),
                 "^" + mask.replace("\\.", "\\\\.").replace("*", ".*") + "$");
     }
 
@@ -884,4 +884,7 @@ public class ZorkaLib  {
         }
     }
 
+    public Set<Object> set(Object...objs) {
+        return ZorkaUtil.set(objs);
+    }
 }

@@ -19,7 +19,7 @@ package com.jitlogic.zorka.viewer;
 import com.jitlogic.zorka.core.perfmon.Metric;
 import com.jitlogic.zorka.core.perfmon.MetricTemplate;
 import com.jitlogic.zorka.core.perfmon.PerfDataEventHandler;
-import com.jitlogic.zorka.core.perfmon.SimplePerfDataFormat;
+import com.jitlogic.zorka.core.store.SimplePerfDataFormat;
 import com.jitlogic.zorka.core.util.*;
 
 import java.io.*;
@@ -33,7 +33,7 @@ import java.util.Map;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class PerfDataSet extends PerfDataEventHandler {
+public class PerfDataSet implements PerfDataEventHandler {
 
     /** Symbol map */
     private Map<Integer,String> symbols = new HashMap<Integer, String>(4096);

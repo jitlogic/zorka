@@ -14,7 +14,12 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.util;
+package com.jitlogic.zorka.core.store;
+
+import com.jitlogic.zorka.core.util.ByteBuffer;
+import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.core.util.ZorkaLog;
+import com.jitlogic.zorka.core.util.ZorkaLogger;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -26,10 +31,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class SymbolRegistry {
+public class SimpleSymbolRegistry implements SymbolRegistry {
 
     /** Logger */
-    private static final ZorkaLog log = ZorkaLogger.getLog(SymbolRegistry.class);
+    private static final ZorkaLog log = ZorkaLogger.getLog(SimpleSymbolRegistry.class);
 
     /** ID of last symbol added to registry. */
     private AtomicInteger lastSymbolId = new AtomicInteger(0);
@@ -40,6 +45,13 @@ public class SymbolRegistry {
     /** Symbol ID to name map */
     private ConcurrentHashMap<Integer,String> symbolNames = new ConcurrentHashMap<Integer,String>();
 
+    private ZorkaAsyncThread<byte[]> output;
+
+
+    public SimpleSymbolRegistry(ZorkaAsyncThread<byte[]> output) {
+        this.output = output;
+    }
+
     /**
      * Returns ID of named symbol. If symbol hasn't been registered yet,
      * it will be and new ID will be assigned for it.
@@ -48,6 +60,7 @@ public class SymbolRegistry {
      *
      * @return symbol ID (integer)
      */
+    @Override
     public int symbolId(String symbol) {
 
         if (symbol == null) {
@@ -64,6 +77,11 @@ public class SymbolRegistry {
             id = symbolIds.putIfAbsent(symbol, newid);
             if (id == null) {
                 symbolNames.put(newid, symbol);
+                if (output != null) {
+                    ByteBuffer buf = new ByteBuffer(128);
+                    new SimplePerfDataFormat(buf).newSymbol(newid, symbol);
+                    output.submit(buf.getContent());
+                }
                 id = newid;
             }
         }
@@ -79,6 +97,7 @@ public class SymbolRegistry {
      *
      * @return symbol name
      */
+    @Override
     public String symbolName(int symbolId) {
         if (symbolId == 0) {
             return "<null>";
@@ -94,6 +113,7 @@ public class SymbolRegistry {
      *
      * @param symbol symbol name
      */
+    @Override
     public void put(int symbolId, String symbol) {
 
         log.debug(ZorkaLogger.ZTR_SYMBOL_REGISTRY, "Putting symbol '%s', newid=%s", symbol, symbolId);
@@ -101,12 +121,19 @@ public class SymbolRegistry {
         symbolIds.put(symbol, symbolId);
         symbolNames.put(symbolId, symbol);
 
+        if (output != null) {
+            ByteBuffer buf = new ByteBuffer(128);
+            new SimplePerfDataFormat(buf).newSymbol(symbolId, symbol);
+            output.submit(buf.getContent());
+        }
+
         // TODO not thread safe !
         if (symbolId > lastSymbolId.get()) {
             lastSymbolId.set(symbolId);
         }
     }
 
+    @Override
     public int size() {
         return symbolIds.size();
     }
