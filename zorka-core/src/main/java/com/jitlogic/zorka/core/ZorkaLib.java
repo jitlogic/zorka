@@ -884,4 +884,7 @@ public class ZorkaLib  {
         }
     }
 
+    public Set<Object> set(Object...objs) {
+        return ZorkaUtil.set(objs);
+    }
 }

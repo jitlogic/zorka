@@ -23,6 +23,7 @@ import com.jitlogic.zorka.core.util.OverlayClassLoader;
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * Tracer library contains functions for configuring and using tracer.
@@ -31,7 +32,7 @@ import java.io.IOException;
  */
 public class TracerLib {
 
-    public static final int ALWAYS_SUBMIT = TraceMarker.ALWAYS_SUBMIT;
+    public static final int ALWAYS_SUBMIT = TraceMarker.SUBMIT_TRACE;
     public static final int ALL_METHODS = TraceMarker.ALL_METHODS;
     public static final int DROP_INTERIM = TraceMarker.DROP_INTERIM;
     public static final int TRACE_CALLS = TraceMarker.TRACE_CALLS;
@@ -213,6 +214,16 @@ public class TracerLib {
         }
     }
 
+
+    public SpyProcessor filterBy(String srcField, Boolean defval, Set<Object> yes, Set<Object> no, Set<Object> maybe) {
+        return new TraceFilterProcessor(tracer, srcField, defval, yes, no, maybe);
+    }
+
+
+    public void filterTrace(boolean decision) {
+        TraceBuilder builder = (TraceBuilder)tracer.getHandler();
+        builder.markTraceFlag(decision ? TraceMarker.SUBMIT_TRACE : TraceMarker.DROP_TRACE);
+    }
 
 
     /**

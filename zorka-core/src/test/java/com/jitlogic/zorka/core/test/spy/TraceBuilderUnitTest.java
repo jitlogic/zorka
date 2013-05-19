@@ -90,7 +90,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     public void testSingleTraceWithOneShortElementAndAlwaysSubmitFlag() throws Exception {
         b.traceEnter(c1, m1, s1, 10 * MS);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
-        b.markTraceFlag(TraceMarker.ALWAYS_SUBMIT);
+        b.markTraceFlag(TraceMarker.SUBMIT_TRACE);
         b.traceReturn(20 * MS);
 
         Assert.assertEquals("Output actions mismatch.",
@@ -557,6 +557,16 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         assertThat(records.size()).isEqualTo(1);
         assertThat(records.get(0).getException()).isNull();
+    }
+
+    @Test
+    public void testTraceDropFlag() throws Exception {
+        b.traceEnter(c1, m1, s1, 10 * MS);
+        b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
+        b.markTraceFlag(TraceMarker.DROP_TRACE);
+        b.traceReturn(20 * MS);
+
+        assertThat(records.size()).isEqualTo(0);
     }
 
 }

@@ -209,8 +209,9 @@ public class TraceBuilder implements TraceEventHandler {
 
         // Submit data if trace marker found
         if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {
-            if (ttop.getTime() >= ttop.getMarker().getMinimumTime()
-                    || 0 != (ttop.getMarker().getFlags() & TraceMarker.ALWAYS_SUBMIT)) {
+            int flags = ttop.getMarker().getFlags();
+            if ( (ttop.getTime() >= ttop.getMarker().getMinimumTime() && 0 == (flags & TraceMarker.DROP_TRACE))
+                    || 0 != (flags & TraceMarker.SUBMIT_TRACE)) {
                 submit(ttop);
                 AgentDiagnostics.inc(AgentDiagnostics.TRACES_SUBMITTED);
                 clean = false;
