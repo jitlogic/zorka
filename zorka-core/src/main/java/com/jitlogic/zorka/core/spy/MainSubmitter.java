@@ -39,6 +39,12 @@ public class MainSubmitter {
     /** Tracer receiving trace events */
     private static Tracer tracer;
 
+    /** Thread local  */
+    private static ThreadLocal<Boolean> inSubmit = new ThreadLocal<Boolean>() {
+        public Boolean initialValue() {
+            return false;
+        }
+    };
 
     /**
      * This method is called by spy probes.
@@ -52,9 +58,15 @@ public class MainSubmitter {
      * @param vals values fetched by probe
      */
     public static void submit(int stage, int id, int submitFlags, Object[] vals) {
+
+        if (inSubmit.get()) {
+            return;
+        }
+
         try {
             tracer.getHandler().disable();
             if (submitter != null) {
+                inSubmit.set(true);
                 submitter.submit(stage, id, submitFlags, vals);
             }
         } catch (EvalError e) {
@@ -64,6 +76,7 @@ public class MainSubmitter {
             log.debug(ZorkaLogger.ZSP_ERRORS, "Error submitting value from instrumented code: ", e);
             AgentDiagnostics.inc(AgentDiagnostics.SPY_ERRORS);
         } finally {
+            inSubmit.set(false);
             tracer.getHandler().enable();
         }
     }
