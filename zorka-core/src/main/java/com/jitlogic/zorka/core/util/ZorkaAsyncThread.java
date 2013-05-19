@@ -15,7 +15,10 @@
  */
 package com.jitlogic.zorka.core.util;
 
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -23,6 +26,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Implements asunchronous processing thread with submit queue.
  *
  * @param <T> type of elements in a queue
+ *
+ * TODO factor out direct processing functionality (exposing process(), flush(), open(), close() etc.)
  */
 public abstract class ZorkaAsyncThread<T> implements Runnable {
 
@@ -30,7 +35,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
     protected final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     /** Submit queue */
-    private final LinkedBlockingQueue<T> submitQueue = new LinkedBlockingQueue<T>(1024);
+    private final BlockingQueue<T> submitQueue = new ArrayBlockingQueue<T>(256);
 
     /** Thred name (will be prefixed with ZORKA-) */
     private final String name;
@@ -40,8 +45,6 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
 
     /** Thread object representing actual processing thread. */
     private Thread thread;
-
-    private boolean flushNeeded;
 
     protected boolean countTraps = true;
 
@@ -98,15 +101,15 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
      */
     private void runCycle() {
         try {
-            T obj = submitQueue.poll(10, TimeUnit.MILLISECONDS);
+            T obj = submitQueue.take();
             if (obj != null) {
                 process(obj);
-                flushNeeded = true;
-            } else {
-                if (flushNeeded) {
-                    flush();
-                    flushNeeded = false;
+                List<T> lst = new ArrayList<T>(submitQueue.size());
+                submitQueue.drainTo(lst);
+                for (T o : lst) {
+                    process(o);
                 }
+                flush();
             }
         } catch (InterruptedException e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Cannot perform run cycle", e);
@@ -120,7 +123,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
      */
     public boolean submit(T obj) {
         try {
-            return submitQueue.offer(obj, 0, TimeUnit.MILLISECONDS);
+            return submitQueue.offer(obj, 1, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             return false;
         }

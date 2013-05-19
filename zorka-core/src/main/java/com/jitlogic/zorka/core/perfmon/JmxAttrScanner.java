@@ -19,6 +19,8 @@ package com.jitlogic.zorka.core.perfmon;
 import com.jitlogic.zorka.core.AgentDiagnostics;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.spy.TracerOutput;
+import com.jitlogic.zorka.core.store.MetricsRegistry;
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.*;
 
 import java.util.ArrayList;
@@ -86,30 +88,30 @@ public class JmxAttrScanner implements Runnable {
         if (metric == null) {
             switch (template.getType()) {
                 case MetricTemplate.RAW_DATA:
-                    metric = new RawDataMetric(template, result.attrSet());
+                    metric = metricsRegistry.getMetric(new RawDataMetric(template, result.attrSet()));
                     break;
                 case MetricTemplate.RAW_DELTA:
-                    metric = new RawDeltaMetric(template, result.attrSet());
+                    metric = metricsRegistry.getMetric(new RawDeltaMetric(template, result.attrSet()));
                     break;
                 case MetricTemplate.TIMED_DELTA:
-                    metric = new TimedDeltaMetric(template, result.attrSet());
+                    metric = metricsRegistry.getMetric(new TimedDeltaMetric(template, result.attrSet()));
                     break;
                 case MetricTemplate.WINDOWED_RATE:
-                    metric = new WindowedRateMetric(template, result.attrSet());
+                    metric = metricsRegistry.getMetric(new WindowedRateMetric(template, result.attrSet()));
                     break;
                 case MetricTemplate.UTILIZATION:
-                    metric = new UtilizationMetric(template, result.attrSet());
+                    metric = metricsRegistry.getMetric(new UtilizationMetric(template, result.attrSet()));
                     break;
                 default:
                     return null;
             }
 
             if (template.getId() == 0) {
-                metricsRegistry.templateId(template);
+                metricsRegistry.getTemplate(template);
             }
 
             template.putMetric(key, metric);
-            metricsRegistry.metricId(metric);
+            metricsRegistry.getMetric(metric);
 
             if (template.getDynamicAttrs().size() > 0) {
                 Map<String,Integer> dynamicAttrs = new HashMap<String,Integer>();

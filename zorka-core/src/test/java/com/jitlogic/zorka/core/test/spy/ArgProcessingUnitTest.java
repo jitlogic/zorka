@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
+import static org.fest.assertions.Assertions.assertThat;
 
 public class ArgProcessingUnitTest extends ZorkaFixture {
 
@@ -305,6 +306,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         assertEquals(3, rec.get("S"));
     }
 
+
     @Test
     public void testThreadLocalReset() {
         ThreadLocal tl = new ThreadLocal();
@@ -312,5 +314,16 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         ThreadLocalProcessor tp = new ThreadLocalProcessor(null, ThreadLocalProcessor.REMOVE, tl);
         tp.process(new HashMap<String,Object>());
         assertNull(tl.get());
+    }
+
+
+    @Test
+    public void testFilterDecider() {
+        TraceFilterProcessor p = (TraceFilterProcessor)tracer.filterBy("TEST", false,
+                zorka.set(100, 200), zorka.set(500, 503), zorka.set(401, 404));
+        assertThat(p.decide(100)).isTrue();
+        assertThat(p.decide(500)).isFalse();
+        assertThat(p.decide(401)).isNull();
+        assertThat(p.decide(403)).isFalse();
     }
 }

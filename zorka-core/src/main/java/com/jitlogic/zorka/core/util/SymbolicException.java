@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.core.util;
 
+import com.jitlogic.zorka.core.store.SymbolRegistry;
+
 /**
  * Represents exception in symbolic form (suitable to be saved into trace file
  * and restored by trace reader without need to actually have this exact exception

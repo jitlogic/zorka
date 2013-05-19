@@ -20,7 +20,8 @@ import com.jitlogic.zorka.core.util.ZorkaLogger;
 import com.jitlogic.zorka.core.util.ZorkaUtil;
 
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -50,7 +51,7 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
     private AtomicLong droppedRecords;
 
     /** Processing queue */
-    private LinkedBlockingQueue<Map<String,Object>> procQueue = new LinkedBlockingQueue<Map<String,Object>>(1024);
+    private BlockingQueue<Map<String,Object>> procQueue = new ArrayBlockingQueue<Map<String,Object>>(128);
 
     /** Records attributes to be copied */
     private final String[] attrs;
@@ -157,7 +158,7 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
     public void run() {
         while (running) {
             try {
-                doProcess(procQueue.poll(10, TimeUnit.MILLISECONDS));
+                doProcess(procQueue.take());
             } catch (InterruptedException e) { }
         }
     }

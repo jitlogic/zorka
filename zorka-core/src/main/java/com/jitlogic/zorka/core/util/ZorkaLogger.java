@@ -82,8 +82,17 @@ public class ZorkaLogger implements ZorkaTrapper {
     public static final long ZAG_DEBUG      = ZAG_INFO | ZAG_QUERIES;
     public static final long ZAG_TRACE      = ZAG_DEBUG | ZAG_TRACES;
 
+    /** Collector log flags */
+    public static final long ZCL_NONE       = 0x0000000000L;
+    public static final long ZCL_CONFIG     = 0x0100000000L;
+    public static final long ZCL_WARNINGS   = 0x2000000000L;
+    public static final long ZCL_ERRORS     = 0x4000000000L;
+    public static final long ZCL_INFO       = ZCL_CONFIG|ZCL_WARNINGS|ZCL_ERRORS;
+    public static final long ZCL_DEBUG      = ZCL_INFO;
+    public static final long ZCL_TRACE      = ZCL_INFO;
+
     /** Default perfmon log verbosity */
-    private static long logLevel = ZTR_INFO | ZPM_INFO | ZSP_INFO | ZAG_INFO;
+    private static long logLevel = ZTR_INFO | ZPM_INFO | ZSP_INFO | ZAG_INFO | ZCL_INFO;
 
     /**
      * Returns true if tracer is configured to log at given level
@@ -181,7 +190,8 @@ public class ZorkaLogger implements ZorkaTrapper {
         logLevel = parse("zorka.log.tracer", "ZTR", properties.getProperty("zorka.log.tracer",  "INFO"))
                 | parse("zorka.log.perfmon", "ZPM", properties.getProperty("zorka.log.perfmon", "INFO"))
                 | parse("zorka.log.spy",     "ZSP", properties.getProperty("zorka.log.spy",     "INFO"))
-                | parse("zorka.log.agent",   "ZAG", properties.getProperty("zorka.log.agent",   "INFO"));
+                | parse("zorka.log.agent",   "ZAG", properties.getProperty("zorka.log.agent",   "INFO"))
+                | parse("zorka.log.collect", "ZCL", properties.getProperty("zorka.log.collect", "INFO"));
     }
 
 

@@ -18,7 +18,7 @@ package com.jitlogic.zorka.core.spy;
 
 
 import com.jitlogic.zorka.core.AgentDiagnostics;
-import com.jitlogic.zorka.core.util.SymbolRegistry;
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.TraceEventHandler;
 import com.jitlogic.zorka.core.util.ZorkaLog;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
@@ -29,7 +29,7 @@ import com.jitlogic.zorka.core.util.ZorkaLogger;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TraceBuilder extends TraceEventHandler {
+public class TraceBuilder implements TraceEventHandler {
 
     private final static ZorkaLog log = ZorkaLogger.getLog(TraceBuilder.class);
 
@@ -209,8 +209,9 @@ public class TraceBuilder extends TraceEventHandler {
 
         // Submit data if trace marker found
         if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {
-            if (ttop.getTime() >= ttop.getMarker().getMinimumTime()
-                    || 0 != (ttop.getMarker().getFlags() & TraceMarker.ALWAYS_SUBMIT)) {
+            int flags = ttop.getMarker().getFlags();
+            if ( (ttop.getTime() >= ttop.getMarker().getMinimumTime() && 0 == (flags & TraceMarker.DROP_TRACE))
+                    || 0 != (flags & TraceMarker.SUBMIT_TRACE)) {
                 submit(ttop);
                 AgentDiagnostics.inc(AgentDiagnostics.TRACES_SUBMITTED);
                 clean = false;

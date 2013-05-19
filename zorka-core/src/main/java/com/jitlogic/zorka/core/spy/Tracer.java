@@ -16,8 +16,9 @@
 
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.core.perfmon.MetricsRegistry;
+import com.jitlogic.zorka.core.store.MetricsRegistry;
 import com.jitlogic.zorka.core.perfmon.Submittable;
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.*;
 
 import java.util.ArrayList;
@@ -33,14 +34,22 @@ public class Tracer implements TracerOutput {
     /** Minimum default method execution time required to attach method to trace. */
     private static long minMethodTime = 250000;
 
-    /** Minimum trace exetuion time required to further process trace */
+    /** Minimum trace execution time required to further process trace */
     private static long minTraceTime = 50000000;
 
     /** Maximum number of records inside trace */
     private static int maxTraceRecords = 4096;
 
-
     private List<ZorkaAsyncThread<Submittable>> outputs = new ArrayList<ZorkaAsyncThread<Submittable>>();
+
+    /** Defines which classes and methods should be traced. */
+    private SpyMatcherSet matcherSet;
+
+    /** Symbol registry containing names of all symbols tracer knows about. */
+    private SymbolRegistry symbolRegistry;
+
+    private MetricsRegistry metricsRegistry;
+
 
     public static long getMinMethodTime() {
         return minMethodTime;
@@ -71,16 +80,6 @@ public class Tracer implements TracerOutput {
         maxTraceRecords = traceSize;
     }
 
-
-    /** Defines which classes and methods should be traced. */
-    private SpyMatcherSet matcherSet = new SpyMatcherSet();
-
-    /** Symbol registry containing names of all symbols tracer knows about. */
-    private SymbolRegistry symbolRegistry = new SymbolRegistry();
-
-    private MetricsRegistry metricsRegistry = new MetricsRegistry();
-
-
     /** Thread local serving trace builder objects for application threads */
     private ThreadLocal<TraceEventHandler> localHandlers =
         new ThreadLocal<TraceEventHandler>() {
@@ -88,6 +87,13 @@ public class Tracer implements TracerOutput {
                 return new TraceBuilder(Tracer.this, symbolRegistry);
             }
         };
+
+
+    public Tracer(SpyMatcherSet matcherSet, SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry) {
+        this.matcherSet = matcherSet;
+        this.symbolRegistry = symbolRegistry;
+        this.metricsRegistry = metricsRegistry;
+    }
 
     /**
      * Returns trace even handler receiving events from local application thread.
@@ -97,17 +103,6 @@ public class Tracer implements TracerOutput {
     public TraceEventHandler getHandler() {
         return localHandlers.get();
     }
-
-
-    public SymbolRegistry getSymbolRegistry() {
-        return symbolRegistry;
-    }
-
-
-    public MetricsRegistry getMetricsRegistry() {
-        return metricsRegistry;
-    }
-
 
     /**
      * Adds new matcher that includes (or excludes) classes and method to be traced.

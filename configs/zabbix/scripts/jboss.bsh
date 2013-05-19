@@ -70,6 +70,10 @@ __jboss() {
           zorka.registerMbs("jboss", mbs, ccl);
           super.jbossMbs = mbs;
           zorka.logInfo("Registered JBoss MBean server as 'jboss'");
+          if (zorka.boolCfg("jboss.dsquery", false)) {
+            super.super.dsquery = __dsquery(ccl);
+            zorka.logInfo("Created jboss.dsquery JDBC DataSource interface.");
+          }
         }
       }
       return record;

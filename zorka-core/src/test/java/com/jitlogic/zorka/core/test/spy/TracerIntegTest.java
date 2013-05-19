@@ -35,7 +35,7 @@ public class TracerIntegTest extends ZorkaFixture {
     private ZorkaAsyncThread<Submittable> output;
 
     private int sym(String s) {
-        return agentInstance.getTracer().getSymbolRegistry().symbolId(s);
+        return agentInstance.getSymbolRegistry().symbolId(s);
     }
 
     @Before

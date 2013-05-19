@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.core.util;
 
+import com.jitlogic.zorka.core.store.SymbolRegistry;
+
 public class SymbolicStackElement {
 
     private int classId;

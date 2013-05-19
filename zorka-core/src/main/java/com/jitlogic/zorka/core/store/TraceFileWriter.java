@@ -14,11 +14,10 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.perfmon.MetricsRegistry;
-import com.jitlogic.zorka.core.perfmon.SimplePerfDataFormat;
 import com.jitlogic.zorka.core.perfmon.Submittable;
+import com.jitlogic.zorka.core.spy.SymbolEnricher;
 import com.jitlogic.zorka.core.util.*;
 
 import java.io.*;
@@ -62,18 +61,6 @@ public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
 
     /** Current trace file size. */
     private long curSize;
-
-
-    /**
-     * Creates trace file writer.
-     *
-     * @param path path to trace file
-     *
-     * @param symbols symbol registry containing symbols from incoming traces
-     */
-//    public TraceFileWriter(String path, SymbolRegistry symbols, MetricsRegistry metricsRegistry) {
-//        this(path, symbols, metricsRegistry, 8, 8 * 1024 * 1024);
-//    }
 
 
     /**

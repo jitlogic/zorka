@@ -19,7 +19,8 @@ package com.jitlogic.zorka.core.perfmon;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.mbeans.MethodCallStatistic;
 import com.jitlogic.zorka.core.spy.Tracer;
-import com.jitlogic.zorka.core.util.SymbolRegistry;
+import com.jitlogic.zorka.core.store.MetricsRegistry;
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 
 public class PerfMonLib {
 
@@ -33,35 +34,35 @@ public class PerfMonLib {
 
     private MBeanServerRegistry mbsRegistry;
 
-    public PerfMonLib(Tracer tracer, MBeanServerRegistry mbsRegistry) {
+    public PerfMonLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, MBeanServerRegistry mbsRegistry) {
         this.tracer = tracer;
         this.mbsRegistry = mbsRegistry;
-        this.symbolRegistry = tracer.getSymbolRegistry();
-        this.metricsRegistry = tracer.getMetricsRegistry();
+        this.symbolRegistry = symbolRegistry;
+        this.metricsRegistry = metricsRegistry;
     }
 
 
     public MetricTemplate metric(String name, String units) {
-        return new MetricTemplate(MetricTemplate.RAW_DATA, name, units);
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.RAW_DATA, name, units));
     }
 
 
     public MetricTemplate timedDelta(String name, String units) {
-        return new MetricTemplate(MetricTemplate.TIMED_DELTA, name, units);
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.TIMED_DELTA, name, units));
     }
 
 
     public MetricTemplate delta(String name, String units) {
-        return new MetricTemplate(MetricTemplate.RAW_DELTA, name, units);
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.RAW_DELTA, name, units));
     }
 
 
     public MetricTemplate rate(String name, String units, String nom, String div) {
-        return new MetricTemplate(MetricTemplate.WINDOWED_RATE, name, units, nom, div);
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.WINDOWED_RATE, name, units, nom, div));
     }
 
     public MetricTemplate util(String name, String units, String nom, String div) {
-        return new MetricTemplate(MetricTemplate.UTILIZATION, name, units, nom, div);
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.UTILIZATION, name, units, nom, div));
     }
 
     /**
