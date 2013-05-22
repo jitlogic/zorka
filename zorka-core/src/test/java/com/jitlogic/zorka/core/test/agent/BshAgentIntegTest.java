@@ -67,7 +67,8 @@ public class BshAgentIntegTest extends ZorkaFixture {
 
 	@Test
 	public void testJmxCalls() throws Exception {
-		Object obj = execute( "zorka.jmx(\"java\",\"java.lang:type=Runtime\",\"SpecVersion\")", 1000);
+        mBeanServerRegistry.register("java", java.lang.management.ManagementFactory.getPlatformMBeanServer(), null);
+        Object obj = execute( "zorka.jmx(\"java\",\"java.lang:type=Runtime\",\"SpecVersion\")", 1000);
 		//assertEquals("1.0", obj);
         assertTrue(obj instanceof String);
 	}

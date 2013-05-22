@@ -68,8 +68,11 @@ public class ZabbixAgentIntegTest {
         config = new ZorkaConfig(this.getClass().getResource("/conf").getPath());
         ZorkaLogger.setLogger(new TestLogger());
         translator = new ZabbixQueryTranslator();
+        MBeanServerRegistry mbsRegistry = new MBeanServerRegistry();
+        mbsRegistry.register("java", java.lang.management.ManagementFactory.getPlatformMBeanServer(), null);
         agent = new ZorkaBshAgent(Executors.newSingleThreadExecutor(), Executors.newSingleThreadExecutor(), 5000,
-                new MBeanServerRegistry(true), config, translator);
+                mbsRegistry, config, translator);
+
 		config.getProperties().put ("zabbix.listen.addr", "127.0.0.1");
 		config.getProperties().put("zabbix.listen.port", "10066");
 		service = new ZabbixAgent(config,  agent, translator);

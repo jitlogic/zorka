@@ -462,7 +462,7 @@ public class AgentInstance {
      */
     public MBeanServerRegistry getMBeanServerRegistry() {
         if (mBeanServerRegistry == null) {
-            mBeanServerRegistry = new MBeanServerRegistry(config.boolCfg("zorka.mbs.autoregister", true));
+            mBeanServerRegistry = new MBeanServerRegistry();
         }
         return mBeanServerRegistry;
     }

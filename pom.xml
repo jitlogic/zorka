@@ -26,8 +26,6 @@
         <module>zorka-core</module>
         <module>zorka-viewer</module>
         <module>zorka-agent</module>
-        <module>zorka-central</module>
-        <module>zorka-central</module>
         <module>zorka-console</module>
     </modules>
 
