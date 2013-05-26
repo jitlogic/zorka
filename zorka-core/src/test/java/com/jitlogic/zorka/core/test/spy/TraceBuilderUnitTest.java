@@ -544,6 +544,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         assertEquals("should mark dropped record", TraceRecord.DROPPED_PARENT, output.getData().get(4).get("flags"));
     }
 
+
     @Test
     public void testProperExceptionCleanupAfterTraceExit() throws Exception {
 
@@ -559,6 +560,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         assertThat(records.get(0).getException()).isNull();
     }
 
+
     @Test
     public void testTraceDropFlag() throws Exception {
         b.traceEnter(c1, m1, s1, 10 * MS);
@@ -567,6 +569,22 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceReturn(20 * MS);
 
         assertThat(records.size()).isEqualTo(0);
+    }
+
+
+    @Test
+    public void testTraceAttrReusableRecordBug() throws Exception {
+        tracer.setTracerMinTraceTime(0);
+
+        b.traceEnter(c1, m1, s1, 10 * MS);
+        b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
+        b.traceEnter(c1, m1, s1, 10 * MS + 1);
+        b.traceReturn(10 * MS + 2);
+        b.newAttr(1, "oja!");
+        b.traceReturn(20 * MS);
+
+        Assert.assertEquals("Ouptut actions mismatch.",
+                Arrays.asList("traceBegin", "traceEnter", "traceStats", "newAttr", "traceReturn"), output.listAttr("action"));
     }
 
 }

@@ -68,7 +68,7 @@ public class TraceAttrProcessor implements SpyProcessor {
 
         if (val != null) {
             if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
-                TraceRecord top = ((TraceBuilder)tracer.getHandler()).getTTop();
+                TraceRecord top = ((TraceBuilder)tracer.getHandler()).realTop();
                 log.debug(ZorkaLogger.ZSP_ARGPROC, "Value: '" + val + "' stored as trace attribute "
                     + symbolRegistry.symbolName(attrId) + " (classId= " + top.getClassId() + " methodId=" + top.getMethodId()
                     + " signatureId=" + top.getSignatureId() + ")");
