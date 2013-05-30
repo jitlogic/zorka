@@ -161,6 +161,7 @@ public class ZorkaStore implements RestfulService<Object> {
                     .cacheLRUEnable()
                     .cacheSize(16384)
                     .asyncFlushDelay(1)
+                    .closeOnJvmShutdown()
                     .make();
             tracesById = traceDB.getTreeMap("traces");
             tracesByTstamp = traceDB.getTreeMap("tracesByTstamp");

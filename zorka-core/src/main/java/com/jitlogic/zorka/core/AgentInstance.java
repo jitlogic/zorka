@@ -21,7 +21,6 @@ import com.jitlogic.zorka.core.store.MetricsRegistry;
 import com.jitlogic.zorka.core.perfmon.PerfMonLib;
 import com.jitlogic.zorka.core.store.SimpleMetricsRegistry;
 import com.jitlogic.zorka.core.spy.*;
-import com.jitlogic.zorka.core.store.SimpleSymbolRegistry;
 import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.*;
 import com.jitlogic.zorka.core.integ.*;
@@ -287,7 +286,7 @@ public class AgentInstance {
 
     public synchronized SymbolRegistry getSymbolRegistry() {
         if (symbolRegistry == null) {
-            symbolRegistry = new SimpleSymbolRegistry(null);
+            symbolRegistry = new SymbolRegistry();
         }
         return symbolRegistry;
     }

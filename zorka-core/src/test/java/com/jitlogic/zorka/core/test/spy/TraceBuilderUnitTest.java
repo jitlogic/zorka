@@ -17,7 +17,6 @@
 package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.core.perfmon.Submittable;
-import com.jitlogic.zorka.core.store.SimpleSymbolRegistry;
 import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.SymbolicException;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
@@ -40,7 +39,7 @@ import static org.fest.assertions.Assertions.assertThat;
 public class TraceBuilderUnitTest extends ZorkaFixture {
 
     private TestTracer output = new TestTracer();
-    private SymbolRegistry symbols = new SimpleSymbolRegistry(null);
+    private SymbolRegistry symbols = new SymbolRegistry();
     private List<TraceRecord> records = new ArrayList<TraceRecord>();
 
     private TraceBuilder b = new TraceBuilder(
