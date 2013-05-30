@@ -16,26 +16,19 @@
 
 package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.perfmon.PerfRecord;
-import com.jitlogic.zorka.core.perfmon.Submittable;
 import com.jitlogic.zorka.core.spy.TraceMarker;
 import com.jitlogic.zorka.core.spy.TraceRecord;
-import com.jitlogic.zorka.core.util.ByteBuffer;
-import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
-import com.jitlogic.zorka.core.util.ZorkaLog;
-import com.jitlogic.zorka.core.util.ZorkaLogger;
+import com.jitlogic.zorka.core.util.*;
 import org.mapdb.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.atomic.AtomicLong;
 
-public class ZorkaStore {
+public class ZorkaStore implements RestfulService<Object> {
 
     private ZorkaLog log = ZorkaLogger.getLog(ZorkaStore.class);
 
@@ -46,7 +39,8 @@ public class ZorkaStore {
     private DB traceDB;
     private TraceDataStore traceData;
 
-    private ConcurrentNavigableMap<Long,TraceEntry> tracesByPos;
+    private AtomicLong lastId;
+    private ConcurrentNavigableMap<Long,TraceEntry> tracesById;
     private ConcurrentNavigableMap<Long,TraceEntry> tracesByTstamp;
 
 
@@ -95,8 +89,8 @@ public class ZorkaStore {
     }
 
 
-    public void add(TraceRecord tr) throws IOException {
-        if (traceData == null || tracesByPos == null) {
+    public synchronized void add(TraceRecord tr) throws IOException {
+        if (traceData == null || tracesById == null) {
             return;
         }
 
@@ -112,10 +106,11 @@ public class ZorkaStore {
             byte[] b1 = buf.getContent();
             long pos = traceData.write(b1);
 
-            TraceEntry entry = new TraceEntry(TraceEntry.FORMAT_SIMPLE, pos, b1.length,
+            long id = lastId.incrementAndGet();
+            TraceEntry entry = new TraceEntry(id, TraceEntry.FORMAT_SIMPLE, pos, b1.length,
                 marker.getClock(), tr.getTime(), tr.getCalls(), tr.getErrors(), traceRecords(tr), traceLabel(tr));
 
-            tracesByPos.put(pos, entry);
+            tracesById.put(entry.getId(), entry);
             tracesByTstamp.put(marker.getClock(), entry);
         } else {
             log.error(ZorkaLogger.ZCL_ERRORS, "Received trace without marker. Skipping.");
@@ -167,15 +162,17 @@ public class ZorkaStore {
                     .cacheSize(16384)
                     .asyncFlushDelay(1)
                     .make();
-            tracesByPos = traceDB.getTreeMap("traces");
+            tracesById = traceDB.getTreeMap("traces");
             tracesByTstamp = traceDB.getTreeMap("tracesByTstamp");
+            lastId = new AtomicLong(tracesById.isEmpty() ? 0L : tracesById.lastKey());
         }
     }
 
 
     public synchronized void close() {
         flush();
-        tracesByPos = null;
+        lastId = null;
+        tracesById = null;
         tracesByTstamp = null;
         traceDB.close();
         traceDB = null;
@@ -202,21 +199,46 @@ public class ZorkaStore {
 
     private void cleanOldEntries() {
         long pos = traceData.getStartPos();
-        if (tracesByPos.firstKey() < pos) {
-            Set<Long> keys = new HashSet<Long>(), tstamps = new HashSet<Long>();
 
-            for (Map.Entry<Long,TraceEntry> e : tracesByPos.headMap(pos, false).entrySet()) {
-                keys.add(e.getKey());
-                tstamps.add(e.getValue().getTstamp());
-            }
-
-            for (Long key : keys) {
-                tracesByPos.remove(key);
-            }
-
-            for (Long tstamp : tstamps) {
-                tracesByTstamp.remove(tstamp);
-            }
+        for (Map.Entry<Long,TraceEntry> e = tracesById.firstEntry(); e != null && e.getValue().getPos() < pos; e = tracesById.firstEntry()) {
+            tracesByTstamp.remove(e.getValue().getTstamp());
+            tracesById.remove(e.getKey());
         }
+    }
+
+    @Override
+    public Object get(String path, Map<String, String> params) {
+
+        if (path.startsWith("/traces")) {
+            // List trace entries
+            int offs = ZorkaUtil.iparam(params, "offs", 0);
+            int limit = ZorkaUtil.iparam(params, "limit", 50);
+
+            List<Map> lst = new ArrayList<Map>(limit);
+
+            if (!tracesById.isEmpty()) {
+                long id = tracesById.lastKey() - offs;
+
+                for (int i = 0; i < limit && id > 0; i++,id--) {
+                    TraceEntry e = tracesById.get(id);
+                    if (e != null) {
+                        lst.add(ZorkaUtil.map(
+                            "id", e.getId(),
+                            "tstamp", new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS").format(new Date(e.getTstamp())),
+                            "time", ZorkaUtil.strTime(e.getTime()),
+                            "calls", e.getCalls(),
+                            "errors", e.getErrors(),
+                            "recs", e.getRecs(),
+                            "label", e.getLabel()
+                        ));
+                    }
+                }
+            }
+            return lst;
+        } else {
+            //
+        }
+
+        return null;
     }
 }

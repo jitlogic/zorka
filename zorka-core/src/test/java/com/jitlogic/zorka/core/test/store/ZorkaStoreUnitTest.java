@@ -21,27 +21,31 @@ import com.jitlogic.zorka.core.spy.TraceRecord;
 import com.jitlogic.zorka.core.store.TraceEntry;
 import com.jitlogic.zorka.core.store.ZorkaStore;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
+import com.jitlogic.zorka.core.util.ZorkaUtil;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentNavigableMap;
 
 import static org.fest.assertions.Assertions.assertThat;
 
 public class ZorkaStoreUnitTest extends ZorkaFixture {
 
-    private Random r = new Random();
     private ZorkaStore store1, store2;
+
+    private static final long MB = 1024*1024;
 
     public TraceRecord mktr(TraceRecord parent, String suffix, int level, int limit) {
         TraceRecord tr = new TraceRecord(null);
 
         tr.setClassId(symbols.symbolId("com/test/Test" + suffix + level));
         tr.setMethodId(symbols.symbolId("method" + suffix + level));
-        tr.setCalls(r.nextInt(10000) + 1);
-        tr.setErrors(r.nextInt(100) + 1);
+        tr.setCalls(level*13+limit*17);
+        tr.setErrors(level*3+limit);
 
         if (level < limit) {
             for (int i = 0; i < level; i++) {
@@ -63,12 +67,16 @@ public class ZorkaStoreUnitTest extends ZorkaFixture {
     }
 
 
-    private void wrtrace(String fname, int levels) throws IOException {
-        store1 = new ZorkaStore(fname, 1024, 1024, symbols);
-        TraceRecord tr = mktrace("TEST", 100, levels);
+    private void wrtrace(String fname, long maxsz, long clock, int levels, int records) throws IOException {
+        store1 = new ZorkaStore(fname, maxsz, maxsz*10, symbols);
 
         store1.open();
-        store1.add(tr);
+
+        for (int i = 0; i < records; i++) {
+            TraceRecord tr = mktrace("TEST", clock*(i+1), levels);
+            store1.add(tr);
+        }
+
         store1.flush();
 
         store1.close();
@@ -79,7 +87,7 @@ public class ZorkaStoreUnitTest extends ZorkaFixture {
     @Test
     public void testStoreReopenAndRetreiveTrace() throws Exception {
         String fname = zorka.path(getTmpDir(), "store");
-        wrtrace(fname, 1);
+        wrtrace(fname, 100*MB, 100, 1, 1);
 
         assertThat(new File(fname).exists());
 
@@ -104,6 +112,57 @@ public class ZorkaStoreUnitTest extends ZorkaFixture {
         assertThat(rec.getMarker().getClock()).isEqualTo(100L);
     }
 
-    // TODO test for removal of old items
 
+    private List<String> path(String...args) {
+        return Arrays.asList(args);
+    }
+
+
+    private Map<String,String> par(String...args) {
+        return ZorkaUtil.map(args);
+    }
+
+
+    @Test
+    public void testListItemViaRestfulIface() throws Exception {
+        String fname = zorka.path(getTmpDir(), "store");
+        wrtrace(fname, 100*MB, 100, 1, 1);
+
+        store2 = new ZorkaStore(fname, 1024, 1024, symbols);
+        store2.open();
+
+        assertThat(store2.get("/traces", par())).isEqualTo(
+            Arrays.asList(ZorkaUtil.map(
+                "id", 1L, "time", "0.00ms", "errors", 1L,
+                "label", "TEST", "recs", 1L, "calls", 17L,
+                "tstamp", "1970-01-01 01:00:00.100")));
+
+        assertThat(store2.get("/traces", par("offs", "1"))).isEqualTo(
+            Arrays.asList(new Map[0]));
+    }
+
+    @Test
+    public void testListMoreItemsViaRestfulIface() throws Exception {
+        String fname = zorka.path(getTmpDir(), "store");
+        wrtrace(fname, 100*MB, 10000, 1, 100);
+
+        store2 = new ZorkaStore(fname, 1024, 1024, symbols);
+        store2.open();
+
+        assertThat(store2.get("/traces", par("offs", "0", "limit", "2"))).isEqualTo(
+                Arrays.asList(
+                        ZorkaUtil.map("id", 100L, "time", "0.00ms", "errors", 1L,
+                                "label", "TEST", "recs", 1L, "calls", 17L, "tstamp", "1970-01-01 01:16:40.000"),
+                        ZorkaUtil.map("id", 99L, "time", "0.00ms", "errors", 1L,
+                                "label", "TEST", "recs", 1L, "calls", 17L, "tstamp", "1970-01-01 01:16:30.000")
+                ));
+
+        assertThat(store2.get("/traces", par("offs", "50", "limit", "2"))).isEqualTo(
+                Arrays.asList(
+                        ZorkaUtil.map("id", 50L, "time", "0.00ms", "errors", 1L,
+                                "label", "TEST", "recs", 1L, "calls", 17L, "tstamp", "1970-01-01 01:08:20.000"),
+                        ZorkaUtil.map("id", 49L, "time", "0.00ms", "errors", 1L,
+                                "label", "TEST", "recs", 1L, "calls", 17L, "tstamp", "1970-01-01 01:08:10.000")
+                ));
+    }
 }

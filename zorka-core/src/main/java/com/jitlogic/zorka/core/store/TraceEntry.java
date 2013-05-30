@@ -28,6 +28,7 @@ public class TraceEntry implements Serializable {
     public static final int FORMAT_ASN1_BER = 2;
     public static final int FORMAT_ASN1_PER = 3;
 
+    private long id;
     private int format;
     private long pos, len;
     private long tstamp, time;
@@ -40,7 +41,8 @@ public class TraceEntry implements Serializable {
     }
 
 
-    public TraceEntry(int format, long pos, long len, long tstamp, long time, long calls, long errors, long recs, String label) {
+    public TraceEntry(long id, int format, long pos, long len, long tstamp, long time, long calls, long errors, long recs, String label) {
+        this.id = id;
         this.format = format;
         this.pos = pos;
         this.len = len;
@@ -55,22 +57,21 @@ public class TraceEntry implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof TraceEntry) {
-            TraceEntry e = (TraceEntry)obj;
-            return format == e.format && pos == e.pos && len == e.len
-                    &&  tstamp == e.tstamp && time == e.time
-                    && calls == e.calls && errors == e.errors
-                    && recs == e.recs && ZorkaUtil.objEquals(label, e.label);
-        } else {
-            return false;
-        }
+        return obj instanceof TraceEntry && ((TraceEntry)obj).id == id;
     }
 
     @Override
     public int hashCode() {
-        return (int)(format + pos * 17 + len * 31 + tstamp * 41);
+        return (int)(id * 31);
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 
     public int getFormat() {
         return format;

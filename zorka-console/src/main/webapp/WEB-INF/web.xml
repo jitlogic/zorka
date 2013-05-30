@@ -3,5 +3,17 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-  <display-name>Archetype Created Web Application</display-name>
+    <display-name>Archetype Created Web Application</display-name>
+    <servlet>
+        <servlet-name>TraceDataApiServlet</servlet-name>
+        <servlet-class>com.jitlogic.zorka.console.service.DataApiServlet</servlet-class>
+        <init-param>
+            <param-name>rootURI</param-name>
+            <param-value>/data</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>TraceDataApiServlet</servlet-name>
+        <url-pattern>/data/*</url-pattern>
+    </servlet-mapping>
 </web-app>
