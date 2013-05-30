@@ -19,7 +19,6 @@ package com.jitlogic.zorka.core;
 import com.jitlogic.zorka.core.mbeans.AttrGetter;
 import com.jitlogic.zorka.core.store.MetricsRegistry;
 import com.jitlogic.zorka.core.perfmon.PerfMonLib;
-import com.jitlogic.zorka.core.store.SimpleMetricsRegistry;
 import com.jitlogic.zorka.core.spy.*;
 import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.*;
@@ -276,7 +275,7 @@ public class AgentInstance {
 
     public synchronized  MetricsRegistry getMetricsRegistry() {
         if (metricsRegistry == null) {
-            metricsRegistry = new SimpleMetricsRegistry(null);
+            metricsRegistry = new MetricsRegistry();
         }
         return metricsRegistry;
     }

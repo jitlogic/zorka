@@ -37,7 +37,7 @@ import static org.fest.reflect.core.Reflection.method;
 public class MetadataStorageUnitTest extends ZorkaFixture {
 
     private SymbolRegistry sreg1, sreg2;
-    private MetricsRegistry mreg;
+    private MetricsRegistry mreg1, mreg2;
     private File file;
 
     @Before
@@ -83,18 +83,18 @@ public class MetadataStorageUnitTest extends ZorkaFixture {
 
 
 
-    @Test @Ignore
-    public void testCreateSaveLoadMetricTemplate() {
+    @Test
+    public void testCreateSaveLoadMetricTemplate() throws Exception {
 
         MetricTemplate mt = new MetricTemplate(MetricTemplate.RAW_DATA, "test", "B", null, null);
 
-        //open("meta.dat");
-        int id = mreg.getTemplate(mt).getId();
-        //close();
+        mreg1 = new MetricsRegistry(new File(getTmpDir(), "metrics.db"));
+        int id = mreg1.getTemplate(mt).getId();
+        mreg1.close();
 
-        //open("meta.dat");
-        MetricTemplate mt2 = mreg.getTemplate(id);
-        //close();
+        MetricsRegistry mreg2 = new MetricsRegistry(new File(getTmpDir(), "metrics.db"));
+        MetricTemplate mt2 = mreg2.getTemplate(id);
+        mreg2.close();
 
         assertThat(mt2).isNotNull();
         assertThat(mt2.getType()).isEqualTo(MetricTemplate.RAW_DATA);
@@ -106,26 +106,22 @@ public class MetadataStorageUnitTest extends ZorkaFixture {
     }
 
 
-    @Test @Ignore
-    public void testOpenCloseTwiceAndCheckIfMetricTemplateFileDoesNotGrow() {
+    @Test
+    public void testOpenCloseTwiceAndCheckIfMetricTemplateFileDoesNotGrow() throws Exception {
         MetricTemplate mt = new MetricTemplate(MetricTemplate.RAW_DATA, "test", "B", null, null);
 
-        //open("meta.dat");
-        int id = mreg.getTemplate(mt).getId();
-        //close();
+        mreg1 = new MetricsRegistry(new File(getTmpDir(), "metrics.db"));
+        int id = mreg1.getTemplate(mt).getId();
+        mreg1.close();
 
-        String path = zorka.path(getTmpDir(), "meta.dat");
-        long len = new File(path).length();
 
-        //open("meta.dat");
-        assertThat(mreg.getTemplate(id)).isNotNull();
-        //close();
-
-        assertThat(new File(path).length()).isEqualTo(len);
+        mreg2 = new MetricsRegistry(new File(getTmpDir(), "metrics.db"));
+        assertThat(mreg2.getTemplate(id)).isNotNull();
+        mreg2.close();
     }
 
 
-    @Test @Ignore
+    @Test
     public void testMetricTemplateHashingFn() {
         MetricTemplate mt1 = new MetricTemplate(MetricTemplate.RAW_DATA, "test", "B", null, null);
         MetricTemplate mt2 = new MetricTemplate(MetricTemplate.RAW_DATA, "test", "B", null, null);
@@ -139,19 +135,19 @@ public class MetadataStorageUnitTest extends ZorkaFixture {
     }
 
 
-    @Test @Ignore
-    public void testSaveLoadMetricTemplateAndCheckIfRedefinedObjectMatchesOriginal() {
+    @Test
+    public void testSaveLoadMetricTemplateAndCheckIfRedefinedObjectMatchesOriginal() throws Exception {
         MetricTemplate mt1 = new MetricTemplate(MetricTemplate.RAW_DATA, "test", "B", null, null);
 
-        //open("meta.dat");
-        int id = mreg.getTemplate(mt1).getId();
-        //close();
+        MetricsRegistry mreg1 = new MetricsRegistry(new File(getTmpDir(), "metrics.db"));
+        int id = mreg1.getTemplate(mt1).getId();
+        mreg1.close();
 
         MetricTemplate mt2 = new MetricTemplate(MetricTemplate.RAW_DATA, "test", "B", null, null);
 
-        //open("meta.dat");
-        int id2 = mreg.getTemplate(mt2).getId();
-        //close();
+        MetricsRegistry mreg2 = new MetricsRegistry(new File(getTmpDir(), "metrics.db"));
+        int id2 = mreg2.getTemplate(mt2).getId();
+        mreg2.close();
 
         assertThat(id2).isEqualTo(id);
     }

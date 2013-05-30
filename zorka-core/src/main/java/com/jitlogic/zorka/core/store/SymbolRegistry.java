@@ -50,9 +50,9 @@ public class SymbolRegistry implements Closeable {
         symbolNames = new ConcurrentSkipListMap<Integer, String>();
     }
 
-    public SymbolRegistry(File path) {
+    public SymbolRegistry(File file) {
 
-        db = DBMaker.newFileDB(path)
+        db = DBMaker.newFileDB(file)
                 .randomAccessFileEnable()
                 .closeOnJvmShutdown()
                 .asyncFlushDelay(1)

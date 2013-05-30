@@ -18,12 +18,13 @@ package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.core.util.ZorkaUtil;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class MetricTemplate {
+public class MetricTemplate implements Serializable {
 
     public static final int RAW_DATA       = 1;
     public static final int RAW_DELTA      = 2;
