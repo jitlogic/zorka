@@ -21,6 +21,7 @@ import com.jitlogic.zorka.core.AgentInstance;
 import com.jitlogic.zorka.core.ZorkaConfig;
 import com.jitlogic.zorka.core.spy.MainSubmitter;
 
+import java.io.File;
 import java.lang.instrument.Instrumentation;
 
 /**
@@ -51,8 +52,22 @@ public class AgentMain {
             MainSubmitter.setSubmitter(instance.getSubmitter());
             MainSubmitter.setTracer(instance.getTracer());
         }
+    }
 
-
-
+    /**
+     * This is entry method of utility functions of agent
+     *
+     * @param args
+     */
+    public static void main(String[] args) throws Exception {
+        if (args.length > 0) {
+            if ("import".equals(args[0])) {
+                String storeRoot = args[1];
+                String traceFile = args[2];
+                System.out.println("Importing " + traceFile + " to " + storeRoot);
+                AgentUtil util = new AgentUtil(storeRoot);
+                util.storeImport(new File(traceFile));
+            }
+        }
     }
 }

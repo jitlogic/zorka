@@ -85,7 +85,9 @@ public class ZorkaStore implements RestfulService<Object> {
         TraceReader reader = new TraceReader();
         new SimplePerfDataFormat(buf).decode(reader);
 
-        return reader.getRoot();
+        List<TraceRecord> result = reader.getResults();
+
+        return result.size() > 0 ? result.get(0) : null;
     }
 
 

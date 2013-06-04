@@ -23,11 +23,26 @@ import com.jitlogic.zorka.core.spy.TraceMarker;
 import com.jitlogic.zorka.core.spy.TraceRecord;
 import com.jitlogic.zorka.core.util.PerfSample;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TraceReader implements PerfDataEventHandler {
 
+    private List<TraceRecord> results = new ArrayList<TraceRecord>();
     private TraceRecord root = new TraceRecord(null), cur;
+    private SymbolRegistry symbols;
+
+    public TraceReader() {
+
+    }
+
+    public TraceReader(SymbolRegistry symbols) {
+        this.symbols = symbols;
+    }
+
+    public List<TraceRecord> getResults() {
+        return results;
+    }
 
     public TraceRecord getRoot() {
         return root;
@@ -42,7 +57,13 @@ public class TraceReader implements PerfDataEventHandler {
         }
     }
 
-    @Override public void newSymbol(int symbolId, String symbolText) { }
+    @Override
+    public void newSymbol(int symbolId, String symbolText) {
+        if (symbols != null) {
+            symbols.put(symbolId, symbolText);
+        }
+    }
+
     @Override public void perfData(long clock, int scannerId, List<PerfSample> samples) { }
     @Override public void newMetricTemplate(MetricTemplate template) { }
     @Override public void newMetric(Metric metric) { }
@@ -67,15 +88,23 @@ public class TraceReader implements PerfDataEventHandler {
 
     @Override
     public void traceReturn(long tstamp) {
-        cur.setTime(tstamp);
-        cur = cur.getParent();
+        pop(tstamp);
     }
 
     @Override
     public void traceError(Object exception, long tstamp) {
         cur.setException(exception);
+        pop(tstamp);
+    }
+
+    private void pop(long tstamp) {
         cur.setTime(tstamp);
         cur = cur.getParent();
+
+        if (cur == null) {
+            results.add(root);
+            root = new TraceRecord(null);
+        }
     }
 
     @Override

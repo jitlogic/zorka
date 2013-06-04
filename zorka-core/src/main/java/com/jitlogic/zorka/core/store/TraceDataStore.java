@@ -16,6 +16,9 @@
 
 package com.jitlogic.zorka.core.store;
 
+import com.jitlogic.zorka.core.util.ZorkaLog;
+import com.jitlogic.zorka.core.util.ZorkaLogger;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +29,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TraceDataStore implements Closeable {
+
+    private ZorkaLog log = ZorkaLogger.getLog(TraceDataStore.class);
 
     private String path, prefix, suffix;
     private long maxFileSize, maxPhysSize;
