@@ -29,11 +29,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <version>0.0.1</version>
         </dependency>
         <dependency>
-            <groupId>org.mapdb</groupId>
-            <artifactId>mapdb</artifactId>
-            <version>0.9.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>org.ow2.spec.ee</groupId>
             <artifactId>ow2-jsr77-1.1-spec</artifactId>
             <version>1.0.10</version>
@@ -44,16 +39,6 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <artifactId>asm-util</artifactId>
             <version>4.0</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.easytesting</groupId>
-            <artifactId>fest-assert</artifactId>
-            <version>${fest.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.easytesting</groupId>
-            <artifactId>fest-reflect</artifactId>
-            <version>${fest.version}</version>
         </dependency>
     </dependencies>
     <build>

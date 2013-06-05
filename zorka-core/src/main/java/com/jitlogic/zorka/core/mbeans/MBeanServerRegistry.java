@@ -41,9 +41,6 @@ public class MBeanServerRegistry {
     /** Logger */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** If set to true, platform mbean server will be autmatically registered when referenced for first time. */
-    private boolean autoRegister = true;
-
     /** Represents deferred registration of mbean attributes for not yet registered mbean servers. */
     private static class DeferredRegistration {
         /** mbean server name, object name, attribute name, attribute description */
@@ -86,17 +83,6 @@ public class MBeanServerRegistry {
 
 
     /**
-     * Creates new MBeanServerRegistry object.
-     *
-     * @param autoRegister platform mbean server will be automatically registered when used for the first time
-     */
-    public MBeanServerRegistry(boolean autoRegister) {
-        log.info(ZorkaLogger.ZAG_CONFIG, "Initializing MBeanServerRegistry with autoRegister=" + autoRegister);
-        this.autoRegister = autoRegister;
-    }
-
-
-    /**
      * Looks for a given MBean server. java and jboss mbean servers are currently available.
      *
      * @param name mbean server name
@@ -104,16 +90,7 @@ public class MBeanServerRegistry {
      * @return mbean server connection
      */
     public MBeanServerConnection lookup(String name) {
-        MBeanServerConnection conn = conns.get(name);
-        if (conn == null && autoRegister) {
-            if ("java".equals(name)) {
-                conn = ManagementFactory.getPlatformMBeanServer();
-                conns.put("java", conn);
-                registerDeferred(name);
-            }
-        }
-
-        return conn;
+        return conns.get(name);
     }
 
     /**

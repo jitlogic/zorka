@@ -623,14 +623,19 @@ public class SpyLib {
      * number, field1,field2,... are (optional) fields used exactly as in
      * zorkalib.get() function.
      *
+     * @param dst destination field
      * @param expr format expressions.
+     * @param len maximum result string length
      *
      * @return formatting processor object
      */
-    public SpyProcessor format(String dst, String expr) {
-        return new StringFormatProcessor(dst, expr);
+    public SpyProcessor format(String dst, String expr, int len) {
+        return new StringFormatProcessor(dst, expr, len);
     }
 
+    public SpyProcessor format(String dst, String expr) {
+        return format(dst, expr, -1);
+    }
 
     /**
      * Filters records according to given regular expression.
@@ -909,5 +914,18 @@ public class SpyLib {
      */
     public SpyProcessor strTime(String dst, String src) {
         return UtilFnProcessor.strTimeFn(dst, src);
+    }
+
+
+    public SpyProcessor and(SpyProcessor...processors) {
+        return new LogicalFilterProcessor(LogicalFilterProcessor.FILTER_AND, processors);
+    }
+
+    public SpyProcessor or(SpyProcessor...processors) {
+        return new LogicalFilterProcessor(LogicalFilterProcessor.FILTER_OR, processors);
+    }
+
+    public SpyProcessor subchain(SpyProcessor...processors) {
+        return new LogicalFilterProcessor(LogicalFilterProcessor.FILTER_NONE, processors);
     }
 }

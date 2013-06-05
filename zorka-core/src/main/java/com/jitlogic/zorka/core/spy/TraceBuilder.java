@@ -174,10 +174,20 @@ public class TraceBuilder implements TraceEventHandler {
     }
 
 
+    public TraceRecord realTop() {
+        if (ttop.isEmpty() && ttop.getParent() != null) {
+            return ttop.getParent();
+        } else {
+            return ttop;
+        }
+    }
+
 
     @Override
     public void newAttr(int attrId, Object attrVal) {
-        ttop.setAttr(attrId, attrVal);
+        // TODO propable bug: if ttop is "cleaned up for reuse", attribute will be lost
+        // TODO the same with trace markers, flags etc.
+        realTop().setAttr(attrId, attrVal);
     }
 
     @Override
@@ -296,11 +306,6 @@ public class TraceBuilder implements TraceEventHandler {
     }
 
 
-    public TraceRecord getTTop() {
-        return ttop;
-    }
-
-
     /**
      * Sets minimum trace execution time for currently recorded trace.
      * If there is no trace being recorded just yet, this method will
@@ -309,15 +314,17 @@ public class TraceBuilder implements TraceEventHandler {
      * @param minimumTraceTime (in nanoseconds)
      */
     public void setMinimumTraceTime(long minimumTraceTime) {
-        if (ttop.inTrace()) {
-            ttop.getMarker().setMinimumTime(minimumTraceTime);
+        TraceRecord top = realTop();
+        if (top.inTrace()) {
+            top.getMarker().setMinimumTime(minimumTraceTime);
         }
     }
 
 
     public void markTraceFlag(int flag) {
-        if (ttop.getMarker() != null) {
-            ttop.getMarker().markFlag(flag);
+        TraceRecord top = realTop();
+        if (top.getMarker() != null) {
+            top.getMarker().markFlag(flag);
         }
     }
 

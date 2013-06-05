@@ -60,9 +60,16 @@ __jboss() {
   __mbsRegister() {
 
     jbossMbs = null;
+    javaMbs = null;
 
     process(record) {
       synchronized (super) {
+        if (super.javaMbs == null) {
+          mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
+          zorka.registerMbs("java", mbs);
+          super.javaMbs = mbs;
+          zorka.logInfo("Registered platform mbean server as 'java'");
+        }
         if (super.jbossMbs == null) {
           mbs = record.get("THIS").getServer();
           //mbs = record.get("MBS");

@@ -19,21 +19,98 @@ package com.jitlogic.zorka.core.store;
 import com.jitlogic.zorka.core.perfmon.Metric;
 import com.jitlogic.zorka.core.perfmon.MetricTemplate;
 
-public interface MetricsRegistry {
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
-    public void add(MetricTemplate template);
+public class MetricsRegistry {
 
-    MetricTemplate getTemplate(MetricTemplate template);
+    private AtomicInteger lastTemplateId;
+    private NavigableMap<Integer,MetricTemplate> templateById;
+    private Map<MetricTemplate,MetricTemplate> templates = new ConcurrentHashMap<MetricTemplate, MetricTemplate>();
 
-    MetricTemplate getTemplate(int id);
+    private AtomicInteger lastMetricId;
+    private NavigableMap<Integer,Metric> metricById;
 
-    public void add(Metric metric);
 
-    Metric getMetric(Metric metric);
+    public MetricsRegistry() {
+        templateById = new ConcurrentSkipListMap<Integer, MetricTemplate>();
+        metricById = new ConcurrentSkipListMap<Integer, Metric>();
 
-    Metric getMetric(int id);
+        lastTemplateId = new AtomicInteger(0);
+        lastMetricId = new AtomicInteger(0);
+    }
 
-    int numMetrics();
 
-    int numTemplates();
+    public void add(MetricTemplate template) {
+        int id = template.getId();
+        if (id != 0) {
+            templateById.put(id, template);
+            templates.put(template, template);
+            if (id > lastTemplateId.get()) {
+                lastTemplateId.set(id);
+            }
+        } else {
+            getTemplate(template);
+        }
+    }
+
+
+    public MetricTemplate getTemplate(MetricTemplate template) {
+
+        MetricTemplate mt = templates.get(template);
+        if (mt != null) {
+            return mt;
+        }
+
+        if (template.getId() == 0) {
+            template.setId(lastTemplateId.incrementAndGet());
+            templateById.put(template.getId(), template);
+            templates.put(template, template);
+        }
+        return template;
+    }
+
+
+    public MetricTemplate getTemplate(int id) {
+        return templateById.get(id);
+    }
+
+
+    public void add(Metric metric) {
+        int id = metric.getId();
+        if (id != 0) {
+            metricById.put(id, metric);
+            if (id > lastMetricId.get()) {
+                lastMetricId.set(id);
+            }
+        }
+    }
+
+
+    public Metric getMetric(Metric metric) {
+        if (metric.getId() == 0) {
+            metric.setId(lastMetricId.incrementAndGet());
+            metricById.put(metric.getId(), metric);
+        }
+        return metric;
+    }
+
+
+    public Metric getMetric(int id) {
+        return metricById.get(id);
+    }
+
+
+    public int numMetrics() {
+        return metricById.size();
+    }
+
+
+    public int numTemplates() {
+        return templateById.size();
+    }
+
 }

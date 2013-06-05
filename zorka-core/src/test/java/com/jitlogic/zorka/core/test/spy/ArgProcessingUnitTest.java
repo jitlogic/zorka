@@ -51,7 +51,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     @Test
     public void testTrivialStringFormatArgProcessing() throws Exception {
-        SpyProcessor proc = new StringFormatProcessor("E0", "len=${E0.length()}");
+        SpyProcessor proc = spy.format("E0", "len=${E0.length()}");
         record.put("E0", "oja!");
 
         record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_ENTER));
@@ -62,6 +62,12 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         assertEquals("len=4", record.get("E0"));
     }
 
+    @Test
+    public void testTrivialStringFormatWithLimit() throws Exception {
+        SpyProcessor proc = spy.format("S", "1234567890", 5);
+        proc.process(record);
+        assertEquals("12345", record.get("S"));
+    }
 
     @Test
     public void testTrivialGetterArgProcessing() throws Exception {
@@ -325,5 +331,56 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         assertThat(p.decide(500)).isFalse();
         assertThat(p.decide(401)).isNull();
         assertThat(p.decide(403)).isFalse();
+    }
+
+
+    @Test
+    public void testLogicalAndFilter() {
+        SpyProcessor f1 = spy.and(
+                spy.vcmp("X", "==", "a"),
+                spy.vcmp("Y", "==", "b"));
+
+        record.put("X", "a"); record.put("Y", "b");
+        assertThat(f1.process(record)).isNotNull();
+
+        record.put("X", "b");
+        assertThat(f1.process(record)).isNull();
+
+        record.put("Y", "a");
+        assertThat(f1.process(record)).isNull();
+    }
+
+
+    @Test
+    public void testLogicalOrFilter() {
+        SpyProcessor f1 = spy.or(
+                spy.vcmp("X", "==", "a"),
+                spy.vcmp("Y", "==", "b"));
+
+        record.put("X", "a"); record.put("Y", "b");
+        assertThat(f1.process(record)).isNotNull();
+
+        record.put("X", "b");
+        assertThat(f1.process(record)).isNotNull();
+
+        record.put("Y", "a");
+        assertThat(f1.process(record)).isNull();
+    }
+
+
+    @Test
+    public void testSubchainFilter() {
+        SpyProcessor f1 = spy.subchain(
+                spy.vcmp("X", "==", "a"),
+                spy.vcmp("Y", "==", "b"));
+
+        record.put("X", "a"); record.put("Y", "b");
+        assertThat(f1.process(record)).isNotNull();
+
+        record.put("X", "b");
+        assertThat(f1.process(record)).isNotNull();
+
+        record.put("Y", "a");
+        assertThat(f1.process(record)).isNotNull();
     }
 }

@@ -738,6 +738,7 @@ public class ZorkaUtil {
         return Collections.unmodifiableSet(set);
     }
 
+
     public static String path(String...components) {
         StringBuilder sb = new StringBuilder();
 
@@ -765,6 +766,7 @@ public class ZorkaUtil {
         return sb.toString();
     }
 
+
     public static String strTime(long ns) {
         double t = 1.0 * ns / 1000000.0;
         String u = "ms";
@@ -774,4 +776,14 @@ public class ZorkaUtil {
         }
         return String.format(t > 10 ? "%.0f" : "%.2f", t) + u;
     }
+
+
+    public static int iparam(Map<String,String> params, String name, int defval) {
+        try {
+            return params.containsKey(name) ? Integer.parseInt(params.get(name)) : defval;
+        } catch (NumberFormatException e) {
+            return defval;
+        }
+    }
+
 }

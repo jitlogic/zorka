@@ -204,17 +204,6 @@ public class TracerLib {
     }
 
 
-    public ZorkaAsyncThread<Submittable> toStore(String path, long maxSize) {
-        try {
-            ZorkaStoreWriter store = new ZorkaStoreWriter(new ZorkaStore(path, maxSize >> 4, maxSize, symbolRegistry));
-            store.start();
-            return store;
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
-
     public SpyProcessor filterBy(String srcField, Boolean defval, Set<Object> yes, Set<Object> no, Set<Object> maybe) {
         return new TraceFilterProcessor(tracer, srcField, defval, yes, no, maybe);
     }
