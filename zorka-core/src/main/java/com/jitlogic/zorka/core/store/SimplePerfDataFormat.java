@@ -97,6 +97,8 @@ public class SimplePerfDataFormat implements PerfDataEventHandler {
 
     private int mask;
 
+    private boolean running = true;
+
     public SimplePerfDataFormat(ByteBuffer buf) {
         this(buf, ALL_MASK);
     }
@@ -352,7 +354,8 @@ public class SimplePerfDataFormat implements PerfDataEventHandler {
      * @param output handler that will receive decoded events
      */
     public void decode(PerfDataEventHandler output) {
-        while (!buf.eof()) {
+        running = true;
+        while (running && !buf.eof()) {
             byte cmd = buf.getByte();
             switch (cmd) {
                 case TRACE_BEGIN: {
@@ -575,5 +578,9 @@ public class SimplePerfDataFormat implements PerfDataEventHandler {
         }
 
         return new SymbolicException(classId, message, stack, cause);
+    }
+
+    public void halt() {
+        running = false;
     }
 }

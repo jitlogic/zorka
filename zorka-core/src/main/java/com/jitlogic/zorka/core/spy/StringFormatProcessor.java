@@ -33,6 +33,9 @@ public class StringFormatProcessor implements SpyProcessor {
     /** Format expression */
     private String expr;
 
+    /** Maximum length */
+    private int len;
+
     /**
      * Creates new string format processor.
      *
@@ -40,14 +43,22 @@ public class StringFormatProcessor implements SpyProcessor {
      *
      * @param expr expression
      */
-    public StringFormatProcessor(String dstField, String expr) {
+    public StringFormatProcessor(String dstField, String expr, int len) {
         this.dstField = dstField;
         this.expr = expr;
+        this.len = len;
     }
 
     @Override
     public Map<String,Object> process(Map<String,Object> record) {
-        record.put(dstField, ObjectInspector.substitute(expr, record));
+        String s = ObjectInspector.substitute(expr, record);
+
+        if (len > 0 && s.length() > len) {
+            s = s.substring(0, len);
+        }
+
+        record.put(dstField, s);
+
         return record;
     }
 }

@@ -18,13 +18,14 @@ package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.core.util.ObjectInspector;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class Metric {
+public abstract class Metric implements Serializable {
 
-    private MetricTemplate template;
+    private transient MetricTemplate template;
 
     private int id, templateId;
     private String name;

@@ -48,4 +48,9 @@ public class ObjectInspectorUnitTest {
                 ObjectInspector.substitute("This is ${fubar:by default} !", props));
     }
 
+    @Test
+    public void testGetClassName() {
+        Assert.assertEquals("java.lang.String", ObjectInspector.get(String.class, "name"));
+    }
+
 }

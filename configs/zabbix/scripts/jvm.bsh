@@ -17,6 +17,12 @@
 
 __jvm() {
 
+  if (zorka.boolCfg("zorka.mbs.autoregister", true)) {
+      mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
+      zorka.registerMbs("java", mbs);
+      zorka.logInfo("Registered platform mbean server as 'java'");
+  }
+
   memutil(name) {
     mem_used = zorka.jmx("java", "java.lang:name="+name+",type=MemoryPool", "Usage", "used");
     mem_max = zorka.jmx("java", "java.lang:name="+name+",type=MemoryPool", "PeakUsage", "max");

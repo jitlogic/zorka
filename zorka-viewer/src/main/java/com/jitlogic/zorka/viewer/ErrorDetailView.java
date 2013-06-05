@@ -27,33 +27,84 @@ import java.util.Map;
 
 public class ErrorDetailView extends JPanel {
 
+    private JSplitPane splitPane;
     private JTextArea exceptionDisplay;
+    private JTextArea attributeDisplay;
 
     public ErrorDetailView() {
+        createUI();
+    }
+
+    private void createUI() {
         setBorder(new EmptyBorder(3,3,3,3));
         setLayout(new BorderLayout(0, 0));
 
-        add(new Label("Thrown exception:"), BorderLayout.NORTH);
+        splitPane = new JSplitPane();
+        splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+        add(splitPane, BorderLayout.CENTER);
 
+        JPanel attributePanel = new JPanel();
+        attributePanel.setLayout(new BorderLayout(0,0));
+        attributeDisplay = new JTextArea();
+        attributeDisplay.setEditable(false);
+        attributeDisplay.setLineWrap(true);
+        attributeDisplay.setWrapStyleWord(true);
+        JScrollPane scrAttributeDisplay = new JScrollPane();
+        scrAttributeDisplay.setViewportView(attributeDisplay);
+        attributePanel.add(new Label("Method info"), BorderLayout.NORTH);
+        attributePanel.add(scrAttributeDisplay, BorderLayout.CENTER);
+
+        splitPane.setTopComponent(attributePanel);
+
+        JPanel exceptionPanel = new JPanel();
+        exceptionPanel.setLayout(new BorderLayout(0,0));
         exceptionDisplay = new JTextArea();
         exceptionDisplay.setEditable(false);
         JScrollPane scrExceptionDisplay = new JScrollPane();
         scrExceptionDisplay.setViewportView(exceptionDisplay);
-        add(scrExceptionDisplay, BorderLayout.CENTER);
+        exceptionPanel.add(new Label("Thrown exception:"), BorderLayout.NORTH);
+        exceptionPanel.add(scrExceptionDisplay, BorderLayout.CENTER);
+
+        splitPane.setBottomComponent(exceptionPanel);
+
+        splitPane.setResizeWeight(0.5);
     }
 
 
     public void update(Map<Integer,String> symbols, NamedTraceRecord record) {
         StringBuilder sb = new StringBuilder();
         SymbolicException cause = findCause(record);
+        SymbolicException exception = findException(record);
 
-        if (record.getException() != null) {
-            exceptionDisplay.setText(printException(symbols, (SymbolicException)record.getException(), cause, sb));
+        if (exception != null) {
+            exceptionDisplay.setText(printException(symbols, exception, cause, sb));
         } else {
             exceptionDisplay.setText("<no exception>");
         }
+
+        StringBuilder mdesc = new StringBuilder();
+
+        mdesc.append(record.prettyPrint() + "\n\n");
+
+        if (record.numAttrs() > 0) {
+            for (Map.Entry<String,Object> e : record.getAttrs().entrySet()) {
+                mdesc.append(e.getKey() + "=" + e.getValue() + "\n");
+            }
+        }
+
+        attributeDisplay.setText(mdesc.toString());
     }
 
+
+    private SymbolicException findException(NamedTraceRecord record) {
+        if (record.getException() != null) {
+            return (SymbolicException)record.getException();
+        } else if (0 != (record.getFlags() & NamedTraceRecord.EXCEPTION_PASS) && record.numChildren() > 0) {
+            return findException(record.getChild(record.numChildren()-1));
+        } else {
+            return null;
+        }
+    }
 
     private SymbolicException findCause(NamedTraceRecord record) {
 

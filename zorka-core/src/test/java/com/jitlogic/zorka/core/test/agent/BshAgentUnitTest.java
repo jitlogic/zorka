@@ -36,6 +36,7 @@ public class BshAgentUnitTest extends ZorkaFixture {
 
     @Before
     public void setUp() throws Exception {
+        mBeanServerRegistry.register("java", java.lang.management.ManagementFactory.getPlatformMBeanServer(), null);
         ZabbixLib zl = new ZabbixLib(mBeanServerRegistry, config);
         zorkaAgent.install("zabbix", zl);
         zorkaAgent.loadScript(getClass().getResource("/unittest/BshAgentTest.bsh").getPath());
