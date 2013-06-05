@@ -52,7 +52,6 @@
                             <includes>
                                 <include>com.googlecode.json-simple:json-simple</include>
                                 <include>org.ow2.asm:asm</include>
-                                <include>org.mapdb:mapdb</include>
                                 <include>com.jitlogic.zoola:zoola-core</include>
                                 <include>com.jitlogic.contrib:libsnmp</include>
                                 <include>com.jitlogic.zorka:zorka-core</include>
@@ -73,10 +72,6 @@
                                 <rule>
                                     <pattern>com.jitlogic.contrib.**</pattern>
                                     <result>com.jitlogic.zorka.deps.@1</result>
-                                </rule>
-                                <rule>
-                                    <pattern>org.mapdb.**</pattern>
-                                    <result>com.jitlogic.zorka.deps.mapdb.@1</result>
                                 </rule>
                                 <keep>
                                     <pattern>com.jitlogic.zorka.**</pattern>

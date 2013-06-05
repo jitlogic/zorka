@@ -18,18 +18,13 @@ package com.jitlogic.zorka.core.store;
 
 import com.jitlogic.zorka.core.util.ZorkaLog;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
 
-import java.io.Closeable;
-import java.io.File;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class SymbolRegistry implements Closeable {
+public class SymbolRegistry {
     /** Logger */
     private static final ZorkaLog log = ZorkaLogger.getLog(SymbolRegistry.class);
 
@@ -42,32 +37,11 @@ public class SymbolRegistry implements Closeable {
     /** Symbol ID to name map */
     private ConcurrentNavigableMap<Integer,String> symbolNames;
 
-    private DB db;
-
     public SymbolRegistry() {
         lastSymbolId  = new AtomicInteger(0);
         symbolIds = new ConcurrentHashMap<String, Integer>();
         symbolNames = new ConcurrentSkipListMap<Integer, String>();
     }
-
-    public SymbolRegistry(File file) {
-
-        db = DBMaker.newFileDB(file)
-                .randomAccessFileEnable()
-                .closeOnJvmShutdown()
-                .asyncFlushDelay(1)
-                .make();
-
-        symbolNames = db.getTreeMap("symbols");
-        symbolIds = new ConcurrentHashMap<String, Integer>();
-
-        lastSymbolId = new AtomicInteger(symbolNames.size() > 0 ? symbolNames.lastKey() : 0);
-
-        for (Map.Entry<Integer,String> e : symbolNames.entrySet()) {
-            symbolIds.put(e.getValue(), e.getKey());
-        }
-    }
-
 
     /**
      * Returns ID of named symbol. If symbol hasn't been registered yet,
@@ -140,18 +114,4 @@ public class SymbolRegistry implements Closeable {
         return symbolIds.size();
     }
 
-    public void flush() {
-        if (db != null) {
-            db.commit();
-        }
-    }
-
-    @Override
-    public void close() {
-        if (db != null) {
-            db.commit();
-            db.close();
-            db = null;
-        }
-    }
 }

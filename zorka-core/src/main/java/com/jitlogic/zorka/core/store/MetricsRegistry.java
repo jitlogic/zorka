@@ -18,23 +18,14 @@ package com.jitlogic.zorka.core.store;
 
 import com.jitlogic.zorka.core.perfmon.Metric;
 import com.jitlogic.zorka.core.perfmon.MetricTemplate;
-import com.jitlogic.zorka.core.util.ZorkaLog;
-import com.jitlogic.zorka.core.util.ZorkaLogger;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MetricsRegistry implements Closeable {
-
-    private static final ZorkaLog log = ZorkaLogger.getLog(MetricsRegistry.class);
+public class MetricsRegistry {
 
     private AtomicInteger lastTemplateId;
     private NavigableMap<Integer,MetricTemplate> templateById;
@@ -43,8 +34,6 @@ public class MetricsRegistry implements Closeable {
     private AtomicInteger lastMetricId;
     private NavigableMap<Integer,Metric> metricById;
 
-    private DB db;
-
 
     public MetricsRegistry() {
         templateById = new ConcurrentSkipListMap<Integer, MetricTemplate>();
@@ -52,26 +41,6 @@ public class MetricsRegistry implements Closeable {
 
         lastTemplateId = new AtomicInteger(0);
         lastMetricId = new AtomicInteger(0);
-    }
-
-
-    public MetricsRegistry(File file) {
-
-        db = DBMaker.newFileDB(file)
-                .randomAccessFileEnable()
-                .closeOnJvmShutdown()
-                .asyncFlushDelay(1)
-                .make();
-
-        templateById = db.getTreeMap("templates");
-        lastTemplateId = new AtomicInteger(templateById.size() > 0 ? templateById.lastKey() : 0);
-
-        for (Map.Entry<Integer,MetricTemplate> e : templateById.entrySet()) {
-            templates.put(e.getValue(), e.getValue());
-        }
-
-        metricById = db.getTreeMap("metrics");
-        lastMetricId = new AtomicInteger(metricById.size() > 0 ? metricById.lastKey() : 0);
     }
 
 
@@ -144,18 +113,4 @@ public class MetricsRegistry implements Closeable {
         return templateById.size();
     }
 
-    public void flush() {
-        if (db != null) {
-            db.commit();
-        }
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (db != null) {
-            db.commit();
-            db.close();
-            db = null;
-        }
-    }
 }

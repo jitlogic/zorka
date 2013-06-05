@@ -54,20 +54,4 @@ public class AgentMain {
         }
     }
 
-    /**
-     * This is entry method of utility functions of agent
-     *
-     * @param args
-     */
-    public static void main(String[] args) throws Exception {
-        if (args.length > 0) {
-            if ("import".equals(args[0])) {
-                String storeRoot = args[1];
-                String traceFile = args[2];
-                System.out.println("Importing " + traceFile + " to " + storeRoot);
-                AgentUtil util = new AgentUtil(storeRoot);
-                util.storeImport(new File(traceFile));
-            }
-        }
-    }
 }
