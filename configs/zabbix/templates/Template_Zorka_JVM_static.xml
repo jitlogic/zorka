@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2013-04-14T04:30:51Z</date>
+    <date>2013-06-05T18:48:44Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -1052,84 +1052,6 @@
                     <valuemap/>
                 </item>
                 <item>
-                    <name>Perm Gen usage</name>
-                    <type>0</type>
-                    <snmp_community/>
-                    <multiplier>0</multiplier>
-                    <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name=Perm Gen,type=MemoryPool&quot;,&quot;Usage&quot;,&quot;used&quot;]</key>
-                    <delay>60</delay>
-                    <history>10</history>
-                    <trends>365</trends>
-                    <status>0</status>
-                    <value_type>3</value_type>
-                    <allowed_hosts/>
-                    <units>B</units>
-                    <delta>0</delta>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privpassphrase/>
-                    <formula>1</formula>
-                    <delay_flex/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <data_type>0</data_type>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>Memory Pools</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                </item>
-                <item>
-                    <name>Perm Gen utilization</name>
-                    <type>0</type>
-                    <snmp_community/>
-                    <multiplier>0</multiplier>
-                    <snmp_oid/>
-                    <key>jvm.memutil[&quot;Perm Gen&quot;]</key>
-                    <delay>300</delay>
-                    <history>10</history>
-                    <trends>365</trends>
-                    <status>0</status>
-                    <value_type>0</value_type>
-                    <allowed_hosts/>
-                    <units>%</units>
-                    <delta>0</delta>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privpassphrase/>
-                    <formula>1</formula>
-                    <delay_flex/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <data_type>0</data_type>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>Memory Pools</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                </item>
-                <item>
                     <name>Physical Memory</name>
                     <type>0</type>
                     <snmp_community>public</snmp_community>
@@ -1369,7 +1291,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name=MarkSweepCompact,type=GarbageCollector&quot;,&quot;CollectionTime&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name={$GC_OLD},type=GarbageCollector&quot;,&quot;CollectionTime&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -1437,6 +1359,84 @@
                     <applications>
                         <application>
                             <name>Garbage Collector</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                </item>
+                <item>
+                    <name>{$GC_PERM} usage</name>
+                    <type>0</type>
+                    <snmp_community/>
+                    <multiplier>0</multiplier>
+                    <snmp_oid/>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name={$MP_PERM},type=MemoryPool&quot;,&quot;Usage&quot;,&quot;used&quot;]</key>
+                    <delay>60</delay>
+                    <history>10</history>
+                    <trends>365</trends>
+                    <status>0</status>
+                    <value_type>3</value_type>
+                    <allowed_hosts/>
+                    <units>B</units>
+                    <delta>0</delta>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privpassphrase/>
+                    <formula>1</formula>
+                    <delay_flex/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <data_type>0</data_type>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Memory Pools</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                </item>
+                <item>
+                    <name>{$GC_PERM} utilization</name>
+                    <type>0</type>
+                    <snmp_community/>
+                    <multiplier>0</multiplier>
+                    <snmp_oid/>
+                    <key>jvm.memutil[&quot;{$MP_PERM}&quot;]</key>
+                    <delay>300</delay>
+                    <history>10</history>
+                    <trends>365</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units>%</units>
+                    <delta>0</delta>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privpassphrase/>
+                    <formula>1</formula>
+                    <delay_flex/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <data_type>0</data_type>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Memory Pools</name>
                         </application>
                     </applications>
                     <valuemap/>
@@ -1614,11 +1614,11 @@
                 </macro>
                 <macro>
                     <macro>{$GC_NEW}</macro>
-                    <value>Copy</value>
+                    <value>PS Scavenge</value>
                 </macro>
                 <macro>
                     <macro>{$GC_OLD}</macro>
-                    <value>MarkSweepCompact</value>
+                    <value>PS MarkSweep</value>
                 </macro>
                 <macro>
                     <macro>{$MEM_H}</macro>
@@ -1634,11 +1634,15 @@
                 </macro>
                 <macro>
                     <macro>{$MP_NEW}</macro>
-                    <value>Eden Space</value>
+                    <value>PS Eden Space</value>
                 </macro>
                 <macro>
                     <macro>{$MP_OLD}</macro>
-                    <value>Tenured Gen</value>
+                    <value>PS Old Gen</value>
+                </macro>
+                <macro>
+                    <macro>{$MP_PERM}</macro>
+                    <value>PS Perm Gen</value>
                 </macro>
             </macros>
             <templates>
@@ -1651,17 +1655,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM_Static:zorka.jmx[&quot;java&quot;,&quot;java.lang:name=MarkSweepCompact,type=GarbageCollector&quot;,&quot;CollectionTime&quot;].avg(3)}&gt;{$GC_H})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM_Static:zorka.jmx[&quot;java&quot;,&quot;java.lang:name=MarkSweepCompact,type=GarbageCollector&quot;,&quot;CollectionTime&quot;].avg(3)}&gt;{$GC_M})</expression>
-            <name>{HOSTNAME} MarkSweepCompact GC overload</name>
-            <url/>
-            <status>0</status>
-            <priority>3</priority>
-            <description/>
-            <type>0</type>
-            <dependencies/>
-        </trigger>
-        <trigger>
-            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM_Static:zorka.jmx[&quot;java&quot;,&quot;java.lang:name=MarkSweepCompact,type=GarbageCollector&quot;,&quot;CollectionTime&quot;].avg(3)}&gt;{$GC_M})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM_Static:zorka.jmx[&quot;java&quot;,&quot;java.lang:name=MarkSweepCompact,type=GarbageCollector&quot;,&quot;CollectionTime&quot;].avg(3)}&gt;{$GC_L})</expression>
+            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM_Static:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={$GC_OLD},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].avg(3)}&gt;{$GC_M})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM_Static:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={$GC_OLD},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].avg(3)}&gt;{$GC_L})</expression>
             <name>{HOSTNAME} MarkSweepCompact GC overload</name>
             <url>https://some.wiki/pages/MarkSweepCompactGcOverload</url>
             <status>0</status>
@@ -1671,11 +1665,11 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM_Static:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM_Static:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_L})</expression>
-            <name>{HOSTNAME} memory usage too high</name>
+            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM_Static:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={$GC_OLD},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].avg(3)}&gt;{$GC_H})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM_Static:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={$GC_OLD},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].avg(3)}&gt;{$GC_M})</expression>
+            <name>{HOSTNAME} MarkSweepCompact GC overload</name>
             <url/>
-            <status>1</status>
-            <priority>2</priority>
+            <status>0</status>
+            <priority>3</priority>
             <description/>
             <type>0</type>
             <dependencies/>
@@ -1686,6 +1680,16 @@
             <url/>
             <status>0</status>
             <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <dependencies/>
+        </trigger>
+        <trigger>
+            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM_Static:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM_Static:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_L})</expression>
+            <name>{HOSTNAME} memory usage too high</name>
+            <url/>
+            <status>1</status>
+            <priority>2</priority>
             <description/>
             <type>0</type>
             <dependencies/>
@@ -1721,7 +1725,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_JVM_Static:jvm.memutil[&quot;Perm Gen&quot;].last(0)}&gt;90.0</expression>
+            <expression>{Template_Zorka_JVM_Static:jvm.memutil[&quot;{$MP_PERM}&quot;].last(0)}&gt;90.0</expression>
             <name>{HOSTNAME} PermGen utilization is &gt; 90%</name>
             <url/>
             <status>0</status>
@@ -1783,7 +1787,7 @@
                     <type>0</type>
                     <item>
                         <host>Template_Zorka_JVM_Static</host>
-                        <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name=MarkSweepCompact,type=GarbageCollector&quot;,&quot;CollectionTime&quot;]</key>
+                        <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name={$GC_OLD},type=GarbageCollector&quot;,&quot;CollectionTime&quot;]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -1951,7 +1955,7 @@
                     <type>0</type>
                     <item>
                         <host>Template_Zorka_JVM_Static</host>
-                        <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name=Perm Gen,type=MemoryPool&quot;,&quot;Usage&quot;,&quot;used&quot;]</key>
+                        <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name={$MP_PERM},type=MemoryPool&quot;,&quot;Usage&quot;,&quot;used&quot;]</key>
                     </item>
                 </graph_item>
             </graph_items>
