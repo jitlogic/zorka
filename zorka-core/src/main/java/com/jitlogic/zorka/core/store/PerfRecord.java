@@ -14,11 +14,9 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.perfmon;
+package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.store.MetadataChecker;
-import com.jitlogic.zorka.core.store.Submittable;
-import com.jitlogic.zorka.core.util.PerfSample;
+import com.jitlogic.zorka.core.perfmon.PerfDataEventHandler;
 
 import java.util.List;
 

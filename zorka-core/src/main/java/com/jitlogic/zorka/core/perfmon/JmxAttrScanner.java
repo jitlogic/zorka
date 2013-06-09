@@ -19,8 +19,7 @@ package com.jitlogic.zorka.core.perfmon;
 import com.jitlogic.zorka.core.AgentDiagnostics;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.spy.TracerOutput;
-import com.jitlogic.zorka.core.store.MetricsRegistry;
-import com.jitlogic.zorka.core.store.SymbolRegistry;
+import com.jitlogic.zorka.core.store.*;
 import com.jitlogic.zorka.core.util.*;
 
 import java.util.ArrayList;

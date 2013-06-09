@@ -15,8 +15,6 @@
  */
 package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.perfmon.Metric;
-import com.jitlogic.zorka.core.perfmon.MetricTemplate;
 import com.jitlogic.zorka.core.util.*;
 import org.fressian.FressianWriter;
 import org.fressian.Writer;

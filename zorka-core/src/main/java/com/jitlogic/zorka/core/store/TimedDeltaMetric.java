@@ -14,31 +14,35 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.perfmon;
+package com.jitlogic.zorka.core.store;
 
 import java.util.Map;
 import java.util.Set;
 
-public class RawDataMetric extends Metric {
+public class TimedDeltaMetric extends RawDeltaMetric {
 
+    private long lastClock;
 
-    public RawDataMetric(int id, String name, Map<String, Object> attrs) {
+    public TimedDeltaMetric(int id, String name, Map<String, Object> attrs) {
         super(id, name, attrs);
     }
 
-    public RawDataMetric(int id, int templateId, String name, Map<String,Object> attrs) {
+    public TimedDeltaMetric(int id, int templateId, String name, Map<String, Object> attrs) {
         super(id, templateId, name, attrs);
     }
 
-
-    public RawDataMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
+    public TimedDeltaMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
         super(template, attrSet);
     }
 
-
     @Override
     public Number getValue(long clock, Object value) {
-        return multiply((Number)value);
-    }
+        Number val = super.getValue(clock, (Number)value);
 
+        long dclock = clock - lastClock;
+
+        lastClock = clock;
+
+        return dclock > 0 ?  1000.0 * val.doubleValue() / dclock : 0.0;
+    }
 }

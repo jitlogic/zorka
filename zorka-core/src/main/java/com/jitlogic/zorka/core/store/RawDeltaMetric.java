@@ -14,10 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.perfmon;
-
-import com.jitlogic.zorka.core.perfmon.MetricTemplate;
-import com.jitlogic.zorka.core.perfmon.RawDataMetric;
+package com.jitlogic.zorka.core.store;
 
 import java.util.Map;
 import java.util.Set;

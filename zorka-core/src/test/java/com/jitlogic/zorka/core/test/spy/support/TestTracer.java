@@ -16,9 +16,10 @@
 
 package com.jitlogic.zorka.core.test.spy.support;
 
-import com.jitlogic.zorka.core.perfmon.Metric;
-import com.jitlogic.zorka.core.perfmon.MetricTemplate;
+import com.jitlogic.zorka.core.store.Metric;
+import com.jitlogic.zorka.core.store.MetricTemplate;
 import com.jitlogic.zorka.core.perfmon.PerfDataEventHandler;
+import com.jitlogic.zorka.core.store.PerfSample;
 import com.jitlogic.zorka.core.util.*;
 import org.junit.Assert;
 
