@@ -18,6 +18,8 @@ package com.jitlogic.zorka.core.store;
 
 import com.jitlogic.zorka.core.util.ZorkaUtil;
 
+import java.io.IOException;
+
 /**
  * Represents exception in symbolic form (suitable to be saved into trace file
  * and restored by trace reader without need to actually have this exact exception
@@ -25,7 +27,7 @@ import com.jitlogic.zorka.core.util.ZorkaUtil;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class SymbolicException {
+public class SymbolicException implements SymbolicRecord {
 
 
     /** Exception class name symbol ID */
@@ -155,7 +157,8 @@ public class SymbolicException {
     }
 
 
-    public void traverse(MetadataChecker checker) {
+    @Override
+    public void traverse(MetadataChecker checker) throws IOException {
         checker.checkSymbol(classId);
         for (SymbolicStackElement el : stackTrace) {
             checker.checkSymbol(el.getClassId());

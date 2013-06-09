@@ -30,6 +30,8 @@ import java.io.*;
  */
 public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
 
+    // TODO class to be removed (along with simple trace format)
+
     /** Logger object. */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 

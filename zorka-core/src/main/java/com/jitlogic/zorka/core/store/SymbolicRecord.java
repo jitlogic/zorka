@@ -15,6 +15,8 @@
  */
 package com.jitlogic.zorka.core.store;
 
+import java.io.IOException;
+
 public interface SymbolicRecord {
-    void traverse(MetadataChecker checker);
+    void traverse(MetadataChecker checker) throws IOException;
 }

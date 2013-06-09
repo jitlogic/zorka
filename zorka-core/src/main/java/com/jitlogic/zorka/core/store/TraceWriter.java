@@ -1,3 +1,7 @@
+package com.jitlogic.zorka.core.store;
+
+import java.io.IOException;
+
 /**
  * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -13,13 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.store;
 
-import java.io.OutputStream;
+public interface TraceWriter {
+    void write(Submittable record) throws IOException;
 
+    void setOutput(TraceOutput output);
 
-public interface OutputFactory {
-
-    public OutputStream  getOutput();
-
+    void reset();
 }

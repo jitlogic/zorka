@@ -18,6 +18,7 @@ package com.jitlogic.zorka.core.store;
 
 import com.jitlogic.zorka.core.perfmon.PerfDataEventHandler;
 
+import java.io.IOException;
 import java.util.List;
 
 public class PerfRecord implements Submittable {
@@ -41,7 +42,7 @@ public class PerfRecord implements Submittable {
 
 
     @Override
-    public void traverse(MetadataChecker checker) {
+    public void traverse(MetadataChecker checker) throws IOException {
         checker.checkSymbol(scannerId);
         for (PerfSample sample : samples) {
             checker.checkMetric(sample.getMetricId());

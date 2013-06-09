@@ -26,9 +26,9 @@ import java.io.OutputStream;
 /**
  * Serializes trace data in Fressian format.
  */
-public class FressianTraceWriter implements MetadataChecker {
+public class FressianTraceWriter implements MetadataChecker, TraceWriter {
 
-    private ZorkaLog log = ZorkaLogger.getLog(FressianTraceWriter.class);
+    private static ZorkaLog log = ZorkaLogger.getLog(FressianTraceWriter.class);
 
     /** Symbol registry used by event sender. */
     private SymbolRegistry symbols;
@@ -37,105 +37,79 @@ public class FressianTraceWriter implements MetadataChecker {
 
     BitVector symbolsSent = new BitVector(),  metricsSent = new BitVector(16), templatesSent = new BitVector(16);
 
-    private OutputFactory factory;
+    private TraceOutput output;
 
-    private OutputStream output;
+    private OutputStream os;
 
     private Writer writer;
 
-    public FressianTraceWriter(OutputFactory factory, SymbolRegistry symbols, MetricsRegistry metrics) {
-        this.factory = factory;
+    public FressianTraceWriter(SymbolRegistry symbols, MetricsRegistry metrics) {
         this.symbols = symbols;
         this.metrics = metrics;
     }
 
 
-    public void write(Submittable record) {
+    @Override
+    public void write(Submittable record) throws IOException {
         checkOutput();
+        record.traverse(this);
+        writer.writeObject(record);
+    }
 
-        try {
-            // Look for metadata
-            record.traverse(this);
 
-            // Serialize record in tagged fressian format
-            writer.writeObject(record);
-        } catch (IOException e) {
-            handleError("Cannot process submitted record.", e);
-        }
+    @Override
+    public void setOutput(TraceOutput output) {
+        this.output = output;
     }
 
 
     public void reset() {
-        if (output != null) {
-            try {
-                output.close();
-            } catch (IOException e) {
-                // TODO should we go on if output stream does not close properly ?
-                log.error(ZorkaLogger.ZSP_SUBMIT, "Cannot close output stream.", e);
-            }
-        }
-        output = factory.getOutput();
+        os = output.getOutputStream();
         symbolsSent.reset();
         metricsSent.reset();
         templatesSent.reset();
-        this.writer = new FressianWriter(output, FressianTraceFormat.WRITE_LOOKUP);
+        this.writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);
     }
 
-
-    private void handleError(String msg, Throwable e) {
-        log.error(ZorkaLogger.ZSP_SUBMIT, msg, e);
-        reset();
-    }
 
     private void checkOutput() {
-        if (output == null) {
+        if (os == null) {
             reset();
         }
     }
 
+
     @Override
-    public void checkSymbol(int id) {
+    public void checkSymbol(int id) throws IOException {
         checkOutput();
         if (!symbolsSent.get(id)) {
             String sym = symbols.symbolName(id);
             log.debug(ZorkaLogger.ZTR_SYMBOL_ENRICHMENT, "Enriching output stream with symbol '%s', id=%s", sym, id);
-            try {
-                writer.writeObject(new Symbol(id, sym));
-            } catch (IOException e) {
-                handleError("Cannot submit symbol.", e);
-            }
+            writer.writeObject(new Symbol(id, sym));
             symbolsSent.set(id);
         }
     }
 
 
     @Override
-    public void checkMetric(int id) {
+    public void checkMetric(int id) throws IOException {
         checkOutput();
         if (!metricsSent.get(id)) {
             Metric metric = metrics.getMetric(id);
             log.debug(ZorkaLogger.ZTR_SYMBOL_ENRICHMENT, "Enriching output stream with metric '" + metric + "', id=" + id);
             checkTemplate(metric.getTemplateId());
-            try {
-                writer.writeObject(metric);
-            } catch (IOException e) {
-                handleError("Cannot submit metric.", e);
-            }
+            writer.writeObject(metric);
             metricsSent.set(id);
         }
     }
 
 
-    public void checkTemplate(int id) {
+    public void checkTemplate(int id) throws IOException {
         checkOutput();
         if (!templatesSent.get(id)) {
             MetricTemplate template = metrics.getTemplate(id);
             log.debug(ZorkaLogger.ZTR_SYMBOL_ENRICHMENT, "Enriching output stream with metric '" + template + "', id=" + id);
-            try {
-                writer.writeObject(template);
-            } catch (IOException e) {
-                handleError("Cannot submit metric template.", e);
-            }
+            writer.writeObject(template);
             templatesSent.set(id);
         }
     }

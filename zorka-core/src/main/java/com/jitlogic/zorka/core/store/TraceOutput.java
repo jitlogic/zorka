@@ -15,10 +15,11 @@
  */
 package com.jitlogic.zorka.core.store;
 
-import java.io.IOException;
+import java.io.OutputStream;
 
-public interface MetadataChecker {
-    void checkSymbol(int symbolId) throws IOException;
 
-    void checkMetric(int metricId) throws IOException;
+public interface TraceOutput {
+
+    public OutputStream getOutputStream();
+
 }

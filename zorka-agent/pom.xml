@@ -76,7 +76,7 @@
                                 </rule>
                                 <rule>
                                     <pattern>org.fressian.**</pattern>
-                                    <result>com.jitlogic.zorka.deps.@1</result>
+                                    <result>com.jitlogic.zorka.deps.fressian.@1</result>
                                 </rule>
                                 <keep>
                                     <pattern>com.jitlogic.zorka.**</pattern>

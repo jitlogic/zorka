@@ -26,6 +26,7 @@ import com.jitlogic.zorka.core.store.*;
 import com.jitlogic.zorka.core.store.PerfSample;
 import com.jitlogic.zorka.core.util.ZorkaUtil;
 import org.fressian.FressianReader;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -40,11 +41,11 @@ public class FressianTraceFormatUnitTest {
     ByteArrayOutputStream output = new ByteArrayOutputStream();
     private SymbolRegistry symbols = new SymbolRegistry();
     private MetricsRegistry metrics = new MetricsRegistry();
-    private FressianTraceWriter writer = new FressianTraceWriter(mkf(output), symbols, metrics);;
+    private FressianTraceWriter writer;
 
-    private OutputFactory mkf(final OutputStream output) {
-        return new OutputFactory() {
-            @Override public OutputStream getOutput() {
+    private TraceOutput mkf(final OutputStream output) {
+        return new TraceOutput() {
+            @Override public OutputStream getOutputStream() {
                 return output;
             }
         };
@@ -74,6 +75,12 @@ public class FressianTraceFormatUnitTest {
         return new Symbol(id, name);
     }
 
+
+    @Before
+    public void setUp() {
+        writer  = new FressianTraceWriter(symbols, metrics);
+        writer.setOutput(mkf(output));
+    }
 
     @Test
     public void testReadWriteSimpleSymbol() throws Exception {

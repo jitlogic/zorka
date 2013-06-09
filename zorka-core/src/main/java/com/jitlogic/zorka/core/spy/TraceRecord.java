@@ -22,6 +22,7 @@ import com.jitlogic.zorka.core.store.Submittable;
 import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.store.SymbolicException;
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -346,7 +347,7 @@ public class TraceRecord implements Submittable {
 
 
     @Override
-    public void traverse(MetadataChecker checker) {
+    public void traverse(MetadataChecker checker) throws IOException {
         checker.checkSymbol(classId);
         checker.checkSymbol(methodId);
         checker.checkSymbol(signatureId);
