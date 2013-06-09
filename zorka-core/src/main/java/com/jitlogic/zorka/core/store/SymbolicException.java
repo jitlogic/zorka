@@ -14,9 +14,9 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.util;
+package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.store.SymbolRegistry;
+import com.jitlogic.zorka.core.util.ZorkaUtil;
 
 /**
  * Represents exception in symbolic form (suitable to be saved into trace file
@@ -152,5 +152,15 @@ public class SymbolicException {
 
     public SymbolicStackElement[] getStackTrace() {
         return stackTrace;
+    }
+
+
+    public void traverse(MetadataChecker checker) {
+        checker.checkSymbol(classId);
+        for (SymbolicStackElement el : stackTrace) {
+            checker.checkSymbol(el.getClassId());
+            checker.checkSymbol(el.getFileId());
+            checker.checkSymbol(el.getMethodId());
+        }
     }
 }

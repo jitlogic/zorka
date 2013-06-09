@@ -31,6 +31,9 @@ public class WindowedRateMetric extends Metric {
         super(id, name, attrs);
     }
 
+    public WindowedRateMetric(int id, int templateId, String name, Map<String, Object> attrs) {
+        super(id, name, attrs);
+    }
     public WindowedRateMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
         super(template, attrSet);
     }
@@ -59,4 +62,5 @@ public class WindowedRateMetric extends Metric {
         Double multiplier = getTemplate().getMultiplier();
         return multiplier != 1.0 ? multiplier * rslt : rslt;
     }
+
 }

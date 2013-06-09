@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -14,12 +14,13 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.store.Submittable;
+import com.jitlogic.zorka.core.perfmon.PerfDataEventHandler;
 
-public interface TracerOutput {
+// TODO to be removed (as soon as SimpleTraceFormat disappears)
+public interface Submittable extends SymbolicRecord {
 
-    public void submit(Submittable record);
+    public void traverse(PerfDataEventHandler output);
 
 }

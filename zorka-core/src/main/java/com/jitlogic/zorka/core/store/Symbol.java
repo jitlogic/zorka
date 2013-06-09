@@ -13,32 +13,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-
-package com.jitlogic.zorka.core.perfmon;
-
-import java.util.Map;
-import java.util.Set;
-
-public class RawDataMetric extends Metric {
+package com.jitlogic.zorka.core.store;
 
 
-    public RawDataMetric(int id, String name, Map<String, Object> attrs) {
-        super(id, name, attrs);
+import com.jitlogic.zorka.core.util.ZorkaUtil;
+
+public class Symbol {
+    private final int id;
+    private final String name;
+
+    public Symbol(int id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
-    public RawDataMetric(int id, int templateId, String name, Map<String,Object> attrs) {
-        super(id, templateId, name, attrs);
+    public int getId() {
+        return id;
     }
 
-
-    public RawDataMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
-        super(template, attrSet);
+    public String getName() {
+        return name;
     }
-
 
     @Override
-    public Number getValue(long clock, Object value) {
-        return multiply((Number)value);
+    public boolean equals(Object obj) {
+        return obj instanceof Symbol &&
+            ((Symbol)obj).id == id &&
+            ZorkaUtil.objEquals(name, ((Symbol)obj).name);
     }
 
+    @Override
+    public String toString() {
+        return "Symbol(" + id + "," + name + ")";
+    }
+
+    @Override
+    public int hashCode() {
+        return 17 * id + 31 * (name != null ? name.hashCode() : 0);
+    }
 }

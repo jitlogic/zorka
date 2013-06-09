@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -13,11 +13,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.core.store;
 
-package com.jitlogic.zorka.core.perfmon;
-
-public interface Submittable {
-
-    public void traverse(PerfDataEventHandler output);
-
+public interface SymbolicRecord {
+    void traverse(MetadataChecker checker);
 }

@@ -61,8 +61,7 @@ public class TraceMarker {
      * @param clock current time (wall clock time)
      */
     public TraceMarker(TraceRecord root, int traceId, long clock) {
-        this.traceId = traceId;
-        this.clock = clock;
+        this(traceId, clock);
         TraceMarker parent = root.getMarker();
         if (parent != null) {
             this.minimumTime = parent.getMinimumTime();
@@ -71,6 +70,12 @@ public class TraceMarker {
             this.minimumTime = Tracer.getMinTraceTime();
             this.flags = 0;
         }
+    }
+
+
+    public TraceMarker(int traceId, long clock) {
+        this.traceId = traceId;
+        this.clock = clock;
     }
 
 

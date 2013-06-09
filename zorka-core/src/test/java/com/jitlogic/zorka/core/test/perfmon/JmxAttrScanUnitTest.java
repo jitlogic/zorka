@@ -25,7 +25,7 @@ import com.jitlogic.zorka.core.test.support.TestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import com.jitlogic.zorka.core.perfmon.Metric;
 import com.jitlogic.zorka.core.util.PerfSample;
-import com.jitlogic.zorka.core.perfmon.Submittable;
+import com.jitlogic.zorka.core.store.Submittable;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

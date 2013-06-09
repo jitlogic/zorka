@@ -41,6 +41,13 @@ public abstract class Metric implements Serializable {
         this.attrs = attrs;
     }
 
+    public Metric(int id, int templateId, String name, Map<String,Object> attrs) {
+        this.id = id;
+        this.templateId = templateId;
+        this.name = name;
+        this.attrs = attrs;
+    }
+
     public Metric(MetricTemplate template, Set<Map.Entry<String,Object>> attrSet) {
         this.template = template;
 

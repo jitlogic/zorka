@@ -29,6 +29,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
             <version>0.0.1</version>
         </dependency>
         <dependency>
+            <groupId>org.fressian</groupId>
+            <artifactId>fressian</artifactId>
+            <version>0.6.3</version>
+        </dependency>
+        <dependency>
             <groupId>org.ow2.spec.ee</groupId>
             <artifactId>ow2-jsr77-1.1-spec</artifactId>
             <version>1.0.10</version>

@@ -14,9 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.util;
-
-import com.jitlogic.zorka.core.store.SymbolRegistry;
+package com.jitlogic.zorka.core.store;
 
 public class SymbolicStackElement {
 

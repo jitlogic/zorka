@@ -14,14 +14,12 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.store;
 
 
 import com.jitlogic.zorka.core.perfmon.Metric;
 import com.jitlogic.zorka.core.perfmon.MetricTemplate;
-import com.jitlogic.zorka.core.store.MetricsRegistry;
 import com.jitlogic.zorka.core.perfmon.PerfDataEventHandler;
-import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.util.*;
 
 import java.util.List;

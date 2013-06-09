@@ -55,6 +55,7 @@
                                 <include>com.jitlogic.zoola:zoola-core</include>
                                 <include>com.jitlogic.contrib:libsnmp</include>
                                 <include>com.jitlogic.zorka:zorka-core</include>
+                                <include>org.fressian:fressian</include>
                             </includes>
                             <rules>
                                 <rule>
@@ -71,6 +72,10 @@
                                 </rule>
                                 <rule>
                                     <pattern>com.jitlogic.contrib.**</pattern>
+                                    <result>com.jitlogic.zorka.deps.@1</result>
+                                </rule>
+                                <rule>
+                                    <pattern>org.fressian.**</pattern>
                                     <result>com.jitlogic.zorka.deps.@1</result>
                                 </rule>
                                 <keep>

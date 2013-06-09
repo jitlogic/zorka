@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.core.perfmon;
 
+import com.jitlogic.zorka.core.store.MetadataChecker;
+import com.jitlogic.zorka.core.store.Submittable;
 import com.jitlogic.zorka.core.util.PerfSample;
 
 import java.util.List;
@@ -37,5 +39,26 @@ public class PerfRecord implements Submittable {
     @Override
     public void traverse(PerfDataEventHandler output) {
         output.perfData(clock, scannerId, samples);
+    }
+
+
+    @Override
+    public void traverse(MetadataChecker checker) {
+        checker.checkSymbol(scannerId);
+        for (PerfSample sample : samples) {
+            checker.checkMetric(sample.getMetricId());
+        }
+    }
+
+    public long getClock() {
+        return clock;
+    }
+
+    public int getScannerId() {
+        return scannerId;
+    }
+
+    public List<PerfSample> getSamples() {
+        return samples;
     }
 }

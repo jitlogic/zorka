@@ -13,32 +13,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.core.store;
 
-package com.jitlogic.zorka.core.perfmon;
-
-import java.util.Map;
-import java.util.Set;
-
-public class RawDataMetric extends Metric {
+import java.io.OutputStream;
 
 
-    public RawDataMetric(int id, String name, Map<String, Object> attrs) {
-        super(id, name, attrs);
-    }
+public interface OutputFactory {
 
-    public RawDataMetric(int id, int templateId, String name, Map<String,Object> attrs) {
-        super(id, templateId, name, attrs);
-    }
-
-
-    public RawDataMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
-        super(template, attrSet);
-    }
-
-
-    @Override
-    public Number getValue(long clock, Object value) {
-        return multiply((Number)value);
-    }
+    public OutputStream  getOutput();
 
 }

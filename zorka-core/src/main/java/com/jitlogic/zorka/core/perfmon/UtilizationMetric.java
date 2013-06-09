@@ -16,8 +16,6 @@
 
 package com.jitlogic.zorka.core.perfmon;
 
-import com.jitlogic.zorka.core.perfmon.Metric;
-import com.jitlogic.zorka.core.perfmon.MetricTemplate;
 import com.jitlogic.zorka.core.util.ObjectInspector;
 
 import java.util.Map;
@@ -29,6 +27,9 @@ public class UtilizationMetric extends Metric {
         super(id, name, attrs);
     }
 
+    public UtilizationMetric(int id, int templateId, String name, Map<String, Object> attrs) {
+        super(id, name, attrs);
+    }
     public UtilizationMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
         super(template, attrSet);
     }
@@ -54,4 +55,5 @@ public class UtilizationMetric extends Metric {
         Double multiplier = getTemplate().getMultiplier();
         return multiplier != 1.0 ? multiplier * rslt : rslt;
     }
+
 }

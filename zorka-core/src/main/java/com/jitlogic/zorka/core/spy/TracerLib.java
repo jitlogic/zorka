@@ -18,11 +18,9 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.core.ZorkaConfig;
 import com.jitlogic.zorka.core.store.*;
-import com.jitlogic.zorka.core.perfmon.Submittable;
 import com.jitlogic.zorka.core.util.OverlayClassLoader;
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 
-import java.io.IOException;
 import java.util.Set;
 
 /**

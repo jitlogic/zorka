@@ -17,9 +17,9 @@
 package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.core.store.MetricsRegistry;
+import com.jitlogic.zorka.core.store.SymbolEnricher;
 import com.jitlogic.zorka.core.store.SymbolRegistry;
-import com.jitlogic.zorka.core.util.SymbolicException;
-import com.jitlogic.zorka.core.spy.*;
+import com.jitlogic.zorka.core.store.SymbolicException;
 import com.jitlogic.zorka.core.test.spy.support.TestTracer;
 
 import org.junit.Assert;
