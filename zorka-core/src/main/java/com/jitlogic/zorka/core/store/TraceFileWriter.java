@@ -16,8 +16,6 @@
 
 package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.perfmon.Submittable;
-import com.jitlogic.zorka.core.spy.SymbolEnricher;
 import com.jitlogic.zorka.core.util.*;
 
 import java.io.*;
@@ -31,6 +29,8 @@ import java.io.*;
  * @author rafal.lewczuk@jitlogic.com
  */
 public class TraceFileWriter extends ZorkaAsyncThread<Submittable> {
+
+    // TODO class to be removed (along with simple trace format)
 
     /** Logger object. */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());

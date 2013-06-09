@@ -16,9 +16,6 @@
 
 package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.perfmon.Metric;
-import com.jitlogic.zorka.core.perfmon.MetricTemplate;
-
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.concurrent.ConcurrentHashMap;

@@ -19,9 +19,6 @@ package com.jitlogic.zorka.core.store;
 
 import com.jitlogic.zorka.core.perfmon.*;
 import com.jitlogic.zorka.core.util.ByteBuffer;
-import com.jitlogic.zorka.core.util.PerfSample;
-import com.jitlogic.zorka.core.util.SymbolicException;
-import com.jitlogic.zorka.core.util.SymbolicStackElement;
 
 import java.util.*;
 
@@ -291,6 +288,7 @@ public class SimplePerfDataFormat implements PerfDataEventHandler {
             }
         }
     }
+
 
     @Override
     public void newMetric(Metric metric) {

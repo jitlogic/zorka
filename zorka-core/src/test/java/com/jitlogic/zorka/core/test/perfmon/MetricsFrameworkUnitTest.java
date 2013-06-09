@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core.test.perfmon;
 
 import com.jitlogic.zorka.core.perfmon.*;
+import com.jitlogic.zorka.core.store.*;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
 import com.jitlogic.zorka.core.util.*;

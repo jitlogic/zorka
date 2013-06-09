@@ -18,11 +18,10 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.core.ZorkaConfig;
 import com.jitlogic.zorka.core.store.*;
-import com.jitlogic.zorka.core.perfmon.Submittable;
 import com.jitlogic.zorka.core.util.OverlayClassLoader;
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.Set;
 
 /**
@@ -201,6 +200,14 @@ public class TracerLib {
                 symbolRegistry, metricsRegistry, maxFiles, maxSize);
         writer.start();
         return writer;
+    }
+
+
+    public ZorkaAsyncThread<Submittable> toLocalFile(String path, int maxFiles, long maxSize) {
+        TraceWriter writer = new FressianTraceWriter(symbolRegistry, metricsRegistry);
+        FileTraceOutput output = new FileTraceOutput(writer, new File(config.formatCfg(path)), maxFiles, maxSize);
+        output.start();
+        return output;
     }
 
 

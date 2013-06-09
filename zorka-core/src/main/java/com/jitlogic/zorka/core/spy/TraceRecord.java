@@ -17,10 +17,12 @@
 package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.core.perfmon.PerfDataEventHandler;
-import com.jitlogic.zorka.core.perfmon.Submittable;
+import com.jitlogic.zorka.core.store.MetadataChecker;
+import com.jitlogic.zorka.core.store.Submittable;
 import com.jitlogic.zorka.core.store.SymbolRegistry;
-import com.jitlogic.zorka.core.util.SymbolicException;
+import com.jitlogic.zorka.core.store.SymbolicException;
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -90,6 +92,11 @@ public class TraceRecord implements Submittable {
      * @param parent parent record
      */
     public TraceRecord(TraceRecord parent) {
+        setParent(parent);
+    }
+
+
+    public void setParent(TraceRecord parent) {
         this.parent = parent;
 
         if (parent != null) {
@@ -113,12 +120,17 @@ public class TraceRecord implements Submittable {
         }
     }
 
+    public int numAttrs() {
+        return attrs != null ? attrs.size() : 0;
+    }
 
     public Map<Integer,Object> getAttrs() {
         return attrs;
     }
 
-
+    public void setAttrs(Map<Integer,Object> attrs) {
+        this.attrs = attrs;
+    }
 
     /**
      * Sets custom attribute value.
@@ -175,6 +187,14 @@ public class TraceRecord implements Submittable {
         return children != null ? children.size() : 0;
     }
 
+
+    public List<TraceRecord> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<TraceRecord> children) {
+        this.children = children;
+    }
 
     public TraceRecord getParent() {
         return parent;
@@ -326,6 +346,30 @@ public class TraceRecord implements Submittable {
     }
 
 
+    @Override
+    public void traverse(MetadataChecker checker) throws IOException {
+        checker.checkSymbol(classId);
+        checker.checkSymbol(methodId);
+        checker.checkSymbol(signatureId);
+
+        if (exception instanceof SymbolicException) {
+            ((SymbolicException)exception).traverse(checker);
+        }
+
+        if (attrs != null) {
+            for (Integer attrId : attrs.keySet()) {
+                checker.checkSymbol(attrId);
+            }
+        }
+
+        if (children != null) {
+            for (TraceRecord child : children) {
+                child.traverse(checker);
+            }
+        }
+    }
+
+
     /**
      * Cleans up record for reuse. This is used to limit amount of
      * memory consumed by subsequent allocations (thus imposing less
@@ -353,6 +397,9 @@ public class TraceRecord implements Submittable {
         return 0 != (flags & flag);
     }
 
+    public int getFlags() {
+        return flags;
+    }
 
     /**
      * Returns true if record is part of recorded trace.

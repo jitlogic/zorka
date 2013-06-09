@@ -13,13 +13,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.core.store;
 
-package com.jitlogic.zorka.core.spy;
+import java.io.OutputStream;
 
-import com.jitlogic.zorka.core.store.Submittable;
 
-public interface TracerOutput {
+public interface TraceOutput {
 
-    public void submit(Submittable record);
+    public OutputStream getOutputStream();
 
 }

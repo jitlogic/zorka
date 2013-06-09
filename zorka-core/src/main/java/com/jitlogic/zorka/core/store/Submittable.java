@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -14,28 +14,13 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.perfmon;
+package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.util.PerfSample;
+import com.jitlogic.zorka.core.perfmon.PerfDataEventHandler;
 
-import java.util.List;
+// TODO to be removed (as soon as SimpleTraceFormat disappears)
+public interface Submittable extends SymbolicRecord {
 
-public class PerfRecord implements Submittable {
+    public void traverse(PerfDataEventHandler output);
 
-    private long clock;
-    private int scannerId;
-    private List<PerfSample> samples;
-
-
-    public PerfRecord(long clock, int scannerId, List<PerfSample> samples) {
-        this.clock = clock;
-        this.scannerId = scannerId;
-        this.samples = samples;
-    }
-
-
-    @Override
-    public void traverse(PerfDataEventHandler output) {
-        output.perfData(clock, scannerId, samples);
-    }
 }

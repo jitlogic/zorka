@@ -14,15 +14,12 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.perfmon;
+package com.jitlogic.zorka.core.store;
 
 import com.jitlogic.zorka.core.util.ZorkaUtil;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class MetricTemplate implements Serializable {
 
@@ -51,6 +48,17 @@ public class MetricTemplate implements Serializable {
     public MetricTemplate(int type, String name, String units) {
         this(type, name, units, null, null);
     }
+
+
+    public MetricTemplate(int id, int type, String name, String units, String nomField, String divField) {
+        this.id = id;
+        this.type = type;
+        this.name = name;
+        this.units = units;
+        this.nomField = nomField;
+        this.divField = divField;
+    }
+
 
 
     public MetricTemplate(int type, String name, String units, String nomField, String divField) {
@@ -147,6 +155,14 @@ public class MetricTemplate implements Serializable {
         for (String attr : attrs) {
             mt.dynamicAttrs.add(attr);
         }
+        return mt;
+    }
+
+
+    public MetricTemplate dynamicAttrs(Collection<String> attrs) {
+        if (attrs == null) { return this; }
+        MetricTemplate mt = new MetricTemplate(this);
+        mt.dynamicAttrs.addAll(attrs);
         return mt;
     }
 

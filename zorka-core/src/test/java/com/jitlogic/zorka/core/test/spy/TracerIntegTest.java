@@ -16,10 +16,11 @@
 
 package com.jitlogic.zorka.core.test.spy;
 
+import com.jitlogic.zorka.core.store.SymbolicRecord;
 import com.jitlogic.zorka.core.test.spy.support.TestTracer;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.core.perfmon.Submittable;
+import com.jitlogic.zorka.core.store.Submittable;
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 import org.junit.Before;
 import org.junit.Test;
