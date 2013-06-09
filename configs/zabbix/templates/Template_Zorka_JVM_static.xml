@@ -1364,7 +1364,7 @@
                     <valuemap/>
                 </item>
                 <item>
-                    <name>{$GC_PERM} usage</name>
+                    <name>{$MP_PERM} usage</name>
                     <type>0</type>
                     <snmp_community/>
                     <multiplier>0</multiplier>
@@ -1403,7 +1403,7 @@
                     <valuemap/>
                 </item>
                 <item>
-                    <name>{$GC_PERM} utilization</name>
+                    <name>{$MP_PERM} utilization</name>
                     <type>0</type>
                     <snmp_community/>
                     <multiplier>0</multiplier>
