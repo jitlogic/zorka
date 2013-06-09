@@ -4,9 +4,6 @@
     <date>2012-09-08T15:14:36Z</date>
     <groups>
         <group>
-            <name>KOLEKTOR-TEST</name>
-        </group>
-        <group>
             <name>Templates</name>
         </group>
     </groups>
@@ -15,9 +12,6 @@
             <template>Template_Zorka_JBoss_RequestProcessors</template>
             <name>Template_Zorka_JBoss_RequestProcessors</name>
             <groups>
-                <group>
-                    <name>KOLEKTOR-TEST</name>
-                </group>
                 <group>
                     <name>Templates</name>
                 </group>

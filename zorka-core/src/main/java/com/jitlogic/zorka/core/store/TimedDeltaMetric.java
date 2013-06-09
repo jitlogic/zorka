@@ -14,38 +14,35 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.perfmon;
-
-import com.jitlogic.zorka.core.perfmon.MetricTemplate;
-import com.jitlogic.zorka.core.perfmon.RawDataMetric;
+package com.jitlogic.zorka.core.store;
 
 import java.util.Map;
 import java.util.Set;
 
-public class RawDeltaMetric extends RawDataMetric {
+public class TimedDeltaMetric extends RawDeltaMetric {
 
-    private Number last;
+    private long lastClock;
 
-    public RawDeltaMetric(int id, String name, Map<String, Object> attrs) {
+    public TimedDeltaMetric(int id, String name, Map<String, Object> attrs) {
         super(id, name, attrs);
     }
 
-    public RawDeltaMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
+    public TimedDeltaMetric(int id, int templateId, String name, Map<String, Object> attrs) {
+        super(id, templateId, name, attrs);
+    }
+
+    public TimedDeltaMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
         super(template, attrSet);
     }
 
     @Override
     public Number getValue(long clock, Object value) {
-        Number cur = super.getValue(clock, value), rslt;
+        Number val = super.getValue(clock, (Number)value);
 
-        if (cur instanceof Double || cur instanceof Float || last instanceof Double) {
-            rslt = last != null ? cur.doubleValue() - last.doubleValue() : 0.0;
-            last = cur.doubleValue();
-        } else {
-            rslt = last != null ? cur.longValue() - last.longValue() : 0L;
-            last = cur.longValue();
-        }
+        long dclock = clock - lastClock;
 
-        return rslt;
+        lastClock = clock;
+
+        return dclock > 0 ?  1000.0 * val.doubleValue() / dclock : 0.0;
     }
 }

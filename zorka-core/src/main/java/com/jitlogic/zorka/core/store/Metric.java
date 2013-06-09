@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.perfmon;
+package com.jitlogic.zorka.core.store;
 
 import com.jitlogic.zorka.core.util.ObjectInspector;
 
@@ -37,6 +37,13 @@ public abstract class Metric implements Serializable {
 
     public Metric(int id, String name, Map<String,Object> attrs) {
         this.id = id;
+        this.name = name;
+        this.attrs = attrs;
+    }
+
+    public Metric(int id, int templateId, String name, Map<String,Object> attrs) {
+        this.id = id;
+        this.templateId = templateId;
         this.name = name;
         this.attrs = attrs;
     }

@@ -14,22 +14,25 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.perfmon;
+package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.perfmon.Metric;
-import com.jitlogic.zorka.core.perfmon.MetricTemplate;
 import com.jitlogic.zorka.core.util.ObjectInspector;
 
 import java.util.Map;
 import java.util.Set;
 
-public class UtilizationMetric extends Metric {
+public class WindowedRateMetric extends Metric {
 
-    public UtilizationMetric(int id, String name, Map<String, Object> attrs) {
+    private long lastNom, lastDiv;
+
+    public WindowedRateMetric(int id, String name, Map<String, Object> attrs) {
         super(id, name, attrs);
     }
 
-    public UtilizationMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
+    public WindowedRateMetric(int id, int templateId, String name, Map<String, Object> attrs) {
+        super(id, name, attrs);
+    }
+    public WindowedRateMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
         super(template, attrSet);
     }
 
@@ -42,16 +45,20 @@ public class UtilizationMetric extends Metric {
             return 0.0;
         }
 
-        double curNom = rawNom.longValue();
-        double curDiv = rawDiv.longValue();
+        long curNom = rawNom.longValue();
+        long curDiv = rawDiv.longValue();
 
         Double rslt = 0.0;
 
-        if (curDiv != 0) {
-            rslt = 100.0 * curNom / curDiv;
+        if (curDiv - lastDiv > 0) {
+            rslt = ((double)(curNom-lastNom)) / ((double)(curDiv-lastDiv));
         }
+
+        lastNom = curNom;
+        lastDiv = curDiv;
 
         Double multiplier = getTemplate().getMultiplier();
         return multiplier != 1.0 ? multiplier * rslt : rslt;
     }
+
 }

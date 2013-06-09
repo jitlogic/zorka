@@ -1,3 +1,7 @@
+package com.jitlogic.zorka.core.store;
+
+import java.io.IOException;
+
 /**
  * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -14,30 +18,10 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.perfmon;
+public interface TraceWriter {
+    void write(Submittable record) throws IOException;
 
-import com.jitlogic.zorka.core.perfmon.Metric;
-import com.jitlogic.zorka.core.perfmon.MetricTemplate;
+    void setOutput(TraceOutput output);
 
-import java.util.Map;
-import java.util.Set;
-
-public class RawDataMetric extends Metric {
-
-
-    public RawDataMetric(int id, String name, Map<String, Object> attrs) {
-        super(id, name, attrs);
-    }
-
-
-    public RawDataMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
-        super(template, attrSet);
-    }
-
-
-    @Override
-    public Number getValue(long clock, Object value) {
-        return multiply((Number)value);
-    }
-
+    void reset();
 }
