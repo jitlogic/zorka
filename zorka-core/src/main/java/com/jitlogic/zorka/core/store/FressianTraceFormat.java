@@ -16,8 +16,6 @@
 package com.jitlogic.zorka.core.store;
 
 
-import com.jitlogic.zorka.core.spy.TraceMarker;
-import com.jitlogic.zorka.core.spy.TraceRecord;
 import com.jitlogic.zorka.core.util.ZorkaUtil;
 import org.fressian.Reader;
 import org.fressian.Writer;

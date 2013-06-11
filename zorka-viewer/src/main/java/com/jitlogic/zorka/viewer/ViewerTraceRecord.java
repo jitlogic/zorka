@@ -16,8 +16,8 @@
 package com.jitlogic.zorka.viewer;
 
 
-import com.jitlogic.zorka.core.spy.TraceMarker;
-import com.jitlogic.zorka.core.spy.TraceRecord;
+import com.jitlogic.zorka.core.store.TraceMarker;
+import com.jitlogic.zorka.core.store.TraceRecord;
 import com.jitlogic.zorka.core.store.SymbolRegistry;
 import org.objectweb.asm.Type;
 

@@ -16,7 +16,7 @@
 package com.jitlogic.zorka.viewer;
 
 
-import com.jitlogic.zorka.core.spy.TraceRecord;
+import com.jitlogic.zorka.core.store.TraceRecord;
 import com.jitlogic.zorka.core.store.FressianTraceFormat;
 import com.jitlogic.zorka.core.store.Symbol;
 import com.jitlogic.zorka.core.store.SymbolRegistry;

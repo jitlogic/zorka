@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.core.store.FileTraceOutput;
 import com.jitlogic.zorka.core.ZorkaConfig;
 import com.jitlogic.zorka.core.store.*;
 import com.jitlogic.zorka.core.util.OverlayClassLoader;

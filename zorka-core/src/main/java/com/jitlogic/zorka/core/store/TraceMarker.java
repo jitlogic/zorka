@@ -14,7 +14,9 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.store;
+
+import com.jitlogic.zorka.core.spy.Tracer;
 
 /**
  * Trace marker object marks beginning of a new trace. It can be attached
