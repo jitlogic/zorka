@@ -53,7 +53,7 @@ public class ViewerTraceRecord extends TraceRecord {
 
 
     public boolean hasError() {
-        return hasFlag(NamedTraceRecord.EXCEPTION_PASS) || this.getException() != null;
+        return hasFlag(ViewerTraceRecord.EXCEPTION_PASS) || this.getException() != null;
     }
 
 

@@ -33,9 +33,6 @@ public class TraceDataSet {
     private List<ViewerTraceRecord> traceRecords = new ArrayList<ViewerTraceRecord>();
 
 
-    public TraceDataSet() { }
-
-
     public TraceDataSet(File file) {
 
         FressianTraceFormat.TraceRecordBuilder oldb = FressianTraceFormat.TRACE_RECORD_BUILDER;

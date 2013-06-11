@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
 
 public class TraceDetailPanel extends JPanel {
 
-    //private PerfDataSet traceSet;
     private TraceDataSet dataSet;
 
     private ErrorDetailView pnlStackTrace;

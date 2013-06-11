@@ -49,17 +49,4 @@ public class TraceCellRenderer extends JLabel implements TableCellRenderer {
 
         return this;
     }
-
-    private String traceLabel(NamedTraceRecord rec) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(rec.getTraceName());
-        if (rec.getAttrs() != null) {
-            for (Map.Entry<String,Object> e : rec.getAttrs().entrySet()) {
-                sb.append('|');
-                sb.append(e.getValue());
-            }
-        }
-        return sb.toString();
-    }
-
 }

@@ -27,16 +27,11 @@ public class MethodCellRenderer extends JLabel implements TableCellRenderer {
     public static final int SINGLE_LEVEL = 12;
 
     private ViewerTraceRecord record;
-    private ImageIcon icnException, icnOverflow, icnTraceBegin; //, icnDroppedParent;
     private ImageIcon icnTreePlus, icnTreeMinus;
 
 
     public MethodCellRenderer() {
         setOpaque(true);
-        icnException = ResourceManager.getIcon16x16("error-mark");
-        icnOverflow = ResourceManager.getIcon16x16("flag");
-        icnTraceBegin = ResourceManager.getIcon16x16("trace-begin");
-        //icnDroppedParent = ResourceManager.getIcon16x16("dropped-parent");
         icnTreePlus = ResourceManager.getIcon12x12("tree-plus");
         icnTreeMinus = ResourceManager.getIcon12x12("tree-minus");
     }
@@ -98,7 +93,7 @@ public class MethodCellRenderer extends JLabel implements TableCellRenderer {
 
         Graphics2D g2 = (Graphics2D)g;
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g.setFont(record.hasFlag(NamedTraceRecord.TRACE_BEGIN) ? getFont().deriveFont(Font.BOLD) : getFont());
+        g.setFont(record.hasFlag(ViewerTraceRecord.TRACE_BEGIN) ? getFont().deriveFont(Font.BOLD) : getFont());
         g.setColor(record.hasError() ? Color.RED : Color.BLACK);
         g.drawString(record.prettyPrint(), offs, 13);
 

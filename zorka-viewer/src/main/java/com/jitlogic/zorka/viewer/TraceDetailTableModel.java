@@ -68,7 +68,7 @@ public class TraceDetailTableModel extends AbstractTableModel {
             public boolean matches(ViewerTraceRecord record) {
                 return record != null && record.getTimePct() >= minPct
                     && (!errOnly
-                        || (0 != (record.getFlags() & NamedTraceRecord.EXCEPTION_PASS)
+                        || (0 != (record.getFlags() & ViewerTraceRecord.EXCEPTION_PASS)
                         || record.getException() != null))
                     && !omits.contains(record.getClassName() + "." + record.getMethodName());
             }
