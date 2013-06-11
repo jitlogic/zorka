@@ -20,19 +20,6 @@ public class TracePrinterManualTest {
 
     //@Test
     public void testReadAndPrintTrace() throws Exception {
-//        File f = new File("/tmp/trace.trc");
-//        InputStream is = new FileInputStream(f);
-//        byte[] buf = new byte[(int)f.length()];
-//        is.read(buf);
-//        is.close();
-//
-//        OutputStream os = new BufferedOutputStream(new FileOutputStream("/tmp/trace.txt"));
-//        PrintStream ps = new PrintStream(os);
-//
-//        PerfPrinterStream printer = new PerfPrinterStream(ps);
-//        new SimplePerfDataFormat(buf).decode(printer);
-//        ps.flush();
-//        ps.close();
     }
 
 }

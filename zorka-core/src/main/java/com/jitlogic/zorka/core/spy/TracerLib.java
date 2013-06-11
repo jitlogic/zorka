@@ -196,14 +196,6 @@ public class TracerLib {
      * @return trace file writer
      */
     public ZorkaAsyncThread<Submittable> toFile(String path, int maxFiles, long maxSize) {
-        TraceFileWriter writer = new TraceFileWriter(config.formatCfg(path),
-                symbolRegistry, metricsRegistry, maxFiles, maxSize);
-        writer.start();
-        return writer;
-    }
-
-
-    public ZorkaAsyncThread<Submittable> toLocalFile(String path, int maxFiles, long maxSize) {
         TraceWriter writer = new FressianTraceWriter(symbolRegistry, metricsRegistry);
         FileTraceOutput output = new FileTraceOutput(writer, new File(config.formatCfg(path)), maxFiles, maxSize);
         output.start();
