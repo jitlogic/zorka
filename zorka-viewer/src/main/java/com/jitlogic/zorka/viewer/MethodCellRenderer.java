@@ -26,7 +26,7 @@ public class MethodCellRenderer extends JLabel implements TableCellRenderer {
 
     public static final int SINGLE_LEVEL = 12;
 
-    private NamedTraceRecord record;
+    private ViewerTraceRecord record;
     private ImageIcon icnException, icnOverflow, icnTraceBegin; //, icnDroppedParent;
     private ImageIcon icnTreePlus, icnTreeMinus;
 
@@ -67,7 +67,7 @@ public class MethodCellRenderer extends JLabel implements TableCellRenderer {
             setBorder(new EmptyBorder(1,2,1,2));
         }
 
-        record = (NamedTraceRecord)value;
+        record = (ViewerTraceRecord)value;
 
         setSize(new Dimension(table.getTableHeader().getColumnModel().getColumn(column).getWidth(), 1000));
 
@@ -106,8 +106,8 @@ public class MethodCellRenderer extends JLabel implements TableCellRenderer {
             int line = 1;
             g.setFont(getFont().deriveFont(Font.BOLD));
             g.setColor(Color.BLUE);
-            for (Map.Entry<String,Object> e : record.getAttrs().entrySet()) {
-                g.drawString(e.getKey() + "=" + e.getValue(), offs + 8, 13 + line*16);
+            for (Map.Entry<?,?> e : record.getAttrs().entrySet()) {
+                g.drawString(record.sym((Long)e.getKey()) + "=" + e.getValue(), offs + 8, 13 + line*16);
                 line++;
             }
         }

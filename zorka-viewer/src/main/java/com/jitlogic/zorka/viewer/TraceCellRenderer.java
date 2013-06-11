@@ -31,7 +31,7 @@ public class TraceCellRenderer extends JLabel implements TableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value,
                                                    boolean isSelected, boolean hasFocus, int row, int column) {
 
-        NamedTraceRecord record = (NamedTraceRecord)value;
+        ViewerTraceRecord record = (ViewerTraceRecord)value;
 
         if (record != null) {
             if (isSelected) {
@@ -44,7 +44,7 @@ public class TraceCellRenderer extends JLabel implements TableCellRenderer {
                 setForeground(record.hasError() ? Color.RED : UIManager.getColor("Table.foreground"));
                 setBackground(UIManager.getColor("Table.background"));
             }
-            setText(traceLabel(record));
+            setText(record.getTraceLabel());
         }
 
         return this;

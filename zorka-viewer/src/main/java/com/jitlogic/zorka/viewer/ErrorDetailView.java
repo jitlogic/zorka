@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.viewer;
 
 
+import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.store.SymbolicException;
 import com.jitlogic.zorka.core.store.SymbolicStackElement;
 
@@ -71,7 +72,7 @@ public class ErrorDetailView extends JPanel {
     }
 
 
-    public void update(Map<Integer,String> symbols, NamedTraceRecord record) {
+    public void update(SymbolRegistry symbols, ViewerTraceRecord record) {
         StringBuilder sb = new StringBuilder();
         SymbolicException cause = findCause(record);
         SymbolicException exception = findException(record);
@@ -87,8 +88,8 @@ public class ErrorDetailView extends JPanel {
         mdesc.append(record.prettyPrint() + "\n\n");
 
         if (record.numAttrs() > 0) {
-            for (Map.Entry<String,Object> e : record.getAttrs().entrySet()) {
-                mdesc.append(e.getKey() + "=" + e.getValue() + "\n");
+            for (Map.Entry<Integer,Object> e : record.getAttrs().entrySet()) {
+                mdesc.append(record.sym(e.getKey()) + "=" + e.getValue() + "\n");
             }
         }
 
@@ -96,23 +97,23 @@ public class ErrorDetailView extends JPanel {
     }
 
 
-    private SymbolicException findException(NamedTraceRecord record) {
+    private SymbolicException findException(ViewerTraceRecord record) {
         if (record.getException() != null) {
             return (SymbolicException)record.getException();
         } else if (0 != (record.getFlags() & NamedTraceRecord.EXCEPTION_PASS) && record.numChildren() > 0) {
-            return findException(record.getChild(record.numChildren()-1));
+            return findException((ViewerTraceRecord)record.getChild(record.numChildren()-1));
         } else {
             return null;
         }
     }
 
-    private SymbolicException findCause(NamedTraceRecord record) {
+    private SymbolicException findCause(ViewerTraceRecord record) {
 
         SymbolicException cause = null;
 
         if (0 != (record.getFlags() & NamedTraceRecord.EXCEPTION_WRAP) && record.numChildren() > 0) {
             // Identify cause of wrapped exception)
-            NamedTraceRecord child = record.getChild(record.numChildren()-1);
+            ViewerTraceRecord child = (ViewerTraceRecord)record.getChild(record.numChildren()-1);
             if (child.getException() != null) {
                 cause = ((SymbolicException)child.getException()).getCause();
             } else {
@@ -124,18 +125,18 @@ public class ErrorDetailView extends JPanel {
     }
 
 
-    private String printException(Map<Integer, String> symbols, SymbolicException ex, SymbolicException cause, StringBuilder sb) {
-        sb.append(symbols.get(ex.getClassId()));
+    private String printException(SymbolRegistry symbols, SymbolicException ex, SymbolicException cause, StringBuilder sb) {
+        sb.append(symbols.symbolName(ex.getClassId()));
         sb.append(": ");
         sb.append(ex.getMessage());
         sb.append("\n");
         for (SymbolicStackElement sse : ex.getStackTrace()) {
             sb.append("    at ");
-            sb.append(symbols.get(sse.getClassId()));
+            sb.append(symbols.symbolName(sse.getClassId()));
             sb.append(".");
-            sb.append(symbols.get(sse.getMethodId()));
+            sb.append(symbols.symbolName(sse.getMethodId()));
             sb.append("(): ");
-            sb.append(symbols.get(sse.getFileId()));
+            sb.append(symbols.symbolName(sse.getFileId()));
             sb.append(":");
             sb.append(sse.getLineNum());
             sb.append("\n");

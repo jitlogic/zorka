@@ -24,6 +24,7 @@ import com.jitlogic.zorka.core.spy.TraceMarker;
 import com.jitlogic.zorka.core.spy.TraceRecord;
 import com.jitlogic.zorka.core.store.*;
 import com.jitlogic.zorka.core.store.PerfSample;
+import com.jitlogic.zorka.core.util.BitVector;
 import com.jitlogic.zorka.core.util.ZorkaUtil;
 import org.fressian.FressianReader;
 import org.junit.Before;
@@ -35,6 +36,8 @@ import static com.jitlogic.zorka.core.store.FressianTraceFormat.READ_LOOKUP;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class FressianTraceFormatUnitTest {
 
@@ -207,10 +210,13 @@ public class FressianTraceFormatUnitTest {
 
         Object obj = reader.readObject();
 
+        Set<Integer> ids = new HashSet<Integer>();
+
         while (obj instanceof Symbol) {
             Symbol s = (Symbol)obj;
             assertThat(s.getId()).isEqualTo(sid(s.getName()));
             obj = reader.readObject();
+            ids.add(s.getId());
         }
 
         TraceRecord tr2 = (TraceRecord)obj;
@@ -222,6 +228,9 @@ public class FressianTraceFormatUnitTest {
         assertThat(tm2.getFlags()).isEqualTo(TraceMarker.OVERFLOW_FLAG);
         assertThat(tm2.getClock()).isEqualTo(100L);
         assertThat(tm2.getTraceId()).isEqualTo(sid("TRACE"));
+
+        assertThat(ids.size()).isEqualTo(symbols.size());
+
     }
 
 

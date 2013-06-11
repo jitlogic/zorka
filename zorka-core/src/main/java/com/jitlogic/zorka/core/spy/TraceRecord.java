@@ -367,6 +367,10 @@ public class TraceRecord implements Submittable {
                 child.traverse(checker);
             }
         }
+
+        if (marker != null) {
+            checker.checkSymbol(marker.getTraceId());
+        }
     }
 
 

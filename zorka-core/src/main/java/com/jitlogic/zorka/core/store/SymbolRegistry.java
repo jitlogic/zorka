@@ -86,7 +86,9 @@ public class SymbolRegistry {
         if (symbolId == 0) {
             return "<null>";
         }
-        return symbolNames.get(symbolId);
+        String sym = symbolNames.get(symbolId);
+
+        return sym != null ? sym : "<?>";
     }
 
 

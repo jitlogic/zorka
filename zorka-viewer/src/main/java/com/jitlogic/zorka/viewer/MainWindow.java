@@ -38,6 +38,8 @@ public class MainWindow extends JFrame {
     /** Contains loaded traces */
     private PerfDataSet traceSet = new PerfDataSet();
 
+    private TraceDataSet traceData = null;
+
     /** Content pane */
     private JPanel contentPane;
 
@@ -73,15 +75,18 @@ public class MainWindow extends JFrame {
         @Override public void actionPerformed(ActionEvent e) {
             JFileChooser chooser = new JFileChooser(ViewerUtil.usableDir(
                     new File(viewerState.get(ViewerState.STATE_CWD, System.getProperty("user.home")))));
-            chooser.setFileFilter(new FileNameExtensionFilter("Zorka Trace files", "trc"));
+            chooser.setFileFilter(new FileNameExtensionFilter("Zorka Trace files", "ftf"));
             chooser.setDialogTitle("Open trace file");
 
             int rv = chooser.showOpenDialog(contentPane);
             if (rv == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = chooser.getSelectedFile();
                 viewerState.put(ViewerState.STATE_CWD, selectedFile.getParent());
-                traceSet.load(selectedFile);
-                pnlTraces.setData(traceSet);
+                traceData = new TraceDataSet(selectedFile);
+                pnlTraces.setData(traceData);
+
+                //traceSet.load(selectedFile);
+                //pnlTraces.setData(traceSet);
                 //tbmMetrics.setData(traceSet);
             }
         }
