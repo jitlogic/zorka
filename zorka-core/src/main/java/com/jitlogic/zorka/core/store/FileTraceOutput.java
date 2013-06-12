@@ -21,6 +21,8 @@ import com.jitlogic.zorka.core.util.ZorkaLog;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 
 import java.io.*;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
 
 
 public class FileTraceOutput extends ZorkaAsyncThread<Submittable> implements TraceOutput {
@@ -31,19 +33,21 @@ public class FileTraceOutput extends ZorkaAsyncThread<Submittable> implements Tr
 
     private int maxArchiveFiles;
     private long maxFileSize;
+    private boolean compress;
 
     private TraceWriter traceWriter;
 
     private FileOutputStream fileStream;
     private OutputStream stream;
 
-    public FileTraceOutput(TraceWriter traceWriter, File path, int maxArchiveFiles, long maxFileSize) {
+    public FileTraceOutput(TraceWriter traceWriter, File path, int maxArchiveFiles, long maxFileSize, boolean compress) {
         super("file-output");
 
         this.traceWriter = traceWriter;
         this.path = path;
         this.maxArchiveFiles = maxArchiveFiles;
         this.maxFileSize = maxFileSize;
+        this.compress = compress;
 
         traceWriter.setOutput(this);
     }
@@ -59,6 +63,7 @@ public class FileTraceOutput extends ZorkaAsyncThread<Submittable> implements Tr
     protected void process(Submittable obj) {
         try {
             traceWriter.write(obj);
+            stream.flush();
             if (fileStream.getChannel().position() >= maxFileSize) {
                 roll(); // TODO proper size limit control
                 traceWriter.reset();
@@ -96,20 +101,39 @@ public class FileTraceOutput extends ZorkaAsyncThread<Submittable> implements Tr
 
         log.info(ZorkaLogger.ZSP_SUBMIT, "Opening trace file: " + path);
 
-        try {
-            fileStream = new FileOutputStream(path);
-            stream = new BufferedOutputStream(fileStream);
-        } catch (FileNotFoundException e) {
-            log.error(ZorkaLogger.ZTR_ERRORS, "Cannot open trace file " + path, e);
-        }
+        reopen();
 
         traceWriter.reset();
+    }
+
+    byte[] ZTRZ_MAGIC = new byte[] { 'Z', 'T', 'R', 'Z' };
+    byte[] ZTRC_MAGIC = new byte[] { 'Z', 'T', 'R', 'C' };
+
+    private void reopen() {
+        try {
+            fileStream = new FileOutputStream(path);
+
+            if (compress) {
+                log.info(ZorkaLogger.ZSP_SUBMIT, "Opening compressed trace file.");
+                fileStream.write(ZTRZ_MAGIC);
+                stream = new BufferedOutputStream(new DeflaterOutputStream(fileStream, new Deflater(6, true), 65536));
+
+            } else {
+                log.info(ZorkaLogger.ZSP_SUBMIT, "Opening plain trace file.");
+                fileStream.write(ZTRC_MAGIC);
+                stream = new BufferedOutputStream(fileStream);
+            }
+
+        } catch (FileNotFoundException e) {
+            log.error(ZorkaLogger.ZTR_ERRORS, "Cannot open trace file " + path, e);
+        } catch (IOException e) {
+            log.error(ZorkaLogger.ZTR_ERRORS, "Cannot write to trace file " + path, e);
+        }
     }
 
 
     @Override
     protected void open() {
-        log.info(ZorkaLogger.ZSP_SUBMIT, "Kurwa: " + path);
         roll();
     }
 

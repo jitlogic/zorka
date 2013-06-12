@@ -66,7 +66,7 @@ public class MainWindow extends JFrame {
         @Override public void actionPerformed(ActionEvent e) {
             JFileChooser chooser = new JFileChooser(ViewerUtil.usableDir(
                     new File(viewerState.get(ViewerState.STATE_CWD, System.getProperty("user.home")))));
-            chooser.setFileFilter(new FileNameExtensionFilter("Zorka Trace files", "ftf"));
+            chooser.setFileFilter(new FileNameExtensionFilter("Zorka Trace files", "ztr"));
             chooser.setDialogTitle("Open trace file");
 
             int rv = chooser.showOpenDialog(contentPane);

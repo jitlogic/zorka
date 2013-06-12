@@ -189,20 +189,22 @@ public class TracerLib {
      * Creates trace file writer object. Trace writer can receive traces and store them in a file.
      *
      * @param path path to a file
-     *
      * @param maxFiles maximum number of archived files
-     *
      * @param maxSize maximum file size
+     * @param compress output file will be compressed if true
      *
      * @return trace file writer
      */
-    public ZorkaAsyncThread<Submittable> toFile(String path, int maxFiles, long maxSize) {
+    public ZorkaAsyncThread<Submittable> toFile(String path, int maxFiles, long maxSize, boolean compress) {
         TraceWriter writer = new FressianTraceWriter(symbolRegistry, metricsRegistry);
-        FileTraceOutput output = new FileTraceOutput(writer, new File(config.formatCfg(path)), maxFiles, maxSize);
+        FileTraceOutput output = new FileTraceOutput(writer, new File(config.formatCfg(path)), maxFiles, maxSize, compress);
         output.start();
         return output;
     }
 
+    public ZorkaAsyncThread<Submittable> toFile(String path, int maxFiles, long maxSize) {
+        return toFile(path, maxFiles, maxSize, false);
+    }
 
     public SpyProcessor filterBy(String srcField, Boolean defval, Set<Object> yes, Set<Object> no, Set<Object> maybe) {
         return new TraceFilterProcessor(tracer, srcField, defval, yes, no, maybe);

@@ -26,6 +26,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.zip.*;
 
 public class TraceDataSet {
 
@@ -55,11 +56,12 @@ public class TraceDataSet {
         return symbols;
     }
 
+
     private void load(File file) {
         InputStream is = null;
 
         try {
-            is = new BufferedInputStream(new FileInputStream(file));
+            is = open(file);
             FressianReader r = new FressianReader(is, FressianTraceFormat.READ_LOOKUP);
             for (Object obj = r.readObject(); obj != null; obj = r.readObject()) {
                 if (obj instanceof Symbol) {
@@ -84,6 +86,25 @@ public class TraceDataSet {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+
+    private InputStream open(File file) throws IOException {
+        FileInputStream fis = new FileInputStream(file);
+        byte[] hdr = new byte[4]; fis.read(hdr);
+
+        if (hdr[0] != 'Z' || hdr[1] != 'T' || hdr[2] != 'R') {
+            throw new IOException("Invalid header (invalid file type).");
+        }
+
+        if (hdr[3] == 'Z') {
+            InputStream is = new BufferedInputStream(new InflaterInputStream(fis, new Inflater(true), 65536));
+            return is;
+        } else if (hdr[3] == 'C') {
+            return new BufferedInputStream(fis);
+        } else {
+            throw new IOException("Invalid header (invalid file type).");
         }
     }
 
