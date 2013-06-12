@@ -18,15 +18,14 @@
 package com.jitlogic.zorka.core.test.agent;
 
 import java.net.URL;
-import java.util.concurrent.Executor;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 
 import com.jitlogic.zorka.core.*;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import com.jitlogic.zorka.core.util.ObjectDumper;
 import com.jitlogic.zorka.core.integ.ZabbixLib;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -74,10 +73,11 @@ public class BshAgentUnitTest extends ZorkaFixture {
 
     @Test
     public void testZabbixDiscoveryFunc() throws Exception {
-        Object obj = zorkaAgent.eval("zabbix.discovery(\"java\", \"java.lang:type=MemoryPool,*\", \"name\")");
-        assertTrue("should return JSSONObject", obj instanceof JSONObject);
-        Object data = ((JSONObject)obj).get("data");
-        assertTrue("obj.data should be JSONArray", data instanceof JSONArray);
+        Map<String,List<Map<String,String>>> obj = (Map<String,List<Map<String,String>>>)
+                zorkaAgent.eval("zabbix._discovery(\"java\", \"java.lang:type=MemoryPool,*\", \"name\", \"type\")");
+        assertTrue("should return map", obj != null);
+         List<Map<String,String>> data = obj.get("data");
+        assertTrue("obj.data should be non-empty", data.size() > 0);
     }
 
 

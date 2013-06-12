@@ -26,7 +26,6 @@ import java.net.Socket;
 import com.jitlogic.zorka.core.AgentDiagnostics;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 import com.jitlogic.zorka.core.util.ZorkaLog;
-import org.json.simple.JSONAware;
 
 /**
  * Zabbix request handler is used by ZabbixAgent thread to parse queries from zabbix server and format responses.
@@ -268,9 +267,6 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
      * @return serialized (string) value
      */
     private String serialize(Object obj) {
-        if (obj instanceof JSONAware) {
-            return ((JSONAware)obj).toJSONString();
-        }
         return obj != null ? obj.toString() : ZBX_NOTSUPPORTED;
     }
 

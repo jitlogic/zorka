@@ -22,9 +22,11 @@ import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
 import com.jitlogic.zorka.core.perfmon.QueryLister;
 import com.jitlogic.zorka.core.perfmon.QueryResult;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import com.jitlogic.zorka.core.util.JSONWriter;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -48,8 +50,14 @@ public class ZabbixLib {
         this.config = config;
     }
 
-    public JSONObject discovery(QueryDef...qdefs) {
+
+    public String discovery(QueryDef...qdefs) {
         return discovery(QueryDef.NO_NULL_ATTRS, qdefs);
+    }
+
+
+    public Map<String,List<Map<String,String>>> _discovery(QueryDef...qdefs) {
+        return _discovery(QueryDef.NO_NULL_ATTRS, qdefs);
     }
 
     /**
@@ -59,13 +67,13 @@ public class ZabbixLib {
      *
      * @return JSON object describing discovered objects
      */
-    public JSONObject discovery(int flags, QueryDef...qdefs) {
-        JSONArray data = new JSONArray();
+    public Map<String,List<Map<String,String>>> _discovery(int flags, QueryDef...qdefs) {
+        List<Map<String,String>> data = new ArrayList<Map<String,String>>();
 
         for (QueryDef qdef : qdefs) {
             qdef = qdef.with(flags);
             for (QueryResult result : new QueryLister(mbsRegistry, qdef).list()) {
-                JSONObject item = new JSONObject();
+                Map<String,String> item = new HashMap<String,String>();
                 for (Map.Entry<String,Object> e : result.attrSet()) {
                     item.put("{#" + e.getKey().toUpperCase().replace("-", "") + "}", e.getValue().toString());
                 }
@@ -73,10 +81,16 @@ public class ZabbixLib {
             }
         }
 
-        JSONObject discoveries = new JSONObject();
+        Map<String,List<Map<String,String>>> discoveries = new HashMap<String, List<Map<String,String>>>();
         discoveries.put("data", data);
         return discoveries;
     }
+
+
+    public String discovery(int flags, QueryDef...qdefs) {
+        return new JSONWriter().write(_discovery(flags, qdefs));
+    }
+
 
     /**
      * Simplified zabbix discovery function usable directly from zabbix.
@@ -90,10 +104,14 @@ public class ZabbixLib {
      *
      * @return JSON string describing discovered objects.
      */
-    public JSONObject discovery(String mbs, String filter, String...attrs) {
-        return discovery(new QueryDef(mbs, filter, attrs));
+    public String discovery(String mbs, String filter, String...attrs) {
+        return new JSONWriter().write(_discovery(mbs, filter, attrs));
     }
 
+
+    public Map<String,List<Map<String,String>>> _discovery(String mbs, String filter, String...attrs) {
+        return _discovery(QueryDef.NO_NULL_ATTRS, new QueryDef(mbs, filter, attrs));
+    }
 
 
     /**
