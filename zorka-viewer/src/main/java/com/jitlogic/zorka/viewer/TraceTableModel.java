@@ -29,25 +29,25 @@ public class TraceTableModel extends AbstractTableModel {
     private String[] colNames = { "Date", "Time", "Calls", "Err", "Recs", "Label" };
     private int[]    colWidth = { 90, 50, 60, 40, 40, 550 };
 
-    //private PerfDataSet traceSet = new PerfDataSet();
-    private List<NamedTraceRecord> records = new ArrayList<NamedTraceRecord>();
+    private List<ViewerTraceRecord> traceRecords = new ArrayList<ViewerTraceRecord>();
 
-    public void setTraceSet(PerfDataSet traceSet, NamedRecordFilter filter) {
-        //this.traceSet = traceSet;
-        if (traceSet != null) {
-            records = new ArrayList<NamedTraceRecord>(traceSet.getTraces().size());
 
-            for (NamedTraceRecord record : traceSet.getTraces()) {
-                if (filter == null || filter.matches(record)) {
-                    records.add(record);
+    public void setDataSet(TraceDataSet dataSet, ViewerRecordFilter filter) {
+        if (dataSet != null) {
+            traceRecords = new ArrayList<ViewerTraceRecord>(dataSet.numRecords());
+
+            for (ViewerTraceRecord rec : dataSet.getRecords()) {
+                if (filter == null || filter.matches(rec)) {
+                    traceRecords.add(rec);
                 }
             }
         } else {
-            records = new ArrayList<NamedTraceRecord>(1);
+            traceRecords = new ArrayList<ViewerTraceRecord>();
         }
 
         fireTableDataChanged();
     }
+
 
     public void adjustColumns(JTable table) {
         for (int i = 0; i < colWidth.length; i++) {
@@ -56,24 +56,28 @@ public class TraceTableModel extends AbstractTableModel {
         table.getColumnModel().getColumn(5).setCellRenderer(new TraceCellRenderer());
     }
 
+
     @Override
     public String getColumnName(int idx) {
         return colNames[idx];
     }
 
+
     @Override
     public int getRowCount() {
-        return records.size();
+        return traceRecords.size();
     }
+
 
     @Override
     public int getColumnCount() {
         return colWidth.length;
     }
 
+
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        NamedTraceRecord el = records.get(rowIndex);
+        ViewerTraceRecord el = traceRecords.get(rowIndex);
 
         switch (columnIndex) {
             case 0:
@@ -85,7 +89,7 @@ public class TraceTableModel extends AbstractTableModel {
             case 3:
                 return el.getErrors();
             case 4:
-                return el.getRecords();
+                return el.getRecs();
             case 5:
                 return el;
         }
@@ -94,7 +98,7 @@ public class TraceTableModel extends AbstractTableModel {
 
 
 
-    public NamedTraceRecord get(int i) {
-        return records.get(i);
+    public ViewerTraceRecord get(int i) {
+        return traceRecords.get(i);
     }
 }

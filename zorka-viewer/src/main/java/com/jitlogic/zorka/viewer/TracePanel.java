@@ -27,7 +27,7 @@ public class TracePanel extends JPanel {
 
     private TraceDetailPanel pnlTraceDetail;
 
-    private PerfDataSet traceSet;
+    private TraceDataSet dataSet;
 
     private JTextField txtMinTime;
 
@@ -45,21 +45,21 @@ public class TracePanel extends JPanel {
     private JToggleButton btnFilterErrors;
 
 
-    private class TraceFilter implements NamedRecordFilter {
+    private class TraceFilter implements ViewerRecordFilter {
         @Override
-        public boolean matches(NamedTraceRecord record) {
+        public boolean matches(ViewerTraceRecord record) {
             return record.getTime() >= minTraceTime
                 && (!errorsOnly || record.getException() != null)
                 && (traceLabel == null || traceLabel.equals(record.getTraceName()));
         }
-
-        @Override public boolean recurse(NamedTraceRecord record) {
+        @Override public boolean recurse(ViewerTraceRecord record) {
             return false;
         }
     }
 
 
     private TraceFilter traceFilter = new TraceFilter();
+
 
 
     private class FilterByTimeAction extends AbstractAction {
@@ -77,7 +77,7 @@ public class TracePanel extends JPanel {
                 minTraceTime = 0;
             }
 
-            tbmTraces.setTraceSet(traceSet, traceFilter);
+            tbmTraces.setDataSet(dataSet, traceFilter);
         }
     }
 
@@ -91,7 +91,7 @@ public class TracePanel extends JPanel {
         public void actionPerformed(ActionEvent e) {
             errorsOnly = !errorsOnly;
             btnFilterErrors.setSelected(errorsOnly);
-            tbmTraces.setTraceSet(traceSet, traceFilter);
+            tbmTraces.setDataSet(dataSet, traceFilter);
         }
     }
 
@@ -114,7 +114,7 @@ public class TracePanel extends JPanel {
 
         tblTraces.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
-                TracePanel.this.pnlTraceDetail.setTrace(traceSet, tbmTraces.get(tblTraces.getSelectedRow()));
+                TracePanel.this.pnlTraceDetail.setTrace(dataSet, tbmTraces.get(tblTraces.getSelectedRow()));
             }
         });
 
@@ -159,7 +159,7 @@ public class TracePanel extends JPanel {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     String item = (String)e.getItem();
                     traceLabel = "*".equals(item) ? null : item;
-                    tbmTraces.setTraceSet(traceSet, traceFilter);
+                    tbmTraces.setDataSet(dataSet, traceFilter);
                 }
             }
         });
@@ -170,8 +170,8 @@ public class TracePanel extends JPanel {
     }
 
 
-    public void setData(PerfDataSet traceSet) {
-        this.traceSet = traceSet;
+    public void setData(TraceDataSet dataSet) {
+        this.dataSet = dataSet;
         this.errorsOnly = false;
         this.traceLabel = null;
         this.minTraceTime = 0;
@@ -179,11 +179,11 @@ public class TracePanel extends JPanel {
         btnFilterErrors.setSelected(false);
         txtMinTime.setText("");
 
-        tbmTraces.setTraceSet(traceSet, traceFilter);
+        tbmTraces.setDataSet(dataSet, null);
 
         List<String> traceNames = new ArrayList<String>();
 
-        for (NamedTraceRecord rec : traceSet.getTraces()) {
+        for (ViewerTraceRecord rec : dataSet.getRecords()) {
             String traceName = rec.getTraceName();
             if (traceName != null && !traceNames.contains(traceName)) {
                 traceNames.add(traceName);
@@ -198,4 +198,6 @@ public class TracePanel extends JPanel {
             cmbTraceType.addItem(traceName);
         }
     }
+
+
 }

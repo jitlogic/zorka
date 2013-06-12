@@ -40,11 +40,11 @@ public class TraceDetailTableModel extends AbstractTableModel {
     public static final int METHOD_COLUMN = 4;
 
     /** Current data ("flattened" method call tree representing single trace) */
-    private List<NamedTraceRecord> data = new ArrayList<NamedTraceRecord>(1);
+    private List<ViewerTraceRecord> data = new ArrayList<ViewerTraceRecord>(1);
 
-    private NamedTraceRecord root;
+    private ViewerTraceRecord root;
 
-    private NamedRecordFilter filter;
+    private ViewerRecordFilter filter;
 
     /**
      * Configures supplied table. Sets colum names, preferred columns widths,
@@ -63,18 +63,18 @@ public class TraceDetailTableModel extends AbstractTableModel {
 
 
     public void filterOut(final double minPct, final boolean errOnly, final Set<String> omits) {
-        filter = new NamedRecordFilter() {
+        filter = new ViewerRecordFilter() {
             @Override
-            public boolean matches(NamedTraceRecord record) {
+            public boolean matches(ViewerTraceRecord record) {
                 return record != null && record.getTimePct() >= minPct
                     && (!errOnly
-                        || (0 != (record.getFlags() & NamedTraceRecord.EXCEPTION_PASS)
+                        || (0 != (record.getFlags() & ViewerTraceRecord.EXCEPTION_PASS)
                         || record.getException() != null))
                     && !omits.contains(record.getClassName() + "." + record.getMethodName());
             }
 
             @Override
-            public boolean recurse(NamedTraceRecord record) {
+            public boolean recurse(ViewerTraceRecord record) {
                 return !omits.contains(record.getClassName() + "." + record.getMethodName());
             }
         };
@@ -87,14 +87,14 @@ public class TraceDetailTableModel extends AbstractTableModel {
      *
      * @param root new trace root record.
      */
-    public void setTrace(NamedTraceRecord root) {
+    public void setTrace(ViewerTraceRecord root) {
         this.root = root;
         refresh();
     }
 
     public void refresh() {
         if (root != null) {
-            data = new ArrayList<NamedTraceRecord>(root.getRecords()+2);
+            data = new ArrayList<ViewerTraceRecord>(root.getRecs()+2);
             root.scanRecords(data, filter);
             fireTableDataChanged();
         }
@@ -122,7 +122,7 @@ public class TraceDetailTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (rowIndex < data.size()) {
-            NamedTraceRecord el = data.get(rowIndex);
+            ViewerTraceRecord el = data.get(rowIndex);
             switch (columnIndex) {
                 case 0:
                     return ZorkaUtil.strTime(el.getTime());
@@ -150,7 +150,7 @@ public class TraceDetailTableModel extends AbstractTableModel {
      *
      * @return trace record
      */
-    public NamedTraceRecord getRecord(int i) {
+    public ViewerTraceRecord getRecord(int i) {
         return data.get(i);
     }
 }

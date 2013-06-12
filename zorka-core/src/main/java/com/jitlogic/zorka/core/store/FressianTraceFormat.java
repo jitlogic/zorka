@@ -16,8 +16,6 @@
 package com.jitlogic.zorka.core.store;
 
 
-import com.jitlogic.zorka.core.spy.TraceMarker;
-import com.jitlogic.zorka.core.spy.TraceRecord;
 import com.jitlogic.zorka.core.util.ZorkaUtil;
 import org.fressian.Reader;
 import org.fressian.Writer;
@@ -99,10 +97,23 @@ public class FressianTraceFormat {
     };
 
 
+    public static interface TraceRecordBuilder {
+        TraceRecord get();
+    }
+
+
+    public static TraceRecordBuilder TRACE_RECORD_BUILDER = new TraceRecordBuilder() {
+        @Override
+        public TraceRecord get() {
+            return new TraceRecord(null);
+        }
+    };
+
+
     private static final ReadHandler RECORD_RH = new ReadHandler() {
         @Override
         public Object read(Reader r, Object tag, int componentCount) throws IOException {
-            TraceRecord tr = new TraceRecord(null);
+            TraceRecord tr = TRACE_RECORD_BUILDER.get();
             tr.setClassId((int)r.readInt());
             tr.setMethodId((int)r.readInt());
             tr.setSignatureId((int)r.readInt());

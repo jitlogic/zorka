@@ -1,7 +1,9 @@
-Zorka 0.9.7 (2013-05-20)
+Zorka 0.9.7 (2013-06-20)
 ------------------------
 
- * rudimentary collector engine (embedded!);
+ * use fressian format for saving traces;
+ * lots of fixes;
+ *
 
 
 Zorka 0.9.6 (2013-05-01)

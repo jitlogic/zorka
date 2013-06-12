@@ -1,3 +1,5 @@
+package com.jitlogic.zorka.viewer;
+
 /**
  * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -14,12 +16,10 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.util;
+public interface ViewerRecordFilter {
 
-import java.util.Map;
+    public boolean matches(ViewerTraceRecord record);
 
-public interface RestfulService<T> {
-
-    public T get(String path, Map<String,String> params);
+    public boolean recurse(ViewerTraceRecord record);
 
 }

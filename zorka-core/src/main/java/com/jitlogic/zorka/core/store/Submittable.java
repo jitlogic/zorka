@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.perfmon.PerfDataEventHandler;
+import com.jitlogic.zorka.core.util.PerfDataEventHandler;
 
 // TODO to be removed (as soon as SimpleTraceFormat disappears)
 public interface Submittable extends SymbolicRecord {

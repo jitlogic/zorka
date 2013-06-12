@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 
 public class TraceDetailPanel extends JPanel {
 
-    private PerfDataSet traceSet;
+    private TraceDataSet dataSet;
 
     private ErrorDetailView pnlStackTrace;
 
@@ -89,7 +89,7 @@ public class TraceDetailPanel extends JPanel {
             Pattern pattern = Pattern.compile(txtSearch.getText().trim().length() > 0 ? ".*"+txtSearch.getText().trim()+".*" : ".*");
 
             for (int i = tblTraceDetail.getSelectedRow() + 1; i < tbmTraceDetail.getRowCount(); i++) {
-                NamedTraceRecord rec = tbmTraceDetail.getRecord(i);
+                ViewerTraceRecord rec = tbmTraceDetail.getRecord(i);
                 if (pattern.matcher(rec.getClassName()).matches() || pattern.matcher(rec.getMethodName()).matches()) {
                     tblTraceDetail.getSelectionModel().setSelectionInterval(i, i);
                     return;
@@ -139,9 +139,9 @@ public class TraceDetailPanel extends JPanel {
             @Override public void mouseClicked(MouseEvent e) {
                 int selectedRow = tblTraceDetail.getSelectedRow();
                 if (selectedRow >= 0) {
-                    TraceDetailPanel.this.pnlStackTrace.update(traceSet.getSymbols(),
+                    TraceDetailPanel.this.pnlStackTrace.update(dataSet.getSymbols(),
                         tbmTraceDetail.getRecord(selectedRow));
-                    NamedTraceRecord record = tbmTraceDetail.getRecord(selectedRow);
+                    ViewerTraceRecord record = tbmTraceDetail.getRecord(selectedRow);
                     switch (e.getButton()) {
                         case MouseEvent.BUTTON1: {
                             int x = e.getX()  - getMethodCellOffset();
@@ -247,8 +247,8 @@ public class TraceDetailPanel extends JPanel {
         return offs;
     }
 
-    public void setTrace(PerfDataSet traceSet, NamedTraceRecord record) {
-        this.traceSet = traceSet;
+    public void setTrace(TraceDataSet dataSet, ViewerTraceRecord record) {
+        this.dataSet = dataSet;
         tbmTraceDetail.setTrace(record);
     }
 
