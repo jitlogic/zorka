@@ -30,7 +30,7 @@ public class WindowedRateMetric extends Metric {
     }
 
     public WindowedRateMetric(int id, int templateId, String name, Map<String, Object> attrs) {
-        super(id, name, attrs);
+        super(id, templateId, name, attrs);
     }
     public WindowedRateMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
         super(template, attrSet);

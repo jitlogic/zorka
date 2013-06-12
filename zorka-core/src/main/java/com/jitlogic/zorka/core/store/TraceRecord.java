@@ -14,13 +14,9 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.perfmon.PerfDataEventHandler;
-import com.jitlogic.zorka.core.store.MetadataChecker;
-import com.jitlogic.zorka.core.store.Submittable;
-import com.jitlogic.zorka.core.store.SymbolRegistry;
-import com.jitlogic.zorka.core.store.SymbolicException;
+import com.jitlogic.zorka.core.util.PerfDataEventHandler;
 
 import java.io.IOException;
 import java.util.*;
@@ -366,6 +362,10 @@ public class TraceRecord implements Submittable {
             for (TraceRecord child : children) {
                 child.traverse(checker);
             }
+        }
+
+        if (marker != null) {
+            checker.checkSymbol(marker.getTraceId());
         }
     }
 

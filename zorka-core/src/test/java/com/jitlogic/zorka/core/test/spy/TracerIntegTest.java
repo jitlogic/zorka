@@ -16,7 +16,6 @@
 
 package com.jitlogic.zorka.core.test.spy;
 
-import com.jitlogic.zorka.core.store.SymbolicRecord;
 import com.jitlogic.zorka.core.test.spy.support.TestTracer;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 

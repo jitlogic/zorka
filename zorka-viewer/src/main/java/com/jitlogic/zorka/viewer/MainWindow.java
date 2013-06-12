@@ -35,16 +35,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class MainWindow extends JFrame {
 
-    /** Contains loaded traces */
-    private PerfDataSet traceSet = new PerfDataSet();
+    private TraceDataSet traceData = null;
 
     /** Content pane */
     private JPanel contentPane;
 
     private JTabbedPane tabTraces;
-
-    //private JTable tblMetrics;
-    //private PerfMetricsTableModel tbmMetrics = new PerfMetricsTableModel();
 
     private TracePanel pnlTraces;
 
@@ -55,9 +51,6 @@ public class MainWindow extends JFrame {
 
     /** This view contains stack trace of currently selected method call trace record */
     private ErrorDetailView pnlStackTrace;
-
-    /** Performance metric panel */
-    //private PerfMetricView pnlPerfMetric;
 
     private ViewerState viewerState = new ViewerState();
 
@@ -73,16 +66,15 @@ public class MainWindow extends JFrame {
         @Override public void actionPerformed(ActionEvent e) {
             JFileChooser chooser = new JFileChooser(ViewerUtil.usableDir(
                     new File(viewerState.get(ViewerState.STATE_CWD, System.getProperty("user.home")))));
-            chooser.setFileFilter(new FileNameExtensionFilter("Zorka Trace files", "trc"));
+            chooser.setFileFilter(new FileNameExtensionFilter("Zorka Trace files", "ztr"));
             chooser.setDialogTitle("Open trace file");
 
             int rv = chooser.showOpenDialog(contentPane);
             if (rv == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = chooser.getSelectedFile();
                 viewerState.put(ViewerState.STATE_CWD, selectedFile.getParent());
-                traceSet.load(selectedFile);
-                pnlTraces.setData(traceSet);
-                //tbmMetrics.setData(traceSet);
+                traceData = new TraceDataSet(selectedFile);
+                pnlTraces.setData(traceData);
             }
         }
     };
@@ -144,7 +136,6 @@ public class MainWindow extends JFrame {
         contentPane.setLayout(new BorderLayout(0,0));
         setContentPane(contentPane);
 
-
         splitPane = new JSplitPane();
         contentPane.add(splitPane, BorderLayout.CENTER);
 
@@ -159,38 +150,17 @@ public class MainWindow extends JFrame {
             }
         });
 
-
         tabTraces = new JTabbedPane();
         splitPane.setLeftComponent(tabTraces);
 
         pnlTraces = new TracePanel(pnlTraceDetail);
         tabTraces.add("Traces", pnlTraces);
 
-
-        //JScrollPane scrMetrics = new JScrollPane();
-        //tabTraces.add("Metrics", scrMetrics);
-
-        //tblMetrics = new JTable(tbmMetrics);
-        //tbmMetrics.configure(tblMetrics);
-
-        //tblMetrics.addMouseListener(new MouseAdapter() {
-        //    @Override
-        //    public void mouseClicked(MouseEvent e) {
-        //        displayMetric(tblMetrics.getSelectedRow());
-        //    }
-        //});
-        //scrMetrics.setViewportView(tblMetrics);
-
         tabDetail = new JTabbedPane();
         tabDetail.addTab("Trace details", pnlTraceDetail);
-
         tabDetail.addTab("Call details", pnlStackTrace);
 
-        //pnlPerfMetric = new PerfMetricView();
-        //tabDetail.addTab("Performance data", pnlPerfMetric);
-
         splitPane.setRightComponent(tabDetail);
-
         splitPane.setResizeWeight(0.2);
     }
 
@@ -208,8 +178,4 @@ public class MainWindow extends JFrame {
         getRootPane().getActionMap().put(action,action);
     }
 
-
-    private void displayMetric(int idx) {
-        //tbmMetrics.feed(pnlPerfMetric, idx);
-    }
 }

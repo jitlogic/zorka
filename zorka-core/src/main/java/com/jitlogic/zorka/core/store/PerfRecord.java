@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.perfmon.PerfDataEventHandler;
+import com.jitlogic.zorka.core.util.PerfDataEventHandler;
 
 import java.io.IOException;
 import java.util.List;

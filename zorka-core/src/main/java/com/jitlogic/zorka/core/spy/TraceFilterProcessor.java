@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.core.store.TraceMarker;
 import com.jitlogic.zorka.core.util.ZorkaLog;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 

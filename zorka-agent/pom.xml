@@ -50,7 +50,6 @@
                         </goals>
                         <configuration>
                             <includes>
-                                <include>com.googlecode.json-simple:json-simple</include>
                                 <include>org.ow2.asm:asm</include>
                                 <include>com.jitlogic.zoola:zoola-core</include>
                                 <include>com.jitlogic.contrib:libsnmp</include>
@@ -58,10 +57,6 @@
                                 <include>org.fressian:fressian</include>
                             </includes>
                             <rules>
-                                <rule>
-                                    <pattern>org.json.simple.**</pattern>
-                                    <result>com.jitlogic.zorka.deps.json.@1</result>
-                                </rule>
                                 <rule>
                                     <pattern>org.objectweb.asm.**</pattern>
                                     <result>com.jitlogic.zorka.deps.asm.@1</result>
