@@ -16,10 +16,7 @@
 
 package com.jitlogic.zorka.core.test.spy.support;
 
-import com.jitlogic.zorka.core.store.Metric;
-import com.jitlogic.zorka.core.store.MetricTemplate;
-import com.jitlogic.zorka.core.util.PerfDataEventHandler;
-import com.jitlogic.zorka.core.store.PerfSample;
+import com.jitlogic.zorka.core.spy.TraceBuilder;
 import com.jitlogic.zorka.core.util.*;
 import org.junit.Assert;
 
@@ -27,9 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class TestTracer implements PerfDataEventHandler {
+public class TestTracer extends TraceBuilder {
 
     private List<Map<Object,Object>> data = new ArrayList<Map<Object, Object>>();
+
+    public TestTracer() {
+        super(null, null);
+    }
 
     @Override
     public void traceBegin(int traceId, long clock, int flags) {
@@ -52,16 +53,6 @@ public class TestTracer implements PerfDataEventHandler {
     }
 
     @Override
-    public void traceStats(long calls, long errors, int flags) {
-        data.add(ZorkaUtil.map("action", "traceStats", "calls", calls, "errors", errors, "flags", flags));
-    }
-
-    @Override
-    public void newSymbol(int symbolId, String symbolName) {
-        data.add(ZorkaUtil.map("action", "newSymbol", "symbolId", symbolId, "symbolName", symbolName));
-    }
-
-    @Override
     public void newAttr(int attrId, Object attrVal) {
         data.add(ZorkaUtil.map("action", "newAttr", "attrId", attrId, "attrVal", attrVal));
     }
@@ -75,22 +66,6 @@ public class TestTracer implements PerfDataEventHandler {
     public void enable() {
         //To change body of implemented methods use File | Settings | File Templates.
     }
-
-    @Override
-    public void perfData(long clock, int scannerId, List<PerfSample> samples) {
-        data.add(ZorkaUtil.map("action", "perfData", "clock", clock, "scannerId", scannerId, "samples", samples));
-    }
-
-    @Override
-    public void newMetricTemplate(MetricTemplate template) {
-        data.add(ZorkaUtil.map("action", "newMetricTemplate", "mt", template));
-    }
-
-    @Override
-    public void newMetric(Metric metric) {
-        data.add(ZorkaUtil.map("action", "newMetric", "metric", metric));
-    }
-
 
     public List<Map<Object,Object>> getData() {
         return data;
@@ -126,9 +101,5 @@ public class TestTracer implements PerfDataEventHandler {
 
     public int size() {
         return data.size();
-    }
-
-    public void clear() {
-        data.clear();
     }
 }
