@@ -16,10 +16,10 @@
 package com.jitlogic.zorka.viewer;
 
 
-import com.jitlogic.zorka.core.store.TraceRecord;
-import com.jitlogic.zorka.core.store.FressianTraceFormat;
-import com.jitlogic.zorka.core.store.Symbol;
-import com.jitlogic.zorka.core.store.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
+import com.jitlogic.zorka.common.tracedata.Symbol;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import org.fressian.FressianReader;
 
 import java.io.*;

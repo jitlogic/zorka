@@ -16,22 +16,18 @@
 package com.jitlogic.zorka.core.test.store;
 
 
-import com.jitlogic.zorka.core.store.Metric;
-import com.jitlogic.zorka.core.store.MetricTemplate;
-import com.jitlogic.zorka.core.store.PerfRecord;
-import com.jitlogic.zorka.core.store.RawDataMetric;
-import com.jitlogic.zorka.core.store.TraceMarker;
-import com.jitlogic.zorka.core.store.TraceRecord;
+import com.jitlogic.zorka.common.tracedata.*;
+import com.jitlogic.zorka.common.tracedata.TraceMarker;
+import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.core.store.*;
-import com.jitlogic.zorka.core.store.PerfSample;
-import com.jitlogic.zorka.core.util.ZorkaUtil;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.FressianReader;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 
-import static com.jitlogic.zorka.core.store.FressianTraceFormat.READ_LOOKUP;
+import static com.jitlogic.zorka.common.tracedata.FressianTraceFormat.READ_LOOKUP;
 
 import java.io.*;
 import java.util.Arrays;

@@ -16,6 +16,9 @@
 
 package com.jitlogic.zorka.core.store;
 
+import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
+import com.jitlogic.zorka.common.tracedata.TraceOutput;
+import com.jitlogic.zorka.common.tracedata.TraceWriter;
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.core.util.ZorkaLog;
 import com.jitlogic.zorka.core.util.ZorkaLogger;

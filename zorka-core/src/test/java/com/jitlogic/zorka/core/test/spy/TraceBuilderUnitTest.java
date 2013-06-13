@@ -16,10 +16,9 @@
 
 package com.jitlogic.zorka.core.test.spy;
 
-import com.jitlogic.zorka.core.store.*;
+import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 import com.jitlogic.zorka.core.spy.*;
-import com.jitlogic.zorka.core.test.spy.support.TestTracer;
 
 import com.jitlogic.zorka.core.test.support.TestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;

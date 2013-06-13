@@ -16,7 +16,7 @@
  */
 package com.jitlogic.zorka.core.test.support;
 
-import com.jitlogic.zorka.core.util.ZorkaUtil;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import javax.management.j2ee.statistics.Statistic;
 import javax.management.j2ee.statistics.Stats;

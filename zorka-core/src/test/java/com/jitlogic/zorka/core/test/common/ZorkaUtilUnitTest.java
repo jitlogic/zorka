@@ -16,8 +16,8 @@ package com.jitlogic.zorka.core.test.common;
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-import com.jitlogic.zorka.core.mbeans.MethodCallStatistic;
-import com.jitlogic.zorka.core.util.ZorkaUtil;
+import com.jitlogic.zorka.common.stats.MethodCallStatistic;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,19 +32,19 @@ public class ZorkaUtilUnitTest {
     @Test
     public void testInstanceOf1() throws Exception {
         Assert.assertTrue("immediate implements",
-            ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.core.util.ZorkaStat"));
+            ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.common.stats.ZorkaStat"));
     }
 
     @Test
     public void testInstanceOf2() throws Exception {
         Assert.assertTrue("subinterface implements",   // TODO find better example (as this one doesn't matter anymore)
-                ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.core.util.ZorkaStat"));
+                ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.common.stats.ZorkaStat"));
     }
 
     @Test
     public void testInstanceOf3() throws Exception {
         Assert.assertTrue("superclass implements subinterface", // TODO find better example (as this one doesn't matter anymore)
-                ZorkaUtil.instanceOf(TestCallStatistic.class, "com.jitlogic.zorka.core.util.ZorkaStat"));
+                ZorkaUtil.instanceOf(TestCallStatistic.class, "com.jitlogic.zorka.common.stats.ZorkaStat"));
     }
 
     @Test
@@ -56,7 +56,7 @@ public class ZorkaUtilUnitTest {
     @Test
     public void testInstanceOf5() throws Exception {
         Assert.assertTrue("immediate implements",
-                ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.core.mbeans.MethodCallStatistic"));
+                ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.common.stats.MethodCallStatistic"));
     }
 
 }

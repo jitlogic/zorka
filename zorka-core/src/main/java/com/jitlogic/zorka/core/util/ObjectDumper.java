@@ -17,6 +17,11 @@
 
 package com.jitlogic.zorka.core.util;
 
+import com.jitlogic.zorka.common.stats.ZorkaStat;
+import com.jitlogic.zorka.common.stats.ZorkaStats;
+import com.jitlogic.zorka.common.util.JmxObject;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;

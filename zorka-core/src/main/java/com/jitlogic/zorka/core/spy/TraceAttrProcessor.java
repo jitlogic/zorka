@@ -16,8 +16,8 @@
 
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.core.store.SymbolRegistry;
-import com.jitlogic.zorka.core.store.TraceRecord;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 import com.jitlogic.zorka.core.util.ZorkaLog;
 

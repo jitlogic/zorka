@@ -16,9 +16,9 @@
 
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.core.store.MetricsRegistry;
-import com.jitlogic.zorka.core.store.SymbolRegistry;
-import com.jitlogic.zorka.core.store.SymbolicRecord;
+import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.core.util.*;
 
 import java.util.ArrayList;
@@ -33,9 +33,6 @@ public class Tracer implements TracerOutput {
 
     /** Minimum default method execution time required to attach method to trace. */
     private static long minMethodTime = 250000;
-
-    /** Minimum trace execution time required to further process trace */
-    private static long minTraceTime = 50000000;
 
     /** Maximum number of records inside trace */
     private static int maxTraceRecords = 4096;
@@ -60,15 +57,6 @@ public class Tracer implements TracerOutput {
         minMethodTime = methodTime;
     }
 
-
-    public static long getMinTraceTime() {
-        return minTraceTime;
-    }
-
-
-    public static void setMinTraceTime(long traceTime) {
-        minTraceTime = traceTime;
-    }
 
 
     public static int getMaxTraceRecords() {

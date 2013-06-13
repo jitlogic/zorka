@@ -16,10 +16,13 @@
 
 package com.jitlogic.zorka.core.test.perfmon;
 
+import com.jitlogic.zorka.common.tracedata.Metric;
+import com.jitlogic.zorka.common.tracedata.PerfRecord;
+import com.jitlogic.zorka.common.tracedata.PerfSample;
+import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.core.perfmon.JmxAttrScanner;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
 import com.jitlogic.zorka.core.spy.TracerOutput;
-import com.jitlogic.zorka.core.store.*;
 import com.jitlogic.zorka.core.test.support.TestJmx;
 import com.jitlogic.zorka.core.test.support.TestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;

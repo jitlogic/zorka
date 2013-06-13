@@ -16,8 +16,8 @@
 
 package com.jitlogic.zorka.core.test.spy.support;
 
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.TraceBuilder;
-import com.jitlogic.zorka.core.util.*;
 import org.junit.Assert;
 
 import java.util.ArrayList;

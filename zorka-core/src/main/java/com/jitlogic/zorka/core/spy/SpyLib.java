@@ -23,9 +23,9 @@ import com.jitlogic.zorka.core.util.ZorkaTrapper;
 import com.jitlogic.zorka.core.integ.SnmpTrapper;
 import com.jitlogic.zorka.core.integ.TrapVarBindDef;
 import com.jitlogic.zorka.core.normproc.Normalizer;
-import com.jitlogic.zorka.core.util.ObjectInspector;
+import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.util.ZorkaLogLevel;
-import com.jitlogic.zorka.core.util.ZorkaUtil;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.util.*;
 import java.util.regex.Matcher;

@@ -16,8 +16,8 @@
 
 package com.jitlogic.zorka.core.test.spy;
 
-import com.jitlogic.zorka.core.store.SymbolicRecord;
-import com.jitlogic.zorka.core.store.TraceRecord;
+import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
+import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;

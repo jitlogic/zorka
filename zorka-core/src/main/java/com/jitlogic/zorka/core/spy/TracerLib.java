@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.core.store.FileTraceOutput;
 import com.jitlogic.zorka.core.ZorkaConfig;
 import com.jitlogic.zorka.core.store.*;
@@ -247,7 +248,7 @@ public class TracerLib {
      * @param traceTime minimum trace execution time (50 milliseconds by default)
      */
     public void setTracerMinTraceTime(int traceTime) {
-        Tracer.setMinTraceTime(traceTime * 1000000L);
+        TraceMarker.setMinTraceTime(traceTime * 1000000L);
     }
 
 
@@ -259,7 +260,7 @@ public class TracerLib {
      * @param traceTime minimum trace execution time (50 milliseconds by default)
      */
     public void setTracerMinTraceTime(long traceTime) {
-        Tracer.setMinTraceTime(traceTime * 1000000L);
+        TraceMarker.setMinTraceTime(traceTime * 1000000L);
     }
 
 

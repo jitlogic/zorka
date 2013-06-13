@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.core.store.SymbolicRecord;
+import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 
 public interface TracerOutput {
 

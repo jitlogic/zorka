@@ -36,6 +36,7 @@
         <module>zorka-core</module>
         <module>zorka-viewer</module>
         <module>zorka-agent</module>
+        <module>zorka-common</module>
     </modules>
 
 </project>
