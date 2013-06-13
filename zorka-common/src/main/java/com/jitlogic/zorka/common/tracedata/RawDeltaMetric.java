@@ -31,8 +31,8 @@ public class RawDeltaMetric extends RawDataMetric {
         super(id, templateId, name, attrs);
     }
 
-    public RawDeltaMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
-        super(template, attrSet);
+    public RawDeltaMetric(MetricTemplate template, String name, Map<String,Object> attrs) {
+        super(template, name, attrs);
     }
 
     @Override

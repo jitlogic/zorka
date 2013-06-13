@@ -16,11 +16,7 @@
 
 package com.jitlogic.zorka.common.tracedata;
 
-import com.jitlogic.zorka.common.tracedata.Metric;
-import com.jitlogic.zorka.common.tracedata.MetricTemplate;
-
 import java.util.Map;
-import java.util.Set;
 
 public class RawDataMetric extends Metric {
 
@@ -34,8 +30,8 @@ public class RawDataMetric extends Metric {
     }
 
 
-    public RawDataMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
-        super(template, attrSet);
+    public RawDataMetric(MetricTemplate template, String name, Map<String,Object> attrs) {
+        super(template, name, attrs);
     }
 
 

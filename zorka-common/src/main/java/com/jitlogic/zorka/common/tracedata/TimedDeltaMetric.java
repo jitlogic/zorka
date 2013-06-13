@@ -16,11 +16,7 @@
 
 package com.jitlogic.zorka.common.tracedata;
 
-import com.jitlogic.zorka.common.tracedata.MetricTemplate;
-import com.jitlogic.zorka.common.tracedata.RawDeltaMetric;
-
 import java.util.Map;
-import java.util.Set;
 
 public class TimedDeltaMetric extends RawDeltaMetric {
 
@@ -34,8 +30,8 @@ public class TimedDeltaMetric extends RawDeltaMetric {
         super(id, templateId, name, attrs);
     }
 
-    public TimedDeltaMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
-        super(template, attrSet);
+    public TimedDeltaMetric(MetricTemplate template, String name, Map<String,Object> attrs) {
+        super(template, name, attrs);
     }
 
     @Override

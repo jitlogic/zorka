@@ -16,12 +16,9 @@
 
 package com.jitlogic.zorka.common.tracedata;
 
-import com.jitlogic.zorka.common.util.ObjectInspector;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public abstract class Metric implements Serializable {
 
@@ -48,14 +45,14 @@ public abstract class Metric implements Serializable {
         this.attrs = attrs;
     }
 
-    public Metric(MetricTemplate template, Set<Map.Entry<String,Object>> attrSet) {
+    public Metric(MetricTemplate template, String name, Map<String,Object> attrs) {
         this.template = template;
 
-        for (Map.Entry<String,Object> entry : attrSet) {
+        for (Map.Entry<String,Object> entry : attrs.entrySet()) {
             this.attrs.put(entry.getKey(), entry.getValue().toString());
         }
 
-        name = ObjectInspector.substitute(template.getName(), this.attrs);
+        this.name = name;
     }
 
 

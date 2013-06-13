@@ -16,8 +16,6 @@
 
 package com.jitlogic.zorka.common.tracedata;
 
-import com.jitlogic.zorka.common.tracedata.Metric;
-import com.jitlogic.zorka.common.tracedata.MetricTemplate;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 
 import java.util.Map;
@@ -34,8 +32,8 @@ public class WindowedRateMetric extends Metric {
     public WindowedRateMetric(int id, int templateId, String name, Map<String, Object> attrs) {
         super(id, templateId, name, attrs);
     }
-    public WindowedRateMetric(MetricTemplate template, Set<Map.Entry<String, Object>> attrSet) {
-        super(template, attrSet);
+    public WindowedRateMetric(MetricTemplate template, String name, Map<String,Object> attrs) {
+        super(template, name, attrs);
     }
 
     @Override
