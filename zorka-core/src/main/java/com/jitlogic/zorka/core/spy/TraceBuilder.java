@@ -21,7 +21,6 @@ import com.jitlogic.zorka.core.AgentDiagnostics;
 import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.store.TraceMarker;
 import com.jitlogic.zorka.core.store.TraceRecord;
-import com.jitlogic.zorka.core.util.TraceEventHandler;
 import com.jitlogic.zorka.core.util.ZorkaLog;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 
@@ -31,7 +30,7 @@ import com.jitlogic.zorka.core.util.ZorkaLogger;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TraceBuilder implements TraceEventHandler {
+public class TraceBuilder {
 
     private final static ZorkaLog log = ZorkaLogger.getLog(TraceBuilder.class);
 
@@ -61,7 +60,6 @@ public class TraceBuilder implements TraceEventHandler {
     }
 
 
-    @Override
     public void traceBegin(int traceId, long clock, int flags) {
 
         if (ttop == null) {
@@ -80,7 +78,6 @@ public class TraceBuilder implements TraceEventHandler {
     }
 
 
-    @Override
     public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
 
         if (disabled) {
@@ -120,7 +117,6 @@ public class TraceBuilder implements TraceEventHandler {
     }
 
 
-    @Override
     public void traceReturn(long tstamp) {
 
         if (disabled) {
@@ -147,7 +143,6 @@ public class TraceBuilder implements TraceEventHandler {
     }
 
 
-    @Override
     public void traceError(Object exception, long tstamp) {
 
         if (disabled) {
@@ -185,19 +180,16 @@ public class TraceBuilder implements TraceEventHandler {
     }
 
 
-    @Override
     public void newAttr(int attrId, Object attrVal) {
         // TODO propable bug: if ttop is "cleaned up for reuse", attribute will be lost
         // TODO the same with trace markers, flags etc.
         realTop().setAttr(attrId, attrVal);
     }
 
-    @Override
     public void disable() {
         disabled = true;
     }
 
-    @Override
     public void enable() {
         disabled = false;
     }

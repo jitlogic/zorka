@@ -81,9 +81,9 @@ public class Tracer implements TracerOutput {
     }
 
     /** Thread local serving trace builder objects for application threads */
-    private ThreadLocal<TraceEventHandler> localHandlers =
-        new ThreadLocal<TraceEventHandler>() {
-            public TraceEventHandler initialValue() {
+    private ThreadLocal<TraceBuilder> localHandlers =
+        new ThreadLocal<TraceBuilder>() {
+            public TraceBuilder initialValue() {
                 return new TraceBuilder(Tracer.this, symbolRegistry);
             }
         };
@@ -100,7 +100,7 @@ public class Tracer implements TracerOutput {
      *
      * @return trace event handler (trace builder object)
      */
-    public TraceEventHandler getHandler() {
+    public TraceBuilder getHandler() {
         return localHandlers.get();
     }
 
