@@ -17,7 +17,6 @@
 package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.core.store.MetricsRegistry;
-import com.jitlogic.zorka.core.store.Submittable;
 import com.jitlogic.zorka.core.store.SymbolRegistry;
 import com.jitlogic.zorka.core.store.SymbolicRecord;
 import com.jitlogic.zorka.core.util.*;
@@ -41,7 +40,7 @@ public class Tracer implements TracerOutput {
     /** Maximum number of records inside trace */
     private static int maxTraceRecords = 4096;
 
-    private List<ZorkaAsyncThread<Submittable>> outputs = new ArrayList<ZorkaAsyncThread<Submittable>>();
+    private List<ZorkaAsyncThread<SymbolicRecord>> outputs = new ArrayList<ZorkaAsyncThread<SymbolicRecord>>();
 
     /** Defines which classes and methods should be traced. */
     private SpyMatcherSet matcherSet;
@@ -116,8 +115,8 @@ public class Tracer implements TracerOutput {
 
 
 
-    public void submit(Submittable record) {
-        for (ZorkaAsyncThread<Submittable> output : outputs) {
+    public void submit(SymbolicRecord record) {
+        for (ZorkaAsyncThread<SymbolicRecord> output : outputs) {
             output.submit(record);
         }
     }
@@ -130,7 +129,7 @@ public class Tracer implements TracerOutput {
      *
      * @param output trace event handler
      */
-    public void addOutput(ZorkaAsyncThread<Submittable> output) {
+    public void addOutput(ZorkaAsyncThread<SymbolicRecord> output) {
         outputs.add(output);
     }
 

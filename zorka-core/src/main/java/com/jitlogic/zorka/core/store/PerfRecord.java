@@ -16,12 +16,10 @@
 
 package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.util.PerfDataEventHandler;
-
 import java.io.IOException;
 import java.util.List;
 
-public class PerfRecord implements Submittable {
+public class PerfRecord implements SymbolicRecord {
 
     private long clock;
     private int scannerId;
@@ -32,12 +30,6 @@ public class PerfRecord implements Submittable {
         this.clock = clock;
         this.scannerId = scannerId;
         this.samples = samples;
-    }
-
-
-    @Override
-    public void traverse(PerfDataEventHandler output) {
-        output.perfData(clock, scannerId, samples);
     }
 
 

@@ -16,10 +16,10 @@
 
 package com.jitlogic.zorka.core.test.spy;
 
+import com.jitlogic.zorka.core.store.SymbolicRecord;
 import com.jitlogic.zorka.core.store.TraceRecord;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.core.store.Submittable;
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +36,7 @@ public class TracerIntegTest extends ZorkaFixture {
 
     private List<Object> results = new ArrayList<Object>();
 
-    private ZorkaAsyncThread<Submittable> output;
+    private ZorkaAsyncThread<SymbolicRecord> output;
 
     private int sym(String s) {
         return agentInstance.getSymbolRegistry().symbolId(s);
@@ -44,12 +44,12 @@ public class TracerIntegTest extends ZorkaFixture {
 
     @Before
     public void initOutput() {
-        output = new ZorkaAsyncThread<Submittable>("test") {
-            @Override public boolean submit(Submittable obj) {
+        output = new ZorkaAsyncThread<SymbolicRecord>("test") {
+            @Override public boolean submit(SymbolicRecord obj) {
                 results.add(obj);
                 return true;
             }
-            @Override protected void process(Submittable obj) { }
+            @Override protected void process(SymbolicRecord obj) { }
         };
     }
 

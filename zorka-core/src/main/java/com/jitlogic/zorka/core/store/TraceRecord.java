@@ -16,8 +16,6 @@
 
 package com.jitlogic.zorka.core.store;
 
-import com.jitlogic.zorka.core.util.PerfDataEventHandler;
-
 import java.io.IOException;
 import java.util.*;
 
@@ -28,7 +26,7 @@ import java.util.*;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TraceRecord implements Submittable {
+public class TraceRecord implements SymbolicRecord {
 
     /** Overflow record will be discarded regardless of method execution time and other conditions. */
     public static final int OVERFLOW_FLAG = 0x0001;
@@ -302,43 +300,6 @@ public class TraceRecord implements Submittable {
      */
     public int getTraceId() {
         return marker != null ? marker.getTraceId() : 0;
-    }
-
-
-    /**
-     * Traverses record (and recursively all its children) and
-     * sends its content as series of calls to supplied trace
-     * event handler object.
-     *
-     * @param output output handler object
-     */
-    @Override
-    public void traverse(PerfDataEventHandler output) {
-
-        if (hasFlag(TRACE_BEGIN)) {
-            output.traceBegin(marker.getTraceId(), getClock(), marker != null ? marker.getFlags() : 0);
-        }
-
-        output.traceEnter(classId, methodId, signatureId, 0);
-        output.traceStats(calls, errors, flags);
-
-        if (attrs != null) {
-            for (Map.Entry<Integer,Object> entry : attrs.entrySet()) {
-                output.newAttr(entry.getKey(), entry.getValue());
-            }
-        }
-
-        if (children != null) {
-            for (TraceRecord child : children) {
-                child.traverse(output);
-            }
-        }
-
-        if (exception != null) {
-            output.traceError(exception, time);
-        } else {
-            output.traceReturn(time);
-        }
     }
 
 

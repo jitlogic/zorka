@@ -65,7 +65,7 @@ public class TracerLib {
      *
      * @param output trace processing object
      */
-    public void output(ZorkaAsyncThread<Submittable> output) {
+    public void output(ZorkaAsyncThread<SymbolicRecord> output) {
         tracer.addOutput(output);
     }
 
@@ -195,14 +195,14 @@ public class TracerLib {
      *
      * @return trace file writer
      */
-    public ZorkaAsyncThread<Submittable> toFile(String path, int maxFiles, long maxSize, boolean compress) {
+    public ZorkaAsyncThread<SymbolicRecord> toFile(String path, int maxFiles, long maxSize, boolean compress) {
         TraceWriter writer = new FressianTraceWriter(symbolRegistry, metricsRegistry);
         FileTraceOutput output = new FileTraceOutput(writer, new File(config.formatCfg(path)), maxFiles, maxSize, compress);
         output.start();
         return output;
     }
 
-    public ZorkaAsyncThread<Submittable> toFile(String path, int maxFiles, long maxSize) {
+    public ZorkaAsyncThread<SymbolicRecord> toFile(String path, int maxFiles, long maxSize) {
         return toFile(path, maxFiles, maxSize, false);
     }
 

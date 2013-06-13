@@ -50,7 +50,7 @@ public class FressianTraceWriter implements MetadataChecker, TraceWriter {
 
 
     @Override
-    public void write(Submittable record) throws IOException {
+    public void write(SymbolicRecord record) throws IOException {
         checkOutput();
         record.traverse(this);
         writer.writeObject(record);

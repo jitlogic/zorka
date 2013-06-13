@@ -19,7 +19,7 @@ import java.io.IOException;
  */
 
 public interface TraceWriter {
-    void write(Submittable record) throws IOException;
+    void write(SymbolicRecord record) throws IOException;
 
     void setOutput(TraceOutput output);
 
