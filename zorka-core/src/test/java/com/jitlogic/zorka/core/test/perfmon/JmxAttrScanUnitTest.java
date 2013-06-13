@@ -19,7 +19,7 @@ package com.jitlogic.zorka.core.test.perfmon;
 import com.jitlogic.zorka.core.perfmon.JmxAttrScanner;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
 import com.jitlogic.zorka.core.spy.TracerOutput;
-import com.jitlogic.zorka.core.test.spy.support.TestTracer;
+import com.jitlogic.zorka.core.store.PerfRecord;
 import com.jitlogic.zorka.core.test.support.TestJmx;
 import com.jitlogic.zorka.core.test.support.TestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
@@ -31,22 +31,22 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.management.ObjectName;
+import java.util.ArrayList;
 import java.util.List;
 
 public class JmxAttrScanUnitTest extends ZorkaFixture {
 
-    TestTracer output;
     TracerOutput out;
+    List<Object> results = new ArrayList<Object>();
 
     @Before
     public void createSomeMBeans() throws Exception {
         makeTestJmx("test:name=bean1,type=TestJmx", 10, 10, "oja", "woja", "aja", "waja", "uja", "wuja");
         makeTestJmx("test:name=bean2,type=TestJmx", 10, 10, "oja", "woja", "aja", "waja", "eja", "weja");
-        output = new TestTracer();
         out  = new TracerOutput() {
             @Override
             public void submit(Submittable record) {
-                record.traverse(output);
+                results.add(record);
             }
         };
     }
@@ -59,7 +59,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
                         .metric(perfmon.metric("test", "test")));
         TestUtil.setField(scanner, "output", out);
         scanner.runCycle(100);
-        Assert.assertEquals(0, output.size());
+        Assert.assertEquals(0, results.size());
     }
 
 
@@ -70,7 +70,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
                         .metric(perfmon.metric("test", "test")));
         TestUtil.setField(scanner, "output", out);
         scanner.runCycle(100);
-        Assert.assertEquals(1, output.size());
+        Assert.assertEquals(1, results.size());
     }
 
 
@@ -81,7 +81,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
                         .metric(perfmon.metric("test", "test")));
         TestUtil.setField(scanner, "output", out);
         scanner.runCycle(100);
-        List<PerfSample> samples = output.get(0, "samples");
+        List<PerfSample> samples = ((PerfRecord)results.get(0)).getSamples();
 
         Assert.assertNotNull(samples);
         Assert.assertEquals(2, samples.size());
@@ -105,7 +105,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
         TestUtil.setField(scanner, "output", out);
 
         scanner.runCycle(100);
-        List<PerfSample> samples = output.get(0, "samples");
+        List<PerfSample> samples = ((PerfRecord)results.get(0)).getSamples();
 
         Assert.assertNotNull(samples);
         Assert.assertEquals(2, samples.size());
@@ -126,7 +126,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
         TestUtil.setField(scanner, "output", out);
 
         scanner.runCycle(100);
-        List<PerfSample> samples = output.get(0, "samples");
+        List<PerfSample> samples = ((PerfRecord)results.get(0)).getSamples();
 
         Assert.assertNotNull(samples);
         Assert.assertEquals(2, samples.size());
