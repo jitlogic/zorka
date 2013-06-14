@@ -16,13 +16,12 @@
 
 package com.jitlogic.zorka.viewer;
 
-import com.jitlogic.zorka.core.util.ZorkaUtil;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class TraceTableModel extends AbstractTableModel {
 

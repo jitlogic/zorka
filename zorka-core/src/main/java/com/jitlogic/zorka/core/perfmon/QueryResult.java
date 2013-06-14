@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.core.perfmon;
 
-import com.jitlogic.zorka.core.store.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 
 import java.util.*;
 

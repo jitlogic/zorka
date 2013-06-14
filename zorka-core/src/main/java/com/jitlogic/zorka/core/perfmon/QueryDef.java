@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.core.perfmon;
 
-import com.jitlogic.zorka.core.store.MetricTemplate;
+import com.jitlogic.zorka.common.tracedata.MetricTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;

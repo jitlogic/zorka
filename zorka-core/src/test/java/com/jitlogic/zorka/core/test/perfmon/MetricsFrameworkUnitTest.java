@@ -16,11 +16,11 @@
 
 package com.jitlogic.zorka.core.test.perfmon;
 
+import com.jitlogic.zorka.common.tracedata.*;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.perfmon.*;
-import com.jitlogic.zorka.core.store.*;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.core.util.*;
 import org.junit.Before;
 import org.junit.Test;
 

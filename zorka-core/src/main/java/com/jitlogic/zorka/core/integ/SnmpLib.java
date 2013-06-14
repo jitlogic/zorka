@@ -18,10 +18,10 @@ package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.contrib.libsnmp.*;
 import com.jitlogic.zorka.core.ZorkaConfig;
-import com.jitlogic.zorka.core.util.ObjectInspector;
+import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.util.ZorkaLog;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
-import com.jitlogic.zorka.core.util.ZorkaUtil;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.util.Map;
 import java.util.Vector;

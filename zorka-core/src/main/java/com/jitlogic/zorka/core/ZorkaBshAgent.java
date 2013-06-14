@@ -26,7 +26,7 @@ import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.util.ObjectDumper;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
-import com.jitlogic.zorka.core.util.ZorkaUtil;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.util.ZorkaLog;
 
 import bsh.EvalError;

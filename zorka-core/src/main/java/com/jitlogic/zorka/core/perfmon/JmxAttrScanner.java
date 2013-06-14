@@ -16,10 +16,11 @@
 
 package com.jitlogic.zorka.core.perfmon;
 
+import com.jitlogic.zorka.common.tracedata.*;
+import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.AgentDiagnostics;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.spy.TracerOutput;
-import com.jitlogic.zorka.core.store.*;
 import com.jitlogic.zorka.core.util.*;
 
 import java.util.ArrayList;
@@ -85,21 +86,29 @@ public class JmxAttrScanner implements Runnable {
 
         Metric metric = template.getMetric(key);
         if (metric == null) {
+            Map<String,Object> attrs = new HashMap<String,Object>();
+
+            for (Map.Entry<String,Object> e : result.attrSet()) {
+                attrs.put(e.getKey(), e.getValue().toString());
+            }
+
+            String name = ObjectInspector.substitute(template.getName(), attrs);
+
             switch (template.getType()) {
                 case MetricTemplate.RAW_DATA:
-                    metric = metricsRegistry.getMetric(new RawDataMetric(template, result.attrSet()));
+                    metric = metricsRegistry.getMetric(new RawDataMetric(template, name, attrs));
                     break;
                 case MetricTemplate.RAW_DELTA:
-                    metric = metricsRegistry.getMetric(new RawDeltaMetric(template, result.attrSet()));
+                    metric = metricsRegistry.getMetric(new RawDeltaMetric(template, name, attrs));
                     break;
                 case MetricTemplate.TIMED_DELTA:
-                    metric = metricsRegistry.getMetric(new TimedDeltaMetric(template, result.attrSet()));
+                    metric = metricsRegistry.getMetric(new TimedDeltaMetric(template, name, attrs));
                     break;
                 case MetricTemplate.WINDOWED_RATE:
-                    metric = metricsRegistry.getMetric(new WindowedRateMetric(template, result.attrSet()));
+                    metric = metricsRegistry.getMetric(new WindowedRateMetric(template, name, attrs));
                     break;
                 case MetricTemplate.UTILIZATION:
-                    metric = metricsRegistry.getMetric(new UtilizationMetric(template, result.attrSet()));
+                    metric = metricsRegistry.getMetric(new UtilizationMetric(template, name, attrs));
                     break;
                 default:
                     return null;

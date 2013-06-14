@@ -16,6 +16,9 @@
 
 package com.jitlogic.zorka.core.store;
 
+import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
+import com.jitlogic.zorka.common.tracedata.TraceOutput;
+import com.jitlogic.zorka.common.tracedata.TraceWriter;
 import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.core.util.ZorkaLog;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
@@ -25,7 +28,7 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
 
-public class FileTraceOutput extends ZorkaAsyncThread<Submittable> implements TraceOutput {
+public class FileTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements TraceOutput {
 
     private static final ZorkaLog log = ZorkaLogger.getLog(FileTraceOutput.class);
 
@@ -60,7 +63,7 @@ public class FileTraceOutput extends ZorkaAsyncThread<Submittable> implements Tr
 
 
     @Override
-    protected void process(Submittable obj) {
+    protected void process(SymbolicRecord obj) {
         try {
             traceWriter.write(obj);
             stream.flush();

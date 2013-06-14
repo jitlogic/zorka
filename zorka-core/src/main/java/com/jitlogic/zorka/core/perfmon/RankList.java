@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.core.perfmon;
 
-import com.jitlogic.zorka.core.util.ZorkaUtil;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.util.Collections;
 import java.util.Comparator;

@@ -19,7 +19,7 @@ package com.jitlogic.zorka.core.perfmon;
 
 import java.util.LinkedList;
 
-import com.jitlogic.zorka.core.util.ZorkaUtil;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 /**
  * This is old rate aggregate object.

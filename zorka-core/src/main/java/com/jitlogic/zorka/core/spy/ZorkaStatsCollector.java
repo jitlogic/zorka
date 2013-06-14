@@ -18,9 +18,9 @@
 package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.core.mbeans.MethodCallStatistic;
-import com.jitlogic.zorka.core.mbeans.MethodCallStatistics;
-import com.jitlogic.zorka.core.util.ObjectInspector;
+import com.jitlogic.zorka.common.stats.MethodCallStatistic;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
+import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 import com.jitlogic.zorka.core.util.ZorkaLog;
 

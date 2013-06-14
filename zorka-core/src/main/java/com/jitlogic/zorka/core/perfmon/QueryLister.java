@@ -16,8 +16,10 @@
 
 package com.jitlogic.zorka.core.perfmon;
 
+import com.jitlogic.zorka.common.util.JmxObject;
+import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.core.store.MetricTemplate;
+import com.jitlogic.zorka.common.tracedata.MetricTemplate;
 import com.jitlogic.zorka.core.util.*;
 
 import javax.management.*;

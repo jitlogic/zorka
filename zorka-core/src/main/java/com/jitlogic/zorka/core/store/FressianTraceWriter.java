@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zorka.core.store;
 
+import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.core.util.*;
 import org.fressian.FressianWriter;
 import org.fressian.Writer;
@@ -50,7 +51,7 @@ public class FressianTraceWriter implements MetadataChecker, TraceWriter {
 
 
     @Override
-    public void write(Submittable record) throws IOException {
+    public void write(SymbolicRecord record) throws IOException {
         checkOutput();
         record.traverse(this);
         writer.writeObject(record);

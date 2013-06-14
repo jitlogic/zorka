@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.core.store.FileTraceOutput;
 import com.jitlogic.zorka.core.ZorkaConfig;
 import com.jitlogic.zorka.core.store.*;
@@ -65,7 +66,7 @@ public class TracerLib {
      *
      * @param output trace processing object
      */
-    public void output(ZorkaAsyncThread<Submittable> output) {
+    public void output(ZorkaAsyncThread<SymbolicRecord> output) {
         tracer.addOutput(output);
     }
 
@@ -195,14 +196,14 @@ public class TracerLib {
      *
      * @return trace file writer
      */
-    public ZorkaAsyncThread<Submittable> toFile(String path, int maxFiles, long maxSize, boolean compress) {
+    public ZorkaAsyncThread<SymbolicRecord> toFile(String path, int maxFiles, long maxSize, boolean compress) {
         TraceWriter writer = new FressianTraceWriter(symbolRegistry, metricsRegistry);
         FileTraceOutput output = new FileTraceOutput(writer, new File(config.formatCfg(path)), maxFiles, maxSize, compress);
         output.start();
         return output;
     }
 
-    public ZorkaAsyncThread<Submittable> toFile(String path, int maxFiles, long maxSize) {
+    public ZorkaAsyncThread<SymbolicRecord> toFile(String path, int maxFiles, long maxSize) {
         return toFile(path, maxFiles, maxSize, false);
     }
 
@@ -247,7 +248,7 @@ public class TracerLib {
      * @param traceTime minimum trace execution time (50 milliseconds by default)
      */
     public void setTracerMinTraceTime(int traceTime) {
-        Tracer.setMinTraceTime(traceTime * 1000000L);
+        TraceMarker.setMinTraceTime(traceTime * 1000000L);
     }
 
 
@@ -259,7 +260,7 @@ public class TracerLib {
      * @param traceTime minimum trace execution time (50 milliseconds by default)
      */
     public void setTracerMinTraceTime(long traceTime) {
-        Tracer.setMinTraceTime(traceTime * 1000000L);
+        TraceMarker.setMinTraceTime(traceTime * 1000000L);
     }
 
 

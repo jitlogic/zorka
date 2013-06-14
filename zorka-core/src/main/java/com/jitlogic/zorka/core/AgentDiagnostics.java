@@ -18,7 +18,7 @@ package com.jitlogic.zorka.core;
 
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.util.ValGetter;
-import com.jitlogic.zorka.core.util.ZorkaUtil;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;

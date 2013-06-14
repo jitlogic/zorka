@@ -22,7 +22,7 @@ import com.jitlogic.zorka.core.perfmon.QueryResult;
 import com.jitlogic.zorka.core.test.support.TestJmx;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.core.util.ZorkaUtil;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
