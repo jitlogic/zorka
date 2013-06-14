@@ -17,9 +17,13 @@ package com.jitlogic.zorka.common.tracedata;
 
 import java.io.OutputStream;
 
-
+/**
+ * Objects implementing this interface can server output stream for
+ * trace writer objects.
+ */
 public interface TraceOutput {
 
+    /** Returns output stream for trace writer. */
     public OutputStream getOutputStream();
 
 }

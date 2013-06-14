@@ -17,8 +17,18 @@ package com.jitlogic.zorka.common.tracedata;
 
 import java.io.IOException;
 
+/**
+ * Objects implementing this interface can be passed to traverse() method
+ * of all data objects (trace records, performance metrics etc.). For all
+ * symbols found in trace data checkSymbol() method of passed object will
+ * be invoked. For all metrics found in trace data checkMetric() will be
+ * invoked.
+ */
 public interface MetadataChecker {
+
+    /** Metod called for every symbol found in trace data. */
     void checkSymbol(int symbolId) throws IOException;
 
+    /** Method called for every metric found in trace data. */
     void checkMetric(int metricId) throws IOException;
 }

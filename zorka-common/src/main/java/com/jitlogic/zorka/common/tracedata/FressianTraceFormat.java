@@ -16,7 +16,6 @@
 package com.jitlogic.zorka.common.tracedata;
 
 
-import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.Reader;
 import org.fressian.Writer;
@@ -34,6 +33,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This class contains Fressian handlers for Zorka Trace Format. This data format
+ * is used for both local file store and network stores.
+ */
 public class FressianTraceFormat {
 
     public static final String SYMBOL_TAG     = "com.jitlogic.zorka.Symbol_v1";
@@ -47,6 +50,7 @@ public class FressianTraceFormat {
     public static final String PERFSAMPLE_TAG = "com.jitlogic.zorka.PerfSample_v1";
 
 
+    /** Default write handler for values of unknown types. */
     private static final WriteHandler NULL_WRITE_HANDLER = new WriteHandler() {
         @Override
         public void write(Writer w, Object instance) throws IOException {
@@ -55,6 +59,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** Write handler for symbols. */
     private static final WriteHandler SYMBOL_WH = new WriteHandler() {
         @Override
         public void write(Writer w, Object instance) throws IOException {
@@ -67,6 +72,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** Read handler for symbols. */
     private static final ReadHandler SYMBOL_RH = new ReadHandler() {
         @Override
         public Object read(Reader r, Object tag, int componentCount) throws IOException {
@@ -75,6 +81,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** Write handler for trace records. */
     private static final WriteHandler RECORD_WH = new WriteHandler() {
         @Override
         public void write(Writer w, Object instance) throws IOException {
@@ -98,11 +105,20 @@ public class FressianTraceFormat {
     };
 
 
+    /**
+     * Trace record builder interface. This can be used in clients to extend data type representing
+     * trace records (eg. ViewerTraceRecord in zorka-viewer).
+     */
     public static interface TraceRecordBuilder {
         TraceRecord get();
     }
 
 
+    /**
+     * Default trace record builder builds objects of class TraceRecord. Create new
+     * builder implementation and assign it to this variable in order to change this
+     * data type.
+     */
     public static TraceRecordBuilder TRACE_RECORD_BUILDER = new TraceRecordBuilder() {
         @Override
         public TraceRecord get() {
@@ -111,6 +127,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** Read handler for trace records. */
     private static final ReadHandler RECORD_RH = new ReadHandler() {
         @Override
         public Object read(Reader r, Object tag, int componentCount) throws IOException {
@@ -140,6 +157,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** Performance data Metric object write handler. */
     private static final WriteHandler METRIC_WH = new WriteHandler() {
         @Override
         public void write(Writer w, Object instance) throws IOException {
@@ -156,6 +174,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** Performance data Metric object read handler. */
     private static final ReadHandler METRIC_RH = new ReadHandler() {
         @Override
         public Object read(Reader r, Object tag, int componentCount) throws IOException {
@@ -184,6 +203,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** MetricTemplate write handler */
     private static final WriteHandler TEMPLATE_WH = new WriteHandler() {
         @Override
         public void write(Writer w, Object instance) throws IOException {
@@ -203,6 +223,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** MetricTemplate read handler */
     private static final ReadHandler TEMPLATE_RH = new ReadHandler() {
         @Override
         public Object read(Reader r, Object tag, int componentCount) throws IOException {
@@ -220,6 +241,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** TraceMarker write handler */
     public static final WriteHandler MARKER_WH = new WriteHandler() {
         @Override
         public void write(Writer w, Object instance) throws IOException {
@@ -235,6 +257,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** TraceMarker read handler */
     public static final ReadHandler MARKER_RH = new ReadHandler() {
         @Override
         public Object read(Reader r, Object tag, int componentCount) throws IOException {
@@ -248,6 +271,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** SymbolicException write handler */
     public static WriteHandler EXCEPTION_WH = new WriteHandler() {
         @Override
         public void write(Writer w, Object instance) throws IOException {
@@ -263,6 +287,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** SymbolicException read handler */
     public static ReadHandler EXCEPTION_RH = new ReadHandler() {
         @Override
         public Object read(Reader r, Object tag, int componentCount) throws IOException {
@@ -275,7 +300,7 @@ public class FressianTraceFormat {
     };
 
 
-
+    /** Exception StackElement write handler */
     public static final WriteHandler STACKEL_WH = new WriteHandler() {
         @Override
         public void write(Writer w, Object instance) throws IOException {
@@ -291,6 +316,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** Exception StackElement write handler */
     public static final ReadHandler STACKEL_RH = new ReadHandler() {
         @Override
         public Object read(Reader r, Object tag, int componentCount) throws IOException {
@@ -299,6 +325,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** Performance data PerfRecord write handler */
     public static final WriteHandler PERFRECORD_WH = new WriteHandler() {
         @Override
         public void write(Writer w, Object instance) throws IOException {
@@ -313,6 +340,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** Performance data PerfRecord read handler */
     public static final ReadHandler PERFRECORD_RH = new ReadHandler() {
         @Override
         public Object read(Reader r, Object tag, int componentCount) throws IOException {
@@ -321,6 +349,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** Performance data PerfSample read handler */
     public static final WriteHandler PERFSAMPLE_WH = new WriteHandler() {
         @Override
         public void write(Writer w, Object instance) throws IOException {
@@ -335,6 +364,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** Performance data PerfSample Write Handler */
     public static final ReadHandler PERFSAMPLE_RH = new ReadHandler() {
         @Override
         public Object read(Reader r, Object tag, int componentCount) throws IOException {
@@ -343,6 +373,7 @@ public class FressianTraceFormat {
     };
 
 
+    /** Lookup object grouping all write handlers */
     public static ILookup<Class, Map<String,WriteHandler>> WRITE_LOOKUP =
         new ChainedLookup<Class, Map<String, WriteHandler>>(
 
@@ -373,6 +404,7 @@ public class FressianTraceFormat {
         );
 
 
+    /** Lookup object grouping all read handlers */
     public static ILookup<Object, ReadHandler> READ_LOOKUP =
         new MapLookup<Object,ReadHandler>(
             ZorkaUtil.<Object,ReadHandler>constMap(
