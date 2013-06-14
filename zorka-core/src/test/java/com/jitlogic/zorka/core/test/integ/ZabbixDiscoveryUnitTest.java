@@ -17,7 +17,7 @@
 
 package com.jitlogic.zorka.core.test.integ;
 
-import com.jitlogic.zorka.core.mbeans.MethodCallStatistics;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.core.mbeans.ZorkaMappedMBean;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
 import com.jitlogic.zorka.core.test.support.TestJmx;

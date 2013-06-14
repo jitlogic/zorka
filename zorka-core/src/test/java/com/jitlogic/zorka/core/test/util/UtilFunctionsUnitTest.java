@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.core.test.util;
 
-import com.jitlogic.zorka.core.util.ZorkaUtil;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.fest.assertions.Assertions.assertThat;

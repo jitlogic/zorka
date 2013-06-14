@@ -16,10 +16,9 @@
 
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.core.store.MetricsRegistry;
-import com.jitlogic.zorka.core.store.Submittable;
-import com.jitlogic.zorka.core.store.SymbolRegistry;
-import com.jitlogic.zorka.core.store.SymbolicRecord;
+import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.core.util.*;
 
 import java.util.ArrayList;
@@ -35,13 +34,10 @@ public class Tracer implements TracerOutput {
     /** Minimum default method execution time required to attach method to trace. */
     private static long minMethodTime = 250000;
 
-    /** Minimum trace execution time required to further process trace */
-    private static long minTraceTime = 50000000;
-
     /** Maximum number of records inside trace */
     private static int maxTraceRecords = 4096;
 
-    private List<ZorkaAsyncThread<Submittable>> outputs = new ArrayList<ZorkaAsyncThread<Submittable>>();
+    private List<ZorkaAsyncThread<SymbolicRecord>> outputs = new ArrayList<ZorkaAsyncThread<SymbolicRecord>>();
 
     /** Defines which classes and methods should be traced. */
     private SpyMatcherSet matcherSet;
@@ -62,15 +58,6 @@ public class Tracer implements TracerOutput {
     }
 
 
-    public static long getMinTraceTime() {
-        return minTraceTime;
-    }
-
-
-    public static void setMinTraceTime(long traceTime) {
-        minTraceTime = traceTime;
-    }
-
 
     public static int getMaxTraceRecords() {
         return maxTraceRecords;
@@ -82,9 +69,9 @@ public class Tracer implements TracerOutput {
     }
 
     /** Thread local serving trace builder objects for application threads */
-    private ThreadLocal<TraceEventHandler> localHandlers =
-        new ThreadLocal<TraceEventHandler>() {
-            public TraceEventHandler initialValue() {
+    private ThreadLocal<TraceBuilder> localHandlers =
+        new ThreadLocal<TraceBuilder>() {
+            public TraceBuilder initialValue() {
                 return new TraceBuilder(Tracer.this, symbolRegistry);
             }
         };
@@ -101,7 +88,7 @@ public class Tracer implements TracerOutput {
      *
      * @return trace event handler (trace builder object)
      */
-    public TraceEventHandler getHandler() {
+    public TraceBuilder getHandler() {
         return localHandlers.get();
     }
 
@@ -116,8 +103,8 @@ public class Tracer implements TracerOutput {
 
 
 
-    public void submit(Submittable record) {
-        for (ZorkaAsyncThread<Submittable> output : outputs) {
+    public void submit(SymbolicRecord record) {
+        for (ZorkaAsyncThread<SymbolicRecord> output : outputs) {
             output.submit(record);
         }
     }
@@ -130,7 +117,7 @@ public class Tracer implements TracerOutput {
      *
      * @param output trace event handler
      */
-    public void addOutput(ZorkaAsyncThread<Submittable> output) {
+    public void addOutput(ZorkaAsyncThread<SymbolicRecord> output) {
         outputs.add(output);
     }
 

@@ -17,7 +17,7 @@
 
 package com.jitlogic.zorka.core.test.support;
 
-import com.jitlogic.zorka.core.util.ZorkaUtil;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 /**
  * Test double for ZorkaUtil class.

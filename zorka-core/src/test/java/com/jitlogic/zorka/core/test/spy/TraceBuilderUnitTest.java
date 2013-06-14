@@ -16,10 +16,9 @@
 
 package com.jitlogic.zorka.core.test.spy;
 
-import com.jitlogic.zorka.core.store.*;
+import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.core.util.ZorkaLogger;
 import com.jitlogic.zorka.core.spy.*;
-import com.jitlogic.zorka.core.test.spy.support.TestTracer;
 
 import com.jitlogic.zorka.core.test.support.TestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
@@ -28,7 +27,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -36,13 +34,14 @@ import static org.fest.assertions.Assertions.assertThat;
 
 public class TraceBuilderUnitTest extends ZorkaFixture {
 
-    private TestTracer output = new TestTracer();
     private SymbolRegistry symbols = new SymbolRegistry();
     private List<TraceRecord> records = new ArrayList<TraceRecord>();
 
     private TraceBuilder b = new TraceBuilder(
         new TracerOutput() {
-            @Override public void submit(Submittable obj) { obj.traverse(output); records.add((TraceRecord)obj); }
+            @Override public void submit(SymbolicRecord obj) {
+                records.add((TraceRecord)obj);
+            }
         }, symbols);
 
     private static final int MS = 1000000;
@@ -64,12 +63,23 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         tracer.setTracerMinTraceTime(50);
     }
 
+    private void checkRC(int recs, int...chld) {
+        assertThat(records.size()).isEqualTo(recs);
+        if (chld.length > 0) {
+            TraceRecord rec = records.get(0);
+            for (int c : chld) {
+                assertThat(rec.numChildren()).isEqualTo(c);
+                rec = rec.getChild(0);
+            }
+        }
+    }
+
     @Test
     public void testStrayTraceFragment() throws Exception {
         b.traceEnter(c1, m1, s1, 100 * MS);
         b.traceReturn(200 * MS);
 
-        assertEquals("Nothing should be sent to output", 0, output.getData().size());
+        checkRC(0);
     }
 
 
@@ -79,7 +89,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
         b.traceReturn(100 * MS + 100);
 
-        assertEquals("Nothing should be sent to output", 0, output.getData().size());
+        checkRC(0);
     }
 
 
@@ -90,9 +100,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.markTraceFlag(TraceMarker.SUBMIT_TRACE);
         b.traceReturn(20 * MS);
 
-        Assert.assertEquals("Output actions mismatch.",
-                Arrays.asList("traceBegin", "traceEnter", "traceStats", "traceReturn"),
-                output.listAttr("action"));
+        checkRC(1, 0);
     }
 
 
@@ -105,10 +113,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceReturn(20 * MS + 10);
         b.traceReturn(200 * MS);
 
-        Assert.assertEquals("Output actions mismatch.",
-                Arrays.asList("traceBegin", "traceEnter", "traceStats", "traceEnter", "traceStats",
-                        "traceReturn", "traceReturn"), output.listAttr("action"));
-
+        checkRC(1, 1, 0);
     }
 
 
@@ -118,9 +123,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceBegin(t1, 200L, TraceMarker.DROP_INTERIM);
         b.traceReturn(200 * MS);
 
-        Assert.assertEquals("Output actions mismatch.",
-            Arrays.asList("traceBegin", "traceEnter", "traceStats", "traceReturn"),
-                          output.listAttr("action"));
+        checkRC(1, 0);
     }
 
 
@@ -132,11 +135,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceReturn(300 * MS);
         b.traceReturn(400 * MS);
 
-        Assert.assertEquals("Output actions mismatch.",
-            Arrays.asList("traceBegin", "traceEnter", "traceStats", "traceEnter", "traceStats",
-                          "traceReturn", "traceReturn"), output.listAttr("action"));
-
-        assertEquals("should record two calls", 2L, output.getData().get(2).get("calls"));
+        checkRC(1, 1, 0);
+        assertThat(records.get(0).getCalls()).isEqualTo(2);
     }
 
 
@@ -146,9 +146,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceBegin(t1, 400L, TraceMarker.DROP_INTERIM);
         b.traceError(new Exception("oja!"), 200 * MS);
 
-        Assert.assertEquals("Output actions mismatch.",
-            Arrays.asList("traceBegin", "traceEnter", "traceStats", "traceError"),
-                          output.listAttr("action"));
+        checkRC(1, 0);
+        assertThat(records.get(0).getException()).isNotNull();
     }
 
 
@@ -160,10 +159,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceError(new Exception("oja!"), 200 * MS + 100);
         b.traceReturn(400 * MS);
 
-        Assert.assertEquals("Output actions mismatch.",
-            Arrays.asList("traceBegin", "traceEnter", "traceStats", "traceEnter", "traceStats",
-                          "traceError", "traceReturn"), output.listAttr("action"));
-        assertEquals("should record two calls", 2L, output.getData().get(2).get("calls"));
+        checkRC(1, 1, 0);
+        assertThat(records.get(0).getCalls()).isEqualTo(2L);
     }
 
 
@@ -178,11 +175,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceReturn(130 * MS);
         b.traceReturn(140 * MS);
 
-        Assert.assertEquals("Output actions mismatch.",
-            Arrays.asList("traceBegin", "traceEnter", "traceStats", "traceEnter", "traceStats",
-                          "traceReturn", "traceReturn"), output.listAttr("action"));
-
-        assertEquals("Number of recorded calls.", 3L, output.getData().get(2).get("calls"));
+        checkRC(1, 1, 0);
+        assertThat(records.get(0).getCalls()).isEqualTo(3L);
     }
 
 
@@ -195,9 +189,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.newAttr(a2, "other val");
         b.traceReturn(110 * MS);
 
-        Assert.assertEquals("Output actions mismatch.",
-            Arrays.asList("traceBegin", "traceEnter", "traceStats", "newAttr", "newAttr", "traceReturn"),
-            output.listAttr("action"));
+        checkRC(1, 0);
+        assertThat(records.get(0).numAttrs()).isEqualTo(2);
     }
 
 
@@ -235,9 +228,9 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         b.traceReturn(11 * MS);
 
-        Assert.assertEquals("Should record begin and 3 full records", 1 +3*3, output.size());
-        output.check(2, "calls", 5L);
-        output.check(0, "flags", TraceMarker.OVERFLOW_FLAG|TraceMarker.DROP_INTERIM);
+        checkRC(1, 2);
+        assertThat(records.get(0).getCalls()).isEqualTo(5L);
+        assertThat(records.get(0).getMarker().getFlags()).isEqualTo(TraceMarker.OVERFLOW_FLAG | TraceMarker.DROP_INTERIM);
     }
 
 
@@ -265,9 +258,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         b.traceReturn(11 * MS);
 
-        Assert.assertEquals("Should record begin and 3 full records", 1 +3*3, output.size());
-
-        output.check(0, "flags", TraceMarker.OVERFLOW_FLAG|TraceMarker.DROP_INTERIM);
+        checkRC(1, 1, 1, 0);
+        assertThat(records.get(0).getMarker().getFlags()).isEqualTo(TraceMarker.OVERFLOW_FLAG | TraceMarker.DROP_INTERIM);
     }
 
 
@@ -298,17 +290,15 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         // Check inner trace
         TraceRecord top = TestUtil.getField(b, "ttop");
         assertEquals("Root record of a trace should have only one child.", 1, top.numChildren());
-        Assert.assertEquals("Should record begin and 3 full frames (3 records each)",
-                1 + 3 * 3, output.size());
+        checkRC(1, 2, 0);
 
-        output.clear();
+        records.clear();
 
         b.traceReturn(16 * MS);
 
-        Assert.assertEquals("Should record 2 times begin and 4 full frames (3 records each)",
-                2 + 4 * 3, output.size());
+        checkRC(1, 1, 2, 0);
 
-        output.check(0, "flags", TraceMarker.OVERFLOW_FLAG|TraceMarker.DROP_INTERIM);
+        assertThat(records.get(0).getMarker().getFlags()).isEqualTo(TraceMarker.OVERFLOW_FLAG | TraceMarker.DROP_INTERIM);
     }
 
 
@@ -322,8 +312,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceBegin(t2, 2 * MS, TraceMarker.DROP_INTERIM);
         b.traceReturn(3 * MS);
 
-        Assert.assertEquals("Should record one begin event and one full frame (3 records)", 1 + 3, output.size());
-        output.check(0, "action", "traceBegin", "traceId", t1);
+        checkRC(1, 0);
+        assertThat(records.get(0).getMarker().getTraceId()).isEqualTo(t1);
     }
 
 
@@ -344,7 +334,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceBegin(t1, 6 * MS, TraceMarker.DROP_INTERIM);
         b.traceReturn(7 * MS);
 
-        Assert.assertEquals("Should record one begin event and one full frame (3 records)", 2 * (1 + 3), output.size());
+        checkRC(2);
     }
 
 
@@ -363,21 +353,19 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceReturn(5 * MS);
 
         // Single trace should appear on output
-        Assert.assertEquals(4, output.size());
-        output.clear();
+        checkRC(1, 0); records.clear();
 
         // Start subsequent trace
         b.traceEnter(c1, m2, s1, 6 * MS);
         b.traceBegin(t2, 7 * MS, 0);
         b.traceReturn(8 * MS);
 
-        Assert.assertEquals(4, output.size());
-        output.clear();
+        checkRC(1, 0); records.clear();
 
         // Return from main frame
         b.traceReturn(9 * MS);
 
-        Assert.assertEquals(3+3*3, output.size());
+        checkRC(1, 2);
     }
 
 
@@ -395,17 +383,11 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceError(e, 4 * MS);
         b.traceError(e, 5 * MS);
 
-        Assert.assertEquals(7, output.size());
+        checkRC(1, 1, 0);
 
-        // Exception of inner method
-        output.check(5, "exception", new SymbolicException(e, symbols, true));
-
-        // Exception of outer method
-        output.check(6, "exception", null);
-
-        // Flags of outer method
-        output.check(2, "flags", TraceRecord.EXCEPTION_PASS|TraceRecord.TRACE_BEGIN);
-
+        assertThat(records.get(0).getException()).isNull();
+        assertThat(records.get(0).getFlags()).isEqualTo(TraceRecord.EXCEPTION_PASS|TraceRecord.TRACE_BEGIN);
+        assertThat(records.get(0).getChild(0).getException()).isEqualTo(new SymbolicException(e, symbols, true));
     }
 
 
@@ -424,16 +406,11 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceError(e1, 4 * MS);
         b.traceError(e2, 5 * MS);
 
-        Assert.assertEquals(7, output.size());
+        checkRC(1, 1, 0);
 
-        // Exception of inner method
-        output.check(5, "exception", new SymbolicException(e1, symbols, true));
-
-        // Exception of outer method
-        output.check(6, "exception", new SymbolicException(e2, symbols, false));
-
-        // Flags of outer method
-        output.check(2, "flags", TraceRecord.EXCEPTION_WRAP|TraceRecord.TRACE_BEGIN);
+        assertThat(records.get(0).getChild(0).getException()).isEqualTo(new SymbolicException(e1, symbols, true));
+        assertThat(records.get(0).getException()).isEqualTo(new SymbolicException(e2, symbols, false));
+        assertThat(records.get(0).getFlags()).isEqualTo(TraceRecord.EXCEPTION_WRAP|TraceRecord.TRACE_BEGIN);
     }
 
 
@@ -453,9 +430,10 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         b.traceReturn(56);
 
-        output.check(2, "action", "traceStats", "calls", 3L);
-        output.check(3, "action", "traceEnter", "tstamp", 0L);
-        output.check(5, "action", "traceReturn", "tstamp", 15L);
+        TraceRecord tr = records.get(0);
+
+        assertThat(tr.getCalls()).isEqualTo(3);
+        assertThat(tr.getChild(0).getTime()).isEqualTo(15);
     }
 
 
@@ -477,8 +455,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         b.traceReturn(40);
 
-        output.check(3, "action", "traceEnter", "tstamp", 0L);
-        output.check(5, "action", "traceReturn", "tstamp", 16L);
+        checkRC(1, 1, 0);
+        assertThat(records.get(0).getChild(0).getTime()).isEqualTo(16);
     }
 
 
@@ -531,14 +509,9 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceReturn(21);
         b.traceReturn(22);
 
-        Assert.assertEquals(7, output.size());
-
-        Assert.assertEquals("Output actions mismatch.",
-                Arrays.asList("traceBegin", "traceEnter", "traceStats", "traceEnter", "traceStats",
-                        "traceReturn", "traceReturn"), output.listAttr("action"));
-
-        assertEquals("should record 3 calls", 3L, output.getData().get(2).get("calls"));
-        assertEquals("should mark dropped record", TraceRecord.DROPPED_PARENT, output.getData().get(4).get("flags"));
+        checkRC(1, 1, 0);
+        assertThat(records.get(0).getCalls()).isEqualTo(3);
+        assertThat(records.get(0).getChild(0).getFlags()).isEqualTo(TraceRecord.DROPPED_PARENT);
     }
 
 
@@ -580,8 +553,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.newAttr(1, "oja!");
         b.traceReturn(20 * MS);
 
-        Assert.assertEquals("Ouptut actions mismatch.",
-                Arrays.asList("traceBegin", "traceEnter", "traceStats", "newAttr", "traceReturn"), output.listAttr("action"));
+        checkRC(1, 0);
+        assertThat(records.get(0).numAttrs()).isEqualTo(1);
     }
 
 }

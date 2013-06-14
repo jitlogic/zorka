@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.core.test.util;
 
-import com.jitlogic.zorka.core.util.ObjectInspector;
+import com.jitlogic.zorka.common.util.ObjectInspector;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -27,7 +27,7 @@ import com.jitlogic.zorka.core.spy.SpyClassTransformer;
 import com.jitlogic.zorka.core.spy.SpyLib;
 import com.jitlogic.zorka.core.spy.TracerLib;
 
-import com.jitlogic.zorka.core.store.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import org.junit.After;
 import org.junit.Before;
 

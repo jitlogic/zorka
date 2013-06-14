@@ -16,14 +16,14 @@
 
 package com.jitlogic.zorka.core.test.spy;
 
-import com.jitlogic.zorka.core.mbeans.MethodCallStatistic;
+import com.jitlogic.zorka.common.stats.MethodCallStatistic;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
-import com.jitlogic.zorka.core.mbeans.MethodCallStatistics;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.core.spy.SpyContext;
 import com.jitlogic.zorka.core.spy.SpyDefinition;
 import com.jitlogic.zorka.core.spy.ZorkaStatsCollector;
 
-import com.jitlogic.zorka.core.util.ZorkaUtil;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

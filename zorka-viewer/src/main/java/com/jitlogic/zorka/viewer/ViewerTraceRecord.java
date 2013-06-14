@@ -16,9 +16,9 @@
 package com.jitlogic.zorka.viewer;
 
 
-import com.jitlogic.zorka.core.store.TraceMarker;
-import com.jitlogic.zorka.core.store.TraceRecord;
-import com.jitlogic.zorka.core.store.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.TraceMarker;
+import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import org.objectweb.asm.Type;
 
 import java.text.SimpleDateFormat;

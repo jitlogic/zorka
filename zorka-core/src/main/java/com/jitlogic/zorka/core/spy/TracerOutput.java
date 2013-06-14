@@ -16,10 +16,10 @@
 
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.core.store.Submittable;
+import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 
 public interface TracerOutput {
 
-    public void submit(Submittable record);
+    public void submit(SymbolicRecord record);
 
 }
