@@ -105,6 +105,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         assertEquals(2, stats.getStatisticNames().length);
     }
 
+
     @Test
     public void testTwoCollectorsReportingToSingleZorkaStat() throws Exception {
         ZorkaStatsCollector c1 = new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=SomeBean", "stats", "AAA", "C0");
@@ -119,6 +120,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         MethodCallStatistics stats = (MethodCallStatistics)getAttr(testMbs, "test:name=SomeBean", "stats");
         assertEquals(2L, ((MethodCallStatistic)stats.getStatistic("AAA")).getCalls());
     }
+
 
     @Test
     public void testMaxTimeCLR() throws Exception {
@@ -135,5 +137,19 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
 
         assertEquals(11L, stat.getMaxTimeCLR());
         assertEquals(0L, stat.getMaxTimeCLR());
+    }
+
+
+    @Test
+    public void testThreadCounter() throws Exception {
+        MethodCallStatistic stat = new MethodCallStatistic("A");
+
+        stat.markEnter();
+        assertEquals(1L, stat.getMaxThreads());
+        assertEquals(1L, stat.getCurThreads());
+
+        stat.markExit();
+        assertEquals(1L, stat.getMaxThreads());
+        assertEquals(0L, stat.getCurThreads());
     }
 }
