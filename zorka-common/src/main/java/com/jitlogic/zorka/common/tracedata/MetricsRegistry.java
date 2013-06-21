@@ -16,28 +16,23 @@
 
 package com.jitlogic.zorka.common.tracedata;
 
-import com.jitlogic.zorka.common.tracedata.Metric;
-import com.jitlogic.zorka.common.tracedata.MetricTemplate;
-
-import java.util.Map;
-import java.util.NavigableMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MetricsRegistry {
 
     private AtomicInteger lastTemplateId;
-    private NavigableMap<Integer,MetricTemplate> templateById;
-    private Map<MetricTemplate,MetricTemplate> templates = new ConcurrentHashMap<MetricTemplate, MetricTemplate>();
+    private ConcurrentMap<Integer,MetricTemplate> templateById;
+    private ConcurrentMap<MetricTemplate,MetricTemplate> templates = new ConcurrentHashMap<MetricTemplate, MetricTemplate>();
 
     private AtomicInteger lastMetricId;
-    private NavigableMap<Integer,Metric> metricById;
+    private ConcurrentMap<Integer,Metric> metricById;
 
 
     public MetricsRegistry() {
-        templateById = new ConcurrentSkipListMap<Integer, MetricTemplate>();
-        metricById = new ConcurrentSkipListMap<Integer, Metric>();
+        templateById = new ConcurrentHashMap<Integer, MetricTemplate>();
+        metricById = new ConcurrentHashMap<Integer, Metric>();
 
         lastTemplateId = new AtomicInteger(0);
         lastMetricId = new AtomicInteger(0);

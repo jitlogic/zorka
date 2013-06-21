@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.common.tracedata;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,15 +28,15 @@ public class SymbolRegistry {
     private AtomicInteger lastSymbolId;
 
     /** Symbol name to ID map */
-    private ConcurrentHashMap<String,Integer> symbolIds;
+    private ConcurrentMap<String,Integer> symbolIds;
 
     /** Symbol ID to name map */
-    private ConcurrentNavigableMap<Integer,String> symbolNames;
+    private ConcurrentMap<Integer,String> symbolNames;
 
     public SymbolRegistry() {
         lastSymbolId  = new AtomicInteger(0);
         symbolIds = new ConcurrentHashMap<String, Integer>();
-        symbolNames = new ConcurrentSkipListMap<Integer, String>();
+        symbolNames = new ConcurrentHashMap<Integer, String>();
     }
 
     /**
