@@ -194,6 +194,14 @@ public class ZorkaLib  {
     } // dump()
 
 
+
+    public Object jmxv(Object defval, Object...args) {
+        Object v = jmx(args);
+        return v != null ? v : defval;
+    }
+
+
+
     /**
      * Retrieves object from JMX
      *
