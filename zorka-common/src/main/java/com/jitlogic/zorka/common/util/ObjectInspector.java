@@ -357,6 +357,8 @@ public final class ObjectInspector {
     /** Regular expression for identifying substitution markers in strings. Used by substitute() methods. */
     public static final Pattern reVarSubstPattern = Pattern.compile("\\$\\{([^\\}]+)\\}");
 
+    private static final Pattern reDollarSign = Pattern.compile("$", Pattern.LITERAL);
+    private static final String reDollarReplacement = Matcher.quoteReplacement("\\$");
 
     /**
      * Substitutes marked variables in a string with record fields. Variables are marked with
@@ -379,7 +381,7 @@ public final class ObjectInspector {
             for (int i = 1; i < segs.length; i++) {
                 v = getAttr(v, segs[i]);
             }
-            m.appendReplacement(sb, ""+v);
+            m.appendReplacement(sb, reDollarSign.matcher(""+v).replaceAll(reDollarReplacement));
         }
 
         m.appendTail(sb);
