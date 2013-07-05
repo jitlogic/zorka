@@ -1,10 +1,9 @@
-Zorka 0.9.7 (2013-06-20)
+Zorka 0.9.7 (2013-06-22)
 ------------------------
 
  * use fressian format for saving traces;
+ * congestion monitoring (via ZorkaStats);
  * lots of fixes;
- *
-
 
 Zorka 0.9.6 (2013-05-01)
 ------------------------

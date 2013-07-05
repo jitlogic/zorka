@@ -35,6 +35,7 @@ public class MethodCallStatistic implements ZorkaStat {
     /** Summary data. */
     private AtomicLong calls, errors, time, maxTime;
 
+    private AtomicLong curThreads, maxThreads;
 
     /**
      * Standard constructor.
@@ -49,6 +50,9 @@ public class MethodCallStatistic implements ZorkaStat {
         this.errors = new AtomicLong(0);
         this.time = new AtomicLong(0);
         this.maxTime = new AtomicLong(0);
+
+        this.curThreads = new AtomicLong(0);
+        this.maxThreads = new AtomicLong(0);
     }
 
 
@@ -178,32 +182,64 @@ public class MethodCallStatistic implements ZorkaStat {
      * @return maximum execution time (in milliseconds)
      */
     public long getMaxTimeNsCLR() {
-        long t = maxTime.longValue();
+        return getMaxCLR(maxTime);
+    }
 
-        while (!maxTime.compareAndSet(t, 0)) {
-            t = maxTime.longValue();
+
+    private long getMaxCLR(AtomicLong counter) {
+        long t = counter.longValue();
+
+        while (!counter.compareAndSet(t, 0)) {
+            t = counter.longValue();
         }
 
         return t;
     }
 
+
+    public void markEnter() {
+        setMax(maxThreads, curThreads.incrementAndGet());
+    }
+
+
+    public void markExit() {
+        curThreads.decrementAndGet();
+    }
+
+
+    public long getMaxThreads() {
+        return maxThreads.get();
+    }
+
+
+    public long getMaxThreadsCLR() {
+        return getMaxCLR(maxThreads);
+    }
+
+    public long getCurThreads() {
+        return curThreads.get();
+    }
+
+
     /**
-     * Sets maximum time to atomic variable
+     * Sets maximum value to an atomic counter
      * in thread safe manner.
      *
-     * @param t max time candidate
+     * @param v sample value
+     *
      */
-    private void setMaxTime(long t) {
-        long t2 = maxTime.longValue();
+    private void setMax(AtomicLong counter, long v) {
+        long v2 = counter.longValue();
 
-        while (t > t2) {
-            if (!maxTime.compareAndSet(t2, t)) {
-                t2 = maxTime.longValue();
+        while (v > v2) {
+            if (!counter.compareAndSet(v2, v)) {
+                v2 = counter.longValue();
             } else {
                 return;
             }
         }
     }
+
 
     /**
      * Logs successful method call
@@ -213,7 +249,7 @@ public class MethodCallStatistic implements ZorkaStat {
 	public void logCall(long time) {
         this.calls.incrementAndGet();
         this.time.addAndGet(time);
-        this.setMaxTime(time);
+        this.setMax(maxTime, time);
 	}
 
 
@@ -227,7 +263,7 @@ public class MethodCallStatistic implements ZorkaStat {
         this.errors.incrementAndGet();
         this.calls.incrementAndGet();
         this.time.addAndGet(time);
-        this.setMaxTime(time);
+        this.setMax(maxTime, time);
     }
 
 

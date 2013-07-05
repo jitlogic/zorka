@@ -37,6 +37,9 @@ import static com.jitlogic.zorka.core.spy.SpyLib.*;
  */
 public class ZorkaStatsCollector implements SpyProcessor {
 
+    public static final int ACTION_STATS = 0x01;
+    public static final int ACTION_ENTER = 0x02;
+    public static final int ACTION_EXIT  = 0x04;
 
     public static final String CLASS_NAME = "className";
     public static final String METHOD_NAME = "methodName";
@@ -57,6 +60,9 @@ public class ZorkaStatsCollector implements SpyProcessor {
 
     /** Logger */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+
+    /** Actions that will be taken when method execution hits collector */
+    private int actions;
 
     /** MBean server name */
     private String mbsName;
@@ -99,18 +105,26 @@ public class ZorkaStatsCollector implements SpyProcessor {
     /** MBean server registry */
     private MBeanServerRegistry registry;
 
+
+    public ZorkaStatsCollector(MBeanServerRegistry mbsRegistry, String mbsName, String mbeanTemplate,
+                               String attrTemplate, String statTemplate, String timeField) {
+        this(mbsRegistry, mbsName, mbeanTemplate, attrTemplate, statTemplate, timeField, ACTION_STATS);
+    }
+
+
     /**
      * Creates new method call statistics collector.
      *
      * @param mbsName mbean server name
      *
      * @param mbeanTemplate mbean name template (object name)
-     *@param attrTemplate attribute name template
-     *@param statTemplate statistic name template
-     *@param timeField execution time field name
+     * @param attrTemplate attribute name template
+     * @param statTemplate statistic name template
+     * @param timeField execution time field name
+     *
      */
     public ZorkaStatsCollector(MBeanServerRegistry mbsRegistry, String mbsName, String mbeanTemplate,
-                               String attrTemplate, String statTemplate, String timeField) {
+                               String attrTemplate, String statTemplate, String timeField, int actions) {
 
         // Some strings are intern()ed immediately, so
 
@@ -121,6 +135,7 @@ public class ZorkaStatsCollector implements SpyProcessor {
         this.statTemplate = statTemplate.intern();
 
         this.timeField = timeField;
+        this.actions = actions;
 
         this.mbeanFlags = templateFlags(mbeanTemplate);
         this.attrFlags = templateFlags(attrTemplate);
@@ -192,7 +207,17 @@ public class ZorkaStatsCollector implements SpyProcessor {
             statistic = statistics.getMethodCallStatistic(key);
         }
 
-        submit(record, statistic);
+        if (0 != (actions & ACTION_STATS)) {
+            submit(record, statistic);
+        }
+
+        if (0 != (actions & ACTION_ENTER)) {
+            statistic.markEnter();
+        }
+
+        if (0 != (actions & ACTION_EXIT)) {
+            statistic.markExit();
+        }
 
         return record;
     }
@@ -317,12 +342,6 @@ public class ZorkaStatsCollector implements SpyProcessor {
         } else {
             return ObjectInspector.substitute(input, record);
         }
-    }
-
-    /** Returns statistic template */
-    public String getStatTemplate() {
-        // TODO get rid of this method, use introspection in unit tests
-        return statTemplate;
     }
 
 

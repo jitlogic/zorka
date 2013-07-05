@@ -46,6 +46,9 @@ public class SpyLib {
     public static final int SF_IMMEDIATE = 1;
     public static final int SF_FLUSH = 2;
 
+    public static final int ZST_STATS = 0x01;
+    public static final int ZST_ENTER = 0x02;
+    public static final int ZST_EXIT  = 0x04;
 
     // Debug levels
 
@@ -436,6 +439,11 @@ public class SpyLib {
     }
 
 
+    public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr, int actions) {
+        return zorkaStats(mbsName, beanName, attrName, keyExpr, "T", actions);
+    }
+
+
     /**
      * Creates method call statistics collector object. It will maintain zorka call statistics and update them with
      * incoming data.
@@ -454,6 +462,11 @@ public class SpyLib {
      */
     public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr, String timeField) {
         return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr, timeField);
+    }
+
+
+    public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr, String timeField, int actions) {
+        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr, timeField, actions);
     }
 
 
