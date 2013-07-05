@@ -27,15 +27,13 @@ import com.jitlogic.zorka.core.spy.SpyContext;
 import com.jitlogic.zorka.core.spy.SpyDefinition;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.management.*;
 import javax.management.j2ee.statistics.TimeStatistic;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -191,6 +189,42 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
         assertEquals("123!", ObjectInspector.substitute("${E0}!", rec));
         assertEquals("aaa", ObjectInspector.substitute("${R0}", rec));
         assertEquals("4", ObjectInspector.substitute("${E1.length()}", rec));
+    }
+
+
+    @Test
+    public void testSubstituteSpecialChars() {
+        Map<String,Object> rec = ZorkaUtil.map("A", "a $ b");
+        assertEquals("a $ b", ObjectInspector.substitute("${A}", rec));
+    }
+
+
+    private Properties props(String...kv) {
+        Properties properties = new Properties();
+        for (int i = 1; i < kv.length; i += 2) {
+            properties.setProperty(kv[i-1], kv[i]);
+        }
+        return properties;
+    }
+
+
+    @Test
+    public void testSubstituteWithPropertyValues() {
+        Properties props = props("zorka.home.dir", "/opt/zorka", "my.prop", "Oja!");
+
+        assertEquals("Oja! Zorka found in /opt/zorka !",
+            ObjectInspector.substitute("${my.prop} Zorka found in ${zorka.home.dir} !", props));
+
+        assertEquals("This is ${non.existent}.",
+            ObjectInspector.substitute("This is ${non.existent}.", props));
+
+        assertEquals("This is by default !",
+            ObjectInspector.substitute("This is ${fubar:by default} !", props));
+    }
+
+    @Test
+    public void testGetClassName() {
+        Assert.assertEquals("java.lang.String", ObjectInspector.get(String.class, "name"));
     }
 
 
