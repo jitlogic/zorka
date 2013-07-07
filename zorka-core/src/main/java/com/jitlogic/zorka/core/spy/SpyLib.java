@@ -128,6 +128,10 @@ public class SpyLib {
     public static final int AC_PKGPRIV      = 0x010000;
     public static final int AC_ANY          = 0x000000;
 
+    public static final int ACTION_STATS = 0x01;
+    public static final int ACTION_ENTER = 0x02;
+    public static final int ACTION_EXIT  = 0x04;
+
     private SpyClassTransformer classTransformer;
     private MBeanServerRegistry mbsRegistry;
 
@@ -677,6 +681,16 @@ public class SpyLib {
      */
     public SpyProcessor regexFilter(String dst, String regex, boolean filterOut) {
         return new RegexFilterProcessor(dst, regex, filterOut);
+    }
+
+
+    public SpyProcessor valSetFilter(String field, Set<?> candidates) {
+        return new SetFilterProcessor(field, false, candidates);
+    }
+
+
+    public SpyProcessor valSetFilter(String field, boolean invert, Set<?> candidates) {
+        return new SetFilterProcessor(field, invert, candidates);
     }
 
 
