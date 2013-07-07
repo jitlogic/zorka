@@ -306,4 +306,9 @@ public class ZorkaConfig {
         return s != null && s.trim().length() > 0;
     }
 
+
+    public void setCfg(String key, Object val) {
+        properties.setProperty(key, ""+val);
+    }
+
 }
