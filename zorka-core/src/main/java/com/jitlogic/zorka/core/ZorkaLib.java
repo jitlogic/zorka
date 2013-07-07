@@ -820,6 +820,30 @@ public class ZorkaLib  {
     }
 
 
+    public void defCfg(String key, String defVal) {
+        if (!hasCfg(key)) {
+            config.setCfg(key, defVal);
+        }
+    }
+
+
+    public Set<String> setCfg(String key) {
+        Set<String> set = new HashSet<String>();
+        set.addAll(listCfg(key));
+        return set;
+    }
+
+
+    public Object ifCfg(String key, boolean defVal, Object thenVal, Object elseVal) {
+        return boolCfg(key, defVal) ? thenVal : elseVal;
+    }
+
+
+    public Object ifCfg(String key, boolean defVal, Object thenVal) {
+        return ifCfg(key, defVal, thenVal, null);
+    }
+
+
     public Properties loadCfg(String fname) {
         String path = path(config.getHomeDir(), fname);
         Properties props = config.loadCfg(config.getProperties(), path, false);
@@ -842,6 +866,7 @@ public class ZorkaLib  {
         }
         return props;
     }
+
 
 
     public String path(String...components) {

@@ -216,6 +216,7 @@ public class MethodCallStatistic implements ZorkaStat {
         return getMaxCLR(maxThreads);
     }
 
+
     public long getCurThreads() {
         return curThreads.get();
     }
