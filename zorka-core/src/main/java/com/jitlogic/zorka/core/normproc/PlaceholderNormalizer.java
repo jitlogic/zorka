@@ -15,20 +15,12 @@
  */
 package com.jitlogic.zorka.core.normproc;
 
-/**
- * Normalizer interface. Object implementing this interface are capable of normalizing strings
- * of various types (eg. SQL queries). Normalization consists of stripping unnecessary spaces,
- * stripping data (literals), case aligning all symbols and keywords (to uppercase or lower case) etc.
- *
- * @author rafal.lewczuk@jitlogic.com
- */
-public interface Normalizer {
-    /**
-     * Performs string normalization.
-     *
-     * @param input input string
-     *
-     * @return normalized string
-     */
-    String normalize(String input, Object...params);
+
+public class PlaceholderNormalizer implements Normalizer {
+
+
+    @Override
+    public String normalize(String input, Object...params) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

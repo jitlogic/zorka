@@ -9,6 +9,7 @@
 
     <properties>
         <fest.version>1.4</fest.version>
+        <junit.version>4.11</junit.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -16,7 +17,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -33,10 +34,11 @@
 
 
     <modules>
-        <module>zorka-core</module>
-        <module>zorka-viewer</module>
-        <module>zorka-agent</module>
         <module>zorka-common</module>
+        <module>zorka-core</module>
+        <module>zorka-agent</module>
+        <module>zorka-central</module>
+        <module>zorka-viewer</module>
     </modules>
 
 </project>

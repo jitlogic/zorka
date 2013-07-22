@@ -13,22 +13,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.normproc;
+package com.jitlogic.zorka.central;
 
-/**
- * Normalizer interface. Object implementing this interface are capable of normalizing strings
- * of various types (eg. SQL queries). Normalization consists of stripping unnecessary spaces,
- * stripping data (literals), case aligning all symbols and keywords (to uppercase or lower case) etc.
- *
- * @author rafal.lewczuk@jitlogic.com
- */
-public interface Normalizer {
-    /**
-     * Performs string normalization.
-     *
-     * @param input input string
-     *
-     * @return normalized string
-     */
-    String normalize(String input, Object...params);
+import java.io.IOException;
+
+
+public class RAGZException extends IOException {
+
+    public RAGZException(String msg) {
+        super(msg);
+    }
+
+    public RAGZException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
 }

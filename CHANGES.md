@@ -1,9 +1,10 @@
-Zorka 0.9.7 (2013-06-22)
+Zorka 0.9.7 (2013-07-07)
 ------------------------
 
  * use fressian format for saving traces;
  * congestion monitoring (via ZorkaStats);
  * lots of fixes;
+
 
 Zorka 0.9.6 (2013-05-01)
 ------------------------
@@ -12,6 +13,7 @@ Zorka 0.9.6 (2013-05-01)
  * load additional property files with zorka.loadCfg() function;
  * programmatic tracer attribute setting with tracer.newAttr() function;
  * lots ot fixes
+
 
 Zorka 0.9.5 (2013-04-15)
 ------------------------
@@ -31,11 +33,13 @@ Zorka 0.9.4 (2013-04-02)
  * refactor zorka-common+zorka-agent -> zorka-core+zorka-agent;
  * bugfixes;
 
+
 Zorka 0.9.3 (2013-03-23)
 ------------------------
 
  * support for JDK5;
  * fixes;
+
 
 Zorka 0.9.2 (2013-03-11)
 ------------------------
@@ -43,11 +47,13 @@ Zorka 0.9.2 (2013-03-11)
  * enhance trace viewer, get rid of unnecessary dependencies;
  * new 'local max' attribute maintained by method call statistics;
 
+
 Zorka 0.9.1 (2013-02-28)
 ------------------------
 
  * zorka diagnostics (with zabbix template) - mbean for monitoring agent health
  * lots of fixes for viewer and agent itself;
+
 
 Zorka 0.9 (2013-02-05)
 ----------------------
@@ -58,11 +64,13 @@ Zorka 0.9 (2013-02-05)
  * `zabbix.discovery()` now uses JMX query DSL;
  * convenient API for accessing `zorka.properties` settings from BSH scripts;
 
+
 Zorka 0.8 (2013-01-20)
 ---------------------
 
  * rudimentary method call tracer implemented;
  * zorka-viewer: trace files viewer;
+
 
 Zorka 0.7 (2013-01-06)
 ----------------------
@@ -78,6 +86,7 @@ Zorka 0.7 (2013-01-06)
  * remove custom pool executors, use standard ThreadPoolExecutor instead;
  * support for matching classes and methods by annotations;
 
+
 Zorka 0.6 (2012-12-22)
 ----------------------
 
@@ -86,6 +95,7 @@ Zorka 0.6 (2012-12-22)
  * file trapper (logs events to files instead of syslog/zabbix/SNMP);
  * composite processing chains and comparator filters;
  * zorka API overhaul (yet more refactoring are on the way);
+
 
 Zorka 0.5 (2012-12-07)
 ----------------------
@@ -96,6 +106,7 @@ Zorka 0.5 (2012-12-07)
  * config scripts and zabbix templates for JBoss 7;
  * documentation: converted to `md` format; more interesting examples (eg. CAS auditing);
 
+
 Zorka 0.4 (2012-11-26)
 ----------------------
 
@@ -103,6 +114,7 @@ Zorka 0.4 (2012-11-26)
  * nagios NRPE protocol support;
  * thread rank ported to new ranking framework;
  * new - circular buffer aggregate;
+
 
 Zorka 0.3 (2012-11-10)
 ----------------------
@@ -113,6 +125,7 @@ Zorka 0.3 (2012-11-10)
  * support for IBM JDK and JRockit;
  * documentation updates, cleanups and fixes;
 
+
 Zorka 0.2 (2012-11-04)
 ---------
 
@@ -121,6 +134,7 @@ Zorka 0.2 (2012-11-04)
  * get rid of j2ee dependencies (use reflection instead);
  * remove zorka5.sar module and jboss dependencies (use instrumentation instead);
  * documentation updates, many little cleanups and fixes;
+
 
 Zorka 0.1 (2012-09-19)
 ----------------------

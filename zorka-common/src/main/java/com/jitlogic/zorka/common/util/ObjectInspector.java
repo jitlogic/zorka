@@ -300,9 +300,19 @@ public final class ObjectInspector {
      */
     public static Field lookupField(Class<?> clazz, String name) {
         try {
-            return clazz.getDeclaredField(name);
+            Field field = clazz.getDeclaredField(name);
+            if (field == null) {
+                if (clazz.getSuperclass() != Object.class && clazz.getSuperclass() != null) {
+                    return lookupField(clazz.getSuperclass(), name);
+                }
+            }
+            return field;
         } catch (NoSuchFieldException e) {
-            return null;
+            if (clazz.getSuperclass() != Object.class && clazz.getSuperclass() != null) {
+                return lookupField(clazz.getSuperclass(), name);
+            } else {
+                return null;
+            }
         }
     }
 
@@ -454,6 +464,11 @@ public final class ObjectInspector {
     public static Object getField(Object obj, String fieldName) {
         if (obj != null) {
             Field field = lookupField(obj instanceof Class ? (Class)obj : obj.getClass(), fieldName);
+
+            if (field == null) {
+                //return null;
+            }
+
             boolean accessible = field.isAccessible();
 
             if (!accessible) {
@@ -481,6 +496,11 @@ public final class ObjectInspector {
     public static void setField(Object obj, String fieldName, Object value) {
         if (obj != null) {
             Field field = lookupField(obj instanceof Class ? (Class)obj : obj.getClass(), fieldName);
+
+            if (field == null) {
+                return;
+            }
+
             boolean accessible = field.isAccessible();
 
             if (!accessible) {
