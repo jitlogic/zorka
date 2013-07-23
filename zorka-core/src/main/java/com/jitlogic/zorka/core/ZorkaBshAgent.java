@@ -179,10 +179,23 @@ public class ZorkaBshAgent {
      *
      */
     public void loadScripts() {
-        String configDir = config.getConfDir();
+        String scriptsDir = config.stringCfg(ZorkaConfig.PROP_SCRIPTS_DIR, null);
+
+        if (scriptsDir == null) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Scripts directory not set. Internal error ?!?");
+            return;
+        }
+
+        File dir = new File(scriptsDir);
+
+        if (!dir.exists() || !dir.isDirectory()) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Scripts directory non existent or not a directory: " + dir);
+            return;
+        }
+
+        log.info(ZorkaLogger.ZAG_CONFIG, "Listing directory: " + scriptsDir);
+
         try {
-            File dir = new File(configDir);
-            log.info(ZorkaLogger.ZAG_CONFIG, "Listing directory: " + configDir);
 
             List<String> scripts = new ArrayList();
             scripts.addAll(Arrays.asList(dir.list()));
@@ -195,7 +208,7 @@ public class ZorkaBshAgent {
                 if (!fname.matches(".*.bsh")) {
                     continue;
                 }
-                String scrPath = ZorkaUtil.path(configDir, fname);
+                String scrPath = ZorkaUtil.path(scriptsDir, fname);
                 if (new File(scrPath).isFile() && !loadedScripts.contains(fname)) {
                     loadScript(scrPath);
                     loadedScripts.add(fname);
@@ -205,7 +218,7 @@ public class ZorkaBshAgent {
                 }
             }
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot open directory: " + configDir, e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot open directory: " + scriptsDir, e);
         }
 
     }

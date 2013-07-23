@@ -59,6 +59,9 @@ public class ZorkaConfig {
     /** Path to config defaults (always in classpath) */
     public final static String DEFAULT_CONF_PATH = "/com/jitlogic/zorka/core/zorka.properties";
 
+    public static final String PROP_SCRIPTS_DIR  = "zorka.scripts.dir";;
+    public static final String PROP_PROFILE_DIR = "zorka.profile.dir";
+
     public ZorkaConfig(String home) {
         loadProperties(home);
         loadProfiles();
@@ -67,6 +70,7 @@ public class ZorkaConfig {
     public ZorkaConfig(Properties props) {
         properties = props;
         homeDir = props.getProperty("zorka.home.dir");
+        setBaseProps();
         loadProfiles();
     }
 
@@ -92,21 +96,6 @@ public class ZorkaConfig {
      */
     public String getLogDir() {
         return ZorkaUtil.path(homeDir, "log");
-    }
-
-
-    /**
-     * Returns path to configuration directory.
-     *
-     * @return directory from which agent reads BSH configuration scripts.
-     */
-	public String getConfDir() {
-        return ZorkaUtil.path(homeDir, "conf");
-    }
-
-
-    public List<String> getProfiles() {
-        return Collections.unmodifiableList(profiles);
     }
 
 
@@ -159,9 +148,23 @@ public class ZorkaConfig {
         loadCfg(properties, propPath, true);
 
         properties.put("zorka.home.dir", homeDir);
-        properties.put("zorka.config.dir", ZorkaUtil.path(homeDir, "conf"));
-        properties.put("zorka.log.dir", ZorkaUtil.path(homeDir, "log"));
+
+        setBaseProps();
 	}
+
+    private void setBaseProps() {
+        if (!properties.containsKey(PROP_SCRIPTS_DIR)) {
+            properties.put(PROP_SCRIPTS_DIR, ZorkaUtil.path(homeDir, "scripts"));
+        }
+
+        if (!properties.containsKey(PROP_PROFILE_DIR)) {
+            properties.put(PROP_PROFILE_DIR, ZorkaUtil.path(homeDir, "profiles"));
+        }
+
+        if (!properties.containsKey("zorka.log.dir")) {
+            properties.put("zorka.log.dir", ZorkaUtil.path(homeDir, "log"));
+        }
+    }
 
 
     /**
@@ -171,7 +174,7 @@ public class ZorkaConfig {
         profiles = listCfg("zorka.profiles", "jvm");
 
         for (String profile : profiles) {
-            File f = new File(ZorkaUtil.path(getConfDir(), profile+".profile"));
+            File f = new File(ZorkaUtil.path(stringCfg(PROP_PROFILE_DIR, "/"), profile+".profile"));
             if (f.exists() && f.canRead()) {
                 log.info(ZorkaLogger.ZAG_CONFIG, "Loading profile: " + profile);
                 Properties props = loadCfg(new Properties(), f.getPath(), true);
