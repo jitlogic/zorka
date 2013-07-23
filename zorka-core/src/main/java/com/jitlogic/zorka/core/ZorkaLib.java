@@ -525,11 +525,10 @@ public class ZorkaLib  {
      * Reloads and executes configuration scripts matching given mask.
      * Scripts have to be in $ZORKA_HOME/conf directory.
      *
-     * @param mask file name or file mask.
+     * @param name file name (relative to conf dir)
      */
-    public String reload(String mask) {
-        return agent.loadScriptDir(config.getConfDir(),
-                "^" + mask.replace("\\.", "\\\\.").replace("*", ".*") + "$");
+    public String reload(String name) {
+        return agent.loadScript(ZorkaUtil.path(config.getConfDir(), name));
     }
 
 
