@@ -30,5 +30,5 @@ public interface Normalizer {
      *
      * @return normalized string
      */
-    String normalize(String input);
+    String normalize(String input, Object...params);
 }

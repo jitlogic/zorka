@@ -23,10 +23,12 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import com.jitlogic.zorka.core.*;
+import com.jitlogic.zorka.core.test.support.TestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import com.jitlogic.zorka.core.util.ObjectDumper;
 import com.jitlogic.zorka.core.integ.ZabbixLib;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
@@ -37,7 +39,7 @@ public class BshAgentUnitTest extends ZorkaFixture {
     public void setUp() throws Exception {
         mBeanServerRegistry.register("java", java.lang.management.ManagementFactory.getPlatformMBeanServer(), null);
         ZabbixLib zl = new ZabbixLib(mBeanServerRegistry, config);
-        zorkaAgent.install("zabbix", zl);
+        zorkaAgent.put("zabbix", zl);
         zorkaAgent.loadScript(getClass().getResource("/unittest/BshAgentTest.bsh").getPath());
     }
 
@@ -83,17 +85,24 @@ public class BshAgentUnitTest extends ZorkaFixture {
 
     @Test
     public void testNewBshEllipsis() throws Exception {
-        zorkaAgent.install("test", new SomeTestLib());
+        zorkaAgent.put("test", new SomeTestLib());
         String rslt = zorkaAgent.query("test.join(\"a\", \"b\", \"c\")");
         assertEquals("a:bc", rslt);
     }
 
 
     @Test
-    public void testStartAndLoadScripts() throws Exception {
-        URL url = this.getClass().getResource("/cfg1");
-        zorkaAgent.loadScriptDir(url.getPath(), ".*.bsh");
-        assertEquals("oja! right!", query("testLoadScriptDir()"));
+    public void testStartAndLoadProfilesAndScripts() throws Exception {
+        URL url = getClass().getResource("/cfgp");
+        ZorkaConfig config = new ZorkaConfig(url.getPath());
+        TestUtil.setField(zorkaAgent, "config", config);
+        zorkaAgent.loadScripts();
+        assertNotNull("common.bsh script should be loaded.", zorkaAgent.get("common_bsh"));
+        assertNotNull("jvm/jvm.bsh script should be loaded.", zorkaAgent.get("jvm_bsh"));
+        assertTrue("property values for jvm module should be present", config.hasCfg("jvm.test.property"));
+        assertFalse("profile.scripts properties should be filtered off", config.hasCfg("profile.scripts"));
+        assertNotNull("test/test.bsh script should be loaded.", zorkaAgent.get("test_bsh"));
+        assertEquals("jvm/jvm.bsh script should be called only once.", "bar", zorkaAgent.get("not_to_be_overridden"));
     }
 
 
