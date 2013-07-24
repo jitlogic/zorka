@@ -129,7 +129,7 @@ public class GenericNormalizer implements Normalizer {
 
 
     @Override
-    public String normalize(String input) {
+    public String normalize(String input, Object...params) {
 
         if (input == null) {
             return null;

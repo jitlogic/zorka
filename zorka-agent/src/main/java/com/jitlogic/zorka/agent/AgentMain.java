@@ -31,7 +31,11 @@ import java.lang.instrument.Instrumentation;
  */
 public class AgentMain {
 
-    private static AgentInstance instance;
+    private static volatile AgentInstance instance;
+
+    public static AgentInstance getInstance() {
+        return instance;
+    }
 
     /**
      * This is entry method of java agent.

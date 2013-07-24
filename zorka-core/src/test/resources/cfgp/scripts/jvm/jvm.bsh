@@ -1,0 +1,6 @@
+
+jvm_bsh = 1;
+
+not_to_be_overridden = "foo";
+
+

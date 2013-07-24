@@ -1,0 +1,114 @@
+/**
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+__wso2() {
+
+
+  if (zorka.boolCfg("tracer", false)) {
+
+    zorka.logInfo("Enabling tracer for WSO2.");
+    zorka.loadCfg("tracer.properties");
+
+    for (String pkg : zorka.listCfg("tracer.include.extra")) {
+      if (pkg.contains("/")) {
+        cm = pkg.split("/");
+        zorka.logInfo("Include methods for trace: '" + cm[0] + "' / '" + cm[1] + "'");
+        tracer.include(spy.byMethod(cm[0].trim(),cm[1].trim()));
+      } else {
+        zorka.logInfo("Include classes for trace: '" + pkg + "'");
+        tracer.include(spy.byClass(pkg).forTrace());
+      }
+    }
+
+
+    for (String pkg : zorka.listCfg("tracer.exclude", 
+        "com.jitlogic.zorka.**", "net.sf.saxon.**", "org.wso2.carbon.ndatasource.**", 
+        "sun.security.ec.**", "com.sun.crypto.provider.**")) {
+      if (pkg.contains("/")) {
+        cm = pkg.split("/");
+        zorka.logInfo("Exclude methods from trace: '" + cm[0] + "' / '" + cm[1] + "'");
+        tracer.exclude(spy.byMethod(cm[0].trim(),cm[1].trim()));
+      } else {
+        zorka.logInfo("Exclude classes from trace: '" + pkg + "'");
+        tracer.exclude(spy.byClass(pkg));
+      }
+    }
+
+
+    for (String pkg : zorka.listCfg("tracer.exclude.extra")) {
+      if (pkg.contains("/")) {
+        cm = pkg.split("/");
+        zorka.logInfo("Exclude methods from trace: '" + cm[0] + "' / '" + cm[1] + "'");
+        tracer.exclude(spy.byMethod(cm[0].trim(),cm[1].trim()));
+      } else {
+        zorka.logInfo("Exclude clases from trace: '" + pkg + "'");
+        tracer.exclude(spy.byClass(pkg));
+      }
+    }
+
+
+    for (String pkg : zorka.listCfg("tracer.include", "**")) {
+      if (pkg.contains("/")) {
+        cm = pkg.split("/");
+        zorka.logInfo("Include methods for trace: '" + cm[0] + "' / '" + cm[1] + "'");
+        tracer.include(spy.byMethod(cm[0].trim(),cm[1].trim()));
+      } else {
+        zorka.logInfo("Include classes for trace: '" + pkg + "'");
+        tracer.include(spy.byClass(pkg).forTrace());
+      }
+    }
+
+
+    // Entry point: AXIS web services
+    spy.add(spy.instance()
+      .onEnter(spy.fetchArg("CTX", 1), tracer.begin("AXIS_REQ"), spy.format("ACTION", "${CTX.soapAction}"), tracer.attr("ACTION", "ACTION"))
+      .include(spy.byMethod("org.apache.axis2.transport.http.HTTPTransportUtils", "processHTTPPostRequest")));
+
+
+    tracer.output(tracer.toFile(
+      zorka.stringCfg("tracer.log.path", zorka.path("${zorka.log.dir}", "trace.trc")),
+      zorka.intCfg("tracer.log.fnum", 8),
+      zorka.kiloCfg("tracer.log.size", 128*1024*1024)));
+
+
+    if (zorka.hasCfg("tracer.min.method.time")) {
+      mmt = zorka.longCfg("tracer.min.method.time", 1000000);
+      zorka.logInfo("Setting tracer minimum method time to " + mmt + " ns");
+      tracer.setTracerMinMethodTime(mmt);
+    }
+
+
+    if (zorka.hasCfg("tracer.min.trace.time")) {
+      mtt = zorka.longCfg("tracer.min.trace.time", 100);
+      zorka.logInfo("Settting tracer minimum trace time to " + mtt + " ms");
+      tracer.setTracerMinTraceTime(mtt);
+    }
+
+
+    if (zorka.hasCfg("tracer.max.trace.records")) {
+      mtr = zorka.intCfg("tracer.max.trace.records", 4096);
+      zorka.logInfo("Setting maximum records per trace to " + mtr + ".");
+      tracer.setTracerMaxTraceRecords(mtr);
+    }
+
+  } // tracer = yes
+
+
+  return this;
+}
+
+wso2 = __wso2();

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>zorka</artifactId>
+        <groupId>com.jitlogic.zorka</groupId>
+        <version>0.9.8-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>zorka-dist</artifactId>
+    <packaging>pom</packaging>
+
+    <build>
+        <outputDirectory>target/output</outputDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="${project.build.outputDirectory}/zorka-${project.version}"/>
+                                <mkdir dir="${project.build.outputDirectory}/zorka-${project.version}/log"/>
+                                <copy file="../zorka-agent/target/zorka-agent-${project.version}.jar"
+                                      toFile="${project.build.outputDirectory}/zorka-${project.version}/zorka.jar"/>
+                                <copy file="../COPYING" toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
+                                <copy file="src/zorka.properties" toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
+                                <copy file="../README.md" toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
+                                <copy file="../CHANGES.md" toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
+                                <mkdir dir="${project.build.outputDirectory}/zorka-${project.version}/scripts"/>
+                                <copy toDir="${project.build.outputDirectory}/zorka-${project.version}/scripts">
+                                    <fileset dir="${project.basedir}/src/scripts" defaultexcludes="false">
+                                        <include name="**"/>
+                                    </fileset>
+                                </copy>
+                                <mkdir dir="${project.build.outputDirectory}/zorka-${project.version}/profiles"/>
+                                <copy toDir="${project.build.outputDirectory}/zorka-${project.version}/profiles">
+                                    <fileset dir="${project.basedir}/src/profiles" defaultexcludes="false">
+                                        <include name="**"/>
+                                    </fileset>
+                                </copy>
+                                <mkdir dir="${project.build.outputDirectory}/zorka-${project.version}/templates"/>
+                                <copy toDir="${project.build.outputDirectory}/zorka-${project.version}/templates">
+                                    <fileset dir="${project.basedir}/src/templates" defaultexcludes="false">
+                                        <include name="**"/>
+                                    </fileset>
+                                </copy>
+                                <zip destfile="${project.build.directory}/zorka-${project.version}.zip">
+                                    <fileset dir="${project.build.outputDirectory}" defaultexcludes="false">
+                                        <include name="**"/>
+                                    </fileset>
+                                </zip>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

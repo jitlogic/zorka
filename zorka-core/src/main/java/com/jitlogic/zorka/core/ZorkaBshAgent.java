@@ -18,7 +18,7 @@
 package com.jitlogic.zorka.core;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
@@ -53,6 +53,8 @@ public class ZorkaBshAgent {
 
     private ExecutorService mainExecutor;
 
+    private ZorkaConfig config;
+
     private long timeout;
 
     private boolean initialized;
@@ -62,17 +64,20 @@ public class ZorkaBshAgent {
      *
      * @param connExecutor connExecutor for asynchronous processing queries
      */
-	public ZorkaBshAgent(Executor connExecutor, ExecutorService mainExecutor, long timeout, MBeanServerRegistry mbsRegistry,
+	public ZorkaBshAgent(Executor connExecutor, ExecutorService mainExecutor,
+                         long timeout, MBeanServerRegistry mbsRegistry,
                          ZorkaConfig config, QueryTranslator translator) {
+
 		this.interpreter = new Interpreter();
 
 		this.connExecutor = connExecutor;
         this.mainExecutor = mainExecutor;
         this.timeout = timeout;
+        this.config = config;
 
 
 		zorkaLib = new ZorkaLib(this, mbsRegistry, config, translator);
-        install("zorka", zorkaLib);
+        put("zorka", zorkaLib);
     }
 
 
@@ -84,11 +89,19 @@ public class ZorkaBshAgent {
      *
      * @param obj object
      */
-    public void install(String name, Object obj) {
+    public void put(String name, Object obj) {
         try {
             interpreter.set(name, obj);
         } catch (EvalError e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error adding module '" + name + "' to global namespace", e);
+        }
+    }
+
+    public Object get(String name) {
+        try {
+            return interpreter.get(name);
+        } catch (EvalError e) {
+            return null;
         }
     }
 
@@ -164,43 +177,55 @@ public class ZorkaBshAgent {
     /**
      * Loads and executes all script in given directory matching given mask.
      *
-     * @param path path to directory
-     *
-     * @param mask file mas (eg. *.bsh)
      */
-    public String loadScriptDir(String path, String mask) {
-        StringBuilder sb = new StringBuilder();
+    public void loadScripts() {
+        String scriptsDir = config.stringCfg(ZorkaConfig.PROP_SCRIPTS_DIR, null);
+
+        if (scriptsDir == null) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Scripts directory not set. Internal error ?!?");
+            return;
+        }
+
+        File dir = new File(scriptsDir);
+
+        if (!dir.exists() || !dir.isDirectory()) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Scripts directory non existent or not a directory: " + dir);
+            return;
+        }
+
+        log.info(ZorkaLogger.ZAG_CONFIG, "Listing directory: " + scriptsDir);
+
         try {
-            File dir = new File(path);
-            log.info(ZorkaLogger.ZAG_CONFIG, "Listing directory: " + path);
-            String[] files = dir.list();
-            if (files == null || files.length == 0) {
-                return "No files in " + path + " directory.\n";
-            }
-            Arrays.sort(files);
-            for (String fname : files) {
-                if (!fname.matches(mask)) {
+
+            List<String> scripts = new ArrayList();
+            scripts.addAll(Arrays.asList(dir.list()));
+            Collections.sort(scripts);
+            scripts.addAll(config.getProfileScripts());
+
+            Set<String> loadedScripts = new HashSet<String>();
+
+            for (String fname : scripts) {
+                if (!fname.matches(".*.bsh")) {
                     continue;
                 }
-                String scrPath = ZorkaUtil.path(path, fname);
-                File scrFile = new File(scrPath);
-                if (fname.endsWith(".bsh") && scrFile.isFile()) {
-                    sb.append("Executed " + fname + ": " + loadScript(scrPath) + "\n");
+                String scrPath = ZorkaUtil.path(scriptsDir, fname);
+                if (new File(scrPath).isFile() && !loadedScripts.contains(fname)) {
+                    loadScript(scrPath);
+                    loadedScripts.add(fname);
                 } else {
-                    log.info(ZorkaLogger.ZAG_CONFIG, "Skipping file '" + scrPath + ": isFile=" + scrFile.isFile());
-                    sb.append("Skipped " + fname + "." + "\n");
+                    log.info(ZorkaLogger.ZAG_CONFIG, "Skipping: '" + scrPath + ": " +
+                        (loadedScripts.contains(fname) ? "already loaded" : "not a (proper) file") + ".");
                 }
             }
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot open directory: " + path, e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot open directory: " + scriptsDir, e);
         }
 
-        return sb.toString();
     }
 
 
-    public void initialize(String configDir) {
-        loadScriptDir(configDir, ".*\\.bsh$");
+    public void initialize() {
+        loadScripts();
         initialized = true;
     }
 

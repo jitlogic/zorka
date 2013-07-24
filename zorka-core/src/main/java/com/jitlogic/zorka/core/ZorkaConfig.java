@@ -22,6 +22,7 @@ import com.jitlogic.zorka.core.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.util.ZorkaLog;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,15 +53,26 @@ public class ZorkaConfig {
     /** Home directory */
 	private String homeDir;
 
+    private List<String> profiles = new ArrayList<String>();
+    private List<String> profileScripts = new ArrayList<String>();
+
     /** Path to config defaults (always in classpath) */
     public final static String DEFAULT_CONF_PATH = "/com/jitlogic/zorka/core/zorka.properties";
 
+    public static final String PROP_HOME_DIR = "zorka.home.dir";
+    public static final String PROP_SCRIPTS_DIR  = "zorka.scripts.dir";;
+    public static final String PROP_PROFILE_DIR = "zorka.profile.dir";
+
     public ZorkaConfig(String home) {
         loadProperties(home);
+        loadProfiles();
     }
 
     public ZorkaConfig(Properties props) {
         properties = props;
+        homeDir = props.getProperty(PROP_HOME_DIR);
+        setBaseProps();
+        loadProfiles();
     }
 
 
@@ -88,13 +100,8 @@ public class ZorkaConfig {
     }
 
 
-    /**
-     * Returns path to configuration directory.
-     *
-     * @return directory from which agent reads BSH configuration scripts.
-     */
-	public String getConfDir() {
-        return ZorkaUtil.path(homeDir, "conf");
+    public List<String> getProfileScripts() {
+        return Collections.unmodifiableList(profileScripts);
     }
 
 
@@ -129,6 +136,7 @@ public class ZorkaConfig {
     }
 
 
+
     /**
      * Sets agent home directory and load zorka.properties file from it.
      *
@@ -140,10 +148,48 @@ public class ZorkaConfig {
         String propPath = ZorkaUtil.path(homeDir, "zorka.properties");
         loadCfg(properties, propPath, true);
 
-        properties.put("zorka.home.dir", homeDir);
-        properties.put("zorka.config.dir", ZorkaUtil.path(homeDir, "conf"));
-        properties.put("zorka.log.dir", ZorkaUtil.path(homeDir, "log"));
+        properties.put(PROP_HOME_DIR, homeDir);
+
+        setBaseProps();
 	}
+
+    private void setBaseProps() {
+        if (!properties.containsKey(PROP_SCRIPTS_DIR)) {
+            properties.put(PROP_SCRIPTS_DIR, ZorkaUtil.path(homeDir, "scripts"));
+        }
+
+        if (!properties.containsKey(PROP_PROFILE_DIR)) {
+            properties.put(PROP_PROFILE_DIR, ZorkaUtil.path(homeDir, "profiles"));
+        }
+
+        if (!properties.containsKey("zorka.log.dir")) {
+            properties.put("zorka.log.dir", ZorkaUtil.path(homeDir, "log"));
+        }
+    }
+
+
+    /**
+     * Loads selected profiles and merges their properties with main configuration.
+     */
+    private void loadProfiles() {
+        profiles = listCfg("profiles");
+
+        for (String profile : profiles) {
+            File f = new File(ZorkaUtil.path(stringCfg(PROP_PROFILE_DIR, "/"), profile+".profile"));
+            if (f.exists() && f.canRead()) {
+                log.info(ZorkaLogger.ZAG_CONFIG, "Loading profile: " + profile);
+                Properties props = loadCfg(new Properties(), f.getPath(), true);
+                profileScripts.addAll(listCfg(props, "profile.scripts"));
+                props.remove("profile.scripts");
+                for (Map.Entry<Object,Object> e : props.entrySet()) {
+                    properties.setProperty(e.getKey().toString(), e.getValue().toString());
+                }
+            } else {
+                log.error(ZorkaLogger.ZAG_CONFIG, "Cannot load profile " + profile + ": file " + f + " does not exist.");
+            }
+        }
+
+    }
 
 
     public Properties loadCfg(Properties properties, String propPath, boolean verbose) {
@@ -182,7 +228,13 @@ public class ZorkaConfig {
         return properties == null ? input : ObjectInspector.substitute(input, properties);
     }
 
+
     public List<String> listCfg(String key, String...defVals) {
+        return listCfg(properties, key, defVals);
+    }
+
+
+    private List<String> listCfg(Properties properties, String key, String...defVals) {
         String s = properties.getProperty(key);
 
         if (s != null) {

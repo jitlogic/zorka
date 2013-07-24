@@ -114,17 +114,17 @@ public class AgentInstance {
 
         if (config.boolCfg("spy", true)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Zorka SPY");
-            getZorkaAgent().install("spy", getSpyLib());
-            getZorkaAgent().install("tracer", getTracerLib());
+            getZorkaAgent().put("spy", getSpyLib());
+            getZorkaAgent().put("tracer", getTracerLib());
         }
 
-        getZorkaAgent().install("perfmon", getPerfMonLib());
+        getZorkaAgent().put("perfmon", getPerfMonLib());
 
         initIntegrationLibs();
 
-        getZorkaAgent().install("normalizers", getNormLib());
+        getZorkaAgent().put("normalizers", getNormLib());
 
-        zorkaAgent.initialize(props.getProperty("zorka.config.dir"));
+        zorkaAgent.initialize();
 
         if (config.boolCfg("zorka.diagnostics", true)) {
             createZorkaDiagMBean();
@@ -141,24 +141,24 @@ public class AgentInstance {
         if (config.boolCfg("zabbix", true)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling ZABBIX subsystem ...");
             getZabbixAgent().start();
-            zorkaAgent.install("zabbix", getZabbixLib());
+            zorkaAgent.put("zabbix", getZabbixLib());
         }
 
         if (config.boolCfg("syslog", true)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Syslog subsystem ....");
-            zorkaAgent.install("syslog", getSyslogLib());
+            zorkaAgent.put("syslog", getSyslogLib());
         }
 
         if (config.boolCfg("snmp", true)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling SNMP subsystem ...");
-            zorkaAgent.install("snmp", getSnmpLib());
+            zorkaAgent.put("snmp", getSnmpLib());
         }
 
         if (config.boolCfg("nagios", false)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Nagios support.");
             getNagiosAgent().start();
             nagiosAgent.start();
-            zorkaAgent.install("nagios", getNagiosLib());
+            zorkaAgent.put("nagios", getNagiosLib());
         }
     }
 
