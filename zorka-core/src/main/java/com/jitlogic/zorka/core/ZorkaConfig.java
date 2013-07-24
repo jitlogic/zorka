@@ -59,6 +59,7 @@ public class ZorkaConfig {
     /** Path to config defaults (always in classpath) */
     public final static String DEFAULT_CONF_PATH = "/com/jitlogic/zorka/core/zorka.properties";
 
+    public static final String PROP_HOME_DIR = "zorka.home.dir";
     public static final String PROP_SCRIPTS_DIR  = "zorka.scripts.dir";;
     public static final String PROP_PROFILE_DIR = "zorka.profile.dir";
 
@@ -69,7 +70,7 @@ public class ZorkaConfig {
 
     public ZorkaConfig(Properties props) {
         properties = props;
-        homeDir = props.getProperty("zorka.home.dir");
+        homeDir = props.getProperty(PROP_HOME_DIR);
         setBaseProps();
         loadProfiles();
     }
@@ -147,7 +148,7 @@ public class ZorkaConfig {
         String propPath = ZorkaUtil.path(homeDir, "zorka.properties");
         loadCfg(properties, propPath, true);
 
-        properties.put("zorka.home.dir", homeDir);
+        properties.put(PROP_HOME_DIR, homeDir);
 
         setBaseProps();
 	}
@@ -171,7 +172,7 @@ public class ZorkaConfig {
      * Loads selected profiles and merges their properties with main configuration.
      */
     private void loadProfiles() {
-        profiles = listCfg("zorka.profiles", "jvm");
+        profiles = listCfg("profiles");
 
         for (String profile : profiles) {
             File f = new File(ZorkaUtil.path(stringCfg(PROP_PROFILE_DIR, "/"), profile+".profile"));

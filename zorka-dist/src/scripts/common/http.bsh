@@ -1,0 +1,91 @@
+/**
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+__http() {
+
+  // Default values for HTTP stats
+  zorka.defCfg("http.stats", "yes");
+  zorka.defCfg("http.stats.congestion", "yes");
+  zorka.defCfg("http.stats.mbean", "zorka:type=ZorkaStats,name=HttpStats");
+
+  // Default values for HTTP parameter processing
+  zorka.defCfg("http.params", "no");
+  zorka.defCfg("http.params.include", "~.*");
+  zorka.defCfg("http.params.exclude", "");
+
+  // Default values for HTTP slow requests log configuration options
+  zorka.defCfg("http.slow.log", "no");
+  zorka.defCfg("http.slow.time", "5000");
+  zorka.defCfg("http.slow.file", "yes");
+  zorka.defCfg("http.slow.file.path", zorka.path("${zorka.log.dir}", "http-slow.log"));
+  zorka.defCfg("http.slow.file.max", "8M");
+  zorka.defCfg("http.slow.file.num", "8");
+  zorka.defCfg("http.slow.format", "[${TIME}] ${URI}${PARAMS} -> ${STATUS}");
+
+  // Default values for HTTP error log configuration options
+  zorka.defCfg("http.error.log", "no");
+  zorka.defCfg("http.error.codes", "400,500,502,504");
+  zorka.defCfg("http.error.file", "yes");
+  zorka.defCfg("http.error.file.path", zorka.path("${zorka.log.dir}", "http-error.log"));
+  zorka.defCfg("http.error.file.max", "8M");
+  zorka.defCfg("http.error.file.num", "8");
+  zorka.defCfg("http.error.format", "[${TIME}] ${URI}${PARAMS} -> ${STATUS}");
+
+  // Default values for HTTP tracer options 
+  zorka.defCfg("http.trace", zorka.stringCfg("tracer"));
+  zorka.defCfg("http.trace.time", "1000");
+  zorka.defCfg("http.trace.params.prefix", "P:");
+
+  _mbean = zorka.stringCfg("http.stats.mbean");
+
+  discovery(attr, tag) {
+    return zabbix.discovery(zorka.query("java", _mbean, "name", "type").get(attr).listAs("**", tag));
+  }
+
+  calls(attr, tag) {
+    calls = zorka.jmx("java", _mbean, attr, tag, "calls");
+    return calls != null ? calls : 0;
+  }
+
+  errors(attr, tag) {
+    errors = zorka.jmx("java", _mbean, attr, tag, "errors");
+    return errors != null ? errors : 0;
+  }
+
+  peak(attr, tag) {
+    peak = zorka.jmx("java",  _mbean, attr, tag, "maxTimeCLR");
+    return peak != null ? peak : 0;
+  }
+
+  threads(attr, tag) {
+    threads = zorka.jmx("java",  _mbean, attr, tag, "maxThreadsCLR");
+  }
+
+  avg5(attr, tag) {
+    return zorka.rate("java", _mbean, attr, tag, "time", "calls", "AVG5");
+  }
+
+  avg15(attr, tag) {
+    return zorka.rate("java", _mbean, attr, tag, "time", "calls", "AVG15");
+  }
+
+  return this;
+}
+
+http = __http();
+

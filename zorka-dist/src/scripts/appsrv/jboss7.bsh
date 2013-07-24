@@ -1,0 +1,154 @@
+/**
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+__jboss7() {
+
+  // Basic servlet statistics
+  __servlets() {
+
+    discovery() {
+      return zabbix.discovery("java", "jboss.as:subsystem=web,*", "deployment", "servlet");
+    }
+
+    requests(deployment,servlet) {
+      return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment+",servlet="+servlet, "requestCount");
+    }
+
+    time(deployment,servlet,horizon) {
+      return zorka.rate("java", "jboss.as:subsystem=web,deployment="+deployment+",servlet="+servlet, "processingTime", "requestCount", horizon);
+    }
+
+    return this;
+  }
+
+  servlets = __servlets();
+
+  // Basic session statistics
+  __sessions() {
+
+    discovery() {
+      return zabbix.discovery("java", "jboss.as:subsystem=web,deployment=*", "deployment");
+    }
+
+    stat(deployment, attr) {
+       return zorka.jmx("java", "jboss.as:subsystem=web,deployment="+deployment, attr);
+    }
+
+    return this;
+  }
+
+  sessions = __sessions();
+
+    // Basic data source statistics
+    __datasources() {
+        discovery() {
+            return zabbix.discovery("java", "jboss.as:subsystem=datasources,data-source=*", "data-source");
+        }
+
+        url(datasource) {
+            return zorka.jmx("java", "jboss.as:subsystem=datasources,data-source="+datasource, "connectionUrl");
+        }
+
+        jndi(datasource) {
+            return zorka.jmx("java", "jboss.as:subsystem=datasources,data-source="+datasource, "jndiName");
+        }
+
+        // TODO find out how to get statistics
+
+        return this;
+    }
+
+    datasources = __datasources();
+
+
+  __ejb3() {
+
+    discovery(component) {
+      return zabbix.discovery("java", "jboss.as:subsystem=ejb3,*", "deployment", "stateless-session-bean");
+    }
+
+    slsb(deployment, bean, attr) {
+      return zorka.jmx("java", "jboss.as:subsystem=ejb3,deployment="+deployment+",stateless-session-bean="+bean, attr);
+    }
+
+    sls_time(deployment, bean, horiz) {
+      return zorka.rate("java", "jboss.as:subsystem=ejb3,deployment="+deployment+",stateless-session-bean="+bean, 
+        "executionTime", "invocations", horiz);
+    }
+
+    sls_wait(deployment, bean, horiz) {
+      return zorka.rate("java", "jboss.as:subsystem=ejb3,deployment="+deployment+",stateless-session-bean="+bean, 
+        "waitTime", "invocations", horiz);
+    }
+
+    return this;
+  }
+
+  ejb3 = __ejb3();
+
+
+
+  __jpa() {
+
+    discovery(component) {
+      return zabbix.discovery("java", "jboss.as:subsystem=jpa,*", "deployment", "hibernate-persistence-unit");
+    }
+
+    hpu(deployment, unit, attr) {
+      return zorka.jmx("java", "jboss.as:subsystem=jpa,deployment="+deployment+",hibernate-persistence-unit="+unit, attr);
+    }
+
+    return this;
+  }
+
+  jpa = __jpa();
+
+
+
+  // Catch MX mbean server initialization and register JBoss MBean Server here ...
+
+  __mbsRegister() {
+    jbossMbs = null;
+
+    process(record) {
+      synchronized (super) {
+        if (super.jbossMbs == null) {
+          mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
+          zorka.registerMbs("java", mbs);
+          super.jbossMbs = mbs;
+          zorka.logInfo("Registered platform mbean server as 'java'");
+        }
+      }
+      return record;
+    }
+    return this;
+  }
+
+
+  spy.add(spy.instance()
+    .onReturn((com.jitlogic.zorka.core.spy.SpyProcessor)__mbsRegister())
+    .include(spy.byMethod(spy.AC_STATIC, "org.jboss.modules.ModuleLoader", "installMBeanServer", "void")));
+
+
+  return this;
+}
+
+
+jboss7 = __jboss7();
+
+
+
