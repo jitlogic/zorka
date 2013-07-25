@@ -29,8 +29,10 @@
                             <tasks>
                                 <mkdir dir="${project.build.outputDirectory}/zorka-${project.version}"/>
                                 <mkdir dir="${project.build.outputDirectory}/zorka-${project.version}/log"/>
-                                <copy file="../zorka-agent/target/zorka-agent-${project.version}.jar"
+                                <copy file="../zorka-agent/target/zorka-agent-${project.version}-jdk15.jar"
                                       toFile="${project.build.outputDirectory}/zorka-${project.version}/zorka.jar"/>
+                                <copy file="../zorka-viewer/target/zorka-viewer-${project.version}.jar"
+                                      toFile="${project.build.outputDirectory}/zorka-${project.version}/zorka-viewer.jar"/>
                                 <copy file="../COPYING" toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
                                 <copy file="src/zorka.properties" toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
                                 <copy file="../README.md" toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
