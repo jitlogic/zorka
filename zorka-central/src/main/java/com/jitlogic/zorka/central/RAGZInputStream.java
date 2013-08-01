@@ -154,6 +154,10 @@ public class RAGZInputStream extends InputStream {
             lpos = 0;
         }
 
+        if (lpos == logicalPos) {
+            return 0;
+        }
+
         Segment seg = findSegment(lpos);
 
         if (seg != null) {
@@ -190,7 +194,7 @@ public class RAGZInputStream extends InputStream {
      *
      * @throws IOException
      */
-    public synchronized long length() throws IOException {
+    public synchronized long logicalLength() throws IOException {
         Segment seg = segments.get(segments.size()-1);
 
         if (!seg.finished && seg.physicalPos + seg.physicalLen < input.length()) {

@@ -83,7 +83,7 @@ public class RAGZUnitTest extends CentralFixture {
         os.close();
 
         RAGZInputStream is = RAGZInputStream.fromFile(path);
-        assertThat(is.length()).isEqualTo(4);
+        assertThat(is.logicalLength()).isEqualTo(4);
 
         byte[] buf = new byte[4];
         assertThat(is.read(buf)).isEqualTo(4);
@@ -101,7 +101,7 @@ public class RAGZUnitTest extends CentralFixture {
         os.close();
 
         RAGZInputStream is = RAGZInputStream.fromFile(path);
-        assertThat(is.length()).isEqualTo(10);
+        assertThat(is.logicalLength()).isEqualTo(10);
 
         byte[] buf = new byte[10];
         assertThat(is.read(buf)).isEqualTo(10);
@@ -129,7 +129,7 @@ public class RAGZUnitTest extends CentralFixture {
         }
 
         RAGZInputStream is = RAGZInputStream.fromFile(path);
-        assertThat(is.length()).isGreaterThan(0);
+        assertThat(is.logicalLength()).isGreaterThan(0);
 
         is.close();
         os.close();
@@ -147,7 +147,7 @@ public class RAGZUnitTest extends CentralFixture {
         os.close();
 
         RAGZInputStream is = RAGZInputStream.fromFile(path);
-        assertThat(is.length()).isEqualTo(8);
+        assertThat(is.logicalLength()).isEqualTo(8);
         byte[] buf = new byte[8];
         assertThat(is.read(buf)).isEqualTo(8);
         assertThat(new String(buf, "UTF-8")).isEqualTo("1234ABCD");
@@ -168,7 +168,7 @@ public class RAGZUnitTest extends CentralFixture {
         os.close();
 
         RAGZInputStream is = RAGZInputStream.fromFile(path);
-        assertThat(is.length()).isEqualTo(4);
+        assertThat(is.logicalLength()).isEqualTo(4);
         byte[] buf = new byte[4];
         assertThat(is.read(buf)).isEqualTo(4);
         assertThat(new String(buf, "UTF-8")).isEqualTo("1234");

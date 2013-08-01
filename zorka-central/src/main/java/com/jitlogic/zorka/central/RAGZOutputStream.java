@@ -43,6 +43,7 @@ public class RAGZOutputStream extends OutputStream {
     }
 
     private long logicalLength;
+    private long lastSavedPos = 0;
 
     private long maxSegSize;
     private RandomAccessFile outFile;
@@ -128,6 +129,11 @@ public class RAGZOutputStream extends OutputStream {
     }
 
 
+    public long lastSavedPos() {
+        return lastSavedPos;
+    }
+
+
     private void deflate() throws IOException {
         int len = deflater.deflate(outputBuf, 0, outputBuf.length);
         if (len > 0) {
@@ -170,6 +176,8 @@ public class RAGZOutputStream extends OutputStream {
 
         deflater  = new Deflater(6, true);
         crc = new CRC32();
+
+        lastSavedPos = logicalLength;
     }
 
 
