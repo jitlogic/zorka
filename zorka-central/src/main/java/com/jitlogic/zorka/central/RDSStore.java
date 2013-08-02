@@ -152,6 +152,10 @@ public class RDSStore implements Closeable {
         outputCache.add(ZorkaUtil.copyArray(data));
         outputPos += data.length;
 
+        if (output.physicalLength() > physThreshold) {
+            rotate();
+        }
+
         return pos;
     }
 
@@ -181,11 +185,14 @@ public class RDSStore implements Closeable {
         } else if (offs >= outputStart && offs <= outputPos + outputStart) {
             int len = length <= outputPos + outputStart - offs ? length : (int)(outputStart + outputPos - offs);
             byte[] data = new byte[len];
-            long pos; int i;
+            long pos; int i, o = 0;
             for (i = 0, pos = outputStart; i < outputCache.size(); pos += outputCache.get(i).length, i++) {
                 byte[] b = outputCache.get(i);
-                if (offs >= pos && offs+len <= pos + b.length) {
-                    System.arraycopy(b, (int)(offs-pos), data, 0, len);
+                if (offs+o >= pos && offs+o <= pos + b.length) {
+                    int x = o == 0 ? (int)(offs-pos) : 0;
+                    int l = (len-o) <= b.length-x ? (len-o) : b.length-x;
+                    System.arraycopy(b, (int)(offs-pos)+o, data, o, l);
+                    o += l;
                 }
             }
             return data;

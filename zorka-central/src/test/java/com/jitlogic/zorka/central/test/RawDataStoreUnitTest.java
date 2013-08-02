@@ -19,6 +19,7 @@ package com.jitlogic.zorka.central.test;
 import com.jitlogic.zorka.central.RDSStore;
 import com.jitlogic.zorka.central.test.support.CentralFixture;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -96,4 +97,35 @@ public class RawDataStoreUnitTest extends CentralFixture {
         rds.close();
     }
 
+    @Test
+    public void testWriteReadMultipleChunksInOneTx() throws Exception {
+        rds = new RDSStore(tmpFile("testrw"), 4096, 1024, 1024);
+        assertEquals("First chunk should be written at offset 0", 0, rds.write("ABCD".getBytes()));
+        assertEquals("Second chunk should be written at offset 4", 4, rds.write("EFGH".getBytes()));
+        assertEquals("Thrid chunk should be written at offset 8", 8, rds.write("IJKL".getBytes()));
+        assertThat(rds.read(0, 8)).isEqualTo("ABCDEFGH".getBytes());
+        assertThat(rds.read(2, 4)).isEqualTo("CDEF".getBytes());
+        assertThat(rds.read(2, 8)).isEqualTo("CDEFGHIJ".getBytes());
+        assertThat(rds.read(6, 4)).isEqualTo("GHIJ".getBytes());
+        assertThat(rds.read(0, 12)).isEqualTo("ABCDEFGHIJKL".getBytes());
+        rds.close();
+    }
+
+    @Test @Ignore
+    public void testWriteReadMultipleChunksMixedTx() throws Exception {
+        rds = new RDSStore(tmpFile("testrw"), 4096, 1024, 1024);
+        assertEquals("First chunk should be written at offset 0", 0, rds.write("ABCD".getBytes()));
+        rds.close();
+
+        rds = new RDSStore(tmpFile("testrw"), 4096, 1024, 1024);
+        assertEquals("Second chunk should be written at offset 4", 4, rds.write("EFGH".getBytes()));
+        assertEquals("Thrid chunk should be written at offset 8", 8, rds.write("IJKL".getBytes()));
+        rds.close();
+
+        assertThat(rds.read(0, 8)).isEqualTo("ABCDEFGH".getBytes());
+        //assertThat(rds.read(2, 4)).isEqualTo("CDEF".getBytes());
+        //assertThat(rds.read(2, 8)).isEqualTo("CDEFGHIJ".getBytes());
+        //assertThat(rds.read(6, 4)).isEqualTo("GHIJ".getBytes());
+        //assertThat(rds.read(0, 12)).isEqualTo("ABCDEFGHIJKL".getBytes());
+    }
 }
