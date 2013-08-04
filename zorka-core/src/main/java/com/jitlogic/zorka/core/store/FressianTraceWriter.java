@@ -81,7 +81,7 @@ public class FressianTraceWriter implements MetadataChecker, TraceWriter {
 
 
     @Override
-    public void checkSymbol(int id) throws IOException {
+    public int checkSymbol(int id) throws IOException {
         checkOutput();
         if (!symbolsSent.get(id)) {
             String sym = symbols.symbolName(id);
@@ -89,6 +89,7 @@ public class FressianTraceWriter implements MetadataChecker, TraceWriter {
             writer.writeObject(new Symbol(id, sym));
             symbolsSent.set(id);
         }
+        return id;
     }
 
 

@@ -27,7 +27,7 @@ import java.io.IOException;
 public interface MetadataChecker {
 
     /** Metod called for every symbol found in trace data. */
-    void checkSymbol(int symbolId) throws IOException;
+    int checkSymbol(int symbolId) throws IOException;
 
     /** Method called for every metric found in trace data. */
     void checkMetric(int metricId) throws IOException;

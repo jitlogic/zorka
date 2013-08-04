@@ -15,11 +15,6 @@
             <artifactId>zorka-common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.mapdb</groupId>
-            <artifactId>mapdb</artifactId>
-            <version>0.9.3</version>
-        </dependency>
     </dependencies>
 
 </project>

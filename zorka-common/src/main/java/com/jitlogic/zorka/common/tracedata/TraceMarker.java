@@ -97,6 +97,10 @@ public class TraceMarker {
         return traceId;
     }
 
+    public void setTraceId(int traceId) {
+        this.traceId = traceId;
+    }
+
 
     public long getClock() {
         return clock;

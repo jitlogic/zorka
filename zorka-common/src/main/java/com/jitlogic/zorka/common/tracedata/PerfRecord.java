@@ -16,10 +16,6 @@
 
 package com.jitlogic.zorka.common.tracedata;
 
-import com.jitlogic.zorka.common.tracedata.MetadataChecker;
-import com.jitlogic.zorka.common.tracedata.PerfSample;
-import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -39,7 +35,7 @@ public class PerfRecord implements SymbolicRecord {
 
     @Override
     public void traverse(MetadataChecker checker) throws IOException {
-        checker.checkSymbol(scannerId);
+        scannerId = checker.checkSymbol(scannerId);
         for (PerfSample sample : samples) {
             checker.checkMetric(sample.getMetricId());
         }

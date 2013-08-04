@@ -30,6 +30,11 @@
             <artifactId>fest-reflect</artifactId>
             <version>${fest.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mapdb</groupId>
+            <artifactId>mapdb</artifactId>
+            <version>0.9.3</version>
+        </dependency>
     </dependencies>
 
     <modules>
