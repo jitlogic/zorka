@@ -17,14 +17,19 @@ package com.jitlogic.zorka.central;
 
 
 import com.jitlogic.zorka.common.tracedata.*;
+import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
 import org.fressian.FressianWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ReceiverContext implements MetadataChecker {
+public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
+
+    private static Logger log = LoggerFactory.getLogger(ReceiverContext.class);
 
     private SymbolStore symbolStore;
     private Map<Integer,Integer> sidMap = new HashMap<Integer,Integer>();
@@ -43,13 +48,16 @@ public class ReceiverContext implements MetadataChecker {
     }
 
 
+    @Override
     public synchronized void process(Object obj) throws IOException {
         if (obj instanceof Symbol) {
             processSymbol((Symbol)obj);
         } else if (obj instanceof TraceRecord) {
             processTraceRecord((TraceRecord) obj);
         } else {
-            // TODO log something here
+            if (obj != null) {
+                log.warn("Unsupported object type:" + obj.getClass());
+            }
         }
     }
 

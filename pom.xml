@@ -10,6 +10,9 @@
     <properties>
         <fest.version>1.4</fest.version>
         <junit.version>4.11</junit.version>
+        <netty.version>4.0.6.Final</netty.version>
+        <mapdb.version>0.9.3</mapdb.version>
+        <slf4j.version>1.7.5</slf4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -29,11 +32,6 @@
             <groupId>org.easytesting</groupId>
             <artifactId>fest-reflect</artifactId>
             <version>${fest.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mapdb</groupId>
-            <artifactId>mapdb</artifactId>
-            <version>0.9.3</version>
         </dependency>
     </dependencies>
 
