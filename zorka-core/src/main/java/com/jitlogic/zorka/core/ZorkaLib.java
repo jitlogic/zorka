@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.management.*;
 
 import com.jitlogic.zorka.common.util.*;
-import com.jitlogic.zorka.core.integ.FileTrapper;
+import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.core.util.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;

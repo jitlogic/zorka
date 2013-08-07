@@ -53,6 +53,14 @@ public class RDSStore implements Closeable {
     private RAGZInputStream currentInput;
 
 
+    /**
+     *
+     * @param basePath
+     * @param physSize
+     * @param physThreshold
+     * @param segmentSize
+     * @throws IOException
+     */
     public RDSStore(String basePath, int physSize, long physThreshold, long segmentSize) throws IOException {
         this.basePath = basePath;
         this.physSize = physSize;

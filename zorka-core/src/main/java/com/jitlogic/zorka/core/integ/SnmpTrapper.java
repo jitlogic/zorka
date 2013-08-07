@@ -18,7 +18,7 @@ package com.jitlogic.zorka.core.integ;
 import com.jitlogic.contrib.libsnmp.*;
 import com.jitlogic.zorka.core.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaLogLevel;
 import com.jitlogic.zorka.common.util.ZorkaTrapper;
 

@@ -16,8 +16,33 @@
 package com.jitlogic.zorka.central;
 
 
-public class CentralConfig {
+import com.jitlogic.zorka.common.util.ZorkaConfig;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
+import java.util.Properties;
 
+public class CentralConfig extends ZorkaConfig {
 
+    public final static String DEFAULT_CONF_PATH = "/com/jitlogic/zorka/central/central.properties";
+
+    public CentralConfig(Properties props) {
+        properties = props;
+        homeDir = props.getProperty("central.home.dir");
+        setBaseProps();
+    }
+
+    public CentralConfig(String home) {
+        loadProperties(home, DEFAULT_CONF_PATH);
+        setBaseProps();
+    }
+
+    private void setBaseProps() {
+        if (!properties.containsKey("central.log.dir")) {
+            properties.put("central.log.dir", ZorkaUtil.path(homeDir, "log"));
+        }
+
+        if (!properties.containsKey("central.data.dir")) {
+            properties.put("central.data.dir", ZorkaUtil.path(homeDir, "data"));
+        }
+    }
 }

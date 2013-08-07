@@ -56,7 +56,7 @@ public class AgentConfig extends ZorkaConfig {
     }
 
 
-    private void setBaseProps() {
+    protected void setBaseProps() {
         if (!properties.containsKey(PROP_SCRIPTS_DIR)) {
             properties.put(PROP_SCRIPTS_DIR, ZorkaUtil.path(homeDir, "scripts"));
         }

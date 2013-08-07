@@ -16,13 +16,27 @@
 
 package com.jitlogic.zorka.central.test.support;
 
+import com.jitlogic.zorka.central.CentralConfig;
+import com.jitlogic.zorka.central.CentralInstance;
+import com.jitlogic.zorka.central.StoreManager;
+import com.jitlogic.zorka.common.util.ZorkaConfig;
+import org.junit.After;
 import org.junit.Before;
 
 import java.io.File;
+import java.util.Properties;
 
 public class CentralFixture {
 
     private String tmpDir;
+
+    private Properties configProperties;
+
+    protected CentralConfig config;
+
+    protected CentralInstance instance;
+
+    protected StoreManager storeManager;
 
     @Before
     public void setUpCentralFixture() throws Exception {
@@ -30,14 +44,41 @@ public class CentralFixture {
         TestUtil.rmrf(tmpDir);
         new File(tmpDir).mkdirs();
 
+        configProperties = setProps(
+                ZorkaConfig.defaultProperties(CentralConfig.DEFAULT_CONF_PATH),
+                "central.home.dir", tmpDir
+        );
+
+        config = new CentralConfig(configProperties);
+
+        instance = new CentralInstance(config);
+        instance.start();
+
+        storeManager = instance.getStoreManager();
+    }
+
+    @After
+    public void tearDownCentralFixture() throws Exception {
+        instance.stop();
     }
 
     public String getTmpDir() {
         return tmpDir;
     }
 
+
     public String tmpFile(String name) {
         return new File(getTmpDir(), name).getPath();
+    }
+
+
+    private static Properties setProps(Properties props, String...data) {
+
+        for (int i = 1; i < data.length; i+=2) {
+            props.setProperty(data[i-1], data[i]);
+        }
+
+        return props;
     }
 
 }

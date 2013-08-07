@@ -31,7 +31,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
     private static Logger log = LoggerFactory.getLogger(ReceiverContext.class);
 
-    private SymbolStore symbolStore;
+    private SymbolSet symbolSet;
     private Map<Integer,Integer> sidMap = new HashMap<Integer,Integer>();
 
     private TraceEntrySet traceEntrySet;
@@ -40,11 +40,11 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     private int unknownSid;
 
 
-    public ReceiverContext(SymbolStore symbolStore, TraceEntrySet traceEntrySet, RDSStore traceDataStore) {
-        this.symbolStore = symbolStore;
-        this.traceEntrySet = traceEntrySet;
-        this.traceDataStore = traceDataStore;
-        this.unknownSid = symbolStore.get("<UNKNOWN>");
+    public ReceiverContext(Store store) {
+        this.symbolSet = store.getSymbols();
+        this.traceEntrySet = store.getTraces();
+        this.traceDataStore = store.getRds();
+        this.unknownSid = symbolSet.get("<UNKNOWN>");
     }
 
 
@@ -63,7 +63,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
 
     private void processSymbol(Symbol sym) {
-        int newid = symbolStore.get(sym.getName());
+        int newid = symbolSet.get(sym.getName());
         sidMap.put(sym.getId(), newid);
     }
 
@@ -75,7 +75,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
         writer.writeObject(rec);
         byte[] chunk = os.toByteArray();
         long offs = traceDataStore.write(chunk);
-        traceEntrySet.save(new TraceEntry(offs, chunk.length, symbolStore, rec));
+        traceEntrySet.save(new TraceEntry(offs, chunk.length, symbolSet, rec));
     }
 
 

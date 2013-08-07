@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core;
 
+import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogLevel;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
@@ -88,7 +89,7 @@ public class AgentInstance {
     private PerfMonLib perfMonLib;
 
     /** Agent configuration properties */
-    private Properties props;
+    private Properties props;                // TODO get rid of this, access configuration via ZorkaConfig methods
 
     private Tracer tracer;
 

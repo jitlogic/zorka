@@ -13,14 +13,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.integ;
+package com.jitlogic.zorka.common.util;
 
-import com.jitlogic.zorka.common.util.ZorkaLogLevel;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaTrapper;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.core.AgentDiagnostics;
-import com.jitlogic.zorka.core.util.*;
+//import com.jitlogic.zorka.core.AgentDiagnostics;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -152,10 +147,10 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
             }
         }
 
-        AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SUBMITTED);
+        // TODO AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SUBMITTED);
 
         if (!submit(sb.toString())) {
-                AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_DROPPED);
+                // TODO AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_DROPPED);
         }
 
     }
@@ -204,7 +199,7 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
         if (out != null) {
             out.println(msg);
             currentSize += msg.getBytes().length + 1;
-            AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SENT);
+            // TODO AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SENT);
         }
     }
 

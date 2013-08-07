@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SymbolStore implements Closeable {
+public class SymbolSet implements Closeable {
 
     private int lastId = 0;
     private Map<Integer,String> symbols;
@@ -32,7 +32,7 @@ public class SymbolStore implements Closeable {
 
     private DB db;
 
-    public SymbolStore(String path) {
+    public SymbolSet(String path) {
         db = DBMaker.newFileDB(new File(path))
                 .closeOnJvmShutdown()
                 .asyncFlushDelay(10)

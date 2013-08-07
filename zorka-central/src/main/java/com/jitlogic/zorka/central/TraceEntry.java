@@ -40,7 +40,7 @@ public class TraceEntry {
     }
 
 
-    public TraceEntry(long offs, long len, SymbolStore symbolStore, TraceRecord rec) {
+    public TraceEntry(long offs, long len, SymbolSet symbolSet, TraceRecord rec) {
         this.offs = offs;
         this.len = len;
         this.clock = rec.getClock();
@@ -50,12 +50,12 @@ public class TraceEntry {
         this.errors = rec.getErrors();
         this.records = numRecords(rec);
         this.time = rec.getTime();
-        this.label = symbolStore.get(rec.getMarker().getTraceId());
+        this.label = symbolSet.get(rec.getMarker().getTraceId());
         this.desc = this.label;
         if (rec.getAttrs() != null) {
             attrs = new LinkedHashMap<String, String>();
             for (Map.Entry<Integer,Object> e : rec.getAttrs().entrySet()) {
-                attrs.put(symbolStore.get(e.getKey()), ""+e.getValue());
+                attrs.put(symbolSet.get(e.getKey()), ""+e.getValue());
                 this.desc += "|" + e.getValue();
             }
         }

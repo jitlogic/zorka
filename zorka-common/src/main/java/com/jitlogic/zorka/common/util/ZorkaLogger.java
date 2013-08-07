@@ -27,6 +27,8 @@ import java.util.*;
  */
 public class ZorkaLogger implements ZorkaTrapper {
 
+    // TODO move agent-specific parts to dedicated agent class
+
     /** Tracer log flags */
     public static final long ZTR_NONE               = 0x00;
     public static final long ZTR_CONFIG             = 0x01;

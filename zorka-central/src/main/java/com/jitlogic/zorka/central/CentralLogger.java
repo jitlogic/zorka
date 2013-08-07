@@ -16,21 +16,8 @@
 package com.jitlogic.zorka.central;
 
 
-import com.jitlogic.zorka.common.tracedata.HelloRequest;
-import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
-import com.jitlogic.zorka.common.zico.ZicoDataProcessorFactory;
+public class CentralLogger {
 
-import java.net.Socket;
-
-public class ReceiverContextManager implements ZicoDataProcessorFactory {
-
-    public ReceiverContextManager(CentralConfig config) {
-
-    }
-
-    @Override
-    public ZicoDataProcessor get(Socket socket, HelloRequest hello) {
-        return null;
-    }
+    public final static long STORE_ERRORS = 0x000001; // TODO
 
 }
