@@ -38,8 +38,8 @@ import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularType;
 
 import com.jitlogic.zorka.core.util.ValGetter;
-import com.jitlogic.zorka.core.util.ZorkaLogger;
-import com.jitlogic.zorka.core.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaLog;
 
 
 /**

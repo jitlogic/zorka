@@ -22,7 +22,11 @@ import com.jitlogic.zorka.common.zico.ZicoDataProcessorFactory;
 
 import java.net.Socket;
 
-public class ReceiverContextFactory implements ZicoDataProcessorFactory {
+public class ReceiverContextManager implements ZicoDataProcessorFactory {
+
+    public ReceiverContextManager(CentralConfig config) {
+
+    }
 
     @Override
     public ZicoDataProcessor get(Socket socket, HelloRequest hello) {

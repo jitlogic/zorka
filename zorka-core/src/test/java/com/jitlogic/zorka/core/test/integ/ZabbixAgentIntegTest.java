@@ -27,7 +27,7 @@ import java.util.concurrent.Executors;
 import com.jitlogic.zorka.core.integ.ZabbixQueryTranslator;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.test.support.TestLogger;
-import com.jitlogic.zorka.core.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

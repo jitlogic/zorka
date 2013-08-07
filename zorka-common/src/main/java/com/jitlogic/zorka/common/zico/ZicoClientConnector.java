@@ -52,6 +52,7 @@ public class ZicoClientConnector extends ZicoConnector {
         return t2-t1;
     }
 
+
     public void hello(String hostname, String auth) throws IOException {
         send(ZICO_HELLO, ZicoUtil.pack(
             new HelloRequest(System.currentTimeMillis(), hostname, auth)));
@@ -65,6 +66,7 @@ public class ZicoClientConnector extends ZicoConnector {
                 throw new ZicoException(pkt.getStatus(), "Other error.");
         }
     }
+
 
     public void submit(Object data) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();

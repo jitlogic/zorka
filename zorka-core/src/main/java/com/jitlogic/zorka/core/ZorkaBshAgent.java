@@ -25,9 +25,9 @@ import java.util.concurrent.ExecutorService;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.util.ObjectDumper;
-import com.jitlogic.zorka.core.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.core.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLog;
 
 import bsh.EvalError;
 import bsh.Interpreter;

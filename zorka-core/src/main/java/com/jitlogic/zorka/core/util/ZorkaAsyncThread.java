@@ -15,6 +15,9 @@
  */
 package com.jitlogic.zorka.core.util;
 
+import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;

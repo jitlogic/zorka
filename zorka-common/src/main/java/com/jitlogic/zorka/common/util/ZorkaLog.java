@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.util;
+package com.jitlogic.zorka.common.util;
 
 /**
  * ZorkaLog objects are used internally as loggers. Zorka agent avoids using

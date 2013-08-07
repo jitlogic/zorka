@@ -18,9 +18,9 @@
 package com.jitlogic.zorka.core;
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.core.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.core.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLog;
 
 import java.io.File;
 import java.io.FileInputStream;

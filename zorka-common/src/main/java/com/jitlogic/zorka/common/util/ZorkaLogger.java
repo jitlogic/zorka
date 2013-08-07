@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.util;
+package com.jitlogic.zorka.common.util;
 
 import java.lang.reflect.Field;
 import java.util.*;

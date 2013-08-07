@@ -15,6 +15,9 @@
  */
 package com.jitlogic.zorka.core.integ;
 
+import com.jitlogic.zorka.common.util.ZorkaLogLevel;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaTrapper;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.AgentDiagnostics;
 import com.jitlogic.zorka.core.util.*;
