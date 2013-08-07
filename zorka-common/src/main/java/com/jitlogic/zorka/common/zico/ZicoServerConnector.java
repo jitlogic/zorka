@@ -17,12 +17,13 @@ package com.jitlogic.zorka.common.zico;
 
 
 import com.jitlogic.zorka.common.tracedata.HelloRequest;
+import static com.jitlogic.zorka.common.zico.ZicoPacket.*;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.util.List;
 
-public class ZicoServerConnector extends AbstractZicoConnector implements Runnable {
+public class ZicoServerConnector extends ZicoConnector implements Runnable {
 
     private ZicoDataProcessorFactory factory;
     private ZicoDataProcessor context = null;
@@ -38,18 +39,37 @@ public class ZicoServerConnector extends AbstractZicoConnector implements Runnab
 
 
     private void runCycle() throws IOException {
-        Object msg = getMessage();
-        if (msg instanceof List) {
-            for (Object o : (List)msg) {
-                if (o instanceof HelloRequest) {
-                    context = factory.get(socket, (HelloRequest)o);
-                } else if (context != null) {
-                    context.process(o);
-                } else {
-                    throw new ZicoException(ZICO_AUTH_ERROR, "Not logged in.");
-                }
+        ZicoPacket pkt = recv();
+        switch (pkt.getStatus()) {
+            case ZICO_PING: {
+                send(ZICO_PONG);
+                break;
             }
-            sendMessage(ZICO_OK);
+            case ZICO_HELLO: {
+                List<Object> lst = ZicoUtil.unpack(pkt.getData());
+                if (lst.size() > 0 && lst.get(0) instanceof HelloRequest) {
+                    context = factory.get(socket, (HelloRequest) lst.get(0));
+                    send(ZICO_OK);
+                } else {
+                    // TODO log here
+                    send(ZICO_BAD_REQUEST);
+                }
+                break;
+            }
+            case ZICO_DATA: {
+                if (context != null) {
+                    for (Object o : ZicoUtil.unpack(pkt.getData())) {
+                        context.process(o);
+                    }
+                    send(ZICO_OK);
+                } else {
+                    send(ZICO_AUTH_ERROR);
+                }
+                break;
+            }
+            default:
+                send(ZICO_BAD_REQUEST);
+                break;
         }
     }
 
@@ -63,7 +83,7 @@ public class ZicoServerConnector extends AbstractZicoConnector implements Runnab
             }
         } catch (ZicoException ze) {
             // TODO log
-            try { sendMessage(ze.getStatus()); } catch (IOException e) { }
+            try { send(ze.getStatus()); } catch (IOException e) { }
         } catch (Exception e) {
             // TODO log
             running = false;

@@ -16,10 +16,7 @@
 package com.jitlogic.zorka.common.test.support;
 
 import com.jitlogic.zorka.common.tracedata.HelloRequest;
-import com.jitlogic.zorka.common.zico.AbstractZicoConnector;
-import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
-import com.jitlogic.zorka.common.zico.ZicoDataProcessorFactory;
-import com.jitlogic.zorka.common.zico.ZicoException;
+import com.jitlogic.zorka.common.zico.*;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -35,7 +32,7 @@ public class TestZicoProcessorFactory implements ZicoDataProcessorFactory {
     public ZicoDataProcessor get(Socket socket, HelloRequest hello) throws IOException {
 
         if (hello == null || "BAD".equals(hello.getAuth())) {
-            throw new ZicoException(AbstractZicoConnector.ZICO_AUTH_ERROR, "Login failed.");
+            throw new ZicoException(ZicoPacket.ZICO_AUTH_ERROR, "Login failed.");
         }
 
         if (!pmap.containsKey(hello.getHostname())) {

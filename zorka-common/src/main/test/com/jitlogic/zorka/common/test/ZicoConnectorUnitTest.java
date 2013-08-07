@@ -18,11 +18,8 @@ package com.jitlogic.zorka.common.test;
 
 import com.jitlogic.zorka.common.test.support.TestZicoProcessor;
 import com.jitlogic.zorka.common.test.support.TestZicoProcessorFactory;
-import com.jitlogic.zorka.common.tracedata.HelloRequest;
 import com.jitlogic.zorka.common.tracedata.Symbol;
-import com.jitlogic.zorka.common.zico.AbstractZicoConnector;
-import com.jitlogic.zorka.common.zico.ZicoClientConnector;
-import com.jitlogic.zorka.common.zico.ZicoService;
+import com.jitlogic.zorka.common.zico.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -71,7 +68,7 @@ public class ZicoConnectorUnitTest { //extends CentralFixture {
         }
 
         ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-        AbstractZicoConnector.seekSignature(bis, AbstractZicoConnector.ZICO_MAGIC);
+        ZicoUtil.seekSignature(bis, ZicoConnector.ZICO_MAGIC);
         return bis.read();
     }
 
@@ -79,7 +76,7 @@ public class ZicoConnectorUnitTest { //extends CentralFixture {
     @Test(timeout = 100)
     public void testSearchZicoSignature1() throws Exception {
         assertEquals("No data after signature.", -1,
-                signatureTest(AbstractZicoConnector.ZICO_MAGIC));
+                signatureTest(ZicoConnector.ZICO_MAGIC));
 
         assertEquals("Some data after signature.", 0x11,
                 signatureTest(0x21, 0xC0, 0xBA, 0xBE, 0x11 ));
@@ -129,8 +126,7 @@ public class ZicoConnectorUnitTest { //extends CentralFixture {
         ZicoClientConnector conn = new ZicoClientConnector("127.0.0.1", 8642);
         conn.connect();
 
-        short rslt = conn.sendData(new HelloRequest(10L, "test", "aaa"));
-        assertEquals(AbstractZicoConnector.ZICO_OK, rslt);
+        conn.hello("test", "aaa");
         TestZicoProcessor proc = factory.getPmap().get("test");
         assertNotNull("New data processor should be registered.", proc);
         assertEquals("Should have no records received.", 0, proc.getResults().size());
@@ -147,8 +143,8 @@ public class ZicoConnectorUnitTest { //extends CentralFixture {
         ZicoClientConnector conn = new ZicoClientConnector("127.0.0.1", 8643);
         conn.connect();
 
-        assertEquals(AbstractZicoConnector.ZICO_OK, conn.sendData(new HelloRequest(10L, "test", "aaa")));
-        assertEquals(AbstractZicoConnector.ZICO_OK, conn.sendData(new Symbol(1, "test")));
+        conn.hello("test", "aaa");
+        conn.submit(new Symbol(1, "test"));
 
         TestZicoProcessor proc = factory.getPmap().get("test");
         assertNotNull("New data processor should be registered.", proc);
@@ -159,7 +155,7 @@ public class ZicoConnectorUnitTest { //extends CentralFixture {
     }
 
 
-    @Test(timeout = 1000)
+    @Test(timeout = 1000, expected = ZicoException.class)
     public void sendUnauthorizedMsg() throws Exception {
         service = new ZicoService("127.0.0.1", 8644, factory);
         service.start();
@@ -167,14 +163,13 @@ public class ZicoConnectorUnitTest { //extends CentralFixture {
         ZicoClientConnector conn = new ZicoClientConnector("127.0.0.1", 8644);
         conn.connect();
 
-        assertEquals("Should return ZICO_AUTH_ERROR.",
-                AbstractZicoConnector.ZICO_AUTH_ERROR, conn.sendData(new Symbol(1, "test")));
+        conn.submit(new Symbol(1, "test"));
 
         conn.close();
     }
 
 
-    @Test(timeout = 1000)
+    @Test(timeout = 1000, expected = ZicoException.class)
     public void sendBadLoginMsg() throws Exception {
         service = new ZicoService("127.0.0.1", 8644, factory);
         service.start();
@@ -182,10 +177,7 @@ public class ZicoConnectorUnitTest { //extends CentralFixture {
         ZicoClientConnector conn = new ZicoClientConnector("127.0.0.1", 8644);
         conn.connect();
 
-        assertEquals("Should return ZICO_AUTH_ERROR.",
-                AbstractZicoConnector.ZICO_AUTH_ERROR, conn.sendData(new HelloRequest(1, "test", "BAD")));
-
-        conn.close();
+        conn.hello("test", "BAD");
     }
 
     // TODO Transfer trace test

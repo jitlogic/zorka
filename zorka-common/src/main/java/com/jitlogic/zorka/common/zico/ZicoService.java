@@ -21,13 +21,12 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
-
 public class ZicoService implements Runnable {
 
     //private final static Logger log = LoggerFactory.getLogger(ZicoService.class);
 
     public final static int COLLECTOR_PORT = 8640;
-    public final static int AGENT_PORT = 8642;
+    public final static int AGENT_PORT     = 8642;
 
     private volatile Thread thread;
     private volatile boolean running;
@@ -80,30 +79,21 @@ public class ZicoService implements Runnable {
     }
 
 
-    private boolean allowedAddr(Socket sock) {
-        return false;
-    }
-
-
     public void start() {
         if (thread == null) {
             try {
                 socket = new ServerSocket(listenPort, 0, listenAddr);
                 thread = new Thread(this);
                 thread.setDaemon(true);
-                thread.setName("ZICO-acceptor-");
+                thread.setName("ZICO-acceptor-"+listenPort);
                 running = true;
                 thread.start();
             } catch (IOException e) {
-                // Log error here
-                System.err.println("Kurwa: " + e);
-                e.printStackTrace();
+                // TODO Log error here
             }
         }
     }
 
-    void notifyClosed(ZicoServerConnector conn) {
-    }
 
     public void stop() {
         if (running) {

@@ -15,15 +15,25 @@
  */
 package com.jitlogic.zorka.common.zico;
 
+import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
+import com.jitlogic.zorka.common.tracedata.HelloRequest;
+import org.fressian.FressianWriter;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
 
+import static com.jitlogic.zorka.common.zico.ZicoPacket.*;
 
-public class ZicoClientConnector extends AbstractZicoConnector {
+public class ZicoClientConnector extends ZicoConnector {
+
 
     public ZicoClientConnector(String addr, int port) throws IOException {
-        super(addr, port);
+        this.addr = InetAddress.getByName(addr);
+        this.port = port;
     }
+
 
     public void connect() throws IOException {
         socket = new Socket(addr, port);
@@ -31,12 +41,41 @@ public class ZicoClientConnector extends AbstractZicoConnector {
         out = socket.getOutputStream();
     }
 
+
     public long ping() throws IOException {
         long t1 = System.nanoTime();
-        sendMessage(ZICO_PING);
-        getMessage();
+        send(ZICO_PING);
+        if (recv().getStatus() != ZICO_PONG) {
+            throw new ZicoException(ZICO_BAD_REPLY, "Expected PONG reply.");
+        }
         long t2 = System.nanoTime();
         return t2-t1;
+    }
+
+    public void hello(String hostname, String auth) throws IOException {
+        send(ZICO_HELLO, ZicoUtil.pack(
+            new HelloRequest(System.currentTimeMillis(), hostname, auth)));
+        ZicoPacket pkt = recv();
+        switch (pkt.getStatus()) {
+            case ZICO_OK:
+                return;
+            case ZICO_AUTH_ERROR:
+                throw new ZicoException(ZICO_AUTH_ERROR, "Authentication error.");
+            default:
+                throw new ZicoException(pkt.getStatus(), "Other error.");
+        }
+    }
+
+    public void submit(Object data) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        FressianWriter writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);
+        writer.writeObject(data);
+        writer.close();
+        send(ZICO_DATA, ZicoUtil.pack(data));
+        ZicoPacket pkt = recv();
+        if (pkt.getStatus() != ZICO_OK) {
+            throw new ZicoException(pkt.getStatus(), "ZICO submission error.");
+        }
     }
 
 }
