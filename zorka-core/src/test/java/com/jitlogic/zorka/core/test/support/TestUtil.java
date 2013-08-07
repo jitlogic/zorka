@@ -68,6 +68,13 @@ public class TestUtil extends ClassLoader {
             }
         }
 
+        if (clazz.getSuperclass() != Object.class) {
+            Field f = lookupField(clazz.getSuperclass(), fieldName);
+            if (f != null) {
+                return f;
+            }
+        }
+
         fail("Cannot find field " + fieldName + " in class " + clazz.getName());
         return null;
     }

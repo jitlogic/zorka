@@ -524,7 +524,7 @@ public class ZorkaLib  {
      * @param name file name (relative to conf dir)
      */
     public String reload(String name) {
-        return agent.loadScript(ZorkaUtil.path(config.stringCfg(ZorkaConfig.PROP_SCRIPTS_DIR, null), name));
+        return agent.loadScript(ZorkaUtil.path(config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null), name));
     }
 
 

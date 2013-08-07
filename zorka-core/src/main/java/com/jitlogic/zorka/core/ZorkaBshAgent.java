@@ -53,7 +53,7 @@ public class ZorkaBshAgent {
 
     private ExecutorService mainExecutor;
 
-    private ZorkaConfig config;
+    private AgentConfig config;
 
     private long timeout;
 
@@ -66,7 +66,7 @@ public class ZorkaBshAgent {
      */
 	public ZorkaBshAgent(Executor connExecutor, ExecutorService mainExecutor,
                          long timeout, MBeanServerRegistry mbsRegistry,
-                         ZorkaConfig config, QueryTranslator translator) {
+                         AgentConfig config, QueryTranslator translator) {
 
 		this.interpreter = new Interpreter();
 
@@ -179,7 +179,7 @@ public class ZorkaBshAgent {
      *
      */
     public void loadScripts() {
-        String scriptsDir = config.stringCfg(ZorkaConfig.PROP_SCRIPTS_DIR, null);
+        String scriptsDir = config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null);
 
         if (scriptsDir == null) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Scripts directory not set. Internal error ?!?");

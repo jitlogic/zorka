@@ -96,11 +96,11 @@ public class AgentInstance {
 
     private DispatchingSubmitter submitter;
 
-    private ZorkaConfig config;
+    private AgentConfig config;
 
     private ZabbixQueryTranslator translator;
 
-    public AgentInstance(ZorkaConfig config) {
+    public AgentInstance(AgentConfig config) {
         this.config = config;
         props = config.getProperties();
     }
@@ -250,7 +250,7 @@ public class AgentInstance {
     }
 
 
-    public ZorkaConfig getConfig() {
+    public AgentConfig getConfig() {
         return config;
     }
 

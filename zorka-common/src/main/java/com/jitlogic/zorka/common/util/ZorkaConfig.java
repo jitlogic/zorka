@@ -15,20 +15,15 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core;
+package com.jitlogic.zorka.common.util;
 
-import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 /**
  * Zorka Configuration handling class. 
@@ -42,38 +37,20 @@ import java.util.regex.Pattern;
  * @author rafal.lewczuk@jitlogic.com
  *
  */
-public class ZorkaConfig {
+public abstract class ZorkaConfig {
 
     /** Logger */
     private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaConfig.class);
 
     /** Configuration properties */
-    private Properties properties;
+    protected Properties properties;
 
     /** Home directory */
-	private String homeDir;
+	protected String homeDir;
 
-    private List<String> profiles = new ArrayList<String>();
-    private List<String> profileScripts = new ArrayList<String>();
-
-    /** Path to config defaults (always in classpath) */
-    public final static String DEFAULT_CONF_PATH = "/com/jitlogic/zorka/core/zorka.properties";
 
     public static final String PROP_HOME_DIR = "zorka.home.dir";
-    public static final String PROP_SCRIPTS_DIR  = "zorka.scripts.dir";;
-    public static final String PROP_PROFILE_DIR = "zorka.profile.dir";
 
-    public ZorkaConfig(String home) {
-        loadProperties(home);
-        loadProfiles();
-    }
-
-    public ZorkaConfig(Properties props) {
-        properties = props;
-        homeDir = props.getProperty(PROP_HOME_DIR);
-        setBaseProps();
-        loadProfiles();
-    }
 
 
     /**
@@ -100,10 +77,6 @@ public class ZorkaConfig {
     }
 
 
-    public List<String> getProfileScripts() {
-        return Collections.unmodifiableList(profileScripts);
-    }
-
 
     /**
      * Returns default configuration properties. This is read from property file embedded
@@ -111,13 +84,13 @@ public class ZorkaConfig {
      *
      * @return default configuration properties.
      */
-    public static Properties defaultProperties() {
+    public static Properties defaultProperties(String path) {
         Properties props = new Properties();
 
         InputStream is = null;
 
         try {
-            is = ZorkaConfig.class.getResourceAsStream(DEFAULT_CONF_PATH);
+            is = ZorkaConfig.class.getResourceAsStream(path);
             props.load(is);
             is.close();
         } catch (IOException e) {
@@ -133,62 +106,6 @@ public class ZorkaConfig {
         }
 
         return props;
-    }
-
-
-
-    /**
-     * Sets agent home directory and load zorka.properties file from it.
-     *
-     * @param home home directory for zorka agent
-     */
-	private void loadProperties(String home) {
-        homeDir = home;
-		properties = defaultProperties();
-        String propPath = ZorkaUtil.path(homeDir, "zorka.properties");
-        loadCfg(properties, propPath, true);
-
-        properties.put(PROP_HOME_DIR, homeDir);
-
-        setBaseProps();
-	}
-
-    private void setBaseProps() {
-        if (!properties.containsKey(PROP_SCRIPTS_DIR)) {
-            properties.put(PROP_SCRIPTS_DIR, ZorkaUtil.path(homeDir, "scripts"));
-        }
-
-        if (!properties.containsKey(PROP_PROFILE_DIR)) {
-            properties.put(PROP_PROFILE_DIR, ZorkaUtil.path(homeDir, "profiles"));
-        }
-
-        if (!properties.containsKey("zorka.log.dir")) {
-            properties.put("zorka.log.dir", ZorkaUtil.path(homeDir, "log"));
-        }
-    }
-
-
-    /**
-     * Loads selected profiles and merges their properties with main configuration.
-     */
-    private void loadProfiles() {
-        profiles = listCfg("profiles");
-
-        for (String profile : profiles) {
-            File f = new File(ZorkaUtil.path(stringCfg(PROP_PROFILE_DIR, "/"), profile+".profile"));
-            if (f.exists() && f.canRead()) {
-                log.info(ZorkaLogger.ZAG_CONFIG, "Loading profile: " + profile);
-                Properties props = loadCfg(new Properties(), f.getPath(), true);
-                profileScripts.addAll(listCfg(props, "profile.scripts"));
-                props.remove("profile.scripts");
-                for (Map.Entry<Object,Object> e : props.entrySet()) {
-                    properties.setProperty(e.getKey().toString(), e.getValue().toString());
-                }
-            } else {
-                log.error(ZorkaLogger.ZAG_CONFIG, "Cannot load profile " + profile + ": file " + f + " does not exist.");
-            }
-        }
-
     }
 
 
@@ -234,7 +151,7 @@ public class ZorkaConfig {
     }
 
 
-    private List<String> listCfg(Properties properties, String key, String...defVals) {
+    protected List<String> listCfg(Properties properties, String key, String...defVals) {
         String s = properties.getProperty(key);
 
         if (s != null) {
@@ -284,8 +201,7 @@ public class ZorkaConfig {
                 return defval;
             }
         } catch (NumberFormatException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
-            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
+            markError("Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
             return defval;
         }
     }
@@ -308,8 +224,7 @@ public class ZorkaConfig {
                 return defval;
             }
         } catch (NumberFormatException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
-            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
+            markError("Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
             return defval;
         }
     }
@@ -325,8 +240,7 @@ public class ZorkaConfig {
                 return defval;
             }
         } catch (NumberFormatException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
-            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
+            markError("Cannot parse key '" + key + "' -> '" + s + "'. Returning default value of " + defval + ".", e);
             return defval;
         }
     }
@@ -343,14 +257,16 @@ public class ZorkaConfig {
             } else if (s.equalsIgnoreCase("false") || s.equalsIgnoreCase("no")) {
                 return false;
             } else {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Invalid value for '" + key + "' -> '" + s + "'. Setting default value of '" + defval);
-                AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
+                markError("Invalid value for '" + key + "' -> '" + s + "'. Setting default value of '" + defval, null);
             }
         }
 
         return defval;
     }
 
+    protected void markError(String msg, Throwable e) {
+        log.error(ZorkaLogger.ZAG_CONFIG, msg, e);
+    }
 
     public boolean hasCfg(String key) {
         String s = properties.getProperty(key);
@@ -363,4 +279,18 @@ public class ZorkaConfig {
         properties.setProperty(key, ""+val);
     }
 
+    /**
+     * Sets agent home directory and load zorka.properties file from it.
+     *
+     * @param home home directory for zorka agent
+     */
+    protected void loadProperties(String home, String defPath) {
+        homeDir = home;
+        properties = defaultProperties(defPath);
+        String propPath = ZorkaUtil.path(homeDir, "zorka.properties");
+        loadCfg(properties, propPath, true);
+
+        properties.put(PROP_HOME_DIR, homeDir);
+
+    }
 }

@@ -94,7 +94,7 @@ public class BshAgentUnitTest extends ZorkaFixture {
     @Test
     public void testStartAndLoadProfilesAndScripts() throws Exception {
         URL url = getClass().getResource("/cfgp");
-        ZorkaConfig config = new ZorkaConfig(url.getPath());
+        AgentConfig config = new AgentConfig(url.getPath());
         TestUtil.setField(zorkaAgent, "config", config);
         zorkaAgent.loadScripts();
         assertNotNull("common.bsh script should be loaded.", zorkaAgent.get("common_bsh"));

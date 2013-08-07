@@ -21,7 +21,7 @@ package com.jitlogic.zorka.core.integ;
 import java.net.Socket;
 
 import com.jitlogic.zorka.core.ZorkaBshAgent;
-import com.jitlogic.zorka.core.ZorkaConfig;
+import com.jitlogic.zorka.common.util.ZorkaConfig;
 
 /**
  * Zabbix agent integrates Zorka with Zabbix server. It handles incoming zabbix
