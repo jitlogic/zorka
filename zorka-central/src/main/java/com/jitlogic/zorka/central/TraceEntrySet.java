@@ -30,6 +30,7 @@ import java.util.NavigableMap;
 public class TraceEntrySet implements Closeable {
 
     private DB db;
+
     private NavigableMap<Long,TraceEntry> tracesByOffs;
 
 
@@ -47,6 +48,10 @@ public class TraceEntrySet implements Closeable {
 
     public void save(TraceEntry entry) {
         tracesByOffs.put(entry.getOffs(), entry);
+    }
+
+    public int size() {
+        return tracesByOffs.size();
     }
 
 }

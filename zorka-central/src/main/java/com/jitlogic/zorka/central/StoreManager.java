@@ -61,7 +61,7 @@ public class StoreManager implements Closeable, ZicoDataProcessorFactory {
             try {
                 entry.getValue().close();
             } catch (IOException e) {
-                log.error(CentralLogger.STORE_ERRORS, "Cannot close agent store for host " + entry.getKey(), e);
+                log.error(ZorkaLogger.ZCL_ERRORS, "Cannot close agent store for host " + entry.getKey(), e);
             }
         }
     }

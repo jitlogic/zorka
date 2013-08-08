@@ -35,7 +35,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
     protected final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     /** Submit queue */
-    private final BlockingQueue<T> submitQueue = new ArrayBlockingQueue<T>(256);
+    private BlockingQueue<T> submitQueue;
 
     /** Thred name (will be prefixed with ZORKA-) */
     private final String name;
@@ -48,13 +48,19 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
 
     protected boolean countTraps = true;
 
+
+    public ZorkaAsyncThread(String name) {
+        this(name, 256);
+    }
+
     /**
      * Standard constructor.
      *
      * @param name thread name
      */
-    public ZorkaAsyncThread(String name) {
+    public ZorkaAsyncThread(String name, int qlen) {
         this.name = "ZORKA-"+name;
+        submitQueue = new ArrayBlockingQueue<T>(qlen);
     }
 
     /**

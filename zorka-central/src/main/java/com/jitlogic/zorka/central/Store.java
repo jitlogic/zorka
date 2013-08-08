@@ -16,6 +16,8 @@
 package com.jitlogic.zorka.central;
 
 
+import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.io.Closeable;
@@ -27,6 +29,8 @@ import java.io.IOException;
  *
  */
 public class Store implements Closeable {
+
+    private final static ZorkaLog log = ZorkaLogger.getLog(Store.class);
 
     private String hostname;
     private String rootPath;
@@ -54,15 +58,21 @@ public class Store implements Closeable {
     }
 
 
+    public String toString() {
+        return "central.Store(" + hostname + ")";
+    }
+
+
     public RDSStore getRds() {
         if (rds == null) {
+            String rdspath = ZorkaUtil.path(rootPath, "traceadata");
             try {
-                rds = new RDSStore(ZorkaUtil.path(rootPath, "traceadata"),
+                rds = new RDSStore(rdspath,
                     config.kiloCfg("rds.file.size", 16*1024*1024L).intValue(),
                     config.kiloCfg("rds.max.size", 256*1024*1024L),
                     config.kiloCfg("rds.seg.size", 1024*1024L));
             } catch (IOException e) {
-                // TODO log something here
+                log.error(ZorkaLogger.ZCL_STORE, "Cannot open RDS store at '" + rdspath + "'", e);
             }
         }
         return rds;
@@ -87,20 +97,31 @@ public class Store implements Closeable {
 
     @Override
     public synchronized void close() throws IOException {
-        // TODO proper IOError handling
-        if (symbols != null) {
-            symbols.close();
-            symbols = null;
+        try {
+            if (symbols != null) {
+                symbols.close();
+                symbols = null;
+            }
+        } catch (IOException e) {
+            log.error(ZorkaLogger.ZCL_STORE, "Cannot close symbols store '" + symbols + "' for " + hostname , e);
         }
 
-        if(traces != null) {
-            traces.close();
-            traces = null;
+        try {
+            if(traces != null) {
+                traces.close();
+                traces = null;
+            }
+        } catch (IOException e) {
+            log.error(ZorkaLogger.ZCL_STORE, "Cannot close trace index '" + traces + "' for " + hostname, e);
         }
 
-        if (rds != null) {
-            rds.close();
-            rds = null;
+        try {
+            if (rds != null) {
+                rds.close();
+                rds = null;
+            }
+        } catch (IOException e) {
+            log.error(ZorkaLogger.ZCL_STORE, "Cannot close RDS store '" + rds + "' for " + hostname, e);
         }
     }
 }

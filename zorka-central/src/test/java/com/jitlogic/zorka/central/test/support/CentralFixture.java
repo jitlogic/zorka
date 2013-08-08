@@ -47,7 +47,8 @@ public class CentralFixture {
 
         configProperties = setProps(
                 ZorkaConfig.defaultProperties(CentralConfig.DEFAULT_CONF_PATH),
-                "central.home.dir", tmpDir
+                "central.home.dir", tmpDir,
+                "zico.service", "no"
         );
 
         config = new CentralConfig(configProperties);

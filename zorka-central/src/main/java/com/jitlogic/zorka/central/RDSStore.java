@@ -16,6 +16,8 @@
 package com.jitlogic.zorka.central;
 
 
+import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.io.Closeable;
@@ -32,6 +34,8 @@ import java.util.regex.Pattern;
  * Raw Data Store (RDS) builds upon RAGZ stream classes.
  */
 public class RDSStore implements Closeable {
+
+    private final static ZorkaLog log = ZorkaLogger.getLog(RDSStore.class);
 
     private static Pattern RGZ_FILE = Pattern.compile("^[0-9a-f]{16}\\.rgz$");
 
@@ -226,7 +230,7 @@ public class RDSStore implements Closeable {
                 plen = file.length();
                 inp.close();
             } catch (Exception e) {
-                // TODO log something here
+                log.error(ZorkaLogger.ZCL_STORE, "Cannot open RDS chunk file '" + fname + "'", e);
                 if (is != null) {
                     try { is.close(); } catch (IOException e1) { }
                 }

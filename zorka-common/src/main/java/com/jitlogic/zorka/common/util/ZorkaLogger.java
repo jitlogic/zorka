@@ -27,9 +27,9 @@ import java.util.*;
  */
 public class ZorkaLogger implements ZorkaTrapper {
 
-    // TODO move agent-specific parts to dedicated agent class
+    // TODO ensure overall modeling for logging is done properly: subsystems vs priorities
 
-    /** Tracer log flags */
+    /** Agent: Tracer log flags */
     public static final long ZTR_NONE               = 0x00;
     public static final long ZTR_CONFIG             = 0x01;
     public static final long ZTR_INSTRUMENT_CLASS   = 0x02;
@@ -45,7 +45,7 @@ public class ZorkaLogger implements ZorkaTrapper {
     public static final long ZTR_DEBUG              = ZTR_INFO | ZTR_INSTRUMENT_CLASS | ZTR_INSTRUMENT_METHOD | ZTR_SYMBOL_REGISTRY | ZTR_SYMBOL_ENRICHMENT | ZTR_TRACER_DBG;
     public static final long ZTR_TRACE              = ZTR_DEBUG | ZTR_TRACE_CALLS | ZTR_TRACE_EXCEPTIONS;
 
-    /** Performance metrics log flags */
+    /** Agent: Performance metrics log flags */
     public static final long ZPM_NONE       = 0x0000;
     public static final long ZPM_CONFIG     = 0x0100;
     public static final long ZPM_RUNS       = 0x0200;
@@ -56,7 +56,7 @@ public class ZorkaLogger implements ZorkaTrapper {
     public static final long ZPM_DEBUG      = ZPM_INFO | ZPM_RUNS | ZPM_RUN_DEBUG;
     public static final long ZPM_TRACE      = ZPM_DEBUG | ZPM_RUN_TRACE;
 
-    /** Zorka Spy log flags */
+    /** Agent: Zorka Spy log flags */
     public static final long ZSP_NONE       = 0x000000;
     public static final long ZSP_CONFIG     = 0x010000;
     public static final long ZSP_CLASS_DBG  = 0x020000;
@@ -66,14 +66,12 @@ public class ZorkaLogger implements ZorkaTrapper {
     public static final long ZSP_CLASS_TRC  = 0x200000;
     public static final long ZSP_METHOD_TRC = 0x400000;
     public static final long ZSP_ARGPROC    = 0x800000;
-
-
     public static final long ZSP_INFO       = ZSP_CONFIG|ZSP_ERRORS;
     public static final long ZSP_DEBUG      = ZSP_INFO|ZSP_CLASS_DBG|ZSP_METHOD_DBG;
     public static final long ZSP_TRACE      = ZSP_DEBUG|ZSP_CLASS_TRC|ZSP_SUBMIT|ZSP_ARGPROC|ZSP_METHOD_TRC;
 
 
-    /** Agent core log flags */
+    /** Agent: Core log flags */
     public static final long ZAG_NONE       = 0x00000000;
     public static final long ZAG_CONFIG     = 0x01000000;
     public static final long ZAG_QUERIES    = 0x02000000;
@@ -84,12 +82,13 @@ public class ZorkaLogger implements ZorkaTrapper {
     public static final long ZAG_DEBUG      = ZAG_INFO | ZAG_QUERIES;
     public static final long ZAG_TRACE      = ZAG_DEBUG | ZAG_TRACES;
 
-    /** Collector log flags */
+    /** Agent/Central: Collector log flags */
     public static final long ZCL_NONE       = 0x0000000000L;
     public static final long ZCL_CONFIG     = 0x0100000000L;
-    public static final long ZCL_WARNINGS   = 0x2000000000L;
+    public static final long ZCL_STORE      = 0x0200000000L;
+    public static final long ZCL_ZICO       = 0x0400000000L;
     public static final long ZCL_ERRORS     = 0x4000000000L;
-    public static final long ZCL_INFO       = ZCL_CONFIG|ZCL_WARNINGS|ZCL_ERRORS;
+    public static final long ZCL_INFO       = ZCL_CONFIG|ZCL_STORE|ZCL_ERRORS;
     public static final long ZCL_DEBUG      = ZCL_INFO;
     public static final long ZCL_TRACE      = ZCL_INFO;
 

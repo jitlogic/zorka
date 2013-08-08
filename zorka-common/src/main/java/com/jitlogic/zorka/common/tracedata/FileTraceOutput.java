@@ -14,11 +14,8 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.store;
+package com.jitlogic.zorka.common.tracedata;
 
-import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
-import com.jitlogic.zorka.common.tracedata.TraceOutput;
-import com.jitlogic.zorka.common.tracedata.TraceWriter;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;

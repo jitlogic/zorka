@@ -20,6 +20,7 @@ import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogLevel;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.common.zico.ZicoService;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +35,7 @@ public class CentralInstance {
 
     private StoreManager storeManager;
 
+    private ZicoService zicoService;
 
     public CentralInstance(CentralConfig config) {
         this.config = config;
@@ -42,10 +44,20 @@ public class CentralInstance {
 
     public synchronized void start() {
         initLoggers(config.getProperties());
+
+        if (config.boolCfg("zico.service", true)) {
+            getZicoService().start();
+        }
+
     }
 
 
     public synchronized void stop() {
+
+        if (zicoService != null) {
+            zicoService.stop();
+        }
+
         if (storeManager != null) {
             try {
                 storeManager.close();
@@ -53,6 +65,7 @@ public class CentralInstance {
                 // TODO log error
             }
         }
+
     }
 
 
@@ -117,6 +130,16 @@ public class CentralInstance {
             storeManager = new StoreManager(getConfig());
         }
         return storeManager;
+    }
+
+    public synchronized ZicoService getZicoService() {
+        if (null == zicoService) {
+            zicoService = new ZicoService(
+                config.stringCfg("central.listen.addr", "0.0.0.0"),
+                config.intCfg("central.listen.port", ZicoService.COLLECTOR_PORT),
+                 getStoreManager());
+        }
+        return zicoService;
     }
 
 }

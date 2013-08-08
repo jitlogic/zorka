@@ -13,12 +13,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.store;
+package com.jitlogic.zorka.common.tracedata;
 
-import com.jitlogic.zorka.common.tracedata.*;
+import com.jitlogic.zorka.common.util.BitVector;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.core.util.*;
 import org.fressian.FressianWriter;
 import org.fressian.Writer;
 
