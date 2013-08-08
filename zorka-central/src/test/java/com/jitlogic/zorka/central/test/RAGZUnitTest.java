@@ -18,6 +18,7 @@ package com.jitlogic.zorka.central.test;
 import com.jitlogic.zorka.central.RAGZInputStream;
 import com.jitlogic.zorka.central.RAGZOutputStream;
 import com.jitlogic.zorka.central.test.support.CentralFixture;
+import com.jitlogic.zorka.common.test.support.TestUtil;
 import org.junit.Test;
 
 import java.io.File;
@@ -25,8 +26,6 @@ import java.io.RandomAccessFile;
 import java.util.Random;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static com.jitlogic.zorka.central.test.support.TestUtil.cmd;
-import static com.jitlogic.zorka.central.test.support.TestUtil.cat;
 
 public class RAGZUnitTest extends CentralFixture {
 
@@ -41,12 +40,12 @@ public class RAGZUnitTest extends CentralFixture {
         assertThat(new File(path).length()).isEqualTo(30);
 
         // TODO check important internal fields here
-        byte[] buf = cat(path);
+        byte[] buf = TestUtil.cat(path);
         assertThat(buf[16]).isEqualTo((byte)2);
         assertThat(buf[19]).isEqualTo((byte)0);
 
         if (new File(GZIP).canExecute()) {
-            assertThat(cmd(GZIP + " -d " + path)).isEqualTo(0);
+            assertThat(TestUtil.cmd(GZIP + " -d " + path)).isEqualTo(0);
             assertThat(new File(tmpFile("test")).length()).isEqualTo(0);
         }
     }
@@ -59,7 +58,7 @@ public class RAGZUnitTest extends CentralFixture {
         os.write("ABCD".getBytes());
         os.close();
 
-        byte[] buf = cat(path);
+        byte[] buf = TestUtil.cat(path);
 
 
         assertThat(new File(path).length()).isEqualTo(34);
@@ -69,7 +68,7 @@ public class RAGZUnitTest extends CentralFixture {
         assertThat(buf[33]).isEqualTo((byte)0);
 
         if (new File(GZIP).canExecute()) {
-            assertThat(cmd(GZIP + " -d " + path)).isEqualTo(0);
+            assertThat(TestUtil.cmd(GZIP + " -d " + path)).isEqualTo(0);
             assertThat(new File(tmpFile("test")).length()).isEqualTo(4);
         }
     }

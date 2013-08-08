@@ -19,8 +19,6 @@ package com.jitlogic.zorka.central;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
 import org.fressian.FressianWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,7 +27,7 @@ import java.util.Map;
 
 public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
-    private static Logger log = LoggerFactory.getLogger(ReceiverContext.class);
+    //private static Logger log = LoggerFactory.getLogger(ReceiverContext.class);
 
     private SymbolSet symbolSet;
     private Map<Integer,Integer> sidMap = new HashMap<Integer,Integer>();
@@ -56,7 +54,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
             processTraceRecord((TraceRecord) obj);
         } else {
             if (obj != null) {
-                log.warn("Unsupported object type:" + obj.getClass());
+                //log.warn("Unsupported object type:" + obj.getClass());
             }
         }
     }

@@ -20,7 +20,6 @@ import com.jitlogic.zorka.common.test.support.TestZicoProcessor;
 import com.jitlogic.zorka.common.test.support.TestZicoProcessorFactory;
 import com.jitlogic.zorka.common.tracedata.Symbol;
 import com.jitlogic.zorka.common.zico.*;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +28,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ZicoConnectorUnitTest { //extends CentralFixture {
 

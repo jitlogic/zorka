@@ -19,6 +19,7 @@ package com.jitlogic.zorka.central.test.support;
 import com.jitlogic.zorka.central.CentralConfig;
 import com.jitlogic.zorka.central.CentralInstance;
 import com.jitlogic.zorka.central.StoreManager;
+import com.jitlogic.zorka.common.test.support.TestUtil;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import org.junit.After;
 import org.junit.Before;

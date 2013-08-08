@@ -94,18 +94,6 @@ public class TestUtil extends ClassLoader {
     }
 
 
-    public static void setField(Object obj, String fieldName, Object val) throws Exception {
-
-        Field field = lookupField(obj.getClass(), fieldName);
-        boolean accessible = field.isAccessible();
-        field.setAccessible(true);
-
-        field.set(obj, val);
-
-        field.setAccessible(accessible);
-    }
-
-
     public static Object invoke(Object obj, String name, Object...args) throws Exception {
         Method method = null;
         Class<?> clazz = obj.getClass();
