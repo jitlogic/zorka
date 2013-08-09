@@ -124,7 +124,9 @@ public abstract class ZicoConnector implements Closeable {
     @Override
     public void close() throws IOException {
         if (socket != null) {
+            in.close();
             in = null;
+            out.close();
             out = null;
             socket.close();
             socket = null;

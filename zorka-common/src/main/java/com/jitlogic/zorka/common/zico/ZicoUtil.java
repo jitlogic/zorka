@@ -20,10 +20,7 @@ import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
 import org.fressian.FressianReader;
 import org.fressian.FressianWriter;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +59,11 @@ public class ZicoUtil {
         int n = 0;
 
         for (int i = 0; i < signature.length; i++) {
-            data[i] = is.read();
+            int c = is.read();
+            if (c == -1) {
+                throw new EOFException("End of ZICO stream.");
+            }
+            data[i] = c;
         }
 
         do {
@@ -71,7 +72,11 @@ public class ZicoUtil {
                     for (int i = 1; i < data.length; i++) {
                         data[i-1] = data[i];
                     }
-                    data[data.length-1] = is.read();
+                    int c = is.read();
+                    if (c == -1) {
+                        throw new EOFException("End of ZICO stream.");
+                    }
+                    data[data.length-1] = c;
                     break;
                 }
             }

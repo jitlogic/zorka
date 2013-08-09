@@ -22,9 +22,9 @@ import com.jitlogic.zorka.central.test.support.CentralFixture;
 import com.jitlogic.zorka.common.test.support.TestTraceGenerator;
 import com.jitlogic.zorka.common.tracedata.FressianTraceWriter;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
-import com.jitlogic.zorka.common.zico.ZicoService;
 import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
 
+import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -32,23 +32,60 @@ import static org.fest.reflect.core.Reflection.*;
 
 public class DataCollectionIntegTest extends CentralFixture {
 
-    @Test
-    public void testCollectSingleTraceRecord() throws Exception {
-        // Start collector service ...
-        ZicoService svc = instance.getZicoService();
-        svc.start();
+    private TestTraceGenerator generator;
+    private ZicoTraceOutput output;
 
-        TestTraceGenerator tg = new TestTraceGenerator();
-        FressianTraceWriter ftw = new FressianTraceWriter(tg.getSymbols(), tg.getMetrics());
-        ZicoTraceOutput output = new ZicoTraceOutput(ftw, "127.0.0.1", 8640, "test", "aaa");
-        TraceRecord rec = tg.generate();
 
+    @Before
+    public void setUpOutputAndCollector() throws Exception {
+        zicoService.start();
+
+        generator = new TestTraceGenerator();
+        output = new ZicoTraceOutput(
+                new FressianTraceWriter(generator.getSymbols(), generator.getMetrics()),
+                "127.0.0.1", 8640, "test", "aaa");
+    }
+
+
+    private void submit(TraceRecord rec) {
         method("open").in(output).invoke();
         output.submit(rec);
         method("runCycle").in(output).invoke();
-
-        Store store = storeManager.get("test");
-        assertEquals(1, store.getTraces().size());
     }
 
+
+    @Test(timeout = 1000)
+    public void testCollectSingleTraceRecord() throws Exception {
+        TraceRecord rec = generator.generate();
+
+        submit(rec);
+
+        assertEquals("One trace should be noticed.", 1, storeManager.get("test").getTraces().size());
+    }
+
+
+    @Test//(timeout = 1000)
+    public void testCollectTwoTraceRecords() throws Exception {
+        submit(generator.generate());
+        assertEquals("One trace should be noticed.", 1, storeManager.get("test").getTraces().size());
+        submit(generator.generate());
+        assertEquals("Two traces should be noticed.", 1, storeManager.get("test").getTraces().size());
+    }
+
+
+
+    @Test//(timeout = 1000)
+    public void testCollectBrokenTraceCausingNPE() throws Exception {
+        TraceRecord rec = generator.generate();
+        //rec.setMarker(null);
+        rec.setFlags(0);
+
+        submit(rec);
+
+        assertEquals("Trace will not reach store.", 0, storeManager.get("test").getTraces().size());
+
+        rec = generator.generate();
+        submit(rec);
+        assertEquals("TraceOutput should reconnect and send properly.", 1, storeManager.get("test").getTraces().size());
+    }
 }

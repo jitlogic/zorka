@@ -18,10 +18,11 @@ package com.jitlogic.zorka.central;
 
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 
+import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class TraceEntry {
+public class TraceEntry implements Serializable {
 
     private long offs, len;
     private long clock;

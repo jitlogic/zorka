@@ -21,6 +21,7 @@ import com.jitlogic.zorka.central.CentralInstance;
 import com.jitlogic.zorka.central.StoreManager;
 import com.jitlogic.zorka.common.test.support.TestUtil;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
+import com.jitlogic.zorka.common.zico.ZicoService;
 import org.junit.After;
 import org.junit.Before;
 
@@ -30,14 +31,12 @@ import java.util.Properties;
 public class CentralFixture {
 
     private String tmpDir;
-
     private Properties configProperties;
 
     protected CentralConfig config;
-
     protected CentralInstance instance;
-
     protected StoreManager storeManager;
+    protected ZicoService zicoService;
 
     @Before
     public void setUpCentralFixture() throws Exception {
@@ -57,6 +56,7 @@ public class CentralFixture {
         instance.start();
 
         storeManager = instance.getStoreManager();
+        zicoService = instance.getZicoService();
     }
 
     @After
