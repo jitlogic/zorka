@@ -64,17 +64,17 @@ public class DataCollectionIntegTest extends CentralFixture {
     }
 
 
-    @Test//(timeout = 1000)
+    @Test(timeout = 1000)
     public void testCollectTwoTraceRecords() throws Exception {
         submit(generator.generate());
         assertEquals("One trace should be noticed.", 1, storeManager.get("test").getTraces().size());
         submit(generator.generate());
-        assertEquals("Two traces should be noticed.", 1, storeManager.get("test").getTraces().size());
+        assertEquals("Two traces should be noticed.", 2, storeManager.get("test").getTraces().size());
     }
 
 
 
-    @Test//(timeout = 1000)
+    @Test(timeout = 1000)
     public void testCollectBrokenTraceCausingNPE() throws Exception {
         TraceRecord rec = generator.generate();
         //rec.setMarker(null);

@@ -65,6 +65,11 @@ public class FressianTraceWriter implements MetadataChecker, TraceWriter {
     }
 
 
+    public void softReset() {
+        writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);
+    }
+
+
     public void reset() {
         os = output.getOutputStream();
         symbolsSent.reset();

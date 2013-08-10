@@ -65,6 +65,7 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
     protected void process(SymbolicRecord record) {
         try {
             os.reset();
+            writer.softReset();
             writer.write(record);
             conn.send(ZicoPacket.ZICO_DATA, os.toByteArray());
             ZicoPacket rslt = conn.recv();
