@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.central;
 
 
+import com.jitlogic.zorka.central.db.TraceTable;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
 import org.fressian.FressianWriter;
@@ -29,20 +30,16 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
     //private static Logger log = LoggerFactory.getLogger(ReceiverContext.class);
 
-    private SymbolSet symbolSet;
+    private SymbolRegistry symbolRegistry;
     private Map<Integer,Integer> sidMap = new HashMap<Integer,Integer>();
 
-    private TraceEntrySet traceEntrySet;
+    private TraceTable traceTable;
     private RDSStore traceDataStore;
 
-    private int unknownSid;
-
-
     public ReceiverContext(Store store) {
-        this.symbolSet = store.getSymbols();
-        this.traceEntrySet = store.getTraces();
+        this.symbolRegistry = store.getSymbolRegistry();
+        this.traceTable = store.getTraces();
         this.traceDataStore = store.getRds();
-        this.unknownSid = symbolSet.get("<UNKNOWN>");
     }
 
 
@@ -61,7 +58,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
 
     private void processSymbol(Symbol sym) {
-        int newid = symbolSet.get(sym.getName());
+        int newid = symbolRegistry.symbolId(sym.getName());
         sidMap.put(sym.getId(), newid);
     }
 
@@ -73,13 +70,13 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
         writer.writeObject(rec);
         byte[] chunk = os.toByteArray();
         long offs = traceDataStore.write(chunk);
-        traceEntrySet.save(new TraceEntry(offs, chunk.length, symbolSet, rec));
+        traceTable.save(offs, chunk.length, rec);
     }
 
 
     @Override
     public int checkSymbol(int symbolId) throws IOException {
-        return sidMap.containsKey(symbolId) ? sidMap.get(symbolId) : unknownSid;
+        return sidMap.containsKey(symbolId) ? sidMap.get(symbolId) : 0;
     }
 
 

@@ -15,9 +15,14 @@
  */
 package com.jitlogic.zorka.central;
 
+import com.jitlogic.zorka.central.db.DbContext;
+import com.jitlogic.zorka.central.db.DbRecord;
+import com.jitlogic.zorka.central.db.HostTable;
 import com.jitlogic.zorka.common.tracedata.HelloRequest;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessorFactory;
 
@@ -33,23 +38,35 @@ public class StoreManager implements Closeable, ZicoDataProcessorFactory {
 
     private static ZorkaLog log = ZorkaLogger.getLog(StoreManager.class);
 
-    private File dataDir;
+    private String dataDir;
 
     private CentralConfig config;
+
+    private DbContext dbContext;
+
+    private SymbolRegistry symbolRegistry;
+
+    private HostTable hostTable;
 
     private Map<String,Store> stores = new HashMap<String, Store>();
 
 
-    public StoreManager(CentralConfig config) {
+    public StoreManager(CentralConfig config, DbContext dbContext, SymbolRegistry symbolRegistry, HostTable hostTable) {
         this.config = config;
-        this.dataDir = new File(config.stringCfg("central.data.dir", null));
+        this.symbolRegistry = symbolRegistry;
+        this.hostTable = hostTable;
+        this.dbContext = dbContext;
+        this.dataDir = config.stringCfg("central.data.dir", null);
     }
 
 
     public synchronized Store get(String hostname) {
         if (!stores.containsKey(hostname)) {
-            Store store = new Store(this, config, hostname, new File(dataDir, hostname).getPath());
-            stores.put(hostname, store);
+            DbRecord host = hostTable.getHost(hostname, null);
+            if (host != null) {
+                Store store = new Store(config, host, dataDir, dbContext, symbolRegistry);
+                stores.put(hostname, store);
+            }
         }
         return stores.get(hostname);
     }

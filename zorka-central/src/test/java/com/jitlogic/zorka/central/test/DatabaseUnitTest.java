@@ -16,12 +16,11 @@
 package com.jitlogic.zorka.central.test;
 
 
-import com.jitlogic.zorka.central.db.DbRecord;
-import com.jitlogic.zorka.central.db.DbUtil;
+import com.jitlogic.zorka.central.db.DbContext;
 import com.jitlogic.zorka.central.test.support.CentralFixture;
 import org.junit.Test;
+import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -29,10 +28,11 @@ public class DatabaseUnitTest extends CentralFixture {
 
     @Test
     public void testIfTablesHaveBeenCreated() throws Exception {
-        DbUtil util = instance.getDbUtil();
+        DbContext ctx = instance.getDbContext();
 
-        List<DbRecord> rec = util.select("select count(1) as cnt from SYMBOLS");
-        assertEquals(1, rec.size());
+        JdbcTemplate t = ctx.getJdbcTemplate();
+
+        assertEquals((Object) 1, t.queryForObject("select count(1) as cnt from SYMBOLS", Integer.class));
     }
 
 }

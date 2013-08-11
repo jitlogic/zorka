@@ -1,3 +1,8 @@
+package com.jitlogic.zorka.central.db;
+
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 /**
  * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -13,45 +18,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central;
 
+public class DbSymbolRegistry extends SymbolRegistry {
 
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
+    private JdbcTemplate jdbcTemplate;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.util.NavigableMap;
-
-/**
- * File backed trace entry set.
- */
-public class TraceEntrySet implements Closeable {
-
-    private DB db;
-
-    private NavigableMap<Long,TraceEntry> tracesByOffs;
-
-
-    public TraceEntrySet(String path) {
-        db = DBMaker.newFileDB(new File(path)).make();
-        tracesByOffs = db.getTreeMap("tracesByOffset");
+    public DbSymbolRegistry(DbContext ctx) {
+        this.jdbcTemplate = ctx.getJdbcTemplate();
     }
-
 
     @Override
-    public void close() throws IOException {
-        db.close();
+    protected void persist(int symbolId, String symbolName) {
+        jdbcTemplate.update("insert into CENTRAL.SYMBOLS (SID,NAME) values (?,?)", symbolId, symbolName);
     }
-
-
-    public void save(TraceEntry entry) {
-        tracesByOffs.put(entry.getOffs(), entry);
-    }
-
-    public int size() {
-        return tracesByOffs.size();
-    }
-
 }

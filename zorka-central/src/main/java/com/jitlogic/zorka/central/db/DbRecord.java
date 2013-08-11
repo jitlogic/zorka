@@ -20,6 +20,22 @@ import java.util.HashMap;
 
 public class DbRecord extends HashMap<String,Object> {
 
+    private DbTableDesc tableDesc;
 
+    public DbRecord(DbTableDesc tableDesc) {
+        this.tableDesc = tableDesc;
+    }
+
+    public DbTableDesc getTableDesc() {
+        return tableDesc;
+    }
+
+    public Integer getI(String key) {
+        return (Integer)get(key);
+    }
+
+    public String getS(String key) {
+        return (String)get(key);
+    }
 
 }

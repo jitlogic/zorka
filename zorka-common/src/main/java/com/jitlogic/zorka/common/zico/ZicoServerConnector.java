@@ -87,7 +87,7 @@ public class ZicoServerConnector extends ZicoConnector implements Runnable {
         } catch (Exception e) {
             // TODO log
             running = false;
-            e.printStackTrace();
+            //e.printStackTrace();
         } finally {
             try { close(); } catch (IOException e) { }
         }

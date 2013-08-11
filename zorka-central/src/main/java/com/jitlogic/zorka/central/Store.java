@@ -16,6 +16,10 @@
 package com.jitlogic.zorka.central;
 
 
+import com.jitlogic.zorka.central.db.DbContext;
+import com.jitlogic.zorka.central.db.DbRecord;
+import com.jitlogic.zorka.central.db.TraceTable;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
@@ -33,28 +37,33 @@ public class Store implements Closeable {
     private final static ZorkaLog log = ZorkaLogger.getLog(Store.class);
 
     private String hostname;
+    private Integer hostid;
     private String rootPath;
     private CentralConfig config;
 
     private RDSStore rds;
-    private SymbolSet symbols;
-    private TraceEntrySet traces;
+    private TraceTable traces;
+
+    private DbContext dbContext;
+    private SymbolRegistry symbolRegistry;
 
 
-    public Store(StoreManager manager, CentralConfig config, String hostname, String rootPath) {
+    public Store(CentralConfig config,
+                 DbRecord host, String root,
+                 DbContext dbContext,
+                 SymbolRegistry symbolRegistry) {
+
         this.config = config;
-        this.hostname = hostname;
-        this.rootPath = rootPath;
+        this.hostname = host.getS("HOST_NAME");
+        this.hostid = host.getI("HOST_ID");
+        this.rootPath = ZorkaUtil.path(root, host.getS("HOST_PATH"));
+        this.dbContext = dbContext;
+        this.symbolRegistry = symbolRegistry;
 
         File rootDir = new File(rootPath);
         if (!rootDir.exists()) {
             rootDir.mkdirs();
         }
-    }
-
-
-    public String getHostname() {
-        return hostname;
     }
 
 
@@ -79,17 +88,13 @@ public class Store implements Closeable {
     }
 
 
-    public synchronized SymbolSet getSymbols() {
-        if (symbols == null) {
-            symbols = new SymbolSet(ZorkaUtil.path(rootPath, "symbols.db"));
-        }
-        return symbols;
+    public SymbolRegistry getSymbolRegistry() {
+        return symbolRegistry;
     }
 
-
-    public synchronized TraceEntrySet getTraces() {
+    public synchronized TraceTable getTraces() {
         if (traces == null) {
-            traces = new TraceEntrySet(ZorkaUtil.path(rootPath, "traces.db"));
+            traces = new TraceTable(dbContext, symbolRegistry, hostid);
         }
         return traces;
     }
@@ -97,14 +102,6 @@ public class Store implements Closeable {
 
     @Override
     public synchronized void close() throws IOException {
-        try {
-            if (symbols != null) {
-                symbols.close();
-                symbols = null;
-            }
-        } catch (IOException e) {
-            log.error(ZorkaLogger.ZCL_STORE, "Cannot close symbols store '" + symbols + "' for " + hostname , e);
-        }
 
         try {
             if(traces != null) {

@@ -25,13 +25,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SymbolRegistry {
 
     /** ID of last symbol added to registry. */
-    private AtomicInteger lastSymbolId;
+    protected AtomicInteger lastSymbolId;
 
     /** Symbol name to ID map */
-    private ConcurrentMap<String,Integer> symbolIds;
+    protected ConcurrentMap<String,Integer> symbolIds;
 
     /** Symbol ID to name map */
-    private ConcurrentMap<Integer,String> symbolNames;
+    protected ConcurrentMap<Integer,String> symbolNames;
 
     public SymbolRegistry() {
         lastSymbolId  = new AtomicInteger(0);
@@ -98,10 +98,15 @@ public class SymbolRegistry {
         symbolIds.put(symbol, symbolId);
         symbolNames.put(symbolId, symbol);
 
-        // TODO not thread safe !
         if (symbolId > lastSymbolId.get()) {
             lastSymbolId.set(symbolId);
         }
+
+        persist(symbolId, symbol);
+    }
+
+    protected void persist(int symbolId, String symbolName) {
+        // To be overwritten in persistent variants of SymbolRegistry
     }
 
     public int size() {

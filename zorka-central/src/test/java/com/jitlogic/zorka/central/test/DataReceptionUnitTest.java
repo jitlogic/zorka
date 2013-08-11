@@ -16,9 +16,9 @@
 package com.jitlogic.zorka.central.test;
 
 import com.jitlogic.zorka.central.Store;
-import com.jitlogic.zorka.central.SymbolSet;
 import com.jitlogic.zorka.central.test.support.CentralFixture;
 
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import org.junit.Test;
 
@@ -29,25 +29,15 @@ public class DataReceptionUnitTest extends CentralFixture {
     @Test
     public void testAcquireSingleStoreAndCheckIfItWorks() throws Exception {
         Store store = storeManager.get("test");
-        SymbolSet symbols = store.getSymbols();
-        int t1 = symbols.get("t1"), t2 = symbols.get("t2");
+        SymbolRegistry symbols = store.getSymbolRegistry();
+        int t1 = symbols.symbolId("t1"), t2 = symbols.symbolId("t2");
 
-        assertEquals(t2, symbols.get("t2"));
-        assertEquals(t1, symbols.get("t1"));
+        assertEquals(t2, symbols.symbolId("t2"));
+        assertEquals(t1, symbols.symbolId("t1"));
         assertNotEquals(t1, t2);
 
         assertNotNull(store.getRds());
         assertNotNull(store.getTraces());
     }
 
-
-    @Test
-    public void testIfStorageManagerProperlyClosesAllStores() throws Exception {
-        Store store = storeManager.get("test");
-        store.getSymbols();
-
-        assertNotNull(ObjectInspector.getField(store, "symbols"));
-        storeManager.close();
-        assertNull(ObjectInspector.getField(store, "symbols"));
-    }
 }

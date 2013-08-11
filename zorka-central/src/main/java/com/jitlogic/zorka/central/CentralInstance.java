@@ -16,7 +16,10 @@
 package com.jitlogic.zorka.central;
 
 
-import com.jitlogic.zorka.central.db.DbUtil;
+import com.jitlogic.zorka.central.db.DbContext;
+import com.jitlogic.zorka.central.db.DbSymbolRegistry;
+import com.jitlogic.zorka.central.db.HostTable;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogLevel;
@@ -38,7 +41,11 @@ public class CentralInstance {
 
     private ZicoService zicoService;
 
-    private DbUtil dbUtil;
+    private DbContext dbContext;
+
+    private SymbolRegistry symbolRegistry;
+
+    private HostTable hostTable;
 
     public CentralInstance(CentralConfig config) {
         this.config = config;
@@ -69,9 +76,9 @@ public class CentralInstance {
             }
         }
 
-        if (dbUtil != null) {
+        if (dbContext != null) {
             try {
-                dbUtil.close();
+                dbContext.close();
             } catch (IOException e) {
                 // TODO log error
             }
@@ -136,9 +143,18 @@ public class CentralInstance {
     }
 
 
+    public synchronized SymbolRegistry getSymbolRegistry() {
+        if (symbolRegistry == null) {
+            symbolRegistry = new DbSymbolRegistry(getDbContext());
+        }
+
+        return symbolRegistry;
+    }
+
+
     public synchronized StoreManager getStoreManager() {
         if (null == storeManager) {
-            storeManager = new StoreManager(getConfig());
+            storeManager = new StoreManager(getConfig(), getDbContext(), getSymbolRegistry(), getHostTable());
         }
         return storeManager;
     }
@@ -155,11 +171,18 @@ public class CentralInstance {
     }
 
 
-    public synchronized DbUtil getDbUtil() {
-        if (dbUtil == null) {
-            dbUtil = new DbUtil(getConfig());
+    public synchronized DbContext getDbContext() {
+        if (dbContext == null) {
+            dbContext = new DbContext(getConfig());
         }
-        return dbUtil;
+        return dbContext;
     }
 
+
+    public synchronized HostTable getHostTable() {
+        if (hostTable == null) {
+            hostTable = new HostTable(getConfig(), getDbContext());
+        }
+        return hostTable;
+    }
 }
