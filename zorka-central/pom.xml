@@ -21,9 +21,20 @@
             <version>${mapdb.version}</version>
         </dependency>
         <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>${dbcp.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.jitlogic.zorka</groupId>
             <artifactId>zorka-common-test</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2db.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

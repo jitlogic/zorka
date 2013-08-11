@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.central;
 
 
+import com.jitlogic.zorka.central.db.DbUtil;
 import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogLevel;
@@ -36,6 +37,8 @@ public class CentralInstance {
     private StoreManager storeManager;
 
     private ZicoService zicoService;
+
+    private DbUtil dbUtil;
 
     public CentralInstance(CentralConfig config) {
         this.config = config;
@@ -61,6 +64,14 @@ public class CentralInstance {
         if (storeManager != null) {
             try {
                 storeManager.close();
+            } catch (IOException e) {
+                // TODO log error
+            }
+        }
+
+        if (dbUtil != null) {
+            try {
+                dbUtil.close();
             } catch (IOException e) {
                 // TODO log error
             }
@@ -132,6 +143,7 @@ public class CentralInstance {
         return storeManager;
     }
 
+
     public synchronized ZicoService getZicoService() {
         if (null == zicoService) {
             zicoService = new ZicoService(
@@ -140,6 +152,14 @@ public class CentralInstance {
                  getStoreManager());
         }
         return zicoService;
+    }
+
+
+    public synchronized DbUtil getDbUtil() {
+        if (dbUtil == null) {
+            dbUtil = new DbUtil(getConfig());
+        }
+        return dbUtil;
     }
 
 }

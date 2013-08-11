@@ -45,9 +45,13 @@ public class CentralFixture {
         new File(tmpDir).mkdirs();
 
         configProperties = setProps(
-                ZorkaConfig.defaultProperties(CentralConfig.DEFAULT_CONF_PATH),
-                "central.home.dir", tmpDir,
-                "zico.service", "no"
+            ZorkaConfig.defaultProperties(CentralConfig.DEFAULT_CONF_PATH),
+            "central.home.dir", tmpDir,
+            "zico.service",     "no",
+            "central.db.type",  "h2",
+            "central.db.url",   "jdbc:h2:mem:test",
+            "central.db.user",  "sa",
+            "central.db.pass",  "sa"
         );
 
         config = new CentralConfig(configProperties);
