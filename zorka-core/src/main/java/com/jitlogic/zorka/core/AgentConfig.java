@@ -37,7 +37,7 @@ public class AgentConfig extends ZorkaConfig {
 
 
     public AgentConfig(String home) {
-        loadProperties(home, DEFAULT_CONF_PATH);
+        loadProperties(home, "zorka.properties", DEFAULT_CONF_PATH);
         setBaseProps();
         loadProfiles();
     }

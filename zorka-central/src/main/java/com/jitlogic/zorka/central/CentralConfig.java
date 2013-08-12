@@ -32,7 +32,7 @@ public class CentralConfig extends ZorkaConfig {
     }
 
     public CentralConfig(String home) {
-        loadProperties(home, DEFAULT_CONF_PATH);
+        loadProperties(home, "central.properties", DEFAULT_CONF_PATH);
         setBaseProps();
     }
 

@@ -7,7 +7,7 @@
  *
  */
 
-package com.jitlogic.zorka.core.util;
+package com.jitlogic.zorka.common.util;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;

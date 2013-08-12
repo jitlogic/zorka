@@ -57,10 +57,13 @@ public class DbContext implements Closeable {
         dataSource.setDriverClassName(config.stringCfg("central.db.driver", null));
         dataSource.setUrl(config.stringCfg("central.db.url", null));
         dataSource.setUsername(config.stringCfg("central.db.user", null));
-        dataSource.setUsername(config.stringCfg("central.db.pass", null));
+        dataSource.setPassword(config.stringCfg("central.db.pass", null));
 
         jdbcTemplate = new JdbcTemplate(dataSource);
-        jdbcTemplate.execute("RUNSCRIPT FROM 'classpath:/com/jitlogic/zorka/central/" + dbType + ".createdb.sql'");
+
+        if (config.boolCfg("central.db.create", false)) {
+            jdbcTemplate.execute("RUNSCRIPT FROM 'classpath:/com/jitlogic/zorka/central/" + dbType + ".createdb.sql'");
+        }
 
         namedTemplate = new NamedParameterJdbcTemplate(dataSource);
     }

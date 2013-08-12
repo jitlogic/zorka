@@ -13,26 +13,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.test;
+package com.jitlogic.zorka.central.jedi;
 
 
-import com.jitlogic.zorka.central.db.DbContext;
-import com.jitlogic.zorka.central.test.support.CentralFixture;
-import org.junit.Test;
-import org.springframework.jdbc.core.JdbcTemplate;
+import java.util.Map;
 
+/**
+ * JEDI stands for JSON Extensible Data Interface.
+ */
+public interface JediService {
 
-import static org.junit.Assert.*;
+    public Object GET(String path, Map<String,String> params);
 
-public class DatabaseUnitTest extends CentralFixture {
+    public Object PUT(String path, Map<String,String> params, Object data);
 
-    @Test
-    public void testIfTablesHaveBeenCreated() throws Exception {
-        DbContext ctx = instance.getDbContext();
+    public Object DELETE(String path, Map<String,String> params);
 
-        JdbcTemplate t = ctx.getJdbcTemplate();
-
-        assertEquals((Object) 1, t.queryForObject("select count(1) as cnt from SYMBOLS", Integer.class));
-    }
-
+    public Object POST(String path, Map<String,String> params, Object data);
 }

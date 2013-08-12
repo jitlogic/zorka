@@ -19,6 +19,8 @@ package com.jitlogic.zorka.central.test.support;
 import com.jitlogic.zorka.central.CentralConfig;
 import com.jitlogic.zorka.central.CentralInstance;
 import com.jitlogic.zorka.central.StoreManager;
+import com.jitlogic.zorka.central.db.HostTable;
+import com.jitlogic.zorka.central.jedi.JediService;
 import com.jitlogic.zorka.common.test.support.TestUtil;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.zico.ZicoService;
@@ -38,6 +40,9 @@ public class CentralFixture {
     protected StoreManager storeManager;
     protected ZicoService zicoService;
 
+    protected HostTable hostTable;
+    protected JediService jediService;
+
     @Before
     public void setUpCentralFixture() throws Exception {
         tmpDir = "/tmp" + File.separatorChar + "zorka-unit-test";
@@ -51,7 +56,8 @@ public class CentralFixture {
             "central.db.type",  "h2",
             "central.db.url",   "jdbc:h2:mem:test",
             "central.db.user",  "sa",
-            "central.db.pass",  "sa"
+            "central.db.pass",  "sa",
+            "central.db.create", "yes"
         );
 
         config = new CentralConfig(configProperties);
@@ -61,6 +67,9 @@ public class CentralFixture {
 
         storeManager = instance.getStoreManager();
         zicoService = instance.getZicoService();
+
+        hostTable = instance.getHostTable();
+        jediService = instance.getJediService();
     }
 
     @After

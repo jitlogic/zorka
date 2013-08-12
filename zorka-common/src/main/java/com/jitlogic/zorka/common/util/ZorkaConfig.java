@@ -284,10 +284,10 @@ public abstract class ZorkaConfig {
      *
      * @param home home directory for zorka agent
      */
-    protected void loadProperties(String home, String defPath) {
+    protected void loadProperties(String home, String fname, String defPath) {
         homeDir = home;
         properties = defaultProperties(defPath);
-        String propPath = ZorkaUtil.path(homeDir, "zorka.properties");
+        String propPath = ZorkaUtil.path(homeDir, fname);
         loadCfg(properties, propPath, true);
 
         properties.put(PROP_HOME_DIR, homeDir);

@@ -17,8 +17,12 @@ package com.jitlogic.zorka.central;
 
 
 import com.jitlogic.zorka.central.db.DbContext;
+import com.jitlogic.zorka.central.db.DbRecord;
 import com.jitlogic.zorka.central.db.DbSymbolRegistry;
 import com.jitlogic.zorka.central.db.HostTable;
+import com.jitlogic.zorka.central.jedi.JediCompositeService;
+import com.jitlogic.zorka.central.jedi.JediEntityProxyService;
+import com.jitlogic.zorka.central.jedi.JediService;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.common.util.ZorkaLog;
@@ -41,11 +45,13 @@ public class CentralInstance {
 
     private ZicoService zicoService;
 
-    private DbContext dbContext;
+    private DbContext db;
 
     private SymbolRegistry symbolRegistry;
 
     private HostTable hostTable;
+
+    private JediCompositeService jediService;
 
     public CentralInstance(CentralConfig config) {
         this.config = config;
@@ -76,9 +82,9 @@ public class CentralInstance {
             }
         }
 
-        if (dbContext != null) {
+        if (db != null) {
             try {
-                dbContext.close();
+                db.close();
             } catch (IOException e) {
                 // TODO log error
             }
@@ -145,7 +151,7 @@ public class CentralInstance {
 
     public synchronized SymbolRegistry getSymbolRegistry() {
         if (symbolRegistry == null) {
-            symbolRegistry = new DbSymbolRegistry(getDbContext());
+            symbolRegistry = new DbSymbolRegistry(getDb());
         }
 
         return symbolRegistry;
@@ -154,7 +160,7 @@ public class CentralInstance {
 
     public synchronized StoreManager getStoreManager() {
         if (null == storeManager) {
-            storeManager = new StoreManager(getConfig(), getDbContext(), getSymbolRegistry(), getHostTable());
+            storeManager = new StoreManager(getConfig(), getDb(), getSymbolRegistry(), getHostTable());
         }
         return storeManager;
     }
@@ -171,18 +177,27 @@ public class CentralInstance {
     }
 
 
-    public synchronized DbContext getDbContext() {
-        if (dbContext == null) {
-            dbContext = new DbContext(getConfig());
+    public synchronized DbContext getDb() {
+        if (db == null) {
+            db = new DbContext(getConfig());
         }
-        return dbContext;
+        return db;
     }
 
 
     public synchronized HostTable getHostTable() {
         if (hostTable == null) {
-            hostTable = new HostTable(getConfig(), getDbContext());
+            hostTable = new HostTable(getConfig(), getDb());
         }
         return hostTable;
+    }
+
+
+    public synchronized JediService getJediService() {
+        if (jediService == null) {
+            jediService = new JediCompositeService();
+            jediService.register("hosts", new JediEntityProxyService<DbRecord>(getHostTable()));
+        }
+        return jediService;
     }
 }

@@ -1,9 +1,11 @@
 package com.jitlogic.zorka.central.db;
 
 import com.jitlogic.zorka.central.CentralConfig;
+import com.jitlogic.zorka.central.jedi.JediEntityProxy;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
@@ -21,7 +23,7 @@ import java.util.List;
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class HostTable {
+public class HostTable implements JediEntityProxy<DbRecord> {
 
     private DbContext db;
     private JdbcTemplate jdbc;
@@ -34,6 +36,19 @@ public class HostTable {
         this.jdbc = this.db.getJdbcTemplate();
         this.tdesc = db.getNamedDesc("HOSTS");
 
+    }
+
+    @Override
+    public List<DbRecord> list(Map<String, String> params) {
+        return jdbc.query("select * from HOSTS order by HOST_NAME", tdesc);
+    }
+
+
+    @Override
+    public DbRecord get(String id, Map<String, String> params) {
+        List<DbRecord> lst = jdbc.query("select * from HOSTS where HOST_ID = ?",
+                new Object[] { Integer.parseInt(id) }, tdesc);
+        return lst.size() > 0 ? lst.get(0) : null;
     }
 
 

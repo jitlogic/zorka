@@ -16,11 +16,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mapdb</groupId>
-            <artifactId>mapdb</artifactId>
-            <version>${mapdb.version}</version>
-        </dependency>
-        <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
             <version>${dbcp.version}</version>
@@ -40,7 +35,6 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>${h2db.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
