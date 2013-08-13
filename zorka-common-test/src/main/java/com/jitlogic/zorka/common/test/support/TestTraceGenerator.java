@@ -61,6 +61,7 @@ public class TestTraceGenerator {
         tr.setSignatureId(rsid(methodSignatures));
         tr.setTime(rmtime());
         tr.setFlags(TraceRecord.TRACE_BEGIN);
+        tr.setAttr(rsid("SQL"), "SELECT * from XXX");
 
         TraceMarker tm = new TraceMarker(tr, rsid(traceMarkers), 100);
         tr.setMarker(tm);

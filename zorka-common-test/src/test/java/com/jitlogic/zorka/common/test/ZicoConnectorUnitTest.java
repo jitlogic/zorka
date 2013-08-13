@@ -135,7 +135,7 @@ public class ZicoConnectorUnitTest { //extends CentralFixture {
     }
 
 
-    @Test(timeout = 1000)
+    @Test//(timeout = 1000)
     public void testSendSimpleSymbolMessage() throws Exception {
         service = new ZicoService("127.0.0.1", 8643, factory);
         service.start();

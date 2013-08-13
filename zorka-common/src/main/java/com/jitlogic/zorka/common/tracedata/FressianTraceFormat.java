@@ -142,7 +142,14 @@ public class FressianTraceFormat {
             tr.setErrors(r.readInt());
             tr.setMarker((TraceMarker)r.readObject());
             tr.setException(r.readObject());
-            tr.setAttrs((Map<Integer,Object>)r.readObject());
+
+            Map<Long,Object> m = (Map<Long,Object>)r.readObject();
+
+            if (m != null) {
+                for (Map.Entry<Long,Object> e : m.entrySet()) {
+                    tr.setAttr((int)(long)e.getKey(), e.getValue());
+                }
+            }
 
             List<TraceRecord> children = (List<TraceRecord>)r.readObject();
 

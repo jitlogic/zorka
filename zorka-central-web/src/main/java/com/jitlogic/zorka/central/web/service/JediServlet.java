@@ -15,36 +15,34 @@
  */
 package com.jitlogic.zorka.central.web.service;
 
-import com.jitlogic.zorka.central.jedi.JediService;
+import com.jitlogic.zorka.central.roof.RoofService;
 import com.jitlogic.zorka.common.util.JSONWriter;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class JediServlet extends HttpServlet {
 
-    private JediService service = CentralApp.getInstance().getJediService(); // TODO decouple this ...
+    private RoofService service = CentralApp.getInstance().getJediService(); // TODO decouple this ...
 
-    private static final Pattern RE_SLASH = Pattern.compile("\\/");
+    private static final Pattern RE_SLASH = Pattern.compile("/");
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
         List<String> segs = Arrays.asList(RE_SLASH.split(req.getRequestURI()));
 
-        String path = null;
+        List<String> path = null;
 
         for (int i = 0; i < segs.size(); i++) {
             if ("jedi".equals(segs.get(i))) {
-                path = ZorkaUtil.join("/", segs.subList(i+1, segs.size()));
+                path = segs.subList(i+1, segs.size());
             }
         }
 

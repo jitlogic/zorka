@@ -13,18 +13,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.jedi;
+package com.jitlogic.zorka.common.test;
 
-public class JediException extends RuntimeException {
 
-    private int status;
+import com.jitlogic.zorka.common.zico.ZicoDataLoader;
+import org.junit.Test;
 
-    public JediException(int status, String message) {
-        super(message);
-        this.status = status;
+public class DataLoadingManualTest {
+
+    @Test
+    public void testLoadDataFile() throws Exception {
+        ZicoDataLoader loader = new ZicoDataLoader("127.0.0.1", 8640, "test", "");
+        loader.load("/works/zorka-traces/cg/tw.prd.nsn/traces/trace.ztr.10");
     }
 
-    public int getStatus() {
-        return status;
-    }
 }

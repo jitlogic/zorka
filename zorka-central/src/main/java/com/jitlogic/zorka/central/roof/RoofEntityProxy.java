@@ -13,16 +13,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.jedi;
+package com.jitlogic.zorka.central.roof;
 
 import java.util.List;
 import java.util.Map;
 
 
-public interface JediEntityProxy<T> {
+public interface RoofEntityProxy {
 
-    public List<T> list(Map<String,String> params);
+    // TODO flyweight pattern desperately needed here ...
 
-    public T get(String id, Map<String,String> params);
+    // TODO make this a simple marker interface
+
+    public List list(Map<String,String> params);
+
+    public Object get(List<String> id, Map<String,String> params);
 
 }

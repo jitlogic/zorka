@@ -13,21 +13,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.jedi;
+package com.jitlogic.zorka.central.roof;
 
-
-import java.util.Map;
-
-/**
- * JEDI stands for JSON Extensible Data Interface.
- */
-public interface JediService {
-
-    public Object GET(String path, Map<String,String> params);
-
-    public Object PUT(String path, Map<String,String> params, Object data);
-
-    public Object DELETE(String path, Map<String,String> params);
-
-    public Object POST(String path, Map<String,String> params, Object data);
+public @interface RoofAction {
+    String value();
 }

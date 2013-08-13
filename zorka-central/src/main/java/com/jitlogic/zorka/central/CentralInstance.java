@@ -20,9 +20,9 @@ import com.jitlogic.zorka.central.db.DbContext;
 import com.jitlogic.zorka.central.db.DbRecord;
 import com.jitlogic.zorka.central.db.DbSymbolRegistry;
 import com.jitlogic.zorka.central.db.HostTable;
-import com.jitlogic.zorka.central.jedi.JediCompositeService;
-import com.jitlogic.zorka.central.jedi.JediEntityProxyService;
-import com.jitlogic.zorka.central.jedi.JediService;
+import com.jitlogic.zorka.central.roof.RoofCompositeService;
+import com.jitlogic.zorka.central.roof.RoofEntityProxyService;
+import com.jitlogic.zorka.central.roof.RoofService;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.common.util.ZorkaLog;
@@ -51,7 +51,7 @@ public class CentralInstance {
 
     private HostTable hostTable;
 
-    private JediCompositeService jediService;
+    private RoofCompositeService jediService;
 
     public CentralInstance(CentralConfig config) {
         this.config = config;
@@ -193,10 +193,10 @@ public class CentralInstance {
     }
 
 
-    public synchronized JediService getJediService() {
+    public synchronized RoofService getJediService() {
         if (jediService == null) {
-            jediService = new JediCompositeService();
-            jediService.register("hosts", new JediEntityProxyService<DbRecord>(getHostTable()));
+            jediService = new RoofCompositeService();
+            jediService.register("hosts", new RoofEntityProxyService<DbRecord>(getHostTable()));
         }
         return jediService;
     }

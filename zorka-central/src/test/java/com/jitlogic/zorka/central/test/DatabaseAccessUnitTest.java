@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,9 +41,14 @@ public class DatabaseAccessUnitTest extends CentralFixture {
 
     @Test
     public void testHostJediService() {
-        assertEquals(0, ((List)jediService.GET("hosts", new HashMap<String, String>())).size());
+        assertEquals(0, ((List) roofService.GET(Arrays.asList("hosts"), new HashMap<String, String>())).size());
         hostTable.getHost("test", "test");
-        assertEquals(1, ((List)jediService.GET("hosts", new HashMap<String, String>())).size());
+        assertEquals(1, ((List) roofService.GET(Arrays.asList("hosts"), new HashMap<String, String>())).size());
+    }
+
+    @Test
+    public void testAccessTraceTableViaHost() {
+
     }
 
 }

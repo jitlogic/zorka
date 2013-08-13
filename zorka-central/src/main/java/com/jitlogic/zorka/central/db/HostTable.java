@@ -1,9 +1,13 @@
 package com.jitlogic.zorka.central.db;
 
 import com.jitlogic.zorka.central.CentralConfig;
-import com.jitlogic.zorka.central.jedi.JediEntityProxy;
+import com.jitlogic.zorka.central.roof.RoofCollection;
+import com.jitlogic.zorka.central.roof.RoofEntityProxy;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,12 +27,15 @@ import java.util.Map;
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class HostTable implements JediEntityProxy<DbRecord> {
+public class HostTable implements RoofEntityProxy {
 
     private DbContext db;
     private JdbcTemplate jdbc;
 
     private DbTableDesc tdesc;
+
+    private SymbolRegistry symbolRegistry;
+    private DbContext dbContext;
 
 
     public HostTable(CentralConfig config, DbContext db) {
@@ -39,16 +46,26 @@ public class HostTable implements JediEntityProxy<DbRecord> {
     }
 
     @Override
-    public List<DbRecord> list(Map<String, String> params) {
+    public List list(Map<String, String> params) {
         return jdbc.query("select * from HOSTS order by HOST_NAME", tdesc);
     }
 
 
     @Override
-    public DbRecord get(String id, Map<String, String> params) {
+    public DbRecord get(List<String> id, Map<String, String> params) {
         List<DbRecord> lst = jdbc.query("select * from HOSTS where HOST_ID = ?",
-                new Object[] { Integer.parseInt(id) }, tdesc);
+                new Object[] { Integer.parseInt(id.get(0)) }, tdesc);
         return lst.size() > 0 ? lst.get(0) : null;
+    }
+
+
+    @RoofCollection("traces")
+    public TraceTable getTraceTable(String id) {
+        DbRecord rec = get(Arrays.asList(id), new HashMap<String, String>());
+        if (rec != null) {
+            return new TraceTable(dbContext, symbolRegistry, rec.getI("HOST_ID"));
+        }
+        return null;
     }
 
 

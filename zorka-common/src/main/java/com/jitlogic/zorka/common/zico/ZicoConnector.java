@@ -38,7 +38,7 @@ import java.util.zip.CRC32;
 public abstract class ZicoConnector implements Closeable {
 
     /** */
-    public final static int HEADER_LENGTH = 10;
+    public final static int HEADER_LENGTH = 14;
 
     public final static int[] ZICO_MAGIC = { 0x21, 0xC0, 0xBA, 0xBE };
 
@@ -75,10 +75,19 @@ public abstract class ZicoConnector implements Closeable {
 
         short type = buf.getShort();
         int length = buf.getInt();
-        long crc32 = buf.getInt() & 0xffffffffL;
+        long crc32 = buf.getLong();
 
         byte[] d = new byte[length];
-        in.read(d);
+        int offs = 0;
+
+        while (offs < length) {
+            int rlen = in.read(d, offs, length-offs);
+            if (rlen >= 0) {
+                offs += rlen;
+            } else {
+                throw new ZicoException(ZicoPacket.ZICO_BAD_REQUEST, "Unexpected end of stream.");
+            }
+        }
 
         CRC32 crc = new CRC32();
         crc.update(d);
@@ -100,7 +109,7 @@ public abstract class ZicoConnector implements Closeable {
      *
      * @throws IOException
      */
-    public void send(int type, byte... data) throws IOException {
+    public void send(int type, byte...data) throws IOException {
         CRC32 crc = new CRC32();
         crc.update(data);
 
@@ -112,7 +121,7 @@ public abstract class ZicoConnector implements Closeable {
         ByteBuffer buf = ByteBuffer.wrap(b);
         buf.putShort((short)type);
         buf.putInt(data.length);
-        buf.putInt((int)(crc.getValue() & 0xffffffff));
+        buf.putLong(crc.getValue());
 
         out.write(b);
         if (data.length > 0) {

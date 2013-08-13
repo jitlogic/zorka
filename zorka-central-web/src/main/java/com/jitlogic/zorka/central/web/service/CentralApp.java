@@ -37,8 +37,6 @@ public class CentralApp {
             }
             CentralConfig config = new CentralConfig(homeDir);
             System.out.println("Database URL: " + config.stringCfg("central.db.url", "??"));
-            System.out.println("Database URL: " + config.stringCfg("central.db.url", "??"));
-            System.out.println("Database URL: " + config.stringCfg("central.db.url", "??"));
             instance = new CentralInstance(config);
             instance.start();
         }

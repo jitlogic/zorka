@@ -20,7 +20,7 @@ import com.jitlogic.zorka.central.CentralConfig;
 import com.jitlogic.zorka.central.CentralInstance;
 import com.jitlogic.zorka.central.StoreManager;
 import com.jitlogic.zorka.central.db.HostTable;
-import com.jitlogic.zorka.central.jedi.JediService;
+import com.jitlogic.zorka.central.roof.RoofService;
 import com.jitlogic.zorka.common.test.support.TestUtil;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.zico.ZicoService;
@@ -41,7 +41,7 @@ public class CentralFixture {
     protected ZicoService zicoService;
 
     protected HostTable hostTable;
-    protected JediService jediService;
+    protected RoofService roofService;
 
     @Before
     public void setUpCentralFixture() throws Exception {
@@ -69,7 +69,7 @@ public class CentralFixture {
         zicoService = instance.getZicoService();
 
         hostTable = instance.getHostTable();
-        jediService = instance.getJediService();
+        roofService = instance.getJediService();
     }
 
     @After

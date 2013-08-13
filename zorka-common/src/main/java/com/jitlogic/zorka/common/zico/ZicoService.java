@@ -82,12 +82,14 @@ public class ZicoService implements Runnable {
     public void start() {
         if (thread == null) {
             try {
+                System.out.println("Starting ZICO service at " + listenAddr + ":" + listenPort);
                 socket = new ServerSocket(listenPort, 0, listenAddr);
                 thread = new Thread(this);
                 thread.setDaemon(true);
                 thread.setName("ZICO-acceptor-"+listenPort);
                 running = true;
                 thread.start();
+                System.out.println("ZICO service started.");
             } catch (IOException e) {
                 // TODO Log error here
             }

@@ -15,11 +15,8 @@
                   <g:ListBox ui:field="hostList"/>
               </g:HorizontalPanel>
           </g:north>
-          <g:west size="35">
-              <g:HTML>West panel.</g:HTML>
-          </g:west>
           <g:center>
-              <g:ScrollPanel>
+              <g:ScrollPanel width="100" height="100">
                   <c:CellTable ui:field="cellTable" addStyleNames="{style.cellTable}"/>
               </g:ScrollPanel>
           </g:center>
