@@ -17,11 +17,15 @@ package com.jitlogic.zorka.central.web.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.cellview.client.DataGrid;
+import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -32,29 +36,58 @@ public class TraceListPanel extends Composite {
 
     private static TraceListPanelUiBinder ourUiBinder = GWT.create(TraceListPanelUiBinder.class);
 
-    @UiField
-    ListBox hostList;
+    @UiField ListBox hostList;
+    @UiField DataGrid<RoofRecord> traceTable;
+    @UiField SimplePager pager;
 
-    @UiField
-    CellTable<String[]> cellTable;
 
-    JediClient<JediRecord> client = new JediClient<JediRecord>("jedi/hosts");
+    RoofClient<RoofRecord> client = new RoofClient<RoofRecord>("roof/hosts");
+    RoofTableDataProvider traceListProvider = new RoofTableDataProvider(client);
+
 
     public TraceListPanel() {
         initWidget(ourUiBinder.createAndBindUi(this));
-        client.list(null, new AsyncCallback<JsArray<JediRecord>>() {
+        loadHostList();
+        configureTraceTable();
+    }
+
+    private void loadHostList() {
+        client.list(null, new AsyncCallback<JsArray<RoofRecord>>() {
             @Override
             public void onFailure(Throwable e) {
                 GWT.log("Error fetching host list", e);
             }
 
             @Override
-            public void onSuccess(JsArray<JediRecord> result) {
+            public void onSuccess(JsArray<RoofRecord> result) {
                 for (int i = 0; i < result.length(); i++) {
-                    JediRecord rec = result.get(i);
+                    RoofRecord rec = result.get(i);
                     hostList.addItem(rec.getS("HOST_NAME"), ""+rec.getI("HOST_ID"));
                 }
             }
         });
+    }
+
+
+    private void configureTraceTable() {
+        RoofDataColumnRenderers.tstampColumn(traceTable, "CLOCK", "Timestamp", "125px");
+        RoofDataColumnRenderers.durationColumn(traceTable, "EXTIME", "Time", "75px");
+        RoofDataColumnRenderers.textColumn(traceTable, "CALLS", "Calls", "75px");
+        RoofDataColumnRenderers.textColumn(traceTable, "ERRORS", "Errs", "75px");
+        RoofDataColumnRenderers.textColumn(traceTable, "RECORDS", "Recs", "75px");
+        RoofDataColumnRenderers.textColumn(traceTable, "OVERVIEW", "Description", null);
+
+        traceListProvider.addDataDisplay(traceTable);
+        traceTable.setEmptyTableWidget(new Label("No traces"));
+
+        pager.setDisplay(traceTable);
+    }
+
+
+    @UiHandler("hostList")
+    public void onHostChange(ChangeEvent e) {
+        String hostIdStr = hostList.getValue(hostList.getSelectedIndex());
+        GWT.log("Selecting host: " + hostIdStr);
+        traceListProvider.setHostId(hostIdStr);
     }
 }

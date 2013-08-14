@@ -24,12 +24,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
-public class JediServlet extends HttpServlet {
+public class RoofServlet extends HttpServlet {
 
-    private RoofService service = CentralApp.getInstance().getJediService(); // TODO decouple this ...
+    private RoofService service = CentralApp.getInstance().getRoofService(); // TODO decouple this ...
 
     private static final Pattern RE_SLASH = Pattern.compile("/");
 
@@ -38,16 +40,22 @@ public class JediServlet extends HttpServlet {
 
         List<String> segs = Arrays.asList(RE_SLASH.split(req.getRequestURI()));
 
-        List<String> path = null;
+        List<String> path = segs;
 
-        for (int i = 0; i < segs.size(); i++) {
-            if ("jedi".equals(segs.get(i))) {
-                path = segs.subList(i+1, segs.size());
-            }
+        do {
+            path = path.subList(1, path.size());
+        } while (path.size() > 0 && !path.get(0).equals("roof"));
+
+        path = path.subList(1, path.size());
+
+        Map<String,String> params = new HashMap<String, String>();
+
+        for (Object key : req.getParameterMap().keySet()) {
+            params.put(key.toString(), req.getParameter(key.toString()));
         }
 
-        if (path != null) {
-            Object rslt = service.GET(path, req.getParameterMap());
+        if (path.size() > 0) {
+            Object rslt = service.GET(path, params);
             resp.getWriter().write(new JSONWriter().write(rslt));
         } else {
             resp.getWriter().println("Bad request.");

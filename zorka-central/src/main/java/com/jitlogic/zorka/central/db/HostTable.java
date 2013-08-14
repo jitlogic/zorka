@@ -1,6 +1,7 @@
 package com.jitlogic.zorka.central.db;
 
 import com.jitlogic.zorka.central.CentralConfig;
+import com.jitlogic.zorka.central.roof.RoofAction;
 import com.jitlogic.zorka.central.roof.RoofCollection;
 import com.jitlogic.zorka.central.roof.RoofEntityProxy;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
@@ -35,14 +36,13 @@ public class HostTable implements RoofEntityProxy {
     private DbTableDesc tdesc;
 
     private SymbolRegistry symbolRegistry;
-    private DbContext dbContext;
 
 
-    public HostTable(CentralConfig config, DbContext db) {
+    public HostTable(CentralConfig config, DbContext db, SymbolRegistry symbolRegistry) {
         this.db = db;
         this.jdbc = this.db.getJdbcTemplate();
         this.tdesc = db.getNamedDesc("HOSTS");
-
+        this.symbolRegistry = symbolRegistry;
     }
 
     @Override
@@ -58,13 +58,19 @@ public class HostTable implements RoofEntityProxy {
         return lst.size() > 0 ? lst.get(0) : null;
     }
 
+    @RoofAction("count")
+    public int count() {
+        return jdbc.queryForObject("select count(1) from HOSTS", Integer.class);
+    }
 
     @RoofCollection("traces")
     public TraceTable getTraceTable(String id) {
         DbRecord rec = get(Arrays.asList(id), new HashMap<String, String>());
+
         if (rec != null) {
-            return new TraceTable(dbContext, symbolRegistry, rec.getI("HOST_ID"));
+            return new TraceTable(db, symbolRegistry, rec.getI("HOST_ID"));
         }
+
         return null;
     }
 

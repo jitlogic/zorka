@@ -187,16 +187,16 @@ public class CentralInstance {
 
     public synchronized HostTable getHostTable() {
         if (hostTable == null) {
-            hostTable = new HostTable(getConfig(), getDb());
+            hostTable = new HostTable(getConfig(), getDb(), getSymbolRegistry());
         }
         return hostTable;
     }
 
 
-    public synchronized RoofService getJediService() {
+    public synchronized RoofService getRoofService() {
         if (jediService == null) {
             jediService = new RoofCompositeService();
-            jediService.register("hosts", new RoofEntityProxyService<DbRecord>(getHostTable()));
+            jediService.register("hosts", new RoofEntityProxyService(getHostTable()));
         }
         return jediService;
     }

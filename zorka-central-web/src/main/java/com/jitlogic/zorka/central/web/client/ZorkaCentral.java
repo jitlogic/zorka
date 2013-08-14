@@ -18,29 +18,24 @@ package com.jitlogic.zorka.central.web.client;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 
 
 public class ZorkaCentral implements EntryPoint {
 
+    TabLayoutPanel tabPanel;
+
+
     public void onModuleLoad() {
-//        final VerticalPanel vp = new VerticalPanel();
-//        JediClient<JediRecord> client = new JediClient<JediRecord>("hosts");
-//        vp.add(new Label(client.getUrl()));
-        RootPanel.get("CentralConsole").add(new TraceListPanel());
+        tabPanel = new TabLayoutPanel(2.5, Style.Unit.EM);
+        tabPanel.add(new HostListPanel(), "Hosts");
+        tabPanel.add(new TraceListPanel(), "Traces1");
+        tabPanel.add(new TraceListPanel(), "Traces2");
+        tabPanel.setWidth("100%");
+        tabPanel.setHeight("100%");
 
-//        client.list("hosts", new AsyncCallback<JsArray<JediRecord>>() {
-//            @Override
-//            public void onFailure(Throwable caught) {
-//                vp.add(new Label("ERROR: " + caught.getMessage()));
-//            }
-//
-//            @Override
-//            public void onSuccess(JsArray<JediRecord> result) {
-//                vp.add(new Label("ADR: " + result.get(0).get("HOST_ADDR")));
-//            }
-//        });
-
+        RootPanel.get("CentralConsole").add(tabPanel);
     }
 }

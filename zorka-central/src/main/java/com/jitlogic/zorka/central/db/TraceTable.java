@@ -16,36 +16,32 @@
 package com.jitlogic.zorka.central.db;
 
 
+import com.jitlogic.zorka.central.roof.RoofAction;
+import com.jitlogic.zorka.central.roof.RoofEntityProxy;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.io.Closeable;
-import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Database backed trace entry set.
  */
-public class TraceTable implements Closeable {
+public class TraceTable implements RoofEntityProxy {
 
     private int hostid;
     private DbContext db;
-    private JdbcTemplate template;
+    private DbTableDesc tdesc;
+    private JdbcTemplate jdbc;
     private SymbolRegistry symbolRegistry;
 
     public TraceTable(DbContext dbContext, SymbolRegistry symbolRegistry, int hostid) {
         this.symbolRegistry = symbolRegistry;
         this.db = dbContext;
-        this.template = this.db.getJdbcTemplate();
+        this.jdbc = this.db.getJdbcTemplate();
         this.hostid = hostid;
-
-
-    }
-
-
-    @Override
-    public void close() throws IOException {
+        this.tdesc = this.db.getNamedDesc("TRACES");
     }
 
 
@@ -63,30 +59,58 @@ public class TraceTable implements Closeable {
 
 
 
-        template.update("insert into TRACES (HOST_ID,DATA_OFFS,TRACE_ID,DATA_LEN,CLOCK,RFLAGS,TFLAGS,CALLS,"
+        jdbc.update("insert into TRACES (HOST_ID,DATA_OFFS,TRACE_ID,DATA_LEN,CLOCK,RFLAGS,TFLAGS,CALLS,"
                 + "ERRORS,RECORDS,EXTIME,OVERVIEW) " + "values(?,?,?,?,?,?,?,?,?,?,?,?)",
-                        hostid,
-                        offs,
-                        rec.getMarker().getTraceId(),
-                        length,
-                        rec.getClock(),
-                        rec.getFlags(),
-                        rec.getMarker().getFlags(),
-                        rec.getCalls(),
-                        rec.getErrors(),
-                        numRecords(rec),
-                        rec.getTime(),
-                        overview.length() > 250 ? overview.toString().substring(0, 250) : overview.toString());
+                hostid,
+                offs,
+                rec.getMarker().getTraceId(),
+                length,
+                rec.getClock(),
+                rec.getFlags(),
+                rec.getMarker().getFlags(),
+                rec.getCalls(),
+                rec.getErrors(),
+                numRecords(rec),
+                rec.getTime(),
+                overview.length() > 250 ? overview.toString().substring(0, 250) : overview.toString());
     }
 
 
     private int numRecords(TraceRecord rec) {
-        return 1;
+        return 1; // TODO
     }
 
 
+    @RoofAction("count")
     public int size() {
-        return db.getJdbcTemplate().queryForObject("select count(1) from TRACES", Integer.class);
+        return db.getJdbcTemplate().queryForObject("select count(1) from TRACES where HOST_ID = " + hostid, Integer.class);
     }
 
+
+    @Override
+    public List list(Map<String, String> params) {
+        String sLimit = params.get("limit"), sOffset = params.get("offset");
+
+        StringBuilder sb = new StringBuilder();
+
+        if (sLimit != null) {
+            sb.append(" limit ");
+            sb.append(sLimit);
+            if (sOffset != null) {
+                sb.append(" offset ");
+                sb.append(sOffset);
+            }
+        }
+
+        return jdbc.query("select * from TRACES where HOST_ID = ? order by DATA_OFFS desc" + sb.toString(),
+            new Object[]{ hostid }, tdesc);
+    }
+
+
+    @Override
+    public Object get(List<String> id, Map<String, String> params) {
+        List lst = jdbc.query("select * from TRACES where HOST_ID = ? and DATA_OFFS = ?",
+            new Object[] { hostid, Long.parseLong(id.get(0)) }, tdesc);
+        return lst.size() > 0 ? lst.get(0) : null;
+    }
 }

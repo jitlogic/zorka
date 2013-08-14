@@ -25,13 +25,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JediClient<T extends JavaScriptObject> {
+public class RoofClient<T extends JavaScriptObject> {
 
 
     private String url;
 
 
-    public JediClient(String path) {
+    public RoofClient(String path) {
         url = GWT.getHostPageBaseURL() + path;
     }
 
@@ -47,7 +47,16 @@ public class JediClient<T extends JavaScriptObject> {
 
 
     public void list(String path, Map<String,String> params, final AsyncCallback<JsArray<T>> callback) {
-        RequestBuilder rb = new RequestBuilder(RequestBuilder.GET, path != null ?  url + "/" + path : url);
+        StringBuilder sb = new StringBuilder();
+
+        for (Map.Entry<String,String> e : params.entrySet()) {
+            sb.append(sb.length() == 0 ? "?" : "&");
+            sb.append(e.getKey());
+            sb.append("=");
+            sb.append(e.getValue());
+        }
+
+        RequestBuilder rb = new RequestBuilder(RequestBuilder.GET, (path != null ?  url + "/" + path : url) + sb);
         try {
             rb.sendRequest(null, new RequestCallback() {
                 @Override
@@ -68,6 +77,32 @@ public class JediClient<T extends JavaScriptObject> {
         } catch (RequestException e) {
             callback.onFailure(e);
         }
+    }
+
+
+    public void call(String entity, String method, final AsyncCallback<String> callback) {
+        RequestBuilder rb = new RequestBuilder(RequestBuilder.GET, url + "/" + entity + "/actions/" + method);
+        try {
+            rb.sendRequest(null, new RequestCallback() {
+                @Override
+                public void onResponseReceived(Request request, Response response) {
+                    if (response.getStatusCode() == 200) {
+                        callback.onSuccess(response.getText());
+                    } else {
+                        callback.onFailure(new RequestException("HTTP error "
+                                + response.getStatusCode() + ": " + response.getStatusText()));
+                    }
+                }
+
+                @Override
+                public void onError(Request request, Throwable exception) {
+                    callback.onFailure(exception);
+                }
+            });
+        } catch (RequestException e) {
+            callback.onFailure(e);
+        }
+
     }
 
 

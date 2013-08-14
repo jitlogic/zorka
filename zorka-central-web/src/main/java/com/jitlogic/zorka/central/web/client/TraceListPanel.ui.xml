@@ -8,17 +8,24 @@
               margin-bottom: 4px;
           }
       </ui:style>
-      <g:SplitLayoutPanel>
+      <g:DockLayoutPanel>
           <g:north size="25">
               <g:HorizontalPanel>
                   <g:Label>Host: </g:Label>
                   <g:ListBox ui:field="hostList"/>
               </g:HorizontalPanel>
           </g:north>
-          <g:center>
-              <g:ScrollPanel width="100" height="100">
-                  <c:CellTable ui:field="cellTable" addStyleNames="{style.cellTable}"/>
-              </g:ScrollPanel>
+          <g:center style="margin-top: 5px;">
+              <c:DataGrid ui:field="traceTable" pageSize="100" addStyleNames="{style.cellTable}"/>
           </g:center>
-      </g:SplitLayoutPanel>
+          <g:south size="25">
+              <g:HTMLPanel>
+                  <table style="width:100%">
+                      <tr><td align="center">
+                          <c:SimplePager ui:field="pager" location="CENTER"/>
+                      </td></tr>
+                  </table>
+              </g:HTMLPanel>
+          </g:south>
+      </g:DockLayoutPanel>
 </ui:UiBinder>

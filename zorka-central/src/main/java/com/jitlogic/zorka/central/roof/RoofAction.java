@@ -15,6 +15,10 @@
  */
 package com.jitlogic.zorka.central.roof;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Retention(RetentionPolicy.RUNTIME)
 public @interface RoofAction {
     String value();
 }

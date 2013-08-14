@@ -18,16 +18,16 @@ package com.jitlogic.zorka.central.web.client;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
-public class JediRecord extends JavaScriptObject {
+public class RoofRecord extends JavaScriptObject {
 
-    protected JediRecord() { }
+    protected RoofRecord() { }
 
-    public final native Object get(String key) /*-{ return this[key]; }-*/;
+    public final native Object get(String key)  /*-{ return this[key]; }-*/;
 
-    public final native int getI(String key) /*-{ return this[key]; }-*/;
+    public final native int getI(String key)    /*-{ return this[key]; }-*/;
 
-    public final native Long getL(String key) /*-{ return this[key]; }-*/;
+    public final native Long getL(String key)   /*-{ return this[key]; }-*/;
 
-    public final native String getS(String key) /*-{ return this[key]; }-*/;
+    public final native String getS(String key) /*-{ return ""+this[key]; }-*/;
 
 }

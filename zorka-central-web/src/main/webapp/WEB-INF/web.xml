@@ -7,12 +7,12 @@
 
     <servlet>
         <servlet-name>DataSearch</servlet-name>
-        <servlet-class>com.jitlogic.zorka.central.web.service.JediServlet</servlet-class>
+        <servlet-class>com.jitlogic.zorka.central.web.service.RoofServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>DataSearch</servlet-name>
-        <url-pattern>/jedi/*</url-pattern>
+        <url-pattern>/roof/*</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>

@@ -69,7 +69,7 @@ public class CentralFixture {
         zicoService = instance.getZicoService();
 
         hostTable = instance.getHostTable();
-        roofService = instance.getJediService();
+        roofService = instance.getRoofService();
     }
 
     @After

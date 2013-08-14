@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.central.roof;
 
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -37,14 +38,30 @@ public class RoofEntityProxyService implements RoofService {
     }
 
     private Object callProxyMethod(Method m, Object...args) {
-        return null;
+        try {
+            return m.invoke(proxy, args);
+        } catch (IllegalAccessException e) {
+            throw new RoofException(405, "Inaccessible method.");
+        } catch (InvocationTargetException e) {
+            throw new RoofException(500, "Error calling method.", e);
+        }
     }
 
     private Object getCollection(String id, String name) {
         for (Method m : proxy.getClass().getMethods()) {
             RoofCollection jc = m.getAnnotation(RoofCollection.class);
             if (jc != null && jc.value().equals(name)) {
-                return callProxyMethod(m, name);
+                return callProxyMethod(m, id);
+            }
+        }
+        return null;
+    }
+
+    private Method getAction(String name) {
+        for (Method m : proxy.getClass().getMethods()) {
+            RoofAction ac = m.getAnnotation(RoofAction.class);
+            if (ac != null && ac.value().equals(name)) {
+                return m;
             }
         }
         return null;
@@ -54,21 +71,29 @@ public class RoofEntityProxyService implements RoofService {
     public Object GET(List<String> path, Map<String, String> params) {
         if (path.size() == 0) {
             return proxy.list(params);
-        } else if (path.size() == 1) {
-            return proxy.get(path, params);
+        } else if ("actions".equals(path.get(0))) {
+            if (path.size() >= 2) {
+                Method action = getAction(path.get(1));
+                if (action == null) {
+                    throw new RoofException(404, "No such action found.");
+                }
+                return callProxyMethod(action, path.subList(2, path.size()).toArray());
+            } else {
+                throw new RoofException(405, "No action name passed.");
+            }
         } else {
             if (path.get(1).equals("collections") && path.size() >= 3) {
                 Object col = getCollection(path.get(0), path.get(2));
                 if (col instanceof RoofEntityProxy) {
                     return new RoofEntityProxyService((RoofEntityProxy)col)
-                        .GET(path.subList(2, path.size()), params);
+                        .GET(path.subList(3, path.size()), params);
                 } else if (col instanceof RoofService) {
                     return ((RoofService)col).GET(path.subList(2, path.size()), params);
                 } else {
                     throw new RoofException(405, "Collection not found.");
                 }
             } else {
-                throw new RoofException(501, "Not implemented (yet).");
+                return proxy.get(path, params);
             }
         }
     }

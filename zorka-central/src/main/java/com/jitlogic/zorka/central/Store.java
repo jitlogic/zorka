@@ -104,15 +104,6 @@ public class Store implements Closeable {
     public synchronized void close() throws IOException {
 
         try {
-            if(traces != null) {
-                traces.close();
-                traces = null;
-            }
-        } catch (IOException e) {
-            log.error(ZorkaLogger.ZCL_STORE, "Cannot close trace index '" + traces + "' for " + hostname, e);
-        }
-
-        try {
             if (rds != null) {
                 rds.close();
                 rds = null;
