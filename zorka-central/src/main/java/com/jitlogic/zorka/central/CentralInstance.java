@@ -161,6 +161,7 @@ public class CentralInstance {
     public synchronized StoreManager getStoreManager() {
         if (null == storeManager) {
             storeManager = new StoreManager(getConfig(), getDb(), getSymbolRegistry(), getHostTable());
+            getHostTable().setStorageManager(storeManager);
         }
         return storeManager;
     }

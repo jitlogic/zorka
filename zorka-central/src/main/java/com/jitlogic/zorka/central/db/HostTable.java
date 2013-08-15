@@ -1,17 +1,3 @@
-package com.jitlogic.zorka.central.db;
-
-import com.jitlogic.zorka.central.CentralConfig;
-import com.jitlogic.zorka.central.roof.RoofAction;
-import com.jitlogic.zorka.central.roof.RoofCollection;
-import com.jitlogic.zorka.central.roof.RoofEntityProxy;
-import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import org.springframework.jdbc.core.JdbcTemplate;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -27,6 +13,22 @@ import java.util.Map;
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.central.db;
+
+import com.jitlogic.zorka.central.CentralConfig;
+import com.jitlogic.zorka.central.Store;
+import com.jitlogic.zorka.central.StoreManager;
+import com.jitlogic.zorka.central.roof.RoofAction;
+import com.jitlogic.zorka.central.roof.RoofCollection;
+import com.jitlogic.zorka.central.roof.RoofEntityProxy;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 public class HostTable implements RoofEntityProxy {
 
@@ -37,12 +39,17 @@ public class HostTable implements RoofEntityProxy {
 
     private SymbolRegistry symbolRegistry;
 
+    private StoreManager storeManager;
 
     public HostTable(CentralConfig config, DbContext db, SymbolRegistry symbolRegistry) {
         this.db = db;
         this.jdbc = this.db.getJdbcTemplate();
         this.tdesc = db.getNamedDesc("HOSTS");
         this.symbolRegistry = symbolRegistry;
+    }
+
+    public void setStorageManager(StoreManager storeManager) {
+        this.storeManager = storeManager;
     }
 
     @Override
@@ -68,7 +75,7 @@ public class HostTable implements RoofEntityProxy {
         DbRecord rec = get(Arrays.asList(id), new HashMap<String, String>());
 
         if (rec != null) {
-            return new TraceTable(db, symbolRegistry, rec.getI("HOST_ID"));
+            return storeManager.get(rec.getS("HOST_NAME")).getTraces(); // TODO what a crap ... make sure hosts are always referenced by ID
         }
 
         return null;

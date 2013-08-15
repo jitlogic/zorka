@@ -254,13 +254,14 @@ public class RAGZInputStream extends InputStream {
         long lpos = 0;
 
         while (input.getFilePointer() < input.length()) {
+            long fp = input.getFilePointer(), lp = input.length();
             byte m1 = input.readByte(), m2 = (byte)(input.readByte() & 0xff);
-            if (m1 != 0x1f || m2 != (byte)0x8b) throw new RAGZException(
-                String.format("Invalid magic of gzip header: m1=0x%2x m2=0x%2x", m1, m2));
+            if (m1 != 0x1f || m2 != (byte)0x8b)
+                throw new RAGZException(String.format("Invalid magic of gzip header: m1=0x%2x m2=0x%2x", m1, m2));
             input.skipBytes(10);
             byte c1 = input.readByte(), c2 = input.readByte();
-            if (c1 != 0x52 && c2 != 0x47) throw new RAGZException(
-                String.format("Invalid magic of EXT header: c1=0x%2x c2=0x%2x", c1, c2));
+            if (c1 != 0x52 && c2 != 0x47)
+                throw new RAGZException(String.format("Invalid magic of EXT header: c1=0x%2x c2=0x%2x", c1, c2));
             input.skipBytes(2);
             long clen = readUInt();
             long cpos = input.getFilePointer();
@@ -288,7 +289,7 @@ public class RAGZInputStream extends InputStream {
             throw new EOFException("EOF encountered when reading UINT");
         }
 
-        return ((long)b[0]&0xff) | (((long)b[1]&0xff)<<8) | (((long)b[2]&0xff)<<16) | (((long)b[2]&0xff)<<24);
+        return CentralUtil.toUIntBE(b);
     }
 
 

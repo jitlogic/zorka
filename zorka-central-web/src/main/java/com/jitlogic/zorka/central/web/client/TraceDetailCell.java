@@ -13,18 +13,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.common.test;
+package com.jitlogic.zorka.central.web.client;
 
 
-import com.jitlogic.zorka.common.zico.ZicoDataLoader;
-import org.junit.Test;
+import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 
-public class DataLoadingManualTest {
-
-    @Test
-    public void testLoadDataFile() throws Exception {
-        ZicoDataLoader loader = new ZicoDataLoader("127.0.0.1", 8640, System.getProperty("load.host"), "");
-        loader.load(System.getProperty("load.file"));
+public class TraceDetailCell extends AbstractCell<RoofRecord> {
+    @Override
+    public void render(Context context, RoofRecord value, SafeHtmlBuilder sb) {
+        sb.appendHtmlConstant("<div>");
+        sb.append(SafeHtmlUtils.fromString(value.getS("METHOD")));
+        sb.appendHtmlConstant("<div>");
     }
-
 }

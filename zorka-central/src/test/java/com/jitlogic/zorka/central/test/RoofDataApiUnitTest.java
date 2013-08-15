@@ -87,4 +87,5 @@ public class RoofDataApiUnitTest extends CentralFixture {
         Object count = roofService.GET(path, Collections.EMPTY_MAP);
         assertEquals(1, count);
     }
+
 }

@@ -94,7 +94,7 @@ public class Store implements Closeable {
 
     public synchronized TraceTable getTraces() {
         if (traces == null) {
-            traces = new TraceTable(dbContext, symbolRegistry, hostid);
+            traces = new TraceTable(getRds(), dbContext, symbolRegistry, hostid);
         }
         return traces;
     }

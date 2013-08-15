@@ -80,7 +80,7 @@ public class RoofClient<T extends JavaScriptObject> {
     }
 
 
-    public void call(String entity, String method, final AsyncCallback<String> callback) {
+    public void callS(String entity, String method, final AsyncCallback<String> callback) {
         RequestBuilder rb = new RequestBuilder(RequestBuilder.GET, url + "/" + entity + "/actions/" + method);
         try {
             rb.sendRequest(null, new RequestCallback() {
@@ -105,6 +105,74 @@ public class RoofClient<T extends JavaScriptObject> {
 
     }
 
+
+    public void callL(String entity, String method, Map<String,String> params, final AsyncCallback<JsArray<T>> callback) {
+
+        StringBuilder sb = new StringBuilder();
+
+        for (Map.Entry<String,String> e : params.entrySet()) {
+            sb.append(sb.length() == 0 ? "?" : "&");
+            sb.append(e.getKey());
+            sb.append("=");
+            sb.append(e.getValue());
+        }
+
+        RequestBuilder rb = new RequestBuilder(RequestBuilder.GET, url + "/" + entity + "/actions/" + method + sb.toString());
+        try {
+            rb.sendRequest(null, new RequestCallback() {
+                @Override
+                public void onResponseReceived(Request request, Response response) {
+                    if (response.getStatusCode() == 200) {
+                        callback.onSuccess((JsArray<T>)JsonUtils.safeEval(response.getText()));
+                    } else {
+                        callback.onFailure(new RequestException("HTTP error "
+                                + response.getStatusCode() + ": " + response.getStatusText()));
+                    }
+                }
+
+                @Override
+                public void onError(Request request, Throwable exception) {
+                    callback.onFailure(exception);
+                }
+            });
+        } catch (RequestException e) {
+            callback.onFailure(e);
+        }
+    }
+
+    public void callR(String entity, String method, Map<String,String> params, final AsyncCallback<RoofRecord> callback) {
+
+        StringBuilder sb = new StringBuilder();
+
+        for (Map.Entry<String,String> e : params.entrySet()) {
+            sb.append(sb.length() == 0 ? "?" : "&");
+            sb.append(e.getKey());
+            sb.append("=");
+            sb.append(e.getValue());
+        }
+
+        RequestBuilder rb = new RequestBuilder(RequestBuilder.GET, url + "/" + entity + "/actions/" + method + sb.toString());
+        try {
+            rb.sendRequest(null, new RequestCallback() {
+                @Override
+                public void onResponseReceived(Request request, Response response) {
+                    if (response.getStatusCode() == 200) {
+                        callback.onSuccess((RoofRecord)JsonUtils.safeEval(response.getText()));
+                    } else {
+                        callback.onFailure(new RequestException("HTTP error "
+                                + response.getStatusCode() + ": " + response.getStatusText()));
+                    }
+                }
+
+                @Override
+                public void onError(Request request, Throwable exception) {
+                    callback.onFailure(exception);
+                }
+            });
+        } catch (RequestException e) {
+            callback.onFailure(e);
+        }
+    }
 
     public void get(String entity, Object id, final AsyncCallback<T> callback) {
         RequestBuilder rb = new RequestBuilder(RequestBuilder.GET, url + "/" + entity + "/" + id);

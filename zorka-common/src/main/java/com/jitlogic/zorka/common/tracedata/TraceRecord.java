@@ -28,6 +28,7 @@ import java.util.*;
  */
 public class TraceRecord implements SymbolicRecord {
 
+
     /** Overflow record will be discarded regardless of method execution time and other conditions. */
     public static final int OVERFLOW_FLAG = 0x0001;
 

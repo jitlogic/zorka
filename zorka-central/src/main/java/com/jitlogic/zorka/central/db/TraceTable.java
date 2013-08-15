@@ -16,14 +16,20 @@
 package com.jitlogic.zorka.central.db;
 
 
+import com.jitlogic.zorka.central.CentralUtil;
+import com.jitlogic.zorka.central.RDSStore;
 import com.jitlogic.zorka.central.roof.RoofAction;
 import com.jitlogic.zorka.central.roof.RoofEntityProxy;
+import com.jitlogic.zorka.central.roof.RoofException;
+import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import org.fressian.FressianReader;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.util.List;
-import java.util.Map;
+import java.io.ByteArrayInputStream;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Database backed trace entry set.
@@ -34,14 +40,17 @@ public class TraceTable implements RoofEntityProxy {
     private DbContext db;
     private DbTableDesc tdesc;
     private JdbcTemplate jdbc;
+
+    private RDSStore rds;
     private SymbolRegistry symbolRegistry;
 
-    public TraceTable(DbContext dbContext, SymbolRegistry symbolRegistry, int hostid) {
+    public TraceTable(RDSStore rds, DbContext dbContext, SymbolRegistry symbolRegistry, int hostid) {
         this.symbolRegistry = symbolRegistry;
         this.db = dbContext;
         this.jdbc = this.db.getJdbcTemplate();
         this.hostid = hostid;
         this.tdesc = this.db.getNamedDesc("TRACES");
+        this.rds = rds;
     }
 
 
@@ -82,10 +91,76 @@ public class TraceTable implements RoofEntityProxy {
 
 
     @RoofAction("count")
-    public int size() {
+    public int count() {
         return db.getJdbcTemplate().queryForObject("select count(1) from TRACES where HOST_ID = " + hostid, Integer.class);
     }
 
+    private final static Pattern RE_SLASH = Pattern.compile("/");
+
+    private TraceRecord getTraceRecord(String tid, String path) {
+        DbRecord trace = (DbRecord)get(Arrays.asList(tid), Collections.EMPTY_MAP);
+
+        if (trace != null) {
+            try {
+                long data_offs = trace.getL("DATA_OFFS");
+                int data_len = trace.getI("DATA_LEN");
+                byte[] blob = rds.read(data_offs, data_len);
+                ByteArrayInputStream is = new ByteArrayInputStream(blob);
+                FressianReader reader = new FressianReader(is, FressianTraceFormat.READ_LOOKUP);
+                TraceRecord tr = (TraceRecord)reader.readObject();
+                if (path != null && path.trim().length() > 0) {;
+                    for (String p : RE_SLASH.split(path.trim())) {
+                        Integer idx = Integer.parseInt(p);
+                        if (idx >= 0 && idx < tr.numChildren()) {
+                            tr = tr.getChild(idx);
+                        } else {
+                            throw new RoofException(405, "Child record of path " + path + " not found.");
+                        }
+                    }
+                }
+
+                return tr;
+            } catch (Exception e) {
+                throw new RoofException(501, "Error retrieving trace record.", e);
+            }
+        } else {
+            throw new RoofException(405, "Trace not found.");
+        }
+
+    }
+
+    @RoofAction("getRecord")
+    public Object getRecord(String id, Map<String,String> params) {
+
+        TraceRecord tr = getTraceRecord(id, params.get("path"));
+
+        DbRecord rec = packRecord(tr);
+        return rec;
+    }
+
+    private DbRecord packRecord(TraceRecord tr) {
+        DbRecord rec = new DbRecord(tdesc);
+        rec.put("CALLS", tr.getCalls());
+        rec.put("ERRORS", tr.getErrors());
+        rec.put("TIME", tr.getTime());
+        rec.put("FLAGS", tr.getFlags());
+        rec.put("METHOD", CentralUtil.prettyPrint(tr, symbolRegistry));
+        rec.put("CHILDREN", tr.numChildren());
+        return rec;
+    }
+
+
+    @RoofAction("listRecords")
+    public List<DbRecord> listRecords(String id, Map<String,String> params) {
+        TraceRecord tr = getTraceRecord(id, params.get("path"));
+        List<DbRecord> recs = new ArrayList<DbRecord>();
+
+        for (int i = 0; i < tr.numChildren(); i++) {
+            recs.add(packRecord(tr.getChild(i)));
+        }
+
+        return recs;
+    }
 
     @Override
     public List list(Map<String, String> params) {

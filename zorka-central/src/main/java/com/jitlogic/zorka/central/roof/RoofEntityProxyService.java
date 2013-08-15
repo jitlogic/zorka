@@ -81,20 +81,24 @@ public class RoofEntityProxyService implements RoofService {
             } else {
                 throw new RoofException(405, "No action name passed.");
             }
-        } else {
-            if (path.get(1).equals("collections") && path.size() >= 3) {
-                Object col = getCollection(path.get(0), path.get(2));
-                if (col instanceof RoofEntityProxy) {
-                    return new RoofEntityProxyService((RoofEntityProxy)col)
-                        .GET(path.subList(3, path.size()), params);
-                } else if (col instanceof RoofService) {
-                    return ((RoofService)col).GET(path.subList(2, path.size()), params);
-                } else {
-                    throw new RoofException(405, "Collection not found.");
-                }
+        } else if (path.size() >= 3 && path.get(1).equals("collections")) {
+            Object col = getCollection(path.get(0), path.get(2));
+            if (col instanceof RoofEntityProxy) {
+                return new RoofEntityProxyService((RoofEntityProxy)col)
+                    .GET(path.subList(3, path.size()), params);
+            } else if (col instanceof RoofService) {
+                return ((RoofService)col).GET(path.subList(2, path.size()), params);
             } else {
-                return proxy.get(path, params);
+                throw new RoofException(405, "Collection not found.");
             }
+        } else if (path.size() >= 3 && path.get(1).equals("actions")) {
+            Method action = getAction(path.get(2));
+            if (action == null) {
+                throw new RoofException(404, "No such action found.");
+            }
+            return callProxyMethod(action, path.get(0), params);
+        } else {
+              return proxy.get(path, params);
         }
     }
 

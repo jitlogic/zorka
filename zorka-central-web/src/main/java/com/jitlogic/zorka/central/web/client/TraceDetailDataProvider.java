@@ -26,67 +26,48 @@ import com.google.gwt.view.client.Range;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class RoofTableDataProvider extends AsyncDataProvider<RoofRecord> {
+public class TraceDetailDataProvider extends AsyncDataProvider<RoofRecord> {
+
+    private String path;
+    private int children;
+
+    private int hostId;
+    private int traceOffs;
 
     private RoofClient<RoofRecord> client;
-    private String hostIdStr;
 
-    public RoofTableDataProvider(RoofClient<RoofRecord> client) {
+    public TraceDetailDataProvider(RoofClient<RoofRecord> client, int hostId, RoofRecord record) {
+        super(null);
         this.client = client;
+        this.hostId = hostId;
+        this.path = record.getS("PATH");
+        this.children = Integer.parseInt(record.getS("CHILDREN"));
     }
 
-    public void setHostId(String hostIdStr) {
-        this.hostIdStr = hostIdStr;
-
-        client.callS(hostIdStr + "/collections/traces", "count", new AsyncCallback<String>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                GWT.log("Error", caught);
-                updateRowCount(0, true);
-            }
-
-            @Override
-            public void onSuccess(String result) {
-                GWT.log("Number of rows found: " + result);
-                int i = Integer.parseInt(result);
-                updateRowCount(i, true);
-                for (HasData<RoofRecord> display : getDataDisplays()) {
-                    onRangeChanged(display);
-                }
-            }
-        });
+    @Override
+    public void addDataDisplay(HasData<RoofRecord> display) {
+        super.addDataDisplay(display);
+        updateRowCount(children, true);
     }
 
     @Override
     protected void onRangeChanged(HasData<RoofRecord> display) {
-
         final Range range = display.getVisibleRange();
-
-        if (hostIdStr == null) {
-            updateRowData(range.getStart(), new ArrayList<RoofRecord>());
-            updateRowCount(0, true);
-            return;
-        }
-
-        Map<String,String> params = new HashMap<String, String>();
-        params.put("offset", ""+range.getStart());
-        params.put("limit", ""+range.getLength());
-
-        client.list(hostIdStr + "/collections/traces", params, new AsyncCallback<JsArray<RoofRecord>>() {
+        client.callL("" + hostId + "/collections/traces/" + traceOffs , "listRecords",
+                new HashMap<String, String>(), new AsyncCallback<JsArray<RoofRecord>>() {
             @Override
             public void onFailure(Throwable caught) {
-                GWT.log("Error listing traces for " + hostIdStr, caught);
+                GWT.log("Error: ", caught);
             }
 
             @Override
             public void onSuccess(JsArray<RoofRecord> result) {
-                List<RoofRecord> records = new ArrayList<RoofRecord>();
+                List<RoofRecord> lst = new ArrayList<RoofRecord>();
                 for (int i = 0; i < result.length(); i++) {
-                    records.add(result.get(i));
+                    lst.add(result.get(i));
                 }
-                updateRowData(range.getStart(), records);
+                updateRowData(0, lst);
             }
         });
     }

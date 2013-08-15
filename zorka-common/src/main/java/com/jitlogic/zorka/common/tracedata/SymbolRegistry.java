@@ -61,6 +61,7 @@ public class SymbolRegistry {
             id = symbolIds.putIfAbsent(symbol, newid);
             if (id == null) {
                 symbolNames.put(newid, symbol);
+                persist(newid, symbol);
                 id = newid;
             }
         }

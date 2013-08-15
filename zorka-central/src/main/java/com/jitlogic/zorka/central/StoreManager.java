@@ -59,7 +59,7 @@ public class StoreManager implements Closeable, ZicoDataProcessorFactory {
         this.dataDir = config.stringCfg("central.data.dir", null);
     }
 
-
+    // TODO use ID as proper host ID as get(id), rename this method to reflect it is get-or-create method, not a simple getter
     public synchronized Store get(String hostname) {
         if (!stores.containsKey(hostname)) {
             DbRecord host = hostTable.getHost(hostname, null);

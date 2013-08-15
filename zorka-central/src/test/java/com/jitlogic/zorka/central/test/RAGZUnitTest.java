@@ -27,6 +27,11 @@ import java.util.Random;
 
 import static org.fest.assertions.Assertions.assertThat;
 
+import static org.junit.Assert.*;
+
+import static com.jitlogic.zorka.central.CentralUtil.fromUIntBE;
+import static com.jitlogic.zorka.central.CentralUtil.toUIntBE;
+
 public class RAGZUnitTest extends CentralFixture {
 
     public static final String GZIP = "/usr/bin/gzip";
@@ -61,11 +66,11 @@ public class RAGZUnitTest extends CentralFixture {
         byte[] buf = TestUtil.cat(path);
 
 
-        assertThat(new File(path).length()).isEqualTo(34);
-        assertThat(buf[16]).isEqualTo((byte)6);
-        assertThat(buf[19]).isEqualTo((byte)0);
-        assertThat(buf[30]).isEqualTo((byte)4);
-        assertThat(buf[33]).isEqualTo((byte)0);
+        assertThat(new File(path).length()).isEqualTo(40);
+        //assertThat(buf[16]).isEqualTo((byte)6);
+        //assertThat(buf[19]).isEqualTo((byte)0);
+        //assertThat(buf[30]).isEqualTo((byte)4);
+        //assertThat(buf[33]).isEqualTo((byte)0);
 
         if (new File(GZIP).canExecute()) {
             assertThat(TestUtil.cmd(GZIP + " -d " + path)).isEqualTo(0);
@@ -152,6 +157,16 @@ public class RAGZUnitTest extends CentralFixture {
         assertThat(new String(buf, "UTF-8")).isEqualTo("1234ABCD");
         is.close();
 
+    }
+
+    @Test
+    public void testUIntEncoding() {
+        byte[] b = fromUIntBE(4000000L);
+        long l = toUIntBE(b);
+        assertEquals(4L, toUIntBE(fromUIntBE(4L)));
+        assertEquals(4000L, toUIntBE(fromUIntBE(4000L)));
+        assertEquals(4000000L, toUIntBE(fromUIntBE(4000000L)));
+        assertEquals(4000000000L, toUIntBE(fromUIntBE(4000000000L)));
     }
 
     //@Test

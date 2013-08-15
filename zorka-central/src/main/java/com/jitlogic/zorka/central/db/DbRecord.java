@@ -34,6 +34,10 @@ public class DbRecord extends HashMap<String,Object> {
         return (Integer)get(key);
     }
 
+    public Long getL(String key) {
+        return (Long)get(key);
+    }
+
     public String getS(String key) {
         return (String)get(key);
     }

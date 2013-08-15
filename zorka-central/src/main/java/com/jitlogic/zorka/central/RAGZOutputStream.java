@@ -16,13 +16,14 @@
 package com.jitlogic.zorka.central;
 
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 
 import java.io.RandomAccessFile;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
+
+import static com.jitlogic.zorka.central.CentralUtil.fromUIntBE;
 
 /**
  * Random access gzipped output stream.
@@ -135,7 +136,7 @@ public class RAGZOutputStream extends OutputStream {
 
 
     private void deflate() throws IOException {
-        int len = deflater.deflate(outputBuf, 0, outputBuf.length);
+        int len = deflater.deflate(outputBuf, 0, outputBuf.length, Deflater.SYNC_FLUSH);
         if (len > 0) {
             outFile.write(outputBuf, 0, len);
         }
@@ -187,11 +188,11 @@ public class RAGZOutputStream extends OutputStream {
             while (!deflater.finished()) {
                 deflate();
             }
-            writeUInt(crc.getValue());
-            writeUInt(curSegSize);
+            outFile.write(fromUIntBE(crc.getValue()));
+            outFile.write(fromUIntBE(curSegSize));
             long pos = outFile.getFilePointer();
             outFile.seek(curSegStart+12+4);
-            writeUInt(pos - curSegStart - 28); // Compressed length
+            outFile.write(fromUIntBE(pos - curSegStart - 28));
             outFile.seek(pos);
 
             deflater = null;
@@ -199,20 +200,5 @@ public class RAGZOutputStream extends OutputStream {
         }
     }
 
-
-    private void writeUInt(long l) throws IOException {
-        byte[] buf = { (byte)(l & 0xff), (byte)((l>>8)&0xff), (byte)((l>>16)&0xff), (byte)((l>>24)&0xff) };
-        outFile.write(buf);
-    }
-
-    private long readUInt() throws IOException {
-        byte[] b = new byte[4];
-
-        if (outFile.read(b) != 4) {
-            throw new EOFException("EOF encountered when reading UINT");
-        }
-
-        return ((long)b[0]&0xff) | (((long)b[1]&0xff)<<8) | (((long)b[2]&0xff)<<16) | (((long)b[2]&0xff)<<24);
-    }
 
 }

@@ -23,7 +23,7 @@ import java.io.File;
 
 public class CentralApp {
 
-    private static CentralInstance instance = null;
+    private static volatile CentralInstance instance = null;
 
     public static synchronized CentralInstance getInstance() {
         if (instance == null) {
@@ -39,8 +39,19 @@ public class CentralApp {
             System.out.println("Database URL: " + config.stringCfg("central.db.url", "??"));
             instance = new CentralInstance(config);
             instance.start();
+            Runtime.getRuntime().addShutdownHook(new ShutdownHook());
         }
         return instance;
+    }
+
+
+    private static class ShutdownHook extends Thread {
+        public void run() {
+            if (instance != null) {
+                System.out.println("Shutting down Zorka Central ...");
+                instance.stop();
+            }
+        }
     }
 
 }

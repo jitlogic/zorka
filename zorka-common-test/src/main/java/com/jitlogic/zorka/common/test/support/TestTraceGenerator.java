@@ -26,7 +26,7 @@ import java.util.Random;
 public class TestTraceGenerator {
 
     private final static String[] traceMarkers = { "MY_TRACE" };
-    private final static String[] classNames = { "my/pkg/SomeClass", "my/pkg/OtherClass" };
+    private final static String[] classNames = { "my.pkg.SomeClass", "my.pkg.OtherClass" };
     private final static String[] methodNames = { "someMethod", "otherMethod" };
     private final static String[] methodSignatures = { "()V" };
 
@@ -76,6 +76,7 @@ public class TestTraceGenerator {
 
 
     private int rsid(String...inputs) {
-        return symbols.symbolId(inputs[random.nextInt(inputs.length)]);
+        String input = inputs[random.nextInt(inputs.length)];
+        return symbols.symbolId(input);
     }
 }

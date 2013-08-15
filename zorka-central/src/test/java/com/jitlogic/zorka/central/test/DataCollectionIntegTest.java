@@ -60,16 +60,16 @@ public class DataCollectionIntegTest extends CentralFixture {
 
         submit(rec);
 
-        assertEquals("One trace should be noticed.", 1, storeManager.get("test").getTraces().size());
+        assertEquals("One trace should be noticed.", 1, storeManager.get("test").getTraces().count());
     }
 
 
     @Test(timeout = 1000)
     public void testCollectTwoTraceRecords() throws Exception {
         submit(generator.generate());
-        assertEquals("One trace should be noticed.", 1, storeManager.get("test").getTraces().size());
+        assertEquals("One trace should be noticed.", 1, storeManager.get("test").getTraces().count());
         submit(generator.generate());
-        assertEquals("Two traces should be noticed.", 2, storeManager.get("test").getTraces().size());
+        assertEquals("Two traces should be noticed.", 2, storeManager.get("test").getTraces().count());
     }
 
 
@@ -82,10 +82,10 @@ public class DataCollectionIntegTest extends CentralFixture {
 
         submit(rec);
 
-        assertEquals("Trace will not reach store.", 0, storeManager.get("test").getTraces().size());
+        assertEquals("Trace will not reach store.", 0, storeManager.get("test").getTraces().count());
 
         rec = generator.generate();
         submit(rec);
-        assertEquals("TraceOutput should reconnect and send properly.", 1, storeManager.get("test").getTraces().size());
+        assertEquals("TraceOutput should reconnect and send properly.", 1, storeManager.get("test").getTraces().count());
     }
 }

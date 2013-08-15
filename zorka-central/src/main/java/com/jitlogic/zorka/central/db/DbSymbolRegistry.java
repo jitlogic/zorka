@@ -1,8 +1,3 @@
-package com.jitlogic.zorka.central.db;
-
-import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import org.springframework.jdbc.core.JdbcTemplate;
-
 /**
  * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -18,17 +13,46 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.central.db;
+
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 
 public class DbSymbolRegistry extends SymbolRegistry {
 
     private JdbcTemplate jdbcTemplate;
 
+
     public DbSymbolRegistry(DbContext ctx) {
         this.jdbcTemplate = ctx.getJdbcTemplate();
+        loadSymbols();
     }
+
+
+    private void loadSymbols() {
+        jdbcTemplate.query("select * from SYMBOLS", new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet rs) throws SQLException {
+                int sid = rs.getInt("SID");
+                String name = rs.getString("NAME");
+                symbolIds.put(name, sid);
+                symbolNames.put(sid, name);
+                if (sid > lastSymbolId.get()) {
+                    lastSymbolId.set(sid);
+                }
+            }
+        });
+        System.out.println("Symbols read: " + symbolIds.size());
+    }
+
 
     @Override
     protected void persist(int symbolId, String symbolName) {
-        jdbcTemplate.update("insert into CENTRAL.SYMBOLS (SID,NAME) values (?,?)", symbolId, symbolName);
+        jdbcTemplate.update("insert into SYMBOLS (SID,NAME) values (?,?)", symbolId, symbolName);
     }
 }
