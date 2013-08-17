@@ -26,6 +26,7 @@ import com.google.gwt.view.client.Range;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TraceDetailDataProvider extends AsyncDataProvider<RoofRecord> {
 
@@ -54,21 +55,23 @@ public class TraceDetailDataProvider extends AsyncDataProvider<RoofRecord> {
     @Override
     protected void onRangeChanged(HasData<RoofRecord> display) {
         final Range range = display.getVisibleRange();
-        client.callL("" + hostId + "/collections/traces/" + traceOffs , "listRecords",
-                new HashMap<String, String>(), new AsyncCallback<JsArray<RoofRecord>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                GWT.log("Error: ", caught);
-            }
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("path", path);
+        client.callL("" + hostId + "/collections/traces/" + traceOffs, "listRecords", params,
+                new AsyncCallback<JsArray<RoofRecord>>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        GWT.log("Error: ", caught);
+                    }
 
-            @Override
-            public void onSuccess(JsArray<RoofRecord> result) {
-                List<RoofRecord> lst = new ArrayList<RoofRecord>();
-                for (int i = 0; i < result.length(); i++) {
-                    lst.add(result.get(i));
-                }
-                updateRowData(0, lst);
-            }
-        });
+                    @Override
+                    public void onSuccess(JsArray<RoofRecord> result) {
+                        List<RoofRecord> lst = new ArrayList<RoofRecord>();
+                        for (int i = 0; i < result.length(); i++) {
+                            lst.add(result.get(i));
+                        }
+                        updateRowData(0, lst);
+                    }
+                });
     }
 }

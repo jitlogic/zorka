@@ -59,13 +59,16 @@ public class TraceTable implements RoofEntityProxy {
         StringBuilder overview = new StringBuilder();
 
         if (rec.getAttrs() != null) {
-            for (Map.Entry<Integer,Object> e : rec.getAttrs().entrySet()) {
-                if (overview.length() > 250) { break; }
-                if (overview.length() > 0) { overview.append("|"); }
+            for (Map.Entry<Integer, Object> e : rec.getAttrs().entrySet()) {
+                if (overview.length() > 250) {
+                    break;
+                }
+                if (overview.length() > 0) {
+                    overview.append("|");
+                }
                 overview.append(e.getValue());
             }
         }
-
 
 
         jdbc.update("insert into TRACES (HOST_ID,DATA_OFFS,TRACE_ID,DATA_LEN,CLOCK,RFLAGS,TFLAGS,CALLS,"
@@ -98,7 +101,7 @@ public class TraceTable implements RoofEntityProxy {
     private final static Pattern RE_SLASH = Pattern.compile("/");
 
     private TraceRecord getTraceRecord(String tid, String path) {
-        DbRecord trace = (DbRecord)get(Arrays.asList(tid), Collections.EMPTY_MAP);
+        DbRecord trace = (DbRecord) get(Arrays.asList(tid), Collections.EMPTY_MAP);
 
         if (trace != null) {
             try {
@@ -107,8 +110,9 @@ public class TraceTable implements RoofEntityProxy {
                 byte[] blob = rds.read(data_offs, data_len);
                 ByteArrayInputStream is = new ByteArrayInputStream(blob);
                 FressianReader reader = new FressianReader(is, FressianTraceFormat.READ_LOOKUP);
-                TraceRecord tr = (TraceRecord)reader.readObject();
-                if (path != null && path.trim().length() > 0) {;
+                TraceRecord tr = (TraceRecord) reader.readObject();
+                if (path != null && path.trim().length() > 0) {
+                    ;
                     for (String p : RE_SLASH.split(path.trim())) {
                         Integer idx = Integer.parseInt(p);
                         if (idx >= 0 && idx < tr.numChildren()) {
@@ -130,11 +134,14 @@ public class TraceTable implements RoofEntityProxy {
     }
 
     @RoofAction("getRecord")
-    public Object getRecord(String id, Map<String,String> params) {
+    public Object getRecord(String id, Map<String, String> params) {
 
         TraceRecord tr = getTraceRecord(id, params.get("path"));
 
         DbRecord rec = packRecord(tr);
+
+        rec.put("PATH", params.containsKey("path") ? params.get("path") : "");
+
         return rec;
     }
 
@@ -151,12 +158,15 @@ public class TraceTable implements RoofEntityProxy {
 
 
     @RoofAction("listRecords")
-    public List<DbRecord> listRecords(String id, Map<String,String> params) {
-        TraceRecord tr = getTraceRecord(id, params.get("path"));
+    public List<DbRecord> listRecords(String id, Map<String, String> params) {
+        String path = params.get("path");
+        TraceRecord tr = getTraceRecord(id, path);
         List<DbRecord> recs = new ArrayList<DbRecord>();
 
         for (int i = 0; i < tr.numChildren(); i++) {
-            recs.add(packRecord(tr.getChild(i)));
+            DbRecord rec = packRecord(tr.getChild(i));
+            rec.put("PATH", path.length() > 0 ? (path + "/" + i) : "" + i);
+            recs.add(rec);
         }
 
         return recs;
@@ -178,14 +188,14 @@ public class TraceTable implements RoofEntityProxy {
         }
 
         return jdbc.query("select * from TRACES where HOST_ID = ? order by DATA_OFFS desc" + sb.toString(),
-            new Object[]{ hostid }, tdesc);
+                new Object[]{hostid}, tdesc);
     }
 
 
     @Override
     public Object get(List<String> id, Map<String, String> params) {
         List lst = jdbc.query("select * from TRACES where HOST_ID = ? and DATA_OFFS = ?",
-            new Object[] { hostid, Long.parseLong(id.get(0)) }, tdesc);
+                new Object[]{hostid, Long.parseLong(id.get(0))}, tdesc);
         return lst.size() > 0 ? lst.get(0) : null;
     }
 }
