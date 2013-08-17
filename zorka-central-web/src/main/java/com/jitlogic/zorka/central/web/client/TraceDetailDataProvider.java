@@ -22,55 +22,50 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
+import com.jitlogic.zorka.central.web.client.data.TraceDataService;
+import com.jitlogic.zorka.central.web.client.data.TraceInfo;
+import com.jitlogic.zorka.central.web.client.data.TraceRecordInfo;
+import org.fusesource.restygwt.client.Method;
+import org.fusesource.restygwt.client.MethodCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TraceDetailDataProvider extends AsyncDataProvider<RoofRecord> {
+public class TraceDetailDataProvider extends AsyncDataProvider<TraceRecordInfo> {
 
-    private String path;
-    private int children;
+    private TraceInfo traceInfo;
+    private TraceRecordInfo recordInfo;
+    private TraceDataService service;
 
-    private int hostId;
-    private int traceOffs;
-
-    private RoofClient<RoofRecord> client;
-
-    public TraceDetailDataProvider(RoofClient<RoofRecord> client, int hostId, RoofRecord record) {
-        super(null);
-        this.client = client;
-        this.hostId = hostId;
-        this.path = record.getS("PATH");
-        this.children = Integer.parseInt(record.getS("CHILDREN"));
+    public TraceDetailDataProvider(TraceDataService service, TraceInfo traceInfo, TraceRecordInfo recordInfo) {
+        super(null);   // TODO ProvidesKey ?
+        this.service = service;
+        this.traceInfo = traceInfo;
+        this.recordInfo = recordInfo;
     }
 
     @Override
-    public void addDataDisplay(HasData<RoofRecord> display) {
+    public void addDataDisplay(HasData<TraceRecordInfo> display) {
         super.addDataDisplay(display);
-        updateRowCount(children, true);
+        updateRowCount(recordInfo.getChildren(), true);
     }
 
     @Override
-    protected void onRangeChanged(HasData<RoofRecord> display) {
+    protected void onRangeChanged(HasData<TraceRecordInfo> display) {
         final Range range = display.getVisibleRange();
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("path", path);
-        client.callL("" + hostId + "/collections/traces/" + traceOffs, "listRecords", params,
-                new AsyncCallback<JsArray<RoofRecord>>() {
+
+        service.listTraceRecords(traceInfo.getHostId(), traceInfo.getDataOffs(), recordInfo.getPath(),
+                new MethodCallback<List<TraceRecordInfo>>() {
                     @Override
-                    public void onFailure(Throwable caught) {
-                        GWT.log("Error: ", caught);
+                    public void onFailure(Method method, Throwable exception) {
+                        GWT.log("Error calling method " + method, exception);
                     }
 
                     @Override
-                    public void onSuccess(JsArray<RoofRecord> result) {
-                        List<RoofRecord> lst = new ArrayList<RoofRecord>();
-                        for (int i = 0; i < result.length(); i++) {
-                            lst.add(result.get(i));
-                        }
-                        updateRowData(0, lst);
+                    public void onSuccess(Method method, List<TraceRecordInfo> response) {
+                        updateRowData(0, response);
                     }
                 });
     }

@@ -18,37 +18,36 @@ package com.jitlogic.zorka.central.web.client;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.gwt.view.client.TreeViewModel;
+import com.jitlogic.zorka.central.web.client.data.TraceDataService;
+import com.jitlogic.zorka.central.web.client.data.TraceInfo;
+import com.jitlogic.zorka.central.web.client.data.TraceRecordInfo;
 
 public class TraceDetailViewModel implements TreeViewModel {
 
-    private int hostId;
+    private TraceInfo traceInfo;
+    private TraceDataService service;
 
-    private RoofClient<RoofRecord> client = new RoofClient<RoofRecord>("roof/hosts");
-
-    private final SingleSelectionModel<RoofRecord> selectionModel = new SingleSelectionModel<RoofRecord>();
-    private final Cell<RoofRecord> cell = new TraceDetailCell();
+    private final SingleSelectionModel<TraceRecordInfo> selectionModel = new SingleSelectionModel<TraceRecordInfo>();
+    private final Cell<TraceRecordInfo> cell = new TraceDetailCell();
 
 
-    public TraceDetailViewModel(RoofRecord trace) {
-        this.hostId = Integer.parseInt(trace.getS("HOST_ID"));
+    public TraceDetailViewModel(TraceDataService service, TraceInfo traceInfo) {
+        this.traceInfo = traceInfo;
+        this.service = service;
     }
 
 
     @Override
     public <T> NodeInfo<?> getNodeInfo(T value) {
-        RoofRecord rec = (RoofRecord)value;
-        TraceDetailDataProvider provider = new TraceDetailDataProvider(client, hostId, rec);
-        return new DefaultNodeInfo<RoofRecord>(provider, cell, selectionModel, null);
+        TraceRecordInfo recordInfo = (TraceRecordInfo) value;
+        TraceDetailDataProvider provider = new TraceDetailDataProvider(service, traceInfo, recordInfo);
+        return new DefaultNodeInfo<TraceRecordInfo>(provider, cell, selectionModel, null);
     }
 
 
     @Override
     public boolean isLeaf(Object value) {
-        //return true;
-        if (value == null) {
-            return true;
-        }
-        int numChildren = Integer.parseInt(((RoofRecord) value).getS("CHILDREN"));
-        return numChildren == 0;
+        return value != null ? ((TraceRecordInfo) value).getChildren() == 0 : true;
     }
 }
+

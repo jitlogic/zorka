@@ -19,12 +19,13 @@ package com.jitlogic.zorka.central.web.client;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.jitlogic.zorka.central.web.client.data.TraceRecordInfo;
 
-public class TraceDetailCell extends AbstractCell<RoofRecord> {
+public class TraceDetailCell extends AbstractCell<TraceRecordInfo> {
     @Override
-    public void render(Context context, RoofRecord value, SafeHtmlBuilder sb) {
+    public void render(Context context, TraceRecordInfo value, SafeHtmlBuilder sb) {
         sb.appendHtmlConstant("<div>");
-        sb.append(SafeHtmlUtils.fromString(value.getS("METHOD")));
+        sb.append(SafeHtmlUtils.fromString(value.getMethod()));
         sb.appendHtmlConstant("<div>");
     }
 }

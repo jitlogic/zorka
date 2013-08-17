@@ -24,38 +24,38 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.jitlogic.zorka.central.db.DbRecord;
+import com.jitlogic.zorka.central.web.client.data.TraceDataService;
+import com.jitlogic.zorka.central.web.client.data.TraceInfo;
+import com.jitlogic.zorka.central.web.client.data.TraceRecordInfo;
 
 
 public class TraceDetailPanel extends Composite {
-    interface TraceDetailPanelUiBinder extends UiBinder<Widget, TraceDetailPanel> { }
+    interface TraceDetailPanelUiBinder extends UiBinder<Widget, TraceDetailPanel> {
+    }
 
     private static TraceDetailPanelUiBinder ourUiBinder = GWT.create(TraceDetailPanelUiBinder.class);
 
-    @UiField(provided = true) CellTree tree;
-    @UiField Button btnClose;
+    @UiField(provided = true)
+    CellTree tree;
+    @UiField
+    Button btnClose;
 
-    private ZorkaCentral central;
-
-    private RoofRecord root;
-    private RoofRecord trace;
+    private TraceInfo traceInfo;
+    private TraceRecordInfo rootRecord;
+    private TraceDataService service;
 
     private TraceDetailViewModel model;
-    private RoofClient<RoofRecord> client;
 
-
-    public TraceDetailPanel(ZorkaCentral central, RoofClient<RoofRecord> client, RoofRecord trace, RoofRecord root) {
-        this.central = central;
-        this.client = client;
-
-        this.trace = trace;
-        this.root = root;
+    public TraceDetailPanel(TraceDataService service, TraceInfo traceInfo, TraceRecordInfo rootRecord) {
+        this.service = service;
+        this.traceInfo = traceInfo;
+        this.rootRecord = rootRecord;
 
         CellTree.Resources res = GWT.create(CellTree.BasicResources.class);
 
-        model = new TraceDetailViewModel(this.trace);
-        tree = new CellTree(model, root, res);
+        model = new TraceDetailViewModel(service, traceInfo);
+        tree = new CellTree(model, rootRecord, res);
         tree.setAnimationEnabled(false);
-
 
         initWidget(ourUiBinder.createAndBindUi(this));
     }

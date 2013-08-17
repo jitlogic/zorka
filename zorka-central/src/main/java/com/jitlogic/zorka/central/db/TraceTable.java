@@ -149,7 +149,7 @@ public class TraceTable implements RoofEntityProxy {
         DbRecord rec = new DbRecord(tdesc);
         rec.put("CALLS", tr.getCalls());
         rec.put("ERRORS", tr.getErrors());
-        rec.put("TIME", tr.getTime());
+        rec.put("XTIME", tr.getTime());
         rec.put("FLAGS", tr.getFlags());
         rec.put("METHOD", CentralUtil.prettyPrint(tr, symbolRegistry));
         rec.put("CHILDREN", tr.numChildren());

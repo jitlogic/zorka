@@ -15,35 +15,35 @@
  */
 package com.jitlogic.zorka.central.web.client;
 
+import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.DataGrid;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SingleSelectionModel;
+import com.jitlogic.zorka.central.web.client.data.HostInfo;
+import org.fusesource.restygwt.client.Method;
+import org.fusesource.restygwt.client.MethodCallback;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
 public class HostListPanel extends Composite {
 
-    interface HostListPanelUiBinder extends UiBinder<Widget, HostListPanel> { }
+    interface HostListPanelUiBinder extends UiBinder<Widget, HostListPanel> {
+    }
 
     private static HostListPanelUiBinder ourUiBinder = GWT.create(HostListPanelUiBinder.class);
 
-    @UiField DataGrid<RoofRecord> hostTable;
+    @UiField
+    DataGrid<HostInfo> hostTable;
 
-    private SingleSelectionModel<RoofRecord> sel = new SingleSelectionModel<RoofRecord>();
-
-    private RoofClient<RoofRecord> client = new RoofClient<RoofRecord>("roof/hosts");
-
+    private SingleSelectionModel<HostInfo> sel;
     private ZorkaCentral central;
 
     public HostListPanel(ZorkaCentral central) {
@@ -55,40 +55,50 @@ public class HostListPanel extends Composite {
 
 
     private void configureTable() {
-        RoofDataColumnRenderers.textColumn(hostTable, "HOST_NAME", "Host name", "250px");
-        RoofDataColumnRenderers.textColumn(hostTable, "HOST_ADDR", "Host address", "250px");
+        Column<HostInfo, String> colName = new Column<HostInfo, String>(new TextCell()) {
+            @Override
+            public String getValue(HostInfo object) {
+                return object.getName();
+            }
+        };
+        hostTable.addColumn(colName, "Host name");
+        hostTable.setColumnWidth(colName, "250px");
 
+        Column<HostInfo, String> colAddr = new Column<HostInfo, String>(new TextCell()) {
+            @Override
+            public String getValue(HostInfo object) {
+                return object.getAddr();
+            }
+        };
+        hostTable.addColumn(colAddr, "Host address");
+        hostTable.setColumnWidth(colAddr, "250px");
+
+        sel = new SingleSelectionModel<HostInfo>();
         hostTable.setSelectionModel(sel);
 
         hostTable.addDomHandler(new DoubleClickHandler() {
             @Override
             public void onDoubleClick(DoubleClickEvent event) {
-                RoofRecord selected = sel.getSelectedObject();
-                GWT.log("Selected host id: " + selected.getS("HOST_ID"));
-                central.add(new TraceListPanel(central, selected.getS("HOST_ID")), selected.getS("HOST_NAME"));
+                HostInfo info = sel.getSelectedObject();
+                GWT.log("Selected host id: " + info.getId());
+                central.add(new TraceListPanel(central, info.getId()), info.getName());
             }
         }, DoubleClickEvent.getType());
     }
 
 
-
-
     private void loadHostList() {
-        client.list(null, new AsyncCallback<JsArray<RoofRecord>>() {
+        central.getTraceDataService().listHosts(new MethodCallback<List<HostInfo>>() {
             @Override
-            public void onFailure(Throwable e) {
-                GWT.log("Error fetching host list", e);
+            public void onFailure(Method method, Throwable exception) {
+                GWT.log("Error calling method " + method, exception);
             }
 
             @Override
-            public void onSuccess(JsArray<RoofRecord> result) {
-                List<RoofRecord> hostList = new ArrayList<RoofRecord>();
-                for (int i = 0; i < result.length(); i++) {
-                    hostList.add(result.get(i));
-                }
-                hostTable.setPageSize(hostList.size());
-                hostTable.setRowData(hostList);
-                hostTable.setRowCount(hostList.size());
+            public void onSuccess(Method method, List<HostInfo> response) {
+                hostTable.setPageSize(response.size());
+                hostTable.setRowCount(response.size());
+                hostTable.setRowData(response);
             }
         });
     }

@@ -16,17 +16,22 @@
 package com.jitlogic.zorka.central.web.client;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
+import com.jitlogic.zorka.central.web.client.data.TraceDataService;
+import org.fusesource.restygwt.client.Resource;
+import org.fusesource.restygwt.client.RestServiceProxy;
 
 
 public class ZorkaCentral implements EntryPoint {
 
-    TabLayoutPanel tabPanel;
+    private TabLayoutPanel tabPanel;
 
+    private TraceDataService traceDataService;
 
     public void add(IsWidget w, String title) {
         tabPanel.add(w, title);
@@ -37,7 +42,15 @@ public class ZorkaCentral implements EntryPoint {
         tabPanel.remove(w);
     }
 
+    public TraceDataService getTraceDataService() {
+        return traceDataService;
+    }
+
     public void onModuleLoad() {
+
+        traceDataService = GWT.create(TraceDataService.class);
+        ((RestServiceProxy) traceDataService).setResource(new Resource(GWT.getHostPageBaseURL() + "roof"));
+
         tabPanel = new TabLayoutPanel(2.5, Style.Unit.EM);
         tabPanel.add(new HostListPanel(this), "Hosts");
         //tabPanel.add(new TraceListPanel(), "Traces1");

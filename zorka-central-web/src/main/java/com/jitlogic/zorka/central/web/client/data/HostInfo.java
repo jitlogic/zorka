@@ -13,21 +13,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.web.client;
+package com.jitlogic.zorka.central.web.client.data;
 
 
-import com.google.gwt.core.client.JavaScriptObject;
+import org.codehaus.jackson.annotate.JsonProperty;
 
-public class RoofRecord extends JavaScriptObject {
+public class HostInfo {
 
-    protected RoofRecord() { }
+    // TODO named property annotations seem to be broken (data does not deserialize properly)
+    // TODO setting property values via constructor is also broken (crashes compile process)
 
-    public final native Object get(String key)  /*-{ return this[key]; }-*/;
+    @JsonProperty
+    int HOST_ID;
 
-    public final native int getI(String key)    /*-{ return this[key]; }-*/;
+    @JsonProperty
+    String HOST_NAME;
 
-    public final native Long getL(String key)   /*-{ return this[key]; }-*/;
+    @JsonProperty
+    String HOST_ADDR;
 
-    public final native String getS(String key) /*-{ return ""+this[key]; }-*/;
 
+    public int getId() {
+        return HOST_ID;
+    }
+
+    public String getName() {
+        return HOST_NAME;
+    }
+
+    public String getAddr() {
+        return HOST_ADDR;
+    }
 }
