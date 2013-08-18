@@ -17,12 +17,11 @@
 
 package com.jitlogic.zorka.core.mbeans;
 
-import com.jitlogic.zorka.core.util.ZorkaLogger;
-import com.jitlogic.zorka.core.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaLog;
 
 import javax.management.*;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

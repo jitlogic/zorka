@@ -16,6 +16,8 @@
 package com.jitlogic.zorka.core.mbeans;
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
+import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.util.*;
 

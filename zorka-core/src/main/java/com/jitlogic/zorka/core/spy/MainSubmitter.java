@@ -19,8 +19,8 @@ package com.jitlogic.zorka.core.spy;
 
 import bsh.EvalError;
 import com.jitlogic.zorka.core.AgentDiagnostics;
-import com.jitlogic.zorka.core.util.ZorkaLog;
-import com.jitlogic.zorka.core.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
 
 /**
  * Main submitter contains static methods that can be called directly by

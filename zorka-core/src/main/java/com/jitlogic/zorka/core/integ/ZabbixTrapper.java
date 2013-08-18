@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.integ;
 
+import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.core.AgentDiagnostics;
 import com.jitlogic.zorka.core.util.*;
 

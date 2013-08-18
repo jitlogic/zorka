@@ -17,11 +17,10 @@
 
 package com.jitlogic.zorka.agent;
 
+import com.jitlogic.zorka.core.AgentConfig;
 import com.jitlogic.zorka.core.AgentInstance;
-import com.jitlogic.zorka.core.ZorkaConfig;
 import com.jitlogic.zorka.core.spy.MainSubmitter;
 
-import java.io.File;
 import java.lang.instrument.Instrumentation;
 
 /**
@@ -48,7 +47,7 @@ public class AgentMain {
 
         String home = System.getProperties().getProperty("zorka.home.dir", args);
 
-        instance = new AgentInstance(new ZorkaConfig(home));
+        instance = new AgentInstance(new AgentConfig(home));
         instance.start();
 
         if (instance.getConfig().boolCfg("spy", true)) {

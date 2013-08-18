@@ -17,12 +17,12 @@
 
 package com.jitlogic.zorka.core.integ;
 
-import com.jitlogic.zorka.core.ZorkaConfig;
+import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
 import com.jitlogic.zorka.core.perfmon.QueryLister;
 import com.jitlogic.zorka.core.perfmon.QueryResult;
-import com.jitlogic.zorka.core.util.JSONWriter;
+import com.jitlogic.zorka.common.util.JSONWriter;
 
 import java.util.ArrayList;
 import java.util.HashMap;

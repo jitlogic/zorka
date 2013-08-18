@@ -19,7 +19,6 @@ package com.jitlogic.zorka.core.test.store;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
-import com.jitlogic.zorka.core.store.*;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.FressianReader;
 import org.junit.Before;

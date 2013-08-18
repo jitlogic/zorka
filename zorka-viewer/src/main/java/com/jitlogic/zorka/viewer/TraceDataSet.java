@@ -91,6 +91,7 @@ public class TraceDataSet {
 
 
     private InputStream open(File file) throws IOException {
+        // TODO this is redudant
         FileInputStream fis = new FileInputStream(file);
         byte[] hdr = new byte[4]; fis.read(hdr);
 

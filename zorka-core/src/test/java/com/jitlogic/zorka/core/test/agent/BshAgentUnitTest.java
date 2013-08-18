@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
+import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.*;
 import com.jitlogic.zorka.core.test.support.TestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
@@ -94,8 +95,8 @@ public class BshAgentUnitTest extends ZorkaFixture {
     @Test
     public void testStartAndLoadProfilesAndScripts() throws Exception {
         URL url = getClass().getResource("/cfgp");
-        ZorkaConfig config = new ZorkaConfig(url.getPath());
-        TestUtil.setField(zorkaAgent, "config", config);
+        AgentConfig config = new AgentConfig(url.getPath());
+        ObjectInspector.setField(zorkaAgent, "config", config);
         zorkaAgent.loadScripts();
         assertNotNull("common.bsh script should be loaded.", zorkaAgent.get("common_bsh"));
         assertNotNull("jvm/jvm.bsh script should be loaded.", zorkaAgent.get("jvm_bsh"));

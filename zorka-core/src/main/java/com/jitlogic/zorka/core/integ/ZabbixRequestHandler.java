@@ -24,8 +24,8 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 import com.jitlogic.zorka.core.AgentDiagnostics;
-import com.jitlogic.zorka.core.util.ZorkaLogger;
-import com.jitlogic.zorka.core.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaLog;
 
 /**
  * Zabbix request handler is used by ZabbixAgent thread to parse queries from zabbix server and format responses.

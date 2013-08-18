@@ -15,7 +15,6 @@
  */
 package com.jitlogic.zorka.common.tracedata;
 
-import com.jitlogic.zorka.common.tracedata.MetadataChecker;
 
 import java.io.IOException;
 

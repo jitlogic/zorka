@@ -35,4 +35,7 @@ public interface TraceWriter {
      * trace output object.
      */
     void reset();
+
+
+    void softReset();
 }

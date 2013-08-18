@@ -48,6 +48,7 @@ public class FressianTraceFormat {
     public static final String STACKEL_TAG    = "com.jitlogic.zorka.SymbolicStackElement_v1";
     public static final String PERFRECORD_TAG = "com.jitlogic.zorka.PerfRecord_v1";
     public static final String PERFSAMPLE_TAG = "com.jitlogic.zorka.PerfSample_v1";
+    public static final String HELLO_TAG      = "com.jitlogic.zorka.HelloRquest_v1";
 
 
     /** Default write handler for values of unknown types. */
@@ -141,7 +142,14 @@ public class FressianTraceFormat {
             tr.setErrors(r.readInt());
             tr.setMarker((TraceMarker)r.readObject());
             tr.setException(r.readObject());
-            tr.setAttrs((Map<Integer,Object>)r.readObject());
+
+            Map<Long,Object> m = (Map<Long,Object>)r.readObject();
+
+            if (m != null) {
+                for (Map.Entry<Long,Object> e : m.entrySet()) {
+                    tr.setAttr((int)(long)e.getKey(), e.getValue());
+                }
+            }
 
             List<TraceRecord> children = (List<TraceRecord>)r.readObject();
 
@@ -373,6 +381,27 @@ public class FressianTraceFormat {
     };
 
 
+    /** HELLO record read handler */
+    public static final ReadHandler HELLO_RH = new ReadHandler() {
+        @Override
+        public Object read(Reader r, Object tag, int componentCount) throws IOException {
+            return new HelloRequest(r.readInt(), (String)r.readObject(), (String)r.readObject());
+        }
+    };
+
+
+    public static final WriteHandler HELLO_WH = new WriteHandler() {
+        @Override
+        public void write(Writer w, Object instance) throws IOException {
+            HelloRequest hello = (HelloRequest)instance;
+
+            w.writeTag(HELLO_TAG, 3);
+            w.writeInt(hello.getTstamp());
+            w.writeObject(hello.getHostname());
+            w.writeObject(hello.getAuth());
+        }
+    };
+
     /** Lookup object grouping all write handlers */
     public static ILookup<Class, Map<String,WriteHandler>> WRITE_LOOKUP =
         new ChainedLookup<Class, Map<String, WriteHandler>>(
@@ -392,7 +421,8 @@ public class FressianTraceFormat {
                         SymbolicException.class,    ZorkaUtil.<String,WriteHandler>constMap(EXCEPTION_TAG, EXCEPTION_WH),
                         SymbolicStackElement.class, ZorkaUtil.<String,WriteHandler>constMap(STACKEL_TAG, STACKEL_WH),
                         PerfRecord.class,           ZorkaUtil.<String,WriteHandler>constMap(PERFRECORD_TAG, PERFRECORD_WH),
-                        PerfSample.class,           ZorkaUtil.<String,WriteHandler>constMap(PERFSAMPLE_TAG, PERFSAMPLE_WH)
+                        PerfSample.class,           ZorkaUtil.<String,WriteHandler>constMap(PERFSAMPLE_TAG, PERFSAMPLE_WH),
+                        HelloRequest.class,         ZorkaUtil.<String,WriteHandler>constMap(HELLO_TAG, HELLO_WH)
                     ))),
 
             // Null handler for other types
@@ -416,6 +446,7 @@ public class FressianTraceFormat {
                 EXCEPTION_TAG,  EXCEPTION_RH,
                 STACKEL_TAG,    STACKEL_RH,
                 PERFRECORD_TAG, PERFRECORD_RH,
-                PERFSAMPLE_TAG, PERFSAMPLE_RH
+                PERFSAMPLE_TAG, PERFSAMPLE_RH,
+                HELLO_TAG,      HELLO_RH
         ));
 }
