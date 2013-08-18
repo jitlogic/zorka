@@ -17,14 +17,12 @@ package com.jitlogic.zorka.central.test;
 
 
 import com.jitlogic.zorka.central.db.DbContext;
+import com.jitlogic.zorka.central.rest.TraceDataApi;
 import com.jitlogic.zorka.central.test.support.CentralFixture;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-
-import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -32,6 +30,8 @@ public class RoofDataApiUnitTest extends CentralFixture {
 
 
     private int hostId;
+    private TraceDataApi api;
+
 
     @Before
     public void populateData() {
@@ -39,8 +39,9 @@ public class RoofDataApiUnitTest extends CentralFixture {
 
         jdbc.update("insert into HOSTS (HOST_NAME,HOST_ADDR,HOST_PATH) values(?,?,?)", "test", "127.0.0.1", "test");
         hostId = jdbc.queryForObject("select HOST_ID from HOSTS where HOST_NAME = 'test'", Integer.class);
-        jdbc.update("insert into TRACES values (?,?,?,?,?,?,?,?,?,?,?,?)", hostId,10,1,100,1234,1,2,100,10,50,1000,"fval1|fval2|etc");
-        jdbc.update("insert into TRACES values (?,?,?,?,?,?,?,?,?,?,?,?)", hostId,20,1,100,1234,1,2,100,10,50,1000,"fval1|fval2|xxx");
+        jdbc.update("insert into TRACES values (?,?,?,?,?,?,?,?,?,?,?,?)", hostId, 10, 1, 100, 1234, 1, 2, 100, 10, 50, 1000, "fval1|fval2|etc");
+        jdbc.update("insert into TRACES values (?,?,?,?,?,?,?,?,?,?,?,?)", hostId, 20, 1, 100, 1234, 1, 2, 100, 10, 50, 1000, "fval1|fval2|xxx");
+        api = new TraceDataApi();
     }
 
 
@@ -55,37 +56,25 @@ public class RoofDataApiUnitTest extends CentralFixture {
 
 
     @Test
-    public void testHostJediService() {
-        assertEquals(1, ((List) roofService.GET(Arrays.asList("hosts"), Collections.EMPTY_MAP)).size());
+    public void testListHostsViaApi() {
+        assertEquals(1, api.getHosts().size());
     }
+
 
     @Test
     public void testAccessTraceTableViaHost() {
-        List<String> path = Arrays.asList("hosts", "" + hostId, "collections", "traces");
-        List traces = (List)roofService.GET(path, Collections.EMPTY_MAP);
-        assertEquals(2, traces.size());
+        assertEquals(2, api.listTraces(hostId, 0, 100).size());
     }
+
 
     @Test
     public void testAccessTraceTableCount() {
-        List<String> path = Arrays.asList("hosts", "" + hostId, "collections", "traces", "actions", "count");
-        Object count = roofService.GET(path, Collections.EMPTY_MAP);
-        assertEquals(2, count);
+        assertEquals(2, api.countTraces(hostId));
     }
 
     @Test
     public void testAccessTraceTableWithOffsetAndLimit() {
-        List<String> path = Arrays.asList("hosts", "" + hostId, "collections", "traces");
-        Map<String,String> params = ZorkaUtil.map("limit", "1", "offset", "1");
-        List traces = (List)roofService.GET(path, params);
-        assertEquals(1, traces.size());
-    }
-
-    @Test
-    public void testAccessHostTableCount() {
-        List<String> path = Arrays.asList("hosts", "actions", "count");
-        Object count = roofService.GET(path, Collections.EMPTY_MAP);
-        assertEquals(1, count);
+        assertEquals(1, api.listTraces(hostId, 1, 1).size());
     }
 
 }

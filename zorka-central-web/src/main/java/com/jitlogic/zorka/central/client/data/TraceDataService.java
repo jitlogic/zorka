@@ -16,6 +16,9 @@
 package com.jitlogic.zorka.central.client.data;
 
 
+import com.jitlogic.zorka.central.data.HostInfo;
+import com.jitlogic.zorka.central.data.TraceInfo;
+import com.jitlogic.zorka.central.data.TraceRecordInfo;
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.RestService;
 
@@ -28,12 +31,12 @@ import java.util.List;
 public interface TraceDataService extends RestService {
 
     @GET
-    @Path("hosts")
+    @Path("hosts/list")
     public void listHosts(MethodCallback<List<HostInfo>> callback);
 
 
     @GET
-    @Path("hosts/{hostId}/collections/traces?limit={limit}&offset={offset}")
+    @Path("hosts/{hostId}/list?limit={limit}&offset={offset}")
     public void listTraces(@PathParam("hostId") int hostId,
                            @PathParam("offset") int offset,
                            @PathParam("limit") int limit,
@@ -41,13 +44,13 @@ public interface TraceDataService extends RestService {
 
 
     @GET
-    @Path("hosts/{hostId}/collections/traces/actions/count")
+    @Path("hosts/{hostId}/count")
     public void countTraces(@PathParam("hostId") int hostId,
                             MethodCallback<Integer> callback);
 
 
     @GET
-    @Path("hosts/{hostId}/collections/traces/{traceOffs}/actions/listRecords?path={path}")
+    @Path("hosts/{hostId}/{traceOffs}/list?path={path}")
     public void listTraceRecords(@PathParam("hostId") int hostId,
                                  @PathParam("traceOffs") long traceOffs,
                                  @PathParam("path") String path,
@@ -55,7 +58,7 @@ public interface TraceDataService extends RestService {
 
 
     @GET
-    @Path("hosts/{hostId}/collections/traces/{traceOffs}/actions/getRecord?path={path}")
+    @Path("hosts/{hostId}/{traceOffs}/get?path={path}")
     public void getTraceRecord(@PathParam("hostId") int hostId,
                                @PathParam("traceOffs") long traceOffs,
                                @PathParam("path") String path,

@@ -8,4 +8,7 @@
 
     <entry-point class='com.jitlogic.zorka.central.client.ZorkaCentral'/>
 
+    <source path="client"/>
+    <source path="data"/>
+
 </module>

@@ -15,7 +15,7 @@
             </g:HorizontalPanel>
         </g:north>
         <g:center style="margin-top: 5px;">
-            <c:DataGrid ui:field="traceTable" pageSize="100" addStyleNames="{style.cellTable}"/>
+            <c:DataGrid ui:field="traceTable" addStyleNames="{style.cellTable}"/>
         </g:center>
         <g:south size="25">
             <g:HTMLPanel>

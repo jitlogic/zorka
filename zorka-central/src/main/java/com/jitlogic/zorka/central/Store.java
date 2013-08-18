@@ -16,9 +16,7 @@
 package com.jitlogic.zorka.central;
 
 
-import com.jitlogic.zorka.central.db.DbContext;
-import com.jitlogic.zorka.central.db.DbRecord;
-import com.jitlogic.zorka.central.db.TraceTable;
+import com.jitlogic.zorka.central.data.HostInfo;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
@@ -30,35 +28,31 @@ import java.io.IOException;
 
 /**
  * Represents performance data store for a single agent.
- *
  */
 public class Store implements Closeable {
 
     private final static ZorkaLog log = ZorkaLogger.getLog(Store.class);
 
     private String hostname;
-    private Integer hostid;
     private String rootPath;
     private CentralConfig config;
 
     private RDSStore rds;
-    private TraceTable traces;
 
-    private DbContext dbContext;
+    private HostInfo hostInfo;
+
     private SymbolRegistry symbolRegistry;
 
 
     public Store(CentralConfig config,
-                 DbRecord host, String root,
-                 DbContext dbContext,
+                 HostInfo hostInfo, String root,
                  SymbolRegistry symbolRegistry) {
 
         this.config = config;
-        this.hostname = host.getS("HOST_NAME");
-        this.hostid = host.getI("HOST_ID");
-        this.rootPath = ZorkaUtil.path(root, host.getS("HOST_PATH"));
-        this.dbContext = dbContext;
+        this.hostname = hostInfo.getName();
+        this.rootPath = ZorkaUtil.path(root, hostInfo.getPath());
         this.symbolRegistry = symbolRegistry;
+        this.hostInfo = hostInfo;
 
         File rootDir = new File(rootPath);
         if (!rootDir.exists()) {
@@ -66,6 +60,9 @@ public class Store implements Closeable {
         }
     }
 
+    public HostInfo getHostInfo() {
+        return hostInfo;
+    }
 
     public String toString() {
         return "central.Store(" + hostname + ")";
@@ -77,9 +74,9 @@ public class Store implements Closeable {
             String rdspath = ZorkaUtil.path(rootPath, "traceadata");
             try {
                 rds = new RDSStore(rdspath,
-                    config.kiloCfg("rds.file.size", 16*1024*1024L).intValue(),
-                    config.kiloCfg("rds.max.size", 256*1024*1024L),
-                    config.kiloCfg("rds.seg.size", 1024*1024L));
+                        config.kiloCfg("rds.file.size", 16 * 1024 * 1024L).intValue(),
+                        config.kiloCfg("rds.max.size", 256 * 1024 * 1024L),
+                        config.kiloCfg("rds.seg.size", 1024 * 1024L));
             } catch (IOException e) {
                 log.error(ZorkaLogger.ZCL_STORE, "Cannot open RDS store at '" + rdspath + "'", e);
             }
@@ -91,14 +88,6 @@ public class Store implements Closeable {
     public SymbolRegistry getSymbolRegistry() {
         return symbolRegistry;
     }
-
-    public synchronized TraceTable getTraces() {
-        if (traces == null) {
-            traces = new TraceTable(getRds(), dbContext, symbolRegistry, hostid);
-        }
-        return traces;
-    }
-
 
     @Override
     public synchronized void close() throws IOException {

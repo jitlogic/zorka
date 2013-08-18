@@ -13,59 +13,86 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.client.data;
+package com.jitlogic.zorka.central.data;
 
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class TraceRecordInfo {
+    @JsonProperty
+    long calls;
 
     @JsonProperty
-    long CALLS;
+    long errors;
 
     @JsonProperty
-    long ERRORS;
+    long time;
 
     @JsonProperty
-    long TIME;
+    int flags;
 
     @JsonProperty
-    int FLAGS;
+    String method;
 
     @JsonProperty
-    String METHOD;
+    int children;
 
     @JsonProperty
-    int CHILDREN;
-
-    @JsonProperty
-    String PATH;
+    String path;
 
     public long getCalls() {
-        return CALLS;
+        return calls;
     }
 
-    public long getErorrs() {
-        return ERRORS;
+    public void setCalls(long calls) {
+        this.calls = calls;
+    }
+
+    public long getErrors() {
+        return errors;
+    }
+
+    public void setErrors(long errors) {
+        this.errors = errors;
     }
 
     public long getTime() {
-        return TIME;
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
     }
 
     public int getFlags() {
-        return FLAGS;
+        return flags;
+    }
+
+    public void setFlags(int flags) {
+        this.flags = flags;
     }
 
     public String getMethod() {
-        return METHOD;
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
     }
 
     public int getChildren() {
-        return CHILDREN;
+        return children;
+    }
+
+    public void setChildren(int children) {
+        this.children = children;
     }
 
     public String getPath() {
-        return PATH;
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }

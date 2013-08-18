@@ -40,6 +40,9 @@ public class CentralApp {
         return instance;
     }
 
+    public static synchronized void setInstance(CentralInstance instance) {
+        CentralApp.instance = instance;
+    }
 
     private static class ShutdownHook extends Thread {
         public void run() {

@@ -25,17 +25,17 @@ import java.sql.SQLException;
 
 public class DbSymbolRegistry extends SymbolRegistry {
 
-    private JdbcTemplate jdbcTemplate;
+    private JdbcTemplate jdbc;
 
 
-    public DbSymbolRegistry(DbContext ctx) {
-        this.jdbcTemplate = ctx.getJdbcTemplate();
+    public DbSymbolRegistry(JdbcTemplate jdbc) {
+        this.jdbc = jdbc;
         loadSymbols();
     }
 
 
     private void loadSymbols() {
-        jdbcTemplate.query("select * from SYMBOLS", new RowCallbackHandler() {
+        jdbc.query("select * from SYMBOLS", new RowCallbackHandler() {
             @Override
             public void processRow(ResultSet rs) throws SQLException {
                 int sid = rs.getInt("SID");
@@ -53,6 +53,6 @@ public class DbSymbolRegistry extends SymbolRegistry {
 
     @Override
     protected void persist(int symbolId, String symbolName) {
-        jdbcTemplate.update("insert into SYMBOLS (SID,NAME) values (?,?)", symbolId, symbolName);
+        jdbc.update("insert into SYMBOLS (SID,NAME) values (?,?)", symbolId, symbolName);
     }
 }

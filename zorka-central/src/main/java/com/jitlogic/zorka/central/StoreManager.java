@@ -15,19 +15,18 @@
  */
 package com.jitlogic.zorka.central;
 
+import com.jitlogic.zorka.central.data.HostInfo;
 import com.jitlogic.zorka.central.db.DbContext;
-import com.jitlogic.zorka.central.db.DbRecord;
-import com.jitlogic.zorka.central.db.HostTable;
+import com.jitlogic.zorka.central.rest.TraceDataApi;
 import com.jitlogic.zorka.common.tracedata.HelloRequest;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessorFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
@@ -42,39 +41,39 @@ public class StoreManager implements Closeable, ZicoDataProcessorFactory {
 
     private CentralConfig config;
 
-    private DbContext dbContext;
 
     private SymbolRegistry symbolRegistry;
+    private Map<String, Store> stores = new HashMap<String, Store>();
 
-    private HostTable hostTable;
+    private TraceDataApi traceDataApi;
 
-    private Map<String,Store> stores = new HashMap<String, Store>();
+    private JdbcTemplate jdbc;
 
-
-    public StoreManager(CentralConfig config, DbContext dbContext, SymbolRegistry symbolRegistry, HostTable hostTable) {
+    public StoreManager(CentralConfig config, DbContext dbContext, SymbolRegistry symbolRegistry) {
         this.config = config;
         this.symbolRegistry = symbolRegistry;
-        this.hostTable = hostTable;
-        this.dbContext = dbContext;
         this.dataDir = config.stringCfg("central.data.dir", null);
+        this.traceDataApi = new TraceDataApi(dbContext.getJdbcTemplate(), this, symbolRegistry);
+        this.jdbc = dbContext.getJdbcTemplate();
     }
 
     // TODO use ID as proper host ID as get(id), rename this method to reflect it is get-or-create method, not a simple getter
-    public synchronized Store get(String hostname) {
-        if (!stores.containsKey(hostname)) {
-            DbRecord host = hostTable.getHost(hostname, null);
+    public synchronized Store get(String hostName) {
+        if (!stores.containsKey(hostName)) {
+            HostInfo host = traceDataApi.getOrCreateHost(hostName, null);
             if (host != null) {
-                Store store = new Store(config, host, dataDir, dbContext, symbolRegistry);
-                stores.put(hostname, store);
+                Store store = new Store(config, host, dataDir, symbolRegistry);
+                stores.put(hostName, store);
             }
         }
-        return stores.get(hostname);
+
+        return stores.get(hostName);
     }
 
 
     @Override
     public synchronized void close() throws IOException {
-        for (Map.Entry<String,Store> entry : stores.entrySet()) {
+        for (Map.Entry<String, Store> entry : stores.entrySet()) {
             try {
                 entry.getValue().close();
             } catch (IOException e) {
@@ -86,6 +85,7 @@ public class StoreManager implements Closeable, ZicoDataProcessorFactory {
 
     @Override
     public ZicoDataProcessor get(Socket socket, HelloRequest hello) throws IOException {
-        return new ReceiverContext(get(hello.getHostname()));
+        Store store = get(hello.getHostname());
+        return new ReceiverContext(jdbc, store);
     }
 }

@@ -37,7 +37,6 @@ public class DataReceptionUnitTest extends CentralFixture {
         assertNotEquals(t1, t2);
 
         assertNotNull(store.getRds());
-        assertNotNull(store.getTraces());
     }
 
 }

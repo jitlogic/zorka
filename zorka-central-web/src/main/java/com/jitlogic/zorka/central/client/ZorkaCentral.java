@@ -46,12 +46,10 @@ public class ZorkaCentral implements EntryPoint {
     public void onModuleLoad() {
 
         traceDataService = GWT.create(TraceDataService.class);
-        ((RestServiceProxy) traceDataService).setResource(new Resource(GWT.getHostPageBaseURL() + "roof"));
+        ((RestServiceProxy) traceDataService).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
 
         tabPanel = new TabLayoutPanel(2.5, Style.Unit.EM);
         tabPanel.add(new HostListPanel(this), "Hosts");
-        //tabPanel.add(new TraceListPanel(), "Traces1");
-        //tabPanel.add(new TraceListPanel(), "Traces2");
         tabPanel.setWidth("100%");
         tabPanel.setHeight("100%");
 

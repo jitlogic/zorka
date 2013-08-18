@@ -6,13 +6,22 @@
     <display-name>Archetype Created Web Application</display-name>
 
     <servlet>
-        <servlet-name>DataSearch</servlet-name>
-        <servlet-class>com.jitlogic.zorka.central.roof.RoofServlet</servlet-class>
+        <servlet-name>rest-servlet</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>com.jitlogic.zorka.central.rest</param-value>
+        </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+            <param-value>true</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
+
     <servlet-mapping>
-        <servlet-name>DataSearch</servlet-name>
-        <url-pattern>/roof/*</url-pattern>
+        <servlet-name>rest-servlet</servlet-name>
+        <url-pattern>/rest/*</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>

@@ -17,12 +17,7 @@ package com.jitlogic.zorka.central;
 
 
 import com.jitlogic.zorka.central.db.DbContext;
-import com.jitlogic.zorka.central.db.DbRecord;
 import com.jitlogic.zorka.central.db.DbSymbolRegistry;
-import com.jitlogic.zorka.central.db.HostTable;
-import com.jitlogic.zorka.central.roof.RoofCompositeService;
-import com.jitlogic.zorka.central.roof.RoofEntityProxyService;
-import com.jitlogic.zorka.central.roof.RoofService;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.common.util.ZorkaLog;
@@ -36,7 +31,9 @@ import java.util.Properties;
 
 public class CentralInstance {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     private CentralConfig config;
@@ -49,9 +46,6 @@ public class CentralInstance {
 
     private SymbolRegistry symbolRegistry;
 
-    private HostTable hostTable;
-
-    private RoofCompositeService jediService;
 
     public CentralInstance(CentralConfig config) {
         this.config = config;
@@ -114,7 +108,6 @@ public class CentralInstance {
 
     /**
      * Creates and configures file trapper according to configuration properties
-     *
      */
     private void initFileTrapper() {
         String logDir = config.getLogDir();
@@ -122,11 +115,11 @@ public class CentralInstance {
         String logFileName = config.stringCfg("zorka.log.fname", "zorka.log");
         ZorkaLogLevel logThreshold = ZorkaLogLevel.DEBUG;
 
-        int maxSize = 4*1024*1024, maxLogs = 4; // TODO int -> long
+        int maxSize = 4 * 1024 * 1024, maxLogs = 4; // TODO int -> long
 
         try {
             logThreshold = ZorkaLogLevel.valueOf(config.stringCfg("zorka.log.level", "INFO"));
-            maxSize = (int)(long)config.kiloCfg("zorka.log.size", 4L*1024*1024);
+            maxSize = (int) (long) config.kiloCfg("zorka.log.size", 4L * 1024 * 1024);
             maxLogs = config.intCfg("zorka.log.num", 8);
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing logger arguments", e);
@@ -151,7 +144,7 @@ public class CentralInstance {
 
     public synchronized SymbolRegistry getSymbolRegistry() {
         if (symbolRegistry == null) {
-            symbolRegistry = new DbSymbolRegistry(getDb());
+            symbolRegistry = new DbSymbolRegistry(getDb().getJdbcTemplate());
         }
 
         return symbolRegistry;
@@ -160,8 +153,7 @@ public class CentralInstance {
 
     public synchronized StoreManager getStoreManager() {
         if (null == storeManager) {
-            storeManager = new StoreManager(getConfig(), getDb(), getSymbolRegistry(), getHostTable());
-            getHostTable().setStorageManager(storeManager);
+            storeManager = new StoreManager(getConfig(), getDb(), getSymbolRegistry());
         }
         return storeManager;
     }
@@ -170,9 +162,9 @@ public class CentralInstance {
     public synchronized ZicoService getZicoService() {
         if (null == zicoService) {
             zicoService = new ZicoService(
-                config.stringCfg("central.listen.addr", "0.0.0.0"),
-                config.intCfg("central.listen.port", ZicoService.COLLECTOR_PORT),
-                 getStoreManager());
+                    config.stringCfg("central.listen.addr", "0.0.0.0"),
+                    config.intCfg("central.listen.port", ZicoService.COLLECTOR_PORT),
+                    getStoreManager());
         }
         return zicoService;
     }
@@ -183,22 +175,5 @@ public class CentralInstance {
             db = new DbContext(getConfig());
         }
         return db;
-    }
-
-
-    public synchronized HostTable getHostTable() {
-        if (hostTable == null) {
-            hostTable = new HostTable(getConfig(), getDb(), getSymbolRegistry());
-        }
-        return hostTable;
-    }
-
-
-    public synchronized RoofService getRoofService() {
-        if (jediService == null) {
-            jediService = new RoofCompositeService();
-            jediService.register("hosts", new RoofEntityProxyService(getHostTable()));
-        }
-        return jediService;
     }
 }

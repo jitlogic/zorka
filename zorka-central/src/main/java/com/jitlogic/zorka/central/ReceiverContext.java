@@ -16,10 +16,10 @@
 package com.jitlogic.zorka.central;
 
 
-import com.jitlogic.zorka.central.db.TraceTable;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
 import org.fressian.FressianWriter;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,27 +28,27 @@ import java.util.Map;
 
 public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
-    //private static Logger log = LoggerFactory.getLogger(ReceiverContext.class);
-
     private SymbolRegistry symbolRegistry;
-    private Map<Integer,Integer> sidMap = new HashMap<Integer,Integer>();
+    private Map<Integer, Integer> sidMap = new HashMap<Integer, Integer>();
 
-    private TraceTable traceTable;
     private RDSStore traceDataStore;
+    private JdbcTemplate jdbc;
+    private int hostId;
 
-    public ReceiverContext(Store store) {
+    public ReceiverContext(JdbcTemplate jdbc, Store store) {
         this.symbolRegistry = store.getSymbolRegistry();
-        this.traceTable = store.getTraces();
         this.traceDataStore = store.getRds();
+        this.jdbc = jdbc;
+        this.hostId = store.getHostInfo().getId();
     }
 
 
     @Override
     public synchronized void process(Object obj) throws IOException {
         if (obj instanceof Symbol) {
-            processSymbol((Symbol)obj);
+            processSymbol((Symbol) obj);
         } else if (obj instanceof TraceRecord) {
-            processTraceRecord((TraceRecord) obj);
+            processTraceRecord(hostId, (TraceRecord) obj);
         } else {
             if (obj != null) {
                 //log.warn("Unsupported object type:" + obj.getClass());
@@ -63,16 +63,60 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     }
 
 
-    private void processTraceRecord(TraceRecord rec) throws IOException {
+    private void processTraceRecord(int hostId, TraceRecord rec) throws IOException {
         rec.traverse(this);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         FressianWriter writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);
         writer.writeObject(rec);
         byte[] chunk = os.toByteArray();
         long offs = traceDataStore.write(chunk);
-        traceTable.save(offs, chunk.length, rec);
+        save(hostId, offs, chunk.length, rec);
     }
 
+
+    public void save(int hostId, long offs, int length, TraceRecord tr) {
+
+        StringBuilder overview = new StringBuilder();
+
+        if (tr.getAttrs() != null) {
+            for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
+                if (overview.length() > 250) {
+                    break;
+                }
+                if (overview.length() > 0) {
+                    overview.append("|");
+                }
+                overview.append(e.getValue());
+            }
+        }
+
+
+        jdbc.update("insert into TRACES (HOST_ID,DATA_OFFS,TRACE_ID,DATA_LEN,CLOCK,RFLAGS,TFLAGS,CALLS,"
+                + "ERRORS,RECORDS,EXTIME,OVERVIEW) " + "values(?,?,?,?,?,?,?,?,?,?,?,?)",
+                hostId,
+                offs,
+                tr.getMarker().getTraceId(),
+                length,
+                tr.getClock(),
+                tr.getFlags(),
+                tr.getMarker().getFlags(),
+                tr.getCalls(),
+                tr.getErrors(),
+                numRecords(tr),
+                tr.getTime(),
+                overview.length() > 250 ? overview.toString().substring(0, 250) : overview.toString());
+    }
+
+
+    private int numRecords(TraceRecord rec) {
+        int n = 1;
+
+        for (int i = 0; i < rec.numChildren(); i++) {
+            n += numRecords(rec.getChild(i));
+        }
+
+        return n;
+    }
 
     @Override
     public int checkSymbol(int symbolId) throws IOException {

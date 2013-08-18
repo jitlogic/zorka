@@ -19,7 +19,7 @@ package com.jitlogic.zorka.central.client;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.jitlogic.zorka.central.client.data.TraceRecordInfo;
+import com.jitlogic.zorka.central.data.TraceRecordInfo;
 
 public class TraceDetailCell extends AbstractCell<TraceRecordInfo> {
     @Override

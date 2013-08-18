@@ -26,7 +26,7 @@ import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SingleSelectionModel;
-import com.jitlogic.zorka.central.client.data.HostInfo;
+import com.jitlogic.zorka.central.data.HostInfo;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 

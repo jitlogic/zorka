@@ -13,35 +13,61 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.client.data;
-
+package com.jitlogic.zorka.central.data;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class HostInfo {
 
-    // TODO named property annotations seem to be broken (data does not deserialize properly)
-    // TODO setting property values via constructor is also broken (crashes compile process)
+    @JsonProperty
+    private int id;
 
     @JsonProperty
-    int HOST_ID;
+    private String name;
 
     @JsonProperty
-    String HOST_NAME;
+    private String addr;
 
     @JsonProperty
-    String HOST_ADDR;
+    private String path;
 
 
     public int getId() {
-        return HOST_ID;
+        return id;
     }
+
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
 
     public String getName() {
-        return HOST_NAME;
+        return name;
     }
 
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
     public String getAddr() {
-        return HOST_ADDR;
+        return addr;
+    }
+
+
+    public void setAddr(String addr) {
+        this.addr = addr;
+    }
+
+
+    public String getPath() {
+        return path;
+    }
+
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }

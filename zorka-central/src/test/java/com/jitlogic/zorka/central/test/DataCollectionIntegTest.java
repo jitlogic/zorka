@@ -16,7 +16,6 @@
 package com.jitlogic.zorka.central.test;
 
 
-import com.jitlogic.zorka.central.Store;
 import com.jitlogic.zorka.central.test.support.CentralFixture;
 
 import com.jitlogic.zorka.common.test.support.TestTraceGenerator;
@@ -26,9 +25,11 @@ import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
 
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import static org.fest.reflect.core.Reflection.*;
+
+import static org.junit.Assert.*;
 
 public class DataCollectionIntegTest extends CentralFixture {
 
@@ -54,24 +55,31 @@ public class DataCollectionIntegTest extends CentralFixture {
     }
 
 
+    private int countTraces(String hostName) {
+        JdbcTemplate jdbc = instance.getDb().getJdbcTemplate();
+
+        int hostId = jdbc.queryForObject("select HOST_ID from HOSTS where HOST_NAME = ?", Integer.class, hostName);
+        return jdbc.queryForObject("select count(1) as C from TRACES where HOST_ID = ?", Integer.class, hostId);
+    }
+
+
     @Test(timeout = 1000)
     public void testCollectSingleTraceRecord() throws Exception {
         TraceRecord rec = generator.generate();
 
         submit(rec);
 
-        assertEquals("One trace should be noticed.", 1, storeManager.get("test").getTraces().count());
+        assertEquals("One trace should be noticed.", 1, countTraces("test"));
     }
 
 
     @Test(timeout = 1000)
     public void testCollectTwoTraceRecords() throws Exception {
         submit(generator.generate());
-        assertEquals("One trace should be noticed.", 1, storeManager.get("test").getTraces().count());
+        assertEquals("One trace should be noticed.", 1, countTraces("test"));
         submit(generator.generate());
-        assertEquals("Two traces should be noticed.", 2, storeManager.get("test").getTraces().count());
+        assertEquals("Two traces should be noticed.", 2, countTraces("test"));
     }
-
 
 
     @Test(timeout = 1000)
@@ -82,10 +90,10 @@ public class DataCollectionIntegTest extends CentralFixture {
 
         submit(rec);
 
-        assertEquals("Trace will not reach store.", 0, storeManager.get("test").getTraces().count());
+        assertEquals("Trace will not reach store.", 0, countTraces("test"));
 
         rec = generator.generate();
         submit(rec);
-        assertEquals("TraceOutput should reconnect and send properly.", 1, storeManager.get("test").getTraces().count());
+        assertEquals("TraceOutput should reconnect and send properly.", 1, countTraces("test"));
     }
 }

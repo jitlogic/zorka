@@ -16,11 +16,10 @@
 
 package com.jitlogic.zorka.central.test.support;
 
+import com.jitlogic.zorka.central.CentralApp;
 import com.jitlogic.zorka.central.CentralConfig;
 import com.jitlogic.zorka.central.CentralInstance;
 import com.jitlogic.zorka.central.StoreManager;
-import com.jitlogic.zorka.central.db.HostTable;
-import com.jitlogic.zorka.central.roof.RoofService;
 import com.jitlogic.zorka.common.test.support.TestUtil;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.zico.ZicoService;
@@ -40,9 +39,6 @@ public class CentralFixture {
     protected StoreManager storeManager;
     protected ZicoService zicoService;
 
-    protected HostTable hostTable;
-    protected RoofService roofService;
-
     @Before
     public void setUpCentralFixture() throws Exception {
         tmpDir = "/tmp" + File.separatorChar + "zorka-unit-test";
@@ -50,31 +46,31 @@ public class CentralFixture {
         new File(tmpDir).mkdirs();
 
         configProperties = setProps(
-            ZorkaConfig.defaultProperties(CentralConfig.DEFAULT_CONF_PATH),
-            "central.home.dir", tmpDir,
-            "zico.service",     "no",
-            "central.db.type",  "h2",
-            "central.db.url",   "jdbc:h2:mem:test",
-            "central.db.user",  "sa",
-            "central.db.pass",  "sa",
-            "central.db.create", "yes"
+                ZorkaConfig.defaultProperties(CentralConfig.DEFAULT_CONF_PATH),
+                "central.home.dir", tmpDir,
+                "zico.service", "no",
+                "central.db.type", "h2",
+                "central.db.url", "jdbc:h2:mem:test",
+                "central.db.user", "sa",
+                "central.db.pass", "sa",
+                "central.db.create", "yes"
         );
 
         config = new CentralConfig(configProperties);
 
         instance = new CentralInstance(config);
+        CentralApp.setInstance(instance);
         instance.start();
 
         storeManager = instance.getStoreManager();
         zicoService = instance.getZicoService();
 
-        hostTable = instance.getHostTable();
-        roofService = instance.getRoofService();
     }
 
     @After
     public void tearDownCentralFixture() throws Exception {
         instance.stop();
+        CentralApp.setInstance(null);
     }
 
     public String getTmpDir() {
@@ -87,10 +83,10 @@ public class CentralFixture {
     }
 
 
-    private static Properties setProps(Properties props, String...data) {
+    private static Properties setProps(Properties props, String... data) {
 
-        for (int i = 1; i < data.length; i+=2) {
-            props.setProperty(data[i-1], data[i]);
+        for (int i = 1; i < data.length; i += 2) {
+            props.setProperty(data[i - 1], data[i]);
         }
 
         return props;

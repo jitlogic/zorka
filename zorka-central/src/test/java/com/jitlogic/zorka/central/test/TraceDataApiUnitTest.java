@@ -17,7 +17,8 @@ package com.jitlogic.zorka.central.test;
 
 
 import com.jitlogic.zorka.central.ReceiverContext;
-import com.jitlogic.zorka.central.db.DbRecord;
+import com.jitlogic.zorka.central.data.TraceRecordInfo;
+import com.jitlogic.zorka.central.rest.TraceDataApi;
 import com.jitlogic.zorka.central.test.support.CentralFixture;
 import com.jitlogic.zorka.common.test.support.TestTraceGenerator;
 import com.jitlogic.zorka.common.tracedata.Symbol;
@@ -25,19 +26,20 @@ import com.jitlogic.zorka.common.tracedata.TraceRecord;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class TraceDataApiUnitTest extends CentralFixture {
 
+    TraceDataApi api;
 
     @Before
     public void prepareData() throws Exception {
-        ReceiverContext rcx  = new ReceiverContext(instance.getStoreManager().get("test"));
+        JdbcTemplate jdbc = instance.getDb().getJdbcTemplate();
+        ReceiverContext rcx = new ReceiverContext(jdbc, instance.getStoreManager().get("test"));
         TestTraceGenerator generator = new TestTraceGenerator();
         TraceRecord tr = generator.generate();
         Symbol s1 = new Symbol(tr.getClassId(), generator.getSymbols().symbolName(tr.getClassId()));
@@ -45,26 +47,20 @@ public class TraceDataApiUnitTest extends CentralFixture {
         rcx.process(new Symbol(tr.getMethodId(), generator.getSymbols().symbolName(tr.getMethodId())));
         rcx.process(new Symbol(tr.getSignatureId(), generator.getSymbols().symbolName(tr.getSignatureId())));
         rcx.process(tr);
+
+        api = new TraceDataApi();
     }
 
 
     @Test
     public void testGetTraceRoot() throws Exception {
-        int hostId = hostTable.getHost("test", "").getI("HOST_ID");
-        List<String> path = Arrays.asList("hosts", "" + hostId, "collections", "traces", "0", "actions", "getRecord");
-        Object obj = roofService.GET(path, Collections.EMPTY_MAP);
-        assertTrue(obj instanceof DbRecord);
-        DbRecord rec = (DbRecord)obj;
-        assertEquals(0, (int)rec.getI("CHILDREN"));
+        TraceRecordInfo tr = api.getRecord(api.getOrCreateHost("test", "").getId(), 0, "");
+        assertEquals(0, tr.getChildren());
     }
 
     @Test
     public void testListTraceRoot() throws Exception {
-        int hostId = hostTable.getHost("test", "").getI("HOST_ID");
-        List<String> path = Arrays.asList("hosts", "" + hostId, "collections", "traces", "0", "actions", "listRecords");
-        Object obj = roofService.GET(path, Collections.EMPTY_MAP);
-        assertTrue(obj instanceof DbRecord);
-        DbRecord rec = (DbRecord)obj;
-        assertEquals(0, (int)rec.getI("CHILDREN"));
+        List<TraceRecordInfo> lst = api.listRecords(api.getOrCreateHost("test", "").getId(), 0, "");
+        assertNotNull(lst);
     }
 }

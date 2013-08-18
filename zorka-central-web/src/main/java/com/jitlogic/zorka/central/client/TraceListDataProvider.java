@@ -21,7 +21,7 @@ import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
 import com.jitlogic.zorka.central.client.data.TraceDataService;
-import com.jitlogic.zorka.central.client.data.TraceInfo;
+import com.jitlogic.zorka.central.data.TraceInfo;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
