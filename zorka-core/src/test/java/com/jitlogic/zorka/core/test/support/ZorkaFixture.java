@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zorka.core.test.support;
 
+import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.*;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.core.integ.SnmpLib;
@@ -54,7 +55,7 @@ public class ZorkaFixture {
     protected ZorkaLib zorka;
 
     protected PerfMonLib perfmon;
-    protected ZorkaConfig config;
+    protected AgentConfig config;
 
     protected SymbolRegistry symbols;
 
@@ -70,7 +71,7 @@ public class ZorkaFixture {
         // Configure and spawn agent instance ...
 
         configProperties = setProps(
-                ZorkaConfig.defaultProperties(),
+                ZorkaConfig.defaultProperties(AgentConfig.DEFAULT_CONF_PATH),
                 "zorka.home.dir", "/tmp",
                 "zabbix.enabled", "no",
                 "zorka.hostname", "test",
@@ -79,7 +80,7 @@ public class ZorkaFixture {
                 "spy", "yes"
                 );
 
-        config = new ZorkaConfig(configProperties);
+        config = new AgentConfig(configProperties);
         agentInstance = new AgentInstance(config); //AgentInstance.instance();
         agentInstance.start();
 

@@ -15,8 +15,8 @@
  */
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.core.util.ZorkaLog;
-import com.jitlogic.zorka.core.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.normproc.Normalizer;
 
 import java.util.Map;

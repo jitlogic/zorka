@@ -16,7 +16,9 @@
 
 package com.jitlogic.zorka.common.tracedata;
 
-public class SymbolicStackElement {
+import java.io.IOException;
+
+public class SymbolicStackElement implements SymbolicRecord {
 
     private int classId;
     private int methodId;
@@ -80,5 +82,12 @@ public class SymbolicStackElement {
     @Override
     public String toString() {
         return "[" + classId + "," + methodId + "," + fileId + "," + lineNum + "]";
+    }
+
+    @Override
+    public void traverse(MetadataChecker checker) throws IOException {
+        classId = checker.checkSymbol(classId);
+        methodId = checker.checkSymbol(methodId);
+        fileId = checker.checkSymbol(fileId);
     }
 }

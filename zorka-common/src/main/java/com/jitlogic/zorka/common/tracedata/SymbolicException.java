@@ -159,11 +159,9 @@ public class SymbolicException implements SymbolicRecord {
 
     @Override
     public void traverse(MetadataChecker checker) throws IOException {
-        checker.checkSymbol(classId);
+        classId = checker.checkSymbol(classId);
         for (SymbolicStackElement el : stackTrace) {
-            checker.checkSymbol(el.getClassId());
-            checker.checkSymbol(el.getFileId());
-            checker.checkSymbol(el.getMethodId());
+            el.traverse(checker);
         }
     }
 }

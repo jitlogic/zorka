@@ -20,7 +20,7 @@ import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.core.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -530,45 +530,6 @@
                     <valuemap/>
                 </item>
                 <item>
-                    <name>Performance Monitor samples sent</name>
-                    <type>0</type>
-                    <snmp_community/>
-                    <multiplier>1</multiplier>
-                    <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonSamplesSent&quot;]</key>
-                    <delay>180</delay>
-                    <history>10</history>
-                    <trends>365</trends>
-                    <status>0</status>
-                    <value_type>0</value_type>
-                    <allowed_hosts/>
-                    <units>samples/min</units>
-                    <delta>1</delta>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privpassphrase/>
-                    <formula>60</formula>
-                    <delay_flex/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <data_type>0</data_type>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>Zorka Diagnotic</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                </item>
-                <item>
                     <name>Performance Monitor time per cycle</name>
                     <type>0</type>
                     <snmp_community/>

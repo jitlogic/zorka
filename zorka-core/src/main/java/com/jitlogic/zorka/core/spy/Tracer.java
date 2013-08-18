@@ -19,7 +19,7 @@ package com.jitlogic.zorka.core.spy;
 import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
-import com.jitlogic.zorka.core.util.*;
+import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 
 import java.util.ArrayList;
 import java.util.List;

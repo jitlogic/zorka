@@ -16,12 +16,15 @@
 
 package com.jitlogic.zorka.core;
 
+import com.jitlogic.zorka.common.util.FileTrapper;
+import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogLevel;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.mbeans.AttrGetter;
 import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
 import com.jitlogic.zorka.core.perfmon.PerfMonLib;
 import com.jitlogic.zorka.core.spy.*;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.core.util.*;
 import com.jitlogic.zorka.core.integ.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.normproc.NormLib;
@@ -86,7 +89,7 @@ public class AgentInstance {
     private PerfMonLib perfMonLib;
 
     /** Agent configuration properties */
-    private Properties props;
+    private Properties props;                // TODO get rid of this, access configuration via ZorkaConfig methods
 
     private Tracer tracer;
 
@@ -94,11 +97,11 @@ public class AgentInstance {
 
     private DispatchingSubmitter submitter;
 
-    private ZorkaConfig config;
+    private AgentConfig config;
 
     private ZabbixQueryTranslator translator;
 
-    public AgentInstance(ZorkaConfig config) {
+    public AgentInstance(AgentConfig config) {
         this.config = config;
         props = config.getProperties();
     }
@@ -248,7 +251,7 @@ public class AgentInstance {
     }
 
 
-    public ZorkaConfig getConfig() {
+    public AgentConfig getConfig() {
         return config;
     }
 

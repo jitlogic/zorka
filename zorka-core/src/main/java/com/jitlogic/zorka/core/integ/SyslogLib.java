@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.core.integ;
 
-import com.jitlogic.zorka.core.ZorkaConfig;
+import com.jitlogic.zorka.common.util.ZorkaConfig;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

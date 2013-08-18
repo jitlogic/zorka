@@ -15,9 +15,10 @@
  */
 package com.jitlogic.zorka.central.test;
 
-import com.jitlogic.zorka.central.RAGZInputStream;
-import com.jitlogic.zorka.central.RAGZOutputStream;
+import com.jitlogic.zorka.central.rds.RAGZInputStream;
+import com.jitlogic.zorka.central.rds.RAGZOutputStream;
 import com.jitlogic.zorka.central.test.support.CentralFixture;
+import com.jitlogic.zorka.common.test.support.TestUtil;
 import org.junit.Test;
 
 import java.io.File;
@@ -25,8 +26,11 @@ import java.io.RandomAccessFile;
 import java.util.Random;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static com.jitlogic.zorka.central.test.support.TestUtil.cmd;
-import static com.jitlogic.zorka.central.test.support.TestUtil.cat;
+
+import static org.junit.Assert.*;
+
+import static com.jitlogic.zorka.central.CentralUtil.fromUIntBE;
+import static com.jitlogic.zorka.central.CentralUtil.toUIntBE;
 
 public class RAGZUnitTest extends CentralFixture {
 
@@ -41,12 +45,12 @@ public class RAGZUnitTest extends CentralFixture {
         assertThat(new File(path).length()).isEqualTo(30);
 
         // TODO check important internal fields here
-        byte[] buf = cat(path);
-        assertThat(buf[16]).isEqualTo((byte)2);
-        assertThat(buf[19]).isEqualTo((byte)0);
+        byte[] buf = TestUtil.cat(path);
+        assertThat(buf[16]).isEqualTo((byte) 2);
+        assertThat(buf[19]).isEqualTo((byte) 0);
 
         if (new File(GZIP).canExecute()) {
-            assertThat(cmd(GZIP + " -d " + path)).isEqualTo(0);
+            assertThat(TestUtil.cmd(GZIP + " -d " + path)).isEqualTo(0);
             assertThat(new File(tmpFile("test")).length()).isEqualTo(0);
         }
     }
@@ -59,17 +63,17 @@ public class RAGZUnitTest extends CentralFixture {
         os.write("ABCD".getBytes());
         os.close();
 
-        byte[] buf = cat(path);
+        byte[] buf = TestUtil.cat(path);
 
 
-        assertThat(new File(path).length()).isEqualTo(34);
-        assertThat(buf[16]).isEqualTo((byte)6);
-        assertThat(buf[19]).isEqualTo((byte)0);
-        assertThat(buf[30]).isEqualTo((byte)4);
-        assertThat(buf[33]).isEqualTo((byte)0);
+        assertThat(new File(path).length()).isEqualTo(40);
+        //assertThat(buf[16]).isEqualTo((byte)6);
+        //assertThat(buf[19]).isEqualTo((byte)0);
+        //assertThat(buf[30]).isEqualTo((byte)4);
+        //assertThat(buf[33]).isEqualTo((byte)0);
 
         if (new File(GZIP).canExecute()) {
-            assertThat(cmd(GZIP + " -d " + path)).isEqualTo(0);
+            assertThat(TestUtil.cmd(GZIP + " -d " + path)).isEqualTo(0);
             assertThat(new File(tmpFile("test")).length()).isEqualTo(4);
         }
     }
@@ -83,7 +87,7 @@ public class RAGZUnitTest extends CentralFixture {
         os.close();
 
         RAGZInputStream is = RAGZInputStream.fromFile(path);
-        assertThat(is.length()).isEqualTo(4);
+        assertThat(is.logicalLength()).isEqualTo(4);
 
         byte[] buf = new byte[4];
         assertThat(is.read(buf)).isEqualTo(4);
@@ -101,7 +105,7 @@ public class RAGZUnitTest extends CentralFixture {
         os.close();
 
         RAGZInputStream is = RAGZInputStream.fromFile(path);
-        assertThat(is.length()).isEqualTo(10);
+        assertThat(is.logicalLength()).isEqualTo(10);
 
         byte[] buf = new byte[10];
         assertThat(is.read(buf)).isEqualTo(10);
@@ -129,7 +133,7 @@ public class RAGZUnitTest extends CentralFixture {
         }
 
         RAGZInputStream is = RAGZInputStream.fromFile(path);
-        assertThat(is.length()).isGreaterThan(0);
+        assertThat(is.logicalLength()).isGreaterThan(0);
 
         is.close();
         os.close();
@@ -147,12 +151,22 @@ public class RAGZUnitTest extends CentralFixture {
         os.close();
 
         RAGZInputStream is = RAGZInputStream.fromFile(path);
-        assertThat(is.length()).isEqualTo(8);
+        assertThat(is.logicalLength()).isEqualTo(8);
         byte[] buf = new byte[8];
         assertThat(is.read(buf)).isEqualTo(8);
         assertThat(new String(buf, "UTF-8")).isEqualTo("1234ABCD");
         is.close();
 
+    }
+
+    @Test
+    public void testUIntEncoding() {
+        byte[] b = fromUIntBE(4000000L);
+        long l = toUIntBE(b);
+        assertEquals(4L, toUIntBE(fromUIntBE(4L)));
+        assertEquals(4000L, toUIntBE(fromUIntBE(4000L)));
+        assertEquals(4000000L, toUIntBE(fromUIntBE(4000000L)));
+        assertEquals(4000000000L, toUIntBE(fromUIntBE(4000000000L)));
     }
 
     //@Test
@@ -168,7 +182,7 @@ public class RAGZUnitTest extends CentralFixture {
         os.close();
 
         RAGZInputStream is = RAGZInputStream.fromFile(path);
-        assertThat(is.length()).isEqualTo(4);
+        assertThat(is.logicalLength()).isEqualTo(4);
         byte[] buf = new byte[4];
         assertThat(is.read(buf)).isEqualTo(4);
         assertThat(new String(buf, "UTF-8")).isEqualTo("1234");

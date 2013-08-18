@@ -22,14 +22,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.*;
 
-import com.jitlogic.zorka.common.util.JmxObject;
-import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.core.integ.FileTrapper;
+import com.jitlogic.zorka.common.util.*;
+import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.core.util.*;
-import com.jitlogic.zorka.core.util.ZorkaLog;
-import com.jitlogic.zorka.core.util.ZorkaLogLevel;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.*;
 import com.jitlogic.zorka.core.mbeans.AttrGetter;
@@ -528,7 +524,7 @@ public class ZorkaLib  {
      * @param name file name (relative to conf dir)
      */
     public String reload(String name) {
-        return agent.loadScript(ZorkaUtil.path(config.stringCfg(ZorkaConfig.PROP_SCRIPTS_DIR, null), name));
+        return agent.loadScript(ZorkaUtil.path(config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null), name));
     }
 
 

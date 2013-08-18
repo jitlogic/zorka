@@ -24,10 +24,11 @@ import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.concurrent.Executors;
 
+import com.jitlogic.zorka.core.AgentConfig;
 import com.jitlogic.zorka.core.integ.ZabbixQueryTranslator;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.test.support.TestLogger;
-import com.jitlogic.zorka.core.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +36,7 @@ import org.junit.Test;
 import com.jitlogic.zorka.core.ZorkaBshAgent;
 import com.jitlogic.zorka.core.integ.ZabbixAgent;
 import com.jitlogic.zorka.core.integ.ZabbixRequestHandler;
-import com.jitlogic.zorka.core.ZorkaConfig;
+
 import static org.fest.assertions.Assertions.assertThat;
 
 public class ZabbixAgentIntegTest {
@@ -61,11 +62,11 @@ public class ZabbixAgentIntegTest {
 	
 	private ZorkaBshAgent agent = null;
 	private ZabbixAgent service = null;
-    private ZorkaConfig config;
+    private AgentConfig config;
 	
 	@Before
 	public void setUp() throws Exception {
-        config = new ZorkaConfig(this.getClass().getResource("/conf").getPath());
+        config = new AgentConfig(this.getClass().getResource("/conf").getPath());
         ZorkaLogger.setLogger(new TestLogger());
         translator = new ZabbixQueryTranslator();
         MBeanServerRegistry mbsRegistry = new MBeanServerRegistry();

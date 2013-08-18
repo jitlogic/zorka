@@ -19,12 +19,12 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.core.integ.SnmpLib;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.core.util.ZorkaTrapper;
+import com.jitlogic.zorka.common.util.ZorkaTrapper;
 import com.jitlogic.zorka.core.integ.SnmpTrapper;
 import com.jitlogic.zorka.core.integ.TrapVarBindDef;
 import com.jitlogic.zorka.core.normproc.Normalizer;
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.core.util.ZorkaLogLevel;
+import com.jitlogic.zorka.common.util.ZorkaLogLevel;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.util.*;

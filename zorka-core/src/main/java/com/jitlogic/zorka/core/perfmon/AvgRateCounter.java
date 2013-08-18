@@ -19,8 +19,8 @@ package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.core.AgentDiagnostics;
 import com.jitlogic.zorka.core.ZorkaLib;
-import com.jitlogic.zorka.core.util.ZorkaLog;
-import com.jitlogic.zorka.core.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -88,8 +88,6 @@ public class AvgRateCounter {
         } else if (val instanceof Byte) {
             return (long)(Byte)val;
         } else {
-            log.debug(ZorkaLogger.ZAG_DEBUG, "Cannot coerce object of type '"
-                    + (val != null ? val.getClass().getName() : "null") + "' to Long.");
             AgentDiagnostics.inc(AgentDiagnostics.AVG_CNT_ERRORS);
             return 0;
         }

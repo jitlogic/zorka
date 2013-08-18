@@ -17,8 +17,8 @@
 package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.common.stats.MethodCallStatistic;
-import com.jitlogic.zorka.core.util.ZorkaLog;
-import com.jitlogic.zorka.core.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

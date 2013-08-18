@@ -18,9 +18,9 @@
 package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.core.AgentDiagnostics;
-import com.jitlogic.zorka.core.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.core.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLog;
 
 import java.util.List;
 import java.util.Map;
