@@ -19,12 +19,14 @@ import com.jitlogic.zorka.central.*;
 import com.jitlogic.zorka.central.data.HostInfo;
 import com.jitlogic.zorka.central.data.TraceInfo;
 import com.jitlogic.zorka.central.data.TraceRecordInfo;
+import com.jitlogic.zorka.central.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import org.fressian.FressianReader;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.sql.DataSource;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayInputStream;
@@ -41,14 +43,14 @@ public class TraceDataApi {
 
 
     public TraceDataApi() {
-        jdbc = CentralApp.getInstance().getDb().getJdbcTemplate();
+        jdbc = new JdbcTemplate(CentralApp.getInstance().getDs());
         storeManager = CentralApp.getInstance().getStoreManager();
         symbolRegistry = CentralApp.getInstance().getSymbolRegistry();
     }
 
 
-    public TraceDataApi(JdbcTemplate jdbc, StoreManager storeManager, SymbolRegistry symbolRegistry) {
-        this.jdbc = jdbc;
+    public TraceDataApi(DataSource ds, StoreManager storeManager, SymbolRegistry symbolRegistry) {
+        this.jdbc = new JdbcTemplate(ds);
         this.storeManager = storeManager;
         this.symbolRegistry = symbolRegistry;
     }

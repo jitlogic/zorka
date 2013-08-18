@@ -16,14 +16,14 @@
 package com.jitlogic.zorka.central;
 
 
-import com.jitlogic.zorka.central.db.DbContext;
-import com.jitlogic.zorka.central.db.DbSymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogLevel;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.zico.ZicoService;
+import org.apache.commons.dbcp.BasicDataSource;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +42,7 @@ public class CentralInstance {
 
     private ZicoService zicoService;
 
-    private DbContext db;
+    private BasicDataSource ds;
 
     private SymbolRegistry symbolRegistry;
 
@@ -76,10 +76,10 @@ public class CentralInstance {
             }
         }
 
-        if (db != null) {
+        if (ds != null) {
             try {
-                db.close();
-            } catch (IOException e) {
+                ds.close();
+            } catch (Exception e) {
                 // TODO log error
             }
         }
@@ -144,7 +144,7 @@ public class CentralInstance {
 
     public synchronized SymbolRegistry getSymbolRegistry() {
         if (symbolRegistry == null) {
-            symbolRegistry = new DbSymbolRegistry(getDb().getJdbcTemplate());
+            symbolRegistry = new DbSymbolRegistry(getDs());
         }
 
         return symbolRegistry;
@@ -153,7 +153,7 @@ public class CentralInstance {
 
     public synchronized StoreManager getStoreManager() {
         if (null == storeManager) {
-            storeManager = new StoreManager(getConfig(), getDb(), getSymbolRegistry());
+            storeManager = new StoreManager(getConfig(), getDs(), getSymbolRegistry());
         }
         return storeManager;
     }
@@ -170,10 +170,22 @@ public class CentralInstance {
     }
 
 
-    public synchronized DbContext getDb() {
-        if (db == null) {
-            db = new DbContext(getConfig());
+    public synchronized BasicDataSource getDs() {
+
+        if (ds == null) {
+            ds = new BasicDataSource();
+            ds.setDriverClassName(config.stringCfg("central.db.driver", null));
+            ds.setUrl(config.stringCfg("central.db.url", null));
+            ds.setUsername(config.stringCfg("central.db.user", null));
+            ds.setPassword(config.stringCfg("central.db.pass", null));
+
+            if (config.boolCfg("central.db.create", false)) {
+                new JdbcTemplate(ds).execute("RUNSCRIPT FROM 'classpath:/com/jitlogic/zorka/central/"
+                        + config.stringCfg("central.db.type", "h2") + ".createdb.sql'");
+            }
+
         }
-        return db;
+
+        return ds;
     }
 }

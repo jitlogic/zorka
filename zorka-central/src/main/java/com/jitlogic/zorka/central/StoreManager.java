@@ -16,7 +16,6 @@
 package com.jitlogic.zorka.central;
 
 import com.jitlogic.zorka.central.data.HostInfo;
-import com.jitlogic.zorka.central.db.DbContext;
 import com.jitlogic.zorka.central.rest.TraceDataApi;
 import com.jitlogic.zorka.common.tracedata.HelloRequest;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
@@ -26,6 +25,7 @@ import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessorFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.Socket;
@@ -49,12 +49,12 @@ public class StoreManager implements Closeable, ZicoDataProcessorFactory {
 
     private JdbcTemplate jdbc;
 
-    public StoreManager(CentralConfig config, DbContext dbContext, SymbolRegistry symbolRegistry) {
+    public StoreManager(CentralConfig config, DataSource ds, SymbolRegistry symbolRegistry) {
         this.config = config;
         this.symbolRegistry = symbolRegistry;
         this.dataDir = config.stringCfg("central.data.dir", null);
-        this.traceDataApi = new TraceDataApi(dbContext.getJdbcTemplate(), this, symbolRegistry);
-        this.jdbc = dbContext.getJdbcTemplate();
+        this.jdbc = new JdbcTemplate(ds);
+        this.traceDataApi = new TraceDataApi(ds, this, symbolRegistry);
     }
 
     // TODO use ID as proper host ID as get(id), rename this method to reflect it is get-or-create method, not a simple getter

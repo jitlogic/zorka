@@ -15,8 +15,8 @@
  */
 package com.jitlogic.zorka.central.test;
 
-import com.jitlogic.zorka.central.RAGZInputStream;
-import com.jitlogic.zorka.central.RAGZOutputStream;
+import com.jitlogic.zorka.central.rds.RAGZInputStream;
+import com.jitlogic.zorka.central.rds.RAGZOutputStream;
 import com.jitlogic.zorka.central.test.support.CentralFixture;
 import com.jitlogic.zorka.common.test.support.TestUtil;
 import org.junit.Test;
@@ -46,8 +46,8 @@ public class RAGZUnitTest extends CentralFixture {
 
         // TODO check important internal fields here
         byte[] buf = TestUtil.cat(path);
-        assertThat(buf[16]).isEqualTo((byte)2);
-        assertThat(buf[19]).isEqualTo((byte)0);
+        assertThat(buf[16]).isEqualTo((byte) 2);
+        assertThat(buf[19]).isEqualTo((byte) 0);
 
         if (new File(GZIP).canExecute()) {
             assertThat(TestUtil.cmd(GZIP + " -d " + path)).isEqualTo(0);

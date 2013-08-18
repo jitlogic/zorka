@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central;
+package com.jitlogic.zorka.central.rds;
 
 
 import java.io.IOException;
@@ -67,7 +67,7 @@ public class RAGZOutputStream extends OutputStream {
 
     @Override
     public void write(int b) throws IOException {
-        byte[] buf = { (byte)(b & 0xff) };
+        byte[] buf = {(byte) (b & 0xff)};
         write(buf, 0, 1);
     }
 
@@ -79,7 +79,7 @@ public class RAGZOutputStream extends OutputStream {
             throw new NullPointerException("Passed buffer is null.");
         } else if (off < 0 || len < 0 || off + len > buf.length) {
             throw new IndexOutOfBoundsException("Possible buffer overrun: off="
-                            + off + ", len=" + len + ", buf.length=" + buf.length);
+                    + off + ", len=" + len + ", buf.length=" + buf.length);
         } else if (len == 0) {
             return;
         }
@@ -88,7 +88,7 @@ public class RAGZOutputStream extends OutputStream {
             nextSegment();
         }
 
-        int len0 = curSegSize + len >= maxSegSize ? (int)(maxSegSize - curSegSize) : len;
+        int len0 = curSegSize + len >= maxSegSize ? (int) (maxSegSize - curSegSize) : len;
 
         deflater.setInput(buf, off, len0);
         while (!deflater.needsInput()) {
@@ -100,7 +100,7 @@ public class RAGZOutputStream extends OutputStream {
         crc.update(buf, off, len0);
 
         if (len > len0) {
-            write (buf, off+len0, len-len0);
+            write(buf, off + len0, len - len0);
         }
     }
 
@@ -143,21 +143,21 @@ public class RAGZOutputStream extends OutputStream {
     }
 
 
-    private static final int GZ_HLEN = 10+2;
+    private static final int GZ_HLEN = 10 + 2;
     private static final int GZ_XLEN = 8;
     private static final int GZ_FLEN = 8;
 
 
     private static final byte[] GZ_HEADER = {
-            0x1f, (byte)0x8b, 0x08, 0x04,   // magic, compression and flags
-            0x00,       0x00, 0x00, 0x00,   // mtime (will be undefined)
-            0x00,       0x03, 0x08, 0x00    // XFL, OS, XLEN
+            0x1f, (byte) 0x8b, 0x08, 0x04,   // magic, compression and flags
+            0x00, 0x00, 0x00, 0x00,   // mtime (will be undefined)
+            0x00, 0x03, 0x08, 0x00    // XFL, OS, XLEN
     };
 
 
     private static final byte[] GZ_XTRA = {
-            (byte)'R', (byte)'G', 0x04, 0x00,
-            0x00,      0x00,      0x00, 0x00
+            (byte) 'R', (byte) 'G', 0x04, 0x00,
+            0x00, 0x00, 0x00, 0x00
     };
 
 
@@ -175,7 +175,7 @@ public class RAGZOutputStream extends OutputStream {
         outFile.write(GZ_HEADER);
         outFile.write(GZ_XTRA);
 
-        deflater  = new Deflater(6, true);
+        deflater = new Deflater(6, true);
         crc = new CRC32();
 
         lastSavedPos = logicalLength;
@@ -191,7 +191,7 @@ public class RAGZOutputStream extends OutputStream {
             outFile.write(fromUIntBE(crc.getValue()));
             outFile.write(fromUIntBE(curSegSize));
             long pos = outFile.getFilePointer();
-            outFile.seek(curSegStart+12+4);
+            outFile.seek(curSegStart + 12 + 4);
             outFile.write(fromUIntBE(pos - curSegStart - 28));
             outFile.seek(pos);
 

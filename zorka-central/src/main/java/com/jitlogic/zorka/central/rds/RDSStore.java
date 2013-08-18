@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central;
+package com.jitlogic.zorka.central.rds;
 
 
 import com.jitlogic.zorka.common.util.ZorkaLog;
@@ -58,7 +58,6 @@ public class RDSStore implements Closeable {
 
 
     /**
-     *
      * @param basePath
      * @param physSize
      * @param physThreshold
@@ -123,7 +122,7 @@ public class RDSStore implements Closeable {
             archivedFiles.add(new RDSChunkFile(String.format("%016.rgz", outputStart)));
         }
         output = new RAGZOutputStream(
-                    new RandomAccessFile(new File(basePath, fname), "rw"),
+                new RandomAccessFile(new File(basePath, fname), "rw"),
                 segmentSize);
         outputStart = logicalPos;
         outputPos = 0;
@@ -174,12 +173,14 @@ public class RDSStore implements Closeable {
 
     public byte[] read(long offs, int length) throws IOException {
         if (currentChunk == null || offs < currentChunk.loffs
-            || offs > currentChunk.loffs+currentChunk.loffs) {
+                || offs > currentChunk.loffs + currentChunk.loffs) {
             currentChunk = null;
-            if (currentInput != null) { currentInput.close(); }
+            if (currentInput != null) {
+                currentInput.close();
+            }
             currentInput = null;
             for (RDSChunkFile chunk : archivedFiles) {
-                if (offs >= chunk.loffs && offs < chunk.loffs+chunk.llen) {
+                if (offs >= chunk.loffs && offs < chunk.loffs + chunk.llen) {
                     currentChunk = chunk;
                     currentInput = RAGZInputStream.fromFile(new File(basePath, chunk.fname).getPath());
                     break;
@@ -189,21 +190,22 @@ public class RDSStore implements Closeable {
 
         if (currentChunk != null) {
             int len = length <= currentChunk.loffs + currentChunk.llen - offs
-                    ? length : (int)(currentChunk.loffs + currentChunk.llen - offs);
+                    ? length : (int) (currentChunk.loffs + currentChunk.llen - offs);
             byte[] data = new byte[len];
-            currentInput.seek(offs-currentChunk.loffs);
+            currentInput.seek(offs - currentChunk.loffs);
             currentInput.read(data);
             return data;
         } else if (offs >= outputStart && offs <= outputPos + outputStart) {
-            int len = length <= outputPos + outputStart - offs ? length : (int)(outputStart + outputPos - offs);
+            int len = length <= outputPos + outputStart - offs ? length : (int) (outputStart + outputPos - offs);
             byte[] data = new byte[len];
-            long pos; int i, o = 0;
+            long pos;
+            int i, o = 0;
             for (i = 0, pos = outputStart; i < outputCache.size(); pos += outputCache.get(i).length, i++) {
                 byte[] b = outputCache.get(i);
-                if (offs+o >= pos && offs+o <= pos + b.length) {
-                    int x = o == 0 ? (int)(offs-pos) : 0;
-                    int l = (len-o) <= b.length-x ? (len-o) : b.length-x;
-                    System.arraycopy(b, (int)(offs-pos)+o, data, o, l);
+                if (offs + o >= pos && offs + o <= pos + b.length) {
+                    int x = o == 0 ? (int) (offs - pos) : 0;
+                    int l = (len - o) <= b.length - x ? (len - o) : b.length - x;
+                    System.arraycopy(b, (int) (offs - pos) + o, data, o, l);
                     o += l;
                 }
             }
@@ -232,7 +234,10 @@ public class RDSStore implements Closeable {
             } catch (Exception e) {
                 log.error(ZorkaLogger.ZCL_STORE, "Cannot open RDS chunk file '" + fname + "'", e);
                 if (is != null) {
-                    try { is.close(); } catch (IOException e1) { }
+                    try {
+                        is.close();
+                    } catch (IOException e1) {
+                    }
                 }
             }
         }
@@ -251,7 +256,7 @@ public class RDSStore implements Closeable {
 
         @Override
         public boolean equals(Object o) {
-            return o instanceof RDSChunkFile && fname.equals(((RDSChunkFile)o).fname);
+            return o instanceof RDSChunkFile && fname.equals(((RDSChunkFile) o).fname);
         }
     }
 }

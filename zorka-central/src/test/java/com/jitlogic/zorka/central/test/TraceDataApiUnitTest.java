@@ -38,7 +38,7 @@ public class TraceDataApiUnitTest extends CentralFixture {
 
     @Before
     public void prepareData() throws Exception {
-        JdbcTemplate jdbc = instance.getDb().getJdbcTemplate();
+        JdbcTemplate jdbc = new JdbcTemplate(instance.getDs());
         ReceiverContext rcx = new ReceiverContext(jdbc, instance.getStoreManager().get("test"));
         TestTraceGenerator generator = new TestTraceGenerator();
         TraceRecord tr = generator.generate();

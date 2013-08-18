@@ -13,9 +13,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central;
+package com.jitlogic.zorka.central.rds;
 
 
+import com.jitlogic.zorka.central.CentralUtil;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.io.EOFException;
@@ -25,7 +26,6 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.DataFormatException;
-import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 public class RAGZInputStream extends InputStream {
@@ -99,7 +99,7 @@ public class RAGZInputStream extends InputStream {
 
         while (llen > 0) {
 
-            if (curSegment == null || logicalPos >= curSegment.logicalPos+curSegment.logicalLen || logicalPos < curSegment.logicalPos) {
+            if (curSegment == null || logicalPos >= curSegment.logicalPos + curSegment.logicalLen || logicalPos < curSegment.logicalPos) {
                 curSegment = findSegment(logicalPos);
                 if (curSegment == null) {
                     break;
@@ -110,13 +110,14 @@ public class RAGZInputStream extends InputStream {
 
             long cpos = logicalPos - curSegment.logicalPos;
             long csz = min(llen, curSegment.logicalLen - cpos);
-            System.arraycopy(logicalBuf, (int) cpos, b, (int)lpos, (int)csz);
+            System.arraycopy(logicalBuf, (int) cpos, b, (int) lpos, (int) csz);
 
             logicalPos += csz;
-            llen -= csz; lpos += csz;
+            llen -= csz;
+            lpos += csz;
         }
 
-        return (int)(len - llen);
+        return (int) (len - llen);
     }
 
 
@@ -134,7 +135,7 @@ public class RAGZInputStream extends InputStream {
     @Override
     public synchronized int available() throws IOException {
         if (curSegment != null) {
-            return (int)(curSegment.logicalPos  + curSegment.logicalLen - logicalPos);
+            return (int) (curSegment.logicalPos + curSegment.logicalLen - logicalPos);
         } else {
             return 0;
         }
@@ -161,7 +162,7 @@ public class RAGZInputStream extends InputStream {
         Segment seg = findSegment(lpos);
 
         if (seg != null) {
-            seg = segments.get(segments.size()-1);
+            seg = segments.get(segments.size() - 1);
 
         }
 
@@ -191,11 +192,10 @@ public class RAGZInputStream extends InputStream {
      * Returns logical length of compressed data.
      *
      * @return
-     *
      * @throws IOException
      */
     public synchronized long logicalLength() throws IOException {
-        Segment seg = segments.get(segments.size()-1);
+        Segment seg = segments.get(segments.size() - 1);
 
         if (!seg.finished && seg.physicalPos + seg.physicalLen < input.length()) {
             updateSegment(seg);
@@ -206,7 +206,7 @@ public class RAGZInputStream extends InputStream {
 
 
     private void updateSegment(Segment seg) throws IOException {
-        input.seek(seg.physicalPos-4);
+        input.seek(seg.physicalPos - 4);
         int clen = input.readInt();
 
         if (clen != 0) {
@@ -232,11 +232,11 @@ public class RAGZInputStream extends InputStream {
 
     private Segment findSegment(long logicalPos) throws IOException {
         for (Segment seg : segments) {
-            if (logicalPos >= seg.logicalPos && logicalPos < seg.logicalPos+seg.logicalLen) {
+            if (logicalPos >= seg.logicalPos && logicalPos < seg.logicalPos + seg.logicalLen) {
                 return seg;
             } else if (!seg.finished) {
                 updateSegment(seg);
-                if (logicalPos >= seg.logicalPos && logicalPos < seg.logicalPos+seg.logicalLen) {
+                if (logicalPos >= seg.logicalPos && logicalPos < seg.logicalPos + seg.logicalLen) {
                     return seg;
                 }
             }
@@ -255,8 +255,8 @@ public class RAGZInputStream extends InputStream {
 
         while (input.getFilePointer() < input.length()) {
             long fp = input.getFilePointer(), lp = input.length();
-            byte m1 = input.readByte(), m2 = (byte)(input.readByte() & 0xff);
-            if (m1 != 0x1f || m2 != (byte)0x8b)
+            byte m1 = input.readByte(), m2 = (byte) (input.readByte() & 0xff);
+            if (m1 != 0x1f || m2 != (byte) 0x8b)
                 throw new RAGZException(String.format("Invalid magic of gzip header: m1=0x%2x m2=0x%2x", m1, m2));
             input.skipBytes(10);
             byte c1 = input.readByte(), c2 = input.readByte();
@@ -267,7 +267,7 @@ public class RAGZInputStream extends InputStream {
             long cpos = input.getFilePointer();
             if (clen != 0) {
                 // Finished segment
-                input.skipBytes((int)clen+4);
+                input.skipBytes((int) clen + 4);
                 long llen = readUInt();
                 segments.add(new Segment(cpos, clen, lpos, llen, true));
                 lpos += llen;
@@ -293,9 +293,8 @@ public class RAGZInputStream extends InputStream {
     }
 
 
-
     private byte[] unpackSegment(Segment seg) throws IOException {
-        byte[] ibuf = new byte[(int)seg.physicalLen];
+        byte[] ibuf = new byte[(int) seg.physicalLen];
 
         if (ibuf.length == 0) {
             return ibuf;
@@ -307,7 +306,7 @@ public class RAGZInputStream extends InputStream {
             throw new RAGZException("Unexpected end of file.");
         }
 
-        byte[] obuf = new byte[(int)(seg.logicalLen > 0 ? seg.logicalLen : defaultLogicalLen)];
+        byte[] obuf = new byte[(int) (seg.logicalLen > 0 ? seg.logicalLen : defaultLogicalLen)];
 
         try {
             Inflater inf = new Inflater(true);

@@ -16,7 +16,6 @@
 package com.jitlogic.zorka.central.test;
 
 
-import com.jitlogic.zorka.central.db.DbContext;
 import com.jitlogic.zorka.central.rest.TraceDataApi;
 import com.jitlogic.zorka.central.test.support.CentralFixture;
 import org.junit.Before;
@@ -31,11 +30,12 @@ public class RoofDataApiUnitTest extends CentralFixture {
 
     private int hostId;
     private TraceDataApi api;
+    private JdbcTemplate jdbc;
 
 
     @Before
     public void populateData() {
-        JdbcTemplate jdbc = instance.getDb().getJdbcTemplate();
+        jdbc = new JdbcTemplate(instance.getDs());
 
         jdbc.update("insert into HOSTS (HOST_NAME,HOST_ADDR,HOST_PATH) values(?,?,?)", "test", "127.0.0.1", "test");
         hostId = jdbc.queryForObject("select HOST_ID from HOSTS where HOST_NAME = 'test'", Integer.class);
@@ -47,11 +47,7 @@ public class RoofDataApiUnitTest extends CentralFixture {
 
     @Test
     public void testIfTablesHaveBeenCreated() throws Exception {
-        DbContext ctx = instance.getDb();
-
-        JdbcTemplate t = ctx.getJdbcTemplate();
-
-        assertEquals((Object) 1, t.queryForObject("select count(1) as cnt from SYMBOLS", Integer.class));
+        assertEquals((Object) 1, jdbc.queryForObject("select count(1) as cnt from SYMBOLS", Integer.class));
     }
 
 

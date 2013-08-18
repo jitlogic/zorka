@@ -17,6 +17,7 @@ package com.jitlogic.zorka.central;
 
 
 import com.jitlogic.zorka.central.data.HostInfo;
+import com.jitlogic.zorka.central.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;

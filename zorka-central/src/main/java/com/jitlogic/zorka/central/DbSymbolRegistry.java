@@ -13,12 +13,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.db;
+package com.jitlogic.zorka.central;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
+import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -28,8 +29,8 @@ public class DbSymbolRegistry extends SymbolRegistry {
     private JdbcTemplate jdbc;
 
 
-    public DbSymbolRegistry(JdbcTemplate jdbc) {
-        this.jdbc = jdbc;
+    public DbSymbolRegistry(DataSource ds) {
+        this.jdbc = new JdbcTemplate(ds);
         loadSymbols();
     }
 

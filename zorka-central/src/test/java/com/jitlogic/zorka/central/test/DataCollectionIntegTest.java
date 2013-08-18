@@ -56,7 +56,7 @@ public class DataCollectionIntegTest extends CentralFixture {
 
 
     private int countTraces(String hostName) {
-        JdbcTemplate jdbc = instance.getDb().getJdbcTemplate();
+        JdbcTemplate jdbc = new JdbcTemplate(instance.getDs());
 
         int hostId = jdbc.queryForObject("select HOST_ID from HOSTS where HOST_NAME = ?", Integer.class, hostName);
         return jdbc.queryForObject("select count(1) as C from TRACES where HOST_ID = ?", Integer.class, hostId);
