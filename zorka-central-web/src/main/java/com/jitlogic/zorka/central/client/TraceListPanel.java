@@ -13,33 +13,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.web.client;
+package com.jitlogic.zorka.central.client;
 
 import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.SimplePager;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.SingleSelectionModel;
-import com.jitlogic.zorka.central.web.client.data.TraceDataService;
-import com.jitlogic.zorka.central.web.client.data.TraceInfo;
-import com.jitlogic.zorka.central.web.client.data.TraceRecordInfo;
+import com.jitlogic.zorka.central.client.data.TraceDataService;
+import com.jitlogic.zorka.central.client.data.TraceInfo;
+import com.jitlogic.zorka.central.client.data.TraceRecordInfo;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
 import java.util.Date;
-import java.util.HashMap;
 
 
 public class TraceListPanel extends Composite {

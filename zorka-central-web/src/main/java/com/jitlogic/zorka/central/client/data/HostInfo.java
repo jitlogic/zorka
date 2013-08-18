@@ -13,59 +13,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.web.client.data;
+package com.jitlogic.zorka.central.client.data;
 
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class TraceRecordInfo {
+public class HostInfo {
+
+    // TODO named property annotations seem to be broken (data does not deserialize properly)
+    // TODO setting property values via constructor is also broken (crashes compile process)
 
     @JsonProperty
-    long CALLS;
+    int HOST_ID;
 
     @JsonProperty
-    long ERRORS;
+    String HOST_NAME;
 
     @JsonProperty
-    long TIME;
+    String HOST_ADDR;
 
-    @JsonProperty
-    int FLAGS;
 
-    @JsonProperty
-    String METHOD;
-
-    @JsonProperty
-    int CHILDREN;
-
-    @JsonProperty
-    String PATH;
-
-    public long getCalls() {
-        return CALLS;
+    public int getId() {
+        return HOST_ID;
     }
 
-    public long getErorrs() {
-        return ERRORS;
+    public String getName() {
+        return HOST_NAME;
     }
 
-    public long getTime() {
-        return TIME;
-    }
-
-    public int getFlags() {
-        return FLAGS;
-    }
-
-    public String getMethod() {
-        return METHOD;
-    }
-
-    public int getChildren() {
-        return CHILDREN;
-    }
-
-    public String getPath() {
-        return PATH;
+    public String getAddr() {
+        return HOST_ADDR;
     }
 }

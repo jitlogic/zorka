@@ -13,9 +13,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.web.service;
+package com.jitlogic.zorka.central.roof;
 
-import com.jitlogic.zorka.central.roof.RoofService;
+import com.jitlogic.zorka.central.CentralApp;
 import com.jitlogic.zorka.common.util.JSONWriter;
 
 import javax.servlet.ServletException;
@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
 
 public class RoofServlet extends HttpServlet {
 
@@ -48,7 +49,7 @@ public class RoofServlet extends HttpServlet {
 
         path = path.subList(1, path.size());
 
-        Map<String,String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<String, String>();
 
         for (Object key : req.getParameterMap().keySet()) {
             params.put(key.toString(), req.getParameter(key.toString()));

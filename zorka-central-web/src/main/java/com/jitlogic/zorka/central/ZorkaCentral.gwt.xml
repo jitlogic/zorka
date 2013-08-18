@@ -6,6 +6,6 @@
     <inherits name='com.google.gwt.http.HTTP'/>
     <inherits name='org.fusesource.restygwt.RestyGWT'/>
 
-    <entry-point class='com.jitlogic.zorka.central.web.client.ZorkaCentral'/>
+    <entry-point class='com.jitlogic.zorka.central.client.ZorkaCentral'/>
 
 </module>

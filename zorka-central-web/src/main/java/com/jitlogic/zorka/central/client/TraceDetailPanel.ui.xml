@@ -2,7 +2,7 @@
              xmlns:g='urn:import:com.google.gwt.user.client.ui'
              xmlns:c='urn:import:com.google.gwt.user.cellview.client'>
     <ui:style>
-        .hostTable {
+        .cellTable {
             border-bottom: 1px solid #ccc;
             text-align: left;
             margin-bottom: 4px;
@@ -11,11 +11,13 @@
     <g:DockLayoutPanel>
         <g:north size="25">
             <g:HorizontalPanel>
-                <g:Label>(host options here) </g:Label>
+                <g:Button ui:field="btnClose" text="Close"/>
             </g:HorizontalPanel>
         </g:north>
         <g:center style="margin-top: 5px;">
-            <c:DataGrid ui:field="hostTable" pageSize="500" addStyleNames="{style.hostTable}"/>
+            <!-- <g:ScrollPanel> -->
+            <c:CellTree ui:field="tree" width="100%" height="100%"/>
+            <!-- </g:ScrollPanel> -->
         </g:center>
         <!-- <g:south size="25">
             <g:HTMLPanel>
@@ -27,5 +29,4 @@
             </g:HTMLPanel>
         </g:south> -->
     </g:DockLayoutPanel>
-
 </ui:UiBinder>

@@ -13,15 +13,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.web.client;
+package com.jitlogic.zorka.central.client;
 
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
-import com.jitlogic.zorka.central.web.client.data.TraceDataService;
-import com.jitlogic.zorka.central.web.client.data.TraceInfo;
+import com.jitlogic.zorka.central.client.data.TraceDataService;
+import com.jitlogic.zorka.central.client.data.TraceInfo;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 

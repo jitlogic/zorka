@@ -13,35 +13,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.web.client.data;
+package com.jitlogic.zorka.central.client;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.jitlogic.zorka.central.client.data.TraceRecordInfo;
 
-public class HostInfo {
-
-    // TODO named property annotations seem to be broken (data does not deserialize properly)
-    // TODO setting property values via constructor is also broken (crashes compile process)
-
-    @JsonProperty
-    int HOST_ID;
-
-    @JsonProperty
-    String HOST_NAME;
-
-    @JsonProperty
-    String HOST_ADDR;
-
-
-    public int getId() {
-        return HOST_ID;
-    }
-
-    public String getName() {
-        return HOST_NAME;
-    }
-
-    public String getAddr() {
-        return HOST_ADDR;
+public class TraceDetailCell extends AbstractCell<TraceRecordInfo> {
+    @Override
+    public void render(Context context, TraceRecordInfo value, SafeHtmlBuilder sb) {
+        sb.appendHtmlConstant("<div>");
+        sb.append(SafeHtmlUtils.fromString(value.getMethod()));
+        sb.appendHtmlConstant("<div>");
     }
 }

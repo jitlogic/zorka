@@ -13,14 +13,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.web.client;
+package com.jitlogic.zorka.central.client;
 
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.gwt.view.client.TreeViewModel;
-import com.jitlogic.zorka.central.web.client.data.TraceDataService;
-import com.jitlogic.zorka.central.web.client.data.TraceInfo;
-import com.jitlogic.zorka.central.web.client.data.TraceRecordInfo;
+import com.jitlogic.zorka.central.client.data.TraceDataService;
+import com.jitlogic.zorka.central.client.data.TraceInfo;
+import com.jitlogic.zorka.central.client.data.TraceRecordInfo;
 
 public class TraceDetailViewModel implements TreeViewModel {
 

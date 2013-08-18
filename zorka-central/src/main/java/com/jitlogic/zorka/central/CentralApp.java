@@ -13,16 +13,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.web.service;
-
-
-import com.jitlogic.zorka.central.CentralConfig;
-import com.jitlogic.zorka.central.CentralInstance;
+package com.jitlogic.zorka.central;
 
 import java.io.File;
 
-public class CentralApp {
 
+public class CentralApp {
     private static volatile CentralInstance instance = null;
 
     public static synchronized CentralInstance getInstance() {
@@ -30,7 +26,7 @@ public class CentralApp {
             String homeDir = System.getProperty("central.home.dir");
             if (homeDir == null) {
                 throw new RuntimeException("Missing home dir configuration property. " +
-                    "Add '-Dcentral.home.dir=/path/to/zorka/central' to JVM options.");
+                        "Add '-Dcentral.home.dir=/path/to/zorka/central' to JVM options.");
             }
             if (!new File(homeDir).isDirectory()) {
                 throw new RuntimeException("Home dir property does not point to a directory.");
@@ -53,5 +49,4 @@ public class CentralApp {
             }
         }
     }
-
 }
