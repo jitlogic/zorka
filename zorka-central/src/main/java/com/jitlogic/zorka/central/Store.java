@@ -22,6 +22,8 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.File;
@@ -32,7 +34,7 @@ import java.io.IOException;
  */
 public class Store implements Closeable {
 
-    private final static ZorkaLog log = ZorkaLogger.getLog(Store.class);
+    private final static Logger log = LoggerFactory.getLogger(Store.class);
 
     private String hostname;
     private String rootPath;
@@ -79,7 +81,7 @@ public class Store implements Closeable {
                         config.kiloCfg("rds.max.size", 256 * 1024 * 1024L),
                         config.kiloCfg("rds.seg.size", 1024 * 1024L));
             } catch (IOException e) {
-                log.error(ZorkaLogger.ZCL_STORE, "Cannot open RDS store at '" + rdspath + "'", e);
+                log.error("Cannot open RDS store at '" + rdspath + "'", e);
             }
         }
         return rds;
@@ -99,7 +101,7 @@ public class Store implements Closeable {
                 rds = null;
             }
         } catch (IOException e) {
-            log.error(ZorkaLogger.ZCL_STORE, "Cannot close RDS store '" + rds + "' for " + hostname, e);
+            log.error("Cannot close RDS store '" + rds + "' for " + hostname, e);
         }
     }
 }

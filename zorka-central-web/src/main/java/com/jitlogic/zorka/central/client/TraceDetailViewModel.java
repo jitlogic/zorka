@@ -16,9 +16,9 @@
 package com.jitlogic.zorka.central.client;
 
 import com.google.gwt.cell.client.Cell;
+import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.gwt.view.client.TreeViewModel;
-import com.jitlogic.zorka.central.client.data.TraceDataService;
 import com.jitlogic.zorka.central.data.TraceInfo;
 import com.jitlogic.zorka.central.data.TraceRecordInfo;
 
@@ -27,7 +27,14 @@ public class TraceDetailViewModel implements TreeViewModel {
     private TraceInfo traceInfo;
     private TraceDataService service;
 
-    private final SingleSelectionModel<TraceRecordInfo> selectionModel = new SingleSelectionModel<TraceRecordInfo>();
+    private final SingleSelectionModel<TraceRecordInfo> selectionModel = new SingleSelectionModel<TraceRecordInfo>(
+            new ProvidesKey<TraceRecordInfo>() {
+                @Override
+                public Object getKey(TraceRecordInfo item) {
+                    return item.getPath();
+                }
+            }
+    );
     private final Cell<TraceRecordInfo> cell = new TraceDetailCell();
 
 

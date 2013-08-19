@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.client.data;
+package com.jitlogic.zorka.central.client;
 
 
 import com.jitlogic.zorka.central.data.HostInfo;

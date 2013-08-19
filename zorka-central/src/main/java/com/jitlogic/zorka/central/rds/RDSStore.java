@@ -19,6 +19,8 @@ package com.jitlogic.zorka.central.rds;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.File;
@@ -35,7 +37,7 @@ import java.util.regex.Pattern;
  */
 public class RDSStore implements Closeable {
 
-    private final static ZorkaLog log = ZorkaLogger.getLog(RDSStore.class);
+    private final static Logger log = LoggerFactory.getLogger(RDSStore.class);
 
     private static Pattern RGZ_FILE = Pattern.compile("^[0-9a-f]{16}\\.rgz$");
 
@@ -232,7 +234,7 @@ public class RDSStore implements Closeable {
                 plen = file.length();
                 inp.close();
             } catch (Exception e) {
-                log.error(ZorkaLogger.ZCL_STORE, "Cannot open RDS chunk file '" + fname + "'", e);
+                log.error("Cannot open RDS chunk file '" + fname + "'", e);
                 if (is != null) {
                     try {
                         is.close();

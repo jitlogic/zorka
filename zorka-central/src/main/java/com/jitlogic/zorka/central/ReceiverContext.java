@@ -20,6 +20,8 @@ import com.jitlogic.zorka.central.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
 import org.fressian.FressianWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.ByteArrayOutputStream;
@@ -28,6 +30,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
+
+    private final static Logger log = LoggerFactory.getLogger(ReceiverContext.class);
 
     private SymbolRegistry symbolRegistry;
     private Map<Integer, Integer> sidMap = new HashMap<Integer, Integer>();
@@ -52,7 +56,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
             processTraceRecord(hostId, (TraceRecord) obj);
         } else {
             if (obj != null) {
-                //log.warn("Unsupported object type:" + obj.getClass());
+                log.warn("Unsupported object type:" + obj.getClass());
             }
         }
     }

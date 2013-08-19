@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-@Path("/hosts")
+@Path("hosts")
 public class TraceDataApi {
 
     private JdbcTemplate jdbc;
@@ -186,7 +186,7 @@ public class TraceDataApi {
 
         if (tr != null) {
             for (int i = 0; i < tr.numChildren(); i++) {
-                lst.add(packTraceRecord(tr, path.length() > 0 ? (path + "/" + i) : "" + i));
+                lst.add(packTraceRecord(tr.getChild(i), path.length() > 0 ? (path + "/" + i) : "" + i));
             }
         }
 

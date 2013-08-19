@@ -20,7 +20,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
-import com.jitlogic.zorka.central.client.data.TraceDataService;
 import com.jitlogic.zorka.central.data.TraceInfo;
 import com.jitlogic.zorka.central.data.TraceRecordInfo;
 import org.fusesource.restygwt.client.Method;
@@ -48,7 +47,7 @@ public class TraceDetailDataProvider extends AsyncDataProvider<TraceRecordInfo> 
     }
 
     @Override
-    protected void onRangeChanged(HasData<TraceRecordInfo> display) {
+    protected void onRangeChanged(final HasData<TraceRecordInfo> display) {
         final Range range = display.getVisibleRange();
 
         service.listTraceRecords(traceInfo.getHostId(), traceInfo.getDataOffs(), recordInfo.getPath(),
@@ -60,7 +59,8 @@ public class TraceDetailDataProvider extends AsyncDataProvider<TraceRecordInfo> 
 
                     @Override
                     public void onSuccess(Method method, List<TraceRecordInfo> response) {
-                        updateRowData(0, response);
+                        updateRowCount(response.size(), true);
+                        updateRowData(range.getStart(), response);
                     }
                 });
     }

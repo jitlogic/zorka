@@ -20,7 +20,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.Range;
-import com.jitlogic.zorka.central.client.data.TraceDataService;
 import com.jitlogic.zorka.central.data.TraceInfo;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
@@ -73,6 +72,7 @@ public class TraceListDataProvider extends AsyncDataProvider<TraceInfo> {
                         @Override
                         public void onSuccess(Method method, List<TraceInfo> response) {
                             updateRowData(range.getStart(), response);
+                            updateRowCount(response.size(), true);
                         }
                     });
         }

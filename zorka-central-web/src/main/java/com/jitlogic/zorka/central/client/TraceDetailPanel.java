@@ -22,7 +22,6 @@ import com.google.gwt.user.cellview.client.CellTree;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
-import com.jitlogic.zorka.central.client.data.TraceDataService;
 import com.jitlogic.zorka.central.data.TraceInfo;
 import com.jitlogic.zorka.central.data.TraceRecordInfo;
 
@@ -35,6 +34,7 @@ public class TraceDetailPanel extends Composite {
 
     @UiField(provided = true)
     CellTree tree;
+
     @UiField
     Button btnClose;
 
