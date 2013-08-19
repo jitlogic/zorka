@@ -23,6 +23,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.sencha.gxt</groupId>
+            <artifactId>gxt</artifactId>
+            <version>${gxt.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.fusesource.restygwt</groupId>
             <artifactId>restygwt</artifactId>
             <version>${resty.version}</version>

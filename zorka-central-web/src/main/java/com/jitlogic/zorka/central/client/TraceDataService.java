@@ -17,6 +17,7 @@ package com.jitlogic.zorka.central.client;
 
 
 import com.jitlogic.zorka.central.data.HostInfo;
+import com.jitlogic.zorka.central.data.PagingData;
 import com.jitlogic.zorka.central.data.TraceInfo;
 import com.jitlogic.zorka.central.data.TraceRecordInfo;
 import org.fusesource.restygwt.client.MethodCallback;
@@ -44,6 +45,14 @@ public interface TraceDataService extends RestService {
 
 
     @GET
+    @Path("hosts/{hostId}/page?limit={limit}&offset={offset}")
+    public void pageTraces(@PathParam("hostId") int hostId,
+                           @PathParam("offset") int offset,
+                           @PathParam("limit") int limit,
+                           MethodCallback<PagingData<TraceInfo>> callback);
+
+
+    @GET
     @Path("hosts/{hostId}/count")
     public void countTraces(@PathParam("hostId") int hostId,
                             MethodCallback<Integer> callback);
@@ -63,4 +72,6 @@ public interface TraceDataService extends RestService {
                                @PathParam("traceOffs") long traceOffs,
                                @PathParam("path") String path,
                                MethodCallback<TraceRecordInfo> callback);
+
+
 }

@@ -17,6 +17,7 @@ package com.jitlogic.zorka.central.rest;
 
 import com.jitlogic.zorka.central.*;
 import com.jitlogic.zorka.central.data.HostInfo;
+import com.jitlogic.zorka.central.data.PagingData;
 import com.jitlogic.zorka.central.data.TraceInfo;
 import com.jitlogic.zorka.central.data.TraceRecordInfo;
 import com.jitlogic.zorka.central.rds.RDSStore;
@@ -76,6 +77,7 @@ public class TraceDataApi {
         return jdbc.queryForObject("select count(1) from TRACES where HOST_ID = ?", Integer.class, hostId);
     }
 
+
     @GET
     @Path("/{hostId: [0-9]+}/list")
     public List<TraceInfo> listTraces(@PathParam("hostId") int hostId,
@@ -85,6 +87,7 @@ public class TraceDataApi {
                 DataMappers.TRACE_INFO_MAPPER, hostId, limit, offset);
     }
 
+
     @GET
     @Path("/{hostId: [0-9]+}/{traceId: [0-9]+}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -92,6 +95,26 @@ public class TraceDataApi {
         return jdbc.queryForObject("select * from TRACES where HOST_ID = ? and DATA_OFFS = ?",
                 DataMappers.TRACE_INFO_MAPPER, hostId, traceOffs);
     }
+
+
+    @GET
+    @Path("/{hostId: [0-9]+}/page")
+    public PagingData pageTraces(@PathParam("hostId") int hostId,
+                                 @DefaultValue("0") @QueryParam("offset") int offset,
+                                 @DefaultValue("100") @QueryParam("limit") int limit) {
+
+        List<TraceInfo> results = jdbc.query("select * from TRACES where HOST_ID = ? LIMIT ? OFFSET ?",
+                DataMappers.TRACE_INFO_MAPPER, hostId, limit, offset);
+
+        PagingData result = new PagingData();
+
+        result.setOffset(offset);
+        result.setTotal(jdbc.queryForObject("select count(1) from TRACES where HOST_ID = ?", Integer.class, hostId));
+        result.setResults(results);
+
+        return result;
+    }
+
 
     public HostInfo getOrCreateHost(String hostName, String hostAddr) {
         List<HostInfo> lst = jdbc.query("select * from HOSTS where HOST_NAME = ?",
@@ -192,5 +215,6 @@ public class TraceDataApi {
 
         return lst;
     }
+
 
 }

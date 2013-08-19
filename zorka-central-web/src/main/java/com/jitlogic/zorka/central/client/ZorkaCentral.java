@@ -17,7 +17,7 @@ package com.jitlogic.zorka.central.client;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import org.fusesource.restygwt.client.Resource;
 import org.fusesource.restygwt.client.RestServiceProxy;
@@ -25,33 +25,35 @@ import org.fusesource.restygwt.client.RestServiceProxy;
 
 public class ZorkaCentral implements EntryPoint {
 
-    private TabLayoutPanel tabPanel;
-
     private TraceDataService traceDataService;
 
     public void add(IsWidget w, String title) {
-        tabPanel.add(w, title);
-        tabPanel.selectTab(w);
-    }
 
-    public void remove(Widget w) {
-        tabPanel.remove(w);
     }
 
     public TraceDataService getTraceDataService() {
         return traceDataService;
     }
 
+    private ZorkaCentralShell shell;
+
     public void onModuleLoad() {
 
         traceDataService = GWT.create(TraceDataService.class);
         ((RestServiceProxy) traceDataService).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
 
-        tabPanel = new TabLayoutPanel(2.5, Style.Unit.EM);
-        tabPanel.add(new HostListPanel(this), "Hosts");
-        tabPanel.setWidth("100%");
-        tabPanel.setHeight("100%");
+        Window.enableScrolling(false);
 
-        RootPanel.get("CentralConsole").add(tabPanel);
+        shell = new ZorkaCentralShell(traceDataService);
+
+        RootPanel.get().add(shell);
+
+        onReady();
     }
+
+    private native void onReady() /*-{
+        if (typeof $wnd.GxtReady != 'undefined') {
+            $wnd.GxtReady();
+        }
+    }-*/;
 }
