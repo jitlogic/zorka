@@ -31,6 +31,8 @@ import com.jitlogic.zorka.central.data.TraceInfoProperties;
 import com.sencha.gxt.core.client.Style;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
+import com.sencha.gxt.data.shared.SortDir;
+import com.sencha.gxt.data.shared.SortInfo;
 import com.sencha.gxt.data.shared.loader.*;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.CellDoubleClickEvent;
@@ -42,7 +44,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class TraceListingPanel extends VerticalLayoutContainer {
+public class TraceListPanel extends VerticalLayoutContainer {
 
     private static final TraceInfoProperties props = GWT.create(TraceInfoProperties.class);
 
@@ -57,7 +59,7 @@ public class TraceListingPanel extends VerticalLayoutContainer {
 
     private ZorkaCentralShell shell;
 
-    public TraceListingPanel(ZorkaCentralShell shell, TraceDataService tds, HostInfo hostInfo) {
+    public TraceListPanel(ZorkaCentralShell shell, TraceDataService tds, HostInfo hostInfo) {
         this.shell = shell;
         this.tds = tds;
         this.selectedHost = hostInfo;
@@ -111,7 +113,11 @@ public class TraceListingPanel extends VerticalLayoutContainer {
             @Override
             public void load(final PagingLoadConfig loadConfig, final Callback<PagingLoadResult<TraceInfo>, Throwable> callback) {
                 if (selectedHost != null) {
+                    List<? extends SortInfo> sort = loadConfig.getSortInfo();
+                    String orderBy = sort.size() > 0 ? sort.get(0).getSortField() : "clock";
+                    String orderDir = sort.size() > 0 ? sort.get(0).getSortDir().name() : "DESC";
                     tds.pageTraces(selectedHost.getId(), loadConfig.getOffset(), loadConfig.getLimit(),
+                            orderBy, orderDir,
                             new MethodCallback<PagingData<TraceInfo>>() {
                                 @Override
                                 public void onFailure(Method method, Throwable exception) {

@@ -45,10 +45,12 @@ public interface TraceDataService extends RestService {
 
 
     @GET
-    @Path("hosts/{hostId}/page?limit={limit}&offset={offset}")
+    @Path("hosts/{hostId}/page?limit={limit}&offset={offset}&orderBy={orderBy}&orderDir={orderDir}")
     public void pageTraces(@PathParam("hostId") int hostId,
                            @PathParam("offset") int offset,
                            @PathParam("limit") int limit,
+                           @PathParam("orderBy") String orderBy,
+                           @PathParam("orderDir") String orderDir,
                            MethodCallback<PagingData<TraceInfo>> callback);
 
 

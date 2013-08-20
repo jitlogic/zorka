@@ -24,6 +24,7 @@ import com.jitlogic.zorka.central.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.FressianReader;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -33,6 +34,8 @@ import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 @Path("hosts")
@@ -96,14 +99,31 @@ public class TraceDataApi {
                 DataMappers.TRACE_INFO_MAPPER, hostId, traceOffs);
     }
 
+    private final static Map<String, String> TRACES_ORDER_COLS = ZorkaUtil.map(
+            "clock", "CLOCK",
+            "calls", "CALLS",
+            "errors", "ERRORS",
+            "records", "RECORDS",
+            "description", "OVERVIEW",
+            "executionTime", "EXTIME"
+    );
+
+    private final static Set<String> TRACES_ORDER_DIRS = ZorkaUtil.set("ASC", "DESC");
 
     @GET
     @Path("/{hostId: [0-9]+}/page")
-    public PagingData pageTraces(@PathParam("hostId") int hostId,
-                                 @DefaultValue("0") @QueryParam("offset") int offset,
-                                 @DefaultValue("100") @QueryParam("limit") int limit) {
+    public PagingData<TraceInfo> pageTraces(@PathParam("hostId") int hostId,
+                                            @DefaultValue("0") @QueryParam("offset") int offset,
+                                            @DefaultValue("100") @QueryParam("limit") int limit,
+                                            @DefaultValue("CLOCK") @QueryParam("orderBy") String orderBy,
+                                            @DefaultValue("DESC") @QueryParam("orderDir") String orderDir) {
 
-        List<TraceInfo> results = jdbc.query("select * from TRACES where HOST_ID = ? LIMIT ? OFFSET ?",
+        if (!TRACES_ORDER_COLS.containsKey(orderBy) || !TRACES_ORDER_DIRS.contains(orderDir)) {
+            throw new RuntimeException("Invalid ordering arguments: orderBy=" + orderBy + ", orderDir=" + orderDir);
+        }
+
+        List<TraceInfo> results = jdbc.query("select * from TRACES where HOST_ID = ? order by "
+                + TRACES_ORDER_COLS.get(orderBy) + " " + orderDir + " limit ? offset ?",
                 DataMappers.TRACE_INFO_MAPPER, hostId, limit, offset);
 
         PagingData result = new PagingData();

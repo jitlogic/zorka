@@ -28,7 +28,6 @@ import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.TabItemConfig;
 import com.sencha.gxt.widget.core.client.TabPanel;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
-import com.sencha.gxt.widget.core.client.container.HtmlLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.event.CellDoubleClickEvent;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
@@ -113,7 +112,7 @@ public class ZorkaCentralShell extends BorderLayoutContainer {
             @Override
             public void onCellClick(CellDoubleClickEvent event) {
                 GWT.log("Selected host: " + selectionModel.getSelectedItem());
-                addView(new TraceListingPanel(ZorkaCentralShell.this, tds, selectionModel.getSelectedItem()),
+                addView(new TraceListPanel(ZorkaCentralShell.this, tds, selectionModel.getSelectedItem()),
                         selectionModel.getSelectedItem().getName() + ": traces");
             }
         });
