@@ -16,9 +16,6 @@
 package com.jitlogic.zorka.central.rds;
 
 
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +25,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -42,16 +38,16 @@ public class RDSStore implements Closeable {
     private static Pattern RGZ_FILE = Pattern.compile("^[0-9a-f]{16}\\.rgz$");
 
     private String basePath;
-    private int physSize;
+    private long physSize;
 
     private long physThreshold;
     private long segmentSize;
 
     private long logicalPos = 0;
 
+    private RAGZInputStream input;
     private RAGZOutputStream output;
     private long outputStart = 0, outputPos = 0;
-    private List<byte[]> outputCache = new LinkedList<byte[]>();
 
     private List<RDSChunkFile> archivedFiles = new ArrayList<RDSChunkFile>();
 
@@ -60,13 +56,13 @@ public class RDSStore implements Closeable {
 
 
     /**
-     * @param basePath
-     * @param physSize
-     * @param physThreshold
-     * @param segmentSize
+     * @param basePath      path to directory containing store files
+     * @param physSize      maximum physical size of the store
+     * @param physThreshold maximum physical size of a single file in the store
+     * @param segmentSize   segment size (inside single RAGZ file)
      * @throws IOException
      */
-    public RDSStore(String basePath, int physSize, long physThreshold, long segmentSize) throws IOException {
+    public RDSStore(String basePath, long physSize, long physThreshold, long segmentSize) throws IOException {
         this.basePath = basePath;
         this.physSize = physSize;
         this.physThreshold = physThreshold;
@@ -119,16 +115,41 @@ public class RDSStore implements Closeable {
      */
     private void rotate() throws IOException {
         String fname = String.format("%016x.rgz", logicalPos).toLowerCase();
+
         if (output != null) {
             output.close();
-            archivedFiles.add(new RDSChunkFile(String.format("%016.rgz", outputStart)));
+            archivedFiles.add(new RDSChunkFile(String.format("%016x.rgz", outputStart)));
         }
+
+        if (input != null) {
+            input.close();
+            input = null;
+        }
+
         output = new RAGZOutputStream(
                 new RandomAccessFile(new File(basePath, fname), "rw"),
                 segmentSize);
         outputStart = logicalPos;
         outputPos = 0;
-        outputCache.clear();
+    }
+
+
+    private void cleanup() throws IOException {
+        long size = output.physicalLength();
+
+        for (RDSChunkFile f : archivedFiles) {
+            size += f.plen;
+        }
+
+        while (size > physSize && archivedFiles.size() > 0) {
+            RDSChunkFile rcf = archivedFiles.get(0);
+            File f = new File(basePath, rcf.fname);
+            if (f.exists()) {
+                f.delete();
+            }
+            size -= rcf.plen;
+            archivedFiles.remove(0);
+        }
     }
 
 
@@ -137,6 +158,11 @@ public class RDSStore implements Closeable {
         if (output != null) {
             output.close();
             output = null;
+        }
+
+        if (input != null) {
+            input.close();
+            input = null;
         }
     }
 
@@ -162,11 +188,11 @@ public class RDSStore implements Closeable {
 
         logicalPos += data.length;
 
-        outputCache.add(ZorkaUtil.copyArray(data));
         outputPos += data.length;
 
         if (output.physicalLength() > physThreshold) {
             rotate();
+            cleanup();
         }
 
         return pos;
@@ -174,6 +200,18 @@ public class RDSStore implements Closeable {
 
 
     public byte[] read(long offs, int length) throws IOException {
+
+        if (offs >= outputStart && offs <= outputPos + outputStart) {
+            if (input == null) {
+                input = RAGZInputStream.fromFile(new File(basePath, String.format("%016x.rgz", outputStart)).getPath());
+            }
+            int len = length <= outputPos + outputStart - offs ? length : (int) (outputStart + outputPos - offs);
+            byte[] data = new byte[len];
+            input.seek(offs - outputStart);
+            input.read(data);
+            return data;
+        }
+
         if (currentChunk == null || offs < currentChunk.loffs
                 || offs > currentChunk.loffs + currentChunk.loffs) {
             currentChunk = null;
@@ -197,24 +235,10 @@ public class RDSStore implements Closeable {
             currentInput.seek(offs - currentChunk.loffs);
             currentInput.read(data);
             return data;
-        } else if (offs >= outputStart && offs <= outputPos + outputStart) {
-            int len = length <= outputPos + outputStart - offs ? length : (int) (outputStart + outputPos - offs);
-            byte[] data = new byte[len];
-            long pos;
-            int i, o = 0;
-            for (i = 0, pos = outputStart; i < outputCache.size(); pos += outputCache.get(i).length, i++) {
-                byte[] b = outputCache.get(i);
-                if (offs + o >= pos && offs + o <= pos + b.length) {
-                    int x = o == 0 ? (int) (offs - pos) : 0;
-                    int l = (len - o) <= b.length - x ? (len - o) : b.length - x;
-                    System.arraycopy(b, (int) (offs - pos) + o, data, o, l);
-                    o += l;
-                }
-            }
-            return data;
-        } else {
-            return new byte[0];
         }
+
+
+        return new byte[0];
     }
 
     private class RDSChunkFile implements Comparable<RDSChunkFile> {
