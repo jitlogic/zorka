@@ -20,28 +20,39 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import org.objectweb.asm.Type;
 
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.regex.Pattern;
 
 public class CentralUtil {
 
-    /** Print short class name */
+    /**
+     * Print short class name
+     */
     public static final int PS_SHORT_CLASS = 0x01;
 
-    /** Print result type */
+    /**
+     * Print result type
+     */
     public static final int PS_RESULT_TYPE = 0x02;
 
-    /** Print short argument types */
-    public static final int PS_SHORT_ARGS  = 0x04;
+    /**
+     * Print short argument types
+     */
+    public static final int PS_SHORT_ARGS = 0x04;
 
-    /** Omits arguments overall in pretty pring */
-    public static final int PS_NO_ARGS     = 0x08;
+    /**
+     * Omits arguments overall in pretty pring
+     */
+    public static final int PS_NO_ARGS = 0x08;
 
 
     private static final Pattern RE_DOT = Pattern.compile("\\.");
 
     public static String shortClassName(String className) {
         String[] segs = RE_DOT.split(className != null ? className : "");
-        return segs[segs.length-1];
+        return segs[segs.length - 1];
     }
 
 
@@ -51,7 +62,7 @@ public class CentralUtil {
      * @return method description string
      */
     public static String prettyPrint(TraceRecord tr, SymbolRegistry sr) {
-        return prettyPrint(tr, sr, PS_RESULT_TYPE|PS_SHORT_ARGS);
+        return prettyPrint(tr, sr, PS_RESULT_TYPE | PS_SHORT_ARGS);
     }
 
 
@@ -59,7 +70,6 @@ public class CentralUtil {
      * Returns human readable method description (configurable with supplied flags)
      *
      * @param style style flags (see PS_* constants)
-     *
      * @return method description string
      */
     public static String prettyPrint(TraceRecord tr, SymbolRegistry sr, int style) {
@@ -93,7 +103,9 @@ public class CentralUtil {
         if (0 == (style & PS_NO_ARGS)) {
             Type[] types = Type.getArgumentTypes(signature);
             for (int i = 0; i < types.length; i++) {
-                if (i > 0) { sb.append(", "); }
+                if (i > 0) {
+                    sb.append(", ");
+                }
                 if (0 != (style & PS_SHORT_ARGS)) {
                     sb.append(shortClassName(types[i].getClassName()));
                 } else {
@@ -109,19 +121,29 @@ public class CentralUtil {
 
 
     public static long toUIntBE(byte[] b) {
-        return  (b[0] & 0xffL)
-             | ((b[1] & 0xffL) << 8)
-             | ((b[2] & 0xffL) << 16)
-             | ((b[3] & 0xffL) << 24);
+        return (b[0] & 0xffL)
+                | ((b[1] & 0xffL) << 8)
+                | ((b[2] & 0xffL) << 16)
+                | ((b[3] & 0xffL) << 24);
     }
 
 
     public static byte[] fromUIntBE(long l) {
-        return new byte[] {
-                (byte)l,
-                (byte)(l>>>8),
-                (byte)(l>>>16),
-                (byte)(l>>>24) };
+        return new byte[]{
+                (byte) l,
+                (byte) (l >>> 8),
+                (byte) (l >>> 16),
+                (byte) (l >>> 24)};
+    }
+
+    public static long readUInt(RandomAccessFile input) throws IOException {
+        byte[] b = new byte[4];
+
+        if (input.read(b) != 4) {
+            throw new EOFException("EOF encountered when reading UINT");
+        }
+
+        return CentralUtil.toUIntBE(b);
     }
 
 }
