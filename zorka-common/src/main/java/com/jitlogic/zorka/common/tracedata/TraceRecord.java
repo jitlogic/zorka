@@ -29,56 +29,90 @@ import java.util.*;
 public class TraceRecord implements SymbolicRecord {
 
 
-    /** Overflow record will be discarded regardless of method execution time and other conditions. */
+    /**
+     * Overflow record will be discarded regardless of method execution time and other conditions.
+     */
     public static final int OVERFLOW_FLAG = 0x0001;
 
-    /** Indicates that new trace has been started from here. */
-    public static final int TRACE_BEGIN   = 0x0002;
+    /**
+     * Indicates that new trace has been started from here.
+     */
+    public static final int TRACE_BEGIN = 0x0002;
 
-    /** Exception thrown from method called from frame hasn't been handled and has been thrown out of current frame. */
+    /**
+     * Exception thrown from method called from frame hasn't been handled and has been thrown out of current frame.
+     */
     public static final int EXCEPTION_PASS = 0x0004;
 
-    /** Exception thrown from method called current frame has been wrapped and thrown out of current frame. */
+    /**
+     * Exception thrown from method called current frame has been wrapped and thrown out of current frame.
+     */
     public static final int EXCEPTION_WRAP = 0x0008;
 
-    /** Indicates that parent method has been dropped due to short execution time. */
+    /**
+     * Indicates that parent method has been dropped due to short execution time.
+     */
     public static final int DROPPED_PARENT = 0x0010;
 
-    /** Class ID refers to class name in symbol registry. */
+    /**
+     * Class ID refers to class name in symbol registry.
+     */
     private int classId;
 
-    /** Method ID refers to method name in symbol registry. */
+    /**
+     * Method ID refers to method name in symbol registry.
+     */
     private int methodId;
 
-    /** Signature ID refers to signature string in symbol registry. */
+    /**
+     * Signature ID refers to signature string in symbol registry.
+     */
     private int signatureId;
 
-    /** Various flags (see *_FLAG constants defined above) */
+    /**
+     * Various flags (see *_FLAG constants defined above)
+     */
     private int flags;
 
-    /** Method execution time. */
+    /**
+     * Method execution time.
+     */
     private long time;
 
-    /** Number of instrumented method calls performed from this method (and recursively from all subsequent calls. */
+    /**
+     * Number of instrumented method calls performed from this method (and recursively from all subsequent calls.
+     */
     private long calls;
 
-    /** Number of (catched) errors found in  */
+    /**
+     * Number of (catched) errors found in
+     */
     private long errors;
 
-    /** If not null, this reference contains trace marker (that identifies and delimits traces).
-     *  Tracer can submit trace when exiting from method marked by trace marker. */
+    /**
+     * If not null, this reference contains trace marker (that identifies and delimits traces).
+     * Tracer can submit trace when exiting from method marked by trace marker.
+     */
     private TraceMarker marker;
 
-    /** Exception caught on method exit (if any) */
+    /**
+     * Exception caught on method exit (if any)
+     */
     private Object exception;
 
-    /** Parent trace record represents information about method execution from which current method execution was called. */
+    /**
+     * Parent trace record represents information about method execution from which current method execution was called.
+     */
     private TraceRecord parent;
 
-    /** Attributes grabbed at this method execution (by spy instrumentation engine). */
-    private Map<Integer,Object> attrs;
+    /**
+     * Attributes grabbed at this method execution (by spy instrumentation engine).
+     */
+    private Map<Integer, Object> attrs;
 
-    /** Contains list of records describing method executions called directly from this execution. */
+    /**
+     * Contains list of records describing method executions called directly from this execution.
+     */
     private List<TraceRecord> children;
 
     /**
@@ -104,7 +138,6 @@ public class TraceRecord implements SymbolicRecord {
      * Returns custom attribute value.
      *
      * @param attrId ID referring to symbol name from symbol registry
-     *
      * @return attribute value or null if no attribute has been found
      */
     public Object getAttr(int attrId) {
@@ -119,24 +152,23 @@ public class TraceRecord implements SymbolicRecord {
         return attrs != null ? attrs.size() : 0;
     }
 
-    public Map<Integer,Object> getAttrs() {
+    public Map<Integer, Object> getAttrs() {
         return attrs;
     }
 
-    public void setAttrs(Map<Integer,Object> attrs) {
+    public void setAttrs(Map<Integer, Object> attrs) {
         this.attrs = attrs;
     }
 
     /**
      * Sets custom attribute value.
      *
-     * @param attrId ID referring to symbol name from symbol registry
-     *
+     * @param attrId  ID referring to symbol name from symbol registry
      * @param attrVal attribute value
      */
     public void setAttr(int attrId, Object attrVal) {
         if (attrs == null) {
-            attrs = new LinkedHashMap<Integer,Object>();
+            attrs = new LinkedHashMap<Integer, Object>();
         }
         attrs.put(attrId, attrVal);
     }
@@ -161,7 +193,6 @@ public class TraceRecord implements SymbolicRecord {
      * Returns child record.
      *
      * @param i child record index (starting with 0)
-     *
      * @return child trace record.
      */
     public TraceRecord getChild(int i) {
@@ -311,12 +342,12 @@ public class TraceRecord implements SymbolicRecord {
         signatureId = checker.checkSymbol(signatureId);
 
         if (exception instanceof SymbolicException) {
-            ((SymbolicException)exception).traverse(checker);
+            ((SymbolicException) exception).traverse(checker);
         }
 
         if (attrs != null) {
-            Map<Integer,Object> newAttrs = new LinkedHashMap<Integer, Object>();
-            for (Map.Entry<Integer,Object> e : attrs.entrySet()) {
+            Map<Integer, Object> newAttrs = new LinkedHashMap<Integer, Object>();
+            for (Map.Entry<Integer, Object> e : attrs.entrySet()) {
                 newAttrs.put(checker.checkSymbol(e.getKey()), e.getValue());
             }
             attrs = newAttrs;
@@ -328,7 +359,7 @@ public class TraceRecord implements SymbolicRecord {
             }
         }
 
-        if (marker != null) {
+        if (marker != null && 0 != (flags & TRACE_BEGIN)) {
             marker.setTraceId(checker.checkSymbol(marker.getTraceId()));
         }
     }
@@ -338,7 +369,7 @@ public class TraceRecord implements SymbolicRecord {
      * Cleans up record for reuse. This is used to limit amount of
      * memory consumed by subsequent allocations (thus imposing less
      * strain on gabage collection).
-     *
+     * <p/>
      * Trace records are not actually pooled in any way, but can often
      * be reused while tracing subsequent method calls.
      */
@@ -398,7 +429,7 @@ public class TraceRecord implements SymbolicRecord {
         }
 
         if (exception instanceof Throwable) {
-            exception = new SymbolicException((Throwable)exception, symbols, 0 == (flags & EXCEPTION_WRAP));
+            exception = new SymbolicException((Throwable) exception, symbols, 0 == (flags & EXCEPTION_WRAP));
         }
     }
 

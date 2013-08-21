@@ -27,11 +27,14 @@ import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.FressianReader;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 
 import javax.sql.DataSource;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayInputStream;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +47,44 @@ public class TraceDataApi {
     private JdbcTemplate jdbc;
     private StoreManager storeManager;
     private SymbolRegistry symbolRegistry;
+
+
+    private final RowMapper<HostInfo> HOST_INFO_MAPPER = new RowMapper<HostInfo>() {
+        @Override
+        public HostInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
+            HostInfo info = new HostInfo();
+
+            info.setId(rs.getInt("HOST_ID"));
+            info.setName(rs.getString("HOST_NAME"));
+            info.setAddr(rs.getString("HOST_ADDR"));
+            info.setPath(rs.getString("HOST_PATH"));
+
+            return info;
+        }
+    };
+
+
+    private final RowMapper<TraceInfo> TRACE_INFO_MAPPER = new RowMapper<TraceInfo>() {
+        @Override
+        public TraceInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
+            TraceInfo info = new TraceInfo();
+
+            info.setHostId(rs.getInt("HOST_ID"));
+            info.setDataOffs(rs.getLong("DATA_OFFS"));
+            info.setTraceId(rs.getInt("TRACE_ID"));
+            info.setDataLen(rs.getInt("DATA_LEN"));
+            info.setClock(rs.getLong("CLOCK"));
+            info.setMethodFlags(rs.getInt("RFLAGS"));
+            info.setTraceFlags(rs.getInt("TFLAGS"));
+            info.setCalls(rs.getLong("CALLS"));
+            info.setErrors(rs.getLong("ERRORS"));
+            info.setRecords(rs.getLong("RECORDS"));
+            info.setExecutionTime(rs.getLong("EXTIME"));
+            info.setDescription(rs.getString("DESCRIPTION"));
+
+            return info;
+        }
+    };
 
 
     public TraceDataApi() {
@@ -64,12 +105,12 @@ public class TraceDataApi {
     @Path("/list")
     @Produces(MediaType.APPLICATION_JSON)
     public List<HostInfo> getHosts() {
-        return jdbc.query("select * from HOSTS order by HOST_NAME", DataMappers.HOST_INFO_MAPPER);
+        return jdbc.query("select * from HOSTS order by HOST_NAME", HOST_INFO_MAPPER);
     }
 
 
     public HostInfo getHost(int hostId) {
-        return jdbc.queryForObject("select * from HOSTS where HOST_ID = ?", DataMappers.HOST_INFO_MAPPER, hostId);
+        return jdbc.queryForObject("select * from HOSTS where HOST_ID = ?", HOST_INFO_MAPPER, hostId);
     }
 
 
@@ -87,7 +128,7 @@ public class TraceDataApi {
                                       @DefaultValue("0") @QueryParam("offset") int offset,
                                       @DefaultValue("100") @QueryParam("limit") int limit) {
         return jdbc.query("select * from TRACES where HOST_ID = ? LIMIT ? OFFSET ?",
-                DataMappers.TRACE_INFO_MAPPER, hostId, limit, offset);
+                TRACE_INFO_MAPPER, hostId, limit, offset);
     }
 
 
@@ -96,7 +137,7 @@ public class TraceDataApi {
     @Produces(MediaType.APPLICATION_JSON)
     public TraceInfo getTrace(@PathParam("hostId") int hostId, @PathParam("traceId") long traceOffs) {
         return jdbc.queryForObject("select * from TRACES where HOST_ID = ? and DATA_OFFS = ?",
-                DataMappers.TRACE_INFO_MAPPER, hostId, traceOffs);
+                TRACE_INFO_MAPPER, hostId, traceOffs);
     }
 
     private final static Map<String, String> TRACES_ORDER_COLS = ZorkaUtil.map(
@@ -124,7 +165,7 @@ public class TraceDataApi {
 
         List<TraceInfo> results = jdbc.query("select * from TRACES where HOST_ID = ? order by "
                 + TRACES_ORDER_COLS.get(orderBy) + " " + orderDir + " limit ? offset ?",
-                DataMappers.TRACE_INFO_MAPPER, hostId, limit, offset);
+                TRACE_INFO_MAPPER, hostId, limit, offset);
 
         PagingData result = new PagingData();
 
@@ -138,7 +179,7 @@ public class TraceDataApi {
 
     public HostInfo getOrCreateHost(String hostName, String hostAddr) {
         List<HostInfo> lst = jdbc.query("select * from HOSTS where HOST_NAME = ?",
-                DataMappers.HOST_INFO_MAPPER, hostName);
+                HOST_INFO_MAPPER, hostName);
         if (lst.size() == 0) {
             jdbc.update("insert into HOSTS (HOST_NAME,HOST_ADDR,HOST_PATH) values (?,?,?)",
                     hostName, hostAddr, safePath(hostName));

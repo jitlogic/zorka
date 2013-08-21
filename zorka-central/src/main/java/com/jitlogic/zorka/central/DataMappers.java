@@ -25,42 +25,4 @@ import java.sql.SQLException;
 
 public class DataMappers {
 
-    public final static RowMapper<HostInfo> HOST_INFO_MAPPER = new RowMapper<HostInfo>() {
-        @Override
-        public HostInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
-            HostInfo info = new HostInfo();
-
-            info.setId(rs.getInt("HOST_ID"));
-            info.setName(rs.getString("HOST_NAME"));
-            info.setAddr(rs.getString("HOST_ADDR"));
-            info.setPath(rs.getString("HOST_PATH"));
-
-            return info;
-        }
-    };
-
-
-    public final static RowMapper<TraceInfo> TRACE_INFO_MAPPER = new RowMapper<TraceInfo>() {
-        @Override
-        public TraceInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
-            TraceInfo info = new TraceInfo();
-
-            info.setHostId(rs.getInt("HOST_ID"));
-            info.setDataOffs(rs.getLong("DATA_OFFS"));
-            info.setTraceId(rs.getInt("TRACE_ID"));
-            info.setDataLen(rs.getInt("DATA_LEN"));
-            info.setClock(rs.getLong("CLOCK"));
-            info.setMethodFlags(rs.getInt("RFLAGS"));
-            info.setTraceFlags(rs.getInt("TFLAGS"));
-            info.setCalls(rs.getLong("CALLS"));
-            info.setErrors(rs.getLong("ERRORS"));
-            info.setRecords(rs.getLong("RECORDS"));
-            info.setExecutionTime(rs.getLong("EXTIME"));
-            info.setDescription(rs.getString("OVERVIEW"));
-
-            return info;
-        }
-    };
-
-
 }

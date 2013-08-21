@@ -65,11 +65,18 @@ public class DataCollectionIntegTest extends CentralFixture {
 
     @Test(timeout = 1000)
     public void testCollectSingleTraceRecord() throws Exception {
+        JdbcTemplate jdbc = new JdbcTemplate(instance.getDs());
         TraceRecord rec = generator.generate();
 
         submit(rec);
 
         assertEquals("One trace should be noticed.", 1, countTraces("test"));
+
+        String tn1 = generator.getSymbols().symbolName(rec.getMarker().getTraceId());
+        int remoteTID = jdbc.queryForObject("select TRACE_ID from TRACES", Integer.class);
+        String tn2 = instance.getSymbolRegistry().symbolName(remoteTID);
+
+        assertEquals(tn1, tn2);
     }
 
 
