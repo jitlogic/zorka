@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import java.io.RandomAccessFile;
+import java.util.List;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 
@@ -61,9 +62,9 @@ public class RAGZOutputStream extends OutputStream {
     public RAGZOutputStream(RandomAccessFile outFile, long maxSegSize) throws IOException {
         this.outFile = outFile;
         this.maxSegSize = maxSegSize;
-        nextSegment();
-    }
 
+        reopenSegment(outFile);
+    }
 
     @Override
     public void write(int b) throws IOException {
@@ -100,6 +101,7 @@ public class RAGZOutputStream extends OutputStream {
         crc.update(buf, off, len0);
 
         if (len > len0) {
+            // TODO get rid of this split, use single write (into single
             write(buf, off + len0, len - len0);
         }
     }
@@ -161,8 +163,37 @@ public class RAGZOutputStream extends OutputStream {
     };
 
 
-    private void nextSegment() throws IOException {
+    private void reopenSegment(RandomAccessFile outFile) throws IOException {
+        if (outFile.length() > 0) {
+            List<RAGZSegment> segments = RAGZSegment.scan(outFile);
+            if (segments.size() > 0) {
+                RAGZSegment segment = segments.get(segments.size() - 1);
+                if (segment.getPhysicalLen() < 3) { // Empty segment has exactly 2 bytes (resulting from compression)
+                    outFile.setLength(segment.getPhysicalPos());
+                    outFile.seek(segment.getPhysicalPos());
+                    curSegStart = segment.getPhysicalPos() - 20;
+                    curSegSize = 0;
+                    // there is no need to write a header
+                    deflater = new Deflater(6, true);
+                    crc = new CRC32();
+                    lastSavedPos = logicalLength;
+                } else {
+                    curSegStart = segment.getPhysicalPos() - 20;
+                    byte[] data = RAGZSegment.unpack(outFile, segment);
+                    curSegSize = data.length;
+                    deflater = new Deflater(6, true);
+                    crc = new CRC32();
+                    crc.update(data);
+                    nextSegment();
+                }
+            }
+        } else {
+            nextSegment();
+        }
+    }
 
+
+    private void nextSegment() throws IOException {
         outFile.seek(outFile.length());
 
         if (curSegSize >= 0) {

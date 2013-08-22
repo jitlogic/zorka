@@ -18,6 +18,8 @@ package com.jitlogic.zorka.central.data;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.util.Map;
+
 public class TraceRecordInfo {
     @JsonProperty
     long calls;
@@ -39,6 +41,12 @@ public class TraceRecordInfo {
 
     @JsonProperty
     String path;
+
+    @JsonProperty
+    Map<String, String> attributes;
+
+    @JsonProperty
+    SymbolicExceptionInfo exceptionInfo;
 
     public long getCalls() {
         return calls;
@@ -94,5 +102,21 @@ public class TraceRecordInfo {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public Map<String, String> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(Map<String, String> attributes) {
+        this.attributes = attributes;
+    }
+
+    public SymbolicExceptionInfo getExceptionInfo() {
+        return exceptionInfo;
+    }
+
+    public void setExceptionInfo(SymbolicExceptionInfo exceptionInfo) {
+        this.exceptionInfo = exceptionInfo;
     }
 }

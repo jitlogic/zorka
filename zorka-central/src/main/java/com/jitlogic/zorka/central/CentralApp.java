@@ -15,34 +15,62 @@
  */
 package com.jitlogic.zorka.central;
 
+import org.slf4j.bridge.SLF4JBridgeHandler;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 
-public class CentralApp {
+public class CentralApp extends HttpServlet {
     private static volatile CentralInstance instance = null;
+
+
+    public void init(ServletConfig config) throws ServletException {
+        configureInstance();
+    }
+
 
     public static synchronized CentralInstance getInstance() {
         if (instance == null) {
-            String homeDir = System.getProperty("central.home.dir");
-            if (homeDir == null) {
-                throw new RuntimeException("Missing home dir configuration property. " +
-                        "Add '-Dcentral.home.dir=/path/to/zorka/central' to JVM options.");
-            }
-            if (!new File(homeDir).isDirectory()) {
-                throw new RuntimeException("Home dir property does not point to a directory.");
-            }
-            CentralConfig config = new CentralConfig(homeDir);
-            System.out.println("Database URL: " + config.stringCfg("central.db.url", "??"));
-            instance = new CentralInstance(config);
-            instance.start();
-            Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+            configureInstance();
         }
         return instance;
     }
 
+
+    private static synchronized void configureInstance() {
+        // Redirect java.util.logging to slf4j
+        LogManager.getLogManager().reset();
+        SLF4JBridgeHandler.install();
+        Logger.getLogger("global").setLevel(Level.FINEST);
+
+        String homeDir = System.getProperty("central.home.dir");
+
+        if (homeDir == null) {
+            throw new RuntimeException("Missing home dir configuration property. " +
+                    "Add '-Dcentral.home.dir=/path/to/zorka/central' to JVM options.");
+        }
+
+        if (!new File(homeDir).isDirectory()) {
+            throw new RuntimeException("Home dir property does not point to a directory.");
+        }
+
+        CentralConfig config = new CentralConfig(homeDir);
+        instance = new CentralInstance(config);
+        instance.start();
+        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+    }
+
+
     public static synchronized void setInstance(CentralInstance instance) {
         CentralApp.instance = instance;
     }
+
 
     private static class ShutdownHook extends Thread {
         public void run() {

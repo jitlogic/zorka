@@ -15,64 +15,49 @@
  */
 package com.jitlogic.zorka.central.data;
 
+
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class HostInfo {
+import java.util.List;
+
+public class SymbolicExceptionInfo {
 
     @JsonProperty
-    private int id;
+    String exClass;
 
     @JsonProperty
-    private String name;
+    String message;
 
     @JsonProperty
-    private String addr;
-
-    @JsonProperty
-    private String path;
+    List<String> stackTrace;
 
 
-    public int getId() {
-        return id;
+    public String getExClass() {
+        return exClass;
     }
 
 
-    public void setId(int id) {
-        this.id = id;
+    public void setExClass(String exClass) {
+        this.exClass = exClass;
     }
 
 
-    public String getName() {
-        return name;
+    public String getMessage() {
+        return message;
     }
 
 
-    public void setName(String name) {
-        this.name = name;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
 
-    public String getAddr() {
-        return addr;
+    public List<String> getStackTrace() {
+        return stackTrace;
     }
 
 
-    public void setAddr(String addr) {
-        this.addr = addr;
-    }
-
-
-    public String getPath() {
-        return path;
-    }
-
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    @Override
-    public String toString() {
-        return "HostInfo(" + id + "," + name + ")";
+    public void setStackTrace(List<String> stackTrace) {
+        this.stackTrace = stackTrace;
     }
 }
