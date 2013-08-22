@@ -20,6 +20,8 @@ import com.jitlogic.zorka.central.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
 import org.fressian.FressianWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.ByteArrayOutputStream;
@@ -28,6 +30,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
+
+    private final static Logger log = LoggerFactory.getLogger(ReceiverContext.class);
 
     private SymbolRegistry symbolRegistry;
     private Map<Integer, Integer> sidMap = new HashMap<Integer, Integer>();
@@ -52,7 +56,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
             processTraceRecord(hostId, (TraceRecord) obj);
         } else {
             if (obj != null) {
-                //log.warn("Unsupported object type:" + obj.getClass());
+                log.warn("Unsupported object type:" + obj.getClass());
             }
         }
     }
@@ -77,23 +81,28 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
     public void save(int hostId, long offs, int length, TraceRecord tr) {
 
-        StringBuilder overview = new StringBuilder();
+        StringBuilder description = new StringBuilder();
+        description.append(symbolRegistry.symbolName(tr.getMarker().getTraceId()));
 
         if (tr.getAttrs() != null) {
             for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
-                if (overview.length() > 250) {
-                    break;
+                String val = e.getValue() != null ? e.getValue().toString() : "";
+                if (val.length() > 32000) {
+                    val = val.substring(0, 32000) + "...";
                 }
-                if (overview.length() > 0) {
-                    overview.append("|");
+                jdbc.update("insert into TRACE_ATTRS (HOST_ID,DATA_OFFS,ATTR_KEY,ATTR_VAL) values (?,?,?,?)",
+                        hostId, offs, e.getKey(), val);
+                if (val.length() > 50) {
+                    val = val.substring(0, 50);
                 }
-                overview.append(e.getValue());
+                description.append('|');
+                description.append(val);
             }
         }
 
-
-        jdbc.update("insert into TRACES (HOST_ID,DATA_OFFS,TRACE_ID,DATA_LEN,CLOCK,RFLAGS,TFLAGS,CALLS,"
-                + "ERRORS,RECORDS,EXTIME,OVERVIEW) " + "values(?,?,?,?,?,?,?,?,?,?,?,?)",
+        jdbc.update("insert into TRACES (HOST_ID,DATA_OFFS,TRACE_ID,DATA_LEN,CLOCK,RFLAGS,TFLAGS,"
+                + "CLASS_ID,METHOD_ID,SIGN_ID,CALLS,ERRORS,RECORDS,EXTIME,DESCRIPTION) "
+                + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 hostId,
                 offs,
                 tr.getMarker().getTraceId(),
@@ -101,11 +110,14 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
                 tr.getClock(),
                 tr.getFlags(),
                 tr.getMarker().getFlags(),
+                tr.getClassId(),
+                tr.getMethodId(),
+                tr.getSignatureId(),
                 tr.getCalls(),
                 tr.getErrors(),
                 numRecords(tr),
                 tr.getTime(),
-                overview.length() > 250 ? overview.toString().substring(0, 250) : overview.toString());
+                description.length() <= 250 ? description.toString() : description.substring(0, 250));
     }
 
 

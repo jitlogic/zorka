@@ -40,7 +40,8 @@ public class ZicoDataLoader {
 
     public static InputStream open(File file) throws IOException {
         FileInputStream fis = new FileInputStream(file);
-        byte[] hdr = new byte[4]; fis.read(hdr);
+        byte[] hdr = new byte[4];
+        fis.read(hdr);
 
         if (hdr[0] != 'Z' || hdr[1] != 'T' || hdr[2] != 'R') {
             throw new IOException("Invalid header (invalid file type).");
@@ -64,23 +65,14 @@ public class ZicoDataLoader {
             load(is);
         } catch (IOException e) {
             e.printStackTrace();
-            try { is.close(); } catch (IOException e1) {
+            try {
+                is.close();
+            } catch (IOException e1) {
 
             }
         }
     }
 
-    public void loadXX(InputStream is) throws IOException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        for (int b = is.read(); b != -1; b = is.read()) {
-            os.write(b);
-        }
-        conn.send(ZicoPacket.ZICO_DATA, os.toByteArray());
-        ZicoPacket rslt = conn.recv();
-        if (rslt.getStatus() != ZicoPacket.ZICO_OK) {
-            throw new ZicoException(rslt.getStatus(), "Error submitting data.");
-        }
-    }
 
     public void load(InputStream is) throws IOException {
         FressianReader reader = new FressianReader(is, FressianTraceFormat.READ_LOOKUP);
@@ -92,7 +84,7 @@ public class ZicoDataLoader {
 
         while (null != (obj = reader.readObject())) {
             writer.writeObject(obj);
-            if (obj instanceof TraceRecord && os.size() > 1024*1024) {
+            if (obj instanceof TraceRecord && os.size() > 1024 * 1024) {
                 conn.send(ZicoPacket.ZICO_DATA, os.toByteArray());
                 ZicoPacket rslt = conn.recv();
                 if (rslt.getStatus() != ZicoPacket.ZICO_OK) {

@@ -16,30 +16,67 @@
 package com.jitlogic.zorka.central.rest;
 
 import com.jitlogic.zorka.central.*;
-import com.jitlogic.zorka.central.data.HostInfo;
-import com.jitlogic.zorka.central.data.TraceInfo;
-import com.jitlogic.zorka.central.data.TraceRecordInfo;
+import com.jitlogic.zorka.central.data.*;
 import com.jitlogic.zorka.central.rds.RDSStore;
-import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
-import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.common.tracedata.*;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.FressianReader;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 
 import javax.sql.DataSource;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 import java.util.regex.Pattern;
 
-@Path("/hosts")
+@Path("hosts")
 public class TraceDataApi {
 
     private JdbcTemplate jdbc;
     private StoreManager storeManager;
     private SymbolRegistry symbolRegistry;
+
+
+    private final RowMapper<HostInfo> HOST_INFO_MAPPER = new RowMapper<HostInfo>() {
+        @Override
+        public HostInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
+            HostInfo info = new HostInfo();
+
+            info.setId(rs.getInt("HOST_ID"));
+            info.setName(rs.getString("HOST_NAME"));
+            info.setAddr(rs.getString("HOST_ADDR"));
+            info.setPath(rs.getString("HOST_PATH"));
+
+            return info;
+        }
+    };
+
+
+    private final RowMapper<TraceInfo> TRACE_INFO_MAPPER = new RowMapper<TraceInfo>() {
+        @Override
+        public TraceInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
+            TraceInfo info = new TraceInfo();
+
+            info.setHostId(rs.getInt("HOST_ID"));
+            info.setDataOffs(rs.getLong("DATA_OFFS"));
+            info.setTraceId(rs.getInt("TRACE_ID"));
+            info.setDataLen(rs.getInt("DATA_LEN"));
+            info.setClock(rs.getLong("CLOCK"));
+            info.setMethodFlags(rs.getInt("RFLAGS"));
+            info.setTraceFlags(rs.getInt("TFLAGS"));
+            info.setCalls(rs.getLong("CALLS"));
+            info.setErrors(rs.getLong("ERRORS"));
+            info.setRecords(rs.getLong("RECORDS"));
+            info.setExecutionTime(rs.getLong("EXTIME"));
+            info.setDescription(rs.getString("DESCRIPTION"));
+
+            return info;
+        }
+    };
 
 
     public TraceDataApi() {
@@ -60,12 +97,12 @@ public class TraceDataApi {
     @Path("/list")
     @Produces(MediaType.APPLICATION_JSON)
     public List<HostInfo> getHosts() {
-        return jdbc.query("select * from HOSTS order by HOST_NAME", DataMappers.HOST_INFO_MAPPER);
+        return jdbc.query("select * from HOSTS order by HOST_NAME", HOST_INFO_MAPPER);
     }
 
 
     public HostInfo getHost(int hostId) {
-        return jdbc.queryForObject("select * from HOSTS where HOST_ID = ?", DataMappers.HOST_INFO_MAPPER, hostId);
+        return jdbc.queryForObject("select * from HOSTS where HOST_ID = ?", HOST_INFO_MAPPER, hostId);
     }
 
 
@@ -76,26 +113,65 @@ public class TraceDataApi {
         return jdbc.queryForObject("select count(1) from TRACES where HOST_ID = ?", Integer.class, hostId);
     }
 
+
     @GET
     @Path("/{hostId: [0-9]+}/list")
     public List<TraceInfo> listTraces(@PathParam("hostId") int hostId,
                                       @DefaultValue("0") @QueryParam("offset") int offset,
                                       @DefaultValue("100") @QueryParam("limit") int limit) {
         return jdbc.query("select * from TRACES where HOST_ID = ? LIMIT ? OFFSET ?",
-                DataMappers.TRACE_INFO_MAPPER, hostId, limit, offset);
+                TRACE_INFO_MAPPER, hostId, limit, offset);
     }
+
 
     @GET
     @Path("/{hostId: [0-9]+}/{traceId: [0-9]+}")
     @Produces(MediaType.APPLICATION_JSON)
     public TraceInfo getTrace(@PathParam("hostId") int hostId, @PathParam("traceId") long traceOffs) {
         return jdbc.queryForObject("select * from TRACES where HOST_ID = ? and DATA_OFFS = ?",
-                DataMappers.TRACE_INFO_MAPPER, hostId, traceOffs);
+                TRACE_INFO_MAPPER, hostId, traceOffs);
     }
+
+    private final static Map<String, String> TRACES_ORDER_COLS = ZorkaUtil.map(
+            "clock", "CLOCK",
+            "calls", "CALLS",
+            "errors", "ERRORS",
+            "records", "RECORDS",
+            "description", "OVERVIEW",
+            "executionTime", "EXTIME"
+    );
+
+    private final static Set<String> TRACES_ORDER_DIRS = ZorkaUtil.set("ASC", "DESC");
+
+    @GET
+    @Path("/{hostId: [0-9]+}/page")
+    public PagingData<TraceInfo> pageTraces(@PathParam("hostId") int hostId,
+                                            @DefaultValue("0") @QueryParam("offset") int offset,
+                                            @DefaultValue("100") @QueryParam("limit") int limit,
+                                            @DefaultValue("CLOCK") @QueryParam("orderBy") String orderBy,
+                                            @DefaultValue("DESC") @QueryParam("orderDir") String orderDir) {
+
+        if (!TRACES_ORDER_COLS.containsKey(orderBy) || !TRACES_ORDER_DIRS.contains(orderDir)) {
+            throw new RuntimeException("Invalid ordering arguments: orderBy=" + orderBy + ", orderDir=" + orderDir);
+        }
+
+        List<TraceInfo> results = jdbc.query("select * from TRACES where HOST_ID = ? order by "
+                + TRACES_ORDER_COLS.get(orderBy) + " " + orderDir + " limit ? offset ?",
+                TRACE_INFO_MAPPER, hostId, limit, offset);
+
+        PagingData result = new PagingData();
+
+        result.setOffset(offset);
+        result.setTotal(jdbc.queryForObject("select count(1) from TRACES where HOST_ID = ?", Integer.class, hostId));
+        result.setResults(results);
+
+        return result;
+    }
+
 
     public HostInfo getOrCreateHost(String hostName, String hostAddr) {
         List<HostInfo> lst = jdbc.query("select * from HOSTS where HOST_NAME = ?",
-                DataMappers.HOST_INFO_MAPPER, hostName);
+                HOST_INFO_MAPPER, hostName);
         if (lst.size() == 0) {
             jdbc.update("insert into HOSTS (HOST_NAME,HOST_ADDR,HOST_PATH) values (?,?,?)",
                     hostName, hostAddr, safePath(hostName));
@@ -145,7 +221,6 @@ public class TraceDataApi {
         }
     }
 
-
     private TraceRecordInfo packTraceRecord(TraceRecord tr, String path) {
         TraceRecordInfo info = new TraceRecordInfo();
 
@@ -156,6 +231,34 @@ public class TraceDataApi {
         info.setMethod(CentralUtil.prettyPrint(tr, symbolRegistry));
         info.setChildren(tr.numChildren());
         info.setPath(path);
+
+        if (tr.getAttrs() != null) {
+            Map<String, String> nattr = new HashMap<String, String>();
+            for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
+                String s = "" + e.getValue();
+                if (s.length() > 250) {
+                    s = s.substring(0, 250) + "...";
+                }
+                nattr.put(symbolRegistry.symbolName(e.getKey()), s);
+            }
+            info.setAttributes(nattr);
+        }
+
+        SymbolicException sex = tr.findException();
+        if (sex != null) {
+            SymbolicExceptionInfo sei = new SymbolicExceptionInfo();
+            sei.setExClass(symbolRegistry.symbolName(sex.getClassId()));
+            sei.setMessage(sex.getMessage());
+            List<String> stack = new ArrayList<String>(sex.getStackTrace().length);
+            for (SymbolicStackElement sel : sex.getStackTrace()) {
+                stack.add("  at " + symbolRegistry.symbolName(sel.getClassId())
+                        + "." + symbolRegistry.symbolName(sel.getMethodId())
+                        + " [" + symbolRegistry.symbolName(sel.getFileId())
+                        + ":" + sel.getLineNum() + "]");
+            }
+            sei.setStackTrace(stack);
+            info.setExceptionInfo(sei);
+        }
 
         return info;
     }
@@ -186,11 +289,12 @@ public class TraceDataApi {
 
         if (tr != null) {
             for (int i = 0; i < tr.numChildren(); i++) {
-                lst.add(packTraceRecord(tr, path.length() > 0 ? (path + "/" + i) : "" + i));
+                lst.add(packTraceRecord(tr.getChild(i), path.length() > 0 ? (path + "/" + i) : "" + i));
             }
         }
 
         return lst;
     }
+
 
 }

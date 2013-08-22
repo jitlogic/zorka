@@ -39,8 +39,13 @@ public class RoofDataApiUnitTest extends CentralFixture {
 
         jdbc.update("insert into HOSTS (HOST_NAME,HOST_ADDR,HOST_PATH) values(?,?,?)", "test", "127.0.0.1", "test");
         hostId = jdbc.queryForObject("select HOST_ID from HOSTS where HOST_NAME = 'test'", Integer.class);
-        jdbc.update("insert into TRACES values (?,?,?,?,?,?,?,?,?,?,?,?)", hostId, 10, 1, 100, 1234, 1, 2, 100, 10, 50, 1000, "fval1|fval2|etc");
-        jdbc.update("insert into TRACES values (?,?,?,?,?,?,?,?,?,?,?,?)", hostId, 20, 1, 100, 1234, 1, 2, 100, 10, 50, 1000, "fval1|fval2|xxx");
+
+        jdbc.update("insert into TRACES values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                hostId, 10, 1, 100, 1234, 1, 2, 6, 5, 4, 100, 10, 50, 1000, "EJB|invoke|testdata");
+
+        jdbc.update("insert into TRACES values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                hostId, 20, 1, 100, 1234, 1, 2, 6, 5, 4, 100, 10, 50, 1000, "HTTP|index.do|500");
+
         api = new TraceDataApi();
     }
 

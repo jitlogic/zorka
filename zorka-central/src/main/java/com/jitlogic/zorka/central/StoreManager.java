@@ -23,6 +23,8 @@ import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessorFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
@@ -35,7 +37,7 @@ import java.util.Map;
 
 public class StoreManager implements Closeable, ZicoDataProcessorFactory {
 
-    private static ZorkaLog log = ZorkaLogger.getLog(StoreManager.class);
+    private final static Logger log = LoggerFactory.getLogger(StoreManager.class);
 
     private String dataDir;
 
@@ -77,7 +79,7 @@ public class StoreManager implements Closeable, ZicoDataProcessorFactory {
             try {
                 entry.getValue().close();
             } catch (IOException e) {
-                log.error(ZorkaLogger.ZCL_ERRORS, "Cannot close agent store for host " + entry.getKey(), e);
+                log.error("Cannot close agent store for host " + entry.getKey(), e);
             }
         }
     }

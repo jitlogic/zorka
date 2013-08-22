@@ -18,7 +18,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.3</version>
+                <version>${antrun.plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -33,10 +33,14 @@
                                       toFile="${project.build.outputDirectory}/zorka-${project.version}/zorka.jar"/>
                                 <copy file="../zorka-viewer/target/zorka-viewer-${project.version}.jar"
                                       toFile="${project.build.outputDirectory}/zorka-${project.version}/zorka-viewer.jar"/>
-                                <copy file="../COPYING" toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
-                                <copy file="src/zorka.properties" toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
-                                <copy file="../README.md" toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
-                                <copy file="../CHANGES.md" toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
+                                <copy file="../COPYING"
+                                      toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
+                                <copy file="src/zorka.properties"
+                                      toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
+                                <copy file="../README.md"
+                                      toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
+                                <copy file="../CHANGES.md"
+                                      toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
                                 <mkdir dir="${project.build.outputDirectory}/zorka-${project.version}/scripts"/>
                                 <copy toDir="${project.build.outputDirectory}/zorka-${project.version}/scripts">
                                     <fileset dir="${project.basedir}/src/scripts" defaultexcludes="false">

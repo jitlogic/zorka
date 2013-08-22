@@ -16,46 +16,21 @@
 package com.jitlogic.zorka.central.rds;
 
 
-import com.jitlogic.zorka.central.CentralUtil;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
-
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.DataFormatException;
-import java.util.zip.Inflater;
 
 public class RAGZInputStream extends InputStream {
 
     // TODO CRC verification
 
-    private static class Segment {
-        private long physicalPos;
-        private long physicalLen;
-        private long logicalPos;
-        private long logicalLen;
-        private boolean finished;
-
-        public Segment(long physicalPos, long physicalLen, long logicalPos, long logicalLen, boolean finished) {
-            this.physicalPos = physicalPos;
-            this.physicalLen = physicalLen;
-            this.logicalPos = logicalPos;
-            this.logicalLen = logicalLen;
-            this.finished = finished;
-        }
-    }
-
-    private List<Segment> segments;
+    private List<RAGZSegment> segments;
     private RandomAccessFile input;
 
-    private Segment curSegment;
+    private RAGZSegment curSegment;
     private byte[] logicalBuf;
     private long logicalPos;
-
-    private long defaultLogicalLen = 1048576 * 2;
 
 
     public static RAGZInputStream fromFile(String path) throws IOException {
@@ -66,7 +41,13 @@ public class RAGZInputStream extends InputStream {
 
     public RAGZInputStream(RandomAccessFile input) throws IOException {
         this.input = input;
-        scanSegments();
+        segments = RAGZSegment.scan(input);
+        if (segments.size() > 0) {
+            RAGZSegment seg = segments.get(segments.size() - 1);
+            if (!seg.isFinished()) {
+                RAGZSegment.update(input, seg);
+            }
+        }
     }
 
 
@@ -96,20 +77,20 @@ public class RAGZInputStream extends InputStream {
 
         // TODO clip llen if needed
 
-
         while (llen > 0) {
 
-            if (curSegment == null || logicalPos >= curSegment.logicalPos + curSegment.logicalLen || logicalPos < curSegment.logicalPos) {
+            if (curSegment == null || logicalPos >= curSegment.getLogicalPos() + curSegment.getLogicalLen()
+                    || logicalPos < curSegment.getLogicalPos()) {
                 curSegment = findSegment(logicalPos);
                 if (curSegment == null) {
                     break;
                 }
-                logicalBuf = unpackSegment(curSegment);
+                logicalBuf = RAGZSegment.unpack(input, curSegment);
             }
 
 
-            long cpos = logicalPos - curSegment.logicalPos;
-            long csz = min(llen, curSegment.logicalLen - cpos);
+            long cpos = logicalPos - curSegment.getLogicalPos();
+            long csz = Math.min(llen, curSegment.getLogicalLen() - cpos);
             System.arraycopy(logicalBuf, (int) cpos, b, (int) lpos, (int) csz);
 
             logicalPos += csz;
@@ -118,11 +99,6 @@ public class RAGZInputStream extends InputStream {
         }
 
         return (int) (len - llen);
-    }
-
-
-    private long min(long l1, long l2) {
-        return l1 < l2 ? l1 : l2;
     }
 
 
@@ -135,7 +111,7 @@ public class RAGZInputStream extends InputStream {
     @Override
     public synchronized int available() throws IOException {
         if (curSegment != null) {
-            return (int) (curSegment.logicalPos + curSegment.logicalLen - logicalPos);
+            return (int) (curSegment.getLogicalPos() + curSegment.getLogicalLen() - logicalPos);
         } else {
             return 0;
         }
@@ -159,7 +135,7 @@ public class RAGZInputStream extends InputStream {
             return 0;
         }
 
-        Segment seg = findSegment(lpos);
+        RAGZSegment seg = findSegment(lpos);
 
         if (seg != null) {
             seg = segments.get(segments.size() - 1);
@@ -168,11 +144,11 @@ public class RAGZInputStream extends InputStream {
 
         if (seg != curSegment) {
             curSegment = seg;
-            logicalBuf = unpackSegment(seg);
+            logicalBuf = RAGZSegment.unpack(input, seg);
         }
 
-        if (lpos >= curSegment.logicalPos + curSegment.logicalLen) {
-            lpos = curSegment.logicalPos + curSegment.logicalLen;
+        if (lpos >= curSegment.getLogicalPos() + curSegment.getLogicalLen()) {
+            lpos = curSegment.getLogicalPos() + curSegment.getLogicalLen();
         }
 
         long offs = lpos - logicalPos;
@@ -195,33 +171,13 @@ public class RAGZInputStream extends InputStream {
      * @throws IOException
      */
     public synchronized long logicalLength() throws IOException {
-        Segment seg = segments.get(segments.size() - 1);
+        RAGZSegment seg = segments.get(segments.size() - 1);
 
-        if (!seg.finished && seg.physicalPos + seg.physicalLen < input.length()) {
-            updateSegment(seg);
+        if (!seg.isFinished() && seg.getPhysicalPos() + seg.getPhysicalLen() < input.length()) {
+            RAGZSegment.update(input, seg);
         }
 
-        return seg.logicalPos + seg.logicalLen;
-    }
-
-
-    private void updateSegment(Segment seg) throws IOException {
-        input.seek(seg.physicalPos - 4);
-        int clen = input.readInt();
-
-        if (clen != 0) {
-            // Finished segment
-            seg.finished = true;
-            seg.physicalLen = clen;
-            input.seek(seg.physicalPos + seg.physicalLen + 4);
-            seg.logicalLen = readUInt();
-        } else {
-            // Unfinished segment
-            seg.physicalLen = input.length() - seg.physicalPos;
-            seg.logicalLen = unpackSegment(seg).length;
-
-            // TODO search for next segment here
-        }
+        return seg.getLogicalPos() + seg.getLogicalLen();
     }
 
 
@@ -230,14 +186,25 @@ public class RAGZInputStream extends InputStream {
     }
 
 
-    private Segment findSegment(long logicalPos) throws IOException {
-        for (Segment seg : segments) {
-            if (logicalPos >= seg.logicalPos && logicalPos < seg.logicalPos + seg.logicalLen) {
+    private RAGZSegment findSegment(long logicalPos) throws IOException {
+        for (RAGZSegment seg : segments) {
+            if (logicalPos >= seg.getLogicalPos() && logicalPos < seg.getLogicalPos() + seg.getLogicalLen()) {
                 return seg;
-            } else if (!seg.finished) {
-                updateSegment(seg);
-                if (logicalPos >= seg.logicalPos && logicalPos < seg.logicalPos + seg.logicalLen) {
+            } else if (!seg.isFinished()) {
+                RAGZSegment.update(input, seg);
+                if (logicalPos >= seg.getLogicalPos() && logicalPos < seg.getLogicalPos() + seg.getLogicalLen()) {
                     return seg;
+                } else {
+                    // This segment has been finished by concurrent process. Try scanning for more segments.
+                    List<RAGZSegment> segs = RAGZSegment.scan(input,
+                            seg.getLogicalPos() + seg.getLogicalLen(),
+                            seg.getPhysicalPos() + seg.getPhysicalLen() + 8);
+                    if (segs.size() > 0) {
+                        segments.addAll(segs);
+                        return findSegment(logicalPos);
+                    } else {
+                        return null;
+                    }
                 }
             }
         }
@@ -246,82 +213,4 @@ public class RAGZInputStream extends InputStream {
     }
 
 
-    private void scanSegments() throws IOException {
-        segments = new ArrayList<Segment>();
-
-        input.seek(0);
-
-        long lpos = 0;
-
-        while (input.getFilePointer() < input.length()) {
-            long fp = input.getFilePointer(), lp = input.length();
-            byte m1 = input.readByte(), m2 = (byte) (input.readByte() & 0xff);
-            if (m1 != 0x1f || m2 != (byte) 0x8b)
-                throw new RAGZException(String.format("Invalid magic of gzip header: m1=0x%2x m2=0x%2x", m1, m2));
-            input.skipBytes(10);
-            byte c1 = input.readByte(), c2 = input.readByte();
-            if (c1 != 0x52 && c2 != 0x47)
-                throw new RAGZException(String.format("Invalid magic of EXT header: c1=0x%2x c2=0x%2x", c1, c2));
-            input.skipBytes(2);
-            long clen = readUInt();
-            long cpos = input.getFilePointer();
-            if (clen != 0) {
-                // Finished segment
-                input.skipBytes((int) clen + 4);
-                long llen = readUInt();
-                segments.add(new Segment(cpos, clen, lpos, llen, true));
-                lpos += llen;
-            } else {
-                // Unfinished segment (last one)
-                Segment seg = new Segment(cpos, clen, lpos, 0, false);
-                updateSegment(seg);
-                segments.add(seg);
-                break; // presumeably unfinished segment is the last one
-            }
-        } // while
-    }
-
-
-    private long readUInt() throws IOException {
-        byte[] b = new byte[4];
-
-        if (input.read(b) != 4) {
-            throw new EOFException("EOF encountered when reading UINT");
-        }
-
-        return CentralUtil.toUIntBE(b);
-    }
-
-
-    private byte[] unpackSegment(Segment seg) throws IOException {
-        byte[] ibuf = new byte[(int) seg.physicalLen];
-
-        if (ibuf.length == 0) {
-            return ibuf;
-        }
-
-        input.seek(seg.physicalPos);
-
-        if (input.read(ibuf) < ibuf.length) {
-            throw new RAGZException("Unexpected end of file.");
-        }
-
-        byte[] obuf = new byte[(int) (seg.logicalLen > 0 ? seg.logicalLen : defaultLogicalLen)];
-
-        try {
-            Inflater inf = new Inflater(true);
-            inf.setInput(ibuf);
-            int n = inf.inflate(obuf);
-            if (n > 0) {
-                if (n != obuf.length) {
-                    obuf = ZorkaUtil.clipArray(obuf, n);
-                }
-                return obuf;
-            } else {
-                return new byte[0];
-            }
-        } catch (DataFormatException e) {
-            throw new RAGZException("Problem uncompressing input data.", e);
-        }
-    }
 }

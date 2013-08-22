@@ -16,6 +16,8 @@
 package com.jitlogic.zorka.central;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
@@ -25,6 +27,8 @@ import java.sql.SQLException;
 
 
 public class DbSymbolRegistry extends SymbolRegistry {
+
+    private final static Logger log = LoggerFactory.getLogger(DbSymbolRegistry.class);
 
     private JdbcTemplate jdbc;
 
@@ -48,7 +52,7 @@ public class DbSymbolRegistry extends SymbolRegistry {
                 }
             }
         });
-        System.out.println("Symbols read: " + symbolIds.size());
+        log.debug("Symbols read: " + symbolIds.size());
     }
 
 

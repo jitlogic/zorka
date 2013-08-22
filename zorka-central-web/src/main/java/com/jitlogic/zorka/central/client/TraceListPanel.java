@@ -15,166 +15,168 @@
  */
 package com.jitlogic.zorka.central.client;
 
-import com.google.gwt.cell.client.TextCell;
+
+import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.DoubleClickEvent;
-import com.google.gwt.event.dom.client.DoubleClickHandler;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.DataGrid;
-import com.google.gwt.user.cellview.client.SimplePager;
-import com.google.gwt.user.client.ui.*;
-import com.google.gwt.view.client.SingleSelectionModel;
-import com.jitlogic.zorka.central.client.data.TraceDataService;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.jitlogic.zorka.central.data.HostInfo;
+import com.jitlogic.zorka.central.data.PagingData;
 import com.jitlogic.zorka.central.data.TraceInfo;
-import com.jitlogic.zorka.central.data.TraceRecordInfo;
+import com.jitlogic.zorka.central.data.TraceInfoProperties;
+import com.sencha.gxt.core.client.Style;
+import com.sencha.gxt.data.shared.ListStore;
+import com.sencha.gxt.data.shared.ModelKeyProvider;
+import com.sencha.gxt.data.shared.SortDir;
+import com.sencha.gxt.data.shared.SortInfo;
+import com.sencha.gxt.data.shared.loader.*;
+import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.event.CellDoubleClickEvent;
+import com.sencha.gxt.widget.core.client.grid.*;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
+public class TraceListPanel extends VerticalLayoutContainer {
 
-public class TraceListPanel extends Composite {
+    private static final TraceInfoProperties props = GWT.create(TraceInfoProperties.class);
 
-    interface TraceListPanelUiBinder extends UiBinder<Widget, TraceListPanel> {
+    private TraceDataService tds;
+
+    private HostInfo selectedHost;
+    private Grid<TraceInfo> traceGrid;
+    private ListStore<TraceInfo> traceStore;
+    private DataProxy<PagingLoadConfig, PagingLoadResult<TraceInfo>> traceProxy;
+    private PagingLoader<PagingLoadConfig, PagingLoadResult<TraceInfo>> traceLoader;
+    private LiveGridView<TraceInfo> traceGridView;
+
+    private ZorkaCentralShell shell;
+
+    public TraceListPanel(ZorkaCentralShell shell, TraceDataService tds, HostInfo hostInfo) {
+        this.shell = shell;
+        this.tds = tds;
+        this.selectedHost = hostInfo;
+
+        createTraceListGrid();
     }
 
-    private static TraceListPanelUiBinder ourUiBinder = GWT.create(TraceListPanelUiBinder.class);
 
-    @UiField
-    Button btnClose;
+    private void createTraceListGrid() {
+        ColumnConfig<TraceInfo, Long> clockCol = new ColumnConfig<TraceInfo, Long>(props.clock(), 100, "Clock");
+        clockCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
-    @UiField
-    DataGrid<TraceInfo> traceTable;
+        ColumnConfig<TraceInfo, Long> durationCol = new ColumnConfig<TraceInfo, Long>(props.executionTime(), 50, "Time");
+        durationCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
-    @UiField
-    SimplePager pager;
+        ColumnConfig<TraceInfo, Long> callsCol = new ColumnConfig<TraceInfo, Long>(props.calls(), 50, "Calls");
+        callsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
-    private int hostId;
-    private TraceDataService service;
-    private ZorkaCentral central;
+        ColumnConfig<TraceInfo, Long> errorsCol = new ColumnConfig<TraceInfo, Long>(props.errors(), 50, "Errors");
+        errorsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
-    private SingleSelectionModel<TraceInfo> sel = new SingleSelectionModel<TraceInfo>();
-    private TraceListDataProvider dataProvider;
+        ColumnConfig<TraceInfo, Long> recordsCol = new ColumnConfig<TraceInfo, Long>(props.records(), 50, "Records");
+        recordsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
+        ColumnConfig<TraceInfo, String> descCol = new ColumnConfig<TraceInfo, String>(props.description(), 500, "Description");
 
-    public TraceListPanel(ZorkaCentral central, int hostId) {
-        this.hostId = hostId;
-        this.central = central;
-        this.service = central.getTraceDataService();
+        ColumnModel<TraceInfo> model = new ColumnModel<TraceInfo>(Arrays.<ColumnConfig<TraceInfo, ?>>asList(
+                clockCol, durationCol, callsCol, errorsCol, recordsCol, descCol));
 
-        this.dataProvider = new TraceListDataProvider(service);
-
-        initWidget(ourUiBinder.createAndBindUi(this));
-        configureTraceTable();
-
-        traceTable.setSelectionModel(sel);
-
-        traceTable.addDomHandler(new DoubleClickHandler() {
+        clockCol.setCell(new AbstractCell<Long>() {
             @Override
-            public void onDoubleClick(DoubleClickEvent event) {
-                TraceInfo info = sel.getSelectedObject();
-                GWT.log("Selected trace: " + info.getHostId() + ":" + info.getDataOffs());
-                openTraceDetailPanel(info);
+            public void render(Context context, Long clock, SafeHtmlBuilder sb) {
+                sb.appendHtmlConstant("<span>");
+                sb.append(SafeHtmlUtils.fromString(ClientUtil.formatTimestamp(clock)));
+                sb.appendHtmlConstant("</span>");
             }
-        }, DoubleClickEvent.getType());
-    }
+        });
 
+        durationCol.setCell(new AbstractCell<Long>() {
+            @Override
+            public void render(Context context, Long time, SafeHtmlBuilder sb) {
+                String strTime = ClientUtil.formatDuration(time);
+                sb.appendHtmlConstant("<span>");
+                sb.append(SafeHtmlUtils.fromString(strTime));
+                sb.appendHtmlConstant("</span>");
+            }
+        });
 
-    private void openTraceDetailPanel(final TraceInfo info) {
-        service.getTraceRecord(info.getHostId(), info.getDataOffs(), "",
-                new MethodCallback<TraceRecordInfo>() {
+        traceStore = new ListStore<TraceInfo>(new ModelKeyProvider<TraceInfo>() {
+            @Override
+            public String getKey(TraceInfo item) {
+                return "" + item.getDataOffs();
+            }
+        });
+
+        traceGridView = new LiveGridView<TraceInfo>();
+        traceGridView.setAutoExpandColumn(descCol);
+        traceGridView.setForceFit(true);
+
+        traceProxy = new DataProxy<PagingLoadConfig, PagingLoadResult<TraceInfo>>() {
+            @Override
+            public void load(final PagingLoadConfig loadConfig, final Callback<PagingLoadResult<TraceInfo>, Throwable> callback) {
+                if (selectedHost != null) {
+                    List<? extends SortInfo> sort = loadConfig.getSortInfo();
+                    String orderBy = sort.size() > 0 ? sort.get(0).getSortField() : "clock";
+                    String orderDir = sort.size() > 0 ? sort.get(0).getSortDir().name() : "DESC";
+                    tds.pageTraces(selectedHost.getId(), loadConfig.getOffset(), loadConfig.getLimit(),
+                            orderBy, orderDir,
+                            new MethodCallback<PagingData<TraceInfo>>() {
+                                @Override
+                                public void onFailure(Method method, Throwable exception) {
+                                    callback.onFailure(exception);
+                                }
+
+                                @Override
+                                public void onSuccess(Method method, PagingData<TraceInfo> response) {
+                                    PagingLoadResultBean<TraceInfo> result = new PagingLoadResultBean<TraceInfo>(
+                                            response.getResults(), response.getTotal(), response.getOffset());
+                                    callback.onSuccess(result);
+                                }
+                            });
+                }
+            }
+        };
+
+        traceLoader = new PagingLoader<PagingLoadConfig, PagingLoadResult<TraceInfo>>(traceProxy);
+        traceLoader.setRemoteSort(false);
+
+        traceGrid = new Grid<TraceInfo>(traceStore, model) {
+            @Override
+            protected void onAfterFirstAttach() {
+                super.onAfterFirstAttach();
+                Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
                     @Override
-                    public void onFailure(Method method, Throwable exception) {
-                        GWT.log("Error calling method " + method, exception);
-                    }
-
-                    @Override
-                    public void onSuccess(Method method, TraceRecordInfo record) {
-                        TraceDetailPanel tdp = new TraceDetailPanel(service, info, record);
-                        GWT.log("Root method: " + record);
-                        central.add(tdp, "Details"); // TODO meaningful title
+                    public void execute() {
+                        traceLoader.load(0, traceGridView.getCacheSize());
                     }
                 });
-    }
-
-
-    private void configureTraceTable() {
-
-        Column<TraceInfo, String> colTstamp = new Column<TraceInfo, String>(new TextCell()) {
-            @Override
-            public String getValue(TraceInfo info) {
-                Date d = new Date(info.getClock());
-                return DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss").format(d)
-                        + "." + NumberFormat.getFormat("000").format(info.getClock() % 1000);
             }
         };
-        traceTable.addColumn(colTstamp, "Timestamp");
-        traceTable.setColumnWidth(colTstamp, "125px");
 
-        Column<TraceInfo, String> colDuration = new Column<TraceInfo, String>(new TextCell()) {
+        traceGrid.setLoadMask(true);
+        traceGrid.setLoader(traceLoader);
+        traceGrid.setView(traceGridView);
+
+        traceGrid.getSelectionModel().setSelectionMode(Style.SelectionMode.SINGLE);
+        traceGrid.addCellDoubleClickHandler(new CellDoubleClickEvent.CellDoubleClickHandler() {
             @Override
-            public String getValue(TraceInfo info) {
-                double t = 1.0 * info.getExecutionTime() / 1000000.0;
-                String u = "ms";
-
-                if (t > 1000.0) {
-                    t /= 1000.0;
-                    u = "s";
-                }
-
-                return t > 10
-                        ? NumberFormat.getFormat("#####").format(t) + u
-                        : NumberFormat.getFormat("###.00").format(t) + u;
+            public void onCellClick(CellDoubleClickEvent event) {
+                TraceInfo traceInfo = traceGrid.getSelectionModel().getSelectedItem();
+                TraceDetailPanel detail = new TraceDetailPanel(tds, traceInfo);
+                shell.addView(detail, ClientUtil.formatTimestamp(traceInfo.getClock()) + "@" + selectedHost.getName());
             }
-        };
-        traceTable.addColumn(colDuration, "Time");
-        traceTable.setColumnWidth(colDuration, "75px");
+        });
 
-        Column<TraceInfo, String> colCalls = new Column<TraceInfo, String>(new TextCell()) {
-            @Override
-            public String getValue(TraceInfo info) {
-                return "" + info.getCalls();
-            }
-        };
-        traceTable.addColumn(colCalls, "Calls");
-        traceTable.setColumnWidth(colCalls, "75px");
-
-        Column<TraceInfo, String> colErrors = new Column<TraceInfo, String>(new TextCell()) {
-            @Override
-            public String getValue(TraceInfo info) {
-                return "" + info.getErrors();
-            }
-        };
-        traceTable.addColumn(colErrors, "Errors");
-        traceTable.setColumnWidth(colErrors, "75px");
-
-        Column<TraceInfo, String> colRecords = new Column<TraceInfo, String>(new TextCell()) {
-            @Override
-            public String getValue(TraceInfo info) {
-                return "" + info.getRecords();
-            }
-        };
-        traceTable.addColumn(colRecords, "Recs");
-        traceTable.setColumnWidth(colRecords, "75px");
-
-        Column<TraceInfo, String> colDesc = new Column<TraceInfo, String>(new TextCell()) {
-            @Override
-            public String getValue(TraceInfo info) {
-                return info.getDescription();
-            }
-        };
-        traceTable.addColumn(colDesc, "Description");
-
-        dataProvider.addDataDisplay(traceTable);
-        dataProvider.setHostId(hostId);
-
-        traceTable.setEmptyTableWidget(new Label("No traces"));
-
-        pager.setDisplay(traceTable);
+        add(traceGrid, new VerticalLayoutData(1, 1));
     }
 
 }

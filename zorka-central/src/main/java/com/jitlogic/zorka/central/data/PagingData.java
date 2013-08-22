@@ -15,64 +15,48 @@
  */
 package com.jitlogic.zorka.central.data;
 
+
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class HostInfo {
+import java.util.List;
+
+public class PagingData<T> {
+
 
     @JsonProperty
-    private int id;
+    private int offset;
 
     @JsonProperty
-    private String name;
+    private int total;
 
     @JsonProperty
-    private String addr;
+    private List<T> results;
 
-    @JsonProperty
-    private String path;
+    public PagingData() {
 
-
-    public int getId() {
-        return id;
     }
 
-
-    public void setId(int id) {
-        this.id = id;
+    public int getOffset() {
+        return offset;
     }
 
-
-    public String getName() {
-        return name;
+    public void setOffset(int offset) {
+        this.offset = offset;
     }
 
-
-    public void setName(String name) {
-        this.name = name;
+    public int getTotal() {
+        return total;
     }
 
-
-    public String getAddr() {
-        return addr;
+    public void setTotal(int total) {
+        this.total = total;
     }
 
-
-    public void setAddr(String addr) {
-        this.addr = addr;
+    public List<T> getResults() {
+        return results;
     }
 
-
-    public String getPath() {
-        return path;
-    }
-
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    @Override
-    public String toString() {
-        return "HostInfo(" + id + "," + name + ")";
+    public void setResults(List<T> results) {
+        this.results = results;
     }
 }

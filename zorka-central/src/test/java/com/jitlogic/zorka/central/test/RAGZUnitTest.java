@@ -36,6 +36,14 @@ public class RAGZUnitTest extends CentralFixture {
 
     public static final String GZIP = "/usr/bin/gzip";
 
+    private void checkGzipFile(String path) throws Exception {
+        if (new File(GZIP).canExecute()) {
+            assertThat(TestUtil.cmd(GZIP + " -d " + path)).isEqualTo(0);
+            //assertThat(new File(tmpFile("test")).length()).isEqualTo(0);
+        }
+    }
+
+
     @Test
     public void testTrivialCompressAndCheckHeaders() throws Exception {
         String path = tmpFile("test.gz");
@@ -49,10 +57,7 @@ public class RAGZUnitTest extends CentralFixture {
         assertThat(buf[16]).isEqualTo((byte) 2);
         assertThat(buf[19]).isEqualTo((byte) 0);
 
-        if (new File(GZIP).canExecute()) {
-            assertThat(TestUtil.cmd(GZIP + " -d " + path)).isEqualTo(0);
-            assertThat(new File(tmpFile("test")).length()).isEqualTo(0);
-        }
+        checkGzipFile(path);
     }
 
 
@@ -72,10 +77,7 @@ public class RAGZUnitTest extends CentralFixture {
         //assertThat(buf[30]).isEqualTo((byte)4);
         //assertThat(buf[33]).isEqualTo((byte)0);
 
-        if (new File(GZIP).canExecute()) {
-            assertThat(TestUtil.cmd(GZIP + " -d " + path)).isEqualTo(0);
-            assertThat(new File(tmpFile("test")).length()).isEqualTo(4);
-        }
+        checkGzipFile(path);
     }
 
 
@@ -139,6 +141,7 @@ public class RAGZUnitTest extends CentralFixture {
         os.close();
     }
 
+
     @Test
     public void testReopenAndAddSomeContent() throws Exception {
         String path = tmpFile("test.gz");
@@ -159,6 +162,7 @@ public class RAGZUnitTest extends CentralFixture {
 
     }
 
+
     @Test
     public void testUIntEncoding() {
         byte[] b = fromUIntBE(4000000L);
@@ -168,6 +172,7 @@ public class RAGZUnitTest extends CentralFixture {
         assertEquals(4000000L, toUIntBE(fromUIntBE(4000000L)));
         assertEquals(4000000000L, toUIntBE(fromUIntBE(4000000000L)));
     }
+
 
     //@Test
     public void testReopenImproperlyClosedSegment() throws Exception {
@@ -188,4 +193,133 @@ public class RAGZUnitTest extends CentralFixture {
         assertThat(new String(buf, "UTF-8")).isEqualTo("1234");
     }
 
+
+    @Test
+    public void testIfOutputStreamDropsEmptySegments() throws Exception {
+        String path = tmpFile("test.gz");
+
+        RAGZOutputStream os1 = RAGZOutputStream.toFile(path);
+        os1.close();
+
+        long len1 = new File(path).length();
+
+        RAGZOutputStream os2 = RAGZOutputStream.toFile(path);
+        os2.close();
+
+        long len2 = new File(path).length();
+
+        assertEquals("Second opening should not create another header.", len1, len2);
+    }
+
+
+    @Test
+    public void testIfOutputStreamDropsEmptySegmentsAfterBeingImproperlyClosed() throws Exception {
+        String path = tmpFile("test.gz");
+        RandomAccessFile f = new RandomAccessFile(path, "rw");
+
+        new RAGZOutputStream(f, RAGZOutputStream.DEFAULT_SEGSZ);
+        f.close();
+
+        RAGZOutputStream os2 = RAGZOutputStream.toFile(path);
+        os2.close();
+
+        assertEquals("Empty file should have exactly 30 bytes.", 30, new File(path).length());
+    }
+
+
+    @Test  // propably the most common case in production
+    public void testIfOutputStreamIsProperlyReopenedAfterImproperlyClosedPartiallyWrittenSegment() throws Exception {
+        String path = tmpFile("test.gz");
+        RandomAccessFile f = new RandomAccessFile(path, "rw");
+
+        RAGZOutputStream os1 = new RAGZOutputStream(f, RAGZOutputStream.DEFAULT_SEGSZ);
+        os1.write("ABCDEFGH".getBytes());
+        f.close();
+
+        long len1 = new File(path).length();
+
+        RAGZOutputStream os2 = RAGZOutputStream.toFile(path);
+        os2.close();
+
+        long len2 = new File(path).length();
+
+        assertEquals("Footer (8B) + empty segment (30B) should be added.", len1 + 40, len2);
+
+
+        RAGZOutputStream os3 = RAGZOutputStream.toFile(path);
+        os3.close();
+
+        long len3 = new File(path).length();
+
+        assertEquals(len3, len2);
+
+        checkGzipFile(path);
+    }
+
+    @Test  // propably the most common case in production
+    public void testIfOutputStreamIsProperlyReopenedAfterImproperlyClosedPartiallyWrittenSegment2() throws Exception {
+        String path = tmpFile("test.gz");
+        RandomAccessFile f = new RandomAccessFile(path, "rw");
+
+        RAGZOutputStream os1 = new RAGZOutputStream(f, RAGZOutputStream.DEFAULT_SEGSZ);
+        os1.write("ABCDEFGH".getBytes());
+        f.close();
+
+        long len1 = new File(path).length();
+
+        RAGZOutputStream os2 = RAGZOutputStream.toFile(path);
+        f.close();
+
+        long len2 = new File(path).length();
+
+        assertEquals("Footer (8B) + empty segment (30B) should be added.", len1 + 30, len2);
+
+
+        RAGZOutputStream os3 = RAGZOutputStream.toFile(path);
+        os3.close();
+
+        long len3 = new File(path).length();
+
+        assertEquals(len2 + 10, len3);
+
+        checkGzipFile(path);
+    }
+
+
+    @Test
+    public void testConcurrentReadAndWriteInTheSameFileLastSegment() throws Exception {
+        String path = tmpFile("test.gz");
+        RandomAccessFile f = new RandomAccessFile(path, "rw");
+
+        RAGZOutputStream os1 = new RAGZOutputStream(f, RAGZOutputStream.DEFAULT_SEGSZ);
+
+        RAGZInputStream is1 = RAGZInputStream.fromFile(path);
+        byte[] b = new byte[4];
+
+        os1.write("ABCD".getBytes());
+        assertEquals(4, is1.read(b));
+        assertEquals("ABCD", new String(b, "UTF8"));
+
+        os1.write("EFGH".getBytes());
+        assertEquals(4, is1.read(b));
+        assertEquals("EFGH", new String(b, "UTF8"));
+    }
+
+    @Test
+    public void testConcurrentReadAndWriteInTheSameFileNextSegment() throws Exception {
+        String path = tmpFile("test.gz");
+        RandomAccessFile f = new RandomAccessFile(path, "rw");
+
+        RAGZOutputStream os1 = new RAGZOutputStream(f, 8);
+        RAGZInputStream is1 = RAGZInputStream.fromFile(path);
+        byte[] b = new byte[8];
+
+        os1.write("ABCDEFGH".getBytes());
+        assertEquals(8, is1.read(b));
+        assertEquals("ABCDEFGH", new String(b, "UTF8"));
+
+        os1.write("12345678".getBytes());
+        assertEquals(8, is1.read(b));
+        assertEquals("12345678", new String(b, "UTF8"));
+    }
 }

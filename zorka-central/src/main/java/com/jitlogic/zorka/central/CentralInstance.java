@@ -23,6 +23,8 @@ import com.jitlogic.zorka.common.util.ZorkaLogLevel;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.zico.ZicoService;
 import org.apache.commons.dbcp.BasicDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.File;
@@ -31,10 +33,8 @@ import java.util.Properties;
 
 public class CentralInstance {
 
-    /**
-     * Logger
-     */
-    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private final static Logger log = LoggerFactory.getLogger(CentralInstance.class);
+
 
     private CentralConfig config;
 
@@ -53,6 +53,7 @@ public class CentralInstance {
 
 
     public synchronized void start() {
+
         initLoggers(config.getProperties());
 
         if (config.boolCfg("zico.service", true)) {
@@ -97,7 +98,9 @@ public class CentralInstance {
             initFileTrapper();
         }
 
-        // TODO
+        // TODO ZorkaLogger and ZorkaLog will be replaced with slf4j+custom backend (logging to standard trapper)
+        // TODO ?? or the other way around ??
+
         //if (config.boolCfg("zorka.syslog", false)) {
         //    initSyslogTrapper();
         //}
@@ -122,8 +125,8 @@ public class CentralInstance {
             maxSize = (int) (long) config.kiloCfg("zorka.log.size", 4L * 1024 * 1024);
             maxLogs = config.intCfg("zorka.log.num", 8);
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing logger arguments", e);
-            log.info(ZorkaLogger.ZAG_ERRORS, "File trapper will be disabled.");
+            log.error("Error parsing logger arguments", e);
+            log.info("File trapper will be disabled.");
             // TODO AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         }
 
