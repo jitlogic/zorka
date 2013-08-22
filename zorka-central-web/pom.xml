@@ -70,7 +70,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>${maven.war.plugin.version}</version>
+                <version>${war.plugin.version}</version>
                 <configuration>
                     <warName>central</warName>
                     <archive>
@@ -91,7 +91,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.3</version>
+                <version>${antrun.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>main-class-placement</id>
