@@ -16,14 +16,9 @@
 package com.jitlogic.zorka.central.rest;
 
 import com.jitlogic.zorka.central.*;
-import com.jitlogic.zorka.central.data.HostInfo;
-import com.jitlogic.zorka.central.data.PagingData;
-import com.jitlogic.zorka.central.data.TraceInfo;
-import com.jitlogic.zorka.central.data.TraceRecordInfo;
+import com.jitlogic.zorka.central.data.*;
 import com.jitlogic.zorka.central.rds.RDSStore;
-import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
-import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.FressianReader;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -35,10 +30,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayInputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @Path("hosts")
@@ -229,7 +221,6 @@ public class TraceDataApi {
         }
     }
 
-
     private TraceRecordInfo packTraceRecord(TraceRecord tr, String path) {
         TraceRecordInfo info = new TraceRecordInfo();
 
@@ -240,6 +231,34 @@ public class TraceDataApi {
         info.setMethod(CentralUtil.prettyPrint(tr, symbolRegistry));
         info.setChildren(tr.numChildren());
         info.setPath(path);
+
+        if (tr.getAttrs() != null) {
+            Map<String, String> nattr = new HashMap<String, String>();
+            for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
+                String s = "" + e.getValue();
+                if (s.length() > 250) {
+                    s = s.substring(0, 250) + "...";
+                }
+                nattr.put(symbolRegistry.symbolName(e.getKey()), s);
+            }
+            info.setAttributes(nattr);
+        }
+
+        SymbolicException sex = tr.findException();
+        if (sex != null) {
+            SymbolicExceptionInfo sei = new SymbolicExceptionInfo();
+            sei.setExClass(symbolRegistry.symbolName(sex.getClassId()));
+            sei.setMessage(sex.getMessage());
+            List<String> stack = new ArrayList<String>(sex.getStackTrace().length);
+            for (SymbolicStackElement sel : sex.getStackTrace()) {
+                stack.add("  at " + symbolRegistry.symbolName(sel.getClassId())
+                        + "." + symbolRegistry.symbolName(sel.getMethodId())
+                        + " [" + symbolRegistry.symbolName(sel.getFileId())
+                        + ":" + sel.getLineNum() + "]");
+            }
+            sei.setStackTrace(stack);
+            info.setExceptionInfo(sei);
+        }
 
         return info;
     }

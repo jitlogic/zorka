@@ -299,6 +299,16 @@ public class TraceRecord implements SymbolicRecord {
         this.exception = exception;
     }
 
+    public SymbolicException findException() {
+
+        if (exception instanceof SymbolicException) {
+            return (SymbolicException) exception;
+        } else if (hasFlag(EXCEPTION_PASS) && children != null) {
+            return children.get(children.size() - 1).findException();
+        }
+
+        return null;
+    }
 
     public TraceMarker getMarker() {
         return marker;

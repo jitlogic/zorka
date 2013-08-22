@@ -86,7 +86,13 @@ public class ZorkaCentralShell extends BorderLayoutContainer {
 
     private void createHostListPanel() {
         ColumnConfig<HostInfo, String> nameCol = new ColumnConfig<HostInfo, String>(props.name(), 128, "Host Name");
+        nameCol.setMenuDisabled(true);
+        nameCol.setSortable(false);
+
         ColumnConfig<HostInfo, String> addrCol = new ColumnConfig<HostInfo, String>(props.addr(), 127, "IP Address");
+        addrCol.setMenuDisabled(true);
+        addrCol.setSortable(false);
+
         ColumnModel<HostInfo> model = new ColumnModel<HostInfo>(Arrays.<ColumnConfig<HostInfo, ?>>asList(nameCol, addrCol));
         final ListStore<HostInfo> store = new ListStore<HostInfo>(props.key());
 

@@ -24,6 +24,7 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.jitlogic.zorka.central.data.HostInfo;
 import com.jitlogic.zorka.central.data.PagingData;
 import com.jitlogic.zorka.central.data.TraceInfo;
@@ -70,10 +71,20 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
     private void createTraceListGrid() {
         ColumnConfig<TraceInfo, Long> clockCol = new ColumnConfig<TraceInfo, Long>(props.clock(), 100, "Clock");
+        clockCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+
         ColumnConfig<TraceInfo, Long> durationCol = new ColumnConfig<TraceInfo, Long>(props.executionTime(), 50, "Time");
+        durationCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+
         ColumnConfig<TraceInfo, Long> callsCol = new ColumnConfig<TraceInfo, Long>(props.calls(), 50, "Calls");
+        callsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+
         ColumnConfig<TraceInfo, Long> errorsCol = new ColumnConfig<TraceInfo, Long>(props.errors(), 50, "Errors");
+        errorsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+
         ColumnConfig<TraceInfo, Long> recordsCol = new ColumnConfig<TraceInfo, Long>(props.records(), 50, "Records");
+        recordsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+
         ColumnConfig<TraceInfo, String> descCol = new ColumnConfig<TraceInfo, String>(props.description(), 500, "Description");
 
         ColumnModel<TraceInfo> model = new ColumnModel<TraceInfo>(Arrays.<ColumnConfig<TraceInfo, ?>>asList(

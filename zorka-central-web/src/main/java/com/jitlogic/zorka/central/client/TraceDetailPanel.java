@@ -17,14 +17,18 @@ package com.jitlogic.zorka.central.client;
 
 
 import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.jitlogic.zorka.central.data.TraceInfo;
 import com.jitlogic.zorka.central.data.TraceRecordInfo;
 import com.jitlogic.zorka.central.data.TraceRecordInfoProperties;
+import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.data.shared.loader.ChildTreeStoreBinding;
 import com.sencha.gxt.data.shared.loader.DataProxy;
@@ -32,10 +36,12 @@ import com.sencha.gxt.data.shared.loader.TreeLoader;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
+import com.sencha.gxt.widget.core.client.grid.RowExpander;
 import com.sencha.gxt.widget.core.client.treegrid.TreeGrid;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
+import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 
@@ -83,6 +89,9 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
         loader.addLoadHandler(new ChildTreeStoreBinding<TraceRecordInfo>(store));
 
         ColumnConfig<TraceRecordInfo, Long> durationCol = new ColumnConfig<TraceRecordInfo, Long>(props.time(), 50, "Time");
+        durationCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+        durationCol.setMenuDisabled(true);
+        durationCol.setSortable(false);
 
         durationCol.setCell(new AbstractCell<Long>() {
             @Override
@@ -105,24 +114,60 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
 
         ColumnConfig<TraceRecordInfo, Long> callsCol = new ColumnConfig<TraceRecordInfo, Long>(props.calls(), 50, "Calls");
+        callsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+        callsCol.setMenuDisabled(true);
+        callsCol.setSortable(false);
+
         ColumnConfig<TraceRecordInfo, Long> errorsCol = new ColumnConfig<TraceRecordInfo, Long>(props.errors(), 50, "Errors");
+        errorsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+        errorsCol.setMenuDisabled(true);
+        errorsCol.setSortable(false);
+
         ColumnConfig<TraceRecordInfo, Long> pctCol = new ColumnConfig<TraceRecordInfo, Long>(props.time(), 50, "Pct");
+        pctCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+        pctCol.setMenuDisabled(true);
+        pctCol.setSortable(false);
 
         pctCol.setCell(new AbstractCell<Long>() {
             @Override
             public void render(Context context, Long time, SafeHtmlBuilder sb) {
                 double pct = 100.0 * time / traceInfo.getExecutionTime();
                 String strTime = NumberFormat.getFormat("###.0").format(pct) + "%";
-                sb.appendHtmlConstant("<span>");
+                //int g = 255 - (int) (pct * 2.49);
+                //g = g < 0 ? 0 : g > 255 ? 255 : g;
+                int g = (int) (pct * 2.49);
+                //Color bgColor = new Color(255, g, g);
+
+                sb.appendHtmlConstant("<span style=\"color: rgb(" + g + ",0,0);\"><b>");
                 sb.append(SafeHtmlUtils.fromString(strTime));
+                sb.appendHtmlConstant("</b></span>");
+            }
+        });
+
+        ColumnConfig<TraceRecordInfo, TraceRecordInfo> methodCol = new ColumnConfig<TraceRecordInfo, TraceRecordInfo>(
+                new IdentityValueProvider<TraceRecordInfo>(), 500, "Method");
+
+        methodCol.setMenuDisabled(true);
+        methodCol.setSortable(false);
+
+        methodCol.setCell(new AbstractCell<TraceRecordInfo>() {
+            @Override
+            public void render(Context context, TraceRecordInfo tr, SafeHtmlBuilder sb) {
+                String color = tr.getExceptionInfo() != null ? "red"
+                        : tr.getAttributes() != null ? "blue" : "black";
+                sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
+                sb.append(SafeHtmlUtils.fromString(tr.getMethod()));
                 sb.appendHtmlConstant("</span>");
             }
         });
 
-        ColumnConfig<TraceRecordInfo, String> methodCol = new ColumnConfig<TraceRecordInfo, String>(props.method(), 500, "Method");
+        RowExpander<TraceRecordInfo> expander = new RowExpander<TraceRecordInfo>(
+                new IdentityValueProvider<TraceRecordInfo>(), new MethodDetailCell());
 
         ColumnModel<TraceRecordInfo> model = new ColumnModel<TraceRecordInfo>(
-                Arrays.<ColumnConfig<TraceRecordInfo, ?>>asList(durationCol, callsCol, errorsCol, pctCol, methodCol));
+                Arrays.<ColumnConfig<TraceRecordInfo, ?>>asList(
+                        expander, methodCol, durationCol, callsCol, errorsCol, pctCol));
+
 
         TreeGrid<TraceRecordInfo> tree = new TreeGrid<TraceRecordInfo>(store, model, methodCol) {
             @Override
@@ -130,12 +175,18 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
                 super.onAfterFirstAttach();
                 loader.load();
             }
+
+            protected ImageResource calculateIconStyle(TraceRecordInfo model) {
+                return null;
+            }
         };
         tree.setBorders(true);
         tree.setTreeLoader(loader);
         tree.getView().setTrackMouseOver(false);
         tree.getView().setAutoExpandColumn(methodCol);
         tree.getView().setForceFit(true);
+
+        expander.initPlugin(tree);
 
         add(tree, new VerticalLayoutData(1, 1));
     }
