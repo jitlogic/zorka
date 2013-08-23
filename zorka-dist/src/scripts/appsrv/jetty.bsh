@@ -16,11 +16,11 @@
  */
 
 
-__catalina() {
+__jetty() {
 
   spy.add(spy.instrument()
-    .onEnter(spy.fetchArg("REQ", 1), spy.fetchArg("RESP", 2),
-      spy.format("URI", "${REQ.request.requestURI}"),
+    .onEnter(spy.fetchArg("REQ", 2), spy.fetchArg("RESP", 4),
+      spy.format("URI", "${REQ.requestURI}"),
       http._trace ? tracer.begin("HTTP_REQ", zorka.longCfg("http.trace.time")) : null,
       http._trace ? tracer.attr("URI", "URI") : null,
       http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", spy.ACTION_ENTER) : null)
@@ -40,10 +40,12 @@ __catalina() {
         http.error_marker(),
         http._errorF ? spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format")) : null) : null,
       http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", http._action) : null)
-    .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
+    .include(
+      spy.byMethod("org.mortbay.jetty.servlet.ServletHandler", "doHandle"),
+      spy.byMethod("org.eclipse.jetty.servlet.ServletHandler", "doHandle")));
 
   return this;
 }
 
+jetty = __jetty();
 
-catalina = __catalina();
