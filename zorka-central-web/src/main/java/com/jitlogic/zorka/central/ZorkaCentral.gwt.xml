@@ -4,6 +4,7 @@
 
     <inherits name='com.google.gwt.user.User'/>
     <inherits name='com.google.gwt.http.HTTP'/>
+    <inherits name='com.google.gwt.resources.Resources'/>
     <inherits name='com.sencha.gxt.ui.GXT'/>
     <inherits name='org.fusesource.restygwt.RestyGWT'/>
 

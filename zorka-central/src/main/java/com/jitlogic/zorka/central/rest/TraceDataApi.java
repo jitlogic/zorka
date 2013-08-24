@@ -23,6 +23,9 @@ import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.FressianReader;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 
 import javax.sql.DataSource;
 import javax.ws.rs.*;
@@ -37,6 +40,7 @@ import java.util.regex.Pattern;
 public class TraceDataApi {
 
     private JdbcTemplate jdbc;
+    private NamedParameterJdbcTemplate ndbc;
     private StoreManager storeManager;
     private SymbolRegistry symbolRegistry;
 
@@ -81,6 +85,7 @@ public class TraceDataApi {
 
     public TraceDataApi() {
         jdbc = new JdbcTemplate(CentralApp.getInstance().getDs());
+        ndbc = new NamedParameterJdbcTemplate(CentralApp.getInstance().getDs());
         storeManager = CentralApp.getInstance().getStoreManager();
         symbolRegistry = CentralApp.getInstance().getSymbolRegistry();
     }
@@ -137,32 +142,56 @@ public class TraceDataApi {
             "calls", "CALLS",
             "errors", "ERRORS",
             "records", "RECORDS",
-            "description", "OVERVIEW",
+            "description", "DESCRIPTION",
             "executionTime", "EXTIME"
     );
 
     private final static Set<String> TRACES_ORDER_DIRS = ZorkaUtil.set("ASC", "DESC");
 
-    @GET
+    @POST
     @Path("/{hostId: [0-9]+}/page")
+    @Consumes(MediaType.APPLICATION_JSON)
     public PagingData<TraceInfo> pageTraces(@PathParam("hostId") int hostId,
                                             @DefaultValue("0") @QueryParam("offset") int offset,
                                             @DefaultValue("100") @QueryParam("limit") int limit,
-                                            @DefaultValue("CLOCK") @QueryParam("orderBy") String orderBy,
-                                            @DefaultValue("DESC") @QueryParam("orderDir") String orderDir) {
+                                            TraceListFilterExpression filter) {
+
+        String orderBy = filter.getSortBy();
+        String orderDir = filter.isSortAsc() ? "ASC" : "DESC";
 
         if (!TRACES_ORDER_COLS.containsKey(orderBy) || !TRACES_ORDER_DIRS.contains(orderDir)) {
             throw new RuntimeException("Invalid ordering arguments: orderBy=" + orderBy + ", orderDir=" + orderDir);
         }
 
-        List<TraceInfo> results = jdbc.query("select * from TRACES where HOST_ID = ? order by "
-                + TRACES_ORDER_COLS.get(orderBy) + " " + orderDir + " limit ? offset ?",
-                TRACE_INFO_MAPPER, hostId, limit, offset);
+        String sql1 = "select * from TRACES where HOST_ID = :hostId";
+        String sql2 = "select count(1) from TRACES where HOST_ID = :hostId";
+        MapSqlParameterSource params = new MapSqlParameterSource("hostId", hostId);
+
+
+        if (filter.getFilterExpr() != null && filter.getFilterExpr().trim().length() > 0) {
+            sql1 += " and DESCRIPTION like :filterExpr";
+            sql2 += " and DESCRIPTION like :filterExpr";
+            params.addValue("filterExpr", filter.getFilterExpr().trim());
+        }
+
+        if (filter.getMinTime() > 0) {
+            sql1 += " and EXTIME > :minTime";
+            sql2 += " and EXTIME > :minTime";
+            params.addValue("minTime", filter.getMinTime());
+        }
+
+        sql1 += " order by " + TRACES_ORDER_COLS.get(orderBy) + " " + orderDir + " limit :limit offset :offset";
+
+        params.addValue("limit", limit);
+        params.addValue("offset", offset);
+
+        List<TraceInfo> results = ndbc.query(sql1, params, TRACE_INFO_MAPPER);
 
         PagingData result = new PagingData();
 
+
         result.setOffset(offset);
-        result.setTotal(jdbc.queryForObject("select count(1) from TRACES where HOST_ID = ?", Integer.class, hostId));
+        result.setTotal(ndbc.queryForObject(sql2, params, Integer.class));
         result.setResults(results);
 
         return result;
