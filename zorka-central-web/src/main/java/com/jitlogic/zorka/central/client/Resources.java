@@ -37,5 +37,17 @@ public interface Resources extends ClientBundle {
     ImageResource filterIcon();
 
     @Source("images/go-next.png")
-    ImageResource goIcon();
+    ImageResource goNextIcon();
+
+    @Source("images/go-previous.png")
+    ImageResource goPrevIcon();
+
+    @Source("images/go-down-search.png")
+    ImageResource goDownIcon();
+
+    @Source("images/exception-thrown.png")
+    ImageResource exceptionIcon();
+
+    @Source("images/expand.png")
+    ImageResource expandIcon();
 }

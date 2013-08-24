@@ -20,8 +20,6 @@ import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -215,7 +213,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
         toolBar.add(new SeparatorToolItem());
 
 //        TextButton btnSetStart = new TextButton();
-//        btnSetStart.setIcon(Resources.INSTANCE.goIcon());
+//        btnSetStart.setIcon(Resources.INSTANCE.goNextIcon());
 //        btnSetStart.setToolTip("Go to specific point in time.");
 //        toolBar.add(btnSetStart);
 //
@@ -231,7 +229,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
         TextButton btnFilter = new TextButton();
         btnFilter.setIcon(Resources.INSTANCE.filterIcon());
-        btnFilter.setToolTip("Filter by text.");
+        btnFilter.setToolTip("Filter by criteria");
         toolBar.add(btnFilter);
 
         final SpinnerField<Double> txtDuration = new SpinnerField<Double>(new NumberPropertyEditor.DoublePropertyEditor());
