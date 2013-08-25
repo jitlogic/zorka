@@ -17,8 +17,10 @@ package com.jitlogic.zorka.common.zico;
 
 
 import com.jitlogic.zorka.common.tracedata.HelloRequest;
+
 import static com.jitlogic.zorka.common.zico.ZicoPacket.*;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.List;
@@ -29,7 +31,7 @@ public class ZicoServerConnector extends ZicoConnector implements Runnable {
     private ZicoDataProcessor context = null;
 
     public ZicoServerConnector(Socket socket, ZicoDataProcessorFactory factory) throws IOException {
-        this.socket  = socket;
+        this.socket = socket;
         this.in = socket.getInputStream();
         this.out = socket.getOutputStream();
         this.factory = factory;
@@ -74,25 +76,31 @@ public class ZicoServerConnector extends ZicoConnector implements Runnable {
     }
 
 
-
     @Override
     public void run() {
         try {
             while (running) {
                 runCycle();
             }
+        } catch (EOFException e) {
+            //log.info()
         } catch (ZicoException ze) {
             ze.printStackTrace();
-            try { send(ze.getStatus()); } catch (IOException e) { }
+            try {
+                send(ze.getStatus());
+            } catch (IOException e) {
+            }
         } catch (Exception e) {
             e.printStackTrace();
             running = false;
             //e.printStackTrace();
         } finally {
-            try { close(); } catch (IOException e) { }
+            try {
+                close();
+            } catch (IOException e) {
+            }
         }
     }
-
 
 
     @Override

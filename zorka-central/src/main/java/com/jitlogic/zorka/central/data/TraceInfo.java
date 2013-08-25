@@ -42,6 +42,9 @@ public class TraceInfo {
     int traceFlags;
 
     @JsonProperty
+    int status;
+
+    @JsonProperty
     long calls;
 
     @JsonProperty
@@ -110,6 +113,14 @@ public class TraceInfo {
 
     public void setTraceFlags(int traceFlags) {
         this.traceFlags = traceFlags;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public long getCalls() {

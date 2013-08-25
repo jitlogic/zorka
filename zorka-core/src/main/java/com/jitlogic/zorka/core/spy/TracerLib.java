@@ -144,6 +144,10 @@ public class TracerLib {
     }
 
 
+    public SpyProcessor markError() {
+        return new TraceMarkerProcessor(tracer, TraceMarker.ERROR_MARK);
+    }
+
     /**
      * Adds trace attribute to trace record immediately. This is useful for programmatic attribute setting.
      *

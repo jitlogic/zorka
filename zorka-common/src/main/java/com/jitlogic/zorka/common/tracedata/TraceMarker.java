@@ -22,36 +22,61 @@ package com.jitlogic.zorka.common.tracedata;
  */
 public class TraceMarker {
 
-    /** Minimum trace execution time required to further process trace */
+    /**
+     * Minimum trace execution time required to further process trace
+     */
     private static long minTraceTime = 50000000;
 
-    /** Overflow flag (set if some records in current trace have been skipped). */
+    /**
+     * Overflow flag (set if some records in current trace have been skipped).
+     */
     public static final int OVERFLOW_FLAG = 0x01;
 
-    /** Always submit trace (regardless of trace execution time etc.). */
+    /**
+     * Always submit trace (regardless of trace execution time etc.).
+     */
     public static final int SUBMIT_TRACE = 0x02;
 
     public static final int ALL_METHODS = 0x04;
 
-    /** This flag instructs trace builder algorithm to drop frames whose execution time is too small */
+    /**
+     * This flag instructs trace builder algorithm to drop frames whose execution time is too small
+     */
     public static final int DROP_INTERIM = 0x08;
 
-    /** This flag instructs trace builder to log all method calls (on entry and on return/error) */
+    /**
+     * This flag instructs trace builder to log all method calls (on entry and on return/error)
+     */
     public static final int TRACE_CALLS = 0x10;
 
-    /** Always drop trace (regardless of trace execution time etc.). */
+    /**
+     * Always drop trace (regardless of trace execution time etc.).
+     */
     public static final int DROP_TRACE = 0x20;
 
-    /** Trace ID (refers to symbol containing trace name) */
+    /**
+     * Trace error mark. This flag is used indicate that this trace ended with error condition (eg. HTTP/500).
+     */
+    public static final int ERROR_MARK = 0x1000;
+
+    /**
+     * Trace ID (refers to symbol containing trace name)
+     */
     private int traceId;
 
-    /** Trace start (wall clock time) */
+    /**
+     * Trace start (wall clock time)
+     */
     private long clock;
 
-    /** Minimum execution time of this trace */
+    /**
+     * Minimum execution time of this trace
+     */
     private long minimumTime;
 
-    /** Trace marker flags */
+    /**
+     * Trace marker flags
+     */
     private int flags;
 
 
@@ -68,11 +93,9 @@ public class TraceMarker {
     /**
      * Creates new trace marker.
      *
-     * @param root root trace record
-     *
+     * @param root    root trace record
      * @param traceId trace ID
-     *
-     * @param clock current time (wall clock time)
+     * @param clock   current time (wall clock time)
      */
     public TraceMarker(TraceRecord root, int traceId, long clock) {
         this(traceId, clock);
@@ -135,7 +158,7 @@ public class TraceMarker {
     }
 
 
-    public void markFlag(int flag) {
+    public void markFlags(int flag) {
         this.flags |= flag;
     }
 }

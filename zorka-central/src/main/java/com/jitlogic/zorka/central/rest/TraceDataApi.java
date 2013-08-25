@@ -72,6 +72,7 @@ public class TraceDataApi {
             info.setClock(rs.getLong("CLOCK"));
             info.setMethodFlags(rs.getInt("RFLAGS"));
             info.setTraceFlags(rs.getInt("TFLAGS"));
+            info.setStatus(rs.getInt("STATUS"));
             info.setCalls(rs.getLong("CALLS"));
             info.setErrors(rs.getLong("ERRORS"));
             info.setRecords(rs.getLong("RECORDS"));
@@ -167,6 +168,10 @@ public class TraceDataApi {
         String sql2 = "select count(1) from TRACES where HOST_ID = :hostId";
         MapSqlParameterSource params = new MapSqlParameterSource("hostId", hostId);
 
+        if (filter.isErrorsOnly()) {
+            sql1 += " and STATUS = 1";
+            sql2 += " and STATUS = 1";
+        }
 
         if (filter.getFilterExpr() != null && filter.getFilterExpr().trim().length() > 0) {
             sql1 += " and DESCRIPTION like :filterExpr";

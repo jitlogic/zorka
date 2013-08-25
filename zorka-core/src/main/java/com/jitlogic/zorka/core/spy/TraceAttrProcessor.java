@@ -31,27 +31,33 @@ import java.util.Map;
  */
 public class TraceAttrProcessor implements SpyProcessor {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** Tracer object */
+    /**
+     * Tracer object
+     */
     private Tracer tracer;
 
     private SymbolRegistry symbolRegistry;
 
-    /** source field name */
+    /**
+     * source field name
+     */
     private String srcField;
 
-    /** Attribute ID (as taken from symbol registry) */
+    /**
+     * Attribute ID (as taken from symbol registry)
+     */
     private int attrId;
 
     /**
      * Creates custom attribute processor.
      *
-     * @param tracer tracer object
-     *
-     * @param srcField source field name
-     *
+     * @param tracer    tracer object
+     * @param srcField  source field name
      * @param traceAttr attribute ID
      */
     public TraceAttrProcessor(SymbolRegistry symbolRegistry, Tracer tracer, String srcField, String traceAttr) {
@@ -69,10 +75,10 @@ public class TraceAttrProcessor implements SpyProcessor {
 
         if (val != null) {
             if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
-                TraceRecord top = ((TraceBuilder)tracer.getHandler()).realTop();
+                TraceRecord top = tracer.getHandler().realTop();
                 log.debug(ZorkaLogger.ZSP_ARGPROC, "Value: '" + val + "' stored as trace attribute "
-                    + symbolRegistry.symbolName(attrId) + " (classId= " + top.getClassId() + " methodId=" + top.getMethodId()
-                    + " signatureId=" + top.getSignatureId() + ")");
+                        + symbolRegistry.symbolName(attrId) + " (classId= " + top.getClassId() + " methodId=" + top.getMethodId()
+                        + " signatureId=" + top.getSignatureId() + ")");
             }
             tracer.getHandler().newAttr(attrId, val);
         } else {

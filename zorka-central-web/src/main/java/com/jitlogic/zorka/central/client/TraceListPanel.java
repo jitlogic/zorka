@@ -17,13 +17,19 @@ package com.jitlogic.zorka.central.client;
 
 
 import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.ImageResourceRenderer;
 import com.jitlogic.zorka.central.data.*;
+import com.jitlogic.zorka.common.tracedata.TraceMarker;
+import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
@@ -61,6 +67,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
     TraceListFilterExpression filter = new TraceListFilterExpression();
 
     private ZorkaCentralShell shell;
+    private ToggleButton btnErrors;
 
     public TraceListPanel(ZorkaCentralShell shell, TraceDataService tds, HostInfo hostInfo) {
         this.shell = shell;
@@ -76,10 +83,28 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
 
     private void createTraceListGrid() {
-        ColumnConfig<TraceInfo, Long> clockCol = new ColumnConfig<TraceInfo, Long>(props.clock(), 100, "Clock");
+
+        ColumnConfig<TraceInfo, TraceInfo> statusCol = new ColumnConfig<TraceInfo, TraceInfo>(
+                new IdentityValueProvider<TraceInfo>(), 18, " ");
+
+        statusCol.setCell(new AbstractCell<TraceInfo>() {
+            private ImageResourceRenderer renderer = new ImageResourceRenderer();
+
+            @Override
+            public void render(Context context, TraceInfo info, SafeHtmlBuilder sb) {
+                if (info.getStatus() == 1) {
+                    sb.append(renderer.render(Resources.INSTANCE.errorMarkIcon()));
+                }
+            }
+        });
+
+        statusCol.setMenuDisabled(true);
+        statusCol.setSortable(false);
+
+        ColumnConfig<TraceInfo, Long> clockCol = new ColumnConfig<TraceInfo, Long>(props.clock(), 100, "Time");
         clockCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
-        ColumnConfig<TraceInfo, Long> durationCol = new ColumnConfig<TraceInfo, Long>(props.executionTime(), 50, "Time");
+        ColumnConfig<TraceInfo, Long> durationCol = new ColumnConfig<TraceInfo, Long>(props.executionTime(), 50, "Duration");
         durationCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
         ColumnConfig<TraceInfo, Long> callsCol = new ColumnConfig<TraceInfo, Long>(props.calls(), 50, "Calls");
@@ -94,7 +119,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
         ColumnConfig<TraceInfo, String> descCol = new ColumnConfig<TraceInfo, String>(props.description(), 500, "Description");
 
         ColumnModel<TraceInfo> model = new ColumnModel<TraceInfo>(Arrays.<ColumnConfig<TraceInfo, ?>>asList(
-                clockCol, durationCol, callsCol, errorsCol, recordsCol, descCol));
+                statusCol, clockCol, durationCol, callsCol, errorsCol, recordsCol, descCol));
 
         clockCol.setCell(new AbstractCell<Long>() {
             @Override
@@ -204,11 +229,19 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
         toolBar.add(new SeparatorToolItem());
 
-        ToggleButton btnErrors = new ToggleButton();
+        btnErrors = new ToggleButton();
         btnErrors.setIcon(Resources.INSTANCE.errorMarkIcon());
         btnErrors.setToolTip("Show only error traces.");
 
         toolBar.add(btnErrors);
+
+        btnErrors.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<Boolean> event) {
+                filter.setErrorsOnly(event.getValue());
+                traceGridView.refresh();
+            }
+        });
 
         toolBar.add(new SeparatorToolItem());
 

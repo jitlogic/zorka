@@ -100,9 +100,9 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
             }
         }
 
-        jdbc.update("insert into TRACES (HOST_ID,DATA_OFFS,TRACE_ID,DATA_LEN,CLOCK,RFLAGS,TFLAGS,"
+        jdbc.update("insert into TRACES (HOST_ID,DATA_OFFS,TRACE_ID,DATA_LEN,CLOCK,RFLAGS,TFLAGS,STATUS,"
                 + "CLASS_ID,METHOD_ID,SIGN_ID,CALLS,ERRORS,RECORDS,EXTIME,DESCRIPTION) "
-                + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 hostId,
                 offs,
                 tr.getMarker().getTraceId(),
@@ -110,6 +110,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
                 tr.getClock(),
                 tr.getFlags(),
                 tr.getMarker().getFlags(),
+                0 != (tr.getMarker().getFlags() & TraceMarker.ERROR_MARK) ? 1 : 0,
                 tr.getClassId(),
                 tr.getMethodId(),
                 tr.getSignatureId(),

@@ -38,6 +38,7 @@ __catalina() {
       http._error ? spy.subchain(
         spy.valSetFilter("STATUS", http._errors),
         http.error_marker(),
+        http._trace ? tracer.markError() : null,
         http._errorF ? spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format")) : null) : null,
       http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", http._action) : null)
     .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
