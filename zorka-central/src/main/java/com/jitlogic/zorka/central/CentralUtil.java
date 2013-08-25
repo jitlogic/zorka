@@ -120,6 +120,15 @@ public class CentralUtil {
     }
 
 
+    public static String prettyPrintSafe(TraceRecord tr, SymbolRegistry sr, int style) {
+        try {
+            return prettyPrint(tr, sr, style);
+        } catch (Exception e) {
+            return "<Error: " + e.getMessage() + ">";
+        }
+    }
+
+
     public static long toUIntBE(byte[] b) {
         return (b[0] & 0xffL)
                 | ((b[1] & 0xffL) << 8)

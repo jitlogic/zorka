@@ -92,9 +92,7 @@ public class RAGZOutputStream extends OutputStream {
         int len0 = curSegSize + len >= maxSegSize ? (int) (maxSegSize - curSegSize) : len;
 
         deflater.setInput(buf, off, len0);
-        while (!deflater.needsInput()) {
-            deflate();
-        }
+        deflate();
 
         curSegSize += len0;
         logicalLength += len0;
@@ -104,14 +102,7 @@ public class RAGZOutputStream extends OutputStream {
             // TODO get rid of this split, use single write (into single
             write(buf, off + len0, len - len0);
         }
-    }
 
-
-    @Override
-    public void flush() throws IOException {
-        while (!deflater.needsInput()) {
-            deflate();
-        }
     }
 
 
@@ -138,8 +129,9 @@ public class RAGZOutputStream extends OutputStream {
 
 
     private void deflate() throws IOException {
-        int len = deflater.deflate(outputBuf, 0, outputBuf.length, Deflater.SYNC_FLUSH);
-        if (len > 0) {
+        int len = outputBuf.length;
+        while (len == outputBuf.length) {
+            len = deflater.deflate(outputBuf, 0, outputBuf.length, Deflater.SYNC_FLUSH);
             outFile.write(outputBuf, 0, len);
         }
     }
@@ -216,9 +208,7 @@ public class RAGZOutputStream extends OutputStream {
     private void finishSegment() throws IOException {
         if (!deflater.finished()) {
             deflater.finish();
-            while (!deflater.finished()) {
-                deflate();
-            }
+            deflate();
             outFile.write(fromUIntBE(crc.getValue()));
             outFile.write(fromUIntBE(curSegSize));
             long pos = outFile.getFilePointer();

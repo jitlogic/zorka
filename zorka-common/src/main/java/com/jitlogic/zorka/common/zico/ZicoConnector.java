@@ -25,9 +25,9 @@ import java.util.zip.CRC32;
 
 /**
  * ZICO stands for Zorka Internet Collector, Zorka Internal Communication (or whatever).
- *
+ * <p/>
  * Standard TCP port for ZICO communication is 8640 (0x21C0 - 'ZICO' in hex).
- *
+ * <p/>
  * ZICO message:
  * - zico magic   (2 bytes) -> 0x21C0
  * - message type (2 bytes) -> message type and checksum options;
@@ -40,8 +40,7 @@ public abstract class ZicoConnector implements Closeable {
     /** */
     public final static int HEADER_LENGTH = 14;
 
-    public final static int[] ZICO_MAGIC = { 0x21, 0xC0, 0xBA, 0xBE };
-
+    public final static int[] ZICO_MAGIC = {0x21, 0xC0, 0xBA, 0xBE};
 
 
     protected InetAddress addr;
@@ -58,9 +57,8 @@ public abstract class ZicoConnector implements Closeable {
      * Receives ZICO packet.
      *
      * @return unpacked object or status/error.
-     *
-     * TODO this is not good design - encapsulate transferred packets and split data unpacking from data transfer
-     *
+     *         <p/>
+     *         TODO this is not good design - encapsulate transferred packets and split data unpacking from data transfer
      * @throws IOException
      */
     protected ZicoPacket recv() throws IOException {
@@ -81,7 +79,7 @@ public abstract class ZicoConnector implements Closeable {
         int offs = 0;
 
         while (offs < length) {
-            int rlen = in.read(d, offs, length-offs);
+            int rlen = in.read(d, offs, length - offs);
             if (rlen >= 0) {
                 offs += rlen;
             } else {
@@ -104,12 +102,10 @@ public abstract class ZicoConnector implements Closeable {
      * Sends packet of given type.
      *
      * @param type packet type
-     *
      * @param data data (bytes)
-     *
      * @throws IOException
      */
-    public void send(int type, byte...data) throws IOException {
+    public void send(int type, byte... data) throws IOException {
         CRC32 crc = new CRC32();
         crc.update(data);
 
@@ -119,7 +115,7 @@ public abstract class ZicoConnector implements Closeable {
 
         byte[] b = new byte[HEADER_LENGTH];
         ByteBuffer buf = ByteBuffer.wrap(b);
-        buf.putShort((short)type);
+        buf.putShort((short) type);
         buf.putInt(data.length);
         buf.putLong(crc.getValue());
 
@@ -140,5 +136,23 @@ public abstract class ZicoConnector implements Closeable {
             socket.close();
             socket = null;
         }
+    }
+
+
+    public InetAddress getAddr() {
+        return addr;
+    }
+
+
+    public void setAddr(InetAddress addr) {
+        this.addr = addr;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 }
