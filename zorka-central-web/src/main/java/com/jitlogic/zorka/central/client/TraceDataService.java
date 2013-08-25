@@ -20,11 +20,9 @@ import com.jitlogic.zorka.central.data.*;
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.RestService;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface TraceDataService extends RestService {
@@ -72,5 +70,23 @@ public interface TraceDataService extends RestService {
                                @PathParam("path") String path,
                                MethodCallback<TraceRecordInfo> callback);
 
+
+    @POST
+    @Path("hosts/")
+    public void addHost(HostInfo hostInfo,
+                        MethodCallback<Void> callback);
+
+
+    @PUT
+    @Path("hosts/{hostId}")
+    public void updateHost(@PathParam("hostId") int hostId,
+                           HostInfo hostIndo,
+                           MethodCallback<Void> callback);
+
+
+    @DELETE
+    @Path("hosts/{hostId}")
+    public void deleteHost(@PathParam("hostId") int hostId,
+                           MethodCallback<Void> callback);
 
 }

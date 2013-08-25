@@ -43,7 +43,6 @@ public class StoreManager implements Closeable, ZicoDataProcessorFactory {
 
     private CentralConfig config;
 
-
     private SymbolRegistry symbolRegistry;
     private Map<String, Store> stores = new HashMap<String, Store>();
 

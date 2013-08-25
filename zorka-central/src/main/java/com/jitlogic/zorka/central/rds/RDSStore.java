@@ -71,6 +71,9 @@ public class RDSStore implements Closeable {
         open();
     }
 
+    public String getBasePath() {
+        return basePath;
+    }
 
     private void open() throws IOException {
         File baseDir = new File(basePath);

@@ -31,6 +31,7 @@ import javax.sql.DataSource;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -54,6 +55,9 @@ public class TraceDataApi {
             info.setName(rs.getString("HOST_NAME"));
             info.setAddr(rs.getString("HOST_ADDR"));
             info.setPath(rs.getString("HOST_PATH"));
+            info.setPass(rs.getString("HOST_PASS"));
+            info.setFlags(rs.getInt("HOST_FLAGS"));
+            info.setDescription(rs.getString("HOST_DESC"));
 
             return info;
         }
@@ -331,4 +335,42 @@ public class TraceDataApi {
     }
 
 
+    @POST
+    @Path("/")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void addHost(HostInfo hostInfo) {
+        if (0 != jdbc.queryForObject("select count(1) from HOSTS where HOST_NAME = ?",
+                Integer.class, hostInfo.getName())) {
+            throw new RuntimeException("Host already exists.");
+        }
+
+        // TODO bad hack; refactor whole host/store creation code into somewhat more edible form;
+        HostInfo hi = getOrCreateHost(hostInfo.getName(), hostInfo.getAddr());
+        updateHost(hi.getId(), hostInfo);
+    }
+
+
+    @PUT
+    @Path("/{hostId: [0-9]+}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void updateHost(@PathParam("hostId") int hostId, HostInfo info) {
+        jdbc.update("update HOSTS set HOST_ADDR=?, HOST_DESC=?, HOST_PASS=?, HOST_FLAGS=? where HOST_ID=?",
+                info.getAddr(), info.getDescription(), info.getPass(), info.getFlags(), hostId);
+    }
+
+
+    @DELETE
+    @Path("/{hostId: [0-9]+}")
+    public void deleteHost(@PathParam("hostId") int hostId) throws IOException {
+        HostInfo info = getHost(hostId);
+        if (info != null) {
+            Store store = storeManager.get(info.getName());
+            String rootPath = store.getRootPath();
+            store.close();
+            ZorkaUtil.rmrf(rootPath);
+            jdbc.update("delete from TRACE_ATTRS where HOST_ID = ?", hostId);
+            jdbc.update("delete from TRACES where HOST_ID = ?", hostId);
+            jdbc.update("delete from HOSTS where HOST_ID = ?", hostId);
+        }
+    }
 }

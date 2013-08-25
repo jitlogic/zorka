@@ -104,4 +104,8 @@ public class Store implements Closeable {
             log.error("Cannot close RDS store '" + rds + "' for " + hostname, e);
         }
     }
+
+    public String getRootPath() {
+        return rootPath;
+    }
 }

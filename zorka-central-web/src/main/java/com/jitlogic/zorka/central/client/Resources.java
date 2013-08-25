@@ -50,4 +50,16 @@ public interface Resources extends ClientBundle {
 
     @Source("images/expand.png")
     ImageResource expandIcon();
+
+    @Source("images/add.png")
+    ImageResource addIcon();
+
+    @Source("images/remove.png")
+    ImageResource removeIcon();
+
+    @Source("images/edit.png")
+    ImageResource editIcon();
+
+    @Source("images/list-columns.png")
+    ImageResource listColumnsIcon();
 }
