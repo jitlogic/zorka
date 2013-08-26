@@ -32,14 +32,6 @@ public interface TraceDataService extends RestService {
     public void listHosts(MethodCallback<List<HostInfo>> callback);
 
 
-    @GET
-    @Path("hosts/{hostId}/list?limit={limit}&offset={offset}")
-    public void listTraces(@PathParam("hostId") int hostId,
-                           @PathParam("offset") int offset,
-                           @PathParam("limit") int limit,
-                           MethodCallback<List<TraceInfo>> callback);
-
-
     @POST
     @Path("hosts/{hostId}/page?limit={limit}&offset={offset}")
     public void pageTraces(@PathParam("hostId") int hostId,
@@ -47,12 +39,6 @@ public interface TraceDataService extends RestService {
                            @PathParam("limit") int limit,
                            TraceListFilterExpression filter,
                            MethodCallback<PagingData<TraceInfo>> callback);
-
-
-    @GET
-    @Path("hosts/{hostId}/count")
-    public void countTraces(@PathParam("hostId") int hostId,
-                            MethodCallback<Integer> callback);
 
 
     @GET

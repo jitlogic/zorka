@@ -15,11 +15,10 @@
  */
 package com.jitlogic.zorka.central.test;
 
-import com.jitlogic.zorka.central.Store;
+import com.jitlogic.zorka.central.HostStore;
 import com.jitlogic.zorka.central.test.support.CentralFixture;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.common.util.ObjectInspector;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -28,8 +27,8 @@ public class DataReceptionUnitTest extends CentralFixture {
 
     @Test
     public void testAcquireSingleStoreAndCheckIfItWorks() throws Exception {
-        Store store = storeManager.get("test");
-        SymbolRegistry symbols = store.getSymbolRegistry();
+        HostStore store = storeManager.get("test");
+        SymbolRegistry symbols = store.getStoreManager().getSymbolRegistry();
         int t1 = symbols.symbolId("t1"), t2 = symbols.symbolId("t2");
 
         assertEquals(t2, symbols.symbolId("t2"));

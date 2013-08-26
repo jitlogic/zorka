@@ -40,8 +40,8 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     private JdbcTemplate jdbc;
     private int hostId;
 
-    public ReceiverContext(JdbcTemplate jdbc, Store store) {
-        this.symbolRegistry = store.getSymbolRegistry();
+    public ReceiverContext(JdbcTemplate jdbc, HostStore store) {
+        this.symbolRegistry = store.getStoreManager().getSymbolRegistry();
         this.traceDataStore = store.getRds();
         this.jdbc = jdbc;
         this.hostId = store.getHostInfo().getId();
@@ -100,6 +100,15 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
             }
         }
 
+        int status = 0;
+        ;
+
+        if (tr.getException() != null
+                || tr.hasFlag(TraceRecord.EXCEPTION_PASS)
+                || tr.getMarker().hasFlag(TraceMarker.ERROR_MARK)) {
+            status = 1;
+        }
+
         jdbc.update("insert into TRACES (HOST_ID,DATA_OFFS,TRACE_ID,DATA_LEN,CLOCK,RFLAGS,TFLAGS,STATUS,"
                 + "CLASS_ID,METHOD_ID,SIGN_ID,CALLS,ERRORS,RECORDS,EXTIME,DESCRIPTION) "
                 + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
@@ -110,7 +119,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
                 tr.getClock(),
                 tr.getFlags(),
                 tr.getMarker().getFlags(),
-                0 != (tr.getMarker().getFlags() & TraceMarker.ERROR_MARK) ? 1 : 0,
+                status,
                 tr.getClassId(),
                 tr.getMethodId(),
                 tr.getSignatureId(),
