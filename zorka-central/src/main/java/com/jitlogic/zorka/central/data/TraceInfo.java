@@ -18,6 +18,8 @@ package com.jitlogic.zorka.central.data;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.util.Map;
+
 public class TraceInfo {
 
     @JsonProperty
@@ -58,6 +60,9 @@ public class TraceInfo {
 
     @JsonProperty
     String description;
+
+    @JsonProperty
+    Map<String, String> attributes;
 
     public int getHostId() {
         return hostId;
@@ -161,5 +166,13 @@ public class TraceInfo {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Map<String, String> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(Map<String, String> attributes) {
+        this.attributes = attributes;
     }
 }

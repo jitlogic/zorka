@@ -23,6 +23,7 @@ import com.jitlogic.zorka.central.data.TraceListFilterExpression;
 import com.jitlogic.zorka.central.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -35,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,6 +45,21 @@ import java.util.Set;
  * Represents performance data store for a single agent.
  */
 public class HostStore implements Closeable {
+
+    private final static Logger log = LoggerFactory.getLogger(HostStore.class);
+
+    private ObjectMapper mapper = new ObjectMapper();
+
+
+    private String rootPath;
+    private RDSStore rds;
+    private HostInfo hostInfo;
+    private HostStoreManager manager;
+
+
+    private JdbcTemplate jdbc;
+    private NamedParameterJdbcTemplate ndbc;
+
 
     private final RowMapper<TraceInfo> TRACE_INFO_MAPPER = new RowMapper<TraceInfo>() {
         @Override
@@ -61,23 +78,35 @@ public class HostStore implements Closeable {
             info.setErrors(rs.getLong("ERRORS"));
             info.setRecords(rs.getLong("RECORDS"));
             info.setExecutionTime(rs.getLong("EXTIME"));
-            info.setDescription(rs.getString("DESCRIPTION"));
+
+            StringBuilder sdesc = new StringBuilder();
+            Map<String, String> attrs = new HashMap<String, String>();
+
+            try {
+                attrs = mapper.readValue(rs.getString("ATTRS"), Map.class);
+            } catch (IOException e) {
+                log.error("Error unpacking JSON attrs", e);
+            }
+
+            info.setAttributes(attrs);
+
+            sdesc.append(manager.getSymbolRegistry().symbolName(rs.getInt("TRACE_ID")));
+
+            for (Map.Entry<String, String> e : attrs.entrySet()) {
+                sdesc.append("|");
+                if (e.getValue().length() > 50) {
+                    sdesc.append(e.getValue().substring(0, 50));
+                } else {
+                    sdesc.append(e.getValue());
+                }
+            }
+
+            info.setDescription(sdesc.toString());
+
 
             return info;
         }
     };
-
-    private final static Logger log = LoggerFactory.getLogger(HostStore.class);
-
-
-    private String rootPath;
-    private RDSStore rds;
-    private HostInfo hostInfo;
-    private HostStoreManager manager;
-
-
-    private JdbcTemplate jdbc;
-    private NamedParameterJdbcTemplate ndbc;
 
 
     public HostStore(HostStoreManager manager,
@@ -156,7 +185,6 @@ public class HostStore implements Closeable {
             "calls", "CALLS",
             "errors", "ERRORS",
             "records", "RECORDS",
-            "description", "DESCRIPTION",
             "executionTime", "EXTIME"
     );
 
@@ -180,8 +208,8 @@ public class HostStore implements Closeable {
         }
 
         if (filter.getFilterExpr() != null && filter.getFilterExpr().trim().length() > 0) {
-            sql1 += " and DESCRIPTION like :filterExpr";
-            sql2 += " and DESCRIPTION like :filterExpr";
+            sql1 += " and ATTRS like :filterExpr";
+            sql2 += " and ATTRS like :filterExpr";
             params.addValue("filterExpr", filter.getFilterExpr().trim());
         }
 

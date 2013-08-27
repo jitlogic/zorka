@@ -84,23 +84,6 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
     private void createTraceListGrid() {
 
-        ColumnConfig<TraceInfo, TraceInfo> statusCol = new ColumnConfig<TraceInfo, TraceInfo>(
-                new IdentityValueProvider<TraceInfo>(), 18, " ");
-
-        statusCol.setCell(new AbstractCell<TraceInfo>() {
-            private ImageResourceRenderer renderer = new ImageResourceRenderer();
-
-            @Override
-            public void render(Context context, TraceInfo info, SafeHtmlBuilder sb) {
-                if (info.getStatus() == 1) {
-                    sb.append(renderer.render(Resources.INSTANCE.errorMarkIcon()));
-                }
-            }
-        });
-
-        statusCol.setMenuDisabled(true);
-        statusCol.setSortable(false);
-
         ColumnConfig<TraceInfo, Long> clockCol = new ColumnConfig<TraceInfo, Long>(props.clock(), 100, "Time");
         clockCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
@@ -116,10 +99,17 @@ public class TraceListPanel extends VerticalLayoutContainer {
         ColumnConfig<TraceInfo, Long> recordsCol = new ColumnConfig<TraceInfo, Long>(props.records(), 50, "Records");
         recordsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
-        ColumnConfig<TraceInfo, String> descCol = new ColumnConfig<TraceInfo, String>(props.description(), 500, "Description");
+        ColumnConfig<TraceInfo, TraceInfo> descCol = new ColumnConfig<TraceInfo, TraceInfo>(
+                new IdentityValueProvider<TraceInfo>(), 500, "Description");
+
+        descCol.setSortable(false);
+        descCol.setMenuDisabled(true);
+
+        RowExpander<TraceInfo> expander = new RowExpander<TraceInfo>(
+                new IdentityValueProvider<TraceInfo>(), new TraceDetailCell());
 
         ColumnModel<TraceInfo> model = new ColumnModel<TraceInfo>(Arrays.<ColumnConfig<TraceInfo, ?>>asList(
-                statusCol, clockCol, durationCol, callsCol, errorsCol, recordsCol, descCol));
+                expander, clockCol, durationCol, callsCol, errorsCol, recordsCol, descCol));
 
         clockCol.setCell(new AbstractCell<Long>() {
             @Override
@@ -136,6 +126,16 @@ public class TraceListPanel extends VerticalLayoutContainer {
                 String strTime = ClientUtil.formatDuration(time);
                 sb.appendHtmlConstant("<span>");
                 sb.append(SafeHtmlUtils.fromString(strTime));
+                sb.appendHtmlConstant("</span>");
+            }
+        });
+
+        descCol.setCell(new AbstractCell<TraceInfo>() {
+            @Override
+            public void render(Context context, TraceInfo ti, SafeHtmlBuilder sb) {
+                String color = ti.getStatus() != 0 ? "red" : "black";
+                sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
+                sb.append(SafeHtmlUtils.fromString(ti.getDescription()));
                 sb.appendHtmlConstant("</span>");
             }
         });
@@ -207,7 +207,8 @@ public class TraceListPanel extends VerticalLayoutContainer {
             }
         });
 
-        //setCenterWidget(traceGrid);
+        expander.initPlugin(traceGrid);
+
         add(traceGrid, new VerticalLayoutData(1, 1));
     }
 

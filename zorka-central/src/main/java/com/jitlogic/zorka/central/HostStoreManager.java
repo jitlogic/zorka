@@ -151,7 +151,6 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
             String rootPath = store.getRootPath();
             store.close();
             ZorkaUtil.rmrf(rootPath);
-            jdbc.update("delete from TRACE_ATTRS where HOST_ID = ?", hostId);
             jdbc.update("delete from TRACES where HOST_ID = ?", hostId);
             jdbc.update("delete from HOSTS where HOST_ID = ?", hostId);
             storesById.remove(store.getHostInfo().getId());
