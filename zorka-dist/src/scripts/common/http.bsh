@@ -29,7 +29,7 @@ __http() {
   zorka.defCfg("http.params.exclude", "");
 
   // Default values for HTTP slow requests log configuration options
-  zorka.defCfg("http.slow.log", "no");
+  zorka.defCfg("http.slow", "no");
   zorka.defCfg("http.slow.time", "5000");
   zorka.defCfg("http.slow.file", "yes");
   zorka.defCfg("http.slow.file.path", zorka.path("${zorka.log.dir}", "http-slow.log"));
@@ -38,7 +38,7 @@ __http() {
   zorka.defCfg("http.slow.format", "[${TIME}] ${URI}${PARAMS} -> ${STATUS}");
 
   // Default values for HTTP error log configuration options
-  zorka.defCfg("http.error.log", "no");
+  zorka.defCfg("http.error", "no");
   zorka.defCfg("http.error.codes", "400,500,502,504");
   zorka.defCfg("http.error.file", "yes");
   zorka.defCfg("http.error.file.path", zorka.path("${zorka.log.dir}", "http-error.log"));
@@ -51,7 +51,54 @@ __http() {
   zorka.defCfg("http.trace.time", "1000");
   zorka.defCfg("http.trace.params.prefix", "P:");
 
+  _trace = zorka.boolCfg("http.trace");
+  _stats = zorka.boolCfg("http.stats");
+  _congestion = zorka.boolCfg("http.stats.congestion");
   _mbean = zorka.stringCfg("http.stats.mbean");
+  _action = _congestion ? spy.ACTION_EXIT|spy.ACTION_STATS : spy.ACTION_STATS;
+  _slow = zorka.boolCfg("http.slow");
+  _slowF = _slow && zorka.boolCfg("http.slow.file");
+  _params = zorka.boolCfg("http.params");
+  _prefix = zorka.stringCfg("http.trace.params.prefix");
+  _error = zorka.boolCfg("http.error");
+  _errorF = zorka.boolCfg("http.error.file");
+  _errors = zorka.setCfg("http.error.codes");
+  _excludedParams = zorka.setCfg("http.params.exclude");
+
+  slow_ft = _slowF ? zorka.rollingFileTrapper("http.slow", "INFO", zorka.stringCfg("http.slow.file.path"),
+                     zorka.intCfg("http.slow.file.num"), zorka.kiloCfg("http.slow.file.max"), false) : null;
+
+  error_ft = _errorF ? zorka.rollingFileTrapper("http.error", "INFO", zorka.stringCfg("http.error.file.path"),
+                       zorka.intCfg("http.error.file.num"), zorka.kiloCfg("http.error.file.max"), false) : null;
+
+
+  param_processor() {
+    process(rec) {
+      sb = new StringBuilder();
+      pmap = rec.get("REQ").getParameterMap();
+      for (e : pmap.entrySet()) {
+        String k = e.getKey();
+        if (_excludedParams.contains(k)) continue;
+        String v = e.getValue().length > 0 ? e.getValue()[0] : "";
+        if (_trace) { tracer.newAttr(_prefix+k, v); }
+        c = sb.length() > 0 ? "&" : "?";
+        sb.append(c + k + "=" + v);
+      }
+      rec.put("PARAMS", sb.toString());
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+
+  error_marker() {
+    process(rec) {
+      rec.put(".STAGES", (rec.get(".STAGES")|(1<<spy.ON_ERROR))&(~(1<<spy.ON_RETURN)));
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
 
   discovery(attr, tag) {
     return zabbix.discovery(zorka.query("java", _mbean, "name", "type").get(attr).listAs("**", tag));

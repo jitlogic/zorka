@@ -18,7 +18,6 @@ package com.jitlogic.zorka.central;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.FileTrapper;
-import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogLevel;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.zico.ZicoService;
@@ -38,7 +37,7 @@ public class CentralInstance {
 
     private CentralConfig config;
 
-    private StoreManager storeManager;
+    private HostStoreManager storeManager;
 
     private ZicoService zicoService;
 
@@ -46,6 +45,7 @@ public class CentralInstance {
 
     private SymbolRegistry symbolRegistry;
 
+    private TraceTemplater traceTemplater;
 
     public CentralInstance(CentralConfig config) {
         this.config = config;
@@ -154,9 +154,9 @@ public class CentralInstance {
     }
 
 
-    public synchronized StoreManager getStoreManager() {
+    public synchronized HostStoreManager getStoreManager() {
         if (null == storeManager) {
-            storeManager = new StoreManager(getConfig(), getDs(), getSymbolRegistry());
+            storeManager = new HostStoreManager(getConfig(), getDs(), getSymbolRegistry(), getTraceTemplater());
         }
         return storeManager;
     }
@@ -190,5 +190,14 @@ public class CentralInstance {
         }
 
         return ds;
+    }
+
+
+    public synchronized TraceTemplater getTraceTemplater() {
+        if (traceTemplater == null) {
+            traceTemplater = new TraceTemplater(getDs(), getSymbolRegistry());
+        }
+
+        return traceTemplater;
     }
 }

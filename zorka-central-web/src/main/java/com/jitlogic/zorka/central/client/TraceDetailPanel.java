@@ -17,9 +17,9 @@ package com.jitlogic.zorka.central.client;
 
 
 import com.google.gwt.cell.client.AbstractCell;
-import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -33,15 +33,23 @@ import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.data.shared.loader.ChildTreeStoreBinding;
 import com.sencha.gxt.data.shared.loader.DataProxy;
 import com.sencha.gxt.data.shared.loader.TreeLoader;
+import com.sencha.gxt.widget.core.client.button.TextButton;
+import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.event.SelectEvent;
+import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor;
+import com.sencha.gxt.widget.core.client.form.SpinnerField;
+import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.RowExpander;
+import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
+import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
+import com.sencha.gxt.widget.core.client.tree.Tree;
 import com.sencha.gxt.widget.core.client.treegrid.TreeGrid;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
-import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,12 +59,112 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
     private TraceDataService tds;
     private TraceInfo traceInfo;
+    private TreeGrid<TraceRecordInfo> methodTree;
+    private TreeStore<TraceRecordInfo> methodTreeStore;
+
 
     public TraceDetailPanel(TraceDataService tds, TraceInfo traceInfo) {
         this.tds = tds;
         this.traceInfo = traceInfo;
+
+        createToolbar();
         createTraceDetailTree();
     }
+
+
+    private void createToolbar() {
+        ToolBar toolBar = new ToolBar();
+
+        TextButton btnSlowestMethod = new TextButton();
+        btnSlowestMethod.setIcon(Resources.INSTANCE.goDownIcon());
+        btnSlowestMethod.setToolTip("Drill down: slowest method");
+        toolBar.add(btnSlowestMethod);
+
+        btnSlowestMethod.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                findNextSlowestMethod();
+            }
+        });
+
+        TextButton btnNextException = new TextButton();
+        btnNextException.setIcon(Resources.INSTANCE.exceptionIcon());
+        btnNextException.setToolTip("Drill down: next exception");
+        toolBar.add(btnNextException);
+
+        toolBar.add(new SeparatorToolItem());
+
+        TextButton btnFilter = new TextButton();
+        btnFilter.setIcon(Resources.INSTANCE.filterIcon());
+        btnFilter.setToolTip("Filter by criteria");
+        toolBar.add(btnFilter);
+
+        final SpinnerField<Double> txtDuration = new SpinnerField<Double>(new NumberPropertyEditor.DoublePropertyEditor());
+        txtDuration.setIncrement(1d);
+        txtDuration.setMinValue(0);
+        txtDuration.setMaxValue(1000000d);
+        txtDuration.setAllowNegative(false);
+        txtDuration.setAllowBlank(true);
+        txtDuration.setWidth(100);
+        txtDuration.setToolTip("Minimum trace execution time (milliseconds)");
+        toolBar.add(txtDuration);
+
+        toolBar.add(new SeparatorToolItem());
+
+        TextButton btnExpandAll = new TextButton();
+        btnExpandAll.setIcon(Resources.INSTANCE.expandIcon());
+        btnExpandAll.setToolTip("Expand all");
+        toolBar.add(btnExpandAll);
+
+        btnExpandAll.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                methodTree.expandAll();
+            }
+        });
+
+        toolBar.add(new SeparatorToolItem());
+
+        TextButton btnSearchPrev = new TextButton();
+        btnSearchPrev.setIcon(Resources.INSTANCE.goPrevIcon());
+        btnSearchPrev.setToolTip("Search previous occurence");
+        toolBar.add(btnSearchPrev);
+
+        TextButton btnSearchNext = new TextButton();
+        btnSearchNext.setIcon(Resources.INSTANCE.goNextIcon());
+        btnSearchNext.setToolTip("Search next");
+        toolBar.add(btnSearchNext);
+
+        final TextField txtFilter = new TextField();
+        BoxLayoutContainer.BoxLayoutData txtFilterLayout = new BoxLayoutContainer.BoxLayoutData();
+        txtFilterLayout.setFlex(1.0);
+        txtFilter.setToolTip("Search for text (in class/method name or attributes)");
+        txtFilter.setLayoutData(txtFilterLayout);
+        toolBar.add(txtFilter);
+
+        add(toolBar, new VerticalLayoutData(1, -1));
+    }
+
+
+    private void findNextSlowestMethod() {
+        TraceRecordInfo info = null;
+
+
+        for (TraceRecordInfo i : methodTreeStore.getAll()) {
+            if ((info == null || i.getTime() > info.getTime()) &&
+                    (!methodTree.isExpanded(i) && !methodTree.isLeaf(i))) {
+                info = i;
+            }
+        }
+
+        if (info != null) {
+            methodTree.setExpanded(info, true);
+            methodTree.getSelectionModel().setSelection(Arrays.asList(info));
+            // TODO scroll to selected row if needed
+        }
+
+    }
+
 
     private void createTraceDetailTree() {
 
@@ -85,8 +193,8 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
             }
         };
 
-        TreeStore<TraceRecordInfo> store = new TreeStore<TraceRecordInfo>(props.key());
-        loader.addLoadHandler(new ChildTreeStoreBinding<TraceRecordInfo>(store));
+        methodTreeStore = new TreeStore<TraceRecordInfo>(props.key());
+        loader.addLoadHandler(new ChildTreeStoreBinding<TraceRecordInfo>(methodTreeStore));
 
         ColumnConfig<TraceRecordInfo, Long> durationCol = new ColumnConfig<TraceRecordInfo, Long>(props.time(), 50, "Time");
         durationCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
@@ -133,12 +241,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
             public void render(Context context, Long time, SafeHtmlBuilder sb) {
                 double pct = 100.0 * time / traceInfo.getExecutionTime();
                 String strTime = NumberFormat.getFormat("###.0").format(pct) + "%";
-                //int g = 255 - (int) (pct * 2.49);
-                //g = g < 0 ? 0 : g > 255 ? 255 : g;
-                int g = (int) (pct * 2.49);
-                //Color bgColor = new Color(255, g, g);
-
-                sb.appendHtmlConstant("<span style=\"color: rgb(" + g + ",0,0);\"><b>");
+                sb.appendHtmlConstant("<span style=\"color: rgb(" + ((int) (pct * 2.49)) + ",0,0);\"><b>");
                 sb.append(SafeHtmlUtils.fromString(strTime));
                 sb.appendHtmlConstant("</b></span>");
             }
@@ -169,7 +272,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
                         expander, methodCol, durationCol, callsCol, errorsCol, pctCol));
 
 
-        TreeGrid<TraceRecordInfo> tree = new TreeGrid<TraceRecordInfo>(store, model, methodCol) {
+        methodTree = new TreeGrid<TraceRecordInfo>(methodTreeStore, model, methodCol) {
             @Override
             protected void onAfterFirstAttach() {
                 super.onAfterFirstAttach();
@@ -180,14 +283,14 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
                 return null;
             }
         };
-        tree.setBorders(true);
-        tree.setTreeLoader(loader);
-        tree.getView().setTrackMouseOver(false);
-        tree.getView().setAutoExpandColumn(methodCol);
-        tree.getView().setForceFit(true);
+        methodTree.setBorders(true);
+        methodTree.setTreeLoader(loader);
+        methodTree.getView().setTrackMouseOver(false);
+        methodTree.getView().setAutoExpandColumn(methodCol);
+        methodTree.getView().setForceFit(true);
 
-        expander.initPlugin(tree);
+        expander.initPlugin(methodTree);
 
-        add(tree, new VerticalLayoutData(1, 1));
+        add(methodTree, new VerticalLayoutData(1, 1));
     }
 }

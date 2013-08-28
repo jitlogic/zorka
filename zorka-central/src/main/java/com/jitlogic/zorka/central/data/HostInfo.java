@@ -31,6 +31,14 @@ public class HostInfo {
     @JsonProperty
     private String path;
 
+    @JsonProperty
+    private String pass;
+
+    @JsonProperty
+    private int flags;
+
+    @JsonProperty
+    private String description;
 
     public int getId() {
         return id;
@@ -70,6 +78,37 @@ public class HostInfo {
     public void setPath(String path) {
         this.path = path;
     }
+
+
+    public String getPass() {
+        return pass;
+    }
+
+
+    public void setPass(String pass) {
+        this.pass = pass;
+    }
+
+
+    public int getFlags() {
+        return flags;
+    }
+
+
+    public void setFlags(int flags) {
+        this.flags = flags;
+    }
+
+
+    public String getDescription() {
+        return description;
+    }
+
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
 
     @Override
     public String toString() {

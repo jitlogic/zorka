@@ -1,3 +1,11 @@
+Zorka 0.9.8 (2013-09-01)
+------------------------
+
+ * zorka-central - network trace collector;
+ * agent profiles - multiple script configuration in single directory;
+ * usual fixes;
+
+
 Zorka 0.9.7 (2013-07-07)
 ------------------------
 

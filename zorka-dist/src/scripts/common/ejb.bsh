@@ -28,6 +28,7 @@ __ejb() {
 
   // Default values for HTTP parameter processing
   zorka.defCfg("ejb.params", "no");
+  zorka.defCfg("ejb.params.prefix", "P:");
   zorka.defCfg("ejb.params.include", "");
   zorka.defCfg("ejb.params.exclude", "**");
 
@@ -53,9 +54,70 @@ __ejb() {
   // Default values for HTTP tracer options
   zorka.defCfg("ejb.trace", zorka.stringCfg("tracer"));
   zorka.defCfg("ejb.trace.time", "1000");
-  zorka.defCfg("ejb.trace.params.prefix", "P:");
 
   _mbean = zorka.stringCfg("ejb.stats.mbean");
+
+
+  slow_trapper = zorka.boolCfg("ejb.slow.file")
+    ? zorka.rollingFileTrapper("ejb.slow", "INFO", zorka.stringCfg("ejb.slow.file.path"),
+              zorka.intCfg("ejb.slow.file.num"), zorka.kiloCfg("ejb.slow.file.max"), false)
+    : null;
+
+  error_trapper = zorka.boolCfg("ejb.error.file")
+    ? zorka.rollingFileTrapper("ejb.error", "INFO", zorka.stringCfg("ejb.error.file.path"),
+                             zorka.intCfg("ejb.error.file.num"), zorka.kiloCfg("ejb.error.file.max"), false)
+    : null;
+
+
+  // Set of types allowed to convert to string by parameter processing
+  // This is for safety purposes: calling toString() on some objects may have
+  // unintended consequences.
+  //
+  // Only basic types are allowed initially. Use ejb.trace.include to add more.
+  types_allowed = zorka.set(
+    "java.lang.Byte", "java.lang.Character", "java.lang.Short", "java.lang.Integer", "java.lang.Long",
+    "java.lang.String", "java.lang.Double", "java.lang.Float");
+
+
+  arg_processor() {
+
+    _trace_enabled = zorka.boolCfg("ejb.trace");
+    _params_prefix = zorka.stringCfg("ejb.params.prefix");
+
+    zorka.logInfo("EJB argument processing enabled.");
+
+    str(obj) {
+      if (obj == null) {
+        return "null";
+      } else if (types.allowed.contains(obj.getClass().getName())) {
+        return obj.toString();
+      } else {
+        return "<" + obj.getClass().getName() + "@" + System.identityHashCode(obj) + ">";
+      }
+    }
+
+    process(rec) {
+      rec.put("RET", str(rec.get("RET")));
+      args = rec.get("INV").getArguments();
+      sb = new StringBuilder();
+      if (args != null) {
+        for (i = 0; i < args.length; i++) {
+          sb.append(sb.length() > 0 ? ", " : "");
+          sb.append(str(arg));
+          if (_trace_enabled) {
+            tracer.newAttr(_params_prefix + i, s);
+          }
+        }
+      }
+      rec.put("PARAMS", sb.toString());
+      return rec;
+    }
+
+    return this;
+  }
+
+
+  // Utility functions (for zabbix)
 
   discovery(attr, tag) {
     return zabbix.discovery(zorka.query("java", _mbean, "name", "type").get(attr).listAs("**", tag));

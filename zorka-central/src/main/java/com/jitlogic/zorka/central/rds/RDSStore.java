@@ -71,6 +71,9 @@ public class RDSStore implements Closeable {
         open();
     }
 
+    public String getBasePath() {
+        return basePath;
+    }
 
     private void open() throws IOException {
         File baseDir = new File(basePath);
@@ -172,7 +175,7 @@ public class RDSStore implements Closeable {
     }
 
 
-    public long write(byte[] data) throws IOException {
+    public synchronized long write(byte[] data) throws IOException {
 
         if (output == null) {
             throw new RDSException("Trying to write data to closed RDS.");
@@ -199,7 +202,7 @@ public class RDSStore implements Closeable {
     }
 
 
-    public byte[] read(long offs, int length) throws IOException {
+    public synchronized byte[] read(long offs, int length) throws IOException {
 
         if (offs >= outputStart && offs <= outputPos + outputStart) {
             if (input == null) {

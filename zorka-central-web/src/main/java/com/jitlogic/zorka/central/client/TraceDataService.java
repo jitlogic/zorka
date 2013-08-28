@@ -16,17 +16,13 @@
 package com.jitlogic.zorka.central.client;
 
 
-import com.jitlogic.zorka.central.data.HostInfo;
-import com.jitlogic.zorka.central.data.PagingData;
-import com.jitlogic.zorka.central.data.TraceInfo;
-import com.jitlogic.zorka.central.data.TraceRecordInfo;
+import com.jitlogic.zorka.central.data.*;
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.RestService;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface TraceDataService extends RestService {
@@ -36,28 +32,13 @@ public interface TraceDataService extends RestService {
     public void listHosts(MethodCallback<List<HostInfo>> callback);
 
 
-    @GET
-    @Path("hosts/{hostId}/list?limit={limit}&offset={offset}")
-    public void listTraces(@PathParam("hostId") int hostId,
-                           @PathParam("offset") int offset,
-                           @PathParam("limit") int limit,
-                           MethodCallback<List<TraceInfo>> callback);
-
-
-    @GET
-    @Path("hosts/{hostId}/page?limit={limit}&offset={offset}&orderBy={orderBy}&orderDir={orderDir}")
+    @POST
+    @Path("hosts/{hostId}/page?limit={limit}&offset={offset}")
     public void pageTraces(@PathParam("hostId") int hostId,
                            @PathParam("offset") int offset,
                            @PathParam("limit") int limit,
-                           @PathParam("orderBy") String orderBy,
-                           @PathParam("orderDir") String orderDir,
+                           TraceListFilterExpression filter,
                            MethodCallback<PagingData<TraceInfo>> callback);
-
-
-    @GET
-    @Path("hosts/{hostId}/count")
-    public void countTraces(@PathParam("hostId") int hostId,
-                            MethodCallback<Integer> callback);
 
 
     @GET
@@ -75,5 +56,23 @@ public interface TraceDataService extends RestService {
                                @PathParam("path") String path,
                                MethodCallback<TraceRecordInfo> callback);
 
+
+    @POST
+    @Path("hosts/")
+    public void addHost(HostInfo hostInfo,
+                        MethodCallback<Void> callback);
+
+
+    @PUT
+    @Path("hosts/{hostId}")
+    public void updateHost(@PathParam("hostId") int hostId,
+                           HostInfo hostIndo,
+                           MethodCallback<Void> callback);
+
+
+    @DELETE
+    @Path("hosts/{hostId}")
+    public void deleteHost(@PathParam("hostId") int hostId,
+                           MethodCallback<Void> callback);
 
 }

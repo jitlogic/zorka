@@ -50,7 +50,7 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
         conn = new ZicoClientConnector(addr, port);
 
         this.writer = writer;
-        this.os = new ByteArrayOutputStream(512*1024);
+        this.os = new ByteArrayOutputStream(512 * 1024);
         this.writer.setOutput(this);
     }
 
@@ -73,9 +73,10 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
                 throw new ZicoException(rslt.getStatus(), "Error submitting data.");
             }
         } catch (Exception e) {
-            // TODO log.error (...
+            log.error(ZorkaLogger.ZCL_STORE, "Error sending trace record. Resetting connection.", e);
             this.close();
             this.open();
+            // TODO push record back to a queue
         }
     }
 
@@ -83,11 +84,11 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
     @Override
     protected void open() {
         try {
+            writer.reset();
             conn.connect();
             conn.hello(hostname, auth);
-
         } catch (Exception e) {
-            // TODO log.error(... - rozszyć logger !!!
+            log.error(ZorkaLogger.ZCL_STORE, "Error connecting " + conn.getAddr() + ":" + conn.getPort(), e);
         }
     }
 
@@ -96,7 +97,7 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
         try {
             conn.close();
         } catch (IOException e) {
-            // TODO log.error(... - rozszyć logger !!!
+            log.error(ZorkaLogger.ZCL_STORE, "Error disconnecting " + conn.getAddr() + ":" + conn.getPort(), e);
         }
     }
 

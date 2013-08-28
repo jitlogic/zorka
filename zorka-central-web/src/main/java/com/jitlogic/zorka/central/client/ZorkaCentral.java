@@ -17,6 +17,7 @@ package com.jitlogic.zorka.central.client;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
 import org.fusesource.restygwt.client.Resource;
@@ -27,28 +28,21 @@ public class ZorkaCentral implements EntryPoint {
 
     private TraceDataService traceDataService;
 
-    public void add(IsWidget w, String title) {
-
-    }
-
-    public TraceDataService getTraceDataService() {
-        return traceDataService;
-    }
-
     private ZorkaCentralShell shell;
 
     public void onModuleLoad() {
 
-        traceDataService = GWT.create(TraceDataService.class);
-        ((RestServiceProxy) traceDataService).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
-
-        Window.enableScrolling(false);
-
-        shell = new ZorkaCentralShell(traceDataService);
-
-        RootPanel.get().add(shell);
-
-        onReady();
+        Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
+            @Override
+            public void execute() {
+                traceDataService = GWT.create(TraceDataService.class);
+                ((RestServiceProxy) traceDataService).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
+                Window.enableScrolling(false);
+                shell = new ZorkaCentralShell(traceDataService);
+                RootPanel.get().add(shell);
+                onReady();
+            }
+        });
     }
 
     private native void onReady() /*-{

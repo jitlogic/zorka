@@ -66,11 +66,21 @@ if (zorka.boolCfg("tracer", false)) {
     }
   }
 
-  tracer.output(tracer.toFile(
-    zorka.stringCfg("tracer.log.path", "${zorka.log.dir}/trace.ztr"),
-    zorka.intCfg("tracer.log.fnum", 16),
-    zorka.kiloCfg("tracer.log.size", 32*1024*1024),
-    zorka.boolCfg("tracer.log.compress", true)));
+  if (zorka.boolCfg("tracer.file", true)) {
+    tracer.output(tracer.toFile(
+      zorka.stringCfg("tracer.file.path", "${zorka.log.dir}/trace.ztr"),
+      zorka.intCfg("tracer.file.fnum", 16),
+      zorka.kiloCfg("tracer.file.size", 32*1024*1024),
+      zorka.boolCfg("tracer.file.compress", true)));
+  }
+
+  if (zorka.boolCfg("tracer.net", false)) {
+    tracer.output(tracer.toCentral(
+      zorka.stringCfg("tracer.net.addr", "127.0.0.1"),
+      zorka.intCfg("tracer.net.port", 8640),
+      zorka.stringCfg("tracer.net.host", zorka.getHostname()),
+      zorka.stringCfg("tracer.net.pass", "changeme")));
+  }
 
   if (zorka.hasCfg("tracer.min.method.time")) {
     mmt = zorka.longCfg("tracer.min.method.time", 250000);

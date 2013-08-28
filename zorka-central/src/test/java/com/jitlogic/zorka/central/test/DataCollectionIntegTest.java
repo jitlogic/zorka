@@ -63,7 +63,7 @@ public class DataCollectionIntegTest extends CentralFixture {
     }
 
 
-    @Test(timeout = 1000)
+    @Test//(timeout = 1000)
     public void testCollectSingleTraceRecord() throws Exception {
         JdbcTemplate jdbc = new JdbcTemplate(instance.getDs());
         TraceRecord rec = generator.generate();

@@ -35,17 +35,23 @@ public class TraceBuilder {
     private final static ZorkaLog log = ZorkaLogger.getLog(TraceBuilder.class);
 
 
-    /** Output */
+    /**
+     * Output
+     */
     private TracerOutput output;
 
     private SymbolRegistry symbols;
 
-    /** Top of trace records stack. */
+    /**
+     * Top of trace records stack.
+     */
     private TraceRecord ttop = new TraceRecord(null);
 
     private boolean disabled;
 
-    /** Number of records collected so far */
+    /**
+     * Number of records collected so far
+     */
     private int numRecords = 0;
 
 
@@ -73,7 +79,7 @@ public class TraceBuilder {
         } else {
             ttop.setMarker(new TraceMarker(ttop, traceId, clock));
             ttop.markFlag(TraceRecord.TRACE_BEGIN);
-            ttop.getMarker().markFlag(flags);
+            ttop.getMarker().markFlags(flags);
         }
     }
 
@@ -86,10 +92,10 @@ public class TraceBuilder {
 
         if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACER_DBG)) {
             if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS) ||
-                 (ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
-                 log.trace(ZorkaLogger.ZTR_TRACER_DBG, "traceEnter("
-                     + symbols.symbolName(classId) + "." + symbols.symbolName(methodId) + ")");
-             }
+                    (ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
+                log.trace(ZorkaLogger.ZTR_TRACER_DBG, "traceEnter("
+                        + symbols.symbolName(classId) + "." + symbols.symbolName(methodId) + ")");
+            }
         }
 
         if (!ttop.isEmpty()) {
@@ -125,11 +131,13 @@ public class TraceBuilder {
 
         if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACER_DBG)) {
             if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS) ||
-                (ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
+                    (ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
                 TraceRecord tr = ttop;
-                if (tr.getClassId() == 0 && tr.getParent() != null) { tr = tr.getParent(); }
+                if (tr.getClassId() == 0 && tr.getParent() != null) {
+                    tr = tr.getParent();
+                }
                 log.trace(ZorkaLogger.ZTR_TRACER_DBG, "traceReturn("
-                    + symbols.symbolName(tr.getClassId()) + "." + symbols.symbolName(tr.getMethodId()) + ")");
+                        + symbols.symbolName(tr.getClassId()) + "." + symbols.symbolName(tr.getMethodId()) + ")");
             }
         }
 
@@ -151,11 +159,13 @@ public class TraceBuilder {
 
         if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACER_DBG)) {
             if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_EXCEPTIONS) ||
-                (ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
+                    (ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
                 TraceRecord tr = ttop;
-                if (tr.getClassId() == 0 && tr.getParent() != null) { tr = tr.getParent(); }
+                if (tr.getClassId() == 0 && tr.getParent() != null) {
+                    tr = tr.getParent();
+                }
                 log.trace(ZorkaLogger.ZTR_TRACER_DBG, "traceError(" + symbols.symbolName(tr.getClassId()) +
-                    "." + symbols.symbolName(tr.getMethodId()) + ")", (Throwable)exception);
+                        "." + symbols.symbolName(tr.getMethodId()) + ")", (Throwable) exception);
             }
         }
 
@@ -200,7 +210,6 @@ public class TraceBuilder {
      * trace record from top of stack but it also implements quite a bit of logic handling
      * various aspects of handling trace records (filtering, limiting number of records in one
      * frame, reusing trace record if suitable etc.).
-     *
      */
     private void pop() {
 
@@ -214,7 +223,7 @@ public class TraceBuilder {
         // Submit data if trace marker found
         if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {
             int flags = ttop.getMarker().getFlags();
-            if ( (ttop.getTime() >= ttop.getMarker().getMinimumTime() && 0 == (flags & TraceMarker.DROP_TRACE))
+            if ((ttop.getTime() >= ttop.getMarker().getMinimumTime() && 0 == (flags & TraceMarker.DROP_TRACE))
                     || 0 != (flags & TraceMarker.SUBMIT_TRACE)) {
                 submit(ttop);
                 AgentDiagnostics.inc(AgentDiagnostics.TRACES_SUBMITTED);
@@ -239,7 +248,7 @@ public class TraceBuilder {
                     reparentTop(parent);
 
                 } else {
-                    parent.getMarker().markFlag(TraceMarker.OVERFLOW_FLAG);
+                    parent.getMarker().markFlags(TraceMarker.OVERFLOW_FLAG);
                 }
                 clean = false;
             }
@@ -266,8 +275,8 @@ public class TraceBuilder {
     private void popException() {
         // Get rid of redundant exception object
         if (ttop.getException() != null && ttop.numChildren() > 0) {
-            Throwable tex = (Throwable)ttop.getException();
-            Throwable cex = (Throwable)ttop.getChild(ttop.numChildren()-1).getException();
+            Throwable tex = (Throwable) ttop.getException();
+            Throwable cex = (Throwable) ttop.getChild(ttop.numChildren() - 1).getException();
             if (cex == tex) {
                 ttop.setException(null);
                 ttop.markFlag(TraceRecord.EXCEPTION_PASS);
@@ -296,6 +305,9 @@ public class TraceBuilder {
 
     private void submit(TraceRecord record) {
         record.fixup(symbols);
+        if (record.getException() != null || record.hasFlag(TraceRecord.EXCEPTION_PASS)) {
+            record.getMarker().markFlags(TraceMarker.ERROR_MARK);
+        }
         output.submit(record);
     }
 
@@ -318,7 +330,7 @@ public class TraceBuilder {
     public void markTraceFlag(int flag) {
         TraceRecord top = realTop();
         if (top.getMarker() != null) {
-            top.getMarker().markFlag(flag);
+            top.getMarker().markFlags(flag);
         }
     }
 
