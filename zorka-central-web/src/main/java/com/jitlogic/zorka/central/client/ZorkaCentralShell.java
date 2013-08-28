@@ -15,6 +15,8 @@
  */
 package com.jitlogic.zorka.central.client;
 
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.core.client.util.Margins;
@@ -28,10 +30,21 @@ public class ZorkaCentralShell extends BorderLayoutContainer {
 
     private TabPanel tabPanel;
 
+    private final static int DX = 0;
+    private final static int DY = 0;
 
     public ZorkaCentralShell(TraceDataService tds) {
 
-        setPixelSize(Window.getClientWidth() - 10, Window.getClientHeight() - 16);
+        Window.enableScrolling(false);
+        setPixelSize(Window.getClientWidth() - DX, Window.getClientHeight() - DY);
+
+        Window.addResizeHandler(new ResizeHandler() {
+            @Override
+            public void onResize(ResizeEvent event) {
+                ZorkaCentralShell.this.setPixelSize(Window.getClientWidth() - DX, Window.getClientHeight() - DY);
+            }
+        });
+
 
         BorderLayoutContainer.BorderLayoutData westData = new BorderLayoutContainer.BorderLayoutData(256);
         westData.setMargins(new Margins(5, 0, 5, 5));
@@ -55,6 +68,7 @@ public class ZorkaCentralShell extends BorderLayoutContainer {
         MarginData centerData = new MarginData();
         centerData.setMargins(new Margins(5));
         setCenterWidget(tabPanel, centerData);
+
     }
 
 
@@ -68,7 +82,7 @@ public class ZorkaCentralShell extends BorderLayoutContainer {
 
     @Override
     protected void onWindowResize(int width, int height) {
-        setPixelSize(width - 10, height - 16);
+        setPixelSize(width - DX, height - DY);
     }
 
 }
