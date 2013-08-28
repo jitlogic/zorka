@@ -74,12 +74,14 @@ public class HostStore implements Closeable {
             info.setMethodFlags(rs.getInt("RFLAGS"));
             info.setTraceFlags(rs.getInt("TFLAGS"));
             info.setStatus(rs.getInt("STATUS"));
+            info.setClassId(rs.getInt("CLASS_ID"));
+            info.setMethodId(rs.getInt("METHOD_ID"));
+            info.setSignatureId(rs.getInt("SIGN_ID"));
             info.setCalls(rs.getLong("CALLS"));
             info.setErrors(rs.getLong("ERRORS"));
             info.setRecords(rs.getLong("RECORDS"));
             info.setExecutionTime(rs.getLong("EXTIME"));
 
-            StringBuilder sdesc = new StringBuilder();
             Map<String, String> attrs = new HashMap<String, String>();
 
             try {
@@ -90,19 +92,7 @@ public class HostStore implements Closeable {
 
             info.setAttributes(attrs);
 
-            sdesc.append(manager.getSymbolRegistry().symbolName(rs.getInt("TRACE_ID")));
-
-            for (Map.Entry<String, String> e : attrs.entrySet()) {
-                sdesc.append("|");
-                if (e.getValue().length() > 50) {
-                    sdesc.append(e.getValue().substring(0, 50));
-                } else {
-                    sdesc.append(e.getValue());
-                }
-            }
-
-            info.setDescription(sdesc.toString());
-
+            info.setDescription(manager.getTraceTemplater().templateDescription(info));
 
             return info;
         }

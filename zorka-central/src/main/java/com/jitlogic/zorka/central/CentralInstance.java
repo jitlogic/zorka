@@ -45,6 +45,7 @@ public class CentralInstance {
 
     private SymbolRegistry symbolRegistry;
 
+    private TraceTemplater traceTemplater;
 
     public CentralInstance(CentralConfig config) {
         this.config = config;
@@ -155,7 +156,7 @@ public class CentralInstance {
 
     public synchronized HostStoreManager getStoreManager() {
         if (null == storeManager) {
-            storeManager = new HostStoreManager(getConfig(), getDs(), getSymbolRegistry());
+            storeManager = new HostStoreManager(getConfig(), getDs(), getSymbolRegistry(), getTraceTemplater());
         }
         return storeManager;
     }
@@ -189,5 +190,14 @@ public class CentralInstance {
         }
 
         return ds;
+    }
+
+
+    public synchronized TraceTemplater getTraceTemplater() {
+        if (traceTemplater == null) {
+            traceTemplater = new TraceTemplater(getDs(), getSymbolRegistry());
+        }
+
+        return traceTemplater;
     }
 }

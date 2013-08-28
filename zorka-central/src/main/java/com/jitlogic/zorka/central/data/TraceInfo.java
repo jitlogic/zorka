@@ -47,6 +47,15 @@ public class TraceInfo {
     int status;
 
     @JsonProperty
+    int classId;
+
+    @JsonProperty
+    int methodId;
+
+    @JsonProperty
+    int signatureId;
+
+    @JsonProperty
     long calls;
 
     @JsonProperty
@@ -126,6 +135,30 @@ public class TraceInfo {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public int getClassId() {
+        return classId;
+    }
+
+    public void setClassId(int classId) {
+        this.classId = classId;
+    }
+
+    public int getMethodId() {
+        return methodId;
+    }
+
+    public void setMethodId(int methodId) {
+        this.methodId = methodId;
+    }
+
+    public int getSignatureId() {
+        return signatureId;
+    }
+
+    public void setSignatureId(int signatureId) {
+        this.signatureId = signatureId;
     }
 
     public long getCalls() {
