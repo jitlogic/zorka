@@ -19,10 +19,12 @@ package com.jitlogic.zorka.core.spy;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.tracedata.FileTraceOutput;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
+import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
 import com.jitlogic.zorka.core.util.OverlayClassLoader;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -44,7 +46,9 @@ public class TracerLib {
 
     private ZorkaConfig config;
 
-    /** Default trace flags */
+    /**
+     * Default trace flags
+     */
     private int defaultTraceFlags = TraceMarker.DROP_INTERIM;
 
     /**
@@ -96,7 +100,6 @@ public class TracerLib {
      * Starts a new (named) trace.
      *
      * @param name trace name
-     *
      * @return spy processor object marking new trace
      */
     public SpyProcessor begin(String name) {
@@ -107,10 +110,8 @@ public class TracerLib {
     /**
      * Starts new trace.
      *
-     * @param name trace name
-     *
+     * @param name             trace name
      * @param minimumTraceTime minimum trace time
-     *
      * @return spy processor object marking new trace
      */
     public SpyProcessor begin(String name, long minimumTraceTime) {
@@ -121,12 +122,9 @@ public class TracerLib {
     /**
      * Starts new trace.
      *
-     * @param name trace name
-     *
+     * @param name             trace name
      * @param minimumTraceTime minimum trace time
-     *
-     * @param flags initial flags
-     *
+     * @param flags            initial flags
      * @return spy processor object marking new trace
      */
     public SpyProcessor begin(String name, long minimumTraceTime, int flags) {
@@ -138,9 +136,7 @@ public class TracerLib {
      * Creates spy processor that attaches attribute to trace record.
      *
      * @param srcField source field name (from spy record)
-     *
-     * @param dstAttr destination attribute name (in trace data)
-     *
+     * @param dstAttr  destination attribute name (in trace data)
      * @return spy processor object adding new trace attribute
      */
     public SpyProcessor attr(String srcField, String dstAttr) {
@@ -148,11 +144,14 @@ public class TracerLib {
     }
 
 
+    public SpyProcessor markError() {
+        return new TraceMarkerProcessor(tracer, TraceMarker.ERROR_MARK);
+    }
+
     /**
      * Adds trace attribute to trace record immediately. This is useful for programmatic attribute setting.
      *
-     * @param name attribute name
-     *
+     * @param name  attribute name
      * @param value attribute value
      */
     public void newAttr(String name, Object value) {
@@ -163,7 +162,6 @@ public class TracerLib {
      * Creates spy processor that sets flags in trace marker.
      *
      * @param flags flags to set
-     *
      * @return spy processor object
      */
     public SpyProcessor flags(int flags) {
@@ -175,9 +173,7 @@ public class TracerLib {
      * Creates spy processor that sets flags in trace marker only if given record field is null.
      *
      * @param srcField spy record field to be checked
-     *
-     * @param flags flags to set
-     *
+     * @param flags    flags to set
      * @return spy processor object
      */
     public SpyProcessor flags(String srcField, int flags) {
@@ -188,11 +184,10 @@ public class TracerLib {
     /**
      * Creates trace file writer object. Trace writer can receive traces and store them in a file.
      *
-     * @param path path to a file
+     * @param path     path to a file
      * @param maxFiles maximum number of archived files
-     * @param maxSize maximum file size
+     * @param maxSize  maximum file size
      * @param compress output file will be compressed if true
-     *
      * @return trace file writer
      */
     public ZorkaAsyncThread<SymbolicRecord> toFile(String path, int maxFiles, long maxSize, boolean compress) {
@@ -202,9 +197,29 @@ public class TracerLib {
         return output;
     }
 
+
     public ZorkaAsyncThread<SymbolicRecord> toFile(String path, int maxFiles, long maxSize) {
         return toFile(path, maxFiles, maxSize, false);
     }
+
+
+    /**
+     * Creates trace network sender. It will receive traces and send them to remote collector.
+     *
+     * @param addr     collector host name or IP address
+     * @param port     collector port
+     * @param hostname agent name - this will be presented in collector console;
+     * @param auth
+     * @return
+     * @throws IOException
+     */
+    public ZorkaAsyncThread<SymbolicRecord> toCentral(String addr, int port, String hostname, String auth) throws IOException {
+        TraceWriter writer = new FressianTraceWriter(symbolRegistry, metricsRegistry);
+        ZicoTraceOutput output = new ZicoTraceOutput(writer, addr, port, hostname, auth);
+        output.start();
+        return output;
+    }
+
 
     public SpyProcessor filterBy(String srcField, Boolean defval, Set<Object> yes, Set<Object> no, Set<Object> maybe) {
         return new TraceFilterProcessor(tracer, srcField, defval, yes, no, maybe);
@@ -212,7 +227,7 @@ public class TracerLib {
 
 
     public void filterTrace(boolean decision) {
-        TraceBuilder builder = (TraceBuilder)tracer.getHandler();
+        TraceBuilder builder = (TraceBuilder) tracer.getHandler();
         builder.markTraceFlag(decision ? TraceMarker.SUBMIT_TRACE : TraceMarker.DROP_TRACE);
     }
 
@@ -278,7 +293,7 @@ public class TracerLib {
 
 
     public void setTracerMaxTraceRecords(long maxRecords) {
-        Tracer.setMaxTraceRecords((int)maxRecords);
+        Tracer.setMaxTraceRecords((int) maxRecords);
     }
 
 

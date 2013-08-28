@@ -17,32 +17,38 @@ package com.jitlogic.zorka.central.client;
 
 
 import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.jitlogic.zorka.central.data.HostInfo;
-import com.jitlogic.zorka.central.data.PagingData;
-import com.jitlogic.zorka.central.data.TraceInfo;
-import com.jitlogic.zorka.central.data.TraceInfoProperties;
+import com.google.gwt.user.client.ui.ImageResourceRenderer;
+import com.jitlogic.zorka.central.data.*;
+import com.jitlogic.zorka.common.tracedata.TraceMarker;
+import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
-import com.sencha.gxt.data.shared.SortDir;
 import com.sencha.gxt.data.shared.SortInfo;
 import com.sencha.gxt.data.shared.loader.*;
+import com.sencha.gxt.widget.core.client.button.TextButton;
+import com.sencha.gxt.widget.core.client.button.ToggleButton;
+import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.CellDoubleClickEvent;
+import com.sencha.gxt.widget.core.client.event.SelectEvent;
+import com.sencha.gxt.widget.core.client.form.*;
 import com.sencha.gxt.widget.core.client.grid.*;
+import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
+import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 public class TraceListPanel extends VerticalLayoutContainer {
@@ -58,22 +64,30 @@ public class TraceListPanel extends VerticalLayoutContainer {
     private PagingLoader<PagingLoadConfig, PagingLoadResult<TraceInfo>> traceLoader;
     private LiveGridView<TraceInfo> traceGridView;
 
+    TraceListFilterExpression filter = new TraceListFilterExpression();
+
     private ZorkaCentralShell shell;
+    private ToggleButton btnErrors;
 
     public TraceListPanel(ZorkaCentralShell shell, TraceDataService tds, HostInfo hostInfo) {
         this.shell = shell;
         this.tds = tds;
         this.selectedHost = hostInfo;
 
+        filter.setSortBy("clock");
+        filter.setSortAsc(false);
+
+        createToolbar();
         createTraceListGrid();
     }
 
 
     private void createTraceListGrid() {
-        ColumnConfig<TraceInfo, Long> clockCol = new ColumnConfig<TraceInfo, Long>(props.clock(), 100, "Clock");
+
+        ColumnConfig<TraceInfo, Long> clockCol = new ColumnConfig<TraceInfo, Long>(props.clock(), 100, "Time");
         clockCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
-        ColumnConfig<TraceInfo, Long> durationCol = new ColumnConfig<TraceInfo, Long>(props.executionTime(), 50, "Time");
+        ColumnConfig<TraceInfo, Long> durationCol = new ColumnConfig<TraceInfo, Long>(props.executionTime(), 50, "Duration");
         durationCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
         ColumnConfig<TraceInfo, Long> callsCol = new ColumnConfig<TraceInfo, Long>(props.calls(), 50, "Calls");
@@ -85,10 +99,17 @@ public class TraceListPanel extends VerticalLayoutContainer {
         ColumnConfig<TraceInfo, Long> recordsCol = new ColumnConfig<TraceInfo, Long>(props.records(), 50, "Records");
         recordsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
-        ColumnConfig<TraceInfo, String> descCol = new ColumnConfig<TraceInfo, String>(props.description(), 500, "Description");
+        ColumnConfig<TraceInfo, TraceInfo> descCol = new ColumnConfig<TraceInfo, TraceInfo>(
+                new IdentityValueProvider<TraceInfo>(), 500, "Description");
+
+        descCol.setSortable(false);
+        descCol.setMenuDisabled(true);
+
+        RowExpander<TraceInfo> expander = new RowExpander<TraceInfo>(
+                new IdentityValueProvider<TraceInfo>(), new TraceDetailCell());
 
         ColumnModel<TraceInfo> model = new ColumnModel<TraceInfo>(Arrays.<ColumnConfig<TraceInfo, ?>>asList(
-                clockCol, durationCol, callsCol, errorsCol, recordsCol, descCol));
+                expander, clockCol, durationCol, callsCol, errorsCol, recordsCol, descCol));
 
         clockCol.setCell(new AbstractCell<Long>() {
             @Override
@@ -109,6 +130,16 @@ public class TraceListPanel extends VerticalLayoutContainer {
             }
         });
 
+        descCol.setCell(new AbstractCell<TraceInfo>() {
+            @Override
+            public void render(Context context, TraceInfo ti, SafeHtmlBuilder sb) {
+                String color = ti.getStatus() != 0 ? "red" : "black";
+                sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
+                sb.append(SafeHtmlUtils.fromString(ti.getDescription()));
+                sb.appendHtmlConstant("</span>");
+            }
+        });
+
         traceStore = new ListStore<TraceInfo>(new ModelKeyProvider<TraceInfo>() {
             @Override
             public String getKey(TraceInfo item) {
@@ -125,10 +156,10 @@ public class TraceListPanel extends VerticalLayoutContainer {
             public void load(final PagingLoadConfig loadConfig, final Callback<PagingLoadResult<TraceInfo>, Throwable> callback) {
                 if (selectedHost != null) {
                     List<? extends SortInfo> sort = loadConfig.getSortInfo();
-                    String orderBy = sort.size() > 0 ? sort.get(0).getSortField() : "clock";
-                    String orderDir = sort.size() > 0 ? sort.get(0).getSortDir().name() : "DESC";
+                    filter.setSortBy(sort.size() > 0 ? sort.get(0).getSortField() : "clock");
+                    filter.setSortAsc(sort.size() > 0 ? sort.get(0).getSortDir().name().equals("ASC") : false);
                     tds.pageTraces(selectedHost.getId(), loadConfig.getOffset(), loadConfig.getLimit(),
-                            orderBy, orderDir,
+                            filter,
                             new MethodCallback<PagingData<TraceInfo>>() {
                                 @Override
                                 public void onFailure(Method method, Throwable exception) {
@@ -176,7 +207,98 @@ public class TraceListPanel extends VerticalLayoutContainer {
             }
         });
 
+        expander.initPlugin(traceGrid);
+
         add(traceGrid, new VerticalLayoutData(1, 1));
+    }
+
+
+    private void createToolbar() {
+        ToolBar toolBar = new ToolBar();
+
+        TextButton btnRefresh = new TextButton();
+        btnRefresh.setIcon(Resources.INSTANCE.refreshIcon());
+        btnRefresh.setToolTip("Refresh data");
+        toolBar.add(btnRefresh);
+
+        btnRefresh.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                traceGridView.refresh();
+            }
+        });
+
+        toolBar.add(new SeparatorToolItem());
+
+        btnErrors = new ToggleButton();
+        btnErrors.setIcon(Resources.INSTANCE.errorMarkIcon());
+        btnErrors.setToolTip("Show only error traces.");
+
+        toolBar.add(btnErrors);
+
+        btnErrors.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<Boolean> event) {
+                filter.setErrorsOnly(event.getValue());
+                traceGridView.refresh();
+            }
+        });
+
+        toolBar.add(new SeparatorToolItem());
+
+//        TextButton btnSetStart = new TextButton();
+//        btnSetStart.setIcon(Resources.INSTANCE.goNextIcon());
+//        btnSetStart.setToolTip("Go to specific point in time.");
+//        toolBar.add(btnSetStart);
+//
+//        DateField txtStartDate = new DateField();
+//        txtStartDate.setWidth(100);
+//        toolBar.add(txtStartDate);
+//
+//        TimeField txtStartTime = new TimeField();
+//        txtStartTime.setWidth(80);
+//        toolBar.add(txtStartTime);
+//
+//        toolBar.add(new SeparatorToolItem());
+
+        TextButton btnFilter = new TextButton();
+        btnFilter.setIcon(Resources.INSTANCE.filterIcon());
+        btnFilter.setToolTip("Filter by criteria");
+        toolBar.add(btnFilter);
+
+        final SpinnerField<Double> txtDuration = new SpinnerField<Double>(new NumberPropertyEditor.DoublePropertyEditor());
+        txtDuration.setIncrement(1d);
+        txtDuration.setMinValue(0);
+        txtDuration.setMaxValue(1000000d);
+        txtDuration.setAllowNegative(false);
+        txtDuration.setAllowBlank(true);
+        txtDuration.setWidth(80);
+        txtDuration.setToolTip("Minimum trace execution time (in seconds)");
+        toolBar.add(txtDuration);
+
+        final TextField txtFilter = new TextField();
+        BoxLayoutContainer.BoxLayoutData txtFilterLayout = new BoxLayoutContainer.BoxLayoutData();
+        txtFilterLayout.setFlex(1.0);
+        txtFilter.setToolTip("Search for text (as in Description field)");
+        txtFilter.setLayoutData(txtFilterLayout);
+        toolBar.add(txtFilter);
+
+        btnFilter.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                GWT.log("Setting filter to " + txtFilter.getText());
+                filter.setFilterExpr(txtFilter.getValue());
+                if (txtDuration.getCurrentValue() != null) {
+                    filter.setMinTime((long) (txtDuration.getCurrentValue() * 1000000000L));
+                } else {
+                    filter.setMinTime(0);
+                }
+                traceGridView.refresh();
+            }
+        });
+
+
+        add(toolBar, new VerticalLayoutData(1, -1));
     }
 
 }

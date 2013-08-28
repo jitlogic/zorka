@@ -18,78 +18,29 @@
 
 __catalina() {
 
-  _trace = zorka.boolCfg("http.trace");
-  _stats = zorka.boolCfg("http.stats");
-  _congestion = zorka.boolCfg("http.stats.congestion");
-  _mbean = zorka.stringCfg("http.stats.mbean");
-  _action = _congestion ? spy.ACTION_EXIT|spy.ACTION_STATS : spy.ACTION_STATS;
-  _slow = zorka.boolCfg("http.slow.log"); 
-  _slowF = _slow && zorka.boolCfg("http.slow.file");
-  _params = zorka.boolCfg("http.params");
-  _prefix = zorka.stringCfg("http.trace.params.prefix");
-  _error = zorka.boolCfg("http.error.log");
-  _errorF = zorka.boolCfg("http.error.file");
-  _errors = zorka.setCfg("http.error.codes");
-  _excludedParams = zorka.setCfg("http.params.exclude");
-
-  slowFT = _slowF ? zorka.rollingFileTrapper("http.slow", "INFO", zorka.stringCfg("http.slow.file.path"), 
-                        zorka.intCfg("http.slow.file.num"), zorka.kiloCfg("http.slow.file.max"), false) : null;
-
-  errorFT = _errorF ? zorka.rollingFileTrapper("http.error", "INFO", zorka.stringCfg("http.error.file.path"), 
-                        zorka.intCfg("http.error.file.num"), zorka.kiloCfg("http.error.file.max"), false) : null;
-
-
-  __processParams() {
-    process(rec) {
-      sb = new StringBuilder();
-      pmap = rec.get("REQ").getParameterMap();
-      for (e : pmap.entrySet()) {
-        String k = e.getKey();
-        if (_excludedParams.contains(k)) continue;
-        String v = e.getValue().length > 0 ? e.getValue()[0] : "";
-        if (_trace) { tracer.newAttr(_prefix+k, v); }
-        c = sb.length() > 0 ? "&" : "?";
-        sb.append(c + k + "=" + v);
-      }
-      rec.put("PARAMS", sb.toString());
-      return rec;
-    }
-    return this;
-  }
-
-
-  __markError() {
-    process(rec) {
-      rec.put(".STAGES", (rec.get(".STAGES")|(1<<spy.ON_ERROR))&(~(1<<spy.ON_RETURN)));
-      return rec;
-    }
-    return this;
-  }
-
-
   spy.add(spy.instrument()
     .onEnter(spy.fetchArg("REQ", 1), spy.fetchArg("RESP", 2),
       spy.format("URI", "${REQ.request.requestURI}"),
-      _trace ? tracer.begin("HTTP_REQ", zorka.longCfg("http.trace.time")) : null,
-      _trace ? tracer.attr("URI", "URI") : null,
-      _congestion ? spy.zorkaStats("java", _mbean, "stats", "ALL", spy.ACTION_ENTER) : null)
-    .onError(spy.fetchError("EX"),
-      spy.format("ERR", "${EX}"),
-      _trace ? tracer.attr("ERR", "ERR") : null)
+      http._trace ? tracer.begin("HTTP_REQ", zorka.longCfg("http.trace.time")) : null,
+      http._trace ? tracer.attr("URI", "URI") : null,
+      http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", spy.ACTION_ENTER) : null)
+    .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),
+      http._trace ? tracer.attr("ERR", "ERR") : null)
     .onSubmit(
       spy.format("STATUS", "${RESP.status}"),
-      _trace ? tracer.attr("STATUS", "STATUS") : null,
-      _trace ? tracer.filterBy("STATUS", null, _errors, null, null) : null,
-      _params ? ((com.jitlogic.zorka.core.spy.SpyProcessor)__processParams()) : null,
-      _slow ? spy.subchain(
+      http._trace ? tracer.attr("STATUS", "STATUS") : null,
+      http._trace ? tracer.filterBy("STATUS", null, http._errors, null, null) : null,
+      http._params ? http.param_processor() : null,
+      http._slow ? spy.subchain(
         spy.longerThan(zorka.longCfg("http.slow.time")),
         spy.strTime("TIME"),
-        _slowF ? spy.trapperCollector(slowFT, zorka.INFO, "HTTP", zorka.stringCfg("http.slow.format")) : null) : null,
-      _error ? spy.subchain(
-        spy.valSetFilter("STATUS", _errors),
-        (com.jitlogic.zorka.core.spy.SpyProcessor)__markError(),
-        _errorF ? spy.trapperCollector(errorFT, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format")) : null) : null,
-      _stats ? spy.zorkaStats("java", _mbean, "stats", "ALL", _action) : null)
+        http._slowF ? spy.trapperCollector(http.slow_ft, zorka.INFO, "HTTP", zorka.stringCfg("http.slow.format")) : null) : null,
+      http._error ? spy.subchain(
+        spy.valSetFilter("STATUS", http._errors),
+        http.error_marker(),
+        http._trace ? tracer.markError() : null,
+        http._errorF ? spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format")) : null) : null,
+      http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", http._action) : null)
     .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
 
   return this;

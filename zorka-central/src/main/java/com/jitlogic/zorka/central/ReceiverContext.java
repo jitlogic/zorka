@@ -19,6 +19,7 @@ package com.jitlogic.zorka.central;
 import com.jitlogic.zorka.central.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.fressian.FressianWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +41,12 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     private JdbcTemplate jdbc;
     private int hostId;
 
-    public ReceiverContext(JdbcTemplate jdbc, Store store) {
-        this.symbolRegistry = store.getSymbolRegistry();
+    private int maxAttrLen = 1024;
+
+    private ObjectMapper mapper = new ObjectMapper();
+
+    public ReceiverContext(JdbcTemplate jdbc, HostStore store) {
+        this.symbolRegistry = store.getStoreManager().getSymbolRegistry();
         this.traceDataStore = store.getRds();
         this.jdbc = jdbc;
         this.hostId = store.getHostInfo().getId();
@@ -81,28 +86,39 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
     public void save(int hostId, long offs, int length, TraceRecord tr) {
 
-        StringBuilder description = new StringBuilder();
-        description.append(symbolRegistry.symbolName(tr.getMarker().getTraceId()));
+        Map<String, String> attrMap = new HashMap<String, String>();
 
         if (tr.getAttrs() != null) {
             for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
                 String val = e.getValue() != null ? e.getValue().toString() : "";
-                if (val.length() > 32000) {
-                    val = val.substring(0, 32000) + "...";
+                if (val.length() > maxAttrLen) {   // TODO configurable limit
+                    val = val.substring(0, maxAttrLen);
                 }
-                jdbc.update("insert into TRACE_ATTRS (HOST_ID,DATA_OFFS,ATTR_KEY,ATTR_VAL) values (?,?,?,?)",
-                        hostId, offs, e.getKey(), val);
-                if (val.length() > 50) {
-                    val = val.substring(0, 50);
-                }
-                description.append('|');
-                description.append(val);
+                attrMap.put(symbolRegistry.symbolName(e.getKey()), val);
             }
         }
 
-        jdbc.update("insert into TRACES (HOST_ID,DATA_OFFS,TRACE_ID,DATA_LEN,CLOCK,RFLAGS,TFLAGS,"
-                + "CLASS_ID,METHOD_ID,SIGN_ID,CALLS,ERRORS,RECORDS,EXTIME,DESCRIPTION) "
-                + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        int status = 0;
+        ;
+
+        if (tr.getException() != null
+                || tr.hasFlag(TraceRecord.EXCEPTION_PASS)
+                || tr.getMarker().hasFlag(TraceMarker.ERROR_MARK)) {
+            status = 1;
+        }
+
+        String attrJson = "";
+
+        // TODO ? what if resulting JSON > 64000 bytes ?
+        try {
+            attrJson = mapper.writeValueAsString(attrMap);
+        } catch (IOException e) {
+            log.error("Error serializing attributes", e);
+        }
+
+        jdbc.update("insert into TRACES (HOST_ID,DATA_OFFS,TRACE_ID,DATA_LEN,CLOCK,RFLAGS,TFLAGS,STATUS,"
+                + "CLASS_ID,METHOD_ID,SIGN_ID,CALLS,ERRORS,RECORDS,EXTIME,ATTRS) "
+                + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 hostId,
                 offs,
                 tr.getMarker().getTraceId(),
@@ -110,6 +126,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
                 tr.getClock(),
                 tr.getFlags(),
                 tr.getMarker().getFlags(),
+                status,
                 tr.getClassId(),
                 tr.getMethodId(),
                 tr.getSignatureId(),
@@ -117,7 +134,8 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
                 tr.getErrors(),
                 numRecords(tr),
                 tr.getTime(),
-                description.length() <= 250 ? description.toString() : description.substring(0, 250));
+                attrJson
+        );
     }
 
 

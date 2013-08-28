@@ -18,6 +18,8 @@ package com.jitlogic.zorka.central.data;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import java.util.Map;
+
 public class TraceInfo {
 
     @JsonProperty
@@ -42,6 +44,18 @@ public class TraceInfo {
     int traceFlags;
 
     @JsonProperty
+    int status;
+
+    @JsonProperty
+    int classId;
+
+    @JsonProperty
+    int methodId;
+
+    @JsonProperty
+    int signatureId;
+
+    @JsonProperty
     long calls;
 
     @JsonProperty
@@ -55,6 +69,9 @@ public class TraceInfo {
 
     @JsonProperty
     String description;
+
+    @JsonProperty
+    Map<String, String> attributes;
 
     public int getHostId() {
         return hostId;
@@ -112,6 +129,38 @@ public class TraceInfo {
         this.traceFlags = traceFlags;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getClassId() {
+        return classId;
+    }
+
+    public void setClassId(int classId) {
+        this.classId = classId;
+    }
+
+    public int getMethodId() {
+        return methodId;
+    }
+
+    public void setMethodId(int methodId) {
+        this.methodId = methodId;
+    }
+
+    public int getSignatureId() {
+        return signatureId;
+    }
+
+    public void setSignatureId(int signatureId) {
+        this.signatureId = signatureId;
+    }
+
     public long getCalls() {
         return calls;
     }
@@ -150,5 +199,13 @@ public class TraceInfo {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Map<String, String> getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(Map<String, String> attributes) {
+        this.attributes = attributes;
     }
 }

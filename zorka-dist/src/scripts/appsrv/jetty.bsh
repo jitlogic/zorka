@@ -1,0 +1,51 @@
+/**
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+__jetty() {
+
+  spy.add(spy.instrument()
+    .onEnter(spy.fetchArg("REQ", 2), spy.fetchArg("RESP", 4),
+      spy.format("URI", "${REQ.requestURI}"),
+      http._trace ? tracer.begin("HTTP_REQ", zorka.longCfg("http.trace.time")) : null,
+      http._trace ? tracer.attr("URI", "URI") : null,
+      http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", spy.ACTION_ENTER) : null)
+    .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),
+      http._trace ? tracer.attr("ERR", "ERR") : null)
+    .onSubmit(
+      spy.format("STATUS", "${RESP.status}"),
+      http._trace ? tracer.attr("STATUS", "STATUS") : null,
+      http._trace ? tracer.filterBy("STATUS", null, http._errors, null, null) : null,
+      http._params ? http.param_processor() : null,
+      http._slow ? spy.subchain(
+        spy.longerThan(zorka.longCfg("http.slow.time")),
+        spy.strTime("TIME"),
+        http._slowF ? spy.trapperCollector(http.slow_ft, zorka.INFO, "HTTP", zorka.stringCfg("http.slow.format")) : null) : null,
+      http._error ? spy.subchain(
+        spy.valSetFilter("STATUS", http._errors),
+        http.error_marker(),
+        http._errorF ? spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format")) : null) : null,
+      http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", http._action) : null)
+    .include(
+      spy.byMethod("org.mortbay.jetty.servlet.ServletHandler", "doHandle"),
+      spy.byMethod("org.eclipse.jetty.servlet.ServletHandler", "doHandle")));
+
+  return this;
+}
+
+jetty = __jetty();
+
