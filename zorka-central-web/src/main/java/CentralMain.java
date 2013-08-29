@@ -14,28 +14,38 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.jitlogic.zorka.central.CentralApp;
-import com.jitlogic.zorka.central.CentralConfig;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.security.ProtectionDomain;
+import java.util.Properties;
 
 
 public class CentralMain {
 
+    private static String addr;
+    private static int port;
+    private static String homeDir;
+    private static Server server;
+
     public static void main(String[] args) throws Exception {
 
-        CentralConfig config = CentralApp.getInstance().getConfig();
+        configure();
 
-        InetSocketAddress addr = new InetSocketAddress(
-                config.stringCfg("central.http.addr", "0.0.0.0"),
-                config.intCfg("central.http.port", 8080));
+        initServer();
 
-        Server server = new Server(addr);
+        server.start();
+        server.join();
+    }
+
+    private static void initServer() {
+        server = new Server(new InetSocketAddress(addr, port));
         ProtectionDomain domain = Server.class.getProtectionDomain();
         URL location = domain.getCodeSource().getLocation();
 
@@ -44,12 +54,47 @@ public class CentralMain {
         webapp.setDescriptor(location.toExternalForm() + "/WEB-INF/web.xml");
         webapp.setServer(server);
         webapp.setWar(location.toExternalForm());
-
-        webapp.setTempDirectory(new File("/tmp"));
+        webapp.setTempDirectory(new File(homeDir, "tmp"));
 
         server.setHandler(webapp);
-        server.start();
-        server.join();
+    }
+
+    private static void configure() throws IOException {
+
+        homeDir = System.getProperty("central.home.dir");
+
+        if (homeDir == null) {
+            System.err.println("Missing home dir property: add -Dcentral.home.dir=<path-to-central-home> to JVM args.");
+            System.exit(1);
+        }
+
+        addr = System.getProperty("central.http.addr", "0.0.0.0").trim();
+        String strPort = System.getProperty("central.http.port", "8642").trim();
+
+        Properties props = new Properties();
+
+        InputStream fis = null;
+        try {
+            fis = new FileInputStream(new File(homeDir, "central.properties"));
+            props.load(fis);
+        } catch (IOException e) {
+            System.err.println("Cannot open central.properties file: " + e.getMessage());
+            System.exit(1);
+        } finally {
+            if (fis != null) {
+                fis.close();
+            }
+        }
+
+        addr = props.getProperty("central.http.addr", addr).trim();
+        strPort = props.getProperty("central.http.port", strPort).trim();
+
+        try {
+            port = Integer.parseInt(strPort);
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid HTTP port setting (not a number): " + strPort);
+            System.exit(1);
+        }
     }
 
 }

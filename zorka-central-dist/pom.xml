@@ -30,6 +30,7 @@
                                 <mkdir dir="${project.build.outputDirectory}/central-${project.version}"/>
                                 <mkdir dir="${project.build.outputDirectory}/central-${project.version}/data"/>
                                 <mkdir dir="${project.build.outputDirectory}/central-${project.version}/log"/>
+                                <mkdir dir="${project.build.outputDirectory}/central-${project.version}/tmp"/>
                                 <copy file="../zorka-central-web/target/central.war"
                                       toFile="${project.build.outputDirectory}/central-${project.version}/central.war"/>
                                 <copy file="../COPYING"
