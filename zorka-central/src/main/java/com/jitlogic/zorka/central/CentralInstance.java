@@ -47,6 +47,8 @@ public class CentralInstance {
 
     private TraceTemplater traceTemplater;
 
+    private TraceCache traceCache;
+
     public CentralInstance(CentralConfig config) {
         this.config = config;
     }
@@ -154,9 +156,17 @@ public class CentralInstance {
     }
 
 
+    public synchronized TraceCache getTraceCache() {
+        if (null == traceCache) {
+            traceCache = new TraceCache(getConfig().intCfg("trace.cache.size", 5));
+        }
+        return traceCache;
+    }
+
+
     public synchronized HostStoreManager getStoreManager() {
         if (null == storeManager) {
-            storeManager = new HostStoreManager(getConfig(), getDs(), getSymbolRegistry(), getTraceTemplater());
+            storeManager = new HostStoreManager(getConfig(), getDs(), getSymbolRegistry(), getTraceCache(), getTraceTemplater());
         }
         return storeManager;
     }

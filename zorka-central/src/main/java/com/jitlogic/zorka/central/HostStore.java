@@ -55,6 +55,7 @@ public class HostStore implements Closeable {
     private RDSStore rds;
     private HostInfo hostInfo;
     private HostStoreManager manager;
+    private TraceCache cache;
 
 
     private JdbcTemplate jdbc;
@@ -100,8 +101,12 @@ public class HostStore implements Closeable {
 
 
     public HostStore(HostStoreManager manager,
+                     TraceCache cache,
                      ResultSet rs) throws SQLException {
+
+        this.cache = cache;
         this.manager = manager;
+
         this.hostInfo = new HostInfo();
 
         this.jdbc = new JdbcTemplate(manager.getDs());
@@ -234,7 +239,7 @@ public class HostStore implements Closeable {
 
 
     public TraceContext getTraceContext(long traceOffs) {
-        return new TraceContext(this, getTrace(traceOffs), manager.getSymbolRegistry());
+        return new TraceContext(this, getTrace(traceOffs), cache, manager.getSymbolRegistry());
     }
 
 

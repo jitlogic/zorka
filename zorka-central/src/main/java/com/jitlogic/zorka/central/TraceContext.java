@@ -17,6 +17,7 @@ package com.jitlogic.zorka.central;
 
 
 import com.jitlogic.zorka.central.data.SymbolicExceptionInfo;
+import com.jitlogic.zorka.central.data.TraceDetailFilterExpression;
 import com.jitlogic.zorka.central.data.TraceInfo;
 import com.jitlogic.zorka.central.data.TraceRecordInfo;
 import com.jitlogic.zorka.central.rds.RDSStore;
@@ -24,6 +25,7 @@ import com.jitlogic.zorka.common.tracedata.*;
 import org.fressian.FressianReader;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,23 +36,26 @@ public class TraceContext {
 
     private HostStore hostStore;
     private TraceInfo traceInfo;
+
+    private TraceCache cache;
     private SymbolRegistry symbolRegistry;
 
-    public TraceContext(HostStore hostStore, TraceInfo traceInfo, SymbolRegistry symbolRegistry) {
+
+    public TraceContext(HostStore hostStore, TraceInfo traceInfo, TraceCache cache, SymbolRegistry symbolRegistry) {
         this.hostStore = hostStore;
         this.traceInfo = traceInfo;
+
+        this.cache = cache;
         this.symbolRegistry = symbolRegistry;
     }
 
+
     private final static Pattern RE_SLASH = Pattern.compile("/");
 
+
     public TraceRecord getTraceRecord(String path) {
-        RDSStore rds = hostStore.getRds();
         try {
-            byte[] blob = rds.read(traceInfo.getDataOffs(), traceInfo.getDataLen());
-            ByteArrayInputStream is = new ByteArrayInputStream(blob);
-            FressianReader reader = new FressianReader(is, FressianTraceFormat.READ_LOOKUP);
-            TraceRecord tr = (TraceRecord) reader.readObject();
+            TraceRecord tr = fetchRecord();
             if (path != null && path.trim().length() > 0) {
                 for (String p : RE_SLASH.split(path.trim())) {
                     Integer idx = Integer.parseInt(p);
@@ -67,6 +72,27 @@ public class TraceContext {
             throw new RuntimeException("Error retrieving trace record.", e);
         }
     }
+
+
+    private TraceRecord fetchRecord() throws IOException {
+        TraceDetailFilterExpression filter = new TraceDetailFilterExpression();
+        filter.setHostId(hostStore.getHostInfo().getId());
+        filter.setTraceOffs(traceInfo.getDataOffs());
+
+        TraceRecord tr = cache.get(filter);
+
+        if (tr == null) {
+            RDSStore rds = hostStore.getRds();
+            byte[] blob = rds.read(traceInfo.getDataOffs(), traceInfo.getDataLen());
+            ByteArrayInputStream is = new ByteArrayInputStream(blob);
+            FressianReader reader = new FressianReader(is, FressianTraceFormat.READ_LOOKUP);
+            tr = (TraceRecord) reader.readObject();
+            cache.put(filter, tr);
+        }
+
+        return tr;
+    }
+
 
     public TraceRecordInfo packTraceRecord(TraceRecord tr, String path) {
         TraceRecordInfo info = new TraceRecordInfo();
