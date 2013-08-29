@@ -127,7 +127,11 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
     // TODO move this outside this class
     public ZicoDataProcessor get(Socket socket, HelloRequest hello) throws IOException {
         HostStore store = get(hello.getHostname());
-        return new ReceiverContext(jdbc, store);
+        if (store.getHostInfo().getAddr() == null) {
+            store.getHostInfo().setAddr(socket.getInetAddress().getHostAddress());
+            store.save();
+        }
+        return new ReceiverContext(ds, store);
     }
 
     @Override

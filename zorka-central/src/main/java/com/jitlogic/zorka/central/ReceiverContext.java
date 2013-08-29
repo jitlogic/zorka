@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -45,10 +46,11 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    public ReceiverContext(JdbcTemplate jdbc, HostStore store) {
+
+    public ReceiverContext(DataSource ds, HostStore store) {
         this.symbolRegistry = store.getStoreManager().getSymbolRegistry();
         this.traceDataStore = store.getRds();
-        this.jdbc = jdbc;
+        this.jdbc = new JdbcTemplate(ds);
         this.hostId = store.getHostInfo().getId();
     }
 
