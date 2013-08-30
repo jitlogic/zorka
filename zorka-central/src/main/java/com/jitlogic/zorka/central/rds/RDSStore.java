@@ -38,9 +38,9 @@ public class RDSStore implements Closeable {
     private static Pattern RGZ_FILE = Pattern.compile("^[0-9a-f]{16}\\.rgz$");
 
     private String basePath;
-    private long physSize;
+    private long maxSize;
 
-    private long physThreshold;
+    private long fileSize;
     private long segmentSize;
 
     private long logicalPos = 0;
@@ -51,21 +51,23 @@ public class RDSStore implements Closeable {
 
     private List<RDSChunkFile> archivedFiles = new ArrayList<RDSChunkFile>();
 
+    private List<RDSCleanupListener> cleanupListeners = new ArrayList<RDSCleanupListener>();
+
     private RDSChunkFile currentChunk;
     private RAGZInputStream currentInput;
 
 
     /**
-     * @param basePath      path to directory containing store files
-     * @param physSize      maximum physical size of the store
-     * @param physThreshold maximum physical size of a single file in the store
-     * @param segmentSize   segment size (inside single RAGZ file)
+     * @param basePath    path to directory containing store files
+     * @param maxSize     maximum physical size of the store
+     * @param fileSize    maximum physical size of a single file in the store
+     * @param segmentSize segment size (inside single RAGZ file)
      * @throws IOException
      */
-    public RDSStore(String basePath, long physSize, long physThreshold, long segmentSize) throws IOException {
+    public RDSStore(String basePath, long maxSize, long fileSize, long segmentSize) throws IOException {
         this.basePath = basePath;
-        this.physSize = physSize;
-        this.physThreshold = physThreshold;
+        this.maxSize = maxSize;
+        this.fileSize = fileSize;
         this.segmentSize = segmentSize;
 
         open();
@@ -144,14 +146,22 @@ public class RDSStore implements Closeable {
             size += f.plen;
         }
 
-        while (size > physSize && archivedFiles.size() > 0) {
+        while (size > maxSize && archivedFiles.size() > 0) {
             RDSChunkFile rcf = archivedFiles.get(0);
             File f = new File(basePath, rcf.fname);
+
             if (f.exists()) {
                 f.delete();
             }
+
             size -= rcf.plen;
+
             archivedFiles.remove(0);
+
+            for (RDSCleanupListener listener : cleanupListeners) {
+                listener.onChunkRemoved(rcf.loffs, rcf.llen);
+            }
+
         }
     }
 
@@ -193,7 +203,7 @@ public class RDSStore implements Closeable {
 
         outputPos += data.length;
 
-        if (output.physicalLength() > physThreshold) {
+        if (output.physicalLength() > fileSize) {
             rotate();
             cleanup();
         }
@@ -240,9 +250,14 @@ public class RDSStore implements Closeable {
             return data;
         }
 
-
         return new byte[0];
     }
+
+
+    public void addCleanupListener(RDSCleanupListener listener) {
+        cleanupListeners.add(listener);
+    }
+
 
     private class RDSChunkFile implements Comparable<RDSChunkFile> {
         private String fname;

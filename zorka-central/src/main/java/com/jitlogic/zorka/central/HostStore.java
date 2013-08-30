@@ -17,6 +17,7 @@ package com.jitlogic.zorka.central;
 
 
 import com.jitlogic.zorka.central.data.*;
+import com.jitlogic.zorka.central.rds.RDSCleanupListener;
 import com.jitlogic.zorka.central.rds.RDSStore;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -40,7 +41,7 @@ import java.util.Set;
 /**
  * Represents performance data store for a single agent.
  */
-public class HostStore implements Closeable {
+public class HostStore implements Closeable, RDSCleanupListener {
 
     private final static Logger log = LoggerFactory.getLogger(HostStore.class);
 
@@ -163,10 +164,14 @@ public class HostStore implements Closeable {
             }
 
             try {
+                long fileSize = getStoreManager().getConfig().kiloCfg("rds.file.size", 16 * 1024 * 1024L).intValue();
+                long maxSize = getStoreManager().getConfig().kiloCfg("rds.max.size", 256 * 1024 * 1024L);
+                long segmentSize = getStoreManager().getConfig().kiloCfg("rds.seg.size", 1024 * 1024L);
                 rds = new RDSStore(rdspath,
-                        getStoreManager().getConfig().kiloCfg("rds.file.size", 16 * 1024 * 1024L).intValue(),
-                        getStoreManager().getConfig().kiloCfg("rds.max.size", 256 * 1024 * 1024L),
-                        getStoreManager().getConfig().kiloCfg("rds.seg.size", 1024 * 1024L));
+                        maxSize,
+                        fileSize,
+                        segmentSize);
+                rds.addCleanupListener(this);
             } catch (IOException e) {
                 log.error("Cannot open RDS store at '" + rdspath + "'", e);
             }
@@ -270,4 +275,12 @@ public class HostStore implements Closeable {
     public HostStoreManager getStoreManager() {
         return manager;
     }
+
+    @Override
+    public void onChunkRemoved(long start, long length) {
+        log.info("Discarding old trace data for " + hostInfo.getName() + " start=" + start + ", length=" + length);
+        jdbc.update("delete from TRACES where HOST_ID = ? and DATA_OFFS between ? and ?",
+                hostInfo.getId(), start, start + length);
+    }
 }
+
