@@ -111,16 +111,30 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
         String attrJson = "";
 
-        // TODO ? what if resulting JSON > 64000 bytes ?
+        // TODO ? what if resulting JSON > 48000 bytes ?
         try {
             attrJson = mapper.writeValueAsString(attrMap);
         } catch (IOException e) {
             log.error("Error serializing attributes", e);
         }
 
+        String exJson = null;
+
+        SymbolicException e = tr.findException();
+
+        if (e != null) {
+            try {
+                exJson = mapper.writeValueAsString(CentralUtil.extractSymbolicExceptionInfo(symbolRegistry, e));
+            } catch (IOException e1) {
+                log.error("Error serializing exception info", e);
+            }
+        }
+
+        // TODO ? what if resulting JSON > 16000 bytes ?
+
         jdbc.update("insert into TRACES (HOST_ID,DATA_OFFS,TRACE_ID,DATA_LEN,CLOCK,RFLAGS,TFLAGS,STATUS,"
-                + "CLASS_ID,METHOD_ID,SIGN_ID,CALLS,ERRORS,RECORDS,EXTIME,ATTRS) "
-                + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                + "CLASS_ID,METHOD_ID,SIGN_ID,CALLS,ERRORS,RECORDS,EXTIME,ATTRS,EXINFO) "
+                + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 hostId,
                 offs,
                 tr.getMarker().getTraceId(),
@@ -136,7 +150,8 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
                 tr.getErrors(),
                 numRecords(tr),
                 tr.getTime(),
-                attrJson
+                attrJson,
+                exJson
         );
     }
 
@@ -150,6 +165,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
         return n;
     }
+
 
     @Override
     public int checkSymbol(int symbolId) throws IOException {

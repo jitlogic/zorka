@@ -16,12 +16,8 @@
 package com.jitlogic.zorka.central;
 
 
-import com.jitlogic.zorka.central.data.HostInfo;
-import com.jitlogic.zorka.central.data.PagingData;
-import com.jitlogic.zorka.central.data.TraceInfo;
-import com.jitlogic.zorka.central.data.TraceListFilterExpression;
+import com.jitlogic.zorka.central.data.*;
 import com.jitlogic.zorka.central.rds.RDSStore;
-import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -92,6 +88,15 @@ public class HostStore implements Closeable {
             }
 
             info.setAttributes(attrs);
+
+            String exJson = rs.getString("EXINFO");
+            if (exJson != null) {
+                try {
+                    info.setExceptionInfo(mapper.readValue(exJson, SymbolicExceptionInfo.class));
+                } catch (IOException e) {
+                    log.error("Error unpacking JSON exInfo", e);
+                }
+            }
 
             info.setDescription(manager.getTraceTemplater().templateDescription(info));
 

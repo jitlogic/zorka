@@ -16,13 +16,18 @@
 package com.jitlogic.zorka.central;
 
 
+import com.jitlogic.zorka.central.data.SymbolicExceptionInfo;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicException;
+import com.jitlogic.zorka.common.tracedata.SymbolicStackElement;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import org.objectweb.asm.Type;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class CentralUtil {
@@ -153,6 +158,21 @@ public class CentralUtil {
         }
 
         return CentralUtil.toUIntBE(b);
+    }
+
+    public static SymbolicExceptionInfo extractSymbolicExceptionInfo(SymbolRegistry symbolRegistry, SymbolicException sex) {
+        SymbolicExceptionInfo sei = new SymbolicExceptionInfo();
+        sei.setExClass(symbolRegistry.symbolName(sex.getClassId()));
+        sei.setMessage(sex.getMessage());
+        List<String> stack = new ArrayList<String>(sex.getStackTrace().length);
+        for (SymbolicStackElement sel : sex.getStackTrace()) {
+            stack.add("  at " + symbolRegistry.symbolName(sel.getClassId())
+                    + "." + symbolRegistry.symbolName(sel.getMethodId())
+                    + " [" + symbolRegistry.symbolName(sel.getFileId())
+                    + ":" + sel.getLineNum() + "]");
+        }
+        sei.setStackTrace(stack);
+        return sei;
     }
 
 }

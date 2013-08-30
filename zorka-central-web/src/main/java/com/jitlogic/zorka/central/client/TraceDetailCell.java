@@ -19,6 +19,7 @@ package com.jitlogic.zorka.central.client;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.jitlogic.zorka.central.data.SymbolicExceptionInfo;
 import com.jitlogic.zorka.central.data.TraceInfo;
 
 import java.util.Map;
@@ -37,6 +38,18 @@ public class TraceDetailCell extends AbstractCell<TraceInfo> {
                 sb.appendHtmlConstant("</div>");
             }
         }
-
+        if (ti.getExceptionInfo() != null) {
+            SymbolicExceptionInfo e = ti.getExceptionInfo();
+            sb.appendHtmlConstant("<div><span style=\"color: red;\">");
+            sb.append(SafeHtmlUtils.fromString("Caught: " + e.getExClass()));
+            sb.appendHtmlConstant("</span></div><div><b>");
+            sb.append(SafeHtmlUtils.fromString(e.getMessage()));
+            sb.appendHtmlConstant("</b></div>");
+            for (String s : e.getStackTrace()) {
+                sb.appendHtmlConstant("<div>");
+                sb.append(SafeHtmlUtils.fromString(s));
+                sb.appendHtmlConstant("</div>");
+            }
+        }
     }
 }

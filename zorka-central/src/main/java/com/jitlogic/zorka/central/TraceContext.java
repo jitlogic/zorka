@@ -119,21 +119,12 @@ public class TraceContext {
 
         SymbolicException sex = tr.findException();
         if (sex != null) {
-            SymbolicExceptionInfo sei = new SymbolicExceptionInfo();
-            sei.setExClass(symbolRegistry.symbolName(sex.getClassId()));
-            sei.setMessage(sex.getMessage());
-            List<String> stack = new ArrayList<String>(sex.getStackTrace().length);
-            for (SymbolicStackElement sel : sex.getStackTrace()) {
-                stack.add("  at " + symbolRegistry.symbolName(sel.getClassId())
-                        + "." + symbolRegistry.symbolName(sel.getMethodId())
-                        + " [" + symbolRegistry.symbolName(sel.getFileId())
-                        + ":" + sel.getLineNum() + "]");
-            }
-            sei.setStackTrace(stack);
+            SymbolicExceptionInfo sei = CentralUtil.extractSymbolicExceptionInfo(symbolRegistry, sex);
             info.setExceptionInfo(sei);
         }
 
         return info;
     }
+
 
 }
