@@ -96,49 +96,8 @@ public class CentralInstance {
      * @param props configuration properties
      */
     public void initLoggers(Properties props) {
-        if (config.boolCfg("central.filelog", true)) {
-            initFileTrapper();
-        }
-
         // TODO ZorkaLogger and ZorkaLog will be replaced with slf4j+custom backend (logging to standard trapper)
-        // TODO ?? or the other way around ??
-
-        //if (config.boolCfg("zorka.syslog", false)) {
-        //    initSyslogTrapper();
-        //}
-
-        ZorkaLogger.configure(props);
-    }
-
-
-    /**
-     * Creates and configures file trapper according to configuration properties
-     */
-    private void initFileTrapper() {
-        String logDir = config.getLogDir();
-        boolean logExceptions = config.boolCfg("zorka.log.exceptions", true);
-        String logFileName = config.stringCfg("zorka.log.fname", "zorka.log");
-        ZorkaLogLevel logThreshold = ZorkaLogLevel.DEBUG;
-
-        int maxSize = 4 * 1024 * 1024, maxLogs = 4; // TODO int -> long
-
-        try {
-            logThreshold = ZorkaLogLevel.valueOf(config.stringCfg("zorka.log.level", "INFO"));
-            maxSize = (int) (long) config.kiloCfg("zorka.log.size", 4L * 1024 * 1024);
-            maxLogs = config.intCfg("zorka.log.num", 8);
-        } catch (Exception e) {
-            log.error("Error parsing logger arguments", e);
-            log.info("File trapper will be disabled.");
-            // TODO AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
-        }
-
-
-        FileTrapper trapper = FileTrapper.rolling(logThreshold,
-                new File(logDir, logFileName).getPath(), maxLogs, maxSize, logExceptions);
-        trapper.disableTrapCounter();
-        trapper.start();
-
-        ZorkaLogger.getLogger().addTrapper(trapper);
+        //ZorkaLogger.configure(props);
     }
 
 
