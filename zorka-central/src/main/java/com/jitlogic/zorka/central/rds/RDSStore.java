@@ -139,7 +139,7 @@ public class RDSStore implements Closeable {
     }
 
 
-    private void cleanup() throws IOException {
+    public synchronized void cleanup() throws IOException {
         long size = output.physicalLength();
 
         for (RDSChunkFile f : archivedFiles) {
@@ -165,6 +165,9 @@ public class RDSStore implements Closeable {
         }
     }
 
+    public void setMaxSize(long maxSize) {
+        this.maxSize = maxSize;
+    }
 
     @Override
     public void close() throws IOException {

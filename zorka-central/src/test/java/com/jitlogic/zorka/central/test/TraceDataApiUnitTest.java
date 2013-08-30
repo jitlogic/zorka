@@ -117,7 +117,7 @@ public class TraceDataApiUnitTest extends CentralFixture {
     @Test
     public void testGetTraceRoot() throws Exception {
         int hostId = storeManager.getOrCreateHost("test", "").getHostInfo().getId();
-        TraceRecordInfo tr = traceDataApi.getRecord(hostId, 0, "");
+        TraceRecordInfo tr = traceDataApi.getRecord(hostId, 0, 0, "");
         assertEquals(0, tr.getChildren());
     }
 
@@ -125,7 +125,7 @@ public class TraceDataApiUnitTest extends CentralFixture {
     @Test
     public void testListTraceRoot() throws Exception {
         int hostId = storeManager.getOrCreateHost("test", "").getHostInfo().getId();
-        List<TraceRecordInfo> lst = traceDataApi.listRecords(hostId, 0, "");
+        List<TraceRecordInfo> lst = traceDataApi.listRecords(hostId, 0, 0, "");
         assertNotNull(lst);
     }
 }

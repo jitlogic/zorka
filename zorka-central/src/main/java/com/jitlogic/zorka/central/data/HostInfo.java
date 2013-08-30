@@ -38,77 +38,74 @@ public class HostInfo {
     private int flags;
 
     @JsonProperty
+    long maxSize;
+
+    @JsonProperty
     private String description;
 
     public int getId() {
         return id;
     }
 
-
     public void setId(int id) {
         this.id = id;
     }
-
 
     public String getName() {
         return name;
     }
 
-
     public void setName(String name) {
         this.name = name;
     }
-
 
     public String getAddr() {
         return addr;
     }
 
-
     public void setAddr(String addr) {
         this.addr = addr;
     }
-
 
     public String getPath() {
         return path;
     }
 
-
     public void setPath(String path) {
         this.path = path;
     }
-
 
     public String getPass() {
         return pass;
     }
 
-
     public void setPass(String pass) {
         this.pass = pass;
     }
-
 
     public int getFlags() {
         return flags;
     }
 
-
     public void setFlags(int flags) {
         this.flags = flags;
     }
 
+    public long getMaxSize() {
+        return maxSize;
+    }
+
+    public void setMaxSize(long maxSize) {
+        this.maxSize = maxSize;
+    }
 
     public String getDescription() {
         return description;
     }
 
-
     public void setDescription(String description) {
         this.description = description;
     }
-
 
     @Override
     public String toString() {

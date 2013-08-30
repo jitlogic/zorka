@@ -23,6 +23,8 @@ import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.FieldLabel;
+import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor;
+import com.sencha.gxt.widget.core.client.form.SpinnerField;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
@@ -38,6 +40,7 @@ public class HostPrefsDialog extends Dialog {
     private TextField txtHostAddr;
     private TextField txtHostDesc;
     private TextField txtHostPass;
+    private SpinnerField<Long> txtMaxSize;
 
 
     public HostPrefsDialog(TraceDataService tds, HostListPanel panel, HostInfo info) {
@@ -86,6 +89,23 @@ public class HostPrefsDialog extends Dialog {
             txtHostPass.setText(info.getPass());
         }
 
+
+        txtMaxSize = new SpinnerField<Long>(new NumberPropertyEditor.LongPropertyEditor());
+        txtMaxSize.setIncrement(1L);
+        txtMaxSize.setMinValue(16);
+        txtMaxSize.setMaxValue(1024 * 1024L);
+        txtMaxSize.setAllowBlank(false);
+        txtMaxSize.setToolTip("Maximum amount of trace data stored for this host.");
+        vlc.add(txtMaxSize);
+        vlc.add(new FieldLabel(txtMaxSize, "Max store size (MB)"),
+                new VerticalLayoutContainer.VerticalLayoutData(1, -1));
+
+        if (info != null) {
+            txtMaxSize.setText("" + (info.getMaxSize() / 1048576L));
+        } else {
+            txtMaxSize.setText("1024");
+        }
+
         txtHostDesc = new TextField();
         vlc.add(txtHostDesc);
         vlc.add(new FieldLabel(txtHostDesc, "Comment"),
@@ -130,6 +150,7 @@ public class HostPrefsDialog extends Dialog {
         hi.setAddr(txtHostAddr.getText());
         hi.setDescription(txtHostDesc.getText());
         hi.setPass(txtHostPass.getText());
+        hi.setMaxSize(txtMaxSize.getCurrentValue() * 1048576L);
 
         MethodCallback<Void> handler = new MethodCallback<Void>() {
             @Override

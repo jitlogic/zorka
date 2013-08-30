@@ -53,9 +53,9 @@ public class TraceContext {
     private final static Pattern RE_SLASH = Pattern.compile("/");
 
 
-    public TraceRecord getTraceRecord(String path) {
+    public TraceRecord getTraceRecord(String path, long minMethodTime) {
         try {
-            TraceRecord tr = fetchRecord();
+            TraceRecord tr = fetchRecord(minMethodTime);
             if (path != null && path.trim().length() > 0) {
                 for (String p : RE_SLASH.split(path.trim())) {
                     Integer idx = Integer.parseInt(p);
@@ -74,10 +74,11 @@ public class TraceContext {
     }
 
 
-    private TraceRecord fetchRecord() throws IOException {
+    private TraceRecord fetchRecord(long minMethodTime) throws IOException {
         TraceDetailFilterExpression filter = new TraceDetailFilterExpression();
         filter.setHostId(hostStore.getHostInfo().getId());
         filter.setTraceOffs(traceInfo.getDataOffs());
+        filter.setMinMethodTime(minMethodTime);
 
         TraceRecord tr = cache.get(filter);
 
@@ -87,7 +88,26 @@ public class TraceContext {
             ByteArrayInputStream is = new ByteArrayInputStream(blob);
             FressianReader reader = new FressianReader(is, FressianTraceFormat.READ_LOOKUP);
             tr = (TraceRecord) reader.readObject();
+            if (minMethodTime > 0) {
+                tr = filterByTime(tr, minMethodTime);
+            }
             cache.put(filter, tr);
+        }
+
+        return tr;
+    }
+
+
+    public TraceRecord filterByTime(TraceRecord orig, long minMethodTime) {
+        TraceRecord tr = orig.copy();
+        if (orig.getChildren() != null) {
+            ArrayList<TraceRecord> children = new ArrayList<TraceRecord>(orig.numChildren());
+            for (TraceRecord child : orig.getChildren()) {
+                if (child.getTime() >= minMethodTime) {
+                    children.add(filterByTime(child, minMethodTime));
+                }
+            }
+            tr.setChildren(children);
         }
 
         return tr;

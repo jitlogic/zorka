@@ -131,6 +131,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
         hostInfo.setPath(rs.getString("HOST_PATH"));
         hostInfo.setPass(rs.getString("HOST_PASS"));
         hostInfo.setFlags(rs.getInt("HOST_FLAGS"));
+        hostInfo.setMaxSize(rs.getLong("MAX_SIZE"));
         hostInfo.setDescription(rs.getString("HOST_DESC"));
     }
 
@@ -139,6 +140,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
         hostInfo.setAddr(info.getAddr());
         hostInfo.setPass(info.getPass());
         hostInfo.setFlags(info.getFlags());
+        hostInfo.setMaxSize(info.getMaxSize());
         hostInfo.setDescription(info.getDescription());
     }
 
@@ -165,10 +167,9 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
             try {
                 long fileSize = getStoreManager().getConfig().kiloCfg("rds.file.size", 16 * 1024 * 1024L).intValue();
-                long maxSize = getStoreManager().getConfig().kiloCfg("rds.max.size", 256 * 1024 * 1024L);
                 long segmentSize = getStoreManager().getConfig().kiloCfg("rds.seg.size", 1024 * 1024L);
                 rds = new RDSStore(rdspath,
-                        maxSize,
+                        hostInfo.getMaxSize(),
                         fileSize,
                         segmentSize);
                 rds.addCleanupListener(this);
@@ -180,9 +181,18 @@ public class HostStore implements Closeable, RDSCleanupListener {
     }
 
 
-    public void save() {
-        jdbc.update("update HOSTS set HOST_ADDR=?, HOST_DESC=?, HOST_PASS=?, HOST_FLAGS=? where HOST_ID=?",
-                hostInfo.getAddr(), hostInfo.getDescription(), hostInfo.getPass(), hostInfo.getFlags(), hostInfo.getId());
+    public synchronized void save() {
+        jdbc.update("update HOSTS set HOST_ADDR=?, HOST_DESC=?, HOST_PASS=?, HOST_FLAGS=?, MAX_SIZE = ? where HOST_ID=?",
+                hostInfo.getAddr(), hostInfo.getDescription(), hostInfo.getPass(), hostInfo.getFlags(),
+                hostInfo.getMaxSize(), hostInfo.getId());
+        if (rds != null) {
+            rds.setMaxSize(hostInfo.getMaxSize());
+            try {
+                rds.cleanup();
+            } catch (IOException e) {
+                log.error("Error resizing RDS store for " + hostInfo.getName());
+            }
+        }
     }
 
     private final static Map<String, String> TRACES_ORDER_COLS = ZorkaUtil.map(

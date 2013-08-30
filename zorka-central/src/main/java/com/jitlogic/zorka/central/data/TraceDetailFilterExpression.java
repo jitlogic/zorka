@@ -30,10 +30,6 @@ public class TraceDetailFilterExpression {
     @JsonProperty
     long minMethodTime;
 
-    @JsonProperty
-    int flags;
-
-
     public long getMinMethodTime() {
         return minMethodTime;
     }
@@ -41,16 +37,6 @@ public class TraceDetailFilterExpression {
 
     public void setMinMethodTime(long minMethodTime) {
         this.minMethodTime = minMethodTime;
-    }
-
-
-    public int getFlags() {
-        return flags;
-    }
-
-
-    public void setFlags(int flags) {
-        this.flags = flags;
     }
 
 
@@ -79,7 +65,6 @@ public class TraceDetailFilterExpression {
         return obj instanceof TraceDetailFilterExpression
                 && ((TraceDetailFilterExpression) obj).hostId == hostId
                 && ((TraceDetailFilterExpression) obj).traceOffs == traceOffs
-                && ((TraceDetailFilterExpression) obj).flags == flags
                 && ((TraceDetailFilterExpression) obj).minMethodTime == minMethodTime;
     }
 }
