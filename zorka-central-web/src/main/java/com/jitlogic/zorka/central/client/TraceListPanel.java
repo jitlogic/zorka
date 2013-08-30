@@ -283,6 +283,11 @@ public class TraceListPanel extends VerticalLayoutContainer {
         txtFilter.setLayoutData(txtFilterLayout);
         toolBar.add(txtFilter);
 
+        TextButton btnClear = new TextButton();
+        btnClear.setIcon(Resources.INSTANCE.clearIcon());
+        btnClear.setToolTip("Clear all filters.");
+        toolBar.add(btnClear);
+
         btnFilter.addSelectHandler(new SelectEvent.SelectHandler() {
             @Override
             public void onSelect(SelectEvent event) {
@@ -297,6 +302,21 @@ public class TraceListPanel extends VerticalLayoutContainer {
             }
         });
 
+
+        btnClear.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                txtFilter.setText("");
+                txtDuration.setText("");
+                btnErrors.setValue(false);
+
+                filter.setErrorsOnly(false);
+                filter.setMinTime(0);
+                filter.setFilterExpr("");
+
+                traceGridView.refresh();
+            }
+        });
 
         add(toolBar, new VerticalLayoutData(1, -1));
     }
