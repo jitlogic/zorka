@@ -287,7 +287,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
             @Override
             public void onSelect(SelectEvent event) {
                 GWT.log("Setting filter to " + txtFilter.getText());
-                filter.setFilterExpr(txtFilter.getValue());
+                filter.setFilterExpr(txtFilter.getText());
                 if (txtDuration.getCurrentValue() != null) {
                     filter.setMinTime((long) (txtDuration.getCurrentValue() * 1000000000L));
                 } else {

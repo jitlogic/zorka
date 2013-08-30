@@ -205,7 +205,7 @@ public class HostStore implements Closeable {
         if (filter.getFilterExpr() != null && filter.getFilterExpr().trim().length() > 0) {
             sql1 += " and ATTRS like :filterExpr";
             sql2 += " and ATTRS like :filterExpr";
-            params.addValue("filterExpr", filter.getFilterExpr().trim());
+            params.addValue("filterExpr", "%" + filter.getFilterExpr().trim().replace("*", "%") + "%");
         }
 
         if (filter.getMinTime() > 0) {
