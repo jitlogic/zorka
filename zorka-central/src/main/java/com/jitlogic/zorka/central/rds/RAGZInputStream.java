@@ -91,6 +91,11 @@ public class RAGZInputStream extends InputStream {
 
             long cpos = logicalPos - curSegment.getLogicalPos();
             long csz = Math.min(llen, curSegment.getLogicalLen() - cpos);
+
+            if (cpos + csz > logicalBuf.length) {
+                logicalBuf = RAGZSegment.unpack(input, curSegment);
+            }
+
             System.arraycopy(logicalBuf, (int) cpos, b, (int) lpos, (int) csz);
 
             logicalPos += csz;
