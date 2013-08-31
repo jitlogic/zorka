@@ -69,7 +69,7 @@ __jboss() {
         _ejb_trace ? tracer.attr("METHOD", "METHOD") : null,
         _ejb_trace ? tracer.attr("CLASS", "CLASS") : null)
       .onError(
-        tracer.flags(tracer.ALWAYS_SUBMIT),
+        tracer.flags(tracer.SUBMIT_TRACE),
         spy.fetchError("ERR"),
         spy.format("MSG", "${ERR.message}"),
         spy.trapperCollector(ejb.error_trapper, zorka.INFO, "EJB", zorka.stringCfg("ejb.error.format")))

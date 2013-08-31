@@ -34,10 +34,11 @@ import java.util.Set;
  */
 public class TracerLib {
 
-    public static final int ALWAYS_SUBMIT = TraceMarker.SUBMIT_TRACE;
+    public static final int SUBMIT_TRACE = TraceMarker.SUBMIT_TRACE;
     public static final int ALL_METHODS = TraceMarker.ALL_METHODS;
     public static final int DROP_INTERIM = TraceMarker.DROP_INTERIM;
     public static final int TRACE_CALLS = TraceMarker.TRACE_CALLS;
+    public static final int ERROR_MARK = TraceMarker.ERROR_MARK;
 
     private Tracer tracer;
 
@@ -143,10 +144,6 @@ public class TracerLib {
         return new TraceAttrProcessor(symbolRegistry, tracer, srcField, dstAttr);
     }
 
-
-    public SpyProcessor markError() {
-        return new TraceMarkerProcessor(tracer, TraceMarker.ERROR_MARK);
-    }
 
     /**
      * Adds trace attribute to trace record immediately. This is useful for programmatic attribute setting.

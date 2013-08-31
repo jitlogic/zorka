@@ -15,11 +15,16 @@
  */
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
+
 import java.util.Map;
 import java.util.Set;
 
 
 public class SetFilterProcessor implements SpyProcessor {
+
+    private static final ZorkaLog log = ZorkaLogger.getLog(SetFilterProcessor.class);
 
     private String srcField;
     private boolean invert;
@@ -29,10 +34,18 @@ public class SetFilterProcessor implements SpyProcessor {
         this.srcField = srcField;
         this.invert = invert;
         this.candidates = candidates;
+
+        log.info(ZorkaLogger.ZSP_CONFIG, "SetFilterProcessor configured for "
+                + srcField + ", candidates=" + this.candidates);
     }
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
-        return candidates.contains(record.get(srcField)) ^ invert ? record : null;
+        Object val = record.get(srcField);
+        boolean pass = candidates.contains(val) ^ invert;
+        if (ZorkaLogger.isSpyLevel(ZorkaLogger.ZSP_ARGPROC)) {
+            log.debug(ZorkaLogger.ZSP_ARGPROC, "pass(" + val + ":" + val.getClass().getName() + ") -> " + pass);
+        }
+        return pass ? record : null;
     }
 }
