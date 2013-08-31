@@ -60,7 +60,7 @@ public class ZicoConnectorUnitTest { //extends CentralFixture {
     }
 
 
-    private int signatureTest(int...inputs) throws Exception {
+    private int signatureTest(int... inputs) throws Exception {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
         for (int i : inputs) {
@@ -79,7 +79,7 @@ public class ZicoConnectorUnitTest { //extends CentralFixture {
                 signatureTest(ZicoConnector.ZICO_MAGIC));
 
         assertEquals("Some data after signature.", 0x11,
-                signatureTest(0x21, 0xC0, 0xBA, 0xBE, 0x11 ));
+                signatureTest(0x21, 0xC0, 0xBA, 0xBE, 0x11));
 
         assertEquals("Some garbage before signature.", 0x11,
                 signatureTest(0x10, 0x21, 0xC0, 0xBA, 0xBE, 0x11));
@@ -91,10 +91,10 @@ public class ZicoConnectorUnitTest { //extends CentralFixture {
 
     @Test(timeout = 1000)
     public void testBasicConnectDisconnect() throws Exception {
-        service = new ZicoService("127.0.0.1", 8640, factory);
+        service = new ZicoService("127.0.0.1", 8645, factory);
         service.start();
 
-        ZicoClientConnector conn = new ZicoClientConnector("127.0.0.1", 8640);
+        ZicoClientConnector conn = new ZicoClientConnector("127.0.0.1", 8645);
         conn.connect();
         conn.close();
 
