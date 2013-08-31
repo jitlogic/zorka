@@ -18,7 +18,7 @@
 __ejb() {
 
   // Enable or disable all EJB monitoring
-  zorka.defCfg("ejb", "yes");
+  zorka.defCfg("ejb", "no");
 
   // Default values for EJB stats
   zorka.defCfg("ejb.stats", "yes");
@@ -34,9 +34,9 @@ __ejb() {
 
 
   // Default values for EJB slow calls log configuration options
-  zorka.defCfg("ejb.slow.log", "no");
+  zorka.defCfg("ejb.slow", "no");
   zorka.defCfg("ejb.slow.time", "1000");
-  zorka.defCfg("ejb.slow.file", "yes");
+  zorka.defCfg("ejb.slow.file", zorka.boolCfg("ejb.slow", false));
   zorka.defCfg("ejb.slow.file.path", zorka.path("${zorka.log.dir}", "ejb-slow.log"));
   zorka.defCfg("ejb.slow.file.max", "8M");
   zorka.defCfg("ejb.slow.file.num", "8");
@@ -44,9 +44,9 @@ __ejb() {
 
 
   // Default values for EJB error log configuration options
-  zorka.defCfg("ejb.error.log", "no");
-  zorka.defCfg("ejb.error.file", "yes");
-  zorka.defCfg("ejb.error.file.path", zorka.path("${zorka.log.dir}", "http-error.log"));
+  zorka.defCfg("ejb.error", "no");
+  zorka.defCfg("ejb.error.file", zorka.boolCfg("ejb.error", false));
+  zorka.defCfg("ejb.error.file.path", zorka.path("${zorka.log.dir}", "ejb-error.log"));
   zorka.defCfg("ejb.error.file.max", "8M");
   zorka.defCfg("ejb.error.file.num", "8");
   zorka.defCfg("ejb.error.format", "[${TIME}] ${CLASS}.${METHOD}(${PARAMS}) -> ${ERR}");
