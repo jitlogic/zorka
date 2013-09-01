@@ -16,9 +16,7 @@
  */
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.common.util.ZorkaLogLevel;
-import com.jitlogic.zorka.common.util.ZorkaTrapper;
-import com.jitlogic.zorka.common.util.ObjectInspector;
+import com.jitlogic.zorka.common.util.*;
 
 import java.util.Map;
 
@@ -29,26 +27,34 @@ import java.util.Map;
  */
 public class TrapperCollector implements SpyProcessor {
 
+    private static ZorkaLog log = ZorkaLogger.getLog(TrapperCollector.class);
 
-    /** Trapper object. */
+    /**
+     * Trapper object.
+     */
     private ZorkaTrapper trapper;
 
 
-    /** Log level */
+    /**
+     * Log level
+     */
     private ZorkaLogLevel logLevel;
 
 
-    /** Tag, message, error templates and error field */
+    /**
+     * Tag, message, error templates and error field
+     */
     private String tag, message, errExpr, errField;
 
 
     /**
      * Creates new trapper collector
-     * @param trapper output trapper
+     *
+     * @param trapper  output trapper
      * @param logLevel log level
-     * @param tag log tag
-     * @param message log message
-     * @param errExpr error expression
+     * @param tag      log tag
+     * @param message  log message
+     * @param errExpr  error expression
      * @param errField error field
      */
     public TrapperCollector(ZorkaTrapper trapper, ZorkaLogLevel logLevel,
@@ -64,7 +70,13 @@ public class TrapperCollector implements SpyProcessor {
 
 
     @Override
-    public Map<String,Object> process(Map<String,Object> record) {
+    public Map<String, Object> process(Map<String, Object> record) {
+
+        if (trapper == null || logLevel == null || tag == null || message == null) {
+            log.error(ZorkaLogger.ZSP_CONFIG,
+                    "Improperly configured TrapperCollector (null trapper or log level or tag or message).");
+            return record;
+        }
 
         String tag = ObjectInspector.substitute(this.tag, record);
         String msg;
@@ -76,7 +88,7 @@ public class TrapperCollector implements SpyProcessor {
             msg = ObjectInspector.substitute(message, record);
         }
 
-        trapper.trap(logLevel, tag, msg, (Throwable)record.get(errField));
+        trapper.trap(logLevel, tag, msg, (Throwable) record.get(errField));
 
         return record;
     }

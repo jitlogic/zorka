@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -45,10 +46,11 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    public ReceiverContext(JdbcTemplate jdbc, HostStore store) {
+
+    public ReceiverContext(DataSource ds, HostStore store) {
         this.symbolRegistry = store.getStoreManager().getSymbolRegistry();
         this.traceDataStore = store.getRds();
-        this.jdbc = jdbc;
+        this.jdbc = new JdbcTemplate(ds);
         this.hostId = store.getHostInfo().getId();
     }
 
@@ -109,16 +111,30 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
         String attrJson = "";
 
-        // TODO ? what if resulting JSON > 64000 bytes ?
+        // TODO ? what if resulting JSON > 48000 bytes ?
         try {
             attrJson = mapper.writeValueAsString(attrMap);
         } catch (IOException e) {
             log.error("Error serializing attributes", e);
         }
 
+        String exJson = null;
+
+        SymbolicException e = tr.findException();
+
+        if (e != null) {
+            try {
+                exJson = mapper.writeValueAsString(CentralUtil.extractSymbolicExceptionInfo(symbolRegistry, e));
+            } catch (IOException e1) {
+                log.error("Error serializing exception info", e);
+            }
+        }
+
+        // TODO ? what if resulting JSON > 16000 bytes ?
+
         jdbc.update("insert into TRACES (HOST_ID,DATA_OFFS,TRACE_ID,DATA_LEN,CLOCK,RFLAGS,TFLAGS,STATUS,"
-                + "CLASS_ID,METHOD_ID,SIGN_ID,CALLS,ERRORS,RECORDS,EXTIME,ATTRS) "
-                + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                + "CLASS_ID,METHOD_ID,SIGN_ID,CALLS,ERRORS,RECORDS,EXTIME,ATTRS,EXINFO) "
+                + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 hostId,
                 offs,
                 tr.getMarker().getTraceId(),
@@ -134,7 +150,8 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
                 tr.getErrors(),
                 numRecords(tr),
                 tr.getTime(),
-                attrJson
+                attrJson,
+                exJson
         );
     }
 
@@ -148,6 +165,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
         return n;
     }
+
 
     @Override
     public int checkSymbol(int symbolId) throws IOException {

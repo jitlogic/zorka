@@ -45,6 +45,7 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
     private CentralConfig config;
     private SymbolRegistry symbolRegistry;
     private TraceTemplater traceTemplater;
+    private TraceCache cache;
 
 
     private Map<Integer, HostStore> storesById = new HashMap<Integer, HostStore>();
@@ -53,11 +54,12 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
     private JdbcTemplate jdbc;
     private DataSource ds;
 
-    public HostStoreManager(CentralConfig config, DataSource ds, SymbolRegistry symbolRegistry, TraceTemplater traceTemplater) {
+    public HostStoreManager(CentralConfig config, DataSource ds, SymbolRegistry symbolRegistry, TraceCache cache, TraceTemplater traceTemplater) {
         this.config = config;
         this.symbolRegistry = symbolRegistry;
         this.dataDir = config.stringCfg("central.data.dir", null);
         this.ds = ds;
+        this.cache = cache;
         this.traceTemplater = traceTemplater;
 
         this.jdbc = new JdbcTemplate(ds);
@@ -125,7 +127,11 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
     // TODO move this outside this class
     public ZicoDataProcessor get(Socket socket, HelloRequest hello) throws IOException {
         HostStore store = get(hello.getHostname());
-        return new ReceiverContext(jdbc, store);
+        if (store.getHostInfo().getAddr() == null) {
+            store.getHostInfo().setAddr(socket.getInetAddress().getHostAddress());
+            store.save();
+        }
+        return new ReceiverContext(ds, store);
     }
 
     @Override
@@ -137,7 +143,7 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
             store.updateInfo(rs);
             return store;
         } else {
-            HostStore store = new HostStore(this, rs);
+            HostStore store = new HostStore(this, cache, rs);
             storesById.put(store.getHostInfo().getId(), store);
             return store;
         }

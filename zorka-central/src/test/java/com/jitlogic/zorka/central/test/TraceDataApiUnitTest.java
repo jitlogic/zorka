@@ -42,7 +42,7 @@ public class TraceDataApiUnitTest extends CentralFixture {
     public void prepareData() throws Exception {
         jdbc = new JdbcTemplate(instance.getDs());
 
-        ReceiverContext rcx = new ReceiverContext(jdbc, instance.getStoreManager().get("test"));
+        ReceiverContext rcx = new ReceiverContext(instance.getDs(), instance.getStoreManager().get("test"));
         TestTraceGenerator generator = new TestTraceGenerator();
         TraceRecord tr = generator.generate();
         Symbol s1 = new Symbol(tr.getClassId(), generator.getSymbols().symbolName(tr.getClassId()));
@@ -117,7 +117,7 @@ public class TraceDataApiUnitTest extends CentralFixture {
     @Test
     public void testGetTraceRoot() throws Exception {
         int hostId = storeManager.getOrCreateHost("test", "").getHostInfo().getId();
-        TraceRecordInfo tr = traceDataApi.getRecord(hostId, 0, "");
+        TraceRecordInfo tr = traceDataApi.getRecord(hostId, 0, 0, "");
         assertEquals(0, tr.getChildren());
     }
 
@@ -125,7 +125,7 @@ public class TraceDataApiUnitTest extends CentralFixture {
     @Test
     public void testListTraceRoot() throws Exception {
         int hostId = storeManager.getOrCreateHost("test", "").getHostInfo().getId();
-        List<TraceRecordInfo> lst = traceDataApi.listRecords(hostId, 0, "");
+        List<TraceRecordInfo> lst = traceDataApi.listRecords(hostId, 0, 0, "");
         assertNotNull(lst);
     }
 }

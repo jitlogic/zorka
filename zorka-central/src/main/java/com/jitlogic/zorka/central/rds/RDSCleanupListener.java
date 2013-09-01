@@ -13,31 +13,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.central.rds;
 
 
-import com.jitlogic.zorka.common.tracedata.TraceRecord;
+public interface RDSCleanupListener {
 
-import java.util.Map;
+    void onChunkRemoved(long start, long length);
 
-public class TraceMarkerProcessor implements SpyProcessor {
-
-    private int mflags;
-    private Tracer tracer;
-
-    public TraceMarkerProcessor(Tracer tracer, int mflags) {
-        this.tracer = tracer;
-        this.mflags = mflags;
-    }
-
-    @Override
-    public Map<String, Object> process(Map<String, Object> record) {
-        TraceRecord top = tracer.getHandler().realTop();
-
-        if (top.getMarker() != null) {
-            top.getMarker().markFlags(mflags);
-        }
-
-        return record;
-    }
 }

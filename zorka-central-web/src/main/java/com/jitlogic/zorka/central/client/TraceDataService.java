@@ -42,17 +42,19 @@ public interface TraceDataService extends RestService {
 
 
     @GET
-    @Path("hosts/{hostId}/{traceOffs}/list?path={path}")
+    @Path("hosts/{hostId}/{traceOffs}/list?path={path}&minTime={minTime}")
     public void listTraceRecords(@PathParam("hostId") int hostId,
                                  @PathParam("traceOffs") long traceOffs,
+                                 @PathParam("minTime") long minTime,
                                  @PathParam("path") String path,
                                  MethodCallback<List<TraceRecordInfo>> callback);
 
 
     @GET
-    @Path("hosts/{hostId}/{traceOffs}/get?path={path}")
+    @Path("hosts/{hostId}/{traceOffs}/get?path={path}&minTime={minTime}")
     public void getTraceRecord(@PathParam("hostId") int hostId,
                                @PathParam("traceOffs") long traceOffs,
+                               @PathParam("minTime") long minTime,
                                @PathParam("path") String path,
                                MethodCallback<TraceRecordInfo> callback);
 
