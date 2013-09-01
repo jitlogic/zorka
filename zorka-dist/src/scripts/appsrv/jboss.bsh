@@ -59,6 +59,9 @@ __jboss() {
     // EJB monitoring for JBoss
     _ejb_trace = zorka.boolCfg("ejb.trace");
     _ejb_params = zorka.boolCfg("ejb.params");
+    _ejb_stats = zorka.boolCfg("ejb.stats");
+    _ejb_error = zorka.boolCfg("ejb.error");
+    _ejb_slow = zorka.boolCfg("ejb.slow");
 
     spy.add(spy.instrument()
       .onEnter(
@@ -69,20 +72,21 @@ __jboss() {
         _ejb_trace ? tracer.attr("METHOD", "METHOD") : null,
         _ejb_trace ? tracer.attr("CLASS", "CLASS") : null)
       .onError(
-        tracer.flags(tracer.SUBMIT_TRACE),
+        _ejb_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
         spy.fetchError("ERR"),
         spy.format("MSG", "${ERR.message}"),
-        spy.trapperCollector(ejb.error_trapper, zorka.INFO, "EJB", zorka.stringCfg("ejb.error.format")))
-      .onReturn(spy.fetchRetVal("RET"))
-    .onSubmit(
+        _ejb_error ? spy.trapperCollector(ejb.error_trapper, zorka.INFO, "EJB", zorka.stringCfg("ejb.error.format")) : null)
+      .onReturn(
+        _ejb_params ? spy.fetchRetVal("RET") : spy.put("RET", ""))
+      .onSubmit(
         _ejb_params ? (com.jitlogic.zorka.core.spy.SpyProcessor)(ejb.arg_processor()) : spy.put("PARAMS", ""),
         _ejb_trace ? tracer.attr("RET", "RET") : null,
-        spy.zorkaStats("java", ejb._mbean, "byMethod", "${CLASS}.${METHOD}"),
-        spy.zorkaStats("java", ejb._mbean, "stats", "ALL"),
+        _ejb_stats ? spy.zorkaStats("java", ejb._mbean, "byMethod", "${CLASS}.${METHOD}") : null,
+        _ejb_stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null,
         spy.longerThan(zorka.longCfg("ejb.slow.time")),
         spy.strTime("TIME"),
-        spy.trapperCollector(ejb.slow_trapper, zorka.INFO, "EJB", zorka.stringCfg("ejb.slow.format")))
-    .include(spy.byMethod("org.jboss.ejb.Container", "invoke")));
+        _ejb_slow ? spy.trapperCollector(ejb.slow_trapper, zorka.INFO, "EJB", zorka.stringCfg("ejb.slow.format")) : null)
+      .include(spy.byMethod("org.jboss.ejb.Container", "invoke")));
 
   }
 
