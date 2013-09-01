@@ -73,6 +73,9 @@ public class TraceInfo {
     @JsonProperty
     Map<String, String> attributes;
 
+    @JsonProperty
+    SymbolicExceptionInfo exceptionInfo;
+
     public int getHostId() {
         return hostId;
     }
@@ -207,5 +210,13 @@ public class TraceInfo {
 
     public void setAttributes(Map<String, String> attributes) {
         this.attributes = attributes;
+    }
+
+    public SymbolicExceptionInfo getExceptionInfo() {
+        return exceptionInfo;
+    }
+
+    public void setExceptionInfo(SymbolicExceptionInfo exceptionInfo) {
+        this.exceptionInfo = exceptionInfo;
     }
 }

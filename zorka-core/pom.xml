@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zorka-core</artifactId>
     <parent>
         <groupId>com.jitlogic.zorka</groupId>
         <artifactId>zorka</artifactId>
-        <version>0.9.8-SNAPSHOT</version>
+        <version>0.9.8</version>
     </parent>
     <dependencies>
         <dependency>
@@ -16,12 +16,12 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
         <dependency>
             <groupId>com.jitlogic.zoola</groupId>
             <artifactId>zoola-core</artifactId>
-            <version>0.1.0</version>
+            <version>${zoola.version}</version>
         </dependency>
         <dependency>
             <groupId>com.jitlogic.contrib</groupId>
             <artifactId>libsnmp</artifactId>
-            <version>0.0.1</version>
+            <version>${libsnmp.version}</version>
         </dependency>
         <dependency>
             <groupId>org.fressian</groupId>

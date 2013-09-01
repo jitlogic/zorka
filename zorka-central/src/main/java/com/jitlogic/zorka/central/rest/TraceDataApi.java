@@ -91,10 +91,11 @@ public class TraceDataApi {
     public TraceRecordInfo getRecord(
             @PathParam("hostId") int hostId,
             @PathParam("traceOffs") long traceOffs,
+            @DefaultValue("0") @QueryParam("minTime") long minTime,
             @DefaultValue("") @QueryParam("path") String path) {
 
         TraceContext ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
-        return ctx.packTraceRecord(ctx.getTraceRecord(path), path);
+        return ctx.packTraceRecord(ctx.getTraceRecord(path, minTime), path);
     }
 
 
@@ -104,10 +105,11 @@ public class TraceDataApi {
     public List<TraceRecordInfo> listRecords(
             @PathParam("hostId") int hostId,
             @PathParam("traceOffs") long traceOffs,
+            @DefaultValue("0") @QueryParam("minTime") long minTime,
             @DefaultValue("") @QueryParam("path") String path) {
 
         TraceContext ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
-        TraceRecord tr = ctx.getTraceRecord(path);
+        TraceRecord tr = ctx.getTraceRecord(path, minTime);
 
         List<TraceRecordInfo> lst = new ArrayList<TraceRecordInfo>();
 

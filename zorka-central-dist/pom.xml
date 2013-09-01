@@ -5,7 +5,7 @@
     <parent>
         <artifactId>zorka</artifactId>
         <groupId>com.jitlogic.zorka</groupId>
-        <version>0.9.8-SNAPSHOT</version>
+        <version>0.9.8</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -30,6 +30,7 @@
                                 <mkdir dir="${project.build.outputDirectory}/central-${project.version}"/>
                                 <mkdir dir="${project.build.outputDirectory}/central-${project.version}/data"/>
                                 <mkdir dir="${project.build.outputDirectory}/central-${project.version}/log"/>
+                                <mkdir dir="${project.build.outputDirectory}/central-${project.version}/tmp"/>
                                 <copy file="../zorka-central-web/target/central.war"
                                       toFile="${project.build.outputDirectory}/central-${project.version}/central.war"/>
                                 <copy file="../COPYING"

@@ -61,7 +61,9 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
     private TraceInfo traceInfo;
     private TreeGrid<TraceRecordInfo> methodTree;
     private TreeStore<TraceRecordInfo> methodTreeStore;
+    private SpinnerField<Double> txtDuration;
 
+    private long minMethodTime = 0;
 
     public TraceDetailPanel(TraceDataService tds, TraceInfo traceInfo) {
         this.tds = tds;
@@ -87,10 +89,10 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
             }
         });
 
-        TextButton btnNextException = new TextButton();
-        btnNextException.setIcon(Resources.INSTANCE.exceptionIcon());
-        btnNextException.setToolTip("Drill down: next exception");
-        toolBar.add(btnNextException);
+        //TextButton btnNextException = new TextButton();
+        //btnNextException.setIcon(Resources.INSTANCE.exceptionIcon());
+        //btnNextException.setToolTip("Drill down: next exception");
+        //toolBar.add(btnNextException);
 
         toolBar.add(new SeparatorToolItem());
 
@@ -99,7 +101,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
         btnFilter.setToolTip("Filter by criteria");
         toolBar.add(btnFilter);
 
-        final SpinnerField<Double> txtDuration = new SpinnerField<Double>(new NumberPropertyEditor.DoublePropertyEditor());
+        txtDuration = new SpinnerField<Double>(new NumberPropertyEditor.DoublePropertyEditor());
         txtDuration.setIncrement(1d);
         txtDuration.setMinValue(0);
         txtDuration.setMaxValue(1000000d);
@@ -123,28 +125,39 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
             }
         });
 
-        toolBar.add(new SeparatorToolItem());
+        //toolBar.add(new SeparatorToolItem());
 
-        TextButton btnSearchPrev = new TextButton();
-        btnSearchPrev.setIcon(Resources.INSTANCE.goPrevIcon());
-        btnSearchPrev.setToolTip("Search previous occurence");
-        toolBar.add(btnSearchPrev);
+        //TextButton btnSearchPrev = new TextButton();
+        //btnSearchPrev.setIcon(Resources.INSTANCE.goPrevIcon());
+        //btnSearchPrev.setToolTip("Search previous occurence");
+        //toolBar.add(btnSearchPrev);
 
-        TextButton btnSearchNext = new TextButton();
-        btnSearchNext.setIcon(Resources.INSTANCE.goNextIcon());
-        btnSearchNext.setToolTip("Search next");
-        toolBar.add(btnSearchNext);
+        //TextButton btnSearchNext = new TextButton();
+        //btnSearchNext.setIcon(Resources.INSTANCE.goNextIcon());
+        //btnSearchNext.setToolTip("Search next");
+        //toolBar.add(btnSearchNext);
 
-        final TextField txtFilter = new TextField();
-        BoxLayoutContainer.BoxLayoutData txtFilterLayout = new BoxLayoutContainer.BoxLayoutData();
-        txtFilterLayout.setFlex(1.0);
-        txtFilter.setToolTip("Search for text (in class/method name or attributes)");
-        txtFilter.setLayoutData(txtFilterLayout);
-        toolBar.add(txtFilter);
+        //final TextField txtFilter = new TextField();
+        //BoxLayoutContainer.BoxLayoutData txtFilterLayout = new BoxLayoutContainer.BoxLayoutData();
+        //txtFilterLayout.setFlex(1.0);
+        //txtFilter.setToolTip("Search for text (in class/method name or attributes)");
+        //txtFilter.setLayoutData(txtFilterLayout);
+        //toolBar.add(txtFilter);
 
         add(toolBar, new VerticalLayoutData(1, -1));
-    }
 
+        btnFilter.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                Double duration = txtDuration.getCurrentValue();
+                minMethodTime = duration != null ? (long) (duration * 1000000) : 0;
+                methodTree.collapseAll();
+                List<TraceRecordInfo> tr = methodTreeStore.getRootItems();
+                methodTreeStore.clear();
+                methodTreeStore.add(tr);
+            }
+        });
+    }
 
     private void findNextSlowestMethod() {
         TraceRecordInfo info = null;
@@ -171,7 +184,8 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
         DataProxy<TraceRecordInfo, List<TraceRecordInfo>> proxy = new DataProxy<TraceRecordInfo, List<TraceRecordInfo>>() {
             @Override
             public void load(TraceRecordInfo parent, final Callback<List<TraceRecordInfo>, Throwable> callback) {
-                tds.listTraceRecords(traceInfo.getHostId(), traceInfo.getDataOffs(), parent != null ? parent.getPath() : "",
+                tds.listTraceRecords(traceInfo.getHostId(), traceInfo.getDataOffs(), minMethodTime,
+                        parent != null ? parent.getPath() : "",
                         new MethodCallback<List<TraceRecordInfo>>() {
                             @Override
                             public void onFailure(Method method, Throwable exception) {

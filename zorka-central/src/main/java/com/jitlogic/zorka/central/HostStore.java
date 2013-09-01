@@ -16,12 +16,9 @@
 package com.jitlogic.zorka.central;
 
 
-import com.jitlogic.zorka.central.data.HostInfo;
-import com.jitlogic.zorka.central.data.PagingData;
-import com.jitlogic.zorka.central.data.TraceInfo;
-import com.jitlogic.zorka.central.data.TraceListFilterExpression;
+import com.jitlogic.zorka.central.data.*;
+import com.jitlogic.zorka.central.rds.RDSCleanupListener;
 import com.jitlogic.zorka.central.rds.RDSStore;
-import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -44,7 +41,7 @@ import java.util.Set;
 /**
  * Represents performance data store for a single agent.
  */
-public class HostStore implements Closeable {
+public class HostStore implements Closeable, RDSCleanupListener {
 
     private final static Logger log = LoggerFactory.getLogger(HostStore.class);
 
@@ -55,6 +52,7 @@ public class HostStore implements Closeable {
     private RDSStore rds;
     private HostInfo hostInfo;
     private HostStoreManager manager;
+    private TraceCache cache;
 
 
     private JdbcTemplate jdbc;
@@ -92,6 +90,15 @@ public class HostStore implements Closeable {
 
             info.setAttributes(attrs);
 
+            String exJson = rs.getString("EXINFO");
+            if (exJson != null) {
+                try {
+                    info.setExceptionInfo(mapper.readValue(exJson, SymbolicExceptionInfo.class));
+                } catch (IOException e) {
+                    log.error("Error unpacking JSON exInfo", e);
+                }
+            }
+
             info.setDescription(manager.getTraceTemplater().templateDescription(info));
 
             return info;
@@ -100,8 +107,12 @@ public class HostStore implements Closeable {
 
 
     public HostStore(HostStoreManager manager,
+                     TraceCache cache,
                      ResultSet rs) throws SQLException {
+
+        this.cache = cache;
         this.manager = manager;
+
         this.hostInfo = new HostInfo();
 
         this.jdbc = new JdbcTemplate(manager.getDs());
@@ -120,6 +131,7 @@ public class HostStore implements Closeable {
         hostInfo.setPath(rs.getString("HOST_PATH"));
         hostInfo.setPass(rs.getString("HOST_PASS"));
         hostInfo.setFlags(rs.getInt("HOST_FLAGS"));
+        hostInfo.setMaxSize(rs.getLong("MAX_SIZE"));
         hostInfo.setDescription(rs.getString("HOST_DESC"));
     }
 
@@ -128,6 +140,7 @@ public class HostStore implements Closeable {
         hostInfo.setAddr(info.getAddr());
         hostInfo.setPass(info.getPass());
         hostInfo.setFlags(info.getFlags());
+        hostInfo.setMaxSize(info.getMaxSize());
         hostInfo.setDescription(info.getDescription());
     }
 
@@ -153,10 +166,13 @@ public class HostStore implements Closeable {
             }
 
             try {
+                long fileSize = getStoreManager().getConfig().kiloCfg("rds.file.size", 16 * 1024 * 1024L).intValue();
+                long segmentSize = getStoreManager().getConfig().kiloCfg("rds.seg.size", 1024 * 1024L);
                 rds = new RDSStore(rdspath,
-                        getStoreManager().getConfig().kiloCfg("rds.file.size", 16 * 1024 * 1024L).intValue(),
-                        getStoreManager().getConfig().kiloCfg("rds.max.size", 256 * 1024 * 1024L),
-                        getStoreManager().getConfig().kiloCfg("rds.seg.size", 1024 * 1024L));
+                        hostInfo.getMaxSize(),
+                        fileSize,
+                        segmentSize);
+                rds.addCleanupListener(this);
             } catch (IOException e) {
                 log.error("Cannot open RDS store at '" + rdspath + "'", e);
             }
@@ -165,9 +181,18 @@ public class HostStore implements Closeable {
     }
 
 
-    public void save() {
-        jdbc.update("update HOSTS set HOST_ADDR=?, HOST_DESC=?, HOST_PASS=?, HOST_FLAGS=? where HOST_ID=?",
-                hostInfo.getAddr(), hostInfo.getDescription(), hostInfo.getPass(), hostInfo.getFlags(), hostInfo.getId());
+    public synchronized void save() {
+        jdbc.update("update HOSTS set HOST_ADDR=?, HOST_DESC=?, HOST_PASS=?, HOST_FLAGS=?, MAX_SIZE = ? where HOST_ID=?",
+                hostInfo.getAddr(), hostInfo.getDescription(), hostInfo.getPass(), hostInfo.getFlags(),
+                hostInfo.getMaxSize(), hostInfo.getId());
+        if (rds != null) {
+            rds.setMaxSize(hostInfo.getMaxSize());
+            try {
+                rds.cleanup();
+            } catch (IOException e) {
+                log.error("Error resizing RDS store for " + hostInfo.getName());
+            }
+        }
     }
 
     private final static Map<String, String> TRACES_ORDER_COLS = ZorkaUtil.map(
@@ -200,7 +225,7 @@ public class HostStore implements Closeable {
         if (filter.getFilterExpr() != null && filter.getFilterExpr().trim().length() > 0) {
             sql1 += " and ATTRS like :filterExpr";
             sql2 += " and ATTRS like :filterExpr";
-            params.addValue("filterExpr", filter.getFilterExpr().trim());
+            params.addValue("filterExpr", "%" + filter.getFilterExpr().trim().replace("*", "%") + "%");
         }
 
         if (filter.getMinTime() > 0) {
@@ -234,7 +259,7 @@ public class HostStore implements Closeable {
 
 
     public TraceContext getTraceContext(long traceOffs) {
-        return new TraceContext(this, getTrace(traceOffs), manager.getSymbolRegistry());
+        return new TraceContext(this, getTrace(traceOffs), cache, manager.getSymbolRegistry());
     }
 
 
@@ -260,4 +285,12 @@ public class HostStore implements Closeable {
     public HostStoreManager getStoreManager() {
         return manager;
     }
+
+    @Override
+    public void onChunkRemoved(long start, long length) {
+        log.info("Discarding old trace data for " + hostInfo.getName() + " start=" + start + ", length=" + length);
+        jdbc.update("delete from TRACES where HOST_ID = ? and DATA_OFFS between ? and ?",
+                hostInfo.getId(), start, start + length);
+    }
 }
+

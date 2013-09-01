@@ -62,4 +62,7 @@ public interface Resources extends ClientBundle {
 
     @Source("images/list-columns.png")
     ImageResource listColumnsIcon();
+
+    @Source("images/clear.png")
+    ImageResource clearIcon();
 }

@@ -115,6 +115,10 @@ public class TraceRecord implements SymbolicRecord {
      */
     private List<TraceRecord> children;
 
+    public TraceRecord() {
+
+    }
+
     /**
      * Creates trace record.
      *
@@ -122,6 +126,24 @@ public class TraceRecord implements SymbolicRecord {
      */
     public TraceRecord(TraceRecord parent) {
         setParent(parent);
+    }
+
+
+    public TraceRecord copy() {
+        TraceRecord tr = new TraceRecord();
+        tr.classId = classId;
+        tr.methodId = methodId;
+        tr.signatureId = signatureId;
+        tr.flags = flags;
+        tr.time = time;
+        tr.calls = calls;
+        tr.errors = errors;
+        tr.marker = marker;
+        tr.exception = exception;
+        tr.parent = parent;
+        tr.attrs = attrs;
+        tr.children = children;
+        return tr;
     }
 
 
