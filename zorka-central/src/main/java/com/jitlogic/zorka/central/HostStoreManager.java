@@ -15,11 +15,14 @@
  */
 package com.jitlogic.zorka.central;
 
+import com.jitlogic.zorka.central.data.HostInfo;
 import com.jitlogic.zorka.common.tracedata.HelloRequest;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessorFactory;
+import com.jitlogic.zorka.common.zico.ZicoException;
+import com.jitlogic.zorka.common.zico.ZicoPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -47,6 +50,7 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
     private TraceTemplater traceTemplater;
     private TraceCache cache;
 
+    private boolean enableSecurity;
 
     private Map<Integer, HostStore> storesById = new HashMap<Integer, HostStore>();
     private Map<String, HostStore> storesByName = new HashMap<String, HostStore>();
@@ -63,6 +67,7 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
         this.traceTemplater = traceTemplater;
 
         this.jdbc = new JdbcTemplate(ds);
+        this.enableSecurity = config.boolCfg("zico.security", false);
     }
 
 
@@ -99,8 +104,8 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
 
     // TODO use ID as proper host ID as get(id), rename this method to reflect it is get-or-create method, not a simple getter
     // TODO this method is redundant
-    public synchronized HostStore get(String hostName) {
-        if (!storesByName.containsKey(hostName)) {
+    public synchronized HostStore get(String hostName, boolean create) {
+        if (!storesByName.containsKey(hostName) && create) {
             HostStore host = getOrCreateHost(hostName, null);
             if (host != null) {
                 storesByName.put(hostName, host);
@@ -126,11 +131,28 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
     @Override
     // TODO move this outside this class
     public ZicoDataProcessor get(Socket socket, HelloRequest hello) throws IOException {
-        HostStore store = get(hello.getHostname());
+        HostStore store = get(hello.getHostname(), !enableSecurity);
         if (store.getHostInfo().getAddr() == null) {
             store.getHostInfo().setAddr(socket.getInetAddress().getHostAddress());
             store.save();
         }
+
+        if (store == null) {
+            throw new ZicoException(ZicoPacket.ZICO_AUTH_ERROR, "Unauthorized.");
+        }
+
+        if (enableSecurity) {
+            HostInfo hi = store.getHostInfo();
+
+            if (hi.getAddr() != null && !hi.getAddr().equals("" + socket.getInetAddress())) {
+                throw new ZicoException(ZicoPacket.ZICO_AUTH_ERROR, "Unauthorized.");
+            }
+
+            if (hi.getPass() != null && !hi.getPass().equals(hello.getAuth())) {
+                throw new ZicoException(ZicoPacket.ZICO_AUTH_ERROR, "Unauthorized.");
+            }
+        }
+
         return new ReceiverContext(ds, store);
     }
 
