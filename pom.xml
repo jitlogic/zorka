@@ -3,11 +3,13 @@
     <groupId>com.jitlogic.zorka</groupId>
     <artifactId>zorka</artifactId>
     <packaging>pom</packaging>
-    <version>0.9.8-SNAPSHOT</version>
+    <version>0.9.8</version>
     <name>zorka: parent aggregator</name>
     <url>http://www.jitlogic.com/zorka</url>
 
     <properties>
+        <zoola.version>0.1.0</zoola.version>
+        <libsnmp.version>0.0.1</libsnmp.version>
         <fest.version>1.4</fest.version>
         <junit.version>4.11</junit.version>
         <netty.version>4.0.6.Final</netty.version>
