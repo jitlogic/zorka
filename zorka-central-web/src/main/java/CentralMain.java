@@ -14,7 +14,13 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.LoginService;
+import org.eclipse.jetty.security.authentication.FormAuthenticator;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import java.io.File;
@@ -33,12 +39,16 @@ public class CentralMain {
     private static int port;
     private static String homeDir;
     private static Server server;
+    private static WebAppContext webapp;
+
 
     public static void main(String[] args) throws Exception {
 
         configure();
 
         initServer();
+
+        initSecurity();
 
         server.start();
         server.join();
@@ -49,7 +59,7 @@ public class CentralMain {
         ProtectionDomain domain = Server.class.getProtectionDomain();
         URL location = domain.getCodeSource().getLocation();
 
-        WebAppContext webapp = new WebAppContext();
+        webapp = new WebAppContext();
         webapp.setContextPath("/");
         webapp.setDescriptor(location.toExternalForm() + "/WEB-INF/web.xml");
         webapp.setServer(server);
@@ -59,12 +69,41 @@ public class CentralMain {
         server.setHandler(webapp);
     }
 
+    private static void initSecurity() {
+        File config = new File(homeDir, "users.properties");
+
+        if (!config.exists()) {
+            System.err.println("ERROR: Missing users.properties file in " + homeDir);
+            System.exit(1);
+        }
+
+        Constraint constraint = new Constraint();
+        constraint.setName(Constraint.__FORM_AUTH);
+        constraint.setRoles(new String[]{"OPER"});
+        constraint.setAuthenticate(true);
+
+        ConstraintMapping mapping = new ConstraintMapping();
+        mapping.setConstraint(constraint);
+        mapping.setPathSpec("/*");
+
+        FormAuthenticator authenticator = new FormAuthenticator("/login.html", "/login-fail.html", false);
+
+        LoginService loginService = new HashLoginService("Zorka Central UI", config.getPath());
+
+        ConstraintSecurityHandler handler = new ConstraintSecurityHandler();
+        handler.addConstraintMapping(mapping);
+        handler.setLoginService(loginService);
+        handler.setAuthenticator(authenticator);
+
+        webapp.setSecurityHandler(handler);
+    }
+
     private static void configure() throws IOException {
 
         homeDir = System.getProperty("central.home.dir");
 
         if (homeDir == null) {
-            System.err.println("Missing home dir property: add -Dcentral.home.dir=<path-to-central-home> to JVM args.");
+            System.err.println("ERROR: Missing home dir property: add -Dcentral.home.dir=<path-to-central-home> to JVM args.");
             System.exit(1);
         }
 
