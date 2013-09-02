@@ -26,6 +26,7 @@
         <war.plugin.version>2.1.1</war.plugin.version>
         <antrun.plugin.version>1.3</antrun.plugin.version>
         <mysql.connector.version>5.1.26</mysql.connector.version>
+        <pgsql.connector.version>9.2-1003-jdbc4</pgsql.connector.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
