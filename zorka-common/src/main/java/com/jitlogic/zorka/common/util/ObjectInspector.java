@@ -42,10 +42,14 @@ import java.util.regex.Pattern;
  */
 public final class ObjectInspector {
 
-    /** Special attribute name that will extract stack trace from throwable objects. */
+    /**
+     * Special attribute name that will extract stack trace from throwable objects.
+     */
     public static final String STACK_TRACE_KEY = "printStackTrace";
 
-    /** Private constructor to block instantiation of utility class. */
+    /**
+     * Private constructor to block instantiation of utility class.
+     */
     private ObjectInspector() {
     }
 
@@ -53,19 +57,19 @@ public final class ObjectInspector {
      * Gets a chain of attributes from an object. That is, gets first attribute from obj, then
      * gets second attribute from obtained object, then gets third attribute from second obtained object etc.
      *
-     * @param obj source object
+     * @param obj  source object
      * @param keys chain of attribute names
-     * @param <T> result type
+     * @param <T>  result type
      * @return final result
      */
-    public static <T> T get(Object obj, Object...keys) {
+    public static <T> T get(Object obj, Object... keys) {
         Object cur = obj;
 
         for (Object key : keys) {
             cur = getAttr(cur, key);
         }
 
-        return (T)cur;
+        return (T) cur;
     }
 
     /**
@@ -75,9 +79,7 @@ public final class ObjectInspector {
      * otherwise.
      *
      * @param obj object subjected
-     *
      * @param key attribute identified (name, index, etc. - depending on object type)
-     *
      * @return attribute value or null if no matching attribute has been found
      */
     private static Object getAttr(Object obj, Object key) {
@@ -91,11 +93,11 @@ public final class ObjectInspector {
         if (key instanceof String && key.toString().endsWith("()")) {
             // Explicit method call for attributes ending with '()'
             String name = key.toString();
-            name = name.substring(0, name.length()-2);
+            name = name.substring(0, name.length() - 2);
             Method method = lookupMethod(clazz, name);
 
             if (method == null && obj instanceof Class) {
-                method = lookupMethod((Class)obj, name);
+                method = lookupMethod((Class) obj, name);
             }
 
             return fetchViaMethod(obj, method);
@@ -108,25 +110,25 @@ public final class ObjectInspector {
 
         if (obj instanceof Throwable && STACK_TRACE_KEY.equals(key)) {
             Writer rslt = new StringWriter(512);
-            ((Throwable)obj).printStackTrace(new PrintWriter(rslt));
+            ((Throwable) obj).printStackTrace(new PrintWriter(rslt));
             return rslt.toString();
         }
 
         if (obj instanceof Map<?, ?>) {
-            return ((Map<?,?>)obj).get(key);
+            return ((Map<?, ?>) obj).get(key);
         } else if (obj instanceof List<?>) {
             Integer idx = (Integer) ZorkaUtil.coerce(key, Integer.class);
-            return idx != null ? ((List<?>)obj).get(idx) : null;
+            return idx != null ? ((List<?>) obj).get(idx) : null;
         } else if (obj.getClass().isArray()) {
-            Integer idx = (Integer)ZorkaUtil.coerce(key, Integer.class);
-            return idx != null ? ((Object[])obj)[idx] : null;
+            Integer idx = (Integer) ZorkaUtil.coerce(key, Integer.class);
+            return idx != null ? ((Object[]) obj)[idx] : null;
         } else if (obj instanceof CompositeData) {
-            return ((CompositeData)obj).get(""+key);
+            return ((CompositeData) obj).get("" + key);
         } else if (obj instanceof TabularData) {
             String[] keys = key.toString().split("\\,");
-            obj = ((TabularData)obj).get(keys);
+            obj = ((TabularData) obj).get(keys);
         } else if (obj instanceof ZorkaStats) {
-            return ((ZorkaStats)obj).getStatistic(key.toString());
+            return ((ZorkaStats) obj).getStatistic(key.toString());
         } else if (ZorkaUtil.instanceOf(obj.getClass(), "javax.management.j2ee.statistics.Stats")) {
             try {
                 Method m = obj.getClass().getMethod("getStatistic", String.class);
@@ -137,7 +139,7 @@ public final class ObjectInspector {
                 return "Error invoking getStatistic('" + key + "'): " + e.getMessage();
             }
         } else if (obj instanceof JmxObject) {
-            return ((JmxObject)obj).get(key);
+            return ((JmxObject) obj).get(key);
         }
 
         if (key instanceof String) {
@@ -146,7 +148,7 @@ public final class ObjectInspector {
             Method method = lookupMethod(clazz, "get" + name.substring(0, 1).toUpperCase() + name.substring(1));
 
             if (method == null && obj instanceof Class) {
-                method = lookupMethod((Class)obj, "get" + name.substring(0, 1).toUpperCase() + name.substring(1));
+                method = lookupMethod((Class) obj, "get" + name.substring(0, 1).toUpperCase() + name.substring(1));
             }
 
             if (method == null) {
@@ -154,7 +156,7 @@ public final class ObjectInspector {
             }
 
             if (method == null && obj instanceof Class) {
-                method = lookupMethod((Class)obj, "is" + name.substring(0, 1).toUpperCase() + name.substring(1));
+                method = lookupMethod((Class) obj, "is" + name.substring(0, 1).toUpperCase() + name.substring(1));
             }
 
             if (method == null) {
@@ -162,7 +164,7 @@ public final class ObjectInspector {
             }
 
             if (method == null && obj instanceof Class) {
-                method = lookupMethod((Class)obj, name);
+                method = lookupMethod((Class) obj, name);
             }
 
             if (method != null) {
@@ -185,38 +187,38 @@ public final class ObjectInspector {
     public static List<?> list(Object obj) {
         List<String> lst = new ArrayList<String>();
         if (obj instanceof Map) {
-            for (Object key : ((Map<?,?>)obj).keySet()) {
+            for (Object key : ((Map<?, ?>) obj).keySet()) {
                 lst.add(key.toString());
             }
         } else if (obj instanceof List<?>) {
-            int len = ((List)obj).size();
-            List<Integer> ret = new ArrayList<Integer>(len+2);
+            int len = ((List) obj).size();
+            List<Integer> ret = new ArrayList<Integer>(len + 2);
             for (int i = 0; i < len; i++) {
                 ret.add(i);
             }
             return ret;
         } else if (obj.getClass().isArray()) {
-            int len = ((Object[])obj).length;
-            List<Integer> ret = new ArrayList<Integer>(len+2);
+            int len = ((Object[]) obj).length;
+            List<Integer> ret = new ArrayList<Integer>(len + 2);
             for (int i = 0; i < len; i++) {
                 ret.add(i);
             }
             return ret;
         } else if (obj instanceof CompositeData) {
-            for (Object s : ((CompositeData)obj).getCompositeType().keySet()) {
+            for (Object s : ((CompositeData) obj).getCompositeType().keySet()) {
                 lst.add(s.toString());
             }
         } else if (obj instanceof TabularData) {
-            for (Object k : ((TabularData)obj).keySet()) {
-                lst.add(ZorkaUtil.join(",", (Collection<?>)k));
+            for (Object k : ((TabularData) obj).keySet()) {
+                lst.add(ZorkaUtil.join(",", (Collection<?>) k));
             }
         } else if (obj instanceof ZorkaStats) {
-            lst = Arrays.asList(((ZorkaStats)obj).getStatisticNames());
+            lst = Arrays.asList(((ZorkaStats) obj).getStatisticNames());
         } else if (ZorkaUtil.instanceOf(obj.getClass(), "javax.management.j2ee.statistics.Stats")) {
             try {
                 Method m = obj.getClass().getMethod("getStatisticNames");
                 if (m != null) {
-                    return Arrays.asList((Object[])m.invoke(obj));
+                    return Arrays.asList((Object[]) m.invoke(obj));
                 }
             } catch (Exception e) {
                 return new ArrayList<String>(1);
@@ -241,7 +243,7 @@ public final class ObjectInspector {
     /**
      * Fetches attribute value by calling getter method.
      *
-     * @param obj source object
+     * @param obj    source object
      * @param method target method (method object)
      * @return result of calling target method
      */
@@ -265,8 +267,7 @@ public final class ObjectInspector {
      * Fetches attribute value by accessing field directly (and unlocking it
      * for a moment if this is private field).
      *
-     *
-     * @param obj source object
+     * @param obj  source object
      * @param name field name
      * @return obtained value
      */
@@ -276,7 +277,7 @@ public final class ObjectInspector {
             name = name.startsWith(".") ? name.substring(1) : name;
             Field field = lookupField(clazz, name);
             if (field == null && obj instanceof Class) {
-                field = lookupField((Class)obj, name);
+                field = lookupField((Class) obj, name);
             }
             if (field == null) {
                 return null;
@@ -295,7 +296,7 @@ public final class ObjectInspector {
      * Lookf for field of given name.
      *
      * @param clazz class of inspected object
-     * @param name field name
+     * @param name  field name
      * @return field object of null if no such field exists
      */
     public static Field lookupField(Class<?> clazz, String name) {
@@ -322,7 +323,7 @@ public final class ObjectInspector {
      * interfaces that given class implements.
      *
      * @param clazz class of inspected object
-     * @param name method name
+     * @param name  method name
      * @return method object of null if no such method exists
      */
     public static Method lookupMethod(Class<?> clazz, String name) {
@@ -349,7 +350,7 @@ public final class ObjectInspector {
     /**
      * Queries mbean server for all objects matching given query string.
      *
-     * @param conn mbean server connection
+     * @param conn  mbean server connection
      * @param query query string
      * @return set of object names (possibly empty set if no matching names have been found or error occured)
      */
@@ -357,14 +358,16 @@ public final class ObjectInspector {
     public static Set<ObjectName> queryNames(MBeanServerConnection conn, String query) {
         try {
             ObjectName on = new ObjectName(query);
-            return (Set<ObjectName>)conn.queryNames(on, null);
+            return (Set<ObjectName>) conn.queryNames(on, null);
         } catch (Exception e) {
             return new HashSet<ObjectName>();
         }
     }
 
 
-    /** Regular expression for identifying substitution markers in strings. Used by substitute() methods. */
+    /**
+     * Regular expression for identifying substitution markers in strings. Used by substitute() methods.
+     */
     public static final Pattern reVarSubstPattern = Pattern.compile("\\$\\{([^\\}]+)\\}");
 
     private static final Pattern reDollarSign = Pattern.compile("$", Pattern.LITERAL);
@@ -376,22 +379,38 @@ public final class ObjectInspector {
      * parameter, subsequent attribute chains are used to obtain subsequent values as in
      * ObjectInspector.get() method.
      *
-     * @param input input (template) string
+     * @param input  input (template) string
      * @param record spy record to be substituted
      * @return string with substitutions filled with values from record
      */
-    public static String substitute(String input, Map<String,Object> record) {
+    public static String substitute(String input, Map<String, Object> record) {
         Matcher m = reVarSubstPattern.matcher(input);
         StringBuffer sb = new StringBuffer();
 
         while (m.find()) {
-            String expr = m.group(1);
+            String expr = m.group(1), def = null;
+            if (expr.contains(":")) {
+                String[] s = expr.split(":");
+                expr = s[0];
+                def = s[1];
+            }
+            Integer len = null;
+            if (expr.contains("~")) {
+                String[] s = expr.split("~");
+                expr = s[0];
+                len = Integer.parseInt(s[1]);
+            }
             String[] segs = expr.split("\\.");
             Object v = record.get(segs[0]);
             for (int i = 1; i < segs.length; i++) {
                 v = getAttr(v, segs[i]);
             }
-            m.appendReplacement(sb, reDollarSign.matcher(""+v).replaceAll(reDollarReplacement));
+            v = v != null ? v : def;
+            String s = v != null ? v.toString() : "null";
+            if (len != null && s.length() > len) {
+                s = s.substring(0, len);
+            }
+            m.appendReplacement(sb, reDollarSign.matcher(s).replaceAll(reDollarReplacement));
         }
 
         m.appendTail(sb);
@@ -403,7 +422,7 @@ public final class ObjectInspector {
     /**
      * Substitutes marked variables in a string with property strings.
      *
-     * @param input input (template) string
+     * @param input      input (template) string
      * @param properties spy record to be substituted
      * @return string with substitutions filled with values from record
      */
@@ -418,8 +437,17 @@ public final class ObjectInspector {
                 key = s[0];
                 def = s[1];
             }
+            Integer len = null;
+            if (key.contains("~")) {
+                String[] s = key.split("~");
+                key = s[0];
+                len = Integer.parseInt(s[1]);
+            }
             String val = properties.getProperty(key);
             if (val != null) {
+                if (len != null && val.length() > len) {
+                    val = val.substring(0, len);
+                }
                 m.appendReplacement(sb, val);
             } else if (def != null) {
                 m.appendReplacement(sb, def);
@@ -439,20 +467,36 @@ public final class ObjectInspector {
      * ObjectInspector.get() method.
      *
      * @param input input (template) string
-     * @param vals array of values
+     * @param vals  array of values
      * @return string with substitutions filled with values from record
      */
     public static String substitute(String input, Object[] vals) {
         Matcher m = reVarSubstPattern.matcher(input);
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
-            String expr = m.group(1);
+            String expr = m.group(1), def = null;
+            if (expr.contains(":")) {
+                String[] s = expr.split(":");
+                expr = s[0];
+                def = s[1];
+            }
+            Integer len = null;
+            if (expr.contains("~")) {
+                String[] s = expr.split("~");
+                expr = s[0];
+                len = Integer.parseInt(s[1]);
+            }
             String[] segs = expr.split("\\.");
             Object v = vals[Integer.parseInt(segs[0])];
             for (int i = 1; i < segs.length; i++) {
                 v = getAttr(v, segs[i]);
             }
-            m.appendReplacement(sb, ""+v);
+            v = v != null ? v : def;
+            String s = "" + v;
+            if (len != null && s.length() > len) {
+                s = s.substring(0, len);
+            }
+            m.appendReplacement(sb, s);
         }
 
         m.appendTail(sb);
@@ -463,7 +507,7 @@ public final class ObjectInspector {
 
     public static Object getField(Object obj, String fieldName) {
         if (obj != null) {
-            Field field = lookupField(obj instanceof Class ? (Class)obj : obj.getClass(), fieldName);
+            Field field = lookupField(obj instanceof Class ? (Class) obj : obj.getClass(), fieldName);
 
             if (field == null) {
                 //return null;
@@ -495,7 +539,7 @@ public final class ObjectInspector {
 
     public static void setField(Object obj, String fieldName, Object value) {
         if (obj != null) {
-            Field field = lookupField(obj instanceof Class ? (Class)obj : obj.getClass(), fieldName);
+            Field field = lookupField(obj instanceof Class ? (Class) obj : obj.getClass(), fieldName);
 
             if (field == null) {
                 return;

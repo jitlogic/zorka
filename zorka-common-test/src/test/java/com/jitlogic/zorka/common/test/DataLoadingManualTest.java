@@ -21,7 +21,7 @@ import org.junit.Test;
 
 public class DataLoadingManualTest {
 
-    @Test
+    //@Test
     public void testLoadDataFile() throws Exception {
         ZicoDataLoader loader = new ZicoDataLoader("127.0.0.1", 8640, System.getProperty("load.host"), "");
         loader.load(System.getProperty("load.file"));

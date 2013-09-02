@@ -15,6 +15,45 @@
  */
 package com.jitlogic.zorka.common.test;
 
+import com.jitlogic.zorka.common.util.ObjectInspector;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Properties;
+
+import static org.junit.Assert.*;
 
 public class ObjectInspectorUnitTest {
+
+    @Test
+    public void testSubstituteWithDefaultVal1() {
+        assertEquals("XXX", ObjectInspector.substitute("${X:XXX}", new HashMap<String, Object>()));
+        assertEquals("ABC", ObjectInspector.substitute("${X:XXX}", ZorkaUtil.<String, Object>map("X", "ABC")));
+        assertEquals("XXX", ObjectInspector.substitute("${0:XXX}", new Object[]{null}));
+        assertEquals("ABC", ObjectInspector.substitute("${0:XXX}", new Object[]{"ABC"}));
+    }
+
+
+    @Test
+    public void testSubstituteWithLimit() {
+        assertEquals("ABC", ObjectInspector.substitute("${X~3}", ZorkaUtil.<String, Object>map("X", "ABCDEF")));
+        assertEquals("ABC", ObjectInspector.substitute("${0~3}", new Object[]{"ABCDEF"}));
+    }
+
+
+    @Test
+    public void testSubstituteWithDefaultAndLimit() {
+        assertEquals("AB.YY", ObjectInspector.substitute("${X~2:XX}.${Y~2:YY}",
+                ZorkaUtil.<String, Object>map("X", "ABCD")));
+        assertEquals("AB.YY", ObjectInspector.substitute("${0~2:XX}.${1~2:YY}", new Object[]{"ABCD", null}));
+    }
+
+
+    @Test
+    public void testSubstitutePropWithLimit() {
+        Properties props = new Properties();
+        props.setProperty("X", "ABCDEF");
+        assertEquals("ABC", ObjectInspector.substitute("${X~3}", props));
+    }
 }
