@@ -42,6 +42,7 @@ import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.CellDoubleClickEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.*;
+import com.sencha.gxt.widget.core.client.form.validator.RegExValidator;
 import com.sencha.gxt.widget.core.client.grid.*;
 import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
@@ -68,6 +69,10 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
     private ZorkaCentralShell shell;
     private ToggleButton btnErrors;
+    private TextField txtClockEnd;
+    private TextField txtClockBegin;
+    private TextField txtFilter;
+    private SpinnerField<Double> txtDuration;
 
     public TraceListPanel(ZorkaCentralShell shell, TraceDataService tds, HostInfo hostInfo) {
         this.shell = shell;
@@ -266,7 +271,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
         btnFilter.setToolTip("Filter by criteria");
         toolBar.add(btnFilter);
 
-        final SpinnerField<Double> txtDuration = new SpinnerField<Double>(new NumberPropertyEditor.DoublePropertyEditor());
+        txtDuration = new SpinnerField<Double>(new NumberPropertyEditor.DoublePropertyEditor());
         txtDuration.setIncrement(1d);
         txtDuration.setMinValue(0);
         txtDuration.setMaxValue(1000000d);
@@ -276,17 +281,34 @@ public class TraceListPanel extends VerticalLayoutContainer {
         txtDuration.setToolTip("Minimum trace execution time (in seconds)");
         toolBar.add(txtDuration);
 
-        final TextField txtFilter = new TextField();
+        txtFilter = new TextField();
         BoxLayoutContainer.BoxLayoutData txtFilterLayout = new BoxLayoutContainer.BoxLayoutData();
         txtFilterLayout.setFlex(1.0);
         txtFilter.setToolTip("Search for text (as in Description field)");
         txtFilter.setLayoutData(txtFilterLayout);
         toolBar.add(txtFilter);
 
+        txtClockBegin = new TextField();
+        txtClockBegin.setWidth(130);
+        //txtClockBegin.setToolTip("From trace timestamp.");
+        txtClockBegin.addValidator(
+                new RegExValidator("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}", "Enter YYYY-MM-DD hh:mm:ss timestamp."));
+        txtClockBegin.setEmptyText("Start time");
+        toolBar.add(txtClockBegin);
+
+        txtClockEnd = new TextField();
+        txtClockEnd.setWidth(130);
+        //txtClockEnd.setWidth("To trace timestamp.");
+        txtClockEnd.addValidator(
+                new RegExValidator("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}", "Enter YYYY-MM-DD hh:mm:ss timestamp."));
+        txtClockEnd.setEmptyText("End time");
+        toolBar.add(txtClockEnd);
+
         TextButton btnClear = new TextButton();
         btnClear.setIcon(Resources.INSTANCE.clearIcon());
         btnClear.setToolTip("Clear all filters.");
         toolBar.add(btnClear);
+
 
         btnFilter.addSelectHandler(new SelectEvent.SelectHandler() {
             @Override
@@ -298,6 +320,8 @@ public class TraceListPanel extends VerticalLayoutContainer {
                 } else {
                     filter.setMinTime(0);
                 }
+                filter.setTimeStart(ClientUtil.parseTimestamp(txtClockBegin.getText()));
+                filter.setTimeEnd(ClientUtil.parseTimestamp(txtClockEnd.getText()));
                 traceGridView.refresh();
             }
         });
@@ -313,6 +337,8 @@ public class TraceListPanel extends VerticalLayoutContainer {
                 filter.setErrorsOnly(false);
                 filter.setMinTime(0);
                 filter.setFilterExpr("");
+                filter.setTimeStart(0);
+                filter.setTimeEnd(0);
 
                 traceGridView.refresh();
             }

@@ -220,6 +220,18 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
         String sqlc = " HOST_ID = :hostId";
 
+        if (filter.getTimeStart() != 0 && filter.getTimeEnd() != 0) {
+            sqlc += " and CLOCK between :timeStart and :timeEnd";
+            params.addValue("timeStart", filter.getTimeStart());
+            params.addValue("timeEnd", filter.getTimeEnd());
+        } else if (filter.getTimeEnd() != 0) {
+            sqlc += " and CLOCK < :timeEnd";
+            params.addValue("timeEnd", filter.getTimeEnd());
+        } else if (filter.getTimeStart() != 0) {
+            sqlc += " and CLOCK > :timeStart";
+            params.addValue("timeStart", filter.getTimeStart());
+        }
+
         if (filter.isErrorsOnly()) {
             sqlc += " and STATUS = 1";
         }

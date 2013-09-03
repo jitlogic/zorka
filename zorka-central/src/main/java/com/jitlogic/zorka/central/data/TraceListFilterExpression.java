@@ -36,7 +36,14 @@ public class TraceListFilterExpression {
     int traceId;
 
     @JsonProperty
+    long timeStart;
+
+    @JsonProperty
+    long timeEnd;
+
+    @JsonProperty
     String filterExpr;
+
 
     public String getSortBy() {
         return sortBy;
@@ -97,4 +104,23 @@ public class TraceListFilterExpression {
         this.filterExpr = filterExpr;
     }
 
+
+    public long getTimeStart() {
+        return timeStart;
+    }
+
+
+    public void setTimeStart(long timeStart) {
+        this.timeStart = timeStart;
+    }
+
+
+    public long getTimeEnd() {
+        return timeEnd;
+    }
+
+
+    public void setTimeEnd(long timeEnd) {
+        this.timeEnd = timeEnd;
+    }
 }

@@ -44,5 +44,10 @@ public class ClientUtil {
         return t > 10 ? DURATION_SFORMAT.format(t) + u : DURATION_MFORMAT.format(t) + u;
     }
 
-
+    public static long parseTimestamp(String tstamp) {
+        if (tstamp == null || tstamp.trim().length() == 0) {
+            return 0;
+        }
+        return TSTAMP_DFORMAT.parse(tstamp).getTime();
+    }
 }
