@@ -54,6 +54,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
     private HostStoreManager manager;
     private TraceCache cache;
 
+    private String reOp;
 
     private JdbcTemplate jdbc;
     private NamedParameterJdbcTemplate ndbc;
@@ -121,6 +122,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
         updateInfo(rs);
 
         this.rootPath = ZorkaUtil.path(manager.getDataDir(), hostInfo.getPath());
+
+        this.reOp = "pgsql".equals(manager.getConfig().stringCfg("central.db.type", null)) ? "~" : "regexp";
     }
 
 
@@ -213,28 +216,25 @@ public class HostStore implements Closeable, RDSCleanupListener {
             throw new RuntimeException("Invalid ordering arguments: orderBy=" + orderBy + ", orderDir=" + orderDir);
         }
 
-        String sql1 = "select * from TRACES where HOST_ID = :hostId";
-        String sql2 = "select count(1) from TRACES where HOST_ID = :hostId";
         MapSqlParameterSource params = new MapSqlParameterSource("hostId", hostInfo.getId());
 
+        String sqlc = " HOST_ID = :hostId";
+
         if (filter.isErrorsOnly()) {
-            sql1 += " and STATUS = 1";
-            sql2 += " and STATUS = 1";
+            sqlc += " and STATUS = 1";
         }
 
         if (filter.getFilterExpr() != null && filter.getFilterExpr().trim().length() > 0) {
-            sql1 += " and ATTRS like :filterExpr";
-            sql2 += " and ATTRS like :filterExpr";
-            params.addValue("filterExpr", "%" + filter.getFilterExpr().trim().replace("*", "%") + "%");
+            sqlc += parseFilterExpr(filter.getFilterExpr().trim(), params, reOp);
         }
 
         if (filter.getMinTime() > 0) {
-            sql1 += " and EXTIME > :minTime";
-            sql2 += " and EXTIME > :minTime";
+            sqlc += " and EXTIME > :minTime";
             params.addValue("minTime", filter.getMinTime());
         }
 
-        sql1 += " order by " + TRACES_ORDER_COLS.get(orderBy) + " " + orderDir + " limit :limit offset :offset";
+        String sql1 = "select * from TRACES where " + sqlc + " order by " + TRACES_ORDER_COLS.get(orderBy)
+                + " " + orderDir + " limit :limit offset :offset";
 
         params.addValue("limit", limit);
         params.addValue("offset", offset);
@@ -243,6 +243,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
         PagingData result = new PagingData();
 
+        String sql2 = "select count(1) from TRACES where " + sqlc;
 
         result.setOffset(offset);
         result.setTotal(ndbc.queryForObject(sql2, params, Integer.class));
@@ -250,6 +251,48 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
         return result;
 
+    }
+
+    private static final String QUOTED_CHARS = "*[]().\\?+{}^$";
+
+    public static String parseFilterExpr(String expr, MapSqlParameterSource params, String reOp) {
+        if (expr.startsWith("@")) {
+            int ix = expr.indexOf('=');
+            if (ix < 2) {
+                throw new RuntimeException("Invalid filter expression: '" + expr + "'");
+            }
+            String sa = expr.substring(1, ix);
+            String sv = expr.substring(ix + 1, expr.length());
+            if (!sv.startsWith("~")) {
+                StringBuilder sb = new StringBuilder(expr.length() + 10);
+                for (int i = 0; i < sv.length(); i++) {
+                    char ch = sv.charAt(i);
+                    if (ch == '*') {
+                        sb.append("[^\"]*");
+                    } else if (ch == '?') {
+                        sb.append("[^\"]");
+                    } else {
+                        if (QUOTED_CHARS.indexOf(ch) != -1) {
+                            sb.append('\\');
+                        }
+                        sb.append(ch);
+                    }
+                }
+                sv = sb.toString();
+            } else {
+                sv = sv.substring(1, sv.length()).replace(".", "[^\"]");
+            }
+            String regex = "\"" + sa + "\":\"" + sv + "\"";
+            params.addValue("filterRegex", regex);
+            return " and ATTRS " + reOp + " :filterRegex";
+        }
+        if (expr.startsWith("~")) {
+            params.addValue("filterRegex", expr.substring(1));
+            return " and ATTRS " + reOp + " :filterRegex";
+        } else {
+            params.addValue("filterExpr", "%" + expr.replace("*", "%") + "%");
+            return " and ATTRS like :filterExpr";
+        }
     }
 
     public TraceInfo getTrace(long traceOffs) {

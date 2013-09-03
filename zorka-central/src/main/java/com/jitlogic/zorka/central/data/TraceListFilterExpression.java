@@ -36,9 +36,6 @@ public class TraceListFilterExpression {
     int traceId;
 
     @JsonProperty
-    int filterType;
-
-    @JsonProperty
     String filterExpr;
 
     public String getSortBy() {
@@ -100,13 +97,4 @@ public class TraceListFilterExpression {
         this.filterExpr = filterExpr;
     }
 
-
-    public int getFilterType() {
-        return filterType;
-    }
-
-
-    public void setFilterType(int filterType) {
-        this.filterType = filterType;
-    }
 }
