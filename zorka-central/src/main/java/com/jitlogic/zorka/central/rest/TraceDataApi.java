@@ -17,24 +17,12 @@ package com.jitlogic.zorka.central.rest;
 
 import com.jitlogic.zorka.central.*;
 import com.jitlogic.zorka.central.data.*;
-import com.jitlogic.zorka.central.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.*;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
-import org.fressian.FressianReader;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import javax.sql.DataSource;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
-import java.util.regex.Pattern;
 
 @Path("hosts")
 public class TraceDataApi {
@@ -94,7 +82,7 @@ public class TraceDataApi {
             @DefaultValue("0") @QueryParam("minTime") long minTime,
             @DefaultValue("") @QueryParam("path") String path) {
 
-        TraceContext ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
+        TraceRecordStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
         return ctx.packTraceRecord(ctx.getTraceRecord(path, minTime), path);
     }
 
@@ -108,7 +96,7 @@ public class TraceDataApi {
             @DefaultValue("0") @QueryParam("minTime") long minTime,
             @DefaultValue("") @QueryParam("path") String path) {
 
-        TraceContext ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
+        TraceRecordStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
         TraceRecord tr = ctx.getTraceRecord(path, minTime);
 
         List<TraceRecordInfo> lst = new ArrayList<TraceRecordInfo>();
@@ -120,6 +108,24 @@ public class TraceDataApi {
         return lst;
     }
 
+
+    @POST
+    @Path("/{hostId: [0-9]+}/{traceOffs: [0-9]+}/search")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public List<TraceRecordInfo> searchRecords(
+            @PathParam("hostId") int hostId,
+            @PathParam("traceOffs") long traceOffs,
+            @DefaultValue("0") @QueryParam("minTime") long minTime,
+            @DefaultValue("") @QueryParam("path") String path,
+            TraceDetailSearchExpression expr) {
+
+        TraceRecordStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
+        TraceRecord tr = ctx.getTraceRecord(path, minTime);
+        List<TraceRecordInfo> result = new ArrayList<TraceRecordInfo>();
+        ctx.searchRecords(tr, path, expr, result);
+
+        return result;
+    }
 
     @POST
     @Path("/")

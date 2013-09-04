@@ -65,4 +65,7 @@ public interface Resources extends ClientBundle {
 
     @Source("images/clear.png")
     ImageResource clearIcon();
+
+    @Source("images/search.png")
+    ImageResource searchIcon();
 }

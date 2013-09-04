@@ -63,7 +63,14 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
     private TreeStore<TraceRecordInfo> methodTreeStore;
     private SpinnerField<Double> txtDuration;
 
+    private TraceRecordSearchDialog searchDialog;
+
     private long minMethodTime = 0;
+
+    private int expandLevel = -1;
+    private int[] expandIndexes = null;
+    private String expandPath = null;
+    private TraceRecordInfo expandNode = null;
 
     public TraceDetailPanel(TraceDataService tds, TraceInfo traceInfo) {
         this.tds = tds;
@@ -125,7 +132,22 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
             }
         });
 
-        //toolBar.add(new SeparatorToolItem());
+        toolBar.add(new SeparatorToolItem());
+
+        TextButton btnSearch = new TextButton();
+        btnSearch.setIcon(Resources.INSTANCE.searchIcon());
+        btnSearch.setToolTip("Search");
+        toolBar.add(btnSearch);
+
+        btnSearch.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                if (searchDialog == null) {
+                    searchDialog = new TraceRecordSearchDialog(TraceDetailPanel.this, tds, traceInfo, null);
+                }
+                searchDialog.show();
+            }
+        });
 
         //TextButton btnSearchPrev = new TextButton();
         //btnSearchPrev.setIcon(Resources.INSTANCE.goPrevIcon());
@@ -179,6 +201,43 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
     }
 
 
+    public void expandStart(String expandPath) {
+        this.expandPath = expandPath;
+        String[] s = expandPath.split("/");
+        expandIndexes = new int[s.length - 1];
+        for (int i = 1; i < s.length; i++) {
+            expandIndexes[i - 1] = Integer.parseInt(s[i]);
+        }
+        expandLevel = 0;
+        expandNode = null;
+        expandCont();
+    }
+
+
+    private void expandCont() {
+        int idx = expandIndexes[expandLevel];
+        expandNode = expandNode != null
+                ? methodTreeStore.getChildren(expandNode).get(idx)
+                : methodTreeStore.getRootItems().get(idx);
+
+        expandLevel++;
+
+        if (expandLevel >= expandIndexes.length || expandNode == null || methodTree.isLeaf(expandNode)) {
+            expandPath = null;
+            expandIndexes = null;
+            expandNode = null;
+            expandLevel = -1;
+        } else {
+            if (methodTree.isExpanded(expandNode)) {
+                expandCont();
+            } else {
+                methodTree.setExpanded(expandNode, true);
+            }
+            methodTree.getSelectionModel().setSelection(Arrays.asList(expandNode));
+        }
+    }
+
+
     private void createTraceDetailTree() {
 
         DataProxy<TraceRecordInfo, List<TraceRecordInfo>> proxy = new DataProxy<TraceRecordInfo, List<TraceRecordInfo>>() {
@@ -195,6 +254,9 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
                             @Override
                             public void onSuccess(Method method, List<TraceRecordInfo> records) {
                                 callback.onSuccess(records);
+                                if (expandPath != null) {
+                                    expandCont();
+                                }
                             }
                         });
             }

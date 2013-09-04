@@ -313,8 +313,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
     }
 
 
-    public TraceContext getTraceContext(long traceOffs) {
-        return new TraceContext(this, getTrace(traceOffs), cache, manager.getSymbolRegistry());
+    public TraceRecordStore getTraceContext(long traceOffs) {
+        return new TraceRecordStore(this, getTrace(traceOffs), cache, manager.getSymbolRegistry());
     }
 
 
