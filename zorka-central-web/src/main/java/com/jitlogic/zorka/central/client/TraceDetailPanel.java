@@ -50,6 +50,7 @@ import com.sencha.gxt.widget.core.client.treegrid.TreeGrid;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -65,12 +66,17 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
     private TraceRecordSearchDialog searchDialog;
 
+    private List<TraceRecordInfo> searchResults = new ArrayList<TraceRecordInfo>();
+    private int currentResult = 0;
+
     private long minMethodTime = 0;
 
     private int expandLevel = -1;
     private int[] expandIndexes = null;
     private String expandPath = null;
     private TraceRecordInfo expandNode = null;
+    private TextButton btnSearchPrev;
+    private TextButton btnSearchNext;
 
     public TraceDetailPanel(TraceDataService tds, TraceInfo traceInfo) {
         this.tds = tds;
@@ -95,11 +101,6 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
                 findNextSlowestMethod();
             }
         });
-
-        //TextButton btnNextException = new TextButton();
-        //btnNextException.setIcon(Resources.INSTANCE.exceptionIcon());
-        //btnNextException.setToolTip("Drill down: next exception");
-        //toolBar.add(btnNextException);
 
         toolBar.add(new SeparatorToolItem());
 
@@ -149,15 +150,36 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
             }
         });
 
-        //TextButton btnSearchPrev = new TextButton();
-        //btnSearchPrev.setIcon(Resources.INSTANCE.goPrevIcon());
-        //btnSearchPrev.setToolTip("Search previous occurence");
-        //toolBar.add(btnSearchPrev);
+        btnSearchPrev = new TextButton();
+        btnSearchPrev.setIcon(Resources.INSTANCE.goPrevIcon());
+        btnSearchPrev.setToolTip("Search previous occurence");
+        btnSearchPrev.setEnabled(false);
+        toolBar.add(btnSearchPrev);
 
-        //TextButton btnSearchNext = new TextButton();
-        //btnSearchNext.setIcon(Resources.INSTANCE.goNextIcon());
-        //btnSearchNext.setToolTip("Search next");
-        //toolBar.add(btnSearchNext);
+        btnSearchPrev.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                if (currentResult > 0) {
+                    goToResult(currentResult - 1);
+                }
+            }
+        });
+
+        btnSearchNext = new TextButton();
+        btnSearchNext.setIcon(Resources.INSTANCE.goNextIcon());
+        btnSearchNext.setToolTip("Search next");
+        btnSearchNext.setEnabled(false);
+
+        btnSearchNext.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                if (currentResult < searchResults.size() - 1) {
+                    goToResult(currentResult + 1);
+                }
+            }
+        });
+
+        toolBar.add(btnSearchNext);
 
         //final TextField txtFilter = new TextField();
         //BoxLayoutContainer.BoxLayoutData txtFilterLayout = new BoxLayoutContainer.BoxLayoutData();
@@ -222,6 +244,10 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
         expandLevel++;
 
+        if (expandNode != null) {
+            methodTree.getSelectionModel().setSelection(Arrays.asList(expandNode));
+        }
+
         if (expandLevel >= expandIndexes.length || expandNode == null || methodTree.isLeaf(expandNode)) {
             expandPath = null;
             expandIndexes = null;
@@ -233,7 +259,21 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
             } else {
                 methodTree.setExpanded(expandNode, true);
             }
-            methodTree.getSelectionModel().setSelection(Arrays.asList(expandNode));
+            //methodTree.getSelectionModel().setSelection(Arrays.asList(expandNode));
+        }
+    }
+
+    public void setResults(List<TraceRecordInfo> results, int idx) {
+        this.searchResults = results;
+        goToResult(idx);
+    }
+
+    public void goToResult(int idx) {
+        if (idx >= 0 && idx < searchResults.size()) {
+            currentResult = idx;
+            btnSearchNext.setEnabled(idx < searchResults.size() - 1);
+            btnSearchPrev.setEnabled(idx > 0);
+            expandStart(searchResults.get(idx).getPath());
         }
     }
 

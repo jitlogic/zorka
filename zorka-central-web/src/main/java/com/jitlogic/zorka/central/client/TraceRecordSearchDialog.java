@@ -176,9 +176,8 @@ public class TraceRecordSearchDialog extends Dialog {
 
     private void doGoTo() {
         TraceRecordInfo tri = resultsGrid.getSelectionModel().getSelectedItem();
-        if (tri != null) {
-            panel.expandStart(tri.getPath());
-        }
+        int idx = tri != null ? resultsStore.indexOf(tri) : 0;
+        panel.setResults(resultsStore.getAll(), idx);
         this.hide();
     }
 
@@ -268,7 +267,7 @@ public class TraceRecordSearchDialog extends Dialog {
                         | (chkAttribs.getValue() ? TraceDetailSearchExpression.SEARCH_ATTRS : 0)
                         | (chkExceptionText.getValue() ? TraceDetailSearchExpression.SEARCH_EX_MSG : 0));
 
-        expr.setSearchExpr(txtSearchFilter.getText());
+        expr.setSearchExpr(txtSearchFilter.getValue());
 
         tds.searchTraceRecords(trace.getHostId(), trace.getDataOffs(), 0, "", expr,
                 new MethodCallback<List<TraceRecordInfo>>() {
