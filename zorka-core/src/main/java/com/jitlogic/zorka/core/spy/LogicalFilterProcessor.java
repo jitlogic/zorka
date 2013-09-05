@@ -16,6 +16,7 @@
  */
 package com.jitlogic.zorka.core.spy;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -30,15 +31,20 @@ public class LogicalFilterProcessor implements SpyProcessor {
     private List<SpyProcessor> processors;
 
 
-    public LogicalFilterProcessor(int mode, SpyProcessor...processors) {
+    public LogicalFilterProcessor(int mode, SpyProcessor... processors) {
         this.mode = mode;
-        this.processors = Arrays.asList(processors);
+        this.processors = new ArrayList<SpyProcessor>(processors.length);
+        for (SpyProcessor p : processors) {
+            if (p != null) {
+                this.processors.add(p);
+            }
+        }
     }
 
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
-        Map<String,Object> rec = record;
+        Map<String, Object> rec = record;
 
         for (SpyProcessor sp : processors) {
             rec = sp.process(rec != null ? rec : record);
