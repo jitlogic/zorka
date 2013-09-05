@@ -110,8 +110,10 @@ public class TraceListPanel extends VerticalLayoutContainer {
         descCol.setSortable(false);
         descCol.setMenuDisabled(true);
 
+        TraceDetailCell traceDetailCell = new TraceDetailCell();
+
         RowExpander<TraceInfo> expander = new RowExpander<TraceInfo>(
-                new IdentityValueProvider<TraceInfo>(), new TraceDetailCell());
+                new IdentityValueProvider<TraceInfo>(), traceDetailCell);
 
         ColumnModel<TraceInfo> model = new ColumnModel<TraceInfo>(Arrays.<ColumnConfig<TraceInfo, ?>>asList(
                 expander, clockCol, durationCol, callsCol, errorsCol, recordsCol, descCol));
