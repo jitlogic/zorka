@@ -120,8 +120,7 @@ public final class ObjectInspector {
             Integer idx = (Integer) ZorkaUtil.coerce(key, Integer.class);
             return idx != null ? ((List<?>) obj).get(idx) : null;
         } else if (obj.getClass().isArray()) {
-            Integer idx = (Integer) ZorkaUtil.coerce(key, Integer.class);
-            return idx != null ? ((Object[]) obj)[idx] : null;
+            return inspectArray(obj, key);
         } else if (obj instanceof CompositeData) {
             return ((CompositeData) obj).get("" + key);
         } else if (obj instanceof TabularData) {
@@ -174,6 +173,59 @@ public final class ObjectInspector {
             return fetchFieldVal(obj, name);
         }
 
+        return null;
+    }
+
+    private static Object inspectArray(Object obj, Object key) {
+        if (obj instanceof Object[]) {
+            if ("length".equals(key)) {
+                return ((Object[]) obj).length;
+            }
+            Integer idx = (Integer) ZorkaUtil.coerce(key, Integer.class);
+            return idx != null ? ((Object[]) obj)[idx] : null;
+        } else if (obj instanceof byte[]) {
+            if ("length".equals(key)) {
+                return ((byte[]) obj).length;
+            }
+            Integer idx = (Integer) ZorkaUtil.coerce(key, Integer.class);
+            return idx != null ? ((byte[]) obj)[idx] : null;
+        } else if (obj instanceof int[]) {
+            if ("length".equals(key)) {
+                return ((int[]) obj).length;
+            }
+            Integer idx = (Integer) ZorkaUtil.coerce(key, Integer.class);
+            return idx != null ? ((int[]) obj)[idx] : null;
+        } else if (obj instanceof long[]) {
+            if ("length".equals(key)) {
+                return ((long[]) obj).length;
+            }
+            Integer idx = (Integer) ZorkaUtil.coerce(key, Integer.class);
+            return idx != null ? ((long[]) obj)[idx] : null;
+        } else if (obj instanceof double[]) {
+            if ("length".equals(key)) {
+                return ((double[]) obj).length;
+            }
+            Integer idx = (Integer) ZorkaUtil.coerce(key, Integer.class);
+            return idx != null ? ((double[]) obj)[idx] : null;
+        } else if (obj instanceof float[]) {
+            if ("length".equals(key)) {
+                return ((float[]) obj).length;
+            }
+            Integer idx = (Integer) ZorkaUtil.coerce(key, Integer.class);
+            return idx != null ? ((float[]) obj)[idx] : null;
+        } else if (obj instanceof char[]) {
+            if ("length".equals(key)) {
+                return ((char[]) obj).length;
+            }
+            Integer idx = (Integer) ZorkaUtil.coerce(key, Integer.class);
+            return idx != null ? ((char[]) obj)[idx] : null;
+        } else if (obj instanceof short[]) {
+            if ("length".equals(key)) {
+                return ((short[]) obj).length;
+            }
+            Integer idx = (Integer) ZorkaUtil.coerce(key, Integer.class);
+            return idx != null ? ((short[]) obj)[idx] : null;
+        }
         return null;
     }
 
