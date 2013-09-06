@@ -41,6 +41,28 @@
                                       toDir="${project.build.outputDirectory}/central-${project.version}"/>
                                 <copy file="src/README.md"
                                       toDir="${project.build.outputDirectory}/central-${project.version}"/>
+                                <copy file="src/central.conf"
+                                      toDir="${project.build.outputDirectory}/central-${project.version}"/>
+                                <copy file="src/zorka.properties"
+                                      toDir="${project.build.outputDirectory}/central-${project.version}"/>
+                                <copy file="../zorka-agent/target/zorka-agent-${project.version}.jar"
+                                      toFile="${project.build.outputDirectory}/central-${project.version}/zorka.jar"/>
+                                <mkdir dir="${project.build.outputDirectory}/central-${project.version}/scripts"/>
+                                <copy toDir="${project.build.outputDirectory}/central-${project.version}/scripts">
+                                    <fileset dir="../zorka-dist/src/scripts" defaultexcludes="false">
+                                        <include name="**"/>
+                                    </fileset>
+                                </copy>
+                                <copy file="src/central.bsh"
+                                      toDir="${project.build.outputDirectory}/central-${project.version}/scripts/apps"/>
+                                <mkdir dir="${project.build.outputDirectory}/central-${project.version}/profiles"/>
+                                <copy toDir="${project.build.outputDirectory}/central-${project.version}/profiles">
+                                    <fileset dir="../zorka-dist/src/profiles" defaultexcludes="false">
+                                        <include name="**"/>
+                                    </fileset>
+                                </copy>
+                                <copy file="src/central.profile"
+                                      toDir="${project.build.outputDirectory}/central-${project.version}/profiles"/>
                                 <zip destfile="${project.build.directory}/central-${project.version}.zip">
                                     <fileset dir="${project.build.outputDirectory}" defaultexcludes="false">
                                         <include name="**"/>
@@ -50,7 +72,6 @@
                         </configuration>
                     </execution>
                 </executions>
-
             </plugin>
         </plugins>
     </build>
