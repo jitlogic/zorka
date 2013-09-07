@@ -1,4 +1,3 @@
-
 /**
  * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
@@ -18,45 +17,15 @@
 
 __pgsql() {
 
-  spy.add(spy.instrument()
-    .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("SQL", 1),
-      spy.format("DB", "${THIS.connection.creatingURL}"),
-      sql._trace ? tracer.attr("SQL", "SQL") : null,
-      sql._trace ? tracer.attr("DB", "DB") : null,
-      sql._trace ? tracer.begin("SQL", zorka.longCfg("sql.trace.time")) : null)
-    .onError(spy.fetchError("ERR"),
-      sql._errorF ? spy.trapperCollector(sql.error_ft, zorka.ERROR, "SQL", zorka.stringCfg("sql.error.format"), zorka.stringCfg("sql.error.format"), "ERR") : null)
-    .onSubmit(spy.strTime("TIME"),
-      sql._slow ? spy.subchain(
-        spy.longerThan(zorka.longCfg("sql.slow.time")),
-        sql._slowF ? spy.trapperCollector(sql.slow_ft, zorka.INFO, "SQL", zorka.stringCfg("sql.slow.format")) : null
-      ) : null,
-      sql._stats ? spy.zorkaStats("java", sql._mbean, "ALL", "ALL") : null,
-      sql._stats ? spy.zorkaStats("java", sql._mbean, "ALL", "${DB}") : null)
-    .include(spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, "String"),
+  spy.add(sql._instrumentStmt("${THIS.connection.creatingURL}")
+    .include(
+      spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, "String"),
       spy.byMethod(0, "org.postgresql.jdbc3.AbstractJdbc3Statement", "execute*", null, "String")));
 
-
-  spy.add(spy.instrument()
-    .onEnter(spy.fetchArg("THIS", 0),
-      spy.format("SQL", "${THIS.preparedQuery}"),
-      spy.format("DB", "${THIS.connection.creatingURL}"),
-      sql._trace ? tracer.attr("SQL", "SQL") : null,
-      sql._trace ? tracer.attr("DB", "DB") : null,
-      sql._trace ? tracer.begin("SQL", zorka.longCfg("sql.trace.time")) : null)
-    .onError(spy.fetchError("ERR"),
-      sql._errorF ? spy.trapperCollector(sql.error_ft, zorka.ERROR, "SQL", zorka.stringCfg("sql.error.format"), zorka.stringCfg("sql.error.format"), "ERR") : null)
-    .onSubmit(spy.strTime("TIME"),
-      sql._slow ? spy.subchain(
-        spy.longerThan(zorka.longCfg("sql.slow.time")),
-        sql._slowF ? spy.trapperCollector(sql.slow_ft, zorka.INFO, "SQL", zorka.stringCfg("sql.slow.format")) : null
-      ) : null,
-      sql._stats ? spy.zorkaStats("java", sql._mbean, "ALL", "ALL") : null,
-      sql._stats ? spy.zorkaStats("java", sql._mbean, "ALL", "${DB}") : null)
+  spy.add(sql._instrumentPStmt("${THIS.connection.creatingURL}", "${THIS.preparedQuery}")
     .include(
       spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, spy.SM_NOARGS),
       spy.byMethod(0, "org.postgresql.jdbc3.AbstractJdbc3Statement", "execute*", null, spy.SM_NOARGS)));
-
 
   return this;
 }

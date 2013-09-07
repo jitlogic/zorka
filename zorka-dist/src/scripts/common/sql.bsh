@@ -105,6 +105,43 @@ __sql() {
     return zorka.rate("java", _mbean, attr, tag, "time", "calls", "AVG15");
   }
 
+  _instrumentStmt(dbform) {
+    return spy.instrument()
+    .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("SQL", 1),
+      spy.format("DB", dbform),
+      _trace ? tracer.attr("SQL", "SQL") : null,
+      _trace ? tracer.attr("DB", "DB") : null,
+      _trace ? tracer.begin("SQL", zorka.longCfg("sql.trace.time")) : null)
+    .onError(spy.fetchError("ERR"),
+      _errorF ? spy.trapperCollector(error_ft, zorka.ERROR, "SQL", zorka.stringCfg("sql.error.format"), zorka.stringCfg("sql.error.format"), "ERR") : null)
+    .onSubmit(spy.strTime("TIME"),
+      _slow ? spy.subchain(
+        spy.longerThan(zorka.longCfg("sql.slow.time")),
+        _slowF ? spy.trapperCollector(slow_ft, zorka.INFO, "SQL", zorka.stringCfg("sql.slow.format")) : null
+      ) : null,
+      _stats ? spy.zorkaStats("java", _mbean, "ALL", "ALL") : null,
+      _stats ? spy.zorkaStats("java", _mbean, "ALL", "${DB}") : null);
+  }
+
+  _instrumentPStmt(dbform, sqlform) {
+    return spy.instrument()
+    .onEnter(spy.fetchArg("THIS", 0),
+      spy.format("SQL", sqlform),
+      spy.format("DB", dbform),
+      _trace ? tracer.attr("SQL", "SQL") : null,
+      _trace ? tracer.attr("DB", "DB") : null,
+      _trace ? tracer.begin("SQL", zorka.longCfg("sql.trace.time")) : null)
+    .onError(spy.fetchError("ERR"),
+      _errorF ? spy.trapperCollector(error_ft, zorka.ERROR, "SQL", zorka.stringCfg("sql.error.format"), zorka.stringCfg("sql.error.format"), "ERR") : null)
+    .onSubmit(spy.strTime("TIME"),
+      _slow ? spy.subchain(
+        spy.longerThan(zorka.longCfg("sql.slow.time")),
+        _slowF ? spy.trapperCollector(slow_ft, zorka.INFO, "SQL", zorka.stringCfg("sql.slow.format")) : null
+      ) : null,
+      _stats ? spy.zorkaStats("java", _mbean, "ALL", "ALL") : null,
+      _stats ? spy.zorkaStats("java", _mbean, "ALL", "${DB}") : null);
+  }
+
   return this;
 }
 
