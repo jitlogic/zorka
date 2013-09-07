@@ -1,6 +1,6 @@
 
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -16,11 +16,11 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-__pgsql() {
+__mysql() {
 
   spy.add(spy.instrument()
     .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("SQL", 1),
-      spy.format("DB", "${THIS.connection.creatingURL}"),
+      spy.format("DB", "${THIS.connection.database}"),
       sql._trace ? tracer.attr("SQL", "SQL") : null,
       sql._trace ? tracer.attr("DB", "DB") : null,
       sql._trace ? tracer.begin("SQL", zorka.longCfg("sql.trace.time")) : null)
@@ -33,14 +33,12 @@ __pgsql() {
       ) : null,
       sql._stats ? spy.zorkaStats("java", sql._mbean, "ALL", "ALL") : null,
       sql._stats ? spy.zorkaStats("java", sql._mbean, "ALL", "${DB}") : null)
-    .include(spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, "String"),
-      spy.byMethod(0, "org.postgresql.jdbc3.AbstractJdbc3Statement", "execute*", null, "String")));
-
+    .include(spy.byMethod(spy.AC_PUBLIC, "com.mysql.jdbc.StatementImpl", "execut*", null, "String")));
 
   spy.add(spy.instrument()
     .onEnter(spy.fetchArg("THIS", 0),
-      spy.format("SQL", "${THIS.preparedQuery}"),
-      spy.format("DB", "${THIS.connection.creatingURL}"),
+      spy.format("SQL", "${THIS.originalSql}"),
+      spy.format("DB", "${THIS.connection.database}"),
       sql._trace ? tracer.attr("SQL", "SQL") : null,
       sql._trace ? tracer.attr("DB", "DB") : null,
       sql._trace ? tracer.begin("SQL", zorka.longCfg("sql.trace.time")) : null)
@@ -54,13 +52,12 @@ __pgsql() {
       sql._stats ? spy.zorkaStats("java", sql._mbean, "ALL", "ALL") : null,
       sql._stats ? spy.zorkaStats("java", sql._mbean, "ALL", "${DB}") : null)
     .include(
-      spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, spy.SM_NOARGS),
-      spy.byMethod(0, "org.postgresql.jdbc3.AbstractJdbc3Statement", "execute*", null, spy.SM_NOARGS)));
-
+      spy.byMethod("com.mysql.jdbc.PreparedStatement", "execut*"),
+      spy.byMethod("com.mysql.jdbc.CallableStatement", "execut*")));
 
   return this;
 }
 
 
-pgsql = __pgsql();
+mysql = __mysql();
 
