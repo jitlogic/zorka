@@ -21,6 +21,8 @@ import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -44,6 +46,10 @@ import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.*;
 import com.sencha.gxt.widget.core.client.form.validator.RegExValidator;
 import com.sencha.gxt.widget.core.client.grid.*;
+import com.sencha.gxt.widget.core.client.menu.Item;
+import com.sencha.gxt.widget.core.client.menu.Menu;
+import com.sencha.gxt.widget.core.client.menu.MenuItem;
+import com.sencha.gxt.widget.core.client.menu.SeparatorMenuItem;
 import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 import org.fusesource.restygwt.client.Method;
@@ -84,6 +90,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
         createToolbar();
         createTraceListGrid();
+        createContextMenu();
     }
 
 
@@ -208,15 +215,19 @@ public class TraceListPanel extends VerticalLayoutContainer {
         traceGrid.addCellDoubleClickHandler(new CellDoubleClickEvent.CellDoubleClickHandler() {
             @Override
             public void onCellClick(CellDoubleClickEvent event) {
-                TraceInfo traceInfo = traceGrid.getSelectionModel().getSelectedItem();
-                TraceDetailPanel detail = new TraceDetailPanel(tds, traceInfo);
-                shell.addView(detail, ClientUtil.formatTimestamp(traceInfo.getClock()) + "@" + selectedHost.getName());
+                openDetailView();
             }
         });
 
         expander.initPlugin(traceGrid);
 
         add(traceGrid, new VerticalLayoutData(1, 1));
+    }
+
+    private void openDetailView() {
+        TraceInfo traceInfo = traceGrid.getSelectionModel().getSelectedItem();
+        TraceDetailPanel detail = new TraceDetailPanel(tds, traceInfo);
+        shell.addView(detail, ClientUtil.formatTimestamp(traceInfo.getClock()) + "@" + selectedHost.getName());
     }
 
 
@@ -347,6 +358,37 @@ public class TraceListPanel extends VerticalLayoutContainer {
         });
 
         add(toolBar, new VerticalLayoutData(1, -1));
+    }
+
+    private void createContextMenu() {
+        Menu menu = new Menu();
+
+        MenuItem mnuMethodTree = new MenuItem("Method call tree");
+        mnuMethodTree.setIcon(Resources.INSTANCE.methodTreeIcon());
+        menu.add(mnuMethodTree);
+
+        mnuMethodTree.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                openDetailView();
+            }
+        });
+
+        menu.add(new SeparatorMenuItem());
+
+        MenuItem mnuMethodAttrs = new MenuItem("Trace Attributes");
+        mnuMethodAttrs.setIcon(Resources.INSTANCE.medthodAttrs());
+        menu.add(mnuMethodAttrs);
+
+        mnuMethodAttrs.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                MethodAttrsDialog dialog = new MethodAttrsDialog(traceGrid.getSelectionModel().getSelectedItem());
+                dialog.show();
+            }
+        });
+
+        traceGrid.setContextMenu(menu);
     }
 
 }

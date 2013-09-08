@@ -68,4 +68,10 @@ public interface Resources extends ClientBundle {
 
     @Source("images/search.png")
     ImageResource searchIcon();
+
+    @Source("images/method-tree.png")
+    ImageResource methodTreeIcon();
+
+    @Source("images/method-attrs.png")
+    ImageResource medthodAttrs();
 }

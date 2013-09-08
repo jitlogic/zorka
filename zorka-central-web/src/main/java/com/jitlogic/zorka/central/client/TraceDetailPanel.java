@@ -20,6 +20,8 @@ import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -36,6 +38,7 @@ import com.sencha.gxt.data.shared.loader.TreeLoader;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.event.CellDoubleClickEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor;
 import com.sencha.gxt.widget.core.client.form.SpinnerField;
@@ -43,6 +46,9 @@ import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.RowExpander;
+import com.sencha.gxt.widget.core.client.menu.Item;
+import com.sencha.gxt.widget.core.client.menu.Menu;
+import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 import com.sencha.gxt.widget.core.client.tree.Tree;
@@ -84,6 +90,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
         createToolbar();
         createTraceDetailTree();
+        createContextMenu();
     }
 
 
@@ -407,6 +414,32 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
         expander.initPlugin(methodTree);
 
+        methodTree.addCellDoubleClickHandler(new CellDoubleClickEvent.CellDoubleClickHandler() {
+            @Override
+            public void onCellClick(CellDoubleClickEvent event) {
+                MethodAttrsDialog mad = new MethodAttrsDialog(methodTree.getSelectionModel().getSelectedItem());
+                mad.show();
+            }
+        });
+
         add(methodTree, new VerticalLayoutData(1, 1));
+    }
+
+    private void createContextMenu() {
+        Menu menu = new Menu();
+
+        MenuItem mnuMethodAttrs = new MenuItem("Method Details");
+        mnuMethodAttrs.setIcon(Resources.INSTANCE.medthodAttrs());
+        menu.add(mnuMethodAttrs);
+
+        mnuMethodAttrs.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                MethodAttrsDialog dialog = new MethodAttrsDialog(methodTree.getSelectionModel().getSelectedItem());
+                dialog.show();
+            }
+        });
+
+        methodTree.setContextMenu(menu);
     }
 }
