@@ -89,20 +89,12 @@ public class RAGZOutputStream extends OutputStream {
             nextSegment();
         }
 
-        int len0 = curSegSize + len >= maxSegSize ? (int) (maxSegSize - curSegSize) : len;
-
-        deflater.setInput(buf, off, len0);
+        deflater.setInput(buf, off, len);
         deflate();
 
-        curSegSize += len0;
-        logicalLength += len0;
-        crc.update(buf, off, len0);
-
-        if (len > len0) {
-            // TODO get rid of this split, use single write (into single
-            write(buf, off + len0, len - len0);
-        }
-
+        curSegSize += len;
+        logicalLength += len;
+        crc.update(buf, off, len);
     }
 
 
