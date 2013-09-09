@@ -21,16 +21,16 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class TraceTemplateInfo {
 
     @JsonProperty
-    private int id;
+    int id;
 
     @JsonProperty
-    private int traceId;
+    int traceId;
 
     @JsonProperty
-    private int order;
+    int order;
 
     @JsonProperty
-    private int flags;
+    int flags;
 
     @JsonProperty
     String condTemplate;

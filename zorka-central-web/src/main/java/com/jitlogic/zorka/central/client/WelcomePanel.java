@@ -16,17 +16,30 @@
 package com.jitlogic.zorka.central.client;
 
 
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.*;
 import com.sencha.gxt.widget.core.client.Portlet;
 import com.sencha.gxt.widget.core.client.button.ToolButton;
 import com.sencha.gxt.widget.core.client.container.PortalLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
+import org.fusesource.restygwt.client.Method;
+import org.fusesource.restygwt.client.MethodCallback;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class WelcomePanel implements IsWidget {
 
     private PortalLayoutContainer portal;
+
+    private ZorkaCentralShell shell;
+
+    public WelcomePanel(ZorkaCentralShell shell) {
+        this.shell = shell;
+    }
 
     @Override
     public Widget asWidget() {
@@ -45,28 +58,70 @@ public class WelcomePanel implements IsWidget {
         portal.setColumnWidth(1, .25);
         portal.setColumnWidth(2, .25);
 
-        Portlet wndHelp = configure("Welcome", true);
-        wndHelp.add(new HTML(Resources.INSTANCE.tipsHtml().getText()));
-        portal.add(wndHelp, 0);
+        createHelpPortlet();
 
-        Portlet wndTopHosts = configure("Top Hosts", true);
+        Portlet wndTopHosts = newPortlet("Top Hosts", true);
         wndTopHosts.add(new HTML("TBD"));
         portal.add(wndTopHosts, 1);
 
-        Portlet wndTopOffenders = configure("Top Offenders", true);
+        Portlet wndTopOffenders = newPortlet("Top Offenders", true);
         wndTopOffenders.add(new HTML("TBD"));
         portal.add(wndTopOffenders, 1);
 
-        Portlet wndStatus = configure("Collector status", true);
+        Portlet wndStatus = newPortlet("Collector status", true);
         wndStatus.add(new HTML("TBD"));
         portal.add(wndStatus, 2);
 
-        Portlet wndAdmin = configure("Admin tasks", true);
-        wndAdmin.add(new HTML("TBD"));
+        createAdminPortlet();
+    }
+
+    private void createHelpPortlet() {
+        Portlet wndHelp = newPortlet("Welcome", true);
+        HTML htmlHelp = new HTML(Resources.INSTANCE.tipsHtml().getText());
+        VerticalLayoutContainer vp = new VerticalLayoutContainer();
+        vp.add(htmlHelp);
+        wndHelp.add(vp);
+        portal.add(wndHelp, 0);
+    }
+
+    private void createAdminPortlet() {
+        Portlet wndAdmin = newPortlet("Admin tasks", true);
+
+        VerticalLayoutContainer vp = new VerticalLayoutContainer();
+
+        Hyperlink lnkTraceDisplayTemplates = new Hyperlink("Trace List Display Templates", "");
+        vp.add(lnkTraceDisplayTemplates);
+
+        lnkTraceDisplayTemplates.addHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                openTemplatePanel();
+            }
+        }, ClickEvent.getType());
+
+        Hyperlink lnkUsersAccess = new Hyperlink("Users & Access Privileges", "");
+        vp.add(lnkUsersAccess);
+
+        wndAdmin.add(vp);
         portal.add(wndAdmin, 2);
     }
 
-    private Portlet configure(String title, boolean closeable) {
+    private void openTemplatePanel() {
+        shell.getAdminService().getTidMap(new MethodCallback<Map<String, String>>() {
+            @Override
+            public void onFailure(Method method, Throwable exception) {
+                GWT.log("Error calling method " + method, exception);
+            }
+
+            @Override
+            public void onSuccess(Method method, Map<String, String> response) {
+                TraceTemplatePanel panel = new TraceTemplatePanel(shell.getAdminService(), response);
+                shell.addView(panel, "Templates");
+            }
+        });
+    }
+
+    private Portlet newPortlet(String title, boolean closeable) {
         final Portlet portlet = new Portlet();
         portlet.setHeadingText(title);
         portlet.setCollapsible(true);

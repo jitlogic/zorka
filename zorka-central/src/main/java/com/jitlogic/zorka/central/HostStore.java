@@ -100,7 +100,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
                 }
             }
 
-            info.setDescription(manager.getTraceTemplater().templateDescription(info));
+            info.setDescription(manager.getTemplater().templateDescription(info));
 
             return info;
         }
