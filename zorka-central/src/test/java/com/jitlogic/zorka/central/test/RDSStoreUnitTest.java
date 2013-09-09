@@ -122,5 +122,23 @@ public class RDSStoreUnitTest extends CentralFixture {
         rds.close();
     }
 
+    @Test
+    public void testOpenWriteReopenAndCheckIfThereIsNoSecondFile() throws Exception {
+
+        rds = new RDSStore(tmpFile("testrw"), 4096, 1024, 1024);
+        rds.write("ABCD".getBytes());
+        rds.close();
+
+        rds = new RDSStore(tmpFile("testrw"), 4096, 1024, 1024);
+        rds.write("EFGH".getBytes());
+        rds.close();
+
+        assertEquals(1, new File(tmpFile("testrw")).list().length);
+
+        rds = new RDSStore(tmpFile("testrw"), 4096, 1024, 1024);
+        assertThat(rds.read(0, 8)).isEqualTo("ABCDEFGH".getBytes());
+        rds.close();
+    }
+
     // TODO test proper file rotation workings
 }
