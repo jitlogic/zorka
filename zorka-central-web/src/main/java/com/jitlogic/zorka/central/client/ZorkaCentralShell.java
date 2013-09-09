@@ -69,6 +69,7 @@ public class ZorkaCentralShell extends BorderLayoutContainer {
         centerData.setMargins(new Margins(5));
         setCenterWidget(tabPanel, centerData);
 
+        tabPanel.add(new WelcomePanel(), new TabItemConfig("Welcome"));
     }
 
 

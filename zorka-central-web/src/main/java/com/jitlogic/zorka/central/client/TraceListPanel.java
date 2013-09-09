@@ -17,7 +17,6 @@ package com.jitlogic.zorka.central.client;
 
 
 import com.google.gwt.cell.client.AbstractCell;
-import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
@@ -28,9 +27,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.ImageResourceRenderer;
 import com.jitlogic.zorka.central.data.*;
-import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style;
 import com.sencha.gxt.data.shared.ListStore;
@@ -377,7 +374,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
         menu.add(new SeparatorMenuItem());
 
         MenuItem mnuMethodAttrs = new MenuItem("Trace Attributes");
-        mnuMethodAttrs.setIcon(Resources.INSTANCE.medthodAttrs());
+        mnuMethodAttrs.setIcon(Resources.INSTANCE.methodAttrsIcon());
         menu.add(mnuMethodAttrs);
 
         mnuMethodAttrs.addSelectionHandler(new SelectionHandler<Item>() {
