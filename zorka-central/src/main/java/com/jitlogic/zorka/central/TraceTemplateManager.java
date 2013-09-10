@@ -20,8 +20,10 @@ import com.jitlogic.zorka.central.data.TraceInfo;
 import com.jitlogic.zorka.central.data.TraceTemplateInfo;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ObjectInspector;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 import javax.sql.DataSource;
 import java.sql.ResultSet;
@@ -31,15 +33,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TraceTemplater {
+public class TraceTemplateManager {
 
     private JdbcTemplate jdbc;
+    private SimpleJdbcInsert jdbci;
 
     private SymbolRegistry symbolRegistry;
     private volatile Map<Integer, List<TraceTemplateInfo>> templates = new HashMap<Integer, List<TraceTemplateInfo>>();
 
 
-    private RowMapper<TraceTemplateInfo> TEMPLATE_MAPPER = new RowMapper<TraceTemplateInfo>() {
+    public RowMapper<TraceTemplateInfo> TEMPLATE_MAPPER = new RowMapper<TraceTemplateInfo>() {
         @Override
         public TraceTemplateInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
             TraceTemplateInfo tti = new TraceTemplateInfo();
@@ -57,10 +60,12 @@ public class TraceTemplater {
     };
 
 
-    public TraceTemplater(DataSource ds, SymbolRegistry symbolRegistry) {
+    public TraceTemplateManager(DataSource ds, SymbolRegistry symbolRegistry) {
         this.symbolRegistry = symbolRegistry;
 
         this.jdbc = new JdbcTemplate(ds);
+        this.jdbci = new SimpleJdbcInsert(ds).withTableName("TEMPLATES").usingGeneratedKeyColumns("TEMPLATE_ID")
+                .usingColumns("TRACE_ID", "ORDER_NUM", "FLAGS", "COND_TEMPLATE", "COND_PATTERN", "TEMPLATE");
 
         reload();
     }
@@ -91,7 +96,7 @@ public class TraceTemplater {
             }
 
             for (TraceTemplateInfo tti : templates.get(info.getTraceId())) {
-                if (tti.getCondTemplate() == null ||
+                if (tti.getCondTemplate() == null || tti.getCondTemplate().trim().length() == 0 ||
                         ObjectInspector.substitute(tti.getCondTemplate(), attrs).matches(tti.getCondRegex())) {
                     return ObjectInspector.substitute(tti.getTemplate(), attrs);
                 }
@@ -116,5 +121,53 @@ public class TraceTemplater {
             }
         }
         return sdesc.toString();
+    }
+
+
+    public List<TraceTemplateInfo> listTemplates() {
+        return jdbc.query("select * from TEMPLATES order by ORDER_NUM", TEMPLATE_MAPPER);
+    }
+
+
+    public int save(TraceTemplateInfo tti) {
+        if (tti.getId() != 0) {
+            jdbc.update("update TEMPLATES set TRACE_ID = ?, ORDER_NUM = ?, FLAGS = ?, COND_TEMPLATE = ?," +
+                    " COND_PATTERN = ?, TEMPLATE = ? where TEMPLATE_ID = ?", tti.getTraceId(), tti.getOrder(),
+                    tti.getFlags(), tti.getCondTemplate(), tti.getCondRegex(), tti.getTemplate(), tti.getId());
+            reload();
+            return tti.getId();
+        } else {
+            int tid = jdbci.executeAndReturnKey(ZorkaUtil.<String, Object>map(
+                    "TRACE_ID", tti.getTraceId(),
+                    "ORDER_NUM", tti.getOrder(),
+                    "FLAGS", tti.getFlags(),
+                    "COND_TEMPLATE", tti.getCondTemplate(),
+                    "COND_PATTERN", tti.getCondRegex(),
+                    "TEMPLATE", tti.getTemplate())).intValue();
+            reload();
+            return tid;
+        }
+    }
+
+
+    public void remove(int tid) {
+        jdbc.update("delete from TEMPLATES where TEMPLATE_ID = ?", tid);
+        reload();
+    }
+
+
+    public Map<Integer, String> getTidMap() {
+        Map<Integer, String> ttmap = new HashMap<Integer, String>();
+
+        for (Integer tid : jdbc.query("select distinct TRACE_ID from TRACES", new RowMapper<Integer>() {
+            @Override
+            public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
+                return rs.getInt("TRACE_ID");
+            }
+        })) {
+            ttmap.put(tid, symbolRegistry.symbolName(tid));
+        }
+
+        return ttmap;
     }
 }

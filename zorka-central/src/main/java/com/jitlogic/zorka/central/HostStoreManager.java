@@ -47,7 +47,7 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
 
     private CentralConfig config;
     private SymbolRegistry symbolRegistry;
-    private TraceTemplater traceTemplater;
+    private TraceTemplateManager templater;
     private TraceCache cache;
 
     private boolean enableSecurity;
@@ -58,13 +58,13 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
     private JdbcTemplate jdbc;
     private DataSource ds;
 
-    public HostStoreManager(CentralConfig config, DataSource ds, SymbolRegistry symbolRegistry, TraceCache cache, TraceTemplater traceTemplater) {
+    public HostStoreManager(CentralConfig config, DataSource ds, SymbolRegistry symbolRegistry, TraceCache cache, TraceTemplateManager templater) {
         this.config = config;
         this.symbolRegistry = symbolRegistry;
         this.dataDir = config.stringCfg("central.data.dir", null);
         this.ds = ds;
         this.cache = cache;
-        this.traceTemplater = traceTemplater;
+        this.templater = templater;
 
         this.jdbc = new JdbcTemplate(ds);
         this.enableSecurity = config.boolCfg("zico.security", false);
@@ -210,7 +210,7 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
         return ds;
     }
 
-    public TraceTemplater getTraceTemplater() {
-        return traceTemplater;
+    public TraceTemplateManager getTemplater() {
+        return templater;
     }
 }

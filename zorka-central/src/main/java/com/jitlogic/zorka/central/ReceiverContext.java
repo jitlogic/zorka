@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.central;
 
 
+import com.jitlogic.zorka.central.data.HostInfo;
 import com.jitlogic.zorka.central.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
@@ -40,7 +41,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
     private RDSStore traceDataStore;
     private JdbcTemplate jdbc;
-    private int hostId;
+    private HostInfo hostInfo;
 
     private int maxAttrLen = 1024;
 
@@ -51,7 +52,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
         this.symbolRegistry = store.getStoreManager().getSymbolRegistry();
         this.traceDataStore = store.getRds();
         this.jdbc = new JdbcTemplate(ds);
-        this.hostId = store.getHostInfo().getId();
+        this.hostInfo = store.getHostInfo();
     }
 
 
@@ -60,7 +61,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
         if (obj instanceof Symbol) {
             processSymbol((Symbol) obj);
         } else if (obj instanceof TraceRecord) {
-            processTraceRecord(hostId, (TraceRecord) obj);
+            processTraceRecord((TraceRecord) obj);
         } else {
             if (obj != null) {
                 log.warn("Unsupported object type:" + obj.getClass());
@@ -75,14 +76,14 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     }
 
 
-    private void processTraceRecord(int hostId, TraceRecord rec) throws IOException {
+    private void processTraceRecord(TraceRecord rec) throws IOException {
         rec.traverse(this);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         FressianWriter writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);
         writer.writeObject(rec);
         byte[] chunk = os.toByteArray();
         long offs = traceDataStore.write(chunk);
-        save(hostId, offs, chunk.length, rec);
+        save(hostInfo.getId(), offs, chunk.length, rec);
     }
 
 
@@ -177,4 +178,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     public void checkMetric(int metricId) throws IOException {
     }
 
+    public HostInfo getHostInfo() {
+        return hostInfo;
+    }
 }

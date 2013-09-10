@@ -16,10 +16,7 @@
 package com.jitlogic.zorka.central;
 
 
-import com.jitlogic.zorka.central.data.SymbolicExceptionInfo;
-import com.jitlogic.zorka.central.data.TraceDetailFilterExpression;
-import com.jitlogic.zorka.central.data.TraceInfo;
-import com.jitlogic.zorka.central.data.TraceRecordInfo;
+import com.jitlogic.zorka.central.data.*;
 import com.jitlogic.zorka.central.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.*;
 import org.fressian.FressianReader;
@@ -32,7 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class TraceContext {
+import static com.jitlogic.zorka.central.data.TraceDetailSearchExpression.*;
+
+public class TraceRecordStore {
 
     private HostStore hostStore;
     private TraceInfo traceInfo;
@@ -41,7 +40,7 @@ public class TraceContext {
     private SymbolRegistry symbolRegistry;
 
 
-    public TraceContext(HostStore hostStore, TraceInfo traceInfo, TraceCache cache, SymbolRegistry symbolRegistry) {
+    public TraceRecordStore(HostStore hostStore, TraceInfo traceInfo, TraceCache cache, SymbolRegistry symbolRegistry) {
         this.hostStore = hostStore;
         this.traceInfo = traceInfo;
 
@@ -51,6 +50,68 @@ public class TraceContext {
 
 
     private final static Pattern RE_SLASH = Pattern.compile("/");
+
+
+    private boolean matches(String s, String expr) {
+        return s != null && s.contains(expr);
+    }
+
+
+    private boolean matches(TraceRecord tr, TraceDetailSearchExpression expr) {
+        if ((expr.hasFlag(SEARCH_CLASSES)
+                && matches(symbolRegistry.symbolName(tr.getClassId()), expr.getSearchExpr()))
+                || (expr.hasFlag(SEARCH_METHODS)
+                && matches(symbolRegistry.symbolName(tr.getMethodId()), expr.getSearchExpr()))) {
+            return true;
+        }
+
+        if (expr.hasFlag(SEARCH_ATTRS) && tr.getAttrs() != null) {
+            for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
+                if (matches(symbolRegistry.symbolName(e.getKey()), expr.getSearchExpr())) {
+                    return true;
+                }
+                if (e.getValue() != null && matches(e.getValue().toString(), expr.getSearchExpr())) {
+                    return true;
+                }
+            }
+        }
+
+        SymbolicException se = tr.findException();
+
+        if (expr.hasFlag(SEARCH_EX_MSG) && se != null &&
+                (matches(se.getMessage(), expr.getSearchExpr())
+                        || matches(symbolRegistry.symbolName(se.getClassId()), expr.getSearchExpr()))) {
+            return true;
+        }
+
+        if (expr.hasFlag(SEARCH_EX_STACK) && se != null) {
+            for (SymbolicStackElement sse : se.getStackTrace()) {
+                if (matches(symbolRegistry.symbolName(sse.getClassId()), expr.getSearchExpr())
+                        || matches(symbolRegistry.symbolName(sse.getMethodId()), expr.getSearchExpr())
+                        || matches(symbolRegistry.symbolName(sse.getFileId()), expr.getSearchExpr())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public void searchRecords(TraceRecord tr, String path,
+                              TraceDetailSearchExpression expr, List<TraceRecordInfo> result) {
+
+        boolean matches = (expr.emptyExpr() || matches(tr, expr))
+                && (0 == (expr.getFlags() & TraceDetailSearchExpression.ERRORS_ONLY) || null != tr.findException())
+                && (0 == (expr.getFlags() & TraceDetailSearchExpression.METHODS_WITH_ATTRS) || tr.numAttrs() > 0);
+
+        if (matches) {
+            result.add(packTraceRecord(tr, path));
+        }
+
+        for (int i = 0; i < tr.numChildren(); i++) {
+            searchRecords(tr.getChild(i), path + "/" + i, expr, result);
+        }
+    }
 
 
     public TraceRecord getTraceRecord(String path, long minMethodTime) {

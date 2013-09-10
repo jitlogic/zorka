@@ -19,7 +19,8 @@ package com.jitlogic.zorka.central.client;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Element;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -34,22 +35,24 @@ import com.sencha.gxt.data.shared.loader.ChildTreeStoreBinding;
 import com.sencha.gxt.data.shared.loader.DataProxy;
 import com.sencha.gxt.data.shared.loader.TreeLoader;
 import com.sencha.gxt.widget.core.client.button.TextButton;
-import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.event.CellDoubleClickEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor;
 import com.sencha.gxt.widget.core.client.form.SpinnerField;
-import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.RowExpander;
+import com.sencha.gxt.widget.core.client.menu.Item;
+import com.sencha.gxt.widget.core.client.menu.Menu;
+import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
-import com.sencha.gxt.widget.core.client.tree.Tree;
 import com.sencha.gxt.widget.core.client.treegrid.TreeGrid;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -63,7 +66,19 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
     private TreeStore<TraceRecordInfo> methodTreeStore;
     private SpinnerField<Double> txtDuration;
 
+    private TraceRecordSearchDialog searchDialog;
+
+    private List<TraceRecordInfo> searchResults = new ArrayList<TraceRecordInfo>();
+    private int currentResult = 0;
+
     private long minMethodTime = 0;
+
+    private int expandLevel = -1;
+    private int[] expandIndexes = null;
+    private String expandPath = null;
+    private TraceRecordInfo expandNode = null;
+    private TextButton btnSearchPrev;
+    private TextButton btnSearchNext;
 
     public TraceDetailPanel(TraceDataService tds, TraceInfo traceInfo) {
         this.tds = tds;
@@ -71,6 +86,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
         createToolbar();
         createTraceDetailTree();
+        createContextMenu();
     }
 
 
@@ -88,11 +104,6 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
                 findNextSlowestMethod();
             }
         });
-
-        //TextButton btnNextException = new TextButton();
-        //btnNextException.setIcon(Resources.INSTANCE.exceptionIcon());
-        //btnNextException.setToolTip("Drill down: next exception");
-        //toolBar.add(btnNextException);
 
         toolBar.add(new SeparatorToolItem());
 
@@ -125,17 +136,53 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
             }
         });
 
-        //toolBar.add(new SeparatorToolItem());
+        toolBar.add(new SeparatorToolItem());
 
-        //TextButton btnSearchPrev = new TextButton();
-        //btnSearchPrev.setIcon(Resources.INSTANCE.goPrevIcon());
-        //btnSearchPrev.setToolTip("Search previous occurence");
-        //toolBar.add(btnSearchPrev);
+        TextButton btnSearch = new TextButton();
+        btnSearch.setIcon(Resources.INSTANCE.searchIcon());
+        btnSearch.setToolTip("Search");
+        toolBar.add(btnSearch);
 
-        //TextButton btnSearchNext = new TextButton();
-        //btnSearchNext.setIcon(Resources.INSTANCE.goNextIcon());
-        //btnSearchNext.setToolTip("Search next");
-        //toolBar.add(btnSearchNext);
+        btnSearch.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                if (searchDialog == null) {
+                    searchDialog = new TraceRecordSearchDialog(TraceDetailPanel.this, tds, traceInfo, null);
+                }
+                searchDialog.show();
+            }
+        });
+
+        btnSearchPrev = new TextButton();
+        btnSearchPrev.setIcon(Resources.INSTANCE.goPrevIcon());
+        btnSearchPrev.setToolTip("Search previous occurence");
+        btnSearchPrev.setEnabled(false);
+        toolBar.add(btnSearchPrev);
+
+        btnSearchPrev.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                if (currentResult > 0) {
+                    goToResult(currentResult - 1);
+                }
+            }
+        });
+
+        btnSearchNext = new TextButton();
+        btnSearchNext.setIcon(Resources.INSTANCE.goNextIcon());
+        btnSearchNext.setToolTip("Search next");
+        btnSearchNext.setEnabled(false);
+
+        btnSearchNext.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                if (currentResult < searchResults.size() - 1) {
+                    goToResult(currentResult + 1);
+                }
+            }
+        });
+
+        toolBar.add(btnSearchNext);
 
         //final TextField txtFilter = new TextField();
         //BoxLayoutContainer.BoxLayoutData txtFilterLayout = new BoxLayoutContainer.BoxLayoutData();
@@ -179,6 +226,61 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
     }
 
 
+    public void expandStart(String expandPath) {
+        this.expandPath = expandPath;
+        String[] s = expandPath.split("/");
+        expandIndexes = new int[s.length - 1];
+        for (int i = 1; i < s.length; i++) {
+            expandIndexes[i - 1] = Integer.parseInt(s[i]);
+        }
+        expandLevel = 0;
+        expandNode = null;
+        expandCont();
+    }
+
+
+    private void expandCont() {
+        int idx = expandIndexes[expandLevel];
+        expandNode = expandNode != null
+                ? methodTreeStore.getChildren(expandNode).get(idx)
+                : methodTreeStore.getRootItems().get(idx);
+
+        expandLevel++;
+
+        if (expandNode != null) {
+            methodTree.getSelectionModel().setSelection(Arrays.asList(expandNode));
+        }
+
+        if (expandLevel >= expandIndexes.length || expandNode == null || methodTree.isLeaf(expandNode)) {
+            expandPath = null;
+            expandIndexes = null;
+            expandNode = null;
+            expandLevel = -1;
+        } else {
+            if (methodTree.isExpanded(expandNode)) {
+                expandCont();
+            } else {
+                methodTree.setExpanded(expandNode, true);
+            }
+            //methodTree.getSelectionModel().setSelection(Arrays.asList(expandNode));
+        }
+    }
+
+    public void setResults(List<TraceRecordInfo> results, int idx) {
+        this.searchResults = results;
+        goToResult(idx);
+    }
+
+    public void goToResult(int idx) {
+        if (idx >= 0 && idx < searchResults.size()) {
+            currentResult = idx;
+            btnSearchNext.setEnabled(idx < searchResults.size() - 1);
+            btnSearchPrev.setEnabled(idx > 0);
+            expandStart(searchResults.get(idx).getPath());
+        }
+    }
+
+
     private void createTraceDetailTree() {
 
         DataProxy<TraceRecordInfo, List<TraceRecordInfo>> proxy = new DataProxy<TraceRecordInfo, List<TraceRecordInfo>>() {
@@ -195,6 +297,9 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
                             @Override
                             public void onSuccess(Method method, List<TraceRecordInfo> records) {
                                 callback.onSuccess(records);
+                                if (expandPath != null) {
+                                    expandCont();
+                                }
                             }
                         });
             }
@@ -305,6 +410,32 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
         expander.initPlugin(methodTree);
 
+        methodTree.addCellDoubleClickHandler(new CellDoubleClickEvent.CellDoubleClickHandler() {
+            @Override
+            public void onCellClick(CellDoubleClickEvent event) {
+                MethodAttrsDialog mad = new MethodAttrsDialog(methodTree.getSelectionModel().getSelectedItem());
+                mad.show();
+            }
+        });
+
         add(methodTree, new VerticalLayoutData(1, 1));
+    }
+
+    private void createContextMenu() {
+        Menu menu = new Menu();
+
+        MenuItem mnuMethodAttrs = new MenuItem("Method Details");
+        mnuMethodAttrs.setIcon(Resources.INSTANCE.methodAttrsIcon());
+        menu.add(mnuMethodAttrs);
+
+        mnuMethodAttrs.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                MethodAttrsDialog dialog = new MethodAttrsDialog(methodTree.getSelectionModel().getSelectedItem());
+                dialog.show();
+            }
+        });
+
+        methodTree.setContextMenu(menu);
     }
 }

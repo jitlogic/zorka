@@ -48,16 +48,19 @@ public class HostListPanel extends VerticalLayoutContainer {
     private static final HostInfoProperties props = GWT.create(HostInfoProperties.class);
 
     private ZorkaCentralShell shell;
+
     private TraceDataService tds;
+    private TraceAdminService ads;
 
     private Grid<HostInfo> hostGrid;
     private ListStore<HostInfo> hostGridStore;
     private GridSelectionModel<HostInfo> selectionModel;
 
 
-    public HostListPanel(ZorkaCentralShell shell, TraceDataService tds) {
+    public HostListPanel(ZorkaCentralShell shell, TraceDataService tds, TraceAdminService ads) {
         this.shell = shell;
         this.tds = tds;
+        this.ads = ads;
 
         createHostListPanel();
         createContextMenu();
@@ -88,7 +91,7 @@ public class HostListPanel extends VerticalLayoutContainer {
             @Override
             public void onCellClick(CellDoubleClickEvent event) {
                 GWT.log("Selected host: " + selectionModel.getSelectedItem());
-                shell.addView(new TraceListPanel(shell, tds, selectionModel.getSelectedItem()),
+                shell.addView(new TraceListPanel(shell, tds, ads, selectionModel.getSelectedItem()),
                         selectionModel.getSelectedItem().getName() + ": traces");
             }
         });
@@ -206,7 +209,7 @@ public class HostListPanel extends VerticalLayoutContainer {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
                 GWT.log("Selected host: " + selectionModel.getSelectedItem());
-                shell.addView(new TraceListPanel(shell, tds, selectionModel.getSelectedItem()),
+                shell.addView(new TraceListPanel(shell, tds, ads, selectionModel.getSelectedItem()),
                         selectionModel.getSelectedItem().getName() + ": traces");
 
             }

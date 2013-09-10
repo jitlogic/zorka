@@ -18,7 +18,9 @@ package com.jitlogic.zorka.central.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.DataResource;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.resources.client.TextResource;
 
 public interface Resources extends ClientBundle {
 
@@ -65,4 +67,17 @@ public interface Resources extends ClientBundle {
 
     @Source("images/clear.png")
     ImageResource clearIcon();
+
+    @Source("images/search.png")
+    ImageResource searchIcon();
+
+    @Source("images/method-tree.png")
+    ImageResource methodTreeIcon();
+
+    @Source("images/method-attrs.png")
+    ImageResource methodAttrsIcon();
+
+    @DataResource.MimeType("text/html")
+    @Source("resources/tips.html")
+    TextResource tipsHtml();
 }

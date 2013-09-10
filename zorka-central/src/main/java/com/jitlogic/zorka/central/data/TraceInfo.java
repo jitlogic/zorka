@@ -32,6 +32,9 @@ public class TraceInfo {
     int traceId;
 
     @JsonProperty
+    String traceType;
+
+    @JsonProperty
     int dataLen;
 
     @JsonProperty
@@ -98,6 +101,14 @@ public class TraceInfo {
 
     public void setTraceId(int traceId) {
         this.traceId = traceId;
+    }
+
+    public String getTraceType() {
+        return traceType;
+    }
+
+    public void setTraceType(String traceType) {
+        this.traceType = traceType;
     }
 
     public int getDataLen() {

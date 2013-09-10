@@ -50,7 +50,7 @@ __http() {
   // Default values for HTTP tracer options 
   zorka.defCfg("http.trace", zorka.stringCfg("tracer"));
   zorka.defCfg("http.trace.time", "1000");
-  zorka.defCfg("http.trace.params.prefix", "P:");
+  zorka.defCfg("http.trace.params.prefix", "P_");
 
   _trace = zorka.boolCfg("http.trace");
   _stats = zorka.boolCfg("http.stats");

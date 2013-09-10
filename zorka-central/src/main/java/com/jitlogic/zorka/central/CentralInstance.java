@@ -17,16 +17,12 @@ package com.jitlogic.zorka.central;
 
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.common.util.FileTrapper;
-import com.jitlogic.zorka.common.util.ZorkaLogLevel;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.zico.ZicoService;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -45,7 +41,7 @@ public class CentralInstance {
 
     private SymbolRegistry symbolRegistry;
 
-    private TraceTemplater traceTemplater;
+    private TraceTemplateManager templater;
 
     private TraceCache traceCache;
 
@@ -125,7 +121,7 @@ public class CentralInstance {
 
     public synchronized HostStoreManager getStoreManager() {
         if (null == storeManager) {
-            storeManager = new HostStoreManager(getConfig(), getDs(), getSymbolRegistry(), getTraceCache(), getTraceTemplater());
+            storeManager = new HostStoreManager(getConfig(), getDs(), getSymbolRegistry(), getTraceCache(), getTemplater());
         }
         return storeManager;
     }
@@ -162,11 +158,11 @@ public class CentralInstance {
     }
 
 
-    public synchronized TraceTemplater getTraceTemplater() {
-        if (traceTemplater == null) {
-            traceTemplater = new TraceTemplater(getDs(), getSymbolRegistry());
+    public synchronized TraceTemplateManager getTemplater() {
+        if (templater == null) {
+            templater = new TraceTemplateManager(getDs(), getSymbolRegistry());
         }
 
-        return traceTemplater;
+        return templater;
     }
 }

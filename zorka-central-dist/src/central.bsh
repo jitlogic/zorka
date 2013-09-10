@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -15,21 +15,19 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-__pgsql() {
+__central() {
 
-  spy.add(sql._instrumentStmt("${THIS.connection.creatingURL}")
-    .include(
-      spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, "String"),
-      spy.byMethod(0, "org.postgresql.jdbc3.AbstractJdbc3Statement", "execute*", null, "String")));
+  _mbean1 = "zorka.central:name=ReceiverContext,type=ZorkaStats";
 
-  spy.add(sql._instrumentPStmt("${THIS.connection.creatingURL}", "${THIS.preparedQuery}")
+  spy.add(spy.instrument()
+    .onEnter(spy.fetchArg("CTX", 0))
+    .onSubmit(
+      spy.zorkaStats("java", _mbean1, "traces", "ALL"),
+      spy.zorkaStats("java", _mbean1, "traces", "${CTX.hostInfo.name}"))
     .include(
-      spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, spy.SM_NOARGS),
-      spy.byMethod(0, "org.postgresql.jdbc3.AbstractJdbc3Statement", "execute*", null, spy.SM_NOARGS)));
+      spy.byMethod(0, "com.jitlogic.zorka.central.ReceiverContext", "processTraceRecord", null)));
 
   return this;
 }
 
-
-pgsql = __pgsql();
-
+central = __central();

@@ -60,6 +60,16 @@ public interface TraceDataService extends RestService {
 
 
     @POST
+    @Path("hosts/{hostId}/{traceOffs}/search?path={path}&minTime={minTime}")
+    public void searchTraceRecords(@PathParam("hostId") int hostId,
+                                   @PathParam("traceOffs") long traceOffs,
+                                   @PathParam("minTime") long minTime,
+                                   @PathParam("path") String path,
+                                   TraceDetailSearchExpression expr,
+                                   MethodCallback<List<TraceRecordInfo>> callback);
+
+
+    @POST
     @Path("hosts/")
     public void addHost(HostInfo hostInfo,
                         MethodCallback<Void> callback);

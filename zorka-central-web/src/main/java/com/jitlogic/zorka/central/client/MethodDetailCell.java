@@ -29,14 +29,15 @@ public class MethodDetailCell extends AbstractCell<TraceRecordInfo> {
     @Override
     public void render(Context context, TraceRecordInfo tr, SafeHtmlBuilder sb) {
         if (tr.getAttributes() != null) {
+            sb.appendHtmlConstant("<table border=\"0\" cellspacing=\"2\"><tbody>");
             for (Map.Entry<String, String> e : tr.getAttributes().entrySet()) {
-                sb.appendHtmlConstant("<div style=\"white-space: nowrap;\">");
-                sb.appendHtmlConstant("<span style=\"color: blue;\">");
-                sb.append(SafeHtmlUtils.fromString(e.getKey() + " = "));
-                sb.appendHtmlConstant("</span>");
-                sb.append(SafeHtmlUtils.fromString("" + e.getValue()));
-                sb.appendHtmlConstant("</div>");
+                sb.appendHtmlConstant("<tr><td align=\"right\" style=\"color:blue; font-size: small;\"><b>");
+                sb.append(SafeHtmlUtils.fromString(e.getKey()));
+                sb.appendHtmlConstant("</b></td><td><div style=\"text-wrap: unrestricted; white-space: pre; word-wrap: break-word; font-size: small;\">");
+                sb.append(SafeHtmlUtils.fromString(e.getValue() != null ? e.getValue().toString() : ""));
+                sb.appendHtmlConstant("</div></td></tr>");
             }
+            sb.appendHtmlConstant("</tbody></table>");
         }
         if (tr.getExceptionInfo() != null) {
             SymbolicExceptionInfo e = tr.getExceptionInfo();
