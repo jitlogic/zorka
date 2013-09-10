@@ -21,7 +21,7 @@ __catalina() {
   spy.add(spy.instrument()
     .onEnter(spy.fetchArg("REQ", 1), spy.fetchArg("RESP", 2),
       spy.format("URI", "${REQ.request.requestURI}"),
-      http._trace ? tracer.begin("HTTP_REQ", zorka.longCfg("http.trace.time")) : null,
+      http._trace ? tracer.begin("HTTP", zorka.longCfg("http.trace.time")) : null,
       http._trace ? tracer.attr("URI", "URI") : null,
       http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", spy.ACTION_ENTER) : null)
     .onReturn(spy.put("ERR", ""))
