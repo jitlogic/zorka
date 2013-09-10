@@ -68,6 +68,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
             info.setHostId(rs.getInt("HOST_ID"));
             info.setDataOffs(rs.getLong("DATA_OFFS"));
             info.setTraceId(rs.getInt("TRACE_ID"));
+            info.setTraceType(manager.getSymbolRegistry().symbolName(info.getTraceId()));
             info.setDataLen(rs.getInt("DATA_LEN"));
             info.setClock(rs.getLong("CLOCK"));
             info.setMethodFlags(rs.getInt("RFLAGS"));
@@ -230,6 +231,11 @@ public class HostStore implements Closeable, RDSCleanupListener {
         } else if (filter.getTimeStart() != 0) {
             sqlc += " and CLOCK > :timeStart";
             params.addValue("timeStart", filter.getTimeStart());
+        }
+
+        if (filter.getTraceId() != 0) {
+            sqlc += " and TRACE_ID = :traceId";
+            params.addValue("traceId", filter.getTraceId());
         }
 
         if (filter.isErrorsOnly()) {

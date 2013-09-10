@@ -36,6 +36,8 @@ public interface TraceInfoProperties extends PropertyAccess<TraceInfo> {
 
     ValueProvider<TraceInfo, Integer> traceId();
 
+    ValueProvider<TraceInfo, String> traceType();
+
     ValueProvider<TraceInfo, Integer> dataLen();
 
     ValueProvider<TraceInfo, Long> clock();

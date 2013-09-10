@@ -59,7 +59,7 @@ public class ZorkaCentralShell extends BorderLayoutContainer {
         ContentPanel westContainer = new ContentPanel();
         westContainer.setHeadingText("Hosts");
         westContainer.setBodyBorder(true);
-        westContainer.add(new HostListPanel(this, tds));
+        westContainer.add(new HostListPanel(this, tds, adminService));
 
         setWestWidget(westContainer, westData);
 
