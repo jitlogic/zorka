@@ -101,7 +101,11 @@ public class RDSStore implements Closeable {
 
         // TODO determine last written data (? any kind of metadata file ?)
 
-        rotate();
+        if (archivedFiles.size() > 0 && archivedFiles.get(archivedFiles.size() - 1).plen < fileSize) {
+            reopen();
+        } else {
+            rotate();
+        }
     }
 
 
@@ -114,6 +118,25 @@ public class RDSStore implements Closeable {
         }
     }
 
+
+    private void reopen() throws IOException {
+        RDSChunkFile rcf = archivedFiles.get(archivedFiles.size() - 1);
+
+        if (output != null) {
+            output.close();
+            output = null;
+        }
+
+        if (input != null) {
+            input.close();
+            input = null;
+        }
+
+        output = new RAGZOutputStream(new RandomAccessFile(new File(basePath, rcf.fname), "rw"), segmentSize);
+        outputStart = rcf.loffs;
+        outputPos = rcf.loffs + rcf.llen;
+        archivedFiles.remove(archivedFiles.size() - 1);
+    }
 
     /**
      * (Re)opens latest output file.
@@ -131,9 +154,7 @@ public class RDSStore implements Closeable {
             input = null;
         }
 
-        output = new RAGZOutputStream(
-                new RandomAccessFile(new File(basePath, fname), "rw"),
-                segmentSize);
+        output = new RAGZOutputStream(new RandomAccessFile(new File(basePath, fname), "rw"), segmentSize);
         outputStart = logicalPos;
         outputPos = 0;
     }

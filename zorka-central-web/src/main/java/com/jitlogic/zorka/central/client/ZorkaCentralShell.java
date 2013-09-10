@@ -25,15 +25,18 @@ import com.sencha.gxt.widget.core.client.TabItemConfig;
 import com.sencha.gxt.widget.core.client.TabPanel;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.MarginData;
+import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 
 public class ZorkaCentralShell extends BorderLayoutContainer {
 
     private TabPanel tabPanel;
 
+    private TraceAdminService adminService;
+
     private final static int DX = 0;
     private final static int DY = 0;
 
-    public ZorkaCentralShell(TraceDataService tds) {
+    public ZorkaCentralShell(TraceDataService tds, TraceAdminService adminService) {
 
         Window.enableScrolling(false);
         setPixelSize(Window.getClientWidth() - DX, Window.getClientHeight() - DY);
@@ -56,7 +59,7 @@ public class ZorkaCentralShell extends BorderLayoutContainer {
         ContentPanel westContainer = new ContentPanel();
         westContainer.setHeadingText("Hosts");
         westContainer.setBodyBorder(true);
-        westContainer.add(new HostListPanel(this, tds));
+        westContainer.add(new HostListPanel(this, tds, adminService));
 
         setWestWidget(westContainer, westData);
 
@@ -65,12 +68,24 @@ public class ZorkaCentralShell extends BorderLayoutContainer {
         tabPanel.setTabScroll(true);
         tabPanel.setCloseContextMenu(true);
 
+        tabPanel.setCloseContextMenu(true);
+
+        this.adminService = adminService;
+
         MarginData centerData = new MarginData();
         centerData.setMargins(new Margins(5));
-        setCenterWidget(tabPanel, centerData);
 
+        SimpleContainer center = new SimpleContainer();
+        center.add(tabPanel);
+
+        setCenterWidget(center, centerData);
+
+        tabPanel.add(new WelcomePanel(this), new TabItemConfig("Welcome"));
     }
 
+    public TraceAdminService getAdminService() {
+        return adminService;
+    }
 
     public void addView(Widget widget, String title) {
         TabItemConfig tic = new TabItemConfig(title);

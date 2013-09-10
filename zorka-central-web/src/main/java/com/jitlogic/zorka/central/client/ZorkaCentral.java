@@ -27,18 +27,26 @@ import org.fusesource.restygwt.client.RestServiceProxy;
 public class ZorkaCentral implements EntryPoint {
 
     private TraceDataService traceDataService;
+    private TraceAdminService adminService;
 
     private ZorkaCentralShell shell;
+
 
     public void onModuleLoad() {
 
         Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
             @Override
             public void execute() {
+
                 traceDataService = GWT.create(TraceDataService.class);
                 ((RestServiceProxy) traceDataService).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
+
+                adminService = GWT.create(TraceAdminService.class);
+                ((RestServiceProxy) adminService).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
+
                 Window.enableScrolling(false);
-                shell = new ZorkaCentralShell(traceDataService);
+                shell = new ZorkaCentralShell(traceDataService, adminService);
+
                 RootPanel.get().add(shell);
                 onReady();
             }

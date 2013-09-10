@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -15,21 +15,20 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-__pgsql() {
+__mysql() {
 
-  spy.add(sql._instrumentStmt("${THIS.connection.creatingURL}")
+  spy.add(sql._instrumentStmt("${THIS.connection.sCatalog}")
     .include(
-      spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, "String"),
-      spy.byMethod(0, "org.postgresql.jdbc3.AbstractJdbc3Statement", "execute*", null, "String")));
+      spy.byMethod(spy.AC_PUBLIC, "com.microsoft.sqlserver.jdbc.SQLServerStatement", "execut*", null, "String")));
 
-  spy.add(sql._instrumentPStmt("${THIS.connection.creatingURL}", "${THIS.preparedQuery}")
+  spy.add(sql._instrumentPStmt("${THIS.connection.sCatalog}", "${THIS.sqlCommand}")
     .include(
-      spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, spy.SM_NOARGS),
-      spy.byMethod(0, "org.postgresql.jdbc3.AbstractJdbc3Statement", "execute*", null, spy.SM_NOARGS)));
+      spy.byMethod(1, "com.microsoft.sqlserver.jdbc.SQLServerStatement", "execut*", null, spy.SM_NOARGS),
+      spy.byMethod(1, "com.microsoft.sqlserver.jdbc.SQLServerPreparedStatement", "execut*", null, spy.SM_NOARGS)));
 
   return this;
 }
 
 
-pgsql = __pgsql();
+mysql = __mysql();
 

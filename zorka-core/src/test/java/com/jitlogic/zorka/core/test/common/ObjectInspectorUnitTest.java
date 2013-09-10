@@ -60,7 +60,7 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
 
     @Test
     public void testInspectArray() {
-        String[] array = { "c", "b", "a" };
+        String[] array = {"c", "b", "a"};
 
         assertEquals("b", ObjectInspector.get(array, 1));
         assertEquals("c", ObjectInspector.get(array, 0));
@@ -68,17 +68,78 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testListArray() {
-        String[] array = { "c", "b", "a" };
+    public void testInspectArrayLength() {
+        String[] array = {"a", "b", "c"};
+        assertEquals(3, ObjectInspector.get(array, "length"));
+    }
 
-        assertEquals(Arrays.asList(0,1,2), ObjectInspector.list(array));
+
+    @Test
+    public void testInspectByteArrayLength() {
+        byte[] array = {1, 2, 3};
+        assertEquals(3, ObjectInspector.get(array, "length"));
+        assertEquals((byte) 2, ObjectInspector.get(array, 1));
+    }
+
+
+    @Test
+    public void testInspectIntArrayLength() {
+        int[] array = {1, 2, 3};
+        assertEquals(3, ObjectInspector.get(array, "length"));
+        assertEquals(2, ObjectInspector.get(array, 1));
+    }
+
+
+    @Test
+    public void testInspectLongArrayLength() {
+        long[] array = {1, 2, 3};
+        assertEquals(3, ObjectInspector.get(array, "length"));
+        assertEquals(2L, ObjectInspector.get(array, 1));
+    }
+
+    @Test
+    public void testInspectDoubleArrayLength() {
+        double[] array = {1.0, 2.0, 3.0};
+        assertEquals(3, ObjectInspector.get(array, "length"));
+        assertEquals(2.0, (Double) (ObjectInspector.get(array, 1)), 0.01);
+    }
+
+    @Test
+    public void testInspectFloatArrayLength() {
+        float[] array = {1, 2, 3};
+        assertEquals(3, ObjectInspector.get(array, "length"));
+        assertEquals(2, (Float) (ObjectInspector.get(array, 1)), 0.01);
+    }
+
+    @Test
+    public void testInspectShortArrayLength() {
+        short[] array = {1, 2, 3};
+        assertEquals(3, ObjectInspector.get(array, "length"));
+        assertEquals((short) 2, ObjectInspector.get(array, 1));
+    }
+
+
+    @Test
+    public void testInspectCharArrayLength() {
+        char[] array = {'A', 'B', 'C'};
+        assertEquals(3, ObjectInspector.get(array, "length"));
+        assertEquals('B', ObjectInspector.get(array, 1));
+    }
+
+    @Test
+    public void testListArray() {
+        String[] array = {"c", "b", "a"};
+
+        assertEquals(Arrays.asList(0, 1, 2), ObjectInspector.list(array));
     }
 
 
     @Test
     public void testInspectMap() {
-        Map<String,Integer> map = new HashMap<String, Integer>();
-        map.put("a", 11); map.put("b", 22); map.put("c", 33);
+        Map<String, Integer> map = new HashMap<String, Integer>();
+        map.put("a", 11);
+        map.put("b", 22);
+        map.put("c", 33);
 
         assertEquals(11, ObjectInspector.get(map, "a"));
         assertEquals(3, ObjectInspector.get(map, "size()"));
@@ -87,8 +148,10 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
 
     @Test
     public void testLisMap() {
-        Map<String,Integer> map = new HashMap<String, Integer>();
-        map.put("a", 11); map.put("b", 22); map.put("c", 33);
+        Map<String, Integer> map = new HashMap<String, Integer>();
+        map.put("a", 11);
+        map.put("b", 22);
+        map.put("c", 33);
 
         assertEquals("sorted map keys", Arrays.asList("a", "b", "c"), ObjectInspector.list(map));
     }
@@ -109,20 +172,20 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
         Object o = ObjectInspector.get(e, "printStackTrace");
 
         assertTrue("should be a string", o instanceof String);
-        assertTrue("should contain multiple lines", ((String)o).split("\n").length > 1);
+        assertTrue("should contain multiple lines", ((String) o).split("\n").length > 1);
     }
 
     @Test
     public void testListList() {
         List<String> list = Arrays.asList("c", "b", "a");
 
-        assertEquals(Arrays.asList(0,1,2), ObjectInspector.list(list));
+        assertEquals(Arrays.asList(0, 1, 2), ObjectInspector.list(list));
     }
 
 
     @Test
     public void testInspectJ2eeStats() throws Exception {
-        TimeStatistic ts = (TimeStatistic)ObjectInspector.get(new TestStats(), "aaa");
+        TimeStatistic ts = (TimeStatistic) ObjectInspector.get(new TestStats(), "aaa");
         assertNotNull("didn't resolve anything", ts);
         assertEquals("stat name", "aaa", ts.getName());
     }
@@ -152,8 +215,8 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
 
     @Test
     public void testTrivialSubstitutions() {
-        assertEquals("ab123cd", ObjectInspector.substitute("ab${0}cd", new Object[] { "123" }));
-        assertEquals("3", ObjectInspector.substitute("${0.length()}", new Object[] { "123"}));
+        assertEquals("ab123cd", ObjectInspector.substitute("ab${0}cd", new Object[]{"123"}));
+        assertEquals("3", ObjectInspector.substitute("${0.length()}", new Object[]{"123"}));
     }
 
 
@@ -166,7 +229,6 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
 
         assertEquals("java.lang.String", obj2);
     }
-
 
 
     // TODO more tests for border cases of inspector.substitute()
@@ -184,7 +246,7 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
     @Test
     public void testRecordSubstitutions() {
         SpyContext ctx = new SpyContext(SpyDefinition.instance(), "some.Class", "someMethod", "()V", 1);
-        Map<String,Object> rec = ZorkaUtil.map(".CTX", ctx, "E0", "123", "E1", "4567", "R0", "aaa", "R1", "bbb");
+        Map<String, Object> rec = ZorkaUtil.map(".CTX", ctx, "E0", "123", "E1", "4567", "R0", "aaa", "R1", "bbb");
 
         assertEquals("123!", ObjectInspector.substitute("${E0}!", rec));
         assertEquals("aaa", ObjectInspector.substitute("${R0}", rec));
@@ -194,15 +256,15 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
 
     @Test
     public void testSubstituteSpecialChars() {
-        Map<String,Object> rec = ZorkaUtil.map("A", "a $ b");
+        Map<String, Object> rec = ZorkaUtil.map("A", "a $ b");
         assertEquals("a $ b", ObjectInspector.substitute("${A}", rec));
     }
 
 
-    private Properties props(String...kv) {
+    private Properties props(String... kv) {
         Properties properties = new Properties();
         for (int i = 1; i < kv.length; i += 2) {
-            properties.setProperty(kv[i-1], kv[i]);
+            properties.setProperty(kv[i - 1], kv[i]);
         }
         return properties;
     }
@@ -213,13 +275,13 @@ public class ObjectInspectorUnitTest extends ZorkaFixture {
         Properties props = props("zorka.home.dir", "/opt/zorka", "my.prop", "Oja!");
 
         assertEquals("Oja! Zorka found in /opt/zorka !",
-            ObjectInspector.substitute("${my.prop} Zorka found in ${zorka.home.dir} !", props));
+                ObjectInspector.substitute("${my.prop} Zorka found in ${zorka.home.dir} !", props));
 
         assertEquals("This is ${non.existent}.",
-            ObjectInspector.substitute("This is ${non.existent}.", props));
+                ObjectInspector.substitute("This is ${non.existent}.", props));
 
         assertEquals("This is by default !",
-            ObjectInspector.substitute("This is ${fubar:by default} !", props));
+                ObjectInspector.substitute("This is ${fubar:by default} !", props));
     }
 
     @Test

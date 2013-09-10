@@ -22,38 +22,24 @@ import com.sencha.gxt.data.shared.LabelProvider;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.PropertyAccess;
 
-public interface TraceInfoProperties extends PropertyAccess<TraceInfo> {
-
-    @Editor.Path("dataOffs")
-    ModelKeyProvider<TraceInfo> key();
+public interface TraceTemplateInfoProperties extends PropertyAccess<TraceTemplateInfo> {
+    @Editor.Path("id")
+    ModelKeyProvider<TraceTemplateInfo> key();
 
     @Editor.Path("description")
-    LabelProvider<TraceInfo> nameLabel();
+    LabelProvider<TraceTemplateInfo> nameLabel();
 
-    ValueProvider<TraceInfo, Integer> hostId();
+    ValueProvider<TraceTemplateInfo, Integer> id();
 
-    ValueProvider<TraceInfo, Long> dataOffs();
+    ValueProvider<TraceTemplateInfo, Integer> traceId();
 
-    ValueProvider<TraceInfo, Integer> traceId();
+    ValueProvider<TraceTemplateInfo, Integer> order();
 
-    ValueProvider<TraceInfo, String> traceType();
+    ValueProvider<TraceTemplateInfo, Integer> flags();
 
-    ValueProvider<TraceInfo, Integer> dataLen();
+    ValueProvider<TraceTemplateInfo, String> condTemplate();
 
-    ValueProvider<TraceInfo, Long> clock();
+    ValueProvider<TraceTemplateInfo, String> condRegex();
 
-    ValueProvider<TraceInfo, Integer> methodFlags();
-
-    ValueProvider<TraceInfo, Integer> traceFlags();
-
-    ValueProvider<TraceInfo, Long> calls();
-
-    ValueProvider<TraceInfo, Long> errors();
-
-    ValueProvider<TraceInfo, Long> records();
-
-    ValueProvider<TraceInfo, Long> executionTime();
-
-    ValueProvider<TraceInfo, String> description();
+    ValueProvider<TraceTemplateInfo, String> template();
 }
-

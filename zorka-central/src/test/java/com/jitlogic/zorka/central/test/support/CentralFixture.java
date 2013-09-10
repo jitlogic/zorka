@@ -20,6 +20,7 @@ import com.jitlogic.zorka.central.CentralApp;
 import com.jitlogic.zorka.central.CentralConfig;
 import com.jitlogic.zorka.central.CentralInstance;
 import com.jitlogic.zorka.central.HostStoreManager;
+import com.jitlogic.zorka.central.rest.AdminApi;
 import com.jitlogic.zorka.central.rest.TraceDataApi;
 import com.jitlogic.zorka.common.test.support.TestUtil;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
@@ -39,7 +40,9 @@ public class CentralFixture {
     protected CentralInstance instance;
     protected HostStoreManager storeManager;
     protected ZicoService zicoService;
+
     protected TraceDataApi traceDataApi;
+    protected AdminApi adminApi;
 
     @Before
     public void setUpCentralFixture() throws Exception {
@@ -66,7 +69,9 @@ public class CentralFixture {
 
         storeManager = instance.getStoreManager();
         zicoService = instance.getZicoService();
+
         traceDataApi = new TraceDataApi(instance.getStoreManager());
+        adminApi = new AdminApi(instance);
     }
 
     @After

@@ -21,7 +21,7 @@ __jetty() {
   spy.add(spy.instrument()
     .onEnter(spy.fetchArg("REQ", 2), spy.fetchArg("RESP", 4),
       spy.format("URI", "${REQ.requestURI}"),
-      http._trace ? tracer.begin("HTTP_REQ", zorka.longCfg("http.trace.time")) : null,
+      http._trace ? tracer.begin("HTTP", zorka.longCfg("http.trace.time")) : null,
       http._trace ? tracer.attr("URI", "URI") : null,
       http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", spy.ACTION_ENTER) : null)
     .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),
