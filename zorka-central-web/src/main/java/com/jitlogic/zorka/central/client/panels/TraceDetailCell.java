@@ -13,24 +13,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.client;
+package com.jitlogic.zorka.central.client.panels;
 
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.jitlogic.zorka.central.data.SymbolicExceptionInfo;
-import com.jitlogic.zorka.central.data.TraceRecordInfo;
+import com.jitlogic.zorka.central.data.TraceInfo;
 
 import java.util.Map;
 
-public class MethodDetailCell extends AbstractCell<TraceRecordInfo> {
+public class TraceDetailCell extends AbstractCell<TraceInfo> {
 
     @Override
-    public void render(Context context, TraceRecordInfo tr, SafeHtmlBuilder sb) {
-        if (tr.getAttributes() != null) {
+    public void render(Context context, TraceInfo ti, SafeHtmlBuilder sb) {
+        if (ti.getAttributes() != null) {
             sb.appendHtmlConstant("<table border=\"0\" cellspacing=\"2\"><tbody>");
-            for (Map.Entry<String, String> e : tr.getAttributes().entrySet()) {
+            for (Map.Entry<String, String> e : ti.getAttributes().entrySet()) {
                 sb.appendHtmlConstant("<tr><td align=\"right\" style=\"color:blue; font-size: small;\"><b>");
                 sb.append(SafeHtmlUtils.fromString(e.getKey()));
                 sb.appendHtmlConstant("</b></td><td><div style=\"text-wrap: unrestricted; white-space: pre; word-wrap: break-word; font-size: small;\">");
@@ -39,8 +39,8 @@ public class MethodDetailCell extends AbstractCell<TraceRecordInfo> {
             }
             sb.appendHtmlConstant("</tbody></table>");
         }
-        if (tr.getExceptionInfo() != null) {
-            SymbolicExceptionInfo e = tr.getExceptionInfo();
+        if (ti.getExceptionInfo() != null) {
+            SymbolicExceptionInfo e = ti.getExceptionInfo();
             sb.appendHtmlConstant("<div><span style=\"color: red;\">");
             sb.append(SafeHtmlUtils.fromString("Caught: " + e.getExClass()));
             sb.appendHtmlConstant("</span></div><div><b>");

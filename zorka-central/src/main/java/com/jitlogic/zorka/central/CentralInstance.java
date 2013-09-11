@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.central;
 
 
+import com.jitlogic.zorka.common.ZorkaAgent;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.zico.ZicoService;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -24,7 +25,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
-import java.util.Properties;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
+import java.util.*;
 
 public class CentralInstance {
 
@@ -164,5 +168,50 @@ public class CentralInstance {
         }
 
         return templater;
+    }
+
+    private static final long MB = 1024 * 1024;
+
+    /**
+     * Reference to self-monitoring agent
+     */
+    private ZorkaAgent agent;
+
+    public void setAgent(ZorkaAgent agent) {
+        this.agent = agent;
+    }
+
+    public List<String> systemInfo() {
+        List<String> info = new ArrayList<String>();
+
+        // TODO use agent to present these things - it's already there :)
+
+        MemoryMXBean mem = ManagementFactory.getMemoryMXBean();
+
+        MemoryUsage hmu = mem.getHeapMemoryUsage();
+
+        long uptime = ManagementFactory.getRuntimeMXBean().getUptime() / 1000;
+        long ss = uptime % 60, mm = ((uptime - ss) / 60) % 60, hh = ((uptime - mm * 60 - ss) / 3600) % 60,
+                dd = ((uptime - hh * 3600 - mm * 60 - ss) / 86400);
+
+        info.add("Uptime: " + String.format("%dd %02d:%02d:%02d", dd, hh, mm, ss));
+
+        info.add("Heap Memory: " + String.format("%dMB/%dMB (%.1f%%)",
+                hmu.getUsed() / MB, hmu.getMax() / MB, 100.0 * hmu.getUsed() / hmu.getMax()));
+
+        MemoryUsage nmu = mem.getNonHeapMemoryUsage();
+
+        info.add("Non-Heap Memory: " + String.format("%dMB/%dMB (%.1f%%)",
+                nmu.getUsed() / MB, nmu.getMax() / MB, 100.0 * nmu.getUsed() / nmu.getMax()));
+
+        try {
+            if (agent != null) {
+                info.addAll(Arrays.asList(agent.query("central.info()").split("\n")));
+            }
+        } catch (Exception e) {
+            log.warn("Call to self-monitoring agent failed.", e);
+        }
+
+        return info;
     }
 }
