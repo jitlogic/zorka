@@ -18,7 +18,7 @@
         <h2db.version>1.3.173</h2db.version>
         <spring.version>3.2.4.RELEASE</spring.version>
         <gwt.version>2.5.1</gwt.version>
-        <asm.version>4.0</asm.version>
+        <asm.version>4.1</asm.version>
         <resty.version>1.3.1</resty.version>
         <jersey.version>2.2</jersey.version>
         <gxt.version>3.0.1</gxt.version>
