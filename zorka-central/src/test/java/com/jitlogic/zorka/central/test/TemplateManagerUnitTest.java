@@ -42,10 +42,10 @@ public class TemplateManagerUnitTest extends CentralFixture {
     public void testInsertNewTemplateRecord() throws Exception {
         TraceTemplateInfo t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
 
-        t1.setId(adminApi.saveTemplate(t1));
+        t1.setId(adminService.saveTemplate(t1));
         assertTrue("TEMPLATE_ID should be assigned by database and > 0", t1.getId() > 0);
 
-        List<TraceTemplateInfo> lst = adminApi.listTemplates();
+        List<TraceTemplateInfo> lst = adminService.listTemplates();
         assertEquals(1, lst.size());
         assertEquals(t1.getId(), lst.get(0).getId());
     }
@@ -54,13 +54,13 @@ public class TemplateManagerUnitTest extends CentralFixture {
     @Test
     public void testInsertAndModifyNewTemplate() {
         TraceTemplateInfo t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
-        t1.setId(adminApi.saveTemplate(t1));
+        t1.setId(adminService.saveTemplate(t1));
 
 
         t1.setTemplate("some.Class.findKey(${ARG0})");
-        adminApi.saveTemplate(t1);
+        adminService.saveTemplate(t1);
 
-        List<TraceTemplateInfo> lst = adminApi.listTemplates();
+        List<TraceTemplateInfo> lst = adminService.listTemplates();
         assertEquals(1, lst.size());
         assertEquals(t1.getId(), lst.get(0).getId());
     }
@@ -68,15 +68,15 @@ public class TemplateManagerUnitTest extends CentralFixture {
     @Test
     public void testAddRemoveTemplate() {
         TraceTemplateInfo t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
-        t1.setId(adminApi.saveTemplate(t1));
+        t1.setId(adminService.saveTemplate(t1));
 
-        adminApi.removeTemplate(t1.getId());
-        assertEquals(0, adminApi.listTemplates().size());
+        adminService.removeTemplate(t1.getId());
+        assertEquals(0, adminService.listTemplates().size());
     }
 
     @Test
     public void testSearchForEmptyTraceIdMap() {
-        Map<Integer, String> ttids = adminApi.getTidMap();
+        Map<Integer, String> ttids = adminService.getTidMap();
         assertEquals(0, ttids.size());
     }
 }

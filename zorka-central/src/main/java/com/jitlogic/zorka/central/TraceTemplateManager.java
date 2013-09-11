@@ -25,6 +25,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
+import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -59,7 +60,7 @@ public class TraceTemplateManager {
         }
     };
 
-
+    @Inject
     public TraceTemplateManager(DataSource ds, SymbolRegistry symbolRegistry) {
         this.symbolRegistry = symbolRegistry;
 

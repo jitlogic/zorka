@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.central;
 
 
+import com.google.inject.Inject;
 import com.jitlogic.zorka.central.data.TraceDetailFilterExpression;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 
@@ -28,8 +29,9 @@ public class TraceCache {
 
     private List<TraceCacheItem> cache;
 
-    public TraceCache(int maxTraces) {
-        this.maxTraces = maxTraces;
+    @Inject
+    public TraceCache(CentralConfig config) {
+        this.maxTraces = config.intCfg("trace.cache.size", 5);
         cache = new ArrayList<TraceCacheItem>(maxTraces + 1);
     }
 

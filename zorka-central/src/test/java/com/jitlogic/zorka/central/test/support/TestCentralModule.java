@@ -13,35 +13,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.rest;
+package com.jitlogic.zorka.central.test.support;
 
-import com.jitlogic.zorka.central.CentralApp;
-import com.jitlogic.zorka.central.CentralInstance;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import java.util.List;
+import com.google.inject.Provides;
+import com.jitlogic.zorka.central.AbstractCentralModule;
+import com.jitlogic.zorka.central.CentralConfig;
 
-@Path("system")
-public class SystemApiService {
+import javax.inject.Singleton;
 
-    private CentralInstance instance;
+public class TestCentralModule extends AbstractCentralModule {
 
-    public SystemApiService() {
-        instance = CentralApp.getInstance();
+    private CentralConfig config;
+
+    public TestCentralModule(CentralConfig config) {
+        this.config = config;
     }
 
-    public SystemApiService(CentralInstance instance) {
-        this.instance = instance;
-    }
-
-    @GET
-    @Path("/info")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<String> systemInfo() {
-        return instance.systemInfo();
+    @Provides
+    @Singleton
+    public CentralConfig provideConfig() {
+        return config;
     }
 
 }

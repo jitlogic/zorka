@@ -16,8 +16,7 @@
 package com.jitlogic.zorka.central.rest;
 
 
-import com.jitlogic.zorka.central.CentralApp;
-import com.jitlogic.zorka.central.CentralInstance;
+import com.google.inject.Inject;
 import com.jitlogic.zorka.central.TraceTemplateManager;
 import com.jitlogic.zorka.central.data.TraceTemplateInfo;
 
@@ -27,17 +26,14 @@ import java.util.List;
 import java.util.Map;
 
 @Path("admin")
-public class AdminApi {
+public class AdminService {
 
 
     private TraceTemplateManager templater;
 
-    public AdminApi() {
-        templater = CentralApp.getInstance().getTemplater();
-    }
-
-    public AdminApi(CentralInstance instance) {
-        templater = instance.getTemplater();
+    @Inject
+    public AdminService(TraceTemplateManager templater) {
+        this.templater = templater;
     }
 
     @GET
