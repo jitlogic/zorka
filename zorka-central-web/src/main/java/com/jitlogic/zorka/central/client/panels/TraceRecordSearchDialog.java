@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.client;
+package com.jitlogic.zorka.central.client.panels;
 
 
 import com.google.gwt.cell.client.AbstractCell;
@@ -23,6 +23,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.jitlogic.zorka.central.client.api.TraceDataApi;
 import com.jitlogic.zorka.central.data.TraceDetailSearchExpression;
 import com.jitlogic.zorka.central.data.TraceInfo;
 import com.jitlogic.zorka.central.data.TraceRecordInfo;
@@ -52,7 +53,7 @@ public class TraceRecordSearchDialog extends Dialog {
 
     private final static TraceRecordInfoProperties props = GWT.create(TraceRecordInfoProperties.class);
 
-    private TraceDataService tds;
+    private TraceDataApi tds;
     private TraceInfo trace;
     private TraceRecordInfo root;
 
@@ -71,7 +72,7 @@ public class TraceRecordSearchDialog extends Dialog {
     private CheckBox chkErrorsOnly;
     private CheckBox chkMethodsWithAttrs;
 
-    public TraceRecordSearchDialog(TraceDetailPanel panel, TraceDataService tds,
+    public TraceRecordSearchDialog(TraceDetailPanel panel, TraceDataApi tds,
                                    TraceInfo trace, TraceRecordInfo root) {
         this.tds = tds;
         this.trace = trace;

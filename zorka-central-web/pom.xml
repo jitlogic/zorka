@@ -23,6 +23,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.google.gwt.inject</groupId>
+            <artifactId>gin</artifactId>
+            <version>${gin.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.sencha.gxt</groupId>
             <artifactId>gxt</artifactId>
             <version>${gxt.version}</version>

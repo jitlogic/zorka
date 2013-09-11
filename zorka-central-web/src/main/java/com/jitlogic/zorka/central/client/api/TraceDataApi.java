@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.client;
+package com.jitlogic.zorka.central.client.api;
 
 
 import com.jitlogic.zorka.central.data.*;
@@ -25,7 +25,7 @@ import javax.ws.rs.*;
 import java.io.IOException;
 import java.util.List;
 
-public interface TraceDataService extends RestService {
+public interface TraceDataApi extends RestService {
 
     @GET
     @Path("hosts/list")

@@ -13,13 +13,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.client;
+package com.jitlogic.zorka.central.client.portal;
 
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.*;
+import com.google.inject.Inject;
+import com.jitlogic.zorka.central.client.Resources;
+import com.jitlogic.zorka.central.client.ZorkaCentralShell;
+import com.jitlogic.zorka.central.client.api.AdminApi;
+import com.jitlogic.zorka.central.client.api.SystemApi;
+import com.jitlogic.zorka.central.client.panels.PanelFactory;
+import com.jitlogic.zorka.central.client.panels.TraceTemplatePanel;
 import com.sencha.gxt.widget.core.client.Portlet;
 import com.sencha.gxt.widget.core.client.button.ToolButton;
 import com.sencha.gxt.widget.core.client.container.PortalLayoutContainer;
@@ -28,16 +35,26 @@ import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
-import java.util.HashMap;
+import javax.inject.Provider;
 import java.util.Map;
 
 public class WelcomePanel implements IsWidget {
 
     private PortalLayoutContainer portal;
 
-    private ZorkaCentralShell shell;
+    private AdminApi adminApi;
+    private Provider<ZorkaCentralShell> shell;
 
-    public WelcomePanel(ZorkaCentralShell shell) {
+    private SystemInfoPortlet systemInfoPortlet;
+    private PanelFactory panelFactory;
+
+    @Inject
+    public WelcomePanel(AdminApi adminApi, SystemInfoPortlet systemInfoPortlet,
+                        PanelFactory panelFactory, Provider<ZorkaCentralShell> shell) {
+
+        this.adminApi = adminApi;
+        this.systemInfoPortlet = systemInfoPortlet;
+        this.panelFactory = panelFactory;
         this.shell = shell;
     }
 
@@ -60,17 +77,15 @@ public class WelcomePanel implements IsWidget {
 
         createHelpPortlet();
 
-        Portlet wndTopHosts = newPortlet("Top Hosts", true);
+        Portlet wndTopHosts = newPortlet("Top Hosts", false);
         wndTopHosts.add(new HTML("TBD"));
         portal.add(wndTopHosts, 1);
 
-        Portlet wndTopOffenders = newPortlet("Top Offenders", true);
+        Portlet wndTopOffenders = newPortlet("Top Offenders", false);
         wndTopOffenders.add(new HTML("TBD"));
         portal.add(wndTopOffenders, 1);
 
-        Portlet wndStatus = newPortlet("Collector status", true);
-        wndStatus.add(new HTML("TBD"));
-        portal.add(wndStatus, 2);
+        portal.add(systemInfoPortlet, 2);
 
         createAdminPortlet();
     }
@@ -85,7 +100,7 @@ public class WelcomePanel implements IsWidget {
     }
 
     private void createAdminPortlet() {
-        Portlet wndAdmin = newPortlet("Admin tasks", true);
+        Portlet wndAdmin = newPortlet("Admin tasks", false);
 
         VerticalLayoutContainer vp = new VerticalLayoutContainer();
 
@@ -99,15 +114,15 @@ public class WelcomePanel implements IsWidget {
             }
         }, ClickEvent.getType());
 
-        Hyperlink lnkUsersAccess = new Hyperlink("Users & Access Privileges", "");
-        vp.add(lnkUsersAccess);
+        //Hyperlink lnkUsersAccess = new Hyperlink("Users & Access Privileges", "");
+        //vp.add(lnkUsersAccess);
 
         wndAdmin.add(vp);
         portal.add(wndAdmin, 2);
     }
 
     private void openTemplatePanel() {
-        shell.getAdminService().getTidMap(new MethodCallback<Map<String, String>>() {
+        adminApi.getTidMap(new MethodCallback<Map<String, String>>() {
             @Override
             public void onFailure(Method method, Throwable exception) {
                 GWT.log("Error calling method " + method, exception);
@@ -115,8 +130,7 @@ public class WelcomePanel implements IsWidget {
 
             @Override
             public void onSuccess(Method method, Map<String, String> response) {
-                TraceTemplatePanel panel = new TraceTemplatePanel(shell.getAdminService(), response);
-                shell.addView(panel, "Templates");
+                shell.get().addView(panelFactory.traceTemplatePanel(response), "Templates");
             }
         });
     }

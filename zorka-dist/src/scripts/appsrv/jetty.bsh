@@ -34,11 +34,11 @@ __jetty() {
       http._slow ? spy.subchain(
         spy.longerThan(zorka.longCfg("http.slow.time")),
         spy.strTime("TIME"),
-        http._slowF ? spy.trapperCollector(http.slow_ft, zorka.INFO, "HTTP", zorka.stringCfg("http.slow.format")) : null) : null,
+        spy.trapperCollector(http.slow_ft, zorka.INFO, "HTTP", zorka.stringCfg("http.slow.format"))) : null,
       http._error ? spy.subchain(
         spy.valSetFilter("STATUS", http._errors),
         http.error_marker(),
-        http._errorF ? spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format")) : null) : null,
+        spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format"))) : null,
       http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", http._action) : null)
     .include(
       spy.byMethod("org.mortbay.jetty.servlet.ServletHandler", "doHandle"),

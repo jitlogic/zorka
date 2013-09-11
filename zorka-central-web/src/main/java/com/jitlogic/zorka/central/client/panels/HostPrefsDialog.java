@@ -13,9 +13,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.client;
+package com.jitlogic.zorka.central.client.panels;
 
 
+import com.jitlogic.zorka.central.client.api.TraceDataApi;
+import com.jitlogic.zorka.central.client.panels.HostListPanel;
 import com.jitlogic.zorka.central.data.HostInfo;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
@@ -31,7 +33,7 @@ import org.fusesource.restygwt.client.MethodCallback;
 
 public class HostPrefsDialog extends Dialog {
 
-    private TraceDataService tds;
+    private TraceDataApi tds;
     private HostListPanel panel;
 
     private int hostId;
@@ -43,7 +45,7 @@ public class HostPrefsDialog extends Dialog {
     private SpinnerField<Long> txtMaxSize;
 
 
-    public HostPrefsDialog(TraceDataService tds, HostListPanel panel, HostInfo info) {
+    public HostPrefsDialog(TraceDataApi tds, HostListPanel panel, HostInfo info) {
         this.tds = tds;
         this.panel = panel;
 
