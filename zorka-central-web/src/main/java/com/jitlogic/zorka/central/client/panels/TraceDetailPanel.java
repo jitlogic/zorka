@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.client;
+package com.jitlogic.zorka.central.client.panels;
 
 
 import com.google.gwt.cell.client.AbstractCell;
@@ -26,6 +26,9 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.inject.assistedinject.Assisted;
+import com.jitlogic.zorka.central.client.Resources;
+import com.jitlogic.zorka.central.client.api.TraceDataApi;
 import com.jitlogic.zorka.central.data.TraceInfo;
 import com.jitlogic.zorka.central.data.TraceRecordInfo;
 import com.jitlogic.zorka.central.data.TraceRecordInfoProperties;
@@ -52,6 +55,7 @@ import com.sencha.gxt.widget.core.client.treegrid.TreeGrid;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,7 +64,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
     private final static TraceRecordInfoProperties props = GWT.create(TraceRecordInfoProperties.class);
 
-    private TraceDataService tds;
+    private TraceDataApi tds;
     private TraceInfo traceInfo;
     private TreeGrid<TraceRecordInfo> methodTree;
     private TreeStore<TraceRecordInfo> methodTreeStore;
@@ -80,7 +84,9 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
     private TextButton btnSearchPrev;
     private TextButton btnSearchNext;
 
-    public TraceDetailPanel(TraceDataService tds, TraceInfo traceInfo) {
+
+    @Inject
+    public TraceDetailPanel(TraceDataApi tds, @Assisted TraceInfo traceInfo) {
         this.tds = tds;
         this.traceInfo = traceInfo;
 

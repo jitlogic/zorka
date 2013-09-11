@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.client;
+package com.jitlogic.zorka.central.client.panels;
 
 
 import com.google.gwt.cell.client.AbstractCell;
@@ -27,6 +27,11 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+import com.jitlogic.zorka.central.client.*;
+import com.jitlogic.zorka.central.client.api.AdminApi;
+import com.jitlogic.zorka.central.client.api.TraceDataApi;
 import com.jitlogic.zorka.central.data.*;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style;
@@ -53,6 +58,7 @@ import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
+import javax.inject.Provider;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -62,8 +68,9 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
     private static final TraceInfoProperties props = GWT.create(TraceInfoProperties.class);
 
-    private TraceDataService tds;
-    private TraceAdminService ads;
+    private TraceDataApi tds;
+    private AdminApi ads;
+    private PanelFactory panelFactory;
 
     private HostInfo selectedHost;
     private Grid<TraceInfo> traceGrid;
@@ -74,7 +81,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
     private TraceListFilterExpression filter = new TraceListFilterExpression();
 
-    private ZorkaCentralShell shell;
+    private Provider<ZorkaCentralShell> shell;
     private ToggleButton btnErrors;
     private TextField txtClockEnd;
     private TextField txtClockBegin;
@@ -84,11 +91,14 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
     private Map<Integer, String> traceTypes;
 
-    public TraceListPanel(ZorkaCentralShell shell, TraceDataService tds, TraceAdminService ads, HostInfo hostInfo) {
+    @Inject
+    public TraceListPanel(Provider<ZorkaCentralShell> shell, TraceDataApi tds, AdminApi ads,
+                          PanelFactory panelFactory, @Assisted HostInfo hostInfo) {
         this.shell = shell;
         this.tds = tds;
         this.ads = ads;
         this.selectedHost = hostInfo;
+        this.panelFactory = panelFactory;
 
         filter.setSortBy("clock");
         filter.setSortAsc(false);
@@ -238,8 +248,8 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
     private void openDetailView() {
         TraceInfo traceInfo = traceGrid.getSelectionModel().getSelectedItem();
-        TraceDetailPanel detail = new TraceDetailPanel(tds, traceInfo);
-        shell.addView(detail, ClientUtil.formatTimestamp(traceInfo.getClock()) + "@" + selectedHost.getName());
+        TraceDetailPanel detail = panelFactory.traceDetailPanel(traceInfo);
+        shell.get().addView(detail, ClientUtil.formatTimestamp(traceInfo.getClock()) + "@" + selectedHost.getName());
     }
 
 

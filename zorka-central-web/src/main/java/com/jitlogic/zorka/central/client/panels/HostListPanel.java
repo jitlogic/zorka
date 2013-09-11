@@ -13,11 +13,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.client;
+package com.jitlogic.zorka.central.client.panels;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.inject.Inject;
+import com.jitlogic.zorka.central.client.Resources;
+import com.jitlogic.zorka.central.client.ZorkaCentralShell;
+import com.jitlogic.zorka.central.client.api.TraceDataApi;
 import com.jitlogic.zorka.central.data.HostInfo;
 import com.jitlogic.zorka.central.data.HostInfoProperties;
 import com.sencha.gxt.core.client.Style;
@@ -39,6 +43,7 @@ import com.sencha.gxt.widget.core.client.menu.SeparatorMenuItem;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
+import javax.inject.Provider;
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,20 +52,20 @@ public class HostListPanel extends VerticalLayoutContainer {
 
     private static final HostInfoProperties props = GWT.create(HostInfoProperties.class);
 
-    private ZorkaCentralShell shell;
-
-    private TraceDataService tds;
-    private TraceAdminService ads;
+    private TraceDataApi traceDataApi;
+    private Provider<ZorkaCentralShell> shell;
+    private PanelFactory panelFactory;
 
     private Grid<HostInfo> hostGrid;
     private ListStore<HostInfo> hostGridStore;
     private GridSelectionModel<HostInfo> selectionModel;
 
 
-    public HostListPanel(ZorkaCentralShell shell, TraceDataService tds, TraceAdminService ads) {
+    @Inject
+    public HostListPanel(Provider<ZorkaCentralShell> shell, TraceDataApi traceDataApi, PanelFactory panelFactory) {
         this.shell = shell;
-        this.tds = tds;
-        this.ads = ads;
+        this.traceDataApi = traceDataApi;
+        this.panelFactory = panelFactory;
 
         createHostListPanel();
         createContextMenu();
@@ -90,9 +95,7 @@ public class HostListPanel extends VerticalLayoutContainer {
         hostGrid.addCellDoubleClickHandler(new CellDoubleClickEvent.CellDoubleClickHandler() {
             @Override
             public void onCellClick(CellDoubleClickEvent event) {
-                GWT.log("Selected host: " + selectionModel.getSelectedItem());
-                shell.addView(new TraceListPanel(shell, tds, ads, selectionModel.getSelectedItem()),
-                        selectionModel.getSelectedItem().getName() + ": traces");
+                selectHost();
             }
         });
 
@@ -102,7 +105,7 @@ public class HostListPanel extends VerticalLayoutContainer {
 
     public void refresh() {
         hostGridStore.clear();
-        this.tds.listHosts(new MethodCallback<List<HostInfo>>() {
+        this.traceDataApi.listHosts(new MethodCallback<List<HostInfo>>() {
             @Override
             public void onFailure(Method method, Throwable exception) {
                 GWT.log("Error calling " + method, exception);
@@ -125,7 +128,7 @@ public class HostListPanel extends VerticalLayoutContainer {
                 public void onHide(HideEvent event) {
                     Dialog d = (Dialog) event.getSource();
                     if ("Yes".equals(d.getHideButton().getText())) {
-                        tds.deleteHost(hi.getId(), new MethodCallback<Void>() {
+                        traceDataApi.deleteHost(hi.getId(), new MethodCallback<Void>() {
                             @Override
                             public void onFailure(Method method, Throwable exception) {
                                 AlertMessageBox amb = new AlertMessageBox("Error saving host", exception.getMessage());
@@ -168,7 +171,7 @@ public class HostListPanel extends VerticalLayoutContainer {
         mnuNewHost.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
-                HostPrefsDialog dialog = new HostPrefsDialog(tds, HostListPanel.this, null);
+                HostPrefsDialog dialog = new HostPrefsDialog(traceDataApi, HostListPanel.this, null);
                 dialog.show();
             }
         });
@@ -193,7 +196,7 @@ public class HostListPanel extends VerticalLayoutContainer {
             public void onSelection(SelectionEvent<Item> event) {
                 HostInfo info = hostGrid.getSelectionModel().getSelectedItem();
                 if (info != null) {
-                    HostPrefsDialog dialog = new HostPrefsDialog(tds, HostListPanel.this, info);
+                    HostPrefsDialog dialog = new HostPrefsDialog(traceDataApi, HostListPanel.this, info);
                     dialog.show();
                 }
             }
@@ -208,13 +211,18 @@ public class HostListPanel extends VerticalLayoutContainer {
         mnuListTraces.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
-                GWT.log("Selected host: " + selectionModel.getSelectedItem());
-                shell.addView(new TraceListPanel(shell, tds, ads, selectionModel.getSelectedItem()),
-                        selectionModel.getSelectedItem().getName() + ": traces");
-
+                selectHost();
             }
         });
 
         hostGrid.setContextMenu(menu);
+    }
+
+    private void selectHost() {
+
+        HostInfo hostInfo = selectionModel.getSelectedItem();
+        GWT.log("Selected host: " + hostInfo);
+
+        shell.get().addView(panelFactory.traceListPanel(hostInfo), hostInfo.getName() + ": traces");
     }
 }

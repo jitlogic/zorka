@@ -13,13 +13,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.client;
+package com.jitlogic.zorka.central.client.panels;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+import com.jitlogic.zorka.central.client.Resources;
+import com.jitlogic.zorka.central.client.api.AdminApi;
 import com.jitlogic.zorka.central.data.TraceTemplateInfo;
 import com.jitlogic.zorka.central.data.TraceTemplateInfoProperties;
 import com.sencha.gxt.core.client.Style;
@@ -50,7 +54,7 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
 
     private final static TraceTemplateInfoProperties props = GWT.create(TraceTemplateInfoProperties.class);
 
-    private TraceAdminService adminService;
+    private AdminApi adminService;
     private ListStore<TraceTemplateInfo> templateStore;
     private Grid<TraceTemplateInfo> templateGrid;
     private GridRowEditing<TraceTemplateInfo> templateEditor;
@@ -64,7 +68,8 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
     private TextField txtCondRegex;
     private TextField txtTraceTemplate;
 
-    public TraceTemplatePanel(TraceAdminService adminService, Map<String, String> tidMap) {
+    @Inject
+    public TraceTemplatePanel(AdminApi adminService, @Assisted Map<String, String> tidMap) {
         this.adminService = adminService;
 
         createToolbar();

@@ -13,32 +13,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.client;
+package com.jitlogic.zorka.central.client.api;
 
-import com.jitlogic.zorka.central.data.TraceTemplateInfo;
+
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.RestService;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import java.util.List;
-import java.util.Map;
 
-
-public interface TraceAdminService extends RestService {
+public interface SystemApi extends RestService {
 
     @GET
-    @Path("admin/templates")
-    public void listTemplates(MethodCallback<List<TraceTemplateInfo>> cb);
+    @Path("system/info")
+    void systemInfo(MethodCallback<List<String>> cb);
 
-    @POST
-    @Path("admin/templates")
-    public void saveTemplate(TraceTemplateInfo tti, MethodCallback<Integer> cb);
-
-    @GET
-    @Path("admin/tidmap")
-    public void getTidMap(MethodCallback<Map<String, String>> cb);
-
-    @DELETE
-    @Path("admin/templates/{tid}")
-    public void removeTemplate(@PathParam("tid") int tid, MethodCallback<Void> cb);
 }

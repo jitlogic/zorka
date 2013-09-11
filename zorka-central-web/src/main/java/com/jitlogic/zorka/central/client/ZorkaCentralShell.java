@@ -19,6 +19,11 @@ import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import com.jitlogic.zorka.central.client.api.AdminApi;
+import com.jitlogic.zorka.central.client.api.TraceDataApi;
+import com.jitlogic.zorka.central.client.panels.HostListPanel;
+import com.jitlogic.zorka.central.client.portal.WelcomePanel;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.TabItemConfig;
@@ -31,12 +36,17 @@ public class ZorkaCentralShell extends BorderLayoutContainer {
 
     private TabPanel tabPanel;
 
-    private TraceAdminService adminService;
+    @Inject
+    private AdminApi adminService;
+
+    @Inject
+    private TraceDataApi traceDataApi;
 
     private final static int DX = 0;
     private final static int DY = 0;
 
-    public ZorkaCentralShell(TraceDataService tds, TraceAdminService adminService, SystemApi systemApi) {
+    @Inject
+    public ZorkaCentralShell(HostListPanel hostListPanel, WelcomePanel welcomePanel) {
 
         Window.enableScrolling(false);
         setPixelSize(Window.getClientWidth() - DX, Window.getClientHeight() - DY);
@@ -59,7 +69,8 @@ public class ZorkaCentralShell extends BorderLayoutContainer {
         ContentPanel westContainer = new ContentPanel();
         westContainer.setHeadingText("Hosts");
         westContainer.setBodyBorder(true);
-        westContainer.add(new HostListPanel(this, tds, adminService));
+        westContainer.add(hostListPanel);
+
 
         setWestWidget(westContainer, westData);
 
@@ -70,8 +81,6 @@ public class ZorkaCentralShell extends BorderLayoutContainer {
 
         tabPanel.setCloseContextMenu(true);
 
-        this.adminService = adminService;
-
         MarginData centerData = new MarginData();
         centerData.setMargins(new Margins(5));
 
@@ -80,11 +89,7 @@ public class ZorkaCentralShell extends BorderLayoutContainer {
 
         setCenterWidget(center, centerData);
 
-        tabPanel.add(new WelcomePanel(this, systemApi), new TabItemConfig("Welcome"));
-    }
-
-    public TraceAdminService getAdminService() {
-        return adminService;
+        tabPanel.add(welcomePanel, new TabItemConfig("Welcome"));
     }
 
     public void addView(Widget widget, String title) {

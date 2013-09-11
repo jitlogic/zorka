@@ -20,17 +20,18 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
+import com.jitlogic.zorka.central.client.api.AdminApi;
+import com.jitlogic.zorka.central.client.api.SystemApi;
+import com.jitlogic.zorka.central.client.api.TraceDataApi;
+import com.jitlogic.zorka.central.client.inject.ClientGinjector;
 import org.fusesource.restygwt.client.Resource;
 import org.fusesource.restygwt.client.RestServiceProxy;
 
 
 public class ZorkaCentral implements EntryPoint {
 
-    private TraceDataService traceDataService;
-    private TraceAdminService adminService;
-    private SystemApi systemApi;
-
     private ZorkaCentralShell shell;
+    private ClientGinjector injector = GWT.create(ClientGinjector.class);
 
 
     public void onModuleLoad() {
@@ -38,24 +39,15 @@ public class ZorkaCentral implements EntryPoint {
         Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
             @Override
             public void execute() {
-
-                traceDataService = GWT.create(TraceDataService.class);
-                ((RestServiceProxy) traceDataService).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
-
-                adminService = GWT.create(TraceAdminService.class);
-                ((RestServiceProxy) adminService).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
-
-                systemApi = GWT.create(SystemApi.class);
-                ((RestServiceProxy) systemApi).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
-
                 Window.enableScrolling(false);
-                shell = new ZorkaCentralShell(traceDataService, adminService, systemApi);
+                shell = injector.getShell();
 
                 RootPanel.get().add(shell);
                 onReady();
             }
         });
     }
+
 
     private native void onReady() /*-{
         if (typeof $wnd.GxtReady != 'undefined') {

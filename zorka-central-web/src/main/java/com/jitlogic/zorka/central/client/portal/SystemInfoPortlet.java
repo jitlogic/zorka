@@ -13,15 +13,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.client;
+package com.jitlogic.zorka.central.client.portal;
 
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Label;
+import com.google.inject.Inject;
+import com.jitlogic.zorka.central.client.api.SystemApi;
 import com.sencha.gxt.widget.core.client.Portlet;
-import com.sencha.gxt.widget.core.client.button.ToolButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
-import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
@@ -34,6 +34,7 @@ public class SystemInfoPortlet extends Portlet {
     private SystemApi systemApi;
     private Timer timer;
 
+    @Inject
     public SystemInfoPortlet(SystemApi systemApi) {
         this.systemApi = systemApi;
 

@@ -13,20 +13,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.central.client;
+package com.jitlogic.zorka.central.client.inject;
 
 
-import org.fusesource.restygwt.client.MethodCallback;
-import org.fusesource.restygwt.client.RestService;
+import com.google.gwt.inject.client.GinModules;
+import com.google.gwt.inject.client.Ginjector;
+import com.jitlogic.zorka.central.client.ZorkaCentralShell;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import java.util.List;
+@GinModules(ClientModule.class)
+public interface ClientGinjector extends Ginjector {
 
-public interface SystemApi extends RestService {
-
-    @GET
-    @Path("system/info")
-    void systemInfo(MethodCallback<List<String>> cb);
+    ZorkaCentralShell getShell();
 
 }
