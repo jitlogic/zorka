@@ -28,6 +28,7 @@ public class ZorkaCentral implements EntryPoint {
 
     private TraceDataService traceDataService;
     private TraceAdminService adminService;
+    private SystemApi systemApi;
 
     private ZorkaCentralShell shell;
 
@@ -44,8 +45,11 @@ public class ZorkaCentral implements EntryPoint {
                 adminService = GWT.create(TraceAdminService.class);
                 ((RestServiceProxy) adminService).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
 
+                systemApi = GWT.create(SystemApi.class);
+                ((RestServiceProxy) systemApi).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
+
                 Window.enableScrolling(false);
-                shell = new ZorkaCentralShell(traceDataService, adminService);
+                shell = new ZorkaCentralShell(traceDataService, adminService, systemApi);
 
                 RootPanel.get().add(shell);
                 onReady();

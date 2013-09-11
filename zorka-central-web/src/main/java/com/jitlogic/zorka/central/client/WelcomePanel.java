@@ -28,7 +28,6 @@ import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class WelcomePanel implements IsWidget {
@@ -37,8 +36,11 @@ public class WelcomePanel implements IsWidget {
 
     private ZorkaCentralShell shell;
 
-    public WelcomePanel(ZorkaCentralShell shell) {
+    private SystemApi systemApi;
+
+    public WelcomePanel(ZorkaCentralShell shell, SystemApi systemApi) {
         this.shell = shell;
+        this.systemApi = systemApi;
     }
 
     @Override
@@ -60,17 +62,15 @@ public class WelcomePanel implements IsWidget {
 
         createHelpPortlet();
 
-        Portlet wndTopHosts = newPortlet("Top Hosts", true);
+        Portlet wndTopHosts = newPortlet("Top Hosts", false);
         wndTopHosts.add(new HTML("TBD"));
         portal.add(wndTopHosts, 1);
 
-        Portlet wndTopOffenders = newPortlet("Top Offenders", true);
+        Portlet wndTopOffenders = newPortlet("Top Offenders", false);
         wndTopOffenders.add(new HTML("TBD"));
         portal.add(wndTopOffenders, 1);
 
-        Portlet wndStatus = newPortlet("Collector status", true);
-        wndStatus.add(new HTML("TBD"));
-        portal.add(wndStatus, 2);
+        portal.add(new SystemInfoPortlet(systemApi), 2);
 
         createAdminPortlet();
     }
@@ -85,7 +85,7 @@ public class WelcomePanel implements IsWidget {
     }
 
     private void createAdminPortlet() {
-        Portlet wndAdmin = newPortlet("Admin tasks", true);
+        Portlet wndAdmin = newPortlet("Admin tasks", false);
 
         VerticalLayoutContainer vp = new VerticalLayoutContainer();
 
@@ -99,8 +99,8 @@ public class WelcomePanel implements IsWidget {
             }
         }, ClickEvent.getType());
 
-        Hyperlink lnkUsersAccess = new Hyperlink("Users & Access Privileges", "");
-        vp.add(lnkUsersAccess);
+        //Hyperlink lnkUsersAccess = new Hyperlink("Users & Access Privileges", "");
+        //vp.add(lnkUsersAccess);
 
         wndAdmin.add(vp);
         portal.add(wndAdmin, 2);

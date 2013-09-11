@@ -36,7 +36,7 @@ public class ZorkaCentralShell extends BorderLayoutContainer {
     private final static int DX = 0;
     private final static int DY = 0;
 
-    public ZorkaCentralShell(TraceDataService tds, TraceAdminService adminService) {
+    public ZorkaCentralShell(TraceDataService tds, TraceAdminService adminService, SystemApi systemApi) {
 
         Window.enableScrolling(false);
         setPixelSize(Window.getClientWidth() - DX, Window.getClientHeight() - DY);
@@ -80,7 +80,7 @@ public class ZorkaCentralShell extends BorderLayoutContainer {
 
         setCenterWidget(center, centerData);
 
-        tabPanel.add(new WelcomePanel(this), new TabItemConfig("Welcome"));
+        tabPanel.add(new WelcomePanel(this, systemApi), new TabItemConfig("Welcome"));
     }
 
     public TraceAdminService getAdminService() {

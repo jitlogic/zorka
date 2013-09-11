@@ -1,16 +1,16 @@
-/** 
+/**
  * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
- * 
+ *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
+import com.jitlogic.zorka.common.ZorkaAgent;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.util.ObjectDumper;
@@ -37,19 +38,27 @@ import bsh.Interpreter;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class ZorkaBshAgent {
+public class ZorkaBshAgent implements ZorkaAgent {
 
-    /** Logger */
-	private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    /**
+     * Logger
+     */
+    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** Beanshell interpreter */
-	private Interpreter interpreter;
+    /**
+     * Beanshell interpreter
+     */
+    private Interpreter interpreter;
 
-    /** Zorka standard library */
-	private ZorkaLib zorkaLib;
+    /**
+     * Zorka standard library
+     */
+    private ZorkaLib zorkaLib;
 
-    /** Executor for asynchronous processing queries */
-	private Executor connExecutor;
+    /**
+     * Executor for asynchronous processing queries
+     */
+    private Executor connExecutor;
 
     private ExecutorService mainExecutor;
 
@@ -64,19 +73,19 @@ public class ZorkaBshAgent {
      *
      * @param connExecutor connExecutor for asynchronous processing queries
      */
-	public ZorkaBshAgent(Executor connExecutor, ExecutorService mainExecutor,
+    public ZorkaBshAgent(Executor connExecutor, ExecutorService mainExecutor,
                          long timeout, MBeanServerRegistry mbsRegistry,
                          AgentConfig config, QueryTranslator translator) {
 
-		this.interpreter = new Interpreter();
+        this.interpreter = new Interpreter();
 
-		this.connExecutor = connExecutor;
+        this.connExecutor = connExecutor;
         this.mainExecutor = mainExecutor;
         this.timeout = timeout;
         this.config = config;
 
 
-		zorkaLib = new ZorkaLib(this, mbsRegistry, config, translator);
+        zorkaLib = new ZorkaLib(this, mbsRegistry, config, translator);
         put("zorka", zorkaLib);
     }
 
@@ -86,8 +95,7 @@ public class ZorkaBshAgent {
      * objects as function libraries.
      *
      * @param name name in beanshell namespace
-     *
-     * @param obj object
+     * @param obj  object
      */
     public void put(String name, Object obj) {
         try {
@@ -110,45 +118,41 @@ public class ZorkaBshAgent {
      * Evaluates BSH query. If error occurs, it returns exception text with stack dump.
      *
      * @param expr query string
-     *
      * @return response string
      */
+    @Override
     public String query(String expr) {
-		try {
-			return ""+interpreter.eval(expr); // TODO proper object-to-string conversion
-		} catch (EvalError e) {
+        try {
+            return "" + interpreter.eval(expr); // TODO proper object-to-string conversion
+        } catch (EvalError e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error evaluating '" + expr + "': ", e);
-			return ObjectDumper.errorDump(e);
-		}
-	}
+            return ObjectDumper.errorDump(e);
+        }
+    }
 
 
     /**
      * Evaluates BSH query. If evaluation error occurs, it is thrown out as EvalError.
      *
      * @param expr query string
-     *
      * @return evaluation result
-     *
      * @throws EvalError
      */
-	public Object eval(String expr) throws EvalError {
-		return interpreter.eval(expr);
-	}
+    public Object eval(String expr) throws EvalError {
+        return interpreter.eval(expr);
+    }
 
 
     /**
      * Executes query asynchronously. Result is returned via callback object.
      *
-     * @param expr BSH expression
-     *
+     * @param expr     BSH expression
      * @param callback callback object
      */
-	public void exec(String expr, ZorkaCallback callback) {
-		ZorkaBshWorker worker = new ZorkaBshWorker(mainExecutor, timeout, this, expr, callback);
-		connExecutor.execute(worker);
-	}
-
+    public void exec(String expr, ZorkaCallback callback) {
+        ZorkaBshWorker worker = new ZorkaBshWorker(mainExecutor, timeout, this, expr, callback);
+        connExecutor.execute(worker);
+    }
 
 
     /**
@@ -173,10 +177,8 @@ public class ZorkaBshAgent {
     }
 
 
-
     /**
      * Loads and executes all script in given directory matching given mask.
-     *
      */
     public void loadScripts() {
         String scriptsDir = config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null);
@@ -214,7 +216,7 @@ public class ZorkaBshAgent {
                     loadedScripts.add(fname);
                 } else {
                     log.info(ZorkaLogger.ZAG_CONFIG, "Skipping: '" + scrPath + ": " +
-                        (loadedScripts.contains(fname) ? "already loaded" : "not a (proper) file") + ".");
+                            (loadedScripts.contains(fname) ? "already loaded" : "not a (proper) file") + ".");
                 }
             }
         } catch (Exception e) {
@@ -241,7 +243,7 @@ public class ZorkaBshAgent {
      * @return zorka library instance.
      */
     public ZorkaLib getZorkaLib() {
-		return zorkaLib;
-	}
+        return zorkaLib;
+    }
 
 }
