@@ -23,6 +23,7 @@ import com.jitlogic.zorka.common.util.ZorkaLogger;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,24 +38,36 @@ import static org.objectweb.asm.Opcodes.*;
  */
 public class SpyClassVisitor extends ClassVisitor {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** Parent class transformer  */
+    /**
+     * Parent class transformer
+     */
     private SpyClassTransformer transformer;
 
-    /** List of spy definitions to be applied (visitor will only check for method matches, not class matches!) */
+    /**
+     * List of spy definitions to be applied (visitor will only check for method matches, not class matches!)
+     */
     private List<SpyDefinition> sdefs;
 
-    /** List of matchers used by tracer generation code. */
+    /**
+     * List of matchers used by tracer generation code.
+     */
     private Tracer tracer;
 
-    /** Name of instrumented class */
+    /**
+     * Name of instrumented class
+     */
     private String className;
 
     private List<String> classInterfaces;
 
-    /** List of class annotations encountered when traversing class */
+    /**
+     * List of class annotations encountered when traversing class
+     */
     private List<String> classAnnotations = new ArrayList<String>();
 
     private SymbolRegistry symbolRegistry;
@@ -63,14 +76,14 @@ public class SpyClassVisitor extends ClassVisitor {
      * Creates Spy class visitor.
      *
      * @param transformer parent class transformer
-     * @param className class name
-     * @param sdefs list of spy definitions to be applied
-     * @param tracer reference to tracer
-     * @param cv output class visitor (typically ClassWriter)
+     * @param className   class name
+     * @param sdefs       list of spy definitions to be applied
+     * @param tracer      reference to tracer
+     * @param cv          output class visitor (typically ClassWriter)
      */
     public SpyClassVisitor(SpyClassTransformer transformer, SymbolRegistry symbolRegistry, String className,
                            List<SpyDefinition> sdefs, Tracer tracer, ClassVisitor cv) {
-        super(V1_6, cv);
+        super(Opcodes.ASM4, cv);
         this.transformer = transformer;
         this.symbolRegistry = symbolRegistry;
         this.className = className;
@@ -100,7 +113,7 @@ public class SpyClassVisitor extends ClassVisitor {
         log.debug(ZorkaLogger.ZSP_METHOD_TRC, "Encountered method: " + className + "." + methodName + " " + methodDesc);
 
         MethodVisitor mv = createVisitor(access, methodName, methodDesc, methodSignature, exceptions);
-        List<SpyContext> ctxs = new ArrayList<SpyContext>(sdefs.size()+2);
+        List<SpyContext> ctxs = new ArrayList<SpyContext>(sdefs.size() + 2);
 
         boolean m = true;
 
@@ -118,7 +131,7 @@ public class SpyClassVisitor extends ClassVisitor {
         }
 
         boolean doTrace = tracer.getMatcherSet()
-            .methodMatch(className, classAnnotations, classInterfaces, access, methodName, methodDesc, null);
+                .methodMatch(className, classAnnotations, classInterfaces, access, methodName, methodDesc, null);
 
         if (ctxs.size() > 0 || doTrace) {
             return new SpyMethodVisitor(m, doTrace ? symbolRegistry : null, className,
@@ -131,10 +144,10 @@ public class SpyClassVisitor extends ClassVisitor {
     /**
      * Creates method visitor for given method.
      *
-     * @param access method access flags
-     * @param name method name
-     * @param desc method descriptor
-     * @param signature method signature
+     * @param access     method access flags
+     * @param name       method name
+     * @param desc       method descriptor
+     * @param signature  method signature
      * @param exceptions names of thrown exceptions
      * @return method visitor
      */

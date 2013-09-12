@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.IOException;
@@ -58,6 +59,7 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
     private JdbcTemplate jdbc;
     private DataSource ds;
 
+    @Inject
     public HostStoreManager(CentralConfig config, DataSource ds, SymbolRegistry symbolRegistry, TraceCache cache, TraceTemplateManager templater) {
         this.config = config;
         this.symbolRegistry = symbolRegistry;

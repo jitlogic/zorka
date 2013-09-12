@@ -20,7 +20,6 @@ import com.jitlogic.zorka.central.HostStore;
 import com.jitlogic.zorka.central.ReceiverContext;
 import com.jitlogic.zorka.central.data.HostInfo;
 import com.jitlogic.zorka.central.data.TraceRecordInfo;
-import com.jitlogic.zorka.central.rest.TraceDataApi;
 import com.jitlogic.zorka.central.test.support.CentralFixture;
 import com.jitlogic.zorka.common.test.support.TestTraceGenerator;
 import com.jitlogic.zorka.common.tracedata.Symbol;
@@ -40,9 +39,9 @@ public class TraceDataApiUnitTest extends CentralFixture {
 
     @Before
     public void prepareData() throws Exception {
-        jdbc = new JdbcTemplate(instance.getDs());
+        jdbc = new JdbcTemplate(dataSource);
 
-        ReceiverContext rcx = new ReceiverContext(instance.getDs(), instance.getStoreManager().get("test", true));
+        ReceiverContext rcx = new ReceiverContext(dataSource, storeManager.get("test", true));
         TestTraceGenerator generator = new TestTraceGenerator();
         TraceRecord tr = generator.generate();
         Symbol s1 = new Symbol(tr.getClassId(), generator.getSymbols().symbolName(tr.getClassId()));
@@ -67,7 +66,7 @@ public class TraceDataApiUnitTest extends CentralFixture {
     @Test
     public void testCreateHost() throws Exception {
         HostInfo myinfo = mkHost(0, "myhost", "127.0.0.1", "My Description", 0x20);
-        traceDataApi.addHost(myinfo);
+        traceDataService.addHost(myinfo);
 
         assertEquals(1, (int) jdbc.queryForObject("select count(1) from HOSTS where HOST_NAME = ?", Integer.class, "myhost"));
 
@@ -85,12 +84,12 @@ public class TraceDataApiUnitTest extends CentralFixture {
     @Test
     public void testCreateAndUpdateHost() throws Exception {
         HostInfo myinfo = mkHost(0, "myhost", "127.0.0.1", "My Description", 0x20);
-        traceDataApi.addHost(myinfo);
+        traceDataService.addHost(myinfo);
 
         int hostId = jdbc.queryForObject("select HOST_ID from HOSTS where HOST_NAME = ?", Integer.class, "myhost");
 
         HostInfo newInfo = mkHost(0, "myhost", "1.2.3.4", "Other Description", 0x40);
-        traceDataApi.updateHost(hostId, newInfo);
+        traceDataService.updateHost(hostId, newInfo);
 
         String hostAddr = jdbc.queryForObject("select HOST_ADDR from HOSTS where HOST_NAME = ?", String.class, "myhost");
         assertEquals("1.2.3.4", hostAddr);
@@ -100,11 +99,11 @@ public class TraceDataApiUnitTest extends CentralFixture {
     @Test
     public void testCreateAndDeleteHost() throws Exception {
         HostInfo myinfo = mkHost(0, "myhost", "127.0.0.1", "My Description", 0x20);
-        traceDataApi.addHost(myinfo);
+        traceDataService.addHost(myinfo);
 
         int hostId = jdbc.queryForObject("select HOST_ID from HOSTS where HOST_NAME = ?", Integer.class, "myhost");
 
-        traceDataApi.deleteHost(hostId);
+        traceDataService.deleteHost(hostId);
 
         int hostCnt = jdbc.queryForObject("select count(1) from HOSTS where HOST_ID = ?", Integer.class, hostId);
         assertEquals(0, hostCnt);
@@ -117,7 +116,7 @@ public class TraceDataApiUnitTest extends CentralFixture {
     @Test
     public void testGetTraceRoot() throws Exception {
         int hostId = storeManager.getOrCreateHost("test", "").getHostInfo().getId();
-        TraceRecordInfo tr = traceDataApi.getRecord(hostId, 0, 0, "");
+        TraceRecordInfo tr = traceDataService.getRecord(hostId, 0, 0, "");
         assertEquals(0, tr.getChildren());
     }
 
@@ -125,7 +124,7 @@ public class TraceDataApiUnitTest extends CentralFixture {
     @Test
     public void testListTraceRoot() throws Exception {
         int hostId = storeManager.getOrCreateHost("test", "").getHostInfo().getId();
-        List<TraceRecordInfo> lst = traceDataApi.listRecords(hostId, 0, 0, "");
+        List<TraceRecordInfo> lst = traceDataService.listRecords(hostId, 0, 0, "");
         assertNotNull(lst);
     }
 }

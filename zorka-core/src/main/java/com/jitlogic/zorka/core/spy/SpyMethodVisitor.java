@@ -21,10 +21,7 @@ import com.jitlogic.zorka.core.AgentDiagnostics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
+import org.objectweb.asm.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,10 +42,14 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     private static final ZorkaLog log = ZorkaLogger.getLog(SpyMethodVisitor.class);
 
-    /** Class that receives data from probes */
+    /**
+     * Class that receives data from probes
+     */
     private final static String SUBMIT_CLASS = "com/jitlogic/zorka/core/spy/MainSubmitter";
 
-    /** Method used by various probes */
+    /**
+     * Method used by various probes
+     */
     private final static String SUBMIT_METHOD = "submit";
     private final static String SUBMIT_SIGNATURE = "(III[Ljava/lang/Object;)V";
     private static final String ENTER_METHOD = "traceEnter";
@@ -58,28 +59,39 @@ public class SpyMethodVisitor extends MethodVisitor {
     private static final String ERROR_METHOD = "traceError";
     private static final String ERROR_SIGNATURE = "(Ljava/lang/Throwable;)V";
 
-    /** Access flags of (instrumented) method */
+    /**
+     * Access flags of (instrumented) method
+     */
     private final int access;
 
     private final String className;
 
-    /** Name of (instrumented) metod */
+    /**
+     * Name of (instrumented) metod
+     */
     private final String methodName;
 
     private final String methodSignature;
 
-    /** Argument types of (instrumented) method */
+    /**
+     * Argument types of (instrumented) method
+     */
     private final Type[] argTypes;
 
-    /** Return type of (instrumented) method */
+    /**
+     * Return type of (instrumented) method
+     */
     private final Type returnType;
 
-    /** Slot in method stack for retaining return values (or exception objects) */
+    /**
+     * Slot in method stack for retaining return values (or exception objects)
+     */
     private int retValProbeSlot;
 
-    /** Return probe (error probe) found in any of supplied contexts. It is actually only needed to
-     *  mark if return/error value is actually neede and generate parts of error/return fetch code that
-     *  has to be executed before other probes on return/error paths.
+    /**
+     * Return probe (error probe) found in any of supplied contexts. It is actually only needed to
+     * mark if return/error value is actually neede and generate parts of error/return fetch code that
+     * has to be executed before other probes on return/error paths.
      */
     private SpyProbe returnProbe;
 
@@ -89,25 +101,37 @@ public class SpyMethodVisitor extends MethodVisitor {
      */
     private List<SpyContext> ctxs;
 
-    /** How many elements have to be added to JVM stack by instrumented code. Used in visitMaxs() method. */
+    /**
+     * How many elements have to be added to JVM stack by instrumented code. Used in visitMaxs() method.
+     */
     private int stackDelta;
 
-    /** Label used for enclosing method code into try..finally block to intercept thrown exceptions. */
+    /**
+     * Label used for enclosing method code into try..finally block to intercept thrown exceptions.
+     */
     private final Label lTryFrom = new Label();
 
-    /** Label used for enclosing method code into try..finally block to intercept thrown exceptions. */
+    /**
+     * Label used for enclosing method code into try..finally block to intercept thrown exceptions.
+     */
     private final Label lTryTo = new Label();
 
-    /** Label used for enclosing method code into try..finally block to intercept thrown exceptions. */
+    /**
+     * Label used for enclosing method code into try..finally block to intercept thrown exceptions.
+     */
     private final Label lTryHandler = new Label();
 
-    /** Boolean flag used when method annotation matching is required */
+    /**
+     * Boolean flag used when method annotation matching is required
+     */
     private boolean matches = false;
 
-    /** Boolean flag indicating if tracer code should be injected. */
+    /**
+     * Boolean flag indicating if tracer code should be injected.
+     */
     private SymbolRegistry symbolRegistry;
 
-    private List<String> annotations =  new ArrayList<String>();
+    private List<String> annotations = new ArrayList<String>();
 
     private List<String> classAnnotations;
 
@@ -120,19 +144,18 @@ public class SpyMethodVisitor extends MethodVisitor {
     /**
      * Standard constructor.
      *
-     * @param matches true if visitor should always instrument or false if it should check for annotations
-     *
-     * @param access method access flags
-     * @param methodName method name
+     * @param matches         true if visitor should always instrument or false if it should check for annotations
+     * @param access          method access flags
+     * @param methodName      method name
      * @param methodSignature method descriptor
-     * @param ctxs spy contexts interested in receiving data from this visitor
-     * @param mv method visitor (next in processing chain)
+     * @param ctxs            spy contexts interested in receiving data from this visitor
+     * @param mv              method visitor (next in processing chain)
      */
     public SpyMethodVisitor(boolean matches, SymbolRegistry symbolRegistry,
                             String className, List<String> classAnnotations, List<String> classInterfaces,
                             int access, String methodName, String methodSignature,
                             List<SpyContext> ctxs, MethodVisitor mv) {
-        super(V1_6, mv);
+        super(Opcodes.ASM4, mv);
         this.matches = matches;
         this.symbolRegistry = symbolRegistry;
         this.className = className;
@@ -181,7 +204,6 @@ public class SpyMethodVisitor extends MethodVisitor {
      * Returns type of method argument at given position.
      *
      * @param idx argument index
-     *
      * @return argument type
      */
     public Type getArgType(int idx) {
@@ -193,7 +215,6 @@ public class SpyMethodVisitor extends MethodVisitor {
         annotations.add(desc.replace("/", "."));
         return super.visitAnnotation(desc, visible);
     }
-
 
 
     @Override
@@ -242,14 +263,14 @@ public class SpyMethodVisitor extends MethodVisitor {
                 returnProbe.emitFetchRetVal(this, returnType);
             }
 
-            for (int i = ctxs.size()-1; i >= 0; i--) {
+            for (int i = ctxs.size() - 1; i >= 0; i--) {
                 if (!ctxMatches.get(i)) {
                     continue;
                 }
                 SpyContext ctx = ctxs.get(i);
                 SpyDefinition sdef = ctx.getSpyDefinition();
                 if (getSubmitFlags(ctx.getSpyDefinition(), ON_ENTER) == SF_NONE ||
-                    sdef.getProbes(ON_RETURN).size() > 0 || sdef.getProcessors(ON_RETURN).size() > 0) {
+                        sdef.getProbes(ON_RETURN).size() > 0 || sdef.getProcessors(ON_RETURN).size() > 0) {
                     stackDelta = max(stackDelta, emitProbes(ON_RETURN, ctx));
                 }
             }
@@ -273,14 +294,14 @@ public class SpyMethodVisitor extends MethodVisitor {
             returnProbe.emitFetchRetVal(this, Type.getType(Object.class));
         }
 
-        for (int i = ctxs.size()-1; i >= 0; i--) {
+        for (int i = ctxs.size() - 1; i >= 0; i--) {
             if (!ctxMatches.get(i)) {
                 continue;
             }
             SpyContext ctx = ctxs.get(i);
             SpyDefinition sdef = ctx.getSpyDefinition();
             if (getSubmitFlags(ctx.getSpyDefinition(), ON_ENTER) == SF_NONE ||
-                sdef.getProbes(ON_ERROR).size() > 0 || sdef.getProcessors(ON_ERROR).size() > 0) {
+                    sdef.getProbes(ON_ERROR).size() > 0 || sdef.getProcessors(ON_ERROR).size() > 0) {
                 stackDelta = max(stackDelta, emitProbes(ON_ERROR, ctx));
             }
         }
@@ -303,13 +324,11 @@ public class SpyMethodVisitor extends MethodVisitor {
      * Returns flag that will be passed by probes of a given sdef on a given stage.
      * This flag is used by submit dispatcher to determine if submit record has to be
      * processed immediately or needs to wait for more data to come.
-     *
+     * <p/>
      * TODO this is propably useless as submitter has reference to spy context, so can determine it by itself
      *
-     * @param sdef spy definition
-     *
+     * @param sdef  spy definition
      * @param stage whether it is method entry, return or error handling
-     *
      * @return
      */
     public static int getSubmitFlags(SpyDefinition sdef, int stage) {
@@ -336,7 +355,7 @@ public class SpyMethodVisitor extends MethodVisitor {
     private void checkReturnVals() {
 
         for (SpyContext ctx : ctxs) {
-            for (int stage : new int[] { ON_ERROR, ON_RETURN }) {
+            for (int stage : new int[]{ON_ERROR, ON_RETURN}) {
                 for (SpyProbe spe : ctx.getSpyDefinition().getProbes(stage)) {
                     if (spe instanceof SpyReturnProbe) {
                         returnProbe = spe;
@@ -355,8 +374,8 @@ public class SpyMethodVisitor extends MethodVisitor {
     /**
      * Emits tracer code on method entry.
      *
-     * @param classId class name (symbol ID)
-     * @param methodId method name (symbol ID)
+     * @param classId     class name (symbol ID)
+     * @param methodId    method name (symbol ID)
      * @param signatureId method signature (symbolID)
      * @return number of JVM stack slots consumed
      */
@@ -408,9 +427,7 @@ public class SpyMethodVisitor extends MethodVisitor {
      * have to be called in reverse order.
      *
      * @param stage stage (ON_ENTER, ON_RETURN, ON_ERROR)
-     *
-     * @param ctx spy context
-     *
+     * @param ctx   spy context
      * @return number of JVM stack slots consumed
      */
     private int emitProbes(int stage, SpyContext ctx) {

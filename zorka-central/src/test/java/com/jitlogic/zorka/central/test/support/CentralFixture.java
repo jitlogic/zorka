@@ -16,15 +16,17 @@
 
 package com.jitlogic.zorka.central.test.support;
 
-import com.jitlogic.zorka.central.CentralApp;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.jitlogic.zorka.central.CentralConfig;
-import com.jitlogic.zorka.central.CentralInstance;
 import com.jitlogic.zorka.central.HostStoreManager;
-import com.jitlogic.zorka.central.rest.AdminApi;
-import com.jitlogic.zorka.central.rest.TraceDataApi;
+import com.jitlogic.zorka.central.rest.AdminService;
+import com.jitlogic.zorka.central.rest.TraceDataService;
 import com.jitlogic.zorka.common.test.support.TestUtil;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.zico.ZicoService;
+import org.apache.commons.dbcp.BasicDataSource;
 import org.junit.After;
 import org.junit.Before;
 
@@ -37,12 +39,17 @@ public class CentralFixture {
     private Properties configProperties;
 
     protected CentralConfig config;
-    protected CentralInstance instance;
     protected HostStoreManager storeManager;
     protected ZicoService zicoService;
 
-    protected TraceDataApi traceDataApi;
-    protected AdminApi adminApi;
+    protected TraceDataService traceDataService;
+    protected AdminService adminService;
+
+    protected SymbolRegistry symbolRegistry;
+
+    protected TestCentralModule testCentralModule;
+    protected Injector injector;
+    protected BasicDataSource dataSource;
 
     @Before
     public void setUpCentralFixture() throws Exception {
@@ -63,21 +70,26 @@ public class CentralFixture {
 
         config = new CentralConfig(configProperties);
 
-        instance = new CentralInstance(config);
-        CentralApp.setInstance(instance);
-        instance.start();
+        testCentralModule = new TestCentralModule(config);
+        injector = Guice.createInjector(testCentralModule);
 
-        storeManager = instance.getStoreManager();
-        zicoService = instance.getZicoService();
+        dataSource = injector.getInstance(BasicDataSource.class);
 
-        traceDataApi = new TraceDataApi(instance.getStoreManager());
-        adminApi = new AdminApi(instance);
+        storeManager = injector.getInstance(HostStoreManager.class);
+        zicoService = injector.getInstance(ZicoService.class);
+        zicoService.start();
+
+        traceDataService = injector.getInstance(TraceDataService.class);
+        adminService = injector.getInstance(AdminService.class);
+
+        symbolRegistry = injector.getInstance(SymbolRegistry.class);
     }
 
     @After
     public void tearDownCentralFixture() throws Exception {
-        instance.stop();
-        CentralApp.setInstance(null);
+        zicoService.stop();
+        storeManager.close();
+        dataSource.close();
     }
 
     public String getTmpDir() {

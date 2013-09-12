@@ -19,23 +19,20 @@ import com.jitlogic.zorka.central.*;
 import com.jitlogic.zorka.central.data.*;
 import com.jitlogic.zorka.common.tracedata.*;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.*;
 
 @Path("hosts")
-public class TraceDataApi {
+public class TraceDataService {
 
     private HostStoreManager storeManager;
 
 
-    public TraceDataApi() {
-        storeManager = CentralApp.getInstance().getStoreManager();
-    }
-
-
-    public TraceDataApi(HostStoreManager storeManager) {
+    @Inject
+    public TraceDataService(HostStoreManager storeManager) {
         this.storeManager = storeManager;
     }
 

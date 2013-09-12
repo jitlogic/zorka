@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
+import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,7 +33,7 @@ public class DbSymbolRegistry extends SymbolRegistry {
 
     private JdbcTemplate jdbc;
 
-
+    @Inject
     public DbSymbolRegistry(DataSource ds) {
         this.jdbc = new JdbcTemplate(ds);
         loadSymbols();

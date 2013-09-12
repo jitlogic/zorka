@@ -16,7 +16,6 @@
 package com.jitlogic.zorka.central.test;
 
 
-import com.jitlogic.zorka.central.rest.TraceDataApi;
 import com.jitlogic.zorka.central.test.support.CentralFixture;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,13 +28,12 @@ public class RoofDataApiUnitTest extends CentralFixture {
 
 
     private int hostId;
-    private TraceDataApi api;
     private JdbcTemplate jdbc;
 
 
     @Before
     public void populateData() {
-        jdbc = new JdbcTemplate(instance.getDs());
+        jdbc = new JdbcTemplate(dataSource);
 
         jdbc.update("insert into HOSTS (HOST_NAME,HOST_ADDR,HOST_PATH) values(?,?,?)", "test", "127.0.0.1", "test");
         hostId = jdbc.queryForObject("select HOST_ID from HOSTS where HOST_NAME = 'test'", Integer.class);
@@ -46,7 +44,6 @@ public class RoofDataApiUnitTest extends CentralFixture {
         jdbc.update("insert into TRACES values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 hostId, 20, 1, 100, 1234, 1, 2, 0, 6, 5, 4, 100, 10, 50, 1000, "HTTP|index.do|500", null);
 
-        api = new TraceDataApi();
     }
 
 
@@ -58,6 +55,6 @@ public class RoofDataApiUnitTest extends CentralFixture {
 
     @Test
     public void testListHostsViaApi() {
-        assertEquals(1, api.getHosts().size());
+        assertEquals(1, traceDataService.getHosts().size());
     }
 }
