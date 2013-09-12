@@ -77,13 +77,13 @@ public class WelcomePanel implements IsWidget {
 
         createHelpPortlet();
 
-        Portlet wndTopHosts = newPortlet("Top Hosts", false);
-        wndTopHosts.add(new HTML("TBD"));
-        portal.add(wndTopHosts, 1);
+        //Portlet wndTopHosts = newPortlet("Top Hosts", false);
+        //wndTopHosts.add(new HTML("TBD"));
+        //portal.add(wndTopHosts, 1);
 
-        Portlet wndTopOffenders = newPortlet("Top Offenders", false);
-        wndTopOffenders.add(new HTML("TBD"));
-        portal.add(wndTopOffenders, 1);
+        //Portlet wndTopOffenders = newPortlet("Top Offenders", false);
+        //wndTopOffenders.add(new HTML("TBD"));
+        //portal.add(wndTopOffenders, 1);
 
         portal.add(systemInfoPortlet, 2);
 
