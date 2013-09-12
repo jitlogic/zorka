@@ -305,6 +305,7 @@ public class RAGZUnitTest extends CentralFixture {
         assertEquals("EFGH", new String(b, "UTF8"));
     }
 
+
     @Test
     public void testConcurrentReadAndWriteInTheSameFileNextSegment() throws Exception {
         String path = tmpFile("test.gz");

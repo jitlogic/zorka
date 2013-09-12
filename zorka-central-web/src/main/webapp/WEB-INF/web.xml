@@ -5,54 +5,33 @@
 <web-app>
     <display-name>Archetype Created Web Application</display-name>
 
-    <servlet>
-        <servlet-name>configurator-servlet</servlet-name>
-        <servlet-class>com.jitlogic.zorka.central.CentralApp</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
+    <context-param>
+        <param-name>resteasy.servlet.mapping.prefix</param-name>
+        <param-value>/rest</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>resteasy.guice.modules</param-name>
+        <param-value>com.jitlogic.zorka.central.ProdCentralModule</param-value>
+    </context-param>
+
+
+    <listener>
+        <listener-class>com.jitlogic.zorka.central.CentralBootstrapListener</listener-class>
+    </listener>
 
     <servlet>
-        <servlet-name>rest-servlet</servlet-name>
-        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-        <init-param>
-            <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>com.jitlogic.zorka.central.rest</param-value>
-        </init-param>
-        <init-param>
-            <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
-            <param-value>true</param-value>
-        </init-param>
-        <load-on-startup>2</load-on-startup>
+        <servlet-name>resteasy-servlet</servlet-name>
+        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>rest-servlet</servlet-name>
+        <servlet-name>resteasy-servlet</servlet-name>
         <url-pattern>/rest/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>configurator-servlet</servlet-name>
-        <url-pattern>/central</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>
         <welcome-file>ZorkaCentral.html</welcome-file>
     </welcome-file-list>
 
-    <!-- Uncomment lines below when deploying in a standard web container
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>ALL</web-resource-name>
-            <url-pattern>/*</url-pattern>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>OPER</role-name>
-        </auth-constraint>
-    </security-constraint>
-
-    <login-config>
-        <auth-method>BASIC</auth-method>
-        <realm-name>Zorka Central UI</realm-name>
-    </login-config>
-    -->
 </web-app>
