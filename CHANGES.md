@@ -1,3 +1,10 @@
+Zorka 0.9.9 (2013-09-15)
+------------------------
+
+ * many improvements and fixes in zorka-central;
+ * unified scripts and  for JDBC monitoring;
+
+
 Zorka 0.9.8 (2013-09-01)
 ------------------------
 
