@@ -5,7 +5,7 @@
     <parent>
         <artifactId>zorka</artifactId>
         <groupId>com.jitlogic.zorka</groupId>
-        <version>0.9.9-SNAPSHOT</version>
+        <version>0.9.9</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -47,6 +47,8 @@
                                       toDir="${project.build.outputDirectory}/central-${project.version}"/>
                                 <copy file="../zorka-agent/target/zorka-agent-${project.version}.jar"
                                       toFile="${project.build.outputDirectory}/central-${project.version}/zorka.jar"/>
+                                <copy file="../CHANGES.md"
+                                      toDir="${project.build.outputDirectory}/central-${project.version}"/>
                                 <mkdir dir="${project.build.outputDirectory}/central-${project.version}/scripts"/>
                                 <copy toDir="${project.build.outputDirectory}/central-${project.version}/scripts">
                                     <fileset dir="../zorka-dist/src/scripts" defaultexcludes="false">
@@ -59,6 +61,13 @@
                                 <copy toDir="${project.build.outputDirectory}/central-${project.version}/profiles">
                                     <fileset dir="../zorka-dist/src/profiles" defaultexcludes="false">
                                         <include name="**"/>
+                                    </fileset>
+                                </copy>
+                                <mkdir dir="${project.build.outputDirectory}/central-${project.version}/dbscripts"/>
+                                <copy toDir="${project.build.outputDirectory}/central-${project.version}/dbscripts">
+                                    <fileset dir="../zorka-central/src/main/resources/com/jitlogic/zorka/central"
+                                             defaultexcludes="false">
+                                        <include name="*.sql"/>
                                     </fileset>
                                 </copy>
                                 <copy file="src/central.profile"
