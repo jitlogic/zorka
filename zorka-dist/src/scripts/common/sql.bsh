@@ -27,8 +27,6 @@ __sql() {
 
   // Default values for SQL parameter processing
   zorka.defCfg("sql.params", "no");
-  //zorka.defCfg("sql.params.include", "~.*");
-  //zorka.defCfg("sql.params.exclude", "");
 
   // Default values for SQL slow requests log configuration options
   zorka.defCfg("sql.slow", "no");
@@ -45,7 +43,7 @@ __sql() {
   zorka.defCfg("sql.error.file.path", zorka.path("${zorka.log.dir}", "sql-error.log"));
   zorka.defCfg("sql.error.file.max", "8M");
   zorka.defCfg("sql.error.file.num", "8");
-  zorka.defCfg("sql.error.format", "[${TIME}] ${URI}${PARAMS} -> ${STATUS}");
+  zorka.defCfg("sql.error.format", "[${TIME}] ${DB}: ${SQL} -> ${ERR}");
 
   // Default values for SQL tracer options 
   zorka.defCfg("sql.trace", zorka.stringCfg("tracer"));
