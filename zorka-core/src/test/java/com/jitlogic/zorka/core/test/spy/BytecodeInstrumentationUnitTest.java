@@ -583,18 +583,6 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
 
     @Test
-    public void testInstrumentSafeRecursiveIndirectInterfaceMethod() throws Exception {
-        engine.add(SpyDefinition.instrument().include(
-                spy.byInterfaceAndMethod(ICLASS2, "myMethod2").safeRecursive()));
-
-        Object obj = instantiate(engine, TCLASS2);
-        invoke(obj, "myMethod2");
-
-        assertEquals("spy should match", 2, submitter.size());
-    }
-
-
-    @Test
     public void testInstrumentRecursiveIndirectByClassInterfaceMethod() throws Exception {
         engine.add(SpyDefinition.instrument().include(
                 spy.byInterfaceAndMethod(ICLASS1, "trivialMethod4").recursive()));

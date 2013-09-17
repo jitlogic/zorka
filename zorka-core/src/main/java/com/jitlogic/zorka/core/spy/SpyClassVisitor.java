@@ -74,7 +74,7 @@ public class SpyClassVisitor extends ClassVisitor {
 
     private SymbolRegistry symbolRegistry;
 
-    private boolean recursive, safeRecursive;
+    private boolean recursive;
 
     /**
      * Creates Spy class visitor.
@@ -101,9 +101,6 @@ public class SpyClassVisitor extends ClassVisitor {
                 if (matcher.hasFlags(SpyMatcher.RECURSIVE)) {
                     recursive = true;
                 }
-                if (matcher.hasFlags(SpyMatcher.SAFE_RECURSIVE)) {
-                    safeRecursive = true;
-                }
             }
         }
     }
@@ -117,11 +114,7 @@ public class SpyClassVisitor extends ClassVisitor {
         for (String ifname : interfaces) {
             String interfaceClass = ifname.replace('/', '.');
             this.classInterfaces.add(interfaceClass);
-            if (recursive || safeRecursive) {
-
-                if (safeRecursive) {
-                    transformer.lock();
-                }
+            if (recursive) {
 
                 try {
                     recursiveInterfaceScan(interfaceClass);
@@ -129,26 +122,14 @@ public class SpyClassVisitor extends ClassVisitor {
                     log.error(ZorkaLogger.ZSP_CONFIG, "Cannot (recursively) load class: " + interfaceClass, e);
                 }
 
-                if (safeRecursive) {
-                    transformer.unlock();
-                }
             }
         }
 
-        if ((recursive || safeRecursive) && !"java/lang/Object".equals(superName)) {
-
-            if (safeRecursive) {
-                transformer.lock();
-            }
-
+        if ((recursive) && !"java/lang/Object".equals(superName)) {
             try {
                 recursiveInterfaceScan(superName.replace('/', '.'));
             } catch (Exception e) {
                 log.error(ZorkaLogger.ZSP_CONFIG, "Cannot (recursively) load class: " + superName, e);
-            }
-
-            if (safeRecursive) {
-                transformer.unlock();
             }
         }
 

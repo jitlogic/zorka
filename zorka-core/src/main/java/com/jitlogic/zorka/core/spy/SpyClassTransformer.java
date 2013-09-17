@@ -65,6 +65,13 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
     private ThreadLocal<Boolean> transformLock = new ThreadLocal<Boolean>();
 
+    private ThreadLocal<Set<String>> currentTransformsTL = new ThreadLocal<Set<String>>() {
+        @Override
+        public Set<String> initialValue() {
+            return new HashSet<String>();
+        }
+    };
+
     private SymbolRegistry symbolRegistry;
 
     /**
@@ -148,6 +155,13 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
         String clazzName = className.replace("/", ".");
 
+        Set<String> currentTransforms = currentTransformsTL.get();
+        if (currentTransforms.contains(clazzName)) {
+            return classfileBuffer;
+        } else {
+            currentTransforms.add(clazzName);
+        }
+
         List<SpyDefinition> found = new ArrayList<SpyDefinition>();
 
         for (SpyDefinition sdef : sdefs) {
@@ -159,12 +173,14 @@ public class SpyClassTransformer implements ClassFileTransformer {
             }
         }
 
-        boolean classMatch = tracer.getMatcherSet().classMatch(clazzName);
+        boolean tracerMatch = tracer.getMatcherSet().classMatch(clazzName);
 
-        if (found.size() > 0 || classMatch) {
+        byte[] buf = classfileBuffer;
+
+        if (found.size() > 0 || tracerMatch) {
 
             log.debug(ZorkaLogger.ZSP_CLASS_TRC, "Transforming class: %s (sdefs found: %d; tracer match: %b)",
-                    className, found.size(), classMatch);
+                    className, found.size(), tracerMatch);
 
             AgentDiagnostics.inc(AgentDiagnostics.CLASSES_TRANSFORMED);
 
@@ -172,10 +188,11 @@ public class SpyClassTransformer implements ClassFileTransformer {
             ClassWriter cw = new ClassWriter(cr, 0);
             ClassVisitor scv = createVisitor(classLoader, clazzName, found, tracer, cw);
             cr.accept(scv, 0);
-            return cw.toByteArray();
+            buf = cw.toByteArray();
         }
 
-        return classfileBuffer;
+        currentTransforms.remove(clazzName);
+        return buf;
     }
 
     /**
@@ -190,13 +207,4 @@ public class SpyClassTransformer implements ClassFileTransformer {
         return new SpyClassVisitor(this, classLoader, symbolRegistry, className, found, tracer, cw);
     }
 
-
-    public void lock() {
-        transformLock.set(true);
-    }
-
-
-    public void unlock() {
-        transformLock.set(false);
-    }
 }

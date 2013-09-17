@@ -67,7 +67,7 @@ public class SpyMatcher {
     public static final int NO_CONSTRUCTORS = 0x040;
     public static final int NO_ACCESSORS = 0x080;
     public static final int NO_COMMONS = 0x100;
-    public static final int SAFE_RECURSIVE = 0x200;
+
     public static final int RECURSIVE = 0x400;
     public static final int EXCLUDE_MATCH = 0x800;
 
@@ -299,12 +299,6 @@ public class SpyMatcher {
     public SpyMatcher recursive() {
         return new SpyMatcher(flags | RECURSIVE, access, classPattern, methodPattern, signaturePattern);
     }
-
-
-    public SpyMatcher safeRecursive() {
-        return new SpyMatcher(flags | SAFE_RECURSIVE, access, classPattern, methodPattern, signaturePattern);
-    }
-
 
     /**
      * Excludes constructors and static constructors.
