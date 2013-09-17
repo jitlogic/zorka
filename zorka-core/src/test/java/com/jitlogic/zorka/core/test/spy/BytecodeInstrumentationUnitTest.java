@@ -31,7 +31,7 @@ import static com.jitlogic.zorka.core.test.support.TestUtil.*;
 public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixture {
 
     @Test
-    public void testClassWithoutAnyTransform() throws Exception{
+    public void testClassWithoutAnyTransform() throws Exception {
         Object obj = instantiate(engine, TCLASS1);
         assertNotNull("should instantiate properly", obj);
         assertEquals("should be of class " + TCLASS1, TCLASS1, obj.getClass().getName());
@@ -51,7 +51,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
     }
 
 
-//    @Test  TODO make this test working
+    //    @Test  TODO make this test working
     public void testStaticNotPublicMethod() throws Exception {
         engine.add(SpyDefinition.instance().onReturn(spy.fetchTime("R0"))
                 .include(spy.byMethod(TCLASS1, "nonPublicStatic")));
@@ -175,7 +175,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
         assertEquals("should submit one record", 1, submitter.size());
         assertTrue("should fetch class object", submitter.get(0).get(0) instanceof Class);
-        assertEquals("class should be of " + TCLASS1, TCLASS1, ((Class)(submitter.get(0).get(0))).getName());
+        assertEquals("class should be of " + TCLASS1, TCLASS1, ((Class) (submitter.get(0).get(0))).getName());
     }
 
 
@@ -191,8 +191,8 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
         assertEquals("should submit one record", 1, submitter.size());
         assertEquals("should fetch integer as first parameter", Integer.valueOf(10), submitter.get(0).get(0));
         assertEquals("should fetch long as second parameter", Long.valueOf(20), submitter.get(0).get(1));
-        assertEquals("should fetch short as third parameter", (short)30, submitter.get(0).get(2));
-        assertEquals("should fetch byte as fourth parameter", (byte)40, submitter.get(0).get(3));
+        assertEquals("should fetch short as third parameter", (short) 30, submitter.get(0).get(2));
+        assertEquals("should fetch byte as fourth parameter", (byte) 40, submitter.get(0).get(3));
     }
 
 
@@ -219,8 +219,8 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
         checkForError(invoke(obj, "paramMethod3", 1.23, (float) 2.34));
 
         assertEquals("should submit one record", 1, submitter.size());
-        assertEquals("should fetch double as first parameter", 1.23, (Double)(submitter.get(0).get(0)), 0.01);
-        assertEquals("should fetch float as second parameter", 2.34, (Float)(submitter.get(0).get(1)), 0.01);
+        assertEquals("should fetch double as first parameter", 1.23, (Double) (submitter.get(0).get(0)), 0.01);
+        assertEquals("should fetch float as second parameter", 2.34, (Float) (submitter.get(0).get(1)), 0.01);
     }
 
 
@@ -351,7 +351,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
                 .include(spy.byMethod(TCLASS1, "paramMethod4")));
 
         Object obj = instantiate(engine, TCLASS1);
-        checkForError(invoke(obj, "paramMethod4", new int[]{1,2,3}, new byte[]{5,6,7}, new double[]{7,8,9}));
+        checkForError(invoke(obj, "paramMethod4", new int[]{1, 2, 3}, new byte[]{5, 6, 7}, new double[]{7, 8, 9}));
 
         assertEquals("should submit one record", 1, submitter.size());
         assertTrue("first parameter should be an array of integers", submitter.get(0).get(0) instanceof int[]);
@@ -457,6 +457,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
         assertEquals("should submit no records", 0, submitter.size());
     }
 
+
     @Test
     public void testMatchClassByMethodAnnotation() throws Exception {
         engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("X"))
@@ -467,6 +468,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
         assertEquals("should submit one record", 1, submitter.size());
     }
+
 
     @Test
     public void testNonMatchClassByMethodAnnotation() throws Exception {
@@ -479,6 +481,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
         assertEquals("should submit no records", 0, submitter.size());
     }
 
+
     @Test
     public void testInstrumentClassWithNoStack() throws Exception {
         engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("T1")).onReturn(spy.fetchTime("T2"))
@@ -490,6 +493,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
         assertEquals("should submit two records", 2, submitter.size());
     }
 
+
     @Test
     public void testInstrumentMethodEntryWithoutProbes() throws Exception {
         SpyProcessor col = new TestCollector();
@@ -500,6 +504,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
         assertEquals("should submit one record", 1, submitter.size());
     }
+
 
     @Test
     public void testInstrumentMethodReturnWithoutProbes() throws Exception {
@@ -513,6 +518,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
         assertEquals("record should carry no values", 0, submitter.get(0).size());
     }
 
+
     @Test
     public void testInstrumentMethodErrorWithoutProbes() throws Exception {
         SpyProcessor col = new TestCollector();
@@ -524,6 +530,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
         assertEquals("should submit one record", 1, submitter.size());
         assertEquals("record should carry no values", 0, submitter.get(0).size());
     }
+
 
     @Test
     public void testInstrumentWithAssymetricProbePlacements() throws Exception {
@@ -538,6 +545,64 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
         assertEquals(SF_NONE, submitter.get(0).submitFlags);
         assertEquals(SF_FLUSH, submitter.get(1).submitFlags);
 
+    }
+
+
+    @Test
+    public void testInstrumentDirectInterfaceMethod() throws Exception {
+        engine.add(SpyDefinition.instrument().include(spy.byInterfaceAndMethod(ICLASS1, "myMethod1")));
+
+        Object obj = instantiate(engine, TCLASS2);
+        invoke(obj, "myMethod1");
+
+        assertEquals(2, submitter.size());
+    }
+
+
+    @Test
+    public void testInstrumentNonRecursiveIndirectInterfaceMethod() throws Exception {
+        engine.add(SpyDefinition.instrument().include(spy.byInterfaceAndMethod(ICLASS2, "myMethod2")));
+
+        Object obj = instantiate(engine, TCLASS2);
+        invoke(obj, "myMethod2");
+
+        assertEquals("spy should not match anything", 0, submitter.size());
+    }
+
+
+    @Test
+    public void testInstrumentRecursiveIndirectInterfaceMethod() throws Exception {
+        engine.add(SpyDefinition.instrument().include(
+                spy.byInterfaceAndMethod(ICLASS2, "myMethod2").recursive()));
+
+        Object obj = instantiate(engine, TCLASS2);
+        invoke(obj, "myMethod2");
+
+        assertEquals("spy match", 2, submitter.size());
+    }
+
+
+    @Test
+    public void testInstrumentSafeRecursiveIndirectInterfaceMethod() throws Exception {
+        engine.add(SpyDefinition.instrument().include(
+                spy.byInterfaceAndMethod(ICLASS2, "myMethod2").safeRecursive()));
+
+        Object obj = instantiate(engine, TCLASS2);
+        invoke(obj, "myMethod2");
+
+        assertEquals("spy should match", 2, submitter.size());
+    }
+
+
+    @Test
+    public void testInstrumentRecursiveIndirectByClassInterfaceMethod() throws Exception {
+        engine.add(SpyDefinition.instrument().include(
+                spy.byInterfaceAndMethod(ICLASS1, "trivialMethod4").recursive()));
+
+        Object obj = instantiate(engine, TCLASS4);
+        invoke(obj, "trivialMethod4");
+
+        assertEquals(2, submitter.size());
     }
 
     // TODO test if stack traces in exceptions are the same with and without intercepting errors by instrumentation

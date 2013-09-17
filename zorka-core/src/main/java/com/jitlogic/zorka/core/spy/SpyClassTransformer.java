@@ -38,24 +38,38 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SpyClassTransformer implements ClassFileTransformer {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** All spy defs configured */
+    /**
+     * All spy defs configured
+     */
     private List<SpyDefinition> sdefs = new ArrayList<SpyDefinition>();
 
-    /** SpyContext counter. */
+    /**
+     * SpyContext counter.
+     */
     private int nextId = 1;
 
-    /** Map of spy contexts (by ID) */
+    /**
+     * Map of spy contexts (by ID)
+     */
     private Map<Integer, SpyContext> ctxById = new ConcurrentHashMap<Integer, SpyContext>();
 
-    /** Map of spy contexts (by instance) */
+    /**
+     * Map of spy contexts (by instance)
+     */
     private Map<SpyContext, SpyContext> ctxInstances = new HashMap<SpyContext, SpyContext>();
+
+    private ThreadLocal<Boolean> transformLock = new ThreadLocal<Boolean>();
 
     private SymbolRegistry symbolRegistry;
 
-    /** Reference to tracer instance. */
+    /**
+     * Reference to tracer instance.
+     */
     Tracer tracer;
 
 
@@ -81,11 +95,10 @@ public class SpyClassTransformer implements ClassFileTransformer {
      * If there is none, supplied context will be registered and will have an  ID assigned.
      *
      * @param keyCtx sample (possibly unregistered) context
-     *
      * @return registered context
-     *
-     * TODO get rid of this crap, use strings to find already created contexts for a method
-     * TODO BUG one context ID refers only to one sdef, so using multiple sdefs on a single method will result errors (submitting data from all probes only to first one)
+     *         <p/>
+     *         TODO get rid of this crap, use strings to find already created contexts for a method
+     *         TODO BUG one context ID refers only to one sdef, so using multiple sdefs on a single method will result errors (submitting data from all probes only to first one)
      */
     public SpyContext lookup(SpyContext keyCtx) {
         synchronized (this) { // TODO get rid of synchronized, use
@@ -106,7 +119,6 @@ public class SpyClassTransformer implements ClassFileTransformer {
      * it will look if this sdef matches and possibly instrument methods according to sdef.
      *
      * @param sdef spy definition
-     *
      * @return
      */
     public SpyDefinition add(SpyDefinition sdef) {
@@ -127,8 +139,12 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
 
     @Override
-    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
-        ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+    public byte[] transform(ClassLoader classLoader, String className, Class<?> classBeingRedefined,
+                            ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+
+        if (Boolean.TRUE.equals(transformLock.get())) {
+            return classfileBuffer;
+        }
 
         String clazzName = className.replace("/", ".");
 
@@ -154,7 +170,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
             ClassReader cr = new ClassReader(classfileBuffer);
             ClassWriter cw = new ClassWriter(cr, 0);
-            ClassVisitor scv = createVisitor(clazzName, found, tracer, cw);
+            ClassVisitor scv = createVisitor(classLoader, clazzName, found, tracer, cw);
             cr.accept(scv, 0);
             return cw.toByteArray();
         }
@@ -166,15 +182,21 @@ public class SpyClassTransformer implements ClassFileTransformer {
      * Spawn class visitor for transformed class.
      *
      * @param className class name
-     *
-     * @param found spy definitions that match
-     *
-     * @param cw output (class writer)
-     *
+     * @param found     spy definitions that match
+     * @param cw        output (class writer)
      * @return class visitor for instrumenting this class
      */
-    protected ClassVisitor createVisitor(String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
-        return new SpyClassVisitor(this, symbolRegistry, className, found, tracer, cw);
+    protected ClassVisitor createVisitor(ClassLoader classLoader, String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
+        return new SpyClassVisitor(this, classLoader, symbolRegistry, className, found, tracer, cw);
     }
 
+
+    public void lock() {
+        transformLock.set(true);
+    }
+
+
+    public void unlock() {
+        transformLock.set(false);
+    }
 }

@@ -35,67 +35,82 @@ import static com.jitlogic.zorka.core.spy.SpyLib.SM_NOARGS;
 public class SpyMatcher {
 
 
-    /** Maps primitive types to type codes used by JVM */
-    private static final Map<String,String> typeCodes = ZorkaUtil.constMap(
+    /**
+     * Maps primitive types to type codes used by JVM
+     */
+    private static final Map<String, String> typeCodes = ZorkaUtil.constMap(
             "void", "V", "boolean", "Z", "byte", "B", "char", "C",
             "short", "S", "int", "I", "long", "J", "float", "F", "double", "D"
     );
 
 
-    /** Maps regular expression special characters (sequences) to escaped sequences. */
-    private static final Map<Character,String> regexChars = ZorkaUtil.constMap(
+    /**
+     * Maps regular expression special characters (sequences) to escaped sequences.
+     */
+    private static final Map<Character, String> regexChars = ZorkaUtil.constMap(
             '[', "\\]", ']', "\\]", '.', "\\.", ';', "\\;", '(', "\\(", ')', "\\)"
     );
 
 
-    /** List of common methods (typically omitted by instrumentation) */
+    /**
+     * List of common methods (typically omitted by instrumentation)
+     */
     public static final Set<String> COMMON_METHODS = ZorkaUtil.set("toString", "equals", "hashCode", "valueOf");
 
 
-    public static final int BY_CLASS_NAME        = 0x001;
-    public static final int BY_CLASS_ANNOTATION  = 0x002;
-    public static final int BY_INTERFACE         = 0x004;
-    public static final int BY_METHOD_NAME       = 0x008;
-    public static final int BY_METHOD_SIGNATURE  = 0x010;
+    public static final int BY_CLASS_NAME = 0x001;
+    public static final int BY_CLASS_ANNOTATION = 0x002;
+    public static final int BY_INTERFACE = 0x004;
+    public static final int BY_METHOD_NAME = 0x008;
+    public static final int BY_METHOD_SIGNATURE = 0x010;
     public static final int BY_METHOD_ANNOTATION = 0x020;
-    public static final int NO_CONSTRUCTORS      = 0x040;
-    public static final int NO_ACCESSORS         = 0x080;
-    public static final int NO_COMMONS           = 0x100;
-    public static final int EXCLUDE_MATCH        = 0x800;
+    public static final int NO_CONSTRUCTORS = 0x040;
+    public static final int NO_ACCESSORS = 0x080;
+    public static final int NO_COMMONS = 0x100;
+    public static final int SAFE_RECURSIVE = 0x200;
+    public static final int RECURSIVE = 0x400;
+    public static final int EXCLUDE_MATCH = 0x800;
 
-    /** Special access bit - package private */
+    /**
+     * Special access bit - package private
+     */
     public static final int ACC_PKGPRIV = 0x10000;
 
-    /** No methods will regarding access bits */
+    /**
+     * No methods will regarding access bits
+     */
     public static final int NULL_FILTER = 0x0000;
 
-    /** Default filter: public and package private methods match */
-    public static final int DEFAULT_FILTER = ACC_PUBLIC|ACC_PKGPRIV;
+    /**
+     * Default filter: public and package private methods match
+     */
+    public static final int DEFAULT_FILTER = ACC_PUBLIC | ACC_PKGPRIV;
 
-    /** Public, private, protected and package private methods will match */
-    public static final int ANY_FILTER     = ACC_PUBLIC|ACC_PRIVATE|ACC_PROTECTED|ACC_PKGPRIV;
+    /**
+     * Public, private, protected and package private methods will match
+     */
+    public static final int ANY_FILTER = ACC_PUBLIC | ACC_PRIVATE | ACC_PROTECTED | ACC_PKGPRIV;
 
-    /** Access bits and custom matcher flags */
+    /**
+     * Access bits and custom matcher flags
+     */
     private int access, flags;
 
-    /** Regexps for matching class name/annotation, method name/annotation and method descriptor */
+    /**
+     * Regexps for matching class name/annotation, method name/annotation and method descriptor
+     */
     private Pattern classPattern, methodPattern, signaturePattern;
 
 
     /**
      * Creates spy matcher
      *
-     * @param flags custom matcher flags
-     *
-     * @param access java accessibility flags
-     *
-     * @param className class name/annotation pattern
-     *
+     * @param flags      custom matcher flags
+     * @param access     java accessibility flags
+     * @param className  class name/annotation pattern
      * @param methodName method name/annotation pattern
-     *
-     * @param retType return type
-     *
-     * @param argTypes argument types
+     * @param retType    return type
+     * @param argTypes   argument types
      */
     public SpyMatcher(int flags, int access, String className, String methodName, String retType, String... argTypes) {
         this.flags = flags;
@@ -109,14 +124,10 @@ public class SpyMatcher {
     /**
      * Copy constructor (for trace alteration methods below)
      *
-     * @param flags custom matcher flags
-     *
-     * @param access accessibility flags
-     *
-     * @param classPattern class name/annotation pattern
-     *
-     * @param methodPattern method name/annotation pattern
-     *
+     * @param flags            custom matcher flags
+     * @param access           accessibility flags
+     * @param classPattern     class name/annotation pattern
+     * @param methodPattern    method name/annotation pattern
      * @param signaturePattern signature pattern
      */
     private SpyMatcher(int flags, int access, Pattern classPattern, Pattern methodPattern, Pattern signaturePattern) {
@@ -132,7 +143,6 @@ public class SpyMatcher {
      * Converts symbol match pattern (string) to regular expression object.
      *
      * @param symbolName symbol match pattern
-     *
      * @return regular expression pattern
      */
     private Pattern toSymbolMatch(String symbolName) {
@@ -153,7 +163,6 @@ public class SpyMatcher {
      * classes.
      *
      * @param className full name (with package prefix)
-     *
      * @return true if such class exists
      */
     private static boolean probeClass(String className) {
@@ -172,7 +181,6 @@ public class SpyMatcher {
      * their full name (package "." className).
      *
      * @param type type (java language form)
-     *
      * @return type descriptor (JVM form)
      */
     private static String toTypeCode(String type) {
@@ -180,7 +188,7 @@ public class SpyMatcher {
 
         while (type.endsWith("[]")) {
             sb.append("[");
-            type = type.substring(0, type.length()-2);
+            type = type.substring(0, type.length() - 2);
         }
 
         if (typeCodes.containsKey(type)) {
@@ -203,11 +211,10 @@ public class SpyMatcher {
      * Converts string to regular expression. Special characters will be automatically escaped.
      *
      * @param str string to be converted
-     *
      * @return regular expression (still string form)
      */
     private static String strToRegex(String str) {
-        StringBuilder sb = new StringBuilder(str.length()+32);
+        StringBuilder sb = new StringBuilder(str.length() + 32);
         for (char ch : str.toCharArray()) {
             sb.append(regexChars.containsKey(ch) ? regexChars.get(ch) : ch);
         }
@@ -219,10 +226,8 @@ public class SpyMatcher {
      * Creates method descriptor from return type and argument types. Descriptor be a regexp
      * pattern matching strings in form '(argTypeDescriptors)retTypeDescriptor'.
      *
-     * @param retType return type
-     *
+     * @param retType  return type
      * @param argTypes argument types
-     *
      * @return regexp pattern suitable to match method descriptors
      */
     private Pattern toDescriptorMatch(String retType, String... argTypes) {
@@ -256,6 +261,11 @@ public class SpyMatcher {
     }
 
 
+    public boolean hasFlags(int flags) {
+        return 0 != (this.flags & flags);
+    }
+
+
     public int getAccess() {
         return access;
     }
@@ -283,6 +293,16 @@ public class SpyMatcher {
      */
     public SpyMatcher exclude() {
         return new SpyMatcher(flags | EXCLUDE_MATCH, access, classPattern, methodPattern, signaturePattern);
+    }
+
+
+    public SpyMatcher recursive() {
+        return new SpyMatcher(flags | RECURSIVE, access, classPattern, methodPattern, signaturePattern);
+    }
+
+
+    public SpyMatcher safeRecursive() {
+        return new SpyMatcher(flags | SAFE_RECURSIVE, access, classPattern, methodPattern, signaturePattern);
     }
 
 
@@ -321,6 +341,6 @@ public class SpyMatcher {
      * @return altered spy matcher
      */
     public SpyMatcher forTrace() {
-        return new SpyMatcher(flags|NO_CONSTRUCTORS|NO_ACCESSORS|NO_COMMONS, access, classPattern, methodPattern, signaturePattern);
+        return new SpyMatcher(flags | NO_CONSTRUCTORS | NO_ACCESSORS | NO_COMMONS, access, classPattern, methodPattern, signaturePattern);
     }
 }

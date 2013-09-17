@@ -15,32 +15,11 @@
  */
 package com.jitlogic.zorka.core.test.spy.support;
 
-public class TestClass2 implements TestInterface1 {
 
-    protected int calls = 0;
+public class TestClass4 extends TestClass2 {
 
-    @TestAnnotation
-    public void trivialMethod() {
+    public void trivialMethod4() {
         calls++;
     }
 
-    public int echoInt(int in) {
-        return in;
-    }
-
-    public void recursiveMethod() {
-        calls++;
-        trivialMethod();
-        calls++;
-    }
-
-    @Override
-    public void myMethod1() {
-        calls++;
-    }
-
-    @Override
-    public void myMethod2() {
-        calls++;
-    }
 }

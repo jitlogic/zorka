@@ -26,10 +26,7 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import static org.objectweb.asm.Opcodes.*;
 
 /**
  * Traverses class file and instruments selected method according to supplied spy definitions.
@@ -47,6 +44,11 @@ public class SpyClassVisitor extends ClassVisitor {
      * Parent class transformer
      */
     private SpyClassTransformer transformer;
+
+    /**
+     * Defining class loader.
+     */
+    private ClassLoader classLoader;
 
     /**
      * List of spy definitions to be applied (visitor will only check for method matches, not class matches!)
@@ -72,6 +74,8 @@ public class SpyClassVisitor extends ClassVisitor {
 
     private SymbolRegistry symbolRegistry;
 
+    private boolean recursive, safeRecursive;
+
     /**
      * Creates Spy class visitor.
      *
@@ -81,21 +85,88 @@ public class SpyClassVisitor extends ClassVisitor {
      * @param tracer      reference to tracer
      * @param cv          output class visitor (typically ClassWriter)
      */
-    public SpyClassVisitor(SpyClassTransformer transformer, SymbolRegistry symbolRegistry, String className,
+    public SpyClassVisitor(SpyClassTransformer transformer, ClassLoader classLoader, SymbolRegistry symbolRegistry,
+                           String className,
                            List<SpyDefinition> sdefs, Tracer tracer, ClassVisitor cv) {
         super(Opcodes.ASM4, cv);
         this.transformer = transformer;
+        this.classLoader = classLoader;
         this.symbolRegistry = symbolRegistry;
         this.className = className;
         this.sdefs = sdefs;
         this.tracer = tracer;
+
+        for (SpyDefinition sdef : sdefs) {
+            for (SpyMatcher matcher : sdef.getMatcherSet().getMatchers()) {
+                if (matcher.hasFlags(SpyMatcher.RECURSIVE)) {
+                    recursive = true;
+                }
+                if (matcher.hasFlags(SpyMatcher.SAFE_RECURSIVE)) {
+                    safeRecursive = true;
+                }
+            }
+        }
     }
 
 
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         cv.visit(version, access, name, signature, superName, interfaces);
-        this.classInterfaces = Arrays.asList(interfaces);
+
+        this.classInterfaces = new ArrayList(interfaces.length);
+        for (String ifname : interfaces) {
+            String interfaceClass = ifname.replace('/', '.');
+            this.classInterfaces.add(interfaceClass);
+            if (recursive || safeRecursive) {
+
+                if (safeRecursive) {
+                    transformer.lock();
+                }
+
+                try {
+                    recursiveInterfaceScan(interfaceClass);
+                } catch (Exception e) {
+                    log.error(ZorkaLogger.ZSP_CONFIG, "Cannot (recursively) load class: " + interfaceClass, e);
+                }
+
+                if (safeRecursive) {
+                    transformer.unlock();
+                }
+            }
+        }
+
+        if ((recursive || safeRecursive) && !"java/lang/Object".equals(superName)) {
+
+            if (safeRecursive) {
+                transformer.lock();
+            }
+
+            try {
+                recursiveInterfaceScan(superName.replace('/', '.'));
+            } catch (Exception e) {
+                log.error(ZorkaLogger.ZSP_CONFIG, "Cannot (recursively) load class: " + superName, e);
+            }
+
+            if (safeRecursive) {
+                transformer.unlock();
+            }
+        }
+
+    }
+
+
+    private void recursiveInterfaceScan(String className) throws ClassNotFoundException {
+        Class<?> clazz = classLoader.loadClass(className);
+        for (Class<?> ifc : clazz.getInterfaces()) {
+            String ifname = ifc.getName();
+            if (!classInterfaces.contains(ifname)) {
+                classInterfaces.add(ifname);
+                recursiveInterfaceScan(ifname);
+            }
+        }
+        if (!clazz.isInterface() && clazz.getSuperclass() != Object.class) {
+            recursiveInterfaceScan(clazz.getSuperclass().getName());
+        }
     }
 
 

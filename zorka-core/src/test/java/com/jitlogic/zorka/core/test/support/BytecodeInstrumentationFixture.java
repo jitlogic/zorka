@@ -30,6 +30,10 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
     public final static String TCLASS1 = "com.jitlogic.zorka.core.test.spy.support.TestClass1";
     public final static String TCLASS2 = "com.jitlogic.zorka.core.test.spy.support.TestClass2";
     public final static String TCLASS3 = "com.jitlogic.zorka.core.test.spy.support.TestClass3";
+    public final static String TCLASS4 = "com.jitlogic.zorka.core.test.spy.support.TestClass4";
+
+    public final static String ICLASS1 = "com.jitlogic.zorka.core.test.spy.support.TestInterface1";
+    public final static String ICLASS2 = "com.jitlogic.zorka.core.test.spy.support.TestInterface2";
 
     public final static String TACLASS = "com.jitlogic.zorka.core.test.spy.support.ClassAnnotation";
     public final static String TAMETHOD = "com.jitlogic.zorka.core.test.spy.support.TestAnnotation";
@@ -42,7 +46,7 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
 
     @Before
     public void setUp() throws Exception {
-        engine = new TestSpyTransformer(agentInstance.getSymbolRegistry(),agentInstance.getTracer());
+        engine = new TestSpyTransformer(agentInstance.getSymbolRegistry(), agentInstance.getTracer());
         submitter = new TestSubmitter();
         MainSubmitter.setSubmitter(submitter);
         output = new TestTracer();

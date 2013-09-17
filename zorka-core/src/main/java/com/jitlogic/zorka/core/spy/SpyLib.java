@@ -279,7 +279,7 @@ public class SpyLib {
 
 
     /**
-     * Creates new matcher that will match all methods of given class.
+     * Creates new matcher that will match all public methods of given class.
      *
      * @param className class name (or mask)
      * @return spy matched object
@@ -288,6 +288,15 @@ public class SpyLib {
         return byMethod(className, "*");
     }
 
+    /**
+     * Creates new matcher that will match all public methods of given class.
+     *
+     * @param iClassName interface class name (or mask)
+     * @return spy matched object
+     */
+    public SpyMatcher byInterface(String iClassName) {
+        return byInterfaceAndMethod(iClassName, "*");
+    }
 
     /**
      * Creates new matcher that will match methods by method annotation.
@@ -312,6 +321,37 @@ public class SpyLib {
     public SpyMatcher byClassMethodAnnotation(String classAnnotation, String methodAnnotation) {
         return new SpyMatcher(SpyMatcher.BY_CLASS_ANNOTATION | SpyMatcher.BY_METHOD_ANNOTATION, 1,
                 "L" + classAnnotation + ";", "L" + methodAnnotation + ";", null);
+    }
+
+
+    /**
+     * Creates new matcher object that will match methods by class name and method name.
+     *
+     * @param iClassPattern interface class name mask (where * matches arbitrary name and ** matches arbitrary path) or
+     *                      regular expression (if starts with '~' character);
+     * @param methodPattern method name mask (where '*' means arbitrary name part) or regular expression
+     *                      (if starts with '~' character);
+     * @return new matcher object
+     */
+    public SpyMatcher byInterfaceAndMethod(String iClassPattern, String methodPattern) {
+        return new SpyMatcher(SpyMatcher.BY_INTERFACE | SpyMatcher.BY_METHOD_NAME, 1, iClassPattern, methodPattern, null);
+    }
+
+
+    /**
+     * Creates new matcher object that will match methods by class name, method name, access flags, return type and arguments.
+     *
+     * @param access        access flags (use spy.ACC_* constants);
+     * @param iClassPattern interface class name mask (where * matches arbitrary name and ** matches arbitrary path) or
+     *                      regular expression (if starts with '~' character);
+     * @param methodPattern method name mask (where '*' means arbitrary string) or regular expression (if starts with '~' char);
+     * @param retType       return type (eg. void, int, String, javax.servlet.HttpResponse etc.);
+     * @param argTypes      types of consecutive arguments;
+     * @return new matcher object;
+     */
+    public SpyMatcher byInterfaceAndMethod(int access, String iClassPattern, String methodPattern, String retType, String... argTypes) {
+        return new SpyMatcher(SpyMatcher.BY_INTERFACE | SpyMatcher.BY_METHOD_NAME | SpyMatcher.BY_METHOD_SIGNATURE,
+                access, iClassPattern, methodPattern, retType, argTypes);
     }
 
 
