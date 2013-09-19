@@ -210,7 +210,7 @@ public class TracerLib {
      * @return
      * @throws IOException
      */
-    public ZorkaAsyncThread<SymbolicRecord> toCentral(String addr, int port, String hostname, String auth) throws IOException {
+    public ZorkaAsyncThread<SymbolicRecord> toZico(String addr, int port, String hostname, String auth) throws IOException {
         TraceWriter writer = new FressianTraceWriter(symbolRegistry, metricsRegistry);
         ZicoTraceOutput output = new ZicoTraceOutput(writer, addr, port, hostname, auth);
         output.start();

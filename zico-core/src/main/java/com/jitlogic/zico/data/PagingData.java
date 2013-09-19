@@ -13,32 +13,50 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.common.test.support;
+package com.jitlogic.zico.data;
 
 
-import org.junit.Before;
+import org.codehaus.jackson.annotate.JsonProperty;
 
-import java.io.File;
+import java.util.List;
 
-public class ZorkaCommonFixture {
+public class PagingData<T> {
 
-    private String tmpDir;
 
-    @Before
-    public void setUpFixture() throws Exception {
-        tmpDir = "/tmp" + File.separatorChar + "zorka-unit-test";
-        TestUtil.rmrf(tmpDir);
-        new File(tmpDir).mkdirs();
+    @JsonProperty
+    private int offset;
+
+    @JsonProperty
+    private int total;
+
+    @JsonProperty
+    private List<T> results;
+
+    public PagingData() {
 
     }
 
-    public String getTmpDir() {
-        return tmpDir;
+    public int getOffset() {
+        return offset;
     }
 
-    public String tmpFile(String name) {
-        return new File(getTmpDir(), name).getPath();
+    public void setOffset(int offset) {
+        this.offset = offset;
     }
 
+    public int getTotal() {
+        return total;
+    }
 
+    public void setTotal(int total) {
+        this.total = total;
+    }
+
+    public List<T> getResults() {
+        return results;
+    }
+
+    public void setResults(List<T> results) {
+        this.results = results;
+    }
 }

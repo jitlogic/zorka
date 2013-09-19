@@ -1,3 +1,10 @@
+package com.jitlogic.zico.core;
+
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+
+import java.io.File;
+
 /**
  * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
@@ -13,31 +20,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.common.test.support;
 
+public class ProdZicoModule extends AbstractZicoModule {
 
-import org.junit.Before;
+    @Provides
+    @Singleton
+    public ZicoConfig provideConfig() {
+        String homeDir = System.getProperty("zico.home.dir");
 
-import java.io.File;
+        if (homeDir == null) {
+            throw new RuntimeException("Missing home dir configuration property. " +
+                    "Add '-Dzico.home.dir=/path/to/zico/home' to JVM options.");
+        }
 
-public class ZorkaCommonFixture {
+        if (!new File(homeDir).isDirectory()) {
+            throw new RuntimeException("Home dir property does not point to a directory.");
+        }
 
-    private String tmpDir;
-
-    @Before
-    public void setUpFixture() throws Exception {
-        tmpDir = "/tmp" + File.separatorChar + "zorka-unit-test";
-        TestUtil.rmrf(tmpDir);
-        new File(tmpDir).mkdirs();
-
-    }
-
-    public String getTmpDir() {
-        return tmpDir;
-    }
-
-    public String tmpFile(String name) {
-        return new File(getTmpDir(), name).getPath();
+        return new ZicoConfig(homeDir);
     }
 
 

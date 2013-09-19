@@ -45,11 +45,11 @@
         <module>zorka-common-test</module>
         <module>zorka-core</module>
         <module>zorka-agent</module>
-        <module>zorka-central</module>
         <module>zorka-viewer</module>
         <module>zorka-dist</module>
-        <module>zorka-central-web</module>
-        <module>zorka-central-dist</module>
+        <module>zico-core</module>
+        <module>zico-web</module>
+        <module>zico-dist</module>
     </modules>
 
 </project>

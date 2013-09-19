@@ -13,32 +13,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.common.test.support;
+package com.jitlogic.zico.client.api;
 
 
-import org.junit.Before;
+import org.fusesource.restygwt.client.MethodCallback;
+import org.fusesource.restygwt.client.RestService;
 
-import java.io.File;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import java.util.List;
 
-public class ZorkaCommonFixture {
+public interface SystemApi extends RestService {
 
-    private String tmpDir;
-
-    @Before
-    public void setUpFixture() throws Exception {
-        tmpDir = "/tmp" + File.separatorChar + "zorka-unit-test";
-        TestUtil.rmrf(tmpDir);
-        new File(tmpDir).mkdirs();
-
-    }
-
-    public String getTmpDir() {
-        return tmpDir;
-    }
-
-    public String tmpFile(String name) {
-        return new File(getTmpDir(), name).getPath();
-    }
-
+    @GET
+    @Path("system/info")
+    void systemInfo(MethodCallback<List<String>> cb);
 
 }

@@ -13,32 +13,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.common.test.support;
+package com.jitlogic.zico.data;
 
 
-import org.junit.Before;
+import com.google.gwt.editor.client.Editor;
+import com.jitlogic.zico.data.HostInfo;
+import com.sencha.gxt.core.client.ValueProvider;
+import com.sencha.gxt.data.shared.LabelProvider;
+import com.sencha.gxt.data.shared.ModelKeyProvider;
+import com.sencha.gxt.data.shared.PropertyAccess;
 
-import java.io.File;
+public interface HostInfoProperties extends PropertyAccess<HostInfo> {
 
-public class ZorkaCommonFixture {
+    @Editor.Path("id")
+    ModelKeyProvider<HostInfo> key();
 
-    private String tmpDir;
+    @Editor.Path("name")
+    LabelProvider<HostInfo> nameLabel();
 
-    @Before
-    public void setUpFixture() throws Exception {
-        tmpDir = "/tmp" + File.separatorChar + "zorka-unit-test";
-        TestUtil.rmrf(tmpDir);
-        new File(tmpDir).mkdirs();
+    ValueProvider<HostInfo, String> name();
 
-    }
-
-    public String getTmpDir() {
-        return tmpDir;
-    }
-
-    public String tmpFile(String name) {
-        return new File(getTmpDir(), name).getPath();
-    }
-
-
+    ValueProvider<HostInfo, String> addr();
 }

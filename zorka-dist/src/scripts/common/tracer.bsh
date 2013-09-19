@@ -75,7 +75,7 @@ if (zorka.boolCfg("tracer", false)) {
   }
 
   if (zorka.boolCfg("tracer.net", false)) {
-    tracer.output(tracer.toCentral(
+    tracer.output(tracer.toZico(
       zorka.stringCfg("tracer.net.addr", "127.0.0.1"),
       zorka.intCfg("tracer.net.port", 8640),
       zorka.stringCfg("tracer.net.host", zorka.getHostname()),

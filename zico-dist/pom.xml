@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>zorka</artifactId>
+        <groupId>com.jitlogic.zorka</groupId>
+        <version>0.9.10-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>zico-dist</artifactId>
+    <packaging>pom</packaging>
+
+    <build>
+        <outputDirectory>target/output</outputDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>${antrun.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="${project.build.outputDirectory}/zico-${project.version}"/>
+                                <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/data"/>
+                                <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/log"/>
+                                <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/tmp"/>
+                                <copy file="../zico-web/target/zico.war"
+                                      toFile="${project.build.outputDirectory}/zico-${project.version}/zico.war"/>
+                                <copy file="../COPYING"
+                                      toDir="${project.build.outputDirectory}/zico-${project.version}"/>
+                                <copy file="src/zico.properties"
+                                      toDir="${project.build.outputDirectory}/zico-${project.version}"/>
+                                <copy file="src/zico.sh"
+                                      toDir="${project.build.outputDirectory}/zico-${project.version}"/>
+                                <copy file="src/README.md"
+                                      toDir="${project.build.outputDirectory}/zico-${project.version}"/>
+                                <copy file="src/zico.conf"
+                                      toDir="${project.build.outputDirectory}/zico-${project.version}"/>
+                                <copy file="src/zorka.properties"
+                                      toDir="${project.build.outputDirectory}/zico-${project.version}"/>
+                                <copy file="../zorka-agent/target/zorka-agent-${project.version}.jar"
+                                      toFile="${project.build.outputDirectory}/zico-${project.version}/zorka.jar"/>
+                                <copy file="../CHANGES.md"
+                                      toDir="${project.build.outputDirectory}/zico-${project.version}"/>
+                                <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/scripts"/>
+                                <copy toDir="${project.build.outputDirectory}/zico-${project.version}/scripts">
+                                    <fileset dir="../zorka-dist/src/scripts" defaultexcludes="false">
+                                        <include name="**"/>
+                                    </fileset>
+                                </copy>
+                                <copy file="src/zico.bsh"
+                                      toDir="${project.build.outputDirectory}/zico-${project.version}/scripts/apps"/>
+                                <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/profiles"/>
+                                <copy toDir="${project.build.outputDirectory}/zico-${project.version}/profiles">
+                                    <fileset dir="../zorka-dist/src/profiles" defaultexcludes="false">
+                                        <include name="**"/>
+                                    </fileset>
+                                </copy>
+                                <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/dbscripts"/>
+                                <copy toDir="${project.build.outputDirectory}/zico-${project.version}/dbscripts">
+                                    <fileset dir="../zico-core/src/main/resources/com/jitlogic/zico"
+                                             defaultexcludes="false">
+                                        <include name="*.sql"/>
+                                    </fileset>
+                                </copy>
+                                <copy file="src/zico.profile"
+                                      toDir="${project.build.outputDirectory}/zico-${project.version}/profiles"/>
+                                <zip destfile="${project.build.directory}/zico-${project.version}.zip">
+                                    <fileset dir="${project.build.outputDirectory}" defaultexcludes="false">
+                                        <include name="**"/>
+                                    </fileset>
+                                </zip>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

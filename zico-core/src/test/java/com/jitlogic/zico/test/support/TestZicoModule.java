@@ -13,32 +13,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.common.test.support;
+package com.jitlogic.zico.test.support;
 
 
-import org.junit.Before;
+import com.google.inject.Provides;
+import com.jitlogic.zico.core.AbstractZicoModule;
+import com.jitlogic.zico.core.ZicoConfig;
 
-import java.io.File;
+import javax.inject.Singleton;
 
-public class ZorkaCommonFixture {
+public class TestZicoModule extends AbstractZicoModule {
 
-    private String tmpDir;
+    private ZicoConfig config;
 
-    @Before
-    public void setUpFixture() throws Exception {
-        tmpDir = "/tmp" + File.separatorChar + "zorka-unit-test";
-        TestUtil.rmrf(tmpDir);
-        new File(tmpDir).mkdirs();
-
+    public TestZicoModule(ZicoConfig config) {
+        this.config = config;
     }
 
-    public String getTmpDir() {
-        return tmpDir;
+    @Provides
+    @Singleton
+    public ZicoConfig provideConfig() {
+        return config;
     }
-
-    public String tmpFile(String name) {
-        return new File(getTmpDir(), name).getPath();
-    }
-
 
 }

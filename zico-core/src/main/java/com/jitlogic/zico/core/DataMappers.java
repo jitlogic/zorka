@@ -13,32 +13,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.common.test.support;
+package com.jitlogic.zico.core;
 
 
-import org.junit.Before;
+import com.jitlogic.zico.data.HostInfo;
+import com.jitlogic.zico.data.TraceInfo;
+import org.springframework.jdbc.core.RowMapper;
 
-import java.io.File;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class ZorkaCommonFixture {
-
-    private String tmpDir;
-
-    @Before
-    public void setUpFixture() throws Exception {
-        tmpDir = "/tmp" + File.separatorChar + "zorka-unit-test";
-        TestUtil.rmrf(tmpDir);
-        new File(tmpDir).mkdirs();
-
-    }
-
-    public String getTmpDir() {
-        return tmpDir;
-    }
-
-    public String tmpFile(String name) {
-        return new File(getTmpDir(), name).getPath();
-    }
-
+public class DataMappers {
 
 }

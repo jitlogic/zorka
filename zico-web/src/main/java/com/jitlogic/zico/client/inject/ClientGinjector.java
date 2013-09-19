@@ -13,32 +13,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.common.test.support;
+package com.jitlogic.zico.client.inject;
 
 
-import org.junit.Before;
+import com.google.gwt.inject.client.GinModules;
+import com.google.gwt.inject.client.Ginjector;
+import com.jitlogic.zico.client.ZicoShell;
 
-import java.io.File;
+@GinModules(ClientModule.class)
+public interface ClientGinjector extends Ginjector {
 
-public class ZorkaCommonFixture {
-
-    private String tmpDir;
-
-    @Before
-    public void setUpFixture() throws Exception {
-        tmpDir = "/tmp" + File.separatorChar + "zorka-unit-test";
-        TestUtil.rmrf(tmpDir);
-        new File(tmpDir).mkdirs();
-
-    }
-
-    public String getTmpDir() {
-        return tmpDir;
-    }
-
-    public String tmpFile(String name) {
-        return new File(getTmpDir(), name).getPath();
-    }
-
+    ZicoShell getShell();
 
 }
