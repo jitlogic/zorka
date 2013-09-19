@@ -34,6 +34,7 @@ __catalina() {
       http._trace ? tracer.attr("STATUS", "STATUS") : null,
       http._trace ? tracer.filterBy("STATUS", null, http._errors, null, null) : null,
       http._params ? http.param_processor() : spy.put("PARAMS", ""),
+      http._cookies ? http.cookies_processor() : spy.put("COOKIES", ""),
       http._slow ? spy.subchain(
         spy.longerThan(zorka.longCfg("http.slow.time")),
         spy.trapperCollector(http.slow_ft, zorka.INFO, "HTTP", zorka.stringCfg("http.slow.format"))) : null,
