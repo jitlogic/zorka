@@ -358,8 +358,12 @@ public class TraceListPanel extends VerticalLayoutContainer {
                 } else {
                     filter.setMinTime(0);
                 }
-                filter.setTimeStart(ClientUtil.parseTimestamp(txtClockBegin.getValue()));
-                filter.setTimeEnd(ClientUtil.parseTimestamp(txtClockEnd.getValue()));
+                if (txtClockBegin.getValue() != null) {
+                    filter.setTimeStart(ClientUtil.parseTimestamp(txtClockBegin.getValue()));
+                }
+                if (txtClockEnd.getValue() != null) {
+                    filter.setTimeEnd(ClientUtil.parseTimestamp(txtClockEnd.getValue()));
+                }
                 traceGridView.refresh();
             }
         });
