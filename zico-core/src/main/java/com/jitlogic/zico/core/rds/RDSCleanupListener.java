@@ -18,6 +18,6 @@ package com.jitlogic.zico.core.rds;
 
 public interface RDSCleanupListener {
 
-    void onChunkRemoved(long start, long length);
+    void onChunkRemoved(Long start, Long length);
 
 }

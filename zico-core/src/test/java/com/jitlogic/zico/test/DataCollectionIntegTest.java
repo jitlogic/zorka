@@ -44,7 +44,7 @@ public class DataCollectionIntegTest extends ZicoFixture {
         generator = new TestTraceGenerator();
         output = new ZicoTraceOutput(
                 new FressianTraceWriter(generator.getSymbols(), generator.getMetrics()),
-                "127.0.0.1", 8640, "test", "aaa", 64, 8, 250, 8);
+                "127.0.0.1", 8640, "test", "aaa", 64, 1, 250, 8);
     }
 
 

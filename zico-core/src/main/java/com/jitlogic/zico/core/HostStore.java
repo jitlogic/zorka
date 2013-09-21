@@ -175,8 +175,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
                 rds = new RDSStore(rdspath,
                         hostInfo.getMaxSize(),
                         fileSize,
-                        segmentSize);
-                rds.addCleanupListener(this);
+                        segmentSize, this);
+                //rds.addCleanupListener(this);
             } catch (IOException e) {
                 log.error("Cannot open RDS store at '" + rdspath + "'", e);
             }
@@ -348,10 +348,15 @@ public class HostStore implements Closeable, RDSCleanupListener {
     }
 
     @Override
-    public void onChunkRemoved(long start, long length) {
+    public void onChunkRemoved(Long start, Long length) {
         log.info("Discarding old trace data for " + hostInfo.getName() + " start=" + start + ", length=" + length);
-        jdbc.update("delete from TRACES where HOST_ID = ? and DATA_OFFS between ? and ?",
-                hostInfo.getId(), start, start + length);
+
+        if (start != null && length != null) {
+            jdbc.update("delete from TRACES where HOST_ID = ? and DATA_OFFS between ? and ?",
+                    hostInfo.getId(), start, start + length);
+        } else if (start != null) {
+            jdbc.update("delete from TRACES where HOST_ID = ? and DATA_OFFS < ?", hostInfo.getId(), start);
+        }
     }
 }
 

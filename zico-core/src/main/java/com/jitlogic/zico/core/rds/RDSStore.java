@@ -23,9 +23,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -64,11 +62,15 @@ public class RDSStore implements Closeable {
      * @param segmentSize segment size (inside single RAGZ file)
      * @throws IOException
      */
-    public RDSStore(String basePath, long maxSize, long fileSize, long segmentSize) throws IOException {
+    public RDSStore(String basePath, long maxSize, long fileSize, long segmentSize,
+                    RDSCleanupListener... cleanupListeners) throws IOException {
+
         this.basePath = basePath;
         this.maxSize = maxSize;
         this.fileSize = fileSize;
         this.segmentSize = segmentSize;
+
+        this.cleanupListeners = Arrays.asList(cleanupListeners);
 
         open();
     }
@@ -99,12 +101,47 @@ public class RDSStore implements Closeable {
 
         Collections.sort(archivedFiles);
 
-        // TODO determine last written data (? any kind of metadata file ?)
+        checkBrokenFiles();
 
-        if (archivedFiles.size() > 0 && archivedFiles.get(archivedFiles.size() - 1).plen < fileSize) {
+        if (archivedFiles.size() > 0
+                && archivedFiles.get(archivedFiles.size() - 1).plen < fileSize
+                && archivedFiles.get(archivedFiles.size() - 1).llen >= 0) {
             reopen();
         } else {
             rotate();
+        }
+    }
+
+
+    private void checkBrokenFiles() {
+
+        for (int i = 0; i < archivedFiles.size(); i++) {
+            RDSChunkFile rcf = archivedFiles.get(i);
+            if (rcf.llen == -1) {
+                File f1 = new File(basePath, rcf.fname);
+                File f2 = new File(f1.getPath() + ".broken");
+                log.warn("File " + f1.getPath() + " is broken.");
+
+                Long size = (i + 1) < archivedFiles.size() ? archivedFiles.get(i + 1).loffs - rcf.loffs : null;
+                for (RDSCleanupListener rcl : cleanupListeners) {
+                    rcl.onChunkRemoved(rcf.loffs, size);
+                }
+
+                if (f2.exists()) {
+                    f1.delete();
+                } else {
+                    f1.renameTo(f2);
+                }
+            }
+        }
+
+        Iterator<RDSChunkFile> i = archivedFiles.iterator();
+
+        while (i.hasNext()) {
+            RDSChunkFile f = i.next();
+            if (f.llen == -1) {
+                i.remove();
+            }
         }
     }
 
@@ -278,25 +315,20 @@ public class RDSStore implements Closeable {
     }
 
 
-    public void addCleanupListener(RDSCleanupListener listener) {
-        cleanupListeners.add(listener);
-    }
-
-
     private class RDSChunkFile implements Comparable<RDSChunkFile> {
         private String fname;
-        private long loffs;
-        private long llen;
-        private long plen;
+        private long loffs = -1;
+        private long llen = -1;
+        private long plen = -1;
 
         public RDSChunkFile(String fname) throws IOException {
             RAGZInputStream is = null;
             this.fname = fname;
             try {
+                loffs = Long.parseLong(fname.substring(0, 16), 16);
                 File file = new File(basePath, fname);
                 RAGZInputStream inp = RAGZInputStream.fromFile(file.getPath());
                 llen = inp.logicalLength();
-                loffs = Long.parseLong(fname.substring(0, 16), 16);
                 plen = file.length();
                 inp.close();
             } catch (Exception e) {
