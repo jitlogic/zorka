@@ -20,6 +20,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.gwt.inject.client.assistedinject.GinFactoryModuleBuilder;
 import com.google.inject.Provides;
+import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.api.AdminApi;
 import com.jitlogic.zico.client.api.SystemApi;
@@ -33,6 +34,7 @@ import javax.inject.Singleton;
 public class ClientModule extends AbstractGinModule {
     @Override
     protected void configure() {
+        bind(ErrorHandler.class);
         bind(ZicoShell.class).in(Singleton.class);
         install(new GinFactoryModuleBuilder().build(PanelFactory.class));
     }

@@ -16,6 +16,7 @@
 package com.jitlogic.zico.client.panel;
 
 
+import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.client.panel.HostListPanel;
 import com.jitlogic.zico.data.HostInfo;
@@ -44,10 +45,12 @@ public class HostPrefsDialog extends Dialog {
     private TextField txtHostPass;
     private SpinnerField<Long> txtMaxSize;
 
+    private ErrorHandler errorHandler;
 
-    public HostPrefsDialog(TraceDataApi tds, HostListPanel panel, HostInfo info) {
+    public HostPrefsDialog(TraceDataApi tds, HostListPanel panel, HostInfo info, ErrorHandler errorHandler) {
         this.tds = tds;
         this.panel = panel;
+        this.errorHandler = errorHandler;
 
         if (info != null) {
             hostId = info.getId();
@@ -157,8 +160,7 @@ public class HostPrefsDialog extends Dialog {
         MethodCallback<Void> handler = new MethodCallback<Void>() {
             @Override
             public void onFailure(Method method, Throwable exception) {
-                AlertMessageBox amb = new AlertMessageBox("Error saving host.", exception.getMessage());
-                amb.show();
+                errorHandler.error("Error calling API method: " + method, exception);
             }
 
             @Override

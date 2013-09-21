@@ -22,6 +22,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.api.AdminApi;
 import com.jitlogic.zico.data.TraceTemplateInfo;
@@ -68,9 +69,14 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
     private TextField txtCondRegex;
     private TextField txtTraceTemplate;
 
+    private ErrorHandler errorHandler;
+
     @Inject
-    public TraceTemplatePanel(AdminApi adminService, @Assisted Map<String, String> tidMap) {
+    public TraceTemplatePanel(AdminApi adminService, ErrorHandler errorHandler,
+                              @Assisted Map<String, String> tidMap) {
+
         this.adminService = adminService;
+        this.errorHandler = errorHandler;
 
         createToolbar();
         createTemplateListGrid();
@@ -288,7 +294,7 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
         adminService.listTemplates(new MethodCallback<List<TraceTemplateInfo>>() {
             @Override
             public void onFailure(Method method, Throwable exception) {
-                GWT.log("Error calling " + method, exception);
+                errorHandler.error("Error calling API method: " + method, exception);
             }
 
             @Override

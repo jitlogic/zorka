@@ -23,6 +23,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.data.TraceDetailSearchExpression;
 import com.jitlogic.zico.data.TraceInfo;
@@ -72,12 +73,16 @@ public class TraceRecordSearchDialog extends Dialog {
     private CheckBox chkErrorsOnly;
     private CheckBox chkMethodsWithAttrs;
 
+    private ErrorHandler errorHandler;
+
     public TraceRecordSearchDialog(TraceDetailPanel panel, TraceDataApi tds,
-                                   TraceInfo trace, TraceRecordInfo root) {
+                                   TraceInfo trace, TraceRecordInfo root,
+                                   ErrorHandler errorHandler) {
         this.tds = tds;
         this.trace = trace;
         this.root = root;
         this.panel = panel;
+        this.errorHandler = errorHandler;
 
         createUI();
     }
@@ -274,7 +279,7 @@ public class TraceRecordSearchDialog extends Dialog {
                 new MethodCallback<List<TraceRecordInfo>>() {
                     @Override
                     public void onFailure(Method method, Throwable exception) {
-                        GWT.log("Error: ", exception);
+                        errorHandler.error("Error calling API method: " + method, exception);
                     }
 
                     @Override

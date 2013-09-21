@@ -16,18 +16,15 @@
 package com.jitlogic.zico.client.portal;
 
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.*;
 import com.google.inject.Inject;
+import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.ZicoShell;
-import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.api.AdminApi;
-import com.jitlogic.zico.client.api.SystemApi;
 import com.jitlogic.zico.client.panel.PanelFactory;
-import com.jitlogic.zico.client.panel.TraceTemplatePanel;
 import com.sencha.gxt.widget.core.client.Portlet;
 import com.sencha.gxt.widget.core.client.button.ToolButton;
 import com.sencha.gxt.widget.core.client.container.PortalLayoutContainer;
@@ -49,14 +46,18 @@ public class WelcomePanel implements IsWidget {
     private SystemInfoPortlet systemInfoPortlet;
     private PanelFactory panelFactory;
 
+    private ErrorHandler errorHandler;
+
     @Inject
     public WelcomePanel(AdminApi adminApi, SystemInfoPortlet systemInfoPortlet,
-                        PanelFactory panelFactory, Provider<ZicoShell> shell) {
+                        PanelFactory panelFactory, Provider<ZicoShell> shell,
+                        ErrorHandler errorHandler) {
 
         this.adminApi = adminApi;
         this.systemInfoPortlet = systemInfoPortlet;
         this.panelFactory = panelFactory;
         this.shell = shell;
+        this.errorHandler = errorHandler;
     }
 
     @Override
@@ -126,7 +127,7 @@ public class WelcomePanel implements IsWidget {
         adminApi.getTidMap(new MethodCallback<Map<String, String>>() {
             @Override
             public void onFailure(Method method, Throwable exception) {
-                GWT.log("Error calling method " + method, exception);
+                errorHandler.error("Error calling method: " + method, exception);
             }
 
             @Override

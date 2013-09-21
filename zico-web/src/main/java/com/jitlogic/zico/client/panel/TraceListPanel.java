@@ -29,9 +29,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import com.jitlogic.zico.client.ClientUtil;
-import com.jitlogic.zico.client.Resources;
-import com.jitlogic.zico.client.ZicoShell;
+import com.jitlogic.zico.client.*;
 import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.data.*;
 import com.jitlogic.zico.client.api.AdminApi;
@@ -94,14 +92,18 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
     private Map<Integer, String> traceTypes;
 
+    private ErrorHandler errorHandler;
+
     @Inject
     public TraceListPanel(Provider<ZicoShell> shell, TraceDataApi tds, AdminApi ads,
-                          PanelFactory panelFactory, @Assisted HostInfo hostInfo) {
+                          PanelFactory panelFactory, @Assisted HostInfo hostInfo,
+                          ErrorHandler errorHandler) {
         this.shell = shell;
         this.tds = tds;
         this.ads = ads;
         this.selectedHost = hostInfo;
         this.panelFactory = panelFactory;
+        this.errorHandler = errorHandler;
 
         filter.setSortBy("clock");
         filter.setSortAsc(false);
@@ -425,7 +427,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
         ads.getTidMap(new MethodCallback<Map<String, String>>() {
             @Override
             public void onFailure(Method method, Throwable exception) {
-                GWT.log("Error calling " + method, exception);
+                errorHandler.error("Error calling API method: " + method, exception);
             }
 
             @Override

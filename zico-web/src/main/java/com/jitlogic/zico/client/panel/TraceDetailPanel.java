@@ -27,6 +27,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.inject.assistedinject.Assisted;
+import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.data.TraceInfo;
@@ -84,10 +85,13 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
     private TextButton btnSearchPrev;
     private TextButton btnSearchNext;
 
+    private ErrorHandler errorHandler;
 
     @Inject
-    public TraceDetailPanel(TraceDataApi tds, @Assisted TraceInfo traceInfo) {
+    public TraceDetailPanel(TraceDataApi tds, ErrorHandler errorHandler,
+                            @Assisted TraceInfo traceInfo) {
         this.tds = tds;
+        this.errorHandler = errorHandler;
         this.traceInfo = traceInfo;
 
         createToolbar();
@@ -153,7 +157,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
             @Override
             public void onSelect(SelectEvent event) {
                 if (searchDialog == null) {
-                    searchDialog = new TraceRecordSearchDialog(TraceDetailPanel.this, tds, traceInfo, null);
+                    searchDialog = new TraceRecordSearchDialog(TraceDetailPanel.this, tds, traceInfo, null, errorHandler);
                 }
                 searchDialog.show();
             }

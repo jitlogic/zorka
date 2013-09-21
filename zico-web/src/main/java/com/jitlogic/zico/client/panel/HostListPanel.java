@@ -19,6 +19,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.inject.Inject;
+import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.ZicoShell;
@@ -61,12 +62,15 @@ public class HostListPanel extends VerticalLayoutContainer {
     private ListStore<HostInfo> hostGridStore;
     private GridSelectionModel<HostInfo> selectionModel;
 
+    private ErrorHandler errorHandler;
 
     @Inject
-    public HostListPanel(Provider<ZicoShell> shell, TraceDataApi traceDataApi, PanelFactory panelFactory) {
+    public HostListPanel(Provider<ZicoShell> shell, TraceDataApi traceDataApi, PanelFactory panelFactory,
+                         ErrorHandler errorHandler) {
         this.shell = shell;
         this.traceDataApi = traceDataApi;
         this.panelFactory = panelFactory;
+        this.errorHandler = errorHandler;
 
         createHostListPanel();
         createContextMenu();
@@ -89,6 +93,9 @@ public class HostListPanel extends VerticalLayoutContainer {
         selectionModel = hostGrid.getSelectionModel();
         selectionModel.setSelectionMode(Style.SelectionMode.SINGLE);
 
+        hostGrid.getView().setAutoExpandColumn(addrCol);
+        hostGrid.getView().setForceFit(true);
+
         // TODO host selection handler for keyboard: select item, press ENTER
 
         refresh();
@@ -109,7 +116,7 @@ public class HostListPanel extends VerticalLayoutContainer {
         this.traceDataApi.listHosts(new MethodCallback<List<HostInfo>>() {
             @Override
             public void onFailure(Method method, Throwable exception) {
-                GWT.log("Error calling " + method, exception);
+                errorHandler.error("Error calling API method: " + method, exception);
             }
 
             @Override
@@ -132,8 +139,7 @@ public class HostListPanel extends VerticalLayoutContainer {
                         traceDataApi.deleteHost(hi.getId(), new MethodCallback<Void>() {
                             @Override
                             public void onFailure(Method method, Throwable exception) {
-                                AlertMessageBox amb = new AlertMessageBox("Error saving host", exception.getMessage());
-                                amb.show();
+                                errorHandler.error("Error calling API method: " + method, exception);
                             }
 
                             @Override
@@ -172,7 +178,7 @@ public class HostListPanel extends VerticalLayoutContainer {
         mnuNewHost.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
-                HostPrefsDialog dialog = new HostPrefsDialog(traceDataApi, HostListPanel.this, null);
+                HostPrefsDialog dialog = new HostPrefsDialog(traceDataApi, HostListPanel.this, null, errorHandler);
                 dialog.show();
             }
         });
@@ -197,7 +203,7 @@ public class HostListPanel extends VerticalLayoutContainer {
             public void onSelection(SelectionEvent<Item> event) {
                 HostInfo info = hostGrid.getSelectionModel().getSelectedItem();
                 if (info != null) {
-                    HostPrefsDialog dialog = new HostPrefsDialog(traceDataApi, HostListPanel.this, info);
+                    HostPrefsDialog dialog = new HostPrefsDialog(traceDataApi, HostListPanel.this, info, errorHandler);
                     dialog.show();
                 }
             }
