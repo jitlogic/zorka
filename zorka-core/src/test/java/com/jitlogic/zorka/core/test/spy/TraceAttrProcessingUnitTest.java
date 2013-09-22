@@ -19,6 +19,7 @@ package com.jitlogic.zorka.core.test.spy;
 import com.jitlogic.zorka.common.tracedata.TaggedValue;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.TraceAttrProcessor;
+import com.jitlogic.zorka.core.spy.TraceTaggerProcessor;
 import com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture;
 
 import org.junit.Test;
@@ -28,9 +29,9 @@ public class TraceAttrProcessingUnitTest extends BytecodeInstrumentationFixture 
 
     @Test
     public void testTraceUntaggedAttr() {
-        TraceAttrProcessor tap = new TraceAttrProcessor(symbols, tracerObj, "SQL", "SQL", null);
 
-        tap.process(ZorkaUtil.<String, Object>map("SQL", "select * from table"));
+        new TraceAttrProcessor(symbols, tracerObj, "SQL", "SQL", null).process(
+                ZorkaUtil.<String, Object>map("SQL", "select * from table"));
 
         traceBuilder.check(0, "action", "newAttr", "attrId", symbols.symbolId("SQL"));
         traceBuilder.check(0, "attrVal", "select * from table");
@@ -39,12 +40,25 @@ public class TraceAttrProcessingUnitTest extends BytecodeInstrumentationFixture 
 
     @Test
     public void testTraceTaggedAttr() {
-        TraceAttrProcessor tap = new TraceAttrProcessor(symbols, tracerObj, "SQL", "SQL", "SQL_QUERY");
-
-        tap.process(ZorkaUtil.<String, Object>map("SQL", "select * from table"));
+        new TraceAttrProcessor(symbols, tracerObj, "SQL", "SQL", "SQL_QUERY").process(
+                ZorkaUtil.<String, Object>map("SQL", "select * from table"));
 
         traceBuilder.check(0, "action", "newAttr", "attrId", symbols.symbolId("SQL"));
         traceBuilder.check(0, "attrVal", new TaggedValue(symbols.symbolId("SQL_QUERY"), "select * from table"));
     }
 
+    @Test
+    public void testTraceTags() {
+        new TraceTaggerProcessor(symbols, tracerObj, "TAGS", "TAGS", "TAG1", "TAG2").process(null);
+
+        traceBuilder.check(0, "action", "newAttr", "attrId", symbols.symbolId("TAGS"));
+        traceBuilder.check(0, "attrVal", new TaggedValue(symbols.symbolId("TAGS"),
+                ZorkaUtil.<Integer>set(symbols.symbolId("TAG1"), symbols.symbolId("TAG2"))));
+
+        new TraceTaggerProcessor(symbols, tracerObj, "TAGS", "TAGS", "TAG3", "TAG4").process(null);
+
+        traceBuilder.check(0, "attrVal", new TaggedValue(symbols.symbolId("TAGS"), ZorkaUtil.<Integer>set(
+                symbols.symbolId("TAG1"), symbols.symbolId("TAG2"), symbols.symbolId("TAG3"), symbols.symbolId("TAG4"))));
+
+    }
 }

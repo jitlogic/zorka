@@ -190,15 +190,20 @@ public class TraceBuilder {
     }
 
 
+    public Object getAttr(int attrId) {
+        return realTop().getAttr(attrId);
+    }
+
+
     public void newAttr(int attrId, Object attrVal) {
-        // TODO propable bug: if ttop is "cleaned up for reuse", attribute will be lost
-        // TODO the same with trace markers, flags etc.
         realTop().setAttr(attrId, attrVal);
     }
+
 
     public void disable() {
         disabled = true;
     }
+
 
     public void enable() {
         disabled = false;
