@@ -28,4 +28,6 @@ public interface PanelFactory {
     public TraceDetailPanel traceDetailPanel(TraceInfo traceInfo);
 
     public TraceTemplatePanel traceTemplatePanel(Map<String, String> tidMap);
+
+    public TraceRecordSearchDialog traceRecordSearchDialog(TraceDetailPanel panel, TraceInfo trace);
 }

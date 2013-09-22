@@ -86,12 +86,14 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
     private TextButton btnSearchNext;
 
     private ErrorHandler errorHandler;
+    private PanelFactory panelFactory;
 
     @Inject
-    public TraceDetailPanel(TraceDataApi tds, ErrorHandler errorHandler,
+    public TraceDetailPanel(TraceDataApi tds, ErrorHandler errorHandler, PanelFactory panelFactory,
                             @Assisted TraceInfo traceInfo) {
         this.tds = tds;
         this.errorHandler = errorHandler;
+        this.panelFactory = panelFactory;
         this.traceInfo = traceInfo;
 
         createToolbar();
@@ -157,7 +159,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
             @Override
             public void onSelect(SelectEvent event) {
                 if (searchDialog == null) {
-                    searchDialog = new TraceRecordSearchDialog(TraceDetailPanel.this, tds, traceInfo, null, errorHandler);
+                    searchDialog = panelFactory.traceRecordSearchDialog(TraceDetailPanel.this, traceInfo);
                 }
                 searchDialog.show();
             }

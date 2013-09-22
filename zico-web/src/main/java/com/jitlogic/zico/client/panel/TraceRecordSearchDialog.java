@@ -23,6 +23,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.inject.assistedinject.Assisted;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.data.TraceDetailSearchExpression;
@@ -47,6 +48,7 @@ import com.sencha.gxt.widget.core.client.grid.RowExpander;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,7 +58,6 @@ public class TraceRecordSearchDialog extends Dialog {
 
     private TraceDataApi tds;
     private TraceInfo trace;
-    private TraceRecordInfo root;
 
     private TraceDetailPanel panel;
 
@@ -75,12 +76,12 @@ public class TraceRecordSearchDialog extends Dialog {
 
     private ErrorHandler errorHandler;
 
-    public TraceRecordSearchDialog(TraceDetailPanel panel, TraceDataApi tds,
-                                   TraceInfo trace, TraceRecordInfo root,
-                                   ErrorHandler errorHandler) {
+    @Inject
+    public TraceRecordSearchDialog(TraceDataApi tds, ErrorHandler errorHandler,
+                                   @Assisted TraceDetailPanel panel, @Assisted TraceInfo trace) {
+
         this.tds = tds;
         this.trace = trace;
-        this.root = root;
         this.panel = panel;
         this.errorHandler = errorHandler;
 
