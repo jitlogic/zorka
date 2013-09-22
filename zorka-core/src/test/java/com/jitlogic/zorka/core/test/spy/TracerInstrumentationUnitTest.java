@@ -42,7 +42,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
 
-        assertEquals(2, output.size());
+        assertEquals(2, traceBuilder.size());
     }
 
 
@@ -68,9 +68,9 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
 
-        assertEquals(2, output.size());
+        assertEquals(2, traceBuilder.size());
         assertEquals(1, submitter.size());
-        assertEquals("trivialMethod", symbols.symbolName((Integer)output.getData().get(0).get("methodId")));
+        assertEquals("trivialMethod", symbols.symbolName((Integer) traceBuilder.getData().get(0).get("methodId")));
     }
 
 
@@ -82,7 +82,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         invoke(obj, "recursiveMethod");
 
         Assert.assertEquals("Output actions mismatch.",
-            Arrays.asList("traceEnter", "traceEnter", "traceReturn", "traceReturn"), output.listAttr("action"));
+                Arrays.asList("traceEnter", "traceEnter", "traceReturn", "traceReturn"), traceBuilder.listAttr("action"));
     }
 
 
@@ -93,9 +93,9 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         Object obj = instantiate(engine, TCLASS1);
         Object rslt = invoke(obj, "errorMethod");
 
-        assertEquals(2, output.getData().size());
-        assertEquals(rslt, output.getData().get(1).get("exception"));
-        assertEquals("errorMethod", symbols.symbolName((Integer)output.getData().get(0).get("methodId")));
+        assertEquals(2, traceBuilder.getData().size());
+        assertEquals(rslt, traceBuilder.getData().get(1).get("exception"));
+        assertEquals("errorMethod", symbols.symbolName((Integer) traceBuilder.getData().get(0).get("methodId")));
     }
 
 

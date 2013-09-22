@@ -141,7 +141,19 @@ public class TracerLib {
      * @return spy processor object adding new trace attribute
      */
     public SpyProcessor attr(String srcField, String dstAttr) {
-        return new TraceAttrProcessor(symbolRegistry, tracer, srcField, dstAttr);
+        return attr(srcField, dstAttr, null);
+    }
+
+    /**
+     * Creates spy processor that attaches tagged attribute to trace record.
+     *
+     * @param srcField source field name (from spy record)
+     * @param dstAttr  destination attribute name (in trace data)
+     * @param attrTag  attribute tag;
+     * @return spy processor object adding new trace attribute
+     */
+    public SpyProcessor attr(String srcField, String dstAttr, String attrTag) {
+        return new TraceAttrProcessor(symbolRegistry, tracer, srcField, dstAttr, attrTag);
     }
 
 
@@ -154,6 +166,18 @@ public class TracerLib {
     public void newAttr(String name, Object value) {
         tracer.getHandler().newAttr(symbolRegistry.symbolId(name), value);
     }
+
+
+    /**
+     * Adds trace attribute to trace record immediately. This is useful for programmatic attribute setting.
+     *
+     * @param name  attribute name
+     * @param value attribute value
+     */
+    public void newAttr(String name, Object value, String tag) {
+        tracer.getHandler().newAttr(symbolRegistry.symbolId(name), new TaggedValue(symbolRegistry.symbolId(tag), value));
+    }
+
 
     /**
      * Creates spy processor that sets flags in trace marker.

@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class TestTracer extends TraceBuilder {
+public class TestTraceBuilder extends TraceBuilder {
 
-    private List<Map<Object,Object>> data = new ArrayList<Map<Object, Object>>();
+    private List<Map<Object, Object>> data = new ArrayList<Map<Object, Object>>();
 
-    public TestTracer() {
+    public TestTraceBuilder() {
         super(null, null);
     }
 
@@ -67,22 +67,22 @@ public class TestTracer extends TraceBuilder {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public List<Map<Object,Object>> getData() {
+    public List<Map<Object, Object>> getData() {
         return data;
     }
 
 
     public <T> List<T> listAttr(Object key) {
         List<T> lst = new ArrayList<T>();
-        for (Map<Object,Object> datum : data) {
-            lst.add((T)datum.get(key));
+        for (Map<Object, Object> datum : data) {
+            lst.add((T) datum.get(key));
         }
         return lst;
     }
 
 
     public <T> T get(int idx, Object key) {
-        return idx < data.size() ?  (T)data.get(idx).get(key) : null;
+        return idx < data.size() ? (T) data.get(idx).get(key) : null;
     }
 
 
@@ -92,10 +92,10 @@ public class TestTracer extends TraceBuilder {
             Assert.fail("Requested slot " + idx + " but only " + data.size() + " have been recorded.");
         }
 
-        Map<Object,Object> rec = data.get(idx);
+        Map<Object, Object> rec = data.get(idx);
 
         for (int i = 1; i < kv.length; i += 2) {
-            Assert.assertEquals("Attribute " + kv[i-1], kv[i], rec.get(kv[i-1]));
+            Assert.assertEquals("Attribute " + kv[i - 1], kv[i], rec.get(kv[i - 1]));
         }
     }
 
