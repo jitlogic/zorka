@@ -22,18 +22,19 @@ import com.google.inject.Inject;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.ZicoShell;
-import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.data.HostInfo;
 import com.jitlogic.zico.data.HostInfoProperties;
 import com.sencha.gxt.core.client.Style;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.Dialog;
-import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.sencha.gxt.widget.core.client.box.ConfirmMessageBox;
+import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.event.CellClickEvent;
 import com.sencha.gxt.widget.core.client.event.CellDoubleClickEvent;
 import com.sencha.gxt.widget.core.client.event.HideEvent;
+import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
@@ -42,6 +43,8 @@ import com.sencha.gxt.widget.core.client.menu.Item;
 import com.sencha.gxt.widget.core.client.menu.Menu;
 import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.sencha.gxt.widget.core.client.menu.SeparatorMenuItem;
+import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
+import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
@@ -64,16 +67,106 @@ public class HostListPanel extends VerticalLayoutContainer {
 
     private ErrorHandler errorHandler;
 
+    private TextButton btnRefresh;
+    private TextButton btnAddHost;
+    private TextButton btnRemoveHost;
+    private TextButton btnEditHost;
+    private TextButton btnListTraces;
+    private MenuItem mnuRefresh;
+    private MenuItem mnuNewHost;
+    private MenuItem mnuRemoveHost;
+    private MenuItem mnuEditHost;
+    private MenuItem mnuListTraces;
+
+    private boolean selectionDependentControlsEnabled = true;
+
+
     @Inject
     public HostListPanel(Provider<ZicoShell> shell, TraceDataApi traceDataApi, PanelFactory panelFactory,
                          ErrorHandler errorHandler) {
+
         this.shell = shell;
         this.traceDataApi = traceDataApi;
         this.panelFactory = panelFactory;
         this.errorHandler = errorHandler;
 
+        createToolbar();
         createHostListPanel();
         createContextMenu();
+
+        enableSelectionDependentControls(false);
+    }
+
+    private void enableSelectionDependentControls(boolean enabled) {
+        if (selectionDependentControlsEnabled != enabled) {
+            btnRemoveHost.setEnabled(enabled);
+            btnEditHost.setEnabled(enabled);
+            btnListTraces.setEnabled(enabled);
+            mnuRemoveHost.setEnabled(enabled);
+            mnuEditHost.setEnabled(enabled);
+            mnuListTraces.setEnabled(enabled);
+            selectionDependentControlsEnabled = enabled;
+        }
+    }
+
+    private void createToolbar() {
+        ToolBar toolBar = new ToolBar();
+
+        btnRefresh = new TextButton();
+        btnRefresh.setIcon(Resources.INSTANCE.refreshIcon());
+        btnRefresh.setToolTip("Refresh host list");
+        btnRefresh.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                refresh();
+            }
+        });
+        toolBar.add(btnRefresh);
+
+        toolBar.add(new SeparatorToolItem());
+
+        btnAddHost = new TextButton();
+        btnAddHost.setIcon(Resources.INSTANCE.addIcon());
+        btnAddHost.setToolTip("Add new host");
+        btnAddHost.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                addHost();
+            }
+        });
+        toolBar.add(btnAddHost);
+
+        btnRemoveHost = new TextButton();
+        btnRemoveHost.setIcon(Resources.INSTANCE.removeIcon());
+        btnRemoveHost.setToolTip("Remove host");
+        btnRemoveHost.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                removeHost();
+            }
+        });
+        toolBar.add(btnRemoveHost);
+
+        btnEditHost = new TextButton();
+        btnEditHost.setIcon(Resources.INSTANCE.editIcon());
+        btnEditHost.setToolTip("Edit host");
+        toolBar.add(btnEditHost);
+
+        toolBar.add(new SeparatorToolItem());
+
+        btnListTraces = new TextButton();
+        btnListTraces.setIcon(Resources.INSTANCE.listColumnsIcon());
+        btnListTraces.setToolTip("List traces");
+        toolBar.add(btnListTraces);
+
+        btnListTraces.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                listTraces();
+            }
+        });
+
+        add(toolBar, new VerticalLayoutData(1, -1));
     }
 
 
@@ -103,7 +196,15 @@ public class HostListPanel extends VerticalLayoutContainer {
         hostGrid.addCellDoubleClickHandler(new CellDoubleClickEvent.CellDoubleClickHandler() {
             @Override
             public void onCellClick(CellDoubleClickEvent event) {
-                selectHost();
+                enableSelectionDependentControls(hostGrid.getSelectionModel().getSelectedItem() != null);
+                listTraces();
+            }
+        });
+
+        hostGrid.addCellClickHandler(new CellClickEvent.CellClickHandler() {
+            @Override
+            public void onCellClick(CellClickEvent event) {
+                enableSelectionDependentControls(hostGrid.getSelectionModel().getSelectedItem() != null);
             }
         });
 
@@ -122,6 +223,7 @@ public class HostListPanel extends VerticalLayoutContainer {
             @Override
             public void onSuccess(Method method, List<HostInfo> response) {
                 hostGridStore.addAll(response);
+                enableSelectionDependentControls(hostGrid.getSelectionModel().getSelectedItem() != null);
             }
         });
     }
@@ -158,78 +260,88 @@ public class HostListPanel extends VerticalLayoutContainer {
     private void createContextMenu() {
         Menu menu = new Menu();
 
-        MenuItem mnuRefresh = new MenuItem("Refresh");
+        mnuRefresh = new MenuItem("Refresh");
         mnuRefresh.setIcon(Resources.INSTANCE.refreshIcon());
-        menu.add(mnuRefresh);
-
         mnuRefresh.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
                 refresh();
             }
         });
+        menu.add(mnuRefresh);
 
         menu.add(new SeparatorMenuItem());
 
-        MenuItem mnuNewHost = new MenuItem("New host");
+        mnuNewHost = new MenuItem("New host");
         mnuNewHost.setIcon(Resources.INSTANCE.addIcon());
-        menu.add(mnuNewHost);
-
         mnuNewHost.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
-                HostPrefsDialog dialog = new HostPrefsDialog(traceDataApi, HostListPanel.this, null, errorHandler);
-                dialog.show();
+                addHost();
             }
         });
+        menu.add(mnuNewHost);
 
-        MenuItem mnuRemoveHost = new MenuItem("Remove host");
+        mnuRemoveHost = new MenuItem("Remove host");
         mnuRemoveHost.setIcon(Resources.INSTANCE.removeIcon());
-        menu.add(mnuRemoveHost);
-
         mnuRemoveHost.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
-                removeHost(hostGrid.getSelectionModel().getSelectedItem());
+                removeHost();
             }
         });
+        menu.add(mnuRemoveHost);
 
-        MenuItem mnuEditHost = new MenuItem("Edit host");
+        mnuEditHost = new MenuItem("Edit host");
         mnuEditHost.setIcon(Resources.INSTANCE.editIcon());
-        menu.add(mnuEditHost);
-
         mnuEditHost.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
-                HostInfo info = hostGrid.getSelectionModel().getSelectedItem();
-                if (info != null) {
-                    HostPrefsDialog dialog = new HostPrefsDialog(traceDataApi, HostListPanel.this, info, errorHandler);
-                    dialog.show();
-                }
+                editHost();
             }
         });
+        menu.add(mnuEditHost);
 
         menu.add(new SeparatorMenuItem());
 
-        MenuItem mnuListTraces = new MenuItem("List traces");
+        mnuListTraces = new MenuItem("List traces");
         mnuListTraces.setIcon(Resources.INSTANCE.listColumnsIcon());
-        menu.add(mnuListTraces);
-
         mnuListTraces.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
-                selectHost();
+                listTraces();
             }
         });
+        menu.add(mnuListTraces);
 
         hostGrid.setContextMenu(menu);
     }
 
-    private void selectHost() {
 
+    private void addHost() {
+        new HostPrefsDialog(traceDataApi, this, null, errorHandler).show();
+    }
+
+
+    private void removeHost() {
+        removeHost(hostGrid.getSelectionModel().getSelectedItem());
+    }
+
+
+    private void editHost() {
+        HostInfo hostInfo = hostGrid.getSelectionModel().getSelectedItem();
+        if (hostInfo != null) {
+            new HostPrefsDialog(traceDataApi, this, hostInfo, errorHandler).show();
+        }
+    }
+
+
+    private void listTraces() {
         HostInfo hostInfo = selectionModel.getSelectedItem();
         GWT.log("Selected host: " + hostInfo);
 
-        shell.get().addView(panelFactory.traceListPanel(hostInfo), hostInfo.getName() + ": traces");
+        if (hostInfo != null) {
+            shell.get().addView(panelFactory.traceListPanel(hostInfo), hostInfo.getName() + ": traces");
+        }
     }
 }
