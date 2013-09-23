@@ -39,6 +39,7 @@ public class ZicoClientConnector extends ZicoConnector {
         socket = new Socket(addr, port);
         in = socket.getInputStream();
         out = socket.getOutputStream();
+        // TODO log connection here
     }
 
 
@@ -49,13 +50,13 @@ public class ZicoClientConnector extends ZicoConnector {
             throw new ZicoException(ZICO_BAD_REPLY, "Expected PONG reply.");
         }
         long t2 = System.nanoTime();
-        return t2-t1;
+        return t2 - t1;
     }
 
 
     public void hello(String hostname, String auth) throws IOException {
         send(ZICO_HELLO, ZicoUtil.pack(
-            new HelloRequest(System.currentTimeMillis(), hostname, auth)));
+                new HelloRequest(System.currentTimeMillis(), hostname, auth)));
         ZicoPacket pkt = recv();
         switch (pkt.getStatus()) {
             case ZICO_OK:
@@ -63,7 +64,7 @@ public class ZicoClientConnector extends ZicoConnector {
             case ZICO_AUTH_ERROR:
                 throw new ZicoException(ZICO_AUTH_ERROR, "Authentication error.");
             default:
-                throw new ZicoException(pkt.getStatus(), "Other error.");
+                throw new ZicoException(pkt.getStatus(), "Other error: status=" + pkt.getStatus());
         }
     }
 
@@ -76,7 +77,7 @@ public class ZicoClientConnector extends ZicoConnector {
         send(ZICO_DATA, ZicoUtil.pack(data));
         ZicoPacket pkt = recv();
         if (pkt.getStatus() != ZICO_OK) {
-            throw new ZicoException(pkt.getStatus(), "ZICO submission error.");
+            throw new ZicoException(pkt.getStatus(), "ZICO submission error: status=" + pkt.getStatus());
         }
     }
 

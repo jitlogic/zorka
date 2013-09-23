@@ -51,6 +51,18 @@ public abstract class AbstractZicoModule implements Module {
         ds.setUrl(config.stringCfg("zico.db.url", null));
         ds.setUsername(config.stringCfg("zico.db.user", null));
         ds.setPassword(config.stringCfg("zico.db.pass", null));
+        ds.setInitialSize(0);
+        ds.setMaxActive(128);
+        ds.setMaxIdle(32);
+
+        ds.setRemoveAbandonedTimeout(180 * 1000);
+        ds.setRemoveAbandoned(true);
+        ds.setLogAbandoned(true);
+
+        ds.setTimeBetweenEvictionRunsMillis(30 * 1000);
+        ds.setMinEvictableIdleTimeMillis(180 * 1000);
+        ds.setValidationQuery("select 1");
+        ds.setTestWhileIdle(true);
 
         if (config.boolCfg("zico.db.create", false)) {
             new JdbcTemplate(ds).execute("RUNSCRIPT FROM 'classpath:/com/jitlogic/zico/"

@@ -248,6 +248,10 @@ public class TracerLib {
     }
 
 
+    public ZorkaAsyncThread<SymbolicRecord> toZico(String addr, int port, String hostname, String auth) throws IOException {
+        return toZico(addr, port, hostname, auth, 64, 10, 125, 2);
+    }
+
     /**
      * Creates trace network sender. It will receive traces and send them to remote collector.
      *

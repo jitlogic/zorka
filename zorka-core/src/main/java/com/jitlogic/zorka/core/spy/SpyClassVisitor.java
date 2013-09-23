@@ -172,7 +172,7 @@ public class SpyClassVisitor extends ClassVisitor {
         for (SpyDefinition sdef : sdefs) {
             if (sdef.getMatcherSet().methodMatch(className, classAnnotations, classInterfaces,
                     access, methodName, methodDesc, null)) {
-                log.debug(ZorkaLogger.ZSP_METHOD_DBG, "Instrumenting method: " + className + "." + methodName + " " + methodDesc);
+                log.debug(ZorkaLogger.ZSP_METHOD_DBG, "Instrumenting method (full SPY): " + className + "." + methodName + " " + methodDesc);
                 ctxs.add(transformer.lookup(
                         new SpyContext(sdef, className, methodName, methodDesc, access)));
             }
@@ -184,6 +184,10 @@ public class SpyClassVisitor extends ClassVisitor {
 
         boolean doTrace = tracer.getMatcherSet()
                 .methodMatch(className, classAnnotations, classInterfaces, access, methodName, methodDesc, null);
+
+        if (doTrace && ZorkaLogger.isSpyLevel(ZorkaLogger.ZSP_METHOD_DBG)) {
+            log.debug(ZorkaLogger.ZSP_METHOD_DBG, "Instrumenting method (for trace): " + className + "." + methodName + " " + methodDesc);
+        }
 
         if (ctxs.size() > 0 || doTrace) {
             return new SpyMethodVisitor(m, doTrace ? symbolRegistry : null, className,
