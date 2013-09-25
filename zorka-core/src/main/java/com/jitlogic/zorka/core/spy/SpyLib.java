@@ -160,6 +160,13 @@ public class SpyLib {
     public static final int ACTION_ENTER = 0x02;
     public static final int ACTION_EXIT = 0x04;
 
+    public static final String TRACE = "TRACE";
+    public static final String DEBUG = "DEBUG";
+    public static final String INFO = "INFO";
+    public static final String WARN = "WARN";
+    public static final String ERROR = "ERROR";
+    public static final String FATAL = "FATAL";
+
     private SpyClassTransformer classTransformer;
     private MBeanServerRegistry mbsRegistry;
 
