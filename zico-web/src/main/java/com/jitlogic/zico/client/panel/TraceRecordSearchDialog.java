@@ -191,6 +191,7 @@ public class TraceRecordSearchDialog extends Dialog {
     private void createResultsGrid() {
 
         ColumnConfig<TraceRecordInfo, Long> durationCol = new ColumnConfig<TraceRecordInfo, Long>(props.time(), 50, "Time");
+        durationCol.setCell(new NanoTimeRenderingCell());
         durationCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         durationCol.setMenuDisabled(true);
         durationCol.setSortable(false);

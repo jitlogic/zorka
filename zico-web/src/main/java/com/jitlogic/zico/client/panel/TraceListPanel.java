@@ -161,15 +161,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
             }
         });
 
-        durationCol.setCell(new AbstractCell<Long>() {
-            @Override
-            public void render(Context context, Long time, SafeHtmlBuilder sb) {
-                String strTime = ClientUtil.formatDuration(time);
-                sb.appendHtmlConstant("<span>");
-                sb.append(SafeHtmlUtils.fromString(strTime));
-                sb.appendHtmlConstant("</span>");
-            }
-        });
+        durationCol.setCell(new NanoTimeRenderingCell());
 
         descCol.setCell(new AbstractCell<TraceInfo>() {
             @Override

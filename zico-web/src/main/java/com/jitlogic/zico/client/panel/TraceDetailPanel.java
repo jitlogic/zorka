@@ -329,27 +329,9 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
         ColumnConfig<TraceRecordInfo, Long> durationCol = new ColumnConfig<TraceRecordInfo, Long>(props.time(), 50, "Time");
         durationCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+        durationCol.setCell(new NanoTimeRenderingCell());
         durationCol.setMenuDisabled(true);
         durationCol.setSortable(false);
-
-        durationCol.setCell(new AbstractCell<Long>() {
-            @Override
-            public void render(Context context, Long time, SafeHtmlBuilder sb) {
-                double t = 1.0 * time / 1000000.0;
-                String u = "ms";
-
-                if (t > 1000.0) {
-                    t /= 1000.0;
-                    u = "s";
-                }
-
-                String strTime = t > 10 ? NumberFormat.getFormat("#####").format(t) + u
-                        : NumberFormat.getFormat("###.00").format(t) + u;
-                sb.appendHtmlConstant("<span>");
-                sb.append(SafeHtmlUtils.fromString(strTime));
-                sb.appendHtmlConstant("</span>");
-            }
-        });
 
 
         ColumnConfig<TraceRecordInfo, Long> callsCol = new ColumnConfig<TraceRecordInfo, Long>(props.calls(), 50, "Calls");
