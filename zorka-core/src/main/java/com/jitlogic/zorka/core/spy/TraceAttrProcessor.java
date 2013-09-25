@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.TaggedValue;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaLog;
@@ -41,30 +42,44 @@ public class TraceAttrProcessor implements SpyProcessor {
      */
     private Tracer tracer;
 
+
+    /**
+     * Symbol Registry.
+     */
     private SymbolRegistry symbolRegistry;
+
 
     /**
      * source field name
      */
     private String srcField;
 
+
     /**
      * Attribute ID (as taken from symbol registry)
      */
     private int attrId;
 
+
+    /**
+     * Attribute Tag ID (null if attribute should not be tagged)
+     */
+    private Integer attrTagId;
+
+
     /**
      * Creates custom attribute processor.
      *
-     * @param tracer    tracer object
-     * @param srcField  source field name
-     * @param traceAttr attribute ID
+     * @param tracer   tracer object
+     * @param srcField source field name
+     * @param attrName attribute ID
      */
-    public TraceAttrProcessor(SymbolRegistry symbolRegistry, Tracer tracer, String srcField, String traceAttr) {
+    public TraceAttrProcessor(SymbolRegistry symbolRegistry, Tracer tracer, String srcField, String attrName, String attrTag) {
         this.tracer = tracer;
         this.srcField = srcField;
         this.symbolRegistry = symbolRegistry;
-        this.attrId = symbolRegistry.symbolId(traceAttr);
+        this.attrId = symbolRegistry.symbolId(attrName);
+        this.attrTagId = attrTag != null ? symbolRegistry.symbolId(attrTag) : null;
     }
 
 
@@ -80,7 +95,7 @@ public class TraceAttrProcessor implements SpyProcessor {
                         + symbolRegistry.symbolName(attrId) + " (classId= " + top.getClassId() + " methodId=" + top.getMethodId()
                         + " signatureId=" + top.getSignatureId() + ")");
             }
-            tracer.getHandler().newAttr(attrId, val);
+            tracer.getHandler().newAttr(attrId, attrTagId != null ? new TaggedValue(attrTagId, val) : val);
         } else {
             if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
                 log.debug(ZorkaLogger.ZSP_ARGPROC, "Null value received. ");

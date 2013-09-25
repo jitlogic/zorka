@@ -26,10 +26,7 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import static org.objectweb.asm.Opcodes.*;
 
 /**
  * Traverses class file and instruments selected method according to supplied spy definitions.
@@ -47,6 +44,11 @@ public class SpyClassVisitor extends ClassVisitor {
      * Parent class transformer
      */
     private SpyClassTransformer transformer;
+
+    /**
+     * Defining class loader.
+     */
+    private ClassLoader classLoader;
 
     /**
      * List of spy definitions to be applied (visitor will only check for method matches, not class matches!)
@@ -72,6 +74,8 @@ public class SpyClassVisitor extends ClassVisitor {
 
     private SymbolRegistry symbolRegistry;
 
+    private boolean recursive;
+
     /**
      * Creates Spy class visitor.
      *
@@ -81,21 +85,69 @@ public class SpyClassVisitor extends ClassVisitor {
      * @param tracer      reference to tracer
      * @param cv          output class visitor (typically ClassWriter)
      */
-    public SpyClassVisitor(SpyClassTransformer transformer, SymbolRegistry symbolRegistry, String className,
+    public SpyClassVisitor(SpyClassTransformer transformer, ClassLoader classLoader, SymbolRegistry symbolRegistry,
+                           String className,
                            List<SpyDefinition> sdefs, Tracer tracer, ClassVisitor cv) {
         super(Opcodes.ASM4, cv);
         this.transformer = transformer;
+        this.classLoader = classLoader;
         this.symbolRegistry = symbolRegistry;
         this.className = className;
         this.sdefs = sdefs;
         this.tracer = tracer;
+
+        for (SpyDefinition sdef : sdefs) {
+            for (SpyMatcher matcher : sdef.getMatcherSet().getMatchers()) {
+                if (matcher.hasFlags(SpyMatcher.RECURSIVE)) {
+                    recursive = true;
+                }
+            }
+        }
     }
 
 
     @Override
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         cv.visit(version, access, name, signature, superName, interfaces);
-        this.classInterfaces = Arrays.asList(interfaces);
+
+        this.classInterfaces = new ArrayList(interfaces.length);
+        for (String ifname : interfaces) {
+            String interfaceClass = ifname.replace('/', '.');
+            this.classInterfaces.add(interfaceClass);
+            if (recursive) {
+
+                try {
+                    recursiveInterfaceScan(interfaceClass);
+                } catch (Exception e) {
+                    log.error(ZorkaLogger.ZSP_CONFIG, "Cannot (recursively) load class: " + interfaceClass, e);
+                }
+
+            }
+        }
+
+        if ((recursive) && !"java/lang/Object".equals(superName)) {
+            try {
+                recursiveInterfaceScan(superName.replace('/', '.'));
+            } catch (Exception e) {
+                log.error(ZorkaLogger.ZSP_CONFIG, "Cannot (recursively) load class: " + superName, e);
+            }
+        }
+
+    }
+
+
+    private void recursiveInterfaceScan(String className) throws ClassNotFoundException {
+        Class<?> clazz = classLoader.loadClass(className);
+        for (Class<?> ifc : clazz.getInterfaces()) {
+            String ifname = ifc.getName();
+            if (!classInterfaces.contains(ifname)) {
+                classInterfaces.add(ifname);
+                recursiveInterfaceScan(ifname);
+            }
+        }
+        if (!clazz.isInterface() && clazz.getSuperclass() != Object.class) {
+            recursiveInterfaceScan(clazz.getSuperclass().getName());
+        }
     }
 
 
@@ -120,7 +172,7 @@ public class SpyClassVisitor extends ClassVisitor {
         for (SpyDefinition sdef : sdefs) {
             if (sdef.getMatcherSet().methodMatch(className, classAnnotations, classInterfaces,
                     access, methodName, methodDesc, null)) {
-                log.debug(ZorkaLogger.ZSP_METHOD_DBG, "Instrumenting method: " + className + "." + methodName + " " + methodDesc);
+                log.debug(ZorkaLogger.ZSP_METHOD_DBG, "Instrumenting method (full SPY): " + className + "." + methodName + " " + methodDesc);
                 ctxs.add(transformer.lookup(
                         new SpyContext(sdef, className, methodName, methodDesc, access)));
             }
@@ -132,6 +184,11 @@ public class SpyClassVisitor extends ClassVisitor {
 
         boolean doTrace = tracer.getMatcherSet()
                 .methodMatch(className, classAnnotations, classInterfaces, access, methodName, methodDesc, null);
+
+        if (doTrace && ZorkaLogger.isSpyLevel(ZorkaLogger.ZTR_INSTRUMENT_METHOD)) {
+            log.debug(ZorkaLogger.ZTR_INSTRUMENT_METHOD, "Instrumenting method (for trace): "
+                    + className + "." + methodName + " " + methodDesc);
+        }
 
         if (ctxs.size() > 0 || doTrace) {
             return new SpyMethodVisitor(m, doTrace ? symbolRegistry : null, className,

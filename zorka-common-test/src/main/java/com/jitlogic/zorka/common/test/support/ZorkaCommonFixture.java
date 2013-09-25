@@ -25,7 +25,7 @@ public class ZorkaCommonFixture {
     private String tmpDir;
 
     @Before
-    public void setUpCentralFixture() throws Exception {
+    public void setUpFixture() throws Exception {
         tmpDir = "/tmp" + File.separatorChar + "zorka-unit-test";
         TestUtil.rmrf(tmpDir);
         new File(tmpDir).mkdirs();

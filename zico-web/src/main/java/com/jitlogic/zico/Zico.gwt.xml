@@ -1,0 +1,18 @@
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.0//EN"
+        "http://google-web-toolkit.googlecode.com/svn/releases/2.0/distro-source/core/src/gwt-module.dtd">
+<module>
+
+    <inherits name='com.google.gwt.user.User'/>
+    <inherits name='com.google.gwt.http.HTTP'/>
+    <inherits name='com.google.gwt.resources.Resources'/>
+    <inherits name='com.sencha.gxt.ui.GXT'/>
+    <inherits name='com.sencha.gxt.theme.gray.Gray'/>
+    <inherits name='org.fusesource.restygwt.RestyGWT'/>
+    <inherits name='com.google.gwt.inject.Inject'/>
+
+    <entry-point class='com.jitlogic.zico.client.ZicoEP'/>
+
+    <source path="client"/>
+    <source path="data"/>
+
+</module>

@@ -455,8 +455,8 @@ public class TraceRecord implements SymbolicRecord {
     public void fixup(SymbolRegistry symbols) {
 
         if (children != null) {
-            for (TraceRecord child : children) {
-                child.fixup(symbols);
+            for (int i = 0; i < children.size(); i++) {
+                children.get(i).fixup(symbols);
             }
         }
 

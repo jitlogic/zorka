@@ -155,4 +155,8 @@ public abstract class ZicoConnector implements Closeable {
     public void setPort(int port) {
         this.port = port;
     }
+
+    public boolean isOpen() {
+        return socket != null;
+    }
 }

@@ -25,8 +25,13 @@ __http() {
 
   // Default values for HTTP parameter processing
   zorka.defCfg("http.params", "no");
-  zorka.defCfg("http.params.include", "~.*");
   zorka.defCfg("http.params.exclude", "");
+  zorka.defCfg("http.param.maxlen", 128);
+
+  // Default values for HTTP cookie processing
+  zorka.defCfg("http.cookies", "no");
+  zorka.defCfg("http.cookies.exclude", "");
+  zorka.defCfg("http.cookie.maxlen", "128");
 
   // Default values for HTTP slow requests log configuration options
   zorka.defCfg("http.slow", "no");
@@ -51,6 +56,7 @@ __http() {
   zorka.defCfg("http.trace", zorka.stringCfg("tracer"));
   zorka.defCfg("http.trace.time", "1000");
   zorka.defCfg("http.trace.params.prefix", "P_");
+  zorka.defCfg("http.trace.cookies.prefix", "C_");
 
   _trace = zorka.boolCfg("http.trace");
   _stats = zorka.boolCfg("http.stats");
@@ -60,10 +66,15 @@ __http() {
   _slow = zorka.boolCfg("http.slow");
   _slowF = _slow && zorka.boolCfg("http.slow.file");
   _params = zorka.boolCfg("http.params");
-  _prefix = zorka.stringCfg("http.trace.params.prefix");
+  _paramLen = zorka.intCfg("http.param.maxlen", 128);
+  _cookies = zorka.boolCfg("http.cookies");
+  _cookieLen = zorka.intCfg("http.cookie.maxlen", 128);
+  _pprefix = zorka.stringCfg("http.trace.params.prefix");
+  _cprefix = zorka.stringCfg("http.trace.cookies.prefix");
   _error = zorka.boolCfg("http.error");
   _errorF = zorka.boolCfg("http.error.file");
   _excludedParams = zorka.setCfg("http.params.exclude");
+  _excludedCookies = zorka.setCfg("http.cookies.exclude");
 
   slow_ft = _slowF ? zorka.rollingFileTrapper("http.slow", "INFO", zorka.stringCfg("http.slow.file.path"),
                      zorka.intCfg("http.slow.file.num"), zorka.kiloCfg("http.slow.file.max"), false) : null;
@@ -81,11 +92,36 @@ __http() {
         String k = e.getKey();
         if (_excludedParams.contains(k)) continue;
         String v = e.getValue().length > 0 ? e.getValue()[0] : "";
-        if (_trace) { tracer.newAttr(_prefix+k, v); }
+        if (v.length() > _paramLen) {
+          v = v.substring(0, _paramLen);
+        }
+        if (_trace) { tracer.newAttr(_pprefix+k, v); }
         c = sb.length() > 0 ? "&" : "?";
         sb.append(c + k + "=" + v);
       }
       rec.put("PARAMS", sb.toString());
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+
+  cookies_processor() {
+    process(rec) {
+      cookies = rec.get("REQ").getCookies();
+      sb = new StringBuilder();
+      for (c : cookies) {
+          name = c.getName();
+          if (_excludedCookies.contains(name)) continue;
+          val = c.getValue();
+          if (val != null && val.length() > _cookieLen) {
+            val = val.substring(0, _cookieLen);
+          }
+          if (_trace) { tracer.newAttr(_cprefix+name,val); }
+          c = sb.length() > 0 ? ";  " : "";
+          sb.append(c + name + "=" + val);
+      }
+      rec.put("COOKIES", sb.toString());
       return rec;
     }
     return (com.jitlogic.zorka.core.spy.SpyProcessor)this;

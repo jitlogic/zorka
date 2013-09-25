@@ -1,3 +1,11 @@
+Zorka 0.9.10 (2013-09-30)
+-------------------------
+
+ * rename zorka-central -> zico;
+ * match classes and methods by interface (with recursion);
+
+
+
 Zorka 0.9.9 (2013-09-15)
 ------------------------
 

@@ -28,7 +28,9 @@ import java.util.regex.Pattern;
  */
 public class SpyMatcherSet {
 
-    /** List of (included) matchers. */
+    /**
+     * List of (included) matchers.
+     */
     private List<SpyMatcher> matchers = new ArrayList<SpyMatcher>();
 
 
@@ -44,7 +46,7 @@ public class SpyMatcherSet {
      *
      * @param matchers initial matchers
      */
-    public SpyMatcherSet(SpyMatcher...matchers) {
+    public SpyMatcherSet(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
             this.matchers.add(matcher);
         }
@@ -54,11 +56,10 @@ public class SpyMatcherSet {
     /**
      * Creates new matcher set and populates it with matchers from original matcher set and additional supplied matchers.
      *
-     * @param orig original matcher set
-     *
+     * @param orig     original matcher set
      * @param matchers supplied matchers
      */
-    public SpyMatcherSet(SpyMatcherSet orig, SpyMatcher...matchers) {
+    public SpyMatcherSet(SpyMatcherSet orig, SpyMatcher... matchers) {
         this.matchers.addAll(orig.matchers);
         for (SpyMatcher matcher : matchers) {
             this.matchers.add(matcher);
@@ -69,23 +70,23 @@ public class SpyMatcherSet {
     /**
      * Checks whenever class name matches any of included matchers. If match result is undecided
      * (eg. some matchers use interface or class annotations), also returns true.
-     *
+     * <p/>
      * This method is used by class transformer to decide whenever
      *
      * @param className
-     *
      * @return
      */
     public boolean classMatch(String className) {
         for (SpyMatcher matcher : matchers) {
             int flags = matcher.getFlags();
+
             if ((0 != (flags & BY_CLASS_NAME)) && match(matcher.getClassPattern(), className)) {
                 // Return true or false depending on whether this is normal or inverted match
                 return 0 == (flags & EXCLUDE_MATCH);
             }
 
-            if (0 != (flags & (BY_CLASS_ANNOTATION|BY_INTERFACE|BY_METHOD_ANNOTATION))) {
-                return true;
+            if (0 != (flags & (BY_CLASS_ANNOTATION | BY_INTERFACE | BY_METHOD_ANNOTATION))) {
+                return 0 == (flags & EXCLUDE_MATCH);
             }
         }
 
@@ -97,43 +98,36 @@ public class SpyMatcherSet {
      * Checks whetner given method matches any of included matchers. If passed method annotations list is null
      * and any of included matchers looks for mathod annotations, this method will return true.
      *
-     * @param className class name
-     *
-     * @param classAnnotations list of class names of class annotations
-     *
-     * @param classInterfaces list of class names of interfaces directly implemented by this class
-     *
-     * @param access method access flags
-     *
-     * @param methodName method name
-     *
-     * @param methodSignature method signature string
-     *
+     * @param className         class name
+     * @param classAnnotations  list of class names of class annotations
+     * @param classInterfaces   list of class names of interfaces directly implemented by this class
+     * @param access            method access flags
+     * @param methodName        method name
+     * @param methodSignature   method signature string
      * @param methodAnnotations list of class names of method annotations
-     *
      * @return true if method matches
      */
     public boolean methodMatch(String className, List<String> classAnnotations, List<String> classInterfaces,
-        int access, String methodName, String methodSignature, List<String> methodAnnotations) {
+                               int access, String methodName, String methodSignature, List<String> methodAnnotations) {
 
         for (SpyMatcher matcher : matchers) {
             int flags = matcher.getFlags();
 
             if ((0 != (flags & BY_CLASS_NAME) && match(matcher.getClassPattern(), className))
-             || (0 != (flags & BY_CLASS_ANNOTATION) && match(matcher.getClassPattern(), classAnnotations))
-             || (0 != (flags & BY_INTERFACE) && match(matcher.getClassPattern(), classInterfaces))) {
+                    || (0 != (flags & BY_CLASS_ANNOTATION) && match(matcher.getClassPattern(), classAnnotations))
+                    || (0 != (flags & BY_INTERFACE) && match(matcher.getClassPattern(), classInterfaces))) {
 
                 if ((0 != (flags & NO_CONSTRUCTORS) && ("<init>".equals(methodName) || "<clinit>".equals(methodName)))
-                 || (0 != (flags & NO_ACCESSORS) && isAccessor(methodName, methodSignature))
-                 || (0 != (flags & NO_COMMONS) && COMMON_METHODS.contains(methodName))) {
+                        || (0 != (flags & NO_ACCESSORS) && isAccessor(methodName, methodSignature))
+                        || (0 != (flags & NO_COMMONS) && COMMON_METHODS.contains(methodName))) {
                     return false;
                 }
 
                 // Method access-name-signature check
                 if ((0 == matcher.getAccess() || 0 != (access & matcher.getAccess()))
-                 && (0 == (flags & BY_METHOD_NAME) || match(matcher.getMethodPattern(), methodName))
-                 && (0 == (flags & BY_METHOD_SIGNATURE) || match(matcher.getSignaturePattern(), methodSignature))
-                 && (0 == (flags & BY_METHOD_ANNOTATION) || methodAnnotations == null
+                        && (0 == (flags & BY_METHOD_NAME) || match(matcher.getMethodPattern(), methodName))
+                        && (0 == (flags & BY_METHOD_SIGNATURE) || match(matcher.getSignaturePattern(), methodSignature))
+                        && (0 == (flags & BY_METHOD_ANNOTATION) || methodAnnotations == null
                         || match(matcher.getMethodPattern(), methodAnnotations))) {
                     // Return true or false depending on whether this is normal or inverted match
                     return true;
@@ -153,9 +147,9 @@ public class SpyMatcherSet {
 
     private boolean isAccessor(String methodName, String methodSignature) {
         return (methodName.startsWith("set") && methodSignature.endsWith(")V"))
-            || (methodName.startsWith("get") && methodSignature.startsWith("()"))
-            || (methodName.startsWith("is") && methodSignature.startsWith("()"))
-            || (methodName.startsWith("has") && methodSignature.startsWith("()"));
+                || (methodName.startsWith("get") && methodSignature.startsWith("()"))
+                || (methodName.startsWith("is") && methodSignature.startsWith("()"))
+                || (methodName.startsWith("has") && methodSignature.startsWith("()"));
     }
 
 
@@ -177,10 +171,8 @@ public class SpyMatcherSet {
     /**
      * Returns true supplied string matches given regular expression pattern.
      *
-     * @param pattern regular expression pattern
-     *
+     * @param pattern   regular expression pattern
      * @param candidate candidate
-     *
      * @return true if candidate matches
      */
     private boolean match(Pattern pattern, String candidate) {
@@ -191,10 +183,8 @@ public class SpyMatcherSet {
     /**
      * Returns true if any of supplied strings matches given pattern.
      *
-     * @param pattern regular expression pattern
-     *
+     * @param pattern    regular expression pattern
      * @param candidates candidates
-     *
      * @return true if any candidate matches
      */
     private boolean match(Pattern pattern, List<String> candidates) {
@@ -212,12 +202,16 @@ public class SpyMatcherSet {
      *
      * @param matchers appended matchers
      */
-    public void  include(SpyMatcher...matchers) {
+    public void include(SpyMatcher... matchers) {
 
         for (SpyMatcher matcher : matchers) {
             this.matchers.add(matcher);
         }
 
+    }
+
+    public List<SpyMatcher> getMatchers() {
+        return matchers;
     }
 
 }

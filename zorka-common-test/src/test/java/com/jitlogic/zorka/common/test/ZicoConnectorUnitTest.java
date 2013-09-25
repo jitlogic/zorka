@@ -31,7 +31,7 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class ZicoConnectorUnitTest { //extends CentralFixture {
+public class ZicoConnectorUnitTest {
 
     ZicoService service;
     TestZicoProcessorFactory factory;
