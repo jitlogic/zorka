@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import java.io.RandomAccessFile;
+import java.nio.channels.FileLock;
 import java.util.List;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
@@ -48,7 +49,9 @@ public class RAGZOutputStream extends OutputStream {
     private long lastSavedPos = 0;
 
     private long maxSegSize;
+
     private RandomAccessFile outFile;
+    private FileLock outLock;
 
     private long curSegSize = -1;  // Current segment size (uncompressed)
     private long curSegStart = 0;  // Current segment start position (physical - in file); gzip header starts at this position;
@@ -62,6 +65,8 @@ public class RAGZOutputStream extends OutputStream {
     public RAGZOutputStream(RandomAccessFile outFile, long maxSegSize) throws IOException {
         this.outFile = outFile;
         this.maxSegSize = maxSegSize;
+
+        outLock = this.outFile.getChannel().tryLock();
 
         reopenSegment(outFile);
     }
@@ -101,6 +106,7 @@ public class RAGZOutputStream extends OutputStream {
     @Override
     public void close() throws IOException {
         finishSegment();
+        outLock.release();
         outFile.close();
     }
 
@@ -198,7 +204,7 @@ public class RAGZOutputStream extends OutputStream {
 
 
     private void finishSegment() throws IOException {
-        if (!deflater.finished()) {
+        if (deflater != null) {
             deflater.finish();
             deflate();
             outFile.write(fromUIntBE(crc.getValue()));
@@ -214,4 +220,7 @@ public class RAGZOutputStream extends OutputStream {
     }
 
 
+    public RandomAccessFile getOutFile() {
+        return outFile;
+    }
 }

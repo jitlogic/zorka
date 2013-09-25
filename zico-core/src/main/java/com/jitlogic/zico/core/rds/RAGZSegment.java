@@ -26,12 +26,41 @@ import java.util.List;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
+
+/**
+ * This structure represents a single in-memory segment.
+ */
 public class RAGZSegment {
 
+
+    /**
+     * Physical position: where segment compressed data starts (so it excludes headers)
+     */
     private long physicalPos;
+
+
+    /**
+     * Physical length: length of compressed data block
+     */
     private long physicalLen;
+
+
+    /**
+     * Logical position: position in uncompressed data where this segment starts
+     */
     private long logicalPos;
+
+
+    /**
+     * Logical length: length of uncompressed data stored in this segment
+     */
     private long logicalLen;
+
+
+    /**
+     * If true, this segment has been finished and won't grow anymore. If false, this is the last segment where
+     * new data is still being appended.
+     */
     private boolean finished;
 
 
@@ -48,6 +77,10 @@ public class RAGZSegment {
         return physicalPos;
     }
 
+    @Override
+    public String toString() {
+        return "RAGZSegment(ppos=" + physicalPos + ", plen=" + physicalLen + ", lpos=" + logicalPos + ", llen=" + logicalLen + ")";
+    }
 
     public void setPhysicalPos(long physicalPos) {
         this.physicalPos = physicalPos;
@@ -102,21 +135,32 @@ public class RAGZSegment {
     }
 
 
-    public static List<RAGZSegment> scan(RandomAccessFile file, long logicalPos, long physicalPos) throws IOException {
+    /**
+     * Scans file for written segments.
+     *
+     * @param file       open file (to be scanned)
+     * @param logicalPos logical position of first scanned segment
+     * @param filePos    physical position where segments start (including GZ headers)
+     * @return list of segments found
+     * @throws IOException
+     */
+    public static List<RAGZSegment> scan(RandomAccessFile file, long logicalPos, long filePos) throws IOException {
         List<RAGZSegment> segments = new ArrayList<RAGZSegment>();
 
-        file.seek(physicalPos);
+        file.seek(filePos);
 
         long lpos = logicalPos;
 
         while (file.getFilePointer() < file.length()) {
             byte m1 = file.readByte(), m2 = (byte) (file.readByte() & 0xff);
             if (m1 != 0x1f || m2 != (byte) 0x8b)
-                throw new RAGZException(String.format("Invalid magic of gzip header: m1=0x%2x m2=0x%2x", m1, m2));
+                throw new RAGZException(String.format("Invalid magic of gzip header: m1=0x%2x m2=0x%2x (pos=%d)",
+                        m1, m2, file.getChannel().position() - 2));
             file.skipBytes(10);
             byte c1 = file.readByte(), c2 = file.readByte();
             if (c1 != 0x52 && c2 != 0x47)
-                throw new RAGZException(String.format("Invalid magic of EXT header: c1=0x%2x c2=0x%2x", c1, c2));
+                throw new RAGZException(String.format("Invalid magic of EXT header: c1=0x%2x c2=0x%2x (pos=%d)",
+                        c1, c2, file.getChannel().position() - 2));
             file.skipBytes(2);
             long clen = ZicoUtil.readUInt(file);
             long cpos = file.getFilePointer();
@@ -138,6 +182,13 @@ public class RAGZSegment {
     }
 
 
+    /**
+     * Updates segment information. Re-reads relevant segment information and updates relevant field in segment structure.
+     *
+     * @param file open random access file
+     * @param seg  segment structure being updated
+     * @throws IOException
+     */
     public static void update(RandomAccessFile file, RAGZSegment seg) throws IOException {
         file.seek(seg.getPhysicalPos() - 4);
         long clen = ZicoUtil.readUInt(file);
@@ -158,6 +209,14 @@ public class RAGZSegment {
     }
 
 
+    /**
+     * Uncompresses segment data.
+     *
+     * @param file open RAGZ file
+     * @param seg  segment
+     * @return
+     * @throws IOException
+     */
     public static byte[] unpack(RandomAccessFile file, RAGZSegment seg) throws IOException {
         byte[] ibuf = new byte[(int) seg.getPhysicalLen()];
 

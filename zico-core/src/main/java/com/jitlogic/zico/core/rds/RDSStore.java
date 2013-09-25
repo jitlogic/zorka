@@ -35,11 +35,17 @@ public class RDSStore implements Closeable {
 
     private static Pattern RGZ_FILE = Pattern.compile("^[0-9a-f]{16}\\.rgz$");
 
+    public static final int BROKEN_NOOP = 0;
+    public static final int BROKEN_MOVE = 1;
+    public static final int BROKEN_DEL = 2;
+
     private String basePath;
     private long maxSize;
 
     private long fileSize;
     private long segmentSize;
+
+    private int brokenHandling = 0;
 
     private long logicalPos = 0;
 
@@ -79,7 +85,7 @@ public class RDSStore implements Closeable {
         return basePath;
     }
 
-    private void open() throws IOException {
+    private synchronized void open() throws IOException {
         File baseDir = new File(basePath);
 
         if (!baseDir.exists()) {
@@ -101,7 +107,9 @@ public class RDSStore implements Closeable {
 
         Collections.sort(archivedFiles);
 
-        checkBrokenFiles();
+        if (brokenHandling != BROKEN_NOOP) {
+            checkBrokenFiles();
+        }
 
         if (archivedFiles.size() > 0
                 && archivedFiles.get(archivedFiles.size() - 1).plen < fileSize

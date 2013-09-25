@@ -174,7 +174,7 @@ public class RAGZUnitTest extends ZicoFixture {
     }
 
 
-    //@Test
+    @Test
     public void testReopenImproperlyClosedSegment() throws Exception {
         String path = tmpFile("test.gz");
         RandomAccessFile f = new RandomAccessFile(path, "rw");
@@ -187,8 +187,10 @@ public class RAGZUnitTest extends ZicoFixture {
         os.close();
 
         RAGZInputStream is = RAGZInputStream.fromFile(path);
-        assertThat(is.logicalLength()).isEqualTo(4);
+        assertThat(is.logicalLength()).isEqualTo(8);
         byte[] buf = new byte[4];
+        assertThat(is.read(buf)).isEqualTo(4);
+        assertThat(new String(buf, "UTF-8")).isEqualTo("ABCD");
         assertThat(is.read(buf)).isEqualTo(4);
         assertThat(new String(buf, "UTF-8")).isEqualTo("1234");
     }
@@ -268,7 +270,7 @@ public class RAGZUnitTest extends ZicoFixture {
         long len1 = new File(path).length();
 
         RAGZOutputStream os2 = RAGZOutputStream.toFile(path);
-        f.close();
+        os2.getOutFile().close();
 
         long len2 = new File(path).length();
 
@@ -322,5 +324,41 @@ public class RAGZUnitTest extends ZicoFixture {
         os1.write("12345678".getBytes());
         assertEquals(8, is1.read(b));
         assertEquals("12345678", new String(b, "UTF8"));
+    }
+
+
+    @Test
+    public void testNonResetClenAtSegmentExtensionBug() throws Exception {
+        String path = tmpFile("test.gz");
+
+        RAGZOutputStream os = RAGZOutputStream.toFile(path);
+        os.write("1234".getBytes());
+        os.close();
+
+        os = RAGZOutputStream.toFile(path);
+        os.getOutFile().close();
+
+        RandomAccessFile f = new RandomAccessFile(path, "rw");
+        os = new RAGZOutputStream(f, 1024);
+        os.write("5678".getBytes());
+        //f.close();
+        os.close();
+
+        os = RAGZOutputStream.toFile(path);
+        os.write("ABCD".getBytes());
+        os.close();
+
+        RAGZInputStream is = RAGZInputStream.fromFile(path);
+        byte[] b = new byte[12];
+        assertEquals(12, is.read(b));
+        assertEquals("12345678ABCD", new String(b, "UTF8"));
+        is.close();
+    }
+
+    private final static String RGZ_PATH = "/home/rlewczuk/projects/zorka/rgc/0000000000000000.rgz.b01";
+
+    //@Test
+    public void manualTestOpenBrokenRgzFile() throws Exception {
+        RAGZInputStream is1 = RAGZInputStream.fromFile(RGZ_PATH);
     }
 }
