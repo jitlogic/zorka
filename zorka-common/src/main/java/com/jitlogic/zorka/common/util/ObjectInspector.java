@@ -452,13 +452,17 @@ public final class ObjectInspector {
                 expr = s[0];
                 len = Integer.parseInt(s[1]);
             }
-            String[] segs = expr.split("\\.");
-            Object v = record.get(segs[0]);
-            for (int i = 1; i < segs.length; i++) {
-                v = getAttr(v, segs[i]);
+            Object val = null;
+            for (String exp : expr.split("\\|")) {
+                String[] segs = exp.split("\\.");
+                val = record.get(segs[0]);
+                for (int i = 1; i < segs.length; i++) {
+                    val = getAttr(val, segs[i]);
+                }
+                if (val != null) break;
             }
-            v = v != null ? v : def;
-            String s = v != null ? v.toString() : "null";
+            val = val != null ? val : def;
+            String s = val != null ? val.toString() : "null";
             if (len != null && s.length() > len) {
                 s = s.substring(0, len);
             }
@@ -495,7 +499,11 @@ public final class ObjectInspector {
                 key = s[0];
                 len = Integer.parseInt(s[1]);
             }
-            String val = properties.getProperty(key);
+            String val = null;
+            for (String k : key.split("\\|")) {
+                val = properties.getProperty(k);
+                if (val != null) break;
+            }
             if (val != null) {
                 if (len != null && val.length() > len) {
                     val = val.substring(0, len);
@@ -538,13 +546,17 @@ public final class ObjectInspector {
                 expr = s[0];
                 len = Integer.parseInt(s[1]);
             }
-            String[] segs = expr.split("\\.");
-            Object v = vals[Integer.parseInt(segs[0])];
-            for (int i = 1; i < segs.length; i++) {
-                v = getAttr(v, segs[i]);
+            Object val = null;
+            for (String exp : expr.split("\\|")) {
+                String[] segs = exp.split("\\.");
+                val = vals[Integer.parseInt(segs[0])];
+                for (int i = 1; i < segs.length; i++) {
+                    val = getAttr(val, segs[i]);
+                }
+                if (val != null) break;
             }
-            v = v != null ? v : def;
-            String s = "" + v;
+            val = val != null ? val : def;
+            String s = "" + val;
             if (len != null && s.length() > len) {
                 s = s.substring(0, len);
             }

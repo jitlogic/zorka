@@ -56,4 +56,31 @@ public class ObjectInspectorUnitTest {
         props.setProperty("X", "ABCDEF");
         assertEquals("ABC", ObjectInspector.substitute("${X~3}", props));
     }
+
+    @Test
+    public void testSubstituteWithAlternatives() {
+        assertEquals("ABC", ObjectInspector.substitute("${X|Y|Z}",
+                ZorkaUtil.<String, Object>map("X", "ABC")));
+
+        assertEquals("DEF", ObjectInspector.substitute("${X|Y|Z}",
+                ZorkaUtil.<String, Object>map("Y", "DEF", "Z", "GHI")));
+
+        assertEquals("GHI", ObjectInspector.substitute("${X|Y|Z}",
+                ZorkaUtil.<String, Object>map("Z", "GHI")));
+
+        assertEquals("JKL", ObjectInspector.substitute("${X|Y.A|Z}",
+                ZorkaUtil.<String, Object>map("Y", ZorkaUtil.map("A", "JKL"))));
+
+        assertEquals("ABC", ObjectInspector.substitute("${0|1}", new Object[]{null, "ABC"}));
+    }
+
+    @Test
+    public void testSubstituteWithAlternativeProps() {
+
+        Properties props = new Properties();
+        props.setProperty("Y", "ABC");
+
+        assertEquals("ABC", ObjectInspector.substitute("${X|Y|Z}", props));
+    }
+
 }
