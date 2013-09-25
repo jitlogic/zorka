@@ -95,13 +95,21 @@ public class TraceDataService {
             @DefaultValue("0") @QueryParam("minTime") long minTime,
             @DefaultValue("") @QueryParam("path") String path) {
 
+        if ("null".equals(path)) {
+            path = null;
+        }
+
         TraceRecordStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
         TraceRecord tr = ctx.getTraceRecord(path, minTime);
 
         List<TraceRecordInfo> lst = new ArrayList<TraceRecordInfo>();
 
-        for (int i = 0; i < tr.numChildren(); i++) {
-            lst.add(ctx.packTraceRecord(tr.getChild(i), path.length() > 0 ? (path + "/" + i) : "" + i));
+        if (path != null) {
+            for (int i = 0; i < tr.numChildren(); i++) {
+                lst.add(ctx.packTraceRecord(tr.getChild(i), path.length() > 0 ? (path + "/" + i) : "" + i));
+            }
+        } else {
+            lst.add(ctx.packTraceRecord(tr, ""));
         }
 
         return lst;

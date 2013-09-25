@@ -299,7 +299,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
             @Override
             public void load(TraceRecordInfo parent, final Callback<List<TraceRecordInfo>, Throwable> callback) {
                 tds.listTraceRecords(traceInfo.getHostId(), traceInfo.getDataOffs(), minMethodTime,
-                        parent != null ? parent.getPath() : "",
+                        parent != null ? parent.getPath() : null,
                         new MethodCallback<List<TraceRecordInfo>>() {
                             @Override
                             public void onFailure(Method method, Throwable exception) {
@@ -386,16 +386,11 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
 
         methodTree = new TreeGrid<TraceRecordInfo>(methodTreeStore, model, methodCol) {
-            @Override
-            protected void onAfterFirstAttach() {
-                super.onAfterFirstAttach();
-                loader.load();
-            }
-
             protected ImageResource calculateIconStyle(TraceRecordInfo model) {
                 return null;
             }
         };
+
         methodTree.setBorders(true);
         methodTree.setTreeLoader(loader);
         methodTree.getView().setTrackMouseOver(false);
