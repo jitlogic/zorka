@@ -1,0 +1,125 @@
+#!/bin/sh
+#
+# zico - this script starts and stops the nginx daemon
+#
+# chkconfig:   - 85 15
+# description:  Zorka Intranet Collector
+# processname: zico
+
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+if [ -f /etc/default/zico ] ; then
+    . /etc/default/zico
+else
+    echo "ZICO configuration file /etc/default/zico is missing."
+    exit 1
+fi
+
+# Check that networking is up.
+[ "$NETWORKING" = "no" ] && exit 0
+
+if [ -z "$ZICO_HOME" ] ; then
+    echo "ZICO_HOME is not set. Check /etc/default/zico configuration file."
+    exit 1
+fi
+
+# Check if ZICO installation is correct ...
+for F in zico.conf zico.properties zico.war ; do
+    if [ ! -f $ZICO_HOME/$F ] ; then
+        echo "Incomplete collector installation: missing $F file in $ZICO_HOME."
+    fi
+done
+
+for D in tmp log data db ; do
+    if [ ! -d $ZICO_HOME/$D ] ; then
+      echo "Missing directory: $ZICO_HOME/$D. Created."
+      mkdir $ZICO_HOME/$D
+    fi
+done
+
+PNAME="Zorka Intranet Collector"
+
+if [ -z "$ZICO_NAME" ] ; then
+  ZICO_NAME="zico"
+fi
+
+
+check() {
+    pgrep -f "Dzorka.app=$ZICO_NAME" >/dev/null 2>&1
+}
+
+
+start() {
+    if check
+    then
+        echo -n "$PNAME is already running."
+        success
+    else
+        echo -n "Starting $PNAME ..."
+        cd $ZICO_HOME
+        su - $ZICO_USER -c "cd $ZICO_HOME ; setsid $JAVA_HOME/bin/java -Dzorka.app=$ZICO_NAME $JAVA_OPTS -jar zico.war >$ZICO_HOME/log/console.log 2>&1 &"
+        retval=$?
+        if [ $retval = 0 ] ; then
+          success
+        else
+          failure
+        fi
+    fi
+    echo
+}
+
+
+stop() {
+    if check
+    then
+        echo -n "Stopping $PNAME ..."
+        pkill -f Dzorka.app=$Z_NAME >/dev/null
+        success
+    else
+        echo -n "$PNAME already stopped."
+        success
+    fi
+    echo
+}
+
+
+status() {
+    if check
+    then
+        echo "$PNAME is running ..."
+        exit 0
+    else
+        echo "$PNAME is stopped ..."
+        exit 1
+    fi
+}
+
+restart() {
+    stop
+    while check ; do
+        sleep 1
+    done
+    start
+}
+
+reload() {
+    stop
+    while check ; do
+        sleep 1
+    done
+    start
+}
+
+case "$1" in
+    start|stop|reload|restart|status)
+        $1
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|reload|configtest|status|force-reload|upgrade|restart|reopen_logs}"
+        exit 2
+esac
