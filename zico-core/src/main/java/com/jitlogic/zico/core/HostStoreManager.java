@@ -29,6 +29,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.IOException;
@@ -40,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 
+@Singleton
 public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, RowMapper<HostStore> {
 
     private final static Logger log = LoggerFactory.getLogger(HostStoreManager.class);

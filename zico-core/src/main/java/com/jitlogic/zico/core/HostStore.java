@@ -159,7 +159,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
     }
 
 
-    public RDSStore getRds() {
+    public synchronized RDSStore getRds() {
         if (rds == null) {
             String rootPath = ZorkaUtil.path(manager.getDataDir(), hostInfo.getPath());
             String rdspath = ZorkaUtil.path(rootPath, "traces");

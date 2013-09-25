@@ -19,8 +19,10 @@ package com.jitlogic.zico.core;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
+import javax.inject.Singleton;
 import java.util.Properties;
 
+@Singleton
 public class ZicoConfig extends ZorkaConfig {
 
     public final static String DEFAULT_CONF_PATH = "/com/jitlogic/zico/zico.properties";

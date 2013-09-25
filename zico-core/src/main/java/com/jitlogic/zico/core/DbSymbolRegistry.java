@@ -22,11 +22,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
+@Singleton
 public class DbSymbolRegistry extends SymbolRegistry {
 
     private final static Logger log = LoggerFactory.getLogger(DbSymbolRegistry.class);

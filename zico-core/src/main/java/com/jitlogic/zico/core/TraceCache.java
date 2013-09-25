@@ -20,9 +20,12 @@ import com.google.inject.Inject;
 import com.jitlogic.zico.data.TraceDetailFilterExpression;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 
+import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 
+
+@Singleton
 public class TraceCache {
 
     private int maxTraces;
