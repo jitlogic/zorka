@@ -38,24 +38,45 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SpyClassTransformer implements ClassFileTransformer {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** All spy defs configured */
+    /**
+     * All spy defs configured
+     */
     private List<SpyDefinition> sdefs = new ArrayList<SpyDefinition>();
 
-    /** SpyContext counter. */
+    /**
+     * SpyContext counter.
+     */
     private int nextId = 1;
 
-    /** Map of spy contexts (by ID) */
+    /**
+     * Map of spy contexts (by ID)
+     */
     private Map<Integer, SpyContext> ctxById = new ConcurrentHashMap<Integer, SpyContext>();
 
-    /** Map of spy contexts (by instance) */
+    /**
+     * Map of spy contexts (by instance)
+     */
     private Map<SpyContext, SpyContext> ctxInstances = new HashMap<SpyContext, SpyContext>();
+
+    private ThreadLocal<Boolean> transformLock = new ThreadLocal<Boolean>();
+
+    private ThreadLocal<Set<String>> currentTransformsTL = new ThreadLocal<Set<String>>() {
+        @Override
+        public Set<String> initialValue() {
+            return new HashSet<String>();
+        }
+    };
 
     private SymbolRegistry symbolRegistry;
 
-    /** Reference to tracer instance. */
+    /**
+     * Reference to tracer instance.
+     */
     Tracer tracer;
 
 
@@ -81,11 +102,10 @@ public class SpyClassTransformer implements ClassFileTransformer {
      * If there is none, supplied context will be registered and will have an  ID assigned.
      *
      * @param keyCtx sample (possibly unregistered) context
-     *
      * @return registered context
-     *
-     * TODO get rid of this crap, use strings to find already created contexts for a method
-     * TODO BUG one context ID refers only to one sdef, so using multiple sdefs on a single method will result errors (submitting data from all probes only to first one)
+     *         <p/>
+     *         TODO get rid of this crap, use strings to find already created contexts for a method
+     *         TODO BUG one context ID refers only to one sdef, so using multiple sdefs on a single method will result errors (submitting data from all probes only to first one)
      */
     public SpyContext lookup(SpyContext keyCtx) {
         synchronized (this) { // TODO get rid of synchronized, use
@@ -106,7 +126,6 @@ public class SpyClassTransformer implements ClassFileTransformer {
      * it will look if this sdef matches and possibly instrument methods according to sdef.
      *
      * @param sdef spy definition
-     *
      * @return
      */
     public SpyDefinition add(SpyDefinition sdef) {
@@ -127,10 +146,21 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
 
     @Override
-    public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
-        ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+    public byte[] transform(ClassLoader classLoader, String className, Class<?> classBeingRedefined,
+                            ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+
+        if (Boolean.TRUE.equals(transformLock.get())) {
+            return classfileBuffer;
+        }
 
         String clazzName = className.replace("/", ".");
+
+        Set<String> currentTransforms = currentTransformsTL.get();
+        if (currentTransforms.contains(clazzName)) {
+            return classfileBuffer;
+        } else {
+            currentTransforms.add(clazzName);
+        }
 
         List<SpyDefinition> found = new ArrayList<SpyDefinition>();
 
@@ -143,38 +173,38 @@ public class SpyClassTransformer implements ClassFileTransformer {
             }
         }
 
-        boolean classMatch = tracer.getMatcherSet().classMatch(clazzName);
+        boolean tracerMatch = tracer.getMatcherSet().classMatch(clazzName);
 
-        if (found.size() > 0 || classMatch) {
+        byte[] buf = classfileBuffer;
+
+        if (found.size() > 0 || tracerMatch) {
 
             log.debug(ZorkaLogger.ZSP_CLASS_TRC, "Transforming class: %s (sdefs found: %d; tracer match: %b)",
-                    className, found.size(), classMatch);
+                    className, found.size(), tracerMatch);
 
             AgentDiagnostics.inc(AgentDiagnostics.CLASSES_TRANSFORMED);
 
             ClassReader cr = new ClassReader(classfileBuffer);
             ClassWriter cw = new ClassWriter(cr, 0);
-            ClassVisitor scv = createVisitor(clazzName, found, tracer, cw);
+            ClassVisitor scv = createVisitor(classLoader, clazzName, found, tracer, cw);
             cr.accept(scv, 0);
-            return cw.toByteArray();
+            buf = cw.toByteArray();
         }
 
-        return classfileBuffer;
+        currentTransforms.remove(clazzName);
+        return buf;
     }
 
     /**
      * Spawn class visitor for transformed class.
      *
      * @param className class name
-     *
-     * @param found spy definitions that match
-     *
-     * @param cw output (class writer)
-     *
+     * @param found     spy definitions that match
+     * @param cw        output (class writer)
      * @return class visitor for instrumenting this class
      */
-    protected ClassVisitor createVisitor(String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
-        return new SpyClassVisitor(this, symbolRegistry, className, found, tracer, cw);
+    protected ClassVisitor createVisitor(ClassLoader classLoader, String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
+        return new SpyClassVisitor(this, classLoader, symbolRegistry, className, found, tracer, cw);
     }
 
 }

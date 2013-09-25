@@ -21,7 +21,7 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.spy.*;
 import com.jitlogic.zorka.core.test.spy.support.TestSpyTransformer;
 import com.jitlogic.zorka.core.test.spy.support.TestSubmitter;
-import com.jitlogic.zorka.core.test.spy.support.TestTracer;
+import com.jitlogic.zorka.core.test.spy.support.TestTraceBuilder;
 import org.junit.After;
 import org.junit.Before;
 
@@ -30,6 +30,10 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
     public final static String TCLASS1 = "com.jitlogic.zorka.core.test.spy.support.TestClass1";
     public final static String TCLASS2 = "com.jitlogic.zorka.core.test.spy.support.TestClass2";
     public final static String TCLASS3 = "com.jitlogic.zorka.core.test.spy.support.TestClass3";
+    public final static String TCLASS4 = "com.jitlogic.zorka.core.test.spy.support.TestClass4";
+
+    public final static String ICLASS1 = "com.jitlogic.zorka.core.test.spy.support.TestInterface1";
+    public final static String ICLASS2 = "com.jitlogic.zorka.core.test.spy.support.TestInterface2";
 
     public final static String TACLASS = "com.jitlogic.zorka.core.test.spy.support.ClassAnnotation";
     public final static String TAMETHOD = "com.jitlogic.zorka.core.test.spy.support.TestAnnotation";
@@ -37,23 +41,23 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
     public TestSpyTransformer engine;
     public SymbolRegistry symbols;
     public TestSubmitter submitter;
-    public TestTracer output;
-    public Tracer t;
+    public TestTraceBuilder traceBuilder;
+    public Tracer tracerObj;
 
     @Before
     public void setUp() throws Exception {
-        engine = new TestSpyTransformer(agentInstance.getSymbolRegistry(),agentInstance.getTracer());
+        engine = new TestSpyTransformer(agentInstance.getSymbolRegistry(), agentInstance.getTracer());
         submitter = new TestSubmitter();
         MainSubmitter.setSubmitter(submitter);
-        output = new TestTracer();
-        t = new Tracer(agentInstance.getTracerMatcherSet(),
+        traceBuilder = new TestTraceBuilder();
+        tracerObj = new Tracer(agentInstance.getTracerMatcherSet(),
                 agentInstance.getSymbolRegistry(),
                 agentInstance.getMetricsRegistry()) {
             public TraceBuilder getHandler() {
-                return output;
+                return traceBuilder;
             }
         };
-        MainSubmitter.setTracer(t);
+        MainSubmitter.setTracer(tracerObj);
         symbols = agentInstance.getSymbolRegistry();
     }
 

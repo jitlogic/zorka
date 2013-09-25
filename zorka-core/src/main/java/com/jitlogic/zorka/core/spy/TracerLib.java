@@ -141,7 +141,19 @@ public class TracerLib {
      * @return spy processor object adding new trace attribute
      */
     public SpyProcessor attr(String srcField, String dstAttr) {
-        return new TraceAttrProcessor(symbolRegistry, tracer, srcField, dstAttr);
+        return attr(srcField, dstAttr, null);
+    }
+
+    /**
+     * Creates spy processor that attaches tagged attribute to trace record.
+     *
+     * @param srcField source field name (from spy record)
+     * @param dstAttr  destination attribute name (in trace data)
+     * @param attrTag  attribute tag;
+     * @return spy processor object adding new trace attribute
+     */
+    public SpyProcessor attr(String srcField, String dstAttr, String attrTag) {
+        return new TraceAttrProcessor(symbolRegistry, tracer, srcField, dstAttr, attrTag);
     }
 
 
@@ -154,6 +166,18 @@ public class TracerLib {
     public void newAttr(String name, Object value) {
         tracer.getHandler().newAttr(symbolRegistry.symbolId(name), value);
     }
+
+
+    /**
+     * Adds trace attribute to trace record immediately. This is useful for programmatic attribute setting.
+     *
+     * @param name  attribute name
+     * @param value attribute value
+     */
+    public void newAttr(String name, Object value, String tag) {
+        tracer.getHandler().newAttr(symbolRegistry.symbolId(name), new TaggedValue(symbolRegistry.symbolId(tag), value));
+    }
+
 
     /**
      * Creates spy processor that sets flags in trace marker.
@@ -179,6 +203,30 @@ public class TracerLib {
 
 
     /**
+     * Labels current trace with tags.
+     *
+     * @param tags tag strings
+     * @return spy processor object
+     */
+    public SpyProcessor tags(String... tags) {
+        return customTags("TAGS", "TAGS", tags);
+    }
+
+
+    /**
+     * Labels
+     *
+     * @param attrName
+     * @param attrTag
+     * @param tags
+     * @return
+     */
+    public SpyProcessor customTags(String attrName, String attrTag, String... tags) {
+        return new TraceTaggerProcessor(symbolRegistry, tracer, attrName, attrTag, tags);
+    }
+
+
+    /**
      * Creates trace file writer object. Trace writer can receive traces and store them in a file.
      *
      * @param path     path to a file
@@ -200,6 +248,10 @@ public class TracerLib {
     }
 
 
+    public ZorkaAsyncThread<SymbolicRecord> toZico(String addr, int port, String hostname, String auth) throws IOException {
+        return toZico(addr, port, hostname, auth, 64, 10, 125, 2);
+    }
+
     /**
      * Creates trace network sender. It will receive traces and send them to remote collector.
      *
@@ -210,9 +262,10 @@ public class TracerLib {
      * @return
      * @throws IOException
      */
-    public ZorkaAsyncThread<SymbolicRecord> toCentral(String addr, int port, String hostname, String auth) throws IOException {
+    public ZorkaAsyncThread<SymbolicRecord> toZico(String addr, int port, String hostname, String auth,
+                                                   int qlen, int retries, long retryTime, long retryTimeExp) throws IOException {
         TraceWriter writer = new FressianTraceWriter(symbolRegistry, metricsRegistry);
-        ZicoTraceOutput output = new ZicoTraceOutput(writer, addr, port, hostname, auth);
+        ZicoTraceOutput output = new ZicoTraceOutput(writer, addr, port, hostname, auth, qlen, retries, retryTime, retryTimeExp);
         output.start();
         return output;
     }

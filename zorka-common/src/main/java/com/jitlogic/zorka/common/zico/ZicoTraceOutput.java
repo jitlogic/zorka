@@ -22,6 +22,7 @@ import com.jitlogic.zorka.common.tracedata.TraceWriter;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,12 +41,20 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
 
     private ByteArrayOutputStream os;
 
+    private int retries;
+    private long retryTime, retryTimeExp;
 
-    public ZicoTraceOutput(TraceWriter writer, String addr, int port, String hostname, String auth) throws IOException {
-        super("zico-output", 64);
+
+    public ZicoTraceOutput(TraceWriter writer, String addr, int port, String hostname, String auth,
+                           int qlen, int retries, long retryTime, long retryTimeExp) throws IOException {
+        super("zico-output", qlen);
 
         this.hostname = hostname;
         this.auth = auth;
+
+        this.retries = retries;
+        this.retryTime = retryTime;
+        this.retryTimeExp = retryTimeExp;
 
         conn = new ZicoClientConnector(addr, port);
 
@@ -63,21 +72,37 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
 
     @Override
     protected void process(SymbolicRecord record) {
-        try {
-            os.reset();
-            writer.softReset();
-            writer.write(record);
-            conn.send(ZicoPacket.ZICO_DATA, os.toByteArray());
-            ZicoPacket rslt = conn.recv();
-            if (rslt.getStatus() != ZicoPacket.ZICO_OK) {
-                throw new ZicoException(rslt.getStatus(), "Error submitting data.");
+        long rt = retryTime;
+        for (int i = 0; i < retries; i++) {
+            try {
+                os.reset();
+                writer.softReset();
+                writer.write(record);
+                if (!conn.isOpen()) {
+                    conn.connect();
+                }
+                conn.send(ZicoPacket.ZICO_DATA, os.toByteArray());
+                ZicoPacket rslt = conn.recv();
+                if (rslt.getStatus() != ZicoPacket.ZICO_OK) {
+                    throw new ZicoException(rslt.getStatus(), "Error submitting data.");
+                }
+                return;
+            } catch (Exception e) {
+                log.error(ZorkaLogger.ZCL_STORE, "Error sending trace record: " + e + ". Resetting connection.");
+                this.close();
+                this.open();
             }
-        } catch (Exception e) {
-            log.error(ZorkaLogger.ZCL_STORE, "Error sending trace record. Resetting connection.", e);
-            this.close();
-            this.open();
-            // TODO push record back to a queue
-        }
+
+            try {
+                Thread.sleep(rt);
+            } catch (InterruptedException e) {
+
+            }
+
+            rt *= retryTimeExp;
+        } // for ( ... )
+
+        log.error(ZorkaLogger.ZCL_STORE, "Too many errors while trying to send trace. Giving up. Trace will be lost.");
     }
 
 

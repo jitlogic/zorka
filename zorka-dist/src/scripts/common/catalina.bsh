@@ -34,12 +34,13 @@ __catalina() {
       http._trace ? tracer.attr("STATUS", "STATUS") : null,
       http._trace ? tracer.filterBy("STATUS", null, http._errors, null, null) : null,
       http._params ? http.param_processor() : spy.put("PARAMS", ""),
+      http._cookies ? http.cookies_processor() : spy.put("COOKIES", ""),
       http._slow ? spy.subchain(
         spy.longerThan(zorka.longCfg("http.slow.time")),
         spy.trapperCollector(http.slow_ft, zorka.INFO, "HTTP", zorka.stringCfg("http.slow.format"))) : null,
       spy.subchain(
         spy.valSetFilter("STATUS", http._errors),
-        http._trace ? http.error_marker() : null,
+        http.error_marker(),
         http._trace ? tracer.flags(tracer.ERROR_MARK|tracer.SUBMIT_TRACE) : null,
         spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format"))),
       http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", http._action) : null)

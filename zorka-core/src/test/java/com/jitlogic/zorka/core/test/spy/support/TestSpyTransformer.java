@@ -44,13 +44,13 @@ public class TestSpyTransformer extends SpyClassTransformer {
     }
 
     @Override
-    protected ClassVisitor createVisitor(String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
+    protected ClassVisitor createVisitor(ClassLoader classLoader, String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
 
         if (debug) {
-            return new SpyClassVisitor(this, sreg, className, found,
+            return new SpyClassVisitor(this, classLoader, sreg, className, found,
                     tracer, new TraceClassVisitor(cw, new PrintWriter(System.out, true)));
         } else {
-            return new SpyClassVisitor(this, sreg, className, found, tracer, cw);
+            return new SpyClassVisitor(this, classLoader, sreg, className, found, tracer, cw);
         }
 
     }

@@ -75,11 +75,15 @@ if (zorka.boolCfg("tracer", false)) {
   }
 
   if (zorka.boolCfg("tracer.net", false)) {
-    tracer.output(tracer.toCentral(
+    tracer.output(tracer.toZico(
       zorka.stringCfg("tracer.net.addr", "127.0.0.1"),
       zorka.intCfg("tracer.net.port", 8640),
       zorka.stringCfg("tracer.net.host", zorka.getHostname()),
-      zorka.stringCfg("tracer.net.pass", "changeme")));
+      zorka.stringCfg("tracer.net.pass", "changeme"),
+      zorka.intCfg("tracer.net.qlen", 64),
+      zorka.intCfg("tracer.net.retries", 10),
+      zorka.intCfg("tracer.net.retry.time", 125L),
+      zorka.intCfg("tracer.net.retry.exp", 2L)));
   }
 
   if (zorka.hasCfg("tracer.min.method.time")) {
