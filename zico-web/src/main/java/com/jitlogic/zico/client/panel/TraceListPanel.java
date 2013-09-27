@@ -346,7 +346,9 @@ public class TraceListPanel extends VerticalLayoutContainer {
             public void onSelect(SelectEvent event) {
                 GWT.log("Setting filter to " + txtFilter.getText());
                 filter.setFilterExpr(txtFilter.getText());
-                filter.setTraceId(cmbTraceType.getCurrentValue());
+                if (cmbTraceType.getCurrentValue() != null) {
+                    filter.setTraceId(cmbTraceType.getCurrentValue());
+                }
                 if (txtDuration.getCurrentValue() != null) {
                     filter.setMinTime((long) (txtDuration.getCurrentValue() * 1000000000L));
                 } else {
@@ -369,6 +371,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
                 txtFilter.setText("");
                 txtDuration.setText("");
                 btnErrors.setValue(false);
+                cmbTraceType.setValue(null);
 
                 filter.setErrorsOnly(false);
                 filter.setMinTime(0);
