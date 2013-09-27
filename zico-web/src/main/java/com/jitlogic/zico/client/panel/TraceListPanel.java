@@ -407,7 +407,8 @@ public class TraceListPanel extends VerticalLayoutContainer {
         mnuMethodAttrs.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
-                MethodAttrsDialog dialog = new MethodAttrsDialog(traceGrid.getSelectionModel().getSelectedItem());
+                TraceInfo ti = traceGrid.getSelectionModel().getSelectedItem();
+                MethodAttrsDialog dialog = panelFactory.methodAttrsDialog(ti.getHostId(), ti.getDataOffs(), "", 0L);
                 dialog.show();
             }
         });

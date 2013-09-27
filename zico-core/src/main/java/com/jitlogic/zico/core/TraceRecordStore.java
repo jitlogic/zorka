@@ -105,7 +105,7 @@ public class TraceRecordStore {
                 && (0 == (expr.getFlags() & TraceDetailSearchExpression.METHODS_WITH_ATTRS) || tr.numAttrs() > 0);
 
         if (matches) {
-            result.add(packTraceRecord(tr, path));
+            result.add(packTraceRecord(tr, path, 250));
         }
 
         for (int i = 0; i < tr.numChildren(); i++) {
@@ -175,7 +175,7 @@ public class TraceRecordStore {
     }
 
 
-    public TraceRecordInfo packTraceRecord(TraceRecord tr, String path) {
+    public TraceRecordInfo packTraceRecord(TraceRecord tr, String path, Integer attrLimit) {
         TraceRecordInfo info = new TraceRecordInfo();
 
         info.setCalls(tr.getCalls());
@@ -190,8 +190,8 @@ public class TraceRecordStore {
             Map<String, String> nattr = new HashMap<String, String>();
             for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
                 String s = "" + e.getValue();
-                if (s.length() > 250) {
-                    s = s.substring(0, 250) + "...";
+                if (attrLimit != null && s.length() > attrLimit) {
+                    s = s.substring(0, attrLimit) + "...";
                 }
                 nattr.put(symbolRegistry.symbolName(e.getKey()), s);
             }

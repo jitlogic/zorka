@@ -82,7 +82,7 @@ public class TraceDataService {
             @DefaultValue("") @QueryParam("path") String path) {
 
         TraceRecordStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
-        return ctx.packTraceRecord(ctx.getTraceRecord(path, minTime), path);
+        return ctx.packTraceRecord(ctx.getTraceRecord(path, minTime), path, null);
     }
 
 
@@ -106,10 +106,10 @@ public class TraceDataService {
 
         if (path != null) {
             for (int i = 0; i < tr.numChildren(); i++) {
-                lst.add(ctx.packTraceRecord(tr.getChild(i), path.length() > 0 ? (path + "/" + i) : "" + i));
+                lst.add(ctx.packTraceRecord(tr.getChild(i), path.length() > 0 ? (path + "/" + i) : "" + i, 250));
             }
         } else {
-            lst.add(ctx.packTraceRecord(tr, ""));
+            lst.add(ctx.packTraceRecord(tr, "", 250));
         }
 
         return lst;
