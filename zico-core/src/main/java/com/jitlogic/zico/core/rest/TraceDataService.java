@@ -159,4 +159,16 @@ public class TraceDataService {
     public void deleteHost(@PathParam("hostId") int hostId) throws IOException {
         storeManager.delete(hostId);
     }
+
+
+    @GET
+    @Path("/{hostId: [0-9]+}/{traceOffs: [0-9]+}/rank")
+    public List<MethodRankInfo> traceMethodRank(
+            @PathParam("hostId") int hostId,
+            @PathParam("traceOffs") long traceOffs,
+            @DefaultValue("calls") @QueryParam("orderBy") String orderBy,
+            @DefaultValue("DESC") @QueryParam("orderDesc") String orderDesc) {
+        TraceRecordStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
+        return ctx.methodRank(orderBy, orderDesc);
+    }
 }

@@ -19,14 +19,12 @@ package com.jitlogic.zico.core;
 import com.jitlogic.zico.data.*;
 import com.jitlogic.zico.core.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.*;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.FressianReader;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static com.jitlogic.zico.data.TraceDetailSearchExpression.*;
@@ -208,4 +206,129 @@ public class TraceRecordStore {
     }
 
 
+    private void makeHistogram(Map<String, MethodRankInfo> histogram, TraceRecord tr) {
+        String id = "" + tr.getClassId() + "." + tr.getMethodId() + "." + tr.getSignatureId();
+
+        MethodRankInfo mri = histogram.get(id);
+        if (mri == null) {
+            mri = new MethodRankInfo();
+            mri.setMethod(ZicoUtil.prettyPrint(tr, symbolRegistry));
+            mri.setMinTime(Long.MAX_VALUE);
+            mri.setMaxTime(Long.MIN_VALUE);
+            mri.setMinBareTime(Long.MAX_VALUE);
+            mri.setMaxBareTime(Long.MIN_VALUE);
+            histogram.put(id, mri);
+        }
+
+        mri.setCalls(mri.getCalls() + 1);
+        if (tr.getException() != null || tr.hasFlag(TraceRecord.EXCEPTION_PASS | TraceRecord.EXCEPTION_WRAP)) {
+            mri.setErrors(mri.getErrors() + 1);
+        }
+        mri.setTime(mri.getTime() + tr.getTime());
+        mri.setMinTime(Math.min(mri.getMinTime(), tr.getTime()));
+        mri.setMaxTime(Math.max(mri.getMaxTime(), tr.getTime()));
+
+        long bareTime = tr.getTime();
+
+        if (tr.numChildren() > 0) {
+            for (TraceRecord c : tr.getChildren()) {
+                makeHistogram(histogram, c);
+                bareTime -= c.getTime();
+            }
+        }
+
+        mri.setBareTime(mri.getBareTime() + bareTime);
+        mri.setMinBareTime(Math.min(mri.getMinBareTime(), bareTime));
+        mri.setMaxBareTime(Math.max(mri.getMaxBareTime(), bareTime));
+    }
+
+
+    private static final Map<String, Comparator<MethodRankInfo>> RANK_COMPARATORS = ZorkaUtil.map(
+            "calls.DESC",
+            new Comparator<MethodRankInfo>() {
+                @Override
+                public int compare(MethodRankInfo o1, MethodRankInfo o2) {
+                    long l = o2.getCalls() - o1.getCalls();
+                    return l == 0 ? 0 : (l > 0 ? 1 : -1);
+                }
+            },
+            "calls.ASC",
+            new Comparator<MethodRankInfo>() {
+                @Override
+                public int compare(MethodRankInfo o1, MethodRankInfo o2) {
+                    long l = o1.getCalls() - o2.getCalls();
+                    return l == 0 ? 0 : (l > 0 ? 1 : -1);
+                }
+            },
+            "errors.DESC",
+            new Comparator<MethodRankInfo>() {
+                @Override
+                public int compare(MethodRankInfo o1, MethodRankInfo o2) {
+                    long l = o2.getErrors() - o1.getErrors();
+                    return l == 0 ? 0 : (l > 0 ? 1 : -1);
+                }
+            },
+            "errors.ASC",
+            new Comparator<MethodRankInfo>() {
+                @Override
+                public int compare(MethodRankInfo o1, MethodRankInfo o2) {
+                    long l = o1.getErrors() - o2.getErrors();
+                    return l == 0 ? 0 : (l > 0 ? 1 : -1);
+                }
+            },
+            "time.DESC",
+            new Comparator<MethodRankInfo>() {
+                @Override
+                public int compare(MethodRankInfo o1, MethodRankInfo o2) {
+                    long l = o2.getTime() - o1.getTime();
+                    return l == 0 ? 0 : (l > 0 ? 1 : -1);
+                }
+            },
+            "time.ASC",
+            new Comparator<MethodRankInfo>() {
+                @Override
+                public int compare(MethodRankInfo o1, MethodRankInfo o2) {
+                    long l = o1.getTime() - o2.getTime();
+                    return l == 0 ? 0 : (l > 0 ? 1 : -1);
+                }
+            },
+            "avgTime.DESC",
+            new Comparator<MethodRankInfo>() {
+                @Override
+                public int compare(MethodRankInfo o1, MethodRankInfo o2) {
+                    long l = o2.getAvgTime() - o1.getAvgTime();
+                    return l == 0 ? 0 : (l > 0 ? 1 : -1);
+                }
+            },
+            "avgTime.ASC",
+            new Comparator<MethodRankInfo>() {
+                @Override
+                public int compare(MethodRankInfo o1, MethodRankInfo o2) {
+                    long l = o1.getAvgTime() - o2.getAvgTime();
+                    return l == 0 ? 0 : (l > 0 ? 1 : -1);
+                }
+            }
+    );
+
+    public List<MethodRankInfo> methodRank(String orderBy, String orderDesc) {
+        TraceRecord tr = getTraceRecord("", 0);
+
+        Map<String, MethodRankInfo> histogram = new HashMap<String, MethodRankInfo>();
+
+        if (tr != null) {
+            makeHistogram(histogram, tr);
+        }
+
+        List<MethodRankInfo> result = new ArrayList<MethodRankInfo>(histogram.size());
+        result.addAll(histogram.values());
+
+        String key = orderBy + "." + orderDesc;
+        Comparator<MethodRankInfo> comparator = RANK_COMPARATORS.get(key);
+
+        if (comparator != null) {
+            Collections.sort(result, comparator);
+        }
+
+        return result;
+    }
 }

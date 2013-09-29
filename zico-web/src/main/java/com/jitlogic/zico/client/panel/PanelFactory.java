@@ -33,4 +33,6 @@ public interface PanelFactory {
     public TraceRecordSearchDialog traceRecordSearchDialog(TraceDetailPanel panel, TraceInfo trace);
 
     public MethodAttrsDialog methodAttrsDialog(Integer hostId, Long dataOffs, String path, @Assisted("minTime") Long minTime);
+
+    public MethodRankingPanel methodRankingPanel(TraceInfo traceInfo);
 }
