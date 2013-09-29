@@ -13,9 +13,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.common.test;
+package com.jitlogic.zico.test;
 
 
+import com.jitlogic.zico.core.ZicoService;
 import com.jitlogic.zorka.common.test.support.TestZicoProcessor;
 import com.jitlogic.zorka.common.test.support.TestZicoProcessorFactory;
 import com.jitlogic.zorka.common.tracedata.Symbol;

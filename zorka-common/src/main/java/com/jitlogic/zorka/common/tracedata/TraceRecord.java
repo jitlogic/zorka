@@ -472,4 +472,10 @@ public class TraceRecord implements SymbolicRecord {
                 && 0 == (flags & TRACE_BEGIN)
                 && children != null && children.size() == 1;
     }
+
+    @Override
+    public String toString() {
+        return "TraceRecord(classId=" + classId + ", methodId=" + methodId
+                + ", traceId=" + (marker != null ? marker.getTraceId() : "<null>");
+    }
 }

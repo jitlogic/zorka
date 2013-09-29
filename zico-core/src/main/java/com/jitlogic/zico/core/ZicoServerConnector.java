@@ -13,10 +13,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.common.zico;
+package com.jitlogic.zico.core;
 
 
 import com.jitlogic.zorka.common.tracedata.HelloRequest;
+import com.jitlogic.zorka.common.zico.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.jitlogic.zorka.common.zico.ZicoPacket.*;
 
@@ -26,6 +29,8 @@ import java.net.Socket;
 import java.util.List;
 
 public class ZicoServerConnector extends ZicoConnector implements Runnable {
+
+    private static final Logger log = LoggerFactory.getLogger(ZicoServerConnector.class);
 
     private ZicoDataProcessorFactory factory;
     private ZicoDataProcessor context = null;
@@ -48,28 +53,32 @@ public class ZicoServerConnector extends ZicoConnector implements Runnable {
                 break;
             }
             case ZICO_HELLO: {
-                List<Object> lst = ZicoUtil.unpack(pkt.getData());
+                List<Object> lst = com.jitlogic.zorka.common.zico.ZicoUtil.unpack(pkt.getData());
+                log.debug("Encountered ZICO HELLO packet: " + lst);
                 if (lst.size() > 0 && lst.get(0) instanceof HelloRequest) {
                     context = factory.get(socket, (HelloRequest) lst.get(0));
                     send(ZICO_OK);
                 } else {
-                    // TODO log here
+                    log.error("ZICO_HELLO packet with invalid content: " + lst);
                     send(ZICO_BAD_REQUEST);
                 }
                 break;
             }
             case ZICO_DATA: {
+                log.debug("Received ZICO data packet: status=" + pkt.getStatus() + ", dlen=" + pkt.getData().length);
                 if (context != null) {
-                    for (Object o : ZicoUtil.unpack(pkt.getData())) {
+                    for (Object o : com.jitlogic.zorka.common.zico.ZicoUtil.unpack(pkt.getData())) {
                         context.process(o);
                     }
                     send(ZICO_OK);
                 } else {
+                    log.error("Client " + socket.getInetAddress() + " not authorized.");
                     send(ZICO_AUTH_ERROR);
                 }
                 break;
             }
             default:
+                log.error("ZICO packet from " + socket.getInetAddress() + " with invalid status code: " + pkt.getStatus());
                 send(ZICO_BAD_REQUEST);
                 break;
         }
@@ -83,17 +92,16 @@ public class ZicoServerConnector extends ZicoConnector implements Runnable {
                 runCycle();
             }
         } catch (EOFException e) {
-            //log.info()
+            log.info("Client disconnected.");
         } catch (ZicoException ze) {
-            ze.printStackTrace();
+            log.error("Got ZICO exception: (status=" + ze.getStatus() + ")", ze);
             try {
                 send(ze.getStatus());
             } catch (IOException e) {
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error in client connection main loop", e);
             running = false;
-            //e.printStackTrace();
         } finally {
             try {
                 close();

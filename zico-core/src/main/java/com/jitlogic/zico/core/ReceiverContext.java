@@ -58,14 +58,21 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
     @Override
     public synchronized void process(Object obj) throws IOException {
-        if (obj instanceof Symbol) {
-            processSymbol((Symbol) obj);
-        } else if (obj instanceof TraceRecord) {
-            processTraceRecord((TraceRecord) obj);
-        } else {
-            if (obj != null) {
-                log.warn("Unsupported object type:" + obj.getClass());
+        try {
+            if (obj instanceof Symbol) {
+                processSymbol((Symbol) obj);
+            } else if (obj instanceof TraceRecord) {
+                log.debug("Processing trace record:" + obj);
+                processTraceRecord((TraceRecord) obj);
+            } else {
+                if (obj != null) {
+                    log.warn("Unsupported object type:" + obj.getClass());
+                } else {
+                    log.warn("Attempted processing NULL object (?)");
+                }
             }
+        } catch (Exception e) {
+            log.error("Error processing trace record: ", e);
         }
     }
 
