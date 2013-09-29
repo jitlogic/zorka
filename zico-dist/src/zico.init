@@ -29,7 +29,7 @@ if [ -z "$ZICO_HOME" ] ; then
 fi
 
 # Check if ZICO installation is correct ...
-for F in zico.conf zico.properties zico.war ; do
+for F in zico.properties zico.war ; do
     if [ ! -f $ZICO_HOME/$F ] ; then
         echo "Incomplete collector installation: missing $F file in $ZICO_HOME."
     fi
