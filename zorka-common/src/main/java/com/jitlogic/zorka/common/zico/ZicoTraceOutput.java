@@ -73,16 +73,22 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
     @Override
     protected void process(SymbolicRecord record) {
         long rt = retryTime;
+        log.debug(ZorkaLogger.ZTR_TRACER_DBG, "Processing record: " + record);
         for (int i = 0; i < retries; i++) {
             try {
                 os.reset();
                 writer.softReset();
                 writer.write(record);
                 if (!conn.isOpen()) {
+                    log.debug(ZorkaLogger.ZTR_TRACER_DBG,
+                            "Opening connection to " + conn.getAddr() + ":" + conn.getPort());
                     conn.connect();
                 }
-                conn.send(ZicoPacket.ZICO_DATA, os.toByteArray());
+                byte[] data = os.toByteArray();
+                log.debug(ZorkaLogger.ZTR_TRACER_DBG, "Sending ZICO packet: len=" + data.length);
+                conn.send(ZicoPacket.ZICO_DATA, data);
                 ZicoPacket rslt = conn.recv();
+                log.debug(ZorkaLogger.ZTR_TRACER_DBG, "Received response: status=" + rslt.getStatus());
                 if (rslt.getStatus() != ZicoPacket.ZICO_OK) {
                     throw new ZicoException(rslt.getStatus(), "Error submitting data.");
                 }
@@ -94,6 +100,7 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
             }
 
             try {
+                log.debug(ZorkaLogger.ZTR_TRACER_DBG, "Will retry (wait=" + rt + ")");
                 Thread.sleep(rt);
             } catch (InterruptedException e) {
 
@@ -113,7 +120,8 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
             conn.connect();
             conn.hello(hostname, auth);
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZCL_STORE, "Error connecting " + conn.getAddr() + ":" + conn.getPort(), e);
+            log.error(ZorkaLogger.ZCL_STORE, "Error connecting " + conn.getAddr() + ":" + conn.getPort()
+                    + ": " + e.getMessage() + "       (will reconnect later)");
         }
     }
 
