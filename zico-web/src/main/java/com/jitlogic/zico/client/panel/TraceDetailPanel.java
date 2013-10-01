@@ -398,6 +398,9 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
         methodTree.getView().setAutoExpandColumn(methodCol);
         methodTree.getView().setForceFit(true);
 
+        methodTree.getStyle().setJointOpenIcon(Resources.INSTANCE.treePlusIcon());
+        methodTree.getStyle().setJointCloseIcon(Resources.INSTANCE.treeMinusIcon());
+
         expander.initPlugin(methodTree);
 
         methodTree.addCellDoubleClickHandler(new CellDoubleClickEvent.CellDoubleClickHandler() {
