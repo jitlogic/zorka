@@ -190,6 +190,11 @@ public class TracerLib {
     }
 
 
+    public void newFlags(int flags) {
+        tracer.getHandler().markTraceFlags(flags);
+    }
+
+
     /**
      * Creates spy processor that sets flags in trace marker only if given record field is null.
      *
@@ -278,7 +283,7 @@ public class TracerLib {
 
     public void filterTrace(boolean decision) {
         TraceBuilder builder = (TraceBuilder) tracer.getHandler();
-        builder.markTraceFlag(decision ? TraceMarker.SUBMIT_TRACE : TraceMarker.DROP_TRACE);
+        builder.markTraceFlags(decision ? TraceMarker.SUBMIT_TRACE : TraceMarker.DROP_TRACE);
     }
 
 

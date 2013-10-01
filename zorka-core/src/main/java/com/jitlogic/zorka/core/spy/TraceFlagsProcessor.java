@@ -20,13 +20,19 @@ import java.util.Map;
 
 public class TraceFlagsProcessor implements SpyProcessor {
 
-    /** Tracer object */
+    /**
+     * Tracer object
+     */
     private Tracer tracer;
 
-    /** source field name */
+    /**
+     * source field name
+     */
     private String checkField;
 
-    /** flags to be set */
+    /**
+     * flags to be set
+     */
     private int flags;
 
     public TraceFlagsProcessor(Tracer tracer, String checkField, int flags) {
@@ -39,7 +45,7 @@ public class TraceFlagsProcessor implements SpyProcessor {
     public Map<String, Object> process(Map<String, Object> record) {
 
         if (checkField == null || record.get(checkField) != null) {
-            ((TraceBuilder)(tracer.getHandler())).markTraceFlag(flags);
+            ((TraceBuilder) (tracer.getHandler())).markTraceFlags(flags);
         }
 
         return record;
