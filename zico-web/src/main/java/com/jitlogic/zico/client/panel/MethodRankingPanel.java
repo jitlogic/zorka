@@ -118,7 +118,7 @@ public class MethodRankingPanel extends VerticalLayoutContainer {
         colAvgBareTime.setMenuDisabled(true);
 
         ColumnModel<MethodRankInfo> model = new ColumnModel<MethodRankInfo>(Arrays.<ColumnConfig<MethodRankInfo, ?>>asList(
-                colMethod, colCalls, colErrors, colTime, colMinTime, colMaxTime, colAvgTime, colBareTime, colAvgBareTime
+                colCalls, colErrors, colTime, colMinTime, colMaxTime, colAvgTime, colBareTime, colAvgBareTime, colMethod
         ));
 
         rankStore = new ListStore<MethodRankInfo>(props.key());

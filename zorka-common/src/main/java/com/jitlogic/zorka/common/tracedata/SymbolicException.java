@@ -30,19 +30,27 @@ import java.io.IOException;
 public class SymbolicException implements SymbolicRecord {
 
 
-    /** Exception class name symbol ID */
+    /**
+     * Exception class name symbol ID
+     */
     private int classId;
 
 
-    /** Exception message text */
+    /**
+     * Exception message text
+     */
     private String message;
 
 
-    /** Stack trace consists of (class-name),(method-name),(line-number) triples. */
+    /**
+     * Stack trace consists of (class-name),(method-name),(line-number) triples.
+     */
     private SymbolicStackElement[] stackTrace;
 
 
-    /** Cause (inner exception) */
+    /**
+     * Cause (inner exception)
+     */
     private SymbolicException cause;
 
 
@@ -50,7 +58,6 @@ public class SymbolicException implements SymbolicRecord {
      * Creates new symbolic exception object.
      *
      * @param classId class ID
-     *
      * @param message error message
      */
     public SymbolicException(int classId, String message, SymbolicStackElement[] stackTrace, SymbolicException cause) {
@@ -65,7 +72,6 @@ public class SymbolicException implements SymbolicRecord {
      * Creates new symbolic exception object from local throwable object.
      *
      * @param exception
-     *
      * @param symbols
      */
     private SymbolicException(Throwable exception, SymbolRegistry symbols, SymbolicException cause) {
@@ -120,9 +126,9 @@ public class SymbolicException implements SymbolicRecord {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof SymbolicException) {
-            SymbolicException sex = (SymbolicException)obj;
+            SymbolicException sex = (SymbolicException) obj;
 
-            if (sex.classId != classId || !ZorkaUtil.objEquals(sex.message,  message) ||
+            if (sex.classId != classId || !ZorkaUtil.objEquals(sex.message, message) ||
                     !ZorkaUtil.objEquals(sex.cause, cause) || sex.stackTrace.length != stackTrace.length) {
                 return false;
             }
@@ -159,7 +165,7 @@ public class SymbolicException implements SymbolicRecord {
 
     @Override
     public void traverse(MetadataChecker checker) throws IOException {
-        classId = checker.checkSymbol(classId);
+        classId = checker.checkSymbol(classId, this);
         for (SymbolicStackElement el : stackTrace) {
             el.traverse(checker);
         }

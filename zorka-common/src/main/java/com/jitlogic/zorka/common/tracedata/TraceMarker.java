@@ -16,11 +16,13 @@
 
 package com.jitlogic.zorka.common.tracedata;
 
+import java.io.IOException;
+
 /**
  * Trace marker object marks beginning of a new trace. It can be attached
  * to current trace record at the beginning of a trace.
  */
-public class TraceMarker {
+public class TraceMarker implements SymbolicRecord {
 
     /**
      * Minimum trace execution time required to further process trace
@@ -144,9 +146,11 @@ public class TraceMarker {
         return flags;
     }
 
+
     public boolean hasFlag(int flag) {
         return 0 != (flags & flag);
     }
+
 
     public void setFlags(int flags) {
         this.flags = flags;
@@ -160,5 +164,11 @@ public class TraceMarker {
 
     public void markFlags(int flag) {
         this.flags |= flag;
+    }
+
+
+    @Override
+    public void traverse(MetadataChecker checker) throws IOException {
+        traceId = checker.checkSymbol(traceId, this);
     }
 }

@@ -42,7 +42,8 @@ public class FressianTraceFormatUnitTest {
 
     private TraceOutput mkf(final OutputStream output) {
         return new TraceOutput() {
-            @Override public OutputStream getOutputStream() {
+            @Override
+            public OutputStream getOutputStream() {
                 return output;
             }
         };
@@ -75,14 +76,14 @@ public class FressianTraceFormatUnitTest {
 
     @Before
     public void setUp() {
-        writer  = new FressianTraceWriter(symbols, metrics);
+        writer = new FressianTraceWriter(symbols, metrics);
         writer.setOutput(mkf(output));
     }
 
     @Test
     public void testReadWriteSimpleSymbol() throws Exception {
         symbols.put(10, "oja!");
-        writer.checkSymbol(10);
+        writer.checkSymbol(10, null);
 
         assertThat(reader().readObject()).isEqualTo(new Symbol(10, "oja!"));
     }
@@ -111,8 +112,8 @@ public class FressianTraceFormatUnitTest {
     @Test
     public void testReadWriteMetricTemplateWithAttrs() throws Exception {
         MetricTemplate mt = metrics.getTemplate(
-            new MetricTemplate(0, MetricTemplate.WINDOWED_RATE, "Test Metric", "m/s", "nomNom", "divDiv")
-                .dynamicAttrs("a", "b", "c", "d"));
+                new MetricTemplate(0, MetricTemplate.WINDOWED_RATE, "Test Metric", "m/s", "nomNom", "divDiv")
+                        .dynamicAttrs("a", "b", "c", "d"));
 
         writer.checkTemplate(mt.getId());
 
@@ -125,30 +126,31 @@ public class FressianTraceFormatUnitTest {
     @Test
     public void testReadWriteMetric() throws Exception {
         MetricTemplate mt = metrics.getTemplate(
-            new MetricTemplate(0, MetricTemplate.RAW_DATA, "Test Metric", "m/s", "nomNom", "divDiv"));
+                new MetricTemplate(0, MetricTemplate.RAW_DATA, "Test Metric", "m/s", "nomNom", "divDiv"));
 
         Metric m = metrics.getMetric(
-            new RawDataMetric(0, mt.getId(), "Test", ZorkaUtil.<String,Object>map("a", 1, "b", 2)));
+                new RawDataMetric(0, mt.getId(), "Test", ZorkaUtil.<String, Object>map("a", 1, "b", 2)));
 
-        m.setTemplate(mt); m.setTemplateId(mt.getId());
+        m.setTemplate(mt);
+        m.setTemplateId(mt.getId());
 
         writer.checkMetric(m.getId());
 
         FressianReader reader = reader();
 
-        MetricTemplate mt2 = (MetricTemplate)reader.readObject();
-        Metric m2 = (Metric)reader.readObject();
+        MetricTemplate mt2 = (MetricTemplate) reader.readObject();
+        Metric m2 = (Metric) reader.readObject();
 
         assertThat(m2).isInstanceOfAny(RawDataMetric.class);
 
         assertThat(m2.getId()).isEqualTo(m.getId());
         assertThat(m2.getName()).isEqualTo(m.getName());
-        assertThat(m2.getAttrs()).isEqualTo(ZorkaUtil.<String,Object>constMap("a", 1L, "b", 2L));
+        assertThat(m2.getAttrs()).isEqualTo(ZorkaUtil.<String, Object>constMap("a", 1L, "b", 2L));
     }
 
     public TraceRecord tr(String className, String methodName, String methodSignature,
                           long calls, long errors, int flags, long time,
-                          TraceRecord...children) {
+                          TraceRecord... children) {
         TraceRecord tr = new TraceRecord(null);
         tr.setClassId(sid(className));
         tr.setMethodId(sid(methodName));
@@ -180,12 +182,12 @@ public class FressianTraceFormatUnitTest {
         Object obj = reader.readObject();
 
         while (obj instanceof Symbol) {
-            Symbol s = (Symbol)obj;
+            Symbol s = (Symbol) obj;
             assertThat(s.getId()).isEqualTo(sid(s.getName()));
             obj = reader.readObject();
         }
 
-        TraceRecord tr2 = (TraceRecord)obj;
+        TraceRecord tr2 = (TraceRecord) obj;
         assertThat(tr2.getFlags()).isEqualTo(TraceRecord.EXCEPTION_PASS);
         assertThat(tr2.getCalls()).isEqualTo(tr.getCalls());
         assertThat(tr2.getTime()).isEqualTo(tr.getTime());
@@ -196,7 +198,8 @@ public class FressianTraceFormatUnitTest {
     public void testReadWriteTraceRecordWithMarker() throws Exception {
         TraceRecord tr = tr("some.Class", "someMethod", "()V", 1, 0, TraceRecord.TRACE_BEGIN, 100);
         TraceMarker tm = new TraceMarker(tr, sid("TRACE"), 100L);
-        tm.setFlags(TraceMarker.OVERFLOW_FLAG); tr.setMarker(tm);
+        tm.setFlags(TraceMarker.OVERFLOW_FLAG);
+        tr.setMarker(tm);
 
         writer.write(tr);
 
@@ -207,13 +210,13 @@ public class FressianTraceFormatUnitTest {
         Set<Integer> ids = new HashSet<Integer>();
 
         while (obj instanceof Symbol) {
-            Symbol s = (Symbol)obj;
+            Symbol s = (Symbol) obj;
             assertThat(s.getId()).isEqualTo(sid(s.getName()));
             obj = reader.readObject();
             ids.add(s.getId());
         }
 
-        TraceRecord tr2 = (TraceRecord)obj;
+        TraceRecord tr2 = (TraceRecord) obj;
         assertThat(tr2.getFlags()).isEqualTo(TraceRecord.TRACE_BEGIN);
 
         TraceMarker tm2 = tr2.getMarker();
@@ -231,8 +234,8 @@ public class FressianTraceFormatUnitTest {
     @Test
     public void testReadWriteRecursiveTrace() throws Exception {
         TraceRecord tr =
-            tr("some.Class", "someMethod", "()V", 2, 0, 0, 100,
-                tr("other.Class", "otherMethod", "()V", 1, 0, 0, 50));
+                tr("some.Class", "someMethod", "()V", 2, 0, 0, 100,
+                        tr("other.Class", "otherMethod", "()V", 1, 0, 0, 50));
 
         writer.write(tr);
 
@@ -241,12 +244,12 @@ public class FressianTraceFormatUnitTest {
         Object obj = reader.readObject();
 
         while (obj instanceof Symbol) {
-            Symbol s = (Symbol)obj;
+            Symbol s = (Symbol) obj;
             assertThat(s.getId()).isEqualTo(sid(s.getName()));
             obj = reader.readObject();
         }
 
-        TraceRecord tr2 = (TraceRecord)obj;
+        TraceRecord tr2 = (TraceRecord) obj;
         assertThat(tr2.numChildren()).isEqualTo(1);
         assertThat(tr2.getChild(0).getTime()).isEqualTo(50L);
     }
@@ -268,14 +271,14 @@ public class FressianTraceFormatUnitTest {
         Object obj = reader.readObject();
 
         while (obj instanceof Symbol) {
-            Symbol s = (Symbol)obj;
+            Symbol s = (Symbol) obj;
             assertThat(s.getId()).isEqualTo(sid(s.getName()));
             obj = reader.readObject();
         }
 
-        TraceRecord tr2 = (TraceRecord)obj;
+        TraceRecord tr2 = (TraceRecord) obj;
 
-        SymbolicException se = (SymbolicException)tr2.getException();
+        SymbolicException se = (SymbolicException) tr2.getException();
         assertThat(se.getMessage()).isEqualTo("oja!");
         assertThat(se.getClassId()).isEqualTo(sid("java.lang.Exception"));
         assertThat(se.getStackTrace()).isNotNull();
@@ -298,9 +301,10 @@ public class FressianTraceFormatUnitTest {
                 new MetricTemplate(0, MetricTemplate.RAW_DATA, "Test Metric", "m/s", "nomNom", "divDiv"));
 
         Metric m = metrics.getMetric(
-                new RawDataMetric(0, mt.getId(), "Test", ZorkaUtil.<String,Object>map("a", 1, "b", 2)));
+                new RawDataMetric(0, mt.getId(), "Test", ZorkaUtil.<String, Object>map("a", 1, "b", 2)));
 
-        m.setTemplate(mt); m.setTemplateId(mt.getId());
+        m.setTemplate(mt);
+        m.setTemplateId(mt.getId());
 
         PerfRecord pr = new PerfRecord(100L, sid("PERF"), Arrays.asList(ps(m, 100L, 100L), ps(m, 200L, 200L)));
 
@@ -312,13 +316,13 @@ public class FressianTraceFormatUnitTest {
 
         while (obj != null && !(obj instanceof PerfRecord)) {
             if (obj instanceof Symbol) {
-                Symbol s = (Symbol)obj;
+                Symbol s = (Symbol) obj;
                 assertThat(s.getId()).isEqualTo(sid(s.getName()));
             }
             obj = reader.readObject();
         }
 
-        PerfRecord pr2 = (PerfRecord)obj;
+        PerfRecord pr2 = (PerfRecord) obj;
         assertThat(pr2).isNotNull();
         assertThat(pr2.getClock()).isEqualTo(100L);
         assertThat(pr2.getScannerId()).isEqualTo(sid("PERF"));

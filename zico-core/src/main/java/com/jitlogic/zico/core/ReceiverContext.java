@@ -30,7 +30,9 @@ import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
@@ -46,6 +48,8 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     private int maxAttrLen = 1024;
 
     private ObjectMapper mapper = new ObjectMapper();
+
+    private Set<Object> visitedObjects = new HashSet<Object>();
 
 
     public ReceiverContext(DataSource ds, HostStore store) {
@@ -176,7 +180,14 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
 
     @Override
-    public int checkSymbol(int symbolId) throws IOException {
+    public int checkSymbol(int symbolId, Object owner) throws IOException {
+        if (owner instanceof TraceMarker) {
+            if (visitedObjects.contains(owner)) {
+                return symbolId;
+            } else {
+                visitedObjects.add(owner);
+            }
+        }
         return sidMap.containsKey(symbolId) ? sidMap.get(symbolId) : 0;
     }
 
@@ -184,6 +195,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     @Override
     public void checkMetric(int metricId) throws IOException {
     }
+
 
     public HostInfo getHostInfo() {
         return hostInfo;

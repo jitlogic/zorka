@@ -32,12 +32,14 @@ public class FressianTraceWriter implements MetadataChecker, TraceWriter {
 
     private static ZorkaLog log = ZorkaLogger.getLog(FressianTraceWriter.class);
 
-    /** Symbol registry used by event sender. */
+    /**
+     * Symbol registry used by event sender.
+     */
     private SymbolRegistry symbols;
 
     private MetricsRegistry metrics;
 
-    BitVector symbolsSent = new BitVector(),  metricsSent = new BitVector(16), templatesSent = new BitVector(16);
+    BitVector symbolsSent = new BitVector(), metricsSent = new BitVector(16), templatesSent = new BitVector(16);
 
     private TraceOutput output;
 
@@ -87,7 +89,7 @@ public class FressianTraceWriter implements MetadataChecker, TraceWriter {
 
 
     @Override
-    public int checkSymbol(int id) throws IOException {
+    public int checkSymbol(int id, Object parent) throws IOException {
         checkOutput();
         if (!symbolsSent.get(id)) {
             String sym = symbols.symbolName(id);
