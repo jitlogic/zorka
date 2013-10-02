@@ -26,6 +26,8 @@ import static com.jitlogic.zorka.common.zico.ZicoPacket.*;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.SocketTimeoutException;
 import java.util.List;
 
 public class ZicoServerConnector extends ZicoConnector implements Runnable {
@@ -35,11 +37,20 @@ public class ZicoServerConnector extends ZicoConnector implements Runnable {
     private ZicoDataProcessorFactory factory;
     private ZicoDataProcessor context = null;
 
+    private SocketAddress saddr;
+
     public ZicoServerConnector(Socket socket, ZicoDataProcessorFactory factory) throws IOException {
         this.socket = socket;
         this.in = socket.getInputStream();
         this.out = socket.getOutputStream();
         this.factory = factory;
+
+        this.saddr = socket.getRemoteSocketAddress();
+
+        // TODO this is a crutch; socket timeout or config object should be supplied by injector;
+        if (factory instanceof HostStoreManager) {
+            this.socket.setSoTimeout(((HostStoreManager) factory).getConfig().intCfg("zico.socket.timeout", 1200000));
+        }
     }
 
     private volatile boolean running = true;
@@ -54,31 +65,32 @@ public class ZicoServerConnector extends ZicoConnector implements Runnable {
             }
             case ZICO_HELLO: {
                 List<Object> lst = com.jitlogic.zorka.common.zico.ZicoUtil.unpack(pkt.getData());
-                log.debug("Encountered ZICO HELLO packet: " + lst);
+                log.debug("Encountered ZICO HELLO packet: " + lst + "(addr=" + saddr + ")");
                 if (lst.size() > 0 && lst.get(0) instanceof HelloRequest) {
                     context = factory.get(socket, (HelloRequest) lst.get(0));
                     send(ZICO_OK);
                 } else {
-                    log.error("ZICO_HELLO packet with invalid content: " + lst);
+                    log.error("ZICO_HELLO packet with invalid content: " + lst + "(addr=" + addr + ")");
                     send(ZICO_BAD_REQUEST);
                 }
                 break;
             }
             case ZICO_DATA: {
-                log.debug("Received ZICO data packet: status=" + pkt.getStatus() + ", dlen=" + pkt.getData().length);
+                log.debug("Received ZICO data packet from " + saddr + ": status=" + pkt.getStatus()
+                        + ", dlen=" + pkt.getData().length);
                 if (context != null) {
                     for (Object o : com.jitlogic.zorka.common.zico.ZicoUtil.unpack(pkt.getData())) {
                         context.process(o);
                     }
                     send(ZICO_OK);
                 } else {
-                    log.error("Client " + socket.getInetAddress() + " not authorized.");
+                    log.error("Client " + saddr + " not authorized.");
                     send(ZICO_AUTH_ERROR);
                 }
                 break;
             }
             default:
-                log.error("ZICO packet from " + socket.getInetAddress() + " with invalid status code: " + pkt.getStatus());
+                log.error("ZICO packet from " + saddr + " with invalid status code: " + pkt.getStatus());
                 send(ZICO_BAD_REQUEST);
                 break;
         }
@@ -91,16 +103,18 @@ public class ZicoServerConnector extends ZicoConnector implements Runnable {
             while (running) {
                 runCycle();
             }
+        } catch (SocketTimeoutException e) {
+            log.info("Client connection " + saddr + " is inactive. Closing.");
         } catch (EOFException e) {
-            log.info("Client disconnected.");
+            log.info("Client " + saddr + " disconnected.");
         } catch (ZicoException ze) {
-            log.error("Got ZICO exception: (status=" + ze.getStatus() + ")", ze);
+            log.error("Got ZICO exception (addr=" + saddr + ", status=" + ze.getStatus() + ")", ze);
             try {
                 send(ze.getStatus());
             } catch (IOException e) {
             }
         } catch (Exception e) {
-            log.error("Error in client connection main loop", e);
+            log.error("Error in client " + saddr + " connection main loop.", e);
             running = false;
         } finally {
             try {

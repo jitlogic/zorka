@@ -27,6 +27,7 @@ import com.jitlogic.zorka.common.util.ZorkaUtil;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.SocketTimeoutException;
 
 public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements TraceOutput {
 
@@ -46,7 +47,7 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
 
 
     public ZicoTraceOutput(TraceWriter writer, String addr, int port, String hostname, String auth,
-                           int qlen, int retries, long retryTime, long retryTimeExp) throws IOException {
+                           int qlen, int retries, long retryTime, long retryTimeExp, int timeout) throws IOException {
         super("zico-output", qlen);
 
         this.hostname = hostname;
@@ -56,7 +57,7 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
         this.retryTime = retryTime;
         this.retryTimeExp = retryTimeExp;
 
-        conn = new ZicoClientConnector(addr, port);
+        conn = new ZicoClientConnector(addr, port, timeout);
 
         this.writer = writer;
         this.os = new ByteArrayOutputStream(512 * 1024);
@@ -93,6 +94,10 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
                     throw new ZicoException(rslt.getStatus(), "Error submitting data.");
                 }
                 return;
+            } catch (SocketTimeoutException e) {
+                log.info(ZorkaLogger.ZCL_STORE, "Resetting collector connection.");
+                this.close();
+                this.open();
             } catch (Exception e) {
                 log.error(ZorkaLogger.ZCL_STORE, "Error sending trace record: " + e + ". Resetting connection.");
                 this.close();

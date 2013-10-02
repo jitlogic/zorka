@@ -49,5 +49,9 @@ public class ZicoBootstrapListener extends GuiceResteasyBootstrapServletContextL
                 }
             }
         });
+
+        // TODO this is a crutch; use injection for instantiating server connection contexts;
+
+
     }
 }
