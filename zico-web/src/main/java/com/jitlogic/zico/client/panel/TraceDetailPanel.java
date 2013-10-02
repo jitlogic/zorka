@@ -240,9 +240,9 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
     public void expandStart(String expandPath) {
         this.expandPath = expandPath;
         String[] s = expandPath.split("/");
-        expandIndexes = new int[s.length - 1];
-        for (int i = 1; i < s.length; i++) {
-            expandIndexes[i - 1] = Integer.parseInt(s[i]);
+        expandIndexes = new int[s.length];
+        for (int i = 0; i < s.length; i++) {
+            expandIndexes[i] = s[i].trim().length() > 0 ? Integer.parseInt(s[i]) : 0;
         }
         expandLevel = 0;
         expandNode = null;
