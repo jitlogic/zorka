@@ -47,8 +47,7 @@ public class SystemService {
         List<String> info = new ArrayList<String>();
 
         // TODO use agent to present these things - it's already there :)
-        info.add("Version: " + config.stringCfg("zico.version", "<null>")
-                + "  (" + config.stringCfg("zico.btstamp", "<null>") + ")");
+        info.add("Version: " + config.stringCfg("zico.version", "<null>"));
 
         MemoryMXBean mem = ManagementFactory.getMemoryMXBean();
 
