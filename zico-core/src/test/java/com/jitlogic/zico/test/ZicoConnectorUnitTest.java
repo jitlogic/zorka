@@ -61,47 +61,6 @@ public class ZicoConnectorUnitTest {
     }
 
 
-    private int signatureTest(int... inputs) throws Exception {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        for (int i : inputs) {
-            bos.write(i);
-        }
-
-        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-        for (int sbyte : ZicoConnector.ZICO_MAGIC) {
-            if (bis.read() != sbyte) {
-                throw new ZicoException(ZicoPacket.ZICO_BAD_REPLY, "Malformed input data: invalid ZICO magic.");
-            }
-        }
-        return bis.read();
-    }
-
-
-    @Test(timeout = 100)
-    public void testSearchValidZicoSignature1() throws Exception {
-        assertEquals("No data after signature.", -1,
-                signatureTest(ZicoConnector.ZICO_MAGIC));
-
-        assertEquals("Some data after signature.", 0x11,
-                signatureTest(0x21, 0xC0, 0xBA, 0xBE, 0x11));
-    }
-
-
-    @Test(timeout = 1000, expected = ZicoException.class)
-    public void testSearchInvalidZicoSignature1() throws Exception {
-        assertEquals("Some garbage before signature.", 0x11,
-                signatureTest(0x10, 0x21, 0xC0, 0xBA, 0xBE, 0x11));
-    }
-
-
-    @Test(timeout = 1000, expected = ZicoException.class)
-    public void testSearchInvalidZicoSignature2() throws Exception {
-        assertEquals("Partial and then complete signature.", 0x11,
-                signatureTest(0x21, 0xC0, 0xBA, 0x21, 0xC0, 0xBA, 0xBE, 0x11));
-    }
-
-
     @Test(timeout = 1000)
     public void testBasicConnectDisconnect() throws Exception {
         service = new ZicoService("127.0.0.1", 8645, factory);
