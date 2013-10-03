@@ -133,6 +133,23 @@ public class TracerLib {
     }
 
 
+    public void traceBegin(String name) {
+        traceBegin(name, 0);
+    }
+
+
+    public void traceBegin(String name, long minimumTraceTime) {
+        traceBegin(name, minimumTraceTime, defaultTraceFlags);
+    }
+
+
+    public void traceBegin(String name, long minimumTraceTime, int flags) {
+        TraceBuilder traceBuilder = tracer.getHandler();
+        traceBuilder.traceBegin(symbolRegistry.symbolId(name), System.currentTimeMillis(), flags);
+        traceBuilder.setMinimumTraceTime(minimumTraceTime);
+    }
+
+
     /**
      * Creates spy processor that attaches attribute to trace record.
      *
