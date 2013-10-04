@@ -140,12 +140,26 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
     @Test
     public void testMatchWithFilterExclusion() {
         SpyMatcherSet sms = new SpyMatcherSet(
-            spy.byMethod("java**", "*").exclude(),
-            spy.byMethod("com.sun.**", "*").exclude(),
-            spy.byMethod("**", "*").forTrace());
+                spy.byMethod("java**", "*").exclude(),
+                spy.byMethod("com.sun.**", "*").exclude(),
+                spy.byMethod("**", "*").forTrace());
 
         Assert.assertTrue(sms.classMatch("org.apache.catalina.Valve"));
         Assert.assertFalse(sms.classMatch("java.util.Properties"));
     }
+
+
+    @Test
+    public void testMatchMethodsWithFilterExclusion() {
+        SpyMatcherSet sms = new SpyMatcherSet(
+                spy.byMethod("com.jitlogic.foo.SomeClass", "some*"),
+                spy.byClass("com.jitlogic.**").exclude(),
+                spy.byClass("**")
+        );
+
+        Assert.assertTrue(sms.methodMatch("com.jitlogic.foo.SomeClass", null, null, 1, "someMethod", "()V", null));
+        Assert.assertFalse(sms.methodMatch("com.jitlogic.foo.SomeClass", null, null, 1, "otherMethod", "()V", null));
+    }
+
 
 }

@@ -27,7 +27,9 @@ import org.junit.Before;
 
 public class BytecodeInstrumentationFixture extends ZorkaFixture {
 
+    public final static String MCLASS0 = "com.jitlogic.zorka.core.test.**";
     public final static String TCLASS1 = "com.jitlogic.zorka.core.test.spy.support.TestClass1";
+    public final static String MCLASS1 = "com.jitlogic.zorka.core.test.spy.support.*Class1";
     public final static String TCLASS2 = "com.jitlogic.zorka.core.test.spy.support.TestClass2";
     public final static String TCLASS3 = "com.jitlogic.zorka.core.test.spy.support.TestClass3";
     public final static String TCLASS4 = "com.jitlogic.zorka.core.test.spy.support.TestClass4";
