@@ -16,7 +16,6 @@
 package com.jitlogic.zico.core;
 
 import com.google.inject.Injector;
-import com.jitlogic.zorka.common.zico.ZicoService;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.jboss.resteasy.plugins.guice.GuiceResteasyBootstrapServletContextListener;
 import org.slf4j.Logger;
@@ -50,5 +49,9 @@ public class ZicoBootstrapListener extends GuiceResteasyBootstrapServletContextL
                 }
             }
         });
+
+        // TODO this is a crutch; use injection for instantiating server connection contexts;
+
+
     }
 }

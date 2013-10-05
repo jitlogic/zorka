@@ -64,7 +64,16 @@ public abstract class ZicoConnector implements Closeable {
     protected ZicoPacket recv() throws IOException {
 
 
-        ZicoUtil.seekSignature(in, ZICO_MAGIC);
+        for (int sbyte : ZICO_MAGIC) {
+            int b;
+            if ((b = in.read()) != sbyte) {
+                if (b != -1) {
+                    throw new ZicoException(ZicoPacket.ZICO_BAD_REPLY, "Malformed input data: invalid ZICO magic.");
+                } else {
+                    throw new ZicoException(ZicoPacket.ZICO_EOD, "Peer disconnected. Try again.");
+                }
+            }
+        }
 
         byte[] b = new byte[HEADER_LENGTH];
         in.read(b);

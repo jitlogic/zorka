@@ -86,4 +86,12 @@ public interface TraceDataApi extends RestService {
     public void deleteHost(@PathParam("hostId") int hostId,
                            MethodCallback<Void> callback);
 
+    @GET
+    @Path("hosts/{hostId}/{traceOffs}/rank?orderBy={orderBy}&orderDesc={orderDesc}")
+    public void traceMethodRank(
+            @PathParam("hostId") int hostId,
+            @PathParam("traceOffs") long traceOffs,
+            @PathParam("orderBy") String orderBy,
+            @PathParam("orderDesc") String orderDesc,
+            MethodCallback<List<MethodRankInfo>> callback);
 }

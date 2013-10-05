@@ -369,9 +369,9 @@ public class TraceRecord implements SymbolicRecord {
 
     @Override
     public void traverse(MetadataChecker checker) throws IOException {
-        classId = checker.checkSymbol(classId);
-        methodId = checker.checkSymbol(methodId);
-        signatureId = checker.checkSymbol(signatureId);
+        classId = checker.checkSymbol(classId, this);
+        methodId = checker.checkSymbol(methodId, this);
+        signatureId = checker.checkSymbol(signatureId, this);
 
         if (exception instanceof SymbolicException) {
             ((SymbolicException) exception).traverse(checker);
@@ -380,7 +380,7 @@ public class TraceRecord implements SymbolicRecord {
         if (attrs != null) {
             Map<Integer, Object> newAttrs = new LinkedHashMap<Integer, Object>();
             for (Map.Entry<Integer, Object> e : attrs.entrySet()) {
-                newAttrs.put(checker.checkSymbol(e.getKey()), e.getValue());
+                newAttrs.put(checker.checkSymbol(e.getKey(), this), e.getValue());
             }
             attrs = newAttrs;
         }
@@ -392,7 +392,7 @@ public class TraceRecord implements SymbolicRecord {
         }
 
         if (marker != null && 0 != (flags & TRACE_BEGIN)) {
-            marker.setTraceId(checker.checkSymbol(marker.getTraceId()));
+            marker.traverse(checker);
         }
     }
 
@@ -471,5 +471,11 @@ public class TraceRecord implements SymbolicRecord {
                 && attrs == null
                 && 0 == (flags & TRACE_BEGIN)
                 && children != null && children.size() == 1;
+    }
+
+    @Override
+    public String toString() {
+        return "TraceRecord(classId=" + classId + ", methodId=" + methodId
+                + ", traceId=" + (marker != null ? marker.getTraceId() : "<null>");
     }
 }

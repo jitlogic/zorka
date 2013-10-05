@@ -245,8 +245,18 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
     private void openDetailView() {
         TraceInfo traceInfo = traceGrid.getSelectionModel().getSelectedItem();
-        TraceDetailPanel detail = panelFactory.traceDetailPanel(traceInfo);
-        shell.get().addView(detail, ClientUtil.formatTimestamp(traceInfo.getClock()) + "@" + selectedHost.getName());
+        if (traceInfo != null) {
+            TraceDetailPanel detail = panelFactory.traceDetailPanel(traceInfo);
+            shell.get().addView(detail, ClientUtil.formatTimestamp(traceInfo.getClock()) + "@" + selectedHost.getName());
+        }
+    }
+
+    private void openRankingView() {
+        TraceInfo traceInfo = traceGrid.getSelectionModel().getSelectedItem();
+        if (traceInfo != null) {
+            MethodRankingPanel ranking = panelFactory.methodRankingPanel(traceInfo);
+            shell.get().addView(ranking, ClientUtil.formatTimestamp(traceInfo.getClock()) + "@" + selectedHost.getName());
+        }
     }
 
 
@@ -346,7 +356,9 @@ public class TraceListPanel extends VerticalLayoutContainer {
             public void onSelect(SelectEvent event) {
                 GWT.log("Setting filter to " + txtFilter.getText());
                 filter.setFilterExpr(txtFilter.getText());
-                filter.setTraceId(cmbTraceType.getCurrentValue());
+                if (cmbTraceType.getCurrentValue() != null) {
+                    filter.setTraceId(cmbTraceType.getCurrentValue());
+                }
                 if (txtDuration.getCurrentValue() != null) {
                     filter.setMinTime((long) (txtDuration.getCurrentValue() * 1000000000L));
                 } else {
@@ -369,6 +381,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
                 txtFilter.setText("");
                 txtDuration.setText("");
                 btnErrors.setValue(false);
+                cmbTraceType.setValue(null);
 
                 filter.setErrorsOnly(false);
                 filter.setMinTime(0);
@@ -398,6 +411,17 @@ public class TraceListPanel extends VerticalLayoutContainer {
             }
         });
 
+        MenuItem mnuMethodRank = new MenuItem("Method call stats");
+        mnuMethodRank.setIcon(Resources.INSTANCE.methodRankIcon());
+        menu.add(mnuMethodRank);
+
+        mnuMethodRank.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                openRankingView();
+            }
+        });
+
         menu.add(new SeparatorMenuItem());
 
         MenuItem mnuMethodAttrs = new MenuItem("Trace Attributes");
@@ -407,10 +431,12 @@ public class TraceListPanel extends VerticalLayoutContainer {
         mnuMethodAttrs.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
-                MethodAttrsDialog dialog = new MethodAttrsDialog(traceGrid.getSelectionModel().getSelectedItem());
+                TraceInfo ti = traceGrid.getSelectionModel().getSelectedItem();
+                MethodAttrsDialog dialog = panelFactory.methodAttrsDialog(ti.getHostId(), ti.getDataOffs(), "", 0L);
                 dialog.show();
             }
         });
+
 
         traceGrid.setContextMenu(menu);
     }

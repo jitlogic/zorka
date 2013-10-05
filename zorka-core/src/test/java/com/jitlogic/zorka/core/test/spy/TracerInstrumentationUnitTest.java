@@ -136,4 +136,18 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         assertEquals("Outer finally { } block didn't execute.", 0, getField(obj, "finals"));
     }
 
+    @Test
+    public void testIfTracerCatchesSpuriousMethodsBUG() throws Exception {
+        tracer.include(spy.byMethod(MCLASS1, "trivia*"));
+        tracer.exclude(spy.byClass(MCLASS0));
+        tracer.include(spy.byClass("**"));
+
+        Object obj = instantiate(engine, TCLASS1);
+        invoke(obj, "errorMethod");
+
+        assertEquals(0, traceBuilder.getData().size());
+
+        invoke(obj, "trivialMethod");
+        assertEquals(2, traceBuilder.getData().size());
+    }
 }

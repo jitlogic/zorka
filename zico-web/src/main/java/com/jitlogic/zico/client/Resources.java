@@ -77,6 +77,15 @@ public interface Resources extends ClientBundle {
     @Source("images/method-attrs.png")
     ImageResource methodAttrsIcon();
 
+    @Source("images/method-rank.png")
+    ImageResource methodRankIcon();
+
+    @Source("images/treePlus.gif")
+    ImageResource treeMinusIcon();
+
+    @Source("images/treeMinus.gif")
+    ImageResource treePlusIcon();
+
     @DataResource.MimeType("text/html")
     @Source("resources/tips.html")
     TextResource tipsHtml();

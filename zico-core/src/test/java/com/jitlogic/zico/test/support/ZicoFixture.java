@@ -25,7 +25,7 @@ import com.jitlogic.zico.core.rest.TraceDataService;
 import com.jitlogic.zorka.common.test.support.TestUtil;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
-import com.jitlogic.zorka.common.zico.ZicoService;
+import com.jitlogic.zico.core.ZicoService;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.junit.After;
 import org.junit.Before;

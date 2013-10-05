@@ -13,9 +13,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.common.test;
+package com.jitlogic.zico.test;
 
 
+import com.jitlogic.zico.core.ZicoService;
 import com.jitlogic.zorka.common.test.support.TestZicoProcessor;
 import com.jitlogic.zorka.common.test.support.TestZicoProcessorFactory;
 import com.jitlogic.zorka.common.tracedata.Symbol;
@@ -57,35 +58,6 @@ public class ZicoConnectorUnitTest {
                 return;
             }
         }
-    }
-
-
-    private int signatureTest(int... inputs) throws Exception {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        for (int i : inputs) {
-            bos.write(i);
-        }
-
-        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-        ZicoUtil.seekSignature(bis, ZicoConnector.ZICO_MAGIC);
-        return bis.read();
-    }
-
-
-    @Test(timeout = 100)
-    public void testSearchZicoSignature1() throws Exception {
-        assertEquals("No data after signature.", -1,
-                signatureTest(ZicoConnector.ZICO_MAGIC));
-
-        assertEquals("Some data after signature.", 0x11,
-                signatureTest(0x21, 0xC0, 0xBA, 0xBE, 0x11));
-
-        assertEquals("Some garbage before signature.", 0x11,
-                signatureTest(0x10, 0x21, 0xC0, 0xBA, 0xBE, 0x11));
-
-        assertEquals("Partial and then complete signature.", 0x11,
-                signatureTest(0x21, 0xC0, 0xBA, 0x21, 0xC0, 0xBA, 0xBE, 0x11));
     }
 
 

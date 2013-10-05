@@ -133,6 +133,23 @@ public class TracerLib {
     }
 
 
+    public void traceBegin(String name) {
+        traceBegin(name, 0);
+    }
+
+
+    public void traceBegin(String name, long minimumTraceTime) {
+        traceBegin(name, minimumTraceTime, defaultTraceFlags);
+    }
+
+
+    public void traceBegin(String name, long minimumTraceTime, int flags) {
+        TraceBuilder traceBuilder = tracer.getHandler();
+        traceBuilder.traceBegin(symbolRegistry.symbolId(name), System.currentTimeMillis(), flags);
+        traceBuilder.setMinimumTraceTime(minimumTraceTime);
+    }
+
+
     /**
      * Creates spy processor that attaches attribute to trace record.
      *
@@ -187,6 +204,11 @@ public class TracerLib {
      */
     public SpyProcessor flags(int flags) {
         return new TraceFlagsProcessor(tracer, null, flags);
+    }
+
+
+    public void newFlags(int flags) {
+        tracer.getHandler().markTraceFlags(flags);
     }
 
 
@@ -249,7 +271,7 @@ public class TracerLib {
 
 
     public ZorkaAsyncThread<SymbolicRecord> toZico(String addr, int port, String hostname, String auth) throws IOException {
-        return toZico(addr, port, hostname, auth, 64, 10, 125, 2);
+        return toZico(addr, port, hostname, auth, 64, 10, 125, 2, 60000);
     }
 
     /**
@@ -263,9 +285,11 @@ public class TracerLib {
      * @throws IOException
      */
     public ZorkaAsyncThread<SymbolicRecord> toZico(String addr, int port, String hostname, String auth,
-                                                   int qlen, int retries, long retryTime, long retryTimeExp) throws IOException {
+                                                   int qlen, int retries, long retryTime, long retryTimeExp,
+                                                   int timeout) throws IOException {
         TraceWriter writer = new FressianTraceWriter(symbolRegistry, metricsRegistry);
-        ZicoTraceOutput output = new ZicoTraceOutput(writer, addr, port, hostname, auth, qlen, retries, retryTime, retryTimeExp);
+        ZicoTraceOutput output = new ZicoTraceOutput(writer, addr, port, hostname, auth, qlen,
+                retries, retryTime, retryTimeExp, timeout);
         output.start();
         return output;
     }
@@ -278,7 +302,7 @@ public class TracerLib {
 
     public void filterTrace(boolean decision) {
         TraceBuilder builder = (TraceBuilder) tracer.getHandler();
-        builder.markTraceFlag(decision ? TraceMarker.SUBMIT_TRACE : TraceMarker.DROP_TRACE);
+        builder.markTraceFlags(decision ? TraceMarker.SUBMIT_TRACE : TraceMarker.DROP_TRACE);
     }
 
 

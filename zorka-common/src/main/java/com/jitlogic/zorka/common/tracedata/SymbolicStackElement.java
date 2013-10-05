@@ -71,7 +71,7 @@ public class SymbolicStackElement implements SymbolicRecord {
     @Override
     public boolean equals(Object ref) {
         if (ref instanceof SymbolicStackElement) {
-            SymbolicStackElement sse = (SymbolicStackElement)ref;
+            SymbolicStackElement sse = (SymbolicStackElement) ref;
             return classId == sse.classId && methodId == sse.methodId && fileId == sse.fileId && lineNum == sse.lineNum;
         } else {
             return false;
@@ -86,8 +86,8 @@ public class SymbolicStackElement implements SymbolicRecord {
 
     @Override
     public void traverse(MetadataChecker checker) throws IOException {
-        classId = checker.checkSymbol(classId);
-        methodId = checker.checkSymbol(methodId);
-        fileId = checker.checkSymbol(fileId);
+        classId = checker.checkSymbol(classId, this);
+        methodId = checker.checkSymbol(methodId, this);
+        fileId = checker.checkSymbol(fileId, this);
     }
 }

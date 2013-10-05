@@ -15,8 +15,10 @@
  */
 package com.jitlogic.zico.core.rest;
 
+import com.jitlogic.zico.core.ZicoConfig;
 import com.jitlogic.zorka.common.ZorkaAgent;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -31,6 +33,12 @@ import java.util.List;
 @Path("system")
 public class SystemService {
 
+    private ZicoConfig config;
+
+    @Inject
+    public SystemService(ZicoConfig config) {
+        this.config = config;
+    }
 
     @GET
     @Path("/info")
@@ -39,6 +47,7 @@ public class SystemService {
         List<String> info = new ArrayList<String>();
 
         // TODO use agent to present these things - it's already there :)
+        info.add("Version: " + config.stringCfg("zico.version", "<null>"));
 
         MemoryMXBean mem = ManagementFactory.getMemoryMXBean();
 

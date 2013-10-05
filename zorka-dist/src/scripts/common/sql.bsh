@@ -117,8 +117,8 @@ __sql() {
         spy.longerThan(zorka.longCfg("sql.slow.time")),
         spy.trapperCollector(slow_ft, zorka.INFO, "SQL", zorka.stringCfg("sql.slow.format"))
       ) : null,
-      _stats ? spy.zorkaStats("java", _mbean, "ALL", "ALL") : null,
-      _stats ? spy.zorkaStats("java", _mbean, "ALL", "${DB}") : null);
+      _stats ? spy.zorkaStats("java", _mbean, "stats", "ALL") : null,
+      _stats ? spy.zorkaStats("java", _mbean, "stats", "${DB}") : null);
   }
 
   _instrumentPStmt(dbform, sqlform) {
@@ -136,8 +136,8 @@ __sql() {
         spy.longerThan(zorka.longCfg("sql.slow.time")),
         spy.trapperCollector(slow_ft, zorka.INFO, "SQL", zorka.stringCfg("sql.slow.format"))
       ) : null,
-      _stats ? spy.zorkaStats("java", _mbean, "ALL", "ALL") : null,
-      _stats ? spy.zorkaStats("java", _mbean, "ALL", "${DB}") : null);
+      _stats ? spy.zorkaStats("java", _mbean, "stats", "ALL") : null,
+      _stats ? spy.zorkaStats("java", _mbean, "stats", "${DB}") : null);
   }
 
   return this;

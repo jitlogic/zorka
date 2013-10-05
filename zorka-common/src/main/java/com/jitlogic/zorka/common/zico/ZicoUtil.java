@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ZicoUtil {
+
     public static List<Object> unpack(byte[] data) throws IOException {
         List<Object> lst = new ArrayList<Object>();
         ByteArrayInputStream is = new ByteArrayInputStream(data);
@@ -35,7 +36,8 @@ public class ZicoUtil {
         return lst;
     }
 
-    public static byte[] pack(Object...data) throws IOException {
+
+    public static byte[] pack(Object... data) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         FressianWriter writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);
         for (Object d : data) {
@@ -44,43 +46,5 @@ public class ZicoUtil {
         return os.toByteArray();
     }
 
-    /**
-     * Seeks for proper protocol signature sequence. Returns just after reading last
-     * byte of sought signature.
-     *
-     * @param is
-     *
-     * @param signature
-     *
-     * @throws IOException
-     */
-    public static void seekSignature(InputStream is, int...signature) throws IOException {
-        int[] data = new int[signature.length];
-        int n = 0;
-
-        for (int i = 0; i < signature.length; i++) {
-            int c = is.read();
-            if (c == -1) {
-                throw new EOFException("End of ZICO stream.");
-            }
-            data[i] = c;
-        }
-
-        do {
-            for (n = 0; n < signature.length; n++) {
-                if (data[n] != signature[n]) {
-                    for (int i = 1; i < data.length; i++) {
-                        data[i-1] = data[i];
-                    }
-                    int c = is.read();
-                    if (c == -1) {
-                        throw new EOFException("End of ZICO stream.");
-                    }
-                    data[data.length-1] = c;
-                    break;
-                }
-            }
-        } while (n < signature.length);
-    }
 
 }

@@ -142,11 +142,12 @@ public class RAGZInputStream extends InputStream {
 
         RAGZSegment seg = findSegment(lpos);
 
-        if (seg != null) {
+        if (seg == null) {
             seg = segments.get(segments.size() - 1);
 
         }
 
+        // TODO re-read and unpack is propably redundant here
         if (seg != curSegment) {
             curSegment = seg;
             logicalBuf = RAGZSegment.unpack(input, seg);
@@ -192,10 +193,11 @@ public class RAGZInputStream extends InputStream {
 
 
     private RAGZSegment findSegment(long logicalPos) throws IOException {
-        for (RAGZSegment seg : segments) {
+        for (int i = 0; i < segments.size(); i++) {
+            RAGZSegment seg = segments.get(i);
             if (logicalPos >= seg.getLogicalPos() && logicalPos < seg.getLogicalPos() + seg.getLogicalLen()) {
                 return seg;
-            } else if (!seg.isFinished()) {
+            } else if (i == segments.size() - 1) {
                 RAGZSegment.update(input, seg);
                 if (logicalPos >= seg.getLogicalPos() && logicalPos < seg.getLogicalPos() + seg.getLogicalLen()) {
                     return seg;

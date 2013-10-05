@@ -85,14 +85,12 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
     private TextButton btnSearchPrev;
     private TextButton btnSearchNext;
 
-    private ErrorHandler errorHandler;
     private PanelFactory panelFactory;
 
+
     @Inject
-    public TraceDetailPanel(TraceDataApi tds, ErrorHandler errorHandler, PanelFactory panelFactory,
-                            @Assisted TraceInfo traceInfo) {
+    public TraceDetailPanel(TraceDataApi tds, PanelFactory panelFactory, @Assisted TraceInfo traceInfo) {
         this.tds = tds;
-        this.errorHandler = errorHandler;
         this.panelFactory = panelFactory;
         this.traceInfo = traceInfo;
 
@@ -218,6 +216,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
         });
     }
 
+
     private void findNextSlowestMethod() {
         TraceRecordInfo info = null;
 
@@ -241,9 +240,9 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
     public void expandStart(String expandPath) {
         this.expandPath = expandPath;
         String[] s = expandPath.split("/");
-        expandIndexes = new int[s.length - 1];
-        for (int i = 1; i < s.length; i++) {
-            expandIndexes[i - 1] = Integer.parseInt(s[i]);
+        expandIndexes = new int[s.length];
+        for (int i = 0; i < s.length; i++) {
+            expandIndexes[i] = s[i].trim().length() > 0 ? Integer.parseInt(s[i]) : 0;
         }
         expandLevel = 0;
         expandNode = null;
@@ -278,10 +277,12 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
         }
     }
 
+
     public void setResults(List<TraceRecordInfo> results, int idx) {
         this.searchResults = results;
         goToResult(idx);
     }
+
 
     public void goToResult(int idx) {
         if (idx >= 0 && idx < searchResults.size()) {
@@ -397,18 +398,24 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
         methodTree.getView().setAutoExpandColumn(methodCol);
         methodTree.getView().setForceFit(true);
 
+        methodTree.getStyle().setJointOpenIcon(Resources.INSTANCE.treePlusIcon());
+        methodTree.getStyle().setJointCloseIcon(Resources.INSTANCE.treeMinusIcon());
+
         expander.initPlugin(methodTree);
 
         methodTree.addCellDoubleClickHandler(new CellDoubleClickEvent.CellDoubleClickHandler() {
             @Override
             public void onCellClick(CellDoubleClickEvent event) {
-                MethodAttrsDialog mad = new MethodAttrsDialog(methodTree.getSelectionModel().getSelectedItem());
+                TraceRecordInfo tr = methodTree.getSelectionModel().getSelectedItem();
+                MethodAttrsDialog mad = panelFactory.methodAttrsDialog(
+                        traceInfo.getHostId(), traceInfo.getDataOffs(), tr.getPath(), minMethodTime);
                 mad.show();
             }
         });
 
         add(methodTree, new VerticalLayoutData(1, 1));
     }
+
 
     private void createContextMenu() {
         Menu menu = new Menu();
@@ -420,7 +427,9 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
         mnuMethodAttrs.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
-                MethodAttrsDialog dialog = new MethodAttrsDialog(methodTree.getSelectionModel().getSelectedItem());
+                TraceRecordInfo tr = methodTree.getSelectionModel().getSelectedItem();
+                MethodAttrsDialog dialog = panelFactory.methodAttrsDialog(
+                        traceInfo.getHostId(), traceInfo.getDataOffs(), tr.getPath(), minMethodTime);
                 dialog.show();
             }
         });

@@ -16,6 +16,9 @@
 package com.jitlogic.zico.client.panel;
 
 
+import com.google.inject.assistedinject.Assisted;
+import com.jitlogic.zico.client.ErrorHandler;
+import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.data.SymbolicExceptionInfo;
 import com.jitlogic.zico.data.TraceInfo;
 import com.jitlogic.zico.data.TraceRecordInfo;
@@ -23,7 +26,10 @@ import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.form.TextArea;
+import org.fusesource.restygwt.client.Method;
+import org.fusesource.restygwt.client.MethodCallback;
 
+import javax.inject.Inject;
 import java.util.Map;
 
 public class MethodAttrsDialog extends Dialog {
@@ -31,29 +37,44 @@ public class MethodAttrsDialog extends Dialog {
     private TextArea txtAttrs;
     private TextArea txtException;
 
-    public MethodAttrsDialog(TraceInfo ti) {
+    private TraceDataApi api;
+    private ErrorHandler errorHandler;
+
+    @Inject
+    public MethodAttrsDialog(TraceDataApi api, ErrorHandler errorHandler,
+                             @Assisted Integer hostId, @Assisted Long dataOffs,
+                             @Assisted String path, @Assisted("minTime") Long minTime) {
+        this.api = api;
+        this.errorHandler = errorHandler;
         configure("Trace Details");
 
-        if (ti.getAttributes() != null) {
-            fillAttrs(ti.getAttributes());
-        }
+        txtAttrs.setText("Please wait ...");
 
-        if (ti.getExceptionInfo() != null) {
-            fillExceptionInfo(ti.getExceptionInfo());
-        }
+        loadTraceDetail(hostId, dataOffs, path, minTime);
     }
 
-    public MethodAttrsDialog(TraceRecordInfo tr) {
-        configure("Method Details");
 
-        if (tr.getAttributes() != null) {
-            fillAttrs(tr.getAttributes());
-        }
+    private void loadTraceDetail(Integer hostId, Long dataOffs, String path, Long minTime) {
+        api.getTraceRecord(hostId, dataOffs, minTime, path,
+                new MethodCallback<TraceRecordInfo>() {
+                    @Override
+                    public void onFailure(Method method, Throwable exception) {
+                        errorHandler.error("Error calling method: " + method, exception);
+                    }
 
-        if (tr.getExceptionInfo() != null) {
-            fillExceptionInfo(tr.getExceptionInfo());
-        }
+                    @Override
+                    public void onSuccess(Method method, TraceRecordInfo tr) {
+                        if (tr.getAttributes() != null) {
+                            fillAttrs(tr.getAttributes());
+                        }
+
+                        if (tr.getExceptionInfo() != null) {
+                            fillExceptionInfo(tr.getExceptionInfo());
+                        }
+                    }
+                });
     }
+
 
     private void fillAttrs(Map<String, String> attrs) {
         StringBuilder sb = new StringBuilder();
@@ -63,6 +84,7 @@ public class MethodAttrsDialog extends Dialog {
         txtAttrs.setText(sb.toString());
     }
 
+
     private void fillExceptionInfo(SymbolicExceptionInfo e) {
         StringBuilder sb = new StringBuilder();
         sb.append(e.getExClass() + ": " + e.getMessage() + "\n");
@@ -71,6 +93,7 @@ public class MethodAttrsDialog extends Dialog {
         }
         txtException.setText(sb.toString());
     }
+
 
     private void configure(String headingText) {
         setHeadingText(headingText);

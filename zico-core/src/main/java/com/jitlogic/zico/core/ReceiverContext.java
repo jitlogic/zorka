@@ -30,7 +30,9 @@ import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
@@ -47,6 +49,8 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
     private ObjectMapper mapper = new ObjectMapper();
 
+    private Set<Object> visitedObjects = new HashSet<Object>();
+
 
     public ReceiverContext(DataSource ds, HostStore store) {
         this.symbolRegistry = store.getStoreManager().getSymbolRegistry();
@@ -58,14 +62,21 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
     @Override
     public synchronized void process(Object obj) throws IOException {
-        if (obj instanceof Symbol) {
-            processSymbol((Symbol) obj);
-        } else if (obj instanceof TraceRecord) {
-            processTraceRecord((TraceRecord) obj);
-        } else {
-            if (obj != null) {
-                log.warn("Unsupported object type:" + obj.getClass());
+        try {
+            if (obj instanceof Symbol) {
+                processSymbol((Symbol) obj);
+            } else if (obj instanceof TraceRecord) {
+                log.debug("Processing trace record:" + obj);
+                processTraceRecord((TraceRecord) obj);
+            } else {
+                if (obj != null) {
+                    log.warn("Unsupported object type:" + obj.getClass());
+                } else {
+                    log.warn("Attempted processing NULL object (?)");
+                }
             }
+        } catch (Exception e) {
+            log.error("Error processing trace record: ", e);
         }
     }
 
@@ -169,7 +180,14 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
 
     @Override
-    public int checkSymbol(int symbolId) throws IOException {
+    public int checkSymbol(int symbolId, Object owner) throws IOException {
+        if (owner instanceof TraceMarker) {
+            if (visitedObjects.contains(owner)) {
+                return symbolId;
+            } else {
+                visitedObjects.add(owner);
+            }
+        }
         return sidMap.containsKey(symbolId) ? sidMap.get(symbolId) : 0;
     }
 
@@ -177,6 +195,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     @Override
     public void checkMetric(int metricId) throws IOException {
     }
+
 
     public HostInfo getHostInfo() {
         return hostInfo;
