@@ -23,20 +23,28 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 
 import static com.jitlogic.zorka.common.zico.ZicoPacket.*;
 
 public class ZicoClientConnector extends ZicoConnector {
 
+    private int timeout;
 
     public ZicoClientConnector(String addr, int port) throws IOException {
+        this(addr, port, 30000);
+    }
+
+    public ZicoClientConnector(String addr, int port, int timeout) throws IOException {
         this.addr = InetAddress.getByName(addr);
         this.port = port;
+        this.timeout = timeout;
     }
 
 
     public void connect() throws IOException {
         socket = new Socket(addr, port);
+        socket.setSoTimeout(timeout);
         in = socket.getInputStream();
         out = socket.getOutputStream();
         // TODO log connection here

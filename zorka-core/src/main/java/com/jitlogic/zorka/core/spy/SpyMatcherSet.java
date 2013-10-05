@@ -130,7 +130,7 @@ public class SpyMatcherSet {
                         && (0 == (flags & BY_METHOD_ANNOTATION) || methodAnnotations == null
                         || match(matcher.getMethodPattern(), methodAnnotations))) {
                     // Return true or false depending on whether this is normal or inverted match
-                    return true;
+                    return !matcher.hasFlags(SpyMatcher.EXCLUDE_MATCH);
                 }
 
                 // Method annotation is undecidable at this point, always return true

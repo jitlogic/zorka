@@ -24,7 +24,6 @@ import com.jitlogic.zico.core.rest.AdminService;
 import com.jitlogic.zico.core.rest.SystemService;
 import com.jitlogic.zico.core.rest.TraceDataService;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.common.zico.ZicoService;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 

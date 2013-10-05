@@ -38,11 +38,12 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     private List<TraceRecord> records = new ArrayList<TraceRecord>();
 
     private TraceBuilder b = new TraceBuilder(
-        new TracerOutput() {
-            @Override public void submit(SymbolicRecord obj) {
-                records.add((TraceRecord)obj);
-            }
-        }, symbols);
+            new TracerOutput() {
+                @Override
+                public void submit(SymbolicRecord obj) {
+                    records.add((TraceRecord) obj);
+                }
+            }, symbols);
 
     private static final int MS = 1000000;
 
@@ -63,7 +64,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         tracer.setTracerMinTraceTime(50);
     }
 
-    private void checkRC(int recs, int...chld) {
+    private void checkRC(int recs, int... chld) {
         assertThat(records.size()).isEqualTo(recs);
         if (chld.length > 0) {
             TraceRecord rec = records.get(0);
@@ -97,7 +98,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     public void testSingleTraceWithOneShortElementAndAlwaysSubmitFlag() throws Exception {
         b.traceEnter(c1, m1, s1, 10 * MS);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
-        b.markTraceFlag(TraceMarker.SUBMIT_TRACE);
+        b.markTraceFlags(TraceMarker.SUBMIT_TRACE);
         b.traceReturn(20 * MS);
 
         checkRC(1, 0);
@@ -108,7 +109,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     public void testAllMethodsSubmitFlag() throws Exception {
         b.traceEnter(c1, m1, s1, 10 * MS);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
-        b.markTraceFlag(TraceMarker.ALL_METHODS);
+        b.markTraceFlags(TraceMarker.ALL_METHODS);
         b.traceEnter(c1, m1, s1, 20 * MS);
         b.traceReturn(20 * MS + 10);
         b.traceReturn(200 * MS);
@@ -353,14 +354,16 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceReturn(5 * MS);
 
         // Single trace should appear on output
-        checkRC(1, 0); records.clear();
+        checkRC(1, 0);
+        records.clear();
 
         // Start subsequent trace
         b.traceEnter(c1, m2, s1, 6 * MS);
         b.traceBegin(t2, 7 * MS, 0);
         b.traceReturn(8 * MS);
 
-        checkRC(1, 0); records.clear();
+        checkRC(1, 0);
+        records.clear();
 
         // Return from main frame
         b.traceReturn(9 * MS);
@@ -386,7 +389,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         checkRC(1, 1, 0);
 
         assertThat(records.get(0).getException()).isNull();
-        assertThat(records.get(0).getFlags()).isEqualTo(TraceRecord.EXCEPTION_PASS|TraceRecord.TRACE_BEGIN);
+        assertThat(records.get(0).getFlags()).isEqualTo(TraceRecord.EXCEPTION_PASS | TraceRecord.TRACE_BEGIN);
         assertThat(records.get(0).getChild(0).getException()).isEqualTo(new SymbolicException(e, symbols, true));
     }
 
@@ -410,7 +413,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         assertThat(records.get(0).getChild(0).getException()).isEqualTo(new SymbolicException(e1, symbols, true));
         assertThat(records.get(0).getException()).isEqualTo(new SymbolicException(e2, symbols, false));
-        assertThat(records.get(0).getFlags()).isEqualTo(TraceRecord.EXCEPTION_WRAP|TraceRecord.TRACE_BEGIN);
+        assertThat(records.get(0).getFlags()).isEqualTo(TraceRecord.EXCEPTION_WRAP | TraceRecord.TRACE_BEGIN);
     }
 
 
@@ -535,7 +538,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     public void testTraceDropFlag() throws Exception {
         b.traceEnter(c1, m1, s1, 10 * MS);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
-        b.markTraceFlag(TraceMarker.DROP_TRACE);
+        b.markTraceFlags(TraceMarker.DROP_TRACE);
         b.traceReturn(20 * MS);
 
         assertThat(records.size()).isEqualTo(0);

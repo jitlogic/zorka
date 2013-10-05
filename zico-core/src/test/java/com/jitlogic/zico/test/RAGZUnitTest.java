@@ -355,10 +355,48 @@ public class RAGZUnitTest extends ZicoFixture {
         is.close();
     }
 
-    private final static String RGZ_PATH = "/home/rlewczuk/projects/zorka/rgc/0000000000000000.rgz.b01";
 
-    //@Test
-    public void manualTestOpenBrokenRgzFile() throws Exception {
-        RAGZInputStream is1 = RAGZInputStream.fromFile(RGZ_PATH);
+    @Test
+    public void testRereadAfterLastSegmentHasBeenFinishedBUG() throws Exception {
+        String path = tmpFile("test.gz");
+
+        RandomAccessFile f = new RandomAccessFile(path, "rw");
+        RAGZOutputStream os = new RAGZOutputStream(f, 4);
+        os.write("123".getBytes());
+
+        RAGZInputStream is = RAGZInputStream.fromFile(path);
+
+        os.write("456".getBytes());
+        os.write("ABC".getBytes());
+
+        check(is, 4, "56");
+        check(is, 7, "BC");
+
+        is.close();
+        os.close();
+    }
+
+    @Test
+    public void testReadFromPreviousSegmentsBUG() throws Exception {
+        String path = tmpFile("test.gz");
+
+        RandomAccessFile f = new RandomAccessFile(path, "rw");
+        RAGZOutputStream os = new RAGZOutputStream(f, 4);
+        os.write("123".getBytes());
+        os.write("456".getBytes());
+        os.write("ABC".getBytes());
+
+        RAGZInputStream is = RAGZInputStream.fromFile(path);
+
+        is.seek(7);
+
+        check(is, 1, "23");
+    }
+
+    private void check(RAGZInputStream is, long pos, String str) throws Exception {
+        byte[] b = new byte[str.length()];
+        is.seek(pos);
+        is.read(b);
+        assertEquals("At position " + pos, str, new String(b, "UTF8"));
     }
 }

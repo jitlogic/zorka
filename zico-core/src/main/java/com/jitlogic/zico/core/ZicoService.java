@@ -13,7 +13,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.common.zico;
+package com.jitlogic.zico.core;
+
+import com.jitlogic.zorka.common.zico.ZicoDataProcessorFactory;
+import com.jitlogic.zico.core.ZicoServerConnector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.*;
@@ -23,21 +28,27 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class ZicoService implements Runnable {
 
-    //private final static Logger log = LoggerFactory.getLogger(ZicoService.class);
+    private final static Logger log = LoggerFactory.getLogger(ZicoService.class);
 
     public final static int COLLECTOR_PORT = 8640;
-    public final static int AGENT_PORT     = 8642;
+    public final static int AGENT_PORT = 8642;
 
     private volatile Thread thread;
     private volatile boolean running;
 
-    /** TCP listen port */
+    /**
+     * TCP listen port
+     */
     private int listenPort;
 
-    /** TCP listen address */
+    /**
+     * TCP listen address
+     */
     private InetAddress listenAddr;
 
-    /** TCP server socket */
+    /**
+     * TCP server socket
+     */
     private ServerSocket socket;
 
     private ZicoDataProcessorFactory factory;
@@ -56,7 +67,6 @@ public class ZicoService implements Runnable {
             //log.error("Cannot resolve address: " + listenAddr, e);
         }
     }
-
 
 
     @Override
@@ -82,14 +92,14 @@ public class ZicoService implements Runnable {
     public void start() {
         if (thread == null) {
             try {
-                System.out.println("Starting ZICO service at " + listenAddr + ":" + listenPort);
+                log.info("Starting ZICO service at " + listenAddr + ":" + listenPort);
                 socket = new ServerSocket(listenPort, 0, listenAddr);
                 thread = new Thread(this);
                 thread.setDaemon(true);
-                thread.setName("ZICO-acceptor-"+listenPort);
+                thread.setName("ZICO-acceptor-" + listenPort);
                 running = true;
                 thread.start();
-                System.out.println("ZICO service started.");
+                log.info("ZICO service started.");
             } catch (IOException e) {
                 // TODO Log error here
             }

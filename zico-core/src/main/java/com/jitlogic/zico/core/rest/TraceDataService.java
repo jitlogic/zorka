@@ -82,7 +82,7 @@ public class TraceDataService {
             @DefaultValue("") @QueryParam("path") String path) {
 
         TraceRecordStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
-        return ctx.packTraceRecord(ctx.getTraceRecord(path, minTime), path);
+        return ctx.packTraceRecord(ctx.getTraceRecord(path, minTime), path, null);
     }
 
 
@@ -106,10 +106,10 @@ public class TraceDataService {
 
         if (path != null) {
             for (int i = 0; i < tr.numChildren(); i++) {
-                lst.add(ctx.packTraceRecord(tr.getChild(i), path.length() > 0 ? (path + "/" + i) : "" + i));
+                lst.add(ctx.packTraceRecord(tr.getChild(i), path.length() > 0 ? (path + "/" + i) : "" + i, 250));
             }
         } else {
-            lst.add(ctx.packTraceRecord(tr, ""));
+            lst.add(ctx.packTraceRecord(tr, "", 250));
         }
 
         return lst;
@@ -158,5 +158,17 @@ public class TraceDataService {
     @Path("/{hostId: [0-9]+}")
     public void deleteHost(@PathParam("hostId") int hostId) throws IOException {
         storeManager.delete(hostId);
+    }
+
+
+    @GET
+    @Path("/{hostId: [0-9]+}/{traceOffs: [0-9]+}/rank")
+    public List<MethodRankInfo> traceMethodRank(
+            @PathParam("hostId") int hostId,
+            @PathParam("traceOffs") long traceOffs,
+            @DefaultValue("calls") @QueryParam("orderBy") String orderBy,
+            @DefaultValue("DESC") @QueryParam("orderDesc") String orderDesc) {
+        TraceRecordStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
+        return ctx.methodRank(orderBy, orderDesc);
     }
 }

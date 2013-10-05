@@ -83,7 +83,8 @@ if (zorka.boolCfg("tracer", false)) {
       zorka.intCfg("tracer.net.qlen", 64),
       zorka.intCfg("tracer.net.retries", 10),
       zorka.intCfg("tracer.net.retry.time", 125L),
-      zorka.intCfg("tracer.net.retry.exp", 2L)));
+      zorka.intCfg("tracer.net.retry.exp", 2L),
+      zorka.intCfg("tracer.net.timeout", 60000)));
   }
 
   if (zorka.hasCfg("tracer.min.method.time")) {

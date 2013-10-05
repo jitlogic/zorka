@@ -18,16 +18,17 @@ package com.jitlogic.zorka.common.zico;
 
 public class ZicoPacket {
 
-    public final static int ZICO_OK              = 0x0000;
-    public final static int ZICO_DATA            = 0x0001;
-    public final static int ZICO_CRC_ERROR       = 0x0003;
-    public final static int ZICO_PING            = 0x0004;
-    public final static int ZICO_PONG            = 0x0005;
-    public final static int ZICO_AUTH_ERROR      = 0x0006;
-    public final static int ZICO_INTERNAL_ERROR  = 0x0007;
-    public final static int ZICO_BAD_REQUEST     = 0x0008;
-    public final static int ZICO_BAD_REPLY       = 0x0009;
-    public final static int ZICO_HELLO           = 0x0010;
+    public final static int ZICO_OK = 0x0000;
+    public final static int ZICO_DATA = 0x0001;
+    public final static int ZICO_CRC_ERROR = 0x0003;
+    public final static int ZICO_PING = 0x0004;
+    public final static int ZICO_PONG = 0x0005;
+    public final static int ZICO_AUTH_ERROR = 0x0006;
+    public final static int ZICO_INTERNAL_ERROR = 0x0007;
+    public final static int ZICO_BAD_REQUEST = 0x0008;
+    public final static int ZICO_BAD_REPLY = 0x0009;
+    public final static int ZICO_EOD = 0x000a;
+    public final static int ZICO_HELLO = 0x0010;
 
     private int status;
     private byte[] data;

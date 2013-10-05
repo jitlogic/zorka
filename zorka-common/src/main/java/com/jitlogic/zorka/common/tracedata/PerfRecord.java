@@ -35,7 +35,7 @@ public class PerfRecord implements SymbolicRecord {
 
     @Override
     public void traverse(MetadataChecker checker) throws IOException {
-        scannerId = checker.checkSymbol(scannerId);
+        scannerId = checker.checkSymbol(scannerId, this);
         for (PerfSample sample : samples) {
             checker.checkMetric(sample.getMetricId());
         }

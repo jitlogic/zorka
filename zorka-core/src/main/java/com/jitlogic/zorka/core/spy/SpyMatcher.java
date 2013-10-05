@@ -139,6 +139,13 @@ public class SpyMatcher {
     }
 
 
+    @Override
+    public String toString() {
+        return "SpyMatcher(class='" + classPattern + "', method='" + methodPattern + "', signature='" + signaturePattern
+                + "', access=" + String.format("0x%04x", access) + ", flags=" + String.format("0x%04x", flags) + ")";
+    }
+
+
     /**
      * Converts symbol match pattern (string) to regular expression object.
      *

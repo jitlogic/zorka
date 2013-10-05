@@ -332,7 +332,7 @@ public class TraceBuilder {
     }
 
 
-    public void markTraceFlag(int flag) {
+    public void markTraceFlags(int flag) {
         TraceRecord top = realTop();
         if (top.getMarker() != null) {
             top.getMarker().markFlags(flag);
