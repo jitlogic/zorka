@@ -280,12 +280,12 @@ public class TraceBuilder {
     private void popException() {
         // Get rid of redundant exception object
         if (ttop.getException() != null && ttop.numChildren() > 0) {
-            Throwable tex = (Throwable) ttop.getException();
-            Throwable cex = (Throwable) ttop.getChild(ttop.numChildren() - 1).getException();
+            Object tex = ttop.getException();
+            Object cex = ttop.getChild(ttop.numChildren() - 1).getException();
             if (cex == tex) {
                 ttop.setException(null);
                 ttop.markFlag(TraceRecord.EXCEPTION_PASS);
-            } else if (cex == tex.getCause()) {
+            } else if (cex == ((Throwable) tex).getCause()) {
                 ttop.markFlag(TraceRecord.EXCEPTION_WRAP);
             }
         }
