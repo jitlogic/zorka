@@ -238,8 +238,9 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
 
     public void expandStart(String expandPath) {
-        this.expandPath = expandPath;
-        String[] s = expandPath.split("/");
+        this.expandPath = expandPath.startsWith("/") ? expandPath : "/" + expandPath;
+        // TODO this is a crutch; should search API always return full paths ?
+        String[] s = this.expandPath.split("/");
         expandIndexes = new int[s.length];
         for (int i = 0; i < s.length; i++) {
             expandIndexes[i] = s[i].trim().length() > 0 ? Integer.parseInt(s[i]) : 0;
@@ -419,6 +420,24 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
     private void createContextMenu() {
         Menu menu = new Menu();
+
+
+        MenuItem mnuSearchMethods = new MenuItem("Search for methods");
+        mnuSearchMethods.setIcon(Resources.INSTANCE.searchIcon());
+        menu.add(mnuSearchMethods);
+
+        mnuSearchMethods.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                TraceRecordInfo tr = methodTree.getSelectionModel().getSelectedItem();
+                if (searchDialog == null) {
+                    searchDialog = panelFactory.traceRecordSearchDialog(TraceDetailPanel.this, traceInfo);
+                }
+                searchDialog.setRootPath(tr != null ? tr.getPath() : "");
+                searchDialog.show();
+            }
+        });
+
 
         MenuItem mnuMethodAttrs = new MenuItem("Method Details");
         mnuMethodAttrs.setIcon(Resources.INSTANCE.methodAttrsIcon());
