@@ -90,8 +90,12 @@ public class ZorkaUtil {
         return null;
     }
 
-    private static String castString(Object val) {
-        return val != null ? val.toString() : "null";
+    public static String castString(Object val) {
+        try {
+            return val != null ? val.toString() : "null";
+        } catch (Exception e) {
+            return "<ERR: " + e.getMessage() + ">";
+        }
     }
 
     private static float castFloat(Object val) {

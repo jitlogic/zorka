@@ -462,7 +462,7 @@ public final class ObjectInspector {
                 if (val != null) break;
             }
             val = val != null ? val : def;
-            String s = val != null ? val.toString() : "null";
+            String s = ZorkaUtil.castString(val);
             if (len != null && s.length() > len) {
                 s = s.substring(0, len);
             }
@@ -556,7 +556,7 @@ public final class ObjectInspector {
                 if (val != null) break;
             }
             val = val != null ? val : def;
-            String s = "" + val;
+            String s = ZorkaUtil.castString(val);
             if (len != null && s.length() > len) {
                 s = s.substring(0, len);
             }
