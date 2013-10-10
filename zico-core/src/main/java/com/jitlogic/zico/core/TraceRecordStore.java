@@ -95,19 +95,31 @@ public class TraceRecordStore {
         return false;
     }
 
-    public void searchRecords(TraceRecord tr, String path,
-                              TraceDetailSearchExpression expr, List<TraceRecordInfo> result) {
+    public void searchRecords(TraceRecord tr, String path, TraceDetailSearchExpression expr,
+                              TraceRecordSearchResult result, long traceTime, boolean recur) {
 
         boolean matches = (expr.emptyExpr() || matches(tr, expr))
                 && (0 == (expr.getFlags() & TraceDetailSearchExpression.ERRORS_ONLY) || null != tr.findException())
                 && (0 == (expr.getFlags() & TraceDetailSearchExpression.METHODS_WITH_ATTRS) || tr.numAttrs() > 0);
 
         if (matches) {
-            result.add(packTraceRecord(tr, path, 250));
+            result.getResult().add(packTraceRecord(tr, path, 250));
+
+            double pct = 100.0 * tr.getTime() / traceTime;
+
+            result.setSumPct(result.getSumPct() + pct);
+            result.setSumTime(result.getSumTime() + tr.getTime());
+            result.setMaxTime(Math.max(result.getMaxTime(), tr.getTime()));
+            result.setMinTime(Math.min(result.getMinTime(), tr.getTime()));
+
+            if (!recur) {
+                result.setRecurPct(result.getRecurPct() + pct);
+                result.setRecurTime(result.getRecurTime() + tr.getTime());
+            }
         }
 
         for (int i = 0; i < tr.numChildren(); i++) {
-            searchRecords(tr.getChild(i), path + "/" + i, expr, result);
+            searchRecords(tr.getChild(i), path + "/" + i, expr, result, traceTime, matches || recur);
         }
     }
 

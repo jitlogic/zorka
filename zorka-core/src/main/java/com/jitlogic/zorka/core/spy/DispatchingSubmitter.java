@@ -36,22 +36,26 @@ import static com.jitlogic.zorka.core.spy.SpyLib.*;
  */
 public class DispatchingSubmitter implements SpySubmitter {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** Spy class transformer */
+    /**
+     * Spy class transformer
+     */
     private SpyClassTransformer transformer;
 
     /**
      * Submission stack is used to associate results from method entry probes with results from return/error probes.
      */
-    private ThreadLocal<Stack<Map<String,Object>>> submissionStack =
-        new ThreadLocal<Stack<Map<String,Object>>>() {
-            @Override
-            public Stack<Map<String,Object>> initialValue() {
-                return new Stack<Map<String,Object>>();
-            }
-        };
+    private ThreadLocal<Stack<Map<String, Object>>> submissionStack =
+            new ThreadLocal<Stack<Map<String, Object>>>() {
+                @Override
+                public Stack<Map<String, Object>> initialValue() {
+                    return new Stack<Map<String, Object>>();
+                }
+            };
 
 
     /**
@@ -78,7 +82,7 @@ public class DispatchingSubmitter implements SpySubmitter {
             return;
         }
 
-        Map<String,Object> record = getRecord(stage, ctx, submitFlags, vals);
+        Map<String, Object> record = getRecord(stage, ctx, submitFlags, vals);
 
         SpyDefinition sdef = ctx.getSpyDefinition();
 
@@ -103,20 +107,16 @@ public class DispatchingSubmitter implements SpySubmitter {
     /**
      * Retrieves or creates spy record for probe submission purposes.
      *
-     * @param stage method bytecode point where probe has been installed (entry, return, error)
-     *
-     * @param ctx spy context associated with submitting probe
-     *
+     * @param stage       method bytecode point where probe has been installed (entry, return, error)
+     * @param ctx         spy context associated with submitting probe
      * @param submitFlags controls whether SUBMIT chain should be immediately processed or record should be
      *                    stored in thread local stack (and wait for another probe submission)
-     *
-     * @param vals submitted values
-     *
+     * @param vals        submitted values
      * @return spy record
      */
-    private Map<String,Object> getRecord(int stage, SpyContext ctx, int submitFlags, Object[] vals) {
+    private Map<String, Object> getRecord(int stage, SpyContext ctx, int submitFlags, Object[] vals) {
 
-        Map<String,Object> record;
+        Map<String, Object> record;
 
         switch (submitFlags) {
             case SF_IMMEDIATE:
@@ -124,23 +124,23 @@ public class DispatchingSubmitter implements SpySubmitter {
                 record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
                 break;
             case SF_FLUSH:
-                Stack<Map<String,Object>> stack = submissionStack.get();
+                Stack<Map<String, Object>> stack = submissionStack.get();
                 if (stack.size() > 0) {
                     record = stack.pop();
                     // TODO check if record belongs to proper frame, warn if not
                 } else {
                     log.error(ZorkaLogger.ZSP_ERRORS, "Submission thread local stack mismatch (ctx=" + ctx
-                        + ", stage=" + stage + ", submitFlags=" + submitFlags + ")");
+                            + ", stage=" + stage + ", submitFlags=" + submitFlags + ")");
                     record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
                 }
                 break;
             default:
                 log.error(ZorkaLogger.ZSP_ERRORS, "Illegal submission flag: " + submitFlags + ". Creating empty records.");
-                record =  ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
+                record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
                 break;
         }
 
-        SpyContext context =((SpyContext)record.get(".CTX"));
+        SpyContext context = ((SpyContext) record.get(".CTX"));
         List<SpyProbe> probes = context.getSpyDefinition().getProbes(stage);
 
         // TODO check if vals.length == probes.size() and log something here ...
@@ -150,7 +150,7 @@ public class DispatchingSubmitter implements SpySubmitter {
             record.put(probe.getDstField(), vals[i]);
         }
 
-        record.put(".STAGES", (Integer)record.get(".STAGES") | (1 << stage));
+        record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << stage));
         record.put(".STAGE", stage);
 
         return record;
@@ -160,15 +160,12 @@ public class DispatchingSubmitter implements SpySubmitter {
     /**
      * Processes specified processing chain of sdef in record
      *
-     * @param stage chain ID
-     *
-     * @param sdef spy definition with configured processing chains
-     *
+     * @param stage  chain ID
+     * @param sdef   spy definition with configured processing chains
      * @param record spy record (input)
-     *
      * @return spy record (output) or null if record should not be further processed
      */
-    private Map<String,Object> process(int stage, SpyDefinition sdef, Map<String,Object> record) {
+    private Map<String, Object> process(int stage, SpyDefinition sdef, Map<String, Object> record) {
         List<SpyProcessor> processors = sdef.getProcessors(stage);
 
         record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << stage));
@@ -183,9 +180,9 @@ public class DispatchingSubmitter implements SpySubmitter {
                 if (null == (record = processor.process(record))) {
                     break;
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 log.error(ZorkaLogger.ZSP_ERRORS, "Error processing record %s (on processor %s, stage=%s)", e,
-                    record, processor, stage);
+                        record, processor, stage);
             }
         }
 
