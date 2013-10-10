@@ -65,7 +65,7 @@ public interface TraceDataApi extends RestService {
                                    @PathParam("minTime") long minTime,
                                    @PathParam("path") String path,
                                    TraceDetailSearchExpression expr,
-                                   MethodCallback<List<TraceRecordInfo>> callback);
+                                   MethodCallback<TraceRecordSearchResult> callback);
 
 
     @POST

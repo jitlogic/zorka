@@ -119,7 +119,7 @@ public class TraceDataService {
     @POST
     @Path("/{hostId: [0-9]+}/{traceOffs: [0-9]+}/search")
     @Consumes(MediaType.APPLICATION_JSON)
-    public List<TraceRecordInfo> searchRecords(
+    public TraceRecordSearchResult searchRecords(
             @PathParam("hostId") int hostId,
             @PathParam("traceOffs") long traceOffs,
             @DefaultValue("0") @QueryParam("minTime") long minTime,
@@ -128,8 +128,20 @@ public class TraceDataService {
 
         TraceRecordStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
         TraceRecord tr = ctx.getTraceRecord(path, minTime);
-        List<TraceRecordInfo> result = new ArrayList<TraceRecordInfo>();
-        ctx.searchRecords(tr, path, expr, result);
+        TraceRecordSearchResult result = new TraceRecordSearchResult();
+        result.setResult(new ArrayList<TraceRecordInfo>());
+        result.setMinTime(Long.MAX_VALUE);
+        result.setMaxTime(Long.MIN_VALUE);
+
+        ctx.searchRecords(tr, path, expr, result, tr.getTime(), false);
+
+        if (result.getMinTime() == Long.MAX_VALUE) {
+            result.setMinTime(0);
+        }
+
+        if (result.getMaxTime() == Long.MIN_VALUE) {
+            result.setMaxTime(0);
+        }
 
         return result;
     }

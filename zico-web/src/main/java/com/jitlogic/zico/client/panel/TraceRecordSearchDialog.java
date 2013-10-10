@@ -18,23 +18,25 @@ package com.jitlogic.zico.client.panel;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.*;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.inject.assistedinject.Assisted;
+import com.jitlogic.zico.client.ClientUtil;
 import com.jitlogic.zico.client.ErrorHandler;
+import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.api.TraceDataApi;
-import com.jitlogic.zico.data.TraceDetailSearchExpression;
-import com.jitlogic.zico.data.TraceInfo;
-import com.jitlogic.zico.data.TraceRecordInfo;
-import com.jitlogic.zico.data.TraceRecordInfoProperties;
+import com.jitlogic.zico.data.*;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.button.TextButton;
+import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.CellDoubleClickEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
@@ -50,14 +52,15 @@ import org.fusesource.restygwt.client.MethodCallback;
 
 import javax.inject.Inject;
 import java.util.Arrays;
-import java.util.List;
 
 public class TraceRecordSearchDialog extends Dialog {
 
     private final static TraceRecordInfoProperties props = GWT.create(TraceRecordInfoProperties.class);
 
     private TraceDataApi tds;
+
     private TraceInfo trace;
+    private String rootPath = "";
 
     private TraceDetailPanel panel;
 
@@ -76,6 +79,9 @@ public class TraceRecordSearchDialog extends Dialog {
 
     private ErrorHandler errorHandler;
 
+    private Label lblSumStats;
+
+
     @Inject
     public TraceRecordSearchDialog(TraceDataApi tds, ErrorHandler errorHandler,
                                    @Assisted TraceDetailPanel panel, @Assisted TraceInfo trace) {
@@ -87,6 +93,7 @@ public class TraceRecordSearchDialog extends Dialog {
 
         createUI();
     }
+
 
     private void createUI() {
 
@@ -101,11 +108,52 @@ public class TraceRecordSearchDialog extends Dialog {
 
         vp.setLayoutData(vd);
 
+        HorizontalLayoutContainer hl1 = new HorizontalLayoutContainer();
+        HorizontalLayoutContainer.HorizontalLayoutData hd1 = new HorizontalLayoutContainer.HorizontalLayoutData();
+        hd1.setMargins(new Margins(0, 4, 4, 0));
+        hl1.setLayoutData(hd1);
+
+
         txtSearchFilter = new TextField();
         txtSearchFilter.setEmptyText("Enter search text ...");
-        //vp.add(txtSearchFilter);
-        vp.add(new FieldLabel(txtSearchFilter, "Search filter"),
+        hl1.add(txtSearchFilter, new HorizontalLayoutContainer.HorizontalLayoutData(1, 1));
+
+
+        txtSearchFilter.addKeyDownHandler(new KeyDownHandler() {
+            @Override
+            public void onKeyDown(KeyDownEvent event) {
+                if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+                    doSearch();
+                }
+            }
+        });
+
+
+        TextButton btnSearch = new TextButton();
+        btnSearch.setIcon(Resources.INSTANCE.searchIcon());
+        btnSearch.setToolTip("Run search");
+        btnSearch.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                doSearch();
+            }
+        });
+        hl1.add(btnSearch, new HorizontalLayoutContainer.HorizontalLayoutData(-1, -1));
+
+        TextButton btnFilter = new TextButton();
+        btnFilter.setIcon(Resources.INSTANCE.gotoIcon());
+        btnFilter.setToolTip("Go to ...");
+        btnFilter.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                doGoTo();
+            }
+        });
+        hl1.add(btnFilter, new HorizontalLayoutContainer.HorizontalLayoutData(-1, -1));
+
+        vp.add(new FieldLabel(hl1, "Search filter"),
                 new VerticalLayoutContainer.VerticalLayoutData(1, -1));
+
 
         HorizontalPanel hp = new HorizontalPanel();
 
@@ -131,19 +179,19 @@ public class TraceRecordSearchDialog extends Dialog {
 
         vp.add(new FieldLabel(hp, "Search in"));
 
-        HorizontalPanel hpSearchOnly = new HorizontalPanel();
-
         chkErrorsOnly = new CheckBox();
-        chkErrorsOnly.setBoxLabel("Errors and Exceptions");
+        chkErrorsOnly.setBoxLabel("Only Errors and Exceptions");
         chkErrorsOnly.setValue(false);
-        hpSearchOnly.add(chkErrorsOnly);
+        hp.add(chkErrorsOnly);
 
         chkMethodsWithAttrs = new CheckBox();
-        chkMethodsWithAttrs.setBoxLabel("Methods with attributes");
+        chkMethodsWithAttrs.setBoxLabel("Only Methods with attributes");
         chkMethodsWithAttrs.setValue(false);
-        hpSearchOnly.add(chkMethodsWithAttrs);
+        hp.add(chkMethodsWithAttrs);
 
-        vp.add(new FieldLabel(hpSearchOnly, "Only in"));
+        lblSumStats = new Label("n/a");
+
+        vp.add(new FieldLabel(lblSumStats, "Summary"));
 
         createResultsGrid();
 
@@ -151,35 +199,17 @@ public class TraceRecordSearchDialog extends Dialog {
 
         add(vp);
 
-        TextButton btnSearch = new TextButton("Search");
-        addButton(btnSearch);
 
-        btnSearch.addSelectHandler(new SelectEvent.SelectHandler() {
-            @Override
-            public void onSelect(SelectEvent event) {
-                doSearch();
-            }
-        });
-
-        TextButton btnFilter = new TextButton("Go to ...");
-        addButton(btnFilter);
-
-        btnFilter.addSelectHandler(new SelectEvent.SelectHandler() {
-            @Override
-            public void onSelect(SelectEvent event) {
-                doGoTo();
-            }
-        });
-
-        TextButton btnClose = new TextButton("Close");
-        btnClose.addSelectHandler(new SelectEvent.SelectHandler() {
-            @Override
-            public void onSelect(SelectEvent event) {
-                TraceRecordSearchDialog.this.hide();
-            }
-        });
-        addButton(btnClose);
+        //TextButton btnClose = new TextButton("Close");
+        //btnClose.addSelectHandler(new SelectEvent.SelectHandler() {
+        //    @Override
+        //    public void onSelect(SelectEvent event) {
+        //        TraceRecordSearchDialog.this.hide();
+        //    }
+        //});
+        //addButton(btnClose);
     }
+
 
     private void doGoTo() {
         TraceRecordInfo tri = resultsGrid.getSelectionModel().getSelectedItem();
@@ -188,28 +218,34 @@ public class TraceRecordSearchDialog extends Dialog {
         this.hide();
     }
 
+
+    public void setRootPath(String rootPath) {
+        if (this.rootPath != rootPath) {
+            this.rootPath = rootPath; //.startsWith("/") ? rootPath.substring(1, rootPath.length()) : rootPath;
+            this.resultsStore.clear();
+            this.lblSumStats.setText("n/a");
+        }
+    }
+
+
     private void createResultsGrid() {
 
         ColumnConfig<TraceRecordInfo, Long> durationCol = new ColumnConfig<TraceRecordInfo, Long>(props.time(), 50, "Time");
         durationCol.setCell(new NanoTimeRenderingCell());
         durationCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         durationCol.setMenuDisabled(true);
-        durationCol.setSortable(false);
 
         ColumnConfig<TraceRecordInfo, Long> callsCol = new ColumnConfig<TraceRecordInfo, Long>(props.calls(), 50, "Calls");
         callsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         callsCol.setMenuDisabled(true);
-        callsCol.setSortable(false);
 
         ColumnConfig<TraceRecordInfo, Long> errorsCol = new ColumnConfig<TraceRecordInfo, Long>(props.errors(), 50, "Errors");
         errorsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         errorsCol.setMenuDisabled(true);
-        errorsCol.setSortable(false);
 
         ColumnConfig<TraceRecordInfo, Long> pctCol = new ColumnConfig<TraceRecordInfo, Long>(props.time(), 50, "Pct");
         pctCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         pctCol.setMenuDisabled(true);
-        pctCol.setSortable(false);
 
         pctCol.setCell(new AbstractCell<Long>() {
             @Override
@@ -265,6 +301,7 @@ public class TraceRecordSearchDialog extends Dialog {
 
     }
 
+
     private void doSearch() {
 
         expr.setFlags(
@@ -277,17 +314,24 @@ public class TraceRecordSearchDialog extends Dialog {
 
         expr.setSearchExpr(txtSearchFilter.getValue());
 
-        tds.searchTraceRecords(trace.getHostId(), trace.getDataOffs(), 0, "", expr,
-                new MethodCallback<List<TraceRecordInfo>>() {
+        tds.searchTraceRecords(trace.getHostId(), trace.getDataOffs(), 0, rootPath, expr,
+                new MethodCallback<TraceRecordSearchResult>() {
                     @Override
                     public void onFailure(Method method, Throwable exception) {
                         errorHandler.error("Error calling API method: " + method, exception);
                     }
 
                     @Override
-                    public void onSuccess(Method method, List<TraceRecordInfo> response) {
+                    public void onSuccess(Method method, TraceRecordSearchResult response) {
                         resultsStore.clear();
-                        resultsStore.addAll(response);
+                        resultsStore.addAll(response.getResult());
+                        lblSumStats.setText(response.getResult().size() + " methods, "
+                                + NumberFormat.getFormat("###.0").format(response.getRecurPct()) + "% of trace execution time. "
+                                + "Time: " + ClientUtil.formatDuration(response.getRecurTime()) + " non-recursive"
+                                + ", " + ClientUtil.formatDuration(response.getMinTime()) + " min, "
+                                + ", " + ClientUtil.formatDuration(response.getMaxTime()) + " max."
+
+                        );
                     }
                 });
     }

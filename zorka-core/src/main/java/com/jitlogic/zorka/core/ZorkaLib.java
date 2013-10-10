@@ -874,4 +874,9 @@ public class ZorkaLib {
     public Set<Object> set(Object... objs) {
         return ZorkaUtil.set(objs);
     }
+
+
+    public String castString(Object obj) {
+        return ZorkaUtil.castString(obj);
+    }
 }
