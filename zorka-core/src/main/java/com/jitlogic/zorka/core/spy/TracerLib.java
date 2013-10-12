@@ -161,6 +161,19 @@ public class TracerLib {
         return attr(srcField, dstAttr, null);
     }
 
+
+    /**
+     * Creates spy processor that formats a string and attaches it as attribute to trace record.
+     *
+     * @param srcFormat source field name (from spy record)
+     * @param dstAttr   destination attribute name (in trace data)
+     * @return spy processor object adding new trace attribute
+     */
+    public SpyProcessor formatAttr(String srcFormat, String dstAttr) {
+        return formatAttr(srcFormat, dstAttr, null);
+    }
+
+
     /**
      * Creates spy processor that attaches tagged attribute to trace record.
      *
@@ -170,7 +183,22 @@ public class TracerLib {
      * @return spy processor object adding new trace attribute
      */
     public SpyProcessor attr(String srcField, String dstAttr, String attrTag) {
-        return new TraceAttrProcessor(symbolRegistry, tracer, srcField, dstAttr, attrTag);
+        return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.FIELD_GETTING_PROCESSOR,
+                srcField, dstAttr, attrTag);
+    }
+
+
+    /**
+     * Creates spy processor that formats a string and attaches it as tagged attribute to trace record.
+     *
+     * @param srcFormat source field name (from spy record)
+     * @param dstAttr   destination attribute name (in trace data)
+     * @param attrTag   attribute tag;
+     * @return spy processor object adding new trace attribute
+     */
+    public SpyProcessor formatAttr(String srcFormat, String dstAttr, String attrTag) {
+        return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.STRING_FORMAT_PROCESSOR,
+                srcFormat, dstAttr, attrTag);
     }
 
 

@@ -19,6 +19,7 @@ package com.jitlogic.zorka.core.spy;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TaggedValue;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 
@@ -31,6 +32,10 @@ import java.util.Map;
  * @author rafal.lewczuk@jitlogic.com
  */
 public class TraceAttrProcessor implements SpyProcessor {
+
+    public final static int FIELD_GETTING_PROCESSOR = 1;
+
+    public final static int STRING_FORMAT_PROCESSOR = 2;
 
     /**
      * Logger
@@ -48,11 +53,12 @@ public class TraceAttrProcessor implements SpyProcessor {
      */
     private SymbolRegistry symbolRegistry;
 
+    private int type;
 
     /**
      * source field name
      */
-    private String srcField;
+    private String srcVal;
 
 
     /**
@@ -71,13 +77,15 @@ public class TraceAttrProcessor implements SpyProcessor {
      * Creates custom attribute processor.
      *
      * @param tracer   tracer object
-     * @param srcField source field name
+     * @param srcVal   source field name
      * @param attrName attribute ID
      */
-    public TraceAttrProcessor(SymbolRegistry symbolRegistry, Tracer tracer, String srcField, String attrName, String attrTag) {
+    public TraceAttrProcessor(SymbolRegistry symbolRegistry, Tracer tracer, int type,
+                              String srcVal, String attrName, String attrTag) {
         this.tracer = tracer;
-        this.srcField = srcField;
+        this.srcVal = srcVal;
         this.symbolRegistry = symbolRegistry;
+        this.type = type;
         this.attrId = symbolRegistry.symbolId(attrName);
         this.attrTagId = attrTag != null ? symbolRegistry.symbolId(attrTag) : null;
     }
@@ -85,8 +93,9 @@ public class TraceAttrProcessor implements SpyProcessor {
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
-        Object val = record.get(srcField);
 
+        Object val = type == FIELD_GETTING_PROCESSOR ? record.get(srcVal)
+                : ObjectInspector.substitute(srcVal, record);
 
         if (val != null) {
             if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
