@@ -99,7 +99,7 @@ public class TraceRecordSearchDialog extends Dialog {
 
         setHeadingText("Search for methods ...");
         setPredefinedButtons();
-        setPixelSize(1200, 850);
+        setPixelSize(1200, 750);
 
         VerticalLayoutContainer vp = new VerticalLayoutContainer();
 
