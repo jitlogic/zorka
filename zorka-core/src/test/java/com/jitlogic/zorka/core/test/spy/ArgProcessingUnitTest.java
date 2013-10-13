@@ -37,7 +37,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     protected SpyContext ctx;
     protected SpyDefinition sdef;
-    protected Map<String,Object> record;
+    protected Map<String, Object> record;
 
     @Before
     public void setUp() {
@@ -120,7 +120,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testFilterOutPositiveVal()  throws Exception {
+    public void testFilterOutPositiveVal() throws Exception {
         SpyProcessor proc = new RegexFilterProcessor("E0", "[a-z]+", true);
         record.put("E0", "abc");
 
@@ -230,7 +230,8 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     private boolean scmp(Object a, String op, Object b) {
         SpyProcessor sp = ComparatorProcessor.scmp("E0", op, "E1");
-        record.put("E0", a); record.put("E1", b);
+        record.put("E0", a);
+        record.put("E1", b);
         record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_ENTER));
         record.put(".STAGE", SpyLib.ON_ENTER);
         return null != sp.process(record);
@@ -239,18 +240,18 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     @Test
     public void testScmpProc() {
-        assertEquals(true,  scmp(1, EQ, 1));
+        assertEquals(true, scmp(1, EQ, 1));
         assertEquals(false, scmp(1, NE, 1));
-        assertEquals(true,  scmp(null, EQ, null));
-        assertEquals(true,  scmp(1L, EQ, 1));
-        assertEquals(true,  scmp(2, GT, 1));
-        assertEquals(true,  scmp(1, LT, 2));
-        assertEquals(true,  scmp(1.0, GE, 1.0));
+        assertEquals(true, scmp(null, EQ, null));
+        assertEquals(true, scmp(1L, EQ, 1));
+        assertEquals(true, scmp(2, GT, 1));
+        assertEquals(true, scmp(1, LT, 2));
+        assertEquals(true, scmp(1.0, GE, 1.0));
         assertEquals(false, scmp(1.0011, EQ, 1.0));
-        assertEquals(true,  scmp(1.0011, GT, 1.0));
-        assertEquals(true,  scmp(1.0001, EQ, 1.0));
+        assertEquals(true, scmp(1.0011, GT, 1.0));
+        assertEquals(true, scmp(1.0001, EQ, 1.0));
 
-        assertEquals(true,  scmp("oja!", EQ, "oja!"));
+        assertEquals(true, scmp("oja!", EQ, "oja!"));
         assertEquals(false, scmp("oja!", EQ, "oje!"));
     }
 
@@ -267,18 +268,18 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
     @Test
     public void testVcmpProc() {
-        assertEquals(true,  vcmp(1, EQ, 1));
+        assertEquals(true, vcmp(1, EQ, 1));
         assertEquals(false, vcmp(1, NE, 1));
-        assertEquals(true,  vcmp(null, EQ, null));
-        assertEquals(true,  vcmp(1L, EQ, 1));
-        assertEquals(true,  vcmp(2, GT, 1));
-        assertEquals(true,  vcmp(1, LT, 2));
-        assertEquals(true,  vcmp(1.0, GE, 1.0));
+        assertEquals(true, vcmp(null, EQ, null));
+        assertEquals(true, vcmp(1L, EQ, 1));
+        assertEquals(true, vcmp(2, GT, 1));
+        assertEquals(true, vcmp(1, LT, 2));
+        assertEquals(true, vcmp(1.0, GE, 1.0));
         assertEquals(false, vcmp(1.0011, EQ, 1.0));
-        assertEquals(true,  vcmp(1.0011, GT, 1.0));
-        assertEquals(true,  vcmp(1.0001, EQ, 1.0));
+        assertEquals(true, vcmp(1.0011, GT, 1.0));
+        assertEquals(true, vcmp(1.0001, EQ, 1.0));
 
-        assertEquals(true,  vcmp("oja!", EQ, "oja!"));
+        assertEquals(true, vcmp("oja!", EQ, "oja!"));
         assertEquals(false, vcmp("oja!", EQ, "oje!"));
     }
 
@@ -286,8 +287,8 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
     @Test
     public void testTdiffProc() {
         SpyProcessor sp = new TimeDiffProcessor("T1", "T2", "T");
-        Map<String,Object> in = ZorkaUtil.map("T1", 10L, "T2", 30L);
-        Map<String,Object> out = sp.process(in);
+        Map<String, Object> in = ZorkaUtil.map("T1", 10L, "T2", 30L);
+        Map<String, Object> out = sp.process(in);
 
         assertEquals(20L, out.get("T"));
     }
@@ -297,7 +298,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
     public void testThreadLocalSet() {
         ThreadLocal tl = new ThreadLocal();
         ThreadLocalProcessor tp = new ThreadLocalProcessor("S", ThreadLocalProcessor.SET, tl);
-        Map<String,Object> rec = ZorkaUtil.map("S", "abc");
+        Map<String, Object> rec = ZorkaUtil.map("S", "abc");
         assertEquals("processor should pass record without changes", rec, tp.process(rec));
         assertEquals("abc", tl.get());
     }
@@ -308,7 +309,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         ThreadLocal tl = new ThreadLocal();
         tl.set("abc");
         ThreadLocalProcessor tp = new ThreadLocalProcessor("S", ThreadLocalProcessor.GET, tl, "length()");
-        Map<String,Object> rec = tp.process(new HashMap<String,Object>());
+        Map<String, Object> rec = tp.process(new HashMap<String, Object>());
         assertEquals(3, rec.get("S"));
     }
 
@@ -318,14 +319,14 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
         ThreadLocal tl = new ThreadLocal();
         tl.set("abc");
         ThreadLocalProcessor tp = new ThreadLocalProcessor(null, ThreadLocalProcessor.REMOVE, tl);
-        tp.process(new HashMap<String,Object>());
+        tp.process(new HashMap<String, Object>());
         assertNull(tl.get());
     }
 
 
     @Test
     public void testFilterDecider() {
-        TraceFilterProcessor p = (TraceFilterProcessor)tracer.filterBy("TEST", false,
+        TraceFilterProcessor p = (TraceFilterProcessor) tracer.filterBy("TEST", false,
                 zorka.set(100, 200), zorka.set(500, 503), zorka.set(401, 404));
         assertThat(p.decide(100)).isTrue();
         assertThat(p.decide(500)).isFalse();
@@ -340,7 +341,8 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
                 spy.vcmp("X", "==", "a"),
                 spy.vcmp("Y", "==", "b"));
 
-        record.put("X", "a"); record.put("Y", "b");
+        record.put("X", "a");
+        record.put("Y", "b");
         assertThat(f1.process(record)).isNotNull();
 
         record.put("X", "b");
@@ -357,7 +359,8 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
                 spy.vcmp("X", "==", "a"),
                 spy.vcmp("Y", "==", "b"));
 
-        record.put("X", "a"); record.put("Y", "b");
+        record.put("X", "a");
+        record.put("Y", "b");
         assertThat(f1.process(record)).isNotNull();
 
         record.put("X", "b");
@@ -374,7 +377,8 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
                 spy.vcmp("X", "==", "a"),
                 spy.vcmp("Y", "==", "b"));
 
-        record.put("X", "a"); record.put("Y", "b");
+        record.put("X", "a");
+        record.put("Y", "b");
         assertThat(f1.process(record)).isNotNull();
 
         record.put("X", "b");
@@ -382,5 +386,55 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
         record.put("Y", "a");
         assertThat(f1.process(record)).isNotNull();
+    }
+
+    @Test
+    public void testSimpleCrc32Sum() {
+        Map<String, Object> rec = ZorkaUtil.map("VAL", "ABCD");
+        SpyProcessor proc = spy.crc32sum("SUM", "VAL");
+
+        proc.process(rec);
+
+        assertEquals("db1720a5", rec.get("SUM"));
+    }
+
+    @Test
+    public void testSimpleCrc32SumOfCustomType() {
+        Map<String, Object> rec = ZorkaUtil.map("VAL", 1234);
+        SpyProcessor proc = spy.crc32sum("SUM", "VAL");
+
+        proc.process(rec);
+
+        assertEquals("9be3e0a3", rec.get("SUM"));
+    }
+
+    @Test
+    public void testLimitedCrc32Sum() {
+        Map<String, Object> rec = ZorkaUtil.map("VAL", "ABCD");
+        SpyProcessor proc = spy.crc32sum("SUM", "VAL", 4);
+
+        proc.process(rec);
+
+        assertEquals("db17", rec.get("SUM"));
+    }
+
+    @Test
+    public void testSimpleMd5Sum() {
+        Map<String, Object> rec = ZorkaUtil.map("VAL", "ABCD");
+        SpyProcessor proc = spy.md5sum("SUM", "VAL");
+
+        proc.process(rec);
+
+        assertEquals("cb08ca4a7bb5f9683c19133a84872ca7", rec.get("SUM"));
+    }
+
+    @Test
+    public void testSimpleSha1Sum() {
+        Map<String, Object> rec = ZorkaUtil.map("VAL", "ABCD");
+        SpyProcessor proc = spy.sha1sum("SUM", "VAL");
+
+        proc.process(rec);
+
+        assertEquals("fb2f85c88567f3c8ce9b799c7c54642d0c7b41f6", rec.get("SUM"));
     }
 }

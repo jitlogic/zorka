@@ -19,9 +19,12 @@ package com.jitlogic.zorka.common.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
+import java.util.zip.CRC32;
 
 
 /**
@@ -29,6 +32,8 @@ import java.util.regex.Pattern;
  * instance methods.
  */
 public class ZorkaUtil {
+
+    private final static ZorkaLog log = ZorkaLogger.getLog(ZorkaUtil.class);
 
     /**
      * Singleton instance
@@ -774,6 +779,52 @@ public class ZorkaUtil {
             }
             f.delete();
         }
+    }
+
+
+    private static final char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+    public static String hex(byte[] input) {
+        StringBuffer sb = new StringBuffer(input.length * 2);
+
+        for (int i = 0; i < input.length; i++) {
+            int c = input[i] & 0xff;
+            sb.append(HEX[(c >> 4) & 0x0f]);
+            sb.append(HEX[c & 0x0f]);
+        }
+
+        return sb.toString();
+    }
+
+
+    public static String crc32(String input) {
+        CRC32 crc32 = new CRC32();
+        crc32.update(input.getBytes());
+        return String.format("%08x", crc32.getValue());
+    }
+
+
+    public static String md5(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(input.getBytes());
+            return hex(md.digest());
+        } catch (NoSuchAlgorithmException e) {
+            log.error(ZorkaLogger.ZSP_ERRORS, "Not supported digest algorithm: 'MD5'");
+        }
+        return null;
+    }
+
+
+    public static String sha1(String input) {
+        try {
+            MessageDigest sha = MessageDigest.getInstance("SHA1");
+            sha.update(input.getBytes());
+            return hex(sha.digest());
+        } catch (NoSuchAlgorithmException e) {
+            log.error(ZorkaLogger.ZSP_ERRORS, "Not supported digest algorithm: 'SHA1'");
+        }
+        return null;
     }
 
 }

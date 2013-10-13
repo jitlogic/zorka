@@ -874,6 +874,82 @@ public class SpyLib {
         return strTime(dst, "T");
     }
 
+
+    /**
+     * Calculates CRC32 sum and stores it as hexified string
+     *
+     * @param dst destination field
+     * @param src source field
+     * @return processor object
+     */
+    public SpyProcessor crc32sum(String dst, String src) {
+        return crc32sum(dst, src, CheckSumProcessor.MAX_LIMIT);
+    }
+
+
+    /**
+     * Calculates CRC32 sum and stores it as hexified string
+     *
+     * @param dst   destination field
+     * @param src   source field
+     * @param limit maximum length of resulting string
+     * @return processor object
+     */
+    public SpyProcessor crc32sum(String dst, String src, int limit) {
+        return new CheckSumProcessor(dst, src, CheckSumProcessor.CRC32_TYPE, limit);
+    }
+
+
+    /**
+     * Calculates MD5 sum and stores it as hexified string
+     *
+     * @param dst destination field
+     * @param src source field
+     * @return processor object
+     */
+    public SpyProcessor md5sum(String dst, String src) {
+        return md5sum(dst, src, CheckSumProcessor.MAX_LIMIT);
+    }
+
+
+    /**
+     * Calculates MD5 sum and stores it as hexified string
+     *
+     * @param dst   destination field
+     * @param src   source field
+     * @param limit maximum length of resulting string
+     * @return processor object
+     */
+    public SpyProcessor md5sum(String dst, String src, int limit) {
+        return new CheckSumProcessor(dst, src, CheckSumProcessor.MD5_TYPE, limit);
+    }
+
+
+    /**
+     * Calculates SHA1 sum and stores it as hexified string
+     *
+     * @param dst destination field
+     * @param src source field
+     * @return processor object
+     */
+    public SpyProcessor sha1sum(String dst, String src) {
+        return sha1sum(dst, src, CheckSumProcessor.MAX_LIMIT);
+    }
+
+
+    /**
+     * Calculates SHA1 sum and stores it as hexified string
+     *
+     * @param dst   destination field
+     * @param src   source field
+     * @param limit maximum length of resulting string
+     * @return processor object
+     */
+    public SpyProcessor sha1sum(String dst, String src, int limit) {
+        return new CheckSumProcessor(dst, src, CheckSumProcessor.SHA1_TYPE, limit);
+    }
+
+
     /**
      * Return time in human readable form.
      *
