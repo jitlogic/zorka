@@ -23,6 +23,7 @@ import org.fusesource.restygwt.client.RestService;
 import javax.ws.rs.*;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TraceDataApi extends RestService {
 
@@ -86,6 +87,7 @@ public interface TraceDataApi extends RestService {
     public void deleteHost(@PathParam("hostId") int hostId,
                            MethodCallback<Void> callback);
 
+
     @GET
     @Path("hosts/{hostId}/{traceOffs}/rank?orderBy={orderBy}&orderDesc={orderDesc}")
     public void traceMethodRank(
@@ -94,4 +96,16 @@ public interface TraceDataApi extends RestService {
             @PathParam("orderBy") String orderBy,
             @PathParam("orderDesc") String orderDesc,
             MethodCallback<List<MethodRankInfo>> callback);
+
+
+    @GET
+    @Path("hosts/tidmap")
+    public void getTidMap(MethodCallback<Map<String, String>> cb);
+
+
+    @GET
+    @Path("hosts/tidmap/{hostId}")
+    public void getTidMap(@PathParam("hostId") int hostId,
+                          MethodCallback<Map<String, String>> cb);
+
 }

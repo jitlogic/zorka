@@ -76,7 +76,7 @@ public class TemplateManagerUnitTest extends ZicoFixture {
 
     @Test
     public void testSearchForEmptyTraceIdMap() {
-        Map<Integer, String> ttids = adminService.getTidMap();
+        Map<Integer, String> ttids = traceDataService.getTidMap();
         assertEquals(0, ttids.size());
     }
 }

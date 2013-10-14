@@ -62,8 +62,14 @@ public class DataCollectionIntegTest extends ZicoFixture {
         return jdbc.queryForObject("select count(1) as C from TRACES where HOST_ID = ?", Integer.class, hostId);
     }
 
+    private int countTraceTypes(String hostName) {
+        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
 
-    @Test//(timeout = 1000)
+        int hostId = jdbc.queryForObject("select HOST_ID from HOSTS where HOST_NAME = ?", Integer.class, hostName);
+        return jdbc.queryForObject("select count(1) as C from TRACE_TYPES where HOST_ID = ?", Integer.class, hostId);
+    }
+
+    @Test(timeout = 1000)
     public void testCollectSingleTraceRecord() throws Exception {
         JdbcTemplate jdbc = new JdbcTemplate(dataSource);
         TraceRecord rec = generator.generate();
@@ -71,12 +77,16 @@ public class DataCollectionIntegTest extends ZicoFixture {
         submit(rec);
 
         assertEquals("One trace should be noticed.", 1, countTraces("test"));
+        assertEquals("One trace type should be noticed", 1, countTraceTypes("test"));
 
         String tn1 = generator.getSymbols().symbolName(rec.getMarker().getTraceId());
         int remoteTID = jdbc.queryForObject("select TRACE_ID from TRACES", Integer.class);
         String tn2 = symbolRegistry.symbolName(remoteTID);
 
         assertEquals(tn1, tn2);
+
+        int remoteTypeId = jdbc.queryForObject("select TRACE_ID from TRACE_TYPES", Integer.class);
+        assertEquals("Trace type ID stored in TRACE_TYPES table should be the same.", remoteTID, remoteTypeId);
     }
 
 

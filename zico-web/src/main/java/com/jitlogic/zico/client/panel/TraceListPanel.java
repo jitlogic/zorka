@@ -442,7 +442,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
     }
 
     private void loadTraceTypes() {
-        ads.getTidMap(new MethodCallback<Map<String, String>>() {
+        tds.getTidMap(selectedHost.getId(), new MethodCallback<Map<String, String>>() {
             @Override
             public void onFailure(Method method, Throwable exception) {
                 errorHandler.error("Error calling API method: " + method, exception);

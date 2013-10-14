@@ -18,6 +18,7 @@ package com.jitlogic.zico.core.rest;
 
 import com.google.inject.Inject;
 import com.jitlogic.zico.core.TraceTemplateManager;
+import com.jitlogic.zico.core.TraceTypeRegistry;
 import com.jitlogic.zico.data.TraceTemplateInfo;
 
 import javax.ws.rs.*;
@@ -27,7 +28,6 @@ import java.util.Map;
 
 @Path("admin")
 public class AdminService {
-
 
     private TraceTemplateManager templater;
 
@@ -43,7 +43,6 @@ public class AdminService {
         return templater.listTemplates();
     }
 
-
     @POST
     @Path("/templates")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -56,12 +55,5 @@ public class AdminService {
     @Path("/templates/{tid}")
     public void removeTemplate(@PathParam("tid") int tid) {
         templater.remove(tid);
-    }
-
-    @GET
-    @Path("/tidmap")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<Integer, String> getTidMap() {
-        return templater.getTidMap();
     }
 }

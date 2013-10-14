@@ -18,6 +18,7 @@ package com.jitlogic.zico.core.rest;
 import com.jitlogic.zico.core.HostStore;
 import com.jitlogic.zico.core.HostStoreManager;
 import com.jitlogic.zico.core.TraceRecordStore;
+import com.jitlogic.zico.core.TraceTypeRegistry;
 import com.jitlogic.zico.data.*;
 import com.jitlogic.zorka.common.tracedata.*;
 
@@ -32,10 +33,12 @@ public class TraceDataService {
 
     private HostStoreManager storeManager;
 
+    private TraceTypeRegistry traceTypeRegistry;
 
     @Inject
-    public TraceDataService(HostStoreManager storeManager) {
+    public TraceDataService(HostStoreManager storeManager, TraceTypeRegistry traceTypeRegistry) {
         this.storeManager = storeManager;
+        this.traceTypeRegistry = traceTypeRegistry;
     }
 
 
@@ -183,4 +186,19 @@ public class TraceDataService {
         TraceRecordStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
         return ctx.methodRank(orderBy, orderDesc);
     }
+
+    @GET
+    @Path("/tidmap")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<Integer, String> getTidMap() {
+        return traceTypeRegistry.getTidMap(null);
+    }
+
+    @GET
+    @Path("/tidmap/{hostId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<Integer, String> getTidMap(@PathParam("hostId") int hostId) {
+        return traceTypeRegistry.getTidMap(hostId);
+    }
+
 }

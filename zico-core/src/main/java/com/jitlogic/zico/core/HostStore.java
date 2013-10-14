@@ -52,6 +52,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
     private RDSStore rds;
     private HostInfo hostInfo;
     private HostStoreManager manager;
+
     private TraceCache cache;
 
     private String reOp;

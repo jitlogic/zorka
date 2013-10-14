@@ -34,10 +34,6 @@ public interface AdminApi extends RestService {
     @Path("admin/templates")
     public void saveTemplate(TraceTemplateInfo tti, MethodCallback<Integer> cb);
 
-    @GET
-    @Path("admin/tidmap")
-    public void getTidMap(MethodCallback<Map<String, String>> cb);
-
     @DELETE
     @Path("admin/templates/{tid}")
     public void removeTemplate(@PathParam("tid") int tid, MethodCallback<Void> cb);
