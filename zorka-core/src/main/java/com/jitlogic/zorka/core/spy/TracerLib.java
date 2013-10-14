@@ -334,6 +334,11 @@ public class TracerLib {
     }
 
 
+    public long getTracerMinMethodTime() {
+        return Tracer.getMinMethodTime();
+    }
+
+
     /**
      * Sets minimum traced method execution time. Methods that took less time
      * will be discarded from traces and will only reflect in summary call/error counters.
@@ -353,6 +358,11 @@ public class TracerLib {
      */
     public void setTracerMinMethodTime(long methodTime) {
         Tracer.setMinMethodTime(methodTime);
+    }
+
+
+    public long getTracerMinTraceTime() {
+        return TraceMarker.getMinTraceTime() / 1000000L;
     }
 
 
@@ -396,6 +406,11 @@ public class TracerLib {
 
     public void setTracerMaxTraceRecords(long maxRecords) {
         Tracer.setMaxTraceRecords((int) maxRecords);
+    }
+
+
+    public int getTracerMaxTraceRecords() {
+        return Tracer.getMaxTraceRecords();
     }
 
 
