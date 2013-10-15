@@ -60,6 +60,10 @@ public class TraceAttrProcessor implements SpyProcessor {
      */
     private String srcVal;
 
+    /**
+     * Trace ID (if any).
+     */
+    private int traceId;
 
     /**
      * Attribute ID (as taken from symbol registry)
@@ -76,9 +80,12 @@ public class TraceAttrProcessor implements SpyProcessor {
     /**
      * Creates custom attribute processor.
      *
-     * @param tracer   tracer object
-     * @param srcVal   source field name
-     * @param attrName attribute ID
+     * @param symbolRegistry agent's symbol registry
+     * @param tracer         tracer object
+     * @param type           processor type (field getting or string formatting)
+     * @param srcVal         source field name
+     * @param attrName       attribute ID
+     * @param attrTag        (optional) attribute tag
      */
     public TraceAttrProcessor(SymbolRegistry symbolRegistry, Tracer tracer, int type,
                               String srcVal, String attrName, String attrTag) {
@@ -86,8 +93,24 @@ public class TraceAttrProcessor implements SpyProcessor {
         this.srcVal = srcVal;
         this.symbolRegistry = symbolRegistry;
         this.type = type;
+        this.traceId = -1;
         this.attrId = symbolRegistry.symbolId(attrName);
         this.attrTagId = attrTag != null ? symbolRegistry.symbolId(attrTag) : null;
+    }
+
+    /**
+     * @param symbolRegistry agent's symbol registry
+     * @param tracer         tracer object
+     * @param type           processor type (field getting or string formatting)
+     * @param srcVal         source field name
+     * @param traceName
+     * @param attrName       attribute ID
+     * @param attrTag        (optional) attribute tag
+     */
+    public TraceAttrProcessor(SymbolRegistry symbolRegistry, Tracer tracer, int type,
+                              String srcVal, String traceName, String attrName, String attrTag) {
+        this(symbolRegistry, tracer, type, srcVal, attrName, attrTag);
+        this.traceId = traceName == null ? 0 : symbolRegistry.symbolId(traceName);
     }
 
 
@@ -104,7 +127,7 @@ public class TraceAttrProcessor implements SpyProcessor {
                         + symbolRegistry.symbolName(attrId) + " (classId= " + top.getClassId() + " methodId=" + top.getMethodId()
                         + " signatureId=" + top.getSignatureId() + ")");
             }
-            tracer.getHandler().newAttr(attrId, attrTagId != null ? new TaggedValue(attrTagId, val) : val);
+            tracer.getHandler().newAttr(traceId, attrId, attrTagId != null ? new TaggedValue(attrTagId, val) : val);
         } else {
             if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
                 log.debug(ZorkaLogger.ZSP_ARGPROC, "Null value received. ");

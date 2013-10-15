@@ -1,0 +1,207 @@
+/**
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * <p/>
+ * This is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * <p/>
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p/>
+ * You should have received a copy of the GNU General Public License
+ * along with this software. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.jitlogic.zorka.core.test.spy;
+
+import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
+import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.core.test.support.ZorkaFixture;
+
+import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.*;
+
+import static com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture.*;
+import static com.jitlogic.zorka.core.test.support.TestUtil.*;
+
+public class FullTracerUnitTest extends ZorkaFixture {
+
+    private List<TraceRecord> results = new ArrayList<TraceRecord>();
+
+    private ZorkaAsyncThread<SymbolicRecord> output;
+
+    private int sym(String s) {
+        return agentInstance.getSymbolRegistry().symbolId(s);
+    }
+
+
+    @Before
+    public void initOutput() {
+        output = new ZorkaAsyncThread<SymbolicRecord>("test") {
+            @Override
+            public boolean submit(SymbolicRecord obj) {
+                results.add((TraceRecord) obj);
+                return true;
+            }
+
+            @Override
+            protected void process(SymbolicRecord obj) {
+            }
+        };
+    }
+
+
+    @Test
+    public void testSimpleTooShortTrace() throws Exception {
+        tracer.include(spy.byMethod(TCLASS1, "trivialMethod"));
+        spy.add(
+                spy.instance().onEnter(tracer.begin("TEST"))
+                        .include(spy.byMethod(TCLASS1, "trivialMethod")));
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS1);
+        invoke(obj, "trivialMethod");
+
+        assertEquals("should return begin, trace", 0, results.size());
+    }
+
+
+    @Test
+    public void testSimpleTrace() throws Exception {
+        tracer.include(spy.byMethod(TCLASS1, "trivialMethod"));
+        spy.add(
+                spy.instance().onEnter(tracer.begin("TEST", 0))
+                        .include(spy.byMethod(TCLASS1, "trivialMethod")));
+
+        agentInstance.getTracer().setMinMethodTime(0); // Catch everything
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS1);
+        invoke(obj, "trivialMethod");
+
+        assertEquals("should return begin, trace", 1, results.size());
+        TraceRecord rec = results.get(0);
+        assertEquals(sym(TCLASS1), rec.getClassId());
+        assertEquals(1, rec.getCalls());
+    }
+
+
+    @Test
+    public void testSimpleTraceWithAttr() throws Exception {
+        tracer.include(spy.byMethod(TCLASS1, "trivialMethod"));
+        spy.add(spy.instance().onEnter(
+                tracer.begin("TEST", 0),
+                spy.put("URL", "http://some.url"),
+                tracer.attr("URL", "URL")
+        ).include(spy.byMethod(TCLASS1, "trivialMethod")));
+
+        agentInstance.getTracer().setMinMethodTime(0);
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS1);
+        invoke(obj, "trivialMethod");
+
+        assertEquals("should return begin, trace", 1, results.size());
+        assertNotNull(results.get(0).getAttrs());
+        assertEquals("http://some.url", results.get(0).getAttr(symbols.symbolId("URL")));
+    }
+
+
+    @Test
+    public void testTraceAttrUpwardPropagationToNamedTrace() throws Exception {
+        tracer.include(spy.byMethod(TCLASS4, "recur*"));
+        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
+        spy.add(spy.instance().onEnter(tracer.begin("TEST2", 0)).include(spy.byMethod(TCLASS4, "recursive2")));
+        spy.add(spy.instance().onEnter(tracer.formatTraceAttr("TEST1", "X", "XXX")).include(spy.byMethod(TCLASS4, "recursive1")));
+
+        agentInstance.getTracer().setMinMethodTime(0);
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
+        invoke(obj, "recursive3");
+
+        assertEquals("should return two traces", 2, results.size());
+        assertEquals("TEST1", symbols.symbolName(results.get(1).getMarker().getTraceId()));
+        assertEquals("XXX", results.get(1).getAttr(symbols.symbolId("X")));
+    }
+
+
+    @Test
+    public void testTraceAttrUpwardPropagationToAnyTrace() throws Exception {
+        tracer.include(spy.byMethod(TCLASS4, "recur*"));
+        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
+        spy.add(spy.instance().onEnter(tracer.begin("TEST2", 0)).include(spy.byMethod(TCLASS4, "recursive2")));
+        spy.add(spy.instance().onEnter(tracer.formatTraceAttr(null, "X", "XXX")).include(spy.byMethod(TCLASS4, "recursive1")));
+
+        agentInstance.getTracer().setMinMethodTime(0);
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
+        invoke(obj, "recursive3");
+
+        assertEquals("should return two traces", 2, results.size());
+        assertEquals("TEST2", symbols.symbolName(results.get(0).getMarker().getTraceId()));
+        assertEquals("XXX", results.get(0).getAttr(symbols.symbolId("X")));
+    }
+
+    @Test
+    public void testTraceAttrUpwardPropagationToUnknownTrace() throws Exception {
+        tracer.include(spy.byMethod(TCLASS4, "recur*"));
+        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
+        spy.add(spy.instance().onEnter(tracer.begin("TEST2", 0)).include(spy.byMethod(TCLASS4, "recursive2")));
+        spy.add(spy.instance().onEnter(tracer.formatTraceAttr("TEST3", "X", "XXX")).include(spy.byMethod(TCLASS4, "recursive1")));
+
+        agentInstance.getTracer().setMinMethodTime(0);
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
+        invoke(obj, "recursive3");
+
+        assertEquals("should return two traces", 2, results.size());
+        assertEquals(null, results.get(0).getAttr(symbols.symbolId("X")));
+        assertEquals(null, results.get(1).getAttr(symbols.symbolId("X")));
+    }
+
+
+    @Test
+    public void testTraceAttrUpwardPropagationToTheSameMethodNamed() throws Exception {
+        tracer.include(spy.byMethod(TCLASS4, "recur*"));
+        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0), tracer.formatTraceAttr("TEST1", "X", "XXX")).include(spy.byMethod(TCLASS4, "recursive3")));
+
+        agentInstance.getTracer().setMinMethodTime(0);
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
+        invoke(obj, "recursive3");
+
+        assertEquals("should return two traces", 1, results.size());
+        assertEquals("TEST1", symbols.symbolName(results.get(0).getMarker().getTraceId()));
+        assertEquals("XXX", results.get(0).getAttr(symbols.symbolId("X")));
+    }
+
+
+    @Test
+    public void testTraceAttrUpwardPropagationToTheSameMethodUnnamed() throws Exception {
+        tracer.include(spy.byMethod(TCLASS4, "recur*"));
+        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0), tracer.formatTraceAttr(null, "X", "XXX")).include(spy.byMethod(TCLASS4, "recursive3")));
+
+        agentInstance.getTracer().setMinMethodTime(0);
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
+        invoke(obj, "recursive3");
+
+        assertEquals("should return two traces", 1, results.size());
+        assertEquals("TEST1", symbols.symbolName(results.get(0).getMarker().getTraceId()));
+        assertEquals("XXX", results.get(0).getAttr(symbols.symbolId("X")));
+    }
+
+}

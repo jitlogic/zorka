@@ -186,8 +186,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceEnter(c1, m1, s1, 100 * MS);
         b.traceBegin(t1, 700L, TraceMarker.DROP_INTERIM);
         b.setMinimumTraceTime(0);
-        b.newAttr(a1, "some val");
-        b.newAttr(a2, "other val");
+        b.newAttr(-1, a1, "some val");
+        b.newAttr(-1, a2, "other val");
         b.traceReturn(110 * MS);
 
         checkRC(1, 0);
@@ -553,7 +553,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
         b.traceEnter(c1, m1, s1, 10 * MS + 1);
         b.traceReturn(10 * MS + 2);
-        b.newAttr(1, "oja!");
+        b.newAttr(-1, 1, "oja!");
         b.traceReturn(20 * MS);
 
         checkRC(1, 0);

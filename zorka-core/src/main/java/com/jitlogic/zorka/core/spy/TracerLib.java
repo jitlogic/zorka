@@ -153,76 +153,119 @@ public class TracerLib {
     /**
      * Creates spy processor that attaches attribute to trace record.
      *
+     * @param attrName destination attribute name (in trace data)
      * @param srcField source field name (from spy record)
-     * @param dstAttr  destination attribute name (in trace data)
      * @return spy processor object adding new trace attribute
      */
-    public SpyProcessor attr(String srcField, String dstAttr) {
-        return attr(srcField, dstAttr, null);
+    public SpyProcessor attr(String attrName, String srcField) {
+        return attr(attrName, null, srcField);
+    }
+
+
+    public SpyProcessor traceAttr(String traceName, String attrName, String srcField) {
+        return traceAttr(traceName, attrName, srcField);
     }
 
 
     /**
      * Creates spy processor that formats a string and attaches it as attribute to trace record.
      *
+     * @param attrName  destination attribute name (in trace data)
      * @param srcFormat source field name (from spy record)
-     * @param dstAttr   destination attribute name (in trace data)
      * @return spy processor object adding new trace attribute
      */
-    public SpyProcessor formatAttr(String srcFormat, String dstAttr) {
-        return formatAttr(srcFormat, dstAttr, null);
+    public SpyProcessor formatAttr(String attrName, String srcFormat) {
+        return formatAttr(attrName, null, srcFormat);
+    }
+
+
+    public SpyProcessor formatTraceAttr(String traceName, String attrName, String srcFormat) {
+        return formatTraceAttr(traceName, attrName, null, srcFormat);
     }
 
 
     /**
      * Creates spy processor that attaches tagged attribute to trace record.
      *
-     * @param srcField source field name (from spy record)
-     * @param dstAttr  destination attribute name (in trace data)
+     * @param attrName destination attribute name (in trace data)
      * @param attrTag  attribute tag;
+     * @param srcField source field name (from spy record)
      * @return spy processor object adding new trace attribute
      */
-    public SpyProcessor attr(String srcField, String dstAttr, String attrTag) {
+    public SpyProcessor attr(String attrName, String attrTag, String srcField) {
         return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.FIELD_GETTING_PROCESSOR,
-                srcField, dstAttr, attrTag);
+                srcField, null, attrName, attrTag);
+    }
+
+
+    public SpyProcessor traceAttr(String traceName, String attrName, String attrTag, String srcField) {
+        return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.FIELD_GETTING_PROCESSOR,
+                srcField, traceName, attrName, attrTag);
     }
 
 
     /**
      * Creates spy processor that formats a string and attaches it as tagged attribute to trace record.
      *
-     * @param srcFormat source field name (from spy record)
-     * @param dstAttr   destination attribute name (in trace data)
+     * @param attrName  destination attribute name (in trace data)
      * @param attrTag   attribute tag;
+     * @param srcFormat source field name (from spy record)
      * @return spy processor object adding new trace attribute
      */
-    public SpyProcessor formatAttr(String srcFormat, String dstAttr, String attrTag) {
+    public SpyProcessor formatAttr(String attrName, String attrTag, String srcFormat) {
         return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.STRING_FORMAT_PROCESSOR,
-                srcFormat, dstAttr, attrTag);
+                srcFormat, null, attrName, attrTag);
+    }
+
+
+    public SpyProcessor formatTraceAttr(String traceName, String attrName, String attrTag, String srcFormat) {
+        return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.STRING_FORMAT_PROCESSOR,
+                srcFormat, traceName, attrName, attrTag);
     }
 
 
     /**
      * Adds trace attribute to trace record immediately. This is useful for programmatic attribute setting.
      *
-     * @param name  attribute name
-     * @param value attribute value
+     * @param attrName attribute name
+     * @param value    attribute value
      */
-    public void newAttr(String name, Object value) {
-        tracer.getHandler().newAttr(symbolRegistry.symbolId(name), value);
+    public void newAttr(String attrName, Object value) {
+        tracer.getHandler().newAttr(-1, symbolRegistry.symbolId(attrName), value);
     }
 
 
     /**
-     * Adds trace attribute to trace record immediately. This is useful for programmatic attribute setting.
-     *
-     * @param name  attribute name
-     * @param value attribute value
+     * @param traceName
+     * @param attrName
+     * @param value
      */
-    public void newAttr(String name, Object value, String tag) {
-        tracer.getHandler().newAttr(symbolRegistry.symbolId(name), new TaggedValue(symbolRegistry.symbolId(tag), value));
+    public void newTraceAttr(String traceName, String attrName, Object value) {
+        tracer.getHandler().newAttr(symbolRegistry.symbolId(traceName), symbolRegistry.symbolId(attrName), value);
     }
 
+    /**
+     * Adds trace attribute to trace record immediately. This is useful for programmatic attribute setting.
+     *
+     * @param attrName attribute name
+     * @param value    attribute value
+     */
+    public void newAttr(String attrName, String tag, Object value) {
+        tracer.getHandler().newAttr(-1, symbolRegistry.symbolId(attrName), new TaggedValue(symbolRegistry.symbolId(tag), value));
+    }
+
+
+    /**
+     * @param traceName
+     * @param attrName
+     * @param tag
+     * @param value
+     */
+    public void newTraceAttr(String traceName, String attrName, String tag, Object value) {
+        tracer.getHandler().newAttr(
+                symbolRegistry.symbolId(traceName), symbolRegistry.symbolId(attrName),
+                new TaggedValue(symbolRegistry.symbolId(tag), value));
+    }
 
     /**
      * Creates spy processor that sets flags in trace marker.
