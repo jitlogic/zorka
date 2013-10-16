@@ -36,10 +36,12 @@ import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.button.TextButton;
+import com.sencha.gxt.widget.core.client.button.ToggleButton;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.CellDoubleClickEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
+import com.sencha.gxt.widget.core.client.event.ShowEvent;
 import com.sencha.gxt.widget.core.client.form.CheckBox;
 import com.sencha.gxt.widget.core.client.form.FieldLabel;
 import com.sencha.gxt.widget.core.client.form.TextField;
@@ -77,6 +79,8 @@ public class TraceRecordSearchDialog extends Dialog {
     private CheckBox chkErrorsOnly;
     private CheckBox chkMethodsWithAttrs;
 
+    private ToggleButton btnEql;
+
     private ErrorHandler errorHandler;
 
     private Label lblSumStats;
@@ -97,7 +101,7 @@ public class TraceRecordSearchDialog extends Dialog {
 
     private void createUI() {
 
-        setHeadingText("Search for methods ...");
+        setHeadingText("Search for methods");
         setPredefinedButtons();
         setPixelSize(1200, 750);
 
@@ -113,11 +117,14 @@ public class TraceRecordSearchDialog extends Dialog {
         hd1.setMargins(new Margins(0, 4, 4, 0));
         hl1.setLayoutData(hd1);
 
+        btnEql = new ToggleButton();
+        btnEql.setIcon(Resources.INSTANCE.eqlIcon());
+        btnEql.setToolTip("EQL query (instead of full text search)");
+        hl1.add(btnEql);
 
         txtSearchFilter = new TextField();
         txtSearchFilter.setEmptyText("Enter search text ...");
         hl1.add(txtSearchFilter, new HorizontalLayoutContainer.HorizontalLayoutData(1, 1));
-
 
         txtSearchFilter.addKeyDownHandler(new KeyDownHandler() {
             @Override
@@ -127,7 +134,6 @@ public class TraceRecordSearchDialog extends Dialog {
                 }
             }
         });
-
 
         TextButton btnSearch = new TextButton();
         btnSearch.setIcon(Resources.INSTANCE.searchIcon());
@@ -174,7 +180,6 @@ public class TraceRecordSearchDialog extends Dialog {
 
         chkExceptionText = new CheckBox();
         chkExceptionText.setBoxLabel("Exception text");
-        chkExceptionText.setValue(true);
         hp.add(chkExceptionText);
 
         vp.add(new FieldLabel(hp, "Search in"));
@@ -199,15 +204,12 @@ public class TraceRecordSearchDialog extends Dialog {
 
         add(vp);
 
-
-        //TextButton btnClose = new TextButton("Close");
-        //btnClose.addSelectHandler(new SelectEvent.SelectHandler() {
-        //    @Override
-        //    public void onSelect(SelectEvent event) {
-        //        TraceRecordSearchDialog.this.hide();
-        //    }
-        //});
-        //addButton(btnClose);
+        addShowHandler(new ShowEvent.ShowHandler() {
+            @Override
+            public void onShow(ShowEvent event) {
+                setFocusWidget(txtSearchFilter);
+            }
+        });
     }
 
 
@@ -221,7 +223,7 @@ public class TraceRecordSearchDialog extends Dialog {
 
     public void setRootPath(String rootPath) {
         if (this.rootPath != rootPath) {
-            this.rootPath = rootPath; //.startsWith("/") ? rootPath.substring(1, rootPath.length()) : rootPath;
+            this.rootPath = rootPath;
             this.resultsStore.clear();
             this.lblSumStats.setText("n/a");
         }
@@ -304,6 +306,8 @@ public class TraceRecordSearchDialog extends Dialog {
 
     private void doSearch() {
 
+        expr.setType(btnEql.getValue() ? TraceDetailSearchExpression.EQL_QUERY : TraceDetailSearchExpression.TXT_QUERY);
+
         expr.setFlags(
                 (chkErrorsOnly.getValue() ? TraceDetailSearchExpression.ERRORS_ONLY : 0)
                         | (chkMethodsWithAttrs.getValue() ? TraceDetailSearchExpression.METHODS_WITH_ATTRS : 0)
@@ -312,7 +316,7 @@ public class TraceRecordSearchDialog extends Dialog {
                         | (chkAttribs.getValue() ? TraceDetailSearchExpression.SEARCH_ATTRS : 0)
                         | (chkExceptionText.getValue() ? TraceDetailSearchExpression.SEARCH_EX_MSG : 0));
 
-        expr.setSearchExpr(txtSearchFilter.getValue());
+        expr.setSearchExpr(txtSearchFilter.getCurrentValue());
 
         tds.searchTraceRecords(trace.getHostId(), trace.getDataOffs(), 0, rootPath, expr,
                 new MethodCallback<TraceRecordSearchResult>() {
@@ -332,6 +336,7 @@ public class TraceRecordSearchDialog extends Dialog {
                                 + ", " + ClientUtil.formatDuration(response.getMaxTime()) + " max."
 
                         );
+                        setFocusWidget(txtSearchFilter);
                     }
                 });
     }

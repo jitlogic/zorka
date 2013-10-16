@@ -20,6 +20,9 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class TraceDetailSearchExpression {
 
+    public final static int TXT_QUERY = 0;
+    public final static int EQL_QUERY = 1;
+
     public final static int ERRORS_ONLY = 0x0001;
     public final static int METHODS_WITH_ATTRS = 0x0002;
 
@@ -28,6 +31,11 @@ public class TraceDetailSearchExpression {
     public final static int SEARCH_ATTRS = 0x0400;
     public final static int SEARCH_EX_MSG = 0x0800;
     public final static int SEARCH_EX_STACK = 0x1000;
+    public final static int SEARCH_SIGNATURE = 0x2000;
+
+
+    @JsonProperty
+    int type;
 
     @JsonProperty
     int flags;
@@ -41,6 +49,14 @@ public class TraceDetailSearchExpression {
 
     public boolean emptyExpr() {
         return searchExpr == null || searchExpr.trim().length() == 0;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public int getFlags() {

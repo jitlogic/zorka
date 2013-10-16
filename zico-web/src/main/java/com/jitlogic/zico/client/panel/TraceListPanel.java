@@ -70,7 +70,6 @@ public class TraceListPanel extends VerticalLayoutContainer {
     private static final TraceInfoProperties props = GWT.create(TraceInfoProperties.class);
 
     private TraceDataApi tds;
-    private AdminApi ads;
     private PanelFactory panelFactory;
 
     private HostInfo selectedHost;
@@ -95,12 +94,11 @@ public class TraceListPanel extends VerticalLayoutContainer {
     private ErrorHandler errorHandler;
 
     @Inject
-    public TraceListPanel(Provider<ZicoShell> shell, TraceDataApi tds, AdminApi ads,
+    public TraceListPanel(Provider<ZicoShell> shell, TraceDataApi tds,
                           PanelFactory panelFactory, @Assisted HostInfo hostInfo,
                           ErrorHandler errorHandler) {
         this.shell = shell;
         this.tds = tds;
-        this.ads = ads;
         this.selectedHost = hostInfo;
         this.panelFactory = panelFactory;
         this.errorHandler = errorHandler;
@@ -137,6 +135,8 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
         ColumnConfig<TraceInfo, String> traceTypeCol = new ColumnConfig<TraceInfo, String>(props.traceType(), 50, "Type");
         traceTypeCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+        traceTypeCol.setSortable(false);
+        traceTypeCol.setMenuDisabled(true);
 
         ColumnConfig<TraceInfo, TraceInfo> descCol = new ColumnConfig<TraceInfo, TraceInfo>(
                 new IdentityValueProvider<TraceInfo>(), 500, "Description");

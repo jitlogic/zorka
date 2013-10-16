@@ -156,10 +156,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
         btnSearch.addSelectHandler(new SelectEvent.SelectHandler() {
             @Override
             public void onSelect(SelectEvent event) {
-                if (searchDialog == null) {
-                    searchDialog = panelFactory.traceRecordSearchDialog(TraceDetailPanel.this, traceInfo);
-                }
-                searchDialog.show();
+                doSearch();
             }
         });
 
@@ -214,6 +211,13 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
                 methodTreeStore.add(tr);
             }
         });
+    }
+
+    private void doSearch() {
+        if (searchDialog == null) {
+            searchDialog = panelFactory.traceRecordSearchDialog(this, traceInfo);
+        }
+        searchDialog.show();
     }
 
 

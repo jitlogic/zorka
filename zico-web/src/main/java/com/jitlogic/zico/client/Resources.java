@@ -89,6 +89,9 @@ public interface Resources extends ClientBundle {
     @Source("images/goto.png")
     ImageResource gotoIcon();
 
+    @Source("images/eql.png")
+    ImageResource eqlIcon();
+
     @DataResource.MimeType("text/html")
     @Source("resources/tips.html")
     TextResource tipsHtml();
