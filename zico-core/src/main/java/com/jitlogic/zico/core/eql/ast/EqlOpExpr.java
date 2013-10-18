@@ -13,29 +13,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core.eql;
+package com.jitlogic.zico.core.eql.ast;
 
 
-import com.jitlogic.zico.core.eql.ast.EqlExpr;
+public abstract class EqlOpExpr extends EqlExpr {
 
-public class EqlException extends RuntimeException {
-
-    private EqlExpr expr;
-
-    public EqlException(String msg) {
-        super(msg);
+    public static Object precede(Object exobj) {
+        if (exobj instanceof EqlOpExpr) {
+            EqlOpExpr expr = (EqlOpExpr) exobj;
+            expr.preceding = true;
+            return expr;
+        } else {
+            return exobj;
+        }
     }
 
-    public EqlException(String msg, Throwable cause) {
-        super(msg, cause);
+    private boolean preceding;
+
+    public boolean isPreceding() {
+        return preceding;
     }
 
-    public EqlException(String msg, EqlExpr expr) {
-        super(msg);
-        this.expr = expr;
-    }
-
-    public EqlExpr getExpr() {
-        return expr;
-    }
 }

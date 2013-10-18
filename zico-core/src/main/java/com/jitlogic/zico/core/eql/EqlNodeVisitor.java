@@ -13,17 +13,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core.eql.ast;
+package com.jitlogic.zico.core.eql;
 
+
+import com.jitlogic.zico.core.eql.ast.*;
 
 public class EqlNodeVisitor<T> {
 
-    public T visit(EqlExpression node) {
+    public T visit(EqlExpr node) {
         return node.accept(this);
     }
 
     public T visit(EqlFunCall node) {
-        for (EqlExpression expr : node.getArguments()) {
+        for (EqlExpr expr : node.getArguments()) {
             expr.accept(this);
         }
         node.getFunction().accept(this);
@@ -33,6 +35,11 @@ public class EqlNodeVisitor<T> {
     public T visit(EqlBinaryExpr node) {
         node.getArg1().accept(this);
         node.getArg2().accept(this);
+        return null;
+    }
+
+    public T visit(EqlUnaryExpr node) {
+        node.getArg().accept(this);
         return null;
     }
 

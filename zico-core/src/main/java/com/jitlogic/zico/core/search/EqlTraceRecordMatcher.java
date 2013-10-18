@@ -18,7 +18,7 @@ package com.jitlogic.zico.core.search;
 
 import com.jitlogic.zico.core.ZicoUtil;
 import com.jitlogic.zico.core.eql.EqlExprEvaluator;
-import com.jitlogic.zico.core.eql.ast.EqlExpression;
+import com.jitlogic.zico.core.eql.ast.EqlExpr;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
@@ -26,7 +26,7 @@ import com.jitlogic.zorka.common.util.ZorkaUtil;
 public class EqlTraceRecordMatcher extends EqlExprEvaluator implements TraceRecordMatcher {
 
     private SymbolRegistry symbolRegistry;
-    private EqlExpression expr;
+    private EqlExpr expr;
     private int flags;
 
     private long totalTime;
@@ -35,7 +35,7 @@ public class EqlTraceRecordMatcher extends EqlExprEvaluator implements TraceReco
     private String signature;
 
 
-    public EqlTraceRecordMatcher(SymbolRegistry symbolRegistry, EqlExpression expr, int flags, long totalTime) {
+    public EqlTraceRecordMatcher(SymbolRegistry symbolRegistry, EqlExpr expr, int flags, long totalTime) {
         this.symbolRegistry = symbolRegistry;
         this.expr = expr;
         this.flags = flags;

@@ -17,8 +17,10 @@ package com.jitlogic.zico.core.eql;
 
 
 import com.jitlogic.zico.core.eql.ast.*;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 public abstract class EqlExprEvaluator extends EqlNodeVisitor<Object> {
+
 
     public Object visit(EqlBinaryExpr expr) {
 
@@ -57,7 +59,19 @@ public abstract class EqlExprEvaluator extends EqlNodeVisitor<Object> {
                 return EqlUtils.bitwise(expr.getArg1().accept(this), expr.getOp(), expr.getArg2().accept(this));
         }
 
-        throw new EqlException("Operation '" + expr.getOp().getName() + "' not implemented: ", expr);
+        throw new EqlException("Operation '" + expr.getOp().getName() + "' not suitable for binary expressions.", expr);
+    }
+
+
+    public Object visit(EqlUnaryExpr expr) {
+        switch (expr.getOp()) {
+            case NOT:
+                return !ZorkaUtil.coerceBool(expr.getArg().accept(this));
+            case BIT_NOT:
+                return EqlUtils.negate(expr.getArg().accept(this));
+        }
+
+        throw new EqlException("Operation '" + expr.getOp().getName() + "' not suitable for unary expressions.", expr);
     }
 
 

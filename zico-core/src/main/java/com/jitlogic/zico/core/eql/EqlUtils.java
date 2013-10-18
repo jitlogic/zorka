@@ -16,7 +16,7 @@
 package com.jitlogic.zico.core.eql;
 
 
-import com.jitlogic.zico.core.eql.ast.EqlBinaryOp;
+import com.jitlogic.zico.core.eql.ast.EqlOp;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.util.regex.Pattern;
@@ -103,10 +103,10 @@ public class EqlUtils {
     }
 
 
-    public static Object arithmetic(Object obj1, EqlBinaryOp op, Object obj2) {
+    public static Object arithmetic(Object obj1, EqlOp op, Object obj2) {
 
         if (obj1 == null || obj2 == null) {
-            if (op == EqlBinaryOp.ADD) {
+            if (op == EqlOp.ADD) {
                 return obj2 == null ? obj1 : obj2;
             } else {
                 throw new EqlException("Arithmetic operation on null values.");
@@ -169,7 +169,7 @@ public class EqlUtils {
     }
 
 
-    public static boolean logical(Object arg1, EqlBinaryOp op, Object arg2) {
+    public static boolean logical(Object arg1, EqlOp op, Object arg2) {
         boolean b1 = ZorkaUtil.coerceBool(arg1), b2 = ZorkaUtil.coerceBool(arg2);
 
         switch (op) {
@@ -182,7 +182,26 @@ public class EqlUtils {
         throw new EqlException("Illegal logical operation: " + op);
     }
 
-    public static Object bitwise(Object arg1, EqlBinaryOp op, Object arg2) {
+
+    public static Object negate(Object arg) {
+
+        if (arg == null) {
+            throw new EqlException("Cannot perform bitwise operation on null value.");
+        }
+
+        if (arg instanceof Number && arg.getClass() != Float.class && arg.getClass() != Double.class) {
+            if (arg.getClass() == Long.class) {
+                return ~((Number) arg).longValue();
+            } else {
+                return ~(((Number) arg).intValue());
+            }
+        }
+
+        throw new EqlException("Cannot perform bitwise negation on " + arg.getClass());
+    }
+
+
+    public static Object bitwise(Object arg1, EqlOp op, Object arg2) {
 
         if (arg1 == null || arg2 == null) {
             throw new EqlException("Cannot perform bitwise operation on null");

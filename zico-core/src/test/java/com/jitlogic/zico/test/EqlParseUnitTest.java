@@ -27,8 +27,8 @@ import static org.junit.Assert.*;
 public class EqlParseUnitTest {
 
 
-    private EqlExpression expr(String expr) throws ParseException {
-        EqlExpression rslt = new Parser().expr(expr);
+    private EqlExpr expr(String expr) throws ParseException {
+        EqlExpr rslt = new Parser().expr(expr);
         assertNotNull("Result should not be null.", rslt);
         return rslt;
     }
@@ -44,11 +44,15 @@ public class EqlParseUnitTest {
     }
 
 
-    private EqlBinaryExpr bin(EqlExpression arg1, String opName, EqlExpression arg2) {
-        return new EqlBinaryExpr(arg1, EqlBinaryOp.fromName(opName), arg2);
+    private EqlBinaryExpr bin(EqlExpr arg1, String opName, EqlExpr arg2) {
+        return new EqlBinaryExpr(arg1, EqlOp.fromName(opName), arg2);
     }
 
-    private EqlFunCall fun(EqlExpression function, EqlExpression... args) {
+    private EqlUnaryExpr una(String opName, EqlExpr arg) {
+        return new EqlUnaryExpr(EqlOp.fromName(opName), arg);
+    }
+
+    private EqlFunCall fun(EqlExpr function, EqlExpr... args) {
         return new EqlFunCall(function, args);
     }
 
@@ -129,5 +133,14 @@ public class EqlParseUnitTest {
         assertEquals(lit(1000000000L), expr("1s"));
         assertEquals(lit(120000000000L), expr("2m"));
         assertEquals(lit(86400000000000L), expr("24h"));
+    }
+
+    @Test
+    public void testParseUnaryExpr() {
+        assertEquals(una("not", lit(1)), expr("not 1"));
+        assertEquals(bin(una("not", bin(sym("a"), "=", lit(2))), "and", una("not", bin(sym("b"), "=", sym("c")))),
+                expr("not a = 2 and ! b = c"));
+        assertEquals(una("not", lit(1)), expr("(not 1)"));
+        assertEquals(lit(2), expr("(2)"));
     }
 }

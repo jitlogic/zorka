@@ -16,7 +16,7 @@
 package com.jitlogic.zico.core.eql;
 
 
-import com.jitlogic.zico.core.eql.ast.EqlExpression;
+import com.jitlogic.zico.core.eql.ast.EqlExpr;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.ReportingParseRunner;
@@ -28,8 +28,8 @@ public class Parser {
 
     private static final ParserSyntax rules = Parboiled.createParser(ParserSyntax.class);
 
-    public static EqlExpression expr(String expr) throws ParseException {
-        ParsingResult<EqlExpression> rslt = new ReportingParseRunner(rules.SoleExpression()).run(expr);
+    public static EqlExpr expr(String expr) throws ParseException {
+        ParsingResult<EqlExpr> rslt = new ReportingParseRunner(rules.SoleExpression()).run(expr);
 
         if (rslt.hasErrors() || !rslt.matched) {
             throw new ParseException("Error parsing EQL expression", rslt.parseErrors);

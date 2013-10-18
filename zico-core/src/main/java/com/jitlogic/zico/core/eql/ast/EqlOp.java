@@ -19,7 +19,7 @@ package com.jitlogic.zico.core.eql.ast;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum EqlBinaryOp {
+public enum EqlOp {
 
     DOT(".", 1),
     BIT_NOT("~", 2),
@@ -47,7 +47,7 @@ public enum EqlBinaryOp {
     private final String name;
     private final int precedence;
 
-    private EqlBinaryOp(String op, int precedence) {
+    private EqlOp(String op, int precedence) {
         this.name = op;
         this.precedence = precedence;
     }
@@ -60,9 +60,9 @@ public enum EqlBinaryOp {
         return precedence;
     }
 
-    private static Map<String, EqlBinaryOp> operations = new HashMap<String, EqlBinaryOp>();
+    private static Map<String, EqlOp> operations = new HashMap<String, EqlOp>();
 
-    public static EqlBinaryOp fromName(String name) {
+    public static EqlOp fromName(String name) {
         if (!operations.containsKey(name)) {
             throw new RuntimeException("Illegal operator: " + name);
         }
@@ -71,12 +71,14 @@ public enum EqlBinaryOp {
 
     static {
 
-        for (EqlBinaryOp op : EqlBinaryOp.values()) {
+        for (EqlOp op : EqlOp.values()) {
             operations.put(op.getName(), op);
         }
 
         operations.put("!=", NE);
         operations.put("&&", AND);
         operations.put("||", OR);
+        operations.put("!", NOT);
     }
+
 }

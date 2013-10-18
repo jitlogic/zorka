@@ -16,58 +16,51 @@
 package com.jitlogic.zico.core.eql.ast;
 
 
-public class EqlBinaryExpr extends EqlExpression {
+import com.jitlogic.zico.core.eql.EqlNodeVisitor;
+
+public class EqlBinaryExpr extends EqlOpExpr {
 
 
     public static EqlBinaryExpr make(Object arg2, Object opName, Object arg1) {
-        EqlBinaryOp op = EqlBinaryOp.fromName(opName.toString());
+        EqlOp op = EqlOp.fromName(opName.toString());
         if (arg2 instanceof EqlBinaryExpr) {
             EqlBinaryExpr expr = (EqlBinaryExpr) arg2;
-            if (!expr.preceding && op.getPrecedence() <= expr.op.getPrecedence())
+            if (!expr.isPreceding() && op.getPrecedence() <= expr.op.getPrecedence())
                 return new EqlBinaryExpr(
-                        new EqlBinaryExpr((EqlExpression) arg1, op, expr.arg1), expr.op, expr.arg2);
+                        new EqlBinaryExpr((EqlExpr) arg1, op, expr.arg1), expr.op, expr.arg2);
         }
 
-        return new EqlBinaryExpr((EqlExpression) arg1, op, (EqlExpression) arg2);
+        return new EqlBinaryExpr((EqlExpr) arg1, op, (EqlExpr) arg2);
     }
 
 
-    public static EqlBinaryExpr precede(Object exobj) {
-        EqlBinaryExpr expr = (EqlBinaryExpr) exobj;
-        expr.preceding = true;
-        return expr;
-    }
+    private EqlOp op;
+    private EqlExpr arg1, arg2;
 
-
-    private boolean preceding;
-    private EqlBinaryOp op;
-    private EqlExpression arg1, arg2;
-
-    public EqlBinaryExpr(EqlExpression arg1, EqlBinaryOp op, EqlExpression arg2) {
+    public EqlBinaryExpr(EqlExpr arg1, EqlOp op, EqlExpr arg2) {
         this.op = op;
         this.arg1 = arg1;
         this.arg2 = arg2;
     }
 
-
-    public EqlBinaryOp getOp() {
+    public EqlOp getOp() {
         return op;
     }
 
 
-    public EqlExpression getArg1() {
+    public EqlExpr getArg1() {
         return arg1;
     }
 
-    public void setArg1(EqlExpression arg1) {
+    public void setArg1(EqlExpr arg1) {
         this.arg1 = arg1;
     }
 
-    public EqlExpression getArg2() {
+    public EqlExpr getArg2() {
         return arg2;
     }
 
-    public void setArg2(EqlExpression arg2) {
+    public void setArg2(EqlExpr arg2) {
         this.arg2 = arg2;
     }
 

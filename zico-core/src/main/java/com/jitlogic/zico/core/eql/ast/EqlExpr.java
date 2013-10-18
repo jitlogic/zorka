@@ -16,7 +16,9 @@
 package com.jitlogic.zico.core.eql.ast;
 
 
-public abstract class EqlExpression {
+import com.jitlogic.zico.core.eql.EqlNodeVisitor;
+
+public abstract class EqlExpr {
 
     public abstract <T> T accept(EqlNodeVisitor<T> visitor);
 

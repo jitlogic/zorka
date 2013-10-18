@@ -19,7 +19,7 @@ package com.jitlogic.zico.test;
 import com.jitlogic.zico.core.eql.EqlException;
 import com.jitlogic.zico.core.eql.EqlExprEvaluator;
 import com.jitlogic.zico.core.eql.Parser;
-import com.jitlogic.zico.core.eql.ast.EqlExpression;
+import com.jitlogic.zico.core.eql.ast.EqlExpr;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import org.junit.Test;
@@ -51,7 +51,7 @@ public class EqlEvaluationUnitTest {
 
 
     private Object eval(String expr) {
-        EqlExpression rslt = new Parser().expr(expr);
+        EqlExpr rslt = new Parser().expr(expr);
         assertNotNull("Result should not be null.", rslt);
         return rslt.accept(new TestEvaluator());
     }
@@ -127,5 +127,13 @@ public class EqlEvaluationUnitTest {
         assertEquals(true, eval("4 = 3 or 2 = 2"));
         assertEquals(true, eval("4 = 3 || 2 = 2"));
         assertEquals(false, eval("4 = 4 and 2 = 3"));
+    }
+
+
+    @Test
+    public void testEvalUnaryExprs() {
+        assertEquals(false, eval("not true"));
+        assertEquals(true, eval("! 1 = 2"));
+        assertEquals(0, eval("~ -1"));
     }
 }

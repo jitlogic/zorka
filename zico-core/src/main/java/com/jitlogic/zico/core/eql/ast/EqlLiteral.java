@@ -16,9 +16,10 @@
 package com.jitlogic.zico.core.eql.ast;
 
 
+import com.jitlogic.zico.core.eql.EqlNodeVisitor;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
-public class EqlLiteral extends EqlExpression {
+public class EqlLiteral extends EqlExpr {
 
     private Object value;
 

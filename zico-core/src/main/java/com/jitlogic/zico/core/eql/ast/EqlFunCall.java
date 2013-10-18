@@ -16,40 +16,42 @@
 package com.jitlogic.zico.core.eql.ast;
 
 
+import com.jitlogic.zico.core.eql.EqlNodeVisitor;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class EqlFunCall extends EqlExpression {
+public class EqlFunCall extends EqlExpr {
 
     public static Object funcall(Object expr) {
-        return new EqlFunCall((EqlExpression) expr);
+        return new EqlFunCall((EqlExpr) expr);
     }
 
     public static Object argument(Object expr, Object funcall) {
-        ((EqlFunCall) funcall).arguments.add((EqlExpression) expr);
+        ((EqlFunCall) funcall).arguments.add((EqlExpr) expr);
         return funcall;
     }
 
 
-    private EqlExpression function;
+    private EqlExpr function;
 
-    private List<EqlExpression> arguments;
+    private List<EqlExpr> arguments;
 
 
-    public EqlFunCall(EqlExpression function, EqlExpression... arguments) {
+    public EqlFunCall(EqlExpr function, EqlExpr... arguments) {
         this.function = function;
-        this.arguments = new ArrayList<EqlExpression>();
+        this.arguments = new ArrayList<EqlExpr>();
 
-        for (EqlExpression arg : arguments) {
+        for (EqlExpr arg : arguments) {
             this.arguments.add(arg);
         }
     }
 
-    public EqlExpression getFunction() {
+    public EqlExpr getFunction() {
         return function;
     }
 
-    public List<EqlExpression> getArguments() {
+    public List<EqlExpr> getArguments() {
         return arguments;
     }
 
@@ -87,7 +89,7 @@ public class EqlFunCall extends EqlExpression {
     public int hashCode() {
         int hc = function.hashCode();
 
-        for (EqlExpression e : arguments) {
+        for (EqlExpr e : arguments) {
             hc = 31 * hc + e.hashCode();
         }
 

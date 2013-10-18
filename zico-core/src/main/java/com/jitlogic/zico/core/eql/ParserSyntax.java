@@ -16,10 +16,7 @@
 package com.jitlogic.zico.core.eql;
 
 
-import com.jitlogic.zico.core.eql.ast.EqlBinaryExpr;
-import com.jitlogic.zico.core.eql.ast.EqlFunCall;
-import com.jitlogic.zico.core.eql.ast.EqlLiteral;
-import com.jitlogic.zico.core.eql.ast.EqlSymbol;
+import com.jitlogic.zico.core.eql.ast.*;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
@@ -54,8 +51,12 @@ public class ParserSyntax extends BaseParser<Object> {
     }
 
     Rule BinaryExpression() {
-        return Sequence(BaseExpression(), Optional(
+        return Sequence(UnaryExpression(), Optional(
                 Sequence(BINARY_OP(), Expression(), push(EqlBinaryExpr.make(pop(), pop(), pop())))));
+    }
+
+    Rule UnaryExpression() {
+        return FirstOf(Sequence(UNARY_OP(), Expression(), push(EqlUnaryExpr.make(pop(), pop()))), BaseExpression());
     }
 
     Rule BaseExpression() {
@@ -142,7 +143,7 @@ public class ParserSyntax extends BaseParser<Object> {
     }
 
     Rule KEYWORD() {
-        return FirstOf(BINARY_OP(), PARENTH_OP(),
+        return FirstOf(BINARY_OP(), PARENTH_OP(), StringToken("and"), StringToken("or"),
                 StringToken("false"), StringToken("not"), StringToken("null"), StringToken("true"));
     }
 
@@ -169,6 +170,12 @@ public class ParserSyntax extends BaseParser<Object> {
     }
 
     // Operators
+
+
+    Rule UNARY_OP() {
+        return Sequence(FirstOf(OpToken("not"), OpToken("~"), OpToken("!")), push(match().trim()));
+    }
+
 
     Rule BINARY_OP() {
         return Sequence(FirstOf(OpToken("+"), OpToken("-"), OpToken("*"), OpToken("/"), OpToken("%"),
