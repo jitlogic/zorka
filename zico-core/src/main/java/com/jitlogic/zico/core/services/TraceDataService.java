@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core.rest;
+package com.jitlogic.zico.core.services;
 
 import com.jitlogic.zico.core.HostStore;
 import com.jitlogic.zico.core.HostStoreManager;
