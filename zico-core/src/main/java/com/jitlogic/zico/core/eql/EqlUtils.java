@@ -19,6 +19,9 @@ package com.jitlogic.zico.core.eql;
 import com.jitlogic.zico.core.eql.ast.EqlBinaryOp;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 public class EqlUtils {
 
     public static boolean equals(Object obj1, Object obj2) {
@@ -47,6 +50,43 @@ public class EqlUtils {
     }
 
 
+    public static boolean regex(Object arg1, Object arg2) {
+        if (arg1 == null)
+            return false;
+
+        return compile(arg2).matcher(arg1.toString()).matches();
+    }
+
+    public static Pattern compile(Object arg) {
+        if (arg == null) {
+            throw new EqlException("Attempt to construct regex pattern from null value.");
+        }
+
+        if (arg instanceof Pattern) {
+            return (Pattern) arg;
+        }
+
+        String s = arg.toString();
+
+        if (s.startsWith("^")) {
+            s = s.substring(1, s.length());
+        } else {
+            s = ".*" + s;
+        }
+
+        if (s.endsWith("$")) {
+            s = s.substring(0, s.length() - 1);
+        } else {
+            s = s + ".*";
+        }
+
+        try {
+            return Pattern.compile(s);
+        } catch (PatternSyntaxException e) {
+            throw new EqlException("Invalid regex pattern", e);
+        }
+    }
+
     public static int compare(Object obj1, Object obj2) {
 
         if (obj1 == null && obj2 == null)
@@ -59,7 +99,7 @@ public class EqlUtils {
             return ((Comparable) obj1).compareTo(obj2);
         }
 
-        throw new EqlException("Objects '" + obj1.getClass() + "' and '" + obj2.getClass() + "' are not comparable", null);
+        throw new EqlException("Objects '" + obj1.getClass() + "' and '" + obj2.getClass() + "' are not comparable");
     }
 
 
@@ -125,7 +165,7 @@ public class EqlUtils {
             }
         }
 
-        throw new EqlException("Cannot add non-numbers and non-strings.", null);
+        throw new EqlException("Cannot add non-numbers and non-strings.");
     }
 
 

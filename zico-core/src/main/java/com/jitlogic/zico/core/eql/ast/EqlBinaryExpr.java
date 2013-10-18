@@ -59,13 +59,16 @@ public class EqlBinaryExpr extends EqlExpression {
         return arg1;
     }
 
+    public void setArg1(EqlExpression arg1) {
+        this.arg1 = arg1;
+    }
 
     public EqlExpression getArg2() {
         return arg2;
     }
 
-    public boolean isPreceding() {
-        return preceding;
+    public void setArg2(EqlExpression arg2) {
+        this.arg2 = arg2;
     }
 
     public <T> T accept(EqlNodeVisitor<T> visitor) {

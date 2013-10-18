@@ -33,6 +33,7 @@ public enum EqlBinaryOp {
     BIT_XOR("^", 6),
     EQ("=", 7),
     NE("<>", 7),
+    RE("~=", 7),
     LT("<", 7),
     LE("<=", 7),
     GT(">", 7),

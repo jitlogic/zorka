@@ -26,6 +26,10 @@ public class EqlException extends RuntimeException {
         super(msg);
     }
 
+    public EqlException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
+
     public EqlException(String msg, EqlExpression expr) {
         super(msg);
         this.expr = expr;

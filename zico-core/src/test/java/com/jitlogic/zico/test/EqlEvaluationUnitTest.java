@@ -43,7 +43,7 @@ public class EqlEvaluationUnitTest {
         @Override
         protected Object resolve(String name) {
             if (!symbols.containsKey(name)) {
-                throw new EqlException("Cannot resolve symbol: '" + name + "'", null);
+                throw new EqlException("Cannot resolve symbol: '" + name + "'");
             }
             return symbols.get(name);
         }
@@ -84,6 +84,16 @@ public class EqlEvaluationUnitTest {
         assertEquals(false, eval("1 >= 2"));
         assertEquals(true, eval("1 >= 1"));
 
+    }
+
+
+    @Test
+    public void testRegexMatchExpressions() {
+        assertEquals(true, eval("'abcde' ~= 'a.*e'"));
+        assertEquals(false, eval("'abcde' ~= 'a.*f'"));
+        assertEquals(true, eval("'abcde' ~= 'bcd'"));
+        assertEquals(false, eval("'abcde' ~= '^bcd$'"));
+        assertEquals(true, eval("'abcde' ~= '^abc'"));
     }
 
 

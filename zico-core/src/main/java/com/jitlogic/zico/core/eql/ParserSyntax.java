@@ -29,6 +29,10 @@ import org.parboiled.annotations.SuppressNode;
 @BuildParseTree
 public class ParserSyntax extends BaseParser<Object> {
 
+    Rule SoleExpression() {
+        return Sequence(Expression(), EOI);
+    }
+
     Rule Expression() {
         return BinaryExpression();
     }
@@ -157,7 +161,7 @@ public class ParserSyntax extends BaseParser<Object> {
     Rule BINARY_OP() {
         return Sequence(FirstOf(OpToken("+"), OpToken("-"), OpToken("*"), OpToken("/"), OpToken("%"),
                 StringToken("and"), StringToken("or"), OpToken("&&"), OpToken("||"),
-                OpToken("="), OpToken("=="), OpToken("!="), OpToken("<>"),
+                OpToken("="), OpToken("=="), OpToken("!="), OpToken("<>"), OpToken("~="),
                 OpToken("<"), OpToken(">"), OpToken("<="), OpToken(">="),
                 OpToken("&"), OpToken("|"), OpToken("^"),
                 OpToken(".")), push(match().trim()));
