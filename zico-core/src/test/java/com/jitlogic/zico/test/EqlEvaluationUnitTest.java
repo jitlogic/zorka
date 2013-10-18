@@ -106,7 +106,7 @@ public class EqlEvaluationUnitTest {
         assertEquals(5, eval("25 / 5"));
         assertEquals(25, eval("3 * 3 + 4 * 4"));
         assertEquals(1, eval("25 % 3"));
-
+        assertEquals(65000000000L, eval("1m+5s"));
 
         assertEquals("abcd", eval("'ab' + 'cd'"));
     }

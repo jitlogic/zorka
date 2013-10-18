@@ -117,4 +117,17 @@ public class EqlParseUnitTest {
         assertEquals(bin(bin(sym("t"), "<", lit(20)), "and", bin(sym("method"), "<>", lit("create"))),
                 expr("t < 20 and method <> 'create'"));
     }
+
+
+    @Test
+    public void testParseTimestampLiterals() throws Exception {
+        assertEquals(lit(10L), expr("10ns"));
+        assertEquals(lit(20000L), expr("20us"));
+        assertEquals(lit(1250L), expr("1.25us"));
+        assertEquals(lit(1500L), expr("1.5us"));
+        assertEquals(lit(123456789L), expr("123.456789ms"));
+        assertEquals(lit(1000000000L), expr("1s"));
+        assertEquals(lit(120000000000L), expr("2m"));
+        assertEquals(lit(86400000000000L), expr("24h"));
+    }
 }

@@ -20,6 +20,7 @@ import com.jitlogic.zico.core.eql.ast.EqlBinaryExpr;
 import com.jitlogic.zico.core.eql.ast.EqlFunCall;
 import com.jitlogic.zico.core.eql.ast.EqlLiteral;
 import com.jitlogic.zico.core.eql.ast.EqlSymbol;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.parboiled.BaseParser;
 import org.parboiled.Rule;
 
@@ -69,13 +70,24 @@ public class ParserSyntax extends BaseParser<Object> {
         return Sequence(LITERAL(), push(new EqlLiteral(pop())));
     }
 
+    Rule TIMESTAMP() {
+        return Sequence(
+                Sequence(OneOrMore(CharRange('0', '9')), push(ZorkaUtil.map("t1", Long.parseLong(match())))),
+                Optional(Sequence(".", OneOrMore(CharRange('0', '9')), push(Parser.extendMap(pop(), "t2", Long.parseLong(match()))))),
+                Sequence(TIME_SUFFIX(), push(Parser.timestamp(pop(), match()))));
+    }
+
+    Rule TIME_SUFFIX() {
+        return FirstOf("ms", "us", "ns", "h", "m", "s");
+    }
+
     Rule SYMBOL() {
         return Sequence(TestNot(KEYWORD()), Sequence(ALPHA(), ZeroOrMore(ALPHA_NUM())),
                 push(new EqlSymbol(match())), FirstOf(WS0(), TestNot(ALPHA_NUM())));
     }
 
     Rule LITERAL() {
-        return Sequence(FirstOf(LONG(), INTEGER(), NULL(), BOOLEAN(), STRING()), WS0());
+        return Sequence(FirstOf(TIMESTAMP(), LONG(), INTEGER(), NULL(), BOOLEAN(), STRING()), WS0());
     }
 
     Rule NULL() {

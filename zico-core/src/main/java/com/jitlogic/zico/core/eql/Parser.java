@@ -29,7 +29,7 @@ public class Parser {
     private static final ParserSyntax rules = Parboiled.createParser(ParserSyntax.class);
 
     public static EqlExpression expr(String expr) throws ParseException {
-        ParsingResult<EqlExpression> rslt = new ReportingParseRunner(rules.Expression()).run(expr);
+        ParsingResult<EqlExpression> rslt = new ReportingParseRunner(rules.SoleExpression()).run(expr);
 
         if (rslt.hasErrors() || !rslt.matched) {
             throw new ParseException("Error parsing EQL expression", rslt.parseErrors);
@@ -57,4 +57,33 @@ public class Parser {
         return sb.toString();
     }
 
+    public static Object extendMap(Object map, String key, Object val) {
+        ((Map) map).put(key, val);
+        return map;
+    }
+
+    private static final Map<String, Long> TIME_SUFFIXES = ZorkaUtil.map(
+            "ns", 1L,
+            "us", 1000L,
+            "ms", 1000000L,
+            "s", 1000000000L,
+            "m", 60000000000L,
+            "h", 3600000000000L
+    );
+
+    public static long timestamp(Object map, String suffix) {
+        Long t1 = (Long) ((Map) map).get("t1"), t2 = (Long) ((Map) map).get("t2");
+        long scale = TIME_SUFFIXES.get(suffix), t = t1 * scale;
+
+        if (t2 != null) {
+            // No use of floating point to ensure exact remainder calculation
+            long tt = scale * t2, dt = 1;
+            while (dt < t2) {
+                dt *= 10;
+            }
+            t += tt / dt;
+        }
+
+        return t;
+    }
 }
