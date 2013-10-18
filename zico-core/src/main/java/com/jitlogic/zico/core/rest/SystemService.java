@@ -54,7 +54,7 @@ public class SystemService {
         MemoryUsage hmu = mem.getHeapMemoryUsage();
 
         long uptime = ManagementFactory.getRuntimeMXBean().getUptime() / 1000;
-        long ss = uptime % 60, mm = ((uptime - ss) / 60) % 60, hh = ((uptime - mm * 60 - ss) / 3600) % 60,
+        long ss = uptime % 60, mm = ((uptime - ss) / 60) % 60, hh = ((uptime - mm * 60 - ss) / 3600) % 24,
                 dd = ((uptime - hh * 3600 - mm * 60 - ss) / 86400);
 
         info.add("Uptime: " + String.format("%dd %02d:%02d:%02d", dd, hh, mm, ss));
