@@ -16,12 +16,14 @@
 package com.jitlogic.zico.test;
 
 
+import com.jitlogic.zico.core.rds.RDSCleanupListener;
 import com.jitlogic.zico.core.rds.RDSStore;
 import com.jitlogic.zico.test.support.ZicoFixture;
 import org.junit.After;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.fest.assertions.Assertions.assertThat;
@@ -141,5 +143,112 @@ public class RDSStoreUnitTest extends ZicoFixture {
         rds.close();
     }
 
-    // TODO test proper file rotation workings
+
+    private void verifyChunks(String path, Long... ref) {
+        List<Long> chunks = new ArrayList<Long>();
+        for (String fname : new File(path).list()) {
+            if (RDSStore.RGZ_FILE.matcher(fname).matches()) {
+                chunks.add(Long.parseLong(fname.substring(0, 16), 16));
+            }
+        }
+        Collections.sort(chunks);
+
+        assertEquals(Arrays.<Long>asList(ref), chunks);
+    }
+
+
+    @Test
+    public void testFileRotationInsideRdsSingleSeg() throws Exception {
+        byte[] r0 = new byte[0], r1 = rand(1100), r2 = rand(1100), r3 = rand(1100), r4 = rand(1100), r5 = rand(1100);
+        String path = tmpFile("testrw");
+        rds = new RDSStore(path, 4096, 1024, 1024);
+
+        verifyChunks(path, 0L);
+
+        rds.write(r1);
+        verifyChunks(path, 0L, 1100L);
+        assertThat(rds.read(0, 1100)).isEqualTo(r1);
+
+        rds.write(r2);
+        verifyChunks(path, 0L, 1100L, 2200L);
+        assertThat(rds.read(0, 1100)).isEqualTo(r1);
+        assertThat(rds.read(1100, 1100)).isEqualTo(r2);
+
+        rds.write(r3);
+        verifyChunks(path, 0L, 1100L, 2200L, 3300L);
+        assertThat(rds.read(0, 1100)).isEqualTo(r1);
+        assertThat(rds.read(1100, 1100)).isEqualTo(r2);
+        assertThat(rds.read(2200, 1100)).isEqualTo(r3);
+
+        rds.write(r4);
+        verifyChunks(path, 1100L, 2200L, 3300L, 4400L);
+        assertThat(rds.read(0, 1100)).isEqualTo(r0);
+        assertThat(rds.read(1100, 1100)).isEqualTo(r2);
+        assertThat(rds.read(2200, 1100)).isEqualTo(r3);
+        assertThat(rds.read(3300, 1100)).isEqualTo(r4);
+
+        rds.write(r5);
+        verifyChunks(path, 2200L, 3300L, 4400L, 5500L);
+        assertThat(rds.read(0, 1100)).isEqualTo(r0);
+        assertThat(rds.read(1100, 1100)).isEqualTo(r0);
+        assertThat(rds.read(2200, 1100)).isEqualTo(r3);
+        assertThat(rds.read(3300, 1100)).isEqualTo(r4);
+        assertThat(rds.read(4400, 1100)).isEqualTo(r5);
+        assertThat(rds.read(5500, 1100)).isEqualTo(r0);
+
+        rds.close();
+
+    }
+
+
+    @Test
+    public void testFileRotationInsideRdsDoubleSeg() throws Exception {
+        byte[] r0 = new byte[0], r1 = rand(1100), r2 = rand(1100), r3 = rand(1100), r4 = rand(1100),
+                r5 = rand(1100), r6 = rand(1100);
+
+        String path = tmpFile("testrw");
+        rds = new RDSStore(path, 6000, 2048, 1024);
+
+        rds.write(r1);
+        verifyChunks(path, 0L);
+        assertThat(rds.read(0, 1100)).isEqualTo(r1);
+        assertThat(rds.read(1100, 1100)).isEqualTo(r0);
+
+        rds.write(r2);
+        verifyChunks(path, 0L, 2200L);
+        assertThat(rds.read(0, 1100)).isEqualTo(r1);
+        assertThat(rds.read(1100, 1100)).isEqualTo(r2);
+
+        rds.write(r3);
+        verifyChunks(path, 0L, 2200L);
+        assertThat(rds.read(0, 1100)).isEqualTo(r1);
+        assertThat(rds.read(1100, 1100)).isEqualTo(r2);
+        assertThat(rds.read(2200, 1100)).isEqualTo(r3);
+
+        rds.write(r4);
+        verifyChunks(path, 0L, 2200L, 4400L);
+        assertThat(rds.read(0, 1100)).isEqualTo(r1);
+        assertThat(rds.read(1100, 1100)).isEqualTo(r2);
+        assertThat(rds.read(2200, 1100)).isEqualTo(r3);
+        assertThat(rds.read(3300, 1100)).isEqualTo(r4);
+
+        rds.write(r5);
+        verifyChunks(path, 0L, 2200L, 4400L);
+        assertThat(rds.read(0, 1100)).isEqualTo(r1);
+        assertThat(rds.read(1100, 1100)).isEqualTo(r2);
+        assertThat(rds.read(2200, 1100)).isEqualTo(r3);
+        assertThat(rds.read(3300, 1100)).isEqualTo(r4);
+        assertThat(rds.read(4400, 1100)).isEqualTo(r5);
+
+        rds.write(r6);
+        verifyChunks(path, 2200L, 4400L, 6600L);
+        assertThat(rds.read(0, 1100)).isEqualTo(r0);
+        assertThat(rds.read(1100, 1100)).isEqualTo(r0);
+        assertThat(rds.read(2200, 1100)).isEqualTo(r3);
+        assertThat(rds.read(3300, 1100)).isEqualTo(r4);
+        assertThat(rds.read(4400, 1100)).isEqualTo(r5);
+        assertThat(rds.read(5500, 1100)).isEqualTo(r6);
+        assertThat(rds.read(6600, 1100)).isEqualTo(r0);
+    }
+
 }

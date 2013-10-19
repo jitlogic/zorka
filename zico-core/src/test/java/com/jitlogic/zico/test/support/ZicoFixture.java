@@ -33,6 +33,7 @@ import org.junit.Before;
 
 import java.io.File;
 import java.util.Properties;
+import java.util.Random;
 
 public class ZicoFixture {
 
@@ -52,6 +53,8 @@ public class ZicoFixture {
     protected TestZicoModule testZicoModule;
     protected Injector injector;
     protected BasicDataSource dataSource;
+
+    protected Random rand = new Random();
 
     @Before
     public void setUpZicoFixture() throws Exception {
@@ -102,6 +105,12 @@ public class ZicoFixture {
 
     public String tmpFile(String name) {
         return new File(getTmpDir(), name).getPath();
+    }
+
+    public byte[] rand(int size) {
+        byte[] data = new byte[size];
+        rand.nextBytes(data);
+        return data;
     }
 
 

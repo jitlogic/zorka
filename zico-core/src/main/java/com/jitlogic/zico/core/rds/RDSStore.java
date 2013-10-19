@@ -33,7 +33,7 @@ public class RDSStore implements Closeable {
 
     private final static Logger log = LoggerFactory.getLogger(RDSStore.class);
 
-    private static Pattern RGZ_FILE = Pattern.compile("^[0-9a-f]{16}\\.rgz$");
+    public final static Pattern RGZ_FILE = Pattern.compile("^[0-9a-f]{16}\\.rgz$");
 
     private String basePath;
     private long maxSize;
@@ -145,7 +145,6 @@ public class RDSStore implements Closeable {
 
         output = new RAGZOutputStream(new RandomAccessFile(chunkFile(outputStart), "rw"), segmentSize);
         outputPos = outputStart + output.logicalLength();
-        chunkOffsets.remove(chunkOffsets.size() - 1);
     }
 
 
@@ -157,7 +156,6 @@ public class RDSStore implements Closeable {
 
         if (output != null) {
             output.close();
-            chunkOffsets.add(logicalPos);
         }
 
         if (input != null) {
@@ -168,6 +166,8 @@ public class RDSStore implements Closeable {
         output = new RAGZOutputStream(new RandomAccessFile(new File(basePath, fname), "rw"), segmentSize);
         outputStart = logicalPos;
         outputPos = 0;
+
+        chunkOffsets.add(outputStart);
     }
 
 
@@ -271,7 +271,7 @@ public class RDSStore implements Closeable {
             return data;
         }
 
-        if (archLOffs == -1 || offs < archLOffs || offs > archLOffs + archLLen) {
+        if (archLOffs == -1 || offs < archLOffs || offs >= archLOffs + archLLen) {
 
             archLOffs = -1;
             archLLen = 0;
@@ -281,12 +281,13 @@ public class RDSStore implements Closeable {
                 archInput = null;
             }
 
-            for (int i = 0; i < chunkOffsets.size(); i++) {
-                if (offs >= chunkOffsets.get(i) && (i < chunkOffsets.size() - 1 || offs < chunkOffsets.get(i + 1))) {
+            for (int i = 0; i < chunkOffsets.size() - 1; i++) {
+                if (offs >= chunkOffsets.get(i) && offs < chunkOffsets.get(i + 1)) {
+                    long base = chunkOffsets.get(i);
                     RAGZInputStream ri = RAGZInputStream.fromFile(chunkFile(chunkOffsets.get(i)).getPath());
-                    if (offs >= ri.logicalPos() && offs < ri.logicalPos() + ri.logicalLength()) {
+                    if (offs >= base + ri.logicalPos() && offs < base + ri.logicalPos() + ri.logicalLength()) {
                         archInput = ri;
-                        archLOffs = ri.logicalPos();
+                        archLOffs = base + ri.logicalPos();
                         archLLen = ri.logicalLength();
                     } else {
                         ri.close();
