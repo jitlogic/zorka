@@ -328,6 +328,22 @@ public class RAGZUnitTest extends ZicoFixture {
 
 
     @Test
+    public void testRAGZOutputStreamLogicalLength() throws Exception {
+        String path = tmpFile("test.gz");
+
+        RAGZOutputStream os1 = RAGZOutputStream.toFile(path);
+        os1.write("ABCD".getBytes());
+        os1.close();
+
+        RAGZOutputStream os2 = RAGZOutputStream.toFile(path);
+        long llen = os2.logicalLength();
+        os2.close();
+
+        assertEquals(4, llen);
+    }
+
+
+    @Test
     public void testNonResetClenAtSegmentExtensionBug() throws Exception {
         String path = tmpFile("test.gz");
 

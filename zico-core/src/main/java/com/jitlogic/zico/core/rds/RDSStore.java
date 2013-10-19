@@ -56,8 +56,6 @@ public class RDSStore implements Closeable {
     /** */
     private long outputStart = 0, outputPos = 0;
 
-    private List<RDSChunkFile> archivedFiles = new ArrayList<RDSChunkFile>();
-
     private List<Long> chunkOffsets = new ArrayList<Long>();
 
     private List<RDSCleanupListener> cleanupListeners = new ArrayList<RDSCleanupListener>();
@@ -108,13 +106,18 @@ public class RDSStore implements Closeable {
         for (String fname : baseDir.list()) {
             File file = new File(baseDir, fname);
             if (RGZ_FILE.matcher(fname).matches() && file.isFile() && file.canRead()) {
-                scanInputFile(fname);
                 chunkOffsets.add(Long.parseLong(fname.substring(0, 16), 16));
             }
         }
 
-        Collections.sort(archivedFiles);
         Collections.sort(chunkOffsets);
+
+        if (chunkOffsets.size() > 0) {
+            long o = chunkOffsets.get(chunkOffsets.size() - 1);
+            RAGZInputStream in = RAGZInputStream.fromFile(chunkFile(o).getPath());
+            logicalPos = o + in.logicalLength();
+            in.close();
+        }
 
         if (chunkOffsets.size() > 0 && chunkFile(chunkOffsets.get(chunkOffsets.size() - 1)).length() < fileSize) {
             try {
@@ -127,20 +130,7 @@ public class RDSStore implements Closeable {
         }
     }
 
-
-    private void scanInputFile(String fname) throws IOException {
-        RDSChunkFile rcf = new RDSChunkFile(fname);
-        archivedFiles.add(rcf);
-
-        if (rcf.loffs + rcf.llen > logicalPos) {
-            logicalPos = rcf.loffs + rcf.llen;
-        }
-    }
-
-
     private void reopen() throws IOException {
-        RDSChunkFile rcf = archivedFiles.get(archivedFiles.size() - 1);
-
         if (output != null) {
             output.close();
             output = null;
@@ -151,11 +141,13 @@ public class RDSStore implements Closeable {
             input = null;
         }
 
-        output = new RAGZOutputStream(new RandomAccessFile(new File(basePath, rcf.fname), "rw"), segmentSize);
-        outputStart = rcf.loffs;
-        outputPos = rcf.loffs + rcf.llen;
-        archivedFiles.remove(archivedFiles.size() - 1);
+        outputStart = chunkOffsets.get(chunkOffsets.size() - 1);
+
+        output = new RAGZOutputStream(new RandomAccessFile(chunkFile(outputStart), "rw"), segmentSize);
+        outputPos = outputStart + output.logicalLength();
+        chunkOffsets.remove(chunkOffsets.size() - 1);
     }
+
 
     /**
      * (Re)opens latest output file.
@@ -165,7 +157,6 @@ public class RDSStore implements Closeable {
 
         if (output != null) {
             output.close();
-            archivedFiles.add(new RDSChunkFile(String.format("%016x.rgz", outputStart)));
             chunkOffsets.add(logicalPos);
         }
 
@@ -181,39 +172,44 @@ public class RDSStore implements Closeable {
 
 
     public synchronized void cleanup() throws IOException {
-        long size = output.physicalLength();
 
-        for (RDSChunkFile f : archivedFiles) {
-            size += f.plen;
+        if (chunkOffsets.size() == 0) {
+            return;
         }
 
-        while (size > maxSize && archivedFiles.size() > 0) {
-            RDSChunkFile rcf = archivedFiles.get(0);
-            File f = new File(basePath, rcf.fname);
+        long size = 0;
+
+        for (String fname : new File(basePath).list()) {
+            size += new File(basePath, fname).length();
+        }
+
+        while (size > maxSize && chunkOffsets.size() > 0) {
+
+            long chunkOffs = chunkOffsets.get(0);
+            long chunkLen = (chunkOffsets.size() > 1 ? chunkOffsets.get(1) : outputStart) - chunkOffs;
+
+            File f = chunkFile(chunkOffs);
+
+            size -= f.length();
 
             if (f.exists()) {
                 f.delete();
             }
 
-            size -= rcf.plen;
-
-            archivedFiles.remove(0);
-
             chunkOffsets.remove(0);
 
             for (RDSCleanupListener listener : cleanupListeners) {
-                listener.onChunkRemoved(rcf.loffs, rcf.llen);
+                listener.onChunkRemoved(chunkOffs, chunkLen);
             }
-
         }
     }
 
-    public void setMaxSize(long maxSize) {
+    public synchronized void setMaxSize(long maxSize) {
         this.maxSize = maxSize;
     }
 
     @Override
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
         if (output != null) {
             output.close();
             output = null;
@@ -317,49 +313,4 @@ public class RDSStore implements Closeable {
         return new File(basePath, String.format("%016x.rgz", offs));
     }
 
-
-    private class RDSChunkFile implements Comparable<RDSChunkFile> {
-        private String fname;
-        private long loffs = -1;
-        private long llen = -1;
-        private long plen = -1;
-
-        public RDSChunkFile(String fname) throws IOException {
-            RAGZInputStream is = null;
-            this.fname = fname;
-            try {
-                loffs = Long.parseLong(fname.substring(0, 16), 16);
-                File file = new File(basePath, fname);
-                RAGZInputStream inp = RAGZInputStream.fromFile(file.getPath());
-                llen = inp.logicalLength();
-                plen = file.length();
-                inp.close();
-            } catch (Exception e) {
-                log.error("Cannot open RDS chunk file '" + fname + "'", e);
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (IOException e1) {
-                    }
-                }
-            }
-        }
-
-        @Override
-        public int compareTo(RDSChunkFile o) {
-            long d = loffs - o.loffs;
-            // Difference might be > 4G, so we can't just return it.
-            return d == 0 ? 0 : (d > 0 ? 1 : -1);
-        }
-
-        @Override
-        public String toString() {
-            return fname;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return o instanceof RDSChunkFile && fname.equals(((RDSChunkFile) o).fname);
-        }
-    }
 }

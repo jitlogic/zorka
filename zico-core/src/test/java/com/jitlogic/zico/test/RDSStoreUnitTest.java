@@ -60,12 +60,13 @@ public class RDSStoreUnitTest extends ZicoFixture {
 
     @Test
     public void testTrivialWriteRead() throws Exception {
-        rds = new RDSStore(tmpFile("testrw"), 4096, 1024, 1024);
+        String tmpf = tmpFile("testrw");
+        rds = new RDSStore(tmpf, 4096, 1024, 1024);
         assertEquals("First chunk should be written at offset 0", 0, rds.write("ABCD".getBytes()));
         assertEquals("RDS size should increase after write.", 4, rds.size());
         rds.close();
 
-        rds = new RDSStore(tmpFile("testrw"), 4096, 1024, 1024);
+        rds = new RDSStore(tmpf, 4096, 1024, 1024);
         assertEquals("RDS size should be non-zero after reopen.", 4, rds.size());
         assertThat(rds.read(0, 4)).describedAs("Should return encoded 'ABCD' string.").isEqualTo("ABCD".getBytes());
         rds.close();
