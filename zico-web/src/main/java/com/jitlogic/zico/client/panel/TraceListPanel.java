@@ -20,6 +20,7 @@ import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.event.dom.client.*;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -30,6 +31,7 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.jitlogic.zico.client.*;
+import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.data.*;
 import com.jitlogic.zico.client.api.AdminApi;
@@ -275,8 +277,6 @@ public class TraceListPanel extends VerticalLayoutContainer {
             }
         });
 
-        toolBar.add(new SeparatorToolItem());
-
         btnErrors = new ToggleButton();
         btnErrors.setIcon(Resources.INSTANCE.errorMarkIcon());
         btnErrors.setToolTip("Show only error traces.");
@@ -291,14 +291,6 @@ public class TraceListPanel extends VerticalLayoutContainer {
             }
         });
 
-        toolBar.add(new SeparatorToolItem());
-
-        TextButton btnFilter = new TextButton();
-        btnFilter.setIcon(Resources.INSTANCE.filterIcon());
-        btnFilter.setToolTip("Filter by criteria");
-        toolBar.add(btnFilter);
-
-
         cmbTraceType = new SimpleComboBox<Integer>(new LabelProvider<Integer>() {
             @Override
             public String getLabel(Integer item) {
@@ -309,6 +301,13 @@ public class TraceListPanel extends VerticalLayoutContainer {
         cmbTraceType.setForceSelection(true);
         cmbTraceType.setToolTip("Trace type.");
         cmbTraceType.add(0);
+
+        cmbTraceType.addSelectionHandler(new SelectionHandler<Integer>() {
+            @Override
+            public void onSelection(SelectionEvent<Integer> event) {
+                doFilter();
+            }
+        });
 
         toolBar.add(cmbTraceType);
 
@@ -322,6 +321,20 @@ public class TraceListPanel extends VerticalLayoutContainer {
         txtDuration.setToolTip("Minimum trace execution time (in seconds)");
         toolBar.add(txtDuration);
 
+        txtDuration.addValueChangeHandler(new ValueChangeHandler<Double>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<Double> event) {
+                doFilter();
+            }
+        });
+
+        txtDuration.addSelectionHandler(new SelectionHandler<Double>() {
+            @Override
+            public void onSelection(SelectionEvent<Double> event) {
+                doFilter();
+            }
+        });
+
         txtFilter = new TextField();
         BoxLayoutContainer.BoxLayoutData txtFilterLayout = new BoxLayoutContainer.BoxLayoutData();
         txtFilterLayout.setFlex(1.0);
@@ -331,49 +344,70 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
         txtClockBegin = new TextField();
         txtClockBegin.setWidth(130);
-        //txtClockBegin.setToolTip("From trace timestamp.");
         txtClockBegin.addValidator(
                 new RegExValidator("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}", "Enter YYYY-MM-DD hh:mm:ss timestamp."));
         txtClockBegin.setEmptyText("Start time");
         toolBar.add(txtClockBegin);
 
+        txtClockBegin.addKeyDownHandler(new KeyDownHandler() {
+            @Override
+            public void onKeyDown(KeyDownEvent event) {
+                if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+                    doFilter();
+                }
+            }
+        });
+
+        txtClockBegin.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                doFilter();
+            }
+        });
+
         txtClockEnd = new TextField();
         txtClockEnd.setWidth(130);
-        //txtClockEnd.setWidth("To trace timestamp.");
         txtClockEnd.addValidator(
                 new RegExValidator("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}", "Enter YYYY-MM-DD hh:mm:ss timestamp."));
         txtClockEnd.setEmptyText("End time");
         toolBar.add(txtClockEnd);
+
+        txtClockEnd.addKeyDownHandler(new KeyDownHandler() {
+            @Override
+            public void onKeyDown(KeyDownEvent event) {
+                if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+                    doFilter();
+                }
+            }
+        });
+
+        txtClockEnd.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                doFilter();
+            }
+        });
 
         TextButton btnClear = new TextButton();
         btnClear.setIcon(Resources.INSTANCE.clearIcon());
         btnClear.setToolTip("Clear all filters.");
         toolBar.add(btnClear);
 
-
-        btnFilter.addSelectHandler(new SelectEvent.SelectHandler() {
+        txtFilter.addKeyDownHandler(new KeyDownHandler() {
             @Override
-            public void onSelect(SelectEvent event) {
-                GWT.log("Setting filter to " + txtFilter.getText());
-                filter.setFilterExpr(txtFilter.getText());
-                if (cmbTraceType.getCurrentValue() != null) {
-                    filter.setTraceId(cmbTraceType.getCurrentValue());
+            public void onKeyDown(KeyDownEvent event) {
+                if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+                    doFilter();
                 }
-                if (txtDuration.getCurrentValue() != null) {
-                    filter.setMinTime((long) (txtDuration.getCurrentValue() * 1000000000L));
-                } else {
-                    filter.setMinTime(0);
-                }
-                if (txtClockBegin.getValue() != null) {
-                    filter.setTimeStart(ClientUtil.parseTimestamp(txtClockBegin.getValue()));
-                }
-                if (txtClockEnd.getValue() != null) {
-                    filter.setTimeEnd(ClientUtil.parseTimestamp(txtClockEnd.getValue()));
-                }
-                traceGridView.refresh();
             }
         });
 
+        txtFilter.addValueChangeHandler(new ValueChangeHandler<String>() {
+            @Override
+            public void onValueChange(ValueChangeEvent<String> event) {
+                doFilter();
+            }
+        });
 
         btnClear.addSelectHandler(new SelectEvent.SelectHandler() {
             @Override
@@ -395,6 +429,26 @@ public class TraceListPanel extends VerticalLayoutContainer {
         });
 
         add(toolBar, new VerticalLayoutData(1, -1));
+    }
+
+    private void doFilter() {
+        GWT.log("Setting filter to " + txtFilter.getText());
+        filter.setFilterExpr(txtFilter.getText());
+        if (cmbTraceType.getCurrentValue() != null) {
+            filter.setTraceId(cmbTraceType.getCurrentValue());
+        }
+        if (txtDuration.getCurrentValue() != null) {
+            filter.setMinTime((long) (txtDuration.getCurrentValue() * 1000000000L));
+        } else {
+            filter.setMinTime(0);
+        }
+        if (txtClockBegin.getValue() != null) {
+            filter.setTimeStart(ClientUtil.parseTimestamp(txtClockBegin.getValue()));
+        }
+        if (txtClockEnd.getValue() != null) {
+            filter.setTimeEnd(ClientUtil.parseTimestamp(txtClockEnd.getValue()));
+        }
+        traceGridView.refresh();
     }
 
     private void createContextMenu() {
