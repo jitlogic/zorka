@@ -77,6 +77,12 @@
             <artifactId>parboiled-java</artifactId>
             <version>${parboiled.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.jitlogic.zorka</groupId>
+            <artifactId>zorka-common-test</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <finalName>zico-web</finalName>

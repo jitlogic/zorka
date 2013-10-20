@@ -28,13 +28,13 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.Label;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.jitlogic.zico.client.*;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.data.*;
-import com.jitlogic.zico.client.api.AdminApi;
 import com.jitlogic.zico.client.api.TraceDataApi;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style;
@@ -56,7 +56,7 @@ import com.sencha.gxt.widget.core.client.menu.Item;
 import com.sencha.gxt.widget.core.client.menu.Menu;
 import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.sencha.gxt.widget.core.client.menu.SeparatorMenuItem;
-import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
+import com.sencha.gxt.widget.core.client.tips.ToolTipConfig;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
@@ -70,6 +70,8 @@ import java.util.Map;
 public class TraceListPanel extends VerticalLayoutContainer {
 
     private static final TraceInfoProperties props = GWT.create(TraceInfoProperties.class);
+
+    public final static String RE_TIMESTAMP = "\\d{4}-\\d{2}-\\d{2}\\s*(\\d{2}:\\d{2}:\\d{2}(\\.\\d{1-3})?)?";
 
     private TraceDataApi tds;
     private PanelFactory panelFactory;
@@ -94,6 +96,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
     private Map<Integer, String> traceTypes;
 
     private ErrorHandler errorHandler;
+
 
     @Inject
     public TraceListPanel(Provider<ZicoShell> shell, TraceDataApi tds,
@@ -267,7 +270,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
         TextButton btnRefresh = new TextButton();
         btnRefresh.setIcon(Resources.INSTANCE.refreshIcon());
-        btnRefresh.setToolTip("Refresh data");
+        btnRefresh.setToolTip("Refresh list.");
         toolBar.add(btnRefresh);
 
         btnRefresh.addSelectHandler(new SelectEvent.SelectHandler() {
@@ -279,7 +282,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
         btnErrors = new ToggleButton();
         btnErrors.setIcon(Resources.INSTANCE.errorMarkIcon());
-        btnErrors.setToolTip("Show only error traces.");
+        btnErrors.setToolTip("Show only erros.");
 
         toolBar.add(btnErrors);
 
@@ -299,7 +302,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
         });
 
         cmbTraceType.setForceSelection(true);
-        cmbTraceType.setToolTip("Trace type.");
+        cmbTraceType.setToolTip("Select trace type here.");
         cmbTraceType.add(0);
 
         cmbTraceType.addSelectionHandler(new SelectionHandler<Integer>() {
@@ -338,21 +341,38 @@ public class TraceListPanel extends VerticalLayoutContainer {
         txtFilter = new TextField();
         BoxLayoutContainer.BoxLayoutData txtFilterLayout = new BoxLayoutContainer.BoxLayoutData();
         txtFilterLayout.setFlex(1.0);
-        txtFilter.setToolTip("Search for text (as in Description field)");
+
+        ToolTipConfig ttcFilter = new ToolTipConfig("Text search:" +
+                "<li><b>sometext</b> - full-text search</li>"
+                + "<li><b>~regex</b> - regular expression search</li>"
+                + "<li><b>@ATTR=sometext</b> - full text search in specific attribute</li>"
+                + "<li><b>@ATTR~=regex</b> - regex search in specific attribute</li>");
+
+        txtFilter.setToolTipConfig(ttcFilter);
+
         txtFilter.setLayoutData(txtFilterLayout);
         toolBar.add(txtFilter);
 
+        Label lblBetween = new Label("between :");
+        toolBar.add(lblBetween);
+
+        ToolTipConfig ttcDateTime = new ToolTipConfig("Allowed timestamp formats:" +
+                "<li><b>YYYY-MM-DD</b> - date only</li>" +
+                "<li><b>YYYY-MM-DD hh:mm:ss</b> - date and time</li>" +
+                "<li><b>YYYY-MM-DD hh:mm:ss.SSS</b> - millisecond resolution</li>");
+
         txtClockBegin = new TextField();
         txtClockBegin.setWidth(130);
-        txtClockBegin.addValidator(
-                new RegExValidator("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}", "Enter YYYY-MM-DD hh:mm:ss timestamp."));
+        txtClockBegin.setToolTipConfig(ttcDateTime);
+        txtClockBegin.addValidator(new RegExValidator(RE_TIMESTAMP, "Enter valid timestamp."));
         txtClockBegin.setEmptyText("Start time");
+
         toolBar.add(txtClockBegin);
 
         txtClockBegin.addKeyDownHandler(new KeyDownHandler() {
             @Override
             public void onKeyDown(KeyDownEvent event) {
-                if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+                if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER && txtClockBegin.isValid()) {
                     doFilter();
                 }
             }
@@ -361,15 +381,20 @@ public class TraceListPanel extends VerticalLayoutContainer {
         txtClockBegin.addValueChangeHandler(new ValueChangeHandler<String>() {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
-                doFilter();
+                if (txtClockBegin.isValid()) {
+                    doFilter();
+                }
             }
         });
 
+        toolBar.add(new Label("and :"));
+
         txtClockEnd = new TextField();
         txtClockEnd.setWidth(130);
-        txtClockEnd.addValidator(
-                new RegExValidator("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}", "Enter YYYY-MM-DD hh:mm:ss timestamp."));
+        txtClockEnd.setToolTipConfig(ttcDateTime);
+        txtClockEnd.addValidator(new RegExValidator(RE_TIMESTAMP, "Enter valid timestamp."));
         txtClockEnd.setEmptyText("End time");
+
         toolBar.add(txtClockEnd);
 
         txtClockEnd.addKeyDownHandler(new KeyDownHandler() {
@@ -396,7 +421,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
         txtFilter.addKeyDownHandler(new KeyDownHandler() {
             @Override
             public void onKeyDown(KeyDownEvent event) {
-                if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+                if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER && txtClockEnd.isValid()) {
                     doFilter();
                 }
             }
@@ -405,7 +430,9 @@ public class TraceListPanel extends VerticalLayoutContainer {
         txtFilter.addValueChangeHandler(new ValueChangeHandler<String>() {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
-                doFilter();
+                if (txtClockEnd.isValid()) {
+                    doFilter();
+                }
             }
         });
 
@@ -443,10 +470,10 @@ public class TraceListPanel extends VerticalLayoutContainer {
             filter.setMinTime(0);
         }
         if (txtClockBegin.getValue() != null) {
-            filter.setTimeStart(ClientUtil.parseTimestamp(txtClockBegin.getValue()));
+            filter.setTimeStart(ClientUtil.parseTimestamp(txtClockBegin.getValue(), "00:00:00.000"));
         }
         if (txtClockEnd.getValue() != null) {
-            filter.setTimeEnd(ClientUtil.parseTimestamp(txtClockEnd.getValue()));
+            filter.setTimeEnd(ClientUtil.parseTimestamp(txtClockEnd.getValue(), "23:59:59.999"));
         }
         traceGridView.refresh();
     }

@@ -20,6 +20,7 @@ import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.inject.assistedinject.Assisted;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.api.TraceDataApi;
@@ -53,7 +54,8 @@ public class MethodAttrsDialog extends Dialog {
     private TextArea txtAttrVal;
     private Label lblAttrName;
 
-    private BorderLayoutContainer container;
+    //private BorderLayoutContainer container;
+    private SplitLayoutPanel container;
 
     private TraceDataApi api;
     private ErrorHandler errorHandler;
@@ -202,23 +204,12 @@ public class MethodAttrsDialog extends Dialog {
         attrGrid.getView().setAutoExpandColumn(colAttribute);
         attrGrid.getView().setForceFit(true);
 
-        container = new BorderLayoutContainer();
-        BorderLayoutContainer.BorderLayoutData westData = new BorderLayoutContainer.BorderLayoutData(256);
+        container = new SplitLayoutPanel();
 
-        westData.setMargins(new Margins(5, 0, 5, 5));
-        westData.setSplit(true);
-        westData.setCollapsible(true);
-        westData.setCollapseHidden(true);
-        westData.setCollapseMini(true);
+        SimpleContainer sc = new SimpleContainer();
+        sc.add(attrGrid);
 
-
-        ContentPanel westContainer = new ContentPanel();
-        westContainer.setHeaderVisible(false);
-        westContainer.setBodyBorder(true);
-        westContainer.add(attrGrid);
-        westContainer.setWidth(200);
-
-        container.setWestWidget(westContainer);
+        container.addWest(sc, 200);
 
         txtAttrVal = new TextArea();
         txtAttrVal.setReadOnly(true);
@@ -229,10 +220,7 @@ public class MethodAttrsDialog extends Dialog {
         vp.add(lblAttrName);
         vp.add(txtAttrVal, new VerticalLayoutContainer.VerticalLayoutData(1, 1));
 
-        SimpleContainer center = new SimpleContainer();
-        center.add(vp);
-
-        container.setCenterWidget(center);
+        container.add(vp);
 
         add(container);
     }

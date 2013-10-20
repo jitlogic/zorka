@@ -20,16 +20,20 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 
 import java.util.Date;
+import java.util.regex.Pattern;
 
 public class ClientUtil {
 
     private static final NumberFormat DURATION_SFORMAT = NumberFormat.getFormat("#####");
     private static final NumberFormat DURATION_MFORMAT = NumberFormat.getFormat("###.00");
-    private static final DateTimeFormat TSTAMP_DFORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
-    private static final NumberFormat TSTAMP_NFORMAT = NumberFormat.getFormat("000");
+
+    public static final DateTimeFormat TSTAMP_FORMAT0 = DateTimeFormat.getFormat("yyyy-MM-dd");
+    public static final DateTimeFormat TSTAMP_FORMAT1 = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
+    public static final DateTimeFormat TSTAMP_FORMAT2 = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss.SSS");
+
 
     public static String formatTimestamp(Long clock) {
-        return TSTAMP_DFORMAT.format(new Date(clock)) + "." + TSTAMP_NFORMAT.format(clock % 1000);
+        return TSTAMP_FORMAT2.format(new Date(clock));
     }
 
     public static String formatDuration(Long time) {
@@ -44,10 +48,22 @@ public class ClientUtil {
         return t > 10 ? DURATION_SFORMAT.format(t) + u : DURATION_MFORMAT.format(t) + u;
     }
 
-    public static long parseTimestamp(String tstamp) {
+    public static long parseTimestamp(String tstamp, String hms) {
         if (tstamp == null || tstamp.trim().length() == 0) {
             return 0;
         }
-        return TSTAMP_DFORMAT.parse(tstamp).getTime();
+
+        String tst = tstamp.trim();
+
+
+        if (tst.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}")) {
+            return TSTAMP_FORMAT2.parseStrict(tst).getTime();
+        } else if (tst.matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}")) {
+            return TSTAMP_FORMAT1.parseStrict(tst).getTime();
+        } else if (tst.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            return TSTAMP_FORMAT0.parseStrict(tst).getTime();
+        }
+
+        return 0;
     }
 }

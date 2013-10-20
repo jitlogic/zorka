@@ -118,8 +118,8 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
         toolBar.add(new SeparatorToolItem());
 
         TextButton btnFilter = new TextButton();
-        btnFilter.setIcon(Resources.INSTANCE.filterIcon());
-        btnFilter.setToolTip("Filter by criteria");
+        btnFilter.setIcon(Resources.INSTANCE.clockIcon());
+        btnFilter.setToolTip("Filter by execution time.");
         toolBar.add(btnFilter);
 
         txtDuration = new SpinnerField<Double>(new NumberPropertyEditor.DoublePropertyEditor());
@@ -190,13 +190,6 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
         });
 
         toolBar.add(btnSearchNext);
-
-        //final TextField txtFilter = new TextField();
-        //BoxLayoutContainer.BoxLayoutData txtFilterLayout = new BoxLayoutContainer.BoxLayoutData();
-        //txtFilterLayout.setFlex(1.0);
-        //txtFilter.setToolTip("Search for text (in class/method name or attributes)");
-        //txtFilter.setLayoutData(txtFilterLayout);
-        //toolBar.add(txtFilter);
 
         add(toolBar, new VerticalLayoutData(1, -1));
 
