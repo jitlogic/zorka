@@ -163,7 +163,7 @@ public class TracerLib {
 
 
     public SpyProcessor traceAttr(String traceName, String attrName, String srcField) {
-        return traceAttr(traceName, attrName, srcField);
+        return traceAttr(traceName, attrName, null, srcField);
     }
 
 
@@ -194,7 +194,7 @@ public class TracerLib {
      */
     public SpyProcessor attr(String attrName, String attrTag, String srcField) {
         return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.FIELD_GETTING_PROCESSOR,
-                srcField, null, attrName, attrTag);
+                srcField, attrName, attrTag);
     }
 
 
@@ -214,7 +214,7 @@ public class TracerLib {
      */
     public SpyProcessor formatAttr(String attrName, String attrTag, String srcFormat) {
         return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.STRING_FORMAT_PROCESSOR,
-                srcFormat, null, attrName, attrTag);
+                srcFormat, attrName, attrTag);
     }
 
 

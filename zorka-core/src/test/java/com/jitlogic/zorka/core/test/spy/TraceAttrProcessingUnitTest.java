@@ -71,4 +71,7 @@ public class TraceAttrProcessingUnitTest extends BytecodeInstrumentationFixture 
                 symbols.symbolId("TAG1"), symbols.symbolId("TAG2"), symbols.symbolId("TAG3"), symbols.symbolId("TAG4"))));
 
     }
+
+    // TODO create processors from TracerLib functions, not manually (to test correctness of tracer functions)
+
 }

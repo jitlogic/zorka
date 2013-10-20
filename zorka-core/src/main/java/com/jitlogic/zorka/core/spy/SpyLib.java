@@ -663,13 +663,12 @@ public class SpyLib {
     /**
      * Filters record according to given regular expression.
      *
-     * @param dst       destination slot
-     * @param regex     regular expression
-     * @param filterOut inversed filtering if true
+     * @param dst   destination slot
+     * @param regex regular expression
      * @return filtering processor object
      */
-    public SpyProcessor regexFilter(String dst, String regex, boolean filterOut) {
-        return new RegexFilterProcessor(dst, regex, filterOut);
+    public SpyProcessor regexFilterOut(String dst, String regex) {
+        return new RegexFilterProcessor(dst, regex, true);
     }
 
 
@@ -678,8 +677,8 @@ public class SpyLib {
     }
 
 
-    public SpyProcessor valSetFilter(String field, boolean invert, Set<?> candidates) {
-        return new SetFilterProcessor(field, invert, candidates);
+    public SpyProcessor valSetFilterOut(String field, Set<?> candidates) {
+        return new SetFilterProcessor(field, true, candidates);
     }
 
 

@@ -117,7 +117,6 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
         }
 
         int status = 0;
-        ;
 
         if (tr.getException() != null
                 || tr.hasFlag(TraceRecord.EXCEPTION_PASS)
