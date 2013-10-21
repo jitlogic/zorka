@@ -515,7 +515,7 @@ public class SpyLib {
      * @param path     which stat attr to present
      * @return collector object
      */
-    public SpyProcessor getterCollector(String mbsName, String beanName, String attrName, String desc, String src, Object... path) {
+    public SpyProcessor toGetter(String mbsName, String beanName, String attrName, String desc, String src, Object... path) {
         return new GetterPresentingCollector(mbsRegistry, mbsName, beanName, attrName, desc, src, path);
     }
 
@@ -864,17 +864,6 @@ public class SpyLib {
 
 
     /**
-     * Return time in human readable form. Time is taken from "T" field.
-     *
-     * @param dst destination field
-     * @return strTime function spy processor
-     */
-    public SpyProcessor strTime(String dst) {
-        return strTime(dst, "T");
-    }
-
-
-    /**
      * Calculates CRC32 sum and stores it as hexified string
      *
      * @param dst destination field
@@ -946,6 +935,17 @@ public class SpyLib {
      */
     public SpyProcessor sha1sum(String dst, String src, int limit) {
         return new CheckSumProcessor(dst, src, CheckSumProcessor.SHA1_TYPE, limit);
+    }
+
+
+    /**
+     * Return time in human readable form. Time is taken from "T" field.
+     *
+     * @param dst destination field
+     * @return strTime function spy processor
+     */
+    public SpyProcessor strTime(String dst) {
+        return strTime(dst, "T");
     }
 
 

@@ -60,6 +60,7 @@ public class DbSymbolRegistry extends SymbolRegistry {
 
     @Override
     protected void persist(int symbolId, String symbolName) {
+        // TODO this is not thread safe. Duplicates may appear in SYMBOLS table.
         jdbc.update("insert into SYMBOLS (SID,NAME) values (?,?)", symbolId, symbolName);
     }
 }

@@ -915,4 +915,9 @@ public class ZorkaLib {
         return sum.length() > limit ? sum.substring(0, limit) : sum;
     }
 
+
+    public String strTime(long ns) {
+        return ZorkaUtil.strTime(ns);
+    }
+
 }

@@ -25,6 +25,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+// TODO refactor this class, make its semantics similiar to spy.subchain() [but asynchronous]
+
 /**
  * Queues incoming records resumes processing in separate thread.
  * Records are copied and only explicitly selected record attributes
@@ -35,25 +37,39 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class AsyncQueueCollector implements SpyProcessor, Runnable {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** Record processing thread */
+    /**
+     * Record processing thread
+     */
     private Thread thread;
 
-    /** Record processing thread will run as long as this attribute value is true */
+    /**
+     * Record processing thread will run as long as this attribute value is true
+     */
     private volatile boolean running;
 
-    /** Counts submitted records */
+    /**
+     * Counts submitted records
+     */
     private AtomicLong submittedRecords;
 
-    /** Counts dropped records */
+    /**
+     * Counts dropped records
+     */
     private AtomicLong droppedRecords;
 
-    /** Processing queue */
-    private BlockingQueue<Map<String,Object>> procQueue = new ArrayBlockingQueue<Map<String,Object>>(128);
+    /**
+     * Processing queue
+     */
+    private BlockingQueue<Map<String, Object>> procQueue = new ArrayBlockingQueue<Map<String, Object>>(128);
 
-    /** Records attributes to be copied */
+    /**
+     * Records attributes to be copied
+     */
     private final String[] attrs;
 
     /**
@@ -68,11 +84,11 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
     }
 
     @Override
-    public Map<String,Object> process(Map<String,Object> record) {
+    public Map<String, Object> process(Map<String, Object> record) {
 
         boolean submitted = false;
 
-        Map<String,Object> rec = ZorkaUtil.map(
+        Map<String, Object> rec = ZorkaUtil.map(
                 ".CTX", record.get(".CTX"),
                 ".STAGE", record.get(".STAGE"),
                 ".STAGES", record.get(".STAGES"));
@@ -88,10 +104,11 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
         }
 
         try {
-                submitted = procQueue.offer(rec, 0, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) { }
+            submitted = procQueue.offer(rec, 0, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+        }
 
-        synchronized(this) {
+        synchronized (this) {
             if (submitted) {
                 submittedRecords.incrementAndGet();
             } else {
@@ -108,7 +125,7 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
      *
      * @param record record to be processed
      */
-    protected void doProcess(Map<String,Object> record) {
+    protected void doProcess(Map<String, Object> record) {
 
         if (record == null) {
             return;
@@ -159,7 +176,8 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
         while (running) {
             try {
                 doProcess(procQueue.take());
-            } catch (InterruptedException e) { }
+            } catch (InterruptedException e) {
+            }
         }
     }
 
