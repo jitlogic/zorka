@@ -865,11 +865,13 @@ public class ZorkaLib {
         ObjectInspector.setField(obj, name, value);
     }
 
+
     public void allow(String... funcs) {
         for (String func : funcs) {
             translator.allow(func);
         }
     }
+
 
     public Set<Object> set(Object... objs) {
         return ZorkaUtil.set(objs);
@@ -879,4 +881,43 @@ public class ZorkaLib {
     public String castString(Object obj) {
         return ZorkaUtil.castString(obj);
     }
+
+
+    public String crc32sum(String input) {
+        return ZorkaUtil.crc32(input);
+    }
+
+
+    public String crc32sum(String input, int limit) {
+        String sum = ZorkaUtil.crc32(input);
+        return sum.length() > limit ? sum.substring(0, limit) : sum;
+    }
+
+
+    public String md5sum(String input) {
+        return ZorkaUtil.md5(input);
+    }
+
+
+    public String md5sum(String input, int limit) {
+        String sum = ZorkaUtil.md5(input);
+        return sum.length() > limit ? sum.substring(0, limit) : sum;
+    }
+
+
+    public String sha1sum(String input) {
+        return ZorkaUtil.sha1(input);
+    }
+
+
+    public String sha1sum(String input, int limit) {
+        String sum = ZorkaUtil.sha1(input);
+        return sum.length() > limit ? sum.substring(0, limit) : sum;
+    }
+
+
+    public String strTime(long ns) {
+        return ZorkaUtil.strTime(ns);
+    }
+
 }

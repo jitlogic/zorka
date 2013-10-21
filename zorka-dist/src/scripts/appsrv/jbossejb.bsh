@@ -17,7 +17,7 @@
 
 __jbossejb() {
 
-  if (zorka.boolCfg("ejb"), true) {
+  if (zorka.boolCfg("ejb", true)) {
     // EJB tracing for JBoss
     _ejb_trace = zorka.boolCfg("ejb.trace");
     _ejb_params = zorka.boolCfg("ejb.params");

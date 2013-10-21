@@ -111,7 +111,7 @@ public class RAGZOutputStream extends OutputStream {
     }
 
 
-    public long length() {
+    public long logicalLength() {
         return logicalLength;
     }
 
@@ -166,10 +166,12 @@ public class RAGZOutputStream extends OutputStream {
                     // there is no need to write a header
                     deflater = new Deflater(6, true);
                     crc = new CRC32();
+                    logicalLength = segment.getLogicalPos() + curSegSize;
                     lastSavedPos = logicalLength;
                 } else {
                     curSegStart = segment.getPhysicalPos() - 20;
                     byte[] data = RAGZSegment.unpack(outFile, segment);
+                    logicalLength = segment.getLogicalPos() + data.length;
                     curSegSize = data.length;
                     deflater = new Deflater(6, true);
                     crc = new CRC32();

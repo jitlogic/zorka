@@ -13,11 +13,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core.rest;
+package com.jitlogic.zico.core.services;
 
 
 import com.google.inject.Inject;
 import com.jitlogic.zico.core.TraceTemplateManager;
+import com.jitlogic.zico.core.TraceTypeRegistry;
 import com.jitlogic.zico.data.TraceTemplateInfo;
 
 import javax.ws.rs.*;
@@ -27,7 +28,6 @@ import java.util.Map;
 
 @Path("admin")
 public class AdminService {
-
 
     private TraceTemplateManager templater;
 
@@ -43,7 +43,6 @@ public class AdminService {
         return templater.listTemplates();
     }
 
-
     @POST
     @Path("/templates")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -56,12 +55,5 @@ public class AdminService {
     @Path("/templates/{tid}")
     public void removeTemplate(@PathParam("tid") int tid) {
         templater.remove(tid);
-    }
-
-    @GET
-    @Path("/tidmap")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<Integer, String> getTidMap() {
-        return templater.getTidMap();
     }
 }

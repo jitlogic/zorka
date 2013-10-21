@@ -24,17 +24,23 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SymbolRegistry {
 
-    /** ID of last symbol added to registry. */
+    /**
+     * ID of last symbol added to registry.
+     */
     protected AtomicInteger lastSymbolId;
 
-    /** Symbol name to ID map */
-    protected ConcurrentMap<String,Integer> symbolIds;
+    /**
+     * Symbol name to ID map
+     */
+    protected ConcurrentMap<String, Integer> symbolIds;
 
-    /** Symbol ID to name map */
-    protected ConcurrentMap<Integer,String> symbolNames;
+    /**
+     * Symbol ID to name map
+     */
+    protected ConcurrentMap<Integer, String> symbolNames;
 
     public SymbolRegistry() {
-        lastSymbolId  = new AtomicInteger(0);
+        lastSymbolId = new AtomicInteger(0);
         symbolIds = new ConcurrentHashMap<String, Integer>();
         symbolNames = new ConcurrentHashMap<Integer, String>();
     }
@@ -44,7 +50,6 @@ public class SymbolRegistry {
      * it will be and new ID will be assigned for it.
      *
      * @param symbol symbol name
-     *
      * @return symbol ID (integer)
      */
     public int symbolId(String symbol) {
@@ -69,12 +74,20 @@ public class SymbolRegistry {
         return id;
     }
 
+    public int trySymbolId(String symbol) {
+
+        if (symbol == null) {
+            return 0;
+        }
+
+        Integer sym = symbolIds.get(symbol);
+        return sym != null ? sym : 0;
+    }
 
     /**
      * Returns symbol name based on ID or null if no such symbol has been registered.
      *
      * @param symbolId symbol ID
-     *
      * @return symbol name
      */
     public String symbolName(int symbolId) {
@@ -91,8 +104,7 @@ public class SymbolRegistry {
      * Adds new symbol to registry (with predefined ID).
      *
      * @param symbolId symbol ID
-     *
-     * @param symbol symbol name
+     * @param symbol   symbol name
      */
     public void put(int symbolId, String symbol) {
 

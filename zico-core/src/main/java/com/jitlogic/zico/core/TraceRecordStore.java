@@ -16,6 +16,7 @@
 package com.jitlogic.zico.core;
 
 
+import com.jitlogic.zico.core.search.TraceRecordMatcher;
 import com.jitlogic.zico.data.*;
 import com.jitlogic.zico.core.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.*;
@@ -50,57 +51,13 @@ public class TraceRecordStore {
     private final static Pattern RE_SLASH = Pattern.compile("/");
 
 
-    private boolean matches(String s, String expr) {
-        return s != null && s.contains(expr);
-    }
-
-
-    private boolean matches(TraceRecord tr, TraceDetailSearchExpression expr) {
-        if ((expr.hasFlag(SEARCH_CLASSES)
-                && matches(symbolRegistry.symbolName(tr.getClassId()), expr.getSearchExpr()))
-                || (expr.hasFlag(SEARCH_METHODS)
-                && matches(symbolRegistry.symbolName(tr.getMethodId()), expr.getSearchExpr()))) {
-            return true;
-        }
-
-        if (expr.hasFlag(SEARCH_ATTRS) && tr.getAttrs() != null) {
-            for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
-                if (matches(symbolRegistry.symbolName(e.getKey()), expr.getSearchExpr())) {
-                    return true;
-                }
-                if (e.getValue() != null && matches(e.getValue().toString(), expr.getSearchExpr())) {
-                    return true;
-                }
-            }
-        }
-
-        SymbolicException se = tr.findException();
-
-        if (expr.hasFlag(SEARCH_EX_MSG) && se != null &&
-                (matches(se.getMessage(), expr.getSearchExpr())
-                        || matches(symbolRegistry.symbolName(se.getClassId()), expr.getSearchExpr()))) {
-            return true;
-        }
-
-        if (expr.hasFlag(SEARCH_EX_STACK) && se != null) {
-            for (SymbolicStackElement sse : se.getStackTrace()) {
-                if (matches(symbolRegistry.symbolName(sse.getClassId()), expr.getSearchExpr())
-                        || matches(symbolRegistry.symbolName(sse.getMethodId()), expr.getSearchExpr())
-                        || matches(symbolRegistry.symbolName(sse.getFileId()), expr.getSearchExpr())) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    public void searchRecords(TraceRecord tr, String path, TraceDetailSearchExpression expr,
+    // TODO factor out record packing from here
+    public void searchRecords(TraceRecord tr, String path, TraceRecordMatcher matcher,
                               TraceRecordSearchResult result, long traceTime, boolean recur) {
 
-        boolean matches = (expr.emptyExpr() || matches(tr, expr))
-                && (0 == (expr.getFlags() & TraceDetailSearchExpression.ERRORS_ONLY) || null != tr.findException())
-                && (0 == (expr.getFlags() & TraceDetailSearchExpression.METHODS_WITH_ATTRS) || tr.numAttrs() > 0);
+        boolean matches = matcher.match(tr)
+                && (!matcher.hasFlag(TraceDetailSearchExpression.ERRORS_ONLY) || null != tr.findException())
+                && (!matcher.hasFlag(TraceDetailSearchExpression.METHODS_WITH_ATTRS) || tr.numAttrs() > 0);
 
         if (matches) {
             result.getResult().add(packTraceRecord(tr, path, 250));
@@ -119,7 +76,7 @@ public class TraceRecordStore {
         }
 
         for (int i = 0; i < tr.numChildren(); i++) {
-            searchRecords(tr.getChild(i), path + "/" + i, expr, result, traceTime, matches || recur);
+            searchRecords(tr.getChild(i), path + "/" + i, matcher, result, traceTime, matches || recur);
         }
     }
 

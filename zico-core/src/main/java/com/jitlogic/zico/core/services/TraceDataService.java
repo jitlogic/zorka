@@ -13,11 +13,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core.rest;
+package com.jitlogic.zico.core.services;
 
 import com.jitlogic.zico.core.HostStore;
 import com.jitlogic.zico.core.HostStoreManager;
 import com.jitlogic.zico.core.TraceRecordStore;
+import com.jitlogic.zico.core.TraceTypeRegistry;
+import com.jitlogic.zico.core.eql.Parser;
+import com.jitlogic.zico.core.search.EqlTraceRecordMatcher;
+import com.jitlogic.zico.core.search.FullTextTraceRecordMatcher;
+import com.jitlogic.zico.core.search.TraceRecordMatcher;
 import com.jitlogic.zico.data.*;
 import com.jitlogic.zorka.common.tracedata.*;
 
@@ -26,16 +31,22 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Path("hosts")
 public class TraceDataService {
 
     private HostStoreManager storeManager;
 
+    private TraceTypeRegistry traceTypeRegistry;
+
+    private SymbolRegistry symbolRegistry;
 
     @Inject
-    public TraceDataService(HostStoreManager storeManager) {
+    public TraceDataService(HostStoreManager storeManager, TraceTypeRegistry traceTypeRegistry, SymbolRegistry symbolRegistry) {
         this.storeManager = storeManager;
+        this.traceTypeRegistry = traceTypeRegistry;
+        this.symbolRegistry = symbolRegistry;
     }
 
 
@@ -133,7 +144,22 @@ public class TraceDataService {
         result.setMinTime(Long.MAX_VALUE);
         result.setMaxTime(Long.MIN_VALUE);
 
-        ctx.searchRecords(tr, path, expr, result, tr.getTime(), false);
+        TraceRecordMatcher matcher = null;
+        String se = expr.getSearchExpr();
+        switch (expr.getType()) {
+            case TraceDetailSearchExpression.TXT_QUERY:
+                if (se != null && se.startsWith("~")) {
+                    Pattern regex = Pattern.compile(se.substring(1, se.length()));
+                    matcher = new FullTextTraceRecordMatcher(symbolRegistry, expr.getFlags(), regex);
+                } else {
+                    matcher = new FullTextTraceRecordMatcher(symbolRegistry, expr.getFlags(), se);
+                }
+                break;
+            case TraceDetailSearchExpression.EQL_QUERY:
+                matcher = new EqlTraceRecordMatcher(symbolRegistry, Parser.expr(se), expr.getFlags(), tr.getTime());
+                break;
+        }
+        ctx.searchRecords(tr, path, matcher, result, tr.getTime(), false);
 
         if (result.getMinTime() == Long.MAX_VALUE) {
             result.setMinTime(0);
@@ -183,4 +209,19 @@ public class TraceDataService {
         TraceRecordStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
         return ctx.methodRank(orderBy, orderDesc);
     }
+
+    @GET
+    @Path("/tidmap")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<Integer, String> getTidMap() {
+        return traceTypeRegistry.getTidMap(null);
+    }
+
+    @GET
+    @Path("/tidmap/{hostId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Map<Integer, String> getTidMap(@PathParam("hostId") int hostId) {
+        return traceTypeRegistry.getTidMap(hostId);
+    }
+
 }

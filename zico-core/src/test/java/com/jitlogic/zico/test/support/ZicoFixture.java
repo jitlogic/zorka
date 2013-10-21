@@ -18,10 +18,11 @@ package com.jitlogic.zico.test.support;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.jitlogic.zico.core.TraceTypeRegistry;
 import com.jitlogic.zico.core.ZicoConfig;
 import com.jitlogic.zico.core.HostStoreManager;
-import com.jitlogic.zico.core.rest.AdminService;
-import com.jitlogic.zico.core.rest.TraceDataService;
+import com.jitlogic.zico.core.services.AdminService;
+import com.jitlogic.zico.core.services.TraceDataService;
 import com.jitlogic.zorka.common.test.support.TestUtil;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
@@ -32,6 +33,7 @@ import org.junit.Before;
 
 import java.io.File;
 import java.util.Properties;
+import java.util.Random;
 
 public class ZicoFixture {
 
@@ -46,10 +48,13 @@ public class ZicoFixture {
     protected AdminService adminService;
 
     protected SymbolRegistry symbolRegistry;
+    protected TraceTypeRegistry traceTypeRegistry;
 
     protected TestZicoModule testZicoModule;
     protected Injector injector;
     protected BasicDataSource dataSource;
+
+    protected Random rand = new Random();
 
     @Before
     public void setUpZicoFixture() throws Exception {
@@ -83,6 +88,7 @@ public class ZicoFixture {
         adminService = injector.getInstance(AdminService.class);
 
         symbolRegistry = injector.getInstance(SymbolRegistry.class);
+        traceTypeRegistry = injector.getInstance(TraceTypeRegistry.class);
     }
 
     @After
@@ -99,6 +105,12 @@ public class ZicoFixture {
 
     public String tmpFile(String name) {
         return new File(getTmpDir(), name).getPath();
+    }
+
+    public byte[] rand(int size) {
+        byte[] data = new byte[size];
+        rand.nextBytes(data);
+        return data;
     }
 
 

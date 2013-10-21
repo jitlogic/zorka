@@ -158,19 +158,4 @@ public class TraceTemplateManager {
         reload();
     }
 
-
-    public Map<Integer, String> getTidMap() {
-        Map<Integer, String> ttmap = new HashMap<Integer, String>();
-
-        for (Integer tid : jdbc.query("select distinct TRACE_ID from TRACES", new RowMapper<Integer>() {
-            @Override
-            public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
-                return rs.getInt("TRACE_ID");
-            }
-        })) {
-            ttmap.put(tid, symbolRegistry.symbolName(tid));
-        }
-
-        return ttmap;
-    }
 }

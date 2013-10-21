@@ -515,7 +515,7 @@ public class SpyLib {
      * @param path     which stat attr to present
      * @return collector object
      */
-    public SpyProcessor getterCollector(String mbsName, String beanName, String attrName, String desc, String src, Object... path) {
+    public SpyProcessor toGetter(String mbsName, String beanName, String attrName, String desc, String src, Object... path) {
         return new GetterPresentingCollector(mbsRegistry, mbsName, beanName, attrName, desc, src, path);
     }
 
@@ -663,13 +663,12 @@ public class SpyLib {
     /**
      * Filters record according to given regular expression.
      *
-     * @param dst       destination slot
-     * @param regex     regular expression
-     * @param filterOut inversed filtering if true
+     * @param dst   destination slot
+     * @param regex regular expression
      * @return filtering processor object
      */
-    public SpyProcessor regexFilter(String dst, String regex, boolean filterOut) {
-        return new RegexFilterProcessor(dst, regex, filterOut);
+    public SpyProcessor regexFilterOut(String dst, String regex) {
+        return new RegexFilterProcessor(dst, regex, true);
     }
 
 
@@ -678,8 +677,8 @@ public class SpyLib {
     }
 
 
-    public SpyProcessor valSetFilter(String field, boolean invert, Set<?> candidates) {
-        return new SetFilterProcessor(field, invert, candidates);
+    public SpyProcessor valSetFilterOut(String field, Set<?> candidates) {
+        return new SetFilterProcessor(field, true, candidates);
     }
 
 
@@ -865,6 +864,81 @@ public class SpyLib {
 
 
     /**
+     * Calculates CRC32 sum and stores it as hexified string
+     *
+     * @param dst destination field
+     * @param src source field
+     * @return processor object
+     */
+    public SpyProcessor crc32sum(String dst, String src) {
+        return crc32sum(dst, src, CheckSumProcessor.MAX_LIMIT);
+    }
+
+
+    /**
+     * Calculates CRC32 sum and stores it as hexified string
+     *
+     * @param dst   destination field
+     * @param src   source field
+     * @param limit maximum length of resulting string
+     * @return processor object
+     */
+    public SpyProcessor crc32sum(String dst, String src, int limit) {
+        return new CheckSumProcessor(dst, src, CheckSumProcessor.CRC32_TYPE, limit);
+    }
+
+
+    /**
+     * Calculates MD5 sum and stores it as hexified string
+     *
+     * @param dst destination field
+     * @param src source field
+     * @return processor object
+     */
+    public SpyProcessor md5sum(String dst, String src) {
+        return md5sum(dst, src, CheckSumProcessor.MAX_LIMIT);
+    }
+
+
+    /**
+     * Calculates MD5 sum and stores it as hexified string
+     *
+     * @param dst   destination field
+     * @param src   source field
+     * @param limit maximum length of resulting string
+     * @return processor object
+     */
+    public SpyProcessor md5sum(String dst, String src, int limit) {
+        return new CheckSumProcessor(dst, src, CheckSumProcessor.MD5_TYPE, limit);
+    }
+
+
+    /**
+     * Calculates SHA1 sum and stores it as hexified string
+     *
+     * @param dst destination field
+     * @param src source field
+     * @return processor object
+     */
+    public SpyProcessor sha1sum(String dst, String src) {
+        return sha1sum(dst, src, CheckSumProcessor.MAX_LIMIT);
+    }
+
+
+    /**
+     * Calculates SHA1 sum and stores it as hexified string
+     *
+     * @param dst   destination field
+     * @param src   source field
+     * @param limit maximum length of resulting string
+     * @return processor object
+     */
+    public SpyProcessor sha1sum(String dst, String src, int limit) {
+        return new CheckSumProcessor(dst, src, CheckSumProcessor.SHA1_TYPE, limit);
+    }
+
+
+    /**
      * Return time in human readable form. Time is taken from "T" field.
      *
      * @param dst destination field
@@ -873,6 +947,7 @@ public class SpyLib {
     public SpyProcessor strTime(String dst) {
         return strTime(dst, "T");
     }
+
 
     /**
      * Return time in human readable form.

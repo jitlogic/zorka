@@ -44,11 +44,11 @@ public class MethodDetailCell extends AbstractCell<TraceRecordInfo> {
             sb.appendHtmlConstant("<div><span style=\"color: red;\">");
             sb.append(SafeHtmlUtils.fromString("Caught: " + e.getExClass()));
             sb.appendHtmlConstant("</span></div><div><b>");
-            sb.append(SafeHtmlUtils.fromString(e.getMessage()));
+            sb.append(SafeHtmlUtils.fromString("" + e.getMessage()));
             sb.appendHtmlConstant("</b></div>");
             for (String s : e.getStackTrace()) {
                 sb.appendHtmlConstant("<div>");
-                sb.append(SafeHtmlUtils.fromString(s));
+                sb.append(SafeHtmlUtils.fromString("" + s));
                 sb.appendHtmlConstant("</div>");
             }
         }

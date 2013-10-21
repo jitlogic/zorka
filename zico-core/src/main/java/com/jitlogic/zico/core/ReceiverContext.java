@@ -42,8 +42,11 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     private Map<Integer, Integer> sidMap = new HashMap<Integer, Integer>();
 
     private RDSStore traceDataStore;
+    private TraceTypeRegistry traceTypeRegistry;
+
     private JdbcTemplate jdbc;
     private HostInfo hostInfo;
+
 
     private int maxAttrLen = 1024;
 
@@ -52,11 +55,12 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     private Set<Object> visitedObjects = new HashSet<Object>();
 
 
-    public ReceiverContext(DataSource ds, HostStore store) {
+    public ReceiverContext(DataSource ds, HostStore store, TraceTypeRegistry traceTypeRegistry) {
         this.symbolRegistry = store.getStoreManager().getSymbolRegistry();
         this.traceDataStore = store.getRds();
         this.jdbc = new JdbcTemplate(ds);
         this.hostInfo = store.getHostInfo();
+        this.traceTypeRegistry = traceTypeRegistry;
     }
 
 
@@ -113,7 +117,6 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
         }
 
         int status = 0;
-        ;
 
         if (tr.getException() != null
                 || tr.hasFlag(TraceRecord.EXCEPTION_PASS)
@@ -186,6 +189,9 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
                 return symbolId;
             } else {
                 visitedObjects.add(owner);
+            }
+            if (sidMap.containsKey(symbolId)) {
+                traceTypeRegistry.mark(sidMap.get(symbolId), getHostInfo().getId());
             }
         }
         return sidMap.containsKey(symbolId) ? sidMap.get(symbolId) : 0;

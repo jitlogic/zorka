@@ -1,9 +1,18 @@
+Zorka 0.9.11 (2013-10-21)
+-------------------------
+
+ * agent: checksum calculating spy processors;
+ * agent: trace attribute propagation functions;
+ * collector: new query language for searching methods inside trace;
+ * collector: lots of UI fixes and polishes;
+ * collector: enhance self-monitoring (trace and monitor submission chain);
+
+
 Zorka 0.9.10 (2013-09-30)
 -------------------------
 
  * rename zorka-central -> zico;
  * match classes and methods by interface (with recursion);
-
 
 
 Zorka 0.9.9 (2013-09-15)

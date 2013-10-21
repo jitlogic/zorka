@@ -31,44 +31,53 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class RankList<T extends Rankable<?>> implements RankLister<T> {
 
-    /** Rank lister used to scan and update set of watched components. */
+    /**
+     * Rank lister used to scan and update set of watched components.
+     */
     private RankLister<T> lister;
 
-    /** Metric to be used as ranking criterium */
+    /**
+     * Metric to be used as ranking criterium
+     */
     private int metric;
 
-    /** Which average will be used as metric criterium */
+    /**
+     * Which average will be used as metric criterium
+     */
     private int average;
 
-    /** Maximum number of items in tanking */
+    /**
+     * Maximum number of items in tanking
+     */
     private int maxSize;
 
-    /** How often items should be reranked */
+    /**
+     * How often items should be reranked
+     */
     private volatile long rerankTime;
 
-    /** Last rank cycle time */
+    /**
+     * Last rank cycle time
+     */
     private volatile long lastTime;
 
-    /** Number of reranks (since ranking was created and started) */
+    /**
+     * Number of reranks (since ranking was created and started)
+     */
     private AtomicInteger numReranks = new AtomicInteger(0);
 
-    /** List of (ranked) objects */
+    /**
+     * List of (ranked) objects
+     */
     private volatile List<T> rankList;
-
-    /** Utility class (to be made fully static at some point) */
-    private final ZorkaUtil util = ZorkaUtil.getInstance();
 
     /**
      * Standard constructor.
      *
-     * @param lister rank lister used to look for new items
-     *
-     * @param maxSize maximum number of items shown in ranking
-     *
-     * @param metric metric used as rank criterium
-     *
-     * @param average average that will be used as rank criterium
-     *
+     * @param lister     rank lister used to look for new items
+     * @param maxSize    maximum number of items shown in ranking
+     * @param metric     metric used as rank criterium
+     * @param average    average that will be used as rank criterium
      * @param rerankTime how often list should be reranked
      */
     public RankList(RankLister<T> lister, int maxSize, int metric, int average, long rerankTime) {
@@ -85,7 +94,6 @@ public class RankList<T extends Rankable<?>> implements RankLister<T> {
      * Returns n-th item from ranking
      *
      * @param n item index (starting with 0)
-     *
      * @return item
      */
     public T get(int n) {

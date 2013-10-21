@@ -195,8 +195,26 @@ public class TraceBuilder {
     }
 
 
-    public void newAttr(int attrId, Object attrVal) {
-        realTop().setAttr(attrId, attrVal);
+    /**
+     * Attaches attribute to current trace record (or any other record up the call stack).
+     *
+     * @param traceId positive number (trace id) if attribute has to be attached to a top record of specific
+     *                trace, 0 if attribute has to be attached to a top record of any trace, -1 if attribute
+     *                has to be attached to current method;
+     * @param attrId  attribute ID
+     * @param attrVal attribute value
+     */
+    public void newAttr(int traceId, int attrId, Object attrVal) {
+        TraceRecord tr = realTop();
+
+        while (tr != null) {
+            if (traceId == -1 || (tr.hasFlag(TraceRecord.TRACE_BEGIN) &&
+                    (traceId == 0 || tr.getMarker().getTraceId() == traceId))) {
+                tr.setAttr(attrId, attrVal);
+                break;
+            }
+            tr = tr.getParent();
+        }
     }
 
 

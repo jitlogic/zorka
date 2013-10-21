@@ -52,7 +52,7 @@ public class TraceTaggerProcessor implements SpyProcessor {
 
         if (tagObj == null) {
             tagObj = new TaggedValue(attrTagId, new HashSet<Integer>());
-            tracer.getHandler().newAttr(attrNameId, tagObj);
+            tracer.getHandler().newAttr(-1, attrNameId, tagObj);
         }
 
         if (!(tagObj instanceof TaggedValue) || ((TaggedValue) tagObj).getTagId() != attrTagId) {

@@ -17,17 +17,34 @@
 
 __zico() {
 
-  _mbean1 = "zico:name=ReceiverContext,type=ZorkaStats";
+  _mbean = "zico:name=ReceiverContext,type=ZorkaStats";
+  _traceTime = zorka.longCfg("zico.trace.time", 250);
 
   spy.add(spy.instrument()
-    .onEnter(spy.fetchArg("CTX", 0))
+    .onEnter(spy.fetchArg("THIS", 0),
+      spy.format("HOST", "${THIS.hostInfo.name}"),
+      spy.subchain(
+        spy.valSetFilterOut("HOST", zorka.set(zorka.getHostname())),
+        tracer.begin("ZICO", _traceTime),
+        tracer.attr("HOST", "HOST")))
     .onSubmit(
-      spy.zorkaStats("java", _mbean1, "traces", "ALL"),
-      spy.zorkaStats("java", _mbean1, "traces", "${CTX.hostInfo.name}"))
+      spy.zorkaStats("java", _mbean, "zico", "ALL"),
+      spy.zorkaStats("java", _mbean, "zico", "${HOST}"))
     .include(
       spy.byMethod(0, "com.jitlogic.zico.core.ReceiverContext", "processTraceRecord", null)));
+
+  // this method is private, so it has to be explicitly included for tracing
+  tracer.include(spy.byMethod(0, "com.jitlogic.zico.core.ReceiverContext", "processTraceRecord", null));
+
+  spy.add(spy.instance()
+    .onEnter(spy.fetchArg("OFFS", 2), spy.fetchArg("LENGTH", 3),
+      tracer.traceAttr("ZICO", "OFFS", "OFFS"),
+      tracer.traceAttr("ZICO", "LENGTH", "LENGTH"))
+    .include(spy.byMethod("com.jitlogic.zico.core.ReceiverContext", "save")));
+
 
   return this;
 }
 
 zico = __zico();
+

@@ -64,7 +64,7 @@ public class TestTraceBuilder extends TraceBuilder {
     }
 
     @Override
-    public void newAttr(int attrId, Object attrVal) {
+    public void newAttr(int traceId, int attrId, Object attrVal) {
         data.add(ZorkaUtil.map("action", "newAttr", "attrId", attrId, "attrVal", attrVal));
     }
 

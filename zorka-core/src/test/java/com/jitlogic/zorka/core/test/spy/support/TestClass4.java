@@ -22,4 +22,22 @@ public class TestClass4 extends TestClass2 {
         calls++;
     }
 
+    public void recursive0() {
+        calls++;
+    }
+
+    public void recursive1() {
+        recursive0();
+        calls++;
+    }
+
+    public void recursive2() {
+        recursive1();
+        calls++;
+    }
+
+    public void recursive3() {
+        recursive2();
+        calls++;
+    }
 }

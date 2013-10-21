@@ -58,8 +58,9 @@ public class ZorkaLibUnitTest extends ZorkaFixture {
 
     @Test
     public void testRegisterAndListKeyValueHashMap() throws Exception {
-        Map<String,String> map = new HashMap<String, String>();
-        map.put("a", "aaa"); map.put("b", "bbb");
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("a", "aaa");
+        map.put("b", "bbb");
         zorka.registerAttr("test", "test:type=ZorkaLib,name=test1", "map", map, "Some map.");
 
         String[] s = zorka.ls("test", "test:type=ZorkaLib,*", "map", "**").split("\n");
@@ -90,15 +91,26 @@ public class ZorkaLibUnitTest extends ZorkaFixture {
         assertEquals("oja", config.getProperties().getProperty("test.prop"));
     }
 
+
     @Test
     public void testTranslateAllowedFn() {
         zorka.allow("zorka.jmx");
         assertEquals("zorka.jmx()", translator.translate("zorka.jmx[]"));
     }
 
+
     @Test(expected = RuntimeException.class)
     public void testTranslateNotAllowedFn() {
         zorka.allow("zorka.jmx");
         translator.translate("zorka.rate[]");
+    }
+
+
+    @Test
+    public void testChecksumFunctions() {
+        assertEquals("db1720a5", zorka.crc32sum("ABCD"));
+        assertEquals("db17", zorka.crc32sum("ABCD", 4));
+        assertEquals("cb08ca4a7bb5f9683c19133a84872ca7", zorka.md5sum("ABCD"));
+        assertEquals("fb2f85c88567f3c8ce9b799c7c54642d0c7b41f6", zorka.sha1sum("ABCD"));
     }
 }

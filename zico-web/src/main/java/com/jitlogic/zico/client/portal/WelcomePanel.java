@@ -24,6 +24,7 @@ import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.api.AdminApi;
+import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.client.panel.PanelFactory;
 import com.sencha.gxt.widget.core.client.Portlet;
 import com.sencha.gxt.widget.core.client.button.ToolButton;
@@ -41,6 +42,7 @@ public class WelcomePanel implements IsWidget {
     private PortalLayoutContainer portal;
 
     private AdminApi adminApi;
+    private TraceDataApi traceDataApi;
     private Provider<ZicoShell> shell;
 
     private SystemInfoPortlet systemInfoPortlet;
@@ -49,11 +51,13 @@ public class WelcomePanel implements IsWidget {
     private ErrorHandler errorHandler;
 
     @Inject
-    public WelcomePanel(AdminApi adminApi, SystemInfoPortlet systemInfoPortlet,
+    public WelcomePanel(AdminApi adminApi, TraceDataApi traceDataApi,
+                        SystemInfoPortlet systemInfoPortlet,
                         PanelFactory panelFactory, Provider<ZicoShell> shell,
                         ErrorHandler errorHandler) {
 
         this.adminApi = adminApi;
+        this.traceDataApi = traceDataApi;
         this.systemInfoPortlet = systemInfoPortlet;
         this.panelFactory = panelFactory;
         this.shell = shell;
@@ -124,7 +128,7 @@ public class WelcomePanel implements IsWidget {
     }
 
     private void openTemplatePanel() {
-        adminApi.getTidMap(new MethodCallback<Map<String, String>>() {
+        traceDataApi.getTidMap(new MethodCallback<Map<String, String>>() {
             @Override
             public void onFailure(Method method, Throwable exception) {
                 errorHandler.error("Error calling method: " + method, exception);

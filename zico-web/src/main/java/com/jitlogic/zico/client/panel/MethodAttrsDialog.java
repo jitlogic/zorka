@@ -16,29 +16,50 @@
 package com.jitlogic.zico.client.panel;
 
 
+import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.inject.assistedinject.Assisted;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.data.SymbolicExceptionInfo;
-import com.jitlogic.zico.data.TraceInfo;
 import com.jitlogic.zico.data.TraceRecordInfo;
+import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.core.client.util.Margins;
+import com.sencha.gxt.data.shared.ListStore;
+import com.sencha.gxt.data.shared.ModelKeyProvider;
+import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
+import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
+import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.event.CellClickEvent;
 import com.sencha.gxt.widget.core.client.form.TextArea;
+import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
+import com.sencha.gxt.widget.core.client.grid.ColumnModel;
+import com.sencha.gxt.widget.core.client.grid.Grid;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
 import javax.inject.Inject;
-import java.util.Map;
+import java.util.*;
 
 public class MethodAttrsDialog extends Dialog {
 
-    private TextArea txtAttrs;
-    private TextArea txtException;
+    private Grid<String[]> attrGrid;
+    private ListStore<String[]> attrStore;
+
+    private TextArea txtAttrVal;
+    private Label lblAttrName;
+
+    //private BorderLayoutContainer container;
+    private SplitLayoutPanel container;
 
     private TraceDataApi api;
     private ErrorHandler errorHandler;
+
 
     @Inject
     public MethodAttrsDialog(TraceDataApi api, ErrorHandler errorHandler,
@@ -47,8 +68,6 @@ public class MethodAttrsDialog extends Dialog {
         this.api = api;
         this.errorHandler = errorHandler;
         configure("Trace Details");
-
-        txtAttrs.setText("Please wait ...");
 
         loadTraceDetail(hostId, dataOffs, path, minTime);
     }
@@ -60,61 +79,149 @@ public class MethodAttrsDialog extends Dialog {
                     @Override
                     public void onFailure(Method method, Throwable exception) {
                         errorHandler.error("Error calling method: " + method, exception);
+                        txtAttrVal.setText("Error calling method: " + method + "\n" + exception);
                     }
 
                     @Override
                     public void onSuccess(Method method, TraceRecordInfo tr) {
-                        if (tr.getAttributes() != null) {
-                            fillAttrs(tr.getAttributes());
-                        }
-
-                        if (tr.getExceptionInfo() != null) {
-                            fillExceptionInfo(tr.getExceptionInfo());
-                        }
+                        fillTraceDetail(tr);
                     }
                 });
     }
 
 
-    private void fillAttrs(Map<String, String> attrs) {
-        StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, String> e : attrs.entrySet()) {
-            sb.append(e.getKey() + "=" + e.getValue() + "\n");
-        }
-        txtAttrs.setText(sb.toString());
-    }
+    private void fillTraceDetail(TraceRecordInfo tr) {
+        List<String[]> attrs = new ArrayList<String[]>();
 
-
-    private void fillExceptionInfo(SymbolicExceptionInfo e) {
         StringBuilder sb = new StringBuilder();
-        sb.append(e.getExClass() + ": " + e.getMessage() + "\n");
-        for (String s : e.getStackTrace()) {
-            sb.append(s + "\n");
+
+        if (tr.getAttributes() != null) {
+            for (Map.Entry<String, String> e : tr.getAttributes().entrySet()) {
+                String key = e.getKey(), val = e.getValue() != null ? e.getValue() : "";
+                attrs.add(new String[]{key, val});
+                val = val.indexOf("\n") != -1 ? val.substring(0, val.indexOf('\n')) + "..." : val;
+                if (val.length() > 80) {
+                    val = val.substring(0, 80) + "...";
+                }
+                sb.append(key + "=" + val + "\n");
+            }
         }
-        txtException.setText(sb.toString());
+
+        Collections.sort(attrs, new Comparator<String[]>() {
+            @Override
+            public int compare(String[] o1, String[] o2) {
+                return o1[0].compareTo(o2[0]);
+            }
+        });
+
+        if (attrs.size() > 0) {
+            attrs.add(0, new String[]{"(all)", sb.toString()});
+        }
+
+        if (tr.getExceptionInfo() != null) {
+            SymbolicExceptionInfo e = tr.getExceptionInfo();
+            sb = new StringBuilder();
+            sb.append(e.getExClass() + ": " + e.getMessage() + "\n");
+            for (String s : e.getStackTrace()) {
+                sb.append(s + "\n");
+            }
+            attrs.add(new String[]{"(exception)", sb.toString()});
+        }
+
+        if (attrs.size() > 0) {
+            attrStore.addAll(attrs);
+            lblAttrName.setText("Selected attribute: " + attrs.get(0)[0]);
+            txtAttrVal.setText(attrs.get(0)[1]);
+        } else {
+            txtAttrVal.setText("This method has no attributes and hasn't thrown any exception.");
+        }
     }
 
 
     private void configure(String headingText) {
         setHeadingText(headingText);
         setPredefinedButtons();
-        setPixelSize(1200, 850);
+        setPixelSize(1200, 750);
+
+        ValueProvider<String[], String> vpr = new ValueProvider<String[], String>() {
+            @Override
+            public String getValue(String[] object) {
+                return object[0];
+            }
+
+            @Override
+            public void setValue(String[] object, String value) {
+                object[0] = value;
+            }
+
+            @Override
+            public String getPath() {
+                return "";
+            }
+        };
+
+
+        ColumnConfig<String[], String> colAttribute = new ColumnConfig<String[], String>(vpr, 256, "Attributes");
+        colAttribute.setMenuDisabled(true);
+
+
+        colAttribute.setCell(new AbstractCell<String>() {
+            @Override
+            public void render(Context context, String value, SafeHtmlBuilder sb) {
+                String color = "blue";
+                if ("(all)".equals(value)) {
+                    color = "black";
+                }
+                if ("(exception)".equals(value)) {
+                    color = "red";
+                }
+                sb.appendHtmlConstant("<span style=\"color: " + color + "; font-size: small;\"><b>");
+                sb.append(SafeHtmlUtils.fromString("" + value));
+                sb.appendHtmlConstant("</b></span>");
+            }
+        });
+
+        ColumnModel<String[]> columnModel = new ColumnModel<String[]>(Arrays.<ColumnConfig<String[], ?>>asList(colAttribute));
+
+        attrStore = new ListStore<String[]>(new ModelKeyProvider<String[]>() {
+            @Override
+            public String getKey(String[] item) {
+                return item[0];
+            }
+        });
+
+        attrGrid = new Grid<String[]>(attrStore, columnModel);
+
+        attrGrid.addCellClickHandler(new CellClickEvent.CellClickHandler() {
+            @Override
+            public void onCellClick(CellClickEvent event) {
+                String[] item = attrStore.get(event.getRowIndex());
+                lblAttrName.setText("Selected attribute: " + item[0]);
+                txtAttrVal.setText(item[1]);
+            }
+        });
+
+        attrGrid.getView().setAutoExpandColumn(colAttribute);
+        attrGrid.getView().setForceFit(true);
+
+        container = new SplitLayoutPanel();
+
+        SimpleContainer sc = new SimpleContainer();
+        sc.add(attrGrid);
+
+        container.addWest(sc, 200);
+
+        txtAttrVal = new TextArea();
+        txtAttrVal.setReadOnly(true);
+        txtAttrVal.setText("Please wait ...");
 
         VerticalLayoutContainer vp = new VerticalLayoutContainer();
-        VerticalLayoutContainer.VerticalLayoutData vd = new VerticalLayoutContainer.VerticalLayoutData();
-        vd.setMargins(new Margins(10, 0, 0, 0));
-        vp.setLayoutData(vd);
+        lblAttrName = new Label("Selected attribute:");
+        vp.add(lblAttrName);
+        vp.add(txtAttrVal, new VerticalLayoutContainer.VerticalLayoutData(1, 1));
 
-        txtAttrs = new TextArea();
-        txtAttrs.setPixelSize(1190, 400);
-        txtAttrs.setReadOnly(true);
-        vp.add(txtAttrs);
+        container.add(vp);
 
-        txtException = new TextArea();
-        txtException.setPixelSize(1195, 405);
-        txtException.setReadOnly(true);
-        vp.add(txtException);
-
-        add(vp);
+        add(container);
     }
 }

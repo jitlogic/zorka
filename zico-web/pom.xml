@@ -3,7 +3,7 @@
     <parent>
         <artifactId>zorka</artifactId>
         <groupId>com.jitlogic.zorka</groupId>
-        <version>0.9.11-SNAPSHOT</version>
+        <version>0.9.11</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zico-web</artifactId>
@@ -66,6 +66,22 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${pgsql.connector.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.parboiled</groupId>
+            <artifactId>parboiled-core</artifactId>
+            <version>${parboiled.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.parboiled</groupId>
+            <artifactId>parboiled-java</artifactId>
+            <version>${parboiled.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jitlogic.zorka</groupId>
+            <artifactId>zorka-common-test</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>

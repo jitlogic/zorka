@@ -52,6 +52,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
     private RDSStore rds;
     private HostInfo hostInfo;
     private HostStoreManager manager;
+
     private TraceCache cache;
 
     private String reOp;
@@ -204,7 +205,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
             "calls", "CALLS",
             "errors", "ERRORS",
             "records", "RECORDS",
-            "executionTime", "EXTIME"
+            "executionTime", "EXTIME",
+            "traceType", "TRACE_ID"
     );
 
     private final static Set<String> TRACES_ORDER_DIRS = ZorkaUtil.set("ASC", "DESC");
