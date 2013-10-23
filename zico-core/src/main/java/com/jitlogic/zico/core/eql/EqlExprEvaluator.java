@@ -26,9 +26,9 @@ public abstract class EqlExprEvaluator extends EqlNodeVisitor<Object> {
 
         switch (expr.getOp()) {
             case EQ:
-                return EqlUtils.equals(expr.getArg1().accept(this), expr.getArg2().accept(this));
+                return EqlUtils.objEquals(expr.getArg1().accept(this), expr.getArg2().accept(this));
             case NE:
-                return !EqlUtils.equals(expr.getArg1().accept(this), expr.getArg2().accept(this));
+                return !EqlUtils.objEquals(expr.getArg1().accept(this), expr.getArg2().accept(this));
             case RE:
                 if (expr.getArg2().getClass() == EqlLiteral.class) {
                     // Optimization: precompile pattern if constant

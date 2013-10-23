@@ -13,32 +13,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core;
-
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-
-import java.io.File;
+package com.jitlogic.zorka.common.util;
 
 
-public class ProdZicoModule extends AbstractZicoModule {
+public class ZorkaRuntimeException extends RuntimeException {
 
-    @Provides
-    @Singleton
-    public ZicoConfig provideConfig() {
-        String homeDir = System.getProperty("zico.home.dir");
-
-        if (homeDir == null) {
-            throw new ZicoRuntimeException("Missing home dir configuration property. " +
-                    "Add '-Dzico.home.dir=/path/to/zico/home' to JVM options.");
-        }
-
-        if (!new File(homeDir).isDirectory()) {
-            throw new ZicoRuntimeException("Home dir property does not point to a directory.");
-        }
-
-        return new ZicoConfig(homeDir);
+    public ZorkaRuntimeException(String msg) {
+        super(msg);
     }
 
+    public ZorkaRuntimeException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 
 }

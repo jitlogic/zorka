@@ -39,7 +39,8 @@ public class TraceDataSet {
         FressianTraceFormat.TraceRecordBuilder oldb = FressianTraceFormat.TRACE_RECORD_BUILDER;
 
         FressianTraceFormat.TraceRecordBuilder newb = new FressianTraceFormat.TraceRecordBuilder() {
-            @Override public TraceRecord get() {
+            @Override
+            public TraceRecord get() {
                 return new ViewerTraceRecord(symbols);
             }
         };
@@ -65,11 +66,11 @@ public class TraceDataSet {
             FressianReader r = new FressianReader(is, FressianTraceFormat.READ_LOOKUP);
             for (Object obj = r.readObject(); obj != null; obj = r.readObject()) {
                 if (obj instanceof Symbol) {
-                    Symbol sym = (Symbol)obj;
+                    Symbol sym = (Symbol) obj;
                     symbols.put(sym.getId(), sym.getName());
                 } else if (obj instanceof ViewerTraceRecord) {
-                    ((ViewerTraceRecord)obj).fixup();
-                    traceRecords.add((ViewerTraceRecord)obj);
+                    ((ViewerTraceRecord) obj).fixup();
+                    traceRecords.add((ViewerTraceRecord) obj);
                 } else {
                     System.err.println("Unknown object: " + obj);
                 }
@@ -91,21 +92,31 @@ public class TraceDataSet {
 
 
     private InputStream open(File file) throws IOException {
-        // TODO this is redudant
-        FileInputStream fis = new FileInputStream(file);
-        byte[] hdr = new byte[4]; fis.read(hdr);
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(file);
+            byte[] hdr = new byte[4];
+            fis.read(hdr);
 
-        if (hdr[0] != 'Z' || hdr[1] != 'T' || hdr[2] != 'R') {
-            throw new IOException("Invalid header (invalid file type).");
-        }
+            if (hdr[0] != 'Z' || hdr[1] != 'T' || hdr[2] != 'R') {
+                throw new IOException("Invalid header (invalid file type).");
+            }
 
-        if (hdr[3] == 'Z') {
-            InputStream is = new BufferedInputStream(new InflaterInputStream(fis, new Inflater(true), 65536));
-            return is;
-        } else if (hdr[3] == 'C') {
-            return new BufferedInputStream(fis);
-        } else {
-            throw new IOException("Invalid header (invalid file type).");
+            if (hdr[3] == 'Z') {
+                InputStream is = new BufferedInputStream(new InflaterInputStream(fis, new Inflater(true), 65536));
+                return is;
+            } else if (hdr[3] == 'C') {
+                return new BufferedInputStream(fis);
+            } else {
+                throw new IOException("Invalid header (invalid file type).");
+            }
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                }
+            }
         }
     }
 

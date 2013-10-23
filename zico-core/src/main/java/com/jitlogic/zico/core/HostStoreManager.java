@@ -140,13 +140,14 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
     // TODO move this outside this class
     public ZicoDataProcessor get(Socket socket, HelloRequest hello) throws IOException {
         HostStore store = get(hello.getHostname(), !enableSecurity);
-        if (store.getHostInfo().getAddr() == null) {
-            store.getHostInfo().setAddr(socket.getInetAddress().getHostAddress());
-            store.save();
-        }
 
         if (store == null) {
             throw new ZicoException(ZicoPacket.ZICO_AUTH_ERROR, "Unauthorized.");
+        }
+
+        if (store.getHostInfo().getAddr() == null) {
+            store.getHostInfo().setAddr(socket.getInetAddress().getHostAddress());
+            store.save();
         }
 
         if (enableSecurity) {

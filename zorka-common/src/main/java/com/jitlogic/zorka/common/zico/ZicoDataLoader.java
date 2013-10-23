@@ -39,21 +39,31 @@ public class ZicoDataLoader {
 
 
     public static InputStream open(File file) throws IOException {
-        FileInputStream fis = new FileInputStream(file);
-        byte[] hdr = new byte[4];
-        fis.read(hdr);
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(file);
+            byte[] hdr = new byte[4];
+            fis.read(hdr);
 
-        if (hdr[0] != 'Z' || hdr[1] != 'T' || hdr[2] != 'R') {
-            throw new IOException("Invalid header (invalid file type).");
-        }
+            if (hdr[0] != 'Z' || hdr[1] != 'T' || hdr[2] != 'R') {
+                throw new IOException("Invalid header (invalid file type).");
+            }
 
-        if (hdr[3] == 'Z') {
-            InputStream is = new BufferedInputStream(new InflaterInputStream(fis, new Inflater(true), 65536));
-            return is;
-        } else if (hdr[3] == 'C') {
-            return new BufferedInputStream(fis);
-        } else {
-            throw new IOException("Invalid header (invalid file type).");
+            if (hdr[3] == 'Z') {
+                InputStream is = new BufferedInputStream(new InflaterInputStream(fis, new Inflater(true), 65536));
+                return is;
+            } else if (hdr[3] == 'C') {
+                return new BufferedInputStream(fis);
+            } else {
+                throw new IOException("Invalid header (invalid file type).");
+            }
+        } finally {
+            try {
+                if (fis != null) {
+                    fis.close();
+                }
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -66,7 +76,9 @@ public class ZicoDataLoader {
         } catch (IOException e) {
             e.printStackTrace();
             try {
-                is.close();
+                if (is != null) {
+                    is.close();
+                }
             } catch (IOException e1) {
 
             }

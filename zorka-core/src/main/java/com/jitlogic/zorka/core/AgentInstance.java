@@ -43,52 +43,84 @@ import java.util.concurrent.*;
  */
 public class AgentInstance {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** MBean server registry */
+    /**
+     * MBean server registry
+     */
     private MBeanServerRegistry mBeanServerRegistry;
 
-    /** Handles accepted connections. */
+    /**
+     * Handles accepted connections.
+     */
     private Executor connExecutor;
 
-    /** Handles BSH requests (called from connection handlers). */
+    /**
+     * Handles BSH requests (called from connection handlers).
+     */
     private ExecutorService mainExecutor;
 
-    /** Main zorka agent object - one that executes actual requests */
+    /**
+     * Main zorka agent object - one that executes actual requests
+     */
     private ZorkaBshAgent zorkaAgent;
 
-    /** Reference to zabbix agent object - one that handles zabbix requests and passes them to BSH agent */
+    /**
+     * Reference to zabbix agent object - one that handles zabbix requests and passes them to BSH agent
+     */
     private ZabbixAgent zabbixAgent;
 
-    /** Reference to zabbix library - available to zorka scripts as 'zabbix.*' functions */
+    /**
+     * Reference to zabbix library - available to zorka scripts as 'zabbix.*' functions
+     */
     private ZabbixLib zabbixLib;
 
-    /** Reference to nagios agents - one that handles nagios NRPE requests and passes them to BSH agent */
+    /**
+     * Reference to nagios agents - one that handles nagios NRPE requests and passes them to BSH agent
+     */
     private NagiosAgent nagiosAgent;
 
-    /** Reference to nagios library - available to zorka scripts as 'nagios.*' functions */
+    /**
+     * Reference to nagios library - available to zorka scripts as 'nagios.*' functions
+     */
     private NagiosLib nagiosLib;
 
-    /** Reference to spy library - available to zorka scripts as 'spy.*' functions */
+    /**
+     * Reference to spy library - available to zorka scripts as 'spy.*' functions
+     */
     private SpyLib spyLib;
 
-    /** Tracer library */
+    /**
+     * Tracer library
+     */
     private TracerLib tracerLib;
 
-    /** Reference to syslog library - available to zorka scripts as 'syslog.*' functions */
+    /**
+     * Reference to syslog library - available to zorka scripts as 'syslog.*' functions
+     */
     private SyslogLib syslogLib;
 
-    /** Reference to SNMP library - available to zorka scripts as 'snmp.*' functions */
+    /**
+     * Reference to SNMP library - available to zorka scripts as 'snmp.*' functions
+     */
     private SnmpLib snmpLib;
 
-    /** Reference to normalizers library - available to zorka scripts as 'normalizers.*' function */
+    /**
+     * Reference to normalizers library - available to zorka scripts as 'normalizers.*' function
+     */
     private NormLib normLib;
 
-    /** Reference to ranking and metrics processing library. */
+    /**
+     * Reference to ranking and metrics processing library.
+     */
     private PerfMonLib perfMonLib;
 
-    /** Agent configuration properties */
+    /**
+     * Agent configuration properties
+     */
     private Properties props;                // TODO get rid of this, access configuration via ZorkaConfig methods
 
     private Tracer tracer;
@@ -110,7 +142,7 @@ public class AgentInstance {
     /**
      * Starts agent. Real startup sequence is performed here.
      */
-    public  void start() {
+    public void start() {
 
         initLoggers(props);
 
@@ -160,7 +192,6 @@ public class AgentInstance {
         if (config.boolCfg("nagios", false)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Nagios support.");
             getNagiosAgent().start();
-            nagiosAgent.start();
             zorkaAgent.put("nagios", getNagiosLib());
         }
     }
@@ -208,7 +239,6 @@ public class AgentInstance {
 
     /**
      * Creates and configures file trapper according to configuration properties
-     *
      */
     private void initFileTrapper() {
         String logDir = config.getLogDir();
@@ -216,11 +246,11 @@ public class AgentInstance {
         String logFileName = config.stringCfg("zorka.log.fname", "zorka.log");
         ZorkaLogLevel logThreshold = ZorkaLogLevel.DEBUG;
 
-        int maxSize = 4*1024*1024, maxLogs = 4; // TODO int -> long
+        int maxSize = 4 * 1024 * 1024, maxLogs = 4; // TODO int -> long
 
         try {
             logThreshold = ZorkaLogLevel.valueOf(config.stringCfg("zorka.log.level", "INFO"));
-            maxSize = (int)(long)config.kiloCfg("zorka.log.size", 4L*1024*1024);
+            maxSize = (int) (long) config.kiloCfg("zorka.log.size", 4L * 1024 * 1024);
             maxLogs = config.intCfg("zorka.log.num", 8);
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing logger arguments", e);
@@ -242,12 +272,12 @@ public class AgentInstance {
         String mbeanName = props.getProperty("zorka.diagnostics.mbean").trim();
 
         getMBeanServerRegistry().getOrRegister("java", mbeanName, "Version",
-            props.getProperty("zorka.version"), "Agent Diagnostics");
+                props.getProperty("zorka.version"), "Agent Diagnostics");
 
         AgentDiagnostics.initMBean(getMBeanServerRegistry(), mbeanName);
 
         getMBeanServerRegistry().getOrRegister("java", mbeanName, "SymbolsCreated",
-            new AttrGetter(getSymbolRegistry(), "size()"));
+                new AttrGetter(getSymbolRegistry(), "size()"));
     }
 
 
@@ -276,7 +306,7 @@ public class AgentInstance {
 
     private MetricsRegistry metricsRegistry;
 
-    public synchronized  MetricsRegistry getMetricsRegistry() {
+    public synchronized MetricsRegistry getMetricsRegistry() {
         if (metricsRegistry == null) {
             metricsRegistry = new MetricsRegistry();
         }
@@ -339,6 +369,7 @@ public class AgentInstance {
 
     /**
      * Returns reference to BSH agent.
+     *
      * @return instance of Zorka BSH agent
      */
     public synchronized ZorkaBshAgent getZorkaAgent() {
@@ -361,7 +392,7 @@ public class AgentInstance {
 
     public synchronized ZabbixAgent getZabbixAgent() {
         if (zabbixAgent == null) {
-            zabbixAgent = new ZabbixAgent(config,  getZorkaAgent(), getTranslator());
+            zabbixAgent = new ZabbixAgent(config, getZorkaAgent(), getTranslator());
         }
         return zabbixAgent;
     }

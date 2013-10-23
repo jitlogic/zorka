@@ -600,12 +600,10 @@ public class ZorkaLib {
      *
      * @return thread rank lister object
      */
-    public ThreadRankLister threadRankLister() {
-        synchronized (this) {
-            if (threadRankLister == null) {
-                threadRankLister = new ThreadRankLister(mbsRegistry);
-                scheduler.schedule(threadRankLister, 15000, 0);
-            }
+    public synchronized ThreadRankLister threadRankLister() {
+        if (threadRankLister == null) {
+            threadRankLister = new ThreadRankLister(mbsRegistry);
+            scheduler.schedule(threadRankLister, 15000, 0);
         }
 
         return threadRankLister;

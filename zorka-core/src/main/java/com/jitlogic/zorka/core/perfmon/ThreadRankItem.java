@@ -22,19 +22,29 @@ import static com.jitlogic.zorka.core.perfmon.BucketAggregate.*;
  */
 public class ThreadRankItem implements Rankable<ThreadRankInfo> {
 
-    /** thread info (assigned every time thread list is refreshed) */
+    /**
+     * thread info (assigned every time thread list is refreshed)
+     */
     private volatile ThreadRankInfo threadInfo;
 
-    /** by cpu time metric */
+    /**
+     * by cpu time metric
+     */
     private final static int BY_CPU = 0;
 
-    /** by blocked time metric */
+    /**
+     * by blocked time metric
+     */
     private final static int BY_BLOCK = 1;
 
-    /** Maintains CPU time averages for thread */
+    /**
+     * Maintains CPU time averages for thread
+     */
     private BucketAggregate byCpuTime;
 
-    /** Maintains blocked time averages for thread */
+    /**
+     * Maintains blocked time averages for thread
+     */
     private BucketAggregate byBlockedTime;
 
     /**
@@ -50,17 +60,13 @@ public class ThreadRankItem implements Rankable<ThreadRankInfo> {
 
 
     @Override
-    public double getAverage(long tstamp, int metric, int average) {
+    public synchronized double getAverage(long tstamp, int metric, int average) {
 
         switch (metric) {
             case BY_CPU:
-                synchronized (byCpuTime) {
-                    return 100.0 * byCpuTime.getDeltaV(average, tstamp) / byCpuTime.getWindow(average);
-                }
+                return 100.0 * byCpuTime.getDeltaV(average, tstamp) / byCpuTime.getWindow(average);
             case BY_BLOCK:
-                synchronized (byBlockedTime) {
-                    return 100.0 * byBlockedTime.getDeltaV(average, tstamp) / byBlockedTime.getWindow(average);
-                }
+                return 100.0 * byBlockedTime.getDeltaV(average, tstamp) / byBlockedTime.getWindow(average);
         }
 
         return 0.0;
@@ -68,12 +74,12 @@ public class ThreadRankItem implements Rankable<ThreadRankInfo> {
 
     @Override
     public String[] getMetrics() {
-        return new String[] { "CPU", "BLOCK" };
+        return new String[]{"CPU", "BLOCK"};
     }
 
     @Override
     public String[] getAverages() {
-        return new String[] { "30s", "AVG1", "AVG5", "AVG15" };
+        return new String[]{"30s", "AVG1", "AVG5", "AVG15"};
     }
 
     @Override
@@ -90,8 +96,7 @@ public class ThreadRankItem implements Rankable<ThreadRankInfo> {
     /**
      * This method is used by thread rank lister to update information about tracked thread.
      *
-     * @param tstamp time stamp
-     *
+     * @param tstamp     time stamp
      * @param threadInfo thread info object (as from ThreadMXBean)
      */
     public void feed(long tstamp, ThreadRankInfo threadInfo) {

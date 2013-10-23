@@ -24,7 +24,7 @@ import java.util.regex.PatternSyntaxException;
 
 public class EqlUtils {
 
-    public static boolean equals(Object obj1, Object obj2) {
+    public static boolean objEquals(Object obj1, Object obj2) {
 
         if (obj1 == null && obj2 == null)
             return true;

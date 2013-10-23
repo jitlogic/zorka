@@ -15,29 +15,17 @@
  */
 package com.jitlogic.zico.core;
 
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
 
-import java.io.File;
+public class ZicoRuntimeException extends RuntimeException {
 
 
-public class ProdZicoModule extends AbstractZicoModule {
+    public ZicoRuntimeException(String msg) {
+        super(msg);
+    }
 
-    @Provides
-    @Singleton
-    public ZicoConfig provideConfig() {
-        String homeDir = System.getProperty("zico.home.dir");
 
-        if (homeDir == null) {
-            throw new ZicoRuntimeException("Missing home dir configuration property. " +
-                    "Add '-Dzico.home.dir=/path/to/zico/home' to JVM options.");
-        }
-
-        if (!new File(homeDir).isDirectory()) {
-            throw new ZicoRuntimeException("Home dir property does not point to a directory.");
-        }
-
-        return new ZicoConfig(homeDir);
+    public ZicoRuntimeException(String msg, Throwable e) {
+        super(msg, e);
     }
 
 

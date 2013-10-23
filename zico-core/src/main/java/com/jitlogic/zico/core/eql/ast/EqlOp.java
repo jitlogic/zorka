@@ -16,6 +16,8 @@
 package com.jitlogic.zico.core.eql.ast;
 
 
+import com.jitlogic.zico.core.ZicoRuntimeException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,7 +66,7 @@ public enum EqlOp {
 
     public static EqlOp fromName(String name) {
         if (!operations.containsKey(name)) {
-            throw new RuntimeException("Illegal operator: " + name);
+            throw new ZicoRuntimeException("Illegal operator: " + name);
         }
         return operations.get(name);
     }
