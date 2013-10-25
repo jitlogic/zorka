@@ -23,7 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
 
 import static com.jitlogic.zorka.common.zico.ZicoPacket.*;
 
@@ -63,7 +62,7 @@ public class ZicoClientConnector extends ZicoConnector {
 
 
     public void hello(String hostname, String auth) throws IOException {
-        send(ZICO_HELLO, ZicoUtil.pack(
+        send(ZICO_HELLO, ZicoCommonUtil.pack(
                 new HelloRequest(System.currentTimeMillis(), hostname, auth)));
         ZicoPacket pkt = recv();
         switch (pkt.getStatus()) {
@@ -82,7 +81,7 @@ public class ZicoClientConnector extends ZicoConnector {
         FressianWriter writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);
         writer.writeObject(data);
         writer.close();
-        send(ZICO_DATA, ZicoUtil.pack(data));
+        send(ZICO_DATA, ZicoCommonUtil.pack(data));
         ZicoPacket pkt = recv();
         if (pkt.getStatus() != ZICO_OK) {
             throw new ZicoException(pkt.getStatus(), "ZICO submission error: status=" + pkt.getStatus());

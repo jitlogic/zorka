@@ -64,7 +64,7 @@ public class ZicoServerConnector extends ZicoConnector implements Runnable {
                 break;
             }
             case ZICO_HELLO: {
-                List<Object> lst = com.jitlogic.zorka.common.zico.ZicoUtil.unpack(pkt.getData());
+                List<Object> lst = ZicoCommonUtil.unpack(pkt.getData());
                 log.debug("Encountered ZICO HELLO packet: " + lst + "(addr=" + saddr + ")");
                 if (lst.size() > 0 && lst.get(0) instanceof HelloRequest) {
                     context = factory.get(socket, (HelloRequest) lst.get(0));
@@ -79,7 +79,7 @@ public class ZicoServerConnector extends ZicoConnector implements Runnable {
                 log.debug("Received ZICO data packet from " + saddr + ": status=" + pkt.getStatus()
                         + ", dlen=" + pkt.getData().length);
                 if (context != null) {
-                    for (Object o : com.jitlogic.zorka.common.zico.ZicoUtil.unpack(pkt.getData())) {
+                    for (Object o : ZicoCommonUtil.unpack(pkt.getData())) {
                         context.process(o);
                     }
                     send(ZICO_OK);
