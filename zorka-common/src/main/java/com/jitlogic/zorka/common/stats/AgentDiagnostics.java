@@ -55,6 +55,10 @@ public class AgentDiagnostics {
     public static final int CONFIG_ERRORS = 29;
     public static final int SPY_SUBMISSIONS = 30;
     public static final int ZORKA_STATS_CREATED = 31;
+    public static final int ZICO_PACKETS_SENT = 32;
+    public static final int ZICO_PACKETS_DROPPED = 33;  // Packets dropped due to queue overflow
+    public static final int ZICO_PACKETS_LOST = 34;     // Packets lost due to communication errors
+    public static final int ZICO_RECONNECTS = 35;       // ZICO reconnects
 
 
     private static final String[] counterNames = {
@@ -90,6 +94,10 @@ public class AgentDiagnostics {
             "ConfigErrors",         // CONFIG_ERRORS        = 29
             "SpySubmissions",       // SPY_SUBMISSIONS      = 30
             "ZorkaStatsCreated",    // ZORKA_STATS_CREATED  = 31
+            "ZicoPacketsSent",      // ZICO_PACKETS_SENT    = 32
+            "ZicoPacketsDropped",   // ZICO_PACKETS_DROPPED = 33
+            "ZicoPacketsLost",      // ZICO_PACKETS_LOST    = 34
+            "ZicoReconnects",       // ZICO_RECONNECTS      = 35;
     };
 
 
