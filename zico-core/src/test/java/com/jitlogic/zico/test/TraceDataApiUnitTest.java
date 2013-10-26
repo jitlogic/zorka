@@ -41,7 +41,7 @@ public class TraceDataApiUnitTest extends ZicoFixture {
     public void prepareData() throws Exception {
         jdbc = new JdbcTemplate(dataSource);
 
-        ReceiverContext rcx = new ReceiverContext(dataSource, storeManager.get("test", true), traceTypeRegistry);
+        ReceiverContext rcx = new ReceiverContext(storeManager.get("test", true), traceTypeRegistry, traceTableWriter);
         TestTraceGenerator generator = new TestTraceGenerator();
         TraceRecord tr = generator.generate();
         Symbol s1 = new Symbol(tr.getClassId(), generator.getSymbols().symbolName(tr.getClassId()));

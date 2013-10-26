@@ -48,11 +48,11 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
 
     private int retries;
     private long retryTime, retryTimeExp;
-    private int packetSize;
+    private long packetSize;
 
 
     public ZicoTraceOutput(TraceWriter writer, String addr, int port, String hostname, String auth,
-                           int qlen, int packetSize, int retries, long retryTime, long retryTimeExp, int timeout) throws IOException {
+                           int qlen, long packetSize, int retries, long retryTime, long retryTimeExp, int timeout) throws IOException {
         super("zico-output", qlen);
 
         this.hostname = hostname;

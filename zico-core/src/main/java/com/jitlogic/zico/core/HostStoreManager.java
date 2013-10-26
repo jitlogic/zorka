@@ -54,6 +54,7 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
     private TraceTypeRegistry traceTypeRegistry;
     private TraceTemplateManager templater;
     private TraceCache cache;
+    private TraceTableWriter traceTableWriter;
 
     private boolean enableSecurity;
 
@@ -64,7 +65,7 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
     private DataSource ds;
 
     @Inject
-    public HostStoreManager(ZicoConfig config, DataSource ds, SymbolRegistry symbolRegistry,
+    public HostStoreManager(ZicoConfig config, DataSource ds, SymbolRegistry symbolRegistry, TraceTableWriter traceTableWriter,
                             TraceCache cache, TraceTypeRegistry traceTypeRegistry, TraceTemplateManager templater) {
         this.config = config;
         this.symbolRegistry = symbolRegistry;
@@ -73,6 +74,7 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
         this.cache = cache;
         this.traceTypeRegistry = traceTypeRegistry;
         this.templater = templater;
+        this.traceTableWriter = traceTableWriter;
 
         this.jdbc = new JdbcTemplate(ds);
         this.enableSecurity = config.boolCfg("zico.security", false);
@@ -162,7 +164,7 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
             }
         }
 
-        return new ReceiverContext(ds, store, traceTypeRegistry);
+        return new ReceiverContext(store, traceTypeRegistry, traceTableWriter);
     }
 
     @Override

@@ -48,7 +48,7 @@ public class DataCollectionIntegTest extends ZicoFixture {
     }
 
 
-    private void submit(TraceRecord... recs) {
+    private void submit(TraceRecord... recs) throws Exception {
         method("open").in(output).invoke();
         for (TraceRecord rec : recs) {
             output.submit(rec);

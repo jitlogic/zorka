@@ -25,8 +25,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.fressian.FressianWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
@@ -45,8 +43,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
     private RDSStore traceDataStore;
     private TraceTypeRegistry traceTypeRegistry;
-
-    private SimpleJdbcInsert jdbci;
+    private TraceTableWriter traceTableWriter;
 
     private HostInfo hostInfo;
 
@@ -55,14 +52,12 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     private Set<Object> visitedObjects = new HashSet<Object>();
 
 
-    public ReceiverContext(DataSource ds, HostStore store, TraceTypeRegistry traceTypeRegistry) {
+    public ReceiverContext(HostStore store, TraceTypeRegistry traceTypeRegistry, TraceTableWriter traceTableWriter) {
         this.symbolRegistry = store.getStoreManager().getSymbolRegistry();
         this.traceDataStore = store.getRds();
-        this.jdbci = new SimpleJdbcInsert(ds).withTableName("TRACES").usingColumns(
-                "HOST_ID", "DATA_OFFS", "TRACE_ID", "DATA_LEN", "CLOCK", "RFLAGS", "TFLAGS", "STATUS",
-                "CLASS_ID", "METHOD_ID", "SIGN_ID", "CALLS", "ERRORS", "RECORDS", "EXTIME", "ATTRS", "EXINFO");
         this.hostInfo = store.getHostInfo();
         this.traceTypeRegistry = traceTypeRegistry;
+        this.traceTableWriter = traceTableWriter;
     }
 
 
@@ -143,7 +138,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
             }
         }
 
-        jdbci.execute(ZorkaUtil.<String, Object>map(
+        traceTableWriter.submit(ZorkaUtil.<String, Object>map(
                 "HOST_ID", hostId,
                 "DATA_OFFS", offs,
                 "TRACE_ID", tr.getMarker().getTraceId(),
