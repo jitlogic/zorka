@@ -146,7 +146,8 @@ public class TraceDataService {
         switch (expr.getType()) {
             case TraceDetailSearchExpression.TXT_QUERY:
                 if (se != null && se.startsWith("~")) {
-                    Pattern regex = Pattern.compile(se.substring(1, se.length()));
+                    int rflag = 0 != (expr.getFlags() & TraceDetailSearchExpression.IGNORE_CASE) ? Pattern.CASE_INSENSITIVE : 0;
+                    Pattern regex = Pattern.compile(se.substring(1, se.length()), rflag);
                     matcher = new FullTextTraceRecordMatcher(symbolRegistry, expr.getFlags(), regex);
                 } else {
                     matcher = new FullTextTraceRecordMatcher(symbolRegistry, expr.getFlags(), se);

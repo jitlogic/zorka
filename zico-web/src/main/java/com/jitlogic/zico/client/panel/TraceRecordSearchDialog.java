@@ -78,6 +78,7 @@ public class TraceRecordSearchDialog extends Dialog {
     private CheckBox chkExceptionText;
     private CheckBox chkErrorsOnly;
     private CheckBox chkMethodsWithAttrs;
+    private CheckBox chkIgnoreCase;
 
     private ToggleButton btnEql;
 
@@ -193,6 +194,11 @@ public class TraceRecordSearchDialog extends Dialog {
         chkMethodsWithAttrs.setBoxLabel("Only Methods with attributes");
         chkMethodsWithAttrs.setValue(false);
         hp.add(chkMethodsWithAttrs);
+
+        chkIgnoreCase = new CheckBox();
+        chkIgnoreCase.setBoxLabel("Ignore Case");
+        chkIgnoreCase.setValue(true);
+        hp.add(chkIgnoreCase);
 
         lblSumStats = new Label("n/a");
 
@@ -314,7 +320,8 @@ public class TraceRecordSearchDialog extends Dialog {
                         | (chkClass.getValue() ? TraceDetailSearchExpression.SEARCH_CLASSES : 0)
                         | (chkMethod.getValue() ? TraceDetailSearchExpression.SEARCH_METHODS : 0)
                         | (chkAttribs.getValue() ? TraceDetailSearchExpression.SEARCH_ATTRS : 0)
-                        | (chkExceptionText.getValue() ? TraceDetailSearchExpression.SEARCH_EX_MSG : 0));
+                        | (chkExceptionText.getValue() ? TraceDetailSearchExpression.SEARCH_EX_MSG : 0)
+                        | (chkIgnoreCase.getValue() ? TraceDetailSearchExpression.IGNORE_CASE : 0));
 
         expr.setSearchExpr(txtSearchFilter.getCurrentValue());
 
