@@ -26,6 +26,11 @@ public class TraceFlagsProcessor implements SpyProcessor {
     private Tracer tracer;
 
     /**
+     * Trace ID (if any)
+     */
+    private int traceId;
+
+    /**
      * source field name
      */
     private String checkField;
@@ -35,17 +40,18 @@ public class TraceFlagsProcessor implements SpyProcessor {
      */
     private int flags;
 
-    public TraceFlagsProcessor(Tracer tracer, String checkField, int flags) {
+    public TraceFlagsProcessor(Tracer tracer, String checkField, int traceId, int flags) {
         this.tracer = tracer;
         this.checkField = checkField;
         this.flags = flags;
+        this.traceId = traceId;
     }
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
 
         if (checkField == null || record.get(checkField) != null) {
-            ((TraceBuilder) (tracer.getHandler())).markTraceFlags(flags);
+            tracer.getHandler().markTraceFlags(traceId, flags);
         }
 
         return record;

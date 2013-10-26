@@ -350,10 +350,13 @@ public class TraceBuilder {
     }
 
 
-    public void markTraceFlags(int flag) {
-        TraceRecord top = realTop();
-        if (top.getMarker() != null) {
-            top.getMarker().markFlags(flag);
+    public void markTraceFlags(int traceId, int flag) {
+        for (TraceRecord tr = realTop(); tr != null; tr = tr.getParent()) {
+            TraceMarker tm = tr.getMarker();
+            if (tm != null && (traceId == 0 || traceId == tm.getTraceId())) {
+                tm.markFlags(flag);
+                break;
+            }
         }
     }
 

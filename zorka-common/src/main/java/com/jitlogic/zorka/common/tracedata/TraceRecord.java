@@ -475,7 +475,6 @@ public class TraceRecord implements SymbolicRecord {
 
     @Override
     public String toString() {
-        return "TraceRecord(classId=" + classId + ", methodId=" + methodId
-                + ", traceId=" + (marker != null ? marker.getTraceId() : "<null>");
+        return "TraceRecord(classId=" + classId + ", methodId=" + methodId + ", " + marker + ")";
     }
 }

@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
+import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
@@ -191,7 +192,9 @@ public class FullTracerUnitTest extends ZorkaFixture {
     @Test
     public void testTraceAttrUpwardPropagationToTheSameMethodUnnamed() throws Exception {
         tracer.include(spy.byMethod(TCLASS4, "recur*"));
-        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0), tracer.formatTraceAttr(null, "X", "XXX")).include(spy.byMethod(TCLASS4, "recursive3")));
+        spy.add(spy.instance()
+                .onEnter(tracer.begin("TEST1", 0), tracer.formatTraceAttr(null, "X", "XXX"))
+                .include(spy.byMethod(TCLASS4, "recursive3")));
 
         agentInstance.getTracer().setMinMethodTime(0);
         tracer.output(output);
@@ -202,6 +205,31 @@ public class FullTracerUnitTest extends ZorkaFixture {
         assertEquals("should return two traces", 1, results.size());
         assertEquals("TEST1", symbols.symbolName(results.get(0).getMarker().getTraceId()));
         assertEquals("XXX", results.get(0).getAttr(symbols.symbolId("X")));
+    }
+
+    @Test
+    public void testTraceFlagsUpwardPropagation() throws Exception {
+        tracer.include(spy.byMethod(TCLASS4, "recur*"));
+        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
+        spy.add(spy.instance().onEnter(tracer.begin("TEST2", 0)).include(spy.byMethod(TCLASS4, "recursive2")));
+
+        spy.add(spy.instance()
+                .onEnter(tracer.traceFlags("TEST1", TraceMarker.ERROR_MARK))
+                .include(spy.byMethod(TCLASS4, "recursive1")));
+
+        agentInstance.getTracer().setMinMethodTime(0);
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
+        invoke(obj, "recursive3");
+
+        assertEquals("should return two traces", 2, results.size());
+
+        assertTrue("Error flag should be enabled for TEST1 trace",
+                results.get(1).getMarker().hasFlag(TraceMarker.ERROR_MARK));
+
+        assertFalse("Error flag should be disabled for TEST2 trace",
+                results.get(0).getMarker().hasFlag(TraceMarker.ERROR_MARK));
     }
 
 }

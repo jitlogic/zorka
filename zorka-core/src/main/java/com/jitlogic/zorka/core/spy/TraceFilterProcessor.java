@@ -56,9 +56,7 @@ public class TraceFilterProcessor implements SpyProcessor {
         Boolean rslt = decide(val);
 
         if (rslt != null) {
-            TraceBuilder builder = (TraceBuilder) tracer.getHandler();
-            int flag = rslt ? TraceMarker.SUBMIT_TRACE : TraceMarker.DROP_TRACE;
-            builder.markTraceFlags(flag);
+            tracer.getHandler().markTraceFlags(0, rslt ? TraceMarker.SUBMIT_TRACE : TraceMarker.DROP_TRACE);
         }
 
         return record;

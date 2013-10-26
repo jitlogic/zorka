@@ -274,12 +274,17 @@ public class TracerLib {
      * @return spy processor object
      */
     public SpyProcessor flags(int flags) {
-        return new TraceFlagsProcessor(tracer, null, flags);
+        return new TraceFlagsProcessor(tracer, null, 0, flags);
+    }
+
+
+    public SpyProcessor traceFlags(String traceName, int flags) {
+        return new TraceFlagsProcessor(tracer, null, symbolRegistry.symbolId(traceName), flags);
     }
 
 
     public void newFlags(int flags) {
-        tracer.getHandler().markTraceFlags(flags);
+        tracer.getHandler().markTraceFlags(0, flags);
     }
 
 
@@ -291,9 +296,13 @@ public class TracerLib {
      * @return spy processor object
      */
     public SpyProcessor flags(String srcField, int flags) {
-        return new TraceFlagsProcessor(tracer, srcField, flags);
+        return new TraceFlagsProcessor(tracer, srcField, 0, flags);
     }
 
+
+    public SpyProcessor traceFlags(String srcField, String traceName, int flags) {
+        return new TraceFlagsProcessor(tracer, srcField, symbolRegistry.symbolId(traceName), flags);
+    }
 
     /**
      * Labels current trace with tags.
@@ -372,8 +381,7 @@ public class TracerLib {
 
 
     public void filterTrace(boolean decision) {
-        TraceBuilder builder = (TraceBuilder) tracer.getHandler();
-        builder.markTraceFlags(decision ? TraceMarker.SUBMIT_TRACE : TraceMarker.DROP_TRACE);
+        tracer.getHandler().markTraceFlags(0, decision ? TraceMarker.SUBMIT_TRACE : TraceMarker.DROP_TRACE);
     }
 
 
