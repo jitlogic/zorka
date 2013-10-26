@@ -232,4 +232,45 @@ public class FullTracerUnitTest extends ZorkaFixture {
                 results.get(0).getMarker().hasFlag(TraceMarker.ERROR_MARK));
     }
 
+
+    @Test
+    public void testInTraceCheckerPositiveCheck() throws Exception {
+        tracer.include(spy.byMethod(TCLASS4, "recur*"));
+        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
+
+        spy.add(spy.instance()
+                .onEnter(spy.subchain(tracer.inTrace("TEST1"), tracer.formatTraceAttr("TEST1", "IN", "YES")))
+                .include(spy.byMethod(TCLASS4, "recursive1")));
+
+        agentInstance.getTracer().setMinMethodTime(0);
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
+        invoke(obj, "recursive3");
+
+        assertEquals("should return one trace", 1, results.size());
+
+        assertEquals("YES", results.get(0).getAttr(symbols.symbolId("IN")));
+    }
+
+    @Test
+    public void testInTraceCheckerNegativeCheck() throws Exception {
+        tracer.include(spy.byMethod(TCLASS4, "recur*"));
+        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
+
+        spy.add(spy.instance()
+                .onEnter(spy.subchain(tracer.inTrace("TEST2"), tracer.formatTraceAttr("TEST1", "IN", "YES")))
+                .include(spy.byMethod(TCLASS4, "recursive1")));
+
+        agentInstance.getTracer().setMinMethodTime(0);
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
+        invoke(obj, "recursive3");
+
+        assertEquals("should return one trace", 1, results.size());
+
+        assertEquals(null, results.get(0).getAttr(symbols.symbolId("IN")));
+    }
+
 }

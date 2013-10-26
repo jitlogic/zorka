@@ -150,6 +150,16 @@ public class TracerLib {
     }
 
 
+    public SpyProcessor inTrace(String traceName) {
+        return new TraceCheckerProcessor(tracer, symbolRegistry.symbolId(traceName));
+    }
+
+
+    public boolean isInTrace(String traceName) {
+        return tracer.getHandler().isInTrace(symbolRegistry.symbolId(traceName));
+    }
+
+
     /**
      * Creates spy processor that attaches attribute to trace record.
      *

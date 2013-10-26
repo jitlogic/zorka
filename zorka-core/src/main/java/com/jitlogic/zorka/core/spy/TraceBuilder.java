@@ -360,4 +360,15 @@ public class TraceBuilder {
         }
     }
 
+
+    public boolean isInTrace(int traceId) {
+        for (TraceRecord tr = realTop(); tr != null; tr = tr.getParent()) {
+            TraceMarker tm = tr.getMarker();
+            if (tm != null && tm.getTraceId() == traceId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
