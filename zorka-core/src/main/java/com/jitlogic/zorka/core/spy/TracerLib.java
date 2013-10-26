@@ -342,7 +342,7 @@ public class TracerLib {
 
 
     public ZorkaAsyncThread<SymbolicRecord> toZico(String addr, int port, String hostname, String auth) throws IOException {
-        return toZico(addr, port, hostname, auth, 64, 10, 125, 2, 60000);
+        return toZico(addr, port, hostname, auth, 64, 8 * 1024 * 1024, 10, 125, 2, 60000);
     }
 
     /**
@@ -356,10 +356,10 @@ public class TracerLib {
      * @throws IOException
      */
     public ZorkaAsyncThread<SymbolicRecord> toZico(String addr, int port, String hostname, String auth,
-                                                   int qlen, int retries, long retryTime, long retryTimeExp,
+                                                   int qlen, int packetSize, int retries, long retryTime, long retryTimeExp,
                                                    int timeout) throws IOException {
         TraceWriter writer = new FressianTraceWriter(symbolRegistry, metricsRegistry);
-        ZicoTraceOutput output = new ZicoTraceOutput(writer, addr, port, hostname, auth, qlen,
+        ZicoTraceOutput output = new ZicoTraceOutput(writer, addr, port, hostname, auth, qlen, packetSize,
                 retries, retryTime, retryTimeExp, timeout);
         output.start();
         return output;

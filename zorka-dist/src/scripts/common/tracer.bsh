@@ -81,6 +81,7 @@ if (zorka.boolCfg("tracer", false)) {
       zorka.stringCfg("tracer.net.host", zorka.getHostname()),
       zorka.stringCfg("tracer.net.pass", "changeme"),
       zorka.intCfg("tracer.net.qlen", 64),
+      zorka.kiloCfg("tracer.net.packet", 8*1024*1024),
       zorka.intCfg("tracer.net.retries", 10),
       zorka.intCfg("tracer.net.retry.time", 125L),
       zorka.intCfg("tracer.net.retry.exp", 2L),

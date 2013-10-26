@@ -115,7 +115,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
     /**
      * Processes single item from submit queue (if any).
      */
-    private void runCycle() {
+    protected void runCycle() {
         try {
             T obj = submitQueue.take();
             if (obj != null) {
