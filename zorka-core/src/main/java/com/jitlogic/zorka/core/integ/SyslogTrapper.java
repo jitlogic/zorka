@@ -16,7 +16,7 @@
 package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.zorka.common.util.*;
-import com.jitlogic.zorka.core.AgentDiagnostics;
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -34,32 +34,42 @@ import java.util.Date;
  */
 public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrapper {
 
-    /** Default syslog port */
+    /**
+     * Default syslog port
+     */
     public final static int DEFAULT_PORT = 514;
 
-    /** Syslog server IP address */
+    /**
+     * Syslog server IP address
+     */
     private InetAddress syslogAddress;
 
-    /** Syslog server UDP port */
+    /**
+     * Syslog server UDP port
+     */
     private int syslogPort = DEFAULT_PORT;
 
-    /** Default hostname */
+    /**
+     * Default hostname
+     */
     private String defaultHost;
 
-    /** Default facility */
+    /**
+     * Default facility
+     */
     private int defaultFacility = SyslogLib.F_LOCAL0;
 
-    /** UDP socket used to send packet to syslog server */
+    /**
+     * UDP socket used to send packet to syslog server
+     */
     private DatagramSocket socket;
 
 
     /**
      * Creates new syslog trapper.
      *
-     * @param syslogServer syslog server IP address
-     *
-     * @param defaultHost default host name added to syslog messages
-     *
+     * @param syslogServer    syslog server IP address
+     * @param defaultHost     default host name added to syslog messages
      * @param defaultFacility default facility code added to syslog messages
      */
     public SyslogTrapper(String syslogServer, String defaultHost, int defaultFacility) {
@@ -70,14 +80,11 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
     /**
      * Creates new syslog trapper.
      *
-     * @param syslogServer syslog server IP address
-     *
-     * @param defaultHost default host name
-     *
+     * @param syslogServer    syslog server IP address
+     * @param defaultHost     default host name
      * @param defaultFacility default facility code
-     *
-     * @param quiet if true, trapper will not its own errors to zorka logger
-     *              TODO get rid of this 'quiet' feature after refactoring
+     * @param quiet           if true, trapper will not its own errors to zorka logger
+     *                        TODO get rid of this 'quiet' feature after refactoring
      */
     public SyslogTrapper(String syslogServer, String defaultHost, int defaultFacility, boolean quiet) {
         super("syslog-trapper");
@@ -105,12 +112,9 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
      * Logs a message.
      *
      * @param severity syslog severity code
-     *
      * @param facility syslog facility code
-     *
-     * @param tag tag (eg. component name)
-     *
-     * @param message log message
+     * @param tag      tag (eg. component name)
+     * @param message  log message
      */
     public void log(int severity, int facility, String tag, String message) {
         log(severity, facility, defaultHost, tag, message);
@@ -121,14 +125,10 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
      * Logs a message.
      *
      * @param severity syslog severity code
-     *
      * @param facility syslog facility code
-     *
      * @param hostname host name (as syslog protocol mandates)
-     *
-     * @param tag tag (eg. component name)
-     *
-     * @param message log message
+     * @param tag      tag (eg. component name)
+     * @param message  log message
      */
     public void log(int severity, int facility, String hostname, String tag, String message) {
         String s = format(severity, facility, new Date(), hostname, tag, message);
@@ -143,21 +143,15 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
      * Formats syslog message packet.
      *
      * @param severity message severity
-     *
      * @param facility facility code
-     *
-     * @param date message timestamp
-     *
+     * @param date     message timestamp
      * @param hostname host name
-     *
-     * @param tag tag (eg.component name)
-     *
-     * @param message log message
-     *
+     * @param tag      tag (eg.component name)
+     * @param message  log message
      * @return proper syslog message
      */
     public String format(int severity, int facility, Date date, String hostname, String tag, String message) {
-        return "<" + (severity+facility*8) + ">" + new SimpleDateFormat("MMM dd HH:mm:ss").format(date) + " "
+        return "<" + (severity + facility * 8) + ">" + new SimpleDateFormat("MMM dd HH:mm:ss").format(date) + " "
                 + hostname + " " + tag + " " + ZorkaUtil.printableASCII7(message);
     }
 

@@ -26,47 +26,48 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class MethodCallStatistics implements ZorkaStats {
 
-    /** Map of method call statistics objects. */
-	private ConcurrentHashMap<String, MethodCallStatistic> stats = new ConcurrentHashMap<String, MethodCallStatistic>();
+    /**
+     * Map of method call statistics objects.
+     */
+    private ConcurrentHashMap<String, MethodCallStatistic> stats = new ConcurrentHashMap<String, MethodCallStatistic>();
 
-	@Override
-	public ZorkaStat getStatistic(String statisticName) {
-		return stats.get(statisticName);
-	}
-	
-	@Override
-	public String[] getStatisticNames() {
-		String[] names = new String[stats.size()];
-		
-		int i = 0; 
+    @Override
+    public ZorkaStat getStatistic(String statisticName) {
+        return stats.get(statisticName);
+    }
 
-		for (String name : stats.keySet()) {
-			names[i++] = name;
-		}
-		
-		return names;
-	}
+    @Override
+    public String[] getStatisticNames() {
+        String[] names = new String[stats.size()];
+
+        int i = 0;
+
+        for (String name : stats.keySet()) {
+            names[i++] = name;
+        }
+
+        return names;
+    }
 
     /**
      * Returns named statistic. If there is no such statistic, a new one is created and registered.
      *
      * @param name statistic (method) name
-     *
      * @return method call statistic
      */
-	public MethodCallStatistic getMethodCallStatistic(String name) {
-		MethodCallStatistic ret = stats.get(name);
-		
-		if (ret == null) {
+    public MethodCallStatistic getMethodCallStatistic(String name) {
+        MethodCallStatistic ret = stats.get(name);
+
+        if (ret == null) {
             MethodCallStatistic st = stats.putIfAbsent(name, ret = new MethodCallStatistic(name));
             if (st != null) {
                 ret = st;
             }
-            // TODO AgentDiagnostics.inc(AgentDiagnostics.ZORKA_STATS_CREATED);
-		}
-		
-		return ret;
-	}
+            AgentDiagnostics.inc(AgentDiagnostics.ZORKA_STATS_CREATED);
+        }
+
+        return ret;
+    }
 
 
     @Override

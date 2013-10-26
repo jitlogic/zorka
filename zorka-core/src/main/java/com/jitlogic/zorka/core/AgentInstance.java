@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.core;
 
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
+import com.jitlogic.zorka.common.stats.ValGetter;
 import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogLevel;
@@ -274,7 +276,19 @@ public class AgentInstance {
         getMBeanServerRegistry().getOrRegister("java", mbeanName, "Version",
                 props.getProperty("zorka.version"), "Agent Diagnostics");
 
-        AgentDiagnostics.initMBean(getMBeanServerRegistry(), mbeanName);
+        MBeanServerRegistry registry = getMBeanServerRegistry();
+
+        for (int i = 0; i < AgentDiagnostics.numCounters(); i++) {
+            final int counter = i;
+            registry.getOrRegister("java", mbeanName, AgentDiagnostics.getName(counter),
+                    new ValGetter() {
+                        @Override
+                        public Object get() {
+                            return AgentDiagnostics.get(counter);
+                        }
+                    });
+
+        }
 
         getMBeanServerRegistry().getOrRegister("java", mbeanName, "SymbolsCreated",
                 new AttrGetter(getSymbolRegistry(), "size()"));

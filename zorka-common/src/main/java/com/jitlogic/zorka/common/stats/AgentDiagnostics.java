@@ -14,10 +14,8 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core;
+package com.jitlogic.zorka.common.stats;
 
-import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.core.util.ValGetter;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.util.Set;
@@ -25,40 +23,38 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class AgentDiagnostics {
 
-    public static final int CLASSES_TRANSFORMED  = 0;
+    public static final int CLASSES_TRANSFORMED = 0;
     public static final int METHODS_INSTRUMENTED = 1;
-    public static final int SPY_ERRORS           = 2;
-    public static final int TRACER_ERRORS        = 3;
-    public static final int AGENT_REQUESTS       = 4;
-    public static final int AGENT_ERRORS         = 5;
-    public static final int AGENT_TIME           = 6;
-    public static final int TRAPS_SUBMITTED      = 7;
-    public static final int TRAPS_SENT           = 8;
-    public static final int TRAPS_DROPPED        = 9;
-    public static final int ZABBIX_REQUESTS      = 10;
-    public static final int ZABBIX_ERRORS        = 11;
-    public static final int ZABBIX_TIME          = 12;
-    public static final int NAGIOS_REQUESTS      = 13;
-    public static final int NAGIOS_ERRORS        = 14;
-    public static final int NAGIOS_TIME          = 15;
-    public static final int PMON_CYCLES          = 16;
-    public static final int PMON_TIME            = 17;
-    public static final int PMON_PACKETS_SENT    = 18;
-    public static final int PMON_SAMPLES_SENT    = 19;
-    public static final int PMON_WARNINGS        = 20;
-    public static final int PMON_ERRORS          = 21;
-    public static final int PMON_NULLS           = 22;
-    public static final int PMON_QUERIES         = 23;
-    public static final int TRACES_SUBMITTED     = 24;
-    public static final int TRACES_DROPPED       = 25;
-    public static final int METRICS_CREATED      = 26;
-    public static final int AVG_CNT_ERRORS       = 27;
-    public static final int AVG_CNT_CREATED      = 28;
-    public static final int CONFIG_ERRORS        = 29;
-    public static final int SPY_SUBMISSIONS      = 30;
-    public static final int ZORKA_STATS_CREATED  = 31;
-
-    //public static final int SYMBOLS_CREATED      = 27; // TODO make this metric appear
+    public static final int SPY_ERRORS = 2;
+    public static final int TRACER_ERRORS = 3;
+    public static final int AGENT_REQUESTS = 4;
+    public static final int AGENT_ERRORS = 5;
+    public static final int AGENT_TIME = 6;
+    public static final int TRAPS_SUBMITTED = 7;
+    public static final int TRAPS_SENT = 8;
+    public static final int TRAPS_DROPPED = 9;
+    public static final int ZABBIX_REQUESTS = 10;
+    public static final int ZABBIX_ERRORS = 11;
+    public static final int ZABBIX_TIME = 12;
+    public static final int NAGIOS_REQUESTS = 13;
+    public static final int NAGIOS_ERRORS = 14;
+    public static final int NAGIOS_TIME = 15;
+    public static final int PMON_CYCLES = 16;
+    public static final int PMON_TIME = 17;
+    public static final int PMON_PACKETS_SENT = 18;
+    public static final int PMON_SAMPLES_SENT = 19;
+    public static final int PMON_WARNINGS = 20;
+    public static final int PMON_ERRORS = 21;
+    public static final int PMON_NULLS = 22;
+    public static final int PMON_QUERIES = 23;
+    public static final int TRACES_SUBMITTED = 24;
+    public static final int TRACES_DROPPED = 25;
+    public static final int METRICS_CREATED = 26;
+    public static final int AVG_CNT_ERRORS = 27;
+    public static final int AVG_CNT_CREATED = 28;
+    public static final int CONFIG_ERRORS = 29;
+    public static final int SPY_SUBMISSIONS = 30;
+    public static final int ZORKA_STATS_CREATED = 31;
 
 
     private static final String[] counterNames = {
@@ -94,28 +90,13 @@ public class AgentDiagnostics {
             "ConfigErrors",         // CONFIG_ERRORS        = 29
             "SpySubmissions",       // SPY_SUBMISSIONS      = 30
             "ZorkaStatsCreated",    // ZORKA_STATS_CREATED  = 31
-            //"SymbolsCreated",       // SYMBOLS_CREATED      = 27    TODO make this metric appear
     };
 
 
     private static Set<Integer> timeCounters = ZorkaUtil.set(AGENT_TIME, ZABBIX_TIME, NAGIOS_TIME, PMON_TIME);
 
 
-
     private static AtomicLong[] counters;
-
-
-    public static void initMBean(MBeanServerRegistry registry, String mbeanName) {
-        for (int i = 0; i < counterNames.length; i++) {
-            final int counter = i;
-            registry.getOrRegister("java", mbeanName, counterNames[counter],
-                new ValGetter() {
-                    @Override public Object get() {
-                        return AgentDiagnostics.get(counter);
-                    }
-                });
-        }
-    }
 
 
     public static void inc(int counter) {
@@ -136,7 +117,7 @@ public class AgentDiagnostics {
 
     public static long get(int counter) {
         long v = (counter < counters.length && counter >= 0) ? counters[counter].get() : 0L;
-        return timeCounters.contains(counter) ? v/1000000L : v;
+        return timeCounters.contains(counter) ? v / 1000000L : v;
     }
 
 
@@ -148,6 +129,13 @@ public class AgentDiagnostics {
         }
     }
 
+    public static int numCounters() {
+        return counterNames.length;
+    }
+
+    public static String getName(int counter) {
+        return counterNames[counter];
+    }
 
     static {
         clear();

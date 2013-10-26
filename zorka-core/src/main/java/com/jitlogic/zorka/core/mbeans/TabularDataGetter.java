@@ -15,11 +15,11 @@
  */
 package com.jitlogic.zorka.core.mbeans;
 
+import com.jitlogic.zorka.common.stats.ValGetter;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.core.util.*;
 
 import javax.management.openmbean.*;
 
@@ -31,43 +31,51 @@ import javax.management.openmbean.*;
  */
 public class TabularDataGetter implements ValGetter {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** Source field */
+    /**
+     * Source field
+     */
     private Object wrappedObject;
 
-    /** Object type name */
+    /**
+     * Object type name
+     */
     private String typeName;
 
-    /** Object description */
+    /**
+     * Object description
+     */
     private String typeDesc;
 
-    /** Item names (field names) */
+    /**
+     * Item names (field names)
+     */
     private String[] itemNames;
 
-    /** Composite row type */
+    /**
+     * Composite row type
+     */
     private CompositeType rowType;
 
-    /** Tabular type of returned objects */
+    /**
+     * Tabular type of returned objects
+     */
     private TabularType tableType;
 
     /**
      * Creates tabular data getter wrapping a type.
      *
      * @param wrappedObject wrapped object
-     *
-     * @param typeName tabular type name
-     *
-     * @param typeDesc tabular type description
-     *
-     * @param indexField index field
-     *
-     * @param itemNames field names
-     *
-     * @param itemDesc field descriptions
-     *
-     * @param itemTypes field types
+     * @param typeName      tabular type name
+     * @param typeDesc      tabular type description
+     * @param indexField    index field
+     * @param itemNames     field names
+     * @param itemDesc      field descriptions
+     * @param itemTypes     field types
      */
     public TabularDataGetter(Object wrappedObject, String typeName, String typeDesc, String indexField,
                              String[] itemNames, String[] itemDesc, OpenType[] itemTypes) {
@@ -79,7 +87,7 @@ public class TabularDataGetter implements ValGetter {
 
         try {
             rowType = new CompositeType(typeName, typeDesc, itemNames, itemDesc, itemTypes);
-            tableType = new TabularType(typeName + "Table", typeDesc + " table", rowType, new String[] { indexField });
+            tableType = new TabularType(typeName + "Table", typeDesc + " table", rowType, new String[]{indexField});
         } catch (OpenDataException e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error creating row type or table type", e);
         }

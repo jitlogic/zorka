@@ -29,7 +29,7 @@ import com.jitlogic.zorka.core.util.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.*;
 import com.jitlogic.zorka.core.mbeans.AttrGetter;
-import com.jitlogic.zorka.core.util.ValGetter;
+import com.jitlogic.zorka.common.stats.ValGetter;
 import com.jitlogic.zorka.core.mbeans.ZorkaMappedMBean;
 
 
