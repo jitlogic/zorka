@@ -16,13 +16,13 @@
 
 package com.jitlogic.zorka.common.tracedata;
 
-import com.jitlogic.zorka.common.tracedata.Metric;
-import com.jitlogic.zorka.common.tracedata.MetricTemplate;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 
 import java.util.Map;
-import java.util.Set;
 
+/**
+ * Calculates utilization (in percent) from two components obtained from
+ */
 public class UtilizationMetric extends Metric {
 
     public UtilizationMetric(int id, String name, Map<String, Object> attrs) {
@@ -32,7 +32,8 @@ public class UtilizationMetric extends Metric {
     public UtilizationMetric(int id, int templateId, String name, Map<String, Object> attrs) {
         super(id, templateId, name, attrs);
     }
-    public UtilizationMetric(MetricTemplate template, String name, Map<String,Object> attrs) {
+
+    public UtilizationMetric(MetricTemplate template, String name, Map<String, Object> attrs) {
         super(template, name, attrs);
     }
 

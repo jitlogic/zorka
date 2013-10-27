@@ -33,24 +33,72 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Tracer output sending data to remote ZICO collector. It automatically handles reconnections and retransmissions,
+ * lumps data into bigger packets for better throughput, keeps track of symbols already sent etc.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements TraceOutput {
 
     private static ZorkaLog log = ZorkaLogger.getLog(ZicoTraceOutput.class);
 
+    /**
+     * Hostname this client will advertise itself as when connecting to ZICO server
+     */
     private String hostname;
+
+    /**
+     * Passphrase for authentication of ZICO client
+     */
     private String auth;
 
+    /**
+     * ZICO client connection
+     */
     private ZicoClientConnector conn;
 
+    /**
+     * Trace writer responsible for encoding transmitted data and
+     */
     private TraceWriter writer;
 
+    /**
+     * Output buffer
+     */
     private ByteArrayOutputStream os;
 
+    /**
+     * Maximum retransmission retries
+     */
     private int retries;
+
+    /**
+     * Retry wait timing parameters
+     */
     private long retryTime, retryTimeExp;
+
+    /**
+     * Suggested maximum packet size
+     */
     private long packetSize;
 
-
+    /**
+     * Creates trace output object.
+     *
+     * @param writer       trace writer for encoding transmitted data
+     * @param addr         host name or IP address of remote ZICO collector
+     * @param port         port number of remote ZICO collector
+     * @param hostname     name this client will advertise itself when connecting to ZICO collector
+     * @param auth         passphrase for this client (makes sense only when
+     * @param qlen         output queue length
+     * @param packetSize   maximum (recommended) packet size (actual packets might exceed this a bit)
+     * @param retries      maximum number of retries
+     * @param retryTime    base retry time
+     * @param retryTimeExp retry time exponent
+     * @param timeout      socket read timeout for ZICO connections
+     * @throws IOException when connection to remote server cannot be established;
+     */
     public ZicoTraceOutput(TraceWriter writer, String addr, int port, String hostname, String auth,
                            int qlen, long packetSize, int retries, long retryTime, long retryTimeExp, int timeout) throws IOException {
         super("zico-output", qlen);
@@ -76,11 +124,7 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
         return os;
     }
 
-    /**
-     * Submits object to a queue.
-     *
-     * @param obj object to be submitted
-     */
+
     @Override
     public boolean submit(SymbolicRecord obj) {
         boolean submitted = false;
@@ -95,6 +139,7 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
 
         return submitted;
     }
+
 
     @Override
     protected void process(SymbolicRecord record) {
@@ -162,9 +207,7 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
         log.error(ZorkaLogger.ZCL_STORE, "Too many errors while trying to send trace. Giving up. Trace will be lost.");
     }
 
-    /**
-     * Single run cycle. For this particular class it needs
-     */
+
     @Override
     protected void runCycle() {
         try {
@@ -191,6 +234,7 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
     }
 
 
+    @Override
     protected void close() {
         try {
             conn.close();

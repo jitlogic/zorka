@@ -26,30 +26,61 @@ import java.net.Socket;
 
 import static com.jitlogic.zorka.common.zico.ZicoPacket.*;
 
+/**
+ * Client connector for ZICO protocol.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class ZicoClientConnector extends ZicoConnector {
 
-    private int timeout;
+    private int socketTimeout;
 
+    /**
+     * Creates client connector with default socket timeout of 30 seconds.
+     *
+     * @param addr hostname or IP address of ZICO server
+     * @param port ZICO server port number
+     * @throws IOException if connection or server name resolution fails
+     */
     public ZicoClientConnector(String addr, int port) throws IOException {
         this(addr, port, 30000);
     }
 
-    public ZicoClientConnector(String addr, int port, int timeout) throws IOException {
+    /**
+     * Creates client connector with configurable socket timeout
+     *
+     * @param addr          hostname or IP address of ZICO server
+     * @param port          ZICO server port number
+     * @param socketTimeout socket timeout (in milliseconds)
+     * @throws IOException if connection of server name resolution fails
+     */
+    public ZicoClientConnector(String addr, int port, int socketTimeout) throws IOException {
         this.addr = InetAddress.getByName(addr);
         this.port = port;
-        this.timeout = timeout;
+        this.socketTimeout = socketTimeout;
     }
 
 
+    /**
+     * (Re)connects to ZICO server
+     *
+     * @throws IOException if connection fails
+     */
     public void connect() throws IOException {
         socket = new Socket(addr, port);
-        socket.setSoTimeout(timeout);
+        socket.setSoTimeout(socketTimeout);
         in = socket.getInputStream();
         out = socket.getOutputStream();
         // TODO log connection here
     }
 
 
+    /**
+     * Sends ZICO PING packet and awaits reply.
+     *
+     * @return ZICO ping roundtrip time
+     * @throws IOException if connection fails or reply packet received by server is invalid
+     */
     public long ping() throws IOException {
         long t1 = System.nanoTime();
         send(ZICO_PING);
@@ -61,6 +92,14 @@ public class ZicoClientConnector extends ZicoConnector {
     }
 
 
+    /**
+     * Sends HELLO packet and awaits reply. This is equivalent of 'log in' to ZICO server.
+     * No communication or data submission (except for PING) is possible prior to this operation.
+     *
+     * @param hostname client name (as advertised to collector server), will appear in host list;
+     * @param auth     client pass phrase (only if server is working in secure mode);
+     * @throws IOException if connection breaks, client authentication error or other error occurs
+     */
     public void hello(String hostname, String auth) throws IOException {
         send(ZICO_HELLO, ZicoCommonUtil.pack(
                 new HelloRequest(System.currentTimeMillis(), hostname, auth)));
@@ -76,6 +115,12 @@ public class ZicoClientConnector extends ZicoConnector {
     }
 
 
+    /**
+     * Submits data to collector server. Data object will be encoded into fressian format and sent.
+     *
+     * @param data object to be submitted
+     * @throws IOException if connection breaks or server error occurs when processing submitted data;
+     */
     public void submit(Object data) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         FressianWriter writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);

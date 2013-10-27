@@ -18,20 +18,35 @@ package com.jitlogic.zorka.common.zico;
 
 import java.io.IOException;
 
+/**
+ * Represents communication errors for ZICO protocols. This class extends IOException and
+ * adds additional information about error status returned by ZICO server.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class ZicoException extends IOException {
 
+    /**
+     * Status code (as returned by collector server, defined in ZICO protocol).
+     */
     private int status;
 
+    /**
+     * Creates new ZICO exception object
+     *
+     * @param status  status code
+     * @param message error message
+     */
     public ZicoException(int status, String message) {
         super(message);
         this.status = status;
     }
 
-    public ZicoException(int status, String message, Throwable cause) {
-        super(message, cause);
-        this.status = status;
-    }
-
+    /**
+     * Returns ZICO status code.
+     *
+     * @return status (error) code
+     */
     public int getStatus() {
         return status;
     }

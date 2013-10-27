@@ -18,14 +18,40 @@ package com.jitlogic.zorka.common.tracedata;
 
 import java.io.IOException;
 
+/**
+ * Represents one stack trace element (eg. from symbolic form of exception).
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class SymbolicStackElement implements SymbolicRecord {
 
+    /**
+     * ID for class name symbol
+     */
     private int classId;
+
+    /**
+     * ID for method name symbol
+     */
     private int methodId;
+
+    /**
+     * ID for file name symbol
+     */
     private int fileId;
+
+    /**
+     * ID for line number symbol
+     */
     private int lineNum;
 
 
+    /**
+     * Creates symbolic stack trace element from java StackTraceElement object
+     *
+     * @param ste     original stack trace element
+     * @param symbols symbol registry
+     */
     public SymbolicStackElement(StackTraceElement ste, SymbolRegistry symbols) {
         this.classId = symbols.symbolId(ste.getClassName());
         this.methodId = symbols.symbolId(ste.getMethodName());
@@ -34,6 +60,14 @@ public class SymbolicStackElement implements SymbolicRecord {
     }
 
 
+    /**
+     * Creates symbolic stack trace element from scrach.
+     *
+     * @param classId  class name symbol ID
+     * @param methodId method name symbol ID
+     * @param fileId   file name symbol ID
+     * @param lineNum  line number symbol ID
+     */
     public SymbolicStackElement(int classId, int methodId, int fileId, int lineNum) {
         this.classId = classId;
         this.methodId = methodId;
@@ -83,6 +117,7 @@ public class SymbolicStackElement implements SymbolicRecord {
     public String toString() {
         return "[" + classId + "," + methodId + "," + fileId + "," + lineNum + "]";
     }
+
 
     @Override
     public void traverse(MetadataChecker checker) throws IOException {

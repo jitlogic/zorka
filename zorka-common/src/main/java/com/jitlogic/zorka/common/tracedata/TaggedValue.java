@@ -21,12 +21,28 @@ import com.jitlogic.zorka.common.util.ZorkaUtil;
 /**
  * Tagged values can be used as attribute values in trace data.
  * Tagging value makes custom processing at collector side possible.
+ *
+ * @author rafal.lewczuk@jitlogic.com
  */
 public class TaggedValue {
 
+    /**
+     * Tag name symbol ID
+     */
     private int tagId;
+
+    /**
+     * Tagged value
+     */
     private Object value;
 
+
+    /**
+     * Creates new tagged value object
+     *
+     * @param tagId tag name (symbol ID)
+     * @param value tagged value
+     */
     public TaggedValue(int tagId, Object value) {
         this.tagId = tagId;
         this.value = value;

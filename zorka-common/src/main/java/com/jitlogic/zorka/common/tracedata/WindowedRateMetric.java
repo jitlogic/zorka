@@ -21,6 +21,12 @@ import com.jitlogic.zorka.common.util.ObjectInspector;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Tracks two metrics (nominal and divider) and calculates rate by dividing deltas
+ * of those two metrics.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class WindowedRateMetric extends Metric {
 
     private long lastNom, lastDiv;
@@ -32,7 +38,8 @@ public class WindowedRateMetric extends Metric {
     public WindowedRateMetric(int id, int templateId, String name, Map<String, Object> attrs) {
         super(id, templateId, name, attrs);
     }
-    public WindowedRateMetric(MetricTemplate template, String name, Map<String,Object> attrs) {
+
+    public WindowedRateMetric(MetricTemplate template, String name, Map<String, Object> attrs) {
         super(template, name, attrs);
     }
 
@@ -51,7 +58,7 @@ public class WindowedRateMetric extends Metric {
         Double rslt = 0.0;
 
         if (curDiv - lastDiv > 0) {
-            rslt = ((double)(curNom-lastNom)) / ((double)(curDiv-lastDiv));
+            rslt = ((double) (curNom - lastNom)) / ((double) (curDiv - lastDiv));
         }
 
         lastNom = curNom;

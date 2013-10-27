@@ -22,6 +22,20 @@ import java.io.IOException;
 import java.net.Socket;
 
 
+/**
+ * Creates data processing objects for newly connected ZICO clients.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public interface ZicoDataProcessorFactory {
+
+    /**
+     * Returns data processing object for ZICO client
+     *
+     * @param socket open socket with ZICO client connection
+     * @param hello  HELLO packet sent by client
+     * @return data processing object
+     * @throws IOException
+     */
     ZicoDataProcessor get(Socket socket, HelloRequest hello) throws IOException;
 }

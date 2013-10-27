@@ -20,14 +20,37 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Keeps track of concrete instance of tracked performance metrics.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class MetricsRegistry {
 
+    /**
+     * Last template ID
+     */
     private AtomicInteger lastTemplateId;
-    private ConcurrentMap<Integer,MetricTemplate> templateById;
-    private ConcurrentMap<MetricTemplate,MetricTemplate> templates = new ConcurrentHashMap<MetricTemplate, MetricTemplate>();
 
+    /**
+     * Tracked templates (by ID)
+     */
+    private ConcurrentMap<Integer, MetricTemplate> templateById;
+
+    /**
+     * Tracked templates (by template)
+     */
+    private ConcurrentMap<MetricTemplate, MetricTemplate> templates = new ConcurrentHashMap<MetricTemplate, MetricTemplate>();
+
+    /**
+     * Last metric ID
+     */
     private AtomicInteger lastMetricId;
-    private ConcurrentMap<Integer,Metric> metricById;
+
+    /**
+     * Tracked metrics (by ID)
+     */
+    private ConcurrentMap<Integer, Metric> metricById;
 
 
     public MetricsRegistry() {
@@ -39,6 +62,11 @@ public class MetricsRegistry {
     }
 
 
+    /**
+     * Adds new metric template
+     *
+     * @param template
+     */
     public void add(MetricTemplate template) {
         int id = template.getId();
         if (id != 0) {
@@ -53,6 +81,13 @@ public class MetricsRegistry {
     }
 
 
+    /**
+     * Checks if identical template is already registered. If so, returns it.
+     * If not, assigns ID to template passed as argument, registers and returns it.
+     *
+     * @param template template to be verified
+     * @return registered template
+     */
     public MetricTemplate getTemplate(MetricTemplate template) {
 
         MetricTemplate mt = templates.get(template);
@@ -74,6 +109,11 @@ public class MetricsRegistry {
     }
 
 
+    /**
+     * Registers new metric.
+     *
+     * @param metric metric to be registered
+     */
     public void add(Metric metric) {
         int id = metric.getId();
         if (id != 0) {
@@ -85,6 +125,12 @@ public class MetricsRegistry {
     }
 
 
+    /**
+     * Checks if this metric has been registered. Registers when needed and returns registered metric.
+     *
+     * @param metric metric to be checked
+     * @return registered metric
+     */
     public Metric getMetric(Metric metric) {
         if (metric.getId() == 0) {
             metric.setId(lastMetricId.incrementAndGet());

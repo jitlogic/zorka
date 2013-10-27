@@ -312,7 +312,7 @@ public class TraceBuilder {
 
     private void reparentTop(TraceRecord parent) {
         // Drop interim record if necessary
-        if (ttop.getMarker().hasFlag(TraceMarker.DROP_INTERIM) && ttop.isSafeInterim()
+        if (ttop.getMarker().hasFlag(TraceMarker.DROP_INTERIM) && ttop.isInterimDroppable()
                 && ttop.getTime() - ttop.getChild(0).getTime() < Tracer.getMinMethodTime()) {
             TraceRecord child = ttop.getChild(0);
             child.setCalls(ttop.getCalls());

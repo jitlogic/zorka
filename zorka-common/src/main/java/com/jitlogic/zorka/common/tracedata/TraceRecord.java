@@ -115,8 +115,8 @@ public class TraceRecord implements SymbolicRecord {
      */
     private List<TraceRecord> children;
 
-    public TraceRecord() {
 
+    public TraceRecord() {
     }
 
     /**
@@ -129,6 +129,11 @@ public class TraceRecord implements SymbolicRecord {
     }
 
 
+    /**
+     * Creats shallow copy of trace record object.
+     *
+     * @return copy of trace record
+     */
     public TraceRecord copy() {
         TraceRecord tr = new TraceRecord();
         tr.classId = classId;
@@ -147,6 +152,12 @@ public class TraceRecord implements SymbolicRecord {
     }
 
 
+    /**
+     * Sets new parent for this method. Current record 'inherits'
+     * trace marker of its parent.
+     *
+     * @param parent parent record
+     */
     public void setParent(TraceRecord parent) {
         this.parent = parent;
 
@@ -170,13 +181,21 @@ public class TraceRecord implements SymbolicRecord {
         }
     }
 
+
+    /**
+     * Returns number of custom attributes attached to this method via Spy.
+     *
+     * @return number of attributes
+     */
     public int numAttrs() {
         return attrs != null ? attrs.size() : 0;
     }
 
+
     public Map<Integer, Object> getAttrs() {
         return attrs;
     }
+
 
     public void setAttrs(Map<Integer, Object> attrs) {
         this.attrs = attrs;
@@ -240,15 +259,24 @@ public class TraceRecord implements SymbolicRecord {
         return children;
     }
 
+
     public void setChildren(List<TraceRecord> children) {
         this.children = children;
     }
+
 
     public TraceRecord getParent() {
         return parent;
     }
 
 
+    /**
+     * Returns number of calls registered by tracer when executing
+     * recorded method. This includes method described by this trace
+     * record, so it is equal or greater than 1.
+     *
+     * @return number of calls
+     */
     public long getCalls() {
         return calls;
     }
@@ -258,10 +286,18 @@ public class TraceRecord implements SymbolicRecord {
         this.calls = calls;
     }
 
+
     public void setFlags(int flags) {
         this.flags = flags;
     }
 
+
+    /**
+     * Returns number of exceptions thrown and registered by tracer
+     * when executing method recorded by this trace record.
+     *
+     * @return number of errors
+     */
     public long getErrors() {
         return errors;
     }
@@ -321,6 +357,20 @@ public class TraceRecord implements SymbolicRecord {
         this.exception = exception;
     }
 
+
+    /**
+     * If method recorded by this trace has thrown an exception,
+     * looks for exception. Traverses method call tree if needed
+     * as exception can be actually thrown by another method and
+     * tracer would avoid storing copy of exception in this particular
+     * record.
+     * <p/>
+     * Note that this is mainly used in collector/viewer, not agent.
+     * It expects that exceptions will be already converted to symbolic form,
+     * so it is useful only after trace has been finished and submitted.
+     *
+     * @return exception object
+     */
     public SymbolicException findException() {
 
         if (exception instanceof SymbolicException) {
@@ -416,17 +466,32 @@ public class TraceRecord implements SymbolicRecord {
         exception = null;
     }
 
+
+    /**
+     * Enabled additional flag bits.
+     *
+     * @param flag flag bits to enable
+     */
     public void markFlag(int flag) {
         flags |= flag;
     }
 
+
+    /**
+     * Returns true if any flag bits from argument is enabled in this record.
+     *
+     * @param flag
+     * @return
+     */
     public boolean hasFlag(int flag) {
         return 0 != (flags & flag);
     }
 
+
     public int getFlags() {
         return flags;
     }
+
 
     /**
      * Returns true if record is part of recorded trace.
@@ -440,6 +505,7 @@ public class TraceRecord implements SymbolicRecord {
         return marker != null;
     }
 
+
     /**
      * Returns true if record is empty (no actual frame has been
      * recorded in it). This method is implemented for readability
@@ -452,6 +518,13 @@ public class TraceRecord implements SymbolicRecord {
         return classId == 0;
     }
 
+
+    /**
+     * Traverses through call tree and converts all exception objects into symbolic forms.
+     * This operation is performed just before submitting tracer to output (file or collector).
+     *
+     * @param symbols agent's symbol registry
+     */
     public void fixup(SymbolRegistry symbols) {
 
         if (children != null) {
@@ -466,7 +539,13 @@ public class TraceRecord implements SymbolicRecord {
     }
 
 
-    public boolean isSafeInterim() {
+    /**
+     * Returns true if method can be dropped if - as interim method - had too
+     * short execution time.
+     *
+     * @return true if this method can be dropped from trace
+     */
+    public boolean isInterimDroppable() {
         return exception == null
                 && attrs == null
                 && 0 == (flags & TRACE_BEGIN)

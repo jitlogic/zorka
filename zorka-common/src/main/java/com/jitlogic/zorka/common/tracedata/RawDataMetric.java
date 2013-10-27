@@ -18,6 +18,9 @@ package com.jitlogic.zorka.common.tracedata;
 
 import java.util.Map;
 
+/**
+ * Raw data metric. Presents tracked values as is (with optional multiplication).
+ */
 public class RawDataMetric extends Metric {
 
 
@@ -25,19 +28,19 @@ public class RawDataMetric extends Metric {
         super(id, name, attrs);
     }
 
-    public RawDataMetric(int id, int templateId, String name, Map<String,Object> attrs) {
+    public RawDataMetric(int id, int templateId, String name, Map<String, Object> attrs) {
         super(id, templateId, name, attrs);
     }
 
 
-    public RawDataMetric(MetricTemplate template, String name, Map<String,Object> attrs) {
+    public RawDataMetric(MetricTemplate template, String name, Map<String, Object> attrs) {
         super(template, name, attrs);
     }
 
 
     @Override
     public Number getValue(long clock, Object value) {
-        return multiply((Number)value);
+        return multiply((Number) value);
     }
 
 }
