@@ -29,20 +29,31 @@ public class MethodCallStatistic implements ZorkaStat {
     private static final long US = 1000L;
     private static final long MS = 1000000L;
 
-    /** Statistic name */
+    /**
+     * Statistic name
+     */
     private String name;
 
-    /** Summary data. */
+    /**
+     * Summary data.
+     */
     private AtomicLong calls, errors, time, maxTime;
 
+    /**
+     * Contention monitoring
+     */
     private AtomicLong curThreads, maxThreads;
+
+    /**
+     * Throughput monitoring
+     */
+    private AtomicLong throughput, maxThroughput;
+
 
     /**
      * Standard constructor.
      *
      * @param name statistic name
-     *
-     *
      */
     public MethodCallStatistic(String name) {
         this.name = name;
@@ -53,6 +64,9 @@ public class MethodCallStatistic implements ZorkaStat {
 
         this.curThreads = new AtomicLong(0);
         this.maxThreads = new AtomicLong(0);
+
+        this.throughput = new AtomicLong(0);
+        this.maxThroughput = new AtomicLong(0);
     }
 
 
@@ -79,9 +93,9 @@ public class MethodCallStatistic implements ZorkaStat {
      *
      * @return number of calls
      */
-	public long getCalls() {
-		return calls.longValue();
-	}
+    public long getCalls() {
+        return calls.longValue();
+    }
 
 
     /**
@@ -89,9 +103,9 @@ public class MethodCallStatistic implements ZorkaStat {
      *
      * @return number of errors
      */
-	public long getErrors() {
-		return errors.longValue();
-	}
+    public long getErrors() {
+        return errors.longValue();
+    }
 
 
     /**
@@ -99,9 +113,9 @@ public class MethodCallStatistic implements ZorkaStat {
      *
      * @return total execution time (milliseconds)
      */
-	public long getTime() {
-		return time.longValue()/MS;
-	}
+    public long getTime() {
+        return time.longValue() / MS;
+    }
 
 
     /**
@@ -110,7 +124,7 @@ public class MethodCallStatistic implements ZorkaStat {
      * @return total execution time (microseconds)
      */
     public long getTimeUs() {
-        return time.longValue()/US;
+        return time.longValue() / US;
     }
 
 
@@ -130,7 +144,7 @@ public class MethodCallStatistic implements ZorkaStat {
      * @return maximum execution time (in milliseconds)
      */
     public long getMaxTime() {
-        return maxTime.longValue()/MS;
+        return maxTime.longValue() / MS;
     }
 
 
@@ -140,7 +154,7 @@ public class MethodCallStatistic implements ZorkaStat {
      * @return maximum execution time (in microseconds)
      */
     public long getMaxTimeUs() {
-        return maxTime.longValue()/US;
+        return maxTime.longValue() / US;
     }
 
 
@@ -160,7 +174,7 @@ public class MethodCallStatistic implements ZorkaStat {
      * @return maximum execution time (in milliseconds)
      */
     public long getMaxTimeCLR() {
-        return getMaxTimeNsCLR()/MS;
+        return getMaxTimeNsCLR() / MS;
     }
 
 
@@ -171,7 +185,7 @@ public class MethodCallStatistic implements ZorkaStat {
      * @return maximum execution time (in microseconds)
      */
     public long getMaxTimeUsCLR() {
-        return getMaxTimeNsCLR()/US;
+        return getMaxTimeNsCLR() / US;
     }
 
 
@@ -186,6 +200,12 @@ public class MethodCallStatistic implements ZorkaStat {
     }
 
 
+    /**
+     * Returns current value of a counter and zeroes it in one (atomic) operation.
+     *
+     * @param counter counter to be examined
+     * @return counter value (before reset)
+     */
     private long getMaxCLR(AtomicLong counter) {
         long t = counter.longValue();
 
@@ -197,28 +217,80 @@ public class MethodCallStatistic implements ZorkaStat {
     }
 
 
+    /**
+     * Marks method entry. This is used for contention monitoring.
+     */
     public void markEnter() {
         setMax(maxThreads, curThreads.incrementAndGet());
     }
 
 
+    /**
+     * Marks method exit. This is used for contention monitoring.
+     */
     public void markExit() {
         curThreads.decrementAndGet();
     }
 
 
+    /**
+     * Returns maximum number of threads that were executing this method in parallel.
+     *
+     * @return number of threads
+     */
     public long getMaxThreads() {
         return maxThreads.get();
     }
 
 
+    /**
+     * Returns maximum number of threads that were executing this method in parallel.
+     * Clears this counter in the same operation.
+     *
+     * @return number of threads
+     */
     public long getMaxThreadsCLR() {
         return getMaxCLR(maxThreads);
     }
 
 
+    /**
+     * Returns current number of threads executing this method in parallel.
+     *
+     * @return number of threads
+     */
     public long getCurThreads() {
         return curThreads.get();
+    }
+
+
+    /**
+     * Returns sum of all throughput samples (since application start).
+     *
+     * @return current summary throughput value
+     */
+    public long getThroughput() {
+        return throughput.get();
+    }
+
+
+    /**
+     * Returns maximum throughput value recorded (since last counter reset).
+     *
+     * @return maximum throughput recorded
+     */
+    public long getMaxThroughput() {
+        return maxThroughput.get();
+    }
+
+
+    /**
+     * Returns maximum throughput value recorded and resets counter.
+     *
+     * @return maximum throughput recorded
+     */
+    public long getMaxThroughputCLR() {
+        return getMaxCLR(maxThroughput);
     }
 
 
@@ -227,7 +299,6 @@ public class MethodCallStatistic implements ZorkaStat {
      * in thread safe manner.
      *
      * @param v sample value
-     *
      */
     private void setMax(AtomicLong counter, long v) {
         long v2 = counter.longValue();
@@ -247,24 +318,53 @@ public class MethodCallStatistic implements ZorkaStat {
      *
      * @param time execution time
      */
-	public void logCall(long time) {
+    public void logCall(long time) {
         this.calls.incrementAndGet();
         this.time.addAndGet(time);
         this.setMax(maxTime, time);
-	}
+    }
+
+
+    /**
+     * Logs successful method call with throughput value
+     *
+     * @param time       execution time
+     * @param throughput throughput value (eg. data packet size)
+     */
+    public void logCall(long time, long throughput) {
+        logCall(time);
+        this.throughput.addAndGet(throughput);
+        this.setMax(maxThroughput, throughput);
+    }
 
 
     /**
      * Logs unsucessful method call (with error thrown out of method).
-     * Note that you don't need to
+     * Note that logCall() does not have to be called separately as call
+     * counter is also updated.
      *
      * @param time execution time
      */
-	public void logError(long time) {
+    public void logError(long time) {
         this.errors.incrementAndGet();
         this.calls.incrementAndGet();
         this.time.addAndGet(time);
         this.setMax(maxTime, time);
+    }
+
+
+    /**
+     * Logs unsuccesful method call with throughput.
+     * Note that logCall() does not have to be called separately as call
+     * counter is also updated.
+     *
+     * @param time       execution time
+     * @param throughput throughput
+     */
+    public void logError(long time, long throughput) {
+        logError(time);
+        this.throughput.addAndGet(throughput);
+        this.setMax(maxThroughput, throughput);
     }
 
 

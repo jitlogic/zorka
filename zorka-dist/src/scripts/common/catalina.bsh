@@ -23,7 +23,7 @@ __catalina() {
       spy.format("URI", "${REQ.request.requestURI}"),
       http._trace ? tracer.begin("HTTP", zorka.longCfg("http.trace.time")) : null,
       http._trace ? tracer.attr("URI", "URI") : null,
-      http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", spy.ACTION_ENTER) : null)
+      http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
     .onReturn(spy.put("ERR", ""))
     .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),
       http._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
@@ -43,7 +43,7 @@ __catalina() {
         http.error_marker(),
         http._trace ? tracer.flags(tracer.ERROR_MARK|tracer.SUBMIT_TRACE) : null,
         spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format"))),
-      http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", http._action) : null)
+      http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
     .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
 
   return this;

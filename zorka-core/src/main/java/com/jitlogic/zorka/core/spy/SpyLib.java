@@ -257,7 +257,7 @@ public class SpyLib {
         return SpyDefinition.instance()
                 .onEnter(sdaList.toArray(new SpyDefArg[0]))
                 .onReturn(fetchTime("T2")).onError(fetchTime("T2"))
-                .onSubmit(tdiff("T", "T1", "T2"), zorkaStats(mbsName, mbeanName, attrName, sb.toString(), "T"));
+                .onSubmit(tdiff("T", "T1", "T2"), zorkaStats(mbsName, mbeanName, attrName, sb.toString()));
     }
 
 
@@ -480,11 +480,6 @@ public class SpyLib {
     }
 
 
-    public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr, int actions) {
-        return zorkaStats(mbsName, beanName, attrName, keyExpr, "T", actions);
-    }
-
-
     /**
      * Creates method call statistics collector object. It will maintain zorka call statistics and update them with
      * incoming data.
@@ -497,12 +492,46 @@ public class SpyLib {
      * @return collector object
      */
     public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr, String timeField) {
-        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr, timeField);
+        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr, timeField,
+                null, ZorkaStatsCollector.ACTION_STATS);
     }
 
 
-    public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr, String timeField, int actions) {
-        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr, timeField, actions);
+    /**
+     * Creates method call statistics collector object. It will maintain zorka call statistics and update them with
+     * incoming data. This variant also calculates throughput from supplied field.
+     *
+     * @param mbsName         mbean server name
+     * @param beanName        bean name
+     * @param attrName        attribute name
+     * @param keyExpr         key expression
+     * @param timeField       field containing execution time (in nanoseconds)
+     * @param throughputField field containing throughput value (or null to skip throughput calculation)
+     * @return collector object
+     */
+    public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr,
+                                   String timeField, String throughputField) {
+        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr, timeField,
+                throughputField, ZorkaStatsCollector.ACTION_STATS);
+    }
+
+
+    /**
+     * Creates method call statistics collector object. It will maintain zorka call statistics and update them with
+     * incoming data. This variant also calculates throughput from supplied field.
+     *
+     * @param mbsName         mbean server name
+     * @param beanName        bean name
+     * @param attrName        attribute name
+     * @param keyExpr         key expression
+     * @param timeField       field containing execution time (in nanoseconds)
+     * @param throughputField field containing throughput value (or null to skip throughput calculation)
+     * @param actions         which actions will be performed: ENTER, EXIT or STATS (or combination of them)
+     * @return collector object
+     */
+    public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr,
+                                   String timeField, String throughputField, int actions) {
+        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr, timeField, throughputField, actions);
     }
 
 

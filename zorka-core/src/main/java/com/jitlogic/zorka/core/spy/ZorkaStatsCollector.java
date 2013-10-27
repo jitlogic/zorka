@@ -39,7 +39,7 @@ public class ZorkaStatsCollector implements SpyProcessor {
 
     public static final int ACTION_STATS = 0x01;
     public static final int ACTION_ENTER = 0x02;
-    public static final int ACTION_EXIT  = 0x04;
+    public static final int ACTION_EXIT = 0x04;
 
     public static final String CLASS_NAME = "className";
     public static final String METHOD_NAME = "methodName";
@@ -51,90 +51,117 @@ public class ZorkaStatsCollector implements SpyProcessor {
     protected static final String M_CLASS_SNAME = "${shortClassName}";
     protected static final String M_PACKAGE_NAME = "${packageName}";
 
-    protected static final int HAS_CLASS_NAME       = 0x01;
-    protected static final int HAS_METHOD_NAME      = 0x02;
-    protected static final int HAS_CLASS_SNAME      = 0x04;
-    protected static final int HAS_PACKAGE_NAME     = 0x08;
-    protected static final int HAS_OTHER_NAME       = 0x10;
-    protected static final int HAS_SINGLE_MACRO     = 0x20;
+    protected static final int HAS_CLASS_NAME = 0x01;
+    protected static final int HAS_METHOD_NAME = 0x02;
+    protected static final int HAS_CLASS_SNAME = 0x04;
+    protected static final int HAS_PACKAGE_NAME = 0x08;
+    protected static final int HAS_OTHER_NAME = 0x10;
+    protected static final int HAS_SINGLE_MACRO = 0x20;
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** Actions that will be taken when method execution hits collector */
+    /**
+     * Actions that will be taken when method execution hits collector
+     */
     private int actions;
 
-    /** MBean server name */
+    /**
+     * MBean server name
+     */
     private String mbsName;
 
-    /** MBean name template (object name) */
+    /**
+     * MBean name template (object name)
+     */
     private String mbeanTemplate;
 
-    /** Attribute name template */
+    /**
+     * Attribute name template
+     */
     private String attrTemplate;
 
-    /** Statistic name tmeplate */
+    /**
+     * Statistic name tmeplate
+     */
     private String statTemplate;
 
-    /** Execution time field */
+    /**
+     * Execution time field
+     */
     private String timeField;
 
-    /** Object Name substitution flags */
+    /**
+     * Throughput field
+     */
+    private String throughputField;
+
+    /**
+     * Object Name substitution flags
+     */
     private int mbeanFlags;
 
-    /** MBean Attribute substitution flags */
+    /**
+     * MBean Attribute substitution flags
+     */
     private int attrFlags;
 
-    /** Statistic name substitution flags */
+    /**
+     * Statistic name substitution flags
+     */
     private int statFlags;
 
-    /** Context attributes prefetch flags (marks context attributes that will be added to processed records) */
+    /**
+     * Context attributes prefetch flags (marks context attributes that will be added to processed records)
+     */
     private int prefetchFlags;
 
-    /** Cache mapping spy contexts to statistics */
-    private ConcurrentHashMap<SpyContext,MethodCallStatistics> statsCache
+    /**
+     * Cache mapping spy contexts to statistics
+     */
+    private ConcurrentHashMap<SpyContext, MethodCallStatistics> statsCache
             = new ConcurrentHashMap<SpyContext, MethodCallStatistics>();
 
-    /** This flag determines whether statsCache is actually usable for us */
+    /**
+     * This flag determines whether statsCache is actually usable for us
+     */
     private boolean statsCacheEnabled;
 
     private MethodCallStatistic cachedStatistic;
 
     private MethodCallStatistics cachedStatistics;
 
-    /** MBean server registry */
+    /**
+     * MBean server registry
+     */
     private MBeanServerRegistry registry;
-
-
-    public ZorkaStatsCollector(MBeanServerRegistry mbsRegistry, String mbsName, String mbeanTemplate,
-                               String attrTemplate, String statTemplate, String timeField) {
-        this(mbsRegistry, mbsName, mbeanTemplate, attrTemplate, statTemplate, timeField, ACTION_STATS);
-    }
 
 
     /**
      * Creates new method call statistics collector.
      *
-     * @param mbsName mbean server name
-     *
+     * @param mbsName       mbean server name
      * @param mbeanTemplate mbean name template (object name)
-     * @param attrTemplate attribute name template
-     * @param statTemplate statistic name template
-     * @param timeField execution time field name
-     *
+     * @param attrTemplate  attribute name template
+     * @param statTemplate  statistic name template
+     * @param timeField     execution time field name
      */
     public ZorkaStatsCollector(MBeanServerRegistry mbsRegistry, String mbsName, String mbeanTemplate,
-                               String attrTemplate, String statTemplate, String timeField, int actions) {
+                               String attrTemplate, String statTemplate, String timeField, String throughputField,
+                               int actions) {
 
         // Some strings are intern()ed immediately, so
 
         this.registry = mbsRegistry;
-        this.mbsName  = mbsName;
+        this.mbsName = mbsName;
         this.mbeanTemplate = mbeanTemplate.intern();
         this.attrTemplate = attrTemplate.intern();
         this.statTemplate = statTemplate.intern();
 
         this.timeField = timeField;
+        this.throughputField = throughputField;
         this.actions = actions;
 
         this.mbeanFlags = templateFlags(mbeanTemplate);
@@ -157,12 +184,12 @@ public class ZorkaStatsCollector implements SpyProcessor {
             prefetchFlags |= HAS_PACKAGE_NAME;
         }
 
-        statsCacheEnabled = !(0 != ((mbeanFlags|attrFlags) & HAS_OTHER_NAME));
+        statsCacheEnabled = !(0 != ((mbeanFlags | attrFlags) & HAS_OTHER_NAME));
 
         if (mbeanFlags == 0 && attrFlags == 0) {
             // Object name and attribute name are constant ...
             cachedStatistics = registry.getOrRegister(mbsName, mbeanTemplate, attrTemplate,
-                new MethodCallStatistics(), "Call stats");
+                    new MethodCallStatistics(), "Call stats");
 
             if (statFlags == 0) {
                 cachedStatistic = cachedStatistics.getMethodCallStatistic(statTemplate);
@@ -173,7 +200,7 @@ public class ZorkaStatsCollector implements SpyProcessor {
 
 
     @Override
-    public Map<String,Object> process(Map<String,Object> record) {
+    public Map<String, Object> process(Map<String, Object> record) {
 
         if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
             log.debug(ZorkaLogger.ZSP_ARGPROC, "Collecting record: " + record);
@@ -195,14 +222,14 @@ public class ZorkaStatsCollector implements SpyProcessor {
                     String mbeanName = subst(mbeanTemplate, record, ctx, mbeanFlags);
                     String attrName = subst(attrTemplate, record, ctx, attrFlags);
                     statistics = registry.getOrRegister(mbsName, mbeanName, attrName,
-                        new MethodCallStatistics(), "Call stats");
+                            new MethodCallStatistics(), "Call stats");
                     if (statsCacheEnabled) {
                         statsCache.putIfAbsent(ctx, statistics);
                     }
                 }
             }
 
-            String key = statFlags != 0 ? subst(statTemplate, record,  ctx,  statFlags) : statTemplate;
+            String key = statFlags != 0 ? subst(statTemplate, record, ctx, statFlags) : statTemplate;
 
             statistic = statistics.getMethodCallStatistic(key);
         }
@@ -228,11 +255,10 @@ public class ZorkaStatsCollector implements SpyProcessor {
      * Strings that consist solely of context attribute macro are not counted.
      *
      * @param attr attribute bit (see HAS_* constants)
-     *
      * @return true if used (thus should be added to spy record)
      */
     private boolean needsCtxAttr(int attr) {
-        for (int flags : new int[] { mbeanFlags, attrFlags, statFlags }) {
+        for (int flags : new int[]{mbeanFlags, attrFlags, statFlags}) {
             if (0 == (flags & HAS_OTHER_NAME) && 0 != (flags & attr)) {
                 return true;
             }
@@ -246,7 +272,6 @@ public class ZorkaStatsCollector implements SpyProcessor {
      * Determines what kinds of attributes are used in template string
      *
      * @param input template string
-     *
      * @return integer flags (see HAS_* constants)
      */
     private int templateFlags(String input) {
@@ -283,23 +308,22 @@ public class ZorkaStatsCollector implements SpyProcessor {
      * and stores them in spy record.
      *
      * @param record spy record
-     *
-     * @param ctx spy context
+     * @param ctx    spy context
      */
     private void prefetch(Map<String, Object> record, SpyContext ctx) {
-        if (0 !=  (prefetchFlags & HAS_CLASS_NAME)) {
+        if (0 != (prefetchFlags & HAS_CLASS_NAME)) {
             record.put(CLASS_NAME, ctx.getClassName());
         }
 
-        if (0 !=  (prefetchFlags & HAS_METHOD_NAME)) {
+        if (0 != (prefetchFlags & HAS_METHOD_NAME)) {
             record.put(METHOD_NAME, ctx.getMethodName());
         }
 
-        if (0 !=  (prefetchFlags & HAS_CLASS_SNAME)) {
+        if (0 != (prefetchFlags & HAS_CLASS_SNAME)) {
             record.put(CLASS_SNAME, ctx.getShortClassName());
         }
 
-        if (0 !=  (prefetchFlags & HAS_PACKAGE_NAME)) {
+        if (0 != (prefetchFlags & HAS_PACKAGE_NAME)) {
             record.put(PACKAGE_NAME, ctx.getPackageName());
         }
     }
@@ -308,17 +332,13 @@ public class ZorkaStatsCollector implements SpyProcessor {
     /**
      * Performs string substitution. Chooses the fastest possible way to do so.
      *
-     * @param input template string
-     *
+     * @param input  template string
      * @param record spy record (with attributes used to do substitution)
-     *
-     * @param ctx spy context
-     *
-     * @param flags template flags.
-     *
+     * @param ctx    spy context
+     * @param flags  template flags.
      * @return
      */
-    private String subst(String input, Map<String,Object> record, SpyContext ctx, int flags) {
+    private String subst(String input, Map<String, Object> record, SpyContext ctx, int flags) {
 
         if (flags == 0) {
             return input;
@@ -348,24 +368,43 @@ public class ZorkaStatsCollector implements SpyProcessor {
     /**
      * Submits value to method call statistics.
      *
-     * @param record spy record
-     *
+     * @param record    spy record
      * @param statistic statistic used to
      */
     private void submit(Map<String, Object> record, MethodCallStatistic statistic) {
         Object executionTime = record.get(timeField);
+        Number throughput = null;
+
+        if (throughputField != null) {
+            Object v = record.get(throughputField);
+            if (v instanceof Number) {
+                throughput = (Number) v;
+            } else {
+                if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                    log.debug(ZorkaLogger.ZSP_ARGPROC, "Invalid value of throughput field: " + throughput);
+                }
+            }
+        }
 
         if (executionTime instanceof Long) {
             if (0 != ((Integer) record.get(".STAGES") & (1 << ON_RETURN))) {
                 if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
-                    log.debug(ZorkaLogger.ZSP_ARGPROC, "Logging record using logCall()");
+                    log.debug(ZorkaLogger.ZSP_ARGPROC, "Updating stats using logCall()");
                 }
-                statistic.logCall((Long) executionTime);
+                if (throughput != null) {
+                    statistic.logCall((Long) executionTime, throughput.longValue());
+                } else {
+                    statistic.logCall((Long) executionTime);
+                }
             } else if (0 != ((Integer) record.get(".STAGES") & (1 << ON_ERROR))) {
                 if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
-                    log.debug(ZorkaLogger.ZSP_ARGPROC, "Logging record using logError()");
+                    log.debug(ZorkaLogger.ZSP_ARGPROC, "Updating stats using logError()");
                 }
-                statistic.logError((Long)executionTime);
+                if (throughput != null) {
+                    statistic.logError((Long) executionTime, throughput.longValue());
+                } else {
+                    statistic.logError((Long) executionTime);
+                }
             } else {
                 if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
                     log.debug(ZorkaLogger.ZSP_ARGPROC, "No ON_RETURN nor ON_ERROR marked on record " + record);
@@ -373,7 +412,7 @@ public class ZorkaStatsCollector implements SpyProcessor {
             }
         } else {
             if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
-                log.debug(ZorkaLogger.ZSP_ARGPROC, "Unknown type of timeField or tstamp object: " + executionTime);
+                log.debug(ZorkaLogger.ZSP_ARGPROC, "Unknown type of timeField: " + executionTime);
             }
         }
     }
