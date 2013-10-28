@@ -21,17 +21,31 @@ __jetty() {
   spy.add(spy.instrument()
     .onEnter(spy.fetchArg("REQ", 2), spy.fetchArg("RESP", 4),
       spy.format("URI", "${REQ.requestURI}"),
-      http._trace ? tracer.begin("HTTP", zorka.longCfg("http.trace.time")) : null,
-      http._trace ? tracer.attr("URI", "URI") : null,
+      http._trace ? spy.subchain(
+        http._uriQualifier,
+        tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
+        tracer.attr("URI", "URI")
+      ) : null,
       http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
     .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),
-      http._trace ? tracer.attr("ERR", "ERR") : null)
+      http._trace ? spy.subchain(
+        http._uriQualifier,
+        tracer.flags(tracer.SUBMIT_TRACE),
+        tracer.attr("ERR", "ERR")
+      ) : null)
     .onSubmit(
+      spy.strTime("TIME"),
       spy.format("STATUS", "${RESP.status}"),
-      http._trace ? tracer.attr("STATUS", "STATUS") : null,
-      http._trace ? tracer.filterBy("STATUS", null, http._errors, null, null) : null,
-      http._params ? http.param_processor() : null,
-      http._cookies ? http.cookies_processor() : spy.put("COOKIES", ""),
+      spy.get("USER", "REQ", "remoteUser"),
+      http._trace ? spy.subchain(
+        http._uriQualifier,
+        tracer.attr("STATUS", "STATUS"),
+        tracer.filterBy("STATUS", null, http._errors, null, null),
+        tracer.attr("USER", "USER"),
+        http._params ? http.param_processor() : null,
+        http._cookies ? http.cookies_processor(true, false) : null,
+        http._headers ? http.headers_processor(true, true) : null
+      ) : null,
       http._slow ? spy.subchain(
         spy.longerThan(zorka.longCfg("http.slow.time")),
         spy.strTime("TIME"),

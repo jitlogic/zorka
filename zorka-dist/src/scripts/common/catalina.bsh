@@ -18,23 +18,94 @@
 
 __catalina() {
 
+    headers_processor() {
+
+        _iprefix = zorka.stringCfg("http.headers.iprefix");
+        _oprefix = zorka.stringCfg("http.headers.oprefix");
+        _matcher = util.stringMatcher(zorka.listCfg("http.headers.include"), zorka.listCfg("http.headers.exclude"));
+        _maxlen = zorka.intCfg("http.headers.maxlen");
+
+        process(rec) {
+
+            req = rec.get("REQ");
+            if (http._trace && req != null && req.getHeaderNames() != null) {
+                for (name : req.getHeaderNames()) {
+                    hdrs = req.getHeaders(name);
+                    if (hdrs != null) {
+                        i = 0;
+                        for (hdr : hdrs) {
+                            if (hdr.length() > _maxlen) {
+                                hdr = hdr.substring(0, _maxlen) + "...";
+                            }
+                            if (i == 0) {
+                                tracer.newAttr(_iprefix + name, hdr);
+                            } else {
+                                tracer.newAttr(_iprefix + i + "_" + name, hdr);
+                            }
+                            i++;
+                        }
+                    }
+                }
+            }
+
+            resp = rec.get("RESP");
+            if (resp != null) {
+                headers = resp.getCoyoteResponse().getMimeHeaders();
+                for (name : headers.names()) {
+                    i = 0;
+                    for (hdr : headers.values(name)) {
+                        if (hdr.length() > _maxlen) {
+                            hdr = hdr.substring(0, _maxlen) + "...";
+                        }
+                        if (i == 0) {
+                            tracer.newAttr(_oprefix + name, hdr);
+                        } else {
+                            tracer.newAttr(_oprefix + i + "_" + name, hdr);
+                        }
+                    }
+                }
+                location = headers.getHeader("Location");
+                if (http._trace && location != null) {
+                    tracer.newAttr("REDIRECT", location);
+                }
+            }
+
+          return rec;
+        }
+
+        return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+    }
+
+
   spy.add(spy.instrument()
     .onEnter(spy.fetchArg("REQ", 1), spy.fetchArg("RESP", 2),
       spy.format("URI", "${REQ.request.requestURI}"),
-      http._trace ? tracer.begin("HTTP", zorka.longCfg("http.trace.time")) : null,
-      http._trace ? tracer.attr("URI", "URI") : null,
+      http._trace ? spy.subchain(
+        http._uriQualifier,
+        tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
+        tracer.attr("URI", "URI")
+      ) : null,
       http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
     .onReturn(spy.put("ERR", ""))
     .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),
-      http._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
-      http._trace ? tracer.attr("ERR", "ERR") : null)
+      http._trace ? spy.subchain(
+        http._uriQualifier,
+        tracer.flags(tracer.SUBMIT_TRACE),
+        tracer.attr("ERR", "ERR")
+        ) : null)
     .onSubmit(
       spy.strTime("TIME"),
       spy.format("STATUS", "${RESP.status}"),
-      http._trace ? tracer.attr("STATUS", "STATUS") : null,
-      http._trace ? tracer.filterBy("STATUS", null, http._errors, null, null) : null,
-      http._params ? http.param_processor() : spy.put("PARAMS", ""),
-      http._cookies ? http.cookies_processor() : spy.put("COOKIES", ""),
+      spy.get("USER", "REQ", "remoteUser"),
+      http._trace ? spy.subchain(
+        http._uriQualifier,
+        tracer.attr("STATUS", "STATUS"),
+        tracer.filterBy("STATUS", null, http._errors, null, null),
+        tracer.attr("USER", "USER"),
+        http._cookies ? http.cookies_processor(true, true) : spy.put("COOKIES", ""),
+        http._headers ? headers_processor() : null,
+        http._params ? http.param_processor() : spy.put("PARAMS", "")
+      ) : null,
       http._slow ? spy.subchain(
         spy.longerThan(zorka.longCfg("http.slow.time")),
         spy.trapperCollector(http.slow_ft, zorka.INFO, "HTTP", zorka.stringCfg("http.slow.format"))) : null,

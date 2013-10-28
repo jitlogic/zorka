@@ -18,6 +18,7 @@
 package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
+import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.ZorkaLib;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
@@ -75,8 +76,8 @@ public class AvgRateCounter {
 
         synchronized (aggregate) {
             Object obj = zorkaLib.jmx(path.toArray(new Object[0]));
-            Object nom = zorkaLib.get(obj, nomAttr);
-            Object div = divAttr != null ? zorkaLib.get(obj, divAttr) : 0;
+            Object nom = ObjectInspector.get(obj, nomAttr);
+            Object div = divAttr != null ? ObjectInspector.get(obj, divAttr) : 0;
 
             aggregate.feed(coerce(nom), coerce(div));
 

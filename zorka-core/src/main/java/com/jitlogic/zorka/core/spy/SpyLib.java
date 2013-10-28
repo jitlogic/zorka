@@ -868,6 +868,11 @@ public class SpyLib {
     }
 
 
+    public SpyProcessor stringMatcher(String srcField, List<String> includes, List<String> excludes) {
+        return new StringMatcherProcessor(srcField, includes, excludes);
+    }
+
+
     /**
      * Passes only records of method calls that took longer than specified interval.
      * Execution time is taken from default slot called "T".

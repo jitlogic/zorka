@@ -321,18 +321,6 @@ public class ZorkaLib {
 
 
     /**
-     * Recursively accesses object. This is just a ObjectInspector.get() method facade for configuration scripts.
-     *
-     * @param obj  source object
-     * @param args attribute chain
-     * @return retrieved value
-     */
-    public Object get(Object obj, Object... args) {
-        return ObjectInspector.get(obj, args);
-    }
-
-
-    /**
      * Creates zorka dynamic MBean. Such mbean object can be populated with attributes
      * using put() or setAttr() methods.
      *
@@ -868,54 +856,6 @@ public class ZorkaLib {
         for (String func : funcs) {
             translator.allow(func);
         }
-    }
-
-
-    public Set<Object> set(Object... objs) {
-        return ZorkaUtil.set(objs);
-    }
-
-
-    public String castString(Object obj) {
-        return ZorkaUtil.castString(obj);
-    }
-
-
-    public String crc32sum(String input) {
-        return ZorkaUtil.crc32(input);
-    }
-
-
-    public String crc32sum(String input, int limit) {
-        String sum = ZorkaUtil.crc32(input);
-        return sum.length() > limit ? sum.substring(0, limit) : sum;
-    }
-
-
-    public String md5sum(String input) {
-        return ZorkaUtil.md5(input);
-    }
-
-
-    public String md5sum(String input, int limit) {
-        String sum = ZorkaUtil.md5(input);
-        return sum.length() > limit ? sum.substring(0, limit) : sum;
-    }
-
-
-    public String sha1sum(String input) {
-        return ZorkaUtil.sha1(input);
-    }
-
-
-    public String sha1sum(String input, int limit) {
-        String sum = ZorkaUtil.sha1(input);
-        return sum.length() > limit ? sum.substring(0, limit) : sum;
-    }
-
-
-    public String strTime(long ns) {
-        return ZorkaUtil.strTime(ns);
     }
 
 }

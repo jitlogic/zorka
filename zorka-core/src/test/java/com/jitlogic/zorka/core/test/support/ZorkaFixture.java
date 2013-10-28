@@ -60,6 +60,7 @@ public class ZorkaFixture {
     protected SymbolRegistry symbols;
 
     protected ZabbixLib zabbixLib;
+    protected UtilLib util;
 
     protected QueryTranslator translator;
 
@@ -78,7 +79,7 @@ public class ZorkaFixture {
                 "zorka.filelog", "no",
                 "zorka.mbs.autoregister", "yes",
                 "spy", "yes"
-                );
+        );
 
         config = new AgentConfig(configProperties);
         agentInstance = new AgentInstance(config); //AgentInstance.instance();
@@ -97,6 +98,7 @@ public class ZorkaFixture {
         spyTransformer = agentInstance.getClassTransformer();
         zabbixLib = agentInstance.getZabbixLib();
         translator = agentInstance.getTranslator();
+        util = agentInstance.getUtilLib();
 
         // Install test MBean server
 
@@ -131,10 +133,10 @@ public class ZorkaFixture {
         return tmpDir;
     }
 
-    private static Properties setProps(Properties props, String...data) {
+    private static Properties setProps(Properties props, String... data) {
 
-        for (int i = 1; i < data.length; i+=2) {
-            props.setProperty(data[i-1], data[i]);
+        for (int i = 1; i < data.length; i += 2) {
+            props.setProperty(data[i - 1], data[i]);
         }
 
         return props;

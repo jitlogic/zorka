@@ -327,7 +327,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
     @Test
     public void testFilterDecider() {
         TraceFilterProcessor p = (TraceFilterProcessor) tracer.filterBy("TEST", false,
-                zorka.set(100, 200), zorka.set(500, 503), zorka.set(401, 404));
+                util.set(100, 200), util.set(500, 503), util.set(401, 404));
         assertThat(p.decide(100)).isTrue();
         assertThat(p.decide(500)).isFalse();
         assertThat(p.decide(401)).isNull();

@@ -74,7 +74,7 @@ __ejb() {
   // unintended consequences.
   //
   // Only basic types are allowed initially. Use ejb.trace.include to add more.
-  types_allowed = zorka.set(
+  types_allowed = util.set(
     "java.lang.Byte", "java.lang.Character", "java.lang.Short", "java.lang.Integer", "java.lang.Long",
     "java.lang.String", "java.lang.Double", "java.lang.Float");
 

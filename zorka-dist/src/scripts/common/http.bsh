@@ -26,12 +26,25 @@ __http() {
   // Default values for HTTP parameter processing
   zorka.defCfg("http.params", "no");
   zorka.defCfg("http.params.exclude", "");
-  zorka.defCfg("http.param.maxlen", 128);
+  zorka.defCfg("http.params.include", "");
+  zorka.defCfg("http.params.prefix", "Param/");
+  zorka.defCfg("http.param.maxlen", 256);
 
   // Default values for HTTP cookie processing
   zorka.defCfg("http.cookies", "no");
   zorka.defCfg("http.cookies.exclude", "");
-  zorka.defCfg("http.cookie.maxlen", "128");
+  zorka.defCfg("http.cookies.include", "");
+  zorka.defCfg("http.cookies.iprefix", "CookieIn_");
+  zorka.defCfg("http.cookies.oprefix", "CookieOut_");
+  zorka.defCfg("http.cookies.maxlen", "256");
+
+  // Default values for HTTP headers processing
+  zorka.defCfg("http.headers", "no");
+  zorka.defCfg("http.headers.exclude", "");
+  zorka.defCfg("http.headers.include", "");
+  zorka.defCfg("http.headers.iprefix", "HdrIn_");
+  zorka.defCfg("http.headers.oprefix", "HdrOut_");
+  zorka.defCfg("http.headers.maxlen", "256");
 
   // Default values for HTTP slow requests log configuration options
   zorka.defCfg("http.slow", "no");
@@ -55,8 +68,8 @@ __http() {
   // Default values for HTTP tracer options 
   zorka.defCfg("http.trace", zorka.stringCfg("tracer"));
   zorka.defCfg("http.trace.time", "1000");
-  zorka.defCfg("http.trace.params.prefix", "P_");
-  zorka.defCfg("http.trace.cookies.prefix", "C_");
+  zorka.defCfg("http.trace.include", "");
+  zorka.defCfg("http.trace.exclude", "/favicon.ico");
 
   _trace = zorka.boolCfg("http.trace");
   _stats = zorka.boolCfg("http.stats");
@@ -68,13 +81,11 @@ __http() {
   _params = zorka.boolCfg("http.params");
   _paramLen = zorka.intCfg("http.param.maxlen", 128);
   _cookies = zorka.boolCfg("http.cookies");
-  _cookieLen = zorka.intCfg("http.cookie.maxlen", 128);
-  _pprefix = zorka.stringCfg("http.trace.params.prefix");
-  _cprefix = zorka.stringCfg("http.trace.cookies.prefix");
+  _headers = zorka.boolCfg("http.headers");
   _error = zorka.boolCfg("http.error");
   _errorF = zorka.boolCfg("http.error.file");
-  _excludedParams = zorka.setCfg("http.params.exclude");
-  _excludedCookies = zorka.setCfg("http.cookies.exclude");
+
+  _uriQualifier = spy.stringMatcher("URI", zorka.listCfg("http.trace.include"), zorka.listCfg("http.trace.exclude"));
 
   slow_ft = _slowF ? zorka.rollingFileTrapper("http.slow", "INFO", zorka.stringCfg("http.slow.file.path"),
                      zorka.intCfg("http.slow.file.num"), zorka.kiloCfg("http.slow.file.max"), false) : null;
@@ -85,46 +96,140 @@ __http() {
   _errors = zorka.setCfg("http.error.codes");
 
   param_processor() {
-    process(rec) {
-      sb = new StringBuilder();
-      pmap = rec.get("REQ").getParameterMap();
-      for (e : pmap.entrySet()) {
-        String k = e.getKey();
-        if (_excludedParams.contains(k)) continue;
-        String v = e.getValue().length > 0 ? e.getValue()[0] : "";
-        if (v.length() > _paramLen) {
-          v = v.substring(0, _paramLen);
-        }
-        if (_trace) { tracer.newAttr(_pprefix+k, v); }
-        c = sb.length() > 0 ? "&" : "?";
-        sb.append(c + k + "=" + v);
+
+      _pprefix = zorka.stringCfg("http.params.prefix");
+      _matcher = util.stringMatcher(zorka.listCfg("http.params.include"), zorka.listCfg("http.params.exclude"));
+
+      process(rec) {
+          sb = new StringBuilder();
+          pmap = rec.get("REQ").getParameterMap();
+          for (e : pmap.entrySet()) {
+              String k = e.getKey();
+              if (_matcher.matches(k)) {
+                  String v = e.getValue().length > 0 ? e.getValue()[0] : "";
+                  if (v.length() > _paramLen) {
+                      v = v.substring(0, _paramLen);
+                  }
+                  if (_trace) {
+                      tracer.newAttr(_pprefix+k, v);
+                  }
+                  c = sb.length() > 0 ? "&" : "?";
+                  sb.append(c + k + "=" + v);
+              }
+          }
+          rec.put("PARAMS", sb.toString());
+          return rec;
       }
-      rec.put("PARAMS", sb.toString());
-      return rec;
-    }
-    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
   }
 
 
-  cookies_processor() {
-    process(rec) {
-      cookies = rec.get("REQ").getCookies();
-      sb = new StringBuilder();
-      for (c : cookies) {
-          name = c.getName();
-          if (_excludedCookies.contains(name)) continue;
-          val = c.getValue();
-          if (val != null && val.length() > _cookieLen) {
-            val = val.substring(0, _cookieLen);
+  cookies_processor(cIn, cOut) {
+
+      _cookieLen = zorka.intCfg("http.cookie.maxlen", 128);
+      _iprefix = zorka.stringCfg("http.cookies.iprefix");
+      _oprefix = zorka.stringCfg("http.cookies.oprefix");
+      _matcher = util.stringMatcher(zorka.listCfg("http.cookies.include"), zorka.listCfg("http.cookies.exclude"));
+
+      process(rec) {
+          if (cIn) {
+              icookies = rec.get("REQ").getCookies();
+              for (c : icookies) {
+                  name = c.getName();
+                  if (_matcher.matches(name)) {
+                      val = c.getValue();
+                      if (val != null && val.length() > _cookieLen) {
+                          val = val.substring(0, _cookieLen);
+                      }
+                      if (_trace) {
+                          tracer.newAttr(_iprefix + name, val);
+                      }
+                  }
+              }
           }
-          if (_trace) { tracer.newAttr(_cprefix+name,val); }
-          c = sb.length() > 0 ? ";  " : "";
-          sb.append(c + name + "=" + val);
+
+          if (cOut) {
+              ocookies = rec.get("RESP").getCookies();
+              for (c : ocookies) {
+                  name = c.getName();
+                  if (_matcher.matches(name)) {
+                      val = c.getValue();
+                      if (val != null && val.length() > _cookieLen) {
+                          val = val.substring(0, _cookieLen);
+                      }
+                      if (_trace) {
+                          tracer.newAttr(_oprefix + name, val);
+                      }
+                  }
+              }
+          }
+
+          return rec;
       }
-      rec.put("COOKIES", sb.toString());
-      return rec;
-    }
-    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+
+  headers_processor(hdrIn, hdrOut) {
+
+      _iprefix = zorka.stringCfg("http.headers.iprefix");
+      _oprefix = zorka.stringCfg("http.headers.oprefix");
+      _matcher = util.stringMatcher(zorka.listCfg("http.headers.include"), zorka.listCfg("http.headers.exclude"));
+      _maxlen = zorka.intCfg("http.headers.maxlen");
+
+      process(rec) {
+
+          req = rec.get("REQ");
+          if (hdrIn && req != null && req.getHeaderNames() != null) {
+              for (name : req.getHeaderNames()) {
+                  hdrs = req.getHeaders(name);
+                  if (hdrs != null) {
+                      i = 0;
+                      for (hdr : hdrs) {
+                          if (hdr.length() > _maxlen) {
+                              hdr = hdr.substring(0, _maxlen) + "...";
+                          }
+                          if (i == 0) {
+                              tracer.newAttr(_iprefix + name, hdr);
+                          } else {
+                              tracer.newAttr(_iprefix + i + "_" + name, hdr);
+                          }
+                          i++;
+                      }
+                  }
+              }
+          }
+
+          resp = rec.get("RESP");
+          if (hdrOut && resp != null && resp.getHeaderNames() != null) {
+              for (name : resp.getHeaderNames()) {
+                  hdrs = resp.getHeaders(name);
+                  if (hdrs != null) {
+                      i = 0;
+                      for (hdr : hdrs) {
+                          if (hdr.length() > _maxlen) {
+                              hdr = hdr.substring(0, _maxlen) + "...";
+                          }
+                          if (i == 0) {
+                              tracer.newAttr(_oprefix + name, hdr);
+                          } else {
+                              tracer.newAttr(_oprefix + i + "_" + name, hdr);
+                          }
+                          i++;
+                      }
+                  }
+              }
+              for (location : resp.getHeaders("Location")) {
+                  tracer.newAttr("REDIRECT", location);
+              }
+          }
+
+          return rec;
+      }
+
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
   }
 
 

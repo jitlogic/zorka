@@ -105,6 +105,8 @@ public class AgentInstance {
      */
     private SyslogLib syslogLib;
 
+    private UtilLib utilLib;
+
     /**
      * Reference to SNMP library - available to zorka scripts as 'snmp.*' functions
      */
@@ -148,6 +150,7 @@ public class AgentInstance {
 
         initLoggers(props);
 
+        getZorkaAgent().put("util", getUtilLib());
 
         if (config.boolCfg("spy", true)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Zorka SPY");
@@ -417,6 +420,14 @@ public class AgentInstance {
             zabbixLib = new ZabbixLib(getMBeanServerRegistry(), config);
         }
         return zabbixLib;
+    }
+
+
+    public synchronized UtilLib getUtilLib() {
+        if (utilLib == null) {
+            utilLib = new UtilLib();
+        }
+        return utilLib;
     }
 
 
