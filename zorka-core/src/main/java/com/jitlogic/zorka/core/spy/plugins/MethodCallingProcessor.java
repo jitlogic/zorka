@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -31,35 +32,44 @@ import java.util.Map;
  */
 public class MethodCallingProcessor implements SpyProcessor {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** Source field */
+    /**
+     * Source field
+     */
     private String src;
 
-    /** Destination field */
+    /**
+     * Destination field
+     */
     private String dst;
 
-    /** Method name */
+    /**
+     * Method name
+     */
     private String methodName;
 
-    /** Method arguments */
+    /**
+     * Method arguments
+     */
     private Object[] args;
 
-    /** Argument types */
+    /**
+     * Argument types
+     */
     private Class<?>[] argTypes;
 
 
     /**
      * Standard constructor
      *
-     * @param src source field
-     *
-     * @param dst destination field
-     *
+     * @param src        source field
+     * @param dst        destination field
      * @param methodName method name
-     *
-     * @param args argument types
+     * @param args       argument types
      */
     public MethodCallingProcessor(String src, String dst, String methodName, Object... args) {
         this.src = src;
@@ -76,7 +86,7 @@ public class MethodCallingProcessor implements SpyProcessor {
 
 
     @Override
-    public Map<String,Object> process(Map<String,Object> record) {
+    public Map<String, Object> process(Map<String, Object> record) {
         Object val = record.get(src);
 
         if (val == null) {
@@ -101,18 +111,15 @@ public class MethodCallingProcessor implements SpyProcessor {
 
     /**
      * Looks for method matching given name and argument types
-     *
+     * <p/>
      * TODO move this to ObjectInspector
      *
-     * @param clazz introspected class
-     *
+     * @param clazz      introspected class
      * @param methodName method name
-     *
-     * @param argTypes argument types
-     *
+     * @param argTypes   argument types
      * @return method object or null
      */
-    public Method lookupMethod(Class<?> clazz, String methodName, Class<?>...argTypes) {
+    public Method lookupMethod(Class<?> clazz, String methodName, Class<?>... argTypes) {
         for (Method m : clazz.getMethods()) {
             if (methodName.equals(m.getName())) {
                 Class<?>[] paramTypes = m.getParameterTypes();
@@ -128,7 +135,8 @@ public class MethodCallingProcessor implements SpyProcessor {
 
                 for (int i = 0; i < argTypes.length; i++) {
                     if (argTypes[i] == null && paramTypes[i].isPrimitive()) {
-                        matches = false; break;
+                        matches = false;
+                        break;
                     }
 
                     if (paramTypes[i].isPrimitive()) {
@@ -136,7 +144,8 @@ public class MethodCallingProcessor implements SpyProcessor {
                     }
 
                     if (!paramTypes[i].isAssignableFrom(argTypes[i])) {
-                        matches = false; break;
+                        matches = false;
+                        break;
                     }
                 }
 
@@ -149,8 +158,10 @@ public class MethodCallingProcessor implements SpyProcessor {
         return null;
     }
 
-    /** Primitive types to classes map */
-    private static Map<String,Class<?>> primitives;
+    /**
+     * Primitive types to classes map
+     */
+    private static Map<String, Class<?>> primitives;
 
     static {
         primitives = new HashMap<String, Class<?>>(32);

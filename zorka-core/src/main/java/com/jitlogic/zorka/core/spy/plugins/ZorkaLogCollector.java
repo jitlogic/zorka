@@ -14,11 +14,12 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaLogLevel;
+import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.util.Map;
 
@@ -52,7 +53,7 @@ public class ZorkaLogCollector implements SpyProcessor {
         Throwable e = null;
 
         if (fErr != null && record.get(fErr) instanceof Throwable) {
-            e = (Throwable)record.get(fErr);
+            e = (Throwable) record.get(fErr);
         }
 
         logger.trap(logLevel, tag, ObjectInspector.substitute(message, record), e);

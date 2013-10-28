@@ -13,9 +13,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.util.Map;
 
@@ -27,51 +28,66 @@ import java.util.Map;
  */
 public class ComparatorProcessor implements SpyProcessor {
 
-    /** Accuracy when comparing floating point values */
+    /**
+     * Accuracy when comparing floating point values
+     */
     private static final double ACCURACY = 0.001;
 
-    /** Greater-than operator */
+    /**
+     * Greater-than operator
+     */
     private static final int GT = 0;
 
-    /** Greater-or-equal operator */
+    /**
+     * Greater-or-equal operator
+     */
     private static final int GE = 1;
 
-    /** Equal operator */
+    /**
+     * Equal operator
+     */
     private static final int EQ = 2;
 
-    /** Less-or-equal operator */
+    /**
+     * Less-or-equal operator
+     */
     private static final int LE = 3;
 
-    /** Less-than operator */
+    /**
+     * Less-than operator
+     */
     private static final int LT = 4;
 
-    /** Not-equal operator */
+    /**
+     * Not-equal operator
+     */
     private static final int NE = 5;
 
-    /** Decision table for comaprison operators */
+    /**
+     * Decision table for comaprison operators
+     */
     private static final boolean[][] ctab = {
-            { true,  false, false }, // GT
-            { true,  true,  false }, // GE
-            { false, true,  false }, // EQ
-            { false, true,  true  }, // LE
-            { false, false, true  }, // LT
-            { true,  false, true  }, // NE
+            {true, false, false}, // GT
+            {true, true, false}, // GE
+            {false, true, false}, // EQ
+            {false, true, true}, // LE
+            {false, false, true}, // LT
+            {true, false, true}, // NE
     };
 
-    /** Operator name to ID map */
-    private static final Map<String,Integer> operators = ZorkaUtil.constMap(
+    /**
+     * Operator name to ID map
+     */
+    private static final Map<String, Integer> operators = ZorkaUtil.constMap(
             ">", GT, ">=", GE, "=", EQ, "==", EQ, "<=", LE, "<", LT, "!=", NE, "<>", NE);
 
 
     /**
      * Creates comparator that compares two fields: a op b
      *
-     * @param a first field name
-     *
+     * @param a  first field name
      * @param op operator
-     *
-     * @param b second field name
-     *
+     * @param b  second field name
      * @return comparator filtering processor
      */
     public static ComparatorProcessor scmp(String a, String op, String b) {
@@ -82,40 +98,42 @@ public class ComparatorProcessor implements SpyProcessor {
     /**
      * Creates comparator that compares field with a constant: a op v
      *
-     * @param a first field name
-     *
+     * @param a  first field name
      * @param op operator
-     *
-     * @param v constant value
-     *
+     * @param v  constant value
      * @return comparator filtering processor
      */
     public static ComparatorProcessor vcmp(String a, String op, Object v) {
         return new ComparatorProcessor(a, operators.get(op), null, v);
     }
 
-    /** First operand */
+    /**
+     * First operand
+     */
     private String a;
 
-    /** Second operand (if it is field) */
+    /**
+     * Second operand (if it is field)
+     */
     private String b;
 
-    /** Operator ID */
+    /**
+     * Operator ID
+     */
     private int op;
 
-    /** Second operand (if it is constant) */
+    /**
+     * Second operand (if it is constant)
+     */
     private Object v;
 
     /**
      * Constructor is hidden. Use scmp() and vcmp() static methods instead.
      *
-     * @param a first operand
-     *
+     * @param a  first operand
      * @param op operator
-     *
-     * @param b second operand (field)
-     *
-     * @param v second operand (constant)
+     * @param b  second operand (field)
+     * @param v  second operand (constant)
      */
     private ComparatorProcessor(String a, int op, String b, Object v) {
         this.a = a;
@@ -126,23 +144,23 @@ public class ComparatorProcessor implements SpyProcessor {
 
 
     @Override
-    public Map<String,Object> process(Map<String,Object> record) {
+    public Map<String, Object> process(Map<String, Object> record) {
         Object va = record.get(a);
         Object vb = (b != null) ? record.get(b) : v;
 
         if (va instanceof Number && vb instanceof Number) {
             int rcmp;
             if (va instanceof Double || va instanceof Float || vb instanceof Double || vb instanceof Float) {
-                double da = ((Number)va).doubleValue(), db = ((Number)vb).doubleValue();
+                double da = ((Number) va).doubleValue(), db = ((Number) vb).doubleValue();
                 double ac = Math.max(da, db) * ACCURACY;
                 rcmp = Math.abs(db - da) < ac ? 0 : (da > db ? -1 : 1);
             } else {
-                long la = ((Number)va).longValue(), lb = ((Number)vb).longValue();
-                rcmp =  la == lb ? 0 : la > lb ? -1 : 1;
+                long la = ((Number) va).longValue(), lb = ((Number) vb).longValue();
+                rcmp = la == lb ? 0 : la > lb ? -1 : 1;
             }
 
-            return ctab[op][rcmp+1] ? record : null;
-        } else  if (op == EQ || op == NE) {
+            return ctab[op][rcmp + 1] ? record : null;
+        } else if (op == EQ || op == NE) {
             return ((va == null && vb == null) || (va != null && va.equals(vb))) ? record : null;
         }
 

@@ -13,39 +13,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.plugins;
+
+
+import com.jitlogic.zorka.core.spy.SpyProcessor;
+import com.jitlogic.zorka.core.spy.Tracer;
 
 import java.util.Map;
 
-/**
- * Inserts constant to specified record field.
- *
- * @author rafal.lewczuk@jitlogic.com
- */
-public class ConstValProcessor implements SpyProcessor {
+public class TraceCheckerProcessor implements SpyProcessor {
 
-    /** Destination field */
-    private String dst;
+    private int traceId;
 
-    /** Value be put into destination field */
-    private Object val;
+    private Tracer tracer;
 
-    /**
-     * Creates constant value processor
-     *
-     * @param dst destination field
-     *
-     * @param val value to put into destination field
-     */
-    public ConstValProcessor(String dst, Object val) {
-        this.dst = dst;
-        this.val = val;
+    public TraceCheckerProcessor(Tracer tracer, int traceId) {
+        this.tracer = tracer;
+        this.traceId = traceId;
     }
 
-
     @Override
-    public Map<String,Object> process(Map<String,Object> record) {
-        record.put(dst, val);
-        return record;
+    public Map<String, Object> process(Map<String, Object> record) {
+        return tracer.getHandler().isInTrace(traceId) ? record : null;
     }
 }

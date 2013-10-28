@@ -15,11 +15,12 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -32,32 +33,45 @@ import java.util.regex.Pattern;
  */
 public class RegexFilterProcessor implements SpyProcessor {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** Source field */
+    /**
+     * Source field
+     */
     private String src;
 
-    /** Destination field */
+    /**
+     * Destination field
+     */
     private String dst;
 
-    /** Regular expression */
+    /**
+     * Regular expression
+     */
     private Pattern regex;
 
-    /** Substitution expression */
+    /**
+     * Substitution expression
+     */
     private String expr;
 
-    /** Default value */
+    /**
+     * Default value
+     */
     private String defval;
 
-    /** Inverse filter flag */
+    /**
+     * Inverse filter flag
+     */
     private Boolean filterOut;
 
     /**
      * Creates regex filter that filters records based on supplied regular expression.
      *
-     * @param src source field
-     *
+     * @param src   source field
      * @param regex regular expression
      */
     public RegexFilterProcessor(String src, String regex) {
@@ -67,10 +81,8 @@ public class RegexFilterProcessor implements SpyProcessor {
     /**
      * Creates regex filter that filters records based on supplied regular expression.
      *
-     * @param src source field
-     *
-     * @param regex filter regular expression
-     *
+     * @param src       source field
+     * @param regex     filter regular expression
      * @param filterOut inverse filtering if true
      */
     public RegexFilterProcessor(String src, String regex, Boolean filterOut) {
@@ -83,14 +95,10 @@ public class RegexFilterProcessor implements SpyProcessor {
     /**
      * Creates regex filter that transforms records based on supplied regular expression.
      *
-     * @param src source field
-     *
-     * @param dst destination field
-     *
-     * @param regex filter regular expression
-     *
-     * @param expr substitution regular expression (with ${n} marking matches from filter expression)
-     *
+     * @param src       source field
+     * @param dst       destination field
+     * @param regex     filter regular expression
+     * @param expr      substitution regular expression (with ${n} marking matches from filter expression)
      * @param filterOut inverse filtering if true
      */
     public RegexFilterProcessor(String src, String dst, String regex, String expr, Boolean filterOut) {
@@ -103,24 +111,20 @@ public class RegexFilterProcessor implements SpyProcessor {
     /**
      * Creates regex filter that transforms records based on supplied regular expression.
      *
-     * @param src source field
-     *
-     * @param dst destination field
-     *
-     * @param regex filter regular expression
-     *
-     * @param expr substitution regular expression (with ${n} marking matches from filter expression)
-     *
+     * @param src    source field
+     * @param dst    destination field
+     * @param regex  filter regular expression
+     * @param expr   substitution regular expression (with ${n} marking matches from filter expression)
      * @param defval default value
      */
     public RegexFilterProcessor(String src, String dst, String regex, String expr, String defval) {
-        this(src, dst, regex, expr, (Boolean)null);
+        this(src, dst, regex, expr, (Boolean) null);
         this.defval = defval;
     }
 
 
     @Override
-    public Map<String,Object> process(Map<String,Object> record) {
+    public Map<String, Object> process(Map<String, Object> record) {
         Object val = record.get(src);
 
         if (expr == null) {
@@ -130,11 +134,11 @@ public class RegexFilterProcessor implements SpyProcessor {
                 log.debug(ZorkaLogger.ZSP_ARGPROC, "Filtering '" + val + "' through '" + regex.pattern() + "': " + matches);
             }
 
-            return matches^filterOut ? record : null;
+            return matches ^ filterOut ? record : null;
         } else if (val != null) {
             Matcher matcher = regex.matcher(val.toString());
             if (matcher.matches()) {
-                Object[] vals = new Object[matcher.groupCount()+1];
+                Object[] vals = new Object[matcher.groupCount() + 1];
                 for (int i = 0; i < vals.length; i++) {
                     vals[i] = matcher.group(i);
                 }

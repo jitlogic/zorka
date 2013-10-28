@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
+import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.util.Map;
 
@@ -27,21 +28,26 @@ import java.util.Map;
  */
 public class StringFormatProcessor implements SpyProcessor {
 
-    /** Destination field */
+    /**
+     * Destination field
+     */
     private String dstField;
 
-    /** Format expression */
+    /**
+     * Format expression
+     */
     private String expr;
 
-    /** Maximum length */
+    /**
+     * Maximum length
+     */
     private int len;
 
     /**
      * Creates new string format processor.
      *
      * @param dstField destination field
-     *
-     * @param expr expression
+     * @param expr     expression
      */
     public StringFormatProcessor(String dstField, String expr, int len) {
         this.dstField = dstField;
@@ -50,7 +56,7 @@ public class StringFormatProcessor implements SpyProcessor {
     }
 
     @Override
-    public Map<String,Object> process(Map<String,Object> record) {
+    public Map<String, Object> process(Map<String, Object> record) {
         String s = ObjectInspector.substitute(expr, record);
 
         if (len > 0 && s.length() > len) {

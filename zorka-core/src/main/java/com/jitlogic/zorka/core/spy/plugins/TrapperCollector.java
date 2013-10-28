@@ -14,9 +14,11 @@
  * You should have received a copy of the GNU General Public License along with
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.util.*;
+import com.jitlogic.zorka.core.spy.SpyLib;
+import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.util.Map;
 

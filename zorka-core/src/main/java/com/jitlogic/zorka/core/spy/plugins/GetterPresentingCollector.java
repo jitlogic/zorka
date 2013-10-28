@@ -15,12 +15,14 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.mbeans.AttrGetter;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.core.spy.SpyContext;
+import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.util.Map;
 
@@ -32,45 +34,56 @@ import java.util.Map;
  */
 public class GetterPresentingCollector implements SpyProcessor {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** MBean server registry */
+    /**
+     * MBean server registry
+     */
     private MBeanServerRegistry registry;
 
-    /** MBean server name */
+    /**
+     * MBean server name
+     */
     private String mbsName;
 
-    /** MBean object name (or format template) */
+    /**
+     * MBean object name (or format template)
+     */
     private String mbeanTemplate;
 
-    /** Attribute name (or format template) */
+    /**
+     * Attribute name (or format template)
+     */
     private String attrTemplate;
 
-    /** Presented object description. */
+    /**
+     * Presented object description.
+     */
     private String desc;
 
-    /** Source field */
+    /**
+     * Source field
+     */
     private String srcField;
 
-    /** Attribute chain used by ValGetter */
+    /**
+     * Attribute chain used by ValGetter
+     */
     private Object[] attrChain;
 
 
     /**
      * Creates presenting collector
      *
-     * @param mbsName mbean server name
-     *
+     * @param mbsName       mbean server name
      * @param mbeanTemplate object name
-     *
-     * @param attrTemplate attribute
-     *
-     * @param desc description
-     *
-     * @param srcField source field
-     *
-     * @param attrChain attribute chain
+     * @param attrTemplate  attribute
+     * @param desc          description
+     * @param srcField      source field
+     * @param attrChain     attribute chain
      */
     public GetterPresentingCollector(MBeanServerRegistry mbsRegistry, String mbsName, String mbeanTemplate,
                                      String attrTemplate, String desc, String srcField, Object... attrChain) {
@@ -84,7 +97,7 @@ public class GetterPresentingCollector implements SpyProcessor {
     }
 
     @Override
-    public Map<String,Object> process(Map<String,Object> record) {
+    public Map<String, Object> process(Map<String, Object> record) {
         SpyContext ctx = (SpyContext) record.get(".CTX");
         String mbeanName = ctx.subst(mbeanTemplate);
         String attrName = ctx.subst(attrTemplate);

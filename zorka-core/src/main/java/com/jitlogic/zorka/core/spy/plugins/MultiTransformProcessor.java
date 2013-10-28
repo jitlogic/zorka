@@ -13,12 +13,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.plugins;
 
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -83,14 +84,16 @@ public class MultiTransformProcessor implements SpyProcessor {
             rdr = new BufferedReader(new FileReader(cfgFile));
             String line;
             while (null != (line = rdr.readLine())) {
-                if (line.matches("\\s*") || line.matches("\\s*#.*")) { continue; }
+                if (line.matches("\\s*") || line.matches("\\s*#.*")) {
+                    continue;
+                }
                 String[] segs = line.split("\\s+");
-                if (segs.length != srcExprs.size()+1) {
+                if (segs.length != srcExprs.size() + 1) {
                     log.error(ZorkaLogger.ZSP_SUBMIT, "Invalid config line: '" + line + "'. Skipping.");
                     try {
-                        Pattern[] patterns = new Pattern[segs.length-1];
+                        Pattern[] patterns = new Pattern[segs.length - 1];
                         for (int i = 1; i < segs.length; i++) {
-                            patterns[i-1] = Pattern.compile(segs[i]);
+                            patterns[i - 1] = Pattern.compile(segs[i]);
                         }
                         outputs.add(segs[0]);
                         inputs.add(patterns);
@@ -103,7 +106,10 @@ public class MultiTransformProcessor implements SpyProcessor {
             log.error(ZorkaLogger.ZSP_SUBMIT, "I/O error while reading file: " + cfgFile, e);
         } finally {
             if (rdr != null) {
-                try { rdr.close(); } catch (IOException e) { }
+                try {
+                    rdr.close();
+                } catch (IOException e) {
+                }
             }
         }
     }
@@ -118,12 +124,13 @@ public class MultiTransformProcessor implements SpyProcessor {
             vals[i] = ObjectInspector.substitute(srcExprs.get(i), record);
         }
 
-        for (int inp =  0; inp < inputs.size(); inp++) {
+        for (int inp = 0; inp < inputs.size(); inp++) {
             Pattern[] patterns = inputs.get(inp);
             boolean matches = true;
             for (int i = 0; i < vals.length; i++) {
-                if (! patterns[i].matcher(vals[i]).matches()) {
-                    matches = false; break;
+                if (!patterns[i].matcher(vals[i]).matches()) {
+                    matches = false;
+                    break;
                 }
             }
             if (matches) {

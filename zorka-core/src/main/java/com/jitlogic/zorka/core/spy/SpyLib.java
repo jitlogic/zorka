@@ -26,6 +26,7 @@ import com.jitlogic.zorka.core.normproc.Normalizer;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaLogLevel;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import com.jitlogic.zorka.core.spy.plugins.*;
 
 import java.util.*;
 import java.util.regex.Matcher;

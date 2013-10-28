@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.util.Map;
 
@@ -30,25 +31,31 @@ import java.util.Map;
  */
 public class GetterProcessor implements SpyProcessor {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** Source field */
+    /**
+     * Source field
+     */
     private String srcField;
 
-    /** Destination field */
+    /**
+     * Destination field
+     */
     private String dstField;
 
-    /** Attribute chain */
+    /**
+     * Attribute chain
+     */
     private Object[] attrChain;
 
     /**
      * Creates new getter processor.
      *
-     * @param srcField source field
-     *
-     * @param dstField destination field
-     *
+     * @param srcField  source field
+     * @param dstField  destination field
      * @param attrChain attribute chain
      */
     public GetterProcessor(String srcField, String dstField, Object... attrChain) {
@@ -59,7 +66,7 @@ public class GetterProcessor implements SpyProcessor {
 
 
     @Override
-    public Map<String,Object> process(Map<String,Object> record) {
+    public Map<String, Object> process(Map<String, Object> record) {
         Object val = ObjectInspector.get(record.get(srcField), attrChain);
 
         if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {

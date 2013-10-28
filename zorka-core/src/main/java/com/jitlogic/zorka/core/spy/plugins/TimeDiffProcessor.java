@@ -14,7 +14,9 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.plugins;
+
+import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.util.Map;
 
@@ -25,23 +27,27 @@ import java.util.Map;
  */
 public class TimeDiffProcessor implements SpyProcessor {
 
-    /** Field containing start timestamp */
+    /**
+     * Field containing start timestamp
+     */
     private String tstart;
 
-    /** Field containing stop timestamp */
+    /**
+     * Field containing stop timestamp
+     */
     private String tstop;
 
-    /** Field containing result timestamp */
+    /**
+     * Field containing result timestamp
+     */
     private String rslt;
 
     /**
      * Creates time difference calculating processor
      *
      * @param tstart start timestamp field
-     *
-     * @param tstop stop timestamp field
-     *
-     * @param rslt result field
+     * @param tstop  stop timestamp field
+     * @param rslt   result field
      */
     public TimeDiffProcessor(String tstart, String tstop, String rslt) {
         this.tstart = tstart;
@@ -51,13 +57,13 @@ public class TimeDiffProcessor implements SpyProcessor {
 
 
     @Override
-    public Map<String,Object> process(Map<String,Object> record) {
-        Object  v1 = record.get(tstart),
+    public Map<String, Object> process(Map<String, Object> record) {
+        Object v1 = record.get(tstart),
                 v2 = record.get(tstop);
 
         if (v1 instanceof Long && v2 instanceof Long) {
-            long l1 = (Long)v1, l2 = (Long)v2;
-            record.put(rslt, l2-l1);
+            long l1 = (Long) v1, l2 = (Long) v2;
+            record.put(rslt, l2 - l1);
         } // TODO else (log something here ?)
 
         return record;

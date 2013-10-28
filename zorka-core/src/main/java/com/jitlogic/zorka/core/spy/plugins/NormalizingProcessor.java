@@ -13,11 +13,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.normproc.Normalizer;
+import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.util.Map;
 
@@ -28,26 +29,32 @@ import java.util.Map;
  */
 public class NormalizingProcessor implements SpyProcessor {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private static final ZorkaLog log = ZorkaLogger.getLog(NormalizingProcessor.class);
 
-    /** Source field */
+    /**
+     * Source field
+     */
     private String src;
 
-    /** Destination field */
+    /**
+     * Destination field
+     */
     private String dst;
 
-    /** Normalizer */
+    /**
+     * Normalizer
+     */
     private Normalizer normalizer;
 
 
     /**
      * Creates normalizing record processor.
      *
-     * @param src source field
-     *
-     * @param dst destination field
-     *
+     * @param src        source field
+     * @param dst        destination field
      * @param normalizer normalizer object
      */
     public NormalizingProcessor(String src, String dst, Normalizer normalizer) {
@@ -58,11 +65,11 @@ public class NormalizingProcessor implements SpyProcessor {
 
 
     @Override
-    public Map<String,Object> process(Map<String,Object> record) {
+    public Map<String, Object> process(Map<String, Object> record) {
 
         Object v = record.get(src);
 
-        String s = (v instanceof String) ? normalizer.normalize((String)v) : null;
+        String s = (v instanceof String) ? normalizer.normalize((String) v) : null;
 
         if (ZorkaLogger.isAgentLevel(ZorkaLogger.ZSP_ARGPROC)) {
             log.debug(ZorkaLogger.ZAG_TRACES, "Normalizing: '" + v + "' -> '" + s + "'");

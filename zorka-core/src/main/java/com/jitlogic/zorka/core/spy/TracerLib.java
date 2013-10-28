@@ -20,6 +20,7 @@ import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.tracedata.FileTraceOutput;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
+import com.jitlogic.zorka.core.spy.plugins.*;
 import com.jitlogic.zorka.core.util.OverlayClassLoader;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 

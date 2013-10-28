@@ -14,10 +14,11 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.common.util.ObjectInspector;
+import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.util.Map;
 
@@ -28,39 +29,50 @@ import java.util.Map;
  */
 public class ThreadLocalProcessor implements SpyProcessor {
 
-    /** Command that calls ThreadLocal.get() method. */
+    /**
+     * Command that calls ThreadLocal.get() method.
+     */
     public static final int GET = 1;
 
-    /** Command that calls ThreadLocal.set() method. */
+    /**
+     * Command that calls ThreadLocal.set() method.
+     */
     public static final int SET = 2;
 
-    /** Command that calls ThreadLocal.remove() method. */
+    /**
+     * Command that calls ThreadLocal.remove() method.
+     */
     public static final int REMOVE = 3;
 
-    /** Record field that will be used to transfer value between record and thread local */
+    /**
+     * Record field that will be used to transfer value between record and thread local
+     */
     private String field;
 
-    /** Attribute chain - use if value accessed is reachable indirectly from spy record */
+    /**
+     * Attribute chain - use if value accessed is reachable indirectly from spy record
+     */
     private Object[] path;
 
-    /** Thread local operation (see above constants) */
+    /**
+     * Thread local operation (see above constants)
+     */
     private int operation;
 
-    /** Thread local object */
+    /**
+     * Thread local object
+     */
     private ThreadLocal<Object> threadLocal;
 
     /**
      * Constructs thread local processor.
      *
-     * @param field record field that will be accessed
-     *
-     * @param operation thread local operation
-     *
+     * @param field       record field that will be accessed
+     * @param operation   thread local operation
      * @param threadLocal thread local object
-     *
-     * @param path attribute chain
+     * @param path        attribute chain
      */
-    public ThreadLocalProcessor(String field, int operation, ThreadLocal<Object> threadLocal, Object...path) {
+    public ThreadLocalProcessor(String field, int operation, ThreadLocal<Object> threadLocal, Object... path) {
         this.field = field;
         this.operation = operation;
         this.threadLocal = threadLocal;
@@ -69,7 +81,7 @@ public class ThreadLocalProcessor implements SpyProcessor {
 
 
     @Override
-    public Map<String,Object> process(Map<String,Object> record) {
+    public Map<String, Object> process(Map<String, Object> record) {
         switch (operation) {
             case GET:
                 record.put(field, ObjectInspector.get(threadLocal.get(), path));

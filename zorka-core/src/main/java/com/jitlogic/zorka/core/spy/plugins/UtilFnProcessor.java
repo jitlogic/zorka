@@ -14,11 +14,12 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public class UtilFnProcessor implements SpyProcessor {
             case UF_STRTIME:
                 Object t = record.get(srcField);
                 if (t instanceof Long) {
-                    record.put(dstField, ZorkaUtil.strTime((Long)t));
+                    record.put(dstField, ZorkaUtil.strTime((Long) t));
                 } else {
                     log.error(ZorkaLogger.ZSP_ERRORS, "Cannot process value " + t + ": must be of type Long.");
                 }

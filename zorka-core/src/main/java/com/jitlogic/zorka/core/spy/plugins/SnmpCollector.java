@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.core.integ.SnmpLib;
 import com.jitlogic.zorka.core.integ.SnmpTrapper;
@@ -22,6 +22,7 @@ import com.jitlogic.contrib.libsnmp.*;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.util.Map;
 
@@ -33,44 +34,53 @@ import java.util.Map;
  */
 public class SnmpCollector implements SpyProcessor {
 
-    /** Logger object */
+    /**
+     * Logger object
+     */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** SNMP trapper */
+    /**
+     * SNMP trapper
+     */
     private SnmpTrapper trapper;
 
-    /** Enterprise OID */
+    /**
+     * Enterprise OID
+     */
     private SNMPObjectIdentifier oid;
 
-    /** Trap type group */
+    /**
+     * Trap type group
+     */
     private int gtrap;
 
-    /** Trap type */
+    /**
+     * Trap type
+     */
     private int strap;
 
-    /** OID prefix for trap attributes */
+    /**
+     * OID prefix for trap attributes
+     */
     private String oprefix;
 
-    /** Record fields - trap attributes map. */
+    /**
+     * Record fields - trap attributes map.
+     */
     private TrapVarBindDef[] varBindDefs;
 
     /**
      * Creates SNMP collector.
      *
-     * @param trapper SNMP trapper
-     *
-     * @param oid enterprise OID
-     *
-     * @param gtrap trap type group
-     *
-     * @param strap trap type
-     *
-     * @param oprefix OID prefix for attributes
-     *
+     * @param trapper     SNMP trapper
+     * @param oid         enterprise OID
+     * @param gtrap       trap type group
+     * @param strap       trap type
+     * @param oprefix     OID prefix for attributes
      * @param varBindDefs mappings from record fields to trap attributes
      */
     public SnmpCollector(SnmpTrapper trapper, String oid, int gtrap, int strap,
-                         String oprefix, TrapVarBindDef...varBindDefs) {
+                         String oprefix, TrapVarBindDef... varBindDefs) {
         try {
             this.trapper = trapper;
             this.oprefix = oprefix;
@@ -85,7 +95,7 @@ public class SnmpCollector implements SpyProcessor {
 
 
     @Override
-    public Map<String,Object> process(Map<String,Object> record) {
+    public Map<String, Object> process(Map<String, Object> record) {
         SNMPVariablePair[] vars = new SNMPVariablePair[varBindDefs.length];
 
         try {
