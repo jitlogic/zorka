@@ -97,67 +97,100 @@ __cas() {
     .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request))
     .onReturn(spy.put("ACTION", "AUTHENTICATION_SUCCESS"))
     .onError(spy.put("ACTION", "AUTHENTICATION_FAILED"))
-    .onSubmit(spy.zorkaStats("java", mbean, "stats", "AUTHENTICATION"))
+    .onSubmit(spy.strTime("TIME"), spy.zorkaStats("java", mbean, "stats", "AUTHENTICATION"), tracer.attr("ACTION", "ACTION"))
     .include(spy.byMethod("org.jasig.cas.authentication.AbstractAuthenticationManager", "authenticate"));
 
 
-  audit(sdefAuth, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO}");
+  audit(sdefAuth, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} time=${TIME}");
 
 
   // TGT-s created
   sdefTgtCreated = spy.instrument()
     .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request))
-    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_CREATED"))
+    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_CREATED"), tracer.attr("WHAT", "WHAT"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_NOT_CREATED"))
-    .onSubmit(spy.zorkaStats("java", mbean, "stats", "TGT_CREATE"))
+    .onSubmit(spy.strTime("TIME"), spy.zorkaStats("java", mbean, "stats", "TGT_CREATE"), tracer.attr("ACTION", "ACTION"))
     .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "createTicketGrantingTicket"));
 
-  audit(sdefTgtCreated, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT}");
+  audit(sdefTgtCreated, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT} time=${TIME}");
 
 
   // TGT-s destroyed
   sdefTgtDestroyed = spy.instrument()
-    .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request))
+    .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request), tracer.begin("CAS"), tracer.attr("WHO", "WHO"))
     .onReturn(spy.put("WHAT", ""), spy.put("ACTION", "TICKET_GRANTING_TICKET_DESTROYED"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_NOT_DESTROYED"))
-    .onSubmit(spy.zorkaStats("java", mbean, "stats", "TGT_DESTROY"))
+    .onSubmit(spy.strTime("TIME"), spy.zorkaStats("java", mbean, "stats", "TGT_DESTROY"), tracer.attr("ACTION", "ACTION"))
     .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "destroyTicketGrantingTicket"));
 
-  audit(sdefTgtDestroyed, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT}");
+  audit(sdefTgtDestroyed, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT} time=${TIME}");
+
 
 
   // Service tickets granted
   sdefSvcGranted = spy.instrument()
-    .onEnter(spy.fetchArg("TGT", 1), spy.fetchArg("SERVICE", 2), spy.fetchArg("WHO", 2), spy.tlGet("REQ", request))
-    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "SERVICE_TICKET_GRANTED"))
+    .onEnter(spy.fetchArg("TGT", 1), spy.fetchArg("SERVICE", 2), spy.fetchArg("WHO", 2), spy.tlGet("REQ", request), 
+      tracer.begin("CAS"), tracer.attr("TGT", "TGT"), 
+      spy.format("SERVICE", "${SERVICE}"), tracer.attr("SERVICE", "SERVICE"), 
+      spy.format("WHO", "${WHO}"), tracer.attr("WHO", "WHO"))
+    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "SERVICE_TICKET_GRANTED"), tracer.attr("WHAT", "WHAT"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "SERVICE_TICKET_NOT_GRANTED"))
-    .onSubmit(spy.zorkaStats("java", mbean, "stats", "SVT_GRANT"))
-    .include(spy.byMethod(1, "org.jasig.cas.CentralAuthenticationServiceImpl", "grantServiceTicket", 
+    .onSubmit(spy.strTime("TIME"), spy.zorkaStats("java", mbean, "stats", "SVT_GRANT"), tracer.attr("ACTION", "ACTION"))
+    .include(spy.byMethod(1, "org.jasig.cas.CentralAuthenticationServiceImpl", "grantServiceTicket", "String",
         "String", "org.jasig.cas.authentication.principal.Service", "org.jasig.cas.authentication.principal.Credentials"));
 
-  audit(sdefSvcGranted, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} service=${SERVICE} tgt=${TGT} what=${WHAT}");
+  audit(sdefSvcGranted, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} service=${SERVICE} tgt=${TGT} what=${WHAT} time=${TIME}");
 
 
   // Proxy granting ticket created
   sdefProxyGranted = spy.instrument()
-    .onEnter(spy.fetchArg("TICKET", 1), spy.fetchArg("WHO", 2), spy.tlGet("REQ", request))
-    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "PROXY_GRANTING_TICKET_CREATED"))
+    .onEnter(spy.fetchArg("TICKET", 1), spy.fetchArg("WHO", 2), spy.tlGet("REQ", request), 
+      tracer.begin("CAS"), tracer.attr("TICKET", "TICKET"), tracer.attr("WHO", "WHO"))
+    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "PROXY_GRANTING_TICKET_CREATED"), tracer.attr("WHAT", "WHAT"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "PROXY_GRANTING_TICKET_NOT_CREATED"))
-    .onSubmit(spy.zorkaStats("java", mbean, "stats", "PROXY_CREATE"))
+    .onSubmit(spy.strTime("TIME"), spy.zorkaStats("java", mbean, "stats", "PROXY_CREATE"), tracer.attr("ACTION", "ACTION"))
     .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "delegateTicketGrantingTicket"));
 
-  audit(sdefProxyGranted, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT} serviceTicket=${TICKET}");
+  audit(sdefProxyGranted, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT} serviceTicket=${TICKET} time=${TIME}");
+
+
+
+  process_ticket() {
+    process(rec) {
+      //zorka.logInfo("Processing ticket ...");
+      registry = zorka.get(rec.get("THIS"), "serviceTicketRegistry");
+      if (registry != null) {
+        ticket = registry.getTicket(rec.get("TICKET"));
+        if (ticket != null) {
+          t = System.currentTimeMillis() - ticket.getCreationTime();
+          rec.put("TICKET_AGE_MS", t);
+          tracer.newAttr("TICKET_AGE_MS", t);
+          if (t > 1000) {
+            tracer.newFlags(tracer.SUBMIT_TRACE);
+          }
+          rec.put("TA", 1000000L * t);
+        } else zorka.logInfo("Ticket " + rec.get("TICKET") + " not found.");
+      } else zorka.logInfo("Service registry not found.");
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
 
 
   // Validate service ticket
   sdefSvcValidate = spy.instrument()
-    .onEnter(spy.fetchArg("TICKET", 1), spy.fetchArg("SERVICE", 1), spy.tlGet("REQ", request))
+    .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("TICKET", 1), spy.fetchArg("SERVICE", 2), spy.tlGet("REQ", request), 
+      tracer.begin("CAS"), process_ticket(), tracer.attr("TICKET", "TICKET"), 
+      spy.format("SERVICE", "${SERVICE}"), tracer.attr("SERVICE", "SERVICE"))
     .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "SERVICE_TICKET_VALIDATE_SUCCESS"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "SERVICE_TICKET_VALIDATE_FAILURE"))
-    .onSubmit(spy.zorkaStats("java", mbean, "stats", "SVT_VALIDATE"))
+    .onSubmit(spy.strTime("TIME"), tracer.attr("ACTION", "ACTION"),
+      spy.zorkaStats("java", mbean, "stats", "SVT_VALIDATE"), 
+      spy.zorkaStats("java", mbean, "stats", "TICKET_AGE", "TA"))
     .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "validateServiceTicket"));
 
-  audit(sdefSvcValidate, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} what=${WHAT} serviceTicket=${TICKET} service=${SERVICE}");
+  audit(sdefSvcValidate, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} what=${WHAT} serviceTicket=${TICKET} service=${SERVICE} time=${TIME} ticketAge=${TICKET_AGE_MS}ms");
 
 
   // Delete a service
@@ -165,7 +198,7 @@ __cas() {
     .onEnter(spy.fetchArg("ID", 1), spy.tlGet("REQ", request))
     .onReturn(spy.put("RESULT", "OK"), spy.put("ACTION", "DELETE_SERVICE_SUCCESS"))
     .onError(spy.fetchError("RESULT"), spy.put("ACTION", "DELETE_SERVICE_FAILURE"))
-    .onSubmit(spy.zorkaStats("java", mbean, "stats", "SERVICE_DELETE"))
+    .onSubmit(spy.strTime("TIME"), spy.zorkaStats("java", mbean, "stats", "SERVICE_DELETE"))
     .include(spy.byMethod("org.jasig.cas.DefaultServicesManagerImpl", "delete"));
 
   audit(sdefSvcDelete, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} result=${RESULT} id=${ID}");
@@ -176,10 +209,10 @@ __cas() {
     .onEnter(spy.fetchArg("SERVICE", 1), spy.tlGet("REQ", request))
     .onReturn(spy.fetchRetVal("RESULT"), spy.put("ACTION", "SAVE_SERVICE_SUCCESS"))
     .onError(spy.fetchError("RESULT"), spy.put("ACTION", "SAVE_SERVICE_FAILURE"))
-    .onSubmit(spy.zorkaStats("java", mbean, "stats", "SERVICE_SAVE"))
+    .onSubmit(spy.strTime("TIME"), spy.zorkaStats("java", mbean, "stats", "SERVICE_SAVE"))
     .include(spy.byMethod("org.jasig.cas.DefaultServicesManagerImpl", "save"));
 
-  audit(sdefSvcSave, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} service=${SERVICE} result=${RESULT}");
+  audit(sdefSvcSave, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} service=${SERVICE} result=${RESULT} time=${TIME}");
 
 
   discovery() {
