@@ -158,8 +158,9 @@ public class SpyMatcher {
         } else if (symbolName.startsWith("~")) {
             return Pattern.compile(symbolName.substring(1));
         } else {
-            return Pattern.compile(symbolName.replaceAll("\\.", "\\\\.")
-                    .replaceAll("\\*\\*", ".+").replaceAll("\\*", "[a-zA-Z0-9_]+"));
+            String s = symbolName.replaceAll("\\.", "\\\\.").replaceAll("\\$", "\\\\\\$")
+                    .replaceAll("\\*\\*", ".+").replaceAll("\\*", "[a-zA-Z0-9_]+");
+            return Pattern.compile(s);
         }
     }
 

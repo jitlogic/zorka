@@ -136,7 +136,6 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
         Assert.assertTrue(sms.methodMatch(null, Arrays.asList("Lsome.Annotation;"), null, 1, "trivialMethod", "()V", null));
     }
 
-
     @Test
     public void testMatchWithFilterExclusion() {
         SpyMatcherSet sms = new SpyMatcherSet(
@@ -147,7 +146,6 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
         Assert.assertTrue(sms.classMatch("org.apache.catalina.Valve"));
         Assert.assertFalse(sms.classMatch("java.util.Properties"));
     }
-
 
     @Test
     public void testMatchMethodsWithFilterExclusion() {
@@ -161,5 +159,9 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
         Assert.assertFalse(sms.methodMatch("com.jitlogic.foo.SomeClass", null, null, 1, "otherMethod", "()V", null));
     }
 
-
+    @Test
+    public void testMatchInnerClass() {
+        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod("some.Class$1", "run"));
+        Assert.assertTrue(sms.methodMatch("some.Class$1", null, null, 1, "run", "()V", null));
+    }
 }
