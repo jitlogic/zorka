@@ -15,11 +15,17 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Set defaults
+zorka.defCfg("tracer.min.trace.time", 1000);
+zorka.defCfg("tracer.min.method.time", 250000);
+zorka.defCfg("tracer.max.trace.records", 4096);
 
 if (zorka.boolCfg("tracer", false)) {
 
   zorka.logInfo("Enabling tracer for JBoss.");
   zorka.loadCfg("tracer.properties");
+
+
 
   for (String pkg : zorka.listCfg("tracer.include.extra")) {
     if (pkg.contains("/")) {
@@ -89,19 +95,19 @@ if (zorka.boolCfg("tracer", false)) {
   }
 
   if (zorka.hasCfg("tracer.min.method.time")) {
-    mmt = zorka.longCfg("tracer.min.method.time", 250000);
+    mmt = zorka.longCfg("tracer.min.method.time");
     zorka.logInfo("Setting tracer minimum method time to " + mmt + " ns");
     tracer.setTracerMinMethodTime(mmt);
   }
 
   if (zorka.hasCfg("tracer.min.trace.time")) {
-    mtt = zorka.longCfg("tracer.min.trace.time", 100);
+    mtt = zorka.longCfg("tracer.min.trace.time");
     zorka.logInfo("Settting tracer minimum trace time to " + mtt + " ms");
     tracer.setTracerMinTraceTime(mtt);
   }
 
   if (zorka.hasCfg("tracer.max.trace.records")) {
-    mtr = zorka.intCfg("tracer.max.trace.records", 4096);
+    mtr = zorka.intCfg("tracer.max.trace.records");
     zorka.logInfo("Setting maximum records per trace to " + mtr + ".");
     tracer.setTracerMaxTraceRecords(mtr);
   }
