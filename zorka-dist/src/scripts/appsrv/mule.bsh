@@ -20,6 +20,7 @@ __mule() {
 
     zorka.defCfg("mule.trace", zorka.boolCfg("tracer"));
     zorka.defCfg("mule.flow.time", zorka.longCfg("tracer.min.trace.time"));
+    zorka.defCfg("mule.component.time", zorka.longCfg("tracer.min.trace.time"));
     zorka.defCfg("mule.dispatch.time", zorka.longCfg("tracer.min.trace.time"));
 
     zorka.defCfg("mule.stats", "yes");
@@ -69,7 +70,12 @@ __mule() {
     // Mule Components
     spy.add(spy.instrument()
         .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("EVENT", 1),
+            spy.format("FLOW", "${EVENT.flowConstruct.name}"),
+            spy.format("APPLICATION", "${EVENT.message.muleContext.config.id}"),
             _trace ? spy.subchain(
+                tracer.begin("COMPONENT", zorka.longCfg("mule.component.time")),
+                tracer.attr("APPLICATION", "APPLICATION"),
+                tracer.attr("FLOW", "FLOW"),
                 spy.get("ANNOTATIONS", "THIS", "annotations"),
                 extract_annotations()
             ) : null)
@@ -77,7 +83,7 @@ __mule() {
             _stats ? spy.subchain(
                 spy.zorkaStats("java", _mbean, "stats", "ALL"),
                 spy.zorkaStats("java", _mbean, "stats", "COMPONENTS"),
-                spy.zorkaStats("java", _mbean, "components", "${NAME}")
+                spy.zorkaStats("java", _mbean, "components", "${APPLICATION}:${FLOW}.${NAME}")
             ) : null)
         .include(
             spy.byMethod(0, "org.mule.**Component", "doInvoke", "Object", "org.mule.api.MuleEvent")));
@@ -87,8 +93,9 @@ __mule() {
 
     // Mule Transformers
     spy.add(spy.instrument()
-        .onEnter(spy.fetchArg("THIS", 0),
+        .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("MSG", 1),
             spy.format("CLASS", "${THIS.class}"),
+            spy.format("APPLICATION", "${MSG.muleContext.configuration.id}"),
             _trace ? spy.subchain(
                 spy.get("ANNOTATIONS", "THIS", "annotations"),
                 tracer.attr("CLASS", "CLASS"),
@@ -107,10 +114,11 @@ __mule() {
     spy.add(spy.instance()
         .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("MSG", 1),
             spy.format("CLASS", "${THIS.class}"),
+            spy.format("FLOW", "${MSG.flowConstruct.name}"),
             _trace ? spy.subchain(
                 tracer.formatAttr("MSG_ID", "${MSG.uniqueId}"),
                 spy.get("COR_ID", "MSG", "correlationId"), tracer.attr("COR_ID", "COR_ID"),
-                spy.get("TYPE", "MSG", "payload", "class"), tracer.attr("MSG_TYPE", "TYPE"),
+                tracer.formatAttr("PAYLOAD", "${MSG.payload}"),
                 spy.get("EXPR", "THIS", "expression"), tracer.attr("EXPR", "EXPR")
             ) : null)
         .onReturn(
@@ -134,19 +142,22 @@ __mule() {
             spy.get("URI", "THIS", "endpoint", "address"),
             spy.get("ENDPOINT", "THIS", "endpoint", "name"),
             spy.get("ANNOTATIONS", "THIS", "endpoint", "annotations"),
+            spy.format("APPLICATION", "${MSG.muleContext.configuration.id}"),
+            spy.format("FLOW", "${MSG.flowConstruct.name}"),
             _trace ? spy.subchain(
                 tracer.begin("DISPATCH", zorka.longCfg("mule.dispatch.time")),
                 tracer.attr("PROTOCOL", "PROTOCOL"),
                 tracer.attr("URI", "URI"),
                 tracer.attr("ENDPOINT", "ENDPOINT"),
-                tracer.formatAttr("CLASS", "${THIS.class}"),
+                tracer.attr("APPLICATION", "APPLICATION"),
+                tracer.attr("FLOW", "FLOW"),
                 extract_annotations()
             ) : null)
         .onSubmit(
             _stats ? spy.subchain(
                 spy.zorkaStats("java", _mbean, "stats", "ALL"),
                 spy.zorkaStats("java", _mbean, "stats", "DISPATCHERS"),
-                spy.zorkaStats("java", _mbean, "dispatchers", "${NAME}")
+                spy.zorkaStats("java", _mbean, "dispatchers", "${APPLICATION}:${FLOW}.${NAME}")
             ) : null)
         .include(
           spy.byMethod(0, "org.mule.**Dispatcher", "doSend", "org.mule.api.MuleMessage", "org.mule.api.MuleEvent"),
@@ -155,19 +166,22 @@ __mule() {
     tracer.include(spy.byMethod(0, "org.mule.**Dispatcher", "doSend", "org.mule.api.MuleMessage", "org.mule.api.MuleEvent"));
     tracer.include(spy.byMethod(0, "org.mule.**Dispatcher", "doDispatch", "void", "org.mule.api.MuleEvent"));
 
+
     // Mule Flow execution
     spy.add(spy.instrument()
         .onEnter(spy.fetchArg("THIS", 0),
-            spy.format("NAME", "${THIS.val$messageProcessContext.flowConstruct.name}"),
+            spy.format("APPLICATION", "${THIS.val$messageProcessContext.flowExecutionWorkManager.muleContext.configuration.id}"),
+            spy.format("FLOW", "${THIS.val$messageProcessContext.flowConstruct.name}"),
             _trace ? spy.subchain(
                 tracer.begin("FLOW", zorka.longCfg("mule.flow.time")),
-                tracer.attr("NAME", "NAME")
+                tracer.attr("APPLICATION", "APPLICATION"),
+                tracer.attr("FLOW", "FLOW")
             ) : null)
         .onSubmit(
             _stats ? spy.subchain(
                 spy.zorkaStats("java", _mbean, "stats", "ALL"),
                 spy.zorkaStats("java", _mbean, "stats", "FLOWS"),
-                spy.zorkaStats("java", _mbean, "flows", "${NAME}")
+                spy.zorkaStats("java", _mbean, "flows", "${APPLICATION}:${FLOW}")
             ) : null)
         .include(spy.byMethod("org.mule.execution.FlowProcessingPhase$1", "run")));
 
