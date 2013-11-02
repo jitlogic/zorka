@@ -47,40 +47,22 @@ __jvm() {
     return 100.0 * fd_used.longValue() / fd_max.longValue();
   }
 
-  if (zorka.boolCfg("perfmon", false)) {
-
-    qmpUsed = zorka.query("java", "java.lang:type=MemoryPool,*", "name").get("Usage", "used")
-      .metric(perfmon.metric("MP ${name} usage", "B"));
-
-    qmpUtil = zorka.query("java", "java.lang:type=MemoryPool,*", "name").get("Usage")
-      .metric(perfmon.util("MP ${name} utilization", "%", "used", "max"));
-
-    qgcCycles = zorka.query("java", "java.lang:type=GarbageCollector,*", "name").get("CollectionCount")
-      .metric(perfmon.timedDelta("GC ${name} cycles per minute", "cycles/min").multiply(60));
-
-    qgcUtil = zorka.query("java", "java.lang:type=GarbageCollector,*", "name").get("CollectionTime")
-      .metric(perfmon.delta("GC ${name} CPU utilization", "%").multiply(0.1));
-
-    qmhUsed = zorka.query("java", "java.lang:type=Memory").listAs("~.*MemoryUsage$", "name").get("used")
-      .metric(perfmon.metric("MH ${name} usage", "B"));
-
-    qmhUtil = zorka.query("java", "java.lang:type=Memory").listAs("~.*MemoryUsage$", "name")
-      .metric(perfmon.util("MH ${name} utilization", "%", "used", "max"));
-
-    scanner = perfmon.scanner("JVM", qmpUsed, qmpUtil, qgcCycles, qgcUtil, qmhUsed, qmhUtil);
-
-    interval = zorka.longCfg("perfmon.interval", 10000L);
-
-    zorka.schedule(scanner, interval, interval);
-
-  } // perfmon = yes
-
 
   if (zorka.boolCfg("jvm.hiccup", true)) {
     mbean = zorka.stringCfg("jvm.hiccup.mbean", "zorka:type=ZorkaStats,name=Hiccup");
     perfmon.cpuHiccup("java", mbean, "CPU", 10, 30000).start();
-    perfmon.memHiccup("java", mbean, "MEM").start();
   } // hiccup = yes
+
+
+  if (zorka.boolCfg("tracer")) {
+      tracer.exclude(
+          spy.byClass("java.**"),
+          spy.byClass("sun.reflect.**"),
+          spy.byClass("sun.awt.**"),
+          spy.byClass("com.sun.beans.**"),
+          spy.byClass("$Proxy*")
+      );
+  }
 
 
   return this;

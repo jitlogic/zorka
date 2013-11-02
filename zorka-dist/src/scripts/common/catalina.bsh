@@ -117,6 +117,16 @@ __catalina() {
       http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
     .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
 
+
+  if (zorka.boolCfg("tracer")) {
+    tracer.exclude(
+        spy.byClass("org.apache.tomcat.util.**"),
+        spy.byClass("org.apache.catalina.security.**"),
+        spy.byClass("org.apache.catalina.core.ApplicationCont**"),
+        spy.byClass("org.apache.catalina.connector.**")     // TODO but this is sometimes useful for resolving connectivity problems
+    );
+  }
+
   return this;
 }
 

@@ -15,25 +15,13 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-__h2db() {
+// This file contains agent configurations for a variety of Apache libraries
 
-  spy.add(sql._instrumentStmt("H2_SQL_1", "${THIS.conn.url}")
-    .include(
-      spy.byMethod(spy.AC_PUBLIC, "org.h2.jdbc.JdbcStatement", "execut*", null, "String")));
-
-  spy.add(sql._instrumentPStmt("H2_SQL_2", "${THIS.conn.url}", "${THIS.sqlStatement}")
-    .include(
-      spy.byMethod("org.h2.jdbc.JdbcPreparedStatement", "execut*"),
-      spy.byMethod("org.h2.jdbc.JdbcCallableStatement", "execut*")));
-
-
-  if (zorka.boolCfg("tracer")) {
-      tracer.exclude(spy.byClass("org.h2.**"));
-  }
-
-  return this;
+// Tracer tuning
+if (zorka.boolCfg("tracer")) {
+    tracer.exclude(
+        spy.byClass("org.apache.xerces.**"),
+        spy.byClass("org.apache.xml.**"),
+        spy.byClass("org.apache.el.**")
+    );
 }
-
-
-h2db = __h2db();
-

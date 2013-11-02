@@ -92,6 +92,10 @@ __jboss() {
     .include(spy.byMethod(0, "org.jboss.naming.NamingService", "startService", null)));
 
 
+  if (zorka.boolCfg("tracer")) {
+      tracer.exclude(spy.byClass("org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate").priority(250));
+  }
+
   return this;
 }
 

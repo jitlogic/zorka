@@ -67,7 +67,7 @@ __http() {
 
   // Default values for HTTP tracer options 
   zorka.defCfg("http.trace", zorka.stringCfg("tracer"));
-  zorka.defCfg("http.trace.time", "1000");
+  zorka.defCfg("http.trace.time", zorka.longCfg("tracer.min.trace.time"));
   zorka.defCfg("http.trace.include", "");
   zorka.defCfg("http.trace.exclude", "/favicon.ico");
 

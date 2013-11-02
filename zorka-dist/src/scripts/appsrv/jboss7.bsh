@@ -143,6 +143,17 @@ __jboss7() {
     .onReturn((com.jitlogic.zorka.core.spy.SpyProcessor)__mbsRegister())
     .include(spy.byMethod(spy.AC_STATIC, "org.jboss.modules.ModuleLoader", "installMBeanServer", "void")));
 
+  if (zorka.boolCfg("tracer")) {
+    tracer.exclude(spy.byClass("org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate").priority(100));
+    tracer.exclude(
+        spy.byClass("org.jboss.weld.**"),
+        spy.byClass("org.jboss.modules.**"),
+        spy.byClass("org.jboss.logging.**"),
+        spy.byClass("org.jboss.logmanager.**"),
+        spy.byClass("org.jboss.as.weld.webtier.jsf.**"),
+        spy.byClass("org.jboss.vfs.**"),
+        spy.byClass("org.jboss.modules.ConcurrentClassLoader"));
+  }
 
   return this;
 }
