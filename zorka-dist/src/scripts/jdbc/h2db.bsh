@@ -29,9 +29,6 @@ __h2db() {
 
   if (zorka.boolCfg("tracer")) {
       tracer.exclude(spy.byClass("org.h2.**").priority(750));
-      tracer.include(spy.byMethod(spy.AC_PUBLIC, "org.h2.jdbc.JdbcStatement", "execut*", null, "String").priority(250));
-      tracer.include(spy.byMethod("org.h2.jdbc.JdbcPreparedStatement", "execut*").priority(250));
-      tracer.include(spy.byMethod("org.h2.jdbc.JdbcCallableStatement", "execut*").priority(250));
   }
 
   return this;

@@ -27,9 +27,6 @@ __mysql() {
 
   if (zorka.boolCfg("tracer")) {
       tracer.exclude(spy.byClass("com.mysql.**").priority(750));
-      tracer.include(spy.byMethod(spy.AC_PUBLIC, "com.mysql.jdbc.StatementImpl", "execut*", null, "String").priority(250));
-      tracer.include(spy.byMethod("com.mysql.jdbc.PreparedStatement", "execut*").priority(250));
-      tracer.include(spy.byMethod("com.mysql.jdbc.CallableStatement", "execut*").priority(250));
   }
 
   return this;

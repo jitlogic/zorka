@@ -30,10 +30,6 @@ __pgsql() {
 
   if (zorka.boolCfg("tracer")) {
       tracer.exclude(spy.byClass("org.postgresql.**").priority(750));
-      tracer.include(spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, "String").priority(250));
-      tracer.include(spy.byMethod(0, "org.postgresql.jdbc3.AbstractJdbc3Statement", "execute*", null, "String").priority(250));
-      tracer.include(spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, spy.SM_NOARGS).priority(250));
-      tracer.include(spy.byMethod(0, "org.postgresql.jdbc3.AbstractJdbc3Statement", "execute*", null, spy.SM_NOARGS).priority(250));
   }
 
   return this;

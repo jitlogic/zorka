@@ -28,9 +28,6 @@ __oracle() {
 
   if (zorka.boolCfg("tracer")) {
       tracer.exclude(spy.byClass("oracle.jdbc.**").priority(750));
-      tracer.include(spy.byMethod(0, "oracle.jdbc.driver.OracleStatement", "execute*", null, "String").priority(250));
-      tracer.include(spy.byMethod(0, "oracle.jdbc.driver.OraclePreparedStatement", "execute*", null, spy.SM_NOARGS).priority(250));
-      tracer.include(spy.byMethod(0, "oracle.jdbc.driver.OracleCallableStatement", "execute*", null, spy.SM_NOARGS).priority(250));
   }
 
   return this;
