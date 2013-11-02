@@ -103,8 +103,8 @@ __sql() {
     return zorka.rate("java", _mbean, attr, tag, "time", "calls", "AVG15");
   }
 
-  _instrumentStmt(dbform) {
-    return spy.instrument()
+  _instrumentStmt(name, dbform) {
+    return spy.instrument(name)
     .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("SQL", 1),
       spy.format("DB", dbform),
       _trace ? tracer.attr("SQL", "SQL") : null,
@@ -121,8 +121,8 @@ __sql() {
       _stats ? spy.zorkaStats("java", _mbean, "stats", "${DB}") : null);
   }
 
-  _instrumentPStmt(dbform, sqlform) {
-    return spy.instrument()
+  _instrumentPStmt(name, dbform, sqlform) {
+    return spy.instrument(name)
     .onEnter(spy.fetchArg("THIS", 0),
       spy.format("SQL", sqlform),
       spy.format("DB", dbform),

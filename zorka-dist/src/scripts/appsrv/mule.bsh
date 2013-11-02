@@ -30,15 +30,15 @@ __mule() {
     _stats = zorka.boolCfg("mule.stats");
     _mbean = zorka.stringCfg("mule.stats.mbean");
 
-//    spy.add(spy.instance()
+//    spy.add(spy.instance("MULE_TEST1")
 //        .onEnter(tracer.begin("HTTP", 0))
 //        .include(spy.byMethod(0, "~.*HttpWorker$", "doRequest", null)));
 
-//    spy.add(spy.instrument()
+//    spy.add(spy.instrument("MULE_TEST2")
 //        .onEnter(spy.zorkaLog("INFO", "Mule", "runPhase() executed."), show_stack())
 //        .include(spy.byMethod("org.mule.execution.FlowProcessingPhase", "runPhase")));
 
-//    spy.add(spy.instrument()
+//    spy.add(spy.instrument("MULE_TEST3")
 //        .onEnter(tracer.begin("WORK", 0))
 //        .include(spy.byMethod("org.mule.work.WorkerContext", "run")));
 
@@ -68,7 +68,7 @@ __mule() {
 
 
     // Mule Components
-    spy.add(spy.instrument()
+    spy.add(spy.instrument("MULE_COMPONENT")
         .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("EVENT", 1),
             spy.format("FLOW", "${EVENT.flowConstruct.name}"),
             spy.format("APPLICATION", "${EVENT.message.muleContext.config.id}"),
@@ -92,7 +92,7 @@ __mule() {
 
 
     // Mule Transformers
-    spy.add(spy.instrument()
+    spy.add(spy.instrument("MULE_TRANSFORMER")
         .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("MSG", 1),
             spy.format("CLASS", "${THIS.class}"),
             spy.format("APPLICATION", "${MSG.muleContext.configuration.id}"),
@@ -111,7 +111,7 @@ __mule() {
 
 
     // Mule filters
-    spy.add(spy.instance()
+    spy.add(spy.instrument("MULE_FILTER")
         .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("MSG", 1),
             spy.format("CLASS", "${THIS.class}"),
             spy.format("FLOW", "${MSG.flowConstruct.name}"),
@@ -136,7 +136,7 @@ __mule() {
 
 
     // Mule Dispatchers
-    spy.add(spy.instance()
+    spy.add(spy.instrument("MULE_DISPATCH")
         .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("MSG", 1),
             spy.get("PROTOCOL", "THIS", "endpoint", "protocol"),
             spy.get("URI", "THIS", "endpoint", "address"),
@@ -168,7 +168,7 @@ __mule() {
 
 
     // Mule Flow execution
-    spy.add(spy.instrument()
+    spy.add(spy.instrument("MULE_FLOW")
         .onEnter(spy.fetchArg("THIS", 0),
             spy.format("APPLICATION", "${THIS.val$messageProcessContext.flowExecutionWorkManager.muleContext.configuration.id}"),
             spy.format("FLOW", "${THIS.val$messageProcessContext.flowConstruct.name}"),

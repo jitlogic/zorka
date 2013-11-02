@@ -81,7 +81,7 @@ public class SpyLibFunctionsUnitTest extends ZorkaFixture {
 
     @Test
     public void testCtxSubst() {
-        SpyContext ctx = new SpyContext(new SpyDefinition(), "some.pkg.TClass", "testMethod", "()V", 1);
+        SpyContext ctx = new SpyContext(spy.instance("x"), "some.pkg.TClass", "testMethod", "()V", 1);
 
         assertEquals("some.pkg.TClass", ctx.subst("${className}"));
         assertEquals("some.pkg", ctx.subst("${packageName}"));

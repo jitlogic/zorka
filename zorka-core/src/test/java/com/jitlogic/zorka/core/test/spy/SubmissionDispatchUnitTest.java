@@ -51,10 +51,10 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
     @Test
     public void testSubmitWithImmediateFlagAndCheckIfCollected() throws Exception {
         SpyDefinition sdef = engine.add(
-            SpyDefinition.instance().onEnter(spy.fetchTime("E0"))).onSubmit(collector);
+                spy.instance("x").onEnter(spy.fetchTime("E0"))).onSubmit(collector);
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "com.TClass", "tMethod", "()V", 1));
 
-        submitter.submit(ON_ENTER, ctx.getId(), SF_IMMEDIATE, new Object[] { 1L });
+        submitter.submit(ON_ENTER, ctx.getId(), SF_IMMEDIATE, new Object[]{1L});
 
         assertEquals(1, collector.size());
     }
@@ -62,23 +62,23 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
 
     @Test
     public void testSubmitWithBufferAndFlush() throws Exception {
-        SpyDefinition sdef = engine.add(SpyDefinition.instrument().onSubmit(collector));
+        SpyDefinition sdef = engine.add(spy.instrument("x").onSubmit(collector));
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "Class", "method", "()V", 1));
 
-        submitter.submit(ON_ENTER, ctx.getId(), SF_NONE, new Object[] { 1L });
+        submitter.submit(ON_ENTER, ctx.getId(), SF_NONE, new Object[]{1L});
         assertEquals(0, collector.size());
 
-        submitter.submit(ON_RETURN, ctx.getId(), SF_FLUSH, new Object[] { 2L });
+        submitter.submit(ON_RETURN, ctx.getId(), SF_FLUSH, new Object[]{2L});
         assertEquals(1, collector.size());
     }
 
 
     //@Test TODO temporarily disabled
     public void testSubmitAndCheckOnCollectBuf() throws Exception {
-        SpyDefinition sdef = engine.add(SpyDefinition.instance().onSubmit(collector));
+        SpyDefinition sdef = engine.add(spy.instance("x").onSubmit(collector));
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "Class", "method", "()V", 1));
 
-        submitter.submit(ON_ENTER, ctx.getId(), SF_IMMEDIATE, new Object[] { 1L });
+        submitter.submit(ON_ENTER, ctx.getId(), SF_IMMEDIATE, new Object[]{1L});
 
         assertEquals(1, collector.size());
         assertEquals(0, collector.get(0).size());
@@ -87,15 +87,15 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
 
     //@Test TODO temporarily disabled
     public void testSubmitAndCheckSubmitBuffer() throws Exception {
-        SpyDefinition sdef = engine.add(SpyDefinition.instrument().onSubmit(collector));
+        SpyDefinition sdef = engine.add(spy.instrument("x").onSubmit(collector));
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "Class", "method", "()V", 1));
 
-        submitter.submit(ON_ENTER, ctx.getId(), SF_NONE, new Object[] { 1L });
-        submitter.submit(ON_RETURN, ctx.getId(), SF_FLUSH, new Object[] { 2L });
+        submitter.submit(ON_ENTER, ctx.getId(), SF_NONE, new Object[]{1L});
+        submitter.submit(ON_RETURN, ctx.getId(), SF_FLUSH, new Object[]{2L});
 
         assertEquals(1, collector.size());
 
-        Map<String,Object> sr = collector.get(0);
+        Map<String, Object> sr = collector.get(0);
 
         assertEquals(0, sr.size());
     }

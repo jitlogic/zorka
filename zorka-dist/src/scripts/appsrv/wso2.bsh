@@ -74,7 +74,7 @@ __wso2() {
 
 
     // Entry point: AXIS web services
-    spy.add(spy.instance()
+    spy.add(spy.instance("WSO2_AXIS")
       .onEnter(spy.fetchArg("CTX", 1), tracer.begin("AXIS_REQ"), spy.format("ACTION", "${CTX.soapAction}"), tracer.attr("ACTION", "ACTION"))
       .include(spy.byMethod("org.apache.axis2.transport.http.HTTPTransportUtils", "processHTTPPostRequest")));
 

@@ -17,12 +17,12 @@
 
 __pgsql() {
 
-  spy.add(sql._instrumentStmt("${THIS.connection.creatingURL}")
+  spy.add(sql._instrumentStmt("PGSQL_1", "${THIS.connection.creatingURL}")
     .include(
       spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, "String"),
       spy.byMethod(0, "org.postgresql.jdbc3.AbstractJdbc3Statement", "execute*", null, "String")));
 
-  spy.add(sql._instrumentPStmt("${THIS.connection.creatingURL}", "${THIS.preparedQuery}")
+  spy.add(sql._instrumentPStmt("PGSQL_2", "${THIS.connection.creatingURL}", "${THIS.preparedQuery}")
     .include(
       spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, spy.SM_NOARGS),
       spy.byMethod(0, "org.postgresql.jdbc3.AbstractJdbc3Statement", "execute*", null, spy.SM_NOARGS)));

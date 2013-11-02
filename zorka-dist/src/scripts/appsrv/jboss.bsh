@@ -87,7 +87,7 @@ __jboss() {
     return this;
   } // __mbsRegister()
 
-  spy.add(spy.instance()
+  spy.add(spy.instance("JBOSS_MBS_REGISTER")
     .onReturn(spy.fetchArg("THIS", 0), (com.jitlogic.zorka.core.spy.SpyProcessor)__mbsRegister())
     .include(spy.byMethod(0, "org.jboss.naming.NamingService", "startService", null)));
 

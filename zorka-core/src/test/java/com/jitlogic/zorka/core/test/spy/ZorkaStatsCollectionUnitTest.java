@@ -41,7 +41,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         ZorkaStatsCollector collector = new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=Test", "stats",
                 "test", "T", null, ZorkaStatsCollector.ACTION_STATS);
 
-        SpyContext ctx = new SpyContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
+        SpyContext ctx = new SpyContext(spy.instance("x"), "TClass", "testMethod", "()V", 1);
 
         Map<String, Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1 << ON_RETURN), "T", 10L);
 
@@ -58,7 +58,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         ZorkaStatsCollector collector = new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=Test", "stats",
                 "${methodName}", "T", null, ZorkaStatsCollector.ACTION_STATS);
 
-        SpyContext ctx = new SpyContext(new SpyDefinition(), "TClass", "testMethod", "()V", 1);
+        SpyContext ctx = new SpyContext(spy.instance("x"), "TClass", "testMethod", "()V", 1);
 
         Map<String, Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1 << ON_RETURN), "T", 10L);
 
@@ -75,7 +75,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         ZorkaStatsCollector collector = new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=${shortClassName}",
                 "stats", "${methodName}", "T", null, ZorkaStatsCollector.ACTION_STATS);
 
-        SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
+        SpyContext ctx = new SpyContext(spy.instance("x"), "some.TClass", "testMethod", "()V", 1);
 
         Map<String, Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1 << ON_RETURN), "T", 10L);
 
@@ -92,7 +92,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         ZorkaStatsCollector collector = new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=${shortClassName}",
                 "stats", "${C1}", "T", null, ZorkaStatsCollector.ACTION_STATS);
 
-        SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
+        SpyContext ctx = new SpyContext(spy.instance("x"), "some.TClass", "testMethod", "()V", 1);
 
         Map<String, Object> record = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1 << ON_RETURN), "T", 10L, "C1", "oja");
 
@@ -125,7 +125,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         ZorkaStatsCollector c2 = new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=SomeBean", "stats", "AAA", "T",
                 null, ZorkaStatsCollector.ACTION_STATS);
 
-        SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
+        SpyContext ctx = new SpyContext(spy.instance("x"), "some.TClass", "testMethod", "()V", 1);
         Map<String, Object> rec = ZorkaUtil.map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1 << ON_RETURN), "T", 1L);
 
         c1.process(rec);
@@ -141,7 +141,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         ZorkaStatsCollector c1 = new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=SomeBean",
                 "stats", "AAA", "T", "LEN", ZorkaStatsCollector.ACTION_STATS);
 
-        SpyContext ctx = new SpyContext(new SpyDefinition(), "some.TClass", "testMethod", "()V", 1);
+        SpyContext ctx = new SpyContext(spy.instance("x"), "some.TClass", "testMethod", "()V", 1);
         c1.process(ZorkaUtil.<String, Object>map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1 << ON_RETURN), "T", 1L, "LEN", 100));
         c1.process(ZorkaUtil.<String, Object>map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1 << ON_RETURN), "T", 1L, "LEN", 300));
         c1.process(ZorkaUtil.<String, Object>map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1 << ON_RETURN), "T", 1L, "LEN", 200));

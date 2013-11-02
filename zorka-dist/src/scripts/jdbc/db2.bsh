@@ -17,10 +17,10 @@
 
 __db2() {
 
-  spy.add(sql._instrumentStmt("DB2")
+  spy.add(sql._instrumentStmt("DB2_SQL_1", "DB2")
     .include(spy.byMethod(spy.AC_PUBLIC, "com.ibm.db2.jcc**", "execut*", null, "String")));
 
-  spy.add(sql._instrumentPStmt("DB2", "${THIS.Gb}")
+  spy.add(sql._instrumentPStmt("DB2_SQL_2", "DB2", "${THIS.Gb}")
     .include(spy.byMethod(1, "com.ibm.db2.jcc.c.lh", "execut*", null, spy.SM_NOARGS)));
 
   return this;

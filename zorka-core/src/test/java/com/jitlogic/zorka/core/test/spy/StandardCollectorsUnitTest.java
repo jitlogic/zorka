@@ -52,7 +52,7 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
     public void setUp() {
         zorkaAgent.put("test", this);
 
-        sdef = SpyDefinition.instance();
+        sdef = spy.instance("x");
         ctx = new SpyContext(sdef, "some.Class", "someMethod", "()V", 1);
 
         record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);

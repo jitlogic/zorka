@@ -17,11 +17,11 @@
 
 __oracle() {
 
-  spy.add(sql._instrumentStmt("${THIS.connection.database}")
+  spy.add(sql._instrumentStmt("ORACLE_OJDBC6_1", "${THIS.connection.database}")
     .include(
       spy.byMethod(0, "oracle.jdbc.driver.OracleStatement", "execute*", null, "String")));
 
-  spy.add(sql._instrumentPStmt("${THIS.connection.database}", "${THIS.originalSql}")
+  spy.add(sql._instrumentPStmt("ORACLE_OJDBC6_2", "${THIS.connection.database}", "${THIS.originalSql}")
     .include(
       spy.byMethod(0, "oracle.jdbc.driver.OraclePreparedStatement", "execute*", null, spy.SM_NOARGS),
       spy.byMethod(0, "oracle.jdbc.driver.OracleCallableStatement", "execute*", null, spy.SM_NOARGS)));

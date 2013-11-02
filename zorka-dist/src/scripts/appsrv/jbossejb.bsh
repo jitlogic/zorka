@@ -23,7 +23,7 @@ __jbossejb() {
     _ejb_params = zorka.boolCfg("ejb.params");
     _ejb_stats = zorka.boolCfg("ejb.stats");
 
-    spy.add(spy.instrument()
+    spy.add(spy.instrument("JBOSS_EJB")
       .onEnter(
         spy.fetchArg("INV", 1),
         spy.format("METHOD", "${INV.method.name}"),

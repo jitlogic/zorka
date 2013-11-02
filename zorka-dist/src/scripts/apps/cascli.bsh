@@ -18,7 +18,7 @@
 
 __casclient() {
 
-  spy.add(spy.instrument()
+  spy.add(spy.instrument("CASCLI_VALIDATE")
     .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("TICKET", 1), spy.fetchArg("SERVICE", 2),
       spy.format("CAS_URI", "${THIS.casServerUrlPrefix}"), tracer.begin("CASCLI"), 
       tracer.attr("CAS_URI", "CAS_URI"), tracer.attr("TICKET", "TICKET"), tracer.attr("SERVICE", "SERVICE"))

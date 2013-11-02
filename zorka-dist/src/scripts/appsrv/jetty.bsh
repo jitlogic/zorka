@@ -18,7 +18,7 @@
 
 __jetty() {
 
-  spy.add(spy.instrument()
+  spy.add(spy.instrument("JETTY_HTTP")
     .onEnter(spy.fetchArg("REQ", 2), spy.fetchArg("RESP", 4),
       spy.format("URI", "${REQ.requestURI}"),
       http._trace ? spy.subchain(

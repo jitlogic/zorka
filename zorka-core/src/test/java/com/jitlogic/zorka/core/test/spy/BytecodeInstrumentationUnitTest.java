@@ -40,7 +40,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testTrivialInstrumentOnlyEntryPointWithThisRef() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg("E0", 0))
+        engine.add(spy.instance("x").onEnter(spy.fetchArg("E0", 0))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
         Object obj = instantiate(engine, TCLASS1);
 
@@ -53,7 +53,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     //    @Test  TODO make this test working
     public void testStaticNotPublicMethod() throws Exception {
-        engine.add(SpyDefinition.instance().onReturn(spy.fetchTime("R0"))
+        engine.add(spy.instance("x").onReturn(spy.fetchTime("R0"))
                 .include(spy.byMethod(TCLASS1, "nonPublicStatic")));
         Object obj = instantiate(engine, TCLASS1);
 
@@ -65,7 +65,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testInstrumentWithTimeProbe() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("E0"))
+        engine.add(spy.instance("x").onEnter(spy.fetchTime("E0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
         Object obj = instantiate(engine, TCLASS1);
 
@@ -78,7 +78,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testTrivialInstrumentOnlyEntryPointWithCurrentTime() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("E0"))
+        engine.add(spy.instance("x").onEnter(spy.fetchTime("E0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
         Object obj = instantiate(engine, TCLASS1);
 
@@ -92,7 +92,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testInstrumentWithTimeOnEnterExit() throws Exception {
-        engine.add(SpyDefinition.instrument().include(spy.byMethod(TCLASS1, "trivialMethod")));
+        engine.add(spy.instrument("x").include(spy.byMethod(TCLASS1, "trivialMethod")));
         Object obj = instantiate(engine, TCLASS1);
 
         invoke(obj, "trivialMethod");
@@ -105,7 +105,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testInstrumentWithTimeOnEnterError() throws Exception {
-        engine.add(SpyDefinition.instrument().include(spy.byMethod(TCLASS1, "errorMethod")));
+        engine.add(spy.instrument("x").include(spy.byMethod(TCLASS1, "errorMethod")));
         Object obj = instantiate(engine, TCLASS1);
 
         invoke(obj, "errorMethod");
@@ -118,8 +118,8 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testInstrumentWithTwoProbes() throws Exception {
-        engine.add(SpyDefinition.instrument().include(spy.byMethod(TCLASS1, "trivialMethod")));
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg("E0", 0))
+        engine.add(spy.instrument("x").include(spy.byMethod(TCLASS1, "trivialMethod")));
+        engine.add(spy.instance("y").onEnter(spy.fetchArg("E0", 0))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -136,7 +136,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testInstrumentConstructorWithTime() throws Exception {
-        engine.add(SpyDefinition.instrument().include(spy.byMethod(TCLASS1, SM_CONSTRUCTOR)));
+        engine.add(spy.instrument("y").include(spy.byMethod(TCLASS1, SM_CONSTRUCTOR)));
         instantiate(engine, TCLASS1);
 
         assertEquals("should submit two records", 2, submitter.size());
@@ -145,7 +145,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testInstrumentConstructorWithSelfRef() throws Exception {
-        engine.add(SpyDefinition.instance().onReturn(spy.fetchArg("R0", 0))
+        engine.add(spy.instance("x").onReturn(spy.fetchArg("R0", 0))
                 .include(spy.byMethod(TCLASS1, SM_CONSTRUCTOR)));
         Object obj = instantiate(engine, TCLASS1);
 
@@ -156,7 +156,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testInstrumentConstructorWithInvalidSelfRefOnBeginning() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg("E0", 0))
+        engine.add(spy.instance("x").onEnter(spy.fetchArg("E0", 0))
                 .include(spy.byMethod(TCLASS1, SM_CONSTRUCTOR)));
 
         instantiate(engine, TCLASS1);
@@ -168,7 +168,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testFetchClassFromInstrumentedCode() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchClass("E0", TCLASS1))
+        engine.add(spy.instance("x").onEnter(spy.fetchClass("E0", TCLASS1))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
@@ -181,7 +181,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testFetchIntegerTypeArgument() throws Exception {
-        engine.add(SpyDefinition.instance()
+        engine.add(spy.instance("x")
                 .onEnter(spy.fetchArg("E0", 1), spy.fetchArg("E1", 2), spy.fetchArg("E2", 3), spy.fetchArg("E3", 4))
                 .include(spy.byMethod(TCLASS1, "paramMethod1")));
 
@@ -198,7 +198,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testFetchBooleanCharTypeArgument() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg("E0", 1), spy.fetchArg("E1", 2))
+        engine.add(spy.instance("x").onEnter(spy.fetchArg("E0", 1), spy.fetchArg("E1", 2))
                 .include(spy.byMethod(TCLASS1, "paramMethod2")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -212,7 +212,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testFetchFloatingPointArgs() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg("E0", 1), spy.fetchArg("E1", 2))
+        engine.add(spy.instance("x").onEnter(spy.fetchArg("E0", 1), spy.fetchArg("E1", 2))
                 .include(spy.byMethod(TCLASS1, "paramMethod3")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -226,7 +226,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testCheckImmediateFlagInEntryPointOnlyProbe() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("E0"))
+        engine.add(spy.instance("x").onEnter(spy.fetchTime("E0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -239,7 +239,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testCheckNoFlagOnEnterAndFlushFlagOnExit() throws Exception {
-        engine.add(SpyDefinition.instrument().include(spy.byMethod(TCLASS1, "trivialMethod")));
+        engine.add(spy.instrument("x").include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
@@ -252,7 +252,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testCheckNoProbeOnEnterAndImmediateFlagOnExit() throws Exception {
-        engine.add(SpyDefinition.instance().onReturn(spy.fetchTime("R0"))
+        engine.add(spy.instance("x").onReturn(spy.fetchTime("R0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -265,7 +265,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testNoProbeOnExitButProbeOnErrorAndOnEnter() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("E0")).onError(spy.fetchTime("X0"))
+        engine.add(spy.instance("x").onEnter(spy.fetchTime("E0")).onError(spy.fetchTime("X0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -280,7 +280,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testNoProbeOnErrorButProbeOnEnterAndExit() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("E0")).onReturn(spy.fetchTime("X0"))
+        engine.add(spy.instance("x").onEnter(spy.fetchTime("E0")).onReturn(spy.fetchTime("X0"))
                 .include(spy.byMethod(TCLASS1, "errorMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -295,7 +295,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testIfContextIsTheSameForTheSameClassLoadedTwice() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("E0"))
+        engine.add(spy.instance("x").onEnter(spy.fetchTime("E0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         Object obj1 = instantiate(engine, TCLASS1);
@@ -311,8 +311,8 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testSubmissionOrderWhenMoreThanOneProbeInOneMethodRet() throws Exception {
-        engine.add(SpyDefinition.instrument().include(spy.byMethod(TCLASS1, "trivialMethod")));
-        engine.add(SpyDefinition.instrument().include(spy.byMethod(TCLASS1, "trivialMethod")));
+        engine.add(spy.instrument("x").include(spy.byMethod(TCLASS1, "trivialMethod")));
+        engine.add(spy.instrument("x").include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
@@ -329,8 +329,8 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testSubmissionOrderWhenMoreThanOneProbeInOneMethodErr() throws Exception {
-        engine.add(SpyDefinition.instrument().include(spy.byMethod(TCLASS1, "errorMethod")));
-        engine.add(SpyDefinition.instrument().include(spy.byMethod(TCLASS1, "errorMethod")));
+        engine.add(spy.instrument("x").include(spy.byMethod(TCLASS1, "errorMethod")));
+        engine.add(spy.instrument("x").include(spy.byMethod(TCLASS1, "errorMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "errorMethod");
@@ -347,7 +347,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testFetchArraysOfSimpleTypes() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg("E0", 1), spy.fetchArg("E1", 2), spy.fetchArg("E2", 3))
+        engine.add(spy.instance("x").onEnter(spy.fetchArg("E0", 1), spy.fetchArg("E1", 2), spy.fetchArg("E2", 3))
                 .include(spy.byMethod(TCLASS1, "paramMethod4")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -362,7 +362,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testFetchReturnObject() throws Exception {
-        engine.add(SpyDefinition.instance().onReturn(spy.fetchRetVal("R0"))
+        engine.add(spy.instance("x").onReturn(spy.fetchRetVal("R0"))
                 .include(spy.byMethod(TCLASS1, "strMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -377,7 +377,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testFetchReturnSimpleTypeObject() throws Exception {
-        engine.add(SpyDefinition.instance().onReturn(spy.fetchRetVal("R0"))
+        engine.add(spy.instance("x").onReturn(spy.fetchRetVal("R0"))
                 .include(spy.byMethod(TCLASS1, "getUltimateQuestionOfLife")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -392,7 +392,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testFetchReturnValWithDirtyVariableStack() throws Exception {
-        engine.add(SpyDefinition.instance().onReturn(spy.fetchRetVal("R0"))
+        engine.add(spy.instance("x").onReturn(spy.fetchRetVal("R0"))
                 .include(spy.byMethod(TCLASS1, "getUltimateQuestionWithLocalVars")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -407,7 +407,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testFetchCurrentThreadSubmission() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchThread("E0"))
+        engine.add(spy.instance("x").onEnter(spy.fetchThread("E0"))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -420,7 +420,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testFetchExceptionObject() throws Exception {
-        engine.add(SpyDefinition.instance().onError(spy.fetchError("X0"))
+        engine.add(spy.instance("x").onError(spy.fetchError("X0"))
                 .include(spy.byMethod(TCLASS1, "errorMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -436,7 +436,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testInstrumentClassByAnnotation() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("X"))
+        engine.add(spy.instance("x").onEnter(spy.fetchTime("X"))
                 .include(spy.byClassAnnotation(TACLASS)));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -448,7 +448,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testNonInstrumentClassByAnnotation() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("X"))
+        engine.add(spy.instance("x").onEnter(spy.fetchTime("X"))
                 .include(spy.byClassAnnotation(TACLASS)));
 
         Object obj = instantiate(engine, TCLASS2);
@@ -460,7 +460,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testMatchClassByMethodAnnotation() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("X"))
+        engine.add(spy.instance("x").onEnter(spy.fetchTime("X"))
                 .include(spy.byMethodAnnotation(TCLASS2, TAMETHOD)));
 
         Object obj = instantiate(engine, TCLASS2);
@@ -472,7 +472,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testNonMatchClassByMethodAnnotation() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("X"))
+        engine.add(spy.instance("x").onEnter(spy.fetchTime("X"))
                 .include(spy.byMethodAnnotation(TCLASS2, TAMETHOD)));
 
         Object obj = instantiate(engine, TCLASS1);
@@ -484,7 +484,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testInstrumentClassWithNoStack() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("T1")).onReturn(spy.fetchTime("T2"))
+        engine.add(spy.instance("x").onEnter(spy.fetchTime("T1")).onReturn(spy.fetchTime("T2"))
                 .include(spy.byMethod(TCLASS2, "echoInt")));
 
         Object obj = instantiate(engine, TCLASS2);
@@ -497,7 +497,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
     @Test
     public void testInstrumentMethodEntryWithoutProbes() throws Exception {
         SpyProcessor col = new TestCollector();
-        engine.add(SpyDefinition.instance().onEnter(col).include(spy.byMethod(TCLASS1, "trivialMethod")));
+        engine.add(spy.instance("x").onEnter(col).include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
@@ -509,7 +509,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
     @Test
     public void testInstrumentMethodReturnWithoutProbes() throws Exception {
         SpyProcessor col = new TestCollector();
-        engine.add(SpyDefinition.instance().onReturn(col).include(spy.byMethod(TCLASS1, "trivialMethod")));
+        engine.add(spy.instance("x").onReturn(col).include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
@@ -522,7 +522,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
     @Test
     public void testInstrumentMethodErrorWithoutProbes() throws Exception {
         SpyProcessor col = new TestCollector();
-        engine.add(SpyDefinition.instance().onError(col).include(spy.byMethod(TCLASS1, "errorMethod")));
+        engine.add(spy.instance("x").onError(col).include(spy.byMethod(TCLASS1, "errorMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "errorMethod");
@@ -534,7 +534,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testInstrumentWithAssymetricProbePlacements() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchTime("ENTER"))
+        engine.add(spy.instance("x").onEnter(spy.fetchTime("ENTER"))
                 .onReturn(spy.put("RETURN", 1)).onError(spy.put("ERROR", 1))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
@@ -550,7 +550,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testInstrumentDirectInterfaceMethod() throws Exception {
-        engine.add(SpyDefinition.instrument().include(spy.byInterfaceAndMethod(ICLASS1, "myMethod1")));
+        engine.add(spy.instrument("x").include(spy.byInterfaceAndMethod(ICLASS1, "myMethod1")));
 
         Object obj = instantiate(engine, TCLASS2);
         invoke(obj, "myMethod1");
@@ -561,7 +561,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testInstrumentNonRecursiveIndirectInterfaceMethod() throws Exception {
-        engine.add(SpyDefinition.instrument().include(spy.byInterfaceAndMethod(ICLASS2, "myMethod2")));
+        engine.add(spy.instrument("x").include(spy.byInterfaceAndMethod(ICLASS2, "myMethod2")));
 
         Object obj = instantiate(engine, TCLASS2);
         invoke(obj, "myMethod2");
@@ -572,7 +572,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testInstrumentRecursiveIndirectInterfaceMethod() throws Exception {
-        engine.add(SpyDefinition.instrument().include(
+        engine.add(spy.instrument("x").include(
                 spy.byInterfaceAndMethod(ICLASS2, "myMethod2").recursive()));
 
         Object obj = instantiate(engine, TCLASS2);
@@ -584,7 +584,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
     @Test
     public void testInstrumentRecursiveIndirectByClassInterfaceMethod() throws Exception {
-        engine.add(SpyDefinition.instrument().include(
+        engine.add(spy.instrument("x").include(
                 spy.byInterfaceAndMethod(ICLASS1, "trivialMethod4").recursive()));
 
         Object obj = instantiate(engine, TCLASS4);

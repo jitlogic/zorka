@@ -17,11 +17,11 @@
 
 __mysql() {
 
-  spy.add(sql._instrumentStmt("${THIS.connection.database}")
+  spy.add(sql._instrumentStmt("MYSQL_1", "${THIS.connection.database}")
     .include(
       spy.byMethod(spy.AC_PUBLIC, "com.mysql.jdbc.StatementImpl", "execut*", null, "String")));
 
-  spy.add(sql._instrumentPStmt("${THIS.connection.database}", "${THIS.originalSql}")
+  spy.add(sql._instrumentPStmt("MYSQL_2", "${THIS.connection.database}", "${THIS.originalSql}")
     .include(
       spy.byMethod("com.mysql.jdbc.PreparedStatement", "execut*"),
       spy.byMethod("com.mysql.jdbc.CallableStatement", "execut*")));
