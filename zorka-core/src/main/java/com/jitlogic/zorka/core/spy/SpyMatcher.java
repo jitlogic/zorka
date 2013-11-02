@@ -57,6 +57,12 @@ public class SpyMatcher {
      */
     public static final Set<String> COMMON_METHODS = ZorkaUtil.set("toString", "equals", "hashCode", "valueOf");
 
+    /**
+     * This is default priority value for spy matchers.
+     * <p/>
+     * This reflects priority of matchers defined by tracer.include.extra and tracer.exclude.extra settings.
+     */
+    public static final int DEFAULT_PRIORITY = 100;
 
     public static final int BY_CLASS_NAME = 0x001;
     public static final int BY_CLASS_ANNOTATION = 0x002;
@@ -101,6 +107,7 @@ public class SpyMatcher {
      */
     private Pattern classPattern, methodPattern, signaturePattern;
 
+    private int priority = DEFAULT_PRIORITY;
 
     /**
      * Creates spy matcher
@@ -124,18 +131,15 @@ public class SpyMatcher {
     /**
      * Copy constructor (for trace alteration methods below)
      *
-     * @param flags            custom matcher flags
-     * @param access           accessibility flags
-     * @param classPattern     class name/annotation pattern
-     * @param methodPattern    method name/annotation pattern
-     * @param signaturePattern signature pattern
+     * @param orig original matcher object
      */
-    private SpyMatcher(int flags, int access, Pattern classPattern, Pattern methodPattern, Pattern signaturePattern) {
-        this.access = access;
-        this.flags = flags;
-        this.classPattern = classPattern;
-        this.methodPattern = methodPattern;
-        this.signaturePattern = signaturePattern;
+    private SpyMatcher(SpyMatcher orig) {
+        this.access = orig.access;
+        this.flags = orig.flags;
+        this.classPattern = orig.classPattern;
+        this.methodPattern = orig.methodPattern;
+        this.signaturePattern = orig.signaturePattern;
+        this.priority = orig.priority;
     }
 
 
@@ -294,19 +298,36 @@ public class SpyMatcher {
     }
 
 
+    public int getPriority() {
+        return priority;
+    }
+
+
     /**
      * Marks trace as inverted trace (matching methods will be excluded rathern than included).
      *
      * @return altered spy matcher
      */
     public SpyMatcher exclude() {
-        return new SpyMatcher(flags | EXCLUDE_MATCH, access, classPattern, methodPattern, signaturePattern);
+        SpyMatcher m = new SpyMatcher(this);
+        m.flags |= EXCLUDE_MATCH;
+        return m;
     }
 
 
     public SpyMatcher recursive() {
-        return new SpyMatcher(flags | RECURSIVE, access, classPattern, methodPattern, signaturePattern);
+        SpyMatcher m = new SpyMatcher(this);
+        m.flags |= RECURSIVE;
+        return m;
     }
+
+
+    private SpyMatcher withFlags(int flags) {
+        SpyMatcher m = new SpyMatcher(this);
+        m.flags |= flags;
+        return m;
+    }
+
 
     /**
      * Excludes constructors and static constructors.
@@ -314,7 +335,7 @@ public class SpyMatcher {
      * @return altered spy matcher
      */
     public SpyMatcher noConstructors() {
-        return new SpyMatcher(flags | NO_CONSTRUCTORS, access, classPattern, methodPattern, signaturePattern);
+        return withFlags(NO_CONSTRUCTORS);
     }
 
 
@@ -324,7 +345,7 @@ public class SpyMatcher {
      * @return altered spy matcher
      */
     public SpyMatcher noAccessors() {
-        return new SpyMatcher(flags | NO_ACCESSORS, access, classPattern, methodPattern, signaturePattern);
+        return withFlags(NO_ACCESSORS);
     }
 
 
@@ -334,8 +355,9 @@ public class SpyMatcher {
      * @return altered spy matcher
      */
     public SpyMatcher noCommons() {
-        return new SpyMatcher(flags | NO_COMMONS, access, classPattern, methodPattern, signaturePattern);
+        return withFlags(NO_COMMONS);
     }
+
 
     /**
      * Excludes typical methods not suitable for tracer (constructors, accessors, some common methods).
@@ -343,6 +365,19 @@ public class SpyMatcher {
      * @return altered spy matcher
      */
     public SpyMatcher forTrace() {
-        return new SpyMatcher(flags | NO_CONSTRUCTORS | NO_ACCESSORS | NO_COMMONS, access, classPattern, methodPattern, signaturePattern);
+        return withFlags(NO_CONSTRUCTORS | NO_ACCESSORS | NO_COMMONS);
+    }
+
+
+    /**
+     * Alters matcher priority
+     *
+     * @param priority new priority value
+     * @return altered spy matcher
+     */
+    public SpyMatcher priority(int priority) {
+        SpyMatcher m = new SpyMatcher(this);
+        m.priority = priority;
+        return m;
     }
 }

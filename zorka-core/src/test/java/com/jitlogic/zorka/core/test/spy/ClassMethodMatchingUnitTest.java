@@ -19,7 +19,11 @@ package com.jitlogic.zorka.core.test.spy;
 import com.jitlogic.zorka.core.spy.SpyMatcherSet;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import com.jitlogic.zorka.core.spy.SpyMatcher;
+
 import org.junit.Assert;
+
+import static org.junit.Assert.*;
+
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -163,5 +167,18 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
     public void testMatchInnerClass() {
         SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod("some.Class$1", "run"));
         Assert.assertTrue(sms.methodMatch("some.Class$1", null, null, 1, "run", "()V", null));
+    }
+
+    @Test
+    public void testMatchFilterWithPriorities() {
+        SpyMatcherSet sms = new SpyMatcherSet(
+                spy.byClass("**").priority(1000),
+                spy.byClass("com.jitlogic.**").exclude(),
+                spy.byClass("com.jitlogic.TestClazz").priority(10)
+        );
+
+        assertTrue(sms.classMatch("java.lang.Integer"));
+        assertFalse(sms.classMatch("com.jitlogic.zorka.core.spy.SpyProcessor"));
+        assertTrue(sms.classMatch("com.jitlogic.TestClazz"));
     }
 }

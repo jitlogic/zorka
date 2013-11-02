@@ -47,9 +47,7 @@ public class SpyMatcherSet {
      * @param matchers initial matchers
      */
     public SpyMatcherSet(SpyMatcher... matchers) {
-        for (SpyMatcher matcher : matchers) {
-            this.matchers.add(matcher);
-        }
+        include(matchers);
     }
 
 
@@ -61,9 +59,7 @@ public class SpyMatcherSet {
      */
     public SpyMatcherSet(SpyMatcherSet orig, SpyMatcher... matchers) {
         this.matchers.addAll(orig.matchers);
-        for (SpyMatcher matcher : matchers) {
-            this.matchers.add(matcher);
-        }
+        include(matchers);
     }
 
 
@@ -200,14 +196,24 @@ public class SpyMatcherSet {
     /**
      * Adds new matchers to matcher set. New matchers are appended at the end of list (and thus will be checked last).
      *
-     * @param matchers appended matchers
+     * @param includes appended matchers
      */
-    public void include(SpyMatcher... matchers) {
+    public void include(SpyMatcher... includes) {
 
-        for (SpyMatcher matcher : matchers) {
-            this.matchers.add(matcher);
+        for (SpyMatcher m : includes) {
+            if (matchers.size() == 0 || m.getPriority() >= matchers.get(matchers.size() - 1).getPriority()) {
+                matchers.add(m);
+            } else if (m.getPriority() < matchers.get(0).getPriority()) {
+                matchers.add(0, m);
+            } else {
+                for (int i = 0; i < matchers.size(); i++) {
+                    if (matchers.get(i).getPriority() > m.getPriority()) {
+                        matchers.add(i, m);
+                        break;
+                    }
+                }
+            }
         }
-
     }
 
     public List<SpyMatcher> getMatchers() {
