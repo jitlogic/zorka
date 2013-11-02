@@ -16,11 +16,12 @@
  */
 
 // Set defaults
+zorka.defCfg("tracer", "no");
 zorka.defCfg("tracer.min.trace.time", 1000);
 zorka.defCfg("tracer.min.method.time", 250000);
 zorka.defCfg("tracer.max.trace.records", 4096);
 
-if (zorka.boolCfg("tracer", false)) {
+if (zorka.boolCfg("tracer")) {
 
   zorka.logInfo("Enabling tracer for JBoss.");
   zorka.loadCfg("tracer.properties");

@@ -62,7 +62,7 @@ public class SpyMatcher {
      * <p/>
      * This reflects priority of matchers defined by tracer.include.extra and tracer.exclude.extra settings.
      */
-    public static final int DEFAULT_PRIORITY = 100;
+    public static final int DEFAULT_PRIORITY = 500;
 
     public static final int BY_CLASS_NAME = 0x001;
     public static final int BY_CLASS_ANNOTATION = 0x002;

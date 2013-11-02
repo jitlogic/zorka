@@ -26,6 +26,14 @@ __mssql() {
       spy.byMethod(1, "com.microsoft.sqlserver.jdbc.SQLServerStatement", "execut*", null, spy.SM_NOARGS),
       spy.byMethod(1, "com.microsoft.sqlserver.jdbc.SQLServerPreparedStatement", "execut*", null, spy.SM_NOARGS)));
 
+
+  if (zorka.boolCfg("tracer")) {
+      tracer.exclude(spy.byClass("com.microsoft.sqlserver.**").priority(750));
+      tracer.include(spy.byMethod(spy.AC_PUBLIC, "com.microsoft.sqlserver.jdbc.SQLServerStatement", "execut*", null, "String").priority(250));
+      tracer.include(spy.byMethod(1, "com.microsoft.sqlserver.jdbc.SQLServerStatement", "execut*", null, spy.SM_NOARGS).priority(250));
+      tracer.include(spy.byMethod(1, "com.microsoft.sqlserver.jdbc.SQLServerPreparedStatement", "execut*", null, spy.SM_NOARGS).priority(250));
+  }
+
   return this;
 }
 

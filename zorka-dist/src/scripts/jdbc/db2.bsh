@@ -23,6 +23,13 @@ __db2() {
   spy.add(sql._instrumentPStmt("DB2_SQL_2", "DB2", "${THIS.Gb}")
     .include(spy.byMethod(1, "com.ibm.db2.jcc.c.lh", "execut*", null, spy.SM_NOARGS)));
 
+
+  if (zorka.boolCfg("tracer")) {
+      tracer.exclude(spy.byClass("com.ibm.db2.**").priority(750));
+      tracer.include(spy.byMethod(spy.AC_PUBLIC, "com.ibm.db2.jcc**", "execut*", null, "String").priority(250));
+      tracer.include(spy.byMethod(1, "com.ibm.db2.jcc.c.lh", "execut*", null, spy.SM_NOARGS).priority(250));
+  }
+
   return this;
 }
 

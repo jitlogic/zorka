@@ -18,13 +18,19 @@
 __mysql() {
 
   spy.add(sql._instrumentStmt("MYSQL_1", "${THIS.connection.database}")
-    .include(
-      spy.byMethod(spy.AC_PUBLIC, "com.mysql.jdbc.StatementImpl", "execut*", null, "String")));
+      .include(spy.byMethod(spy.AC_PUBLIC, "com.mysql.jdbc.StatementImpl", "execut*", null, "String")));
 
   spy.add(sql._instrumentPStmt("MYSQL_2", "${THIS.connection.database}", "${THIS.originalSql}")
-    .include(
-      spy.byMethod("com.mysql.jdbc.PreparedStatement", "execut*"),
-      spy.byMethod("com.mysql.jdbc.CallableStatement", "execut*")));
+      .include(spy.byMethod("com.mysql.jdbc.PreparedStatement", "execut*"),
+               spy.byMethod("com.mysql.jdbc.CallableStatement", "execut*")));
+
+
+  if (zorka.boolCfg("tracer")) {
+      tracer.exclude(spy.byClass("com.mysql.**").priority(750));
+      tracer.include(spy.byMethod(spy.AC_PUBLIC, "com.mysql.jdbc.StatementImpl", "execut*", null, "String").priority(250));
+      tracer.include(spy.byMethod("com.mysql.jdbc.PreparedStatement", "execut*").priority(250));
+      tracer.include(spy.byMethod("com.mysql.jdbc.CallableStatement", "execut*").priority(250));
+  }
 
   return this;
 }
