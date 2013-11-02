@@ -51,13 +51,16 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
     }
 
 
-    //    @Test  TODO make this test working
+    @Test
     public void testStaticNotPublicMethod() throws Exception {
         engine.add(spy.instance("x").onReturn(spy.fetchTime("R0"))
-                .include(spy.byMethod(TCLASS1, "nonPublicStatic")));
+                .include(spy.byMethod(0, TCLASS1, "nonPublicStatic", null)));
+
         Object obj = instantiate(engine, TCLASS1);
 
         invoke(obj, "nonPublicStatic");
+
+        assertEquals(1, getField(obj, "scalls"));
 
         assertEquals("should submit one record", 1, submitter.size());
     }

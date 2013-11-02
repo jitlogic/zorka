@@ -73,19 +73,19 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
     }
 
 
-    //@Test TODO temporarily disabled
+    @Test
     public void testSubmitAndCheckOnCollectBuf() throws Exception {
-        SpyDefinition sdef = engine.add(spy.instance("x").onSubmit(collector));
+        SpyDefinition sdef = engine.add(spy.instance("x").onEnter(collector));
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "Class", "method", "()V", 1));
 
         submitter.submit(ON_ENTER, ctx.getId(), SF_IMMEDIATE, new Object[]{1L});
 
         assertEquals(1, collector.size());
-        assertEquals(0, collector.get(0).size());
+        assertEquals(3, collector.get(0).size());
     }
 
 
-    //@Test TODO temporarily disabled
+    @Test
     public void testSubmitAndCheckSubmitBuffer() throws Exception {
         SpyDefinition sdef = engine.add(spy.instrument("x").onSubmit(collector));
         SpyContext ctx = engine.lookup(new SpyContext(sdef, "Class", "method", "()V", 1));
@@ -97,7 +97,7 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
 
         Map<String, Object> sr = collector.get(0);
 
-        assertEquals(0, sr.size());
+        assertEquals(6, sr.size());
     }
 
 

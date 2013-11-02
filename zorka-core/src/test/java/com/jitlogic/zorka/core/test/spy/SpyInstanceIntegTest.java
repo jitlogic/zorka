@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.test.spy;
 
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import com.jitlogic.zorka.core.spy.SpyDefinition;
@@ -28,19 +29,21 @@ import static com.jitlogic.zorka.core.test.support.TestUtil.*;
 
 public class SpyInstanceIntegTest extends ZorkaFixture {
 
-    //@Test  TODO
+    @Test
     public void testTrivialMethodRun() throws Exception {
-        SpyDefinition sdef = spy.instrument("x").onSubmit(spy.tdiff("S0", "E0", "R0"))
+        SpyDefinition sdef = spy.instrument("x")
                 .include(spy.byMethod(BytecodeInstrumentationFixture.TCLASS1, "trivialMethod"))
-                .onSubmit(spy.zorkaStats("test", "test:name=${shortClassName}", "stats", "${methodName}", "S0"));
+                .onSubmit(spy.zorkaStats("test", "test:name=${shortClassName}", "stats", "${methodName}"));
 
         agentInstance.getClassTransformer().add(sdef);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), BytecodeInstrumentationFixture.TCLASS1);
         invoke(obj, "trivialMethod");
 
-        Object stats = getAttr(testMbs, "test:name=TestClass1", "stats");
+        MethodCallStatistics stats = (MethodCallStatistics) getAttr(testMbs, "test:name=TestClass1", "stats");
         assertNotNull(stats);
+        assertEquals(1, stats.getMethodCallStatistic("trivialMethod").getCalls());
+
     }
 
 

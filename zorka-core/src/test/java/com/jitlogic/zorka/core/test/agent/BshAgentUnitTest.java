@@ -1,16 +1,16 @@
-/** 
+/**
  * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
- * 
+ *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -31,6 +31,7 @@ import com.jitlogic.zorka.core.integ.ZabbixLib;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
@@ -45,41 +46,24 @@ public class BshAgentUnitTest extends ZorkaFixture {
     }
 
 
-	@Test
-	public void testTrivialQuery() throws Exception {
-		assertEquals("5", zorkaAgent.query("2+3"));
-	}
+    @Test
+    public void testTrivialQuery() throws Exception {
+        assertEquals("5", zorkaAgent.query("2+3"));
+    }
 
 
-	@Test
-	public void testJmxCalls() throws Exception {
-		assertTrue("1.0", zorkaAgent.query("zorka.jmx(\"java\",\"java.lang:type=Runtime\",\"SpecVersion\")").startsWith("1."));
-	}
-
-
-	//@Test @Ignore("Broken, to be fixed.")
-	public void testCreateMappedMBeanWithNoAttrs() throws Exception {
-		assertEquals("ZorkaMappedMBean()", zorkaAgent.query("zorka.mbean(\"java\", \"zorka:type=jvm,name=GCstats\")"));
-		
-		String rslt = zorkaAgent.query("zorka.jmx(\"java\", \"zorka:type=jvm,name=GCstats\")");
-		assertEquals("zorka:type=jvm,name=GCstats", rslt);
-	}
-
-
-	//@Test @Ignore("Broken, to be fixed.")
-	public void testCreateMappedMBeanWithConstantAttr() throws Exception {
-		assertEquals("OK", zorkaAgent.query("createBean1()"));
-		String rslt = zorkaAgent.query("zorka.jmx(\"java\", \"zorka.test:name=Bean1\", \"test1\")");
-		assertEquals("1", rslt);
-	}
+    @Test
+    public void testJmxCalls() throws Exception {
+        assertTrue("1.0", zorkaAgent.query("zorka.jmx(\"java\",\"java.lang:type=Runtime\",\"SpecVersion\")").startsWith("1."));
+    }
 
 
     @Test
     public void testZabbixDiscoveryFunc() throws Exception {
-        Map<String,List<Map<String,String>>> obj = (Map<String,List<Map<String,String>>>)
+        Map<String, List<Map<String, String>>> obj = (Map<String, List<Map<String, String>>>)
                 zorkaAgent.eval("zabbix._discovery(\"java\", \"java.lang:type=MemoryPool,*\", \"name\", \"type\")");
         assertTrue("should return map", obj != null);
-         List<Map<String,String>> data = obj.get("data");
+        List<Map<String, String>> data = obj.get("data");
         assertTrue("obj.data should be non-empty", data.size() > 0);
     }
 
@@ -124,9 +108,10 @@ public class BshAgentUnitTest extends ZorkaFixture {
     }
 
     public static class SomeTestLib {
-        public String join(String foo, String...parts) {
+        public String join(String foo, String... parts) {
             StringBuilder sb = new StringBuilder();
-            sb.append(foo); sb.append(":");
+            sb.append(foo);
+            sb.append(":");
             for (String part : parts)
                 sb.append(part);
             return sb.toString();
