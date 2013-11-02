@@ -150,6 +150,7 @@ public class SpyMethodVisitor extends MethodVisitor {
      * @param methodSignature method descriptor
      * @param ctxs            spy contexts interested in receiving data from this visitor
      * @param mv              method visitor (next in processing chain)
+     *                        TODO add explicit doTrace argument
      */
     public SpyMethodVisitor(boolean matches, SymbolRegistry symbolRegistry,
                             String className, List<String> classAnnotations, List<String> classInterfaces,
@@ -228,7 +229,7 @@ public class SpyMethodVisitor extends MethodVisitor {
         }
 
 
-        // Add trace probe if required
+        // Emit trace probe if required
         if (symbolRegistry != null) {
             log.debug(ZorkaLogger.ZTR_INSTRUMENT_METHOD, "Will trace method: %s.%s", className, methodName);
             stackDelta = max(stackDelta, emitTraceEnter(
@@ -238,7 +239,7 @@ public class SpyMethodVisitor extends MethodVisitor {
         }
 
 
-        // ON_ENTER probes are inserted here
+        // Emit ON_ENTER probes here
         for (int i = 0; i < ctxs.size(); i++) {
             if (!ctxMatches.get(i)) {
                 continue;
@@ -258,7 +259,7 @@ public class SpyMethodVisitor extends MethodVisitor {
     public void visitInsn(int opcode) {
         if (opcode >= IRETURN && opcode <= RETURN) {
 
-            // ON_RETURN probes are inserted here
+            // Emit ON_RETURN probes here
             if (returnProbe != null) {
                 returnProbe.emitFetchRetVal(this, returnType);
             }
@@ -275,6 +276,7 @@ public class SpyMethodVisitor extends MethodVisitor {
                 }
             }
 
+            // Emit trace probe at the end
             if (symbolRegistry != null) {
                 stackDelta = max(stackDelta, emitTraceReturn());
             }
@@ -290,10 +292,12 @@ public class SpyMethodVisitor extends MethodVisitor {
         mv.visitLabel(lTryTo);
         mv.visitLabel(lTryHandler);
 
+        // Emit return value fetch code (used lated by spy probes)
         if (returnProbe != null) {
             returnProbe.emitFetchRetVal(this, Type.getType(Object.class));
         }
 
+        // Emit spy error probes here
         for (int i = ctxs.size() - 1; i >= 0; i--) {
             if (!ctxMatches.get(i)) {
                 continue;
@@ -306,6 +310,7 @@ public class SpyMethodVisitor extends MethodVisitor {
             }
         }
 
+        // Emit trace probe at the end
         if (symbolRegistry != null) {
             stackDelta = max(stackDelta, emitTraceError());
         }

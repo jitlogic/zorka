@@ -113,5 +113,8 @@ if (zorka.boolCfg("tracer")) {
     tracer.setTracerMaxTraceRecords(mtr);
   }
 
+  tracer.setTraceSpyMethods(true);
+} else {
+  tracer.setTraceSpyMethods(false);
 }
 

@@ -364,7 +364,7 @@ public class AgentInstance {
 
     public synchronized Tracer getTracer() {
         if (tracer == null) {
-            tracer = new Tracer(getTracerMatcherSet(), getSymbolRegistry(), getMetricsRegistry());
+            tracer = new Tracer(getTracerMatcherSet(), getSymbolRegistry());
             MainSubmitter.setTracer(getTracer());
         }
         return tracer;

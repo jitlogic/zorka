@@ -53,8 +53,7 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
         MainSubmitter.setSubmitter(submitter);
         traceBuilder = new TestTraceBuilder();
         tracerObj = new Tracer(agentInstance.getTracerMatcherSet(),
-                agentInstance.getSymbolRegistry(),
-                agentInstance.getMetricsRegistry()) {
+                agentInstance.getSymbolRegistry()) {
             public TraceBuilder getHandler() {
                 return traceBuilder;
             }

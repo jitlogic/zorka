@@ -16,7 +16,6 @@
 
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
@@ -31,21 +30,33 @@ import java.util.List;
  */
 public class Tracer implements TracerOutput {
 
-    /** Minimum default method execution time required to attach method to trace. */
+    /**
+     * Minimum default method execution time required to attach method to trace.
+     */
     private static long minMethodTime = 250000;
 
-    /** Maximum number of records inside trace */
+    /**
+     * Maximum number of records inside trace
+     */
     private static int maxTraceRecords = 4096;
 
     private List<ZorkaAsyncThread<SymbolicRecord>> outputs = new ArrayList<ZorkaAsyncThread<SymbolicRecord>>();
 
-    /** Defines which classes and methods should be traced. */
+    /**
+     * Defines which classes and methods should be traced.
+     */
     private SpyMatcherSet matcherSet;
 
-    /** Symbol registry containing names of all symbols tracer knows about. */
+    /**
+     * Symbol registry containing names of all symbols tracer knows about.
+     */
     private SymbolRegistry symbolRegistry;
 
-    private MetricsRegistry metricsRegistry;
+
+    /**
+     * If true, methods instrumented by SPY will also be traced by default.
+     */
+    private boolean traceSpyMethods = true;
 
 
     public static long getMinMethodTime() {
@@ -58,7 +69,6 @@ public class Tracer implements TracerOutput {
     }
 
 
-
     public static int getMaxTraceRecords() {
         return maxTraceRecords;
     }
@@ -68,19 +78,31 @@ public class Tracer implements TracerOutput {
         maxTraceRecords = traceSize;
     }
 
-    /** Thread local serving trace builder objects for application threads */
+
+    public boolean isTraceSpyMethods() {
+        return traceSpyMethods;
+    }
+
+
+    public void setTraceSpyMethods(boolean traceSpyMethods) {
+        this.traceSpyMethods = traceSpyMethods;
+    }
+
+
+    /**
+     * Thread local serving trace builder objects for application threads
+     */
     private ThreadLocal<TraceBuilder> localHandlers =
-        new ThreadLocal<TraceBuilder>() {
-            public TraceBuilder initialValue() {
-                return new TraceBuilder(Tracer.this, symbolRegistry);
-            }
-        };
+            new ThreadLocal<TraceBuilder>() {
+                public TraceBuilder initialValue() {
+                    return new TraceBuilder(Tracer.this, symbolRegistry);
+                }
+            };
 
 
-    public Tracer(SpyMatcherSet matcherSet, SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry) {
+    public Tracer(SpyMatcherSet matcherSet, SymbolRegistry symbolRegistry) {
         this.matcherSet = matcherSet;
         this.symbolRegistry = symbolRegistry;
-        this.metricsRegistry = metricsRegistry;
     }
 
     /**
@@ -102,7 +124,6 @@ public class Tracer implements TracerOutput {
     }
 
 
-
     public void submit(SymbolicRecord record) {
         for (ZorkaAsyncThread<SymbolicRecord> output : outputs) {
             output.submit(record);
@@ -120,7 +141,6 @@ public class Tracer implements TracerOutput {
     public void addOutput(ZorkaAsyncThread<SymbolicRecord> output) {
         outputs.add(output);
     }
-
 
 
     public SpyMatcherSet getMatcherSet() {

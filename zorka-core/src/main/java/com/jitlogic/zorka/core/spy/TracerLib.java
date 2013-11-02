@@ -476,6 +476,16 @@ public class TracerLib {
     }
 
 
+    public void setTraceSpyMethods(boolean tsm) {
+        tracer.setTraceSpyMethods(tsm);
+    }
+
+
+    public boolean isTraceSpyMethods() {
+        return tracer.isTraceSpyMethods();
+    }
+
+
     /**
      * Sets default trace marker flags. This setting will be used when beginning new traces
      * without supplying initial flags.

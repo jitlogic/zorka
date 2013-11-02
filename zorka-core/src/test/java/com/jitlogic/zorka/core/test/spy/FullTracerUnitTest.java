@@ -273,4 +273,69 @@ public class FullTracerUnitTest extends ZorkaFixture {
         assertEquals(null, results.get(0).getAttr(symbols.symbolId("IN")));
     }
 
+
+    @Test
+    public void testTraceSpyMethodsFlagOn() throws Exception {
+        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
+
+        spy.add(spy.instance()
+                .onEnter(spy.put("AA", "OJA"))
+                .include(spy.byMethod(TCLASS4, "recursive1")));
+
+        agentInstance.getTracer().setMinMethodTime(0);
+
+        agentInstance.getTracer().setTraceSpyMethods(true);
+
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
+        invoke(obj, "recursive3");
+
+        assertEquals("should return one trace", 1, results.size());
+        assertEquals("trace should also register recursive1 method", 1, results.get(0).numChildren());
+    }
+
+    @Test
+    public void testTraceSpyMethodsFlagOff() throws Exception {
+        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
+
+        spy.add(spy.instance()
+                .onEnter(spy.put("AA", "OJA"))
+                .include(spy.byMethod(TCLASS4, "recursive1")));
+
+        agentInstance.getTracer().setMinMethodTime(0);
+
+        agentInstance.getTracer().setTraceSpyMethods(false);
+
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
+        invoke(obj, "recursive3");
+
+        assertEquals("should return no trace", 0, results.size());
+    }
+
+
+    @Test
+    public void testTraceSpyMethodsFlagOffAndOneMethodManuallyAddedToTracer() throws Exception {
+        tracer.include(spy.byMethod(TCLASS4, "recursive3"));
+        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
+
+        spy.add(spy.instance()
+                .onEnter(spy.put("AA", "OJA"))
+                .include(spy.byMethod(TCLASS4, "recursive1")));
+
+        agentInstance.getTracer().setMinMethodTime(0);
+
+        agentInstance.getTracer().setTraceSpyMethods(false);
+
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
+        invoke(obj, "recursive3");
+
+        assertEquals("should return one trace", 1, results.size());
+        assertEquals("trace should not register recursive1 method", 0, results.get(0).numChildren());
+    }
+
 }
