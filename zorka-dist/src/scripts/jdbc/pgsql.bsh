@@ -29,7 +29,7 @@ __pgsql() {
 
 
   if (zorka.boolCfg("tracer")) {
-      tracer.exclude(spy.byClass("org.postgresql.**").priority(750));
+      tracer.exclude("org.postgresql.**");
   }
 
   return this;

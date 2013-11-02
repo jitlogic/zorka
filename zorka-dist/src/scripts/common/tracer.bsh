@@ -28,33 +28,25 @@ if (zorka.boolCfg("tracer")) {
 
   zorka.logInfo("Enabling and configuring Zorka tracer ...");
 
-
+  // Process tracer includes ...
   for (String pkg : zorka.listCfg("tracer.include.extra")) {
-    if (pkg.contains("/")) {
-      cm = pkg.split("/");
-      zorka.logInfo("Include methods for trace: '" + cm[0] + "' / '" + cm[1] + "'");
-      tracer.include(spy.byMethod(cm[0].trim(),cm[1].trim()).priority(200));
-    } else {
-      zorka.logInfo("Include classes for trace: '" + pkg + "'");
-      tracer.include(spy.byClass(pkg).forTrace());
+    if (!pkg.indexOf(':') == -1) {
+       pkg = "200:" + pkg;
     }
+    tracer.include(pkg);
   }
 
-
+  // Process tracer excludes ...
   for (String pkg : zorka.listCfg("tracer.exclude.extra")) {
-    if (pkg.contains("/")) {
-      cm = pkg.split("/");
-      zorka.logInfo("Exclude methods from trace: '" + cm[0] + "' / '" + cm[1] + "'");
-      tracer.exclude(spy.byMethod(cm[0].trim(),cm[1].trim()).priority(300));
-    } else {
-      zorka.logInfo("Exclude clases from trace: '" + pkg + "'");
-      tracer.exclude(spy.byClass(pkg));
+    if (!pkg.indexOf(':') == -1) {
+       pkg = "200:" + pkg;
     }
+    tracer.exclude(pkg);
   }
 
 
-  tracer.exclude(spy.byClass("com.jitlogic.zorka.**").priority(100));
-  tracer.include(spy.byClass("**").priority(1000));
+  tracer.exclude("100:com.jitlogic.zorka.**");
+  tracer.include("1000:**");
 
 
   if (zorka.boolCfg("tracer.file")) {
@@ -80,11 +72,13 @@ if (zorka.boolCfg("tracer")) {
       zorka.intCfg("tracer.net.timeout", 60000)));
   }
 
+
   if (zorka.hasCfg("tracer.min.method.time")) {
     mmt = zorka.longCfg("tracer.min.method.time");
     zorka.logInfo("Setting tracer minimum method time to " + mmt + " ns");
     tracer.setTracerMinMethodTime(mmt);
   }
+
 
   if (zorka.hasCfg("tracer.min.trace.time")) {
     mtt = zorka.longCfg("tracer.min.trace.time");
@@ -92,11 +86,13 @@ if (zorka.boolCfg("tracer")) {
     tracer.setTracerMinTraceTime(mtt);
   }
 
+
   if (zorka.hasCfg("tracer.max.trace.records")) {
     mtr = zorka.intCfg("tracer.max.trace.records");
     zorka.logInfo("Setting maximum records per trace to " + mtr + ".");
     tracer.setTracerMaxTraceRecords(mtr);
   }
+
 
   tracer.setTraceSpyMethods(true);
 } else {

@@ -109,6 +109,32 @@ public class SpyMatcher {
 
     private int priority = DEFAULT_PRIORITY;
 
+
+    public static SpyMatcher fromString(String strMatch) {
+        int priority = DEFAULT_PRIORITY;
+        String classPattern = null, methodPattern = null;
+
+        String s = strMatch;
+
+        if (s.indexOf(':') != -1) {
+            priority = Integer.parseInt(s.substring(0, s.indexOf(':')));
+            s = s.substring(s.indexOf(':') + 1);
+        }
+
+        if (s.indexOf('/') != -1) {
+            int ix = s.lastIndexOf('/');
+            classPattern = s.substring(0, ix);
+            methodPattern = s.substring(ix + 1, s.length());
+        } else {
+            classPattern = s;
+            methodPattern = "*";
+        }
+
+        return new SpyMatcher(SpyMatcher.BY_CLASS_NAME | SpyMatcher.BY_METHOD_NAME, 1,
+                classPattern, methodPattern, null).priority(priority);
+    }
+
+
     /**
      * Creates spy matcher
      *

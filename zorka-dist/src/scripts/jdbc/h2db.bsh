@@ -28,7 +28,7 @@ __h2db() {
 
 
   if (zorka.boolCfg("tracer")) {
-      tracer.exclude(spy.byClass("org.h2.**"));
+      tracer.exclude("org.h2.**");
   }
 
   return this;

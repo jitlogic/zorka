@@ -19,6 +19,5 @@
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
-    tracer.exclude(spy.byClass("javax.faces.**"));
-    tracer.exclude(spy.byClass("com.sun.faces.**"));
+    tracer.exclude("javax.faces.**", "com.sun.faces.**");
 }

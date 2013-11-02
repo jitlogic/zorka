@@ -56,11 +56,11 @@ __jvm() {
 
   if (zorka.boolCfg("tracer")) {
       tracer.exclude(
-          spy.byClass("java.**"),
-          spy.byClass("sun.reflect.**"),
-          spy.byClass("sun.awt.**"),
-          spy.byClass("com.sun.beans.**"),
-          spy.byClass("$Proxy*")
+          "java.**",
+          "sun.reflect.**",
+          "sun.awt.**",
+          "com.sun.beans.**",
+          "$Proxy*"
       );
   }
 

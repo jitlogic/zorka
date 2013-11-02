@@ -19,7 +19,5 @@
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
-    tracer.exclude(
-      spy.byClass("javax.enterprise.util.**"),
-      spy.byClass("javax.el.**"));
+    tracer.exclude("javax.enterprise.util.**", "javax.el.**");
 }

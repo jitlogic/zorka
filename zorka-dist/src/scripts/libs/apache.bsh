@@ -19,9 +19,5 @@
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
-    tracer.exclude(
-        spy.byClass("org.apache.xerces.**"),
-        spy.byClass("org.apache.xml.**"),
-        spy.byClass("org.apache.el.**")
-    );
+    tracer.exclude( "org.apache.xerces.**", "org.apache.xml.**", "org.apache.el.**");
 }

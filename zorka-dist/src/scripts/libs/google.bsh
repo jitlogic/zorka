@@ -19,5 +19,5 @@
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
-    tracer.exclude(spy.byClass("com.google.common.**"));
+    tracer.exclude("com.google.common.**");
 }

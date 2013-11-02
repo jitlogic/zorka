@@ -19,6 +19,8 @@ package com.jitlogic.zorka.core.spy;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.tracedata.FileTraceOutput;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
+import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
 import com.jitlogic.zorka.core.spy.plugins.*;
 import com.jitlogic.zorka.core.util.OverlayClassLoader;
@@ -34,6 +36,8 @@ import java.util.Set;
  * @author rafal.lewczuk@jitlogic.com
  */
 public class TracerLib {
+
+    public static final ZorkaLog log = ZorkaLogger.getLog(TracerLib.class);
 
     public static final int SUBMIT_TRACE = TraceMarker.SUBMIT_TRACE;
     public static final int ALL_METHODS = TraceMarker.ALL_METHODS;
@@ -81,8 +85,16 @@ public class TracerLib {
      *
      * @param matchers spy matcher objects (created using spy.byXxxx() functions)
      */
+    public void include(String... matchers) {
+        for (String matcher : matchers) {
+            log.info(ZorkaLogger.ZAG_CONFIG, "Tracer include: " + matcher);
+            tracer.include(SpyMatcher.fromString(matcher.toString()));
+        }
+    }
+
     public void include(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
+            log.info(ZorkaLogger.ZAG_CONFIG, "Tracer include: " + matcher);
             tracer.include(matcher);
         }
     }
@@ -92,10 +104,19 @@ public class TracerLib {
      *
      * @param matchers spy matcher objects (created using spy.byXxxx() functions)
      */
+    public void exclude(String... matchers) {
+        for (String matcher : matchers) {
+            log.info(ZorkaLogger.ZAG_CONFIG, "Tracer exclude: " + matcher);
+            tracer.include(SpyMatcher.fromString(matcher.toString()).exclude());
+        }
+    }
+
     public void exclude(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
-            tracer.include(matcher.exclude());
+            log.info(ZorkaLogger.ZAG_CONFIG, "Tracer exclude: " + matcher);
+            tracer.include((matcher).exclude());
         }
+
     }
 
     /**

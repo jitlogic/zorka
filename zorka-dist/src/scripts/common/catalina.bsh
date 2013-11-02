@@ -120,10 +120,11 @@ __catalina() {
 
   if (zorka.boolCfg("tracer")) {
     tracer.exclude(
-        spy.byClass("org.apache.tomcat.util.**"),
-        spy.byClass("org.apache.catalina.security.**"),
-        spy.byClass("org.apache.catalina.core.ApplicationCont**"),
-        spy.byClass("org.apache.catalina.connector.**")     // TODO but this is sometimes useful for resolving connectivity problems
+        "org.apache.tomcat.util.**",
+        "org.apache.catalina.security.**",
+        "org.apache.catalina.core.ApplicationCont**",
+        "org.apache.catalina.connector.**"
+        // TODO but this is sometimes useful for resolving connectivity problems
     );
   }
 

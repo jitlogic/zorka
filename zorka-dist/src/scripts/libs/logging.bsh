@@ -19,9 +19,6 @@
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
-    tracer.exclude(
-        spy.byClass("org.slf4j.**"),
-        spy.byClass("org.log4j.**")
-    );
+    tracer.exclude("org.slf4j.**", "org.log4j.**");
 }
 

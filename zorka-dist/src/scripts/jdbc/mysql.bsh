@@ -26,7 +26,7 @@ __mysql() {
 
 
   if (zorka.boolCfg("tracer")) {
-      tracer.exclude(spy.byClass("com.mysql.**").priority(750));
+      tracer.exclude("com.mysql.**");
   }
 
   return this;

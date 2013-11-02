@@ -146,13 +146,13 @@ __jboss7() {
   if (zorka.boolCfg("tracer")) {
     tracer.exclude(spy.byClass("org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate").priority(100));
     tracer.exclude(
-        spy.byClass("org.jboss.weld.**"),
-        spy.byClass("org.jboss.modules.**"),
-        spy.byClass("org.jboss.logging.**"),
-        spy.byClass("org.jboss.logmanager.**"),
-        spy.byClass("org.jboss.as.weld.webtier.jsf.**"),
-        spy.byClass("org.jboss.vfs.**"),
-        spy.byClass("org.jboss.modules.ConcurrentClassLoader"));
+        "org.jboss.weld.**",
+        "org.jboss.modules.**",
+        "org.jboss.logging.**",
+        "org.jboss.logmanager.**",
+        "org.jboss.as.weld.webtier.jsf.**",
+        "org.jboss.vfs.**",
+        "org.jboss.modules.ConcurrentClassLoader");
   }
 
   return this;

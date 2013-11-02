@@ -19,7 +19,5 @@
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
-    tracer.exclude(
-        spy.byClass("javassist.**"),
-        spy.byClass("antlr.**"));
+    tracer.exclude("javassist.**", "antlr.**");
 }
