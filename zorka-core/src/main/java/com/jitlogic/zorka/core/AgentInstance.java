@@ -173,7 +173,6 @@ public class AgentInstance {
 
 
     public void stop() {
-        //instance = null;
     }
 
 
@@ -217,6 +216,8 @@ public class AgentInstance {
         }
 
         ZorkaLogger.configure(props);
+
+        log.info(ZorkaLogger.ZAG_CONFIG, "Starting ZORKA agent " + props.getProperty("zorka.version"));
     }
 
 
