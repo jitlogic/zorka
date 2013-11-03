@@ -61,7 +61,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
     @Test
     public void testTraceAndInstrumentSingleTrivialMethod() throws Exception {
-        engine.add(SpyDefinition.instance().onEnter(spy.fetchArg("E0", 0))
+        engine.add(spy.instance("x").onEnter(spy.fetchArg("E0", 0))
                 .include(spy.byMethod(TCLASS1, "trivialMethod")));
         tracer.include(spy.byMethod(TCLASS1, "trivialMethod"));
 

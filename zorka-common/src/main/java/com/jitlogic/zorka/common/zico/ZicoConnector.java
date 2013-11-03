@@ -37,9 +37,14 @@ import java.util.zip.CRC32;
  */
 public abstract class ZicoConnector implements Closeable {
 
-    /** */
+    /**
+     * ZICO protocol header length (in bytes)
+     */
     public final static int HEADER_LENGTH = 14;
 
+    /**
+     * ZICO protocol 'magic' signature
+     */
     public final static int[] ZICO_MAGIC = {0x21, 0xC0, 0xBA, 0xBE};
 
 
@@ -57,12 +62,11 @@ public abstract class ZicoConnector implements Closeable {
      * Receives ZICO packet.
      *
      * @return unpacked object or status/error.
-     *         <p/>
-     *         TODO this is not good design - encapsulate transferred packets and split data unpacking from data transfer
-     * @throws IOException
+     * @throws IOException when communication error occurs.
      */
     protected ZicoPacket recv() throws IOException {
 
+        // TODO this is not good design - encapsulate transferred packets and split data unpacking from data transfer
 
         for (int sbyte : ZICO_MAGIC) {
             int b;
@@ -112,7 +116,7 @@ public abstract class ZicoConnector implements Closeable {
      *
      * @param type packet type
      * @param data data (bytes)
-     * @throws IOException
+     * @throws IOException when network error occurs.
      */
     public void send(int type, byte... data) throws IOException {
         CRC32 crc = new CRC32();
@@ -135,6 +139,11 @@ public abstract class ZicoConnector implements Closeable {
     }
 
 
+    /**
+     * Closes ZICO connection.
+     *
+     * @throws IOException when I/O error occurs while closing.
+     */
     @Override
     public void close() throws IOException {
         if (socket != null) {
@@ -157,13 +166,16 @@ public abstract class ZicoConnector implements Closeable {
         this.addr = addr;
     }
 
+
     public int getPort() {
         return port;
     }
 
+
     public void setPort(int port) {
         this.port = port;
     }
+
 
     public boolean isOpen() {
         return socket != null;

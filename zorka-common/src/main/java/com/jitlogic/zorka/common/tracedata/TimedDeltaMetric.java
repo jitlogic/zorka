@@ -18,8 +18,16 @@ package com.jitlogic.zorka.common.tracedata;
 
 import java.util.Map;
 
+/**
+ * Calculates delta per second from measured data.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class TimedDeltaMetric extends RawDeltaMetric {
 
+    /**
+     * Timestamp of last measurement
+     */
     private long lastClock;
 
     public TimedDeltaMetric(int id, String name, Map<String, Object> attrs) {
@@ -30,18 +38,18 @@ public class TimedDeltaMetric extends RawDeltaMetric {
         super(id, templateId, name, attrs);
     }
 
-    public TimedDeltaMetric(MetricTemplate template, String name, Map<String,Object> attrs) {
+    public TimedDeltaMetric(MetricTemplate template, String name, Map<String, Object> attrs) {
         super(template, name, attrs);
     }
 
     @Override
     public Number getValue(long clock, Object value) {
-        Number val = super.getValue(clock, (Number)value);
+        Number val = super.getValue(clock, (Number) value);
 
         long dclock = clock - lastClock;
 
         lastClock = clock;
 
-        return dclock > 0 ?  1000.0 * val.doubleValue() / dclock : 0.0;
+        return dclock > 0 ? 1000.0 * val.doubleValue() / dclock : 0.0;
     }
 }

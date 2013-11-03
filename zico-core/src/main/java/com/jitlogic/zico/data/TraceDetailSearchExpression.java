@@ -25,6 +25,7 @@ public class TraceDetailSearchExpression {
 
     public final static int ERRORS_ONLY = 0x0001;
     public final static int METHODS_WITH_ATTRS = 0x0002;
+    public final static int IGNORE_CASE = 0x0004;
 
     public final static int SEARCH_CLASSES = 0x0100;
     public final static int SEARCH_METHODS = 0x0200;

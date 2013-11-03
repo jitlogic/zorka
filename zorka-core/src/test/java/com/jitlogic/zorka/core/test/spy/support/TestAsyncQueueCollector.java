@@ -15,13 +15,13 @@
  */
 package com.jitlogic.zorka.core.test.spy.support;
 
-import com.jitlogic.zorka.core.spy.AsyncQueueCollector;
+import com.jitlogic.zorka.core.spy.plugins.AsyncQueueCollector;
 
 import java.util.Map;
 
 public class TestAsyncQueueCollector extends AsyncQueueCollector {
 
-    public Map<String,Object> process(int stage, Map<String,Object> record) {
+    public Map<String, Object> process(int stage, Map<String, Object> record) {
         doProcess(record);
         return record;
     }

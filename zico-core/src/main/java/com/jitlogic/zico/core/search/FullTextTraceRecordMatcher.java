@@ -41,7 +41,13 @@ public class FullTextTraceRecordMatcher implements TraceRecordMatcher {
     public FullTextTraceRecordMatcher(SymbolRegistry symbolRegistry, int flags, String text) {
         this.symbolRegistry = symbolRegistry;
         this.flags = flags;
-        this.text = text;
+
+        if (0 != (flags & IGNORE_CASE)) {
+            this.text = text != null ? text.toLowerCase() : null;
+        } else {
+            this.text = text;
+        }
+
     }
 
 
@@ -64,9 +70,14 @@ public class FullTextTraceRecordMatcher implements TraceRecordMatcher {
 
 
     private boolean matches(String s) {
+
+        if (0 != (flags & IGNORE_CASE)) {
+            s = s.toLowerCase();
+        }
+
         return s != null &&
                 ((text != null && s.contains(text))
-                        || (pattern != null && pattern.matcher(s).matches()));
+                        || (pattern != null && pattern.matcher(s).find()));
     }
 
 

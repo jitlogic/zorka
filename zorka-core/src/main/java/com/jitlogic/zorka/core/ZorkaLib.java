@@ -29,7 +29,7 @@ import com.jitlogic.zorka.core.util.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.*;
 import com.jitlogic.zorka.core.mbeans.AttrGetter;
-import com.jitlogic.zorka.core.util.ValGetter;
+import com.jitlogic.zorka.common.stats.ValGetter;
 import com.jitlogic.zorka.core.mbeans.ZorkaMappedMBean;
 
 
@@ -321,18 +321,6 @@ public class ZorkaLib {
 
 
     /**
-     * Recursively accesses object. This is just a ObjectInspector.get() method facade for configuration scripts.
-     *
-     * @param obj  source object
-     * @param args attribute chain
-     * @return retrieved value
-     */
-    public Object get(Object obj, Object... args) {
-        return ObjectInspector.get(obj, args);
-    }
-
-
-    /**
      * Creates zorka dynamic MBean. Such mbean object can be populated with attributes
      * using put() or setAttr() methods.
      *
@@ -600,12 +588,10 @@ public class ZorkaLib {
      *
      * @return thread rank lister object
      */
-    public ThreadRankLister threadRankLister() {
-        synchronized (this) {
-            if (threadRankLister == null) {
-                threadRankLister = new ThreadRankLister(mbsRegistry);
-                scheduler.schedule(threadRankLister, 15000, 0);
-            }
+    public synchronized ThreadRankLister threadRankLister() {
+        if (threadRankLister == null) {
+            threadRankLister = new ThreadRankLister(mbsRegistry);
+            scheduler.schedule(threadRankLister, 15000, 0);
         }
 
         return threadRankLister;
@@ -870,54 +856,6 @@ public class ZorkaLib {
         for (String func : funcs) {
             translator.allow(func);
         }
-    }
-
-
-    public Set<Object> set(Object... objs) {
-        return ZorkaUtil.set(objs);
-    }
-
-
-    public String castString(Object obj) {
-        return ZorkaUtil.castString(obj);
-    }
-
-
-    public String crc32sum(String input) {
-        return ZorkaUtil.crc32(input);
-    }
-
-
-    public String crc32sum(String input, int limit) {
-        String sum = ZorkaUtil.crc32(input);
-        return sum.length() > limit ? sum.substring(0, limit) : sum;
-    }
-
-
-    public String md5sum(String input) {
-        return ZorkaUtil.md5(input);
-    }
-
-
-    public String md5sum(String input, int limit) {
-        String sum = ZorkaUtil.md5(input);
-        return sum.length() > limit ? sum.substring(0, limit) : sum;
-    }
-
-
-    public String sha1sum(String input) {
-        return ZorkaUtil.sha1(input);
-    }
-
-
-    public String sha1sum(String input, int limit) {
-        String sum = ZorkaUtil.sha1(input);
-        return sum.length() > limit ? sum.substring(0, limit) : sum;
-    }
-
-
-    public String strTime(long ns) {
-        return ZorkaUtil.strTime(ns);
     }
 
 }

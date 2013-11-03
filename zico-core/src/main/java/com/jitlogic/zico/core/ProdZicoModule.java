@@ -29,12 +29,12 @@ public class ProdZicoModule extends AbstractZicoModule {
         String homeDir = System.getProperty("zico.home.dir");
 
         if (homeDir == null) {
-            throw new RuntimeException("Missing home dir configuration property. " +
+            throw new ZicoRuntimeException("Missing home dir configuration property. " +
                     "Add '-Dzico.home.dir=/path/to/zico/home' to JVM options.");
         }
 
         if (!new File(homeDir).isDirectory()) {
-            throw new RuntimeException("Home dir property does not point to a directory.");
+            throw new ZicoRuntimeException("Home dir property does not point to a directory.");
         }
 
         return new ZicoConfig(homeDir);

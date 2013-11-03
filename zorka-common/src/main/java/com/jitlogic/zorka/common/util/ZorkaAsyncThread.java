@@ -26,24 +26,34 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Implements asunchronous processing thread with submit queue.
  *
  * @param <T> type of elements in a queue
- *
- * TODO factor out direct processing functionality (exposing process(), flush(), open(), close() etc.)
+ *            <p/>
+ *            TODO factor out direct processing functionality (exposing process(), flush(), open(), close() etc.)
  */
 public abstract class ZorkaAsyncThread<T> implements Runnable {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     protected final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** Submit queue */
-    private BlockingQueue<T> submitQueue;
+    /**
+     * Submit queue
+     */
+    protected BlockingQueue<T> submitQueue;
 
-    /** Thred name (will be prefixed with ZORKA-) */
+    /**
+     * Thred name (will be prefixed with ZORKA-)
+     */
     private final String name;
 
-    /** Processing thread will be working as long as this attribute value is true */
+    /**
+     * Processing thread will be working as long as this attribute value is true
+     */
     private final AtomicBoolean running = new AtomicBoolean(false);
 
-    /** Thread object representing actual processing thread. */
+    /**
+     * Thread object representing actual processing thread.
+     */
     private Thread thread;
 
     protected boolean countTraps = true;
@@ -59,7 +69,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
      * @param name thread name
      */
     public ZorkaAsyncThread(String name, int qlen) {
-        this.name = "ZORKA-"+name;
+        this.name = "ZORKA-" + name;
         submitQueue = new ArrayBlockingQueue<T>(qlen);
     }
 
@@ -105,7 +115,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
     /**
      * Processes single item from submit queue (if any).
      */
-    private void runCycle() {
+    protected void runCycle() {
         try {
             T obj = submitQueue.take();
             if (obj != null) {
@@ -167,8 +177,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
      * Error handling method - called when processing errors occur.
      *
      * @param message error message
-     *
-     * @param e exception object
+     * @param e       exception object
      */
     protected void handleError(String message, Throwable e) {
         if (log != null) {

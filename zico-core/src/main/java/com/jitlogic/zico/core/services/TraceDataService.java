@@ -15,10 +15,7 @@
  */
 package com.jitlogic.zico.core.services;
 
-import com.jitlogic.zico.core.HostStore;
-import com.jitlogic.zico.core.HostStoreManager;
-import com.jitlogic.zico.core.TraceRecordStore;
-import com.jitlogic.zico.core.TraceTypeRegistry;
+import com.jitlogic.zico.core.*;
 import com.jitlogic.zico.core.eql.Parser;
 import com.jitlogic.zico.core.search.EqlTraceRecordMatcher;
 import com.jitlogic.zico.core.search.FullTextTraceRecordMatcher;
@@ -144,12 +141,13 @@ public class TraceDataService {
         result.setMinTime(Long.MAX_VALUE);
         result.setMaxTime(Long.MIN_VALUE);
 
-        TraceRecordMatcher matcher = null;
+        TraceRecordMatcher matcher;
         String se = expr.getSearchExpr();
         switch (expr.getType()) {
             case TraceDetailSearchExpression.TXT_QUERY:
                 if (se != null && se.startsWith("~")) {
-                    Pattern regex = Pattern.compile(se.substring(1, se.length()));
+                    int rflag = 0 != (expr.getFlags() & TraceDetailSearchExpression.IGNORE_CASE) ? Pattern.CASE_INSENSITIVE : 0;
+                    Pattern regex = Pattern.compile(se.substring(1, se.length()), rflag);
                     matcher = new FullTextTraceRecordMatcher(symbolRegistry, expr.getFlags(), regex);
                 } else {
                     matcher = new FullTextTraceRecordMatcher(symbolRegistry, expr.getFlags(), se);
@@ -158,6 +156,8 @@ public class TraceDataService {
             case TraceDetailSearchExpression.EQL_QUERY:
                 matcher = new EqlTraceRecordMatcher(symbolRegistry, Parser.expr(se), expr.getFlags(), tr.getTime());
                 break;
+            default:
+                throw new ZicoRuntimeException("Illegal search expression type: " + expr.getType());
         }
         ctx.searchRecords(tr, path, matcher, result, tr.getTime(), false);
 

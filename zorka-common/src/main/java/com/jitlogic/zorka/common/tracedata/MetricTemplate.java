@@ -21,35 +21,83 @@ import com.jitlogic.zorka.common.util.ZorkaUtil;
 import java.io.Serializable;
 import java.util.*;
 
+/**
+ * Metric template. This is used to create new metrics for tracking
+ * performance data inside VM.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class MetricTemplate implements Serializable {
 
-    public static final int RAW_DATA       = 1;
-    public static final int RAW_DELTA      = 2;
-    public static final int TIMED_DELTA    = 3;
-    public static final int WINDOWED_RATE  = 4;
-    public static final int UTILIZATION    = 5;
+    public static final int RAW_DATA = 1;
+    public static final int RAW_DELTA = 2;
+    public static final int TIMED_DELTA = 3;
+    public static final int WINDOWED_RATE = 4;
+    public static final int UTILIZATION = 5;
 
+    /**
+     * Template ID (automatically assigned by agent)
+     */
     private int id;
+
+    /**
+     * Determines types of metrics created from this template.
+     */
     private int type;
 
+    /**
+     * Metric name
+     */
     private String name;
+
+    /**
+     * Units of measure (human readable string)
+     */
     private String units;
 
+    /**
+     * Nominator and divider fields (for metrics using two components)
+     */
     private String nomField, divField;
 
+    /**
+     * Result multiplier
+     */
     private double multiplier = 1.0;
 
-    /** Names of dynamic attributes */
+    /**
+     * Names of dynamic attributes
+     */
     private Set<String> dynamicAttrs = new HashSet<String>();
 
-    private Map<String,Metric> metrics = new HashMap<String, Metric>();
+    /**
+     * Metrics created from this template so far
+     */
+    private Map<String, Metric> metrics = new HashMap<String, Metric>();
 
 
+    /**
+     * Creates new template
+     *
+     * @param type  metric type
+     * @param name  metric name
+     * @param units units of measure
+     */
     public MetricTemplate(int type, String name, String units) {
         this(type, name, units, null, null);
     }
 
 
+    /**
+     * Creates new template
+     *
+     * @param id       template ID
+     * @param type     metric type
+     * @param name     metric name
+     * @param units    units of measure
+     * @param nomField nominal field
+     * @param divField divider field
+     */
     public MetricTemplate(int id, int type, String name, String units, String nomField, String divField) {
         this.id = id;
         this.type = type;
@@ -60,7 +108,15 @@ public class MetricTemplate implements Serializable {
     }
 
 
-
+    /**
+     * Creates new template
+     *
+     * @param type     metric type
+     * @param name     metric name
+     * @param units    units of measure
+     * @param nomField nominal field
+     * @param divField divider field
+     */
     public MetricTemplate(int type, String name, String units, String nomField, String divField) {
         this.type = type;
         this.name = name;
@@ -70,6 +126,11 @@ public class MetricTemplate implements Serializable {
     }
 
 
+    /**
+     * Creates copy of metric template
+     *
+     * @param orig original template
+     */
     private MetricTemplate(MetricTemplate orig) {
         this.id = orig.id;
         this.type = orig.type;
@@ -85,11 +146,11 @@ public class MetricTemplate implements Serializable {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof MetricTemplate) {
-            MetricTemplate mt = (MetricTemplate)obj;
+            MetricTemplate mt = (MetricTemplate) obj;
             return type == mt.type
-                && ZorkaUtil.objEquals(name, mt.name)
-                && ZorkaUtil.objEquals(nomField, mt.nomField)
-                && ZorkaUtil.objEquals(divField, mt.divField);
+                    && ZorkaUtil.objEquals(name, mt.name)
+                    && ZorkaUtil.objEquals(nomField, mt.nomField)
+                    && ZorkaUtil.objEquals(divField, mt.divField);
         } else {
             return false;
         }
@@ -98,7 +159,7 @@ public class MetricTemplate implements Serializable {
 
     @Override
     public int hashCode() {
-        return (1117*type) ^ (name != null ? name.hashCode() : 0);
+        return (1117 * type) ^ (name != null ? name.hashCode() : 0);
     }
 
 
@@ -138,6 +199,13 @@ public class MetricTemplate implements Serializable {
     }
 
 
+    /**
+     * Changes multiplier field.
+     * Returns new version of metric template object, original object is unchanged.
+     *
+     * @param multiplier new multiplier
+     * @return altered metric template
+     */
     public MetricTemplate multiply(double multiplier) {
         MetricTemplate mt = new MetricTemplate(this);
         mt.multiplier = multiplier;
@@ -150,7 +218,14 @@ public class MetricTemplate implements Serializable {
     }
 
 
-    public MetricTemplate dynamicAttrs(String...attrs) {
+    /**
+     * Adds new dynamic attributes to metric template
+     * Returns new version of metric template object, original object is unchanged.
+     *
+     * @param attrs new dynamic attribute names
+     * @return altered metric template
+     */
+    public MetricTemplate dynamicAttrs(String... attrs) {
         MetricTemplate mt = new MetricTemplate(this);
         for (String attr : attrs) {
             mt.dynamicAttrs.add(attr);
@@ -159,8 +234,17 @@ public class MetricTemplate implements Serializable {
     }
 
 
+    /**
+     * Adds new dynamic attributes to metric template
+     * Returns new version of metric template object, original object is unchanged.
+     *
+     * @param attrs new dynamic attribute names
+     * @return altered metric template
+     */
     public MetricTemplate dynamicAttrs(Collection<String> attrs) {
-        if (attrs == null) { return this; }
+        if (attrs == null) {
+            return this;
+        }
         MetricTemplate mt = new MetricTemplate(this);
         mt.dynamicAttrs.addAll(attrs);
         return mt;

@@ -18,15 +18,12 @@ package com.jitlogic.zico.test.support;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.jitlogic.zico.core.TraceTypeRegistry;
-import com.jitlogic.zico.core.ZicoConfig;
-import com.jitlogic.zico.core.HostStoreManager;
+import com.jitlogic.zico.core.*;
 import com.jitlogic.zico.core.services.AdminService;
 import com.jitlogic.zico.core.services.TraceDataService;
 import com.jitlogic.zorka.common.test.support.TestUtil;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
-import com.jitlogic.zico.core.ZicoService;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.junit.After;
 import org.junit.Before;
@@ -50,6 +47,8 @@ public class ZicoFixture {
     protected SymbolRegistry symbolRegistry;
     protected TraceTypeRegistry traceTypeRegistry;
 
+    protected TraceTableWriter traceTableWriter;
+
     protected TestZicoModule testZicoModule;
     protected Injector injector;
     protected BasicDataSource dataSource;
@@ -70,7 +69,8 @@ public class ZicoFixture {
                 "zico.db.url", "jdbc:h2:mem:test",
                 "zico.db.user", "sa",
                 "zico.db.pass", "sa",
-                "zico.db.create", "yes"
+                "zico.db.create", "yes",
+                "dbwriter.synchronous.mode", "yes"
         );
 
         config = new ZicoConfig(configProperties);
@@ -89,6 +89,8 @@ public class ZicoFixture {
 
         symbolRegistry = injector.getInstance(SymbolRegistry.class);
         traceTypeRegistry = injector.getInstance(TraceTypeRegistry.class);
+
+        traceTableWriter = injector.getInstance(TraceTableWriter.class);
     }
 
     @After

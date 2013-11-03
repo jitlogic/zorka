@@ -90,14 +90,14 @@ public class TraceRecordStore {
                     if (idx >= 0 && idx < tr.numChildren()) {
                         tr = tr.getChild(idx);
                     } else {
-                        throw new RuntimeException("Child record of path " + path + " not found.");
+                        throw new ZicoRuntimeException("Child record of path " + path + " not found.");
                     }
                 }
             }
 
             return tr;
         } catch (Exception e) {
-            throw new RuntimeException("Error retrieving trace record.", e);
+            throw new ZicoRuntimeException("Error retrieving trace record.", e);
         }
     }
 

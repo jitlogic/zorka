@@ -20,7 +20,7 @@ import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import com.jitlogic.zorka.core.spy.SpyLib;
 import com.jitlogic.zorka.core.spy.*;
 
-import com.jitlogic.zorka.core.spy.GetterPresentingCollector;
+import com.jitlogic.zorka.core.spy.plugins.GetterPresentingCollector;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.junit.Before;
@@ -46,13 +46,13 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
 
     protected SpyContext ctx;
     protected SpyDefinition sdef;
-    protected Map<String,Object> record;
+    protected Map<String, Object> record;
 
     @Before
     public void setUp() {
         zorkaAgent.put("test", this);
 
-        sdef = SpyDefinition.instance();
+        sdef = spy.instance("x");
         ctx = new SpyContext(sdef, "some.Class", "someMethod", "()V", 1);
 
         record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
@@ -71,7 +71,7 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
     @Test
     public void testCollectRecordViaBshFuncManual() throws Exception {
         zorkaAgent.eval("process(obj) { test.result(obj); }");
-        SpyProcessor col = (SpyProcessor)zorkaAgent.eval(
+        SpyProcessor col = (SpyProcessor) zorkaAgent.eval(
                 "(com.jitlogic.zorka.core.spy.SpyProcessor)this");
 
         col.process(record);
@@ -84,7 +84,9 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
     @Test
     public void testPublishObjectViaGetterCollector() throws Exception {
         SpyProcessor col = new GetterPresentingCollector(mBeanServerRegistry, "test", "test:name=TestObj", "testAttr", "meh", "C2");
-        record.put("C0", 1L); record.put("C1", 1L); record.put("C2", "oja!");
+        record.put("C0", 1L);
+        record.put("C1", 1L);
+        record.put("C2", "oja!");
 
         record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_SUBMIT));
         record.put(".STAGE", SpyLib.ON_SUBMIT);
@@ -99,7 +101,9 @@ public class StandardCollectorsUnitTest extends ZorkaFixture {
     @Test
     public void testPublishObjectViaGetterCollectorWithDispatch() throws Exception {
         SpyProcessor col = new GetterPresentingCollector(mBeanServerRegistry, "test", "test:name=TestObj", "testAttr", "meh", "C2", "length()");
-        record.put("C0", 1L); record.put("C1", 1L); record.put("C2", "oja!");
+        record.put("C0", 1L);
+        record.put("C1", 1L);
+        record.put("C2", "oja!");
 
         record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << SpyLib.ON_SUBMIT));
         record.put(".STAGE", SpyLib.ON_SUBMIT);

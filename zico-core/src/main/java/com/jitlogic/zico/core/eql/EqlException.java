@@ -16,9 +16,10 @@
 package com.jitlogic.zico.core.eql;
 
 
+import com.jitlogic.zico.core.ZicoRuntimeException;
 import com.jitlogic.zico.core.eql.ast.EqlExpr;
 
-public class EqlException extends RuntimeException {
+public class EqlException extends ZicoRuntimeException {
 
     private EqlExpr expr;
 

@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.core.spy;
 
 
-import com.jitlogic.zorka.core.AgentDiagnostics;
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
@@ -312,7 +312,7 @@ public class TraceBuilder {
 
     private void reparentTop(TraceRecord parent) {
         // Drop interim record if necessary
-        if (ttop.getMarker().hasFlag(TraceMarker.DROP_INTERIM) && ttop.isSafeInterim()
+        if (ttop.getMarker().hasFlag(TraceMarker.DROP_INTERIM) && ttop.isInterimDroppable()
                 && ttop.getTime() - ttop.getChild(0).getTime() < Tracer.getMinMethodTime()) {
             TraceRecord child = ttop.getChild(0);
             child.setCalls(ttop.getCalls());
@@ -350,11 +350,25 @@ public class TraceBuilder {
     }
 
 
-    public void markTraceFlags(int flag) {
-        TraceRecord top = realTop();
-        if (top.getMarker() != null) {
-            top.getMarker().markFlags(flag);
+    public void markTraceFlags(int traceId, int flag) {
+        for (TraceRecord tr = realTop(); tr != null; tr = tr.getParent()) {
+            TraceMarker tm = tr.getMarker();
+            if (tm != null && (traceId == 0 || traceId == tm.getTraceId())) {
+                tm.markFlags(flag);
+                break;
+            }
         }
+    }
+
+
+    public boolean isInTrace(int traceId) {
+        for (TraceRecord tr = realTop(); tr != null; tr = tr.getParent()) {
+            TraceMarker tm = tr.getMarker();
+            if (tm != null && tm.getTraceId() == traceId) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

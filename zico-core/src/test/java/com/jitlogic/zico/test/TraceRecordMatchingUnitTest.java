@@ -82,6 +82,13 @@ public class TraceRecordMatchingUnitTest extends ZicoFixture {
 
 
     @Test
+    public void testCaseSensitivityInFullTextMatching() throws Exception {
+        assertTrue(new FullTextTraceRecordMatcher(symbolRegistry, flags | IGNORE_CASE, "ExEcUtE").match(tr1));
+        assertFalse(new FullTextTraceRecordMatcher(symbolRegistry, flags, "ExEcUtE").match(tr1));
+    }
+
+
+    @Test
     public void testEqlMatching() throws Exception {
         assertTrue(eqlm("method = 'execute'", tr1));
         assertFalse(eqlm("method = 'executeUpdate'", tr1));

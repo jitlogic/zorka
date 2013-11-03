@@ -16,7 +16,7 @@
 package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.contrib.libsnmp.*;
-import com.jitlogic.zorka.core.AgentDiagnostics;
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaLogLevel;
@@ -34,37 +34,48 @@ import java.net.SocketException;
  */
 public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements ZorkaTrapper {
 
-    /** Default UDP port to send traps to */
+    /**
+     * Default UDP port to send traps to
+     */
     public static final int DEFAULT_TRAP_PORT = 162;
 
-    /** UDP port traps will be sent to */
+    /**
+     * UDP port traps will be sent to
+     */
     private int snmpPort;
 
-    /** IP address SNMP will be sent to */
+    /**
+     * IP address SNMP will be sent to
+     */
     private InetAddress snmpAddr;
 
-    /** Protocol version (SNMP_v1 or SNMP_v2). */
+    /**
+     * Protocol version (SNMP_v1 or SNMP_v2).
+     */
     private int protocol;
 
-    /** SNMP sender (from SNMP library) */
+    /**
+     * SNMP sender (from SNMP library)
+     */
     private SNMPTrapSenderInterface sender;
 
-    /** IP address agent advertises itself as */
+    /**
+     * IP address agent advertises itself as
+     */
     private SNMPIPAddress agentAddr;
 
-    /** Community ID */
+    /**
+     * Community ID
+     */
     private String community;
 
     /**
      * Creates SNMP trapper.
      *
-     * @param snmpAddr IP address traps will be sent to
-     *
+     * @param snmpAddr  IP address traps will be sent to
      * @param community community ID
-     *
      * @param agentAddr IP address agent advertises itself as
-     *
-     * @param protocol SNMP protocol version
+     * @param protocol  SNMP protocol version
      */
     public SnmpTrapper(String snmpAddr, String community, String agentAddr, int protocol) {
         super("snmp-sender");
@@ -91,16 +102,13 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
      * Sends an SNMP tra
      *
      * @param gtrap general trap type
-     *
      * @param strap specific trap type
-     *
-     * @param oid enterprise OID
-     *
-     * @param vars additional (named) attributes
+     * @param oid   enterprise OID
+     * @param vars  additional (named) attributes
      */
-    public void trap(int gtrap, int strap, SNMPObjectIdentifier oid, SNMPVariablePair...vars) {
+    public void trap(int gtrap, int strap, SNMPObjectIdentifier oid, SNMPVariablePair... vars) {
         try {
-            SNMPTimeTicks timestamp = new SNMPTimeTicks((long)(System.currentTimeMillis()/10));
+            SNMPTimeTicks timestamp = new SNMPTimeTicks((long) (System.currentTimeMillis() / 10));
             SNMPVarBindList varBindList = new SNMPVarBindList();
 
             for (SNMPVariablePair var : vars) {

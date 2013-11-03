@@ -18,6 +18,7 @@ package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,7 +37,6 @@ public class ZabbixQueryTranslator implements QueryTranslator {
      * Translates zabbix query to beanshell call
      *
      * @param query zabbix query
-     *
      * @return query ready to be passed to bsh agent
      */
     @Override
@@ -67,7 +67,7 @@ public class ZabbixQueryTranslator implements QueryTranslator {
                 while (pos < query.length() && query.charAt(pos) != '"') {
                     pos++;
                 }
-                sb.append(query.substring(pstart, pos+1));
+                sb.append(query.substring(pstart, pos + 1));
             } else {
                 sb.append(query.charAt(pos));
             }
@@ -81,7 +81,7 @@ public class ZabbixQueryTranslator implements QueryTranslator {
 
     private void isAllowed(String fn) {
         if (allowed.size() > 0 && !allowed.contains(fn)) {
-            throw new RuntimeException("Calling '" + fn + "' is not allowed.");
+            throw new ZorkaRuntimeException("Calling '" + fn + "' is not allowed.");
         }
     }
 

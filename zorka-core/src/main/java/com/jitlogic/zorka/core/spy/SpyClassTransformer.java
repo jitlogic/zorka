@@ -17,7 +17,7 @@
 
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.core.AgentDiagnostics;
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaLog;

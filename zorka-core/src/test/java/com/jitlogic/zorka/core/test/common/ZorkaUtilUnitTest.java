@@ -16,6 +16,7 @@ package com.jitlogic.zorka.core.test.common;
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import com.jitlogic.zorka.common.stats.MethodCallStatistic;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.junit.Assert;
@@ -26,13 +27,15 @@ import org.junit.Test;
 public class ZorkaUtilUnitTest {
 
     public static class TestCallStatistic extends MethodCallStatistic {
-        public TestCallStatistic(String name) { super(name); }
+        public TestCallStatistic(String name) {
+            super(name);
+        }
     }
 
     @Test
     public void testInstanceOf1() throws Exception {
         Assert.assertTrue("immediate implements",
-            ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.common.stats.ZorkaStat"));
+                ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.common.stats.ZorkaStat"));
     }
 
     @Test
@@ -50,7 +53,7 @@ public class ZorkaUtilUnitTest {
     @Test
     public void testInstanceOf4() throws Exception {
         Assert.assertFalse("should not implement",
-                ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.core.util.ValGetter"));
+                ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.common.stats.ValGetter"));
     }
 
     @Test

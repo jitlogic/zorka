@@ -33,7 +33,7 @@ import java.lang.reflect.Method;
 public class TestUtil extends ClassLoader {
 
     public static byte[] readResource(String name) throws Exception {
-        InputStream is = TestUtil.class.getResourceAsStream("/"+name);
+        InputStream is = TestUtil.class.getResourceAsStream("/" + name);
         byte[] buf = new byte[65536];
         int len = is.read(buf);
         is.close();
@@ -90,11 +90,11 @@ public class TestUtil extends ClassLoader {
 
         field.setAccessible(accessible);
 
-        return (T)retVal;
+        return (T) retVal;
     }
 
 
-    public static Object invoke(Object obj, String name, Object...args) throws Exception {
+    public static Object invoke(Object obj, String name, Object... args) throws Exception {
         Method method = null;
         Class<?> clazz = obj.getClass();
 
@@ -102,6 +102,15 @@ public class TestUtil extends ClassLoader {
             if (name.equals(met.getName())) {
                 method = met;
                 break;
+            }
+        }
+
+        if (method == null) {
+            for (Method met : clazz.getDeclaredMethods()) {
+                if (name.equals(met.getName())) {
+                    method = met;
+                    method.setAccessible(true);
+                }
             }
         }
 
@@ -127,13 +136,13 @@ public class TestUtil extends ClassLoader {
     public static Object checkForError(Object obj) {
         if (obj instanceof Throwable) {
             System.err.println("Error: " + obj);
-            ((Throwable)obj).printStackTrace(System.err);
+            ((Throwable) obj).printStackTrace(System.err);
         }
         return obj;
     }
 
 
-    public static Object getAttr(MBeanServerConnection mbs, String mbeanName, String attr) throws Exception{
+    public static Object getAttr(MBeanServerConnection mbs, String mbeanName, String attr) throws Exception {
         return mbs.getAttribute(new ObjectName(mbeanName), attr);
     }
 

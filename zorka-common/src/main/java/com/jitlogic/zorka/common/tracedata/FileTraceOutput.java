@@ -25,21 +25,59 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
 
+/**
+ * Implements functionality of storing data generating by tracer to local files.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class FileTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements TraceOutput {
 
     private static final ZorkaLog log = ZorkaLogger.getLog(FileTraceOutput.class);
 
+    /**
+     * Path to trace file.
+     */
     private File path;
 
+    /**
+     * Maximum number of archived files
+     */
     private int maxArchiveFiles;
+
+    /**
+     * Maximum file size
+     */
     private long maxFileSize;
+
+    /**
+     * If true, output data will be compressed
+     */
     private boolean compress;
 
+    /**
+     * Trace writer responsible for encoding output data
+     */
     private TraceWriter traceWriter;
 
+    /**
+     * File output stream (physical file)
+     */
     private FileOutputStream fileStream;
+
+    /**
+     * Logical output stream (possibly compressor stacked over file output stream)
+     */
     private OutputStream stream;
 
+    /**
+     * Creates file output for tracer.
+     *
+     * @param traceWriter     trace writer
+     * @param path            path to output file
+     * @param maxArchiveFiles max number of archived files
+     * @param maxFileSize     max file size
+     * @param compress        enable compressions
+     */
     public FileTraceOutput(TraceWriter traceWriter, File path, int maxArchiveFiles, long maxFileSize, boolean compress) {
         super("file-output");
 
@@ -89,10 +127,10 @@ public class FileTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
             f.delete();
         }
 
-        for (int i = maxArchiveFiles-1; i > 0; i--) {
+        for (int i = maxArchiveFiles - 1; i > 0; i--) {
             f = new File(path.getPath() + "." + i);
             if (f.exists()) {
-                File nf = new File(path.getPath() + "." + (i+1));
+                File nf = new File(path.getPath() + "." + (i + 1));
                 f.renameTo(nf);
             }
         }
@@ -106,9 +144,21 @@ public class FileTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
         traceWriter.reset();
     }
 
-    byte[] ZTRZ_MAGIC = new byte[] { 'Z', 'T', 'R', 'Z' };
-    byte[] ZTRC_MAGIC = new byte[] { 'Z', 'T', 'R', 'C' };
+    /**
+     * Compressed trace file signature (magic bytes)
+     */
+    byte[] ZTRZ_MAGIC = new byte[]{'Z', 'T', 'R', 'Z'};
 
+    /**
+     * Uncompressed trace file signature (magic bytes)
+     */
+    byte[] ZTRC_MAGIC = new byte[]{'Z', 'T', 'R', 'C'};
+
+
+    /**
+     * Reopens trace file. This always creates new file.
+     * Writes file signature just after reopen.
+     */
     private void reopen() {
         try {
             fileStream = new FileOutputStream(path);

@@ -18,7 +18,7 @@
 package com.jitlogic.zorka.core.spy;
 
 import bsh.EvalError;
-import com.jitlogic.zorka.core.AgentDiagnostics;
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 
@@ -33,13 +33,19 @@ public class MainSubmitter {
 
     private static final ZorkaLog log = ZorkaLogger.getLog(MainSubmitter.class);
 
-    /** Submitter receiving full submissions */
+    /**
+     * Submitter receiving full submissions
+     */
     private static SpySubmitter submitter;
 
-    /** Tracer receiving trace events */
+    /**
+     * Tracer receiving trace events
+     */
     private static Tracer tracer;
 
-    /** Thread local  */
+    /**
+     * Thread local
+     */
     private static ThreadLocal<Boolean> inSubmit = new ThreadLocal<Boolean>() {
         public Boolean initialValue() {
             return false;
@@ -49,13 +55,10 @@ public class MainSubmitter {
     /**
      * This method is called by spy probes.
      *
-     * @param stage entry, return point or error handling point of spy probe
-     *
-     * @param id spy context ID
-     *
+     * @param stage       entry, return point or error handling point of spy probe
+     * @param id          spy context ID
      * @param submitFlags submit flags
-     *
-     * @param vals values fetched by probe
+     * @param vals        values fetched by probe
      */
     public static void submit(int stage, int id, int submitFlags, Object[] vals) {
 
@@ -85,8 +88,7 @@ public class MainSubmitter {
     /**
      * This method is called by tracer probes at method start.
      *
-     * @param classId class ID (registered)
-     *
+     * @param classId  class ID (registered)
      * @param methodId method ID (registered)
      */
     public static void traceEnter(int classId, int methodId, int signatureId) {
@@ -114,8 +116,8 @@ public class MainSubmitter {
             try {
                 tracer.getHandler().traceReturn(System.nanoTime());
             } catch (Throwable e) {
-               log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceReturn", e);
-               AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
+                log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceReturn", e);
+                AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
             }
         } else if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACER_DBG)) {
             log.warn(ZorkaLogger.ZTR_TRACE_CALLS, "Submitter is null !");

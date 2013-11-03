@@ -67,4 +67,15 @@ public class TraceDetailFilterExpression {
                 && ((TraceDetailFilterExpression) obj).traceOffs == traceOffs
                 && ((TraceDetailFilterExpression) obj).minMethodTime == minMethodTime;
     }
+
+    @Override
+    public int hashCode() {
+        return 31 * hostId + 17 * (int) traceOffs + 19 * (int) minMethodTime;
+    }
+
+
+    @Override
+    public String toString() {
+        return "TraceDetailFilter(" + hostId + "," + traceOffs + "," + minMethodTime + ")";
+    }
 }

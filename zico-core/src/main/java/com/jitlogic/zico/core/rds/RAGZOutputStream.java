@@ -153,7 +153,7 @@ public class RAGZOutputStream extends OutputStream {
     };
 
 
-    private void reopenSegment(RandomAccessFile outFile) throws IOException {
+    private synchronized void reopenSegment(RandomAccessFile outFile) throws IOException {
         if (outFile.length() > 0) {
             List<RAGZSegment> segments = RAGZSegment.scan(outFile);
             if (segments.size() > 0) {

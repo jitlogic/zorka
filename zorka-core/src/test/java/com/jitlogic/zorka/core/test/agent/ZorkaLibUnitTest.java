@@ -108,9 +108,9 @@ public class ZorkaLibUnitTest extends ZorkaFixture {
 
     @Test
     public void testChecksumFunctions() {
-        assertEquals("db1720a5", zorka.crc32sum("ABCD"));
-        assertEquals("db17", zorka.crc32sum("ABCD", 4));
-        assertEquals("cb08ca4a7bb5f9683c19133a84872ca7", zorka.md5sum("ABCD"));
-        assertEquals("fb2f85c88567f3c8ce9b799c7c54642d0c7b41f6", zorka.sha1sum("ABCD"));
+        assertEquals("db1720a5", util.crc32sum("ABCD"));
+        assertEquals("db17", util.crc32sum("ABCD", 4));
+        assertEquals("cb08ca4a7bb5f9683c19133a84872ca7", util.md5sum("ABCD"));
+        assertEquals("fb2f85c88567f3c8ce9b799c7c54642d0c7b41f6", util.sha1sum("ABCD"));
     }
 }

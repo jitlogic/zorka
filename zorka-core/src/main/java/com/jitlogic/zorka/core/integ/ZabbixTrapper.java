@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.zorka.common.util.*;
-import com.jitlogic.zorka.core.AgentDiagnostics;
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.core.util.*;
 
 import java.io.OutputStream;
@@ -30,29 +30,37 @@ import java.net.Socket;
  */
 public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrapper {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** Zabbix server IP address */
+    /**
+     * Zabbix server IP address
+     */
     private String serverAddr;
 
-    /** Zabbix server TCP port */
+    /**
+     * Zabbix server TCP port
+     */
     private int serverPort = 10051;
 
-    /** Default host (as presented to zabbix) */
+    /**
+     * Default host (as presented to zabbix)
+     */
     private String defaultHost;
 
-    /** Default item name (as presented to zabbix) */
+    /**
+     * Default item name (as presented to zabbix)
+     */
     private String defaultItem;
 
 
     /**
      * Creates zabbix trapper. Note that in order to actually send traps, it also must be started using start() method.
      *
-     * @param serverAddr zabbix server address
-     *
+     * @param serverAddr  zabbix server address
      * @param defaultHost default host name (as presented to zabbix)
-     *
      * @param defaultItem default item name (as presented to zabbix)
      */
     public ZabbixTrapper(String serverAddr, String defaultHost, String defaultItem) {
@@ -86,8 +94,7 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
     /**
      * Sends trap with default host name and supplied item name.
      *
-     * @param item item name
-     *
+     * @param item  item name
      * @param value item value
      */
     public boolean send(String item, Object value) {
@@ -98,10 +105,8 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
     /**
      * Send trap with supplied host name and item name.
      *
-     * @param host host name
-     *
-     * @param item item name
-     *
+     * @param host  host name
+     * @param item  item name
      * @param value item value
      */
     public boolean send(String host, String item, Object value) {
@@ -146,7 +151,7 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
      * Logs occuring errors.
      *
      * @param msg error message
-     * @param e exception object
+     * @param e   exception object
      */
     protected void handleError(String msg, Throwable e) {
         log.error(ZorkaLogger.ZAG_ERRORS, msg, e);

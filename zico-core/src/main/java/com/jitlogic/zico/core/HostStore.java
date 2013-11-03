@@ -216,7 +216,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
         String orderDir = filter.isSortAsc() ? "ASC" : "DESC";
 
         if (!TRACES_ORDER_COLS.containsKey(orderBy) || !TRACES_ORDER_DIRS.contains(orderDir)) {
-            throw new RuntimeException("Invalid ordering arguments: orderBy=" + orderBy + ", orderDir=" + orderDir);
+            throw new ZicoRuntimeException("Invalid ordering arguments: orderBy=" + orderBy + ", orderDir=" + orderDir);
         }
 
         MapSqlParameterSource params = new MapSqlParameterSource("hostId", hostInfo.getId());
@@ -279,7 +279,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
         if (expr.startsWith("@")) {
             int ix = expr.indexOf('=');
             if (ix < 2) {
-                throw new RuntimeException("Invalid filter expression: '" + expr + "'");
+                throw new ZicoRuntimeException("Invalid filter expression: '" + expr + "'");
             }
             String sa = expr.substring(1, ix);
             String sv = expr.substring(ix + 1, expr.length());

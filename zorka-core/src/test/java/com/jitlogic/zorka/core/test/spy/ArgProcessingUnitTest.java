@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.test.spy;
 
+import com.jitlogic.zorka.core.spy.plugins.*;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
 import com.jitlogic.zorka.core.spy.SpyLib;
@@ -43,7 +44,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
     public void setUp() {
         zorkaAgent.put("test", this);
 
-        sdef = SpyDefinition.instance();
+        sdef = spy.instance("x");
         ctx = new SpyContext(sdef, "some.Class", "someMethod", "()V", 1);
         record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
     }
@@ -327,7 +328,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
     @Test
     public void testFilterDecider() {
         TraceFilterProcessor p = (TraceFilterProcessor) tracer.filterBy("TEST", false,
-                zorka.set(100, 200), zorka.set(500, 503), zorka.set(401, 404));
+                util.set(100, 200), util.set(500, 503), util.set(401, 404));
         assertThat(p.decide(100)).isTrue();
         assertThat(p.decide(500)).isFalse();
         assertThat(p.decide(401)).isNull();

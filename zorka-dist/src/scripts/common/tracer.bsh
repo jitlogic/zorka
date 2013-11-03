@@ -15,58 +15,41 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Set defaults
+zorka.defCfg("tracer", "no");
+zorka.defCfg("tracer.min.trace.time", 1000);
+zorka.defCfg("tracer.min.method.time", 250000);
+zorka.defCfg("tracer.max.trace.records", 4096);
 
-if (zorka.boolCfg("tracer", false)) {
+zorka.defCfg("tracer.file", "no");
+zorka.defCfg("tracer.net", "no");
 
-  zorka.logInfo("Enabling tracer for JBoss.");
-  zorka.loadCfg("tracer.properties");
+if (zorka.boolCfg("tracer")) {
 
+  zorka.logInfo("Enabling and configuring Zorka tracer ...");
+
+  // Process tracer includes ...
   for (String pkg : zorka.listCfg("tracer.include.extra")) {
-    if (pkg.contains("/")) {
-      cm = pkg.split("/");
-      zorka.logInfo("Include methods for trace: '" + cm[0] + "' / '" + cm[1] + "'");
-      tracer.include(spy.byMethod(cm[0].trim(),cm[1].trim()));
-    } else {
-      zorka.logInfo("Include classes for trace: '" + pkg + "'");
-      tracer.include(spy.byClass(pkg).forTrace());
+    if (!pkg.indexOf(':') == -1) {
+       pkg = "200:" + pkg;
     }
+    tracer.include(pkg);
   }
 
-  for (String pkg : zorka.listCfg("tracer.exclude",
-      "com.jitlogic.zorka.**",  "org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate")) {
-    if (pkg.contains("/")) {
-      cm = pkg.split("/");
-      zorka.logInfo("Exclude methods from trace: '" + cm[0] + "' / '" + cm[1] + "'");
-      tracer.exclude(spy.byMethod(cm[0].trim(),cm[1].trim()));
-    } else {
-      zorka.logInfo("Exclude clases from trace: '" + pkg + "'");
-      tracer.exclude(spy.byClass(pkg));
-    }
-  }
-
+  // Process tracer excludes ...
   for (String pkg : zorka.listCfg("tracer.exclude.extra")) {
-    if (pkg.contains("/")) {
-      cm = pkg.split("/");
-      zorka.logInfo("Exclude methods from trace: '" + cm[0] + "' / '" + cm[1] + "'");
-      tracer.exclude(spy.byMethod(cm[0].trim(),cm[1].trim()));
-    } else {
-      zorka.logInfo("Exclude clases from trace: '" + pkg + "'");
-      tracer.exclude(spy.byClass(pkg));
+    if (!pkg.indexOf(':') == -1) {
+       pkg = "200:" + pkg;
     }
+    tracer.exclude(pkg);
   }
 
-  for (String pkg : zorka.listCfg("tracer.include", "**")) {
-    if (pkg.contains("/")) {
-      cm = pkg.split("/");
-      zorka.logInfo("Include methods for trace: '" + cm[0] + "' / '" + cm[1] + "'");
-      tracer.include(spy.byMethod(cm[0].trim(),cm[1].trim()));
-    } else {
-      zorka.logInfo("Include classes for trace: '" + pkg + "'");
-      tracer.include(spy.byClass(pkg).forTrace());
-    }
-  }
 
-  if (zorka.boolCfg("tracer.file", true)) {
+  tracer.exclude("100:com.jitlogic.zorka.**");
+  tracer.include("1000:**");
+
+
+  if (zorka.boolCfg("tracer.file")) {
     tracer.output(tracer.toFile(
       zorka.stringCfg("tracer.file.path", "${zorka.log.dir}/trace.ztr"),
       zorka.intCfg("tracer.file.fnum", 16),
@@ -74,36 +57,45 @@ if (zorka.boolCfg("tracer", false)) {
       zorka.boolCfg("tracer.file.compress", true)));
   }
 
-  if (zorka.boolCfg("tracer.net", false)) {
+
+  if (zorka.boolCfg("tracer.net")) {
     tracer.output(tracer.toZico(
       zorka.stringCfg("tracer.net.addr", "127.0.0.1"),
       zorka.intCfg("tracer.net.port", 8640),
       zorka.stringCfg("tracer.net.host", zorka.getHostname()),
       zorka.stringCfg("tracer.net.pass", "changeme"),
       zorka.intCfg("tracer.net.qlen", 64),
+      zorka.kiloCfg("tracer.net.packet", 8*1024*1024),
       zorka.intCfg("tracer.net.retries", 10),
       zorka.intCfg("tracer.net.retry.time", 125L),
       zorka.intCfg("tracer.net.retry.exp", 2L),
       zorka.intCfg("tracer.net.timeout", 60000)));
   }
 
+
   if (zorka.hasCfg("tracer.min.method.time")) {
-    mmt = zorka.longCfg("tracer.min.method.time", 250000);
+    mmt = zorka.longCfg("tracer.min.method.time");
     zorka.logInfo("Setting tracer minimum method time to " + mmt + " ns");
     tracer.setTracerMinMethodTime(mmt);
   }
 
+
   if (zorka.hasCfg("tracer.min.trace.time")) {
-    mtt = zorka.longCfg("tracer.min.trace.time", 100);
+    mtt = zorka.longCfg("tracer.min.trace.time");
     zorka.logInfo("Settting tracer minimum trace time to " + mtt + " ms");
     tracer.setTracerMinTraceTime(mtt);
   }
 
+
   if (zorka.hasCfg("tracer.max.trace.records")) {
-    mtr = zorka.intCfg("tracer.max.trace.records", 4096);
+    mtr = zorka.intCfg("tracer.max.trace.records");
     zorka.logInfo("Setting maximum records per trace to " + mtr + ".");
     tracer.setTracerMaxTraceRecords(mtr);
   }
 
+
+  tracer.setTraceSpyMethods(true);
+} else {
+  tracer.setTraceSpyMethods(false);
 }
 

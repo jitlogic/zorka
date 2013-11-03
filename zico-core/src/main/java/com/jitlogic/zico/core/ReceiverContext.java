@@ -19,12 +19,12 @@ package com.jitlogic.zico.core;
 import com.jitlogic.zico.data.HostInfo;
 import com.jitlogic.zico.core.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.*;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.fressian.FressianWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
@@ -43,24 +43,21 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
     private RDSStore traceDataStore;
     private TraceTypeRegistry traceTypeRegistry;
+    private TraceTableWriter traceTableWriter;
 
-    private JdbcTemplate jdbc;
     private HostInfo hostInfo;
-
-
-    private int maxAttrLen = 1024;
 
     private ObjectMapper mapper = new ObjectMapper();
 
     private Set<Object> visitedObjects = new HashSet<Object>();
 
 
-    public ReceiverContext(DataSource ds, HostStore store, TraceTypeRegistry traceTypeRegistry) {
+    public ReceiverContext(HostStore store, TraceTypeRegistry traceTypeRegistry, TraceTableWriter traceTableWriter) {
         this.symbolRegistry = store.getStoreManager().getSymbolRegistry();
         this.traceDataStore = store.getRds();
-        this.jdbc = new JdbcTemplate(ds);
         this.hostInfo = store.getHostInfo();
         this.traceTypeRegistry = traceTypeRegistry;
+        this.traceTableWriter = traceTableWriter;
     }
 
 
@@ -109,9 +106,6 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
         if (tr.getAttrs() != null) {
             for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
                 String val = e.getValue() != null ? e.getValue().toString() : "";
-                if (val.length() > maxAttrLen) {   // TODO configurable limit
-                    val = val.substring(0, maxAttrLen);
-                }
                 attrMap.put(symbolRegistry.symbolName(e.getKey()), val);
             }
         }
@@ -126,7 +120,6 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
         String attrJson = "";
 
-        // TODO ? what if resulting JSON > 48000 bytes ?
         try {
             attrJson = mapper.writeValueAsString(attrMap);
         } catch (IOException e) {
@@ -145,29 +138,25 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
             }
         }
 
-        // TODO ? what if resulting JSON > 16000 bytes ?
-
-        jdbc.update("insert into TRACES (HOST_ID,DATA_OFFS,TRACE_ID,DATA_LEN,CLOCK,RFLAGS,TFLAGS,STATUS,"
-                + "CLASS_ID,METHOD_ID,SIGN_ID,CALLS,ERRORS,RECORDS,EXTIME,ATTRS,EXINFO) "
-                + "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                hostId,
-                offs,
-                tr.getMarker().getTraceId(),
-                length,
-                tr.getClock(),
-                tr.getFlags(),
-                tr.getMarker().getFlags(),
-                status,
-                tr.getClassId(),
-                tr.getMethodId(),
-                tr.getSignatureId(),
-                tr.getCalls(),
-                tr.getErrors(),
-                numRecords(tr),
-                tr.getTime(),
-                attrJson,
-                exJson
-        );
+        traceTableWriter.submit(ZorkaUtil.<String, Object>map(
+                "HOST_ID", hostId,
+                "DATA_OFFS", offs,
+                "TRACE_ID", tr.getMarker().getTraceId(),
+                "DATA_LEN", length,
+                "CLOCK", tr.getClock(),
+                "RFLAGS", tr.getFlags(),
+                "TFLAGS", tr.getMarker().getFlags(),
+                "STATUS", status,
+                "CLASS_ID", tr.getClassId(),
+                "METHOD_ID", tr.getMethodId(),
+                "SIGN_ID", tr.getSignatureId(),
+                "CALLS", tr.getCalls(),
+                "ERRORS", tr.getErrors(),
+                "RECORDS", numRecords(tr),
+                "EXTIME", tr.getTime(),
+                "ATTRS", attrJson,
+                "EXINFO", exJson
+        ));
     }
 
 

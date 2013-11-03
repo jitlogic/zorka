@@ -19,8 +19,16 @@ package com.jitlogic.zorka.common.tracedata;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Raw delta metric. Calculates raw delta from submitted data.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class RawDeltaMetric extends RawDataMetric {
 
+    /**
+     * Value from last measurement
+     */
     private Number last;
 
     public RawDeltaMetric(int id, String name, Map<String, Object> attrs) {
@@ -31,7 +39,7 @@ public class RawDeltaMetric extends RawDataMetric {
         super(id, templateId, name, attrs);
     }
 
-    public RawDeltaMetric(MetricTemplate template, String name, Map<String,Object> attrs) {
+    public RawDeltaMetric(MetricTemplate template, String name, Map<String, Object> attrs) {
         super(template, name, attrs);
     }
 

@@ -17,17 +17,17 @@
 
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
+import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.core.integ.SnmpLib;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.common.util.ZorkaTrapper;
 import com.jitlogic.zorka.core.integ.SnmpTrapper;
 import com.jitlogic.zorka.core.integ.TrapVarBindDef;
 import com.jitlogic.zorka.core.normproc.Normalizer;
-import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLogLevel;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
+import com.jitlogic.zorka.core.spy.plugins.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 
 /**
@@ -35,6 +35,8 @@ import java.util.regex.Matcher;
  * and collectors can be created using functions from this library. Spy library is registered as 'spy' namespace in BSH.
  */
 public class SpyLib {
+
+    private static final ZorkaLog log = ZorkaLogger.getLog(SpyLib.class);
 
     public static final String SM_NOARGS = "<no-args>";
     public static final String SM_CONSTRUCTOR = "<init>";
@@ -193,6 +195,17 @@ public class SpyLib {
         }
     }
 
+    private AtomicInteger anonymousSdef = new AtomicInteger(0);
+
+    public SpyDefinition instance() {
+        log.warn(ZorkaLogger.ZAG_CONFIG, "Attempt to create anonymous spy definition. "
+                + "This API is depreciated as spy definitions should to be named since 0.9.12. "
+                + "Sdef will be created for now BUT this will be forbidden in the future. " +
+                "Error counter will be incremented as well, so administrator won't forget about this.");
+        AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
+        return instance("anonymous-" + anonymousSdef.incrementAndGet());
+    }
+
 
     /**
      * Created an empty (unconfigured) spy definition. Use created object's methods to configure it before registering
@@ -200,8 +213,18 @@ public class SpyLib {
      *
      * @return new spy definition
      */
-    public SpyDefinition instance() {
-        return SpyDefinition.instance();
+    public SpyDefinition instance(String name) {
+        return SpyDefinition.instance(name);
+    }
+
+
+    public SpyDefinition instrument() {
+        log.warn(ZorkaLogger.ZAG_CONFIG, "Attempt to create anonymous spy definition. "
+                + "This API is depreciated as spy definitions should to be named since 0.9.12. "
+                + "Sdef will be created for now BUT this will be forbidden in the future. " +
+                "Error counter will be incremented as well, so administrator won't forget about this.");
+        AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
+        return instrument("anonymous-" + anonymousSdef.incrementAndGet());
     }
 
 
@@ -210,12 +233,22 @@ public class SpyLib {
      *
      * @return partially configured psy def
      */
-    public SpyDefinition instrument() {
-        return SpyDefinition.instance()
+    public SpyDefinition instrument(String name) {
+        return SpyDefinition.instance(name)
                 .onEnter(fetchTime("T1"))
                 .onReturn(fetchTime("T2"))
                 .onError(fetchTime("T2"))
                 .onSubmit(tdiff("T", "T1", "T2"));
+    }
+
+
+    public SpyDefinition instrument(String mbsName, String mbeanName, String attrName, String expr) {
+        log.warn(ZorkaLogger.ZAG_CONFIG, "Attempt to create anonymous spy definition. "
+                + "This API is depreciated as spy definitions should to be named since 0.9.12. "
+                + "Sdef will be created for now BUT this will be forbidden in the future. " +
+                "Error counter will be incremented as well, so administrator won't forget about this.");
+        AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
+        return instrument("anonymous-" + anonymousSdef.incrementAndGet(), mbsName, mbeanName, attrName, expr);
     }
 
 
@@ -230,7 +263,12 @@ public class SpyLib {
      * @param expr      expression template that will be used as key for categorizing methods;
      * @return new spy definition object;
      */
-    public SpyDefinition instrument(String mbsName, String mbeanName, String attrName, String expr) {
+    public SpyDefinition instrument(String name, String mbsName, String mbeanName, String attrName, String expr) {
+
+        log.warn(ZorkaLogger.ZAG_CONFIG, "Function spy.instrument(mbsName, mbeanName, attrName, expr) is deprecated due to lack of utility. "
+                + "Sdef will be created for now BUT this will be forbidden in the future. " +
+                "Error counter will be incremented as well, so administrator won't forget about this.");
+        AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
 
         Matcher m = ObjectInspector.reVarSubstPattern.matcher(expr);
 
@@ -254,10 +292,10 @@ public class SpyLib {
 
         sdaList.add(fetchTime("T1"));
 
-        return SpyDefinition.instance()
+        return SpyDefinition.instance(name)
                 .onEnter(sdaList.toArray(new SpyDefArg[0]))
                 .onReturn(fetchTime("T2")).onError(fetchTime("T2"))
-                .onSubmit(tdiff("T", "T1", "T2"), zorkaStats(mbsName, mbeanName, attrName, sb.toString(), "T"));
+                .onSubmit(tdiff("T", "T1", "T2"), zorkaStats(mbsName, mbeanName, attrName, sb.toString()));
     }
 
 
@@ -480,11 +518,6 @@ public class SpyLib {
     }
 
 
-    public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr, int actions) {
-        return zorkaStats(mbsName, beanName, attrName, keyExpr, "T", actions);
-    }
-
-
     /**
      * Creates method call statistics collector object. It will maintain zorka call statistics and update them with
      * incoming data.
@@ -497,12 +530,46 @@ public class SpyLib {
      * @return collector object
      */
     public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr, String timeField) {
-        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr, timeField);
+        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr, timeField,
+                null, ZorkaStatsCollector.ACTION_STATS);
     }
 
 
-    public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr, String timeField, int actions) {
-        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr, timeField, actions);
+    /**
+     * Creates method call statistics collector object. It will maintain zorka call statistics and update them with
+     * incoming data. This variant also calculates throughput from supplied field.
+     *
+     * @param mbsName         mbean server name
+     * @param beanName        bean name
+     * @param attrName        attribute name
+     * @param keyExpr         key expression
+     * @param timeField       field containing execution time (in nanoseconds)
+     * @param throughputField field containing throughput value (or null to skip throughput calculation)
+     * @return collector object
+     */
+    public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr,
+                                   String timeField, String throughputField) {
+        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr, timeField,
+                throughputField, ZorkaStatsCollector.ACTION_STATS);
+    }
+
+
+    /**
+     * Creates method call statistics collector object. It will maintain zorka call statistics and update them with
+     * incoming data. This variant also calculates throughput from supplied field.
+     *
+     * @param mbsName         mbean server name
+     * @param beanName        bean name
+     * @param attrName        attribute name
+     * @param keyExpr         key expression
+     * @param timeField       field containing execution time (in nanoseconds)
+     * @param throughputField field containing throughput value (or null to skip throughput calculation)
+     * @param actions         which actions will be performed: ENTER, EXIT or STATS (or combination of them)
+     * @return collector object
+     */
+    public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr,
+                                   String timeField, String throughputField, int actions) {
+        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr, timeField, throughputField, actions);
     }
 
 
@@ -836,6 +903,11 @@ public class SpyLib {
      */
     public SpyProcessor vcmp(String a, String op, Object v) {
         return ComparatorProcessor.vcmp(a, op, v);
+    }
+
+
+    public SpyProcessor stringMatcher(String srcField, List<String> includes, List<String> excludes) {
+        return new StringMatcherProcessor(srcField, includes, excludes);
     }
 
 

@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.common.zico;
 
 
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.tracedata.TraceOutput;
 import com.jitlogic.zorka.common.tracedata.TraceWriter;
@@ -28,26 +29,78 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+/**
+ * Tracer output sending data to remote ZICO collector. It automatically handles reconnections and retransmissions,
+ * lumps data into bigger packets for better throughput, keeps track of symbols already sent etc.
+ *
+ * @author rafal.lewczuk@jitlogic.com
+ */
 public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements TraceOutput {
 
     private static ZorkaLog log = ZorkaLogger.getLog(ZicoTraceOutput.class);
 
+    /**
+     * Hostname this client will advertise itself as when connecting to ZICO server
+     */
     private String hostname;
+
+    /**
+     * Passphrase for authentication of ZICO client
+     */
     private String auth;
 
+    /**
+     * ZICO client connection
+     */
     private ZicoClientConnector conn;
 
+    /**
+     * Trace writer responsible for encoding transmitted data and
+     */
     private TraceWriter writer;
 
+    /**
+     * Output buffer
+     */
     private ByteArrayOutputStream os;
 
+    /**
+     * Maximum retransmission retries
+     */
     private int retries;
+
+    /**
+     * Retry wait timing parameters
+     */
     private long retryTime, retryTimeExp;
 
+    /**
+     * Suggested maximum packet size
+     */
+    private long packetSize;
 
+    /**
+     * Creates trace output object.
+     *
+     * @param writer       trace writer for encoding transmitted data
+     * @param addr         host name or IP address of remote ZICO collector
+     * @param port         port number of remote ZICO collector
+     * @param hostname     name this client will advertise itself when connecting to ZICO collector
+     * @param auth         passphrase for this client (makes sense only when
+     * @param qlen         output queue length
+     * @param packetSize   maximum (recommended) packet size (actual packets might exceed this a bit)
+     * @param retries      maximum number of retries
+     * @param retryTime    base retry time
+     * @param retryTimeExp retry time exponent
+     * @param timeout      socket read timeout for ZICO connections
+     * @throws IOException when connection to remote server cannot be established;
+     */
     public ZicoTraceOutput(TraceWriter writer, String addr, int port, String hostname, String auth,
-                           int qlen, int retries, long retryTime, long retryTimeExp, int timeout) throws IOException {
+                           int qlen, long packetSize, int retries, long retryTime, long retryTimeExp, int timeout) throws IOException {
         super("zico-output", qlen);
 
         this.hostname = hostname;
@@ -56,6 +109,7 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
         this.retries = retries;
         this.retryTime = retryTime;
         this.retryTimeExp = retryTimeExp;
+        this.packetSize = packetSize;
 
         conn = new ZicoClientConnector(addr, port, timeout);
 
@@ -72,19 +126,51 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
 
 
     @Override
+    public boolean submit(SymbolicRecord obj) {
+        boolean submitted = false;
+        try {
+            submitted = submitQueue.offer(obj, 1, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+        }
+
+        if (!submitted) {
+            AgentDiagnostics.inc(AgentDiagnostics.ZICO_PACKETS_DROPPED);
+        }
+
+        return submitted;
+    }
+
+
+    @Override
     protected void process(SymbolicRecord record) {
         long rt = retryTime;
+
+        List<SymbolicRecord> packet = new ArrayList<SymbolicRecord>();
+        packet.add(record);
+
         log.debug(ZorkaLogger.ZTR_TRACER_DBG, "Processing record: " + record);
+
         for (int i = 0; i < retries; i++) {
             try {
-                os.reset();
-                writer.softReset();
-                writer.write(record);
                 if (!conn.isOpen()) {
                     log.debug(ZorkaLogger.ZTR_TRACER_DBG,
                             "Opening connection to " + conn.getAddr() + ":" + conn.getPort());
                     conn.connect();
                 }
+
+                os.reset();
+                writer.softReset();
+
+                for (SymbolicRecord rec : packet) {
+                    writer.write(rec);
+                }
+
+                while (os.size() < packetSize && submitQueue.size() > 0) {
+                    SymbolicRecord rec = submitQueue.take();
+                    packet.add(rec);
+                    writer.write(rec);
+                }
+
                 byte[] data = os.toByteArray();
                 log.debug(ZorkaLogger.ZTR_TRACER_DBG, "Sending ZICO packet: len=" + data.length);
                 conn.send(ZicoPacket.ZICO_DATA, data);
@@ -93,15 +179,18 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
                 if (rslt.getStatus() != ZicoPacket.ZICO_OK) {
                     throw new ZicoException(rslt.getStatus(), "Error submitting data.");
                 }
+                AgentDiagnostics.inc(AgentDiagnostics.ZICO_PACKETS_SENT);
                 return;
             } catch (SocketTimeoutException e) {
                 log.info(ZorkaLogger.ZCL_STORE, "Resetting collector connection.");
                 this.close();
                 this.open();
+                AgentDiagnostics.inc(AgentDiagnostics.ZICO_RECONNECTS);
             } catch (Exception e) {
                 log.error(ZorkaLogger.ZCL_STORE, "Error sending trace record: " + e + ". Resetting connection.");
                 this.close();
                 this.open();
+                AgentDiagnostics.inc(AgentDiagnostics.ZICO_RECONNECTS);
             }
 
             try {
@@ -114,7 +203,21 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
             rt *= retryTimeExp;
         } // for ( ... )
 
+        AgentDiagnostics.inc(AgentDiagnostics.ZICO_PACKETS_LOST);
         log.error(ZorkaLogger.ZCL_STORE, "Too many errors while trying to send trace. Giving up. Trace will be lost.");
+    }
+
+
+    @Override
+    protected void runCycle() {
+        try {
+            SymbolicRecord obj = submitQueue.take();
+            if (obj != null) {
+                process(obj);
+            }
+        } catch (InterruptedException e) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot perform run cycle", e);
+        }
     }
 
 
@@ -131,6 +234,7 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
     }
 
 
+    @Override
     protected void close() {
         try {
             conn.close();

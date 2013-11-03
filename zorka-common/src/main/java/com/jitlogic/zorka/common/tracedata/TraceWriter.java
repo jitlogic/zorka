@@ -23,19 +23,30 @@ import java.io.IOException;
  */
 public interface TraceWriter {
 
-    /** Serializes and writes trace data object. */
+    /**
+     * Serializes and writes trace data object.
+     *
+     * @param record data to be serialized
+     */
     void write(SymbolicRecord record) throws IOException;
 
-    /** Sets trace output for the writer. */
+    /**
+     * Sets trace output for the writer.
+     *
+     * @param output trace output object
+     */
     void setOutput(TraceOutput output);
 
     /**
-     * Resets internal state of a trace writer. This clears internal state
+     * Resets internal state of trace writer. This clears internal state
      * of the writer and causes it to obtain new output stream from supplied
      * trace output object.
      */
     void reset();
 
-
+    /**
+     * Resets internal state of trace writer. It clears internal state
+     * of the writer without resetting output stream obtainer from tracer output.
+     */
     void softReset();
 }

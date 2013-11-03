@@ -26,7 +26,7 @@ import static com.jitlogic.zorka.core.spy.SpyLib.*;
  * Spy definition contains complete set of information on how to instrument a specific
  * aspect of monitored application. Think of it as 'spy configuration' for some set of
  * methods you're interested in.
- *
+ * <p/>
  * Along with spy library functions it defines mini-DSL for configuring instrumentation.
  * Language allows for choosing classes and methods to instrument, extracting parameters,
  * return values, transforming/filtering intercepted values and presenting them via
@@ -41,13 +41,21 @@ public class SpyDefinition {
     private static final List<SpyProbe> EMPTY_AF =
             Collections.unmodifiableList(Arrays.asList(new SpyProbe[0]));
 
-    /** Spy probes for various places in method bytecode */
+    private final String name;
+
+    /**
+     * Spy probes for various places in method bytecode
+     */
     private List<SpyProbe>[] probes;
 
-    /** Lists of spy record processors and collectors (for various stages) */
+    /**
+     * Lists of spy record processors and collectors (for various stages)
+     */
     private List<SpyProcessor>[] processors;
 
-    /** List of matchers defining that classes/methods this sdef looks for */
+    /**
+     * List of matchers defining that classes/methods this sdef looks for
+     */
     private SpyMatcherSet matcherSet = new SpyMatcherSet();
 
     /**
@@ -56,12 +64,12 @@ public class SpyDefinition {
      *
      * @return spy definition
      */
-    public static SpyDefinition instrument() {
-        return new SpyDefinition()
-            .onEnter(new SpyTimeProbe("T1"))
-            .onReturn(new SpyTimeProbe("T2"))
-            .onError(new SpyTimeProbe("T2"))
-            .onEnter();
+    public static SpyDefinition instrument(String name) {
+        return new SpyDefinition(name)
+                .onEnter(new SpyTimeProbe("T1"))
+                .onReturn(new SpyTimeProbe("T2"))
+                .onError(new SpyTimeProbe("T2"))
+                .onEnter();
     }
 
     /**
@@ -69,16 +77,15 @@ public class SpyDefinition {
      *
      * @return spy definition
      */
-    public static SpyDefinition instance() {
-        return new SpyDefinition();
+    public static SpyDefinition instance(String name) {
+        return new SpyDefinition(name);
     }
 
     /**
      * Creates empty (unconfigured) spy definition.
-     *
      */
-    public SpyDefinition() {
-
+    public SpyDefinition(String name) {
+        this.name = name;
         probes = new List[4];
         for (int i = 0; i < probes.length; i++) {
             probes[i] = EMPTY_AF;
@@ -92,6 +99,7 @@ public class SpyDefinition {
 
 
     private SpyDefinition(SpyDefinition orig) {
+        this.name = orig.name;
         this.probes = ZorkaUtil.copyArray(orig.probes);
         this.processors = ZorkaUtil.copyArray(orig.processors);
         this.matcherSet = new SpyMatcherSet(orig.matcherSet);
@@ -102,7 +110,6 @@ public class SpyDefinition {
      * Returns list of probe definitions from particular stage
      *
      * @param stage stage we're interested in
-     *
      * @return list of probes defined for this stage
      */
     public List<SpyProbe> getProbes(int stage) {
@@ -114,7 +121,6 @@ public class SpyDefinition {
      * Returns list of processors for a particular stage.
      *
      * @param stage
-     *
      * @return
      */
     public List<SpyProcessor> getProcessors(int stage) {
@@ -122,11 +128,9 @@ public class SpyDefinition {
     }
 
 
-
     public SpyMatcherSet getMatcherSet() {
         return matcherSet;
     }
-
 
 
     /**
@@ -134,7 +138,7 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition onEnter(SpyDefArg...args) {
+    public SpyDefinition onEnter(SpyDefArg... args) {
         return with(ON_ENTER, args);
     }
 
@@ -144,7 +148,7 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition onReturn(SpyDefArg...args) {
+    public SpyDefinition onReturn(SpyDefArg... args) {
         return with(ON_RETURN, args);
     }
 
@@ -154,7 +158,7 @@ public class SpyDefinition {
      *
      * @return
      */
-    public SpyDefinition onError(SpyDefArg...args) {
+    public SpyDefinition onError(SpyDefArg... args) {
         return with(ON_ERROR, args);
     }
 
@@ -165,7 +169,7 @@ public class SpyDefinition {
      *
      * @return augmented spy definition
      */
-    public SpyDefinition onSubmit(SpyDefArg...args) {
+    public SpyDefinition onSubmit(SpyDefArg... args) {
         return with(ON_SUBMIT, args);
     }
 
@@ -174,10 +178,9 @@ public class SpyDefinition {
      * Instructs spy what method to include.
      *
      * @param matchers
-     *
      * @return
      */
-    public SpyDefinition include(SpyMatcher...matchers) {
+    public SpyDefinition include(SpyMatcher... matchers) {
         SpyDefinition sdef = new SpyDefinition(this);
         sdef.matcherSet = new SpyMatcherSet(sdef.matcherSet, matchers);
         return sdef;
@@ -190,30 +193,29 @@ public class SpyDefinition {
      * only at one place of a method (beginning or end - depending on
      * whether instrumentation will actually run at the beginning or at the end of
      * method.
-     *
+     * <p/>
      * <p>For instance methods first argument will have index 1 and
-     *    instance reference will be present at index 0. </p>
+     * instance reference will be present at index 0. </p>
      * <p>For static methods arguments start with 0. </p>
      *
      * @param args argument indexes to be fetched (or class names if
      *             class objects are to be fetched)
-     *
      * @return spy definition with augmented fetched argument list;
      */
-    private SpyDefinition with(int curStage, SpyDefArg...args) {
+    private SpyDefinition with(int curStage, SpyDefArg... args) {
         SpyDefinition sdef = new SpyDefinition(this);
 
-        List<SpyProbe> newProbes = new ArrayList<SpyProbe>(sdef.probes[curStage].size()+args.length+2);
+        List<SpyProbe> newProbes = new ArrayList<SpyProbe>(sdef.probes[curStage].size() + args.length + 2);
         newProbes.addAll(sdef.probes[curStage]);
 
-        List<SpyProcessor> newProcessors = new ArrayList<SpyProcessor>(sdef.processors[curStage].size()+args.length+2);
+        List<SpyProcessor> newProcessors = new ArrayList<SpyProcessor>(sdef.processors[curStage].size() + args.length + 2);
         newProcessors.addAll(sdef.processors[curStage]);
 
         for (Object arg : args) {
             if (arg instanceof SpyProcessor) {
-                newProcessors.add((SpyProcessor)arg);
+                newProcessors.add((SpyProcessor) arg);
             } else if (arg instanceof SpyProbe) {
-                newProbes.add((SpyProbe)arg);
+                newProbes.add((SpyProbe) arg);
             } else if (arg != null) {
                 throw new IllegalArgumentException();
             }

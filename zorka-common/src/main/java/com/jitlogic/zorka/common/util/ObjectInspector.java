@@ -354,10 +354,8 @@ public final class ObjectInspector {
     public static Field lookupField(Class<?> clazz, String name) {
         try {
             Field field = clazz.getDeclaredField(name);
-            if (field == null) {
-                if (clazz.getSuperclass() != Object.class && clazz.getSuperclass() != null) {
-                    return lookupField(clazz.getSuperclass(), name);
-                }
+            if (clazz.getSuperclass() != Object.class && clazz.getSuperclass() != null) {
+                return lookupField(clazz.getSuperclass(), name);
             }
             return field;
         } catch (NoSuchFieldException e) {

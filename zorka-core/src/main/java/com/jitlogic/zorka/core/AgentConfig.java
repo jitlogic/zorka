@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.core;
 
 
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
@@ -29,7 +30,8 @@ public class AgentConfig extends ZorkaConfig {
     private static final ZorkaLog log = ZorkaLogger.getLog(AgentConfig.class);
 
     public final static String DEFAULT_CONF_PATH = "/com/jitlogic/zorka/core/zorka.properties";
-    public static final String PROP_SCRIPTS_DIR  = "zorka.scripts.dir";;
+    public static final String PROP_SCRIPTS_DIR = "zorka.scripts.dir";
+    ;
     public static final String PROP_PROFILE_DIR = "zorka.profile.dir";
 
     private List<String> profiles = new ArrayList<String>();
@@ -71,7 +73,6 @@ public class AgentConfig extends ZorkaConfig {
     }
 
 
-
     /**
      * Loads selected profiles and merges their properties with main configuration.
      */
@@ -85,7 +86,7 @@ public class AgentConfig extends ZorkaConfig {
                 Properties props = loadCfg(new Properties(), f.getPath(), true);
                 profileScripts.addAll(listCfg(props, "profile.scripts"));
                 props.remove("profile.scripts");
-                for (Map.Entry<Object,Object> e : props.entrySet()) {
+                for (Map.Entry<Object, Object> e : props.entrySet()) {
                     properties.setProperty(e.getKey().toString(), e.getValue().toString());
                 }
             } else {

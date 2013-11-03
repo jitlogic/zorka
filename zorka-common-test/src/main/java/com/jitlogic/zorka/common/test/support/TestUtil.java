@@ -44,10 +44,17 @@ public class TestUtil {
 
     public static byte[] cat(String path) throws IOException {
         File f = new File(path);
-        byte[] buf = new byte[(int)f.length()];
-        InputStream is = new FileInputStream(f);
-        is.read(buf);
-        is.close();
+        byte[] buf = new byte[(int) f.length()];
+        InputStream is = null;
+        try {
+            is = new FileInputStream(f);
+            is.read(buf);
+            is.close();
+        } finally {
+            if (is != null) {
+                is.close();
+            }
+        }
         return buf;
     }
 }

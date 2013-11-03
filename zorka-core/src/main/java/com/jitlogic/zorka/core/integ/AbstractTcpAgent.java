@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.core.integ;
 
-import com.jitlogic.zorka.core.AgentDiagnostics;
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.core.ZorkaBshAgent;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaLog;
@@ -38,40 +38,61 @@ import java.util.List;
  */
 public abstract class AbstractTcpAgent implements Runnable {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** BSH agent */
+    /**
+     * BSH agent
+     */
     private ZorkaBshAgent agent;
 
-    /** Connections accepting thread */
+    /**
+     * Connections accepting thread
+     */
     private Thread thread;
 
-    /** Thread main loop will run as long as this attribute is true */
+    /**
+     * Thread main loop will run as long as this attribute is true
+     */
     private volatile boolean running;
 
-    /** Name prefix (will appear in thread name, configuration properties will start with this prefix etc.) */
+    /**
+     * Name prefix (will appear in thread name, configuration properties will start with this prefix etc.)
+     */
     private String prefix;
 
-    /** TCP listen port */
+    /**
+     * TCP listen port
+     */
     private int listenPort;
 
-    /** TCP listen address */
+    /**
+     * TCP listen address
+     */
     private InetAddress listenAddr;
 
-    /** List of addresses from which agent will accept connections. */
+    /**
+     * List of addresses from which agent will accept connections.
+     */
     private List<InetAddress> allowedAddrs = new ArrayList<InetAddress>();
 
-    /** TCP server socket */
+    /**
+     * TCP server socket
+     */
     private ServerSocket socket;
 
-    /** Query translator */
+    /**
+     * Query translator
+     */
     protected QueryTranslator translator;
 
     /**
      * Standard constructor
-     * @param agent BSH agent
-     * @param prefix agent name prefix
+     *
+     * @param agent       BSH agent
+     * @param prefix      agent name prefix
      * @param defaultAddr
      * @param defaultPort agent default port
      */
@@ -82,24 +103,24 @@ public abstract class AbstractTcpAgent implements Runnable {
         this.prefix = prefix;
         this.translator = translator;
 
-        String la = config.stringCfg(prefix+".listen.addr", defaultAddr);
+        String la = config.stringCfg(prefix + ".listen.addr", defaultAddr);
         try {
             listenAddr = InetAddress.getByName(la.trim());
         } catch (UnknownHostException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse "+prefix+".listen.addr in zorka.properties", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse " + prefix + ".listen.addr in zorka.properties", e);
             AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         }
 
-        listenPort = config.intCfg(prefix+".listen.port", defaultPort);
+        listenPort = config.intCfg(prefix + ".listen.port", defaultPort);
 
-        log.info(ZorkaLogger.ZAG_ERRORS, "Zorka will listen for "+prefix+" connections on " + listenAddr + ":" + listenPort);
+        log.info(ZorkaLogger.ZAG_ERRORS, "Zorka will listen for " + prefix + " connections on " + listenAddr + ":" + listenPort);
 
-        for (String sa : config.listCfg(prefix+".server.addr", "127.0.0.1")) {
+        for (String sa : config.listCfg(prefix + ".server.addr", "127.0.0.1")) {
             try {
-                log.info(ZorkaLogger.ZAG_ERRORS, "Zorka will accept "+prefix+" connections from '" + sa.trim() + "'.");
+                log.info(ZorkaLogger.ZAG_ERRORS, "Zorka will accept " + prefix + " connections from '" + sa.trim() + "'.");
                 allowedAddrs.add(InetAddress.getByName(sa.trim()));
             } catch (UnknownHostException e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse "+prefix+".server.addr in zorka.properties", e);
+                log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse " + prefix + ".server.addr in zorka.properties", e);
             }
         }
     }
@@ -114,12 +135,12 @@ public abstract class AbstractTcpAgent implements Runnable {
                 socket = new ServerSocket(listenPort, 0, listenAddr);
                 running = true;
                 thread = new Thread(this);
-                thread.setName("ZORKA-"+prefix+"-main");
+                thread.setName("ZORKA-" + prefix + "-main");
                 thread.setDaemon(true);
                 thread.start();
-                log.info(ZorkaLogger.ZAG_CONFIG, "ZORKA-"+prefix+" core is listening at " + listenAddr + ":" + listenPort + ".");
+                log.info(ZorkaLogger.ZAG_CONFIG, "ZORKA-" + prefix + " core is listening at " + listenAddr + ":" + listenPort + ".");
             } catch (IOException e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "I/O error while starting "+prefix+" core:" + e.getMessage());
+                log.error(ZorkaLogger.ZAG_ERRORS, "I/O error while starting " + prefix + " core:" + e.getMessage());
             }
         }
     }
@@ -140,7 +161,8 @@ public abstract class AbstractTcpAgent implements Runnable {
                 for (int i = 0; i < 100; i++) {
                     try {
                         Thread.sleep(10);
-                    } catch (InterruptedException e) { }
+                    } catch (InterruptedException e) {
+                    }
                     if (thread == null) {
                         return;
                     }
@@ -160,7 +182,6 @@ public abstract class AbstractTcpAgent implements Runnable {
      * This abstract method creates new request handlers for accepted TCP connections.
      *
      * @param sock socket representing accepted connection
-     *
      * @return request handler for new connection
      */
     protected abstract ZorkaRequestHandler newRequest(Socket sock);

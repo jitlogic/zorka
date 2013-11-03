@@ -20,7 +20,7 @@ import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.core.AgentDiagnostics;
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.spy.TracerOutput;
 
@@ -39,34 +39,43 @@ import java.util.Map;
  */
 public class JmxAttrScanner implements Runnable {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private static final ZorkaLog log = ZorkaLogger.getLog(JmxAttrScanner.class);
 
-    /** Scanner ID (attached to every packet of sample data) */
+    /**
+     * Scanner ID (attached to every packet of sample data)
+     */
     private int id;
     private String name;
 
-    /** Symbol registry */
+    /**
+     * Symbol registry
+     */
     private SymbolRegistry symbols;
 
     private MetricsRegistry metricsRegistry;
 
-    /** Output handler - handles generated data (eg. saves them to trace files). */
+    /**
+     * Output handler - handles generated data (eg. saves them to trace files).
+     */
     private TracerOutput output;
 
-    /** Query listers representing queries supplied at scanner construction time */
+    /**
+     * Query listers representing queries supplied at scanner construction time
+     */
     private List<QueryLister> listers = new ArrayList<QueryLister>();
 
 
     /**
      * Creates new JMX attribute scanner object.
      *
-     * @param symbols symbol registry
-     *
-     * @param name scanner name (converted to ID using symbol registry and attached to every emitted packet of data).
-     *@param registry MBean server registry object
-     *@param output tracer output
-     *@param qdefs JMX queries
+     * @param symbols  symbol registry
+     * @param name     scanner name (converted to ID using symbol registry and attached to every emitted packet of data).
+     * @param registry MBean server registry object
+     * @param output   tracer output
+     * @param qdefs    JMX queries
      */
     public JmxAttrScanner(SymbolRegistry symbols, MetricsRegistry metricRegistry, String name,
                           MBeanServerRegistry registry, TracerOutput output, QueryDef... qdefs) {
@@ -87,9 +96,9 @@ public class JmxAttrScanner implements Runnable {
 
         Metric metric = template.getMetric(key);
         if (metric == null) {
-            Map<String,Object> attrs = new HashMap<String,Object>();
+            Map<String, Object> attrs = new HashMap<String, Object>();
 
-            for (Map.Entry<String,Object> e : result.attrSet()) {
+            for (Map.Entry<String, Object> e : result.attrSet()) {
                 attrs.put(e.getKey(), e.getValue().toString());
             }
 
@@ -123,7 +132,7 @@ public class JmxAttrScanner implements Runnable {
             metricsRegistry.getMetric(metric);
 
             if (template.getDynamicAttrs().size() > 0) {
-                Map<String,Integer> dynamicAttrs = new HashMap<String,Integer>();
+                Map<String, Integer> dynamicAttrs = new HashMap<String, Integer>();
                 for (String attr : template.getDynamicAttrs()) {
                     dynamicAttrs.put(attr, symbols.symbolId(attr));
                 }
@@ -136,7 +145,6 @@ public class JmxAttrScanner implements Runnable {
 
         return metric;
     }
-
 
 
     @Override
@@ -189,8 +197,8 @@ public class JmxAttrScanner implements Runnable {
 
                     // Add dynamic attributes if necessary
                     if (metric.getDynamicAttrs() != null) {
-                        Map<Integer,String> attrs = new HashMap<Integer, String>();
-                        for (Map.Entry<String,Integer> e : metric.getDynamicAttrs().entrySet()) {
+                        Map<Integer, String> attrs = new HashMap<Integer, String>();
+                        for (Map.Entry<String, Integer> e : metric.getDynamicAttrs().entrySet()) {
                             attrs.put(e.getValue(), result.getAttr(e.getKey()).toString());
                         }
                         sample.setAttrs(attrs);
@@ -204,10 +212,10 @@ public class JmxAttrScanner implements Runnable {
 
         long t2 = System.nanoTime();
 
-        log.info(ZorkaLogger.ZPM_RUNS, "Scanner %s execution took " + (t2-t1)/1000000L + " milliseconds to execute. "
-                    + "Collected samples: " + samples.size());
+        log.info(ZorkaLogger.ZPM_RUNS, "Scanner %s execution took " + (t2 - t1) / 1000000L + " milliseconds to execute. "
+                + "Collected samples: " + samples.size());
 
-        AgentDiagnostics.inc(AgentDiagnostics.PMON_TIME, t2-t1);
+        AgentDiagnostics.inc(AgentDiagnostics.PMON_TIME, t2 - t1);
         AgentDiagnostics.inc(AgentDiagnostics.PMON_PACKETS_SENT);
         AgentDiagnostics.inc(AgentDiagnostics.PMON_SAMPLES_SENT, samples.size());
 

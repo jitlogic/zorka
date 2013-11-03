@@ -98,7 +98,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     public void testSingleTraceWithOneShortElementAndAlwaysSubmitFlag() throws Exception {
         b.traceEnter(c1, m1, s1, 10 * MS);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
-        b.markTraceFlags(TraceMarker.SUBMIT_TRACE);
+        b.markTraceFlags(0, TraceMarker.SUBMIT_TRACE);
         b.traceReturn(20 * MS);
 
         checkRC(1, 0);
@@ -109,7 +109,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     public void testAllMethodsSubmitFlag() throws Exception {
         b.traceEnter(c1, m1, s1, 10 * MS);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
-        b.markTraceFlags(TraceMarker.ALL_METHODS);
+        b.markTraceFlags(0, TraceMarker.ALL_METHODS);
         b.traceEnter(c1, m1, s1, 20 * MS);
         b.traceReturn(20 * MS + 10);
         b.traceReturn(200 * MS);
@@ -538,7 +538,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     public void testTraceDropFlag() throws Exception {
         b.traceEnter(c1, m1, s1, 10 * MS);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
-        b.markTraceFlags(TraceMarker.DROP_TRACE);
+        b.markTraceFlags(0, TraceMarker.DROP_TRACE);
         b.traceReturn(20 * MS);
 
         assertThat(records.size()).isEqualTo(0);

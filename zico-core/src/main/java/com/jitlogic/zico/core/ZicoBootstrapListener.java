@@ -31,6 +31,7 @@ public class ZicoBootstrapListener extends GuiceResteasyBootstrapServletContextL
 
     public void withInjector(final Injector injector) {
         injector.getInstance(ZicoService.class).start();
+        injector.getInstance(TraceTableWriter.class).start();
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 System.out.println("Shutting down Zorka Intranet Collector ...");

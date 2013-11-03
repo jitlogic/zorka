@@ -20,7 +20,7 @@ __zico() {
   _mbean = "zico:name=ReceiverContext,type=ZorkaStats";
   _traceTime = zorka.longCfg("zico.trace.time", 250);
 
-  spy.add(spy.instrument()
+  spy.add(spy.instrument("ZICO_PROCESS")
     .onEnter(spy.fetchArg("THIS", 0),
       spy.format("HOST", "${THIS.hostInfo.name}"),
       spy.subchain(
@@ -36,7 +36,7 @@ __zico() {
   // this method is private, so it has to be explicitly included for tracing
   tracer.include(spy.byMethod(0, "com.jitlogic.zico.core.ReceiverContext", "processTraceRecord", null));
 
-  spy.add(spy.instance()
+  spy.add(spy.instance("ZICO_RECV")
     .onEnter(spy.fetchArg("OFFS", 2), spy.fetchArg("LENGTH", 3),
       tracer.traceAttr("ZICO", "OFFS", "OFFS"),
       tracer.traceAttr("ZICO", "LENGTH", "LENGTH"))

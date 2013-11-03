@@ -23,6 +23,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 import com.jitlogic.zorka.common.ZorkaAgent;
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.util.ObjectDumper;

@@ -171,4 +171,9 @@ public class TraceMarker implements SymbolicRecord {
     public void traverse(MetadataChecker checker) throws IOException {
         traceId = checker.checkSymbol(traceId, this);
     }
+
+    @Override
+    public String toString() {
+        return "TraceMarker(" + traceId + ")";
+    }
 }
