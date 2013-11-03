@@ -18,20 +18,22 @@
 __ejb() {
 
   // Enable or disable all EJB monitoring
-  zorka.defCfg("ejb", "no");
+  zorka.defCfg("ejb", "yes");
 
   // Default values for EJB stats
   zorka.defCfg("ejb.stats", "yes");
   zorka.defCfg("ejb.stats.congestion", "yes");
   zorka.defCfg("ejb.stats.mbean", "zorka:type=ZorkaStats,name=EjbStats");
 
+  // Default values for HTTP tracer options
+  zorka.defCfg("ejb.trace", zorka.stringCfg("tracer"));
+  zorka.defCfg("ejb.trace.time", zorka.longCfg("tracer.min.trace.time"));
 
-  // Default values for HTTP parameter processing
-  zorka.defCfg("ejb.params", "no");
-  zorka.defCfg("ejb.params.prefix", "P:");
+  // Default values for EJB argument processing
+  zorka.defCfg("ejb.params", zorka.stringCfg("ejb.trace"));
+  zorka.defCfg("ejb.params.prefix", "ARG");
   zorka.defCfg("ejb.params.include", "");
-  zorka.defCfg("ejb.params.exclude", "**");
-
+  zorka.defCfg("ejb.params.exclude", "");
 
   // Default values for EJB slow calls log configuration options
   zorka.defCfg("ejb.slow", "no");
@@ -42,7 +44,6 @@ __ejb() {
   zorka.defCfg("ejb.slow.file.num", "8");
   zorka.defCfg("ejb.slow.format", "[${TIME}] ${CLASS}.${METHOD}(${PARAMS}) -> ${RET}");
 
-
   // Default values for EJB error log configuration options
   zorka.defCfg("ejb.error", "no");
   zorka.defCfg("ejb.error.file", zorka.boolCfg("ejb.error", false));
@@ -51,12 +52,16 @@ __ejb() {
   zorka.defCfg("ejb.error.file.num", "8");
   zorka.defCfg("ejb.error.format", "[${TIME}] ${CLASS}.${METHOD}(${PARAMS}) -> ${ERR}");
 
-  // Default values for HTTP tracer options
-  zorka.defCfg("ejb.trace", zorka.stringCfg("tracer"));
-  zorka.defCfg("ejb.trace.time", "1000");
-
   _mbean = zorka.stringCfg("ejb.stats.mbean");
 
+  _trace = zorka.boolCfg("ejb.trace");
+  _slow = zorka.boolCfg("ejb.slow");
+  _error = zorka.boolCfg("ejb.error");
+  _params = zorka.boolCfg("ejb.params");
+  _stats = zorka.boolCfg("ejb.stats");
+
+  _paramsMatcher = util.stringMatcher(zorka.listCfg("ejb.params.include"), zorka.listCfg("ejb.params.exclude"));
+  _paramsPrefix = zorka.stringCfg("ejb.params.prefix");
 
   slow_trapper = zorka.boolCfg("ejb.slow.file")
     ? zorka.rollingFileTrapper("ejb.slow", "INFO", zorka.stringCfg("ejb.slow.file.path"),
@@ -81,15 +86,13 @@ __ejb() {
 
   arg_processor() {
 
-    _trace_enabled = zorka.boolCfg("ejb.trace");
-    _params_prefix = zorka.stringCfg("ejb.params.prefix");
 
     zorka.logInfo("EJB argument processing enabled.");
 
     str(obj) {
       if (obj == null) {
         return "null";
-      } else if (types.allowed.contains(obj.getClass().getName())) {
+      } else if (_paramsMatcher.matches(obj.getClass().getName())) {
         return obj.toString();
       } else {
         return "<" + obj.getClass().getName() + "@" + System.identityHashCode(obj) + ">";
@@ -98,14 +101,15 @@ __ejb() {
 
     process(rec) {
       rec.put("RET", str(rec.get("RET")));
-      args = rec.get("INV").getArguments();
+      args = rec.get("ARGS");
       sb = new StringBuilder();
       if (args != null) {
         for (i = 0; i < args.length; i++) {
+          s = str(args[i]);
           sb.append(sb.length() > 0 ? ", " : "");
-          sb.append(str(arg));
-          if (_trace_enabled) {
-            tracer.newAttr(_params_prefix + i, s);
+          sb.append(s);
+          if (_trace) {
+            tracer.newAttr(_paramsPrefix + i, s);
           }
         }
       }

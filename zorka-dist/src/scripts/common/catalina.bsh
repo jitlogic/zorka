@@ -113,7 +113,7 @@ __catalina() {
         spy.valSetFilter("STATUS", http._errors),
         http.error_marker(),
         http._trace ? tracer.flags(tracer.ERROR_MARK|tracer.SUBMIT_TRACE) : null,
-        spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format"))),
+        http._error ? spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format")) : null),
       http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
     .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
 
@@ -123,8 +123,9 @@ __catalina() {
         "org.apache.tomcat.util.**",
         "org.apache.catalina.security.**",
         "org.apache.catalina.core.ApplicationCont**",
-        "org.apache.catalina.connector.**"
-        // TODO but this is sometimes useful for resolving connectivity problems
+        "org.apache.catalina.core.StandardWrap**",
+        "org.apache.catalina.connector.**", // TODO but this is sometimes useful for resolving connectivity problems
+        "org.apache.catalina.util.**"
     );
   }
 

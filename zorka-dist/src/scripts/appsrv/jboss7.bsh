@@ -138,10 +138,47 @@ __jboss7() {
     return this;
   }
 
-
   spy.add(spy.instance("JBOSS_MBS_REGISTER")
     .onReturn((com.jitlogic.zorka.core.spy.SpyProcessor)__mbsRegister())
     .include(spy.byMethod(spy.AC_STATIC, "org.jboss.modules.ModuleLoader", "installMBeanServer", "void")));
+
+
+  if (zorka.boolCfg("ejb")) {
+
+    // EJB tracing for JBoss 7
+
+    spy.add(spy.instrument("JBOSS7_EJB")
+      .onEnter(
+          spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 3),
+          ejb._trace ? tracer.begin("EJB", zorka.longCfg("ejb.trace.time")) : null,
+          ejb._trace ? tracer.formatAttr("METHOD", "${MDESC.name}") : null,
+          ejb._trace ? tracer.formatAttr("CLASS", "${MDESC.declaringClass.name}") : null)
+      .onError(
+          ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
+          spy.fetchError("ERR"),
+          spy.format("MSG", "${ERR.message}"),
+          ejb._error ? spy.trapperCollector(ejb.error_trapper, zorka.INFO, "EJB", zorka.stringCfg("ejb.error.format")) : null)
+      .onReturn(
+          ejb._params ? spy.fetchRetVal("RET") : spy.put("RET", ""))
+      .onSubmit(
+          ejb._params ? (com.jitlogic.zorka.core.spy.SpyProcessor)(ejb.arg_processor()) : spy.put("PARAMS", ""),
+          ejb._trace ? tracer.attr("RET", "RET") : null,
+          ejb._stats ? spy.zorkaStats("java", ejb._mbean, "byMethod", "${CLASS}.${METHOD}") : null,
+          ejb._stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null,
+          spy.longerThan(zorka.longCfg("ejb.slow.time")),
+          spy.strTime("TIME"),
+          ejb._slow ? spy.trapperCollector(ejb.slow_trapper, zorka.INFO, "EJB", zorka.stringCfg("ejb.slow.format")) : null)
+      .include(
+          spy.byMethod("org.jboss.as.ejb3.inflow.AbstractInvocationHandler", "invoke"),
+          spy.byMethod("org.jboss.as.ee.component.ProxyInvocationHandler", "invoke"),
+          spy.byMethod("org.jboss.as.cmp.component.CmpEntityBeanInvocationHandler", "invoke"),
+          spy.byMethod("org.jboss.invocation.InterceptorInvocationHandler", "invoke")
+      ));
+
+  }
+
+  // TODO org.jboss.ejb.client.EJBInvocationHandler  -  JBoss EJB client
+
 
   if (zorka.boolCfg("tracer")) {
     tracer.exclude(spy.byClass("org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate").priority(100));

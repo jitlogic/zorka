@@ -23,27 +23,33 @@ __http() {
   zorka.defCfg("http.stats.congestion", "yes");
   zorka.defCfg("http.stats.mbean", "zorka:type=ZorkaStats,name=HttpStats");
 
+  // Default values for HTTP tracer options
+  zorka.defCfg("http.trace", zorka.stringCfg("tracer", "no"));
+  zorka.defCfg("http.trace.time", zorka.longCfg("tracer.min.trace.time"));
+  zorka.defCfg("http.trace.include", "");
+  zorka.defCfg("http.trace.exclude", "/favicon.ico");
+
   // Default values for HTTP parameter processing
-  zorka.defCfg("http.params", "no");
+  zorka.defCfg("http.params", zorka.stringCfg("http.trace"));
   zorka.defCfg("http.params.exclude", "");
   zorka.defCfg("http.params.include", "");
-  zorka.defCfg("http.params.prefix", "Param/");
+  zorka.defCfg("http.params.prefix", "Par__");
   zorka.defCfg("http.param.maxlen", 256);
 
   // Default values for HTTP cookie processing
-  zorka.defCfg("http.cookies", "no");
+  zorka.defCfg("http.cookies", zorka.stringCfg("http.trace"));
   zorka.defCfg("http.cookies.exclude", "");
   zorka.defCfg("http.cookies.include", "");
-  zorka.defCfg("http.cookies.iprefix", "CookieIn_");
-  zorka.defCfg("http.cookies.oprefix", "CookieOut_");
+  zorka.defCfg("http.cookies.iprefix", "CookieIn__");
+  zorka.defCfg("http.cookies.oprefix", "CookieOut__");
   zorka.defCfg("http.cookies.maxlen", "256");
 
   // Default values for HTTP headers processing
-  zorka.defCfg("http.headers", "no");
+  zorka.defCfg("http.headers", zorka.stringCfg("http.trace"));
   zorka.defCfg("http.headers.exclude", "");
   zorka.defCfg("http.headers.include", "");
-  zorka.defCfg("http.headers.iprefix", "HdrIn_");
-  zorka.defCfg("http.headers.oprefix", "HdrOut_");
+  zorka.defCfg("http.headers.iprefix", "HdrIn__");
+  zorka.defCfg("http.headers.oprefix", "HdrOut__");
   zorka.defCfg("http.headers.maxlen", "256");
 
   // Default values for HTTP slow requests log configuration options
@@ -64,12 +70,6 @@ __http() {
   zorka.defCfg("http.error.file.max", "8M");
   zorka.defCfg("http.error.file.num", "8");
   zorka.defCfg("http.error.format", "[${TIME}] ${URI}${PARAMS} -> ${STATUS}");
-
-  // Default values for HTTP tracer options 
-  zorka.defCfg("http.trace", zorka.stringCfg("tracer"));
-  zorka.defCfg("http.trace.time", zorka.longCfg("tracer.min.trace.time"));
-  zorka.defCfg("http.trace.include", "");
-  zorka.defCfg("http.trace.exclude", "/favicon.ico");
 
   _trace = zorka.boolCfg("http.trace");
   _stats = zorka.boolCfg("http.stats");
@@ -103,18 +103,20 @@ __http() {
       process(rec) {
           sb = new StringBuilder();
           pmap = rec.get("REQ").getParameterMap();
-          for (e : pmap.entrySet()) {
-              String k = e.getKey();
-              if (_matcher.matches(k)) {
-                  String v = e.getValue().length > 0 ? e.getValue()[0] : "";
-                  if (v.length() > _paramLen) {
-                      v = v.substring(0, _paramLen);
+          if (pmap != null) {
+              for (e : pmap.entrySet()) {
+                  String k = e.getKey();
+                  if (_matcher.matches(k)) {
+                      String v = e.getValue().length > 0 ? e.getValue()[0] : "";
+                      if (v.length() > _paramLen) {
+                          v = v.substring(0, _paramLen);
+                      }
+                      if (_trace) {
+                          tracer.newAttr(_pprefix+k, v);
+                      }
+                      c = sb.length() > 0 ? "&" : "?";
+                      sb.append(c + k + "=" + v);
                   }
-                  if (_trace) {
-                      tracer.newAttr(_pprefix+k, v);
-                  }
-                  c = sb.length() > 0 ? "&" : "?";
-                  sb.append(c + k + "=" + v);
               }
           }
           rec.put("PARAMS", sb.toString());
@@ -135,15 +137,17 @@ __http() {
       process(rec) {
           if (cIn) {
               icookies = rec.get("REQ").getCookies();
-              for (c : icookies) {
-                  name = c.getName();
-                  if (_matcher.matches(name)) {
-                      val = c.getValue();
-                      if (val != null && val.length() > _cookieLen) {
-                          val = val.substring(0, _cookieLen);
-                      }
-                      if (_trace) {
-                          tracer.newAttr(_iprefix + name, val);
+              if (icookies != null) {
+                  for (c : icookies) {
+                      name = c.getName();
+                      if (_matcher.matches(name)) {
+                          val = c.getValue();
+                          if (val != null && val.length() > _cookieLen) {
+                              val = val.substring(0, _cookieLen);
+                          }
+                          if (_trace) {
+                              tracer.newAttr(_iprefix + name, val);
+                          }
                       }
                   }
               }
@@ -151,15 +155,17 @@ __http() {
 
           if (cOut) {
               ocookies = rec.get("RESP").getCookies();
-              for (c : ocookies) {
-                  name = c.getName();
-                  if (_matcher.matches(name)) {
-                      val = c.getValue();
-                      if (val != null && val.length() > _cookieLen) {
-                          val = val.substring(0, _cookieLen);
-                      }
-                      if (_trace) {
-                          tracer.newAttr(_oprefix + name, val);
+              if (ocookies != null) {
+                  for (c : ocookies) {
+                      name = c.getName();
+                      if (_matcher.matches(name)) {
+                          val = c.getValue();
+                          if (val != null && val.length() > _cookieLen) {
+                              val = val.substring(0, _cookieLen);
+                          }
+                          if (_trace) {
+                              tracer.newAttr(_oprefix + name, val);
+                          }
                       }
                   }
               }
