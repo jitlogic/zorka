@@ -15,14 +15,5 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// This file contains agent configurations for Hibernate ORM
+zorka.require("svr/jboss.bsh");
 
-zorka.require("tracer.bsh");
-
-// Tracer tuning
-if (zorka.boolCfg("tracer")) {
-    tracer.exclude("org.hibernate.**");
-}
-
-
-// TODO more features: statistics, interesting method attributes, dedicated traces, typical errors, tunables etc.

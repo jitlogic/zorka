@@ -17,6 +17,9 @@
 
 // Common JBoss 4/5/6 support functions
 
+zorka.require("catalina.bsh");
+zorka.require("svr/jbossejb.bsh");
+
 __jboss() {
 
   // Servlets
@@ -86,6 +89,7 @@ __jboss() {
     }
     return this;
   } // __mbsRegister()
+
 
   spy.add(spy.instance("JBOSS_MBS_REGISTER")
     .onReturn(spy.fetchArg("THIS", 0), (com.jitlogic.zorka.core.spy.SpyProcessor)__mbsRegister())

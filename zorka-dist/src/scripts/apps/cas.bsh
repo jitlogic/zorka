@@ -15,7 +15,6 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * CAS audit script
  *
@@ -30,6 +29,8 @@
  * - cas.audit.file.path = ${zorka.log.dir}/cas_audit.log  path to log file
  * - cas.audit.zabbix.host = ${zorka.hostname}
  */
+
+zorka.require("tracer.bsh");
 
 __cas() {
 

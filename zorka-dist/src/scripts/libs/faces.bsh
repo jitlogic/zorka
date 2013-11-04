@@ -17,6 +17,8 @@
 
 // This file contains agent configurations for JSF libraries
 
+zorka.require("tracer.bsh");
+
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
     tracer.exclude("javax.faces.**", "com.sun.faces.**");

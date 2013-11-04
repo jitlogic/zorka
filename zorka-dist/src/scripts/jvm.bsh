@@ -17,10 +17,12 @@
 
 __jvm() {
 
-  if (zorka.boolCfg("zorka.mbs.autoregister", true)) {
-      mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
-      zorka.registerMbs("java", mbs);
-      zorka.logInfo("Registered platform mbean server as 'java'");
+  autoregister() {
+      if (!zorka.isMbsRegistered("java")) {
+          mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
+          zorka.registerMbs("java", mbs);
+          zorka.logInfo("Registered platform mbean server as 'java'");
+      }
   }
 
   memutil(name) {
@@ -52,18 +54,6 @@ __jvm() {
     mbean = zorka.stringCfg("jvm.hiccup.mbean", "zorka:type=ZorkaStats,name=Hiccup");
     perfmon.cpuHiccup("java", mbean, "CPU", 10, 30000).start();
   } // hiccup = yes
-
-
-  if (zorka.boolCfg("tracer")) {
-      tracer.exclude(
-          "java.**",
-          "sun.reflect.**",
-          "sun.awt.**",
-          "com.sun.beans.**",
-          "$Proxy*"
-      );
-  }
-
 
   return this;
 }

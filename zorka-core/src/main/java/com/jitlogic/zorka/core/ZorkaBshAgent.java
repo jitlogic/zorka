@@ -19,6 +19,7 @@ package com.jitlogic.zorka.core;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
@@ -68,6 +69,8 @@ public class ZorkaBshAgent implements ZorkaAgent {
     private long timeout;
 
     private boolean initialized;
+
+    private Set<String> loadedScripts = new ConcurrentSkipListSet<String>();
 
     /**
      * Standard constructor.
@@ -165,6 +168,7 @@ public class ZorkaBshAgent implements ZorkaAgent {
         try {
             log.info(ZorkaLogger.ZAG_CONFIG, "Executing script: " + path);
             interpreter.source(path);
+            loadedScripts.add(path);
             return "OK";
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error loading script " + path, e);
@@ -174,6 +178,15 @@ public class ZorkaBshAgent implements ZorkaAgent {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error executing script " + path, e);
             AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
             return "Error: " + e.getMessage();
+        }
+    }
+
+
+    public String require(String path) {
+        if (!loadedScripts.contains(path)) {
+            return loadScript(path);
+        } else {
+            return "Already loaded.";
         }
     }
 
@@ -189,39 +202,14 @@ public class ZorkaBshAgent implements ZorkaAgent {
             return;
         }
 
-        File dir = new File(scriptsDir);
+        List<String> scripts = config.listCfg("scripts");
 
-        if (!dir.exists() || !dir.isDirectory()) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Scripts directory non existent or not a directory: " + dir);
-            return;
-        }
-
-        log.info(ZorkaLogger.ZAG_CONFIG, "Listing directory: " + scriptsDir);
-
-        try {
-
-            List<String> scripts = new ArrayList();
-            scripts.addAll(config.getProfileScripts());
-
-            Set<String> loadedScripts = new HashSet<String>();
-
-            for (String fname : scripts) {
-                if (!fname.matches(".*.bsh")) {
-                    continue;
-                }
-                String scrPath = ZorkaUtil.path(scriptsDir, fname);
-                if (new File(scrPath).isFile() && !loadedScripts.contains(fname)) {
-                    loadScript(scrPath);
-                    loadedScripts.add(fname);
-                } else {
-                    log.info(ZorkaLogger.ZAG_CONFIG, "Skipping: '" + scrPath + ": " +
-                            (loadedScripts.contains(fname) ? "already loaded" : "not a (proper) file") + ".");
-                }
+        if (scripts != null) {
+            for (String script : scripts) {
+                String scriptPath = new File(scriptsDir, script).getPath();
+                require(scriptPath);
             }
-        } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot open directory: " + scriptsDir, e);
         }
-
     }
 
 

@@ -17,6 +17,8 @@
 
 // This file contains agent configurations for J2EE libraries
 
+zorka.require("tracer.bsh");
+
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
     tracer.exclude("javax.enterprise.util.**", "javax.el.**", "javax.servlet.**");

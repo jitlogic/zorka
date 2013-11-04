@@ -15,6 +15,9 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
+zorka.require("jvm.bsh");
+zorka.require("catalina.bsh");
+
 __tomcat() {
 
   thread_util(name) {
@@ -87,6 +90,8 @@ __tomcat() {
   }
 
   jsp = __jsp();
+
+  jvm.autoregister();
 
   return this;
 

@@ -15,6 +15,18 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
+zorka.require("ejb.bsh");
+zorka.require("catalina.bsh");
+
+zorka.require(
+    "libs/apache.bsh",
+    "libs/faces.bsh",
+    "libs/google.bsh",
+    "libs/hibernate.bsh",
+    "libs/j2ee.bsh",
+    "libs/logging.bsh",
+    "libs/misc.bsh");
+
 __jboss7() {
 
   // Basic servlet statistics

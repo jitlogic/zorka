@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.*;
 import com.jitlogic.zorka.core.test.support.TestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
@@ -81,12 +82,13 @@ public class BshAgentUnitTest extends ZorkaFixture {
         URL url = getClass().getResource("/cfgp");
         AgentConfig config = new AgentConfig(url.getPath());
         ObjectInspector.setField(zorkaAgent, "config", config);
+        ObjectInspector.setField(zorka, "config", config);
         zorkaAgent.loadScripts();
         assertNotNull("jvm/jvm.bsh script should be loaded.", zorkaAgent.get("jvm_bsh"));
-        assertTrue("property values for jvm module should be present", config.hasCfg("jvm.test.property"));
         assertFalse("profile.scripts properties should be filtered off", config.hasCfg("profile.scripts"));
         assertNotNull("test/test.bsh script should be loaded.", zorkaAgent.get("test_bsh"));
         assertEquals("jvm/jvm.bsh script should be called only once.", "bar", zorkaAgent.get("not_to_be_overridden"));
+        assertNotNull("common.bsh script should be indirectly loaded via jvm.bsh", zorkaAgent.get("common_bsh"));
     }
 
 

@@ -46,7 +46,9 @@ if (zorka.boolCfg("tracer")) {
 
 
   tracer.exclude("100:com.jitlogic.zorka.**");
+  tracer.exclude("java.**", "sun.reflect.**", "sun.awt.**", "com.sun.beans.**", "$Proxy*");
   tracer.include("1000:**");
+
 
 
   if (zorka.boolCfg("tracer.file")) {

@@ -17,6 +17,7 @@
 
 __wso2() {
 
+  // TODO to be overhauled
 
   if (zorka.boolCfg("tracer", false)) {
 

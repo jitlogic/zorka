@@ -15,6 +15,8 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
+zorka.require("jvm.bsh");
+zorka.require("http.bsh");
 
 __jetty() {
 
@@ -59,6 +61,8 @@ __jetty() {
     .include(
       spy.byMethod("org.mortbay.jetty.servlet.ServletHandler", "doHandle"),
       spy.byMethod("org.eclipse.jetty.servlet.ServletHandler", "doHandle")));
+
+  jvm.autoregister();
 
   return this;
 }

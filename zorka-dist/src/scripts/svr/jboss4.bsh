@@ -17,6 +17,8 @@
 
 // JBoss 4.x support functions
 
+zorka.require("svr/jboss.bsh");
+
 __jboss4() {
 
   // EJB 3.x stuff

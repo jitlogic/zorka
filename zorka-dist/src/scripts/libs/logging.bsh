@@ -17,6 +17,8 @@
 
 // This file contains agent configurations for a variety of Apache libraries
 
+zorka.require("tracer.bsh");
+
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
     tracer.exclude("org.slf4j.**", "org.log4j.**");

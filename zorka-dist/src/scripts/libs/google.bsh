@@ -17,6 +17,8 @@
 
 // This file contains agent configurations for Google libraries
 
+zorka.require("tracer.bsh");
+
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
     tracer.exclude("com.google.common.**");
