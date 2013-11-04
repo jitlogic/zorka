@@ -22,8 +22,19 @@ __jvm() {
           mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
           zorka.registerMbs("java", mbs);
           zorka.logInfo("Registered platform mbean server as 'java'");
+      } else {
+          zorka.logInfo("Platform mbean server already registered. Skipping.");
       }
   }
+
+  autoregister_plugin() {
+      process(rec) {
+          autoregister();
+          return rec;
+      }
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
 
   memutil(name) {
     mem_used = zorka.jmx("java", "java.lang:name="+name+",type=MemoryPool", "Usage", "used");

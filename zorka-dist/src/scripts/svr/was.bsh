@@ -1,0 +1,157 @@
+/**
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+zorka.require("jvm.bsh");
+zorka.require("http.bsh");
+
+__was() {
+
+  class_loader = null;
+
+  WasAdminServiceWrapper(adminService) {
+
+    service = adminService;
+    subject = null;
+    loginTL = new ThreadLocal();
+    wasUser = zorka.stringCfg("was.user", null);
+
+    do_login() {
+      zorka.logInfo("Authenticating agent as " + wasUser);
+      callback = class_loader.loadClass("com.ibm.websphere.security.auth.callback.WSCallbackHandlerImpl")
+        .getConstructor(String.class,String.class,String.class)
+        .newInstance(zorka.stringCfg("was.user"), zorka.stringCfg("was.role", "Monitor"), zorka.stringCfg("was.pass"));
+
+      lc = new javax.security.auth.login.LoginContext("WSLogin", callback);
+      lc.login();
+      super.subject = lc.getSubject();
+    }
+
+    check_login() {
+      if (wasUser != null && loginTL.get() == null) {
+        zorka.logInfo("Adding " + wasUser + " credentials to agent thread.");
+        thread = Thread.currentThread();
+        old_cl = thread.getContextClassLoader();
+        thread.setContextClassLoader(class_loader);
+
+        synchronized(super) {
+          try {
+            if (super.subject == null) {
+              do_login();
+            }
+            class_loader.loadClass("com.ibm.websphere.security.auth.WSSubject")
+              .getMethod("setRunAsSubject", javax.security.auth.Subject.class)
+              .invoke(null, subject);
+            loginTL.set(subject);
+          } finally {
+            thread.setContextClassLoader(old_cl);
+          }
+        }
+      }
+    }
+
+    nim() { throw new RuntimeException("Not implemented."); }
+
+    getCellName() { return service.getCellName(); }
+    getNodeName() { return service.getNodeName(); }
+    getProcessName() { return service.getProcessName(); }
+
+    createMBean(className, name) { check_login(); return service.createMBean(className, name); }
+    createMBean(className, name, loaderName) { check_login(); return service.createMBean(className, name, loaderName); }
+    createMBean(className, name, params, signature) { check_login(); return service.createMBean(className, name, params, signature); }
+    createMBean(className, name, loaderName, params, signature) { check_login(); return service.createMBean(name, loaderName, params, signature); }
+
+    registerMBean(object, name) { check_login(); return service.registerMBean(object, name); }
+    unregisterMBean(name) { check_login(); service.unregisterMBean(name); }
+
+    getObjectInstance(name) { check_login(); return service.getObjectInstance(name); }
+    queryMBeans(name, query) { check_login(); return service.queryMBeans(name, query); }
+    queryNames(name, query) { check_login(); return service.queryNames(name, query); }
+    isRegistered(name) { check_login(); return service.isRegistered(name); }
+    getMBeanCount() { check_login(); return service.getMBeanCount(); }
+
+    getAttribute(name, attribute) { check_login(); return service.getAttribute(name, attribute); }
+    getAttributes(name, attributes) { check_login(); return service.getAttributes(name, attributes); }
+    setAttribute(name, attribute) { check_login(); service.setAttribute(name, attribute); }
+    setAttributes(name, attributes) { check_login(); service.setAttributes(name, attributes); }
+
+    invoke(name, op, params, signature) { check_login(); return service.invoke(name, op, params, signature); }
+
+    getDefaultDomain() { check_login(); return service.getDefaultDomain(); }
+    getDomains() { check_login(); return service.getDomains(); }
+
+    addNotificationListener(name, listener, filter, handback) { check_login(); return service.addNotiricationListener(name, listener, filter, handback); }
+    removeNotificationListener(name, listener) { check_login(); service.removeNotificationListener(name, listener); }
+    removeNotificationListener(name, listener, filter, handback) { check_login(); service.removeNotificationListener(name, listener, filter, handback); }
+
+    getMBeanInfo(name) { check_login(); return service.getMBeanInfo(name); }
+    isInstanceOf(name, className) { check_login(); return service.isInstanceOf(name, className); }
+
+    instantiate(className) { check_login(); return service.instantiate(className); }
+    instantiate(className, loaderName) { check_login(); return service.instantiate(className, loaderName); }
+    instantiate(className, params, signature) { check_login(); return service.instantiate(className, params, signature); }
+    instantiate(className, loaderName, params, signature) { check_login(); return service.instantiate(className, loaderName, params, signature); }
+
+    deserialize(name, data) { throw new RuntimeException("Not implemented."); }
+    deserialize(className, loaderName, data) { throw new RuntimeException("Not implemented."); }
+
+    getClassLoaderFor(mbeanName) { check_login(); return service.getClassLoaderFor(mbeanName); }
+    getClassLoader(loaderName) { check_login(); return service.getClassLoader(loaderName); }
+    getClassLoaderRepository() { check_login(); return service.getClassLoaderRepository(); }
+
+    return (javax.management.MBeanServer)this;
+  }
+
+
+  pmi_register() {
+      pmi = null;
+      process(rec) {
+          synchronized (super) {
+              if (super.pmi == null) {
+                  super.pmi = WasAdminServiceWrapper(rec.get("THIS"));
+                  zorka.registerMbs("pmi", super.pmi);
+                  zorka.logInfo("Registered PMI mbean server.");
+              }
+          }
+          return rec;
+      }
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+  spy.add(spy.instance("WAS_MBS_REGISTER")
+    .onReturn(spy.fetchArg("THIS", 0), jvm.autoregister_plugin(), pmi_register())
+    .include(spy.byMethod("com.ibm.ws.management.AdminServiceImpl", "<init>")));
+
+
+  class_loader_catcher() {
+      process(rec) {
+          cl = rec.get("THIS");
+          zorka.logInfo("Found application server class loader: " + cl);
+          super.super.class_loader = cl;
+          return rec;
+      }
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+  spy.add(spy.instance("WAS_CATCH_CLASS_LOADER")
+    .onReturn(spy.fetchArg("THIS", 0), class_loader_catcher())
+    .include(spy.byMethod("com.ibm.ws.classloader.ProtectionClassLoader", "<init>")));
+
+  return this;
+}
+
+
+was = __was();
