@@ -82,7 +82,6 @@ public class BshAgentUnitTest extends ZorkaFixture {
         AgentConfig config = new AgentConfig(url.getPath());
         ObjectInspector.setField(zorkaAgent, "config", config);
         zorkaAgent.loadScripts();
-        assertNotNull("common.bsh script should be loaded.", zorkaAgent.get("common_bsh"));
         assertNotNull("jvm/jvm.bsh script should be loaded.", zorkaAgent.get("jvm_bsh"));
         assertTrue("property values for jvm module should be present", config.hasCfg("jvm.test.property"));
         assertFalse("profile.scripts properties should be filtered off", config.hasCfg("profile.scripts"));

@@ -179,7 +179,7 @@ public class ZorkaBshAgent implements ZorkaAgent {
 
 
     /**
-     * Loads and executes all script in given directory matching given mask.
+     * Loads and executes all script in script directory.
      */
     public void loadScripts() {
         String scriptsDir = config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null);
@@ -201,8 +201,6 @@ public class ZorkaBshAgent implements ZorkaAgent {
         try {
 
             List<String> scripts = new ArrayList();
-            scripts.addAll(Arrays.asList(dir.list()));
-            Collections.sort(scripts);
             scripts.addAll(config.getProfileScripts());
 
             Set<String> loadedScripts = new HashSet<String>();
