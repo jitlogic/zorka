@@ -65,12 +65,6 @@
                                 </copy>
                                 <copy file="src/zico.bsh"
                                       toDir="${project.build.outputDirectory}/zico-${project.version}/scripts/apps"/>
-                                <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/profiles"/>
-                                <copy toDir="${project.build.outputDirectory}/zico-${project.version}/profiles">
-                                    <fileset dir="../zorka-dist/src/profiles" defaultexcludes="false">
-                                        <include name="**"/>
-                                    </fileset>
-                                </copy>
                                 <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/dbscripts"/>
                                 <copy toDir="${project.build.outputDirectory}/zico-${project.version}/dbscripts">
                                     <fileset dir="../zico-core/src/main/resources/com/jitlogic/zico"
@@ -78,8 +72,6 @@
                                         <include name="*.sql"/>
                                     </fileset>
                                 </copy>
-                                <copy file="src/zico.profile"
-                                      toDir="${project.build.outputDirectory}/zico-${project.version}/profiles"/>
                                 <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/templates"/>
                                 <copy file="src/Template_Zico_Collector.xml"
                                       toDir="${project.build.outputDirectory}/zico-${project.version}/templates"/>
