@@ -21,5 +21,18 @@ zorka.require("tracer.bsh");
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
-    tracer.exclude( "org.apache.xerces.**", "org.apache.xml.**", "org.apache.el.**");
+    tracer.exclude(
+        "org.apache.xerces.**",
+        "org.apache.xml.**",
+        "org.apache.el.**",
+        "org.apache.harmony.**",
+        "org.apache.soap.**",
+        "org.apache.xpath.**",
+        "org.apache.xalan.**",
+        "org.apache.struts.**",
+        "org.apache.jasper.**",
+        "org.apache.commons.collections.**",
+        "org.apache.commons.validator.**",
+        "org.apache.commons.logging.**"
+    );
 }

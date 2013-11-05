@@ -150,6 +150,101 @@ __was() {
     .onReturn(spy.fetchArg("THIS", 0), class_loader_catcher())
     .include(spy.byMethod("com.ibm.ws.classloader.ProtectionClassLoader", "<init>")));
 
+
+  // HTTP tracing
+
+  _ireq  = new ThreadLocal();
+
+  spy.add(spy.instrument("WAS_HTTP_HELPER")
+    .onEnter(spy.fetchArg("IREQ", 1), spy.tlSet("IREQ", _ireq))
+    .onSubmit(spy.tlRemove(_ireq))
+    .include(spy.byMethod("com.ibm.ws.webcontainer.WebContainer", "handleRequest")));
+
+  // HTTP Request class: com.ibm.ws.webcontainer.srt.SRTServletRequest
+  // HTTP Response class: com.ibm.ws.webcontainer.srt.SRTServletResponse
+
+  spy.add(spy.instrument("WAS_HTTP")
+    .onEnter(spy.fetchArg("REQ", 1), spy.fetchArg("RESP", 2), spy.tlGet("IREQ", _ireq),
+      spy.format("URI", "${IREQ.requestURI}"),
+      http._trace ? spy.subchain(
+        http._uriQualifier,
+        tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
+        tracer.attr("URI", "URI")
+      ) : null,
+      http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
+    .onReturn(spy.put("ERR", ""))
+    .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"), spy.format("STATUS", "ERR"),
+      http._trace ? spy.subchain(
+        http._uriQualifier,
+        tracer.flags(tracer.SUBMIT_TRACE),
+        tracer.attr("ERR", "ERR")
+      ) : null)
+    .onSubmit(spy.strTime("TIME"),
+      spy.get("STATUS", "RESP", "statusCode"),
+      http._trace ? spy.subchain(
+        http._uriQualifier,
+        tracer.attr("STATUS", "STATUS"),
+        tracer.filterBy("STATUS", null, http._errors, null, null),
+        http._params ? http.param_processor() : spy.put("PARAMS", ""),
+        http._headers ? http.headers_processor(true, true) : null,
+        http._cookies ? http.cookies_processor(true, true) : spy.put("COOKIES", "")
+      ) : null,
+      http._slow ? spy.subchain(
+        spy.longerThan(zorka.longCfg("http.slow.time")),
+        spy.trapperCollector(http.slow_ft, zorka.INFO, "HTTP", zorka.stringCfg("http.slow.format"))) : null,
+      spy.subchain(
+        spy.valSetFilter("STATUS", http._errors),
+        http._trace ? http.error_marker() : null,
+        http._trace ? tracer.flags(tracer.ERROR_MARK|tracer.SUBMIT_TRACE) : null,
+        spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format"))),
+      http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
+    .include(
+      spy.byMethod("com.ibm.ws.webcontainer.servlet.CacheServletWrapper", "handleRequest"),
+      spy.byMethod("com.ibm.ws.webcontainer.webapp.WebApp", "handleRequest")
+    ));
+
+  // Tracer tuning
+  zorka.require("libs/apache.bsh");
+  zorka.require("libs/eclipse.bsh");
+  zorka.require("libs/j2ee.bsh");
+
+  if (zorka.boolCfg("tracer")) {
+    tracer.exclude(
+      "com.ibm.ejs.ras.**",
+      "com.ibm.ws.classloader.**",
+      "com.ibm.ws.logging.**",
+      "com.ibm.ws.security.**",
+      "com.ibm.ws.bootstrap.**",
+      "com.ibm.ws.webcontainer.util.**",
+      "com.ibm.ws.util.**",
+      "com.ibm.security.util.**",
+      "com.ibm.ws.injectionengine.**",
+      "com.ibm.sec.authz.**",
+      "com.ibm.websphere.pmi.**",
+      "com.ibm.xtq.common.utils.**",
+      "com.ibm.xtq.xslt.**",
+      "com.ibm.ws.sibx.scax.mediation.component.**",
+      "com.ibm.oti.shared.**",
+      "com.ibm.ws.adaptor.ClasspathPrependHook.**",
+      "com.ibm.cds.CDSHookImpls",
+      "com.ibm.ws.tx.util.logging.**",
+      "com.ibm.ejs.util.**",
+      "com.ibm.ws.wim.xpath.**",
+      "com.ibm.ws.genericbnf.**",
+      "com.ibm.ws.webcontainer.srt.**",
+      "com.ibm.ws.PluginModelObject",
+      "com.ibm.websphere.models.config.**",
+      "com.ibm.rmi.util.**",
+      "com.ibm.isclite.wccm.navigation.impl.**",
+      "com.ibm.isclite.wccm.base.impl.**",
+      "com.ibm.isclite.datastore.runtime.**",
+      "com.ibm.websphere.resource.**",
+      "com.ibm.isclite.common.tree.TreeNode",
+      "com.ibm.ws.featureref.impl.**",
+      "com.ibm.ws.management.authorizer.**"
+    );
+  }
+
   return this;
 }
 

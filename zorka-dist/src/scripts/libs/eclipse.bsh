@@ -15,19 +15,19 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// This file contains agent configurations for J2EE libraries
+// This file contains agent configurations for a variety of Apache libraries
 
 zorka.require("tracer.bsh");
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
     tracer.exclude(
-        "javax.enterprise.util.**",
-        "javax.el.**",
-        "javax.servlet.**",
-        "javax.security.**",
-        "javax.crypto.spec.**",
-        "org.xml.sax.**",
-        "javax.xml.parsers.**"
+        "org.eclipse.emf.**",
+        "org.eclipse.osgi.**",
+        "org.eclipse.hyades.**",
+        "org.eclipse.core.**",
+        "org.eclipse.wst.common.**",
+        "org.osgi.service.permissionadmin.**"
     );
 }
+

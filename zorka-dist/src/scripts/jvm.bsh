@@ -60,11 +60,18 @@ __jvm() {
     return 100.0 * fd_used.longValue() / fd_max.longValue();
   }
 
-
   if (zorka.boolCfg("jvm.hiccup", true)) {
     mbean = zorka.stringCfg("jvm.hiccup.mbean", "zorka:type=ZorkaStats,name=Hiccup");
     perfmon.cpuHiccup("java", mbean, "CPU", 10, 30000).start();
   } // hiccup = yes
+
+  if (zorka.boolCfg("tracer")) {
+      tracer.exclude(
+          "com.sun.jmx.**",
+          "javax.management.**"
+      );
+  }
+
 
   return this;
 }
