@@ -39,12 +39,11 @@ public class DataCollectionIntegTest extends ZicoFixture {
 
     @Before
     public void setUpOutputAndCollector() throws Exception {
-        zicoService.start();
 
         generator = new TestTraceGenerator();
         output = new ZicoTraceOutput(
                 new FressianTraceWriter(generator.getSymbols(), generator.getMetrics()),
-                "127.0.0.1", 8640, "test", "aaa", 64, 8 * 1024 * 1024, 1, 250, 8, 30000);
+                "127.0.0.1", 9640, "test", "aaa", 64, 8 * 1024 * 1024, 1, 250, 8, 30000);
     }
 
 
@@ -108,7 +107,7 @@ public class DataCollectionIntegTest extends ZicoFixture {
 
     @Test(timeout = 1000)
     public void testCollectThreeRecordsWithLimitPerPacket() throws Exception {
-        field("packetSize").ofType(int.class).in(output).set(210);
+        field("packetSize").ofType(long.class).in(output).set(210L);
         submit(generator.generate(), generator.generate(), generator.generate());
         assertEquals("Two traces should be noticed.", 2, countTraces("test"));
         submit();

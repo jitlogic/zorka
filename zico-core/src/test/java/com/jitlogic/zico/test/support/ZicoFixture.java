@@ -64,6 +64,7 @@ public class ZicoFixture {
         configProperties = setProps(
                 ZorkaConfig.defaultProperties(ZicoConfig.DEFAULT_CONF_PATH),
                 "zico.home.dir", tmpDir,
+                "zico.listen.port", "9640",
                 "zico.service", "no",
                 "zico.db.type", "h2",
                 "zico.db.url", "jdbc:h2:mem:test",
