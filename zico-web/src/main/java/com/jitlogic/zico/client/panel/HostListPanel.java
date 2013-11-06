@@ -15,9 +15,13 @@
  */
 package com.jitlogic.zico.client.panel;
 
+import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.inject.Inject;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
@@ -25,6 +29,7 @@ import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.data.HostInfo;
 import com.jitlogic.zico.data.HostInfoProperties;
+import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.Dialog;
@@ -67,16 +72,8 @@ public class HostListPanel extends VerticalLayoutContainer {
 
     private ErrorHandler errorHandler;
 
-    private TextButton btnRefresh;
-    private TextButton btnAddHost;
-    private TextButton btnRemoveHost;
-    private TextButton btnEditHost;
-    private TextButton btnListTraces;
-    private MenuItem mnuRefresh;
-    private MenuItem mnuNewHost;
-    private MenuItem mnuRemoveHost;
-    private MenuItem mnuEditHost;
-    private MenuItem mnuListTraces;
+    private TextButton btnRefresh, btnAddHost, btnRemoveHost, btnEditHost, btnListTraces, btnDisableHost, btnEnableHost;
+    private MenuItem mnuRefresh, mnuNewHost, mnuRemoveHost, mnuEditHost, mnuListTraces, mnuDisableHost, mnuEnableHost;
 
     private boolean selectionDependentControlsEnabled = true;
 
@@ -94,10 +91,12 @@ public class HostListPanel extends VerticalLayoutContainer {
         createHostListPanel();
         createContextMenu();
 
-        enableSelectionDependentControls(false);
+        enableSelectionDependentControls(null);
     }
 
-    private void enableSelectionDependentControls(boolean enabled) {
+    private void enableSelectionDependentControls(HostInfo hostInfo) {
+        boolean enabled = hostInfo != null;
+        boolean hostDisabled = hostInfo != null && hostInfo.hasFlag(HostInfo.DISABLED);
         if (selectionDependentControlsEnabled != enabled) {
             btnRemoveHost.setEnabled(enabled);
             btnEditHost.setEnabled(enabled);
@@ -107,6 +106,11 @@ public class HostListPanel extends VerticalLayoutContainer {
             mnuListTraces.setEnabled(enabled);
             selectionDependentControlsEnabled = enabled;
         }
+
+        btnDisableHost.setEnabled(enabled && !hostDisabled);
+        btnEnableHost.setEnabled(hostDisabled);
+        mnuDisableHost.setEnabled(enabled && !hostDisabled);
+        mnuEnableHost.setEnabled(hostDisabled);
     }
 
     private void createToolbar() {
@@ -147,10 +151,42 @@ public class HostListPanel extends VerticalLayoutContainer {
         });
         toolBar.add(btnRemoveHost);
 
+        toolBar.add(new SeparatorToolItem());
+
         btnEditHost = new TextButton();
         btnEditHost.setIcon(Resources.INSTANCE.editIcon());
         btnEditHost.setToolTip("Edit host");
+        btnEditHost.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                editHost();
+            }
+        });
         toolBar.add(btnEditHost);
+
+        toolBar.add(new SeparatorToolItem());
+
+        btnDisableHost = new TextButton();
+        btnDisableHost.setIcon(Resources.INSTANCE.disableIcon());
+        btnDisableHost.setToolTip("Disable host");
+        btnDisableHost.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                toggleHost(false);
+            }
+        });
+        toolBar.add(btnDisableHost);
+
+        btnEnableHost = new TextButton();
+        btnEnableHost.setIcon(Resources.INSTANCE.enableIcon());
+        btnEnableHost.setToolTip("Enable host");
+        btnEnableHost.addSelectHandler(new SelectEvent.SelectHandler() {
+            @Override
+            public void onSelect(SelectEvent event) {
+                toggleHost(true);
+            }
+        });
+        toolBar.add(btnEnableHost);
 
         toolBar.add(new SeparatorToolItem());
 
@@ -171,13 +207,35 @@ public class HostListPanel extends VerticalLayoutContainer {
 
 
     private void createHostListPanel() {
-        ColumnConfig<HostInfo, String> nameCol = new ColumnConfig<HostInfo, String>(props.name(), 128, "Host Name");
+        ColumnConfig<HostInfo, HostInfo> nameCol = new ColumnConfig<HostInfo, HostInfo>(
+                new IdentityValueProvider<HostInfo>(), 128, "Host Name");
         nameCol.setMenuDisabled(true);
         nameCol.setSortable(false);
 
-        ColumnConfig<HostInfo, String> addrCol = new ColumnConfig<HostInfo, String>(props.addr(), 127, "IP Address");
+        nameCol.setCell(new AbstractCell<HostInfo>() {
+            @Override
+            public void render(Context context, HostInfo host, SafeHtmlBuilder sb) {
+                String color = host.hasFlag(HostInfo.DISABLED) ? "gray" : "black";
+                sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
+                sb.append(SafeHtmlUtils.fromString(host.getName()));
+                sb.appendHtmlConstant("</span>");
+            }
+        });
+
+        ColumnConfig<HostInfo, HostInfo> addrCol = new ColumnConfig<HostInfo, HostInfo>(
+                new IdentityValueProvider<HostInfo>(), 127, "IP Address");
         addrCol.setMenuDisabled(true);
         addrCol.setSortable(false);
+
+        addrCol.setCell(new AbstractCell<HostInfo>() {
+            @Override
+            public void render(Context context, HostInfo host, SafeHtmlBuilder sb) {
+                String color = host.hasFlag(HostInfo.DISABLED) ? "gray" : "black";
+                sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
+                sb.append(SafeHtmlUtils.fromString(host.getAddr()));
+                sb.appendHtmlConstant("</span>");
+            }
+        });
 
         ColumnModel<HostInfo> model = new ColumnModel<HostInfo>(Arrays.<ColumnConfig<HostInfo, ?>>asList(nameCol, addrCol));
         hostGridStore = new ListStore<HostInfo>(props.key());
@@ -196,7 +254,7 @@ public class HostListPanel extends VerticalLayoutContainer {
         hostGrid.addCellDoubleClickHandler(new CellDoubleClickEvent.CellDoubleClickHandler() {
             @Override
             public void onCellClick(CellDoubleClickEvent event) {
-                enableSelectionDependentControls(hostGrid.getSelectionModel().getSelectedItem() != null);
+                enableSelectionDependentControls(hostGrid.getSelectionModel().getSelectedItem());
                 listTraces();
             }
         });
@@ -204,7 +262,7 @@ public class HostListPanel extends VerticalLayoutContainer {
         hostGrid.addCellClickHandler(new CellClickEvent.CellClickHandler() {
             @Override
             public void onCellClick(CellClickEvent event) {
-                enableSelectionDependentControls(hostGrid.getSelectionModel().getSelectedItem() != null);
+                enableSelectionDependentControls(hostGrid.getSelectionModel().getSelectedItem());
             }
         });
 
@@ -223,7 +281,7 @@ public class HostListPanel extends VerticalLayoutContainer {
             @Override
             public void onSuccess(Method method, List<HostInfo> response) {
                 hostGridStore.addAll(response);
-                enableSelectionDependentControls(hostGrid.getSelectionModel().getSelectedItem() != null);
+                enableSelectionDependentControls(hostGrid.getSelectionModel().getSelectedItem());
             }
         });
     }
@@ -304,6 +362,28 @@ public class HostListPanel extends VerticalLayoutContainer {
 
         menu.add(new SeparatorMenuItem());
 
+        mnuDisableHost = new MenuItem("Disable host");
+        mnuDisableHost.setIcon(Resources.INSTANCE.disableIcon());
+        mnuDisableHost.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                toggleHost(false);
+            }
+        });
+        menu.add(mnuDisableHost);
+
+        mnuEnableHost = new MenuItem("Enable host");
+        mnuEnableHost.setIcon(Resources.INSTANCE.enableIcon());
+        mnuEnableHost.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                toggleHost(true);
+            }
+        });
+        menu.add(mnuEnableHost);
+
+        menu.add(new SeparatorMenuItem());
+
         mnuListTraces = new MenuItem("List traces");
         mnuListTraces.setIcon(Resources.INSTANCE.listColumnsIcon());
         mnuListTraces.addSelectionHandler(new SelectionHandler<Item>() {
@@ -335,6 +415,24 @@ public class HostListPanel extends VerticalLayoutContainer {
         }
     }
 
+
+    private void toggleHost(boolean enabled) {
+        HostInfo info = selectionModel.getSelectedItem();
+        if (info != null) {
+            info.setFlags(enabled ? (info.getFlags() & ~HostInfo.DISABLED) : info.getFlags() | HostInfo.DISABLED);
+            traceDataApi.updateHost(info.getId(), info, new MethodCallback<Void>() {
+                @Override
+                public void onFailure(Method method, Throwable exception) {
+
+                }
+
+                @Override
+                public void onSuccess(Method method, Void response) {
+                    refresh();
+                }
+            });
+        }
+    }
 
     private void listTraces() {
         HostInfo hostInfo = selectionModel.getSelectedItem();

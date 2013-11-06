@@ -89,13 +89,17 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
 
     private void processTraceRecord(TraceRecord rec) throws IOException {
-        rec.traverse(this);
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        FressianWriter writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);
-        writer.writeObject(rec);
-        byte[] chunk = os.toByteArray();
-        long offs = traceDataStore.write(chunk);
-        save(hostInfo.getId(), offs, chunk.length, rec);
+        if (!hostInfo.hasFlag(HostInfo.DISABLED)) {
+            rec.traverse(this);
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            FressianWriter writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);
+            writer.writeObject(rec);
+            byte[] chunk = os.toByteArray();
+            long offs = traceDataStore.write(chunk);
+            save(hostInfo.getId(), offs, chunk.length, rec);
+        } else {
+            log.debug("Dropping trace for inactive host: " + hostInfo.getName());
+        }
     }
 
 

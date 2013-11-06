@@ -19,6 +19,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class HostInfo {
 
+    public static final int DISABLED = 0x00000001;
+
     @JsonProperty
     private int id;
 
@@ -81,6 +83,10 @@ public class HostInfo {
 
     public void setPass(String pass) {
         this.pass = pass;
+    }
+
+    public boolean hasFlag(int flag) {
+        return 0 != (flag & this.flags);
     }
 
     public int getFlags() {

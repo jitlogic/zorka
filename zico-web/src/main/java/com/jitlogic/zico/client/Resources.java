@@ -95,6 +95,12 @@ public interface Resources extends ClientBundle {
     @Source("images/clock.png")
     ImageResource clockIcon();
 
+    @Source("images/disable.png")
+    ImageResource disableIcon();
+
+    @Source("images/enable.png")
+    ImageResource enableIcon();
+
     @DataResource.MimeType("text/html")
     @Source("resources/tips.html")
     TextResource tipsHtml();
