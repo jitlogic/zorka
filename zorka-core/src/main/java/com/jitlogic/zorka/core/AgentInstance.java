@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core;
 
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.stats.ValGetter;
 import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.common.util.ZorkaLog;
@@ -121,6 +122,8 @@ public class AgentInstance {
      * Reference to ranking and metrics processing library.
      */
     private PerfMonLib perfMonLib;
+
+    private MethodCallStatistics stats = new MethodCallStatistics();
 
     /**
      * Agent configuration properties
@@ -277,10 +280,11 @@ public class AgentInstance {
     public void createZorkaDiagMBean() {
         String mbeanName = props.getProperty("zorka.diagnostics.mbean").trim();
 
-        getMBeanServerRegistry().getOrRegister("java", mbeanName, "Version",
+        MBeanServerRegistry registry = getMBeanServerRegistry();
+
+        registry.getOrRegister("java", mbeanName, "Version",
                 props.getProperty("zorka.version"), "Agent Diagnostics");
 
-        MBeanServerRegistry registry = getMBeanServerRegistry();
 
         for (int i = 0; i < AgentDiagnostics.numCounters(); i++) {
             final int counter = i;
@@ -294,8 +298,10 @@ public class AgentInstance {
 
         }
 
-        getMBeanServerRegistry().getOrRegister("java", mbeanName, "SymbolsCreated",
+        registry.getOrRegister("java", mbeanName, "SymbolsCreated",
                 new AttrGetter(getSymbolRegistry(), "size()"));
+
+        registry.getOrRegister("java", mbeanName, "stats", stats);
     }
 
 
@@ -373,7 +379,7 @@ public class AgentInstance {
 
     public synchronized SpyClassTransformer getClassTransformer() {
         if (classTransformer == null) {
-            classTransformer = new SpyClassTransformer(getSymbolRegistry(), getTracer());
+            classTransformer = new SpyClassTransformer(getSymbolRegistry(), getTracer(), stats);
         }
         return classTransformer;
     }

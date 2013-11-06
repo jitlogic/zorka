@@ -18,6 +18,8 @@
 package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
+import com.jitlogic.zorka.common.stats.MethodCallStatistic;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaLog;
@@ -79,15 +81,20 @@ public class SpyClassTransformer implements ClassFileTransformer {
      */
     Tracer tracer;
 
+    private MethodCallStatistic tracerLookups, classesProcessed, classesTransformed;
 
     /**
      * Creates new spy class transformer
      *
      * @param tracer reference to tracer engine object
      */
-    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer) {
+    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer, MethodCallStatistics statistics) {
         this.symbolRegistry = symbolRegistry;
         this.tracer = tracer;
+
+        this.tracerLookups = statistics.getMethodCallStatistic("tracerLookups");
+        this.classesProcessed = statistics.getMethodCallStatistic("classesProcessed");
+        this.classesTransformed = statistics.getMethodCallStatistic("classesTransformed");
     }
 
     /**
@@ -162,36 +169,53 @@ public class SpyClassTransformer implements ClassFileTransformer {
             currentTransforms.add(clazzName);
         }
 
+        long pt1 = System.nanoTime();
+
         List<SpyDefinition> found = new ArrayList<SpyDefinition>();
 
-        for (SpyDefinition sdef : sdefs) {
-
+        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_CLASS_TRC)) {
             log.debug(ZorkaLogger.ZSP_CLASS_TRC, "Encountered class: %s", className);
+        }
+
+        for (SpyDefinition sdef : sdefs) {
 
             if (sdef.getMatcherSet().classMatch(clazzName)) {
                 found.add(sdef);
             }
         }
 
+        long lt1 = System.nanoTime();
         boolean tracerMatch = tracer.getMatcherSet().classMatch(clazzName);
+        long lt2 = System.nanoTime();
+
+        tracerLookups.logCall(lt2 - lt1);
 
         byte[] buf = classfileBuffer;
 
         if (found.size() > 0 || tracerMatch) {
 
-            log.debug(ZorkaLogger.ZSP_CLASS_TRC, "Transforming class: %s (sdefs found: %d; tracer match: %b)",
-                    className, found.size(), tracerMatch);
+            long tt1 = System.nanoTime();
 
-            AgentDiagnostics.inc(AgentDiagnostics.CLASSES_TRANSFORMED);
+            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_CLASS_TRC)) {
+                log.debug(ZorkaLogger.ZSP_CLASS_TRC, "Transforming class: %s (sdefs found: %d; tracer match: %b)",
+                        className, found.size(), tracerMatch);
+            }
 
             ClassReader cr = new ClassReader(classfileBuffer);
             ClassWriter cw = new ClassWriter(cr, 0);
             ClassVisitor scv = createVisitor(classLoader, clazzName, found, tracer, cw);
             cr.accept(scv, 0);
             buf = cw.toByteArray();
+
+            long tt2 = System.nanoTime();
+            classesTransformed.logCall(tt2 - tt1);
         }
 
         currentTransforms.remove(clazzName);
+
+        long pt2 = System.nanoTime();
+        classesProcessed.logCall(pt2 - pt1);
+
         return buf;
     }
 
