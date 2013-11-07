@@ -48,7 +48,7 @@ __sql() {
 
   // Default values for SQL tracer options 
   zorka.defCfg("sql.trace", zorka.stringCfg("tracer"));
-  zorka.defCfg("sql.trace.time", "1000");
+  zorka.defCfg("sql.trace.time", zorka.longCfg("tracer.min.trace.time"));
   //zorka.defCfg("sql.trace.params.prefix", "P"); // not implemented yet
 
   _trace = zorka.boolCfg("sql.trace");

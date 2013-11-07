@@ -15,23 +15,26 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// This file contains agent configurations for a variety of Apache libraries
+zorka.require("jvm.bsh", "tracer.bsh");
 
-zorka.require("tracer.bsh");
+zorka.require(
+    "apache/axis2.bsh",
+    "apache/tomcat.bsh",
+    "libs/apache.bsh",
+    "libs/eclipse.bsh",
+    "libs/j2ee.bsh",
+    "libs/misc.bsh",
+    "libs/logging.bsh",
+    "libs/misc.bsh",
+    "wso2/carbon.bsh"
+);
 
-// Tracer tuning
-if (zorka.boolCfg("tracer")) {
-    tracer.exclude(
-        "org.osgi.framework.**",
-        "org.eclipse.emf.**",
-        "org.eclipse.osgi.**",
-        "org.eclipse.hyades.**",
-        "org.eclipse.core.**",
-        "org.eclipse.osgi.**",
-        "org.eclipse.jdt.**",
-        "org.eclipse.wst.common.**",
-        "org.eclipse.equinox.**",
-        "org.osgi.service.permissionadmin.**"
-    );
+__wso2esb() {
+
+
+  jvm.autoregister();
+
+  return this;
 }
 
+wso2esb = __wso2esb();

@@ -73,7 +73,9 @@ __jvm() {
           "sun.font.**",
           "sun.java2d.**",
           "sun.security.provider.**",
-          "sun.misc.FpUtils"
+          "sun.util.ResourceBundleEnumeration",
+          "sun.misc.FpUtils",
+          "sun.text.**"
       );
   }
 

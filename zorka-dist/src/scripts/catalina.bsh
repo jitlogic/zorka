@@ -133,7 +133,8 @@ __catalina() {
         "org.apache.catalina.session.StandardSessionFacade",
         "org.apache.catalina.util.**",
         "org.apache.coyote.Request",
-        "org.apache.coyote.Response"
+        "org.apache.coyote.Response",
+        "org.apache.catalina.core.ApplicationHttpRequest"
     );
   }
 

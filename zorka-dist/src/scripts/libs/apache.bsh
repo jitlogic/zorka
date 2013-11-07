@@ -31,10 +31,18 @@ if (zorka.boolCfg("tracer")) {
         "org.apache.xalan.**",
         "org.apache.struts.**",
         "org.apache.jasper.**",
+        "org.apache.axiom.**",
+        "org.apache.commons.**",
         "org.apache.commons.beanutils.**",
         "org.apache.commons.collections.**",
         "org.apache.commons.digester.**",
         "org.apache.commons.validator.**",
-        "org.apache.commons.logging.**"
+        "org.apache.commons.logging.**",
+        "org.apache.http.util.CharArrayBuffer",
+        "org.apache.http.message.BasicHeader",
+        "org.apache.synapse.transport.nhttp.ServerWorker$1/compare",
+        "org.apache.taglibs.standard.**",
+        "org.apache.tiles.**",
+        "org.apache.ws.commons.schema.**"
     );
 }

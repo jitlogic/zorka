@@ -17,7 +17,7 @@
 
 zorka.require("sql.bsh");
 
-__h2db() {
+__h2() {
 
   spy.add(sql._instrumentStmt("H2_SQL_1", "${THIS.conn.url}")
     .include(
@@ -37,5 +37,5 @@ __h2db() {
 }
 
 
-h2db = __h2db();
+h2 = __h2();
 

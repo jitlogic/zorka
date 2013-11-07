@@ -28,6 +28,9 @@ if (zorka.boolCfg("tracer")) {
         "org.dom4j.**",
         "org.xml.sax.**",
         "org.ajax4jsf.**",
-        "gnu.trove.**"
+        "gnu.trove.**",
+        "com.ctc.wstx.**",
+        "org.jaxen.**",
+        "net.sf.saxon.**"
     );
 }

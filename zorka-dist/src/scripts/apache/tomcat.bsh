@@ -91,6 +91,13 @@ __tomcat() {
 
   jsp = __jsp();
 
+  if (zorka.boolCfg("tracer")) {
+    tracer.exclude(
+      "org.apache.tomcat.jdbc.pool.**"
+
+    );
+  }
+
   jvm.autoregister();
 
   return this;

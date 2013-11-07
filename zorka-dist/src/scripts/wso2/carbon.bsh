@@ -15,23 +15,26 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// This file contains agent configurations for a variety of Apache libraries
-
 zorka.require("tracer.bsh");
 
-// Tracer tuning
-if (zorka.boolCfg("tracer")) {
+__wso2carbon() {
+
+  if (zorka.boolCfg("tracer")) {
     tracer.exclude(
-        "org.osgi.framework.**",
-        "org.eclipse.emf.**",
-        "org.eclipse.osgi.**",
-        "org.eclipse.hyades.**",
-        "org.eclipse.core.**",
-        "org.eclipse.osgi.**",
-        "org.eclipse.jdt.**",
-        "org.eclipse.wst.common.**",
-        "org.eclipse.equinox.**",
-        "org.osgi.service.permissionadmin.**"
+      "org.wso2.carbon.**/engageNotify",
+      "org.wso2.carbon.base.CarbonBaseUtils",
+      "org.wso2.carbon.base.ServerConfiguration",
+      "org.wso2.carbon.core.util.**",
+      "org.wso2.carbon.ndatasource.rdbms.ConnectionRollbackOnReturnInterceptor",
+      "org.wso2.carbon.registry.core.**",
+      "org.wso2.carbon.security.pox.POXSecurityHandler",
+      "org.wso2.carbon.ui.**",
+      "org.wso2.carbon.utils.**"
     );
+  }
+
+
+  return this;
 }
 
+wso2carbon = __wso2carbon();
