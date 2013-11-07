@@ -122,11 +122,18 @@ __catalina() {
   if (zorka.boolCfg("tracer")) {
     tracer.exclude(
         "org.apache.tomcat.util.**",
+        "org.apache.naming.resources.**",
         "org.apache.catalina.security.**",
         "org.apache.catalina.core.ApplicationCont**",
+        "org.apache.catalina.core.ContainerBase/fireContainerEvent",
         "org.apache.catalina.core.StandardWrap**",
+        "org.apache.catalina.core.StandardContext",
         "org.apache.catalina.connector.**", // TODO but this is sometimes useful for resolving connectivity problems
-        "org.apache.catalina.util.**"
+        "org.apache.catalina.session.StandardSession",
+        "org.apache.catalina.session.StandardSessionFacade",
+        "org.apache.catalina.util.**",
+        "org.apache.coyote.Request",
+        "org.apache.coyote.Response"
     );
   }
 

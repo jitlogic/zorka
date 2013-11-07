@@ -15,10 +15,10 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("ejb.bsh");
-zorka.require("catalina.bsh");
 
 zorka.require(
+    "ejb.bsh",
+    "catalina.bsh",
     "libs/apache.bsh",
     "libs/faces.bsh",
     "libs/google.bsh",
@@ -26,6 +26,7 @@ zorka.require(
     "libs/j2ee.bsh",
     "libs/logging.bsh",
     "libs/misc.bsh");
+
 
 __jboss7() {
 
@@ -162,7 +163,7 @@ __jboss7() {
     spy.add(spy.instrument("JBOSS7_EJB")
       .onEnter(
           spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 3),
-          ejb._trace ? tracer.begin("EJB", zorka.longCfg("ejb.trace.time")) : null,
+          ejb._trace ? tracer.begin("EJB3", zorka.longCfg("ejb.trace.time")) : null,
           ejb._trace ? tracer.formatAttr("METHOD", "${MDESC.name}") : null,
           ejb._trace ? tracer.formatAttr("CLASS", "${MDESC.declaringClass.name}") : null)
       .onError(
@@ -189,12 +190,11 @@ __jboss7() {
 
   }
 
-  // TODO org.jboss.ejb.client.EJBInvocationHandler  -  JBoss EJB client
-
 
   if (zorka.boolCfg("tracer")) {
-    tracer.exclude(spy.byClass("org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate").priority(100));
+
     tracer.exclude(
+        "100:org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate",
         "org.jboss.weld.**",
         "org.jboss.modules.**",
         "org.jboss.logging.**",
@@ -202,6 +202,7 @@ __jboss7() {
         "org.jboss.as.weld.webtier.jsf.**",
         "org.jboss.vfs.**",
         "org.jboss.modules.ConcurrentClassLoader");
+
   }
 
   return this;

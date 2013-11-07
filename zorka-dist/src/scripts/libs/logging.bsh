@@ -21,6 +21,10 @@ zorka.require("tracer.bsh");
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
-    tracer.exclude("org.slf4j.**", "org.log4j.**");
+    tracer.exclude(
+        "org.slf4j.**",
+        "org.log4j.**",
+        "org.apache.log4j.**"
+    );
 }
 

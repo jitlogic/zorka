@@ -31,7 +31,9 @@ if (zorka.boolCfg("tracer")) {
         "org.apache.xalan.**",
         "org.apache.struts.**",
         "org.apache.jasper.**",
+        "org.apache.commons.beanutils.**",
         "org.apache.commons.collections.**",
+        "org.apache.commons.digester.**",
         "org.apache.commons.validator.**",
         "org.apache.commons.logging.**"
     );

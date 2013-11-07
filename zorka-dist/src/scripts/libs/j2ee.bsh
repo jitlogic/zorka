@@ -22,12 +22,22 @@ zorka.require("tracer.bsh");
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
     tracer.exclude(
-        "javax.enterprise.util.**",
-        "javax.el.**",
-        "javax.servlet.**",
-        "javax.security.**",
+        "com.sun.naming.internal.**",
+
         "javax.crypto.spec.**",
+        "javax.el.**",
+        "javax.enterprise.util.**",
+        "javax.security.**",
+        "javax.servlet.**",
+        "javax.xml.**",
+
+        "javax.naming.Binding",
+        "javax.naming.NameImpl",
+        "javax.naming.CompoundName",
+        "javax.naming.NamingException",
+
         "org.xml.sax.**",
-        "javax.xml.parsers.**"
+
+        "sun.security.jca.**"
     );
 }

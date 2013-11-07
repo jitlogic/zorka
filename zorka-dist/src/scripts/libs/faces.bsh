@@ -21,5 +21,10 @@ zorka.require("tracer.bsh");
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
-    tracer.exclude("javax.faces.**", "com.sun.faces.**");
+    tracer.exclude(
+        "javax.faces.**",
+        "com.sun.faces.**",
+        "com.sun.facelets.**",
+        "org.richfaces.**"
+    );
 }

@@ -17,8 +17,17 @@
 
 // Common JBoss 4/5/6 support functions
 
-zorka.require("catalina.bsh");
-zorka.require("svr/jbossejb.bsh");
+zorka.require(
+    "catalina.bsh",
+    "svr/jbossejb.bsh",
+    "libs/apache.bsh",
+    "libs/faces.bsh",
+    "libs/hibernate.bsh",
+    "libs/j2ee.bsh",
+    "libs/logging.bsh",
+    "libs/misc.bsh",
+    "libs/seam.bsh"
+);
 
 __jboss() {
 
@@ -97,7 +106,80 @@ __jboss() {
 
 
   if (zorka.boolCfg("tracer")) {
-      tracer.exclude(spy.byClass("org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate").priority(250));
+      tracer.exclude(
+          "250:org.jboss.jms.client.delegate.**",
+
+          // Most of exclusions below are on class basis. This is to avoid blind spots in application server tracing.
+
+          "org.jboss.aop.**",
+
+          "org.jboss.classloader.**",
+          "org.jboss.classloading.spi.vfs.policy.VFSClassLoaderPolic**",
+
+          "org.jboss.ejb3.interceptors.lang.SecurityAct**",
+          "org.jboss.ejb3.interceptors.metadata.**",
+          "org.jboss.ejb3.metadata.plugins.**",
+          "org.jboss.ejb3.security.bridge.**",
+
+          "org.jboss.el.**",      // TODO is this some kind of library ?
+
+          "org.jboss.jmx.adaptor.model.DomainData",
+          "org.jboss.jmx.adaptor.model.MBeanData",
+
+          "org.jboss.logbridge.**",
+          "org.jboss.logging.**",
+          "org.jboss.logmanager.**",
+
+          "org.jboss.metadata.plugins.**",
+          "org.jboss.metadata.spi.**",
+
+          "org.jboss.mx.interceptor.AbstractInterceptor",
+          "org.jboss.mx.interceptor.ModelMBeanInfoInterceptor",
+          "org.jboss.mx.interceptor.StandardMBeanInfoInterceptor",
+          "org.jboss.mx.server.*",
+          "org.jboss.mx.server.registry.BasicMBeanRegistry",
+          "org.jboss.mx.server.registry.MBeanEntry",
+
+          "org.jboss.net.protocol.file.Handler",
+          "org.jboss.net.protocol.file.FileURLConnection",
+
+          "org.jboss.on.embedded.**",
+
+          "org.jboss.reflect.**",
+
+          "org.jboss.serial.**",
+
+          "org.jboss.virtual.Visitor**",
+          "org.jboss.virtual.plugins.cache.**",
+          "org.jboss.virtual.plugins.context.Abstract**",
+          "org.jboss.virtual.plugins.context.DelegatingHandler",
+          "org.jboss.virtual.plugins.context.DefaultOptions",
+          "org.jboss.virtual.plugins.context.file.FileHandler",
+          "org.jboss.virtual.plugins.context.file.FileSystemContext",
+          "org.jboss.virtual.plugins.context.memory.MemoryContextHandler",
+          "org.jboss.virtual.plugins.context.temp.BasicTempInfo",
+          "org.jboss.virtual.plugins.context.zip.**",
+          "org.jboss.virtual.plugins.registry.VFSRegistry",
+          "org.jboss.virtual.plugins.registry.DefaultVFSRegistry",
+          "org.jboss.virtual.plugins.vfs.VirtualFileURLConnection",
+          "org.jboss.virtual.plugins.vfs.helpers.**",
+          "org.jboss.virtual.spi.cache.VFSCacheFactory",
+          "org.jboss.virtual.spi.registry.VFSRegistry",
+          "org.jboss.virtual.VirtualFile",
+          "org.jboss.virtual.VFSUtils",
+
+          "org.jboss.util.collection.**",
+          "org.jboss.util.WeakObject",
+          "org.jboss.util.TimedCache**",
+
+          "org.jnp.interfaces.FastNamingProperties",
+          "org.jnp.interfaces.NamingParser",
+          "org.jnp.interfaces.NamingContext",
+
+          "org.rhq.core.**",
+
+          "com.arjuna.common.internal.util.logging.**"
+      );
   }
 
   return this;

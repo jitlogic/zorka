@@ -27,7 +27,7 @@ __jbossejb() {
       .onEnter(
         spy.fetchArg("INV", 1),
         spy.format("METHOD", "${INV.method.name}"),
-        spy.format("CLASS", "${INV.method.clazz.name}"),
+        spy.format("CLASS", "${INV.method.declaringClass.name}"),
         spy.get("ARGS", "INV", "arguments"),
         ejb._trace ? tracer.begin("EJB", zorka.longCfg("ejb.trace.time")) : null,
         ejb._trace ? tracer.attr("METHOD", "METHOD") : null,
@@ -48,8 +48,34 @@ __jbossejb() {
         spy.strTime("TIME"),
         ejb._slow ? spy.trapperCollector(ejb.slow_trapper, zorka.INFO, "EJB", zorka.stringCfg("ejb.slow.format")) : null)
       .include(spy.byMethod("org.jboss.ejb.Container", "invoke")));
-
   }
+
+
+    spy.add(spy.instrument("JBOSS_EJB3")
+      .onEnter(
+          spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 3),
+          ejb._trace ? tracer.begin("EJB3", zorka.longCfg("ejb.trace.time")) : null,
+          ejb._trace ? tracer.formatAttr("METHOD", "${MDESC.name}") : null,
+          ejb._trace ? tracer.formatAttr("CLASS", "${MDESC.declaringClass.name}") : null)
+      .onError(
+          ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
+          spy.fetchError("ERR"),
+          spy.format("MSG", "${ERR.message}"),
+          ejb._error ? spy.trapperCollector(ejb.error_trapper, zorka.INFO, "EJB", zorka.stringCfg("ejb.error.format")) : null)
+      .onReturn(
+          ejb._params ? spy.fetchRetVal("RET") : spy.put("RET", ""))
+      .onSubmit(
+          ejb._params ? (com.jitlogic.zorka.core.spy.SpyProcessor)(ejb.arg_processor()) : spy.put("PARAMS", ""),
+          ejb._trace ? tracer.attr("RET", "RET") : null,
+          ejb._stats ? spy.zorkaStats("java", ejb._mbean, "byMethod", "${CLASS}.${METHOD}") : null,
+          ejb._stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null,
+          spy.longerThan(zorka.longCfg("ejb.slow.time")),
+          spy.strTime("TIME"),
+          ejb._slow ? spy.trapperCollector(ejb.slow_trapper, zorka.INFO, "EJB", zorka.stringCfg("ejb.slow.format")) : null)
+      .include(
+          spy.byMethod(0, "org.jboss.ejb3.proxy.impl.handler.session.SessionProxyInvocationHandlerBase", "invoke",
+              "Object", "Object", "java.lang.reflect.Method")
+      ));
 
   return this;
 

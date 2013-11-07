@@ -21,5 +21,13 @@ zorka.require("tracer.bsh");
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
-    tracer.exclude("javassist.**", "antlr.**");
+    tracer.exclude(
+        "antlr.**",
+        "EDU.oswego.cs.dl.util.concurrent.**",
+        "javassist.**",
+        "org.dom4j.**",
+        "org.xml.sax.**",
+        "org.ajax4jsf.**",
+        "gnu.trove.**"
+    );
 }
