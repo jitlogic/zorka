@@ -22,28 +22,18 @@ zorka.require("tracer.bsh");
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
     tracer.exclude(
-        "org.apache.xerces.**",
-        "org.apache.xml.**",
-        "org.apache.el.**",
-        "org.apache.harmony.**",
-        "org.apache.soap.**",
-        "org.apache.xpath.**",
-        "org.apache.xalan.**",
-        "org.apache.struts.**",
-        "org.apache.jasper.**",
-        "org.apache.axiom.**",
-        "org.apache.commons.**",
-        "org.apache.commons.beanutils.**",
-        "org.apache.commons.collections.**",
-        "org.apache.commons.digester.**",
-        "org.apache.commons.validator.**",
-        "org.apache.commons.logging.**",
-        "org.apache.http.util.CharArrayBuffer",
-        "org.apache.http.message.BasicHeader",
-        "org.apache.log4j.**",
-        "org.apache.synapse.transport.nhttp.ServerWorker$1/compare",
-        "org.apache.taglibs.standard.**",
-        "org.apache.tiles.**",
-        "org.apache.ws.commons.schema.**"
+        "org.aspectj.**",
+        "org.eclipse.emf.**",
+        "org.eclipse.osgi.**",
+        "org.eclipse.hyades.**",
+        "org.eclipse.core.**",
+        "org.eclipse.osgi.**",
+        "org.eclipse.jdt.**",
+        "org.eclipse.jst.**",
+        "org.eclipse.wst.common.**",
+        "org.eclipse.equinox.**",
+        "org.osgi.framework.**",
+        "org.osgi.service.permissionadmin.**"
     );
 }
+

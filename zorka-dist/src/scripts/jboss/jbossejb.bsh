@@ -54,7 +54,7 @@ __jbossejb() {
     spy.add(spy.instrument("JBOSS_EJB3")
       .onEnter(
           spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 3),
-          ejb._trace ? tracer.begin("EJB3", zorka.longCfg("ejb.trace.time")) : null,
+          ejb._trace ? tracer.begin("EJB", zorka.longCfg("ejb.trace.time")) : null,
           ejb._trace ? tracer.formatAttr("METHOD", "${MDESC.name}") : null,
           ejb._trace ? tracer.formatAttr("CLASS", "${MDESC.declaringClass.name}") : null)
       .onError(

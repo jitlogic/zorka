@@ -22,7 +22,7 @@ zorka.require(
     "jsf.bsh",
     "libs.bsh"
     "apache/catalina.bsh",
-    "apache/libs.bsh",
+    "apache/apache.bsh",
     "google/libs.bsh",
     "jboss/hibernate.bsh"
 );
@@ -163,7 +163,7 @@ __jboss7() {
     spy.add(spy.instrument("JBOSS7_EJB")
       .onEnter(
           spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 3),
-          ejb._trace ? tracer.begin("EJB3", zorka.longCfg("ejb.trace.time")) : null,
+          ejb._trace ? tracer.begin("EJB", zorka.longCfg("ejb.trace.time")) : null,
           ejb._trace ? tracer.formatAttr("METHOD", "${MDESC.name}") : null,
           ejb._trace ? tracer.formatAttr("CLASS", "${MDESC.declaringClass.name}") : null)
       .onError(

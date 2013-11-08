@@ -18,7 +18,7 @@
 zorka.require(
   "libs.bsh",
   "tracer.bsh",
-  "apache/libs.bsh"
+  "apache/apache.bsh"
 );
 
 // Tracer tuning

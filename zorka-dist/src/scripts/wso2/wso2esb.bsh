@@ -22,8 +22,8 @@ zorka.require(
   "tracer.bsh"
   "apache/axis2.bsh",
   "apache/tomcat.bsh",
-  "apache/libs.bsh",
-  "eclipse/libs.bsh",
+  "apache/apache.bsh",
+  "eclipse/eclipse.bsh",
   "wso2/carbon.bsh"
 );
 
