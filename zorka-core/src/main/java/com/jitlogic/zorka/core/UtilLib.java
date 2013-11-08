@@ -88,4 +88,9 @@ public class UtilLib {
     public StringMatcher stringMatcher(List<String> includes, List<String> excludes) {
         return new StringMatcher(includes, excludes);
     }
+
+    public String path(String... components) {
+        return ZorkaUtil.path(components);
+    }
+
 }

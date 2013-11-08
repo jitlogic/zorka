@@ -803,7 +803,7 @@ public class ZorkaLib {
 
 
     public Properties loadCfg(String fname) {
-        String path = path(config.getHomeDir(), fname);
+        String path = ZorkaUtil.path(config.getHomeDir(), fname);
         Properties props = config.loadCfg(config.getProperties(), path, false);
         if (props != null) {
             log.info(ZorkaLogger.ZAG_INFO, "Loaded property file: " + path);
@@ -815,7 +815,7 @@ public class ZorkaLib {
 
 
     public Properties loadCfg(Properties properties, String fname, boolean verbose) {
-        String path = path(config.getHomeDir(), fname);
+        String path = ZorkaUtil.path(config.getHomeDir(), fname);
         Properties props = config.loadCfg(properties, path, verbose);
         if (props != null) {
             log.info(ZorkaLogger.ZAG_INFO, "Loaded property file: " + path);
@@ -823,11 +823,6 @@ public class ZorkaLib {
             log.info(ZorkaLogger.ZAG_INFO, "Property file not found: " + path);
         }
         return props;
-    }
-
-
-    public String path(String... components) {
-        return ZorkaUtil.path(components);
     }
 
 

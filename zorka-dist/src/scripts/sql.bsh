@@ -33,7 +33,7 @@ __sql() {
   zorka.defCfg("sql.slow", "no");
   zorka.defCfg("sql.slow.time", "5000");
   zorka.defCfg("sql.slow.file", zorka.boolCfg("sql.slow"));
-  zorka.defCfg("sql.slow.file.path", zorka.path("${zorka.log.dir}", "sql-slow.log"));
+  zorka.defCfg("sql.slow.file.path", util.path("${zorka.log.dir}", "sql-slow.log"));
   zorka.defCfg("sql.slow.file.max", "8M");
   zorka.defCfg("sql.slow.file.num", "8");
   zorka.defCfg("sql.slow.format", "[${TIME}] ${DB}: ${SQL}");
@@ -41,7 +41,7 @@ __sql() {
   // Default values for SQL error log configuration options
   zorka.defCfg("sql.error", "no");
   zorka.defCfg("sql.error.file", zorka.boolCfg("sql.error"));
-  zorka.defCfg("sql.error.file.path", zorka.path("${zorka.log.dir}", "sql-error.log"));
+  zorka.defCfg("sql.error.file.path", util.path("${zorka.log.dir}", "sql-error.log"));
   zorka.defCfg("sql.error.file.max", "8M");
   zorka.defCfg("sql.error.file.num", "8");
   zorka.defCfg("sql.error.format", "[${TIME}] ${DB}: ${SQL} -> ${ERR}");
