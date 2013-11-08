@@ -93,8 +93,8 @@ __tomcat() {
 
   if (zorka.boolCfg("tracer")) {
     tracer.exclude(
-      "org.apache.tomcat.jdbc.pool.**"
-
+      "org.apache.tomcat.jdbc.pool.**",
+      "org.apache.juli.logging.**"
     );
   }
 

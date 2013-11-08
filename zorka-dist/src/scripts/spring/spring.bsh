@@ -15,16 +15,26 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// This file contains agent configurations for a variety of Apache libraries
-
-zorka.require("tracer.bsh");
+zorka.require(
+  "libs.bsh",
+  "tracer.bsh",
+  "apache/libs.bsh"
+);
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
     tracer.exclude(
-        "org.slf4j.**",
-        "org.log4j.**",
-        "org.apache.log4j.**"
+      "org.aspectj.**",
+      "org.springframework.aop.**",
+      "org.springframework.beans.**",
+      "org.springframework.binding.**",
+      "org.springframework.core.**",
+      "org.springframework.context.**",
+      "org.springframework.util.**",
+      "org.springframework.web.context.**",
+      "org.springframework.web.servlet.**",
+      "org.springframework.web.util.**",
+      "org.springframework.webflow.core.**",
+      "org.springframework.webflow.engine.**"
     );
 }
-

@@ -22,7 +22,7 @@ zorka.require("tracer.bsh");
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
     tracer.exclude(
-        "org.osgi.framework.**",
+        "org.aspectj.**",
         "org.eclipse.emf.**",
         "org.eclipse.osgi.**",
         "org.eclipse.hyades.**",
@@ -31,6 +31,7 @@ if (zorka.boolCfg("tracer")) {
         "org.eclipse.jdt.**",
         "org.eclipse.wst.common.**",
         "org.eclipse.equinox.**",
+        "org.osgi.framework.**",
         "org.osgi.service.permissionadmin.**"
     );
 }

@@ -123,6 +123,7 @@ __catalina() {
     tracer.exclude(
         "org.apache.tomcat.util.**",
         "org.apache.naming.resources.**",
+        "org.apache.naming.StringManager",
         "org.apache.catalina.security.**",
         "org.apache.catalina.core.ApplicationCont**",
         "org.apache.catalina.core.ContainerBase/fireContainerEvent",
@@ -134,7 +135,8 @@ __catalina() {
         "org.apache.catalina.util.**",
         "org.apache.coyote.Request",
         "org.apache.coyote.Response",
-        "org.apache.catalina.core.ApplicationHttpRequest"
+        "org.apache.catalina.core.ApplicationHttpRequest",
+        "org.apache.catalina.loader.WebappClassLoader"
     );
   }
 

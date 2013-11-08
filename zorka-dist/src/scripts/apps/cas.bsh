@@ -16,67 +16,105 @@
  */
 
 /**
- * CAS audit script
+ * CAS server monitoring, tracing and auditing.
  *
  * The following settings (and default values) can be set in zorka.properties:
  *
- * - cas.audit = no             enables while CAS auditing fuctionality
- * - cas.audit.zabbix = no      enables sending audit information to zabbix server
- * - cas.audit.syslog = no      enables sending audit information to syslog server
- * - cas.audit.file = yes       enables logging audit information to local file
- * - cas.audit.tag = cas.audit  zabbix item or syslog tag audit records will be marked with
- * - cas.audit.syslog.addr = ${zorka.syslog.server}   syslog server address
- * - cas.audit.file.path = ${zorka.log.dir}/cas_audit.log  path to log file
- * - cas.audit.zabbix.host = ${zorka.hostname}
+ * - cas.audit = yes            enables while CAS auditing fuctionality;
+ * - cas.audit.file = yes       enables logging audit information to local file;
+ * - cas.audit.syslog = no      enables sending audit information to syslog server;
+ * - cas.audit.zabbix = no      enables sending audit information to zabbix server;
+ * - cas.audit.tag = cas.audit  zabbix item or syslog tag audit records will be marked with;
+ * - cas.audit.syslog.addr      syslog server address (127.0.0.1);
+ * - cas.audit.file.path        path to log file (defaults to ${zorka.log.dir}/cas_audit.log);
+ * - cas.audit.zabbix.addr      zabbix host (defaults to ${zabbix.host.addr});
+ * - cas.stats = yes            enables maintaining of CAS-specific statistics;
+ * - cas.stats.mbean =          mbean name that will maintain statistics for CAS;
+ * - cas.trace = ${tracer}
+ * - cas.trace.time = ${tracer.min.trace.time}
  */
 
-zorka.require("tracer.bsh");
+zorka.require(
+  "javax.bsh",
+  "tracer.bsh",
+  "jboss/hibernate.bsh",
+  "spring/spring.bsh"
+);
 
 __cas() {
 
-  zorka.logInfo("Enabling Audit logging for CAS ...");
-
-  tag = zorka.stringCfg("cas.audit.tag", "cas.audit");
-  mbean = zorka.stringCfg("cas.mbean", "cas:name=CasAudit,type=ZorkaStats");
-
-  enableAudit = zorka.boolCfg("cas.audit", false);
-  enableSyslog = zorka.boolCfg("cas.audit.syslog", false) && enableAudit;
-  enableZabbix = zorka.boolCfg("cas.audit.zabbix", false) && enableAudit;
-  enableFile   = zorka.boolCfg("cas.audit.file", false) && enableAudit;
+  zorka.logInfo("Enabling CAS monitoring ...");
 
 
-  if (enableSyslog) {
-    syslogAddr = zorka.stringCfg("cas.audit.syslog.addr", zorka.stringCfg("zorka.syslog.server", "127.0.0.1"));
-    syslogTrapper = syslog.trapper("audit", syslogAddr, zorka.getHostname(), syslog.F_AUDIT);
-    zorka.logInfo("CAS Audit logs will be sent to remote syslog server: " + syslogAddr);
-  }
+  zorka.defCfg("cas.audit", "yes");
+  zorka.defCfg("cas.audit.file", zorka.boolCfg("cas.audit"));
+  zorka.defCfg("cas.audit.file.path", util.path("${zorka.log.dir}", "cas_audit.log"));
+  zorka.defCfg("cas.audit.syslog", "no");
+  zorka.defCfg("cas.audit.syslog.addr", "127.0.0.1");
+  zorka.defCfg("cas.audit.secure", "no");
+  zorka.defCfg("cas.audit.zabbix", "no");
+  zorka.defCfg("cas.audit.zabbix.host", zorka.stringCfg("zorka.hostname"));
+  zorka.defCfg("cas.audit.zabbix.addr", zorka.stringCfg("zabbix.server.addr"));
+  zorka.defCfg("cas.audit.tag", "cas.audit");
+
+  zorka.defCfg("cas.stats", "yes");
+  zorka.defCfg("cas.stats.mbean", "cas:name=CasAudit,type=ZorkaStats");
+  zorka.defCfg("cas.trace", zorka.boolCfg("tracer"));
+  zorka.defCfg("cas.trace.time", zorka.longCfg("tracer.min.trace.time"));
 
 
-  if (enableZabbix) {
-    zabbixHost = zorka.stringCfg("cas.audit.zabbix.host", zorka.getHostname());
-    zabbixTrapper = zabbix.trapper("cas.audit", "${zabbix.server.addr}", zabbixHost, tag);
-    zorka.logInfo("CAS Audit logs will be sent to zabbix server.");
-  }
+  _audit = zorka.boolCfg("cas.audit");
+  _audit_file = _audit && zorka.boolCfg("cas.audit.file");
+  _audit_syslog = _audit && zorka.boolCfg("cas.audit.syslog");
+  _audit_zabbix = _audit && zorka.boolCfg("cas.audit.zabbix");
+  _audit_tag = zorka.stringCfg("cas.audit.tag");
+
+  _stats = zorka.boolCfg("cas.stats");
+  _mbean = zorka.stringCfg("cas.stats.mbean");
+
+  _trace = zorka.boolCfg("cas.trace");
+  _trace_time = zorka.longCfg("cas.trace.time");
 
 
-  if (enableFile) {
+  if (_audit_file) {
     filePath = zorka.stringCfg("cas.audit.file.path", zorka.formatCfg("${zorka.log.dir}/cas_audit.log"));
     zorka.logInfo("CAS Audit logs will be logged to local file: " + filePath);
     fileTrapper = zorka.dailyFileTrapper("cas.audit", zorka.INFO, filePath, false);
   }
 
 
-  audit(sdef, expr) {
-    if (enableSyslog) {
-      sdef = sdef.onSubmit(spy.trapperCollector(syslogTrapper, zorka.INFO, tag, expr));
+  if (_audit_syslog) {
+    syslogAddr = zorka.stringCfg("cas.audit.syslog.addr");
+    syslogTrapper = syslog.trapper("audit", syslogAddr, zorka.getHostname(), syslog.F_AUDIT);
+    zorka.logInfo("CAS Audit logs will be sent to remote syslog server: " + syslogAddr);
+  }
+
+
+  if (_audit_zabbix) {
+    zabbixTrapper = zabbix.trapper("cas.audit", "${cas.audit.zabbix.addr}", ${cas.audit.zabbix.host}, _audit_tag);
+    zorka.logInfo("CAS Audit logs will be sent to zabbix server: ${cas.audit.zabbix.addr}/${cas.audit.zabbix.host}");
+  }
+
+
+
+  audit(sdef, action, expr) {
+
+    sdef = sdef.onSubmit(spy.strTime("TIME"));
+
+    if (_audit_file) {
+      sdef = sdef.onSubmit(spy.trapperCollector(fileTrapper, zorka.INFO, _audit_tag, expr));
     }
 
-    if (enableZabbix) {
-      sdef = sdef.onSubmit(spy.trapperCollector(zabbixTrapper, zorka.INFO, tag, expr));
+    if (_audit_syslog) {
+      sdef = sdef.onSubmit(spy.trapperCollector(syslogTrapper, zorka.INFO, _audit_tag, expr));
     }
 
-    if (enableFile) {
-      sdef = sdef.onSubmit(spy.trapperCollector(fileTrapper, zorka.INFO, tag, expr));
+    if (_audit_zabbix) {
+      sdef = sdef.onSubmit(spy.trapperCollector(zabbixTrapper, zorka.INFO, _audit_tag, expr));
+    }
+
+    if(_stats) {
+      sdef = sdef.onSubmit(spy.zorkaStats("java", _mbean, "stats", action));
     }
 
     spy.add(sdef);
@@ -98,11 +136,11 @@ __cas() {
     .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request))
     .onReturn(spy.put("ACTION", "AUTHENTICATION_SUCCESS"))
     .onError(spy.put("ACTION", "AUTHENTICATION_FAILED"))
-    .onSubmit(spy.strTime("TIME"), spy.zorkaStats("java", mbean, "stats", "AUTHENTICATION"), tracer.attr("ACTION", "ACTION"))
+    .onSubmit(tracer.attr("ACTION", "ACTION"))
     .include(spy.byMethod("org.jasig.cas.authentication.AbstractAuthenticationManager", "authenticate"));
 
 
-  audit(sdefAuth, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} time=${TIME}");
+  audit(sdefAuth, "AUTHENTICATION", "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} time=${TIME}");
 
 
   // TGT-s created
@@ -110,10 +148,10 @@ __cas() {
     .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request))
     .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_CREATED"), tracer.attr("WHAT", "WHAT"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_NOT_CREATED"))
-    .onSubmit(spy.strTime("TIME"), spy.zorkaStats("java", mbean, "stats", "TGT_CREATE"), tracer.attr("ACTION", "ACTION"))
+    .onSubmit(tracer.attr("ACTION", "ACTION"))
     .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "createTicketGrantingTicket"));
 
-  audit(sdefTgtCreated, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT} time=${TIME}");
+  audit(sdefTgtCreated, "TGT_CREATE", "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT} time=${TIME}");
 
 
   // TGT-s destroyed
@@ -121,10 +159,11 @@ __cas() {
     .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request), tracer.begin("CAS"), tracer.attr("WHO", "WHO"))
     .onReturn(spy.put("WHAT", ""), spy.put("ACTION", "TICKET_GRANTING_TICKET_DESTROYED"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_NOT_DESTROYED"))
-    .onSubmit(spy.strTime("TIME"), spy.zorkaStats("java", mbean, "stats", "TGT_DESTROY"), tracer.attr("ACTION", "ACTION"))
+    .onSubmit(tracer.attr("ACTION", "ACTION"))
     .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "destroyTicketGrantingTicket"));
 
-  audit(sdefTgtDestroyed, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT} time=${TIME}");
+  audit(sdefTgtDestroyed, "TGT_DESTROY",
+    "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT} time=${TIME}");
 
 
 
@@ -136,11 +175,12 @@ __cas() {
       spy.format("WHO", "${WHO}"), tracer.attr("WHO", "WHO"))
     .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "SERVICE_TICKET_GRANTED"), tracer.attr("WHAT", "WHAT"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "SERVICE_TICKET_NOT_GRANTED"))
-    .onSubmit(spy.strTime("TIME"), spy.zorkaStats("java", mbean, "stats", "SVT_GRANT"), tracer.attr("ACTION", "ACTION"))
+    .onSubmit(tracer.attr("ACTION", "ACTION"))
     .include(spy.byMethod(1, "org.jasig.cas.CentralAuthenticationServiceImpl", "grantServiceTicket", "String",
         "String", "org.jasig.cas.authentication.principal.Service", "org.jasig.cas.authentication.principal.Credentials"));
 
-  audit(sdefSvcGranted, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} service=${SERVICE} tgt=${TGT} what=${WHAT} time=${TIME}");
+  audit(sdefSvcGranted, "SVT_GRANT",
+    "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} service=${SERVICE} tgt=${TGT} what=${WHAT} time=${TIME}");
 
 
   // Proxy granting ticket created
@@ -149,10 +189,11 @@ __cas() {
       tracer.begin("CAS"), tracer.attr("TICKET", "TICKET"), tracer.attr("WHO", "WHO"))
     .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "PROXY_GRANTING_TICKET_CREATED"), tracer.attr("WHAT", "WHAT"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "PROXY_GRANTING_TICKET_NOT_CREATED"))
-    .onSubmit(spy.strTime("TIME"), spy.zorkaStats("java", mbean, "stats", "PROXY_CREATE"), tracer.attr("ACTION", "ACTION"))
+    .onSubmit(spy.strTime("TIME"), spy.zorkaStats("java", _mbean, "stats", "PROXY_CREATE"), tracer.attr("ACTION", "ACTION"))
     .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "delegateTicketGrantingTicket"));
 
-  audit(sdefProxyGranted, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT} serviceTicket=${TICKET} time=${TIME}");
+  audit(sdefProxyGranted, "PROXY_CREATE",
+    "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} who=${WHO} what=${WHAT} serviceTicket=${TICKET} time=${TIME}");
 
 
 
@@ -187,11 +228,11 @@ __cas() {
     .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "SERVICE_TICKET_VALIDATE_SUCCESS"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "SERVICE_TICKET_VALIDATE_FAILURE"))
     .onSubmit(spy.strTime("TIME"), tracer.attr("ACTION", "ACTION"),
-      spy.zorkaStats("java", mbean, "stats", "SVT_VALIDATE"), 
-      spy.zorkaStats("java", mbean, "stats", "TICKET_AGE", "TA"))
+      spy.zorkaStats("java", _mbean, "stats", "TICKET_AGE", "TA"))
     .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "validateServiceTicket"));
 
-  audit(sdefSvcValidate, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} what=${WHAT} serviceTicket=${TICKET} service=${SERVICE} time=${TIME} ticketAge=${TICKET_AGE_MS}ms");
+  audit(sdefSvcValidate, "SVT_VALIDATE",
+    "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} what=${WHAT} serviceTicket=${TICKET} service=${SERVICE} time=${TIME} ticketAge=${TICKET_AGE_MS}ms");
 
 
   // Delete a service
@@ -199,10 +240,11 @@ __cas() {
     .onEnter(spy.fetchArg("ID", 1), spy.tlGet("REQ", request))
     .onReturn(spy.put("RESULT", "OK"), spy.put("ACTION", "DELETE_SERVICE_SUCCESS"))
     .onError(spy.fetchError("RESULT"), spy.put("ACTION", "DELETE_SERVICE_FAILURE"))
-    .onSubmit(spy.strTime("TIME"), spy.zorkaStats("java", mbean, "stats", "SERVICE_DELETE"))
+    .onSubmit(spy.strTime("TIME"))
     .include(spy.byMethod("org.jasig.cas.DefaultServicesManagerImpl", "delete"));
 
-  audit(sdefSvcDelete, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} result=${RESULT} id=${ID}");
+  audit(sdefSvcDelete, "SERVICE_DELETE",
+    "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} result=${RESULT} id=${ID}");
 
 
   // Save a service
@@ -210,14 +252,22 @@ __cas() {
     .onEnter(spy.fetchArg("SERVICE", 1), spy.tlGet("REQ", request))
     .onReturn(spy.fetchRetVal("RESULT"), spy.put("ACTION", "SAVE_SERVICE_SUCCESS"))
     .onError(spy.fetchError("RESULT"), spy.put("ACTION", "SAVE_SERVICE_FAILURE"))
-    .onSubmit(spy.strTime("TIME"), spy.zorkaStats("java", mbean, "stats", "SERVICE_SAVE"))
+    .onSubmit(spy.strTime("TIME"))
     .include(spy.byMethod("org.jasig.cas.DefaultServicesManagerImpl", "save"));
 
-  audit(sdefSvcSave, "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} service=${SERVICE} result=${RESULT} time=${TIME}");
+  audit(sdefSvcSave, "SERVICE_SAVE",
+    "remote=${REQ.remoteAddr} local=${REQ.localAddr} action=${ACTION} service=${SERVICE} result=${RESULT} time=${TIME}");
 
 
   discovery() {
     return zabbix.discovery(zorka.query("java", mbean, "name", "type").get("stats").listAs("**", "ACTION"));
+  }
+
+  if (zorka.boolCfg("tracer")) {
+    tracer.exclude(
+      "org.jasig.cas.aspect.LogAspect",
+      "org.opensaml.xml.**"
+    );
   }
 
   return this;

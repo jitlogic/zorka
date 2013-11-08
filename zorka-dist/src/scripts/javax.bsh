@@ -24,7 +24,7 @@ if (zorka.boolCfg("tracer")) {
     tracer.exclude(
         "com.sun.naming.internal.**",
 
-        "javax.crypto.spec.**",
+        "javax.crypto.**",
         "javax.el.**",
         "javax.enterprise.util.**",
         "javax.security.**",

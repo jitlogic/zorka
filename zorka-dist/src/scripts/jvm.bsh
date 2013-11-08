@@ -74,7 +74,9 @@ __jvm() {
           "sun.java2d.**",
           "sun.security.provider.**",
           "sun.util.ResourceBundleEnumeration",
+          "sun.security.**",
           "sun.misc.FpUtils",
+          "sun.misc.IOUtils",
           "sun.text.**"
       );
   }

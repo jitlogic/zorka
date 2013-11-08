@@ -19,7 +19,6 @@ zorka.require(
   "jvm.bsh",
   "javax.bsh",
   "libs.bsh",
-  "loggers.bsh",
   "tracer.bsh"
   "apache/axis2.bsh",
   "apache/tomcat.bsh",

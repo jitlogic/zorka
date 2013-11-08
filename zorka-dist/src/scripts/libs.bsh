@@ -31,6 +31,8 @@ if (zorka.boolCfg("tracer")) {
         "gnu.trove.**",
         "com.ctc.wstx.**",
         "org.jaxen.**",
-        "net.sf.saxon.**"
+        "net.sf.saxon.**",
+        "ognl.**",
+        "org.slf4j.**"
     );
 }

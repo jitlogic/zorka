@@ -18,14 +18,13 @@
 
 zorka.require(
     "ejb.bsh",
+    "javax.bsh",
+    "jsf.bsh",
+    "libs.bsh"
     "apache/catalina.bsh",
     "apache/libs.bsh",
-    "jsf.bsh",
     "google/libs.bsh",
-    "jboss/hibernate.bsh",
-    "javax.bsh",
-    "loggers.bsh",
-    "libs.bsh"
+    "jboss/hibernate.bsh"
 );
 
 
