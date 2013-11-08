@@ -15,26 +15,19 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("jvm.bsh", "tracer.bsh");
-
 zorka.require(
-    "apache/axis2.bsh",
-    "apache/tomcat.bsh",
-    "libs/apache.bsh",
-    "libs/eclipse.bsh",
-    "libs/j2ee.bsh",
-    "libs/misc.bsh",
-    "libs/logging.bsh",
-    "libs/misc.bsh",
-    "wso2/carbon.bsh"
+  "jvm.bsh",
+  "javax.bsh",
+  "libs.bsh",
+  "loggers.bsh",
+  "tracer.bsh"
+  "apache/axis2.bsh",
+  "apache/tomcat.bsh",
+  "apache/libs.bsh",
+  "eclipse/libs.bsh",
+  "wso2/carbon.bsh"
 );
 
-__wso2esb() {
 
+jvm.autoregister();
 
-  jvm.autoregister();
-
-  return this;
-}
-
-wso2esb = __wso2esb();

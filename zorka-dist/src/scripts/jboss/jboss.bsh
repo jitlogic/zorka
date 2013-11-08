@@ -18,15 +18,15 @@
 // Common JBoss 4/5/6 support functions
 
 zorka.require(
-    "catalina.bsh",
-    "svr/jbossejb.bsh",
-    "libs/apache.bsh",
-    "libs/faces.bsh",
-    "libs/hibernate.bsh",
-    "libs/j2ee.bsh",
-    "libs/logging.bsh",
-    "libs/misc.bsh",
-    "libs/seam.bsh"
+    "javax.bsh",
+    "jsf.bsh",
+    "libs.bsh",
+    "loggers.bsh",
+    "apache/libs.bsh",
+    "apache/catalina.bsh",
+    "jboss/hibernate.bsh",
+    "jboss/jbossejb.bsh",
+    "jboss/seam.bsh"
 );
 
 __jboss() {

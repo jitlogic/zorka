@@ -16,7 +16,7 @@
  */
 
 zorka.require("jvm.bsh");
-zorka.require("catalina.bsh");
+zorka.require("apache/catalina.bsh");
 
 __tomcat() {
 

@@ -17,7 +17,7 @@
 
 zorka.require("tracer.bsh");
 
-__mule() {
+__muleesb() {
 
 
     zorka.defCfg("mule.trace", zorka.boolCfg("tracer"));
@@ -196,4 +196,4 @@ __mule() {
 }
 
 
-mule = __mule();
+muleesb = __muleesb();

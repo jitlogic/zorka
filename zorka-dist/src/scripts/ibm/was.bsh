@@ -15,8 +15,13 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("jvm.bsh");
-zorka.require("http.bsh");
+zorka.require(
+  "jvm.bsh",
+  "http.bsh",
+  "javax.bsh",
+  "apache/libs.bsh",
+  "eclipse/libs.bsh"
+);
 
 __was() {
 
@@ -203,10 +208,6 @@ __was() {
       spy.byMethod("com.ibm.ws.webcontainer.webapp.WebApp", "handleRequest")
     ));
 
-  // Tracer tuning
-  zorka.require("libs/apache.bsh");
-  zorka.require("libs/eclipse.bsh");
-  zorka.require("libs/j2ee.bsh");
 
   if (zorka.boolCfg("tracer")) {
     tracer.exclude(
