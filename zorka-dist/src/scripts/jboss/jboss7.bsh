@@ -24,7 +24,8 @@ zorka.require(
     "apache/catalina.bsh",
     "apache/apache.bsh",
     "google/libs.bsh",
-    "jboss/hibernate.bsh"
+    "jboss/hibernate.bsh",
+    "jboss/weld.bsh"
 );
 
 
@@ -195,7 +196,6 @@ __jboss7() {
 
     tracer.exclude(
         "100:org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate",
-        "org.jboss.weld.**",
         "org.jboss.modules.**",
         "org.jboss.logging.**",
         "org.jboss.logmanager.**",

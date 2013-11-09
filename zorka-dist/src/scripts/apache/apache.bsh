@@ -23,6 +23,7 @@ zorka.require("tracer.bsh");
 if (zorka.boolCfg("tracer")) {
     tracer.exclude(
         "org.apache.axiom.**",
+        "org.apache.beehive.**",
         "org.apache.commons.**",
         "org.apache.commons.beanutils.**",
         "org.apache.commons.collections.**",
@@ -46,6 +47,7 @@ if (zorka.boolCfg("tracer")) {
         "org.apache.xalan.**",
         "org.apache.xerces.**",
         "org.apache.xml.**",
+        "org.apache.xmlbeans.**",
         "org.apache.xpath.**"
     );
 }

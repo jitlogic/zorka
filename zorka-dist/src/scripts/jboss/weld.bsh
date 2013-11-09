@@ -15,26 +15,12 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// This file contains agent configurations for a variety of Apache libraries
 
-zorka.require("tracer.bsh");
+  if (zorka.boolCfg("tracer")) {
 
-// Tracer tuning
-if (zorka.boolCfg("tracer")) {
     tracer.exclude(
-        "org.aspectj.**",
-        "org.eclipse.emf.**",
-        "org.eclipse.osgi.**",
-        "org.eclipse.hyades.**",
-        "org.eclipse.core.**",
-        "org.eclipse.osgi.**",
-        "org.eclipse.jdt.**",
-        "org.eclipse.jst.**",
-        "org.eclipse.wst.common.**",
-        "org.eclipse.equinox.**",
-        "org.eclipse.persistence.**",
-        "org.osgi.framework.**",
-        "org.osgi.service.permissionadmin.**"
+        "org.jboss.weld.util.**",
+        "org.jboss.weld.**/hashCode"
     );
-}
 
+  }

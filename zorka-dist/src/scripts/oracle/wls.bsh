@@ -1,0 +1,158 @@
+/**
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+zorka.require(
+  "ejb.bsh",
+  "jvm.bsh",
+  "jsf.bsh",
+  "http.bsh",
+  "javax.bsh",
+  "libs.bsh",
+  "apache/apache.bsh",
+  "eclipse/eclipse.bsh",
+  "google/libs.bsh",
+  "jboss/hibernate.bsh",
+  "jboss/weld.bsh"
+);
+
+__wls() {
+
+
+  spy.add(spy.instrument("WLS_HTTP")
+    .onEnter(spy.fetchArg("REQ", 1), spy.fetchArg("RESP", 2),
+      spy.format("URI", "${REQ.requestURI}"),
+      http._trace ? spy.subchain(
+        http._uriQualifier,
+        tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
+        tracer.attr("URI", "URI")
+      ) : null,
+      http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
+    .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),
+      http._trace ? spy.subchain(
+        http._uriQualifier,
+        tracer.flags(tracer.SUBMIT_TRACE),
+        tracer.attr("ERR", "ERR")
+      ) : null)
+    .onSubmit(
+      spy.strTime("TIME"),
+      spy.format("STATUS", "${RESP.status}"),
+      spy.get("USER", "REQ", "remoteUser"),
+      http._trace ? spy.subchain(
+        http._uriQualifier,
+        tracer.attr("STATUS", "STATUS"),
+        tracer.filterBy("STATUS", null, http._errors, null, null),
+        tracer.attr("USER", "USER"),
+        http._params ? http.param_processor() : null,
+        http._cookies ? http.cookies_processor(true, false) : null,
+        http._headers ? http.headers_processor(true, true) : null
+      ) : null,
+      http._slow ? spy.subchain(
+        spy.longerThan(zorka.longCfg("http.slow.time")),
+        spy.strTime("TIME"),
+        spy.trapperCollector(http.slow_ft, zorka.INFO, "HTTP", zorka.stringCfg("http.slow.format"))) : null,
+      http._error ? spy.subchain(
+        spy.valSetFilter("STATUS", http._errors),
+        http.error_marker(),
+        http._trace ? tracer.flags(tracer.ERROR_MARK|tracer.SUBMIT_TRACE) : null,
+        spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format"))) : null,
+      http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
+    .include(
+      spy.byMethod(0, "weblogic.servlet.internal.WebAppServletContext", "execute", null)
+    ));
+
+
+    spy.add(spy.instrument("WLS_EJB")
+      .onEnter(
+          spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 4),
+          ejb._trace ? tracer.begin("EJB", zorka.longCfg("ejb.trace.time")) : null,
+          ejb._trace ? tracer.formatAttr("METHOD", "${MDESC.name}") : null,
+          ejb._trace ? tracer.formatAttr("CLASS", "${MDESC.declaringClass.name}") : null)
+      .onError(
+          ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
+          spy.fetchError("ERR"),
+          spy.format("MSG", "${ERR.message}"),
+          ejb._error ? spy.trapperCollector(ejb.error_trapper, zorka.INFO, "EJB", zorka.stringCfg("ejb.error.format")) : null)
+      .onReturn(
+          ejb._params ? spy.fetchRetVal("RET") : spy.put("RET", ""))
+      .onSubmit(
+          ejb._params ? (com.jitlogic.zorka.core.spy.SpyProcessor)(ejb.arg_processor()) : spy.put("PARAMS", ""),
+          ejb._trace ? tracer.attr("RET", "RET") : null,
+          ejb._stats ? spy.zorkaStats("java", ejb._mbean, "byMethod", "${CLASS}.${METHOD}") : null,
+          ejb._stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null,
+          spy.longerThan(zorka.longCfg("ejb.slow.time")),
+          spy.strTime("TIME"),
+          ejb._slow ? spy.trapperCollector(ejb.slow_trapper, zorka.INFO, "EJB", zorka.stringCfg("ejb.slow.format")) : null)
+      .include(
+          spy.byMethod("org.jboss.interceptor.proxy.InterceptorMethodHandler", "invoke")
+      ));
+
+
+  if (zorka.boolCfg("tracer")) {
+    tracer.exclude(
+      "com.bea.console.handles.**",
+      "com.bea.jsptools.**",
+      "com.bea.netuix.**",
+      "com.bea.p13n.util.**",
+      "com.bea.portlet.adapter.NetuiActionHandler",
+      "com.bea.portlet.GenericURL",
+      "com.bea.staxb.**",
+      "com.bea.xbean.**",
+      "com.bea.xml.**",
+
+      "com.octetstring.**",
+
+      "com.oracle.injection.**",
+
+      "weblogic.application.ApplicationAcc**",
+      "weblogic.application.descriptor.ReaderEvent2",
+      "weblogic.application.io.DescriptorFinder",
+      "weblogic.application.io.ManifestFinder",
+      "weblogic.application.utils.**",
+      "weblogic.common.internal.PackageInfo",
+      "weblogic.diagnostics.debug.**",
+      "weblogic.diagnostics.instrumentation.**",
+      "weblogic.j2ee.ApplicationManager/loadClass",
+      "weblogic.i18ntools.**",
+      "weblogic.jsp.**",
+      "weblogic.kernel.FinalThread**",
+      "weblogic.kernel.ResettableThread**",
+      "weblogic.kernel.ThreadLocalStack",
+      "weblogic.management.**",
+      "weblogic.rmi.extensions.server.CBV**",
+      "weblogic.rmi.internal.**",
+      "weblogic.rmi.utils.io.RemoteObjectReplacer",
+      "weblogic.security.**",
+      "weblogic.servlet.internal.**",
+      "weblogic.servlet.jsp.**",
+      "weblogic.servlet.spi.WebServerRegistry/isProductionMode",
+      "weblogic.servlet.utils.**",
+      "weblogic.transaction.internal.TransactionManagerImpl/getTransactionManager",
+      "weblogic.transaction.TransactionHelp**/get*",
+      "weblogic.utils.**",
+      "weblogic.validation.**",
+      "weblogic.work.ExecuteThread",
+      "weblogic.xml.**"
+    );
+  }
+
+  jvm.autoregister();
+
+  return this;
+}
+
+wls = __wls();
+

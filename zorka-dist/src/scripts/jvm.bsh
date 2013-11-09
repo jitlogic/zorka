@@ -69,6 +69,8 @@ __jvm() {
       tracer.exclude(
           "com.sun.jmx.**",
           "com.sun.xml.**",
+          "com.sun.org.apache.**",
+          "com.sun.java_cup.**",
           "javax.management.**",
           "sun.font.**",
           "sun.java2d.**",
