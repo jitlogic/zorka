@@ -15,7 +15,10 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("tracer.bsh");
+zorka.require(
+  "jvm.bsh", 
+  "tracer.bsh"
+);
 
 __muleesb() {
 
@@ -187,10 +190,10 @@ __muleesb() {
             ) : null)
         .include(spy.byMethod("org.mule.execution.FlowProcessingPhase$1", "run")));
 
-
-
     // org.mule.execution.EndProcessPhase
     // org.mule.execution.ValidationPhase
+
+    jvm.autoregister();
 
     return this;
 }

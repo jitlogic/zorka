@@ -15,8 +15,14 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("jvm.bsh");
-zorka.require("apache/catalina.bsh");
+zorka.require(
+  "jvm.bsh",
+  "javax.bsh",
+  "libs.bsh",
+  "apache/apache.bsh",
+  "apache/catalina.bsh",
+  "eclipse/eclipse.bsh"
+);
 
 __tomcat() {
 
@@ -93,6 +99,7 @@ __tomcat() {
 
   if (zorka.boolCfg("tracer")) {
     tracer.exclude(
+      "org.apache.naming.NamingContextBindingEnumeration",
       "org.apache.tomcat.jdbc.pool.**",
       "org.apache.juli.logging.**"
     );

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2013-06-05T18:48:44Z</date>
+    <date>2013-11-10T14:23:44Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -77,12 +77,14 @@
                     <valuemap/>
                 </item>
                 <item>
-                    <name>CPU hiccup (peak, microseconds)</name>
+                    <name>CPU hiccup (peak)</name>
                     <type>0</type>
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Hiccup&quot;, &quot;CPU&quot;, &quot;maxTimeUsCLR&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Hiccup&quot;, &quot;CPU&quot;,
+                        &quot;maxTimeUsCLR&quot;]
+                    </key>
                     <delay>60</delay>
                     <history>90</history>
                     <trends>365</trends>
@@ -545,45 +547,6 @@
                     <valuemap/>
                 </item>
                 <item>
-                    <name>MEM hiccup (peak, microseconds)</name>
-                    <type>0</type>
-                    <snmp_community/>
-                    <multiplier>1</multiplier>
-                    <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Hiccup&quot;, &quot;MEM&quot;, &quot;maxTimeUsCLR&quot;]</key>
-                    <delay>60</delay>
-                    <history>90</history>
-                    <trends>365</trends>
-                    <status>0</status>
-                    <value_type>0</value_type>
-                    <allowed_hosts/>
-                    <units/>
-                    <delta>0</delta>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privpassphrase/>
-                    <formula>0.001</formula>
-                    <delay_flex/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <data_type>0</data_type>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>Hiccups</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                </item>
-                <item>
                     <name>Non-Heap Memory Commited</name>
                     <type>0</type>
                     <snmp_community>public</snmp_community>
@@ -823,7 +786,9 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;DaemonThreadCount&quot;]</key>
+                    <key>
+                        zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;DaemonThreadCount&quot;]
+                    </key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -979,7 +944,8 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=OperatingSystem&quot;,&quot;Version&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=OperatingSystem&quot;,&quot;Version&quot;]
+                    </key>
                     <delay>14400</delay>
                     <history>10</history>
                     <trends>0</trends>
@@ -1018,7 +984,8 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;PeakThreadCount&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;PeakThreadCount&quot;]
+                    </key>
                     <delay>3600</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -1364,84 +1331,6 @@
                     <valuemap/>
                 </item>
                 <item>
-                    <name>{$MP_PERM} usage</name>
-                    <type>0</type>
-                    <snmp_community/>
-                    <multiplier>0</multiplier>
-                    <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name={$MP_PERM},type=MemoryPool&quot;,&quot;Usage&quot;,&quot;used&quot;]</key>
-                    <delay>60</delay>
-                    <history>10</history>
-                    <trends>365</trends>
-                    <status>0</status>
-                    <value_type>3</value_type>
-                    <allowed_hosts/>
-                    <units>B</units>
-                    <delta>0</delta>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privpassphrase/>
-                    <formula>1</formula>
-                    <delay_flex/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <data_type>0</data_type>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>Memory Pools</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                </item>
-                <item>
-                    <name>{$MP_PERM} utilization</name>
-                    <type>0</type>
-                    <snmp_community/>
-                    <multiplier>0</multiplier>
-                    <snmp_oid/>
-                    <key>jvm.memutil[&quot;{$MP_PERM}&quot;]</key>
-                    <delay>300</delay>
-                    <history>10</history>
-                    <trends>365</trends>
-                    <status>0</status>
-                    <value_type>0</value_type>
-                    <allowed_hosts/>
-                    <units>%</units>
-                    <delta>0</delta>
-                    <snmpv3_securityname/>
-                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                    <snmpv3_authpassphrase/>
-                    <snmpv3_privpassphrase/>
-                    <formula>1</formula>
-                    <delay_flex/>
-                    <params/>
-                    <ipmi_sensor/>
-                    <data_type>0</data_type>
-                    <authtype>0</authtype>
-                    <username/>
-                    <password/>
-                    <publickey/>
-                    <privatekey/>
-                    <port/>
-                    <description/>
-                    <inventory_link>0</inventory_link>
-                    <applications>
-                        <application>
-                            <name>Memory Pools</name>
-                        </application>
-                    </applications>
-                    <valuemap/>
-                </item>
-                <item>
                     <name>{$MP_NEW} usage</name>
                     <type>0</type>
                     <snmp_community/>
@@ -1597,6 +1486,84 @@
                     </applications>
                     <valuemap/>
                 </item>
+                <item>
+                    <name>{$MP_PERM} usage</name>
+                    <type>0</type>
+                    <snmp_community/>
+                    <multiplier>0</multiplier>
+                    <snmp_oid/>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:name={$MP_PERM},type=MemoryPool&quot;,&quot;Usage&quot;,&quot;used&quot;]</key>
+                    <delay>60</delay>
+                    <history>10</history>
+                    <trends>365</trends>
+                    <status>0</status>
+                    <value_type>3</value_type>
+                    <allowed_hosts/>
+                    <units>B</units>
+                    <delta>0</delta>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privpassphrase/>
+                    <formula>1</formula>
+                    <delay_flex/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <data_type>0</data_type>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Memory Pools</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                </item>
+                <item>
+                    <name>{$MP_PERM} utilization</name>
+                    <type>0</type>
+                    <snmp_community/>
+                    <multiplier>0</multiplier>
+                    <snmp_oid/>
+                    <key>jvm.memutil[&quot;{$MP_PERM}&quot;]</key>
+                    <delay>300</delay>
+                    <history>10</history>
+                    <trends>365</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units>%</units>
+                    <delta>0</delta>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privpassphrase/>
+                    <formula>1</formula>
+                    <delay_flex/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <data_type>0</data_type>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Memory Pools</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                </item>
             </items>
             <discovery_rules/>
             <macros>
@@ -1655,16 +1622,6 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM_Static:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={$GC_OLD},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].avg(3)}&gt;{$GC_M})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM_Static:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={$GC_OLD},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].avg(3)}&gt;{$GC_L})</expression>
-            <name>{HOSTNAME} MarkSweepCompact GC overload</name>
-            <url>https://some.wiki/pages/MarkSweepCompactGcOverload</url>
-            <status>0</status>
-            <priority>2</priority>
-            <description>This might be memory leak. If this alert won't disappear for a long time, JVM restart might be needed.</description>
-            <type>0</type>
-            <dependencies/>
-        </trigger>
-        <trigger>
             <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM_Static:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={$GC_OLD},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].avg(3)}&gt;{$GC_H})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM_Static:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={$GC_OLD},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].avg(3)}&gt;{$GC_M})</expression>
             <name>{HOSTNAME} MarkSweepCompact GC overload</name>
             <url/>
@@ -1675,12 +1632,14 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>(({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM_Static:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_H})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM_Static:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M}))&amp;({$PROD}=1)</expression>
-            <name>{HOSTNAME} memory usage too high</name>
-            <url/>
+            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM_Static:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={$GC_OLD},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].avg(3)}&gt;{$GC_M})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM_Static:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={$GC_OLD},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].avg(3)}&gt;{$GC_L})</expression>
+            <name>{HOSTNAME} MarkSweepCompact GC overload</name>
+            <url>https://some.wiki/pages/MarkSweepCompactGcOverload</url>
             <status>0</status>
-            <priority>3</priority>
-            <description/>
+            <priority>2</priority>
+            <description>This might be memory leak. If this alert won't disappear for a long time, JVM restart might be
+                needed.
+            </description>
             <type>0</type>
             <dependencies/>
         </trigger>
@@ -1690,6 +1649,16 @@
             <url/>
             <status>1</status>
             <priority>2</priority>
+            <description/>
+            <type>0</type>
+            <dependencies/>
+        </trigger>
+        <trigger>
+            <expression>(({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM_Static:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_H})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM_Static:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M}))&amp;({$PROD}=1)</expression>
+            <name>{HOSTNAME} memory usage too high</name>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
             <description/>
             <type>0</type>
             <dependencies/>
@@ -1831,19 +1800,9 @@
                     <type>0</type>
                     <item>
                         <host>Template_Zorka_JVM_Static</host>
-                        <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Hiccup&quot;, &quot;CPU&quot;, &quot;maxTimeUsCLR&quot;]</key>
-                    </item>
-                </graph_item>
-                <graph_item>
-                    <sortorder>1</sortorder>
-                    <drawtype>0</drawtype>
-                    <color>0000EE</color>
-                    <yaxisside>0</yaxisside>
-                    <calc_fnc>2</calc_fnc>
-                    <type>0</type>
-                    <item>
-                        <host>Template_Zorka_JVM_Static</host>
-                        <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Hiccup&quot;, &quot;MEM&quot;, &quot;maxTimeUsCLR&quot;]</key>
+                        <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Hiccup&quot;, &quot;CPU&quot;,
+                            &quot;maxTimeUsCLR&quot;]
+                        </key>
                     </item>
                 </graph_item>
             </graph_items>
@@ -1887,7 +1846,8 @@
                     <type>0</type>
                     <item>
                         <host>Template_Zorka_JVM_Static</host>
-                        <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;ThreadCount&quot;]</key>
+                        <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;ThreadCount&quot;]
+                        </key>
                     </item>
                 </graph_item>
                 <graph_item>

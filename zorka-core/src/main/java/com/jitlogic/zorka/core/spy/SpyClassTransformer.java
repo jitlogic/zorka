@@ -17,7 +17,6 @@
 
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.stats.MethodCallStatistic;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
@@ -81,7 +80,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
      */
     Tracer tracer;
 
-    private MethodCallStatistic tracerLookups, classesProcessed, classesTransformed;
+    private MethodCallStatistic tracerLookups, classesProcessed, classesTransformed, spyLookups;
 
     /**
      * Creates new spy class transformer
@@ -92,9 +91,10 @@ public class SpyClassTransformer implements ClassFileTransformer {
         this.symbolRegistry = symbolRegistry;
         this.tracer = tracer;
 
-        this.tracerLookups = statistics.getMethodCallStatistic("tracerLookups");
-        this.classesProcessed = statistics.getMethodCallStatistic("classesProcessed");
-        this.classesTransformed = statistics.getMethodCallStatistic("classesTransformed");
+        this.spyLookups = statistics.getMethodCallStatistic("SpyLookups");
+        this.tracerLookups = statistics.getMethodCallStatistic("TracerLookups");
+        this.classesProcessed = statistics.getMethodCallStatistic("ClassesProcessed");
+        this.classesTransformed = statistics.getMethodCallStatistic("ClassesTransformed");
     }
 
     /**
@@ -177,12 +177,16 @@ public class SpyClassTransformer implements ClassFileTransformer {
             log.debug(ZorkaLogger.ZSP_CLASS_TRC, "Encountered class: %s", className);
         }
 
+        long st1 = System.nanoTime();
         for (SpyDefinition sdef : sdefs) {
 
             if (sdef.getMatcherSet().classMatch(clazzName)) {
                 found.add(sdef);
             }
         }
+        long st2 = System.nanoTime();
+
+        spyLookups.logCall(st2 - st1);
 
         long lt1 = System.nanoTime();
         boolean tracerMatch = tracer.getMatcherSet().classMatch(clazzName);

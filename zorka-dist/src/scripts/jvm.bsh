@@ -67,18 +67,19 @@ __jvm() {
 
   if (zorka.boolCfg("tracer")) {
       tracer.exclude(
-          "com.sun.jmx.**",
-          "com.sun.xml.**",
-          "com.sun.org.apache.**",
           "com.sun.java_cup.**",
+          "com.sun.jmx.**",
+          "com.sun.org.apache.**",
+          "com.sun.xml.**",
           "javax.management.**",
           "sun.font.**",
           "sun.java2d.**",
+          "sun.misc.FpUtils",
+          "sun.misc.IOUtils",
+          "sun.nio.cs.**",
           "sun.security.provider.**",
           "sun.util.ResourceBundleEnumeration",
           "sun.security.**",
-          "sun.misc.FpUtils",
-          "sun.misc.IOUtils",
           "sun.text.**"
       );
   }

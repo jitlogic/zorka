@@ -15,5 +15,5 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("svr/jboss.bsh");
+zorka.require("jboss/jboss.bsh");
 

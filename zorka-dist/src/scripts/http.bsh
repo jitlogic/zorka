@@ -137,7 +137,7 @@ __http() {
 
       process(rec) {
           if (cIn) {
-              icookies = rec.get("REQ").getCookies();
+              icookies = util.get(rec.get("REQ"), "cookies");
               if (icookies != null) {
                   for (c : icookies) {
                       name = c.getName();
@@ -155,7 +155,7 @@ __http() {
           }
 
           if (cOut) {
-              ocookies = rec.get("RESP").getCookies();
+              ocookies = util.get(rec.get("RESP"), "cookies");
               if (ocookies != null) {
                   for (c : ocookies) {
                       name = c.getName();

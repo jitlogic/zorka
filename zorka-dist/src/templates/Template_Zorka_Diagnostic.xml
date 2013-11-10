@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2013-02-23T18:19:18Z</date>
+    <date>2013-11-10T14:45:05Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -67,7 +67,9 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;AgentTime&quot;, &quot;AgentRequests&quot;, &quot;AVG15&quot;]</key>
+                    <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;AgentTime&quot;,
+                        &quot;AgentRequests&quot;, &quot;AVG15&quot;]
+                    </key>
                     <delay>160</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -218,12 +220,55 @@
                     <valuemap/>
                 </item>
                 <item>
+                    <name>Classes Processed</name>
+                    <type>0</type>
+                    <snmp_community/>
+                    <multiplier>0</multiplier>
+                    <snmp_oid/>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;stats&quot;,
+                        &quot;ClassesProcessed&quot;, &quot;calls&quot;]
+                    </key>
+                    <delay>1800</delay>
+                    <history>10</history>
+                    <trends>365</trends>
+                    <status>0</status>
+                    <value_type>3</value_type>
+                    <allowed_hosts/>
+                    <units>classes</units>
+                    <delta>0</delta>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privpassphrase/>
+                    <formula>1</formula>
+                    <delay_flex/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <data_type>0</data_type>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Zorka Diagnotic</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                </item>
+                <item>
                     <name>Classes Transformed</name>
                     <type>0</type>
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;ClassesTransformed&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;stats&quot;,
+                        &quot;ClassesTransformed&quot;, &quot;calls&quot;]
+                    </key>
                     <delay>1800</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -535,7 +580,9 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonTime&quot;, &quot;PerfMonCycles&quot;, &quot;AVG15&quot;]</key>
+                    <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonTime&quot;,
+                        &quot;PerfMonCycles&quot;, &quot;AVG15&quot;]
+                    </key>
                     <delay>160</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -627,6 +674,47 @@
                     <snmpv3_authpassphrase/>
                     <snmpv3_privpassphrase/>
                     <formula>60</formula>
+                    <delay_flex/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <data_type>0</data_type>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Zorka Diagnotic</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                </item>
+                <item>
+                    <name>Spy Lookup Time (cumulative)</name>
+                    <type>0</type>
+                    <snmp_community/>
+                    <multiplier>1</multiplier>
+                    <snmp_oid/>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;stats&quot;,
+                        &quot;SpyLookups&quot;, &quot;time&quot;]
+                    </key>
+                    <delay>1800</delay>
+                    <history>10</history>
+                    <trends>365</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units>s</units>
+                    <delta>0</delta>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privpassphrase/>
+                    <formula>0.001</formula>
                     <delay_flex/>
                     <params/>
                     <ipmi_sensor/>
@@ -764,6 +852,47 @@
                     <valuemap/>
                 </item>
                 <item>
+                    <name>Tracer Lookup Time (cumulative)</name>
+                    <type>0</type>
+                    <snmp_community/>
+                    <multiplier>1</multiplier>
+                    <snmp_oid/>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;stats&quot;,
+                        &quot;TracerLookups&quot;, &quot;time&quot;]
+                    </key>
+                    <delay>1800</delay>
+                    <history>10</history>
+                    <trends>365</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units>s</units>
+                    <delta>0</delta>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privpassphrase/>
+                    <formula>0.001</formula>
+                    <delay_flex/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <data_type>0</data_type>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Zorka Diagnotic</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                </item>
+                <item>
                     <name>Traces Dropped</name>
                     <type>0</type>
                     <snmp_community/>
@@ -822,6 +951,47 @@
                     <snmpv3_authpassphrase/>
                     <snmpv3_privpassphrase/>
                     <formula>60</formula>
+                    <delay_flex/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <data_type>0</data_type>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>Zorka Diagnotic</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                </item>
+                <item>
+                    <name>Transform Time (cumulative)</name>
+                    <type>0</type>
+                    <snmp_community/>
+                    <multiplier>1</multiplier>
+                    <snmp_oid/>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;stats&quot;,
+                        &quot;ClassesTransformed&quot;, &quot;time&quot;]
+                    </key>
+                    <delay>1800</delay>
+                    <history>10</history>
+                    <trends>365</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units>s</units>
+                    <delta>0</delta>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privpassphrase/>
+                    <formula>0.001</formula>
                     <delay_flex/>
                     <params/>
                     <ipmi_sensor/>

@@ -20,7 +20,7 @@ zorka.require(
     "ejb.bsh",
     "javax.bsh",
     "jsf.bsh",
-    "libs.bsh"
+    "libs.bsh",
     "apache/catalina.bsh",
     "apache/apache.bsh",
     "google/libs.bsh",

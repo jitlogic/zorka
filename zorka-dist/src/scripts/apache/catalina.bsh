@@ -130,6 +130,7 @@ __catalina() {
         "org.apache.catalina.core.StandardWrap**",
         "org.apache.catalina.core.StandardContext",
         "org.apache.catalina.connector.**", // TODO but this is sometimes useful for resolving connectivity problems
+        "org.apache.catalina.deploy.Security**",
         "org.apache.catalina.session.StandardSession",
         "org.apache.catalina.session.StandardSessionFacade",
         "org.apache.catalina.util.**",
