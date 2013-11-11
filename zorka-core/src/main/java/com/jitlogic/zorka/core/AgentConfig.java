@@ -34,14 +34,9 @@ public class AgentConfig extends ZorkaConfig {
     ;
     public static final String PROP_PROFILE_DIR = "zorka.profile.dir";
 
-    private List<String> profiles = new ArrayList<String>();
-    private List<String> profileScripts = new ArrayList<String>();
-
-
     public AgentConfig(String home) {
         loadProperties(home, "zorka.properties", DEFAULT_CONF_PATH);
         setBaseProps();
-        loadProfiles();
     }
 
 
@@ -49,12 +44,6 @@ public class AgentConfig extends ZorkaConfig {
         properties = props;
         homeDir = props.getProperty(PROP_HOME_DIR);
         setBaseProps();
-        loadProfiles();
-    }
-
-
-    public List<String> getProfileScripts() {
-        return Collections.unmodifiableList(profileScripts);
     }
 
 
@@ -72,29 +61,6 @@ public class AgentConfig extends ZorkaConfig {
         }
     }
 
-
-    /**
-     * Loads selected profiles and merges their properties with main configuration.
-     */
-    private void loadProfiles() {
-        profiles = listCfg("profiles");
-
-        for (String profile : profiles) {
-            File f = new File(ZorkaUtil.path(stringCfg(PROP_PROFILE_DIR, "/"), profile + ".profile"));
-            if (f.exists() && f.canRead()) {
-                log.info(ZorkaLogger.ZAG_CONFIG, "Loading profile: " + profile);
-                Properties props = loadCfg(new Properties(), f.getPath(), true);
-                profileScripts.addAll(listCfg(props, "profile.scripts"));
-                props.remove("profile.scripts");
-                for (Map.Entry<Object, Object> e : props.entrySet()) {
-                    properties.setProperty(e.getKey().toString(), e.getValue().toString());
-                }
-            } else {
-                log.error(ZorkaLogger.ZAG_CONFIG, "Cannot load profile " + profile + ": file " + f + " does not exist.");
-            }
-        }
-
-    }
 
     @Override
     protected void markError(String msg, Throwable e) {

@@ -15,6 +15,8 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
+zorka.require("sql.bsh");
+
 __db2() {
 
   spy.add(sql._instrumentStmt("DB2_SQL_1", "DB2")

@@ -34,10 +34,14 @@ public class TraceDataSet {
     private List<ViewerTraceRecord> traceRecords = new ArrayList<ViewerTraceRecord>();
 
 
+    public TraceDataSet(String path) {
+        this(new File(path));
+    }
+
+
     public TraceDataSet(File file) {
 
         FressianTraceFormat.TraceRecordBuilder oldb = FressianTraceFormat.TRACE_RECORD_BUILDER;
-
         FressianTraceFormat.TraceRecordBuilder newb = new FressianTraceFormat.TraceRecordBuilder() {
             @Override
             public TraceRecord get() {
@@ -45,11 +49,14 @@ public class TraceDataSet {
             }
         };
 
-        FressianTraceFormat.TRACE_RECORD_BUILDER = newb;
-
-        load(file);
-
-        FressianTraceFormat.TRACE_RECORD_BUILDER = oldb;
+        synchronized (FressianTraceFormat.class) {
+            FressianTraceFormat.TRACE_RECORD_BUILDER = newb;
+            try {
+                load(file);
+            } finally {
+                FressianTraceFormat.TRACE_RECORD_BUILDER = oldb;
+            }
+        }
 
     }
 

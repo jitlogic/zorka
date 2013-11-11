@@ -1,0 +1,62 @@
+/**
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// This file contains agent configurations for a variety of Apache libraries
+
+zorka.require("tracer.bsh");
+
+__axis2() {
+
+    // Tracer tuning
+    if (zorka.boolCfg("tracer")) {
+        tracer.exclude(
+            "org.apache.axis2.client.Options",
+            "org.apache.axis2.context.AbstractContext",
+            "org.apache.axis2.context.ConfigurationContext",
+            "org.apache.axis2.context.MessageContext",
+            "org.apache.axis2.databinding.utils.reader.**",
+            "org.apache.axis2.engine.AxisConfiguration",
+            "org.apache.axis2.engine.Handler$InvocationResponse",
+            "org.apache.axis2.engine.Phase",
+            "org.apache.axis2.description.**",
+            "org.apache.axis2.deployment.util.**",
+            "org.apache.axis2.handlers.AbstractHandler",
+            "org.apache.axis2.phaseresolver.PhaseHolder",
+            "org.apache.axis2.phaseresolver.PhaseResolver",
+            "org.apache.axis2.databinding.typemapping.**",
+            "org.apache.axis2.wsdl.**",
+            "org.apache.axis2.util.**"
+        );
+    }
+
+
+  if (zorka.boolCfg("tracer")) {
+
+    // Entry point: AXIS web services
+    spy.add(spy.instance("WSO2_AXIS")
+      .onEnter(
+        spy.fetchArg("CTX", 1),
+        tracer.begin("AXIS"),
+        spy.format("ACTION", "${CTX.soapAction}"),
+        tracer.attr("ACTION", "ACTION"))
+      .include(spy.byMethod("org.apache.axis2.transport.http.HTTPTransportUtils", "processHTTPPostRequest")));
+  }
+
+    return this;
+}
+
+axis2 = __axis2();

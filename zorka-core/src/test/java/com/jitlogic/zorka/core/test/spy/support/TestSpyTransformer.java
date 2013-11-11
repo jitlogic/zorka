@@ -16,6 +16,7 @@
  */
 package com.jitlogic.zorka.core.test.spy.support;
 
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.core.spy.SpyClassTransformer;
 import com.jitlogic.zorka.core.spy.SpyClassVisitor;
 import com.jitlogic.zorka.core.spy.SpyDefinition;
@@ -35,7 +36,7 @@ public class TestSpyTransformer extends SpyClassTransformer {
     private SymbolRegistry sreg;
 
     public TestSpyTransformer(SymbolRegistry symbolRegistry, Tracer tracer) {
-        super(symbolRegistry, tracer);
+        super(symbolRegistry, tracer, new MethodCallStatistics());
         sreg = symbolRegistry;
     }
 

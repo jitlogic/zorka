@@ -42,6 +42,8 @@ import java.util.regex.Pattern;
  */
 public final class ObjectInspector {
 
+    private static final ZorkaLog log = ZorkaLogger.getLog(ObjectInspector.class);
+
     /**
      * Special attribute name that will extract stack trace from throwable objects.
      */
@@ -408,8 +410,9 @@ public final class ObjectInspector {
     public static Set<ObjectName> queryNames(MBeanServerConnection conn, String query) {
         try {
             ObjectName on = new ObjectName(query);
-            return (Set<ObjectName>) conn.queryNames(on, null);
+            return conn.queryNames(on, null);
         } catch (Exception e) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error performing '" + query + "' JMX query", e);
             return new HashSet<ObjectName>();
         }
     }

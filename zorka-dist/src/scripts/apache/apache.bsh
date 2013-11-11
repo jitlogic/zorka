@@ -1,0 +1,53 @@
+/**
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// This file contains agent configurations for a variety of Apache libraries
+
+zorka.require("tracer.bsh");
+
+// Tracer tuning
+if (zorka.boolCfg("tracer")) {
+    tracer.exclude(
+        "org.apache.axiom.**",
+        "org.apache.beehive.**",
+        "org.apache.commons.**",
+        "org.apache.commons.beanutils.**",
+        "org.apache.commons.collections.**",
+        "org.apache.commons.digester.**",
+        "org.apache.commons.logging.**",
+        "org.apache.commons.validator.**",
+        "org.apache.el.**",
+        "org.apache.harmony.**",
+        "org.apache.http.message.BasicHeader",
+        "org.apache.http.util.CharArrayBuffer",
+        "org.apache.jasper.**",
+        "org.apache.log4j.**",
+        "org.apache.soap.**",
+        "org.apache.struts.**",
+        "org.apache.synapse.transport.nhttp.ServerWorker$1/compare",
+        "org.apache.taglibs.standard.**",
+        "org.apache.tiles.**",
+        "org.apache.webbeans.util.**",
+        "org.apache.webbeans.logger.**",
+        "org.apache.ws.commons.schema.**",
+        "org.apache.xalan.**",
+        "org.apache.xerces.**",
+        "org.apache.xml.**",
+        "org.apache.xmlbeans.**",
+        "org.apache.xpath.**"
+    );
+}

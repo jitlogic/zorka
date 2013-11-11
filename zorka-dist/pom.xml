@@ -47,12 +47,6 @@
                                         <include name="**"/>
                                     </fileset>
                                 </copy>
-                                <mkdir dir="${project.build.outputDirectory}/zorka-${project.version}/profiles"/>
-                                <copy toDir="${project.build.outputDirectory}/zorka-${project.version}/profiles">
-                                    <fileset dir="${project.basedir}/src/profiles" defaultexcludes="false">
-                                        <include name="**"/>
-                                    </fileset>
-                                </copy>
                                 <mkdir dir="${project.build.outputDirectory}/zorka-${project.version}/templates"/>
                                 <copy toDir="${project.build.outputDirectory}/zorka-${project.version}/templates">
                                     <fileset dir="${project.basedir}/src/templates" defaultexcludes="false">

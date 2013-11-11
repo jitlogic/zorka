@@ -492,6 +492,15 @@ public class ZorkaLib {
     }
 
 
+    public String require(String... names) {
+        String s = "";
+        for (String name : names) {
+            s += agent.require(ZorkaUtil.path(config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null), name)) + "; ";
+        }
+        return s;
+    }
+
+
     /**
      * Returns true if agent has been initialized (i.e. executing BSH code is
      * executing after initial execution of configuration scripts
@@ -527,6 +536,11 @@ public class ZorkaLib {
      */
     public void registerMbs(String name, MBeanServerConnection mbs, ClassLoader classLoader) {
         mbsRegistry.register(name, mbs, classLoader);
+    }
+
+
+    public boolean isMbsRegistered(String name) {
+        return mbsRegistry.lookup(name) != null;
     }
 
 
@@ -767,6 +781,9 @@ public class ZorkaLib {
         defCfg(key, strVal);
     }
 
+    public void setCfg(String key, String val) {
+        config.setCfg(key, val);
+    }
 
     public Set<String> setCfg(String key) {
         Set<String> set = new HashSet<String>();
@@ -786,7 +803,7 @@ public class ZorkaLib {
 
 
     public Properties loadCfg(String fname) {
-        String path = path(config.getHomeDir(), fname);
+        String path = ZorkaUtil.path(config.getHomeDir(), fname);
         Properties props = config.loadCfg(config.getProperties(), path, false);
         if (props != null) {
             log.info(ZorkaLogger.ZAG_INFO, "Loaded property file: " + path);
@@ -798,7 +815,7 @@ public class ZorkaLib {
 
 
     public Properties loadCfg(Properties properties, String fname, boolean verbose) {
-        String path = path(config.getHomeDir(), fname);
+        String path = ZorkaUtil.path(config.getHomeDir(), fname);
         Properties props = config.loadCfg(properties, path, verbose);
         if (props != null) {
             log.info(ZorkaLogger.ZAG_INFO, "Loaded property file: " + path);
@@ -806,11 +823,6 @@ public class ZorkaLib {
             log.info(ZorkaLogger.ZAG_INFO, "Property file not found: " + path);
         }
         return props;
-    }
-
-
-    public String path(String... components) {
-        return ZorkaUtil.path(components);
     }
 
 
