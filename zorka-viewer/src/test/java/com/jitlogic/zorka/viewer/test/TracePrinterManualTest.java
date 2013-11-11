@@ -16,10 +16,23 @@
 
 package com.jitlogic.zorka.viewer.test;
 
+import com.jitlogic.zorka.viewer.TraceDataSet;
+
+import com.jitlogic.zorka.viewer.ViewerTraceRecord;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+import java.io.File;
+import java.util.List;
+
 public class TracePrinterManualTest {
 
-    //@Test
+    @Test
     public void testReadAndPrintTrace() throws Exception {
+        String path = "/opt/zorka-test/apache-tomcat-6.0.35/zorka/log/trace.ztr";
+        TraceDataSet tds = new TraceDataSet(new File(path));
+        List<ViewerTraceRecord> lst = tds.getRecords();
+        assertTrue(lst.size() > 0);
     }
 
 }
