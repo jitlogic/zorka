@@ -22,22 +22,31 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import org.objectweb.asm.Type;
 
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ViewerTraceRecord extends TraceRecord {
 
-    /** Print short class name */
+    /**
+     * Print short class name
+     */
     public static final int PS_SHORT_CLASS = 0x01;
 
-    /** Print result type */
+    /**
+     * Print result type
+     */
     public static final int PS_RESULT_TYPE = 0x02;
 
-    /** Print short argument types */
-    public static final int PS_SHORT_ARGS  = 0x04;
+    /**
+     * Print short argument types
+     */
+    public static final int PS_SHORT_ARGS = 0x04;
 
-    /** Omits arguments overall in pretty pring */
-    public static final int PS_NO_ARGS     = 0x08;
+    /**
+     * Omits arguments overall in pretty pring
+     */
+    public static final int PS_NO_ARGS = 0x08;
 
 
     private SymbolRegistry symbols;
@@ -63,7 +72,7 @@ public class ViewerTraceRecord extends TraceRecord {
         sb.append(m != null ? sym(m.getTraceId()) : "?");
 
         if (getAttrs() != null) {
-            for (Map.Entry<Integer,Object> e : getAttrs().entrySet()) {
+            for (Map.Entry<Integer, Object> e : getAttrs().entrySet()) {
                 sb.append('|');
                 sb.append(e.getValue());
             }
@@ -86,7 +95,7 @@ public class ViewerTraceRecord extends TraceRecord {
 
 
     public String sym(long id) {
-        return symbols.symbolName((int)id);
+        return symbols.symbolName((int) id);
     }
 
     public String sym(int id) {
@@ -109,7 +118,6 @@ public class ViewerTraceRecord extends TraceRecord {
      * for this record and all children recursively
      *
      * @param total total trace execution time
-     *
      * @param level recursion level of parent method
      */
     public void fixup(long total, int level) {
@@ -119,12 +127,11 @@ public class ViewerTraceRecord extends TraceRecord {
 
         if (getChildren() != null) {
             for (TraceRecord child : getChildren()) {
-                ((ViewerTraceRecord)child).fixup(total, level+1);
-                recs += ((ViewerTraceRecord)child).getRecs();
+                ((ViewerTraceRecord) child).fixup(total, level + 1);
+                recs += ((ViewerTraceRecord) child).getRecs();
             }
         }
     }
-
 
 
     public String prettyClock() {
@@ -138,7 +145,7 @@ public class ViewerTraceRecord extends TraceRecord {
      * @return method description string
      */
     public String prettyPrint() {
-        return prettyPrint(PS_RESULT_TYPE|PS_SHORT_ARGS);
+        return prettyPrint(PS_RESULT_TYPE | PS_SHORT_ARGS);
     }
 
 
@@ -146,7 +153,6 @@ public class ViewerTraceRecord extends TraceRecord {
      * Returns human readable method description (configurable with supplied flags)
      *
      * @param style style flags (see PS_* constants)
-     *
      * @return method description string
      */
     public String prettyPrint(int style) {
@@ -180,7 +186,9 @@ public class ViewerTraceRecord extends TraceRecord {
         if (0 == (style & PS_NO_ARGS)) {
             Type[] types = Type.getArgumentTypes(signature);
             for (int i = 0; i < types.length; i++) {
-                if (i > 0) { sb.append(", "); }
+                if (i > 0) {
+                    sb.append(", ");
+                }
                 if (0 != (style & PS_SHORT_ARGS)) {
                     sb.append(ViewerUtil.shortClassName(types[i].getClassName()));
                 } else {
@@ -207,7 +215,7 @@ public class ViewerTraceRecord extends TraceRecord {
 
         if (getChildren() != null && expanded && (filter == null || filter.recurse(this))) {
             for (TraceRecord child : getChildren()) {
-                ((ViewerTraceRecord)child).scanRecords(result, filter);
+                ((ViewerTraceRecord) child).scanRecords(result, filter);
             }
         }
     }
@@ -230,6 +238,18 @@ public class ViewerTraceRecord extends TraceRecord {
 
     public String getTraceName() {
         return getMarker() != null ? sym(getMarker().getTraceId()) : null;
+    }
+
+    public Map<String, Object> listAttrs() {
+        Map<String, Object> ret = new HashMap<String, Object>();
+
+        if (getAttrs() != null) {
+            for (Map.Entry<Integer, Object> e : getAttrs().entrySet()) {
+                ret.put(sym(e.getKey()), e.getValue());
+            }
+        }
+
+        return ret;
     }
 
 }
