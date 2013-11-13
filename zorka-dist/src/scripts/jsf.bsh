@@ -25,6 +25,9 @@ if (zorka.boolCfg("tracer")) {
         "javax.faces.**",
         "com.sun.faces.**",
         "com.sun.facelets.**",
+        "org.apache.myfaces.el.**",
+        "org.apache.myfaces.renderkit.**",
+        "org.apache.myfaces.shared**",
         "org.richfaces.**"
     );
 }

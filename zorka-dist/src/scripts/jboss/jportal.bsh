@@ -15,27 +15,23 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This file contains agent configurations for JSF libraries
+
 zorka.require(
-  "libs.bsh",
   "tracer.bsh",
-  "apache/apache.bsh"
+  "lang/groovy.bsh"
 );
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
     tracer.exclude(
-      "org.aspectj.**",
-      "org.springframework.aop.**",
-      "org.springframework.beans.**",
-      "org.springframework.binding.**",
-      "org.springframework.core.**",
-      "org.springframework.context.**",
-      "org.springframework.orm.**",
-      "org.springframework.util.**",
-      "org.springframework.web.context.**",
-      "org.springframework.web.servlet.**",
-      "org.springframework.web.util.**",
-      "org.springframework.webflow.core.**",
-      "org.springframework.webflow.engine.**"
+        "org.chromattic.**",
+        "org.exoplatform.commons.utils.**",
+        "org.exoplatform.groovyscript.**",
+        "org.exoplatform.services.jcr.**",
+        "org.exoplatform.services.log.**",
+        "org.gatein.pc.portlet.impl.jsr168.**",
+        "org.jboss.cache.**",
+        "org.gatein.common.text.**"
     );
 }

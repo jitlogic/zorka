@@ -110,6 +110,8 @@ __jboss() {
 
           // Most of exclusions below are on class basis. This is to avoid blind spots in application server tracing.
 
+          "com.arjuna.ats.**",
+
           "org.jboss.aop.**",
 
           "org.jboss.classloader.**",
@@ -144,9 +146,15 @@ __jboss() {
 
           "org.jboss.on.embedded.**",
 
+          "org.jboss.resource.adapter.jdbc.*Set",
+          "org.jboss.resource.adapter.jdbc.*Statement",
           "org.jboss.reflect.**",
+          "org.jboss.resource.connectionmanager.**/checkTransactionActive",
 
           "org.jboss.serial.**",
+          "org.jboss.slf4j.**",
+
+          "org.jboss.security.**/run",
 
           "org.jboss.virtual.Visitor**",
           "org.jboss.virtual.plugins.cache.**",
@@ -167,6 +175,10 @@ __jboss() {
           "org.jboss.virtual.VirtualFile",
           "org.jboss.virtual.VFSUtils",
 
+          "org.jboss.web.tomcat.service.TomcatInjectionContainer",
+          "org.jboss.web.tomcat.service.injection.WebResourceHandler",
+
+          "org.jboss.util.LRU*",
           "org.jboss.util.collection.**",
           "org.jboss.util.WeakObject",
           "org.jboss.util.TimedCache**",
