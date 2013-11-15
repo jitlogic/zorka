@@ -40,12 +40,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.ow2.spec.ee</groupId>
-            <artifactId>ow2-jsr77-1.1-spec</artifactId>
-            <version>1.0.10</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-util</artifactId>
             <version>${asm.version}</version>

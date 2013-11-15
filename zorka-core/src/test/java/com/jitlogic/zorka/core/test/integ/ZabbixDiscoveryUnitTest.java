@@ -18,9 +18,9 @@
 package com.jitlogic.zorka.core.test.integ;
 
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
+import com.jitlogic.zorka.common.test.support.TestJmx;
 import com.jitlogic.zorka.core.mbeans.ZorkaMappedMBean;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
-import com.jitlogic.zorka.core.test.support.TestJmx;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.junit.Test;
 
@@ -44,9 +44,9 @@ public class ZabbixDiscoveryUnitTest extends ZorkaFixture {
         makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
         makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);
 
-        Map<String,List<Map<String,String>>> obj = zabbixLib._discovery("test", "test:type=TestJmx,*", "name", "type");
+        Map<String, List<Map<String, String>>> obj = zabbixLib._discovery("test", "test:type=TestJmx,*", "name", "type");
 
-        assertTrue("Must return object", obj  != null);
+        assertTrue("Must return object", obj != null);
         assertTrue("Must return more than 1 item", obj.get("data").size() > 1);
     }
 
@@ -57,7 +57,7 @@ public class ZabbixDiscoveryUnitTest extends ZorkaFixture {
         makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);
 
         assertThat(zabbixLib.discovery("test", "test:type=TestJmx,*", "name", "type"))
-            .contains("{#NAME}").contains("{#TYPE}").contains("TestJmx");
+                .contains("{#NAME}").contains("{#TYPE}").contains("TestJmx");
     }
 
 
@@ -66,7 +66,7 @@ public class ZabbixDiscoveryUnitTest extends ZorkaFixture {
         makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
         makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);
 
-        Map<String,List<Map<String,String>>> obj = zabbixLib._discovery(zorka.query("test", "test:type=TestJmx,*", "name", "type"));
+        Map<String, List<Map<String, String>>> obj = zabbixLib._discovery(zorka.query("test", "test:type=TestJmx,*", "name", "type"));
 
         assertTrue("Must return object", obj != null);
         assertTrue("Must return more than 1 item", obj.get("data").size() > 1);
@@ -85,19 +85,20 @@ public class ZabbixDiscoveryUnitTest extends ZorkaFixture {
         stats.getMethodCallStatistic("B").logCall(1L);
 
         QueryDef query1 = zorka.query("test", "test:type=ZorkaStats", "type").get("stats").listAs("**", "PAR");
-        Map<String,List<Map<String,String>>> obj1 = zabbixLib._discovery(query1);
+        Map<String, List<Map<String, String>>> obj1 = zabbixLib._discovery(query1);
         assertEquals("query with exact attrs should return data", 2, obj1.get("data").size());
 
 
         QueryDef query2 = zorka.query("test", "test:type=ZorkaStats").get("stats").listAs("**", "PAR");
-        Map<String,List<Map<String,String>>> obj2 = zabbixLib._discovery(query2);
+        Map<String, List<Map<String, String>>> obj2 = zabbixLib._discovery(query2);
         assertEquals("query with redundant attrs should return no data", 0, obj2.get("data").size());
     }
 
 
     private TestJmx makeTestJmx(String name, long nom, long div) throws Exception {
         TestJmx bean = new TestJmx();
-        bean.setNom(nom); bean.setDiv(div);
+        bean.setNom(nom);
+        bean.setDiv(div);
 
         testMbs.registerMBean(bean, new ObjectName(name));
 

@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.test.support;
+package com.jitlogic.zorka.common.test.support;
 
 /**
  * @author RLE <rafal.lewczuk@gmail.com>
@@ -27,7 +27,7 @@ public class TestInspectorClass {
     public static int count = 123;
 
     public static int count() {
-        return count+3;
+        return count + 3;
     }
 
     public static int getCount() {

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.test.support;
+package com.jitlogic.zorka.common.test.support;
 
 
 import javax.management.j2ee.statistics.TimeStatistic;

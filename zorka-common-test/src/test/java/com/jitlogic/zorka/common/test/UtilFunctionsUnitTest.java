@@ -14,10 +14,11 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.test.util;
+package com.jitlogic.zorka.common.test;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 import static org.fest.assertions.Assertions.assertThat;
 

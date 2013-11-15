@@ -20,7 +20,6 @@ import com.jitlogic.zorka.common.stats.MethodCallStatistic;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.core.spy.SpyContext;
-import com.jitlogic.zorka.core.spy.SpyDefinition;
 import com.jitlogic.zorka.core.spy.plugins.ZorkaStatsCollector;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;

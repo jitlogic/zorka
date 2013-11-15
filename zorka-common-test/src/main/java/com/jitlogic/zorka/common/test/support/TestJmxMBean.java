@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.test.support;
+package com.jitlogic.zorka.common.test.support;
 
 import java.util.Map;
 
@@ -25,5 +25,5 @@ public interface TestJmxMBean {
 
     public long getDiv();
 
-    public Map<String,String> getStrMap();
+    public Map<String, String> getStrMap();
 }

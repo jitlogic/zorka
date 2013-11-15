@@ -16,10 +16,10 @@
 
 package com.jitlogic.zorka.core.test.perfmon;
 
+import com.jitlogic.zorka.common.test.support.TestJmx;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
 import com.jitlogic.zorka.core.perfmon.QueryLister;
 import com.jitlogic.zorka.core.perfmon.QueryResult;
-import com.jitlogic.zorka.core.test.support.TestJmx;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
@@ -43,7 +43,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     @Test
     public void testTrivialSearchAttrOnly() {
         QueryLister lister = new QueryLister(mBeanServerRegistry,
-            new QueryDef("test", "test:type=TestJmx,*", "name"));
+                new QueryDef("test", "test:type=TestJmx,*", "name"));
 
         List<QueryResult> results = lister.list();
 
@@ -56,7 +56,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     @Test
     public void testTrivialSearchAndGetSingleAttr() {
         QueryLister lister = new QueryLister(mBeanServerRegistry,
-            new QueryDef("test", "test:type=TestJmx,*", "name").getAs("Nom", "Nom"));
+                new QueryDef("test", "test:type=TestJmx,*", "name").getAs("Nom", "Nom"));
 
         List<QueryResult> results = lister.list();
 
@@ -70,7 +70,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     @Test
     public void testSearchAndGetMultipleAttrs() {
         QueryLister lister = new QueryLister(mBeanServerRegistry,
-            new QueryDef("test", "test:type=TestJmx,*", "name").listAs("*", "Attr"));
+                new QueryDef("test", "test:type=TestJmx,*", "name").listAs("*", "Attr"));
 
         List<QueryResult> results = lister.list();
 
@@ -86,7 +86,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     @Test
     public void testSearchAndGetMultiSecondLevelAttr() {
         QueryLister lister = new QueryLister(mBeanServerRegistry,
-            new QueryDef("test", "test:type=TestJmx,*", "name").get("StrMap").listAs("*", "Attr"));
+                new QueryDef("test", "test:type=TestJmx,*", "name").get("StrMap").listAs("*", "Attr"));
 
         List<QueryResult> results = lister.list();
 
@@ -102,7 +102,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     @Test
     public void testSearchAndGetMultipleSecondLevelAttr() {
         QueryLister lister = new QueryLister(mBeanServerRegistry,
-            new QueryDef("test", "test:type=TestJmx,*", "name").get("StrMap").getAs("oja", "Attr"));
+                new QueryDef("test", "test:type=TestJmx,*", "name").get("StrMap").getAs("oja", "Attr"));
 
         List<QueryResult> results = lister.list();
 
@@ -118,7 +118,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     @Test
     public void testSearchWithSomeRecordsHavingNoSuchAttr() {
         QueryLister lister = new QueryLister(mBeanServerRegistry,
-             new QueryDef("test", "test:type=TestJmx,*", "name").get("StrMap").get("uja").with(QueryDef.NO_NULL_VALS));
+                new QueryDef("test", "test:type=TestJmx,*", "name").get("StrMap").get("uja").with(QueryDef.NO_NULL_VALS));
 
         List<QueryResult> results = lister.list();
 
@@ -129,7 +129,7 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     @Test
     public void testSearchWithNullAttrsInObjectName() throws Exception {
         QueryLister lister = new QueryLister(mBeanServerRegistry,
-            new QueryDef("test", "test:*", "name").with(QueryDef.NO_NULL_ATTRS));
+                new QueryDef("test", "test:*", "name").with(QueryDef.NO_NULL_ATTRS));
         makeTestJmx("test:name=oja", 10, 10);
 
         List<QueryResult> results = lister.list();
@@ -138,13 +138,14 @@ public class JmxQueryUnitTest extends ZorkaFixture {
     }
 
 
-    private TestJmx makeTestJmx(String name, long nom, long div, String...md) throws Exception {
+    private TestJmx makeTestJmx(String name, long nom, long div, String... md) throws Exception {
         TestJmx bean = new TestJmx();
 
-        bean.setNom(nom); bean.setDiv(div);
+        bean.setNom(nom);
+        bean.setDiv(div);
 
         for (int i = 1; i < md.length; i += 2) {
-            bean.put(md[i-1], md[i]);
+            bean.put(md[i - 1], md[i]);
         }
 
         testMbs.registerMBean(bean, new ObjectName(name));
