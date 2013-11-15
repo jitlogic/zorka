@@ -1,0 +1,98 @@
+/**
+ * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+zorka.require("tracer.bsh");
+
+__ldap() {
+
+    // Default values for LDAP tracer options
+    zorka.defCfg("ldap.trace", zorka.stringCfg("tracer", "no"));
+    zorka.defCfg("ldap.trace.time", zorka.longCfg("tracer.min.trace.time"));
+
+    _mbean = "zorka:type=ZorkaStats,name=Ldap";
+    _trace = zorka.boolCfg("ldap.trace");
+    _traceTime = zorka.longCfg("ldap.trace.time");
+
+    spy.add(spy.instrument("LDAP_CONNECT")
+        .onEnter(spy.fetchArg("MAP", 1), 
+            _trace ? tracer.formatAttr("ARGS", "${MAP}") : null)
+        .include(spy.byMethod("javax.naming.spi.NamingManager", "getInitialContext")));
+
+    spy.add(spy.instrument("LDAP_SEARCH_old")
+        .onEnter(spy.fetchArg("DN", 1), spy.fetchArg("SCOPE", 2), spy.fetchArg("FILTER", 8),
+            _trace ? spy.subchain(
+                tracer.begin("LDAP", zorka.longCfg("ldap.trace.time")),
+                tracer.attr("DN", "DN"), tracer.attr("SCOPE", "SCOPE"), tracer.attr("FILTER", "FILTER")
+            ) : null)
+        .include(spy.byMethod("com.sun.jndi.ldap.LdapClient", "search")));
+
+
+    spy.add(spy.instrument("LDAP_SEARCH")
+       .onEnter(spy.fetchArg("NAME", 1), spy.fetchArg("FILTER", 2),
+           _trace ? spy.subchain(
+               tracer.begin("LDAP", _traceTime),
+               tracer.formatAttr("NAME", "${NAME}"),
+               tracer.formatAttr("FILTER", "${FILTER}")
+           ) : null)
+       .onSubmit(spy.zorkaStats("java", _mbean, "stats", "ALL"))
+       .include(
+           spy.byMethod(0, "javax.naming.directory.InitialDirContext", "search", null, "javax.naming.Name"),
+           spy.byMethod(0, "javax.naming.directory.InitialDirContext", "search", null, "String", "javax.naming.directory.Attributes"),
+           spy.byMethod(0, "javax.naming.directory.InitialDirContext", "search", null, "String", "String", "javax.naming.directory.SearchControls")
+        ));
+
+
+    args_formatter() {
+        process(rec) {
+            try {
+                tracer.newAttr("FILTER", java.text.MessageFormat.format(rec.get("FILTER"), rec.get("ARGS")));
+            } catch (Exception e) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("<err> '" + rec.get("FILTER") + "' [");
+                if (rec.get("ARGS") != null) {
+                    for (arg : rec.get("ARGS")) {
+                        sb.append(arg); sb.append(", ");
+                    }
+                }
+                sb.append("]");
+                tracer.newAttr("FILTER", sb.toString());
+            }
+            return rec;
+        }
+        return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+    }
+
+    spy.add(spy.instrument("LDAP_SEARCH_ATTRS")
+       .onEnter(spy.fetchArg("NAME", 1), spy.fetchArg("FILTER", 2), spy.fetchArg("ARGS", 3),
+           _trace ? spy.subchain(
+               tracer.begin("LDAP", _traceTime),
+               tracer.formatAttr("NAME", "${NAME}"),
+               args_formatter()
+               //tracer.formatAttr("FILTER", "${FILTER}")
+           ) : null)
+       .onSubmit(spy.zorkaStats("java", _mbean, "stats", "ALL"))
+       .include(
+           spy.byMethod(0, "javax.naming.directory.InitialDirContext", "search", null, "String", "String", "Object[]", "javax.naming.directory.SearchControls")
+        ));
+
+  return this;
+
+}
+
+ldap = __ldap();
+
