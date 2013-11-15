@@ -17,6 +17,8 @@
 
 package com.jitlogic.zorka.common.test.support;
 
+import java.util.Properties;
+
 /**
  * @author RLE <rafal.lewczuk@gmail.com>
  */
@@ -26,12 +28,25 @@ public class TestInspectorClass {
 
     public static int count = 123;
 
+    private Properties props;
+
+    public TestInspectorClass() {
+    }
+
+    public TestInspectorClass(Properties props) {
+        this.props = props;
+    }
+
     public static int count() {
         return count + 3;
     }
 
     public static int getCount() {
         return count + 2;
+    }
+
+    protected Properties getProperties() {
+        return props;
     }
 
 }

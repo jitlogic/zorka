@@ -15,10 +15,7 @@
  */
 package com.jitlogic.zorka.common.test;
 
-import com.jitlogic.zorka.common.test.support.CommonFixture;
-import com.jitlogic.zorka.common.test.support.TestInspectorClass;
-import com.jitlogic.zorka.common.test.support.TestJmx;
-import com.jitlogic.zorka.common.test.support.TestStats;
+import com.jitlogic.zorka.common.test.support.*;
 import com.jitlogic.zorka.common.util.JmxObject;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
@@ -27,6 +24,7 @@ import org.junit.Test;
 
 import javax.management.ObjectName;
 import javax.management.j2ee.statistics.TimeStatistic;
+import java.io.ByteArrayInputStream;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -226,6 +224,26 @@ public class ObjectInspectorUnitTest extends CommonFixture {
     public void testSubstituteSpecialChars() {
         Map<String, Object> rec = ZorkaUtil.map("A", "a $ b");
         assertEquals("a $ b", ObjectInspector.substitute("${A}", rec));
+    }
+
+
+    @Test
+    public void testInspectPrivateFieldInObjectWithSuperclass() throws Exception {
+        byte[] b1 = "ABCD".getBytes();
+        ByteArrayInputStream bis = new ByteArrayInputStream(b1);
+
+        byte[] b2 = ObjectInspector.get(bis, "buf");
+
+        assertSame(b1, b2);
+    }
+
+
+    @Test
+    public void testInspectPrivateFielfOfSuperclass() throws Exception {
+        Properties props = props("AAA", "BBB");
+
+        assertSame(props, ObjectInspector.get(new TestInspectorClass2(props), "props"));
+
     }
 
 
