@@ -85,6 +85,24 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
     }
 
     @Test
+    public void testClassMatchWithNullArgument() {
+        SpyMatcherSet sms = new SpyMatcherSet(
+             spy.byMethod(0, "javax.naming.directory.InitialDirContext", "search", null, "String", "String", null,
+                     "javax.naming.directory.SearchControls"));
+        Assert.assertTrue(sms.methodMatch("javax.naming.directory.InitialDirContext", null, null, 1, "search",
+                "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;Ljavax/naming/directory/SearchControls;)Ljavax/naming/NamingEnumeration;", null));
+    }
+
+    @Test
+    public void testClassMatchWithArrayArgument() {
+        SpyMatcherSet sms = new SpyMatcherSet(
+                spy.byMethod(0, "javax.naming.directory.InitialDirContext", "search", null, "String", "String", "Object[]",
+                        "javax.naming.directory.SearchControls"));
+        Assert.assertTrue(sms.methodMatch("javax.naming.directory.InitialDirContext", null, null, 1, "search",
+                "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/Object;Ljavax/naming/directory/SearchControls;)Ljavax/naming/NamingEnumeration;", null));
+    }
+
+    @Test
     public void testClassMatchSignatureWithSimpleReturnAndArgumentType() {
         SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xff, "test.*", "frobnicate", "int", "int"));
         SpyMatcher cm = new SpyMatcher(0, 0xFF, "test.*", "frobnicate", "int", "int");
