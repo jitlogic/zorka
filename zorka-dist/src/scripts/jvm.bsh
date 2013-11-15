@@ -27,6 +27,7 @@ __jvm() {
       }
   }
 
+
   autoregister_plugin() {
       process(rec) {
           autoregister();
@@ -68,12 +69,15 @@ __jvm() {
   if (zorka.boolCfg("tracer")) {
       tracer.exclude(
           "com.sun.java_cup.**",
+          "com.sun.jndi.ldap.Ber*",
           "com.sun.jmx.**",
           "com.sun.org.apache.**",
+          "com.sun.proxy.**",
           "com.sun.xml.**",
           "javax.management.**",
           "sun.font.**",
           "sun.java2d.**",
+          "sun.misc.CharacterDecoder",
           "sun.misc.FpUtils",
           "sun.misc.IOUtils",
           "sun.nio.cs.**",
@@ -84,6 +88,10 @@ __jvm() {
       );
   }
 
+
+  if (zorka.boolCfg("zorka.mbs.autoregister", false)) {
+    autoregister();
+  }
 
   return this;
 }

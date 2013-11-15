@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.core.test.support;
+package com.jitlogic.zorka.common.test.support;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
@@ -30,9 +30,12 @@ public class TestStats implements Stats {
         stats = new Statistic[3];
         names = new String[3];
 
-        stats[0] = new TestStat("aaa", 0, 0); names[0] = stats[0].getName();
-        stats[1] = new TestStat("bbb", 1, 1); names[1] = stats[1].getName();
-        stats[2] = new TestStat("ccc", 2, 2); names[2] = stats[2].getName();
+        stats[0] = new TestStat("aaa", 0, 0);
+        names[0] = stats[0].getName();
+        stats[1] = new TestStat("bbb", 1, 1);
+        names[1] = stats[1].getName();
+        stats[2] = new TestStat("ccc", 2, 2);
+        names[2] = stats[2].getName();
     }
 
     public Statistic getStatistic(String statisticName) {

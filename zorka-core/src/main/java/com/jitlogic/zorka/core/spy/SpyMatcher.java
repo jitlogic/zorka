@@ -48,7 +48,7 @@ public class SpyMatcher {
      * Maps regular expression special characters (sequences) to escaped sequences.
      */
     private static final Map<Character, String> regexChars = ZorkaUtil.constMap(
-            '[', "\\]", ']', "\\]", '.', "\\.", ';', "\\;", '(', "\\(", ')', "\\)"
+            '[', "\\[", ']', "\\]", '.', "\\.", ';', "\\;", '(', "\\(", ')', "\\)"
     );
 
 
@@ -222,6 +222,9 @@ public class SpyMatcher {
      * @return type descriptor (JVM form)
      */
     private static String toTypeCode(String type) {
+        if (type == null) {
+            return null;
+        }
         StringBuilder sb = new StringBuilder();
 
         while (type.endsWith("[]")) {
@@ -282,7 +285,8 @@ public class SpyMatcher {
                     moreAttrs = false;
                     break;
                 }
-                sb.append(strToRegex(toTypeCode(argType)));
+                String ttc = toTypeCode(argType);
+                sb.append(ttc != null ? strToRegex(ttc) : ".*");
             }
             sb.append(moreAttrs ? ".*\\)" : "\\)");
         }

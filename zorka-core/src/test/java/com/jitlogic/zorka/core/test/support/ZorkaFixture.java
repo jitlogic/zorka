@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zorka.core.test.support;
 
+import com.jitlogic.zorka.common.test.support.CommonFixture;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.*;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
@@ -32,15 +33,13 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import org.junit.After;
 import org.junit.Before;
 
-import javax.management.MBeanServer;
 import javax.management.MBeanServerBuilder;
 import java.io.File;
 import java.util.Properties;
 
-public class ZorkaFixture {
+public class ZorkaFixture extends CommonFixture {
 
     protected Properties configProperties;
-    protected MBeanServer testMbs;
     protected MBeanServerRegistry mBeanServerRegistry;
 
     protected AgentInstance agentInstance;
@@ -102,7 +101,6 @@ public class ZorkaFixture {
 
         // Install test MBean server
 
-        testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
         mBeanServerRegistry.register("test", testMbs, testMbs.getClass().getClassLoader());
 
         MainSubmitter.setSubmitter(agentInstance.getSubmitter());

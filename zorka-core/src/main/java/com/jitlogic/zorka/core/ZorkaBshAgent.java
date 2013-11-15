@@ -206,8 +206,7 @@ public class ZorkaBshAgent implements ZorkaAgent {
 
         if (scripts != null) {
             for (String script : scripts) {
-                String scriptPath = new File(scriptsDir, script).getPath();
-                require(scriptPath);
+                require(ZorkaUtil.path(scriptsDir, script));
             }
         }
     }

@@ -34,6 +34,10 @@ if (zorka.boolCfg("tracer")) {
         "net.sf.saxon.**",
         "ognl.**",
         "org.slf4j.**",
-        "org.objectweb.asm.**"
+        "org.objectweb.asm.**",
+        "org.owasp.esapi.codecs.**",
+        "org.jibx.**",
+        "org.exolab.castor.**",
+        "org.castor.**"
     );
 }

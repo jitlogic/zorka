@@ -15,40 +15,15 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.test.support;
+package com.jitlogic.zorka.common.test.support;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * @author RLE <rafal.lewczuk@gmail.com>
- */
-public class TestJmx implements TestJmxMBean {
+public interface TestJmxMBean {
 
-    public long nom, div;
-    private Map<String,String> strMap = new LinkedHashMap<String, String>();
+    public long getNom();
 
-    public long getNom() {
-        return nom;
-    }
+    public long getDiv();
 
-    public long getDiv() {
-        return div;
-    }
-
-    public Map<String, String> getStrMap() {
-        return strMap;
-    }
-
-    public void put(String key, String val) {
-        strMap.put(key, val);
-    }
-
-    public void setNom(long nom) {
-        this.nom = nom;
-    }
-
-    public void setDiv(long div) {
-        this.div = div;
-    }
+    public Map<String, String> getStrMap();
 }

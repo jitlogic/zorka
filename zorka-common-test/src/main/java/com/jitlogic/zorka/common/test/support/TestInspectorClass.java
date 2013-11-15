@@ -15,27 +15,38 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require(
-  "libs.bsh",
-  "tracer.bsh",
-  "apache/apache.bsh"
-);
+package com.jitlogic.zorka.common.test.support;
 
-// Tracer tuning
-if (zorka.boolCfg("tracer")) {
-    tracer.exclude(
-      "org.aspectj.**",
-      "org.springframework.aop.**",
-      "org.springframework.beans.**",
-      "org.springframework.binding.**",
-      "org.springframework.core.**",
-      "org.springframework.context.**",
-      "org.springframework.orm.**",
-      "org.springframework.util.**",
-      "org.springframework.web.context.**",
-      "org.springframework.web.servlet.**",
-      "org.springframework.web.util.**",
-      "org.springframework.webflow.core.**",
-      "org.springframework.webflow.engine.**"
-    );
+import java.util.Properties;
+
+/**
+ * @author RLE <rafal.lewczuk@gmail.com>
+ */
+public class TestInspectorClass {
+
+    private static int priv = 234;
+
+    public static int count = 123;
+
+    private Properties props;
+
+    public TestInspectorClass() {
+    }
+
+    public TestInspectorClass(Properties props) {
+        this.props = props;
+    }
+
+    public static int count() {
+        return count + 3;
+    }
+
+    public static int getCount() {
+        return count + 2;
+    }
+
+    protected Properties getProperties() {
+        return props;
+    }
+
 }

@@ -17,8 +17,8 @@
 
 package com.jitlogic.zorka.core.test.perfmon;
 
+import com.jitlogic.zorka.common.test.support.TestJmx;
 import com.jitlogic.zorka.core.perfmon.AvgRateCounter;
-import com.jitlogic.zorka.core.test.support.TestJmx;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,10 +53,12 @@ public class AverageRateCountingUnitTest extends ZorkaFixture {
         List<Object> path = counter.list("test", "test:name=bean1,type=TestJmx");
 
         assertEquals(0.0, counter.get(path, "Nom", "Div", AvgRateCounter.AVG1), 0.01);
-        tj.setNom(5); tj.setDiv(5);
+        tj.setNom(5);
+        tj.setDiv(5);
 
         assertEquals(1.0, counter.get(path, "Nom", "Div", AvgRateCounter.AVG1), 0.01);
-        tj.setNom(10); tj.setDiv(20);
+        tj.setNom(10);
+        tj.setDiv(20);
         assertEquals(0.5, counter.get(path, "Nom", "Div", AvgRateCounter.AVG1), 0.01);
     }
 
@@ -65,16 +67,20 @@ public class AverageRateCountingUnitTest extends ZorkaFixture {
         TestJmx tj = makeTestJmx("test:name=bean1,type=TestJmx", 0, 0);
         List<Object> path = counter.list("test", "test:name=bean1,type=TestJmx");
 
-        tj.setNom(5); tj.setDiv(5);
+        tj.setNom(5);
+        tj.setDiv(5);
         assertEquals(0.0, counter.get(path, "Nom", "Div", AvgRateCounter.AVG1), 0.01);
 
-        tj.setNom(10); tj.setDiv(20);
+        tj.setNom(10);
+        tj.setDiv(20);
         assertEquals(0.0, counter.get(path, "Nom", "Div", AvgRateCounter.AVG5), 0.01);
 
-        tj.setNom(10); tj.setDiv(20);
+        tj.setNom(10);
+        tj.setDiv(20);
         assertEquals(0.33, counter.get(path, "Nom", "Div", AvgRateCounter.AVG1), 0.01);
 
-        tj.setNom(10); tj.setDiv(20);
+        tj.setNom(10);
+        tj.setDiv(20);
         assertEquals(0.0, counter.get(path, "Nom", "Div", AvgRateCounter.AVG5), 0.01);
     }
 
@@ -83,14 +89,16 @@ public class AverageRateCountingUnitTest extends ZorkaFixture {
         TestJmx tj = makeTestJmx("test:name=bean1,type=TestJmx", 0, 0);
 
         assertEquals(0.0, zorka.rate("test", "test:name=bean1,type=TestJmx", "Nom", "Div", 60), 0.01);
-        tj.setNom(5); tj.setDiv(5);
+        tj.setNom(5);
+        tj.setDiv(5);
         assertEquals(1.0, zorka.rate("test", "test:name=bean1,type=TestJmx", "Nom", "Div", 60), 0.01);
         assertEquals(1.0, zorka.rate("test", "test:name=bean1,type=TestJmx", "Nom", "Div", "AVG1"), 0.01);
     }
 
     private TestJmx makeTestJmx(String name, long nom, long div) throws Exception {
         TestJmx bean = new TestJmx();
-        bean.setNom(nom); bean.setDiv(div);
+        bean.setNom(nom);
+        bean.setDiv(div);
 
         testMbs.registerMBean(bean, new ObjectName(name));
 

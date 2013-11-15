@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -13,27 +13,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zorka.common.test.support;
 
-package com.jitlogic.zorka.viewer.test;
 
-import com.jitlogic.zorka.viewer.TraceDataSet;
+import java.util.Properties;
 
-import com.jitlogic.zorka.viewer.ViewerTraceRecord;
-import org.junit.Test;
+public class TestInspectorClass2 extends TestInspectorClass {
 
-import static org.junit.Assert.*;
-
-import java.io.File;
-import java.util.List;
-
-public class TracePrinterManualTest {
-
-    @Test
-    public void testReadAndPrintTrace() throws Exception {
-        String path = this.getClass().getResource("/trace.ztr").getPath();
-        TraceDataSet tds = new TraceDataSet(new File(path));
-        List<ViewerTraceRecord> lst = tds.getRecords();
-        assertTrue(lst.size() > 0);
+    public TestInspectorClass2(Properties props) {
+        super(props);
     }
 
 }

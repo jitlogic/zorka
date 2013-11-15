@@ -34,10 +34,6 @@ public class TraceDataSet {
     private List<ViewerTraceRecord> traceRecords = new ArrayList<ViewerTraceRecord>();
 
 
-    public TraceDataSet(String path) {
-        this(new File(path));
-    }
-
 
     public TraceDataSet(File file) {
 
@@ -117,14 +113,15 @@ public class TraceDataSet {
             } else {
                 throw new IOException("Invalid header (invalid file type).");
             }
-        } finally {
+        } catch (Exception e) {
             if (fis != null) {
                 try {
                     fis.close();
-                } catch (IOException e) {
+                } catch (IOException e1) {
                 }
             }
         }
+        return null;
     }
 
 
