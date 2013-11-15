@@ -38,6 +38,8 @@ if (zorka.boolCfg("tracer")) {
         "org.owasp.esapi.codecs.**",
         "org.jibx.**",
         "org.exolab.castor.**",
-        "org.castor.**"
+        "org.castor.**",
+        "com.lowagie.text.**",
+        "net.sf.jasperreports.engine.**"
     );
 }

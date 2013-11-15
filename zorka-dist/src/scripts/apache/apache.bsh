@@ -37,6 +37,7 @@ if (zorka.boolCfg("tracer")) {
         "org.apache.http.util.CharArrayBuffer",
         "org.apache.jasper.**",
         "org.apache.log4j.**",
+        "org.apache.neethi.**",
         "org.apache.portals.bridges.**",
         "org.apache.soap.**",
         "org.apache.struts.**",

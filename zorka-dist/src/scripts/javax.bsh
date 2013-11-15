@@ -22,6 +22,7 @@ zorka.require("tracer.bsh");
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
     tracer.exclude(
+        "com.sun.activation.registries.MailcapTokenizer",
         "com.sun.el.**",
         "com.sun.naming.internal.**",
 
