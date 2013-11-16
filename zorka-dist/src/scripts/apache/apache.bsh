@@ -27,6 +27,7 @@ if (zorka.boolCfg("tracer")) {
         "org.apache.commons.**",
         "org.apache.commons.beanutils.**",
         "org.apache.commons.collections.**",
+        "org.apache.commons.dbcp.**",
         "org.apache.commons.digester.**",
         "org.apache.commons.logging.**",
         "org.apache.commons.validator.**",

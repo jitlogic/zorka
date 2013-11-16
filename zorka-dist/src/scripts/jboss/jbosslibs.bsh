@@ -15,32 +15,13 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// This file contains agent configurations for J2EE libraries
+// This file contains agent configurations for various unqualified libraries
 
 zorka.require("tracer.bsh");
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
     tracer.exclude(
-        "com.sun.activation.registries.MailcapTokenizer",
-        "com.sun.el.**",
-        "com.sun.naming.internal.**",
-
-        "javax.crypto.**",
-        "javax.el.**",
-        "javax.enterprise.util.**",
-        "javax.security.**",
-        "javax.servlet.**",
-        "javax.xml.**",
-        "javax.ws.**",
-
-        "javax.naming.Binding",
-        "javax.naming.NameImpl",
-        "javax.naming.CompoundName",
-        "javax.naming.NamingException",
-
-        "org.xml.sax.**",
-
-        "sun.security.jca.**"
+      "org.jboss.resteasy.**"
     );
 }

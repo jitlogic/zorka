@@ -62,6 +62,15 @@ __jetty() {
       spy.byMethod("org.mortbay.jetty.servlet.ServletHandler", "doHandle"),
       spy.byMethod("org.eclipse.jetty.servlet.ServletHandler", "doHandle")));
 
+  if (http._trace) {
+    tracer.exclude(
+      "org.eclipse.jetty.util.**",
+      "org.eclipse.jetty.http.Http*",
+      "org.eclipse.jetty.server.Response",
+      "org.eclipse.jetty.server.HttpOutput"
+    );
+  }
+
   jvm.autoregister();
 
   return this;
