@@ -16,7 +16,6 @@
 package com.jitlogic.zico.client.panel;
 
 import com.google.gwt.cell.client.AbstractCell;
-import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -73,10 +72,12 @@ public class HostListPanel extends VerticalLayoutContainer {
     private ErrorHandler errorHandler;
 
     private TextButton btnRefresh, btnAddHost, btnRemoveHost, btnEditHost, btnListTraces, btnDisableHost, btnEnableHost;
-    private MenuItem mnuRefresh, mnuNewHost, mnuRemoveHost, mnuEditHost, mnuListTraces, mnuDisableHost, mnuEnableHost;
+    private MenuItem mnuRefresh, mnuAddHost, mnuRemoveHost, mnuEditHost, mnuListTraces, mnuDisableHost, mnuEnableHost;
 
     private boolean selectionDependentControlsEnabled = true;
 
+    // TODO this is very badly written crutch. It will be fixed as soon as we move to GWT 2.6, so it will be in sync with Jetty 9.
+    private boolean adminMode = false;
 
     @Inject
     public HostListPanel(Provider<ZicoShell> shell, TraceDataApi traceDataApi, PanelFactory panelFactory,
@@ -94,23 +95,31 @@ public class HostListPanel extends VerticalLayoutContainer {
         enableSelectionDependentControls(null);
     }
 
+    public void setAdminMode(boolean adminMode) {
+        this.adminMode = adminMode;
+        enableSelectionDependentControls(null);
+    }
+
     private void enableSelectionDependentControls(HostInfo hostInfo) {
         boolean enabled = hostInfo != null;
         boolean hostDisabled = hostInfo != null && hostInfo.hasFlag(HostInfo.DISABLED);
         if (selectionDependentControlsEnabled != enabled) {
-            btnRemoveHost.setEnabled(enabled);
-            btnEditHost.setEnabled(enabled);
+            btnRemoveHost.setEnabled(enabled && adminMode);
+            btnEditHost.setEnabled(enabled && adminMode);
             btnListTraces.setEnabled(enabled);
-            mnuRemoveHost.setEnabled(enabled);
-            mnuEditHost.setEnabled(enabled);
+            mnuRemoveHost.setEnabled(enabled && adminMode);
+            mnuEditHost.setEnabled(enabled && adminMode);
             mnuListTraces.setEnabled(enabled);
             selectionDependentControlsEnabled = enabled;
         }
 
-        btnDisableHost.setEnabled(enabled && !hostDisabled);
-        btnEnableHost.setEnabled(hostDisabled);
-        mnuDisableHost.setEnabled(enabled && !hostDisabled);
-        mnuEnableHost.setEnabled(hostDisabled);
+        btnDisableHost.setEnabled(enabled && !hostDisabled && adminMode);
+        btnEnableHost.setEnabled(hostDisabled && adminMode);
+        mnuDisableHost.setEnabled(enabled && !hostDisabled && adminMode);
+        mnuEnableHost.setEnabled(hostDisabled && adminMode);
+
+        btnAddHost.setEnabled(adminMode);
+        mnuAddHost.setEnabled(adminMode);
     }
 
     private void createToolbar() {
@@ -330,15 +339,15 @@ public class HostListPanel extends VerticalLayoutContainer {
 
         menu.add(new SeparatorMenuItem());
 
-        mnuNewHost = new MenuItem("New host");
-        mnuNewHost.setIcon(Resources.INSTANCE.addIcon());
-        mnuNewHost.addSelectionHandler(new SelectionHandler<Item>() {
+        mnuAddHost = new MenuItem("New host");
+        mnuAddHost.setIcon(Resources.INSTANCE.addIcon());
+        mnuAddHost.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
                 addHost();
             }
         });
-        menu.add(mnuNewHost);
+        menu.add(mnuAddHost);
 
         mnuRemoveHost = new MenuItem("Remove host");
         mnuRemoveHost.setIcon(Resources.INSTANCE.removeIcon());

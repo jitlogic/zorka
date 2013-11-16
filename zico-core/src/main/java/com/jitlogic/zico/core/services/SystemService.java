@@ -15,10 +15,12 @@
  */
 package com.jitlogic.zico.core.services;
 
+import com.jitlogic.zico.core.ZicoCacheControlFilter;
 import com.jitlogic.zico.core.ZicoConfig;
 import com.jitlogic.zorka.common.ZorkaAgent;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -33,12 +35,8 @@ import java.util.List;
 @Path("system")
 public class SystemService {
 
-    private ZicoConfig config;
-
     @Inject
-    public SystemService(ZicoConfig config) {
-        this.config = config;
-    }
+    private ZicoConfig config;
 
     @GET
     @Path("/info")
@@ -77,6 +75,18 @@ public class SystemService {
 
         return info;
     }
+
+
+    @GET
+    @Path("/user/roles/admin")
+    @Produces(MediaType.APPLICATION_JSON)
+    public boolean isAdminRole() {
+
+        HttpServletRequest req = ZicoCacheControlFilter.getRequest();
+
+        return config.boolCfg("zico.auth.disable", false) || (req != null && req.isUserInRole("ADMIN"));
+    }
+
 
     private static final long MB = 1024 * 1024;
 

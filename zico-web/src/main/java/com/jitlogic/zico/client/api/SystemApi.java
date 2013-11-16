@@ -29,4 +29,8 @@ public interface SystemApi extends RestService {
     @Path("system/info")
     void systemInfo(MethodCallback<List<String>> cb);
 
+    @GET
+    @Path("system/user/roles/admin")
+    void isAdminRole(MethodCallback<Boolean> cb);
+
 }
