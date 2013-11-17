@@ -35,18 +35,6 @@ __muleesb() {
     _stats = zorka.boolCfg("mule.stats");
     _mbean = zorka.stringCfg("mule.stats.mbean");
 
-//    spy.add(spy.instance("MULE_TEST1")
-//        .onEnter(tracer.begin("HTTP", 0))
-//        .include(spy.byMethod(0, "~.*HttpWorker$", "doRequest", null)));
-
-//    spy.add(spy.instrument("MULE_TEST2")
-//        .onEnter(spy.zorkaLog("INFO", "Mule", "runPhase() executed."), show_stack())
-//        .include(spy.byMethod("org.mule.execution.FlowProcessingPhase", "runPhase")));
-
-//    spy.add(spy.instrument("MULE_TEST3")
-//        .onEnter(tracer.begin("WORK", 0))
-//        .include(spy.byMethod("org.mule.work.WorkerContext", "run")));
-
 
     extract_annotations() {
 
@@ -86,7 +74,6 @@ __muleesb() {
             ) : null)
         .onSubmit(
             _stats ? spy.subchain(
-                spy.zorkaStats("java", _mbean, "stats", "ALL"),
                 spy.zorkaStats("java", _mbean, "stats", "COMPONENTS"),
                 spy.zorkaStats("java", _mbean, "components", "${APPLICATION}:${FLOW}.${NAME}")
             ) : null)
@@ -108,7 +95,6 @@ __muleesb() {
             ) : null)
         .onSubmit(
             _stats ? spy.subchain(
-                spy.zorkaStats("java", _mbean, "stats", "ALL"),
                 spy.zorkaStats("java", _mbean, "stats", "TRANSFORMERS"),
                 spy.zorkaStats("java", _mbean, "transformers", "${CLASS}")
             ) : null)
@@ -133,7 +119,6 @@ __muleesb() {
             ) : null)
         .onSubmit(
             _stats ? spy.subchain(
-                spy.zorkaStats("java", _mbean, "stats", "ALL"),
                 spy.zorkaStats("java", _mbean, "stats", "FILTERS"),
                 spy.zorkaStats("java", _mbean, "filters", "${CLASS}")
             ) : null)
@@ -160,7 +145,6 @@ __muleesb() {
             ) : null)
         .onSubmit(
             _stats ? spy.subchain(
-                spy.zorkaStats("java", _mbean, "stats", "ALL"),
                 spy.zorkaStats("java", _mbean, "stats", "DISPATCHERS"),
                 spy.zorkaStats("java", _mbean, "dispatchers", "${APPLICATION}:${FLOW}.${NAME}")
             ) : null)
@@ -184,7 +168,6 @@ __muleesb() {
             ) : null)
         .onSubmit(
             _stats ? spy.subchain(
-                spy.zorkaStats("java", _mbean, "stats", "ALL"),
                 spy.zorkaStats("java", _mbean, "stats", "FLOWS"),
                 spy.zorkaStats("java", _mbean, "flows", "${APPLICATION}:${FLOW}")
             ) : null)
