@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2012-09-08T15:10:31Z</date>
+    <date>2013-11-19T19:32:45Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template_Zorka_JBoss_MQ</template>
-            <name>Template_Zorka_JBoss_MQ</name>
+            <template>Template_Zorka_JBoss4_MQ</template>
+            <name>Template_Zorka_JBoss4_MQ</name>
             <groups>
                 <group>
                     <name>Templates</name>
@@ -28,7 +28,9 @@
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix.discovery[&quot;jboss&quot;, &quot;jboss.mq.destination:service=Queue,*&quot;, &quot;name&quot;]</key>
+                    <key>zabbix.discovery[&quot;jboss&quot;, &quot;jboss.mq.destination:service=Queue,*&quot;, &quot;service&quot;,
+                        &quot;name&quot;]
+                    </key>
                     <delay>60</delay>
                     <status>0</status>
                     <allowed_hosts/>
@@ -55,7 +57,9 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;jboss&quot;, &quot;jboss.mq.destination:service=Queue,name={#NAME}&quot;, &quot;MessageStatistics&quot;, &quot;0&quot;, &quot;depth&quot;]</key>
+                            <key>zorka.jmx[&quot;jboss&quot;, &quot;jboss.mq.destination:service=Queue,name={#NAME}&quot;,
+                                &quot;MessageStatistics&quot;, &quot;0&quot;, &quot;depth&quot;]
+                            </key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -94,7 +98,9 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;jboss&quot;, &quot;jboss.mq.destination:service=Queue,name={#NAME}&quot;, &quot;MessageStatistics&quot;, &quot;0&quot;, &quot;count&quot;]</key>
+                            <key>zorka.jmx[&quot;jboss&quot;, &quot;jboss.mq.destination:service=Queue,name={#NAME}&quot;,
+                                &quot;MessageStatistics&quot;, &quot;0&quot;, &quot;count&quot;]
+                            </key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>

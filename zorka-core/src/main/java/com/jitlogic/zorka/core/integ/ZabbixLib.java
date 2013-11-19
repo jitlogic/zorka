@@ -31,16 +31,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *
  * Zabbix functions library.
  *
  * @author rafal.lewczuk@jitlogic.com
- *
  */
 public class ZabbixLib {
 
 
-    private Map<String,ZabbixTrapper> trappers = new ConcurrentHashMap<String, ZabbixTrapper>();
+    private Map<String, ZabbixTrapper> trappers = new ConcurrentHashMap<String, ZabbixTrapper>();
 
     private MBeanServerRegistry mbsRegistry;
     private ZorkaConfig config;
@@ -51,12 +49,12 @@ public class ZabbixLib {
     }
 
 
-    public String discovery(QueryDef...qdefs) {
+    public String discovery(QueryDef... qdefs) {
         return discovery(QueryDef.NO_NULL_ATTRS, qdefs);
     }
 
 
-    public Map<String,List<Map<String,String>>> _discovery(QueryDef...qdefs) {
+    public Map<String, List<Map<String, String>>> _discovery(QueryDef... qdefs) {
         return _discovery(QueryDef.NO_NULL_ATTRS, qdefs);
     }
 
@@ -64,30 +62,35 @@ public class ZabbixLib {
      * Zabbix discovery function using JMX query framework
      *
      * @param qdefs queries
-     *
      * @return JSON object describing discovered objects
      */
-    public Map<String,List<Map<String,String>>> _discovery(int flags, QueryDef...qdefs) {
-        List<Map<String,String>> data = new ArrayList<Map<String,String>>();
+    public Map<String, List<Map<String, String>>> _discovery(int flags, QueryDef... qdefs) {
+        List<Map<String, String>> data = new ArrayList<Map<String, String>>();
 
         for (QueryDef qdef : qdefs) {
             qdef = qdef.with(flags);
             for (QueryResult result : new QueryLister(mbsRegistry, qdef).list()) {
-                Map<String,String> item = new HashMap<String,String>();
-                for (Map.Entry<String,Object> e : result.attrSet()) {
+                Map<String, String> item = new HashMap<String, String>();
+                for (Map.Entry<String, Object> e : result.attrSet()) {
+                    if (e.getValue() == null) {
+                        item = null;
+                        break;
+                    }
                     item.put("{#" + e.getKey().toUpperCase().replace("-", "") + "}", e.getValue().toString());
                 }
-                data.add(item);
+                if (item != null) {
+                    data.add(item);
+                }
             }
         }
 
-        Map<String,List<Map<String,String>>> discoveries = new HashMap<String, List<Map<String,String>>>();
+        Map<String, List<Map<String, String>>> discoveries = new HashMap<String, List<Map<String, String>>>();
         discoveries.put("data", data);
         return discoveries;
     }
 
 
-    public String discovery(int flags, QueryDef...qdefs) {
+    public String discovery(int flags, QueryDef... qdefs) {
         return new JSONWriter().write(_discovery(flags, qdefs));
     }
 
@@ -95,21 +98,17 @@ public class ZabbixLib {
     /**
      * Simplified zabbix discovery function usable directly from zabbix.
      *
-     *
-     * @param mbs mbean server name
-     *
+     * @param mbs    mbean server name
      * @param filter object name filter
-     *
-     * @param attrs attribute chain
-     *
+     * @param attrs  attribute chain
      * @return JSON string describing discovered objects.
      */
-    public String discovery(String mbs, String filter, String...attrs) {
+    public String discovery(String mbs, String filter, String... attrs) {
         return new JSONWriter().write(_discovery(mbs, filter, attrs));
     }
 
 
-    public Map<String,List<Map<String,String>>> _discovery(String mbs, String filter, String...attrs) {
+    public Map<String, List<Map<String, String>>> _discovery(String mbs, String filter, String... attrs) {
         return _discovery(QueryDef.NO_NULL_ATTRS, new QueryDef(mbs, filter, attrs));
     }
 
@@ -118,7 +117,6 @@ public class ZabbixLib {
      * Returns zabbix trapper registered as id or null.
      *
      * @param id trapper ID
-     *
      * @return zabbix trapper or null
      */
     public ZabbixTrapper trapper(String id) {
@@ -128,8 +126,9 @@ public class ZabbixLib {
 
     /**
      * Returns zabbix trapper or creates a new one (if not created already)
-     * @param id trapper ID
-     * @param serverAddr server address
+     *
+     * @param id          trapper ID
+     * @param serverAddr  server address
      * @param defaultHost default host name
      * @return zabbix trapper
      */
@@ -138,7 +137,7 @@ public class ZabbixLib {
 
         if (trapper == null) {
             trapper = new ZabbixTrapper(config.formatCfg(serverAddr),
-                                        config.formatCfg(defaultHost), defaultItem);
+                    config.formatCfg(defaultHost), defaultItem);
             trappers.put(id, trapper);
             trapper.start();
         }
@@ -149,6 +148,7 @@ public class ZabbixLib {
 
     /**
      * Stops and removes zabbix trapper
+     *
      * @param id trapper id
      */
     public void remove(String id) {

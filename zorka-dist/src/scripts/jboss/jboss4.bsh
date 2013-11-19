@@ -27,7 +27,7 @@ __jboss4() {
     // Discover EJB3 beans
     discovery() {
       return zabbix.discovery(zorka.query("jboss", "jboss.j2ee:service=EJB3,*", "ear", "jar", "name", "service")
-          .get("InvokeStats").get("Stats").listAs("**", "method"));
+          .get("InvokeStats").get("stats").listAs("**", "method"));
     }
 
     // Returns number of calls of an EJB method
