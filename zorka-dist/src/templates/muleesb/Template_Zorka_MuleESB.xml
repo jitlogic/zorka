@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2012-09-17T19:08:46Z</date>
+    <date>2013-11-19T10:50:09Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template_Zorka_MuleESB_System</template>
-            <name>Template_Zorka_MuleESB_System</name>
+            <template>Template_Zorka_MuleEsb</template>
+            <name>Template_Zorka_MuleEsb</name>
             <groups>
                 <group>
                     <name>Templates</name>

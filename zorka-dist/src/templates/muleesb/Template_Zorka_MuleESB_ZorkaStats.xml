@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2013-11-17T13:16:36Z</date>
+    <date>2013-11-19T10:46:48Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -453,7 +453,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template_Zorka_MuleESB:zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;,
+            <expression>{Template_Zorka_MuleESB_ZorkaStats:zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;,
                 &quot;stats&quot;, &quot;DISPATCHERS&quot;, &quot;time&quot;, &quot;calls&quot;, &quot;AVG5&quot;].last(0)}&gt;{$DISPATCH_TIME}
             </expression>
             <name>{HOST.NAME} average dispatch time too long.</name>
@@ -465,7 +465,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_MuleESB:zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;,
+            <expression>{Template_Zorka_MuleESB_ZorkaStats:zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;,
                 &quot;stats&quot;, &quot;FLOWS&quot;, &quot;time&quot;, &quot;calls&quot;, &quot;AVG5&quot;].last(0)}&gt;{$FLOW_TIME}
             </expression>
             <name>{HOST.NAME} average flow execution time too long.</name>
@@ -477,7 +477,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_MuleESB:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;,
+            <expression>{Template_Zorka_MuleESB_ZorkaStats:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;,
                 &quot;stats&quot;, &quot;DISPATCHERS&quot;, &quot;errors&quot;].last(0)}&gt;0
             </expression>
             <name>{HOST.NAME} dispatch errors detected.</name>
@@ -489,7 +489,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_MuleESB:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;,
+            <expression>{Template_Zorka_MuleESB_ZorkaStats:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;,
                 &quot;stats&quot;, &quot;FLOWS&quot;, &quot;errors&quot;].last(0)}&gt;0
             </expression>
             <name>{HOST.NAME} Flow execution errors detected.</name>
@@ -501,7 +501,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_MuleESB:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;,
+            <expression>{Template_Zorka_MuleESB_ZorkaStats:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;,
                 &quot;stats&quot;, &quot;DISPATCHERS&quot;, &quot;maxTimeCLR&quot;].last(0)}&gt;{$DISPATCH_TIME}
             </expression>
             <name>{HOST.NAME} some dispatch executions are slow.</name>
@@ -513,7 +513,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_MuleESB:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;,
+            <expression>{Template_Zorka_MuleESB_ZorkaStats:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;,
                 &quot;stats&quot;, &quot;FLOWS&quot;, &quot;maxTimeCLR&quot;].last(0)}&gt;{$FLOW_TIME}
             </expression>
             <name>{HOST.NAME} some flow executions are slow.</name>
@@ -552,7 +552,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template_Zorka_MuleESB</host>
+                        <host>Template_Zorka_MuleESB_ZorkaStats</host>
                         <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;, &quot;stats&quot;,
                             &quot;DISPATCHERS&quot;, &quot;time&quot;, &quot;calls&quot;, &quot;AVG5&quot;]
                         </key>
@@ -566,7 +566,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template_Zorka_MuleESB</host>
+                        <host>Template_Zorka_MuleESB_ZorkaStats</host>
                         <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;, &quot;stats&quot;,
                             &quot;DISPATCHERS&quot;, &quot;time&quot;, &quot;calls&quot;, &quot;AVG15&quot;]
                         </key>
@@ -580,7 +580,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template_Zorka_MuleESB</host>
+                        <host>Template_Zorka_MuleESB_ZorkaStats</host>
                         <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;, &quot;stats&quot;,
                             &quot;DISPATCHERS&quot;, &quot;maxTimeCLR&quot;]
                         </key>
@@ -594,7 +594,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template_Zorka_MuleESB</host>
+                        <host>Template_Zorka_MuleESB_ZorkaStats</host>
                         <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;, &quot;stats&quot;,
                             &quot;DISPATCHERS&quot;, &quot;calls&quot;]
                         </key>
@@ -608,7 +608,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template_Zorka_MuleESB</host>
+                        <host>Template_Zorka_MuleESB_ZorkaStats</host>
                         <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;, &quot;stats&quot;,
                             &quot;DISPATCHERS&quot;, &quot;errors&quot;]
                         </key>
@@ -642,7 +642,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template_Zorka_MuleESB</host>
+                        <host>Template_Zorka_MuleESB_ZorkaStats</host>
                         <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;, &quot;stats&quot;,
                             &quot;FLOWS&quot;, &quot;time&quot;, &quot;calls&quot;, &quot;AVG5&quot;]
                         </key>
@@ -656,7 +656,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template_Zorka_MuleESB</host>
+                        <host>Template_Zorka_MuleESB_ZorkaStats</host>
                         <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;, &quot;stats&quot;,
                             &quot;FLOWS&quot;, &quot;time&quot;, &quot;calls&quot;, &quot;AVG15&quot;]
                         </key>
@@ -670,7 +670,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template_Zorka_MuleESB</host>
+                        <host>Template_Zorka_MuleESB_ZorkaStats</host>
                         <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;, &quot;stats&quot;,
                             &quot;FLOWS&quot;, &quot;maxTimeCLR&quot;]
                         </key>
@@ -684,7 +684,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template_Zorka_MuleESB</host>
+                        <host>Template_Zorka_MuleESB_ZorkaStats</host>
                         <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;, &quot;stats&quot;,
                             &quot;FLOWS&quot;, &quot;calls&quot;]
                         </key>
@@ -698,7 +698,7 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template_Zorka_MuleESB</host>
+                        <host>Template_Zorka_MuleESB_ZorkaStats</host>
                         <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=MuleStats&quot;, &quot;stats&quot;,
                             &quot;FLOWS&quot;, &quot;errors&quot;]
                         </key>
