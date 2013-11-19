@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2012-09-12T19:25:32Z</date>
+    <date>2013-11-19T12:16:51Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -28,7 +28,9 @@
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix.discovery[&quot;java&quot;, &quot;Catalina:type=ThreadPool,*&quot;, &quot;name&quot;]</key>
+                    <key>zabbix.discovery[&quot;java&quot;, &quot;Catalina:type=ThreadPool,*&quot;, &quot;type&quot;,
+                        &quot;name&quot;]
+                    </key>
                     <delay>3600</delay>
                     <status>0</status>
                     <allowed_hosts/>
@@ -50,12 +52,12 @@
                     <description/>
                     <item_prototypes>
                         <item_prototype>
-                            <name>{#NAME} connection count</name>
+                            <name>{#NAME} thread count</name>
                             <type>0</type>
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;java&quot;, &quot;Catalina:type=ThreadPool,name={#NAME}&quot;, &quot;connectionCount&quot;]</key>
+                            <key>zorka.jmx[&quot;java&quot;, &quot;Catalina:type=ThreadPool,name={#NAME}&quot;, &quot;currentThreadCount&quot;]</key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -89,13 +91,13 @@
                             <valuemap/>
                         </item_prototype>
                         <item_prototype>
-                            <name>{#NAME} thread count</name>
+                            <name>{#NAME} thread max</name>
                             <type>0</type>
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;java&quot;, &quot;Catalina:type=ThreadPool,name={#NAME}&quot;, &quot;currentThreadCount&quot;]</key>
-                            <delay>60</delay>
+                            <key>zorka.jmx[&quot;java&quot;, &quot;Catalina:type=ThreadPool,name={#NAME}&quot;, &quot;maxThreads&quot;]</key>
+                            <delay>3600</delay>
                             <history>10</history>
                             <trends>365</trends>
                             <status>0</status>
@@ -206,7 +208,21 @@
                             <valuemap/>
                         </item_prototype>
                     </item_prototypes>
-                    <trigger_prototypes/>
+                    <trigger_prototypes>
+                        <trigger_prototype>
+                            <expression>100.0*{Template_Zorka_Tomcat_ThreadPools:zorka.jmx[&quot;java&quot;, &quot;Catalina:type=ThreadPool,name={#NAME}&quot;,
+                                &quot;currentThreadsBusy&quot;].last(0)}=0 /
+                                {Template_Zorka_Tomcat_ThreadPools:zorka.jmx[&quot;java&quot;, &quot;Catalina:type=ThreadPool,name={#NAME}&quot;,
+                                &quot;maxThreads&quot;].last(0)}=0 &gt; 90.0
+                            </expression>
+                            <name>{HOST.NAME} Too many {#NAME} threads busy.</name>
+                            <url/>
+                            <status>0</status>
+                            <priority>2</priority>
+                            <description/>
+                            <type>0</type>
+                        </trigger_prototype>
+                    </trigger_prototypes>
                     <graph_prototypes/>
                 </discovery_rule>
             </discovery_rules>
