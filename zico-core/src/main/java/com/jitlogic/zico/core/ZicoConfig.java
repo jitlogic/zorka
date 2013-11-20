@@ -16,6 +16,7 @@
 package com.jitlogic.zico.core;
 
 
+import com.jitlogic.zico.core.rds.RAGZOutputStream;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
@@ -46,5 +47,7 @@ public class ZicoConfig extends ZorkaConfig {
         if (!properties.containsKey("zico.data.dir")) {
             properties.put("zico.data.dir", ZorkaUtil.path(homeDir, "data"));
         }
+
+        RAGZOutputStream.useLock(boolCfg("rds.lock", true));
     }
 }

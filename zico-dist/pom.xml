@@ -39,6 +39,8 @@
                                       toDir="${project.build.outputDirectory}/zico-${project.version}"/>
                                 <copy file="src/zico.sh"
                                       toDir="${project.build.outputDirectory}/zico-${project.version}"/>
+                                <copy file="src/zico.cmd"
+                                      toDir="${project.build.outputDirectory}/zico-${project.version}"/>
                                 <copy file="src/users.properties"
                                       toDir="${project.build.outputDirectory}/zico-${project.version}"/>
                                 <copy file="src/zico.init"

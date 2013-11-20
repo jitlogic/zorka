@@ -36,6 +36,12 @@ public class RAGZOutputStream extends OutputStream {
 
     public final static long DEFAULT_SEGSZ = 1048576;
 
+    private static boolean useLock = true;
+
+    public static void useLock(boolean _useLock) {
+        useLock = _useLock;
+    }
+
     public static RAGZOutputStream toFile(String path) throws IOException {
         return toFile(path, DEFAULT_SEGSZ);
     }
@@ -51,7 +57,7 @@ public class RAGZOutputStream extends OutputStream {
     private long maxSegSize;
 
     private RandomAccessFile outFile;
-    private FileLock outLock;
+    private FileLock outLock = null;
 
     private long curSegSize = -1;  // Current segment size (uncompressed)
     private long curSegStart = 0;  // Current segment start position (physical - in file); gzip header starts at this position;
@@ -66,7 +72,9 @@ public class RAGZOutputStream extends OutputStream {
         this.outFile = outFile;
         this.maxSegSize = maxSegSize;
 
-        outLock = this.outFile.getChannel().tryLock();
+        if (useLock) {
+            outLock = this.outFile.getChannel().tryLock();
+        }
 
         reopenSegment(outFile);
     }
@@ -106,7 +114,9 @@ public class RAGZOutputStream extends OutputStream {
     @Override
     public void close() throws IOException {
         finishSegment();
-        outLock.release();
+        if (outLock != null) {
+            outLock.release();
+        }
         outFile.close();
     }
 
