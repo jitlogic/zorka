@@ -37,7 +37,7 @@ public class ErrorDetailView extends JPanel {
     }
 
     private void createUI() {
-        setBorder(new EmptyBorder(3,3,3,3));
+        setBorder(new EmptyBorder(3, 3, 3, 3));
         setLayout(new BorderLayout(0, 0));
 
         splitPane = new JSplitPane();
@@ -45,7 +45,7 @@ public class ErrorDetailView extends JPanel {
         add(splitPane, BorderLayout.CENTER);
 
         JPanel attributePanel = new JPanel();
-        attributePanel.setLayout(new BorderLayout(0,0));
+        attributePanel.setLayout(new BorderLayout(0, 0));
         attributeDisplay = new JTextArea();
         attributeDisplay.setEditable(false);
         attributeDisplay.setLineWrap(true);
@@ -58,7 +58,7 @@ public class ErrorDetailView extends JPanel {
         splitPane.setTopComponent(attributePanel);
 
         JPanel exceptionPanel = new JPanel();
-        exceptionPanel.setLayout(new BorderLayout(0,0));
+        exceptionPanel.setLayout(new BorderLayout(0, 0));
         exceptionDisplay = new JTextArea();
         exceptionDisplay.setEditable(false);
         JScrollPane scrExceptionDisplay = new JScrollPane();
@@ -88,8 +88,8 @@ public class ErrorDetailView extends JPanel {
         mdesc.append(record.prettyPrint() + "\n\n");
 
         if (record.numAttrs() > 0) {
-            for (Map.Entry<?,Object> e : record.getAttrs().entrySet()) {
-                mdesc.append(record.sym((Long)e.getKey()) + "=" + e.getValue() + "\n");
+            for (Map.Entry<?, Object> e : record.getAttrs().entrySet()) {
+                mdesc.append(record.sym((Integer) e.getKey()) + "=" + e.getValue() + "\n");
             }
         }
 
@@ -99,9 +99,9 @@ public class ErrorDetailView extends JPanel {
 
     private SymbolicException findException(ViewerTraceRecord record) {
         if (record.getException() != null) {
-            return (SymbolicException)record.getException();
+            return (SymbolicException) record.getException();
         } else if (0 != (record.getFlags() & ViewerTraceRecord.EXCEPTION_PASS) && record.numChildren() > 0) {
-            return findException((ViewerTraceRecord)record.getChild(record.numChildren()-1));
+            return findException((ViewerTraceRecord) record.getChild(record.numChildren() - 1));
         } else {
             return null;
         }
@@ -113,9 +113,9 @@ public class ErrorDetailView extends JPanel {
 
         if (0 != (record.getFlags() & ViewerTraceRecord.EXCEPTION_WRAP) && record.numChildren() > 0) {
             // Identify cause of wrapped exception)
-            ViewerTraceRecord child = (ViewerTraceRecord)record.getChild(record.numChildren()-1);
+            ViewerTraceRecord child = (ViewerTraceRecord) record.getChild(record.numChildren() - 1);
             if (child.getException() != null) {
-                cause = ((SymbolicException)child.getException()).getCause();
+                cause = ((SymbolicException) child.getException()).getCause();
             } else {
                 return findCause(child);
             }

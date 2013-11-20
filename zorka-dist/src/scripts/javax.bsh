@@ -26,6 +26,7 @@ if (zorka.boolCfg("tracer")) {
         "com.sun.el.**",
         "com.sun.naming.internal.**",
 
+        "javax.activation.**",
         "javax.crypto.**",
         "javax.el.**",
         "javax.enterprise.util.**",

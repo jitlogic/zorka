@@ -1,3 +1,25 @@
+Zorka 0.9.12 (2013-11-20)
+-------------------------
+
+ * agent: websphere support (HTTP, EJB3 tracing, PMI access, rudimentary PMI templates for zabbix);
+ * agent: MuleESB support (tracing flows, dispatchers,flow components, maintaining ZorkaStats, zabbix templates etc.);
+ * agent: LDAP monitoring (tracing LDAP searches, maintaining ZorkaStats);
+ * agent: improve HTTP tracing (headers, cookies, redirections);
+ * agent: revive and extend zabbix templates for JBoss, Tomcat etc.
+ * agent: improve ZICO performance with bulk ZICO transfers;
+ * agent: prioritized class/method matchers;
+ * agent: `zorka.require()` function to include scripts from other scripts;
+ * agent: get rid of profiles, rework scripts to be included directly from `zorka.properties`;
+ * agent: tracer tuning embedded directly in agent scripts (no need for manual tuning for every new application);
+ * agent: instrumentation engine statistics: time spent on matching, instrumentation etc. (available as ZorkaStats);
+ * agent: throughput monitoring implemented in ZorkaStats;
+ * collector: asynchronous DB writer for TRACES table to eliminate lags caused by MySQL hiccups;
+ * collector: admin and viewer roles for collector;
+ * collector: option to disable/enable collection from particular hosts available from UI;
+ * collector: case-insensitive search in trace detail panel (full-text only for now);
+ * lots of small fixes;
+
+
 Zorka 0.9.11 (2013-10-21)
 -------------------------
 

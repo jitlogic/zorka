@@ -59,10 +59,10 @@ public class MethodCellRenderer extends JLabel implements TableCellRenderer {
                 setBackground(UIManager.getColor("Table.focusCellBackground"));
             }
         } else {
-            setBorder(new EmptyBorder(1,2,1,2));
+            setBorder(new EmptyBorder(1, 2, 1, 2));
         }
 
-        record = (ViewerTraceRecord)value;
+        record = (ViewerTraceRecord) value;
 
         setSize(new Dimension(table.getTableHeader().getColumnModel().getColumn(column).getWidth(), 1000));
 
@@ -74,7 +74,6 @@ public class MethodCellRenderer extends JLabel implements TableCellRenderer {
 
         return this;
     }
-
 
     public void paint(Graphics g) {
 
@@ -91,7 +90,7 @@ public class MethodCellRenderer extends JLabel implements TableCellRenderer {
             g.drawImage(icon.getImage(), offs - 14, 2, null);
         }
 
-        Graphics2D g2 = (Graphics2D)g;
+        Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g.setFont(record.hasFlag(ViewerTraceRecord.TRACE_BEGIN) ? getFont().deriveFont(Font.BOLD) : getFont());
         g.setColor(record.hasError() ? Color.RED : Color.BLACK);
@@ -101,8 +100,8 @@ public class MethodCellRenderer extends JLabel implements TableCellRenderer {
             int line = 1;
             g.setFont(getFont().deriveFont(Font.BOLD));
             g.setColor(Color.BLUE);
-            for (Map.Entry<?,?> e : record.getAttrs().entrySet()) {
-                g.drawString(record.sym((Long)e.getKey()) + "=" + e.getValue(), offs + 8, 13 + line*16);
+            for (Map.Entry<?, ?> e : record.getAttrs().entrySet()) {
+                g.drawString(record.sym((Integer) e.getKey()) + "=" + e.getValue(), offs + 8, 13 + line * 16);
                 line++;
             }
         }

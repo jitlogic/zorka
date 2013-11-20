@@ -16,8 +16,12 @@
  */
 
 zorka.require(
-  "jvm.bsh", 
-  "tracer.bsh"
+  "jvm.bsh",
+  "javax.bsh",
+  "libs.bsh",
+  "tracer.bsh",
+  "apache/apache.bsh",
+  "spring/spring.bsh"
 );
 
 __muleesb() {
@@ -175,6 +179,19 @@ __muleesb() {
 
     // org.mule.execution.EndProcessPhase
     // org.mule.execution.ValidationPhase
+
+    if (zorka.boolCfg("mule.trace")) {
+        tracer.exclude(
+            "org.mule.DefaultMuleMessage",
+            "org.mule.api.transport.PropertyScope$ScopeComparator",
+            "org.mule.MessagePropertiesContext",
+            "org.mule.el.**",
+            "org.mule.launcher.FineGrainedControlClassLoader",
+            "org.mule.context.notification.ServerNotificationManager/isNotificationEnabled",
+            "org.mule.module.logging.**",
+            "org.mule.util.annotation.**"
+        );
+    }
 
     jvm.autoregister();
 

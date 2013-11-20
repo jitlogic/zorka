@@ -36,6 +36,7 @@
 
 zorka.require(
   "javax.bsh",
+  "ldap.bsh",
   "tracer.bsh",
   "jboss/hibernate.bsh",
   "spring/spring.bsh"
