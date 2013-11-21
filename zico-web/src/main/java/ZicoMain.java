@@ -79,7 +79,7 @@ public class ZicoMain {
 
         Constraint constraint = new Constraint();
         constraint.setName(Constraint.__FORM_AUTH);
-        constraint.setRoles(new String[]{"OPER"});
+        constraint.setRoles(new String[]{"VIEWER"});
         constraint.setAuthenticate(true);
 
         ConstraintMapping mapping = new ConstraintMapping();

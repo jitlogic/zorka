@@ -19,14 +19,14 @@ zorka.require("sql.bsh");
 
 __oracle() {
 
-  spy.add(sql._instrumentStmt("ORACLE_OJDBC6_1", "${THIS.connection.database}")
+  spy.add(sql._instrumentStmt("ORACLE_OJDBC6_1", "${THIS.connection.metaData.URL}")
     .include(
       spy.byMethod(0, "oracle.jdbc.driver.OracleStatement", "execute*", null, "String")));
 
-  spy.add(sql._instrumentPStmt("ORACLE_OJDBC6_2", "${THIS.connection.database}", "${THIS.originalSql}")
+  spy.add(sql._instrumentPStmt("ORACLE_OJDBC6_2", "${THIS.connection.metaData.URL}", "${THIS.originalSql}")
     .include(
-      spy.byMethod(0, "oracle.jdbc.driver.OraclePreparedStatement", "execute*", null, spy.SM_NOARGS),
-      spy.byMethod(0, "oracle.jdbc.driver.OracleCallableStatement", "execute*", null, spy.SM_NOARGS)));
+      spy.byMethod(0, "oracle.jdbc.driver.OraclePreparedStatement", "~execute[^I].*", null, spy.SM_NOARGS),
+      spy.byMethod(0, "oracle.jdbc.driver.OracleCallableStatement", "~execute[^I].*", null, spy.SM_NOARGS)));
 
   if (zorka.boolCfg("tracer")) {
       tracer.exclude("oracle.jdbc.**");

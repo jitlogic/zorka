@@ -31,7 +31,7 @@ __tomcat() {
     tmax  = zorka.jmx("java", "Catalina:type=ThreadPool,name="+name, "maxThreads");
     if (tbusy == null || tmax == null) return null;
     if (tbusy.equals(0L) || tmax.equals(0L)) return 0.0;
-    return 100 * tbusy.longValue() / tmax.longValue();
+    return 100.0 * tbusy.longValue() / tmax.longValue();
   }
 
   // Servlets
@@ -39,7 +39,7 @@ __tomcat() {
 
     discovery() {
       return zabbix.discovery("java", "Catalina:j2eeType=Servlet,*", 
-          "name", "WebModule", "J2EEApplication", "J2EEServer");
+          "j2eeType", "name", "WebModule", "J2EEApplication", "J2EEServer");
     }
 
     // Request count
@@ -76,19 +76,19 @@ __tomcat() {
   __jsp() {
 
     discovery() {
-      return zabbix.discovery("java", "Catalina:j2eeType=JspMonitor,*", 
-          "name", "WebModule", "J2EEApplication", "J2EEServer");
+      return zabbix.discovery("java", "Catalina:type=JspMonitor,*",
+          "type", "name", "WebModule", "J2EEApplication", "J2EEServer");
     }
 
     // Pages
     count(server,application,module,name) {
-      return zorka.jmx("java", "Catalina:j2eeType=JspMonitor,J2EEServer="+server+
+      return zorka.jmx("java", "Catalina:type=JspMonitor,J2EEServer="+server+
         ",J2EEApplication="+application+",WebModule="+module+",name="+name, "jspCount");
     }
 
     // Reloads
     reloads(server,application,module,name) {
-      return zorka.jmx("java", "Catalina:j2eeType=JspMonitor,J2EEServer="+server+
+      return zorka.jmx("java", "Catalina:type=JspMonitor,J2EEServer="+server+
         ",J2EEApplication="+application+",WebModule="+module+",name="+name, "jspReloadCount");
     }
 

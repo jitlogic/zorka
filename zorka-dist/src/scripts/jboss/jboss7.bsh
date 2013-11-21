@@ -35,7 +35,7 @@ __jboss7() {
   __servlets() {
 
     discovery() {
-      return zabbix.discovery("java", "jboss.as:subsystem=web,*", "deployment", "servlet");
+      return zabbix.discovery("java", "jboss.as:subsystem=web,*", "subsystem", "deployment", "servlet");
     }
 
     requests(deployment,servlet) {
@@ -55,7 +55,7 @@ __jboss7() {
   __sessions() {
 
     discovery() {
-      return zabbix.discovery("java", "jboss.as:subsystem=web,deployment=*", "deployment");
+      return zabbix.discovery("java", "jboss.as:subsystem=web,deployment=*", "subsystem", "deployment");
     }
 
     stat(deployment, attr) {
@@ -70,7 +70,7 @@ __jboss7() {
     // Basic data source statistics
     __datasources() {
         discovery() {
-            return zabbix.discovery("java", "jboss.as:subsystem=datasources,data-source=*", "data-source");
+            return zabbix.discovery("java", "jboss.as:subsystem=datasources,data-source=*", "subsystem", "data-source");
         }
 
         url(datasource) {
@@ -92,7 +92,7 @@ __jboss7() {
   __ejb3() {
 
     discovery(component) {
-      return zabbix.discovery("java", "jboss.as:subsystem=ejb3,*", "deployment", "stateless-session-bean");
+      return zabbix.discovery("java", "jboss.as:subsystem=ejb3,*", "subsystem", "deployment", "stateless-session-bean");
     }
 
     slsb(deployment, bean, attr) {
@@ -119,7 +119,7 @@ __jboss7() {
   __jpa() {
 
     discovery(component) {
-      return zabbix.discovery("java", "jboss.as:subsystem=jpa,*", "deployment", "hibernate-persistence-unit");
+      return zabbix.discovery("java", "jboss.as:subsystem=jpa,*", "subsystem", "deployment", "hibernate-persistence-unit");
     }
 
     hpu(deployment, unit, attr) {

@@ -26,10 +26,12 @@ if (zorka.boolCfg("tracer")) {
     tracer.exclude(
       "org.aspectj.**",
       "org.springframework.aop.**",
+      "org.springframework.asm.**",
       "org.springframework.beans.**",
       "org.springframework.binding.**",
       "org.springframework.core.**",
       "org.springframework.context.**",
+      "org.springframework.expression.**",
       "org.springframework.orm.**",
       "org.springframework.util.**",
       "org.springframework.web.context.**",

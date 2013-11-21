@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2012-09-08T14:22:11Z</date>
+    <date>2013-11-19T19:38:34Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -28,7 +28,7 @@
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>jboss.jca.discovery[]</key>
+                    <key>jboss4.jca.discovery[]</key>
                     <delay>60</delay>
                     <status>0</status>
                     <allowed_hosts/>
@@ -55,7 +55,9 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>jboss.jca.use_time[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;, &quot;AVG5&quot;]</key>
+                            <key>jboss4.jca.use_time[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;,
+                                &quot;AVG5&quot;]
+                            </key>
                             <delay>55</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -94,7 +96,9 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>jboss.jca.use_time[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;, &quot;AVG15&quot;]</key>
+                            <key>jboss4.jca.use_time[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;,
+                                &quot;AVG15&quot;]
+                            </key>
                             <delay>55</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -133,7 +137,9 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>jboss.jca.wait_time[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;, &quot;AVG5&quot;]</key>
+                            <key>jboss4.jca.wait_time[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;,
+                                &quot;AVG5&quot;]
+                            </key>
                             <delay>55</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -172,7 +178,9 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>jboss.jca.wait_time[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;, &quot;AVG15&quot;]</key>
+                            <key>jboss4.jca.wait_time[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;,
+                                &quot;AVG15&quot;]
+                            </key>
                             <delay>55</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -211,7 +219,9 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>jboss.jca.conn_closed[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;]</key>
+                            <key>jboss4.jca.conn_closed[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;,
+                                &quot;{#NAME}&quot;]
+                            </key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -250,7 +260,9 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>jboss.jca.conn_created[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;]</key>
+                            <key>jboss4.jca.conn_created[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;,
+                                &quot;{#NAME}&quot;]
+                            </key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -289,7 +301,7 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>jboss.jca.free_size[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;]</key>
+                            <key>jboss4.jca.free_size[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;]</key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -328,7 +340,7 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>jboss.jca.pool_size[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;]</key>
+                            <key>jboss4.jca.pool_size[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;]</key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -367,7 +379,7 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>jboss.jca.use_count[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;]</key>
+                            <key>jboss4.jca.use_count[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;]</key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -406,7 +418,7 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>jboss.jca.wait_count[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;]</key>
+                            <key>jboss4.jca.wait_count[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;]</key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -442,7 +454,9 @@
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Template_Zorka_JBoss4_JCA:jboss.jca.wait_count[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;].last(0)}&gt;10</expression>
+                            <expression>{Template_Zorka_JBoss4_JCA:jboss4.jca.wait_count[&quot;{#J2EESERVER}&quot;,
+                                &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;].last(0)}&gt;10
+                            </expression>
                             <name>{HOST.NAME}/{#NAME} has too many waiting threads.</name>
                             <url/>
                             <status>0</status>
@@ -451,7 +465,9 @@
                             <type>0</type>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template_Zorka_JBoss4_JCA:jboss.jca.wait_time[&quot;{#J2EESERVER}&quot;, &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;, &quot;AVG5&quot;].last(0)}&gt;3</expression>
+                            <expression>{Template_Zorka_JBoss4_JCA:jboss4.jca.wait_time[&quot;{#J2EESERVER}&quot;,
+                                &quot;{#RESOURCEADAPTER}&quot;, &quot;{#NAME}&quot;, &quot;AVG5&quot;].last(0)}&gt;3
+                            </expression>
                             <name>{HOST.NAME}/{#NAME} threads are waiting too long for connections.</name>
                             <url/>
                             <status>0</status>

@@ -52,6 +52,18 @@ public class ZabbixDiscoveryUnitTest extends ZorkaFixture {
 
 
     @Test
+    public void testSimpleDiscoveryWithIncorrectAttributeNamesThatShouldNotCauseNPE() throws Exception {
+        makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
+        makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);
+
+        Map<String, List<Map<String, String>>> obj = zabbixLib._discovery("test", "test:type=TestJmx,*", "bad", "type");
+
+        assertTrue("Must return object", obj != null);
+        assertTrue("Must return more than 1 item", obj.get("data").size() == 0);
+    }
+
+
+    @Test
     public void testSimpleDiscoveryAsJsonString() throws Exception {
         makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
         makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);

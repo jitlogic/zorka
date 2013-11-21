@@ -16,8 +16,12 @@
  */
 
 zorka.require(
-  "jvm.bsh", 
-  "tracer.bsh"
+  "jvm.bsh",
+  "javax.bsh",
+  "libs.bsh",
+  "tracer.bsh",
+  "apache/apache.bsh",
+  "spring/spring.bsh"
 );
 
 __muleesb() {
@@ -29,23 +33,11 @@ __muleesb() {
     zorka.defCfg("mule.dispatch.time", zorka.longCfg("tracer.min.trace.time"));
 
     zorka.defCfg("mule.stats", "yes");
-    zorka.defCfg("mule.stats.mbean", "mule:type=ZorkaStats,name=MuleStats");
+    zorka.defCfg("mule.stats.mbean", "zorka:type=ZorkaStats,name=MuleStats");
 
     _trace = zorka.boolCfg("mule.trace");
     _stats = zorka.boolCfg("mule.stats");
     _mbean = zorka.stringCfg("mule.stats.mbean");
-
-//    spy.add(spy.instance("MULE_TEST1")
-//        .onEnter(tracer.begin("HTTP", 0))
-//        .include(spy.byMethod(0, "~.*HttpWorker$", "doRequest", null)));
-
-//    spy.add(spy.instrument("MULE_TEST2")
-//        .onEnter(spy.zorkaLog("INFO", "Mule", "runPhase() executed."), show_stack())
-//        .include(spy.byMethod("org.mule.execution.FlowProcessingPhase", "runPhase")));
-
-//    spy.add(spy.instrument("MULE_TEST3")
-//        .onEnter(tracer.begin("WORK", 0))
-//        .include(spy.byMethod("org.mule.work.WorkerContext", "run")));
 
 
     extract_annotations() {
@@ -86,7 +78,6 @@ __muleesb() {
             ) : null)
         .onSubmit(
             _stats ? spy.subchain(
-                spy.zorkaStats("java", _mbean, "stats", "ALL"),
                 spy.zorkaStats("java", _mbean, "stats", "COMPONENTS"),
                 spy.zorkaStats("java", _mbean, "components", "${APPLICATION}:${FLOW}.${NAME}")
             ) : null)
@@ -108,7 +99,6 @@ __muleesb() {
             ) : null)
         .onSubmit(
             _stats ? spy.subchain(
-                spy.zorkaStats("java", _mbean, "stats", "ALL"),
                 spy.zorkaStats("java", _mbean, "stats", "TRANSFORMERS"),
                 spy.zorkaStats("java", _mbean, "transformers", "${CLASS}")
             ) : null)
@@ -133,7 +123,6 @@ __muleesb() {
             ) : null)
         .onSubmit(
             _stats ? spy.subchain(
-                spy.zorkaStats("java", _mbean, "stats", "ALL"),
                 spy.zorkaStats("java", _mbean, "stats", "FILTERS"),
                 spy.zorkaStats("java", _mbean, "filters", "${CLASS}")
             ) : null)
@@ -160,7 +149,6 @@ __muleesb() {
             ) : null)
         .onSubmit(
             _stats ? spy.subchain(
-                spy.zorkaStats("java", _mbean, "stats", "ALL"),
                 spy.zorkaStats("java", _mbean, "stats", "DISPATCHERS"),
                 spy.zorkaStats("java", _mbean, "dispatchers", "${APPLICATION}:${FLOW}.${NAME}")
             ) : null)
@@ -184,7 +172,6 @@ __muleesb() {
             ) : null)
         .onSubmit(
             _stats ? spy.subchain(
-                spy.zorkaStats("java", _mbean, "stats", "ALL"),
                 spy.zorkaStats("java", _mbean, "stats", "FLOWS"),
                 spy.zorkaStats("java", _mbean, "flows", "${APPLICATION}:${FLOW}")
             ) : null)
@@ -192,6 +179,19 @@ __muleesb() {
 
     // org.mule.execution.EndProcessPhase
     // org.mule.execution.ValidationPhase
+
+    if (zorka.boolCfg("mule.trace")) {
+        tracer.exclude(
+            "org.mule.DefaultMuleMessage",
+            "org.mule.api.transport.PropertyScope$ScopeComparator",
+            "org.mule.MessagePropertiesContext",
+            "org.mule.el.**",
+            "org.mule.launcher.FineGrainedControlClassLoader",
+            "org.mule.context.notification.ServerNotificationManager/isNotificationEnabled",
+            "org.mule.module.logging.**",
+            "org.mule.util.annotation.**"
+        );
+    }
 
     jvm.autoregister();
 

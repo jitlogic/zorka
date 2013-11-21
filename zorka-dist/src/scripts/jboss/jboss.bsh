@@ -30,6 +30,14 @@ zorka.require(
 
 __jboss() {
 
+  thread_util(name) {
+    tbusy = zorka.jmx("jboss", "jboss.web:type=ThreadPool,name="+name, "currentThreadsBusy");
+    tmax  = zorka.jmx("jboss", "jboss.web:type=ThreadPool,name="+name, "maxThreads");
+    if (tbusy == null || tmax == null) return null;
+    if (tbusy.equals(0L) || tmax.equals(0L)) return 0.0;
+    return 100.0 * tbusy.longValue() / tmax.longValue();
+  }
+
   // Servlets
   __servlet() {
 

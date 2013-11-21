@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2012-09-08T15:10:31Z</date>
+    <date>2013-11-19T10:51:14Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template_Zorka_JBoss_MQ</template>
-            <name>Template_Zorka_JBoss_MQ</name>
+            <template>Template_Zorka_WebSphere_ThreadPools</template>
+            <name>Template_Zorka_WebSphere_ThreadPools</name>
             <groups>
                 <group>
                     <name>Templates</name>
@@ -18,18 +18,21 @@
             </groups>
             <applications>
                 <application>
-                    <name>JBoss Queues</name>
+                    <name>WebSphere Thread Pools</name>
                 </application>
             </applications>
             <items/>
             <discovery_rules>
                 <discovery_rule>
-                    <name>JBoss Queues</name>
+                    <name>WebSphere Thread Pools</name>
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix.discovery[&quot;jboss&quot;, &quot;jboss.mq.destination:service=Queue,*&quot;, &quot;name&quot;]</key>
-                    <delay>60</delay>
+                    <key>zabbix.discovery[&quot;pmi&quot;, &quot;WebSphere:type=ThreadPool,*&quot;, &quot;name&quot;,
+                        &quot;process&quot;, &quot;platform&quot;, &quot;node&quot;, &quot;version&quot;, &quot;type&quot;,
+                        &quot;mbeanIdentifier&quot;, &quot;cell&quot;, &quot;spec&quot;]
+                    </key>
+                    <delay>1800</delay>
                     <status>0</status>
                     <allowed_hosts/>
                     <snmpv3_securityname/>
@@ -46,23 +49,25 @@
                     <privatekey/>
                     <port/>
                     <filter>:</filter>
-                    <lifetime>30</lifetime>
+                    <lifetime>10</lifetime>
                     <description/>
                     <item_prototypes>
                         <item_prototype>
-                            <name>{#NAME} depth</name>
+                            <name>Thread pool {#NAME} active threads</name>
                             <type>0</type>
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;jboss&quot;, &quot;jboss.mq.destination:service=Queue,name={#NAME}&quot;, &quot;MessageStatistics&quot;, &quot;0&quot;, &quot;depth&quot;]</key>
+                            <key>zorka.jmx[&quot;pmi&quot;, &quot;WebSphere:type=ThreadPool,name={#NAME},*&quot;, &quot;stats&quot;,
+                                &quot;ActiveCount&quot;, &quot;current&quot;]
+                            </key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
                             <status>0</status>
                             <value_type>3</value_type>
                             <allowed_hosts/>
-                            <units/>
+                            <units>threads</units>
                             <delta>0</delta>
                             <snmpv3_securityname/>
                             <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -83,31 +88,33 @@
                             <inventory_link>0</inventory_link>
                             <applications>
                                 <application>
-                                    <name>JBoss Queues</name>
+                                    <name>WebSphere Thread Pools</name>
                                 </application>
                             </applications>
                             <valuemap/>
                         </item_prototype>
                         <item_prototype>
-                            <name>{#NAME} messages processed</name>
+                            <name>Thread pool {#NAME} max threads</name>
                             <type>0</type>
                             <snmp_community/>
-                            <multiplier>1</multiplier>
+                            <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;jboss&quot;, &quot;jboss.mq.destination:service=Queue,name={#NAME}&quot;, &quot;MessageStatistics&quot;, &quot;0&quot;, &quot;count&quot;]</key>
+                            <key>zorka.jmx[&quot;pmi&quot;, &quot;WebSphere:type=ThreadPool,name={#NAME},*&quot;, &quot;stats&quot;,
+                                &quot;PoolSize&quot;, &quot;current&quot;]
+                            </key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
                             <status>0</status>
-                            <value_type>0</value_type>
+                            <value_type>3</value_type>
                             <allowed_hosts/>
-                            <units>msg/min</units>
-                            <delta>1</delta>
+                            <units>threads</units>
+                            <delta>0</delta>
                             <snmpv3_securityname/>
                             <snmpv3_securitylevel>0</snmpv3_securitylevel>
                             <snmpv3_authpassphrase/>
                             <snmpv3_privpassphrase/>
-                            <formula>60</formula>
+                            <formula>1</formula>
                             <delay_flex/>
                             <params/>
                             <ipmi_sensor/>
@@ -122,13 +129,27 @@
                             <inventory_link>0</inventory_link>
                             <applications>
                                 <application>
-                                    <name>JBoss Queues</name>
+                                    <name>WebSphere Thread Pools</name>
                                 </application>
                             </applications>
                             <valuemap/>
                         </item_prototype>
                     </item_prototypes>
-                    <trigger_prototypes/>
+                    <trigger_prototypes>
+                        <trigger_prototype>
+                            <expression>{Template_Zorka_WebSphere_ThreadPools:zorka.jmx[&quot;pmi&quot;, &quot;WebSphere:type=ThreadPool,name={#NAME},*&quot;,
+                                &quot;stats&quot;, &quot;ActiveCount&quot;, &quot;current&quot;].last(0)}={Template_Zorka_WebSphere_ThreadPools:zorka.jmx[&quot;pmi&quot;,
+                                &quot;WebSphere:type=ThreadPool,name={#NAME},*&quot;, &quot;stats&quot;, &quot;PoolSize&quot;,
+                                &quot;current&quot;].last(0)}
+                            </expression>
+                            <name>{HOST.NAME}: {#NAME} thread pool is full</name>
+                            <url/>
+                            <status>0</status>
+                            <priority>2</priority>
+                            <description/>
+                            <type>0</type>
+                        </trigger_prototype>
+                    </trigger_prototypes>
                     <graph_prototypes/>
                 </discovery_rule>
             </discovery_rules>

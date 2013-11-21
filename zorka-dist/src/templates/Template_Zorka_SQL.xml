@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2013-11-19T19:46:22Z</date>
+    <date>2013-11-19T10:42:41Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template_Zorka_EJB</template>
-            <name>Template_Zorka_EJB</name>
+            <template>Template_Zorka_SQL</template>
+            <name>Template_Zorka_SQL</name>
             <groups>
                 <group>
                     <name>Templates</name>
@@ -18,17 +18,17 @@
             </groups>
             <applications>
                 <application>
-                    <name>EJB calls</name>
+                    <name>SQL statistics</name>
                 </application>
             </applications>
             <items>
                 <item>
-                    <name>EJB average execution time (AVG5)</name>
+                    <name>SQL average handling time (AVG5)</name>
                     <type>0</type>
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>ejb.avg5[&quot;stats&quot;, &quot;ALL&quot;]</key>
+                    <key>sql.avg5[&quot;stats&quot;, &quot;ALL&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -56,18 +56,18 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>EJB calls</name>
+                            <name>SQL statistics</name>
                         </application>
                     </applications>
                     <valuemap/>
                 </item>
                 <item>
-                    <name>EJB average execution time (AVG15)</name>
+                    <name>SQL average handling time (AVG15)</name>
                     <type>0</type>
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>ejb.avg15[&quot;stats&quot;, &quot;ALL&quot;]</key>
+                    <key>sql.avg15[&quot;stats&quot;, &quot;ALL&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -95,25 +95,25 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>EJB calls</name>
+                            <name>SQL statistics</name>
                         </application>
                     </applications>
                     <valuemap/>
                 </item>
                 <item>
-                    <name>EJB calls per minute</name>
+                    <name>SQL errors per minute</name>
                     <type>0</type>
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>ejb.calls[&quot;stats&quot;, &quot;ALL&quot;]</key>
+                    <key>sql.errors[&quot;stats&quot;, &quot;ALL&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
                     <status>0</status>
                     <value_type>0</value_type>
                     <allowed_hosts/>
-                    <units>calls/min</units>
+                    <units>qry/min</units>
                     <delta>1</delta>
                     <snmpv3_securityname/>
                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -134,18 +134,18 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>EJB calls</name>
+                            <name>SQL statistics</name>
                         </application>
                     </applications>
                     <valuemap/>
                 </item>
                 <item>
-                    <name>EJB peak handling time</name>
+                    <name>SQL peak handling time</name>
                     <type>0</type>
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>ejb.peak[&quot;stats&quot;, &quot;ALL&quot;]</key>
+                    <key>sql.peak[&quot;stats&quot;, &quot;ALL&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -173,21 +173,99 @@
                     <inventory_link>0</inventory_link>
                     <applications>
                         <application>
-                            <name>EJB calls</name>
+                            <name>SQL statistics</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                </item>
+                <item>
+                    <name>SQL queries per minute</name>
+                    <type>0</type>
+                    <snmp_community/>
+                    <multiplier>1</multiplier>
+                    <snmp_oid/>
+                    <key>sql.calls[&quot;stats&quot;, &quot;ALL&quot;]</key>
+                    <delay>60</delay>
+                    <history>10</history>
+                    <trends>365</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units>qry/min</units>
+                    <delta>1</delta>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privpassphrase/>
+                    <formula>60</formula>
+                    <delay_flex/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <data_type>0</data_type>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>SQL statistics</name>
                         </application>
                     </applications>
                     <valuemap/>
                 </item>
             </items>
             <discovery_rules/>
-            <macros/>
+            <macros>
+                <macro>
+                    <macro>{$SQL_QUERY_TIME}</macro>
+                    <value>1.0</value>
+                </macro>
+            </macros>
             <templates/>
             <screens/>
         </template>
     </templates>
+    <triggers>
+        <trigger>
+            <expression>{Template_Zorka_SQL:sql.avg5[&quot;stats&quot;, &quot;ALL&quot;].last(0)}&gt;{$SQL_QUERY_TIME}
+            </expression>
+            <name>Lots of SQL queries perform badly on {HOST.NAME}</name>
+            <url/>
+            <status>0</status>
+            <priority>3</priority>
+            <description/>
+            <type>0</type>
+            <dependencies/>
+        </trigger>
+        <trigger>
+            <expression>{Template_Zorka_SQL:sql.peak[&quot;stats&quot;, &quot;ALL&quot;].last(0)}&gt;{$SQL_QUERY_TIME}
+            </expression>
+            <name>Some SQL queries perform badly on {HOST.NAME}</name>
+            <url/>
+            <status>0</status>
+            <priority>2</priority>
+            <description/>
+            <type>0</type>
+            <dependencies/>
+        </trigger>
+        <trigger>
+            <expression>{Template_Zorka_SQL:sql.errors[&quot;stats&quot;, &quot;ALL&quot;].last(0)}&gt;0</expression>
+            <name>SQL errors on {HOST.NAME}</name>
+            <url/>
+            <status>0</status>
+            <priority>2</priority>
+            <description/>
+            <type>0</type>
+            <dependencies/>
+        </trigger>
+    </triggers>
     <graphs>
         <graph>
-            <name>EJB congestions</name>
+            <name>SQL congestions</name>
             <width>900</width>
             <height>200</height>
             <yaxismin>0.0000</yaxismin>
@@ -212,14 +290,14 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template_Zorka_EJB</host>
-                        <key>ejb.calls[&quot;stats&quot;, &quot;ALL&quot;]</key>
+                        <host>Template_Zorka_SQL</host>
+                        <key>sql.calls[&quot;stats&quot;, &quot;ALL&quot;]</key>
                     </item>
                 </graph_item>
             </graph_items>
         </graph>
         <graph>
-            <name>EJB execution time</name>
+            <name>SQL handling</name>
             <width>900</width>
             <height>200</height>
             <yaxismin>0.0000</yaxismin>
@@ -244,8 +322,8 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template_Zorka_EJB</host>
-                        <key>ejb.avg5[&quot;stats&quot;, &quot;ALL&quot;]</key>
+                        <host>Template_Zorka_SQL</host>
+                        <key>sql.avg5[&quot;stats&quot;, &quot;ALL&quot;]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -256,8 +334,8 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template_Zorka_EJB</host>
-                        <key>ejb.avg15[&quot;stats&quot;, &quot;ALL&quot;]</key>
+                        <host>Template_Zorka_SQL</host>
+                        <key>sql.avg15[&quot;stats&quot;, &quot;ALL&quot;]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -268,8 +346,8 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template_Zorka_EJB</host>
-                        <key>ejb.peak[&quot;stats&quot;, &quot;ALL&quot;]</key>
+                        <host>Template_Zorka_SQL</host>
+                        <key>sql.peak[&quot;stats&quot;, &quot;ALL&quot;]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -280,8 +358,8 @@
                     <calc_fnc>2</calc_fnc>
                     <type>0</type>
                     <item>
-                        <host>Template_Zorka_EJB</host>
-                        <key>ejb.calls[&quot;stats&quot;, &quot;ALL&quot;]</key>
+                        <host>Template_Zorka_SQL</host>
+                        <key>sql.calls[&quot;stats&quot;, &quot;ALL&quot;]</key>
                     </item>
                 </graph_item>
             </graph_items>

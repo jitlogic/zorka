@@ -56,14 +56,13 @@ public class QueryLister {
 
         if (cl1 != null) {
             Thread.currentThread().setContextClassLoader(cl1);
-            log.debug(ZorkaLogger.ZAG_DEBUG, "Switching to MBS class loader ...");
         }
 
         List<QueryResult> results;
 
         try {
 
-            results =  getResults(conn);
+            results = getResults(conn);
 
             List<QuerySegment> segments = query.getSegments();
             if (segments.size() > 1) {
@@ -80,7 +79,6 @@ public class QueryLister {
         } finally {
             if (cl1 != null) {
                 Thread.currentThread().setContextClassLoader(cl0);
-                log.debug(ZorkaLogger.ZAG_DEBUG, "Switching back from MBS class loader ...");
             }
         }
 
@@ -100,7 +98,7 @@ public class QueryLister {
         Set<ObjectName> objNames = ObjectInspector.queryNames(conn, query.getQuery());
         QuerySegment seg = query.getSegments().size() > 0 ? query.getSegments().get(0) : null;
 
-        List<QueryResult> results = new ArrayList(objNames.size()+1);
+        List<QueryResult> results = new ArrayList(objNames.size() + 1);
 
         for (ObjectName on : objNames) {
 
@@ -125,7 +123,7 @@ public class QueryLister {
 
 
     private void getMultiResult(MBeanServerConnection conn, QuerySegment seg, List<QueryResult> results, ObjectName on) {
-        Pattern pattern = (Pattern)seg.getAttr();
+        Pattern pattern = (Pattern) seg.getAttr();
         try {
             for (MBeanAttributeInfo attr : conn.getMBeanInfo(on).getAttributes()) {
                 if (pattern.matcher(attr.getName()).matches()) {
@@ -141,8 +139,8 @@ public class QueryLister {
     private void getSingleResult(MBeanServerConnection conn, QuerySegment seg, List<QueryResult> results, ObjectName on) {
         try {
             makeResult(seg, results, on, seg != null
-                ? conn.getAttribute(on, seg.getAttr().toString())
-                : new JmxObject(on, conn, null),
+                    ? conn.getAttribute(on, seg.getAttr().toString())
+                    : new JmxObject(on, conn, null),
                     seg != null ? seg.getAttr() : null);
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error listing results of " + query, e);
@@ -201,7 +199,7 @@ public class QueryLister {
             }
         }
 
-        return  results;
+        return results;
     }
 
     public MetricTemplate getMetricTemplate() {

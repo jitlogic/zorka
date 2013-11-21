@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2013-11-19T12:38:38Z</date>
+    <date>2013-11-19T19:26:21Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template_Zorka_Tomcat_Servlets</template>
-            <name>Template_Zorka_Tomcat_Servlets</name>
+            <template>Template_Zorka_JBoss4_EJB3</template>
+            <name>Template_Zorka_JBoss4_EJB3</name>
             <groups>
                 <group>
                     <name>Templates</name>
@@ -18,17 +18,17 @@
             </groups>
             <applications>
                 <application>
-                    <name>Servlets</name>
+                    <name>EJB3 method calls</name>
                 </application>
             </applications>
             <items/>
             <discovery_rules>
                 <discovery_rule>
-                    <name>Servlet Stats</name>
+                    <name>EJB3 Beans</name>
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>tomcat.servlet.discovery[]</key>
+                    <key>jboss4.ejb3.discovery[]</key>
                     <delay>3600</delay>
                     <status>0</status>
                     <allowed_hosts/>
@@ -50,13 +50,15 @@
                     <description/>
                     <item_prototypes>
                         <item_prototype>
-                            <name>{#WEBMODULE}:{#NAME} Average request processing time (AVG5)</name>
+                            <name>{#NAME}.{#METHOD} average execution time (AVG5)</name>
                             <type>0</type>
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>tomcat.servlet.time[&quot;{#J2EESERVER}&quot;,&quot;{#J2EEAPPLICATION}&quot;,&quot;{#WEBMODULE}&quot;,&quot;{#NAME}&quot;,&quot;AVG5&quot;]</key>
-                            <delay>60</delay>
+                            <key>jboss4.ejb3.time[&quot;{#EAR}&quot;,&quot;{#JAR}&quot;,&quot;{#NAME}&quot;,&quot;{#METHOD}&quot;,
+                                &quot;AVG5&quot;]
+                            </key>
+                            <delay>59</delay>
                             <history>10</history>
                             <trends>365</trends>
                             <status>0</status>
@@ -83,19 +85,21 @@
                             <inventory_link>0</inventory_link>
                             <applications>
                                 <application>
-                                    <name>Servlets</name>
+                                    <name>EJB3 method calls</name>
                                 </application>
                             </applications>
                             <valuemap/>
                         </item_prototype>
                         <item_prototype>
-                            <name>{#WEBMODULE}:{#NAME} Average request processing time (AVG15)</name>
+                            <name>{#NAME}.{#METHOD} average execution time (AVG15)</name>
                             <type>0</type>
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>tomcat.servlet.time[&quot;{#J2EESERVER}&quot;,&quot;{#J2EEAPPLICATION}&quot;,&quot;{#WEBMODULE}&quot;,&quot;{#NAME}&quot;,&quot;AVG15&quot;]</key>
-                            <delay>60</delay>
+                            <key>jboss4.ejb3.time[&quot;{#EAR}&quot;,&quot;{#JAR}&quot;,&quot;{#NAME}&quot;,&quot;{#METHOD}&quot;,
+                                &quot;AVG15&quot;]
+                            </key>
+                            <delay>59</delay>
                             <history>10</history>
                             <trends>365</trends>
                             <status>0</status>
@@ -122,31 +126,31 @@
                             <inventory_link>0</inventory_link>
                             <applications>
                                 <application>
-                                    <name>Servlets</name>
+                                    <name>EJB3 method calls</name>
                                 </application>
                             </applications>
                             <valuemap/>
                         </item_prototype>
                         <item_prototype>
-                            <name>{#WEBMODULE}:{#NAME} Errors occured (per minute)</name>
+                            <name>{#NAME}.{#METHOD} calls per minute</name>
                             <type>0</type>
                             <snmp_community/>
-                            <multiplier>0</multiplier>
+                            <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>tomcat.servlet.errors[&quot;{#J2EESERVER}&quot;,&quot;{#J2EEAPPLICATION}&quot;,&quot;{#WEBMODULE}&quot;,&quot;{#NAME}&quot;]</key>
+                            <key>jboss4.ejb3.calls[&quot;{#EAR}&quot;,&quot;{#JAR}&quot;,&quot;{#NAME}&quot;,&quot;{#METHOD}&quot;]</key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
                             <status>0</status>
                             <value_type>0</value_type>
                             <allowed_hosts/>
-                            <units>req/min</units>
+                            <units>calls/min</units>
                             <delta>1</delta>
                             <snmpv3_securityname/>
                             <snmpv3_securitylevel>0</snmpv3_securitylevel>
                             <snmpv3_authpassphrase/>
                             <snmpv3_privpassphrase/>
-                            <formula>1</formula>
+                            <formula>60</formula>
                             <delay_flex/>
                             <params/>
                             <ipmi_sensor/>
@@ -161,71 +165,13 @@
                             <inventory_link>0</inventory_link>
                             <applications>
                                 <application>
-                                    <name>Servlets</name>
-                                </application>
-                            </applications>
-                            <valuemap/>
-                        </item_prototype>
-                        <item_prototype>
-                            <name>{#WEBMODULE}:{#NAME} Requests handled (per minute)</name>
-                            <type>0</type>
-                            <snmp_community/>
-                            <multiplier>0</multiplier>
-                            <snmp_oid/>
-                            <key>tomcat.servlet.requests[&quot;{#J2EESERVER}&quot;,&quot;{#J2EEAPPLICATION}&quot;,&quot;{#WEBMODULE}&quot;,&quot;{#NAME}&quot;]</key>
-                            <delay>60</delay>
-                            <history>10</history>
-                            <trends>365</trends>
-                            <status>0</status>
-                            <value_type>0</value_type>
-                            <allowed_hosts/>
-                            <units>req/min</units>
-                            <delta>1</delta>
-                            <snmpv3_securityname/>
-                            <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                            <snmpv3_authpassphrase/>
-                            <snmpv3_privpassphrase/>
-                            <formula>1</formula>
-                            <delay_flex/>
-                            <params/>
-                            <ipmi_sensor/>
-                            <data_type>0</data_type>
-                            <authtype>0</authtype>
-                            <username/>
-                            <password/>
-                            <publickey/>
-                            <privatekey/>
-                            <port/>
-                            <description/>
-                            <inventory_link>0</inventory_link>
-                            <applications>
-                                <application>
-                                    <name>Servlets</name>
+                                    <name>EJB3 method calls</name>
                                 </application>
                             </applications>
                             <valuemap/>
                         </item_prototype>
                     </item_prototypes>
-                    <trigger_prototypes>
-                        <trigger_prototype>
-                            <expression>{Template_Zorka_Tomcat_Servlets:tomcat.servlet.errors[&quot;{#J2EESERVER}&quot;,&quot;{#J2EEAPPLICATION}&quot;,&quot;{#WEBMODULE}&quot;,&quot;{#NAME}&quot;].last(0)}&gt;10</expression>
-                            <name>More Servlet errors on {HOST.NAME}/{#WEBMODULE}/{#NAME}</name>
-                            <url/>
-                            <status>0</status>
-                            <priority>3</priority>
-                            <description/>
-                            <type>0</type>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                            <expression>{Template_Zorka_Tomcat_Servlets:tomcat.servlet.errors[&quot;{#J2EESERVER}&quot;,&quot;{#J2EEAPPLICATION}&quot;,&quot;{#WEBMODULE}&quot;,&quot;{#NAME}&quot;].last(0)}&gt;0</expression>
-                            <name>Servlet errors on {HOST.NAME}/{#WEBMODULE}/{#NAME}</name>
-                            <url/>
-                            <status>0</status>
-                            <priority>2</priority>
-                            <description/>
-                            <type>0</type>
-                        </trigger_prototype>
-                    </trigger_prototypes>
+                    <trigger_prototypes/>
                     <graph_prototypes/>
                 </discovery_rule>
             </discovery_rules>

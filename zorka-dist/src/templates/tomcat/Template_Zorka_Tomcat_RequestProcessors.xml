@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2012-09-12T19:26:54Z</date>
+    <date>2013-11-19T12:13:28Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -28,7 +28,9 @@
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix.discovery[&quot;jboss&quot;, &quot;jboss.web:type=GlobalRequestProcessor,*&quot;, &quot;name&quot;]</key>
+                    <key>zabbix.discovery[&quot;java&quot;, &quot;Catalina:type=GlobalRequestProcessor,*&quot;, &quot;name&quot;,
+                        &quot;type&quot;]
+                    </key>
                     <delay>3600</delay>
                     <status>0</status>
                     <allowed_hosts/>
@@ -55,7 +57,9 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;jboss&quot;, &quot;jboss.web:type=GlobalRequestProcessor,name={#NAME}&quot;, &quot;errorCount&quot;]</key>
+                            <key>zorka.jmx[&quot;java&quot;, &quot;Catalina:type=GlobalRequestProcessor,name={#NAME}&quot;,
+                                &quot;errorCount&quot;]
+                            </key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -94,7 +98,9 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;jboss&quot;, &quot;jboss.web:type=GlobalRequestProcessor,name={#NAME}&quot;, &quot;bytesReceived&quot;]</key>
+                            <key>zorka.jmx[&quot;java&quot;, &quot;Catalina:type=GlobalRequestProcessor,name={#NAME}&quot;,
+                                &quot;bytesReceived&quot;]
+                            </key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -133,7 +139,9 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>zorka.rate[&quot;jboss&quot;, &quot;jboss.web:type=GlobalRequestProcessor,name={#NAME}&quot;, &quot;processingTime&quot;, &quot;requestCount&quot;, &quot;AVG5&quot;]</key>
+                            <key>zorka.rate[&quot;java&quot;, &quot;Catalina:type=GlobalRequestProcessor,name={#NAME}&quot;,
+                                &quot;processingTime&quot;, &quot;requestCount&quot;, &quot;AVG5&quot;]
+                            </key>
                             <delay>55</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -172,7 +180,9 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>zorka.rate[&quot;jboss&quot;, &quot;jboss.web:type=GlobalRequestProcessor,name={#NAME}&quot;, &quot;processingTime&quot;, &quot;requestCount&quot;, &quot;AVG15&quot;]</key>
+                            <key>zorka.rate[&quot;java&quot;, &quot;Catalina:type=GlobalRequestProcessor,name={#NAME}&quot;,
+                                &quot;processingTime&quot;, &quot;requestCount&quot;, &quot;AVG15&quot;]
+                            </key>
                             <delay>55</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -211,7 +221,9 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;jboss&quot;, &quot;jboss.web:type=GlobalRequestProcessor,name={#NAME}&quot;, &quot;requestCount&quot;]</key>
+                            <key>zorka.jmx[&quot;java&quot;, &quot;Catalina:type=GlobalRequestProcessor,name={#NAME}&quot;,
+                                &quot;requestCount&quot;]
+                            </key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -250,7 +262,9 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;jboss&quot;, &quot;jboss.web:type=GlobalRequestProcessor,name={#NAME}&quot;, &quot;bytesSent&quot;]</key>
+                            <key>zorka.jmx[&quot;java&quot;, &quot;Catalina:type=GlobalRequestProcessor,name={#NAME}&quot;,
+                                &quot;bytesSent&quot;]
+                            </key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -286,7 +300,9 @@
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Template_Zorka_Tomcat_RequestProcessors:zorka.jmx[&quot;jboss&quot;, &quot;jboss.web:type=GlobalRequestProcessor,name={#NAME}&quot;, &quot;errorCount&quot;].last(0)}&gt;0</expression>
+                            <expression>{Template_Zorka_Tomcat_RequestProcessors:zorka.jmx[&quot;java&quot;, &quot;Catalina:type=GlobalRequestProcessor,name={#NAME}&quot;,
+                                &quot;errorCount&quot;].last(0)}&gt;0
+                            </expression>
                             <name>Errors on {HOST.NAME}:{#NAME} request processor.</name>
                             <url/>
                             <status>0</status>
@@ -295,7 +311,9 @@
                             <type>0</type>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template_Zorka_Tomcat_RequestProcessors:zorka.jmx[&quot;jboss&quot;, &quot;jboss.web:type=GlobalRequestProcessor,name={#NAME}&quot;, &quot;errorCount&quot;].last(0)}&gt;10</expression>
+                            <expression>{Template_Zorka_Tomcat_RequestProcessors:zorka.jmx[&quot;java&quot;, &quot;Catalina:type=GlobalRequestProcessor,name={#NAME}&quot;,
+                                &quot;errorCount&quot;].last(0)}&gt;10
+                            </expression>
                             <name>Errors on {HOST.NAME}:{#NAME} request processor.</name>
                             <url/>
                             <status>0</status>
@@ -304,20 +322,24 @@
                             <type>0</type>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>{Template_Zorka_Tomcat_RequestProcessors:zorka.rate[&quot;jboss&quot;, &quot;jboss.web:type=GlobalRequestProcessor,name={#NAME}&quot;, &quot;processingTime&quot;, &quot;requestCount&quot;, &quot;AVG5&quot;].last(0)}&gt;3</expression>
-                            <name>{HOST.NAME}/{#NAME} request processor is slowing down.</name>
-                            <url/>
-                            <status>0</status>
-                            <priority>2</priority>
-                            <description/>
-                            <type>0</type>
-                        </trigger_prototype>
-                        <trigger_prototype>
-                            <expression>{Template_Zorka_Tomcat_RequestProcessors:zorka.rate[&quot;jboss&quot;, &quot;jboss.web:type=GlobalRequestProcessor,name={#NAME}&quot;, &quot;processingTime&quot;, &quot;requestCount&quot;, &quot;AVG5&quot;].last(0)}&gt;10</expression>
+                            <expression>{Template_Zorka_Tomcat_RequestProcessors:zorka.rate[&quot;java&quot;, &quot;Catalina:type=GlobalRequestProcessor,name={#NAME}&quot;,
+                                &quot;processingTime&quot;, &quot;requestCount&quot;, &quot;AVG5&quot;].last(0)}&gt;10
+                            </expression>
                             <name>{HOST.NAME}/{#NAME} request processor is slowing down.</name>
                             <url/>
                             <status>0</status>
                             <priority>3</priority>
+                            <description/>
+                            <type>0</type>
+                        </trigger_prototype>
+                        <trigger_prototype>
+                            <expression>{Template_Zorka_Tomcat_RequestProcessors:zorka.rate[&quot;java&quot;, &quot;Catalina:type=GlobalRequestProcessor,name={#NAME}&quot;,
+                                &quot;processingTime&quot;, &quot;requestCount&quot;, &quot;AVG5&quot;].last(0)}&gt;3
+                            </expression>
+                            <name>{HOST.NAME}/{#NAME} request processor is slowing down.</name>
+                            <url/>
+                            <status>0</status>
+                            <priority>2</priority>
                             <description/>
                             <type>0</type>
                         </trigger_prototype>

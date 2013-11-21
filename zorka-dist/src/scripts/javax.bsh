@@ -22,15 +22,18 @@ zorka.require("tracer.bsh");
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
     tracer.exclude(
+        "com.sun.activation.registries.MailcapTokenizer",
         "com.sun.el.**",
         "com.sun.naming.internal.**",
 
+        "javax.activation.**",
         "javax.crypto.**",
         "javax.el.**",
         "javax.enterprise.util.**",
         "javax.security.**",
         "javax.servlet.**",
         "javax.xml.**",
+        "javax.ws.**",
 
         "javax.naming.Binding",
         "javax.naming.NameImpl",

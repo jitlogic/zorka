@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -295,6 +296,32 @@ public final class ObjectInspector {
 
 
     /**
+     * Fetches attribute value by calling getter method from non-public class.
+     *
+     * @param obj    source object
+     * @param method target method (method object)
+     * @return result of calling target method
+     */
+    private static Object fetchViaNonPublicMethod(Object obj, Method method) {
+        Object ret = null;
+        synchronized (method) {
+            method.setAccessible(true);
+            try {
+                if (Modifier.isStatic(method.getModifiers())) {
+                    obj = obj.getClass();
+                }
+                ret = method.invoke(obj);
+            } catch (Exception e) {
+                log.error(ZorkaLogger.ZSP_ERRORS, "Method '" + method.getName() + "' invocation failed", e);
+            } finally {
+                method.setAccessible(false);
+            }
+        }
+        return ret;
+    }
+
+
+    /**
      * Fetches attribute value by calling getter method.
      *
      * @param obj    source object
@@ -303,13 +330,17 @@ public final class ObjectInspector {
      */
     private static Object fetchViaMethod(Object obj, Method method) {
         if (method != null) {
+            if (!method.isAccessible()) {
+                return fetchViaNonPublicMethod(obj, method);
+            }
             try {
                 if (Modifier.isStatic(method.getModifiers())) {
                     obj = obj.getClass();
                 }
-                return method.invoke(obj);
+                Object ret = method.invoke(obj);
+                return ret;
             } catch (Exception e) {
-                //log.error("Method '" + method.getName() + "' invocation failed", e);
+                log.error(ZorkaLogger.ZSP_ERRORS, "Method '" + method.getName() + "' invocation failed", e);
                 return null;
             }
         }
@@ -345,6 +376,7 @@ public final class ObjectInspector {
             return null;
         }
     }
+
 
     /**
      * Lookf for field of given name.
