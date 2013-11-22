@@ -28,7 +28,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;AgentErrors&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;AgentErrors&quot;]</key>
                     <delay>180</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -67,9 +67,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;AgentTime&quot;,
-                        &quot;AgentRequests&quot;, &quot;AVG15&quot;]
-                    </key>
+                    <key>zorka.rate[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;AgentTime&quot;,&quot;AgentRequests&quot;,&quot;AVG15&quot;]</key>
                     <delay>160</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -108,7 +106,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;AgentRequests&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;AgentRequests&quot;]</key>
                     <delay>180</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -147,7 +145,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;AvgCountersCreated&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;AvgCountersCreated&quot;]</key>
                     <delay>600</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -186,7 +184,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;AvgCounterErrors&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;AvgCounterErrors&quot;]</key>
                     <delay>180</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -225,8 +223,8 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;stats&quot;,
-                        &quot;ClassesProcessed&quot;, &quot;calls&quot;]
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;stats&quot;,&quot;ClassesProcessed&quot;,
+                        &quot;calls&quot;]
                     </key>
                     <delay>1800</delay>
                     <history>10</history>
@@ -266,8 +264,8 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;stats&quot;,
-                        &quot;ClassesTransformed&quot;, &quot;calls&quot;]
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;stats&quot;,&quot;ClassesTransformed&quot;,
+                        &quot;calls&quot;]
                     </key>
                     <delay>1800</delay>
                     <history>10</history>
@@ -307,7 +305,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;ConfigErrors&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;ConfigErrors&quot;]</key>
                     <delay>900</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -346,7 +344,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;MethodsInstrumented&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;MethodsInstrumented&quot;]</key>
                     <delay>1800</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -385,7 +383,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;MetricsCreated&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;MetricsCreated&quot;]</key>
                     <delay>1800</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -424,7 +422,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonCycles&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonCycles&quot;]</key>
                     <delay>180</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -463,7 +461,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonErrors&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonErrors&quot;]</key>
                     <delay>180</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -502,7 +500,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonNulls&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonNulls&quot;]</key>
                     <delay>180</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -541,7 +539,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonQueries&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonQueries&quot;]</key>
                     <delay>180</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -580,8 +578,8 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonTime&quot;,
-                        &quot;PerfMonCycles&quot;, &quot;AVG15&quot;]
+                    <key>zorka.rate[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonTime&quot;,&quot;PerfMonCycles&quot;,
+                        &quot;AVG15&quot;]
                     </key>
                     <delay>160</delay>
                     <history>10</history>
@@ -621,7 +619,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonWarnings&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonWarnings&quot;]</key>
                     <delay>180</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -660,7 +658,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;SpyErrors&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;SpyErrors&quot;]</key>
                     <delay>180</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -699,8 +697,8 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;stats&quot;,
-                        &quot;SpyLookups&quot;, &quot;time&quot;]
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;stats&quot;,&quot;SpyLookups&quot;,
+                        &quot;time&quot;]
                     </key>
                     <delay>1800</delay>
                     <history>10</history>
@@ -740,7 +738,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;SpySubmissions&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;SpySubmissions&quot;]</key>
                     <delay>180</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -779,7 +777,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;SymbolsCreated&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;SymbolsCreated&quot;]</key>
                     <delay>600</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -818,7 +816,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;TracerErrors&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;TracerErrors&quot;]</key>
                     <delay>180</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -857,9 +855,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;stats&quot;,
-                        &quot;TracerLookups&quot;, &quot;time&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;stats&quot;,&quot;TracerLookups&quot;,&quot;time&quot;]</key>
                     <delay>1800</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -898,7 +894,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;TracesDropped&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;TracesDropped&quot;]</key>
                     <delay>180</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -937,7 +933,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;TracesSubmitted&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;TracesSubmitted&quot;]</key>
                     <delay>180</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -976,9 +972,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;stats&quot;,
-                        &quot;ClassesTransformed&quot;, &quot;time&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;stats&quot;,&quot;ClassesTransformed&quot;,&quot;time&quot;]</key>
                     <delay>1800</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -1017,7 +1011,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;TrapsDropped&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;TrapsDropped&quot;]</key>
                     <delay>180</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -1056,7 +1050,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;TrapsSent&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;TrapsSent&quot;]</key>
                     <delay>180</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -1095,7 +1089,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;TrapsSubmitted&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;TrapsSubmitted&quot;]</key>
                     <delay>180</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -1134,7 +1128,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;ZorkaStatsCreated&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;ZorkaStatsCreated&quot;]</key>
                     <delay>600</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -1176,7 +1170,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;SpyErrors&quot;].last(0)}&gt;0</expression>
+            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;SpyErrors&quot;].last(0)}&gt;0</expression>
             <name>Spy engine errors occuring on {HOST.NAME} (see zorka log)</name>
             <url/>
             <status>0</status>
@@ -1186,7 +1180,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;ZorkaStatsCreated&quot;].last(0)}&gt;262144</expression>
+            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;ZorkaStatsCreated&quot;].last(0)}&gt;262144</expression>
             <name>Too many method call stats created on {HOST.NAME} (possible leak).</name>
             <url/>
             <status>0</status>
@@ -1196,7 +1190,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;MetricsCreated&quot;].last(0)}&gt;10000</expression>
+            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;MetricsCreated&quot;].last(0)}&gt;10000</expression>
             <name>Too many metrics created by zorka agent on {HOST.NAME} (possible leak).</name>
             <url/>
             <status>0</status>
@@ -1206,7 +1200,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;SymbolsCreated&quot;].last(0)}&gt;262144</expression>
+            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;SymbolsCreated&quot;].last(0)}&gt;262144</expression>
             <name>Too many symbols registered by {HOST.NAME} (possible leak).</name>
             <url/>
             <status>0</status>
@@ -1216,7 +1210,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;TracerErrors&quot;].last(0)}&gt;0</expression>
+            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;TracerErrors&quot;].last(0)}&gt;0</expression>
             <name>Tracer engine errors occuring on {HOST.NAME}.</name>
             <url/>
             <status>0</status>
@@ -1226,7 +1220,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;TrapsDropped&quot;].last(0)}&gt;0</expression>
+            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;TrapsDropped&quot;].last(0)}&gt;0</expression>
             <name>Traps are being dropped by zabbix agent on {HOST.NAME}.</name>
             <url/>
             <status>0</status>
@@ -1236,7 +1230,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;ConfigErrors&quot;].last(0)}&gt;0</expression>
+            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;ConfigErrors&quot;].last(0)}&gt;0</expression>
             <name>Zorka agent configuration errors on {HOST.NAME}</name>
             <url/>
             <status>0</status>
@@ -1246,7 +1240,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;AgentErrors&quot;].last(0)}&gt;0</expression>
+            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;AgentErrors&quot;].last(0)}&gt;0</expression>
             <name>Zorka agent errors on {HOST.NAME}</name>
             <url/>
             <status>0</status>
@@ -1256,7 +1250,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonErrors&quot;].last(0)}&gt;0</expression>
+            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonErrors&quot;].last(0)}&gt;0</expression>
             <name>Zorka performance monitor errors on {HOST.NAME}.</name>
             <url/>
             <status>0</status>
@@ -1266,7 +1260,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonNulls&quot;].last(0)}&gt;0</expression>
+            <expression>{Template_Zorka_Diagnostic:zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Diagnostic&quot;,&quot;PerfMonNulls&quot;].last(0)}&gt;0</expression>
             <name>Zorka performance monitors are catching nulls on {HOST.NAME}.</name>
             <url/>
             <status>0</status>

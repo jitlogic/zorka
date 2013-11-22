@@ -82,9 +82,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Hiccup&quot;, &quot;CPU&quot;,
-                        &quot;maxTimeUsCLR&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Hiccup&quot;,&quot;CPU&quot;,&quot;maxTimeUsCLR&quot;]</key>
                     <delay>60</delay>
                     <history>90</history>
                     <trends>365</trends>
@@ -123,7 +121,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;java.lang:type=OperatingSystem&quot;, &quot;OpenFileDescriptorCount&quot;]</key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=OperatingSystem&quot;,&quot;OpenFileDescriptorCount&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -1800,9 +1798,7 @@
                     <type>0</type>
                     <item>
                         <host>Template_Zorka_JVM_Static</host>
-                        <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Hiccup&quot;, &quot;CPU&quot;,
-                            &quot;maxTimeUsCLR&quot;]
-                        </key>
+                        <key>zorka.jmx[&quot;java&quot;,&quot;zorka:type=ZorkaStats,name=Hiccup&quot;,&quot;CPU&quot;,&quot;maxTimeUsCLR&quot;]</key>
                     </item>
                 </graph_item>
             </graph_items>

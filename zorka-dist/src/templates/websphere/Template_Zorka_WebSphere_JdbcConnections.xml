@@ -28,10 +28,9 @@
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix.discovery[&quot;pmi&quot;, &quot;WebSphere:type=JDBCProvider,*&quot;, &quot;name&quot;,
-                        &quot;process&quot;, &quot;platform&quot;, &quot;node&quot;, &quot;j2eeType&quot;, &quot;J2EEServer&quot;,
-                        &quot;Server&quot;, &quot;version&quot;, &quot;type&quot;, &quot;mbeanIdentifier&quot;, &quot;cell&quot;,
-                        &quot;spec&quot;]
+                    <key>zabbix.discovery[&quot;pmi&quot;, &quot;WebSphere:type=JDBCProvider,*&quot;, &quot;name&quot;,&quot;process&quot;,
+                        &quot;platform&quot;, &quot;node&quot;, &quot;j2eeType&quot;, &quot;J2EEServer&quot;,&quot;Server&quot;,
+                        &quot;version&quot;, &quot;type&quot;, &quot;mbeanIdentifier&quot;, &quot;cell&quot;,&quot;spec&quot;]
                     </key>
                     <delay>30</delay>
                     <status>0</status>
