@@ -39,6 +39,8 @@ __ldap() {
                 tracer.begin("LDAP", zorka.longCfg("ldap.trace.time")),
                 tracer.attr("DN", "DN"), tracer.attr("SCOPE", "SCOPE"), tracer.attr("FILTER", "FILTER")
             ) : null)
+        .onError(_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
+        .onSubmit(spy.zorkaStats("java", _mbean, "stats", "ALL"))
         .include(spy.byMethod("com.sun.jndi.ldap.LdapClient", "search")));
 
 
@@ -49,6 +51,7 @@ __ldap() {
                tracer.formatAttr("NAME", "${NAME}"),
                tracer.formatAttr("FILTER", "${FILTER}")
            ) : null)
+       .onError(_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
        .onSubmit(spy.zorkaStats("java", _mbean, "stats", "ALL"))
        .include(
            spy.byMethod(0, "javax.naming.directory.InitialDirContext", "search", null, "javax.naming.Name"),
