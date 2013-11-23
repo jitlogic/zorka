@@ -43,7 +43,6 @@ public class SpyInstanceIntegTest extends ZorkaFixture {
         MethodCallStatistics stats = (MethodCallStatistics) getAttr(testMbs, "test:name=TestClass1", "stats");
         assertNotNull(stats);
         assertEquals(1, stats.getMethodCallStatistic("trivialMethod").getCalls());
-
     }
 
 

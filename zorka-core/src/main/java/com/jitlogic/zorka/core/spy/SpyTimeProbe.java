@@ -15,6 +15,8 @@
  */
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.common.util.ZorkaUtil;
+
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
 /**
@@ -39,4 +41,24 @@ public class SpyTimeProbe extends SpyProbe {
         mv.visitMethodInsn(INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;");
         return 2;
     }
+
+
+    @Override
+    public int hashCode() {
+        return 31 * getDstField().hashCode();
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof SpyTimeProbe)
+                && ZorkaUtil.objEquals(getDstField(), ((SpyTimeProbe) obj).getDstField());
+    }
+
+
+    @Override
+    public String toString() {
+        return "SpyTimeProbe(" + getDstField() + ")";
+    }
+
 }

@@ -47,7 +47,8 @@ public class SpyClassTransformer implements ClassFileTransformer {
     /**
      * All spy defs configured
      */
-    private List<SpyDefinition> sdefs = new ArrayList<SpyDefinition>();
+    private Map<String, SpyDefinition> sdefs = new LinkedHashMap<String, SpyDefinition>();
+
 
     /**
      * SpyContext counter.
@@ -135,8 +136,26 @@ public class SpyClassTransformer implements ClassFileTransformer {
      * @param sdef spy definition
      * @return
      */
-    public SpyDefinition add(SpyDefinition sdef) {
-        sdefs.add(sdef);
+    public synchronized SpyDefinition add(SpyDefinition sdef) {
+        SpyDefinition osdef = sdefs.get(sdef.getName());
+
+        if (osdef != null && !osdef.sameProbes(sdef)) {
+            log.warn(ZorkaLogger.ZSP_CONFIG, "Cannot overwrite spy definition '" + osdef.getName()
+                    + "' because probes have changed and no retransform is possible.");
+            return null;
+        }
+
+        sdefs.put(sdef.getName(), sdef);
+
+        if (osdef != null) {
+            for (Map.Entry<SpyContext, SpyContext> e : ctxInstances.entrySet()) {
+                SpyContext ctx = e.getValue();
+                if (ctx.getSpyDefinition() == osdef) {
+                    ctx.setSpyDefinition(sdef);
+                }
+            }
+        }
+
         return sdef;
     }
 
@@ -178,8 +197,8 @@ public class SpyClassTransformer implements ClassFileTransformer {
         }
 
         long st1 = System.nanoTime();
-        for (SpyDefinition sdef : sdefs) {
-
+        for (Map.Entry<String, SpyDefinition> e : sdefs.entrySet()) {
+            SpyDefinition sdef = e.getValue();
             if (sdef.getMatcherSet().classMatch(clazzName)) {
                 found.add(sdef);
             }

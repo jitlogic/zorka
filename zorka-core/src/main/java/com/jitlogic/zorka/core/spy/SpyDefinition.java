@@ -132,6 +132,9 @@ public class SpyDefinition {
         return matcherSet;
     }
 
+    public String getName() {
+        return name;
+    }
 
     /**
      * Instructs spy what should be collected at the beginning of a method.
@@ -228,6 +231,16 @@ public class SpyDefinition {
         sdef.processors[curStage] = Collections.unmodifiableList(newProcessors);
 
         return sdef;
+    }
+
+
+    public boolean sameProbes(SpyDefinition sdef) {
+        for (int i = 0; i < 4; i++) {
+            if (!ZorkaUtil.objEquals(this.getProbes(i), sdef.getProbes(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
 

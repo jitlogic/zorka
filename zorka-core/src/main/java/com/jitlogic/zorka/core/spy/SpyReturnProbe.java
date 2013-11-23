@@ -15,6 +15,8 @@
  */
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.common.util.ZorkaUtil;
+
 import static org.objectweb.asm.Opcodes.ALOAD;
 
 /**
@@ -31,9 +33,30 @@ public class SpyReturnProbe extends SpyProbe {
         super(dstField);
     }
 
+
     @Override
     public int emit(SpyMethodVisitor mv, int stage, int opcode) {
         mv.visitVarInsn(ALOAD, mv.getRetValProbeSlot());
         return 1;
     }
+
+
+    @Override
+    public int hashCode() {
+        return 31 * getDstField().hashCode();
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof SpyReturnProbe)
+                && ZorkaUtil.objEquals(getDstField(), ((SpyReturnProbe) obj).getDstField());
+    }
+
+
+    @Override
+    public String toString() {
+        return "SpyReturnProbe(" + getDstField() + ")";
+    }
+
 }
