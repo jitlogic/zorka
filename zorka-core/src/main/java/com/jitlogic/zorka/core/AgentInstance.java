@@ -16,12 +16,11 @@
 
 package com.jitlogic.zorka.core;
 
+import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.stats.ValGetter;
-import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogLevel;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.mbeans.AttrGetter;
 import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
@@ -32,7 +31,6 @@ import com.jitlogic.zorka.core.integ.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.normproc.NormLib;
 
-import java.io.File;
 import java.util.Properties;
 import java.util.concurrent.*;
 
@@ -44,7 +42,7 @@ import java.util.concurrent.*;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class AgentInstance {
+public class AgentInstance implements ZorkaService {
 
     /**
      * Logger
@@ -355,12 +353,14 @@ public class AgentInstance {
         return zabbixAgent;
     }
 
+
     public synchronized ZorkaLib getZorkaLib() {
         if (zorkaLib == null) {
-            zorkaLib = new ZorkaLib(getZorkaAgent(), getMBeanServerRegistry(), getConfig(), getTranslator(), getTracer());
+            zorkaLib = new ZorkaLib(this, getTranslator());
         }
         return zorkaLib;
     }
+
 
     public synchronized ZabbixLib getZabbixLib() {
         if (zabbixLib == null) {
@@ -384,9 +384,11 @@ public class AgentInstance {
      * @return instance of syslog library
      */
     public synchronized SyslogLib getSyslogLib() {
+
         if (syslogLib == null) {
             syslogLib = new SyslogLib(config);
         }
+
         return syslogLib;
     }
 
@@ -397,9 +399,11 @@ public class AgentInstance {
      * @return instance of spy library
      */
     public synchronized SpyLib getSpyLib() {
+
         if (spyLib == null) {
             spyLib = new SpyLib(getClassTransformer(), getMBeanServerRegistry());
         }
+
         return spyLib;
     }
 
@@ -410,25 +414,31 @@ public class AgentInstance {
      * @return instance of tracer library
      */
     public synchronized TracerLib getTracerLib() {
+
         if (tracerLib == null) {
             tracerLib = new TracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config);
         }
+
         return tracerLib;
     }
 
 
     public synchronized NagiosLib getNagiosLib() {
+
         if (nagiosLib == null) {
             nagiosLib = new NagiosLib();
         }
+
         return nagiosLib;
     }
 
 
     public synchronized NormLib getNormLib() {
+
         if (normLib == null) {
             normLib = new NormLib();
         }
+
         return normLib;
     }
 
@@ -439,9 +449,11 @@ public class AgentInstance {
      * @return instance of snmp library
      */
     public synchronized SnmpLib getSnmpLib() {
+
         if (snmpLib == null) {
             snmpLib = new SnmpLib(config);
         }
+
         return snmpLib;
     }
 
@@ -452,9 +464,11 @@ public class AgentInstance {
      * @return instance of perfmon library
      */
     public synchronized PerfMonLib getPerfMonLib() {
+
         if (perfMonLib == null) {
             perfMonLib = new PerfMonLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), getMBeanServerRegistry());
         }
+
         return perfMonLib;
     }
 
@@ -465,10 +479,52 @@ public class AgentInstance {
      * @return mbean server registry reference of null (if not yet initialized)
      */
     public MBeanServerRegistry getMBeanServerRegistry() {
+
         if (mBeanServerRegistry == null) {
             mBeanServerRegistry = new MBeanServerRegistry();
         }
+
         return mBeanServerRegistry;
+    }
+
+
+    @Override
+    public void shutdown() {
+
+        log.info(ZorkaLogger.ZAG_CONFIG, "Shutting down agent ...");
+
+        tracer.clearMatchers();
+        tracer.clearOutputs();
+
+        if (zorkaLib != null) {
+            zorkaLib.shutdown();
+        }
+
+        if (snmpLib != null) {
+            snmpLib.shutdown();
+        }
+
+        if (zabbixLib != null) {
+            zabbixLib.shutdown();
+        }
+
+        if (syslogLib != null) {
+            syslogLib.shutdown();
+        }
+    }
+
+
+    public void restart() {
+        log.info(ZorkaLogger.ZAG_CONFIG, "Reloading agent configuration...");
+        config.reload();
+        ZorkaLogger.getLogger().shutdown();
+        config.initLoggers();
+        log.info(ZorkaLogger.ZAG_CONFIG, "Agent configuration reloaded ...");
+        getZorkaAgent().reloadScripts();
+        long l = AgentDiagnostics.get(AgentDiagnostics.CONFIG_ERRORS);
+        log.info(ZorkaLogger.ZAG_CONFIG, "Agent configuration scripts executed (" + l + " errors).");
+        log.info(ZorkaLogger.ZAG_CONFIG, "Number of matchers in tracer configuration: "
+                + tracer.getMatcherSet().getMatchers().size());
     }
 
 }

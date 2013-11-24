@@ -22,10 +22,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.*;
 
+import com.jitlogic.zorka.common.ZorkaService;
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
-import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.util.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.*;
@@ -40,7 +41,7 @@ import com.jitlogic.zorka.core.mbeans.ZorkaMappedMBean;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class ZorkaLib {
+public class ZorkaLib implements ZorkaService {
 
     private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaLogger.class);
 
@@ -74,19 +75,17 @@ public class ZorkaLib {
 
     private QueryTranslator translator;
 
-    private Tracer tracer;
+    private AgentInstance instance;
 
     /**
      * Standard constructor
-     *
-     * @param agent reference to Zorka BSH agent object
      */
-    public ZorkaLib(ZorkaBshAgent agent, MBeanServerRegistry registry, AgentConfig config, QueryTranslator translator, Tracer tracer) {
-        this.agent = agent;
-        this.mbsRegistry = registry;
-        this.config = config;
+    public ZorkaLib(AgentInstance instance, QueryTranslator translator) {
+        this.agent = instance.getZorkaAgent();
+        this.mbsRegistry = instance.getMBeanServerRegistry();
+        this.config = instance.getConfig();
         this.translator = translator;
-        this.tracer = tracer;
+        this.instance = instance;
 
         this.hostname = config.getProperties().getProperty("zorka.hostname").trim();
         this.version = config.getProperties().getProperty("zorka.version").trim();
@@ -491,17 +490,10 @@ public class ZorkaLib {
      * @return
      */
     public String reload() {
-        log.info(ZorkaLogger.ZAG_CONFIG, "Reloading agent configuration...");
-        config.reload();
-        ZorkaLogger.getLogger().resetTrappers();
-        config.initLoggers();
-        log.info(ZorkaLogger.ZAG_CONFIG, "Agent configuration reloaded ...");
-        tracer.clearMatchers();
-        tracer.clearOutputs();
-        long l = agent.reloadScripts();
-        log.info(ZorkaLogger.ZAG_CONFIG, "Agent configuration scripts executed (" + l + " errors).");
-        log.info(ZorkaLogger.ZAG_CONFIG, "Number of matchers in tracer configuration: "
-                + tracer.getMatcherSet().getMatchers().size());
+        instance.shutdown();
+        ZorkaUtil.sleep(1000);
+        instance.restart();
+        long l = AgentDiagnostics.get(AgentDiagnostics.CONFIG_ERRORS);
         return l == 0 ? "OK" : "ERRORS(" + l + ") see agent log.";
     }
 
@@ -707,8 +699,18 @@ public class ZorkaLib {
         FileTrapper trapper = fileTrappers.get(id);
 
         if (trapper != null) {
+            trapper.close();
             trapper.stop();
         }
+    }
+
+    @Override
+    public void shutdown() {
+        for (FileTrapper trapper : fileTrappers.values()) {
+            trapper.close();
+            trapper.stop();
+        }
+        fileTrappers.clear();
     }
 
 

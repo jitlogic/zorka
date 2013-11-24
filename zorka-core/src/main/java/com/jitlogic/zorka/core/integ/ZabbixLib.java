@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.core.integ;
 
+import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
@@ -35,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class ZabbixLib {
+public class ZabbixLib implements ZorkaService {
 
 
     private Map<String, ZabbixTrapper> trappers = new ConcurrentHashMap<String, ZabbixTrapper>();
@@ -155,6 +156,15 @@ public class ZabbixLib {
         ZabbixTrapper trapper = trappers.remove(id);
 
         if (trapper != null) {
+            trapper.close();
+            trapper.stop();
+        }
+    }
+
+    @Override
+    public void shutdown() {
+        for (ZabbixTrapper trapper : trappers.values()) {
+            trapper.close();
             trapper.stop();
         }
     }

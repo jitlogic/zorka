@@ -289,7 +289,7 @@ public class ZorkaLogger implements ZorkaTrapper {
     }
 
 
-    public synchronized void resetTrappers() {
+    public synchronized void shutdown() {
         for (ZorkaTrapper trapper : trappers) {
             if (trapper instanceof ZorkaAsyncThread) {
                 ((ZorkaAsyncThread) trapper).stop();

@@ -203,11 +203,10 @@ public class ZorkaBshAgent implements ZorkaAgent {
     }
 
 
-    public long reloadScripts() {
+    public void reloadScripts() {
         loadedScripts.clear();
         AgentDiagnostics.clear(AgentDiagnostics.CONFIG_ERRORS);
         loadScripts();
-        return AgentDiagnostics.get(AgentDiagnostics.CONFIG_ERRORS);
     }
 
 
