@@ -17,10 +17,9 @@ package com.jitlogic.zorka.core;
 
 
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
-import com.jitlogic.zorka.common.util.ZorkaConfig;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
+import com.jitlogic.zorka.common.util.*;
+import com.jitlogic.zorka.core.integ.SyslogLib;
+import com.jitlogic.zorka.core.integ.SyslogTrapper;
 
 import java.io.File;
 import java.util.*;
@@ -34,8 +33,15 @@ public class AgentConfig extends ZorkaConfig {
     ;
     public static final String PROP_PROFILE_DIR = "zorka.profile.dir";
 
+    private String agentHome;
+
     public AgentConfig(String home) {
-        loadProperties(home, "zorka.properties", DEFAULT_CONF_PATH);
+        this.agentHome = home;
+        reload();
+    }
+
+    public void reload() {
+        loadProperties(agentHome, "zorka.properties", DEFAULT_CONF_PATH);
         setBaseProps();
     }
 
@@ -59,6 +65,76 @@ public class AgentConfig extends ZorkaConfig {
         if (!properties.containsKey("zorka.log.dir")) {
             properties.put("zorka.log.dir", ZorkaUtil.path(homeDir, "log"));
         }
+    }
+
+    /**
+     * Adds and configures standard loggers.
+     */
+    public void initLoggers() {
+        if (boolCfg("zorka.filelog", true)) {
+            initFileTrapper();
+        }
+
+        if (boolCfg("zorka.syslog", false)) {
+            initSyslogTrapper();
+        }
+
+        ZorkaLogger.configure(getProperties());
+
+        log.info(ZorkaLogger.ZAG_CONFIG, "Starting ZORKA agent " + getProperties().getProperty("zorka.version"));
+    }
+
+
+    /**
+     * Creates and configures syslogt trapper according to configuration properties
+     */
+    private void initSyslogTrapper() {
+        try {
+            String server = stringCfg("zorka.syslog.server", "127.0.0.1");
+            String hostname = stringCfg("zorka.hostname", "zorka");
+            int syslogFacility = SyslogLib.getFacility(stringCfg("zorka.syslog.facility", "F_LOCAL0"));
+
+            SyslogTrapper syslog = new SyslogTrapper(server, hostname, syslogFacility, true);
+            syslog.disableTrapCounter();
+            syslog.start();
+
+            ZorkaLogger.getLogger().addTrapper(syslog);
+        } catch (Exception e) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing logger arguments", e);
+            log.info(ZorkaLogger.ZAG_ERRORS, "Syslog trapper will be disabled.");
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
+        }
+    }
+
+
+    /**
+     * Creates and configures file trapper according to configuration properties
+     */
+    private void initFileTrapper() {
+        String logDir = getLogDir();
+        boolean logExceptions = boolCfg("zorka.log.exceptions", true);
+        String logFileName = stringCfg("zorka.log.fname", "zorka.log");
+        ZorkaLogLevel logThreshold = ZorkaLogLevel.DEBUG;
+
+        int maxSize = 4 * 1024 * 1024, maxLogs = 4; // TODO int -> long
+
+        try {
+            logThreshold = ZorkaLogLevel.valueOf(stringCfg("zorka.log.level", "INFO"));
+            maxSize = (int) (long) kiloCfg("zorka.log.size", 4L * 1024 * 1024);
+            maxLogs = intCfg("zorka.log.num", 8);
+        } catch (Exception e) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing logger arguments", e);
+            log.info(ZorkaLogger.ZAG_ERRORS, "File trapper will be disabled.");
+            AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
+        }
+
+
+        FileTrapper trapper = FileTrapper.rolling(logThreshold,
+                new File(logDir, logFileName).getPath(), maxLogs, maxSize, logExceptions);
+        trapper.disableTrapCounter();
+        trapper.start();
+
+        ZorkaLogger.getLogger().addTrapper(trapper);
     }
 
 

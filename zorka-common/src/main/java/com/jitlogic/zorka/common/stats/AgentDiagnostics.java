@@ -126,6 +126,9 @@ public class AgentDiagnostics {
         return timeCounters.contains(counter) ? v / 1000000L : v;
     }
 
+    public static void clear(int counter) {
+        counters[counter].set(0);
+    }
 
     public static void clear() {
         counters = new AtomicLong[counterNames.length];

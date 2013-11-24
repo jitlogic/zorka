@@ -152,7 +152,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
      * Override this method if some resources have to be allocated
      * before thread starts (eg. network socket).
      */
-    protected void open() {
+    public void open() {
 
     }
 
@@ -161,7 +161,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
      * Override this method if some resources have to be disposed
      * after thread stops (eg. network socket)
      */
-    protected void close() {
+    public void close() {
 
     }
 

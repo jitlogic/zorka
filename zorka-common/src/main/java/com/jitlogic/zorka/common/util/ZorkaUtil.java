@@ -827,4 +827,11 @@ public class ZorkaUtil {
         return null;
     }
 
+
+    public static void sleep(long interval) {
+        try {
+            Thread.sleep(interval);
+        } catch (InterruptedException e) {
+        }
+    }
 }

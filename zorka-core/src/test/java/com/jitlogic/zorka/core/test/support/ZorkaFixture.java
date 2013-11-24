@@ -88,7 +88,7 @@ public class ZorkaFixture extends CommonFixture {
 
         mBeanServerRegistry = agentInstance.getMBeanServerRegistry();
         zorkaAgent = agentInstance.getZorkaAgent();
-        zorka = zorkaAgent.getZorkaLib();
+        zorka = agentInstance.getZorkaLib();
         syslogLib = agentInstance.getSyslogLib();
         snmpLib = agentInstance.getSnmpLib();
         spy = agentInstance.getSpyLib();

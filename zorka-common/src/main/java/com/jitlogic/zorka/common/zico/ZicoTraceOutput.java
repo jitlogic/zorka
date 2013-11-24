@@ -222,7 +222,9 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
 
 
     @Override
-    protected void open() {
+    public void open() {
+        log.info(ZorkaLogger.ZSP_CONFIG, "Starting network tracer output: " + hostname
+                + " -> " + conn.getAddr() + ":" + conn.getPort());
         try {
             writer.reset();
             conn.connect();
@@ -235,7 +237,9 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
 
 
     @Override
-    protected void close() {
+    public synchronized void close() {
+        log.info(ZorkaLogger.ZSP_CONFIG, "Stopping network tracer output: " + hostname
+                + " -> " + conn.getAddr() + ":" + conn.getPort());
         try {
             conn.close();
         } catch (IOException e) {

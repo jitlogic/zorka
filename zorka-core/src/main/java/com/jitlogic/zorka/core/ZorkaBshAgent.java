@@ -27,6 +27,7 @@ import com.jitlogic.zorka.common.ZorkaAgent;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
+import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.util.ObjectDumper;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
@@ -53,11 +54,6 @@ public class ZorkaBshAgent implements ZorkaAgent {
     private Interpreter interpreter;
 
     /**
-     * Zorka standard library
-     */
-    private ZorkaLib zorkaLib;
-
-    /**
      * Executor for asynchronous processing queries
      */
     private Executor connExecutor;
@@ -78,8 +74,7 @@ public class ZorkaBshAgent implements ZorkaAgent {
      * @param connExecutor connExecutor for asynchronous processing queries
      */
     public ZorkaBshAgent(Executor connExecutor, ExecutorService mainExecutor,
-                         long timeout, MBeanServerRegistry mbsRegistry,
-                         AgentConfig config, QueryTranslator translator) {
+                         long timeout, AgentConfig config) {
 
         this.interpreter = new Interpreter();
 
@@ -87,10 +82,6 @@ public class ZorkaBshAgent implements ZorkaAgent {
         this.mainExecutor = mainExecutor;
         this.timeout = timeout;
         this.config = config;
-
-
-        zorkaLib = new ZorkaLib(this, mbsRegistry, config, translator);
-        put("zorka", zorkaLib);
     }
 
 
@@ -212,6 +203,14 @@ public class ZorkaBshAgent implements ZorkaAgent {
     }
 
 
+    public long reloadScripts() {
+        loadedScripts.clear();
+        AgentDiagnostics.clear(AgentDiagnostics.CONFIG_ERRORS);
+        loadScripts();
+        return AgentDiagnostics.get(AgentDiagnostics.CONFIG_ERRORS);
+    }
+
+
     public void initialize() {
         loadScripts();
         initialized = true;
@@ -220,16 +219,6 @@ public class ZorkaBshAgent implements ZorkaAgent {
 
     public boolean isInitialized() {
         return initialized;
-    }
-
-
-    /**
-     * Returns zorka standard library.
-     *
-     * @return zorka library instance.
-     */
-    public ZorkaLib getZorkaLib() {
-        return zorkaLib;
     }
 
 }

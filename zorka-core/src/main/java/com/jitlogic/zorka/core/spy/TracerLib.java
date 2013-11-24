@@ -80,6 +80,11 @@ public class TracerLib {
     }
 
 
+    public void clearOutputs() {
+        tracer.clearOutputs();
+    }
+
+
     /**
      * Adds matching method to tracer.
      *

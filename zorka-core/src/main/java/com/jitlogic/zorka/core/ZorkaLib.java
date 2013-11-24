@@ -25,6 +25,7 @@ import javax.management.*;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
+import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.util.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.*;
@@ -69,20 +70,23 @@ public class ZorkaLib {
 
     private String version;
 
-    private ZorkaConfig config;
+    private AgentConfig config;
 
     private QueryTranslator translator;
+
+    private Tracer tracer;
 
     /**
      * Standard constructor
      *
      * @param agent reference to Zorka BSH agent object
      */
-    public ZorkaLib(ZorkaBshAgent agent, MBeanServerRegistry registry, ZorkaConfig config, QueryTranslator translator) {
+    public ZorkaLib(ZorkaBshAgent agent, MBeanServerRegistry registry, AgentConfig config, QueryTranslator translator, Tracer tracer) {
         this.agent = agent;
         this.mbsRegistry = registry;
         this.config = config;
         this.translator = translator;
+        this.tracer = tracer;
 
         this.hostname = config.getProperties().getProperty("zorka.hostname").trim();
         this.version = config.getProperties().getProperty("zorka.version").trim();
@@ -482,13 +486,23 @@ public class ZorkaLib {
 
 
     /**
-     * Reloads and executes configuration scripts matching given mask.
-     * Scripts have to be in $ZORKA_HOME/conf directory.
+     * Reloads agent configuration and scripts.
      *
-     * @param name file name (relative to conf dir)
+     * @return
      */
-    public String reload(String name) {
-        return agent.loadScript(ZorkaUtil.path(config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null), name));
+    public String reload() {
+        log.info(ZorkaLogger.ZAG_CONFIG, "Reloading agent configuration...");
+        config.reload();
+        ZorkaLogger.getLogger().resetTrappers();
+        config.initLoggers();
+        log.info(ZorkaLogger.ZAG_CONFIG, "Agent configuration reloaded ...");
+        tracer.clearMatchers();
+        tracer.clearOutputs();
+        long l = agent.reloadScripts();
+        log.info(ZorkaLogger.ZAG_CONFIG, "Agent configuration scripts executed (" + l + " errors).");
+        log.info(ZorkaLogger.ZAG_CONFIG, "Number of matchers in tracer configuration: "
+                + tracer.getMatcherSet().getMatchers().size());
+        return l == 0 ? "OK" : "ERRORS(" + l + ") see agent log.";
     }
 
 

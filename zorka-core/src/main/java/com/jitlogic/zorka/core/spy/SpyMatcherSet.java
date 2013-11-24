@@ -220,4 +220,7 @@ public class SpyMatcherSet {
         return matchers;
     }
 
+    public void clear() {
+        matchers.clear();
+    }
 }
