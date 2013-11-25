@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2013-11-19T19:26:21Z</date>
+    <date>2013-11-25T21:19:24Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -55,9 +55,7 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>jboss4.ejb3.time[&quot;{#EAR}&quot;,&quot;{#JAR}&quot;,&quot;{#NAME}&quot;,&quot;{#METHOD}&quot;,
-                                &quot;AVG5&quot;]
-                            </key>
+                            <key>jboss4.ejb3.time[&quot;{#EAR}&quot;,&quot;{#JAR}&quot;,&quot;{#NAME}&quot;,&quot;{#METHOD}&quot;, &quot;AVG5&quot;]</key>
                             <delay>59</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -96,9 +94,7 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>jboss4.ejb3.time[&quot;{#EAR}&quot;,&quot;{#JAR}&quot;,&quot;{#NAME}&quot;,&quot;{#METHOD}&quot;,
-                                &quot;AVG15&quot;]
-                            </key>
+                            <key>jboss4.ejb3.time[&quot;{#EAR}&quot;,&quot;{#JAR}&quot;,&quot;{#NAME}&quot;,&quot;{#METHOD}&quot;, &quot;AVG15&quot;]</key>
                             <delay>59</delay>
                             <history>10</history>
                             <trends>365</trends>

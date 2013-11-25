@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2013-11-19T10:50:48Z</date>
+    <date>2013-11-25T21:29:44Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -28,10 +28,7 @@
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix.discovery[&quot;pmi&quot;, &quot;WebSphere:type=JDBCProvider,*&quot;, &quot;name&quot;,&quot;process&quot;,
-                        &quot;platform&quot;, &quot;node&quot;, &quot;j2eeType&quot;, &quot;J2EEServer&quot;,&quot;Server&quot;,
-                        &quot;version&quot;, &quot;type&quot;, &quot;mbeanIdentifier&quot;, &quot;cell&quot;,&quot;spec&quot;]
-                    </key>
+                    <key>zabbix.discovery[&quot;pmi&quot;, &quot;WebSphere:type=JDBCProvider,*&quot;, &quot;name&quot;,&quot;process&quot;, &quot;platform&quot;, &quot;node&quot;, &quot;j2eeType&quot;, &quot;J2EEServer&quot;,&quot;Server&quot;, &quot;version&quot;, &quot;type&quot;, &quot;mbeanIdentifier&quot;, &quot;cell&quot;,&quot;spec&quot;]</key>
                     <delay>30</delay>
                     <status>0</status>
                     <allowed_hosts/>
@@ -58,10 +55,7 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;pmi&quot;, &quot;WebSphere:type=JDBCProvider,name={#NAME},*&quot;,
-                                &quot;stats&quot;, &quot;getConnectionPools()&quot;, &quot;0&quot;, &quot;PercentUsed&quot;,
-                                &quot;current&quot;]
-                            </key>
+                            <key>zorka.jmx[&quot;pmi&quot;, &quot;WebSphere:type=JDBCProvider,name={#NAME},*&quot;, &quot;stats&quot;, &quot;getConnectionPools()&quot;, &quot;0&quot;, &quot;PercentUsed&quot;, &quot;current&quot;]</key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -100,10 +94,7 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;pmi&quot;, &quot;WebSphere:type=JDBCProvider,name={#NAME},*&quot;,
-                                &quot;stats&quot;, &quot;getConnectionPools()&quot;, &quot;0&quot;, &quot;CreateCount&quot;,
-                                &quot;count&quot;]
-                            </key>
+                            <key>zorka.jmx[&quot;pmi&quot;, &quot;WebSphere:type=JDBCProvider,name={#NAME},*&quot;, &quot;stats&quot;, &quot;getConnectionPools()&quot;, &quot;0&quot;, &quot;CreateCount&quot;, &quot;count&quot;]</key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -142,10 +133,7 @@
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;pmi&quot;, &quot;WebSphere:type=JDBCProvider,name={#NAME},*&quot;,
-                                &quot;stats&quot;, &quot;getConnectionPools()&quot;, &quot;0&quot;, &quot;WaitingThreadCount&quot;,
-                                &quot;current&quot;]
-                            </key>
+                            <key>zorka.jmx[&quot;pmi&quot;, &quot;WebSphere:type=JDBCProvider,name={#NAME},*&quot;, &quot;stats&quot;, &quot;getConnectionPools()&quot;, &quot;0&quot;, &quot;WaitingThreadCount&quot;, &quot;current&quot;]</key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -184,10 +172,7 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>zorka.rate[&quot;pmi&quot;, &quot;WebSphere:type=JDBCProvider,name={#NAME},*&quot;,
-                                &quot;stats&quot;, &quot;getConnectionPools()&quot;, &quot;0&quot;, &quot;UseTime&quot;,
-                                &quot;total&quot;, &quot;count&quot;, &quot;AVG5&quot;]
-                            </key>
+                            <key>zorka.rate[&quot;pmi&quot;, &quot;WebSphere:type=JDBCProvider,name={#NAME},*&quot;, &quot;stats&quot;, &quot;getConnectionPools()&quot;, &quot;0&quot;, &quot;UseTime&quot;, &quot;total&quot;, &quot;count&quot;, &quot;AVG5&quot;]</key>
                             <delay>55</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -226,10 +211,7 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>zorka.rate[&quot;pmi&quot;, &quot;WebSphere:type=JDBCProvider,name={#NAME},*&quot;,
-                                &quot;stats&quot;, &quot;getConnectionPools()&quot;, &quot;0&quot;, &quot;WaitTime&quot;,
-                                &quot;total&quot;, &quot;count&quot;, &quot;AVG5&quot;]
-                            </key>
+                            <key>zorka.rate[&quot;pmi&quot;, &quot;WebSphere:type=JDBCProvider,name={#NAME},*&quot;, &quot;stats&quot;, &quot;getConnectionPools()&quot;, &quot;0&quot;, &quot;WaitTime&quot;, &quot;total&quot;, &quot;count&quot;, &quot;AVG5&quot;]</key>
                             <delay>55</delay>
                             <history>10</history>
                             <trends>365</trends>

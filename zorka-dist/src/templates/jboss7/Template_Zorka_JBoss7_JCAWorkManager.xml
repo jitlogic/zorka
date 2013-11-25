@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2013-11-19T23:35:56Z</date>
+    <date>2013-11-25T21:24:32Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -28,9 +28,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;jboss.as:subsystem=jca,workmanager=default,long-running-threads=default&quot;,
-                        &quot;currentThreadCount&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;jboss.as:subsystem=jca,workmanager=default,long-running-threads=default&quot;, &quot;currentThreadCount&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -69,9 +67,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;jboss.as:subsystem=jca,workmanager=default,long-running-threads=default&quot;,
-                        &quot;maxThreads&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;jboss.as:subsystem=jca,workmanager=default,long-running-threads=default&quot;, &quot;maxThreads&quot;]</key>
                     <delay>3600</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -110,9 +106,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;jboss.as:subsystem=jca,workmanager=default,long-running-threads=default&quot;,
-                        &quot;rejectedCount&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;jboss.as:subsystem=jca,workmanager=default,long-running-threads=default&quot;, &quot;rejectedCount&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -151,9 +145,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;jboss.as:subsystem=jca,workmanager=default,short-running-threads=default&quot;,
-                        &quot;currentThreadCount&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;jboss.as:subsystem=jca,workmanager=default,short-running-threads=default&quot;, &quot;currentThreadCount&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -192,9 +184,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;jboss.as:subsystem=jca,workmanager=default,short-running-threads=default&quot;,
-                        &quot;maxThreads&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;jboss.as:subsystem=jca,workmanager=default,short-running-threads=default&quot;, &quot;maxThreads&quot;]</key>
                     <delay>3600</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -233,9 +223,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;jboss.as:subsystem=jca,workmanager=default,short-running-threads=default&quot;,
-                        &quot;rejectedCount&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;jboss.as:subsystem=jca,workmanager=default,short-running-threads=default&quot;, &quot;rejectedCount&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -277,9 +265,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template_Zorka_JBoss7_JCAWorkManager:zorka.jmx[&quot;java&quot;, &quot;jboss.as:subsystem=jca,workmanager=default,long-running-threads=default&quot;,
-                &quot;rejectedCount&quot;].max(#15)}=0
-            </expression>
+            <expression>{Template_Zorka_JBoss7_JCAWorkManager:zorka.jmx[&quot;java&quot;, &quot;jboss.as:subsystem=jca,workmanager=default,long-running-threads=default&quot;, &quot;rejectedCount&quot;].max(#15)}=0</expression>
             <name>{HOST.NAME} JCA long running thread queue overflow</name>
             <url/>
             <status>0</status>
@@ -289,9 +275,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_JBoss7_JCAWorkManager:zorka.jmx[&quot;java&quot;, &quot;jboss.as:subsystem=jca,workmanager=default,short-running-threads=default&quot;,
-                &quot;rejectedCount&quot;].max(#15)}=0
-            </expression>
+            <expression>{Template_Zorka_JBoss7_JCAWorkManager:zorka.jmx[&quot;java&quot;, &quot;jboss.as:subsystem=jca,workmanager=default,short-running-threads=default&quot;, &quot;rejectedCount&quot;].max(#15)}=0</expression>
             <name>{HOST.NAME} JCA short running thread queue overflow</name>
             <url/>
             <status>0</status>
