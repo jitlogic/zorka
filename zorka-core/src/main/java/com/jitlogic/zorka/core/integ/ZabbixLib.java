@@ -156,16 +156,14 @@ public class ZabbixLib implements ZorkaService {
         ZabbixTrapper trapper = trappers.remove(id);
 
         if (trapper != null) {
-            trapper.close();
-            trapper.stop();
+            trapper.shutdown();
         }
     }
 
     @Override
     public void shutdown() {
         for (ZabbixTrapper trapper : trappers.values()) {
-            trapper.close();
-            trapper.stop();
+            trapper.shutdown();
         }
     }
 }

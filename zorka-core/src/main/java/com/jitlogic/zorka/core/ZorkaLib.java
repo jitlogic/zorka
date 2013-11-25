@@ -699,16 +699,14 @@ public class ZorkaLib implements ZorkaService {
         FileTrapper trapper = fileTrappers.get(id);
 
         if (trapper != null) {
-            trapper.close();
-            trapper.stop();
+            trapper.shutdown();
         }
     }
 
     @Override
     public void shutdown() {
         for (FileTrapper trapper : fileTrappers.values()) {
-            trapper.close();
-            trapper.stop();
+            trapper.shutdown();
         }
         fileTrappers.clear();
     }

@@ -138,7 +138,7 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
 
 
     @Override
-    public void open() {
+    protected void open() {
         try {
             this.sender = new SNMPTrapSenderInterface(snmpPort);
         } catch (SocketException e) {
@@ -148,7 +148,7 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
 
 
     @Override
-    public void close() {
+    protected void close() {
         sender.close();
         sender = null;
     }

@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zorka.core.integ;
 
+import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.core.ZorkaBshAgent;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
@@ -36,7 +37,7 @@ import java.util.List;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public abstract class AbstractTcpAgent implements Runnable {
+public abstract class AbstractTcpAgent implements Runnable, ZorkaService {
 
     /**
      * Logger
@@ -176,6 +177,11 @@ public abstract class AbstractTcpAgent implements Runnable {
                 log.error(ZorkaLogger.ZAG_ERRORS, "I/O error in zabbix core main loop: " + e.getMessage());
             }
         }
+    }
+
+    @Override
+    public void shutdown() {
+        stop();
     }
 
     /**

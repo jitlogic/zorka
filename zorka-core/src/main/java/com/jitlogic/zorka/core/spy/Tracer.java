@@ -165,9 +165,7 @@ public class Tracer implements TracerOutput {
         outputs.set(new ArrayList<ZorkaAsyncThread<SymbolicRecord>>());
 
         for (ZorkaAsyncThread<SymbolicRecord> output : old) {
-            output.close();
-            output.stop();
-
+            output.shutdown();
         }
 
         if (old.size() > 0) {
