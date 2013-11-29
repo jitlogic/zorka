@@ -76,6 +76,8 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
     private SymbolRegistry symbolRegistry;
 
+    private SpyRetransformer retransformer;
+
     /**
      * Reference to tracer instance.
      */
@@ -88,9 +90,11 @@ public class SpyClassTransformer implements ClassFileTransformer {
      *
      * @param tracer reference to tracer engine object
      */
-    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer, MethodCallStatistics statistics) {
+    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer,
+                               MethodCallStatistics statistics, SpyRetransformer retransformer) {
         this.symbolRegistry = symbolRegistry;
         this.tracer = tracer;
+        this.retransformer = retransformer;
 
         this.spyLookups = statistics.getMethodCallStatistic("SpyLookups");
         this.tracerLookups = statistics.getMethodCallStatistic("TracerLookups");
@@ -139,13 +143,15 @@ public class SpyClassTransformer implements ClassFileTransformer {
     public synchronized SpyDefinition add(SpyDefinition sdef) {
         SpyDefinition osdef = sdefs.get(sdef.getName());
 
-        if (osdef != null && !osdef.sameProbes(sdef)) {
+        if (osdef != null && !osdef.sameProbes(sdef) && !retransformer.isEnabled()) {
             log.warn(ZorkaLogger.ZSP_CONFIG, "Cannot overwrite spy definition '" + osdef.getName()
-                    + "' because probes have changed and no retransform is possible.");
+                    + "' because probes have changed and retransform is not possible.");
             return null;
         }
 
         sdefs.put(sdef.getName(), sdef);
+
+        retransformer.retransform(osdef != null ? osdef.getMatcherSet() : null, sdef.getMatcherSet());
 
         if (osdef != null) {
             for (Map.Entry<SpyContext, SpyContext> e : ctxInstances.entrySet()) {

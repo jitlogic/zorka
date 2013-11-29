@@ -39,19 +39,18 @@ public class AgentMain {
     /**
      * This is entry method of java agent.
      *
-     * @param args arguments (supplied via -javaagent:/path/to/agent.jar=arguments)
-     *
-     * @param instr reference to JVM instrumentation interface
+     * @param args            arguments (supplied via -javaagent:/path/to/agent.jar=arguments)
+     * @param instrumentation reference to JVM instrumentation interface
      */
-    public static void premain(String args, Instrumentation instr) {
+    public static void premain(String args, Instrumentation instrumentation) {
 
         String home = System.getProperties().getProperty("zorka.home.dir", args);
 
-        instance = new AgentInstance(new AgentConfig(home));
+        instance = new AgentInstance(new AgentConfig(home), instrumentation);
         instance.start();
 
         if (instance.getConfig().boolCfg("spy", true)) {
-            instr.addTransformer(instance.getClassTransformer());
+            instrumentation.addTransformer(instance.getClassTransformer());
             MainSubmitter.setSubmitter(instance.getSubmitter());
             MainSubmitter.setTracer(instance.getTracer());
         }

@@ -31,6 +31,7 @@ import com.jitlogic.zorka.core.integ.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.normproc.NormLib;
 
+import java.lang.instrument.Instrumentation;
 import java.util.Properties;
 import java.util.concurrent.*;
 
@@ -143,8 +144,13 @@ public class AgentInstance implements ZorkaService {
 
     private ZabbixQueryTranslator translator;
 
-    public AgentInstance(AgentConfig config) {
+    private Instrumentation instrumentation;
+
+    private SpyRetransformer retransformer;
+
+    public AgentInstance(AgentConfig config, Instrumentation instrumentation) {
         this.config = config;
+        this.instrumentation = instrumentation;
         props = config.getProperties();
     }
 
@@ -310,9 +316,17 @@ public class AgentInstance implements ZorkaService {
     }
 
 
+    public synchronized SpyRetransformer getRetransformer() {
+        if (retransformer == null) {
+            retransformer = new SpyRetransformer(instrumentation);
+        }
+        return retransformer;
+    }
+
+
     public synchronized SpyClassTransformer getClassTransformer() {
         if (classTransformer == null) {
-            classTransformer = new SpyClassTransformer(getSymbolRegistry(), getTracer(), stats);
+            classTransformer = new SpyClassTransformer(getSymbolRegistry(), getTracer(), stats, getRetransformer());
         }
         return classTransformer;
     }
