@@ -22,6 +22,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 import com.jitlogic.zorka.common.ZorkaAgent;
+import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.core.util.ObjectDumper;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
@@ -36,7 +37,7 @@ import bsh.Interpreter;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class ZorkaBshAgent implements ZorkaAgent {
+public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
 
     /**
      * Logger
@@ -215,4 +216,12 @@ public class ZorkaBshAgent implements ZorkaAgent {
         return initialized;
     }
 
+    public void restart() {
+        interpreter = new Interpreter();
+    }
+
+    @Override
+    public void shutdown() {
+
+    }
 }

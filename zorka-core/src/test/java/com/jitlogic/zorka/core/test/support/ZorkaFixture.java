@@ -117,9 +117,6 @@ public class ZorkaFixture extends CommonFixture {
         // Uninstall test MBean server
         mBeanServerRegistry.unregister("test");
 
-        // Stop agent
-        agentInstance.stop();
-
         MainSubmitter.setSubmitter(null);
         MainSubmitter.setTracer(null);
     }

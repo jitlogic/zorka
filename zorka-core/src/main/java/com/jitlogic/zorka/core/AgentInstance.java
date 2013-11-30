@@ -22,6 +22,7 @@ import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.stats.ValGetter;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.mbeans.AttrGetter;
 import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
 import com.jitlogic.zorka.core.perfmon.PerfMonLib;
@@ -31,8 +32,8 @@ import com.jitlogic.zorka.core.integ.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.normproc.NormLib;
 
-import java.lang.instrument.Instrumentation;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.*;
 
 /**
@@ -160,19 +161,7 @@ public class AgentInstance implements ZorkaService {
 
         config.initLoggers();
 
-        getZorkaAgent().put("util", getUtilLib());
-
-        if (config.boolCfg("spy", true)) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Zorka SPY");
-            getZorkaAgent().put("spy", getSpyLib());
-            getZorkaAgent().put("tracer", getTracerLib());
-        }
-
-        getZorkaAgent().put("perfmon", getPerfMonLib());
-
-        initIntegrationLibs();
-
-        getZorkaAgent().put("normalizers", getNormLib());
+        initBshLibs();
 
         zorkaAgent.initialize();
 
@@ -182,13 +171,19 @@ public class AgentInstance implements ZorkaService {
     }
 
 
-    public void stop() {
-    }
+    private void initBshLibs() {
 
+        getZorkaAgent().put("zorka", getZorkaLib());
 
-    private void initIntegrationLibs() {
+        getZorkaAgent().put("util", getUtilLib());
 
-        zorkaAgent.put("zorka", getZorkaLib());
+        if (config.boolCfg("spy", true)) {
+            log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Zorka SPY");
+            getZorkaAgent().put("spy", getSpyLib());
+            getZorkaAgent().put("tracer", getTracerLib());
+        }
+
+        getZorkaAgent().put("perfmon", getPerfMonLib());
 
         if (config.boolCfg("zabbix", true)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling ZABBIX subsystem ...");
@@ -211,6 +206,9 @@ public class AgentInstance implements ZorkaService {
             getNagiosAgent().start();
             zorkaAgent.put("nagios", getNagiosLib());
         }
+
+        getZorkaAgent().put("normalizers", getNormLib());
+
     }
 
 
@@ -520,6 +518,14 @@ public class AgentInstance implements ZorkaService {
         if (syslogLib != null) {
             syslogLib.shutdown();
         }
+
+        if (zabbixAgent != null) {
+            zabbixAgent.shutdown();
+        }
+
+        if (nagiosAgent != null) {
+            nagiosAgent.shutdown();
+        }
     }
 
 
@@ -529,11 +535,49 @@ public class AgentInstance implements ZorkaService {
         ZorkaLogger.getLogger().shutdown();
         config.initLoggers();
         log.info(ZorkaLogger.ZAG_CONFIG, "Agent configuration reloaded ...");
+        getZorkaAgent().restart();
+        initBshLibs();
         getZorkaAgent().reloadScripts();
         long l = AgentDiagnostics.get(AgentDiagnostics.CONFIG_ERRORS);
         log.info(ZorkaLogger.ZAG_CONFIG, "Agent configuration scripts executed (" + l + " errors).");
         log.info(ZorkaLogger.ZAG_CONFIG, "Number of matchers in tracer configuration: "
                 + tracer.getMatcherSet().getMatchers().size());
+
+        if (config.boolCfg("zabbix", true)) {
+            getZabbixAgent().restart();
+        }
+
+        if (config.boolCfg("nagios", true)) {
+            getNagiosAgent().restart();
+        }
+
     }
 
+    public void reload() {
+        SpyMatcherSet oldSet = getTracer().getMatcherSet();
+        SpyClassTransformer classTransformer = getClassTransformer();
+        Set<SpyDefinition> oldSdefs = classTransformer.getSdefs();
+        shutdown();
+        ZorkaUtil.sleep(1000);
+        restart();
+        long l = AgentDiagnostics.get(AgentDiagnostics.CONFIG_ERRORS);
+        if (l == 0) {
+            SpyMatcherSet newSet = getTracer().getMatcherSet();
+            log.info(ZorkaLogger.ZAG_CONFIG, "Reinstrumenting classes for tracer ...");
+            getRetransformer().retransform(oldSet, newSet, false);
+            log.info(ZorkaLogger.ZAG_CONFIG, "Checking for old sdefs to be removed...");
+            int removed = 0;
+            for (SpyDefinition sdef : oldSdefs) {
+                if (sdef == classTransformer.getSdef(sdef.getName())) {
+                    classTransformer.remove(sdef);
+                    removed++;
+                }
+            }
+            log.info(ZorkaLogger.ZAG_CONFIG, "Number of sdefs removed: " + removed);
+        } else {
+            log.info(ZorkaLogger.ZAG_CONFIG,
+                    "Reinstrumentating classes for tracer skipped due to configuration errors. Fix config scripts and try again.");
+        }
+
+    }
 }

@@ -19,6 +19,7 @@ package com.jitlogic.zorka.agent;
 
 import com.jitlogic.zorka.core.AgentConfig;
 import com.jitlogic.zorka.core.AgentInstance;
+import com.jitlogic.zorka.core.ZorkaControl;
 import com.jitlogic.zorka.core.spy.MainSubmitter;
 import com.jitlogic.zorka.core.spy.SpyRetransformer;
 
@@ -100,6 +101,9 @@ public class AgentMain {
             MainSubmitter.setSubmitter(instance.getSubmitter());
             MainSubmitter.setTracer(instance.getTracer());
         }
+
+        instance.getMBeanServerRegistry().registerZorkaControl(
+                new ZorkaControl("java", "zorka:type=ZorkaControl,name=ZorkaControl", instance));
     }
 
 }

@@ -493,27 +493,8 @@ public class ZorkaLib implements ZorkaService {
      * @return
      */
     public String reload() {
-        SpyMatcherSet oldSet = instance.getTracer().getMatcherSet();
-        SpyClassTransformer classTransformer = instance.getClassTransformer();
-        Set<SpyDefinition> oldSdefs = classTransformer.getSdefs();
-        instance.shutdown();
-        ZorkaUtil.sleep(1000);
-        instance.restart();
+        instance.reload();
         long l = AgentDiagnostics.get(AgentDiagnostics.CONFIG_ERRORS);
-        if (l == 0) {
-            SpyMatcherSet newSet = instance.getTracer().getMatcherSet();
-            log.info(ZorkaLogger.ZAG_CONFIG, "Reinstrumenting classes for tracer ...");
-            instance.getRetransformer().retransform(oldSet, newSet, false);
-            log.info(ZorkaLogger.ZAG_CONFIG, "Checking for old sdefs to be removed...");
-            for (SpyDefinition sdef : oldSdefs) {
-                if (sdef == classTransformer.getSdef(sdef.getName())) {
-                    classTransformer.remove(sdef);
-                }
-            }
-        } else {
-            log.info(ZorkaLogger.ZAG_CONFIG,
-                    "Reinstrumentating classes for tracer skipped due to configuration errors. Fix config scripts and try again.");
-        }
         return l == 0 ? "OK" : "ERRORS(" + l + ") see agent log.";
     }
 

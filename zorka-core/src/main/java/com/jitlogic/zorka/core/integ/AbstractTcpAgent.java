@@ -69,6 +69,12 @@ public abstract class AbstractTcpAgent implements Runnable, ZorkaService {
      */
     private int listenPort;
 
+    private String defaultAddr;
+
+    private int defaultPort;
+
+    private ZorkaConfig config;
+
     /**
      * TCP listen address
      */
@@ -104,6 +110,14 @@ public abstract class AbstractTcpAgent implements Runnable, ZorkaService {
         this.prefix = prefix;
         this.translator = translator;
 
+        this.defaultPort = defaultPort;
+        this.defaultAddr = defaultAddr;
+        this.config = config;
+
+        setup();
+    }
+
+    protected void setup() {
         String la = config.stringCfg(prefix + ".listen.addr", defaultAddr);
         try {
             listenAddr = InetAddress.getByName(la.trim());
@@ -177,6 +191,11 @@ public abstract class AbstractTcpAgent implements Runnable, ZorkaService {
                 log.error(ZorkaLogger.ZAG_ERRORS, "I/O error in zabbix core main loop: " + e.getMessage());
             }
         }
+    }
+
+    public void restart() {
+        setup();
+        start();
     }
 
     @Override
