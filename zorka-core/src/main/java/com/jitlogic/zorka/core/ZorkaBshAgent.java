@@ -17,17 +17,12 @@
 
 package com.jitlogic.zorka.core;
 
-import java.io.File;
 import java.util.*;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 import com.jitlogic.zorka.common.ZorkaAgent;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
-import com.jitlogic.zorka.core.integ.QueryTranslator;
-import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.util.ObjectDumper;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
@@ -66,7 +61,7 @@ public class ZorkaBshAgent implements ZorkaAgent {
 
     private boolean initialized;
 
-    private Set<String> loadedScripts = new ConcurrentSkipListSet<String>();
+    private Set<String> loadedScripts = new HashSet<String>();
 
     /**
      * Standard constructor.
@@ -155,7 +150,7 @@ public class ZorkaBshAgent implements ZorkaAgent {
      *
      * @param path path to script
      */
-    public String loadScript(String path) {
+    public synchronized String loadScript(String path) {
         try {
             log.info(ZorkaLogger.ZAG_CONFIG, "Executing script: " + path);
             interpreter.source(path);
@@ -173,7 +168,7 @@ public class ZorkaBshAgent implements ZorkaAgent {
     }
 
 
-    public String require(String path) {
+    public synchronized String require(String path) {
         if (!loadedScripts.contains(path)) {
             return loadScript(path);
         } else {
@@ -203,7 +198,7 @@ public class ZorkaBshAgent implements ZorkaAgent {
     }
 
 
-    public void reloadScripts() {
+    public synchronized void reloadScripts() {
         loadedScripts.clear();
         AgentDiagnostics.clear(AgentDiagnostics.CONFIG_ERRORS);
         loadScripts();

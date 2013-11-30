@@ -24,10 +24,7 @@ import com.jitlogic.zorka.core.integ.SyslogLib;
 import com.jitlogic.zorka.core.integ.ZabbixLib;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.PerfMonLib;
-import com.jitlogic.zorka.core.spy.MainSubmitter;
-import com.jitlogic.zorka.core.spy.SpyClassTransformer;
-import com.jitlogic.zorka.core.spy.SpyLib;
-import com.jitlogic.zorka.core.spy.TracerLib;
+import com.jitlogic.zorka.core.spy.*;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import org.junit.After;
@@ -81,7 +78,7 @@ public class ZorkaFixture extends CommonFixture {
         );
 
         config = new AgentConfig(configProperties);
-        agentInstance = new AgentInstance(config, null); //AgentInstance.instance();
+        agentInstance = new AgentInstance(config, new DummySpyRetransformer(null));
         agentInstance.start();
 
         // Get all agent components used by tests

@@ -48,6 +48,7 @@ public class DispatchingSubmitter implements SpySubmitter {
 
     /**
      * Submission stack is used to associate results from method entry probes with results from return/error probes.
+     * TODO what happens to submission stack when spy context disappears when some method is executing ?
      */
     private ThreadLocal<Stack<Map<String, Object>>> submissionStack =
             new ThreadLocal<Stack<Map<String, Object>>>() {

@@ -127,7 +127,7 @@ public class Tracer implements TracerOutput {
      * @param matcher spy matcher to be added
      */
     public void include(SpyMatcher matcher) {
-        matcherSet.include(matcher);
+        matcherSet = matcherSet.include(matcher);
     }
 
     public SpyMatcherSet clearMatchers() {

@@ -143,7 +143,12 @@ public class SpyClassTransformer implements ClassFileTransformer {
     public synchronized SpyDefinition add(SpyDefinition sdef) {
         SpyDefinition osdef = sdefs.get(sdef.getName());
 
-        if (osdef != null && !osdef.sameProbes(sdef) && !retransformer.isEnabled()) {
+        log.info(ZorkaLogger.ZSP_CONFIG, (osdef == null ? "Adding " : "Replacing ")
+                + sdef.getName() + " spy definition.");
+
+        boolean shouldRetransform = osdef != null && !osdef.sameProbes(sdef) && !retransformer.isEnabled();
+
+        if (shouldRetransform) {
             log.warn(ZorkaLogger.ZSP_CONFIG, "Cannot overwrite spy definition '" + osdef.getName()
                     + "' because probes have changed and retransform is not possible.");
             return null;
@@ -151,7 +156,11 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
         sdefs.put(sdef.getName(), sdef);
 
-        retransformer.retransform(osdef != null ? osdef.getMatcherSet() : null, sdef.getMatcherSet());
+        if (retransformer.isEnabled() && (osdef == null || !osdef.sameProbes(sdef))) {
+            retransformer.retransform(osdef != null ? osdef.getMatcherSet() : null, sdef.getMatcherSet(), true);
+        } else {
+            log.info(ZorkaLogger.ZSP_CONFIG, "Probes didn't change for " + sdef.getName() + ". Retransform not needed.");
+        }
 
         if (osdef != null) {
             for (Map.Entry<SpyContext, SpyContext> e : ctxInstances.entrySet()) {
@@ -166,14 +175,55 @@ public class SpyClassTransformer implements ClassFileTransformer {
     }
 
 
-    /**
-     * Resets spy transformer. Removes all added spy definitions.
-     * All submissions coming from existing probes will be ignored.
-     */
-    public void reset() {
-        sdefs.clear();
-        ctxById.clear();
-        ctxInstances.clear();
+    public synchronized void remove(String sdefName) {
+        SpyDefinition sdef = sdefs.get(sdefName);
+        if (sdef != null) {
+            remove(sdef);
+        }
+    }
+
+
+    public synchronized void remove(SpyDefinition sdef) {
+        if (sdefs.get(sdef.getName()) == sdef) {
+            log.info(ZorkaLogger.ZSP_CONFIG, "Removing spy definition: " + sdef.getName());
+
+            sdefs.remove(sdef.getName());
+
+            Set<SpyContext> ctxs = new HashSet<SpyContext>();
+            Set<Integer> ids = new HashSet<Integer>();
+
+            for (Map.Entry<Integer, SpyContext> e : ctxById.entrySet()) {
+                ids.add(e.getKey());
+                ctxs.add(e.getValue());
+            }
+
+            for (Integer id : ids) {
+                ctxById.remove(id);
+            }
+
+            for (SpyContext ctx : ctxs) {
+                ctxInstances.remove(ctx);
+            }
+
+            if (retransformer.isEnabled()) {
+                retransformer.retransform(null, sdef.getMatcherSet(), true);
+            }
+
+        } else {
+            log.info(ZorkaLogger.ZSP_CONFIG, "Spy definition " + sdef.getName() + " has changed.");
+        }
+    }
+
+
+    public SpyDefinition getSdef(String name) {
+        return sdefs.get(name);
+    }
+
+
+    public synchronized Set<SpyDefinition> getSdefs() {
+        Set<SpyDefinition> ret = new HashSet<SpyDefinition>();
+        ret.addAll(sdefs.values());
+        return ret;
     }
 
 

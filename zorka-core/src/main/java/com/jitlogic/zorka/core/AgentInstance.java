@@ -144,14 +144,12 @@ public class AgentInstance implements ZorkaService {
 
     private ZabbixQueryTranslator translator;
 
-    private Instrumentation instrumentation;
-
     private SpyRetransformer retransformer;
 
-    public AgentInstance(AgentConfig config, Instrumentation instrumentation) {
+    public AgentInstance(AgentConfig config, SpyRetransformer retransformer) {
         this.config = config;
-        this.instrumentation = instrumentation;
         props = config.getProperties();
+        this.retransformer = retransformer;
     }
 
 
@@ -317,9 +315,6 @@ public class AgentInstance implements ZorkaService {
 
 
     public synchronized SpyRetransformer getRetransformer() {
-        if (retransformer == null) {
-            retransformer = new SpyRetransformer(instrumentation);
-        }
         return retransformer;
     }
 

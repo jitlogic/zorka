@@ -17,10 +17,14 @@ package com.jitlogic.zorka.core.test.spy;
 
 
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
+import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.spy.SpyDefinition;
 import com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.junit.Test;
+
+import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Method;
 
 import static com.jitlogic.zorka.core.test.support.TestUtil.getAttr;
 import static com.jitlogic.zorka.core.test.support.TestUtil.instantiate;
@@ -80,5 +84,22 @@ public class OnlineReconfUnitTest extends ZorkaFixture {
                 0, stats.getMethodCallStatistic("yyy").getCalls());
     }
 
+    @Test
+    public void testCheckInstrumentationInterface() {
+        Method isModifiable = null, retransformMethod = null;
+
+        for (Method m : Instrumentation.class.getDeclaredMethods()) {
+            if ("isModifiableClass".equals(m.getName())) {
+                isModifiable = m;
+            }
+            if ("retransformClasses".equals(m.getName())) {
+                retransformMethod = m;
+            }
+        }
+
+        assertNotNull("isModifiableMethod should exist", isModifiable);
+        assertNotNull("retransformMethod should exist", retransformMethod);
+
+    }
 
 }

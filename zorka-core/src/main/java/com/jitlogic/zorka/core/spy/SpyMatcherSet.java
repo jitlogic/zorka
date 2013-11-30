@@ -40,6 +40,9 @@ public class SpyMatcherSet {
     public SpyMatcherSet() {
     }
 
+    public SpyMatcherSet(SpyMatcherSet orig) {
+        matchers.addAll(orig.getMatchers());
+    }
 
     /**
      * Creates new matcher set and populates it with supplied matchers.
@@ -47,7 +50,7 @@ public class SpyMatcherSet {
      * @param matchers initial matchers
      */
     public SpyMatcherSet(SpyMatcher... matchers) {
-        include(matchers);
+        includeInternal(matchers);
     }
 
 
@@ -59,7 +62,7 @@ public class SpyMatcherSet {
      */
     public SpyMatcherSet(SpyMatcherSet orig, SpyMatcher... matchers) {
         this.matchers.addAll(orig.matchers);
-        include(matchers);
+        includeInternal(matchers);
     }
 
 
@@ -198,7 +201,7 @@ public class SpyMatcherSet {
      *
      * @param includes appended matchers
      */
-    public void include(SpyMatcher... includes) {
+    private void includeInternal(SpyMatcher... includes) {
 
         for (SpyMatcher m : includes) {
             if (matchers.size() == 0 || m.getPriority() >= matchers.get(matchers.size() - 1).getPriority()) {
@@ -214,6 +217,12 @@ public class SpyMatcherSet {
                 }
             }
         }
+    }
+
+    public SpyMatcherSet include(SpyMatcher... includes) {
+        SpyMatcherSet ret = new SpyMatcherSet(this);
+        ret.includeInternal(includes);
+        return ret;
     }
 
     public List<SpyMatcher> getMatchers() {

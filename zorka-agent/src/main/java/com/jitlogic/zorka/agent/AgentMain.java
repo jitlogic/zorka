@@ -20,8 +20,12 @@ package com.jitlogic.zorka.agent;
 import com.jitlogic.zorka.core.AgentConfig;
 import com.jitlogic.zorka.core.AgentInstance;
 import com.jitlogic.zorka.core.spy.MainSubmitter;
+import com.jitlogic.zorka.core.spy.SpyRetransformer;
 
+import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 /**
  * This class is responsible for bootstrapping zorka agent.
@@ -32,8 +36,47 @@ public class AgentMain {
 
     private static volatile AgentInstance instance;
 
-    public static AgentInstance getInstance() {
-        return instance;
+    private static boolean supportsRetransform(Instrumentation instrumentation) throws Exception {
+        for (Method m : instrumentation.getClass().getMethods()) {
+            if ("isRetransformClassesSupported".equals(m.getName())) {
+                return (Boolean) m.invoke(instrumentation);
+            }
+        }
+        return false;
+    }
+
+    private static SpyRetransformer instantiateRetransformer(Instrumentation instrumentation, String className) throws Exception {
+        Class<?> clazz = Class.forName(className);
+
+        for (Constructor<?> constructor : clazz.getConstructors()) {
+            Class<?>[] args = constructor.getParameterTypes();
+            if (args.length == 1) {
+                return (SpyRetransformer) constructor.newInstance(instrumentation);
+            }
+        }
+
+        throw new IllegalArgumentException("Cannot instantiate retransformer of class " + className);
+    }
+
+    private static void addTransformer(Instrumentation instrumentation, ClassFileTransformer transformer,
+                                       boolean retransformSupported) throws Exception {
+        Method atm = null;
+
+        for (Method m : Instrumentation.class.getMethods()) {
+            if ("addTransformer".equals(m.getName())) {
+                atm = m;
+                if (m.getParameterTypes().length == 2 || !retransformSupported) {
+                    break;
+                }
+            }
+        }
+
+        if (atm.getParameterTypes().length == 2) {
+            atm.invoke(instrumentation, transformer, retransformSupported);
+        } else {
+            atm.invoke(instrumentation, transformer);
+        }
+
     }
 
     /**
@@ -42,15 +85,18 @@ public class AgentMain {
      * @param args            arguments (supplied via -javaagent:/path/to/agent.jar=arguments)
      * @param instrumentation reference to JVM instrumentation interface
      */
-    public static void premain(String args, Instrumentation instrumentation) {
+    public static void premain(String args, Instrumentation instrumentation) throws Exception {
 
         String home = System.getProperties().getProperty("zorka.home.dir", args);
 
-        instance = new AgentInstance(new AgentConfig(home), instrumentation);
+        boolean retransformSupported = supportsRetransform(instrumentation);
+
+        instance = new AgentInstance(new AgentConfig(home), instantiateRetransformer(instrumentation,
+                "com.jitlogic.zorka.core.spy." + (retransformSupported ? "RealSpyRetransformer" : "DummySpyRetransformer")));
         instance.start();
 
         if (instance.getConfig().boolCfg("spy", true)) {
-            instrumentation.addTransformer(instance.getClassTransformer());
+            addTransformer(instrumentation, instance.getClassTransformer(), retransformSupported);
             MainSubmitter.setSubmitter(instance.getSubmitter());
             MainSubmitter.setTracer(instance.getTracer());
         }
