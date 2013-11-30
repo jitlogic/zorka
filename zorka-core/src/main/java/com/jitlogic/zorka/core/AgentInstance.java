@@ -535,13 +535,6 @@ public class AgentInstance implements ZorkaService {
         ZorkaLogger.getLogger().shutdown();
         config.initLoggers();
         log.info(ZorkaLogger.ZAG_CONFIG, "Agent configuration reloaded ...");
-        getZorkaAgent().restart();
-        initBshLibs();
-        getZorkaAgent().reloadScripts();
-        long l = AgentDiagnostics.get(AgentDiagnostics.CONFIG_ERRORS);
-        log.info(ZorkaLogger.ZAG_CONFIG, "Agent configuration scripts executed (" + l + " errors).");
-        log.info(ZorkaLogger.ZAG_CONFIG, "Number of matchers in tracer configuration: "
-                + tracer.getMatcherSet().getMatchers().size());
 
         if (config.boolCfg("zabbix", true)) {
             getZabbixAgent().restart();
@@ -550,6 +543,15 @@ public class AgentInstance implements ZorkaService {
         if (config.boolCfg("nagios", true)) {
             getNagiosAgent().restart();
         }
+
+        getZorkaAgent().restart();
+        initBshLibs();
+        getZorkaAgent().reloadScripts();
+        long l = AgentDiagnostics.get(AgentDiagnostics.CONFIG_ERRORS);
+        log.info(ZorkaLogger.ZAG_CONFIG, "Agent configuration scripts executed (" + l + " errors).");
+        log.info(ZorkaLogger.ZAG_CONFIG, "Number of matchers in tracer configuration: "
+                + tracer.getMatcherSet().getMatchers().size());
+
 
     }
 

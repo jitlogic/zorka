@@ -200,7 +200,15 @@ public abstract class AbstractTcpAgent implements Runnable, ZorkaService {
 
     @Override
     public void shutdown() {
+        log.info(ZorkaLogger.ZAG_CONFIG, "Shutting down " + prefix + " agent ...");
         stop();
+        if (socket != null) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+            }
+            socket = null;
+        }
     }
 
     /**
