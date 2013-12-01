@@ -24,6 +24,7 @@ import com.jitlogic.zico.data.*;
 import com.jitlogic.zorka.common.tracedata.*;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -39,11 +40,15 @@ public class TraceDataService {
 
     private SymbolRegistry symbolRegistry;
 
+    private UserManager userManager;
+
     @Inject
-    public TraceDataService(HostStoreManager storeManager, TraceTypeRegistry traceTypeRegistry, SymbolRegistry symbolRegistry) {
+    public TraceDataService(HostStoreManager storeManager, TraceTypeRegistry traceTypeRegistry,
+                            SymbolRegistry symbolRegistry, UserManager userManager) {
         this.storeManager = storeManager;
         this.traceTypeRegistry = traceTypeRegistry;
         this.symbolRegistry = symbolRegistry;
+        this.userManager = userManager;
     }
 
 
@@ -51,9 +56,16 @@ public class TraceDataService {
     @Path("/list")
     @Produces(MediaType.APPLICATION_JSON)
     public List<HostInfo> getHosts() {
+        HttpServletRequest request = ZicoCacheControlFilter.getRequest();
+        boolean isAdmin = request == null || request.isUserInRole("ADMIN");
+        Set<Integer> allowedHosts = isAdmin ? null : userManager.getAllowedHosts(request.getRemoteUser());
+
         List<HostInfo> infos = new ArrayList<HostInfo>();
+
         for (HostStore host : storeManager.list()) {
-            infos.add(host.getHostInfo());
+            if (isAdmin || allowedHosts.contains(host.getHostInfo().getId())) {
+                infos.add(host.getHostInfo());
+            }
         }
         return infos;
     }
