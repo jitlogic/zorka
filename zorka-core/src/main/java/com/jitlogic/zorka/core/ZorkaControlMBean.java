@@ -20,6 +20,20 @@ public interface ZorkaControlMBean {
 
     String getHostname();
 
+    long getTracerMinMethodTime();
+
+    void setTracerMinMethodTime(long t);
+
+    long getTracerMinTraceTime();
+
+    void setTracerMinTraceTime(long t);
+
+    long getTracerMaxTraceRecords();
+
+    void setTracerMaxTraceRecords(long t);
+
+    String listTracerIncludes();
+
     void reload();
 
 }

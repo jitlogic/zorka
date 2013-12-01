@@ -124,6 +124,16 @@ public class TracerLib {
 
     }
 
+    public String listIncludes() {
+        StringBuilder sb = new StringBuilder();
+        for (SpyMatcher sm : tracer.getMatcherSet().getMatchers()) {
+            sb.append(sm.hasFlags(SpyMatcher.EXCLUDE_MATCH) ? "excl: " : "incl: ");
+            sb.append(sm);
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
     /**
      * Starts a new (named) trace.
      *

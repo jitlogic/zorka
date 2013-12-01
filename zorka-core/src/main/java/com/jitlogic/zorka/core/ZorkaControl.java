@@ -46,6 +46,48 @@ public class ZorkaControl implements ZorkaControlMBean {
 
 
     @Override
+    public long getTracerMinMethodTime() {
+        return instance.getTracerLib().getTracerMinMethodTime();
+    }
+
+
+    @Override
+    public void setTracerMinMethodTime(long t) {
+        instance.getTracerLib().setTracerMinMethodTime(t);
+    }
+
+
+    @Override
+    public long getTracerMinTraceTime() {
+        return instance.getTracerLib().getTracerMinTraceTime();
+    }
+
+
+    @Override
+    public void setTracerMinTraceTime(long t) {
+        instance.getTracerLib().setTracerMinTraceTime(t);
+    }
+
+
+    @Override
+    public long getTracerMaxTraceRecords() {
+        return instance.getTracerLib().getTracerMaxTraceRecords();
+    }
+
+
+    @Override
+    public void setTracerMaxTraceRecords(long t) {
+        instance.getTracerLib().setTracerMaxTraceRecords(t);
+    }
+
+
+    @Override
+    public String listTracerIncludes() {
+        return instance.getTracerLib().listIncludes();
+    }
+
+
+    @Override
     public void reload() {
         instance.reload();
     }
