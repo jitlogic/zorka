@@ -579,6 +579,7 @@ public class AgentInstance implements ZorkaService {
         } else {
             log.info(ZorkaLogger.ZAG_CONFIG,
                     "Reinstrumentating classes for tracer skipped due to configuration errors. Fix config scripts and try again.");
+            getTracer().setMatcherSet(oldSet);
         }
 
     }

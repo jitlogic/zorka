@@ -178,4 +178,9 @@ public class Tracer implements TracerOutput {
         return matcherSet;
     }
 
+
+    public void setMatcherSet(SpyMatcherSet matcherSet) {
+        this.matcherSet = matcherSet;
+    }
+
 }
