@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.common.util.ZorkaUtil;
+
 import static com.jitlogic.zorka.core.spy.SpyMatcher.*;
 
 import java.util.ArrayList;
@@ -91,6 +93,30 @@ public class SpyMatcherSet {
 
         return false;
     }
+
+
+    public boolean classMatch(Class<?> clazz) {
+        String className = clazz.getName();
+        for (SpyMatcher matcher : matchers) {
+            int flags = matcher.getFlags();
+
+            if ((0 != (flags & BY_CLASS_NAME)) && match(matcher.getClassPattern(), className)) {
+                // Return true or false depending on whether this is normal or inverted match
+                return 0 == (flags & EXCLUDE_MATCH);
+            }
+
+            if (0 != (flags & (BY_INTERFACE)) && ZorkaUtil.instanceOf(clazz, matcher.getClassPattern())) {
+                return 0 == (flags & EXCLUDE_MATCH);
+            }
+
+            if (0 != (flags & (BY_CLASS_ANNOTATION | BY_METHOD_ANNOTATION))) {
+                return 0 == (flags & EXCLUDE_MATCH);
+            }
+        }
+
+        return false;
+    }
+
 
 
     /**

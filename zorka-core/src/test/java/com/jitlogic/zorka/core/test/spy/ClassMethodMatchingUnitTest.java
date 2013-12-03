@@ -16,7 +16,9 @@
  */
 package com.jitlogic.zorka.core.test.spy;
 
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.SpyMatcherSet;
+import com.jitlogic.zorka.core.test.spy.support.*;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import com.jitlogic.zorka.core.spy.SpyMatcher;
 
@@ -218,4 +220,32 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
         assertEquals("myMethod", sm.getMethodPattern().toString());
     }
 
+
+    @Test
+    public void testSpyMatchClazzByInterface() {
+        SpyMatcherSet sms = new SpyMatcherSet(
+                spy.byInterfaceAndMethod("com.jitlogic.zorka.core.test.spy.support.TestInterface1", "myMethod1"));
+        assertFalse(sms.classMatch(TestClass1.class));
+        assertTrue(sms.classMatch(TestClass2.class));
+        assertFalse(sms.classMatch(TestClass3.class));
+        assertTrue(sms.classMatch(TestClass4.class));
+    }
+
+
+    @Test
+    public void testSpyMatchClazzBySuperInterface() {
+        SpyMatcherSet sms = new SpyMatcherSet(
+                spy.byInterface("com.jitlogic.zorka.core.test.spy.support.TestInterface2"));
+        assertFalse(sms.classMatch(TestClass1.class));
+        assertTrue(sms.classMatch(TestClass2.class));
+        assertFalse(sms.classMatch(TestClass3.class));
+        assertTrue(sms.classMatch(TestClass4.class));
+        assertTrue(sms.classMatch(TestClass5.class));
+    }
+
+
+    @Test
+    public void testSpyMatchInterfaceClazzByInterface() {
+        assertFalse(ZorkaUtil.instanceOf(TestInterface1.class, "java.lang.Runnable"));
+    }
 }

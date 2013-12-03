@@ -46,9 +46,13 @@ public class RealSpyRetransformer implements SpyRetransformer {
         List<Class<?>> classes = new ArrayList<Class<?>>();
 
         for (Class<?> clazz : instrumentation.getAllLoadedClasses()) {
-            String clazzName = clazz.getName();
-            boolean oldMatch = oldSet != null && oldSet.classMatch(clazzName);
-            boolean newMatch = newSet.classMatch(clazzName);
+
+            if (clazz.isInterface() || clazz.isAnnotation()) {
+                continue;
+            }
+
+            boolean oldMatch = oldSet != null && oldSet.classMatch(clazz);
+            boolean newMatch = newSet.classMatch(clazz);
             if (isSdef ? (oldMatch || newMatch) : (oldMatch != newMatch)) {
                 if (instrumentation.isModifiableClass(clazz)) {
                     classes.add(clazz);
