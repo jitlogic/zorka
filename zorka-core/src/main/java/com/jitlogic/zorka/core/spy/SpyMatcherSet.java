@@ -20,6 +20,8 @@ import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import static com.jitlogic.zorka.core.spy.SpyMatcher.*;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -95,28 +97,86 @@ public class SpyMatcherSet {
     }
 
 
+    private boolean matchesAnnotation(Annotation[] annotations, Pattern pattern) {
+        for (Annotation a : annotations) {
+            String name = "L" + a.annotationType().getName() + ";";
+            if (pattern.matcher(name).matches()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public boolean classMatch(Class<?> clazz) {
         String className = clazz.getName();
         for (SpyMatcher matcher : matchers) {
-            int flags = matcher.getFlags();
 
-            if ((0 != (flags & BY_CLASS_NAME)) && match(matcher.getClassPattern(), className)) {
-                // Return true or false depending on whether this is normal or inverted match
-                return 0 == (flags & EXCLUDE_MATCH);
+            if (matcher.hasFlags(BY_CLASS_NAME) && !match(matcher.getClassPattern(), className)) {
+                continue;
             }
 
-            if (0 != (flags & (BY_INTERFACE)) && ZorkaUtil.instanceOf(clazz, matcher.getClassPattern())) {
-                return 0 == (flags & EXCLUDE_MATCH);
+            if (matcher.hasFlags(BY_INTERFACE) && !ZorkaUtil.instanceOf(clazz, matcher.getClassPattern())) {
+                continue;
             }
 
-            if (0 != (flags & (BY_CLASS_ANNOTATION | BY_METHOD_ANNOTATION))) {
-                return 0 == (flags & EXCLUDE_MATCH);
+            if (matcher.hasFlags(BY_CLASS_ANNOTATION) && !matchesAnnotation(clazz.getAnnotations(), matcher.getClassPattern())) {
+                continue;
             }
+
+            if (!methodMatch(clazz, matcher)) {
+                continue;
+            }
+
+            return !matcher.hasFlags(EXCLUDE_MATCH);
         }
 
         return false;
     }
 
+
+    private static String createDescriptor(Method method) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("(");
+
+        for (Class<?> arg : method.getParameterTypes()) {
+            String type = arg.getName();
+            sb.append(SpyMatcher.toTypeCode(type));
+        }
+
+        sb.append(")");
+
+        String type = method.getReturnType().getName();
+        sb.append(SpyMatcher.toTypeCode(type));
+
+        return sb.toString();
+    }
+
+
+    private boolean methodMatch(Class<?> clazz, SpyMatcher matcher) {
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (matcher.hasFlags(BY_METHOD_NAME) && !match(matcher.getMethodPattern(), method.getName())) {
+                continue;
+            }
+
+            if (matcher.hasFlags(BY_METHOD_ANNOTATION) && !matchesAnnotation(method.getAnnotations(), matcher.getMethodPattern())) {
+                continue;
+            }
+
+            if (matcher.getAccess() != 0 && 0 == (matcher.getAccess() & method.getModifiers())) {
+                continue;
+            }
+
+            if (matcher.hasFlags(BY_METHOD_SIGNATURE) && !match(matcher.getSignaturePattern(), createDescriptor(method))) {
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
 
 
     /**

@@ -234,7 +234,7 @@ public class SpyMatcher {
      * @param type type (java language form)
      * @return type descriptor (JVM form)
      */
-    private static String toTypeCode(String type) {
+    public static String toTypeCode(String type) {
         if (type == null) {
             return null;
         }

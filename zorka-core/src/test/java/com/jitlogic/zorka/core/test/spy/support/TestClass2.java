@@ -34,6 +34,10 @@ public class TestClass2 implements TestInterface1 {
         calls++;
     }
 
+    public String frobnicate(String s) {
+        return "frob" + s + "rrrr";
+    }
+
     @Override
     public void myMethod1() {
         calls++;
