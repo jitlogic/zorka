@@ -14,20 +14,14 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
-import org.eclipse.jetty.security.HashLoginService;
-import org.eclipse.jetty.security.LoginService;
-import org.eclipse.jetty.security.authentication.FormAuthenticator;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.util.security.Constraint;
-import org.eclipse.jetty.webapp.WebAppContext;
+
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.webapp.WebAppContext;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetSocketAddress;
 import java.net.URL;
 import java.security.ProtectionDomain;
 import java.util.Properties;
@@ -35,9 +29,9 @@ import java.util.Properties;
 
 public class ZicoMain {
 
-    private static String addr;
     private static int port;
     private static String homeDir;
+
     private static Server server;
     private static WebAppContext webapp;
 
@@ -48,14 +42,12 @@ public class ZicoMain {
 
         initServer();
 
-        initSecurity();
-
         server.start();
         server.join();
     }
 
     private static void initServer() {
-        server = new Server(new InetSocketAddress(addr, port));
+        server = new Server(port);
         ProtectionDomain domain = Server.class.getProtectionDomain();
         URL location = domain.getCodeSource().getLocation();
 
@@ -69,35 +61,6 @@ public class ZicoMain {
         server.setHandler(webapp);
     }
 
-    private static void initSecurity() {
-        File config = new File(homeDir, "users.properties");
-
-        if (!config.exists()) {
-            System.err.println("ERROR: Missing users.properties file in " + homeDir);
-            System.exit(1);
-        }
-
-        Constraint constraint = new Constraint();
-        constraint.setName(Constraint.__FORM_AUTH);
-        constraint.setRoles(new String[]{"VIEWER"});
-        constraint.setAuthenticate(true);
-
-        ConstraintMapping mapping = new ConstraintMapping();
-        mapping.setConstraint(constraint);
-        mapping.setPathSpec("/*");
-
-        FormAuthenticator authenticator = new FormAuthenticator("/login.html", "/login-fail.html", false);
-
-        LoginService loginService = new HashLoginService("Zorka Intranet Collector", config.getPath());
-
-        ConstraintSecurityHandler handler = new ConstraintSecurityHandler();
-        handler.addConstraintMapping(mapping);
-        handler.setLoginService(loginService);
-        handler.setAuthenticator(authenticator);
-
-        webapp.setSecurityHandler(handler);
-    }
-
     private static void configure() throws IOException {
 
         homeDir = System.getProperty("zico.home.dir");
@@ -107,7 +70,6 @@ public class ZicoMain {
             System.exit(1);
         }
 
-        addr = System.getProperty("zico.http.addr", "0.0.0.0").trim();
         String strPort = System.getProperty("zico.http.port", "8642").trim();
 
         Properties props = new Properties();
@@ -125,7 +87,6 @@ public class ZicoMain {
             }
         }
 
-        addr = props.getProperty("zico.http.addr", addr).trim();
         strPort = props.getProperty("zico.http.port", strPort).trim();
 
         try {
