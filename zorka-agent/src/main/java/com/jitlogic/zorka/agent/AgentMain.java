@@ -46,13 +46,14 @@ public class AgentMain {
         return false;
     }
 
-    private static SpyRetransformer instantiateRetransformer(Instrumentation instrumentation, String className) throws Exception {
+    private static SpyRetransformer instantiateRetransformer(Instrumentation instrumentation, AgentConfig config,
+                                                             String className) throws Exception {
         Class<?> clazz = Class.forName(className);
 
         for (Constructor<?> constructor : clazz.getConstructors()) {
             Class<?>[] args = constructor.getParameterTypes();
-            if (args.length == 1) {
-                return (SpyRetransformer) constructor.newInstance(instrumentation);
+            if (args.length == 2) {
+                return (SpyRetransformer) constructor.newInstance(instrumentation, config);
             }
         }
 
@@ -92,8 +93,10 @@ public class AgentMain {
 
         boolean retransformSupported = supportsRetransform(instrumentation);
 
-        instance = new AgentInstance(new AgentConfig(home), instantiateRetransformer(instrumentation,
+        AgentConfig config = new AgentConfig(home);
+        instance = new AgentInstance(config, instantiateRetransformer(instrumentation, config,
                 "com.jitlogic.zorka.core.spy." + (retransformSupported ? "RealSpyRetransformer" : "DummySpyRetransformer")));
+
         instance.start();
 
         if (instance.getConfig().boolCfg("spy", true)) {

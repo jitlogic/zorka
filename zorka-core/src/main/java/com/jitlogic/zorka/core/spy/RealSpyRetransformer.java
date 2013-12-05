@@ -18,6 +18,7 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.core.AgentConfig;
 
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
@@ -30,8 +31,11 @@ public class RealSpyRetransformer implements SpyRetransformer {
 
     private Instrumentation instrumentation;
 
-    public RealSpyRetransformer(Instrumentation instrumentation) {
+    private boolean matchMethods;
+
+    public RealSpyRetransformer(Instrumentation instrumentation, AgentConfig config) {
         this.instrumentation = instrumentation;
+        matchMethods = config.boolCfg("zorka.retransform.match.methods", false);
         log.info(ZorkaLogger.ZSP_CONFIG, "Enabling spy retransformer. Full online reconfiguration should be possible.");
     }
 
@@ -51,8 +55,8 @@ public class RealSpyRetransformer implements SpyRetransformer {
                 continue;
             }
 
-            boolean oldMatch = oldSet != null && oldSet.classMatch(clazz);
-            boolean newMatch = newSet.classMatch(clazz);
+            boolean oldMatch = oldSet != null && oldSet.classMatch(clazz, matchMethods);
+            boolean newMatch = newSet.classMatch(clazz, matchMethods);
             if (isSdef ? (oldMatch || newMatch) : (oldMatch != newMatch)) {
                 if (instrumentation.isModifiableClass(clazz)) {
                     classes.add(clazz);

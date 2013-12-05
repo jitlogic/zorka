@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import static com.jitlogic.zorka.core.spy.SpyMatcher.*;
@@ -31,6 +33,8 @@ import java.util.regex.Pattern;
  * matchers it contains.
  */
 public class SpyMatcherSet {
+
+    private static final ZorkaLog log = ZorkaLogger.getLog(SpyMatcherSet.class);
 
     /**
      * List of (included) matchers.
@@ -108,27 +112,32 @@ public class SpyMatcherSet {
     }
 
 
-    public boolean classMatch(Class<?> clazz) {
-        String className = clazz.getName();
-        for (SpyMatcher matcher : matchers) {
+    public boolean classMatch(Class<?> clazz, boolean matchMethods) {
+        try {
+            String className = clazz.getName();
+            for (SpyMatcher matcher : matchers) {
 
-            if (matcher.hasFlags(BY_CLASS_NAME) && !match(matcher.getClassPattern(), className)) {
-                continue;
+                if (matcher.hasFlags(BY_CLASS_NAME) && !match(matcher.getClassPattern(), className)) {
+                    continue;
+                }
+
+                if (matcher.hasFlags(BY_INTERFACE) && !ZorkaUtil.instanceOf(clazz, matcher.getClassPattern())) {
+                    continue;
+                }
+
+                if (matcher.hasFlags(BY_CLASS_ANNOTATION) && !matchesAnnotation(clazz.getAnnotations(), matcher.getClassPattern())) {
+                    continue;
+                }
+
+                if ((matchMethods && !methodMatch(clazz, matcher)) || (!matchMethods && matcher.hasFlags(BY_METHOD_ANNOTATION))) {
+                    continue;
+                }
+
+                return !matcher.hasFlags(EXCLUDE_MATCH);
             }
-
-            if (matcher.hasFlags(BY_INTERFACE) && !ZorkaUtil.instanceOf(clazz, matcher.getClassPattern())) {
-                continue;
-            }
-
-            if (matcher.hasFlags(BY_CLASS_ANNOTATION) && !matchesAnnotation(clazz.getAnnotations(), matcher.getClassPattern())) {
-                continue;
-            }
-
-            if (!methodMatch(clazz, matcher)) {
-                continue;
-            }
-
-            return !matcher.hasFlags(EXCLUDE_MATCH);
+        } catch (NoClassDefFoundError e) {
+            log.warn(ZorkaLogger.ZSP_CONFIG,
+                "NoClassDefFoundError occured when inspecting " + clazz + " for retransform. Consider disabling method filtering in retransformation.");
         }
 
         return false;
@@ -155,6 +164,7 @@ public class SpyMatcherSet {
 
 
     private boolean methodMatch(Class<?> clazz, SpyMatcher matcher) {
+
         for (Method method : clazz.getDeclaredMethods()) {
             if (matcher.hasFlags(BY_METHOD_NAME) && !match(matcher.getMethodPattern(), method.getName())) {
                 continue;

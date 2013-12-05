@@ -17,6 +17,7 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.core.AgentConfig;
 
 import java.lang.instrument.Instrumentation;
 
@@ -25,7 +26,7 @@ public class DummySpyRetransformer implements SpyRetransformer {
 
     private static final ZorkaLog log = ZorkaLogger.getLog(DummySpyRetransformer.class);
 
-    public DummySpyRetransformer(Instrumentation instrumentation) {
+    public DummySpyRetransformer(Instrumentation instrumentation, AgentConfig config) {
         log.info(ZorkaLogger.ZSP_CONFIG, "Class retransform is not supported. Online reconfiguration will be crippled.");
     }
 
@@ -39,4 +40,5 @@ public class DummySpyRetransformer implements SpyRetransformer {
     public boolean isEnabled() {
         return false;
     }
+
 }

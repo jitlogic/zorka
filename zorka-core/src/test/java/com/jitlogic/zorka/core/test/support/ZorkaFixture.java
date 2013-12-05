@@ -78,7 +78,7 @@ public class ZorkaFixture extends CommonFixture {
         );
 
         config = new AgentConfig(configProperties);
-        agentInstance = new AgentInstance(config, new DummySpyRetransformer(null));
+        agentInstance = new AgentInstance(config, new DummySpyRetransformer(null, config));
         agentInstance.start();
 
         // Get all agent components used by tests
