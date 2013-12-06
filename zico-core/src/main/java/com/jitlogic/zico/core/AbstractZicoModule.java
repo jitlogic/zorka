@@ -43,9 +43,7 @@ public abstract class AbstractZicoModule implements Module {
         binder.bind(UserManager.class);
     }
 
-    @Provides
-    @Singleton
-    public BasicDataSource provideDataSource(ZicoConfig config) {
+    protected BasicDataSource provideDataSource(ZicoConfig config) {
         BasicDataSource ds = new BasicDataSource();
         ds.setDriverClassName(config.stringCfg("zico.db.driver", null));
         ds.setUrl(config.stringCfg("zico.db.url", null));
@@ -63,11 +61,6 @@ public abstract class AbstractZicoModule implements Module {
         ds.setMinEvictableIdleTimeMillis(180 * 1000);
         ds.setValidationQuery("select 1");
         ds.setTestWhileIdle(true);
-
-        if (config.boolCfg("zico.db.create", false)) {
-            new JdbcTemplate(ds).execute("RUNSCRIPT FROM 'classpath:/com/jitlogic/zico/"
-                    + config.stringCfg("zico.db.type", "h2") + ".createdb.sql'");
-        }
 
         return ds;
     }

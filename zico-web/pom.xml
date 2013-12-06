@@ -63,11 +63,6 @@
             <version>${mysql.connector.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${pgsql.connector.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.parboiled</groupId>
             <artifactId>parboiled-core</artifactId>
             <version>${parboiled.version}</version>

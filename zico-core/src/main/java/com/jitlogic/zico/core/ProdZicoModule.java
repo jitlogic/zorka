@@ -17,6 +17,7 @@ package com.jitlogic.zico.core;
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import org.apache.commons.dbcp.BasicDataSource;
 
 import java.io.File;
 
@@ -40,5 +41,9 @@ public class ProdZicoModule extends AbstractZicoModule {
         return new ZicoConfig(homeDir);
     }
 
-
+    @Provides
+    @Singleton
+    public BasicDataSource provideDataSource(ZicoConfig config) {
+        return super.provideDataSource(config);
+    }
 }
