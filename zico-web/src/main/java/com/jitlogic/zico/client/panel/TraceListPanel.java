@@ -34,6 +34,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.jitlogic.zico.client.*;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.ZicoShell;
+import com.jitlogic.zico.client.inject.PanelFactory;
 import com.jitlogic.zico.data.*;
 import com.jitlogic.zico.client.api.TraceDataApi;
 import com.sencha.gxt.core.client.IdentityValueProvider;

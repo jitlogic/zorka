@@ -25,8 +25,7 @@ import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.api.AdminApi;
 import com.jitlogic.zico.client.api.TraceDataApi;
-import com.jitlogic.zico.client.api.UserApi;
-import com.jitlogic.zico.client.panel.PanelFactory;
+import com.jitlogic.zico.client.inject.PanelFactory;
 import com.sencha.gxt.widget.core.client.Portlet;
 import com.sencha.gxt.widget.core.client.button.ToolButton;
 import com.sencha.gxt.widget.core.client.container.PortalLayoutContainer;
@@ -124,8 +123,15 @@ public class WelcomePanel implements IsWidget {
             }
         }, ClickEvent.getType());
 
-        //Hyperlink lnkUsersAccess = new Hyperlink("Users & Access Privileges", "");
-        //vp.add(lnkUsersAccess);
+        Hyperlink lnkUserManagement = new Hyperlink("Manage users", "");
+        vp.add(lnkUserManagement);
+
+        lnkUserManagement.addHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent clickEvent) {
+                shell.get().addView(panelFactory.userManagementPanel(), "User Management");
+            }
+        }, ClickEvent.getType());
 
         wndAdmin.add(vp);
         portal.add(wndAdmin, 2);
@@ -146,6 +152,7 @@ public class WelcomePanel implements IsWidget {
                 panelFactory.passwordChangeDialog().show();
             }
         }, ClickEvent.getType());
+
 
         //Hyperlink lnkUsersAccess = new Hyperlink("Users & Access Privileges", "");
         //vp.add(lnkUsersAccess);

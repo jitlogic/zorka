@@ -20,13 +20,14 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.inject.client.AbstractGinModule;
 import com.google.gwt.inject.client.assistedinject.GinFactoryModuleBuilder;
 import com.google.inject.Provides;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.SimpleEventBus;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.api.AdminApi;
 import com.jitlogic.zico.client.api.SystemApi;
 import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.client.api.UserApi;
-import com.jitlogic.zico.client.panel.PanelFactory;
 import org.fusesource.restygwt.client.Resource;
 import org.fusesource.restygwt.client.RestServiceProxy;
 
@@ -37,6 +38,7 @@ public class ClientModule extends AbstractGinModule {
     @Override
     protected void configure() {
         bind(ErrorHandler.class);
+        bind(EventBus.class).to(SimpleEventBus.class);
         bind(ZicoShell.class).in(Singleton.class);
         install(new GinFactoryModuleBuilder().build(PanelFactory.class));
     }
@@ -75,5 +77,14 @@ public class ClientModule extends AbstractGinModule {
         UserApi userApi = GWT.create(UserApi.class);
         ((RestServiceProxy)userApi).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
         return userApi;
+    }
+
+
+    @Provides
+    @Singleton
+    ZicoRequestFactory provideRequestFactory(EventBus bus) {
+        ZicoRequestFactory factory = GWT.create(ZicoRequestFactory.class);
+        factory.initialize(bus);
+        return factory;
     }
 }

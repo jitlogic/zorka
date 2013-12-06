@@ -34,9 +34,19 @@
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>request-factory-servlet</servlet-name>
+        <servlet-class>com.google.web.bindery.requestfactory.server.RequestFactoryServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>resteasy-servlet</servlet-name>
         <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>request-factory-servlet</servlet-name>
+        <url-pattern>/gwtRequest</url-pattern>
     </servlet-mapping>
 
     <welcome-file-list>

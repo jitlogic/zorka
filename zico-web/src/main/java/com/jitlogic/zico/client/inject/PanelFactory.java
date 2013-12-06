@@ -13,16 +13,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core;
+package com.jitlogic.zico.client.inject;
 
 
+import com.google.inject.assistedinject.Assisted;
+import com.jitlogic.zico.client.panel.*;
 import com.jitlogic.zico.data.HostInfo;
 import com.jitlogic.zico.data.TraceInfo;
-import org.springframework.jdbc.core.RowMapper;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.Map;
 
-public class DataMappers {
+public interface PanelFactory {
 
+    public TraceListPanel traceListPanel(HostInfo hostInfo);
+
+    public TraceDetailPanel traceDetailPanel(TraceInfo traceInfo);
+
+    public TraceTemplatePanel traceTemplatePanel(Map<String, String> tidMap);
+
+    public TraceRecordSearchDialog traceRecordSearchDialog(TraceDetailPanel panel, TraceInfo trace);
+
+    public MethodAttrsDialog methodAttrsDialog(Integer hostId, Long dataOffs, String path, @Assisted("minTime") Long minTime);
+
+    public MethodRankingPanel methodRankingPanel(TraceInfo traceInfo);
+
+    public PasswordChangeDialog passwordChangeDialog();
+
+    public UserManagementPanel userManagementPanel();
 }
