@@ -23,6 +23,7 @@ import com.google.inject.Singleton;
 import com.jitlogic.zico.core.services.AdminService;
 import com.jitlogic.zico.core.services.SystemService;
 import com.jitlogic.zico.core.services.TraceDataService;
+import com.jitlogic.zico.core.services.UserService;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -40,7 +41,9 @@ public abstract class AbstractZicoModule implements Module {
         binder.bind(AdminService.class);
         binder.bind(SystemService.class);
         binder.bind(TraceDataService.class);
+        binder.bind(UserService.class);
         binder.bind(UserManager.class);
+        binder.bind(UserContext.class);
     }
 
     protected BasicDataSource provideDataSource(ZicoConfig config) {

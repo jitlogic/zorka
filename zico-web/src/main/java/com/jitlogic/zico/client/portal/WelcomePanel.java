@@ -25,6 +25,7 @@ import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.api.AdminApi;
 import com.jitlogic.zico.client.api.TraceDataApi;
+import com.jitlogic.zico.client.api.UserApi;
 import com.jitlogic.zico.client.panel.PanelFactory;
 import com.sencha.gxt.widget.core.client.Portlet;
 import com.sencha.gxt.widget.core.client.button.ToolButton;
@@ -93,8 +94,10 @@ public class WelcomePanel implements IsWidget {
 
         portal.add(systemInfoPortlet, 2);
 
+        createUserPortlet();
         createAdminPortlet();
     }
+
 
     private void createHelpPortlet() {
         Portlet wndHelp = newPortlet("Welcome", true);
@@ -104,6 +107,7 @@ public class WelcomePanel implements IsWidget {
         wndHelp.add(vp);
         portal.add(wndHelp, 0);
     }
+
 
     private void createAdminPortlet() {
         Portlet wndAdmin = newPortlet("Admin tasks", false);
@@ -127,6 +131,30 @@ public class WelcomePanel implements IsWidget {
         portal.add(wndAdmin, 2);
     }
 
+
+    private void createUserPortlet() {
+        Portlet wndUser = newPortlet("My account", false);
+
+        VerticalLayoutContainer vp = new VerticalLayoutContainer();
+
+        Hyperlink lnkTraceDisplayTemplates = new Hyperlink("Change Password", "");
+        vp.add(lnkTraceDisplayTemplates);
+
+        lnkTraceDisplayTemplates.addHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                panelFactory.passwordChangeDialog().show();
+            }
+        }, ClickEvent.getType());
+
+        //Hyperlink lnkUsersAccess = new Hyperlink("Users & Access Privileges", "");
+        //vp.add(lnkUsersAccess);
+
+        wndUser.add(vp);
+        portal.add(wndUser, 2);
+    }
+
+
     private void openTemplatePanel() {
         traceDataApi.getTidMap(new MethodCallback<Map<String, String>>() {
             @Override
@@ -140,6 +168,7 @@ public class WelcomePanel implements IsWidget {
             }
         });
     }
+
 
     private Portlet newPortlet(String title, boolean closeable) {
         final Portlet portlet = new Portlet();

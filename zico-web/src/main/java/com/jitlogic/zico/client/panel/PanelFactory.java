@@ -35,4 +35,6 @@ public interface PanelFactory {
     public MethodAttrsDialog methodAttrsDialog(Integer hostId, Long dataOffs, String path, @Assisted("minTime") Long minTime);
 
     public MethodRankingPanel methodRankingPanel(TraceInfo traceInfo);
+
+    public PasswordChangeDialog passwordChangeDialog();
 }
