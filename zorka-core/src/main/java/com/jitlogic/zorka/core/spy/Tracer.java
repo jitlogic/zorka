@@ -19,9 +19,12 @@ package com.jitlogic.zorka.core.spy;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Groups all tracer engine components and global settings.
@@ -40,7 +43,9 @@ public class Tracer implements TracerOutput {
      */
     private static int maxTraceRecords = 4096;
 
-    private List<ZorkaAsyncThread<SymbolicRecord>> outputs = new ArrayList<ZorkaAsyncThread<SymbolicRecord>>();
+
+    private AtomicReference<List<ZorkaAsyncThread<SymbolicRecord>>> outputs
+            = new AtomicReference<List<ZorkaAsyncThread<SymbolicRecord>>>(new ArrayList<ZorkaAsyncThread<SymbolicRecord>>());
 
     /**
      * Defines which classes and methods should be traced.
@@ -105,6 +110,7 @@ public class Tracer implements TracerOutput {
         this.symbolRegistry = symbolRegistry;
     }
 
+
     /**
      * Returns trace even handler receiving events from local application thread.
      *
@@ -114,18 +120,26 @@ public class Tracer implements TracerOutput {
         return localHandlers.get();
     }
 
+
     /**
      * Adds new matcher that includes (or excludes) classes and method to be traced.
      *
      * @param matcher spy matcher to be added
      */
     public void include(SpyMatcher matcher) {
-        matcherSet.include(matcher);
+        matcherSet = matcherSet.include(matcher);
+    }
+
+    public SpyMatcherSet clearMatchers() {
+        SpyMatcherSet ret = matcherSet;
+        matcherSet = new SpyMatcherSet();
+        return ret;
     }
 
 
+    @Override
     public void submit(SymbolicRecord record) {
-        for (ZorkaAsyncThread<SymbolicRecord> output : outputs) {
+        for (ZorkaAsyncThread<SymbolicRecord> output : outputs.get()) {
             output.submit(record);
         }
     }
@@ -138,13 +152,35 @@ public class Tracer implements TracerOutput {
      *
      * @param output trace event handler
      */
-    public void addOutput(ZorkaAsyncThread<SymbolicRecord> output) {
-        outputs.add(output);
+    public synchronized void addOutput(ZorkaAsyncThread<SymbolicRecord> output) {
+        List<ZorkaAsyncThread<SymbolicRecord>> newOutputs = new ArrayList<ZorkaAsyncThread<SymbolicRecord>>();
+        newOutputs.addAll(outputs.get());
+        newOutputs.add(output);
+        outputs.set(newOutputs);
+    }
+
+
+    public synchronized void clearOutputs() {
+        List<ZorkaAsyncThread<SymbolicRecord>> old = outputs.get();
+        outputs.set(new ArrayList<ZorkaAsyncThread<SymbolicRecord>>());
+
+        for (ZorkaAsyncThread<SymbolicRecord> output : old) {
+            output.shutdown();
+        }
+
+        if (old.size() > 0) {
+            ZorkaUtil.sleep(100);
+        }
     }
 
 
     public SpyMatcherSet getMatcherSet() {
         return matcherSet;
+    }
+
+
+    public void setMatcherSet(SpyMatcherSet matcherSet) {
+        this.matcherSet = matcherSet;
     }
 
 }

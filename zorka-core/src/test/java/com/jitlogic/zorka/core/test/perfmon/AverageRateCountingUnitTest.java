@@ -38,7 +38,7 @@ public class AverageRateCountingUnitTest extends ZorkaFixture {
 
     @Before
     public void setUp() {
-        counter = new AvgRateCounter(zorkaAgent.getZorkaLib());
+        counter = new AvgRateCounter(zorka);
     }
 
     @Test

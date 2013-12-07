@@ -13,26 +13,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.client.panel;
+package com.jitlogic.zorka.core;
 
 
-import com.google.inject.assistedinject.Assisted;
-import com.jitlogic.zico.data.HostInfo;
-import com.jitlogic.zico.data.TraceInfo;
+public interface ZorkaControlMBean {
 
-import java.util.Map;
+    String getHostname();
 
-public interface PanelFactory {
+    long getTracerMinMethodTime();
 
-    public TraceListPanel traceListPanel(HostInfo hostInfo);
+    void setTracerMinMethodTime(long t);
 
-    public TraceDetailPanel traceDetailPanel(TraceInfo traceInfo);
+    long getTracerMinTraceTime();
 
-    public TraceTemplatePanel traceTemplatePanel(Map<String, String> tidMap);
+    void setTracerMinTraceTime(long t);
 
-    public TraceRecordSearchDialog traceRecordSearchDialog(TraceDetailPanel panel, TraceInfo trace);
+    long getTracerMaxTraceRecords();
 
-    public MethodAttrsDialog methodAttrsDialog(Integer hostId, Long dataOffs, String path, @Assisted("minTime") Long minTime);
+    void setTracerMaxTraceRecords(long t);
 
-    public MethodRankingPanel methodRankingPanel(TraceInfo traceInfo);
+    String listTracerIncludes();
+
+    void reload();
+
 }

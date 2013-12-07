@@ -20,12 +20,9 @@ import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.jitlogic.zico.core.services.AdminService;
-import com.jitlogic.zico.core.services.SystemService;
-import com.jitlogic.zico.core.services.TraceDataService;
+import com.jitlogic.zico.core.services.*;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import org.apache.commons.dbcp.BasicDataSource;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 
@@ -40,11 +37,15 @@ public abstract class AbstractZicoModule implements Module {
         binder.bind(AdminService.class);
         binder.bind(SystemService.class);
         binder.bind(TraceDataService.class);
+        binder.bind(UserService.class);
+        binder.bind(UserManager.class);
+        binder.bind(UserContext.class);
+
+        binder.bind(UserLocator.class);
+        binder.bind(UserGwtService.class);
     }
 
-    @Provides
-    @Singleton
-    public BasicDataSource provideDataSource(ZicoConfig config) {
+    protected BasicDataSource provideDataSource(ZicoConfig config) {
         BasicDataSource ds = new BasicDataSource();
         ds.setDriverClassName(config.stringCfg("zico.db.driver", null));
         ds.setUrl(config.stringCfg("zico.db.url", null));
@@ -62,11 +63,6 @@ public abstract class AbstractZicoModule implements Module {
         ds.setMinEvictableIdleTimeMillis(180 * 1000);
         ds.setValidationQuery("select 1");
         ds.setTestWhileIdle(true);
-
-        if (config.boolCfg("zico.db.create", false)) {
-            new JdbcTemplate(ds).execute("RUNSCRIPT FROM 'classpath:/com/jitlogic/zico/"
-                    + config.stringCfg("zico.db.type", "h2") + ".createdb.sql'");
-        }
 
         return ds;
     }

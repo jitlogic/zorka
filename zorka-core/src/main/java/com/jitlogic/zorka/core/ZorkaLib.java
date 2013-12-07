@@ -22,9 +22,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.*;
 
+import com.jitlogic.zorka.common.ZorkaService;
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
+import com.jitlogic.zorka.core.spy.SpyClassTransformer;
+import com.jitlogic.zorka.core.spy.SpyDefinition;
+import com.jitlogic.zorka.core.spy.SpyMatcherSet;
 import com.jitlogic.zorka.core.util.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.*;
@@ -39,7 +44,7 @@ import com.jitlogic.zorka.core.mbeans.ZorkaMappedMBean;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class ZorkaLib {
+public class ZorkaLib implements ZorkaService {
 
     private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaLogger.class);
 
@@ -69,20 +74,21 @@ public class ZorkaLib {
 
     private String version;
 
-    private ZorkaConfig config;
+    private AgentConfig config;
 
     private QueryTranslator translator;
 
+    private AgentInstance instance;
+
     /**
      * Standard constructor
-     *
-     * @param agent reference to Zorka BSH agent object
      */
-    public ZorkaLib(ZorkaBshAgent agent, MBeanServerRegistry registry, ZorkaConfig config, QueryTranslator translator) {
-        this.agent = agent;
-        this.mbsRegistry = registry;
-        this.config = config;
+    public ZorkaLib(AgentInstance instance, QueryTranslator translator) {
+        this.agent = instance.getZorkaAgent();
+        this.mbsRegistry = instance.getMBeanServerRegistry();
+        this.config = instance.getConfig();
         this.translator = translator;
+        this.instance = instance;
 
         this.hostname = config.getProperties().getProperty("zorka.hostname").trim();
         this.version = config.getProperties().getProperty("zorka.version").trim();
@@ -482,13 +488,18 @@ public class ZorkaLib {
 
 
     /**
-     * Reloads and executes configuration scripts matching given mask.
-     * Scripts have to be in $ZORKA_HOME/conf directory.
+     * Reloads agent configuration and scripts.
      *
-     * @param name file name (relative to conf dir)
+     * @return
      */
-    public String reload(String name) {
-        return agent.loadScript(ZorkaUtil.path(config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null), name));
+    public String reload() {
+        instance.reload();
+        long l = AgentDiagnostics.get(AgentDiagnostics.CONFIG_ERRORS);
+        return l == 0 ? "OK" : "ERRORS(" + l + ") see agent log.";
+    }
+
+    public String loadScript(String script) {
+        return agent.loadScript(ZorkaUtil.path(config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null), script));
     }
 
 
@@ -693,8 +704,16 @@ public class ZorkaLib {
         FileTrapper trapper = fileTrappers.get(id);
 
         if (trapper != null) {
-            trapper.stop();
+            trapper.shutdown();
         }
+    }
+
+    @Override
+    public void shutdown() {
+        for (FileTrapper trapper : fileTrappers.values()) {
+            trapper.shutdown();
+        }
+        fileTrappers.clear();
     }
 
 

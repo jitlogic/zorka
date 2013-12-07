@@ -28,42 +28,54 @@ import com.jitlogic.zorka.common.util.ZorkaUtil;
  */
 public class SpyContext {
 
-    /** Context ID */
+    /**
+     * Context ID
+     */
     private Integer id;
 
-    /** Spy definition */
-    private final SpyDefinition spyDefinition;
+    /**
+     * Spy definition. Eventual consistency is everything we need here.
+     */
+    private volatile SpyDefinition spyDefinition;
 
-    /** Full name of instrumented class */
+    /**
+     * Full name of instrumented class
+     */
     private final String className;
 
-    /** Short name of instrumented class */
+    /**
+     * Short name of instrumented class
+     */
     private final String shortClassName;
 
-    /** Package name of instrumented class */
+    /**
+     * Package name of instrumented class
+     */
     private final String packageName;
 
-    /** Name of instrumented method */
+    /**
+     * Name of instrumented method
+     */
     private final String methodName;
 
-    /** Signature of instrumented method */
+    /**
+     * Signature of instrumented method
+     */
     private final String methodSignature;
 
-    /** Access flags of instrumented method */
+    /**
+     * Access flags of instrumented method
+     */
     private final int access;
 
     /**
      * Creates new spy context
      *
-     * @param spyDefinition spy definition
-     *
-     * @param className name of instrumented class
-     *
-     * @param methodName name of instrumented method
-     *
+     * @param spyDefinition   spy definition
+     * @param className       name of instrumented class
+     * @param methodName      name of instrumented method
      * @param methodSignature signature of instrumented method
-     *
-     * @param access access flags of instrumented method
+     * @param access          access flags of instrumented method
      */
     public SpyContext(SpyDefinition spyDefinition, String className,
                       String methodName, String methodSignature, int access) {
@@ -75,8 +87,8 @@ public class SpyContext {
         this.access = access;
 
         String[] segs = className.split("\\.");
-        this.shortClassName = segs[segs.length-1];
-        this.packageName = segs.length > 1 ?  ZorkaUtil.join(".", ZorkaUtil.clipArray(segs, segs.length - 1)) : "";
+        this.shortClassName = segs[segs.length - 1];
+        this.packageName = segs.length > 1 ? ZorkaUtil.join(".", ZorkaUtil.clipArray(segs, segs.length - 1)) : "";
     }
 
     /**
@@ -91,6 +103,7 @@ public class SpyContext {
 
     /**
      * Sets context ID
+     *
      * @param id context ID
      */
     public void setId(Integer id) {
@@ -107,6 +120,12 @@ public class SpyContext {
     public SpyDefinition getSpyDefinition() {
         return spyDefinition;
     }
+
+
+    public void setSpyDefinition(SpyDefinition sdef) {
+        this.spyDefinition = sdef;
+    }
+
 
     /**
      * Returns name of instrumented class
@@ -146,11 +165,10 @@ public class SpyContext {
 
     /**
      * Formats string by filling it with spy context information.
-     *
+     * <p/>
      * TODO get rid of it, use standard record accessors ("${__CTX__.className}" etc.)
      *
      * @param template string template
-     *
      * @return formatted string
      */
     public String subst(String template) {
@@ -164,7 +182,7 @@ public class SpyContext {
     @Override
     public int hashCode() {
         return spyDefinition.hashCode() + className.hashCode() +
-            methodName.hashCode() + methodSignature.hashCode() + access;
+                methodName.hashCode() + methodSignature.hashCode() + access;
     }
 
     @Override
@@ -173,10 +191,10 @@ public class SpyContext {
             return false;
         }
 
-        SpyContext ic = (SpyContext)obj;
+        SpyContext ic = (SpyContext) obj;
 
         return spyDefinition.equals(ic.spyDefinition) &&
-            className.equals(ic.className) && methodName.equals(ic.methodName) &&
-            methodSignature.equals(ic.methodSignature) && access == ic.access;
+                className.equals(ic.className) && methodName.equals(ic.methodName) &&
+                methodSignature.equals(ic.methodSignature) && access == ic.access;
     }
 }

@@ -453,7 +453,7 @@ public class SpyLib {
      * @return class fetching probe
      */
     public SpyProbe fetchClass(String dst, String className) {
-        return new SpyClassProbe(className, dst);
+        return new SpyClassProbe(dst, className);
     }
 
 

@@ -293,7 +293,7 @@ public class ZorkaUtil {
      */
     public static boolean instanceOf(Class<?> c, String name) {
 
-        for (Class<?> clazz = c; !"java.lang.Object".equals(clazz.getName()); clazz = clazz.getSuperclass()) {
+        for (Class<?> clazz = c; clazz != null && !"java.lang.Object".equals(clazz.getName()); clazz = clazz.getSuperclass()) {
             if (name.equals(clazz.getName()) || interfaceOf(clazz, name)) {
                 return true;
             }
@@ -302,6 +302,17 @@ public class ZorkaUtil {
         return false;
     }
 
+
+    public static boolean instanceOf(Class<?> c, Pattern clPattern) {
+
+        for (Class<?> clazz = c; clazz != null && !"java.lang.Object".equals(clazz.getName()); clazz = clazz.getSuperclass()) {
+            if (clPattern.matcher(clazz.getName()).matches() || interfaceOf(clazz, clPattern)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Checks if given class implements interface of name given by ifName. Analogous to above instanceOf() method.
@@ -320,6 +331,16 @@ public class ZorkaUtil {
         return false;
     }
 
+
+    public static boolean interfaceOf(Class<?> c, Pattern ifcPattern) {
+        for (Class<?> ifc : c.getInterfaces()) {
+            if (ifcPattern.matcher(ifc.getName()).matches() || interfaceOf(ifc, ifcPattern)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /**
      * Clones array of bytes. Implemented by hand as JDK 1.5 does not have such method.
@@ -827,4 +848,11 @@ public class ZorkaUtil {
         return null;
     }
 
+
+    public static void sleep(long interval) {
+        try {
+            Thread.sleep(interval);
+        } catch (InterruptedException e) {
+        }
+    }
 }

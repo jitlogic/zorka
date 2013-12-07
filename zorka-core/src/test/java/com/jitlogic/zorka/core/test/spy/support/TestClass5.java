@@ -13,16 +13,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core;
+package com.jitlogic.zorka.core.test.spy.support;
 
-
-import com.jitlogic.zico.data.HostInfo;
-import com.jitlogic.zico.data.TraceInfo;
-import org.springframework.jdbc.core.RowMapper;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-public class DataMappers {
-
+public class TestClass5 implements TestInterface2 {
+    @Override
+    public void myMethod2() {
+        System.out.println("oja!");
+    }
 }

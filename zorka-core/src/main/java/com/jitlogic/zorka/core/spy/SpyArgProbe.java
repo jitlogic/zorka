@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.objectweb.asm.Type;
 
 import static com.jitlogic.zorka.core.spy.SpyLib.ON_ENTER;
@@ -27,20 +28,23 @@ import static org.objectweb.asm.Opcodes.*;
  */
 public class SpyArgProbe extends SpyProbe {
 
-    /** Argument index */
+    /**
+     * Argument index
+     */
     private int argIndex;
+
 
     /**
      * Creates new argument fetching probe
      *
-     * @param argIdx argument index
-     *
+     * @param argIdx   argument index
      * @param dstField destination field
      */
     public SpyArgProbe(int argIdx, String dstField) {
         super(dstField);
         this.argIndex = argIdx;
     }
+
 
     @Override
     public int emit(SpyMethodVisitor mv, int stage, int opcode) {
@@ -75,5 +79,24 @@ public class SpyArgProbe extends SpyProbe {
         return 1;
     }
 
+
+    @Override
+    public int hashCode() {
+        return 31 * getDstField().hashCode();
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof SpyArgProbe)
+                && ZorkaUtil.objEquals(getDstField(), ((SpyArgProbe) obj).getDstField()) &&
+                argIndex == ((SpyArgProbe) obj).argIndex;
+    }
+
+
+    @Override
+    public String toString() {
+        return "SpyArgProbe(" + getDstField() + ", " + argIndex + ")";
+    }
 
 }

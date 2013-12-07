@@ -148,7 +148,7 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
 
 
     @Override
-    public void close() {
+    protected void close() {
         sender.close();
         sender = null;
     }

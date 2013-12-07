@@ -50,7 +50,6 @@ if (zorka.boolCfg("tracer")) {
   tracer.include(spy.byClass("**").forTrace().priority(1000));
 
 
-
   if (zorka.boolCfg("tracer.file")) {
     tracer.output(tracer.toFile(
       zorka.stringCfg("tracer.file.path", "${zorka.log.dir}/trace.ztr"),

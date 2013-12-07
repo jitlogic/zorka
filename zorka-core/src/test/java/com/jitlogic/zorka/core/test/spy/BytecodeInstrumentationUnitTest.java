@@ -315,7 +315,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
     @Test
     public void testSubmissionOrderWhenMoreThanOneProbeInOneMethodRet() throws Exception {
         engine.add(spy.instrument("x").include(spy.byMethod(TCLASS1, "trivialMethod")));
-        engine.add(spy.instrument("x").include(spy.byMethod(TCLASS1, "trivialMethod")));
+        engine.add(spy.instrument("y").include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
         checkForError(invoke(obj, "trivialMethod"));
@@ -333,7 +333,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
     @Test
     public void testSubmissionOrderWhenMoreThanOneProbeInOneMethodErr() throws Exception {
         engine.add(spy.instrument("x").include(spy.byMethod(TCLASS1, "errorMethod")));
-        engine.add(spy.instrument("x").include(spy.byMethod(TCLASS1, "errorMethod")));
+        engine.add(spy.instrument("y").include(spy.byMethod(TCLASS1, "errorMethod")));
 
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "errorMethod");

@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zico.core.services;
 
+import com.google.inject.Singleton;
 import com.jitlogic.zico.core.ZicoCacheControlFilter;
 import com.jitlogic.zico.core.ZicoConfig;
 import com.jitlogic.zorka.common.ZorkaAgent;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Singleton
 @Path("system")
 public class SystemService {
 

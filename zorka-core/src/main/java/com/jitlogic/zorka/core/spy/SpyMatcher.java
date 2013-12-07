@@ -169,10 +169,23 @@ public class SpyMatcher {
     }
 
 
+    private String unstr(Pattern pattern) {
+        String s = pattern.toString();
+        s = s.replace(".*", "**")
+                .replace("[a-zA-Z0-9_]+", "*")
+                .replace(".+", "*")
+                .replace("\\", "")
+                .replace("^", "")
+                .replace("$", "");
+
+        return s;
+    }
+
+
     @Override
     public String toString() {
-        return "SpyMatcher(class='" + classPattern + "', method='" + methodPattern + "', signature='" + signaturePattern
-                + "', access=" + String.format("0x%04x", access) + ", flags=" + String.format("0x%04x", flags) + ")";
+        return "" + priority + ": " + unstr(classPattern) + "/" + unstr(methodPattern) + "  " + unstr(signaturePattern)
+                + ", [a=" + String.format("0x%04x", access) + ",f=" + String.format("0x%04x", flags) + "]";
     }
 
 
@@ -221,7 +234,7 @@ public class SpyMatcher {
      * @param type type (java language form)
      * @return type descriptor (JVM form)
      */
-    private static String toTypeCode(String type) {
+    public static String toTypeCode(String type) {
         if (type == null) {
             return null;
         }

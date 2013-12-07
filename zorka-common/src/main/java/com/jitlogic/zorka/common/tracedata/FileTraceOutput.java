@@ -184,12 +184,14 @@ public class FileTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
 
     @Override
     protected void open() {
+        log.info(ZorkaLogger.ZSP_CONFIG, "Starting file tracer output: " + path);
         roll();
     }
 
 
     @Override
     protected void close() {
+        log.info(ZorkaLogger.ZSP_CONFIG, "Stopping file tracer output: " + path);
         try {
             stream.close();
             stream = null;

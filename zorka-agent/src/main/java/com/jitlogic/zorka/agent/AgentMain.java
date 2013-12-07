@@ -19,9 +19,14 @@ package com.jitlogic.zorka.agent;
 
 import com.jitlogic.zorka.core.AgentConfig;
 import com.jitlogic.zorka.core.AgentInstance;
+import com.jitlogic.zorka.core.ZorkaControl;
 import com.jitlogic.zorka.core.spy.MainSubmitter;
+import com.jitlogic.zorka.core.spy.SpyRetransformer;
 
+import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 /**
  * This class is responsible for bootstrapping zorka agent.
@@ -32,29 +37,76 @@ public class AgentMain {
 
     private static volatile AgentInstance instance;
 
-    public static AgentInstance getInstance() {
-        return instance;
+    private static boolean supportsRetransform(Instrumentation instrumentation) throws Exception {
+        for (Method m : instrumentation.getClass().getMethods()) {
+            if ("isRetransformClassesSupported".equals(m.getName())) {
+                return (Boolean) m.invoke(instrumentation);
+            }
+        }
+        return false;
+    }
+
+    private static SpyRetransformer instantiateRetransformer(Instrumentation instrumentation, AgentConfig config,
+                                                             String className) throws Exception {
+        Class<?> clazz = Class.forName(className);
+
+        for (Constructor<?> constructor : clazz.getConstructors()) {
+            Class<?>[] args = constructor.getParameterTypes();
+            if (args.length == 2) {
+                return (SpyRetransformer) constructor.newInstance(instrumentation, config);
+            }
+        }
+
+        throw new IllegalArgumentException("Cannot instantiate retransformer of class " + className);
+    }
+
+    private static void addTransformer(Instrumentation instrumentation, ClassFileTransformer transformer,
+                                       boolean retransformSupported) throws Exception {
+        Method atm = null;
+
+        for (Method m : Instrumentation.class.getMethods()) {
+            if ("addTransformer".equals(m.getName())) {
+                atm = m;
+                if (m.getParameterTypes().length == 2 || !retransformSupported) {
+                    break;
+                }
+            }
+        }
+
+        if (atm.getParameterTypes().length == 2) {
+            atm.invoke(instrumentation, transformer, retransformSupported);
+        } else {
+            atm.invoke(instrumentation, transformer);
+        }
+
     }
 
     /**
      * This is entry method of java agent.
      *
-     * @param args arguments (supplied via -javaagent:/path/to/agent.jar=arguments)
-     *
-     * @param instr reference to JVM instrumentation interface
+     * @param args            arguments (supplied via -javaagent:/path/to/agent.jar=arguments)
+     * @param instrumentation reference to JVM instrumentation interface
      */
-    public static void premain(String args, Instrumentation instr) {
+    public static void premain(String args, Instrumentation instrumentation) throws Exception {
 
         String home = System.getProperties().getProperty("zorka.home.dir", args);
 
-        instance = new AgentInstance(new AgentConfig(home));
+        boolean retransformSupported = supportsRetransform(instrumentation);
+
+        AgentConfig config = new AgentConfig(home);
+        instance = new AgentInstance(config, instantiateRetransformer(instrumentation, config,
+                "com.jitlogic.zorka.core.spy." + (retransformSupported ? "RealSpyRetransformer" : "DummySpyRetransformer")));
+
         instance.start();
 
         if (instance.getConfig().boolCfg("spy", true)) {
-            instr.addTransformer(instance.getClassTransformer());
+            addTransformer(instrumentation, instance.getClassTransformer(), retransformSupported);
             MainSubmitter.setSubmitter(instance.getSubmitter());
             MainSubmitter.setTracer(instance.getTracer());
         }
+
+        instance.getMBeanServerRegistry().registerZorkaControl(
+                new ZorkaControl("java", "zorka:type=ZorkaControl,name=ZorkaControl", instance));
     }
 
 }

@@ -360,5 +360,55 @@ public class HostStore implements Closeable, RDSCleanupListener {
             jdbc.update("delete from TRACES where HOST_ID = ? and DATA_OFFS < ?", hostInfo.getId(), start);
         }
     }
+
+
+    // ------------------ entity methods ----------------------
+    public Integer getId() {
+        return hostInfo.getId();
+    }
+
+    public String getName() {
+        return hostInfo.getName();
+    }
+
+    public String getAddr() {
+        return hostInfo.getAddr();
+    }
+
+    public void setAddr(String addr) {
+        hostInfo.setAddr(addr);
+    }
+
+    public String getDescription() {
+        return hostInfo.getDescription();
+    }
+
+    public void setDescription(String description) {
+        hostInfo.setDescription(description);
+    }
+
+    public String getPass() {
+        return hostInfo.getPass();
+    }
+
+    public void setPass(String pass) {
+        hostInfo.setPath(pass);
+    }
+
+    public int getFlags() {
+        return hostInfo.getFlags();
+    }
+
+    public void setFlags(int flags) {
+        hostInfo.setFlags(flags);
+    }
+
+    public long getMaxSize() {
+        return hostInfo.getMaxSize();
+    }
+
+    public void setMaxSize(long maxSize) {
+        hostInfo.setMaxSize(maxSize);
+    }
 }
 

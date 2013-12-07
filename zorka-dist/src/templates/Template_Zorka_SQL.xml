@@ -231,8 +231,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template_Zorka_SQL:sql.avg5[&quot;stats&quot;, &quot;ALL&quot;].last(0)}&gt;{$SQL_QUERY_TIME}
-            </expression>
+            <expression>{Template_Zorka_SQL:sql.avg5[&quot;stats&quot;, &quot;ALL&quot;].last(0)}&gt;{$SQL_QUERY_TIME}</expression>
             <name>Lots of SQL queries perform badly on {HOST.NAME}</name>
             <url/>
             <status>0</status>
@@ -242,8 +241,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_SQL:sql.peak[&quot;stats&quot;, &quot;ALL&quot;].last(0)}&gt;{$SQL_QUERY_TIME}
-            </expression>
+            <expression>{Template_Zorka_SQL:sql.peak[&quot;stats&quot;, &quot;ALL&quot;].last(0)}&gt;{$SQL_QUERY_TIME}</expression>
             <name>Some SQL queries perform badly on {HOST.NAME}</name>
             <url/>
             <status>0</status>

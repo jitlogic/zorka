@@ -16,8 +16,6 @@
  */
 package com.jitlogic.zorka.common.util;
 
-import com.jitlogic.zorka.common.util.ZorkaLogLevel;
-
 /**
  * Zorka trapper interface. Objects implementing this interface can accept traps (logs)
  * and process them in arbitrary way.
@@ -28,14 +26,10 @@ public interface ZorkaTrapper {
      * Sends log message.
      *
      * @param logLevel log level
-     *
-     * @param tag log tag
-     *
-     * @param msg message text (or format string)
-     *
-     * @param e exception object (or null if no exception has to be logged)
-     *
-     * @param args optional arguments (if log message is a format string)
+     * @param tag      log tag
+     * @param msg      message text (or format string)
+     * @param e        exception object (or null if no exception has to be logged)
+     * @param args     optional arguments (if log message is a format string)
      */
     public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e, Object... args);
 

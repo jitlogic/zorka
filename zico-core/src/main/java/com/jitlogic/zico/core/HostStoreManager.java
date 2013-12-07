@@ -182,9 +182,17 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
         }
     }
 
+
     public List<HostStore> list() {
         return jdbc.query("select * from HOSTS order by HOST_NAME", this);
     }
+
+
+    public List<HostStore> listForUser(User user) {
+        return jdbc.query(
+            "select * from HOSTS h left join USERS_HOSTS u on h.HOST_ID = u.HOST_ID where u.USER_ID = ?", this, user.getId());
+    }
+
 
     public synchronized void delete(int hostId) throws IOException {
         // TODO this might potentially take a long time and block other processes - do only necessary parts in synchronized section

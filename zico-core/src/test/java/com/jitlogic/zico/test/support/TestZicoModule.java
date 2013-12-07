@@ -19,6 +19,8 @@ package com.jitlogic.zico.test.support;
 import com.google.inject.Provides;
 import com.jitlogic.zico.core.AbstractZicoModule;
 import com.jitlogic.zico.core.ZicoConfig;
+import org.apache.commons.dbcp.BasicDataSource;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.inject.Singleton;
 
@@ -31,6 +33,19 @@ public class TestZicoModule extends AbstractZicoModule {
     }
 
     @Provides
+    @com.google.inject.Singleton
+    public BasicDataSource provideDataSource(ZicoConfig config) {
+        BasicDataSource ds = super.provideDataSource(config);
+
+        if (config.boolCfg("zico.db.create", false)) {
+            new JdbcTemplate(ds).execute("RUNSCRIPT FROM 'classpath:/com/jitlogic/zico/"
+                    + config.stringCfg("zico.db.type", "h2") + ".createdb.sql'");
+        }
+
+        return ds;
+    }
+
+        @Provides
     @Singleton
     public ZicoConfig provideConfig() {
         return config;

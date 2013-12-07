@@ -19,6 +19,8 @@ package com.jitlogic.zorka.core.mbeans;
 
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.core.ZorkaControl;
+import com.jitlogic.zorka.core.ZorkaControlMBean;
 
 import javax.management.*;
 import java.io.IOException;
@@ -37,16 +39,27 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class MBeanServerRegistry {
 
-    /** Logger */
+    /**
+     * Logger
+     */
     private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
-    /** Represents deferred registration of mbean attributes for not yet registered mbean servers. */
+    /**
+     * Represents deferred registration of mbean attributes for not yet registered mbean servers.
+     */
     private static class DeferredRegistration {
-        /** mbean server name, object name, attribute name, attribute description */
+        /**
+         * mbean server name, object name, attribute name, attribute description
+         */
         public final String name, bean, attr, desc;
-        /** Attribute value */
+        /**
+         * Attribute value
+         */
         public final Object obj;
-        /** Standard constructor */
+
+        /**
+         * Standard constructor
+         */
         public DeferredRegistration(String name, String bean, String attr, Object obj, String desc) {
             this.name = name;
             this.bean = bean;
@@ -58,7 +71,7 @@ public class MBeanServerRegistry {
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof DeferredRegistration) {
-                DeferredRegistration reg = (DeferredRegistration)obj;
+                DeferredRegistration reg = (DeferredRegistration) obj;
                 return name.equals(reg.name) && bean.equals(reg.bean) && attr.equals(reg.attr);
             } else {
                 return false;
@@ -71,21 +84,27 @@ public class MBeanServerRegistry {
         }
     }
 
-    /** Mbean server connections map */
-    private Map<String,MBeanServerConnection> conns = new ConcurrentHashMap<String, MBeanServerConnection>();
+    /**
+     * Mbean server connections map
+     */
+    private Map<String, MBeanServerConnection> conns = new ConcurrentHashMap<String, MBeanServerConnection>();
 
-    /** Accompanying class loaders map */
-    private Map<String,ClassLoader> classLoaders = new ConcurrentHashMap<String, ClassLoader>();
+    /**
+     * Accompanying class loaders map
+     */
+    private Map<String, ClassLoader> classLoaders = new ConcurrentHashMap<String, ClassLoader>();
 
-    /** Deferred registrations queue */
+    /**
+     * Deferred registrations queue
+     */
     private List<DeferredRegistration> deferredRegistrations = new ArrayList<DeferredRegistration>();
 
+    private ZorkaControl zorkaControl;
 
     /**
      * Looks for a given MBean server. java and jboss mbean servers are currently available.
      *
      * @param name mbean server name
-     *
      * @return mbean server connection
      */
     public MBeanServerConnection lookup(String name) {
@@ -97,7 +116,6 @@ public class MBeanServerRegistry {
      * or null if no class loader is needed.
      *
      * @param name mbean server name
-     *
      * @return class loader associated with mbean server or null
      */
     public ClassLoader getClassLoader(String name) {
@@ -108,10 +126,8 @@ public class MBeanServerRegistry {
     /**
      * Registers mbean server. Any deferred registrations to this mbean server will be performed.
      *
-     * @param mbsName mbean server name
-     *
-     * @param mbsConn mbean server connection
-     *
+     * @param mbsName     mbean server name
+     * @param mbsConn     mbean server connection
      * @param classLoader class loader associated with mbean server connection (or null)
      */
     public void register(String mbsName, MBeanServerConnection mbsConn, ClassLoader classLoader) {
@@ -148,16 +164,11 @@ public class MBeanServerRegistry {
     /**
      * Registers object as mbean server attribute (or return existing one if already registered)
      *
-     * @param mbsName mbean server name
-     *
+     * @param mbsName  mbean server name
      * @param beanName bean name (object name)
-     *
      * @param attrName attribtue name
-     *
-     * @param obj attribute value
-     *
-     * @param <T> type of attribute value
-     *
+     * @param obj      attribute value
+     * @param <T>      type of attribute value
      * @return attribute value (if any)
      */
     public <T> T getOrRegister(String mbsName, String beanName, String attrName, T obj) {
@@ -168,18 +179,12 @@ public class MBeanServerRegistry {
     /**
      * Registers object as mbean server attribute (or return existing one if already registered)
      *
-     * @param mbsName mbean server name
-     *
+     * @param mbsName  mbean server name
      * @param beanName bean name (object name)
-     *
      * @param attrName attribtue name
-     *
      * @param desc
-     *
-     * @param obj attribute value
-     *
-     * @param <T> type of attribute value
-     *
+     * @param obj      attribute value
+     * @param <T>      type of attribute value
      * @return attribute value (if any)
      */
     public <T> T getOrRegister(String mbsName, String beanName, String attrName, T obj, String desc) {
@@ -189,7 +194,7 @@ public class MBeanServerRegistry {
 
         if (mbs != null) {
             try {
-                return (T)mbs.getAttribute(new ObjectName(beanName), attrName);
+                return (T) mbs.getAttribute(new ObjectName(beanName), attrName);
             } catch (MBeanException e) {
                 log.error(ZorkaLogger.ZAG_ERRORS, "Error registering mbean", e);
             } catch (AttributeNotFoundException e) {
@@ -216,12 +221,12 @@ public class MBeanServerRegistry {
     private <T> T defer(DeferredRegistration reg) {
         for (DeferredRegistration dr : deferredRegistrations) {
             if (reg.equals(dr)) {
-                return (T)dr.obj;
+                return (T) dr.obj;
             }
         }
 
         deferredRegistrations.add(reg);
-        return (T)reg.obj;
+        return (T) reg.obj;
     }
 
 
@@ -229,15 +234,10 @@ public class MBeanServerRegistry {
      * Registers attribute in mbean server
      *
      * @param conn mbean server connection
-     *
      * @param bean bean name (object name)
-     *
      * @param attr attribute name
-     *
-     * @param obj attribute value
-     *
-     * @param <T> attribute type
-     *
+     * @param obj  attribute value
+     * @param <T>  attribute type
      * @return value
      */
     private <T> T registerAttr(MBeanServerConnection conn, String bean, String attr, T obj) {
@@ -254,23 +254,17 @@ public class MBeanServerRegistry {
      * Registers attribute in mbean server.
      *
      * @param conn mbean server connection
-     *
      * @param bean bean name (object name)
-     *
      * @param attr attribute name
-     *
-     * @param obj attribute value
-     *
+     * @param obj  attribute value
      * @param desc attribute description
-     *
-     * @param <T> attribute type
-     *
+     * @param <T>  attribute type
      * @return value
      */
     private <T> T registerBeanAttr(MBeanServerConnection conn, String bean, String attr, T obj, String desc) {
         ZorkaMappedMBean mbean = new ZorkaMappedMBean(desc);
         mbean.put(attr, obj);
-        MBeanServer mbs = (MBeanServer)conn;
+        MBeanServer mbs = (MBeanServer) conn;
         try {
             mbs.registerMBean(mbean, new ObjectName(bean));
         } catch (Exception e) {
@@ -280,6 +274,25 @@ public class MBeanServerRegistry {
     }
 
 
+    public void registerZorkaControl(ZorkaControl zorkaControl) {
+        this.zorkaControl = zorkaControl;
+        registerZorkaControlDeferred();
+    }
+
+
+    private void registerZorkaControlDeferred() {
+        MBeanServer mbs = (MBeanServer) conns.get(zorkaControl.getMbsName());
+        if (zorkaControl != null && mbs != null) {
+            log.info(ZorkaLogger.ZAG_CONFIG, "Registering ZorkaControl MBean...");
+            try {
+                ObjectName on = new ObjectName(zorkaControl.getObjectName());
+                mbs.registerMBean(zorkaControl, on);
+            } catch (Exception e) {
+                log.error(ZorkaLogger.ZAG_CONFIG, "Cannot register ZorkaControl MBean", e);
+            }
+        }
+    }
+
     /**
      * Registers all deferred attributes in an mbean server
      *
@@ -288,7 +301,7 @@ public class MBeanServerRegistry {
     private void registerDeferred(String name) {
         if (deferredRegistrations.size() > 0 && conns.containsKey(name)) {
             List<DeferredRegistration> dregs = deferredRegistrations;
-            deferredRegistrations = new ArrayList<DeferredRegistration>(dregs.size()+2);
+            deferredRegistrations = new ArrayList<DeferredRegistration>(dregs.size() + 2);
             for (DeferredRegistration dr : dregs) {
                 if (name.equals(dr.name)) {
                     getOrRegister(name, dr.bean, dr.attr, dr.obj, dr.desc);
@@ -297,5 +310,10 @@ public class MBeanServerRegistry {
                 }
             }
         }
+
+        if (zorkaControl != null && name.equals(zorkaControl.getMbsName())) {
+            registerZorkaControlDeferred();
+        }
+
     }
 }

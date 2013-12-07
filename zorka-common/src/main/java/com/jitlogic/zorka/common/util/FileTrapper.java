@@ -30,52 +30,69 @@ import java.util.Date;
  */
 public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrapper {
 
-    /** Rolling (rotating) file trapper maintains limited numebr of archived logs. */
+    /**
+     * Rolling (rotating) file trapper maintains limited numebr of archived logs.
+     */
     private static final int ROLLING = 1;
 
-    /** Daily file trapper mainatains log files by date (yyyy-mm-dd) */
+    /**
+     * Daily file trapper mainatains log files by date (yyyy-mm-dd)
+     */
     private static final int DAILY = 2;
 
-    /** Base log file */
+    /**
+     * Base log file
+     */
     private final File logFile;
 
-    /** Trapper type */
+    /**
+     * Trapper type
+     */
     private final int type;
 
-    /** Maximum number of logs (only for rolling trappers) */
+    /**
+     * Maximum number of logs (only for rolling trappers)
+     */
     private final int maxLogs;
 
-    /** Maximum log size (only for rolling trappers) */
+    /**
+     * Maximum log size (only for rolling trappers)
+     */
     private final long maxSize;
 
-    /** Logs stack traces of exceptions if set to true */
+    /**
+     * Logs stack traces of exceptions if set to true
+     */
     private boolean logExceptions = true;
 
-    /** Output (as print stream) */
+    /**
+     * Output (as print stream)
+     */
     private PrintStream out;
 
-    /** Output (as output stream) */
+    /**
+     * Output (as output stream)
+     */
     private OutputStream os;
 
-    /** Current log size (for rolling trappers) */
+    /**
+     * Current log size (for rolling trappers)
+     */
     private long currentSize;
 
-    /** Current suffix (for daily trappers) */
+    /**
+     * Current suffix (for daily trappers)
+     */
     private String currentSuffix;
 
     /**
      * Creates new rolling trapper.
      *
-     * @param logLevel log level
-     *
-     * @param logPath path to log file
-     *
-     * @param maxLogs maximum number of archived logs
-     *
-     * @param maxSize maximum log file size
-     *
+     * @param logLevel      log level
+     * @param logPath       path to log file
+     * @param maxLogs       maximum number of archived logs
+     * @param maxSize       maximum log file size
      * @param logExceptions logs stack traces of exceptions if true
-     *
      * @return new file trapper
      */
     public static FileTrapper rolling(ZorkaLogLevel logLevel, String logPath, int maxLogs, long maxSize, boolean logExceptions) {
@@ -86,12 +103,9 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
     /**
      * Creates new daily trapper
      *
-     * @param logLevel log level
-     *
-     * @param logPath path to log file
-     *
+     * @param logLevel      log level
+     * @param logPath       path to log file
      * @param logExceptions log stack traces of exceptions if true
-     *
      * @return new file trapper
      */
     public static FileTrapper daily(ZorkaLogLevel logLevel, String logPath, boolean logExceptions) {
@@ -102,14 +116,10 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
     /**
      * Standard constructor (not publicly available - use static methods instead).
      *
-     * @param logFile log file path (as File object)
-     *
-     * @param type trapper type
-     *
-     * @param maxLogs max number of logs (irrelevant for daily trappers)
-     *
-     * @param size log size (irrelevant for daily trappers)
-     *
+     * @param logFile       log file path (as File object)
+     * @param type          trapper type
+     * @param maxLogs       max number of logs (irrelevant for daily trappers)
+     * @param size          log size (irrelevant for daily trappers)
      * @param logExceptions log stack traces of exceptions if true
      */
     private FileTrapper(File logFile, int type, int maxLogs, long size, boolean logExceptions) {
@@ -150,7 +160,7 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
         // TODO AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SUBMITTED);
 
         if (!submit(sb.toString())) {
-                // TODO AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_DROPPED);
+            // TODO AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_DROPPED);
         }
 
     }
@@ -162,12 +172,10 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
      * for more information about string formatting.
      *
      * @param message message string (template)
-     *
-     * @param args arguments for String.format() function
-     *
+     * @param args    arguments for String.format() function
      * @return formatted string
      */
-    public String format(String message, Object...args) {
+    public String format(String message, Object... args) {
         if (args.length == 0) {
             return message;
         } else {
@@ -240,9 +248,11 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
 
         switch (type) {
             case ROLLING:
-                roll(); break;
+                roll();
+                break;
             case DAILY:
-                reopen(); break;
+                reopen();
+                break;
         }
     }
 
@@ -256,10 +266,10 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
             f.delete();
         }
 
-        for (int i = maxLogs-1; i >= 0; i--) {
+        for (int i = maxLogs - 1; i >= 0; i--) {
             f = new File(logFile.getPath() + "." + i);
             if (f.exists()) {
-                File nf = new File(logFile.getPath() + "." + (i+1));
+                File nf = new File(logFile.getPath() + "." + (i + 1));
                 f.renameTo(nf);
             }
         }

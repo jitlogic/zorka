@@ -15,6 +15,8 @@
  */
 package com.jitlogic.zorka.common.util;
 
+import com.jitlogic.zorka.common.ZorkaService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -29,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *            <p/>
  *            TODO factor out direct processing functionality (exposing process(), flush(), open(), close() etc.)
  */
-public abstract class ZorkaAsyncThread<T> implements Runnable {
+public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService {
 
     /**
      * Logger
@@ -171,6 +173,11 @@ public abstract class ZorkaAsyncThread<T> implements Runnable {
      */
     protected void flush() {
 
+    }
+
+    public void shutdown() {
+        close();
+        stop();
     }
 
     /**

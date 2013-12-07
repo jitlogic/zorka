@@ -26,6 +26,7 @@ import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.api.TraceDataApi;
+import com.jitlogic.zico.client.inject.PanelFactory;
 import com.jitlogic.zico.data.HostInfo;
 import com.jitlogic.zico.data.HostInfoProperties;
 import com.sencha.gxt.core.client.IdentityValueProvider;

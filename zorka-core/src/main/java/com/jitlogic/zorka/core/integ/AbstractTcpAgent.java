@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zorka.core.integ;
 
+import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.core.ZorkaBshAgent;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
@@ -36,7 +37,7 @@ import java.util.List;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public abstract class AbstractTcpAgent implements Runnable {
+public abstract class AbstractTcpAgent implements Runnable, ZorkaService {
 
     /**
      * Logger
@@ -67,6 +68,12 @@ public abstract class AbstractTcpAgent implements Runnable {
      * TCP listen port
      */
     private int listenPort;
+
+    private String defaultAddr;
+
+    private int defaultPort;
+
+    private ZorkaConfig config;
 
     /**
      * TCP listen address
@@ -103,6 +110,14 @@ public abstract class AbstractTcpAgent implements Runnable {
         this.prefix = prefix;
         this.translator = translator;
 
+        this.defaultPort = defaultPort;
+        this.defaultAddr = defaultAddr;
+        this.config = config;
+
+        setup();
+    }
+
+    protected void setup() {
         String la = config.stringCfg(prefix + ".listen.addr", defaultAddr);
         try {
             listenAddr = InetAddress.getByName(la.trim());
@@ -175,6 +190,24 @@ public abstract class AbstractTcpAgent implements Runnable {
             } catch (IOException e) {
                 log.error(ZorkaLogger.ZAG_ERRORS, "I/O error in zabbix core main loop: " + e.getMessage());
             }
+        }
+    }
+
+    public void restart() {
+        setup();
+        start();
+    }
+
+    @Override
+    public void shutdown() {
+        log.info(ZorkaLogger.ZAG_CONFIG, "Shutting down " + prefix + " agent ...");
+        stop();
+        if (socket != null) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+            }
+            socket = null;
         }
     }
 

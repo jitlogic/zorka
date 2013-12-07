@@ -3,7 +3,7 @@
     <parent>
         <artifactId>zorka</artifactId>
         <groupId>com.jitlogic.zorka</groupId>
-        <version>0.9.12</version>
+        <version>0.9.13-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zico-web</artifactId>
@@ -47,8 +47,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty</artifactId>
             <version>${jetty.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -61,11 +61,6 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.connector.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>${pgsql.connector.version}</version>
         </dependency>
         <dependency>
             <groupId>org.parboiled</groupId>

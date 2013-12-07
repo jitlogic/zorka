@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2013-11-19T22:33:23Z</date>
+    <date>2013-11-25T21:23:33Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -28,9 +28,7 @@
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix.discovery[&quot;jboss&quot;, &quot;jboss.web:type=ThreadPool,*&quot;, &quot;type&quot;,
-                        &quot;name&quot;]
-                    </key>
+                    <key>zabbix.discovery[&quot;jboss&quot;, &quot;jboss.web:type=ThreadPool,*&quot;, &quot;type&quot;, &quot;name&quot;]</key>
                     <delay>3600</delay>
                     <status>0</status>
                     <allowed_hosts/>
@@ -210,11 +208,7 @@
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>100.0*{Template_Zorka_JBoss_ThreadPools:zorka.jmx[&quot;jboss&quot;, &quot;jboss.web:type=ThreadPool,name={#NAME}&quot;,
-                                &quot;currentThreadsBusy&quot;].last(0)}=0 /
-                                {Template_Zorka_JBoss_ThreadPools:zorka.jmx[&quot;jboss&quot;, &quot;jboss.web:type=ThreadPool,name={#NAME}&quot;,
-                                &quot;maxThreads&quot;].last(0)}=0 &gt; 90.0
-                            </expression>
+                            <expression>100.0*{Template_Zorka_JBoss_ThreadPools:zorka.jmx[&quot;jboss&quot;, &quot;jboss.web:type=ThreadPool,name={#NAME}&quot;, &quot;currentThreadsBusy&quot;].last(0)}=0 / {Template_Zorka_JBoss_ThreadPools:zorka.jmx[&quot;jboss&quot;, &quot;jboss.web:type=ThreadPool,name={#NAME}&quot;, &quot;maxThreads&quot;].last(0)}=0 &gt; 90.0</expression>
                             <name>{HOST.NAME} Too many {#NAME} threads busy.</name>
                             <url/>
                             <status>0</status>

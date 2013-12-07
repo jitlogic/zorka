@@ -284,9 +284,20 @@ public class ZorkaLogger implements ZorkaTrapper {
      *
      * @param trapper trapper
      */
-    public void addTrapper(ZorkaTrapper trapper) {
+    public synchronized void addTrapper(ZorkaTrapper trapper) {
         trappers.add(trapper);
     }
+
+
+    public synchronized void shutdown() {
+        for (ZorkaTrapper trapper : trappers) {
+            if (trapper instanceof ZorkaAsyncThread) {
+                ((ZorkaAsyncThread) trapper).stop();
+            }
+        }
+        trappers.clear();
+    }
+
 
     /**
      * Logs a message. Log message is sent to all registered trappers.
@@ -297,7 +308,7 @@ public class ZorkaLogger implements ZorkaTrapper {
      * @param e        exception thrown (if any)
      * @param args     optional argument used when message text is a format string
      */
-    public void trap(ZorkaLogLevel logLevel, String tag, String message, Throwable e, Object... args) {
+    public synchronized void trap(ZorkaLogLevel logLevel, String tag, String message, Throwable e, Object... args) {
         for (ZorkaTrapper trapper : trappers) {
             trapper.trap(logLevel, tag, message, e, args);
         }

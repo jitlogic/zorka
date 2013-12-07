@@ -28,9 +28,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;,
-                        &quot;ALL&quot;, &quot;time&quot;, &quot;calls&quot;, &quot;AVG5&quot;]
-                    </key>
+                    <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;, &quot;ALL&quot;, &quot;time&quot;, &quot;calls&quot;, &quot;AVG5&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -69,9 +67,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;,
-                        &quot;ALL&quot;, &quot;time&quot;, &quot;calls&quot;, &quot;AVG15&quot;]
-                    </key>
+                    <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;, &quot;ALL&quot;, &quot;time&quot;, &quot;calls&quot;, &quot;AVG15&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -110,9 +106,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;,
-                        &quot;ALL&quot;, &quot;errors&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;, &quot;ALL&quot;, &quot;errors&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -151,9 +145,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;,
-                        &quot;ALL&quot;, &quot;maxTimeCLR&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;, &quot;ALL&quot;, &quot;maxTimeCLR&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -192,9 +184,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;,
-                        &quot;ALL&quot;, &quot;calls&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;, &quot;ALL&quot;, &quot;calls&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -241,9 +231,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>{Template_Zorka_LDAP:zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;,
-                &quot;stats&quot;, &quot;ALL&quot;, &quot;time&quot;, &quot;calls&quot;, &quot;AVG5&quot;].last(0)}&gt;{$LDAP_SLOW_TIME}
-            </expression>
+            <expression>{Template_Zorka_LDAP:zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;, &quot;ALL&quot;, &quot;time&quot;, &quot;calls&quot;, &quot;AVG5&quot;].last(0)}&gt;{$LDAP_SLOW_TIME}</expression>
             <name>{HOST.NAME} average LDAP query execution time too long.</name>
             <url/>
             <status>0</status>
@@ -253,9 +241,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_LDAP:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;,
-                &quot;stats&quot;, &quot;ALL&quot;, &quot;errors&quot;].last(0)}&gt;0
-            </expression>
+            <expression>{Template_Zorka_LDAP:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;, &quot;ALL&quot;, &quot;errors&quot;].last(0)}&gt;0</expression>
             <name>{HOST.NAME} LDAP errors detected.</name>
             <url/>
             <status>0</status>
@@ -265,9 +251,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_LDAP:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;,
-                &quot;stats&quot;, &quot;ALL&quot;, &quot;maxTimeCLR&quot;].last(0)}&gt;{$LDAP_SLOW_TIME}
-            </expression>
+            <expression>{Template_Zorka_LDAP:zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;, &quot;ALL&quot;, &quot;maxTimeCLR&quot;].last(0)}&gt;{$LDAP_SLOW_TIME}</expression>
             <name>{HOST.NAME} some LDAP requests are slow.</name>
             <url/>
             <status>0</status>
@@ -305,9 +289,7 @@
                     <type>0</type>
                     <item>
                         <host>Template_Zorka_LDAP</host>
-                        <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;,
-                            &quot;ALL&quot;, &quot;time&quot;, &quot;calls&quot;, &quot;AVG5&quot;]
-                        </key>
+                        <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;, &quot;ALL&quot;, &quot;time&quot;, &quot;calls&quot;, &quot;AVG5&quot;]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -319,9 +301,7 @@
                     <type>0</type>
                     <item>
                         <host>Template_Zorka_LDAP</host>
-                        <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;,
-                            &quot;ALL&quot;, &quot;time&quot;, &quot;calls&quot;, &quot;AVG15&quot;]
-                        </key>
+                        <key>zorka.rate[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;, &quot;ALL&quot;, &quot;time&quot;, &quot;calls&quot;, &quot;AVG15&quot;]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -333,9 +313,7 @@
                     <type>0</type>
                     <item>
                         <host>Template_Zorka_LDAP</host>
-                        <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;,
-                            &quot;ALL&quot;, &quot;maxTimeCLR&quot;]
-                        </key>
+                        <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;, &quot;ALL&quot;, &quot;maxTimeCLR&quot;]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -347,9 +325,7 @@
                     <type>0</type>
                     <item>
                         <host>Template_Zorka_LDAP</host>
-                        <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;,
-                            &quot;ALL&quot;, &quot;calls&quot;]
-                        </key>
+                        <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Ldap&quot;, &quot;stats&quot;, &quot;ALL&quot;, &quot;calls&quot;]</key>
                     </item>
                 </graph_item>
             </graph_items>

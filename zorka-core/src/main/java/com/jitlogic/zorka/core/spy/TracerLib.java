@@ -80,6 +80,11 @@ public class TracerLib {
     }
 
 
+    public void clearOutputs() {
+        tracer.clearOutputs();
+    }
+
+
     /**
      * Adds matching method to tracer.
      *
@@ -117,6 +122,16 @@ public class TracerLib {
             tracer.include((matcher).exclude());
         }
 
+    }
+
+    public String listIncludes() {
+        StringBuilder sb = new StringBuilder();
+        for (SpyMatcher sm : tracer.getMatcherSet().getMatchers()) {
+            sb.append(sm.hasFlags(SpyMatcher.EXCLUDE_MATCH) ? "excl: " : "incl: ");
+            sb.append(sm);
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 
     /**

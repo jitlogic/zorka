@@ -16,8 +16,14 @@
 
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
+
 import static com.jitlogic.zorka.core.spy.SpyMatcher.*;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -27,6 +33,8 @@ import java.util.regex.Pattern;
  * matchers it contains.
  */
 public class SpyMatcherSet {
+
+    private static final ZorkaLog log = ZorkaLogger.getLog(SpyMatcherSet.class);
 
     /**
      * List of (included) matchers.
@@ -40,6 +48,9 @@ public class SpyMatcherSet {
     public SpyMatcherSet() {
     }
 
+    public SpyMatcherSet(SpyMatcherSet orig) {
+        matchers.addAll(orig.getMatchers());
+    }
 
     /**
      * Creates new matcher set and populates it with supplied matchers.
@@ -47,7 +58,7 @@ public class SpyMatcherSet {
      * @param matchers initial matchers
      */
     public SpyMatcherSet(SpyMatcher... matchers) {
-        include(matchers);
+        includeInternal(matchers);
     }
 
 
@@ -59,7 +70,7 @@ public class SpyMatcherSet {
      */
     public SpyMatcherSet(SpyMatcherSet orig, SpyMatcher... matchers) {
         this.matchers.addAll(orig.matchers);
-        include(matchers);
+        includeInternal(matchers);
     }
 
 
@@ -84,6 +95,94 @@ public class SpyMatcherSet {
             if (0 != (flags & (BY_CLASS_ANNOTATION | BY_INTERFACE | BY_METHOD_ANNOTATION))) {
                 return 0 == (flags & EXCLUDE_MATCH);
             }
+        }
+
+        return false;
+    }
+
+
+    private boolean matchesAnnotation(Annotation[] annotations, Pattern pattern) {
+        for (Annotation a : annotations) {
+            String name = "L" + a.annotationType().getName() + ";";
+            if (pattern.matcher(name).matches()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public boolean classMatch(Class<?> clazz, boolean matchMethods) {
+        try {
+            String className = clazz.getName();
+            for (SpyMatcher matcher : matchers) {
+
+                if (matcher.hasFlags(BY_CLASS_NAME) && !match(matcher.getClassPattern(), className)) {
+                    continue;
+                }
+
+                if (matcher.hasFlags(BY_INTERFACE) && !ZorkaUtil.instanceOf(clazz, matcher.getClassPattern())) {
+                    continue;
+                }
+
+                if (matcher.hasFlags(BY_CLASS_ANNOTATION) && !matchesAnnotation(clazz.getAnnotations(), matcher.getClassPattern())) {
+                    continue;
+                }
+
+                if ((matchMethods && !methodMatch(clazz, matcher)) || (!matchMethods && matcher.hasFlags(BY_METHOD_ANNOTATION))) {
+                    continue;
+                }
+
+                return !matcher.hasFlags(EXCLUDE_MATCH);
+            }
+        } catch (NoClassDefFoundError e) {
+            log.warn(ZorkaLogger.ZSP_CONFIG,
+                "NoClassDefFoundError occured when inspecting " + clazz + " for retransform. Consider disabling method filtering in retransformation.");
+        }
+
+        return false;
+    }
+
+
+    private static String createDescriptor(Method method) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("(");
+
+        for (Class<?> arg : method.getParameterTypes()) {
+            String type = arg.getName();
+            sb.append(SpyMatcher.toTypeCode(type));
+        }
+
+        sb.append(")");
+
+        String type = method.getReturnType().getName();
+        sb.append(SpyMatcher.toTypeCode(type));
+
+        return sb.toString();
+    }
+
+
+    private boolean methodMatch(Class<?> clazz, SpyMatcher matcher) {
+
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (matcher.hasFlags(BY_METHOD_NAME) && !match(matcher.getMethodPattern(), method.getName())) {
+                continue;
+            }
+
+            if (matcher.hasFlags(BY_METHOD_ANNOTATION) && !matchesAnnotation(method.getAnnotations(), matcher.getMethodPattern())) {
+                continue;
+            }
+
+            if (matcher.getAccess() != 0 && 0 == (matcher.getAccess() & method.getModifiers())) {
+                continue;
+            }
+
+            if (matcher.hasFlags(BY_METHOD_SIGNATURE) && !match(matcher.getSignaturePattern(), createDescriptor(method))) {
+                continue;
+            }
+
+            return true;
         }
 
         return false;
@@ -198,7 +297,7 @@ public class SpyMatcherSet {
      *
      * @param includes appended matchers
      */
-    public void include(SpyMatcher... includes) {
+    private void includeInternal(SpyMatcher... includes) {
 
         for (SpyMatcher m : includes) {
             if (matchers.size() == 0 || m.getPriority() >= matchers.get(matchers.size() - 1).getPriority()) {
@@ -216,8 +315,17 @@ public class SpyMatcherSet {
         }
     }
 
+    public SpyMatcherSet include(SpyMatcher... includes) {
+        SpyMatcherSet ret = new SpyMatcherSet(this);
+        ret.includeInternal(includes);
+        return ret;
+    }
+
     public List<SpyMatcher> getMatchers() {
         return matchers;
     }
 
+    public void clear() {
+        matchers.clear();
+    }
 }

@@ -113,6 +113,7 @@ __sql() {
         tracer.attr("DB", "DB")
       ) : null)
     .onError(spy.fetchError("ERR"),
+      _trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
       _error ? spy.trapperCollector(error_ft, zorka.ERROR, "SQL", zorka.stringCfg("sql.error.format"), zorka.stringCfg("sql.error.format"), "ERR") : null)
     .onSubmit(spy.strTime("TIME"),
       _slow ? spy.subchain(
@@ -136,6 +137,7 @@ __sql() {
         tracer.attr("DB", "DB")
       ) : null)
     .onError(spy.fetchError("ERR"),
+      _trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
       _error ? spy.trapperCollector(error_ft, zorka.ERROR, "SQL", zorka.stringCfg("sql.error.format"), zorka.stringCfg("sql.error.format"), "ERR") : null)
     .onSubmit(spy.strTime("TIME"),
       _slow ? spy.subchain(

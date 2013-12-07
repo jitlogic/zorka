@@ -15,6 +15,8 @@
  */
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.common.util.ZorkaUtil;
+
 import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 
 /**
@@ -34,10 +36,30 @@ public class SpyThreadProbe extends SpyProbe {
         super(dstField);
     }
 
+
     @Override
     public int emit(SpyMethodVisitor mv, int stage, int opcode) {
         mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;");
         return 1;
+    }
+
+
+    @Override
+    public int hashCode() {
+        return 31 * getDstField().hashCode();
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof SpyThreadProbe)
+                && ZorkaUtil.objEquals(getDstField(), ((SpyThreadProbe) obj).getDstField());
+    }
+
+
+    @Override
+    public String toString() {
+        return "SpyThreadProbe(" + getDstField() + ")";
     }
 
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2013-11-19T10:50:09Z</date>
+    <date>2013-11-25T21:33:26Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -31,9 +31,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;Mule.default:name=MuleContext&quot;,
-                        &quot;BuildNumber&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;Mule.default:name=MuleContext&quot;, &quot;BuildNumber&quot;]</key>
                     <delay>14400</delay>
                     <history>90</history>
                     <trends>365</trends>
@@ -72,8 +70,7 @@
                     <snmp_community/>
                     <multiplier>0</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;Mule.default:name=MuleContext&quot;, &quot;Version&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;Mule.default:name=MuleContext&quot;, &quot;Version&quot;]</key>
                     <delay>14400</delay>
                     <history>90</history>
                     <trends>365</trends>
@@ -218,9 +215,7 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;java&quot;, &quot;Mule.default:type=Application,name={#NAME}&quot;,
-                                &quot;AsyncEventsReceived&quot;]
-                            </key>
+                            <key>zorka.jmx[&quot;java&quot;, &quot;Mule.default:type=Application,name={#NAME}&quot;, &quot;AsyncEventsReceived&quot;]</key>
                             <delay>120</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -259,9 +254,7 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;java&quot;, &quot;Mule.default:type=Application,name={#NAME}&quot;,
-                                &quot;ExecutionErrors&quot;]
-                            </key>
+                            <key>zorka.jmx[&quot;java&quot;, &quot;Mule.default:type=Application,name={#NAME}&quot;, &quot;ExecutionErrors&quot;]</key>
                             <delay>120</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -300,9 +293,7 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;java&quot;, &quot;Mule.default:type=Application,name={#NAME}&quot;,
-                                &quot;FatalErrors&quot;]
-                            </key>
+                            <key>zorka.jmx[&quot;java&quot;, &quot;Mule.default:type=Application,name={#NAME}&quot;, &quot;FatalErrors&quot;]</key>
                             <delay>120</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -341,9 +332,7 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;java&quot;, &quot;Mule.default:type=Application,name={#NAME}&quot;,
-                                &quot;ProcessedEvents&quot;]
-                            </key>
+                            <key>zorka.jmx[&quot;java&quot;, &quot;Mule.default:type=Application,name={#NAME}&quot;, &quot;ProcessedEvents&quot;]</key>
                             <delay>120</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -382,9 +371,7 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;java&quot;, &quot;Mule.default:type=Application,name={#NAME}&quot;,
-                                &quot;SyncEventsReceived&quot;]
-                            </key>
+                            <key>zorka.jmx[&quot;java&quot;, &quot;Mule.default:type=Application,name={#NAME}&quot;, &quot;SyncEventsReceived&quot;]</key>
                             <delay>120</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -423,9 +410,7 @@
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;java&quot;, &quot;Mule.default:type=Application,name={#NAME}&quot;,
-                                &quot;TotalEventsReceived&quot;]
-                            </key>
+                            <key>zorka.jmx[&quot;java&quot;, &quot;Mule.default:type=Application,name={#NAME}&quot;, &quot;TotalEventsReceived&quot;]</key>
                             <delay>120</delay>
                             <history>10</history>
                             <trends>365</trends>
