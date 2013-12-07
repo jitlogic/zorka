@@ -30,6 +30,12 @@ public class User  {
 
     private int flags;
 
+    private UserLocator locator;
+
+    public User(UserLocator locator) {
+        this.locator = locator;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -68,5 +74,26 @@ public class User  {
 
     public void setFlags(int flags) {
         this.flags = flags;
+    }
+
+    public boolean isAdmin() {
+        return 0 != (flags & ADMIN_USER);
+    }
+
+    public void setAdmin(boolean admin) {
+        if (admin) {
+            flags |= ADMIN_USER;
+        } else {
+            flags &= ~ADMIN_USER;
+        }
+    }
+
+    public void persist() {
+        locator.persist(this);
+    }
+
+
+    public void remove() {
+        locator.remove(this);
     }
 }

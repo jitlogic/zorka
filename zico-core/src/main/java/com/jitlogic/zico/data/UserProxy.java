@@ -35,4 +35,7 @@ public interface UserProxy extends EntityProxy {
 
     public void setRealName(String realName);
 
+    public boolean isAdmin();
+
+    public void setAdmin(boolean admin);
 }

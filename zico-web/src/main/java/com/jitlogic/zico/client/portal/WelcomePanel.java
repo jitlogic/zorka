@@ -24,6 +24,7 @@ import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.api.AdminApi;
+import com.jitlogic.zico.client.api.SystemApi;
 import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.client.inject.PanelFactory;
 import com.sencha.gxt.widget.core.client.Portlet;
@@ -42,6 +43,8 @@ public class WelcomePanel implements IsWidget {
     private PortalLayoutContainer portal;
 
     private AdminApi adminApi;
+    private SystemApi systemApi;
+
     private TraceDataApi traceDataApi;
     private Provider<ZicoShell> shell;
 
@@ -52,11 +55,13 @@ public class WelcomePanel implements IsWidget {
 
     @Inject
     public WelcomePanel(AdminApi adminApi, TraceDataApi traceDataApi,
+                        SystemApi systemApi,
                         SystemInfoPortlet systemInfoPortlet,
                         PanelFactory panelFactory, Provider<ZicoShell> shell,
                         ErrorHandler errorHandler) {
 
         this.adminApi = adminApi;
+        this.systemApi = systemApi;
         this.traceDataApi = traceDataApi;
         this.systemInfoPortlet = systemInfoPortlet;
         this.panelFactory = panelFactory;
@@ -94,7 +99,20 @@ public class WelcomePanel implements IsWidget {
         portal.add(systemInfoPortlet, 2);
 
         createUserPortlet();
-        createAdminPortlet();
+
+        systemApi.isAdminRole(new MethodCallback<Boolean>() {
+            @Override
+            public void onFailure(Method method, Throwable exception) {
+            }
+
+            @Override
+            public void onSuccess(Method method, Boolean isAdmin) {
+                if (isAdmin) {
+                    createAdminPortlet();
+                }
+            }
+        });
+
     }
 
 
@@ -149,7 +167,7 @@ public class WelcomePanel implements IsWidget {
         lnkTraceDisplayTemplates.addHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                panelFactory.passwordChangeDialog().show();
+                panelFactory.passwordChangeDialog("").show();
             }
         }, ClickEvent.getType());
 

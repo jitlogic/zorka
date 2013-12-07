@@ -104,6 +104,9 @@ public interface Resources extends ClientBundle {
     @Source("images/msgbox-ok.png")
     ImageResource msgBoxOkIcon();
 
+    @Source("images/key.png")
+    ImageResource keyIcon();
+
     @DataResource.MimeType("text/html")
     @Source("resources/tips.html")
     TextResource tipsHtml();

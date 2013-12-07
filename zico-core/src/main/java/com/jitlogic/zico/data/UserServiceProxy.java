@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zico.data;
 
+import com.google.web.bindery.requestfactory.shared.InstanceRequest;
 import com.google.web.bindery.requestfactory.shared.Request;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
 
@@ -35,6 +36,10 @@ public interface UserServiceProxy extends RequestContext {
     Request<List<Integer>> getAllowedHostIds(Integer userId);
 
     Request<Void> setAllowedHostIds(Integer userId, List<Integer> hostIds);
+
+    //InstanceRequest<UserProxy, Void> persist();
+
+    //InstanceRequest<UserProxy, Void> remove();
 
     Request<Void> persist(UserProxy user);
 

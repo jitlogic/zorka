@@ -29,6 +29,7 @@ public class UserGwtService {
     private JdbcTemplate jdbc;
     private UserLocator locator;
 
+
     @Inject
     public UserGwtService(DataSource ds, UserLocator locator) {
         jdbc = new JdbcTemplate(ds);
@@ -45,10 +46,12 @@ public class UserGwtService {
         return jdbc.query("select * from USERS", locator);
     }
 
+
     public List<Integer> getAllowedHostIds(Integer userId) {
         List<Integer> lst = jdbc.queryForList("select HOST_ID from USERS_HOSTS where USER_ID = ?", Integer.class, userId);
         return lst;
     }
+
 
     public void setAllowedHostIds(Integer userId, List<Integer> hostIds) {
         jdbc.update("delete from USERS_HOSTS where USER_ID = ?", userId);
@@ -57,6 +60,7 @@ public class UserGwtService {
             jdbc.update("insert into USERS_HOSTS (USER_ID, HOST_ID) values (?,?)", userId, hostId);
         }
     }
+
 
     public void persist(User user) {
         locator.persist(user);

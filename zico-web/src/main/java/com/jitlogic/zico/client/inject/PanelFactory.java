@@ -37,7 +37,7 @@ public interface PanelFactory {
 
     public MethodRankingPanel methodRankingPanel(TraceInfo traceInfo);
 
-    public PasswordChangeDialog passwordChangeDialog();
+    public PasswordChangeDialog passwordChangeDialog(@Assisted("userName") String userName);
 
     public UserManagementPanel userManagementPanel();
 }

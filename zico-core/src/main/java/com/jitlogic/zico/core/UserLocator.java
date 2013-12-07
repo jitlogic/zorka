@@ -19,6 +19,7 @@ package com.jitlogic.zico.core;
 import com.google.inject.Singleton;
 import com.google.web.bindery.requestfactory.shared.Locator;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -49,12 +50,16 @@ public class UserLocator extends Locator<User, Integer> implements RowMapper<Use
 
     @Override
     public User create(Class<? extends User> aClass) {
-        return new User();
+        return new User(this);
     }
 
     @Override
     public User find(Class<? extends User> clazz, Integer id) {
-        return jdbc.queryForObject("select * from USERS where USER_ID = ?", this, id);
+        try {
+            return jdbc.queryForObject("select * from USERS where USER_ID = ?", this, id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     @Override
@@ -83,7 +88,7 @@ public class UserLocator extends Locator<User, Integer> implements RowMapper<Use
 
     @Override
     public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-        User user = new User();
+        User user = new User(this);
 
         user.setId(rs.getInt("USER_ID"));
         user.setUserName(rs.getString("USER_NAME"));
@@ -101,13 +106,29 @@ public class UserLocator extends Locator<User, Integer> implements RowMapper<Use
             jdbc.update("update USERS set USER_NAME = ?, REAL_NAME = ?, PASSWORD = ?, FLAGS = ? where USER_ID = ?",
                     user.getUserName(), user.getRealName(), user.getPassword(), user.getFlags(), user.getId());
         } else {
-            Number id = jdbci.executeAndReturnKey(ZorkaUtil.<String,Object>map(
+
+            if (user.getPassword() == null) {
+                user.setPassword("MD5:00000000000000000000000000000000");
+            }
+
+            Number id = jdbci.executeAndReturnKey(ZorkaUtil.<String, Object>map(
                     "USER_NAME", user.getUserName(),
                     "REAL_NAME", user.getRealName(),
                     "PASSWORD", user.getPassword(),
                     "FLAGS", user.getFlags()
             ));
             user.setId(id.intValue());
+
+            int vid = jdbc.queryForObject("select GROUP_ID from GROUPS where GROUP_NAME = ?", Integer.class, "VIEWER");
+            jdbc.update("insert into USERS_GROUPS (USER_ID,GROUP_ID) values (?,?)", user.getId(), vid);
+        }
+
+        int gid = jdbc.queryForObject("select GROUP_ID from GROUPS where GROUP_NAME = ?", Integer.class, "ADMIN");
+
+        jdbc.update("delete from USERS_GROUPS where USER_ID = ? and GROUP_ID = ?", user.getId(), gid);
+
+        if (user.isAdmin()) {
+            jdbc.update("insert into USERS_GROUPS (USER_ID,GROUP_ID) values (?,?)", user.getId(), gid);
         }
     }
 

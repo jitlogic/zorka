@@ -50,15 +50,27 @@ public class UserService {
 
     @POST
     @Path("/self/password")
-    public void resetPassword(@QueryParam("oldPassword") String oldPassword, @QueryParam("newPassword") String newPassword) {
+    public void resetPassword(
+            @QueryParam("userName") String userName,
+            @QueryParam("oldPassword") String oldPassword,
+            @QueryParam("newPassword") String newPassword) {
 
-        String user = userContext.getUser();
-        String chkHash = "MD5:" + ZorkaUtil.md5(oldPassword);
+        boolean adminMode = userContext.isInRole("ADMIN");
 
-        String oldHash = jdbc.queryForObject("select PASSWORD from USERS where USER_NAME = ?", String.class, user);
+        if (userName != null && !adminMode) {
+            throw new ZicoRuntimeException("Insufficient privileges to reset other users password");
+        }
 
-        if (!chkHash.equals(oldHash)) {
-            throw new ZicoRuntimeException("Invalid (old) password.");
+        String user = (userName != null && userName.length() > 0) ? userName : userContext.getUser();
+
+        if (!adminMode) {
+            String chkHash = "MD5:" + ZorkaUtil.md5(oldPassword);
+
+            String oldHash = jdbc.queryForObject("select PASSWORD from USERS where USER_NAME = ?", String.class, user);
+
+            if (!chkHash.equals(oldHash)) {
+                throw new ZicoRuntimeException("Invalid (old) password.");
+            }
         }
 
         jdbc.update("update USERS set PASSWORD = ? where USER_NAME = ?", "MD5:" + ZorkaUtil.md5(newPassword), user);

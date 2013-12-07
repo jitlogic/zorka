@@ -31,7 +31,9 @@ public interface UserApi extends RestService {
 
     @POST
     @Path("users/self/password")
-    public void resetPassword(@QueryParam("oldPassword") String oldPassword,
-                              @QueryParam("newPassword") String newPassword,
-                              MethodCallback<Void> callback);
+    public void resetPassword(
+            @QueryParam("userName") String userName,
+            @QueryParam("oldPassword") String oldPassword,
+            @QueryParam("newPassword") String newPassword,
+            MethodCallback<Void> callback);
 }

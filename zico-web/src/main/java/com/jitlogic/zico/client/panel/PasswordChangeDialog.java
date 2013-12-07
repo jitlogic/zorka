@@ -16,6 +16,7 @@
 package com.jitlogic.zico.client.panel;
 
 
+import com.google.inject.assistedinject.Assisted;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.api.UserApi;
 import com.sencha.gxt.widget.core.client.Dialog;
@@ -37,9 +38,12 @@ public class PasswordChangeDialog extends Dialog {
 
     private PasswordField txtOldPassword, txtNewPassword, txtRepPassword;
 
+    private String username;
+
     @Inject
-    public PasswordChangeDialog(UserApi userApi) {
+    public PasswordChangeDialog(UserApi userApi, @Assisted("userName") String username) {
         this.userApi = userApi;
+        this.username = username;
         createUi();
     }
 
@@ -50,9 +54,11 @@ public class PasswordChangeDialog extends Dialog {
 
         VerticalLayoutContainer vlc = new VerticalLayoutContainer();
 
-        txtOldPassword =  new PasswordField();
-        vlc.add(txtOldPassword);
-        vlc.add(new FieldLabel(txtOldPassword, "Old password"), new VerticalLayoutContainer.VerticalLayoutData(1, -1));
+        if (username == null) {
+            txtOldPassword =  new PasswordField();
+            vlc.add(txtOldPassword);
+            vlc.add(new FieldLabel(txtOldPassword, "Old password"), new VerticalLayoutContainer.VerticalLayoutData(1, -1));
+        }
 
         txtNewPassword = new PasswordField();
         vlc.add(txtNewPassword);
@@ -88,11 +94,11 @@ public class PasswordChangeDialog extends Dialog {
     }
 
     private void doPasswordChange() {
-        String oldPassword = txtOldPassword.getText();
+        String oldPassword = username == null ? txtOldPassword.getText() : null;
         String newPassword = txtNewPassword.getText();
         String repPassword = txtRepPassword.getText();
 
-        if (oldPassword == null || oldPassword.length() == 0) {
+        if (username == null && (oldPassword == null || oldPassword.length() == 0)) {
             AlertMessageBox amb = new AlertMessageBox("Password change", "You have to enter old password.");
             amb.show();
             return;
@@ -112,10 +118,10 @@ public class PasswordChangeDialog extends Dialog {
             return;
         }
 
-        userApi.resetPassword(oldPassword, newPassword, new MethodCallback<Void>() {
+        userApi.resetPassword(username, oldPassword, newPassword, new MethodCallback<Void>() {
             @Override
             public void onFailure(Method method, Throwable e) {
-                txtOldPassword.setText("");
+                if (username == null) txtOldPassword.setText("");
                 txtNewPassword.setText("");
                 txtRepPassword.setText("");
                 AlertMessageBox amb = new AlertMessageBox("Password change", "Password change failed: " + e.getMessage());
@@ -124,11 +130,11 @@ public class PasswordChangeDialog extends Dialog {
 
             @Override
             public void onSuccess(Method method, Void response) {
-                txtOldPassword.setText("");
+                if (username == null) txtOldPassword.setText("");
                 txtNewPassword.setText("");
                 txtRepPassword.setText("");
 
-                AlertMessageBox amb = new AlertMessageBox("Password change", "Your password has been changed.");
+                AlertMessageBox amb = new AlertMessageBox("Password change", "Password has been changed.");
                 amb.setIcon(Resources.INSTANCE.msgBoxOkIcon());
                 amb.show();
                 hide();
