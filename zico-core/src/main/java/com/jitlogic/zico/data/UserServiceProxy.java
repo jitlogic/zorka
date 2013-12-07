@@ -32,7 +32,9 @@ public interface UserServiceProxy extends RequestContext {
 
     Request<List<UserProxy>> findAll();
 
-    Request<List<Integer>> findAllowedHostIds(Integer userId);
+    Request<List<Integer>> getAllowedHostIds(Integer userId);
+
+    Request<Void> setAllowedHostIds(Integer userId, List<Integer> hostIds);
 
     Request<Void> persist(UserProxy user);
 

@@ -17,11 +17,14 @@ package com.jitlogic.zico.client.panel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.data.*;
+import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
@@ -30,9 +33,12 @@ import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.CellClickEvent;
+import com.sencha.gxt.widget.core.client.grid.CheckBoxSelectionModel;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
+import com.sencha.gxt.widget.core.client.selection.SelectionChangedEvent;
+import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 
 import javax.inject.Inject;
@@ -40,6 +46,8 @@ import java.util.*;
 
 
 public class UserManagementPanel extends VerticalLayoutContainer {
+
+    private VerticalLayoutContainer pnlUserList;
 
     interface UserProperties extends PropertyAccess<UserProxy> {
         ModelKeyProvider<UserProxy> id();
@@ -60,24 +68,24 @@ public class UserManagementPanel extends VerticalLayoutContainer {
 
     private DockLayoutPanel rootPanel;
 
-    private UserServiceProxy userService;
-    private HostServiceProxy hostService;
+    private ZicoRequestFactory rf;
 
     private ListStore<UserProxy> userStore;
     private Grid<UserProxy> userGrid;
+    private UserProxy selectedUser;
 
     private List<HostProxy> hosts = new ArrayList<HostProxy>();
     private Set<Integer> allowedHosts = new HashSet<Integer>();
 
     private ListStore<HostProxy> hostStore;
+    private CheckBoxSelectionModel<HostProxy> hostSelection;
     private Grid<HostProxy> hostGrid;
 
 
     @Inject
     public UserManagementPanel(ZicoRequestFactory requestFactory) {
 
-        this.userService = requestFactory.userService();
-        this.hostService = requestFactory.hostService();
+        this.rf = requestFactory;
 
         loadHosts();
         createUi();
@@ -88,8 +96,20 @@ public class UserManagementPanel extends VerticalLayoutContainer {
     private void createUi() {
         rootPanel = new DockLayoutPanel(Style.Unit.PCT);
 
-        VerticalLayoutContainer vp = new VerticalLayoutContainer();
+        pnlUserList = new VerticalLayoutContainer();
 
+        createToolBar();
+
+        createUserGrid();
+
+        createHostGrid();
+
+        rootPanel.add(pnlUserList);
+        add(rootPanel, new VerticalLayoutData(1, 1));
+    }
+
+
+    private void createToolBar() {
         ToolBar toolBar = new ToolBar();
 
         TextButton btnRefresh = new TextButton();
@@ -97,17 +117,23 @@ public class UserManagementPanel extends VerticalLayoutContainer {
         btnRefresh.setToolTip("Refresh user list");
         toolBar.add(btnRefresh);
 
-        vp.add(toolBar, new VerticalLayoutData(1, -1));
+        toolBar.add(new SeparatorToolItem());
 
-        createUserGrid(vp);
+        TextButton btnAdd = new TextButton();
+        btnAdd.setIcon(Resources.INSTANCE.addIcon());
+        btnAdd.setToolTip("Add user");
+        toolBar.add(btnAdd);
 
-        createHostGrid();
+        TextButton btnRemove = new TextButton();
+        btnRemove.setIcon(Resources.INSTANCE.removeIcon());
+        btnRemove.setToolTip("Remove user");
+        toolBar.add(btnRemove);
 
-        rootPanel.add(vp);
-        add(rootPanel, new VerticalLayoutData(1, 1));
+        pnlUserList.add(toolBar, new VerticalLayoutData(1, -1));
     }
 
-    private void createUserGrid(VerticalLayoutContainer vp) {
+
+    private void createUserGrid() {
         userStore = new ListStore<UserProxy>(userProperties.id());
 
         ColumnConfig<UserProxy, String> colUserName
@@ -124,43 +150,77 @@ public class UserManagementPanel extends VerticalLayoutContainer {
                 colUserName, colRealName));
 
         userGrid = new Grid<UserProxy>(userStore, model);
+        userGrid.getView().setAutoExpandColumn(colUserName);
+        userGrid.getView().setForceFit(true);
 
         userGrid.addCellClickHandler(new CellClickEvent.CellClickHandler() {
             @Override
             public void onCellClick(CellClickEvent event) {
-                updateHostList();
+                hostStore.clear();
+                rf.userService().getAllowedHostIds(userGrid.getSelectionModel().getSelectedItem().getId()).fire(
+                    new Receiver<List<Integer>>() {
+                        @Override
+                        public void onSuccess(List<Integer> hostIds) {
+                            updateHosts(hostIds);
+                        }
+                    }
+                );
             }
         });
 
-        vp.add(userGrid);
+        pnlUserList.add(userGrid);
     }
 
 
-    private void updateHostList() {
-        hostStore.clear();
-        userService.findAllowedHostIds(userGrid.getSelectionModel().getSelectedItem().getId()).fire(
-                new Receiver<List<Integer>>() {
-                    @Override
-                    public void onSuccess(List<Integer> hostIds) {
-                        hostStore.addAll(hosts);
-                        allowedHosts.clear();
-                        allowedHosts.addAll(hostIds);
-                    }
-                }
-        );
+    private void updateHosts(List<Integer> hostIds) {
+        hostStore.addAll(hosts);
+        allowedHosts.clear();
+        allowedHosts.addAll(hostIds);
+        Set<Integer> hostIdSet = new HashSet<Integer>();
+        hostIdSet.addAll(hostIds);
+        List<HostProxy> selectedHosts = new ArrayList<HostProxy>();
+        for (HostProxy host : hosts) {
+            if (hostIdSet.contains(host.getId())) {
+                selectedHosts.add(host);
+            }
+        }
+        hostSelection.setSelection(selectedHosts);
     }
 
 
     private void createHostGrid() {
+
+        IdentityValueProvider<HostProxy> idp = new IdentityValueProvider<HostProxy>();
+
+        hostSelection = new CheckBoxSelectionModel<HostProxy>(idp);
+        hostSelection.setSelectionMode(com.sencha.gxt.core.client.Style.SelectionMode.SIMPLE);
+
         hostStore = new ListStore<HostProxy>(hostProperties.id());
 
         ColumnConfig<HostProxy, String> colHostName
             = new ColumnConfig<HostProxy, String>(hostProperties.name(), 100, "Host name");
 
         ColumnModel<HostProxy> hostModel
-            = new ColumnModel<HostProxy>(Arrays.<ColumnConfig<HostProxy,?>>asList(colHostName));
+            = new ColumnModel<HostProxy>(Arrays.<ColumnConfig<HostProxy,?>>asList(hostSelection.getColumn(), colHostName));
 
         hostGrid = new Grid<HostProxy>(hostStore, hostModel);
+        hostGrid.setSelectionModel(hostSelection);
+        hostGrid.getView().setAutoExpandColumn(colHostName);
+        hostGrid.getView().setForceFit(true);
+
+        hostSelection.addSelectionHandler(new SelectionHandler<HostProxy>() {
+            @Override
+            public void onSelection(SelectionEvent<HostProxy> hostProxySelectionEvent) {
+                saveAllowedHostList();
+            }
+        });
+//        hostSelection.addSelectionChangedHandler(new SelectionChangedEvent.SelectionChangedHandler<HostProxy>() {
+//            @Override
+//            public void onSelectionChanged(SelectionChangedEvent<HostProxy> event) {
+//                saveAllowedHostList();
+//            }
+//        });
+        //hostGrid.addCellClickHandler(new Cell)
 
         ContentPanel cp = new ContentPanel();
         cp.setHeadingText("Allowed hosts");
@@ -170,8 +230,20 @@ public class UserManagementPanel extends VerticalLayoutContainer {
     }
 
 
+    private void saveAllowedHostList() {
+        UserProxy selectedUser = userGrid.getSelectionModel().getSelectedItem();
+        List<Integer> ids = new ArrayList<Integer>();
+
+        for (HostProxy host : hostSelection.getSelectedItems()) {
+            ids.add(host.getId());
+        }
+
+        rf.userService().setAllowedHostIds(selectedUser.getId(), ids).fire();
+    }
+
+
     private void refreshUsers() {
-        userService.findAll().fire(new Receiver<List<UserProxy>>() {
+        rf.userService().findAll().fire(new Receiver<List<UserProxy>>() {
             @Override
             public void onSuccess(List<UserProxy> users) {
                 userStore.addAll(users);
@@ -181,7 +253,7 @@ public class UserManagementPanel extends VerticalLayoutContainer {
 
 
     private void loadHosts() {
-        hostService.findAll().fire(new Receiver<List<HostProxy>>() {
+        rf.hostService().findAll().fire(new Receiver<List<HostProxy>>() {
             @Override
             public void onSuccess(List<HostProxy> hosts) {
                 UserManagementPanel.this.hosts = hosts;
