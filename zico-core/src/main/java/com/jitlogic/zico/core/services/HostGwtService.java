@@ -24,6 +24,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.util.List;
 
 
@@ -59,4 +60,15 @@ public class HostGwtService {
         jdbc.update("delete from USERS_HOSTS where USER_ID = ? and HOST_ID = ?", user.getId(), host.getId());
     }
 
+    public void persist(HostStore host) {
+        host.save();
+    }
+
+    public void remove(HostStore host) {
+        try {
+            hsm.delete(host.getId());
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+    }
 }

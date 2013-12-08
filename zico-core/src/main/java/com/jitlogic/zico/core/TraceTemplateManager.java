@@ -172,7 +172,8 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
 
     @Override
     public TraceTemplate find(Class<? extends TraceTemplate> aClass, Integer templateId) {
-        return jdbc.queryForObject("select * from TEMPLATES where TEMPLATE_ID = ?", TEMPLATE_MAPPER, templateId);
+        List<TraceTemplate> lst = jdbc.query("select * from TEMPLATES where TEMPLATE_ID = ?", TEMPLATE_MAPPER, templateId);
+        return lst.size() > 0 ? lst.get(0) : null;
     }
 
     @Override

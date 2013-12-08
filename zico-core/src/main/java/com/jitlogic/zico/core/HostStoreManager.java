@@ -15,7 +15,6 @@
  */
 package com.jitlogic.zico.core;
 
-import com.jitlogic.zico.data.HostInfo;
 import com.jitlogic.zorka.common.tracedata.HelloRequest;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaUtil;

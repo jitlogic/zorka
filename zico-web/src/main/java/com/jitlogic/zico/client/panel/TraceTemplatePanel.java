@@ -170,28 +170,20 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
 
 
     private void saveChanges(int row) {
-        final TraceTemplateProxy tti = templateStore.get(row);
+        SystemServiceProxy req = newTemplateRequest != null ? newTemplateRequest : rf.systemService();
+        newTemplateRequest = null;
+        final TraceTemplateProxy tti = req.edit(templateStore.get(row));
         tti.setTraceId(cmbTraceType.getCurrentValue());
         tti.setOrder(txtOrder.getCurrentValue());
         tti.setCondTemplate(txtCondTempl.getCurrentValue());
         tti.setCondRegex(txtCondRegex.getCurrentValue());
         tti.setTemplate(txtTraceTemplate.getCurrentValue());
-
-        //
-//        adminService.saveTemplate(tti, new MethodCallback<Integer>() {
-//            @Override
-//            public void onFailure(Method method, Throwable exception) {
-//                GWT.log("Error calling method " + method, exception);
-//            }
-//
-//            @Override
-//            public void onSuccess(Method method, Integer response) {
-//                if (tti.getId() == 0) {
-//                    tti.setId(response);
-//                }
-//                loadData();
-//            }
-//        });
+        req.saveTemplate(tti).fire(new Receiver<Integer>() {
+            @Override
+            public void onSuccess(Integer integer) {
+                loadData();
+            }
+        });
     }
 
 

@@ -22,13 +22,15 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.inject.Inject;
+import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.ZicoShell;
-import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.client.inject.PanelFactory;
-import com.jitlogic.zico.data.HostInfo;
+import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.data.HostInfoProperties;
+import com.jitlogic.zico.shared.data.HostProxy;
+import com.jitlogic.zico.shared.services.HostServiceProxy;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style;
 import com.sencha.gxt.data.shared.ListStore;
@@ -50,8 +52,6 @@ import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.sencha.gxt.widget.core.client.menu.SeparatorMenuItem;
 import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.MethodCallback;
 
 import javax.inject.Provider;
 import java.util.Arrays;
@@ -62,13 +62,13 @@ public class HostListPanel extends VerticalLayoutContainer {
 
     private static final HostInfoProperties props = GWT.create(HostInfoProperties.class);
 
-    private TraceDataApi traceDataApi;
     private Provider<ZicoShell> shell;
     private PanelFactory panelFactory;
+    private ZicoRequestFactory rf;
 
-    private Grid<HostInfo> hostGrid;
-    private ListStore<HostInfo> hostGridStore;
-    private GridSelectionModel<HostInfo> selectionModel;
+    private Grid<HostProxy> hostGrid;
+    private ListStore<HostProxy> hostGridStore;
+    private GridSelectionModel<HostProxy> selectionModel;
 
     private ErrorHandler errorHandler;
 
@@ -81,12 +81,12 @@ public class HostListPanel extends VerticalLayoutContainer {
     private boolean adminMode = false;
 
     @Inject
-    public HostListPanel(Provider<ZicoShell> shell, TraceDataApi traceDataApi, PanelFactory panelFactory,
-                         ErrorHandler errorHandler) {
+    public HostListPanel(Provider<ZicoShell> shell, PanelFactory panelFactory,
+                         ZicoRequestFactory rf, ErrorHandler errorHandler) {
 
         this.shell = shell;
-        this.traceDataApi = traceDataApi;
         this.panelFactory = panelFactory;
+        this.rf = rf;
         this.errorHandler = errorHandler;
 
         createToolbar();
@@ -101,9 +101,9 @@ public class HostListPanel extends VerticalLayoutContainer {
         enableSelectionDependentControls(null);
     }
 
-    private void enableSelectionDependentControls(HostInfo hostInfo) {
+    private void enableSelectionDependentControls(HostProxy hostInfo) {
         boolean enabled = hostInfo != null;
-        boolean hostDisabled = hostInfo != null && hostInfo.hasFlag(HostInfo.DISABLED);
+        boolean hostDisabled = hostInfo != null && !hostInfo.isEnabled();
         if (selectionDependentControlsEnabled != enabled) {
             btnRemoveHost.setEnabled(enabled && adminMode);
             btnEditHost.setEnabled(enabled && adminMode);
@@ -217,40 +217,41 @@ public class HostListPanel extends VerticalLayoutContainer {
 
 
     private void createHostListPanel() {
-        ColumnConfig<HostInfo, HostInfo> nameCol = new ColumnConfig<HostInfo, HostInfo>(
-                new IdentityValueProvider<HostInfo>(), 128, "Host Name");
+
+        ColumnConfig<HostProxy, HostProxy> nameCol = new ColumnConfig<HostProxy, HostProxy>(
+                new IdentityValueProvider<HostProxy>(), 128, "Host Name");
         nameCol.setMenuDisabled(true);
         nameCol.setSortable(false);
 
-        nameCol.setCell(new AbstractCell<HostInfo>() {
+        nameCol.setCell(new AbstractCell<HostProxy>() {
             @Override
-            public void render(Context context, HostInfo host, SafeHtmlBuilder sb) {
-                String color = host.hasFlag(HostInfo.DISABLED) ? "gray" : "black";
+            public void render(Context context, HostProxy host, SafeHtmlBuilder sb) {
+                String color = host.isEnabled() ? "black" : "gray";
                 sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
                 sb.append(SafeHtmlUtils.fromString(host.getName()));
                 sb.appendHtmlConstant("</span>");
             }
         });
 
-        ColumnConfig<HostInfo, HostInfo> addrCol = new ColumnConfig<HostInfo, HostInfo>(
-                new IdentityValueProvider<HostInfo>(), 127, "IP Address");
+        ColumnConfig<HostProxy, HostProxy> addrCol = new ColumnConfig<HostProxy, HostProxy>(
+                new IdentityValueProvider<HostProxy>(), 127, "IP Address");
         addrCol.setMenuDisabled(true);
         addrCol.setSortable(false);
 
-        addrCol.setCell(new AbstractCell<HostInfo>() {
+        addrCol.setCell(new AbstractCell<HostProxy>() {
             @Override
-            public void render(Context context, HostInfo host, SafeHtmlBuilder sb) {
-                String color = host.hasFlag(HostInfo.DISABLED) ? "gray" : "black";
+            public void render(Context context, HostProxy host, SafeHtmlBuilder sb) {
+                String color = host.isEnabled() ? "black" : "gray";
                 sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
                 sb.append(SafeHtmlUtils.fromString(host.getAddr()));
                 sb.appendHtmlConstant("</span>");
             }
         });
 
-        ColumnModel<HostInfo> model = new ColumnModel<HostInfo>(Arrays.<ColumnConfig<HostInfo, ?>>asList(nameCol, addrCol));
-        hostGridStore = new ListStore<HostInfo>(props.key());
+        ColumnModel<HostProxy> model = new ColumnModel<HostProxy>(Arrays.<ColumnConfig<HostProxy, ?>>asList(nameCol, addrCol));
+        hostGridStore = new ListStore<HostProxy>(props.key());
 
-        hostGrid = new Grid<HostInfo>(hostGridStore, model);
+        hostGrid = new Grid<HostProxy>(hostGridStore, model);
         selectionModel = hostGrid.getSelectionModel();
         selectionModel.setSelectionMode(Style.SelectionMode.SINGLE);
 
@@ -282,14 +283,9 @@ public class HostListPanel extends VerticalLayoutContainer {
 
     public void refresh() {
         hostGridStore.clear();
-        this.traceDataApi.listHosts(new MethodCallback<List<HostInfo>>() {
+        rf.hostService().findAll().fire(new Receiver<List<HostProxy>>() {
             @Override
-            public void onFailure(Method method, Throwable exception) {
-                errorHandler.error("Error calling API method: " + method, exception);
-            }
-
-            @Override
-            public void onSuccess(Method method, List<HostInfo> response) {
+            public void onSuccess(List<HostProxy> response) {
                 hostGridStore.addAll(response);
                 enableSelectionDependentControls(hostGrid.getSelectionModel().getSelectedItem());
             }
@@ -297,7 +293,7 @@ public class HostListPanel extends VerticalLayoutContainer {
     }
 
 
-    private void removeHost(final HostInfo hi) {
+    private void removeHost(final HostProxy hi) {
         if (hi != null) {
             ConfirmMessageBox cmb = new ConfirmMessageBox(
                     "Removing host", "Are you sure you want to remove host " + hi.getName() + "?");
@@ -306,17 +302,8 @@ public class HostListPanel extends VerticalLayoutContainer {
                 public void onHide(HideEvent event) {
                     Dialog d = (Dialog) event.getSource();
                     if ("Yes".equals(d.getHideButton().getText())) {
-                        traceDataApi.deleteHost(hi.getId(), new MethodCallback<Void>() {
-                            @Override
-                            public void onFailure(Method method, Throwable exception) {
-                                errorHandler.error("Error calling API method: " + method, exception);
-                            }
-
-                            @Override
-                            public void onSuccess(Method method, Void response) {
-                                refresh();
-                            }
-                        });
+                        hostGridStore.remove(hi);
+                        rf.hostService().remove(hi).fire();
                     }
                 }
             });
@@ -409,7 +396,7 @@ public class HostListPanel extends VerticalLayoutContainer {
 
 
     private void addHost() {
-        new HostPrefsDialog(traceDataApi, this, null, errorHandler).show();
+        new HostPrefsDialog(rf, this, null, errorHandler).show();
     }
 
 
@@ -419,33 +406,31 @@ public class HostListPanel extends VerticalLayoutContainer {
 
 
     private void editHost() {
-        HostInfo hostInfo = hostGrid.getSelectionModel().getSelectedItem();
+        HostProxy hostInfo = hostGrid.getSelectionModel().getSelectedItem();
         if (hostInfo != null) {
-            new HostPrefsDialog(traceDataApi, this, hostInfo, errorHandler).show();
+            new HostPrefsDialog(rf, this, hostInfo, errorHandler).show();
         }
     }
 
 
     private void toggleHost(boolean enabled) {
-        HostInfo info = selectionModel.getSelectedItem();
+        HostProxy info = selectionModel.getSelectedItem();
         if (info != null) {
-            info.setFlags(enabled ? (info.getFlags() & ~HostInfo.DISABLED) : info.getFlags() | HostInfo.DISABLED);
-            traceDataApi.updateHost(info.getId(), info, new MethodCallback<Void>() {
+            HostServiceProxy req = rf.hostService();
+            HostProxy editedHost = req.edit(info);
+            editedHost.setEnabled(enabled);
+            req.fire(new Receiver<Void>() {
                 @Override
-                public void onFailure(Method method, Throwable exception) {
-
-                }
-
-                @Override
-                public void onSuccess(Method method, Void response) {
+                public void onSuccess(Void aVoid) {
                     refresh();
                 }
             });
         }
     }
 
+
     private void listTraces() {
-        HostInfo hostInfo = selectionModel.getSelectedItem();
+        HostProxy hostInfo = selectionModel.getSelectedItem();
         GWT.log("Selected host: " + hostInfo);
 
         if (hostInfo != null) {

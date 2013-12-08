@@ -16,7 +16,6 @@
 package com.jitlogic.zico.core;
 
 
-import com.jitlogic.zico.data.HostInfo;
 import com.jitlogic.zico.core.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
@@ -26,7 +25,6 @@ import org.fressian.FressianWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;

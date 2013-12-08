@@ -30,7 +30,7 @@ public class UserContext {
     }
 
     public boolean isInRole(String role) {
-        return ZicoCacheControlFilter.getRequest().isUserInRole(role);
+        return ZicoCacheControlFilter.getRequest() != null ?  ZicoCacheControlFilter.getRequest().isUserInRole(role) : true;
     }
 
     public void checkAdmin() {
@@ -39,15 +39,4 @@ public class UserContext {
         }
     }
 
-    private static String[] ROLES = { "ADMIN", "VIEWER" };
-
-    public List<String> listRoles() {
-        List<String> roles = new ArrayList<String>();
-        for (String role : ROLES) {
-            if (isInRole(role)) {
-                roles.add(role);
-            }
-        }
-        return roles;
-    }
 }

@@ -37,15 +37,9 @@ public class SystemGwtService {
 
     private static final long MB = 1024 * 1024;
 
-    private ZorkaAgent agent;
-
     private TraceTemplateManager templater;
 
     private UserContext userContext;
-
-    public void setAgent(ZorkaAgent agent) {
-        this.agent = agent;
-    }
 
     @Inject
     public SystemGwtService(ZicoConfig config, TraceTemplateManager templater, UserContext userContext) {
@@ -92,14 +86,6 @@ public class SystemGwtService {
 
         info.add("Non-Heap Memory: " + String.format("%dMB/%dMB (%.1f%%)",
                 nmu.getUsed() / MB, nmu.getMax() / MB, 100.0 * nmu.getUsed() / nmu.getMax()));
-
-        try {
-            if (agent != null) {
-                info.addAll(Arrays.asList(agent.query("zico.info()").split("\n")));
-            }
-        } catch (Exception e) {
-            //log.warn("Call to self-monitoring agent failed.", e);
-        }
 
         return info;
     }

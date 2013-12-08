@@ -17,21 +17,21 @@ package com.jitlogic.zico.data;
 
 
 import com.google.gwt.editor.client.Editor;
-import com.jitlogic.zico.data.HostInfo;
+import com.jitlogic.zico.shared.data.HostProxy;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.LabelProvider;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.PropertyAccess;
 
-public interface HostInfoProperties extends PropertyAccess<HostInfo> {
+public interface HostInfoProperties extends PropertyAccess<HostProxy> {
 
     @Editor.Path("id")
-    ModelKeyProvider<HostInfo> key();
+    ModelKeyProvider<HostProxy> key();
 
     @Editor.Path("name")
-    LabelProvider<HostInfo> nameLabel();
+    LabelProvider<HostProxy> nameLabel();
 
-    ValueProvider<HostInfo, String> name();
+    ValueProvider<HostProxy, String> name();
 
-    ValueProvider<HostInfo, String> addr();
+    ValueProvider<HostProxy, String> addr();
 }

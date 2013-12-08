@@ -16,12 +16,12 @@
 package com.jitlogic.zico.client.panel;
 
 
+import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.jitlogic.zico.client.ErrorHandler;
-import com.jitlogic.zico.client.api.TraceDataApi;
-import com.jitlogic.zico.client.panel.HostListPanel;
-import com.jitlogic.zico.data.HostInfo;
+import com.jitlogic.zico.client.inject.ZicoRequestFactory;
+import com.jitlogic.zico.shared.data.HostProxy;
+import com.jitlogic.zico.shared.services.HostServiceProxy;
 import com.sencha.gxt.widget.core.client.Dialog;
-import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
@@ -29,15 +29,13 @@ import com.sencha.gxt.widget.core.client.form.FieldLabel;
 import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor;
 import com.sencha.gxt.widget.core.client.form.SpinnerField;
 import com.sencha.gxt.widget.core.client.form.TextField;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.MethodCallback;
 
 public class HostPrefsDialog extends Dialog {
 
-    private TraceDataApi tds;
-    private HostListPanel panel;
+    private HostProxy editedHost;
+    private HostServiceProxy editHostRequest;
 
-    private int hostId;
+    private HostListPanel panel;
 
     private TextField txtHostName;
     private TextField txtHostAddr;
@@ -47,13 +45,16 @@ public class HostPrefsDialog extends Dialog {
 
     private ErrorHandler errorHandler;
 
-    public HostPrefsDialog(TraceDataApi tds, HostListPanel panel, HostInfo info, ErrorHandler errorHandler) {
-        this.tds = tds;
+
+    public HostPrefsDialog(ZicoRequestFactory rf, HostListPanel panel, HostProxy info, ErrorHandler errorHandler) {
         this.panel = panel;
         this.errorHandler = errorHandler;
 
+        editHostRequest = rf.hostService();
         if (info != null) {
-            hostId = info.getId();
+            editedHost = editHostRequest.edit(info);
+        } else {
+            editedHost = editHostRequest.create(HostProxy.class);
         }
 
         setHeadingText(info != null ? "Edit host: " + info.getName() : "New host");
@@ -63,7 +64,7 @@ public class HostPrefsDialog extends Dialog {
     }
 
 
-    private void createUi(HostInfo info) {
+    private void createUi(HostProxy info) {
         VerticalLayoutContainer vlc = new VerticalLayoutContainer();
 
         if (info == null) {
@@ -147,33 +148,18 @@ public class HostPrefsDialog extends Dialog {
 
 
     public void save() {
-        HostInfo hi = new HostInfo();
-        if (txtHostName != null) {
-            hi.setName(txtHostName.getText());
-        }
+        // What about new host ?
+        editedHost.setAddr(txtHostAddr.getText());
+        editedHost.setDescription(txtHostDesc.getText());
+        editedHost.setPass(txtHostPass.getText());
+        editedHost.setMaxSize(txtMaxSize.getCurrentValue() * 1048576L);
 
-        hi.setAddr(txtHostAddr.getText());
-        hi.setDescription(txtHostDesc.getText());
-        hi.setPass(txtHostPass.getText());
-        hi.setMaxSize(txtMaxSize.getCurrentValue() * 1048576L);
-
-        MethodCallback<Void> handler = new MethodCallback<Void>() {
+        editHostRequest.persist(editedHost).fire(new Receiver<Void>() {
             @Override
-            public void onFailure(Method method, Throwable exception) {
-                errorHandler.error("Error calling API method: " + method, exception);
-            }
-
-            @Override
-            public void onSuccess(Method method, Void response) {
+            public void onSuccess(Void aVoid) {
                 hide();
                 panel.refresh();
             }
-        };
-
-        if (txtHostName != null) {
-            tds.addHost(hi, handler);
-        } else {
-            tds.updateHost(hostId, hi, handler);
-        }
+        });
     }
 }

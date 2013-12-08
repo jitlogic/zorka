@@ -377,6 +377,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public void setAddr(String addr) {
         hostInfo.setAddr(addr);
+        save();
     }
 
     public String getDescription() {
@@ -385,6 +386,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public void setDescription(String description) {
         hostInfo.setDescription(description);
+        save();
     }
 
     public String getPass() {
@@ -393,6 +395,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public void setPass(String pass) {
         hostInfo.setPath(pass);
+        save();
     }
 
     public int getFlags() {
@@ -401,6 +404,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public void setFlags(int flags) {
         hostInfo.setFlags(flags);
+        save();
     }
 
     public long getMaxSize() {
@@ -409,6 +413,20 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public void setMaxSize(long maxSize) {
         hostInfo.setMaxSize(maxSize);
+        save();
+    }
+
+    public boolean isEnabled() {
+        return 0 == (hostInfo.getFlags() & HostInfo.DISABLED);
+    }
+
+    public void setEnabled(boolean enabled) {
+        if (enabled) {
+            hostInfo.setFlags(hostInfo.getFlags() & ~HostInfo.DISABLED);
+        } else {
+            hostInfo.setFlags(hostInfo.getFlags()|HostInfo.DISABLED);
+        }
+        save();
     }
 }
 

@@ -37,6 +37,7 @@ import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.inject.PanelFactory;
 import com.jitlogic.zico.data.*;
 import com.jitlogic.zico.client.api.TraceDataApi;
+import com.jitlogic.zico.shared.data.HostProxy;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style;
 import com.sencha.gxt.data.shared.LabelProvider;
@@ -77,7 +78,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
     private TraceDataApi tds;
     private PanelFactory panelFactory;
 
-    private HostInfo selectedHost;
+    private HostProxy selectedHost;
     private Grid<TraceInfo> traceGrid;
     private ListStore<TraceInfo> traceStore;
     private DataProxy<PagingLoadConfig, PagingLoadResult<TraceInfo>> traceProxy;
@@ -101,7 +102,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
     @Inject
     public TraceListPanel(Provider<ZicoShell> shell, TraceDataApi tds,
-                          PanelFactory panelFactory, @Assisted HostInfo hostInfo,
+                          PanelFactory panelFactory, @Assisted HostProxy hostInfo,
                           ErrorHandler errorHandler) {
         this.shell = shell;
         this.tds = tds;

@@ -18,14 +18,14 @@ package com.jitlogic.zico.client.inject;
 
 import com.google.inject.assistedinject.Assisted;
 import com.jitlogic.zico.client.panel.*;
-import com.jitlogic.zico.data.HostInfo;
 import com.jitlogic.zico.data.TraceInfo;
+import com.jitlogic.zico.shared.data.HostProxy;
 
 import java.util.Map;
 
 public interface PanelFactory {
 
-    public TraceListPanel traceListPanel(HostInfo hostInfo);
+    public TraceListPanel traceListPanel(HostProxy hostInfo);
 
     public TraceDetailPanel traceDetailPanel(TraceInfo traceInfo);
 

@@ -27,11 +27,6 @@ import java.util.Map;
 
 public interface TraceDataApi extends RestService {
 
-    @GET
-    @Path("hosts/list")
-    public void listHosts(MethodCallback<List<HostInfo>> callback);
-
-
     @POST
     @Path("hosts/{hostId}/page?limit={limit}&offset={offset}")
     public void pageTraces(@PathParam("hostId") int hostId,
@@ -68,24 +63,6 @@ public interface TraceDataApi extends RestService {
                                    TraceDetailSearchExpression expr,
                                    MethodCallback<TraceRecordSearchResult> callback);
 
-
-    @POST
-    @Path("hosts/")
-    public void addHost(HostInfo hostInfo,
-                        MethodCallback<Void> callback);
-
-
-    @PUT
-    @Path("hosts/{hostId}")
-    public void updateHost(@PathParam("hostId") int hostId,
-                           HostInfo hostIndo,
-                           MethodCallback<Void> callback);
-
-
-    @DELETE
-    @Path("hosts/{hostId}")
-    public void deleteHost(@PathParam("hostId") int hostId,
-                           MethodCallback<Void> callback);
 
 
     @GET

@@ -53,25 +53,6 @@ public class TraceDataService {
 
 
     @GET
-    @Path("/list")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<HostInfo> getHosts() {
-        HttpServletRequest request = ZicoCacheControlFilter.getRequest();
-        boolean isAdmin = request == null || request.isUserInRole("ADMIN");
-        Set<Integer> allowedHosts = isAdmin ? null : userManager.getAllowedHosts(request.getRemoteUser());
-
-        List<HostInfo> infos = new ArrayList<HostInfo>();
-
-        for (HostStore host : storeManager.list()) {
-            if (isAdmin || allowedHosts.contains(host.getHostInfo().getId())) {
-                infos.add(host.getHostInfo());
-            }
-        }
-        return infos;
-    }
-
-
-    @GET
     @Path("/{hostId: [0-9]+}/{traceId: [0-9]+}")
     @Produces(MediaType.APPLICATION_JSON)
     public TraceInfo getTrace(@PathParam("hostId") int hostId, @PathParam("traceId") long traceOffs) {
@@ -182,32 +163,6 @@ public class TraceDataService {
         }
 
         return result;
-    }
-
-    @POST
-    @Path("/")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void addHost(HostInfo hostInfo) {
-        HostStore store = storeManager.getOrCreateHost(hostInfo.getName(), hostInfo.getAddr());
-        store.updateInfo(hostInfo);
-        store.save();
-    }
-
-
-    @PUT
-    @Path("/{hostId: [0-9]+}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void updateHost(@PathParam("hostId") int hostId, HostInfo info) {
-        HostStore store = storeManager.getHost(hostId);
-        store.updateInfo(info);
-        store.save();
-    }
-
-
-    @DELETE
-    @Path("/{hostId: [0-9]+}")
-    public void deleteHost(@PathParam("hostId") int hostId) throws IOException {
-        storeManager.delete(hostId);
     }
 
 

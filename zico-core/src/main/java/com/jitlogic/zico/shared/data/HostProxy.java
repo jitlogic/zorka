@@ -44,6 +44,10 @@ public interface HostProxy extends EntityProxy {
 
     void setFlags(int flags);
 
+    boolean isEnabled();
+
+    public void setEnabled(boolean enabled);
+
     long getMaxSize();
 
     void setMaxSize(long maxSize);
