@@ -18,6 +18,7 @@ package com.jitlogic.zico.client.inject;
 
 import com.google.web.bindery.requestfactory.shared.RequestFactory;
 import com.jitlogic.zico.data.HostServiceProxy;
+import com.jitlogic.zico.data.SystemServiceProxy;
 import com.jitlogic.zico.data.UserServiceProxy;
 
 public interface ZicoRequestFactory extends RequestFactory {
@@ -25,4 +26,6 @@ public interface ZicoRequestFactory extends RequestFactory {
     UserServiceProxy userService();
 
     HostServiceProxy hostService();
+
+    SystemServiceProxy systemService();
 }

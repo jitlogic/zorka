@@ -13,9 +13,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core;
+package com.jitlogic.zico.core.services;
 
 
+import com.jitlogic.zico.core.User;
+import com.jitlogic.zico.core.UserContext;
+import com.jitlogic.zico.core.UserLocator;
+import com.jitlogic.zico.core.ZicoRuntimeException;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -96,5 +100,9 @@ public class UserGwtService {
 
         jdbc.update("update USERS set PASSWORD = ? where USER_NAME = ?", "MD5:" + ZorkaUtil.md5(newPassword), user);
 
+    }
+
+    public boolean isAdminMode() {
+        return userContext.isInRole("ADMIN");
     }
 }

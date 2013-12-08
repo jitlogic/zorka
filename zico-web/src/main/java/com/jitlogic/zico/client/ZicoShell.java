@@ -20,7 +20,8 @@ import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import com.jitlogic.zico.client.api.SystemApi;
+import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.client.panel.HostListPanel;
 import com.jitlogic.zico.client.portal.WelcomePanel;
 import com.sencha.gxt.core.client.util.Margins;
@@ -30,18 +31,22 @@ import com.sencha.gxt.widget.core.client.TabPanel;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.MarginData;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.MethodCallback;
 
 public class ZicoShell extends BorderLayoutContainer {
 
     private TabPanel tabPanel;
 
+    private ZicoRequestFactory rf;
+
     private final static int DX = 0;
     private final static int DY = 0;
 
     @Inject
-    public ZicoShell(final HostListPanel hostListPanel, final SystemApi systemService, WelcomePanel welcomePanel, final ErrorHandler errorHandler) {
+    public ZicoShell(final HostListPanel hostListPanel,
+                     ZicoRequestFactory rf,
+                     WelcomePanel welcomePanel) {
+
+        this.rf = rf;
 
         Window.enableScrolling(false);
         setPixelSize(Window.getClientWidth() - DX, Window.getClientHeight() - DY);
@@ -86,14 +91,9 @@ public class ZicoShell extends BorderLayoutContainer {
 
         tabPanel.add(welcomePanel, new TabItemConfig("Welcome"));
 
-        systemService.isAdminRole(new MethodCallback<Boolean>() {
+        rf.userService().isAdminMode().fire(new Receiver<Boolean>() {
             @Override
-            public void onFailure(Method method, Throwable exception) {
-                errorHandler.error("Error calling " + method, exception);
-            }
-
-            @Override
-            public void onSuccess(Method method, Boolean response) {
+            public void onSuccess(Boolean response) {
                 hostListPanel.setAdminMode(response);
             }
         });

@@ -15,14 +15,13 @@
  */
 package com.jitlogic.zico.data;
 
-import com.google.web.bindery.requestfactory.shared.InstanceRequest;
 import com.google.web.bindery.requestfactory.shared.Request;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
 
 import com.google.web.bindery.requestfactory.shared.Service;
 
 import com.jitlogic.zico.core.ZicoServiceLocator;
-import com.jitlogic.zico.core.UserGwtService;
+import com.jitlogic.zico.core.services.UserGwtService;
 
 import java.util.List;
 
@@ -42,4 +41,6 @@ public interface UserServiceProxy extends RequestContext {
     Request<Void> remove(UserProxy user);
 
     Request<Void> resetPassword(String userName, String oldPassword, String newPassword);
+
+    Request<Boolean> isAdminMode();
 }

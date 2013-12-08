@@ -20,7 +20,7 @@ import com.google.web.bindery.requestfactory.shared.Request;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.Service;
 import com.jitlogic.zico.core.ZicoServiceLocator;
-import com.jitlogic.zico.core.HostGwtService;
+import com.jitlogic.zico.core.services.HostGwtService;
 
 import java.util.List;
 

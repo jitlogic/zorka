@@ -13,24 +13,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.client.api;
+package com.jitlogic.zico.data;
 
 
-import org.fusesource.restygwt.client.MethodCallback;
-import org.fusesource.restygwt.client.RestService;
+import com.google.web.bindery.requestfactory.shared.Request;
+import com.google.web.bindery.requestfactory.shared.RequestContext;
+import com.google.web.bindery.requestfactory.shared.Service;
+import com.jitlogic.zico.core.ZicoServiceLocator;
+import com.jitlogic.zico.core.services.SystemGwtService;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 import java.util.List;
 
-public interface SystemApi extends RestService {
+@Service(value = SystemGwtService.class, locator = ZicoServiceLocator.class)
+public interface SystemServiceProxy extends RequestContext {
 
-    @GET
-    @Path("system/info")
-    void systemInfo(MethodCallback<List<String>> cb);
-
-    @GET
-    @Path("system/user/roles/admin")
-    void isAdminRole(MethodCallback<Boolean> cb);
+    Request<List<String>> systemInfo();
 
 }

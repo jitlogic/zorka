@@ -19,11 +19,11 @@ package com.jitlogic.zico.client.portal;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Label;
 import com.google.inject.Inject;
-import com.jitlogic.zico.client.api.SystemApi;
+import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
+import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.sencha.gxt.widget.core.client.Portlet;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.MethodCallback;
 
 import java.util.List;
 
@@ -31,12 +31,12 @@ public class SystemInfoPortlet extends Portlet {
 
     VerticalLayoutContainer content;
 
-    private SystemApi systemApi;
+    private ZicoRequestFactory rf;
     private Timer timer;
 
     @Inject
-    public SystemInfoPortlet(SystemApi systemApi) {
-        this.systemApi = systemApi;
+    public SystemInfoPortlet(ZicoRequestFactory rf) {
+        this.rf = rf;
 
         setHeadingText("System info");
         setCollapsible(true);
@@ -44,16 +44,6 @@ public class SystemInfoPortlet extends Portlet {
         content = new VerticalLayoutContainer();
         content.add(new Label("Wait..."));
         add(content);
-
-//        getHeader().addTool(new ToolButton(ToolButton.CLOSE, new SelectEvent.SelectHandler() {
-//            @Override
-//            public void onSelect(SelectEvent event) {
-//                if (timer != null) {
-//                    timer.cancel();
-//                }
-//                SystemInfoPortlet.this.removeFromParent();
-//            }
-//        }));
 
         loadData();
 
@@ -67,19 +57,20 @@ public class SystemInfoPortlet extends Portlet {
     }
 
     private void loadData() {
-        systemApi.systemInfo(new MethodCallback<List<String>>() {
+        rf.systemService().systemInfo().fire(new Receiver<List<String>>() {
             @Override
-            public void onFailure(Method method, Throwable exception) {
-                content.clear();
-                content.add(new Label("Error: " + exception));
-            }
-
-            @Override
-            public void onSuccess(Method method, List<String> response) {
+            public void onSuccess(List<String> response) {
                 content.clear();
                 for (String s : response) {
                     content.add(new Label(s));
                 }
+            }
+
+            @Override
+            public void onFailure(ServerFailure e) {
+                content.clear();
+                content.add(new Label("Error: " + e.getMessage()));
+
             }
         });
     }

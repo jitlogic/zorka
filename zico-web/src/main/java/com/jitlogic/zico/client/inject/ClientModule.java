@@ -25,7 +25,6 @@ import com.google.web.bindery.event.shared.SimpleEventBus;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.api.AdminApi;
-import com.jitlogic.zico.client.api.SystemApi;
 import com.jitlogic.zico.client.api.TraceDataApi;
 import org.fusesource.restygwt.client.Resource;
 import org.fusesource.restygwt.client.RestServiceProxy;
@@ -49,15 +48,6 @@ public class ClientModule extends AbstractGinModule {
         AdminApi adminApi = GWT.create(AdminApi.class);
         ((RestServiceProxy) adminApi).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
         return adminApi;
-    }
-
-
-    @Provides
-    @Singleton
-    SystemApi provideSystemApi() {
-        SystemApi systemApi = GWT.create(SystemApi.class);
-        ((RestServiceProxy) systemApi).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
-        return systemApi;
     }
 
 
