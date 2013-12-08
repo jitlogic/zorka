@@ -155,7 +155,7 @@
                             <goal>unpack-dependencies</goal>
                         </goals>
                         <configuration>
-                            <includeGroupIds>org.eclipse.jetty,javax.servlet</includeGroupIds>
+                            <includeGroupIds>org.mortbay.jetty,javax.servlet,mysql</includeGroupIds>
                             <excludeArtifactIds>jsp-api,jstl</excludeArtifactIds>
                             <excludes>META-INF/ECLIPSEF.*</excludes>
                             <outputDirectory>
