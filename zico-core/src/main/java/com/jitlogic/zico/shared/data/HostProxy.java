@@ -13,29 +13,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.data;
+package com.jitlogic.zico.shared.data;
 
 import com.google.web.bindery.requestfactory.shared.EntityProxy;
 import com.google.web.bindery.requestfactory.shared.ProxyFor;
+import com.jitlogic.zico.core.HostStore;
+import com.jitlogic.zico.core.HostLocator;
 
-import com.jitlogic.zico.core.User;
-import com.jitlogic.zico.core.UserLocator;
 
-@ProxyFor(value = User.class, locator = UserLocator.class)
-public interface UserProxy extends EntityProxy {
-    public Integer getId();
+@ProxyFor(value = HostStore.class, locator = HostLocator.class)
+public interface HostProxy extends EntityProxy {
 
-    public void setId(Integer id);
+    Integer getId();
 
-    public String getUserName();
+    String getName();
 
-    public void setUserName(String userName);
+    String getAddr();
 
-    public String getRealName();
+    void setAddr(String addr);
 
-    public void setRealName(String realName);
+    String getDescription();
 
-    public boolean isAdmin();
+    void setDescription(String desc);
 
-    public void setAdmin(boolean admin);
+    String getPass();
+
+    void setPass(String pass);
+
+    int getFlags();
+
+    void setFlags(int flags);
+
+    long getMaxSize();
+
+    void setMaxSize(long maxSize);
 }

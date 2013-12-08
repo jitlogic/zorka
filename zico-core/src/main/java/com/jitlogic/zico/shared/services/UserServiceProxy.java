@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.data;
+package com.jitlogic.zico.shared.services;
 
 import com.google.web.bindery.requestfactory.shared.Request;
 import com.google.web.bindery.requestfactory.shared.RequestContext;
@@ -22,6 +22,7 @@ import com.google.web.bindery.requestfactory.shared.Service;
 
 import com.jitlogic.zico.core.ZicoServiceLocator;
 import com.jitlogic.zico.core.services.UserGwtService;
+import com.jitlogic.zico.shared.data.UserProxy;
 
 import java.util.List;
 
