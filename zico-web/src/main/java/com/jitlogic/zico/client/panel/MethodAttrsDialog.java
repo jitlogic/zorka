@@ -118,13 +118,22 @@ public class MethodAttrsDialog extends Dialog {
             attrs.add(0, new String[]{"(all)", sb.toString()});
         }
 
-        if (tr.getExceptionInfo() != null) {
-            SymbolicExceptionInfo e = tr.getExceptionInfo();
-            sb = new StringBuilder();
+        SymbolicExceptionInfo e = tr.getExceptionInfo();
+        sb = new StringBuilder();
+        while (e != null) {
             sb.append(e.getExClass() + ": " + e.getMessage() + "\n");
             for (String s : e.getStackTrace()) {
                 sb.append(s + "\n");
             }
+
+            e = e.getCause();
+
+            if (e != null) {
+                sb.append("\nCaused by: ");
+            }
+        }
+
+        if (sb.length() > 0) {
             attrs.add(new String[]{"(exception)", sb.toString()});
         }
 

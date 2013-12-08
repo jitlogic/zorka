@@ -166,8 +166,13 @@ public class SymbolicException implements SymbolicRecord {
     @Override
     public void traverse(MetadataChecker checker) throws IOException {
         classId = checker.checkSymbol(classId, this);
+
         for (SymbolicStackElement el : stackTrace) {
             el.traverse(checker);
+        }
+
+        if (cause != null) {
+            cause.traverse(checker);
         }
     }
 }

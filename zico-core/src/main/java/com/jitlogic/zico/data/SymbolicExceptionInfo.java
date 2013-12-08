@@ -31,6 +31,8 @@ public class SymbolicExceptionInfo {
     @JsonProperty
     List<String> stackTrace;
 
+    @JsonProperty
+    SymbolicExceptionInfo cause;
 
     public String getExClass() {
         return exClass;
@@ -59,5 +61,15 @@ public class SymbolicExceptionInfo {
 
     public void setStackTrace(List<String> stackTrace) {
         this.stackTrace = stackTrace;
+    }
+
+
+    public SymbolicExceptionInfo getCause() {
+        return cause;
+    }
+
+
+    public void setCause(SymbolicExceptionInfo cause) {
+        this.cause = cause;
     }
 }

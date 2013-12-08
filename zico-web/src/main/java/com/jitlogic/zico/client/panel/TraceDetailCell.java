@@ -46,10 +46,19 @@ public class TraceDetailCell extends AbstractCell<TraceInfo> {
             sb.appendHtmlConstant("</span></div><div><b>");
             sb.append(SafeHtmlUtils.fromString("" + e.getMessage()));
             sb.appendHtmlConstant("</b></div>");
+            int i = 0;
             for (String s : e.getStackTrace()) {
                 sb.appendHtmlConstant("<div>");
                 sb.append(SafeHtmlUtils.fromString("" + s));
                 sb.appendHtmlConstant("</div>");
+                i++;
+                if (i > 5) {
+                    sb.appendHtmlConstant("<div>");
+                    sb.append(SafeHtmlUtils.fromString("...      (open trace attributes window to see full stack trace)"));
+                    sb.appendHtmlConstant("</div>");
+                    break;
+                }
+
             }
         }
     }

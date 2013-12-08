@@ -165,13 +165,41 @@ public class TraceRecordStore {
             info.setAttributes(nattr);
         }
 
-        SymbolicException sex = tr.findException();
-        if (sex != null) {
-            SymbolicExceptionInfo sei = ZicoUtil.extractSymbolicExceptionInfo(symbolRegistry, sex);
-            info.setExceptionInfo(sei);
-        }
+        SymbolicExceptionInfo sei = packException(tr);
+
+        info.setExceptionInfo(sei);
 
         return info;
+    }
+
+
+    private SymbolicExceptionInfo packException(TraceRecord tr) {
+        SymbolicExceptionInfo ret = null, lex = null;
+
+        TraceRecord rec = tr;
+
+        while (rec != null && ((rec.getException() != null && ret == null)
+                || rec.hasFlag(TraceRecord.EXCEPTION_PASS|TraceRecord.EXCEPTION_WRAP))) {
+
+            if (rec.getException() != null) {
+                SymbolicException sex = (SymbolicException)rec.getException();
+                while (sex != null) {
+                    SymbolicExceptionInfo sei = ZicoUtil.extractSymbolicExceptionInfo(symbolRegistry, sex);
+
+                    if (ret == null) {
+                        ret = lex = sei;
+                    } else {
+                        lex.setCause(sei);
+                        lex = sei;
+                    }
+                    sex = sex.getCause();
+                }
+            }
+
+            rec = rec.numChildren() > 0 ? rec.getChild(rec.numChildren()-1) : null;
+        }
+
+        return ret;
     }
 
 
