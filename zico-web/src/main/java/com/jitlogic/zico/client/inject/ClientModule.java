@@ -27,7 +27,6 @@ import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.api.AdminApi;
 import com.jitlogic.zico.client.api.SystemApi;
 import com.jitlogic.zico.client.api.TraceDataApi;
-import com.jitlogic.zico.client.api.UserApi;
 import org.fusesource.restygwt.client.Resource;
 import org.fusesource.restygwt.client.RestServiceProxy;
 
@@ -68,15 +67,6 @@ public class ClientModule extends AbstractGinModule {
         TraceDataApi traceDataApi = GWT.create(TraceDataApi.class);
         ((RestServiceProxy) traceDataApi).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
         return traceDataApi;
-    }
-
-
-    @Provides
-    @Singleton
-    UserApi providesUserApi() {
-        UserApi userApi = GWT.create(UserApi.class);
-        ((RestServiceProxy)userApi).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
-        return userApi;
     }
 
 

@@ -37,7 +37,6 @@ public abstract class AbstractZicoModule implements Module {
         binder.bind(AdminService.class);
         binder.bind(SystemService.class);
         binder.bind(TraceDataService.class);
-        binder.bind(UserService.class);
         binder.bind(UserManager.class);
         binder.bind(UserContext.class);
 

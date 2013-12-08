@@ -37,11 +37,9 @@ public interface UserServiceProxy extends RequestContext {
 
     Request<Void> setAllowedHostIds(Integer userId, List<Integer> hostIds);
 
-    //InstanceRequest<UserProxy, Void> persist();
-
-    //InstanceRequest<UserProxy, Void> remove();
-
     Request<Void> persist(UserProxy user);
 
     Request<Void> remove(UserProxy user);
+
+    Request<Void> resetPassword(String userName, String oldPassword, String newPassword);
 }

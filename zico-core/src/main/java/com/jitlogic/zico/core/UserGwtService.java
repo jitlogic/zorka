@@ -16,6 +16,7 @@
 package com.jitlogic.zico.core;
 
 
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.inject.Inject;
@@ -28,12 +29,14 @@ public class UserGwtService {
 
     private JdbcTemplate jdbc;
     private UserLocator locator;
+    private UserContext userContext;
 
 
     @Inject
-    public UserGwtService(DataSource ds, UserLocator locator) {
+    public UserGwtService(DataSource ds, UserLocator locator, UserContext userContext) {
         jdbc = new JdbcTemplate(ds);
         this.locator = locator;
+        this.userContext = userContext;
     }
 
 
@@ -69,5 +72,29 @@ public class UserGwtService {
 
     public void remove(User user) {
         locator.remove(user);
+    }
+
+
+    public void resetPassword(String userName, String oldPassword, String newPassword) {
+        boolean adminMode = userContext.isInRole("ADMIN");
+
+        if (userName != null && !adminMode) {
+            throw new ZicoRuntimeException("Insufficient privileges to reset other users password");
+        }
+
+        String user = (userName != null && userName.length() > 0) ? userName : userContext.getUser();
+
+        if (!adminMode) {
+            String chkHash = "MD5:" + ZorkaUtil.md5(oldPassword);
+
+            String oldHash = jdbc.queryForObject("select PASSWORD from USERS where USER_NAME = ?", String.class, user);
+
+            if (!chkHash.equals(oldHash)) {
+                throw new ZicoRuntimeException("Invalid (old) password.");
+            }
+        }
+
+        jdbc.update("update USERS set PASSWORD = ? where USER_NAME = ?", "MD5:" + ZorkaUtil.md5(newPassword), user);
+
     }
 }

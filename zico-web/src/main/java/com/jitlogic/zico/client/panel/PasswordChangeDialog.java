@@ -17,8 +17,10 @@ package com.jitlogic.zico.client.panel;
 
 
 import com.google.inject.assistedinject.Assisted;
+import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.Resources;
-import com.jitlogic.zico.client.api.UserApi;
+import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
@@ -26,24 +28,21 @@ import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.FieldLabel;
 import com.sencha.gxt.widget.core.client.form.PasswordField;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.MethodCallback;
 
 import javax.inject.Inject;
 
 
 public class PasswordChangeDialog extends Dialog {
 
-    private UserApi userApi;
+    private ZicoRequestFactory rf;
 
     private PasswordField txtOldPassword, txtNewPassword, txtRepPassword;
-
     private String username;
 
     @Inject
-    public PasswordChangeDialog(UserApi userApi, @Assisted("userName") String username) {
-        this.userApi = userApi;
+    public PasswordChangeDialog(ZicoRequestFactory rf, @Assisted("userName") String username) {
         this.username = username;
+        this.rf = rf;
         createUi();
     }
 
@@ -118,18 +117,9 @@ public class PasswordChangeDialog extends Dialog {
             return;
         }
 
-        userApi.resetPassword(username, oldPassword, newPassword, new MethodCallback<Void>() {
+        rf.userService().resetPassword(username, oldPassword, newPassword).fire(new Receiver<Void>() {
             @Override
-            public void onFailure(Method method, Throwable e) {
-                if (username == null) txtOldPassword.setText("");
-                txtNewPassword.setText("");
-                txtRepPassword.setText("");
-                AlertMessageBox amb = new AlertMessageBox("Password change", "Password change failed: " + e.getMessage());
-                amb.show();
-            }
-
-            @Override
-            public void onSuccess(Method method, Void response) {
+            public void onSuccess(Void aVoid) {
                 if (username == null) txtOldPassword.setText("");
                 txtNewPassword.setText("");
                 txtRepPassword.setText("");
@@ -138,6 +128,14 @@ public class PasswordChangeDialog extends Dialog {
                 amb.setIcon(Resources.INSTANCE.msgBoxOkIcon());
                 amb.show();
                 hide();
+            }
+
+            public void onFailure(ServerFailure e) {
+                if (username == null) txtOldPassword.setText("");
+                txtNewPassword.setText("");
+                txtRepPassword.setText("");
+                AlertMessageBox amb = new AlertMessageBox("Password change", "Password change failed: " + e.getMessage());
+                amb.show();
             }
         });
     }
