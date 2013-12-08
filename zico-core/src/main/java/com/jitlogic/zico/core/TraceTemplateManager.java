@@ -16,8 +16,8 @@
 package com.jitlogic.zico.core;
 
 
+import com.google.web.bindery.requestfactory.shared.Locator;
 import com.jitlogic.zico.data.TraceInfo;
-import com.jitlogic.zico.data.TraceTemplateInfo;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
@@ -36,19 +36,19 @@ import java.util.List;
 import java.util.Map;
 
 @Singleton
-public class TraceTemplateManager {
+public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
 
     private JdbcTemplate jdbc;
     private SimpleJdbcInsert jdbci;
 
     private SymbolRegistry symbolRegistry;
-    private volatile Map<Integer, List<TraceTemplateInfo>> templates = new HashMap<Integer, List<TraceTemplateInfo>>();
+    private volatile Map<Integer, List<TraceTemplate>> templates = new HashMap<Integer, List<TraceTemplate>>();
 
 
-    public RowMapper<TraceTemplateInfo> TEMPLATE_MAPPER = new RowMapper<TraceTemplateInfo>() {
+    public RowMapper<TraceTemplate> TEMPLATE_MAPPER = new RowMapper<TraceTemplate>() {
         @Override
-        public TraceTemplateInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
-            TraceTemplateInfo tti = new TraceTemplateInfo();
+        public TraceTemplate mapRow(ResultSet rs, int rowNum) throws SQLException {
+            TraceTemplate tti = new TraceTemplate();
 
             tti.setId(rs.getInt("TEMPLATE_ID"));
             tti.setTraceId(rs.getInt("TRACE_ID"));
@@ -61,6 +61,13 @@ public class TraceTemplateManager {
             return tti;
         }
     };
+
+
+    public TraceTemplateManager() {
+        this(ZicoServiceLocator.injector.getInstance(DataSource.class),
+             ZicoServiceLocator.injector.getInstance(SymbolRegistry.class));
+    }
+
 
     @Inject
     public TraceTemplateManager(DataSource ds, SymbolRegistry symbolRegistry) {
@@ -75,10 +82,10 @@ public class TraceTemplateManager {
 
 
     public synchronized void reload() {
-        Map<Integer, List<TraceTemplateInfo>> templates = new HashMap<Integer, List<TraceTemplateInfo>>();
-        for (TraceTemplateInfo tti : jdbc.query("select * from TEMPLATES order by ORDER_NUM", TEMPLATE_MAPPER)) {
+        Map<Integer, List<TraceTemplate>> templates = new HashMap<Integer, List<TraceTemplate>>();
+        for (TraceTemplate tti : jdbc.query("select * from TEMPLATES order by ORDER_NUM", TEMPLATE_MAPPER)) {
             if (!templates.containsKey(tti.getTraceId())) {
-                templates.put(tti.getTraceId(), new ArrayList<TraceTemplateInfo>());
+                templates.put(tti.getTraceId(), new ArrayList<TraceTemplate>());
             }
             templates.get(tti.getTraceId()).add(tti);
         }
@@ -98,7 +105,7 @@ public class TraceTemplateManager {
                 }
             }
 
-            for (TraceTemplateInfo tti : templates.get(info.getTraceId())) {
+            for (TraceTemplate tti : templates.get(info.getTraceId())) {
                 if (tti.getCondTemplate() == null || tti.getCondTemplate().trim().length() == 0 ||
                         ObjectInspector.substitute(tti.getCondTemplate(), attrs).matches(tti.getCondRegex())) {
                     return ObjectInspector.substitute(tti.getTemplate(), attrs);
@@ -127,12 +134,12 @@ public class TraceTemplateManager {
     }
 
 
-    public List<TraceTemplateInfo> listTemplates() {
+    public List<TraceTemplate> listTemplates() {
         return jdbc.query("select * from TEMPLATES order by ORDER_NUM", TEMPLATE_MAPPER);
     }
 
 
-    public int save(TraceTemplateInfo tti) {
+    public int save(TraceTemplate tti) {
         if (tti.getId() != 0) {
             jdbc.update("update TEMPLATES set TRACE_ID = ?, ORDER_NUM = ?, FLAGS = ?, COND_TEMPLATE = ?," +
                     " COND_PATTERN = ?, TEMPLATE = ? where TEMPLATE_ID = ?", tti.getTraceId(), tti.getOrder(),
@@ -158,4 +165,33 @@ public class TraceTemplateManager {
         reload();
     }
 
+    @Override
+    public TraceTemplate create(Class<? extends TraceTemplate> aClass) {
+        return new TraceTemplate();
+    }
+
+    @Override
+    public TraceTemplate find(Class<? extends TraceTemplate> aClass, Integer templateId) {
+        return jdbc.queryForObject("select * from TEMPLATES where TEMPLATE_ID = ?", TEMPLATE_MAPPER, templateId);
+    }
+
+    @Override
+    public Class<TraceTemplate> getDomainType() {
+        return TraceTemplate.class;
+    }
+
+    @Override
+    public Integer getId(TraceTemplate traceTemplate) {
+        return traceTemplate.getId();
+    }
+
+    @Override
+    public Class<Integer> getIdType() {
+        return Integer.class;
+    }
+
+    @Override
+    public Object getVersion(TraceTemplate traceTemplate) {
+        return 1;
+    }
 }

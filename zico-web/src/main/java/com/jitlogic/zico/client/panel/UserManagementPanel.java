@@ -300,7 +300,7 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
         if (user != null) {
             userStore.remove(user);
             rf.userService().remove(user).fire();
-            refreshUsers();
+            //refreshUsers();
         }
     }
 

@@ -17,30 +17,30 @@ package com.jitlogic.zico.data;
 
 
 import com.google.gwt.editor.client.Editor;
-import com.jitlogic.zico.data.TraceTemplateInfo;
+import com.jitlogic.zico.shared.data.TraceTemplateProxy;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.LabelProvider;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.PropertyAccess;
 
-public interface TraceTemplateInfoProperties extends PropertyAccess<TraceTemplateInfo> {
+public interface TraceTemplateInfoProperties extends PropertyAccess<TraceTemplateProxy> {
     @Editor.Path("id")
-    ModelKeyProvider<TraceTemplateInfo> key();
+    ModelKeyProvider<TraceTemplateProxy> key();
 
     @Editor.Path("description")
-    LabelProvider<TraceTemplateInfo> nameLabel();
+    LabelProvider<TraceTemplateProxy> nameLabel();
 
-    ValueProvider<TraceTemplateInfo, Integer> id();
+    ValueProvider<TraceTemplateProxy, Integer> id();
 
-    ValueProvider<TraceTemplateInfo, Integer> traceId();
+    ValueProvider<TraceTemplateProxy, Integer> traceId();
 
-    ValueProvider<TraceTemplateInfo, Integer> order();
+    ValueProvider<TraceTemplateProxy, Integer> order();
 
-    ValueProvider<TraceTemplateInfo, Integer> flags();
+    ValueProvider<TraceTemplateProxy, Integer> flags();
 
-    ValueProvider<TraceTemplateInfo, String> condTemplate();
+    ValueProvider<TraceTemplateProxy, String> condTemplate();
 
-    ValueProvider<TraceTemplateInfo, String> condRegex();
+    ValueProvider<TraceTemplateProxy, String> condRegex();
 
-    ValueProvider<TraceTemplateInfo, String> template();
+    ValueProvider<TraceTemplateProxy, String> template();
 }

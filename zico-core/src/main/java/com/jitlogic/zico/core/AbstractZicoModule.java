@@ -34,8 +34,6 @@ public abstract class AbstractZicoModule implements Module {
         binder.bind(SymbolRegistry.class).to(DbSymbolRegistry.class).in(Singleton.class);
         binder.bind(DataSource.class).to(BasicDataSource.class).in(Singleton.class);
 
-        binder.bind(AdminService.class);
-        binder.bind(SystemService.class);
         binder.bind(TraceDataService.class);
         binder.bind(UserManager.class);
         binder.bind(UserContext.class);

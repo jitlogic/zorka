@@ -19,7 +19,7 @@ package com.jitlogic.zico.test.support;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.jitlogic.zico.core.*;
-import com.jitlogic.zico.core.services.AdminService;
+import com.jitlogic.zico.core.services.SystemGwtService;
 import com.jitlogic.zico.core.services.TraceDataService;
 import com.jitlogic.zorka.common.test.support.TestUtil;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
@@ -42,7 +42,7 @@ public class ZicoFixture {
     protected ZicoService zicoService;
 
     protected TraceDataService traceDataService;
-    protected AdminService adminService;
+    protected SystemGwtService systemService;
 
     protected SymbolRegistry symbolRegistry;
     protected TraceTypeRegistry traceTypeRegistry;
@@ -86,7 +86,7 @@ public class ZicoFixture {
         zicoService.start();
 
         traceDataService = injector.getInstance(TraceDataService.class);
-        adminService = injector.getInstance(AdminService.class);
+        systemService = injector.getInstance(SystemGwtService.class);
 
         symbolRegistry = injector.getInstance(SymbolRegistry.class);
         traceTypeRegistry = injector.getInstance(TraceTypeRegistry.class);

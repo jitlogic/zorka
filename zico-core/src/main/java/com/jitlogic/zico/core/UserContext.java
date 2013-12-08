@@ -33,6 +33,12 @@ public class UserContext {
         return ZicoCacheControlFilter.getRequest().isUserInRole(role);
     }
 
+    public void checkAdmin() {
+        if (!isInRole("ADMIN")) {
+            throw new ZicoRuntimeException("Insufficient privileges.");
+        }
+    }
+
     private static String[] ROLES = { "ADMIN", "VIEWER" };
 
     public List<String> listRoles() {

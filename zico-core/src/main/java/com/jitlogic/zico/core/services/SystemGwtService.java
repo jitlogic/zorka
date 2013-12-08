@@ -16,7 +16,10 @@
 package com.jitlogic.zico.core.services;
 
 import com.google.inject.Singleton;
+import com.jitlogic.zico.core.TraceTemplateManager;
+import com.jitlogic.zico.core.UserContext;
 import com.jitlogic.zico.core.ZicoConfig;
+import com.jitlogic.zico.core.TraceTemplate;
 import com.jitlogic.zorka.common.ZorkaAgent;
 
 import javax.inject.Inject;
@@ -36,13 +39,34 @@ public class SystemGwtService {
 
     private ZorkaAgent agent;
 
+    private TraceTemplateManager templater;
+
+    private UserContext userContext;
+
     public void setAgent(ZorkaAgent agent) {
         this.agent = agent;
     }
 
     @Inject
-    public SystemGwtService(ZicoConfig config) {
-        this.config = config;
+    public SystemGwtService(ZicoConfig config, TraceTemplateManager templater, UserContext userContext) {
+        this.config = config; // TODO use annotations instead of handcrafted code
+        this.templater = templater;
+        this.userContext = userContext;
+    }
+
+    public List<TraceTemplate> listTemplates() {
+        userContext.checkAdmin();
+        return templater.listTemplates();
+    }
+
+    public int saveTemplate(TraceTemplate tti) {
+        userContext.checkAdmin();
+        return templater.save(tti);
+    }
+
+    public void removeTemplate(Integer tid) {
+        userContext.checkAdmin();
+        templater.remove(tid);
     }
 
     public List<String> systemInfo() {
