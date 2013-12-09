@@ -13,22 +13,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.client.inject;
+package com.jitlogic.zico.core;
 
 
-import com.google.web.bindery.requestfactory.shared.RequestFactory;
-import com.jitlogic.zico.shared.services.HostServiceProxy;
-import com.jitlogic.zico.shared.services.SystemServiceProxy;
-import com.jitlogic.zico.shared.services.TraceDataServiceProxy;
-import com.jitlogic.zico.shared.services.UserServiceProxy;
+import org.codehaus.jackson.annotate.JsonProperty;
 
-public interface ZicoRequestFactory extends RequestFactory {
+public class TraceAttributeInfo {
 
-    UserServiceProxy userService();
+    @JsonProperty
+    private String key;
 
-    HostServiceProxy hostService();
+    @JsonProperty
+    private String value;
 
-    SystemServiceProxy systemService();
+    public TraceAttributeInfo() { }
 
-    TraceDataServiceProxy traceDataService();
+    public TraceAttributeInfo(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String name) {
+        this.key = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 }

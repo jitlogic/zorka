@@ -30,9 +30,9 @@ import com.google.inject.assistedinject.Assisted;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.client.inject.PanelFactory;
-import com.jitlogic.zico.data.TraceInfo;
 import com.jitlogic.zico.data.TraceRecordInfo;
 import com.jitlogic.zico.data.TraceRecordInfoProperties;
+import com.jitlogic.zico.shared.data.TraceInfoProxy;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.data.shared.loader.ChildTreeStoreBinding;
@@ -66,7 +66,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
     private final static TraceRecordInfoProperties props = GWT.create(TraceRecordInfoProperties.class);
 
     private TraceDataApi tds;
-    private TraceInfo traceInfo;
+    private TraceInfoProxy traceInfo;
     private TreeGrid<TraceRecordInfo> methodTree;
     private TreeStore<TraceRecordInfo> methodTreeStore;
     private SpinnerField<Double> txtDuration;
@@ -89,7 +89,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
 
     @Inject
-    public TraceDetailPanel(TraceDataApi tds, PanelFactory panelFactory, @Assisted TraceInfo traceInfo) {
+    public TraceDetailPanel(TraceDataApi tds, PanelFactory panelFactory, @Assisted TraceInfoProxy traceInfo) {
         this.tds = tds;
         this.panelFactory = panelFactory;
         this.traceInfo = traceInfo;

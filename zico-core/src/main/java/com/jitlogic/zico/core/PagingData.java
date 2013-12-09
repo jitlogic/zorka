@@ -13,64 +13,51 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.data;
+package com.jitlogic.zico.core;
 
 
-import com.jitlogic.zico.shared.data.SymbolicExceptionProxy;
+import com.jitlogic.zico.core.TraceInfo;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.List;
 
-public class SymbolicExceptionInfo {
+public class PagingData  {
+
 
     @JsonProperty
-    String exClass;
+    private int offset;
 
     @JsonProperty
-    String message;
+    private int total;
 
     @JsonProperty
-    List<String> stackTrace;
+    private List<TraceInfo> results;
 
-    @JsonProperty
-    SymbolicExceptionInfo cause;
+    public PagingData() {
 
-    public String getExClass() {
-        return exClass;
     }
 
-
-    public void setExClass(String exClass) {
-        this.exClass = exClass;
+    public int getOffset() {
+        return offset;
     }
 
-
-    public String getMessage() {
-        return message;
+    public void setOffset(int offset) {
+        this.offset = offset;
     }
 
-
-    public void setMessage(String message) {
-        this.message = message;
+    public int getTotal() {
+        return total;
     }
 
-
-    public List<String> getStackTrace() {
-        return stackTrace;
+    public void setTotal(int total) {
+        this.total = total;
     }
 
-
-    public void setStackTrace(List<String> stackTrace) {
-        this.stackTrace = stackTrace;
+    public List<TraceInfo> getResults() {
+        return results;
     }
 
-
-    public SymbolicExceptionInfo getCause() {
-        return cause;
-    }
-
-
-    public void setCause(SymbolicExceptionInfo cause) {
-        this.cause = cause;
+    public void setResults(List<TraceInfo> results) {
+        this.results = results;
     }
 }

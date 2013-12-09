@@ -16,6 +16,7 @@
 package com.jitlogic.zico.client.api;
 
 
+import com.jitlogic.zico.core.PagingData;
 import com.jitlogic.zico.data.*;
 import org.fusesource.restygwt.client.MethodCallback;
 import org.fusesource.restygwt.client.RestService;
@@ -33,7 +34,7 @@ public interface TraceDataApi extends RestService {
                            @PathParam("offset") int offset,
                            @PathParam("limit") int limit,
                            TraceListFilterExpression filter,
-                           MethodCallback<PagingData<TraceInfo>> callback);
+                           MethodCallback<PagingData> callback);
 
 
     @GET

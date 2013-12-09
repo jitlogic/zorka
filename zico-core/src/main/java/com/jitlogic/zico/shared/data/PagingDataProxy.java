@@ -13,22 +13,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.client.inject;
+package com.jitlogic.zico.shared.data;
+
+import com.google.web.bindery.requestfactory.shared.ProxyFor;
+import com.google.web.bindery.requestfactory.shared.ValueProxy;
+import com.jitlogic.zico.core.PagingData;
+
+import java.util.List;
 
 
-import com.google.web.bindery.requestfactory.shared.RequestFactory;
-import com.jitlogic.zico.shared.services.HostServiceProxy;
-import com.jitlogic.zico.shared.services.SystemServiceProxy;
-import com.jitlogic.zico.shared.services.TraceDataServiceProxy;
-import com.jitlogic.zico.shared.services.UserServiceProxy;
+@ProxyFor(PagingData.class)
+public interface PagingDataProxy extends ValueProxy {
 
-public interface ZicoRequestFactory extends RequestFactory {
+    int getOffset();
 
-    UserServiceProxy userService();
+    int getTotal();
 
-    HostServiceProxy hostService();
-
-    SystemServiceProxy systemService();
-
-    TraceDataServiceProxy traceDataService();
+    List<TraceInfoProxy> getResults();
 }

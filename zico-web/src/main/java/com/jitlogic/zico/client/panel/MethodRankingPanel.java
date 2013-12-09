@@ -24,7 +24,7 @@ import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.data.MethodRankInfo;
 import com.jitlogic.zico.data.MethodRankInfoProperties;
-import com.jitlogic.zico.data.TraceInfo;
+import com.jitlogic.zico.shared.data.TraceInfoProxy;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
@@ -43,7 +43,7 @@ public class MethodRankingPanel extends VerticalLayoutContainer {
     private static final MethodRankInfoProperties props = GWT.create(MethodRankInfoProperties.class);
 
     private TraceDataApi api;
-    private TraceInfo traceInfo;
+    private TraceInfoProxy traceInfo;
     private ErrorHandler errorHandler;
 
     private Grid<MethodRankInfo> rankGrid;
@@ -53,7 +53,7 @@ public class MethodRankingPanel extends VerticalLayoutContainer {
     private final int COL_SZ = 40;
 
     @Inject
-    public MethodRankingPanel(TraceDataApi api, ErrorHandler errorHandler, @Assisted TraceInfo traceInfo) {
+    public MethodRankingPanel(TraceDataApi api, ErrorHandler errorHandler, @Assisted TraceInfoProxy traceInfo) {
         this.api = api;
         this.traceInfo = traceInfo;
         this.errorHandler = errorHandler;

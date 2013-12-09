@@ -19,18 +19,19 @@ package com.jitlogic.zico.client.panel;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.jitlogic.zico.data.SymbolicExceptionInfo;
-import com.jitlogic.zico.data.TraceInfo;
+import com.jitlogic.zico.shared.data.SymbolicExceptionProxy;
+import com.jitlogic.zico.shared.data.TraceAttributeProxy;
+import com.jitlogic.zico.shared.data.TraceInfoProxy;
 
 import java.util.Map;
 
-public class TraceDetailCell extends AbstractCell<TraceInfo> {
+public class TraceDetailCell extends AbstractCell<TraceInfoProxy> {
 
     @Override
-    public void render(Context context, TraceInfo ti, SafeHtmlBuilder sb) {
+    public void render(Context context, TraceInfoProxy ti, SafeHtmlBuilder sb) {
         if (ti.getAttributes() != null) {
             sb.appendHtmlConstant("<table border=\"0\" cellspacing=\"2\"><tbody>");
-            for (Map.Entry<String, String> e : ti.getAttributes().entrySet()) {
+            for (TraceAttributeProxy e : ti.getAttributes()) {
                 sb.appendHtmlConstant("<tr><td align=\"right\" style=\"color:blue; font-size: small;\"><b>");
                 sb.append(SafeHtmlUtils.fromString(e.getKey()));
                 sb.appendHtmlConstant("</b></td><td><div style=\"text-wrap: unrestricted; white-space: pre; word-wrap: break-word; font-size: small;\">");
@@ -40,7 +41,7 @@ public class TraceDetailCell extends AbstractCell<TraceInfo> {
             sb.appendHtmlConstant("</tbody></table>");
         }
         if (ti.getExceptionInfo() != null) {
-            SymbolicExceptionInfo e = ti.getExceptionInfo();
+            SymbolicExceptionProxy e = ti.getExceptionInfo();
             sb.appendHtmlConstant("<div><span style=\"color: red;\">");
             sb.append(SafeHtmlUtils.fromString("Caught: " + e.getExClass()));
             sb.appendHtmlConstant("</span></div><div><b>");

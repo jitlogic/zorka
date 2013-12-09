@@ -13,12 +13,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.data;
+package com.jitlogic.zico.core;
 
 
+import com.jitlogic.zico.data.SymbolicExceptionInfo;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import java.util.Map;
+import java.util.List;
 
 public class TraceInfo {
 
@@ -74,7 +75,7 @@ public class TraceInfo {
     String description;
 
     @JsonProperty
-    Map<String, String> attributes;
+    List<TraceAttributeInfo> attributes;
 
     @JsonProperty
     SymbolicExceptionInfo exceptionInfo;
@@ -215,11 +216,11 @@ public class TraceInfo {
         this.description = description;
     }
 
-    public Map<String, String> getAttributes() {
+    public List<TraceAttributeInfo> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(Map<String, String> attributes) {
+    public void setAttributes(List<TraceAttributeInfo> attributes) {
         this.attributes = attributes;
     }
 

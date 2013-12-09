@@ -18,8 +18,8 @@ package com.jitlogic.zico.client.inject;
 
 import com.google.inject.assistedinject.Assisted;
 import com.jitlogic.zico.client.panel.*;
-import com.jitlogic.zico.data.TraceInfo;
 import com.jitlogic.zico.shared.data.HostProxy;
+import com.jitlogic.zico.shared.data.TraceInfoProxy;
 
 import java.util.Map;
 
@@ -27,15 +27,15 @@ public interface PanelFactory {
 
     public TraceListPanel traceListPanel(HostProxy hostInfo);
 
-    public TraceDetailPanel traceDetailPanel(TraceInfo traceInfo);
+    public TraceDetailPanel traceDetailPanel(TraceInfoProxy traceInfo);
 
     public TraceTemplatePanel traceTemplatePanel(Map<String, String> tidMap);
 
-    public TraceRecordSearchDialog traceRecordSearchDialog(TraceDetailPanel panel, TraceInfo trace);
+    public TraceRecordSearchDialog traceRecordSearchDialog(TraceDetailPanel panel, TraceInfoProxy trace);
 
     public MethodAttrsDialog methodAttrsDialog(Integer hostId, Long dataOffs, String path, @Assisted("minTime") Long minTime);
 
-    public MethodRankingPanel methodRankingPanel(TraceInfo traceInfo);
+    public MethodRankingPanel methodRankingPanel(TraceInfoProxy traceInfo);
 
     public PasswordChangeDialog passwordChangeDialog(@Assisted("userName") String userName);
 

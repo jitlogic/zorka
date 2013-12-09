@@ -28,8 +28,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static com.jitlogic.zico.data.TraceDetailSearchExpression.*;
-
 public class TraceRecordStore {
 
     private HostStore hostStore;

@@ -31,6 +31,7 @@ import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.data.*;
+import com.jitlogic.zico.shared.data.TraceInfoProxy;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.ListStore;
@@ -61,7 +62,7 @@ public class TraceRecordSearchDialog extends Dialog {
 
     private TraceDataApi tds;
 
-    private TraceInfo trace;
+    private TraceInfoProxy trace;
     private String rootPath = "";
 
     private TraceDetailPanel panel;
@@ -89,7 +90,7 @@ public class TraceRecordSearchDialog extends Dialog {
 
     @Inject
     public TraceRecordSearchDialog(TraceDataApi tds, ErrorHandler errorHandler,
-                                   @Assisted TraceDetailPanel panel, @Assisted TraceInfo trace) {
+                                   @Assisted TraceDetailPanel panel, @Assisted TraceInfoProxy trace) {
 
         this.tds = tds;
         this.trace = trace;

@@ -33,10 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Represents performance data store for a single agent.
@@ -91,7 +88,15 @@ public class HostStore implements Closeable, RDSCleanupListener {
                 log.error("Error unpacking JSON attrs", e);
             }
 
-            info.setAttributes(attrs);
+            if (attrs != null) {
+                List<TraceAttributeInfo> attrList = new ArrayList<TraceAttributeInfo>(attrs.size());
+
+                for (Map.Entry<String,String> e : attrs.entrySet()) {
+                    attrList.add(new TraceAttributeInfo(e.getKey(), e.getValue()));
+                }
+
+                info.setAttributes(attrList);
+            }
 
             String exJson = rs.getString("EXINFO");
             if (exJson != null) {
@@ -211,7 +216,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     private final static Set<String> TRACES_ORDER_DIRS = ZorkaUtil.set("ASC", "DESC");
 
-    public PagingData<TraceInfo> pageTraces(int offset, int limit, TraceListFilterExpression filter) {
+    public PagingData pageTraces(int offset, int limit, TraceListFilterExpression filter) {
         String orderBy = filter.getSortBy();
         String orderDir = filter.isSortAsc() ? "ASC" : "DESC";
 

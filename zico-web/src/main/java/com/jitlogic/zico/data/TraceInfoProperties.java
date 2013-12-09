@@ -17,44 +17,44 @@ package com.jitlogic.zico.data;
 
 
 import com.google.gwt.editor.client.Editor;
-import com.jitlogic.zico.data.TraceInfo;
+import com.jitlogic.zico.shared.data.TraceInfoProxy;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.LabelProvider;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.PropertyAccess;
 
-public interface TraceInfoProperties extends PropertyAccess<TraceInfo> {
+public interface TraceInfoProperties extends PropertyAccess<TraceInfoProxy> {
 
     @Editor.Path("dataOffs")
-    ModelKeyProvider<TraceInfo> key();
+    ModelKeyProvider<TraceInfoProxy> key();
 
     @Editor.Path("description")
-    LabelProvider<TraceInfo> nameLabel();
+    LabelProvider<TraceInfoProxy> nameLabel();
 
-    ValueProvider<TraceInfo, Integer> hostId();
+    ValueProvider<TraceInfoProxy, Integer> hostId();
 
-    ValueProvider<TraceInfo, Long> dataOffs();
+    ValueProvider<TraceInfoProxy, Long> dataOffs();
 
-    ValueProvider<TraceInfo, Integer> traceId();
+    ValueProvider<TraceInfoProxy, Integer> traceId();
 
-    ValueProvider<TraceInfo, String> traceType();
+    ValueProvider<TraceInfoProxy, String> traceType();
 
-    ValueProvider<TraceInfo, Integer> dataLen();
+    ValueProvider<TraceInfoProxy, Integer> dataLen();
 
-    ValueProvider<TraceInfo, Long> clock();
+    ValueProvider<TraceInfoProxy, Long> clock();
 
-    ValueProvider<TraceInfo, Integer> methodFlags();
+    ValueProvider<TraceInfoProxy, Integer> methodFlags();
 
-    ValueProvider<TraceInfo, Integer> traceFlags();
+    ValueProvider<TraceInfoProxy, Integer> traceFlags();
 
-    ValueProvider<TraceInfo, Long> calls();
+    ValueProvider<TraceInfoProxy, Long> calls();
 
-    ValueProvider<TraceInfo, Long> errors();
+    ValueProvider<TraceInfoProxy, Long> errors();
 
-    ValueProvider<TraceInfo, Long> records();
+    ValueProvider<TraceInfoProxy, Long> records();
 
-    ValueProvider<TraceInfo, Long> executionTime();
+    ValueProvider<TraceInfoProxy, Long> executionTime();
 
-    ValueProvider<TraceInfo, String> description();
+    ValueProvider<TraceInfoProxy, String> description();
 }
 

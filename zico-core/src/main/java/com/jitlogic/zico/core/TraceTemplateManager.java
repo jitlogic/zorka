@@ -17,7 +17,6 @@ package com.jitlogic.zico.core;
 
 
 import com.google.web.bindery.requestfactory.shared.Locator;
-import com.jitlogic.zico.data.TraceInfo;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
@@ -100,7 +99,7 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
             attrs.put("methodName", symbolRegistry.symbolName(info.getMethodId()));
             attrs.put("className", symbolRegistry.symbolName(info.getClassId()));
             if (info.getAttributes() != null) {
-                for (Map.Entry<String, String> e : info.getAttributes().entrySet()) {
+                for (TraceAttributeInfo e : info.getAttributes()) {
                     attrs.put(e.getKey(), e.getValue());
                 }
             }
@@ -121,12 +120,12 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
         StringBuilder sdesc = new StringBuilder();
         sdesc.append(symbolRegistry.symbolName(info.getTraceId()));
         if (info.getAttributes() != null) {
-            for (Map.Entry<String, String> e : info.getAttributes().entrySet()) {
+            for (TraceAttributeInfo attr : info.getAttributes()) {
                 sdesc.append("|");
-                if (e.getValue().length() > 50) {
-                    sdesc.append(e.getValue().substring(0, 50));
+                if (attr.getValue().length() > 50) {
+                    sdesc.append(attr.getValue().substring(0, 50));
                 } else {
-                    sdesc.append(e.getValue());
+                    sdesc.append(attr.getValue());
                 }
             }
         }

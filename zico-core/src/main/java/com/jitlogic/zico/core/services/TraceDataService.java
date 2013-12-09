@@ -24,10 +24,8 @@ import com.jitlogic.zico.data.*;
 import com.jitlogic.zorka.common.tracedata.*;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -64,7 +62,7 @@ public class TraceDataService {
     @POST
     @Path("/{hostId: [0-9]+}/page")
     @Consumes(MediaType.APPLICATION_JSON)
-    public PagingData<TraceInfo> pageTraces(@PathParam("hostId") int hostId,
+    public PagingData pageTraces(@PathParam("hostId") int hostId,
                                             @DefaultValue("0") @QueryParam("offset") int offset,
                                             @DefaultValue("100") @QueryParam("limit") int limit,
                                             TraceListFilterExpression filter) {
