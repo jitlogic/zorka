@@ -273,18 +273,25 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
         userEditor.addCompleteEditHandler(new CompleteEditEvent.CompleteEditHandler<UserProxy>() {
             @Override
             public void onCompleteEdit(CompleteEditEvent<UserProxy> event) {
-                UserServiceProxy req = newUserRequest != null ? newUserRequest : rf.userService();
-                UserProxy user = userStore.get(event.getEditCell().getRow());
-                UserProxy editedUser = user.getId() != null ? req.edit(user) : user;
-                editedUser.setUserName(txtUserName.getText());
-                editedUser.setRealName(txtRealName.getText());
-                editedUser.setAdmin(cbxUserAdmin.getValue());
-                req.persist(editedUser).fire();
-                refreshUsers();
+                saveUser(userStore.get(event.getEditCell().getRow()));
             }
         });
 
         pnlUserList.add(userGrid, new VerticalLayoutData(1, 1));
+    }
+
+    private void saveUser(UserProxy user) {
+        UserServiceProxy req = newUserRequest != null ? newUserRequest : rf.userService();
+        UserProxy editedUser = user.getId() != null ? req.edit(user) : user;
+        editedUser.setUserName(txtUserName.getText());
+        editedUser.setRealName(txtRealName.getText());
+        editedUser.setAdmin(cbxUserAdmin.getValue());
+        req.persist(editedUser).fire(new Receiver<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                refreshUsers();
+            }
+        });
     }
 
 
