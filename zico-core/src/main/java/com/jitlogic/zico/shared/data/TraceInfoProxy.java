@@ -57,7 +57,7 @@ public interface TraceInfoProxy extends ValueProxy {
 
     String getDescription();
 
-    List<TraceAttributeProxy> getAttributes();
+    List<KeyValueProxy> getAttributes();
 
     SymbolicExceptionProxy getExceptionInfo();
 }

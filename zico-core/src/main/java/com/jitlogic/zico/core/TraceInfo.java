@@ -75,7 +75,7 @@ public class TraceInfo {
     String description;
 
     @JsonProperty
-    List<TraceAttributeInfo> attributes;
+    List<KeyValuePair> attributes;
 
     @JsonProperty
     SymbolicExceptionInfo exceptionInfo;
@@ -216,11 +216,11 @@ public class TraceInfo {
         this.description = description;
     }
 
-    public List<TraceAttributeInfo> getAttributes() {
+    public List<KeyValuePair> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(List<TraceAttributeInfo> attributes) {
+    public void setAttributes(List<KeyValuePair> attributes) {
         this.attributes = attributes;
     }
 

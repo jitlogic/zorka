@@ -89,10 +89,10 @@ public class HostStore implements Closeable, RDSCleanupListener {
             }
 
             if (attrs != null) {
-                List<TraceAttributeInfo> attrList = new ArrayList<TraceAttributeInfo>(attrs.size());
+                List<KeyValuePair> attrList = new ArrayList<KeyValuePair>(attrs.size());
 
                 for (Map.Entry<String,String> e : attrs.entrySet()) {
-                    attrList.add(new TraceAttributeInfo(e.getKey(), e.getValue()));
+                    attrList.add(new KeyValuePair(e.getKey(), e.getValue()));
                 }
 
                 info.setAttributes(attrList);

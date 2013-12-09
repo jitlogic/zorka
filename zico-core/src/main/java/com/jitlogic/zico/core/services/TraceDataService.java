@@ -175,18 +175,4 @@ public class TraceDataService {
         return ctx.methodRank(orderBy, orderDesc);
     }
 
-    @GET
-    @Path("/tidmap")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<Integer, String> getTidMap() {
-        return traceTypeRegistry.getTidMap(null);
-    }
-
-    @GET
-    @Path("/tidmap/{hostId}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<Integer, String> getTidMap(@PathParam("hostId") int hostId) {
-        return traceTypeRegistry.getTidMap(hostId);
-    }
-
 }

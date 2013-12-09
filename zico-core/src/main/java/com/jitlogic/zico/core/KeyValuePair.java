@@ -18,7 +18,7 @@ package com.jitlogic.zico.core;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class TraceAttributeInfo {
+public class KeyValuePair {
 
     @JsonProperty
     private String key;
@@ -26,9 +26,9 @@ public class TraceAttributeInfo {
     @JsonProperty
     private String value;
 
-    public TraceAttributeInfo() { }
+    public KeyValuePair() { }
 
-    public TraceAttributeInfo(String key, String value) {
+    public KeyValuePair(String key, String value) {
         this.key = key;
         this.value = value;
     }

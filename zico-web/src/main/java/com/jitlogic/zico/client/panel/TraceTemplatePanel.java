@@ -27,6 +27,7 @@ import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
+import com.jitlogic.zico.core.KeyValuePair;
 import com.jitlogic.zico.data.TraceTemplateInfoProperties;
 import com.jitlogic.zico.shared.data.TraceTemplateProxy;
 import com.jitlogic.zico.shared.services.SystemServiceProxy;
@@ -78,7 +79,7 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
 
     @Inject
     public TraceTemplatePanel(ZicoRequestFactory rf, ErrorHandler errorHandler,
-                              @Assisted Map<String, String> tidMap) {
+                              @Assisted List<KeyValuePair> tidMap) {
 
         this.errorHandler = errorHandler;
         this.rf = rf;
@@ -278,8 +279,8 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
     }
 
 
-    private void loadTids(Map<String, String> tidMap) {
-        for (Map.Entry<String, String> e : tidMap.entrySet()) {
+    private void loadTids(List<KeyValuePair> tidMap) {
+        for (KeyValuePair e : tidMap) {
             // TODO this is a crutch; bug in RestyGWT/Jersey or use beans instead ?
             int tid = Integer.parseInt(e.getKey());
             String name = e.getValue();

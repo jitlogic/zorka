@@ -19,10 +19,7 @@ import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 import com.google.inject.Singleton;
@@ -76,16 +73,16 @@ public class TraceTypeRegistry {
     }
 
 
-    public synchronized Map<Integer, String> getTidMap(Integer host) {
-        Map<Integer, String> map = new HashMap<Integer, String>();
+    public synchronized List<KeyValuePair> getTidMap(Integer host) {
+        List<KeyValuePair> kv = new ArrayList<KeyValuePair>(tids.size());
 
         for (Map.Entry<Integer, Set<Integer>> e : tids.entrySet()) {
             if (host == null || e.getValue().contains(host)) {
-                map.put(e.getKey(), symbols.symbolName(e.getKey()));
+                kv.add(new KeyValuePair(""+e.getKey(), symbols.symbolName(e.getKey())));
             }
         }
 
-        return map;
+        return kv;
     }
 
 }

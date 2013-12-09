@@ -16,13 +16,11 @@
 package com.jitlogic.zico.core.services;
 
 import com.google.inject.Singleton;
-import com.jitlogic.zico.core.TraceTemplateManager;
-import com.jitlogic.zico.core.UserContext;
-import com.jitlogic.zico.core.ZicoConfig;
-import com.jitlogic.zico.core.TraceTemplate;
+import com.jitlogic.zico.core.*;
 import com.jitlogic.zorka.common.ZorkaAgent;
 
 import javax.inject.Inject;
+import javax.ws.rs.PathParam;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
@@ -41,11 +39,14 @@ public class SystemGwtService {
 
     private UserContext userContext;
 
+    private TraceTypeRegistry traceTypeRegistry;
+
     @Inject
-    public SystemGwtService(ZicoConfig config, TraceTemplateManager templater, UserContext userContext) {
+    public SystemGwtService(ZicoConfig config, TraceTemplateManager templater, UserContext userContext, TraceTypeRegistry traceTypeRegistry) {
         this.config = config; // TODO use annotations instead of handcrafted code
         this.templater = templater;
         this.userContext = userContext;
+        this.traceTypeRegistry = traceTypeRegistry;
     }
 
     public List<TraceTemplate> listTemplates() {
@@ -90,5 +91,12 @@ public class SystemGwtService {
         return info;
     }
 
+    public List<KeyValuePair> getTidMap() {
+        return traceTypeRegistry.getTidMap(null);
+    }
+
+    public List<KeyValuePair> getTidMap(int hostId) {
+        return traceTypeRegistry.getTidMap(hostId);
+    }
 
 }

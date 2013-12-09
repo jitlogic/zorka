@@ -19,9 +19,10 @@ package com.jitlogic.zico.client.inject;
 import com.google.inject.assistedinject.Assisted;
 import com.jitlogic.zico.client.panel.*;
 import com.jitlogic.zico.shared.data.HostProxy;
+import com.jitlogic.zico.shared.data.KeyValueProxy;
 import com.jitlogic.zico.shared.data.TraceInfoProxy;
 
-import java.util.Map;
+import java.util.List;
 
 public interface PanelFactory {
 
@@ -29,7 +30,7 @@ public interface PanelFactory {
 
     public TraceDetailPanel traceDetailPanel(TraceInfoProxy traceInfo);
 
-    public TraceTemplatePanel traceTemplatePanel(Map<String, String> tidMap);
+    public TraceTemplatePanel traceTemplatePanel(List<KeyValueProxy> tidMap);
 
     public TraceRecordSearchDialog traceRecordSearchDialog(TraceDetailPanel panel, TraceInfoProxy trace);
 

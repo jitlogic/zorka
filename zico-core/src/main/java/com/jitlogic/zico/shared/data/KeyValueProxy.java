@@ -17,10 +17,10 @@ package com.jitlogic.zico.shared.data;
 
 import com.google.web.bindery.requestfactory.shared.ProxyFor;
 import com.google.web.bindery.requestfactory.shared.ValueProxy;
-import com.jitlogic.zico.core.TraceAttributeInfo;
+import com.jitlogic.zico.core.KeyValuePair;
 
-@ProxyFor(TraceAttributeInfo.class)
-public interface TraceAttributeProxy extends ValueProxy {
+@ProxyFor(KeyValuePair.class)
+public interface KeyValueProxy extends ValueProxy {
 
     String getKey();
 

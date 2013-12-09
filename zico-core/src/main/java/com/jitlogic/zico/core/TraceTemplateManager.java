@@ -99,7 +99,7 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
             attrs.put("methodName", symbolRegistry.symbolName(info.getMethodId()));
             attrs.put("className", symbolRegistry.symbolName(info.getClassId()));
             if (info.getAttributes() != null) {
-                for (TraceAttributeInfo e : info.getAttributes()) {
+                for (KeyValuePair e : info.getAttributes()) {
                     attrs.put(e.getKey(), e.getValue());
                 }
             }
@@ -120,7 +120,7 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
         StringBuilder sdesc = new StringBuilder();
         sdesc.append(symbolRegistry.symbolName(info.getTraceId()));
         if (info.getAttributes() != null) {
-            for (TraceAttributeInfo attr : info.getAttributes()) {
+            for (KeyValuePair attr : info.getAttributes()) {
                 sdesc.append("|");
                 if (attr.getValue().length() > 50) {
                     sdesc.append(attr.getValue().substring(0, 50));

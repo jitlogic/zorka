@@ -24,7 +24,6 @@ import org.fusesource.restygwt.client.RestService;
 import javax.ws.rs.*;
 
 import java.util.List;
-import java.util.Map;
 
 public interface TraceDataApi extends RestService {
 
@@ -75,15 +74,5 @@ public interface TraceDataApi extends RestService {
             @PathParam("orderDesc") String orderDesc,
             MethodCallback<List<MethodRankInfo>> callback);
 
-
-    @GET
-    @Path("hosts/tidmap")
-    public void getTidMap(MethodCallback<Map<String, String>> cb);
-
-
-    @GET
-    @Path("hosts/tidmap/{hostId}")
-    public void getTidMap(@PathParam("hostId") int hostId,
-                          MethodCallback<Map<String, String>> cb);
 
 }

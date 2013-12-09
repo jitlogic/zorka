@@ -27,6 +27,7 @@ import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.client.inject.PanelFactory;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
+import com.jitlogic.zico.shared.data.KeyValueProxy;
 import com.sencha.gxt.widget.core.client.Portlet;
 import com.sencha.gxt.widget.core.client.button.ToolButton;
 import com.sencha.gxt.widget.core.client.container.PortalLayoutContainer;
@@ -36,6 +37,7 @@ import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.MethodCallback;
 
 import javax.inject.Provider;
+import java.util.List;
 import java.util.Map;
 
 public class WelcomePanel implements IsWidget {
@@ -176,14 +178,9 @@ public class WelcomePanel implements IsWidget {
 
 
     private void openTemplatePanel() {
-        traceDataApi.getTidMap(new MethodCallback<Map<String, String>>() {
+        rf.systemService().getTidMap().fire(new Receiver<List<KeyValueProxy>>() {
             @Override
-            public void onFailure(Method method, Throwable exception) {
-                errorHandler.error("Error calling method: " + method, exception);
-            }
-
-            @Override
-            public void onSuccess(Method method, Map<String, String> response) {
+            public void onSuccess(List<KeyValueProxy> response) {
                 shell.get().addView(panelFactory.traceTemplatePanel(response), "Templates");
             }
         });

@@ -39,10 +39,7 @@ import com.jitlogic.zico.client.inject.PanelFactory;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.data.*;
 import com.jitlogic.zico.client.api.TraceDataApi;
-import com.jitlogic.zico.shared.data.HostProxy;
-import com.jitlogic.zico.shared.data.PagingDataProxy;
-import com.jitlogic.zico.shared.data.TraceInfoProxy;
-import com.jitlogic.zico.shared.data.TraceListFilterProxy;
+import com.jitlogic.zico.shared.data.*;
 import com.jitlogic.zico.shared.services.TraceDataServiceProxy;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style;
@@ -522,15 +519,10 @@ public class TraceListPanel extends VerticalLayoutContainer {
     }
 
     private void loadTraceTypes() {
-        tds.getTidMap(selectedHost.getId(), new MethodCallback<Map<String, String>>() {
+        rf.systemService().getTidMap(selectedHost.getId()).fire(new Receiver<List<KeyValueProxy>>() {
             @Override
-            public void onFailure(Method method, Throwable exception) {
-                errorHandler.error("Error calling API method: " + method, exception);
-            }
-
-            @Override
-            public void onSuccess(Method method, Map<String, String> response) {
-                for (Map.Entry<String, String> e : response.entrySet()) {
+            public void onSuccess(List<KeyValueProxy> response) {
+                for (KeyValueProxy e : response) {
                     int tid = Integer.parseInt(e.getKey());
                     traceTypes.put(tid, e.getValue());
                     cmbTraceType.add(tid);

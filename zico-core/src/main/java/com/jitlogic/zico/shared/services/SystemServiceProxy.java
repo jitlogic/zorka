@@ -21,6 +21,7 @@ import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.Service;
 import com.jitlogic.zico.core.ZicoServiceLocator;
 import com.jitlogic.zico.core.services.SystemGwtService;
+import com.jitlogic.zico.shared.data.KeyValueProxy;
 import com.jitlogic.zico.shared.data.TraceTemplateProxy;
 
 import java.util.List;
@@ -35,5 +36,9 @@ public interface SystemServiceProxy extends RequestContext {
     Request<Integer> saveTemplate(TraceTemplateProxy template);
 
     Request<Void> removeTemplate(Integer tid);
+
+    Request<List<KeyValueProxy>> getTidMap();
+
+    Request<List<KeyValueProxy>> getTidMap(int hostId);
 
 }
