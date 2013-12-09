@@ -22,17 +22,16 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.inject.assistedinject.Assisted;
+import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.jitlogic.zico.client.ErrorHandler;
-import com.jitlogic.zico.client.api.TraceDataApi;
-import com.jitlogic.zico.data.SymbolicExceptionInfo;
-import com.jitlogic.zico.data.TraceRecordInfo;
+import com.jitlogic.zico.client.inject.ZicoRequestFactory;
+import com.jitlogic.zico.shared.data.KeyValueProxy;
+import com.jitlogic.zico.shared.data.SymbolicExceptionProxy;
+import com.jitlogic.zico.shared.data.TraceRecordProxy;
 import com.sencha.gxt.core.client.ValueProvider;
-import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
-import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.Dialog;
-import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.CellClickEvent;
@@ -40,8 +39,6 @@ import com.sencha.gxt.widget.core.client.form.TextArea;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.MethodCallback;
 
 import javax.inject.Inject;
 import java.util.*;
@@ -54,18 +51,17 @@ public class MethodAttrsDialog extends Dialog {
     private TextArea txtAttrVal;
     private Label lblAttrName;
 
-    //private BorderLayoutContainer container;
     private SplitLayoutPanel container;
 
-    private TraceDataApi api;
+    private ZicoRequestFactory rf;
     private ErrorHandler errorHandler;
 
 
     @Inject
-    public MethodAttrsDialog(TraceDataApi api, ErrorHandler errorHandler,
+    public MethodAttrsDialog(ZicoRequestFactory rf, ErrorHandler errorHandler,
                              @Assisted Integer hostId, @Assisted Long dataOffs,
                              @Assisted String path, @Assisted("minTime") Long minTime) {
-        this.api = api;
+        this.rf = rf;
         this.errorHandler = errorHandler;
         configure("Trace Details");
 
@@ -74,29 +70,22 @@ public class MethodAttrsDialog extends Dialog {
 
 
     private void loadTraceDetail(Integer hostId, Long dataOffs, String path, Long minTime) {
-        api.getTraceRecord(hostId, dataOffs, minTime, path,
-                new MethodCallback<TraceRecordInfo>() {
-                    @Override
-                    public void onFailure(Method method, Throwable exception) {
-                        errorHandler.error("Error calling method: " + method, exception);
-                        txtAttrVal.setText("Error calling method: " + method + "\n" + exception);
-                    }
-
-                    @Override
-                    public void onSuccess(Method method, TraceRecordInfo tr) {
-                        fillTraceDetail(tr);
-                    }
-                });
+        rf.traceDataService().getRecord(hostId, dataOffs, minTime, path).fire(new Receiver<TraceRecordProxy>() {
+            @Override
+            public void onSuccess(TraceRecordProxy tr) {
+                fillTraceDetail(tr);
+            }
+        });
     }
 
 
-    private void fillTraceDetail(TraceRecordInfo tr) {
+    private void fillTraceDetail(TraceRecordProxy tr) {
         List<String[]> attrs = new ArrayList<String[]>();
 
         StringBuilder sb = new StringBuilder();
 
         if (tr.getAttributes() != null) {
-            for (Map.Entry<String, String> e : tr.getAttributes().entrySet()) {
+            for (KeyValueProxy e : tr.getAttributes()) {
                 String key = e.getKey(), val = e.getValue() != null ? e.getValue() : "";
                 attrs.add(new String[]{key, val});
                 val = val.indexOf("\n") != -1 ? val.substring(0, val.indexOf('\n')) + "..." : val;
@@ -118,7 +107,7 @@ public class MethodAttrsDialog extends Dialog {
             attrs.add(0, new String[]{"(all)", sb.toString()});
         }
 
-        SymbolicExceptionInfo e = tr.getExceptionInfo();
+        SymbolicExceptionProxy e = tr.getExceptionInfo();
         sb = new StringBuilder();
         while (e != null) {
             sb.append(e.getExClass() + ": " + e.getMessage() + "\n");

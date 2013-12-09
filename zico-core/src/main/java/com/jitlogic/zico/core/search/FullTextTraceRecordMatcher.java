@@ -24,7 +24,7 @@ import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static com.jitlogic.zico.data.TraceDetailSearchExpression.*;
+import static com.jitlogic.zico.core.TraceDetailSearchExpression.*;
 
 
 public class FullTextTraceRecordMatcher implements TraceRecordMatcher {

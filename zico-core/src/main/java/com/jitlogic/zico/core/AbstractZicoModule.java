@@ -33,13 +33,6 @@ public abstract class AbstractZicoModule implements Module {
     public void configure(Binder binder) {
         binder.bind(SymbolRegistry.class).to(DbSymbolRegistry.class).in(Singleton.class);
         binder.bind(DataSource.class).to(BasicDataSource.class).in(Singleton.class);
-
-        binder.bind(TraceDataService.class);
-        binder.bind(UserManager.class);
-        binder.bind(UserContext.class);
-
-        binder.bind(UserLocator.class);
-        binder.bind(UserGwtService.class);
     }
 
     protected BasicDataSource provideDataSource(ZicoConfig config) {

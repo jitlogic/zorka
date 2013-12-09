@@ -20,7 +20,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.jitlogic.zico.core.*;
 import com.jitlogic.zico.core.services.SystemGwtService;
-import com.jitlogic.zico.core.services.TraceDataService;
+import com.jitlogic.zico.core.services.TraceDataGwtService;
 import com.jitlogic.zorka.common.test.support.TestUtil;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
@@ -41,7 +41,7 @@ public class ZicoFixture {
     protected HostStoreManager storeManager;
     protected ZicoService zicoService;
 
-    protected TraceDataService traceDataService;
+    protected TraceDataGwtService traceDataService;
     protected SystemGwtService systemService;
 
     protected SymbolRegistry symbolRegistry;
@@ -85,7 +85,7 @@ public class ZicoFixture {
         zicoService = injector.getInstance(ZicoService.class);
         zicoService.start();
 
-        traceDataService = injector.getInstance(TraceDataService.class);
+        traceDataService = injector.getInstance(TraceDataGwtService.class);
         systemService = injector.getInstance(SystemGwtService.class);
 
         symbolRegistry = injector.getInstance(SymbolRegistry.class);

@@ -17,17 +17,20 @@ package com.jitlogic.zico.shared.data;
 
 import com.google.web.bindery.requestfactory.shared.ProxyFor;
 import com.google.web.bindery.requestfactory.shared.ValueProxy;
-import com.jitlogic.zico.core.SymbolicExceptionInfo;
+import com.jitlogic.zico.core.TraceDetailSearchExpression;
 
-import java.util.List;
+@ProxyFor(TraceDetailSearchExpression.class)
+public interface TraceDetailSearchProxy extends ValueProxy {
 
-@ProxyFor(SymbolicExceptionInfo.class)
-public interface SymbolicExceptionProxy extends ValueProxy {
-    String getExClass();
+    int getType();
 
-    String getMessage();
+    public void setType(int type);
 
-    List<String> getStackTrace();
+    int getFlags();
 
-    SymbolicExceptionProxy getCause();
+    public void setFlags(int flags);
+
+    String getSearchExpr();
+
+    public void setSearchExpr(String expr);
 }

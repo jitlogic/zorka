@@ -38,8 +38,11 @@ import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.inject.PanelFactory;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.data.*;
-import com.jitlogic.zico.client.api.TraceDataApi;
-import com.jitlogic.zico.shared.data.*;
+import com.jitlogic.zico.shared.data.HostProxy;
+import com.jitlogic.zico.shared.data.KeyValueProxy;
+import com.jitlogic.zico.shared.data.PagingDataProxy;
+import com.jitlogic.zico.shared.data.TraceInfoProxy;
+import com.jitlogic.zico.shared.data.TraceListFilterProxy;
 import com.jitlogic.zico.shared.services.TraceDataServiceProxy;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style;
@@ -63,8 +66,6 @@ import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.sencha.gxt.widget.core.client.menu.SeparatorMenuItem;
 import com.sencha.gxt.widget.core.client.tips.ToolTipConfig;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.MethodCallback;
 
 import javax.inject.Provider;
 import java.util.Arrays;
@@ -80,8 +81,6 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
     private PanelFactory panelFactory;
     private ZicoRequestFactory rf;
-
-    private TraceDataApi tds;
 
     private HostProxy selectedHost;
     private Grid<TraceInfoProxy> traceGrid;
@@ -104,12 +103,11 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
 
     @Inject
-    public TraceListPanel(Provider<ZicoShell> shell, ZicoRequestFactory rf, TraceDataApi tds,
+    public TraceListPanel(Provider<ZicoShell> shell, ZicoRequestFactory rf,
                           PanelFactory panelFactory, @Assisted HostProxy hostInfo,
                           ErrorHandler errorHandler) {
         this.shell = shell;
         this.rf = rf;
-        this.tds = tds;
         this.selectedHost = hostInfo;
         this.panelFactory = panelFactory;
         this.errorHandler = errorHandler;

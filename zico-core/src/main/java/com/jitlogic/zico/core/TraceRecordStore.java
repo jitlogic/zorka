@@ -17,7 +17,6 @@ package com.jitlogic.zico.core;
 
 
 import com.jitlogic.zico.core.search.TraceRecordMatcher;
-import com.jitlogic.zico.data.*;
 import com.jitlogic.zico.core.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
@@ -152,15 +151,15 @@ public class TraceRecordStore {
         info.setPath(path);
 
         if (tr.getAttrs() != null) {
-            Map<String, String> nattr = new HashMap<String, String>();
+            List<KeyValuePair> attrs = new ArrayList<KeyValuePair>(tr.getAttrs().size());
             for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
                 String s = "" + e.getValue();
                 if (attrLimit != null && s.length() > attrLimit) {
                     s = s.substring(0, attrLimit) + "...";
                 }
-                nattr.put(symbolRegistry.symbolName(e.getKey()), s);
+                attrs.add(new KeyValuePair(symbolRegistry.symbolName(e.getKey()), s));
             }
-            info.setAttributes(nattr);
+            info.setAttributes(attrs);
         }
 
         SymbolicExceptionInfo sei = packException(tr);

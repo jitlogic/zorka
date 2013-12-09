@@ -13,8 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.data;
-
+package com.jitlogic.zico.core;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 

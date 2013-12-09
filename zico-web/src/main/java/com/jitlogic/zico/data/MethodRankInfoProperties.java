@@ -17,38 +17,39 @@ package com.jitlogic.zico.data;
 
 
 import com.google.gwt.editor.client.Editor;
+import com.jitlogic.zico.shared.data.MethodRankProxy;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.LabelProvider;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.PropertyAccess;
 
-public interface MethodRankInfoProperties extends PropertyAccess<MethodRankInfo> {
+public interface MethodRankInfoProperties extends PropertyAccess<MethodRankProxy> {
 
     @Editor.Path("method")
-    ModelKeyProvider<MethodRankInfo> key();
+    ModelKeyProvider<MethodRankProxy> key();
 
     @Editor.Path("method")
-    LabelProvider<MethodRankInfo> label();
+    LabelProvider<MethodRankProxy> label();
 
-    ValueProvider<MethodRankInfo, String> method();
+    ValueProvider<MethodRankProxy, String> method();
 
-    ValueProvider<MethodRankInfo, Long> calls();
+    ValueProvider<MethodRankProxy, Long> calls();
 
-    ValueProvider<MethodRankInfo, Long> errors();
+    ValueProvider<MethodRankProxy, Long> errors();
 
-    ValueProvider<MethodRankInfo, Long> time();
+    ValueProvider<MethodRankProxy, Long> time();
 
-    ValueProvider<MethodRankInfo, Long> avgTime();
+    ValueProvider<MethodRankProxy, Long> avgTime();
 
-    ValueProvider<MethodRankInfo, Long> minTime();
+    ValueProvider<MethodRankProxy, Long> minTime();
 
-    ValueProvider<MethodRankInfo, Long> maxTime();
+    ValueProvider<MethodRankProxy, Long> maxTime();
 
-    ValueProvider<MethodRankInfo, Long> bareTime();
+    ValueProvider<MethodRankProxy, Long> bareTime();
 
-    ValueProvider<MethodRankInfo, Long> avgBareTime();
+    ValueProvider<MethodRankProxy, Long> avgBareTime();
 
-    ValueProvider<MethodRankInfo, Long> minBareTime();
+    ValueProvider<MethodRankProxy, Long> minBareTime();
 
-    ValueProvider<MethodRankInfo, Long> maxBareTime();
+    ValueProvider<MethodRankProxy, Long> maxBareTime();
 }

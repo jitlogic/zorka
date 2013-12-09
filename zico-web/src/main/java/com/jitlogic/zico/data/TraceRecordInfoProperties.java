@@ -16,31 +16,31 @@
 package com.jitlogic.zico.data;
 
 import com.google.gwt.editor.client.Editor;
-import com.jitlogic.zico.data.TraceRecordInfo;
+import com.jitlogic.zico.shared.data.TraceRecordProxy;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.LabelProvider;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.PropertyAccess;
 
-public interface TraceRecordInfoProperties extends PropertyAccess<TraceRecordInfo> {
+public interface TraceRecordInfoProperties extends PropertyAccess<TraceRecordProxy> {
 
     @Editor.Path("path")
-    ModelKeyProvider<TraceRecordInfo> key();
+    ModelKeyProvider<TraceRecordProxy> key();
 
     @Editor.Path("method")
-    LabelProvider<TraceRecordInfo> nameLabel();
+    LabelProvider<TraceRecordProxy> nameLabel();
 
-    ValueProvider<TraceRecordInfo, Long> calls();
+    ValueProvider<TraceRecordProxy, Long> calls();
 
-    ValueProvider<TraceRecordInfo, Long> errors();
+    ValueProvider<TraceRecordProxy, Long> errors();
 
-    ValueProvider<TraceRecordInfo, Long> time();
+    ValueProvider<TraceRecordProxy, Long> time();
 
-    ValueProvider<TraceRecordInfo, Integer> flags();
+    ValueProvider<TraceRecordProxy, Integer> flags();
 
-    ValueProvider<TraceRecordInfo, String> method();
+    ValueProvider<TraceRecordProxy, String> method();
 
-    ValueProvider<TraceRecordInfo, Integer> children();
+    ValueProvider<TraceRecordProxy, Integer> children();
 
-    ValueProvider<TraceRecordInfo, String> path();
+    ValueProvider<TraceRecordProxy, String> path();
 }

@@ -21,9 +21,9 @@ import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.Service;
 import com.jitlogic.zico.core.ZicoServiceLocator;
 import com.jitlogic.zico.core.services.TraceDataGwtService;
-import com.jitlogic.zico.shared.data.PagingDataProxy;
-import com.jitlogic.zico.shared.data.TraceInfoProxy;
-import com.jitlogic.zico.shared.data.TraceListFilterProxy;
+import com.jitlogic.zico.shared.data.*;
+
+import java.util.List;
 
 @Service(value = TraceDataGwtService.class, locator = ZicoServiceLocator.class)
 public interface TraceDataServiceProxy extends RequestContext {
@@ -32,4 +32,12 @@ public interface TraceDataServiceProxy extends RequestContext {
 
     Request<PagingDataProxy> pageTraces(int hostId, int offset, int limit, TraceListFilterProxy filter);
 
+    Request<List<MethodRankProxy>> traceMethodRank(int hostId, long traceOffs, String orderBy, String orderDesc);
+
+    Request<TraceRecordProxy> getRecord(int hostId, long traceOffs, long minTime, String path);
+
+    Request<List<TraceRecordProxy>> listRecords(int hostId, long traceOffs, long minTime, String path);
+
+    Request<TraceRecordSearchProxy> searchRecords(int hostId, long traceOffs, long minTime, String path,
+                                                  TraceDetailSearchProxy expr);
 }

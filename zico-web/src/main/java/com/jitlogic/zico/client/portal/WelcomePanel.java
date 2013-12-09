@@ -24,7 +24,6 @@ import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.ZicoShell;
-import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.client.inject.PanelFactory;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.shared.data.KeyValueProxy;
@@ -33,12 +32,9 @@ import com.sencha.gxt.widget.core.client.button.ToolButton;
 import com.sencha.gxt.widget.core.client.container.PortalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.MethodCallback;
 
 import javax.inject.Provider;
 import java.util.List;
-import java.util.Map;
 
 public class WelcomePanel implements IsWidget {
 
@@ -46,7 +42,6 @@ public class WelcomePanel implements IsWidget {
 
     private ZicoRequestFactory rf;
 
-    private TraceDataApi traceDataApi;
     private Provider<ZicoShell> shell;
 
     private SystemInfoPortlet systemInfoPortlet;
@@ -55,14 +50,12 @@ public class WelcomePanel implements IsWidget {
     private ErrorHandler errorHandler;
 
     @Inject
-    public WelcomePanel(TraceDataApi traceDataApi,
-                        ZicoRequestFactory rf,
+    public WelcomePanel(ZicoRequestFactory rf,
                         SystemInfoPortlet systemInfoPortlet,
                         PanelFactory panelFactory, Provider<ZicoShell> shell,
                         ErrorHandler errorHandler) {
 
         this.rf = rf;
-        this.traceDataApi = traceDataApi;
         this.systemInfoPortlet = systemInfoPortlet;
         this.panelFactory = panelFactory;
         this.shell = shell;

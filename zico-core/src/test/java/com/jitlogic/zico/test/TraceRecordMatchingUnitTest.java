@@ -21,7 +21,7 @@ import com.jitlogic.zico.core.search.FullTextTraceRecordMatcher;
 import com.jitlogic.zico.test.support.ZicoFixture;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 
-import static com.jitlogic.zico.data.TraceDetailSearchExpression.*;
+import static com.jitlogic.zico.core.TraceDetailSearchExpression.*;
 
 import org.junit.Before;
 import org.junit.Test;

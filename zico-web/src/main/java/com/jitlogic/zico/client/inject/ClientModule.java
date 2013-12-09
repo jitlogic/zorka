@@ -24,9 +24,6 @@ import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.SimpleEventBus;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.ZicoShell;
-import com.jitlogic.zico.client.api.TraceDataApi;
-import org.fusesource.restygwt.client.Resource;
-import org.fusesource.restygwt.client.RestServiceProxy;
 
 import javax.inject.Singleton;
 
@@ -39,16 +36,6 @@ public class ClientModule extends AbstractGinModule {
         bind(ZicoShell.class).in(Singleton.class);
         install(new GinFactoryModuleBuilder().build(PanelFactory.class));
     }
-
-
-    @Provides
-    @Singleton
-    TraceDataApi providesTraceDataApi() {
-        TraceDataApi traceDataApi = GWT.create(TraceDataApi.class);
-        ((RestServiceProxy) traceDataApi).setResource(new Resource(GWT.getHostPageBaseURL() + "rest"));
-        return traceDataApi;
-    }
-
 
     @Provides
     @Singleton

@@ -17,17 +17,30 @@ package com.jitlogic.zico.shared.data;
 
 import com.google.web.bindery.requestfactory.shared.ProxyFor;
 import com.google.web.bindery.requestfactory.shared.ValueProxy;
-import com.jitlogic.zico.core.SymbolicExceptionInfo;
+import com.jitlogic.zico.core.MethodRankInfo;
 
-import java.util.List;
 
-@ProxyFor(SymbolicExceptionInfo.class)
-public interface SymbolicExceptionProxy extends ValueProxy {
-    String getExClass();
+@ProxyFor(MethodRankInfo.class)
+public interface MethodRankProxy extends ValueProxy {
+    long getCalls();
 
-    String getMessage();
+    long getErrors();
 
-    List<String> getStackTrace();
+    long getTime();
 
-    SymbolicExceptionProxy getCause();
+    long getAvgTime();
+
+    String getMethod();
+
+    long getBareTime();
+
+    long getAvgBareTime();
+
+    long getMinTime();
+
+    long getMaxTime();
+
+    long getMinBareTime();
+
+    long getMaxBareTime();
 }

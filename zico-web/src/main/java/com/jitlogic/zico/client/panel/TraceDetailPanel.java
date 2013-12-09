@@ -27,12 +27,13 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.inject.assistedinject.Assisted;
+import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.jitlogic.zico.client.Resources;
-import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.client.inject.PanelFactory;
-import com.jitlogic.zico.data.TraceRecordInfo;
+import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.data.TraceRecordInfoProperties;
 import com.jitlogic.zico.shared.data.TraceInfoProxy;
+import com.jitlogic.zico.shared.data.TraceRecordProxy;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.data.shared.loader.ChildTreeStoreBinding;
@@ -53,8 +54,6 @@ import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 import com.sencha.gxt.widget.core.client.treegrid.TreeGrid;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.MethodCallback;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -65,15 +64,15 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
     private final static TraceRecordInfoProperties props = GWT.create(TraceRecordInfoProperties.class);
 
-    private TraceDataApi tds;
+    private ZicoRequestFactory rf;
     private TraceInfoProxy traceInfo;
-    private TreeGrid<TraceRecordInfo> methodTree;
-    private TreeStore<TraceRecordInfo> methodTreeStore;
+    private TreeGrid<TraceRecordProxy> methodTree;
+    private TreeStore<TraceRecordProxy> methodTreeStore;
     private SpinnerField<Double> txtDuration;
 
     private TraceRecordSearchDialog searchDialog;
 
-    private List<TraceRecordInfo> searchResults = new ArrayList<TraceRecordInfo>();
+    private List<TraceRecordProxy> searchResults = new ArrayList<TraceRecordProxy>();
     private int currentResult = 0;
 
     private long minMethodTime = 0;
@@ -81,7 +80,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
     private int expandLevel = -1;
     private int[] expandIndexes = null;
     private String expandPath = null;
-    private TraceRecordInfo expandNode = null;
+    private TraceRecordProxy expandNode = null;
     private TextButton btnSearchPrev;
     private TextButton btnSearchNext;
 
@@ -89,8 +88,8 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
 
     @Inject
-    public TraceDetailPanel(TraceDataApi tds, PanelFactory panelFactory, @Assisted TraceInfoProxy traceInfo) {
-        this.tds = tds;
+    public TraceDetailPanel(ZicoRequestFactory rf, PanelFactory panelFactory, @Assisted TraceInfoProxy traceInfo) {
+        this.rf = rf;
         this.panelFactory = panelFactory;
         this.traceInfo = traceInfo;
 
@@ -199,7 +198,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
                 Double duration = txtDuration.getCurrentValue();
                 minMethodTime = duration != null ? (long) (duration * 1000000) : 0;
                 methodTree.collapseAll();
-                List<TraceRecordInfo> tr = methodTreeStore.getRootItems();
+                List<TraceRecordProxy> tr = methodTreeStore.getRootItems();
                 methodTreeStore.clear();
                 methodTreeStore.add(tr);
             }
@@ -215,10 +214,10 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
 
     private void findNextSlowestMethod() {
-        TraceRecordInfo info = null;
+        TraceRecordProxy info = null;
 
 
-        for (TraceRecordInfo i : methodTreeStore.getAll()) {
+        for (TraceRecordProxy i : methodTreeStore.getAll()) {
             if ((info == null || i.getTime() > info.getTime()) &&
                     (!methodTree.isExpanded(i) && !methodTree.isLeaf(i))) {
                 info = i;
@@ -276,7 +275,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
     }
 
 
-    public void setResults(List<TraceRecordInfo> results, int idx) {
+    public void setResults(List<TraceRecordProxy> results, int idx) {
         this.searchResults = results;
         goToResult(idx);
     }
@@ -294,56 +293,50 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
 
     private void createTraceDetailTree() {
 
-        DataProxy<TraceRecordInfo, List<TraceRecordInfo>> proxy = new DataProxy<TraceRecordInfo, List<TraceRecordInfo>>() {
+        DataProxy<TraceRecordProxy, List<TraceRecordProxy>> proxy = new DataProxy<TraceRecordProxy, List<TraceRecordProxy>>() {
             @Override
-            public void load(TraceRecordInfo parent, final Callback<List<TraceRecordInfo>, Throwable> callback) {
-                tds.listTraceRecords(traceInfo.getHostId(), traceInfo.getDataOffs(), minMethodTime,
-                        parent != null ? parent.getPath() : null,
-                        new MethodCallback<List<TraceRecordInfo>>() {
-                            @Override
-                            public void onFailure(Method method, Throwable exception) {
-                                callback.onFailure(exception);
-                            }
-
-                            @Override
-                            public void onSuccess(Method method, List<TraceRecordInfo> records) {
-                                callback.onSuccess(records);
-                                if (expandPath != null) {
-                                    expandCont();
-                                }
-                            }
-                        });
+            public void load(TraceRecordProxy parent, final Callback<List<TraceRecordProxy>, Throwable> callback) {
+                rf.traceDataService().listRecords(traceInfo.getHostId(), traceInfo.getDataOffs(), minMethodTime,
+                        parent != null ? parent.getPath() : null).fire(new Receiver<List<TraceRecordProxy>>() {
+                    @Override
+                    public void onSuccess(List<TraceRecordProxy> records) {
+                        callback.onSuccess(records);
+                        if (expandPath != null) {
+                            expandCont();
+                        }
+                    }
+                });
             }
         };
 
 
-        final TreeLoader<TraceRecordInfo> loader = new TreeLoader<TraceRecordInfo>(proxy) {
-            public boolean hasChildren(TraceRecordInfo info) {
+        final TreeLoader<TraceRecordProxy> loader = new TreeLoader<TraceRecordProxy>(proxy) {
+            public boolean hasChildren(TraceRecordProxy info) {
                 return info.getChildren() > 0;
             }
         };
 
-        methodTreeStore = new TreeStore<TraceRecordInfo>(props.key());
-        loader.addLoadHandler(new ChildTreeStoreBinding<TraceRecordInfo>(methodTreeStore));
+        methodTreeStore = new TreeStore<TraceRecordProxy>(props.key());
+        loader.addLoadHandler(new ChildTreeStoreBinding<TraceRecordProxy>(methodTreeStore));
 
-        ColumnConfig<TraceRecordInfo, Long> durationCol = new ColumnConfig<TraceRecordInfo, Long>(props.time(), 50, "Time");
+        ColumnConfig<TraceRecordProxy, Long> durationCol = new ColumnConfig<TraceRecordProxy, Long>(props.time(), 50, "Time");
         durationCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         durationCol.setCell(new NanoTimeRenderingCell());
         durationCol.setMenuDisabled(true);
         durationCol.setSortable(false);
 
 
-        ColumnConfig<TraceRecordInfo, Long> callsCol = new ColumnConfig<TraceRecordInfo, Long>(props.calls(), 50, "Calls");
+        ColumnConfig<TraceRecordProxy, Long> callsCol = new ColumnConfig<TraceRecordProxy, Long>(props.calls(), 50, "Calls");
         callsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         callsCol.setMenuDisabled(true);
         callsCol.setSortable(false);
 
-        ColumnConfig<TraceRecordInfo, Long> errorsCol = new ColumnConfig<TraceRecordInfo, Long>(props.errors(), 50, "Errors");
+        ColumnConfig<TraceRecordProxy, Long> errorsCol = new ColumnConfig<TraceRecordProxy, Long>(props.errors(), 50, "Errors");
         errorsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         errorsCol.setMenuDisabled(true);
         errorsCol.setSortable(false);
 
-        ColumnConfig<TraceRecordInfo, Long> pctCol = new ColumnConfig<TraceRecordInfo, Long>(props.time(), 50, "Pct");
+        ColumnConfig<TraceRecordProxy, Long> pctCol = new ColumnConfig<TraceRecordProxy, Long>(props.time(), 50, "Pct");
         pctCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         pctCol.setMenuDisabled(true);
         pctCol.setSortable(false);
@@ -359,15 +352,15 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
             }
         });
 
-        ColumnConfig<TraceRecordInfo, TraceRecordInfo> methodCol = new ColumnConfig<TraceRecordInfo, TraceRecordInfo>(
-                new IdentityValueProvider<TraceRecordInfo>(), 500, "Method");
+        ColumnConfig<TraceRecordProxy, TraceRecordProxy> methodCol = new ColumnConfig<TraceRecordProxy, TraceRecordProxy>(
+                new IdentityValueProvider<TraceRecordProxy>(), 500, "Method");
 
         methodCol.setMenuDisabled(true);
         methodCol.setSortable(false);
 
-        methodCol.setCell(new AbstractCell<TraceRecordInfo>() {
+        methodCol.setCell(new AbstractCell<TraceRecordProxy>() {
             @Override
-            public void render(Context context, TraceRecordInfo tr, SafeHtmlBuilder sb) {
+            public void render(Context context, TraceRecordProxy tr, SafeHtmlBuilder sb) {
                 String color = tr.getExceptionInfo() != null ? "red"
                         : tr.getAttributes() != null ? "blue" : "black";
                 sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
@@ -376,16 +369,16 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
             }
         });
 
-        RowExpander<TraceRecordInfo> expander = new RowExpander<TraceRecordInfo>(
-                new IdentityValueProvider<TraceRecordInfo>(), new MethodDetailCell());
+        RowExpander<TraceRecordProxy> expander = new RowExpander<TraceRecordProxy>(
+                new IdentityValueProvider<TraceRecordProxy>(), new MethodDetailCell());
 
-        ColumnModel<TraceRecordInfo> model = new ColumnModel<TraceRecordInfo>(
-                Arrays.<ColumnConfig<TraceRecordInfo, ?>>asList(
+        ColumnModel<TraceRecordProxy> model = new ColumnModel<TraceRecordProxy>(
+                Arrays.<ColumnConfig<TraceRecordProxy, ?>>asList(
                         expander, methodCol, durationCol, callsCol, errorsCol, pctCol));
 
 
-        methodTree = new TreeGrid<TraceRecordInfo>(methodTreeStore, model, methodCol) {
-            protected ImageResource calculateIconStyle(TraceRecordInfo model) {
+        methodTree = new TreeGrid<TraceRecordProxy>(methodTreeStore, model, methodCol) {
+            protected ImageResource calculateIconStyle(TraceRecordProxy model) {
                 return null;
             }
         };
@@ -404,7 +397,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
         methodTree.addCellDoubleClickHandler(new CellDoubleClickEvent.CellDoubleClickHandler() {
             @Override
             public void onCellClick(CellDoubleClickEvent event) {
-                TraceRecordInfo tr = methodTree.getSelectionModel().getSelectedItem();
+                TraceRecordProxy tr = methodTree.getSelectionModel().getSelectedItem();
                 MethodAttrsDialog mad = panelFactory.methodAttrsDialog(
                         traceInfo.getHostId(), traceInfo.getDataOffs(), tr.getPath(), minMethodTime);
                 mad.show();
@@ -426,7 +419,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
         mnuSearchMethods.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
-                TraceRecordInfo tr = methodTree.getSelectionModel().getSelectedItem();
+                TraceRecordProxy tr = methodTree.getSelectionModel().getSelectedItem();
                 if (searchDialog == null) {
                     searchDialog = panelFactory.traceRecordSearchDialog(TraceDetailPanel.this, traceInfo);
                 }
@@ -443,7 +436,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
         mnuMethodAttrs.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
-                TraceRecordInfo tr = methodTree.getSelectionModel().getSelectedItem();
+                TraceRecordProxy tr = methodTree.getSelectionModel().getSelectedItem();
                 MethodAttrsDialog dialog = panelFactory.methodAttrsDialog(
                         traceInfo.getHostId(), traceInfo.getDataOffs(), tr.getPath(), minMethodTime);
                 dialog.show();

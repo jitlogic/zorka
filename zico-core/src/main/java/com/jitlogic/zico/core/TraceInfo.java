@@ -16,7 +16,6 @@
 package com.jitlogic.zico.core;
 
 
-import com.jitlogic.zico.data.SymbolicExceptionInfo;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.List;
