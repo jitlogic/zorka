@@ -21,7 +21,13 @@ import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.Service;
 import com.jitlogic.zico.core.inject.ZicoServiceLocator;
 import com.jitlogic.zico.core.services.TraceDataGwtService;
-import com.jitlogic.zico.shared.data.*;
+import com.jitlogic.zico.shared.data.MethodRankProxy;
+import com.jitlogic.zico.shared.data.PagingDataProxy;
+import com.jitlogic.zico.shared.data.TraceDetailSearchProxy;
+import com.jitlogic.zico.shared.data.TraceInfoProxy;
+import com.jitlogic.zico.shared.data.TraceListFilterProxy;
+import com.jitlogic.zico.shared.data.TraceRecordProxy;
+import com.jitlogic.zico.shared.data.TraceRecordSearchProxy;
 
 import java.util.List;
 

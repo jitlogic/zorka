@@ -16,9 +16,10 @@
 package com.jitlogic.zico.core.services;
 
 import com.google.inject.Singleton;
-import com.jitlogic.zico.core.*;
+import com.jitlogic.zico.core.TraceTypeRegistry;
+import com.jitlogic.zico.core.UserContext;
+import com.jitlogic.zico.core.ZicoConfig;
 import com.jitlogic.zico.core.locators.TraceTemplateManager;
-import com.jitlogic.zico.core.model.KeyValuePair;
 import com.jitlogic.zico.core.model.TraceTemplate;
 import com.jitlogic.zorka.common.tracedata.Symbol;
 

@@ -16,12 +16,15 @@
 package com.jitlogic.zico.core;
 
 import com.jitlogic.zorka.common.zico.ZicoDataProcessorFactory;
-import com.jitlogic.zico.core.ZicoServerConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;

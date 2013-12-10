@@ -24,15 +24,23 @@ import com.jitlogic.zico.core.model.TraceDetailSearchExpression;
 import com.jitlogic.zico.core.model.TraceInfo;
 import com.jitlogic.zico.core.model.TraceRecordInfo;
 import com.jitlogic.zico.core.model.TraceRecordSearchResult;
-import com.jitlogic.zico.core.search.TraceRecordMatcher;
 import com.jitlogic.zico.core.rds.RDSStore;
-import com.jitlogic.zorka.common.tracedata.*;
+import com.jitlogic.zico.core.search.TraceRecordMatcher;
+import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicException;
+import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.FressianReader;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class TraceRecordStore {

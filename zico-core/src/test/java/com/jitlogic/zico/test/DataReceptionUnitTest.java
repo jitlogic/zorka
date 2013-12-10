@@ -17,11 +17,12 @@ package com.jitlogic.zico.test;
 
 import com.jitlogic.zico.core.HostStore;
 import com.jitlogic.zico.test.support.ZicoFixture;
-
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class DataReceptionUnitTest extends ZicoFixture {
 

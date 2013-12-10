@@ -16,10 +16,10 @@
 package com.jitlogic.zico.core.services;
 
 
-import com.jitlogic.zico.core.model.User;
 import com.jitlogic.zico.core.UserContext;
-import com.jitlogic.zico.core.locators.UserLocator;
 import com.jitlogic.zico.core.ZicoRuntimeException;
+import com.jitlogic.zico.core.locators.UserLocator;
+import com.jitlogic.zico.core.model.User;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.springframework.jdbc.core.JdbcTemplate;
 

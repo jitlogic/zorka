@@ -21,18 +21,13 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicException;
 import com.jitlogic.zorka.common.tracedata.SymbolicStackElement;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.objectweb.asm.Type;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class ZicoUtil {
@@ -180,14 +175,6 @@ public class ZicoUtil {
         }
         sei.setStackTrace(stack);
         return sei;
-    }
-
-    public static String jsonPackException(SymbolicExceptionInfo ex) throws JSONException {
-        return "";
-    }
-
-    public static SymbolicExceptionInfo jsonUnpackException(String s) throws JSONException {
-        return null;
     }
 
 }

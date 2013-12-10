@@ -17,12 +17,17 @@ package com.jitlogic.zico.client.inject;
 
 
 import com.google.inject.assistedinject.Assisted;
-import com.jitlogic.zico.client.panel.*;
+import com.jitlogic.zico.client.panel.MethodAttrsDialog;
+import com.jitlogic.zico.client.panel.MethodRankingPanel;
+import com.jitlogic.zico.client.panel.PasswordChangeDialog;
+import com.jitlogic.zico.client.panel.TraceDetailPanel;
+import com.jitlogic.zico.client.panel.TraceListPanel;
+import com.jitlogic.zico.client.panel.TraceRecordSearchDialog;
+import com.jitlogic.zico.client.panel.TraceTemplatePanel;
+import com.jitlogic.zico.client.panel.UserManagementPanel;
 import com.jitlogic.zico.shared.data.HostProxy;
-import com.jitlogic.zico.shared.data.KeyValueProxy;
 import com.jitlogic.zico.shared.data.SymbolProxy;
 import com.jitlogic.zico.shared.data.TraceInfoProxy;
-import com.jitlogic.zorka.common.tracedata.Symbol;
 
 import java.util.List;
 

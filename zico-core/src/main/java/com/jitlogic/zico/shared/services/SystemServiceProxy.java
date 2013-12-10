@@ -21,10 +21,8 @@ import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.Service;
 import com.jitlogic.zico.core.inject.ZicoServiceLocator;
 import com.jitlogic.zico.core.services.SystemGwtService;
-import com.jitlogic.zico.shared.data.KeyValueProxy;
 import com.jitlogic.zico.shared.data.SymbolProxy;
 import com.jitlogic.zico.shared.data.TraceTemplateProxy;
-import com.jitlogic.zorka.common.tracedata.Symbol;
 
 import java.util.List;
 

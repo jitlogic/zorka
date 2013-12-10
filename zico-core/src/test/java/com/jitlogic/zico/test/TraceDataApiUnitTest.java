@@ -24,15 +24,14 @@ import com.jitlogic.zico.test.support.ZicoFixture;
 import com.jitlogic.zorka.common.test.support.TestTraceGenerator;
 import com.jitlogic.zorka.common.tracedata.Symbol;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
-
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TraceDataApiUnitTest extends ZicoFixture {
 

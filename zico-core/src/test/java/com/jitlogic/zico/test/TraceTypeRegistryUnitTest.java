@@ -16,18 +16,14 @@
 package com.jitlogic.zico.test;
 
 import com.jitlogic.zico.core.TraceTypeRegistry;
-import com.jitlogic.zico.core.model.KeyValuePair;
 import com.jitlogic.zico.test.support.ZicoFixture;
 import com.jitlogic.zorka.common.tracedata.Symbol;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import static org.fest.assertions.Assertions.assertThat;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TraceTypeRegistryUnitTest extends ZicoFixture {
 
@@ -69,7 +65,7 @@ public class TraceTypeRegistryUnitTest extends ZicoFixture {
         assertThat(ttr.getTidMap(1)).hasSize(2)
             .contains(new Symbol(e, "EJB"), new Symbol(h, "HTTP"));
 
-        assertEquals(0, (int)jdbc.queryForObject("select count(1) from TRACE_TYPES where HOST_ID = ? and TRACE_ID = ?",
+        assertEquals(0, (int) jdbc.queryForObject("select count(1) from TRACE_TYPES where HOST_ID = ? and TRACE_ID = ?",
                 Integer.class, 1, s));
 
         ttr.mark(s, 1);

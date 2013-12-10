@@ -16,18 +16,22 @@
 package com.jitlogic.zico.core.services;
 
 import com.google.inject.Singleton;
-import com.jitlogic.zico.core.*;
+import com.jitlogic.zico.core.HostStoreManager;
+import com.jitlogic.zico.core.TraceRecordStore;
+import com.jitlogic.zico.core.TraceTypeRegistry;
+import com.jitlogic.zico.core.UserManager;
+import com.jitlogic.zico.core.ZicoRuntimeException;
 import com.jitlogic.zico.core.eql.Parser;
+import com.jitlogic.zico.core.model.MethodRankInfo;
 import com.jitlogic.zico.core.model.PagingData;
+import com.jitlogic.zico.core.model.TraceDetailSearchExpression;
 import com.jitlogic.zico.core.model.TraceInfo;
 import com.jitlogic.zico.core.model.TraceListFilterExpression;
+import com.jitlogic.zico.core.model.TraceRecordInfo;
+import com.jitlogic.zico.core.model.TraceRecordSearchResult;
 import com.jitlogic.zico.core.search.EqlTraceRecordMatcher;
 import com.jitlogic.zico.core.search.FullTextTraceRecordMatcher;
 import com.jitlogic.zico.core.search.TraceRecordMatcher;
-import com.jitlogic.zico.core.model.MethodRankInfo;
-import com.jitlogic.zico.core.model.TraceDetailSearchExpression;
-import com.jitlogic.zico.core.model.TraceRecordInfo;
-import com.jitlogic.zico.core.model.TraceRecordSearchResult;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 

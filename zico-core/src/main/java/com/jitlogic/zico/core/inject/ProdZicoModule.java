@@ -22,7 +22,6 @@ import com.jitlogic.zico.core.UserContext;
 import com.jitlogic.zico.core.UserHttpContext;
 import com.jitlogic.zico.core.ZicoConfig;
 import com.jitlogic.zico.core.ZicoRuntimeException;
-import com.jitlogic.zico.core.inject.AbstractZicoModule;
 import org.apache.commons.dbcp.BasicDataSource;
 
 import java.io.File;

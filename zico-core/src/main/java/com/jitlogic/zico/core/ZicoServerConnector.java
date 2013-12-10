@@ -17,11 +17,14 @@ package com.jitlogic.zico.core;
 
 
 import com.jitlogic.zorka.common.tracedata.HelloRequest;
-import com.jitlogic.zorka.common.zico.*;
+import com.jitlogic.zorka.common.zico.ZicoCommonUtil;
+import com.jitlogic.zorka.common.zico.ZicoConnector;
+import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
+import com.jitlogic.zorka.common.zico.ZicoDataProcessorFactory;
+import com.jitlogic.zorka.common.zico.ZicoException;
+import com.jitlogic.zorka.common.zico.ZicoPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.jitlogic.zorka.common.zico.ZicoPacket.*;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -29,6 +32,14 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.util.List;
+
+import static com.jitlogic.zorka.common.zico.ZicoPacket.ZICO_AUTH_ERROR;
+import static com.jitlogic.zorka.common.zico.ZicoPacket.ZICO_BAD_REQUEST;
+import static com.jitlogic.zorka.common.zico.ZicoPacket.ZICO_DATA;
+import static com.jitlogic.zorka.common.zico.ZicoPacket.ZICO_HELLO;
+import static com.jitlogic.zorka.common.zico.ZicoPacket.ZICO_OK;
+import static com.jitlogic.zorka.common.zico.ZicoPacket.ZICO_PING;
+import static com.jitlogic.zorka.common.zico.ZicoPacket.ZICO_PONG;
 
 public class ZicoServerConnector extends ZicoConnector implements Runnable {
 

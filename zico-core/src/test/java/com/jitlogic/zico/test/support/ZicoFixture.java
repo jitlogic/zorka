@@ -18,7 +18,11 @@ package com.jitlogic.zico.test.support;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.jitlogic.zico.core.*;
+import com.jitlogic.zico.core.HostStoreManager;
+import com.jitlogic.zico.core.TraceTableWriter;
+import com.jitlogic.zico.core.TraceTypeRegistry;
+import com.jitlogic.zico.core.ZicoConfig;
+import com.jitlogic.zico.core.ZicoService;
 import com.jitlogic.zico.core.services.HostGwtService;
 import com.jitlogic.zico.core.services.SystemGwtService;
 import com.jitlogic.zico.core.services.TraceDataGwtService;

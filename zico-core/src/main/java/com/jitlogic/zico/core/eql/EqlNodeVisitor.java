@@ -16,7 +16,12 @@
 package com.jitlogic.zico.core.eql;
 
 
-import com.jitlogic.zico.core.eql.ast.*;
+import com.jitlogic.zico.core.eql.ast.EqlBinaryExpr;
+import com.jitlogic.zico.core.eql.ast.EqlExpr;
+import com.jitlogic.zico.core.eql.ast.EqlFunCall;
+import com.jitlogic.zico.core.eql.ast.EqlLiteral;
+import com.jitlogic.zico.core.eql.ast.EqlSymbol;
+import com.jitlogic.zico.core.eql.ast.EqlUnaryExpr;
 
 public class EqlNodeVisitor<T> {
 
