@@ -190,29 +190,4 @@ public class ZicoUtil {
         return null;
     }
 
-    public static String jsonPack(Map<String,String> map) throws JSONException {
-        JSONObject obj = new JSONObject();
-            for (Map.Entry<String,String> e : map.entrySet()) {
-                obj.put(e.getKey(), e.getValue());
-            }
-
-        return obj.toString();
-    }
-
-
-    // TODO this particular JSON implementation is total cock-up; find and use something better instead;
-
-    public static Map<String,String> jsonUnpack(String s) throws JSONException {
-        Map<String,String> map = new HashMap<String, String>();
-            if (s != null && s.trim().length() > 0) {
-                JSONObject obj = new JSONObject().getJSONObject(s);
-                JSONArray names = obj.names();
-                for (int i = 0; i < names.length(); i++) {
-                    String name = names.getString(i);
-                    map.put(name, obj.getString(name));
-                }
-            }
-        return map;
-    }
-
 }

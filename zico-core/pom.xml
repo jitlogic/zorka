@@ -112,6 +112,11 @@
             <artifactId>parboiled-java</artifactId>
             <version>${parboiled.version}</version>
         </dependency>
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+            <version>${json.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

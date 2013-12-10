@@ -28,6 +28,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <parboiled.version>1.1.6</parboiled.version>
         <bval.version>0.5</bval.version>
+        <json.version>1.2</json.version>
     </properties>
 
     <repositories>

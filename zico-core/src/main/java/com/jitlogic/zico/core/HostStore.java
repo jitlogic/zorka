@@ -25,6 +25,9 @@ import com.jitlogic.zico.core.model.TraceListFilterExpression;
 import com.jitlogic.zico.core.rds.RDSCleanupListener;
 import com.jitlogic.zico.core.rds.RDSStore;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+import net.minidev.json.JSONValue;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,31 +85,33 @@ public class HostStore implements Closeable, RDSCleanupListener {
             info.setRecords(rs.getLong("RECORDS"));
             info.setExecutionTime(rs.getLong("EXTIME"));
 
-            Map<String, String> attrs = new HashMap<String, String>();
-
-            try {
-                attrs = ZicoUtil.jsonUnpack(rs.getString("ATTRS"));
-            } catch (JSONException e) {
-                log.error("Error unpacking JSON attrs", e);
-            }
+            JSONObject attrs = (JSONObject)JSONValue.parse(rs.getString("ATTRS"));
 
             if (attrs != null) {
                 List<KeyValuePair> attrList = new ArrayList<KeyValuePair>(attrs.size());
 
-                for (Map.Entry<String,String> e : attrs.entrySet()) {
-                    attrList.add(new KeyValuePair(e.getKey(), e.getValue()));
+                for (Map.Entry<String,Object> e : attrs.entrySet()) {
+                    attrList.add(new KeyValuePair(e.getKey(), ""+e.getValue()));
                 }
 
                 info.setAttributes(attrList);
             }
 
             String exJson = rs.getString("EXINFO");
-            if (exJson != null) {
-                try {
-                    info.setExceptionInfo(ZicoUtil.jsonUnpackException(exJson));
-                } catch (JSONException e) {
-                    log.error("Error unpacking JSON exInfo", e);
+            if (exJson != null && exJson.trim().length() > 0) {
+                JSONObject json = (JSONObject)JSONValue.parse(exJson);
+                SymbolicExceptionInfo sei = new SymbolicExceptionInfo();
+                sei.setExClass(""+json.get("exClass"));
+                sei.setMessage("" + json.get("message"));
+                JSONArray jstack = (JSONArray)(json.get("stackTrace"));
+                if (jstack != null) {
+                    List<String> stack = new ArrayList<String>(jstack.size());
+                    for (Object obj : jstack) {
+                        stack.add(""+obj);
+                    }
+                    sei.setStackTrace(stack);
                 }
+                info.setExceptionInfo(sei);
             }
 
             info.setDescription(manager.getTemplater().templateDescription(info));
