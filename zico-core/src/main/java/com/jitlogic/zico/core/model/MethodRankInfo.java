@@ -15,35 +15,25 @@
  */
 package com.jitlogic.zico.core.model;
 
-import org.codehaus.jackson.annotate.JsonProperty;
 
 public class MethodRankInfo {
 
-    @JsonProperty
     long calls;
 
-    @JsonProperty
     long errors;
 
-    @JsonProperty
     long time;
 
-    @JsonProperty
     long bareTime;
 
-    @JsonProperty
     long minTime;
 
-    @JsonProperty
     long maxTime;
 
-    @JsonProperty
     long minBareTime;
 
-    @JsonProperty
     long maxBareTime;
 
-    @JsonProperty
     String method;
 
 

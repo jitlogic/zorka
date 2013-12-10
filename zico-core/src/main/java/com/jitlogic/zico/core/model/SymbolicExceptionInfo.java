@@ -15,23 +15,16 @@
  */
 package com.jitlogic.zico.core.model;
 
-
-import org.codehaus.jackson.annotate.JsonProperty;
-
 import java.util.List;
 
 public class SymbolicExceptionInfo {
 
-    @JsonProperty
     String exClass;
 
-    @JsonProperty
     String message;
 
-    @JsonProperty
     List<String> stackTrace;
 
-    @JsonProperty
     SymbolicExceptionInfo cause;
 
     public String getExClass() {

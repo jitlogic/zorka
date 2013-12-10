@@ -16,20 +16,14 @@
 package com.jitlogic.zico.core.model;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
 import java.util.List;
 
 public class PagingData  {
 
-
-    @JsonProperty
     private int offset;
 
-    @JsonProperty
     private int total;
 
-    @JsonProperty
     private List<TraceInfo> results;
 
     public PagingData() {

@@ -15,9 +15,10 @@
  */
 package com.jitlogic.zico.core;
 
+import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.servlet.GuiceServletContextListener;
 import org.apache.commons.dbcp.BasicDataSource;
-import org.jboss.resteasy.plugins.guice.GuiceResteasyBootstrapServletContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,11 +26,14 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 
-public class ZicoBootstrapListener extends GuiceResteasyBootstrapServletContextListener {
+public class ZicoBootstrapListener extends GuiceServletContextListener {
 
     private final static Logger log = LoggerFactory.getLogger(ZicoBootstrapListener.class);
 
-    public void withInjector(final Injector injector) {
+    @Override
+    protected Injector getInjector() {
+        final Injector injector = Guice.createInjector(new ProdZicoModule());
+
         injector.getInstance(ZicoService.class).start();
         injector.getInstance(TraceTableWriter.class).start();
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -53,7 +57,6 @@ public class ZicoBootstrapListener extends GuiceResteasyBootstrapServletContextL
 
         ZicoServiceLocator.injector = injector;
 
-        // TODO this is a crutch; use injection for instantiating server connection contexts;
-
+        return injector;
     }
 }

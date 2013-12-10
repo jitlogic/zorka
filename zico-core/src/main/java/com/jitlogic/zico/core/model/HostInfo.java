@@ -15,34 +15,24 @@
  */
 package com.jitlogic.zico.core.model;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
 public class HostInfo {
 
     public static final int DISABLED = 0x00000001;
 
-    @JsonProperty
     private int id;
 
-    @JsonProperty
     private String name;
 
-    @JsonProperty
     private String addr;
 
-    @JsonProperty
     private String path;
 
-    @JsonProperty
     private String pass;
 
-    @JsonProperty
     private int flags;
 
-    @JsonProperty
     long maxSize;
 
-    @JsonProperty
     private String description;
 
     public int getId() {

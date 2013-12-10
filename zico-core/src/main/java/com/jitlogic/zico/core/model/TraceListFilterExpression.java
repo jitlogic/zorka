@@ -16,32 +16,22 @@
 package com.jitlogic.zico.core.model;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
 public class TraceListFilterExpression {
 
-    @JsonProperty
     String sortBy;
 
-    @JsonProperty
     boolean sortAsc;
 
-    @JsonProperty
     boolean errorsOnly;
 
-    @JsonProperty
     long minTime;
 
-    @JsonProperty
     int traceId;
 
-    @JsonProperty
     long timeStart;
 
-    @JsonProperty
     long timeEnd;
 
-    @JsonProperty
     String filterExpr;
 
 

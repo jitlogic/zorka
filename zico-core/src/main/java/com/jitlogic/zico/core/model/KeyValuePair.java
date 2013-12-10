@@ -16,14 +16,11 @@
 package com.jitlogic.zico.core.model;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
 
 public class KeyValuePair {
 
-    @JsonProperty
     private String key;
 
-    @JsonProperty
     private String value;
 
     public KeyValuePair() { }

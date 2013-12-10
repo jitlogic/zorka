@@ -16,29 +16,20 @@
 package com.jitlogic.zico.core.model;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
 public class TraceTemplate {
 
-    @JsonProperty
     int id;
 
-    @JsonProperty
     int traceId;
 
-    @JsonProperty
     int order;
 
-    @JsonProperty
     int flags;
 
-    @JsonProperty
     String condTemplate;
 
-    @JsonProperty
     String condRegex;
 
-    @JsonProperty
     String template;
 
     public int getId() {

@@ -15,32 +15,22 @@
  */
 package com.jitlogic.zico.core.model;
 
-import com.jitlogic.zico.core.model.TraceRecordInfo;
-import org.codehaus.jackson.annotate.JsonProperty;
-
 import java.util.List;
 
 public class TraceRecordSearchResult {
 
-    @JsonProperty
     List<TraceRecordInfo> result;
 
-    @JsonProperty
     double sumPct;
 
-    @JsonProperty
     double recurPct;
 
-    @JsonProperty
     long sumTime;
 
-    @JsonProperty
     long recurTime;
 
-    @JsonProperty
     long minTime;
 
-    @JsonProperty
     long maxTime;
 
     public List<TraceRecordInfo> getResult() {

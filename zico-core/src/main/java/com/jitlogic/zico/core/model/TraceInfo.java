@@ -16,67 +16,46 @@
 package com.jitlogic.zico.core.model;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
 import java.util.List;
 
 public class TraceInfo {
 
-    @JsonProperty
     int hostId;
 
-    @JsonProperty
     long dataOffs;
 
-    @JsonProperty
     int traceId;
 
-    @JsonProperty
     String traceType;
 
-    @JsonProperty
     int dataLen;
 
-    @JsonProperty
     long clock;
 
-    @JsonProperty
     int methodFlags;
 
-    @JsonProperty
     int traceFlags;
 
-    @JsonProperty
     int status;
 
-    @JsonProperty
     int classId;
 
-    @JsonProperty
     int methodId;
 
-    @JsonProperty
     int signatureId;
 
-    @JsonProperty
     long calls;
 
-    @JsonProperty
     long errors;
 
-    @JsonProperty
     long records;
 
-    @JsonProperty
     long executionTime;
 
-    @JsonProperty
     String description;
 
-    @JsonProperty
     List<KeyValuePair> attributes;
 
-    @JsonProperty
     SymbolicExceptionInfo exceptionInfo;
 
     public int getHostId() {

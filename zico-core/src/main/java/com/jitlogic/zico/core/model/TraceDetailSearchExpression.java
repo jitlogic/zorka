@@ -15,8 +15,6 @@
  */
 package com.jitlogic.zico.core.model;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
 public class TraceDetailSearchExpression {
 
     public final static int TXT_QUERY = 0;
@@ -33,14 +31,10 @@ public class TraceDetailSearchExpression {
     public final static int SEARCH_EX_STACK = 0x1000;
     public final static int SEARCH_SIGNATURE = 0x2000;
 
-
-    @JsonProperty
     int type;
 
-    @JsonProperty
     int flags;
 
-    @JsonProperty
     String searchExpr;
 
     public boolean hasFlag(int flag) {

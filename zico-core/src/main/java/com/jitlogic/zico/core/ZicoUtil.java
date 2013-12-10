@@ -21,13 +21,18 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicException;
 import com.jitlogic.zorka.common.tracedata.SymbolicStackElement;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.objectweb.asm.Type;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class ZicoUtil {
@@ -150,6 +155,7 @@ public class ZicoUtil {
                 (byte) (l >>> 24)};
     }
 
+
     public static long readUInt(RandomAccessFile input) throws IOException {
         byte[] b = new byte[4];
 
@@ -159,6 +165,7 @@ public class ZicoUtil {
 
         return ZicoUtil.toUIntBE(b);
     }
+
 
     public static SymbolicExceptionInfo extractSymbolicExceptionInfo(SymbolRegistry symbolRegistry, SymbolicException sex) {
         SymbolicExceptionInfo sei = new SymbolicExceptionInfo();
@@ -173,6 +180,39 @@ public class ZicoUtil {
         }
         sei.setStackTrace(stack);
         return sei;
+    }
+
+    public static String jsonPackException(SymbolicExceptionInfo ex) throws JSONException {
+        return "";
+    }
+
+    public static SymbolicExceptionInfo jsonUnpackException(String s) throws JSONException {
+        return null;
+    }
+
+    public static String jsonPack(Map<String,String> map) throws JSONException {
+        JSONObject obj = new JSONObject();
+            for (Map.Entry<String,String> e : map.entrySet()) {
+                obj.put(e.getKey(), e.getValue());
+            }
+
+        return obj.toString();
+    }
+
+
+    // TODO this particular JSON implementation is total cock-up; find and use something better instead;
+
+    public static Map<String,String> jsonUnpack(String s) throws JSONException {
+        Map<String,String> map = new HashMap<String, String>();
+            if (s != null && s.trim().length() > 0) {
+                JSONObject obj = new JSONObject().getJSONObject(s);
+                JSONArray names = obj.names();
+                for (int i = 0; i < names.length(); i++) {
+                    String name = names.getString(i);
+                    map.put(name, obj.getString(name));
+                }
+            }
+        return map;
     }
 
 }

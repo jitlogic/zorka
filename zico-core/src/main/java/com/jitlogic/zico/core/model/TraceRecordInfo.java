@@ -16,36 +16,25 @@
 package com.jitlogic.zico.core.model;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
 import java.util.List;
 
 public class TraceRecordInfo {
-    @JsonProperty
     long calls;
 
-    @JsonProperty
     long errors;
 
-    @JsonProperty
     long time;
 
-    @JsonProperty
     int flags;
 
-    @JsonProperty
     String method;
 
-    @JsonProperty
     int children;
 
-    @JsonProperty
     String path;
 
-    @JsonProperty
     List<KeyValuePair> attributes;
 
-    @JsonProperty
     SymbolicExceptionInfo exceptionInfo;
 
     public long getCalls() {

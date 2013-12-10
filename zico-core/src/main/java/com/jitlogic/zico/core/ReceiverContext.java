@@ -21,8 +21,8 @@ import com.jitlogic.zico.core.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.fressian.FressianWriter;
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,8 +45,6 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     private TraceTableWriter traceTableWriter;
 
     private HostInfo hostInfo;
-
-    private ObjectMapper mapper = new ObjectMapper();
 
     private Set<Object> visitedObjects = new HashSet<Object>();
 
@@ -124,8 +122,8 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
         String attrJson = "";
 
         try {
-            attrJson = mapper.writeValueAsString(attrMap);
-        } catch (IOException e) {
+            attrJson = ZicoUtil.jsonPack(attrMap);
+        } catch (JSONException e) {
             log.error("Error serializing attributes", e);
         }
 
@@ -135,8 +133,8 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
         if (e != null) {
             try {
-                exJson = mapper.writeValueAsString(ZicoUtil.extractSymbolicExceptionInfo(symbolRegistry, e));
-            } catch (IOException e1) {
+                exJson = ZicoUtil.jsonPackException(ZicoUtil.extractSymbolicExceptionInfo(symbolRegistry, e));
+            } catch (JSONException e1) {
                 log.error("Error serializing exception info", e);
             }
         }

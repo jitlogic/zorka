@@ -25,7 +25,7 @@ import com.jitlogic.zico.core.model.TraceListFilterExpression;
 import com.jitlogic.zico.core.rds.RDSCleanupListener;
 import com.jitlogic.zico.core.rds.RDSStore;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -46,9 +46,6 @@ import java.util.*;
 public class HostStore implements Closeable, RDSCleanupListener {
 
     private final static Logger log = LoggerFactory.getLogger(HostStore.class);
-
-    private ObjectMapper mapper = new ObjectMapper();
-
 
     private String rootPath;
     private RDSStore rds;
@@ -88,8 +85,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
             Map<String, String> attrs = new HashMap<String, String>();
 
             try {
-                attrs = mapper.readValue(rs.getString("ATTRS"), Map.class);
-            } catch (IOException e) {
+                attrs = ZicoUtil.jsonUnpack(rs.getString("ATTRS"));
+            } catch (JSONException e) {
                 log.error("Error unpacking JSON attrs", e);
             }
 
@@ -106,8 +103,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
             String exJson = rs.getString("EXINFO");
             if (exJson != null) {
                 try {
-                    info.setExceptionInfo(mapper.readValue(exJson, SymbolicExceptionInfo.class));
-                } catch (IOException e) {
+                    info.setExceptionInfo(ZicoUtil.jsonUnpackException(exJson));
+                } catch (JSONException e) {
                     log.error("Error unpacking JSON exInfo", e);
                 }
             }

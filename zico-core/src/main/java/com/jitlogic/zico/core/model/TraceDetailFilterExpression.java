@@ -16,18 +16,12 @@
 package com.jitlogic.zico.core.model;
 
 
-import org.codehaus.jackson.annotate.JsonProperty;
-
-
 public class TraceDetailFilterExpression {
 
-    @JsonProperty
     int hostId;
 
-    @JsonProperty
     long traceOffs;
 
-    @JsonProperty
     long minMethodTime;
 
     public long getMinMethodTime() {
