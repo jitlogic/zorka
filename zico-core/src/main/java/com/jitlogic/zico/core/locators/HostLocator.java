@@ -13,13 +13,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core;
+package com.jitlogic.zico.core.locators;
 
 
 import com.google.web.bindery.requestfactory.shared.Locator;
+import com.jitlogic.zico.core.HostStore;
+import com.jitlogic.zico.core.HostStoreManager;
+import com.jitlogic.zico.core.ZicoEntity;
+import com.jitlogic.zico.core.ZicoRuntimeException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
+import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.io.IOException;
 
@@ -30,12 +35,12 @@ public class HostLocator extends Locator<HostStore, Integer> implements ZicoEnti
 
     private HostStoreManager hsm;
 
-    public HostLocator() {
-        DataSource ds = ZicoServiceLocator.injector.getInstance(DataSource.class);
+    @Inject
+    public HostLocator(DataSource ds, HostStoreManager hsm) {
         jdbc = new JdbcTemplate(ds);
         jdbci = new SimpleJdbcInsert(ds).withTableName("HOSTS").usingGeneratedKeyColumns("HOST_ID")
                 .usingColumns("HOST_NAME", "HOST_ADDR", "HOST_PATH", "HOST_DESC", "HOST_PASS", "HOST_FLAGS", "MAX_SIZE");
-        hsm = ZicoServiceLocator.injector.getInstance(HostStoreManager.class);
+        this.hsm = hsm;
     }
 
     @Override

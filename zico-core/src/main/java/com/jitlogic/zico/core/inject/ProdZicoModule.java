@@ -13,10 +13,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core;
+package com.jitlogic.zico.core.inject;
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.jitlogic.zico.core.ZicoConfig;
+import com.jitlogic.zico.core.ZicoRuntimeException;
+import com.jitlogic.zico.core.inject.AbstractZicoModule;
 import org.apache.commons.dbcp.BasicDataSource;
 
 import java.io.File;

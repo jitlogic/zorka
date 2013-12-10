@@ -18,7 +18,7 @@ package com.jitlogic.zico.shared.data;
 import com.google.web.bindery.requestfactory.shared.EntityProxy;
 import com.google.web.bindery.requestfactory.shared.ProxyFor;
 import com.jitlogic.zico.core.HostStore;
-import com.jitlogic.zico.core.HostLocator;
+import com.jitlogic.zico.core.locators.HostLocator;
 
 
 @ProxyFor(value = HostStore.class, locator = HostLocator.class)

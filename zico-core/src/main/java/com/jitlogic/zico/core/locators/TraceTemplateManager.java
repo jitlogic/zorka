@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core;
+package com.jitlogic.zico.core.locators;
 
 
 import com.google.web.bindery.requestfactory.shared.Locator;
@@ -63,12 +63,6 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
             return tti;
         }
     };
-
-
-    public TraceTemplateManager() {
-        this(ZicoServiceLocator.injector.getInstance(DataSource.class),
-             ZicoServiceLocator.injector.getInstance(SymbolRegistry.class));
-    }
 
 
     @Inject

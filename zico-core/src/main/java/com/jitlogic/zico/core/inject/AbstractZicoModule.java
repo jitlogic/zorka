@@ -13,13 +13,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core;
+package com.jitlogic.zico.core.inject;
 
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.jitlogic.zico.core.DbSymbolRegistry;
+import com.jitlogic.zico.core.HostStoreManager;
+import com.jitlogic.zico.core.ZicoConfig;
+import com.jitlogic.zico.core.ZicoService;
 import com.jitlogic.zico.core.services.*;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -33,6 +37,7 @@ public abstract class AbstractZicoModule implements Module {
     public void configure(Binder binder) {
         binder.bind(SymbolRegistry.class).to(DbSymbolRegistry.class).in(Singleton.class);
         binder.bind(DataSource.class).to(BasicDataSource.class).in(Singleton.class);
+        binder.bind(ZicoRequestFactoryServlet.class);
     }
 
     protected BasicDataSource provideDataSource(ZicoConfig config) {

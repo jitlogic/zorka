@@ -13,11 +13,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core;
+package com.jitlogic.zico.core.locators;
 
 
 import com.google.inject.Singleton;
 import com.google.web.bindery.requestfactory.shared.Locator;
+import com.jitlogic.zico.core.ZicoEntity;
 import com.jitlogic.zico.core.model.User;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -25,6 +26,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
+import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,19 +37,12 @@ public class UserLocator extends Locator<User, Integer> implements RowMapper<Use
     private JdbcTemplate jdbc;
     private SimpleJdbcInsert jdbci;
 
-
-    // TODO inject it via injector, not default instanatiation
-    public UserLocator() {
-        DataSource ds = ZicoServiceLocator.injector.getInstance(DataSource.class);
+    @Inject
+    public UserLocator(DataSource ds) {
         jdbc = new JdbcTemplate(ds);
         jdbci = new SimpleJdbcInsert(ds).withTableName("USERS").usingGeneratedKeyColumns("USER_ID")
                 .usingColumns("USER_NAME", "REAL_NAME", "FLAGS", "PASSWORD");
     }
-
-//    @Inject
-//    public UserLocator(DataSource ds) {
-//        jdbc = new JdbcTemplate(ds);
-//    }
 
     @Override
     public User create(Class<? extends User> aClass) {

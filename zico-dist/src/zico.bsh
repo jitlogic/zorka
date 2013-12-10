@@ -61,7 +61,7 @@ __zico() {
     "com.jitlogic.zico.search.**",
     "com.jitlogic.zico.core.**/mapRow",
     "com.jitlogic.zico.core.ReceiverContext/checkSymbol",
-    "com.jitlogic.zico.core.TraceTemplateManager",
+    "com.jitlogic.zico.core.locators.TraceTemplateManager",
     "com.jitlogic.zico.core.ZicoUtil"
   );
 

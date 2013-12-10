@@ -13,29 +13,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.shared.data;
+package com.jitlogic.zico.core.inject;
 
-import com.google.web.bindery.requestfactory.shared.EntityProxy;
-import com.google.web.bindery.requestfactory.shared.ProxyFor;
+import com.google.inject.Injector;
+import com.google.inject.Singleton;
+import com.google.web.bindery.requestfactory.shared.ServiceLocator;
 
-import com.jitlogic.zico.core.model.User;
-import com.jitlogic.zico.core.locators.UserLocator;
+import javax.inject.Inject;
 
-@ProxyFor(value = User.class, locator = UserLocator.class)
-public interface UserProxy extends EntityProxy {
-    public Integer getId();
+@Singleton
+public class ZicoServiceLocator implements ServiceLocator {
 
-    public void setId(Integer id);
+    private Injector injector;
 
-    public String getUserName();
+    @Inject
+    public ZicoServiceLocator(Injector injector) {
+        this.injector = injector;
+    }
 
-    public void setUserName(String userName);
+    @Override
+    public Object getInstance(Class<?> clazz) {
+        return injector != null ? injector.getInstance(clazz) : null;
+    }
 
-    public String getRealName();
-
-    public void setRealName(String realName);
-
-    public boolean isAdmin();
-
-    public void setAdmin(boolean admin);
 }

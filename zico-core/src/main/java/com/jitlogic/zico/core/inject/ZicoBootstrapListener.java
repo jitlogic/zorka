@@ -13,11 +13,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core;
+package com.jitlogic.zico.core.inject;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
+import com.google.inject.servlet.ServletModule;
+import com.jitlogic.zico.core.HostStoreManager;
+import com.jitlogic.zico.core.TraceTableWriter;
+import com.jitlogic.zico.core.ZicoService;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +34,16 @@ public class ZicoBootstrapListener extends GuiceServletContextListener {
 
     private final static Logger log = LoggerFactory.getLogger(ZicoBootstrapListener.class);
 
+    public static class ZicoServletModule extends ServletModule {
+        @Override
+        protected void configureServlets() {
+            serve("/gwtRequest").with(ZicoRequestFactoryServlet.class);
+        }
+    }
+
     @Override
     protected Injector getInjector() {
-        final Injector injector = Guice.createInjector(new ProdZicoModule());
+        final Injector injector = Guice.createInjector(new ProdZicoModule(), new ZicoServletModule());
 
         injector.getInstance(ZicoService.class).start();
         injector.getInstance(TraceTableWriter.class).start();
@@ -54,8 +65,6 @@ public class ZicoBootstrapListener extends GuiceServletContextListener {
                 }
             }
         });
-
-        ZicoServiceLocator.injector = injector;
 
         return injector;
     }

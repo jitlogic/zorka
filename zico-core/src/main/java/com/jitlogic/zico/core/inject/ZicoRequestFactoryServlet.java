@@ -13,20 +13,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core;
+package com.jitlogic.zico.core.inject;
 
-import com.google.inject.Injector;
-import com.google.inject.Singleton;
-import com.google.web.bindery.requestfactory.shared.ServiceLocator;
+import com.google.web.bindery.requestfactory.server.DefaultExceptionHandler;
+import com.google.web.bindery.requestfactory.server.RequestFactoryServlet;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Singleton
-public class ZicoServiceLocator implements ServiceLocator {
+public class ZicoRequestFactoryServlet extends RequestFactoryServlet {
 
-    public static Injector injector; // TODO this is a crutch
-
-    @Override
-    public Object getInstance(Class<?> clazz) {
-        return injector != null ? injector.getInstance(clazz) : null;
+    @Inject
+    public ZicoRequestFactoryServlet(ZicoServiceLayerDecorator decorator) {
+        super(new DefaultExceptionHandler(), decorator);
     }
 
 }

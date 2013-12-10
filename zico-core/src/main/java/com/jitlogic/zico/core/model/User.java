@@ -16,7 +16,7 @@
 package com.jitlogic.zico.core.model;
 
 
-import com.jitlogic.zico.core.UserLocator;
+import com.jitlogic.zico.core.locators.UserLocator;
 
 public class User  {
 

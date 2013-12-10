@@ -17,7 +17,7 @@ package com.jitlogic.zico.test.support;
 
 
 import com.google.inject.Provides;
-import com.jitlogic.zico.core.AbstractZicoModule;
+import com.jitlogic.zico.core.inject.AbstractZicoModule;
 import com.jitlogic.zico.core.ZicoConfig;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;

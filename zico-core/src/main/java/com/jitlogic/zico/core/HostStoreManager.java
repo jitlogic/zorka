@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zico.core;
 
+import com.jitlogic.zico.core.locators.TraceTemplateManager;
 import com.jitlogic.zico.core.model.HostInfo;
 import com.jitlogic.zico.core.model.User;
 import com.jitlogic.zorka.common.tracedata.HelloRequest;
