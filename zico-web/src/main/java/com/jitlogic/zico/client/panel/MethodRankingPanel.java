@@ -23,7 +23,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
-import com.jitlogic.zico.data.MethodRankInfoProperties;
+import com.jitlogic.zico.client.props.MethodRankInfoProperties;
 import com.jitlogic.zico.shared.data.MethodRankProxy;
 import com.jitlogic.zico.shared.data.TraceInfoProxy;
 import com.sencha.gxt.data.shared.ListStore;

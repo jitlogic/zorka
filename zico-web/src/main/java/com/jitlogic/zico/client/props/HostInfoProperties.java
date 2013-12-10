@@ -13,21 +13,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.shared.data;
-
-import com.google.web.bindery.requestfactory.shared.ProxyFor;
-import com.google.web.bindery.requestfactory.shared.ValueProxy;
-import com.jitlogic.zico.core.model.PagingData;
-
-import java.util.List;
+package com.jitlogic.zico.client.props;
 
 
-@ProxyFor(PagingData.class)
-public interface PagingDataProxy extends ValueProxy {
+import com.google.gwt.editor.client.Editor;
+import com.jitlogic.zico.shared.data.HostProxy;
+import com.sencha.gxt.core.client.ValueProvider;
+import com.sencha.gxt.data.shared.LabelProvider;
+import com.sencha.gxt.data.shared.ModelKeyProvider;
+import com.sencha.gxt.data.shared.PropertyAccess;
 
-    int getOffset();
+public interface HostInfoProperties extends PropertyAccess<HostProxy> {
 
-    int getTotal();
+    @Editor.Path("id")
+    ModelKeyProvider<HostProxy> key();
 
-    List<TraceInfoProxy> getResults();
+    @Editor.Path("name")
+    LabelProvider<HostProxy> nameLabel();
+
+    ValueProvider<HostProxy, String> name();
+
+    ValueProvider<HostProxy, String> addr();
 }

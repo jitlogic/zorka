@@ -28,7 +28,7 @@ import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.inject.PanelFactory;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
-import com.jitlogic.zico.data.HostInfoProperties;
+import com.jitlogic.zico.client.props.HostInfoProperties;
 import com.jitlogic.zico.shared.data.HostProxy;
 import com.jitlogic.zico.shared.services.HostServiceProxy;
 import com.sencha.gxt.core.client.IdentityValueProvider;

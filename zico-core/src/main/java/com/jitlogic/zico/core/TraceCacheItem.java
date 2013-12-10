@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zico.core;
 
+import com.jitlogic.zico.core.model.TraceDetailFilterExpression;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 
 public class TraceCacheItem {

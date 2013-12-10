@@ -13,16 +13,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core;
+package com.jitlogic.zico.core.model;
 
-
-import com.jitlogic.zico.core.KeyValuePair;
-import com.jitlogic.zico.core.SymbolicExceptionInfo;
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import java.util.List;
+public class MethodRankInfo {
 
-public class TraceRecordInfo {
     @JsonProperty
     long calls;
 
@@ -33,22 +29,23 @@ public class TraceRecordInfo {
     long time;
 
     @JsonProperty
-    int flags;
+    long bareTime;
+
+    @JsonProperty
+    long minTime;
+
+    @JsonProperty
+    long maxTime;
+
+    @JsonProperty
+    long minBareTime;
+
+    @JsonProperty
+    long maxBareTime;
 
     @JsonProperty
     String method;
 
-    @JsonProperty
-    int children;
-
-    @JsonProperty
-    String path;
-
-    @JsonProperty
-    List<KeyValuePair> attributes;
-
-    @JsonProperty
-    SymbolicExceptionInfo exceptionInfo;
 
     public long getCalls() {
         return calls;
@@ -74,51 +71,67 @@ public class TraceRecordInfo {
         this.time = time;
     }
 
-    public int getFlags() {
-        return flags;
+    public long getAvgTime() {
+        return calls > 0 ? time / calls : 0;
     }
 
-    public void setFlags(int flags) {
-        this.flags = flags;
+    public void setAvgTime(long avgTime) {
+        time = calls * avgTime;
     }
 
     public String getMethod() {
         return method;
     }
 
+    public long getBareTime() {
+        return bareTime;
+    }
+
+    public void setBareTime(long bareTime) {
+        this.bareTime = bareTime;
+    }
+
+    public long getAvgBareTime() {
+        return calls > 0 ? bareTime / calls : 0;
+    }
+
+    public void setAvgBareTime(long avgBareTime) {
+        bareTime = calls * avgBareTime;
+    }
+
+    public long getMinTime() {
+        return minTime;
+    }
+
+    public void setMinTime(long minTime) {
+        this.minTime = minTime;
+    }
+
+    public long getMaxTime() {
+        return maxTime;
+    }
+
+    public void setMaxTime(long maxTime) {
+        this.maxTime = maxTime;
+    }
+
+    public long getMinBareTime() {
+        return minBareTime;
+    }
+
+    public void setMinBareTime(long minBareTime) {
+        this.minBareTime = minBareTime;
+    }
+
+    public long getMaxBareTime() {
+        return maxBareTime;
+    }
+
+    public void setMaxBareTime(long maxBareTime) {
+        this.maxBareTime = maxBareTime;
+    }
+
     public void setMethod(String method) {
         this.method = method;
-    }
-
-    public int getChildren() {
-        return children;
-    }
-
-    public void setChildren(int children) {
-        this.children = children;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public List<KeyValuePair> getAttributes() {
-        return attributes;
-    }
-
-    public void setAttributes(List<KeyValuePair> attributes) {
-        this.attributes = attributes;
-    }
-
-    public SymbolicExceptionInfo getExceptionInfo() {
-        return exceptionInfo;
-    }
-
-    public void setExceptionInfo(SymbolicExceptionInfo exceptionInfo) {
-        this.exceptionInfo = exceptionInfo;
     }
 }

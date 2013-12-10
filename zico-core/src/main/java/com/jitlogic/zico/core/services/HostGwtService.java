@@ -18,7 +18,7 @@ package com.jitlogic.zico.core.services;
 
 import com.jitlogic.zico.core.HostStore;
 import com.jitlogic.zico.core.HostStoreManager;
-import com.jitlogic.zico.core.User;
+import com.jitlogic.zico.core.model.User;
 import com.jitlogic.zico.core.UserContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;

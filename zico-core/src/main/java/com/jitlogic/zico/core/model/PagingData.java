@@ -13,39 +13,50 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core;
+package com.jitlogic.zico.core.model;
 
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class KeyValuePair {
+import java.util.List;
+
+public class PagingData  {
+
 
     @JsonProperty
-    private String key;
+    private int offset;
 
     @JsonProperty
-    private String value;
+    private int total;
 
-    public KeyValuePair() { }
+    @JsonProperty
+    private List<TraceInfo> results;
 
-    public KeyValuePair(String key, String value) {
-        this.key = key;
-        this.value = value;
+    public PagingData() {
+
     }
 
-    public String getKey() {
-        return key;
+    public int getOffset() {
+        return offset;
     }
 
-    public void setKey(String name) {
-        this.key = name;
+    public void setOffset(int offset) {
+        this.offset = offset;
     }
 
-    public String getValue() {
-        return value;
+    public int getTotal() {
+        return total;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setTotal(int total) {
+        this.total = total;
+    }
+
+    public List<TraceInfo> getResults() {
+        return results;
+    }
+
+    public void setResults(List<TraceInfo> results) {
+        this.results = results;
     }
 }

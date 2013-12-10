@@ -17,6 +17,9 @@ package com.jitlogic.zico.core;
 
 
 import com.google.web.bindery.requestfactory.shared.Locator;
+import com.jitlogic.zico.core.model.KeyValuePair;
+import com.jitlogic.zico.core.model.TraceInfo;
+import com.jitlogic.zico.core.model.TraceTemplate;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaUtil;

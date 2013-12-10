@@ -15,14 +15,13 @@
  */
 package com.jitlogic.zico.test;
 
-import com.jitlogic.zico.core.TraceTemplate;
+import com.jitlogic.zico.core.model.TraceTemplate;
 import com.jitlogic.zico.test.support.ZicoFixture;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.*;
 

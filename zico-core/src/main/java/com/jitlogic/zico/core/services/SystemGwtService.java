@@ -17,15 +17,14 @@ package com.jitlogic.zico.core.services;
 
 import com.google.inject.Singleton;
 import com.jitlogic.zico.core.*;
-import com.jitlogic.zorka.common.ZorkaAgent;
+import com.jitlogic.zico.core.model.KeyValuePair;
+import com.jitlogic.zico.core.model.TraceTemplate;
 
 import javax.inject.Inject;
-import javax.ws.rs.PathParam;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Singleton

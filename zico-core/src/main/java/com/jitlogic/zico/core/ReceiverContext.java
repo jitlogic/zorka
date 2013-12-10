@@ -16,6 +16,7 @@
 package com.jitlogic.zico.core;
 
 
+import com.jitlogic.zico.core.model.HostInfo;
 import com.jitlogic.zico.core.rds.RDSStore;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaUtil;

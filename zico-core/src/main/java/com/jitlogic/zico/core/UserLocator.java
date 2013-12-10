@@ -18,6 +18,7 @@ package com.jitlogic.zico.core;
 
 import com.google.inject.Singleton;
 import com.google.web.bindery.requestfactory.shared.Locator;
+import com.jitlogic.zico.core.model.User;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;

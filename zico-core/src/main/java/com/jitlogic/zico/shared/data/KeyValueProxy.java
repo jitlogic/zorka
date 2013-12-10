@@ -17,7 +17,7 @@ package com.jitlogic.zico.shared.data;
 
 import com.google.web.bindery.requestfactory.shared.ProxyFor;
 import com.google.web.bindery.requestfactory.shared.ValueProxy;
-import com.jitlogic.zico.core.KeyValuePair;
+import com.jitlogic.zico.core.model.KeyValuePair;
 
 @ProxyFor(KeyValuePair.class)
 public interface KeyValueProxy extends ValueProxy {

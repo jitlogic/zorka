@@ -18,7 +18,7 @@ package com.jitlogic.zico.test;
 
 import com.jitlogic.zico.core.HostStore;
 import com.jitlogic.zico.core.ReceiverContext;
-import com.jitlogic.zico.core.HostInfo;
+import com.jitlogic.zico.core.model.HostInfo;
 import com.jitlogic.zico.test.support.ZicoFixture;
 import com.jitlogic.zorka.common.test.support.TestTraceGenerator;
 import com.jitlogic.zorka.common.tracedata.Symbol;

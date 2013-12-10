@@ -17,7 +17,7 @@ package com.jitlogic.zico.shared.data;
 
 import com.google.web.bindery.requestfactory.shared.ProxyFor;
 import com.google.web.bindery.requestfactory.shared.ValueProxy;
-import com.jitlogic.zico.core.TraceInfo;
+import com.jitlogic.zico.core.model.TraceInfo;
 
 import java.util.List;
 

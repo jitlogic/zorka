@@ -13,25 +13,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.data;
+package com.jitlogic.zico.core.model;
 
 
-import com.google.gwt.editor.client.Editor;
-import com.jitlogic.zico.shared.data.HostProxy;
-import com.sencha.gxt.core.client.ValueProvider;
-import com.sencha.gxt.data.shared.LabelProvider;
-import com.sencha.gxt.data.shared.ModelKeyProvider;
-import com.sencha.gxt.data.shared.PropertyAccess;
+import org.codehaus.jackson.annotate.JsonProperty;
 
-public interface HostInfoProperties extends PropertyAccess<HostProxy> {
+public class KeyValuePair {
 
-    @Editor.Path("id")
-    ModelKeyProvider<HostProxy> key();
+    @JsonProperty
+    private String key;
 
-    @Editor.Path("name")
-    LabelProvider<HostProxy> nameLabel();
+    @JsonProperty
+    private String value;
 
-    ValueProvider<HostProxy, String> name();
+    public KeyValuePair() { }
 
-    ValueProvider<HostProxy, String> addr();
+    public KeyValuePair(String key, String value) {
+        this.key = key;
+        this.value = value;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String name) {
+        this.key = name;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
 }

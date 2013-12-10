@@ -13,34 +13,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.data;
+package com.jitlogic.zico.client.props;
 
 
 import com.google.gwt.editor.client.Editor;
-import com.jitlogic.zico.shared.data.TraceTemplateProxy;
+import com.jitlogic.zico.shared.data.MethodRankProxy;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.LabelProvider;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.PropertyAccess;
 
-public interface TraceTemplateInfoProperties extends PropertyAccess<TraceTemplateProxy> {
-    @Editor.Path("id")
-    ModelKeyProvider<TraceTemplateProxy> key();
+public interface MethodRankInfoProperties extends PropertyAccess<MethodRankProxy> {
 
-    @Editor.Path("description")
-    LabelProvider<TraceTemplateProxy> nameLabel();
+    @Editor.Path("method")
+    ModelKeyProvider<MethodRankProxy> key();
 
-    ValueProvider<TraceTemplateProxy, Integer> id();
+    @Editor.Path("method")
+    LabelProvider<MethodRankProxy> label();
 
-    ValueProvider<TraceTemplateProxy, Integer> traceId();
+    ValueProvider<MethodRankProxy, String> method();
 
-    ValueProvider<TraceTemplateProxy, Integer> order();
+    ValueProvider<MethodRankProxy, Long> calls();
 
-    ValueProvider<TraceTemplateProxy, Integer> flags();
+    ValueProvider<MethodRankProxy, Long> errors();
 
-    ValueProvider<TraceTemplateProxy, String> condTemplate();
+    ValueProvider<MethodRankProxy, Long> time();
 
-    ValueProvider<TraceTemplateProxy, String> condRegex();
+    ValueProvider<MethodRankProxy, Long> avgTime();
 
-    ValueProvider<TraceTemplateProxy, String> template();
+    ValueProvider<MethodRankProxy, Long> minTime();
+
+    ValueProvider<MethodRankProxy, Long> maxTime();
+
+    ValueProvider<MethodRankProxy, Long> bareTime();
+
+    ValueProvider<MethodRankProxy, Long> avgBareTime();
+
+    ValueProvider<MethodRankProxy, Long> minBareTime();
+
+    ValueProvider<MethodRankProxy, Long> maxBareTime();
 }

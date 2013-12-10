@@ -31,7 +31,7 @@ import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.inject.PanelFactory;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
-import com.jitlogic.zico.data.TraceRecordInfoProperties;
+import com.jitlogic.zico.client.props.TraceRecordInfoProperties;
 import com.jitlogic.zico.shared.data.TraceInfoProxy;
 import com.jitlogic.zico.shared.data.TraceRecordProxy;
 import com.sencha.gxt.core.client.IdentityValueProvider;

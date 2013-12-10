@@ -17,6 +17,7 @@ package com.jitlogic.zico.core;
 
 
 import com.google.inject.Inject;
+import com.jitlogic.zico.core.model.TraceDetailFilterExpression;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 
 import javax.inject.Singleton;

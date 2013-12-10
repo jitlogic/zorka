@@ -16,6 +16,7 @@
 package com.jitlogic.zico.core;
 
 
+import com.jitlogic.zico.core.model.SymbolicExceptionInfo;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicException;
 import com.jitlogic.zorka.common.tracedata.SymbolicStackElement;
