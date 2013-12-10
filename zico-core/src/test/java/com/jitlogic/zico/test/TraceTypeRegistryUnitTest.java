@@ -18,6 +18,7 @@ package com.jitlogic.zico.test;
 import com.jitlogic.zico.core.TraceTypeRegistry;
 import com.jitlogic.zico.core.model.KeyValuePair;
 import com.jitlogic.zico.test.support.ZicoFixture;
+import com.jitlogic.zorka.common.tracedata.Symbol;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -54,10 +55,10 @@ public class TraceTypeRegistryUnitTest extends ZicoFixture {
     public void testReadAndQueryRegistry() {
         TraceTypeRegistry ttr = new TraceTypeRegistry(symbolRegistry, dataSource);
         assertThat(ttr.getTidMap(1)).hasSize(2)
-            .contains(new KeyValuePair("" + e, "EJB"), new KeyValuePair("" + h, "HTTP"));
+            .contains(new Symbol(e, "EJB"), new Symbol(h, "HTTP"));
 
         assertThat(ttr.getTidMap(null)).hasSize(3)
-            .contains(new KeyValuePair(""+e, "EJB"), new KeyValuePair(""+h, "HTTP"), new KeyValuePair(""+s, "SQL"));
+            .contains(new Symbol(e, "EJB"), new Symbol(h, "HTTP"), new Symbol(s, "SQL"));
     }
 
 
@@ -66,7 +67,7 @@ public class TraceTypeRegistryUnitTest extends ZicoFixture {
         TraceTypeRegistry ttr = new TraceTypeRegistry(symbolRegistry, dataSource);
 
         assertThat(ttr.getTidMap(1)).hasSize(2)
-            .contains(new KeyValuePair(""+e, "EJB"), new KeyValuePair(""+h, "HTTP"));
+            .contains(new Symbol(e, "EJB"), new Symbol(h, "HTTP"));
 
         assertEquals(0, (int)jdbc.queryForObject("select count(1) from TRACE_TYPES where HOST_ID = ? and TRACE_ID = ?",
                 Integer.class, 1, s));
@@ -74,9 +75,9 @@ public class TraceTypeRegistryUnitTest extends ZicoFixture {
         ttr.mark(s, 1);
 
         assertThat(ttr.getTidMap(1)).hasSize(3)
-            .contains(new KeyValuePair(""+e, "EJB"), new KeyValuePair(""+h, "HTTP"), new KeyValuePair(""+s, "SQL"));
+            .contains(new Symbol(e, "EJB"), new Symbol(h, "HTTP"), new Symbol(s, "SQL"));
 
-        assertEquals(1, (int)jdbc.queryForObject("select count(1) from TRACE_TYPES where HOST_ID = ? and TRACE_ID = ?",
+        assertEquals(1, (int) jdbc.queryForObject("select count(1) from TRACE_TYPES where HOST_ID = ? and TRACE_ID = ?",
                 Integer.class, 1, s));
 
     }

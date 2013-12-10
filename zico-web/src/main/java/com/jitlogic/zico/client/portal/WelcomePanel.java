@@ -27,6 +27,8 @@ import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.inject.PanelFactory;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.shared.data.KeyValueProxy;
+import com.jitlogic.zico.shared.data.SymbolProxy;
+import com.jitlogic.zorka.common.tracedata.Symbol;
 import com.sencha.gxt.widget.core.client.Portlet;
 import com.sencha.gxt.widget.core.client.button.ToolButton;
 import com.sencha.gxt.widget.core.client.container.PortalLayoutContainer;
@@ -171,9 +173,9 @@ public class WelcomePanel implements IsWidget {
 
 
     private void openTemplatePanel() {
-        rf.systemService().getTidMap().fire(new Receiver<List<KeyValueProxy>>() {
+        rf.systemService().getTidMap(null).fire(new Receiver<List<SymbolProxy>>() {
             @Override
-            public void onSuccess(List<KeyValueProxy> response) {
+            public void onSuccess(List<SymbolProxy> response) {
                 shell.get().addView(panelFactory.traceTemplatePanel(response), "Templates");
             }
         });

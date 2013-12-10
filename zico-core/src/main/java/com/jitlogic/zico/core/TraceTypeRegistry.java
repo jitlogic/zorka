@@ -24,6 +24,7 @@ import java.util.*;
 
 import com.google.inject.Singleton;
 import com.jitlogic.zico.core.model.KeyValuePair;
+import com.jitlogic.zorka.common.tracedata.Symbol;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -74,12 +75,12 @@ public class TraceTypeRegistry {
     }
 
 
-    public synchronized List<KeyValuePair> getTidMap(Integer host) {
-        List<KeyValuePair> kv = new ArrayList<KeyValuePair>(tids.size());
+    public synchronized List<Symbol> getTidMap(Integer host) {
+        List<Symbol> kv = new ArrayList<Symbol>(tids.size());
 
         for (Map.Entry<Integer, Set<Integer>> e : tids.entrySet()) {
             if (host == null || e.getValue().contains(host)) {
-                kv.add(new KeyValuePair(""+e.getKey(), symbols.symbolName(e.getKey())));
+                kv.add(new Symbol(e.getKey(), symbols.symbolName(e.getKey())));
             }
         }
 

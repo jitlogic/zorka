@@ -41,9 +41,11 @@ import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.shared.data.HostProxy;
 import com.jitlogic.zico.shared.data.KeyValueProxy;
 import com.jitlogic.zico.shared.data.PagingDataProxy;
+import com.jitlogic.zico.shared.data.SymbolProxy;
 import com.jitlogic.zico.shared.data.TraceInfoProxy;
 import com.jitlogic.zico.shared.data.TraceListFilterProxy;
 import com.jitlogic.zico.shared.services.TraceDataServiceProxy;
+import com.jitlogic.zorka.common.tracedata.Symbol;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style;
 import com.sencha.gxt.data.shared.LabelProvider;
@@ -517,13 +519,12 @@ public class TraceListPanel extends VerticalLayoutContainer {
     }
 
     private void loadTraceTypes() {
-        rf.systemService().getTidMap(selectedHost.getId()).fire(new Receiver<List<KeyValueProxy>>() {
+        rf.systemService().getTidMap(selectedHost.getId()).fire(new Receiver<List<SymbolProxy>>() {
             @Override
-            public void onSuccess(List<KeyValueProxy> response) {
-                for (KeyValueProxy e : response) {
-                    int tid = Integer.parseInt(e.getKey());
-                    traceTypes.put(tid, e.getValue());
-                    cmbTraceType.add(tid);
+            public void onSuccess(List<SymbolProxy> response) {
+                for (SymbolProxy e : response) {
+                    traceTypes.put(e.getId(), e.getName());
+                    cmbTraceType.add(e.getId());
                 }
             }
         });

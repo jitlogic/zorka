@@ -29,8 +29,10 @@ import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.client.props.TraceTemplateInfoProperties;
 import com.jitlogic.zico.shared.data.KeyValueProxy;
+import com.jitlogic.zico.shared.data.SymbolProxy;
 import com.jitlogic.zico.shared.data.TraceTemplateProxy;
 import com.jitlogic.zico.shared.services.SystemServiceProxy;
+import com.jitlogic.zorka.common.tracedata.Symbol;
 import com.sencha.gxt.core.client.Style;
 import com.sencha.gxt.data.shared.LabelProvider;
 import com.sencha.gxt.data.shared.ListStore;
@@ -79,7 +81,7 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
 
     @Inject
     public TraceTemplatePanel(ZicoRequestFactory rf, ErrorHandler errorHandler,
-                              @Assisted List<KeyValueProxy> tidMap) {
+                              @Assisted List<SymbolProxy> tidMap) {
 
         this.errorHandler = errorHandler;
         this.rf = rf;
@@ -279,14 +281,11 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
     }
 
 
-    private void loadTids(List<KeyValueProxy> tidMap) {
-        for (KeyValueProxy e : tidMap) {
-            // TODO this is a crutch; bug in RestyGWT/Jersey or use beans instead ?
-            int tid = Integer.parseInt(e.getKey());
-            String name = e.getValue();
-            ttidByName.put(name, tid);
-            ttidByType.put(tid, name);
-            cmbTraceType.add(tid);
+    private void loadTids(List<SymbolProxy> tidMap) {
+        for (SymbolProxy e : tidMap) {
+            ttidByName.put(e.getName(), e.getId());
+            ttidByType.put(e.getId(), e.getName());
+            cmbTraceType.add(e.getId());
         }
     }
 

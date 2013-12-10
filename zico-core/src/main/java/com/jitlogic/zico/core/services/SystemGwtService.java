@@ -20,6 +20,7 @@ import com.jitlogic.zico.core.*;
 import com.jitlogic.zico.core.locators.TraceTemplateManager;
 import com.jitlogic.zico.core.model.KeyValuePair;
 import com.jitlogic.zico.core.model.TraceTemplate;
+import com.jitlogic.zorka.common.tracedata.Symbol;
 
 import javax.inject.Inject;
 import java.lang.management.ManagementFactory;
@@ -91,11 +92,7 @@ public class SystemGwtService {
         return info;
     }
 
-    public List<KeyValuePair> getTidMap() {
-        return traceTypeRegistry.getTidMap(null);
-    }
-
-    public List<KeyValuePair> getTidMap(int hostId) {
+    public List<Symbol> getTidMap(Integer hostId) {
         return traceTypeRegistry.getTidMap(hostId);
     }
 
