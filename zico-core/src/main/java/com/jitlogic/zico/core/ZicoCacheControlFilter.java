@@ -43,41 +43,28 @@ public class ZicoCacheControlFilter implements Filter {
         return false;
     }
 
-    // This is workaround for a piece of shit called "Resteasy-Guice integration" which has broken scoping.
-    // Moving away from Resteasy will propably be proper solution here.
-    private static ThreadLocal<HttpServletRequest> requestTL = new ThreadLocal<HttpServletRequest>();
-
-    public static HttpServletRequest getRequest() {
-        return requestTL.get();
-    }
-
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        try {
-            if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
-                HttpServletRequest req = (HttpServletRequest) request;
-                HttpServletResponse res = (HttpServletResponse) response;
-                Date now = new Date();
-                res.setDateHeader("Date", now.getTime());
-                if (matches(CACHE_MATCHES, req.getRequestURI())) {
-                    res.setDateHeader("Expires", now.getTime() + DAY * 300);
-                    res.setHeader("Pragma", "no-cache");
-                    res.setHeader("Cache-control", "public, max-age=" + (DAY / 1000 * 300));
-                } else {
-                    res.setDateHeader("Expires", now.getTime() + DAY);
-                    res.setHeader("Pragma", "no-cache");
-                    res.setHeader("Cache-control", "no-cache, no-store, must-revalidate");
-                }
-                requestTL.set(req);
+        if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
+            HttpServletRequest req = (HttpServletRequest) request;
+            HttpServletResponse res = (HttpServletResponse) response;
+            Date now = new Date();
+            res.setDateHeader("Date", now.getTime());
+            if (matches(CACHE_MATCHES, req.getRequestURI())) {
+                res.setDateHeader("Expires", now.getTime() + DAY * 300);
+                res.setHeader("Pragma", "no-cache");
+                res.setHeader("Cache-control", "public, max-age=" + (DAY / 1000 * 300));
+            } else {
+                res.setDateHeader("Expires", now.getTime() + DAY);
+                res.setHeader("Pragma", "no-cache");
+                res.setHeader("Cache-control", "no-cache, no-store, must-revalidate");
             }
-            chain.doFilter(request, response);
-        } finally {
-            requestTL.remove();
         }
+        chain.doFilter(request, response);
     }
 
     @Override

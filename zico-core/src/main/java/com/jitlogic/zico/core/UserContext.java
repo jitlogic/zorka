@@ -15,22 +15,30 @@
  */
 package com.jitlogic.zico.core;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
 public class UserContext {
 
-    // TODO this is overriding standard mechanisms (along with ZicoCacheControlFilter thread local);
-    // TODO get rid of it as soon as standard guice request context stuff will work with resteasy
+    private Provider<HttpServletRequest> req;
+
+    @Inject
+    public UserContext(Provider<HttpServletRequest> req) {
+        this.req = req;
+    }
 
     public String getUser() {
-        return ZicoCacheControlFilter.getRequest().getRemoteUser();
+        return req.get().getRemoteUser();
     }
 
     public boolean isInRole(String role) {
-        return ZicoCacheControlFilter.getRequest() != null ?  ZicoCacheControlFilter.getRequest().isUserInRole(role) : true;
+        HttpServletRequest r = req.get();
+        return r != null ?  r.isUserInRole(role) : true;
     }
 
     public void checkAdmin() {
