@@ -27,7 +27,7 @@ public class DataReceptionUnitTest extends ZicoFixture {
 
     @Test
     public void testAcquireSingleStoreAndCheckIfItWorks() throws Exception {
-        HostStore store = storeManager.get("test", true);
+        HostStore store = hostStoreManager.get("test", true);
         SymbolRegistry symbols = store.getStoreManager().getSymbolRegistry();
         int t1 = symbols.symbolId("t1"), t2 = symbols.symbolId("t2");
 

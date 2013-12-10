@@ -18,12 +18,13 @@ package com.jitlogic.zico.test;
 import com.jitlogic.zico.core.model.TraceTemplate;
 import com.jitlogic.zico.test.support.ZicoFixture;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
 
 import static org.junit.Assert.*;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 public class TemplateManagerUnitTest extends ZicoFixture {
 
@@ -74,9 +75,8 @@ public class TemplateManagerUnitTest extends ZicoFixture {
         assertEquals(0, systemService.listTemplates().size());
     }
 
-    @Test @Ignore("To be fixed.")
+    @Test
     public void testSearchForEmptyTraceIdMap() {
-        //Map<Integer, String> ttids = traceDataService.getTidMap();
-        //assertEquals(0, ttids.size());
+        assertThat(systemService.getTidMap()).hasSize(0);
     }
 }

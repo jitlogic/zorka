@@ -15,8 +15,11 @@
  */
 package com.jitlogic.zico.core.inject;
 
+import com.google.inject.Binder;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.jitlogic.zico.core.UserContext;
+import com.jitlogic.zico.core.UserHttpContext;
 import com.jitlogic.zico.core.ZicoConfig;
 import com.jitlogic.zico.core.ZicoRuntimeException;
 import com.jitlogic.zico.core.inject.AbstractZicoModule;
@@ -26,6 +29,12 @@ import java.io.File;
 
 
 public class ProdZicoModule extends AbstractZicoModule {
+
+    @Override
+    public void configure(Binder binder) {
+        super.configure(binder);
+        binder.bind(UserContext.class).to(UserHttpContext.class);
+    }
 
     @Provides
     @Singleton

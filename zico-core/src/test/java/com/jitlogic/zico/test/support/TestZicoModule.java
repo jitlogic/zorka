@@ -16,7 +16,9 @@
 package com.jitlogic.zico.test.support;
 
 
+import com.google.inject.Binder;
 import com.google.inject.Provides;
+import com.jitlogic.zico.core.UserContext;
 import com.jitlogic.zico.core.inject.AbstractZicoModule;
 import com.jitlogic.zico.core.ZicoConfig;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -30,6 +32,12 @@ public class TestZicoModule extends AbstractZicoModule {
 
     public TestZicoModule(ZicoConfig config) {
         this.config = config;
+    }
+
+    @Override
+    public void configure(Binder binder) {
+        super.configure(binder);
+        binder.bind(UserContext.class).to(UserTestContext.class);
     }
 
     @Provides

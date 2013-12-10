@@ -16,33 +16,56 @@
 package com.jitlogic.zico.core.model;
 
 
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 public class KeyValuePair {
 
     private String key;
-
     private String value;
 
-    public KeyValuePair() { }
 
     public KeyValuePair(String key, String value) {
         this.key = key;
         this.value = value;
     }
 
+
     public String getKey() {
         return key;
     }
+
 
     public void setKey(String name) {
         this.key = name;
     }
 
+
     public String getValue() {
         return value;
     }
 
+
     public void setValue(String value) {
         this.value = value;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof KeyValuePair
+            && ZorkaUtil.objEquals(key, ((KeyValuePair)obj).key)
+            && ZorkaUtil.objEquals(value, ((KeyValuePair)obj).value);
+    }
+
+
+    @Override
+    public int hashCode() {
+        return 17 * key.hashCode() + 31 * value.hashCode();
+    }
+
+
+    @Override
+    public String toString() {
+        return "['" + key + "','" + value + "']";
     }
 }

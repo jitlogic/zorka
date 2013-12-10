@@ -16,12 +16,15 @@
 package com.jitlogic.zico.test;
 
 import com.jitlogic.zico.core.TraceTypeRegistry;
+import com.jitlogic.zico.core.model.KeyValuePair;
 import com.jitlogic.zico.test.support.ZicoFixture;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 import static org.junit.Assert.*;
 
@@ -31,6 +34,7 @@ public class TraceTypeRegistryUnitTest extends ZicoFixture {
     private int e;
     private int h;
     private int s;
+
 
     @Before
     public void initTraceTypesTable() {
@@ -45,22 +49,35 @@ public class TraceTypeRegistryUnitTest extends ZicoFixture {
         }
     }
 
-    @Test @Ignore("To be fixed.")
+
+    @Test
     public void testReadAndQueryRegistry() {
         TraceTypeRegistry ttr = new TraceTypeRegistry(symbolRegistry, dataSource);
-        assertEquals(ZorkaUtil.<Integer, String>map(e, "EJB", h, "HTTP"), ttr.getTidMap(1));
-        assertEquals(ZorkaUtil.<Integer, String>map(e, "EJB", h, "HTTP", s, "SQL"), ttr.getTidMap(null));
+        assertThat(ttr.getTidMap(1)).hasSize(2)
+            .contains(new KeyValuePair("" + e, "EJB"), new KeyValuePair("" + h, "HTTP"));
+
+        assertThat(ttr.getTidMap(null)).hasSize(3)
+            .contains(new KeyValuePair(""+e, "EJB"), new KeyValuePair(""+h, "HTTP"), new KeyValuePair(""+s, "SQL"));
     }
 
-    @Test @Ignore("TO be fixed.")
+
+    @Test
     public void testMarkNewTraceHostPairsAndCheckIfRememberedAndSaved() {
         TraceTypeRegistry ttr = new TraceTypeRegistry(symbolRegistry, dataSource);
 
-        assertEquals(ZorkaUtil.<Integer, String>map(e, "EJB", h, "HTTP"), ttr.getTidMap(1));
-        assertEquals(0, jdbc.queryForInt("select count(1) from TRACE_TYPES where HOST_ID = ? and TRACE_ID = ?", 1, s));
+        assertThat(ttr.getTidMap(1)).hasSize(2)
+            .contains(new KeyValuePair(""+e, "EJB"), new KeyValuePair(""+h, "HTTP"));
+
+        assertEquals(0, (int)jdbc.queryForObject("select count(1) from TRACE_TYPES where HOST_ID = ? and TRACE_ID = ?",
+                Integer.class, 1, s));
+
         ttr.mark(s, 1);
-        assertEquals(ZorkaUtil.<Integer, String>map(e, "EJB", h, "HTTP", s, "SQL"), ttr.getTidMap(1));
-        assertEquals(1, jdbc.queryForInt("select count(1) from TRACE_TYPES where HOST_ID = ? and TRACE_ID = ?", 1, s));
+
+        assertThat(ttr.getTidMap(1)).hasSize(3)
+            .contains(new KeyValuePair(""+e, "EJB"), new KeyValuePair(""+h, "HTTP"), new KeyValuePair(""+s, "SQL"));
+
+        assertEquals(1, (int)jdbc.queryForObject("select count(1) from TRACE_TYPES where HOST_ID = ? and TRACE_ID = ?",
+                Integer.class, 1, s));
 
     }
 }

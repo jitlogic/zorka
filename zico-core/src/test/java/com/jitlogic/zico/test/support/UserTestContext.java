@@ -13,13 +13,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core;
+package com.jitlogic.zico.test.support;
 
+import com.google.inject.Singleton;
+import com.jitlogic.zico.core.UserContext;
 
-public interface UserContext {
-    String getUser();
+@Singleton
+public class UserTestContext implements UserContext {
+    @Override
+    public String getUser() {
+        return "test";
+    }
 
-    boolean isInRole(String role);
+    @Override
+    public boolean isInRole(String role) {
+        return true;
+    }
 
-    void checkAdmin();
+    @Override
+    public void checkAdmin() {
+    }
 }

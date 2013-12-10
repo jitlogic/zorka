@@ -25,7 +25,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import static org.junit.Assert.*;
 
-public class RoofDataApiUnitTest extends ZicoFixture {
+public class TraceDataApi1UnitTests extends ZicoFixture {
 
 
     private int hostId;
@@ -54,8 +54,8 @@ public class RoofDataApiUnitTest extends ZicoFixture {
     }
 
 
-    @Test @Ignore("TODO test HostGwtService instead")
+    @Test
     public void testListHostsViaApi() {
-        //assertEquals(1, traceDataService.getHosts().size());
+        assertEquals(1, hostService.findAll().size());
     }
 }

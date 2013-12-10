@@ -19,6 +19,7 @@ package com.jitlogic.zico.test.support;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.jitlogic.zico.core.*;
+import com.jitlogic.zico.core.services.HostGwtService;
 import com.jitlogic.zico.core.services.SystemGwtService;
 import com.jitlogic.zico.core.services.TraceDataGwtService;
 import com.jitlogic.zorka.common.test.support.TestUtil;
@@ -38,11 +39,12 @@ public class ZicoFixture {
     private Properties configProperties;
 
     protected ZicoConfig config;
-    protected HostStoreManager storeManager;
+    protected HostStoreManager hostStoreManager;
     protected ZicoService zicoService;
 
     protected TraceDataGwtService traceDataService;
     protected SystemGwtService systemService;
+    protected HostGwtService hostService;
 
     protected SymbolRegistry symbolRegistry;
     protected TraceTypeRegistry traceTypeRegistry;
@@ -81,12 +83,13 @@ public class ZicoFixture {
 
         dataSource = injector.getInstance(BasicDataSource.class);
 
-        storeManager = injector.getInstance(HostStoreManager.class);
+        hostStoreManager = injector.getInstance(HostStoreManager.class);
         zicoService = injector.getInstance(ZicoService.class);
         zicoService.start();
 
         traceDataService = injector.getInstance(TraceDataGwtService.class);
         systemService = injector.getInstance(SystemGwtService.class);
+        hostService = injector.getInstance(HostGwtService.class);
 
         symbolRegistry = injector.getInstance(SymbolRegistry.class);
         traceTypeRegistry = injector.getInstance(TraceTypeRegistry.class);
@@ -97,7 +100,7 @@ public class ZicoFixture {
     @After
     public void tearDownZicoFixture() throws Exception {
         zicoService.stop();
-        storeManager.close();
+        hostStoreManager.close();
         dataSource.close();
     }
 

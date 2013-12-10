@@ -141,7 +141,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
     }
 
 
-    public synchronized void updateInfo(ResultSet rs) throws SQLException {
+    public synchronized HostStore updateInfo(ResultSet rs) throws SQLException {
         hostInfo.setId(rs.getInt("HOST_ID"));
         hostInfo.setName(rs.getString("HOST_NAME"));
         hostInfo.setAddr(rs.getString("HOST_ADDR"));
@@ -150,15 +150,17 @@ public class HostStore implements Closeable, RDSCleanupListener {
         hostInfo.setFlags(rs.getInt("HOST_FLAGS"));
         hostInfo.setMaxSize(rs.getLong("MAX_SIZE"));
         hostInfo.setDescription(rs.getString("HOST_DESC"));
+        return this;
     }
 
 
-    public synchronized void updateInfo(HostInfo info) {
+    public synchronized HostStore updateInfo(HostInfo info) {
         hostInfo.setAddr(info.getAddr());
         hostInfo.setPass(info.getPass());
         hostInfo.setFlags(info.getFlags());
         hostInfo.setMaxSize(info.getMaxSize());
         hostInfo.setDescription(info.getDescription());
+        return this;
     }
 
 
