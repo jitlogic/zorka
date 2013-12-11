@@ -124,7 +124,7 @@ public class TraceDataApiUnitTest extends ZicoFixture {
     @Test
     public void testListTraceRoot() throws Exception {
         int hostId = hostStoreManager.getOrCreateHost("test", "").getHostInfo().getId();
-        List<TraceRecordInfo> lst = traceDataService.listRecords(hostId, 0, 0, "");
+        List<TraceRecordInfo> lst = traceDataService.listRecords(hostId, 0, 0, "", false);
         assertNotNull(lst);
     }
 }

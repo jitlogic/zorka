@@ -40,21 +40,24 @@ public class MethodDetailCell extends AbstractCell<TraceRecordProxy> {
         }
         if (tr.getExceptionInfo() != null) {
             SymbolicExceptionProxy e = tr.getExceptionInfo();
-            sb.appendHtmlConstant("<div><span style=\"color: red;\">");
+            //style="font-family: tahoma,arial,verdana,sans-serif !important;font-size: 11px !important;"
+            //style="font-family: tahoma,arial,verdana,sans-serif;font-size: 11px;"
+            sb.appendHtmlConstant("<div><span style=\"color: red;font-family: tahoma,arial,verdana,sans-serif;font-size: 11px;\">");
             sb.append(SafeHtmlUtils.fromString("Caught: " + e.getExClass()));
-            sb.appendHtmlConstant("</span></div><div><b>");
+            sb.appendHtmlConstant("</span></div>");
+            sb.appendHtmlConstant("<div style=\"font-family: tahoma,arial,verdana,sans-serif;font-size: 11px;\"><b>");
             sb.append(SafeHtmlUtils.fromString("" + e.getMessage()));
             sb.appendHtmlConstant("</b></div>");
             int i = 0;
             for (String s : e.getStackTrace()) {
-                sb.appendHtmlConstant("<div>");
+                sb.appendHtmlConstant("<div style=\"font-family: tahoma,arial,verdana,sans-serif;font-size: 11px;\">");
                 sb.append(SafeHtmlUtils.fromString("" + s));
                 sb.appendHtmlConstant("</div>");
                 i++;
                 if (i > 5) {
-                    sb.appendHtmlConstant("<div>");
-                    sb.append(SafeHtmlUtils.fromString("...      (open method attributes window to see full stack trace)"));
-                    sb.appendHtmlConstant("</div>");
+                    sb.appendHtmlConstant("<div style=\"font-family: tahoma,arial,verdana,sans-serif;font-size: 11px;\"><b>");
+                    sb.append(SafeHtmlUtils.fromString("...  (double click on this method to see details)"));
+                    sb.appendHtmlConstant("</b></div>");
                     break;
                 }
             }

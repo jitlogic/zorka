@@ -88,6 +88,8 @@ public class MethodAttrsDialog extends Dialog {
 
         StringBuilder sb = new StringBuilder();
 
+        sb.append(tr.getMethod() + "\n\n");
+
         if (tr.getAttributes() != null) {
             for (KeyValueProxy e : tr.getAttributes()) {
                 String key = e.getKey(), val = e.getValue() != null ? e.getValue() : "";
@@ -135,7 +137,7 @@ public class MethodAttrsDialog extends Dialog {
             lblAttrName.setText("Selected attribute: " + attrs.get(0)[0]);
             txtAttrVal.setText(attrs.get(0)[1]);
         } else {
-            txtAttrVal.setText("This method has no attributes and hasn't thrown any exception.");
+            txtAttrVal.setText(tr.getMethod() + "\n\n" + "This method has no attributes and hasn't thrown any exception.");
         }
     }
 

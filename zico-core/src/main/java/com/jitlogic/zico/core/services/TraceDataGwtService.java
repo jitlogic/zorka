@@ -83,7 +83,7 @@ public class TraceDataGwtService {
     }
 
 
-    public List<TraceRecordInfo> listRecords(int hostId, long traceOffs, long minTime, String path) {
+    public List<TraceRecordInfo> listRecords(int hostId, long traceOffs, long minTime, String path, boolean recursive) {
 
         // TODO this is propably useless now ...
         if ("null".equals(path)) {
@@ -96,14 +96,27 @@ public class TraceDataGwtService {
         List<TraceRecordInfo> lst = new ArrayList<TraceRecordInfo>();
 
         if (path != null) {
-            for (int i = 0; i < tr.numChildren(); i++) {
-                lst.add(ctx.packTraceRecord(tr.getChild(i), path.length() > 0 ? (path + "/" + i) : "" + i, 250));
-            }
+            packRecords(path, ctx, tr, lst, recursive);
         } else {
             lst.add(ctx.packTraceRecord(tr, "", 250));
+            if (recursive) {
+                packRecords("", ctx, tr, lst, recursive);
+            }
         }
 
         return lst;
+    }
+
+
+    private void packRecords(String path, TraceRecordStore ctx, TraceRecord tr, List<TraceRecordInfo> lst, boolean recursive) {
+        for (int i = 0; i < tr.numChildren(); i++) {
+            TraceRecord child = tr.getChild(i);
+            String childPath = path.length() > 0 ? (path + "/" + i) : "" + i;
+            lst.add(ctx.packTraceRecord(child, childPath, 250));
+            if (recursive && child.numChildren() > 0) {
+                packRecords(childPath, ctx, child, lst, recursive);
+            }
+        }
     }
 
 

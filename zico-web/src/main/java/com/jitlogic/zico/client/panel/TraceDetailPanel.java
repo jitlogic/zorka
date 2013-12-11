@@ -206,10 +206,11 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
     }
 
     private void doSearch() {
-        if (searchDialog == null) {
-            searchDialog = panelFactory.traceRecordSearchDialog(this, traceInfo);
-        }
-        searchDialog.show();
+// Nieczynne.
+//        if (searchDialog == null) {
+//            searchDialog = panelFactory.traceRecordSearchDialog(this, traceInfo);
+//        }
+//        searchDialog.show();
     }
 
 
@@ -297,7 +298,7 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
             @Override
             public void load(TraceRecordProxy parent, final Callback<List<TraceRecordProxy>, Throwable> callback) {
                 rf.traceDataService().listRecords(traceInfo.getHostId(), traceInfo.getDataOffs(), minMethodTime,
-                        parent != null ? parent.getPath() : null).fire(new Receiver<List<TraceRecordProxy>>() {
+                        parent != null ? parent.getPath() : null, false).fire(new Receiver<List<TraceRecordProxy>>() {
                     @Override
                     public void onSuccess(List<TraceRecordProxy> records) {
                         callback.onSuccess(records);
@@ -416,17 +417,19 @@ public class TraceDetailPanel extends VerticalLayoutContainer {
         mnuSearchMethods.setIcon(Resources.INSTANCE.searchIcon());
         menu.add(mnuSearchMethods);
 
-        mnuSearchMethods.addSelectionHandler(new SelectionHandler<Item>() {
-            @Override
-            public void onSelection(SelectionEvent<Item> event) {
-                TraceRecordProxy tr = methodTree.getSelectionModel().getSelectedItem();
-                if (searchDialog == null) {
-                    searchDialog = panelFactory.traceRecordSearchDialog(TraceDetailPanel.this, traceInfo);
-                }
-                searchDialog.setRootPath(tr != null ? tr.getPath() : "");
-                searchDialog.show();
-            }
-        });
+// Nieczynne.
+//        mnuSearchMethods.addSelectionHandler(new SelectionHandler<Item>() {
+//            @Override
+//            public void onSelection(SelectionEvent<Item> event) {
+//            }
+//                TraceRecordProxy tr = methodTree.getSelectionModel().getSelectedItem();
+//                if (searchDialog == null) {
+//                    searchDialog = panelFactory.traceRecordSearchDialog(TraceDetailPanel.this, traceInfo);
+//                }
+//                searchDialog.setRootPath(tr != null ? tr.getPath() : "");
+//                searchDialog.show();
+//            }
+//        });
 
 
         MenuItem mnuMethodAttrs = new MenuItem("Method Details");

@@ -70,7 +70,7 @@ public class TraceRecordSearchDialog extends Dialog {
     private TraceInfoProxy trace;
     private String rootPath = "";
 
-    private TraceDetailPanel panel;
+    private TraceCallTreePanel panel;
     private ZicoRequestFactory rf;
 
     private ListStore<TraceRecordProxy> resultsStore;
@@ -94,7 +94,7 @@ public class TraceRecordSearchDialog extends Dialog {
 
     @Inject
     public TraceRecordSearchDialog(ZicoRequestFactory rf, ErrorHandler errorHandler,
-                                   @Assisted TraceDetailPanel panel, @Assisted TraceInfoProxy trace) {
+                                   @Assisted TraceCallTreePanel panel, @Assisted TraceInfoProxy trace) {
 
         this.rf = rf;
         this.trace = trace;
@@ -332,7 +332,7 @@ public class TraceRecordSearchDialog extends Dialog {
 
         expr.setSearchExpr(txtSearchFilter.getCurrentValue());
 
-        rf.traceDataService().searchRecords(trace.getHostId(), trace.getDataOffs(), 0, rootPath, expr).fire(
+        req.searchRecords(trace.getHostId(), trace.getDataOffs(), 0, rootPath, expr).fire(
                 new Receiver<TraceRecordSearchProxy>() {
                     @Override
                     public void onSuccess(TraceRecordSearchProxy response) {

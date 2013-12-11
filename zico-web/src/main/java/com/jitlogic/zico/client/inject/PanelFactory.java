@@ -20,6 +20,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.jitlogic.zico.client.panel.MethodAttrsDialog;
 import com.jitlogic.zico.client.panel.MethodRankingPanel;
 import com.jitlogic.zico.client.panel.PasswordChangeDialog;
+import com.jitlogic.zico.client.panel.TraceCallTreePanel;
 import com.jitlogic.zico.client.panel.TraceDetailPanel;
 import com.jitlogic.zico.client.panel.TraceListPanel;
 import com.jitlogic.zico.client.panel.TraceRecordSearchDialog;
@@ -37,9 +38,11 @@ public interface PanelFactory {
 
     public TraceDetailPanel traceDetailPanel(TraceInfoProxy traceInfo);
 
+    public TraceCallTreePanel traceCallTreePanel(TraceInfoProxy traceInfo);
+
     public TraceTemplatePanel traceTemplatePanel(List<SymbolProxy> tidMap);
 
-    public TraceRecordSearchDialog traceRecordSearchDialog(TraceDetailPanel panel, TraceInfoProxy trace);
+    public TraceRecordSearchDialog traceRecordSearchDialog(TraceCallTreePanel panel, TraceInfoProxy trace);
 
     public MethodAttrsDialog methodAttrsDialog(Integer hostId, Long dataOffs, String path, @Assisted("minTime") Long minTime);
 

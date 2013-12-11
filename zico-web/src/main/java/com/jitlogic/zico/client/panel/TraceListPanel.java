@@ -244,10 +244,18 @@ public class TraceListPanel extends VerticalLayoutContainer {
         add(traceGrid, new VerticalLayoutData(1, 1));
     }
 
-    private void openDetailView() {
+    private void openCallTreeView() {
         TraceInfoProxy traceInfo = traceGrid.getSelectionModel().getSelectedItem();
         if (traceInfo != null) {
             TraceDetailPanel detail = panelFactory.traceDetailPanel(traceInfo);
+            shell.get().addView(detail, ClientUtil.formatTimestamp(traceInfo.getClock()) + "@" + selectedHost.getName());
+        }
+    }
+
+    private void openDetailView() {
+        TraceInfoProxy traceInfo = traceGrid.getSelectionModel().getSelectedItem();
+        if (traceInfo != null) {
+            TraceCallTreePanel detail = panelFactory.traceCallTreePanel(traceInfo);
             shell.get().addView(detail, ClientUtil.formatTimestamp(traceInfo.getClock()) + "@" + selectedHost.getName());
         }
     }
@@ -497,6 +505,17 @@ public class TraceListPanel extends VerticalLayoutContainer {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
                 openDetailView();
+            }
+        });
+
+        MenuItem mnuCallTree =  new MenuItem("Method call tree (old)");
+        mnuCallTree.setIcon(Resources.INSTANCE.methodTreeIcon());
+        menu.add(mnuCallTree);
+
+        mnuCallTree.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                openCallTreeView();
             }
         });
 

@@ -28,7 +28,6 @@ public class ZicoEP implements EntryPoint {
     private ZicoShell shell;
     private ClientGinjector injector = GWT.create(ClientGinjector.class);
 
-
     public void onModuleLoad() {
 
         Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {

@@ -42,7 +42,7 @@ public interface TraceDataServiceProxy extends RequestContext {
 
     Request<TraceRecordProxy> getRecord(int hostId, long traceOffs, long minTime, String path);
 
-    Request<List<TraceRecordProxy>> listRecords(int hostId, long traceOffs, long minTime, String path);
+    Request<List<TraceRecordProxy>> listRecords(int hostId, long traceOffs, long minTime, String path, boolean recursive);
 
     Request<TraceRecordSearchProxy> searchRecords(int hostId, long traceOffs, long minTime, String path,
                                                   TraceDetailSearchProxy expr);

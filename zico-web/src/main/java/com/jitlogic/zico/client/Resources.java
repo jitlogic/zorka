@@ -21,8 +21,15 @@ import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.DataResource;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.resources.client.TextResource;
+import com.google.gwt.user.cellview.client.DataGrid;
 
 public interface Resources extends ClientBundle {
+
+
+    public static interface ZicoDataGridCssResources extends DataGrid.Resources {
+        @Source({DataGrid.Style.DEFAULT_CSS, "resources/ZicoDataGrid.css"})
+        DataGrid.Style dataGridStyle();
+    }
 
     public final static Resources INSTANCE = GWT.create(Resources.class);
 
@@ -47,11 +54,17 @@ public interface Resources extends ClientBundle {
     @Source("images/go-down-search.png")
     ImageResource goDownIcon();
 
+    @Source("images/go-up-search.png")
+    ImageResource goUpIcon();
+
     @Source("images/exception-thrown.png")
     ImageResource exceptionIcon();
 
     @Source("images/expand.png")
     ImageResource expandIcon();
+
+    @Source("images/lightning-go.png")
+    ImageResource ligtningGo();
 
     @Source("images/add.png")
     ImageResource addIcon();
@@ -106,6 +119,15 @@ public interface Resources extends ClientBundle {
 
     @Source("images/key.png")
     ImageResource keyIcon();
+
+    @Source("images/zoom-in-5.png")
+    ImageResource zoomIn();
+
+    @Source("images/zoom-out-5.png")
+    ImageResource zoomOut();
+
+    @Source("images/attachment.png")
+    ImageResource attachment();
 
     @DataResource.MimeType("text/html")
     @Source("resources/tips.html")
