@@ -31,9 +31,12 @@ if (zorka.boolCfg("tracer")) {
         "org.exoplatform.groovyscript.**",
         "org.exoplatform.services.jcr.**",
         "org.exoplatform.services.log.**",
+        "org.gatein.common.logging.**",
+        "org.gatein.common.text.**",
+        "org.gatein.common.util.**",
+        "org.gatein.pc.api.**",
         "org.gatein.pc.portlet.impl.jsr168.**",
         "org.jboss.cache.**",
-        "org.gatein.common.text.**",
         "org.picketlink.idm.impl.configuration.jaxb2.generated.**"
     );
 }

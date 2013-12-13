@@ -15,8 +15,12 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("jvm.bsh");
-zorka.require("http.bsh");
+zorka.require(
+  "jvm.bsh",
+  "http.bsh",
+  "javax.bsh",
+  "eclipse/eclipse.bsh"
+);
 
 __jetty() {
 
@@ -52,11 +56,11 @@ __jetty() {
         spy.longerThan(zorka.longCfg("http.slow.time")),
         spy.strTime("TIME"),
         spy.trapperCollector(http.slow_ft, zorka.INFO, "HTTP", zorka.stringCfg("http.slow.format"))) : null,
-      http._error ? spy.subchain(
+      spy.subchain(
         spy.valSetFilter("STATUS", http._errors),
         http.error_marker(),
         http._trace ? tracer.flags(tracer.ERROR_MARK|tracer.SUBMIT_TRACE) : null,
-        spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format"))) : null,
+        http._error ? spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format")): null),
       http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
     .include(
       spy.byMethod("org.mortbay.jetty.servlet.ServletHandler", "doHandle"),
@@ -67,7 +71,8 @@ __jetty() {
       "org.eclipse.jetty.util.**",
       "org.eclipse.jetty.http.Http*",
       "org.eclipse.jetty.server.Response",
-      "org.eclipse.jetty.server.HttpOutput"
+      "org.eclipse.jetty.server.HttpOutput",
+      "org.eclipse.jetty.webapp.WebAppClassLoader/loadClass"
     );
   }
 

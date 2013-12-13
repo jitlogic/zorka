@@ -44,6 +44,7 @@ if (zorka.boolCfg("tracer")) {
         "org.apache.struts.**",
         "org.apache.synapse.transport.nhttp.ServerWorker$1/compare",
         "org.apache.taglibs.standard.**",
+        "org.apache.tika.mime.**",
         "org.apache.tiles.**",
         "org.apache.velocity.**",
         "org.apache.webbeans.util.**",
