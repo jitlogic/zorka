@@ -16,7 +16,6 @@
 package com.jitlogic.zico.client.panel;
 
 
-import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.dom.builder.shared.DivBuilder;
 import com.google.gwt.dom.builder.shared.TableCellBuilder;
@@ -30,6 +29,7 @@ import com.google.gwt.user.cellview.client.RowStyles;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.view.client.SelectionModel;
+import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.shared.data.TraceRecordProxy;
 
 import java.util.Set;
@@ -37,14 +37,13 @@ import java.util.Set;
 public class TraceCallTableBuilder extends AbstractCellTableBuilder<TraceRecordProxy> {
 
     private final String evenRowStyle;
-    private final String oddRowStyle;
     private final String selectedRowStyle;
     private final String cellStyle;
     private final String evenCellStyle;
-    private final String oddCellStyle;
     private final String firstColumnStyle;
     private final String lastColumnStyle;
     private final String selectedCellStyle;
+    private final String extenderCellStyle;
 
 
     private Set<String> expandedDetails;
@@ -62,14 +61,13 @@ public class TraceCallTableBuilder extends AbstractCellTableBuilder<TraceRecordP
         // Cache styles for faster access.
         AbstractCellTable.Style style = cellTable.getResources().style();
         evenRowStyle = style.evenRow();
-        oddRowStyle = style.oddRow();
         selectedRowStyle = " " + style.selectedRow();
         cellStyle = style.cell();
         evenCellStyle = " " + style.evenRowCell();
-        oddCellStyle = " " + style.oddRowCell();
         firstColumnStyle = " " + style.firstColumn();
         lastColumnStyle = " " + style.lastColumn();
         selectedCellStyle = " " + style.selectedRowCell();
+        extenderCellStyle = Resources.INSTANCE.zicoCssResources().methodDetailCell();
 
         this.colDetails = new IdentityColumn<TraceRecordProxy>(new MethodDetailCell());
         this.expandedDetails = expandedDetails;
@@ -104,9 +102,10 @@ public class TraceCallTableBuilder extends AbstractCellTableBuilder<TraceRecordP
     private void buildDetailRow(TraceRecordProxy value, int absRowIndex, boolean isSelected, String trClasses) {
         TableRowBuilder tr = startRow();
         tr.className(trClasses);
-        TableCellBuilder td = tr.startTD().colSpan(cellTable.getColumnCount());
-        DivBuilder div = td.startDiv();
-        div.style().outlineStyle(Style.OutlineStyle.NONE).endStyle();
+        tr.startTD().endTD();
+        TableCellBuilder td = tr.startTD().colSpan(cellTable.getColumnCount()-1);
+        DivBuilder div = td.startDiv().className(extenderCellStyle);
+        //div.style().outlineStyle(Style.OutlineStyle.NONE).endStyle();
         this.renderCell(div, createContext(1), colDetails, value);
         div.endDiv();
         td.endTD();
@@ -161,7 +160,7 @@ public class TraceCallTableBuilder extends AbstractCellTableBuilder<TraceRecordP
 
             // Add the inner div.
             DivBuilder div = td.startDiv();
-            div.style().outlineStyle(Style.OutlineStyle.NONE).height(18, Style.Unit.PX).endStyle();
+            div.style().outlineStyle(Style.OutlineStyle.NONE).height(14, Style.Unit.PX).endStyle();
 
             // Render the cell into the div.
             renderCell(div, context, column, rowValue);

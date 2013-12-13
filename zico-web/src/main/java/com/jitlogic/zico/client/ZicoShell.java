@@ -42,11 +42,13 @@ public class ZicoShell extends BorderLayoutContainer {
     private final static int DX = 0;
     private final static int DY = 0;
 
+
     public static final Resources.ZicoDataGridCssResources ZICO_DATA_GRID_CSS_RESOURCES
             = GWT.create(Resources.ZicoDataGridCssResources.class);
 
     static {
         ZICO_DATA_GRID_CSS_RESOURCES.dataGridStyle().ensureInjected();
+        Resources.INSTANCE.zicoCssResources().ensureInjected();
     }
 
 

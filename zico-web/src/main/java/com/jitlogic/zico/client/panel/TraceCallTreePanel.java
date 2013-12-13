@@ -18,11 +18,10 @@ package com.jitlogic.zico.client.panel;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.cell.client.Cell;
-import com.google.gwt.cell.client.CompositeCell;
-import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.cell.client.HasCell;
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.dom.client.BrowserEvents;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.EventTarget;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
@@ -33,6 +32,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.DataGrid;
+import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.IdentityColumn;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -53,7 +53,6 @@ import com.jitlogic.zico.shared.data.TraceRecordProxy;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
-import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor;
 import com.sencha.gxt.widget.core.client.form.SpinnerField;
 import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
@@ -86,7 +85,7 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
 
     private Set<String> expandedDetails = new HashSet<String>();
 
-    private SpinnerField<Double> txtDuration;
+    //private SpinnerField<Double> txtDuration;
 
     private TextButton btnSearchPrev;
     private TextButton btnSearchNext;
@@ -96,6 +95,7 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
     private List<TraceRecordProxy> searchResults = new ArrayList<TraceRecordProxy>();
     private int curentSearchResultIdx = -1;
     private TextButton btnExpandAll;
+
 
     @Inject
     public TraceCallTreePanel(ZicoRequestFactory rf, PanelFactory panelFactory, @Assisted TraceInfoProxy trace) {
@@ -217,70 +217,44 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
         add(toolBar, new VerticalLayoutData(1, -1));
     }
 
+    private final static String SMALL_CELL_CSS = Resources.INSTANCE.zicoCssResources().traceSmallCell();
 
     private void createCallTreeGrid() {
         grid = new DataGrid<TraceRecordProxy>(1024*1024, KEY_PROVIDER);
         selection = new SingleSelectionModel<TraceRecordProxy>(KEY_PROVIDER);
         grid.setSelectionModel(selection);
 
-        List<HasCell<TraceRecordProxy,?>> subCells = new ArrayList<HasCell<TraceRecordProxy, ?>>();
-
-        subCells.add(new HasIdentityCell<TraceRecordProxy>(TREE_SPACER_CELL));
-        subCells.add(new HasIdentityCell<TraceRecordProxy>(SUBTREE_EXPAND_CELL));
-        subCells.add(new HasIdentityCell<TraceRecordProxy>(METHOD_NAME_CELL));
-        //subCells.add(new HasIdentityCell<TraceRecordProxy>(DETAIL_EXPAND_CELL));
-
         Column<TraceRecordProxy, TraceRecordProxy> colExpander
                 = new IdentityColumn<TraceRecordProxy>(DETAIL_EXPANDER_CELL);
-        grid.addColumn(colExpander, " ");
+        grid.addColumn(colExpander, "#");
         grid.setColumnWidth(colExpander, 32, Style.Unit.PX);
 
         Column<TraceRecordProxy, TraceRecordProxy> colMethodName
-                = new IdentityColumn<TraceRecordProxy>(new CompositeCell<TraceRecordProxy>(subCells));
+                = new IdentityColumn<TraceRecordProxy>(METHOD_TREE_CELL);
         grid.addColumn(colMethodName, "Method");
         grid.setColumnWidth(colMethodName, 100, Style.Unit.PCT);
 
 
-        Column<TraceRecordProxy, String> colTime =
-            new Column<TraceRecordProxy, String>(SMALL_TEXT_CELL) {
-                @Override
-                public String getValue(TraceRecordProxy rec) {
-                    return ClientUtil.formatDuration(rec.getTime());
-                }
-            };
+        Column<TraceRecordProxy, TraceRecordProxy> colTime =
+            new IdentityColumn<TraceRecordProxy>(METHOD_TIME_CELL);
         grid.addColumn(colTime, "Time");
         grid.setColumnWidth(colTime, 60, Style.Unit.PX);
 
 
-        Column<TraceRecordProxy, String> colCalls =
-            new Column<TraceRecordProxy, String>(SMALL_TEXT_CELL) {
-                @Override
-                public String getValue(TraceRecordProxy rec) {
-                    return ""+rec.getCalls();
-                }
-            };
+        Column<TraceRecordProxy, TraceRecordProxy> colCalls =
+            new IdentityColumn<TraceRecordProxy>(METHOD_CALLS_CELL);
         grid.addColumn(colCalls, "Calls");
         grid.setColumnWidth(colCalls, 60, Style.Unit.PX);
 
 
-        Column<TraceRecordProxy, String> colErrors =
-            new Column<TraceRecordProxy, String>(SMALL_TEXT_CELL) {
-                @Override
-                public String getValue(TraceRecordProxy rec) {
-                    return ""+rec.getErrors();
-                }
-            };
+        Column<TraceRecordProxy, TraceRecordProxy> colErrors =
+            new IdentityColumn<TraceRecordProxy>(METHOD_ERRORS_CELL);
         grid.addColumn(colErrors, "Errors");
         grid.setColumnWidth(colErrors, 60, Style.Unit.PX);
 
-        Column<TraceRecordProxy, String> colPct =
-            new Column<TraceRecordProxy, String>(SMALL_TEXT_CELL) {
-                @Override
-                public String getValue(TraceRecordProxy rec) {
-                    double pct = 100.0 * rec.getTime() / trace.getExecutionTime();
-                    return NumberFormat.getFormat("###.0").format(pct) + "%";
-                }
-            };
+
+        Column<TraceRecordProxy, TraceRecordProxy> colPct =
+            new IdentityColumn<TraceRecordProxy>(METHOD_PCT_CELL);
         grid.addColumn(colPct, "Pct");
         grid.setColumnWidth(colPct, 60, Style.Unit.PX);
 
@@ -291,6 +265,7 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
         grid.setSkipRowHoverStyleUpdate(true);
         grid.setSkipRowHoverFloatElementCheck(true);
         grid.setSkipRowHoverCheck(true);
+        grid.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.DISABLED);
 
         grid.addCellPreviewHandler(new CellPreviewEvent.Handler<TraceRecordProxy>() {
             @Override
@@ -308,8 +283,7 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
         grid.addDomHandler(new DoubleClickHandler() {
             @Override
             public void onDoubleClick(DoubleClickEvent event) {
-                //TraceRecordProxy tr = selection.getSelectedObject();
-                //panelFactory.methodAttrsDialog(trace.getHostId(), trace.getDataOffs(), tr.getPath(), 0L).show();
+
             }
         }, DoubleClickEvent.getType());
 
@@ -393,6 +367,9 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
                         action.run();
                     }
                     popup.hide();
+                    if (response.size() > 1) {
+                        grid.getRowElement(0).scrollIntoView();
+                    }
                 }
             });
     }
@@ -407,14 +384,20 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
 
         List<TraceRecordProxy> recList = data.getList();
 
-        for (int idx = recList.indexOf(rec)-1; idx >= 0; idx--) {
-            TraceRecordProxy prec = recList.get(idx);
-            if (rec.getPath().startsWith(prec.getPath())) {
-                selection.setSelected(prec, true);
-                grid.getRowElement(idx).scrollIntoView();
+        int nsegs = rec.getPath().split("/").length;
+
+        TraceRecordProxy prec = rec;
+        int idx = 0;
+
+        for (idx = recList.indexOf(rec)-1; idx >= 0; idx--) {
+            prec = recList.get(idx);
+            if (prec.getPath().split("/").length < nsegs) {
                 break;
             }
         }
+
+        selection.setSelected(prec, true);
+        grid.getRowElement(idx >= 0 ? idx : 0).scrollIntoView();
     }
 
 
@@ -479,12 +462,8 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
         }
 
         if (lrec != null) {
-            selection.setSelected(rec, false);
             selection.setSelected(lrec, true);
             grid.getRowElement(lidx).scrollIntoView();
-            grid.getRowElement(lidx).setScrollTop(0);
-            //grid.getRowElement(grid.getVisibleItems().indexOf(lrec)).scrollIntoView();
-            //grid.getRowElement(grid.getVisibleItems().indexOf(lrec)).getCells().getItem(0).scrollIntoView();
 
             if (!isExpanded(lidx)) {
                 doExpand(lrec);
@@ -492,6 +471,7 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
         }
 
     }
+
 
     private void doExpand(final TraceRecordProxy rec) {
         rf.traceDataService().listRecords(trace.getHostId(), trace.getDataOffs(), 0, rec.getPath(), false).fire(
@@ -509,13 +489,24 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
     }
 
 
-
     private void doCollapse(TraceRecordProxy rec) {
         List<TraceRecordProxy> list = data.getList();
         int idx = list.indexOf(rec) + 1;
         while (idx < list.size() && list.get(idx).getPath().startsWith(rec.getPath())) {
             list.remove(idx);
         }
+    }
+
+
+    private void toggleSubtree(TraceRecordProxy rec) {
+        if (rec.getChildren() > 0) {
+            if (isExpanded(rec)) {
+                doCollapse(rec);
+            } else {
+                doExpand(rec);
+            }
+        }
+        grid.redrawRow(data.getList().indexOf(rec));
     }
 
 
@@ -536,121 +527,111 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
     }
 
 
+    private void toggleDetails(TraceRecordProxy rec) {
+        String path = rec.getPath();
+        if (expandedDetails.contains(path)) {
+            expandedDetails.remove(path);
+        } else {
+            expandedDetails.add(path);
+        }
+        grid.redrawRow(data.getList().indexOf(rec));
+    }
 
 
+    private static final String PLUS_HTML = AbstractImagePrototype.create(Resources.INSTANCE.treePlusSlimIcon()).getHTML();
+    private static final String MINUS_HTML = AbstractImagePrototype.create(Resources.INSTANCE.treeMinusSlimIcon()).getHTML();
+
+    private static final String EXPANDER_EXPAND = AbstractImagePrototype.create(Resources.INSTANCE.expanderExpand()).getHTML();
+    private static final String EXPANDER_COLLAPSE = AbstractImagePrototype.create(Resources.INSTANCE.expanderCollapse()).getHTML();
 
 
-    private Cell<String> SMALL_TEXT_CELL = new AbstractCell<String>() {
+    private final Cell<TraceRecordProxy> METHOD_TREE_CELL = new AbstractCell<TraceRecordProxy>("click") {
 
         @Override
-        public void render(Context context, String value, SafeHtmlBuilder sb) {
-            sb.appendHtmlConstant("<div>");
-            sb.append(SafeHtmlUtils.fromString(value));
+        public void render(Context context, TraceRecordProxy tr, SafeHtmlBuilder sb) {
+            String path = tr.getPath();
+            int offs = path != null && path.length() > 0 ? (path.split("/").length) * 24 : 0;
+            String color = tr.getExceptionInfo() != null ? "red" : tr.getAttributes() != null ? "blue" : "black";
+
+            sb.appendHtmlConstant("<div style=\"margin-left: " + offs + "px; color: " + color + ";margin-top: 3px;\">");
+            if (tr.getChildren() > 0) {
+                sb.appendHtmlConstant("<span style=\"cursor: pointer;\">");
+                sb.appendHtmlConstant(isExpanded(context.getIndex()) ? MINUS_HTML : PLUS_HTML);
+                sb.appendHtmlConstant("</span>");
+            }
+            sb.appendHtmlConstant("<span style=\"vertical-align: top;\">");
+            sb.append(SafeHtmlUtils.fromString(tr.getMethod()));
+            sb.appendHtmlConstant("</span></div>");
+        }
+
+        @Override
+        public void onBrowserEvent(Context context, Element parent, TraceRecordProxy rec,
+                                   NativeEvent event, ValueUpdater<TraceRecordProxy> valueUpdater) {
+            super.onBrowserEvent(context, parent, rec, event, valueUpdater);
+            EventTarget eventTarget = event.getEventTarget();
+            if (Element.is(eventTarget)) {
+                Element target = eventTarget.cast();
+                if ("IMG".equalsIgnoreCase(target.getTagName())) {
+                    toggleSubtree(rec);
+                }
+            }
+        }
+    };
+
+    private AbstractCell<TraceRecordProxy> METHOD_TIME_CELL = new AbstractCell<TraceRecordProxy>() {
+        @Override
+        public void render(Context context, TraceRecordProxy rec, SafeHtmlBuilder sb) {
+            sb.appendHtmlConstant("<div class=\"" + SMALL_CELL_CSS + "\">");
+            sb.append(SafeHtmlUtils.fromString(ClientUtil.formatDuration(rec.getTime())));
+            sb.appendHtmlConstant("</div>");
+        }
+    };
+
+    private AbstractCell<TraceRecordProxy> METHOD_CALLS_CELL = new AbstractCell<TraceRecordProxy>() {
+        @Override
+        public void render(Context context, TraceRecordProxy rec, SafeHtmlBuilder sb) {
+            sb.appendHtmlConstant("<div class=\"" + SMALL_CELL_CSS + "\">");
+            sb.append(SafeHtmlUtils.fromString("" + rec.getCalls()));
+            sb.appendHtmlConstant("</div>");
+        }
+    };
+
+    private AbstractCell<TraceRecordProxy> METHOD_ERRORS_CELL = new AbstractCell<TraceRecordProxy>() {
+        @Override
+        public void render(Context context, TraceRecordProxy rec, SafeHtmlBuilder sb) {
+            sb.appendHtmlConstant("<div class=\"" + SMALL_CELL_CSS + "\">");
+            sb.append(SafeHtmlUtils.fromString("" + rec.getErrors()));
+            sb.appendHtmlConstant("</div>");
+        }
+    };
+
+    private AbstractCell<TraceRecordProxy> METHOD_PCT_CELL = new AbstractCell<TraceRecordProxy>() {
+        @Override
+        public void render(Context context, TraceRecordProxy rec, SafeHtmlBuilder sb) {
+            double pct = 100.0 * rec.getTime() / trace.getExecutionTime();
+            String color = "rgb(" + ((int) (pct * 2.49)) + ",0,0)";
+            sb.appendHtmlConstant("<div class=\"" + SMALL_CELL_CSS + "\" style=\"color: " + color + ";\">");
+            sb.append(SafeHtmlUtils.fromString(NumberFormat.getFormat("###.0").format(pct) + "%"));
             sb.appendHtmlConstant("</div>");
         }
     };
 
 
-    private final Cell<TraceRecordProxy> METHOD_NAME_CELL = new AbstractCell<TraceRecordProxy>() {
-        @Override
-        public void render(Cell.Context context, TraceRecordProxy tr, SafeHtmlBuilder sb) {
-
-            String color = tr.getExceptionInfo() != null ? "red"
-                    : tr.getAttributes() != null ? "blue" : "black";
-
-            sb.appendHtmlConstant("<span><sp/>");
-            sb.appendHtmlConstant("<span style=\"color: " + color + "; vertical-align: top; margin-top: 3px;\">");
-            sb.append(SafeHtmlUtils.fromString(tr.getMethod()));
-            sb.appendHtmlConstant("</span>");
-            sb.appendHtmlConstant("</span>");
-        }
-    };
-
-
-
-    private final Cell<TraceRecordProxy> TREE_SPACER_CELL = new AbstractCell<TraceRecordProxy>() {
-        @Override
-        public void render(Context context, TraceRecordProxy tr, SafeHtmlBuilder sb) {
-            String path = tr.getPath();
-            int offs = path != null && path.length() > 0 ? (path.split("/").length) * 24 : 0;
-            sb.appendHtmlConstant("<span style=\"margin-left: " + offs + "px;\"><sp></span>");
-        }
-    };
-
-
-    String MINUS_HTML = AbstractImagePrototype.create(Resources.INSTANCE.treePlusIcon()).getHTML();
-    String PLUS_HTML = AbstractImagePrototype.create(Resources.INSTANCE.treeMinusIcon()).getHTML();
-
-    private final Cell<TraceRecordProxy> SUBTREE_EXPAND_CELL = new ActionCell<TraceRecordProxy>("",
-        new ActionCell.Delegate<TraceRecordProxy>() {
-                @Override
-                public void execute(TraceRecordProxy rec) {
-                    if (rec.getChildren() > 0) {
-                        if (isExpanded(rec)) {
-                            doCollapse(rec);
-                        } else {
-                            doExpand(rec);
-                        }
-                    }
-                }
-            }) {
-
-        @Override
-        public void render(Cell.Context context, TraceRecordProxy tr, SafeHtmlBuilder sb) {
-            if (tr.getChildren() > 0) {
-                sb.appendHtmlConstant(isExpanded(context.getIndex()) ? MINUS_HTML : PLUS_HTML);
-            }
-
-        }
-    };
-
-    String EXPANDER_HTML = AbstractImagePrototype.create(Resources.INSTANCE.expander()).getHTML();
-
     private final Cell<TraceRecordProxy> DETAIL_EXPANDER_CELL = new ActionCell<TraceRecordProxy>("",
         new ActionCell.Delegate<TraceRecordProxy>() {
         @Override
         public void execute(TraceRecordProxy rec) {
-            String path = rec.getPath();
-            if (expandedDetails.contains(path)) {
-                expandedDetails.remove(path);
-            } else {
-                expandedDetails.add(path);
-            }
-            grid.redrawRow(data.getList().indexOf(rec));
+            toggleDetails(rec);
         }
     }) {
         @Override
         public void render(Cell.Context context, TraceRecordProxy tr, SafeHtmlBuilder sb) {
             if ((tr.getAttributes() != null && tr.getAttributes().size() > 0)||tr.getExceptionInfo() != null) {
-                sb.appendHtmlConstant(expandedDetails.contains(tr.getPath()) ? MINUS_HTML : PLUS_HTML);
-                //sb.appendHtmlConstant(EXPANDER_HTML);
+                sb.appendHtmlConstant("<span style=\"cursor: pointer;\">");
+                sb.appendHtmlConstant(expandedDetails.contains(tr.getPath()) ? EXPANDER_COLLAPSE : EXPANDER_EXPAND);
+                sb.appendHtmlConstant("</span>");
             }
         }
     };
-
-
-    private class HasIdentityCell<T> implements HasCell<T,T> {
-
-        private Cell<T> cell;
-
-        public HasIdentityCell(Cell<T> cell) {
-            this.cell = cell;
-        }
-
-        @Override
-        public Cell getCell() {
-            return cell;
-        }
-
-        @Override
-        public FieldUpdater getFieldUpdater() {
-            return null;
-        }
-
-        @Override
-        public T getValue(T object) {
-            return object;
-        }
-    }
 
 }
