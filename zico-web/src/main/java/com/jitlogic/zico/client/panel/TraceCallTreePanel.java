@@ -24,9 +24,13 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.EventTarget;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.event.dom.client.ContextMenuEvent;
+import com.google.gwt.event.dom.client.ContextMenuHandler;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -54,6 +58,9 @@ import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.SpinnerField;
+import com.sencha.gxt.widget.core.client.menu.Item;
+import com.sencha.gxt.widget.core.client.menu.Menu;
+import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 
@@ -90,6 +97,8 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
     private TextButton btnSearchPrev;
     private TextButton btnSearchNext;
 
+    private Menu contextMenu;
+
     private boolean fullyExpanded;
 
     private List<TraceRecordProxy> searchResults = new ArrayList<TraceRecordProxy>();
@@ -105,6 +114,7 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
 
         createToolbar();
         createCallTreeGrid();
+        createContextMenu();
         loadData(false, null);
     }
 
@@ -277,21 +287,50 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
                     TraceRecordProxy tr = event.getValue();
                     panelFactory.methodAttrsDialog(trace.getHostId(), trace.getDataOffs(), tr.getPath(), 0L).show();
                 }
+                if (BrowserEvents.CONTEXTMENU.equals(eventType)) {
+                    selection.setSelected(event.getValue(), true);
+                    contextMenu.showAt(event.getNativeEvent().getClientX(), event.getNativeEvent().getClientY());
+                }
             }
         });
 
         grid.addDomHandler(new DoubleClickHandler() {
             @Override
             public void onDoubleClick(DoubleClickEvent event) {
-
+                event.preventDefault();
             }
         }, DoubleClickEvent.getType());
+
+        grid.addDomHandler(new ContextMenuHandler() {
+            @Override
+            public void onContextMenu(ContextMenuEvent event) {
+                event.preventDefault();
+            }
+        }, ContextMenuEvent.getType());
 
         data = new ListDataProvider<TraceRecordProxy>();
 
         data.addDataDisplay(grid);
 
         add(grid, new VerticalLayoutData(1, 1));
+    }
+
+
+    private void createContextMenu() {
+        contextMenu = new Menu();
+
+        MenuItem mnuMethodAttrs = new MenuItem("Trace Attributes");
+        mnuMethodAttrs.setIcon(Resources.INSTANCE.methodAttrsIcon());
+        mnuMethodAttrs.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                TraceRecordProxy tr = selection.getSelectedObject();
+                if (tr != null) {
+                    panelFactory.methodAttrsDialog(trace.getHostId(), trace.getDataOffs(), tr.getPath(), 0L).show();
+                }
+            }
+        });
+        contextMenu.add(mnuMethodAttrs);
     }
 
 
