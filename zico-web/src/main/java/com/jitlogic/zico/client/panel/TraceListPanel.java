@@ -244,14 +244,6 @@ public class TraceListPanel extends VerticalLayoutContainer {
         add(traceGrid, new VerticalLayoutData(1, 1));
     }
 
-    private void openCallTreeView() {
-        TraceInfoProxy traceInfo = traceGrid.getSelectionModel().getSelectedItem();
-        if (traceInfo != null) {
-            TraceDetailPanel detail = panelFactory.traceDetailPanel(traceInfo);
-            shell.get().addView(detail, ClientUtil.formatTimestamp(traceInfo.getClock()) + "@" + selectedHost.getName());
-        }
-    }
-
     private void openDetailView() {
         TraceInfoProxy traceInfo = traceGrid.getSelectionModel().getSelectedItem();
         if (traceInfo != null) {
@@ -499,54 +491,43 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
         MenuItem mnuMethodTree = new MenuItem("Method call tree");
         mnuMethodTree.setIcon(Resources.INSTANCE.methodTreeIcon());
-        menu.add(mnuMethodTree);
-
         mnuMethodTree.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
                 openDetailView();
             }
         });
-
-        MenuItem mnuCallTree =  new MenuItem("Method call tree (old)");
-        mnuCallTree.setIcon(Resources.INSTANCE.methodTreeIcon());
-        menu.add(mnuCallTree);
-
-        mnuCallTree.addSelectionHandler(new SelectionHandler<Item>() {
-            @Override
-            public void onSelection(SelectionEvent<Item> event) {
-                openCallTreeView();
-            }
-        });
+        menu.add(mnuMethodTree);
 
         MenuItem mnuMethodRank = new MenuItem("Method call stats");
         mnuMethodRank.setIcon(Resources.INSTANCE.methodRankIcon());
-        menu.add(mnuMethodRank);
-
         mnuMethodRank.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
                 openRankingView();
             }
         });
+        menu.add(mnuMethodRank);
 
         menu.add(new SeparatorMenuItem());
 
         MenuItem mnuMethodAttrs = new MenuItem("Trace Attributes");
         mnuMethodAttrs.setIcon(Resources.INSTANCE.methodAttrsIcon());
-        menu.add(mnuMethodAttrs);
-
         mnuMethodAttrs.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
-                TraceInfoProxy ti = traceGrid.getSelectionModel().getSelectedItem();
-                MethodAttrsDialog dialog = panelFactory.methodAttrsDialog(ti.getHostId(), ti.getDataOffs(), "", 0L);
-                dialog.show();
+                openMethodAttrsDialog();
             }
         });
-
+        menu.add(mnuMethodAttrs);
 
         traceGrid.setContextMenu(menu);
+    }
+
+    private void openMethodAttrsDialog() {
+        TraceInfoProxy ti = traceGrid.getSelectionModel().getSelectedItem();
+        MethodAttrsDialog dialog = panelFactory.methodAttrsDialog(ti.getHostId(), ti.getDataOffs(), "", 0L);
+        dialog.show();
     }
 
     private void loadTraceTypes() {
