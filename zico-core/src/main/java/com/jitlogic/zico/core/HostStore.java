@@ -96,7 +96,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
                     attrList.add(new KeyValuePair(e.getKey(), ""+e.getValue()));
                 }
 
-                info.setAttributes(attrList);
+                info.setAttributes(ZicoUtil.sortKeyVals(attrList));
             }
 
             String exJson = rs.getString("EXINFO");

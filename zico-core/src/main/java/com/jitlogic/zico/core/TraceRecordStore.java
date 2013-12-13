@@ -175,7 +175,7 @@ public class TraceRecordStore {
                 }
                 attrs.add(new KeyValuePair(symbolRegistry.symbolName(e.getKey()), s));
             }
-            info.setAttributes(attrs);
+            info.setAttributes(ZicoUtil.sortKeyVals(attrs));
         }
 
         SymbolicExceptionInfo sei = packException(tr);
