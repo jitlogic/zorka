@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import com.jitlogic.zorka.core.AgentConfig;
 import com.jitlogic.zorka.core.spy.SpyLib;
 import com.jitlogic.zorka.core.spy.SpyMatcherSet;
 import com.jitlogic.zorka.core.test.spy.support.*;
@@ -203,6 +204,24 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
         assertTrue(sms.classMatch("com.jitlogic.TestClazz"));
     }
 
+    @Test
+    public void testClassExclusionWithOnlySomeMethod() {
+        SpyMatcherSet sms = new SpyMatcherSet(
+                spy.byMethod("com.jitlogic.zorka.core.**", "mapRow").exclude(),
+                spy.byClass("**"));
+        assertTrue(sms.classMatch("com.jitlogic.zorka.core.AgentConfig"));
+        assertTrue(sms.classMatch(AgentConfig.class, false));
+    }
+
+    @Test
+    public void testClassExclusionWithAllMethodsInClassExcluded() {
+        SpyMatcherSet sms = new SpyMatcherSet(
+                spy.byClass("com.jitlogic.zorka.core.**").exclude(),
+                spy.byClass("**"));
+        assertFalse(sms.classMatch("com.jitlogic.zico.core.AgentConfig"));
+        assertFalse(sms.classMatch(AgentConfig.class, false));
+    }
+
 
     @Test
     public void testSpyMatcherFromString() {
@@ -292,4 +311,5 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
         assertFalse(sms.classMatch(TestClass1.class, true));
         assertTrue(sms.classMatch(TestClass2.class, true));
     }
+
 }
