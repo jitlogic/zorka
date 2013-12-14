@@ -18,14 +18,13 @@
 zorka.require(
   "jvm.bsh",
   "http.bsh",
-  "javax.bsh",
-  "eclipse/eclipse.bsh"
+  "javax.bsh"
 );
 
-__jetty() {
+__jetty6() {
 
-  spy.add(spy.instrument("JETTY_HTTP")
-    .onEnter(spy.fetchArg("REQ", 2), spy.fetchArg("RESP", 4),
+  spy.add(spy.instrument("JETTY6_HTTP")
+    .onEnter(spy.fetchArg("REQ", 2), spy.fetchArg("RESP", 3),
       spy.format("URI", "${REQ.requestURI}"),
       http._trace ? spy.subchain(
         http._uriQualifier,
@@ -50,7 +49,7 @@ __jetty() {
         tracer.attr("USER", "USER"),
         http._params ? http.param_processor() : null,
         http._cookies ? http.cookies_processor(true, false) : null,
-        http._headers ? http.headers_processor(true, true) : null
+        http._headers ? http.headers_processor(true, false) : null
       ) : null,
       http._slow ? spy.subchain(
         spy.longerThan(zorka.longCfg("http.slow.time")),
@@ -63,15 +62,19 @@ __jetty() {
         http._error ? spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format")): null),
       http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
     .include(
-      spy.byMethod("org.eclipse.jetty.servlet.ServletHandler", "doHandle")));
+      spy.byMethod("org.mortbay.jetty.servlet.ServletHandler", "handle")));
+
 
   if (http._trace) {
     tracer.exclude(
-      "org.eclipse.jetty.util.**",
-      "org.eclipse.jetty.http.Http*",
-      "org.eclipse.jetty.server.Response",
-      "org.eclipse.jetty.server.HttpOutput",
-      "org.eclipse.jetty.webapp.WebAppClassLoader/loadClass"
+      "org.mortbay.io.*Buff*",
+      "org.mortbay.io.Buff*",
+      "org.mortbay.io.Portable",
+      "org.mortbay.jetty.webapp.WebAppClassLoader",
+      "org.mortbay.jetty.AbstractGen**",
+      "org.mortbay.jetty.HttpGenerator",
+      "org.mortbay.servlet.Gzip*",
+      "org.mortbay.util.**"
     );
   }
 
@@ -80,5 +83,5 @@ __jetty() {
   return this;
 }
 
-jetty = __jetty();
+jetty6 = __jetty6();
 

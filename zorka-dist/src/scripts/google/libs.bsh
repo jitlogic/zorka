@@ -21,5 +21,18 @@ zorka.require("tracer.bsh");
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
-    tracer.exclude("com.google.common.**");
+    tracer.exclude(
+      "com.google.common.**",
+      "com.google.inject.internal.**",
+      "com.google.gwt.core.client.impl.WeakMapping",
+      "com.google.web.bindery.autobean.shared.**",
+      "com.google.web.bindery.autobean.vm.**",
+      "com.google.web.bindery.requestfactory.shared.**",
+      "com.google.web.bindery.requestfactory.server.ServiceLayerDecorator",
+      "com.google.web.bindery.requestfactory.server.ServiceLayerCache",
+      "com.google.web.bindery.requestfactory.server.ReflectiveServiceLayer",
+      "com.google.web.bindery.requestfactory.server.RequestStat**",
+      "com.google.web.bindery.requestfactory.server.Resolver$PropertyResolver",
+      "com.google.web.bindery.requestfactory.server.Resolver$Resolution"
+    );
 }
