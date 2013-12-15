@@ -1,3 +1,13 @@
+Zorka 0.9.3 (2013-12-16)
+------------------------
+
+ * agent: online reconfiguration (via `zorka.reload[]` or built in MBean);
+ * agent: jetty 6.x support script;
+ * collector: user database with access control to particular hosts for ordinary users;
+ * collector: faster method call tree;
+ * lots of small fixes as usual;
+
+
 Zorka 0.9.12 (2013-11-20)
 -------------------------
 

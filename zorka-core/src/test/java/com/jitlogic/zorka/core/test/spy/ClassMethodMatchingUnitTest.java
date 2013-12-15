@@ -218,7 +218,7 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
         SpyMatcherSet sms = new SpyMatcherSet(
                 spy.byClass("com.jitlogic.zorka.core.**").exclude(),
                 spy.byClass("**"));
-        assertFalse(sms.classMatch("com.jitlogic.zico.core.AgentConfig"));
+        assertFalse(sms.classMatch("com.jitlogic.zorka.core.AgentConfig"));
         assertFalse(sms.classMatch(AgentConfig.class, false));
     }
 
