@@ -31,7 +31,7 @@ public class RDSStoreStressTest extends ZicoFixture {
 
     RDSStore rds;
 
-    public final static int CYCLES = 10000;
+    public final static int CYCLES = 1000;
     public final static long RDS_SIZE = 1 * 1048576;
     public final static long RDS_FILE = 64 * 1024;
     public final static long RDS_SEGMENT = 16 * 1024;

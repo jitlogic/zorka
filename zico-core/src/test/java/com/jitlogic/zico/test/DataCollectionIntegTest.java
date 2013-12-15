@@ -17,19 +17,17 @@ package com.jitlogic.zico.test;
 
 
 import com.jitlogic.zico.test.support.ZicoFixture;
-
 import com.jitlogic.zorka.common.test.support.TestTraceGenerator;
 import com.jitlogic.zorka.common.tracedata.FressianTraceWriter;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import static org.fest.reflect.core.Reflection.*;
-
-import static org.junit.Assert.*;
+import static org.fest.reflect.core.Reflection.field;
+import static org.fest.reflect.core.Reflection.method;
+import static org.junit.Assert.assertEquals;
 
 public class DataCollectionIntegTest extends ZicoFixture {
 

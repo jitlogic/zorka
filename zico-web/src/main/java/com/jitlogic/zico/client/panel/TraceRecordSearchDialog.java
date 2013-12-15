@@ -18,7 +18,9 @@ package com.jitlogic.zico.client.panel;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.*;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -26,11 +28,18 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.inject.assistedinject.Assisted;
+import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.jitlogic.zico.client.ClientUtil;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
-import com.jitlogic.zico.client.api.TraceDataApi;
-import com.jitlogic.zico.data.*;
+import com.jitlogic.zico.client.inject.ZicoRequestFactory;
+import com.jitlogic.zico.client.props.TraceRecordInfoProperties;
+import com.jitlogic.zico.core.model.TraceDetailSearchExpression;
+import com.jitlogic.zico.shared.data.TraceDetailSearchProxy;
+import com.jitlogic.zico.shared.data.TraceInfoProxy;
+import com.jitlogic.zico.shared.data.TraceRecordProxy;
+import com.jitlogic.zico.shared.data.TraceRecordSearchProxy;
+import com.jitlogic.zico.shared.services.TraceDataServiceProxy;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.util.Margins;
 import com.sencha.gxt.data.shared.ListStore;
@@ -49,8 +58,6 @@ import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.RowExpander;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.MethodCallback;
 
 import javax.inject.Inject;
 import java.util.Arrays;
@@ -59,17 +66,15 @@ public class TraceRecordSearchDialog extends Dialog {
 
     private final static TraceRecordInfoProperties props = GWT.create(TraceRecordInfoProperties.class);
 
-    private TraceDataApi tds;
 
-    private TraceInfo trace;
+    private TraceInfoProxy trace;
     private String rootPath = "";
 
-    private TraceDetailPanel panel;
+    private TraceCallTreePanel panel;
+    private ZicoRequestFactory rf;
 
-    private TraceDetailSearchExpression expr = new TraceDetailSearchExpression();
-
-    private ListStore<TraceRecordInfo> resultsStore;
-    private Grid<TraceRecordInfo> resultsGrid;
+    private ListStore<TraceRecordProxy> resultsStore;
+    private Grid<TraceRecordProxy> resultsGrid;
 
     private TextField txtSearchFilter;
     private CheckBox chkClass;
@@ -88,10 +93,10 @@ public class TraceRecordSearchDialog extends Dialog {
 
 
     @Inject
-    public TraceRecordSearchDialog(TraceDataApi tds, ErrorHandler errorHandler,
-                                   @Assisted TraceDetailPanel panel, @Assisted TraceInfo trace) {
+    public TraceRecordSearchDialog(ZicoRequestFactory rf, ErrorHandler errorHandler,
+                                   @Assisted TraceCallTreePanel panel, @Assisted TraceInfoProxy trace) {
 
-        this.tds = tds;
+        this.rf = rf;
         this.trace = trace;
         this.panel = panel;
         this.errorHandler = errorHandler;
@@ -220,7 +225,7 @@ public class TraceRecordSearchDialog extends Dialog {
 
 
     private void doGoTo() {
-        TraceRecordInfo tri = resultsGrid.getSelectionModel().getSelectedItem();
+        TraceRecordProxy tri = resultsGrid.getSelectionModel().getSelectedItem();
         int idx = tri != null ? resultsStore.indexOf(tri) : 0;
         panel.setResults(resultsStore.getAll(), idx);
         this.hide();
@@ -238,20 +243,20 @@ public class TraceRecordSearchDialog extends Dialog {
 
     private void createResultsGrid() {
 
-        ColumnConfig<TraceRecordInfo, Long> durationCol = new ColumnConfig<TraceRecordInfo, Long>(props.time(), 50, "Time");
+        ColumnConfig<TraceRecordProxy, Long> durationCol = new ColumnConfig<TraceRecordProxy, Long>(props.time(), 50, "Time");
         durationCol.setCell(new NanoTimeRenderingCell());
         durationCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         durationCol.setMenuDisabled(true);
 
-        ColumnConfig<TraceRecordInfo, Long> callsCol = new ColumnConfig<TraceRecordInfo, Long>(props.calls(), 50, "Calls");
+        ColumnConfig<TraceRecordProxy, Long> callsCol = new ColumnConfig<TraceRecordProxy, Long>(props.calls(), 50, "Calls");
         callsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         callsCol.setMenuDisabled(true);
 
-        ColumnConfig<TraceRecordInfo, Long> errorsCol = new ColumnConfig<TraceRecordInfo, Long>(props.errors(), 50, "Errors");
+        ColumnConfig<TraceRecordProxy, Long> errorsCol = new ColumnConfig<TraceRecordProxy, Long>(props.errors(), 50, "Errors");
         errorsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         errorsCol.setMenuDisabled(true);
 
-        ColumnConfig<TraceRecordInfo, Long> pctCol = new ColumnConfig<TraceRecordInfo, Long>(props.time(), 50, "Pct");
+        ColumnConfig<TraceRecordProxy, Long> pctCol = new ColumnConfig<TraceRecordProxy, Long>(props.time(), 50, "Pct");
         pctCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         pctCol.setMenuDisabled(true);
 
@@ -266,15 +271,15 @@ public class TraceRecordSearchDialog extends Dialog {
             }
         });
 
-        ColumnConfig<TraceRecordInfo, TraceRecordInfo> methodCol = new ColumnConfig<TraceRecordInfo, TraceRecordInfo>(
-                new IdentityValueProvider<TraceRecordInfo>(), 500, "Method");
+        ColumnConfig<TraceRecordProxy, TraceRecordProxy> methodCol = new ColumnConfig<TraceRecordProxy, TraceRecordProxy>(
+                new IdentityValueProvider<TraceRecordProxy>(), 500, "Method");
 
         methodCol.setMenuDisabled(true);
         methodCol.setSortable(false);
 
-        methodCol.setCell(new AbstractCell<TraceRecordInfo>() {
+        methodCol.setCell(new AbstractCell<TraceRecordProxy>() {
             @Override
-            public void render(Context context, TraceRecordInfo tr, SafeHtmlBuilder sb) {
+            public void render(Context context, TraceRecordProxy tr, SafeHtmlBuilder sb) {
                 String color = tr.getExceptionInfo() != null ? "red"
                         : tr.getAttributes() != null ? "blue" : "black";
                 sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
@@ -283,16 +288,16 @@ public class TraceRecordSearchDialog extends Dialog {
             }
         });
 
-        RowExpander<TraceRecordInfo> expander = new RowExpander<TraceRecordInfo>(
-                new IdentityValueProvider<TraceRecordInfo>(), new MethodDetailCell());
+        RowExpander<TraceRecordProxy> expander = new RowExpander<TraceRecordProxy>(
+                new IdentityValueProvider<TraceRecordProxy>(), new MethodDetailCell());
 
-        ColumnModel<TraceRecordInfo> model = new ColumnModel<TraceRecordInfo>(
-                Arrays.<ColumnConfig<TraceRecordInfo, ?>>asList(
+        ColumnModel<TraceRecordProxy> model = new ColumnModel<TraceRecordProxy>(
+                Arrays.<ColumnConfig<TraceRecordProxy, ?>>asList(
                         expander, methodCol, durationCol, callsCol, errorsCol, pctCol));
 
 
-        resultsStore = new ListStore<TraceRecordInfo>(props.key());
-        resultsGrid = new Grid<TraceRecordInfo>(resultsStore, model);
+        resultsStore = new ListStore<TraceRecordProxy>(props.key());
+        resultsGrid = new Grid<TraceRecordProxy>(resultsStore, model);
 
         resultsGrid.setBorders(true);
         resultsGrid.getView().setAutoExpandColumn(methodCol);
@@ -311,6 +316,8 @@ public class TraceRecordSearchDialog extends Dialog {
 
 
     private void doSearch() {
+        TraceDataServiceProxy req = rf.traceDataService();
+        TraceDetailSearchProxy expr = req.create(TraceDetailSearchProxy.class);
 
         expr.setType(btnEql.getValue() ? TraceDetailSearchExpression.EQL_QUERY : TraceDetailSearchExpression.TXT_QUERY);
 
@@ -325,15 +332,10 @@ public class TraceRecordSearchDialog extends Dialog {
 
         expr.setSearchExpr(txtSearchFilter.getCurrentValue());
 
-        tds.searchTraceRecords(trace.getHostId(), trace.getDataOffs(), 0, rootPath, expr,
-                new MethodCallback<TraceRecordSearchResult>() {
+        req.searchRecords(trace.getHostId(), trace.getDataOffs(), 0, rootPath, expr).fire(
+                new Receiver<TraceRecordSearchProxy>() {
                     @Override
-                    public void onFailure(Method method, Throwable exception) {
-                        errorHandler.error("Error calling API method: " + method, exception);
-                    }
-
-                    @Override
-                    public void onSuccess(Method method, TraceRecordSearchResult response) {
+                    public void onSuccess(TraceRecordSearchProxy response) {
                         resultsStore.clear();
                         resultsStore.addAll(response.getResult());
                         lblSumStats.setText(response.getResult().size() + " methods, "
@@ -345,6 +347,7 @@ public class TraceRecordSearchDialog extends Dialog {
                         );
                         setFocusWidget(txtSearchFilter);
                     }
-                });
+                }
+        );
     }
 }

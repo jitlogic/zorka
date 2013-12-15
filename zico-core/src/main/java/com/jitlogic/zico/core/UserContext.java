@@ -15,33 +15,11 @@
  */
 package com.jitlogic.zico.core;
 
-import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
 
-@Singleton
-public class UserContext {
+public interface UserContext {
+    String getUser();
 
-    // TODO this is overriding standard mechanisms (along with ZicoCacheControlFilter thread local);
-    // TODO get rid of it as soon as standard guice request context stuff will work with resteasy
+    boolean isInRole(String role);
 
-    public String getUser() {
-        return ZicoCacheControlFilter.getRequest().getRemoteUser();
-    }
-
-    public boolean isInRole(String role) {
-        return ZicoCacheControlFilter.getRequest().isUserInRole(role);
-    }
-
-    private static String[] ROLES = { "ADMIN", "VIEWER" };
-
-    public List<String> listRoles() {
-        List<String> roles = new ArrayList<String>();
-        for (String role : ROLES) {
-            if (isInRole(role)) {
-                roles.add(role);
-            }
-        }
-        return roles;
-    }
+    void checkAdmin();
 }

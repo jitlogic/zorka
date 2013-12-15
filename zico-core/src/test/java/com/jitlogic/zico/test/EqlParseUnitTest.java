@@ -18,11 +18,17 @@ package com.jitlogic.zico.test;
 
 import com.jitlogic.zico.core.eql.ParseException;
 import com.jitlogic.zico.core.eql.Parser;
-import com.jitlogic.zico.core.eql.ast.*;
-
+import com.jitlogic.zico.core.eql.ast.EqlBinaryExpr;
+import com.jitlogic.zico.core.eql.ast.EqlExpr;
+import com.jitlogic.zico.core.eql.ast.EqlFunCall;
+import com.jitlogic.zico.core.eql.ast.EqlLiteral;
+import com.jitlogic.zico.core.eql.ast.EqlOp;
+import com.jitlogic.zico.core.eql.ast.EqlSymbol;
+import com.jitlogic.zico.core.eql.ast.EqlUnaryExpr;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class EqlParseUnitTest {
 

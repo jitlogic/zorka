@@ -58,10 +58,12 @@ __zico() {
 
   tracer.exclude(
     "com.jitlogic.zico.core.eql.**",
-    "com.jitlogic.zico.search.**",
-    "com.jitlogic.zico.core.**/mapRow",
-    "com.jitlogic.zico.core.ReceiverContext/checkSymbol",
-    "com.jitlogic.zico.core.TraceTemplateManager",
+    "com.jitlogic.zico.core.search.**",
+    "com.jitlogic.zico.core.ZicoUtil$1/compare",
+    "com.jitlogic.zico.core.HostStore$1/mapRow",
+    "com.jitlogic.zico.core.TraceRecordStore/packTraceRecord",
+    "com.jitlogic.zico.core.TraceRecordStore/searchRecords",
+    "com.jitlogic.zico.core.locators.TraceTemplateManager",
     "com.jitlogic.zico.core.ZicoUtil"
   );
 

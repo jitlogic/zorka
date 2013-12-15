@@ -16,11 +16,18 @@
 package com.jitlogic.zico.core;
 
 
-import com.jitlogic.zico.data.*;
+import com.jitlogic.zico.core.model.HostInfo;
+import com.jitlogic.zico.core.model.KeyValuePair;
+import com.jitlogic.zico.core.model.PagingData;
+import com.jitlogic.zico.core.model.SymbolicExceptionInfo;
+import com.jitlogic.zico.core.model.TraceInfo;
+import com.jitlogic.zico.core.model.TraceListFilterExpression;
 import com.jitlogic.zico.core.rds.RDSCleanupListener;
 import com.jitlogic.zico.core.rds.RDSStore;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import org.codehaus.jackson.map.ObjectMapper;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+import net.minidev.json.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -33,7 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,9 +51,6 @@ import java.util.Set;
 public class HostStore implements Closeable, RDSCleanupListener {
 
     private final static Logger log = LoggerFactory.getLogger(HostStore.class);
-
-    private ObjectMapper mapper = new ObjectMapper();
-
 
     private String rootPath;
     private RDSStore rds;
@@ -83,23 +87,33 @@ public class HostStore implements Closeable, RDSCleanupListener {
             info.setRecords(rs.getLong("RECORDS"));
             info.setExecutionTime(rs.getLong("EXTIME"));
 
-            Map<String, String> attrs = new HashMap<String, String>();
+            JSONObject attrs = (JSONObject)JSONValue.parse(rs.getString("ATTRS"));
 
-            try {
-                attrs = mapper.readValue(rs.getString("ATTRS"), Map.class);
-            } catch (IOException e) {
-                log.error("Error unpacking JSON attrs", e);
+            if (attrs != null) {
+                List<KeyValuePair> attrList = new ArrayList<KeyValuePair>(attrs.size());
+
+                for (Map.Entry<String,Object> e : attrs.entrySet()) {
+                    attrList.add(new KeyValuePair(e.getKey(), ""+e.getValue()));
+                }
+
+                info.setAttributes(ZicoUtil.sortKeyVals(attrList));
             }
 
-            info.setAttributes(attrs);
-
             String exJson = rs.getString("EXINFO");
-            if (exJson != null) {
-                try {
-                    info.setExceptionInfo(mapper.readValue(exJson, SymbolicExceptionInfo.class));
-                } catch (IOException e) {
-                    log.error("Error unpacking JSON exInfo", e);
+            if (exJson != null && exJson.trim().length() > 0) {
+                JSONObject json = (JSONObject)JSONValue.parse(exJson);
+                SymbolicExceptionInfo sei = new SymbolicExceptionInfo();
+                sei.setExClass(""+json.get("exClass"));
+                sei.setMessage("" + json.get("message"));
+                JSONArray jstack = (JSONArray)(json.get("stackTrace"));
+                if (jstack != null) {
+                    List<String> stack = new ArrayList<String>(jstack.size());
+                    for (Object obj : jstack) {
+                        stack.add(""+obj);
+                    }
+                    sei.setStackTrace(stack);
                 }
+                info.setExceptionInfo(sei);
             }
 
             info.setDescription(manager.getTemplater().templateDescription(info));
@@ -129,7 +143,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
     }
 
 
-    public synchronized void updateInfo(ResultSet rs) throws SQLException {
+    public synchronized HostStore updateInfo(ResultSet rs) throws SQLException {
         hostInfo.setId(rs.getInt("HOST_ID"));
         hostInfo.setName(rs.getString("HOST_NAME"));
         hostInfo.setAddr(rs.getString("HOST_ADDR"));
@@ -138,15 +152,17 @@ public class HostStore implements Closeable, RDSCleanupListener {
         hostInfo.setFlags(rs.getInt("HOST_FLAGS"));
         hostInfo.setMaxSize(rs.getLong("MAX_SIZE"));
         hostInfo.setDescription(rs.getString("HOST_DESC"));
+        return this;
     }
 
 
-    public synchronized void updateInfo(HostInfo info) {
+    public synchronized HostStore updateInfo(HostInfo info) {
         hostInfo.setAddr(info.getAddr());
         hostInfo.setPass(info.getPass());
         hostInfo.setFlags(info.getFlags());
         hostInfo.setMaxSize(info.getMaxSize());
         hostInfo.setDescription(info.getDescription());
+        return this;
     }
 
 
@@ -211,7 +227,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     private final static Set<String> TRACES_ORDER_DIRS = ZorkaUtil.set("ASC", "DESC");
 
-    public PagingData<TraceInfo> pageTraces(int offset, int limit, TraceListFilterExpression filter) {
+    public PagingData pageTraces(int offset, int limit, TraceListFilterExpression filter) {
         String orderBy = filter.getSortBy();
         String orderDir = filter.isSortAsc() ? "ASC" : "DESC";
 
@@ -377,6 +393,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public void setAddr(String addr) {
         hostInfo.setAddr(addr);
+        save();
     }
 
     public String getDescription() {
@@ -385,6 +402,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public void setDescription(String description) {
         hostInfo.setDescription(description);
+        save();
     }
 
     public String getPass() {
@@ -393,6 +411,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public void setPass(String pass) {
         hostInfo.setPath(pass);
+        save();
     }
 
     public int getFlags() {
@@ -401,6 +420,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public void setFlags(int flags) {
         hostInfo.setFlags(flags);
+        save();
     }
 
     public long getMaxSize() {
@@ -409,6 +429,20 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public void setMaxSize(long maxSize) {
         hostInfo.setMaxSize(maxSize);
+        save();
+    }
+
+    public boolean isEnabled() {
+        return 0 == (hostInfo.getFlags() & HostInfo.DISABLED);
+    }
+
+    public void setEnabled(boolean enabled) {
+        if (enabled) {
+            hostInfo.setFlags(hostInfo.getFlags() & ~HostInfo.DISABLED);
+        } else {
+            hostInfo.setFlags(hostInfo.getFlags()|HostInfo.DISABLED);
+        }
+        save();
     }
 }
 

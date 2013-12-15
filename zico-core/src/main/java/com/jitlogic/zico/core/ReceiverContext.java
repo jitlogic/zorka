@@ -16,17 +16,24 @@
 package com.jitlogic.zico.core;
 
 
-import com.jitlogic.zico.data.HostInfo;
+import com.jitlogic.zico.core.model.HostInfo;
+import com.jitlogic.zico.core.model.SymbolicExceptionInfo;
 import com.jitlogic.zico.core.rds.RDSStore;
-import com.jitlogic.zorka.common.tracedata.*;
+import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
+import com.jitlogic.zorka.common.tracedata.MetadataChecker;
+import com.jitlogic.zorka.common.tracedata.Symbol;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicException;
+import com.jitlogic.zorka.common.tracedata.TraceMarker;
+import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
-import org.codehaus.jackson.map.ObjectMapper;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 import org.fressian.FressianWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -46,8 +53,6 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     private TraceTableWriter traceTableWriter;
 
     private HostInfo hostInfo;
-
-    private ObjectMapper mapper = new ObjectMapper();
 
     private Set<Object> visitedObjects = new HashSet<Object>();
 
@@ -105,7 +110,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
     public void save(int hostId, long offs, int length, TraceRecord tr) {
 
-        Map<String, String> attrMap = new HashMap<String, String>();
+        JSONObject attrMap = new JSONObject();
 
         if (tr.getAttrs() != null) {
             for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
@@ -122,24 +127,23 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
             status = 1;
         }
 
-        String attrJson = "";
-
-        try {
-            attrJson = mapper.writeValueAsString(attrMap);
-        } catch (IOException e) {
-            log.error("Error serializing attributes", e);
-        }
+        String attrJson = attrMap.toJSONString();
 
         String exJson = null;
 
         SymbolicException e = tr.findException();
 
         if (e != null) {
-            try {
-                exJson = mapper.writeValueAsString(ZicoUtil.extractSymbolicExceptionInfo(symbolRegistry, e));
-            } catch (IOException e1) {
-                log.error("Error serializing exception info", e);
+            SymbolicExceptionInfo sei = ZicoUtil.extractSymbolicExceptionInfo(symbolRegistry, e);
+            JSONObject json = new JSONObject();
+            json.put("exClass", sei.getExClass());
+            json.put("message", sei.getMessage());
+            JSONArray stack = new JSONArray();
+            if (sei.getStackTrace() != null) {
+                stack.addAll(sei.getStackTrace().size() > 8 ? sei.getStackTrace().subList(0, 8) : sei.getStackTrace());
             }
+            json.put("stackTrace", stack);
+            exJson = json.toJSONString();
         }
 
         traceTableWriter.submit(ZorkaUtil.<String, Object>map(

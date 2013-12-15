@@ -19,37 +19,52 @@ package com.jitlogic.zico.client.panel;
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.jitlogic.zico.data.SymbolicExceptionInfo;
-import com.jitlogic.zico.data.TraceRecordInfo;
+import com.jitlogic.zico.client.Resources;
+import com.jitlogic.zico.shared.data.KeyValueProxy;
+import com.jitlogic.zico.shared.data.SymbolicExceptionProxy;
+import com.jitlogic.zico.shared.data.TraceRecordProxy;
 
-import java.util.Map;
+public class MethodDetailCell extends AbstractCell<TraceRecordProxy> {
 
-public class MethodDetailCell extends AbstractCell<TraceRecordInfo> {
+    private String methodAttributeKey = Resources.INSTANCE.zicoCssResources().methodAttributeKey();
+    private String methodAttributeVal = Resources.INSTANCE.zicoCssResources().methodAttributeVal();
+    private String methodErrorClassName = Resources.INSTANCE.zicoCssResources().methodErrorClassName();
+    private String methodErrorMessage = Resources.INSTANCE.zicoCssResources().methodErrorMessage();
+    private String methodErrorStack = Resources.INSTANCE.zicoCssResources().methodErrorStack();
 
     @Override
-    public void render(Context context, TraceRecordInfo tr, SafeHtmlBuilder sb) {
+    public void render(Context context, TraceRecordProxy tr, SafeHtmlBuilder sb) {
         if (tr.getAttributes() != null) {
             sb.appendHtmlConstant("<table border=\"0\" cellspacing=\"2\"><tbody>");
-            for (Map.Entry<String, String> e : tr.getAttributes().entrySet()) {
-                sb.appendHtmlConstant("<tr><td align=\"right\" style=\"color:blue; font-size: small;\"><b>");
+            for (KeyValueProxy e : tr.getAttributes()) {
+                sb.appendHtmlConstant("<tr><td align=\"right\" class=\"" + methodAttributeKey + "\"><b>");
                 sb.append(SafeHtmlUtils.fromString(e.getKey()));
-                sb.appendHtmlConstant("</b></td><td><div style=\"text-wrap: unrestricted; white-space: pre; word-wrap: break-word; font-size: small;\">");
+                sb.appendHtmlConstant("</b></td><td><div class=\"" + methodAttributeVal + "\">");
                 sb.append(SafeHtmlUtils.fromString(e.getValue() != null ? e.getValue().toString() : ""));
                 sb.appendHtmlConstant("</div></td></tr>");
             }
             sb.appendHtmlConstant("</tbody></table>");
         }
         if (tr.getExceptionInfo() != null) {
-            SymbolicExceptionInfo e = tr.getExceptionInfo();
-            sb.appendHtmlConstant("<div><span style=\"color: red;\">");
+            SymbolicExceptionProxy e = tr.getExceptionInfo();
+            sb.appendHtmlConstant("<div class=\"" + methodErrorClassName + "\">");
             sb.append(SafeHtmlUtils.fromString("Caught: " + e.getExClass()));
-            sb.appendHtmlConstant("</span></div><div><b>");
+            sb.appendHtmlConstant("</div>");
+            sb.appendHtmlConstant("<div class=\"" + methodErrorMessage + "\">");
             sb.append(SafeHtmlUtils.fromString("" + e.getMessage()));
             sb.appendHtmlConstant("</b></div>");
+            int i = 0;
             for (String s : e.getStackTrace()) {
-                sb.appendHtmlConstant("<div>");
+                sb.appendHtmlConstant("<div class=\"" + methodErrorStack + "\">");
                 sb.append(SafeHtmlUtils.fromString("" + s));
                 sb.appendHtmlConstant("</div>");
+                i++;
+                if (i > 5) {
+                    sb.appendHtmlConstant("<div class=\"" + methodErrorMessage + "\">");
+                    sb.append(SafeHtmlUtils.fromString("...  (double click on this method to see full stack trace)"));
+                    sb.appendHtmlConstant("</div>");
+                    break;
+                }
             }
         }
     }

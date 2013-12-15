@@ -18,20 +18,20 @@ package com.jitlogic.zico.test;
 
 import com.jitlogic.zico.core.HostStore;
 import com.jitlogic.zico.core.ReceiverContext;
-import com.jitlogic.zico.data.HostInfo;
-import com.jitlogic.zico.data.TraceRecordInfo;
+import com.jitlogic.zico.core.model.HostInfo;
+import com.jitlogic.zico.core.model.TraceRecordInfo;
 import com.jitlogic.zico.test.support.ZicoFixture;
 import com.jitlogic.zorka.common.test.support.TestTraceGenerator;
 import com.jitlogic.zorka.common.tracedata.Symbol;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TraceDataApiUnitTest extends ZicoFixture {
 
@@ -41,7 +41,7 @@ public class TraceDataApiUnitTest extends ZicoFixture {
     public void prepareData() throws Exception {
         jdbc = new JdbcTemplate(dataSource);
 
-        ReceiverContext rcx = new ReceiverContext(storeManager.get("test", true), traceTypeRegistry, traceTableWriter);
+        ReceiverContext rcx = new ReceiverContext(hostStoreManager.get("test", true), traceTypeRegistry, traceTableWriter);
         TestTraceGenerator generator = new TestTraceGenerator();
         TraceRecord tr = generator.generate();
         Symbol s1 = new Symbol(tr.getClassId(), generator.getSymbols().symbolName(tr.getClassId()));
@@ -66,12 +66,12 @@ public class TraceDataApiUnitTest extends ZicoFixture {
     @Test
     public void testCreateHost() throws Exception {
         HostInfo myinfo = mkHost(0, "myhost", "127.0.0.1", "My Description", 0x20);
-        traceDataService.addHost(myinfo);
+        hostStoreManager.getOrCreateHost(myinfo.getName(), myinfo.getAddr()).updateInfo(myinfo).save();
 
         assertEquals(1, (int) jdbc.queryForObject("select count(1) from HOSTS where HOST_NAME = ?", Integer.class, "myhost"));
 
         int hostId = jdbc.queryForObject("select HOST_ID from HOSTS where HOST_NAME = ?", Integer.class, "myhost");
-        HostStore host = storeManager.getHost(hostId);
+        HostStore host = hostStoreManager.getHost(hostId);
         assertNotNull(host);
         assertEquals("myhost", host.getHostInfo().getName());
         assertEquals("127.0.0.1", host.getHostInfo().getAddr());
@@ -84,12 +84,12 @@ public class TraceDataApiUnitTest extends ZicoFixture {
     @Test
     public void testCreateAndUpdateHost() throws Exception {
         HostInfo myinfo = mkHost(0, "myhost", "127.0.0.1", "My Description", 0x20);
-        traceDataService.addHost(myinfo);
+        hostStoreManager.getOrCreateHost(myinfo.getName(), myinfo.getAddr()).updateInfo(myinfo).save();
 
         int hostId = jdbc.queryForObject("select HOST_ID from HOSTS where HOST_NAME = ?", Integer.class, "myhost");
 
         HostInfo newInfo = mkHost(0, "myhost", "1.2.3.4", "Other Description", 0x40);
-        traceDataService.updateHost(hostId, newInfo);
+        hostStoreManager.getHost(hostId).updateInfo(newInfo).save();
 
         String hostAddr = jdbc.queryForObject("select HOST_ADDR from HOSTS where HOST_NAME = ?", String.class, "myhost");
         assertEquals("1.2.3.4", hostAddr);
@@ -99,11 +99,11 @@ public class TraceDataApiUnitTest extends ZicoFixture {
     @Test
     public void testCreateAndDeleteHost() throws Exception {
         HostInfo myinfo = mkHost(0, "myhost", "127.0.0.1", "My Description", 0x20);
-        traceDataService.addHost(myinfo);
+        hostStoreManager.getOrCreateHost(myinfo.getName(), myinfo.getAddr()).updateInfo(myinfo).save();
 
         int hostId = jdbc.queryForObject("select HOST_ID from HOSTS where HOST_NAME = ?", Integer.class, "myhost");
 
-        traceDataService.deleteHost(hostId);
+        hostStoreManager.delete(hostId);
 
         int hostCnt = jdbc.queryForObject("select count(1) from HOSTS where HOST_ID = ?", Integer.class, hostId);
         assertEquals(0, hostCnt);
@@ -115,7 +115,7 @@ public class TraceDataApiUnitTest extends ZicoFixture {
 
     @Test
     public void testGetTraceRoot() throws Exception {
-        int hostId = storeManager.getOrCreateHost("test", "").getHostInfo().getId();
+        int hostId = hostStoreManager.getOrCreateHost("test", "").getHostInfo().getId();
         TraceRecordInfo tr = traceDataService.getRecord(hostId, 0, 0, "");
         assertEquals(0, tr.getChildren());
     }
@@ -123,8 +123,8 @@ public class TraceDataApiUnitTest extends ZicoFixture {
 
     @Test
     public void testListTraceRoot() throws Exception {
-        int hostId = storeManager.getOrCreateHost("test", "").getHostInfo().getId();
-        List<TraceRecordInfo> lst = traceDataService.listRecords(hostId, 0, 0, "");
+        int hostId = hostStoreManager.getOrCreateHost("test", "").getHostInfo().getId();
+        List<TraceRecordInfo> lst = traceDataService.listRecords(hostId, 0, 0, "", false);
         assertNotNull(lst);
     }
 }

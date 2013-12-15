@@ -25,12 +25,10 @@ import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.Random;
 
-import static org.fest.assertions.Assertions.assertThat;
-
-import static org.junit.Assert.*;
-
 import static com.jitlogic.zico.core.ZicoUtil.fromUIntBE;
 import static com.jitlogic.zico.core.ZicoUtil.toUIntBE;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class RAGZUnitTest extends ZicoFixture {
 

@@ -89,15 +89,25 @@ public class SpyMatcherSet {
 
             if ((0 != (flags & BY_CLASS_NAME)) && match(matcher.getClassPattern(), className)) {
                 // Return true or false depending on whether this is normal or inverted match
-                return 0 == (flags & EXCLUDE_MATCH);
+                return finalClassMatch(matcher);
             }
 
             if (0 != (flags & (BY_CLASS_ANNOTATION | BY_INTERFACE | BY_METHOD_ANNOTATION))) {
-                return 0 == (flags & EXCLUDE_MATCH);
+                return finalClassMatch(matcher);
             }
         }
 
         return false;
+    }
+
+
+
+    private boolean finalClassMatch(SpyMatcher matcher) {
+        if (matcher.hasFlags(EXCLUDE_MATCH)) {
+            return !"[a-zA-Z0-9_]+".equals(matcher.getMethodPattern().toString());
+        } else {
+            return true;
+        }
     }
 
 
@@ -133,7 +143,7 @@ public class SpyMatcherSet {
                     continue;
                 }
 
-                return !matcher.hasFlags(EXCLUDE_MATCH);
+                return finalClassMatch(matcher);
             }
         } catch (NoClassDefFoundError e) {
             log.warn(ZorkaLogger.ZSP_CONFIG,

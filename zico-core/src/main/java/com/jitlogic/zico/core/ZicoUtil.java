@@ -16,7 +16,8 @@
 package com.jitlogic.zico.core;
 
 
-import com.jitlogic.zico.data.SymbolicExceptionInfo;
+import com.jitlogic.zico.core.model.KeyValuePair;
+import com.jitlogic.zico.core.model.SymbolicExceptionInfo;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicException;
 import com.jitlogic.zorka.common.tracedata.SymbolicStackElement;
@@ -27,6 +28,8 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -150,6 +153,7 @@ public class ZicoUtil {
                 (byte) (l >>> 24)};
     }
 
+
     public static long readUInt(RandomAccessFile input) throws IOException {
         byte[] b = new byte[4];
 
@@ -159,6 +163,7 @@ public class ZicoUtil {
 
         return ZicoUtil.toUIntBE(b);
     }
+
 
     public static SymbolicExceptionInfo extractSymbolicExceptionInfo(SymbolRegistry symbolRegistry, SymbolicException sex) {
         SymbolicExceptionInfo sei = new SymbolicExceptionInfo();
@@ -173,6 +178,17 @@ public class ZicoUtil {
         }
         sei.setStackTrace(stack);
         return sei;
+    }
+
+
+    public static List<KeyValuePair> sortKeyVals(List<KeyValuePair> lkv) {
+        Collections.sort(lkv, new Comparator<KeyValuePair>() {
+            @Override
+            public int compare(KeyValuePair o1, KeyValuePair o2) {
+                return o1.getKey().compareTo(o2.getKey());
+            }
+        });
+        return lkv;
     }
 
 }

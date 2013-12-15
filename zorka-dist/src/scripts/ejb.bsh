@@ -119,7 +119,7 @@ __ejb() {
       return rec;
     }
 
-    return this;
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
   }
 
 

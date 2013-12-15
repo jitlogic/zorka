@@ -20,15 +20,18 @@ import com.jitlogic.zico.core.search.EqlTraceRecordMatcher;
 import com.jitlogic.zico.core.search.FullTextTraceRecordMatcher;
 import com.jitlogic.zico.test.support.ZicoFixture;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
-
-import static com.jitlogic.zico.data.TraceDetailSearchExpression.*;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+import static com.jitlogic.zico.core.model.TraceDetailSearchExpression.IGNORE_CASE;
+import static com.jitlogic.zico.core.model.TraceDetailSearchExpression.SEARCH_ATTRS;
+import static com.jitlogic.zico.core.model.TraceDetailSearchExpression.SEARCH_CLASSES;
+import static com.jitlogic.zico.core.model.TraceDetailSearchExpression.SEARCH_METHODS;
+import static com.jitlogic.zico.core.model.TraceDetailSearchExpression.SEARCH_SIGNATURE;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TraceRecordMatchingUnitTest extends ZicoFixture {
 

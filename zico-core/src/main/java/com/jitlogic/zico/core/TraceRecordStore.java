@@ -16,19 +16,32 @@
 package com.jitlogic.zico.core;
 
 
-import com.jitlogic.zico.core.search.TraceRecordMatcher;
-import com.jitlogic.zico.data.*;
+import com.jitlogic.zico.core.model.KeyValuePair;
+import com.jitlogic.zico.core.model.MethodRankInfo;
+import com.jitlogic.zico.core.model.SymbolicExceptionInfo;
+import com.jitlogic.zico.core.model.TraceDetailFilterExpression;
+import com.jitlogic.zico.core.model.TraceDetailSearchExpression;
+import com.jitlogic.zico.core.model.TraceInfo;
+import com.jitlogic.zico.core.model.TraceRecordInfo;
+import com.jitlogic.zico.core.model.TraceRecordSearchResult;
 import com.jitlogic.zico.core.rds.RDSStore;
-import com.jitlogic.zorka.common.tracedata.*;
+import com.jitlogic.zico.core.search.TraceRecordMatcher;
+import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicException;
+import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.FressianReader;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
-
-import static com.jitlogic.zico.data.TraceDetailSearchExpression.*;
 
 public class TraceRecordStore {
 
@@ -154,24 +167,52 @@ public class TraceRecordStore {
         info.setPath(path);
 
         if (tr.getAttrs() != null) {
-            Map<String, String> nattr = new HashMap<String, String>();
+            List<KeyValuePair> attrs = new ArrayList<KeyValuePair>(tr.getAttrs().size());
             for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
                 String s = "" + e.getValue();
                 if (attrLimit != null && s.length() > attrLimit) {
                     s = s.substring(0, attrLimit) + "...";
                 }
-                nattr.put(symbolRegistry.symbolName(e.getKey()), s);
+                attrs.add(new KeyValuePair(symbolRegistry.symbolName(e.getKey()), s));
             }
-            info.setAttributes(nattr);
+            info.setAttributes(ZicoUtil.sortKeyVals(attrs));
         }
 
-        SymbolicException sex = tr.findException();
-        if (sex != null) {
-            SymbolicExceptionInfo sei = ZicoUtil.extractSymbolicExceptionInfo(symbolRegistry, sex);
-            info.setExceptionInfo(sei);
-        }
+        SymbolicExceptionInfo sei = packException(tr);
+
+        info.setExceptionInfo(sei);
 
         return info;
+    }
+
+
+    private SymbolicExceptionInfo packException(TraceRecord tr) {
+        SymbolicExceptionInfo ret = null, lex = null;
+
+        TraceRecord rec = tr;
+
+        while (rec != null && ((rec.getException() != null && ret == null)
+                || rec.hasFlag(TraceRecord.EXCEPTION_PASS|TraceRecord.EXCEPTION_WRAP))) {
+
+            if (rec.getException() != null) {
+                SymbolicException sex = (SymbolicException)rec.getException();
+                while (sex != null) {
+                    SymbolicExceptionInfo sei = ZicoUtil.extractSymbolicExceptionInfo(symbolRegistry, sex);
+
+                    if (ret == null) {
+                        ret = lex = sei;
+                    } else {
+                        lex.setCause(sei);
+                        lex = sei;
+                    }
+                    sex = sex.getCause();
+                }
+            }
+
+            rec = rec.numChildren() > 0 ? rec.getChild(rec.numChildren()-1) : null;
+        }
+
+        return ret;
     }
 
 

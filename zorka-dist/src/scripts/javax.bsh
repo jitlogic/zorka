@@ -25,11 +25,13 @@ if (zorka.boolCfg("tracer")) {
         "com.sun.activation.registries.MailcapTokenizer",
         "com.sun.el.**",
         "com.sun.naming.internal.**",
+        "com.sun.media.jai.**",
 
         "javax.activation.**",
         "javax.crypto.**",
         "javax.el.**",
         "javax.enterprise.util.**",
+        "javax.media.jai.**",
         "javax.security.**",
         "javax.servlet.**",
         "javax.xml.**",

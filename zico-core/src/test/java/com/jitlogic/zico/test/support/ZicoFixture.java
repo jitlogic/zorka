@@ -18,9 +18,14 @@ package com.jitlogic.zico.test.support;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.jitlogic.zico.core.*;
-import com.jitlogic.zico.core.services.AdminService;
-import com.jitlogic.zico.core.services.TraceDataService;
+import com.jitlogic.zico.core.HostStoreManager;
+import com.jitlogic.zico.core.TraceTableWriter;
+import com.jitlogic.zico.core.TraceTypeRegistry;
+import com.jitlogic.zico.core.ZicoConfig;
+import com.jitlogic.zico.core.ZicoService;
+import com.jitlogic.zico.core.services.HostGwtService;
+import com.jitlogic.zico.core.services.SystemGwtService;
+import com.jitlogic.zico.core.services.TraceDataGwtService;
 import com.jitlogic.zorka.common.test.support.TestUtil;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
@@ -38,11 +43,12 @@ public class ZicoFixture {
     private Properties configProperties;
 
     protected ZicoConfig config;
-    protected HostStoreManager storeManager;
+    protected HostStoreManager hostStoreManager;
     protected ZicoService zicoService;
 
-    protected TraceDataService traceDataService;
-    protected AdminService adminService;
+    protected TraceDataGwtService traceDataService;
+    protected SystemGwtService systemService;
+    protected HostGwtService hostService;
 
     protected SymbolRegistry symbolRegistry;
     protected TraceTypeRegistry traceTypeRegistry;
@@ -81,12 +87,13 @@ public class ZicoFixture {
 
         dataSource = injector.getInstance(BasicDataSource.class);
 
-        storeManager = injector.getInstance(HostStoreManager.class);
+        hostStoreManager = injector.getInstance(HostStoreManager.class);
         zicoService = injector.getInstance(ZicoService.class);
         zicoService.start();
 
-        traceDataService = injector.getInstance(TraceDataService.class);
-        adminService = injector.getInstance(AdminService.class);
+        traceDataService = injector.getInstance(TraceDataGwtService.class);
+        systemService = injector.getInstance(SystemGwtService.class);
+        hostService = injector.getInstance(HostGwtService.class);
 
         symbolRegistry = injector.getInstance(SymbolRegistry.class);
         traceTypeRegistry = injector.getInstance(TraceTypeRegistry.class);
@@ -97,7 +104,7 @@ public class ZicoFixture {
     @After
     public void tearDownZicoFixture() throws Exception {
         zicoService.stop();
-        storeManager.close();
+        hostStoreManager.close();
         dataSource.close();
     }
 

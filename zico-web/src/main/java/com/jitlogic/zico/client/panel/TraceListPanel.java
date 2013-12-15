@@ -20,7 +20,9 @@ import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.event.dom.client.*;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -31,36 +33,53 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Label;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import com.jitlogic.zico.client.*;
+import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.jitlogic.zico.client.ClientUtil;
 import com.jitlogic.zico.client.ErrorHandler;
+import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.inject.PanelFactory;
-import com.jitlogic.zico.data.*;
-import com.jitlogic.zico.client.api.TraceDataApi;
+import com.jitlogic.zico.client.inject.ZicoRequestFactory;
+import com.jitlogic.zico.client.props.TraceInfoProperties;
+import com.jitlogic.zico.shared.data.HostProxy;
+import com.jitlogic.zico.shared.data.PagingDataProxy;
+import com.jitlogic.zico.shared.data.SymbolProxy;
+import com.jitlogic.zico.shared.data.TraceInfoProxy;
+import com.jitlogic.zico.shared.data.TraceListFilterProxy;
+import com.jitlogic.zico.shared.services.TraceDataServiceProxy;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style;
 import com.sencha.gxt.data.shared.LabelProvider;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.SortInfo;
-import com.sencha.gxt.data.shared.loader.*;
+import com.sencha.gxt.data.shared.loader.DataProxy;
+import com.sencha.gxt.data.shared.loader.PagingLoadConfig;
+import com.sencha.gxt.data.shared.loader.PagingLoadResult;
+import com.sencha.gxt.data.shared.loader.PagingLoadResultBean;
+import com.sencha.gxt.data.shared.loader.PagingLoader;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.button.ToggleButton;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.CellDoubleClickEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
-import com.sencha.gxt.widget.core.client.form.*;
+import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor;
+import com.sencha.gxt.widget.core.client.form.SimpleComboBox;
+import com.sencha.gxt.widget.core.client.form.SpinnerField;
+import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.form.validator.RegExValidator;
-import com.sencha.gxt.widget.core.client.grid.*;
+import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
+import com.sencha.gxt.widget.core.client.grid.ColumnModel;
+import com.sencha.gxt.widget.core.client.grid.Grid;
+import com.sencha.gxt.widget.core.client.grid.LiveGridView;
+import com.sencha.gxt.widget.core.client.grid.RowExpander;
 import com.sencha.gxt.widget.core.client.menu.Item;
 import com.sencha.gxt.widget.core.client.menu.Menu;
 import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.sencha.gxt.widget.core.client.menu.SeparatorMenuItem;
 import com.sencha.gxt.widget.core.client.tips.ToolTipConfig;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.MethodCallback;
 
 import javax.inject.Provider;
 import java.util.Arrays;
@@ -74,17 +93,15 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
     public final static String RE_TIMESTAMP = "\\d{4}-\\d{2}-\\d{2}\\s*(\\d{2}:\\d{2}:\\d{2}(\\.\\d{1-3})?)?";
 
-    private TraceDataApi tds;
     private PanelFactory panelFactory;
+    private ZicoRequestFactory rf;
 
-    private HostInfo selectedHost;
-    private Grid<TraceInfo> traceGrid;
-    private ListStore<TraceInfo> traceStore;
-    private DataProxy<PagingLoadConfig, PagingLoadResult<TraceInfo>> traceProxy;
-    private PagingLoader<PagingLoadConfig, PagingLoadResult<TraceInfo>> traceLoader;
-    private LiveGridView<TraceInfo> traceGridView;
-
-    private TraceListFilterExpression filter = new TraceListFilterExpression();
+    private HostProxy selectedHost;
+    private Grid<TraceInfoProxy> traceGrid;
+    private ListStore<TraceInfoProxy> traceStore;
+    private DataProxy<PagingLoadConfig, PagingLoadResult<TraceInfoProxy>> traceProxy;
+    private PagingLoader<PagingLoadConfig, PagingLoadResult<TraceInfoProxy>> traceLoader;
+    private LiveGridView<TraceInfoProxy> traceGridView;
 
     private Provider<ZicoShell> shell;
     private ToggleButton btnErrors;
@@ -100,17 +117,14 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
 
     @Inject
-    public TraceListPanel(Provider<ZicoShell> shell, TraceDataApi tds,
-                          PanelFactory panelFactory, @Assisted HostInfo hostInfo,
+    public TraceListPanel(Provider<ZicoShell> shell, ZicoRequestFactory rf,
+                          PanelFactory panelFactory, @Assisted HostProxy hostInfo,
                           ErrorHandler errorHandler) {
         this.shell = shell;
-        this.tds = tds;
+        this.rf = rf;
         this.selectedHost = hostInfo;
         this.panelFactory = panelFactory;
         this.errorHandler = errorHandler;
-
-        filter.setSortBy("clock");
-        filter.setSortAsc(false);
 
         traceTypes = new HashMap<Integer, String>();
         traceTypes.put(0, "(all)");
@@ -124,38 +138,38 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
     private void createTraceListGrid() {
 
-        ColumnConfig<TraceInfo, Long> clockCol = new ColumnConfig<TraceInfo, Long>(props.clock(), 100, "Time");
+        ColumnConfig<TraceInfoProxy, Long> clockCol = new ColumnConfig<TraceInfoProxy, Long>(props.clock(), 100, "Time");
         clockCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
-        ColumnConfig<TraceInfo, Long> durationCol = new ColumnConfig<TraceInfo, Long>(props.executionTime(), 50, "Duration");
+        ColumnConfig<TraceInfoProxy, Long> durationCol = new ColumnConfig<TraceInfoProxy, Long>(props.executionTime(), 50, "Duration");
         durationCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
-        ColumnConfig<TraceInfo, Long> callsCol = new ColumnConfig<TraceInfo, Long>(props.calls(), 50, "Calls");
+        ColumnConfig<TraceInfoProxy, Long> callsCol = new ColumnConfig<TraceInfoProxy, Long>(props.calls(), 50, "Calls");
         callsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
-        ColumnConfig<TraceInfo, Long> errorsCol = new ColumnConfig<TraceInfo, Long>(props.errors(), 50, "Errors");
+        ColumnConfig<TraceInfoProxy, Long> errorsCol = new ColumnConfig<TraceInfoProxy, Long>(props.errors(), 50, "Errors");
         errorsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
-        ColumnConfig<TraceInfo, Long> recordsCol = new ColumnConfig<TraceInfo, Long>(props.records(), 50, "Records");
+        ColumnConfig<TraceInfoProxy, Long> recordsCol = new ColumnConfig<TraceInfoProxy, Long>(props.records(), 50, "Records");
         recordsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
-        ColumnConfig<TraceInfo, String> traceTypeCol = new ColumnConfig<TraceInfo, String>(props.traceType(), 50, "Type");
+        ColumnConfig<TraceInfoProxy, String> traceTypeCol = new ColumnConfig<TraceInfoProxy, String>(props.traceType(), 50, "Type");
         traceTypeCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         traceTypeCol.setSortable(false);
         traceTypeCol.setMenuDisabled(true);
 
-        ColumnConfig<TraceInfo, TraceInfo> descCol = new ColumnConfig<TraceInfo, TraceInfo>(
-                new IdentityValueProvider<TraceInfo>(), 500, "Description");
+        ColumnConfig<TraceInfoProxy, TraceInfoProxy> descCol = new ColumnConfig<TraceInfoProxy, TraceInfoProxy>(
+                new IdentityValueProvider<TraceInfoProxy>(), 500, "Description");
 
         descCol.setSortable(false);
         descCol.setMenuDisabled(true);
 
         TraceDetailCell traceDetailCell = new TraceDetailCell();
 
-        RowExpander<TraceInfo> expander = new RowExpander<TraceInfo>(
-                new IdentityValueProvider<TraceInfo>(), traceDetailCell);
+        RowExpander<TraceInfoProxy> expander = new RowExpander<TraceInfoProxy>(
+                new IdentityValueProvider<TraceInfoProxy>(), traceDetailCell);
 
-        ColumnModel<TraceInfo> model = new ColumnModel<TraceInfo>(Arrays.<ColumnConfig<TraceInfo, ?>>asList(
+        ColumnModel<TraceInfoProxy> model = new ColumnModel<TraceInfoProxy>(Arrays.<ColumnConfig<TraceInfoProxy, ?>>asList(
                 expander, clockCol, traceTypeCol, durationCol, callsCol, errorsCol, recordsCol, descCol));
 
         clockCol.setCell(new AbstractCell<Long>() {
@@ -169,9 +183,9 @@ public class TraceListPanel extends VerticalLayoutContainer {
 
         durationCol.setCell(new NanoTimeRenderingCell());
 
-        descCol.setCell(new AbstractCell<TraceInfo>() {
+        descCol.setCell(new AbstractCell<TraceInfoProxy>() {
             @Override
-            public void render(Context context, TraceInfo ti, SafeHtmlBuilder sb) {
+            public void render(Context context, TraceInfoProxy ti, SafeHtmlBuilder sb) {
                 String color = ti.getStatus() != 0 ? "red" : "black";
                 sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
                 sb.append(SafeHtmlUtils.fromString(ti.getDescription()));
@@ -179,47 +193,28 @@ public class TraceListPanel extends VerticalLayoutContainer {
             }
         });
 
-        traceStore = new ListStore<TraceInfo>(new ModelKeyProvider<TraceInfo>() {
+        traceStore = new ListStore<TraceInfoProxy>(new ModelKeyProvider<TraceInfoProxy>() {
             @Override
-            public String getKey(TraceInfo item) {
+            public String getKey(TraceInfoProxy item) {
                 return "" + item.getDataOffs();
             }
         });
 
-        traceGridView = new LiveGridView<TraceInfo>();
+        traceGridView = new LiveGridView<TraceInfoProxy>();
         traceGridView.setAutoExpandColumn(descCol);
         traceGridView.setForceFit(true);
 
-        traceProxy = new DataProxy<PagingLoadConfig, PagingLoadResult<TraceInfo>>() {
+        traceProxy = new DataProxy<PagingLoadConfig, PagingLoadResult<TraceInfoProxy>>() {
             @Override
-            public void load(final PagingLoadConfig loadConfig, final Callback<PagingLoadResult<TraceInfo>, Throwable> callback) {
-                if (selectedHost != null) {
-                    List<? extends SortInfo> sort = loadConfig.getSortInfo();
-                    filter.setSortBy(sort.size() > 0 ? sort.get(0).getSortField() : "clock");
-                    filter.setSortAsc(sort.size() > 0 ? sort.get(0).getSortDir().name().equals("ASC") : false);
-                    tds.pageTraces(selectedHost.getId(), loadConfig.getOffset(), loadConfig.getLimit(),
-                            filter,
-                            new MethodCallback<PagingData<TraceInfo>>() {
-                                @Override
-                                public void onFailure(Method method, Throwable exception) {
-                                    callback.onFailure(exception);
-                                }
-
-                                @Override
-                                public void onSuccess(Method method, PagingData<TraceInfo> response) {
-                                    PagingLoadResultBean<TraceInfo> result = new PagingLoadResultBean<TraceInfo>(
-                                            response.getResults(), response.getTotal(), response.getOffset());
-                                    callback.onSuccess(result);
-                                }
-                            });
-                }
+            public void load(final PagingLoadConfig loadConfig, final Callback<PagingLoadResult<TraceInfoProxy>, Throwable> callback) {
+                filterAndLoadData(loadConfig, callback);
             }
         };
 
-        traceLoader = new PagingLoader<PagingLoadConfig, PagingLoadResult<TraceInfo>>(traceProxy);
+        traceLoader = new PagingLoader<PagingLoadConfig, PagingLoadResult<TraceInfoProxy>>(traceProxy);
         traceLoader.setRemoteSort(false);
 
-        traceGrid = new Grid<TraceInfo>(traceStore, model) {
+        traceGrid = new Grid<TraceInfoProxy>(traceStore, model) {
             @Override
             protected void onAfterFirstAttach() {
                 super.onAfterFirstAttach();
@@ -250,15 +245,15 @@ public class TraceListPanel extends VerticalLayoutContainer {
     }
 
     private void openDetailView() {
-        TraceInfo traceInfo = traceGrid.getSelectionModel().getSelectedItem();
+        TraceInfoProxy traceInfo = traceGrid.getSelectionModel().getSelectedItem();
         if (traceInfo != null) {
-            TraceDetailPanel detail = panelFactory.traceDetailPanel(traceInfo);
+            TraceCallTreePanel detail = panelFactory.traceCallTreePanel(traceInfo);
             shell.get().addView(detail, ClientUtil.formatTimestamp(traceInfo.getClock()) + "@" + selectedHost.getName());
         }
     }
 
     private void openRankingView() {
-        TraceInfo traceInfo = traceGrid.getSelectionModel().getSelectedItem();
+        TraceInfoProxy traceInfo = traceGrid.getSelectionModel().getSelectedItem();
         if (traceInfo != null) {
             MethodRankingPanel ranking = panelFactory.methodRankingPanel(traceInfo);
             shell.get().addView(ranking, ClientUtil.formatTimestamp(traceInfo.getClock()) + "@" + selectedHost.getName());
@@ -290,7 +285,6 @@ public class TraceListPanel extends VerticalLayoutContainer {
         btnErrors.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
             @Override
             public void onValueChange(ValueChangeEvent<Boolean> event) {
-                filter.setErrorsOnly(event.getValue());
                 traceGridView.refresh();
             }
         });
@@ -309,7 +303,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
         cmbTraceType.addSelectionHandler(new SelectionHandler<Integer>() {
             @Override
             public void onSelection(SelectionEvent<Integer> event) {
-                doFilter();
+                traceGridView.refresh();
             }
         });
 
@@ -328,14 +322,14 @@ public class TraceListPanel extends VerticalLayoutContainer {
         txtDuration.addValueChangeHandler(new ValueChangeHandler<Double>() {
             @Override
             public void onValueChange(ValueChangeEvent<Double> event) {
-                doFilter();
+                traceGridView.refresh();
             }
         });
 
         txtDuration.addSelectionHandler(new SelectionHandler<Double>() {
             @Override
             public void onSelection(SelectionEvent<Double> event) {
-                doFilter();
+                traceGridView.refresh();
             }
         });
 
@@ -374,7 +368,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
             @Override
             public void onKeyDown(KeyDownEvent event) {
                 if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER && txtClockBegin.isValid()) {
-                    doFilter();
+                    traceGridView.refresh();
                 }
             }
         });
@@ -383,7 +377,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
                 if (txtClockBegin.isValid()) {
-                    doFilter();
+                    traceGridView.refresh();
                 }
             }
         });
@@ -402,7 +396,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
             @Override
             public void onKeyDown(KeyDownEvent event) {
                 if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-                    doFilter();
+                    traceGridView.refresh();
                 }
             }
         });
@@ -410,7 +404,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
         txtClockEnd.addValueChangeHandler(new ValueChangeHandler<String>() {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
-                doFilter();
+                traceGridView.refresh();
             }
         });
 
@@ -423,7 +417,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
             @Override
             public void onKeyDown(KeyDownEvent event) {
                 if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER && txtClockEnd.isValid()) {
-                    doFilter();
+                    traceGridView.refresh();
                 }
             }
         });
@@ -432,7 +426,7 @@ public class TraceListPanel extends VerticalLayoutContainer {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
                 if (txtClockEnd.isValid()) {
-                    doFilter();
+                    traceGridView.refresh();
                 }
             }
         });
@@ -445,13 +439,6 @@ public class TraceListPanel extends VerticalLayoutContainer {
                 btnErrors.setValue(false);
                 cmbTraceType.setValue(null);
 
-                filter.setErrorsOnly(false);
-                filter.setMinTime(0);
-                filter.setFilterExpr("");
-                filter.setTimeStart(0);
-                filter.setTimeEnd(0);
-                filter.setTraceId(0);
-
                 traceGridView.refresh();
             }
         });
@@ -459,83 +446,97 @@ public class TraceListPanel extends VerticalLayoutContainer {
         add(toolBar, new VerticalLayoutData(1, -1));
     }
 
-    private void doFilter() {
-        GWT.log("Setting filter to " + txtFilter.getText());
-        filter.setFilterExpr(txtFilter.getText());
-        if (cmbTraceType.getCurrentValue() != null) {
-            filter.setTraceId(cmbTraceType.getCurrentValue());
+
+    private void filterAndLoadData(PagingLoadConfig loadConfig, final Callback<PagingLoadResult<TraceInfoProxy>, Throwable> callback) {
+        if (selectedHost != null) {
+            List<? extends SortInfo> sort = loadConfig.getSortInfo();
+            TraceDataServiceProxy req = rf.traceDataService();
+            TraceListFilterProxy filter = req.create(TraceListFilterProxy.class);
+
+            filter.setFilterExpr(txtFilter.getText());
+            if (cmbTraceType.getCurrentValue() != null) {
+                filter.setTraceId(cmbTraceType.getCurrentValue());
+            }
+            if (txtDuration.getCurrentValue() != null) {
+                filter.setMinTime((long) (txtDuration.getCurrentValue() * 1000000000L));
+            } else {
+                filter.setMinTime(0);
+            }
+            if (txtClockBegin.getValue() != null) {
+                filter.setTimeStart(ClientUtil.parseTimestamp(txtClockBegin.getValue(), "00:00:00.000"));
+            }
+            if (txtClockEnd.getValue() != null) {
+                filter.setTimeEnd(ClientUtil.parseTimestamp(txtClockEnd.getValue(), "23:59:59.999"));
+            }
+
+            filter.setErrorsOnly(btnErrors.getValue());
+            filter.setSortBy(sort.size() > 0 ? sort.get(0).getSortField() : "clock");
+            filter.setSortAsc(sort.size() > 0 ? sort.get(0).getSortDir().name().equals("ASC") : false);
+
+            req.pageTraces(selectedHost.getId(), loadConfig.getOffset(), loadConfig.getLimit(),
+                    filter).fire(new Receiver<PagingDataProxy>() {
+                @Override
+                public void onSuccess(PagingDataProxy response) {
+                    PagingLoadResultBean<TraceInfoProxy> result = new PagingLoadResultBean<TraceInfoProxy>(
+                            response.getResults(), response.getTotal(), response.getOffset());
+                    callback.onSuccess(result);
+                }
+            });
         }
-        if (txtDuration.getCurrentValue() != null) {
-            filter.setMinTime((long) (txtDuration.getCurrentValue() * 1000000000L));
-        } else {
-            filter.setMinTime(0);
-        }
-        if (txtClockBegin.getValue() != null) {
-            filter.setTimeStart(ClientUtil.parseTimestamp(txtClockBegin.getValue(), "00:00:00.000"));
-        }
-        if (txtClockEnd.getValue() != null) {
-            filter.setTimeEnd(ClientUtil.parseTimestamp(txtClockEnd.getValue(), "23:59:59.999"));
-        }
-        traceGridView.refresh();
     }
+
 
     private void createContextMenu() {
         Menu menu = new Menu();
 
         MenuItem mnuMethodTree = new MenuItem("Method call tree");
         mnuMethodTree.setIcon(Resources.INSTANCE.methodTreeIcon());
-        menu.add(mnuMethodTree);
-
         mnuMethodTree.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
                 openDetailView();
             }
         });
+        menu.add(mnuMethodTree);
 
         MenuItem mnuMethodRank = new MenuItem("Method call stats");
         mnuMethodRank.setIcon(Resources.INSTANCE.methodRankIcon());
-        menu.add(mnuMethodRank);
-
         mnuMethodRank.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
                 openRankingView();
             }
         });
+        menu.add(mnuMethodRank);
 
         menu.add(new SeparatorMenuItem());
 
         MenuItem mnuMethodAttrs = new MenuItem("Trace Attributes");
         mnuMethodAttrs.setIcon(Resources.INSTANCE.methodAttrsIcon());
-        menu.add(mnuMethodAttrs);
-
         mnuMethodAttrs.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
             public void onSelection(SelectionEvent<Item> event) {
-                TraceInfo ti = traceGrid.getSelectionModel().getSelectedItem();
-                MethodAttrsDialog dialog = panelFactory.methodAttrsDialog(ti.getHostId(), ti.getDataOffs(), "", 0L);
-                dialog.show();
+                openMethodAttrsDialog();
             }
         });
-
+        menu.add(mnuMethodAttrs);
 
         traceGrid.setContextMenu(menu);
     }
 
-    private void loadTraceTypes() {
-        tds.getTidMap(selectedHost.getId(), new MethodCallback<Map<String, String>>() {
-            @Override
-            public void onFailure(Method method, Throwable exception) {
-                errorHandler.error("Error calling API method: " + method, exception);
-            }
+    private void openMethodAttrsDialog() {
+        TraceInfoProxy ti = traceGrid.getSelectionModel().getSelectedItem();
+        MethodAttrsDialog dialog = panelFactory.methodAttrsDialog(ti.getHostId(), ti.getDataOffs(), "", 0L);
+        dialog.show();
+    }
 
+    private void loadTraceTypes() {
+        rf.systemService().getTidMap(selectedHost.getId()).fire(new Receiver<List<SymbolProxy>>() {
             @Override
-            public void onSuccess(Method method, Map<String, String> response) {
-                for (Map.Entry<String, String> e : response.entrySet()) {
-                    int tid = Integer.parseInt(e.getKey());
-                    traceTypes.put(tid, e.getValue());
-                    cmbTraceType.add(tid);
+            public void onSuccess(List<SymbolProxy> response) {
+                for (SymbolProxy e : response) {
+                    traceTypes.put(e.getId(), e.getName());
+                    cmbTraceType.add(e.getId());
                 }
             }
         });

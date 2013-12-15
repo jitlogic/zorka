@@ -18,13 +18,24 @@ package com.jitlogic.zico.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.resources.client.DataResource;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.resources.client.TextResource;
+import com.google.gwt.user.cellview.client.DataGrid;
 
 public interface Resources extends ClientBundle {
 
+
+    public static interface ZicoDataGridCssResources extends DataGrid.Resources {
+        @Source({DataGrid.Style.DEFAULT_CSS, "resources/ZicoDataGrid.css"})
+        DataGrid.Style dataGridStyle();
+    }
+
     public final static Resources INSTANCE = GWT.create(Resources.class);
+
+    @Source("resources/Zico.css")
+    ZicoCssResources zicoCssResources();
 
     @Source("images/error-mark.png")
     ImageResource errorMarkIcon();
@@ -47,11 +58,17 @@ public interface Resources extends ClientBundle {
     @Source("images/go-down-search.png")
     ImageResource goDownIcon();
 
+    @Source("images/go-up-search.png")
+    ImageResource goUpIcon();
+
     @Source("images/exception-thrown.png")
     ImageResource exceptionIcon();
 
     @Source("images/expand.png")
     ImageResource expandIcon();
+
+    @Source("images/lightning-go.png")
+    ImageResource ligtningGo();
 
     @Source("images/add.png")
     ImageResource addIcon();
@@ -83,8 +100,14 @@ public interface Resources extends ClientBundle {
     @Source("images/treePlus.gif")
     ImageResource treeMinusIcon();
 
+    @Source("images/treeMinusSlim.png")
+    ImageResource treeMinusSlimIcon();
+
     @Source("images/treeMinus.gif")
     ImageResource treePlusIcon();
+
+    @Source("images/treePlusSlim.png")
+    ImageResource treePlusSlimIcon();
 
     @Source("images/goto.png")
     ImageResource gotoIcon();
@@ -106,6 +129,21 @@ public interface Resources extends ClientBundle {
 
     @Source("images/key.png")
     ImageResource keyIcon();
+
+    @Source("images/zoom-in-5.png")
+    ImageResource zoomIn();
+
+    @Source("images/zoom-out-5.png")
+    ImageResource zoomOut();
+
+    @Source("images/attachment.png")
+    ImageResource attachment();
+
+    @Source("images/expander-expand.png")
+    ImageResource expanderExpand();
+
+    @Source("images/expander-collapse.png")
+    ImageResource expanderCollapse();
 
     @DataResource.MimeType("text/html")
     @Source("resources/tips.html")

@@ -20,13 +20,11 @@ import com.jitlogic.zico.core.ZicoService;
 import com.jitlogic.zorka.common.test.support.TestZicoProcessor;
 import com.jitlogic.zorka.common.test.support.TestZicoProcessorFactory;
 import com.jitlogic.zorka.common.tracedata.Symbol;
-import com.jitlogic.zorka.common.zico.*;
+import com.jitlogic.zorka.common.zico.ZicoClientConnector;
+import com.jitlogic.zorka.common.zico.ZicoException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;

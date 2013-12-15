@@ -21,13 +21,11 @@ import com.jitlogic.zico.core.eql.EqlExprEvaluator;
 import com.jitlogic.zico.core.eql.Parser;
 import com.jitlogic.zico.core.eql.ast.EqlExpr;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class EqlEvaluationUnitTest {

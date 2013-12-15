@@ -22,11 +22,15 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
-import com.jitlogic.zico.client.api.AdminApi;
-import com.jitlogic.zico.data.TraceTemplateInfo;
-import com.jitlogic.zico.data.TraceTemplateInfoProperties;
+import com.jitlogic.zico.client.inject.ZicoRequestFactory;
+import com.jitlogic.zico.client.props.TraceTemplateInfoProperties;
+import com.jitlogic.zico.shared.data.SymbolProxy;
+import com.jitlogic.zico.shared.data.TraceTemplateProxy;
+import com.jitlogic.zico.shared.services.SystemServiceProxy;
 import com.sencha.gxt.core.client.Style;
 import com.sencha.gxt.data.shared.LabelProvider;
 import com.sencha.gxt.data.shared.ListStore;
@@ -45,25 +49,28 @@ import com.sencha.gxt.widget.core.client.grid.editing.ClicksToEdit;
 import com.sencha.gxt.widget.core.client.grid.editing.GridRowEditing;
 import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.MethodCallback;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class TraceTemplatePanel extends VerticalLayoutContainer {
 
     private final static TraceTemplateInfoProperties props = GWT.create(TraceTemplateInfoProperties.class);
 
-    private AdminApi adminService;
-    private ListStore<TraceTemplateInfo> templateStore;
-    private Grid<TraceTemplateInfo> templateGrid;
-    private GridRowEditing<TraceTemplateInfo> templateEditor;
+    private ListStore<TraceTemplateProxy> templateStore;
+    private Grid<TraceTemplateProxy> templateGrid;
+    private GridRowEditing<TraceTemplateProxy> templateEditor;
 
     private SimpleComboBox<Integer> cmbTraceType;
 
     private Map<String, Integer> ttidByName = new HashMap<String, Integer>();
     private Map<Integer, String> ttidByType = new HashMap<Integer, String>();
+
     private SpinnerField<Integer> txtOrder;
     private TextField txtCondTempl;
     private TextField txtCondRegex;
@@ -71,12 +78,16 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
 
     private ErrorHandler errorHandler;
 
-    @Inject
-    public TraceTemplatePanel(AdminApi adminService, ErrorHandler errorHandler,
-                              @Assisted Map<String, String> tidMap) {
+    private ZicoRequestFactory rf;
 
-        this.adminService = adminService;
+    private SystemServiceProxy newTemplateRequest;
+
+    @Inject
+    public TraceTemplatePanel(ZicoRequestFactory rf, ErrorHandler errorHandler,
+                              @Assisted List<SymbolProxy> tidMap) {
+
         this.errorHandler = errorHandler;
+        this.rf = rf;
 
         createToolbar();
         createTemplateListGrid();
@@ -86,8 +97,8 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
 
 
     private void createTemplateListGrid() {
-        ColumnConfig<TraceTemplateInfo, Integer> traceIdCol
-                = new ColumnConfig<TraceTemplateInfo, Integer>(props.traceId(), 120, "Type");
+        ColumnConfig<TraceTemplateProxy, Integer> traceIdCol
+                = new ColumnConfig<TraceTemplateProxy, Integer>(props.traceId(), 120, "Type");
         traceIdCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         traceIdCol.setFixed(true);
 
@@ -99,32 +110,33 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
             }
         });
 
-        ColumnConfig<TraceTemplateInfo, Integer> orderCol
-                = new ColumnConfig<TraceTemplateInfo, Integer>(props.order(), 80, "Order");
+        ColumnConfig<TraceTemplateProxy, Integer> orderCol
+                = new ColumnConfig<TraceTemplateProxy, Integer>(props.order(), 80, "Order");
         orderCol.setFixed(true);
 
-        final ColumnConfig<TraceTemplateInfo, String> traceCondTemplCol
-                = new ColumnConfig<TraceTemplateInfo, String>(props.condTemplate(), 250, "Condition Template");
+        final ColumnConfig<TraceTemplateProxy, String> traceCondTemplCol
+                = new ColumnConfig<TraceTemplateProxy, String>(props.condTemplate(), 250, "Condition Template");
 
-        ColumnConfig<TraceTemplateInfo, String> traceCondRegexCol
-                = new ColumnConfig<TraceTemplateInfo, String>(props.condRegex(), 250, "Condition Match");
+        ColumnConfig<TraceTemplateProxy, String> traceCondRegexCol
+                = new ColumnConfig<TraceTemplateProxy, String>(props.condRegex(), 250, "Condition Match");
 
-        ColumnConfig<TraceTemplateInfo, String> traceTemplateCol
-                = new ColumnConfig<TraceTemplateInfo, String>(props.template(), 250, "Description Template");
+        ColumnConfig<TraceTemplateProxy, String> traceTemplateCol
+                = new ColumnConfig<TraceTemplateProxy, String>(props.template(), 250, "Description Template");
 
-        ColumnModel<TraceTemplateInfo> model = new ColumnModel<TraceTemplateInfo>(Arrays.<ColumnConfig<TraceTemplateInfo, ?>>asList(
-                traceIdCol, orderCol, traceCondTemplCol, traceCondRegexCol, traceTemplateCol));
+        ColumnModel<TraceTemplateProxy> model = new ColumnModel<TraceTemplateProxy>(
+                Arrays.<ColumnConfig<TraceTemplateProxy, ?>>asList(
+                    traceIdCol, orderCol, traceCondTemplCol, traceCondRegexCol, traceTemplateCol));
 
-        templateStore = new ListStore<TraceTemplateInfo>(props.key());
+        templateStore = new ListStore<TraceTemplateProxy>(props.key());
 
-        templateGrid = new Grid<TraceTemplateInfo>(templateStore, model);
+        templateGrid = new Grid<TraceTemplateProxy>(templateStore, model);
         templateGrid.getSelectionModel().setSelectionMode(Style.SelectionMode.SINGLE);
 
         templateGrid.getView().setForceFit(true);
         templateGrid.getView().setAutoFill(true);
 
 
-        templateEditor = new GridRowEditing<TraceTemplateInfo>(templateGrid);
+        templateEditor = new GridRowEditing<TraceTemplateProxy>(templateGrid);
         templateEditor.setClicksToEdit(ClicksToEdit.TWO);
 
         cmbTraceType = new SimpleComboBox<Integer>(new LabelProvider<Integer>() {
@@ -152,9 +164,9 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
         templateEditor.addEditor(traceTemplateCol, txtTraceTemplate);
 
 
-        templateEditor.addCompleteEditHandler(new CompleteEditEvent.CompleteEditHandler<TraceTemplateInfo>() {
+        templateEditor.addCompleteEditHandler(new CompleteEditEvent.CompleteEditHandler<TraceTemplateProxy>() {
             @Override
-            public void onCompleteEdit(final CompleteEditEvent<TraceTemplateInfo> event) {
+            public void onCompleteEdit(final CompleteEditEvent<TraceTemplateProxy> event) {
                 saveChanges(event.getEditCell().getRow());
             }
         });
@@ -164,23 +176,17 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
 
 
     private void saveChanges(int row) {
-        final TraceTemplateInfo tti = templateStore.get(row);
+        SystemServiceProxy req = newTemplateRequest != null ? newTemplateRequest : rf.systemService();
+        newTemplateRequest = null;
+        final TraceTemplateProxy tti = req.edit(templateStore.get(row));
         tti.setTraceId(cmbTraceType.getCurrentValue());
         tti.setOrder(txtOrder.getCurrentValue());
         tti.setCondTemplate(txtCondTempl.getCurrentValue());
         tti.setCondRegex(txtCondRegex.getCurrentValue());
         tti.setTemplate(txtTraceTemplate.getCurrentValue());
-        adminService.saveTemplate(tti, new MethodCallback<Integer>() {
+        req.saveTemplate(tti).fire(new Receiver<Integer>() {
             @Override
-            public void onFailure(Method method, Throwable exception) {
-                GWT.log("Error calling method " + method, exception);
-            }
-
-            @Override
-            public void onSuccess(Method method, Integer response) {
-                if (tti.getId() == 0) {
-                    tti.setId(response);
-                }
+            public void onSuccess(Integer integer) {
                 loadData();
             }
         });
@@ -219,8 +225,7 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
         btnNew.addSelectHandler(new SelectEvent.SelectHandler() {
             @Override
             public void onSelect(SelectEvent event) {
-                templateStore.add(0, new TraceTemplateInfo());
-                templateEditor.startEditing(new Grid.GridCell(0, 2));
+                addTemplate();
             }
         });
 
@@ -248,67 +253,65 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
         btnEdit.addSelectHandler(new SelectEvent.SelectHandler() {
             @Override
             public void onSelect(SelectEvent event) {
-                TraceTemplateInfo tti = templateGrid.getSelectionModel().getSelectedItem();
-                if (tti != null) {
-                    int row = templateStore.indexOf(tti);
-                    templateEditor.startEditing(new Grid.GridCell(row, 2));
-                }
+                editTemplate();
             }
         });
 
         add(toolBar, new VerticalLayoutData(1, -1));
     }
 
+    private void editTemplate() {
+        TraceTemplateProxy tti = templateGrid.getSelectionModel().getSelectedItem();
+        if (tti != null) {
+            int row = templateStore.indexOf(tti);
+            templateEditor.startEditing(new Grid.GridCell(row, 2));
+        }
+    }
+
+    private void addTemplate() {
+        newTemplateRequest = rf.systemService();
+        templateStore.add(0, newTemplateRequest.create(TraceTemplateProxy.class));
+        templateEditor.startEditing(new Grid.GridCell(0, 2));
+    }
+
 
     private void removeSelectedTemplate() {
-        TraceTemplateInfo tti = templateGrid.getSelectionModel().getSelectedItem();
-        if (tti != null) {
-            adminService.removeTemplate(tti.getId(), new MethodCallback<Void>() {
-                @Override
-                public void onFailure(Method method, Throwable exception) {
-                    GWT.log("Error executing method " + method, exception);
-                }
-
-                @Override
-                public void onSuccess(Method method, Void response) {
-                    loadData();
-                }
-            });
+        TraceTemplateProxy template = templateGrid.getSelectionModel().getSelectedItem();
+        if (template != null) {
+            templateStore.remove(template);
+            rf.systemService().removeTemplate(template.getId()).fire();
         }
     }
 
 
-    private void loadTids(Map<String, String> tidMap) {
-        for (Map.Entry<String, String> e : tidMap.entrySet()) {
-            // TODO this is a crutch; bug in RestyGWT/Jersey or use beans instead ?
-            int tid = Integer.parseInt(e.getKey());
-            String name = e.getValue();
-            ttidByName.put(name, tid);
-            ttidByType.put(tid, name);
-            cmbTraceType.add(tid);
+    private void loadTids(List<SymbolProxy> tidMap) {
+        for (SymbolProxy e : tidMap) {
+            ttidByName.put(e.getName(), e.getId());
+            ttidByType.put(e.getId(), e.getName());
+            cmbTraceType.add(e.getId());
         }
     }
 
 
     private void loadData() {
-        adminService.listTemplates(new MethodCallback<List<TraceTemplateInfo>>() {
+        rf.systemService().listTemplates().fire(new Receiver<List<TraceTemplateProxy>>() {
             @Override
-            public void onFailure(Method method, Throwable exception) {
-                errorHandler.error("Error calling API method: " + method, exception);
+            public void onSuccess(List<TraceTemplateProxy> response) {
+                updateData(response);
             }
 
             @Override
-            public void onSuccess(Method method, List<TraceTemplateInfo> response) {
-                updateData(response);
+            public void onFailure(ServerFailure e) {
+                errorHandler.error("Error loading trace templates: ", e);
             }
         });
     }
 
 
-    private void updateData(List<TraceTemplateInfo> data) {
-        Collections.sort(data, new Comparator<TraceTemplateInfo>() {
+    private void updateData(List<TraceTemplateProxy> data) {
+        Collections.sort(data, new Comparator<TraceTemplateProxy>() {
             @Override
-            public int compare(TraceTemplateInfo o1, TraceTemplateInfo o2) {
+            public int compare(TraceTemplateProxy o1, TraceTemplateProxy o2) {
                 if (o1.getTraceId() != o2.getTraceId()) {
                     return traceTypeName(o1.getTraceId()).compareTo(traceTypeName(o2.getTraceId()));
                 }

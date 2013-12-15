@@ -40,7 +40,7 @@ __jbossejb() {
       .onReturn(
         ejb._params ? spy.fetchRetVal("RET") : spy.put("RET", ""))
       .onSubmit(
-        ejb._params ? (com.jitlogic.zorka.core.spy.SpyProcessor)(ejb.arg_processor()) : spy.put("PARAMS", ""),
+        ejb._params ? ejb.arg_processor() : spy.put("PARAMS", ""),
         ejb._trace ? tracer.attr("RET", "RET") : null,
         ejb._stats ? spy.zorkaStats("java", ejb._mbean, "byMethod", "${CLASS}.${METHOD}") : null,
         ejb._stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null,

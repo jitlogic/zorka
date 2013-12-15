@@ -15,20 +15,20 @@
  */
 package com.jitlogic.zico.test;
 
-import com.jitlogic.zico.data.TraceTemplateInfo;
+import com.jitlogic.zico.core.model.TraceTemplate;
 import com.jitlogic.zico.test.support.ZicoFixture;
-
 import org.junit.Test;
 
 import java.util.List;
-import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TemplateManagerUnitTest extends ZicoFixture {
 
-    private TraceTemplateInfo tti(int tid, int order, String condT, String condP, String templ) {
-        TraceTemplateInfo tti = new TraceTemplateInfo();
+    private TraceTemplate tti(int tid, int order, String condT, String condP, String templ) {
+        TraceTemplate tti = new TraceTemplate();
         tti.setTraceId(tid);
         tti.setOrder(order);
         tti.setCondTemplate(condT);
@@ -40,12 +40,12 @@ public class TemplateManagerUnitTest extends ZicoFixture {
 
     @Test
     public void testInsertNewTemplateRecord() throws Exception {
-        TraceTemplateInfo t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
+        TraceTemplate t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
 
-        t1.setId(adminService.saveTemplate(t1));
+        t1.setId(systemService.saveTemplate(t1));
         assertTrue("TEMPLATE_ID should be assigned by database and > 0", t1.getId() > 0);
 
-        List<TraceTemplateInfo> lst = adminService.listTemplates();
+        List<TraceTemplate> lst = systemService.listTemplates();
         assertEquals(1, lst.size());
         assertEquals(t1.getId(), lst.get(0).getId());
     }
@@ -53,30 +53,29 @@ public class TemplateManagerUnitTest extends ZicoFixture {
 
     @Test
     public void testInsertAndModifyNewTemplate() {
-        TraceTemplateInfo t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
-        t1.setId(adminService.saveTemplate(t1));
+        TraceTemplate t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
+        t1.setId(systemService.saveTemplate(t1));
 
 
         t1.setTemplate("some.Class.findKey(${ARG0})");
-        adminService.saveTemplate(t1);
+        systemService.saveTemplate(t1);
 
-        List<TraceTemplateInfo> lst = adminService.listTemplates();
+        List<TraceTemplate> lst = systemService.listTemplates();
         assertEquals(1, lst.size());
         assertEquals(t1.getId(), lst.get(0).getId());
     }
 
     @Test
     public void testAddRemoveTemplate() {
-        TraceTemplateInfo t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
-        t1.setId(adminService.saveTemplate(t1));
+        TraceTemplate t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
+        t1.setId(systemService.saveTemplate(t1));
 
-        adminService.removeTemplate(t1.getId());
-        assertEquals(0, adminService.listTemplates().size());
+        systemService.removeTemplate(t1.getId());
+        assertEquals(0, systemService.listTemplates().size());
     }
 
     @Test
     public void testSearchForEmptyTraceIdMap() {
-        Map<Integer, String> ttids = traceDataService.getTidMap();
-        assertEquals(0, ttids.size());
+        assertThat(systemService.getTidMap(null)).hasSize(0);
     }
 }

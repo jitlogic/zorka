@@ -20,7 +20,6 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 
 import java.util.Date;
-import java.util.regex.Pattern;
 
 public class ClientUtil {
 

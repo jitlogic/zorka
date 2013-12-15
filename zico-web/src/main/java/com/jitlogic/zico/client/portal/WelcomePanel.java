@@ -18,34 +18,33 @@ package com.jitlogic.zico.client.portal;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.ZicoShell;
-import com.jitlogic.zico.client.api.AdminApi;
-import com.jitlogic.zico.client.api.SystemApi;
-import com.jitlogic.zico.client.api.TraceDataApi;
 import com.jitlogic.zico.client.inject.PanelFactory;
+import com.jitlogic.zico.client.inject.ZicoRequestFactory;
+import com.jitlogic.zico.shared.data.SymbolProxy;
 import com.sencha.gxt.widget.core.client.Portlet;
 import com.sencha.gxt.widget.core.client.button.ToolButton;
 import com.sencha.gxt.widget.core.client.container.PortalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
-import org.fusesource.restygwt.client.Method;
-import org.fusesource.restygwt.client.MethodCallback;
 
 import javax.inject.Provider;
-import java.util.Map;
+import java.util.List;
 
 public class WelcomePanel implements IsWidget {
 
     private PortalLayoutContainer portal;
 
-    private AdminApi adminApi;
-    private SystemApi systemApi;
+    private ZicoRequestFactory rf;
 
-    private TraceDataApi traceDataApi;
     private Provider<ZicoShell> shell;
 
     private SystemInfoPortlet systemInfoPortlet;
@@ -54,15 +53,12 @@ public class WelcomePanel implements IsWidget {
     private ErrorHandler errorHandler;
 
     @Inject
-    public WelcomePanel(AdminApi adminApi, TraceDataApi traceDataApi,
-                        SystemApi systemApi,
+    public WelcomePanel(ZicoRequestFactory rf,
                         SystemInfoPortlet systemInfoPortlet,
                         PanelFactory panelFactory, Provider<ZicoShell> shell,
                         ErrorHandler errorHandler) {
 
-        this.adminApi = adminApi;
-        this.systemApi = systemApi;
-        this.traceDataApi = traceDataApi;
+        this.rf = rf;
         this.systemInfoPortlet = systemInfoPortlet;
         this.panelFactory = panelFactory;
         this.shell = shell;
@@ -100,18 +96,15 @@ public class WelcomePanel implements IsWidget {
 
         createUserPortlet();
 
-        systemApi.isAdminRole(new MethodCallback<Boolean>() {
+        rf.userService().isAdminMode().fire(new Receiver<Boolean>() {
             @Override
-            public void onFailure(Method method, Throwable exception) {
-            }
-
-            @Override
-            public void onSuccess(Method method, Boolean isAdmin) {
+            public void onSuccess(Boolean isAdmin) {
                 if (isAdmin) {
                     createAdminPortlet();
                 }
             }
         });
+
 
     }
 
@@ -181,14 +174,9 @@ public class WelcomePanel implements IsWidget {
 
 
     private void openTemplatePanel() {
-        traceDataApi.getTidMap(new MethodCallback<Map<String, String>>() {
+        rf.systemService().getTidMap(null).fire(new Receiver<List<SymbolProxy>>() {
             @Override
-            public void onFailure(Method method, Throwable exception) {
-                errorHandler.error("Error calling method: " + method, exception);
-            }
-
-            @Override
-            public void onSuccess(Method method, Map<String, String> response) {
+            public void onSuccess(List<SymbolProxy> response) {
                 shell.get().addView(panelFactory.traceTemplatePanel(response), "Templates");
             }
         });

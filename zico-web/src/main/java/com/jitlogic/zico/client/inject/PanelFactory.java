@@ -17,25 +17,33 @@ package com.jitlogic.zico.client.inject;
 
 
 import com.google.inject.assistedinject.Assisted;
-import com.jitlogic.zico.client.panel.*;
-import com.jitlogic.zico.data.HostInfo;
-import com.jitlogic.zico.data.TraceInfo;
+import com.jitlogic.zico.client.panel.MethodAttrsDialog;
+import com.jitlogic.zico.client.panel.MethodRankingPanel;
+import com.jitlogic.zico.client.panel.PasswordChangeDialog;
+import com.jitlogic.zico.client.panel.TraceCallTreePanel;
+import com.jitlogic.zico.client.panel.TraceListPanel;
+import com.jitlogic.zico.client.panel.TraceRecordSearchDialog;
+import com.jitlogic.zico.client.panel.TraceTemplatePanel;
+import com.jitlogic.zico.client.panel.UserManagementPanel;
+import com.jitlogic.zico.shared.data.HostProxy;
+import com.jitlogic.zico.shared.data.SymbolProxy;
+import com.jitlogic.zico.shared.data.TraceInfoProxy;
 
-import java.util.Map;
+import java.util.List;
 
 public interface PanelFactory {
 
-    public TraceListPanel traceListPanel(HostInfo hostInfo);
+    public TraceListPanel traceListPanel(HostProxy hostInfo);
 
-    public TraceDetailPanel traceDetailPanel(TraceInfo traceInfo);
+    public TraceCallTreePanel traceCallTreePanel(TraceInfoProxy traceInfo);
 
-    public TraceTemplatePanel traceTemplatePanel(Map<String, String> tidMap);
+    public TraceTemplatePanel traceTemplatePanel(List<SymbolProxy> tidMap);
 
-    public TraceRecordSearchDialog traceRecordSearchDialog(TraceDetailPanel panel, TraceInfo trace);
+    public TraceRecordSearchDialog traceRecordSearchDialog(TraceCallTreePanel panel, TraceInfoProxy trace);
 
     public MethodAttrsDialog methodAttrsDialog(Integer hostId, Long dataOffs, String path, @Assisted("minTime") Long minTime);
 
-    public MethodRankingPanel methodRankingPanel(TraceInfo traceInfo);
+    public MethodRankingPanel methodRankingPanel(TraceInfoProxy traceInfo);
 
     public PasswordChangeDialog passwordChangeDialog(@Assisted("userName") String userName);
 

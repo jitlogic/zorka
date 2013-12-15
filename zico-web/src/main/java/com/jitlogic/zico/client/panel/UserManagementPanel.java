@@ -29,7 +29,9 @@ import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.inject.PanelFactory;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
-import com.jitlogic.zico.data.*;
+import com.jitlogic.zico.shared.data.HostProxy;
+import com.jitlogic.zico.shared.data.UserProxy;
+import com.jitlogic.zico.shared.services.UserServiceProxy;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.ListStore;
@@ -38,7 +40,10 @@ import com.sencha.gxt.data.shared.PropertyAccess;
 import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
-import com.sencha.gxt.widget.core.client.event.*;
+import com.sencha.gxt.widget.core.client.event.CancelEditEvent;
+import com.sencha.gxt.widget.core.client.event.CellClickEvent;
+import com.sencha.gxt.widget.core.client.event.CompleteEditEvent;
+import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.CheckBox;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.CheckBoxSelectionModel;
@@ -51,7 +56,11 @@ import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 public class UserManagementPanel extends VerticalLayoutContainer implements Editor<UserProxy> {
@@ -271,18 +280,25 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
         userEditor.addCompleteEditHandler(new CompleteEditEvent.CompleteEditHandler<UserProxy>() {
             @Override
             public void onCompleteEdit(CompleteEditEvent<UserProxy> event) {
-                UserServiceProxy req = newUserRequest != null ? newUserRequest : rf.userService();
-                UserProxy user = userStore.get(event.getEditCell().getRow());
-                UserProxy editedUser = user.getId() != null ? req.edit(user) : user;
-                editedUser.setUserName(txtUserName.getText());
-                editedUser.setRealName(txtRealName.getText());
-                editedUser.setAdmin(cbxUserAdmin.getValue());
-                req.persist(editedUser).fire();
-                refreshUsers();
+                saveUser(userStore.get(event.getEditCell().getRow()));
             }
         });
 
         pnlUserList.add(userGrid, new VerticalLayoutData(1, 1));
+    }
+
+    private void saveUser(UserProxy user) {
+        UserServiceProxy req = newUserRequest != null ? newUserRequest : rf.userService();
+        UserProxy editedUser = user.getId() != null ? req.edit(user) : user;
+        editedUser.setUserName(txtUserName.getText());
+        editedUser.setRealName(txtRealName.getText());
+        editedUser.setAdmin(cbxUserAdmin.getValue());
+        req.persist(editedUser).fire(new Receiver<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                refreshUsers();
+            }
+        });
     }
 
 
@@ -298,7 +314,7 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
         if (user != null) {
             userStore.remove(user);
             rf.userService().remove(user).fire();
-            refreshUsers();
+            //refreshUsers();
         }
     }
 

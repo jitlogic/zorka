@@ -15,20 +15,22 @@
  */
 package com.jitlogic.zico.core;
 
+import com.google.inject.Singleton;
+import com.jitlogic.zorka.common.tracedata.Symbol;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
+
 import javax.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-
-import com.google.inject.Singleton;
-import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
 
 @Singleton
 public class TraceTypeRegistry {
@@ -76,16 +78,16 @@ public class TraceTypeRegistry {
     }
 
 
-    public synchronized Map<Integer, String> getTidMap(Integer host) {
-        Map<Integer, String> map = new HashMap<Integer, String>();
+    public synchronized List<Symbol> getTidMap(Integer host) {
+        List<Symbol> kv = new ArrayList<Symbol>(tids.size());
 
         for (Map.Entry<Integer, Set<Integer>> e : tids.entrySet()) {
             if (host == null || e.getValue().contains(host)) {
-                map.put(e.getKey(), symbols.symbolName(e.getKey()));
+                kv.add(new Symbol(e.getKey(), symbols.symbolName(e.getKey())));
             }
         }
 
-        return map;
+        return kv;
     }
 
 }
