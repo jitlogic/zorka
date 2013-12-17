@@ -49,6 +49,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     private Map<Integer, Integer> sidMap = new HashMap<Integer, Integer>();
 
     private RDSStore traceDataStore;
+    private TraceInfoStore traceInfoStore;
     private TraceTypeRegistry traceTypeRegistry;
     private TraceTableWriter traceTableWriter;
 
@@ -56,11 +57,13 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
     private Set<Object> visitedObjects = new HashSet<Object>();
 
+    // TODO move all data saving activity to HostStore, only symbolID translation should be performed here;
 
     public ReceiverContext(HostStore store, TraceTypeRegistry traceTypeRegistry, TraceTableWriter traceTableWriter) {
         this.symbolRegistry = store.getStoreManager().getSymbolRegistry();
-        this.traceDataStore = store.getRds();
+        this.traceDataStore = store.getRdsData();
         this.hostInfo = store.getHostInfo();
+        this.traceInfoStore = store.getTraceInfoStore();
         this.traceTypeRegistry = traceTypeRegistry;
         this.traceTableWriter = traceTableWriter;
     }
@@ -96,19 +99,27 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     private void processTraceRecord(TraceRecord rec) throws IOException {
         if (!hostInfo.hasFlag(HostInfo.DISABLED)) {
             rec.traverse(this);
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            FressianWriter writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);
-            writer.writeObject(rec);
-            byte[] chunk = os.toByteArray();
-            long offs = traceDataStore.write(chunk);
-            save(hostInfo.getId(), offs, chunk.length, rec);
+            byte[] dataChunk = serialize(rec);
+            long dataOffs = traceDataStore.write(dataChunk);
+
+            traceInfoStore.save(rec, dataOffs, dataChunk.length);
+
+            save(hostInfo.getId(), dataOffs, dataChunk.length, 0L, 0L, rec);
         } else {
             log.debug("Dropping trace for inactive host: " + hostInfo.getName());
         }
     }
 
 
-    public void save(int hostId, long offs, int length, TraceRecord tr) {
+    private byte[] serialize(TraceRecord rec) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        FressianWriter writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);
+        writer.writeObject(rec);
+        return os.toByteArray();
+    }
+
+
+    public void save(int hostId, long dataOffs, int dataLength, long indexOffs, long indexLength, TraceRecord tr) {
 
         JSONObject attrMap = new JSONObject();
 
@@ -148,9 +159,11 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
         traceTableWriter.submit(ZorkaUtil.<String, Object>map(
                 "HOST_ID", hostId,
-                "DATA_OFFS", offs,
+                "DATA_OFFS", dataOffs,
+                "DATA_LEN", dataLength,
+                "INDEX_OFFS", indexOffs,
+                "INDEX_LEN", indexLength,
                 "TRACE_ID", tr.getMarker().getTraceId(),
-                "DATA_LEN", length,
                 "CLOCK", tr.getClock(),
                 "RFLAGS", tr.getFlags(),
                 "TFLAGS", tr.getMarker().getFlags(),
@@ -160,22 +173,11 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
                 "SIGN_ID", tr.getSignatureId(),
                 "CALLS", tr.getCalls(),
                 "ERRORS", tr.getErrors(),
-                "RECORDS", numRecords(tr),
+                "RECORDS", ZicoUtil.numRecords(tr),
                 "EXTIME", tr.getTime(),
                 "ATTRS", attrJson,
                 "EXINFO", exJson
         ));
-    }
-
-
-    private int numRecords(TraceRecord rec) {
-        int n = 1;
-
-        for (int i = 0; i < rec.numChildren(); i++) {
-            n += numRecords(rec.getChild(i));
-        }
-
-        return n;
     }
 
 

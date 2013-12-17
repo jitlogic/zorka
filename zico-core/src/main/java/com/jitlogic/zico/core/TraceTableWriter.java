@@ -60,7 +60,7 @@ public class TraceTableWriter implements Runnable {
         synchronous = config.boolCfg("dbwriter.synchronous.mode", false);
 
         jdbci = new SimpleJdbcInsert(ds).withTableName("TRACES").usingColumns(
-                "HOST_ID", "DATA_OFFS", "TRACE_ID", "DATA_LEN", "CLOCK", "RFLAGS", "TFLAGS", "STATUS",
+                "HOST_ID", "DATA_OFFS", "INDEX_OFFS", "INDEX_LEN", "TRACE_ID", "DATA_LEN", "CLOCK", "RFLAGS", "TFLAGS", "STATUS",
                 "CLASS_ID", "METHOD_ID", "SIGN_ID", "CALLS", "ERRORS", "RECORDS", "EXTIME", "ATTRS", "EXINFO");
     }
 

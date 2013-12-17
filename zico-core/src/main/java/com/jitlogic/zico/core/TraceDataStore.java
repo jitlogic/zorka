@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class TraceRecordStore {
+public class TraceDataStore {
 
     private HostStore hostStore;
     private TraceInfo traceInfo;
@@ -52,7 +52,7 @@ public class TraceRecordStore {
     private SymbolRegistry symbolRegistry;
 
 
-    public TraceRecordStore(HostStore hostStore, TraceInfo traceInfo, TraceCache cache, SymbolRegistry symbolRegistry) {
+    public TraceDataStore(HostStore hostStore, TraceInfo traceInfo, TraceCache cache, SymbolRegistry symbolRegistry) {
         this.hostStore = hostStore;
         this.traceInfo = traceInfo;
 
@@ -124,7 +124,7 @@ public class TraceRecordStore {
         TraceRecord tr = cache.get(filter);
 
         if (tr == null) {
-            RDSStore rds = hostStore.getRds();
+            RDSStore rds = hostStore.getRdsData();
             byte[] blob = rds.read(traceInfo.getDataOffs(), traceInfo.getDataLen());
             ByteArrayInputStream is = new ByteArrayInputStream(blob);
             FressianReader reader = new FressianReader(is, FressianTraceFormat.READ_LOOKUP);

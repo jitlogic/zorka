@@ -36,7 +36,7 @@ public class DataReceptionUnitTest extends ZicoFixture {
         assertEquals(t1, symbols.symbolId("t1"));
         assertNotEquals(t1, t2);
 
-        assertNotNull(store.getRds());
+        assertNotNull(store.getRdsData());
     }
 
 }

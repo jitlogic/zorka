@@ -154,7 +154,7 @@ public class RDSStore implements Closeable {
     /**
      * (Re)opens latest output file.
      */
-    private void rotate() throws IOException {
+    public synchronized void rotate() throws IOException {
         String fname = String.format("%016x.rgz", logicalPos).toLowerCase();
 
         if (output != null) {
@@ -245,6 +245,11 @@ public class RDSStore implements Closeable {
             throw new RDSException("No data written.");
         }
 
+        if (output.physicalLength() > fileSize) {
+            rotate();
+            cleanup();
+        }
+
         output.write(data);
 
         long pos = logicalPos;
@@ -252,10 +257,6 @@ public class RDSStore implements Closeable {
         logicalPos += data.length;
         outputPos += data.length;
 
-        if (output.physicalLength() > fileSize) {
-            rotate();
-            cleanup();
-        }
 
         return pos;
     }

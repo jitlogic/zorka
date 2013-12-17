@@ -61,8 +61,8 @@ __zico() {
     "com.jitlogic.zico.core.search.**",
     "com.jitlogic.zico.core.ZicoUtil$1/compare",
     "com.jitlogic.zico.core.HostStore$1/mapRow",
-    "com.jitlogic.zico.core.TraceRecordStore/packTraceRecord",
-    "com.jitlogic.zico.core.TraceRecordStore/searchRecords",
+    "com.jitlogic.zico.core.TraceDataStore/packTraceRecord",
+    "com.jitlogic.zico.core.TraceDataStore/searchRecords",
     "com.jitlogic.zico.core.locators.TraceTemplateManager",
     "com.jitlogic.zico.core.ZicoUtil"
   );

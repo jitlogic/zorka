@@ -29,6 +29,7 @@
         <parboiled.version>1.1.6</parboiled.version>
         <bval.version>0.5</bval.version>
         <json.version>1.2</json.version>
+        <mapdb.version>0.9.7</mapdb.version>
     </properties>
 
     <repositories>

@@ -169,31 +169,31 @@ public class RDSStoreUnitTest extends ZicoFixture {
         verifyChunks(path, 0L);
 
         rds.write(r1);
-        verifyChunks(path, 0L, 1100L);
+        verifyChunks(path, 0L);
         assertThat(rds.read(0, 1100)).isEqualTo(r1);
 
         rds.write(r2);
-        verifyChunks(path, 0L, 1100L, 2200L);
+        verifyChunks(path, 0L, 1100L);
         assertThat(rds.read(0, 1100)).isEqualTo(r1);
         assertThat(rds.read(1100, 1100)).isEqualTo(r2);
 
         rds.write(r3);
-        verifyChunks(path, 0L, 1100L, 2200L, 3300L);
+        verifyChunks(path, 0L, 1100L, 2200L);
         assertThat(rds.read(0, 1100)).isEqualTo(r1);
         assertThat(rds.read(1100, 1100)).isEqualTo(r2);
         assertThat(rds.read(2200, 1100)).isEqualTo(r3);
 
         rds.write(r4);
-        verifyChunks(path, 1100L, 2200L, 3300L, 4400L);
-        assertThat(rds.read(0, 1100)).isEqualTo(r0);
+        verifyChunks(path, 0L, 1100L, 2200L, 3300L);
+        assertThat(rds.read(0, 1100)).isEqualTo(r1);
         assertThat(rds.read(1100, 1100)).isEqualTo(r2);
         assertThat(rds.read(2200, 1100)).isEqualTo(r3);
         assertThat(rds.read(3300, 1100)).isEqualTo(r4);
 
         rds.write(r5);
-        verifyChunks(path, 2200L, 3300L, 4400L, 5500L);
+        verifyChunks(path, 1100L, 2200L, 3300L, 4400L);
         assertThat(rds.read(0, 1100)).isEqualTo(r0);
-        assertThat(rds.read(1100, 1100)).isEqualTo(r0);
+        assertThat(rds.read(1100, 1100)).isEqualTo(r2);
         assertThat(rds.read(2200, 1100)).isEqualTo(r3);
         assertThat(rds.read(3300, 1100)).isEqualTo(r4);
         assertThat(rds.read(4400, 1100)).isEqualTo(r5);
@@ -218,7 +218,7 @@ public class RDSStoreUnitTest extends ZicoFixture {
         assertThat(rds.read(1100, 1100)).isEqualTo(r0);
 
         rds.write(r2);
-        verifyChunks(path, 0L, 2200L);
+        verifyChunks(path, 0L);
         assertThat(rds.read(0, 1100)).isEqualTo(r1);
         assertThat(rds.read(1100, 1100)).isEqualTo(r2);
 
@@ -229,7 +229,7 @@ public class RDSStoreUnitTest extends ZicoFixture {
         assertThat(rds.read(2200, 1100)).isEqualTo(r3);
 
         rds.write(r4);
-        verifyChunks(path, 0L, 2200L, 4400L);
+        verifyChunks(path, 0L, 2200L);
         assertThat(rds.read(0, 1100)).isEqualTo(r1);
         assertThat(rds.read(1100, 1100)).isEqualTo(r2);
         assertThat(rds.read(2200, 1100)).isEqualTo(r3);
@@ -244,9 +244,9 @@ public class RDSStoreUnitTest extends ZicoFixture {
         assertThat(rds.read(4400, 1100)).isEqualTo(r5);
 
         rds.write(r6);
-        verifyChunks(path, 2200L, 4400L, 6600L);
-        assertThat(rds.read(0, 1100)).isEqualTo(r0);
-        assertThat(rds.read(1100, 1100)).isEqualTo(r0);
+        verifyChunks(path, 0L, 2200L, 4400L);
+        assertThat(rds.read(0, 1100)).isEqualTo(r1);
+        assertThat(rds.read(1100, 1100)).isEqualTo(r2);
         assertThat(rds.read(2200, 1100)).isEqualTo(r3);
         assertThat(rds.read(3300, 1100)).isEqualTo(r4);
         assertThat(rds.read(4400, 1100)).isEqualTo(r5);

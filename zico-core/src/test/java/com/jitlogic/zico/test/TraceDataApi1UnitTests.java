@@ -37,11 +37,11 @@ public class TraceDataApi1UnitTests extends ZicoFixture {
         jdbc.update("insert into HOSTS (HOST_NAME,HOST_ADDR,HOST_PATH) values(?,?,?)", "test", "127.0.0.1", "test");
         hostId = jdbc.queryForObject("select HOST_ID from HOSTS where HOST_NAME = 'test'", Integer.class);
 
-        jdbc.update("insert into TRACES values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                hostId, 10, 1, 100, 1234, 1, 2, 0, 6, 5, 4, 100, 10, 50, 1000, "EJB|invoke|testdata", null);
+        jdbc.update("insert into TRACES values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                hostId, 10, 1, 100, 1, 10, 1234, 1, 2, 0, 6, 5, 4, 100, 10, 50, 1000, "EJB|invoke|testdata", null);
 
-        jdbc.update("insert into TRACES values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                hostId, 20, 1, 100, 1234, 1, 2, 0, 6, 5, 4, 100, 10, 50, 1000, "HTTP|index.do|500", null);
+        jdbc.update("insert into TRACES values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                hostId, 20, 1, 100, 1, 10, 1234, 1, 2, 0, 6, 5, 4, 100, 10, 50, 1000, "HTTP|index.do|500", null);
 
     }
 

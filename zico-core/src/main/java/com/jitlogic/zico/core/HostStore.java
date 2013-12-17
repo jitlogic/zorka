@@ -53,7 +53,10 @@ public class HostStore implements Closeable, RDSCleanupListener {
     private final static Logger log = LoggerFactory.getLogger(HostStore.class);
 
     private String rootPath;
-    private RDSStore rds;
+    private RDSStore rdsData;
+
+    private TraceInfoStore traceInfoStore;
+
     private HostInfo hostInfo;
     private HostStoreManager manager;
 
@@ -139,6 +142,13 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
         this.rootPath = ZorkaUtil.path(manager.getDataDir(), hostInfo.getPath());
 
+        File rdsDir = new File(rootPath);
+        if (!rdsDir.exists()) {
+            rdsDir.mkdirs();
+        }
+
+        traceInfoStore = new TraceInfoStore(manager.getConfig(), manager.getSymbolRegistry(), this);
+
         this.reOp = "pgsql".equals(manager.getConfig().stringCfg("zico.db.type", null)) ? "~" : "regexp";
     }
 
@@ -176,8 +186,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
     }
 
 
-    public synchronized RDSStore getRds() {
-        if (rds == null) {
+    public synchronized RDSStore getRdsData() {
+        if (rdsData == null) {
             String rootPath = ZorkaUtil.path(manager.getDataDir(), hostInfo.getPath());
             String rdspath = ZorkaUtil.path(rootPath, "traces");
 
@@ -189,16 +199,15 @@ public class HostStore implements Closeable, RDSCleanupListener {
             try {
                 long fileSize = getStoreManager().getConfig().kiloCfg("rds.file.size", 16 * 1024 * 1024L).intValue();
                 long segmentSize = getStoreManager().getConfig().kiloCfg("rds.seg.size", 1024 * 1024L);
-                rds = new RDSStore(rdspath,
+                rdsData = new RDSStore(rdspath,
                         hostInfo.getMaxSize(),
-                        fileSize,
-                        segmentSize, this);
-                //rds.addCleanupListener(this);
+                        fileSize, segmentSize,
+                        this, traceInfoStore);
             } catch (IOException e) {
                 log.error("Cannot open RDS store at '" + rdspath + "'", e);
             }
         }
-        return rds;
+        return rdsData;
     }
 
 
@@ -206,10 +215,10 @@ public class HostStore implements Closeable, RDSCleanupListener {
         jdbc.update("update HOSTS set HOST_ADDR=?, HOST_DESC=?, HOST_PASS=?, HOST_FLAGS=?, MAX_SIZE = ? where HOST_ID=?",
                 hostInfo.getAddr(), hostInfo.getDescription(), hostInfo.getPass(), hostInfo.getFlags(),
                 hostInfo.getMaxSize(), hostInfo.getId());
-        if (rds != null) {
-            rds.setMaxSize(hostInfo.getMaxSize());
+        if (rdsData != null) {
+            rdsData.setMaxSize(hostInfo.getMaxSize());
             try {
-                rds.cleanup();
+                rdsData.cleanup();
             } catch (IOException e) {
                 log.error("Error resizing RDS store for " + hostInfo.getName());
             }
@@ -337,8 +346,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
     }
 
 
-    public TraceRecordStore getTraceContext(long traceOffs) {
-        return new TraceRecordStore(this, getTrace(traceOffs), cache, manager.getSymbolRegistry());
+    public TraceDataStore getTraceContext(long traceOffs) {
+        return new TraceDataStore(this, getTrace(traceOffs), cache, manager.getSymbolRegistry());
     }
 
 
@@ -346,13 +355,15 @@ public class HostStore implements Closeable, RDSCleanupListener {
     public synchronized void close() throws IOException {
 
         try {
-            if (rds != null) {
-                rds.close();
-                rds = null;
+            if (rdsData != null) {
+                rdsData.close();
+                rdsData = null;
             }
         } catch (IOException e) {
-            log.error("Cannot close RDS store '" + rds + "' for " + hostInfo.getName(), e);
+            log.error("Cannot close RDS store '" + rdsData + "' for " + hostInfo.getName(), e);
         }
+
+        traceInfoStore.close();
     }
 
 
@@ -360,6 +371,9 @@ public class HostStore implements Closeable, RDSCleanupListener {
         return rootPath;
     }
 
+    public TraceInfoStore getTraceInfoStore() {
+        return traceInfoStore;
+    }
 
     public HostStoreManager getStoreManager() {
         return manager;
@@ -377,6 +391,10 @@ public class HostStore implements Closeable, RDSCleanupListener {
         }
     }
 
+    @Override
+    public void onChunkStarted(RDSStore origin, Long start) {
+        // Nothing to do here
+    }
 
     // ------------------ entity methods ----------------------
     public Integer getId() {

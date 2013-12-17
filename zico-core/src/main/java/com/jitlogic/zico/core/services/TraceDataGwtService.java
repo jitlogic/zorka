@@ -17,7 +17,7 @@ package com.jitlogic.zico.core.services;
 
 import com.google.inject.Singleton;
 import com.jitlogic.zico.core.HostStoreManager;
-import com.jitlogic.zico.core.TraceRecordStore;
+import com.jitlogic.zico.core.TraceDataStore;
 import com.jitlogic.zico.core.TraceTypeRegistry;
 import com.jitlogic.zico.core.UserManager;
 import com.jitlogic.zico.core.ZicoRuntimeException;
@@ -71,14 +71,14 @@ public class TraceDataGwtService {
 
 
     public List<MethodRankInfo> traceMethodRank(int hostId, long traceOffs, String orderBy, String orderDesc) {
-        TraceRecordStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
+        TraceDataStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
         return ctx.methodRank(orderBy, orderDesc);
     }
 
 
     public TraceRecordInfo getRecord(int hostId, long traceOffs, long minTime, String path) {
 
-        TraceRecordStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
+        TraceDataStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
         return ctx.packTraceRecord(ctx.getTraceRecord(path, minTime), path, null);
     }
 
@@ -90,7 +90,7 @@ public class TraceDataGwtService {
             path = null;
         }
 
-        TraceRecordStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
+        TraceDataStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
         TraceRecord tr = ctx.getTraceRecord(path, minTime);
 
         List<TraceRecordInfo> lst = new ArrayList<TraceRecordInfo>();
@@ -108,7 +108,7 @@ public class TraceDataGwtService {
     }
 
 
-    private void packRecords(String path, TraceRecordStore ctx, TraceRecord tr, List<TraceRecordInfo> lst, boolean recursive) {
+    private void packRecords(String path, TraceDataStore ctx, TraceRecord tr, List<TraceRecordInfo> lst, boolean recursive) {
         for (int i = 0; i < tr.numChildren(); i++) {
             TraceRecord child = tr.getChild(i);
             String childPath = path.length() > 0 ? (path + "/" + i) : "" + i;
@@ -123,7 +123,7 @@ public class TraceDataGwtService {
     public TraceRecordSearchResult searchRecords(int hostId, long traceOffs, long minTime, String path,
                                                  TraceDetailSearchExpression expr) {
 
-        TraceRecordStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
+        TraceDataStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
         TraceRecord tr = ctx.getTraceRecord(path, minTime);
         TraceRecordSearchResult result = new TraceRecordSearchResult();
         result.setResult(new ArrayList<TraceRecordInfo>());

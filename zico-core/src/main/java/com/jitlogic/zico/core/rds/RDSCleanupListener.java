@@ -20,4 +20,6 @@ public interface RDSCleanupListener {
 
     void onChunkRemoved(Long start, Long length);
 
+    void onChunkStarted(RDSStore origin, Long start);
+
 }

@@ -181,6 +181,16 @@ public class ZicoUtil {
     }
 
 
+    public static int numRecords(TraceRecord rec) {
+        int n = 1;
+
+        for (int i = 0; i < rec.numChildren(); i++) {
+            n += numRecords(rec.getChild(i));
+        }
+
+        return n;
+    }
+
     public static List<KeyValuePair> sortKeyVals(List<KeyValuePair> lkv) {
         Collections.sort(lkv, new Comparator<KeyValuePair>() {
             @Override
