@@ -16,99 +16,104 @@
 package com.jitlogic.zico.core.services;
 
 import com.google.inject.Singleton;
+import com.jitlogic.zico.core.HostStore;
 import com.jitlogic.zico.core.HostStoreManager;
-import com.jitlogic.zico.core.TraceDataStore;
-import com.jitlogic.zico.core.TraceTypeRegistry;
-import com.jitlogic.zico.core.UserManager;
+import com.jitlogic.zico.core.model.TraceInfoRecord;
+import com.jitlogic.zico.core.TraceRecordStore;
 import com.jitlogic.zico.core.ZicoRuntimeException;
 import com.jitlogic.zico.core.eql.Parser;
 import com.jitlogic.zico.core.model.MethodRankInfo;
-import com.jitlogic.zico.core.model.PagingData;
-import com.jitlogic.zico.core.model.TraceDetailSearchExpression;
-import com.jitlogic.zico.core.model.TraceInfo;
-import com.jitlogic.zico.core.model.TraceListFilterExpression;
+import com.jitlogic.zico.core.model.TraceInfoSearchQuery;
+import com.jitlogic.zico.core.model.TraceRecordSearchQuery;
+import com.jitlogic.zico.core.model.TraceInfoSearchResult;
 import com.jitlogic.zico.core.model.TraceRecordInfo;
 import com.jitlogic.zico.core.model.TraceRecordSearchResult;
 import com.jitlogic.zico.core.search.EqlTraceRecordMatcher;
 import com.jitlogic.zico.core.search.FullTextTraceRecordMatcher;
 import com.jitlogic.zico.core.search.TraceRecordMatcher;
-import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 
 import javax.inject.Inject;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
 @Singleton
 public class TraceDataGwtService {
     private HostStoreManager storeManager;
-    private TraceTypeRegistry traceTypeRegistry;
-    private SymbolRegistry symbolRegistry;
-    private UserManager userManager;
 
 
     @Inject
-    public TraceDataGwtService(HostStoreManager storeManager, TraceTypeRegistry traceTypeRegistry,
-                            SymbolRegistry symbolRegistry, UserManager userManager) {
+    public TraceDataGwtService(HostStoreManager storeManager) {
         this.storeManager = storeManager;
-        this.traceTypeRegistry = traceTypeRegistry;
-        this.symbolRegistry = symbolRegistry;
-        this.userManager = userManager;
     }
 
 
-    public TraceInfo getTrace(int hostId, long traceOffs) {
-
-        return storeManager.getHost(hostId).getTrace(traceOffs);
-    }
-
-
-    public PagingData pageTraces(int hostId, int offset, int limit, TraceListFilterExpression filter) {
-
-        return storeManager.getHost(hostId).pageTraces(offset, limit, filter);
-    }
-
-
-    public List<MethodRankInfo> traceMethodRank(int hostId, long traceOffs, String orderBy, String orderDesc) {
-        TraceDataStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
-        return ctx.methodRank(orderBy, orderDesc);
-    }
-
-
-    public TraceRecordInfo getRecord(int hostId, long traceOffs, long minTime, String path) {
-
-        TraceDataStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
-        return ctx.packTraceRecord(ctx.getTraceRecord(path, minTime), path, null);
-    }
-
-
-    public List<TraceRecordInfo> listRecords(int hostId, long traceOffs, long minTime, String path, boolean recursive) {
-
-        // TODO this is propably useless now ...
-        if ("null".equals(path)) {
-            path = null;
+    public TraceInfoSearchResult searchTraces(TraceInfoSearchQuery query) {
+        try {
+            return storeManager.getHost(query.getHostName(), false).search(query);
+        } catch (IOException e) {
+            throw new ZicoRuntimeException("Error while searching: " + query, e);
         }
+    }
 
-        TraceDataStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
-        TraceRecord tr = ctx.getTraceRecord(path, minTime);
 
-        List<TraceRecordInfo> lst = new ArrayList<TraceRecordInfo>();
+    public List<MethodRankInfo> traceMethodRank(String hostName, long traceOffs, String orderBy, String orderDesc) {
+        HostStore host = storeManager.getHost(hostName, false);
+        if (host != null) {
+            TraceInfoRecord info = host.getInfoRecord(traceOffs);
+            if (info != null && host.getTraceDataStore() != null) {
+                return host.getTraceDataStore().methodRank(info, orderBy, orderDesc);
+            }
+        }
+        return Collections.EMPTY_LIST;
+    }
 
-        if (path != null) {
-            packRecords(path, ctx, tr, lst, recursive);
-        } else {
-            lst.add(ctx.packTraceRecord(tr, "", 250));
-            if (recursive) {
-                packRecords("", ctx, tr, lst, recursive);
+
+    public TraceRecordInfo getRecord(String hostName, long traceOffs, long minTime, String path) {
+
+        HostStore host = storeManager.getHost(hostName, false);
+        if (host != null) {
+            TraceInfoRecord info = host.getInfoRecord(traceOffs);
+            if (info != null) {
+                return host.getTraceDataStore().packTraceRecord(
+                        host.getTraceDataStore().getTraceRecord(info, path, minTime), path, null);
+            }
+        }
+        return null;
+    }
+
+
+    public List<TraceRecordInfo> listRecords(String hostName, long traceOffs, long minTime, String path, boolean recursive) {
+
+        HostStore host = storeManager.getHost(hostName, false);
+        if (host != null) {
+            TraceInfoRecord info = host.getInfoRecord(traceOffs);
+            TraceRecordStore ctx = host.getTraceDataStore();
+            if (info != null && ctx != null) {
+                TraceRecord tr = ctx.getTraceRecord(info, path, minTime);
+
+                List<TraceRecordInfo> lst = new ArrayList<>();
+
+                if (path != null) {
+                    packRecords(path, ctx, tr, lst, recursive);
+                } else {
+                    lst.add(ctx.packTraceRecord(tr, "", 250));
+                    if (recursive) {
+                        packRecords("", ctx, tr, lst, recursive);
+                    }
+                }
+                return lst;
             }
         }
 
-        return lst;
+        return Collections.EMPTY_LIST;
     }
 
 
-    private void packRecords(String path, TraceDataStore ctx, TraceRecord tr, List<TraceRecordInfo> lst, boolean recursive) {
+    private void packRecords(String path, TraceRecordStore ctx, TraceRecord tr, List<TraceRecordInfo> lst, boolean recursive) {
         for (int i = 0; i < tr.numChildren(); i++) {
             TraceRecord child = tr.getChild(i);
             String childPath = path.length() > 0 ? (path + "/" + i) : "" + i;
@@ -120,45 +125,52 @@ public class TraceDataGwtService {
     }
 
 
-    public TraceRecordSearchResult searchRecords(int hostId, long traceOffs, long minTime, String path,
-                                                 TraceDetailSearchExpression expr) {
+    public TraceRecordSearchResult searchRecords(String hostName, long traceOffs, long minTime, String path,
+                                                 TraceRecordSearchQuery expr) {
 
-        TraceDataStore ctx = storeManager.getHost(hostId).getTraceContext(traceOffs);
-        TraceRecord tr = ctx.getTraceRecord(path, minTime);
-        TraceRecordSearchResult result = new TraceRecordSearchResult();
-        result.setResult(new ArrayList<TraceRecordInfo>());
-        result.setMinTime(Long.MAX_VALUE);
-        result.setMaxTime(Long.MIN_VALUE);
+        HostStore host = storeManager.getHost(hostName, false);
+        if (host != null) {
+            TraceInfoRecord info = host.getInfoRecord(traceOffs);
+            TraceRecordStore ctx = host.getTraceDataStore();
+            if (ctx != null && info != null) {
+                TraceRecord tr = ctx.getTraceRecord(info, path, minTime);
+                TraceRecordSearchResult result = new TraceRecordSearchResult();
+                result.setResult(new ArrayList<TraceRecordInfo>());
+                result.setMinTime(Long.MAX_VALUE);
+                result.setMaxTime(Long.MIN_VALUE);
 
-        TraceRecordMatcher matcher;
-        String se = expr.getSearchExpr();
-        switch (expr.getType()) {
-            case TraceDetailSearchExpression.TXT_QUERY:
-                if (se != null && se.startsWith("~")) {
-                    int rflag = 0 != (expr.getFlags() & TraceDetailSearchExpression.IGNORE_CASE) ? Pattern.CASE_INSENSITIVE : 0;
-                    Pattern regex = Pattern.compile(se.substring(1, se.length()), rflag);
-                    matcher = new FullTextTraceRecordMatcher(symbolRegistry, expr.getFlags(), regex);
-                } else {
-                    matcher = new FullTextTraceRecordMatcher(symbolRegistry, expr.getFlags(), se);
+                TraceRecordMatcher matcher;
+                String se = expr.getSearchExpr();
+                switch (expr.getType()) {
+                    case TraceRecordSearchQuery.TXT_QUERY:
+                        if (se != null && se.startsWith("~")) {
+                            int rflag = 0 != (expr.getFlags() & TraceRecordSearchQuery.IGNORE_CASE) ? Pattern.CASE_INSENSITIVE : 0;
+                            Pattern regex = Pattern.compile(se.substring(1, se.length()), rflag);
+                            matcher = new FullTextTraceRecordMatcher(host.getSymbolRegistry(), expr.getFlags(), regex);
+                        } else {
+                            matcher = new FullTextTraceRecordMatcher(host.getSymbolRegistry(), expr.getFlags(), se);
+                        }
+                        break;
+                    case TraceRecordSearchQuery.EQL_QUERY:
+                        matcher = new EqlTraceRecordMatcher(host.getSymbolRegistry(), Parser.expr(se), expr.getFlags(), tr.getTime());
+                        break;
+                    default:
+                        throw new ZicoRuntimeException("Illegal search expression type: " + expr.getType());
                 }
-                break;
-            case TraceDetailSearchExpression.EQL_QUERY:
-                matcher = new EqlTraceRecordMatcher(symbolRegistry, Parser.expr(se), expr.getFlags(), tr.getTime());
-                break;
-            default:
-                throw new ZicoRuntimeException("Illegal search expression type: " + expr.getType());
-        }
-        ctx.searchRecords(tr, path, matcher, result, tr.getTime(), false);
+                ctx.searchRecords(tr, path, matcher, result, tr.getTime(), false);
 
-        if (result.getMinTime() == Long.MAX_VALUE) {
-            result.setMinTime(0);
-        }
+                if (result.getMinTime() == Long.MAX_VALUE) {
+                    result.setMinTime(0);
+                }
 
-        if (result.getMaxTime() == Long.MIN_VALUE) {
-            result.setMaxTime(0);
-        }
+                if (result.getMaxTime() == Long.MIN_VALUE) {
+                    result.setMaxTime(0);
+                }
 
-        return result;
+                return result;
+            }
+        }
+        return null;
     }
 
 }

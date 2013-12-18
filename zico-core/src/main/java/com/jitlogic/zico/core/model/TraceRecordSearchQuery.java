@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zico.core.model;
 
-public class TraceDetailSearchExpression {
+public class TraceRecordSearchQuery {
 
     public final static int TXT_QUERY = 0;
     public final static int EQL_QUERY = 1;
@@ -30,6 +30,8 @@ public class TraceDetailSearchExpression {
     public final static int SEARCH_EX_MSG = 0x0800;
     public final static int SEARCH_EX_STACK = 0x1000;
     public final static int SEARCH_SIGNATURE = 0x2000;
+
+    public final static int SEARCH_ALL = SEARCH_CLASSES|SEARCH_METHODS|SEARCH_ATTRS|SEARCH_EX_MSG|SEARCH_EX_STACK|SEARCH_SIGNATURE;
 
     int type;
 

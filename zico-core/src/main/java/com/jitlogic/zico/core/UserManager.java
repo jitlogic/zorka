@@ -16,38 +16,112 @@
 package com.jitlogic.zico.core;
 
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
+import com.google.inject.Singleton;
+import com.google.web.bindery.requestfactory.shared.Locator;
+import com.jitlogic.zico.core.model.User;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentNavigableMap;
 
-public class UserManager {
+@Singleton
+public class UserManager extends Locator<User, String> {
 
-    private JdbcTemplate jdbc;
+    private final static Logger log = LoggerFactory.getLogger(UserManager.class);
+
+    private DB db;
+    private ConcurrentNavigableMap<String,User> users;
+
+    private ZicoConfig config;
 
     @Inject
-    public UserManager(DataSource ds) {
-        jdbc = new JdbcTemplate(ds);
+    public UserManager(ZicoConfig config) {
+        this.config = config;
+
+        open();
     }
 
-    public Set<Integer> getAllowedHosts(String username) {
-        final Set<Integer> ret = new HashSet<Integer>();
+    public void open() {
+        db = DBMaker.newFileDB(new File(config.getConfDir(), "users.db")).closeOnJvmShutdown().make();
+        users = db.getTreeMap("USERS");
+    }
 
-        Integer userId = jdbc.queryForObject("select USER_ID from USERS where USER_NAME = ?", Integer.class, username);
+    public void close() {
+        db.close();
+        db = null; users = null;
+    }
 
-        jdbc.query("select HOST_ID from USERS_HOSTS where USER_ID = ?", new RowCallbackHandler() {
-            @Override
-            public void processRow(ResultSet rs) throws SQLException {
-                ret.add(rs.getInt("HOST_ID"));
+    @Override
+    public User create(Class<? extends User> aClass) {
+        return new User();
+    }
+
+
+    @Override
+    public User find(Class<? extends User> clazz, String username) {
+        return users.get(username);
+    }
+
+
+    @Override
+    public Class<User> getDomainType() {
+        return User.class;
+    }
+
+
+    @Override
+    public String getId(User user) {
+        return user.getUserName();
+    }
+
+
+    @Override
+    public Class<String> getIdType() {
+        return String.class;
+    }
+
+
+    @Override
+    public Object getVersion(User user) {
+        return 1;
+    }
+
+    public List<User> findAll() {
+        List<User> lst = new ArrayList<>(users.size());
+        lst.addAll(users.values());
+        return lst;
+    }
+
+    public void persist(User user) {
+        users.put(user.getUserName(), user);
+        rebuildUserProperties();
+        db.commit();
+    }
+
+
+    public void remove(User user) {
+        users.remove(user.getUserName());
+        rebuildUserProperties();
+        db.commit();
+    }
+
+    private void rebuildUserProperties() {
+        File f = new File(config.getHomeDir(), "users.properties");
+        try (PrintWriter out = new PrintWriter(f)) {
+            for (User u : users.values()) {
+                out.println(u.getUserName() + ": " + u.getPassword() + ",VIEWER"
+                    + (u.hasFlag(User.ADMIN_USER) ? ",ADMIN" : ""));
             }
-        }, userId);
-
-        return ret;
+        } catch (IOException e) {
+            log.error("Cannot write users.properties file", e);
+        }
     }
-
 }

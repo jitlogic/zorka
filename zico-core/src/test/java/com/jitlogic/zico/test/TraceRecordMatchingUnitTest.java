@@ -25,11 +25,11 @@ import org.junit.Test;
 
 import java.util.regex.Pattern;
 
-import static com.jitlogic.zico.core.model.TraceDetailSearchExpression.IGNORE_CASE;
-import static com.jitlogic.zico.core.model.TraceDetailSearchExpression.SEARCH_ATTRS;
-import static com.jitlogic.zico.core.model.TraceDetailSearchExpression.SEARCH_CLASSES;
-import static com.jitlogic.zico.core.model.TraceDetailSearchExpression.SEARCH_METHODS;
-import static com.jitlogic.zico.core.model.TraceDetailSearchExpression.SEARCH_SIGNATURE;
+import static com.jitlogic.zico.core.model.TraceRecordSearchQuery.IGNORE_CASE;
+import static com.jitlogic.zico.core.model.TraceRecordSearchQuery.SEARCH_ATTRS;
+import static com.jitlogic.zico.core.model.TraceRecordSearchQuery.SEARCH_CLASSES;
+import static com.jitlogic.zico.core.model.TraceRecordSearchQuery.SEARCH_METHODS;
+import static com.jitlogic.zico.core.model.TraceRecordSearchQuery.SEARCH_SIGNATURE;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 

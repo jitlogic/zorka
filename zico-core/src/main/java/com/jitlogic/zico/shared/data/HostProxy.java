@@ -18,23 +18,17 @@ package com.jitlogic.zico.shared.data;
 import com.google.web.bindery.requestfactory.shared.EntityProxy;
 import com.google.web.bindery.requestfactory.shared.ProxyFor;
 import com.jitlogic.zico.core.HostStore;
-import com.jitlogic.zico.core.locators.HostLocator;
+import com.jitlogic.zico.core.HostStoreManager;
 
 
-@ProxyFor(value = HostStore.class, locator = HostLocator.class)
+@ProxyFor(value = HostStore.class, locator = HostStoreManager.class)
 public interface HostProxy extends EntityProxy {
-
-    Integer getId();
 
     String getName();
 
     String getAddr();
 
     void setAddr(String addr);
-
-    String getDescription();
-
-    void setDescription(String desc);
 
     String getPass();
 

@@ -434,7 +434,7 @@ public class HostListPanel extends VerticalLayoutContainer {
         GWT.log("Selected host: " + hostInfo);
 
         if (hostInfo != null) {
-            shell.get().addView(panelFactory.traceListPanel(hostInfo), hostInfo.getName() + ": traces");
+            shell.get().addView(panelFactory.traceSearchPanel(hostInfo), hostInfo.getName() + ": traces");
         }
     }
 }

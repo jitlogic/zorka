@@ -15,21 +15,20 @@
  */
 package com.jitlogic.zico.shared.data;
 
+
 import com.google.web.bindery.requestfactory.shared.ProxyFor;
 import com.google.web.bindery.requestfactory.shared.ValueProxy;
-import com.jitlogic.zico.core.model.TraceDetailFilterExpression;
+import com.jitlogic.zico.core.model.TraceInfoSearchResult;
 
-@ProxyFor(TraceDetailFilterExpression.class)
-public interface TraceDetailFilterProxy extends ValueProxy {
-    long getMinMethodTime();
+import java.util.List;
 
-    void setMinMethodTime(long minMethodTime);
 
-    int getHostId();
+@ProxyFor(TraceInfoSearchResult.class)
+public interface TraceInfoSearchResultProxy extends ValueProxy {
 
-    void setHostId(int hostId);
+    int getFlags();
 
-    long getTraceOffs();
+    long getLastOffs();
 
-    void setTraceOffs(long traceOffs);
+    List<TraceInfoProxy> getResults();
 }

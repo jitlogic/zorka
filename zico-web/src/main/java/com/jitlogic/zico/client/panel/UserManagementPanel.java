@@ -239,11 +239,11 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
                 if (currentUser == selectedUser) { return; }
                 selectedUser = currentUser;
                 hostStore.clear();
-                rf.userService().getAllowedHostIds(userGrid.getSelectionModel().getSelectedItem().getId()).fire(
-                    new Receiver<List<Integer>>() {
+                rf.userService().getAllowedHosts(userGrid.getSelectionModel().getSelectedItem().getUserName()).fire(
+                    new Receiver<List<String>>() {
                         @Override
-                        public void onSuccess(List<Integer> hostIds) {
-                            updateHosts(hostIds);
+                        public void onSuccess(List<String> hostIds) {
+                            // TODO updateHosts(hostIds);
                         }
                     }
                 );
@@ -289,7 +289,7 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
 
     private void saveUser(UserProxy user) {
         UserServiceProxy req = newUserRequest != null ? newUserRequest : rf.userService();
-        UserProxy editedUser = user.getId() != null ? req.edit(user) : user;
+        UserProxy editedUser = user.getUserName() != null ? req.edit(user) : user;
         editedUser.setUserName(txtUserName.getText());
         editedUser.setRealName(txtRealName.getText());
         editedUser.setAdmin(cbxUserAdmin.getValue());
@@ -337,9 +337,9 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
         hostIdSet.addAll(hostIds);
         List<HostProxy> selectedHosts = new ArrayList<HostProxy>();
         for (HostProxy host : hosts) {
-            if (hostIdSet.contains(host.getId())) {
-                selectedHosts.add(host);
-            }
+//   TODO TBD         if (hostIdSet.contains(host.getId())) {
+//   TODO TBD             selectedHosts.add(host);
+//   TODO TBD         }
         }
         hostSelection.setSelection(selectedHosts);
     }
@@ -390,10 +390,10 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
         List<Integer> ids = new ArrayList<Integer>();
 
         for (HostProxy host : hostSelection.getSelectedItems()) {
-            ids.add(host.getId());
+            // TODO TBD ids.add(host.getId());
         }
 
-        rf.userService().setAllowedHostIds(selectedUser.getId(), ids).fire();
+        // TODO TBD rf.userService().setAllowedHostIds(selectedUser.getId(), ids).fire();
     }
 
 

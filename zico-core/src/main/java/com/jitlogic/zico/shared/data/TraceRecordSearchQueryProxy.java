@@ -17,10 +17,10 @@ package com.jitlogic.zico.shared.data;
 
 import com.google.web.bindery.requestfactory.shared.ProxyFor;
 import com.google.web.bindery.requestfactory.shared.ValueProxy;
-import com.jitlogic.zico.core.model.TraceDetailSearchExpression;
+import com.jitlogic.zico.core.model.TraceRecordSearchQuery;
 
-@ProxyFor(TraceDetailSearchExpression.class)
-public interface TraceDetailSearchProxy extends ValueProxy {
+@ProxyFor(TraceRecordSearchQuery.class)
+public interface TraceRecordSearchQueryProxy extends ValueProxy {
 
     int getType();
 

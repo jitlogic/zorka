@@ -22,5 +22,6 @@ public interface ZicoDataProcessor {
 
     public void process(Object obj) throws IOException;
 
+    public void commit();
 }
 

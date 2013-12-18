@@ -18,13 +18,17 @@ package com.jitlogic.zico.core.inject;
 import com.google.inject.Binder;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.jitlogic.zico.core.HostStoreManager;
 import com.jitlogic.zico.core.UserContext;
 import com.jitlogic.zico.core.UserHttpContext;
 import com.jitlogic.zico.core.ZicoConfig;
 import com.jitlogic.zico.core.ZicoRuntimeException;
-import org.apache.commons.dbcp.BasicDataSource;
+import com.jitlogic.zorka.common.zico.ZicoDataProcessorFactory;
 
+import javax.inject.Named;
 import java.io.File;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 
 public class ProdZicoModule extends AbstractZicoModule {
@@ -33,7 +37,9 @@ public class ProdZicoModule extends AbstractZicoModule {
     public void configure(Binder binder) {
         super.configure(binder);
         binder.bind(UserContext.class).to(UserHttpContext.class);
+        binder.bind(ZicoDataProcessorFactory.class).to(HostStoreManager.class);
     }
+
 
     @Provides
     @Singleton
@@ -50,11 +56,5 @@ public class ProdZicoModule extends AbstractZicoModule {
         }
 
         return new ZicoConfig(homeDir);
-    }
-
-    @Provides
-    @Singleton
-    public BasicDataSource provideDataSource(ZicoConfig config) {
-        return super.provideDataSource(config);
     }
 }

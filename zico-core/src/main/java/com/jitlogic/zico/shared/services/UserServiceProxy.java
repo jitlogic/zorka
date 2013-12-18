@@ -27,13 +27,11 @@ import java.util.List;
 @Service(value = UserGwtService.class, locator = ZicoServiceLocator.class)
 public interface UserServiceProxy extends RequestContext {
 
-    Request<Integer> count();
-
     Request<List<UserProxy>> findAll();
 
-    Request<List<Integer>> getAllowedHostIds(Integer userId);
+    Request<List<String>> getAllowedHosts(String userName);
 
-    Request<Void> setAllowedHostIds(Integer userId, List<Integer> hostIds);
+    Request<Void> setAllowedHosts(String userName, List<String> hostNames);
 
     Request<Void> persist(UserProxy user);
 

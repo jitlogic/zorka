@@ -22,15 +22,22 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicException;
 import com.jitlogic.zorka.common.tracedata.SymbolicStackElement;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.objectweb.asm.Type;
 
 import java.io.EOFException;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class ZicoUtil {
@@ -191,6 +198,7 @@ public class ZicoUtil {
         return n;
     }
 
+
     public static List<KeyValuePair> sortKeyVals(List<KeyValuePair> lkv) {
         Collections.sort(lkv, new Comparator<KeyValuePair>() {
             @Override
@@ -199,6 +207,28 @@ public class ZicoUtil {
             }
         });
         return lkv;
+    }
+
+
+    public static String safePath(String path) {
+        StringBuilder sb = new StringBuilder(path.length());
+        for (int i = 0; i < path.length(); i++) {
+            char c = path.charAt(i);
+            if (Character.isJavaIdentifierPart(c) || c == '.' || c == '-') {
+                sb.append(c);
+            } else {
+                sb.append('_');
+            }
+        }
+        return sb.toString();
+    }
+
+    public static File ensureDir(String path) {
+        File d = new File(path);
+        if (!d.exists()) {
+            d.mkdirs();
+        }
+        return d;
     }
 
 }

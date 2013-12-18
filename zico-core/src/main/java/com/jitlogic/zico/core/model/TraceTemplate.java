@@ -16,7 +16,9 @@
 package com.jitlogic.zico.core.model;
 
 
-public class TraceTemplate {
+import java.io.Serializable;
+
+public class TraceTemplate implements Serializable {
 
     int id;
 
@@ -87,4 +89,6 @@ public class TraceTemplate {
     public void setTemplate(String template) {
         this.template = template;
     }
+
+
 }

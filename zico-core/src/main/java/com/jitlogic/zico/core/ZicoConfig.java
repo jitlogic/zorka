@@ -41,13 +41,25 @@ public class ZicoConfig extends ZorkaConfig {
 
     private void setBaseProps() {
         if (!properties.containsKey("zico.log.dir")) {
-            properties.put("zico.log.dir", ZorkaUtil.path(homeDir, "log"));
+            properties.setProperty("zico.log.dir", ZicoUtil.ensureDir(ZorkaUtil.path(homeDir, "log")).getPath());
         }
 
         if (!properties.containsKey("zico.data.dir")) {
-            properties.put("zico.data.dir", ZorkaUtil.path(homeDir, "data"));
+            properties.setProperty("zico.data.dir", ZicoUtil.ensureDir(ZorkaUtil.path(homeDir, "data")).getPath());
+        }
+
+        if (!properties.containsKey("zico.conf.dir")) {
+            properties.setProperty("zico.conf.dir", ZicoUtil.ensureDir(ZorkaUtil.path(homeDir, "conf")).getPath());
         }
 
         RAGZOutputStream.useLock(boolCfg("rds.lock", true));
+    }
+
+    public String getDataDir() {
+        return properties.getProperty("zico.data.dir");
+    }
+
+    public String getConfDir() {
+        return properties.getProperty("zico.conf.dir");
     }
 }

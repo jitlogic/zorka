@@ -18,32 +18,45 @@ package com.jitlogic.zico.core;
 
 import com.jitlogic.zico.core.model.HostInfo;
 import com.jitlogic.zico.core.model.KeyValuePair;
-import com.jitlogic.zico.core.model.PagingData;
 import com.jitlogic.zico.core.model.SymbolicExceptionInfo;
 import com.jitlogic.zico.core.model.TraceInfo;
-import com.jitlogic.zico.core.model.TraceListFilterExpression;
+import com.jitlogic.zico.core.model.TraceInfoRecord;
+import com.jitlogic.zico.core.model.TraceInfoSearchQuery;
+import com.jitlogic.zico.core.model.TraceInfoSearchResult;
+import com.jitlogic.zico.core.model.TraceRecordSearchQuery;
 import com.jitlogic.zico.core.rds.RDSCleanupListener;
 import com.jitlogic.zico.core.rds.RDSStore;
+import com.jitlogic.zico.core.search.FullTextTraceRecordMatcher;
+import com.jitlogic.zico.core.search.TraceRecordMatcher;
+import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicException;
+import com.jitlogic.zorka.common.tracedata.SymbolicStackElement;
+import com.jitlogic.zorka.common.tracedata.TraceMarker;
+import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
+import org.fressian.FressianWriter;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * Represents performance data store for a single agent.
@@ -52,318 +65,314 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     private final static Logger log = LoggerFactory.getLogger(HostStore.class);
 
+    public final static String HOST_PROPERTIES = "host.properties";
+
+    private static final String PROP_ADDR = "addr";
+    private static final String PROP_PASS = "pass";
+    private static final String PROP_FLAGS = "flags";
+    private static final String PROP_SIZE = "size";
+
+    public static final int ORDER_DESC  = 1;
+    public static final int DEEP_SEARCH = 2;
+
+    private SymbolRegistry symbolRegistry;
+
     private String rootPath;
-    private RDSStore rdsData;
 
-    private TraceInfoStore traceInfoStore;
+    private TraceRecordStore traceDataStore;
+    private TraceRecordStore traceIndexStore;
 
-    private HostInfo hostInfo;
-    private HostStoreManager manager;
+    private TraceTemplateManager templater;  // TODO move this out to service object
 
-    private TraceCache cache;
-
-    private String reOp;
-
-    private JdbcTemplate jdbc;
-    private NamedParameterJdbcTemplate ndbc;
+    private ZicoConfig config;
 
 
-    private final RowMapper<TraceInfo> TRACE_INFO_MAPPER = new RowMapper<TraceInfo>() {
-        @Override
-        public TraceInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
-            TraceInfo info = new TraceInfo();
+    private DB db;
+    private ConcurrentNavigableMap<Long,TraceInfoRecord> infos;
+    private Map<Integer,String> tids;
 
-            info.setHostId(rs.getInt("HOST_ID"));
-            info.setDataOffs(rs.getLong("DATA_OFFS"));
-            info.setTraceId(rs.getInt("TRACE_ID"));
-            info.setTraceType(manager.getSymbolRegistry().symbolName(info.getTraceId()));
-            info.setDataLen(rs.getInt("DATA_LEN"));
-            info.setClock(rs.getLong("CLOCK"));
-            info.setMethodFlags(rs.getInt("RFLAGS"));
-            info.setTraceFlags(rs.getInt("TFLAGS"));
-            info.setStatus(rs.getInt("STATUS"));
-            info.setClassId(rs.getInt("CLASS_ID"));
-            info.setMethodId(rs.getInt("METHOD_ID"));
-            info.setSignatureId(rs.getInt("SIGN_ID"));
-            info.setCalls(rs.getLong("CALLS"));
-            info.setErrors(rs.getLong("ERRORS"));
-            info.setRecords(rs.getLong("RECORDS"));
-            info.setExecutionTime(rs.getLong("EXTIME"));
+    private boolean needsCleanup = false;
 
-            JSONObject attrs = (JSONObject)JSONValue.parse(rs.getString("ATTRS"));
+    private String name;
+    private String addr = "";
+    private String pass = "";
+    private int flags;
+    private long maxSize;
 
-            if (attrs != null) {
-                List<KeyValuePair> attrList = new ArrayList<KeyValuePair>(attrs.size());
 
-                for (Map.Entry<String,Object> e : attrs.entrySet()) {
-                    attrList.add(new KeyValuePair(e.getKey(), ""+e.getValue()));
-                }
+    public HostStore(ZicoConfig config, TraceTemplateManager templater, String name)  {
 
-                info.setAttributes(ZicoUtil.sortKeyVals(attrList));
-            }
+        this.name = name;
+        this.config = config;
 
-            String exJson = rs.getString("EXINFO");
-            if (exJson != null && exJson.trim().length() > 0) {
-                JSONObject json = (JSONObject)JSONValue.parse(exJson);
-                SymbolicExceptionInfo sei = new SymbolicExceptionInfo();
-                sei.setExClass(""+json.get("exClass"));
-                sei.setMessage("" + json.get("message"));
-                JSONArray jstack = (JSONArray)(json.get("stackTrace"));
-                if (jstack != null) {
-                    List<String> stack = new ArrayList<String>(jstack.size());
-                    for (Object obj : jstack) {
-                        stack.add(""+obj);
+        this.rootPath = ZorkaUtil.path(config.getDataDir(), ZicoUtil.safePath(name));
+
+        File hostDir = new File(rootPath);
+
+        if (!hostDir.exists()) {
+            this.maxSize = config.longCfg("rds.max.size", 1024L*1024L*1024L);
+            hostDir.mkdirs();
+            save();
+        } else {
+            load();
+        }
+
+        this.templater = templater;
+
+        open();
+    }
+
+
+    public void open() {
+        try {
+            this.symbolRegistry = new PersistentSymbolRegistry(
+                    new File(ZicoUtil.ensureDir(rootPath), "symbools.dat"));
+            traceDataStore = new TraceRecordStore(config, this, "tdat");
+            traceIndexStore = new TraceRecordStore(config, this, "tidx");
+            db = DBMaker.newFileDB(new File(rootPath, "traces.db"))
+                    .asyncWriteDisable().asyncFlushDelay(100)
+                    .closeOnJvmShutdown().make();
+            infos = db.getTreeMap("INFOS");
+            tids = db.getTreeMap("TIDS");
+        } catch (IOException e) {
+            log.error("Cannot open host store " + name, e);
+        }
+    }
+
+
+    public int countTraces() {
+        return infos.size();
+    }
+
+
+    public synchronized void processTraceRecord(TraceRecord rec) throws IOException {
+        TraceRecordStore.ChunkInfo dchunk = traceDataStore.write(rec);
+
+        if (needsCleanup) {
+            // TODO clean up infos table
+            // TODO clean up index RDS storage
+        }
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        FressianWriter writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);
+
+        List<TraceRecord> tmp = rec.getChildren();
+        rec.setChildren(null);
+        writer.writeObject(rec);
+        rec.setChildren(tmp);
+
+        TraceRecordStore.ChunkInfo ichunk = traceIndexStore.write(rec);
+
+        TraceInfoRecord tir = new TraceInfoRecord(rec,
+                dchunk.getOffset(), dchunk.getLength(),
+                ichunk.getOffset(), ichunk.getLength());
+
+        infos.put(tir.getDataOffs(), tir);
+
+        int traceId = tir.getTraceId();
+
+        if (!tids.containsKey(traceId)) {
+            tids.put(traceId, symbolRegistry.symbolName(traceId));
+        }
+
+    }
+
+    public synchronized void commit() {
+        if (db != null) {
+            long t1 = System.nanoTime();
+            db.commit();
+            long t = (System.nanoTime() - t1) / 1000000L;
+            log.debug(name + ": Commit took " + t + " ms");
+        }
+    }
+
+    public synchronized TraceInfoSearchResult search(TraceInfoSearchQuery query) throws IOException {
+
+        List<TraceInfo> lst = new ArrayList<>(query.getLimit());
+
+        TraceInfoSearchResult result = new TraceInfoSearchResult(lst);
+
+        TraceRecordMatcher matcher = null;
+
+        if (query.getSearchExpr() != null) {
+            matcher = new FullTextTraceRecordMatcher(symbolRegistry,
+                    TraceRecordSearchQuery.SEARCH_ALL, query.getSearchExpr());
+        }
+
+        // TODO implement query execution time limit
+        // TODO implement deep search
+
+        int serarchFlags = query.getFlags();
+        boolean asc = 0 == (serarchFlags & ORDER_DESC);
+        for (Long key = asc ? infos.higherKey(query.getOffset()-1) : infos.lowerKey(query.getOffset()+1);
+             key != null;
+             key = asc ? infos.higherKey(key) : infos.lowerKey(key)) {
+
+            TraceInfoRecord tir = infos.get(key);
+            TraceRecord idxtr = retrieveFromIndex(tir);
+            if (idxtr != null) {
+                if (matcher == null || matcher.match(idxtr)) {
+                    lst.add(toTraceInfo(tir, idxtr));
+                    result.setLastOffs(asc ? tir.getDataOffs()+1 : tir.getDataOffs()-1);
+                    if (lst.size() == query.getLimit()) {
+                        result.markFlag(TraceInfoSearchResult.MORE_RESULTS);
+                        return result;
                     }
-                    sei.setStackTrace(stack);
                 }
-                info.setExceptionInfo(sei);
+            }
+        }
+
+        return result;
+    }
+
+
+    public TraceInfoRecord getInfoRecord(long offs) {
+        return infos.get(offs);
+    }
+
+
+    private TraceRecord retrieveFromIndex(TraceInfoRecord tir) throws IOException {
+        return traceIndexStore.read(tir.getIndexChunk());
+    }
+
+
+    private TraceInfo toTraceInfo(TraceInfoRecord itr, TraceRecord tr) throws IOException {
+
+        if (tr == null) {
+            tr = retrieveFromIndex(itr);
+        }
+
+        TraceInfo ti = new TraceInfo();
+        ti.setHostName(name);
+        ti.setDataOffs(itr.getDataOffs());
+        ti.setTraceId(itr.getTraceId());
+        ti.setTraceType(symbolRegistry.symbolName(itr.getTraceId()));
+        ti.setMethodFlags(itr.getRflags());
+        ti.setTraceFlags(itr.getTflags());
+        ti.setClassId(tr.getClassId());
+        ti.setMethodId(tr.getMethodId());
+        ti.setSignatureId(tr.getSignatureId());
+        ti.setStatus(tr.getException() != null                 // TODO get rid of this field
+                || tr.hasFlag(TraceRecord.EXCEPTION_PASS)
+                || tr.getMarker().hasFlag(TraceMarker.ERROR_MARK) ? 1 : 0);
+        ti.setRecords(itr.getRecords());
+        ti.setDataLen(itr.getDataLen());
+        ti.setCalls(itr.getCalls());
+        ti.setErrors(itr.getErrors());
+        ti.setExecutionTime(itr.getDuration());
+
+        if (tr != null && tr.getAttrs() != null) {
+            List<KeyValuePair> keyvals = new ArrayList<KeyValuePair>(tr.getAttrs().size());
+            for (Map.Entry<Integer,Object> e : tr.getAttrs().entrySet()) {
+                keyvals.add(new KeyValuePair(symbolRegistry.symbolName(e.getKey()), "" + e.getValue()));
+            }
+            ti.setAttributes(ZicoUtil.sortKeyVals(keyvals));
+        } else {
+            ti.setAttributes(Collections.EMPTY_LIST);
+        }
+
+        if (tr.getException() != null) {
+            SymbolicExceptionInfo sei = new SymbolicExceptionInfo();
+            SymbolicException sex = (SymbolicException)tr.getException();
+            sei.setExClass(symbolRegistry.symbolName(sex.getClassId()));
+            sei.setMessage(sex.getMessage());
+            List<String> lst = new ArrayList<String>();
+
+            for (SymbolicStackElement sel : sex.getStackTrace()) {
+                lst.add(symbolRegistry.symbolName(sel.getClassId()) + ":" + sel.getLineNum());
+                if (lst.size() > 10) {
+                    break;
+                }
             }
 
-            info.setDescription(manager.getTemplater().templateDescription(info));
+            sei.setStackTrace(lst);
 
-            return info;
-        }
-    };
-
-
-    public HostStore(HostStoreManager manager,
-                     TraceCache cache,
-                     ResultSet rs) throws SQLException {
-
-        this.cache = cache;
-        this.manager = manager;
-
-        this.hostInfo = new HostInfo();
-
-        this.jdbc = new JdbcTemplate(manager.getDs());
-        this.ndbc = new NamedParameterJdbcTemplate(manager.getDs());
-
-        updateInfo(rs);
-
-        this.rootPath = ZorkaUtil.path(manager.getDataDir(), hostInfo.getPath());
-
-        File rdsDir = new File(rootPath);
-        if (!rdsDir.exists()) {
-            rdsDir.mkdirs();
+            ti.setExceptionInfo(sei);
         }
 
-        traceInfoStore = new TraceInfoStore(manager.getConfig(), manager.getSymbolRegistry(), this);
+        ti.setDescription(templater.templateDescription(symbolRegistry, ti));
 
-        this.reOp = "pgsql".equals(manager.getConfig().stringCfg("zico.db.type", null)) ? "~" : "regexp";
+        return ti;
     }
 
-
-    public synchronized HostStore updateInfo(ResultSet rs) throws SQLException {
-        hostInfo.setId(rs.getInt("HOST_ID"));
-        hostInfo.setName(rs.getString("HOST_NAME"));
-        hostInfo.setAddr(rs.getString("HOST_ADDR"));
-        hostInfo.setPath(rs.getString("HOST_PATH"));
-        hostInfo.setPass(rs.getString("HOST_PASS"));
-        hostInfo.setFlags(rs.getInt("HOST_FLAGS"));
-        hostInfo.setMaxSize(rs.getLong("MAX_SIZE"));
-        hostInfo.setDescription(rs.getString("HOST_DESC"));
-        return this;
-    }
-
-
-    public synchronized HostStore updateInfo(HostInfo info) {
-        hostInfo.setAddr(info.getAddr());
-        hostInfo.setPass(info.getPass());
-        hostInfo.setFlags(info.getFlags());
-        hostInfo.setMaxSize(info.getMaxSize());
-        hostInfo.setDescription(info.getDescription());
-        return this;
-    }
-
-
-    public HostInfo getHostInfo() {
-        return hostInfo;
+    public Map<Integer,String> getTidMap() {
+        return Collections.unmodifiableMap(tids);
     }
 
 
     public String toString() {
-        return "zico.Store(" + hostInfo.getName() + ")";
+        return "HostStore(" + name + ")";
     }
 
 
-    public synchronized RDSStore getRdsData() {
-        if (rdsData == null) {
-            String rootPath = ZorkaUtil.path(manager.getDataDir(), hostInfo.getPath());
-            String rdspath = ZorkaUtil.path(rootPath, "traces");
 
-            File rdsDir = new File(rootPath);
-            if (!rdsDir.exists()) {
-                rdsDir.mkdirs();
-            }
-
-            try {
-                long fileSize = getStoreManager().getConfig().kiloCfg("rds.file.size", 16 * 1024 * 1024L).intValue();
-                long segmentSize = getStoreManager().getConfig().kiloCfg("rds.seg.size", 1024 * 1024L);
-                rdsData = new RDSStore(rdspath,
-                        hostInfo.getMaxSize(),
-                        fileSize, segmentSize,
-                        this, traceInfoStore);
+    public synchronized void load() {
+        File f = new File(rootPath, HOST_PROPERTIES);
+        Properties props = new Properties();
+        if (f.exists() && f.canRead()) {
+            try (InputStream is = new FileInputStream(f)) {
+                props.load(is);
             } catch (IOException e) {
-                log.error("Cannot open RDS store at '" + rdspath + "'", e);
+                log.error("Cannot read " + f, e);
             }
         }
-        return rdsData;
+
+        this.addr = props.getProperty(PROP_ADDR, "127.0.0.1");
+        this.pass = props.getProperty(PROP_PASS, "");
+        this.flags = Integer.parseInt(props.getProperty(PROP_FLAGS, "0"));
+        this.maxSize = Integer.parseInt(props.getProperty(PROP_SIZE,
+            ""+config.kiloCfg("rds.max.size", 1024 * 1024 * 1024L)));
+
     }
 
 
     public synchronized void save() {
-        jdbc.update("update HOSTS set HOST_ADDR=?, HOST_DESC=?, HOST_PASS=?, HOST_FLAGS=?, MAX_SIZE = ? where HOST_ID=?",
-                hostInfo.getAddr(), hostInfo.getDescription(), hostInfo.getPass(), hostInfo.getFlags(),
-                hostInfo.getMaxSize(), hostInfo.getId());
-        if (rdsData != null) {
-            rdsData.setMaxSize(hostInfo.getMaxSize());
-            try {
-                rdsData.cleanup();
-            } catch (IOException e) {
-                log.error("Error resizing RDS store for " + hostInfo.getName());
-            }
-        }
-    }
 
-    private final static Map<String, String> TRACES_ORDER_COLS = ZorkaUtil.map(
-            "clock", "CLOCK",
-            "calls", "CALLS",
-            "errors", "ERRORS",
-            "records", "RECORDS",
-            "executionTime", "EXTIME",
-            "traceType", "TRACE_ID"
-    );
+        Properties props = new Properties();
+        props.setProperty(PROP_ADDR, addr);
+        props.setProperty(PROP_PASS, pass);
+        props.setProperty(PROP_FLAGS, ""+flags);
+        props.setProperty(PROP_SIZE, ""+maxSize);
 
-    private final static Set<String> TRACES_ORDER_DIRS = ZorkaUtil.set("ASC", "DESC");
+        File f = new File(rootPath, HOST_PROPERTIES);
 
-    public PagingData pageTraces(int offset, int limit, TraceListFilterExpression filter) {
-        String orderBy = filter.getSortBy();
-        String orderDir = filter.isSortAsc() ? "ASC" : "DESC";
-
-        if (!TRACES_ORDER_COLS.containsKey(orderBy) || !TRACES_ORDER_DIRS.contains(orderDir)) {
-            throw new ZicoRuntimeException("Invalid ordering arguments: orderBy=" + orderBy + ", orderDir=" + orderDir);
+        try (OutputStream os = new FileOutputStream(f)) {
+            props.store(os, "ZICO Host Descriptor");
+        } catch (IOException e) {
+            log.error("Cannot write " + f, e);
         }
 
-        MapSqlParameterSource params = new MapSqlParameterSource("hostId", hostInfo.getId());
-
-        String sqlc = " HOST_ID = :hostId";
-
-        if (filter.getTimeStart() != 0 && filter.getTimeEnd() != 0) {
-            sqlc += " and CLOCK between :timeStart and :timeEnd";
-            params.addValue("timeStart", filter.getTimeStart());
-            params.addValue("timeEnd", filter.getTimeEnd());
-        } else if (filter.getTimeEnd() != 0) {
-            sqlc += " and CLOCK < :timeEnd";
-            params.addValue("timeEnd", filter.getTimeEnd());
-        } else if (filter.getTimeStart() != 0) {
-            sqlc += " and CLOCK > :timeStart";
-            params.addValue("timeStart", filter.getTimeStart());
-        }
-
-        if (filter.getTraceId() != 0) {
-            sqlc += " and TRACE_ID = :traceId";
-            params.addValue("traceId", filter.getTraceId());
-        }
-
-        if (filter.isErrorsOnly()) {
-            sqlc += " and STATUS = 1";
-        }
-
-        if (filter.getFilterExpr() != null && filter.getFilterExpr().trim().length() > 0) {
-            sqlc += parseFilterExpr(filter.getFilterExpr().trim(), params, reOp);
-        }
-
-        if (filter.getMinTime() > 0) {
-            sqlc += " and EXTIME > :minTime";
-            params.addValue("minTime", filter.getMinTime());
-        }
-
-        String sql1 = "select * from TRACES where " + sqlc + " order by " + TRACES_ORDER_COLS.get(orderBy)
-                + " " + orderDir + " limit :limit offset :offset";
-
-        params.addValue("limit", limit);
-        params.addValue("offset", offset);
-
-        List<TraceInfo> results = ndbc.query(sql1, params, TRACE_INFO_MAPPER);
-
-        PagingData result = new PagingData();
-
-        String sql2 = "select count(1) from TRACES where " + sqlc;
-
-        result.setOffset(offset);
-        result.setTotal(ndbc.queryForObject(sql2, params, Integer.class));
-        result.setResults(results);
-
-        return result;
-
-    }
-
-    private static final String QUOTED_CHARS = "*[]().\\?+{}^$";
-
-    public static String parseFilterExpr(String expr, MapSqlParameterSource params, String reOp) {
-        if (expr.startsWith("@")) {
-            int ix = expr.indexOf('=');
-            if (ix < 2) {
-                throw new ZicoRuntimeException("Invalid filter expression: '" + expr + "'");
-            }
-            String sa = expr.substring(1, ix);
-            String sv = expr.substring(ix + 1, expr.length());
-            if (!sv.startsWith("~")) {
-                StringBuilder sb = new StringBuilder(expr.length() + 10);
-                for (int i = 0; i < sv.length(); i++) {
-                    char ch = sv.charAt(i);
-                    if (ch == '*') {
-                        sb.append("[^\"]*");
-                    } else if (ch == '?') {
-                        sb.append("[^\"]");
-                    } else {
-                        if (QUOTED_CHARS.indexOf(ch) != -1) {
-                            sb.append('\\');
-                        }
-                        sb.append(ch);
-                    }
-                }
-                sv = sb.toString();
-            } else {
-                sv = sv.substring(1, sv.length()).replace(".", "[^\"]");
-            }
-            String regex = "\"" + sa + "\":\"" + sv + "\"";
-            params.addValue("filterRegex", regex);
-            return " and ATTRS " + reOp + " :filterRegex";
-        }
-        if (expr.startsWith("~")) {
-            params.addValue("filterRegex", expr.substring(1));
-            return " and ATTRS " + reOp + " :filterRegex";
-        } else {
-            params.addValue("filterExpr", "%" + expr.replace("*", "%") + "%");
-            return " and ATTRS like :filterExpr";
-        }
-    }
-
-    public TraceInfo getTrace(long traceOffs) {
-        return jdbc.queryForObject("select * from TRACES where HOST_ID = ? and DATA_OFFS = ?",
-                TRACE_INFO_MAPPER, hostInfo.getId(), traceOffs);
-    }
-
-
-    public TraceDataStore getTraceContext(long traceOffs) {
-        return new TraceDataStore(this, getTrace(traceOffs), cache, manager.getSymbolRegistry());
+// TODO automatic cleanup after (potential) shrinking
+//        if (rdsData != null) {
+//            rdsData.setMaxSize(maxSize);
+//            try {
+//                rdsData.cleanup();
+//            } catch (IOException e) {
+//                log.error("Error resizing RDS store for " + getName());
+//            }
+//        }
     }
 
 
     @Override
     public synchronized void close() throws IOException {
+        traceDataStore.close();
+        traceIndexStore.close();
+        db.commit();
+        db.close();
+    }
 
-        try {
-            if (rdsData != null) {
-                rdsData.close();
-                rdsData = null;
-            }
-        } catch (IOException e) {
-            log.error("Cannot close RDS store '" + rdsData + "' for " + hostInfo.getName(), e);
-        }
 
-        traceInfoStore.close();
+    public TraceRecordStore getTraceDataStore() {
+        return traceDataStore;
+    }
+
+    public TraceRecordStore getTraceIndexStore() {
+        return traceIndexStore;
+    }
+
+    public SymbolRegistry getSymbolRegistry() {
+        return symbolRegistry;
     }
 
 
@@ -371,94 +380,77 @@ public class HostStore implements Closeable, RDSCleanupListener {
         return rootPath;
     }
 
-    public TraceInfoStore getTraceInfoStore() {
-        return traceInfoStore;
-    }
-
-    public HostStoreManager getStoreManager() {
-        return manager;
-    }
 
     @Override
     public void onChunkRemoved(Long start, Long length) {
-        log.info("Discarding old trace data for " + hostInfo.getName() + " start=" + start + ", length=" + length);
-
-        if (start != null && length != null) {
-            jdbc.update("delete from TRACES where HOST_ID = ? and DATA_OFFS between ? and ?",
-                    hostInfo.getId(), start, start + length);
-        } else if (start != null) {
-            jdbc.update("delete from TRACES where HOST_ID = ? and DATA_OFFS < ?", hostInfo.getId(), start);
-        }
+        needsCleanup = true;
     }
+
 
     @Override
     public void onChunkStarted(RDSStore origin, Long start) {
-        // Nothing to do here
-    }
-
-    // ------------------ entity methods ----------------------
-    public Integer getId() {
-        return hostInfo.getId();
+        if (traceIndexStore != null) {
+            try {
+                traceIndexStore.getRds().rotate();
+            } catch (IOException e) {
+                log.error("Cannot rotate index for " + name, e);
+            }
+        }
     }
 
     public String getName() {
-        return hostInfo.getName();
+        return name;
     }
 
     public String getAddr() {
-        return hostInfo.getAddr();
+        return addr;
     }
 
     public void setAddr(String addr) {
-        hostInfo.setAddr(addr);
-        save();
-    }
-
-    public String getDescription() {
-        return hostInfo.getDescription();
-    }
-
-    public void setDescription(String description) {
-        hostInfo.setDescription(description);
+        this.addr = addr;
         save();
     }
 
     public String getPass() {
-        return hostInfo.getPass();
+        return pass;
     }
 
     public void setPass(String pass) {
-        hostInfo.setPath(pass);
+        this.pass = pass;
         save();
     }
 
     public int getFlags() {
-        return hostInfo.getFlags();
+        return flags;
     }
 
     public void setFlags(int flags) {
-        hostInfo.setFlags(flags);
+        this.flags = flags;
         save();
     }
 
+    public boolean hasFlag(int flag) {
+        return 0 != (this.flags & flag);
+    }
+
     public long getMaxSize() {
-        return hostInfo.getMaxSize();
+        return maxSize;
     }
 
     public void setMaxSize(long maxSize) {
-        hostInfo.setMaxSize(maxSize);
+        this.maxSize = maxSize;
         save();
     }
 
     public boolean isEnabled() {
-        return 0 == (hostInfo.getFlags() & HostInfo.DISABLED);
+        return 0 == (flags & HostInfo.DISABLED);
     }
 
     public void setEnabled(boolean enabled) {
         if (enabled) {
-            hostInfo.setFlags(hostInfo.getFlags() & ~HostInfo.DISABLED);
+            flags &= ~HostInfo.DISABLED;
         } else {
-            hostInfo.setFlags(hostInfo.getFlags()|HostInfo.DISABLED);
+            flags |= HostInfo.DISABLED;
         }
         save();
     }

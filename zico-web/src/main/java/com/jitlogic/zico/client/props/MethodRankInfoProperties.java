@@ -17,39 +17,39 @@ package com.jitlogic.zico.client.props;
 
 
 import com.google.gwt.editor.client.Editor;
-import com.jitlogic.zico.shared.data.MethodRankProxy;
+import com.jitlogic.zico.shared.data.MethodRankInfoProxy;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.LabelProvider;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.PropertyAccess;
 
-public interface MethodRankInfoProperties extends PropertyAccess<MethodRankProxy> {
+public interface MethodRankInfoProperties extends PropertyAccess<MethodRankInfoProxy> {
 
     @Editor.Path("method")
-    ModelKeyProvider<MethodRankProxy> key();
+    ModelKeyProvider<MethodRankInfoProxy> key();
 
     @Editor.Path("method")
-    LabelProvider<MethodRankProxy> label();
+    LabelProvider<MethodRankInfoProxy> label();
 
-    ValueProvider<MethodRankProxy, String> method();
+    ValueProvider<MethodRankInfoProxy, String> method();
 
-    ValueProvider<MethodRankProxy, Long> calls();
+    ValueProvider<MethodRankInfoProxy, Long> calls();
 
-    ValueProvider<MethodRankProxy, Long> errors();
+    ValueProvider<MethodRankInfoProxy, Long> errors();
 
-    ValueProvider<MethodRankProxy, Long> time();
+    ValueProvider<MethodRankInfoProxy, Long> time();
 
-    ValueProvider<MethodRankProxy, Long> avgTime();
+    ValueProvider<MethodRankInfoProxy, Long> avgTime();
 
-    ValueProvider<MethodRankProxy, Long> minTime();
+    ValueProvider<MethodRankInfoProxy, Long> minTime();
 
-    ValueProvider<MethodRankProxy, Long> maxTime();
+    ValueProvider<MethodRankInfoProxy, Long> maxTime();
 
-    ValueProvider<MethodRankProxy, Long> bareTime();
+    ValueProvider<MethodRankInfoProxy, Long> bareTime();
 
-    ValueProvider<MethodRankProxy, Long> avgBareTime();
+    ValueProvider<MethodRankInfoProxy, Long> avgBareTime();
 
-    ValueProvider<MethodRankProxy, Long> minBareTime();
+    ValueProvider<MethodRankInfoProxy, Long> minBareTime();
 
-    ValueProvider<MethodRankProxy, Long> maxBareTime();
+    ValueProvider<MethodRankInfoProxy, Long> maxBareTime();
 }

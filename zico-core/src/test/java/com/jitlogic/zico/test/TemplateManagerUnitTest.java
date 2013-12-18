@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zico.test;
 
+import com.jitlogic.zico.core.TraceTemplateManager;
 import com.jitlogic.zico.core.model.TraceTemplate;
 import com.jitlogic.zico.test.support.ZicoFixture;
 import org.junit.Test;
@@ -50,6 +51,18 @@ public class TemplateManagerUnitTest extends ZicoFixture {
         assertEquals(t1.getId(), lst.get(0).getId());
     }
 
+    @Test
+    public void testInsertReopenAndReadTemplate() throws Exception {
+        TraceTemplate t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
+
+        t1.setId(systemService.saveTemplate(t1));
+
+        TraceTemplateManager tman = injector.getInstance(TraceTemplateManager.class);
+        tman.close(); tman.open();
+
+        List<TraceTemplate> lst = systemService.listTemplates();
+        assertEquals(1, lst.size());
+    }
 
     @Test
     public void testInsertAndModifyNewTemplate() {

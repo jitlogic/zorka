@@ -20,8 +20,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Properties;
 
 public class TestUtil {
+
+    public static Properties loadProps(String path) throws IOException {
+        Properties props = new Properties();
+
+        try (InputStream is = new FileInputStream(path)) {
+            props.load(is);
+        }
+
+        return props;
+    }
+
     public static void rmrf(String path) throws IOException {
         rmrf(new File(path));
     }

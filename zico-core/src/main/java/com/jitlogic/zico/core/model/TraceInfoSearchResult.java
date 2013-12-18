@@ -29,7 +29,6 @@ public class TraceInfoSearchResult {
     private List<TraceInfo> results;
 
     public TraceInfoSearchResult(List<TraceInfo> results) {
-        this.lastOffs = lastOffs;
         this.results = results;
     }
 

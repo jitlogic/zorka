@@ -92,8 +92,6 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
 
     private Set<String> expandedDetails = new HashSet<String>();
 
-    //private SpinnerField<Double> txtDuration;
-
     private TextButton btnSearchPrev;
     private TextButton btnSearchNext;
 
@@ -156,23 +154,6 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
         toolBar.add(btnErrorMethod);
 
         toolBar.add(new SeparatorToolItem());
-
-//        TextButton btnFilter = new TextButton();
-//        btnFilter.setIcon(Resources.INSTANCE.clockIcon());
-//        btnFilter.setToolTip("Filter by execution time.");
-//        toolBar.add(btnFilter);
-//
-//        txtDuration = new SpinnerField<Double>(new NumberPropertyEditor.DoublePropertyEditor());
-//        txtDuration.setIncrement(1d);
-//        txtDuration.setMinValue(0);
-//        txtDuration.setMaxValue(1000000d);
-//        txtDuration.setAllowNegative(false);
-//        txtDuration.setAllowBlank(true);
-//        txtDuration.setWidth(100);
-//        txtDuration.setToolTip("Minimum trace execution time (milliseconds)");
-//        toolBar.add(txtDuration);
-//
-//        toolBar.add(new SeparatorToolItem());
 
         btnExpandAll = new TextButton();
         btnExpandAll.setIcon(Resources.INSTANCE.expandIcon());
@@ -285,7 +266,7 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
                 if ((BrowserEvents.KEYDOWN.equals(eventType) && nev.getKeyCode() == KeyCodes.KEY_ENTER)
                         || BrowserEvents.DBLCLICK.equals(nev.getType())) {
                     TraceRecordProxy tr = event.getValue();
-                    panelFactory.methodAttrsDialog(trace.getHostId(), trace.getDataOffs(), tr.getPath(), 0L).show();
+                    panelFactory.methodAttrsDialog(trace.getHostName(), trace.getDataOffs(), tr.getPath(), 0L).show();
                 }
                 if (BrowserEvents.CONTEXTMENU.equals(eventType)) {
                     selection.setSelected(event.getValue(), true);
@@ -326,7 +307,7 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
             public void onSelection(SelectionEvent<Item> event) {
                 TraceRecordProxy tr = selection.getSelectedObject();
                 if (tr != null) {
-                    panelFactory.methodAttrsDialog(trace.getHostId(), trace.getDataOffs(), tr.getPath(), 0L).show();
+                    panelFactory.methodAttrsDialog(trace.getHostName(), trace.getDataOffs(), tr.getPath(), 0L).show();
                 }
             }
         });
@@ -397,7 +378,7 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
         if (recursive) {
             fullyExpanded = true;
         }
-        rf.traceDataService().listRecords(trace.getHostId(), trace.getDataOffs(), 0, null, recursive)
+        rf.traceDataService().listRecords(trace.getHostName(), trace.getDataOffs(), 0, null, recursive)
             .fire(new Receiver<List<TraceRecordProxy>>() {
                 @Override
                 public void onSuccess(List<TraceRecordProxy> response) {
@@ -513,7 +494,7 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
 
 
     private void doExpand(final TraceRecordProxy rec) {
-        rf.traceDataService().listRecords(trace.getHostId(), trace.getDataOffs(), 0, rec.getPath(), false).fire(
+        rf.traceDataService().listRecords(trace.getHostName(), trace.getDataOffs(), 0, rec.getPath(), false).fire(
                 new Receiver<List<TraceRecordProxy>>() {
                     @Override
                     public void onSuccess(List<TraceRecordProxy> newrecs) {

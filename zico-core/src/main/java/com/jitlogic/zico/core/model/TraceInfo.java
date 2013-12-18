@@ -20,7 +20,7 @@ import java.util.List;
 
 public class TraceInfo {
 
-    int hostId;
+    String hostName;
 
     long dataOffs;
 
@@ -58,12 +58,12 @@ public class TraceInfo {
 
     SymbolicExceptionInfo exceptionInfo;
 
-    public int getHostId() {
-        return hostId;
+    public String getHostName() {
+        return hostName;
     }
 
-    public void setHostId(int hostId) {
-        this.hostId = hostId;
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
     }
 
     public long getDataOffs() {

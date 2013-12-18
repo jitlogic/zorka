@@ -118,7 +118,7 @@ public class HostPrefsDialog extends Dialog {
                 new VerticalLayoutContainer.VerticalLayoutData(1, -1));
 
         if (info != null) {
-            txtHostDesc.setText(info.getDescription());
+            // TODO txtHostDesc.setText(info.getDescription());
         }
 
         setWidth(400);
@@ -150,7 +150,7 @@ public class HostPrefsDialog extends Dialog {
     public void save() {
         // What about new host ?
         editedHost.setAddr(txtHostAddr.getText());
-        editedHost.setDescription(txtHostDesc.getText());
+        // TODO editedHost.setDescription(txtHostDesc.getText());
         editedHost.setPass(txtHostPass.getText());
         editedHost.setMaxSize(txtMaxSize.getCurrentValue() * 1048576L);
 

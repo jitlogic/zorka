@@ -15,11 +15,8 @@
  */
 package com.jitlogic.zico.core;
 
-import com.jitlogic.zico.core.locators.TraceTemplateManager;
-import com.jitlogic.zico.core.model.HostInfo;
-import com.jitlogic.zico.core.model.User;
+import com.google.web.bindery.requestfactory.shared.Locator;
 import com.jitlogic.zorka.common.tracedata.HelloRequest;
-import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessorFactory;
@@ -27,104 +24,60 @@ import com.jitlogic.zorka.common.zico.ZicoException;
 import com.jitlogic.zorka.common.zico.ZicoPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.sql.DataSource;
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
 @Singleton
-public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, RowMapper<HostStore> {
+public class HostStoreManager extends Locator<HostStore, String> implements Closeable, ZicoDataProcessorFactory {
 
     private final static Logger log = LoggerFactory.getLogger(HostStoreManager.class);
 
     private String dataDir;
 
-    private ZicoConfig config;
-    private SymbolRegistry symbolRegistry;
-
-    private TraceTypeRegistry traceTypeRegistry;
-    private TraceTemplateManager templater;
-    private TraceCache cache;
-    private TraceTableWriter traceTableWriter;
-
     private boolean enableSecurity;
 
-    private Map<Integer, HostStore> storesById = new HashMap<Integer, HostStore>();
-    private Map<String, HostStore> storesByName = new HashMap<String, HostStore>();
+    private Map<String, HostStore> storesByName = new HashMap<>();
 
-    private JdbcTemplate jdbc;
-    private DataSource ds;
+    private ZicoConfig config;
+    private TraceTemplateManager templater;
 
     @Inject
-    public HostStoreManager(ZicoConfig config, DataSource ds, SymbolRegistry symbolRegistry, TraceTableWriter traceTableWriter,
-                            TraceCache cache, TraceTypeRegistry traceTypeRegistry, TraceTemplateManager templater) {
-        this.config = config;
-        this.symbolRegistry = symbolRegistry;
-        this.dataDir = config.stringCfg("zico.data.dir", null);
-        this.ds = ds;
-        this.cache = cache;
-        this.traceTypeRegistry = traceTypeRegistry;
-        this.templater = templater;
-        this.traceTableWriter = traceTableWriter;
+    public HostStoreManager(ZicoConfig config, TraceTemplateManager templater) {
 
-        this.jdbc = new JdbcTemplate(ds);
+        this.config = config;
+        this.templater = templater;
+
+        this.dataDir = config.stringCfg("zico.data.dir", null);
+
         this.enableSecurity = config.boolCfg("zico.security", false);
     }
 
 
-    public synchronized HostStore getOrCreateHost(String hostName, String hostAddr) {
+    public synchronized HostStore getHost(String name, boolean create) {
 
-        if (storesByName.containsKey(hostName)) {
-            return storesByName.get(hostName);
+        if (storesByName.containsKey(name)) {
+            return storesByName.get(name);
         }
 
-        List<HostStore> lst = jdbc.query("select * from HOSTS where HOST_NAME = ?", this, hostName);
+        File hostPath = new File(dataDir, ZicoUtil.safePath(name));
 
-        if (lst.size() == 0) {
-            jdbc.update("insert into HOSTS (HOST_NAME,HOST_ADDR,HOST_PATH) values (?,?,?)",
-                    hostName, hostAddr, safePath(hostName));
-            return getOrCreateHost(hostName, hostAddr);
-        } else {
-            return lst.get(0);
-        }
-    }
-
-
-    private String safePath(String hostname) {
-        return hostname;
-    }
-
-
-    public synchronized HostStore getHost(int hostId) {
-        if (storesById.containsKey(hostId)) {
-            return storesById.get(hostId);
-        }
-        return jdbc.queryForObject("select * from HOSTS where HOST_ID = ?", this, hostId);
-    }
-
-
-    // TODO use ID as proper host ID as get(id), rename this method to reflect it is get-or-create method, not a simple getter
-    // TODO this method is redundant
-    public synchronized HostStore get(String hostName, boolean create) {
-        if (!storesByName.containsKey(hostName) && create) {
-            HostStore host = getOrCreateHost(hostName, null);
-            if (host != null) {
-                storesByName.put(hostName, host);
-            }
+        if (create || new File(hostPath, HostStore.HOST_PROPERTIES).exists()) {
+            HostStore host = new HostStore(config, templater, name);
+            storesByName.put(name, host);
+            return host;
         }
 
-        return storesByName.get(hostName);
+        return null;
     }
 
 
@@ -137,101 +90,125 @@ public class HostStoreManager implements Closeable, ZicoDataProcessorFactory, Ro
                 log.error("Cannot close agent store for host " + entry.getKey(), e);
             }
         }
+        storesByName.clear();
     }
 
 
     @Override
-    // TODO move this outside this class
     public ZicoDataProcessor get(Socket socket, HelloRequest hello) throws IOException {
-        HostStore store = get(hello.getHostname(), !enableSecurity);
+
+        if (hello.getHostname() == null) {
+            log.error("Received HELLO packet with null hostname.");
+            throw new ZicoException(ZicoPacket.ZICO_BAD_REQUEST, "Null hostname.");
+        }
+
+        HostStore store = getHost(hello.getHostname(), !enableSecurity);
 
         if (store == null) {
             throw new ZicoException(ZicoPacket.ZICO_AUTH_ERROR, "Unauthorized.");
         }
 
-        if (store.getHostInfo().getAddr() == null) {
-            store.getHostInfo().setAddr(socket.getInetAddress().getHostAddress());
+        if (store.getAddr() == null) {
+            store.setAddr(socket.getInetAddress().getHostAddress());
             store.save();
         }
 
         if (enableSecurity) {
-            HostInfo hi = store.getHostInfo();
-
-            if (hi.getAddr() != null && !hi.getAddr().equals("" + socket.getInetAddress())) {
+            if (store.getAddr() != null && !store.getAddr().equals("" + socket.getInetAddress())) {
                 throw new ZicoException(ZicoPacket.ZICO_AUTH_ERROR, "Unauthorized.");
             }
 
-            if (hi.getPass() != null && !hi.getPass().equals(hello.getAuth())) {
+            if (store.getPass() != null && !store.getPass().equals(hello.getAuth())) {
                 throw new ZicoException(ZicoPacket.ZICO_AUTH_ERROR, "Unauthorized.");
             }
         }
 
-        return new ReceiverContext(store, traceTypeRegistry, traceTableWriter);
+        return new ReceiverContext(store);
     }
 
-    @Override
-    public synchronized HostStore mapRow(ResultSet rs, int rowNum) throws SQLException {
-        int hostId = rs.getInt("HOST_ID");
 
-        if (storesById.containsKey(hostId)) {
-            HostStore store = storesById.get(hostId);
-            store.updateInfo(rs);
-            return store;
-        } else {
-            HostStore store = new HostStore(this, cache, rs);
-            storesById.put(store.getHostInfo().getId(), store);
-            return store;
+    public List<HostStore> list(String username) {
+        List<HostStore> result = new ArrayList<>();
+
+        for (String name : new File(dataDir).list()) {
+            if (new File(new File(dataDir, name), HostStore.HOST_PROPERTIES).exists()) {
+                // TODO Control user access here ... exclude hosts user does not have access to
+                result.add(getHost(name, false));
+            }
         }
+
+        return result;
     }
 
 
-    public List<HostStore> list() {
-        return jdbc.query("select * from HOSTS order by HOST_NAME", this);
-    }
-
-
-    public List<HostStore> listForUser(User user) {
-        return jdbc.query(
-            "select * from HOSTS h left join USERS_HOSTS u on h.HOST_ID = u.HOST_ID where u.USER_ID = ?", this, user.getId());
-    }
-
-
-    public synchronized void delete(int hostId) throws IOException {
-        // TODO this might potentially take a long time and block other processes - do only necessary parts in synchronized section
-        HostStore store = getHost(hostId);
+    public synchronized void delete(String name) throws IOException {
+        HostStore store = storesByName.get(name);
         if (store != null) {
             String rootPath = store.getRootPath();
             store.close();
             ZorkaUtil.rmrf(rootPath);
-            jdbc.update("delete from TRACES where HOST_ID = ?", hostId);
-            jdbc.update("delete from HOSTS where HOST_ID = ?", hostId);
-            storesById.remove(store.getHostInfo().getId());
-            storesByName.remove(store.getHostInfo().getName());
+            storesByName.remove(name);
         }
 
     }
 
-    public ZicoConfig getConfig() {
-        return config;
+    public synchronized Map<Integer,String> getTids(String hostName) {
+        Map<Integer,String> rslt = new HashMap<>();
+
+        if (hostName != null) {
+            HostStore hs = getHost(hostName, false);
+            if (hs != null) {
+                rslt.putAll(hs.getTidMap());
+            }
+        } else {
+            for (Map.Entry<String,HostStore> e : storesByName.entrySet()) {
+                rslt.putAll(e.getValue().getTidMap());
+            }
+        }
+
+        return rslt;
     }
 
-    public SymbolRegistry getSymbolRegistry() {
-        return symbolRegistry;
+    @Override
+    public HostStore create(Class<? extends HostStore> clazz) {
+        throw new ZicoRuntimeException("Not implemented.");
     }
 
-    public String getDataDir() {
-        return dataDir;
+    @Override
+    public HostStore find(Class<? extends HostStore> clazz, String id) {
+        return getHost(id, false);
     }
 
-    public JdbcTemplate getJdbc() {
-        return jdbc;
+    @Override
+    public Class<HostStore> getDomainType() {
+        return HostStore.class;
     }
 
-    public DataSource getDs() {
-        return ds;
+    @Override
+    public String getId(HostStore host) {
+        return host.getName();
     }
 
-    public TraceTemplateManager getTemplater() {
-        return templater;
+    @Override
+    public Class<String> getIdType() {
+        return String.class;
     }
+
+    @Override
+    public Object getVersion(HostStore host) {
+        return 1;
+    }
+
+    public void persist(HostStore host) {
+        host.save();
+    }
+
+    public void remove(HostStore host) {
+        try {
+            delete(host.getName());
+        } catch (IOException e) {
+            log.error("Cannot remove host", e);
+        }
+    }
+
 }

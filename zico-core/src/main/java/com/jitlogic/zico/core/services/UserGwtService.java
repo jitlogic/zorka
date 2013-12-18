@@ -17,55 +17,53 @@ package com.jitlogic.zico.core.services;
 
 
 import com.jitlogic.zico.core.UserContext;
+import com.jitlogic.zico.core.UserManager;
 import com.jitlogic.zico.core.ZicoRuntimeException;
-import com.jitlogic.zico.core.locators.UserLocator;
 import com.jitlogic.zico.core.model.User;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Singleton
 public class UserGwtService {
 
-    private JdbcTemplate jdbc;
-    private UserLocator locator;
+    private UserManager locator;
     private UserContext userContext;
 
-
     @Inject
-    public UserGwtService(DataSource ds, UserLocator locator, UserContext userContext) {
-        jdbc = new JdbcTemplate(ds);
+    public UserGwtService(UserManager locator, UserContext userContext) {
         this.locator = locator;
         this.userContext = userContext;
     }
 
-
-    public Integer count() {
-        return jdbc.queryForObject("select count(1) from USERS", Integer.class);
-    }
-
-
     public List<User> findAll() {
-        return jdbc.query("select * from USERS", locator);
+        return locator.findAll();
+    }
+
+    public User findUser(String username) {
+        return locator.find(User.class, username);
     }
 
 
-    public List<Integer> getAllowedHostIds(Integer userId) {
-        List<Integer> lst = jdbc.queryForList("select HOST_ID from USERS_HOSTS where USER_ID = ?", Integer.class, userId);
-        return lst;
-    }
-
-
-    public void setAllowedHostIds(Integer userId, List<Integer> hostIds) {
-        jdbc.update("delete from USERS_HOSTS where USER_ID = ?", userId);
-
-        for (Integer hostId : hostIds) {
-            jdbc.update("insert into USERS_HOSTS (USER_ID, HOST_ID) values (?,?)", userId, hostId);
+    public List<String> getAllowedHosts(String username) {
+        User user = locator.find(User.class, username);
+        if (user != null && user.getAllowedHosts() != null) {
+            List<String> lst = new ArrayList<>();
+            lst.addAll(user.getAllowedHosts());
+            return lst;
         }
+        return Collections.EMPTY_LIST;
+    }
+
+
+    public void setAllowedHosts(String username, List<String> hosts) {
+        User user = locator.find(User.class, username);
+        user.setAllowedHosts(hosts);
+        locator.persist(user);
     }
 
 
@@ -86,20 +84,21 @@ public class UserGwtService {
             throw new ZicoRuntimeException("Insufficient privileges to reset other users password");
         }
 
-        String user = (userName != null && userName.length() > 0) ? userName : userContext.getUser();
+        User user = locator.find (User.class,
+                (userName != null && userName.length() > 0) ? userName : userContext.getUser());
 
         if (!adminMode) {
             String chkHash = "MD5:" + ZorkaUtil.md5(oldPassword);
 
-            String oldHash = jdbc.queryForObject("select PASSWORD from USERS where USER_NAME = ?", String.class, user);
+            String oldHash = user.getPassword();
 
             if (!chkHash.equals(oldHash)) {
                 throw new ZicoRuntimeException("Invalid (old) password.");
             }
         }
 
-        jdbc.update("update USERS set PASSWORD = ? where USER_NAME = ?", "MD5:" + ZorkaUtil.md5(newPassword), user);
-
+        user.setPassword("MD5:" + ZorkaUtil.md5(newPassword));
+        locator.persist(user);
     }
 
     public boolean isAdminMode() {

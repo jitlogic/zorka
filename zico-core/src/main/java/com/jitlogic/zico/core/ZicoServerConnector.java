@@ -26,6 +26,7 @@ import com.jitlogic.zorka.common.zico.ZicoPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
@@ -50,7 +51,9 @@ public class ZicoServerConnector extends ZicoConnector implements Runnable {
 
     private SocketAddress saddr;
 
-    public ZicoServerConnector(Socket socket, ZicoDataProcessorFactory factory) throws IOException {
+    @Inject
+    public ZicoServerConnector(int socketTimeout, ZicoDataProcessorFactory factory,
+                               Socket socket) throws IOException {
         this.socket = socket;
         this.in = socket.getInputStream();
         this.out = socket.getOutputStream();
@@ -58,9 +61,8 @@ public class ZicoServerConnector extends ZicoConnector implements Runnable {
 
         this.saddr = socket.getRemoteSocketAddress();
 
-        // TODO this is a crutch; socket timeout or config object should be supplied by injector;
         if (factory instanceof HostStoreManager) {
-            this.socket.setSoTimeout(((HostStoreManager) factory).getConfig().intCfg("zico.socket.timeout", 1200000));
+            this.socket.setSoTimeout(socketTimeout);
         }
     }
 
@@ -87,12 +89,13 @@ public class ZicoServerConnector extends ZicoConnector implements Runnable {
                 break;
             }
             case ZICO_DATA: {
-                log.debug("Received ZICO data packet from " + saddr + ": status=" + pkt.getStatus()
-                        + ", dlen=" + pkt.getData().length);
+                //log.debug("Received ZICO data packet from " + saddr + ": status=" + pkt.getStatus()
+                //        + ", dlen=" + pkt.getData().length);
                 if (context != null) {
                     for (Object o : ZicoCommonUtil.unpack(pkt.getData())) {
                         context.process(o);
                     }
+                    context.commit();
                     send(ZICO_OK);
                 } else {
                     log.error("Client " + saddr + " not authorized.");

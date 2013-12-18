@@ -31,6 +31,11 @@ public class TestZicoProcessor implements ZicoDataProcessor {
         results.add(obj);
     }
 
+    @Override
+    public void commit() {
+
+    }
+
     public List<Object> getResults() {
         return results;
     }

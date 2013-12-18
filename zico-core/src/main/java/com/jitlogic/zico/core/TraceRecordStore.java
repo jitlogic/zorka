@@ -19,9 +19,8 @@ package com.jitlogic.zico.core;
 import com.jitlogic.zico.core.model.KeyValuePair;
 import com.jitlogic.zico.core.model.MethodRankInfo;
 import com.jitlogic.zico.core.model.SymbolicExceptionInfo;
-import com.jitlogic.zico.core.model.TraceDetailFilterExpression;
-import com.jitlogic.zico.core.model.TraceDetailSearchExpression;
-import com.jitlogic.zico.core.model.TraceInfo;
+import com.jitlogic.zico.core.model.TraceInfoRecord;
+import com.jitlogic.zico.core.model.TraceRecordSearchQuery;
 import com.jitlogic.zico.core.model.TraceRecordInfo;
 import com.jitlogic.zico.core.model.TraceRecordSearchResult;
 import com.jitlogic.zico.core.rds.RDSStore;
@@ -32,8 +31,12 @@ import com.jitlogic.zorka.common.tracedata.SymbolicException;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.FressianReader;
+import org.fressian.FressianWriter;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,34 +46,73 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class TraceDataStore {
-
-    private HostStore hostStore;
-    private TraceInfo traceInfo;
-
-    private TraceCache cache;
-    private SymbolRegistry symbolRegistry;
-
-
-    public TraceDataStore(HostStore hostStore, TraceInfo traceInfo, TraceCache cache, SymbolRegistry symbolRegistry) {
-        this.hostStore = hostStore;
-        this.traceInfo = traceInfo;
-
-        this.cache = cache;
-        this.symbolRegistry = symbolRegistry;
-    }
-
+public class TraceRecordStore implements Closeable {
 
     private final static Pattern RE_SLASH = Pattern.compile("/");
 
+    private ZicoConfig config;
+
+    private HostStore hostStore;
+    private SymbolRegistry symbolRegistry;
+
+    private RDSStore rds;
+
+    public TraceRecordStore(ZicoConfig config, HostStore hostStore, String path) throws IOException {
+        this.config = config;
+        this.hostStore = hostStore;
+        this.symbolRegistry = hostStore.getSymbolRegistry();
+
+
+        String rdspath = ZorkaUtil.path(hostStore.getRootPath(), path);
+        File rdsDir = new File(rdspath);
+        if (!rdsDir.exists()) {
+            rdsDir.mkdirs();
+        }
+
+        long fileSize = config.kiloCfg("rds.file.size", 16 * 1024 * 1024L).intValue();
+        long segmentSize = config.kiloCfg("rds.seg.size", 1024 * 1024L);
+        rds = new RDSStore(rdspath,
+                hostStore.getMaxSize(),
+                fileSize, segmentSize,
+                hostStore);
+    }
+
+    public ChunkInfo write(TraceRecord tr) throws IOException {
+        byte[] data = serialize(tr);
+        long offs = rds.write(data);
+        return new ChunkInfo(offs, data.length);
+    }
+
+    public TraceRecord read(ChunkInfo chunk) throws IOException {
+        byte[] blob = rds.read(chunk.getOffset(), chunk.getLength());
+
+        if (blob != null) {
+            ByteArrayInputStream is = new ByteArrayInputStream(blob);
+            FressianReader reader = new FressianReader(is, FressianTraceFormat.READ_LOOKUP);
+            return (TraceRecord) reader.readObject();
+        }
+
+        return null;
+    }
+
+    private byte[] serialize(TraceRecord rec) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        FressianWriter writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);
+        writer.writeObject(rec);
+        return os.toByteArray();
+    }
+
+    public RDSStore getRds() {
+        return rds;
+    }
 
     // TODO factor out record packing from here
     public void searchRecords(TraceRecord tr, String path, TraceRecordMatcher matcher,
                               TraceRecordSearchResult result, long traceTime, boolean recur) {
 
         boolean matches = matcher.match(tr)
-                && (!matcher.hasFlag(TraceDetailSearchExpression.ERRORS_ONLY) || null != tr.findException())
-                && (!matcher.hasFlag(TraceDetailSearchExpression.METHODS_WITH_ATTRS) || tr.numAttrs() > 0);
+                && (!matcher.hasFlag(TraceRecordSearchQuery.ERRORS_ONLY) || null != tr.findException())
+                && (!matcher.hasFlag(TraceRecordSearchQuery.METHODS_WITH_ATTRS) || tr.numAttrs() > 0);
 
         if (matches) {
             result.getResult().add(packTraceRecord(tr, path, 250));
@@ -94,9 +136,9 @@ public class TraceDataStore {
     }
 
 
-    public TraceRecord getTraceRecord(String path, long minMethodTime) {
+    public TraceRecord getTraceRecord(TraceInfoRecord info, String path, long minMethodTime) {
         try {
-            TraceRecord tr = fetchRecord(minMethodTime);
+            TraceRecord tr = fetchRecord(info, minMethodTime);
             if (path != null && path.trim().length() > 0) {
                 for (String p : RE_SLASH.split(path.trim())) {
                     Integer idx = Integer.parseInt(p);
@@ -115,24 +157,17 @@ public class TraceDataStore {
     }
 
 
-    private TraceRecord fetchRecord(long minMethodTime) throws IOException {
-        TraceDetailFilterExpression filter = new TraceDetailFilterExpression();
-        filter.setHostId(hostStore.getHostInfo().getId());
-        filter.setTraceOffs(traceInfo.getDataOffs());
-        filter.setMinMethodTime(minMethodTime);
-
-        TraceRecord tr = cache.get(filter);
+    private TraceRecord fetchRecord(TraceInfoRecord info, long minMethodTime) throws IOException {
+        TraceRecord tr = null;
 
         if (tr == null) {
-            RDSStore rds = hostStore.getRdsData();
-            byte[] blob = rds.read(traceInfo.getDataOffs(), traceInfo.getDataLen());
+            byte[] blob = rds.read(info.getDataOffs(), info.getDataLen());
             ByteArrayInputStream is = new ByteArrayInputStream(blob);
             FressianReader reader = new FressianReader(is, FressianTraceFormat.READ_LOOKUP);
             tr = (TraceRecord) reader.readObject();
             if (minMethodTime > 0) {
                 tr = filterByTime(tr, minMethodTime);
             }
-            cache.put(filter, tr);
         }
 
         return tr;
@@ -142,7 +177,7 @@ public class TraceDataStore {
     public TraceRecord filterByTime(TraceRecord orig, long minMethodTime) {
         TraceRecord tr = orig.copy();
         if (orig.getChildren() != null) {
-            ArrayList<TraceRecord> children = new ArrayList<TraceRecord>(orig.numChildren());
+            ArrayList<TraceRecord> children = new ArrayList<>(orig.numChildren());
             for (TraceRecord child : orig.getChildren()) {
                 if (child.getTime() >= minMethodTime) {
                     children.add(filterByTime(child, minMethodTime));
@@ -167,7 +202,7 @@ public class TraceDataStore {
         info.setPath(path);
 
         if (tr.getAttrs() != null) {
-            List<KeyValuePair> attrs = new ArrayList<KeyValuePair>(tr.getAttrs().size());
+            List<KeyValuePair> attrs = new ArrayList<>(tr.getAttrs().size());
             for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
                 String s = "" + e.getValue();
                 if (attrLimit != null && s.length() > attrLimit) {
@@ -320,16 +355,17 @@ public class TraceDataStore {
             }
     );
 
-    public List<MethodRankInfo> methodRank(String orderBy, String orderDesc) {
-        TraceRecord tr = getTraceRecord("", 0);
 
-        Map<String, MethodRankInfo> histogram = new HashMap<String, MethodRankInfo>();
+    public List<MethodRankInfo> methodRank(TraceInfoRecord info, String orderBy, String orderDesc) {
+        TraceRecord tr = getTraceRecord(info, "", 0);
+
+        Map<String, MethodRankInfo> histogram = new HashMap<>();
 
         if (tr != null) {
             makeHistogram(histogram, tr);
         }
 
-        List<MethodRankInfo> result = new ArrayList<MethodRankInfo>(histogram.size());
+        List<MethodRankInfo> result = new ArrayList<>(histogram.size());
         result.addAll(histogram.values());
 
         String key = orderBy + "." + orderDesc;
@@ -340,5 +376,29 @@ public class TraceDataStore {
         }
 
         return result;
+    }
+
+    @Override
+    public void close() throws IOException {
+        rds.close();
+    }
+
+
+    public static class ChunkInfo {
+        private long offset;
+        private int length;
+
+        public ChunkInfo(long offset, int length) {
+            this.offset = offset;
+            this.length = length;
+        }
+
+        public long getOffset() {
+            return offset;
+        }
+
+        public int getLength() {
+            return length;
+        }
     }
 }

@@ -21,8 +21,8 @@ import com.jitlogic.zico.client.panel.MethodAttrsDialog;
 import com.jitlogic.zico.client.panel.MethodRankingPanel;
 import com.jitlogic.zico.client.panel.PasswordChangeDialog;
 import com.jitlogic.zico.client.panel.TraceCallTreePanel;
-import com.jitlogic.zico.client.panel.TraceListPanel;
 import com.jitlogic.zico.client.panel.TraceRecordSearchDialog;
+import com.jitlogic.zico.client.panel.TraceSearchPanel;
 import com.jitlogic.zico.client.panel.TraceTemplatePanel;
 import com.jitlogic.zico.client.panel.UserManagementPanel;
 import com.jitlogic.zico.shared.data.HostProxy;
@@ -33,7 +33,7 @@ import java.util.List;
 
 public interface PanelFactory {
 
-    public TraceListPanel traceListPanel(HostProxy hostInfo);
+    public TraceSearchPanel traceSearchPanel(HostProxy host);
 
     public TraceCallTreePanel traceCallTreePanel(TraceInfoProxy traceInfo);
 
@@ -41,7 +41,7 @@ public interface PanelFactory {
 
     public TraceRecordSearchDialog traceRecordSearchDialog(TraceCallTreePanel panel, TraceInfoProxy trace);
 
-    public MethodAttrsDialog methodAttrsDialog(Integer hostId, Long dataOffs, String path, @Assisted("minTime") Long minTime);
+    public MethodAttrsDialog methodAttrsDialog(@Assisted("hostName") String hostName, Long dataOffs, String path, @Assisted("minTime") Long minTime);
 
     public MethodRankingPanel methodRankingPanel(TraceInfoProxy traceInfo);
 

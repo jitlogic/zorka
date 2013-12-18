@@ -22,7 +22,7 @@ import com.jitlogic.zico.core.model.TraceRecordSearchResult;
 import java.util.List;
 
 @ProxyFor(TraceRecordSearchResult.class)
-public interface TraceRecordSearchProxy extends ValueProxy {
+public interface TraceRecordSearchResultProxy extends ValueProxy {
     List<TraceRecordProxy> getResult();
 
     double getSumPct();

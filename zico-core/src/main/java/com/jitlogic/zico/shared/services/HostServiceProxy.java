@@ -31,10 +31,6 @@ public interface HostServiceProxy extends RequestContext {
 
     Request<List<HostProxy>> findAll();
 
-    Request<Void> addUserHost(UserProxy user, HostProxy host);
-
-    Request<Void> delUserHost(UserProxy user, HostProxy host);
-
     Request<Void> persist(HostProxy proxy);
 
     Request<Void> remove(HostProxy host);

@@ -13,9 +13,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core;
+package com.jitlogic.zico.core.model;
 
 
+import com.jitlogic.zico.core.TraceRecordStore;
+import com.jitlogic.zico.core.ZicoUtil;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 
 import java.io.Serializable;
@@ -119,6 +121,10 @@ public class TraceInfoRecord implements Serializable {
         return (int)dataOffs;
     }
 
+    public TraceRecordStore.ChunkInfo getIndexChunk() {
+        return new TraceRecordStore.ChunkInfo(indexOffs, indexLen);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj.getClass() == TraceInfoRecord.class) {
@@ -133,4 +139,5 @@ public class TraceInfoRecord implements Serializable {
     public String toString() {
         return "TraceInfoRecord(" + indexOffs + "," + dataOffs + ")";
     }
+
 }

@@ -17,30 +17,31 @@ package com.jitlogic.zico.shared.data;
 
 import com.google.web.bindery.requestfactory.shared.ProxyFor;
 import com.google.web.bindery.requestfactory.shared.ValueProxy;
-import com.jitlogic.zico.core.model.MethodRankInfo;
+import com.jitlogic.zico.core.model.TraceInfoSearchQuery;
 
+@ProxyFor(TraceInfoSearchQuery.class)
+public interface TraceInfoSearchQueryProxy extends ValueProxy {
+    String getHostName();
 
-@ProxyFor(MethodRankInfo.class)
-public interface MethodRankProxy extends ValueProxy {
-    long getCalls();
+    void setHostName(String hostName);
 
-    long getErrors();
+    int getFlags();
 
-    long getTime();
+    void setFlags(int flags);
 
-    long getAvgTime();
+    int getLimit();
 
-    String getMethod();
+    void setLimit(int limit);
 
-    long getBareTime();
+    long getOffset();
 
-    long getAvgBareTime();
+    void setOffset(long offset);
 
-    long getMinTime();
+    long getMinMethodTime();
 
-    long getMaxTime();
+    void setMinMethodTime(long minMethodTime);
 
-    long getMinBareTime();
+    String getSearchExpr();
 
-    long getMaxBareTime();
+    void setSearchExpr(String expr);
 }

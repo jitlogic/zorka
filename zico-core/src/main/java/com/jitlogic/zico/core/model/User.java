@@ -15,14 +15,13 @@
  */
 package com.jitlogic.zico.core.model;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.jitlogic.zico.core.locators.UserLocator;
-
-public class User  {
+public class User implements Serializable {
 
     public final static int ADMIN_USER = 0x0001;
-
-    private Integer id;
 
     private String userName;
 
@@ -32,55 +31,58 @@ public class User  {
 
     private int flags;
 
-    private UserLocator locator;
+    private List<String> allowedHosts = new ArrayList<>();
 
-    public User(UserLocator locator) {
-        this.locator = locator;
-    }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getUserName() {
         return userName;
     }
 
+
     public void setUserName(String userName) {
         this.userName = userName;
     }
+
 
     public String getRealName() {
         return realName;
     }
 
+
     public void setRealName(String realName) {
         this.realName = realName;
     }
+
 
     public String getPassword() {
         return password;
     }
 
+
     public void setPassword(String password) {
         this.password = password;
     }
+
 
     public int getFlags() {
         return flags;
     }
 
+
     public void setFlags(int flags) {
         this.flags = flags;
     }
 
+    public boolean hasFlag(int flag) {
+        return 0 != (flags & flag);
+    }
+
+
     public boolean isAdmin() {
         return 0 != (flags & ADMIN_USER);
     }
+
 
     public void setAdmin(boolean admin) {
         if (admin) {
@@ -90,12 +92,13 @@ public class User  {
         }
     }
 
-    public void persist() {
-        locator.persist(this);
+
+    public List<String> getAllowedHosts() {
+        return allowedHosts;
     }
 
 
-    public void remove() {
-        locator.remove(this);
+    public void setAllowedHosts(List<String> allowedHosts) {
+        this.allowedHosts = allowedHosts;
     }
 }

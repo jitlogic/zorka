@@ -34,11 +34,11 @@ import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.client.props.TraceRecordInfoProperties;
-import com.jitlogic.zico.core.model.TraceDetailSearchExpression;
-import com.jitlogic.zico.shared.data.TraceDetailSearchProxy;
+import com.jitlogic.zico.core.model.TraceRecordSearchQuery;
+import com.jitlogic.zico.shared.data.TraceRecordSearchQueryProxy;
 import com.jitlogic.zico.shared.data.TraceInfoProxy;
 import com.jitlogic.zico.shared.data.TraceRecordProxy;
-import com.jitlogic.zico.shared.data.TraceRecordSearchProxy;
+import com.jitlogic.zico.shared.data.TraceRecordSearchResultProxy;
 import com.jitlogic.zico.shared.services.TraceDataServiceProxy;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.util.Margins;
@@ -317,25 +317,25 @@ public class TraceRecordSearchDialog extends Dialog {
 
     private void doSearch() {
         TraceDataServiceProxy req = rf.traceDataService();
-        TraceDetailSearchProxy expr = req.create(TraceDetailSearchProxy.class);
+        TraceRecordSearchQueryProxy expr = req.create(TraceRecordSearchQueryProxy.class);
 
-        expr.setType(btnEql.getValue() ? TraceDetailSearchExpression.EQL_QUERY : TraceDetailSearchExpression.TXT_QUERY);
+        expr.setType(btnEql.getValue() ? TraceRecordSearchQuery.EQL_QUERY : TraceRecordSearchQuery.TXT_QUERY);
 
         expr.setFlags(
-                (chkErrorsOnly.getValue() ? TraceDetailSearchExpression.ERRORS_ONLY : 0)
-                        | (chkMethodsWithAttrs.getValue() ? TraceDetailSearchExpression.METHODS_WITH_ATTRS : 0)
-                        | (chkClass.getValue() ? TraceDetailSearchExpression.SEARCH_CLASSES : 0)
-                        | (chkMethod.getValue() ? TraceDetailSearchExpression.SEARCH_METHODS : 0)
-                        | (chkAttribs.getValue() ? TraceDetailSearchExpression.SEARCH_ATTRS : 0)
-                        | (chkExceptionText.getValue() ? TraceDetailSearchExpression.SEARCH_EX_MSG : 0)
-                        | (chkIgnoreCase.getValue() ? TraceDetailSearchExpression.IGNORE_CASE : 0));
+                (chkErrorsOnly.getValue() ? TraceRecordSearchQuery.ERRORS_ONLY : 0)
+                        | (chkMethodsWithAttrs.getValue() ? TraceRecordSearchQuery.METHODS_WITH_ATTRS : 0)
+                        | (chkClass.getValue() ? TraceRecordSearchQuery.SEARCH_CLASSES : 0)
+                        | (chkMethod.getValue() ? TraceRecordSearchQuery.SEARCH_METHODS : 0)
+                        | (chkAttribs.getValue() ? TraceRecordSearchQuery.SEARCH_ATTRS : 0)
+                        | (chkExceptionText.getValue() ? TraceRecordSearchQuery.SEARCH_EX_MSG : 0)
+                        | (chkIgnoreCase.getValue() ? TraceRecordSearchQuery.IGNORE_CASE : 0));
 
         expr.setSearchExpr(txtSearchFilter.getCurrentValue());
 
-        req.searchRecords(trace.getHostId(), trace.getDataOffs(), 0, rootPath, expr).fire(
-                new Receiver<TraceRecordSearchProxy>() {
+        req.searchRecords(trace.getHostName(), trace.getDataOffs(), 0, rootPath, expr).fire(
+                new Receiver<TraceRecordSearchResultProxy>() {
                     @Override
-                    public void onSuccess(TraceRecordSearchProxy response) {
+                    public void onSuccess(TraceRecordSearchResultProxy response) {
                         resultsStore.clear();
                         resultsStore.addAll(response.getResult());
                         lblSumStats.setText(response.getResult().size() + " methods, "

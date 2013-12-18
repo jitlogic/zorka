@@ -13,13 +13,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.core;
+package com.jitlogic.zico.shared.data;
+
+import com.google.web.bindery.requestfactory.shared.ProxyFor;
+import com.google.web.bindery.requestfactory.shared.ValueProxy;
+import com.jitlogic.zico.core.model.MethodRankInfo;
 
 
-public interface ZicoEntity<T> {
+@ProxyFor(MethodRankInfo.class)
+public interface MethodRankInfoProxy extends ValueProxy {
+    long getCalls();
 
-    void persist(T obj);
+    long getErrors();
 
-    void remove(T obj);
+    long getTime();
 
+    long getAvgTime();
+
+    String getMethod();
+
+    long getBareTime();
+
+    long getAvgBareTime();
+
+    long getMinTime();
+
+    long getMaxTime();
+
+    long getMinBareTime();
+
+    long getMaxBareTime();
 }

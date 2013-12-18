@@ -63,18 +63,18 @@ public class MethodAttrsDialog extends Dialog {
 
     @Inject
     public MethodAttrsDialog(ZicoRequestFactory rf, ErrorHandler errorHandler,
-                             @Assisted Integer hostId, @Assisted Long dataOffs,
+                             @Assisted("hostName") String hostName, @Assisted Long dataOffs,
                              @Assisted String path, @Assisted("minTime") Long minTime) {
         this.rf = rf;
         this.errorHandler = errorHandler;
         configure("Trace Details");
 
-        loadTraceDetail(hostId, dataOffs, path, minTime);
+        loadTraceDetail(hostName, dataOffs, path, minTime);
     }
 
 
-    private void loadTraceDetail(Integer hostId, Long dataOffs, String path, Long minTime) {
-        rf.traceDataService().getRecord(hostId, dataOffs, minTime, path).fire(new Receiver<TraceRecordProxy>() {
+    private void loadTraceDetail(String hostName, Long dataOffs, String path, Long minTime) {
+        rf.traceDataService().getRecord(hostName, dataOffs, minTime, path).fire(new Receiver<TraceRecordProxy>() {
             @Override
             public void onSuccess(TraceRecordProxy tr) {
                 fillTraceDetail(tr);
