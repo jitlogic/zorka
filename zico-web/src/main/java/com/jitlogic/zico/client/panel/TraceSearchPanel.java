@@ -17,6 +17,8 @@ package com.jitlogic.zico.client.panel;
 
 
 import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.ActionCell;
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.dom.client.BrowserEvents;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style;
@@ -33,11 +35,14 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.IdentityColumn;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.ProvidesKey;
@@ -57,7 +62,6 @@ import com.jitlogic.zico.shared.data.TraceInfoSearchQueryProxy;
 import com.jitlogic.zico.shared.data.TraceInfoSearchResultProxy;
 import com.jitlogic.zico.shared.services.TraceDataServiceProxy;
 import com.sencha.gxt.data.shared.LabelProvider;
-import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.button.ToggleButton;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer;
@@ -78,8 +82,10 @@ import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class TraceSearchPanel extends VerticalLayoutContainer {
 
@@ -93,7 +99,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     private HostProxy host;
 
     private DataGrid<TraceInfoProxy> grid;
-    private ListDataProvider<TraceInfoProxy> store;
+    private ListDataProvider<TraceInfoProxy> data;
     private SingleSelectionModel<TraceInfoProxy> selection;
 
     private Map<Integer, String> traceTypes;
@@ -104,6 +110,10 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     private TextField txtFilter;
     private SpinnerField<Double> txtDuration;
     private SimpleComboBox<Integer> cmbTraceType;
+
+    private TraceSearchTableBuilder rowBuilder;
+
+    private Set<Long> expandedDetails = new HashSet<Long>();
 
     private ErrorHandler errorHandler;
     private Menu contextMenu;
@@ -127,6 +137,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         createContextMenu();
 
         loadTraceTypes();
+        refresh();
     }
 
     private void createToolbar() {
@@ -321,6 +332,10 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
 
         // TODO detail expander cell here
 
+        Column<TraceInfoProxy, TraceInfoProxy> colExpander
+                = new IdentityColumn<TraceInfoProxy>(DETAIL_EXPANDER_CELL);
+        grid.addColumn(colExpander, "#");
+        grid.setColumnWidth(colExpander, 32, Style.Unit.PX);
 
         Column<TraceInfoProxy, TraceInfoProxy> colTraceClock
                 = new IdentityColumn<TraceInfoProxy>(TRACE_CLOCK_CELL);
@@ -357,16 +372,16 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         grid.addColumn(colTraceDesc, "Description");
         grid.setColumnWidth(colTraceDesc, 100, Style.Unit.PCT);
 
-        //rowBuilder = new TraceCallTableBuilder(grid, expandedDetails);
-        //grid.setTableBuilder(rowBuilder);
+        rowBuilder = new TraceSearchTableBuilder(grid, expandedDetails);
+        grid.setTableBuilder(rowBuilder);
 
         grid.setSkipRowHoverStyleUpdate(true);
         grid.setSkipRowHoverFloatElementCheck(true);
         grid.setSkipRowHoverCheck(true);
         grid.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.DISABLED);
 
-        store = new ListDataProvider<TraceInfoProxy>();
-        store.addDataDisplay(grid);
+        data = new ListDataProvider<TraceInfoProxy>();
+        data.addDataDisplay(grid);
 
         grid.addCellPreviewHandler(new CellPreviewEvent.Handler<TraceInfoProxy>() {
             @Override
@@ -467,14 +482,14 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     private void refresh() {
         TraceDataServiceProxy req = rf.traceDataService();
         TraceInfoSearchQueryProxy q = req.create(TraceInfoSearchQueryProxy.class);
-        q.setLimit(100);
+        q.setLimit(50);
         q.setHostName(host.getName());
 
         req.searchTraces(q).fire(new Receiver<TraceInfoSearchResultProxy>() {
             @Override
             public void onSuccess(TraceInfoSearchResultProxy response) {
                 List<TraceInfoProxy> results = response.getResults();
-                store.getList().addAll(results);
+                data.getList().addAll(results);
             }
         });
     }
@@ -491,6 +506,16 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         });
     }
 
+    private void toggleDetails(TraceInfoProxy ti) {
+        long offs = ti.getDataOffs();
+        if (expandedDetails.contains(offs)) {
+            expandedDetails.remove(offs);
+        } else {
+            expandedDetails.add(offs);
+        }
+        grid.redrawRow(data.getList().indexOf(ti));
+    }
+
     private static final ProvidesKey<TraceInfoProxy> KEY_PROVIDER = new ProvidesKey<TraceInfoProxy>() {
         @Override
         public Object getKey(TraceInfoProxy item) {
@@ -500,11 +525,31 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
 
     private final static String SMALL_CELL_CSS = Resources.INSTANCE.zicoCssResources().traceSmallCell();
 
+    private static final String EXPANDER_EXPAND = AbstractImagePrototype.create(Resources.INSTANCE.expanderExpand()).getHTML();
+    private static final String EXPANDER_COLLAPSE = AbstractImagePrototype.create(Resources.INSTANCE.expanderCollapse()).getHTML();
+
+    private final Cell<TraceInfoProxy> DETAIL_EXPANDER_CELL = new ActionCell<TraceInfoProxy>("",
+            new ActionCell.Delegate<TraceInfoProxy>() {
+                @Override
+                public void execute(TraceInfoProxy rec) {
+                    toggleDetails(rec);
+                }
+            }) {
+        @Override
+        public void render(Cell.Context context, TraceInfoProxy tr, SafeHtmlBuilder sb) {
+            if ((tr.getAttributes() != null && tr.getAttributes().size() > 0)||tr.getExceptionInfo() != null) {
+                sb.appendHtmlConstant("<span style=\"cursor: pointer;\">");
+                sb.appendHtmlConstant(expandedDetails.contains(tr.getDataOffs()) ? EXPANDER_COLLAPSE : EXPANDER_EXPAND);
+                sb.appendHtmlConstant("</span>");
+            }
+        }
+    };
+
     private AbstractCell<TraceInfoProxy> TRACE_NAME_CELL = new AbstractCell<TraceInfoProxy>() {
         @Override
         public void render(Context context, TraceInfoProxy ti, SafeHtmlBuilder sb) {
             String color = ti.getStatus() != 0 ? "red" : "black";
-            sb.appendHtmlConstant("<div class=\"" + SMALL_CELL_CSS + "\" style=\"color: " + color + ";\">");
+            sb.appendHtmlConstant("<div class=\"" + SMALL_CELL_CSS + "\" style=\"color: " + color + "; text-align: left;\">");
             sb.append(SafeHtmlUtils.fromString(ti.getDescription()));
             sb.appendHtmlConstant("</div>");
         }
