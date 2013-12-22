@@ -260,6 +260,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
         ti.setCalls(itr.getCalls());
         ti.setErrors(itr.getErrors());
         ti.setExecutionTime(itr.getDuration());
+        ti.setClock(tr.getMarker().getClock());
 
         if (tr != null && tr.getAttrs() != null) {
             List<KeyValuePair> keyvals = new ArrayList<KeyValuePair>(tr.getAttrs().size());
