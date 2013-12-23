@@ -21,6 +21,11 @@ import com.jitlogic.zico.core.model.TraceInfoSearchQuery;
 
 @ProxyFor(TraceInfoSearchQuery.class)
 public interface TraceInfoSearchQueryProxy extends ValueProxy {
+
+    int getSeq();
+
+    void setSeq(int seq);
+
     String getHostName();
 
     void setHostName(String hostName);
@@ -36,6 +41,10 @@ public interface TraceInfoSearchQueryProxy extends ValueProxy {
     long getOffset();
 
     void setOffset(long offset);
+
+    String getTraceName();
+
+    void setTraceName(String name);
 
     long getMinMethodTime();
 

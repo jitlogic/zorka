@@ -31,24 +31,20 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.IdentityColumn;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ClientUtil;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
@@ -71,12 +67,12 @@ import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor;
 import com.sencha.gxt.widget.core.client.form.SimpleComboBox;
 import com.sencha.gxt.widget.core.client.form.SpinnerField;
 import com.sencha.gxt.widget.core.client.form.TextField;
-import com.sencha.gxt.widget.core.client.form.validator.RegExValidator;
 import com.sencha.gxt.widget.core.client.menu.Item;
 import com.sencha.gxt.widget.core.client.menu.Menu;
 import com.sencha.gxt.widget.core.client.menu.MenuItem;
 import com.sencha.gxt.widget.core.client.menu.SeparatorMenuItem;
 import com.sencha.gxt.widget.core.client.tips.ToolTipConfig;
+import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 
 import javax.inject.Inject;
@@ -93,6 +89,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
 
     private PanelFactory pf;
     private ZicoRequestFactory rf;
+    private ErrorHandler errorHandler;
 
     private Provider<ZicoShell> shell;
 
@@ -101,21 +98,26 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     private DataGrid<TraceInfoProxy> grid;
     private ListDataProvider<TraceInfoProxy> data;
     private SingleSelectionModel<TraceInfoProxy> selection;
+    private TraceSearchTableBuilder rowBuilder;
+    private Set<Long> expandedDetails = new HashSet<Long>();
 
     private Map<Integer, String> traceTypes;
 
+    private int seqnum = 0;
+
+    // Search toolbar controls (in order of occurence on panel toolbar)
+    private ToggleButton btnDeepSearch;
     private ToggleButton btnErrors;
-    private TextField txtClockEnd;
-    private TextField txtClockBegin;
-    private TextField txtFilter;
-    private SpinnerField<Double> txtDuration;
     private SimpleComboBox<Integer> cmbTraceType;
+    private SpinnerField<Double> txtDuration;
+    private ToggleButton btnEnableEql;
+    private TextField txtFilter;
+    private TextButton btnRunSearch;
+    private TextButton btnMoreResults;
+    private TextButton btnCancelSearch;
+    private TextButton btnClearFilters;
 
-    private TraceSearchTableBuilder rowBuilder;
 
-    private Set<Long> expandedDetails = new HashSet<Long>();
-
-    private ErrorHandler errorHandler;
     private Menu contextMenu;
 
 
@@ -137,23 +139,17 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         createContextMenu();
 
         loadTraceTypes();
+
         refresh();
     }
 
     private void createToolbar() {
         ToolBar toolBar = new ToolBar();
 
-        TextButton btnRefresh = new TextButton();
-        btnRefresh.setIcon(Resources.INSTANCE.refreshIcon());
-        btnRefresh.setToolTip("Refresh list.");
-        toolBar.add(btnRefresh);
-
-        btnRefresh.addSelectHandler(new SelectEvent.SelectHandler() {
-            @Override
-            public void onSelect(SelectEvent event) {
-                refresh();
-            }
-        });
+        btnDeepSearch = new ToggleButton();
+        btnDeepSearch.setIcon(Resources.INSTANCE.methodTreeIcon());
+        btnDeepSearch.setToolTip("Search whole call trees.");
+        toolBar.add(btnDeepSearch);
 
         btnErrors = new ToggleButton();
         btnErrors.setIcon(Resources.INSTANCE.errorMarkIcon());
@@ -161,12 +157,6 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
 
         toolBar.add(btnErrors);
 
-        btnErrors.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-            @Override
-            public void onValueChange(ValueChangeEvent<Boolean> event) {
-                refresh();
-            }
-        });
 
         cmbTraceType = new SimpleComboBox<Integer>(new LabelProvider<Integer>() {
             @Override
@@ -198,19 +188,12 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         txtDuration.setToolTip("Minimum trace execution time (in seconds)");
         toolBar.add(txtDuration);
 
-        txtDuration.addValueChangeHandler(new ValueChangeHandler<Double>() {
-            @Override
-            public void onValueChange(ValueChangeEvent<Double> event) {
-                refresh();
-            }
-        });
+        btnEnableEql = new ToggleButton();
+        btnEnableEql.setIcon(Resources.INSTANCE.eqlIcon());
+        btnEnableEql.setToolTip("EQL query (instead of full-text query)");
 
-        txtDuration.addSelectionHandler(new SelectionHandler<Double>() {
-            @Override
-            public void onSelection(SelectionEvent<Double> event) {
-                refresh();
-            }
-        });
+        toolBar.add(btnEnableEql);
+
 
         txtFilter = new TextField();
         BoxLayoutContainer.BoxLayoutData txtFilterLayout = new BoxLayoutContainer.BoxLayoutData();
@@ -219,59 +202,15 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         ToolTipConfig ttcFilter = new ToolTipConfig("Text search:" +
                 "<li><b>sometext</b> - full-text search</li>"
                 + "<li><b>~regex</b> - regular expression search</li>"
-                + "<li><b>@ATTR=sometext</b> - full text search in specific attribute</li>"
-                + "<li><b>@ATTR~=regex</b> - regex search in specific attribute</li>");
+                + "<li>Regular expression queries if <b>QL</b> is enabled.</li>");
 
         txtFilter.setToolTipConfig(ttcFilter);
 
         txtFilter.setLayoutData(txtFilterLayout);
         toolBar.add(txtFilter);
 
-        Label lblBetween = new Label("between :");
-        toolBar.add(lblBetween);
 
-        ToolTipConfig ttcDateTime = new ToolTipConfig("Allowed timestamp formats:" +
-                "<li><b>YYYY-MM-DD</b> - date only</li>" +
-                "<li><b>YYYY-MM-DD hh:mm:ss</b> - date and time</li>" +
-                "<li><b>YYYY-MM-DD hh:mm:ss.SSS</b> - millisecond resolution</li>");
-
-        txtClockBegin = new TextField();
-        txtClockBegin.setWidth(130);
-        txtClockBegin.setToolTipConfig(ttcDateTime);
-        txtClockBegin.addValidator(new RegExValidator(RE_TIMESTAMP, "Enter valid timestamp."));
-        txtClockBegin.setEmptyText("Start time");
-
-        toolBar.add(txtClockBegin);
-
-        txtClockBegin.addKeyDownHandler(new KeyDownHandler() {
-            @Override
-            public void onKeyDown(KeyDownEvent event) {
-                if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER && txtClockBegin.isValid()) {
-                    refresh();
-                }
-            }
-        });
-
-        txtClockBegin.addValueChangeHandler(new ValueChangeHandler<String>() {
-            @Override
-            public void onValueChange(ValueChangeEvent<String> event) {
-                if (txtClockBegin.isValid()) {
-                    refresh();
-                }
-            }
-        });
-
-        toolBar.add(new Label("and :"));
-
-        txtClockEnd = new TextField();
-        txtClockEnd.setWidth(130);
-        txtClockEnd.setToolTipConfig(ttcDateTime);
-        txtClockEnd.addValidator(new RegExValidator(RE_TIMESTAMP, "Enter valid timestamp."));
-        txtClockEnd.setEmptyText("End time");
-
-        toolBar.add(txtClockEnd);
-
-        txtClockEnd.addKeyDownHandler(new KeyDownHandler() {
+        txtFilter.addKeyDownHandler(new KeyDownHandler() {
             @Override
             public void onKeyDown(KeyDownEvent event) {
                 if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
@@ -280,37 +219,51 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
             }
         });
 
-        txtClockEnd.addValueChangeHandler(new ValueChangeHandler<String>() {
+        btnRunSearch = new TextButton();
+        btnRunSearch.setIcon(Resources.INSTANCE.searchIcon());
+        btnRunSearch.setToolTip("Search.");
+        toolBar.add(btnRunSearch);
+
+        btnRunSearch.addSelectHandler(new SelectEvent.SelectHandler() {
             @Override
-            public void onValueChange(ValueChangeEvent<String> event) {
+            public void onSelect(SelectEvent event) {
                 refresh();
             }
         });
 
-        TextButton btnClear = new TextButton();
-        btnClear.setIcon(Resources.INSTANCE.clearIcon());
-        btnClear.setToolTip("Clear all filters.");
-        toolBar.add(btnClear);
+        btnMoreResults = new TextButton();
+        btnMoreResults.setIcon(Resources.INSTANCE.gotoIcon());
+        btnMoreResults.setToolTip("More search results");
+        toolBar.add(btnMoreResults);
 
-        txtFilter.addKeyDownHandler(new KeyDownHandler() {
+        btnMoreResults.addSelectHandler(new SelectEvent.SelectHandler() {
             @Override
-            public void onKeyDown(KeyDownEvent event) {
-                if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER && txtClockEnd.isValid()) {
-                    refresh();
-                }
+            public void onSelect(SelectEvent event) {
+                loadMore();
             }
         });
 
-        txtFilter.addValueChangeHandler(new ValueChangeHandler<String>() {
+        btnCancelSearch = new TextButton();
+        btnCancelSearch.setIcon(Resources.INSTANCE.cancel());
+        btnCancelSearch.setToolTip("Cancel search");
+        toolBar.add(btnCancelSearch);
+
+        btnCancelSearch.addSelectHandler(new SelectEvent.SelectHandler() {
             @Override
-            public void onValueChange(ValueChangeEvent<String> event) {
-                if (txtClockEnd.isValid()) {
-                    refresh();
-                }
+            public void onSelect(SelectEvent event) {
+                toggleSearchMode(false);
             }
         });
 
-        btnClear.addSelectHandler(new SelectEvent.SelectHandler() {
+        toolBar.add(new SeparatorToolItem());
+
+        btnClearFilters = new TextButton();
+        btnClearFilters.setIcon(Resources.INSTANCE.clearIcon());
+        btnClearFilters.setToolTip("Clear all filters and refresh");
+        toolBar.add(btnClearFilters);
+
+
+        btnClearFilters.addSelectHandler(new SelectEvent.SelectHandler() {
             @Override
             public void onSelect(SelectEvent event) {
                 txtFilter.setText("");
@@ -395,7 +348,9 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
                 }
                 if (BrowserEvents.CONTEXTMENU.equals(eventType)) {
                     selection.setSelected(event.getValue(), true);
-                    contextMenu.showAt(event.getNativeEvent().getClientX(), event.getNativeEvent().getClientY());
+                    if (selection.getSelectedObject() != null) {
+                        contextMenu.showAt(event.getNativeEvent().getClientX(), event.getNativeEvent().getClientY());
+                    }
                 }
             }
         });
@@ -455,6 +410,21 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     }
 
 
+    private void toggleSearchMode(boolean inSearch) {
+        seqnum++;
+        btnDeepSearch.setEnabled(!inSearch);
+        btnErrors.setEnabled(!inSearch);
+        cmbTraceType.setEnabled(!inSearch);
+        txtDuration.setEnabled(!inSearch);
+        btnEnableEql.setEnabled(!inSearch);
+        txtFilter.setEnabled(!inSearch);
+        btnRunSearch.setEnabled(!inSearch);
+        btnMoreResults.setEnabled(!inSearch);
+        btnCancelSearch.setEnabled(inSearch);
+        btnClearFilters.setEnabled(!inSearch);
+    }
+
+
     private void openDetailView() {
         TraceInfoProxy traceInfo = selection.getSelectedObject();
         if (traceInfo != null) {
@@ -480,16 +450,48 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     }
 
     private void refresh() {
+        data.getList().clear();
+        loadMore();
+    }
+
+    private void loadMore() {
+        toggleSearchMode(true);
         TraceDataServiceProxy req = rf.traceDataService();
         TraceInfoSearchQueryProxy q = req.create(TraceInfoSearchQueryProxy.class);
         q.setLimit(50);
         q.setHostName(host.getName());
+        q.setSeq(seqnum);
+
+        List<TraceInfoProxy> list = data.getList();
+        if (list.size() > 0) {
+            q.setOffset(list.get(list.size()-1).getDataOffs()+2);
+        }
+
+        if (cmbTraceType.getValue() != null && cmbTraceType.getValue() != 0) {
+            q.setTraceName(traceTypes.get(cmbTraceType.getValue()));
+        }
+
+        if (txtFilter.getText() != null && txtFilter.getText().length() > 0) {
+            q.setSearchExpr(txtFilter.getText());
+        }
+
+        if (txtDuration.getCurrentValue() != null) {
+            q.setMinMethodTime((long) (txtDuration.getCurrentValue() * 1000000000L));
+        }
 
         req.searchTraces(q).fire(new Receiver<TraceInfoSearchResultProxy>() {
             @Override
             public void onSuccess(TraceInfoSearchResultProxy response) {
-                List<TraceInfoProxy> results = response.getResults();
-                data.getList().addAll(results);
+                if (response.getSeq() == seqnum) {
+                    List<TraceInfoProxy> results = response.getResults();
+                    data.getList().addAll(results);
+                    toggleSearchMode(false);
+                }
+            }
+
+            @Override
+            public void onFailure(ServerFailure error) {
+                toggleSearchMode(false);
             }
         });
     }

@@ -18,6 +18,7 @@ package com.jitlogic.zico.test;
 
 import com.jitlogic.zico.core.HostStore;
 import com.jitlogic.zico.core.model.TraceInfo;
+import com.jitlogic.zico.core.model.TraceInfoSearchQuery;
 import com.jitlogic.zico.core.model.TraceInfoSearchResult;
 import com.jitlogic.zico.test.support.ZicoFixture;
 import com.jitlogic.zorka.common.tracedata.FressianTraceWriter;
@@ -131,7 +132,7 @@ public class DataCollectionUnitTest extends ZicoFixture {
     @Test(timeout = 1000)
     public void testSubmitAndSearchSingleRecordWithoutCriteria() throws Exception {
         submit(trace(kv("SQL", "select count(1) from HOSTS")));
-        TraceInfoSearchResult result = traceDataService.searchTraces(tiq("test", 0, null));
+        TraceInfoSearchResult result = traceDataService.searchTraces(tiq("test", 0, null, 0L, null));
 
         assertEquals(1, result.getResults().size());
 
@@ -142,16 +143,39 @@ public class DataCollectionUnitTest extends ZicoFixture {
     }
 
 
-    @Test
+    @Test(timeout = 1000)
     public void testSubmitMoreRecordsAndSearchWithSimpleCriteria() throws Exception {
         submit(trace(kv("SQL", "select count(*) from HOSTS")), trace(kv("SQL", "select count(1) from TRACES")));
-        TraceInfoSearchResult result = traceDataService.searchTraces(tiq("test", 0, "TRACES"));
+        TraceInfoSearchResult result = traceDataService.searchTraces(tiq("test", 0, null, 0L, "TRACES"));
         assertEquals(1, result.getResults().size());
     }
 
+
+    @Test
+    public void testSubmitTwoRecordsAndFilterByTime() throws Exception {
+        TraceRecord t1 = trace(); t1.setTime(500);
+        TraceRecord t2 = trace(); t2.setTime(1500);
+        submit(t1, t2);
+        TraceInfoSearchResult result = traceDataService.searchTraces(tiq("test", 0, null, 1000L, null));
+        assertEquals(1, result.getResults().size());
+    }
+
+
+    @Test
+    public void testSubmitTwoRecordsAndFilterByTraceType() throws Exception {
+        submit(traceP("HTTP", rClass(), rMethod(), rSignature(), 100),
+                traceP("EJB", rClass(), rMethod(), rSignature(), 200));
+        TraceInfoSearchResult result = traceDataService.searchTraces(tiq("test", 0, "EJB", 1000L, null));
+        assertEquals(1, result.getResults().size());
+    }
 
     // TODO test: sumbit non-trivial records and then do deep search
 
     // TODO test: submit more records and test if paging is correct
 
+    // TODO test: search in non-existent host - should fail in a controlled way
+
+    // TODO test: search in host without access - should fail in a controlled way
+
+    // TODO test: search in disabled host - should fail in a controlled way
 }

@@ -20,6 +20,8 @@ import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 public class TraceInfoSearchQuery {
 
+    private int seq;
+
     private String hostName;
 
     private int flags;
@@ -28,9 +30,22 @@ public class TraceInfoSearchQuery {
 
     private int limit;
 
+    private String traceName;
+
     private long minMethodTime;
 
     private String searchExpr;
+
+
+    public int getSeq() {
+        return seq;
+    }
+
+
+    public void setSeq(int seq) {
+        this.seq = seq;
+    }
+
 
     public String getHostName() {
         return hostName;
@@ -72,6 +87,16 @@ public class TraceInfoSearchQuery {
     }
 
 
+    public String getTraceName() {
+        return traceName;
+    }
+
+
+    public void setTraceName(String traceName) {
+        this.traceName = traceName;
+    }
+
+
     public long getMinMethodTime() {
         return minMethodTime;
     }
@@ -86,9 +111,11 @@ public class TraceInfoSearchQuery {
         return searchExpr;
     }
 
+
     public void setSearchExpr(String searchExpr) {
         this.searchExpr = searchExpr;
     }
+
 
     @Override
     public boolean equals(Object obj) {

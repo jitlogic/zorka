@@ -177,6 +177,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     }
 
+
     public synchronized void commit() {
         if (db != null) {
             long t1 = System.nanoTime();
@@ -186,13 +187,16 @@ public class HostStore implements Closeable, RDSCleanupListener {
         }
     }
 
+
     public synchronized TraceInfoSearchResult search(TraceInfoSearchQuery query) throws IOException {
 
         List<TraceInfo> lst = new ArrayList<>(query.getLimit());
 
-        TraceInfoSearchResult result = new TraceInfoSearchResult(lst);
+        TraceInfoSearchResult result = new TraceInfoSearchResult(query.getSeq(), lst);
 
         TraceRecordMatcher matcher = null;
+
+        int traceId = query.getTraceName() != null ? symbolRegistry.symbolId(query.getTraceName()) : 0;
 
         if (query.getSearchExpr() != null) {
             matcher = new FullTextTraceRecordMatcher(symbolRegistry,
@@ -209,6 +213,15 @@ public class HostStore implements Closeable, RDSCleanupListener {
              key = asc ? infos.higherKey(key) : infos.lowerKey(key)) {
 
             TraceInfoRecord tir = infos.get(key);
+
+            if (traceId != 0 && tir.getTraceId() != traceId) {
+                continue;
+            }
+
+            if (tir.getDuration() < query.getMinMethodTime()) {
+                continue;
+            }
+
             TraceRecord idxtr = retrieveFromIndex(tir);
             if (idxtr != null) {
                 if (matcher == null || matcher.match(idxtr)) {

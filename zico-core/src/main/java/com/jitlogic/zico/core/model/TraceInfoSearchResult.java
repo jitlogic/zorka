@@ -22,14 +22,25 @@ public class TraceInfoSearchResult {
 
     public static final int MORE_RESULTS = 1;
 
+    private int seq;
+
     private int flags;
 
     private long lastOffs;
 
     private List<TraceInfo> results;
 
-    public TraceInfoSearchResult(List<TraceInfo> results) {
+    public TraceInfoSearchResult(int seq, List<TraceInfo> results) {
+        this.seq = seq;
         this.results = results;
+    }
+
+    public int getSeq() {
+        return seq;
+    }
+
+    public void setSeq(int seq) {
+        this.seq = seq;
     }
 
     public int getFlags() {

@@ -44,13 +44,13 @@ public class ZicoTestUtil {
 
 
     public static TraceRecord trace(Object...args) {
-        return trace(
+        return traceP(
                 randName(traceNames), randName(classNames), randName(methodNames), randName(methodSignatures),
                 nextTime(500), args);
     }
 
 
-    public static TraceRecord trace(String traceName, String className, String methodName, String signature,
+    public static TraceRecord traceP(String traceName, String className, String methodName, String signature,
                                     long clock, Object...trs) {
 
         TraceRecord ret = rec(className, methodName, signature, trs);
@@ -107,12 +107,25 @@ public class ZicoTestUtil {
         return inputs[random.nextInt(inputs.length)];
     }
 
+    public static String rClass() {
+        return randName(classNames);
+    }
 
-    public static TraceInfoSearchQuery tiq(String hostName, int flags, String expr) {
+    public static String rMethod() {
+        return randName(methodNames);
+    }
+
+    public static String rSignature() {
+        return randName(methodSignatures);
+    }
+
+    public static TraceInfoSearchQuery tiq(String hostName, int flags, String traceName, long minTime, String expr) {
         TraceInfoSearchQuery q = new TraceInfoSearchQuery();
 
         q.setHostName(hostName);
         q.setFlags(flags);
+        q.setTraceName(traceName);
+        q.setMinMethodTime(minTime);
         q.setSearchExpr(expr);
         q.setLimit(100);
 
