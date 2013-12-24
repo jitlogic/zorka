@@ -17,6 +17,7 @@ package com.jitlogic.zico.test;
 
 
 import com.jitlogic.zico.core.HostStore;
+import com.jitlogic.zico.core.ZicoRuntimeException;
 import com.jitlogic.zico.core.model.TraceInfo;
 import com.jitlogic.zico.core.model.TraceInfoSearchQuery;
 import com.jitlogic.zico.core.model.TraceInfoSearchResult;
@@ -31,6 +32,8 @@ import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 import static com.jitlogic.zico.test.support.ZicoTestUtil.*;
 import static org.fest.reflect.core.Reflection.field;
@@ -210,15 +213,58 @@ public class DataCollectionUnitTest extends ZicoFixture {
     }
 
 
-    // TODO test: for reverse search (if all records appear properly)
+    @Test
+    public void testSubmitAndListInDescendingOrder() throws Exception {
+        submit(trace(), trace());
+        TraceInfoSearchQuery query = tiq("test", TraceInfoSearchQueryProxy.ORDER_DESC, null, 0, null);
+        TraceInfoSearchResult result = traceDataService.searchTraces(query);
+        List<TraceInfo> lst = result.getResults();
+        assertEquals(2, lst.size());
+        assertTrue("records should be in descending order", lst.get(0).getDataOffs() > lst.get(1).getDataOffs());
+    }
 
-    // TODO test: sumbit non-trivial records and then do deep search
 
-    // TODO test: submit more records and test if paging is correct
+    @Test
+    public void testSubmitAndPageResults() throws Exception {
+        submit(trace(), trace(), trace(), trace());
+        TraceInfoSearchQuery query = tiq("test", 0, null, 0, null);
+        query.setLimit(2);
+        TraceInfoSearchResult rslt1 = traceDataService.searchTraces(query);
+        assertEquals(2, rslt1.getResults().size());
+        query.setOffset(rslt1.getLastOffs()); query.setLimit(100);
+        TraceInfoSearchResult rslt2 = traceDataService.searchTraces(query);
+        assertEquals(2, rslt2.getResults().size());
+        assertTrue(rslt1.getResults().get(1).getDataOffs() < rslt2.getResults().get(0).getDataOffs());
+    }
 
-    // TODO test: search in non-existent host - should fail in a controlled way
+
+    @Test
+    public void testSubmitAndPageResultsDesc() throws Exception {
+        submit(trace(), trace(), trace(), trace());
+        TraceInfoSearchQuery query = tiq("test", TraceInfoSearchQueryProxy.ORDER_DESC, null, 0, null);
+        query.setLimit(2);
+        TraceInfoSearchResult rslt1 = traceDataService.searchTraces(query);
+        assertEquals(2, rslt1.getResults().size());
+        query.setOffset(rslt1.getLastOffs()); query.setLimit(100);
+        TraceInfoSearchResult rslt2 = traceDataService.searchTraces(query);
+        assertEquals(2, rslt2.getResults().size());
+        assertTrue(rslt1.getResults().get(1).getDataOffs() > rslt2.getResults().get(0).getDataOffs());
+    }
+
+
+    @Test(expected = ZicoRuntimeException.class)
+    public void testSubmitAndThenSearchNonExistentHost() throws Exception {
+        submit(trace());
+        traceDataService.searchTraces(tiq("nooone", 0, null, 0, null));
+    }
+
+    // TODO disabled host vs offline host
+
+    // TODO test: search in disabled host - should fail in a controlled way
 
     // TODO test: search in host without access - should fail in a controlled way
 
-    // TODO test: search in disabled host - should fail in a controlled way
+    // TODO automatic index cleanup after main store truncation
+
+    // TODO import hosts
 }

@@ -24,6 +24,20 @@ import com.jitlogic.zico.core.HostStoreManager;
 @ProxyFor(value = HostStore.class, locator = HostStoreManager.class)
 public interface HostProxy extends EntityProxy {
 
+    /**
+     * This flag indicates that incoming data will be dropped instead of being written in host data store.
+     * Host data is still readable, so trace searches and call tree browsing is still possible.
+     */
+    public static final int DISABLED = 0x00000001;
+
+    /**
+     * This flag indicates that host is offline. Performance data cannot be read nor written, host info cannot be
+     * modified (except for switching host back online). As all data files are closed, maintenance tasks can be
+     * executed (eg. backup, database repair etc.).
+     */
+    public static final int OFFLINE  = 0x00000002;
+
+
     String getName();
 
     String getAddr();

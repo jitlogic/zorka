@@ -53,7 +53,11 @@ public class TraceDataGwtService {
 
     public TraceInfoSearchResult searchTraces(TraceInfoSearchQuery query) {
         try {
-            return storeManager.getHost(query.getHostName(), false).search(query);
+            HostStore host = storeManager.getHost(query.getHostName(), false);
+            if (host == null) {
+                throw new ZicoRuntimeException("Unknown host: " + query.getHostName());
+            }
+            return host.search(query);
         } catch (IOException e) {
             throw new ZicoRuntimeException("Error while searching: " + query, e);
         }

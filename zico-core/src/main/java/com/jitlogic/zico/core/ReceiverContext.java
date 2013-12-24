@@ -15,8 +15,7 @@
  */
 package com.jitlogic.zico.core;
 
-
-import com.jitlogic.zico.core.model.HostInfo;
+import com.jitlogic.zico.shared.data.HostProxy;
 import com.jitlogic.zorka.common.tracedata.MetadataChecker;
 import com.jitlogic.zorka.common.tracedata.Symbol;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
@@ -42,6 +41,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     private HostStore hostStore;
 
     private Set<Object> visitedObjects = new HashSet<>();
+
 
     public ReceiverContext(HostStore hostStore) {
         this.hostStore = hostStore;
@@ -79,7 +79,7 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
 
     private void processTraceRecord(TraceRecord rec) throws IOException {
-        if (!hostStore.hasFlag(HostInfo.DISABLED)) {
+        if (!hostStore.hasFlag(HostProxy.DISABLED)) {
             rec.traverse(this);
             visitedObjects.clear();
             hostStore.processTraceRecord(rec);

@@ -17,7 +17,6 @@ package com.jitlogic.zico.core;
 
 
 import com.jitlogic.zico.core.eql.Parser;
-import com.jitlogic.zico.core.model.HostInfo;
 import com.jitlogic.zico.core.model.KeyValuePair;
 import com.jitlogic.zico.core.model.SymbolicExceptionInfo;
 import com.jitlogic.zico.core.model.TraceInfo;
@@ -30,6 +29,7 @@ import com.jitlogic.zico.core.rds.RDSStore;
 import com.jitlogic.zico.core.search.EqlTraceRecordMatcher;
 import com.jitlogic.zico.core.search.FullTextTraceRecordMatcher;
 import com.jitlogic.zico.core.search.TraceRecordMatcher;
+import com.jitlogic.zico.shared.data.HostProxy;
 import com.jitlogic.zico.shared.data.TraceInfoSearchQueryProxy;
 import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
@@ -209,12 +209,15 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
         // TODO implement query execution time limit
 
-        int serarchFlags = query.getFlags();
-        boolean asc = 0 == (serarchFlags & TraceInfoSearchQueryProxy.ORDER_DESC);
+        int searchFlags = query.getFlags();
 
-        for (Long key = asc ? infos.higherKey(query.getOffset()-1) : infos.lowerKey(query.getOffset()+1);
-             key != null;
-             key = asc ? infos.higherKey(key) : infos.lowerKey(key)) {
+        boolean asc = 0 == (searchFlags & TraceInfoSearchQueryProxy.ORDER_DESC);
+
+        Long initialKey = asc
+                ? infos.higherKey(query.getOffset() != 0 ? query.getOffset() : Long.MIN_VALUE)
+                : infos.lowerKey(query.getOffset() != 0 ? query.getOffset() : Long.MAX_VALUE);
+
+        for (Long key = initialKey; key != null; key = asc ? infos.higherKey(key) : infos.lowerKey(key)) {
 
             TraceInfoRecord tir = infos.get(key);
 
@@ -240,7 +243,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
                 }
                 if (matcher == null || recursiveMatch(matcher, idxtr)) {
                     lst.add(toTraceInfo(tir, idxtr));
-                    result.setLastOffs(asc ? tir.getDataOffs()+1 : tir.getDataOffs()-1);
+                    result.setLastOffs(asc ? tir.getDataOffs() + 1 : tir.getDataOffs() - 1);
                     if (lst.size() == query.getLimit()) {
                         result.markFlag(TraceInfoSearchResult.MORE_RESULTS);
                         return result;
@@ -483,14 +486,14 @@ public class HostStore implements Closeable, RDSCleanupListener {
     }
 
     public boolean isEnabled() {
-        return 0 == (flags & HostInfo.DISABLED);
+        return 0 == (flags & HostProxy.DISABLED);
     }
 
     public void setEnabled(boolean enabled) {
         if (enabled) {
-            flags &= ~HostInfo.DISABLED;
+            flags &= ~HostProxy.DISABLED;
         } else {
-            flags |= HostInfo.DISABLED;
+            flags |= HostProxy.DISABLED;
         }
         save();
     }
