@@ -171,6 +171,7 @@ public class DataCollectionUnitTest extends ZicoFixture {
         assertEquals(1, result.getResults().size());
     }
 
+
     @Test
     public void testSubmitAndFilterByMethodErrorMarker() throws Exception {
         TraceRecord t1 = trace(); t1.getMarker().setFlags(TraceMarker.ERROR_MARK);
@@ -180,6 +181,7 @@ public class DataCollectionUnitTest extends ZicoFixture {
         assertEquals(1, result.getResults().size());
     }
 
+
     @Test
     public void testSubmitAndFilterByMethodErrorObject() throws Exception {
         TraceRecord t1 = trace(); t1.setException(boo());
@@ -188,6 +190,25 @@ public class DataCollectionUnitTest extends ZicoFixture {
         TraceInfoSearchResult result = traceDataService.searchTraces(query);
         assertEquals(1, result.getResults().size());
     }
+
+
+    @Test
+    public void testSubmitAndFilterUsingEqlQuery() throws Exception {
+        submit(trace(), trace(kv("SQL", "select 1")));
+        TraceInfoSearchResult result = traceDataService.searchTraces(
+                tiq("test", TraceInfoSearchQueryProxy.EQL_QUERY, null, 1000L, "SQL != null"));
+        assertEquals(1, result.getResults().size());
+    }
+
+
+    @Test
+    public void testSubmitAndFilterUsingDeepSearch() throws Exception {
+        submit(trace(), trace(trace(kv("SQL", "select 1"))));
+        TraceInfoSearchResult result = traceDataService.searchTraces(
+                tiq("test", TraceInfoSearchQueryProxy.DEEP_SEARCH, null, 0, "SQL"));
+        assertEquals(1, result.getResults().size());
+    }
+
 
     // TODO test: for reverse search (if all records appear properly)
 

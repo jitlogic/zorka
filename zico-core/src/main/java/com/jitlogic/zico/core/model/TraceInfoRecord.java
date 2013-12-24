@@ -131,6 +131,10 @@ public class TraceInfoRecord implements Serializable {
         return new TraceRecordStore.ChunkInfo(indexOffs, indexLen);
     }
 
+    public TraceRecordStore.ChunkInfo getDataChunk() {
+        return new TraceRecordStore.ChunkInfo(dataOffs, dataLen);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj.getClass() == TraceInfoRecord.class) {

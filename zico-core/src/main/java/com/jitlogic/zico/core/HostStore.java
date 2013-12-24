@@ -16,6 +16,7 @@
 package com.jitlogic.zico.core;
 
 
+import com.jitlogic.zico.core.eql.Parser;
 import com.jitlogic.zico.core.model.HostInfo;
 import com.jitlogic.zico.core.model.KeyValuePair;
 import com.jitlogic.zico.core.model.SymbolicExceptionInfo;
@@ -26,6 +27,7 @@ import com.jitlogic.zico.core.model.TraceInfoSearchResult;
 import com.jitlogic.zico.core.model.TraceRecordSearchQuery;
 import com.jitlogic.zico.core.rds.RDSCleanupListener;
 import com.jitlogic.zico.core.rds.RDSStore;
+import com.jitlogic.zico.core.search.EqlTraceRecordMatcher;
 import com.jitlogic.zico.core.search.FullTextTraceRecordMatcher;
 import com.jitlogic.zico.core.search.TraceRecordMatcher;
 import com.jitlogic.zico.shared.data.TraceInfoSearchQueryProxy;
@@ -195,12 +197,17 @@ public class HostStore implements Closeable, RDSCleanupListener {
         int traceId = query.getTraceName() != null ? symbolRegistry.symbolId(query.getTraceName()) : 0;
 
         if (query.getSearchExpr() != null) {
-            matcher = new FullTextTraceRecordMatcher(symbolRegistry,
-                    TraceRecordSearchQuery.SEARCH_ALL, query.getSearchExpr());
+            if (query.hasFlag(TraceInfoSearchQueryProxy.EQL_QUERY)) {
+                matcher = new EqlTraceRecordMatcher(symbolRegistry,
+                        Parser.expr(query.getSearchExpr()),
+                        0, 0);
+            } else {
+                matcher = new FullTextTraceRecordMatcher(symbolRegistry,
+                        TraceRecordSearchQuery.SEARCH_ALL, query.getSearchExpr());
+            }
         }
 
         // TODO implement query execution time limit
-        // TODO implement deep search
 
         int serarchFlags = query.getFlags();
         boolean asc = 0 == (serarchFlags & TraceInfoSearchQueryProxy.ORDER_DESC);
@@ -223,9 +230,15 @@ public class HostStore implements Closeable, RDSCleanupListener {
                 continue;
             }
 
-            TraceRecord idxtr = retrieveFromIndex(tir);
+            TraceRecord idxtr = (query.hasFlag(TraceInfoSearchQueryProxy.DEEP_SEARCH) && matcher != null)
+                  ? traceDataStore.read(tir.getDataChunk())
+                  : traceIndexStore.read(tir.getIndexChunk());
+
             if (idxtr != null) {
-                if (matcher == null || matcher.match(idxtr)) {
+                if (matcher instanceof EqlTraceRecordMatcher) {
+                    ((EqlTraceRecordMatcher)matcher).setTotalTime(tir.getDuration());
+                }
+                if (matcher == null || recursiveMatch(matcher, idxtr)) {
                     lst.add(toTraceInfo(tir, idxtr));
                     result.setLastOffs(asc ? tir.getDataOffs()+1 : tir.getDataOffs()-1);
                     if (lst.size() == query.getLimit()) {
@@ -240,20 +253,32 @@ public class HostStore implements Closeable, RDSCleanupListener {
     }
 
 
-    public TraceInfoRecord getInfoRecord(long offs) {
-        return infos.get(offs);
+    private boolean recursiveMatch(TraceRecordMatcher matcher, TraceRecord tr) {
+        if (matcher.match(tr)) {
+            return true;
+        }
+
+        if (tr.numChildren() > 0) {
+            for (TraceRecord c : tr.getChildren()) {
+                if (matcher.match(c)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 
-    private TraceRecord retrieveFromIndex(TraceInfoRecord tir) throws IOException {
-        return traceIndexStore.read(tir.getIndexChunk());
+    public TraceInfoRecord getInfoRecord(long offs) {
+        return infos.get(offs);
     }
 
 
     private TraceInfo toTraceInfo(TraceInfoRecord itr, TraceRecord tr) throws IOException {
 
         if (tr == null) {
-            tr = retrieveFromIndex(itr);
+            tr = traceIndexStore.read(itr.getIndexChunk());
         }
 
         TraceInfo ti = new TraceInfo();

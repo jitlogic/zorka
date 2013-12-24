@@ -467,6 +467,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
                 (btnErrors.getValue() ? TraceInfoSearchQueryProxy.ERRORS_ONLY : 0)
               | (descOrder ? TraceInfoSearchQueryProxy.ORDER_DESC : 0)
               | (btnDeepSearch.getValue() ? TraceInfoSearchQueryProxy.DEEP_SEARCH : 0)
+              | (btnEnableEql.getValue() ? TraceInfoSearchQueryProxy.EQL_QUERY : 0)
         );
 
         List<TraceInfoProxy> list = data.getList();

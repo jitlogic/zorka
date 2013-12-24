@@ -25,6 +25,7 @@ public interface TraceInfoSearchQueryProxy extends ValueProxy {
     public static final int ORDER_DESC  = 0x0001;
     public static final int DEEP_SEARCH = 0x0002;
     public static final int ERRORS_ONLY = 0x0004;
+    public static final int EQL_QUERY   = 0x0008;
 
     int getSeq();
 
