@@ -28,6 +28,7 @@ import com.jitlogic.zico.core.rds.RDSCleanupListener;
 import com.jitlogic.zico.core.rds.RDSStore;
 import com.jitlogic.zico.core.search.FullTextTraceRecordMatcher;
 import com.jitlogic.zico.core.search.TraceRecordMatcher;
+import com.jitlogic.zico.shared.data.TraceInfoSearchQueryProxy;
 import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicException;
@@ -55,8 +56,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentNavigableMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 /**
  * Represents performance data store for a single agent.
@@ -71,9 +70,6 @@ public class HostStore implements Closeable, RDSCleanupListener {
     private static final String PROP_PASS = "pass";
     private static final String PROP_FLAGS = "flags";
     private static final String PROP_SIZE = "size";
-
-    public static final int ORDER_DESC  = 1;
-    public static final int DEEP_SEARCH = 2;
 
     private SymbolRegistry symbolRegistry;
 
@@ -207,12 +203,17 @@ public class HostStore implements Closeable, RDSCleanupListener {
         // TODO implement deep search
 
         int serarchFlags = query.getFlags();
-        boolean asc = 0 == (serarchFlags & ORDER_DESC);
+        boolean asc = 0 == (serarchFlags & TraceInfoSearchQueryProxy.ORDER_DESC);
+
         for (Long key = asc ? infos.higherKey(query.getOffset()-1) : infos.lowerKey(query.getOffset()+1);
              key != null;
              key = asc ? infos.higherKey(key) : infos.lowerKey(key)) {
 
             TraceInfoRecord tir = infos.get(key);
+
+            if (query.hasFlag(TraceInfoSearchQueryProxy.ERRORS_ONLY) && 0 == (tir.getTflags() & TraceMarker.ERROR_MARK)) {
+                continue;
+            }
 
             if (traceId != 0 && tir.getTraceId() != traceId) {
                 continue;

@@ -66,6 +66,10 @@ public class TraceInfoSearchQuery {
         this.flags = flags;
     }
 
+    public boolean hasFlag(int flag) {
+        return 0 != (this.flags & flag);
+    }
+
 
     public long getOffset() {
         return offset;

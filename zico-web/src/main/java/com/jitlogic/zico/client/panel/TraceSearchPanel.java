@@ -104,6 +104,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     private Map<Integer, String> traceTypes;
 
     private int seqnum = 0;
+    private boolean descOrder = false;
 
     // Search toolbar controls (in order of occurence on panel toolbar)
     private ToggleButton btnDeepSearch;
@@ -461,6 +462,12 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         q.setLimit(50);
         q.setHostName(host.getName());
         q.setSeq(seqnum);
+
+        q.setFlags(
+                (btnErrors.getValue() ? TraceInfoSearchQueryProxy.ERRORS_ONLY : 0)
+              | (descOrder ? TraceInfoSearchQueryProxy.ORDER_DESC : 0)
+              | (btnDeepSearch.getValue() ? TraceInfoSearchQueryProxy.DEEP_SEARCH : 0)
+        );
 
         List<TraceInfoProxy> list = data.getList();
         if (list.size() > 0) {

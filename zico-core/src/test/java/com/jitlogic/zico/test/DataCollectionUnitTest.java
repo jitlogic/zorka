@@ -20,10 +20,12 @@ import com.jitlogic.zico.core.HostStore;
 import com.jitlogic.zico.core.model.TraceInfo;
 import com.jitlogic.zico.core.model.TraceInfoSearchQuery;
 import com.jitlogic.zico.core.model.TraceInfoSearchResult;
+import com.jitlogic.zico.shared.data.TraceInfoSearchQueryProxy;
 import com.jitlogic.zico.test.support.ZicoFixture;
 import com.jitlogic.zorka.common.tracedata.FressianTraceWriter;
 import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
 
@@ -168,6 +170,26 @@ public class DataCollectionUnitTest extends ZicoFixture {
         TraceInfoSearchResult result = traceDataService.searchTraces(tiq("test", 0, "EJB", 1000L, null));
         assertEquals(1, result.getResults().size());
     }
+
+    @Test
+    public void testSubmitAndFilterByMethodErrorMarker() throws Exception {
+        TraceRecord t1 = trace(); t1.getMarker().setFlags(TraceMarker.ERROR_MARK);
+        submit(t1, trace());
+        TraceInfoSearchResult result = traceDataService.searchTraces(
+                tiq("test", TraceInfoSearchQueryProxy.ERRORS_ONLY, null, 1000L, null));
+        assertEquals(1, result.getResults().size());
+    }
+
+    @Test
+    public void testSubmitAndFilterByMethodErrorObject() throws Exception {
+        TraceRecord t1 = trace(); t1.setException(boo());
+        submit(t1, trace());
+        TraceInfoSearchQuery query = tiq("test", TraceInfoSearchQueryProxy.ERRORS_ONLY, null, 1000L, null);
+        TraceInfoSearchResult result = traceDataService.searchTraces(query);
+        assertEquals(1, result.getResults().size());
+    }
+
+    // TODO test: for reverse search (if all records appear properly)
 
     // TODO test: sumbit non-trivial records and then do deep search
 

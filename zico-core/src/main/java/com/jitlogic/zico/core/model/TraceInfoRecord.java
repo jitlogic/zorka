@@ -18,6 +18,7 @@ package com.jitlogic.zico.core.model;
 
 import com.jitlogic.zico.core.TraceRecordStore;
 import com.jitlogic.zico.core.ZicoUtil;
+import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 
 import java.io.Serializable;
@@ -66,6 +67,11 @@ public class TraceInfoRecord implements Serializable {
         this.records = ZicoUtil.numRecords(tr);
         this.tflags = tr.getMarker().getFlags();
         this.rflags = tr.getFlags();
+
+        if (tr.getException() != null || tr.hasFlag(TraceRecord.EXCEPTION_PASS)) {
+            this.tflags |= TraceMarker.ERROR_MARK;
+        }
+
     }
 
     public long getDataOffs() {

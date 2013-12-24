@@ -20,6 +20,7 @@ import com.jitlogic.zico.core.model.KeyValuePair;
 import com.jitlogic.zico.core.model.TraceInfoSearchQuery;
 import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicException;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 
@@ -132,4 +133,7 @@ public class ZicoTestUtil {
         return q;
     }
 
+    public static SymbolicException boo() {
+        return new SymbolicException(new RuntimeException("BOO"), symbols, true);
+    }
 }

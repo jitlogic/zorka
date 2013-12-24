@@ -22,6 +22,10 @@ import com.jitlogic.zico.core.model.TraceInfoSearchQuery;
 @ProxyFor(TraceInfoSearchQuery.class)
 public interface TraceInfoSearchQueryProxy extends ValueProxy {
 
+    public static final int ORDER_DESC  = 0x0001;
+    public static final int DEEP_SEARCH = 0x0002;
+    public static final int ERRORS_ONLY = 0x0004;
+
     int getSeq();
 
     void setSeq(int seq);
