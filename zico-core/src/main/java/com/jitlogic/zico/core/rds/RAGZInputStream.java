@@ -16,9 +16,11 @@
 package com.jitlogic.zico.core.rds;
 
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
+import java.util.Collections;
 import java.util.List;
 
 public class RAGZInputStream extends InputStream {
@@ -31,6 +33,11 @@ public class RAGZInputStream extends InputStream {
     private RAGZSegment curSegment;
     private byte[] logicalBuf;
     private long logicalPos;
+
+
+    public static RAGZInputStream fromFile(File file) throws IOException {
+        return fromFile(file.getPath());
+    }
 
 
     public static RAGZInputStream fromFile(String path) throws IOException {
@@ -219,5 +226,7 @@ public class RAGZInputStream extends InputStream {
         return null;
     }
 
-
+    public List<RAGZSegment> getSegments() {
+        return Collections.unmodifiableList(segments);
+    }
 }

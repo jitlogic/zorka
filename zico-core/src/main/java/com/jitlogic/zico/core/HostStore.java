@@ -24,6 +24,8 @@ import com.jitlogic.zico.core.model.TraceInfoRecord;
 import com.jitlogic.zico.core.model.TraceInfoSearchQuery;
 import com.jitlogic.zico.core.model.TraceInfoSearchResult;
 import com.jitlogic.zico.core.model.TraceRecordSearchQuery;
+import com.jitlogic.zico.core.rds.RAGZInputStream;
+import com.jitlogic.zico.core.rds.RAGZSegment;
 import com.jitlogic.zico.core.rds.RDSCleanupListener;
 import com.jitlogic.zico.core.rds.RDSStore;
 import com.jitlogic.zico.core.search.EqlTraceRecordMatcher;
@@ -38,25 +40,17 @@ import com.jitlogic.zorka.common.tracedata.SymbolicStackElement;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import org.fressian.FressianReader;
 import org.fressian.FressianWriter;
+
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.io.*;
+import java.util.*;
 import java.util.concurrent.ConcurrentNavigableMap;
 
 /**
@@ -229,6 +223,90 @@ public class HostStore implements Closeable, RDSCleanupListener {
     }
 
 
+    public void rebuildIndex() throws IOException {
+        boolean offline = isOffline();
+
+        if (!offline) {
+            setOffline(true);
+        }
+
+        // Remove old files (if any)
+        File fTidx = new File(rootPath, "tidx");
+        if (fTidx.exists()) {
+            ZorkaUtil.rmrf(fTidx);
+        }
+
+
+        for (String s : new File(rootPath).list()) {
+            if (s.startsWith("traces.db")) {
+                new File(rootPath, s).delete();
+            }
+        }
+
+        // Reopen and rebuild both db and idx
+        open();
+
+        File tdatDir = new File(rootPath, "tdat");
+        List<String> fnames  = Arrays.asList(tdatDir.list());
+        Collections.sort(fnames);
+
+        for (String fname : fnames) {
+            if (RDSStore.RGZ_FILE.matcher(fname).matches()) {
+                File f = new File(tdatDir, fname);
+                try {
+                    RAGZInputStream is = RAGZInputStream.fromFile(f);
+                    long fileBasePos = Long.parseLong(fname.substring(0, 16), 16);
+                    for (RAGZSegment seg : is.getSegments()) {
+                        if (seg.getLogicalLen() > 0) {
+                            byte[] buf = new byte[(int)seg.getLogicalLen()];
+                            is.seek((int)seg.getLogicalPos());
+                            is.read(buf);
+                            rebuildSegmentIndex(fileBasePos, seg, buf);
+                        }
+                    }
+                    db.commit();
+                } catch (IOException e) {
+                    log.error("Error processing file " + f + " ; all traces saved in this file will be dropped.");
+                }
+            }
+        }
+
+        close();
+
+        setOffline(offline);
+    }
+
+
+    private void rebuildSegmentIndex(long fileBasePos, RAGZSegment seg, byte[] buf) throws IOException {
+        ByteArrayInputStream bis = new ByteArrayInputStream(buf);
+        FressianReader reader = new FressianReader(bis, FressianTraceFormat.READ_LOOKUP);
+        Object obj;
+        long basePos = seg.getLogicalPos() + fileBasePos, lastPos = basePos;
+        try {
+            while (null != (obj = reader.readObject())) {
+                long dataLen = basePos + buf.length - bis.available() - lastPos;
+                if (obj instanceof TraceRecord) {
+                    TraceRecord tr = (TraceRecord)obj;
+                    tr.setChildren(null);
+                    TraceRecordStore.ChunkInfo idxChunk = traceIndexStore.write(tr);
+                    TraceInfoRecord tir = new TraceInfoRecord(
+                        tr, lastPos, (int)dataLen, idxChunk.getOffset(), idxChunk.getLength());
+                    infos.put(lastPos, tir);
+                    int traceId = tir.getTraceId();
+                    if (!tids.containsKey(traceId)) {
+                        tids.put(traceId, symbolRegistry.symbolName(traceId));
+                    }
+                }
+                lastPos += dataLen;
+            }
+        } catch (EOFException e) {
+
+        } catch (IOException e) {
+            log.error("Cannot process segment " + seg + " ; traces saved in this segment will be skipped.", e);
+        }
+    }
+
+
     public synchronized void commit() {
 
         checkEnabled();
@@ -240,6 +318,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
             log.debug(name + ": Commit took " + t + " ms");
         }
     }
+
 
     private void checkEnabled() {
         if (hasFlag(HostProxy.OFFLINE|HostProxy.DISABLED)) {
@@ -400,6 +479,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
         return ti;
     }
+
 
     public Map<Integer, String> getTidMap() {
         checkEnabled();
@@ -570,14 +650,14 @@ public class HostStore implements Closeable, RDSCleanupListener {
     public void setOffline(boolean offline) {
         try {
             if (offline) {
-                flags |= HostProxy.OFFLINE;
-                open();
-            } else {
-                flags &= ~HostProxy.OFFLINE;
                 close();
+                flags |= HostProxy.OFFLINE;
+            } else {
+                open();
+                flags &= ~HostProxy.OFFLINE;
             }
         } catch (Exception e) {
-
+            log.error("Error changing host status", e);
         }
     }
 

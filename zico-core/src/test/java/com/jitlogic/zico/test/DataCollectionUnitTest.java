@@ -266,6 +266,82 @@ public class DataCollectionUnitTest extends ZicoFixture {
         testHost.search(tiq("test", 0, null, 0, null));
     }
 
+
+    @Test
+    public void testStoreSomethingAndRebuildIndex() throws Exception {
+        submit(trace(trace(),trace()), trace(trace(),trace()));
+        TraceInfoSearchResult rslt1 = traceDataService.searchTraces(tiq("test", 0, null, 0, null));
+        HostStore host = hostStoreManager.getHost("test", false);
+
+        host.setOffline(true);
+        host.rebuildIndex();
+        host.setOffline(false);
+
+        TraceInfoSearchResult rslt2 = traceDataService.searchTraces(tiq("test", 0, null, 0, null));
+
+        List<TraceInfo> lst1 = rslt1.getResults(), lst2 = rslt2.getResults();
+        assertEquals(lst1.size(), lst2.size());
+
+        for (int i = 0; i < lst1.size(); i++) {
+            assertEquals(lst1.get(i).getDataOffs(), lst2.get(i).getDataOffs());
+            assertEquals(lst1.get(i).getDataLen(), lst2.get(i).getDataLen());
+        }
+    }
+
+
+    @Test
+    public void testStoreTwoSegmentsAndRebuildIndex() throws Exception {
+        submit(trace(trace(),trace()));
+        HostStore host = hostStoreManager.getHost("test", false);
+        host.close(); host.open();
+        submit(trace());
+
+        TraceInfoSearchResult rslt1 = traceDataService.searchTraces(tiq("test", 0, null, 0, null));
+
+        host.setOffline(true);
+        host.rebuildIndex();
+        host.setOffline(false);
+
+        TraceInfoSearchResult rslt2 = traceDataService.searchTraces(tiq("test", 0, null, 0, null));
+
+        List<TraceInfo> lst1 = rslt1.getResults(), lst2 = rslt2.getResults();
+        assertEquals(lst1.size(), lst2.size());
+
+        for (int i = 0; i < lst1.size(); i++) {
+            assertEquals(lst1.get(i).getDataOffs(), lst2.get(i).getDataOffs());
+            assertEquals(lst1.get(i).getDataLen(), lst2.get(i).getDataLen());
+        }
+    }
+
+    @Test
+    public void testStoreInTwoFilesTwoSegmentsPerFileAndRebuildIndex() throws Exception {
+        submit(trace());
+        HostStore host = hostStoreManager.getHost("test", false);
+        host.close(); host.open();
+        submit(trace());
+        host.getTraceDataStore().getRds().rotate();
+        submit(trace());
+        host.close(); host.open();
+        submit(trace());
+
+        TraceInfoSearchResult rslt1 = traceDataService.searchTraces(tiq("test", 0, null, 0, null));
+
+        host.setOffline(true);
+        host.rebuildIndex();
+        host.setOffline(false);
+
+        TraceInfoSearchResult rslt2 = traceDataService.searchTraces(tiq("test", 0, null, 0, null));
+
+        List<TraceInfo> lst1 = rslt1.getResults(), lst2 = rslt2.getResults();
+        assertEquals(lst1.size(), lst2.size());
+
+        for (int i = 0; i < lst1.size(); i++) {
+            assertEquals(lst1.get(i).getDataOffs(), lst2.get(i).getDataOffs());
+            assertEquals(lst1.get(i).getDataLen(), lst2.get(i).getDataLen());
+        }
+
+    }
+
     // TODO disabled host vs offline host
 
     // TODO test: search in disabled host - should fail in a controlled way
