@@ -84,11 +84,7 @@ public class HostStoreManager extends Locator<HostStore, String> implements Clos
     @Override
     public synchronized void close() throws IOException {
         for (Map.Entry<String, HostStore> entry : storesByName.entrySet()) {
-            try {
-                entry.getValue().close();
-            } catch (IOException e) {
-                log.error("Cannot close agent store for host " + entry.getKey(), e);
-            }
+            entry.getValue().close();
         }
         storesByName.clear();
     }

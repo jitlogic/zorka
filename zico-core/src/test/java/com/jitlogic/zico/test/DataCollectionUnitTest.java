@@ -258,6 +258,14 @@ public class DataCollectionUnitTest extends ZicoFixture {
         traceDataService.searchTraces(tiq("nooone", 0, null, 0, null));
     }
 
+
+    @Test(expected = ZicoRuntimeException.class)
+    public void testTrySubmitToOfflineStore() throws Exception {
+        HostStore testHost = hostStoreManager.getHost("test", true);
+        testHost.setOffline(true);
+        testHost.search(tiq("test", 0, null, 0, null));
+    }
+
     // TODO disabled host vs offline host
 
     // TODO test: search in disabled host - should fail in a controlled way

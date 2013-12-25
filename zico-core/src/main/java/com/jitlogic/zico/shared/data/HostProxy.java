@@ -50,8 +50,6 @@ public interface HostProxy extends EntityProxy {
 
     int getFlags();
 
-    void setFlags(int flags);
-
     boolean isEnabled();
 
     public void setEnabled(boolean enabled);
