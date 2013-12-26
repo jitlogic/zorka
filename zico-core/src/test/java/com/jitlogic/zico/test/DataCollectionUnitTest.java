@@ -28,11 +28,15 @@ import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.jitlogic.zico.test.support.ZicoTestUtil.*;
@@ -342,9 +346,33 @@ public class DataCollectionUnitTest extends ZicoFixture {
 
     }
 
-    // TODO disabled host vs offline host
+    @Test
+    public void testIfDataFilesAndIndexesAreRotatedProperly() throws Exception {
+        config.setCfg("rds.file.size", 200);
+        config.setCfg("rds.seg.size", 100);
+        config.setCfg("rds.max.size", 500);
 
-    // TODO test: search in disabled host - should fail in a controlled way
+        for (int i = 0; i < 10; i++) {
+            submit(trace(rec(kv("OJA", "AAA")),rec()));
+        }
+
+        List<String> dFiles = Arrays.asList(new File(ZorkaUtil.path(config.getDataDir(), "test", "tdat")).list());
+        Collections.sort(dFiles);
+
+        List<String> iFiles = Arrays.asList(new File(ZorkaUtil.path(config.getDataDir(), "test", "tidx")).list());
+        Collections.sort(iFiles);
+
+        TraceInfoSearchResult rslt = traceDataService.searchTraces(tiq("test", 0, null, 0, null));
+        long firstOffs = rslt.getResults().get(0).getDataOffs();
+
+        assertTrue("first record found in index should exist in data store",
+                firstOffs >= Long.parseLong(dFiles.get(0).substring(0,16),16));
+
+        HostStore host = hostStoreManager.getHost("test", false);
+
+        assertTrue("tidx datastore files should be truncated properly",
+                host.getInfoRecord(firstOffs).getIndexOffs() <= Long.parseLong(iFiles.get(1).substring(0,16),16));
+    }
 
     // TODO test: search in host without access - should fail in a controlled way
 

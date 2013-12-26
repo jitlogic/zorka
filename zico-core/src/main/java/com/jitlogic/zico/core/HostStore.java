@@ -193,20 +193,12 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
         TraceRecordStore.ChunkInfo dchunk = traceDataStore.write(rec);
 
-        if (needsCleanup) {
-            // TODO clean up infos table
-            // TODO clean up index RDS storage
-        }
-
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        FressianWriter writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);
-
         List<TraceRecord> tmp = rec.getChildren();
+
         rec.setChildren(null);
-        writer.writeObject(rec);
+        TraceRecordStore.ChunkInfo ichunk = traceIndexStore.write(rec);
         rec.setChildren(tmp);
 
-        TraceRecordStore.ChunkInfo ichunk = traceIndexStore.write(rec);
 
         TraceInfoRecord tir = new TraceInfoRecord(rec,
                 dchunk.getOffset(), dchunk.getLength(),
@@ -529,15 +521,15 @@ public class HostStore implements Closeable, RDSCleanupListener {
             log.error("Cannot write " + f, e);
         }
 
-    // TODO automatic cleanup after (potential) shrinking
-    //        if (rdsData != null) {
-    //            rdsData.setMaxSize(maxSize);
-    //            try {
-    //                rdsData.cleanup();
-    //            } catch (IOException e) {
-    //                log.error("Error resizing RDS store for " + getName());
-    //            }
-    //        }
+        // TODO automatic cleanup after (potential) shrinking
+        //        if (rdsData != null) {
+        //            rdsData.setMaxSize(maxSize);
+        //            try {
+        //                rdsData.cleanup();
+        //            } catch (IOException e) {
+        //                log.error("Error resizing RDS store for " + getName());
+        //            }
+        //        }
     }
 
 
@@ -562,8 +554,21 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
 
     @Override
-    public void onChunkRemoved(Long start, Long length) {
-        needsCleanup = true;
+    public void onChunkRemoved(RDSStore origin, Long start, Long length) {
+        if (traceDataStore != null && origin == traceDataStore.getRds()) {
+            long idxOffs = -1;
+            while (infos.size() > 0 && infos.firstEntry().getValue().getDataOffs() < (start+length)) {
+                idxOffs = Math.min(idxOffs, infos.firstEntry().getValue().getIndexOffs());
+                infos.remove(infos.firstKey());
+            }
+            if (idxOffs > 0) {
+                try {
+                    traceIndexStore.getRds().cleanup(idxOffs);
+                } catch (IOException e) {
+                    log.error("Problem cleaning up index store", e);
+                }
+            }
+        }
     }
 
 
@@ -623,6 +628,9 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public void setMaxSize(long maxSize) {
         this.maxSize = maxSize;
+        if (traceDataStore != null) {
+            traceDataStore.getRds().setMaxSize(maxSize);
+        }
         save();
     }
 

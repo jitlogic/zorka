@@ -52,7 +52,7 @@ public class RDSStoreStressTest extends ZicoFixture {
 
         RDSCleanupListener cleaner = new RDSCleanupListener() {
             @Override
-            public void onChunkRemoved(Long start, Long length) {
+            public void onChunkRemoved(RDSStore origin, Long start, Long length) {
                 while (positions.size() > 0 && positions.get(0) < start + length) {
                     positions.remove(0);
                     chunks.remove(0);
