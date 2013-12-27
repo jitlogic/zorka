@@ -34,4 +34,6 @@ public interface HostServiceProxy extends RequestContext {
     Request<Void> persist(HostProxy proxy);
 
     Request<Void> remove(HostProxy host);
+
+    Request<Void> rebuildIndex(HostProxy host);
 }

@@ -41,7 +41,6 @@ import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.FressianReader;
-import org.fressian.FressianWriter;
 
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -215,8 +214,15 @@ public class HostStore implements Closeable, RDSCleanupListener {
     }
 
 
-    public void rebuildIndex() throws IOException {
+    public synchronized void rebuildIndex() throws IOException {
+
+        int[] stats = new int[2];
+
+        log.info("Start rebuildIndex() operation for host " + name);
+
         boolean offline = isOffline();
+
+        flags |= HostProxy.CHK_IN_PROGRESS;
 
         if (!offline) {
             setOffline(true);
@@ -243,6 +249,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
         Collections.sort(fnames);
 
         for (String fname : fnames) {
+            log.info("Processing file " + name + "/tdat/" + fname);
             if (RDSStore.RGZ_FILE.matcher(fname).matches()) {
                 File f = new File(tdatDir, fname);
                 try {
@@ -253,29 +260,37 @@ public class HostStore implements Closeable, RDSCleanupListener {
                             byte[] buf = new byte[(int)seg.getLogicalLen()];
                             is.seek((int)seg.getLogicalPos());
                             is.read(buf);
-                            rebuildSegmentIndex(fileBasePos, seg, buf);
+                            rebuildSegmentIndex(fileBasePos, seg, buf, stats);
                         }
                     }
-                    db.commit();
-                } catch (IOException e) {
-                    log.error("Error processing file " + f + " ; all traces saved in this file will be dropped.");
+                } catch (Exception e) {
+                    log.error("Error processing file " + f + " ; all traces saved in this file will be dropped.", e);
                 }
+                db.commit();
             }
         }
 
         close();
 
+        flags &= ~HostProxy.CHK_IN_PROGRESS;
+
         setOffline(offline);
+
+        save();
+
+        log.info("Operation rebuildIndex() for host " + name + " finished. "
+            + stats[0] + " traces imported, " + stats[1] + " traces dropped.");
     }
 
 
-    private void rebuildSegmentIndex(long fileBasePos, RAGZSegment seg, byte[] buf) throws IOException {
+    private void rebuildSegmentIndex(long fileBasePos, RAGZSegment seg, byte[] buf, int[] stats) throws IOException {
         ByteArrayInputStream bis = new ByteArrayInputStream(buf);
-        FressianReader reader = new FressianReader(bis, FressianTraceFormat.READ_LOOKUP);
         Object obj;
         long basePos = seg.getLogicalPos() + fileBasePos, lastPos = basePos;
-        try {
-            while (null != (obj = reader.readObject())) {
+        while (bis.available() > 0) {
+            try {
+                FressianReader reader = new FressianReader(bis, FressianTraceFormat.READ_LOOKUP);
+                obj = reader.readObject();
                 long dataLen = basePos + buf.length - bis.available() - lastPos;
                 if (obj instanceof TraceRecord) {
                     TraceRecord tr = (TraceRecord)obj;
@@ -288,13 +303,15 @@ public class HostStore implements Closeable, RDSCleanupListener {
                     if (!tids.containsKey(traceId)) {
                         tids.put(traceId, symbolRegistry.symbolName(traceId));
                     }
+                    stats[0]++;
                 }
                 lastPos += dataLen;
-            }
-        } catch (EOFException e) {
+            } catch (EOFException e) {
 
-        } catch (IOException e) {
-            log.error("Cannot process segment " + seg + " ; traces saved in this segment will be skipped.", e);
+            } catch (Exception e1) {
+                stats[1]++;
+                //log.error("Cannot process segment " + seg + " ; Skipping trace.", e1);
+            }
         }
     }
 
@@ -321,7 +338,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public synchronized TraceInfoSearchResult search(TraceInfoSearchQuery query) throws IOException {
         checkEnabled();
-        List<TraceInfo> lst = new ArrayList<>(query.getLimit());
+        List<TraceInfo> lst = new ArrayList<TraceInfo>(query.getLimit());
 
         TraceInfoSearchResult result = new TraceInfoSearchResult(query.getSeq(), lst);
 
@@ -489,10 +506,16 @@ public class HostStore implements Closeable, RDSCleanupListener {
         File f = new File(rootPath, HOST_PROPERTIES);
         Properties props = new Properties();
         if (f.exists() && f.canRead()) {
-            try (InputStream is = new FileInputStream(f)) {
+            InputStream is = null;
+            try {
+                is = new FileInputStream(f);
                 props.load(is);
             } catch (IOException e) {
                 log.error("Cannot read " + f, e);
+            } finally {
+                if (is != null) {
+                    try { is.close(); } catch (IOException _) { }
+                }
             }
         }
 
@@ -515,10 +538,16 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
         File f = new File(rootPath, HOST_PROPERTIES);
 
-        try (OutputStream os = new FileOutputStream(f)) {
+        OutputStream os = null;
+        try {
+            os = new FileOutputStream(f);
             props.store(os, "ZICO Host Descriptor");
         } catch (IOException e) {
             log.error("Cannot write " + f, e);
+        } finally {
+            if (os != null) {
+                try { os.close(); } catch (IOException _) { }
+            }
         }
 
         // TODO automatic cleanup after (potential) shrinking
@@ -641,11 +670,17 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
 
     public void setEnabled(boolean enabled) {
+
+        if (hasFlag(HostProxy.OFFLINE)) {
+            throw new ZicoRuntimeException("Host is offline.");
+        }
+
         if (enabled) {
             flags &= ~HostProxy.DISABLED;
         } else {
             flags |= HostProxy.DISABLED;
         }
+
         save();
     }
 
@@ -656,13 +691,22 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
 
     public void setOffline(boolean offline) {
+
+        if (hasFlag(HostProxy.CHK_IN_PROGRESS)) {
+            throw new ZicoRuntimeException("Datastore check operation in progress.");
+        }
+
         try {
             if (offline) {
+                log.info("Taking host " + name + " offline.");
                 close();
-                flags |= HostProxy.OFFLINE;
+                flags |= HostProxy.OFFLINE|HostProxy.DISABLED;
+                save();
             } else {
+                log.info("Bringing host " + name + " online.");
                 open();
-                flags &= ~HostProxy.OFFLINE;
+                flags &= ~(HostProxy.OFFLINE|HostProxy.DISABLED);
+                save();
             }
         } catch (Exception e) {
             log.error("Error changing host status", e);

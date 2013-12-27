@@ -60,12 +60,14 @@ public class PersistentSymbolRegistry extends SymbolRegistry implements Closeabl
         open();
     }
 
-    public void open() throws IOException {
 
+    public void open() throws IOException {
 
         if (path.exists()) {
             int maxid = 0;
-            try (InputStream is = new FileInputStream(path)) {
+            InputStream is = null;
+            try {
+                is = new FileInputStream(path);
                 FressianReader reader = new FressianReader(is, FressianTraceFormat.READ_LOOKUP);
                 Object obj;
                 for (obj = reader.readObject(); obj != null; obj = reader.readObject()) {
@@ -80,6 +82,10 @@ public class PersistentSymbolRegistry extends SymbolRegistry implements Closeabl
                 // This is expected, we ignore it
             } catch (IOException e) {
                 log.error("Cannot read symbol table from " + path, e);
+            } finally {
+                if (is != null) {
+                    try { is.close(); } catch (IOException e) { }
+                }
             }
             lastSymbolId.set(maxid);
         }
@@ -90,7 +96,10 @@ public class PersistentSymbolRegistry extends SymbolRegistry implements Closeabl
         File jsonFile = new File(path.getPath().substring(0, path.getPath().lastIndexOf('.')) + ".json");
 
         if (symbolNames.size() == 0 && jsonFile.exists()) {
-            try (Reader reader = new FileReader(jsonFile)) {
+            log.info("Symbol registry " + path + " is empty but JSON dump was found. Importing...");
+            Reader reader = null;
+            try {
+                reader = new FileReader(jsonFile);
                 JSONObject json = new JSONObject(new JSONTokener(reader));
                 JSONArray names = json.names();
                 for (int i = 0; i < names.length(); i++) {
@@ -98,10 +107,15 @@ public class PersistentSymbolRegistry extends SymbolRegistry implements Closeabl
                     String sym = json.getString(id);
                     this.put(Integer.parseInt(id), sym);
                 }
+                log.info("Import of symbol registry at " + path + " completed successfully.");
             } catch (IOException e) {
                 log.error("JSON backup found but cannot be used due to error", e);
             } catch (JSONException e) {
                 log.error("JSON backup found but cannot be used due to error", e);
+            } finally {
+                if (reader != null) {
+                    reader.close();
+                }
             }
 
         }
@@ -123,12 +137,18 @@ public class PersistentSymbolRegistry extends SymbolRegistry implements Closeabl
 
         File jsonFile = new File(path.getPath().substring(0, path.getPath().lastIndexOf('.')) + ".json");
 
-        try (PrintWriter out = new PrintWriter(jsonFile)) {
+        PrintWriter out = null;
+        try {
+            out = new PrintWriter(jsonFile);
             jsonData.write(out);
         } catch (IOException e) {
             log.error("Cannot export symbol table from " + path, e);
         } catch (JSONException e) {
             log.error("Cannot export symbol table from " + path, e);
+        } finally {
+            if (out != null) {
+                out.close();
+            }
         }
     }
 

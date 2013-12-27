@@ -177,7 +177,7 @@ public class TraceRecordStore implements Closeable {
     public TraceRecord filterByTime(TraceRecord orig, long minMethodTime) {
         TraceRecord tr = orig.copy();
         if (orig.getChildren() != null) {
-            ArrayList<TraceRecord> children = new ArrayList<>(orig.numChildren());
+            ArrayList<TraceRecord> children = new ArrayList<TraceRecord>(orig.numChildren());
             for (TraceRecord child : orig.getChildren()) {
                 if (child.getTime() >= minMethodTime) {
                     children.add(filterByTime(child, minMethodTime));
@@ -202,7 +202,7 @@ public class TraceRecordStore implements Closeable {
         info.setPath(path);
 
         if (tr.getAttrs() != null) {
-            List<KeyValuePair> attrs = new ArrayList<>(tr.getAttrs().size());
+            List<KeyValuePair> attrs = new ArrayList<KeyValuePair>(tr.getAttrs().size());
             for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
                 String s = "" + e.getValue();
                 if (attrLimit != null && s.length() > attrLimit) {
@@ -359,13 +359,13 @@ public class TraceRecordStore implements Closeable {
     public List<MethodRankInfo> methodRank(TraceInfoRecord info, String orderBy, String orderDesc) {
         TraceRecord tr = getTraceRecord(info, "", 0);
 
-        Map<String, MethodRankInfo> histogram = new HashMap<>();
+        Map<String, MethodRankInfo> histogram = new HashMap<String, MethodRankInfo>();
 
         if (tr != null) {
             makeHistogram(histogram, tr);
         }
 
-        List<MethodRankInfo> result = new ArrayList<>(histogram.size());
+        List<MethodRankInfo> result = new ArrayList<MethodRankInfo>(histogram.size());
         result.addAll(histogram.values());
 
         String key = orderBy + "." + orderDesc;

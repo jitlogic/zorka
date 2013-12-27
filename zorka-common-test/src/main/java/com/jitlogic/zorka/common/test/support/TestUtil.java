@@ -27,8 +27,14 @@ public class TestUtil {
     public static Properties loadProps(String path) throws IOException {
         Properties props = new Properties();
 
-        try (InputStream is = new FileInputStream(path)) {
+        InputStream is = null;
+        try {
+            is = new FileInputStream(path);
             props.load(is);
+        } finally {
+            if (is != null) {
+                is.close();
+            }
         }
 
         return props;

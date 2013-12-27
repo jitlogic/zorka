@@ -36,11 +36,11 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     private final static Logger log = LoggerFactory.getLogger(ReceiverContext.class);
 
     private SymbolRegistry symbolRegistry;
-    private Map<Integer, Integer> sidMap = new HashMap<>();
+    private Map<Integer, Integer> sidMap = new HashMap<Integer,Integer>();
 
     private HostStore hostStore;
 
-    private Set<Object> visitedObjects = new HashSet<>();
+    private Set<Object> visitedObjects = new HashSet<Object>();
 
 
     public ReceiverContext(HostStore hostStore) {

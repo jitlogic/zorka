@@ -13,6 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zico.main;
 
 
 import org.mortbay.jetty.Server;
@@ -26,18 +27,16 @@ import java.net.URL;
 import java.security.ProtectionDomain;
 import java.util.Properties;
 
+public class ZicoServeCommand implements ZicoCommand {
 
-public class ZicoMain {
+    private int port;
+    private String homeDir;
 
-    private static int port;
-    private static String homeDir;
-
-    private static Server server;
-    private static WebAppContext webapp;
+    private Server server;
+    private WebAppContext webapp;
 
 
-    public static void main(String[] args) throws Exception {
-
+    public void run(String[] args) throws Exception {
         configure();
 
         initServer();
@@ -46,7 +45,7 @@ public class ZicoMain {
         server.join();
     }
 
-    private static void initServer() {
+    private void initServer() {
         server = new Server(port);
         ProtectionDomain domain = Server.class.getProtectionDomain();
         URL location = domain.getCodeSource().getLocation();
@@ -61,7 +60,7 @@ public class ZicoMain {
         server.setHandler(webapp);
     }
 
-    private static void configure() throws IOException {
+    private void configure() throws IOException {
 
         homeDir = System.getProperty("zico.home.dir");
 

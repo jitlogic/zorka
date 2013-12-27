@@ -104,7 +104,7 @@ public class SystemGwtService {
     public List<Symbol> getTidMap(String hostName) {
         Map<Integer,String> tids = hsm.getTids(hostName);
 
-        List<Symbol> rslt = new ArrayList<>(tids.size());
+        List<Symbol> rslt = new ArrayList<Symbol>(tids.size());
 
         for (Map.Entry<Integer,String> e : tids.entrySet()) {
             rslt.add(new Symbol(e.getKey(), e.getValue()));

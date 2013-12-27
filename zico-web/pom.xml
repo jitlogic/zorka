@@ -15,6 +15,43 @@
             <groupId>com.jitlogic.zorka</groupId>
             <artifactId>zico-core</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.jitlogic.zorka</groupId>
+            <artifactId>zorka-common</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>${guice.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-servlet</artifactId>
+            <version>${guice.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.web.bindery</groupId>
+            <artifactId>requestfactory-server</artifactId>
+            <version>${gwt.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.web.bindery</groupId>
+            <artifactId>requestfactory-apt</artifactId>
+            <version>${gwt.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.gwt</groupId>
@@ -26,6 +63,12 @@
             <groupId>com.google.gwt.inject</groupId>
             <artifactId>gin</artifactId>
             <version>${gin.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>${asm.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -41,10 +84,28 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.mapdb</groupId>
+            <artifactId>mapdb</artifactId>
+            <version>${mapdb.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.jitlogic.zorka</groupId>
             <artifactId>zorka-common-test</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.fressian</groupId>
+            <artifactId>fressian</artifactId>
+            <version>${fressian.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <build>
@@ -75,7 +136,7 @@
                     <warName>zico</warName>
                     <archive>
                         <manifest>
-                            <mainClass>ZicoMain</mainClass>
+                            <mainClass>com.jitlogic.zico.main.ZicoMain</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -101,9 +162,10 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <move todir="${project.build.directory}/${project.artifactId}">
-                                    <fileset dir="${project.build.directory}/classes/">
-                                        <include name="ZicoMain.class"/>
+                                <mkdir dir="${project.build.directory}/${project.artifactId}/com/jitlogic/zico/main"/>
+                                <move todir="${project.build.directory}/${project.artifactId}/com/jitlogic/zico/main">
+                                    <fileset dir="${project.build.directory}/classes/com/jitlogic/zico/main/">
+                                         <include name="**.class"/>
                                     </fileset>
                                 </move>
                             </tasks>
@@ -123,7 +185,7 @@
                             <goal>unpack-dependencies</goal>
                         </goals>
                         <configuration>
-                            <includeGroupIds>org.mortbay.jetty,javax.servlet,mysql</includeGroupIds>
+                            <includeGroupIds>org.mortbay.jetty,javax.servlet,com.jitlogic.zorka,org.mapdb,com.google.web.bindery,javax.validation,org.json,com.google.inject,com.google.inject.extensions,org.slf4j,javax.inject,aopalliance,org.ow2.asm,com.google.gwt,org.apache.bval,org.parboiled,org.fressian,ch.qos.logback</includeGroupIds>
                             <excludeArtifactIds>jsp-api,jstl</excludeArtifactIds>
                             <excludes>META-INF/ECLIPSEF.*</excludes>
                             <outputDirectory>

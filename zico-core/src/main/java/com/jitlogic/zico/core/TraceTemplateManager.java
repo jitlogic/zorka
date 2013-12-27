@@ -82,7 +82,10 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
         File jsonFile = new File(config.getConfDir(), "templates.json");
 
         if (templates.size() == 0 && jsonFile.exists()) {
-            try (Reader reader = new FileReader(jsonFile)) {
+            log.info("Templates DB is empty but JSON dump was found. Importing...");
+            Reader reader = null;
+            try {
+                reader = new FileReader(jsonFile);
                 JSONObject json = new JSONObject(new JSONTokener(reader));
                 JSONArray names = json.names();
                 for (int i = 0; i < names.length(); i++) {
@@ -90,10 +93,15 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
                     templates.put(t.getId(), t);
                 }
                 db.commit();
+                log.info("Template DB import finished succesfully.");
             } catch (IOException e) {
                 log.error("Cannot import user db from JSON data", e);
             } catch (JSONException e) {
                 log.error("Cannot import user db from JSON data", e);
+            } finally {
+                if (reader != null) {
+                    try { reader.close(); } catch (IOException e) { }
+                }
             }
         }
 
@@ -112,7 +120,7 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
 
 
     private void reorder() {
-        List<TraceTemplate> ttl = new ArrayList<>(templates.size());
+        List<TraceTemplate> ttl = new ArrayList<TraceTemplate>(templates.size());
         ttl.addAll(templates.values());
         Collections.sort(ttl, new Comparator<TraceTemplate>() {
             @Override
@@ -127,7 +135,9 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
 
 
     public void export() {
-        try (Writer writer = new FileWriter(new File(config.getConfDir(), "templates.json"))) {
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter(new File(config.getConfDir(), "templates.json"));
             JSONObject obj = new JSONObject();
             for (Map.Entry<Integer,TraceTemplate> e : templates.entrySet()) {
                 obj.put(e.getKey().toString(), e.getValue().toJSONObject());
@@ -137,6 +147,10 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
             log.error("Cannot export template DB", e);
         } catch (IOException e) {
 
+        } finally {
+            if (writer != null) {
+                try { writer.close(); } catch (IOException _) { }
+            }
         }
 
     }
@@ -144,7 +158,7 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
 
     public String templateDescription(SymbolRegistry symbolRegistry, TraceInfo info) {
 
-        Map<String, Object> attrs = new HashMap<>();
+        Map<String, Object> attrs = new HashMap<String, Object>();
         attrs.put("methodName", symbolRegistry.symbolName(info.getMethodId()));
         attrs.put("className", symbolRegistry.symbolName(info.getClassId()));
         if (info.getAttributes() != null) {
@@ -183,7 +197,7 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
 
 
     public List<TraceTemplate> listTemplates() {
-        List<TraceTemplate> lst = new ArrayList<>(templates.size());
+        List<TraceTemplate> lst = new ArrayList<TraceTemplate>(templates.size());
         lst.addAll(templates.values());
         return lst;
     }

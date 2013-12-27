@@ -21,6 +21,7 @@ import com.google.inject.Singleton;
 import com.jitlogic.zico.core.HostStoreManager;
 import com.jitlogic.zico.core.UserContext;
 import com.jitlogic.zico.core.UserHttpContext;
+import com.jitlogic.zico.core.UserManager;
 import com.jitlogic.zico.core.ZicoConfig;
 import com.jitlogic.zico.core.ZicoRuntimeException;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessorFactory;
@@ -36,6 +37,7 @@ public class ProdZicoModule extends AbstractZicoModule {
     @Override
     public void configure(Binder binder) {
         super.configure(binder);
+        binder.bind(UserManager.class).asEagerSingleton();
         binder.bind(UserContext.class).to(UserHttpContext.class);
         binder.bind(ZicoDataProcessorFactory.class).to(HostStoreManager.class);
     }

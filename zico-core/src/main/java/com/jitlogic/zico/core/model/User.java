@@ -35,7 +35,7 @@ public class User implements Serializable {
 
     private int flags;
 
-    private List<String> allowedHosts = new ArrayList<>();
+    private List<String> allowedHosts = new ArrayList<String>();
 
 
     public User() {

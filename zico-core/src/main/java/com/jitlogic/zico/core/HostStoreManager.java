@@ -46,7 +46,7 @@ public class HostStoreManager extends Locator<HostStore, String> implements Clos
 
     private boolean enableSecurity;
 
-    private Map<String, HostStore> storesByName = new HashMap<>();
+    private Map<String, HostStore> storesByName = new HashMap<String, HostStore>();
 
     private ZicoConfig config;
     private TraceTemplateManager templater;
@@ -124,7 +124,7 @@ public class HostStoreManager extends Locator<HostStore, String> implements Clos
 
 
     public List<HostStore> list(String username) {
-        List<HostStore> result = new ArrayList<>();
+        List<HostStore> result = new ArrayList<HostStore>();
 
         for (String name : new File(dataDir).list()) {
             if (new File(new File(dataDir, name), HostStore.HOST_PROPERTIES).exists()) {
@@ -149,7 +149,7 @@ public class HostStoreManager extends Locator<HostStore, String> implements Clos
     }
 
     public synchronized Map<Integer,String> getTids(String hostName) {
-        Map<Integer,String> rslt = new HashMap<>();
+        Map<Integer,String> rslt = new HashMap<Integer,String>();
 
         if (hostName != null) {
             HostStore hs = getHost(hostName, false);

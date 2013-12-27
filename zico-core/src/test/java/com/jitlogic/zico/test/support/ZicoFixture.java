@@ -65,7 +65,7 @@ public class ZicoFixture {
         TestUtil.rmrf(tmpDir);
         new File(tmpDir).mkdirs();
 
-        configProperties = setProps(
+        configProperties = ZicoTestUtil.setProps(
                 ZorkaConfig.defaultProperties(ZicoConfig.DEFAULT_CONF_PATH),
                 "zico.home.dir", tmpDir,
                 "zico.listen.port", "9640",
@@ -120,13 +120,5 @@ public class ZicoFixture {
     }
 
 
-    private static Properties setProps(Properties props, String... data) {
-
-        for (int i = 1; i < data.length; i += 2) {
-            props.setProperty(data[i - 1], data[i]);
-        }
-
-        return props;
-    }
 
 }

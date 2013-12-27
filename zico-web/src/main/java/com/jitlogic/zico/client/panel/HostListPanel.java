@@ -75,10 +75,13 @@ public class HostListPanel extends VerticalLayoutContainer {
     private TextButton btnRefresh, btnAddHost, btnRemoveHost, btnEditHost, btnListTraces, btnDisableHost, btnEnableHost;
     private MenuItem mnuRefresh, mnuAddHost, mnuRemoveHost, mnuEditHost, mnuListTraces, mnuDisableHost, mnuEnableHost;
 
+    private MenuItem mnuRebuildIndex, mnuOfflineHost, mnuOnlineHost;
+
     private boolean selectionDependentControlsEnabled = true;
 
     // TODO this is very badly written crutch. It will be fixed as soon as we move to GWT 2.6, so it will be in sync with Jetty 9.
     private boolean adminMode = false;
+    private Menu contextMenu;
 
     @Inject
     public HostListPanel(Provider<ZicoShell> shell, PanelFactory panelFactory,
@@ -99,7 +102,67 @@ public class HostListPanel extends VerticalLayoutContainer {
     public void setAdminMode(boolean adminMode) {
         this.adminMode = adminMode;
         enableSelectionDependentControls(null);
+
+        if (adminMode) {
+            if (mnuRebuildIndex == null) {
+                contextMenu.add(new SeparatorMenuItem());
+                mnuRebuildIndex = new MenuItem("Rebuild Index");
+                contextMenu.add(mnuRebuildIndex);
+
+                mnuRebuildIndex.addSelectionHandler(new SelectionHandler<Item>() {
+                    @Override
+                    public void onSelection(SelectionEvent<Item> event) {
+                        rebuildHostIndex();
+                    }
+                });
+            }
+
+            if (mnuOfflineHost == null) {
+                mnuOfflineHost = new MenuItem("Take host offline");
+                contextMenu.add(mnuOfflineHost);
+
+                mnuOfflineHost.addSelectionHandler(new SelectionHandler<Item>() {
+                    @Override
+                    public void onSelection(SelectionEvent<Item> event) {
+                        offlineHost(true);
+                    }
+                });
+            }
+
+            if (mnuOnlineHost == null) {
+                mnuOnlineHost = new MenuItem("Bring host online");
+                contextMenu.add(mnuOnlineHost);
+
+                mnuOnlineHost.addSelectionHandler(new SelectionHandler<Item>() {
+                    @Override
+                    public void onSelection(SelectionEvent<Item> event) {
+                        offlineHost(false);
+                    }
+                });
+            }
+        }
+
     }
+
+
+    private void rebuildHostIndex() {
+        HostProxy host = selectionModel.getSelectedItem();
+        if (host != null) {
+            rf.hostService().rebuildIndex(host).fire();
+            refresh();
+        }
+    }
+
+
+    private void offlineHost(boolean offline) {
+        HostProxy host = selectionModel.getSelectedItem();
+        if (host != null) {
+            HostServiceProxy req = rf.hostService();
+            req.edit(host).setOffline(offline);
+            req.fire();
+        }
+    }
+
 
     private void enableSelectionDependentControls(HostProxy hostInfo) {
         boolean enabled = hostInfo != null;
@@ -226,7 +289,7 @@ public class HostListPanel extends VerticalLayoutContainer {
         nameCol.setCell(new AbstractCell<HostProxy>() {
             @Override
             public void render(Context context, HostProxy host, SafeHtmlBuilder sb) {
-                String color = host.isEnabled() ? "black" : "gray";
+                String color = (host.isEnabled() && !host.isOffline()) ? "black" : "gray";
                 sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
                 sb.append(SafeHtmlUtils.fromString(host.getName()));
                 sb.appendHtmlConstant("</span>");
@@ -241,7 +304,7 @@ public class HostListPanel extends VerticalLayoutContainer {
         addrCol.setCell(new AbstractCell<HostProxy>() {
             @Override
             public void render(Context context, HostProxy host, SafeHtmlBuilder sb) {
-                String color = host.isEnabled() ? "black" : "gray";
+                String color = (host.isEnabled() && !host.isOffline()) ? "black" : "gray";
                 sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
                 sb.append(SafeHtmlUtils.fromString(host.getAddr()));
                 sb.appendHtmlConstant("</span>");
@@ -313,7 +376,7 @@ public class HostListPanel extends VerticalLayoutContainer {
 
 
     private void createContextMenu() {
-        Menu menu = new Menu();
+        contextMenu = new Menu();
 
         mnuRefresh = new MenuItem("Refresh");
         mnuRefresh.setIcon(Resources.INSTANCE.refreshIcon());
@@ -323,9 +386,9 @@ public class HostListPanel extends VerticalLayoutContainer {
                 refresh();
             }
         });
-        menu.add(mnuRefresh);
+        contextMenu.add(mnuRefresh);
 
-        menu.add(new SeparatorMenuItem());
+        contextMenu.add(new SeparatorMenuItem());
 
         mnuAddHost = new MenuItem("New host");
         mnuAddHost.setIcon(Resources.INSTANCE.addIcon());
@@ -335,7 +398,7 @@ public class HostListPanel extends VerticalLayoutContainer {
                 addHost();
             }
         });
-        menu.add(mnuAddHost);
+        contextMenu.add(mnuAddHost);
 
         mnuRemoveHost = new MenuItem("Remove host");
         mnuRemoveHost.setIcon(Resources.INSTANCE.removeIcon());
@@ -345,7 +408,7 @@ public class HostListPanel extends VerticalLayoutContainer {
                 removeHost();
             }
         });
-        menu.add(mnuRemoveHost);
+        contextMenu.add(mnuRemoveHost);
 
         mnuEditHost = new MenuItem("Edit host");
         mnuEditHost.setIcon(Resources.INSTANCE.editIcon());
@@ -355,9 +418,9 @@ public class HostListPanel extends VerticalLayoutContainer {
                 editHost();
             }
         });
-        menu.add(mnuEditHost);
+        contextMenu.add(mnuEditHost);
 
-        menu.add(new SeparatorMenuItem());
+        contextMenu.add(new SeparatorMenuItem());
 
         mnuDisableHost = new MenuItem("Disable host");
         mnuDisableHost.setIcon(Resources.INSTANCE.disableIcon());
@@ -367,7 +430,7 @@ public class HostListPanel extends VerticalLayoutContainer {
                 toggleHost(false);
             }
         });
-        menu.add(mnuDisableHost);
+        contextMenu.add(mnuDisableHost);
 
         mnuEnableHost = new MenuItem("Enable host");
         mnuEnableHost.setIcon(Resources.INSTANCE.enableIcon());
@@ -377,9 +440,9 @@ public class HostListPanel extends VerticalLayoutContainer {
                 toggleHost(true);
             }
         });
-        menu.add(mnuEnableHost);
+        contextMenu.add(mnuEnableHost);
 
-        menu.add(new SeparatorMenuItem());
+        contextMenu.add(new SeparatorMenuItem());
 
         mnuListTraces = new MenuItem("List traces");
         mnuListTraces.setIcon(Resources.INSTANCE.listColumnsIcon());
@@ -389,9 +452,9 @@ public class HostListPanel extends VerticalLayoutContainer {
                 listTraces();
             }
         });
-        menu.add(mnuListTraces);
+        contextMenu.add(mnuListTraces);
 
-        hostGrid.setContextMenu(menu);
+        hostGrid.setContextMenu(contextMenu);
     }
 
 

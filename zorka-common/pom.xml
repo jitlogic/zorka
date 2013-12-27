@@ -15,7 +15,7 @@
         <dependency>
             <groupId>org.fressian</groupId>
             <artifactId>fressian</artifactId>
-            <version>0.6.3</version>
+            <version>${fressian.version}</version>
         </dependency>
     </dependencies>
 </project>

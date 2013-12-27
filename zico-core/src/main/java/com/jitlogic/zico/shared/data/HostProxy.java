@@ -38,14 +38,9 @@ public interface HostProxy extends EntityProxy {
     public static final int OFFLINE  = 0x0002;
 
     /**
-     * Check needed (index rebuild, symbols etc.)
-     */
-    public static final int PRE_MIGRATE = 0x0004;
-
-    /**
      * Datastore check in progress.
      */
-    public static final int CHK_IN_PROGRESS = 0x0008;
+    public static final int CHK_IN_PROGRESS = 0x0004;
 
     String getName();
 
@@ -66,4 +61,8 @@ public interface HostProxy extends EntityProxy {
     long getMaxSize();
 
     void setMaxSize(long maxSize);
+
+    boolean isOffline();
+
+    void setOffline(boolean offline);
 }

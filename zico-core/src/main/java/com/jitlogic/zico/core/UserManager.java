@@ -16,7 +16,6 @@
 package com.jitlogic.zico.core;
 
 
-import com.google.inject.Singleton;
 import com.google.web.bindery.requestfactory.shared.Locator;
 import com.jitlogic.zico.core.model.User;
 import org.json.JSONArray;
@@ -29,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -72,20 +72,28 @@ public class UserManager extends Locator<User, String> {
         File jsonFile = new File(config.getConfDir(), "users.json");
 
         if (users.size() == 0 && jsonFile.exists()) {
-               try (Reader reader = new FileReader(jsonFile)) {
-                   JSONObject json = new JSONObject(new JSONTokener(reader));
-                   JSONArray names = json.names();
-                   for (int i = 0; i < names.length(); i++) {
-                       User user = new User(json.getJSONObject(names.getString(i)));
-                       users.put(user.getUserName(), user);
-                   }
-                   db.commit();
-                   rebuildUserProperties();
-               } catch (IOException e) {
-                   log.error("Cannot import user db from JSON data", e);
-               } catch (JSONException e) {
-                   log.error("Cannot import user db from JSON data", e);
-               }
+            log.info("User DB is empty but JSON dump file found. Importing...");
+            Reader reader = null;
+            try {
+                reader = new FileReader(jsonFile);
+                JSONObject json = new JSONObject(new JSONTokener(reader));
+                JSONArray names = json.names();
+                for (int i = 0; i < names.length(); i++) {
+                    User user = new User(json.getJSONObject(names.getString(i)));
+                    users.put(user.getUserName(), user);
+                }
+                db.commit();
+                rebuildUserProperties();
+                log.info("User DB import finished successfully.");
+            } catch (IOException e) {
+                log.error("Cannot import user db from JSON data", e);
+            } catch (JSONException e) {
+                log.error("Cannot import user db from JSON data", e);
+            } finally {
+                if (reader != null) {
+                    try { reader.close(); } catch (IOException e) { }
+                }
+            }
         }
     }
 
@@ -100,7 +108,9 @@ public class UserManager extends Locator<User, String> {
 
 
     public void export() {
-        try (Writer writer = new FileWriter(new File(config.getConfDir(), "users.json"))) {
+        Writer writer = null;
+        try {
+            writer = new FileWriter(new File(config.getConfDir(), "users.json"));
             JSONObject obj = new JSONObject();
             for (Map.Entry<String,User> e : users.entrySet()) {
                 obj.put(e.getKey().toString(), e.getValue().toJSONObject());
@@ -110,6 +120,10 @@ public class UserManager extends Locator<User, String> {
             log.error("Cannot export user DB", e);
         } catch (IOException e) {
 
+        } finally {
+            if (writer != null) {
+                try { writer.close(); } catch (IOException e) { }
+            }
         }
     }
 
@@ -151,7 +165,7 @@ public class UserManager extends Locator<User, String> {
 
 
     public List<User> findAll() {
-        List<User> lst = new ArrayList<>(users.size());
+        List<User> lst = new ArrayList<User>(users.size());
         lst.addAll(users.values());
         return lst;
     }
@@ -173,13 +187,19 @@ public class UserManager extends Locator<User, String> {
 
     private void rebuildUserProperties() {
         File f = new File(config.getHomeDir(), "users.properties");
-        try (PrintWriter out = new PrintWriter(f)) {
+        PrintWriter out = null;
+        try {
+            out = new PrintWriter(f);
             for (User u : users.values()) {
                 out.println(u.getUserName() + ": " + u.getPassword() + ",VIEWER"
                     + (u.hasFlag(User.ADMIN_USER) ? ",ADMIN" : ""));
             }
         } catch (IOException e) {
             log.error("Cannot write users.properties file", e);
+        } finally {
+            if (out != null) {
+                out.close();
+            }
         }
     }
 }

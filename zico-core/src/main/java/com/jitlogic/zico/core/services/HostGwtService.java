@@ -19,6 +19,7 @@ package com.jitlogic.zico.core.services;
 import com.jitlogic.zico.core.HostStore;
 import com.jitlogic.zico.core.HostStoreManager;
 import com.jitlogic.zico.core.UserContext;
+import com.jitlogic.zico.shared.data.HostProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +58,16 @@ public class HostGwtService {
             hsm.delete(host.getName());
         } catch (IOException e) {
             log.error("Cannot remove host", e);
+        }
+    }
+
+    public void rebuildIndex(HostStore host) {
+        try {
+            if (!host.hasFlag(HostProxy.CHK_IN_PROGRESS)) {
+                host.rebuildIndex();
+            }
+        } catch (IOException e) {
+            log.error("Cannot rebuilt index for host " + host.getName(), e);
         }
     }
 }

@@ -24,6 +24,7 @@ import com.jitlogic.zorka.common.tracedata.SymbolicException;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 
+import java.util.Properties;
 import java.util.Random;
 
 public class ZicoTestUtil {
@@ -136,4 +137,14 @@ public class ZicoTestUtil {
     public static SymbolicException boo() {
         return new SymbolicException(new RuntimeException("BOO"), symbols, true);
     }
+
+    public static Properties setProps(Properties props, String... data) {
+
+        for (int i = 1; i < data.length; i += 2) {
+            props.setProperty(data[i - 1], data[i]);
+        }
+
+        return props;
+    }
+
 }

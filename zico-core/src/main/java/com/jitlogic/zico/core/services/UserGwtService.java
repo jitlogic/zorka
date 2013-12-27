@@ -52,7 +52,7 @@ public class UserGwtService {
     public List<String> getAllowedHosts(String username) {
         User user = locator.find(User.class, username);
         if (user != null && user.getAllowedHosts() != null) {
-            List<String> lst = new ArrayList<>();
+            List<String> lst = new ArrayList<String>();
             lst.addAll(user.getAllowedHosts());
             return lst;
         }

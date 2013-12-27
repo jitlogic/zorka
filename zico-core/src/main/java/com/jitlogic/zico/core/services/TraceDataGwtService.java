@@ -99,7 +99,7 @@ public class TraceDataGwtService {
             if (info != null && ctx != null) {
                 TraceRecord tr = ctx.getTraceRecord(info, path, minTime);
 
-                List<TraceRecordInfo> lst = new ArrayList<>();
+                List<TraceRecordInfo> lst = new ArrayList<TraceRecordInfo>();
 
                 if (path != null) {
                     packRecords(path, ctx, tr, lst, recursive);
