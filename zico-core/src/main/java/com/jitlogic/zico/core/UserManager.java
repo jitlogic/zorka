@@ -19,6 +19,10 @@ package com.jitlogic.zico.core;
 import com.google.inject.Singleton;
 import com.google.web.bindery.requestfactory.shared.Locator;
 import com.jitlogic.zico.core.model.User;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.slf4j.Logger;
@@ -26,10 +30,15 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentNavigableMap;
 
 @Singleton
@@ -42,6 +51,7 @@ public class UserManager extends Locator<User, String> {
 
     private ZicoConfig config;
 
+
     @Inject
     public UserManager(ZicoConfig config) {
         this.config = config;
@@ -49,15 +59,60 @@ public class UserManager extends Locator<User, String> {
         open();
     }
 
-    public void open() {
+
+    public synchronized void open() {
+
+        if (db != null) {
+            return;
+        }
+
         db = DBMaker.newFileDB(new File(config.getConfDir(), "users.db")).closeOnJvmShutdown().make();
         users = db.getTreeMap("USERS");
+
+        File jsonFile = new File(config.getConfDir(), "users.json");
+
+        if (users.size() == 0 && jsonFile.exists()) {
+               try (Reader reader = new FileReader(jsonFile)) {
+                   JSONObject json = new JSONObject(new JSONTokener(reader));
+                   JSONArray names = json.names();
+                   for (int i = 0; i < names.length(); i++) {
+                       User user = new User(json.getJSONObject(names.getString(i)));
+                       users.put(user.getUserName(), user);
+                   }
+                   db.commit();
+                   rebuildUserProperties();
+               } catch (IOException e) {
+                   log.error("Cannot import user db from JSON data", e);
+               } catch (JSONException e) {
+                   log.error("Cannot import user db from JSON data", e);
+               }
+        }
     }
 
-    public void close() {
-        db.close();
-        db = null; users = null;
+
+    public synchronized void close() {
+        if (db != null) {
+            db.close();
+            db = null;
+            users = null;
+        }
     }
+
+
+    public void export() {
+        try (Writer writer = new FileWriter(new File(config.getConfDir(), "users.json"))) {
+            JSONObject obj = new JSONObject();
+            for (Map.Entry<String,User> e : users.entrySet()) {
+                obj.put(e.getKey().toString(), e.getValue().toJSONObject());
+            }
+            obj.write(writer);
+        } catch (JSONException e) {
+            log.error("Cannot export user DB", e);
+        } catch (IOException e) {
+
+        }
+    }
+
 
     @Override
     public User create(Class<? extends User> aClass) {
@@ -94,11 +149,13 @@ public class UserManager extends Locator<User, String> {
         return 1;
     }
 
+
     public List<User> findAll() {
         List<User> lst = new ArrayList<>(users.size());
         lst.addAll(users.values());
         return lst;
     }
+
 
     public void persist(User user) {
         users.put(user.getUserName(), user);
@@ -112,6 +169,7 @@ public class UserManager extends Locator<User, String> {
         rebuildUserProperties();
         db.commit();
     }
+
 
     private void rebuildUserProperties() {
         File f = new File(config.getHomeDir(), "users.properties");

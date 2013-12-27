@@ -16,6 +16,9 @@
 package com.jitlogic.zico.core.model;
 
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 
 public class TraceTemplate implements Serializable {
@@ -33,6 +36,39 @@ public class TraceTemplate implements Serializable {
     String condRegex;
 
     String template;
+
+
+    public TraceTemplate() {
+
+    }
+
+
+    public TraceTemplate(JSONObject obj) throws JSONException {
+        this.id = obj.getInt("id");
+        this.traceId = obj.getInt("traceId");
+        this.order = obj.getInt("order");
+        this.flags = obj.getInt("flags");
+
+        this.condTemplate = obj.getString("condTemplate");
+        this.condRegex = obj.getString("condRegex");
+        this.template = obj.getString("template");
+    }
+
+
+    public JSONObject toJSONObject() throws JSONException {
+        JSONObject obj = new JSONObject();
+
+        obj.put("id", id);
+        obj.put("traceId", traceId);
+        obj.put("order", order);
+        obj.put("flags", flags);
+        obj.put("condTemplate", condTemplate);
+        obj.put("condRegex", condRegex);
+        obj.put("template", template);
+
+        return obj;
+    }
+
 
     public int getId() {
         return id;

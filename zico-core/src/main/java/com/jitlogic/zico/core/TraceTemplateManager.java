@@ -24,12 +24,23 @@ import com.jitlogic.zico.core.model.TraceInfo;
 import com.jitlogic.zico.core.model.TraceTemplate;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ObjectInspector;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -41,6 +52,8 @@ import java.util.NavigableMap;
 @Singleton
 public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
 
+    private final static Logger log = LoggerFactory.getLogger(TraceTemplateManager.class);
+
     private DB db;
 
     private NavigableMap<Integer,TraceTemplate> templates;
@@ -49,23 +62,54 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
 
     private ZicoConfig config;
 
+
     @Inject
     public TraceTemplateManager(ZicoConfig config) {
         this.config = config;
         open();
+    }
+
+
+    public void open() {
+
+        if (db != null) {
+            return;
+        }
+
+        db = DBMaker.newFileDB(new File(config.getConfDir(), "templates.db")).closeOnJvmShutdown().make();
+        templates = db.getTreeMap("TEMPLATES");
+
+        File jsonFile = new File(config.getConfDir(), "templates.json");
+
+        if (templates.size() == 0 && jsonFile.exists()) {
+            try (Reader reader = new FileReader(jsonFile)) {
+                JSONObject json = new JSONObject(new JSONTokener(reader));
+                JSONArray names = json.names();
+                for (int i = 0; i < names.length(); i++) {
+                    TraceTemplate t = new TraceTemplate(json.getJSONObject(names.getString(i)));
+                    templates.put(t.getId(), t);
+                }
+                db.commit();
+            } catch (IOException e) {
+                log.error("Cannot import user db from JSON data", e);
+            } catch (JSONException e) {
+                log.error("Cannot import user db from JSON data", e);
+            }
+        }
+
         reorder();
     }
 
-    public void open() {
-        db = DBMaker.newFileDB(new File(config.getConfDir(), "templates.db")).closeOnJvmShutdown().make();
-        templates = db.getTreeMap("TEMPLATES");
-    }
 
     public void close() {
-        db.close();
-        db = null;
-        templates=  null;
+        if (db != null) {
+            db.close();
+            db = null;
+            templates=  null;
+            orderedTemplates = null;
+        }
     }
+
 
     private void reorder() {
         List<TraceTemplate> ttl = new ArrayList<>(templates.size());
@@ -80,6 +124,23 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
         });
         orderedTemplates = ttl;
     }
+
+
+    public void export() {
+        try (Writer writer = new FileWriter(new File(config.getConfDir(), "templates.json"))) {
+            JSONObject obj = new JSONObject();
+            for (Map.Entry<Integer,TraceTemplate> e : templates.entrySet()) {
+                obj.put(e.getKey().toString(), e.getValue().toJSONObject());
+            }
+            obj.write(writer);
+        } catch (JSONException e) {
+            log.error("Cannot export template DB", e);
+        } catch (IOException e) {
+
+        }
+
+    }
+
 
     public String templateDescription(SymbolRegistry symbolRegistry, TraceInfo info) {
 
@@ -141,36 +202,41 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
     }
 
 
-
     public void remove(Integer tid) {
         templates.remove(tid);
         db.commit();
     }
+
 
     @Override
     public TraceTemplate create(Class<? extends TraceTemplate> aClass) {
         return new TraceTemplate();
     }
 
+
     @Override
     public TraceTemplate find(Class<? extends TraceTemplate> aClass, Integer templateId) {
         return templates.get(templateId);
     }
+
 
     @Override
     public Class<TraceTemplate> getDomainType() {
         return TraceTemplate.class;
     }
 
+
     @Override
     public Integer getId(TraceTemplate traceTemplate) {
         return traceTemplate.getId();
     }
 
+
     @Override
     public Class<Integer> getIdType() {
         return Integer.class;
     }
+
 
     @Override
     public Object getVersion(TraceTemplate traceTemplate) {

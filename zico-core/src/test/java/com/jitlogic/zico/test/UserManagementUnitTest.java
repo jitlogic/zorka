@@ -22,6 +22,7 @@ import com.jitlogic.zico.core.model.User;
 import com.jitlogic.zico.test.support.UserTestContext;
 import com.jitlogic.zico.test.support.ZicoFixture;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -30,6 +31,14 @@ import java.io.File;
 import java.util.Arrays;
 
 public class UserManagementUnitTest extends ZicoFixture {
+
+    private UserManager userManager;
+
+
+    @Before
+    public void setUp() {
+        userManager = injector.getInstance(UserManager.class);
+    }
 
 
     public static User mkUser(String userName, String realName, String passwd, int flags, String...hosts) {
@@ -104,5 +113,40 @@ public class UserManagementUnitTest extends ZicoFixture {
         uman.close(); uman.open();
         assertNotNull("User account should persist across restarts", userService.findUser("test"));
     }
-    // TODO test: shutdown, reopen user manager; check if data is still there;
+
+
+    @Test
+    public void testIfUserDbPersistsAcrossRestarts() {
+        userService.persist(mkUser("test", "Test User", "noPass", User.ADMIN_USER, "host1", "host2", "host3", "host4"));
+
+        userManager.close();
+        userManager.open();
+
+        User user = userService.findUser("test");
+        assertNotNull(user);
+        assertEquals("noPass", user.getPassword());
+        assertEquals(Arrays.asList("host1", "host2", "host3", "host4"), user.getAllowedHosts());
+    }
+
+
+    @Test
+    public void testExportImportUserDb() {
+        userService.persist(mkUser("test", "Test User", "noPass", User.ADMIN_USER, "host1", "host2", "host3", "host4"));
+        userManager.export();
+        userManager.close();
+
+        assertTrue("export file should exist", new File(config.getConfDir(), "users.json").exists());
+
+        for (String fname : new String[] { "users.db", "users.db.p", "users.db.t" }) {
+            new File(config.getConfDir(), fname).delete();
+        }
+
+        userManager.open();
+
+        User user = userService.findUser("test");
+        assertNotNull(user);
+        assertEquals("noPass", user.getPassword());
+        assertEquals(Arrays.asList("host1", "host2", "host3", "host4"), user.getAllowedHosts());
+    }
+
 }

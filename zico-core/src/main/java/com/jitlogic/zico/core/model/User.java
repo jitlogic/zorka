@@ -15,6 +15,10 @@
  */
 package com.jitlogic.zico.core.model;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +37,44 @@ public class User implements Serializable {
 
     private List<String> allowedHosts = new ArrayList<>();
 
+
+    public User() {
+
+    }
+
+
+    public User(JSONObject obj) throws JSONException {
+        userName = obj.getString("username");
+        realName = obj.getString("realname");
+        flags = obj.getInt("flags");
+        password = obj.getString("password");
+
+        JSONArray hosts = obj.getJSONArray("hosts");
+
+        for (int i = 0; i < hosts.length(); i++) {
+            allowedHosts.add(hosts.getString(i));
+        }
+    }
+
+
+    public JSONObject toJSONObject() throws JSONException {
+        JSONObject json = new JSONObject();
+
+        json.put("username", userName);
+        json.put("realname", realName);
+        json.put("password", password);
+        json.put("flags", flags);
+
+        JSONArray hosts = new JSONArray();
+
+        for (String host : allowedHosts) {
+            hosts.put(host);
+        }
+
+        json.put("hosts", hosts);
+
+        return json;
+    }
 
 
     public String getUserName() {
