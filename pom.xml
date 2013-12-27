@@ -30,7 +30,7 @@
         <bval.version>0.5</bval.version>
         <json.version>1.2</json.version>
         <guava.version>15.0</guava.version>
-        <mapdb.version>0.9.3</mapdb.version>
+        <mapdb.version>0.9.7</mapdb.version>
     </properties>
 
     <repositories>

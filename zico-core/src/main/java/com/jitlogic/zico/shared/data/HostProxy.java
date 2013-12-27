@@ -28,15 +28,24 @@ public interface HostProxy extends EntityProxy {
      * This flag indicates that incoming data will be dropped instead of being written in host data store.
      * Host data is still readable, so trace searches and call tree browsing is still possible.
      */
-    public static final int DISABLED = 0x00000001;
+    public static final int DISABLED = 0x0001;
 
     /**
      * This flag indicates that host is offline. Performance data cannot be read nor written, host info cannot be
      * modified (except for switching host back online). As all data files are closed, maintenance tasks can be
      * executed (eg. backup, database repair etc.).
      */
-    public static final int OFFLINE  = 0x00000002;
+    public static final int OFFLINE  = 0x0002;
 
+    /**
+     * Check needed (index rebuild, symbols etc.)
+     */
+    public static final int PRE_MIGRATE = 0x0004;
+
+    /**
+     * Datastore check in progress.
+     */
+    public static final int CHK_IN_PROGRESS = 0x0008;
 
     String getName();
 
