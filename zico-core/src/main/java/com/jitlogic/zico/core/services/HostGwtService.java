@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -45,13 +47,23 @@ public class HostGwtService {
 
 
     public List<HostStore> findAll() {
-        return hsm.list(ctx.isInRole("ADMIN") ? null : ctx.getUser());
+        List<HostStore> hostList = hsm.list(ctx.isInRole("ADMIN") ? null : ctx.getUser());
+
+        Collections.sort(hostList, new Comparator<HostStore>() {
+            @Override
+            public int compare(HostStore o1, HostStore o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
+
+        return hostList;
     }
 
 
     public void persist(HostStore host) {
         host.save();
     }
+
 
     public void remove(HostStore host) {
         try {
@@ -60,6 +72,7 @@ public class HostGwtService {
             log.error("Cannot remove host", e);
         }
     }
+
 
     public void rebuildIndex(HostStore host) {
         try {
