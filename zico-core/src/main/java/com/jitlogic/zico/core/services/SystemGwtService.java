@@ -16,8 +16,10 @@
 package com.jitlogic.zico.core.services;
 
 import com.google.inject.Singleton;
+import com.jitlogic.zico.core.HostStore;
 import com.jitlogic.zico.core.HostStoreManager;
 import com.jitlogic.zico.core.UserContext;
+import com.jitlogic.zico.core.UserManager;
 import com.jitlogic.zico.core.ZicoConfig;
 import com.jitlogic.zico.core.TraceTemplateManager;
 import com.jitlogic.zico.core.model.TraceTemplate;
@@ -40,6 +42,8 @@ public class SystemGwtService {
 
     private TraceTemplateManager templater;
 
+    private UserManager userManager;
+
     private UserContext userContext;
 
     private HostStoreManager hsm;
@@ -47,11 +51,12 @@ public class SystemGwtService {
 
     @Inject
     public SystemGwtService(ZicoConfig config, TraceTemplateManager templater,
-                            UserContext userContext, HostStoreManager hsm) {
+                            UserContext userContext, HostStoreManager hsm, UserManager userManager) {
         this.config = config;
         this.templater = templater;
         this.userContext = userContext;
         this.hsm = hsm;
+        this.userManager = userManager;
     }
 
 
@@ -76,7 +81,6 @@ public class SystemGwtService {
     public List<String> systemInfo() {
         List<String> info = new ArrayList<String>();
 
-        // TODO use agent to present these things - it's already there :)
         info.add("Version: " + config.stringCfg("zico.version", "<null>"));
 
         MemoryMXBean mem = ManagementFactory.getMemoryMXBean();
@@ -111,6 +115,15 @@ public class SystemGwtService {
         }
 
         return rslt;
+    }
+
+    public synchronized void backupConfig() {
+        userManager.export();
+        templater.export();
+
+        for (HostStore h : hsm.list(null)) {
+            h.export();
+        }
     }
 
 }

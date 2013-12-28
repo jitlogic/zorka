@@ -39,4 +39,5 @@ public interface SystemServiceProxy extends RequestContext {
 
     Request<List<SymbolProxy>> getTidMap(String hostName);
 
+    Request<Void> backupConfig();
 }

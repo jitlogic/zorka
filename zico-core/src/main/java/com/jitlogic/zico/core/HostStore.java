@@ -82,8 +82,6 @@ public class HostStore implements Closeable, RDSCleanupListener {
     private ConcurrentNavigableMap<Long, TraceInfoRecord> infos;
     private Map<Integer, String> tids;
 
-    private boolean needsCleanup = false;
-
     private String name;
     private String addr = "";
     private String pass = "";
@@ -177,6 +175,11 @@ public class HostStore implements Closeable, RDSCleanupListener {
             db = null;
             infos = null;
         }
+    }
+
+
+    public void export() {
+        symbolRegistry.export();
     }
 
 
