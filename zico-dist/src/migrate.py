@@ -4,7 +4,7 @@ import MySQLdb, json
 from os.path import isdir, exists
 from os import rename
 
-db = MySQLdb.connect('localhost', 'zorka', 'zorka', 'zorka')
+db = MySQLdb.connect('localhost', 'zico', 'zico', 'zico')
 
 # Export symbol table (to be used later)
 c = db.cursor()
@@ -31,6 +31,9 @@ pass=%s
 addr=%s
 """
 
+def null(s):
+    return "" if s is None else s
+
 for r in c:
   h = r[2]
   hosts[r[6]] = r[0]
@@ -38,7 +41,7 @@ for r in c:
     if not exists("data/%s/host.properties"%h):
       print "Generating data/%s/host.properties" % h
       with open("data/%s/host.properties"%h, "w") as f:
-        f.write(HOST_PROPS % (7,r[4],r[5],r[1]))
+        f.write(HOST_PROPS % (3,null(r[4]*10),null(r[5]),null(r[1])))
     if not exists("data/%s/symbols.dat"):
       print "Generating data/%s/symbols.json" % h
       with open("data/%s/symbols.json"%h,"w") as f:
@@ -49,14 +52,17 @@ for r in c:
 
 c.close()
 
-# 
+
+
+# Export users
+
 c = db.cursor()
 c.execute("select USER_ID,USER_NAME,REAL_NAME,FLAGS,PASSWORD from USERS")
 
 users = { }
 
 for r in c:
-  users[r[0]] = { "user_name": r[1], "real_name": r[2], "flags": r[3], "password": r[4], "hosts": [ ] }
+  users[r[1]] = { "username": r[1], "realname": r[2], "flags": r[3], "password": r[4], "hosts": [ ] }
 
 c.close()
 
@@ -69,16 +75,33 @@ for r in c:
 
 c.close()
 
-if not exists("users.db") and not exists("users.json"):
-  print "Generating user list ..."
-  with open("users.json", "w") as f:
+if not exists("conf/users.json"):
+  print "Generating user DB ..."
+  with open("conf/users.json", "w") as f:
     f.write(json.dumps(users))
 
+
+
+# Export templates
+
+templates = { }
+
+c = db.cursor();
+c.execute("select TEMPLATE_ID,TRACE_ID,ORDER_NUM,FLAGS,COND_TEMPLATE,COND_PATTERN,TEMPLATE from TEMPLATES")
+
+for r in c:
+  templates[r[0]] = { "id":r[0], "traceId":r[1], "order":r[2], "flags":r[3], "condTemplate":r[4], "condRegex":r[5], "template":r[6] }
+
+c.close()
+
+if not exists("conf/templates.json"):
+  print "Generating template DB ..."
+  with open("conf/templates.json", "w") as f:
+    f.write(json.dumps(templates))
 
 db.close()
 
 
-
-
-
 #print json.dumps(symbols)
+
+
