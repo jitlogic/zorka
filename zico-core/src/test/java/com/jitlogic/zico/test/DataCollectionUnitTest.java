@@ -266,7 +266,7 @@ public class DataCollectionUnitTest extends ZicoFixture {
     @Test(expected = ZicoRuntimeException.class)
     public void testTrySubmitToOfflineStore() throws Exception {
         HostStore testHost = hostStoreManager.getHost("test", true);
-        testHost.setOffline(true);
+        testHost.setEnabled(false);
         testHost.search(tiq("test", 0, null, 0, null));
     }
 
@@ -277,9 +277,8 @@ public class DataCollectionUnitTest extends ZicoFixture {
         TraceInfoSearchResult rslt1 = traceDataService.searchTraces(tiq("test", 0, null, 0, null));
         HostStore host = hostStoreManager.getHost("test", false);
 
-        host.setOffline(true);
         host.rebuildIndex();
-        host.setOffline(false);
+        host.setEnabled(true);
 
         TraceInfoSearchResult rslt2 = traceDataService.searchTraces(tiq("test", 0, null, 0, null));
 
@@ -302,9 +301,7 @@ public class DataCollectionUnitTest extends ZicoFixture {
 
         TraceInfoSearchResult rslt1 = traceDataService.searchTraces(tiq("test", 0, null, 0, null));
 
-        host.setOffline(true);
         host.rebuildIndex();
-        host.setOffline(false);
 
         TraceInfoSearchResult rslt2 = traceDataService.searchTraces(tiq("test", 0, null, 0, null));
 
@@ -330,9 +327,7 @@ public class DataCollectionUnitTest extends ZicoFixture {
 
         TraceInfoSearchResult rslt1 = traceDataService.searchTraces(tiq("test", 0, null, 0, null));
 
-        host.setOffline(true);
         host.rebuildIndex();
-        host.setOffline(false);
 
         TraceInfoSearchResult rslt2 = traceDataService.searchTraces(tiq("test", 0, null, 0, null));
 

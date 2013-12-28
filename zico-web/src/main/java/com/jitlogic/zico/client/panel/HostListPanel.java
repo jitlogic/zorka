@@ -75,11 +75,8 @@ public class HostListPanel extends VerticalLayoutContainer {
     private TextButton btnRefresh, btnAddHost, btnRemoveHost, btnEditHost, btnListTraces, btnDisableHost, btnEnableHost;
     private MenuItem mnuRefresh, mnuAddHost, mnuRemoveHost, mnuEditHost, mnuListTraces, mnuDisableHost, mnuEnableHost;
 
-    private MenuItem mnuRebuildIndex, mnuOfflineHost, mnuOnlineHost;
-
     private boolean selectionDependentControlsEnabled = true;
 
-    // TODO this is very badly written crutch. It will be fixed as soon as we move to GWT 2.6, so it will be in sync with Jetty 9.
     private boolean adminMode = false;
     private Menu contextMenu;
 
@@ -102,65 +99,6 @@ public class HostListPanel extends VerticalLayoutContainer {
     public void setAdminMode(boolean adminMode) {
         this.adminMode = adminMode;
         enableSelectionDependentControls(null);
-
-        if (adminMode) {
-            if (mnuRebuildIndex == null) {
-                contextMenu.add(new SeparatorMenuItem());
-                mnuRebuildIndex = new MenuItem("Rebuild Index");
-                contextMenu.add(mnuRebuildIndex);
-
-                mnuRebuildIndex.addSelectionHandler(new SelectionHandler<Item>() {
-                    @Override
-                    public void onSelection(SelectionEvent<Item> event) {
-                        rebuildHostIndex();
-                    }
-                });
-            }
-
-            if (mnuOfflineHost == null) {
-                mnuOfflineHost = new MenuItem("Take host offline");
-                contextMenu.add(mnuOfflineHost);
-
-                mnuOfflineHost.addSelectionHandler(new SelectionHandler<Item>() {
-                    @Override
-                    public void onSelection(SelectionEvent<Item> event) {
-                        offlineHost(true);
-                    }
-                });
-            }
-
-            if (mnuOnlineHost == null) {
-                mnuOnlineHost = new MenuItem("Bring host online");
-                contextMenu.add(mnuOnlineHost);
-
-                mnuOnlineHost.addSelectionHandler(new SelectionHandler<Item>() {
-                    @Override
-                    public void onSelection(SelectionEvent<Item> event) {
-                        offlineHost(false);
-                    }
-                });
-            }
-        }
-
-    }
-
-
-    private void rebuildHostIndex() {
-        HostProxy host = selectionModel.getSelectedItem();
-        if (host != null) {
-            rf.hostService().rebuildIndex(host).fire();
-            refresh();
-        }
-    }
-
-
-    private void offlineHost(boolean offline) {
-        HostProxy host = selectionModel.getSelectedItem();
-        if (host != null) {
-            HostServiceProxy req = rf.hostService();
-            req.edit(host).setOffline(offline);
-            req.fire();
-        }
     }
 
 
@@ -289,7 +227,7 @@ public class HostListPanel extends VerticalLayoutContainer {
         nameCol.setCell(new AbstractCell<HostProxy>() {
             @Override
             public void render(Context context, HostProxy host, SafeHtmlBuilder sb) {
-                String color = (host.isEnabled() && !host.isOffline()) ? "black" : "gray";
+                String color = (host.isEnabled()) ? "black" : "gray";
                 sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
                 sb.append(SafeHtmlUtils.fromString(host.getName()));
                 sb.appendHtmlConstant("</span>");
@@ -304,7 +242,7 @@ public class HostListPanel extends VerticalLayoutContainer {
         addrCol.setCell(new AbstractCell<HostProxy>() {
             @Override
             public void render(Context context, HostProxy host, SafeHtmlBuilder sb) {
-                String color = (host.isEnabled() && !host.isOffline()) ? "black" : "gray";
+                String color = (host.isEnabled()) ? "black" : "gray";
                 sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
                 sb.append(SafeHtmlUtils.fromString(host.getAddr()));
                 sb.appendHtmlConstant("</span>");

@@ -17,13 +17,14 @@ package com.jitlogic.zico.main.test;
 
 
 import com.jitlogic.zico.main.ZicoMain;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class HostCheckCommandManualTest {
 
-    @Test // This test is performed on bulk data that cannot be distributed
+    @Test @Ignore("This test is performed on bulk data that cannot be distributed.")
     public void testPerformHostCheck() throws Exception {
-        ZicoMain.main(new String[] { "check", "/tmp/zico_import_test", "host1" });
+        ZicoMain.main(new String[] { "check", "/vol/zico" });
     }
 
 }

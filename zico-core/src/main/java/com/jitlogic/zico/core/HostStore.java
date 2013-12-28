@@ -110,7 +110,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
         this.templater = templater;
 
-        if (!hasFlag(HostProxy.OFFLINE)) {
+        if (!hasFlag(HostProxy.DISABLED)) {
             open();
         }
     }
@@ -120,7 +120,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
         try {
             if (symbolRegistry == null) {
                 symbolRegistry = new PersistentSymbolRegistry(
-                    new File(ZicoUtil.ensureDir(rootPath), "symbools.dat"));
+                    new File(ZicoUtil.ensureDir(rootPath), "symbols.dat"));
             }
 
             if (traceDataStore == null) {
@@ -220,12 +220,12 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
         log.info("Start rebuildIndex() operation for host " + name);
 
-        boolean offline = isOffline();
+        boolean enabled = isEnabled();
 
         flags |= HostProxy.CHK_IN_PROGRESS;
 
-        if (!offline) {
-            setOffline(true);
+        if (enabled) {
+            setEnabled(false);
         }
 
         // Remove old files (if any)
@@ -260,7 +260,12 @@ public class HostStore implements Closeable, RDSCleanupListener {
                             byte[] buf = new byte[(int)seg.getLogicalLen()];
                             is.seek((int)seg.getLogicalPos());
                             is.read(buf);
-                            rebuildSegmentIndex(fileBasePos, seg, buf, stats);
+                            try {
+                                rebuildSegmentIndex(fileBasePos, seg, buf, stats);
+                            } catch (Exception e) {
+                                log.warn("Dropping rest of segment " + seg + " of " + name + "/tdat/"
+                                        + fname + " due to error.", e);
+                            }
                         }
                     }
                 } catch (Exception e) {
@@ -274,7 +279,9 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
         flags &= ~HostProxy.CHK_IN_PROGRESS;
 
-        setOffline(offline);
+        if (enabled) {
+            setEnabled(enabled);
+        }
 
         save();
 
@@ -307,10 +314,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
                 }
                 lastPos += dataLen;
             } catch (EOFException e) {
-
-            } catch (Exception e1) {
-                stats[1]++;
-                //log.error("Cannot process segment " + seg + " ; Skipping trace.", e1);
+                // This is normal.
             }
         }
     }
@@ -330,8 +334,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
 
     private void checkEnabled() {
-        if (hasFlag(HostProxy.OFFLINE|HostProxy.DISABLED)) {
-            throw new ZicoRuntimeException("Host " + name + " is disabled or offline.");
+        if (hasFlag(HostProxy.DISABLED)) {
+            throw new ZicoRuntimeException("Host " + name + " is disabled. Bring it back online before issuing operation.");
         }
     }
 
@@ -522,7 +526,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
         this.addr = props.getProperty(PROP_ADDR, "127.0.0.1");
         this.pass = props.getProperty(PROP_PASS, "");
         this.flags = Integer.parseInt(props.getProperty(PROP_FLAGS, "0"));
-        this.maxSize = Integer.parseInt(props.getProperty(PROP_SIZE,
+        this.maxSize = Long.parseLong(props.getProperty(PROP_SIZE,
                 "" + config.kiloCfg("rds.max.size", 1024 * 1024 * 1024L)));
 
     }
@@ -664,54 +668,26 @@ public class HostStore implements Closeable, RDSCleanupListener {
     }
 
 
-    public boolean isEnabled() {
-        return hasFlag(HostProxy.DISABLED);
+    public synchronized boolean isEnabled() {
+        return !hasFlag(HostProxy.DISABLED);
     }
 
 
-    public void setEnabled(boolean enabled) {
-
-        if (hasFlag(HostProxy.OFFLINE)) {
-            throw new ZicoRuntimeException("Host is offline.");
-        }
+    public synchronized void setEnabled(boolean enabled) {
 
         if (enabled) {
+            log.info("Bringing host " + name + " online.");
             flags &= ~HostProxy.DISABLED;
+            open();
         } else {
+            log.info("Taking host " + name + " offline.");
+            close();
             flags |= HostProxy.DISABLED;
         }
 
         save();
     }
 
-
-    public boolean isOffline() {
-        return hasFlag(HostProxy.OFFLINE);
-    }
-
-
-    public void setOffline(boolean offline) {
-
-        if (hasFlag(HostProxy.CHK_IN_PROGRESS)) {
-            throw new ZicoRuntimeException("Datastore check operation in progress.");
-        }
-
-        try {
-            if (offline) {
-                log.info("Taking host " + name + " offline.");
-                close();
-                flags |= HostProxy.OFFLINE|HostProxy.DISABLED;
-                save();
-            } else {
-                log.info("Bringing host " + name + " online.");
-                open();
-                flags &= ~(HostProxy.OFFLINE|HostProxy.DISABLED);
-                save();
-            }
-        } catch (Exception e) {
-            log.error("Error changing host status", e);
-        }
-    }
 
 }
 
