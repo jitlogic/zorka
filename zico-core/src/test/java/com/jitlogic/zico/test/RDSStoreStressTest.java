@@ -87,4 +87,14 @@ public class RDSStoreStressTest extends ZicoFixture {
         }
     }
 
+
+    @Test
+    public void testRdsOpenClose() throws Exception {
+        String path = tmpFile("testrds");
+        for (int i = 0; i < 100; i++) {
+            rds = new RDSStore(path, 1024*1024*1024, 16*1024*1024, 1024*1024);
+            rds.close();
+        }
+    }
+
 }
