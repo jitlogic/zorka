@@ -117,7 +117,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService {
     /**
      * Processes single item from submit queue (if any).
      */
-    protected void runCycle() {
+    public void runCycle() {
         try {
             T obj = submitQueue.take();
             if (obj != null) {
@@ -154,7 +154,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService {
      * Override this method if some resources have to be allocated
      * before thread starts (eg. network socket).
      */
-    protected void open() {
+    public void open() {
 
     }
 
@@ -163,7 +163,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService {
      * Override this method if some resources have to be disposed
      * after thread stops (eg. network socket)
      */
-    protected void close() {
+    public void close() {
 
     }
 
@@ -194,5 +194,9 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService {
 
     public void disableTrapCounter() {
         countTraps = false;
+    }
+
+    public BlockingQueue<T> getSubmitQueue() {
+        return submitQueue;
     }
 }

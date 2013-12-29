@@ -213,13 +213,13 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
 
 
     @Override
-    protected void open() {
+    public void open() {
         reset();
     }
 
 
     @Override
-    protected void close() {
+    public void close() {
         if (out != null) {
             out.close();
             out = null;
