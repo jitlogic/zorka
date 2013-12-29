@@ -475,8 +475,9 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
             q.setOffset(list.get(list.size()-1).getDataOffs()+2);
         }
 
-        if (cmbTraceType.getValue() != null && cmbTraceType.getValue() != 0) {
-            q.setTraceName(traceTypes.get(cmbTraceType.getValue()));
+        Integer tid = cmbTraceType.getCurrentValue();
+        if (tid != null && tid != 0) {
+            q.setTraceName(traceTypes.get(tid));
         }
 
         if (txtFilter.getText() != null && txtFilter.getText().length() > 0) {

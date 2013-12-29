@@ -499,7 +499,15 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public Map<Integer, String> getTidMap() {
         checkEnabled();
-        return Collections.unmodifiableMap(tids);
+
+        // TODO this is a crutch. This really should be just a set of trace IDs
+        Map<Integer,String> tidMap = new HashMap<Integer, String>();
+
+        for (Integer tid : tids.keySet()) {
+            tidMap.put(tid, symbolRegistry.symbolName(tid));
+        }
+
+        return tidMap;
     }
 
 

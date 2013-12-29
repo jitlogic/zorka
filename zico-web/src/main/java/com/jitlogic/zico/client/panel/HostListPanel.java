@@ -37,6 +37,7 @@ import com.google.gwt.user.cellview.client.IdentityColumn;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.ProvidesKey;
+import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
 import com.google.web.bindery.requestfactory.shared.Receiver;
@@ -304,6 +305,13 @@ public class HostListPanel extends VerticalLayoutContainer {
                 event.preventDefault();
             }
         }, ContextMenuEvent.getType());
+
+        selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+            @Override
+            public void onSelectionChange(SelectionChangeEvent event) {
+                enableSelectionDependentControls(selectionModel.getSelectedObject());
+            }
+        });
 
         refresh();
 

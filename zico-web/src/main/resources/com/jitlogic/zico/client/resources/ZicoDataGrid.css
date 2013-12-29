@@ -43,6 +43,16 @@
     -ms-user-select: none;
 }
 
+.dataGridEvenRow {
+    background: #ffffff;
+    cursor: default;
+}
+
+.dataGridOddRow {
+    background: #ffffff;
+    cursor: default;
+}
+
 .dataGridEvenRowCell {
     border: none !important;
 }
