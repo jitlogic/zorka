@@ -13,11 +13,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.main;
+package com.jitlogic.zico.util;
+
+import com.jitlogic.zorka.common.util.ZorkaUtil;
+
+import java.util.Map;
 
 
-public interface ZicoCommand {
+public class ZicoMain {
 
-    void run(String[] args) throws Exception;
+    private static final Map<String,ZicoCommand> commands = ZorkaUtil.map(
+            "check", new ZicoHostStoreCheckCommand(),
+            "help", new ZicoHelpCommand()
+    );
+
+    public static void main(String[] args) throws Exception {
+
+        if (args.length < 1) {
+            commands.get("help").run(args);
+            return;
+        }
+
+        ZicoCommand cmd = commands.get(args[0]);
+
+        if (cmd == null) {
+            System.err.println("Unknown command: " + args[0]);
+            commands.get("help").run(args);
+            return;
+        }
+
+        cmd.run(args);
+    }
 
 }

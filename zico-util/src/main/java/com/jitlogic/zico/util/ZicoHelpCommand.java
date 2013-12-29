@@ -13,18 +13,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.main.test;
+package com.jitlogic.zico.util;
 
 
-import com.jitlogic.zico.main.ZicoMain;
-import org.junit.Ignore;
-import org.junit.Test;
+public class ZicoHelpCommand implements ZicoCommand {
 
-public class HostCheckCommandManualTest {
-
-    @Test @Ignore("This test is performed on bulk data that cannot be distributed.")
-    public void testPerformHostCheck() throws Exception {
-        ZicoMain.main(new String[] { "check", "/vol/zico" });
+    @Override
+    public void run(String[] args) throws Exception {
+        System.err.println("Available commands:\n"
+            + "    help     - print this help"
+            + "    check <home> <host1> [<host2> ...] - check and reindex host data stores"
+            + "    serve    - run ZICO server");
     }
 
 }

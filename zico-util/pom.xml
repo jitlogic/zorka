@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>zorka</artifactId>
         <groupId>com.jitlogic.zorka</groupId>
         <version>0.9.14-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>zorka-agent</artifactId>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>zico-util</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.jitlogic.zorka</groupId>
-            <artifactId>zorka-core</artifactId>
+            <artifactId>zico-core</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
@@ -28,12 +28,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Premain-Class>com.jitlogic.zorka.agent.AgentMain</Premain-Class>
-                            <!-- <Agent-Class>com.jitlogic.zorka.agent.AgentMain</Agent-Class> -->
-                            <Boot-Class-Path>zorka.jar</Boot-Class-Path>
-                            <Can-Redefine-Classes>true</Can-Redefine-Classes>
-                            <Can-Retransform-Classes>true</Can-Retransform-Classes>
-                            <Can-Set-Native-Method-Prefix>true</Can-Set-Native-Method-Prefix>
+                            <Main-Class>com.jitlogic.zico.util.ZicoMain</Main-Class>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -50,49 +45,47 @@
                         </goals>
                         <configuration>
                             <includes>
-                                <include>org.ow2.asm:asm</include>
                                 <include>com.jitlogic.zorka:zorka-common</include>
-                                <include>com.jitlogic.zoola:zoola-core</include>
-                                <include>com.jitlogic.contrib:libsnmp</include>
-                                <include>com.jitlogic.zorka:zorka-core</include>
+                                <include>com.jitlogic.zorka:zico-core</include>
+                                <include>org.ow2.asm:asm</include>
                                 <include>org.fressian:fressian</include>
+                                <include>org.mapdb:mapdb</include>
+                                <include>org.slf4j:slf4j-api</include>
+                                <include>org.slf4j:slf4j-simple</include>
+                                <include>org.json:json</include>
+                                <include>ch.qos.logback:logback-core</include>
+                                <include>ch.qos.logback:logback-classic</include>
                             </includes>
                             <rules>
-                                <rule>
-                                    <pattern>org.objectweb.asm.**</pattern>
-                                    <result>com.jitlogic.zorka.deps.asm.@1</result>
-                                </rule>
-                                <rule>
-                                    <pattern>bsh.**</pattern>
-                                    <result>com.jitlogic.zorka.deps.bsh.@1</result>
-                                </rule>
-                                <rule>
-                                    <pattern>com.jitlogic.contrib.**</pattern>
-                                    <result>com.jitlogic.zorka.deps.@1</result>
-                                </rule>
-                                <rule>
-                                    <pattern>org.fressian.**</pattern>
-                                    <result>com.jitlogic.zorka.deps.fressian.@1</result>
-                                </rule>
                                 <keep>
                                     <pattern>com.jitlogic.zorka.**</pattern>
                                 </keep>
+                                <keep>
+                                    <pattern>com.jitlogic.zico.**</pattern>
+                                </keep>
+                                <rule>
+                                    <pattern>org.objectweb.asm.**</pattern>
+                                    <result>asm.@1</result>
+                                </rule>
+                                <rule>
+                                    <pattern>org.fressian.**</pattern>
+                                    <result>fressian.@1</result>
+                                </rule>
+                                <rule>
+                                    <pattern>org.mapdb.**</pattern>
+                                    <result>mapdb.@1</result>
+                                </rule>
+                                <keep>
+                                    <pattern>org.slf4j.**</pattern>
+                                </keep>
+                                <keep>
+                                    <pattern>ch.qos.logback.**</pattern>
+                                </keep>
+                                <rule>
+                                    <pattern>org.json</pattern>
+                                    <result>json</result>
+                                </rule>
                             </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>retrotranslator-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>translate-project</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>jdk15</classifier>
-                            <attach>true</attach>
                         </configuration>
                     </execution>
                 </executions>

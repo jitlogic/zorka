@@ -13,17 +13,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zico.main;
+package com.jitlogic.zico.util;
 
 
-public class ZicoHelpCommand implements ZicoCommand {
+public interface ZicoCommand {
 
-    @Override
-    public void run(String[] args) throws Exception {
-        System.err.println("Available commands:\n"
-            + "    help     - print this help"
-            + "    check <home> <host1> [<host2> ...] - check and reindex host data stores"
-            + "    serve    - run ZICO server");
-    }
+    void run(String[] args) throws Exception;
 
 }

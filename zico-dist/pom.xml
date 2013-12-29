@@ -33,6 +33,8 @@
                                 <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/tmp"/>
                                 <copy file="../zico-web/target/zico.war"
                                       toFile="${project.build.outputDirectory}/zico-${project.version}/zico.war"/>
+                                <copy file="../zico-util/target/zico-util-${project.version}.jar"
+                                      toFile="${project.build.outputDirectory}/zico-${project.version}/zico-util.jar"/>
                                 <copy file="../COPYING"
                                       toDir="${project.build.outputDirectory}/zico-${project.version}"/>
                                 <copy file="src/zico.properties"

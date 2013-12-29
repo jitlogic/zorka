@@ -1,4 +1,4 @@
-package com.jitlogic.zico.main; /**
+/**
  * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
@@ -13,36 +13,92 @@ package com.jitlogic.zico.main; /**
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+package com.jitlogic.zico.main;
 
-import com.jitlogic.zorka.common.util.ZorkaUtil;
 
-import java.util.Map;
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.webapp.WebAppContext;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.security.ProtectionDomain;
+import java.util.Properties;
 
 public class ZicoMain {
 
-    private static final Map<String,ZicoCommand> commands = ZorkaUtil.map(
-            "check", new ZicoHostStoreCheckCommand(),
-            "help", new ZicoHelpCommand(),
-            "serve", new ZicoServeCommand()
-    );
+    private int port;
+    private String homeDir;
+
+    private Server server;
+    private WebAppContext webapp;
+
 
     public static void main(String[] args) throws Exception {
+        new ZicoMain().run();
+    }
 
-        if (args.length < 1) {
-            commands.get("help").run(args);
-            return;
+
+    public void run() throws Exception {
+        configure();
+
+        initServer();
+
+        server.start();
+        server.join();
+    }
+
+    private void initServer() {
+        server = new Server(port);
+        ProtectionDomain domain = Server.class.getProtectionDomain();
+        URL location = domain.getCodeSource().getLocation();
+
+        webapp = new WebAppContext();
+        webapp.setContextPath("/");
+        webapp.setDescriptor(location.toExternalForm() + "/WEB-INF/web.xml");
+        webapp.setServer(server);
+        webapp.setWar(location.toExternalForm());
+        webapp.setTempDirectory(new File(homeDir, "tmp"));
+
+        server.setHandler(webapp);
+    }
+
+    private void configure() throws IOException {
+
+        homeDir = System.getProperty("zico.home.dir");
+
+        if (homeDir == null) {
+            System.err.println("ERROR: Missing home dir property: add -Dzico.home.dir=<path-to-collector-home> to JVM args.");
+            System.exit(1);
         }
 
-        ZicoCommand cmd = commands.get(args[0]);
+        String strPort = System.getProperty("zico.http.port", "8642").trim();
 
-        if (cmd == null) {
-            System.err.println("Unknown command: " + args[0]);
-            commands.get("help").run(args);
-            return;
+        Properties props = new Properties();
+
+        InputStream fis = null;
+        try {
+            fis = new FileInputStream(new File(homeDir, "zico.properties"));
+            props.load(fis);
+        } catch (IOException e) {
+            System.err.println("Cannot open zico.properties file: " + e.getMessage());
+            System.exit(1);
+        } finally {
+            if (fis != null) {
+                fis.close();
+            }
         }
 
-        cmd.run(args);
+        strPort = props.getProperty("zico.http.port", strPort).trim();
+
+        try {
+            port = Integer.parseInt(strPort);
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid HTTP port setting (not a number): " + strPort);
+            System.exit(1);
+        }
     }
 
 }
