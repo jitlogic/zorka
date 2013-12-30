@@ -105,6 +105,10 @@ public class WelcomePanel implements IsWidget {
                     createAdminPortlet();
                 }
             }
+            @Override
+            public void onFailure(ServerFailure failure) {
+                errorHandler.error("Error performing server request", failure);
+            }
         });
 
 
@@ -160,7 +164,7 @@ public class WelcomePanel implements IsWidget {
 
                     @Override
                     public void onFailure(ServerFailure failure) {
-                        Window.alert("Error backing up symbols and configuration.");
+                        errorHandler.error("Error backing up symbols and configuration.", failure);
                     }
                 });
             }
@@ -200,6 +204,10 @@ public class WelcomePanel implements IsWidget {
             @Override
             public void onSuccess(List<SymbolProxy> response) {
                 shell.get().addView(panelFactory.traceTemplatePanel(response), "Templates");
+            }
+            @Override
+            public void onFailure(ServerFailure failure) {
+                errorHandler.error("Error opening template panel", failure);
             }
         });
     }

@@ -22,6 +22,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.client.panel.HostListPanel;
 import com.jitlogic.zico.client.portal.WelcomePanel;
@@ -42,6 +43,7 @@ public class ZicoShell extends BorderLayoutContainer {
     private final static int DX = 0;
     private final static int DY = 0;
 
+    private ErrorHandler errorHandler;
 
     public static final Resources.ZicoDataGridCssResources ZICO_DATA_GRID_CSS_RESOURCES
             = GWT.create(Resources.ZicoDataGridCssResources.class);
@@ -54,10 +56,11 @@ public class ZicoShell extends BorderLayoutContainer {
 
     @Inject
     public ZicoShell(final HostListPanel hostListPanel,
-                     ZicoRequestFactory rf,
+                     ZicoRequestFactory rf, ErrorHandler errorHandler,
                      WelcomePanel welcomePanel) {
 
         this.rf = rf;
+        this.errorHandler = errorHandler;
 
         Window.enableScrolling(false);
         setPixelSize(Window.getClientWidth() - DX, Window.getClientHeight() - DY);
@@ -106,6 +109,10 @@ public class ZicoShell extends BorderLayoutContainer {
             @Override
             public void onSuccess(Boolean response) {
                 hostListPanel.setAdminMode(response);
+            }
+            @Override
+            public void onFailure(ServerFailure error) {
+                ZicoShell.this.errorHandler.error("Error", error);
             }
         });
     }

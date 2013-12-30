@@ -15,7 +15,6 @@
  */
 package com.jitlogic.zico.core;
 
-
 import com.jitlogic.zico.core.eql.Parser;
 import com.jitlogic.zico.core.model.KeyValuePair;
 import com.jitlogic.zico.core.model.SymbolicExceptionInfo;
@@ -33,6 +32,7 @@ import com.jitlogic.zico.core.search.FullTextTraceRecordMatcher;
 import com.jitlogic.zico.core.search.TraceRecordMatcher;
 import com.jitlogic.zico.shared.data.HostProxy;
 import com.jitlogic.zico.shared.data.TraceInfoSearchQueryProxy;
+import com.jitlogic.zico.shared.data.TraceInfoSearchResultProxy;
 import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicException;
@@ -88,6 +88,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
     private int flags;
     private long maxSize;
 
+    private static final long MAX_SEARCH_T1 = 3000000000L;
+    private static final long MAX_SEARCH_T2 = 30000000000L;
 
     public HostStore(ZicoConfig config, TraceTemplateManager templater, String name) {
 
@@ -179,7 +181,9 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
 
     public void export() {
-        symbolRegistry.export();
+        if (symbolRegistry != null) {
+            symbolRegistry.export();
+        }
     }
 
 
@@ -374,6 +378,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
                 ? infos.higherKey(query.getOffset() != 0 ? query.getOffset() : Long.MIN_VALUE)
                 : infos.lowerKey(query.getOffset() != 0 ? query.getOffset() : Long.MAX_VALUE);
 
+        long tstart = System.nanoTime();
+
         for (Long key = initialKey; key != null; key = asc ? infos.higherKey(key) : infos.lowerKey(key)) {
 
             TraceInfoRecord tir = infos.get(key);
@@ -401,8 +407,9 @@ public class HostStore implements Closeable, RDSCleanupListener {
                 if (matcher == null || recursiveMatch(matcher, idxtr)) {
                     lst.add(toTraceInfo(tir, idxtr));
                     result.setLastOffs(asc ? tir.getDataOffs() + 1 : tir.getDataOffs() - 1);
-                    if (lst.size() == query.getLimit()) {
-                        result.markFlag(TraceInfoSearchResult.MORE_RESULTS);
+                    long t = System.nanoTime()-tstart;
+                    if ((lst.size() >= query.getLimit()) || (t > MAX_SEARCH_T1 && lst.size() > 0) || (t > MAX_SEARCH_T2)) {
+                        result.markFlag(TraceInfoSearchResultProxy.MORE_RESULTS);
                         return result;
                     }
                 }
@@ -600,13 +607,15 @@ public class HostStore implements Closeable, RDSCleanupListener {
     @Override
     public void onChunkRemoved(RDSStore origin, Long start, Long length) {
         if (traceDataStore != null && origin == traceDataStore.getRds()) {
+            log.info("Removing old index entries for host " + name);
             long idxOffs = -1;
             while (infos.size() > 0 && infos.firstEntry().getValue().getDataOffs() < (start+length)) {
-                idxOffs = Math.min(idxOffs, infos.firstEntry().getValue().getIndexOffs());
+                idxOffs = Math.max(idxOffs, infos.firstEntry().getValue().getIndexOffs());
                 infos.remove(infos.firstKey());
             }
             if (idxOffs > 0) {
                 try {
+                    log.info("Cleaning up index RDS for host " + name + " (idxOffs=" + idxOffs + ")");
                     traceIndexStore.getRds().cleanup(idxOffs);
                 } catch (IOException e) {
                     log.error("Problem cleaning up index store", e);

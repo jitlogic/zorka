@@ -48,7 +48,9 @@ import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ClientUtil;
+import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.inject.PanelFactory;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
@@ -83,6 +85,7 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
     private TraceInfoProxy trace;
 
     private TraceRecordSearchDialog searchDialog;
+    private ErrorHandler errorHandler;
     private PanelFactory panelFactory;
 
     private DataGrid<TraceRecordProxy> grid;
@@ -105,9 +108,11 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
 
 
     @Inject
-    public TraceCallTreePanel(ZicoRequestFactory rf, PanelFactory panelFactory, @Assisted TraceInfoProxy trace) {
+    public TraceCallTreePanel(ZicoRequestFactory rf, PanelFactory panelFactory, ErrorHandler errorHandler,
+                              @Assisted TraceInfoProxy trace) {
         this.rf = rf;
         this.panelFactory = panelFactory;
+        this.errorHandler = errorHandler;
         this.trace = trace;
 
         createToolbar();
@@ -391,6 +396,11 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
                         grid.getRowElement(0).scrollIntoView();
                     }
                 }
+                @Override
+                public void onFailure(ServerFailure failure) {
+                    popup.hide();
+                    errorHandler.error("Error loading trace data", failure);
+                }
             });
     }
 
@@ -503,6 +513,10 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
                         for (int i = 0; i < newrecs.size(); i++) {
                             list.add(idx+i, newrecs.get(i));
                         }
+                    }
+                    @Override
+                    public void onFailure(ServerFailure failure) {
+                        errorHandler.error("Error loading trace data", failure);
                     }
                 }
         );

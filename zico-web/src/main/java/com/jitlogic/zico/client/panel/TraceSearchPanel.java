@@ -89,6 +89,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
 
     private PanelFactory pf;
     private ZicoRequestFactory rf;
+
     private ErrorHandler errorHandler;
 
     private Provider<ZicoShell> shell;
@@ -456,10 +457,14 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     }
 
     private void loadMore() {
+        loadMore(50);
+    }
+
+    private void loadMore(final int limit) {
         toggleSearchMode(true);
         TraceDataServiceProxy req = rf.traceDataService();
         TraceInfoSearchQueryProxy q = req.create(TraceInfoSearchQueryProxy.class);
-        q.setLimit(50);
+        q.setLimit(limit);
         q.setHostName(host.getName());
         q.setSeq(seqnum);
 
@@ -495,12 +500,16 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
                     List<TraceInfoProxy> results = response.getResults();
                     data.getList().addAll(results);
                     toggleSearchMode(false);
+                    if (0 != (response.getFlags() & TraceInfoSearchResultProxy.MORE_RESULTS) && results.size() < limit) {
+                        loadMore(limit-results.size());
+                    }
                 }
             }
 
             @Override
             public void onFailure(ServerFailure error) {
                 toggleSearchMode(false);
+                errorHandler.error("Trace search request failed", error);
             }
         });
     }
@@ -513,6 +522,11 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
                     traceTypes.put(e.getId(), e.getName());
                     cmbTraceType.add(e.getId());
                 }
+            }
+
+            @Override
+            public void onFailure(ServerFailure error) {
+                errorHandler.error("Error loading TID map", error);
             }
         });
     }

@@ -26,6 +26,8 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
+import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.inject.PanelFactory;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
@@ -94,6 +96,7 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
 
     private ZicoRequestFactory rf;
     private PanelFactory panelFactory;
+    private ErrorHandler errorHandler;
     private UserServiceProxy newUserRequest;
 
     private ListStore<UserProxy> userStore;
@@ -102,17 +105,18 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
     private UserProxy selectedUser;
 
     private List<HostProxy> hosts = new ArrayList<HostProxy>();
-    private Set<Integer> allowedHosts = new HashSet<Integer>();
+    private Set<String> allowedHosts = new HashSet<String>();
 
     private ListStore<HostProxy> hostStore;
     private CheckBoxSelectionModel<HostProxy> hostSelection;
     private Grid<HostProxy> hostGrid;
 
     @Inject
-    public UserManagementPanel(ZicoRequestFactory requestFactory, PanelFactory panelFactory) {
+    public UserManagementPanel(ZicoRequestFactory requestFactory, PanelFactory panelFactory, ErrorHandler errorHandler) {
 
         this.rf = requestFactory;
         this.panelFactory = panelFactory;
+        this.errorHandler = errorHandler;
 
         loadHosts();
         createUi();
@@ -243,7 +247,11 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
                     new Receiver<List<String>>() {
                         @Override
                         public void onSuccess(List<String> hostIds) {
-                            // TODO updateHosts(hostIds);
+                            updateHosts(hostIds);
+                        }
+                        @Override
+                        public void onFailure(ServerFailure failure) {
+                            errorHandler.error("Error loading user data", failure);
                         }
                     }
                 );
@@ -298,6 +306,10 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
             public void onSuccess(Void aVoid) {
                 refreshUsers();
             }
+            @Override
+            public void onFailure(ServerFailure failure) {
+                errorHandler.error("Error saving user data", failure);
+            }
         });
     }
 
@@ -328,18 +340,18 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
     }
 
 
-    private void updateHosts(List<Integer> hostIds) {
+    private void updateHosts(List<String> hostIds) {
         hostStore.clear();
         hostStore.addAll(hosts);
         allowedHosts.clear();
         allowedHosts.addAll(hostIds);
-        Set<Integer> hostIdSet = new HashSet<Integer>();
+        Set<String> hostIdSet = new HashSet<String>();
         hostIdSet.addAll(hostIds);
         List<HostProxy> selectedHosts = new ArrayList<HostProxy>();
         for (HostProxy host : hosts) {
-//   TODO TBD         if (hostIdSet.contains(host.getId())) {
-//   TODO TBD             selectedHosts.add(host);
-//   TODO TBD         }
+            if (hostIdSet.contains(host.getName())) {
+                selectedHosts.add(host);
+            }
         }
         hostSelection.setSelection(selectedHosts);
     }
@@ -405,6 +417,10 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
             public void onSuccess(List<UserProxy> users) {
                 userStore.addAll(users);
             }
+            @Override
+            public void onFailure(ServerFailure failure) {
+                errorHandler.error("Error loading user data", failure);
+            }
         });
     }
 
@@ -414,6 +430,10 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
             @Override
             public void onSuccess(List<HostProxy> hosts) {
                 UserManagementPanel.this.hosts = hosts;
+            }
+            @Override
+            public void onFailure(ServerFailure failure) {
+                errorHandler.error("Error loading user data", failure);
             }
         });
     }

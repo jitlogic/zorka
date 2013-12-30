@@ -20,8 +20,6 @@ import java.util.List;
 
 public class TraceInfoSearchResult {
 
-    public static final int MORE_RESULTS = 1;
-
     private int seq;
 
     private int flags;

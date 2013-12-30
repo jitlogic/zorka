@@ -21,6 +21,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.client.props.MethodRankInfoProperties;
@@ -137,6 +138,10 @@ public class MethodRankingPanel extends VerticalLayoutContainer {
                     public void onSuccess(List<MethodRankInfoProxy> ranking) {
                         rankStore.clear();
                         rankStore.addAll(ranking);
+                    }
+                    @Override
+                    public void onFailure(ServerFailure error) {
+                        errorHandler.error("Error loading method rank data", error);
                     }
                 }
         );

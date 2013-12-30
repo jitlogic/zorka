@@ -17,6 +17,7 @@ package com.jitlogic.zico.client.panel;
 
 
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.shared.data.HostProxy;
@@ -159,6 +160,10 @@ public class HostPrefsDialog extends Dialog {
             public void onSuccess(Void aVoid) {
                 hide();
                 panel.refresh();
+            }
+            @Override
+            public void onFailure(ServerFailure error) {
+                errorHandler.error("Cannot save host settings", error);
             }
         });
     }

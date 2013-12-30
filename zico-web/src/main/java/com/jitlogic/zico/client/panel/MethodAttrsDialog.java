@@ -23,6 +23,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.shared.data.KeyValueProxy;
@@ -78,6 +79,10 @@ public class MethodAttrsDialog extends Dialog {
             @Override
             public void onSuccess(TraceRecordProxy tr) {
                 fillTraceDetail(tr);
+            }
+            @Override
+            public void onFailure(ServerFailure error) {
+                errorHandler.error("Cannot load method/trace details", error);
             }
         });
     }

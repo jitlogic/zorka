@@ -26,6 +26,8 @@ import java.util.List;
 @ProxyFor(TraceInfoSearchResult.class)
 public interface TraceInfoSearchResultProxy extends ValueProxy {
 
+    public static final int MORE_RESULTS = 0x0001;
+
     int getSeq();
 
     int getFlags();

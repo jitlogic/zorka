@@ -29,6 +29,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ClientUtil;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
@@ -346,6 +347,10 @@ public class TraceRecordSearchDialog extends Dialog {
 
                         );
                         setFocusWidget(txtSearchFilter);
+                    }
+                    @Override
+                    public void onFailure(ServerFailure failure) {
+                        errorHandler.error("Error performing search request", failure);
                     }
                 }
         );

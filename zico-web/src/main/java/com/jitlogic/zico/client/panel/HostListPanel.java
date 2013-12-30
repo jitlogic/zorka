@@ -41,6 +41,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.ZicoShell;
@@ -327,6 +328,10 @@ public class HostListPanel extends VerticalLayoutContainer {
                 hostGridStore.getList().addAll(response);
                 enableSelectionDependentControls(selectionModel.getSelectedObject());
             }
+            @Override
+            public void onFailure(ServerFailure error) {
+                errorHandler.error("Error loading host list", error);
+            }
         });
     }
 
@@ -461,6 +466,10 @@ public class HostListPanel extends VerticalLayoutContainer {
                 @Override
                 public void onSuccess(Void aVoid) {
                     refresh();
+                }
+                @Override
+                public void onFailure(ServerFailure error) {
+                    errorHandler.error("Error enabling/disabling host", error);
                 }
             });
         }
