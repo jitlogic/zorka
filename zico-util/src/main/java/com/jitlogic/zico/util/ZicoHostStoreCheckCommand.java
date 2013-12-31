@@ -49,7 +49,7 @@ public class ZicoHostStoreCheckCommand implements ZicoCommand {
         props.setProperty("zico.home.dir", args[1]);
         config = new ZicoConfig(props);
 
-        int nthreads = Runtime.getRuntime().availableProcessors();
+        int nthreads = Runtime.getRuntime().availableProcessors() * 2;
         List<String> hosts = new ArrayList<String>(args.length);
 
         if (args.length > 2) {

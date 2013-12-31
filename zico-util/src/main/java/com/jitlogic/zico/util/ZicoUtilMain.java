@@ -20,7 +20,7 @@ import com.jitlogic.zorka.common.util.ZorkaUtil;
 import java.util.Map;
 
 
-public class ZicoMain {
+public class ZicoUtilMain {
 
     private static final Map<String,ZicoCommand> commands = ZorkaUtil.map(
             "check", new ZicoHostStoreCheckCommand(),

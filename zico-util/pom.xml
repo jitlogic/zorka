@@ -28,7 +28,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Main-Class>com.jitlogic.zico.util.ZicoMain</Main-Class>
+                            <Main-Class>com.jitlogic.zico.util.ZicoUtilMain</Main-Class>
                         </manifestEntries>
                     </archive>
                 </configuration>
