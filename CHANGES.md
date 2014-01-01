@@ -1,7 +1,8 @@
-Zorka 0.9.14 (2014-01-06)
+Zorka 0.9.14 (2014-01-02)
 -------------------------
 
- * collector: get rid of SQL-based configuration database and trace index, use MapDB+RDS instead;
+ * collector: rewrite trace indexing and search angine; use MapDB+RDS instead of SQL;
+ * lots of fixes;
 
 
 Zorka 0.9.13 (2013-12-16)

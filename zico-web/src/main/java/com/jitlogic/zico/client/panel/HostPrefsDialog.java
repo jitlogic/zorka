@@ -42,10 +42,14 @@ public class HostPrefsDialog extends Dialog {
     private TextField txtHostAddr;
     private TextField txtHostDesc;
     private TextField txtHostPass;
+
     private SpinnerField<Long> txtMaxSize;
 
     private ErrorHandler errorHandler;
 
+    private static final long KB = 1024;
+    private static final long MB = 1024*KB;
+    private static final long GB = 1024*MB;
 
     public HostPrefsDialog(ZicoRequestFactory rf, HostListPanel panel, HostProxy info, ErrorHandler errorHandler) {
         this.panel = panel;
@@ -100,17 +104,21 @@ public class HostPrefsDialog extends Dialog {
         txtMaxSize = new SpinnerField<Long>(new NumberPropertyEditor.LongPropertyEditor());
         txtMaxSize.setIncrement(1L);
         txtMaxSize.setMinValue(16);
-        txtMaxSize.setMaxValue(1024 * 1024L);
+        txtMaxSize.setMaxValue(1024 * GB);
         txtMaxSize.setAllowBlank(false);
         txtMaxSize.setToolTip("Maximum amount of trace data stored for this host.");
         vlc.add(txtMaxSize);
-        vlc.add(new FieldLabel(txtMaxSize, "Max store size (MB)"),
+        vlc.add(new FieldLabel(txtMaxSize, "Store size (GB)"),
                 new VerticalLayoutContainer.VerticalLayoutData(1, -1));
 
+        long sz = info.getMaxSize() / GB;
+
+        if (sz < 1) { sz = 1; }
+
         if (info != null) {
-            txtMaxSize.setText("" + (info.getMaxSize() / 1048576L));
+            txtMaxSize.setText("" + sz);
         } else {
-            txtMaxSize.setText("1024");
+            txtMaxSize.setText("1");
         }
 
         txtHostDesc = new TextField();
@@ -119,7 +127,7 @@ public class HostPrefsDialog extends Dialog {
                 new VerticalLayoutContainer.VerticalLayoutData(1, -1));
 
         if (info != null) {
-            // TODO txtHostDesc.setText(info.getDescription());
+            txtHostDesc.setText(info.getComment());
         }
 
         setWidth(400);
@@ -151,9 +159,9 @@ public class HostPrefsDialog extends Dialog {
     public void save() {
         // What about new host ?
         editedHost.setAddr(txtHostAddr.getText());
-        // TODO editedHost.setDescription(txtHostDesc.getText());
+        editedHost.setComment(txtHostDesc.getText());
         editedHost.setPass(txtHostPass.getText());
-        editedHost.setMaxSize(txtMaxSize.getCurrentValue() * 1048576L);
+        editedHost.setMaxSize(txtMaxSize.getCurrentValue() * GB);
 
         editHostRequest.persist(editedHost).fire(new Receiver<Void>() {
             @Override

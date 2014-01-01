@@ -105,7 +105,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     private Map<Integer, String> traceTypes;
 
     private int seqnum = 0;
-    private boolean descOrder = false;
+    private boolean descOrder = true;
 
     // Search toolbar controls (in order of occurence on panel toolbar)
     private ToggleButton btnDeepSearch;
@@ -295,7 +295,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         Column<TraceInfoProxy, TraceInfoProxy> colTraceClock
                 = new IdentityColumn<TraceInfoProxy>(TRACE_CLOCK_CELL);
         grid.addColumn(colTraceClock, new ResizableHeader<TraceInfoProxy>("Clock", grid, colTraceClock));
-        grid.setColumnWidth(colTraceClock, 128, Style.Unit.PX);
+        grid.setColumnWidth(colTraceClock, 140, Style.Unit.PX);
 
         Column<TraceInfoProxy, TraceInfoProxy> colTraceType
                 = new IdentityColumn<TraceInfoProxy>(TRACE_TYPE_CELL);
@@ -305,7 +305,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         Column<TraceInfoProxy, TraceInfoProxy> colTraceDuration
                 = new IdentityColumn<TraceInfoProxy>(TRACE_DURATION_CELL);
         grid.addColumn(colTraceDuration, new ResizableHeader<TraceInfoProxy>("Time", grid, colTraceDuration));
-        grid.setColumnWidth(colTraceDuration, 50, Style.Unit.PX);
+        grid.setColumnWidth(colTraceDuration, 64, Style.Unit.PX);
 
         Column<TraceInfoProxy, TraceInfoProxy> colTraceCalls
                 = new IdentityColumn<TraceInfoProxy>(TRACE_CALLS_CELL);
@@ -314,12 +314,12 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
 
         Column<TraceInfoProxy, TraceInfoProxy> colTraceErrors
                 = new IdentityColumn<TraceInfoProxy>(TRACE_ERRORS_CELL);
-        grid.addColumn(colTraceErrors, new ResizableHeader<TraceInfoProxy>("Errors", grid, colTraceErrors));
+        grid.addColumn(colTraceErrors, new ResizableHeader<TraceInfoProxy>("Errs", grid, colTraceErrors));
         grid.setColumnWidth(colTraceErrors, 50, Style.Unit.PX);
 
         Column<TraceInfoProxy, TraceInfoProxy> colTraceRecords
                 = new IdentityColumn<TraceInfoProxy>(TRACE_RECORDS_CELL);
-        grid.addColumn(colTraceRecords, new ResizableHeader<TraceInfoProxy>("Records", grid, colTraceRecords));
+        grid.addColumn(colTraceRecords, new ResizableHeader<TraceInfoProxy>("Recs", grid, colTraceRecords));
         grid.setColumnWidth(colTraceRecords, 50, Style.Unit.PX);
 
         Column<TraceInfoProxy, TraceInfoProxy> colTraceDesc

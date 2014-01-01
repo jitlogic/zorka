@@ -228,6 +228,10 @@ public class RDSStore implements Closeable {
     }
 
 
+    public synchronized long getMaxSize() {
+        return maxSize;
+    }
+
     public synchronized void setMaxSize(long maxSize) {
         this.maxSize = maxSize;
     }

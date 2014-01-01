@@ -55,4 +55,8 @@ public interface HostProxy extends EntityProxy {
     long getMaxSize();
 
     void setMaxSize(long maxSize);
+
+    public String getComment();
+
+    public void setComment(String comment);
 }

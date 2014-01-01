@@ -288,6 +288,7 @@ public class DataCollectionUnitTest extends ZicoFixture {
         for (int i = 0; i < lst1.size(); i++) {
             assertEquals(lst1.get(i).getDataOffs(), lst2.get(i).getDataOffs());
             assertEquals(lst1.get(i).getDataLen(), lst2.get(i).getDataLen());
+            assertEquals("Should count properly number of records", 3, lst2.get(i).getRecords());
         }
     }
 

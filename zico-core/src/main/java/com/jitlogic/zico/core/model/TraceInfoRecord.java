@@ -54,7 +54,7 @@ public class TraceInfoRecord implements Serializable {
     }
 
 
-    public TraceInfoRecord(TraceRecord tr, long dataOffs, int dataLen, long indexOffs, int indexLen) {
+    public TraceInfoRecord(TraceRecord tr, int numRecords, long dataOffs, int dataLen, long indexOffs, int indexLen) {
         this.dataOffs = dataOffs;
         this.dataLen = dataLen;
         this.indexOffs = indexOffs;
@@ -64,7 +64,7 @@ public class TraceInfoRecord implements Serializable {
         this.duration = tr.getTime();
         this.calls = tr.getCalls();
         this.errors = tr.getErrors();
-        this.records = ZicoUtil.numRecords(tr);
+        this.records = numRecords;
         this.tflags = tr.getMarker().getFlags();
         this.rflags = tr.getFlags();
 
