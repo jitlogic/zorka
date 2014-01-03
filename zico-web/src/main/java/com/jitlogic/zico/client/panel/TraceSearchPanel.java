@@ -22,6 +22,8 @@ import com.google.gwt.cell.client.Cell;
 import com.google.gwt.dom.client.BrowserEvents;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ContextMenuEvent;
 import com.google.gwt.event.dom.client.ContextMenuHandler;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
@@ -38,6 +40,9 @@ import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.IdentityColumn;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Hyperlink;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.ProvidesKey;
@@ -115,12 +120,14 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     private ToggleButton btnEnableEql;
     private TextField txtFilter;
     private TextButton btnRunSearch;
-    private TextButton btnMoreResults;
-    private TextButton btnCancelSearch;
     private TextButton btnClearFilters;
 
+    private HorizontalPanel statusBar;
+    private Label statusLabel;
+    private Hyperlink lnkCancelSearch, lnkMoreResults;
 
     private Menu contextMenu;
+    private boolean moreResults;
 
 
     @Inject
@@ -138,6 +145,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
 
         createToolbar();
         createTraceGrid();
+        createStatusBar();
         createContextMenu();
 
         loadTraceTypes();
@@ -230,30 +238,6 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
             @Override
             public void onSelect(SelectEvent event) {
                 refresh();
-            }
-        });
-
-        btnMoreResults = new TextButton();
-        btnMoreResults.setIcon(Resources.INSTANCE.gotoIcon());
-        btnMoreResults.setToolTip("More search results");
-        toolBar.add(btnMoreResults);
-
-        btnMoreResults.addSelectHandler(new SelectEvent.SelectHandler() {
-            @Override
-            public void onSelect(SelectEvent event) {
-                loadMore();
-            }
-        });
-
-        btnCancelSearch = new TextButton();
-        btnCancelSearch.setIcon(Resources.INSTANCE.cancel());
-        btnCancelSearch.setToolTip("Cancel search");
-        toolBar.add(btnCancelSearch);
-
-        btnCancelSearch.addSelectHandler(new SelectEvent.SelectHandler() {
-            @Override
-            public void onSelect(SelectEvent event) {
-                toggleSearchMode(false);
             }
         });
 
@@ -374,6 +358,29 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         add(grid, new VerticalLayoutData(1, 1));
     }
 
+    private void createStatusBar() {
+        statusBar = new HorizontalPanel();
+        statusLabel = new Label("Ready.");
+        lnkCancelSearch = new Hyperlink("Cancel search", "");
+        lnkMoreResults = new Hyperlink("More results", "");
+
+        lnkCancelSearch.addHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                toggleSearchMode(false, moreResults, "Search canceled.");
+            }
+        }, ClickEvent.getType());
+
+        lnkMoreResults.addHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                loadMore();
+            }
+        }, ClickEvent.getType());
+
+        statusBar.add(statusLabel);
+        add(statusBar);
+    }
 
     private void createContextMenu() {
         contextMenu = new Menu();
@@ -412,7 +419,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     }
 
 
-    private void toggleSearchMode(boolean inSearch) {
+    private void toggleSearchMode(boolean inSearch, boolean moreResults, String message) {
         seqnum++;
         btnDeepSearch.setEnabled(!inSearch);
         btnErrors.setEnabled(!inSearch);
@@ -421,9 +428,22 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         btnEnableEql.setEnabled(!inSearch);
         txtFilter.setEnabled(!inSearch);
         btnRunSearch.setEnabled(!inSearch);
-        btnMoreResults.setEnabled(!inSearch);
-        btnCancelSearch.setEnabled(inSearch);
         btnClearFilters.setEnabled(!inSearch);
+
+        statusLabel.setText(message);
+
+        if (inSearch) {
+            statusBar.add(lnkCancelSearch);
+        } else {
+            statusBar.remove(lnkCancelSearch);
+        }
+
+        if (moreResults) {
+            statusBar.add(lnkMoreResults);
+        } else {
+            statusBar.remove(lnkMoreResults);
+        }
+
     }
 
 
@@ -461,7 +481,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     }
 
     private void loadMore(final int limit) {
-        toggleSearchMode(true);
+        toggleSearchMode(true, false, "Searching ...");
         TraceDataServiceProxy req = rf.traceDataService();
         TraceInfoSearchQueryProxy q = req.create(TraceInfoSearchQueryProxy.class);
         q.setLimit(limit);
@@ -499,8 +519,9 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
                 if (response.getSeq() == seqnum) {
                     List<TraceInfoProxy> results = response.getResults();
                     data.getList().addAll(results);
-                    toggleSearchMode(false);
-                    if (0 != (response.getFlags() & TraceInfoSearchResultProxy.MORE_RESULTS) && results.size() < limit) {
+                    moreResults = 0 != (response.getFlags() & TraceInfoSearchResultProxy.MORE_RESULTS);
+                    toggleSearchMode(false, moreResults, "Found " + data.getList().size() + " results.");
+                    if (moreResults && results.size() < limit) {
                         loadMore(limit-results.size());
                     }
                 }
@@ -508,7 +529,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
 
             @Override
             public void onFailure(ServerFailure error) {
-                toggleSearchMode(false);
+                toggleSearchMode(false, false, "Error occured while searching: " + error.getMessage());
                 errorHandler.error("Trace search request failed", error);
             }
         });

@@ -67,6 +67,9 @@ public class HostStore implements Closeable, RDSCleanupListener {
     private static final String PROP_SIZE = "size";
     private static final String PROP_COMMENT = "comment";
 
+    private final String DB_INFO_MAP = "INFOS";
+    private final String DB_TIDS_MAP = "TIDS";
+
     private PersistentSymbolRegistry symbolRegistry;
 
     private String rootPath;
@@ -136,8 +139,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
             db = DBMaker.newFileDB(new File(rootPath, "traces.db"))
                     .asyncWriteDisable().asyncFlushDelay(100)
                     .closeOnJvmShutdown().make();
-            infos = db.getTreeMap("INFOS");
-            tids = db.getTreeMap("TIDS");
+            infos = db.getTreeMap(DB_INFO_MAP);
+            tids = db.getTreeMap(DB_TIDS_MAP);
         } catch (IOException e) {
             log.error("Cannot open host store " + name, e);
         }
