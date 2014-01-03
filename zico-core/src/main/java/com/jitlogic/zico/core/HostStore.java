@@ -15,35 +15,42 @@
  */
 package com.jitlogic.zico.core;
 
-
-import com.jitlogic.zico.core.model.HostInfo;
+import com.jitlogic.zico.core.eql.Parser;
 import com.jitlogic.zico.core.model.KeyValuePair;
-import com.jitlogic.zico.core.model.PagingData;
 import com.jitlogic.zico.core.model.SymbolicExceptionInfo;
 import com.jitlogic.zico.core.model.TraceInfo;
-import com.jitlogic.zico.core.model.TraceListFilterExpression;
+import com.jitlogic.zico.core.model.TraceInfoRecord;
+import com.jitlogic.zico.core.model.TraceInfoSearchQuery;
+import com.jitlogic.zico.core.model.TraceInfoSearchResult;
+import com.jitlogic.zico.core.model.TraceRecordSearchQuery;
+import com.jitlogic.zico.core.rds.RAGZInputStream;
+import com.jitlogic.zico.core.rds.RAGZSegment;
 import com.jitlogic.zico.core.rds.RDSCleanupListener;
 import com.jitlogic.zico.core.rds.RDSStore;
+import com.jitlogic.zico.core.search.EqlTraceRecordMatcher;
+import com.jitlogic.zico.core.search.FullTextTraceRecordMatcher;
+import com.jitlogic.zico.core.search.TraceRecordMatcher;
+import com.jitlogic.zico.shared.data.HostProxy;
+import com.jitlogic.zico.shared.data.TraceInfoSearchQueryProxy;
+import com.jitlogic.zico.shared.data.TraceInfoSearchResultProxy;
+import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicException;
+import com.jitlogic.zorka.common.tracedata.SymbolicStackElement;
+import com.jitlogic.zorka.common.tracedata.TraceMarker;
+import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
+import org.fressian.FressianReader;
+
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentNavigableMap;
 
 /**
  * Represents performance data store for a single agent.
@@ -52,307 +59,550 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     private final static Logger log = LoggerFactory.getLogger(HostStore.class);
 
+    public final static String HOST_PROPERTIES = "host.properties";
+
+    private static final String PROP_ADDR = "addr";
+    private static final String PROP_PASS = "pass";
+    private static final String PROP_FLAGS = "flags";
+    private static final String PROP_SIZE = "size";
+    private static final String PROP_COMMENT = "comment";
+
+    private PersistentSymbolRegistry symbolRegistry;
+
     private String rootPath;
-    private RDSStore rds;
-    private HostInfo hostInfo;
-    private HostStoreManager manager;
 
-    private TraceCache cache;
+    private TraceRecordStore traceDataStore;
+    private TraceRecordStore traceIndexStore;
 
-    private String reOp;
+    private TraceTemplateManager templater;  // TODO move this out to service object
 
-    private JdbcTemplate jdbc;
-    private NamedParameterJdbcTemplate ndbc;
+    private ZicoConfig config;
 
 
-    private final RowMapper<TraceInfo> TRACE_INFO_MAPPER = new RowMapper<TraceInfo>() {
-        @Override
-        public TraceInfo mapRow(ResultSet rs, int rowNum) throws SQLException {
-            TraceInfo info = new TraceInfo();
+    private DB db;
+    private ConcurrentNavigableMap<Long, TraceInfoRecord> infos;
+    private Map<Integer, String> tids;
 
-            info.setHostId(rs.getInt("HOST_ID"));
-            info.setDataOffs(rs.getLong("DATA_OFFS"));
-            info.setTraceId(rs.getInt("TRACE_ID"));
-            info.setTraceType(manager.getSymbolRegistry().symbolName(info.getTraceId()));
-            info.setDataLen(rs.getInt("DATA_LEN"));
-            info.setClock(rs.getLong("CLOCK"));
-            info.setMethodFlags(rs.getInt("RFLAGS"));
-            info.setTraceFlags(rs.getInt("TFLAGS"));
-            info.setStatus(rs.getInt("STATUS"));
-            info.setClassId(rs.getInt("CLASS_ID"));
-            info.setMethodId(rs.getInt("METHOD_ID"));
-            info.setSignatureId(rs.getInt("SIGN_ID"));
-            info.setCalls(rs.getLong("CALLS"));
-            info.setErrors(rs.getLong("ERRORS"));
-            info.setRecords(rs.getLong("RECORDS"));
-            info.setExecutionTime(rs.getLong("EXTIME"));
+    private String name;
+    private String addr = "";
+    private String pass = "";
+    private int flags;
+    private long maxSize;
+    private String comment = "";
 
-            JSONObject attrs = (JSONObject)JSONValue.parse(rs.getString("ATTRS"));
+    private static final long MAX_SEARCH_T1 = 3000000000L;
+    private static final long MAX_SEARCH_T2 = 30000000000L;
 
-            if (attrs != null) {
-                List<KeyValuePair> attrList = new ArrayList<KeyValuePair>(attrs.size());
+    public HostStore(ZicoConfig config, TraceTemplateManager templater, String name) {
 
-                for (Map.Entry<String,Object> e : attrs.entrySet()) {
-                    attrList.add(new KeyValuePair(e.getKey(), ""+e.getValue()));
-                }
+        this.name = name;
+        this.config = config;
 
-                info.setAttributes(ZicoUtil.sortKeyVals(attrList));
-            }
+        this.rootPath = ZorkaUtil.path(config.getDataDir(), ZicoUtil.safePath(name));
 
-            String exJson = rs.getString("EXINFO");
-            if (exJson != null && exJson.trim().length() > 0) {
-                JSONObject json = (JSONObject)JSONValue.parse(exJson);
-                SymbolicExceptionInfo sei = new SymbolicExceptionInfo();
-                sei.setExClass(""+json.get("exClass"));
-                sei.setMessage("" + json.get("message"));
-                JSONArray jstack = (JSONArray)(json.get("stackTrace"));
-                if (jstack != null) {
-                    List<String> stack = new ArrayList<String>(jstack.size());
-                    for (Object obj : jstack) {
-                        stack.add(""+obj);
-                    }
-                    sei.setStackTrace(stack);
-                }
-                info.setExceptionInfo(sei);
-            }
+        File hostDir = new File(rootPath);
 
-            info.setDescription(manager.getTemplater().templateDescription(info));
-
-            return info;
-        }
-    };
-
-
-    public HostStore(HostStoreManager manager,
-                     TraceCache cache,
-                     ResultSet rs) throws SQLException {
-
-        this.cache = cache;
-        this.manager = manager;
-
-        this.hostInfo = new HostInfo();
-
-        this.jdbc = new JdbcTemplate(manager.getDs());
-        this.ndbc = new NamedParameterJdbcTemplate(manager.getDs());
-
-        updateInfo(rs);
-
-        this.rootPath = ZorkaUtil.path(manager.getDataDir(), hostInfo.getPath());
-
-        this.reOp = "pgsql".equals(manager.getConfig().stringCfg("zico.db.type", null)) ? "~" : "regexp";
-    }
-
-
-    public synchronized HostStore updateInfo(ResultSet rs) throws SQLException {
-        hostInfo.setId(rs.getInt("HOST_ID"));
-        hostInfo.setName(rs.getString("HOST_NAME"));
-        hostInfo.setAddr(rs.getString("HOST_ADDR"));
-        hostInfo.setPath(rs.getString("HOST_PATH"));
-        hostInfo.setPass(rs.getString("HOST_PASS"));
-        hostInfo.setFlags(rs.getInt("HOST_FLAGS"));
-        hostInfo.setMaxSize(rs.getLong("MAX_SIZE"));
-        hostInfo.setDescription(rs.getString("HOST_DESC"));
-        return this;
-    }
-
-
-    public synchronized HostStore updateInfo(HostInfo info) {
-        hostInfo.setAddr(info.getAddr());
-        hostInfo.setPass(info.getPass());
-        hostInfo.setFlags(info.getFlags());
-        hostInfo.setMaxSize(info.getMaxSize());
-        hostInfo.setDescription(info.getDescription());
-        return this;
-    }
-
-
-    public HostInfo getHostInfo() {
-        return hostInfo;
-    }
-
-
-    public String toString() {
-        return "zico.Store(" + hostInfo.getName() + ")";
-    }
-
-
-    public synchronized RDSStore getRds() {
-        if (rds == null) {
-            String rootPath = ZorkaUtil.path(manager.getDataDir(), hostInfo.getPath());
-            String rdspath = ZorkaUtil.path(rootPath, "traces");
-
-            File rdsDir = new File(rootPath);
-            if (!rdsDir.exists()) {
-                rdsDir.mkdirs();
-            }
-
-            try {
-                long fileSize = getStoreManager().getConfig().kiloCfg("rds.file.size", 16 * 1024 * 1024L).intValue();
-                long segmentSize = getStoreManager().getConfig().kiloCfg("rds.seg.size", 1024 * 1024L);
-                rds = new RDSStore(rdspath,
-                        hostInfo.getMaxSize(),
-                        fileSize,
-                        segmentSize, this);
-                //rds.addCleanupListener(this);
-            } catch (IOException e) {
-                log.error("Cannot open RDS store at '" + rdspath + "'", e);
-            }
-        }
-        return rds;
-    }
-
-
-    public synchronized void save() {
-        jdbc.update("update HOSTS set HOST_ADDR=?, HOST_DESC=?, HOST_PASS=?, HOST_FLAGS=?, MAX_SIZE = ? where HOST_ID=?",
-                hostInfo.getAddr(), hostInfo.getDescription(), hostInfo.getPass(), hostInfo.getFlags(),
-                hostInfo.getMaxSize(), hostInfo.getId());
-        if (rds != null) {
-            rds.setMaxSize(hostInfo.getMaxSize());
-            try {
-                rds.cleanup();
-            } catch (IOException e) {
-                log.error("Error resizing RDS store for " + hostInfo.getName());
-            }
-        }
-    }
-
-    private final static Map<String, String> TRACES_ORDER_COLS = ZorkaUtil.map(
-            "clock", "CLOCK",
-            "calls", "CALLS",
-            "errors", "ERRORS",
-            "records", "RECORDS",
-            "executionTime", "EXTIME",
-            "traceType", "TRACE_ID"
-    );
-
-    private final static Set<String> TRACES_ORDER_DIRS = ZorkaUtil.set("ASC", "DESC");
-
-    public PagingData pageTraces(int offset, int limit, TraceListFilterExpression filter) {
-        String orderBy = filter.getSortBy();
-        String orderDir = filter.isSortAsc() ? "ASC" : "DESC";
-
-        if (!TRACES_ORDER_COLS.containsKey(orderBy) || !TRACES_ORDER_DIRS.contains(orderDir)) {
-            throw new ZicoRuntimeException("Invalid ordering arguments: orderBy=" + orderBy + ", orderDir=" + orderDir);
-        }
-
-        MapSqlParameterSource params = new MapSqlParameterSource("hostId", hostInfo.getId());
-
-        String sqlc = " HOST_ID = :hostId";
-
-        if (filter.getTimeStart() != 0 && filter.getTimeEnd() != 0) {
-            sqlc += " and CLOCK between :timeStart and :timeEnd";
-            params.addValue("timeStart", filter.getTimeStart());
-            params.addValue("timeEnd", filter.getTimeEnd());
-        } else if (filter.getTimeEnd() != 0) {
-            sqlc += " and CLOCK < :timeEnd";
-            params.addValue("timeEnd", filter.getTimeEnd());
-        } else if (filter.getTimeStart() != 0) {
-            sqlc += " and CLOCK > :timeStart";
-            params.addValue("timeStart", filter.getTimeStart());
-        }
-
-        if (filter.getTraceId() != 0) {
-            sqlc += " and TRACE_ID = :traceId";
-            params.addValue("traceId", filter.getTraceId());
-        }
-
-        if (filter.isErrorsOnly()) {
-            sqlc += " and STATUS = 1";
-        }
-
-        if (filter.getFilterExpr() != null && filter.getFilterExpr().trim().length() > 0) {
-            sqlc += parseFilterExpr(filter.getFilterExpr().trim(), params, reOp);
-        }
-
-        if (filter.getMinTime() > 0) {
-            sqlc += " and EXTIME > :minTime";
-            params.addValue("minTime", filter.getMinTime());
-        }
-
-        String sql1 = "select * from TRACES where " + sqlc + " order by " + TRACES_ORDER_COLS.get(orderBy)
-                + " " + orderDir + " limit :limit offset :offset";
-
-        params.addValue("limit", limit);
-        params.addValue("offset", offset);
-
-        List<TraceInfo> results = ndbc.query(sql1, params, TRACE_INFO_MAPPER);
-
-        PagingData result = new PagingData();
-
-        String sql2 = "select count(1) from TRACES where " + sqlc;
-
-        result.setOffset(offset);
-        result.setTotal(ndbc.queryForObject(sql2, params, Integer.class));
-        result.setResults(results);
-
-        return result;
-
-    }
-
-    private static final String QUOTED_CHARS = "*[]().\\?+{}^$";
-
-    public static String parseFilterExpr(String expr, MapSqlParameterSource params, String reOp) {
-        if (expr.startsWith("@")) {
-            int ix = expr.indexOf('=');
-            if (ix < 2) {
-                throw new ZicoRuntimeException("Invalid filter expression: '" + expr + "'");
-            }
-            String sa = expr.substring(1, ix);
-            String sv = expr.substring(ix + 1, expr.length());
-            if (!sv.startsWith("~")) {
-                StringBuilder sb = new StringBuilder(expr.length() + 10);
-                for (int i = 0; i < sv.length(); i++) {
-                    char ch = sv.charAt(i);
-                    if (ch == '*') {
-                        sb.append("[^\"]*");
-                    } else if (ch == '?') {
-                        sb.append("[^\"]");
-                    } else {
-                        if (QUOTED_CHARS.indexOf(ch) != -1) {
-                            sb.append('\\');
-                        }
-                        sb.append(ch);
-                    }
-                }
-                sv = sb.toString();
-            } else {
-                sv = sv.substring(1, sv.length()).replace(".", "[^\"]");
-            }
-            String regex = "\"" + sa + "\":\"" + sv + "\"";
-            params.addValue("filterRegex", regex);
-            return " and ATTRS " + reOp + " :filterRegex";
-        }
-        if (expr.startsWith("~")) {
-            params.addValue("filterRegex", expr.substring(1));
-            return " and ATTRS " + reOp + " :filterRegex";
+        if (!hostDir.exists()) {
+            this.maxSize = config.longCfg("rds.max.size", 1024L * 1024L * 1024L);
+            hostDir.mkdirs();
+            save();
         } else {
-            params.addValue("filterExpr", "%" + expr.replace("*", "%") + "%");
-            return " and ATTRS like :filterExpr";
+            load();
+        }
+
+        this.templater = templater;
+
+        if (!hasFlag(HostProxy.DISABLED)) {
+            open();
         }
     }
 
-    public TraceInfo getTrace(long traceOffs) {
-        return jdbc.queryForObject("select * from TRACES where HOST_ID = ? and DATA_OFFS = ?",
-                TRACE_INFO_MAPPER, hostInfo.getId(), traceOffs);
-    }
 
+    public synchronized void open() {
+        try {
+            if (symbolRegistry == null) {
+                symbolRegistry = new PersistentSymbolRegistry(
+                    new File(ZicoUtil.ensureDir(rootPath), "symbols.dat"));
+            }
 
-    public TraceRecordStore getTraceContext(long traceOffs) {
-        return new TraceRecordStore(this, getTrace(traceOffs), cache, manager.getSymbolRegistry());
+            if (traceDataStore == null) {
+                traceDataStore = new TraceRecordStore(config, this, "tdat");
+            }
+
+            if (traceIndexStore == null) {
+                traceIndexStore = new TraceRecordStore(config, this, "tidx");
+            }
+
+            db = DBMaker.newFileDB(new File(rootPath, "traces.db"))
+                    .asyncWriteDisable().asyncFlushDelay(100)
+                    .closeOnJvmShutdown().make();
+            infos = db.getTreeMap("INFOS");
+            tids = db.getTreeMap("TIDS");
+        } catch (IOException e) {
+            log.error("Cannot open host store " + name, e);
+        }
     }
 
 
     @Override
-    public synchronized void close() throws IOException {
+    public synchronized void close() {
 
-        try {
-            if (rds != null) {
-                rds.close();
-                rds = null;
+        if (symbolRegistry != null) {
+            try {
+                symbolRegistry.close();
+            } catch (IOException e) {
+                log.error("Cannot close symbol registry for " + name, e);
             }
-        } catch (IOException e) {
-            log.error("Cannot close RDS store '" + rds + "' for " + hostInfo.getName(), e);
+            symbolRegistry = null;
         }
+
+        if (traceDataStore != null) {
+            try {
+                traceDataStore.close();
+            } catch (IOException e) {
+                log.error("Cannot close trace data store for " + name, e);
+            }
+            traceDataStore = null;
+        }
+
+        if (traceIndexStore != null) {
+            try {
+                traceIndexStore.close();
+            } catch (IOException e) {
+                log.error("Cannot close trace index store for " + name, e);
+            }
+            traceIndexStore = null;
+        }
+
+        if (db != null) {
+            db.close();
+            db = null;
+            infos = null;
+        }
+    }
+
+
+    public void export() {
+        if (symbolRegistry != null) {
+            symbolRegistry.export();
+        }
+    }
+
+
+    public int countTraces() {
+        checkEnabled();
+        return infos.size();
+    }
+
+
+    public synchronized void processTraceRecord(TraceRecord rec) throws IOException {
+
+        checkEnabled();
+
+        TraceRecordStore.ChunkInfo dchunk = traceDataStore.write(rec);
+
+        List<TraceRecord> tmp = rec.getChildren();
+
+        int numRecords = ZicoUtil.numRecords(rec);
+
+        rec.setChildren(null);
+        TraceRecordStore.ChunkInfo ichunk = traceIndexStore.write(rec);
+        rec.setChildren(tmp);
+
+
+        TraceInfoRecord tir = new TraceInfoRecord(rec,numRecords,
+                dchunk.getOffset(), dchunk.getLength(),
+                ichunk.getOffset(), ichunk.getLength());
+
+        infos.put(tir.getDataOffs(), tir);
+
+        int traceId = tir.getTraceId();
+
+        if (!tids.containsKey(traceId)) {
+            tids.put(traceId, symbolRegistry.symbolName(traceId));
+        }
+
+    }
+
+
+    public synchronized void rebuildIndex() throws IOException {
+
+        int[] stats = new int[2];
+
+        log.info("Start rebuildIndex() operation for host " + name);
+
+        boolean enabled = isEnabled();
+
+        flags |= HostProxy.CHK_IN_PROGRESS;
+
+        if (enabled) {
+            setEnabled(false);
+        }
+
+        // Remove old files (if any)
+        File fTidx = new File(rootPath, "tidx");
+        if (fTidx.exists()) {
+            ZorkaUtil.rmrf(fTidx);
+        }
+
+
+        for (String s : new File(rootPath).list()) {
+            if (s.startsWith("traces.db")) {
+                new File(rootPath, s).delete();
+            }
+        }
+
+        // Reopen and rebuild both db and idx
+        open();
+
+        File tdatDir = new File(rootPath, "tdat");
+        List<String> fnames  = Arrays.asList(tdatDir.list());
+        Collections.sort(fnames);
+
+        for (String fname : fnames) {
+            log.info("Processing file " + name + "/tdat/" + fname);
+            if (RDSStore.RGZ_FILE.matcher(fname).matches()) {
+                File f = new File(tdatDir, fname);
+                try {
+                    RAGZInputStream is = RAGZInputStream.fromFile(f);
+                    long fileBasePos = Long.parseLong(fname.substring(0, 16), 16);
+                    for (RAGZSegment seg : is.getSegments()) {
+                        if (seg.getLogicalLen() > 0) {
+                            byte[] buf = new byte[(int)seg.getLogicalLen()];
+                            is.seek((int)seg.getLogicalPos());
+                            is.read(buf);
+                            try {
+                                rebuildSegmentIndex(fileBasePos, seg, buf, stats);
+                            } catch (Exception e) {
+                                log.warn("Dropping rest of segment " + seg + " of " + name + "/tdat/"
+                                        + fname + " due to error.", e);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error("Error processing file " + f + " ; all traces saved in this file will be dropped.", e);
+                }
+                db.commit();
+            }
+        }
+
+        close();
+
+        flags &= ~HostProxy.CHK_IN_PROGRESS;
+
+        if (enabled) {
+            setEnabled(enabled);
+        }
+
+        save();
+
+        log.info("Operation rebuildIndex() for host " + name + " finished. "
+            + stats[0] + " traces imported, " + stats[1] + " traces dropped.");
+    }
+
+
+    private void rebuildSegmentIndex(long fileBasePos, RAGZSegment seg, byte[] buf, int[] stats) throws IOException {
+        ByteArrayInputStream bis = new ByteArrayInputStream(buf);
+        Object obj;
+        long basePos = seg.getLogicalPos() + fileBasePos, lastPos = basePos;
+        while (bis.available() > 0) {
+            try {
+                FressianReader reader = new FressianReader(bis, FressianTraceFormat.READ_LOOKUP);
+                obj = reader.readObject();
+                long dataLen = basePos + buf.length - bis.available() - lastPos;
+                if (obj instanceof TraceRecord) {
+                    TraceRecord tr = (TraceRecord)obj;
+                    int numRecords = ZicoUtil.numRecords(tr);
+                    tr.setChildren(null);
+                    TraceRecordStore.ChunkInfo idxChunk = traceIndexStore.write(tr);
+                    TraceInfoRecord tir = new TraceInfoRecord(tr, numRecords,
+                            lastPos, (int)dataLen, idxChunk.getOffset(), idxChunk.getLength());
+                    infos.put(lastPos, tir);
+                    int traceId = tir.getTraceId();
+                    if (!tids.containsKey(traceId)) {
+                        tids.put(traceId, symbolRegistry.symbolName(traceId));
+                    }
+                    stats[0]++;
+                }
+                lastPos += dataLen;
+            } catch (EOFException e) {
+                // This is normal.
+            }
+        }
+    }
+
+
+    public synchronized void commit() {
+
+        checkEnabled();
+
+        if (db != null) {
+            long t1 = System.nanoTime();
+            db.commit();
+            long t = (System.nanoTime() - t1) / 1000000L;
+            log.debug(name + ": Commit took " + t + " ms");
+        }
+    }
+
+
+    private void checkEnabled() {
+        if (hasFlag(HostProxy.DISABLED)) {
+            throw new ZicoRuntimeException("Host " + name
+                    + " is disabled. Bring it back online before issuing operation.");
+        }
+    }
+
+
+    public synchronized TraceInfoSearchResult search(TraceInfoSearchQuery query) throws IOException {
+        checkEnabled();
+        List<TraceInfo> lst = new ArrayList<TraceInfo>(query.getLimit());
+
+        TraceInfoSearchResult result = new TraceInfoSearchResult(query.getSeq(), lst);
+
+        TraceRecordMatcher matcher = null;
+
+        int traceId = query.getTraceName() != null ? symbolRegistry.symbolId(query.getTraceName()) : 0;
+
+        if (query.getSearchExpr() != null) {
+            if (query.hasFlag(TraceInfoSearchQueryProxy.EQL_QUERY)) {
+                matcher = new EqlTraceRecordMatcher(symbolRegistry,
+                        Parser.expr(query.getSearchExpr()),
+                        0, 0);
+            } else {
+                matcher = new FullTextTraceRecordMatcher(symbolRegistry,
+                        TraceRecordSearchQuery.SEARCH_ALL, query.getSearchExpr());
+            }
+        }
+
+        // TODO implement query execution time limit
+
+        int searchFlags = query.getFlags();
+
+        boolean asc = 0 == (searchFlags & TraceInfoSearchQueryProxy.ORDER_DESC);
+
+        Long initialKey = asc
+                ? infos.higherKey(query.getOffset() != 0 ? query.getOffset() : Long.MIN_VALUE)
+                : infos.lowerKey(query.getOffset() != 0 ? query.getOffset() : Long.MAX_VALUE);
+
+        long tstart = System.nanoTime();
+
+        for (Long key = initialKey; key != null; key = asc ? infos.higherKey(key) : infos.lowerKey(key)) {
+
+            TraceInfoRecord tir = infos.get(key);
+
+            if (query.hasFlag(TraceInfoSearchQueryProxy.ERRORS_ONLY) && 0 == (tir.getTflags() & TraceMarker.ERROR_MARK)) {
+                continue;
+            }
+
+            if (traceId != 0 && tir.getTraceId() != traceId) {
+                continue;
+            }
+
+            if (tir.getDuration() < query.getMinMethodTime()) {
+                continue;
+            }
+
+            TraceRecord idxtr = (query.hasFlag(TraceInfoSearchQueryProxy.DEEP_SEARCH) && matcher != null)
+                    ? traceDataStore.read(tir.getDataChunk())
+                    : traceIndexStore.read(tir.getIndexChunk());
+
+            if (idxtr != null) {
+                if (matcher instanceof EqlTraceRecordMatcher) {
+                    ((EqlTraceRecordMatcher) matcher).setTotalTime(tir.getDuration());
+                }
+                if (matcher == null || recursiveMatch(matcher, idxtr)) {
+                    lst.add(toTraceInfo(tir, idxtr));
+                    result.setLastOffs(asc ? tir.getDataOffs() + 1 : tir.getDataOffs() - 1);
+                    long t = System.nanoTime()-tstart;
+                    if ((lst.size() >= query.getLimit()) || (t > MAX_SEARCH_T1 && lst.size() > 0) || (t > MAX_SEARCH_T2)) {
+                        result.markFlag(TraceInfoSearchResultProxy.MORE_RESULTS);
+                        return result;
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+
+    private boolean recursiveMatch(TraceRecordMatcher matcher, TraceRecord tr) {
+        if (matcher.match(tr)) {
+            return true;
+        }
+
+        if (tr.numChildren() > 0) {
+            for (TraceRecord c : tr.getChildren()) {
+                if (matcher.match(c)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    public TraceInfoRecord getInfoRecord(long offs) {
+        checkEnabled();
+        return infos.get(offs);
+    }
+
+
+    private TraceInfo toTraceInfo(TraceInfoRecord itr, TraceRecord tr) throws IOException {
+
+        if (tr == null) {
+            tr = traceIndexStore.read(itr.getIndexChunk());
+        }
+
+        TraceInfo ti = new TraceInfo();
+        ti.setHostName(name);
+        ti.setDataOffs(itr.getDataOffs());
+        ti.setTraceId(itr.getTraceId());
+        ti.setTraceType(symbolRegistry.symbolName(itr.getTraceId()));
+        ti.setMethodFlags(itr.getRflags());
+        ti.setTraceFlags(itr.getTflags());
+        ti.setClassId(tr.getClassId());
+        ti.setMethodId(tr.getMethodId());
+        ti.setSignatureId(tr.getSignatureId());
+        ti.setStatus(tr.getException() != null                 // TODO get rid of this field
+                || tr.hasFlag(TraceRecord.EXCEPTION_PASS)
+                || tr.getMarker().hasFlag(TraceMarker.ERROR_MARK) ? 1 : 0);
+        ti.setRecords(itr.getRecords());
+        ti.setDataLen(itr.getDataLen());
+        ti.setCalls(itr.getCalls());
+        ti.setErrors(itr.getErrors());
+        ti.setExecutionTime(itr.getDuration());
+        ti.setClock(tr.getMarker().getClock());
+
+        if (tr != null && tr.getAttrs() != null) {
+            List<KeyValuePair> keyvals = new ArrayList<KeyValuePair>(tr.getAttrs().size());
+            for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
+                keyvals.add(new KeyValuePair(symbolRegistry.symbolName(e.getKey()), "" + e.getValue()));
+            }
+            ti.setAttributes(ZicoUtil.sortKeyVals(keyvals));
+        } else {
+            ti.setAttributes(Collections.EMPTY_LIST);
+        }
+
+        if (tr.getException() != null) {
+            SymbolicExceptionInfo sei = new SymbolicExceptionInfo();
+            SymbolicException sex = (SymbolicException) tr.getException();
+            sei.setExClass(symbolRegistry.symbolName(sex.getClassId()));
+            sei.setMessage(sex.getMessage());
+            List<String> lst = new ArrayList<String>();
+
+            for (SymbolicStackElement sel : sex.getStackTrace()) {
+                lst.add(symbolRegistry.symbolName(sel.getClassId()) + ":" + sel.getLineNum());
+                if (lst.size() > 10) {
+                    break;
+                }
+            }
+
+            sei.setStackTrace(lst);
+
+            ti.setExceptionInfo(sei);
+        }
+
+        ti.setDescription(templater.templateDescription(symbolRegistry, ti));
+
+        return ti;
+    }
+
+
+    public Map<Integer, String> getTidMap() {
+        checkEnabled();
+
+        // TODO this is a crutch. This really should be just a set of trace IDs
+        Map<Integer,String> tidMap = new HashMap<Integer, String>();
+
+        for (Integer tid : tids.keySet()) {
+            tidMap.put(tid, symbolRegistry.symbolName(tid));
+        }
+
+        return tidMap;
+    }
+
+
+    public String toString() {
+        return "HostStore(" + name + ")";
+    }
+
+
+    public synchronized void load() {
+        checkEnabled();
+        File f = new File(rootPath, HOST_PROPERTIES);
+        Properties props = new Properties();
+        if (f.exists() && f.canRead()) {
+            InputStream is = null;
+            try {
+                is = new FileInputStream(f);
+                props.load(is);
+            } catch (IOException e) {
+                log.error("Cannot read " + f, e);
+            } finally {
+                if (is != null) {
+                    try { is.close(); } catch (IOException _) { }
+                }
+            }
+        }
+
+        this.addr = props.getProperty(PROP_ADDR, "127.0.0.1");
+        this.pass = props.getProperty(PROP_PASS, "");
+        this.flags = Integer.parseInt(props.getProperty(PROP_FLAGS, "0"));
+        this.maxSize = Long.parseLong(props.getProperty(PROP_SIZE,
+                "" + config.kiloCfg("rds.max.size", 1024 * 1024 * 1024L)));
+        this.comment = props.getProperty(PROP_COMMENT, "");
+
+    }
+
+
+    public synchronized void save() {
+
+        Properties props = new Properties();
+        props.setProperty(PROP_ADDR, addr);
+        props.setProperty(PROP_PASS, pass);
+        props.setProperty(PROP_FLAGS, "" + flags);
+        props.setProperty(PROP_SIZE, "" + maxSize);
+        props.setProperty(PROP_COMMENT, comment);
+
+        File f = new File(rootPath, HOST_PROPERTIES);
+
+        OutputStream os = null;
+        try {
+            os = new FileOutputStream(f);
+            props.store(os, "ZICO Host Descriptor");
+        } catch (IOException e) {
+            log.error("Cannot write " + f, e);
+        } finally {
+            if (os != null) {
+                try { os.close(); } catch (IOException _) { }
+            }
+        }
+
+        if (traceDataStore != null && maxSize != traceDataStore.getRds().getMaxSize()) {
+            traceDataStore.getRds().setMaxSize(maxSize);
+            try {
+                traceDataStore.getRds().cleanup();
+            } catch (IOException e) {
+                log.error("Cannot perform cleanup for host store " + name, e);
+            }
+        }
+    }
+
+
+    public TraceRecordStore getTraceDataStore() {
+        return traceDataStore;
+    }
+
+
+    public TraceRecordStore getTraceIndexStore() {
+        return traceIndexStore;
+    }
+
+
+    public SymbolRegistry getSymbolRegistry() {
+        return symbolRegistry;
     }
 
 
@@ -361,88 +611,121 @@ public class HostStore implements Closeable, RDSCleanupListener {
     }
 
 
-    public HostStoreManager getStoreManager() {
-        return manager;
+    @Override
+    public void onChunkRemoved(RDSStore origin, Long start, Long length) {
+        if (traceDataStore != null && origin == traceDataStore.getRds()) {
+            log.info("Removing old index entries for host " + name);
+            long idxOffs = -1;
+            while (infos.size() > 0 && infos.firstEntry().getValue().getDataOffs() < (start+length)) {
+                idxOffs = Math.max(idxOffs, infos.firstEntry().getValue().getIndexOffs());
+                infos.remove(infos.firstKey());
+            }
+            if (idxOffs > 0) {
+                try {
+                    log.info("Cleaning up index RDS for host " + name + " (idxOffs=" + idxOffs + ")");
+                    traceIndexStore.getRds().cleanup(idxOffs);
+                } catch (IOException e) {
+                    log.error("Problem cleaning up index store", e);
+                }
+            }
+        }
     }
+
 
     @Override
-    public void onChunkRemoved(Long start, Long length) {
-        log.info("Discarding old trace data for " + hostInfo.getName() + " start=" + start + ", length=" + length);
-
-        if (start != null && length != null) {
-            jdbc.update("delete from TRACES where HOST_ID = ? and DATA_OFFS between ? and ?",
-                    hostInfo.getId(), start, start + length);
-        } else if (start != null) {
-            jdbc.update("delete from TRACES where HOST_ID = ? and DATA_OFFS < ?", hostInfo.getId(), start);
+    public void onChunkStarted(RDSStore origin, Long start) {
+        if (traceIndexStore != null) {
+            try {
+                traceIndexStore.getRds().rotate();
+            } catch (IOException e) {
+                log.error("Cannot rotate index for " + name, e);
+            }
         }
     }
 
-
-    // ------------------ entity methods ----------------------
-    public Integer getId() {
-        return hostInfo.getId();
-    }
 
     public String getName() {
-        return hostInfo.getName();
+        return name;
     }
+
 
     public String getAddr() {
-        return hostInfo.getAddr();
+        return addr;
     }
+
 
     public void setAddr(String addr) {
-        hostInfo.setAddr(addr);
+        this.addr = addr;
         save();
     }
 
-    public String getDescription() {
-        return hostInfo.getDescription();
-    }
-
-    public void setDescription(String description) {
-        hostInfo.setDescription(description);
-        save();
-    }
 
     public String getPass() {
-        return hostInfo.getPass();
+        return pass;
     }
+
 
     public void setPass(String pass) {
-        hostInfo.setPath(pass);
+        this.pass = pass;
         save();
     }
+
 
     public int getFlags() {
-        return hostInfo.getFlags();
+        return flags;
     }
 
-    public void setFlags(int flags) {
-        hostInfo.setFlags(flags);
-        save();
+
+    public boolean hasFlag(int flag) {
+        return 0 != (this.flags & flag);
     }
+
 
     public long getMaxSize() {
-        return hostInfo.getMaxSize();
+        return maxSize;
     }
+
 
     public void setMaxSize(long maxSize) {
-        hostInfo.setMaxSize(maxSize);
-        save();
-    }
-
-    public boolean isEnabled() {
-        return 0 == (hostInfo.getFlags() & HostInfo.DISABLED);
-    }
-
-    public void setEnabled(boolean enabled) {
-        if (enabled) {
-            hostInfo.setFlags(hostInfo.getFlags() & ~HostInfo.DISABLED);
-        } else {
-            hostInfo.setFlags(hostInfo.getFlags()|HostInfo.DISABLED);
+        this.maxSize = maxSize;
+        if (traceDataStore != null) {
+            traceDataStore.getRds().setMaxSize(maxSize);
         }
         save();
     }
+
+
+    public String getComment() {
+        return comment;
+    }
+
+
+    public void setComment(String comment) {
+        this.comment = comment;
+        save();
+    }
+
+
+    public synchronized boolean isEnabled() {
+        return !hasFlag(HostProxy.DISABLED);
+    }
+
+
+    public synchronized void setEnabled(boolean enabled) {
+
+        if (enabled) {
+            log.info("Bringing host " + name + " online.");
+            flags &= ~HostProxy.DISABLED;
+            open();
+        } else {
+            log.info("Taking host " + name + " offline.");
+            close();
+            flags |= HostProxy.DISABLED;
+        }
+
+        save();
+    }
+
+
 }
 

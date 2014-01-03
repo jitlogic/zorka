@@ -145,6 +145,9 @@ public interface Resources extends ClientBundle {
     @Source("images/expander-collapse.png")
     ImageResource expanderCollapse();
 
+    @Source("images/cancel.png")
+    ImageResource cancel();
+
     @DataResource.MimeType("text/html")
     @Source("resources/tips.html")
     TextResource tipsHtml();

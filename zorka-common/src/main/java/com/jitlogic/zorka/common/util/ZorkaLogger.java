@@ -146,7 +146,7 @@ public class ZorkaLogger implements ZorkaTrapper {
      *
      * @param level tracer log level mask.
      */
-    public static void setTracerLevel(int level) {
+    public static void setGlobalLogLevel(long level) {
         logLevel = level;
     }
 

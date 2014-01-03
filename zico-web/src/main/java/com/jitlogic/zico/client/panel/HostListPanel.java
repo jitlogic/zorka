@@ -16,36 +16,45 @@
 package com.jitlogic.zico.client.panel;
 
 import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.BrowserEvents;
+import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.event.dom.client.ContextMenuEvent;
+import com.google.gwt.event.dom.client.ContextMenuHandler;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.DataGrid;
+import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
+import com.google.gwt.user.cellview.client.IdentityColumn;
+import com.google.gwt.view.client.CellPreviewEvent;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.ProvidesKey;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.ZicoShell;
 import com.jitlogic.zico.client.inject.PanelFactory;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
-import com.jitlogic.zico.client.props.HostInfoProperties;
 import com.jitlogic.zico.shared.data.HostProxy;
 import com.jitlogic.zico.shared.services.HostServiceProxy;
-import com.sencha.gxt.core.client.IdentityValueProvider;
-import com.sencha.gxt.core.client.Style;
-import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.box.ConfirmMessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
-import com.sencha.gxt.widget.core.client.event.CellClickEvent;
-import com.sencha.gxt.widget.core.client.event.CellDoubleClickEvent;
 import com.sencha.gxt.widget.core.client.event.HideEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
-import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
-import com.sencha.gxt.widget.core.client.grid.ColumnModel;
-import com.sencha.gxt.widget.core.client.grid.Grid;
-import com.sencha.gxt.widget.core.client.grid.GridSelectionModel;
 import com.sencha.gxt.widget.core.client.menu.Item;
 import com.sencha.gxt.widget.core.client.menu.Menu;
 import com.sencha.gxt.widget.core.client.menu.MenuItem;
@@ -54,21 +63,18 @@ import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 
 import javax.inject.Provider;
-import java.util.Arrays;
 import java.util.List;
 
 
 public class HostListPanel extends VerticalLayoutContainer {
 
-    private static final HostInfoProperties props = GWT.create(HostInfoProperties.class);
-
     private Provider<ZicoShell> shell;
     private PanelFactory panelFactory;
     private ZicoRequestFactory rf;
 
-    private Grid<HostProxy> hostGrid;
-    private ListStore<HostProxy> hostGridStore;
-    private GridSelectionModel<HostProxy> selectionModel;
+    private DataGrid<HostProxy> hostGrid;
+    private ListDataProvider<HostProxy> hostGridStore;
+    private SingleSelectionModel<HostProxy> selectionModel;
 
     private ErrorHandler errorHandler;
 
@@ -77,8 +83,8 @@ public class HostListPanel extends VerticalLayoutContainer {
 
     private boolean selectionDependentControlsEnabled = true;
 
-    // TODO this is very badly written crutch. It will be fixed as soon as we move to GWT 2.6, so it will be in sync with Jetty 9.
     private boolean adminMode = false;
+    private Menu contextMenu;
 
     @Inject
     public HostListPanel(Provider<ZicoShell> shell, PanelFactory panelFactory,
@@ -100,6 +106,7 @@ public class HostListPanel extends VerticalLayoutContainer {
         this.adminMode = adminMode;
         enableSelectionDependentControls(null);
     }
+
 
     private void enableSelectionDependentControls(HostProxy hostInfo) {
         boolean enabled = hostInfo != null;
@@ -215,79 +222,115 @@ public class HostListPanel extends VerticalLayoutContainer {
         add(toolBar, new VerticalLayoutData(1, -1));
     }
 
+    private static final ProvidesKey<HostProxy> KEY_PROVIDER = new ProvidesKey<HostProxy>() {
+        @Override
+        public Object getKey(HostProxy item) {
+            return item.getName();
+        }
+    };
+
+    private static final Cell<HostProxy> NAME_CELL = new AbstractCell<HostProxy>() {
+        @Override
+        public void render(Context context, HostProxy host, SafeHtmlBuilder sb) {
+            String color = (host.isEnabled()) ? "black" : "gray";
+            sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
+            sb.append(SafeHtmlUtils.fromString(host.getName()));
+            sb.appendHtmlConstant("</span>");
+        }
+    };
+
+    private static final Cell<HostProxy> ADDRESS_CELL = new AbstractCell<HostProxy>() {
+        @Override
+        public void render(Context context, HostProxy host, SafeHtmlBuilder sb) {
+            String color = (host.isEnabled()) ? "black" : "gray";
+            sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
+            sb.append(SafeHtmlUtils.fromString(host.getAddr()));
+            sb.appendHtmlConstant("</span>");
+        }
+    };
 
     private void createHostListPanel() {
 
-        ColumnConfig<HostProxy, HostProxy> nameCol = new ColumnConfig<HostProxy, HostProxy>(
-                new IdentityValueProvider<HostProxy>(), 128, "Host Name");
-        nameCol.setMenuDisabled(true);
-        nameCol.setSortable(false);
+        hostGrid = new DataGrid<HostProxy>(1024*1024, KEY_PROVIDER);
+        selectionModel = new SingleSelectionModel<HostProxy>(KEY_PROVIDER);
+        hostGrid.setSelectionModel(selectionModel);
 
-        nameCol.setCell(new AbstractCell<HostProxy>() {
+        Column<HostProxy,HostProxy> colName = new IdentityColumn<HostProxy>(NAME_CELL);
+        hostGrid.addColumn(colName, new ResizableHeader<HostProxy>("Name", hostGrid, colName));
+        hostGrid.setColumnWidth(colName, 128, Style.Unit.PX);
+
+        Column<HostProxy,HostProxy> colAddr = new IdentityColumn<HostProxy>(ADDRESS_CELL);
+        hostGrid.addColumn(colAddr, "Address");
+        hostGrid.setColumnWidth(colAddr, 100, Style.Unit.PCT);
+
+        hostGrid.setSkipRowHoverStyleUpdate(true);
+        hostGrid.setSkipRowHoverFloatElementCheck(true);
+        hostGrid.setSkipRowHoverCheck(true);
+        hostGrid.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.DISABLED);
+
+        hostGridStore = new ListDataProvider<HostProxy>();
+        hostGridStore.addDataDisplay(hostGrid);
+
+        hostGrid.addCellPreviewHandler(new CellPreviewEvent.Handler<HostProxy>() {
             @Override
-            public void render(Context context, HostProxy host, SafeHtmlBuilder sb) {
-                String color = host.isEnabled() ? "black" : "gray";
-                sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
-                sb.append(SafeHtmlUtils.fromString(host.getName()));
-                sb.appendHtmlConstant("</span>");
+            public void onCellPreview(CellPreviewEvent<HostProxy> event) {
+                NativeEvent nev = event.getNativeEvent();
+                String eventType = nev.getType();
+                if ((BrowserEvents.KEYDOWN.equals(eventType) && nev.getKeyCode() == KeyCodes.KEY_ENTER)
+                        || BrowserEvents.DBLCLICK.equals(nev.getType())) {
+                    selectionModel.setSelected(event.getValue(), true);
+                    enableSelectionDependentControls(event.getValue());
+                    listTraces();
+                }
+                if (BrowserEvents.CONTEXTMENU.equals(eventType)) {
+                    selectionModel.setSelected(event.getValue(), true);
+                    if (event.getValue() != null) {
+                        contextMenu.showAt(event.getNativeEvent().getClientX(), event.getNativeEvent().getClientY());
+                    }
+                }
+
+                // TODO update toolbar icons and context menu on element selection
             }
         });
 
-        ColumnConfig<HostProxy, HostProxy> addrCol = new ColumnConfig<HostProxy, HostProxy>(
-                new IdentityValueProvider<HostProxy>(), 127, "IP Address");
-        addrCol.setMenuDisabled(true);
-        addrCol.setSortable(false);
-
-        addrCol.setCell(new AbstractCell<HostProxy>() {
+        hostGrid.addDomHandler(new DoubleClickHandler() {
             @Override
-            public void render(Context context, HostProxy host, SafeHtmlBuilder sb) {
-                String color = host.isEnabled() ? "black" : "gray";
-                sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
-                sb.append(SafeHtmlUtils.fromString(host.getAddr()));
-                sb.appendHtmlConstant("</span>");
+            public void onDoubleClick(DoubleClickEvent event) {
+                event.preventDefault();
+            }
+        }, DoubleClickEvent.getType());
+
+        hostGrid.addDomHandler(new ContextMenuHandler() {
+            @Override
+            public void onContextMenu(ContextMenuEvent event) {
+                event.preventDefault();
+            }
+        }, ContextMenuEvent.getType());
+
+        selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+            @Override
+            public void onSelectionChange(SelectionChangeEvent event) {
+                enableSelectionDependentControls(selectionModel.getSelectedObject());
             }
         });
-
-        ColumnModel<HostProxy> model = new ColumnModel<HostProxy>(Arrays.<ColumnConfig<HostProxy, ?>>asList(nameCol, addrCol));
-        hostGridStore = new ListStore<HostProxy>(props.key());
-
-        hostGrid = new Grid<HostProxy>(hostGridStore, model);
-        selectionModel = hostGrid.getSelectionModel();
-        selectionModel.setSelectionMode(Style.SelectionMode.SINGLE);
-
-        hostGrid.getView().setAutoExpandColumn(addrCol);
-        hostGrid.getView().setForceFit(true);
-
-        // TODO host selection handler for keyboard: select item, press ENTER
 
         refresh();
-
-        hostGrid.addCellDoubleClickHandler(new CellDoubleClickEvent.CellDoubleClickHandler() {
-            @Override
-            public void onCellClick(CellDoubleClickEvent event) {
-                enableSelectionDependentControls(hostGrid.getSelectionModel().getSelectedItem());
-                listTraces();
-            }
-        });
-
-        hostGrid.addCellClickHandler(new CellClickEvent.CellClickHandler() {
-            @Override
-            public void onCellClick(CellClickEvent event) {
-                enableSelectionDependentControls(hostGrid.getSelectionModel().getSelectedItem());
-            }
-        });
 
         add(hostGrid, new VerticalLayoutData(1, 1));
     }
 
 
     public void refresh() {
-        hostGridStore.clear();
+        hostGridStore.getList().clear();
         rf.hostService().findAll().fire(new Receiver<List<HostProxy>>() {
             @Override
             public void onSuccess(List<HostProxy> response) {
-                hostGridStore.addAll(response);
-                enableSelectionDependentControls(hostGrid.getSelectionModel().getSelectedItem());
+                hostGridStore.getList().addAll(response);
+                enableSelectionDependentControls(selectionModel.getSelectedObject());
+            }
+            @Override
+            public void onFailure(ServerFailure error) {
+                errorHandler.error("Error loading host list", error);
             }
         });
     }
@@ -302,7 +345,7 @@ public class HostListPanel extends VerticalLayoutContainer {
                 public void onHide(HideEvent event) {
                     Dialog d = (Dialog) event.getSource();
                     if ("Yes".equals(d.getHideButton().getText())) {
-                        hostGridStore.remove(hi);
+                        hostGridStore.getList().remove(hi);
                         rf.hostService().remove(hi).fire();
                     }
                 }
@@ -313,7 +356,7 @@ public class HostListPanel extends VerticalLayoutContainer {
 
 
     private void createContextMenu() {
-        Menu menu = new Menu();
+        contextMenu = new Menu();
 
         mnuRefresh = new MenuItem("Refresh");
         mnuRefresh.setIcon(Resources.INSTANCE.refreshIcon());
@@ -323,9 +366,9 @@ public class HostListPanel extends VerticalLayoutContainer {
                 refresh();
             }
         });
-        menu.add(mnuRefresh);
+        contextMenu.add(mnuRefresh);
 
-        menu.add(new SeparatorMenuItem());
+        contextMenu.add(new SeparatorMenuItem());
 
         mnuAddHost = new MenuItem("New host");
         mnuAddHost.setIcon(Resources.INSTANCE.addIcon());
@@ -335,7 +378,7 @@ public class HostListPanel extends VerticalLayoutContainer {
                 addHost();
             }
         });
-        menu.add(mnuAddHost);
+        contextMenu.add(mnuAddHost);
 
         mnuRemoveHost = new MenuItem("Remove host");
         mnuRemoveHost.setIcon(Resources.INSTANCE.removeIcon());
@@ -345,7 +388,7 @@ public class HostListPanel extends VerticalLayoutContainer {
                 removeHost();
             }
         });
-        menu.add(mnuRemoveHost);
+        contextMenu.add(mnuRemoveHost);
 
         mnuEditHost = new MenuItem("Edit host");
         mnuEditHost.setIcon(Resources.INSTANCE.editIcon());
@@ -355,9 +398,9 @@ public class HostListPanel extends VerticalLayoutContainer {
                 editHost();
             }
         });
-        menu.add(mnuEditHost);
+        contextMenu.add(mnuEditHost);
 
-        menu.add(new SeparatorMenuItem());
+        contextMenu.add(new SeparatorMenuItem());
 
         mnuDisableHost = new MenuItem("Disable host");
         mnuDisableHost.setIcon(Resources.INSTANCE.disableIcon());
@@ -367,7 +410,7 @@ public class HostListPanel extends VerticalLayoutContainer {
                 toggleHost(false);
             }
         });
-        menu.add(mnuDisableHost);
+        contextMenu.add(mnuDisableHost);
 
         mnuEnableHost = new MenuItem("Enable host");
         mnuEnableHost.setIcon(Resources.INSTANCE.enableIcon());
@@ -377,9 +420,9 @@ public class HostListPanel extends VerticalLayoutContainer {
                 toggleHost(true);
             }
         });
-        menu.add(mnuEnableHost);
+        contextMenu.add(mnuEnableHost);
 
-        menu.add(new SeparatorMenuItem());
+        contextMenu.add(new SeparatorMenuItem());
 
         mnuListTraces = new MenuItem("List traces");
         mnuListTraces.setIcon(Resources.INSTANCE.listColumnsIcon());
@@ -389,9 +432,9 @@ public class HostListPanel extends VerticalLayoutContainer {
                 listTraces();
             }
         });
-        menu.add(mnuListTraces);
+        contextMenu.add(mnuListTraces);
 
-        hostGrid.setContextMenu(menu);
+        //hostGrid.setContextMenu(contextMenu);
     }
 
 
@@ -401,12 +444,12 @@ public class HostListPanel extends VerticalLayoutContainer {
 
 
     private void removeHost() {
-        removeHost(hostGrid.getSelectionModel().getSelectedItem());
+        removeHost(selectionModel.getSelectedObject());
     }
 
 
     private void editHost() {
-        HostProxy hostInfo = hostGrid.getSelectionModel().getSelectedItem();
+        HostProxy hostInfo = selectionModel.getSelectedObject();
         if (hostInfo != null) {
             new HostPrefsDialog(rf, this, hostInfo, errorHandler).show();
         }
@@ -414,7 +457,7 @@ public class HostListPanel extends VerticalLayoutContainer {
 
 
     private void toggleHost(boolean enabled) {
-        HostProxy info = selectionModel.getSelectedItem();
+        HostProxy info = selectionModel.getSelectedObject();
         if (info != null) {
             HostServiceProxy req = rf.hostService();
             HostProxy editedHost = req.edit(info);
@@ -424,17 +467,21 @@ public class HostListPanel extends VerticalLayoutContainer {
                 public void onSuccess(Void aVoid) {
                     refresh();
                 }
+                @Override
+                public void onFailure(ServerFailure error) {
+                    errorHandler.error("Error enabling/disabling host", error);
+                }
             });
         }
     }
 
 
     private void listTraces() {
-        HostProxy hostInfo = selectionModel.getSelectedItem();
+        HostProxy hostInfo = selectionModel.getSelectedObject();
         GWT.log("Selected host: " + hostInfo);
 
         if (hostInfo != null) {
-            shell.get().addView(panelFactory.traceListPanel(hostInfo), hostInfo.getName() + ": traces");
+            shell.get().addView(panelFactory.traceSearchPanel(hostInfo), hostInfo.getName() + ": traces");
         }
     }
 }

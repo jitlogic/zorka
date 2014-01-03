@@ -17,20 +17,29 @@ package com.jitlogic.zico.test.support;
 
 import com.google.inject.Singleton;
 import com.jitlogic.zico.core.UserContext;
+import com.jitlogic.zico.core.ZicoRuntimeException;
 
 @Singleton
 public class UserTestContext implements UserContext {
+
+    public String username = "test";
+
+    public boolean isAdmin = true;
+
     @Override
     public String getUser() {
-        return "test";
+        return username;
     }
 
     @Override
     public boolean isInRole(String role) {
-        return true;
+        return "ADMIN".equals(role) ? isAdmin : true;
     }
 
     @Override
     public void checkAdmin() {
+        if (!isAdmin) {
+            throw new ZicoRuntimeException("Insufficient privileges");
+        }
     }
 }

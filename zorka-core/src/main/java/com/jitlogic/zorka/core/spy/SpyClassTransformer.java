@@ -85,6 +85,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
     private MethodCallStatistic tracerLookups, classesProcessed, classesTransformed, spyLookups;
 
+
     /**
      * Creates new spy class transformer
      *
@@ -102,12 +103,14 @@ public class SpyClassTransformer implements ClassFileTransformer {
         this.classesTransformed = statistics.getMethodCallStatistic("ClassesTransformed");
     }
 
+
     /**
      * Returns context by its ID
      */
     public SpyContext getContext(int id) {
         return ctxById.get(id);
     }
+
 
     /**
      * Looks up for a spy context with the same configuration. If there is one, it will be returned.

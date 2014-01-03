@@ -15,17 +15,27 @@
  */
 package com.jitlogic.zico.test;
 
+import com.jitlogic.zico.core.TraceTemplateManager;
 import com.jitlogic.zico.core.model.TraceTemplate;
 import com.jitlogic.zico.test.support.ZicoFixture;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TemplateManagerUnitTest extends ZicoFixture {
+
+    private TraceTemplateManager templateManager;
+
+
+    @Before
+    public void acquireApplicationObjects() {
+        templateManager = injector.getInstance(TraceTemplateManager.class);
+    }
+
 
     private TraceTemplate tti(int tid, int order, String condT, String condP, String templ) {
         TraceTemplate tti = new TraceTemplate();
@@ -52,6 +62,20 @@ public class TemplateManagerUnitTest extends ZicoFixture {
 
 
     @Test
+    public void testInsertReopenAndReadTemplate() throws Exception {
+        TraceTemplate t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
+
+        t1.setId(systemService.saveTemplate(t1));
+
+        templateManager.close();
+        templateManager.open();
+
+        List<TraceTemplate> lst = systemService.listTemplates();
+        assertEquals(1, lst.size());
+    }
+
+
+    @Test
     public void testInsertAndModifyNewTemplate() {
         TraceTemplate t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
         t1.setId(systemService.saveTemplate(t1));
@@ -65,6 +89,7 @@ public class TemplateManagerUnitTest extends ZicoFixture {
         assertEquals(t1.getId(), lst.get(0).getId());
     }
 
+
     @Test
     public void testAddRemoveTemplate() {
         TraceTemplate t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
@@ -74,8 +99,30 @@ public class TemplateManagerUnitTest extends ZicoFixture {
         assertEquals(0, systemService.listTemplates().size());
     }
 
+
     @Test
     public void testSearchForEmptyTraceIdMap() {
         assertThat(systemService.getTidMap(null)).hasSize(0);
     }
+
+
+    @Test
+    public void testExportImportTemplates() {
+        TraceTemplate t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
+        int tid = systemService.saveTemplate(t1);
+
+        templateManager.export();
+        templateManager.close();
+
+        templateManager.open();
+
+        TraceTemplate t2 = templateManager.find(TraceTemplate.class, tid);
+        assertNotNull(t2);
+        assertEquals(t1.getTemplate(), t2.getTemplate());
+        assertEquals(t1.getOrder(), t2.getOrder());
+        assertEquals(t1.getFlags(), t2.getFlags());
+        assertEquals(t1.getCondRegex(), t2.getCondRegex());
+        assertEquals(t1.getCondTemplate(), t2.getCondTemplate());
+    }
+
 }

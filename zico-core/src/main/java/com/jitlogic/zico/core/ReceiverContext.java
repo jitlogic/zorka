@@ -15,26 +15,16 @@
  */
 package com.jitlogic.zico.core;
 
-
-import com.jitlogic.zico.core.model.HostInfo;
-import com.jitlogic.zico.core.model.SymbolicExceptionInfo;
-import com.jitlogic.zico.core.rds.RDSStore;
-import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
+import com.jitlogic.zico.shared.data.HostProxy;
 import com.jitlogic.zorka.common.tracedata.MetadataChecker;
 import com.jitlogic.zorka.common.tracedata.Symbol;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.common.tracedata.SymbolicException;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-import org.fressian.FressianWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,23 +36,16 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     private final static Logger log = LoggerFactory.getLogger(ReceiverContext.class);
 
     private SymbolRegistry symbolRegistry;
-    private Map<Integer, Integer> sidMap = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> sidMap = new HashMap<Integer,Integer>();
 
-    private RDSStore traceDataStore;
-    private TraceTypeRegistry traceTypeRegistry;
-    private TraceTableWriter traceTableWriter;
-
-    private HostInfo hostInfo;
+    private HostStore hostStore;
 
     private Set<Object> visitedObjects = new HashSet<Object>();
 
 
-    public ReceiverContext(HostStore store, TraceTypeRegistry traceTypeRegistry, TraceTableWriter traceTableWriter) {
-        this.symbolRegistry = store.getStoreManager().getSymbolRegistry();
-        this.traceDataStore = store.getRds();
-        this.hostInfo = store.getHostInfo();
-        this.traceTypeRegistry = traceTypeRegistry;
-        this.traceTableWriter = traceTableWriter;
+    public ReceiverContext(HostStore hostStore) {
+        this.hostStore = hostStore;
+        this.symbolRegistry = hostStore.getSymbolRegistry();
     }
 
 
@@ -72,7 +55,6 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
             if (obj instanceof Symbol) {
                 processSymbol((Symbol) obj);
             } else if (obj instanceof TraceRecord) {
-                log.debug("Processing trace record:" + obj);
                 processTraceRecord((TraceRecord) obj);
             } else {
                 if (obj != null) {
@@ -86,6 +68,9 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
         }
     }
 
+    public void commit() {
+        hostStore.commit();
+    }
 
     private void processSymbol(Symbol sym) {
         int newid = symbolRegistry.symbolId(sym.getName());
@@ -94,89 +79,15 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
 
     private void processTraceRecord(TraceRecord rec) throws IOException {
-        if (!hostInfo.hasFlag(HostInfo.DISABLED)) {
+        if (!hostStore.hasFlag(HostProxy.DISABLED)) {
             rec.traverse(this);
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-            FressianWriter writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);
-            writer.writeObject(rec);
-            byte[] chunk = os.toByteArray();
-            long offs = traceDataStore.write(chunk);
-            save(hostInfo.getId(), offs, chunk.length, rec);
+            visitedObjects.clear();
+            hostStore.processTraceRecord(rec);
         } else {
-            log.debug("Dropping trace for inactive host: " + hostInfo.getName());
+            log.debug("Dropping trace for inactive host: " + hostStore.getName());
         }
     }
 
-
-    public void save(int hostId, long offs, int length, TraceRecord tr) {
-
-        JSONObject attrMap = new JSONObject();
-
-        if (tr.getAttrs() != null) {
-            for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
-                String val = e.getValue() != null ? e.getValue().toString() : "";
-                attrMap.put(symbolRegistry.symbolName(e.getKey()), val);
-            }
-        }
-
-        int status = 0;
-
-        if (tr.getException() != null
-                || tr.hasFlag(TraceRecord.EXCEPTION_PASS)
-                || tr.getMarker().hasFlag(TraceMarker.ERROR_MARK)) {
-            status = 1;
-        }
-
-        String attrJson = attrMap.toJSONString();
-
-        String exJson = null;
-
-        SymbolicException e = tr.findException();
-
-        if (e != null) {
-            SymbolicExceptionInfo sei = ZicoUtil.extractSymbolicExceptionInfo(symbolRegistry, e);
-            JSONObject json = new JSONObject();
-            json.put("exClass", sei.getExClass());
-            json.put("message", sei.getMessage());
-            JSONArray stack = new JSONArray();
-            if (sei.getStackTrace() != null) {
-                stack.addAll(sei.getStackTrace().size() > 8 ? sei.getStackTrace().subList(0, 8) : sei.getStackTrace());
-            }
-            json.put("stackTrace", stack);
-            exJson = json.toJSONString();
-        }
-
-        traceTableWriter.submit(ZorkaUtil.<String, Object>map(
-                "HOST_ID", hostId,
-                "DATA_OFFS", offs,
-                "TRACE_ID", tr.getMarker().getTraceId(),
-                "DATA_LEN", length,
-                "CLOCK", tr.getClock(),
-                "RFLAGS", tr.getFlags(),
-                "TFLAGS", tr.getMarker().getFlags(),
-                "STATUS", status,
-                "CLASS_ID", tr.getClassId(),
-                "METHOD_ID", tr.getMethodId(),
-                "SIGN_ID", tr.getSignatureId(),
-                "CALLS", tr.getCalls(),
-                "ERRORS", tr.getErrors(),
-                "RECORDS", numRecords(tr),
-                "EXTIME", tr.getTime(),
-                "ATTRS", attrJson,
-                "EXINFO", exJson
-        ));
-    }
-
-
-    private int numRecords(TraceRecord rec) {
-        int n = 1;
-
-        for (int i = 0; i < rec.numChildren(); i++) {
-            n += numRecords(rec.getChild(i));
-        }
-
-        return n;
-    }
 
 
     @Override
@@ -187,9 +98,6 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
             } else {
                 visitedObjects.add(owner);
             }
-            if (sidMap.containsKey(symbolId)) {
-                traceTypeRegistry.mark(sidMap.get(symbolId), getHostInfo().getId());
-            }
         }
         return sidMap.containsKey(symbolId) ? sidMap.get(symbolId) : 0;
     }
@@ -199,8 +107,4 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     public void checkMetric(int metricId) throws IOException {
     }
 
-
-    public HostInfo getHostInfo() {
-        return hostInfo;
-    }
 }

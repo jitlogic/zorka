@@ -154,7 +154,7 @@ public class RDSStore implements Closeable {
     /**
      * (Re)opens latest output file.
      */
-    private void rotate() throws IOException {
+    public synchronized void rotate() throws IOException {
         String fname = String.format("%016x.rgz", logicalPos).toLowerCase();
 
         if (output != null) {
@@ -202,14 +202,40 @@ public class RDSStore implements Closeable {
             chunkOffsets.remove(0);
 
             for (RDSCleanupListener listener : cleanupListeners) {
-                listener.onChunkRemoved(chunkOffs, chunkLen);
+                listener.onChunkRemoved(this, chunkOffs, chunkLen);
             }
         }
+    }
+
+
+    public synchronized void cleanup(long toOffs) throws IOException {
+        while (chunkOffsets.size() > 1 && chunkOffsets.get(1) < toOffs) {
+            long chunkOffs = chunkOffsets.get(0);
+            long chunkLen = (chunkOffsets.size() > 1 ? chunkOffsets.get(1) : outputStart) - chunkOffs;
+
+            File f = chunkFile(chunkOffs);
+
+            if (f.exists()) {
+                f.delete();
+            }
+
+            chunkOffsets.remove(0);
+
+            for (RDSCleanupListener listener : cleanupListeners) {
+                listener.onChunkRemoved(this, chunkOffs, chunkLen);
+            }
+        }
+    }
+
+
+    public synchronized long getMaxSize() {
+        return maxSize;
     }
 
     public synchronized void setMaxSize(long maxSize) {
         this.maxSize = maxSize;
     }
+
 
     @Override
     public synchronized void close() throws IOException {
@@ -245,6 +271,11 @@ public class RDSStore implements Closeable {
             throw new RDSException("No data written.");
         }
 
+        if (output.physicalLength() > fileSize) {
+            rotate();
+            cleanup();
+        }
+
         output.write(data);
 
         long pos = logicalPos;
@@ -252,10 +283,6 @@ public class RDSStore implements Closeable {
         logicalPos += data.length;
         outputPos += data.length;
 
-        if (output.physicalLength() > fileSize) {
-            rotate();
-            cleanup();
-        }
 
         return pos;
     }

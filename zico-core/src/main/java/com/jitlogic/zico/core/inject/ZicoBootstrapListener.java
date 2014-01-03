@@ -20,14 +20,11 @@ import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.ServletModule;
 import com.jitlogic.zico.core.HostStoreManager;
-import com.jitlogic.zico.core.TraceTableWriter;
 import com.jitlogic.zico.core.ZicoService;
-import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 
 public class ZicoBootstrapListener extends GuiceServletContextListener {
@@ -46,7 +43,6 @@ public class ZicoBootstrapListener extends GuiceServletContextListener {
         final Injector injector = Guice.createInjector(new ProdZicoModule(), new ZicoServletModule());
 
         injector.getInstance(ZicoService.class).start();
-        injector.getInstance(TraceTableWriter.class).start();
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 System.out.println("Shutting down Zorka Intranet Collector ...");
@@ -56,12 +52,6 @@ public class ZicoBootstrapListener extends GuiceServletContextListener {
                     injector.getInstance(HostStoreManager.class).close();
                 } catch (IOException e) {
                     log.error("Error closing host store manager", e);
-                }
-
-                try {
-                    injector.getInstance(BasicDataSource.class).close();
-                } catch (SQLException e) {
-                    log.error("Error closing database connection", e);
                 }
             }
         });

@@ -18,12 +18,14 @@ package com.jitlogic.zico.client.portal;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.ZicoShell;
@@ -103,6 +105,10 @@ public class WelcomePanel implements IsWidget {
                     createAdminPortlet();
                 }
             }
+            @Override
+            public void onFailure(ServerFailure failure) {
+                errorHandler.error("Error performing server request", failure);
+            }
         });
 
 
@@ -144,6 +150,26 @@ public class WelcomePanel implements IsWidget {
             }
         }, ClickEvent.getType());
 
+        Hyperlink lnkBackupConfig = new Hyperlink("Back up Symbols and Config", "");
+        vp.add(lnkBackupConfig);
+
+        lnkBackupConfig.addHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                rf.systemService().backupConfig().fire(new Receiver<Void>() {
+                    @Override
+                    public void onSuccess(Void response) {
+                        Window.alert("Symbols and configuration backed up succesfully.");
+                    }
+
+                    @Override
+                    public void onFailure(ServerFailure failure) {
+                        errorHandler.error("Error backing up symbols and configuration.", failure);
+                    }
+                });
+            }
+        }, ClickEvent.getType());
+
         wndAdmin.add(vp);
         portal.add(wndAdmin, 2);
     }
@@ -178,6 +204,10 @@ public class WelcomePanel implements IsWidget {
             @Override
             public void onSuccess(List<SymbolProxy> response) {
                 shell.get().addView(panelFactory.traceTemplatePanel(response), "Templates");
+            }
+            @Override
+            public void onFailure(ServerFailure failure) {
+                errorHandler.error("Error opening template panel", failure);
             }
         });
     }

@@ -37,6 +37,7 @@ public interface SystemServiceProxy extends RequestContext {
 
     Request<Void> removeTemplate(Integer tid);
 
-    Request<List<SymbolProxy>> getTidMap(Integer hostId);
+    Request<List<SymbolProxy>> getTidMap(String hostName);
 
+    Request<Void> backupConfig();
 }

@@ -15,14 +15,17 @@
  */
 package com.jitlogic.zico.core.model;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import com.jitlogic.zico.core.locators.UserLocator;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
-public class User  {
+public class User implements Serializable {
 
     public final static int ADMIN_USER = 0x0001;
-
-    private Integer id;
 
     private String userName;
 
@@ -32,55 +35,96 @@ public class User  {
 
     private int flags;
 
-    private UserLocator locator;
+    private List<String> allowedHosts = new ArrayList<String>();
 
-    public User(UserLocator locator) {
-        this.locator = locator;
+
+    public User() {
+
     }
 
-    public Integer getId() {
-        return id;
+
+    public User(JSONObject obj) throws JSONException {
+        userName = obj.getString("username");
+        realName = obj.getString("realname");
+        flags = obj.getInt("flags");
+        password = obj.getString("password");
+
+        JSONArray hosts = obj.getJSONArray("hosts");
+
+        for (int i = 0; i < hosts.length(); i++) {
+            allowedHosts.add(hosts.getString(i));
+        }
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+
+    public JSONObject toJSONObject() throws JSONException {
+        JSONObject json = new JSONObject();
+
+        json.put("username", userName);
+        json.put("realname", realName);
+        json.put("password", password);
+        json.put("flags", flags);
+
+        JSONArray hosts = new JSONArray();
+
+        for (String host : allowedHosts) {
+            hosts.put(host);
+        }
+
+        json.put("hosts", hosts);
+
+        return json;
     }
+
 
     public String getUserName() {
         return userName;
     }
 
+
     public void setUserName(String userName) {
         this.userName = userName;
     }
+
 
     public String getRealName() {
         return realName;
     }
 
+
     public void setRealName(String realName) {
         this.realName = realName;
     }
+
 
     public String getPassword() {
         return password;
     }
 
+
     public void setPassword(String password) {
         this.password = password;
     }
+
 
     public int getFlags() {
         return flags;
     }
 
+
     public void setFlags(int flags) {
         this.flags = flags;
     }
 
+    public boolean hasFlag(int flag) {
+        return 0 != (flags & flag);
+    }
+
+
     public boolean isAdmin() {
         return 0 != (flags & ADMIN_USER);
     }
+
 
     public void setAdmin(boolean admin) {
         if (admin) {
@@ -90,12 +134,13 @@ public class User  {
         }
     }
 
-    public void persist() {
-        locator.persist(this);
+
+    public List<String> getAllowedHosts() {
+        return allowedHosts;
     }
 
 
-    public void remove() {
-        locator.remove(this);
+    public void setAllowedHosts(List<String> allowedHosts) {
+        this.allowedHosts = allowedHosts;
     }
 }

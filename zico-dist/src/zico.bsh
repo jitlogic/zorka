@@ -22,7 +22,8 @@ zorka.require(
   "apache/apache.bsh",
   "google/libs.bsh",
   "jboss/jbosslibs.bsh",
-  "spring/spring.bsh"
+  "spring/spring.bsh",
+  "libs/mapdb.bsh"
 );
 
 __zico() {
@@ -63,8 +64,9 @@ __zico() {
     "com.jitlogic.zico.core.HostStore$1/mapRow",
     "com.jitlogic.zico.core.TraceRecordStore/packTraceRecord",
     "com.jitlogic.zico.core.TraceRecordStore/searchRecords",
-    "com.jitlogic.zico.core.locators.TraceTemplateManager",
-    "com.jitlogic.zico.core.ZicoUtil"
+    "com.jitlogic.zico.core.TraceTemplateManager",
+    "com.jitlogic.zico.core.ZicoUtil",
+    "com.jitlogic.zico.core.model.TraceInfoSearchQuery"
   );
 
 

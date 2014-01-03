@@ -22,21 +22,20 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class DataReceptionUnitTest extends ZicoFixture {
 
     @Test
     public void testAcquireSingleStoreAndCheckIfItWorks() throws Exception {
-        HostStore store = hostStoreManager.get("test", true);
-        SymbolRegistry symbols = store.getStoreManager().getSymbolRegistry();
+        HostStore store = hostStoreManager.getHost("test", true);
+        SymbolRegistry symbols = store.getSymbolRegistry();
         int t1 = symbols.symbolId("t1"), t2 = symbols.symbolId("t2");
 
         assertEquals(t2, symbols.symbolId("t2"));
         assertEquals(t1, symbols.symbolId("t1"));
         assertNotEquals(t1, t2);
 
-        assertNotNull(store.getRds());
+        //assertNotNull(store.getRdsData());
     }
 
 }

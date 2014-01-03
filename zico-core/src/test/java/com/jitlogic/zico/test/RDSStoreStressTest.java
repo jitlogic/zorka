@@ -52,11 +52,15 @@ public class RDSStoreStressTest extends ZicoFixture {
 
         RDSCleanupListener cleaner = new RDSCleanupListener() {
             @Override
-            public void onChunkRemoved(Long start, Long length) {
+            public void onChunkRemoved(RDSStore origin, Long start, Long length) {
                 while (positions.size() > 0 && positions.get(0) < start + length) {
                     positions.remove(0);
                     chunks.remove(0);
                 }
+            }
+
+            @Override
+            public void onChunkStarted(RDSStore origin, Long start) {
             }
         };
 
@@ -80,6 +84,16 @@ public class RDSStoreStressTest extends ZicoFixture {
                 }
             }
 
+        }
+    }
+
+
+    @Test
+    public void testRdsOpenClose() throws Exception {
+        String path = tmpFile("testrds");
+        for (int i = 0; i < 100; i++) {
+            rds = new RDSStore(path, 1024*1024*1024, 16*1024*1024, 1024*1024);
+            rds.close();
         }
     }
 

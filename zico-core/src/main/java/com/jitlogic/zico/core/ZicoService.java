@@ -19,6 +19,7 @@ import com.jitlogic.zorka.common.zico.ZicoDataProcessorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -54,20 +55,30 @@ public class ZicoService implements Runnable {
      */
     private ServerSocket socket;
 
-    private ZicoDataProcessorFactory factory;
+    ZicoDataProcessorFactory factory;
 
     private Executor executor;
 
+    private int socketTimeout;
+
     private AtomicLong connCnt = new AtomicLong(0);
 
-    public ZicoService(String listenAddr, int listenPort, ZicoDataProcessorFactory factory) {
-        this.listenPort = listenPort;
+    @Inject
+    public ZicoService(ZicoDataProcessorFactory factory,
+                       String listenAddr,
+                       int listenPort,
+                       int threadsMax,
+                       int socketTimeout) {
+
         this.factory = factory;
-        executor = Executors.newFixedThreadPool(32); // TODO make this configurable
+        this.listenPort = listenPort;
+        this.socketTimeout = socketTimeout;
+        this.executor = Executors.newFixedThreadPool(threadsMax);
+
         try {
             this.listenAddr = InetAddress.getByName(listenAddr);
         } catch (UnknownHostException e) {
-            //log.error("Cannot resolve address: " + listenAddr, e);
+            log.error("Invalid listen address configured: " + listenAddr, e);
         }
     }
 
@@ -79,12 +90,12 @@ public class ZicoService implements Runnable {
             try {
                 sock = socket.accept();
                 connCnt.incrementAndGet();
-                ZicoServerConnector handler = new ZicoServerConnector(sock, factory);
+                ZicoServerConnector handler = new ZicoServerConnector(socketTimeout, factory, sock);
                 executor.execute(handler);
             } catch (SocketException e) {
                 // TODO check if socket closed
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Error listening for connections.", e);
             } finally {
 
             }

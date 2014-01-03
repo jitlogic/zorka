@@ -19,17 +19,16 @@ package com.jitlogic.zico.test.support;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.jitlogic.zico.core.HostStoreManager;
-import com.jitlogic.zico.core.TraceTableWriter;
-import com.jitlogic.zico.core.TraceTypeRegistry;
+import com.jitlogic.zico.core.UserContext;
 import com.jitlogic.zico.core.ZicoConfig;
 import com.jitlogic.zico.core.ZicoService;
 import com.jitlogic.zico.core.services.HostGwtService;
 import com.jitlogic.zico.core.services.SystemGwtService;
 import com.jitlogic.zico.core.services.TraceDataGwtService;
+import com.jitlogic.zico.core.services.UserGwtService;
 import com.jitlogic.zorka.common.test.support.TestUtil;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
-import org.apache.commons.dbcp.BasicDataSource;
 import org.junit.After;
 import org.junit.Before;
 
@@ -49,15 +48,14 @@ public class ZicoFixture {
     protected TraceDataGwtService traceDataService;
     protected SystemGwtService systemService;
     protected HostGwtService hostService;
+    protected UserGwtService userService;
 
     protected SymbolRegistry symbolRegistry;
-    protected TraceTypeRegistry traceTypeRegistry;
-
-    protected TraceTableWriter traceTableWriter;
 
     protected TestZicoModule testZicoModule;
     protected Injector injector;
-    protected BasicDataSource dataSource;
+
+    protected UserTestContext userContext;
 
     protected Random rand = new Random();
 
@@ -67,7 +65,7 @@ public class ZicoFixture {
         TestUtil.rmrf(tmpDir);
         new File(tmpDir).mkdirs();
 
-        configProperties = setProps(
+        configProperties = ZicoTestUtil.setProps(
                 ZorkaConfig.defaultProperties(ZicoConfig.DEFAULT_CONF_PATH),
                 "zico.home.dir", tmpDir,
                 "zico.listen.port", "9640",
@@ -85,8 +83,6 @@ public class ZicoFixture {
         testZicoModule = new TestZicoModule(config);
         injector = Guice.createInjector(testZicoModule);
 
-        dataSource = injector.getInstance(BasicDataSource.class);
-
         hostStoreManager = injector.getInstance(HostStoreManager.class);
         zicoService = injector.getInstance(ZicoService.class);
         zicoService.start();
@@ -94,18 +90,18 @@ public class ZicoFixture {
         traceDataService = injector.getInstance(TraceDataGwtService.class);
         systemService = injector.getInstance(SystemGwtService.class);
         hostService = injector.getInstance(HostGwtService.class);
+        userService = injector.getInstance(UserGwtService.class);
 
         symbolRegistry = injector.getInstance(SymbolRegistry.class);
-        traceTypeRegistry = injector.getInstance(TraceTypeRegistry.class);
 
-        traceTableWriter = injector.getInstance(TraceTableWriter.class);
+        userContext = (UserTestContext)injector.getInstance(UserContext.class);
+
     }
 
     @After
     public void tearDownZicoFixture() throws Exception {
         zicoService.stop();
         hostStoreManager.close();
-        dataSource.close();
     }
 
     public String getTmpDir() {
@@ -124,13 +120,5 @@ public class ZicoFixture {
     }
 
 
-    private static Properties setProps(Properties props, String... data) {
-
-        for (int i = 1; i < data.length; i += 2) {
-            props.setProperty(data[i - 1], data[i]);
-        }
-
-        return props;
-    }
 
 }

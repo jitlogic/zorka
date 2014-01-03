@@ -17,14 +17,11 @@ package com.jitlogic.zico.shared.data;
 
 import com.google.web.bindery.requestfactory.shared.EntityProxy;
 import com.google.web.bindery.requestfactory.shared.ProxyFor;
-import com.jitlogic.zico.core.locators.UserLocator;
+import com.jitlogic.zico.core.UserManager;
 import com.jitlogic.zico.core.model.User;
 
-@ProxyFor(value = User.class, locator = UserLocator.class)
+@ProxyFor(value = User.class, locator = UserManager.class)
 public interface UserProxy extends EntityProxy {
-    public Integer getId();
-
-    public void setId(Integer id);
 
     public String getUserName();
 

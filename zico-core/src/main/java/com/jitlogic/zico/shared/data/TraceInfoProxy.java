@@ -23,7 +23,7 @@ import java.util.List;
 
 @ProxyFor(TraceInfo.class)
 public interface TraceInfoProxy extends ValueProxy {
-    int getHostId();
+    String getHostName();
 
     long getDataOffs();
 

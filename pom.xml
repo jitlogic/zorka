@@ -3,32 +3,35 @@
     <groupId>com.jitlogic.zorka</groupId>
     <artifactId>zorka</artifactId>
     <packaging>pom</packaging>
-    <version>0.9.13</version>
+    <version>0.9.14</version>
     <name>zorka: parent aggregator</name>
     <url>http://www.jitlogic.com/zorka</url>
 
     <properties>
-        <zoola.version>0.1.0</zoola.version>
-        <libsnmp.version>0.0.1</libsnmp.version>
-        <fest.version>1.4</fest.version>
-        <junit.version>4.11</junit.version>
-        <slf4j.version>1.7.5</slf4j.version>
-        <dbcp.version>1.4</dbcp.version>
-        <h2db.version>1.3.173</h2db.version>
-        <spring.version>3.2.4.RELEASE</spring.version>
-        <gwt.version>2.5.1</gwt.version>
-        <asm.version>4.1</asm.version>
-        <gxt.version>3.0.1</gxt.version>
-        <guice.version>3.0</guice.version>
-        <gin.version>2.1.0</gin.version>
-        <jetty.version>6.1.26</jetty.version>
-        <war.plugin.version>2.1.1</war.plugin.version>
-        <antrun.plugin.version>1.3</antrun.plugin.version>
-        <mysql.connector.version>5.1.26</mysql.connector.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <parboiled.version>1.1.6</parboiled.version>
+
+        <antrun.plugin.version>1.3</antrun.plugin.version>
+        <asm.version>4.1</asm.version>
         <bval.version>0.5</bval.version>
+        <dbcp.version>1.4</dbcp.version>
+        <fest.version>1.4</fest.version>
+        <fressian.version>0.6.3</fressian.version>
+        <gin.version>2.1.0</gin.version>
+        <guava.version>15.0</guava.version>
+        <guice.version>3.0</guice.version>
+        <gwt.version>2.5.1</gwt.version>
+        <gxt.version>3.0.1</gxt.version>
+        <jarjar.version>1.7</jarjar.version>
+        <jetty.version>6.1.26</jetty.version>
         <json.version>1.2</json.version>
+        <junit.version>4.11</junit.version>
+        <libsnmp.version>0.0.1</libsnmp.version>
+        <logback.version>1.0.13</logback.version>
+        <mapdb.version>0.9.7</mapdb.version>
+        <parboiled.version>1.1.6</parboiled.version>
+        <slf4j.version>1.7.5</slf4j.version>
+        <war.plugin.version>2.1.1</war.plugin.version>
+        <zoola.version>0.1.0</zoola.version>
     </properties>
 
     <repositories>
@@ -47,6 +50,7 @@
         <module>zorka-viewer</module>
         <module>zorka-dist</module>
         <module>zico-core</module>
+        <module>zico-util</module>
         <module>zico-web</module>
         <module>zico-dist</module>
     </modules>

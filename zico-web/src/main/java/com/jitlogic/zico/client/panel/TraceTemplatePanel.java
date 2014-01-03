@@ -189,6 +189,10 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
             public void onSuccess(Integer integer) {
                 loadData();
             }
+            @Override
+            public void onFailure(ServerFailure failure) {
+                errorHandler.error("Error saving template", failure);
+            }
         });
     }
 

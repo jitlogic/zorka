@@ -21,10 +21,11 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.client.props.MethodRankInfoProperties;
-import com.jitlogic.zico.shared.data.MethodRankProxy;
+import com.jitlogic.zico.shared.data.MethodRankInfoProxy;
 import com.jitlogic.zico.shared.data.TraceInfoProxy;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
@@ -45,9 +46,9 @@ public class MethodRankingPanel extends VerticalLayoutContainer {
     private TraceInfoProxy traceInfo;
     private ErrorHandler errorHandler;
 
-    private Grid<MethodRankProxy> rankGrid;
-    private GridView<MethodRankProxy> rankGridView;
-    private ListStore<MethodRankProxy> rankStore;
+    private Grid<MethodRankInfoProxy> rankGrid;
+    private GridView<MethodRankInfoProxy> rankGridView;
+    private ListStore<MethodRankInfoProxy> rankStore;
 
     private final int COL_SZ = 40;
 
@@ -63,65 +64,65 @@ public class MethodRankingPanel extends VerticalLayoutContainer {
 
     private void createRankingGrid() {
 
-        ColumnConfig<MethodRankProxy, String> colMethod = new ColumnConfig<MethodRankProxy, String>(props.method(), 500, "Method");
+        ColumnConfig<MethodRankInfoProxy, String> colMethod = new ColumnConfig<MethodRankInfoProxy, String>(props.method(), 500, "Method");
         colMethod.setMenuDisabled(true);
 
-        ColumnConfig<MethodRankProxy, Long> colCalls = new ColumnConfig<MethodRankProxy, Long>(props.calls(), COL_SZ, "Calls");
+        ColumnConfig<MethodRankInfoProxy, Long> colCalls = new ColumnConfig<MethodRankInfoProxy, Long>(props.calls(), COL_SZ, "Calls");
         colCalls.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         colCalls.setMenuDisabled(true);
 
-        ColumnConfig<MethodRankProxy, Long> colErrors = new ColumnConfig<MethodRankProxy, Long>(props.errors(), COL_SZ, "Errors");
+        ColumnConfig<MethodRankInfoProxy, Long> colErrors = new ColumnConfig<MethodRankInfoProxy, Long>(props.errors(), COL_SZ, "Errors");
         colErrors.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         colErrors.setMenuDisabled(true);
 
-        ColumnConfig<MethodRankProxy, Long> colTime = new ColumnConfig<MethodRankProxy, Long>(props.time(), COL_SZ, "Time");
+        ColumnConfig<MethodRankInfoProxy, Long> colTime = new ColumnConfig<MethodRankInfoProxy, Long>(props.time(), COL_SZ, "Time");
         colTime.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         colTime.setToolTip(SafeHtmlUtils.fromString("Total execution time - sum of execution times of all method calls"));
         colTime.setCell(new NanoTimeRenderingCell());
         colTime.setMenuDisabled(true);
 
-        ColumnConfig<MethodRankProxy, Long> colMinTime = new ColumnConfig<MethodRankProxy, Long>(props.minTime(), COL_SZ, "MinTime");
+        ColumnConfig<MethodRankInfoProxy, Long> colMinTime = new ColumnConfig<MethodRankInfoProxy, Long>(props.minTime(), COL_SZ, "MinTime");
         colTime.setToolTip(SafeHtmlUtils.fromString("Peak execution time"));
         colMinTime.setCell(new NanoTimeRenderingCell());
         colMinTime.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         colMinTime.setMenuDisabled(true);
 
-        ColumnConfig<MethodRankProxy, Long> colMaxTime = new ColumnConfig<MethodRankProxy, Long>(props.maxTime(), COL_SZ, "MaxTime");
+        ColumnConfig<MethodRankInfoProxy, Long> colMaxTime = new ColumnConfig<MethodRankInfoProxy, Long>(props.maxTime(), COL_SZ, "MaxTime");
         colTime.setToolTip(SafeHtmlUtils.fromString("Peak execution time"));
         colMaxTime.setCell(new NanoTimeRenderingCell());
         colMaxTime.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         colMaxTime.setMenuDisabled(true);
 
-        ColumnConfig<MethodRankProxy, Long> colAvgTime = new ColumnConfig<MethodRankProxy, Long>(props.avgTime(), COL_SZ, "AvgTime");
+        ColumnConfig<MethodRankInfoProxy, Long> colAvgTime = new ColumnConfig<MethodRankInfoProxy, Long>(props.avgTime(), COL_SZ, "AvgTime");
         colTime.setToolTip(SafeHtmlUtils.fromString("Average execution time"));
         colAvgTime.setCell(new NanoTimeRenderingCell());
         colAvgTime.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         colAvgTime.setMenuDisabled(true);
 
-        ColumnConfig<MethodRankProxy, Long> colBareTime = new ColumnConfig<MethodRankProxy, Long>(props.bareTime(), COL_SZ, "BTime");
+        ColumnConfig<MethodRankInfoProxy, Long> colBareTime = new ColumnConfig<MethodRankInfoProxy, Long>(props.bareTime(), COL_SZ, "BTime");
         colBareTime.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         colBareTime.setToolTip(SafeHtmlUtils.fromString("Total bare execution time - with child methods time subtracted"));
         colBareTime.setCell(new NanoTimeRenderingCell());
         colBareTime.setMenuDisabled(true);
 
-        ColumnConfig<MethodRankProxy, Long> colMaxBareTime = new ColumnConfig<MethodRankProxy, Long>(props.maxBareTime(), COL_SZ, "MaxBTime");
+        ColumnConfig<MethodRankInfoProxy, Long> colMaxBareTime = new ColumnConfig<MethodRankInfoProxy, Long>(props.maxBareTime(), COL_SZ, "MaxBTime");
         colMaxBareTime.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         colMaxBareTime.setToolTip(SafeHtmlUtils.fromString("Maximum bare execution time - with child methods time subtracted"));
         colMaxBareTime.setCell(new NanoTimeRenderingCell());
         colMaxBareTime.setMenuDisabled(true);
 
-        ColumnConfig<MethodRankProxy, Long> colAvgBareTime = new ColumnConfig<MethodRankProxy, Long>(props.avgBareTime(), COL_SZ, "AvgBTime");
+        ColumnConfig<MethodRankInfoProxy, Long> colAvgBareTime = new ColumnConfig<MethodRankInfoProxy, Long>(props.avgBareTime(), COL_SZ, "AvgBTime");
         colAvgBareTime.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         colAvgBareTime.setToolTip(SafeHtmlUtils.fromString("Average bare execution time - with child methods time subtracted"));
         colAvgBareTime.setCell(new NanoTimeRenderingCell());
         colAvgBareTime.setMenuDisabled(true);
 
-        ColumnModel<MethodRankProxy> model = new ColumnModel<MethodRankProxy>(Arrays.<ColumnConfig<MethodRankProxy, ?>>asList(
+        ColumnModel<MethodRankInfoProxy> model = new ColumnModel<MethodRankInfoProxy>(Arrays.<ColumnConfig<MethodRankInfoProxy, ?>>asList(
                 colCalls, colErrors, colTime, colMinTime, colMaxTime, colAvgTime, colBareTime, colAvgBareTime, colMethod
         ));
 
-        rankStore = new ListStore<MethodRankProxy>(props.key());
-        rankGrid = new Grid<MethodRankProxy>(rankStore, model);
+        rankStore = new ListStore<MethodRankInfoProxy>(props.key());
+        rankGrid = new Grid<MethodRankInfoProxy>(rankStore, model);
         rankGridView = rankGrid.getView();
 
         rankGridView.setAutoExpandColumn(colMethod);
@@ -131,12 +132,16 @@ public class MethodRankingPanel extends VerticalLayoutContainer {
     }
 
     private void loadData(String orderBy, String orderDir) {
-        rf.traceDataService().traceMethodRank(traceInfo.getHostId(), traceInfo.getDataOffs(), orderBy, orderDir).fire(
-                new Receiver<List<MethodRankProxy>>() {
+        rf.traceDataService().traceMethodRank(traceInfo.getHostName(), traceInfo.getDataOffs(), orderBy, orderDir).fire(
+                new Receiver<List<MethodRankInfoProxy>>() {
                     @Override
-                    public void onSuccess(List<MethodRankProxy> ranking) {
+                    public void onSuccess(List<MethodRankInfoProxy> ranking) {
                         rankStore.clear();
                         rankStore.addAll(ranking);
+                    }
+                    @Override
+                    public void onFailure(ServerFailure error) {
+                        errorHandler.error("Error loading method rank data", error);
                     }
                 }
         );

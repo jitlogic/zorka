@@ -116,8 +116,7 @@ public class SymbolRegistry {
         persist(symbolId, symbol);
     }
 
-    protected void persist(int symbolId, String symbolName) {
-        // To be overwritten in persistent variants of SymbolRegistry
+    protected void persist(int id, String name) {
     }
 
     public int size() {

@@ -3,9 +3,9 @@
 <Configure class="org.mortbay.jetty.webapp.WebAppContext">
   <Get name="securityHandler">
     <Set name="userRealm">
-      <New class="org.mortbay.jetty.security.JDBCUserRealm">
+      <New class="org.mortbay.jetty.security.HashUserRealm">
         <Set name="name">Zorka Intranet Collector</Set>
-        <Set name="config"><SystemProperty name="zico.home.dir" default="."/>/zico.properties</Set>
+        <Set name="config"><SystemProperty name="zico.home.dir" default="."/>/users.properties</Set>
       </New>
     </Set>
   </Get>

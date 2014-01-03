@@ -87,11 +87,17 @@ public class EqlTraceRecordMatcher extends EqlExprEvaluator implements TraceReco
         return null;
     }
 
+    public long getTotalTime() {
+        return totalTime;
+    }
+
+    public void setTotalTime(long totalTime) {
+        this.totalTime = totalTime;
+    }
 
     private int sym(String symbol) {
         return symbolRegistry.trySymbolId(symbol);
     }
-
 
     private String sym(int id) {
         return symbolRegistry.symbolName(id);

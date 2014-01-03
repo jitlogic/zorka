@@ -3,7 +3,7 @@
     <parent>
         <artifactId>zorka</artifactId>
         <groupId>com.jitlogic.zorka</groupId>
-        <version>0.9.13</version>
+        <version>0.9.14</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zico-web</artifactId>
@@ -15,6 +15,11 @@
             <groupId>com.jitlogic.zorka</groupId>
             <artifactId>zico-core</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.web.bindery</groupId>
+            <artifactId>requestfactory-apt</artifactId>
+            <version>${gwt.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.gwt</groupId>
@@ -39,21 +44,6 @@
             <artifactId>jetty</artifactId>
             <version>${jetty.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.connector.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.parboiled</groupId>
-            <artifactId>parboiled-core</artifactId>
-            <version>${parboiled.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.parboiled</groupId>
-            <artifactId>parboiled-java</artifactId>
-            <version>${parboiled.version}</version>
         </dependency>
         <dependency>
             <groupId>com.jitlogic.zorka</groupId>
@@ -84,13 +74,23 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12</version>
+                <configuration>
+                    <includes>
+                        <include>**/*UnitTest.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>${war.plugin.version}</version>
                 <configuration>
                     <warName>zico</warName>
                     <archive>
                         <manifest>
-                            <mainClass>ZicoMain</mainClass>
+                            <mainClass>com.jitlogic.zico.main.ZicoMain</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -116,9 +116,10 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <move todir="${project.build.directory}/${project.artifactId}">
-                                    <fileset dir="${project.build.directory}/classes/">
-                                        <include name="ZicoMain.class"/>
+                                <mkdir dir="${project.build.directory}/${project.artifactId}/com/jitlogic/zico/main"/>
+                                <move todir="${project.build.directory}/${project.artifactId}/com/jitlogic/zico/main">
+                                    <fileset dir="${project.build.directory}/classes/com/jitlogic/zico/main/">
+                                         <include name="**.class"/>
                                     </fileset>
                                 </move>
                             </tasks>
@@ -138,7 +139,7 @@
                             <goal>unpack-dependencies</goal>
                         </goals>
                         <configuration>
-                            <includeGroupIds>org.mortbay.jetty,javax.servlet,mysql</includeGroupIds>
+                            <includeGroupIds>org.mortbay.jetty,javax.servlet</includeGroupIds>
                             <excludeArtifactIds>jsp-api,jstl</excludeArtifactIds>
                             <excludes>META-INF/ECLIPSEF.*</excludes>
                             <outputDirectory>

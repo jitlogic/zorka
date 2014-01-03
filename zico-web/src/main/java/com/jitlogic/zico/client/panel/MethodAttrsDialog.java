@@ -23,6 +23,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.shared.data.KeyValueProxy;
@@ -63,21 +64,25 @@ public class MethodAttrsDialog extends Dialog {
 
     @Inject
     public MethodAttrsDialog(ZicoRequestFactory rf, ErrorHandler errorHandler,
-                             @Assisted Integer hostId, @Assisted Long dataOffs,
+                             @Assisted("hostName") String hostName, @Assisted Long dataOffs,
                              @Assisted String path, @Assisted("minTime") Long minTime) {
         this.rf = rf;
         this.errorHandler = errorHandler;
         configure("Trace Details");
 
-        loadTraceDetail(hostId, dataOffs, path, minTime);
+        loadTraceDetail(hostName, dataOffs, path, minTime);
     }
 
 
-    private void loadTraceDetail(Integer hostId, Long dataOffs, String path, Long minTime) {
-        rf.traceDataService().getRecord(hostId, dataOffs, minTime, path).fire(new Receiver<TraceRecordProxy>() {
+    private void loadTraceDetail(String hostName, Long dataOffs, String path, Long minTime) {
+        rf.traceDataService().getRecord(hostName, dataOffs, minTime, path).fire(new Receiver<TraceRecordProxy>() {
             @Override
             public void onSuccess(TraceRecordProxy tr) {
                 fillTraceDetail(tr);
+            }
+            @Override
+            public void onFailure(ServerFailure error) {
+                errorHandler.error("Cannot load method/trace details", error);
             }
         });
     }

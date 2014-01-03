@@ -16,10 +16,12 @@
 package com.jitlogic.zico.core.services;
 
 import com.google.inject.Singleton;
-import com.jitlogic.zico.core.TraceTypeRegistry;
+import com.jitlogic.zico.core.HostStore;
+import com.jitlogic.zico.core.HostStoreManager;
 import com.jitlogic.zico.core.UserContext;
+import com.jitlogic.zico.core.UserManager;
 import com.jitlogic.zico.core.ZicoConfig;
-import com.jitlogic.zico.core.locators.TraceTemplateManager;
+import com.jitlogic.zico.core.TraceTemplateManager;
 import com.jitlogic.zico.core.model.TraceTemplate;
 import com.jitlogic.zorka.common.tracedata.Symbol;
 
@@ -29,6 +31,7 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Singleton
 public class SystemGwtService {
@@ -39,37 +42,45 @@ public class SystemGwtService {
 
     private TraceTemplateManager templater;
 
+    private UserManager userManager;
+
     private UserContext userContext;
 
-    private TraceTypeRegistry traceTypeRegistry;
+    private HostStoreManager hsm;
+
 
     @Inject
-    public SystemGwtService(ZicoConfig config, TraceTemplateManager templater, UserContext userContext, TraceTypeRegistry traceTypeRegistry) {
-        this.config = config; // TODO use annotations instead of handcrafted code
+    public SystemGwtService(ZicoConfig config, TraceTemplateManager templater,
+                            UserContext userContext, HostStoreManager hsm, UserManager userManager) {
+        this.config = config;
         this.templater = templater;
         this.userContext = userContext;
-        this.traceTypeRegistry = traceTypeRegistry;
+        this.hsm = hsm;
+        this.userManager = userManager;
     }
+
 
     public List<TraceTemplate> listTemplates() {
         userContext.checkAdmin();
         return templater.listTemplates();
     }
 
+
     public int saveTemplate(TraceTemplate tti) {
         userContext.checkAdmin();
         return templater.save(tti);
     }
+
 
     public void removeTemplate(Integer tid) {
         userContext.checkAdmin();
         templater.remove(tid);
     }
 
+
     public List<String> systemInfo() {
         List<String> info = new ArrayList<String>();
 
-        // TODO use agent to present these things - it's already there :)
         info.add("Version: " + config.stringCfg("zico.version", "<null>"));
 
         MemoryMXBean mem = ManagementFactory.getMemoryMXBean();
@@ -93,8 +104,26 @@ public class SystemGwtService {
         return info;
     }
 
-    public List<Symbol> getTidMap(Integer hostId) {
-        return traceTypeRegistry.getTidMap(hostId);
+
+    public List<Symbol> getTidMap(String hostName) {
+        Map<Integer,String> tids = hsm.getTids(hostName);
+
+        List<Symbol> rslt = new ArrayList<Symbol>(tids.size());
+
+        for (Map.Entry<Integer,String> e : tids.entrySet()) {
+            rslt.add(new Symbol(e.getKey(), e.getValue()));
+        }
+
+        return rslt;
+    }
+
+    public synchronized void backupConfig() {
+        userManager.export();
+        templater.export();
+
+        for (HostStore h : hsm.list(null)) {
+            h.export();
+        }
     }
 
 }

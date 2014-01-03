@@ -157,7 +157,7 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
 
 
     @Override
-    protected void open() {
+    public void open() {
         try {
             socket = new DatagramSocket();
         } catch (SocketException e) {
@@ -168,7 +168,7 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
 
 
     @Override
-    protected void close() {
+    public void close() {
         socket.close();
         socket = null;
     }

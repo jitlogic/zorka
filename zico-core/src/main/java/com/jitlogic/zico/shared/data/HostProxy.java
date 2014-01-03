@@ -18,13 +18,23 @@ package com.jitlogic.zico.shared.data;
 import com.google.web.bindery.requestfactory.shared.EntityProxy;
 import com.google.web.bindery.requestfactory.shared.ProxyFor;
 import com.jitlogic.zico.core.HostStore;
-import com.jitlogic.zico.core.locators.HostLocator;
+import com.jitlogic.zico.core.HostStoreManager;
 
 
-@ProxyFor(value = HostStore.class, locator = HostLocator.class)
+@ProxyFor(value = HostStore.class, locator = HostStoreManager.class)
 public interface HostProxy extends EntityProxy {
 
-    Integer getId();
+    /**
+     * This flag indicates that host is offline. Performance data cannot be read nor written, host info cannot be
+     * modified (except for switching host back online). As all data files are closed, maintenance tasks can be
+     * executed (eg. backup, database repair etc.).
+     */
+    public static final int DISABLED = 0x0001;
+
+    /**
+     * Datastore check in progress.
+     */
+    public static final int CHK_IN_PROGRESS = 0x0004;
 
     String getName();
 
@@ -32,17 +42,11 @@ public interface HostProxy extends EntityProxy {
 
     void setAddr(String addr);
 
-    String getDescription();
-
-    void setDescription(String desc);
-
     String getPass();
 
     void setPass(String pass);
 
     int getFlags();
-
-    void setFlags(int flags);
 
     boolean isEnabled();
 
@@ -51,4 +55,8 @@ public interface HostProxy extends EntityProxy {
     long getMaxSize();
 
     void setMaxSize(long maxSize);
+
+    public String getComment();
+
+    public void setComment(String comment);
 }

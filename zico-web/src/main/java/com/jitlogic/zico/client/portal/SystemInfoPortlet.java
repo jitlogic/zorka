@@ -21,6 +21,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.inject.Inject;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
+import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.sencha.gxt.widget.core.client.Portlet;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
@@ -32,6 +33,7 @@ public class SystemInfoPortlet extends Portlet {
     VerticalLayoutContainer content;
 
     private ZicoRequestFactory rf;
+
     private Timer timer;
 
     @Inject

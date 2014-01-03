@@ -390,6 +390,7 @@ public class RAGZUnitTest extends ZicoFixture {
         os.close();
     }
 
+
     @Test
     public void testReadFromPreviousSegmentsBUG() throws Exception {
         String path = tmpFile("test.gz");
@@ -406,6 +407,18 @@ public class RAGZUnitTest extends ZicoFixture {
 
         check(is, 1, "23");
     }
+
+
+    @Test
+    public void testInputRGZTriesToReadFileTruncatedByOutputRGZ() throws Exception {
+        String path = tmpFile("test.gz");
+        RAGZOutputStream o = RAGZOutputStream.toFile(path);
+        o.close();
+        o = RAGZOutputStream.toFile(path);
+        RAGZInputStream i = RAGZInputStream.fromFile(path);
+        assertEquals(0, i.available());
+    }
+
 
     private void check(RAGZInputStream is, long pos, String str) throws Exception {
         byte[] b = new byte[str.length()];

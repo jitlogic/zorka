@@ -1,5 +1,12 @@
-Zorka 0.9.3 (2013-12-16)
-------------------------
+Zorka 0.9.14 (2014-01-02)
+-------------------------
+
+ * collector: rewrite trace indexing and search angine; use MapDB+RDS instead of SQL;
+ * lots of fixes;
+
+
+Zorka 0.9.13 (2013-12-16)
+-------------------------
 
  * agent: online reconfiguration (via `zorka.reload[]` or built in MBean);
  * agent: jetty 6.x support script;

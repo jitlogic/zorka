@@ -43,6 +43,10 @@ public class ZicoDataLoader {
      */
     private int packetSize = 8 * 1048576;
 
+    private int records = 0;
+
+    private long bytes = 0;
+
     /**
      * Creates new loader object
      *
@@ -67,31 +71,21 @@ public class ZicoDataLoader {
      * @throws IOException if file does not exist, is malformed or I/O error occurs;
      */
     public static InputStream open(File file) throws IOException {
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(file);
-            byte[] hdr = new byte[4];
-            fis.read(hdr);
+        FileInputStream fis = new FileInputStream(file);
+        byte[] hdr = new byte[4];
+        fis.read(hdr);
 
-            if (hdr[0] != 'Z' || hdr[1] != 'T' || hdr[2] != 'R') {
-                throw new IOException("Invalid header (invalid file type).");
-            }
+        if (hdr[0] != 'Z' || hdr[1] != 'T' || hdr[2] != 'R') {
+            throw new IOException("Invalid header (invalid file type).");
+        }
 
-            if (hdr[3] == 'Z') {
-                InputStream is = new BufferedInputStream(new InflaterInputStream(fis, new Inflater(true), 65536));
-                return is;
-            } else if (hdr[3] == 'C') {
-                return new BufferedInputStream(fis);
-            } else {
-                throw new IOException("Invalid header (invalid file type).");
-            }
-        } finally {
-            try {
-                if (fis != null) {
-                    fis.close();
-                }
-            } catch (IOException e) {
-            }
+        if (hdr[3] == 'Z') {
+            InputStream is = new BufferedInputStream(new InflaterInputStream(fis, new Inflater(true), 65536));
+            return is;
+        } else if (hdr[3] == 'C') {
+            return new BufferedInputStream(fis);
+        } else {
+            throw new IOException("Invalid header (invalid file type).");
         }
     }
 
@@ -106,6 +100,8 @@ public class ZicoDataLoader {
         try {
             is = open(new File(path));
             load(is);
+        } catch (EOFException e) {
+
         } catch (IOException e) {
             e.printStackTrace();
             try {
@@ -135,17 +131,30 @@ public class ZicoDataLoader {
 
         while (null != (obj = reader.readObject())) {
             writer.writeObject(obj);
+
+            if (obj instanceof TraceRecord) {
+                records++;
+            }
+
             if (obj instanceof TraceRecord && os.size() > packetSize) {
                 conn.send(ZicoPacket.ZICO_DATA, os.toByteArray());
                 ZicoPacket rslt = conn.recv();
                 if (rslt.getStatus() != ZicoPacket.ZICO_OK) {
                     throw new ZicoException(rslt.getStatus(), "Error submitting data.");
                 }
+                bytes += os.size();
                 os = new ByteArrayOutputStream();
                 writer = new FressianWriter(os, FressianTraceFormat.WRITE_LOOKUP);
-                System.out.print(".");
+                //System.out.print(".");
             }
         }
     }
 
+    public int getRecords() {
+        return records;
+    }
+
+    public long getBytes() {
+        return bytes;
+    }
 }

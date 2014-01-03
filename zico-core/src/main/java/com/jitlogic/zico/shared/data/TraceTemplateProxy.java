@@ -17,7 +17,7 @@ package com.jitlogic.zico.shared.data;
 
 import com.google.web.bindery.requestfactory.shared.EntityProxy;
 import com.google.web.bindery.requestfactory.shared.ProxyFor;
-import com.jitlogic.zico.core.locators.TraceTemplateManager;
+import com.jitlogic.zico.core.TraceTemplateManager;
 import com.jitlogic.zico.core.model.TraceTemplate;
 
 @ProxyFor(value = TraceTemplate.class, locator = TraceTemplateManager.class)

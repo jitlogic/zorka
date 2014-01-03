@@ -21,29 +21,30 @@ import com.google.web.bindery.requestfactory.shared.RequestContext;
 import com.google.web.bindery.requestfactory.shared.Service;
 import com.jitlogic.zico.core.inject.ZicoServiceLocator;
 import com.jitlogic.zico.core.services.TraceDataGwtService;
-import com.jitlogic.zico.shared.data.MethodRankProxy;
-import com.jitlogic.zico.shared.data.PagingDataProxy;
-import com.jitlogic.zico.shared.data.TraceDetailSearchProxy;
-import com.jitlogic.zico.shared.data.TraceInfoProxy;
-import com.jitlogic.zico.shared.data.TraceListFilterProxy;
+import com.jitlogic.zico.shared.data.MethodRankInfoProxy;
+import com.jitlogic.zico.shared.data.TraceInfoSearchQueryProxy;
+import com.jitlogic.zico.shared.data.TraceRecordSearchQueryProxy;
+import com.jitlogic.zico.shared.data.TraceInfoSearchResultProxy;
 import com.jitlogic.zico.shared.data.TraceRecordProxy;
-import com.jitlogic.zico.shared.data.TraceRecordSearchProxy;
+import com.jitlogic.zico.shared.data.TraceRecordSearchResultProxy;
 
 import java.util.List;
 
 @Service(value = TraceDataGwtService.class, locator = ZicoServiceLocator.class)
 public interface TraceDataServiceProxy extends RequestContext {
 
-    Request<TraceInfoProxy> getTrace(int hostId, long traceOffs);
+    public static final int DESC_ORDER = 1;
+    public static final int RECURSIVE  = 2;
 
-    Request<PagingDataProxy> pageTraces(int hostId, int offset, int limit, TraceListFilterProxy filter);
+    Request<TraceInfoSearchResultProxy> searchTraces(TraceInfoSearchQueryProxy query);
 
-    Request<List<MethodRankProxy>> traceMethodRank(int hostId, long traceOffs, String orderBy, String orderDesc);
+    Request<List<MethodRankInfoProxy>> traceMethodRank(String hostName, long traceOffs, String orderBy, String orderDesc);
 
-    Request<TraceRecordProxy> getRecord(int hostId, long traceOffs, long minTime, String path);
+    Request<TraceRecordProxy> getRecord(String hostName, long traceOffs, long minTime, String path);
 
-    Request<List<TraceRecordProxy>> listRecords(int hostId, long traceOffs, long minTime, String path, boolean recursive);
+    Request<List<TraceRecordProxy>> listRecords(String hostName, long traceOffs, long minTime, String path, boolean recursive);
 
-    Request<TraceRecordSearchProxy> searchRecords(int hostId, long traceOffs, long minTime, String path,
-                                                  TraceDetailSearchProxy expr);
+    Request<TraceRecordSearchResultProxy> searchRecords(String hostName, long traceOffs, long minTime, String path,
+                                                  TraceRecordSearchQueryProxy expr);
+
 }

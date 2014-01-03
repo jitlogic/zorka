@@ -17,6 +17,7 @@ package com.jitlogic.zico.test;
 
 
 import com.jitlogic.zico.core.ZicoService;
+import com.jitlogic.zico.test.support.ZicoFixture;
 import com.jitlogic.zorka.common.test.support.TestZicoProcessor;
 import com.jitlogic.zorka.common.test.support.TestZicoProcessorFactory;
 import com.jitlogic.zorka.common.tracedata.Symbol;
@@ -30,7 +31,7 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class ZicoConnectorUnitTest {
+public class ZicoConnectorUnitTest extends ZicoFixture {
 
     ZicoService service;
     TestZicoProcessorFactory factory;
@@ -61,7 +62,7 @@ public class ZicoConnectorUnitTest {
 
     @Test(timeout = 1000)
     public void testBasicConnectDisconnect() throws Exception {
-        service = new ZicoService("127.0.0.1", 9645, factory);
+        service = new ZicoService(factory, "127.0.0.1", 9645, 4, 1000);
         service.start();
 
         ZicoClientConnector conn = new ZicoClientConnector("127.0.0.1", 9645);
@@ -76,7 +77,7 @@ public class ZicoConnectorUnitTest {
 
     @Test(timeout = 1000)
     public void testPingPong() throws Exception {
-        service = new ZicoService("127.0.0.1", 8641, factory);
+        service = new ZicoService(factory, "127.0.0.1", 8641, 4, 1000);
         service.start();
 
         ZicoClientConnector conn = new ZicoClientConnector("127.0.0.1", 8641);
@@ -90,7 +91,7 @@ public class ZicoConnectorUnitTest {
 
     @Test(timeout = 1000)
     public void testHelloMessage() throws Exception {
-        service = new ZicoService("127.0.0.1", 9642, factory);
+        service = new ZicoService(factory, "127.0.0.1", 9642, 4, 1000);
         service.start();
 
         ZicoClientConnector conn = new ZicoClientConnector("127.0.0.1", 9642);
@@ -105,9 +106,9 @@ public class ZicoConnectorUnitTest {
     }
 
 
-    @Test//(timeout = 1000)
+    @Test(timeout = 1000)
     public void testSendSimpleSymbolMessage() throws Exception {
-        service = new ZicoService("127.0.0.1", 9643, factory);
+        service = new ZicoService(factory, "127.0.0.1", 9643, 4, 1000);
         service.start();
 
         ZicoClientConnector conn = new ZicoClientConnector("127.0.0.1", 9643);
@@ -127,7 +128,7 @@ public class ZicoConnectorUnitTest {
 
     @Test(timeout = 1000, expected = ZicoException.class)
     public void sendUnauthorizedMsg() throws Exception {
-        service = new ZicoService("127.0.0.1", 9644, factory);
+        service = new ZicoService(factory, "127.0.0.1", 9644, 4, 1000);
         service.start();
 
         ZicoClientConnector conn = new ZicoClientConnector("127.0.0.1", 9644);
@@ -141,7 +142,7 @@ public class ZicoConnectorUnitTest {
 
     @Test(timeout = 1000, expected = ZicoException.class)
     public void sendBadLoginMsg() throws Exception {
-        service = new ZicoService("127.0.0.1", 9645, factory);
+        service = new ZicoService(factory, "127.0.0.1", 9645, 4, 1000);
         service.start();
 
         ZicoClientConnector conn = new ZicoClientConnector("127.0.0.1", 9645);

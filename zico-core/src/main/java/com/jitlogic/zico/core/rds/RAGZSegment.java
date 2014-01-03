@@ -164,7 +164,7 @@ public class RAGZSegment {
             file.skipBytes(2);
             long clen = ZicoUtil.readUInt(file);
             long cpos = file.getFilePointer();
-            if (clen != 0) {
+            if (clen != 0 && file.length() >= file.getFilePointer() + clen + 8) {
                 // Finished segment
                 file.skipBytes((int) clen + 4);
                 long llen = ZicoUtil.readUInt(file);
@@ -193,7 +193,7 @@ public class RAGZSegment {
         file.seek(seg.getPhysicalPos() - 4);
         long clen = ZicoUtil.readUInt(file);
 
-        if (clen != 0) {
+        if (clen != 0 && file.length() >= file.getFilePointer() + clen + 8) {
             // Finished segment
             seg.setFinished(true);
             seg.setPhysicalLen(clen);
