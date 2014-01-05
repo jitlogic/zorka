@@ -19,6 +19,7 @@ package com.jitlogic.zorka.common.tracedata;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * Represents exception in symbolic form (suitable to be saved into trace file
@@ -27,7 +28,7 @@ import java.io.IOException;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class SymbolicException implements SymbolicRecord {
+public class SymbolicException implements SymbolicRecord, Serializable {
 
 
     /**

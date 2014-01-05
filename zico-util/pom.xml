@@ -63,28 +63,24 @@
                                 <keep>
                                     <pattern>com.jitlogic.zico.**</pattern>
                                 </keep>
-                                <rule>
+                                <keep>
                                     <pattern>org.objectweb.asm.**</pattern>
-                                    <result>asm.@1</result>
-                                </rule>
-                                <rule>
+                                </keep>
+                                <keep>
                                     <pattern>org.fressian.**</pattern>
-                                    <result>fressian.@1</result>
-                                </rule>
-                                <rule>
+                                </keep>
+                                <keep>
                                     <pattern>org.mapdb.**</pattern>
-                                    <result>mapdb.@1</result>
-                                </rule>
+                                </keep>
                                 <keep>
                                     <pattern>org.slf4j.**</pattern>
                                 </keep>
                                 <keep>
                                     <pattern>ch.qos.logback.**</pattern>
                                 </keep>
-                                <rule>
+                                <keep>
                                     <pattern>org.json</pattern>
-                                    <result>json</result>
-                                </rule>
+                                </keep>
                             </rules>
                         </configuration>
                     </execution>

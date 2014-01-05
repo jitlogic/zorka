@@ -137,7 +137,6 @@ public class HostStore implements Closeable, RDSCleanupListener {
             }
 
             db = DBMaker.newFileDB(new File(rootPath, "traces.db"))
-                    .asyncWriteDisable().asyncFlushDelay(100)
                     .closeOnJvmShutdown().make();
             infos = db.getTreeMap(DB_INFO_MAP);
             tids = db.getTreeMap(DB_TIDS_MAP);
