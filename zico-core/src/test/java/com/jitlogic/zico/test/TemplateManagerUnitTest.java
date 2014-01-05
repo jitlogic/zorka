@@ -37,12 +37,10 @@ public class TemplateManagerUnitTest extends ZicoFixture {
     }
 
 
-    private TraceTemplate tti(int tid, int order, String condT, String condP, String templ) {
+    private TraceTemplate tti(int order, String condition, String templ) {
         TraceTemplate tti = new TraceTemplate();
-        tti.setTraceId(tid);
         tti.setOrder(order);
-        tti.setCondTemplate(condT);
-        tti.setCondRegex(condP);
+        tti.setCondition(condition);
         tti.setTemplate(templ);
         return tti;
     }
@@ -50,7 +48,7 @@ public class TemplateManagerUnitTest extends ZicoFixture {
 
     @Test
     public void testInsertNewTemplateRecord() throws Exception {
-        TraceTemplate t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
+        TraceTemplate t1 = tti(0, "METHOD='findKey'", "findKey(${ARG0}");
 
         t1.setId(systemService.saveTemplate(t1));
         assertTrue("TEMPLATE_ID should be assigned by database and > 0", t1.getId() > 0);
@@ -63,7 +61,7 @@ public class TemplateManagerUnitTest extends ZicoFixture {
 
     @Test
     public void testInsertReopenAndReadTemplate() throws Exception {
-        TraceTemplate t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
+        TraceTemplate t1 = tti(0, "METHOD='findKey'", "findKey(${ARG0}");
 
         t1.setId(systemService.saveTemplate(t1));
 
@@ -77,7 +75,7 @@ public class TemplateManagerUnitTest extends ZicoFixture {
 
     @Test
     public void testInsertAndModifyNewTemplate() {
-        TraceTemplate t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
+        TraceTemplate t1 = tti(0, "METHOD='findKey'", "findKey(${ARG0}");
         t1.setId(systemService.saveTemplate(t1));
 
 
@@ -92,7 +90,7 @@ public class TemplateManagerUnitTest extends ZicoFixture {
 
     @Test
     public void testAddRemoveTemplate() {
-        TraceTemplate t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
+        TraceTemplate t1 = tti(0, "METHOD='findKey'", "findKey(${ARG0}");
         t1.setId(systemService.saveTemplate(t1));
 
         systemService.removeTemplate(t1.getId());
@@ -108,7 +106,7 @@ public class TemplateManagerUnitTest extends ZicoFixture {
 
     @Test
     public void testExportImportTemplates() {
-        TraceTemplate t1 = tti(0, 1, "${METHOD}", "findKey", "findKey(${ARG0}");
+        TraceTemplate t1 = tti(0, "METHOD='findKey'", "findKey(${ARG0}");
         int tid = systemService.saveTemplate(t1);
 
         templateManager.export();
@@ -121,8 +119,7 @@ public class TemplateManagerUnitTest extends ZicoFixture {
         assertEquals(t1.getTemplate(), t2.getTemplate());
         assertEquals(t1.getOrder(), t2.getOrder());
         assertEquals(t1.getFlags(), t2.getFlags());
-        assertEquals(t1.getCondRegex(), t2.getCondRegex());
-        assertEquals(t1.getCondTemplate(), t2.getCondTemplate());
+        assertEquals(t1.getCondition(), t2.getCondition());
     }
 
 }

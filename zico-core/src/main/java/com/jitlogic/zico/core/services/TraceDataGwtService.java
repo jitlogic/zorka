@@ -156,7 +156,8 @@ public class TraceDataGwtService {
                         }
                         break;
                     case TraceRecordSearchQuery.EQL_QUERY:
-                        matcher = new EqlTraceRecordMatcher(host.getSymbolRegistry(), Parser.expr(se), expr.getFlags(), tr.getTime());
+                        matcher = new EqlTraceRecordMatcher(host.getSymbolRegistry(), Parser.expr(se),
+                                expr.getFlags(), tr.getTime(), host.getName());
                         break;
                     default:
                         throw new ZicoRuntimeException("Illegal search expression type: " + expr.getType());

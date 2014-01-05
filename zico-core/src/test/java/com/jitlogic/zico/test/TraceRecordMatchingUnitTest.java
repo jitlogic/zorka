@@ -50,7 +50,7 @@ public class TraceRecordMatchingUnitTest extends ZicoFixture {
     }
 
     private boolean eqlm(String expr, TraceRecord tr) {
-        return new EqlTraceRecordMatcher(symbolRegistry, Parser.expr(expr), 0, 1000000000).match(tr);
+        return new EqlTraceRecordMatcher(symbolRegistry, Parser.expr(expr), 0, 1000000000, "testHost").match(tr);
     }
 
     @Before

@@ -369,7 +369,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
             if (query.hasFlag(TraceInfoSearchQueryProxy.EQL_QUERY)) {
                 matcher = new EqlTraceRecordMatcher(symbolRegistry,
                         Parser.expr(query.getSearchExpr()),
-                        0, 0);
+                        0, 0, name);
             } else {
                 matcher = new FullTextTraceRecordMatcher(symbolRegistry,
                         TraceRecordSearchQuery.SEARCH_ALL, query.getSearchExpr());
@@ -506,7 +506,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
             ti.setExceptionInfo(sei);
         }
 
-        ti.setDescription(templater.templateDescription(symbolRegistry, ti));
+        ti.setDescription(templater.templateDescription(symbolRegistry, name, tr));
 
         return ti;
     }
