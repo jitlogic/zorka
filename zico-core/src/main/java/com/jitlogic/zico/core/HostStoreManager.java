@@ -104,7 +104,7 @@ public class HostStoreManager extends Locator<HostStore, String> implements Clos
             throw new ZicoException(ZicoPacket.ZICO_AUTH_ERROR, "Unauthorized.");
         }
 
-        if (store.getAddr() == null) {
+        if (store.getAddr() == null || store.getAddr().length() == 0) {
             store.setAddr(socket.getInetAddress().getHostAddress());
             store.save();
         }

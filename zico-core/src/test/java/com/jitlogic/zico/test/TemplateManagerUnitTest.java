@@ -16,8 +16,12 @@
 package com.jitlogic.zico.test;
 
 import com.jitlogic.zico.core.TraceTemplateManager;
+import com.jitlogic.zico.core.eql.ParseException;
 import com.jitlogic.zico.core.model.TraceTemplate;
 import com.jitlogic.zico.test.support.ZicoFixture;
+import com.jitlogic.zico.test.support.ZicoTestUtil;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,15 +29,24 @@ import java.util.List;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.*;
+import static com.jitlogic.zico.test.support.ZicoTestUtil.*;
 
 public class TemplateManagerUnitTest extends ZicoFixture {
 
     private TraceTemplateManager templateManager;
+    private SymbolRegistry symbols = new SymbolRegistry();
 
 
     @Before
     public void acquireApplicationObjects() {
         templateManager = injector.getInstance(TraceTemplateManager.class);
+        ZicoTestUtil.symbols = symbols;
+    }
+
+
+    @Test
+    public void cleanup() {
+        ZicoTestUtil.symbols = null;
     }
 
 
@@ -122,4 +135,44 @@ public class TemplateManagerUnitTest extends ZicoFixture {
         assertEquals(t1.getCondition(), t2.getCondition());
     }
 
+
+    @Test(expected = ParseException.class)
+    public void testIfTemplateSaveVerifiesEqlExpr() throws Exception {
+        TraceTemplate t1 = tti(0, "METHOD='findKey", "findKey(${ARG0}");
+        templateManager.save(t1);
+    }
+
+
+    @Test
+    public void testIfSavedTemplateGoesImmediatelyIntoEffect() throws Exception {
+        TraceRecord rec = traceP("HTTP", "org.apache.catalina.StandardValve", "invoke", "()V", 1000, kv("URI", "http://xxx"));
+
+        assertThat(templateManager.templateDescription(symbols, "websvr1", rec))
+            .startsWith("HTTP|");
+
+        templateManager.save(tti(0, "URI != null", "GOT_IT"));
+
+        assertThat(templateManager.templateDescription(symbols, "websvr1", rec))
+                .startsWith("GOT_IT");
+
+    }
+
+
+    @Test
+    public void testSelectTemplateByTemplateId() throws Exception {
+        TraceRecord r1 = traceP("HTTP", "org.apache.catalina.StandardValve", "invoke", "()V", 1000, kv("URI", "http://xxx"));
+        TraceRecord r2 = traceP("EJB", "org.jboss.ejb.Invoker", "invoke", "()V", 1000, kv("URI", "http://xxx"));
+        templateManager.save(tti(0, "trace = 'HTTP'", "GOT_IT"));
+        assertEquals("GOT_IT", templateManager.templateDescription(symbols, "myhost", r1));
+        assertNotEquals("GOT_IT", templateManager.templateDescription(symbols, "myhost", r2));
+    }
+
+
+    @Test
+    public void testSelectTemplateByTemplateIdAndHost() throws Exception {
+        TraceRecord rec = traceP("HTTP", "org.apache.catalina.StandardValve", "invoke", "()V", 1000, kv("URI", "http://xxx"));
+        templateManager.save(tti(0, "trace = 'HTTP' and host = 'myhost'", "GOT_IT"));
+        assertEquals("GOT_IT", templateManager.templateDescription(symbols, "myhost", rec));
+        assertNotEquals("GOT_IT", templateManager.templateDescription(symbols, "otherhost", rec));
+    }
 }

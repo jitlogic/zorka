@@ -130,21 +130,23 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
         Collections.sort(ttl, new Comparator<TraceTemplate>() {
             @Override
             public int compare(TraceTemplate o1, TraceTemplate o2) {
-                return o2.getOrder()-o1.getOrder();
+                return o1.getOrder()-o2.getOrder();
             }
         });
-        orderedTemplates = ttl;
 
-        for (TraceTemplate tti : orderedTemplates) {
+        for (TraceTemplate tti : ttl) {
             if (tti.getCondExpr() == null) {
                 try {
                     tti.setCondExpr(Parser.expr(tti.getCondition()));
                 } catch (EqlException e) {
                     log.error("Cannot parse expression '" + tti.getCondition()
-                        + "'. Please fix trace display templates configuration.", e);
+                            + "'. Please fix trace display templates configuration.", e);
                 }
             }
         }
+
+        orderedTemplates = ttl;
+
     }
 
 
@@ -228,12 +230,16 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
 
     public synchronized int save(TraceTemplate tti) {
 
+        tti.setCondExpr(Parser.expr(tti.getCondition()));
+
         if (tti.getId() == 0) {
             tti.setId(templates.size() > 0 ? templates.lastKey()+1 : 1);
         }
 
         templates.put(tti.getId(), tti);
         db.commit();
+
+        reorder();
 
         return tti.getId();
     }

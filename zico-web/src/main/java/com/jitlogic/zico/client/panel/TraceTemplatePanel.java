@@ -94,7 +94,7 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
         orderCol.setFixed(true);
 
         final ColumnConfig<TraceTemplateProxy, String> traceConditionCol
-                = new ColumnConfig<TraceTemplateProxy, String>(props.condTemplate(), 250, "Condition Template");
+                = new ColumnConfig<TraceTemplateProxy, String>(props.condition(), 250, "Condition Expression");
 
         ColumnConfig<TraceTemplateProxy, String> traceTemplateCol
                 = new ColumnConfig<TraceTemplateProxy, String>(props.template(), 250, "Description Template");

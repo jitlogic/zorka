@@ -314,6 +314,10 @@ public class TracerLib {
                 new TaggedValue(symbolRegistry.symbolId(tag), value));
     }
 
+    public SpyProcessor markError() {
+        return flags(SUBMIT_TRACE|ERROR_MARK);
+    }
+
     /**
      * Creates spy processor that sets flags in trace marker.
      *

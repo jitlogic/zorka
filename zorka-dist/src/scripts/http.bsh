@@ -230,6 +230,7 @@ __http() {
               }
               for (location : resp.getHeaders("Location")) {
                   tracer.newAttr("REDIRECT", location);
+                  rec.put("REDIRECT", location);
               }
           }
 

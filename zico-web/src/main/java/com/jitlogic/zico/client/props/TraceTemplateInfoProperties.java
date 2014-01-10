@@ -30,17 +30,9 @@ public interface TraceTemplateInfoProperties extends PropertyAccess<TraceTemplat
     @Editor.Path("description")
     LabelProvider<TraceTemplateProxy> nameLabel();
 
-    ValueProvider<TraceTemplateProxy, Integer> id();
-
-    ValueProvider<TraceTemplateProxy, Integer> traceId();
-
     ValueProvider<TraceTemplateProxy, Integer> order();
 
-    ValueProvider<TraceTemplateProxy, Integer> flags();
-
-    ValueProvider<TraceTemplateProxy, String> condTemplate();
-
-    ValueProvider<TraceTemplateProxy, String> condRegex();
+    ValueProvider<TraceTemplateProxy, String> condition();
 
     ValueProvider<TraceTemplateProxy, String> template();
 }

@@ -67,7 +67,7 @@ public class EqlTraceRecordMatcher extends EqlExprEvaluator implements TraceReco
             return sym(traceRecord.getMethodId());
         } else if ("class".equals(name)) {
             return sym(traceRecord.getClassId());
-        } else if ("type".equals(name)) {
+        } else if ("trace".equals(name)) {
             return traceRecord.getMarker() != null ? sym(traceRecord.getMarker().getTraceId()) : null;
         } else if ("time".equals(name)) {
             return traceRecord.getTime();
