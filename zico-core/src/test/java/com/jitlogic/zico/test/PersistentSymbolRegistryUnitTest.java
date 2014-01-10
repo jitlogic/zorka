@@ -91,6 +91,21 @@ public class PersistentSymbolRegistryUnitTest extends ZicoFixture {
         assertEquals("otherSymbol", syms.symbolName(otherId));
         syms.close();
     }
-    // Test export and import capabilities
+
+
+    @Test
+    public void testExportImportEmptyDictionary() throws Exception {
+        File path = new File(getTmpDir(), "symbols.dat");
+        syms = new PersistentSymbolRegistry(path);
+        syms.export();
+        syms.close();
+
+        path.delete();
+
+        syms = new PersistentSymbolRegistry(path);
+        assertEquals(0, syms.size());
+        syms.close();
+
+    }
 
 }

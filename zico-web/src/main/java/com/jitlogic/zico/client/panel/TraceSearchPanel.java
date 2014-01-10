@@ -110,6 +110,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     private Map<Integer, String> traceTypes;
 
     private int seqnum = 0;
+    private long lastOffs = -1;
     private boolean descOrder = true;
 
     // Search toolbar controls (in order of occurence on panel toolbar)
@@ -473,6 +474,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
 
     private void refresh() {
         data.getList().clear();
+        expandedDetails.clear();
         loadMore();
     }
 

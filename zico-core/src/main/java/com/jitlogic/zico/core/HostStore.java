@@ -93,8 +93,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
     private long maxSize;
     private String comment = "";
 
-    private static final long MAX_SEARCH_T1 = 3000000000L;
-    private static final long MAX_SEARCH_T2 = 30000000000L;
+    private static final long MAX_SEARCH_T1 = 2000000000L;
+    private static final long MAX_SEARCH_T2 = 5000000000L;
 
     public HostStore(ZicoConfig config, TraceTemplateManager templater, String name) {
 
@@ -390,7 +390,16 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
         for (Long key = initialKey; key != null; key = asc ? infos.higherKey(key) : infos.lowerKey(key)) {
 
+            long t = System.nanoTime()-tstart;
+
+            if ((lst.size() >= query.getLimit()) || (t > MAX_SEARCH_T1 && lst.size() > 0) || (t > MAX_SEARCH_T2)) {
+                result.markFlag(TraceInfoSearchResultProxy.MORE_RESULTS);
+                return result;
+            }
+
             TraceInfoRecord tir = infos.get(key);
+
+            result.setLastOffs(key);
 
             if (query.hasFlag(TraceInfoSearchQueryProxy.ERRORS_ONLY) && 0 == (tir.getTflags() & TraceMarker.ERROR_MARK)) {
                 continue;
@@ -414,14 +423,9 @@ public class HostStore implements Closeable, RDSCleanupListener {
                 }
                 if (matcher == null || recursiveMatch(matcher, idxtr)) {
                     lst.add(toTraceInfo(tir, idxtr));
-                    result.setLastOffs(asc ? tir.getDataOffs() + 1 : tir.getDataOffs() - 1);
-                    long t = System.nanoTime()-tstart;
-                    if ((lst.size() >= query.getLimit()) || (t > MAX_SEARCH_T1 && lst.size() > 0) || (t > MAX_SEARCH_T2)) {
-                        result.markFlag(TraceInfoSearchResultProxy.MORE_RESULTS);
-                        return result;
-                    }
                 }
             }
+
         }
 
         return result;
@@ -680,6 +684,10 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public boolean hasFlag(int flag) {
         return 0 != (this.flags & flag);
+    }
+
+    public void markFlag(int flag) {
+        flags |= flag;
     }
 
 

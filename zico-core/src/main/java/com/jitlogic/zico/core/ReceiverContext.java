@@ -54,6 +54,12 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     @Override
     public synchronized void process(Object obj) throws IOException {
 
+        if (hostStore.hasFlag(HostProxy.DELETED)) {
+            log.info("Resetting connection for " + hostStore.getName() + " due to dirty SID map.");
+            throw new ZicoException(ZicoPacket.ZICO_EOD,
+                    "Host has been deleted. Connection needs to be reset. Try again.");
+        }
+
         if (dirtySidMap) {
             log.info("Resetting connection for " + hostStore.getName() + " due to dirty SID map.");
             throw new ZicoException(ZicoPacket.ZICO_EOD,
