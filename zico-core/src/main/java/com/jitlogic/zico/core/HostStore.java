@@ -87,7 +87,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
     private Map<Integer, String> tids;
 
     private String name;
-    private String addr = "";
+    private String addr = "127.0.0.1";
     private String pass = "";
     private int flags;
     private long maxSize;
@@ -123,6 +123,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public synchronized void open() {
         try {
+            load();
             if (symbolRegistry == null) {
                 symbolRegistry = new PersistentSymbolRegistry(
                     new File(ZicoUtil.ensureDir(rootPath), "symbols.dat"));
@@ -341,8 +342,6 @@ public class HostStore implements Closeable, RDSCleanupListener {
         if (db != null) {
             long t1 = System.nanoTime();
             db.commit();
-            long t = (System.nanoTime() - t1) / 1000000L;
-            log.debug(name + ": Commit took " + t + " ms");
         }
     }
 
@@ -536,7 +535,6 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
 
     public synchronized void load() {
-        checkEnabled();
         File f = new File(rootPath, HOST_PROPERTIES);
         Properties props = new Properties();
         if (f.exists() && f.canRead()) {
@@ -551,15 +549,13 @@ public class HostStore implements Closeable, RDSCleanupListener {
                     try { is.close(); } catch (IOException _) { }
                 }
             }
+            this.addr = props.getProperty(PROP_ADDR, "127.0.0.1");
+            this.pass = props.getProperty(PROP_PASS, "");
+            this.flags = Integer.parseInt(props.getProperty(PROP_FLAGS, "0"));
+            this.maxSize = Long.parseLong(props.getProperty(PROP_SIZE,
+                    "" + config.kiloCfg("rds.max.size", 1024 * 1024 * 1024L)));
+            this.comment = props.getProperty(PROP_COMMENT, "");
         }
-
-        this.addr = props.getProperty(PROP_ADDR, "127.0.0.1");
-        this.pass = props.getProperty(PROP_PASS, "");
-        this.flags = Integer.parseInt(props.getProperty(PROP_FLAGS, "0"));
-        this.maxSize = Long.parseLong(props.getProperty(PROP_SIZE,
-                "" + config.kiloCfg("rds.max.size", 1024 * 1024 * 1024L)));
-        this.comment = props.getProperty(PROP_COMMENT, "");
-
     }
 
 
@@ -725,8 +721,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
         if (enabled) {
             log.info("Bringing host " + name + " online.");
-            flags &= ~HostProxy.DISABLED;
             open();
+            flags &= ~HostProxy.DISABLED;
         } else {
             log.info("Taking host " + name + " offline.");
             close();

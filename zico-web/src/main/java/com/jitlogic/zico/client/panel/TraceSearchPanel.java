@@ -507,7 +507,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
 
         List<TraceInfoProxy> list = data.getList();
         if (list.size() > 0) {
-            q.setOffset(list.get(list.size()-1).getDataOffs()+2);
+            q.setOffset(list.get(list.size()-1).getDataOffs());
         }
 
         Integer tid = cmbTraceType.getCurrentValue();
