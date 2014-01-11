@@ -380,7 +380,15 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         }, ClickEvent.getType());
 
         statusBar.add(statusLabel);
-        add(statusBar);
+
+        HorizontalPanel hp = new HorizontalPanel();
+        hp.getElement().addClassName(Resources.INSTANCE.zicoCssResources().searchStatusBar());
+        statusBar.getElement().addClassName(Resources.INSTANCE.zicoCssResources().searchStatusBarInt());
+        hp.setWidth("100%");
+        HorizontalPanel spacer = new HorizontalPanel(); spacer.setWidth("100px"); hp.add(spacer);
+        hp.add(statusBar);
+
+        add(hp);
     }
 
     private void createContextMenu() {

@@ -57,7 +57,7 @@ public class TraceRecordStore implements Closeable {
 
     private RDSStore rds;
 
-    public TraceRecordStore(ZicoConfig config, HostStore hostStore, String path) throws IOException {
+    public TraceRecordStore(ZicoConfig config, HostStore hostStore, String path, int fileSizeDivider) throws IOException {
         this.config = config;
         this.hostStore = hostStore;
         this.symbolRegistry = hostStore.getSymbolRegistry();
@@ -69,8 +69,10 @@ public class TraceRecordStore implements Closeable {
             rdsDir.mkdirs();
         }
 
-        long fileSize = config.kiloCfg("rds.file.size", 16 * 1024 * 1024L).intValue();
+        long fileSize = config.kiloCfg("rds.file.size", 16 * 1024 * 1024L).intValue() / fileSizeDivider;
+
         long segmentSize = config.kiloCfg("rds.seg.size", 1024 * 1024L);
+
         rds = new RDSStore(rdspath,
                 hostStore.getMaxSize(),
                 fileSize, segmentSize,

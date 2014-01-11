@@ -129,11 +129,11 @@ public class HostStore implements Closeable, RDSCleanupListener {
             }
 
             if (traceDataStore == null) {
-                traceDataStore = new TraceRecordStore(config, this, "tdat");
+                traceDataStore = new TraceRecordStore(config, this, "tdat", 1);
             }
 
             if (traceIndexStore == null) {
-                traceIndexStore = new TraceRecordStore(config, this, "tidx");
+                traceIndexStore = new TraceRecordStore(config, this, "tidx", 16);
             }
 
             db = DBMaker.newFileDB(new File(rootPath, "traces.db"))
