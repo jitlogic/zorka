@@ -1,0 +1,14 @@
+{
+  "1":{"template":"${URI} -> ${STATUS}","id":1,"flags":0,"order":110,"condition":"trace = 'HTTP'"},
+  "2":{"template":"${CLASS}.${METHOD}()","id":2,"flags":0,"order":150,"condition":"trace = 'EJB'"},
+  "3":{"template":"${CLASS).${METHOD}(${ARG0~20})","id":3,"flags":0,"order":149,"condition":"trace = 'EJB' and ARG0 != null"},
+  "4":{"template":"${CLASS}.${METHOD}(${ARG0~20},${ARG1~20})","id":4,"flags":0,"order":148,"condition":"trace = 'EJB' and ARG1 != null"},
+  "5":{"template":"${CLASS}.${METHOD}(${ARG0~20},${ARG1~20},${ARG2~20})","id":5,"flags":0,"order":147,"condition":"trace = 'EJB' and ARG2 != null"},
+  "6":{"template":"${CLASS}.${METHOD}(${ARG0~20},${ARG1~20},${ARG2~20},${ARG3~20})","id":6,"flags":0,"order":146,"condition":"trace = 'EJB' and ARG3 != null"},
+  "7":{"template":"${CLASS}.${METHOD}(${ARG0~20},${ARG1~20},${ARG2~20},${ARG3~20},${ARG4~20})","id":7,"flags":0,"order":145,"condition":"trace = 'EJB' and ARG4 != null"},
+  "8":{"template":"${CLASS}.${METHOD}(${ARG0~20},${ARG1~20},${ARG2~20},${ARG3~20},${ARG4~20},${ARG5~20})","id":8,"flags":0,"order":144,"condition":"trace = 'EJB' and ARG5 != null"},
+  "9":{"template":"[${DB}] ${SQL}","id":9,"flags":0,"order":100,"condition":"trace = 'SQL'"},
+  "10":{"template":"${URI} -> ${REDIRECT}","id":10,"flags":0,"order":109,"condition":"trace = 'HTTP' and REDIRECT != null"},
+  "11":{"template":"${CAS_URI} -> ${USERNAME}","id":11,"flags":0,"order":400,"condition":"trace = 'CASCLI'"},
+  "12":{"template":"${ACTION} ${SERVICE: } ${WHO: } ","id":12,"flags":0,"order":400,"condition":"trace = 'CAS'"}
+}
