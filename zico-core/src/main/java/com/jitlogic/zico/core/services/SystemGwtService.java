@@ -16,14 +16,11 @@
 package com.jitlogic.zico.core.services;
 
 import com.google.inject.Singleton;
-import com.jitlogic.zico.core.HostStore;
-import com.jitlogic.zico.core.HostStoreManager;
-import com.jitlogic.zico.core.UserContext;
-import com.jitlogic.zico.core.UserManager;
-import com.jitlogic.zico.core.ZicoConfig;
-import com.jitlogic.zico.core.TraceTemplateManager;
+import com.jitlogic.zico.core.*;
 import com.jitlogic.zico.core.model.TraceTemplate;
 import com.jitlogic.zorka.common.tracedata.Symbol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.lang.management.ManagementFactory;
@@ -35,6 +32,8 @@ import java.util.Map;
 
 @Singleton
 public class SystemGwtService {
+
+    private final static Logger log = LoggerFactory.getLogger(TraceDataGwtService.class);
 
     private ZicoConfig config;
 
@@ -61,20 +60,36 @@ public class SystemGwtService {
 
 
     public List<TraceTemplate> listTemplates() {
-        userContext.checkAdmin();
-        return templater.listTemplates();
+        try {
+            userContext.checkAdmin();
+            return templater.listTemplates();
+        } catch (Exception e) {
+            // TODO use AOP interceptor to implement logging instead of handcoding them; Guice can do such things
+            log.error("Error calling listTemplates()", e);
+            throw new ZicoRuntimeException(e.getMessage(), e);
+        }
     }
 
 
     public int saveTemplate(TraceTemplate tti) {
-        userContext.checkAdmin();
-        return templater.save(tti);
+        try {
+            userContext.checkAdmin();
+            return templater.save(tti);
+        } catch (Exception e) {
+            log.error("Error calling saveTemplate()", e);
+            throw new ZicoRuntimeException(e.getMessage(), e);
+        }
     }
 
 
     public void removeTemplate(Integer tid) {
-        userContext.checkAdmin();
-        templater.remove(tid);
+        try {
+            userContext.checkAdmin();
+            templater.remove(tid);
+        } catch (Exception e) {
+            log.error("Error calling removeTemplate()", e);
+            throw new ZicoRuntimeException(e.getMessage(), e);
+        }
     }
 
 
@@ -106,16 +121,22 @@ public class SystemGwtService {
 
 
     public List<Symbol> getTidMap(String hostName) {
-        Map<Integer,String> tids = hsm.getTids(hostName);
+        try {
+            Map<Integer,String> tids = hsm.getTids(hostName);
 
-        List<Symbol> rslt = new ArrayList<Symbol>(tids.size());
+            List<Symbol> rslt = new ArrayList<Symbol>(tids.size());
 
-        for (Map.Entry<Integer,String> e : tids.entrySet()) {
-            rslt.add(new Symbol(e.getKey(), e.getValue()));
+            for (Map.Entry<Integer,String> e : tids.entrySet()) {
+                rslt.add(new Symbol(e.getKey(), e.getValue()));
+            }
+
+            return rslt;
+        } catch (Exception e) {
+            log.error("Error calling listTemplates()", e);
+            throw new ZicoRuntimeException(e.getMessage(), e);
         }
-
-        return rslt;
     }
+
 
     public synchronized void backupConfig() {
         userManager.export();

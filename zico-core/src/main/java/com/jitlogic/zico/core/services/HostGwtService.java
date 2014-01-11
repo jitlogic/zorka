@@ -19,6 +19,9 @@ package com.jitlogic.zico.core.services;
 import com.jitlogic.zico.core.HostStore;
 import com.jitlogic.zico.core.HostStoreManager;
 import com.jitlogic.zico.core.UserContext;
+import com.jitlogic.zico.core.UserManager;
+import com.jitlogic.zico.core.ZicoRuntimeException;
+import com.jitlogic.zico.core.model.User;
 import com.jitlogic.zico.shared.data.HostProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,26 +40,35 @@ public class HostGwtService {
     private final static Logger log = LoggerFactory.getLogger(HostGwtService.class);
 
     private HostStoreManager hsm;
+
+    private UserManager userManager;
     private UserContext ctx;
 
     @Inject
-    public HostGwtService(HostStoreManager hsm, UserContext ctx) {
+    public HostGwtService(HostStoreManager hsm, UserContext ctx, UserManager userManager) {
         this.hsm = hsm;
         this.ctx = ctx;
+        this.userManager = userManager;
     }
 
 
     public List<HostStore> findAll() {
-        List<HostStore> hostList = hsm.list(ctx.isInRole("ADMIN") ? null : ctx.getUser());
+        try {
+            List<HostStore> hostList = hsm.list(ctx.isInRole("ADMIN") ? null
+                    : userManager.find(User.class, ctx.getUser()).getAllowedHosts());
 
-        Collections.sort(hostList, new Comparator<HostStore>() {
+            Collections.sort(hostList, new Comparator<HostStore>() {
             @Override
             public int compare(HostStore o1, HostStore o2) {
                 return o1.getName().compareTo(o2.getName());
-            }
+                }
         });
 
-        return hostList;
+            return hostList;
+        } catch (Exception e) {
+            log.error("Error calling HostGwtService.findAll()", e);
+            throw new ZicoRuntimeException(e.getMessage(), e);
+        }
     }
 
 

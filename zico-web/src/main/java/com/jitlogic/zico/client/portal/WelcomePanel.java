@@ -200,16 +200,7 @@ public class WelcomePanel implements IsWidget {
 
 
     private void openTemplatePanel() {
-        rf.systemService().getTidMap(null).fire(new Receiver<List<SymbolProxy>>() {
-            @Override
-            public void onSuccess(List<SymbolProxy> response) {
-                shell.get().addView(panelFactory.traceTemplatePanel(response), "Templates");
-            }
-            @Override
-            public void onFailure(ServerFailure failure) {
-                errorHandler.error("Error opening template panel", failure);
-            }
-        });
+        shell.get().addView(panelFactory.traceTemplatePanel(), "Templates");
     }
 
 

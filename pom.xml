@@ -3,7 +3,7 @@
     <groupId>com.jitlogic.zorka</groupId>
     <artifactId>zorka</artifactId>
     <packaging>pom</packaging>
-    <version>0.9.14</version>
+    <version>0.9.15-SNAPSHOT</version>
     <name>zorka: parent aggregator</name>
     <url>http://www.jitlogic.com/zorka</url>
 
@@ -27,7 +27,7 @@
         <junit.version>4.11</junit.version>
         <libsnmp.version>0.0.1</libsnmp.version>
         <logback.version>1.0.13</logback.version>
-        <mapdb.version>0.9.7</mapdb.version>
+        <mapdb.version>0.9.8</mapdb.version>
         <parboiled.version>1.1.6</parboiled.version>
         <slf4j.version>1.7.5</slf4j.version>
         <war.plugin.version>2.1.1</war.plugin.version>

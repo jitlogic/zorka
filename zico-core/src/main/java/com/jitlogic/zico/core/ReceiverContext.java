@@ -22,6 +22,8 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
+import com.jitlogic.zorka.common.zico.ZicoException;
+import com.jitlogic.zorka.common.zico.ZicoPacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +37,9 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
     private final static Logger log = LoggerFactory.getLogger(ReceiverContext.class);
 
-    private SymbolRegistry symbolRegistry;
     private Map<Integer, Integer> sidMap = new HashMap<Integer,Integer>();
+
+    private boolean dirtySidMap = false;
 
     private HostStore hostStore;
 
@@ -45,12 +48,24 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
 
     public ReceiverContext(HostStore hostStore) {
         this.hostStore = hostStore;
-        this.symbolRegistry = hostStore.getSymbolRegistry();
     }
 
 
     @Override
     public synchronized void process(Object obj) throws IOException {
+
+        if (hostStore.hasFlag(HostProxy.DELETED)) {
+            log.info("Resetting connection for " + hostStore.getName() + " due to dirty SID map.");
+            throw new ZicoException(ZicoPacket.ZICO_EOD,
+                    "Host has been deleted. Connection needs to be reset. Try again.");
+        }
+
+        if (dirtySidMap) {
+            log.info("Resetting connection for " + hostStore.getName() + " due to dirty SID map.");
+            throw new ZicoException(ZicoPacket.ZICO_EOD,
+                "Host was disabled and SID map is dirty. Connection needs to be reset. Try again.");
+        }
+
         try {
             if (obj instanceof Symbol) {
                 processSymbol((Symbol) obj);
@@ -73,8 +88,12 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     }
 
     private void processSymbol(Symbol sym) {
-        int newid = symbolRegistry.symbolId(sym.getName());
-        sidMap.put(sym.getId(), newid);
+        if (hostStore.getSymbolRegistry() != null) {
+            int newid = hostStore.getSymbolRegistry().symbolId(sym.getName());
+            sidMap.put(sym.getId(), newid);
+        } else {
+            dirtySidMap = true;
+        }
     }
 
 

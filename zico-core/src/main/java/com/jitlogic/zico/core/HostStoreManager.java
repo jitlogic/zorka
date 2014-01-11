@@ -16,6 +16,7 @@
 package com.jitlogic.zico.core;
 
 import com.google.web.bindery.requestfactory.shared.Locator;
+import com.jitlogic.zico.shared.data.HostProxy;
 import com.jitlogic.zorka.common.tracedata.HelloRequest;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.common.zico.ZicoDataProcessor;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 @Singleton
@@ -104,7 +106,7 @@ public class HostStoreManager extends Locator<HostStore, String> implements Clos
             throw new ZicoException(ZicoPacket.ZICO_AUTH_ERROR, "Unauthorized.");
         }
 
-        if (store.getAddr() == null) {
+        if (store.getAddr() == null || store.getAddr().length() == 0) {
             store.setAddr(socket.getInetAddress().getHostAddress());
             store.save();
         }
@@ -123,13 +125,18 @@ public class HostStoreManager extends Locator<HostStore, String> implements Clos
     }
 
 
-    public List<HostStore> list(String username) {
+    public List<HostStore> list(List<String> allowedHosts) {
         List<HostStore> result = new ArrayList<HostStore>();
 
         for (String name : new File(dataDir).list()) {
             if (new File(new File(dataDir, name), HostStore.HOST_PROPERTIES).exists()) {
-                // TODO Control user access here ... exclude hosts user does not have access to
-                result.add(getHost(name, false));
+                try {
+                    if (allowedHosts == null || allowedHosts.contains(name)) {
+                        result.add(getHost(name, false));
+                    }
+                } catch (Exception e) {
+                    log.error("Error opening host. Consider repairing or removing this host." + name, e);
+                }
             }
         }
 
@@ -141,6 +148,8 @@ public class HostStoreManager extends Locator<HostStore, String> implements Clos
         HostStore store = storesByName.get(name);
         if (store != null) {
             String rootPath = store.getRootPath();
+            store.markFlag(HostProxy.DELETED);
+            store.save();
             store.close();
             ZorkaUtil.rmrf(rootPath);
             storesByName.remove(name);

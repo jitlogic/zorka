@@ -36,6 +36,8 @@ public interface HostProxy extends EntityProxy {
      */
     public static final int CHK_IN_PROGRESS = 0x0004;
 
+    public static final int DELETED = 0x0008;
+
     String getName();
 
     String getAddr();

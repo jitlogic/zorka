@@ -5,7 +5,7 @@
     <parent>
         <artifactId>zorka</artifactId>
         <groupId>com.jitlogic.zorka</groupId>
-        <version>0.9.14</version>
+        <version>0.9.15-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -28,6 +28,7 @@
                         <configuration>
                             <tasks>
                                 <mkdir dir="${project.build.outputDirectory}/zico-${project.version}"/>
+                                <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/conf"/>
                                 <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/data"/>
                                 <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/log"/>
                                 <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/tmp"/>
@@ -53,6 +54,10 @@
                                       toDir="${project.build.outputDirectory}/zico-${project.version}"/>
                                 <copy file="src/zico.conf"
                                       toDir="${project.build.outputDirectory}/zico-${project.version}"/>
+                                <copy file="src/templates.json"
+                                      toDir="${project.build.outputDirectory}/zico-${project.version}/conf"/>
+                                <copy file="src/users.json"
+                                      toDir="${project.build.outputDirectory}/zico-${project.version}/conf"/>
                                 <copy file="src/zorka.properties"
                                       toDir="${project.build.outputDirectory}/zico-${project.version}"/>
                                 <copy file="src/logback.xml"
@@ -69,13 +74,6 @@
                                 </copy>
                                 <copy file="src/zico.bsh"
                                       toDir="${project.build.outputDirectory}/zico-${project.version}/scripts/apps"/>
-                                <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/dbscripts"/>
-                                <copy toDir="${project.build.outputDirectory}/zico-${project.version}/dbscripts">
-                                    <fileset dir="../zico-core/src/main/resources/com/jitlogic/zico"
-                                             defaultexcludes="false">
-                                        <include name="*.sql"/>
-                                    </fileset>
-                                </copy>
                                 <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/templates"/>
                                 <copy file="src/Template_Zico_Collector.xml"
                                       toDir="${project.build.outputDirectory}/zico-${project.version}/templates"/>

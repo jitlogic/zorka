@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.common.tracedata;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 
 
@@ -26,7 +27,7 @@ import java.util.*;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TraceRecord implements SymbolicRecord {
+public class TraceRecord implements SymbolicRecord, Serializable {
 
 
     /**

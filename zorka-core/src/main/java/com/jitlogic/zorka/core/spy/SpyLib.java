@@ -504,6 +504,16 @@ public class SpyLib {
 
 
     /**
+     * Marks current record as error.
+     *
+     * @return
+     */
+    public SpyProcessor markError() {
+        return new SpyFlagsProcessor(true);
+    }
+
+
+    /**
      * Creates method call statistics collector object. It will maintain zorka call statistics and update them with
      * incoming data.
      *

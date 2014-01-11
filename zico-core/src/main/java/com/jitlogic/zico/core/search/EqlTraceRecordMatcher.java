@@ -31,15 +31,18 @@ public class EqlTraceRecordMatcher extends EqlExprEvaluator implements TraceReco
 
     private long totalTime;
 
+    private String hostName;
+
     private TraceRecord traceRecord;
     private String signature;
 
 
-    public EqlTraceRecordMatcher(SymbolRegistry symbolRegistry, EqlExpr expr, int flags, long totalTime) {
+    public EqlTraceRecordMatcher(SymbolRegistry symbolRegistry, EqlExpr expr, int flags, long totalTime, String hostName) {
         this.symbolRegistry = symbolRegistry;
         this.expr = expr;
         this.flags = flags;
         this.totalTime = totalTime;
+        this.hostName = hostName;
     }
 
 
@@ -64,7 +67,7 @@ public class EqlTraceRecordMatcher extends EqlExprEvaluator implements TraceReco
             return sym(traceRecord.getMethodId());
         } else if ("class".equals(name)) {
             return sym(traceRecord.getClassId());
-        } else if ("type".equals(name)) {
+        } else if ("trace".equals(name)) {
             return traceRecord.getMarker() != null ? sym(traceRecord.getMarker().getTraceId()) : null;
         } else if ("time".equals(name)) {
             return traceRecord.getTime();
@@ -72,6 +75,8 @@ public class EqlTraceRecordMatcher extends EqlExprEvaluator implements TraceReco
             return traceRecord.getCalls();
         } else if ("errors".equals(name)) {
             return traceRecord.getErrors();
+        } else if ("host".equals(name)) {
+            return hostName;
         } else if ("pct".equals(name)) {
             return 100.0 * traceRecord.getTime() / totalTime;
         } else if ("signature".equals(name)) {

@@ -16,6 +16,7 @@
 package com.jitlogic.zico.core.model;
 
 
+import com.jitlogic.zico.core.eql.ast.EqlExpr;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,52 +24,42 @@ import java.io.Serializable;
 
 public class TraceTemplate implements Serializable {
 
-    int id;
+    private int id;
 
-    int traceId;
+    private int order;
 
-    int order;
+    private int flags;
 
-    int flags;
+    private String condition;
 
-    String condTemplate;
+    private String template;
 
-    String condRegex;
-
-    String template;
-
+    private transient EqlExpr condExpr;
 
     public TraceTemplate() {
 
     }
 
-
     public TraceTemplate(JSONObject obj) throws JSONException {
         this.id = obj.getInt("id");
-        this.traceId = obj.getInt("traceId");
         this.order = obj.getInt("order");
         this.flags = obj.getInt("flags");
 
-        this.condTemplate = obj.getString("condTemplate");
-        this.condRegex = obj.getString("condRegex");
+        this.condition = obj.getString("condition");
         this.template = obj.getString("template");
     }
-
 
     public JSONObject toJSONObject() throws JSONException {
         JSONObject obj = new JSONObject();
 
         obj.put("id", id);
-        obj.put("traceId", traceId);
         obj.put("order", order);
         obj.put("flags", flags);
-        obj.put("condTemplate", condTemplate);
-        obj.put("condRegex", condRegex);
+        obj.put("condition", condition);
         obj.put("template", template);
 
         return obj;
     }
-
 
     public int getId() {
         return id;
@@ -76,14 +67,6 @@ public class TraceTemplate implements Serializable {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getTraceId() {
-        return traceId;
-    }
-
-    public void setTraceId(int traceId) {
-        this.traceId = traceId;
     }
 
     public int getOrder() {
@@ -102,20 +85,12 @@ public class TraceTemplate implements Serializable {
         this.flags = flags;
     }
 
-    public String getCondTemplate() {
-        return condTemplate;
+    public String getCondition() {
+        return condition;
     }
 
-    public void setCondTemplate(String condTemplate) {
-        this.condTemplate = condTemplate;
-    }
-
-    public String getCondRegex() {
-        return condRegex;
-    }
-
-    public void setCondRegex(String condRegex) {
-        this.condRegex = condRegex;
+    public void setCondition(String condition) {
+        this.condition = condition;
     }
 
     public String getTemplate() {
@@ -126,5 +101,11 @@ public class TraceTemplate implements Serializable {
         this.template = template;
     }
 
+    public EqlExpr getCondExpr() {
+        return condExpr;
+    }
 
+    public void setCondExpr(EqlExpr condExpr) {
+        this.condExpr = condExpr;
+    }
 }

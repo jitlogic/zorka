@@ -17,12 +17,13 @@
 package com.jitlogic.zorka.common.tracedata;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * Trace marker object marks beginning of a new trace. It can be attached
  * to current trace record at the beginning of a trace.
  */
-public class TraceMarker implements SymbolicRecord {
+public class TraceMarker implements SymbolicRecord, Serializable {
 
     /**
      * Minimum trace execution time required to further process trace

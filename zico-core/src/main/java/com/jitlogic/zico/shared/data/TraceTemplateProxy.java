@@ -27,10 +27,6 @@ public interface TraceTemplateProxy extends EntityProxy {
 
     public void setId(int id);
 
-    public int getTraceId();
-
-    public void setTraceId(int id);
-
     public int getOrder();
 
     public void setOrder(int order);
@@ -39,13 +35,9 @@ public interface TraceTemplateProxy extends EntityProxy {
 
     public void setFlags(int flags);
 
-    public String getCondTemplate();
+    public String getCondition();
 
-    public void setCondTemplate(String condTemplate);
-
-    public String getCondRegex();
-
-    public void setCondRegex(String condRegex);
+    public void setCondition(String condition);
 
     public String getTemplate();
 

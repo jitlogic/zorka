@@ -17,13 +17,14 @@
 package com.jitlogic.zorka.common.tracedata;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * Represents one stack trace element (eg. from symbolic form of exception).
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class SymbolicStackElement implements SymbolicRecord {
+public class SymbolicStackElement implements SymbolicRecord, Serializable {
 
     /**
      * ID for class name symbol

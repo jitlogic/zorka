@@ -19,10 +19,15 @@ package com.jitlogic.zico.core;
 import com.google.web.bindery.requestfactory.shared.Locator;
 import com.jitlogic.zico.core.ZicoConfig;
 import com.jitlogic.zico.core.ZicoUtil;
+import com.jitlogic.zico.core.eql.EqlException;
+import com.jitlogic.zico.core.eql.Parser;
 import com.jitlogic.zico.core.model.KeyValuePair;
 import com.jitlogic.zico.core.model.TraceInfo;
 import com.jitlogic.zico.core.model.TraceTemplate;
+import com.jitlogic.zico.core.search.EqlTraceRecordMatcher;
+import com.jitlogic.zico.core.search.TraceRecordMatcher;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -125,12 +130,23 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
         Collections.sort(ttl, new Comparator<TraceTemplate>() {
             @Override
             public int compare(TraceTemplate o1, TraceTemplate o2) {
-                return o1.getTraceId() != o2.getTraceId()
-                        ? o2.getTraceId()-o1.getTraceId()
-                        : o2.getOrder()-o1.getOrder();
+                return o1.getOrder()-o2.getOrder();
             }
         });
+
+        for (TraceTemplate tti : ttl) {
+            if (tti.getCondExpr() == null) {
+                try {
+                    tti.setCondExpr(Parser.expr(tti.getCondition()));
+                } catch (EqlException e) {
+                    log.error("Cannot parse expression '" + tti.getCondition()
+                            + "'. Please fix trace display templates configuration.", e);
+                }
+            }
+        }
+
         orderedTemplates = ttl;
+
     }
 
 
@@ -156,43 +172,52 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
     }
 
 
-    public String templateDescription(SymbolRegistry symbolRegistry, TraceInfo info) {
-
-        Map<String, Object> attrs = new HashMap<String, Object>();
-        attrs.put("methodName", symbolRegistry.symbolName(info.getMethodId()));
-        attrs.put("className", symbolRegistry.symbolName(info.getClassId()));
-        if (info.getAttributes() != null) {
-            for (KeyValuePair e : info.getAttributes()) {
-                attrs.put(e.getKey(), e.getValue());
-            }
-        }
+    public String templateDescription(SymbolRegistry symbolRegistry, String hostName, TraceRecord rec) {
 
         for (TraceTemplate tti : orderedTemplates) {
-            if (tti.getTraceId() == info.getTraceId() &&
-                    (tti.getCondTemplate() == null || tti.getCondTemplate().trim().length() == 0 ||
-                    ObjectInspector.substitute(tti.getCondTemplate(), attrs).matches(tti.getCondRegex()))) {
-                return ObjectInspector.substitute(tti.getTemplate(), attrs);
+            TraceRecordMatcher matcher = new EqlTraceRecordMatcher(
+                    symbolRegistry, tti.getCondExpr(), 0, rec.getTime(), hostName);
+            if (tti.getCondExpr() != null && matcher.match(rec)) {
+                return substitute(tti, symbolRegistry, hostName, rec);
             }
         }
 
-        return genericTemplate(symbolRegistry, info);
+        return genericTemplate(symbolRegistry, rec);
     }
 
 
-    public String genericTemplate(SymbolRegistry symbolRegistry, TraceInfo info) {
-        StringBuilder sdesc = new StringBuilder();
-        sdesc.append(symbolRegistry.symbolName(info.getTraceId()));
-        if (info.getAttributes() != null) {
-            for (KeyValuePair attr : info.getAttributes()) {
-                sdesc.append("|");
-                if (attr.getValue().length() > 50) {
-                    sdesc.append(attr.getValue().substring(0, 50));
-                } else {
-                    sdesc.append(attr.getValue());
-                }
+    private String substitute(TraceTemplate tti, SymbolRegistry symbolRegistry, String hostname, TraceRecord rec) {
+        Map<String, Object> attrs = new HashMap<String, Object>();
+        if (rec.getAttrs() != null) {
+            for (Map.Entry<Integer,Object> e : rec.getAttrs().entrySet()) {
+                attrs.put(symbolRegistry.symbolName(e.getKey()), e.getValue());
             }
         }
-        return sdesc.toString();
+
+        attrs.put("methodName", symbolRegistry.symbolName(rec.getMethodId()));
+        attrs.put("className", symbolRegistry.symbolName(rec.getClassId()));
+        attrs.put("hostName", hostname);
+
+        return ObjectInspector.substitute(tti.getTemplate(), attrs);
+    }
+
+
+    public String genericTemplate(SymbolRegistry symbolRegistry, TraceRecord rec) {
+        StringBuilder sdesc = new StringBuilder();
+
+        if (rec.getMarker() != null) {
+            sdesc.append(symbolRegistry.symbolName(rec.getMarker().getTraceId()));
+        }
+
+        if (rec.getAttrs() != null) {
+            for (Map.Entry<Integer,Object> e : rec.getAttrs().entrySet()) {
+                sdesc.append("|");
+                String s = ""+e.getValue();
+                sdesc.append(s.length() > 50 ? s.substring(0,50) : s);
+            }
+        }
+        String s = sdesc.toString();
+        return s.length() < 255 ? s : s.substring(0,255);
     }
 
 
@@ -205,12 +230,16 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
 
     public synchronized int save(TraceTemplate tti) {
 
+        tti.setCondExpr(Parser.expr(tti.getCondition()));
+
         if (tti.getId() == 0) {
             tti.setId(templates.size() > 0 ? templates.lastKey()+1 : 1);
         }
 
         templates.put(tti.getId(), tti);
         db.commit();
+
+        reorder();
 
         return tti.getId();
     }

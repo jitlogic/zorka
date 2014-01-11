@@ -101,11 +101,13 @@ public class PersistentSymbolRegistry extends SymbolRegistry implements Closeabl
             try {
                 reader = new FileReader(jsonFile);
                 JSONObject json = new JSONObject(new JSONTokener(reader));
-                JSONArray names = json.names();
-                for (int i = 0; i < names.length(); i++) {
-                    String id = names.getString(i);
-                    String sym = json.getString(id);
-                    this.put(Integer.parseInt(id), sym);
+                if (json.length() > 0) {
+                    JSONArray names = json.names();
+                    for (int i = 0; i < names.length(); i++) {
+                        String id = names.getString(i);
+                        String sym = json.getString(id);
+                        this.put(Integer.parseInt(id), sym);
+                    }
                 }
                 log.info("Import of symbol registry at " + path + " completed successfully.");
             } catch (IOException e) {

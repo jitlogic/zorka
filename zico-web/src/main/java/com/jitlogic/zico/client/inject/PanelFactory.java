@@ -37,7 +37,7 @@ public interface PanelFactory {
 
     public TraceCallTreePanel traceCallTreePanel(TraceInfoProxy traceInfo);
 
-    public TraceTemplatePanel traceTemplatePanel(List<SymbolProxy> tidMap);
+    public TraceTemplatePanel traceTemplatePanel();
 
     public TraceRecordSearchDialog traceRecordSearchDialog(TraceCallTreePanel panel, TraceInfoProxy trace);
 

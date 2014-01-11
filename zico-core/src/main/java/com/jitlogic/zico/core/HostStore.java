@@ -67,6 +67,9 @@ public class HostStore implements Closeable, RDSCleanupListener {
     private static final String PROP_SIZE = "size";
     private static final String PROP_COMMENT = "comment";
 
+    private final String DB_INFO_MAP = "INFOS";
+    private final String DB_TIDS_MAP = "TIDS";
+
     private PersistentSymbolRegistry symbolRegistry;
 
     private String rootPath;
@@ -90,8 +93,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
     private long maxSize;
     private String comment = "";
 
-    private static final long MAX_SEARCH_T1 = 3000000000L;
-    private static final long MAX_SEARCH_T2 = 30000000000L;
+    private static final long MAX_SEARCH_T1 = 2000000000L;
+    private static final long MAX_SEARCH_T2 = 5000000000L;
 
     public HostStore(ZicoConfig config, TraceTemplateManager templater, String name) {
 
@@ -126,18 +129,17 @@ public class HostStore implements Closeable, RDSCleanupListener {
             }
 
             if (traceDataStore == null) {
-                traceDataStore = new TraceRecordStore(config, this, "tdat");
+                traceDataStore = new TraceRecordStore(config, this, "tdat", 1);
             }
 
             if (traceIndexStore == null) {
-                traceIndexStore = new TraceRecordStore(config, this, "tidx");
+                traceIndexStore = new TraceRecordStore(config, this, "tidx", 16);
             }
 
             db = DBMaker.newFileDB(new File(rootPath, "traces.db"))
-                    .asyncWriteDisable().asyncFlushDelay(100)
                     .closeOnJvmShutdown().make();
-            infos = db.getTreeMap("INFOS");
-            tids = db.getTreeMap("TIDS");
+            infos = db.getTreeMap(DB_INFO_MAP);
+            tids = db.getTreeMap(DB_TIDS_MAP);
         } catch (IOException e) {
             log.error("Cannot open host store " + name, e);
         }
@@ -367,7 +369,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
             if (query.hasFlag(TraceInfoSearchQueryProxy.EQL_QUERY)) {
                 matcher = new EqlTraceRecordMatcher(symbolRegistry,
                         Parser.expr(query.getSearchExpr()),
-                        0, 0);
+                        0, 0, name);
             } else {
                 matcher = new FullTextTraceRecordMatcher(symbolRegistry,
                         TraceRecordSearchQuery.SEARCH_ALL, query.getSearchExpr());
@@ -388,7 +390,16 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
         for (Long key = initialKey; key != null; key = asc ? infos.higherKey(key) : infos.lowerKey(key)) {
 
+            long t = System.nanoTime()-tstart;
+
+            if ((lst.size() >= query.getLimit()) || (t > MAX_SEARCH_T1 && lst.size() > 0) || (t > MAX_SEARCH_T2)) {
+                result.markFlag(TraceInfoSearchResultProxy.MORE_RESULTS);
+                return result;
+            }
+
             TraceInfoRecord tir = infos.get(key);
+
+            result.setLastOffs(key);
 
             if (query.hasFlag(TraceInfoSearchQueryProxy.ERRORS_ONLY) && 0 == (tir.getTflags() & TraceMarker.ERROR_MARK)) {
                 continue;
@@ -412,14 +423,9 @@ public class HostStore implements Closeable, RDSCleanupListener {
                 }
                 if (matcher == null || recursiveMatch(matcher, idxtr)) {
                     lst.add(toTraceInfo(tir, idxtr));
-                    result.setLastOffs(asc ? tir.getDataOffs() + 1 : tir.getDataOffs() - 1);
-                    long t = System.nanoTime()-tstart;
-                    if ((lst.size() >= query.getLimit()) || (t > MAX_SEARCH_T1 && lst.size() > 0) || (t > MAX_SEARCH_T2)) {
-                        result.markFlag(TraceInfoSearchResultProxy.MORE_RESULTS);
-                        return result;
-                    }
                 }
             }
+
         }
 
         return result;
@@ -504,7 +510,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
             ti.setExceptionInfo(sei);
         }
 
-        ti.setDescription(templater.templateDescription(symbolRegistry, ti));
+        ti.setDescription(templater.templateDescription(symbolRegistry, name, tr));
 
         return ti;
     }
@@ -678,6 +684,10 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public boolean hasFlag(int flag) {
         return 0 != (this.flags & flag);
+    }
+
+    public void markFlag(int flag) {
+        flags |= flag;
     }
 
 

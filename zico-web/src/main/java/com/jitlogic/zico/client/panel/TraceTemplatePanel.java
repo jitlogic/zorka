@@ -66,15 +66,9 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
     private Grid<TraceTemplateProxy> templateGrid;
     private GridRowEditing<TraceTemplateProxy> templateEditor;
 
-    private SimpleComboBox<Integer> cmbTraceType;
-
-    private Map<String, Integer> ttidByName = new HashMap<String, Integer>();
-    private Map<Integer, String> ttidByType = new HashMap<Integer, String>();
-
     private SpinnerField<Integer> txtOrder;
-    private TextField txtCondTempl;
-    private TextField txtCondRegex;
-    private TextField txtTraceTemplate;
+    private TextField txtCondition;
+    private TextField txtTemplate;
 
     private ErrorHandler errorHandler;
 
@@ -83,49 +77,31 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
     private SystemServiceProxy newTemplateRequest;
 
     @Inject
-    public TraceTemplatePanel(ZicoRequestFactory rf, ErrorHandler errorHandler,
-                              @Assisted List<SymbolProxy> tidMap) {
+    public TraceTemplatePanel(ZicoRequestFactory rf, ErrorHandler errorHandler) {
 
         this.errorHandler = errorHandler;
         this.rf = rf;
 
         createToolbar();
         createTemplateListGrid();
-        loadTids(tidMap);
         loadData();
     }
 
 
     private void createTemplateListGrid() {
-        ColumnConfig<TraceTemplateProxy, Integer> traceIdCol
-                = new ColumnConfig<TraceTemplateProxy, Integer>(props.traceId(), 120, "Type");
-        traceIdCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-        traceIdCol.setFixed(true);
-
-        traceIdCol.setCell(new AbstractCell<Integer>() {
-            @Override
-            public void render(Context context, Integer value, SafeHtmlBuilder sb) {
-                String s = traceTypeName(value);
-                sb.append(SafeHtmlUtils.fromString(s));
-            }
-        });
-
         ColumnConfig<TraceTemplateProxy, Integer> orderCol
                 = new ColumnConfig<TraceTemplateProxy, Integer>(props.order(), 80, "Order");
         orderCol.setFixed(true);
 
-        final ColumnConfig<TraceTemplateProxy, String> traceCondTemplCol
-                = new ColumnConfig<TraceTemplateProxy, String>(props.condTemplate(), 250, "Condition Template");
-
-        ColumnConfig<TraceTemplateProxy, String> traceCondRegexCol
-                = new ColumnConfig<TraceTemplateProxy, String>(props.condRegex(), 250, "Condition Match");
+        final ColumnConfig<TraceTemplateProxy, String> traceConditionCol
+                = new ColumnConfig<TraceTemplateProxy, String>(props.condition(), 250, "Condition Expression");
 
         ColumnConfig<TraceTemplateProxy, String> traceTemplateCol
                 = new ColumnConfig<TraceTemplateProxy, String>(props.template(), 250, "Description Template");
 
         ColumnModel<TraceTemplateProxy> model = new ColumnModel<TraceTemplateProxy>(
                 Arrays.<ColumnConfig<TraceTemplateProxy, ?>>asList(
-                    traceIdCol, orderCol, traceCondTemplCol, traceCondRegexCol, traceTemplateCol));
+                    orderCol, traceConditionCol, traceTemplateCol));
 
         templateStore = new ListStore<TraceTemplateProxy>(props.key());
 
@@ -139,29 +115,16 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
         templateEditor = new GridRowEditing<TraceTemplateProxy>(templateGrid);
         templateEditor.setClicksToEdit(ClicksToEdit.TWO);
 
-        cmbTraceType = new SimpleComboBox<Integer>(new LabelProvider<Integer>() {
-            @Override
-            public String getLabel(Integer item) {
-                return ttidByType.get(item);
-            }
-        });
-        cmbTraceType.setForceSelection(true);
-
-        templateEditor.addEditor(traceIdCol, cmbTraceType);
-
         txtOrder = new SpinnerField<Integer>(new NumberPropertyEditor.IntegerPropertyEditor());
         txtOrder.setMinValue(0);
         txtOrder.setMaxValue(9999999);
         templateEditor.addEditor(orderCol, txtOrder);
 
-        txtCondTempl = new TextField();
-        templateEditor.addEditor(traceCondTemplCol, txtCondTempl);
+        txtCondition = new TextField();
+        templateEditor.addEditor(traceConditionCol, txtCondition);
 
-        txtCondRegex = new TextField();
-        templateEditor.addEditor(traceCondRegexCol, txtCondRegex);
-
-        txtTraceTemplate = new TextField();
-        templateEditor.addEditor(traceTemplateCol, txtTraceTemplate);
+        txtTemplate = new TextField();
+        templateEditor.addEditor(traceTemplateCol, txtTemplate);
 
 
         templateEditor.addCompleteEditHandler(new CompleteEditEvent.CompleteEditHandler<TraceTemplateProxy>() {
@@ -179,11 +142,9 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
         SystemServiceProxy req = newTemplateRequest != null ? newTemplateRequest : rf.systemService();
         newTemplateRequest = null;
         final TraceTemplateProxy tti = req.edit(templateStore.get(row));
-        tti.setTraceId(cmbTraceType.getCurrentValue());
         tti.setOrder(txtOrder.getCurrentValue());
-        tti.setCondTemplate(txtCondTempl.getCurrentValue());
-        tti.setCondRegex(txtCondRegex.getCurrentValue());
-        tti.setTemplate(txtTraceTemplate.getCurrentValue());
+        tti.setCondition(txtCondition.getCurrentValue());
+        tti.setTemplate(txtTemplate.getCurrentValue());
         req.saveTemplate(tti).fire(new Receiver<Integer>() {
             @Override
             public void onSuccess(Integer integer) {
@@ -194,11 +155,6 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
                 errorHandler.error("Error saving template", failure);
             }
         });
-    }
-
-
-    private String traceTypeName(Integer value) {
-        return ttidByType.containsKey(value) ? ttidByType.get(value) : "" + value;
     }
 
 
@@ -288,15 +244,6 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
     }
 
 
-    private void loadTids(List<SymbolProxy> tidMap) {
-        for (SymbolProxy e : tidMap) {
-            ttidByName.put(e.getName(), e.getId());
-            ttidByType.put(e.getId(), e.getName());
-            cmbTraceType.add(e.getId());
-        }
-    }
-
-
     private void loadData() {
         rf.systemService().listTemplates().fire(new Receiver<List<TraceTemplateProxy>>() {
             @Override
@@ -316,9 +263,6 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
         Collections.sort(data, new Comparator<TraceTemplateProxy>() {
             @Override
             public int compare(TraceTemplateProxy o1, TraceTemplateProxy o2) {
-                if (o1.getTraceId() != o2.getTraceId()) {
-                    return traceTypeName(o1.getTraceId()).compareTo(traceTypeName(o2.getTraceId()));
-                }
                 return o1.getOrder() - o2.getOrder();
             }
         });

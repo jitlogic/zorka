@@ -370,6 +370,8 @@ public class DataCollectionUnitTest extends ZicoFixture {
                 host.getInfoRecord(firstOffs).getIndexOffs() <= Long.parseLong(iFiles.get(1).substring(0,16),16));
     }
 
+
+
     // TODO test: search in host without access - should fail in a controlled way
 
     // TODO automatic index cleanup after main store truncation

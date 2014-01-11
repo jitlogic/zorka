@@ -93,4 +93,13 @@ public class UtilLib {
         return ZorkaUtil.path(components);
     }
 
+    public Object getField(Object obj, String name) {
+        return ObjectInspector.getField(obj, name);
+    }
+
+
+    public void setField(Object obj, String name, Object value) {
+        ObjectInspector.setField(obj, name, value);
+    }
+
 }
