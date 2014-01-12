@@ -16,15 +16,26 @@
 package com.jitlogic.zico.client.panel;
 
 import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.BrowserEvents;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.editor.client.Editor;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.DataGrid;
+import com.google.gwt.user.cellview.client.IdentityColumn;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.view.client.CellPreviewEvent;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.ProvidesKey;
+import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ErrorHandler;
@@ -40,11 +51,14 @@ import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.PropertyAccess;
 import com.sencha.gxt.widget.core.client.ContentPanel;
+import com.sencha.gxt.widget.core.client.Dialog;
+import com.sencha.gxt.widget.core.client.box.ConfirmMessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.CancelEditEvent;
 import com.sencha.gxt.widget.core.client.event.CellClickEvent;
 import com.sencha.gxt.widget.core.client.event.CompleteEditEvent;
+import com.sencha.gxt.widget.core.client.event.HideEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.CheckBox;
 import com.sencha.gxt.widget.core.client.form.TextField;
@@ -54,62 +68,34 @@ import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.editing.ClicksToEdit;
 import com.sencha.gxt.widget.core.client.grid.editing.GridRowEditing;
+import com.sencha.gxt.widget.core.client.menu.Item;
+import com.sencha.gxt.widget.core.client.menu.Menu;
+import com.sencha.gxt.widget.core.client.menu.MenuItem;
+import com.sencha.gxt.widget.core.client.menu.SeparatorMenuItem;
 import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
-public class UserManagementPanel extends VerticalLayoutContainer implements Editor<UserProxy> {
-
-    private VerticalLayoutContainer pnlUserList;
-    private GridRowEditing<UserProxy> userEditor;
-    private TextField txtUserName;
-    private CheckBox cbxUserAdmin;
-    private TextField txtRealName;
-
-    interface UserProperties extends PropertyAccess<UserProxy> {
-        ModelKeyProvider<UserProxy> id();
-
-        ValueProvider<UserProxy, String> userName();
-
-        ValueProvider<UserProxy, String> realName();
-
-        ValueProvider<UserProxy, Boolean> admin();
-    }
-
-    interface HostProperties extends PropertyAccess<HostProxy> {
-        ModelKeyProvider<HostProxy> id();
-
-        ValueProvider<HostProxy, String> name();
-    }
-
-    private static UserProperties userProperties = GWT.create(UserProperties.class);
-    private static HostProperties hostProperties = GWT.create(HostProperties.class);
-
-    private DockLayoutPanel rootPanel;
+public class UserManagementPanel extends VerticalLayoutContainer {
 
     private ZicoRequestFactory rf;
     private PanelFactory panelFactory;
     private ErrorHandler errorHandler;
-    private UserServiceProxy newUserRequest;
 
-    private ListStore<UserProxy> userStore;
-    private Grid<UserProxy> userGrid;
+    private ListDataProvider<UserProxy> userStore;
+    private DataGrid<UserProxy> userGrid;
+    private SingleSelectionModel<UserProxy> selectionModel;
 
-    private UserProxy selectedUser;
+    private Menu contextMenu;
 
-    private List<HostProxy> hosts = new ArrayList<HostProxy>();
-    private Set<String> allowedHosts = new HashSet<String>();
-
-    private ListStore<HostProxy> hostStore;
-    private CheckBoxSelectionModel<HostProxy> hostSelection;
-    private Grid<HostProxy> hostGrid;
+    private List<String> hostNames = new ArrayList<String>();
 
     @Inject
     public UserManagementPanel(ZicoRequestFactory requestFactory, PanelFactory panelFactory, ErrorHandler errorHandler) {
@@ -125,18 +111,9 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
 
 
     private void createUi() {
-        rootPanel = new DockLayoutPanel(Style.Unit.PCT);
-
-        pnlUserList = new VerticalLayoutContainer();
-
         createToolBar();
-
         createUserGrid();
-
-        createHostGrid();
-
-        rootPanel.add(pnlUserList);
-        add(rootPanel, new VerticalLayoutData(1, 1));
+        createContextMenu();
     }
 
 
@@ -196,143 +173,208 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
         });
 
 
-        pnlUserList.add(toolBar, new VerticalLayoutData(1, -1));
+        add(toolBar, new VerticalLayoutData(1, -1));
     }
+
+
+    private final static ProvidesKey<UserProxy> KEY_PROVIDER = new ProvidesKey<UserProxy>() {
+        @Override
+        public Object getKey(UserProxy item) {
+            return item.getUserName();
+        }
+    };
+
+    private static final Cell<UserProxy> USERNAME_CELL = new AbstractCell<UserProxy>() {
+        @Override
+        public void render(Context context, UserProxy value, SafeHtmlBuilder sb) {
+            sb.append(SafeHtmlUtils.fromString(value.getUserName()));
+        }
+    };
+
+    private static final Cell<UserProxy> REALNAME_CELL = new AbstractCell<UserProxy>() {
+        @Override
+        public void render(Context context, UserProxy value, SafeHtmlBuilder sb) {
+            sb.append(SafeHtmlUtils.fromString(value.getRealName()));
+        }
+    };
+
+    private static final Cell<UserProxy> USERROLE_CELL = new AbstractCell<UserProxy>() {
+        @Override
+        public void render(Context context, UserProxy value, SafeHtmlBuilder sb) {
+            sb.append(SafeHtmlUtils.fromString(value.isAdmin() ? "ADMIN" : "VIEWER"));
+        }
+    };
+
+    private static final Cell<UserProxy> USERHOSTS_CELL = new AbstractCell<UserProxy>() {
+        @Override
+        public void render(Context context, UserProxy value, SafeHtmlBuilder sb) {
+            if (value.isAdmin()) {
+                sb.appendHtmlConstant(
+                    "<span style=\"color: gray;\"> ** all hosts visible due to administrator privileges ** </span>");
+            } else {
+                List<String> hosts = value.getAllowedHosts();
+                if (hosts != null) {
+                    for (int i = 0; i < hosts.size(); i++) {
+                        if (i > 0) {
+                            sb.appendHtmlConstant(",");
+                        }
+                        sb.append(SafeHtmlUtils.fromString(hosts.get(i)));
+                    }
+                }
+            }
+        }
+    };
 
 
     private void createUserGrid() {
-        userStore = new ListStore<UserProxy>(userProperties.id());
+        userGrid = new DataGrid<UserProxy>(1024 * 1024, KEY_PROVIDER);
+        selectionModel = new SingleSelectionModel<UserProxy>(KEY_PROVIDER);
+        userGrid.setSelectionModel(selectionModel);
 
-        ColumnConfig<UserProxy, String> colUserName
-            = new ColumnConfig<UserProxy, String>(userProperties.userName(), 100, "User");
-        colUserName.setMenuDisabled(true);
-        colUserName.setSortable(false);
-        colUserName.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+        Column<UserProxy,UserProxy> colUsername = new IdentityColumn<UserProxy>(USERNAME_CELL);
+        userGrid.addColumn(colUsername, new ResizableHeader<UserProxy>("Username", userGrid, colUsername));
+        userGrid.setColumnWidth(colUsername, 128, Style.Unit.PX);
 
-        ColumnConfig<UserProxy, Boolean> colUserAdmin
-            = new ColumnConfig<UserProxy, Boolean>(userProperties.admin(), 20, "Adm");
-        colUserAdmin.setMenuDisabled(true);
-        colUserAdmin.setSortable(false);
-        colUserAdmin.setCell(new AbstractCell<Boolean>() {
+        Column<UserProxy,UserProxy> colUserRole = new IdentityColumn<UserProxy>(USERROLE_CELL);
+        userGrid.addColumn(colUserRole, new ResizableHeader<UserProxy>("Role", userGrid, colUserRole));
+        userGrid.setColumnWidth(colUserRole, 64, Style.Unit.PX);
+
+        Column<UserProxy,UserProxy> colRealName = new IdentityColumn<UserProxy>(REALNAME_CELL);
+        userGrid.addColumn(colRealName, new ResizableHeader<UserProxy>("Real Name", userGrid, colRealName));
+        userGrid.setColumnWidth(colRealName, 256, Style.Unit.PX);
+
+        Column<UserProxy,UserProxy> colUserHosts = new IdentityColumn<UserProxy>(USERHOSTS_CELL);
+        userGrid.addColumn(colUserHosts, "Allowed hosts");
+        userGrid.setColumnWidth(colUserHosts, 100, Style.Unit.PCT);
+
+        userStore = new ListDataProvider<UserProxy>();
+        userStore.addDataDisplay(userGrid);
+
+        userGrid.addCellPreviewHandler(new CellPreviewEvent.Handler<UserProxy>() {
             @Override
-            public void render(Context context, Boolean val, SafeHtmlBuilder sb) {
-                sb.appendHtmlConstant("<span>");
-                sb.append(SafeHtmlUtils.fromString(val ? "yes" : "no"));
-                sb.appendHtmlConstant("</span>");
-            }
-        });
-        colUserAdmin.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-
-        ColumnConfig<UserProxy, String> colRealName
-            = new ColumnConfig<UserProxy, String>(userProperties.realName(), 300, "Real Name");
-        colRealName.setMenuDisabled(true);
-        colRealName.setSortable(false);
-
-        ColumnModel<UserProxy> model = new ColumnModel<UserProxy>(Arrays.<ColumnConfig<UserProxy,?>>asList(
-                colUserName, colUserAdmin, colRealName));
-
-        userGrid = new Grid<UserProxy>(userStore, model);
-        userGrid.getView().setForceFit(true);
-        userGrid.getView().setAutoFill(true);
-        userGrid.getView().setAutoExpandColumn(colRealName);
-
-        userGrid.addCellClickHandler(new CellClickEvent.CellClickHandler() {
-            @Override
-            public void onCellClick(CellClickEvent event) {
-                UserProxy currentUser = userGrid.getSelectionModel().getSelectedItem();
-                if (currentUser == selectedUser) { return; }
-                selectedUser = currentUser;
-                hostStore.clear();
-                rf.userService().getAllowedHosts(userGrid.getSelectionModel().getSelectedItem().getUserName()).fire(
-                    new Receiver<List<String>>() {
-                        @Override
-                        public void onSuccess(List<String> hostIds) {
-                            updateHosts(hostIds);
-                        }
-                        @Override
-                        public void onFailure(ServerFailure failure) {
-                            errorHandler.error("Error loading user data", failure);
-                        }
+            public void onCellPreview(CellPreviewEvent<UserProxy> event) {
+                NativeEvent nev = event.getNativeEvent();
+                String eventType = nev.getType();
+                if ((BrowserEvents.KEYDOWN.equals(eventType) && nev.getKeyCode() == KeyCodes.KEY_ENTER)
+                        || BrowserEvents.DBLCLICK.equals(nev.getType())) {
+                    selectionModel.setSelected(event.getValue(), true);
+                    editUser();
+                }
+                if (BrowserEvents.CONTEXTMENU.equals(eventType)) {
+                    selectionModel.setSelected(event.getValue(), true);
+                    if (event.getValue() != null) {
+                        contextMenu.showAt(event.getNativeEvent().getClientX(), event.getNativeEvent().getClientY());
                     }
-                );
+                }
+
             }
         });
 
-
-        userEditor = new GridRowEditing<UserProxy>(userGrid);
-        txtUserName = new TextField();
-        userEditor.addEditor(colUserName, txtUserName);
-        cbxUserAdmin = new CheckBox();
-        userEditor.addEditor(colUserAdmin, cbxUserAdmin);
-        txtRealName = new TextField();
-        userEditor.addEditor(colRealName, txtRealName);
-        userEditor.setClicksToEdit(ClicksToEdit.TWO);
-
-
-//        userEditor.addStartEditHandler(new StartEditEvent.StartEditHandler<UserProxy>() {
-//            @Override
-//            public void onStartEdit(StartEditEvent<UserProxy> event) {
-//
-//            }
-//        });
-
-        userEditor.addCancelEditHandler(new CancelEditEvent.CancelEditHandler<UserProxy>() {
-            @Override
-            public void onCancelEdit(CancelEditEvent<UserProxy> event) {
-                newUserRequest = null;
-                refreshUsers();
-            }
-        });
-
-
-        userEditor.addCompleteEditHandler(new CompleteEditEvent.CompleteEditHandler<UserProxy>() {
-            @Override
-            public void onCompleteEdit(CompleteEditEvent<UserProxy> event) {
-                saveUser(userStore.get(event.getEditCell().getRow()));
-            }
-        });
-
-        pnlUserList.add(userGrid, new VerticalLayoutData(1, 1));
+        add(userGrid, new VerticalLayoutData(1, 1));
     }
 
-    private void saveUser(UserProxy user) {
-        UserServiceProxy req = newUserRequest != null ? newUserRequest : rf.userService();
-        UserProxy editedUser = user.getUserName() != null ? req.edit(user) : user;
-        editedUser.setUserName(txtUserName.getText());
-        editedUser.setRealName(txtRealName.getText());
-        editedUser.setAdmin(cbxUserAdmin.getValue());
-        req.persist(editedUser).fire(new Receiver<Void>() {
+
+    private void createContextMenu() {
+        contextMenu = new Menu();
+
+        MenuItem mnuRefresh = new MenuItem("Refresh");
+        mnuRefresh.setIcon(Resources.INSTANCE.refreshIcon());
+        mnuRefresh.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
-            public void onSuccess(Void aVoid) {
+            public void onSelection(SelectionEvent<Item> event) {
                 refreshUsers();
             }
+        });
+
+        contextMenu.add(new SeparatorMenuItem());
+
+        MenuItem mnuAddUser = new MenuItem("Add user");
+        mnuAddUser.setIcon(Resources.INSTANCE.addIcon());
+        mnuAddUser.addSelectionHandler(new SelectionHandler<Item>() {
             @Override
-            public void onFailure(ServerFailure failure) {
-                errorHandler.error("Error saving user data", failure);
+            public void onSelection(SelectionEvent<Item> event) {
+                addUser();
             }
         });
+        contextMenu.add(mnuAddUser);
+
+        MenuItem mnuRemoveUser = new MenuItem("Remove user");
+        mnuRemoveUser.setIcon(Resources.INSTANCE.removeIcon());
+        mnuRemoveUser.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                removeUser();
+            }
+        });
+        contextMenu.add(mnuRemoveUser);
+
+        MenuItem mnuEditUser = new MenuItem("Edit user");
+        mnuEditUser.setIcon(Resources.INSTANCE.editIcon());
+        mnuEditUser.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                editUser();
+            }
+        });
+
+        contextMenu.add(new SeparatorMenuItem());
+
+        MenuItem mnuChangePassword = new MenuItem("Change password");
+        mnuChangePassword.setIcon(Resources.INSTANCE.keyIcon());
+        mnuChangePassword.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                changePassword();
+            }
+        });
+    }
+
+
+    private void editUser() {
+        UserProxy user = selectionModel.getSelectedObject();
+        if (user != null) {
+            new UserPrefsDialog(rf, user, this, hostNames, errorHandler).show();
+        }
     }
 
 
     private void addUser() {
-        newUserRequest = rf.userService();
-        userStore.add(0, newUserRequest.create(UserProxy.class));
-        userEditor.startEditing(new Grid.GridCell(0, 1));
+        new UserPrefsDialog(rf, null, this, hostNames, errorHandler).show();
     }
 
 
     private void removeUser() {
-        UserProxy user = userGrid.getSelectionModel().getSelectedItem();
+        final UserProxy user = selectionModel.getSelectedObject();
         if (user != null) {
-            userStore.remove(user);
-            rf.userService().remove(user).fire();
-            //refreshUsers();
+            ConfirmMessageBox cmb = new ConfirmMessageBox(
+                    "Removing host", "Are you sure you want to remove " + user.getUserName() + " ?");
+            cmb.addHideHandler(new HideEvent.HideHandler() {
+                @Override
+                public void onHide(HideEvent event) {
+                    Dialog d = (Dialog) event.getSource();
+                    if ("Yes".equals(d.getHideButton().getText())) {
+                        userStore.getList().remove(user);
+                        rf.userService().remove(user).fire(
+                                new Receiver<Void>() {
+                                    @Override
+                                    public void onSuccess(Void response) {
+                                        refreshUsers();
+                                    }
+                                    public void onFailure(ServerFailure failure) {
+                                        errorHandler.error("Error removing user " + user.getUserName(), failure);
+                                    }
+                                }
+                        );
+                    }
+                }
+            });
+            cmb.show();
         }
     }
 
 
     private void changePassword() {
-        UserProxy user = userGrid.getSelectionModel().getSelectedItem();
+        UserProxy user = selectionModel.getSelectedObject();
         if (user != null) {
             PasswordChangeDialog dialog = panelFactory.passwordChangeDialog(user.getUserName());
             dialog.show();
@@ -340,82 +382,12 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
     }
 
 
-    private void updateHosts(List<String> hostIds) {
-        hostStore.clear();
-        hostStore.addAll(hosts);
-        allowedHosts.clear();
-        allowedHosts.addAll(hostIds);
-        Set<String> hostIdSet = new HashSet<String>();
-        hostIdSet.addAll(hostIds);
-        List<HostProxy> selectedHosts = new ArrayList<HostProxy>();
-        for (HostProxy host : hosts) {
-            if (hostIdSet.contains(host.getName())) {
-                selectedHosts.add(host);
-            }
-        }
-        hostSelection.setSelection(selectedHosts);
-    }
-
-
-    private void createHostGrid() {
-
-        IdentityValueProvider<HostProxy> idp = new IdentityValueProvider<HostProxy>();
-
-        hostSelection = new CheckBoxSelectionModel<HostProxy>(idp);
-        hostSelection.setSelectionMode(com.sencha.gxt.core.client.Style.SelectionMode.SIMPLE);
-
-        hostStore = new ListStore<HostProxy>(hostProperties.id());
-
-        ColumnConfig<HostProxy, String> colHostName
-            = new ColumnConfig<HostProxy, String>(hostProperties.name(), 100, "Host name");
-
-        ColumnModel<HostProxy> hostModel
-            = new ColumnModel<HostProxy>(Arrays.<ColumnConfig<HostProxy,?>>asList(hostSelection.getColumn(), colHostName));
-
-        hostGrid = new Grid<HostProxy>(hostStore, hostModel);
-        hostGrid.setSelectionModel(hostSelection);
-        hostGrid.getView().setAutoExpandColumn(colHostName);
-        hostGrid.getView().setForceFit(true);
-
-        hostSelection.addSelectionHandler(new SelectionHandler<HostProxy>() {
-            @Override
-            public void onSelection(SelectionEvent<HostProxy> hostProxySelectionEvent) {
-                saveAllowedHostList();
-            }
-        });
-
-        ContentPanel cp = new ContentPanel();
-        cp.setHeadingText("Allowed hosts");
-        cp.add(hostGrid);
-
-        rootPanel.addEast(cp, 25);
-    }
-
-
-    private void saveAllowedHostList() {
-        UserProxy selectedUser = userGrid.getSelectionModel().getSelectedItem();
-
-        if (selectedUser == null) {
-            return;
-        }
-
-        List<Integer> ids = new ArrayList<Integer>();
-
-        for (HostProxy host : hostSelection.getSelectedItems()) {
-            // TODO TBD ids.add(host.getId());
-        }
-
-        // TODO TBD rf.userService().setAllowedHostIds(selectedUser.getId(), ids).fire();
-    }
-
-
-    private void refreshUsers() {
-        hostStore.clear();
-        userStore.clear();
+    public void refreshUsers() {
+        userStore.getList().clear();
         rf.userService().findAll().fire(new Receiver<List<UserProxy>>() {
             @Override
             public void onSuccess(List<UserProxy> users) {
-                userStore.addAll(users);
+                userStore.getList().addAll(users);
             }
             @Override
             public void onFailure(ServerFailure failure) {
@@ -429,7 +401,11 @@ public class UserManagementPanel extends VerticalLayoutContainer implements Edit
         rf.hostService().findAll().fire(new Receiver<List<HostProxy>>() {
             @Override
             public void onSuccess(List<HostProxy> hosts) {
-                UserManagementPanel.this.hosts = hosts;
+                hostNames.clear();
+                for (HostProxy h : hosts) {
+                    hostNames.add(h.getName());
+                }
+                Collections.sort(hostNames);
             }
             @Override
             public void onFailure(ServerFailure failure) {
