@@ -42,6 +42,7 @@ import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.FressianReader;
 
+import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
@@ -83,7 +84,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
 
     private DB db;
-    private ConcurrentNavigableMap<Long, TraceInfoRecord> infos;
+    private BTreeMap<Long, TraceInfoRecord> infos;
     private Map<Integer, String> tids;
 
     private String name;
@@ -138,7 +139,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
             }
 
             db = DBMaker.newFileDB(new File(rootPath, "traces.db"))
-                    .closeOnJvmShutdown().make();
+                .mmapFileEnable().asyncWriteEnable().closeOnJvmShutdown().make();
             infos = db.getTreeMap(DB_INFO_MAP);
             tids = db.getTreeMap(DB_TIDS_MAP);
         } catch (IOException e) {
@@ -615,13 +616,16 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     @Override
     public void onChunkRemoved(RDSStore origin, Long start, Long length) {
+        long end = start + length - 1;
+        long t0 = System.currentTimeMillis();
         if (traceDataStore != null && origin == traceDataStore.getRds()) {
             log.info("Removing old index entries for host " + name);
-            long idxOffs = -1;
-            while (infos.size() > 0 && infos.firstEntry().getValue().getDataOffs() < (start+length)) {
-                idxOffs = Math.max(idxOffs, infos.firstEntry().getValue().getIndexOffs());
-                infos.remove(infos.firstKey());
-            }
+            Map.Entry<Long, TraceInfoRecord> nextEntry = infos.ceilingEntry(end);
+            long idxOffs = nextEntry != null ? nextEntry.getValue().getIndexOffs()-1 : -1;
+            ConcurrentNavigableMap<Long, TraceInfoRecord> rmitems = infos.headMap(end);
+            int count = rmitems.size();
+            rmitems.clear();
+            db.commit();
             if (idxOffs > 0) {
                 try {
                     log.info("Cleaning up index RDS for host " + name + " (idxOffs=" + idxOffs + ")");
@@ -630,6 +634,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
                     log.error("Problem cleaning up index store", e);
                 }
             }
+            long t = System.currentTimeMillis() - t0;
+            log.info("Removing " + count + " entries from " + name + " took " + t + "ms.");
         }
     }
 

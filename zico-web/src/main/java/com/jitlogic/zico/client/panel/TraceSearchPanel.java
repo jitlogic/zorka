@@ -43,6 +43,7 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.ProvidesKey;
@@ -110,13 +111,12 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     private Map<Integer, String> traceTypes;
 
     private int seqnum = 0;
-    private long lastOffs = -1;
     private boolean descOrder = true;
 
     // Search toolbar controls (in order of occurence on panel toolbar)
     private ToggleButton btnDeepSearch;
     private ToggleButton btnErrors;
-    private SimpleComboBox<Integer> cmbTraceType;
+    private ListBox cmbTraceType;
     private SpinnerField<Double> txtDuration;
     private ToggleButton btnEnableEql;
     private TextField txtFilter;
@@ -168,26 +168,11 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
 
         toolBar.add(btnErrors);
 
-
-        cmbTraceType = new SimpleComboBox<Integer>(new LabelProvider<Integer>() {
-            @Override
-            public String getLabel(Integer item) {
-                return traceTypes.get(item);
-            }
-        });
-
-        cmbTraceType.setForceSelection(true);
-        cmbTraceType.setToolTip("Select trace type here.");
-        cmbTraceType.add(0);
-
-        cmbTraceType.addSelectionHandler(new SelectionHandler<Integer>() {
-            @Override
-            public void onSelection(SelectionEvent<Integer> event) {
-                refresh();
-            }
-        });
-
+        cmbTraceType = new ListBox(false);
+        cmbTraceType.addItem("<all>");
         toolBar.add(cmbTraceType);
+
+        toolBar.add(new SeparatorToolItem());
 
         txtDuration = new SpinnerField<Double>(new NumberPropertyEditor.DoublePropertyEditor());
         txtDuration.setIncrement(1d);
@@ -256,7 +241,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
                 txtFilter.setText("");
                 txtDuration.setText("");
                 btnErrors.setValue(false);
-                cmbTraceType.setValue(null);
+                cmbTraceType.setSelectedIndex(0);
 
                 refresh();
             }
@@ -510,9 +495,8 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
             q.setOffset(list.get(list.size()-1).getDataOffs());
         }
 
-        Integer tid = cmbTraceType.getCurrentValue();
-        if (tid != null && tid != 0) {
-            q.setTraceName(traceTypes.get(tid));
+        if (cmbTraceType.getSelectedIndex() != 0) {
+            q.setTraceName(cmbTraceType.getValue(cmbTraceType.getSelectedIndex()));
         }
 
         if (txtFilter.getText() != null && txtFilter.getText().length() > 0) {
@@ -550,8 +534,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
             @Override
             public void onSuccess(List<SymbolProxy> response) {
                 for (SymbolProxy e : response) {
-                    traceTypes.put(e.getId(), e.getName());
-                    cmbTraceType.add(e.getId());
+                    cmbTraceType.addItem(e.getName());
                 }
             }
 
