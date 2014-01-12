@@ -22,6 +22,10 @@ import com.google.gwt.dom.client.BrowserEvents;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.editor.client.Editor;
+import com.google.gwt.event.dom.client.ContextMenuEvent;
+import com.google.gwt.event.dom.client.ContextMenuHandler;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -247,7 +251,7 @@ public class UserManagementPanel extends VerticalLayoutContainer {
         userGrid.addColumn(colUserHosts, "Allowed hosts");
         userGrid.setColumnWidth(colUserHosts, 100, Style.Unit.PCT);
 
-        userStore = new ListDataProvider<UserProxy>();
+        userStore = new ListDataProvider<UserProxy>(KEY_PROVIDER);
         userStore.addDataDisplay(userGrid);
 
         userGrid.addCellPreviewHandler(new CellPreviewEvent.Handler<UserProxy>() {
@@ -269,6 +273,20 @@ public class UserManagementPanel extends VerticalLayoutContainer {
 
             }
         });
+
+        userGrid.addDomHandler(new DoubleClickHandler() {
+            @Override
+            public void onDoubleClick(DoubleClickEvent event) {
+                event.preventDefault();
+            }
+        }, DoubleClickEvent.getType());
+
+        userGrid.addDomHandler(new ContextMenuHandler() {
+            @Override
+            public void onContextMenu(ContextMenuEvent event) {
+                event.preventDefault();
+            }
+        }, ContextMenuEvent.getType());
 
         add(userGrid, new VerticalLayoutData(1, 1));
     }

@@ -68,12 +68,14 @@ public class UserPrefsDialog extends Dialog {
 
         setHeadingText(user != null ? "Edit user: " + user.getUserName() : "New user");
 
-        setPredefinedButtons();
         createUi(user);
     }
 
 
     private void createUi(UserProxy user) {
+
+        setPredefinedButtons();
+
         VerticalLayoutContainer vlc = new VerticalLayoutContainer();
 
         txtUsername = new TextField();
