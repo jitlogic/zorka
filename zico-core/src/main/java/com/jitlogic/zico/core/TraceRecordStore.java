@@ -23,6 +23,7 @@ import com.jitlogic.zico.core.model.TraceInfoRecord;
 import com.jitlogic.zico.core.model.TraceRecordSearchQuery;
 import com.jitlogic.zico.core.model.TraceRecordInfo;
 import com.jitlogic.zico.core.model.TraceRecordSearchResult;
+import com.jitlogic.zico.core.rds.RDSCleanupListener;
 import com.jitlogic.zico.core.rds.RDSStore;
 import com.jitlogic.zico.core.search.TraceRecordMatcher;
 import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
@@ -57,7 +58,8 @@ public class TraceRecordStore implements Closeable {
 
     private RDSStore rds;
 
-    public TraceRecordStore(ZicoConfig config, HostStore hostStore, String path, int fileSizeDivider) throws IOException {
+    public TraceRecordStore(ZicoConfig config, HostStore hostStore, String path, int fileSizeDivider,
+                            RDSCleanupListener...listeners) throws IOException {
         this.config = config;
         this.hostStore = hostStore;
         this.symbolRegistry = hostStore.getSymbolRegistry();
@@ -76,7 +78,7 @@ public class TraceRecordStore implements Closeable {
         rds = new RDSStore(rdspath,
                 hostStore.getMaxSize(),
                 fileSize, segmentSize,
-                hostStore);
+                listeners);
     }
 
     public ChunkInfo write(TraceRecord tr) throws IOException {
