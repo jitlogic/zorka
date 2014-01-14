@@ -703,6 +703,9 @@ public class HostStore implements Closeable, RDSCleanupListener {
         if (traceDataStore != null) {
             traceDataStore.getRds().setMaxSize(maxSize);
         }
+        if (traceIndexStore != null) {
+            traceIndexStore.getRds().setMaxSize(maxSize);
+        }
         save();
     }
 
