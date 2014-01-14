@@ -109,11 +109,11 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     private Map<Integer, String> traceTypes;
 
     private int seqnum = 0;
-    private boolean descOrder = true;
 
     // Search toolbar controls (in order of occurence on panel toolbar)
     private ToggleButton btnDeepSearch;
     private ToggleButton btnErrors;
+    private ToggleButton btnReverse;
     private ListBox cmbTraceType;
     private SpinnerField<Double> txtDuration;
     private ToggleButton btnEnableEql;
@@ -163,8 +163,13 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         btnErrors = new ToggleButton();
         btnErrors.setIcon(Resources.INSTANCE.errorMarkIcon());
         btnErrors.setToolTip("Show only erros.");
-
         toolBar.add(btnErrors);
+
+        btnReverse = new ToggleButton();
+        btnReverse.setIcon(Resources.INSTANCE.sort());
+        btnReverse.setToolTip("Reverse order");
+        btnReverse.setValue(true);
+        toolBar.add(btnReverse);
 
         cmbTraceType = new ListBox(false);
         cmbTraceType.addItem("<all>");
@@ -181,6 +186,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         txtDuration.setWidth(80);
         txtDuration.setToolTip("Minimum trace execution time (in seconds)");
         toolBar.add(txtDuration);
+
 
         btnEnableEql = new ToggleButton();
         btnEnableEql.setIcon(Resources.INSTANCE.eqlIcon());
@@ -493,7 +499,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
 
         q.setFlags(
                 (btnErrors.getValue() ? TraceInfoSearchQueryProxy.ERRORS_ONLY : 0)
-              | (descOrder ? TraceInfoSearchQueryProxy.ORDER_DESC : 0)
+              | (btnReverse.getValue() ? TraceInfoSearchQueryProxy.ORDER_DESC : 0)
               | (btnDeepSearch.getValue() ? TraceInfoSearchQueryProxy.DEEP_SEARCH : 0)
               | (btnEnableEql.getValue() ? TraceInfoSearchQueryProxy.EQL_QUERY : 0)
         );
