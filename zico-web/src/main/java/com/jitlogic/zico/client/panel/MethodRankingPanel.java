@@ -161,7 +161,6 @@ public class MethodRankingPanel extends VerticalLayoutContainer {
         rankGrid.addColumn(colMinBareTime, new ResizableHeader<MethodRankInfoProxy>("MinBT", rankGrid, colMinBareTime));
         rankGrid.setColumnWidth(colMinBareTime, 50, Style.Unit.PX);
 
-
         rankStore = new ListDataProvider<MethodRankInfoProxy>(KEY_PROVIDER);
         rankStore.addDataDisplay(rankGrid);
 

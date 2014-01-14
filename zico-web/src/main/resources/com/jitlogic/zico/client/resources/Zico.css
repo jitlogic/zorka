@@ -50,3 +50,7 @@
     font-family: tahoma,arial,verdana,sans-serif !important;
     font-size: 14px !important;
 }
+
+.whitePanel {
+    background-color: #ffffff !important;
+}
