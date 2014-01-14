@@ -63,14 +63,12 @@ import com.jitlogic.zico.shared.data.TraceInfoProxy;
 import com.jitlogic.zico.shared.data.TraceInfoSearchQueryProxy;
 import com.jitlogic.zico.shared.data.TraceInfoSearchResultProxy;
 import com.jitlogic.zico.shared.services.TraceDataServiceProxy;
-import com.sencha.gxt.data.shared.LabelProvider;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.button.ToggleButton;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor;
-import com.sencha.gxt.widget.core.client.form.SimpleComboBox;
 import com.sencha.gxt.widget.core.client.form.SpinnerField;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.menu.Item;
@@ -125,7 +123,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
 
     private HorizontalPanel statusBar;
     private Label statusLabel;
-    private Hyperlink lnkCancelSearch, lnkMoreResults;
+    private Hyperlink lnkCancelSearch, lnkMore50Results, lnkMore250Results;
 
     private Menu contextMenu;
     private boolean moreResults;
@@ -347,9 +345,8 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     private void createStatusBar() {
         statusBar = new HorizontalPanel();
         statusLabel = new Label("Ready.");
-        lnkCancelSearch = new Hyperlink("Cancel search", "");
-        lnkMoreResults = new Hyperlink("More results", "");
 
+        lnkCancelSearch = new Hyperlink("Cancel search", "");
         lnkCancelSearch.addHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
@@ -357,10 +354,19 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
             }
         }, ClickEvent.getType());
 
-        lnkMoreResults.addHandler(new ClickHandler() {
+        lnkMore50Results = new Hyperlink("[50 more results]", "");
+        lnkMore50Results.addHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                loadMore();
+                loadMore(50);
+            }
+        }, ClickEvent.getType());
+
+        lnkMore250Results = new Hyperlink("[250 more results]", "");
+        lnkMore250Results.addHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                loadMore(250);
             }
         }, ClickEvent.getType());
 
@@ -433,9 +439,11 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         }
 
         if (moreResults) {
-            statusBar.add(lnkMoreResults);
+            statusBar.add(lnkMore50Results);
+            statusBar.add(lnkMore250Results);
         } else {
-            statusBar.remove(lnkMoreResults);
+            statusBar.remove(lnkMore250Results);
+            statusBar.remove(lnkMore50Results);
         }
 
     }
