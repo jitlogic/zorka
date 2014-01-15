@@ -1,7 +1,13 @@
+Zorka 0.9.15 (2014-01-15)
+-------------------------
+
+ * lot of fixes, collector and collector UI;
+
+
 Zorka 0.9.14 (2014-01-02)
 -------------------------
 
- * collector: rewrite trace indexing and search angine; use MapDB+RDS instead of SQL;
+ * collector: rewrite trace indexing and search engine; use MapDB+RDS instead of SQL;
  * lots of fixes;
 
 

@@ -25,9 +25,9 @@ for F in zico.conf zico.properties zico.war ; do
   fi
 done
 
-for D in tmp log data db ; do
+for D in tmp log data ; do
   if [ ! -d $ZICO_HOME/$D ] ; then
-    echo "Missing directory: $ZICO_HOME/$D. Created."
+    echo "Missing directory: $ZICO_HOME/$D. Creating..."
     mkdir $ZICO_HOME/$D
   fi
 done

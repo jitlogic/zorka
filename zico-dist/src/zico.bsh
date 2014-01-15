@@ -34,7 +34,7 @@ __zico() {
 
   spy.add(spy.instrument("ZICO_PROCESS")
     .onEnter(spy.fetchArg("THIS", 0),
-      spy.format("HOST", "${THIS.hostInfo.name}"),
+      spy.format("HOST", "${THIS.hostStore.name}"),
       spy.subchain(
         spy.valSetFilterOut("HOST", util.set(zorka.getHostname())),
         tracer.begin("ZICO", _traceTime),
