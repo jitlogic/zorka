@@ -234,7 +234,12 @@ public class TraceTemplateManager extends Locator<TraceTemplate, Integer> {
 
         if (tti.getId() == 0) {
             tti.setId(templates.size() > 0 ? templates.lastKey()+1 : 1);
+
+            if (tti.getId() < 1000) {
+                tti.setId(1000);
+            }
         }
+
 
         templates.put(tti.getId(), tti);
         db.commit();

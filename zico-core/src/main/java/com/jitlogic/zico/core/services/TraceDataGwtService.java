@@ -18,6 +18,7 @@ package com.jitlogic.zico.core.services;
 import com.google.inject.Singleton;
 import com.jitlogic.zico.core.HostStore;
 import com.jitlogic.zico.core.HostStoreManager;
+import com.jitlogic.zico.core.eql.ParseException;
 import com.jitlogic.zico.core.model.TraceInfoRecord;
 import com.jitlogic.zico.core.TraceRecordStore;
 import com.jitlogic.zico.core.ZicoRuntimeException;
@@ -63,6 +64,9 @@ public class TraceDataGwtService {
                 throw new ZicoRuntimeException("Unknown host: " + query.getHostName());
             }
             return host.search(query);
+        } catch (ParseException e) {
+            log.error("Error while parsing eql query '" + query.getSearchExpr() + "'\n" + e, e);
+            throw new ZicoRuntimeException(e.toString() + " [query '" + query.getSearchExpr() + "']", e);
         } catch (Exception e) {
             log.error("Error searching for traces", e);
             throw new ZicoRuntimeException("Error while searching: " + query, e);

@@ -28,6 +28,7 @@ if (zorka.boolCfg("tracer")) {
       "org.mapdb.Serializer**",
       "org.mapdb.Vol**",
       "org.mapdb.LongConcurrentHashMap",
-      "org.mapdb.StoreWAL"
+      "org.mapdb.StoreWAL",
+      "org.mapdb.LongHashMap"
     );
 }

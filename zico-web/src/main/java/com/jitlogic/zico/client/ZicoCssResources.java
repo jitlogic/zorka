@@ -36,4 +36,6 @@ public interface ZicoCssResources  extends CssResource {
     String searchStatusBar();
 
     String searchStatusBarInt();
+
+    String whitePanel();
 }

@@ -83,9 +83,11 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
         }
     }
 
+
     public void commit() {
         hostStore.commit();
     }
+
 
     private void processSymbol(Symbol sym) {
         if (hostStore.getSymbolRegistry() != null) {
@@ -126,4 +128,8 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
     public void checkMetric(int metricId) throws IOException {
     }
 
+
+    public HostStore getHostStore() {
+        return hostStore;
+    }
 }

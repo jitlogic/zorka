@@ -42,6 +42,7 @@ import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.FressianReader;
 
+import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
@@ -83,11 +84,11 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
 
     private DB db;
-    private ConcurrentNavigableMap<Long, TraceInfoRecord> infos;
+    private BTreeMap<Long, TraceInfoRecord> infos;
     private Map<Integer, String> tids;
 
     private String name;
-    private String addr = "";
+    private String addr = "127.0.0.1";
     private String pass = "";
     private int flags;
     private long maxSize;
@@ -95,6 +96,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     private static final long MAX_SEARCH_T1 = 2000000000L;
     private static final long MAX_SEARCH_T2 = 5000000000L;
+
 
     public HostStore(ZicoConfig config, TraceTemplateManager templater, String name) {
 
@@ -123,13 +125,14 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public synchronized void open() {
         try {
+            load();
             if (symbolRegistry == null) {
                 symbolRegistry = new PersistentSymbolRegistry(
                     new File(ZicoUtil.ensureDir(rootPath), "symbols.dat"));
             }
 
             if (traceDataStore == null) {
-                traceDataStore = new TraceRecordStore(config, this, "tdat", 1);
+                traceDataStore = new TraceRecordStore(config, this, "tdat", 1, this);
             }
 
             if (traceIndexStore == null) {
@@ -137,7 +140,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
             }
 
             db = DBMaker.newFileDB(new File(rootPath, "traces.db"))
-                    .closeOnJvmShutdown().make();
+                .mmapFileEnable().asyncWriteEnable().closeOnJvmShutdown().make();
             infos = db.getTreeMap(DB_INFO_MAP);
             tids = db.getTreeMap(DB_TIDS_MAP);
         } catch (IOException e) {
@@ -192,14 +195,27 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
 
     public int countTraces() {
-        checkEnabled();
+        BTreeMap<Long,TraceInfoRecord> infos = getInfos();
+
+        if (infos == null) {
+            throw new ZicoRuntimeException("Store " + getName() + " is closed.");
+        }
+
         return infos.size();
     }
 
 
-    public synchronized void processTraceRecord(TraceRecord rec) throws IOException {
+    public void processTraceRecord(TraceRecord rec) throws IOException {
 
-        checkEnabled();
+        TraceRecordStore traceDataStore = getTraceDataStore();
+        TraceRecordStore traceIndexStore = getTraceIndexStore();
+        BTreeMap<Long,TraceInfoRecord> infos = getInfos();
+        Map<Integer,String> tids = getTids();
+
+        if (traceDataStore == null || traceIndexStore == null || infos == null || tids == null
+                || hasFlag(HostProxy.DISABLED|HostProxy.DELETED)) {
+            throw new ZicoRuntimeException("Store " + getName() + " is closed and cannot accept records.");
+        }
 
         TraceRecordStore.ChunkInfo dchunk = traceDataStore.write(rec);
 
@@ -335,14 +351,8 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
 
     public synchronized void commit() {
-
-        checkEnabled();
-
         if (db != null) {
-            long t1 = System.nanoTime();
             db.commit();
-            long t = (System.nanoTime() - t1) / 1000000L;
-            log.debug(name + ": Commit took " + t + " ms");
         }
     }
 
@@ -354,9 +364,21 @@ public class HostStore implements Closeable, RDSCleanupListener {
         }
     }
 
+    private synchronized BTreeMap<Long,TraceInfoRecord> getInfos() {
+        return infos;
+    }
 
-    public synchronized TraceInfoSearchResult search(TraceInfoSearchQuery query) throws IOException {
-        checkEnabled();
+    public TraceInfoSearchResult search(TraceInfoSearchQuery query) throws IOException {
+
+        SymbolRegistry symbolRegistry = getSymbolRegistry();
+        BTreeMap<Long,TraceInfoRecord> infos = getInfos();
+        TraceRecordStore traceDataStore = getTraceDataStore();
+        TraceRecordStore traceIndexStore = getTraceIndexStore();
+
+        if (symbolRegistry == null || infos == null || traceDataStore == null || traceIndexStore == null) {
+            throw new ZicoRuntimeException("Host store " + getName() + " is closed.");
+        }
+
         List<TraceInfo> lst = new ArrayList<TraceInfo>(query.getLimit());
 
         TraceInfoSearchResult result = new TraceInfoSearchResult(query.getSeq(), lst);
@@ -369,7 +391,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
             if (query.hasFlag(TraceInfoSearchQueryProxy.EQL_QUERY)) {
                 matcher = new EqlTraceRecordMatcher(symbolRegistry,
                         Parser.expr(query.getSearchExpr()),
-                        0, 0, name);
+                        0, 0, getName());
             } else {
                 matcher = new FullTextTraceRecordMatcher(symbolRegistry,
                         TraceRecordSearchQuery.SEARCH_ALL, query.getSearchExpr());
@@ -516,10 +538,18 @@ public class HostStore implements Closeable, RDSCleanupListener {
     }
 
 
-    public Map<Integer, String> getTidMap() {
-        checkEnabled();
+    public synchronized Map<Integer,String> getTids() {
+        return tids;
+    }
 
-        // TODO this is a crutch. This really should be just a set of trace IDs
+
+    public Map<Integer, String> getTidMap() {
+        Map<Integer,String> tids = getTids();
+
+        if (tids == null) {
+            throw new ZicoRuntimeException("Host store " + getName() + " is closed");
+        }
+
         Map<Integer,String> tidMap = new HashMap<Integer, String>();
 
         for (Integer tid : tids.keySet()) {
@@ -531,12 +561,11 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
 
     public String toString() {
-        return "HostStore(" + name + ")";
+        return "HostStore(" + getName() + ")";
     }
 
 
     public synchronized void load() {
-        checkEnabled();
         File f = new File(rootPath, HOST_PROPERTIES);
         Properties props = new Properties();
         if (f.exists() && f.canRead()) {
@@ -551,15 +580,13 @@ public class HostStore implements Closeable, RDSCleanupListener {
                     try { is.close(); } catch (IOException _) { }
                 }
             }
+            this.addr = props.getProperty(PROP_ADDR, "127.0.0.1");
+            this.pass = props.getProperty(PROP_PASS, "");
+            this.flags = Integer.parseInt(props.getProperty(PROP_FLAGS, "0"));
+            this.maxSize = Long.parseLong(props.getProperty(PROP_SIZE,
+                    "" + config.kiloCfg("rds.max.size", 1024 * 1024 * 1024L)));
+            this.comment = props.getProperty(PROP_COMMENT, "");
         }
-
-        this.addr = props.getProperty(PROP_ADDR, "127.0.0.1");
-        this.pass = props.getProperty(PROP_PASS, "");
-        this.flags = Integer.parseInt(props.getProperty(PROP_FLAGS, "0"));
-        this.maxSize = Long.parseLong(props.getProperty(PROP_SIZE,
-                "" + config.kiloCfg("rds.max.size", 1024 * 1024 * 1024L)));
-        this.comment = props.getProperty(PROP_COMMENT, "");
-
     }
 
 
@@ -597,72 +624,76 @@ public class HostStore implements Closeable, RDSCleanupListener {
     }
 
 
-    public TraceRecordStore getTraceDataStore() {
+    public synchronized TraceRecordStore getTraceDataStore() {
         return traceDataStore;
     }
 
 
-    public TraceRecordStore getTraceIndexStore() {
+    public synchronized TraceRecordStore getTraceIndexStore() {
         return traceIndexStore;
     }
 
 
-    public SymbolRegistry getSymbolRegistry() {
+    public synchronized SymbolRegistry getSymbolRegistry() {
         return symbolRegistry;
     }
 
 
-    public String getRootPath() {
+    public synchronized String getRootPath() {
         return rootPath;
     }
 
+    private DB getDb() {
+        return db;
+    }
 
     @Override
     public void onChunkRemoved(RDSStore origin, Long start, Long length) {
-        if (traceDataStore != null && origin == traceDataStore.getRds()) {
-            log.info("Removing old index entries for host " + name);
-            long idxOffs = -1;
-            while (infos.size() > 0 && infos.firstEntry().getValue().getDataOffs() < (start+length)) {
-                idxOffs = Math.max(idxOffs, infos.firstEntry().getValue().getIndexOffs());
-                infos.remove(infos.firstKey());
-            }
-            if (idxOffs > 0) {
-                try {
-                    log.info("Cleaning up index RDS for host " + name + " (idxOffs=" + idxOffs + ")");
-                    traceIndexStore.getRds().cleanup(idxOffs);
-                } catch (IOException e) {
-                    log.error("Problem cleaning up index store", e);
-                }
-            }
+
+        TraceRecordStore traceIndexStore = getTraceIndexStore();
+        BTreeMap<Long,TraceInfoRecord> infos = getInfos();
+        DB db = getDb();
+
+        long end = start + length - 1;
+        long t0 = System.currentTimeMillis();
+
+        log.info("Removing old index entries for host " + name);
+        long idxOffs = -1;
+        int count = 0;
+        if (infos != null && db != null) {
+            Map.Entry<Long, TraceInfoRecord> nextEntry = infos.ceilingEntry(end);
+            idxOffs = nextEntry != null ? nextEntry.getValue().getIndexOffs()-1 : -1;
+            ConcurrentNavigableMap<Long, TraceInfoRecord> rmitems = infos.headMap(end);
+            count = rmitems.size();
+            rmitems.clear();
+            db.commit();
         }
-    }
 
-
-    @Override
-    public void onChunkStarted(RDSStore origin, Long start) {
-        if (traceIndexStore != null) {
+        if (idxOffs > 0 && traceIndexStore != null) {
             try {
-                traceIndexStore.getRds().rotate();
+                log.info("Cleaning up index RDS for host " + name + " (idxOffs=" + idxOffs + ")");
+                traceIndexStore.getRds().cleanup(idxOffs);
             } catch (IOException e) {
-                log.error("Cannot rotate index for " + name, e);
+                log.error("Problem cleaning up index store", e);
             }
         }
+        long t = System.currentTimeMillis() - t0;
+        log.info("Removing " + count + " entries from " + name + " took " + t + "ms.");
     }
 
 
-    public String getName() {
+    public synchronized String getName() {
         return name;
     }
 
 
-    public String getAddr() {
+    public synchronized String getAddr() {
         return addr;
     }
 
 
-    public void setAddr(String addr) {
+    public synchronized void setAddr(String addr) {
         this.addr = addr;
-        save();
     }
 
 
@@ -673,46 +704,46 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public void setPass(String pass) {
         this.pass = pass;
-        save();
     }
 
 
-    public int getFlags() {
+    public synchronized int getFlags() {
         return flags;
     }
 
 
-    public boolean hasFlag(int flag) {
+    public synchronized boolean hasFlag(int flag) {
         return 0 != (this.flags & flag);
     }
 
-    public void markFlag(int flag) {
+    public synchronized void markFlag(int flag) {
         flags |= flag;
     }
 
 
-    public long getMaxSize() {
+    public synchronized long getMaxSize() {
         return maxSize;
     }
 
 
-    public void setMaxSize(long maxSize) {
+    public synchronized void setMaxSize(long maxSize) {
         this.maxSize = maxSize;
         if (traceDataStore != null) {
             traceDataStore.getRds().setMaxSize(maxSize);
         }
-        save();
+        if (traceIndexStore != null) {
+            traceIndexStore.getRds().setMaxSize(maxSize);
+        }
     }
 
 
-    public String getComment() {
+    public synchronized String getComment() {
         return comment;
     }
 
 
-    public void setComment(String comment) {
+    public synchronized void setComment(String comment) {
         this.comment = comment;
-        save();
     }
 
 
@@ -725,15 +756,13 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
         if (enabled) {
             log.info("Bringing host " + name + " online.");
-            flags &= ~HostProxy.DISABLED;
             open();
+            flags &= ~HostProxy.DISABLED;
         } else {
             log.info("Taking host " + name + " offline.");
             close();
             flags |= HostProxy.DISABLED;
         }
-
-        save();
     }
 
 

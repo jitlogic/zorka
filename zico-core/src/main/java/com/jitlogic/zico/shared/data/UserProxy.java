@@ -20,6 +20,8 @@ import com.google.web.bindery.requestfactory.shared.ProxyFor;
 import com.jitlogic.zico.core.UserManager;
 import com.jitlogic.zico.core.model.User;
 
+import java.util.List;
+
 @ProxyFor(value = User.class, locator = UserManager.class)
 public interface UserProxy extends EntityProxy {
 
@@ -34,4 +36,8 @@ public interface UserProxy extends EntityProxy {
     public boolean isAdmin();
 
     public void setAdmin(boolean admin);
+
+    public List<String> getAllowedHosts();
+
+    public void setAllowedHosts(List<String> hosts);
 }

@@ -148,6 +148,9 @@ public interface Resources extends ClientBundle {
     @Source("images/cancel.png")
     ImageResource cancel();
 
+    @Source("images/sort.png")
+    ImageResource sort();
+
     @DataResource.MimeType("text/html")
     @Source("resources/tips.html")
     TextResource tipsHtml();

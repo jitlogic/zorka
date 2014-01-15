@@ -58,10 +58,6 @@ public class RDSStoreStressTest extends ZicoFixture {
                     chunks.remove(0);
                 }
             }
-
-            @Override
-            public void onChunkStarted(RDSStore origin, Long start) {
-            }
         };
 
         String path = tmpFile("testrw");

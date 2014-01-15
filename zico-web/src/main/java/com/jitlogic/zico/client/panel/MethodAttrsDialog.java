@@ -17,41 +17,44 @@ package com.jitlogic.zico.client.panel;
 
 
 import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.Cell;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.ProvidesKey;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ErrorHandler;
+import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
 import com.jitlogic.zico.shared.data.KeyValueProxy;
 import com.jitlogic.zico.shared.data.SymbolicExceptionProxy;
 import com.jitlogic.zico.shared.data.TraceRecordProxy;
 import com.sencha.gxt.core.client.ValueProvider;
-import com.sencha.gxt.data.shared.ListStore;
-import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.container.SimpleContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
-import com.sencha.gxt.widget.core.client.event.CellClickEvent;
 import com.sencha.gxt.widget.core.client.form.TextArea;
-import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
-import com.sencha.gxt.widget.core.client.grid.ColumnModel;
-import com.sencha.gxt.widget.core.client.grid.Grid;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 public class MethodAttrsDialog extends Dialog {
 
-    private Grid<String[]> attrGrid;
-    private ListStore<String[]> attrStore;
+    private DataGrid<String[]> attrGrid;
+    private ListDataProvider<String[]> attrStore;
+    private SingleSelectionModel<String[]> selectionModel;
 
     private TextArea txtAttrVal;
     private Label lblAttrName;
@@ -138,7 +141,7 @@ public class MethodAttrsDialog extends Dialog {
         }
 
         if (attrs.size() > 0) {
-            attrStore.addAll(attrs);
+            attrStore.getList().addAll(attrs);
             lblAttrName.setText("Selected attribute: " + attrs.get(0)[0]);
             txtAttrVal.setText(attrs.get(0)[1]);
         } else {
@@ -146,6 +149,28 @@ public class MethodAttrsDialog extends Dialog {
         }
     }
 
+    private ProvidesKey<String[]> KEY_PROVIDER = new ProvidesKey<String[]>() {
+        @Override
+        public Object getKey(String[] item) {
+            return item[0];
+        }
+    };
+
+    private Cell<String> ATTR_CELL = new AbstractCell<String>() {
+        @Override
+        public void render(Context context, String value, SafeHtmlBuilder sb) {
+            String color = "blue";
+            if ("(all)".equals(value)) {
+                color = "black";
+            }
+            if ("(exception)".equals(value)) {
+                color = "red";
+            }
+            sb.appendHtmlConstant("<span style=\"color: " + color + "; font-size: small;\"><b>");
+            sb.append(SafeHtmlUtils.fromString("" + value));
+            sb.appendHtmlConstant("</b></span>");
+        }
+    };
 
     private void configure(String headingText) {
         setHeadingText(headingText);
@@ -169,56 +194,41 @@ public class MethodAttrsDialog extends Dialog {
             }
         };
 
+        attrGrid = new DataGrid<String[]>(1024*1024, KEY_PROVIDER);
+        selectionModel = new SingleSelectionModel<String[]>(KEY_PROVIDER);
+        attrGrid.setSelectionModel(selectionModel);
 
-        ColumnConfig<String[], String> colAttribute = new ColumnConfig<String[], String>(vpr, 256, "Attributes");
-        colAttribute.setMenuDisabled(true);
-
-
-        colAttribute.setCell(new AbstractCell<String>() {
+        Column<String[], String> colAttribute = new Column<String[], String>(ATTR_CELL) {
             @Override
-            public void render(Context context, String value, SafeHtmlBuilder sb) {
-                String color = "blue";
-                if ("(all)".equals(value)) {
-                    color = "black";
+            public String getValue(String[] attr) {
+                return attr[0];
+            }
+        };
+        attrGrid.addColumn(colAttribute);
+        attrGrid.setColumnWidth(colAttribute, 100, Style.Unit.PCT);
+
+        attrStore = new ListDataProvider<String[]>(KEY_PROVIDER);
+        attrStore.addDataDisplay(attrGrid);
+
+        selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+            @Override
+            public void onSelectionChange(SelectionChangeEvent event) {
+                String[] item = selectionModel.getSelectedObject();
+                if (item != null) {
+                    lblAttrName.setText("Selected attribute: " + item[0]);
+                    txtAttrVal.setText(item[1]);
                 }
-                if ("(exception)".equals(value)) {
-                    color = "red";
-                }
-                sb.appendHtmlConstant("<span style=\"color: " + color + "; font-size: small;\"><b>");
-                sb.append(SafeHtmlUtils.fromString("" + value));
-                sb.appendHtmlConstant("</b></span>");
             }
         });
-
-        ColumnModel<String[]> columnModel = new ColumnModel<String[]>(Arrays.<ColumnConfig<String[], ?>>asList(colAttribute));
-
-        attrStore = new ListStore<String[]>(new ModelKeyProvider<String[]>() {
-            @Override
-            public String getKey(String[] item) {
-                return item[0];
-            }
-        });
-
-        attrGrid = new Grid<String[]>(attrStore, columnModel);
-
-        attrGrid.addCellClickHandler(new CellClickEvent.CellClickHandler() {
-            @Override
-            public void onCellClick(CellClickEvent event) {
-                String[] item = attrStore.get(event.getRowIndex());
-                lblAttrName.setText("Selected attribute: " + item[0]);
-                txtAttrVal.setText(item[1]);
-            }
-        });
-
-        attrGrid.getView().setAutoExpandColumn(colAttribute);
-        attrGrid.getView().setForceFit(true);
 
         container = new SplitLayoutPanel();
+        container.addStyleName(Resources.INSTANCE.zicoCssResources().whitePanel());
 
         SimpleContainer sc = new SimpleContainer();
         sc.add(attrGrid);
 
-        container.addWest(sc, 200);
+
+        container.addWest(attrGrid, 200);
 
         txtAttrVal = new TextArea();
         txtAttrVal.setReadOnly(true);

@@ -16,65 +16,60 @@
 package com.jitlogic.zico.client.panel;
 
 import com.google.gwt.cell.client.AbstractCell;
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.cell.client.Cell;
+import com.google.gwt.dom.client.BrowserEvents;
+import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.event.dom.client.ContextMenuEvent;
+import com.google.gwt.event.dom.client.ContextMenuHandler;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.DataGrid;
+import com.google.gwt.user.cellview.client.IdentityColumn;
+import com.google.gwt.view.client.CellPreviewEvent;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.ProvidesKey;
+import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
-import com.jitlogic.zico.client.props.TraceTemplateInfoProperties;
-import com.jitlogic.zico.shared.data.SymbolProxy;
 import com.jitlogic.zico.shared.data.TraceTemplateProxy;
-import com.jitlogic.zico.shared.services.SystemServiceProxy;
-import com.sencha.gxt.core.client.Style;
-import com.sencha.gxt.data.shared.LabelProvider;
-import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
-import com.sencha.gxt.widget.core.client.event.CompleteEditEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
-import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor;
-import com.sencha.gxt.widget.core.client.form.SimpleComboBox;
-import com.sencha.gxt.widget.core.client.form.SpinnerField;
-import com.sencha.gxt.widget.core.client.form.TextField;
-import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
-import com.sencha.gxt.widget.core.client.grid.ColumnModel;
-import com.sencha.gxt.widget.core.client.grid.Grid;
-import com.sencha.gxt.widget.core.client.grid.editing.ClicksToEdit;
-import com.sencha.gxt.widget.core.client.grid.editing.GridRowEditing;
+import com.sencha.gxt.widget.core.client.menu.Item;
+import com.sencha.gxt.widget.core.client.menu.Menu;
+import com.sencha.gxt.widget.core.client.menu.MenuItem;
+import com.sencha.gxt.widget.core.client.menu.SeparatorMenuItem;
 import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class TraceTemplatePanel extends VerticalLayoutContainer {
 
-    private final static TraceTemplateInfoProperties props = GWT.create(TraceTemplateInfoProperties.class);
-
-    private ListStore<TraceTemplateProxy> templateStore;
-    private Grid<TraceTemplateProxy> templateGrid;
-    private GridRowEditing<TraceTemplateProxy> templateEditor;
-
-    private SpinnerField<Integer> txtOrder;
-    private TextField txtCondition;
-    private TextField txtTemplate;
+    private ListDataProvider<TraceTemplateProxy> templateStore;
+    private DataGrid<TraceTemplateProxy> templateGrid;
+    private SingleSelectionModel<TraceTemplateProxy> selectionModel;
 
     private ErrorHandler errorHandler;
-
     private ZicoRequestFactory rf;
 
-    private SystemServiceProxy newTemplateRequest;
+    private Menu contextMenu;
+
 
     @Inject
     public TraceTemplatePanel(ZicoRequestFactory rf, ErrorHandler errorHandler) {
@@ -84,77 +79,95 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
 
         createToolbar();
         createTemplateListGrid();
-        loadData();
+        createContextMenu();
+
+        refreshTemplates();
     }
+
+    private final static ProvidesKey<TraceTemplateProxy> KEY_PROVIDER = new ProvidesKey<TraceTemplateProxy>() {
+        @Override
+        public Object getKey(TraceTemplateProxy item) {
+            return item.getId();
+        }
+    };
+
+    private final static Cell<TraceTemplateProxy> ORDER_CELL = new AbstractCell<TraceTemplateProxy>() {
+        @Override
+        public void render(Context context, TraceTemplateProxy value, SafeHtmlBuilder sb) {
+            sb.append(SafeHtmlUtils.fromString(""+value.getOrder()));
+        }
+    };
+
+    private final static Cell<TraceTemplateProxy> CONDITION_CELL = new AbstractCell<TraceTemplateProxy>() {
+        @Override
+        public void render(Context context, TraceTemplateProxy value, SafeHtmlBuilder sb) {
+            sb.append(SafeHtmlUtils.fromString(""+value.getCondition()));
+        }
+    };
+
+    private final static Cell<TraceTemplateProxy> TEMPLATE_CELL = new AbstractCell<TraceTemplateProxy>() {
+        @Override
+        public void render(Context context, TraceTemplateProxy value, SafeHtmlBuilder sb) {
+            sb.append(SafeHtmlUtils.fromString(""+value.getTemplate()));
+        }
+    };
 
 
     private void createTemplateListGrid() {
-        ColumnConfig<TraceTemplateProxy, Integer> orderCol
-                = new ColumnConfig<TraceTemplateProxy, Integer>(props.order(), 80, "Order");
-        orderCol.setFixed(true);
+        templateGrid = new DataGrid<TraceTemplateProxy>(1024*1024, KEY_PROVIDER);
+        selectionModel = new SingleSelectionModel<TraceTemplateProxy>(KEY_PROVIDER);
+        templateGrid.setSelectionModel(selectionModel);
 
-        final ColumnConfig<TraceTemplateProxy, String> traceConditionCol
-                = new ColumnConfig<TraceTemplateProxy, String>(props.condition(), 250, "Condition Expression");
+        Column<TraceTemplateProxy,TraceTemplateProxy> colOrder = new IdentityColumn<TraceTemplateProxy>(ORDER_CELL);
+        templateGrid.addColumn(colOrder, new ResizableHeader<TraceTemplateProxy>("Order", templateGrid, colOrder));
+        templateGrid.setColumnWidth(colOrder, 80, Style.Unit.PX);
 
-        ColumnConfig<TraceTemplateProxy, String> traceTemplateCol
-                = new ColumnConfig<TraceTemplateProxy, String>(props.template(), 250, "Description Template");
+        Column<TraceTemplateProxy,TraceTemplateProxy> colCondition = new IdentityColumn<TraceTemplateProxy>(CONDITION_CELL);
+        templateGrid.addColumn(colCondition, new ResizableHeader<TraceTemplateProxy>("Condition", templateGrid, colCondition));
+        templateGrid.setColumnWidth(colCondition, 250, Style.Unit.PX);
 
-        ColumnModel<TraceTemplateProxy> model = new ColumnModel<TraceTemplateProxy>(
-                Arrays.<ColumnConfig<TraceTemplateProxy, ?>>asList(
-                    orderCol, traceConditionCol, traceTemplateCol));
+        Column<TraceTemplateProxy,TraceTemplateProxy> colTemplate = new IdentityColumn<TraceTemplateProxy>(TEMPLATE_CELL);
+        templateGrid.addColumn(colTemplate, "Description Template");
+        templateGrid.setColumnWidth(colTemplate, 100, Style.Unit.PCT);
 
-        templateStore = new ListStore<TraceTemplateProxy>(props.key());
+        templateStore = new ListDataProvider<TraceTemplateProxy>(KEY_PROVIDER);
+        templateStore.addDataDisplay(templateGrid);
 
-        templateGrid = new Grid<TraceTemplateProxy>(templateStore, model);
-        templateGrid.getSelectionModel().setSelectionMode(Style.SelectionMode.SINGLE);
-
-        templateGrid.getView().setForceFit(true);
-        templateGrid.getView().setAutoFill(true);
-
-
-        templateEditor = new GridRowEditing<TraceTemplateProxy>(templateGrid);
-        templateEditor.setClicksToEdit(ClicksToEdit.TWO);
-
-        txtOrder = new SpinnerField<Integer>(new NumberPropertyEditor.IntegerPropertyEditor());
-        txtOrder.setMinValue(0);
-        txtOrder.setMaxValue(9999999);
-        templateEditor.addEditor(orderCol, txtOrder);
-
-        txtCondition = new TextField();
-        templateEditor.addEditor(traceConditionCol, txtCondition);
-
-        txtTemplate = new TextField();
-        templateEditor.addEditor(traceTemplateCol, txtTemplate);
-
-
-        templateEditor.addCompleteEditHandler(new CompleteEditEvent.CompleteEditHandler<TraceTemplateProxy>() {
+        templateGrid.addCellPreviewHandler(new CellPreviewEvent.Handler<TraceTemplateProxy>() {
             @Override
-            public void onCompleteEdit(final CompleteEditEvent<TraceTemplateProxy> event) {
-                saveChanges(event.getEditCell().getRow());
+            public void onCellPreview(CellPreviewEvent<TraceTemplateProxy> event) {
+                NativeEvent nev = event.getNativeEvent();
+                String eventType = nev.getType();
+                if ((BrowserEvents.KEYDOWN.equals(eventType) && nev.getKeyCode() == KeyCodes.KEY_ENTER)
+                        || BrowserEvents.DBLCLICK.equals(nev.getType())) {
+                    selectionModel.setSelected(event.getValue(), true);
+                    editTemplate();
+                }
+                if (BrowserEvents.CONTEXTMENU.equals(eventType)) {
+                    selectionModel.setSelected(event.getValue(), true);
+                    if (event.getValue() != null) {
+                        contextMenu.showAt(event.getNativeEvent().getClientX(), event.getNativeEvent().getClientY());
+                    }
+                }
+
             }
         });
+
+        templateGrid.addDomHandler(new DoubleClickHandler() {
+            @Override
+            public void onDoubleClick(DoubleClickEvent event) {
+                event.preventDefault();
+            }
+        }, DoubleClickEvent.getType());
+
+        templateGrid.addDomHandler(new ContextMenuHandler() {
+            @Override
+            public void onContextMenu(ContextMenuEvent event) {
+                event.preventDefault();
+            }
+        }, ContextMenuEvent.getType());
 
         add(templateGrid, new VerticalLayoutData(1, 1));
-    }
-
-
-    private void saveChanges(int row) {
-        SystemServiceProxy req = newTemplateRequest != null ? newTemplateRequest : rf.systemService();
-        newTemplateRequest = null;
-        final TraceTemplateProxy tti = req.edit(templateStore.get(row));
-        tti.setOrder(txtOrder.getCurrentValue());
-        tti.setCondition(txtCondition.getCurrentValue());
-        tti.setTemplate(txtTemplate.getCurrentValue());
-        req.saveTemplate(tti).fire(new Receiver<Integer>() {
-            @Override
-            public void onSuccess(Integer integer) {
-                loadData();
-            }
-            @Override
-            public void onFailure(ServerFailure failure) {
-                errorHandler.error("Error saving template", failure);
-            }
-        });
     }
 
 
@@ -170,7 +183,7 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
         btnRefresh.addSelectHandler(new SelectEvent.SelectHandler() {
             @Override
             public void onSelect(SelectEvent event) {
-                loadData();
+                refreshTemplates();
             }
         });
 
@@ -198,7 +211,7 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
         btnRemove.addSelectHandler(new SelectEvent.SelectHandler() {
             @Override
             public void onSelect(SelectEvent event) {
-                removeSelectedTemplate();
+                removeTemplate();
             }
         });
 
@@ -220,35 +233,98 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
         add(toolBar, new VerticalLayoutData(1, -1));
     }
 
+
+    private void createContextMenu() {
+        contextMenu = new Menu();
+
+        MenuItem mnuRefresh = new MenuItem("Refresh");
+        mnuRefresh.setIcon(Resources.INSTANCE.refreshIcon());
+        mnuRefresh.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                refreshTemplates();
+            }
+        });
+        contextMenu.add(mnuRefresh);
+
+        contextMenu.add(new SeparatorMenuItem());
+
+        MenuItem mnuCreateTemplate = new MenuItem("New template");
+        mnuCreateTemplate.setIcon(Resources.INSTANCE.addIcon());
+        mnuCreateTemplate.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                addTemplate();
+            }
+        });
+        contextMenu.add(mnuCreateTemplate);
+
+
+        MenuItem mnuRemoveTemplate = new MenuItem("Remove template");
+        mnuRemoveTemplate.setIcon(Resources.INSTANCE.removeIcon());
+        mnuRemoveTemplate.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                removeTemplate();
+            }
+        });
+        contextMenu.add(mnuRemoveTemplate);
+
+        contextMenu.add(new SeparatorMenuItem());
+
+        MenuItem mnuEditTemplate = new MenuItem("Edit Template");
+        mnuEditTemplate.setIcon(Resources.INSTANCE.editIcon());
+        mnuEditTemplate.addSelectionHandler(new SelectionHandler<Item>() {
+            @Override
+            public void onSelection(SelectionEvent<Item> event) {
+                editTemplate();
+            }
+        });
+
+        contextMenu.add(mnuEditTemplate);
+    }
+
+
     private void editTemplate() {
-        TraceTemplateProxy tti = templateGrid.getSelectionModel().getSelectedItem();
+        TraceTemplateProxy tti = selectionModel.getSelectedObject();
         if (tti != null) {
-            int row = templateStore.indexOf(tti);
-            templateEditor.startEditing(new Grid.GridCell(row, 2));
+            new TraceTemplateDialog(rf, this, tti, errorHandler).show();
         }
     }
+
 
     private void addTemplate() {
-        newTemplateRequest = rf.systemService();
-        templateStore.add(0, newTemplateRequest.create(TraceTemplateProxy.class));
-        templateEditor.startEditing(new Grid.GridCell(0, 2));
+        new TraceTemplateDialog(rf, this, null, errorHandler).show();
     }
 
 
-    private void removeSelectedTemplate() {
-        TraceTemplateProxy template = templateGrid.getSelectionModel().getSelectedItem();
+    private void removeTemplate() {
+        TraceTemplateProxy template = selectionModel.getSelectedObject();
         if (template != null) {
-            templateStore.remove(template);
-            rf.systemService().removeTemplate(template.getId()).fire();
+            rf.systemService().removeTemplate(template.getId()).fire(
+                    new Receiver<Void>() {
+                        @Override
+                        public void onSuccess(Void response) {
+                            refreshTemplates();
+                        }
+                    }
+            );
         }
     }
 
 
-    private void loadData() {
+    public void refreshTemplates() {
         rf.systemService().listTemplates().fire(new Receiver<List<TraceTemplateProxy>>() {
             @Override
             public void onSuccess(List<TraceTemplateProxy> response) {
-                updateData(response);
+                Collections.sort(response, new Comparator<TraceTemplateProxy>() {
+                    @Override
+                    public int compare(TraceTemplateProxy o1, TraceTemplateProxy o2) {
+                        return o1.getOrder() - o2.getOrder();
+                    }
+                });
+                templateStore.getList().clear();
+                templateStore.getList().addAll(response);
             }
 
             @Override
@@ -259,14 +335,4 @@ public class TraceTemplatePanel extends VerticalLayoutContainer {
     }
 
 
-    private void updateData(List<TraceTemplateProxy> data) {
-        Collections.sort(data, new Comparator<TraceTemplateProxy>() {
-            @Override
-            public int compare(TraceTemplateProxy o1, TraceTemplateProxy o2) {
-                return o1.getOrder() - o2.getOrder();
-            }
-        });
-        templateStore.clear();
-        templateStore.addAll(data);
-    }
 }

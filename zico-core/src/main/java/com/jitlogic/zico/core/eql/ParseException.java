@@ -39,7 +39,7 @@ public class ParseException extends RuntimeException {
         sb.append(getMessage() + "\n");
 
         for (ParseError e : parseErrors) {
-            sb.append("[" + e.getStartIndex() + "," + e.getEndIndex() + "] " + e.getErrorMessage());
+            sb.append("(at position " + e.getStartIndex() + ")");
         }
 
         return sb.toString();

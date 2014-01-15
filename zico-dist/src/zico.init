@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# zico - this script starts and stops the nginx daemon
+# zico - this script starts and stops Zorka Intranet Collector
 #
 # chkconfig:   - 85 15
 # description:  Zorka Intranet Collector
@@ -35,7 +35,7 @@ for F in zico.properties zico.war ; do
     fi
 done
 
-for D in tmp log data db ; do
+for D in tmp log data ; do
     if [ ! -d $ZICO_HOME/$D ] ; then
       echo "Missing directory: $ZICO_HOME/$D. Created."
       mkdir $ZICO_HOME/$D

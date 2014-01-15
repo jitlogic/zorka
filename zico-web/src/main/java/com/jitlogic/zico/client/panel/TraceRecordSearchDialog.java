@@ -17,16 +17,33 @@ package com.jitlogic.zico.client.panel;
 
 
 import com.google.gwt.cell.client.AbstractCell;
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.cell.client.ActionCell;
+import com.google.gwt.cell.client.Cell;
+import com.google.gwt.cell.client.TextCell;
+import com.google.gwt.dom.client.BrowserEvents;
+import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.event.dom.client.ContextMenuEvent;
+import com.google.gwt.event.dom.client.ContextMenuHandler;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.DataGrid;
+import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
+import com.google.gwt.user.cellview.client.IdentityColumn;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.view.client.CellPreviewEvent;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.ProvidesKey;
+import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.assistedinject.Assisted;
 import com.google.web.bindery.requestfactory.shared.Receiver;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
@@ -34,38 +51,29 @@ import com.jitlogic.zico.client.ClientUtil;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.Resources;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
-import com.jitlogic.zico.client.props.TraceRecordInfoProperties;
 import com.jitlogic.zico.core.model.TraceRecordSearchQuery;
 import com.jitlogic.zico.shared.data.TraceRecordSearchQueryProxy;
 import com.jitlogic.zico.shared.data.TraceInfoProxy;
 import com.jitlogic.zico.shared.data.TraceRecordProxy;
 import com.jitlogic.zico.shared.data.TraceRecordSearchResultProxy;
 import com.jitlogic.zico.shared.services.TraceDataServiceProxy;
-import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.util.Margins;
-import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.button.ToggleButton;
 import com.sencha.gxt.widget.core.client.container.HorizontalLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
-import com.sencha.gxt.widget.core.client.event.CellDoubleClickEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.ShowEvent;
 import com.sencha.gxt.widget.core.client.form.CheckBox;
 import com.sencha.gxt.widget.core.client.form.FieldLabel;
 import com.sencha.gxt.widget.core.client.form.TextField;
-import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
-import com.sencha.gxt.widget.core.client.grid.ColumnModel;
-import com.sencha.gxt.widget.core.client.grid.Grid;
-import com.sencha.gxt.widget.core.client.grid.RowExpander;
 
 import javax.inject.Inject;
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TraceRecordSearchDialog extends Dialog {
-
-    private final static TraceRecordInfoProperties props = GWT.create(TraceRecordInfoProperties.class);
 
 
     private TraceInfoProxy trace;
@@ -74,8 +82,11 @@ public class TraceRecordSearchDialog extends Dialog {
     private TraceCallTreePanel panel;
     private ZicoRequestFactory rf;
 
-    private ListStore<TraceRecordProxy> resultsStore;
-    private Grid<TraceRecordProxy> resultsGrid;
+    private ListDataProvider<TraceRecordProxy> resultsStore;
+    private TraceCallTableBuilder rowBuilder;
+    private SingleSelectionModel<TraceRecordProxy> selectionModel;
+    private DataGrid<TraceRecordProxy> resultsGrid;
+    private Set<String> expandedDetails = new HashSet<String>();
 
     private TextField txtSearchFilter;
     private CheckBox chkClass;
@@ -226,9 +237,9 @@ public class TraceRecordSearchDialog extends Dialog {
 
 
     private void doGoTo() {
-        TraceRecordProxy tri = resultsGrid.getSelectionModel().getSelectedItem();
-        int idx = tri != null ? resultsStore.indexOf(tri) : 0;
-        panel.setResults(resultsStore.getAll(), idx);
+        TraceRecordProxy tri = selectionModel.getSelectedObject();
+        int idx = tri != null ? resultsStore.getList().indexOf(tri) : 0;
+        panel.setResults(resultsStore.getList(), idx);
         this.hide();
     }
 
@@ -236,83 +247,159 @@ public class TraceRecordSearchDialog extends Dialog {
     public void setRootPath(String rootPath) {
         if (this.rootPath != rootPath) {
             this.rootPath = rootPath;
-            this.resultsStore.clear();
+            this.resultsStore.getList().clear();
             this.lblSumStats.setText("n/a");
         }
     }
 
+    private static final ProvidesKey<TraceRecordProxy> KEY_PROVIDER = new ProvidesKey<TraceRecordProxy>() {
+        @Override
+        public Object getKey(TraceRecordProxy rec) {
+            return rec.getPath();
+        }
+    };
+
+
+    private static final String EXPANDER_EXPAND = AbstractImagePrototype.create(Resources.INSTANCE.expanderExpand()).getHTML();
+    private static final String EXPANDER_COLLAPSE = AbstractImagePrototype.create(Resources.INSTANCE.expanderCollapse()).getHTML();
+
+    private final Cell<TraceRecordProxy> DETAIL_EXPANDER_CELL = new ActionCell<TraceRecordProxy>("",
+            new ActionCell.Delegate<TraceRecordProxy>() {
+                @Override
+                public void execute(TraceRecordProxy rec) {
+                    toggleDetails(rec);
+                }
+            }) {
+        @Override
+        public void render(Cell.Context context, TraceRecordProxy tr, SafeHtmlBuilder sb) {
+            if ((tr.getAttributes() != null && tr.getAttributes().size() > 0)||tr.getExceptionInfo() != null) {
+                sb.appendHtmlConstant("<span style=\"cursor: pointer;\">");
+                sb.appendHtmlConstant(expandedDetails.contains(tr.getPath()) ? EXPANDER_COLLAPSE : EXPANDER_EXPAND);
+                sb.appendHtmlConstant("</span>");
+            }
+        }
+    };
+
+    private AbstractCell<TraceRecordProxy> METHOD_CELL = new AbstractCell<TraceRecordProxy>() {
+        @Override
+        public void render(Context context, TraceRecordProxy tr, SafeHtmlBuilder sb) {
+            String color = tr.getExceptionInfo() != null ? "red"
+                    : tr.getAttributes() != null ? "blue" : "black";
+            sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
+            sb.append(SafeHtmlUtils.fromString(tr.getMethod()));
+            sb.appendHtmlConstant("</span>");
+        }
+    };
+
+    private final static String SMALL_CELL_CSS = Resources.INSTANCE.zicoCssResources().traceSmallCell();
+
+    private AbstractCell<TraceRecordProxy> METHOD_PCT_CELL = new AbstractCell<TraceRecordProxy>() {
+        @Override
+        public void render(Context context, TraceRecordProxy rec, SafeHtmlBuilder sb) {
+            double pct = 100.0 * rec.getTime() / trace.getExecutionTime();
+            String color = "rgb(" + ((int) (pct * 2.49)) + ",0,0)";
+            sb.appendHtmlConstant("<div class=\"" + SMALL_CELL_CSS + "\" style=\"color: " + color + ";\">");
+            sb.append(SafeHtmlUtils.fromString(NumberFormat.getFormat("###.0").format(pct) + "%"));
+            sb.appendHtmlConstant("</div>");
+        }
+    };
 
     private void createResultsGrid() {
 
-        ColumnConfig<TraceRecordProxy, Long> durationCol = new ColumnConfig<TraceRecordProxy, Long>(props.time(), 50, "Time");
-        durationCol.setCell(new NanoTimeRenderingCell());
-        durationCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-        durationCol.setMenuDisabled(true);
+        resultsGrid = new DataGrid<TraceRecordProxy>(1024*1024, KEY_PROVIDER);
+        selectionModel = new SingleSelectionModel<TraceRecordProxy>(KEY_PROVIDER);
+        resultsGrid.setSelectionModel(selectionModel);
 
-        ColumnConfig<TraceRecordProxy, Long> callsCol = new ColumnConfig<TraceRecordProxy, Long>(props.calls(), 50, "Calls");
-        callsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-        callsCol.setMenuDisabled(true);
+        Column<TraceRecordProxy, TraceRecordProxy> colExpander
+                = new IdentityColumn<TraceRecordProxy>(DETAIL_EXPANDER_CELL);
+        resultsGrid.addColumn(colExpander, "#");
+        resultsGrid.setColumnWidth(colExpander, 32, Style.Unit.PX);
 
-        ColumnConfig<TraceRecordProxy, Long> errorsCol = new ColumnConfig<TraceRecordProxy, Long>(props.errors(), 50, "Errors");
-        errorsCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-        errorsCol.setMenuDisabled(true);
+        Column<TraceRecordProxy, TraceRecordProxy> colMethod = new IdentityColumn<TraceRecordProxy>(METHOD_CELL);
+        resultsGrid.addColumn(colMethod, new ResizableHeader<TraceRecordProxy>("Method", resultsGrid, colMethod));
+        resultsGrid.setColumnWidth(colMethod, 100, Style.Unit.PCT);
 
-        ColumnConfig<TraceRecordProxy, Long> pctCol = new ColumnConfig<TraceRecordProxy, Long>(props.time(), 50, "Pct");
-        pctCol.setAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-        pctCol.setMenuDisabled(true);
-
-        pctCol.setCell(new AbstractCell<Long>() {
+        Column<TraceRecordProxy, String> colTime = new Column<TraceRecordProxy, String>(new TextCell()) {
             @Override
-            public void render(Context context, Long time, SafeHtmlBuilder sb) {
-                double pct = 100.0 * time / trace.getExecutionTime();
-                String strTime = NumberFormat.getFormat("###.0").format(pct) + "%";
-                sb.appendHtmlConstant("<span style=\"color: rgb(" + ((int) (pct * 2.49)) + ",0,0);\"><b>");
-                sb.append(SafeHtmlUtils.fromString(strTime));
-                sb.appendHtmlConstant("</b></span>");
+            public String getValue(TraceRecordProxy rec) {
+                return ClientUtil.formatDuration(rec.getTime());
+            }
+        };
+        resultsGrid.addColumn(colTime, new ResizableHeader<TraceRecordProxy>("Time", resultsGrid, colTime));
+        resultsGrid.setColumnWidth(colTime, 50, Style.Unit.PX);
+
+        Column<TraceRecordProxy,String> colCalls = new Column<TraceRecordProxy, String>(new TextCell()) {
+            @Override
+            public String getValue(TraceRecordProxy rec) {
+                return ""+rec.getCalls();
+            }
+        };
+        resultsGrid.addColumn(colCalls, new ResizableHeader<TraceRecordProxy>("Calls", resultsGrid, colCalls));
+        resultsGrid.setColumnWidth(colCalls, 50, Style.Unit.PX);
+
+        Column<TraceRecordProxy,String> colErrors = new Column<TraceRecordProxy, String>(new TextCell()) {
+            @Override
+            public String getValue(TraceRecordProxy rec) {
+                return ""+rec.getErrors();
+            }
+        };
+        resultsGrid.addColumn(colErrors, new ResizableHeader<TraceRecordProxy>("Errors", resultsGrid, colErrors));
+        resultsGrid.setColumnWidth(colErrors, 50, Style.Unit.PX);
+
+        Column<TraceRecordProxy,TraceRecordProxy> colPct = new IdentityColumn<TraceRecordProxy>(METHOD_PCT_CELL);
+        resultsGrid.addColumn(colPct, new ResizableHeader<TraceRecordProxy>("Pct", resultsGrid, colPct));
+        resultsGrid.setColumnWidth(colPct, 50, Style.Unit.PX);
+
+        rowBuilder = new TraceCallTableBuilder(resultsGrid, expandedDetails);
+        resultsGrid.setTableBuilder(rowBuilder);
+
+        resultsGrid.setSkipRowHoverStyleUpdate(true);
+        resultsGrid.setSkipRowHoverFloatElementCheck(true);
+        resultsGrid.setSkipRowHoverCheck(true);
+        resultsGrid.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.DISABLED);
+
+        resultsGrid.addCellPreviewHandler(new CellPreviewEvent.Handler<TraceRecordProxy>() {
+            @Override
+            public void onCellPreview(CellPreviewEvent<TraceRecordProxy> event) {
+                NativeEvent nev = event.getNativeEvent();
+                String eventType = nev.getType();
+                if ((BrowserEvents.KEYDOWN.equals(eventType) && nev.getKeyCode() == KeyCodes.KEY_ENTER)
+                        || BrowserEvents.DBLCLICK.equals(nev.getType())) {
+                    doGoTo();
+                }
+                //if (BrowserEvents.CONTEXTMENU.equals(eventType)) {
+                //    selection.setSelected(event.getValue(), true);
+                //    contextMenu.showAt(event.getNativeEvent().getClientX(), event.getNativeEvent().getClientY());
+                //}
             }
         });
 
-        ColumnConfig<TraceRecordProxy, TraceRecordProxy> methodCol = new ColumnConfig<TraceRecordProxy, TraceRecordProxy>(
-                new IdentityValueProvider<TraceRecordProxy>(), 500, "Method");
-
-        methodCol.setMenuDisabled(true);
-        methodCol.setSortable(false);
-
-        methodCol.setCell(new AbstractCell<TraceRecordProxy>() {
+        resultsGrid.addDomHandler(new DoubleClickHandler() {
             @Override
-            public void render(Context context, TraceRecordProxy tr, SafeHtmlBuilder sb) {
-                String color = tr.getExceptionInfo() != null ? "red"
-                        : tr.getAttributes() != null ? "blue" : "black";
-                sb.appendHtmlConstant("<span style=\"color: " + color + ";\">");
-                sb.append(SafeHtmlUtils.fromString(tr.getMethod()));
-                sb.appendHtmlConstant("</span>");
+            public void onDoubleClick(DoubleClickEvent event) {
+                event.preventDefault();
             }
-        });
-
-        RowExpander<TraceRecordProxy> expander = new RowExpander<TraceRecordProxy>(
-                new IdentityValueProvider<TraceRecordProxy>(), new MethodDetailCell());
-
-        ColumnModel<TraceRecordProxy> model = new ColumnModel<TraceRecordProxy>(
-                Arrays.<ColumnConfig<TraceRecordProxy, ?>>asList(
-                        expander, methodCol, durationCol, callsCol, errorsCol, pctCol));
-
-
-        resultsStore = new ListStore<TraceRecordProxy>(props.key());
-        resultsGrid = new Grid<TraceRecordProxy>(resultsStore, model);
-
-        resultsGrid.setBorders(true);
-        resultsGrid.getView().setAutoExpandColumn(methodCol);
-        resultsGrid.getView().setForceFit(true);
-
-        expander.initPlugin(resultsGrid);
-
-        resultsGrid.addCellDoubleClickHandler(new CellDoubleClickEvent.CellDoubleClickHandler() {
+        }, DoubleClickEvent.getType());
+        resultsGrid.addDomHandler(new ContextMenuHandler() {
             @Override
-            public void onCellClick(CellDoubleClickEvent event) {
-                doGoTo();
+            public void onContextMenu(ContextMenuEvent event) {
+                event.preventDefault();
             }
-        });
+        }, ContextMenuEvent.getType());
 
+        resultsStore = new ListDataProvider<TraceRecordProxy>();
+        resultsStore.addDataDisplay(resultsGrid);
+    }
+
+
+    private void toggleDetails(TraceRecordProxy rec) {
+        String path = rec.getPath();
+        if (expandedDetails.contains(path)) {
+            expandedDetails.remove(path);
+        } else {
+            expandedDetails.add(path);
+        }
+        resultsGrid.redrawRow(resultsStore.getList().indexOf(rec));
     }
 
 
@@ -337,8 +424,8 @@ public class TraceRecordSearchDialog extends Dialog {
                 new Receiver<TraceRecordSearchResultProxy>() {
                     @Override
                     public void onSuccess(TraceRecordSearchResultProxy response) {
-                        resultsStore.clear();
-                        resultsStore.addAll(response.getResult());
+                        resultsStore.getList().clear();
+                        resultsStore.getList().addAll(response.getResult());
                         lblSumStats.setText(response.getResult().size() + " methods, "
                                 + NumberFormat.getFormat("###.0").format(response.getRecurPct()) + "% of trace execution time. "
                                 + "Time: " + ClientUtil.formatDuration(response.getRecurTime()) + " non-recursive"
