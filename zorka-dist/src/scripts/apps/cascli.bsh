@@ -19,14 +19,43 @@ zorka.require("tracer.bsh");
 
 __casclient() {
 
+  zorka.defCfg("cas.audit.secure", "no");
+
+  zorka.defCfg("cas.stats", "yes");
+  zorka.defCfg("cas.stats.mbean", "cas:name=CasAudit,type=ZorkaStats");
+
+  zorka.defCfg("cas.trace", zorka.boolCfg("tracer"));
+  zorka.defCfg("cas.trace.time", zorka.longCfg("tracer.min.trace.time"));
+
+  _secure = zorka.boolCfg("cas.audit.secure");
+
+  _stats = zorka.boolCfg("cas.stats");
+  _mbean = zorka.stringCfg("cas.stats.mbean");
+
+  _trace = zorka.boolCfg("cas.trace");
+  _trace_time = zorka.longCfg("cas.trace.time");
+
+
   spy.add(spy.instrument("CASCLI_VALIDATE")
     .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("TICKET", 1), spy.fetchArg("SERVICE", 2),
-      spy.format("CAS_URI", "${THIS.casServerUrlPrefix}"), tracer.begin("CASCLI"), 
-      tracer.attr("CAS_URI", "CAS_URI"), tracer.attr("TICKET", "TICKET"), tracer.attr("SERVICE", "SERVICE"))
-    .onReturn(spy.fetchRetVal("RET"), 
-      spy.format("USERNAME", "${RET.principal.name}"), spy.format("ATTRS", "${RET.principal.attributes}"),
-      tracer.attr("USERNAME", "USERNAME"), tracer.attr("ATTRS", "ATTRS"))
-    .onError(spy.fetchError("ERR"), spy.format("ERROR", "${ERR.message}"), tracer.attr("ERROR", "ERROR"))
+      _secure ? spy.crc32sum("TICKET", "TICKET") : null,
+      spy.format("CAS_URI", "${THIS.casServerUrlPrefix}"),
+      _trace ? spy.subchain(
+        tracer.begin("CASCLI", _trace_time),
+        tracer.attr("CAS_URI", "CAS_URI"),
+        tracer.attr("TICKET", "TICKET"),
+        tracer.attr("SERVICE", "SERVICE")
+      ) : null)
+    .onReturn(spy.fetchRetVal("RET"),
+      _trace ? spy.subchain(
+        spy.format("USERNAME", "${RET.principal.name}"),
+        spy.format("ATTRS", "${RET.principal.attributes}"),
+        tracer.attr("USERNAME", "USERNAME"), tracer.attr("ATTRS", "ATTRS")
+      ): null)
+    .onError(spy.fetchError("ERR"),
+      _trace ? spy.subchain(
+         spy.format("ERROR", "${ERR.message}"), tracer.attr("ERROR", "ERROR")
+      ) : null)
     .include(spy.byMethod("org.jasig.cas.client.validation.AbstractUrlBasedTicketValidator", "validate")));
 
   return this;

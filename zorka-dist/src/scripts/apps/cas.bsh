@@ -24,6 +24,7 @@
  * - cas.audit.file = yes       enables logging audit information to local file;
  * - cas.audit.syslog = no      enables sending audit information to syslog server;
  * - cas.audit.zabbix = no      enables sending audit information to zabbix server;
+ * - cas.audit.secure = no      replaces all tickets in audit log and trace with CRC32 sums;
  * - cas.audit.tag = cas.audit  zabbix item or syslog tag audit records will be marked with;
  * - cas.audit.syslog.addr      syslog server address (127.0.0.1);
  * - cas.audit.file.path        path to log file (defaults to ${zorka.log.dir}/cas_audit.log);
@@ -46,7 +47,6 @@ __cas() {
 
   zorka.logInfo("Enabling CAS monitoring ...");
 
-
   zorka.defCfg("cas.audit", "yes");
   zorka.defCfg("cas.audit.file", zorka.boolCfg("cas.audit"));
   zorka.defCfg("cas.audit.file.path", util.path("${zorka.log.dir}", "cas_audit.log"));
@@ -63,12 +63,13 @@ __cas() {
   zorka.defCfg("cas.trace", zorka.boolCfg("tracer"));
   zorka.defCfg("cas.trace.time", zorka.longCfg("tracer.min.trace.time"));
 
-
   _audit = zorka.boolCfg("cas.audit");
   _audit_file = _audit && zorka.boolCfg("cas.audit.file");
   _audit_syslog = _audit && zorka.boolCfg("cas.audit.syslog");
   _audit_zabbix = _audit && zorka.boolCfg("cas.audit.zabbix");
   _audit_tag = zorka.stringCfg("cas.audit.tag");
+
+  _secure = zorka.boolCfg("cas.audit.secure");
 
   _stats = zorka.boolCfg("cas.stats");
   _mbean = zorka.stringCfg("cas.stats.mbean");
@@ -134,7 +135,7 @@ __cas() {
 
   // Authentication attempts
   sdefAuth = spy.instrument("CAS_AUTH")
-    .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request))
+    .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request), tracer.begin("CAS", _trace_time))
     .onReturn(spy.put("ACTION", "AUTHENTICATION_SUCCESS"))
     .onError(spy.put("ACTION", "AUTHENTICATION_FAILED"))
     .onSubmit(tracer.attr("ACTION", "ACTION"))
@@ -146,8 +147,9 @@ __cas() {
 
   // TGT-s created
   sdefTgtCreated = spy.instrument("CAS_TGT_CREATE")
-    .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request))
-    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_CREATED"), tracer.attr("WHAT", "WHAT"))
+    .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request), tracer.begin("CAS", _trace_time))
+    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_CREATED"),
+      _secure ? spy.crc32sum("WHAT", "WHAT") : null, tracer.attr("WHAT", "WHAT"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_NOT_CREATED"))
     .onSubmit(tracer.attr("ACTION", "ACTION"))
     .include(spy.byMethod("org.jasig.cas.CentralAuthenticationServiceImpl", "createTicketGrantingTicket"));
@@ -157,7 +159,7 @@ __cas() {
 
   // TGT-s destroyed
   sdefTgtDestroyed = spy.instrument("CAS_TGT_DESTROY")
-    .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request), tracer.begin("CAS"), tracer.attr("WHO", "WHO"))
+    .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request), tracer.begin("CAS", _trace_time), tracer.attr("WHO", "WHO"))
     .onReturn(spy.put("WHAT", ""), spy.put("ACTION", "TICKET_GRANTING_TICKET_DESTROYED"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_NOT_DESTROYED"))
     .onSubmit(tracer.attr("ACTION", "ACTION"))
@@ -171,10 +173,11 @@ __cas() {
   // Service tickets granted
   sdefSvcGranted = spy.instrument("CAS_SVC_GRANT")
     .onEnter(spy.fetchArg("TGT", 1), spy.fetchArg("SERVICE", 2), spy.fetchArg("WHO", 2), spy.tlGet("REQ", request), 
-      tracer.begin("CAS"), tracer.attr("TGT", "TGT"), 
+      tracer.begin("CAS", _trace_time), _secure ? spy.crc32sum("TGT", "TGT") : null, tracer.attr("TGT", "TGT"),
       spy.format("SERVICE", "${SERVICE}"), tracer.attr("SERVICE", "SERVICE"), 
       spy.format("WHO", "${WHO}"), tracer.attr("WHO", "WHO"))
-    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "SERVICE_TICKET_GRANTED"), tracer.attr("WHAT", "WHAT"))
+    .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "SERVICE_TICKET_GRANTED"),
+      _secure ? spy.crc32sum("WHAT", "WHAT") : null, tracer.attr("WHAT", "WHAT"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "SERVICE_TICKET_NOT_GRANTED"))
     .onSubmit(tracer.attr("ACTION", "ACTION"))
     .include(spy.byMethod(1, "org.jasig.cas.CentralAuthenticationServiceImpl", "grantServiceTicket", "String",
@@ -187,7 +190,9 @@ __cas() {
   // Proxy granting ticket created
   sdefProxyGranted = spy.instrument("CAS_PROXY_GRANT")
     .onEnter(spy.fetchArg("TICKET", 1), spy.fetchArg("WHO", 2), spy.tlGet("REQ", request), 
-      tracer.begin("CAS"), tracer.attr("TICKET", "TICKET"), tracer.attr("WHO", "WHO"))
+      tracer.begin("CAS", _trace_time),
+      _secure ? spy.crc32sum("TICKET", "TICKET") : null, tracer.attr("TICKET", "TICKET"),
+      tracer.attr("WHO", "WHO"))
     .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "PROXY_GRANTING_TICKET_CREATED"), tracer.attr("WHAT", "WHAT"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "PROXY_GRANTING_TICKET_NOT_CREATED"))
     .onSubmit(spy.strTime("TIME"), spy.zorkaStats("java", _mbean, "stats", "PROXY_CREATE"), tracer.attr("ACTION", "ACTION"))
@@ -223,8 +228,10 @@ __cas() {
 
   // Validate service ticket
   sdefSvcValidate = spy.instrument("CAS_SVC_VALIDATE")
-    .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("TICKET", 1), spy.fetchArg("SERVICE", 2), spy.tlGet("REQ", request), 
-      tracer.begin("CAS"), process_ticket(), tracer.attr("TICKET", "TICKET"), 
+    .onEnter(spy.fetchArg("THIS", 0),
+      _secure ? spy.crc32sum("TICKET", "TICKET") : null, spy.fetchArg("TICKET", 1),
+      spy.fetchArg("SERVICE", 2), spy.tlGet("REQ", request),
+      tracer.begin("CAS", _trace_time), process_ticket(), tracer.attr("TICKET", "TICKET"),
       spy.format("SERVICE", "${SERVICE}"), tracer.attr("SERVICE", "SERVICE"))
     .onReturn(spy.fetchRetVal("WHAT"), spy.put("ACTION", "SERVICE_TICKET_VALIDATE_SUCCESS"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "SERVICE_TICKET_VALIDATE_FAILURE"))
@@ -267,7 +274,9 @@ __cas() {
   if (zorka.boolCfg("tracer")) {
     tracer.exclude(
       "org.jasig.cas.aspect.LogAspect",
-      "org.opensaml.xml.**"
+      "org.opensaml.xml.**",
+      "org.perf4j.**",
+      "com.github.inspektr.**"
     );
   }
 
