@@ -40,6 +40,7 @@ import com.google.gwt.user.cellview.client.IdentityColumn;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.ProvidesKey;
@@ -223,7 +224,13 @@ public class TraceRecordSearchDialog extends Dialog {
 
         createResultsGrid();
 
-        vp.add(resultsGrid, new VerticalLayoutContainer.VerticalLayoutData(1, 1));
+        SimplePanel panel = new SimplePanel();
+        panel.addStyleName(Resources.INSTANCE.zicoCssResources().whitePanel());
+        panel.setSize("100%", "100%");
+        resultsGrid.setSize("100%", "100%");
+        panel.add(resultsGrid);
+
+        vp.add(panel, new VerticalLayoutContainer.VerticalLayoutData(1, 1));
 
         add(vp);
 
