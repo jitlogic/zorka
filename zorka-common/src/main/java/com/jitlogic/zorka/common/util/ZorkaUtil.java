@@ -744,26 +744,22 @@ public class ZorkaUtil {
 
         for (String s : components) {
 
-            if (File.separatorChar == '\\') {
-                s = s.replace("/", "\\");
-            }
-
-            if (s.endsWith(File.separator)) {
+            if (s.endsWith("/") || s.endsWith("\\")) {
                 s = s.substring(0, s.length() - 1);
             }
 
             if (sb.length() == 0) {
                 sb.append(s);
             } else {
-                if (s.startsWith(File.separator)) {
+                if (s.startsWith("/") || s.startsWith("\\")) {
                     s = s.substring(1);
                 }
-                sb.append(File.separator);
+                sb.append("/");
                 sb.append(s);
             }
         }
 
-        return sb.toString();
+        return sb.toString().replace('\\', '/');
     }
 
 

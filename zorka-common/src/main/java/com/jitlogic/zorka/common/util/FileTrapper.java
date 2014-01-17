@@ -17,9 +17,13 @@ package com.jitlogic.zorka.common.util;
 
 //import com.jitlogic.zorka.core.AgentDiagnostics;
 
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
+
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * File trapper implements trapper interface that logs messages to local file.
@@ -73,7 +77,7 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
     /**
      * Output (as output stream)
      */
-    private OutputStream os;
+    private FileOutputStream os;
 
     /**
      * Current log size (for rolling trappers)
@@ -205,9 +209,26 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
         }
 
         if (out != null) {
-            out.println(msg);
-            currentSize += msg.getBytes().length + 1;
-            // TODO AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SENT);
+
+            // TODO this is a crutch; process(msg) needs to accept array of items, not a single item;
+
+            List<String> msgs = new ArrayList<String>();
+            msgs.add(msg);
+            getSubmitQueue().drainTo(msgs, 128);
+
+            for (String s : msgs) {
+                out.println(s);
+                currentSize += s.getBytes().length + 1;
+                AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SENT);
+            }
+
+            out.flush();
+
+            try {
+                os.flush();
+                os.getFD().sync();
+            } catch (IOException e) {
+            }
         }
     }
 

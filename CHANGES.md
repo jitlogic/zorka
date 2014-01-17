@@ -1,3 +1,10 @@
+Zorka 0.9.16 (2014-02-03)
+-------------------------
+
+ * fixes for agent operating in Windows env (paths, log buffering etc.);
+ * various collector / UI fixes;
+ *
+
 Zorka 0.9.15 (2014-01-15)
 -------------------------
 

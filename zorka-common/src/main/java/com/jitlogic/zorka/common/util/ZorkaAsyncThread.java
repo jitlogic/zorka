@@ -147,6 +147,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService {
         }
     }
 
+    // TODO refactor this to process(List<T> objs) and send items to processes in batches, not just single items;
     protected abstract void process(T obj);
 
 

@@ -17,6 +17,7 @@
 
 package com.jitlogic.zorka.agent;
 
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.AgentConfig;
 import com.jitlogic.zorka.core.AgentInstance;
 import com.jitlogic.zorka.core.ZorkaControl;
@@ -93,7 +94,7 @@ public class AgentMain {
 
         boolean retransformSupported = supportsRetransform(instrumentation);
 
-        AgentConfig config = new AgentConfig(home);
+        AgentConfig config = new AgentConfig(ZorkaUtil.path(home));
         instance = new AgentInstance(config, instantiateRetransformer(instrumentation, config,
                 "com.jitlogic.zorka.core.spy." + (retransformSupported ? "RealSpyRetransformer" : "DummySpyRetransformer")));
 
