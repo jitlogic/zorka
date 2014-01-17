@@ -193,7 +193,7 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
 
 
     @Override
-    protected void process(String msg) {
+    protected void process(List<String> msgs) {
 
         switch (type) {
             case ROLLING:
@@ -209,12 +209,6 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
         }
 
         if (out != null) {
-
-            // TODO this is a crutch; process(msg) needs to accept array of items, not a single item;
-
-            List<String> msgs = new ArrayList<String>();
-            msgs.add(msg);
-            getSubmitQueue().drainTo(msgs, 128);
 
             for (String s : msgs) {
                 out.println(s);

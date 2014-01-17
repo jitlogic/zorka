@@ -54,7 +54,7 @@ public class FullTracerUnitTest extends ZorkaFixture {
             }
 
             @Override
-            protected void process(SymbolicRecord obj) {
+            protected void process(List<SymbolicRecord> obj) {
             }
         };
     }

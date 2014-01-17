@@ -23,7 +23,6 @@ import com.jitlogic.zorka.common.tracedata.TraceWriter;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -101,7 +100,7 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
      */
     public ZicoTraceOutput(TraceWriter writer, String addr, int port, String hostname, String auth,
                            int qlen, long packetSize, int retries, long retryTime, long retryTimeExp, int timeout) throws IOException {
-        super("zico-output", qlen);
+        super("zico-output", qlen, 1);
 
         this.hostname = hostname;
         this.auth = auth;
@@ -142,13 +141,11 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
 
 
     @Override
-    protected void process(SymbolicRecord record) {
+    protected void process(List<SymbolicRecord> records) {
         long rt = retryTime;
 
         List<SymbolicRecord> packet = new ArrayList<SymbolicRecord>();
-        packet.add(record);
-
-        log.debug(ZorkaLogger.ZTR_TRACER_DBG, "Processing record: " + record);
+        packet.addAll(records);
 
         for (int i = 0; i < retries; i++) {
             try {
@@ -205,19 +202,6 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
 
         AgentDiagnostics.inc(AgentDiagnostics.ZICO_PACKETS_LOST);
         log.error(ZorkaLogger.ZCL_STORE, "Too many errors while trying to send trace. Giving up. Trace will be lost.");
-    }
-
-
-    @Override
-    public void runCycle() {
-        try {
-            SymbolicRecord obj = submitQueue.take();
-            if (obj != null) {
-                process(obj);
-            }
-        } catch (InterruptedException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot perform run cycle", e);
-        }
     }
 
 

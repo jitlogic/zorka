@@ -60,18 +60,21 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService {
 
     protected boolean countTraps = true;
 
+    private int plen;
 
     public ZorkaAsyncThread(String name) {
-        this(name, 256);
+        this(name, 256, 1);
     }
 
     /**
      * Standard constructor.
      *
      * @param name thread name
+     * @param plen
      */
-    public ZorkaAsyncThread(String name, int qlen) {
+    public ZorkaAsyncThread(String name, int qlen, int plen) {
         this.name = "ZORKA-" + name;
+        this.plen = plen;
         submitQueue = new ArrayBlockingQueue<T>(qlen);
     }
 
@@ -121,12 +124,12 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService {
         try {
             T obj = submitQueue.take();
             if (obj != null) {
-                process(obj);
-                List<T> lst = new ArrayList<T>(submitQueue.size());
-                submitQueue.drainTo(lst);
-                for (T o : lst) {
-                    process(o);
+                List<T> lst = new ArrayList<T>(plen);
+                lst.add(obj);
+                if (plen > 1) {
+                    submitQueue.drainTo(lst, plen-1);
                 }
+                process(lst);
                 flush();
             }
         } catch (InterruptedException e) {
@@ -147,8 +150,8 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService {
         }
     }
 
-    // TODO refactor this to process(List<T> objs) and send items to processes in batches, not just single items;
-    protected abstract void process(T obj);
+
+    protected abstract void process(List<T> obj);
 
 
     /**

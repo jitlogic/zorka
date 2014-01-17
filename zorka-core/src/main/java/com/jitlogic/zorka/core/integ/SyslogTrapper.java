@@ -25,6 +25,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -175,14 +176,16 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
 
 
     @Override
-    protected void process(String msg) {
-        byte[] buf = msg.getBytes();
-        try {
-            socket.send(new DatagramPacket(buf, 0, buf.length, syslogAddress, syslogPort));
-            AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SENT);
-        } catch (IOException e) {
-            if (log != null) {
-                handleError("Cannot send syslog packet: " + msg, e);
+    protected void process(List<String> msgs) {
+        for (String msg : msgs) {
+            byte[] buf = msg.getBytes();
+            try {
+                socket.send(new DatagramPacket(buf, 0, buf.length, syslogAddress, syslogPort));
+                AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SENT);
+            } catch (IOException e) {
+                if (log != null) {
+                    handleError("Cannot send syslog packet: " + msg, e);
+                }
             }
         }
     }
