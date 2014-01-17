@@ -462,6 +462,7 @@ public class HostListPanel extends VerticalLayoutContainer {
             HostServiceProxy req = rf.hostService();
             HostProxy editedHost = req.edit(info);
             editedHost.setEnabled(enabled);
+            req.persist(editedHost);
             req.fire(new Receiver<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
