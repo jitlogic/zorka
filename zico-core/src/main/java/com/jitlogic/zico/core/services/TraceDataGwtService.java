@@ -18,6 +18,7 @@ package com.jitlogic.zico.core.services;
 import com.google.inject.Singleton;
 import com.jitlogic.zico.core.HostStore;
 import com.jitlogic.zico.core.HostStoreManager;
+import com.jitlogic.zico.core.ZicoUtil;
 import com.jitlogic.zico.core.eql.ParseException;
 import com.jitlogic.zico.core.model.TraceInfoRecord;
 import com.jitlogic.zico.core.TraceRecordStore;
@@ -32,12 +33,12 @@ import com.jitlogic.zico.core.model.TraceRecordSearchResult;
 import com.jitlogic.zico.core.search.EqlTraceRecordMatcher;
 import com.jitlogic.zico.core.search.FullTextTraceRecordMatcher;
 import com.jitlogic.zico.core.search.TraceRecordMatcher;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -98,7 +99,7 @@ public class TraceDataGwtService {
             if (host != null) {
                 TraceInfoRecord info = host.getInfoRecord(traceOffs);
                 if (info != null) {
-                    return host.getTraceDataStore().packTraceRecord(
+                    return ZicoUtil.packTraceRecord(host.getSymbolRegistry(),
                             host.getTraceDataStore().getTraceRecord(info, path, minTime), path, null);
                 }
             }
@@ -122,11 +123,11 @@ public class TraceDataGwtService {
                     List<TraceRecordInfo> lst = new ArrayList<TraceRecordInfo>();
 
                     if (path != null) {
-                        packRecords(path, ctx, tr, lst, recursive);
+                        packRecords(host.getSymbolRegistry(), path, ctx, tr, lst, recursive);
                     } else {
-                        lst.add(ctx.packTraceRecord(tr, "", 250));
+                        lst.add(ZicoUtil.packTraceRecord(host.getSymbolRegistry(), tr, "", 250));
                         if (recursive) {
-                            packRecords("", ctx, tr, lst, recursive);
+                            packRecords(host.getSymbolRegistry(), "", ctx, tr, lst, recursive);
                         }
                     }
                     return lst;
@@ -141,13 +142,14 @@ public class TraceDataGwtService {
     }
 
 
-    private void packRecords(String path, TraceRecordStore ctx, TraceRecord tr, List<TraceRecordInfo> lst, boolean recursive) {
+    private void packRecords(SymbolRegistry symbolRegistry, String path, TraceRecordStore ctx, TraceRecord tr,
+                             List<TraceRecordInfo> lst, boolean recursive) {
         for (int i = 0; i < tr.numChildren(); i++) {
             TraceRecord child = tr.getChild(i);
             String childPath = path.length() > 0 ? (path + "/" + i) : "" + i;
-            lst.add(ctx.packTraceRecord(child, childPath, 250));
+            lst.add(ZicoUtil.packTraceRecord(symbolRegistry, child, childPath, 250));
             if (recursive && child.numChildren() > 0) {
-                packRecords(childPath, ctx, child, lst, recursive);
+                packRecords(symbolRegistry, childPath, ctx, child, lst, recursive);
             }
         }
     }

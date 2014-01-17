@@ -16,19 +16,15 @@
 package com.jitlogic.zico.core;
 
 
-import com.jitlogic.zico.core.model.KeyValuePair;
 import com.jitlogic.zico.core.model.MethodRankInfo;
-import com.jitlogic.zico.core.model.SymbolicExceptionInfo;
 import com.jitlogic.zico.core.model.TraceInfoRecord;
 import com.jitlogic.zico.core.model.TraceRecordSearchQuery;
-import com.jitlogic.zico.core.model.TraceRecordInfo;
 import com.jitlogic.zico.core.model.TraceRecordSearchResult;
 import com.jitlogic.zico.core.rds.RDSCleanupListener;
 import com.jitlogic.zico.core.rds.RDSStore;
 import com.jitlogic.zico.core.search.TraceRecordMatcher;
 import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.common.tracedata.SymbolicException;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.FressianReader;
@@ -119,7 +115,7 @@ public class TraceRecordStore implements Closeable {
                 && (!matcher.hasFlag(TraceRecordSearchQuery.METHODS_WITH_ATTRS) || tr.numAttrs() > 0);
 
         if (matches) {
-            result.getResult().add(packTraceRecord(tr, path, 250));
+            result.getResult().add(ZicoUtil.packTraceRecord(symbolRegistry, tr, path, 250));
 
             double pct = 100.0 * tr.getTime() / traceTime;
 
@@ -191,67 +187,6 @@ public class TraceRecordStore implements Closeable {
         }
 
         return tr;
-    }
-
-
-    public TraceRecordInfo packTraceRecord(TraceRecord tr, String path, Integer attrLimit) {
-        TraceRecordInfo info = new TraceRecordInfo();
-
-        info.setCalls(tr.getCalls());
-        info.setErrors(tr.getErrors());
-        info.setTime(tr.getTime());
-        info.setFlags(tr.getFlags());
-        info.setMethod(ZicoUtil.prettyPrint(tr, symbolRegistry));
-        info.setChildren(tr.numChildren());
-        info.setPath(path);
-
-        if (tr.getAttrs() != null) {
-            List<KeyValuePair> attrs = new ArrayList<KeyValuePair>(tr.getAttrs().size());
-            for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
-                String s = "" + e.getValue();
-                if (attrLimit != null && s.length() > attrLimit) {
-                    s = s.substring(0, attrLimit) + "...";
-                }
-                attrs.add(new KeyValuePair(symbolRegistry.symbolName(e.getKey()), s));
-            }
-            info.setAttributes(ZicoUtil.sortKeyVals(attrs));
-        }
-
-        SymbolicExceptionInfo sei = packException(tr);
-
-        info.setExceptionInfo(sei);
-
-        return info;
-    }
-
-
-    private SymbolicExceptionInfo packException(TraceRecord tr) {
-        SymbolicExceptionInfo ret = null, lex = null;
-
-        TraceRecord rec = tr;
-
-        while (rec != null && ((rec.getException() != null && ret == null)
-                || rec.hasFlag(TraceRecord.EXCEPTION_PASS|TraceRecord.EXCEPTION_WRAP))) {
-
-            if (rec.getException() != null) {
-                SymbolicException sex = (SymbolicException)rec.getException();
-                while (sex != null) {
-                    SymbolicExceptionInfo sei = ZicoUtil.extractSymbolicExceptionInfo(symbolRegistry, sex);
-
-                    if (ret == null) {
-                        ret = lex = sei;
-                    } else {
-                        lex.setCause(sei);
-                        lex = sei;
-                    }
-                    sex = sex.getCause();
-                }
-            }
-
-            rec = rec.numChildren() > 0 ? rec.getChild(rec.numChildren()-1) : null;
-        }
-
-        return ret;
     }
 
 

@@ -18,26 +18,22 @@ package com.jitlogic.zico.core;
 
 import com.jitlogic.zico.core.model.KeyValuePair;
 import com.jitlogic.zico.core.model.SymbolicExceptionInfo;
+import com.jitlogic.zico.core.model.TraceRecordInfo;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicException;
 import com.jitlogic.zorka.common.tracedata.SymbolicStackElement;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.objectweb.asm.Type;
 
 import java.io.EOFException;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class ZicoUtil {
@@ -231,4 +227,66 @@ public class ZicoUtil {
         return d;
     }
 
+
+    public static TraceRecordInfo packTraceRecord(SymbolRegistry symbolRegistry, TraceRecord tr, String path, Integer attrLimit) {
+        TraceRecordInfo info = new TraceRecordInfo();
+
+        info.setCalls(tr.getCalls());
+        info.setErrors(tr.getErrors());
+        info.setTime(tr.getTime());
+        info.setFlags(tr.getFlags());
+        info.setMethod(prettyPrint(tr, symbolRegistry));
+        info.setChildren(tr.numChildren());
+        info.setPath(path);
+
+        if (tr.getAttrs() != null) {
+            List<KeyValuePair> attrs = new ArrayList<KeyValuePair>(tr.getAttrs().size());
+            for (Map.Entry<Integer, Object> e : tr.getAttrs().entrySet()) {
+                String s = "" + e.getValue();
+                if (attrLimit != null && s.length() > attrLimit) {
+                    s = s.substring(0, attrLimit) + "...";
+                }
+                attrs.add(new KeyValuePair(symbolRegistry.symbolName(e.getKey()), s));
+            }
+            info.setAttributes(sortKeyVals(attrs));
+        }
+
+        SymbolicExceptionInfo sei = packException(symbolRegistry, tr);
+
+        info.setExceptionInfo(sei);
+
+        return info;
+    }
+
+
+    public static SymbolicExceptionInfo packException(SymbolRegistry symbolRegistry, TraceRecord tr) {
+        SymbolicExceptionInfo ret = null, lex = null;
+
+        TraceRecord rec = tr;
+
+        while (rec != null && ((rec.getException() != null && ret == null)
+                || rec.hasFlag(TraceRecord.EXCEPTION_PASS|TraceRecord.EXCEPTION_WRAP))) {
+
+            if (rec.getException() != null) {
+                SymbolicException sex = (SymbolicException)rec.getException();
+                while (sex != null) {
+                    SymbolicExceptionInfo sei = extractSymbolicExceptionInfo(symbolRegistry, sex);
+
+                    if (lex == null || !lex.equals(sei)) {
+                        if (ret == null) {
+                            ret = lex = sei;
+                        } else {
+                            lex.setCause(sei);
+                            lex = sei;
+                        }
+                    }
+                    sex = sex.getCause();
+                } // while
+            }
+
+            rec = rec.numChildren() > 0 ? rec.getChild(rec.numChildren()-1) : null;
+        }
+
+        return ret;
+    }
 }
