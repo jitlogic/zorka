@@ -88,7 +88,7 @@ public class HostStore implements Closeable, RDSCleanupListener {
     private Map<Integer, String> tids;
 
     private String name;
-    private String addr = "127.0.0.1";
+    private String addr = "";
     private String pass = "";
     private int flags;
     private long maxSize;
