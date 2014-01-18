@@ -1,0 +1,75 @@
+/**
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+zorka.require(
+  "spring/spring.bsh"
+);
+
+__spring_webflow() {
+
+  zorka.defCfg("spring.webflow.trace", "no");
+  zorka.defCfg("spring.webflow.trace.request.scope", "no");
+  zorka.defCfg("spring.webflow.trace.flash.scope", "no");
+  zorka.defCfg("spring.webflow.trace.view.scope", "no");
+  zorka.defCfg("spring.webflow.trace.flow.scope", "no");
+
+  // Tracer tuning
+  if (zorka.boolCfg("tracer")) {
+    tracer.exclude(
+      "org.springframework.webflow.core.**",
+      "org.springframework.webflow.engine.**"
+    );
+
+    extract_scope(prefix, attr, isView) {
+      process(rec) {
+        ctx = rec.get("CTX");
+        if (isView && !ctx.inViewState()) {
+          return rec;
+        }
+        scope = util.get(ctx, attr);
+        if (scope != null) {
+          for (e : scope.asMap().entrySet()) {
+            tracer.newAttr(prefix + e.getKey(), ""+e.getValue());
+          }
+        }
+        return rec;
+      }
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+    }
+
+    if (zorka.boolCfg("spring.webflow.trace")) {
+      spy.add(
+        spy.instrument("SPRING_WEBFLOW_ACTION")
+           .onEnter(spy.fetchArg("CTX", 1),
+             tracer.formatAttr("STATE", "${CTX.currentState.id}"))
+           .onReturn(spy.fetchRetVal("RET"),
+             tracer.formatAttr("RESULT", "${RET.id}"))
+           .onSubmit(
+             zorka.boolCfg("spring.webflow.trace.request.scope") ? extract_scope("REQ_SC__", "requestScope", false) : null,
+             zorka.boolCfg("spring.webflow.trace.flash.scope") ? extract_scope("FLASH_SC_", "flashScope", false) : null,
+             zorka.boolCfg("spring.webflow.trace.view.scope") ? extract_scope("VIEW_SC_", "viewScope", true) : null,
+             zorka.boolCfg("spring.webflow.trace.flow.scope") ? extract_scope("FLOW_SC_", "flowScope", false) : null
+           )
+           .include(spy.byMethod("org.springframework.webflow.action.AbstractAction", "execute")));
+    }
+
+  }
+
+  return this;
+}
+
+spring_webflow = __spring_webflow();

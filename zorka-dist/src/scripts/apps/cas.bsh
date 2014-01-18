@@ -17,22 +17,6 @@
 
 /**
  * CAS server monitoring, tracing and auditing.
- *
- * The following settings (and default values) can be set in zorka.properties:
- *
- * - cas.audit = yes            enables while CAS auditing fuctionality;
- * - cas.audit.file = yes       enables logging audit information to local file;
- * - cas.audit.syslog = no      enables sending audit information to syslog server;
- * - cas.audit.zabbix = no      enables sending audit information to zabbix server;
- * - cas.audit.secure = no      replaces all tickets in audit log and trace with CRC32 sums;
- * - cas.audit.tag = cas.audit  zabbix item or syslog tag audit records will be marked with;
- * - cas.audit.syslog.addr      syslog server address (127.0.0.1);
- * - cas.audit.file.path        path to log file (defaults to ${zorka.log.dir}/cas_audit.log);
- * - cas.audit.zabbix.addr      zabbix host (defaults to ${zabbix.host.addr});
- * - cas.stats = yes            enables maintaining of CAS-specific statistics;
- * - cas.stats.mbean =          mbean name that will maintain statistics for CAS;
- * - cas.trace = ${tracer}
- * - cas.trace.time = ${tracer.min.trace.time}
  */
 
 zorka.require(
@@ -40,7 +24,8 @@ zorka.require(
   "ldap.bsh",
   "tracer.bsh",
   "jboss/hibernate.bsh",
-  "spring/spring.bsh"
+  "spring/spring.bsh",
+  "spring/webflow.bsh"
 );
 
 __cas() {
@@ -51,7 +36,9 @@ __cas() {
   zorka.defCfg("cas.audit.file", zorka.boolCfg("cas.audit"));
   zorka.defCfg("cas.audit.file.path", util.path("${zorka.log.dir}", "cas_audit.log"));
   zorka.defCfg("cas.audit.syslog", "no");
-  zorka.defCfg("cas.audit.syslog.addr", "127.0.0.1");
+  zorka.defCfg("cas.audit.syslog.server", zorka.stringCfg("zorka.syslog.server"));
+  zorka.defCfg("cas.audit.syslog.facility", syslog.F_AUDIT);
+
   zorka.defCfg("cas.audit.secure", "no");
   zorka.defCfg("cas.audit.zabbix", "no");
   zorka.defCfg("cas.audit.zabbix.host", zorka.stringCfg("zorka.hostname"));
@@ -59,7 +46,7 @@ __cas() {
   zorka.defCfg("cas.audit.tag", "cas.audit");
 
   zorka.defCfg("cas.stats", "yes");
-  zorka.defCfg("cas.stats.mbean", "cas:name=CasAudit,type=ZorkaStats");
+  zorka.defCfg("cas.stats.mbean", "zorka:name=Cas,type=ZorkaStats");
   zorka.defCfg("cas.trace", zorka.boolCfg("tracer"));
   zorka.defCfg("cas.trace.time", zorka.longCfg("tracer.min.trace.time"));
 
@@ -79,7 +66,7 @@ __cas() {
 
 
   if (_audit_file) {
-    filePath = zorka.stringCfg("cas.audit.file.path", zorka.formatCfg("${zorka.log.dir}/cas_audit.log"));
+    filePath = zorka.stringCfg("cas.audit.file.path", util.path(zorka.stringCfg("zorka.log.dir"), "cas_audit.cfg"));
     zorka.logInfo("CAS Audit logs will be logged to local file: " + filePath);
     fileTrapper = zorka.dailyFileTrapper("cas.audit", zorka.INFO, filePath, false);
   }
@@ -93,7 +80,7 @@ __cas() {
 
 
   if (_audit_zabbix) {
-    zabbixTrapper = zabbix.trapper("cas.audit", "${cas.audit.zabbix.addr}", ${cas.audit.zabbix.host}, _audit_tag);
+    zabbixTrapper = zabbix.trapper("cas.audit", "${cas.audit.zabbix.addr}", "${cas.audit.zabbix.host}", _audit_tag);
     zorka.logInfo("CAS Audit logs will be sent to zabbix server: ${cas.audit.zabbix.addr}/${cas.audit.zabbix.host}");
   }
 
@@ -159,7 +146,8 @@ __cas() {
 
   // TGT-s destroyed
   sdefTgtDestroyed = spy.instrument("CAS_TGT_DESTROY")
-    .onEnter(spy.fetchArg("WHO", 1), spy.tlGet("REQ", request), tracer.begin("CAS", _trace_time), tracer.attr("WHO", "WHO"))
+    .onEnter(spy.fetchArg("WHAT", 1), spy.tlGet("REQ", request), tracer.begin("CAS", _trace_time),
+       _secure ? spy.crc32sum("WHAT", "WHAT") : null, tracer.attr("WHAT", "WHAT"))
     .onReturn(spy.put("WHAT", ""), spy.put("ACTION", "TICKET_GRANTING_TICKET_DESTROYED"))
     .onError(spy.fetchError("WHAT"), spy.put("ACTION", "TICKET_GRANTING_TICKET_NOT_DESTROYED"))
     .onSubmit(tracer.attr("ACTION", "ACTION"))
@@ -206,7 +194,7 @@ __cas() {
   process_ticket() {
     process(rec) {
       //zorka.logInfo("Processing ticket ...");
-      registry = zorka.get(rec.get("THIS"), "serviceTicketRegistry");
+      registry = util.get(rec.get("THIS"), "serviceTicketRegistry");
       if (registry != null) {
         ticket = registry.getTicket(rec.get("TICKET"));
         if (ticket != null) {

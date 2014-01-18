@@ -22,7 +22,7 @@ __casclient() {
   zorka.defCfg("cas.audit.secure", "no");
 
   zorka.defCfg("cas.stats", "yes");
-  zorka.defCfg("cas.stats.mbean", "cas:name=CasAudit,type=ZorkaStats");
+  zorka.defCfg("cas.stats.mbean", "zorka:name=Cas,type=ZorkaStats");
 
   zorka.defCfg("cas.trace", zorka.boolCfg("tracer"));
   zorka.defCfg("cas.trace.time", zorka.longCfg("tracer.min.trace.time"));
@@ -56,6 +56,7 @@ __casclient() {
       _trace ? spy.subchain(
          spy.format("ERROR", "${ERR.message}"), tracer.attr("ERROR", "ERROR")
       ) : null)
+    .onSubmit(_stats ? spy.zorkaStats("java", _mbean, "stats", "CLI_VALIDATE") : null)
     .include(spy.byMethod("org.jasig.cas.client.validation.AbstractUrlBasedTicketValidator", "validate")));
 
   return this;

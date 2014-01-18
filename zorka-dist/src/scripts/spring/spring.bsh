@@ -36,8 +36,6 @@ if (zorka.boolCfg("tracer")) {
       "org.springframework.util.**",
       "org.springframework.web.context.**",
       "org.springframework.web.servlet.**",
-      "org.springframework.web.util.**",
-      "org.springframework.webflow.core.**",
-      "org.springframework.webflow.engine.**"
+      "org.springframework.web.util.**"
     );
 }
