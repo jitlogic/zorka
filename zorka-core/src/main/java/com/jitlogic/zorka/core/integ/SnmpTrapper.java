@@ -25,6 +25,7 @@ import com.jitlogic.zorka.common.util.ZorkaTrapper;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.List;
 
 
 /**
@@ -155,16 +156,18 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
 
 
     @Override
-    protected void process(SNMPSequence trap) {
-        try {
-            if (trap instanceof SNMPv1TrapPDU) {
-                sender.sendTrap(snmpAddr, community, (SNMPv1TrapPDU) trap);
-            } else if (trap instanceof SNMPv2TrapPDU) {
-                sender.sendTrap(snmpAddr, community, (SNMPv2TrapPDU) trap);
+    protected void process(List<SNMPSequence> traps) {
+        for (SNMPSequence trap : traps) {
+            try {
+                if (trap instanceof SNMPv1TrapPDU) {
+                    sender.sendTrap(snmpAddr, community, (SNMPv1TrapPDU) trap);
+                } else if (trap instanceof SNMPv2TrapPDU) {
+                    sender.sendTrap(snmpAddr, community, (SNMPv2TrapPDU) trap);
+                }
+                AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SENT);
+            } catch (IOException e) {
+                log.error(ZorkaLogger.ZAG_ERRORS, "Error sending SNMP trap", e);
             }
-            AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SENT);
-        } catch (IOException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error sending SNMP trap", e);
         }
     }
 

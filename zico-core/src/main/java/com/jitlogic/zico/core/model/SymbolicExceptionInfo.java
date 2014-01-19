@@ -15,6 +15,8 @@
  */
 package com.jitlogic.zico.core.model;
 
+import com.jitlogic.zorka.common.util.ZorkaUtil;
+
 import java.util.List;
 
 public class SymbolicExceptionInfo {
@@ -26,6 +28,7 @@ public class SymbolicExceptionInfo {
     List<String> stackTrace;
 
     SymbolicExceptionInfo cause;
+
 
     public String getExClass() {
         return exClass;
@@ -64,5 +67,25 @@ public class SymbolicExceptionInfo {
 
     public void setCause(SymbolicExceptionInfo cause) {
         this.cause = cause;
+    }
+
+
+    @Override
+    public int hashCode() {
+        return exClass.hashCode() + (message != null ? message.hashCode() : 0);
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof SymbolicExceptionInfo
+            && ZorkaUtil.objEquals(((SymbolicExceptionInfo)obj).exClass, exClass)
+            && ZorkaUtil.objEquals(((SymbolicExceptionInfo)obj).message, message)
+            && ZorkaUtil.objEquals(((SymbolicExceptionInfo)obj).stackTrace, stackTrace);
+    }
+
+    @Override
+    public String toString() {
+        return exClass + ": " + message;
     }
 }

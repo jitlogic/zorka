@@ -38,10 +38,9 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.IdentityColumn;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.ProvidesKey;
@@ -59,7 +58,6 @@ import com.jitlogic.zico.shared.data.TraceRecordProxy;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
-import com.sencha.gxt.widget.core.client.form.SpinnerField;
 import com.sencha.gxt.widget.core.client.menu.Item;
 import com.sencha.gxt.widget.core.client.menu.Menu;
 import com.sencha.gxt.widget.core.client.menu.MenuItem;
@@ -98,6 +96,9 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
     private TextButton btnSearchPrev;
     private TextButton btnSearchNext;
 
+    private HorizontalPanel statusBar;
+    private Label statusLabel;
+
     private Menu contextMenu;
 
     private boolean fullyExpanded;
@@ -117,6 +118,7 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
 
         createToolbar();
         createCallTreeGrid();
+        createStatusBar();
         createContextMenu();
         loadData(false, null);
     }
@@ -227,31 +229,31 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
 
         Column<TraceRecordProxy, TraceRecordProxy> colMethodName
                 = new IdentityColumn<TraceRecordProxy>(METHOD_TREE_CELL);
-        grid.addColumn(colMethodName, "Method");
+        grid.addColumn(colMethodName, new ResizableHeader<TraceRecordProxy>("Method", grid, colMethodName));
         grid.setColumnWidth(colMethodName, 100, Style.Unit.PCT);
 
 
         Column<TraceRecordProxy, TraceRecordProxy> colTime =
             new IdentityColumn<TraceRecordProxy>(METHOD_TIME_CELL);
-        grid.addColumn(colTime, "Time");
+        grid.addColumn(colTime, new ResizableHeader<TraceRecordProxy>("Time", grid, colTime));
         grid.setColumnWidth(colTime, 60, Style.Unit.PX);
 
 
         Column<TraceRecordProxy, TraceRecordProxy> colCalls =
             new IdentityColumn<TraceRecordProxy>(METHOD_CALLS_CELL);
-        grid.addColumn(colCalls, "Calls");
+        grid.addColumn(colCalls, new ResizableHeader<TraceRecordProxy>("Calls", grid, colCalls));
         grid.setColumnWidth(colCalls, 60, Style.Unit.PX);
 
 
         Column<TraceRecordProxy, TraceRecordProxy> colErrors =
             new IdentityColumn<TraceRecordProxy>(METHOD_ERRORS_CELL);
-        grid.addColumn(colErrors, "Errors");
+        grid.addColumn(colErrors, new ResizableHeader<TraceRecordProxy>("Errors", grid, colErrors));
         grid.setColumnWidth(colErrors, 60, Style.Unit.PX);
 
 
         Column<TraceRecordProxy, TraceRecordProxy> colPct =
             new IdentityColumn<TraceRecordProxy>(METHOD_PCT_CELL);
-        grid.addColumn(colPct, "Pct");
+        grid.addColumn(colPct, new ResizableHeader<TraceRecordProxy>("Pct", grid, colPct));
         grid.setColumnWidth(colPct, 60, Style.Unit.PX);
 
         rowBuilder = new TraceCallTableBuilder(grid, expandedDetails);
@@ -301,6 +303,21 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
         add(grid, new VerticalLayoutData(1, 1));
     }
 
+    private void createStatusBar() {
+        statusBar = new HorizontalPanel();
+        statusLabel = new Label("Loading ...");
+        statusBar.add(statusLabel);
+
+        HorizontalPanel hp = new HorizontalPanel();
+        hp.getElement().addClassName(Resources.INSTANCE.zicoCssResources().searchStatusBar());
+        statusBar.getElement().addClassName(Resources.INSTANCE.zicoCssResources().searchStatusBarInt());
+        hp.setWidth("100%");
+        HorizontalPanel spacer = new HorizontalPanel(); spacer.setWidth("100px"); hp.add(spacer);
+        hp.add(statusBar);
+
+        add(hp);
+
+    }
 
     private void createContextMenu() {
         contextMenu = new Menu();
@@ -371,10 +388,7 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
 
     private void loadData(final boolean recursive, final Runnable action) {
 
-        final PopupPanel popup = new PopupPanel();
-        popup.setPopupPosition(Window.getClientWidth()/2+100, Window.getClientHeight()*1/3);
-        popup.add(new Label("Loading data. Please wait ..."));
-        popup.show();
+        statusLabel.setText("Loading data. Please wait ...");
 
         if (recursive) {
             btnExpandAll.setEnabled(false);
@@ -391,14 +405,14 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
                     if (action != null) {
                         action.run();
                     }
-                    popup.hide();
+                    statusLabel.setText("Loaded " + response.size() + " records.");
                     if (response.size() > 1) {
                         grid.getRowElement(0).scrollIntoView();
                     }
                 }
                 @Override
                 public void onFailure(ServerFailure failure) {
-                    popup.hide();
+                    statusLabel.setText("Error loading trace data: " + failure.getMessage());
                     errorHandler.error("Error loading trace data", failure);
                 }
             });
@@ -536,6 +550,7 @@ public class TraceCallTreePanel extends VerticalLayoutContainer {
         if (rec.getChildren() > 0) {
             if (isExpanded(rec)) {
                 doCollapse(rec);
+                btnExpandAll.setEnabled(true);
             } else {
                 doExpand(rec);
             }

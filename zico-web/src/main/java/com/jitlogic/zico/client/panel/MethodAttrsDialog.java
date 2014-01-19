@@ -24,6 +24,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.ProvidesKey;
@@ -204,7 +205,7 @@ public class MethodAttrsDialog extends Dialog {
                 return attr[0];
             }
         };
-        attrGrid.addColumn(colAttribute);
+        attrGrid.addColumn(colAttribute, "Attribute");
         attrGrid.setColumnWidth(colAttribute, 100, Style.Unit.PCT);
 
         attrStore = new ListDataProvider<String[]>(KEY_PROVIDER);
@@ -222,13 +223,15 @@ public class MethodAttrsDialog extends Dialog {
         });
 
         container = new SplitLayoutPanel();
-        container.addStyleName(Resources.INSTANCE.zicoCssResources().whitePanel());
 
-        SimpleContainer sc = new SimpleContainer();
-        sc.add(attrGrid);
+        SimplePanel panel = new SimplePanel();
+        panel.addStyleName(Resources.INSTANCE.zicoCssResources().whitePanel());
+        panel.setSize("100%", "100%");
+        attrGrid.setSize("100%", "100%");
+        panel.add(attrGrid);
 
 
-        container.addWest(attrGrid, 200);
+        container.addWest(panel, 200);
 
         txtAttrVal = new TextArea();
         txtAttrVal.setReadOnly(true);

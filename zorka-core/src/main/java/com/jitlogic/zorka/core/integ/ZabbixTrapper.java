@@ -22,6 +22,7 @@ import com.jitlogic.zorka.core.util.*;
 
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.List;
 
 /**
  * Zabbix trapper sends traps to zabbix server.
@@ -125,23 +126,26 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
 
 
     @Override
-    protected void process(String msg) {
-        Socket socket = null;
-        try {
-            socket = new Socket(serverAddr, serverPort);
-            OutputStream os = socket.getOutputStream();
-            os.write(msg.getBytes());
-            os.flush();
-            AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SENT);
-        } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error sending packet", e);
-        } finally {
+    protected void process(List<String> msgs) {
+        for (String msg : msgs) {
+            Socket socket = null;
             try {
-                if (socket != null) {
-                    socket.close();
-                }
+                // TODO this really should be sent at once, not every message in separate connection
+                socket = new Socket(serverAddr, serverPort);
+                OutputStream os = socket.getOutputStream();
+                os.write(msg.getBytes());
+                os.flush();
+                AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SENT);
             } catch (Exception e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error closing zabbix trapper socket. Possible leak.", e);
+                log.error(ZorkaLogger.ZAG_ERRORS, "Error sending packet", e);
+            } finally {
+                try {
+                    if (socket != null) {
+                        socket.close();
+                    }
+                } catch (Exception e) {
+                    log.error(ZorkaLogger.ZAG_ERRORS, "Error closing zabbix trapper socket. Possible leak.", e);
+                }
             }
         }
     }

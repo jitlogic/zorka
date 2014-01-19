@@ -18,6 +18,7 @@ package com.jitlogic.zorka.common.test;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.common.zico.ZicoDataLoader;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -71,7 +72,7 @@ public class DataLoadingManualTest {
 
     private Set<String> VERBOTEN = ZorkaUtil.set(".", "..");
 
-    @Test
+    //@Test @Ignore
     public void testLoadMultipleDataFiles() throws Exception {
         File rootdir = new File("/tmp/traces");
         for (final String d : rootdir.list()) {

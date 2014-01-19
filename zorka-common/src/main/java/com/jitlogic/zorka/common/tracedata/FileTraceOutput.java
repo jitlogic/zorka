@@ -21,6 +21,7 @@ import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 
 import java.io.*;
+import java.util.List;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
@@ -98,9 +99,11 @@ public class FileTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
 
 
     @Override
-    protected void process(SymbolicRecord obj) {
+    protected void process(List<SymbolicRecord> objs) {
         try {
-            traceWriter.write(obj);
+            for (SymbolicRecord obj : objs) {
+                traceWriter.write(obj);
+            }
             stream.flush();
             if (fileStream.getChannel().position() >= maxFileSize) {
                 roll(); // TODO proper size limit control
