@@ -96,6 +96,12 @@ __http() {
 
   _errors = zorka.setCfg("http.error.codes");
 
+  _redirQualifier = zorka.hasCfg("http.redir.errors") ? 
+    spy.subchain(
+      spy.stringMatcher("REDIRECT", zorka.listCfg("http.redir.errors"), zorka.listCfg("")),
+      tracer.traceFlags("HTTP", tracer.SUBMIT_TRACE|tracer.ERROR_MARK)
+    ) : null;
+
   param_processor() {
 
       _pprefix = zorka.stringCfg("http.params.prefix");
