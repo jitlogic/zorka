@@ -43,7 +43,6 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.ProvidesKey;
@@ -89,8 +88,6 @@ import java.util.Set;
 
 public class TraceSearchPanel extends VerticalLayoutContainer {
 
-    public final static String RE_TIMESTAMP = "\\d{4}-\\d{2}-\\d{2}\\s*(\\d{2}:\\d{2}:\\d{2}(\\.\\d{1-3})?)?";
-
     private PanelFactory pf;
     private ZicoRequestFactory rf;
 
@@ -114,7 +111,8 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     private ToggleButton btnDeepSearch;
     private ToggleButton btnErrors;
     private ToggleButton btnReverse;
-    private ListBox cmbTraceType;
+    private TextButton btnTraceType;
+    private String strTraceType;
     private SpinnerField<Double> txtDuration;
     private ToggleButton btnEnableEql;
     private TextField txtFilter;
@@ -171,11 +169,15 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         btnReverse.setValue(true);
         toolBar.add(btnReverse);
 
-        cmbTraceType = new ListBox(false);
-        cmbTraceType.addItem("<all>");
-        toolBar.add(cmbTraceType);
+        btnTraceType = new TextButton();
+        btnTraceType.setIcon(Resources.INSTANCE.filterIcon());
+        btnTraceType.setToolTip("Filter by trace type");
+        btnTraceType.setMenu(new Menu());
+        toolBar.add(btnTraceType);
 
-        toolBar.add(new SeparatorToolItem());
+        SeparatorToolItem separator = new SeparatorToolItem();
+        separator.setWidth(10);
+        toolBar.add(separator);
 
         txtDuration = new SpinnerField<Double>(new NumberPropertyEditor.DoublePropertyEditor());
         txtDuration.setIncrement(1d);
@@ -245,7 +247,8 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
                 txtFilter.setText("");
                 txtDuration.setText("");
                 btnErrors.setValue(false);
-                cmbTraceType.setSelectedIndex(0);
+                strTraceType = null;
+                btnTraceType.setText("<all>");
 
                 refresh();
             }
@@ -429,7 +432,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         seqnum++;
         btnDeepSearch.setEnabled(!inSearch);
         btnErrors.setEnabled(!inSearch);
-        cmbTraceType.setEnabled(!inSearch);
+        btnTraceType.setEnabled(!inSearch);
         txtDuration.setEnabled(!inSearch);
         btnEnableEql.setEnabled(!inSearch);
         txtFilter.setEnabled(!inSearch);
@@ -509,8 +512,8 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
             q.setOffset(list.get(list.size()-1).getDataOffs());
         }
 
-        if (cmbTraceType.getSelectedIndex() != 0) {
-            q.setTraceName(cmbTraceType.getValue(cmbTraceType.getSelectedIndex()));
+        if (strTraceType != null) {
+            q.setTraceName(strTraceType);
         }
 
         if (txtFilter.getText() != null && txtFilter.getText().length() > 0) {
@@ -547,9 +550,32 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         rf.systemService().getTidMap(host.getName()).fire(new Receiver<List<SymbolProxy>>() {
             @Override
             public void onSuccess(List<SymbolProxy> response) {
-                for (SymbolProxy e : response) {
-                    cmbTraceType.addItem(e.getName());
+                Menu menu = new Menu();
+
+                MenuItem miAll = new MenuItem("<all>");
+                miAll.addSelectionHandler(new SelectionHandler<Item>() {
+                    @Override
+                    public void onSelection(SelectionEvent<Item> event) {
+                        strTraceType = null;
+                        refresh();
+                    }
+                });
+                menu.add(miAll);
+                menu.add(new SeparatorMenuItem());
+
+                for (final SymbolProxy e : response) {
+                    MenuItem item = new MenuItem(e.getName());
+                    item.addSelectionHandler(new SelectionHandler<Item>() {
+                        @Override
+                        public void onSelection(SelectionEvent<Item> event) {
+                            strTraceType = e.getName();
+                            refresh();
+                        }
+                    });
+                    menu.add(item);
                 }
+
+                btnTraceType.setMenu(menu);
             }
 
             @Override
