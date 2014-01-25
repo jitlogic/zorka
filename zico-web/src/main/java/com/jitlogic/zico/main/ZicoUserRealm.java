@@ -16,7 +16,6 @@
 package com.jitlogic.zico.main;
 
 
-import com.jitlogic.zico.core.UserCache;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Response;
 import org.mortbay.jetty.security.Credential;
@@ -27,7 +26,13 @@ import java.security.Principal;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ZicoUserRealm extends UserCache implements UserRealm, SSORealm {
+public class ZicoUserRealm implements UserRealm, SSORealm {
+
+    private static ZicoUserRealm instance;
+
+    public static ZicoUserRealm getInstance() {
+        return instance;
+    }
 
     private String name;
     private Map<String,ZicoUser> users;
@@ -35,7 +40,7 @@ public class ZicoUserRealm extends UserCache implements UserRealm, SSORealm {
 
     public ZicoUserRealm() {
         users = new ConcurrentHashMap<String, ZicoUser>();
-        UserCache.instance = this;
+        ZicoUserRealm.instance = this;
     }
 
 
@@ -123,13 +128,11 @@ public class ZicoUserRealm extends UserCache implements UserRealm, SSORealm {
     }
 
 
-    @Override
-    public void update(String username, String password, boolean isAdmin) {
+    public void update(String username, String password, Boolean isAdmin) {
         users.put(username, new ZicoUser(username, password, isAdmin));
     }
 
 
-    @Override
     public void remove(String username) {
         users.remove(username);
     }
