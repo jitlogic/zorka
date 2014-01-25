@@ -18,6 +18,7 @@ package com.jitlogic.zico.core;
 
 import com.google.web.bindery.requestfactory.shared.Locator;
 import com.jitlogic.zico.core.model.User;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,10 +52,17 @@ public class UserManager extends Locator<User, String> {
 
     private ZicoConfig config;
 
+    private UserCache userCache;
+
+    private boolean sumode;
 
     @Inject
     public UserManager(ZicoConfig config) {
         this.config = config;
+
+        userCache = UserCache.instance;
+
+        sumode = config.boolCfg("zico.su.mode", false);
 
         open();
     }
@@ -83,7 +91,6 @@ public class UserManager extends Locator<User, String> {
                     users.put(user.getUserName(), user);
                 }
                 db.commit();
-                rebuildUserProperties();
                 log.info("User DB import finished successfully.");
             } catch (IOException e) {
                 log.error("Cannot import user db from JSON data", e);
@@ -95,6 +102,20 @@ public class UserManager extends Locator<User, String> {
                 }
             }
         }
+
+        if (userCache != null) {
+            for (User user : users.values()) {
+                userCache.update(user.getUserName(), user.getPassword(), user.isAdmin());
+            }
+
+            if (sumode || users.size() == 0) {
+                log.info("SU mode enabled or user database is empty. Adding default 'admin' user with 'zico' password.");
+                userCache.update("admin", "zico", true);
+            }
+        } else {
+            log.error("Cannot initialize ZICO user realm. Logging in to collector will not be possible. Check jetty-web.xml for correctness.");
+        }
+
     }
 
 
@@ -173,33 +194,22 @@ public class UserManager extends Locator<User, String> {
 
     public void persist(User user) {
         users.put(user.getUserName(), user);
-        rebuildUserProperties();
         db.commit();
+
+        if (userCache != null) {
+            userCache.update(user.getUserName(), user.getPassword(), user.isAdmin());
+        }
     }
 
 
     public void remove(User user) {
-        users.remove(user.getUserName());
-        rebuildUserProperties();
-        db.commit();
-    }
 
-
-    private void rebuildUserProperties() {
-        File f = new File(config.getHomeDir(), "users.properties");
-        PrintWriter out = null;
-        try {
-            out = new PrintWriter(f);
-            for (User u : users.values()) {
-                out.println(u.getUserName() + ": " + u.getPassword() + ",VIEWER"
-                    + (u.hasFlag(User.ADMIN_USER) ? ",ADMIN" : ""));
-            }
-        } catch (IOException e) {
-            log.error("Cannot write users.properties file", e);
-        } finally {
-            if (out != null) {
-                out.close();
-            }
+        if (userCache != null) {
+            userCache.update(user.getUserName(), user.getPassword(), user.isAdmin());
         }
+
+        users.remove(user.getUserName());
+        db.commit();
+
     }
 }
