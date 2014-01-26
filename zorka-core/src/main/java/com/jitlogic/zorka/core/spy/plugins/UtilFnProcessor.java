@@ -28,9 +28,14 @@ public class UtilFnProcessor implements SpyProcessor {
     private final static ZorkaLog log = ZorkaLogger.getLog(UtilFnProcessor.class);
 
     public static final int UF_STRTIME = 1;
+    public static final int UF_STRCLOCK = 2;
 
     private int function;
     private String srcField, dstField;
+
+    public static UtilFnProcessor strClockFn(String dst, String src) {
+        return new UtilFnProcessor(UF_STRCLOCK, src, dst);
+    }
 
     public static UtilFnProcessor strTimeFn(String dst, String src) {
         return new UtilFnProcessor(UF_STRTIME, src, dst);
@@ -45,7 +50,7 @@ public class UtilFnProcessor implements SpyProcessor {
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
         switch (function) {
-            case UF_STRTIME:
+            case UF_STRTIME: {
                 Object t = record.get(srcField);
                 if (t instanceof Long) {
                     record.put(dstField, ZorkaUtil.strTime((Long) t));
@@ -53,6 +58,16 @@ public class UtilFnProcessor implements SpyProcessor {
                     log.error(ZorkaLogger.ZSP_ERRORS, "Cannot process value " + t + ": must be of type Long.");
                 }
                 break;
+            }
+            case UF_STRCLOCK: {
+                Object t = record.get(srcField);
+                if (t instanceof Long) {
+                    record.put(dstField, ZorkaUtil.strClock((Long) t));
+                } else {
+                    log.error(ZorkaLogger.ZSP_ERRORS, "Cannot process value " + t + ": must be of type Long.");
+                }
+                break;
+            }
             default:
                 log.error(ZorkaLogger.ZSP_ERRORS, "Invalid function id: " + function);
         }

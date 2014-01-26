@@ -1042,6 +1042,10 @@ public class SpyLib {
         return UtilFnProcessor.strTimeFn(dst, src);
     }
 
+    public SpyProcessor strClock(String dst, String src) {
+        return UtilFnProcessor.strClockFn(dst, src);
+    }
+
 
     public SpyProcessor and(SpyProcessor... processors) {
         return new LogicalFilterProcessor(LogicalFilterProcessor.FILTER_AND, processors);

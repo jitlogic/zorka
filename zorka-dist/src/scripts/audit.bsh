@@ -23,8 +23,8 @@ __audit() {
     zorka.defCfg("audit.tag", "zorka.audit");
 
     zorka.defCfg("audit.log.logins", zorka.boolCfg("audit"));
-    zorka.defCfg("audit.log.authorizations", "no");
-    zorka.defCfg("audit.log.other", "no");
+    zorka.defCfg("audit.log.authorizations", zorka.boolCfg("audit"));
+    zorka.defCfg("audit.log.other", zorka.boolCfg("audit"));
 
     zorka.defCfg("audit.stats", zorka.boolCfg("audit"));
     zorka.defCfg("audit.stats.mbean", "zorka:name=Audit,type=ZorkaStats");
