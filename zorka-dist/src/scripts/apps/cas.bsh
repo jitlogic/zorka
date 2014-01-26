@@ -36,7 +36,7 @@ __cas() {
   zorka.defCfg("cas.audit.file", zorka.boolCfg("cas.audit"));
   zorka.defCfg("cas.audit.file.path", util.path("${zorka.log.dir}", "cas_audit.log"));
   zorka.defCfg("cas.audit.syslog", "no");
-  zorka.defCfg("cas.audit.syslog.server", zorka.stringCfg("zorka.syslog.server"));
+  zorka.defCfg("cas.audit.syslog.addr", zorka.stringCfg("zorka.syslog.server"));
   zorka.defCfg("cas.audit.syslog.facility", syslog.F_AUDIT);
 
   zorka.defCfg("cas.audit.secure", "no");
@@ -66,7 +66,7 @@ __cas() {
 
 
   if (_audit_file) {
-    filePath = zorka.stringCfg("cas.audit.file.path", util.path(zorka.stringCfg("zorka.log.dir"), "cas_audit.cfg"));
+    filePath = zorka.stringCfg("cas.audit.file.path");
     zorka.logInfo("CAS Audit logs will be logged to local file: " + filePath);
     fileTrapper = zorka.dailyFileTrapper("cas.audit", zorka.INFO, filePath, false);
   }

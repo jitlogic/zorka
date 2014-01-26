@@ -80,13 +80,6 @@ public class UserManagementUnitTest extends ZicoFixture {
 
 
     @Test
-    public void testCreateUserAndCheckUsersPropertiesFile() {
-        userService.persist(mkUser("test", "Test User", "1qaz2wsx", User.ADMIN_USER, "host1", "host2", "host3", "host4"));
-
-        assertTrue("user.properties should exist", new File(config.getHomeDir(), "users.properties").exists());
-    }
-
-    @Test
     public void testChangeUserPasswordAsAdminAndThenAsOrdinaryUser() {
         userService.persist(mkUser("test", "Test User", "noPass", User.ADMIN_USER, "host1", "host2", "host3", "host4"));
         userService.resetPassword("test", null, "somePass");

@@ -33,9 +33,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,10 +52,27 @@ public class UserManager extends Locator<User, String> {
 
     private ZicoConfig config;
 
+    private Object userRealm;
+
+    private Method mUpdate, mRemove;
+
+    private boolean sumode;
 
     @Inject
     public UserManager(ZicoConfig config) {
         this.config = config;
+
+        try {
+            Class<?> clazz = Class.forName("com.jitlogic.zico.main.ZicoUserRealm");
+            Method getInstance = clazz.getDeclaredMethod("getInstance");
+            userRealm = getInstance.invoke(clazz);
+            mUpdate = clazz.getDeclaredMethod("update", String.class, String.class, Boolean.class);
+            mRemove = clazz.getDeclaredMethod("remove", String.class);
+        } catch (Exception e) {
+            log.warn("Cannot obtain reference to Jetty user realm: " + e.getMessage());
+        }
+
+        sumode = config.boolCfg("zico.su.mode", false);
 
         open();
     }
@@ -83,7 +101,6 @@ public class UserManager extends Locator<User, String> {
                     users.put(user.getUserName(), user);
                 }
                 db.commit();
-                rebuildUserProperties();
                 log.info("User DB import finished successfully.");
             } catch (IOException e) {
                 log.error("Cannot import user db from JSON data", e);
@@ -95,8 +112,31 @@ public class UserManager extends Locator<User, String> {
                 }
             }
         }
+
+        if (userRealm != null) {
+            for (User user : users.values()) {
+                updateRealm(user.getUserName(), user.getPassword(), user.isAdmin());
+            }
+
+            if (sumode || users.size() == 0) {
+                log.info("SU mode enabled or user database is empty. Adding default 'admin' user with 'zico' password.");
+                updateRealm("admin", "zico", true);
+            }
+        } else {
+            log.error("Cannot initialize ZICO user realm. Logging in to collector will not be possible. Check jetty-web.xml for correctness.");
+        }
+
     }
 
+    private void updateRealm(String username, String password, boolean isAdmin) {
+        if (userRealm != null && mUpdate != null) {
+            try {
+                mUpdate.invoke(userRealm, username, password, isAdmin);
+            } catch (Exception e) {
+                log.error("Cannot update user realm", e);
+            }
+        }
+    }
 
     public synchronized void close() {
         if (db != null) {
@@ -173,33 +213,22 @@ public class UserManager extends Locator<User, String> {
 
     public void persist(User user) {
         users.put(user.getUserName(), user);
-        rebuildUserProperties();
         db.commit();
+
+        updateRealm(user.getUserName(), user.getPassword(), user.isAdmin());
     }
 
 
     public void remove(User user) {
-        users.remove(user.getUserName());
-        rebuildUserProperties();
-        db.commit();
-    }
-
-
-    private void rebuildUserProperties() {
-        File f = new File(config.getHomeDir(), "users.properties");
-        PrintWriter out = null;
-        try {
-            out = new PrintWriter(f);
-            for (User u : users.values()) {
-                out.println(u.getUserName() + ": " + u.getPassword() + ",VIEWER"
-                    + (u.hasFlag(User.ADMIN_USER) ? ",ADMIN" : ""));
-            }
-        } catch (IOException e) {
-            log.error("Cannot write users.properties file", e);
-        } finally {
-            if (out != null) {
-                out.close();
+        if (userRealm != null && mRemove != null) {
+            try {
+                mRemove.invoke(userRealm, user.getUserName());
+            } catch (Exception e) {
+                log.error("Cannot remove user from realm", e);
             }
         }
+
+        users.remove(user.getUserName());
+        db.commit();
     }
 }

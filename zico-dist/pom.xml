@@ -44,8 +44,6 @@
                                       toDir="${project.build.outputDirectory}/zico-${project.version}"/>
                                 <copy file="src/zico.cmd"
                                       toDir="${project.build.outputDirectory}/zico-${project.version}"/>
-                                <copy file="src/users.properties"
-                                      toDir="${project.build.outputDirectory}/zico-${project.version}"/>
                                 <copy file="src/zico.init"
                                       toDir="${project.build.outputDirectory}/zico-${project.version}"/>
                                 <copy file="src/zico.default"
@@ -55,8 +53,6 @@
                                 <copy file="src/zico.conf"
                                       toDir="${project.build.outputDirectory}/zico-${project.version}"/>
                                 <copy file="src/templates.json"
-                                      toDir="${project.build.outputDirectory}/zico-${project.version}/conf"/>
-                                <copy file="src/users.json"
                                       toDir="${project.build.outputDirectory}/zico-${project.version}/conf"/>
                                 <copy file="src/zorka.properties"
                                       toDir="${project.build.outputDirectory}/zico-${project.version}"/>

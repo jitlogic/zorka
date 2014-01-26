@@ -68,6 +68,7 @@ __catalina() {
                 location = headers.getHeader("Location");
                 if (http._trace && location != null) {
                     tracer.newAttr("REDIRECT", location);
+                    rec.put("REDIRECT", location);
                 }
             }
 
@@ -115,6 +116,7 @@ __catalina() {
         http.error_marker(),
         http._trace ? tracer.flags(tracer.ERROR_MARK|tracer.SUBMIT_TRACE) : null,
         http._error ? spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format")) : null),
+        http._redirQualifier,
       http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
     .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
 

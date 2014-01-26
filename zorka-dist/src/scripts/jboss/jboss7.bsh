@@ -21,11 +21,13 @@ zorka.require(
     "javax.bsh",
     "jsf.bsh",
     "libs.bsh",
+    "audit.bsh",
     "apache/catalina.bsh",
     "apache/apache.bsh",
     "google/libs.bsh",
     "jboss/hibernate.bsh",
-    "jboss/weld.bsh"
+    "jboss/weld.bsh",
+    "jdbc/h2.bsh"
 );
 
 
@@ -193,17 +195,92 @@ __jboss7() {
 
 
   if (zorka.boolCfg("tracer")) {
-
-    tracer.exclude(
-        "100:org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate",
-        "org.jboss.modules.**",
-        "org.jboss.logging.**",
-        "org.jboss.logmanager.**",
-        "org.jboss.as.weld.webtier.jsf.**",
-        "org.jboss.vfs.**",
-        "org.jboss.modules.ConcurrentClassLoader");
-
+      tracer.exclude(
+          "100:org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate",
+          "org.jboss.modules.**",
+          "org.jboss.logging.**",
+          "org.jboss.logmanager.**",
+          "org.jboss.as.weld.webtier.jsf.**",
+          "org.jboss.vfs.**",
+          "org.jboss.modules.ConcurrentClassLoader");
   }
+
+
+  if (zorka.boolCfg("audit.log.logins")) {
+      sdefEjbLogin = spy.instrument("JBOSS7_AUDIT_EJB_LOGIN")
+        .onEnter(spy.fetchArg("CTX", 1))
+        .onReturn(spy.fetchRetVal("RET"),
+          spy.put("ACTION", "AUTHENTICATION_SUCCESS"),
+          spy.subchain(
+            spy.vcmp("PRINCIPAL", "==", null),
+            spy.put("ACTION", "AUTHENTICATION_FAILURE"),
+            spy.markError()))
+        .onError(
+          spy.put("ACTION", "AUTHENTICATION_FAILURE"),
+          spy.fetchError("ERROR"))
+        .include(
+          spy.byMethod("org.jboss.as.security.service.SimpleSecurityManager", "authenticate"));
+
+      audit.audit(sdefEjbLogin, "AUTHENTICATION", "${ACTION} result=${CTX.subjectInfo.authenticatedSubject|ERROR}");
+
+      sdefWebLogin = spy.instrument("JBOSS7_AUDIT_WEB_LOGIN")
+        .onEnter(spy.fetchArg("USERNAME", 1))
+        .onReturn(
+          spy.fetchRetVal("PRINCIPAL"),
+          spy.put("ACTION", "AUTHENTICATION_SUCCESS"),
+          spy.subchain(
+            spy.vcmp("PRINCIPAL", "==", null),
+            spy.put("ACTION", "AUTHENTICATION_FAILURE"),
+            spy.markError()))
+        .onError(
+          spy.put("ACTION", "AUTHENTICATION_FAILURE"),
+          spy.fetchError("ERROR"))
+        .include(
+          spy.byMethod("org.jboss.as.web.security.JBossWebRealm", "authenticate"),
+          spy.byMethod("org.jboss.as.web.deployment.mock.MemoryRealm", "authenticate"));
+
+      audit.audit(sdefWebLogin, "AUTHENTICATION", "${ACTION} who=${USERNAME} result=${PRINCIPAL|ERROR}");
+  }
+
+
+  if (zorka.boolCfg("audit.log.authorizations")) {
+      sdefEjbAuthorize = spy.instrument("JBOSS7_AUDIT_EJB_AUTHORIZE")
+        .onEnter(spy.fetchArg("THIS", 0),
+          spy.fetchArg("METHOD", 4),
+          spy.fetchArg("CTX_ID", 5))
+        .onReturn(
+          spy.fetchRetVal("RET"),
+          spy.put("ACTION", "AUTHORIZATION_SUCCESS"),
+          spy.subchain(
+            spy.vcmp("RET", "==", false),
+            spy.put("ACTION", "AUTHORIZATION_FAILURE"),
+            spy.markError()))
+        .onError(
+          spy.put("ACTION", "AUTHORIZATION_FAILURE"),
+          spy.fetchError("ERROR"))
+        .include(
+          spy.byMethod("org.jboss.as.security.service.SimpleSecurityManager", "authorize"));
+
+      audit.audit(sdefEjbAuthorize, "AUTHORIZATION",
+        "${ACTION} who=${THIS.callerPrincipal.name} type=EJB what=${METHOD.declaringClass.name}.${METHOD.name}() ctx=${CTX_ID}");
+
+      sdefWebAuthorize = spy.instrument("JBOSS7_AUDIT_WEB_AUTHORIZE")
+        .onEnter(spy.fetchArg("REQ", 1))
+        .onReturn(spy.fetchRetVal("RET"),
+          spy.put("ACTION", "AUTHORIZATION_SUCCESS"),
+          spy.subchain(
+            spy.vcmp("RET", "==", false),
+            spy.put("ACTION", "AUTHORIZATION_FAILURE"),
+            spy.markError()))
+        .onError(
+          spy.put("ACTION", "AUTHORIZATION_FAILURE"),
+          spy.fetchError("ERROR"))
+        .include(spy.byMethod("org.jboss.as.web.security.JBossWebRealm", "hasResourcePermission"));
+
+      audit.audit(sdefWebAuthorize, "AUTHORIZATION",
+        "${ACTION} who=${REQ.remoteUser} type=HTTP what=${REQ.requestURI}");
+  }
+
 
   return this;
 }
