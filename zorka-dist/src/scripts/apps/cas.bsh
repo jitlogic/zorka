@@ -66,7 +66,7 @@ __cas() {
 
 
   if (_audit_file) {
-    filePath = zorka.stringCfg("cas.audit.file.path", util.path(zorka.stringCfg("zorka.log.dir"), "cas_audit.cfg"));
+    filePath = zorka.stringCfg("cas.audit.file.path");
     zorka.logInfo("CAS Audit logs will be logged to local file: " + filePath);
     fileTrapper = zorka.dailyFileTrapper("cas.audit", zorka.INFO, filePath, false);
   }
