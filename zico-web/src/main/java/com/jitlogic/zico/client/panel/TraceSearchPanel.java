@@ -190,6 +190,16 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
         toolBar.add(txtDuration);
 
 
+        txtDuration.addKeyDownHandler(new KeyDownHandler() {
+            @Override
+            public void onKeyDown(KeyDownEvent event) {
+                if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+                    refresh();
+                }
+            }
+        });
+
+
         btnEnableEql = new ToggleButton();
         btnEnableEql.setIcon(Resources.INSTANCE.eqlIcon());
         btnEnableEql.setToolTip("EQL query (instead of full-text query)");
@@ -248,7 +258,6 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
                 txtDuration.setText("");
                 btnErrors.setValue(false);
                 strTraceType = null;
-                btnTraceType.setText("<all>");
 
                 refresh();
             }
