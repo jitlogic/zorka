@@ -60,15 +60,11 @@ __wls() {
         http._cookies ? http.cookies_processor(true, false) : null,
         http._headers ? http.headers_processor(true, true) : null
       ) : null,
-      http._slow ? spy.subchain(
-        spy.longerThan(zorka.longCfg("http.slow.time")),
-        spy.strTime("TIME"),
-        spy.trapperCollector(http.slow_ft, zorka.INFO, "HTTP", zorka.stringCfg("http.slow.format"))) : null,
+      http._slow_chain,
       http._error ? spy.subchain(
         spy.valSetFilter("STATUS", http._errors),
-        http.error_marker(),
-        http._trace ? tracer.flags(tracer.ERROR_MARK|tracer.SUBMIT_TRACE) : null,
-        spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format"))) : null,
+        spy.markError(),
+        http._error_chain) : null,
       http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
     .include(
       spy.byMethod(0, "weblogic.servlet.internal.WebAppServletContext", "execute", null)

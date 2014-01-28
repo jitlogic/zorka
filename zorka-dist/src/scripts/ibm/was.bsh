@@ -197,14 +197,11 @@ __was() {
         http._headers ? http.headers_processor(true, true) : null,
         http._cookies ? http.cookies_processor(true, true) : spy.put("COOKIES", "")
       ) : null,
-      http._slow ? spy.subchain(
-        spy.longerThan(zorka.longCfg("http.slow.time")),
-        spy.trapperCollector(http.slow_ft, zorka.INFO, "HTTP", zorka.stringCfg("http.slow.format"))) : null,
+      http._slow_chain,
       spy.subchain(
         spy.valSetFilter("STATUS", http._errors),
-        http._trace ? http.error_marker() : null,
-        http._trace ? tracer.flags(tracer.ERROR_MARK|tracer.SUBMIT_TRACE) : null,
-        spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format"))),
+        spy.markError(),
+        http._error_chain),
       http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
     .include(
       spy.byMethod("com.ibm.ws.webcontainer.servlet.CacheServletWrapper", "handleRequest"),
