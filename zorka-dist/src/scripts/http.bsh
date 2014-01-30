@@ -54,7 +54,7 @@ __http() {
   zorka.defCfg("http.headers.maxlen", "256");
 
   // Default values for HTTP slow requests log configuration options
-  zorka.defCfg("http.slow", "no");
+  zorka.defCfg("http.slow", zorka.boolCfg("traps.slow"));
   zorka.defCfg("http.slow.time", "5000");
   zorka.defCfg("http.slow.file.path", util.path("${zorka.log.dir}", "http-slow.log"));
   zorka.defCfg("http.slow.file.max", "8M");
@@ -62,7 +62,7 @@ __http() {
   zorka.defCfg("http.slow.format", "[${TIME}] ${URI}${PARAMS} -> ${STATUS}");
 
   // Default values for HTTP error log configuration options
-  zorka.defCfg("http.error", "no");
+  zorka.defCfg("http.error", zorka.boolCfg("traps.error"));
   zorka.defCfg("http.error.codes", "400,404,405,406,407,408,409,410,411,412,413,414,415,416,417,419,420,422,423,424,"
     + "425,426,428,429,431,444,451,500,501,502,503,504,505,506,507,508,510,598,599");
   zorka.defCfg("http.error.file.path", util.path("${zorka.log.dir}", "http-error.log"));
@@ -86,42 +86,8 @@ __http() {
 
   _errors = zorka.setCfg("http.error.codes");
 
-  _slow_chain = null;
-
-  if (zorka.boolCfg("http.slow")) {
-
-    _slow_file = zorka.boolCfg("traps.file") ? spy.trapperCollector(
-      zorka.rollingFileTrapper("http.slow", "INFO", zorka.stringCfg("http.slow.file.path"),
-          zorka.intCfg("http.slow.file.num"), zorka.kiloCfg("http.slow.file.max"), false),
-      zorka.INFO, "http.slow", zorka.stringCfg("http.slow.format")
-    ) : null;
-
-    _slow_zabbix = zorka.boolCfg("traps.zabbix") ? spy.trapperCollector(
-      zabbix.trapper("http.slow.zabbix", "${traps.zabbix.addr}", "${traps.zabbix.host}", "http.slow"),
-      zorka.ERROR, "http.slow", zorka.stringCfg("http.slow.format")
-    ) : null;
-
-    _slow_chain = spy.subchain(spy.longerThan(zorka.longCfg("http.slow.time")), _slow_file, _slow_zabbix);
-  }
-
-  _error_chain = null;
-
-  if (zorka.boolCfg("http.error")) {
-
-    _error_file = zorka.boolCfg("traps.file") ? spy.trapperCollector(
-      zorka.rollingFileTrapper("http.error", "INFO", zorka.stringCfg("http.error.file.path"),
-          zorka.intCfg("http.error.file.num"), zorka.kiloCfg("http.error.file.max"), false),
-      zorka.INFO, "http.error", zorka.stringCfg("http.error.format"), zorka.stringCfg("http.error.format"), "ERR"
-    ) : null;
-
-
-    _error_zabbix = zorka.boolCfg("traps.zabbix") ? spy.trapperCollector(
-      zabbix.trapper("http.error.zabbix", "${http.zabbix.addr}", "${http.zabbix.host}", "http.error"),
-      zorka.ERROR, "http.error", zorka.stringCfg("http.error.format"), zorka.stringCfg("http.error.format"), "ERR"
-    ) : null;
-
-    _error_chain = spy.subchain(_error_file, _error_zabbix);
-  }
+  _slow_chain = traps.subchain("http", "slow");
+  _error_chain = traps.subchain("http", "error");
 
   _redirQualifier = zorka.hasCfg("http.redir.errors") ? 
     spy.subchain(

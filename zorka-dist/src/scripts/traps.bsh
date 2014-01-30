@@ -17,8 +17,49 @@
 
 
 zorka.defCfg("traps", "yes");
+
+zorka.defCfg("traps.slow", "no");
+zorka.defCfg("traps.error", "no");
+
 zorka.defCfg("traps.file", "yes");
 
 zorka.defCfg("traps.zabbix", "no");
 zorka.defCfg("traps.zabbix.addr", zorka.stringCfg("zabbix.server.addr"));
 zorka.defCfg("traps.zabbix.host", zorka.getHostname());
+
+zorka.defCfg("traps.syslog", "no");
+zorka.defCfg("traps.syslog.addr", zorka.stringCfg("syslog.server.addr"));
+
+
+__traps() {
+
+  subchain(l, t) {
+    lt = l + "." + t;
+
+    if (zorka.boolCfg(lt)) {
+      _file_trapper = zorka.boolCfg("traps.file") ? spy.trapperCollector(
+        zorka.rollingFileTrapper(lt, "INFO",
+          zorka.stringCfg(lt+".file.path", util.path("${zorka.log.dir}", l+"-"+t+".log")),
+          zorka.intCfg(lt+".file.num"), zorka.kiloCfg(lt+".file.max"), false),
+        zorka.INFO, lt, zorka.stringCfg(lt+".format")
+      ) : null;
+
+      _zabbix_trapper = zorka.boolCfg("traps.zabbix") ? spy.trapperCollector(
+        zabbix.trapper(lt+".zabbix", "${traps.zabbix.addr}", "${traps.zabbix.host}", lt),
+          zorka.INFO, lt, zorka.stringCfg(lt+".format")
+        ) : null;
+
+      _chain = spy.subchain(
+        "slow".equals(t) ? spy.longerThan(zorka.longCfg(lt+".time")) : null,
+        _file_trapper, _zabbix_trapper);
+
+      return _chain;
+    }
+
+    return null;
+  }
+
+  return this;
+}
+
+traps = __traps();

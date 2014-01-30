@@ -81,7 +81,8 @@ __wls() {
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
           spy.fetchError("ERR"),
           spy.format("MSG", "${ERR.message}"),
-          ejb._error ? spy.trapperCollector(ejb.error_trapper, zorka.INFO, "EJB", zorka.stringCfg("ejb.error.format")) : null)
+          spy.strTime("TIME"),
+          ejb._error_chain)
       .onReturn(
           ejb._params ? spy.fetchRetVal("RET") : spy.put("RET", ""))
       .onSubmit(
@@ -91,7 +92,7 @@ __wls() {
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null,
           spy.longerThan(zorka.longCfg("ejb.slow.time")),
           spy.strTime("TIME"),
-          ejb._slow ? spy.trapperCollector(ejb.slow_trapper, zorka.INFO, "EJB", zorka.stringCfg("ejb.slow.format")) : null)
+          ejb._slow_chain)
       .include(
           spy.byMethod("org.jboss.interceptor.proxy.InterceptorMethodHandler", "invoke")
       ));
