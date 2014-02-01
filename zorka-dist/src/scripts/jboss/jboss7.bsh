@@ -22,6 +22,7 @@ zorka.require(
     "jsf.bsh",
     "libs.bsh",
     "audit.bsh",
+    "javax/jms.bsh",
     "apache/catalina.bsh",
     "apache/apache.bsh",
     "google/libs.bsh",

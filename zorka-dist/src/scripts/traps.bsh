@@ -21,7 +21,11 @@ zorka.defCfg("traps", "yes");
 zorka.defCfg("traps.slow", "no");
 zorka.defCfg("traps.error", "no");
 
+zorka.defCfg("traps.slow.time", "5000");
+
 zorka.defCfg("traps.file", "yes");
+zorka.defCfg("traps.file.max", "8M");
+zorka.defCfg("traps.file.num", "8");
 
 zorka.defCfg("traps.zabbix", "no");
 zorka.defCfg("traps.zabbix.addr", zorka.stringCfg("zabbix.server.addr"));
@@ -29,6 +33,8 @@ zorka.defCfg("traps.zabbix.host", zorka.getHostname());
 
 zorka.defCfg("traps.syslog", "no");
 zorka.defCfg("traps.syslog.addr", zorka.stringCfg("syslog.server.addr"));
+zorka.defCfg("traps.syslog.host", zorka.getHostname());
+zorka.defCfg("traps.syslog.facility", syslog.F_AUDIT);
 
 
 __traps() {
@@ -49,9 +55,14 @@ __traps() {
           zorka.INFO, lt, zorka.stringCfg(lt+".format")
         ) : null;
 
+      _syslog_trapper = zorka.boolCfg("traps.syslog") ? spy.trapperCollector(
+        syslog.trapper(lt+".syslog", "${traps.syslog.addr}", "${traps.syslog.host}", zorka.intCfg("traps.syslog.facility")),
+        zorka.INFO, lt, zorka.stringCfg(lt+".format")
+      ) : null;
+
       _chain = spy.subchain(
         "slow".equals(t) ? spy.longerThan(zorka.longCfg(lt+".time")) : null,
-        _file_trapper, _zabbix_trapper);
+        _file_trapper, _syslog_trapper, _zabbix_trapper);
 
       return _chain;
     }
