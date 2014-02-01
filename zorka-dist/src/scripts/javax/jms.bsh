@@ -1,0 +1,152 @@
+/**
+ * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+zorka.require("tracer.bsh", "traps.bsh");
+
+// Generic JMS monitoring
+
+__javax_jms() {
+
+  zorka.defCfg("jms", "yes");
+  zorka.defCfg("jms.generic", "yes");
+
+  zorka.defCfg("jms.stats", "yes");
+  zorka.defCfg("jms.stats.mbean", "zorka:type=ZorkaStats,name=JMS");
+
+  // Default values for JMS slow requests log configuration options
+  zorka.defCfg("jms.slow", zorka.boolCfg("traps.slow"));
+  zorka.defCfg("jms.slow.time", zorka.longCfg("traps.slow.time"));
+  zorka.defCfg("jms.slow.file.path", util.path("${zorka.log.dir}", "jms-slow.log"));
+  zorka.defCfg("jms.slow.file.max", "8M");
+  zorka.defCfg("jms.slow.file.num", "8");
+  zorka.defCfg("jms.slow.format", "[${TIME}] ${ID}");
+
+  // Default values for JMS error log configuration options
+  zorka.defCfg("jms.error", zorka.boolCfg("traps.error"));
+  zorka.defCfg("jms.error.file.path", util.path("${zorka.log.dir}", "jms-error.log"));
+  zorka.defCfg("jms.error.file.max", "8M");
+  zorka.defCfg("jms.error.file.num", "8");
+  zorka.defCfg("jms.error.format", "[${TIME}] ${ID} -> ${ERR}");
+
+  zorka.defCfg("jms.fetch.all", "no");
+  zorka.defCfg("jms.fetch.attrs", zorka.boolCfg("jms"));
+  zorka.defCfg("jms.fetch.text", zorka.boolCfg("jms.fetch.all"));
+  zorka.defCfg("jms.fetch.map", zorka.boolCfg("jms.fetch.all"));
+  zorka.defCfg("jms.fetch.map.prefix", "M_");
+  zorka.defCfg("jms.fetch.props", zorka.boolCfg("jms.fetch.all"));
+  zorka.defCfg("jms.fetch.props.prefix", "P_");
+
+  zorka.defCfg("jms.trace", zorka.boolCfg("tracer"));
+  zorka.defCfg("jms.trace.time", zorka.longCfg("tracer.min.trace.time"));
+
+  zorka.defCfg("jms.stats", "yes");
+  zorka.defCfg("jms.stats.mbean", "zorka:name=JMS,type=ZorkaStats");
+
+  _stats = zorka.boolCfg("jms.stats");
+  _trace = zorka.boolCfg("jms.trace");
+  _mapPrefix = zorka.stringCfg("jms.fetch.map.prefix");
+  _propPrefix = zorka.stringCfg("jms.fetch.props.prefix");
+
+  _slow_chain  = traps.subchain("jms", "slow");
+  _error_chain = traps.subchain("jms", "error");
+
+  if (zorka.boolCfg("jms")) {
+
+    _fetchAttrs = zorka.boolCfg("jms.fetch.attrs") ? spy.subchain(
+      spy.get("ID", "MSG", "JMSMessageID"), tracer.attr("ID", "ID"),
+      spy.get("TSTAMP", "MSG", "JMSTimestamp"), spy.strClock("TSTAMP", "TSTAMP"), tracer.attr("TSTAMP", "TSTAMP"),
+      spy.get("CORRELATION", "MSG", "JMSCorrelationID"), tracer.attr("CORRELATION", "CORRELATION"),
+      spy.get("PERSIST", "MSG", "JMSDeliveryMode"), tracer.attr("PERSIST", "PERSIST"),
+      spy.get("REDELIVERY", "MSG", "JMSRedelivered"), tracer.attr("REDELIVERY", "REDELIVERY"),
+      spy.get("JMSTYPE", "MSG", "JMSType"), tracer.attr("JMSTYPE", "JMSTYPE"),
+      spy.get("PRIORITY", "MSG", "JMSPriority"), tracer.attr("PRIORITY", "PRIORITY"),
+      spy.get("EXPIRATION", "MSG", "JMSExpiration"), tracer.attr("EXPIRATION", "EXPIRATION")
+    ) : null;
+
+    _fetchText = zorka.boolCfg("jms.fetch.text") ? spy.subchain(
+      spy.get("TEXT", "MSG", "text"), tracer.attr("TEXT", "TEXT")
+    ) : null;
+
+    _fetchMapProcessor() {
+      process(rec) {
+        names = rec.get("MAP_NAMES");
+        msg = rec.get("MSG");
+        if (names != null && msg != null) {
+          while (names.hasMoreElements()) {
+            name = names.nextElement();
+            tracer.newAttr(_mapPrefix+name, ""+msg.getObject(name));
+          }
+        }
+        return rec;
+      }
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+    }
+
+    _fetchMap = zorka.boolCfg("jms.fetch.map") ? spy.subchain(
+      spy.get("MAP_NAMES", "MSG", "mapNames"),
+      spy.vcmp("MAP_NAMES", "!=", null),
+      _fetchMapProcessor()
+    ) : null;
+
+    _fetchPropsProcessor() {
+      process(rec) {
+        msg = rec.get("MSG");
+        if (msg != null) {
+          names = msg.getPropertyNames();
+          while (names.hasMoreElements()) {
+            name = names.nextElement();
+            tracer.newAttr(_propPrefix+name, ""+msg.getObjectProperty(name));
+          }
+        }
+        return rec;
+      }
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+    }
+
+    _fetchProps = zorka.boolCfg("jms.fetch.props") ? _fetchPropsProcessor() : null;
+
+    if (zorka.boolCfg("jms.generic")) {
+      spy.add(spy.instrument("JAVAX_JMS_LISTENER")
+        .onEnter(spy.fetchArg("MSG", 1),
+          zorka.boolCfg("jms.trace") ? tracer.begin("JMS", zorka.longCfg("jms.trace.time")) : null,
+          _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
+        .onError(spy.fetchError("ERR"), spy.strTime("TIME"), _error_chain, spy.markError())
+        .onSubmit(spy.strTime("TIME"), _slow_chain,
+          zorka.boolCfg("jms.stats") ? spy.zorkaStats("java", zorka.stringCfg("jms.stats.mbean"), "handled", "ALL") : null)
+        .include(spy.byInterfaceAndMethod(0, "javax.jms.MessageListener", "onMessage", "void", "javax.jms.Message")));
+
+      spy.add(spy.instrument("JAVAX_JMS_PRODUCER1")
+        .onEnter(spy.fetchArg("MSG", 1), _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
+        .onSubmit(zorka.boolCfg("jms.stats") ? spy.zorkaStats("java", zorka.stringCfg("jms.stats.mbean"), "sent", "ALL") : null)
+        .include(spy.byInterfaceAndMethod(0, "javax.jms.MessageProducer", "send", "void", "javax.jms.Message")));
+
+      spy.add(spy.instrument("JAVAX_JMS_PRODUCER2")
+        .onEnter(spy.fetchArg("MSG", 2), _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
+        .onSubmit(zorka.boolCfg("jms.stats") ? spy.zorkaStats("java", zorka.stringCfg("jms.stats.mbean"), "sent", "ALL") : null)
+        .include(spy.byInterfaceAndMethod(0, "javax.jms.MessageProducer", "send", "void", "javax.jms.Destination", "javax.jms.Message")));
+
+      spy.add(spy.instrument("JAVAX_JMX_CONSUMER")
+        .onReturn(spy.fetchRetVal("MSG"), _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
+        .onSubmit(zorka.boolCfg("jms.stats") ? spy.zorkaStats("java", zorka.stringCfg("jms.stats.mbean"), "received", "ALL") : null)
+        .include(spy.byInterfaceAndMethod(0, "javax.jms.MessageConsumer", "~receive.*", "javax.jms.Message")));
+    }
+  }
+
+  return this;
+}
+
+javax_jms = __javax_jms();

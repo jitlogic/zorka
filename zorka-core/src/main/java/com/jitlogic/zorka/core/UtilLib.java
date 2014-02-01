@@ -20,6 +20,7 @@ import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.StringMatcher;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -82,6 +83,11 @@ public class UtilLib {
 
     public String strTime(long ns) {
         return ZorkaUtil.strTime(ns);
+    }
+
+
+    public String strClock(long clock) {
+        return ZorkaUtil.strClock(clock);
     }
 
 

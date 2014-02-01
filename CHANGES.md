@@ -1,9 +1,12 @@
-Zorka 0.9.16 (2014-02-03)
+Zorka 0.9.16 (2014-02-01)
 -------------------------
 
  * fixes for agent operating in Windows env (paths, log buffering etc.);
  * various collector / UI fixes;
- *
+ * JMS monitoring support;
+ * file/zabbix/syslog trappers for EJB/HTTP/SQL/JMS slow/error query logs;
+ * rudimentary application auditing framework (only JBoss7 supported at the moment);
+
 
 Zorka 0.9.15 (2014-01-15)
 -------------------------
@@ -227,3 +230,5 @@ Zorka 0.1 (2012-09-19)
  * zabbix integration;
  * basic functions for accessing JMX data;
  * rudimentary instrumentation engine (ZorkaSpy);
+
+

@@ -22,6 +22,7 @@ zorka.require(
   "http.bsh",
   "javax.bsh",
   "libs.bsh",
+  "javax/jms.bsh",
   "apache/apache.bsh",
   "eclipse/eclipse.bsh"
 );
@@ -197,14 +198,11 @@ __was() {
         http._headers ? http.headers_processor(true, true) : null,
         http._cookies ? http.cookies_processor(true, true) : spy.put("COOKIES", "")
       ) : null,
-      http._slow ? spy.subchain(
-        spy.longerThan(zorka.longCfg("http.slow.time")),
-        spy.trapperCollector(http.slow_ft, zorka.INFO, "HTTP", zorka.stringCfg("http.slow.format"))) : null,
+      http._slow_chain,
       spy.subchain(
         spy.valSetFilter("STATUS", http._errors),
-        http._trace ? http.error_marker() : null,
-        http._trace ? tracer.flags(tracer.ERROR_MARK|tracer.SUBMIT_TRACE) : null,
-        spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format"))),
+        spy.markError(),
+        http._error_chain),
       http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
     .include(
       spy.byMethod("com.ibm.ws.webcontainer.servlet.CacheServletWrapper", "handleRequest"),
@@ -223,7 +221,8 @@ __was() {
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
           spy.fetchError("ERR"),
           spy.format("MSG", "${ERR.message}"),
-          ejb._error ? spy.trapperCollector(ejb.error_trapper, zorka.INFO, "EJB", zorka.stringCfg("ejb.error.format")) : null)
+          spy.strTime("TIME"),
+          ejb._error_chain)
       .onReturn(
           ejb._params ? spy.fetchRetVal("RET") : spy.put("RET", ""))
       .onSubmit(
@@ -233,7 +232,7 @@ __was() {
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null,
           spy.longerThan(zorka.longCfg("ejb.slow.time")),
           spy.strTime("TIME"),
-          ejb._slow ? spy.trapperCollector(ejb.slow_trapper, zorka.INFO, "EJB", zorka.stringCfg("ejb.slow.format")) : null)
+          ejb._slow_chain)
       .include(
           spy.byMethod("com.ibm.ejs.container.EJSContainer", "invokeProceed")
       ));

@@ -763,6 +763,10 @@ public class ZorkaUtil {
     }
 
 
+    public static String strClock(long clock) {
+        return new Date(clock).toString();
+    }
+
     public static String strTime(long ns) {
         double t = 1.0 * ns / 1000000.0;
         String u = "ms";

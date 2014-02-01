@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("tracer.bsh");
+zorka.require("tracer.bsh", "traps.bsh");
 
 __ejb() {
 
@@ -40,7 +40,6 @@ __ejb() {
   // Default values for EJB slow calls log configuration options
   zorka.defCfg("ejb.slow", "no");
   zorka.defCfg("ejb.slow.time", "1000");
-  zorka.defCfg("ejb.slow.file", zorka.boolCfg("ejb.slow", false));
   zorka.defCfg("ejb.slow.file.path", util.path("${zorka.log.dir}", "ejb-slow.log"));
   zorka.defCfg("ejb.slow.file.max", "8M");
   zorka.defCfg("ejb.slow.file.num", "8");
@@ -48,7 +47,6 @@ __ejb() {
 
   // Default values for EJB error log configuration options
   zorka.defCfg("ejb.error", "no");
-  zorka.defCfg("ejb.error.file", zorka.boolCfg("ejb.error", false));
   zorka.defCfg("ejb.error.file.path", util.path("${zorka.log.dir}", "ejb-error.log"));
   zorka.defCfg("ejb.error.file.max", "8M");
   zorka.defCfg("ejb.error.file.num", "8");
@@ -65,16 +63,8 @@ __ejb() {
   _paramsMatcher = util.stringMatcher(zorka.listCfg("ejb.params.include"), zorka.listCfg("ejb.params.exclude"));
   _paramsPrefix = zorka.stringCfg("ejb.params.prefix");
 
-  slow_trapper = zorka.boolCfg("ejb.slow.file")
-    ? zorka.rollingFileTrapper("ejb.slow", "INFO", zorka.stringCfg("ejb.slow.file.path"),
-              zorka.intCfg("ejb.slow.file.num"), zorka.kiloCfg("ejb.slow.file.max"), false)
-    : null;
-
-  error_trapper = zorka.boolCfg("ejb.error.file")
-    ? zorka.rollingFileTrapper("ejb.error", "INFO", zorka.stringCfg("ejb.error.file.path"),
-                             zorka.intCfg("ejb.error.file.num"), zorka.kiloCfg("ejb.error.file.max"), false)
-    : null;
-
+  _slow_chain = traps.subchain("ejb", "slow");
+  _error_chain = traps.subchain("ejb", "error");
 
   // Set of types allowed to convert to string by parameter processing
   // This is for safety purposes: calling toString() on some objects may have

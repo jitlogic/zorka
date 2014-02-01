@@ -92,6 +92,7 @@ __catalina() {
     .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),
       http._trace ? spy.subchain(
         http._uriQualifier,
+        http._error_chain,
         tracer.flags(tracer.SUBMIT_TRACE),
         tracer.attr("ERR", "ERR")
         ) : null)
@@ -108,15 +109,12 @@ __catalina() {
         http._headers ? headers_processor() : null,
         http._params ? http.param_processor() : spy.put("PARAMS", "")
       ) : null,
-      http._slow ? spy.subchain(
-        spy.longerThan(zorka.longCfg("http.slow.time")),
-        spy.trapperCollector(http.slow_ft, zorka.INFO, "HTTP", zorka.stringCfg("http.slow.format"))) : null,
+      http._slow_chain,
       spy.subchain(
         spy.valSetFilter("STATUS", http._errors),
-        http.error_marker(),
-        http._trace ? tracer.flags(tracer.ERROR_MARK|tracer.SUBMIT_TRACE) : null,
-        http._error ? spy.trapperCollector(http.error_ft, zorka.ERROR, "HTTP", zorka.stringCfg("http.error.format")) : null),
-        http._redirQualifier,
+        spy.markError(),
+        http._error_chain),
+      http._redirQualifier,
       http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
     .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
 

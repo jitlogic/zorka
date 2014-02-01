@@ -20,57 +20,41 @@ __audit() {
 
     zorka.defCfg("audit", "no");
     zorka.defCfg("audit.secure", "no");
-    zorka.defCfg("audit.tag", "zorka.audit");
 
     zorka.defCfg("audit.log.logins", zorka.boolCfg("audit"));
-    zorka.defCfg("audit.log.authorizations", "no");
-    zorka.defCfg("audit.log.other", "no");
+    zorka.defCfg("audit.log.authorizations", zorka.boolCfg("audit"));
+    zorka.defCfg("audit.log.other", zorka.boolCfg("audit"));
 
     zorka.defCfg("audit.stats", zorka.boolCfg("audit"));
     zorka.defCfg("audit.stats.mbean", "zorka:name=Audit,type=ZorkaStats");
 
-    zorka.defCfg("audit.file", zorka.boolCfg("audit"));
     zorka.defCfg("audit.file.path", util.path("${zorka.log.dir}", "audit.log"));
 
-    zorka.defCfg("audit.syslog", "no");
-    zorka.defCfg("audit.syslog.server.addr", zorka.stringCfg("zorka.syslog.server"));
     zorka.defCfg("audit.syslog.facility", syslog.F_AUDIT);
-
-    zorka.defCfg("audit.zabbix", "no");
-    zorka.defCfg("audit.zabbix.host", zorka.getHostname());
-    zorka.defCfg("audit.zabbix.server.addr", zorka.stringCfg("zabbix.server.addr"));
 
     _stats = zorka.boolCfg("audit.stats");
     _mbean = zorka.stringCfg("audit.stats.mbean");
 
     _audit = zorka.boolCfg("audit");
-    _audit_file = _audit && zorka.boolCfg("audit.file");
-    _audit_syslog = _audit && zorka.boolCfg("audit.syslog");
-    _audit_zabbix = _audit && zorka.boolCfg("audit.zabbix");
-
-    _audit_tag = zorka.stringCfg("audit.tag");
-
-    zorka.logInfo("Audit tag = " + _audit_tag);
 
 
-    if (_audit_file) {
+    if (_audit && zorka.boolCfg("traps.file")) {
         filePath = zorka.stringCfg("audit.file.path");
         zorka.logInfo("Audit logs will be logged to local file: " + filePath);
         fileTrapper = zorka.dailyFileTrapper("audit", zorka.INFO, filePath, false);
     }
 
 
-    if (_audit_syslog) {
-        syslogAddr = zorka.stringCfg("audit.syslog.server.addr");
+    if (_audit && zorka.boolCfg("traps.syslog")) {
+        syslogAddr = zorka.stringCfg("traps.syslog.addr");
         syslogTrapper = syslog.trapper("audit", syslogAddr, zorka.getHostname(), syslog.F_AUDIT);
         zorka.logInfo("Audit logs will be sent to remote syslog server: " + syslogAddr);
     }
 
 
-    if (_audit_zabbix) {
-        zabbixTrapper = zabbix.trapper("audit", "${audit.zabbix.server.addr}", "${audit.zabbix.host}", _audit_tag);
-        zorka.logInfo("CAS Audit logs will be sent to zabbix server: "
-            + zorka.formatCfg("${audit.zabbix.server.addr}/${audit.zabbix.host}"));
+    if (_audit && zorka.boolCfg("traps.zabbix")) {
+        zabbixTrapper = zabbix.trapper("audit", "${traps.zabbix.addr}", "${traps.zabbix.host}", "zorka.audit");
+        zorka.logInfo("Audit logs will be sent to zabbix server.");
     }
 
 
@@ -78,16 +62,16 @@ __audit() {
 
         sdef = sdef.onSubmit(spy.strTime("TIME"));
 
-        if (_audit_file) {
-            sdef = sdef.onSubmit(spy.trapperCollector(fileTrapper, zorka.INFO, _audit_tag, expr));
+        if (_audit && zorka.boolCfg("traps.file")) {
+            sdef = sdef.onSubmit(spy.trapperCollector(fileTrapper, zorka.INFO, "zorka.audit", expr));
         }
 
-        if (_audit_syslog) {
-            sdef = sdef.onSubmit(spy.trapperCollector(syslogTrapper, zorka.INFO, _audit_tag, expr));
+        if (_audit && zorka.boolCfg("traps.syslog")) {
+            sdef = sdef.onSubmit(spy.trapperCollector(syslogTrapper, zorka.INFO, "zorka.audit", expr));
         }
 
-        if (_audit_zabbix) {
-            sdef = sdef.onSubmit(spy.trapperCollector(zabbixTrapper, zorka.INFO, _audit_tag, expr));
+        if (_audit && zorka.boolCfg("traps.zabbix")) {
+            sdef = sdef.onSubmit(spy.trapperCollector(zabbixTrapper, zorka.INFO, "zorka.audit", expr));
         }
 
         if(_stats) {

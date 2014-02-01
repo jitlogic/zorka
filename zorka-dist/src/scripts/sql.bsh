@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("tracer.bsh");
+zorka.require("tracer.bsh", "traps.bsh");
 
 __sql() {
 
@@ -30,46 +30,46 @@ __sql() {
   zorka.defCfg("sql.params", "no");
 
   // Default values for SQL slow requests log configuration options
-  zorka.defCfg("sql.slow", "no");
+  zorka.defCfg("sql.slow", zorka.boolCfg("traps.slow"));
   zorka.defCfg("sql.slow.time", "5000");
-  zorka.defCfg("sql.slow.file", zorka.boolCfg("sql.slow"));
   zorka.defCfg("sql.slow.file.path", util.path("${zorka.log.dir}", "sql-slow.log"));
   zorka.defCfg("sql.slow.file.max", "8M");
   zorka.defCfg("sql.slow.file.num", "8");
   zorka.defCfg("sql.slow.format", "[${TIME}] ${DB}: ${SQL}");
 
   // Default values for SQL error log configuration options
-  zorka.defCfg("sql.error", "no");
-  zorka.defCfg("sql.error.file", zorka.boolCfg("sql.error"));
+  zorka.defCfg("sql.error", zorka.boolCfg("traps.error"));
   zorka.defCfg("sql.error.file.path", util.path("${zorka.log.dir}", "sql-error.log"));
   zorka.defCfg("sql.error.file.max", "8M");
   zorka.defCfg("sql.error.file.num", "8");
   zorka.defCfg("sql.error.format", "[${TIME}] ${DB}: ${SQL} -> ${ERR}");
 
-  // Default values for SQL tracer options 
+  // Default values for SQL tracer options
   zorka.defCfg("sql.trace", zorka.stringCfg("tracer"));
   zorka.defCfg("sql.trace.time", zorka.longCfg("tracer.min.trace.time"));
 
   _trace = zorka.boolCfg("sql.trace");
-  _stats = zorka.boolCfg("sql.stats");
   _congestion = zorka.boolCfg("sql.stats.congestion");
   _mbean = zorka.stringCfg("sql.stats.mbean");
   _action = _congestion ? spy.ACTION_EXIT|spy.ACTION_STATS : spy.ACTION_STATS;
-  _slow = zorka.boolCfg("sql.slow");
-  _slowF = _slow && zorka.boolCfg("sql.slow.file");
   _params = zorka.boolCfg("sql.params");
   _prefix = zorka.stringCfg("sql.trace.params.prefix");
   _error = zorka.boolCfg("sql.error");
-  _errorF = zorka.boolCfg("sql.error.file");
   _excludedParams = zorka.setCfg("sql.params.exclude");
 
-  slow_ft = _slowF ? zorka.rollingFileTrapper("sql.slow", "INFO", zorka.stringCfg("sql.slow.file.path"),
-                     zorka.intCfg("sql.slow.file.num"), zorka.kiloCfg("sql.slow.file.max"), false) : null;
-
-  error_ft = _errorF ? zorka.rollingFileTrapper("sql.error", "INFO", zorka.stringCfg("sql.error.file.path"),
-                       zorka.intCfg("sql.error.file.num"), zorka.kiloCfg("sql.error.file.max"), false) : null;
-
   _errors = zorka.setCfg("sql.error.codes");
+
+  _slow_chain = traps.subchain("sql", "slow");
+  _error_chain = traps.subchain("sql", "error");
+
+  _stats_chain = null;
+
+  if (zorka.boolCfg("sql.stats")) {
+    _stats_chain = spy.subchain(
+        spy.zorkaStats("java", _mbean, "stats", "ALL"),
+        spy.zorkaStats("java", _mbean, "stats", "${DB}")
+      );
+  }
 
 
   discovery(attr, tag) {
@@ -103,6 +103,7 @@ __sql() {
     return zorka.rate("java", _mbean, attr, tag, "time", "calls", "AVG15");
   }
 
+
   _instrumentStmt(name, dbform) {
     return spy.instrument(name)
     .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("SQL", 1),
@@ -112,19 +113,10 @@ __sql() {
         tracer.attr("SQL", "SQL"),
         tracer.attr("DB", "DB")
       ) : null)
-    .onError(spy.fetchError("ERR"),
-      _trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
-      _error ? spy.trapperCollector(error_ft, zorka.ERROR, "SQL", zorka.stringCfg("sql.error.format"), zorka.stringCfg("sql.error.format"), "ERR") : null)
-    .onSubmit(spy.strTime("TIME"),
-      _slow ? spy.subchain(
-        spy.longerThan(zorka.longCfg("sql.slow.time")),
-        spy.trapperCollector(slow_ft, zorka.INFO, "SQL", zorka.stringCfg("sql.slow.format"))
-      ) : null,
-      _stats ? spy.subchain(
-        spy.zorkaStats("java", _mbean, "stats", "ALL"),
-        spy.zorkaStats("java", _mbean, "stats", "${DB}")
-      ) : null);
+    .onError(spy.fetchError("ERR"), _trace ? tracer.flags(tracer.SUBMIT_TRACE) : null, _error_chain)
+    .onSubmit(spy.strTime("TIME"), _slow_chain, _stats_chain);
   }
+
 
   _instrumentPStmt(name, dbform, sqlform) {
     return spy.instrument(name)
@@ -136,18 +128,8 @@ __sql() {
         tracer.attr("SQL", "SQL"),
         tracer.attr("DB", "DB")
       ) : null)
-    .onError(spy.fetchError("ERR"),
-      _trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
-      _error ? spy.trapperCollector(error_ft, zorka.ERROR, "SQL", zorka.stringCfg("sql.error.format"), zorka.stringCfg("sql.error.format"), "ERR") : null)
-    .onSubmit(spy.strTime("TIME"),
-      _slow ? spy.subchain(
-        spy.longerThan(zorka.longCfg("sql.slow.time")),
-        spy.trapperCollector(slow_ft, zorka.INFO, "SQL", zorka.stringCfg("sql.slow.format"))
-      ) : null,
-      _stats ? spy.subchain(
-        spy.zorkaStats("java", _mbean, "stats", "ALL"),
-        spy.zorkaStats("java", _mbean, "stats", "${DB}")
-      ) : null);
+    .onError(spy.fetchError("ERR"), _trace ? tracer.flags(tracer.SUBMIT_TRACE) : null, _error_chain)
+    .onSubmit(spy.strTime("TIME"), _slow_chain, _stats_chain);
   }
 
   return this;

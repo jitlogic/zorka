@@ -25,6 +25,7 @@ zorka.require(
     "apache/catalina.bsh",
     "jboss/hibernate.bsh",
     "jboss/jbossejb.bsh",
+    "javax/jms.bsh",
     "jboss/seam.bsh"
 );
 
