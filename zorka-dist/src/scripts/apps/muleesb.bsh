@@ -21,7 +21,7 @@ zorka.require(
   "libs.bsh",
   "tracer.bsh",
   "apache/apache.bsh",
-  "spring/spring.bsh"
+  "spring.bsh"
 );
 
 __muleesb() {

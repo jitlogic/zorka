@@ -24,8 +24,7 @@ zorka.require(
   "ldap.bsh",
   "tracer.bsh",
   "jboss/hibernate.bsh",
-  "spring/spring.bsh",
-  "spring/webflow.bsh"
+  "spring.bsh"
 );
 
 __cas() {
