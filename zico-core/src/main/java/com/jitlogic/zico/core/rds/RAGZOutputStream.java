@@ -169,10 +169,11 @@ public class RAGZOutputStream extends OutputStream {
                 RAGZSegment segment = segments.get(segments.size() - 1);
                 if (segment.getPhysicalLen() < 3) { // Empty segment has exactly 2 bytes (resulting from compression)
                     outFile.setLength(segment.getPhysicalPos());
-                    outFile.seek(segment.getPhysicalPos());
+                    outFile.seek(segment.getPhysicalPos()-4);    // Segment length needs to be zeroed
+                    outFile.write(fromUIntBE(0));
                     curSegStart = segment.getPhysicalPos() - 20;
                     curSegSize = 0;
-                    // there is no need to write a header
+
                     deflater = new Deflater(6, true);
                     crc = new CRC32();
                     logicalLength = segment.getLogicalPos() + curSegSize;

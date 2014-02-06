@@ -417,6 +417,23 @@ public class RAGZUnitTest extends ZicoFixture {
         o = RAGZOutputStream.toFile(path);
         RAGZInputStream i = RAGZInputStream.fromFile(path);
         assertEquals(0, i.available());
+        o.close();
+    }
+
+
+    @Test
+    public void testInputRgzTriesToReadFileTruncatedAndAppendedByOutputRgz() throws Exception {
+        String path = tmpFile("test.gz");
+        RAGZOutputStream o = RAGZOutputStream.toFile(path);
+        o.close();
+
+        RandomAccessFile f = new RandomAccessFile(path, "rw");
+        o = new RAGZOutputStream(f, 4096);
+        o.write("EFGH0n9482ch0897yhn98(*&BT987hn&*(^RTFGB&*JM907hnRFB67v*&GJMNH98&HB9V78ER76tu(jiohioNHYfvudBIJK:o(k_)ujh(rfgVTCRd7^".getBytes());
+        f.close();
+
+        RAGZInputStream is = RAGZInputStream.fromFile(path);
+        is.close();
     }
 
 
