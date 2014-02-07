@@ -189,6 +189,16 @@ public class SpyDefinition {
         return sdef;
     }
 
+    public SpyDefinition include(String...mdefs) {
+        SpyMatcher[] matchers = new SpyMatcher[mdefs.length];
+
+        for (int i = 0; i < mdefs.length; i++) {
+            matchers[i] = SpyMatcher.fromString(mdefs[i]);
+        }
+
+        return include(matchers);
+    }
+
 
     /**
      * Declares which arguments should be fetched by instrumenting code.
