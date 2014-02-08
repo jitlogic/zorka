@@ -11,5 +11,7 @@
   "10":{"template":"${URI} -> ${REDIRECT}","id":10,"flags":0,"order":109,"condition":"trace = 'HTTP' and REDIRECT != null"},
   "11":{"template":"${CAS_URI} -> ${USERNAME}","id":11,"flags":0,"order":400,"condition":"trace = 'CASCLI'"},
   "12":{"template":"${ACTION} ${SERVICE: } ${WHO: } ","id":12,"flags":0,"order":400,"condition":"trace = 'CAS'"},
-  "13":{"template":"[${NAME}] ${FILTER}","id":13,"flags":0,"order":150,"condition":"trace = 'LDAP'"}
+  "13":{"template":"[${NAME}] ${FILTER}","id":13,"flags":0,"order":150,"condition":"trace = 'LDAP'"},
+  "14":{"template":"[${JMSTYPE: (untyped)}] ${ID}","id":1001,"flags":0,"order":120,"condition":"trace = 'JMS'"},
+  "15":{"template":"[${SCHEDULED_FIRE_TIME}] ${NAME} (${GROUP: })","id":1002,"flags":0,"order":160,"condition":"trace = 'QUARTZ'"}
 }
