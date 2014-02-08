@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -24,8 +24,7 @@ zorka.require(
   "ldap.bsh",
   "tracer.bsh",
   "jboss/hibernate.bsh",
-  "spring/spring.bsh",
-  "spring/webflow.bsh"
+  "spring.bsh"
 );
 
 __cas() {

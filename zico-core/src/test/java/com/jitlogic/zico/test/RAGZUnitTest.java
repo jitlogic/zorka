@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -417,6 +417,23 @@ public class RAGZUnitTest extends ZicoFixture {
         o = RAGZOutputStream.toFile(path);
         RAGZInputStream i = RAGZInputStream.fromFile(path);
         assertEquals(0, i.available());
+        o.close();
+    }
+
+
+    @Test
+    public void testInputRgzTriesToReadFileTruncatedAndAppendedByOutputRgz() throws Exception {
+        String path = tmpFile("test.gz");
+        RAGZOutputStream o = RAGZOutputStream.toFile(path);
+        o.close();
+
+        RandomAccessFile f = new RandomAccessFile(path, "rw");
+        o = new RAGZOutputStream(f, 4096);
+        o.write("EFGH0n9482ch0897yhn98(*&BT987hn&*(^RTFGB&*JM907hnRFB67v*&GJMNH98&HB9V78ER76tu(jiohioNHYfvudBIJK:o(k_)ujh(rfgVTCRd7^".getBytes());
+        f.close();
+
+        RAGZInputStream is = RAGZInputStream.fromFile(path);
+        is.close();
     }
 
 

@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2013 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -187,6 +187,16 @@ public class SpyDefinition {
         SpyDefinition sdef = new SpyDefinition(this);
         sdef.matcherSet = new SpyMatcherSet(sdef.matcherSet, matchers);
         return sdef;
+    }
+
+    public SpyDefinition include(String...mdefs) {
+        SpyMatcher[] matchers = new SpyMatcher[mdefs.length];
+
+        for (int i = 0; i < mdefs.length; i++) {
+            matchers[i] = SpyMatcher.fromString(mdefs[i]);
+        }
+
+        return include(matchers);
     }
 
 
