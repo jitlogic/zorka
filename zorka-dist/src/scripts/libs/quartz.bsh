@@ -1,0 +1,70 @@
+/**
+ * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+__quartz() {
+
+  zorka.defCfg("quartz.trace", zorka.boolCfg("tracer"));
+  zorka.defCfg("quartz.trace.time", zorka.longCfg("tracer.min.trace.time"));
+
+  zorka.defCfg("quartz.stats", "yes");
+  zorka.defCfg("quartz.stats.mbean", "zorka:type=ZorkaStats,name=Quartz");
+
+  _trace = zorka.boolCfg("quartz.trace");
+  _stats = zorka.boolCfg("quartz.stats");
+  _mbean = zorka.stringCfg("quartz.stats.mbean");
+
+
+  spy.add(
+    spy.instrument("QUARTZ_JOB_EXECUTE")
+    .onEnter(spy.fetchArg("CTX", 1),
+      spy.get("DETAIL", "CTX", "jobDetail"),
+      spy.get("KEY", "DETAIL", "key"),
+      _trace ? spy.subchain(
+        tracer.begin("QUARTZ", zorka.longCfg("quartz.trace.time")),
+        tracer.formatAttr("NAME", "${KEY.name|DETAIL.name}"),
+        tracer.formatAttr("GROUP", "${KEY.group|DETAIL.group}"),
+        spy.get("DESCRIPTION", "DETAIL", "description"), tracer.attr("DESCRIPTION", "DESCRIPTION"),
+        tracer.formatAttr("DURABLE", "${DETAIL.durable}"),
+        spy.get("PERSIST", "DETAIL", "persistJobDataAfterExecution"), tracer.attr("PERSIST", "PERSIST"),
+        spy.get("NO_CONCURRENT", "DETAIL", "concurrentExecutionDisabled"), tracer.attr("NO_CONCURRENT", "NO_CONCURRENT"),
+        spy.get("VOLATILE", "DETAIL", "volatile"), tracer.attr("VOLATILE", "VOLATILE"),
+        spy.get("STATEFUL", "DETAIL", "stateful"), tracer.attr("STATEFUL", "STATEFUL"),
+        tracer.formatAttr("RECOVERING", "${CTX.recovering}"),
+        tracer.formatAttr("REFIRE_COUNT", "${CTX.refireCount}"),
+        tracer.formatAttr("FIRE_TIME", "${CTX.fireTime}"),
+        tracer.formatAttr("SCHEDULED_FIRE_TIME", "${CTX.scheduledFireTime}"),
+        tracer.formatAttr("NEXT_FIRE_TIME", "${CTX.nextFireTime}"),
+        spy.get("FIRE_INSTANCE_ID", "CTX", "fireInstanceId"), tracer.attr("FIRE_INSTANCE_ID", "FIRE_INSTANCE_ID")
+      ) : null)
+    .onError(tracer.markError())
+    .onSubmit(
+      _stats ? spy.zorkaStats("java", _mbean, "stats", "ALL") : null,
+      _stats ? spy.zorkaStats("java", _mbean, "jobs", "${KEY.name|DETAIL.name}") : null)
+    .include(spy.byInterfaceAndMethod(0, "org.quartz.Job", "execute", "void", "org.quartz.JobExecutionContext")));
+
+
+  discovery() {
+    return zabbix.discovery(zorka.query("java", _mbean, "name", "type").get("jobs").listAs("**", "JOB"));
+  }
+
+
+  return this;
+}
+
+quartz = __quartz();
+
