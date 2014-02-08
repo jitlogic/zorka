@@ -1,3 +1,11 @@
+Zorka 0.9.17 (2013-02-08)
+-------------------------
+
+ * support for Spring MVC tracing/monitoring;
+ * support for Quartz tracing/monitoring
+ * fix: data corruption in ZICO collector;
+
+
 Zorka 0.9.16 (2014-02-01)
 -------------------------
 
