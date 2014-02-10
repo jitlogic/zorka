@@ -119,6 +119,52 @@ __catalina() {
     .include(spy.byMethod("org.apache.catalina.core.StandardEngineValve", "invoke")));
 
 
+  if (zorka.boolCfg("audit.log.logins")) {
+
+    zorka.logInfo("Enabling AUTHENTICATION audit for Catalina ...");
+
+    sdefWebLogin = spy.instrument("CATALINA_AUDIT_WEB_LOGIN")
+      .onEnter(spy.fetchArg("REQ", 1))
+      .onReturn(spy.fetchRetVal("RET"),
+        spy.put("ACTION", "AUTHENTICATION_SUCCESS"),
+        spy.subchain(
+          spy.vcmp("RET", "==", false),
+          spy.put("ACTION", "AUTHENTICATION_FAILURE"),
+          spy.markError()))
+      .onError(
+        spy.put("ACTION", "AUTHENTICATION_FAILURE"),
+        spy.fetchError("ERROR"))
+      .include(
+        spy.byMethod(0, "org.apache.catalina.authenticator.*Authenticator", "authenticate",
+          "boolean", "org.apache.catalina.connector.Request"));
+
+    audit.audit(sdefWebLogin, "AUTHENTICATION",
+      "${ACTION} who=${REQ.remoteUser}");
+  }
+
+
+  if (zorka.boolCfg("audit.log.authorizations")) {
+
+    zorka.logInfo("Enabling AUTHORIZATION audit for Catalina ...");
+
+    sdefWebAuthorize = spy.instrument("CATALINA_AUDIT_WEB_AUTHORIZE")
+      .onEnter(spy.fetchArg("REQ", 1))
+      .onReturn(spy.fetchRetVal("RET"),
+        spy.put("ACTION", "AUTHORIZATION_SUCCESS"),
+        spy.subchain(
+          spy.vcmp("RET", "==", false),
+          spy.put("ACTION", "AUTHORIZATION_FAILURE"),
+          spy.markError()))
+      .onError(
+        spy.put("ACTION", "AUTHORIZATION_FAILURE"),
+        spy.fetchError("ERROR"))
+      .include(spy.byMethod("org.jboss.web.tomcat.security.JBossWebRealm", "hasResourcePermission"));
+
+    audit.audit(sdefWebAuthorize, "AUTHORIZATION",
+      "${ACTION} who=${REQ.remoteUser} type=HTTP what=${REQ.requestURI}");
+  }
+
+
   if (zorka.boolCfg("tracer")) {
     tracer.exclude(
         "org.apache.tomcat.util.**",

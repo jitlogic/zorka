@@ -208,6 +208,9 @@ __jboss7() {
 
 
   if (zorka.boolCfg("audit.log.logins")) {
+
+      zorka.logInfo("Enabling AUTHENTICATION audit for JBoss7 ...");
+
       sdefEjbLogin = spy.instrument("JBOSS7_AUDIT_EJB_LOGIN")
         .onEnter(spy.fetchArg("CTX", 1))
         .onReturn(spy.fetchRetVal("RET"),
@@ -237,15 +240,17 @@ __jboss7() {
           spy.put("ACTION", "AUTHENTICATION_FAILURE"),
           spy.fetchError("ERROR"))
         .include(
-          spy.byMethod("org.jboss.as.web.security.JBossWebRealm", "authenticate"),
-          spy.byMethod("org.jboss.as.web.deployment.mock.MemoryRealm", "authenticate"));
+          spy.byMethod("org.jboss.as.web.security.JBossWebRealm", "authenticate"));
 
       audit.audit(sdefWebLogin, "AUTHENTICATION", "${ACTION} who=${USERNAME} result=${PRINCIPAL|ERROR}");
   }
 
 
   if (zorka.boolCfg("audit.log.authorizations")) {
-      sdefEjbAuthorize = spy.instrument("JBOSS7_AUDIT_EJB_AUTHORIZE")
+
+    zorka.logInfo("Enabling AUTHORIZATION audit for JBoss ...");
+
+    sdefEjbAuthorize = spy.instrument("JBOSS7_AUDIT_EJB_AUTHORIZE")
         .onEnter(spy.fetchArg("THIS", 0),
           spy.fetchArg("METHOD", 4),
           spy.fetchArg("CTX_ID", 5))
