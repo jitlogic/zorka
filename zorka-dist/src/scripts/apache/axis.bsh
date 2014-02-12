@@ -1,0 +1,106 @@
+/**
+ * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+zorka.require("soap.bsh", "apache/apache.bsh");
+
+__axis() {
+
+  spy.add(
+    spy.instrument("AXIS_SERVER_INVOKE")
+      .onEnter(spy.fetchArg("CTX", 1),
+        soap._trace ? tracer.begin("SOAP", zorka.longCfg("soap.trace.time")) : null)
+      .onError(spy.fetchError("ERROR"), tracer.flags(tracer.SUBMIT_TRACE),
+        spy.format("SERVICE", "${CTX.service.name}"),
+        spy.format("METHOD", "${CTX.operation.name}"),
+        soap._fetch_xml ? spy.format("XML_IN",  "${CTX.requestMessage.SOAPEnvelope}") : null,
+        soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
+        soap._error_chain)
+      .onSubmit(
+        spy.format("SERVICE", "${CTX.service.name}"),
+        spy.format("METHOD", "${CTX.operation.name}"),
+        soap._fetch_xml ? spy.format("XML_IN",  "${CTX.requestMessage.SOAPEnvelope}") : null,
+        soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
+        spy.strTime("TIME"), soap._slow_chain,
+        soap._trace ? spy.subchain(
+          tracer.attr("SERVICE", "SERVICE"),
+          tracer.attr("METHOD", "METHOD"),
+          soap._fetch_xml ? tracer.attr("XML_IN", "XML_IN") : null,
+          soap._fetch_xml ? tracer.attr("XML_OUT", "XML_OUT") : null
+        ) : null,
+        soap._stats ? spy.subchain(
+          spy.zorkaStats("java", soap._mbean, "stats", "SVC"),
+          spy.zorkaStats("java", soap._mbean, "svc", "${SERVICE}.${METHOD}")
+        ) : null)
+    .include(spy.byMethod("org.apache.axis.server.AxisServer", "invoke")));
+
+
+  __get_call_obj() {
+    process(rec) {
+      ctx = rec.get("CTX");
+      if (ctx != null) {
+        rec.put("CALL_OBJ", ctx.getProperty("call_object"));
+      }
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+
+  spy.add(
+    spy.instrument("AXIS_CLIENT_INVOKE")
+      .onEnter(spy.fetchArg("CTX", 1),
+        soap._trace ? tracer.begin("SOAP_CLI", zorka.longCfg("soap.trace.time")) : null)
+      .onError(spy.fetchError("ERROR"), tracer.flags(tracer.SUBMIT_TRACE),
+        __get_call_obj(),
+        spy.format("SERVICE", "${CALL_OBJ.operationName.namespaceURI}"),
+        spy.format("METHOD", "${CALL_OBJ.operationName.localPart}"),
+        soap._fetch_xml ? spy.format("XML_IN",  "${CTX.requestMessage.SOAPEnvelope}") : null,
+        soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
+        soap._error_chain)
+      .onSubmit(
+        __get_call_obj(),
+        spy.format("SERVICE", "${CALL_OBJ.operationName.namespaceURI}"),
+        spy.format("METHOD", "${CALL_OBJ.operationName.localPart}"),
+        soap._fetch_xml ? spy.format("XML_IN",  "${CTX.requestMessage.SOAPEnvelope}") : null,
+        soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
+        spy.strTime("TIME"), soap._slow_chain,
+        soap._trace ? spy.subchain(
+          tracer.attr("SERVICE", "SERVICE"),
+          tracer.attr("METHOD", "METHOD"),
+          soap._fetch_xml ? tracer.attr("XML_IN", "XML_IN") : null,
+          soap._fetch_xml ? tracer.attr("XML_OUT", "XML_OUT") : null
+        ) : null,
+        soap._stats ? spy.subchain(
+          spy.zorkaStats("java", soap._mbean, "stats", "CLI"),
+          spy.zorkaStats("java", soap._mbean, "cli", "${SERVICE}.${METHOD}")
+        ) : null)
+      .include(spy.byMethod(0, "org.apache.axis.client.AxisClient", "invoke", "void")));
+
+
+  if (zorka.boolCfg("tracer")) {
+    tracer.exclude(
+      "org.apache.axis.utils.**",
+      "org.apache.axis.encoding.**",
+      "org.apache.axis.message.**"
+    );
+  }
+
+
+  return this;
+}
+
+axis = __axis();
