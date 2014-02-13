@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template_Zorka_Jboss7_Sessions</template>
-            <name>Template_Zorka_Jboss7_Sessions</name>
+            <template>Template_Zorka_JBoss7_Sessions</template>
+            <name>Template_Zorka_JBoss7_Sessions</name>
             <groups>
                 <group>
                     <name>Templates</name>

@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template_Zorka_Jboss7_Ejb3Stateless</template>
-            <name>Template_Zorka_Jboss7_Ejb3Stateless</name>
+            <template>Template_Zorka_JBoss7_Ejb3Stateless</template>
+            <name>Template_Zorka_JBoss7_Ejb3Stateless</name>
             <groups>
                 <group>
                     <name>Templates</name>
