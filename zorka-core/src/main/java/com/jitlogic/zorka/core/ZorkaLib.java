@@ -244,7 +244,7 @@ public class ZorkaLib implements ZorkaService {
             }
             obj = conn.getAttribute(name, argList.get(2).toString());
         } catch (AttributeNotFoundException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Object '" + conname + "|" + name + "' has no attribute '" + argList.get(2) + "'.");
+            log.error(ZorkaLogger.ZAG_ERRORS, "Object '" + conname + "|" + name + "' has no attribute '" + argList.get(2) + "'.", e);
             return null;
         } catch (Exception e) {
             log.error(ZorkaLogger.ZAG_ERRORS, "Error getting attribute '" + argList.get(2) + "' from '" + conname + "|" + name + "'", e);

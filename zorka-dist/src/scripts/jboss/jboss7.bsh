@@ -135,6 +135,57 @@ __jboss7() {
   jpa = __jpa();
 
 
+  // JBoss Management Controller - for accessing
+
+  _modelNodeClass = null;
+
+  __mcreg() {
+    controller = null;
+    nodeclass = null;
+    process(rec) {
+      synchronized(super) {
+        if (super.controller == null) {
+          mc = rec.get("THIS");
+          super.controller = mc;
+          super.nodeclass = mc.getClass().getClassLoader().loadClass("org.jboss.dmr.ModelNode");
+          zorka.logInfo("Intercepted reference to JBoss ModelController. DMR queries are ready to go.");
+        }
+      }
+      return rec;
+    }
+    return this;
+  }
+
+  mcreg = __mcreg();
+
+  spy.add(spy.instance("JBOSS7_MC_REGISTER")
+    .onEnter(spy.fetchArg("THIS", 0), (com.jitlogic.zorka.core.spy.SpyProcessor)mcreg)
+    .include(spy.byMethod(0, "org.jboss.as.controller.ModelControllerImpl", "finishBoot", "void")));
+
+
+  dmr(path, attr) {
+    op = mcreg.nodeclass.newInstance();
+    op.get("operation").set("read-attribute");
+    addr = op.get("address");
+
+    for (String seg : path.split("/")) {
+      if (seg.contains("=")) {
+        s = seg.split("=");
+        addr.add(s[0],s[1]);
+      }
+    }
+
+    op.get("name").set(attr);
+    ret = mcreg.controller.execute(op, null, null, null).get("result").asString();
+
+    if ("success".equals(ret.get("outcome").asString())) {
+        return ret.get("result").asString();
+    } else {
+      zorka.logError("Cannot get DMR value " + ret);
+      return null;
+    }
+  }
+
 
   // Catch MX mbean server initialization and register JBoss MBean Server here ...
 
@@ -155,7 +206,7 @@ __jboss7() {
     return this;
   }
 
-  spy.add(spy.instance("JBOSS_MBS_REGISTER")
+  spy.add(spy.instance("JBOSS7_MBS_REGISTER")
     .onReturn((com.jitlogic.zorka.core.spy.SpyProcessor)__mbsRegister())
     .include(spy.byMethod(spy.AC_STATIC, "org.jboss.modules.ModuleLoader", "installMBeanServer", "void")));
 
