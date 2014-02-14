@@ -16,12 +16,16 @@
 package com.jitlogic.zorka.core;
 
 
+import com.jitlogic.zorka.common.util.JSONWriter;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.StringMatcher;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class UtilLib {
@@ -35,6 +39,20 @@ public class UtilLib {
      */
     public Object get(Object obj, Object... args) {
         return ObjectInspector.get(obj, args);
+    }
+
+
+    public List<?> list(Object...objs) {
+        List<Object> lst = new ArrayList<Object>();
+        for (Object obj : objs) {
+            lst.add(obj);
+        }
+        return lst;
+    }
+
+
+    public Map<?,?> map(Object...objs) {
+        return ZorkaUtil.map(objs);
     }
 
 
@@ -106,6 +124,10 @@ public class UtilLib {
 
     public void setField(Object obj, String name, Object value) {
         ObjectInspector.setField(obj, name, value);
+    }
+
+    public String json(Object obj) {
+        return new JSONWriter().write(obj);
     }
 
 }

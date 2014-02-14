@@ -163,9 +163,9 @@ __jboss7() {
     .include(spy.byMethod(0, "org.jboss.as.controller.ModelControllerImpl", "finishBoot", "void")));
 
 
-  dmr(path, attr) {
+  dmr_op(path, opname, akey, aval) {
     op = mcreg.nodeclass.newInstance();
-    op.get("operation").set("read-attribute");
+    op.get("operation").set(opname);
     addr = op.get("address");
 
     for (String seg : path.split("/")) {
@@ -175,8 +175,14 @@ __jboss7() {
       }
     }
 
-    op.get("name").set(attr);
-    ret = mcreg.controller.execute(op, null, null, null).get("result").asString();
+    op.get(akey).set(aval);
+    return op;
+  }
+
+
+  dmr(path, attr) {
+    op = dmr_op(path, "read-attribute", "name", attr);
+    ret = mcreg.controller.execute(op, null, null, null);
 
     if ("success".equals(ret.get("outcome").asString())) {
         return ret.get("result").asString();
@@ -184,6 +190,22 @@ __jboss7() {
       zorka.logError("Cannot get DMR value " + ret);
       return null;
     }
+  }
+
+
+  dmr_discovery(path, type) {
+    op = dmr_op(path, "read-children-names", "child-type", type);
+    ret = mcreg.controller.execute(op, null, null, null);
+
+    name = "{#" + type.toUpperCase().replace("-", "") + "}";
+
+    data = util.list();
+
+    for (elem : ret.get("result").asList()) {
+      data.add(util.map(name, elem.asString()));
+    }
+
+    return util.json(util.map("data", data));
   }
 
 

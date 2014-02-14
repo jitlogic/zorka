@@ -729,11 +729,17 @@ public class ZorkaUtil {
      * @param objs members of newly formed set
      * @return set of strings
      */
-    public static <T> Set<T> set(T... objs) {
+    public static <T> Set<T> set(T...objs) {
         Set<T> set = new HashSet<T>(objs.length * 2 + 1);
         for (T s : objs) {
             set.add(s);
         }
+
+        return set;
+    }
+
+    public static <T> Set<T> constSet(T...objs) {
+        Set<T> set = set(objs);
 
         return Collections.unmodifiableSet(set);
     }
