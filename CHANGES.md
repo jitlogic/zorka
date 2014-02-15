@@ -1,4 +1,12 @@
-Zorka 0.9.17 (2013-02-08)
+Zorka 0.9.18 (2014-02-15)
+-------------------------
+
+ * SOAP monitoring (with Axis 1.x support, more to come);
+ * Wildfly 8.0 + Undertow support;
+ * JBoss Management (DMR) access via zorka agent;
+
+
+Zorka 0.9.17 (2014-02-08)
 -------------------------
 
  * support for Spring MVC tracing/monitoring;
