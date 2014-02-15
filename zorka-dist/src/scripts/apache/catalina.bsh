@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("http.bsh");
+zorka.require("http.bsh", "audit.bsh");
 
 __catalina() {
 
