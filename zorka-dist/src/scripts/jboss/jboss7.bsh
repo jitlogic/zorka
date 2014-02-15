@@ -161,7 +161,10 @@ __jboss7() {
 
   spy.add(spy.instance("JBOSS7_MC_REGISTER")
     .onEnter(spy.fetchArg("THIS", 0), (com.jitlogic.zorka.core.spy.SpyProcessor)mcreg)
-    .include(spy.byMethod(0, "org.jboss.as.controller.ModelControllerImpl", "finishBoot", "void")));
+    .include(
+      spy.byMethod(0, "org.jboss.as.controller.ModelControllerImpl", "finshBoot", "void"),   // nasty typo in 7.0.2
+      spy.byMethod(0, "org.jboss.as.controller.ModelControllerImpl", "finishBoot", "void")
+      ));
 
 
   dmr_op(path, opname, akey, aval) {
@@ -169,7 +172,7 @@ __jboss7() {
     op.get("operation").set(opname);
     addr = op.get("address");
 
-    for (String seg : path.split("/")) {
+    for (String seg : path.split(path.substring(0,1))) {
       if (seg.contains("=")) {
         s = seg.split("=");
         addr.add(s[0],s[1]);
