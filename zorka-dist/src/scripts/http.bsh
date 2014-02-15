@@ -226,10 +226,10 @@ __http() {
                           i++;
                       }
                   }
-              }
-              for (location : resp.getHeaders("Location")) {
-                  tracer.newAttr("REDIRECT", location);
-                  rec.put("REDIRECT", location);
+                  if ("Location".equals(name) && hdrs.length > 0) {
+                    tracer.newAttr("REDIRECT", hdrs[0]);
+                    rec.put("REDIRECT", hdrs[0]);
+                  }
               }
           }
 

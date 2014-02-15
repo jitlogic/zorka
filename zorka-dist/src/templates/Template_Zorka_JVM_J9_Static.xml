@@ -82,9 +82,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Hiccup&quot;, &quot;CPU&quot;,
-                        &quot;maxTimeUsCLR&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Hiccup&quot;, &quot;CPU&quot;,&quot;maxTimeUsCLR&quot;]</key>
                     <delay>60</delay>
                     <history>90</history>
                     <trends>365</trends>
@@ -474,9 +472,7 @@
                     <snmp_community/>
                     <multiplier>1</multiplier>
                     <snmp_oid/>
-                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Hiccup&quot;, &quot;MEM&quot;,
-                        &quot;maxTimeUsCLR&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Hiccup&quot;, &quot;MEM&quot;,&quot;maxTimeUsCLR&quot;]</key>
                     <delay>60</delay>
                     <history>90</history>
                     <trends>365</trends>
@@ -749,9 +745,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>
-                        zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;DaemonThreadCount&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;DaemonThreadCount&quot;]</key>
                     <delay>60</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -907,8 +901,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=OperatingSystem&quot;,&quot;Version&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=OperatingSystem&quot;,&quot;Version&quot;]</key>
                     <delay>14400</delay>
                     <history>10</history>
                     <trends>0</trends>
@@ -947,8 +940,7 @@
                     <snmp_community>public</snmp_community>
                     <multiplier>0</multiplier>
                     <snmp_oid>interfaces.ifTable.ifEntry.ifInOctets.1</snmp_oid>
-                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;PeakThreadCount&quot;]
-                    </key>
+                    <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;PeakThreadCount&quot;]</key>
                     <delay>3600</delay>
                     <history>10</history>
                     <trends>365</trends>
@@ -1550,9 +1542,7 @@
                     <type>0</type>
                     <item>
                         <host>Template_Zorka_JVM_J9_Static</host>
-                        <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Hiccup&quot;, &quot;CPU&quot;,
-                            &quot;maxTimeUsCLR&quot;]
-                        </key>
+                        <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Hiccup&quot;, &quot;CPU&quot;,&quot;maxTimeUsCLR&quot;]</key>
                     </item>
                 </graph_item>
                 <graph_item>
@@ -1564,9 +1554,7 @@
                     <type>0</type>
                     <item>
                         <host>Template_Zorka_JVM_J9_Static</host>
-                        <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Hiccup&quot;, &quot;MEM&quot;,
-                            &quot;maxTimeUsCLR&quot;]
-                        </key>
+                        <key>zorka.jmx[&quot;java&quot;, &quot;zorka:type=ZorkaStats,name=Hiccup&quot;, &quot;MEM&quot;,&quot;maxTimeUsCLR&quot;]</key>
                     </item>
                 </graph_item>
             </graph_items>
@@ -1610,8 +1598,7 @@
                     <type>0</type>
                     <item>
                         <host>Template_Zorka_JVM_J9_Static</host>
-                        <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;ThreadCount&quot;]
-                        </key>
+                        <key>zorka.jmx[&quot;java&quot;,&quot;java.lang:type=Threading&quot;,&quot;ThreadCount&quot;]</key>
                     </item>
                 </graph_item>
                 <graph_item>

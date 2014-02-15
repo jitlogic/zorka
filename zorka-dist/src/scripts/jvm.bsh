@@ -73,6 +73,7 @@ __jvm() {
           "com.sun.jmx.**",
           "com.sun.org.apache.**",
           "com.sun.proxy.**",
+          "com.sun.tools.javac.**",
           "com.sun.xml.**",
           "javax.management.**",
           "sun.dc.pr.**",

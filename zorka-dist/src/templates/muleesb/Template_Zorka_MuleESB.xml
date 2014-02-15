@@ -9,8 +9,8 @@
     </groups>
     <templates>
         <template>
-            <template>Template_Zorka_MuleEsb</template>
-            <name>Template_Zorka_MuleEsb</name>
+            <template>Template_Zorka_MuleESB</template>
+            <name>Template_Zorka_MuleESB</name>
             <groups>
                 <group>
                     <name>Templates</name>
