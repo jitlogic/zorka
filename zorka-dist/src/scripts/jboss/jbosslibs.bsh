@@ -22,6 +22,7 @@ zorka.require("tracer.bsh");
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
     tracer.exclude(
-      "org.jboss.resteasy.**"
+      "org.jboss.resteasy.**",
+      "org.xnio.**"
     );
 }

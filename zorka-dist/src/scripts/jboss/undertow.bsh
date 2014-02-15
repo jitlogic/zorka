@@ -1,0 +1,72 @@
+/**
+ * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+zorka.require(
+  "http.bsh",
+  "jboss/jbosslibs.bsh"
+);
+
+__undertow() {
+
+    spy.add(spy.instrument("UNDERTOW_HTTP")
+      .onEnter(spy.fetchArg("EXCH",1), spy.fetchArg("REQ", 4), spy.fetchArg("RESP", 5),
+        spy.format("URI", "${EXCH.requestURI}"),
+        http._trace ? spy.subchain(
+          http._uriQualifier,
+          tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
+          tracer.attr("URI", "URI")
+        ) : null,
+        http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
+      .onReturn(spy.put("ERR", ""))
+      .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),
+        http._trace ? spy.subchain(
+          http._uriQualifier,
+          http._error_chain,
+          tracer.markError(),
+          tracer.attr("ERR", "ERR")
+          ) : null)
+      .onSubmit(
+        spy.strTime("TIME"),
+        spy.format("STATUS", "${EXCH.responseCode}"),
+        spy.get("USER", "REQ", "remoteUser"),
+        http._trace ? spy.subchain(
+          http._uriQualifier,
+          tracer.attr("STATUS", "STATUS"),
+          tracer.filterBy("STATUS", null, http._errors, null, null),
+          tracer.attr("USER", "USER"),
+          http._cookies ? http.cookies_processor(true, true) : spy.put("COOKIES", ""),
+          http._headers ? http.headers_processor(true, true) : null,
+          http._params ? http.param_processor() : spy.put("PARAMS", "")
+        ) : null,
+        http._slow_chain,
+        spy.subchain(
+          spy.valSetFilter("STATUS", http._errors),
+          spy.markError(), tracer.markError(),
+          http._error_chain),
+        http._redirQualifier,
+        http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
+      .include(spy.byMethod("io.undertow.servlet.handlers.ServletInitialHandler", "handleFirstRequest")));
+
+  tracer.exclude(
+    "io.undertow.util.**"
+  );
+
+  return this;
+}
+
+undertow = __undertow();
+

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
-    <date>2014-02-14T21:06:51Z</date>
+    <date>2014-02-15T08:18:54Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -50,12 +50,12 @@
                     <description/>
                     <item_prototypes>
                         <item_prototype>
-                            <name>{#DATASOURCE} connections active</name>
+                            <name>{#NAME} connections active</name>
                             <type>0</type>
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>jboss7.dmr[&quot;/subsystem=datasources/data-source={#DATASOURCE}/statistics=pool&quot;, &quot;ActiveCount&quot;]</key>
+                            <key>jboss7.dmr[&quot;/subsystem=datasources/data-source={#NAME}/statistics=pool&quot;, &quot;ActiveCount&quot;]</key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -89,12 +89,12 @@
                             <valuemap/>
                         </item_prototype>
                         <item_prototype>
-                            <name>{#DATASOURCE} connections available</name>
+                            <name>{#NAME} connections available</name>
                             <type>0</type>
                             <snmp_community/>
                             <multiplier>0</multiplier>
                             <snmp_oid/>
-                            <key>jboss7.dmr[&quot;/subsystem=datasources/data-source={#DATASOURCE}/statistics=pool&quot;, &quot;AvailableCount&quot;]</key>
+                            <key>jboss7.dmr[&quot;/subsystem=datasources/data-source={#NAME}/statistics=pool&quot;, &quot;AvailableCount&quot;]</key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -128,12 +128,12 @@
                             <valuemap/>
                         </item_prototype>
                         <item_prototype>
-                            <name>{#DATASOURCE} connections created</name>
+                            <name>{#NAME} connections created</name>
                             <type>0</type>
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>jboss7.dmr[&quot;/subsystem=datasources/data-source={#DATASOURCE}/statistics=pool&quot;, &quot;CreatedCount&quot;]</key>
+                            <key>jboss7.dmr[&quot;/subsystem=datasources/data-source={#NAME}/statistics=pool&quot;, &quot;CreatedCount&quot;]</key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -167,12 +167,12 @@
                             <valuemap/>
                         </item_prototype>
                         <item_prototype>
-                            <name>{#DATASOURCE} connections destroyed</name>
+                            <name>{#NAME} connections destroyed</name>
                             <type>0</type>
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>jboss7.dmr[&quot;/subsystem=datasources/data-source={#DATASOURCE}/statistics=pool&quot;, &quot;DestroyedCount&quot;]</key>
+                            <key>jboss7.dmr[&quot;/subsystem=datasources/data-source={#NAME}/statistics=pool&quot;, &quot;DestroyedCount&quot;]</key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>
@@ -206,12 +206,12 @@
                             <valuemap/>
                         </item_prototype>
                         <item_prototype>
-                            <name>{#DATASOURCE} connections timed out</name>
+                            <name>{#NAME} connections timed out</name>
                             <type>0</type>
                             <snmp_community/>
                             <multiplier>1</multiplier>
                             <snmp_oid/>
-                            <key>jboss7.dmr[&quot;/subsystem=datasources/data-source={#DATASOURCE}/statistics=pool&quot;, &quot;TimedOut&quot;]</key>
+                            <key>jboss7.dmr[&quot;/subsystem=datasources/data-source={#NAME}/statistics=pool&quot;, &quot;TimedOut&quot;]</key>
                             <delay>60</delay>
                             <history>10</history>
                             <trends>365</trends>

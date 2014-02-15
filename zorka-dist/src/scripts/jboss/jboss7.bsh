@@ -27,6 +27,7 @@ zorka.require(
     "apache/apache.bsh",
     "google/libs.bsh",
     "jboss/hibernate.bsh",
+    "jboss/undertow.bsh",
     "jboss/weld.bsh",
     "jdbc/h2.bsh"
 );
