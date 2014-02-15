@@ -175,7 +175,10 @@ __jboss7() {
       }
     }
 
-    op.get(akey).set(aval);
+    if (akey != null) {
+      op.get(akey).set(aval);
+    }
+
     return op;
   }
 
@@ -193,21 +196,45 @@ __jboss7() {
   }
 
 
-  dmr_discovery(path, type) {
-    op = dmr_op(path, "read-children-names", "child-type", type);
+  dmr_scan1(path, name) {
+    op = dmr_op(path, "read-children-names", "child-type", name);
     ret = mcreg.controller.execute(op, null, null, null);
 
-    name = "{#" + type.toUpperCase().replace("-", "") + "}";
 
-    data = util.list();
-
-    for (elem : ret.get("result").asList()) {
-      data.add(util.map(name, elem.asString()));
-    }
-
-    return util.json(util.map("data", data));
+      data = util.list();
+      for (elem : ret.get("result").asList()) {
+        data.add(util.map("{#NAME}", elem.asString()));
+      }
+      return data;
   }
 
+  dmr_scan1(path) {
+    op = dmr_op(path, "read-children-types", null, null);
+    ret = mcreg.controller.execute(op, null, null, null);
+
+    data = util.list();
+    if ("success".equals(ret.get("outcome").asString())) {
+      for (elem : ret.get("result").asList()) {
+        for (d : dmr_scan1(path, elem.asString())) {
+          d.put("{#TYPE}", elem.asString());
+          data.add(d);
+        }
+      }
+      return data;
+    } else {
+      zorka.logError("Cannot get DMR children types " + ret);
+      return null;
+    }
+
+  }
+
+  dmr_discovery(path) {
+    return util.json(util.map("data", dmr_scan1(path)));
+  }
+
+  dmr_discovery(path, type) {
+    return util.json(util.map("data", dmr_scan1(path, type)));
+  }
 
   // Catch MX mbean server initialization and register JBoss MBean Server here ...
 
