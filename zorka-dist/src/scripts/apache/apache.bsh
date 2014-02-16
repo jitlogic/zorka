@@ -33,6 +33,7 @@ if (zorka.boolCfg("tracer")) {
         "org.apache.commons.validator.**",
         "org.apache.cxf.**",
         "org.apache.el.**",
+        "org.apache.felix.**",
         "org.apache.harmony.**",
         "org.apache.http.message.BasicHeader",
         "org.apache.http.util.CharArrayBuffer",

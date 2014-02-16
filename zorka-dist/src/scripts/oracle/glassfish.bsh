@@ -15,24 +15,35 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// This file contains agent configurations for JSF libraries
+zorka.require(
+  "jvm.bsh",
+  "javax.bsh",
+  "libs.bsh",
+  "jsf.bsh",
+  "apache/apache.bsh",
+  "eclipse/eclipse.bsh",
+  "oracle/grizzly.bsh",
+  "jboss/hibernate.bsh",
+  "google/libs.bsh"
+);
 
-zorka.require("tracer.bsh");
+__glassfish() {
 
-// Tracer tuning
-if (zorka.boolCfg("tracer")) {
-    tracer.exclude(
-        "javax.faces.**",
-        "com.sun.faces.**",
-        "com.sun.facelets.**",
-        "com.sun.jsftemplating.**",
-        "com.sun.webui.jsf.component.**",
-        "com.sun.webui.jsf.faces.UIComponentELResolver",
-        "com.sun.webui.jsf.renderkit.**",
-        "com.sun.webui.jsf.util.**",
-        "org.apache.myfaces.el.**",
-        "org.apache.myfaces.renderkit.**",
-        "org.apache.myfaces.shared**",
-        "org.richfaces.**"
-    );
+  tracer.exclude(
+    "com.sun.enterprise.deployment.**",
+    "com.sun.enterprise.loader.ASURLClassL**",
+    "com.sun.enterprise.module.ModuleMetadata",
+    "org.glassfish.hk2.utilities.**",
+    "org.glassfish.jersey.message.internal.**",
+    "org.glassfish.jersey.uri.internal.**",
+    "org.glassfish.jersey.internal.util.**",
+    "org.glassfish.web.deployment.descriptor.**",
+    "org.jvnet.hk2.**"
+  );
+
+  jvm.autoregister();
+
+  return this;
 }
+
+glassfish = __glassfish();
