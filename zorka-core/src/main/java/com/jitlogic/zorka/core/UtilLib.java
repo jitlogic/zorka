@@ -20,7 +20,11 @@ import com.jitlogic.zorka.common.util.JSONWriter;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.StringMatcher;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import com.jitlogic.zorka.core.util.Base64;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -137,5 +141,36 @@ public class UtilLib {
 
     public boolean reMatch(Pattern pattern, String s) {
         return pattern.matcher(s).matches();
+    }
+
+    private static final int BUF_SZ = 4096;
+
+    public int ioCopy(InputStream is, OutputStream os) throws IOException {
+        int bufsz = Math.min(is.available(), BUF_SZ);
+        final byte[] buf = new byte[bufsz];
+        int n = 0, total = 0;
+        n = is.read(buf);
+        while (n > 0) {
+            os.write(buf, 0, n);
+            total += n;
+            n = is.read(buf);
+        }
+        return total;
+    }
+
+    public long min(long a, long b) {
+        return Math.min(a, b);
+    }
+
+    public long max(long a, long b) {
+        return Math.max(a, b);
+    }
+
+    public byte[] clipArray(byte[] src, int len) {
+        return ZorkaUtil.clipArray(src, len);
+    }
+
+    public String base64(byte[] buf) {
+        return Base64.encode(buf, false);
     }
 }
