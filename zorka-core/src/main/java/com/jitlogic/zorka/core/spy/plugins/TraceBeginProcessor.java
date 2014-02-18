@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.core.spy.plugins;
 
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.TraceBuilder;
 import com.jitlogic.zorka.core.spy.Tracer;
@@ -39,8 +41,9 @@ public class TraceBeginProcessor implements SpyProcessor {
     /**
      * Trace name symbol ID.
      */
-    private int traceId;
+    private String traceName;
 
+    private SymbolRegistry symbolRegistry;
 
     /**
      * Minimum trace execution time.
@@ -58,20 +61,21 @@ public class TraceBeginProcessor implements SpyProcessor {
      * Creates new trace begin marking processsor.
      *
      * @param tracer           tracer object
-     * @param traceId          trace id (symbol)
+     * @param traceName        trace name (or format string)
      * @param minimumTraceTime minimum trace execution time
      */
-    public TraceBeginProcessor(Tracer tracer, int traceId, long minimumTraceTime, int flags) {
+    public TraceBeginProcessor(Tracer tracer, String traceName, long minimumTraceTime, int flags, SymbolRegistry symbolRegistry) {
         this.tracer = tracer;
-        this.traceId = traceId;
+        this.traceName = traceName;
+        this.symbolRegistry = symbolRegistry;
         this.minimumTraceTime = minimumTraceTime;
         this.flags = flags;
     }
 
-
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
         TraceBuilder traceBuilder = tracer.getHandler();
+        int traceId = symbolRegistry.symbolId(ObjectInspector.substitute(traceName, record));
         traceBuilder.traceBegin(traceId, System.currentTimeMillis(), flags);
 
         if (minimumTraceTime >= 0) {
