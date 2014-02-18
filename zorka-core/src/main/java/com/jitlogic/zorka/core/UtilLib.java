@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class UtilLib {
 
@@ -130,4 +131,11 @@ public class UtilLib {
         return new JSONWriter().write(obj);
     }
 
+    public Pattern rePattern(String pattern) {
+        return Pattern.compile(pattern);
+    }
+
+    public boolean reMatch(Pattern pattern, String s) {
+        return pattern.matcher(s).matches();
+    }
 }
