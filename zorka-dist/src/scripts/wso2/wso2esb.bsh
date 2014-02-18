@@ -23,6 +23,7 @@ zorka.require(
   "apache/axis2.bsh",
   "apache/tomcat.bsh",
   "apache/apache.bsh",
+  "apache/cxf.bsh",
   "eclipse/eclipse.bsh",
   "wso2/carbon.bsh"
 );

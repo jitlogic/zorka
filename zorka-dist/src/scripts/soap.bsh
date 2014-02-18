@@ -26,6 +26,10 @@ __soap() {
   zorka.defCfg("soap.stats.mbean", "zorka:type=ZorkaStats,name=SOAP");
 
   zorka.defCfg("soap.fetch.xml", "yes");
+  zorka.defCfg("soap.fetch.xml.limit", "65536");
+  zorka.defCfg("soap.fetch.xml.in", zorka.boolCfg("soap.fetch.xml"));
+  zorka.defCfg("soap.fetch.xml.out", zorka.boolCfg("soap.fetch.xml"));
+
 
   // Default values for SOAP slow requests log configuration options
   zorka.defCfg("soap.slow", zorka.boolCfg("traps.slow"));
@@ -51,8 +55,13 @@ __soap() {
 
 
   _trace = zorka.boolCfg("soap.trace");
+  _time = zorka.longCfg("soap.trace.time");
   _stats = zorka.boolCfg("soap.stats");
-  _fetch_xml = zorka.boolCfg("soap.fetch.xml");
+
+  _fetch_xml       = zorka.boolCfg("soap.fetch.xml");
+  _fetch_xml_in    = zorka.boolCfg("soap.fetch.xml.in");
+  _fetch_xml_out   = zorka.boolCfg("soap.fetch.xml.out");
+  _fetch_xml_limit = zorka.longCfg("soap.fetch.xml.limit");
 
   _mbean = zorka.stringCfg("soap.stats.mbean");
 

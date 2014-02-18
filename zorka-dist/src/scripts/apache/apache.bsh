@@ -31,7 +31,6 @@ if (zorka.boolCfg("tracer")) {
         "org.apache.commons.digester.**",
         "org.apache.commons.logging.**",
         "org.apache.commons.validator.**",
-        "org.apache.cxf.**",
         "org.apache.el.**",
         "org.apache.felix.**",
         "org.apache.harmony.**",
