@@ -1,3 +1,10 @@
+Zorka 0.9.19 (2014-02-22)
+-------------------------
+
+ * agent: util.tapInputStream(), util.tapOutputStream() for wiretaping streams;
+ * support for Apache CXF framework;
+
+
 Zorka 0.9.18 (2014-02-15)
 -------------------------
 

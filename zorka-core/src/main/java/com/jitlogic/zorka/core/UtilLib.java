@@ -19,6 +19,8 @@ package com.jitlogic.zorka.core;
 import com.jitlogic.zorka.common.util.JSONWriter;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.StringMatcher;
+import com.jitlogic.zorka.common.util.TapInputStream;
+import com.jitlogic.zorka.common.util.TapOutputStream;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.util.Base64;
 
@@ -26,8 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -172,5 +172,13 @@ public class UtilLib {
 
     public String base64(byte[] buf) {
         return Base64.encode(buf, false);
+    }
+
+    public TapInputStream tapInputStream(InputStream is, int init, int limit) {
+        return new TapInputStream(is, init, limit);
+    }
+
+    public TapOutputStream tapOutputStream(OutputStream os, int init, int limit) {
+        return new TapOutputStream(os, init, limit);
     }
 }
