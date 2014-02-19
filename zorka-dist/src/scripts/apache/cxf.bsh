@@ -20,8 +20,7 @@ zorka.require("soap.bsh", "apache/apache.bsh");
 
 __cxf() {
 
-
-  _trace_begin() {
+  _cxf_enter() {
     process(rec) {
 
       if ("org.apache.cxf.binding.soap.SoapMessage".equals(rec.get("MSG").getClass().getName())) {
@@ -33,57 +32,76 @@ __cxf() {
     return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
   }
 
-  encodings = util.set("UTF-8", "UTF-16");
 
-  slurp(msg, limit) {
-    contents = util.getField(msg, "contents");
-    is = null; isc = null;
+  _tap_cxf_input() {
+    process(rec) {
+      msg = rec.get("MSG");
 
-    if (contents != null) {
-      for (i = 1; i < contents.length; i += 2) {
-        c = contents[i];
-        if (c instanceof java.io.InputStream) {
-          is = c; isc = contents[i-1]; break;
+      contents = util.getField(msg, "contents");
+      is = null; isc = null; isx = -1;
+
+      // TODO fetching it manually is propably not a good idea; use getContent()/setContent() instead
+      if (contents != null) {
+        for (i = 1; i < contents.length; i += 2) {
+          c = contents[i];
+          if (c instanceof java.io.InputStream) {
+            is = c; isc = contents[i-1]; isx = i; break;
+          }
         }
       }
-    }
 
-    if (is != null) {
-      bos = msg.getClass().getClassLoader().loadClass("org.apache.cxf.io.CachedOutputStream").newInstance();
-      ids = is.getClass().getName().endsWith("DelegatingInputStream");
-      bis = ids ? is.getInputStream() : is;
-      try {
-        util.ioCopy(bis, bos);
-      } finally {
-        bis.close();
+      if (is != null) {
+        if (isc.getName().endsWith("DelegatingInputStream")) {
+          zorka.logInfo("DELEGATING");
+          tap = util.tapInputStream(is.getInputStream(), 512, 65536);
+          is.setInputStream(tap);
+          rec.put("TAP_IN", tap);
+        } else {
+          zorka.logInfo("NON-DELEGATING");
+          tap = util.tapInputStream(is, 512, 65536);
+          contents[isx] = tap;
+          rec.put("TAP_IN", tap);
+        }
       }
-      bis = bos.getInputStream();
-      if (ids) {
-        is.setInputStream(bis);
-      } else {
-        msg.setContent(isc, bis);
-      }
-      len = util.min(bos.size(), limit);
-      byte[] buf = new byte[len];
-      n = bos.getInputStream().read(buf);
-      if (n != len) {
-        buf = util.clipArray(buf, n);
-      }
-      enc = msg.get("org.apache.cxf.message.Message.ENCODING");
-      if (encodings.contains(enc)) {
-        return new String(buf, enc);
-      } else {
-        return util.base64(buf);
-      }
-    } else {
 
+      return rec;
     }
-    return null;
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+  _msg_tap_out = new ThreadLocal();
+
+  _tap_cxf_output() {
+    process(rec) {
+      msg = rec.get("MSG").getExchange().getOutMessage();
+
+      contents = util.getField(msg, "contents");
+      os = null; osc = null; osx = -1;
+
+      // TODO fetching it manually is propably not a good idea; use getContent()/setContent() instead
+      if (contents != null) {
+        for (i = 1; i < contents.length; i += 2) {
+          c = contents[i];
+          if (c instanceof java.io.OutputStream) {
+            os = c; osc = contents[i-1]; osx = i; break;
+          }
+        }
+      }
+
+      if (os != null) {
+        tap_out = util.tapOutputStream(os, 512, 65536);
+        _msg_tap_out.set(tap_out);
+        contents[osx] = tap_out;
+        zorka.logInfo("Intercepted output stream.");
+      }
+
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
   }
 
 
-  _trace_submit() {
-
+  _cxf_submit() {
 
     process(rec) {
 
@@ -96,17 +114,25 @@ __cxf() {
         tracer.newAttr("SERVICE", service); rec.put("SERVICE", service);
         method = msg_in.get("javax.xml.ws.wsdl.operation").getLocalPart();
         tracer.newAttr("METHOD", method); rec.put("METHOD", method);
-        if (soap._fetch_xml_in) {
-          xml_in = slurp(msg_in, soap._fetch_xml_limit);
+        encoding = msg_in.get("org.apache.cxf.message.Message.ENCODING");
+        tracer.newAttr("ENC_IN", encoding);
+
+        tap_in = rec.get("TAP_IN");
+        if (tap_in != null) {
+          xml_in = tap_in.asString(encoding);
           tracer.newAttr("XML_IN", xml_in); rec.put("XML_IN", xml_in);
         }
+
+        tap_out = _msg_tap_out.get();
+        if (tap_out != null) {
+          xml_out = tap_out.asString(encoding);
+          tracer.newAttr("XML_OUT", xml_out); rec.put("XML_OUT", xml_out);
+        }
+
+        _msg_tap_out.remove();
       }
 
-      msg_out = msg.getExchange().getOutMessage();
-
-      //if (msg_out != null && "org.apache.cxf.binding.soap.SoapMessage".equals(msg_in.getClass().getName())) {
-      //}
-
+      //msg_out = msg.getExchange().getOutMessage();
       //err_in = msg.getExchange().getInFaultMessage();
       //err_out = msg.getExchange().getOutFaultMessage();
 
@@ -116,11 +142,21 @@ __cxf() {
     return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
   }
 
-  spy.add(spy.instrument("CXF_MESSAGE_1")
+
+  if (soap._fetch_xml_out) {
+    spy.add(spy.instance("CXF_MESSAGE_OUT_TAP")
+      .onEnter(spy.fetchArg("MSG", 1))
+      .onReturn(_tap_cxf_output())
+      .include(spy.byMethod("org.apache.cxf.interceptor.MessageSenderInterceptor", "handleMessage")));
+  }
+
+
+  spy.add(spy.instrument("CXF_MESSAGE_IN_OUT_GLOBAL")
     .onEnter(spy.fetchArg("MSG", 1),
-      soap._trace ? _trace_begin() : null)
+      soap._trace ? _cxf_enter() : null,
+      soap._fetch_xml_in ? _tap_cxf_input() : null)
     .onError(tracer.markError())
-    .onSubmit(soap._trace ? _trace_submit() : null)
+    .onSubmit(soap._trace ? _cxf_submit() : null)
     .include(spy.byMethod("org.apache.cxf.transport.ChainInitiationObserver", "onMessage")));
 
 
