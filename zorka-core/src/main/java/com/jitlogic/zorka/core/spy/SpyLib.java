@@ -512,6 +512,15 @@ public class SpyLib {
         return new SpyFlagsProcessor(true);
     }
 
+    public void markError(Map<String,Object> record) {
+        int f = (Integer)record.get(".STAGES");
+        record.put(".STAGES", ((f | SpyLib.ON_ERROR) & ~SpyLib.ON_RETURN));
+    }
+
+    public void unmarkError(Map<String,Object> record) {
+        int f = (Integer)record.get(".STAGES");
+        record.put(".STAGES", ((f | SpyLib.ON_RETURN) & ~SpyLib.ON_ERROR));
+    }
 
     /**
      * Creates method call statistics collector object. It will maintain zorka call statistics and update them with

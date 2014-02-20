@@ -174,11 +174,11 @@ public class UtilLib {
         return Base64.encode(buf, false);
     }
 
-    public TapInputStream tapInputStream(InputStream is, int init, int limit) {
-        return new TapInputStream(is, init, limit);
+    public TapInputStream tapInputStream(InputStream is, long init, long limit) {
+        return new TapInputStream(is, (int)init, (int)limit);
     }
 
-    public TapOutputStream tapOutputStream(OutputStream os, int init, int limit) {
-        return new TapOutputStream(os, init, limit);
+    public TapOutputStream tapOutputStream(OutputStream os, long init, long limit) {
+        return new TapOutputStream(os, (int)init, (int)limit);
     }
 }
