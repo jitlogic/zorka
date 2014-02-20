@@ -20,22 +20,12 @@ zorka.require("soap.bsh", "apache/apache.bsh");
 
 __cxf() {
 
-  _cxf_enter() {
-    process(rec) {
+  _tap_xml_in = new ThreadLocal();
+  _tap_xml_in_fault = new ThreadLocal();
 
-      if ("org.apache.cxf.binding.soap.SoapMessage".equals(rec.get("MSG").getClass().getName())) {
-        tracer.traceBegin("SOAP", soap._time);
-      }
+  _tap_xml_input() {
 
-      return rec;
-    }
-    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
-  }
-
-
-  _tap_cxf_input() {
-
-    tap_in(msg, label, rec) {
+    tap_in(msg, tl) {
       contents = util.getField(msg, "contents");
       is = null; isc = null; isx = -1;
 
@@ -53,27 +43,47 @@ __cxf() {
         if (isc.getName().endsWith("DelegatingInputStream")) {
           tap = util.tapInputStream(is.getInputStream(), 512, soap._fetch_xml_limit);
           is.setInputStream(tap);
-          rec.put(label, tap);
+          tl.set(tap);
         } else {
           tap = util.tapInputStream(is, 512, soap._fetch_xml_limit);
           contents[isx] = tap;
-          rec.put(label, tap);
+          tl.set(tap);
         }
       }
+
     }
 
     process(rec) {
-      msg = rec.get("MSG");
-      tap_in(msg, "TAP_IN", rec);
+      exch = rec.get("MSG").getExchange();
+
+      msg = exch.getInMessage();
+      if (msg != null) {
+        tap_in(msg, _tap_xml_in);
+      }
+
+      fault = exch.getInFaultMessage();
+      if (fault != null) {
+        tap_in(fault, _tap_xml_in_fault);
+      }
+
       return rec;
     }
+
     return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
   }
 
-  _msg_tap_out = new ThreadLocal();
-  _msg_tap_out_fault = new ThreadLocal();
+  if (soap._fetch_xml_in) {
+    spy.add(spy.instance("CXF_TAP_XML_INPUT")
+      .onEnter(spy.fetchArg("MSG", 1), _tap_xml_input())
+      .include(spy.byMethod("org.apache.cxf.interceptor.StaxInInterceptor", "handleMessage")));
+  }
 
-  _tap_cxf_output() {
+
+  _tap_xml_out = new ThreadLocal();
+  _tap_xml_out_fault = new ThreadLocal();
+
+  _tap_xml_output() {
+
     tap_out(msg, tl) {
       contents = util.getField(msg, "contents");
       os = null; osc = null; osx = -1;
@@ -100,12 +110,12 @@ __cxf() {
 
       msg = exch.getOutMessage();
       if (msg != null) {
-        tap_out(msg, _msg_tap_out);
+        tap_out(msg, _tap_xml_out);
       }
 
       fault = exch.getOutFaultMessage();
       if (fault != null) {
-        tap_out(fault, _msg_tap_out_fault);
+        tap_out(fault, _tap_xml_out_fault);
       }
 
       return rec;
@@ -114,7 +124,67 @@ __cxf() {
   }
 
 
-  _cxf_submit() {
+  if (soap._fetch_xml_out) {
+    spy.add(spy.instance("CXF_TAP_XML_OUTPUT")
+      .onEnter(spy.fetchArg("MSG", 1), _tap_xml_output())
+      .include(spy.byMethod("org.apache.cxf.interceptor.StaxOutInterceptor", "handleMessage")));
+  }
+
+
+  _check_xml_taps(rec, encoding) {
+
+    // Input message
+    tap_in = _tap_xml_in.get();
+    if (tap_in != null) {
+      xml_in = tap_in.asString(encoding);
+      tracer.newAttr("XML_IN", xml_in); rec.put("XML_IN", xml_in);
+       _tap_xml_in.remove();
+    }
+
+    // Input FAULT message
+    tap_in_fault = _tap_xml_in_fault.get();
+    if (tap_in_fault != null) {
+      xml_in_fault = tap_in_fault.asString(encoding);
+      tracer.newAttr("XML_IN", xml_in_fault); rec.put("XML_IN", xml_in_fault);
+      _tap_xml_out_fault.remove();
+      tracer.newFlags(tracer.SUBMIT_TRACE|tracer.ERROR_MARK);
+      spy.markError(rec);
+    }
+
+    // Output Message
+    tap_out = _tap_xml_out.get();
+    if (tap_out != null) {
+      xml_out = tap_out.asString(encoding);
+      tracer.newAttr("XML_OUT", xml_out); rec.put("XML_OUT", xml_out);
+      _tap_xml_out.remove();
+    }
+
+    // Output FAULT message
+    tap_out_fault = _tap_xml_out_fault.get();
+    if (tap_out_fault != null) {
+      xml_out_fault = tap_out_fault.asString(encoding);
+      tracer.newAttr("FAULT_OUT", xml_out_fault); rec.put("FAULT_OUT", xml_out_fault);
+      _tap_xml_out_fault.remove();
+      tracer.newFlags(tracer.SUBMIT_TRACE|tracer.ERROR_MARK);
+      spy.markError(rec);
+    }
+  }
+
+
+  _soap_svc_begin() {
+    process(rec) {
+      if ("org.apache.cxf.binding.soap.SoapMessage".equals(rec.get("MSG").getClass().getName())) {
+        tracer.traceBegin("SOAP", soap._time);
+      }
+
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+
+
+  _soap_svc_submit() {
 
     process(rec) {
 
@@ -127,6 +197,7 @@ __cxf() {
         tracer.newAttr("SERVICE", service); rec.put("SERVICE", service);
         operation = msg_in.get("javax.xml.ws.wsdl.operation");
         method = null;
+
         if (operation != null) {
           method = operation.getLocalPart();
         } else {
@@ -135,34 +206,9 @@ __cxf() {
         }
         tracer.newAttr("METHOD", method); rec.put("METHOD", method);
         encoding = msg_in.get("org.apache.cxf.message.Message.ENCODING");
-        tracer.newAttr("ENC_IN", encoding);
 
-        tap_in = rec.get("TAP_IN");
-        if (tap_in != null) {
-          xml_in = tap_in.asString(encoding);
-          tracer.newAttr("XML_IN", xml_in); rec.put("XML_IN", xml_in);
-        }
-
-        tap_out = _msg_tap_out.get();
-        if (tap_out != null) {
-          xml_out = tap_out.asString(encoding);
-          tracer.newAttr("XML_OUT", xml_out); rec.put("XML_OUT", xml_out);
-          _msg_tap_out.remove();
-        }
-
-        tap_out_fault = _msg_tap_out_fault.get();
-        if (tap_out_fault != null) {
-          xml_out_fault = tap_out_fault.asString(encoding);
-          tracer.newAttr("FAULT_OUT", xml_out_fault); rec.put("FAULT_OUT", xml_out_fault);
-          _msg_tap_out_fault.remove();
-          tracer.newFlags(tracer.SUBMIT_TRACE|tracer.ERROR_MARK);
-          spy.markError(rec);
-        }
-
+        _check_xml_taps(rec, encoding);
       }
-
-      //err_in = msg.getExchange().getInFaultMessage();
-      //err_out = msg.getExchange().getOutFaultMessage();
 
       return rec;
     }
@@ -171,21 +217,32 @@ __cxf() {
   }
 
 
-  if (soap._fetch_xml_out) {
-    spy.add(spy.instance("CXF_MESSAGE_OUT_TAP")
-      .onEnter(spy.fetchArg("MSG", 1))
-      .onReturn(_tap_cxf_output())
-      .include(spy.byMethod("org.apache.cxf.interceptor.MessageSenderInterceptor", "handleMessage")));
+  spy.add(spy.instrument("CXF_SERVICE")
+    .onEnter(spy.fetchArg("MSG", 1),
+      soap._trace ? _soap_svc_begin() : null)
+    .onError(tracer.markError())
+    .onSubmit(soap._trace ? _soap_svc_submit() : null)
+    .include(spy.byMethod("org.apache.cxf.transport.ChainInitiationObserver", "onMessage")));
+
+
+  _cxf_cli_submit() {
+    process(rec) {
+      _check_xml_taps(rec, null);
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
   }
 
 
-  spy.add(spy.instrument("CXF_MESSAGE_IN_OUT_GLOBAL")
-    .onEnter(spy.fetchArg("MSG", 1),
-      soap._trace ? _cxf_enter() : null,
-      soap._fetch_xml_in ? _tap_cxf_input() : null)
-    .onError(tracer.markError())
-    .onSubmit(soap._trace ? _cxf_submit() : null)
-    .include(spy.byMethod("org.apache.cxf.transport.ChainInitiationObserver", "onMessage")));
+  spy.add(spy.instrument("CXF_WS_CLIENT")
+    .onEnter(spy.fetchArg("MDESC", 2),
+      soap._trace ? spy.subchain(
+        tracer.begin("SOAP_CLI", zorka.longCfg("soap.trace.time")),
+        tracer.formatAttr("METHOD", "${MDESC.name}"),
+        tracer.formatAttr("CLASS", "${MDESC.declaringClass.name}")
+      ) : null)
+    .onSubmit(soap._trace ? _cxf_cli_submit() : null)
+    .include(spy.byMethod("org.apache.cxf.jaxws.JaxWsClientProxy", "invoke")));
 
 
   tracer.exclude(
