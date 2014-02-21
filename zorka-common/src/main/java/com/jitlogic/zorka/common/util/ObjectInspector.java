@@ -610,7 +610,7 @@ public final class ObjectInspector {
             Field field = lookupField(obj instanceof Class ? (Class) obj : obj.getClass(), fieldName);
 
             if (field == null) {
-                //return null;
+                return null;
             }
 
             boolean accessible = field.isAccessible();

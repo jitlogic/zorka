@@ -16,7 +16,7 @@
  */
 
 
-zorka.require("soap.bsh", "apache/apache.bsh");
+zorka.require("soap.bsh", "rest.bsh", "apache/apache.bsh");
 
 __cxf() {
 
@@ -27,6 +27,12 @@ __cxf() {
 
     tap_in(msg, tl) {
       contents = util.getField(msg, "contents");
+      if (contents == null) {
+        contents = util.getField(util.getField(msg, "message"), "contents");
+      }
+
+      zorka.logInfo("IN: contents = " + contents);
+
       is = null; isc = null; isx = -1;
 
       // TODO fetching it manually is propably not a good idea; use getContent()/setContent() instead
@@ -75,7 +81,9 @@ __cxf() {
   if (soap._fetch_xml_in) {
     spy.add(spy.instance("CXF_TAP_XML_INPUT")
       .onEnter(spy.fetchArg("MSG", 1), _tap_xml_input())
-      .include(spy.byMethod("org.apache.cxf.interceptor.StaxInInterceptor", "handleMessage")));
+      .include(
+        spy.byMethod("org.apache.cxf.interceptor.StaxInInterceptor", "handleMessage"),
+        spy.byMethod("org.apache.cxf.jaxrs.interceptor.JAXRSInInterceptor", "handleMessage")));
   }
 
 
@@ -86,6 +94,12 @@ __cxf() {
 
     tap_out(msg, tl) {
       contents = util.getField(msg, "contents");
+      if (contents == null) {
+        contents = util.getField(util.getField(msg, "message"), "contents");
+      }
+
+      zorka.logInfo("OUT: contents = " + contents);
+
       os = null; osc = null; osx = -1;
 
       // TODO fetching it manually is propably not a good idea; use getContent()/setContent() instead
@@ -127,17 +141,24 @@ __cxf() {
   if (soap._fetch_xml_out) {
     spy.add(spy.instance("CXF_TAP_XML_OUTPUT")
       .onEnter(spy.fetchArg("MSG", 1), _tap_xml_output())
-      .include(spy.byMethod("org.apache.cxf.interceptor.StaxOutInterceptor", "handleMessage")));
+      .include(
+        spy.byMethod("org.apache.cxf.interceptor.StaxOutInterceptor", "handleMessage"),
+        spy.byMethod("org.apache.cxf.jaxrs.interceptor.JAXRSOutInterceptor", "handleMessage")));
   }
 
 
   _check_xml_taps(rec, encoding) {
 
+    cti = rec.get("CONTENT_IN");
+    cto = rec.get("CONTENT_OUT");
+
     // Input message
     tap_in = _tap_xml_in.get();
     if (tap_in != null) {
       xml_in = tap_in.asString(encoding);
-      tracer.newAttr("XML_IN", xml_in); rec.put("XML_IN", xml_in);
+      if (xml_in != null && xml_in.length() > 0) {
+        tracer.newAttr(cti, xml_in); rec.put(cti, xml_in);
+      }
        _tap_xml_in.remove();
     }
 
@@ -145,7 +166,9 @@ __cxf() {
     tap_in_fault = _tap_xml_in_fault.get();
     if (tap_in_fault != null) {
       xml_in_fault = tap_in_fault.asString(encoding);
-      tracer.newAttr("XML_IN", xml_in_fault); rec.put("XML_IN", xml_in_fault);
+      if (xml_in_fault != null && xml_in_fault.length() > 0) {
+        tracer.newAttr("XML_IN", xml_in_fault); rec.put(cti, xml_in_fault);
+      }
       _tap_xml_out_fault.remove();
       tracer.newFlags(tracer.SUBMIT_TRACE|tracer.ERROR_MARK);
       spy.markError(rec);
@@ -155,7 +178,7 @@ __cxf() {
     tap_out = _tap_xml_out.get();
     if (tap_out != null) {
       xml_out = tap_out.asString(encoding);
-      tracer.newAttr("XML_OUT", xml_out); rec.put("XML_OUT", xml_out);
+      tracer.newAttr("XML_OUT", xml_out); rec.put(cto, xml_out);
       _tap_xml_out.remove();
     }
 
@@ -163,18 +186,34 @@ __cxf() {
     tap_out_fault = _tap_xml_out_fault.get();
     if (tap_out_fault != null) {
       xml_out_fault = tap_out_fault.asString(encoding);
-      tracer.newAttr("FAULT_OUT", xml_out_fault); rec.put("FAULT_OUT", xml_out_fault);
+      tracer.newAttr("FAULT_OUT", xml_out_fault); rec.put(cto, xml_out_fault);
       _tap_xml_out_fault.remove();
       tracer.newFlags(tracer.SUBMIT_TRACE|tracer.ERROR_MARK);
       spy.markError(rec);
     }
   }
 
+  _content_type(ct, suffix) {
+    c = "text/xml".equals(ct) ? "XML" :
+           "application/json".equals(ct) ? "JSON" :
+           "MSG";
+    return c + suffix;
+  }
 
   _soap_svc_begin() {
     process(rec) {
-      if ("org.apache.cxf.binding.soap.SoapMessage".equals(rec.get("MSG").getClass().getName())) {
+      msg = rec.get("MSG");
+      if ("org.apache.cxf.binding.soap.SoapMessage".equals(msg.getClass().getName())) {
         tracer.traceBegin("SOAP", soap._time);
+        rec.put("CONTENT_IN", "XML_IN");
+        rec.put("CONTENT_OUT", "XML_OUT");
+      } else if (msg.get("org.apache.cxf.request.method") != null) {
+        tracer.traceBegin("REST", rest._time);
+        rec.put("CONTENT_IN", _content_type(msg.get("Content-Type"), "_IN"));
+        rec.put("CONTENT_OUT", _content_type(msg.get("Accept"), "_OUT"));
+      } else {
+        rec.put("CONTENT_IN", "MSG_IN");
+        rec.put("CONTENT_OUT", "MSG_OUT");
       }
 
       return rec;
@@ -191,10 +230,12 @@ __cxf() {
       msg = rec.get("MSG");
       msg_in = msg.getExchange().getInMessage();
 
-      if (msg_in != null && "org.apache.cxf.binding.soap.SoapMessage".equals(msg_in.getClass().getName())) {
-        tracer.traceBegin("SOAP", soap._time);
+      if (msg_in != null) {
         service = msg_in.get("org.apache.cxf.request.url");
-        tracer.newAttr("SERVICE", service); rec.put("SERVICE", service);
+        if (service != null) {
+            tracer.newAttr("SERVICE", service); rec.put("SERVICE", service);
+        }
+
         operation = msg_in.get("javax.xml.ws.wsdl.operation");
         method = null;
 
@@ -204,8 +245,16 @@ __cxf() {
           qs = msg_in.get("org.apache.cxf.message.Message.QUERY_STRING");
           method = "?" + (qs != null ? qs : "");
         }
-        tracer.newAttr("METHOD", method); rec.put("METHOD", method);
+        if (method != null) {
+          tracer.newAttr("METHOD", method); rec.put("METHOD", method);
+        }
         encoding = msg_in.get("org.apache.cxf.message.Message.ENCODING");
+
+        http_method = msg_in.get("org.apache.cxf.request.method");
+
+        if (http_method != null) {
+          tracer.newAttr("HTTP_METHOD", http_method);
+        }
 
         _check_xml_taps(rec, encoding);
       }
