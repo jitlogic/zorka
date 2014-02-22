@@ -28,9 +28,11 @@ __rest() {
   zorka.defCfg("rest.fetch.args", "yes");
   zorka.defCfg("rest.fetch.limit", "65536");
 
+
   _trace = zorka.boolCfg("rest.trace");
   _time  = zorka.longCfg("rest.trace.time");
   _stats = zorka.boolCfg("rest.stats");
+  _mbean = zorka.stringCfg("rest.stats.mbean");
 
   _fetch_args  = zorka.boolCfg("rest.fetch.args");
   _fetch_limit = zorka.longCfg("rest.fetch.limit");

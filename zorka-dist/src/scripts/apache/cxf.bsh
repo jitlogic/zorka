@@ -20,6 +20,12 @@ zorka.require("soap.bsh", "rest.bsh", "apache/apache.bsh");
 
 __cxf() {
 
+  zorka.defCfg("cxf.stats", "yes");
+  zorka.defCfg("cxf.stats.mbean", "zorka:type=ZorkaStats,name=CXF");
+
+  _stats = zorka.boolCfg("cxf.stats");
+  _mbean = zorka.stringCfg("cxf.stats.mbean");
+
   _tap_xml_in = new ThreadLocal();
   _tap_xml_in_fault = new ThreadLocal();
 
@@ -233,7 +239,8 @@ __cxf() {
       if (msg_in != null) {
         service = msg_in.get("org.apache.cxf.request.url");
         if (service != null) {
-            tracer.newAttr("SERVICE", service); rec.put("SERVICE", service);
+            tracer.newAttr("SERVICE", service);
+            rec.put("SERVICE", service);
         }
 
         operation = msg_in.get("javax.xml.ws.wsdl.operation");
@@ -270,7 +277,9 @@ __cxf() {
     .onEnter(spy.fetchArg("MSG", 1),
       soap._trace ? _soap_svc_begin() : null)
     .onError(tracer.markError())
-    .onSubmit(soap._trace ? _soap_svc_submit() : null)
+    .onSubmit(
+      soap._trace ? _soap_svc_submit() : null,
+      _stats ? spy.zorkaStats("java", _mbean, "stats", "ALL") : null)
     .include(spy.byMethod("org.apache.cxf.transport.ChainInitiationObserver", "onMessage")));
 
 

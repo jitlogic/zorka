@@ -26,7 +26,8 @@ zorka.require(
   "oracle/grizzly.bsh",
   "jboss/hibernate.bsh",
   "jboss/weld.bsh",
-  "google/libs.bsh"
+  "google/libs.bsh",
+  "oracle/jersey.bsh"
 );
 
 __glassfish() {

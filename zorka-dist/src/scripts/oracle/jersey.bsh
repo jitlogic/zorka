@@ -1,0 +1,49 @@
+/**
+ * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+zorka.require("rest.bsh");
+
+__jersey() {
+
+  spy.add(spy.instrument("JERSEY2_SERVICE")
+    .onEnter(spy.fetchArg("REQ", 1),
+      rest._trace ? tracer.begin("REST", rest._time) : null)
+    .onError(tracer.markError())
+    .onSubmit(
+      spy.get("SERVICE", "REQ", "baseUri"),
+      rest._trace ? spy.subchain(
+        tracer.attr("SERVICE", "SERVICE"),
+        tracer.formatAttr("URI", "${REQ.requestUri}"),
+        tracer.formatAttr("HTTP_METHOD", "${REQ.method}")
+      ) : null,
+      rest._stats ? spy.subchain(
+        spy.zorkaStats("java", rest._mbean, "stats", "REST"),
+        spy.zorkaStats("java", rest._mbean, "byService", "${SERVICE}")
+      ) : null)
+    .include(spy.byMethod("org.glassfish.jersey.server.ApplicationHandler","handle")));
+
+  tracer.exclude(
+    "org.glassfish.jersey.message.internal.**",
+    "org.glassfish.jersey.uri.internal.**",
+    "org.glassfish.jersey.internal.util.**"
+  );
+
+  return this;
+}
+
+jersey = __jersey();
+
