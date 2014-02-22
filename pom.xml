@@ -3,9 +3,9 @@
     <groupId>com.jitlogic.zorka</groupId>
     <artifactId>zorka</artifactId>
     <packaging>pom</packaging>
-    <version>0.9.18</version>
+    <version>0.9.19</version>
     <name>zorka: parent aggregator</name>
-    <url>http://www.jitlogic.com/zorka</url>
+    <url>http://zorka.io</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

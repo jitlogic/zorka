@@ -15,19 +15,29 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require(
-  "jvm.bsh",
-  "javax.bsh",
-  "libs.bsh",
-  "tracer.bsh",
-  "apache/axis2.bsh",
-  "apache/tomcat.bsh",
-  "apache/apache.bsh",
-  "apache/cxf.bsh",
-  "eclipse/eclipse.bsh",
-  "wso2/carbon.bsh"
-);
+zorka.require("tracer.bsh");
+
+__rest() {
+
+  zorka.defCfg("rest.trace", zorka.boolCfg("tracer"));
+  zorka.defCfg("rest.trace.time", zorka.longCfg("tracer.min.trace.time"));
+
+  zorka.defCfg("rest.stats", "yes");
+  zorka.defCfg("rest.stats.mbean", "zorka:type=ZorkaStats,name=REST");
+
+  zorka.defCfg("rest.fetch.args", "yes");
+  zorka.defCfg("rest.fetch.limit", "65536");
 
 
-jvm.autoregister();
+  _trace = zorka.boolCfg("rest.trace");
+  _time  = zorka.longCfg("rest.trace.time");
+  _stats = zorka.boolCfg("rest.stats");
+  _mbean = zorka.stringCfg("rest.stats.mbean");
 
+  _fetch_args  = zorka.boolCfg("rest.fetch.args");
+  _fetch_limit = zorka.longCfg("rest.fetch.limit");
+
+  return this;
+}
+
+rest = __rest();

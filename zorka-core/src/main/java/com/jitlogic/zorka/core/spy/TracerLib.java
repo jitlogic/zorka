@@ -166,7 +166,7 @@ public class TracerLib {
      * @return spy processor object marking new trace
      */
     public SpyProcessor begin(String name, long minimumTraceTime, int flags) {
-        return new TraceBeginProcessor(tracer, symbolRegistry.symbolId(name), minimumTraceTime * 1000000L, flags);
+        return new TraceBeginProcessor(tracer, name, minimumTraceTime * 1000000L, flags, symbolRegistry);
     }
 
 

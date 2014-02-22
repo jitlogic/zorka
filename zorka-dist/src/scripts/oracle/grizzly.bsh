@@ -1,0 +1,78 @@
+/**
+ * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+zorka.require("http.bsh");
+
+__grizzly() {
+
+    spy.add(spy.instrument("GRIZZLY_HTTP")
+      .onEnter(spy.fetchArg("REQ", 1), spy.fetchArg("RESP", 2),
+        spy.format("URI", "${REQ.request.requestURI}"),
+        http._trace ? spy.subchain(
+          http._uriQualifier,
+          tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
+          tracer.attr("URI", "URI")
+        ) : null,
+        http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
+      .onReturn(spy.put("ERR", ""))
+      .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),
+        http._trace ? spy.subchain(
+          http._uriQualifier,
+          http._error_chain,
+          tracer.flags(tracer.SUBMIT_TRACE),
+          tracer.attr("ERR", "ERR")
+          ) : null)
+      .onSubmit(
+        spy.strTime("TIME"),
+        spy.format("STATUS", "${RESP.status}"),
+        spy.get("USER", "REQ", "remoteUser"),
+        http._trace ? spy.subchain(
+          http._uriQualifier,
+          tracer.attr("STATUS", "STATUS"),
+          tracer.filterBy("STATUS", null, http._errors, null, null),
+          tracer.attr("USER", "USER"),
+          http._cookies ? http.cookies_processor(true, true) : spy.put("COOKIES", ""),
+          http._headers ? http.headers_processor(true, false) : null,
+          http._params ? http.param_processor() : spy.put("PARAMS", "")
+        ) : null,
+        http._slow_chain,
+        spy.subchain(
+          spy.valSetFilter("STATUS", http._errors),
+          spy.markError(), tracer.markError(),
+          http._error_chain),
+        http._redirQualifier,
+        http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
+      .include(spy.byMethod(0, "org.glassfish.grizzly.http.server.HttpHandler", "doHandle", "boolean")));
+
+  tracer.exclude(
+    "org.apache.catalina.connector.Request",
+    "org.apache.catalina.connector.RequestFacade",
+    "org.apache.catalina.connector.Response",
+    "org.apache.catalina.connector.ResponseFacade",
+    "org.apache.catalina.core.ApplicationCont**",
+    "org.apache.catalina.session.StandardSession",
+    "org.apache.catalina.session.StandardSessionFacade",
+    "org.apache.catalina.util.**",
+    "org.glassfish.grizzly.http.HttpRequestPacket",
+    "org.glassfish.grizzly.http.util.**"
+  );
+
+  return this;
+}
+
+grizzly = __grizzly();
+

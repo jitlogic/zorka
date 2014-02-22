@@ -1,0 +1,318 @@
+/**
+ * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+zorka.require("soap.bsh", "rest.bsh", "apache/apache.bsh");
+
+__cxf() {
+
+  zorka.defCfg("cxf.stats", "yes");
+  zorka.defCfg("cxf.stats.mbean", "zorka:type=ZorkaStats,name=CXF");
+
+  _stats = zorka.boolCfg("cxf.stats");
+  _mbean = zorka.stringCfg("cxf.stats.mbean");
+
+  _tap_xml_in = new ThreadLocal();
+  _tap_xml_in_fault = new ThreadLocal();
+
+  _tap_xml_input() {
+
+    tap_in(msg, tl) {
+      contents = util.getField(msg, "contents");
+      if (contents == null) {
+        contents = util.getField(util.getField(msg, "message"), "contents");
+      }
+
+      is = null; isc = null; isx = -1;
+
+      // TODO fetching it manually is propably not a good idea; use getContent()/setContent() instead
+      if (contents != null) {
+        for (i = 1; i < contents.length; i += 2) {
+          c = contents[i];
+          if (c instanceof java.io.InputStream) {
+            is = c; isc = contents[i-1]; isx = i; break;
+          }
+        }
+      }
+
+      if (is != null) {
+        if (isc.getName().endsWith("DelegatingInputStream")) {
+          tap = util.tapInputStream(is.getInputStream(), 512, soap._fetch_xml_limit);
+          is.setInputStream(tap);
+          tl.set(tap);
+        } else {
+          tap = util.tapInputStream(is, 512, soap._fetch_xml_limit);
+          contents[isx] = tap;
+          tl.set(tap);
+        }
+      }
+
+    }
+
+    process(rec) {
+      exch = rec.get("MSG").getExchange();
+
+      msg = exch.getInMessage();
+      if (msg != null) {
+        tap_in(msg, _tap_xml_in);
+      }
+
+      fault = exch.getInFaultMessage();
+      if (fault != null) {
+        tap_in(fault, _tap_xml_in_fault);
+      }
+
+      return rec;
+    }
+
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+  if (soap._fetch_xml_in) {
+    spy.add(spy.instance("CXF_TAP_XML_INPUT")
+      .onEnter(spy.fetchArg("MSG", 1), _tap_xml_input())
+      .include(
+        spy.byMethod("org.apache.cxf.interceptor.StaxInInterceptor", "handleMessage"),
+        spy.byMethod("org.apache.cxf.jaxrs.interceptor.JAXRSInInterceptor", "handleMessage")));
+  }
+
+
+  _tap_xml_out = new ThreadLocal();
+  _tap_xml_out_fault = new ThreadLocal();
+
+  _tap_xml_output() {
+
+    tap_out(msg, tl) {
+      contents = util.getField(msg, "contents");
+      if (contents == null) {
+        contents = util.getField(util.getField(msg, "message"), "contents");
+      }
+
+      os = null; osc = null; osx = -1;
+
+      // TODO fetching it manually is propably not a good idea; use getContent()/setContent() instead
+      if (contents != null) {
+        for (i = 1; i < contents.length; i += 2) {
+          c = contents[i];
+          if (c instanceof java.io.OutputStream) {
+            os = c; osc = contents[i-1]; osx = i; break;
+          }
+        }
+      }
+
+      if (os != null) {
+        tap_out = util.tapOutputStream(os, 512, soap._fetch_xml_limit);
+        tl.set(tap_out);
+        contents[osx] = tap_out;
+      }
+    }
+
+    process(rec) {
+      exch = rec.get("MSG").getExchange();
+
+      msg = exch.getOutMessage();
+      if (msg != null) {
+        tap_out(msg, _tap_xml_out);
+      }
+
+      fault = exch.getOutFaultMessage();
+      if (fault != null) {
+        tap_out(fault, _tap_xml_out_fault);
+      }
+
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+
+  if (soap._fetch_xml_out) {
+    spy.add(spy.instance("CXF_TAP_XML_OUTPUT")
+      .onEnter(spy.fetchArg("MSG", 1), _tap_xml_output())
+      .include(
+        spy.byMethod("org.apache.cxf.interceptor.StaxOutInterceptor", "handleMessage"),
+        spy.byMethod("org.apache.cxf.jaxrs.interceptor.JAXRSOutInterceptor", "handleMessage")));
+  }
+
+
+  _check_xml_taps(rec, encoding) {
+
+    cti = rec.get("CONTENT_IN");
+    cto = rec.get("CONTENT_OUT");
+
+    // Input message
+    tap_in = _tap_xml_in.get();
+    if (tap_in != null) {
+      xml_in = tap_in.asString(encoding);
+      if (xml_in != null && xml_in.length() > 0) {
+        tracer.newAttr(cti, xml_in); rec.put(cti, xml_in);
+      }
+       _tap_xml_in.remove();
+    }
+
+    // Input FAULT message
+    tap_in_fault = _tap_xml_in_fault.get();
+    if (tap_in_fault != null) {
+      xml_in_fault = tap_in_fault.asString(encoding);
+      if (xml_in_fault != null && xml_in_fault.length() > 0) {
+        tracer.newAttr("XML_IN", xml_in_fault); rec.put(cti, xml_in_fault);
+      }
+      _tap_xml_out_fault.remove();
+      tracer.newFlags(tracer.SUBMIT_TRACE|tracer.ERROR_MARK);
+      spy.markError(rec);
+    }
+
+    // Output Message
+    tap_out = _tap_xml_out.get();
+    if (tap_out != null) {
+      xml_out = tap_out.asString(encoding);
+      tracer.newAttr("XML_OUT", xml_out); rec.put(cto, xml_out);
+      _tap_xml_out.remove();
+    }
+
+    // Output FAULT message
+    tap_out_fault = _tap_xml_out_fault.get();
+    if (tap_out_fault != null) {
+      xml_out_fault = tap_out_fault.asString(encoding);
+      tracer.newAttr("FAULT_OUT", xml_out_fault); rec.put(cto, xml_out_fault);
+      _tap_xml_out_fault.remove();
+      tracer.newFlags(tracer.SUBMIT_TRACE|tracer.ERROR_MARK);
+      spy.markError(rec);
+    }
+  }
+
+  _content_type(ct, suffix) {
+    c = "text/xml".equals(ct) ? "XML" :
+           "application/json".equals(ct) ? "JSON" :
+           "MSG";
+    return c + suffix;
+  }
+
+  _soap_svc_begin() {
+    process(rec) {
+      msg = rec.get("MSG");
+      if ("org.apache.cxf.binding.soap.SoapMessage".equals(msg.getClass().getName())) {
+        tracer.traceBegin("SOAP", soap._time);
+        rec.put("CONTENT_IN", "XML_IN");
+        rec.put("CONTENT_OUT", "XML_OUT");
+      } else if (msg.get("org.apache.cxf.request.method") != null) {
+        tracer.traceBegin("REST", rest._time);
+        rec.put("CONTENT_IN", _content_type(msg.get("Content-Type"), "_IN"));
+        rec.put("CONTENT_OUT", _content_type(msg.get("Accept"), "_OUT"));
+      } else {
+        rec.put("CONTENT_IN", "MSG_IN");
+        rec.put("CONTENT_OUT", "MSG_OUT");
+      }
+
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+
+
+  _soap_svc_submit() {
+
+    process(rec) {
+
+      msg = rec.get("MSG");
+      msg_in = msg.getExchange().getInMessage();
+
+      if (msg_in != null) {
+        service = msg_in.get("org.apache.cxf.request.url");
+        if (service != null) {
+            tracer.newAttr("SERVICE", service);
+            rec.put("SERVICE", service);
+        }
+
+        operation = msg_in.get("javax.xml.ws.wsdl.operation");
+        method = null;
+
+        if (operation != null) {
+          method = operation.getLocalPart();
+        } else {
+          qs = msg_in.get("org.apache.cxf.message.Message.QUERY_STRING");
+          method = "?" + (qs != null ? qs : "");
+        }
+        if (method != null) {
+          tracer.newAttr("METHOD", method); rec.put("METHOD", method);
+        }
+        encoding = msg_in.get("org.apache.cxf.message.Message.ENCODING");
+
+        http_method = msg_in.get("org.apache.cxf.request.method");
+
+        if (http_method != null) {
+          tracer.newAttr("HTTP_METHOD", http_method);
+        }
+
+        _check_xml_taps(rec, encoding);
+      }
+
+      return rec;
+    }
+
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+
+  spy.add(spy.instrument("CXF_SERVICE")
+    .onEnter(spy.fetchArg("MSG", 1),
+      soap._trace ? _soap_svc_begin() : null)
+    .onError(tracer.markError())
+    .onSubmit(
+      soap._trace ? _soap_svc_submit() : null,
+      _stats ? spy.zorkaStats("java", _mbean, "stats", "SVC") : null)
+    .include(spy.byMethod("org.apache.cxf.transport.ChainInitiationObserver", "onMessage")));
+
+
+  _cxf_cli_submit() {
+    process(rec) {
+      _check_xml_taps(rec, null);
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+
+  spy.add(spy.instrument("CXF_WS_CLIENT")
+    .onEnter(spy.fetchArg("MDESC", 2),
+      soap._trace ? spy.subchain(
+        tracer.begin("SOAP_CLI", zorka.longCfg("soap.trace.time")),
+        tracer.formatAttr("METHOD", "${MDESC.name}"),
+        tracer.formatAttr("CLASS", "${MDESC.declaringClass.name}")
+      ) : null)
+    .onSubmit(soap._trace ? _cxf_cli_submit() : null)
+    .include(spy.byMethod("org.apache.cxf.jaxws.JaxWsClientProxy", "invoke")));
+
+
+  tracer.exclude(
+    "org.apache.cxf.bus.extension.Extension",
+    "org.apache.cxf.common.logging.**",
+    "org.apache.cxf.message.MessageImpl",
+    "org.apache.cxf.message.StringMapImpl",
+    "org.apache.cxf.helpers.HttpHeaderHelper",
+    "org.apache.cxf.phase.Phase",
+    "org.apache.cxf.common.util.**"
+  );
+
+
+  return this;
+}
+
+cxf = __cxf();
+
+// "org.apache.cxf.**",

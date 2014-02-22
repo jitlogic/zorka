@@ -24,11 +24,16 @@ public class TestClass1 {
     private static int scalls = 0;
     private int calls = 0;
     private int vals = 0;
+    private String tag = "";
 
     public void trivialMethod() {
         calls++;
     }
 
+    public void trivialStrMethod(String tag) {
+        calls++;
+        this.tag = tag;
+    }
 
     public void errorMethod() {
         throw new NullPointerException("dUP!");
@@ -70,5 +75,9 @@ public class TestClass1 {
 
     public int getCalls() {
         return calls;
+    }
+
+    public String getS() {
+        return tag;
     }
 }

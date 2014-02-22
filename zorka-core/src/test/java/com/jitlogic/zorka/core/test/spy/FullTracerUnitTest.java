@@ -78,6 +78,7 @@ public class FullTracerUnitTest extends ZorkaFixture {
     @Test
     public void testSimpleTrace() throws Exception {
         tracer.include(spy.byMethod(TCLASS1, "trivialMethod"));
+
         spy.add(
                 spy.instance().onEnter(tracer.begin("TEST", 0))
                         .include(spy.byMethod(TCLASS1, "trivialMethod")));
@@ -91,6 +92,30 @@ public class FullTracerUnitTest extends ZorkaFixture {
         assertEquals("should return begin, trace", 1, results.size());
         TraceRecord rec = results.get(0);
         assertEquals(sym(TCLASS1), rec.getClassId());
+        assertEquals(sym("TEST"), rec.getTraceId());
+        assertEquals(1, rec.getCalls());
+    }
+
+
+    @Test
+    public void testSimpleTraceWithName() throws Exception {
+        tracer.include(spy.byMethod(TCLASS1, "trivialStrMethod"));
+
+        spy.add(
+          spy.instance()
+            .onEnter(spy.fetchArg("TAG", 1), tracer.begin("${TAG}", 0))
+            .include(spy.byMethod(TCLASS1, "trivialStrMethod")));
+
+        agentInstance.getTracer().setMinMethodTime(0); // Catch everything
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS1);
+        invoke(obj, "trivialStrMethod", "BUMBUM");
+        assertEquals("should return begin, trace", 1, results.size());
+
+        TraceRecord rec = results.get(0);
+        assertEquals(sym(TCLASS1), rec.getClassId());
+        assertEquals(sym("BUMBUM"), rec.getTraceId());
         assertEquals(1, rec.getCalls());
     }
 

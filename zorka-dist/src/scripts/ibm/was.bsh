@@ -24,6 +24,7 @@ zorka.require(
   "libs.bsh",
   "javax/jms.bsh",
   "apache/apache.bsh",
+  "apache/cxf.bsh",
   "eclipse/eclipse.bsh"
 );
 

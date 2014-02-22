@@ -1,3 +1,12 @@
+Zorka 0.9.19 (2014-02-22)
+-------------------------
+
+ * Glassfish 4.0 support;
+ * agent: util.tapInputStream(), util.tapOutputStream() for wiretaping streams;
+ * SOAP monitoring: support for Apache CXF framework;
+ * REST monitoring: general config + support for Apache CXF framework;
+
+
 Zorka 0.9.18 (2014-02-15)
 -------------------------
 
