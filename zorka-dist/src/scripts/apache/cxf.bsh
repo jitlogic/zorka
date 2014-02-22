@@ -37,8 +37,6 @@ __cxf() {
         contents = util.getField(util.getField(msg, "message"), "contents");
       }
 
-      zorka.logInfo("IN: contents = " + contents);
-
       is = null; isc = null; isx = -1;
 
       // TODO fetching it manually is propably not a good idea; use getContent()/setContent() instead
@@ -103,8 +101,6 @@ __cxf() {
       if (contents == null) {
         contents = util.getField(util.getField(msg, "message"), "contents");
       }
-
-      zorka.logInfo("OUT: contents = " + contents);
 
       os = null; osc = null; osx = -1;
 
@@ -279,7 +275,7 @@ __cxf() {
     .onError(tracer.markError())
     .onSubmit(
       soap._trace ? _soap_svc_submit() : null,
-      _stats ? spy.zorkaStats("java", _mbean, "stats", "ALL") : null)
+      _stats ? spy.zorkaStats("java", _mbean, "stats", "SVC") : null)
     .include(spy.byMethod("org.apache.cxf.transport.ChainInitiationObserver", "onMessage")));
 
 

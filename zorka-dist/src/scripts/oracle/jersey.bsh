@@ -31,8 +31,7 @@ __jersey() {
         tracer.formatAttr("HTTP_METHOD", "${REQ.method}")
       ) : null,
       rest._stats ? spy.subchain(
-        spy.zorkaStats("java", rest._mbean, "stats", "REST"),
-        spy.zorkaStats("java", rest._mbean, "byService", "${SERVICE}")
+        spy.zorkaStats("java", rest._mbean, "stats", "SVC")
       ) : null)
     .include(spy.byMethod("org.glassfish.jersey.server.ApplicationHandler","handle")));
 
