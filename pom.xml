@@ -11,7 +11,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <antrun.plugin.version>1.3</antrun.plugin.version>
-        <asm.version>4.1</asm.version>
+        <asm.version>4.2</asm.version>
         <bval.version>0.5</bval.version>
         <dbcp.version>1.4</dbcp.version>
         <fest.version>1.4</fest.version>

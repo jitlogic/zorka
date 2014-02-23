@@ -33,7 +33,7 @@ public class TestSpyTransformer extends SpyClassTransformer {
     private SymbolRegistry sreg;
 
     public TestSpyTransformer(SymbolRegistry symbolRegistry, Tracer tracer, SpyRetransformer spyRetransformer) {
-        super(symbolRegistry, tracer, new MethodCallStatistics(), spyRetransformer);
+        super(symbolRegistry, tracer, false, new MethodCallStatistics(), spyRetransformer);
         sreg = symbolRegistry;
     }
 

@@ -60,6 +60,8 @@ public class SpyClassTransformer implements ClassFileTransformer {
      */
     private Map<Integer, SpyContext> ctxById = new ConcurrentHashMap<Integer, SpyContext>();
 
+    private int writerFlags;
+
     /**
      * Map of spy contexts (by instance)
      */
@@ -91,11 +93,12 @@ public class SpyClassTransformer implements ClassFileTransformer {
      *
      * @param tracer reference to tracer engine object
      */
-    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer,
+    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer, boolean computeStackFrames,
                                MethodCallStatistics statistics, SpyRetransformer retransformer) {
         this.symbolRegistry = symbolRegistry;
         this.tracer = tracer;
         this.retransformer = retransformer;
+        this.writerFlags = computeStackFrames ? ClassWriter.COMPUTE_FRAMES : 0;
 
         this.spyLookups = statistics.getMethodCallStatistic("SpyLookups");
         this.tracerLookups = statistics.getMethodCallStatistic("TracerLookups");
@@ -284,7 +287,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
             }
 
             ClassReader cr = new ClassReader(classfileBuffer);
-            ClassWriter cw = new ClassWriter(cr, 0);
+            ClassWriter cw = new ClassWriter(cr, writerFlags);
             ClassVisitor scv = createVisitor(classLoader, clazzName, found, tracer, cw);
             cr.accept(scv, 0);
             buf = cw.toByteArray();
