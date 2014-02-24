@@ -17,7 +17,7 @@
 
 // This file contains agent configurations for a variety of Apache libraries
 
-zorka.require("tracer.bsh");
+zorka.require("soap.bsh");
 
 __axis2() {
 
@@ -44,17 +44,29 @@ __axis2() {
     }
 
 
-  if (zorka.boolCfg("tracer")) {
-
-    // Entry point: AXIS web services
-    spy.add(spy.instance("WSO2_AXIS")
-      .onEnter(
-        spy.fetchArg("CTX", 1),
-        tracer.begin("AXIS"),
+    spy.add(spy.instrument("AXIS2_SERVER_INVOKE")
+      .onEnter(spy.fetchArg("CTX", 0),
+        soap._trace ? tracer.begin("SOAP", soap._time) : null)
+      .onError(tracer.markError())
+      .onSubmit(
+        spy.format("METHOD", "${CTX.axisOperation.name.localPart}"),
+        soap._fetch_xml_in ? spy.format("SERVICE", "${CTX.axisService}") : null,
+        spy.format("XML_IN", "${CTX.envelope}"),
         spy.format("ACTION", "${CTX.soapAction}"),
-        tracer.attr("ACTION", "ACTION"))
-      .include(spy.byMethod("org.apache.axis2.transport.http.HTTPTransportUtils", "processHTTPPostRequest")));
-  }
+        soap._trace ? spy.subchain(
+          tracer.attr("METHOD", "METHOD"),
+          tracer.attr("XML_IN", "XML_IN"),
+          tracer.attr("SERVICE", "SERVICE"),
+          tracer.attr("ACTION", "ACTION")
+        ) : null,
+        soap._stats ? spy.subchain(
+          spy.zorkaStats("java", soap._mbean, "stats", "SVC"),
+          spy.zorkaStats("java", soap._mbean, "svc", "${SERVICE}.${METHOD}")
+        ) : null)
+      .include(
+        spy.byMethod(0, "org.apache.axis2.engine.AxisEngine", "receive", null)
+      ));
+
 
     return this;
 }
