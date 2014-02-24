@@ -70,6 +70,7 @@ import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor;
 import com.sencha.gxt.widget.core.client.form.SpinnerField;
 import com.sencha.gxt.widget.core.client.form.TextField;
+import com.sencha.gxt.widget.core.client.form.validator.RegExValidator;
 import com.sencha.gxt.widget.core.client.menu.Item;
 import com.sencha.gxt.widget.core.client.menu.Menu;
 import com.sencha.gxt.widget.core.client.menu.MenuItem;
@@ -87,6 +88,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class TraceSearchPanel extends VerticalLayoutContainer {
+
+    public final static String RE_TIMESTAMP = "\\d{4}-\\d{2}-\\d{2}\\s*(\\d{2}:\\d{2}:\\d{2}(\\.\\d{1-3})?)?";
 
     private PanelFactory pf;
     private ZicoRequestFactory rf;
@@ -116,6 +119,7 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
     private SpinnerField<Double> txtDuration;
     private ToggleButton btnEnableEql;
     private TextField txtFilter;
+    private TextField txtSinceDate;
     private TextButton btnRunSearch;
     private TextButton btnClearFilters;
 
@@ -230,6 +234,29 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
                 }
             }
         });
+
+        txtSinceDate = new TextField();
+        txtSinceDate.setWidth(130);
+        txtSinceDate.setEmptyText("Older than ...");
+        txtSinceDate.addValidator(new RegExValidator(RE_TIMESTAMP, "Enter valid timestamp"));
+
+        ToolTipConfig ttcDateTime = new ToolTipConfig("Allowed timestamp formats:" +
+                "<li><b>YYYY-MM-DD</b> - date only</li>" +
+                "<li><b>YYYY-MM-DD hh:mm:ss</b> - date and time</li>" +
+                "<li><b>YYYY-MM-DD hh:mm:ss.SSS</b> - millisecond resolution</li>");
+
+        txtSinceDate.setToolTipConfig(ttcDateTime);
+
+        txtSinceDate.addKeyDownHandler(new KeyDownHandler() {
+            @Override
+            public void onKeyDown(KeyDownEvent event) {
+                if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+                    refresh();
+                }
+            }
+        });
+
+        toolBar.add(txtSinceDate);
 
         btnRunSearch = new TextButton();
         btnRunSearch.setIcon(Resources.INSTANCE.searchIcon());
@@ -527,6 +554,11 @@ public class TraceSearchPanel extends VerticalLayoutContainer {
 
         if (txtFilter.getText() != null && txtFilter.getText().length() > 0) {
             q.setSearchExpr(txtFilter.getText());
+        }
+
+
+        if (txtSinceDate.getCurrentValue() != null) {
+            q.setSinceDate(ClientUtil.parseTimestamp(txtSinceDate.getCurrentValue(), null));
         }
 
         if (txtDuration.getCurrentValue() != null) {

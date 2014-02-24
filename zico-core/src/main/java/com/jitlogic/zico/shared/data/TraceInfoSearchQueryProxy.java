@@ -19,6 +19,8 @@ import com.google.web.bindery.requestfactory.shared.ProxyFor;
 import com.google.web.bindery.requestfactory.shared.ValueProxy;
 import com.jitlogic.zico.core.model.TraceInfoSearchQuery;
 
+import java.util.Date;
+
 @ProxyFor(TraceInfoSearchQuery.class)
 public interface TraceInfoSearchQueryProxy extends ValueProxy {
 
@@ -58,4 +60,8 @@ public interface TraceInfoSearchQueryProxy extends ValueProxy {
     String getSearchExpr();
 
     void setSearchExpr(String expr);
+
+    long getSinceDate();
+
+    void setSinceDate(long tstamp);
 }

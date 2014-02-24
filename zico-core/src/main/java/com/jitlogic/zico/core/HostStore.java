@@ -427,6 +427,10 @@ public class HostStore implements Closeable, RDSCleanupListener {
                 continue;
             }
 
+            if (query.getSinceDate() != 0 && tir.getClock() > query.getSinceDate()) {
+                continue;
+            }
+
             if (traceId != 0 && tir.getTraceId() != traceId) {
                 continue;
             }
