@@ -60,10 +60,15 @@ public class ReceiverContext implements MetadataChecker, ZicoDataProcessor {
                     "Host has been deleted. Connection needs to be reset. Try again.");
         }
 
+        if (hostStore.hasFlag(HostProxy.DISABLED)) {
+            // Host store is disabled. Ignore incoming packets.
+            return;
+        }
+
         if (dirtySidMap) {
             log.info("Resetting connection for " + hostStore.getName() + " due to dirty SID map.");
             throw new ZicoException(ZicoPacket.ZICO_EOD,
-                "Host was disabled and SID map is dirty. Connection needs to be reset. Try again.");
+                "Host was disabled, then enabled and SID map is dirty. Resetting connection.");
         }
 
         try {
