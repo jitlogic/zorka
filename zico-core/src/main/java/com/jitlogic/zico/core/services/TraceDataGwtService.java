@@ -74,7 +74,7 @@ public class TraceDataGwtService {
             throw new ZicoRuntimeException(e.toString() + " [query '" + query.getSearchExpr() + "']", e);
         } catch (Exception e) {
             log.error("Error searching for traces", e);
-            throw new ZicoRuntimeException("Error while searching: " + query, e);
+            throw new ZicoRuntimeException("Error while searching '" + query.getSearchExpr() + "': " + e.getMessage(), e);
         }
     }
 

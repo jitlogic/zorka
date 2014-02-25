@@ -1,8 +1,9 @@
 Zorka 0.9.20 (2014-03-01)
 -------------------------
 
-* Support for JDK8 and Tomcat 8;
-
+* support for JDK8 and Tomcat 8;
+* UI: filter traces by timestamp, other EQL fixes;
+*
 
 
 Zorka 0.9.19 (2014-02-22)
