@@ -21,6 +21,11 @@ import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
 
 public class ErrorHandler {
 
+    public void error(String message) {
+        AlertMessageBox amb = new AlertMessageBox(message, "Error");
+        amb.show();
+    }
+
     public void error(String message, Throwable e) {
         AlertMessageBox amb = new AlertMessageBox(message, e.getMessage());
         amb.show();

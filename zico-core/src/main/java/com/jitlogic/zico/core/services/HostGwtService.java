@@ -90,11 +90,18 @@ public class HostGwtService {
     public void rebuildIndex(HostStore host) {
         try {
             ctx.checkAdmin();
-                if (!host.hasFlag(HostProxy.CHK_IN_PROGRESS)) {
-                    host.rebuildIndex();
-                }
+            if (!host.hasFlag(HostProxy.CHK_IN_PROGRESS)) {
+                host.rebuildIndex();
+            }
         } catch (IOException e) {
             log.error("Cannot rebuilt index for host " + host.getName(), e);
         }
     }
+
+
+    public void newHost(String name, String addr, String desc, String pass, long maxsize) {
+        ctx.checkAdmin();
+        hsm.newHost(name, addr, desc, pass, maxsize);
+    }
+
 }
