@@ -40,7 +40,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
+                <version>${jar.plugin.version}</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -55,6 +55,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>jarjar-maven-plugin</artifactId>
+                <version>${jarjar.plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>

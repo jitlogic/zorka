@@ -130,7 +130,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.3</version>
+                <version>${dependency.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>jetty-classpath</id>
