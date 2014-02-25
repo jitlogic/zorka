@@ -16,7 +16,7 @@
 package com.jitlogic.zico.test;
 
 import com.jitlogic.zico.core.TraceTemplateManager;
-import com.jitlogic.zico.core.eql.ParseException;
+import com.jitlogic.zico.core.eql.EqlParseException;
 import com.jitlogic.zico.core.model.TraceTemplate;
 import com.jitlogic.zico.test.support.ZicoFixture;
 import com.jitlogic.zico.test.support.ZicoTestUtil;
@@ -136,7 +136,7 @@ public class TemplateManagerUnitTest extends ZicoFixture {
     }
 
 
-    @Test(expected = ParseException.class)
+    @Test(expected = EqlParseException.class)
     public void testIfTemplateSaveVerifiesEqlExpr() throws Exception {
         TraceTemplate t1 = tti(0, "METHOD='findKey", "findKey(${ARG0}");
         templateManager.save(t1);

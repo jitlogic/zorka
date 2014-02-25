@@ -28,11 +28,11 @@ public class Parser {
 
     private static final ParserSyntax rules = Parboiled.createParser(ParserSyntax.class);
 
-    public static EqlExpr expr(String expr) throws ParseException {
+    public static EqlExpr expr(String expr) throws EqlParseException {
         ParsingResult<EqlExpr> rslt = new ReportingParseRunner(rules.SoleExpression()).run(expr);
 
         if (rslt.hasErrors() || !rslt.matched) {
-            throw new ParseException("Error parsing EQL expression", rslt.parseErrors);
+            throw new EqlParseException("Error parsing EQL expression", rslt.parseErrors);
         }
 
         return rslt.resultValue;

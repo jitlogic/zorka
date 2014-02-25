@@ -19,10 +19,31 @@ package com.jitlogic.zico.core.eql;
 import com.jitlogic.zico.core.eql.ast.EqlOp;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 public class EqlUtils {
+
+    private final static Pattern RE_DATE0 = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+    private final static Pattern RE_DATE1 = Pattern.compile("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}");
+
+    public static Date parseDate(String s) {
+        try {
+            if (RE_DATE0.matcher(s).matches()) {
+                return new SimpleDateFormat("yyyy-MM-dd").parse(s);
+            }
+            if (RE_DATE1.matcher(s).matches()) {
+                return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(s);
+            }
+        } catch (ParseException e) {
+            // Shouldn't happen
+        }
+
+        throw new EqlException("Unparsable datetime string: '" + s + "'.");
+    }
 
     public static boolean objEquals(Object obj1, Object obj2) {
 
@@ -57,6 +78,7 @@ public class EqlUtils {
         return compile(arg2).matcher(arg1.toString()).matches();
     }
 
+
     public static Pattern compile(Object arg) {
         if (arg == null) {
             throw new EqlException("Attempt to construct regex pattern from null value.");
@@ -87,6 +109,7 @@ public class EqlUtils {
         }
     }
 
+
     public static int compare(Object obj1, Object obj2) {
 
         if (obj1 == null && obj2 == null)
@@ -94,6 +117,14 @@ public class EqlUtils {
 
         if (obj1 == null || obj2 == null)
             return obj1 == null ? -1 : 1;
+
+        if (obj1 instanceof Date && obj2 instanceof String) {
+            obj2 = parseDate(obj2.toString());
+        }
+
+        if (obj1 instanceof String && obj2 instanceof Date) {
+            obj1 = parseDate(obj1.toString());
+        }
 
         if (obj1 instanceof Comparable && obj2 instanceof Comparable) {
             return ((Comparable) obj1).compareTo(obj2);

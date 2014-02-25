@@ -16,7 +16,8 @@
 package com.jitlogic.zico.test;
 
 
-import com.jitlogic.zico.core.eql.ParseException;
+import com.jitlogic.zico.core.eql.EqlParseException;
+import com.jitlogic.zico.core.eql.EqlUtils;
 import com.jitlogic.zico.core.eql.Parser;
 import com.jitlogic.zico.core.eql.ast.EqlBinaryExpr;
 import com.jitlogic.zico.core.eql.ast.EqlExpr;
@@ -27,13 +28,15 @@ import com.jitlogic.zico.core.eql.ast.EqlSymbol;
 import com.jitlogic.zico.core.eql.ast.EqlUnaryExpr;
 import org.junit.Test;
 
+import java.text.SimpleDateFormat;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class EqlParseUnitTest {
 
 
-    private EqlExpr expr(String expr) throws ParseException {
+    private EqlExpr expr(String expr) throws EqlParseException {
         EqlExpr rslt = new Parser().expr(expr);
         assertNotNull("Result should not be null.", rslt);
         return rslt;
@@ -64,7 +67,7 @@ public class EqlParseUnitTest {
 
 
     @Test
-    public void testParseSimpleLiteralExprs() throws ParseException {
+    public void testParseSimpleLiteralExprs() throws EqlParseException {
         assertEquals(lit(123), expr("123"));
         assertEquals(lit(15), expr("0x0f"));
         assertEquals(lit(-4), expr("-4"));
@@ -80,13 +83,13 @@ public class EqlParseUnitTest {
 
 
     @Test
-    public void testParseSymbols() throws ParseException {
+    public void testParseSymbols() throws EqlParseException {
         assertEquals(sym("a"), expr("a"));
     }
 
 
     @Test
-    public void testParseBinaryExpressionsBasics() throws ParseException {
+    public void testParseBinaryExpressionsBasics() throws EqlParseException {
         assertEquals(bin(lit(2), "+", lit(2)), expr("2 + 2"));
         assertEquals(bin(sym("x"), "=", lit(2)), expr("x = 2"));
         assertEquals(bin(sym("a"), "and", sym("b")), expr("a and b"));
@@ -100,7 +103,7 @@ public class EqlParseUnitTest {
 
 
     @Test
-    public void testParseBinaryExpressionsPrecedence() throws ParseException {
+    public void testParseBinaryExpressionsPrecedence() throws EqlParseException {
         assertEquals(bin(bin(lit(2), "*", lit(2)), "+", bin(lit(3), "*", lit(3))), expr("2 * 2 + 3 * 3"));
         assertEquals(bin(bin(lit(2), "*", lit(2)), "+", bin(lit(3), "*", lit(3))), expr("2*2+3*3"));
         assertEquals(bin(lit(2), "*", bin(lit(3), "+", lit(3))), expr("2 * (3 + 3)"));
@@ -141,6 +144,7 @@ public class EqlParseUnitTest {
         assertEquals(lit(86400000000000L), expr("24h"));
     }
 
+
     @Test
     public void testParseUnaryExpr() {
         assertEquals(una("not", lit(1)), expr("not 1"));
@@ -148,5 +152,12 @@ public class EqlParseUnitTest {
                 expr("not a = 2 and ! b = c"));
         assertEquals(una("not", lit(1)), expr("(not 1)"));
         assertEquals(lit(2), expr("(2)"));
+    }
+
+
+    @Test
+    public void testParseDateTime() throws Exception {
+        assertEquals("Tue Jan 01 00:00:00 CET 2013", EqlUtils.parseDate("2013-01-01").toString());
+        assertEquals("Tue Jan 01 12:23:34 CET 2013", EqlUtils.parseDate("2013-01-01 12:23:34").toString());
     }
 }

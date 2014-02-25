@@ -21,11 +21,11 @@ import org.parboiled.errors.ParseError;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParseException extends RuntimeException {
+public class EqlParseException extends RuntimeException {
 
     private List<ParseError> parseErrors;
 
-    public ParseException(String msg, List<ParseError> parseErrors) {
+    public EqlParseException(String msg, List<ParseError> parseErrors) {
         super(msg);
 
         this.parseErrors = new ArrayList<ParseError>(parseErrors.size());
