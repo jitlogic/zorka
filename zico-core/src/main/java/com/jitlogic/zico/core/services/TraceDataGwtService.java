@@ -18,6 +18,8 @@ package com.jitlogic.zico.core.services;
 import com.google.inject.Singleton;
 import com.jitlogic.zico.core.HostStore;
 import com.jitlogic.zico.core.HostStoreManager;
+import com.jitlogic.zico.core.UserContext;
+import com.jitlogic.zico.core.UserManager;
 import com.jitlogic.zico.core.ZicoUtil;
 import com.jitlogic.zico.core.eql.EqlException;
 import com.jitlogic.zico.core.eql.EqlParseException;
@@ -31,6 +33,7 @@ import com.jitlogic.zico.core.model.TraceRecordSearchQuery;
 import com.jitlogic.zico.core.model.TraceInfoSearchResult;
 import com.jitlogic.zico.core.model.TraceRecordInfo;
 import com.jitlogic.zico.core.model.TraceRecordSearchResult;
+import com.jitlogic.zico.core.model.User;
 import com.jitlogic.zico.core.search.EqlTraceRecordMatcher;
 import com.jitlogic.zico.core.search.FullTextTraceRecordMatcher;
 import com.jitlogic.zico.core.search.TraceRecordMatcher;
@@ -51,15 +54,17 @@ public class TraceDataGwtService {
     private final static Logger log = LoggerFactory.getLogger(TraceDataGwtService.class);
 
     private HostStoreManager storeManager;
-
+    private UserManager userManager;
 
     @Inject
-    public TraceDataGwtService(HostStoreManager storeManager) {
+    public TraceDataGwtService(HostStoreManager storeManager, UserManager userManager) {
         this.storeManager = storeManager;
+        this.userManager = userManager;
     }
 
 
     public TraceInfoSearchResult searchTraces(TraceInfoSearchQuery query) {
+        userManager.checkHostAccess(query.getHostName());
         try {
             HostStore host = storeManager.getHost(query.getHostName(), false);
             if (host == null) {
@@ -80,6 +85,7 @@ public class TraceDataGwtService {
 
 
     public List<MethodRankInfo> traceMethodRank(String hostName, long traceOffs, String orderBy, String orderDesc) {
+        userManager.checkHostAccess(hostName);
         try {
             HostStore host = storeManager.getHost(hostName, false);
             if (host != null) {
@@ -98,6 +104,7 @@ public class TraceDataGwtService {
 
 
     public TraceRecordInfo getRecord(String hostName, long traceOffs, long minTime, String path) {
+        userManager.checkHostAccess(hostName);
         try {
             HostStore host = storeManager.getHost(hostName, false);
             if (host != null) {
@@ -116,6 +123,7 @@ public class TraceDataGwtService {
 
 
     public List<TraceRecordInfo> listRecords(String hostName, long traceOffs, long minTime, String path, boolean recursive) {
+        userManager.checkHostAccess(hostName);
         try {
             HostStore host = storeManager.getHost(hostName, false);
             if (host != null) {
@@ -161,6 +169,7 @@ public class TraceDataGwtService {
 
     public TraceRecordSearchResult searchRecords(String hostName, long traceOffs, long minTime, String path,
                                                  TraceRecordSearchQuery expr) {
+        userManager.checkHostAccess(hostName);
         try {
             HostStore host = storeManager.getHost(hostName, false);
             if (host != null) {

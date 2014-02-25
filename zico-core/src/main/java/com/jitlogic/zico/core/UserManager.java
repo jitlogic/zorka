@@ -58,9 +58,12 @@ public class UserManager extends Locator<User, String> {
 
     private boolean sumode;
 
+    private UserContext userContext;
+
     @Inject
-    public UserManager(ZicoConfig config) {
+    public UserManager(ZicoConfig config, UserContext userContext) {
         this.config = config;
+        this.userContext = userContext;
 
         try {
             Class<?> clazz = Class.forName("com.jitlogic.zico.main.ZicoUserRealm");
@@ -164,6 +167,14 @@ public class UserManager extends Locator<User, String> {
             if (writer != null) {
                 try { writer.close(); } catch (IOException e) { }
             }
+        }
+    }
+
+
+    public void checkHostAccess(String hostname) {
+        if (!userContext.isInRole("ADMIN")
+         && !find(User.class, userContext.getUser()).getAllowedHosts().contains(hostname)) {
+            throw new ZicoRuntimeException("Insufficient privileges");
         }
     }
 
