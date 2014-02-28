@@ -18,6 +18,8 @@ package com.jitlogic.zico.core.model;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
+import java.util.Date;
+
 public class TraceInfoSearchQuery {
 
     private int seq;
@@ -35,6 +37,8 @@ public class TraceInfoSearchQuery {
     private long minMethodTime;
 
     private String searchExpr;
+
+    private long sinceDate;
 
 
     public int getSeq() {
@@ -118,6 +122,16 @@ public class TraceInfoSearchQuery {
 
     public void setSearchExpr(String searchExpr) {
         this.searchExpr = searchExpr;
+    }
+
+
+    public long getSinceDate() {
+        return sinceDate;
+    }
+
+
+    public void setSinceDate(long sinceDate) {
+        this.sinceDate = sinceDate;
     }
 
 

@@ -326,7 +326,8 @@ public class HostListPanel extends VerticalLayoutContainer {
             @Override
             public void onSuccess(List<HostProxy> response) {
                 hostGridStore.getList().addAll(response);
-                enableSelectionDependentControls(selectionModel.getSelectedObject());
+                selectionModel.setSelected(selectionModel.getSelectedObject(), false);
+                enableSelectionDependentControls(null);
             }
             @Override
             public void onFailure(ServerFailure error) {
@@ -481,7 +482,7 @@ public class HostListPanel extends VerticalLayoutContainer {
         HostProxy hostInfo = selectionModel.getSelectedObject();
         GWT.log("Selected host: " + hostInfo);
 
-        if (hostInfo != null) {
+        if (hostInfo != null && 0 == (hostInfo.getFlags() & HostProxy.DISABLED)) {
             shell.get().addView(panelFactory.traceSearchPanel(hostInfo), hostInfo.getName() + ": traces");
         }
     }

@@ -112,7 +112,7 @@ public class HostStoreManager extends Locator<HostStore, String> implements Clos
         }
 
         if (enableSecurity) {
-            if (store.getAddr() != null && !store.getAddr().equals("" + socket.getInetAddress())) {
+            if (store.getAddr() != null && !store.getAddr().equals(socket.getInetAddress().getHostAddress())) {
                 throw new ZicoException(ZicoPacket.ZICO_AUTH_ERROR, "Unauthorized.");
             }
 
@@ -157,6 +157,7 @@ public class HostStoreManager extends Locator<HostStore, String> implements Clos
 
     }
 
+
     public synchronized Map<Integer,String> getTids(String hostName) {
         Map<Integer,String> rslt = new HashMap<Integer,String>();
 
@@ -174,39 +175,63 @@ public class HostStoreManager extends Locator<HostStore, String> implements Clos
         return rslt;
     }
 
+
+    public void newHost(String name, String addr, String desc, String pass, long maxsize) {
+
+        if (getHost(name, false) != null) {
+            throw new ZicoRuntimeException("Host named " + name + " already exist.");
+        }
+
+        HostStore host = getHost(name, true);
+        host.setAddr(addr);
+        host.setComment(desc);
+        host.setPass(pass);
+        host.setMaxSize(maxsize);
+        host.save();
+    }
+
+
     @Override
     public HostStore create(Class<? extends HostStore> clazz) {
+
         throw new ZicoRuntimeException("Not implemented.");
     }
+
 
     @Override
     public HostStore find(Class<? extends HostStore> clazz, String id) {
         return getHost(id, false);
     }
 
+
     @Override
     public Class<HostStore> getDomainType() {
         return HostStore.class;
     }
+
 
     @Override
     public String getId(HostStore host) {
         return host.getName();
     }
 
+
     @Override
     public Class<String> getIdType() {
         return String.class;
     }
+
 
     @Override
     public Object getVersion(HostStore host) {
         return 1;
     }
 
+
     public void persist(HostStore host) {
         host.save();
     }
+
 
     public void remove(HostStore host) {
         try {

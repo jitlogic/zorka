@@ -23,6 +23,8 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
+import java.util.Date;
+
 public class EqlTraceRecordMatcher extends EqlExprEvaluator implements TraceRecordMatcher {
 
     private SymbolRegistry symbolRegistry;
@@ -77,6 +79,8 @@ public class EqlTraceRecordMatcher extends EqlExprEvaluator implements TraceReco
             return traceRecord.getErrors();
         } else if ("host".equals(name)) {
             return hostName;
+        } else if ("clock".equals(name)) {
+            return new Date(traceRecord.getClock());
         } else if ("pct".equals(name)) {
             return 100.0 * traceRecord.getTime() / totalTime;
         } else if ("signature".equals(name)) {

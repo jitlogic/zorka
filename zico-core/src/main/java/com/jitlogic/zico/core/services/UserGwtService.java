@@ -41,15 +41,18 @@ public class UserGwtService {
     }
 
     public List<User> findAll() {
+        userContext.checkAdmin();
         return locator.findAll();
     }
 
     public User findUser(String username) {
+        userContext.checkAdmin();
         return locator.find(User.class, username);
     }
 
 
     public List<String> getAllowedHosts(String username) {
+        userContext.checkAdmin();
         User user = locator.find(User.class, username);
         if (user != null && user.getAllowedHosts() != null) {
             List<String> lst = new ArrayList<String>();
@@ -61,6 +64,7 @@ public class UserGwtService {
 
 
     public void setAllowedHosts(String username, List<String> hosts) {
+        userContext.checkAdmin();
         User user = locator.find(User.class, username);
         user.setAllowedHosts(hosts);
         locator.persist(user);
@@ -68,11 +72,13 @@ public class UserGwtService {
 
 
     public void persist(User user) {
+        userContext.checkAdmin();
         locator.persist(user);
     }
 
 
     public void remove(User user) {
+        userContext.checkAdmin();
         locator.remove(user);
     }
 

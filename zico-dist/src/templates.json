@@ -13,5 +13,7 @@
   "12":{"template":"${ACTION} ${SERVICE: } ${WHO: } ","id":12,"flags":0,"order":400,"condition":"trace = 'CAS'"},
   "13":{"template":"[${NAME}] ${FILTER}","id":13,"flags":0,"order":150,"condition":"trace = 'LDAP'"},
   "14":{"template":"[${JMSTYPE: (untyped)}] ${ID}","id":1001,"flags":0,"order":120,"condition":"trace = 'JMS'"},
-  "15":{"template":"[${SCHEDULED_FIRE_TIME}] ${NAME} (${GROUP: })","id":1002,"flags":0,"order":160,"condition":"trace = 'QUARTZ'"}
+  "15":{"template":"[${SCHEDULED_FIRE_TIME}] ${NAME} (${GROUP: })","id":1002,"flags":0,"order":160,"condition":"trace = 'QUARTZ'"},
+  "16":{"template":"${SERVICE|CLASS}.${METHOD}()","id":16,"flags":0,"order":150,"condition":"trace = 'SOAP'"},
+  "17":{"template":"${SERVICE|CLASS}/${METHOD}","id":17,"flags":0,"order":150,"condition":"trace = 'SOAP_CLI'"}
 }

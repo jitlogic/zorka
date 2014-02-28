@@ -18,6 +18,7 @@ package com.jitlogic.zico.core.services;
 import com.google.inject.Singleton;
 import com.jitlogic.zico.core.*;
 import com.jitlogic.zico.core.model.TraceTemplate;
+import com.jitlogic.zico.core.model.User;
 import com.jitlogic.zorka.common.tracedata.Symbol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,6 +122,8 @@ public class SystemGwtService {
 
 
     public List<Symbol> getTidMap(String hostName) {
+        userManager.checkHostAccess(hostName);
+
         try {
             Map<Integer,String> tids = hsm.getTids(hostName);
 

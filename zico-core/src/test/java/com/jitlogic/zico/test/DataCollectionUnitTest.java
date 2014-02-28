@@ -105,7 +105,7 @@ public class DataCollectionUnitTest extends ZicoFixture {
 
     @Test(timeout = 1000)
     public void testCollectThreeRecordsWithLimitPerPacket() throws Exception {
-        field("packetSize").ofType(long.class).in(output).set(210L);
+        field("packetSize").ofType(long.class).in(output).set(200L);
         submit(trace(), trace(), trace());
         assertEquals("Two traces should be noticed.", 2, countTraces("test"));
         submit();

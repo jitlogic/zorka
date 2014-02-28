@@ -1,3 +1,12 @@
+Zorka 1.0.0 (2014-03-01)
+-------------------------
+
+* support for JDK 8 (generating stack maps for instrumented code);
+* Tomcat 8 now officially supported;
+* UI: filter traces by timestamp, other EQL fixes;
+* UI: fixes for safe mode and host properties editing;
+
+
 Zorka 0.9.19 (2014-02-22)
 -------------------------
 

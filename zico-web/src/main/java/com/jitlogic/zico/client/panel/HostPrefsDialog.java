@@ -17,6 +17,7 @@ package com.jitlogic.zico.client.panel;
 
 
 import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.Request;
 import com.google.web.bindery.requestfactory.shared.ServerFailure;
 import com.jitlogic.zico.client.ErrorHandler;
 import com.jitlogic.zico.client.inject.ZicoRequestFactory;
@@ -30,6 +31,8 @@ import com.sencha.gxt.widget.core.client.form.FieldLabel;
 import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor;
 import com.sencha.gxt.widget.core.client.form.SpinnerField;
 import com.sencha.gxt.widget.core.client.form.TextField;
+
+import java.util.regex.Pattern;
 
 public class HostPrefsDialog extends Dialog {
 
@@ -58,8 +61,6 @@ public class HostPrefsDialog extends Dialog {
         editHostRequest = rf.hostService();
         if (info != null) {
             editedHost = editHostRequest.edit(info);
-        } else {
-            editedHost = editHostRequest.create(HostProxy.class);
         }
 
         setHeadingText(info != null ? "Edit host: " + info.getName() : "New host");
@@ -111,7 +112,7 @@ public class HostPrefsDialog extends Dialog {
         vlc.add(new FieldLabel(txtMaxSize, "Store size (GB)"),
                 new VerticalLayoutContainer.VerticalLayoutData(1, -1));
 
-        long sz = info.getMaxSize() / GB;
+        long sz = info != null ? info.getMaxSize() / GB : 1;
 
         if (sz < 1) { sz = 1; }
 
@@ -157,13 +158,32 @@ public class HostPrefsDialog extends Dialog {
 
 
     public void save() {
-        // What about new host ?
-        editedHost.setAddr(txtHostAddr.getText());
-        editedHost.setComment(txtHostDesc.getText());
-        editedHost.setPass(txtHostPass.getText());
-        editedHost.setMaxSize(txtMaxSize.getCurrentValue() * GB);
 
-        editHostRequest.persist(editedHost).fire(new Receiver<Void>() {
+        Request<Void> req;
+
+        if (editedHost == null) {
+
+            String name = txtHostName.getText();
+            if (name.length() == 0 || !name.matches("^[0-9a-zA-Z_\\-\\.]+$")) {
+                errorHandler.error("Illegal host name: '" + name + "'. Use only those characters: 0-9a-zA-Z_-");
+                return;
+            }
+
+            req = editHostRequest.newHost(
+                name,
+                txtHostAddr.getText(),
+                txtHostDesc.getText(),
+                txtHostPass.getText(),
+                txtMaxSize.getCurrentValue() * GB);
+        } else {
+            editedHost.setAddr(txtHostAddr.getText());
+            editedHost.setComment(txtHostDesc.getText());
+            editedHost.setPass(txtHostPass.getText());
+            editedHost.setMaxSize(txtMaxSize.getCurrentValue() * GB);
+            req = editHostRequest.persist(editedHost);
+        }
+
+        req.fire(new Receiver<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 hide();
