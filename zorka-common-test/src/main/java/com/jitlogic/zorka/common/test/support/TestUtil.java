@@ -18,9 +18,14 @@ package com.jitlogic.zorka.common.test.support;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 public class TestUtil {
 
@@ -38,6 +43,18 @@ public class TestUtil {
         }
 
         return props;
+    }
+
+    public static void saveProps(Properties props, String path) throws IOException {
+        OutputStream os = null;
+        try {
+            os = new FileOutputStream(path);
+            props.store(os, "Unit test");
+        } finally {
+            if (os != null) {
+                os.close();
+            }
+        }
     }
 
     public static void rmrf(String path) throws IOException {
@@ -74,5 +91,43 @@ public class TestUtil {
             }
         }
         return buf;
+    }
+
+    public static List<File> find(File dir, String suffix, Set<String> ignore) {
+        List<File> lst = new ArrayList<File>();
+
+        for (String fn : dir.list()) {
+            if (ignore.contains(fn)) {
+                continue;
+            }
+
+            File f = new File(dir, fn);
+
+            if (f.isFile() && fn.endsWith(suffix)) {
+                lst.add(f);
+            }
+
+            if (f.isDirectory() && !f.getPath().startsWith(".")) {
+                lst.addAll(find(f, suffix, ignore));
+            }
+        }
+
+        return lst;
+    }
+
+    public static void sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+        }
+    }
+
+    public static Properties setProps(Properties props, String... data) {
+
+        for (int i = 1; i < data.length; i += 2) {
+            props.setProperty(data[i - 1], data[i]);
+        }
+
+        return props;
     }
 }
