@@ -32,8 +32,6 @@ import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor;
 import com.sencha.gxt.widget.core.client.form.SpinnerField;
 import com.sencha.gxt.widget.core.client.form.TextField;
 
-import java.util.regex.Pattern;
-
 public class HostPrefsDialog extends Dialog {
 
     private HostProxy editedHost;
@@ -104,8 +102,8 @@ public class HostPrefsDialog extends Dialog {
 
         txtMaxSize = new SpinnerField<Long>(new NumberPropertyEditor.LongPropertyEditor());
         txtMaxSize.setIncrement(1L);
-        txtMaxSize.setMinValue(16);
-        txtMaxSize.setMaxValue(1024 * GB);
+        txtMaxSize.setMinValue(1);
+        txtMaxSize.setMaxValue(10240L);
         txtMaxSize.setAllowBlank(false);
         txtMaxSize.setToolTip("Maximum amount of trace data stored for this host.");
         vlc.add(txtMaxSize);
