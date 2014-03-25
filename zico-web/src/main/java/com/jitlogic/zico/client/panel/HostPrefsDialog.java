@@ -41,6 +41,7 @@ public class HostPrefsDialog extends Dialog {
 
     private TextField txtHostName;
     private TextField txtHostAddr;
+    private TextField txtHostGroup;
     private TextField txtHostDesc;
     private TextField txtHostPass;
 
@@ -79,6 +80,14 @@ public class HostPrefsDialog extends Dialog {
                     new VerticalLayoutContainer.VerticalLayoutData(1, -1));
         }
 
+        txtHostGroup = new TextField();
+        vlc.add(txtHostGroup);
+        vlc.add(new FieldLabel(txtHostGroup, "Host group"),
+                new VerticalLayoutContainer.VerticalLayoutData(1, -1));
+
+        if (info != null) {
+            txtHostGroup.setText(info.getGroup());
+        }
 
         txtHostAddr = new TextField();
         vlc.add(txtHostAddr);
@@ -170,11 +179,13 @@ public class HostPrefsDialog extends Dialog {
             req = editHostRequest.newHost(
                 name,
                 txtHostAddr.getText(),
+                txtHostGroup.getText(),
                 txtHostDesc.getText(),
                 txtHostPass.getText(),
                 txtMaxSize.getCurrentValue() * GB);
         } else {
             editedHost.setAddr(txtHostAddr.getText());
+            editedHost.setGroup(txtHostGroup.getText());
             editedHost.setComment(txtHostDesc.getText());
             editedHost.setPass(txtHostPass.getText());
             editedHost.setMaxSize(txtMaxSize.getCurrentValue() * GB);

@@ -99,9 +99,9 @@ public class HostGwtService {
     }
 
 
-    public void newHost(String name, String addr, String desc, String pass, long maxsize) {
+    public void newHost(String name, String addr, String group, String desc, String pass, long maxsize) {
         ctx.checkAdmin();
-        hsm.newHost(name, addr, desc, pass, maxsize);
+        hsm.newHost(name, addr, group, desc, pass, maxsize);
     }
 
 }

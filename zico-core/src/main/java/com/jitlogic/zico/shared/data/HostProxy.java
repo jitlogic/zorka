@@ -22,7 +22,7 @@ import com.jitlogic.zico.core.HostStoreManager;
 
 
 @ProxyFor(value = HostStore.class, locator = HostStoreManager.class)
-public interface HostProxy extends EntityProxy {
+public interface HostProxy extends EntityProxy, HostListObject {
 
     /**
      * This flag indicates that host is offline. Performance data cannot be read nor written, host info cannot be
@@ -57,6 +57,10 @@ public interface HostProxy extends EntityProxy {
     long getMaxSize();
 
     void setMaxSize(long maxSize);
+
+    public String getGroup();
+
+    public void setGroup(String group);
 
     public String getComment();
 
