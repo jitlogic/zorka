@@ -29,7 +29,7 @@ import java.util.List;
 @Service(value = HostGwtService.class, locator = ZicoServiceLocator.class)
 public interface HostServiceProxy extends RequestContext {
 
-    Request<Void> newHost(String name, String addr, String desc, String pass, long maxsize);
+    Request<Void> newHost(String name, String addr, String group, String desc, String pass, long maxsize);
 
     Request<List<HostProxy>> findAll();
 

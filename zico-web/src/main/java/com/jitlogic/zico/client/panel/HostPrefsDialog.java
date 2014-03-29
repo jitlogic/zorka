@@ -32,8 +32,6 @@ import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor;
 import com.sencha.gxt.widget.core.client.form.SpinnerField;
 import com.sencha.gxt.widget.core.client.form.TextField;
 
-import java.util.regex.Pattern;
-
 public class HostPrefsDialog extends Dialog {
 
     private HostProxy editedHost;
@@ -43,6 +41,7 @@ public class HostPrefsDialog extends Dialog {
 
     private TextField txtHostName;
     private TextField txtHostAddr;
+    private TextField txtHostGroup;
     private TextField txtHostDesc;
     private TextField txtHostPass;
 
@@ -81,6 +80,14 @@ public class HostPrefsDialog extends Dialog {
                     new VerticalLayoutContainer.VerticalLayoutData(1, -1));
         }
 
+        txtHostGroup = new TextField();
+        vlc.add(txtHostGroup);
+        vlc.add(new FieldLabel(txtHostGroup, "Host group"),
+                new VerticalLayoutContainer.VerticalLayoutData(1, -1));
+
+        if (info != null) {
+            txtHostGroup.setText(info.getGroup());
+        }
 
         txtHostAddr = new TextField();
         vlc.add(txtHostAddr);
@@ -104,8 +111,8 @@ public class HostPrefsDialog extends Dialog {
 
         txtMaxSize = new SpinnerField<Long>(new NumberPropertyEditor.LongPropertyEditor());
         txtMaxSize.setIncrement(1L);
-        txtMaxSize.setMinValue(16);
-        txtMaxSize.setMaxValue(1024 * GB);
+        txtMaxSize.setMinValue(1);
+        txtMaxSize.setMaxValue(10240L);
         txtMaxSize.setAllowBlank(false);
         txtMaxSize.setToolTip("Maximum amount of trace data stored for this host.");
         vlc.add(txtMaxSize);
@@ -172,11 +179,13 @@ public class HostPrefsDialog extends Dialog {
             req = editHostRequest.newHost(
                 name,
                 txtHostAddr.getText(),
+                txtHostGroup.getText(),
                 txtHostDesc.getText(),
                 txtHostPass.getText(),
                 txtMaxSize.getCurrentValue() * GB);
         } else {
             editedHost.setAddr(txtHostAddr.getText());
+            editedHost.setGroup(txtHostGroup.getText());
             editedHost.setComment(txtHostDesc.getText());
             editedHost.setPass(txtHostPass.getText());
             editedHost.setMaxSize(txtMaxSize.getCurrentValue() * GB);

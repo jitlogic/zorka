@@ -26,11 +26,12 @@ import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.PerfMonLib;
 import com.jitlogic.zorka.core.spy.*;
 
+import com.jitlogic.zorka.common.test.support.TestUtil;
+
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import org.junit.After;
 import org.junit.Before;
 
-import javax.management.MBeanServerBuilder;
 import java.io.File;
 import java.util.Properties;
 
@@ -67,7 +68,7 @@ public class ZorkaFixture extends CommonFixture {
 
         // Configure and spawn agent instance ...
 
-        configProperties = setProps(
+        configProperties = TestUtil.setProps(
                 ZorkaConfig.defaultProperties(AgentConfig.DEFAULT_CONF_PATH),
                 "zorka.home.dir", "/tmp",
                 "zabbix.enabled", "no",
@@ -125,12 +126,4 @@ public class ZorkaFixture extends CommonFixture {
         return tmpDir;
     }
 
-    private static Properties setProps(Properties props, String... data) {
-
-        for (int i = 1; i < data.length; i += 2) {
-            props.setProperty(data[i - 1], data[i]);
-        }
-
-        return props;
-    }
 }

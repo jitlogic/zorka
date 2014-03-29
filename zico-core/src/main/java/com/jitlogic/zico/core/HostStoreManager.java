@@ -176,7 +176,7 @@ public class HostStoreManager extends Locator<HostStore, String> implements Clos
     }
 
 
-    public void newHost(String name, String addr, String desc, String pass, long maxsize) {
+    public void newHost(String name, String addr, String group, String desc, String pass, long maxsize) {
 
         if (getHost(name, false) != null) {
             throw new ZicoRuntimeException("Host named " + name + " already exist.");
@@ -184,6 +184,7 @@ public class HostStoreManager extends Locator<HostStore, String> implements Clos
 
         HostStore host = getHost(name, true);
         host.setAddr(addr);
+        host.setGroup(group);
         host.setComment(desc);
         host.setPass(pass);
         host.setMaxSize(maxsize);

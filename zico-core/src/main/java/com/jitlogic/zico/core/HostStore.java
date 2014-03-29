@@ -62,12 +62,6 @@ public class HostStore implements Closeable, RDSCleanupListener {
 
     public final static String HOST_PROPERTIES = "host.properties";
 
-    private static final String PROP_ADDR = "addr";
-    private static final String PROP_PASS = "pass";
-    private static final String PROP_FLAGS = "flags";
-    private static final String PROP_SIZE = "size";
-    private static final String PROP_COMMENT = "comment";
-
     private final String DB_INFO_MAP = "INFOS";
     private final String DB_TIDS_MAP = "TIDS";
 
@@ -88,8 +82,11 @@ public class HostStore implements Closeable, RDSCleanupListener {
     private Map<Integer, String> tids;
 
     private String name;
+
     private String addr = "";
     private String pass = "";
+    private String group = "";
+
     private int flags;
     private long maxSize;
     private String comment = "";
@@ -584,12 +581,13 @@ public class HostStore implements Closeable, RDSCleanupListener {
                     try { is.close(); } catch (IOException _) { }
                 }
             }
-            this.addr = props.getProperty(PROP_ADDR, "127.0.0.1");
-            this.pass = props.getProperty(PROP_PASS, "");
-            this.flags = Integer.parseInt(props.getProperty(PROP_FLAGS, "0"));
-            this.maxSize = Long.parseLong(props.getProperty(PROP_SIZE,
+            this.addr = props.getProperty("addr", "127.0.0.1");
+            this.pass = props.getProperty("pass", "");
+            this.flags = Integer.parseInt(props.getProperty("flags", "0"));
+            this.maxSize = Long.parseLong(props.getProperty("size",
                     "" + config.kiloCfg("rds.max.size", 1024 * 1024 * 1024L)));
-            this.comment = props.getProperty(PROP_COMMENT, "");
+            this.group = props.getProperty("group", "");
+            this.comment = props.getProperty("comment", "");
         }
     }
 
@@ -597,11 +595,12 @@ public class HostStore implements Closeable, RDSCleanupListener {
     public synchronized void save() {
 
         Properties props = new Properties();
-        props.setProperty(PROP_ADDR, addr);
-        props.setProperty(PROP_PASS, pass);
-        props.setProperty(PROP_FLAGS, "" + flags);
-        props.setProperty(PROP_SIZE, "" + maxSize);
-        props.setProperty(PROP_COMMENT, comment);
+        props.setProperty("addr", addr);
+        props.setProperty("pass", pass);
+        props.setProperty("flags", "" + flags);
+        props.setProperty("size", "" + maxSize);
+        props.setProperty("group", group);
+        props.setProperty("comment", comment);
 
         File f = new File(rootPath, HOST_PROPERTIES);
 
@@ -740,6 +739,13 @@ public class HostStore implements Closeable, RDSCleanupListener {
         }
     }
 
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
 
     public synchronized String getComment() {
         return comment;
