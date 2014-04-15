@@ -39,12 +39,6 @@
                                       toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
                                 <copy file="../CHANGES.md"
                                       toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
-                                <mkdir dir="${project.build.outputDirectory}/zorka-${project.version}/scripts"/>
-                                <copy toDir="${project.build.outputDirectory}/zorka-${project.version}/scripts">
-                                    <fileset dir="${project.basedir}/src/scripts" defaultexcludes="false">
-                                        <include name="**"/>
-                                    </fileset>
-                                </copy>
                                 <mkdir dir="${project.build.outputDirectory}/zorka-${project.version}/templates"/>
                                 <copy toDir="${project.build.outputDirectory}/zorka-${project.version}/templates">
                                     <fileset dir="${project.basedir}/src/templates" defaultexcludes="false">

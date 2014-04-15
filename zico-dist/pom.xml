@@ -63,13 +63,8 @@
                                 <copy file="../CHANGES.md"
                                       toDir="${project.build.outputDirectory}/zico-${project.version}"/>
                                 <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/scripts"/>
-                                <copy toDir="${project.build.outputDirectory}/zico-${project.version}/scripts">
-                                    <fileset dir="../zorka-dist/src/scripts" defaultexcludes="false">
-                                        <include name="**"/>
-                                    </fileset>
-                                </copy>
                                 <copy file="src/zico.bsh"
-                                      toDir="${project.build.outputDirectory}/zico-${project.version}/scripts/apps"/>
+                                      toDir="${project.build.outputDirectory}/zico-${project.version}/scripts"/>
                                 <mkdir dir="${project.build.outputDirectory}/zico-${project.version}/templates"/>
                                 <copy file="src/Template_Zico_Collector.xml"
                                       toDir="${project.build.outputDirectory}/zico-${project.version}/templates"/>
