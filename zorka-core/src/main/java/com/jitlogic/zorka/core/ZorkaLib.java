@@ -499,14 +499,14 @@ public class ZorkaLib implements ZorkaService {
     }
 
     public String loadScript(String script) {
-        return agent.loadScript(ZorkaUtil.path(config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null), script));
+        return agent.loadScript(script);
     }
 
 
     public String require(String... names) {
         String s = "";
         for (String name : names) {
-            s += agent.require(ZorkaUtil.path(config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null), name)) + "; ";
+            s += agent.require(name) + "; ";
         }
         return s;
     }

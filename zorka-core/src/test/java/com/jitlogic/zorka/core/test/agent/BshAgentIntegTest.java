@@ -75,10 +75,14 @@ public class BshAgentIntegTest extends ZorkaFixture {
 
 	@Test
 	public void testAgentTimeout() throws Exception {
-		URL script = this.getClass().getResource("/integTest.bsh");
-		zorkaAgent.loadScript(script.getPath());
+		zorkaAgent.loadScript("/integTest.bsh");
 		//assertNull(null, execute("testLoopForever()", 1000));  // TODO zobaczyc co z tym jest grane 
 		//assertTrue("should reach execution timeout", err instanceof ThreadDeath);
 	}
 
+    @Test
+    public void testLoadScriptFromClassPath() throws Exception {
+        zorkaAgent.loadScript("test.bsh");
+        assertEquals("yes", execute("testScriptIsLoaded()", 1000));
+    }
 }
