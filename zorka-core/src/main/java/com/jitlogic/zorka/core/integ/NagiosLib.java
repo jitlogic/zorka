@@ -16,7 +16,15 @@
 
 package com.jitlogic.zorka.core.integ;
 
+import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
+
+import javax.management.MBeanServerConnection;
 import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 /**
  * Nagios library functions.
@@ -24,6 +32,8 @@ import java.util.Date;
  * @author rafal.lewczuk@jitlogic.com
  */
 public class NagiosLib {
+
+    private static final ZorkaLog log = ZorkaLogger.getLog(NagiosLib.class);
 
     /** OK status */
     public static final int OK = 0;
@@ -36,6 +46,15 @@ public class NagiosLib {
 
     /** UNKNOWN status */
     public static final int UNKNOWN = 3;
+
+    private Map<String,NagiosCommand> commands = new ConcurrentHashMap<String, NagiosCommand>();
+    private MBeanServerRegistry mBeanServerRegistry;
+
+
+    public NagiosLib(MBeanServerRegistry mBeanServerRegistry) {
+        this.mBeanServerRegistry = mBeanServerRegistry;
+    }
+
 
     /**
      * Creates reply packet.
@@ -50,10 +69,79 @@ public class NagiosLib {
      *
      * @return NRPE packet object
      */
-    private NrpePacket reply(int resultCode, String title, String format, Object... vals) {
+    public NrpePacket reply(int resultCode, String title, String format, Object... vals) {
         String msg = "" + title + new Date() + "|" + String.format(format, vals);
-        NrpePacket reply = NrpePacket.newInstance(2, NrpePacket.RESPONSE_PACKET, resultCode, msg);
-        return reply;
+        return NrpePacket.newInstance(2, NrpePacket.RESPONSE_PACKET, resultCode, msg);
     }
 
+
+    /**
+     * Creates error NRPE response.
+     * @param msg error message
+     * @return NRPE response.
+     */
+    public NrpePacket error(String msg) {
+        return NrpePacket.newInstance(2, NrpePacket.RESPONSE_PACKET, ERROR, msg);
+    }
+
+
+    Pattern RE_SPLIT = Pattern.compile("/");
+
+    private String[] splitArgs(String lstr) {
+        if (lstr != null && lstr.length() > 0) {
+            return RE_SPLIT.split(lstr);
+        }
+        return new String[0];
+    }
+
+
+    /**
+     * Defines JMX scan command that can be called later by issuing 'nagios.cmd["NAME"]'.
+     *
+     * @param id command name
+     * @param mbs mbean server na to be used
+     * @param on object name (or mask)
+     * @param path path to extracted values
+     * @param attrs attributes
+     * @param main main element to be used in output part and to determine status;
+     * @param nom nominator value for calculating ratios;
+     * @param div divider value for calculating ratios (null to use absolute values of nominator);
+     * @param warn warning threshold;
+     * @param alrt alert threshold;
+     */
+    public void defjmx(String id, String mbs, String on, String[] path, String[] attrs,
+                    String main, String nom, String div, double warn, double alrt) {
+        MBeanServerConnection conn = mBeanServerRegistry.lookup(mbs);
+        if (conn == null) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot find mban server named '" + mbs
+                    + "' while defining nagions command '" + id + "'");
+            return;
+        }
+
+//        NagiosCommand cmd = new NagiosJmxCommand(conn, on, path, attrs, main, nom, div, warn, alrt);
+//        if (commands.containsKey(id)) {
+//            log.warn(ZorkaLogger.ZAG_CONFIG, "Overwriting already defined nagios command '" + id + "'");
+//        }
+//
+//        commands.put(id, cmd);
+    }
+
+
+    /**
+     * Executes predefined command.
+     *
+     * @param id command name
+     * @param args arguments (optional)
+     *
+     * @return NRPE response.
+     */
+    public NrpePacket cmd(String id, Object...args) {
+        NagiosCommand cmd = commands.get(id);
+
+        if (cmd == null) {
+            return error("No such command: '" + id + "'");
+        }
+
+        return cmd.cmd(args);
+    }
 }

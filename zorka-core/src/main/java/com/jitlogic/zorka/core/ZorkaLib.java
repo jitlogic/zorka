@@ -46,7 +46,7 @@ import com.jitlogic.zorka.core.mbeans.ZorkaMappedMBean;
  */
 public class ZorkaLib implements ZorkaService {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaLogger.class);
+    private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaLib.class);
 
     public static final ZorkaLogLevel TRACE = ZorkaLogLevel.TRACE;
     public static final ZorkaLogLevel DEBUG = ZorkaLogLevel.DEBUG;
