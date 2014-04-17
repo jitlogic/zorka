@@ -29,6 +29,8 @@ import java.util.Map;
 
 public class NagiosJmxCommand implements NagiosCommand {
 
+    private static final String[] RC_CODES = { "OK", "WARNING", "CRITICAL", "UNKNOWN" };
+
     public static final int SEL_SUM = 0;
     public static final int SEL_FIRST = 1;
     public static final int SEL_ONE = 2;
@@ -40,12 +42,13 @@ public class NagiosJmxCommand implements NagiosCommand {
     private MBeanServerRegistry mBeanServerRegistry;
     private QueryDef query;
 
-    private String template;
+    private String tag, title;
 
-    private String label;
+    private long scale = 1;
+
+    private String lblAttr;
     private String[] pAttrs;
     private String pSuffix;
-
 
     private String nomAttr;
     private String divAttr;
@@ -54,28 +57,42 @@ public class NagiosJmxCommand implements NagiosCommand {
     private String selName, selVal;
 
     int rcMode;
-    double rcWarn;
-    double rcAlrt;
+    long rcWarn;
+    long rcAlrt;
 
 
-    public NagiosJmxCommand(MBeanServerRegistry mBeanServerRegistry, QueryDef query,
-                            String template, String label, String[] pAttrs,
-                            String nomAttr, String divAttr) {
+    public NagiosJmxCommand(MBeanServerRegistry mBeanServerRegistry, QueryDef query, String tag, String title) {
 
         this.mBeanServerRegistry = mBeanServerRegistry;
         this.query = query.with(QueryDef.NO_NULL_ATTRS);
 
-        this.template = template;
-        this.label = label;
-        this.pAttrs = pAttrs;
-
-        this.nomAttr = nomAttr;
-        this.divAttr = divAttr;
-
+        this.tag = tag;
+        this.title = title;
     }
 
 
-    public NagiosJmxCommand rcByMin(double rcWarn, double rcAlrt) {
+    public NagiosJmxCommand withScale(long scale) {
+        this.scale = scale;
+        return this;
+    }
+
+
+    public NagiosJmxCommand withPerfData(String pSuffix, String...pAttrs) {
+        this.pSuffix = pSuffix;
+        this.pAttrs = pAttrs;
+        return this;
+    }
+
+
+    public NagiosJmxCommand withAttrs(String lblAttr, String nomAttr, String divAttr) {
+        this.lblAttr = lblAttr;
+        this.nomAttr = nomAttr;
+        this.divAttr = divAttr;
+        return this;
+    }
+
+
+    public NagiosJmxCommand withRcMin(long rcWarn, long rcAlrt) {
         this.rcWarn = rcWarn;
         this.rcAlrt = rcAlrt;
         this.rcMode = RC_MIN;
@@ -83,7 +100,7 @@ public class NagiosJmxCommand implements NagiosCommand {
     }
 
 
-    public NagiosJmxCommand rcByMax(double rcWarn, double rcAlrt) {
+    public NagiosJmxCommand withRcMax(long rcWarn, long rcAlrt) {
         this.rcWarn = rcWarn;
         this.rcAlrt = rcAlrt;
         this.rcMode = RC_MAX;
@@ -91,19 +108,19 @@ public class NagiosJmxCommand implements NagiosCommand {
     }
 
 
-    public NagiosJmxCommand selSum() {
+    public NagiosJmxCommand withSelSum() {
         this.selMode = SEL_SUM;
         return this;
     }
 
 
-    public NagiosJmxCommand selectFirst() {
+    public NagiosJmxCommand withSelFirst() {
         this.selMode = SEL_FIRST;
         return this;
     }
 
 
-    public NagiosJmxCommand selectOne(String selName, String selVal) {
+    public NagiosJmxCommand withSelOne(String selName, String selVal) {
         this.selMode = SEL_ONE;
         this.selName = selName;
         this.selVal = selVal;
@@ -111,40 +128,34 @@ public class NagiosJmxCommand implements NagiosCommand {
     }
 
 
-    private String[] perfLine(QueryResult result) {
-        String plabel = ObjectInspector.substitute(label, result.getAttrs());
-        StringBuilder pval = new StringBuilder();
-        for (String pAttr : pAttrs) {
-            Object v = ObjectInspector.get(result.getValue(), pAttr);
-            if (v == null) { v = ""; }
-            if (pval.length() != 0) {
-                pval.append(";");
-                pval.append(v);
+    public Map<String,Long> toPstats(QueryResult result) {
+        Map<String,Long> pstats = new HashMap<String, Long>();
+
+        for (String pa : pAttrs) {
+            Object v = ObjectInspector.get(result.getValue(), pa);
+            if (v instanceof Long) {
+                pstats.put(pa, ((Long)v)/scale);
+            } else if (v instanceof Integer) {
+                pstats.put(pa, ((long)(Integer)v)/scale);
             } else {
-                pval.append(v);
-                pval.append(pSuffix);
+                pstats.put(pa, 0L);
             }
         }
-        return new String[] { plabel, pval.toString() };
+
+        return pstats;
     }
 
 
-    private Map<String,Long> sumStats(List<QueryResult> input) {
+    public Map<String,Long> sumPstats(List<Map<String,Long>> pstatList) {
         Map<String,Long> sum = new HashMap<String, Long>();
 
         for (String a : pAttrs) {
             sum.put(a, 0L);
         }
 
-        for (QueryResult result : input) {
-            for (String pa : pAttrs) {
-                Object v = ObjectInspector.get(result.getValue(), pa);
-                if (v instanceof Long) {
-                    sum.put(pa, sum.get(pa)+((Long)v));
-                } else if (v instanceof Integer) {
-                    long l = (long)(Integer)v;
-                    sum.put(pa, sum.get(pa)+l);
-                }
+        for (Map<String,Long> pstats : pstatList) {
+            for (Map.Entry<String,Long> e : pstats.entrySet()) {
+                sum.put(e.getKey(), sum.get(e.getKey())+e.getValue());
             }
         }
 
@@ -152,21 +163,95 @@ public class NagiosJmxCommand implements NagiosCommand {
     }
 
 
-    public int resultCode(double v) {
-        return NagiosLib.OK;
+    private String perfLine(QueryResult result, Map<String,Long> pstats) {
+        StringBuilder sb = new StringBuilder();
+
+        for (String pa : pAttrs) {
+            if (sb.length() != 0) {
+                sb.append(";");
+                sb.append(pstats.get(pa));
+            } else {
+                sb.append(pstats.get(pa));
+                sb.append(pSuffix);
+            }
+        }
+
+        return (result != null ? result.getAttr(lblAttr) : "sum") + "=" + sb.toString();
     }
+
+
+    public String textLine(QueryResult result, Map<String,Long> pstats) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(result != null ? result.getAttr(lblAttr) : "sum");
+        sb.append(' ');
+        sb.append(pstats.get(nomAttr));
+        sb.append(' ');
+        sb.append(pSuffix);
+        sb.append(' ');
+
+        Long nv = pstats.get(nomAttr), dv = pstats.get(divAttr);
+        if (nv != null && dv != null) {
+            double pct = 100.0 * nv / dv;
+            sb.append('(');
+            sb.append((int)pct);
+            sb.append("%)");
+        }
+
+        sb.append("; ");
+
+        return sb.toString();
+    }
+
+
+    public int resultCode(Map<String,Long> pstats) {
+
+        Long nv = pstats.get(nomAttr), dv = pstats.get(divAttr);
+        if (divAttr != null && nv != null && dv != null) {
+            double pct = 100.0 * nv / dv;
+            nv = (long)pct;
+        }
+
+        if (nv == null) {
+            return NrpePacket.UNKNOWN;
+        }
+
+        if (rcMode == RC_MIN) {
+            if (nv < rcAlrt) {
+                return NrpePacket.ERROR;
+            }
+            if (nv < rcWarn) {
+                return NrpePacket.WARN;
+            }
+        }
+
+        if (rcMode == RC_MAX) {
+            if (nv > rcAlrt) {
+                return NrpePacket.ERROR;
+            }
+            if (nv > rcWarn) {
+                return NrpePacket.WARN;
+            }
+        }
+
+        return NrpePacket.OK;
+    }
+
+
 
 
     @Override
     public NrpePacket cmd(Object... args) {
 
-        List<String[]> perfdata = new ArrayList<String[]>();
         List<QueryResult> results = new QueryLister(mBeanServerRegistry, query).list();
 
-        if (label != null) {
-            for (QueryResult result : results) {
-                perfdata.add(perfLine(result));
-            }
+        if (results.size() == 0) {
+            return NrpePacket.error("No data found.");
+        }
+
+        List<Map<String,Long>> pstatList = new ArrayList<Map<String, Long>>();
+
+        for (QueryResult result : results) {
+            pstatList.add(toPstats(result));
         }
 
         Map<String,Long> sum = null;
@@ -175,66 +260,59 @@ public class NagiosJmxCommand implements NagiosCommand {
         switch (selMode) {
             case SEL_FIRST:
                 if (results.size() > 0) {
-                    sum = sumStats(results.subList(0,1));
+                    sum = pstatList.get(0);
                     sel = results.get(0);
                 }
                 break;
             case SEL_SUM:
-                sum = sumStats(results);
+                sum = sumPstats(pstatList);
                 break;
             case SEL_ONE:
                 for (int i = 0; i < results.size(); i++) {
                     if (selVal.equals(results.get(i).getAttr(selName))) {
-                        sum = sumStats(results.subList(i,i+1));
+                        sum = pstatList.get(i);
                         sel = results.get(i);
                     }
                 }
                 break;
         }
 
-        Map<String,Object> firstLineAttrs = new HashMap<String, Object>();
-        if (sel != null) {
-            firstLineAttrs.putAll(sel.getAttrs());
-        }
-
-        int rcode = NagiosLib.OK;
-
-        if (sum != null) {
-            firstLineAttrs.putAll(sum);
-
-            if (nomAttr != null && divAttr != null) {
-                Long nv = sum.get(nomAttr), dv = sum.get(divAttr);
-                if (nv != null && dv != null) {
-                    double pct = 100.0 * nv / dv;
-                    firstLineAttrs.put("%", pct);
-                    rcode = resultCode(pct);
-                } else if (nv != null) {
-                    rcode = resultCode((double)nv);
-                }
-            }
-        }
-
-        String firstLine = ObjectInspector.substitute(template, firstLineAttrs);
+        int rcode = resultCode(sum);
 
         StringBuilder pktContent = new StringBuilder();
-        pktContent.append(firstLine);
 
-        if (label != null && sum != null) {
-            String sumLabel = sel != null ? ObjectInspector.substitute(label, sel.getAttrs()) : label;
-            StringBuilder sumValue = new StringBuilder();
-            for (String pa : pAttrs) {
-                Object v = sum.get(pa) != null ? sum.get(pa) : "";
-                if (sumValue.length() == 0) {
-                    sumValue.append(v);
-                    sumValue.append(pSuffix);
-                } else {
-                    sumValue.append(';');
-                    sumValue.append(v);
-                }
+        // Tag, status and title for first result line
+        pktContent.append(tag);
+        pktContent.append(' ');
+        pktContent.append(RC_CODES[rcode]);
+        pktContent.append(" - ");
+        pktContent.append(title);
+        pktContent.append(" ");
+
+        // Label and data for first line
+        pktContent.append(textLine(sel, sum));
+
+        pktContent.append("| ");
+        pktContent.append(perfLine(sel, sum));
+
+        for (int i = 0; i < results.size(); i++) {
+            if (sel != results.get(i)) {
+                pktContent.append('\n');
+                pktContent.append(textLine(results.get(i), pstatList.get(i)));
             }
-
         }
 
+
+        for (int i = 0; i < results.size(); i++) {
+            if (sel != results.get(i)) {
+                if (i > 0) {
+                    pktContent.append('\n');
+                } else {
+                    pktContent.append("| ");
+                }
+                pktContent.append(perfLine(results.get(i), pstatList.get(i)));
+            }
+        }
 
         return NrpePacket.newInstance(2, NrpePacket.RESPONSE_PACKET, rcode, pktContent.toString());
     }

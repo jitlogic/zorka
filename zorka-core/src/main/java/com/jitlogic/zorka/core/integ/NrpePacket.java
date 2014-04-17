@@ -27,6 +27,18 @@ import java.util.zip.CRC32;
  */
 public class NrpePacket {
 
+    /** OK status */
+    public static final int OK = 0;
+
+    /** WARNING status */
+    public static final int WARN = 1;
+
+    /** ERROR status */
+    public static final int ERROR = 2;
+
+    /** UNKNOWN status */
+    public static final int UNKNOWN = 3;
+
     /** NRPE query */
     public static final short QUERY_PACKET = 1;
 
@@ -85,6 +97,9 @@ public class NrpePacket {
         return pkt;
     }
 
+    public static NrpePacket error(String msg) {
+        return newInstance(2, NrpePacket.RESPONSE_PACKET, ERROR, msg);
+    }
 
     /** Hidden constructor. Use newInstance() or fromStream() method instead. */
     private NrpePacket() { }

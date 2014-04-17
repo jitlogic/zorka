@@ -95,15 +95,5 @@ public class AverageRateCountingUnitTest extends ZorkaFixture {
         assertEquals(1.0, zorka.rate("test", "test:name=bean1,type=TestJmx", "Nom", "Div", "AVG1"), 0.01);
     }
 
-    private TestJmx makeTestJmx(String name, long nom, long div) throws Exception {
-        TestJmx bean = new TestJmx();
-        bean.setNom(nom);
-        bean.setDiv(div);
-
-        testMbs.registerMBean(bean, new ObjectName(name));
-
-        return bean;
-    }
-
 
 }

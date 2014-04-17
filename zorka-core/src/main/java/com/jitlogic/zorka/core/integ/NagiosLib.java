@@ -19,6 +19,7 @@ package com.jitlogic.zorka.core.integ;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
+import com.jitlogic.zorka.core.perfmon.QueryDef;
 
 import javax.management.MBeanServerConnection;
 import java.util.Date;
@@ -36,16 +37,17 @@ public class NagiosLib {
     private static final ZorkaLog log = ZorkaLogger.getLog(NagiosLib.class);
 
     /** OK status */
-    public static final int OK = 0;
+    public static final int OK = NrpePacket.OK;
 
     /** WARNING status */
-    public static final int WARN = 1;
+    public static final int WARN = NrpePacket.WARN;
 
     /** ERROR status */
-    public static final int ERROR = 2;
+    public static final int ERROR = NrpePacket.ERROR;
 
     /** UNKNOWN status */
-    public static final int UNKNOWN = 3;
+    public static final int UNKNOWN = NrpePacket.UNKNOWN;
+
 
     private Map<String,NagiosCommand> commands = new ConcurrentHashMap<String, NagiosCommand>();
     private MBeanServerRegistry mBeanServerRegistry;
@@ -81,7 +83,7 @@ public class NagiosLib {
      * @return NRPE response.
      */
     public NrpePacket error(String msg) {
-        return NrpePacket.newInstance(2, NrpePacket.RESPONSE_PACKET, ERROR, msg);
+        return NrpePacket.error(msg);
     }
 
 
@@ -95,35 +97,18 @@ public class NagiosLib {
     }
 
 
-    /**
-     * Defines JMX scan command that can be called later by issuing 'nagios.cmd["NAME"]'.
-     *
-     * @param id command name
-     * @param mbs mbean server na to be used
-     * @param on object name (or mask)
-     * @param path path to extracted values
-     * @param attrs attributes
-     * @param main main element to be used in output part and to determine status;
-     * @param nom nominator value for calculating ratios;
-     * @param div divider value for calculating ratios (null to use absolute values of nominator);
-     * @param warn warning threshold;
-     * @param alrt alert threshold;
-     */
-    public void defjmx(String id, String mbs, String on, String[] path, String[] attrs,
-                    String main, String nom, String div, double warn, double alrt) {
-        MBeanServerConnection conn = mBeanServerRegistry.lookup(mbs);
-        if (conn == null) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot find mban server named '" + mbs
-                    + "' while defining nagions command '" + id + "'");
-            return;
+    public NagiosJmxCommand jmxcmd(QueryDef query, String tag, String title) {
+        return new NagiosJmxCommand(mBeanServerRegistry, query, tag, title);
+    }
+
+
+    public void defcmd(String id, NagiosCommand cmd) {
+
+        if (commands.containsKey(id)) {
+            log.warn(ZorkaLogger.ZAG_CONFIG, "Redefining already defined nagios command '" + id + "'");
         }
 
-//        NagiosCommand cmd = new NagiosJmxCommand(conn, on, path, attrs, main, nom, div, warn, alrt);
-//        if (commands.containsKey(id)) {
-//            log.warn(ZorkaLogger.ZAG_CONFIG, "Overwriting already defined nagios command '" + id + "'");
-//        }
-//
-//        commands.put(id, cmd);
+        commands.put(id, cmd);
     }
 
 

@@ -106,15 +106,4 @@ public class ZabbixDiscoveryUnitTest extends ZorkaFixture {
         assertEquals("query with redundant attrs should return no data", 0, obj2.get("data").size());
     }
 
-
-    private TestJmx makeTestJmx(String name, long nom, long div) throws Exception {
-        TestJmx bean = new TestJmx();
-        bean.setNom(nom);
-        bean.setDiv(div);
-
-        testMbs.registerMBean(bean, new ObjectName(name));
-
-        return bean;
-    }
-
 }
