@@ -165,7 +165,8 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
                 interpreter.source(path);
                 loadedScripts.add(path);
             } else {
-                InputStream is = getClass().getResourceAsStream("/scripts"+(script.startsWith("/") ? "" : "/")+script);
+                InputStream is = getClass().getResourceAsStream(
+                        "/com/jitlogic/zorka/scripts"+(script.startsWith("/") ? "" : "/")+script);
                 if (is != null) {
                     rdr = new InputStreamReader(is);
                     interpreter.eval(rdr, interpreter.getNameSpace(), script);
