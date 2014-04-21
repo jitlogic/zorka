@@ -146,6 +146,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
      * @param callback callback object
      */
     public void exec(String expr, ZorkaCallback callback) {
+        log.debug(ZorkaLogger.ZAG_TRACE, "Processing request BSH expression: " + expr);
         ZorkaBshWorker worker = new ZorkaBshWorker(mainExecutor, timeout, this, expr, callback);
         connExecutor.execute(worker);
     }

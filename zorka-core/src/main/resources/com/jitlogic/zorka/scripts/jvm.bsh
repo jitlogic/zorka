@@ -96,17 +96,17 @@ __jvm() {
 
   if (zorka.boolCfg("nagios", false)) {
     nagios.defcmd("MEM_POOLS", nagios.jmxcmd(
-      zorka.query("java", "java.lang:type=MemoryPool,*", "type", "name").get("Usage"),
-      "MEM_POOLS", "memory pools").withAttrs("name", "used", "max").withRcMax(95, 99));
+      zorka.query("java", "java.lang:type=MemoryPool,*", "type", "name").get("Usage"), "MEM_POOLS", "memory pools")
+      .withAttrs("name", "used", "max").withRcMax(95, 99).withScale(1048576,"MB"));
     nagios.defcmd("MEMORY", nagios.jmxcmd(
-      zorka.query("java", "java.lang:type=Memory", "type").get("HeapMemoryUsage"),
-      "MEMORY", "memory").withAttrs("name", "used", "max").withRcMax(95, 99).withSelFirst());
-    //nagios.defcmd("GC_COUNT", nagios.jmxcmd(
-    //  zorka.query("java", "java.lang:type=GarbageCollector,*", "type", "name"),
-    //  "GC_COUNT", "Collection Counter").withAttrs("name", "CollectionCount", null).withSelFirst());
-    //nagios.defcmd("GC_TIME", nagios.jmxcmd(
-    //  zorka.query("java", "java.lang:type=GarbageCollector,*", "type", "name"),
-    //  "GC_TIME", "Collection Time").withAttrs("name", "CollectionTime", null).withSelFirst());
+      zorka.query("java", "java.lang:type=Memory", "type").get("HeapMemoryUsage"), "MEMORY", "memory")
+      .withAttrs("type", "used", "max").withRcMax(95, 99).withSelFirst().withScale(1048576,"MB"));
+    nagios.defcmd("GC_COUNT", nagios.jmxcmd(
+      zorka.query("java", "java.lang:type=GarbageCollector,*", "type", "name"), "GC_COUNT", "Collection Counter")
+      .withAttrs("name", "CollectionCount", null).withSelFirst().withScale(1, "Cycles"));
+    nagios.defcmd("GC_TIME", nagios.jmxcmd(
+      zorka.query("java", "java.lang:type=GarbageCollector,*", "type", "name"), "GC_TIME", "Collection Time")
+      .withAttrs("name", "CollectionTime", null).withSelFirst().withScale(1, "ms"));
   }
 
   if (zorka.boolCfg("zorka.mbs.autoregister", false)) {

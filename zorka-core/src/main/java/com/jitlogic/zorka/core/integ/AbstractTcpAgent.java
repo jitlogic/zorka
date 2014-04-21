@@ -232,7 +232,8 @@ public abstract class AbstractTcpAgent implements Runnable, ZorkaService {
                     sock.close();
                 } else {
                     rh = newRequest(sock);
-                    agent.exec(rh.getReq(), rh);
+                    String req = rh.getReq();
+                    agent.exec(req, rh);
                 }
             } catch (Exception e) {
                 if (running) {

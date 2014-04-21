@@ -71,8 +71,9 @@ public class NagiosJmxCommand implements NagiosCommand {
     }
 
 
-    public NagiosJmxCommand withScale(long scale) {
+    public NagiosJmxCommand withScale(long scale, String pSuffix) {
         this.scale = scale;
+        this.pSuffix = pSuffix;
         return this;
     }
 
@@ -88,6 +89,11 @@ public class NagiosJmxCommand implements NagiosCommand {
         this.lblAttr = lblAttr;
         this.nomAttr = nomAttr;
         this.divAttr = divAttr;
+
+        if (this.pAttrs == null) {
+            this.pAttrs = new String[] { nomAttr, divAttr };
+        }
+
         return this;
     }
 
@@ -187,11 +193,10 @@ public class NagiosJmxCommand implements NagiosCommand {
         sb.append(pstats.get(nomAttr));
         sb.append(' ');
         sb.append(pSuffix);
-        sb.append(' ');
 
-        Long nv = pstats.get(nomAttr), dv = pstats.get(divAttr);
-        if (nv != null && dv != null) {
-            double pct = 100.0 * nv / dv;
+        if (nomAttr != null && divAttr != null) {
+            sb.append(' ');
+            double pct = 100.0 * pstats.get(nomAttr) / pstats.get(divAttr);
             sb.append('(');
             sb.append((int)pct);
             sb.append("%)");

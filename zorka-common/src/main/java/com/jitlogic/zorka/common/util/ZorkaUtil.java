@@ -812,9 +812,13 @@ public class ZorkaUtil {
     private static final char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
     public static String hex(byte[] input) {
+        return hex(input, input.length);
+    }
+
+    public static String hex(byte[] input, int len) {
         StringBuffer sb = new StringBuffer(input.length * 2);
 
-        for (int i = 0; i < input.length; i++) {
+        for (int i = 0; i < len; i++) {
             int c = input[i] & 0xff;
             sb.append(HEX[(c >> 4) & 0x0f]);
             sb.append(HEX[c & 0x0f]);

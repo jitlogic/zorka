@@ -15,6 +15,8 @@
  */
 package com.jitlogic.zorka.core.integ;
 
+import com.jitlogic.zorka.common.util.ZorkaUtil;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -104,7 +106,6 @@ public class NrpePacket {
     /** Hidden constructor. Use newInstance() or fromStream() method instead. */
     private NrpePacket() { }
 
-
     /**
      * Reads data from input stream and populates fields with parsed values
      *
@@ -131,7 +132,7 @@ public class NrpePacket {
         crc.update(buf, 0, len);
 
         if (crc.getValue() != origCrc) {
-            throw new IOException("CRC error in received NRPE packet.");
+            throw new IOException("CRC error in received NRPE packet (packet content=" + ZorkaUtil.hex(buf, len) + ")");
         }
 
         int msglen = 0;
@@ -210,6 +211,10 @@ public class NrpePacket {
     /** Returns payload data */
     public String getData() {
         return data;
+    }
+
+    public String toString() {
+        return "NRPE(" + type + "," + resultCode + ",'" + data + "')";
     }
 
 }
