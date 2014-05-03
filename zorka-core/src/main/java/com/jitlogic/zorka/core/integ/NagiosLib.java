@@ -98,7 +98,7 @@ public class NagiosLib {
 
 
     public NagiosJmxCommand jmxcmd(QueryDef query, String tag, String title) {
-        return new NagiosJmxCommand(mBeanServerRegistry, query, tag, title);
+        return (NagiosJmxCommand)(new NagiosJmxCommand(mBeanServerRegistry, query).withTitle(tag, title));
     }
 
 

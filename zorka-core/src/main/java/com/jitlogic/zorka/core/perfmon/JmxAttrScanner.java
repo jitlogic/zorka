@@ -37,25 +37,7 @@ import java.util.Map;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class JmxAttrScanner implements Runnable {
-
-    /**
-     * Logger
-     */
-    private static final ZorkaLog log = ZorkaLogger.getLog(JmxAttrScanner.class);
-
-    /**
-     * Scanner ID (attached to every packet of sample data)
-     */
-    private int id;
-    private String name;
-
-    /**
-     * Symbol registry
-     */
-    private SymbolRegistry symbols;
-
-    private MetricsRegistry metricsRegistry;
+public class JmxAttrScanner extends AbstractJmxAttrScanner implements Runnable {
 
     /**
      * Output handler - handles generated data (eg. saves them to trace files).
@@ -63,10 +45,9 @@ public class JmxAttrScanner implements Runnable {
     private TracerOutput output;
 
     /**
-     * Query listers representing queries supplied at scanner construction time
+     * Scanner ID (attached to every packet of sample data)
      */
-    private List<QueryLister> listers = new ArrayList<QueryLister>();
-
+    protected int id;
 
     /**
      * Creates new JMX attribute scanner object.
@@ -79,71 +60,14 @@ public class JmxAttrScanner implements Runnable {
      */
     public JmxAttrScanner(SymbolRegistry symbols, MetricsRegistry metricRegistry, String name,
                           MBeanServerRegistry registry, TracerOutput output, QueryDef... qdefs) {
-        this.symbols = symbols;
-        this.metricsRegistry = metricRegistry;
-        this.id = symbols.symbolId(name);
-        this.name = name;
+        super(metricRegistry, name, symbols);
         this.output = output;
+
+        this.id = symbols.symbolId(name);
 
         for (QueryDef qdef : qdefs) {
             this.listers.add(new QueryLister(registry, qdef));
         }
-    }
-
-
-    public Metric getMetric(MetricTemplate template, QueryResult result) {
-        String key = result.getKey(template.getDynamicAttrs());
-
-        Metric metric = template.getMetric(key);
-        if (metric == null) {
-            Map<String, Object> attrs = new HashMap<String, Object>();
-
-            for (Map.Entry<String, Object> e : result.attrSet()) {
-                attrs.put(e.getKey(), e.getValue().toString());
-            }
-
-            String name = ObjectInspector.substitute(template.getName(), attrs);
-
-            switch (template.getType()) {
-                case MetricTemplate.RAW_DATA:
-                    metric = metricsRegistry.getMetric(new RawDataMetric(template, name, attrs));
-                    break;
-                case MetricTemplate.RAW_DELTA:
-                    metric = metricsRegistry.getMetric(new RawDeltaMetric(template, name, attrs));
-                    break;
-                case MetricTemplate.TIMED_DELTA:
-                    metric = metricsRegistry.getMetric(new TimedDeltaMetric(template, name, attrs));
-                    break;
-                case MetricTemplate.WINDOWED_RATE:
-                    metric = metricsRegistry.getMetric(new WindowedRateMetric(template, name, attrs));
-                    break;
-                case MetricTemplate.UTILIZATION:
-                    metric = metricsRegistry.getMetric(new UtilizationMetric(template, name, attrs));
-                    break;
-                default:
-                    return null;
-            }
-
-            if (template.getId() == 0) {
-                metricsRegistry.getTemplate(template);
-            }
-
-            template.putMetric(key, metric);
-            metricsRegistry.getMetric(metric);
-
-            if (template.getDynamicAttrs().size() > 0) {
-                Map<String, Integer> dynamicAttrs = new HashMap<String, Integer>();
-                for (String attr : template.getDynamicAttrs()) {
-                    dynamicAttrs.put(attr, symbols.symbolId(attr));
-                }
-                metric.setDynamicAttrs(dynamicAttrs);
-            }
-
-            log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Created new metric: " + metric);
-            AgentDiagnostics.inc(AgentDiagnostics.METRICS_CREATED);
-        }
-
-        return metric;
     }
 
 
@@ -164,51 +88,11 @@ public class JmxAttrScanner implements Runnable {
      * @param clock current time (milliseconds since Epoch)
      */
     public void runCycle(long clock) {
-        List<PerfSample> samples = new ArrayList<PerfSample>();
-
         AgentDiagnostics.inc(AgentDiagnostics.PMON_CYCLES);
 
         long t1 = System.nanoTime();
 
-        for (QueryLister lister : listers) {
-            MetricTemplate template = lister.getMetricTemplate();
-            if (template != null) {
-
-                log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Scanning query: %s", lister);
-                AgentDiagnostics.inc(AgentDiagnostics.PMON_QUERIES);
-
-                for (QueryResult result : lister.list()) {
-                    Metric metric = getMetric(template, result);
-                    Number val = metric.getValue(clock, result.getValue());
-
-                    if (val == null) {
-                        log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Obtained null value for metric '%s'. Skipping. ", metric);
-                        AgentDiagnostics.inc(AgentDiagnostics.PMON_NULLS);
-                        continue;
-                    }
-
-                    if (val instanceof Double || val instanceof Float) {
-                        val = val.doubleValue();
-                    } else {
-                        val = val.longValue();
-                    }
-
-                    PerfSample sample = new PerfSample(metric.getId(), val);
-
-                    // Add dynamic attributes if necessary
-                    if (metric.getDynamicAttrs() != null) {
-                        Map<Integer, String> attrs = new HashMap<Integer, String>();
-                        for (Map.Entry<String, Integer> e : metric.getDynamicAttrs().entrySet()) {
-                            attrs.put(e.getValue(), result.getAttr(e.getKey()).toString());
-                        }
-                        sample.setAttrs(attrs);
-                    }
-
-                    log.trace(ZorkaLogger.ZPM_RUN_TRACE, "Submitting sample: %s", sample);
-                    samples.add(sample);
-                }
-            }
-        }
+        List<PerfSample> samples = getPerfSamples(clock);
 
         long t2 = System.nanoTime();
 
@@ -223,5 +107,6 @@ public class JmxAttrScanner implements Runnable {
             output.submit(new PerfRecord(clock, id, samples));
         }
     }
+
 
 }
