@@ -105,6 +105,83 @@ public class NagiosJmxScanCommand extends AbstractNagiosCommand {
         return rdata;
     }
 
+    private Map<String,Object> sumRData(int ncols, Map<String,Map<String,Object>> rdata) {
+        Map<String,Object> rslt = new HashMap<String, Object>();
+
+        for (int i = 0; i < ncols; i++) {
+            rslt.put("LVAL"+i, 0L);
+            rslt.put("DVAL"+i, 0.0);
+        }
+
+        rslt.put("LABEL", selName);
+
+        for (Map.Entry<String,Map<String,Object>> e : rdata.entrySet()) {
+            Map<String,Object> v = e.getValue();
+            for (int i = 0; i < ncols; i++) {
+                String l = "LVAL"+i;
+                if (v.containsKey(l)) {
+                    rslt.put(l, (Long) rslt.get(l) + (Long) v.get(l));
+                }
+                String d = "DVAL"+i;
+                if (v.containsKey(d)) {
+                    rslt.put(d, (Double) rslt.get(d) + (Double) v.get(d));
+                }
+                String u = "UNIT"+i;
+                if (v.containsKey(u) && !rslt.containsKey(u)) {
+                    rslt.put(u, v.get(u));
+                }
+                if (v.containsKey("ATTR") && !rslt.containsKey("ATTR")) {
+                    rslt.put("ATTR", v.get("ATTR"));
+                }
+            }
+        }
+
+        return rslt;
+    }
+
+    public int calcStatus(Map<String,Object> sdata) {
+
+        if (rcMode == RC_NONE) {
+            return NrpePacket.OK;
+        }
+
+        if (rcAttr == null) {
+            log.error(ZorkaLogger.ZPM_ERRORS, "Result calculation mode != NONE but reference attribute not configured.");
+            return NrpePacket.OK;
+        }
+
+        if (!(sdata.get(rcAttr) instanceof Number)) {
+            log.error(ZorkaLogger.ZPM_ERRORS, "Result value `" + rcAttr + "` is not a number.");
+            return NrpePacket.ERROR;
+        }
+
+        double v = ((Number) sdata.get(rcAttr)).doubleValue();
+
+
+        if (rcMode == RC_MIN) {
+            if (v < rcAlrt) {
+                return NrpePacket.ERROR;
+            }
+            if (v < rcWarn) {
+                return NrpePacket.WARN;
+            }
+        }
+
+        if (rcMode == RC_MAX) {
+            if (v > rcAlrt) {
+                return NrpePacket.ERROR;
+            }
+            if (v > rcWarn) {
+                return NrpePacket.WARN;
+            }
+        }
+
+        return NrpePacket.OK;
+    }
+
+
+
+
 
     public NrpePacket runScan(long clock) {
 
@@ -113,7 +190,9 @@ public class NagiosJmxScanCommand extends AbstractNagiosCommand {
         List<String> labels = new ArrayList<String>(results.size());
         Map<String,Map<String,Object>> rdata = new HashMap<String, Map<String, Object>>();
 
+        int ncols = 0;
         for (Map.Entry<String,List<PerfSample>> e : results.entrySet()) {
+            ncols = Math.max(ncols, e.getValue().size());
             labels.add(e.getKey());
             rdata.put(e.getKey(), toRData(e.getKey(), e.getValue()));
         }
@@ -123,14 +202,15 @@ public class NagiosJmxScanCommand extends AbstractNagiosCommand {
         Map<String,Object> sdata = null;
 
         switch (selMode) {
-            // TODO SEL_SUM
+            case SEL_SUM:
+                sdata = sumRData(ncols, rdata);
+                break;
             case SEL_FIRST:
                 sdata = rdata.get(labels.get(0));
                 labels.remove(0);
                 break;
             case SEL_ONE:
-                for (int i = 0; i < labels.size(); i++) {
-                    String l = labels.get(i);
+                for (String l : labels) {
                     String rv = ObjectInspector.get(rdata, l, "ATTR", selName);
                     if (ZorkaUtil.objEquals(selVal, ""+rv)) {
                         sdata = rdata.get(l);
@@ -145,14 +225,29 @@ public class NagiosJmxScanCommand extends AbstractNagiosCommand {
             return NrpePacket.error("Cannot calculate summary data.");
         }
 
-        sdata.put("STATUS", "OK"); // TODO calculate status properly
+        int status = calcStatus(sdata);
+
+        sdata.put("STATUS", RC_CODES[status]);
 
         String summary = ObjectInspector.substitute(tmplSummary, sdata);
         String perfLine = ObjectInspector.substitute(tmplPerfLine, sdata);
 
-        String msg = summary + " | " + perfLine;
+        List<String> textLines = new ArrayList<String>(labels.size());
+        List<String> perfLines = new ArrayList<String>(labels.size());
 
-        return NrpePacket.response(NrpePacket.OK, msg);
+        for (String l : labels) {
+            Map<String,Object> rd = rdata.get(l);
+            textLines.add(ObjectInspector.substitute(tmplTextLine, rd));
+            perfLines.add(ObjectInspector.substitute(tmplPerfLine, rd));
+        }
+
+        String msg = summary + "| " + perfLine;
+
+        if (labels.size() > 0) {
+            msg += "\n" + ZorkaUtil.join("\n", textLines) + "| " + ZorkaUtil.join("\n", perfLines);
+        }
+
+        return NrpePacket.response(status, msg);
     }
 
 

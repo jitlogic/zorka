@@ -49,6 +49,9 @@ public abstract class AbstractNagiosCommand implements NagiosCommand {
     /** Determines how result code should be calculated. See RC_* constants for details */
     protected int rcMode;
 
+    /** Attribute used to calculate status, eg. DVAL0, LSUM1 etc. */
+    protected String rcAttr;
+
     /** Warning threshold - crossing it will result in WARNING status. */
     protected double rcWarn;
 
@@ -76,6 +79,7 @@ public abstract class AbstractNagiosCommand implements NagiosCommand {
     /** Text Line */
     protected String tmplTextLine = "";
 
+
     /**
      * Sets minimum alert thresholds.
      *
@@ -83,7 +87,8 @@ public abstract class AbstractNagiosCommand implements NagiosCommand {
      *
      * @param rcAlrt alert level (CRITICAL)
      */
-    public AbstractNagiosCommand withRcMin(double rcWarn, double rcAlrt) {
+    public AbstractNagiosCommand withRcMin(String rcAttr, double rcWarn, double rcAlrt) {
+        this.rcAttr = rcAttr;
         this.rcWarn = rcWarn;
         this.rcAlrt = rcAlrt;
         this.rcMode = NagiosJmxCommand.RC_MIN;
@@ -98,7 +103,8 @@ public abstract class AbstractNagiosCommand implements NagiosCommand {
      *
      * @param rcAlrt alert level (CRITICAL)
      */
-    public AbstractNagiosCommand withRcMax(double rcWarn, double rcAlrt) {
+    public AbstractNagiosCommand withRcMax(String rcAttr, double rcWarn, double rcAlrt) {
+        this.rcAttr = rcAttr;
         this.rcWarn = rcWarn;
         this.rcAlrt = rcAlrt;
         this.rcMode = NagiosJmxCommand.RC_MAX;
@@ -109,8 +115,9 @@ public abstract class AbstractNagiosCommand implements NagiosCommand {
     /**
      * Calculates sums of all results as summary.
      */
-    public AbstractNagiosCommand withSelSum() {
+    public AbstractNagiosCommand withSelSum(String selName) {
         this.selMode = NagiosJmxCommand.SEL_SUM;
+        this.selName = selName;
         return this;
     }
 

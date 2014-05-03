@@ -31,7 +31,7 @@ public class NagiosJmxScanUnitTest extends ZorkaFixture {
             nagiosLib.jmxscan(
               zorka.query("test", "test:type=TestJmx,*", "name").get("Nom")
                 .metric(perfmon.metric("TEST", "B"))
-        ).withSummaryLine("TEST ${STATUS} - test item ${ATTR.name} ${LVAL0} ${UNIT0};")
+        ).withSummaryLine("TEST ${STATUS} - test item ${ATTR.name} ${LVAL0} ${UNIT0}; ")
          .withSelFirst().withLabel("${name}")
          .withPerfLine("${LABEL}=${LVAL0}${UNIT0};${LVAL0}");
 
@@ -40,6 +40,63 @@ public class NagiosJmxScanUnitTest extends ZorkaFixture {
         assertNotNull("should return some packet", pkt);
         assertEquals(NrpePacket.OK, pkt.getResultCode());
         assertEquals("TEST OK - test item bean1 10 B; | bean1=10B;10", pkt.getData());
+    }
+
+
+    @Test
+    public void testJmxScanForStatuses() throws Exception {
+        makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
+        NagiosJmxScanCommand cmd = (NagiosJmxScanCommand)
+                nagiosLib.jmxscan(
+                        zorka.query("test", "test:type=TestJmx,*", "name").get("Nom")
+                                .metric(perfmon.metric("TEST", "B"))
+                ).withSummaryLine("TEST ${STATUS} - test item ${ATTR.name} ${LVAL0} ${UNIT0};")
+                        .withSelFirst().withLabel("${name}")
+                        .withPerfLine("${LABEL}=${LVAL0}${UNIT0};${LVAL0}");
+
+        cmd.withRcMin("LVAL0", 15, 5);
+        assertEquals("Should respond with WARN status",
+                NrpePacket.WARN, cmd.cmd().getResultCode());
+        cmd.withRcMin("LVAL0", 20, 15);
+
+        assertEquals("Should respond with ERROR status",
+                NrpePacket.ERROR, cmd.cmd().getResultCode());
+
+        cmd.withRcMax("LVAL0", 7, 15);
+        assertEquals("Should respond with WARN status",
+                NrpePacket.WARN, cmd.cmd().getResultCode());
+
+        cmd.withRcMax("LVAL0", 5, 9);
+        assertEquals("Should respond with WARN status",
+                NrpePacket.ERROR, cmd.cmd().getResultCode());
+    }
+
+
+    @Test
+    public void testSumJmxScan() throws Exception {
+        makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
+        makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);
+        NagiosJmxScanCommand cmd = (NagiosJmxScanCommand)
+                nagiosLib.jmxscan(
+                    zorka.query("test", "test:type=TestJmx,*", "name").get("Nom")
+                         .metric(perfmon.metric("TEST", "B"))
+                ).withSummaryLine("TEST ${STATUS} - test items summary ${LVAL0} ${UNIT0}; ")
+                 .withLabel("${name}").withSelSum("sum")
+                 .withTextLine("${ATTR.name} ${LVAL0} ${UNIT0}; ")
+                 .withPerfLine("${LABEL}=${LVAL0}${UNIT0};${LVAL0}");
+
+        NrpePacket pkt = cmd.cmd();
+
+        assertNotNull("should return some packet", pkt);
+        assertEquals(NrpePacket.OK, pkt.getResultCode());
+        assertEquals("TEST OK - test items summary 20 B; | sum=20B;20\n"
+                   + "bean1 10 B; \n"
+                   + "bean2 10 B; | bean1=10B;10\n"
+                   + "bean2=10B;10"
+                ,
+
+                pkt.getData());
+
     }
 
 }
