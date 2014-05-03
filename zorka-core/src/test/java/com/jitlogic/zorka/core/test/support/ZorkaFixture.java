@@ -16,8 +16,10 @@
 package com.jitlogic.zorka.core.test.support;
 
 import com.jitlogic.zorka.common.test.support.CommonFixture;
+import com.jitlogic.zorka.common.test.support.TestJmx;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.*;
+import com.jitlogic.zorka.core.integ.NagiosLib;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.core.integ.SnmpLib;
 import com.jitlogic.zorka.core.integ.SyslogLib;
@@ -32,6 +34,7 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import org.junit.After;
 import org.junit.Before;
 
+import javax.management.ObjectName;
 import java.io.File;
 import java.util.Properties;
 
@@ -57,6 +60,7 @@ public class ZorkaFixture extends CommonFixture {
     protected SymbolRegistry symbols;
 
     protected ZabbixLib zabbixLib;
+    protected NagiosLib nagiosLib;
     protected UtilLib util;
 
     protected QueryTranslator translator;
@@ -94,6 +98,7 @@ public class ZorkaFixture extends CommonFixture {
         perfmon = agentInstance.getPerfMonLib();
         spyTransformer = agentInstance.getClassTransformer();
         zabbixLib = agentInstance.getZabbixLib();
+        nagiosLib = agentInstance.getNagiosLib();
         translator = agentInstance.getTranslator();
         util = agentInstance.getUtilLib();
 
@@ -122,8 +127,20 @@ public class ZorkaFixture extends CommonFixture {
         MainSubmitter.setTracer(null);
     }
 
+
     public String getTmpDir() {
         return tmpDir;
+    }
+
+
+    public TestJmx makeTestJmx(String name, long nom, long div) throws Exception {
+        TestJmx bean = new TestJmx();
+        bean.setNom(nom);
+        bean.setDiv(div);
+
+        testMbs.registerMBean(bean, new ObjectName(name));
+
+        return bean;
     }
 
 }

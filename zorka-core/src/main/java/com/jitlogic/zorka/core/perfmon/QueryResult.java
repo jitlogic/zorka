@@ -88,6 +88,11 @@ public class QueryResult {
     }
 
 
+    public Map<String,Object> getAttrs() {
+        return attrs;
+    }
+
+
     /**
      * Returns attribute map (or empty map if object has no attributes)
      *

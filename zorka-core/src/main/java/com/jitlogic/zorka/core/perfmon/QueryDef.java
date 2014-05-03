@@ -49,6 +49,8 @@ public class QueryDef {
     /** Flags altering query execution. */
     private int flags;
 
+    private String name = "<unnamed>";
+
     /** MBean Server name */
     private String mbsName;
 
@@ -112,6 +114,7 @@ public class QueryDef {
 
         return qdef;
     }
+
 
 
     /**
@@ -195,6 +198,13 @@ public class QueryDef {
     }
 
 
+    public QueryDef withName(String name) {
+        QueryDef qdef = new QueryDef(this);
+        qdef.name = name;
+        return qdef;
+    }
+
+
     /**
      * Sets additional flags for query.
      *
@@ -217,26 +227,23 @@ public class QueryDef {
         return 0 != (this.flags & flags);
     }
 
+    public String getName() { return name; }
 
     public String getMbsName() {
         return mbsName;
     }
 
-
     public String getQuery() {
         return query;
     }
-
 
     public List<String> getAttributes() {
         return attributes;
     }
 
-
     public List<QuerySegment> getSegments() {
         return segments;
     }
-
 
     public MetricTemplate getMetricTemplate() {
         return metricTemplate;

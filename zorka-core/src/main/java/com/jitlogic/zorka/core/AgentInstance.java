@@ -435,7 +435,7 @@ public class AgentInstance implements ZorkaService {
     public synchronized NagiosLib getNagiosLib() {
 
         if (nagiosLib == null) {
-            nagiosLib = new NagiosLib();
+            nagiosLib = new NagiosLib(getMBeanServerRegistry());
         }
 
         return nagiosLib;

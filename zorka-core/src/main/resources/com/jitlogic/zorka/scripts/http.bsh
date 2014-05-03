@@ -248,6 +248,11 @@ __http() {
     return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
   }
 
+  if (zorka.boolCfg("nagios", false)) {
+//    nagios.defcmd("HTTP", nagios.jmxcmd(
+//      zorka.query("java", _mbean, "name", "type").listAs("**", "attr").listAs("**", "tag"),
+//      "HTTP", "http requests").withAttrs("tag", "time", "calls"));
+  }
 
   discovery(attr, tag) {
     return zabbix.discovery(zorka.query("java", _mbean, "name", "type").get(attr).listAs("**", tag));

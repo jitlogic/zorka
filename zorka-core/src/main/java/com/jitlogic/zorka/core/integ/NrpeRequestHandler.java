@@ -78,6 +78,15 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
 
         AgentDiagnostics.inc(AgentDiagnostics.NAGIOS_TIME, tStop - tStart);
 
+        if (req == null) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error: nagios request is null (propably parse error or deadlock)");
+            try {
+                socket.close();
+            } catch (IOException e) {
+            }
+            return;
+        }
+
         NrpePacket resp = null;
         if (rslt instanceof NrpePacket) {
             NrpePacket pkt = (NrpePacket) rslt;
@@ -131,7 +140,8 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
             try {
                 req = NrpePacket.fromStream(socket.getInputStream());
             } catch (IOException e) {
-                return ""; // TODO log it somewhere ?
+                log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing NRPE packet", e);
+                return "";
             }
         }
 

@@ -17,6 +17,11 @@
 
 package com.jitlogic.zorka.core;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -141,6 +146,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
      * @param callback callback object
      */
     public void exec(String expr, ZorkaCallback callback) {
+        log.debug(ZorkaLogger.ZAG_TRACE, "Processing request BSH expression: " + expr);
         ZorkaBshWorker worker = new ZorkaBshWorker(mainExecutor, timeout, this, expr, callback);
         connExecutor.execute(worker);
     }
@@ -149,22 +155,44 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
     /**
      * Loads and executes beanshell script.
      *
-     * @param path path to script
+     * @param script path to script
      */
-    public synchronized String loadScript(String path) {
+    public synchronized String loadScript(String script) {
+        String path = ZorkaUtil.path(config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null), script);
+        Reader rdr = null;
         try {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Executing script: " + path);
-            interpreter.source(path);
-            loadedScripts.add(path);
+            if (new File(path).canRead()) {
+                log.info(ZorkaLogger.ZAG_CONFIG, "Executing script: " + path);
+                interpreter.source(path);
+                loadedScripts.add(path);
+            } else {
+                InputStream is = getClass().getResourceAsStream(
+                        "/com/jitlogic/zorka/scripts"+(script.startsWith("/") ? "" : "/")+script);
+                if (is != null) {
+                    rdr = new InputStreamReader(is);
+                    interpreter.eval(rdr, interpreter.getNameSpace(), script);
+                    loadedScripts.add(path);
+                } else {
+                    log.error(ZorkaLogger.ZAG_ERRORS, "Cannot find script: " + script);
+                }
+            }
             return "OK";
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error loading script " + path, e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error loading script " + script, e);
             AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
             return "Error: " + e.getMessage();
         } catch (EvalError e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error executing script " + path, e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error executing script " + script, e);
             AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
             return "Error: " + e.getMessage();
+        } finally {
+            if (rdr != null) {
+                try {
+                    rdr.close();
+                } catch (IOException e) {
+                    log.error(ZorkaLogger.ZAG_ERRORS, "Error closing script " + script, e);
+                }
+            }
         }
     }
 
@@ -193,7 +221,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
 
         if (scripts != null) {
             for (String script : scripts) {
-                require(ZorkaUtil.path(scriptsDir, script));
+                require(script);
             }
         }
     }

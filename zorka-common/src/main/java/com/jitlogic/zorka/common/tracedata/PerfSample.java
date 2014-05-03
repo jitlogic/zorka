@@ -26,20 +26,22 @@ public class PerfSample {
 
     public static final byte DOUBLE_SAMPLE = 2;
 
+    private transient Object result;
+    private transient Metric metric;
+
     private int metricId;
 
     /** Clock normally isn't used by agent nor encoded in trace files. */
     private transient long clock;
 
+
     private Number value;
 
     private Map<Integer,String> attrs;
 
-
     public PerfSample(int metricId, Number value) {
         this(metricId, value, null);
     }
-
 
     public PerfSample(int metricId, Number value, Map<Integer,String> attrs) {
         this.metricId = metricId;
@@ -75,13 +77,13 @@ public class PerfSample {
 
     @Override
     public String toString() {
-        return "PerfSample(" + metricId + ", " + value + ")";
+        return "PerfSample(" + metric.getId() + ", " + value + ")";
     }
 
 
     @Override
     public int hashCode() {
-        return 31 * metricId + 17 * value.hashCode();
+        return 31 * metric.getId() + 17 * value.hashCode();
     }
 
 
@@ -89,7 +91,7 @@ public class PerfSample {
     public boolean equals(Object obj) {
         if (obj instanceof PerfSample) {
             PerfSample sample = (PerfSample)obj;
-            return metricId == sample.metricId
+            return ZorkaUtil.objEquals(metric, this.metric)
                 && ZorkaUtil.objEquals(value, sample.value)
                 && ZorkaUtil.objEquals(attrs, sample.attrs);
         } else {
@@ -103,5 +105,21 @@ public class PerfSample {
 
     public void setClock(long clock) {
         this.clock = clock;
+    }
+
+    public Object getResult() {
+        return result;
+    }
+
+    public void setResult(Object result) {
+        this.result = result;
+    }
+
+    public Metric getMetric() {
+        return metric;
+    }
+
+    public void setMetric(Metric metric) {
+        this.metric = metric;
     }
 }

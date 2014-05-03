@@ -212,6 +212,10 @@ public class MetricTemplate implements Serializable {
         return mt;
     }
 
+    public MetricTemplate divide(double divider) {
+        return multiply(1.0/divider);
+    }
+
 
     public Set<String> getDynamicAttrs() {
         return dynamicAttrs;

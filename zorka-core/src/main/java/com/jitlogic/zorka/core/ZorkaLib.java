@@ -46,7 +46,7 @@ import com.jitlogic.zorka.core.mbeans.ZorkaMappedMBean;
  */
 public class ZorkaLib implements ZorkaService {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaLogger.class);
+    private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaLib.class);
 
     public static final ZorkaLogLevel TRACE = ZorkaLogLevel.TRACE;
     public static final ZorkaLogLevel DEBUG = ZorkaLogLevel.DEBUG;
@@ -499,14 +499,14 @@ public class ZorkaLib implements ZorkaService {
     }
 
     public String loadScript(String script) {
-        return agent.loadScript(ZorkaUtil.path(config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null), script));
+        return agent.loadScript(script);
     }
 
 
     public String require(String... names) {
         String s = "";
         for (String name : names) {
-            s += agent.require(ZorkaUtil.path(config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null), name)) + "; ";
+            s += agent.require(name) + "; ";
         }
         return s;
     }
