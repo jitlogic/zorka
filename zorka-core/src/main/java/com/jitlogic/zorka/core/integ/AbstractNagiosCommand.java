@@ -91,7 +91,7 @@ public abstract class AbstractNagiosCommand implements NagiosCommand {
         this.rcAttr = rcAttr;
         this.rcWarn = rcWarn;
         this.rcAlrt = rcAlrt;
-        this.rcMode = NagiosJmxCommand.RC_MIN;
+        this.rcMode = RC_MIN;
         return this;
     }
 
@@ -107,7 +107,7 @@ public abstract class AbstractNagiosCommand implements NagiosCommand {
         this.rcAttr = rcAttr;
         this.rcWarn = rcWarn;
         this.rcAlrt = rcAlrt;
-        this.rcMode = NagiosJmxCommand.RC_MAX;
+        this.rcMode = RC_MAX;
         return this;
     }
 
@@ -116,7 +116,7 @@ public abstract class AbstractNagiosCommand implements NagiosCommand {
      * Calculates sums of all results as summary.
      */
     public AbstractNagiosCommand withSelSum(String selName) {
-        this.selMode = NagiosJmxCommand.SEL_SUM;
+        this.selMode = SEL_SUM;
         this.selName = selName;
         return this;
     }
@@ -126,7 +126,7 @@ public abstract class AbstractNagiosCommand implements NagiosCommand {
      * Chooses first result as summary.
      */
     public AbstractNagiosCommand withSelFirst() {
-        this.selMode = NagiosJmxCommand.SEL_FIRST;
+        this.selMode = SEL_FIRST;
         return this;
     }
 
@@ -139,7 +139,7 @@ public abstract class AbstractNagiosCommand implements NagiosCommand {
      * @param selVal desired attribute value
      */
     public AbstractNagiosCommand withSelOne(String selName, String selVal) {
-        this.selMode = NagiosJmxCommand.SEL_ONE;
+        this.selMode = SEL_ONE;
         this.selName = selName;
         this.selVal = selVal;
         return this;

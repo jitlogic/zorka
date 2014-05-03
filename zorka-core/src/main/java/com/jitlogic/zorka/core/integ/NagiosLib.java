@@ -97,11 +97,6 @@ public class NagiosLib {
     }
 
 
-    public NagiosJmxCommand jmxcmd(QueryDef query, String tag, String title) {
-        return (NagiosJmxCommand)(new NagiosJmxCommand(mBeanServerRegistry, query).withTitle(tag, title));
-    }
-
-
     public NagiosJmxScanCommand jmxscan(QueryDef...qdefs) {
         return new NagiosJmxScanCommand(mBeanServerRegistry, qdefs);
     }
