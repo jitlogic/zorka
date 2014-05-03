@@ -22,7 +22,7 @@ import com.jitlogic.zorka.common.tracedata.PerfRecord;
 import com.jitlogic.zorka.common.tracedata.PerfSample;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.core.perfmon.JmxAttrScanner;
+import com.jitlogic.zorka.core.perfmon.TraceOutputJmxScanner;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
 import com.jitlogic.zorka.core.spy.TracerOutput;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
@@ -54,7 +54,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
 
     @Test
     public void testSimpleNullScan() throws Exception {
-        JmxAttrScanner scanner = perfmon.scanner("TEST",
+        TraceOutputJmxScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=XXX,*", "name").get("Nom")
                         .metric(perfmon.metric("test", "test")));
         ObjectInspector.setField(scanner, "output", out);
@@ -65,7 +65,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
 
     @Test
     public void testSimpleScanWithOneResult() throws Exception {
-        JmxAttrScanner scanner = perfmon.scanner("TEST",
+        TraceOutputJmxScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom")
                         .metric(perfmon.metric("test", "test")));
         ObjectInspector.setField(scanner, "output", out);
@@ -76,7 +76,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
 
     @Test
     public void testCheckIfMetricObjectsAreRegisteredAndHaveIds() throws Exception {
-        JmxAttrScanner scanner = perfmon.scanner("TEST",
+        TraceOutputJmxScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom")
                         .metric(perfmon.metric("test", "test")));
         ObjectInspector.setField(scanner, "output", out);
@@ -98,7 +98,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
 
     @Test
     public void testCheckIfDynamicAttributesArePassedCorrectly() throws Exception {
-        JmxAttrScanner scanner = perfmon.scanner("TEST",
+        TraceOutputJmxScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").getAs("Nom", "ATTR")
                         .metric(
                                 perfmon.metric("test", "test").dynamicAttrs("ATTR")));
@@ -119,7 +119,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
 
     @Test
     public void testCheckIfOutputDataIsProperlyCast() throws Exception {
-        JmxAttrScanner scanner = perfmon.scanner("TEST",
+        TraceOutputJmxScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").getAs("Nom", "ATTR")
                         .metric(
                                 perfmon.metric("test", "test").dynamicAttrs("ATTR")));

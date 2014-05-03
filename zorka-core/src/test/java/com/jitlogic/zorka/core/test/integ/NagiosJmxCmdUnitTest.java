@@ -16,7 +16,6 @@
 package com.jitlogic.zorka.core.test.integ;
 
 
-import com.jitlogic.zorka.core.integ.AbstractNagiosCommand;
 import com.jitlogic.zorka.core.integ.NagiosJmxCommand;
 import com.jitlogic.zorka.core.integ.NrpePacket;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
@@ -31,7 +30,7 @@ public class NagiosJmxCmdUnitTest extends ZorkaFixture {
     public void testTrivialSingleItemQuery() throws Exception {
         makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
         QueryDef query = zorka.query("test", "test:*", "name", "type");
-        AbstractNagiosCommand cmd = nagiosLib.jmxcmd(query, "TEST", "test item")
+        NagiosJmxCommand cmd = nagiosLib.jmxcmd(query, "TEST", "test item")
             .withPerfAttrs("Nom", "Div").withSuffix("MB").withAttrs("name", "Nom", "Div");
         NrpePacket pkt = cmd.cmd();
         assertNotNull("Should return some result", pkt);
@@ -45,7 +44,7 @@ public class NagiosJmxCmdUnitTest extends ZorkaFixture {
     public void testTrivialSingleItemQueryWithFirstItemSelected() throws Exception {
         makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
         QueryDef query = zorka.query("test", "test:*", "name", "type");
-        AbstractNagiosCommand cmd = nagiosLib.jmxcmd(query, "TEST", "test item")
+        NagiosJmxCommand cmd = nagiosLib.jmxcmd(query, "TEST", "test item")
             .withSelFirst().withSuffix("MB")
             .withPerfAttrs("Nom", "Div").withAttrs("name", "Nom", "Div");
         NrpePacket pkt = cmd.cmd();
@@ -59,7 +58,7 @@ public class NagiosJmxCmdUnitTest extends ZorkaFixture {
         makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
         makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);
         QueryDef query = zorka.query("test", "test:*", "name", "type");
-        AbstractNagiosCommand cmd = nagiosLib.jmxcmd(query, "TEST", "test item")
+        NagiosJmxCommand cmd = nagiosLib.jmxcmd(query, "TEST", "test item")
                 .withPerfAttrs("Nom", "Div").withSuffix("MB").withAttrs("name", "Nom", "Div");
         NrpePacket pkt = cmd.cmd();
         assertNotNull("Should return some result", pkt);

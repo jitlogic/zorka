@@ -21,6 +21,7 @@ import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,30 +31,49 @@ import java.util.Map;
 /**
  * Created by rlewczuk on 03.05.14.
  */
-public class AbstractJmxAttrScanner {
+public class JmxScanner {
     /**
      * Logger
      */
-    protected static final ZorkaLog log = ZorkaLogger.getLog(JmxAttrScanner.class);
-
-    protected String name;
+    protected static final ZorkaLog log = ZorkaLogger.getLog(JmxScanner.class);
 
     /**
      * Symbol registry
      */
     protected SymbolRegistry symbols;
     protected MetricsRegistry metricsRegistry;
+    protected MBeanServerRegistry mBeanServerRegistry;
+
+    protected boolean attachResults;
 
     /**
      * Query listers representing queries supplied at scanner construction time
      */
     protected List<QueryLister> listers = new ArrayList<QueryLister>();
 
-    public AbstractJmxAttrScanner(MetricsRegistry metricRegistry, String name, SymbolRegistry symbols) {
+
+    public JmxScanner(MBeanServerRegistry mBeanServerRegistry, MetricsRegistry metricRegistry,
+                      SymbolRegistry symbols, List<QueryLister> listers) {
+
+        this.mBeanServerRegistry = mBeanServerRegistry;
         this.metricsRegistry = metricRegistry;
-        this.name = name;
         this.symbols = symbols;
+        this.listers = listers;
     }
+
+
+    public JmxScanner(MBeanServerRegistry mBeanServerRegistry, MetricsRegistry metricRegistry,
+                      SymbolRegistry symbols, QueryDef...qdefs) {
+
+        this.mBeanServerRegistry = mBeanServerRegistry;
+        this.metricsRegistry = metricRegistry;
+        this.symbols = symbols;
+
+        for (QueryDef qdef : qdefs) {
+            this.listers.add(new QueryLister(mBeanServerRegistry, qdef));
+        }
+    }
+
 
     public Metric getMetric(MetricTemplate template, QueryResult result) {
         String key = result.getKey(template.getDynamicAttrs());
@@ -110,6 +130,48 @@ public class AbstractJmxAttrScanner {
         return metric;
     }
 
+
+    public List<PerfSample> getPerfSamples(long clock, QueryLister lister) {
+        List<PerfSample> smpl = new ArrayList<PerfSample>();
+        for (QueryResult result : lister.list()) {
+            Metric metric = getMetric(lister.getMetricTemplate(), result);
+            Number val = metric.getValue(clock, result.getValue());
+
+            if (val == null) {
+                log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Obtained null value for metric '%s'. Skipping. ", metric);
+                AgentDiagnostics.inc(AgentDiagnostics.PMON_NULLS);
+                continue;
+            }
+
+            if (val instanceof Double || val instanceof Float) {
+                val = val.doubleValue();
+            } else {
+                val = val.longValue();
+            }
+
+            PerfSample sample = new PerfSample(metric.getId(), val);
+
+            if (attachResults) {
+                sample.setResult(result);
+                sample.setMetric(metric);
+            }
+
+            // Add dynamic attributes if necessary
+            if (metric.getDynamicAttrs() != null) {
+                Map<Integer, String> attrs = new HashMap<Integer, String>();
+                for (Map.Entry<String, Integer> e : metric.getDynamicAttrs().entrySet()) {
+                    attrs.put(e.getValue(), result.getAttr(e.getKey()).toString());
+                }
+                sample.setAttrs(attrs);
+            }
+
+            log.trace(ZorkaLogger.ZPM_RUN_TRACE, "Submitting sample: %s", sample);
+            smpl.add(sample);
+        }
+        return smpl;
+    }
+
+
     public List<PerfSample> getPerfSamples(long clock) {
         List<PerfSample> samples = new ArrayList<PerfSample>();
 
@@ -120,38 +182,13 @@ public class AbstractJmxAttrScanner {
                 log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Scanning query: %s", lister);
                 AgentDiagnostics.inc(AgentDiagnostics.PMON_QUERIES);
 
-                for (QueryResult result : lister.list()) {
-                    Metric metric = getMetric(template, result);
-                    Number val = metric.getValue(clock, result.getValue());
-
-                    if (val == null) {
-                        log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Obtained null value for metric '%s'. Skipping. ", metric);
-                        AgentDiagnostics.inc(AgentDiagnostics.PMON_NULLS);
-                        continue;
-                    }
-
-                    if (val instanceof Double || val instanceof Float) {
-                        val = val.doubleValue();
-                    } else {
-                        val = val.longValue();
-                    }
-
-                    PerfSample sample = new PerfSample(metric, val);
-
-                    // Add dynamic attributes if necessary
-                    if (metric.getDynamicAttrs() != null) {
-                        Map<Integer, String> attrs = new HashMap<Integer, String>();
-                        for (Map.Entry<String, Integer> e : metric.getDynamicAttrs().entrySet()) {
-                            attrs.put(e.getValue(), result.getAttr(e.getKey()).toString());
-                        }
-                        sample.setAttrs(attrs);
-                    }
-
-                    log.trace(ZorkaLogger.ZPM_RUN_TRACE, "Submitting sample: %s", sample);
-                    samples.add(sample);
-                }
+                samples.addAll(getPerfSamples(clock, lister));
             }
         }
         return samples;
+    }
+
+    public void setAttachResults(boolean attachResults) {
+        this.attachResults = attachResults;
     }
 }

@@ -26,11 +26,14 @@ public class PerfSample {
 
     public static final byte DOUBLE_SAMPLE = 2;
 
+    private transient Object result;
     private transient Metric metric;
+
     private int metricId;
 
     /** Clock normally isn't used by agent nor encoded in trace files. */
     private transient long clock;
+
 
     private Number value;
 
@@ -38,15 +41,6 @@ public class PerfSample {
 
     public PerfSample(int metricId, Number value) {
         this(metricId, value, null);
-    }
-
-    public PerfSample(Metric metric, Number value) {
-        this(metric, value, null);
-    }
-
-    public PerfSample(Metric metric, Number value, Map<Integer,String> attrs) {
-        this(metric.getId(), value, attrs);
-        this.metric = metric;
     }
 
     public PerfSample(int metricId, Number value, Map<Integer,String> attrs) {
@@ -111,5 +105,21 @@ public class PerfSample {
 
     public void setClock(long clock) {
         this.clock = clock;
+    }
+
+    public Object getResult() {
+        return result;
+    }
+
+    public void setResult(Object result) {
+        this.result = result;
+    }
+
+    public Metric getMetric() {
+        return metric;
+    }
+
+    public void setMetric(Metric metric) {
+        this.metric = metric;
     }
 }

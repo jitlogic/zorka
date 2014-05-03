@@ -17,17 +17,12 @@
 package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.common.tracedata.*;
-import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.spy.TracerOutput;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * JMX Attribute Scanner is responsible for traversing JMX (using supplied queries) and
@@ -37,17 +32,25 @@ import java.util.Map;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class JmxAttrScanner extends AbstractJmxAttrScanner implements Runnable {
+public class TraceOutputJmxScanner extends JmxScanner implements Runnable {
 
     /**
      * Output handler - handles generated data (eg. saves them to trace files).
      */
     private TracerOutput output;
 
+
     /**
-     * Scanner ID (attached to every packet of sample data)
+     * Scanner name.
+     */
+    protected String name;
+
+
+    /**
+     * Scanner ID (attached to every packet of sample data).
      */
     protected int id;
+
 
     /**
      * Creates new JMX attribute scanner object.
@@ -58,16 +61,14 @@ public class JmxAttrScanner extends AbstractJmxAttrScanner implements Runnable {
      * @param output   tracer output
      * @param qdefs    JMX queries
      */
-    public JmxAttrScanner(SymbolRegistry symbols, MetricsRegistry metricRegistry, String name,
-                          MBeanServerRegistry registry, TracerOutput output, QueryDef... qdefs) {
-        super(metricRegistry, name, symbols);
+    public TraceOutputJmxScanner(SymbolRegistry symbols, MetricsRegistry metricRegistry, String name,
+                                 MBeanServerRegistry registry, TracerOutput output, QueryDef... qdefs) {
+
+        super(registry, metricRegistry, symbols, qdefs);
+
         this.output = output;
-
+        this.name = name;
         this.id = symbols.symbolId(name);
-
-        for (QueryDef qdef : qdefs) {
-            this.listers.add(new QueryLister(registry, qdef));
-        }
     }
 
 

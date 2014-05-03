@@ -76,8 +76,8 @@ public class PerfMonLib {
      *
      * @return scanner object
      */
-    public JmxAttrScanner scanner(String name, QueryDef... qdefs) {
-        return new JmxAttrScanner(symbolRegistry, metricsRegistry, name, mbsRegistry, tracer, qdefs);
+    public TraceOutputJmxScanner scanner(String name, QueryDef... qdefs) {
+        return new TraceOutputJmxScanner(symbolRegistry, metricsRegistry, name, mbsRegistry, tracer, qdefs);
     }
 
 

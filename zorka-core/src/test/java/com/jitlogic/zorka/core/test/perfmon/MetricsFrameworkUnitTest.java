@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 
 public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
-    private AbstractJmxAttrScanner scanner;
+    private JmxScanner scanner;
 
     @Before
     public void setScanner() {

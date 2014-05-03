@@ -99,6 +99,8 @@ public class NrpePacket {
         return pkt;
     }
 
+    public static NrpePacket response(int rc, String msg) { return newInstance(2, NrpePacket.RESPONSE_PACKET, rc, msg); }
+
     public static NrpePacket error(String msg) {
         return newInstance(2, NrpePacket.RESPONSE_PACKET, ERROR, msg);
     }
