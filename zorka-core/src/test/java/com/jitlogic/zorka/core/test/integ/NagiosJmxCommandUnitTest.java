@@ -15,19 +15,19 @@
  */
 package com.jitlogic.zorka.core.test.integ;
 
-import com.jitlogic.zorka.core.integ.NagiosJmxScanCommand;
+import com.jitlogic.zorka.core.integ.NagiosJmxCommand;
 import com.jitlogic.zorka.core.integ.NrpePacket;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-public class NagiosJmxScanUnitTest extends ZorkaFixture {
+public class NagiosJmxCommandUnitTest extends ZorkaFixture {
 
     @Test
     public void testTrivialJmxScan() throws Exception {
         makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
-        NagiosJmxScanCommand cmd = (NagiosJmxScanCommand)
+        NagiosJmxCommand cmd = (NagiosJmxCommand)
             nagiosLib.jmxscan(
               zorka.query("test", "test:type=TestJmx,*", "name").get("Nom")
                 .metric(perfmon.metric("TEST", "B"))
@@ -46,7 +46,7 @@ public class NagiosJmxScanUnitTest extends ZorkaFixture {
     @Test
     public void testJmxScanForStatuses() throws Exception {
         makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
-        NagiosJmxScanCommand cmd = (NagiosJmxScanCommand)
+        NagiosJmxCommand cmd = (NagiosJmxCommand)
                 nagiosLib.jmxscan(
                         zorka.query("test", "test:type=TestJmx,*", "name").get("Nom")
                                 .metric(perfmon.metric("TEST", "B"))
@@ -76,7 +76,7 @@ public class NagiosJmxScanUnitTest extends ZorkaFixture {
     public void testSumJmxScan() throws Exception {
         makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
         makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);
-        NagiosJmxScanCommand cmd = (NagiosJmxScanCommand)
+        NagiosJmxCommand cmd = (NagiosJmxCommand)
                 nagiosLib.jmxscan(
                     zorka.query("test", "test:type=TestJmx,*", "name").get("Nom")
                          .metric(perfmon.metric("TEST", "B"))

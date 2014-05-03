@@ -31,15 +31,15 @@ import com.jitlogic.zorka.core.perfmon.QueryResult;
 
 import java.util.*;
 
-public class NagiosJmxScanCommand extends AbstractNagiosCommand {
+public class NagiosJmxCommand extends AbstractNagiosCommand {
 
-    protected static final ZorkaLog log = ZorkaLogger.getLog(NagiosJmxScanCommand.class);
+    protected static final ZorkaLog log = ZorkaLogger.getLog(NagiosJmxCommand.class);
 
     private JmxScanner scanner;
     private List<QueryLister> listers;
 
 
-    public NagiosJmxScanCommand(MBeanServerRegistry mBeanServerRegistry, QueryDef...qdefs) {
+    public NagiosJmxCommand(MBeanServerRegistry mBeanServerRegistry, QueryDef... qdefs) {
         listers = new ArrayList<QueryLister>(qdefs.length);
         for (QueryDef qdef : qdefs) {
             this.listers.add(new QueryLister(mBeanServerRegistry, qdef));

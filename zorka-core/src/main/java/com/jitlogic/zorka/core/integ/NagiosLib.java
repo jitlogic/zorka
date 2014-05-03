@@ -21,7 +21,6 @@ import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
 
-import javax.management.MBeanServerConnection;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -97,8 +96,8 @@ public class NagiosLib {
     }
 
 
-    public NagiosJmxScanCommand jmxscan(QueryDef...qdefs) {
-        return new NagiosJmxScanCommand(mBeanServerRegistry, qdefs);
+    public NagiosJmxCommand jmxscan(QueryDef...qdefs) {
+        return new NagiosJmxCommand(mBeanServerRegistry, qdefs);
     }
 
 
