@@ -32,7 +32,7 @@ public class NagiosJmxCommandUnitTest extends ZorkaFixture {
               zorka.query("test", "test:type=TestJmx,*", "name").get("Nom")
                 .metric(perfmon.metric("TEST", "B"))
         ).withSummaryLine("TEST ${STATUS} - test item ${ATTR.name} ${LVAL0} ${UNIT0}; ")
-         .withSelFirst().withLabel("${name}")
+         .withFirstResult().withLabel("${name}")
          .withPerfLine("${LABEL}=${LVAL0}${UNIT0};${LVAL0}");
 
         NrpePacket pkt = cmd.cmd();
@@ -51,7 +51,7 @@ public class NagiosJmxCommandUnitTest extends ZorkaFixture {
                         zorka.query("test", "test:type=TestJmx,*", "name").get("Nom")
                                 .metric(perfmon.metric("TEST", "B"))
                 ).withSummaryLine("TEST ${STATUS} - test item ${ATTR.name} ${LVAL0} ${UNIT0};")
-                        .withSelFirst().withLabel("${name}")
+                        .withFirstResult().withLabel("${name}")
                         .withPerfLine("${LABEL}=${LVAL0}${UNIT0};${LVAL0}");
 
         cmd.withRcMin("LVAL0", 15, 5);
@@ -81,7 +81,7 @@ public class NagiosJmxCommandUnitTest extends ZorkaFixture {
                     zorka.query("test", "test:type=TestJmx,*", "name").get("Nom")
                          .metric(perfmon.metric("TEST", "B"))
                 ).withSummaryLine("TEST ${STATUS} - test items summary ${LVAL0} ${UNIT0}; ")
-                 .withLabel("${name}").withSelSum("sum")
+                 .withLabel("${name}").withSumResult("sum")
                  .withTextLine("${ATTR.name} ${LVAL0} ${UNIT0}; ")
                  .withPerfLine("${LABEL}=${LVAL0}${UNIT0};${LVAL0}");
 
@@ -97,6 +97,28 @@ public class NagiosJmxCommandUnitTest extends ZorkaFixture {
 
                 pkt.getData());
 
+    }
+
+    @Test
+    public void testFilteredJmxScan() throws Exception {
+        makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
+        makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);
+        NagiosJmxCommand cmd = (NagiosJmxCommand)
+                nagiosLib.jmxscan(
+                        zorka.query("test", "test:type=TestJmx,*", "name").get("Nom")
+                                .metric(perfmon.metric("TEST", "B"))
+                ).withSummaryLine("TEST ${STATUS} - test item ${ATTR.name} ${LVAL0} ${UNIT0}; ")
+                        .withLabel("${name}").withFilterResult("name", "bean2")
+                        .withTextLine("${ATTR.name} ${LVAL0} ${UNIT0}; ")
+                        .withPerfLine("${LABEL}=${LVAL0}${UNIT0};${LVAL0}");
+
+        NrpePacket pkt = cmd.cmd();
+
+        assertNotNull("should return some packet", pkt);
+        assertEquals(NrpePacket.OK, pkt.getResultCode());
+        assertEquals("TEST OK - test item bean2 10 B; | bean2=10B;10\n"
+                        + "bean1 10 B; | bean1=10B;10",
+                pkt.getData());
     }
 
 }

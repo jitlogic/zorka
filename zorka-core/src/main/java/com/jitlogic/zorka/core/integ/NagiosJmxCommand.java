@@ -214,6 +214,7 @@ public class NagiosJmxCommand extends AbstractNagiosCommand {
                     String rv = ObjectInspector.get(rdata, l, "ATTR", selName);
                     if (ZorkaUtil.objEquals(selVal, ""+rv)) {
                         sdata = rdata.get(l);
+                        labels.remove(l);
                         break;
                     }
                 }

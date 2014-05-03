@@ -1,3 +1,10 @@
+Zorka 1.0.2 (2014-05-03)
+------------------------
+
+* hide BSH scripts inside agent jar (yet scripts/ directory for user scripts still works)
+* JMX values scanner for Nagios - with aggregates and other features;
+
+
 Zorka 1.0.1 (2014-03-31)
 ------------------------
 

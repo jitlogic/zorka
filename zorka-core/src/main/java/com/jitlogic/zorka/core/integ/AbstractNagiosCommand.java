@@ -115,7 +115,7 @@ public abstract class AbstractNagiosCommand implements NagiosCommand {
     /**
      * Calculates sums of all results as summary.
      */
-    public AbstractNagiosCommand withSelSum(String selName) {
+    public AbstractNagiosCommand withSumResult(String selName) {
         this.selMode = SEL_SUM;
         this.selName = selName;
         return this;
@@ -125,7 +125,7 @@ public abstract class AbstractNagiosCommand implements NagiosCommand {
     /**
      * Chooses first result as summary.
      */
-    public AbstractNagiosCommand withSelFirst() {
+    public AbstractNagiosCommand withFirstResult() {
         this.selMode = SEL_FIRST;
         return this;
     }
@@ -138,7 +138,7 @@ public abstract class AbstractNagiosCommand implements NagiosCommand {
      *
      * @param selVal desired attribute value
      */
-    public AbstractNagiosCommand withSelOne(String selName, String selVal) {
+    public AbstractNagiosCommand withFilterResult(String selName, String selVal) {
         this.selMode = SEL_ONE;
         this.selName = selName;
         this.selVal = selVal;

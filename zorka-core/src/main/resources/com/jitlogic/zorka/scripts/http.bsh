@@ -249,9 +249,9 @@ __http() {
   }
 
   if (zorka.boolCfg("nagios", false)) {
-    nagios.defcmd("HTTP", nagios.jmxcmd(
-      zorka.query("java", _mbean, "name", "type").listAs("**", "attr").listAs("**", "tag"),
-      "HTTP", "http requests").withAttrs("tag", "time", "calls"));
+//    nagios.defcmd("HTTP", nagios.jmxcmd(
+//      zorka.query("java", _mbean, "name", "type").listAs("**", "attr").listAs("**", "tag"),
+//      "HTTP", "http requests").withAttrs("tag", "time", "calls"));
   }
 
   discovery(attr, tag) {
