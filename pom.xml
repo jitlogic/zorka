@@ -55,10 +55,6 @@
         <module>zorka-agent</module>
         <module>zorka-viewer</module>
         <module>zorka-dist</module>
-        <module>zico-core</module>
-        <module>zico-util</module>
-        <module>zico-web</module>
-        <module>zico-dist</module>
     </modules>
 
 </project>
