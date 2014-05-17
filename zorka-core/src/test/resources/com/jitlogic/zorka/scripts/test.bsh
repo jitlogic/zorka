@@ -1,4 +1,6 @@
 
+test_bsh = 1;
+
 testScriptIsLoaded() {
   return "yes";
 }

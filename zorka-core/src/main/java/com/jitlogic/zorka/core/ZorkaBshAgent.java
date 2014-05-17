@@ -164,14 +164,14 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
             if (new File(path).canRead()) {
                 log.info(ZorkaLogger.ZAG_CONFIG, "Executing script: " + path);
                 interpreter.source(path);
-                loadedScripts.add(path);
+                loadedScripts.add(script);
             } else {
                 InputStream is = getClass().getResourceAsStream(
                         "/com/jitlogic/zorka/scripts"+(script.startsWith("/") ? "" : "/")+script);
                 if (is != null) {
                     rdr = new InputStreamReader(is);
                     interpreter.eval(rdr, interpreter.getNameSpace(), script);
-                    loadedScripts.add(path);
+                    loadedScripts.add(script);
                 } else {
                     log.error(ZorkaLogger.ZAG_ERRORS, "Cannot find script: " + script);
                 }
@@ -197,9 +197,9 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
     }
 
 
-    public synchronized String require(String path) {
-        if (!loadedScripts.contains(path)) {
-            return loadScript(path);
+    public synchronized String require(String script) {
+        if (!loadedScripts.contains(script)) {
+            return loadScript(script);
         } else {
             return "Already loaded.";
         }
