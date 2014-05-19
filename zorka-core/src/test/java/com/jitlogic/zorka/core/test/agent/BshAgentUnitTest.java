@@ -91,6 +91,33 @@ public class BshAgentUnitTest extends ZorkaFixture {
         assertNotNull("common.bsh script should be indirectly loaded via jvm.bsh", zorkaAgent.get("common_bsh"));
     }
 
+    @Test
+    public void testIfRequireSkipsAlreadyLoadedScriptFromFilesystem() throws Exception {
+        URL url = getClass().getResource("/cfgp");
+        AgentConfig config = new AgentConfig(url.getPath());
+        ObjectInspector.setField(zorkaAgent, "config", config);
+        ObjectInspector.setField(zorka, "config", config);
+        zorka.require("test/test.bsh");
+        assertEquals("Should load first script", 1, zorkaAgent.get("test_bsh"));
+        zorka.require("test/test2.bsh");
+        assertEquals("Should load second script", 2, zorkaAgent.get("test_bsh"));
+        zorka.require("test/test1.bsh");
+        assertEquals("Should refuse to load first script again", 2, zorkaAgent.get("test_bsh"));
+    }
+
+    @Test
+    public void testIfRequireSkipsAlreadyLoadedScriptFromClasspath() throws Exception {
+        URL url = getClass().getResource("/conf");
+        AgentConfig config = new AgentConfig(url.getPath());
+        ObjectInspector.setField(zorkaAgent, "config", config);
+        ObjectInspector.setField(zorka, "config", config);
+        zorka.require("test.bsh");
+        assertEquals("Should load first script", 1, zorkaAgent.get("test_bsh"));
+        zorka.require("test2.bsh");
+        assertEquals("Should load second script", 2, zorkaAgent.get("test_bsh"));
+        zorka.require("test.bsh");
+        assertEquals("Should refuse to load first script again", 2, zorkaAgent.get("test_bsh"));
+    }
 
     @Test
     public void testObjectDumper() throws Exception {

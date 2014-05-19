@@ -17,6 +17,11 @@
 package com.jitlogic.zorka.core.integ;
 
 
+import com.jitlogic.zorka.common.util.ZorkaUtil;
+
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * This class implements common parts of nagios commands. It is responsible for assembling
  * and formatting result.
@@ -66,7 +71,7 @@ public abstract class AbstractNagiosCommand implements NagiosCommand {
     protected String selName;
 
     /** When choosing selected result as summary: value of attribute by which result will be chosen. */
-    protected String selVal;
+    protected Set<String> selVals = new HashSet<String>();
 
     protected String tmplSummary = "";
 
@@ -132,16 +137,16 @@ public abstract class AbstractNagiosCommand implements NagiosCommand {
 
 
     /**
-     * Selects specific result as summary
+     * Selects specific result as summary (one of selected values)
      *
      * @param selName attribute name to be checked
      *
-     * @param selVal desired attribute value
+     * @param selVals desired attribute values
      */
-    public AbstractNagiosCommand withFilterResult(String selName, String selVal) {
+    public AbstractNagiosCommand withFilterResult(String selName, String...selVals) {
         this.selMode = SEL_ONE;
         this.selName = selName;
-        this.selVal = selVal;
+        this.selVals = ZorkaUtil.set(selVals);
         return this;
     }
 

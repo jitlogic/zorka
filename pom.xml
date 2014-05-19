@@ -3,7 +3,7 @@
     <groupId>com.jitlogic.zorka</groupId>
     <artifactId>zorka</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <name>zorka: parent aggregator</name>
     <url>http://zorka.io</url>
 
@@ -19,13 +19,13 @@
         <surefire.plugin.version>2.12</surefire.plugin.version>
         <war.plugin.version>2.1.1</war.plugin.version>
 
-        <asm.version>4.2</asm.version>
+        <asm.version>5.0.2</asm.version>
         <bval.version>0.5</bval.version>
         <dbcp.version>1.4</dbcp.version>
         <fest.version>1.4</fest.version>
-        <fressian.version>0.6.3</fressian.version>
-        <gin.version>2.1.0</gin.version>
-        <guava.version>15.0</guava.version>
+        <fressian.version>0.6.5</fressian.version>
+        <gin.version>2.1.2</gin.version>
+        <guava.version>17.0</guava.version>
         <guice.version>3.0</guice.version>
         <gwt.version>2.5.1</gwt.version>
         <gxt.version>3.0.1</gxt.version>
@@ -33,10 +33,10 @@
         <json.version>1.2</json.version>
         <junit.version>4.11</junit.version>
         <libsnmp.version>0.0.1</libsnmp.version>
-        <logback.version>1.0.13</logback.version>
+        <logback.version>1.1.2</logback.version>
         <mapdb.version>0.9.8</mapdb.version>
         <parboiled.version>1.1.6</parboiled.version>
-        <slf4j.version>1.7.5</slf4j.version>
+        <slf4j.version>1.7.7</slf4j.version>
         <zoola.version>0.1.0</zoola.version>
     </properties>
 
@@ -55,10 +55,6 @@
         <module>zorka-agent</module>
         <module>zorka-viewer</module>
         <module>zorka-dist</module>
-        <module>zico-core</module>
-        <module>zico-util</module>
-        <module>zico-web</module>
-        <module>zico-dist</module>
     </modules>
 
 </project>

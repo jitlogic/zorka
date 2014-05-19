@@ -200,7 +200,7 @@ public class MetricTemplate implements Serializable {
 
 
     /**
-     * Changes multiplier field.
+     * Changes multiplier ratio by multiplying it with passed argument.
      * Returns new version of metric template object, original object is unchanged.
      *
      * @param multiplier new multiplier
@@ -208,12 +208,22 @@ public class MetricTemplate implements Serializable {
      */
     public MetricTemplate multiply(double multiplier) {
         MetricTemplate mt = new MetricTemplate(this);
-        mt.multiplier = multiplier;
+        mt.multiplier = mt.multiplier * multiplier;
         return mt;
     }
 
+
+    /**
+     * Changes multiplier ratio by dividing it with passed argument.
+     * Returns new version of metric template object, original object is unchanged.
+     *
+     * @param divider new inverted multiplier
+     * @return altered metric template
+     */
     public MetricTemplate divide(double divider) {
-        return multiply(1.0/divider);
+        MetricTemplate mt = new MetricTemplate(this);
+        mt.multiplier = mt.multiplier / multiplier;
+        return mt;
     }
 
 

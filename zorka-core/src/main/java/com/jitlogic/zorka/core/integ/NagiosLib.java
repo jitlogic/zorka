@@ -107,6 +107,8 @@ public class NagiosLib {
             log.warn(ZorkaLogger.ZAG_CONFIG, "Redefining already defined nagios command '" + id + "'");
         }
 
+        log.info(ZorkaLogger.ZAG_CONFIG, "Definig Nagios command: " + id);
+
         commands.put(id, cmd);
     }
 
