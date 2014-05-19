@@ -1,3 +1,11 @@
+Zorka 1.0.3 (2014-05-19)
+------------------------
+
+* enhance nagios commands framework, predefined commands for JVM, HTTP, SQL etc.
+* update dependencies: asm, fressian;
+* revamp ZICO UI (get rid of GXT, upgrade to GWT 2.6, Jetty 9);
+
+
 Zorka 1.0.2 (2014-05-03)
 ------------------------
 
