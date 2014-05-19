@@ -1,0 +1,29 @@
+
+__nagios_util() {
+
+  def_zorka_stat(_mbean, name) {
+        // Monitor zorka stat 
+        nagios.defcmd(name, nagios.jmxscan(
+          zorka.query("java", _mbean, "type", "name").get("stats", "ALL", "calls")
+            .metric(perfmon.timedDelta("LVAL0", "req/min").multiply(60)),
+          zorka.query("java", _mbean, "type", "name").get("stats", "ALL", "errors")
+            .metric(perfmon.timedDelta("LVAL1", "req/min").multiply(60)),
+          zorka.query("java", _mbean, "type", "name").get("stats", "ALL", "maxTimeCLR")
+            .metric(perfmon.metric("LVAL2", "ms")),
+          zorka.query("java", _mbean, "type", "name").get("stats", "ALL", "maxTimeCLR")
+            .metric(perfmon.rate("LVAL3", "ms", "time", "calls"))
+          ).withLabel(name)
+           .withRcMax("LVAL1",
+             zorka.longCfg("nagios.cmd." + name + ".err.warn", 0),
+             zorka.longCfg("nagios.cmd." + name + ".err.alrt", 10))
+           .withFirstResult()
+           .withSummaryLine(name + " ${STATUS} ${LVAL0} req/min, ${LVAL1} err/min, peak(t)=${LVAL2} ms, avg(t)=${LVAL3} ms; ")
+           .withPerfLine("${LABEL}=${LVAL0};${LVAL1};${LVAL2};${LVAL3}")
+           .withTextLine(name + " ${LVAL0} req/min, ${LVAL1} err/min, peak(t)=${LVAL2} ms, avg(t)=${LVAL3} ms; "));
+  }
+
+  return this;
+}
+
+nagios_util = __nagios_util();
+

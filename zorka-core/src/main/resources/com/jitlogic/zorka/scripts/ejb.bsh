@@ -112,6 +112,11 @@ __ejb() {
     return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
   }
 
+  // Nagios commands for zorka stats
+  if (zorka.boolCfg("nagios", false)) {
+    zorka.require("nagios.bsh");
+    nagios_util.def_zorka_stat(_mbean, "EJB");
+  }
 
   // Utility functions (for zabbix)
 

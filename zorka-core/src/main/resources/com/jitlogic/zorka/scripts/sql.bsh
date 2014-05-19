@@ -71,6 +71,11 @@ __sql() {
       );
   }
 
+  // Nagios commands for zorka stats
+  if (zorka.boolCfg("nagios", false)) {
+    zorka.require("nagios.bsh");
+    nagios_util.def_zorka_stat(_mbean, "SQL");
+  }
 
   discovery(attr, tag) {
     return zabbix.discovery(zorka.query("java", _mbean, "name", "type").get(attr).listAs("**", tag));
