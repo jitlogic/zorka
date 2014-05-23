@@ -26,8 +26,7 @@ Instructions for building the agent.
 2. Comment out all zico modules from the main pom.xml
 
 3. Copy the following maven plugin compiler into all pom.xml files:
-
-```xml
+  ```xml
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
