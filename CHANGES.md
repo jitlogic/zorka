@@ -1,9 +1,9 @@
-Zorka 1.0.4 (2014-05-26)
+Zorka 1.0.4 (2014-05-27)
 ------------------------
 
+* lots of UI bugs fixed after scrapping GXT;
 * use REST+JSON for communication between UI and collector (get rid of RequestFactory);
-* collector now requires Java 8 to work;
-* stackmaps generation is now enabled by default;
+* ZICO collector now requires Java 8 to work;
 
 
 Zorka 1.0.3 (2014-05-19)
