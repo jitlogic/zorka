@@ -71,6 +71,9 @@ public class AgentConfig extends ZorkaConfig {
      * Adds and configures standard loggers.
      */
     public void initLoggers() {
+
+        FileTrapper.ENABLE_FSYNC = boolCfg("zorka.log.fsync", false);
+
         if (boolCfg("zorka.filelog", true)) {
             initFileTrapper();
         }

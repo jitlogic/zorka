@@ -34,6 +34,8 @@ import java.util.List;
  */
 public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrapper {
 
+    public static volatile boolean ENABLE_FSYNC = false;
+
     /**
      * Rolling (rotating) file trapper maintains limited numebr of archived logs.
      */
@@ -218,6 +220,12 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
 
             out.flush();
 
+            fsync();
+        }
+    }
+
+    private void fsync() {
+        if (ENABLE_FSYNC) {
             try {
                 os.flush();
                 os.getFD().sync();
