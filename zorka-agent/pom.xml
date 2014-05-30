@@ -16,11 +16,28 @@
             <groupId>com.jitlogic.zorka</groupId>
             <artifactId>zorka-core</artifactId>
             <version>${project.version}</version>
+            <classifier>jar-with-dependencies</classifier>
         </dependency>
+<!--         <dependency> -->
+<!--             <groupId>com.jitlogic.zorka</groupId> -->
+<!--             <artifactId>zorka-common</artifactId> -->
+<!--             <version>${project.version}</version> -->
+<!--             <scope>provided</scope> -->
+<!--         </dependency> -->
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${compiler.plugin.version}</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
