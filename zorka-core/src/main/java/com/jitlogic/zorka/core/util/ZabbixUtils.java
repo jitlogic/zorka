@@ -34,7 +34,7 @@ public final class ZabbixUtils {
 	/**
 	 * Maximum request length
 	 */
-	private static final int MAX_REQUEST_LENGTH = 1024;
+	private static int MAX_REQUEST_LENGTH = 16384;
 
 	
 	/**
@@ -51,6 +51,11 @@ public final class ZabbixUtils {
 	private static Pattern _PATTERN = Pattern.compile("\"key\"\\s*:\\s*\"([^\\]]+])");
 
 
+	public static void setMaxRequestLength(int max) {
+		MAX_REQUEST_LENGTH = max;
+	}
+	
+	
 	/**
 	 * Creates a Zabbbix message with a "ZBXD\x01" + message.len()[8 byte] + message 
 	 * @param msg

@@ -38,6 +38,7 @@ import com.jitlogic.zorka.core.ZorkaBshAgent;
 import com.jitlogic.zorka.core.model.ActiveCheckData;
 import com.jitlogic.zorka.core.model.ActiveCheckResponse;
 import com.jitlogic.zorka.core.model.Data;
+import com.jitlogic.zorka.core.util.ZabbixUtils;
 
 /**
  * Zabbix Active Agent integrates Zorka with Zabbix server. It handles incoming zabbix
@@ -123,6 +124,9 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 			AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
 		}
 
+		/* Message */
+		ZabbixUtils.setMaxRequestLength(config.intCfg(prefix + "message.size", 16384));		
+		
 		/* Active Check: Interval, message+hostname */ 
 		activeCheckInterval = config.intCfg(prefix + ".check.interval", 120);
 		agentHost = config.stringCfg("zorka.hostname", null);
