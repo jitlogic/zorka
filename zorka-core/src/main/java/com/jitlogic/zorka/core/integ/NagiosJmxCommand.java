@@ -212,7 +212,7 @@ public class NagiosJmxCommand extends AbstractNagiosCommand {
             case SEL_ONE:
                 for (String l : labels) {
                     String rv = ObjectInspector.get(rdata, l, "ATTR", selName);
-                    if (ZorkaUtil.objEquals(selVal, ""+rv)) {
+                    if (selVals.contains(""+rv)) {
                         sdata = rdata.get(l);
                         labels.remove(l);
                         break;

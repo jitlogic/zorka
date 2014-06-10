@@ -115,6 +115,10 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
         this.writer = writer;
         this.os = new ByteArrayOutputStream(512 * 1024);
         this.writer.setOutput(this);
+
+        log.info(ZorkaLogger.ZAG_CONFIG, "Configured tracer output: host=" + hostname + ", retries=" + retries
+            + ", retryTime=" + retryTime + ", packetSize=" + packetSize + ", addr=" + addr + ", port=" + port
+            + ", timeout=" + timeout);
     }
 
 

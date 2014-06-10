@@ -29,6 +29,7 @@ zorka.defCfg("traps.file.num", "8");
 
 zorka.defCfg("traps.zabbix", "no");
 zorka.defCfg("traps.zabbix.addr", zorka.stringCfg("zabbix.server.addr"));
+zorka.defCfg("traps.zabbix.port", zorka.stringCfg("zabbix.server.port"));
 zorka.defCfg("traps.zabbix.host", zorka.getHostname());
 
 zorka.defCfg("traps.syslog", "no");
@@ -51,7 +52,9 @@ __traps() {
       ) : null;
 
       _zabbix_trapper = zorka.boolCfg("traps.zabbix") ? spy.trapperCollector(
-        zabbix.trapper(lt+".zabbix", "${traps.zabbix.addr}", "${traps.zabbix.host}", lt),
+        zabbix.trapper(lt+".zabbix",
+        "${traps.zabbix.addr}:${traps.zabbix.port}",
+        "${traps.zabbix.host}", lt),
           zorka.INFO, lt, zorka.stringCfg(lt+".format")
         ) : null;
 
