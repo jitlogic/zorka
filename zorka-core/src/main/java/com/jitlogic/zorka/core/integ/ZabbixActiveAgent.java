@@ -114,7 +114,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		activeIpPort = config.stringCfg(prefix + ".server.addr", defaultAddr);
 		String [] ipPort = activeIpPort.split(":");  
 		String activeIp = ipPort[0];
-		activePort = (ipPort[1] == null || ipPort[1].isEmpty())? defaultPort : Integer.parseInt(ipPort[1]);
+		activePort = (ipPort[1] == null || ipPort[1].length() == 0)? defaultPort : Integer.parseInt(ipPort[1]);
 
 		/* Zabbix Server address */
 		try {

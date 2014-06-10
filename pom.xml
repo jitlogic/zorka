@@ -9,6 +9,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jdk.version>1.5</jdk.version>
 
         <antrun.plugin.version>1.3</antrun.plugin.version>
         <compiler.plugin.version>2.3.2</compiler.plugin.version>
