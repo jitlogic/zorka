@@ -25,11 +25,11 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import com.google.gson.GsonBuilder;
+import com.jitlogic.zorka.common.model.ActiveCheckResponse;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
+import com.jitlogic.zorka.common.util.ZabbixUtils;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.core.model.ActiveCheckResponse;
-import com.jitlogic.zorka.core.util.ZabbixUtils;
 
 /**
  * Zabbix Active Request is used by Zabbix Active Agent to 
@@ -144,7 +144,6 @@ public class ZabbixActiveRequest {
 			String jsonMsg;
 			try {
 				jsonMsg = getReq();
-				log.debug(ZorkaLogger.ZAG_DEBUG, "Zorka checkpoint 1: " + jsonMsg);
 				response = (new GsonBuilder().disableHtmlEscaping().create()).fromJson(jsonMsg.trim(), ActiveCheckResponse.class);
 			} catch (IOException e) {
 				e.printStackTrace();

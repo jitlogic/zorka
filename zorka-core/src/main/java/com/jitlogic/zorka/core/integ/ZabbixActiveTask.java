@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.jitlogic.zorka.common.model.ActiveCheckData;
+import com.jitlogic.zorka.common.model.Data;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.ZorkaBshAgent;
-import com.jitlogic.zorka.core.model.ActiveCheckData;
-import com.jitlogic.zorka.core.model.Data;
 
 public class ZabbixActiveTask implements Runnable, ZorkaRequestHandler {
 

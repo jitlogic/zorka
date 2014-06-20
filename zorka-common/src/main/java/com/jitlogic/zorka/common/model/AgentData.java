@@ -1,4 +1,4 @@
-package com.jitlogic.zorka.core.model;
+package com.jitlogic.zorka.common.model;
 
 import java.util.ArrayList;
 

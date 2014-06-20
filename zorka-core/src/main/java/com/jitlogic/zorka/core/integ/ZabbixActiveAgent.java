@@ -30,15 +30,15 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.jitlogic.zorka.common.ZorkaService;
+import com.jitlogic.zorka.common.model.ActiveCheckData;
+import com.jitlogic.zorka.common.model.ActiveCheckResponse;
+import com.jitlogic.zorka.common.model.Data;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
+import com.jitlogic.zorka.common.util.ZabbixUtils;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.ZorkaBshAgent;
-import com.jitlogic.zorka.core.model.ActiveCheckData;
-import com.jitlogic.zorka.core.model.ActiveCheckResponse;
-import com.jitlogic.zorka.core.model.Data;
-import com.jitlogic.zorka.core.util.ZabbixUtils;
 
 /**
  * Zabbix Active Agent integrates Zorka with Zabbix server. It handles incoming zabbix

@@ -16,19 +16,31 @@
 
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.common.tracedata.*;
-import com.jitlogic.zorka.common.tracedata.FileTraceOutput;
-import com.jitlogic.zorka.common.util.ZorkaConfig;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
-import com.jitlogic.zorka.core.spy.plugins.*;
-import com.jitlogic.zorka.core.util.OverlayClassLoader;
-import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
+
+import com.jitlogic.zorka.common.tracedata.FileTraceOutput;
+import com.jitlogic.zorka.common.tracedata.FressianTraceWriter;
+import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
+import com.jitlogic.zorka.common.tracedata.TaggedValue;
+import com.jitlogic.zorka.common.tracedata.TraceMarker;
+import com.jitlogic.zorka.common.tracedata.TraceWriter;
+import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.common.util.ZorkaConfig;
+import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.common.zabbix.ZabbixTraceOutput;
+import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
+import com.jitlogic.zorka.core.spy.plugins.TraceAttrProcessor;
+import com.jitlogic.zorka.core.spy.plugins.TraceBeginProcessor;
+import com.jitlogic.zorka.core.spy.plugins.TraceCheckerProcessor;
+import com.jitlogic.zorka.core.spy.plugins.TraceFilterProcessor;
+import com.jitlogic.zorka.core.spy.plugins.TraceFlagsProcessor;
+import com.jitlogic.zorka.core.spy.plugins.TraceTaggerProcessor;
+import com.jitlogic.zorka.core.util.OverlayClassLoader;
 
 /**
  * Tracer library contains functions for configuring and using tracer.
@@ -425,6 +437,29 @@ public class TracerLib {
         return output;
     }
 
+    
+    /**
+     * Creates trace network sender. It will receive traces and send them to remote Zabbix Server.
+     *
+     * @param addr     collector host name or IP address
+     * @param port     collector port
+     * @param hostname agent name - this will be presented in collector console;
+     * @param qlen
+     * @param packetSize
+     * @param interval
+     * @return
+     * @throws IOException
+     */
+    public ZorkaAsyncThread<SymbolicRecord> toZabbix(String addr, int port, String hostname, int qlen, 
+                                                   long packetSize, int retries, long retryTime, long retryTimeExp, 
+                                                   int timeout, int interval) throws IOException {
+//        TraceWriter writer = new FressianTraceWriter(symbolRegistry, metricsRegistry);
+        ZabbixTraceOutput output = new ZabbixTraceOutput(symbolRegistry, metricsRegistry, addr, port, hostname, qlen, packetSize,
+        		retries, retryTime, retryTimeExp, timeout, interval);
+        output.start();
+        return output;
+    }
+    
 
     public SpyProcessor filterBy(String srcField, Boolean defval, Set<Object> yes, Set<Object> no, Set<Object> maybe) {
         return new TraceFilterProcessor(tracer, srcField, defval, yes, no, maybe);

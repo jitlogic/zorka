@@ -8,10 +8,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.jitlogic.zorka.common.model.Data;
+import com.jitlogic.zorka.common.util.ZabbixUtils;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.core.model.Data;
-import com.jitlogic.zorka.core.util.ZabbixUtils;
 
 public class ZabbixActiveSenderTask implements Runnable {
 	/**
@@ -59,7 +59,7 @@ public class ZabbixActiveSenderTask implements Runnable {
 
 			log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActiveSender " + endIndex + " items cached");
 
-			if (endIndex > 0) {
+			if (listData.size() > 0) {
 				/* send message */
 				String message = ZabbixUtils.createAgentData(listData, clock);
 

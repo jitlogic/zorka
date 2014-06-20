@@ -16,7 +16,7 @@
             <groupId>com.jitlogic.zorka</groupId>
             <artifactId>zorka-core</artifactId>
             <version>${project.version}</version>
-            <classifier>jar-with-dependencies</classifier>
+<!--             <classifier>jar-with-dependencies</classifier> -->
         </dependency>
 <!--         <dependency> -->
 <!--             <groupId>com.jitlogic.zorka</groupId> -->
@@ -73,6 +73,7 @@
                                 <include>com.jitlogic.contrib:libsnmp</include>
                                 <include>com.jitlogic.zorka:zorka-core</include>
                                 <include>org.fressian:fressian</include>
+                                <include>com.google.code.gson:gson</include>
                             </includes>
                             <rules>
                                 <rule>
@@ -90,6 +91,10 @@
                                 <rule>
                                     <pattern>org.fressian.**</pattern>
                                     <result>com.jitlogic.zorka.deps.fressian.@1</result>
+                                </rule>
+                                <rule>
+                                    <pattern>com.google.gson.**</pattern>
+                                    <result>com.jitlogic.zorka.deps.gson.@1</result>
                                 </rule>
                                 <keep>
                                     <pattern>com.jitlogic.zorka.**</pattern>

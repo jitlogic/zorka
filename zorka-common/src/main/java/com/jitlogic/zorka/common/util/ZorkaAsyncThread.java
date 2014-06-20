@@ -61,6 +61,11 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService {
     protected boolean countTraps = true;
 
     private int plen;
+    
+    /**
+     * Sleeping interval in milliseconds
+     */
+    private long interval = 0l ;
 
     public ZorkaAsyncThread(String name) {
         this(name, 256, 1);
@@ -77,6 +82,21 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService {
         this.plen = plen;
         submitQueue = new ArrayBlockingQueue<T>(qlen);
     }
+    
+    /**
+     * Constructor with interval
+     *
+     * @param name thread name
+     * @param plen
+     * @param interval in seconds
+     */
+    public ZorkaAsyncThread(String name, int qlen, int plen, int interval) {
+    	this(name, qlen, plen);
+    	
+    	// convert to millis
+        this.interval = interval * 1000l;
+    }
+    
 
     /**
      * This method starts thread.
@@ -109,6 +129,12 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService {
     public void run() {
         while (running.get()) {
             runCycle();
+            
+            try {
+				Thread.sleep(interval);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
         }
 
         synchronized (this) {

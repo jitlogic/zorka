@@ -1,4 +1,4 @@
-package com.jitlogic.zorka.core.util;
+package com.jitlogic.zorka.common.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,11 +7,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.gson.GsonBuilder;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.core.integ.ZabbixActiveRequest;
-import com.jitlogic.zorka.core.model.AgentData;
-import com.jitlogic.zorka.core.model.Data;
+import com.jitlogic.zorka.common.model.AgentData;
+import com.jitlogic.zorka.common.model.Data;
 
 public final class ZabbixUtils {
 	/**

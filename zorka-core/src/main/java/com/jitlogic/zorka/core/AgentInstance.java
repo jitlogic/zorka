@@ -553,6 +553,10 @@ public class AgentInstance implements ZorkaService {
         if (zabbixAgent != null) {
             zabbixAgent.shutdown();
         }
+        
+        if (zabbixActiveAgent != null) {
+        	zabbixActiveAgent.shutdown();
+        }
 
         if (nagiosAgent != null) {
             nagiosAgent.shutdown();
@@ -571,6 +575,10 @@ public class AgentInstance implements ZorkaService {
             getZabbixAgent().restart();
         }
 
+        if (config.boolCfg("zabbixActive", true)) {
+            getZabbixActiveAgent().restart();
+        }
+        
         if (config.boolCfg("nagios", true)) {
             getNagiosAgent().restart();
         }
