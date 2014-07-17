@@ -65,6 +65,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 	private long activeCheckInterval;
 	private long senderInterval;
 	private int maxBatchSize;
+	private int maxCacheSize;
 
 
 	/* Connection Settings */
@@ -136,8 +137,10 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
 		senderInterval = config.intCfg(prefix + ".sender.interval", 60);
 		maxBatchSize = config.intCfg(prefix + ".batch.size", 10);
+		maxCacheSize = config.intCfg(prefix + ".cache.size", 150);
 		log.info(ZorkaLogger.ZAG_INFO, "ZabbixActive Agent (" + agentHost + ") will send up to " + maxBatchSize + " metrics every " + 
-				senderInterval + " seconds");
+				senderInterval + " seconds. Agent will persist up to " + maxCacheSize + " metrics per " + (senderInterval*2) + 
+				" seconds, exceeding records will be discarded.");
 
 		/* scheduler's infra */
 		runningTasks = new HashMap<ActiveCheckData, ScheduledFuture<?>>();
@@ -152,14 +155,9 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 			try {
 				socket = new Socket(activeAddr, activePort);
 				log.info(ZorkaLogger.ZAG_ERRORS, "Successfuly connected to " + activeIpPort);
-				running = true;
 
-				thread = new Thread(this);
-				thread.setName("ZORKA-" + prefix + "-main");
-				thread.setDaemon(true);
-				thread.start();
 			} catch (IOException e) {
-				log.error(ZorkaLogger.ZAG_ERRORS, "Failed to connect to " + activeIpPort, e);
+				log.error(ZorkaLogger.ZAG_ERRORS, "Failed to connect to " + activeIpPort + ". Will try to connect later.", e);
 			} finally {
 				if (socket != null) {
 					try {
@@ -170,8 +168,15 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 						socket = null;
 					}
 				}
+				
+				running = true;
+				thread = new Thread(this);
+				thread.setName("ZORKA-" + prefix + "-main");
+				thread.setDaemon(true);
+				thread.start();
 			}
 		}
+		
 	}
 
 
@@ -247,7 +252,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive run...");
 
 		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive Scheduling sender task");
-		scheduleSender();
+		scheduleTasks();
 
 		while (running) {
 			try {
@@ -261,7 +266,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
 				// get requests for metrics
 				ActiveCheckResponse response = request.getActiveResponse();
-				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive response.toString() " + response.toString());
+//				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive response.toString() " + response.toString());
 
 				// Schedule all requests
 				scheduleTasks(response);
@@ -305,19 +310,24 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 			ScheduledFuture<?> taskHandler = runningTasks.get(task);
 			taskHandler.cancel(false);
 		}
-		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive - deleted tasks: " + tasksToDelete.size());
 
 		// Insert Tasks
 		for (ActiveCheckData task : tasksToInsert) {
 			ZabbixActiveTask zabbixActiveTask = new ZabbixActiveTask(agentHost, task, agent, translator,dataQueue);			
 			ScheduledFuture<?> taskHandler = scheduler.scheduleAtFixedRate(zabbixActiveTask, 5, task.getDelay(), TimeUnit.SECONDS);
+			log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive - task: " + task.toString());
 			runningTasks.put(task, taskHandler);
 		}
-		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive - scheduled tasks: " + tasksToInsert.size());
+		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive - new scheduled tasks: " + tasksToInsert.size());
+		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive - deleted old tasks: " + tasksToDelete.size());
+		
 	}
 
-	private void scheduleSender() {
+	private void scheduleTasks() {
 		ZabbixActiveSenderTask sender = new ZabbixActiveSenderTask(activeAddr, activePort, dataQueue, maxBatchSize);			
 		senderTask = scheduler.scheduleAtFixedRate(sender, senderInterval, senderInterval, TimeUnit.SECONDS);
+		
+		ZabbixActiveCleanerTask cleaner = new ZabbixActiveCleanerTask(dataQueue, maxCacheSize);			
+		senderTask = scheduler.scheduleAtFixedRate(cleaner, senderInterval*2, senderInterval*2, TimeUnit.SECONDS);
 	}
 }

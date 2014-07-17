@@ -54,7 +54,7 @@ public class ZabbixActiveTask implements Runnable, ZorkaRequestHandler {
 		String value = serialize(rslt);
 		log.debug(ZorkaLogger.ZAG_DEBUG, "Task response: " + key + " -> " + value);
 		
-		if (!rslt.equals(ZabbixActiveRequest.ZBX_NOTSUPPORTED)) {
+		if (!rslt.equals(ZabbixActiveRequest.ZBX_NOTSUPPORTED)) { // TODO  && !value.equals("{\"data\":[]}")
 			Data response = new Data();
 			response.setHost(agentHost);
 			response.setKey(key);

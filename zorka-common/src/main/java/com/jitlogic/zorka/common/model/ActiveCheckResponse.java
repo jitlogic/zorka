@@ -31,8 +31,13 @@ public class ActiveCheckResponse {
 		stringBuilder.append(response);
 		stringBuilder.append(", data=[");
 		
-		for (ActiveCheckData dataItem : data){
-			stringBuilder.append(dataItem);
+		int size = data.size();
+		if (size > 0) {
+			stringBuilder.append(data.get(0));
+			for (int i = 1; i < size; i++) {
+				stringBuilder.append(", ");
+				stringBuilder.append(data.get(i));
+			}
 		}
 		stringBuilder.append("]}");
 		
