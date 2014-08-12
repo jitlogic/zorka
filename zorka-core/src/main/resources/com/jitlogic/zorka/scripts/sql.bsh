@@ -48,6 +48,7 @@ __sql() {
   zorka.defCfg("sql.trace", zorka.stringCfg("tracer"));
   zorka.defCfg("sql.trace.time", zorka.longCfg("tracer.min.trace.time"));
 
+  _stats = zorka.boolCfg("sql.stats");
   _trace = zorka.boolCfg("sql.trace");
   _congestion = zorka.boolCfg("sql.stats.congestion");
   _mbean = zorka.stringCfg("sql.stats.mbean");
@@ -62,14 +63,39 @@ __sql() {
   _slow_chain = traps.subchain("sql", "slow");
   _error_chain = traps.subchain("sql", "error");
 
+  _tags_chain = null;
+
+  if (_stats && zorka.boolCfg("sql.tags", false)) {
+      zorka.logInfo("Enabling SQL tagging ...");
+      _tags_chain = spy.subchain(spy.put("TAG",
+          zorka.stringCfg("sql.tags.0", "OTHER")));
+      for (i = 1; ; i++) {
+          if (zorka.hasCfg("sql.tags."+i+".sql")) {
+              zorka.logInfo("SQL_TAG: " + zorka.stringCfg("sql.tags."+i+".sql")
+                  + " -> " + zorka.stringCfg("sql.tags."+i));
+              _tags_chain = _tags_chain.with(
+                  spy.transform("TAG", "SQL",
+                      zorka.stringCfg("sql.tags."+i+".sql"),
+                      zorka.stringCfg("sql.tags."+i)));
+          } else {
+              break;
+          }
+      }
+      _tags_chain = _tags_chain.with(
+          spy.zorkaStats("java", _mbean, "byTag", "${TAG}"));
+  }
+
+
   _stats_chain = null;
 
-  if (zorka.boolCfg("sql.stats")) {
+  if (_stats) {
     _stats_chain = spy.subchain(
         spy.zorkaStats("java", _mbean, "stats", "ALL"),
-        spy.zorkaStats("java", _mbean, "stats", "${DB}")
+        spy.zorkaStats("java", _mbean, "stats", "${DB}"),
+        _tags_chain
       );
   }
+
 
   // Nagios commands for zorka stats
   if (zorka.boolCfg("nagios", false)) {

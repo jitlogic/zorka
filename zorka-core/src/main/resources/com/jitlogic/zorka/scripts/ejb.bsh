@@ -112,6 +112,36 @@ __ejb() {
     return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
   }
 
+  _tags_chain = null;
+
+  if (_stats && zorka.boolCfg("ejb.tags", false)) {
+      zorka.logInfo("Enabling EJB tagging ...");
+      _tags_chain = spy.subchain(
+          spy.put("TAG", zorka.stringCfg("ejb.tags.0", "OTHER")));
+      for (i = 1; ; i++) {
+          if (zorka.hasCfg("ejb.tags."+i+".class")) {
+              zorka.logInfo("EJB_TAG_CLASS: " + zorka.stringCfg("ejb.tags."+i+".class")
+                  + " -> " + zorka.stringCfg("ejb.tags."+i));
+              _tags_chain = _tags_chain.with(
+                  spy.transform("TAG", "CLASS",
+                      zorka.stringCfg("ejb.tags."+i+".class"),
+                      zorka.stringCfg("ejb.tags."+i)));
+          } else if (zorka.hasCfg("ejb.tags."+i+".method")) {
+              zorka.logInfo("EJB_TAG_METHOD: " + zorka.stringCfg("ejb.tags."+i+".method")
+                  + " -> " + zorka.stringCfg("ejb.tags."+i));
+              _tags_chain = _tags_chain.with(
+                  spy.transform("TAG", "METHOD",
+                      zorka.stringCfg("ejb.tags."+i+".method"),
+                      zorka.stringCfg("ejb.tags."+i)));
+          } else {
+              break;
+          }
+      }
+      _tags_chain = _tags_chain.with(
+          spy.zorkaStats("java", _mbean, "byTag", "${TAG}"));
+  }
+
+
   // Nagios commands for zorka stats
   if (zorka.boolCfg("nagios", false)) {
     zorka.require("nagios.bsh");
@@ -153,7 +183,6 @@ __ejb() {
     tag = clazz + "." + method;
     return zorka.rate("java", _mbean, attr, tag, "time", "calls", "AVG15");
   }
-
 
   return this;
 }

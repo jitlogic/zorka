@@ -58,7 +58,8 @@ __undertow() {
           spy.markError(), tracer.markError(),
           http._error_chain),
         http._redirQualifier,
-        http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
+        http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null,
+        http._tags_chain)
       .include(spy.byMethod("io.undertow.servlet.handlers.ServletInitialHandler", "handleFirstRequest")));
 
   tracer.exclude(

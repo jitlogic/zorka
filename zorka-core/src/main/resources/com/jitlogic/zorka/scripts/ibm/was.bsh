@@ -204,7 +204,8 @@ __was() {
         spy.valSetFilter("STATUS", http._errors),
         spy.markError(),
         http._error_chain),
-      http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
+      http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null,
+      http._tags_chain)
     .include(
       spy.byMethod("com.ibm.ws.webcontainer.servlet.CacheServletWrapper", "handleRequest"),
       spy.byMethod("com.ibm.ws.webcontainer.webapp.WebApp", "handleRequest")
@@ -231,6 +232,7 @@ __was() {
           ejb._trace ? tracer.attr("RET", "RET") : null,
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "byMethod", "${CLASS}.${METHOD}") : null,
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null,
+          ejb._tags_chain,
           spy.longerThan(zorka.longCfg("ejb.slow.time")),
           spy.strTime("TIME"),
           ejb._slow_chain)
