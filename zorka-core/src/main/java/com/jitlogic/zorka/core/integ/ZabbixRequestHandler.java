@@ -256,7 +256,7 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
     public void handleResult(Object rslt) {
         try {
             tStop = System.nanoTime();
-            log.debug(ZorkaLogger.ZAG_QUERIES, "OK [t=" + (tStop - tStart) / 1000000L + "ms] '" + req + "' -> '" + rslt + "'");
+            log.debug(ZorkaLogger.ZAG_DEBUG, "OK [t=" + (tStop - tStart) / 1000000L + "ms] '" + req + "' -> '" + rslt + "'");
             AgentDiagnostics.inc(AgentDiagnostics.ZABBIX_TIME, tStop - tStart);
             send(serialize(rslt));
         } catch (IOException e) {
@@ -289,7 +289,7 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
         AgentDiagnostics.inc(AgentDiagnostics.ZABBIX_ERRORS);
         try {
             this.tStop = System.nanoTime();
-            log.error(ZorkaLogger.ZAG_QUERIES, "ERROR [t=" + (tStop - tStart) / 1000000L + "ms] + '" + req + "'", e);
+            log.error(ZorkaLogger.ZAG_ERRORS, "ERROR [t=" + (tStop - tStart) / 1000000L + "ms] + '" + req + "'", e);
             AgentDiagnostics.inc(AgentDiagnostics.ZABBIX_TIME, tStop - tStart);
             send(ZBX_NOTSUPPORTED);
         } catch (IOException e1) {

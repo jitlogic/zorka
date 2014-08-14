@@ -74,6 +74,24 @@ if (zorka.boolCfg("tracer")) {
   }
 
 
+  if (zorka.boolCfg("tracer.zabbix")) {
+    tracer.output(tracer.toZabbix(
+      zorka.stringCfg("tracer.zabbix.addr", "127.0.0.1"),
+      zorka.intCfg("tracer.zabbix.port", 10050),
+      zorka.stringCfg("tracer.net.host", zorka.getHostname()),
+      zorka.intCfg("tracer.net.qlen", 64),
+      zorka.intCfg("tracer.zabbix.batch.size", 100),
+      zorka.intCfg("tracer.net.retries", 10),
+      zorka.intCfg("tracer.net.retry.time", 125L),
+      zorka.intCfg("tracer.net.retry.exp", 2L),
+      zorka.intCfg("tracer.net.timeout", 60000),      
+      zorka.intCfg("tracer.zabbix.send.interval", 15)
+      ));
+      
+    zorka.logDebug("Setting tracer.zabbix.send.interval to " + zorka.intCfg("tracer.zabbix.send.interval", 15) );
+  }
+
+
   if (zorka.hasCfg("tracer.min.method.time")) {
     mmt = zorka.longCfg("tracer.min.method.time");
     zorka.logInfo("Setting tracer minimum method time to " + mmt + " ns");
