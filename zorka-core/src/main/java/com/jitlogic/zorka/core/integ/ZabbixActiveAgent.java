@@ -94,7 +94,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 	 * Creates zabbix active agent.
 	 */
 	public ZabbixActiveAgent(ZorkaConfig config, ZorkaBshAgent agent, QueryTranslator translator, ScheduledExecutorService scheduledExecutorService) {
-		this.prefix = "zabbixActive";
+		this.prefix = "zabbix.active";
 		this.config = config;
 		this.defaultPort = 10055;
 		this.defaultAddr = "127.0.0.1:10055";

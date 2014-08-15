@@ -1,7 +1,16 @@
+Zorka 1.0.7 (2014-08-18)
+------------------------
+
+* more fixes to ZICO collector;
+* HTTP/SQL/EJB tagging and classification;
+* active checks for Zabbix (makotoiguchi)
+
+
 Zorka 1.0.6 (2014-07-27)
 ------------------------
 
 * bugfix release
+
 
 Zorka 1.0.5 (2014-07-22)
 ------------------------

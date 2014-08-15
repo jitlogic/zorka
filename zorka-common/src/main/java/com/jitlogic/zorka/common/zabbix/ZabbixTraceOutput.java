@@ -104,7 +104,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 	 * @param packetSize   maximum (recommended) packet size (actual packets might exceed this a bit)
 	 * @throws IOException when connection to remote server cannot be established;
 	 */
-	public ZabbixTraceOutput(/*TraceWriter writer, */
+	public ZabbixTraceOutput(
 			SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, String addr, int port, String hostname, 
 			int qlen, long packetSize, int retries, long retryTime, long retryTimeExp, 
 			int timeout, int interval) throws IOException {
@@ -319,7 +319,6 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 	 * TraceRecord parent,
 	 * Map<Integer, Object> attrs,
 	 * List<TraceRecord> children
-	 * @param string 
 	 */
 	private ArrayList<Data> traceRecordToData(SymbolicRecord rec, String prefix, int level) {
 		log.debug(ZorkaLogger.ZAG_DEBUG, "### traceRecordToData");
@@ -359,7 +358,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		/* Time */
 		data = new Data();
 		data.setHost(hostname);
-		data.setKey(key + ".responseTime");
+		data.setKey(key + ".time");
 		/* nanoseconds -> milliseconds */
 		data.setValue(String.valueOf(traceRecord.getTime() / 1000000l)); 
 		data.setLastlogsize(0);
@@ -370,7 +369,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		/* Calls */
 		data = new Data();
 		data.setHost(hostname);
-		data.setKey(key + ".count");
+		data.setKey(key + ".calls");
 		 /* contar a chamada atual como 1 */
 		data.setValue("1");
 		data.setLastlogsize(0);
@@ -381,7 +380,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		/* Errors */
 		data = new Data();
 		data.setHost(hostname);
-		data.setKey(key + ".errors.count");
+		data.setKey(key + ".errors");
 		data.setValue(String.valueOf(traceRecord.getErrors()));
 		data.setLastlogsize(0);
 		data.setClock(clock);
@@ -402,8 +401,6 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 
 	@Override
 	public void open() {
-		//        log.debug(ZorkaLogger.ZAG_DEBUG, "Starting network tracer output: " + hostname
-		//                + " -> " + serverAddr + ":" + serverPort);
 	}
 
 	@Override

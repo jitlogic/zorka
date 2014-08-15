@@ -195,10 +195,10 @@ public class AgentInstance implements ZorkaService {
 
         getZorkaAgent().put("perfmon", getPerfMonLib());
 
-        if (config.boolCfg("zabbixActive", true)) {
+        if (config.boolCfg("zabbix.active", false)) {
         	log.info(ZorkaLogger.ZAG_CONFIG, "Enabling ZABBIX Active Agent subsystem ...");
         	getZabbixActiveAgent().start();
-            zorkaAgent.put("zabbixActive", getZabbixLib());
+            zorkaAgent.put("zabbix.active", getZabbixLib());
         }
         
         if (config.boolCfg("zabbix", true)) {
@@ -575,7 +575,7 @@ public class AgentInstance implements ZorkaService {
             getZabbixAgent().restart();
         }
 
-        if (config.boolCfg("zabbixActive", true)) {
+        if (config.boolCfg("zabbix.active", false)) {
             getZabbixActiveAgent().restart();
         }
         
