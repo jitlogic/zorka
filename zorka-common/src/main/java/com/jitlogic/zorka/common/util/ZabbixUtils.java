@@ -23,8 +23,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.gson.GsonBuilder;
-import com.jitlogic.zorka.common.model.AgentData;
-import com.jitlogic.zorka.common.model.Data;
+import com.jitlogic.zorka.common.zabbix.ActiveCheckQuery;
+import com.jitlogic.zorka.common.zabbix.ActiveCheckResult;
 
 public final class ZabbixUtils {
 	/**
@@ -110,17 +110,17 @@ public final class ZabbixUtils {
 	
 	/**
 	 * Creates an Agent Data String Message
-	 * @param listData
+	 * @param results
 	 * @param clock
 	 */
-	public static String createAgentData(ArrayList<Data> listData, long clock) {
-		AgentData agentData = new AgentData();
+	public static String createAgentData(ArrayList<ActiveCheckResult> results, long clock) {
+		ActiveCheckQuery query = new ActiveCheckQuery();
 		
-		agentData.setRequest("agent data");
-		agentData.setData(listData);
-		agentData.setClock(clock);
+		query.setRequest("agent data");
+		query.setResults(results);
+		query.setClock(clock);
 		
-		return (new GsonBuilder().disableHtmlEscaping().create()).toJson(agentData);
+		return (new GsonBuilder().disableHtmlEscaping().create()).toJson(query);
 	}
 	
 

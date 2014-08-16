@@ -25,7 +25,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.jitlogic.zorka.common.model.Data;
+import com.jitlogic.zorka.common.zabbix.ActiveCheckResult;
 import com.jitlogic.zorka.common.util.ZabbixUtils;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
@@ -39,7 +39,7 @@ public class ZabbixActiveSenderTask implements Runnable {
 	private InetAddress serverAddr;
 	private int serverPort;
 
-	private ConcurrentLinkedQueue<Data> responseQueue;
+	private ConcurrentLinkedQueue<ActiveCheckResult> responseQueue;
 
 	private long clock;
 
@@ -47,7 +47,7 @@ public class ZabbixActiveSenderTask implements Runnable {
 
 	private final String _SUCCESS = "success";
 
-	public ZabbixActiveSenderTask(InetAddress serverAddr, int serverPort, ConcurrentLinkedQueue<Data> responseQueue, int maxBatchSize){
+	public ZabbixActiveSenderTask(InetAddress serverAddr, int serverPort, ConcurrentLinkedQueue<ActiveCheckResult> responseQueue, int maxBatchSize){
 		this.serverAddr = serverAddr;
 		this.serverPort = serverPort;
 		this.responseQueue = responseQueue;
@@ -68,17 +68,17 @@ public class ZabbixActiveSenderTask implements Runnable {
 			int endIndex = responseQueue.size();
 			endIndex = (endIndex > maxBatchSize)? maxBatchSize : endIndex; 
 
-			ArrayList<Data> listData = new ArrayList<Data>();
-			Iterator<Data> iterator = responseQueue.iterator();
+			ArrayList<ActiveCheckResult> results = new ArrayList<ActiveCheckResult>();
+			Iterator<ActiveCheckResult> iterator = responseQueue.iterator();
 			for (int i = 0; i < endIndex; i++) {
-				listData.add(iterator.next());
+				results.add(iterator.next());
 			}
 
 			log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActiveSender " + endIndex + " items cached");
 
-			if (listData.size() > 0) {
+			if (results.size() > 0) {
 				/* send message */
-				String message = ZabbixUtils.createAgentData(listData, clock);
+				String message = ZabbixUtils.createAgentData(results, clock);
 
 				request.send(message);
 				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActiveSender message sent: " + message);

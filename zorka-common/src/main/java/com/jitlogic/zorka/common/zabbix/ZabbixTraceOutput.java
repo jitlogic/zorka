@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.jitlogic.zorka.common.model.Data;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.tracedata.MethodCallCounterRecord;
 import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
@@ -163,7 +162,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		long clock;
 		long rt = retryTime;
 
-		ArrayList<Data> listData = new ArrayList<Data>();
+		ArrayList<ActiveCheckResult> results = new ArrayList<ActiveCheckResult>();
 
 		// packet: avoid losing records taken from Queue
 		List<SymbolicRecord> packet = new ArrayList<SymbolicRecord>();
@@ -179,20 +178,20 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 						+ " -> " + serverAddr + ":" + serverPort);
 				socket = new Socket(serverAddr, serverPort);
 
-				listData.clear();
+				results.clear();
 
 				for (SymbolicRecord rec : packet) {
-					listData.addAll(recToData(rec));
+					results.addAll(recToData(rec));
 				}
 
 				while (os.size() < packetSize && submitQueue.size() > 0) {
 					SymbolicRecord rec = submitQueue.take();
 					// save to temp list
 					packet.add(rec); 
-					listData.addAll(recToData(rec));
+					results.addAll(recToData(rec));
 				}
 
-				String message = ZabbixUtils.createAgentData(listData, clock);
+				String message = ZabbixUtils.createAgentData(results, clock);
 				byte[] buf = ZabbixUtils.zbx_format(message);
 
 				OutputStream out = socket.getOutputStream();
@@ -241,7 +240,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 	}
 
 
-	private ArrayList<Data> recToData(SymbolicRecord rec) {
+	private ArrayList<ActiveCheckResult> recToData(SymbolicRecord rec) {
 		/*** Data ***
 		 * String host;
 		 * String key;
@@ -249,7 +248,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		 * int lastlogsize;
 		 * long clock;
 		 */
-		ArrayList<Data> list = null;
+		ArrayList<ActiveCheckResult> list = null;
 
 		if (rec instanceof MethodCallCounterRecord) {
 			// TODO Auto-generated method stub
@@ -265,8 +264,8 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 			list = traceRecordToData(rec, "", 0);
 		}
 
-		for (Data data : list){
-			log.debug(ZorkaLogger.ZAG_DEBUG, "### Data: " + data.toString());
+		for (ActiveCheckResult result : list){
+			log.debug(ZorkaLogger.ZAG_DEBUG, "### Data: " + result.toString());
 		}
 
 		return list;
@@ -280,26 +279,26 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 	 * 	  Metric metricId,
 	 *    Number value]
 	 */
-	private ArrayList<Data> perfRecordToData(SymbolicRecord rec) {
+	private ArrayList<ActiveCheckResult> perfRecordToData(SymbolicRecord rec) {
 		log.debug(ZorkaLogger.ZAG_DEBUG, "### perfRecordToData");
 
-		ArrayList<Data> list = new ArrayList<Data>();
+		ArrayList<ActiveCheckResult> list = new ArrayList<ActiveCheckResult>();
 
-		Data data;
+		ActiveCheckResult result;
 		PerfRecord perfRecord = (PerfRecord) rec;
 
 		long clock = perfRecord.getClock();
 
 		for (PerfSample sample : perfRecord.getSamples()) {
-			data = new Data();
+			result = new ActiveCheckResult();
 
-			data.setHost(hostname);
-			data.setKey(sample.getMetric().getName());
-			data.setValue(String.valueOf(sample.getValue()));
-			data.setLastlogsize(0);
-			data.setClock(clock);
+			result.setHost(hostname);
+			result.setKey(sample.getMetric().getName());
+			result.setValue(String.valueOf(sample.getValue()));
+			result.setLastlogsize(0);
+			result.setClock(clock);
 
-			list.add(data);
+			list.add(result);
 		}
 
 		return list;
@@ -320,11 +319,11 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 	 * Map<Integer, Object> attrs,
 	 * List<TraceRecord> children
 	 */
-	private ArrayList<Data> traceRecordToData(SymbolicRecord rec, String prefix, int level) {
+	private ArrayList<ActiveCheckResult> traceRecordToData(SymbolicRecord rec, String prefix, int level) {
 		log.debug(ZorkaLogger.ZAG_DEBUG, "### traceRecordToData");
 
-		ArrayList<Data> list = new ArrayList<Data>();
-		Data data;
+		ArrayList<ActiveCheckResult> list = new ArrayList<ActiveCheckResult>();
+		ActiveCheckResult result;
 		String keySuffix = null; 
 		TraceRecord traceRecord = (TraceRecord) rec;
 		long clock = traceRecord.getClock() / 1000l;
@@ -356,36 +355,36 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		
 		
 		/* Time */
-		data = new Data();
-		data.setHost(hostname);
-		data.setKey(key + ".time");
+		result = new ActiveCheckResult();
+		result.setHost(hostname);
+		result.setKey(key + ".time");
 		/* nanoseconds -> milliseconds */
-		data.setValue(String.valueOf(traceRecord.getTime() / 1000000l)); 
-		data.setLastlogsize(0);
-		data.setClock(clock);
-		list.add(data);
-		log.debug(ZorkaLogger.ZAG_DEBUG, "### traceRecordToData: data=" + data.toString());
+		result.setValue(String.valueOf(traceRecord.getTime() / 1000000l));
+		result.setLastlogsize(0);
+		result.setClock(clock);
+		list.add(result);
+		log.debug(ZorkaLogger.ZAG_DEBUG, "### traceRecordToData: data=" + result.toString());
 
 		/* Calls */
-		data = new Data();
-		data.setHost(hostname);
-		data.setKey(key + ".calls");
+		result = new ActiveCheckResult();
+		result.setHost(hostname);
+		result.setKey(key + ".calls");
 		 /* contar a chamada atual como 1 */
-		data.setValue("1");
-		data.setLastlogsize(0);
-		data.setClock(clock);
-		list.add(data);
-		log.debug(ZorkaLogger.ZAG_DEBUG, "### traceRecordToData: data=" + data.toString());
+		result.setValue("1");
+		result.setLastlogsize(0);
+		result.setClock(clock);
+		list.add(result);
+		log.debug(ZorkaLogger.ZAG_DEBUG, "### traceRecordToData: data=" + result.toString());
 
 		/* Errors */
-		data = new Data();
-		data.setHost(hostname);
-		data.setKey(key + ".errors");
-		data.setValue(String.valueOf(traceRecord.getErrors()));
-		data.setLastlogsize(0);
-		data.setClock(clock);
-		list.add(data);
-		log.debug(ZorkaLogger.ZAG_DEBUG, "### traceRecordToData: data=" + data.toString());
+		result = new ActiveCheckResult();
+		result.setHost(hostname);
+		result.setKey(key + ".errors");
+		result.setValue(String.valueOf(traceRecord.getErrors()));
+		result.setLastlogsize(0);
+		result.setClock(clock);
+		list.add(result);
+		log.debug(ZorkaLogger.ZAG_DEBUG, "### traceRecordToData: data=" + result.toString());
 
 		/* Recursive check children */
 		if ((level <= 1) && (traceRecord.getChildren() != null)) {

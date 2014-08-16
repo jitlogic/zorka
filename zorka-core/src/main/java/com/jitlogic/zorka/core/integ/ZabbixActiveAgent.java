@@ -1,4 +1,5 @@
-/** 
+/**
+ * Copyright 2014 Daniel Makoto Iguchi <daniel.iguchi@gmail.com>
  * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * 
  * ZORKA is free software. You can redistribute it and/or modify it under the
@@ -30,9 +31,9 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.jitlogic.zorka.common.ZorkaService;
-import com.jitlogic.zorka.common.model.ActiveCheckData;
-import com.jitlogic.zorka.common.model.ActiveCheckResponse;
-import com.jitlogic.zorka.common.model.Data;
+import com.jitlogic.zorka.common.zabbix.ActiveCheckQueryItem;
+import com.jitlogic.zorka.common.zabbix.ActiveCheckResponse;
+import com.jitlogic.zorka.common.zabbix.ActiveCheckResult;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.ZabbixUtils;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
@@ -60,11 +61,21 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 	/* Agent Settings */
 	private String prefix;
 	private ZorkaConfig config;
+
+    /** Hostname agent advertises itself to zabbix. */
 	private String agentHost;
 	private String activeIpPort;
+
+    /** Interval between fetching new item list from Zabbix. */
 	private long activeCheckInterval;
+
+    /** Interval between sender cycles */
 	private long senderInterval;
+
+
 	private int maxBatchSize;
+
+
 	private int maxCacheSize;
 
 
@@ -78,8 +89,8 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
 	/* Scheduler Management */
 	private ScheduledExecutorService scheduler;
-	private HashMap<ActiveCheckData, ScheduledFuture<?>> runningTasks;
-	private ConcurrentLinkedQueue<Data> dataQueue;
+	private HashMap<ActiveCheckQueryItem, ScheduledFuture<?>> runningTasks;
+	private ConcurrentLinkedQueue<ActiveCheckResult> resultsQueue;
 	private ScheduledFuture<?> senderTask;
 
 	/* BSH agent */
@@ -97,7 +108,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		this.prefix = "zabbix.active";
 		this.config = config;
 		this.defaultPort = 10055;
-		this.defaultAddr = "127.0.0.1:10055";
+		this.defaultAddr = config.stringCfg("zabbix.server.addr", "127.0.0.1:10051");
 
 		this.scheduler = scheduledExecutorService;
 
@@ -126,7 +137,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		}
 
 		/* Message */
-		ZabbixUtils.setMaxRequestLength(config.intCfg(prefix + "message.size", 16384));		
+		ZabbixUtils.setMaxRequestLength(config.intCfg(prefix + ".message.size", 16384));
 		
 		/* Active Check: Interval, message+hostname */ 
 		activeCheckInterval = config.intCfg(prefix + ".check.interval", 120);
@@ -143,8 +154,8 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 				" seconds, exceeding records will be discarded.");
 
 		/* scheduler's infra */
-		runningTasks = new HashMap<ActiveCheckData, ScheduledFuture<?>>();
-		dataQueue = new ConcurrentLinkedQueue<Data>();
+		runningTasks = new HashMap<ActiveCheckQueryItem, ScheduledFuture<?>>();
+		resultsQueue = new ConcurrentLinkedQueue<ActiveCheckResult>();
 	}
 
 
@@ -190,13 +201,13 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 				senderTask.cancel(true);
 				
 				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive cancelling all ZorkaBsh tasks...");
-				for (ActiveCheckData task : runningTasks.keySet()) {
+				for (ActiveCheckQueryItem task : runningTasks.keySet()) {
 					ScheduledFuture<?> future = runningTasks.remove(task);
 					future.cancel(true);					
 				}
 				
 				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive clearing dataQueue...");
-				dataQueue.clear();
+				resultsQueue.clear();
 				
 				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive closing socket...");
 				if (socket != null) {
@@ -293,9 +304,9 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 	}
 
 	private void scheduleTasks(ActiveCheckResponse checkData) {
-		ArrayList<ActiveCheckData> newTasks = new ArrayList<ActiveCheckData>(checkData.getData());
-		ArrayList<ActiveCheckData> tasksToInsert = new ArrayList<ActiveCheckData>(checkData.getData());
-		ArrayList<ActiveCheckData> tasksToDelete = new ArrayList<ActiveCheckData>(runningTasks.keySet());
+		ArrayList<ActiveCheckQueryItem> newTasks = new ArrayList<ActiveCheckQueryItem>(checkData.getData());
+		ArrayList<ActiveCheckQueryItem> tasksToInsert = new ArrayList<ActiveCheckQueryItem>(checkData.getData());
+		ArrayList<ActiveCheckQueryItem> tasksToDelete = new ArrayList<ActiveCheckQueryItem>(runningTasks.keySet());
 
 		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive - schedule Tasks: " + checkData.toString());
 
@@ -306,14 +317,14 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		tasksToDelete.removeAll(newTasks);
 		
 		// Delete Tasks
-		for (ActiveCheckData task : tasksToDelete) {
+		for (ActiveCheckQueryItem task : tasksToDelete) {
 			ScheduledFuture<?> taskHandler = runningTasks.get(task);
 			taskHandler.cancel(false);
 		}
 
 		// Insert Tasks
-		for (ActiveCheckData task : tasksToInsert) {
-			ZabbixActiveTask zabbixActiveTask = new ZabbixActiveTask(agentHost, task, agent, translator,dataQueue);			
+		for (ActiveCheckQueryItem task : tasksToInsert) {
+			ZabbixActiveTask zabbixActiveTask = new ZabbixActiveTask(agentHost, task, agent, translator, resultsQueue);
 			ScheduledFuture<?> taskHandler = scheduler.scheduleAtFixedRate(zabbixActiveTask, 5, task.getDelay(), TimeUnit.SECONDS);
 			log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive - task: " + task.toString());
 			runningTasks.put(task, taskHandler);
@@ -324,10 +335,10 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 	}
 
 	private void scheduleTasks() {
-		ZabbixActiveSenderTask sender = new ZabbixActiveSenderTask(activeAddr, activePort, dataQueue, maxBatchSize);			
+		ZabbixActiveSenderTask sender = new ZabbixActiveSenderTask(activeAddr, activePort, resultsQueue, maxBatchSize);
 		senderTask = scheduler.scheduleAtFixedRate(sender, senderInterval, senderInterval, TimeUnit.SECONDS);
 		
-		ZabbixActiveCleanerTask cleaner = new ZabbixActiveCleanerTask(dataQueue, maxCacheSize);			
+		ZabbixActiveCleanerTask cleaner = new ZabbixActiveCleanerTask(resultsQueue, maxCacheSize);
 		senderTask = scheduler.scheduleAtFixedRate(cleaner, senderInterval*2, senderInterval*2, TimeUnit.SECONDS);
 	}
 }

@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import com.google.gson.GsonBuilder;
-import com.jitlogic.zorka.common.model.ActiveCheckResponse;
+import com.jitlogic.zorka.common.zabbix.ActiveCheckResponse;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.ZabbixUtils;
 import com.jitlogic.zorka.common.util.ZorkaLog;
@@ -109,7 +109,7 @@ public class ZabbixActiveRequest {
 	/**
 	 * Sends Active Message
 	 *
-	 * @param message response value
+	 * @param host destination host
 	 * @throws IOException if I/O error occurs
 	 */
 	public void sendActiveMessage(String host) throws IOException {

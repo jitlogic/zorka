@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.jitlogic.zorka.common.model.ActiveCheckData;
-import com.jitlogic.zorka.common.model.Data;
+import com.jitlogic.zorka.common.zabbix.ActiveCheckQueryItem;
+import com.jitlogic.zorka.common.zabbix.ActiveCheckResult;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.ZorkaBshAgent;
@@ -33,14 +33,14 @@ public class ZabbixActiveTask implements Runnable, ZorkaRequestHandler {
 	private final ZorkaLog log = ZorkaLogger.getLog(ZabbixActiveTask.class);
 	
 	private String agentHost;
-	private ActiveCheckData item;
+	private ActiveCheckQueryItem item;
 	private ZorkaBshAgent agent;
 	private QueryTranslator translator;
-	private ConcurrentLinkedQueue<Data> responseQueue;
+	private ConcurrentLinkedQueue<ActiveCheckResult> responseQueue;
 	
 	private long clock;
 	
-	public ZabbixActiveTask(String agentHost, ActiveCheckData item, ZorkaBshAgent agent, QueryTranslator translator, ConcurrentLinkedQueue<Data> responseQueue){
+	public ZabbixActiveTask(String agentHost, ActiveCheckQueryItem item, ZorkaBshAgent agent, QueryTranslator translator, ConcurrentLinkedQueue<ActiveCheckResult> responseQueue){
 		this.agentHost = agentHost;
 		this.item = item;
 		this.agent = agent;
@@ -72,7 +72,7 @@ public class ZabbixActiveTask implements Runnable, ZorkaRequestHandler {
 		log.debug(ZorkaLogger.ZAG_DEBUG, "Task response: " + key + " -> " + value);
 		
 		if (!rslt.equals(ZabbixActiveRequest.ZBX_NOTSUPPORTED)) { // TODO  && !value.equals("{\"data\":[]}")
-			Data response = new Data();
+			ActiveCheckResult response = new ActiveCheckResult();
 			response.setHost(agentHost);
 			response.setKey(key);
 			response.setValue(value);

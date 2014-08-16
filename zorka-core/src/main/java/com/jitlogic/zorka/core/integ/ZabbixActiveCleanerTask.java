@@ -19,7 +19,7 @@ package com.jitlogic.zorka.core.integ;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.jitlogic.zorka.common.model.Data;
+import com.jitlogic.zorka.common.zabbix.ActiveCheckResult;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 
@@ -34,11 +34,11 @@ public class ZabbixActiveCleanerTask implements Runnable {
 	 */
 	private static final ZorkaLog log = ZorkaLogger.getLog(ZabbixActiveCleanerTask.class);
 
-	private ConcurrentLinkedQueue<Data> responseQueue;
+	private ConcurrentLinkedQueue<ActiveCheckResult> responseQueue;
 
 	private int maxCacheSize;
 
-	public ZabbixActiveCleanerTask(ConcurrentLinkedQueue<Data> responseQueue, int maxCacheSize){
+	public ZabbixActiveCleanerTask(ConcurrentLinkedQueue<ActiveCheckResult> responseQueue, int maxCacheSize){
 		this.responseQueue = responseQueue;
 		this.maxCacheSize = maxCacheSize;
 	}

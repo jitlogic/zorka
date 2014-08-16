@@ -218,7 +218,7 @@ public class AgentInstance implements ZorkaService {
         }
 
         if (config.boolCfg("nagios", false)) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Nagios support.");
+            log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Nagios support ...");
             getNagiosAgent().start();
             zorkaAgent.put("nagios", getNagiosLib());
         }
