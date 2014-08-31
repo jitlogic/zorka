@@ -23,6 +23,7 @@ zorka.defCfg("tracer.max.trace.records", 4096);
 
 zorka.defCfg("tracer.file", "no");
 zorka.defCfg("tracer.net", "no");
+zorka.defCfg("tracer.zabbix", "no");
 
 if (zorka.boolCfg("tracer")) {
 
@@ -86,7 +87,7 @@ if (zorka.boolCfg("tracer")) {
       zorka.intCfg("tracer.net.retry.exp", 2L),
       zorka.intCfg("tracer.net.timeout", 60000),      
       zorka.intCfg("tracer.zabbix.send.interval", 15)
-      ));
+    ));
       
     zorka.logDebug("Setting tracer.zabbix.send.interval to " + zorka.intCfg("tracer.zabbix.send.interval", 15) );
   }
@@ -112,6 +113,11 @@ if (zorka.boolCfg("tracer")) {
     tracer.setTracerMaxTraceRecords(mtr);
   }
 
+  if (zorka.hasCfg("tracer.flags")) {
+    zfl = zorka.intCfg("tracer.flags");
+    zorka.logInfo("Setting tracer flags: " + zfl);
+    tracer.setDefaultTraceFlags(zfl);
+  }
 
   tracer.setTraceSpyMethods(true);
 } else {
