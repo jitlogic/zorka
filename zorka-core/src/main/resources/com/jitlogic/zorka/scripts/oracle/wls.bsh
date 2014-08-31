@@ -76,10 +76,10 @@ __wls() {
 
     spy.add(spy.instrument("WLS_EJB")
       .onEnter(
-          spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 4),
+          spy.fetchArg("IWRAP", 2), spy.fetchArg("ARGS", 3),
           ejb._trace ? tracer.begin("EJB", zorka.longCfg("ejb.trace.time")) : null,
-          ejb._trace ? tracer.formatAttr("METHOD", "${MDESC.name}") : null,
-          ejb._trace ? tracer.formatAttr("CLASS", "${MDESC.declaringClass.name}") : null)
+          ejb._trace ? tracer.formatAttr("METHOD", "${IWRAP.methodDescriptor.method.name}") : null,
+          ejb._trace ? tracer.formatAttr("CLASS", "${IWRAP.methodDescriptor.method.declaringClass.name}") : null)
       .onError(
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
           spy.fetchError("ERR"),
@@ -98,7 +98,8 @@ __wls() {
           spy.strTime("TIME"),
           ejb._slow_chain)
       .include(
-          spy.byMethod("org.jboss.interceptor.proxy.InterceptorMethodHandler", "invoke")
+          spy.byMethod(0, "weblogic.ejb.container.internal.SessionLocalMethodInvoker", "invoke", null),
+          spy.byMethod(0, "weblogic.ejb.container.internal.SessionRemoteMethodInvoker", "invoke", null)
       ));
 
 
