@@ -1,4 +1,4 @@
-Zorka 1.0.7 (2014-08-18)
+Zorka 1.0.7 (2014-09-05)
 ------------------------
 
 * more fixes to ZICO collector;
