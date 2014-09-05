@@ -1,11 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zorka-core</artifactId>
     <parent>
         <groupId>com.jitlogic.zorka</groupId>
         <artifactId>zorka</artifactId>
-        <version>1.0.6</version>
+        <version>1.0.7</version>
     </parent>
     <dependencies>
         <dependency>
@@ -26,7 +27,8 @@
         <dependency>
             <groupId>org.fressian</groupId>
             <artifactId>fressian</artifactId>
-            <version>0.6.3</version>
+            <version>${fressian.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.jitlogic.zorka</groupId>
@@ -53,8 +55,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${compiler.plugin.version}</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>

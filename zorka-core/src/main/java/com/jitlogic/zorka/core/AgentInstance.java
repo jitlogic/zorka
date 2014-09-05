@@ -67,10 +67,20 @@ public class AgentInstance implements ZorkaService {
     private ExecutorService mainExecutor;
 
     /**
+     * Handles scheduled tasks
+     */
+    private ScheduledExecutorService scheduledExecutor;
+    
+    /**
      * Main zorka agent object - one that executes actual requests
      */
     private ZorkaBshAgent zorkaAgent;
 
+    /**
+     * Reference to zabbix active agent object - one that handles zabbix active requests and passes them to BSH agent
+     */
+    private ZabbixActiveAgent zabbixActiveAgent;
+    
     /**
      * Reference to zabbix agent object - one that handles zabbix requests and passes them to BSH agent
      */
@@ -185,6 +195,12 @@ public class AgentInstance implements ZorkaService {
 
         getZorkaAgent().put("perfmon", getPerfMonLib());
 
+        if (config.boolCfg("zabbix.active", false)) {
+        	log.info(ZorkaLogger.ZAG_CONFIG, "Enabling ZABBIX Active Agent subsystem ...");
+        	getZabbixActiveAgent().start();
+            zorkaAgent.put("zabbix.active", getZabbixLib());
+        }
+        
         if (config.boolCfg("zabbix", true)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling ZABBIX subsystem ...");
             getZabbixAgent().start();
@@ -202,7 +218,7 @@ public class AgentInstance implements ZorkaService {
         }
 
         if (config.boolCfg("nagios", false)) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Nagios support.");
+            log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Nagios support ...");
             getNagiosAgent().start();
             zorkaAgent.put("nagios", getNagiosLib());
         }
@@ -302,6 +318,13 @@ public class AgentInstance implements ZorkaService {
         return mainExecutor;
     }
 
+    private synchronized ScheduledExecutorService getScheduledExecutor() {
+        if (scheduledExecutor == null) {
+            int rt = config.intCfg("zorka.req.threads", 8);
+            scheduledExecutor = Executors.newScheduledThreadPool(rt);
+        }
+        return scheduledExecutor;
+    }
 
     public synchronized Tracer getTracer() {
         if (tracer == null) {
@@ -354,6 +377,12 @@ public class AgentInstance implements ZorkaService {
         return nagiosAgent;
     }
 
+    public synchronized ZabbixActiveAgent getZabbixActiveAgent() {
+        if (zabbixActiveAgent == null) {
+            zabbixActiveAgent = new ZabbixActiveAgent(config, getZorkaAgent(), getTranslator(), getScheduledExecutor());
+        }
+        return zabbixActiveAgent;
+    }
 
     public synchronized ZabbixAgent getZabbixAgent() {
         if (zabbixAgent == null) {
@@ -524,6 +553,10 @@ public class AgentInstance implements ZorkaService {
         if (zabbixAgent != null) {
             zabbixAgent.shutdown();
         }
+        
+        if (zabbixActiveAgent != null) {
+        	zabbixActiveAgent.shutdown();
+        }
 
         if (nagiosAgent != null) {
             nagiosAgent.shutdown();
@@ -542,6 +575,10 @@ public class AgentInstance implements ZorkaService {
             getZabbixAgent().restart();
         }
 
+        if (config.boolCfg("zabbix.active", false)) {
+            getZabbixActiveAgent().restart();
+        }
+        
         if (config.boolCfg("nagios", true)) {
             getNagiosAgent().restart();
         }

@@ -67,7 +67,8 @@ __wls() {
         spy.valSetFilter("STATUS", http._errors),
         spy.markError(),
         http._error_chain) : null,
-      http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
+      http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null,
+      http._tags_chain)
     .include(
       spy.byMethod(0, "weblogic.servlet.internal.WebAppServletContext", "execute", null)
     ));
@@ -75,10 +76,10 @@ __wls() {
 
     spy.add(spy.instrument("WLS_EJB")
       .onEnter(
-          spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 4),
+          spy.fetchArg("IWRAP", 2), spy.fetchArg("ARGS", 3),
           ejb._trace ? tracer.begin("EJB", zorka.longCfg("ejb.trace.time")) : null,
-          ejb._trace ? tracer.formatAttr("METHOD", "${MDESC.name}") : null,
-          ejb._trace ? tracer.formatAttr("CLASS", "${MDESC.declaringClass.name}") : null)
+          ejb._trace ? tracer.formatAttr("METHOD", "${IWRAP.methodDescriptor.method.name}") : null,
+          ejb._trace ? tracer.formatAttr("CLASS", "${IWRAP.methodDescriptor.method.declaringClass.name}") : null)
       .onError(
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
           spy.fetchError("ERR"),
@@ -92,11 +93,13 @@ __wls() {
           ejb._trace ? tracer.attr("RET", "RET") : null,
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "byMethod", "${CLASS}.${METHOD}") : null,
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null,
+          ejb._tags_chain,
           spy.longerThan(zorka.longCfg("ejb.slow.time")),
           spy.strTime("TIME"),
           ejb._slow_chain)
       .include(
-          spy.byMethod("org.jboss.interceptor.proxy.InterceptorMethodHandler", "invoke")
+          spy.byMethod(0, "weblogic.ejb.container.internal.SessionLocalMethodInvoker", "invoke", null),
+          spy.byMethod(0, "weblogic.ejb.container.internal.SessionRemoteMethodInvoker", "invoke", null)
       ));
 
 

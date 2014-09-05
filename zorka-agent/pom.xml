@@ -5,7 +5,7 @@
     <parent>
         <artifactId>zorka</artifactId>
         <groupId>com.jitlogic.zorka</groupId>
-        <version>1.0.6</version>
+        <version>1.0.7</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -23,13 +23,22 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${compiler.plugin.version}</version>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>${jar.plugin.version}</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
                             <Premain-Class>com.jitlogic.zorka.agent.AgentMain</Premain-Class>
-                            <!-- <Agent-Class>com.jitlogic.zorka.agent.AgentMain</Agent-Class> -->
                             <Boot-Class-Path>zorka.jar</Boot-Class-Path>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
                             <Can-Retransform-Classes>true</Can-Retransform-Classes>
@@ -56,6 +65,7 @@
                                 <include>com.jitlogic.contrib:libsnmp</include>
                                 <include>com.jitlogic.zorka:zorka-core</include>
                                 <include>org.fressian:fressian</include>
+                                <include>com.google.code.gson:gson</include>
                             </includes>
                             <rules>
                                 <rule>
@@ -73,6 +83,10 @@
                                 <rule>
                                     <pattern>org.fressian.**</pattern>
                                     <result>com.jitlogic.zorka.deps.fressian.@1</result>
+                                </rule>
+                                <rule>
+                                    <pattern>com.google.gson.**</pattern>
+                                    <result>com.jitlogic.zorka.deps.gson.@1</result>
                                 </rule>
                                 <keep>
                                     <pattern>com.jitlogic.zorka.**</pattern>

@@ -33,9 +33,19 @@ public class LogicalFilterProcessor implements SpyProcessor {
     private List<SpyProcessor> processors;
 
 
-    public LogicalFilterProcessor(int mode, SpyProcessor... processors) {
+    public LogicalFilterProcessor(int mode, SpyProcessor...processors) {
+        this(null, mode, processors);
+    }
+
+
+    public LogicalFilterProcessor(LogicalFilterProcessor orig, int mode, SpyProcessor...processors) {
         this.mode = mode;
-        this.processors = new ArrayList<SpyProcessor>(processors.length);
+        this.processors = new ArrayList<SpyProcessor>();
+
+        if (orig != null) {
+            this.processors.addAll(orig.processors);
+        }
+
         for (SpyProcessor p : processors) {
             if (p != null) {
                 this.processors.add(p);
@@ -59,6 +69,11 @@ public class LogicalFilterProcessor implements SpyProcessor {
         }
 
         return rec;
+    }
+
+
+    public LogicalFilterProcessor with(SpyProcessor...processors) {
+        return new LogicalFilterProcessor(this, this.mode, processors);
     }
 
 }

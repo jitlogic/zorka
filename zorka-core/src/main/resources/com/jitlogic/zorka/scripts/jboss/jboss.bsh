@@ -206,6 +206,8 @@ __jboss() {
 
           "org.jboss.security.**/run",
 
+          "org.jboss.tm.**",
+
           "org.jboss.virtual.Visitor**",
           "org.jboss.virtual.plugins.cache.**",
           "org.jboss.virtual.plugins.context.Abstract**",

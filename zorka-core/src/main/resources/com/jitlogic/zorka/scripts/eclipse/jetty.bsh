@@ -57,7 +57,8 @@ __jetty() {
         spy.valSetFilter("STATUS", http._errors),
         spy.markError(),
         http._error_chain),
-      http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
+      http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null,
+      http._tags_chain)
     .include(
       spy.byMethod("org.eclipse.jetty.servlet.ServletHandler", "doHandle")));
 
