@@ -117,7 +117,7 @@ public final class ZabbixUtils {
 		ActiveCheckQuery query = new ActiveCheckQuery();
 		
 		query.setRequest("agent data");
-		query.setResults(results);
+		query.setData(results);
 		query.setClock(clock);
 		
 		return (new GsonBuilder().disableHtmlEscaping().create()).toJson(query);
