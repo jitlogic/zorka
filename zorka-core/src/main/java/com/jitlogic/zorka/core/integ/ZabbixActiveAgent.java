@@ -279,6 +279,9 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 				ActiveCheckResponse response = request.getActiveResponse();
 //				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive response.toString() " + response.toString());
 
+				if(response.getData() == null) {
+				   response.setData(new ArrayList<ActiveCheckQueryItem>());
+				}
 				// Schedule all requests
 				scheduleTasks(response);
 			} catch (IOException e) {
