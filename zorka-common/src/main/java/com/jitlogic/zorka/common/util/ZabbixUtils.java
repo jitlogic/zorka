@@ -53,9 +53,10 @@ public final class ZabbixUtils {
 	/**
 	 * Active Check constants
 	 */
-	private static String _ACTIVECHECK_MSG = "{ \"request\":\"active checks\", \"host\":\"<hostname>\" }";
+	private static String _ACTIVECHECK_MSG = "{ \"request\":\"active checks\", \"host\":\"<hostname>\", \"host_metadata\": \"<host_metadata>\"}";
 
 	private static String _HOSTNAME_TAG = "<hostname>";
+	private static String _HOSTMETADATA_TAG = "<host_metadata>";
 
 
 	/**
@@ -104,8 +105,9 @@ public final class ZabbixUtils {
 	 * @param host
 	 * @return
 	 */
-	public static String createActiveCheck(String host) {
-		return _ACTIVECHECK_MSG.replace(_HOSTNAME_TAG, host);
+	public static String createActiveCheck(String host, String hostMetadata) {
+		String res = _ACTIVECHECK_MSG.replace(_HOSTNAME_TAG, host);
+		return res.replace(_HOSTMETADATA_TAG, hostMetadata);
 	}
 	
 	/**
