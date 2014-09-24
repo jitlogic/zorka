@@ -22,7 +22,7 @@ import java.util.ArrayList;
 public class ActiveCheckQuery {
 
 	private String request;
-	private ArrayList<ActiveCheckResult> results;
+	private ArrayList<ActiveCheckResult> data;
 	private long clock;
 
 	public String getRequest() {
@@ -33,12 +33,12 @@ public class ActiveCheckQuery {
 		this.request = request;
 	}
 
-	public ArrayList<ActiveCheckResult> getResults() {
-		return results;
+	public ArrayList<ActiveCheckResult> getData() {
+		return data;
 	}
 
-	public void setResults(ArrayList<ActiveCheckResult> results) {
-		this.results = results;
+	public void setData(ArrayList<ActiveCheckResult> results) {
+		this.data = results;
 	}
 	
 	public long getClock() {
@@ -56,7 +56,7 @@ public class ActiveCheckQuery {
 		stringBuilder.append(request);
 		stringBuilder.append(", data=[");
 		
-		for (ActiveCheckResult result : results){
+		for (ActiveCheckResult result : data){
 			stringBuilder.append(result);
 		}
 		stringBuilder.append("], clock=");
