@@ -273,12 +273,15 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 				ZabbixActiveRequest request = new ZabbixActiveRequest(socket);
 
 				// send Active Check Message 
-				request.sendActiveMessage(agentHost);
+				request.sendActiveMessage(agentHost, config.stringCfg(prefix + ".host_metadata", ""));
 
 				// get requests for metrics
 				ActiveCheckResponse response = request.getActiveResponse();
 //				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive response.toString() " + response.toString());
 
+				if(response.getData() == null) {
+				   response.setData(new ArrayList<ActiveCheckQueryItem>());
+				}
 				// Schedule all requests
 				scheduleTasks(response);
 			} catch (IOException e) {
