@@ -1,3 +1,10 @@
+Zorka 1.0.8 (2014-??-??)
+------------------------
+
+* active checks: fixes, new templates;
+* ZICO UI: many fixes, regexp search;
+
+
 Zorka 1.0.7 (2014-09-05)
 ------------------------
 
