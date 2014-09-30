@@ -1,4 +1,4 @@
-Zorka 1.0.8 (2014-??-??)
+Zorka 1.0.8 (2014-09-29)
 ------------------------
 
 * active checks: fixes, new templates;
