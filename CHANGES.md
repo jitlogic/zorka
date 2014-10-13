@@ -1,3 +1,10 @@
+Zorka 1.0.9 (2014-10-13)
+------------------------
+
+* fix: proper ASM5 instruction set version in ASM class reader;
+* ZICO: pivot (aggregate) view of collected traces;
+* zico-util: improve parallelism of index rebuild op (by sorting host dirs by size);
+
 Zorka 1.0.8 (2014-09-29)
 ------------------------
 
