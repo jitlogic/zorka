@@ -133,6 +133,11 @@ public class TraceMarker implements SymbolicRecord, Serializable {
     }
 
 
+    public void setClock(long clock) {
+        this.clock = clock;
+    }
+
+
     public long getMinimumTime() {
         return minimumTime;
     }

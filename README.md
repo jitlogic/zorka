@@ -23,9 +23,7 @@ Instructions for building the agent.
   * zorka-dist
   * zorka-viewer
 
-2. Comment out all zico modules from the main pom.xml
-
-3. Copy the following maven plugin compiler into all pom.xml files:
+2. Copy the following maven plugin compiler into all pom.xml files:
   ```xml
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -39,9 +37,9 @@ Instructions for building the agent.
             </plugin>
 ```
 
-4. Configure the zorka's Maven Build with the "install" goal
+3. Configure the zorka's Maven Build with the "install" goal
 
-5. Copy the following files to a server:
+4. Copy the following files to a server:
   * zorka-dist/target/output/*
 
 
