@@ -15,23 +15,18 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// This file contains agent configurations for various unqualified libraries
+package com.jitlogic.zorka.common.test;
 
-zorka.require("tracer.bsh");
+import org.junit.Test;
 
-if (zorka.boolCfg("tracer")) {
-    tracer.exclude(
-      "org.mapdb.Util**",
-      "org.mapdb.DataInput2",
-      "org.mapdb.DataOutput2",
-      "org.mapdb.BTree**",
-      "org.mapdb.Cache**",
-      "org.mapdb.Serializer**",
-      "org.mapdb.Vol**",
-      "org.mapdb.LongConcurrentHashMap",
-      "org.mapdb.StoreWAL",
-      "org.mapdb.LongHashMap",
-      "org.mapdb.EngineWrapper/get",
-      "org.mapdb.EngineWrapper/update"
-    );
+/**
+ *
+ */
+public class MethodSlaStatsUnitTest {
+
+    @Test
+    public void testSubmitSomeDataAndCheckSla() {
+
+    }
+
 }
