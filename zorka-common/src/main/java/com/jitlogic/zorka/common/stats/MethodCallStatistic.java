@@ -206,7 +206,7 @@ public class MethodCallStatistic implements ZorkaStat {
         return getMaxCLR(maxTime);
     }
 
-    public MethodSlaStatistics sla() {
+    public MethodSlaStatistics getSla() {
         MethodSlaStatistics rslt = this.sla.get();
 
         if (rslt == null) {
@@ -339,7 +339,7 @@ public class MethodCallStatistic implements ZorkaStat {
         this.calls.incrementAndGet();
         this.time.addAndGet(time);
         this.setMax(maxTime, time);
-        sla().logCall(time);
+        getSla().logCall(time);
     }
 
 
@@ -368,7 +368,7 @@ public class MethodCallStatistic implements ZorkaStat {
         this.calls.incrementAndGet();
         this.time.addAndGet(time);
         this.setMax(maxTime, time);
-        sla().logError(time);
+        getSla().logError(time);
     }
 
 

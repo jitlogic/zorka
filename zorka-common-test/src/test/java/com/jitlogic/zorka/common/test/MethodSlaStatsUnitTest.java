@@ -17,16 +17,43 @@
 
 package com.jitlogic.zorka.common.test;
 
-import org.junit.Test;
+import com.jitlogic.zorka.common.stats.MethodCallStatistic;
 
-/**
- *
- */
+import com.jitlogic.zorka.common.util.ObjectInspector;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 public class MethodSlaStatsUnitTest {
+
+    private static final long S = 1000000000L;
 
     @Test
     public void testSubmitSomeDataAndCheckSla() {
+        MethodCallStatistic m = new MethodCallStatistic("test");
 
+        m.logCall(5 * S);
+        assertEquals(100.0, m.getSla().getStatistic("2000").getSla(), 0.1);
+
+        m.logCall(5 * S);
+        assertEquals(0.0, m.getSla().getStatistic("2000").getSla(), 0.1);
+        assertEquals(100.0, m.getSla().getStatistic("4000").getSla(), 0.1);
+
+        m.logCall(1 * S);
+        assertEquals(100.0, m.getSla().getStatistic("4000").getSla(), 0.1);
+
+        assertEquals(50.0, m.getSla().getStatistic("2000").getSlaCLR(), 0.1);
+        assertEquals(100.0, m.getSla().getStatistic("2000").getSla(), 0.1);
+    }
+
+    @Test
+    public void testCheckIfSlaIsAccessibleViaObjectInspector() {
+        MethodCallStatistic m = new MethodCallStatistic("test");
+
+        assertEquals(100.0, (Double)ObjectInspector.get(m, "sla", "4000", "sla"), 0.1);
+
+        m.logCall(S); m.logError(S);
+
+        assertEquals(50.0, (Double)ObjectInspector.get(m, "sla", "4000", "sla"), 0.1);
     }
 
 }

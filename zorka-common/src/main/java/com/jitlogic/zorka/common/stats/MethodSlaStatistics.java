@@ -32,7 +32,7 @@ public class MethodSlaStatistics implements ZorkaStats {
 
 
     @Override
-    public ZorkaStat getStatistic(String statisticName) {
+    public MethodSlaStatistic getStatistic(String statisticName) {
         int threshold = Integer.parseInt(statisticName);
         MethodSlaStatistic rslt = stats.get(threshold);
 
