@@ -272,6 +272,7 @@ __was() {
       "com.ibm.ws.management.authorizer.**",
       "com.ibm.ws.PluginModelObject",
       "com.ibm.ws.pmi.**",
+      "com.ibm.ws.rsadapter.jdbc.**",
       "com.ibm.ws.security.**",
       "com.ibm.ws.sibx.scax.mediation.component.**",
       "com.ibm.ws.tx.util.logging.**",

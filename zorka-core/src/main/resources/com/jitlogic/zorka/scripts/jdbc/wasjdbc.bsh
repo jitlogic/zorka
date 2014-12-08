@@ -17,24 +17,16 @@
 
 zorka.require("sql.bsh");
 
-__db2() {
+__wasjdbc() {
 
-  spy.add(sql._instrumentStmt("DB2_SQL_1", "DB2")
-    .include(spy.byMethod(spy.AC_PUBLIC, "com.ibm.db2.jcc**", "execut*", null, "String")));
+  spy.add(sql._instrumentStmt("WASJDBC_SQL_1", "${THIS.dsConfig.value}")
+    .include(spy.byMethod(spy.AC_PUBLIC, "com.ibm.ws.rsadapter.jdbc.WSJccStatement", "execut*", null, "String")));
 
-  spy.add(sql._instrumentPStmt("DB2_SQL_2", "DB2", "${THIS.Gb}")
-    .include(spy.byMethod(1, "com.ibm.db2.jcc.c.lh", "execut*", null, spy.SM_NOARGS)));
-
-  spy.add(sql._instrumentPStmt("DB2_SQL_3", "DB2", "${THIS.Uc}")
-    .include(spy.byMethod(1, "com.ibm.db2.jcc.am.um", "execut*", null, spy.SM_NOARGS)));
-
-  if (zorka.boolCfg("tracer")) {
-      tracer.exclude("com.ibm.db2.**");
-  }
+  spy.add(sql._instrumentPStmt("WASJDBC_SQL_2", "${THIS.dsConfig.value}", "${THIS.sql}")
+    .include(spy.byMethod(1, "com.ibm.ws.rsadapter.jdbc.WSJccPreparedStatement", "execut*", null, spy.SM_NOARGS)));
 
   return this;
 }
 
 
-db2 = __db2();
-
+wasjdbc = __wasjdbc();

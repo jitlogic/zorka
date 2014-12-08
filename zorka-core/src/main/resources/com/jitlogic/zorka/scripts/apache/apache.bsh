@@ -39,6 +39,7 @@ if (zorka.boolCfg("tracer")) {
         "org.apache.jasper.**",
         "org.apache.log4j.**",
         "org.apache.neethi.**",
+        "org.apache.openjpa.**",
         "org.apache.portals.bridges.**",
         "org.apache.soap.**",
         "org.apache.struts.**",
