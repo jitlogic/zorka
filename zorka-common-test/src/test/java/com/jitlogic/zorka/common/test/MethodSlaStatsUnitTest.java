@@ -56,4 +56,12 @@ public class MethodSlaStatsUnitTest {
         assertEquals(50.0, (Double)ObjectInspector.get(m, "sla", "4000", "sla"), 0.1);
     }
 
+    @Test
+    public void testIfErrorsAlsoMatch() {
+        MethodCallStatistic m = new MethodCallStatistic("test");
+        assertEquals(100.0, m.getSla().getStatistic("2000").getSla(), 0.1);
+        m.logError(S);
+        assertEquals(0.0, m.getSla().getStatistic("2000").getSla(), 0.1);
+    }
+
 }
