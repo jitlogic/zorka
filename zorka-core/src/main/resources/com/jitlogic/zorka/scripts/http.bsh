@@ -308,6 +308,10 @@ __http() {
     return zorka.rate("java", _mbean, attr, tag, "time", "calls", "AVG15");
   }
 
+  sla(attr, tag, t) {
+    return zorka.jmx("java", _mbean, attr, tag, "sla", t, "slaCLR");
+  }
+
   return this;
 }
 
