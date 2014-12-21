@@ -29,19 +29,13 @@ if (zorka.boolCfg("tracer")) {
 
   zorka.logInfo("Enabling and configuring Zorka tracer ...");
 
-  // Process tracer includes ...
-  for (String pkg : zorka.listCfg("tracer.include.extra")) {
-    if (!pkg.indexOf(':') == -1) {
-       pkg = "200:" + pkg;
-    }
+  // Process high priority tracer includes ...
+  for (pkg : zorka.listCfg("tracer.include")) {
     tracer.include(pkg);
   }
 
-  // Process tracer excludes ...
-  for (String pkg : zorka.listCfg("tracer.exclude.extra")) {
-    if (!pkg.indexOf(':') == -1) {
-       pkg = "200:" + pkg;
-    }
+  // Process high priority tracer excludes ...
+  for (pkg : zorka.listCfg("tracer.exclude")) {
     tracer.exclude(pkg);
   }
 
@@ -88,7 +82,7 @@ if (zorka.boolCfg("tracer")) {
       zorka.intCfg("tracer.net.timeout", 60000),      
       zorka.intCfg("tracer.zabbix.send.interval", 15)
     ));
-      
+
     zorka.logDebug("Setting tracer.zabbix.send.interval to " + zorka.intCfg("tracer.zabbix.send.interval", 15) );
   }
 
