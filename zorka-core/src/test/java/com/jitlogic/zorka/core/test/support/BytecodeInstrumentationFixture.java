@@ -24,6 +24,7 @@ import com.jitlogic.zorka.core.test.spy.support.TestSubmitter;
 import com.jitlogic.zorka.core.test.spy.support.TestTraceBuilder;
 import org.junit.After;
 import org.junit.Before;
+import org.objectweb.asm.ClassWriter;
 
 public class BytecodeInstrumentationFixture extends ZorkaFixture {
 
@@ -61,6 +62,9 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
         };
         MainSubmitter.setTracer(tracerObj);
         symbols = agentInstance.getSymbolRegistry();
+
+
+        engine.setWriterFlags(ClassWriter.COMPUTE_FRAMES);
     }
 
     @After

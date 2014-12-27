@@ -30,6 +30,8 @@ import static com.jitlogic.zorka.core.test.support.TestUtil.*;
 
 public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixture {
 
+
+
     @Test
     public void testClassWithoutAnyTransform() throws Exception {
         Object obj = instantiate(engine, TCLASS1);
@@ -592,6 +594,19 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
         Object obj = instantiate(engine, TCLASS4);
         invoke(obj, "trivialMethod4");
+
+        assertEquals(2, submitter.size());
+    }
+
+    @Test
+    public void testInstrumentComplicatedMethodWithVariable() throws Exception {
+
+        engine.add(spy.instrument("x").include(
+                spy.byMethod(TCLASS1, "complicatedMethod")));
+
+        Object obj = instantiate(engine, TCLASS1);
+        Object rslt = invoke(obj, "complicatedMethod", "123");
+        assertEquals(Integer.valueOf("123"), rslt);
 
         assertEquals(2, submitter.size());
     }
