@@ -342,9 +342,13 @@ public class AgentInstance implements ZorkaService {
 
     public synchronized SpyClassTransformer getClassTransformer() {
         if (classTransformer == null) {
-            classTransformer = new SpyClassTransformer(getSymbolRegistry(), getTracer(),
-                    getConfig().boolCfg("zorka.spy.compute.frames", true),
-                    stats, getRetransformer());
+            String rv = System.getProperty("java.specification.version");
+            boolean csf = getConfig().boolCfg("zorka.spy.compute.frames", !(rv.equals("1.5") || rv.equals("1.6")));
+
+            log.info(ZorkaLogger.ZTR_CONFIG, "JVM version: " + rv);
+            log.info(ZorkaLogger.ZTR_CONFIG, "Tracer setting zorka.spy.compute.frames = " + csf);
+            
+            classTransformer = new SpyClassTransformer(getSymbolRegistry(), getTracer(), csf, stats, getRetransformer());
         }
         return classTransformer;
     }

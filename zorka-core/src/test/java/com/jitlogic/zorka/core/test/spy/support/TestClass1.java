@@ -80,4 +80,16 @@ public class TestClass1 {
     public String getS() {
         return tag;
     }
+
+
+    public Number complicatedMethod(String s) {
+        Number rslt = null;
+        if (s.endsWith("L")) {
+            rslt = Long.parseLong(s.substring(0, s.length()-1));
+        } else {
+            rslt = Integer.parseInt(s);
+        }
+        return rslt;
+    }
+
 }

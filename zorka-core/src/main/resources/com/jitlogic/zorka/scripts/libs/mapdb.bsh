@@ -23,12 +23,15 @@ if (zorka.boolCfg("tracer")) {
     tracer.exclude(
       "org.mapdb.Util**",
       "org.mapdb.DataInput2",
+      "org.mapdb.DataOutput2",
       "org.mapdb.BTree**",
       "org.mapdb.Cache**",
       "org.mapdb.Serializer**",
       "org.mapdb.Vol**",
       "org.mapdb.LongConcurrentHashMap",
       "org.mapdb.StoreWAL",
-      "org.mapdb.LongHashMap"
+      "org.mapdb.LongHashMap",
+      "org.mapdb.EngineWrapper/get",
+      "org.mapdb.EngineWrapper/update"
     );
 }

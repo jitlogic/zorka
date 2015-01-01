@@ -62,4 +62,9 @@ public class ZorkaUtilUnitTest {
                 ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.common.stats.MethodCallStatistic"));
     }
 
+    @Test
+    public void testSystemPropsJvmVersion() throws Exception {
+        System.out.println(System.getProperty("java.specification.version"));
+    }
+
 }

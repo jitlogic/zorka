@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>2.0</version>
+    <date>2014-12-11T18:02:41Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Template_Zorka_HTTP_SLA</template>
+            <name>Template_Zorka_HTTP_SLA</name>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>HTTP SLA</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>HTTP SLA with {$HTTP_SLA_TIME}ms threshold</name>
+                    <type>0</type>
+                    <snmp_community/>
+                    <multiplier>0</multiplier>
+                    <snmp_oid/>
+                    <key>http.sla[&quot;stats&quot;, &quot;ALL&quot;, {$HTTP_SLA_TIME}]</key>
+                    <delay>60</delay>
+                    <history>30</history>
+                    <trends>365</trends>
+                    <status>0</status>
+                    <value_type>0</value_type>
+                    <allowed_hosts/>
+                    <units>%</units>
+                    <delta>0</delta>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <formula>1</formula>
+                    <delay_flex/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <data_type>0</data_type>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <description/>
+                    <inventory_link>0</inventory_link>
+                    <applications>
+                        <application>
+                            <name>HTTP SLA</name>
+                        </application>
+                    </applications>
+                    <valuemap/>
+                    <logtimefmt/>
+                </item>
+            </items>
+            <discovery_rules/>
+            <macros>
+                <macro>
+                    <macro>{$HTTP_SLA_TIME}</macro>
+                    <value>1000</value>
+                </macro>
+            </macros>
+            <templates/>
+            <screens/>
+        </template>
+    </templates>
+</zabbix_export>

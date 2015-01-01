@@ -15,12 +15,18 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.test.common;
+zorka.require("sql.bsh");
 
-import com.jitlogic.zorka.core.test.support.ZorkaFixture;
+__wasjdbc() {
 
-// TODO move this test to zorka-common some day
-public class ObjectInspectorUnitTest extends ZorkaFixture {
+  spy.add(sql._instrumentStmt("WASJDBC_SQL_1", "${THIS.dsConfig.value.jndiName}")
+    .include(spy.byMethod(spy.AC_PUBLIC, "com.ibm.ws.rsadapter.jdbc.**", "execut*", null, "String")));
 
+  spy.add(sql._instrumentPStmt("WASJDBC_SQL_2", "${THIS.dsConfig.value.jndiName}", "${THIS.sql}")
+    .include(spy.byMethod(spy.AC_PUBLIC, "com.ibm.ws.rsadapter.jdbc.**", "execut*", null, spy.SM_NOARGS)));
 
+  return this;
 }
+
+
+wasjdbc = __wasjdbc();

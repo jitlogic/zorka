@@ -60,6 +60,9 @@ public class SpyClassTransformer implements ClassFileTransformer {
      */
     private Map<Integer, SpyContext> ctxById = new ConcurrentHashMap<Integer, SpyContext>();
 
+    /**
+     * Writer flags
+     */
     private int writerFlags;
 
     /**
@@ -315,5 +318,16 @@ public class SpyClassTransformer implements ClassFileTransformer {
     protected ClassVisitor createVisitor(ClassLoader classLoader, String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
         return new SpyClassVisitor(this, classLoader, symbolRegistry, className, found, tracer, cw);
     }
+
+
+    public int getWriterFlags() {
+        return writerFlags;
+    }
+
+
+    public void setWriterFlags(int writerFlags) {
+        this.writerFlags = writerFlags;
+    }
+
 
 }

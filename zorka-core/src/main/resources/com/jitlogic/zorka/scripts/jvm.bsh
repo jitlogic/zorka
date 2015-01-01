@@ -68,6 +68,7 @@ __jvm() {
 
   if (zorka.boolCfg("tracer")) {
       tracer.exclude(
+          "com.sun.crypto.provider.SunJ**",
           "com.sun.java_cup.**",
           "com.sun.jndi.ldap.Ber*",
           "com.sun.jmx.**",

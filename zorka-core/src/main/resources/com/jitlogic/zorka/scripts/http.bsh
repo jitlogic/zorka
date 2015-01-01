@@ -59,7 +59,7 @@ __http() {
   zorka.defCfg("http.slow.file.path", util.path("${zorka.log.dir}", "http-slow.log"));
   zorka.defCfg("http.slow.file.max", "8M");
   zorka.defCfg("http.slow.file.num", "8");
-  zorka.defCfg("http.slow.format", "[${TIME}] ${URI}${PARAMS} -> ${STATUS}");
+  zorka.defCfg("http.slow.format", "[${TIME}] ${URI}${PARAMS: } -> ${STATUS}");
 
   // Default values for HTTP error log configuration options
   zorka.defCfg("http.error", zorka.boolCfg("traps.error"));
@@ -68,7 +68,7 @@ __http() {
   zorka.defCfg("http.error.file.path", util.path("${zorka.log.dir}", "http-error.log"));
   zorka.defCfg("http.error.file.max", "8M");
   zorka.defCfg("http.error.file.num", "8");
-  zorka.defCfg("http.error.format", "[${TIME}] ${URI}${PARAMS} -> ${STATUS}");
+  zorka.defCfg("http.error.format", "[${TIME}] ${URI}${PARAMS: } -> ${STATUS}");
 
   _trace = zorka.boolCfg("http.trace");
   _stats = zorka.boolCfg("http.stats");
@@ -306,6 +306,10 @@ __http() {
 
   avg15(attr, tag) {
     return zorka.rate("java", _mbean, attr, tag, "time", "calls", "AVG15");
+  }
+
+  sla(attr, tag, t) {
+    return zorka.jmx("java", _mbean, attr, tag, "sla", t, "slaCLR");
   }
 
   return this;

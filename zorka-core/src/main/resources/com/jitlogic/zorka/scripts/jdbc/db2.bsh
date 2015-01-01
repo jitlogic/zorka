@@ -25,6 +25,8 @@ __db2() {
   spy.add(sql._instrumentPStmt("DB2_SQL_2", "DB2", "${THIS.Gb}")
     .include(spy.byMethod(1, "com.ibm.db2.jcc.c.lh", "execut*", null, spy.SM_NOARGS)));
 
+  spy.add(sql._instrumentPStmt("DB2_SQL_3", "DB2", "${THIS.Uc}")
+    .include(spy.byMethod(1, "com.ibm.db2.jcc.am.um", "execut*", null, spy.SM_NOARGS)));
 
   if (zorka.boolCfg("tracer")) {
       tracer.exclude("com.ibm.db2.**");
