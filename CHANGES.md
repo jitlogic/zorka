@@ -1,3 +1,11 @@
+Zorka 1.0.10 (2015-01-01)
+-------------------------
+
+* zorka: performance SLA calculation for ZorkaStats;
+* zico: reduce memory consumption
+* several bufixes;
+
+
 Zorka 1.0.9 (2014-10-13)
 ------------------------
 
