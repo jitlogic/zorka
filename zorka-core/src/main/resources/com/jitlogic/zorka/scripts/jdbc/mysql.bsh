@@ -24,7 +24,11 @@ __mysql() {
 
   spy.add(sql._instrumentPStmt("MYSQL_2", "${THIS.connection.database}", "${THIS.originalSql}")
       .include(spy.byMethod("com.mysql.jdbc.PreparedStatement", "execut*"),
-               spy.byMethod("com.mysql.jdbc.CallableStatement", "execut*")));
+               spy.byMethod("com.mysql.jdbc.JDBC4PreparedStatement", "execut*"),
+               spy.byMethod("com.mysql.jdbc.CallableStatement", "execut*"),
+               spy.byMethod("com.mysql.jdbc.JDBC4CallableStatement", "execut*"),
+               spy.byMethod("com.mysql.jdbc.ServerPreparedStatement", "execut*"),
+               spy.byMethod("com.mysql.jdbc.JDBC4ServerPreparedStatement", "execut*")));
 
 
   if (zorka.boolCfg("tracer")) {
