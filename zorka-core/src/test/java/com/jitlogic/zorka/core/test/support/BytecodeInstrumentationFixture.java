@@ -62,9 +62,6 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
         };
         MainSubmitter.setTracer(tracerObj);
         symbols = agentInstance.getSymbolRegistry();
-
-
-        engine.setWriterFlags(ClassWriter.COMPUTE_FRAMES);
     }
 
     @After

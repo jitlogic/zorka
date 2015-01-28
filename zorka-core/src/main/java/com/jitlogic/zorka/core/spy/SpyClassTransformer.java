@@ -61,11 +61,6 @@ public class SpyClassTransformer implements ClassFileTransformer {
     private Map<Integer, SpyContext> ctxById = new ConcurrentHashMap<Integer, SpyContext>();
 
     /**
-     * Writer flags
-     */
-    private int writerFlags;
-
-    /**
      * Map of spy contexts (by instance)
      */
     private Map<SpyContext, SpyContext> ctxInstances = new HashMap<SpyContext, SpyContext>();
@@ -96,12 +91,11 @@ public class SpyClassTransformer implements ClassFileTransformer {
      *
      * @param tracer reference to tracer engine object
      */
-    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer, boolean computeStackFrames,
+    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer,
                                MethodCallStatistics statistics, SpyRetransformer retransformer) {
         this.symbolRegistry = symbolRegistry;
         this.tracer = tracer;
         this.retransformer = retransformer;
-        this.writerFlags = computeStackFrames ? ClassWriter.COMPUTE_FRAMES : 0;
 
         this.spyLookups = statistics.getMethodCallStatistic("SpyLookups");
         this.tracerLookups = statistics.getMethodCallStatistic("TracerLookups");
@@ -238,17 +232,23 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
     @Override
     public byte[] transform(ClassLoader classLoader, String className, Class<?> classBeingRedefined,
-                            ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
+                            ProtectionDomain protectionDomain, byte[] cbf) throws IllegalClassFormatException {
 
         if (Boolean.TRUE.equals(transformLock.get())) {
-            return classfileBuffer;
+            return cbf;
+        }
+
+        if (cbf == null || cbf.length < 128 ||
+            cbf[0] != (byte)0xca || cbf[1] != (byte)0xfe ||
+            cbf[2] != (byte)0xba || cbf[3] != (byte)0xbe) {
+            return cbf;
         }
 
         String clazzName = className.replace("/", ".");
 
         Set<String> currentTransforms = currentTransformsTL.get();
         if (currentTransforms.contains(clazzName)) {
-            return classfileBuffer;
+            return cbf;
         } else {
             currentTransforms.add(clazzName);
         }
@@ -278,7 +278,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
         tracerLookups.logCall(lt2 - lt1);
 
-        byte[] buf = classfileBuffer;
+        byte[] buf = cbf;
 
         if (found.size() > 0 || tracerMatch) {
 
@@ -289,8 +289,8 @@ public class SpyClassTransformer implements ClassFileTransformer {
                         className, found.size(), tracerMatch);
             }
 
-            ClassReader cr = new ClassReader(classfileBuffer);
-            ClassWriter cw = new ClassWriter(cr, writerFlags);
+            ClassReader cr = new ClassReader(cbf);
+            ClassWriter cw = new ClassWriter(cr, cbf[7] > (byte)0x32 ? ClassWriter.COMPUTE_FRAMES : 0);
             ClassVisitor scv = createVisitor(classLoader, clazzName, found, tracer, cw);
             cr.accept(scv, 0);
             buf = cw.toByteArray();
@@ -318,16 +318,5 @@ public class SpyClassTransformer implements ClassFileTransformer {
     protected ClassVisitor createVisitor(ClassLoader classLoader, String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
         return new SpyClassVisitor(this, classLoader, symbolRegistry, className, found, tracer, cw);
     }
-
-
-    public int getWriterFlags() {
-        return writerFlags;
-    }
-
-
-    public void setWriterFlags(int writerFlags) {
-        this.writerFlags = writerFlags;
-    }
-
 
 }
