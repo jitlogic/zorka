@@ -31,6 +31,7 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.integ.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.normproc.NormLib;
+import com.jitlogic.zorka.core.util.DaemonThreadFactory;
 
 import java.util.Properties;
 import java.util.Set;
@@ -303,7 +304,8 @@ public class AgentInstance implements ZorkaService {
         if (connExecutor == null) {
             int rt = config.intCfg("zorka.req.threads", 8);
             connExecutor = new ThreadPoolExecutor(rt, rt, 1000, TimeUnit.MILLISECONDS,
-                    new ArrayBlockingQueue<Runnable>(config.intCfg("zorka.req.queue", 64)));
+                    new ArrayBlockingQueue<Runnable>(config.intCfg("zorka.req.queue", 64)),
+                    new DaemonThreadFactory("ZORKA-conn-pool"));
         }
         return connExecutor;
     }
@@ -313,7 +315,8 @@ public class AgentInstance implements ZorkaService {
         if (mainExecutor == null) {
             int rt = config.intCfg("zorka.req.threads", 8);
             mainExecutor = new ThreadPoolExecutor(rt, rt, 1000, TimeUnit.MILLISECONDS,
-                    new ArrayBlockingQueue<Runnable>(config.intCfg("zorka.req.queue", 64)));
+                    new ArrayBlockingQueue<Runnable>(config.intCfg("zorka.req.queue", 64)),
+                    new DaemonThreadFactory("ZORKA-main-pool"));
         }
         return mainExecutor;
     }
@@ -321,7 +324,7 @@ public class AgentInstance implements ZorkaService {
     private synchronized ScheduledExecutorService getScheduledExecutor() {
         if (scheduledExecutor == null) {
             int rt = config.intCfg("zorka.req.threads", 8);
-            scheduledExecutor = Executors.newScheduledThreadPool(rt);
+            scheduledExecutor = Executors.newScheduledThreadPool(rt, new DaemonThreadFactory("ZORKA-thread-pool"));
         }
         return scheduledExecutor;
     }
