@@ -1,8 +1,16 @@
+Zorka 1.0.11 (2015-02-01)
+-------------------------
+
+* automatically determine stack frame computation (JDK7+);
+* agent: fixes (MySQL, thread pools);
+* collector: fixes (NPE when resetting password);
+
+
 Zorka 1.0.10 (2015-01-01)
 -------------------------
 
 * zorka: performance SLA calculation for ZorkaStats;
-* zico: reduce memory consumption
+* zico: reduce memory consumption;
 * several bufixes;
 
 
