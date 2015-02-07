@@ -30,7 +30,6 @@
         <guice.version>3.0</guice.version>
         <gwt.version>2.5.1</gwt.version>
         <gxt.version>3.0.1</gxt.version>
-        <gson.version>2.2.4</gson.version>
         <jetty.version>6.1.26</jetty.version>
         <json.version>1.2</json.version>
         <junit.version>4.11</junit.version>

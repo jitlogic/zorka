@@ -22,9 +22,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.google.gson.GsonBuilder;
+import com.jitlogic.zorka.common.util.JSONReader;
+import com.jitlogic.zorka.common.zabbix.ActiveCheckQueryItem;
 import com.jitlogic.zorka.common.zabbix.ActiveCheckResponse;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.ZabbixUtils;
@@ -141,10 +144,15 @@ public class ZabbixActiveRequest {
 	public ActiveCheckResponse getActiveResponse() {
 		ActiveCheckResponse response = null;
 		if (reqs.isEmpty()) {
-			String jsonMsg;
 			try {
-				jsonMsg = getReq();
-				response = (new GsonBuilder().disableHtmlEscaping().create()).fromJson(jsonMsg.trim(), ActiveCheckResponse.class);
+                Map map = (Map)(new JSONReader().read(getReq()));
+                response = new ActiveCheckResponse();
+                response.setResponse(map.get("response").toString());
+                ArrayList<ActiveCheckQueryItem> items = new ArrayList<ActiveCheckQueryItem>();
+                for (Object obj : ((List)map.get("data"))) {
+                    items.add(ActiveCheckQueryItem.fromJsonObj(obj));
+                }
+                response.setData(items);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

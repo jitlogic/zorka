@@ -16,6 +16,10 @@
  */
 package com.jitlogic.zorka.common.zabbix;
 
+import com.jitlogic.zorka.common.util.JSONReader;
+
+import java.util.Map;
+
 /**
  * Represents single item from active check query.
  */
@@ -112,6 +116,20 @@ public class ActiveCheckQueryItem {
 		
 		return true;
 	}
-	
-	
+
+
+    public static ActiveCheckQueryItem fromJsonStr(String json) {
+        return fromJsonObj(new JSONReader().read(json));
+    }
+
+
+	public static ActiveCheckQueryItem fromJsonObj(Object obj) {
+        Map itm = (Map)obj;
+        ActiveCheckQueryItem qi = new ActiveCheckQueryItem();
+        qi.setKey(itm.get("key").toString());
+        qi.setDelay(((Number)itm.get("delay")).intValue());
+        qi.setLastlogsize(((Number)itm.get("lastlogsize")).intValue());
+        qi.setMtime(((Number)itm.get("mtime")).intValue());
+        return qi;
+    }
 }

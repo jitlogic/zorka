@@ -19,10 +19,11 @@ package com.jitlogic.zorka.common.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.gson.GsonBuilder;
 import com.jitlogic.zorka.common.zabbix.ActiveCheckQuery;
 import com.jitlogic.zorka.common.zabbix.ActiveCheckResult;
 
@@ -109,7 +110,21 @@ public final class ZabbixUtils {
 		String res = _ACTIVECHECK_MSG.replace(_HOSTNAME_TAG, host);
 		return res.replace(_HOSTMETADATA_TAG, hostMetadata);
 	}
-	
+
+    private static List<Map<String,Object>> activeCheckResultList(ArrayList<ActiveCheckResult> rslt) {
+        List<Map<String,Object>> lst = new ArrayList<Map<String, Object>>(rslt.size());
+        for (ActiveCheckResult acr : rslt) {
+            lst.add(ZorkaUtil.<String,Object>map(
+                    "host", acr.getHost(),
+                    "key", acr.getKey(),
+                    "value", acr.getValue(),
+                    "lastlogsize", acr.getLastlogsize(),
+                    "clock", acr.getClock()
+            ));
+        }
+        return lst;
+    }
+
 	/**
 	 * Creates an Agent Data String Message
 	 * @param results
@@ -121,8 +136,14 @@ public final class ZabbixUtils {
 		query.setRequest("agent data");
 		query.setData(results);
 		query.setClock(clock);
-		
-		return (new GsonBuilder().disableHtmlEscaping().create()).toJson(query);
+
+        return new JSONWriter().write(
+                ZorkaUtil.map(
+                        "request", "agent data",
+                        "clock", clock,
+                        "data", activeCheckResultList(results)
+                )
+        );
 	}
 	
 
