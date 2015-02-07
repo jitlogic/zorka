@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.integ;
+package com.jitlogic.zorka.core.integ.zabbix;
 
 
 import java.io.IOException;
@@ -27,10 +27,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.jitlogic.zorka.common.util.JSONReader;
-import com.jitlogic.zorka.common.zabbix.ActiveCheckQueryItem;
-import com.jitlogic.zorka.common.zabbix.ActiveCheckResponse;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
-import com.jitlogic.zorka.common.util.ZabbixUtils;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 

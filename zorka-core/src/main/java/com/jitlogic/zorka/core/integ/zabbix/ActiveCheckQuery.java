@@ -14,48 +14,54 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.common.zabbix;
+package com.jitlogic.zorka.core.integ.zabbix;
 
 import java.util.ArrayList;
 
 
-public class ActiveCheckResponse {
+public class ActiveCheckQuery {
 
-	private String response;
-	private ArrayList<ActiveCheckQueryItem> data;
+	private String request;
+	private ArrayList<ActiveCheckResult> data;
+	private long clock;
 
-	public String getResponse() {
-		return response;
+	public String getRequest() {
+		return request;
 	}
 
-	public void setResponse(String response) {
-		this.response = response;
+	public void setRequest(String request) {
+		this.request = request;
 	}
 
-	public ArrayList<ActiveCheckQueryItem> getData() {
+	public ArrayList<ActiveCheckResult> getData() {
 		return data;
 	}
 
-	public void setData(ArrayList<ActiveCheckQueryItem> data) {
-		this.data = data;
+	public void setData(ArrayList<ActiveCheckResult> results) {
+		this.data = results;
+	}
+	
+	public long getClock() {
+		return clock;
+	}
+	
+	public void setClock(long clock) {
+		this.clock = clock;
 	}
 
 	@Override
 	public String toString(){
 		StringBuilder stringBuilder = new StringBuilder(100);
-		stringBuilder.append("{response=");
-		stringBuilder.append(response);
+		stringBuilder.append("{request=");
+		stringBuilder.append(request);
 		stringBuilder.append(", data=[");
 		
-		int size = data.size();
-		if (size > 0) {
-			stringBuilder.append(data.get(0));
-			for (int i = 1; i < size; i++) {
-				stringBuilder.append(", ");
-				stringBuilder.append(data.get(i));
-			}
+		for (ActiveCheckResult result : data){
+			stringBuilder.append(result);
 		}
-		stringBuilder.append("]}");
+		stringBuilder.append("], clock=");
+		stringBuilder.append(clock);
+		stringBuilder.append("}");
 		
 		return stringBuilder.toString();
 	}

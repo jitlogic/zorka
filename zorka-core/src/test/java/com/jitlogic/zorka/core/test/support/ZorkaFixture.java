@@ -23,7 +23,7 @@ import com.jitlogic.zorka.core.integ.NagiosLib;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.core.integ.SnmpLib;
 import com.jitlogic.zorka.core.integ.SyslogLib;
-import com.jitlogic.zorka.core.integ.ZabbixLib;
+import com.jitlogic.zorka.core.integ.zabbix.ZabbixLib;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.PerfMonLib;
 import com.jitlogic.zorka.core.spy.*;

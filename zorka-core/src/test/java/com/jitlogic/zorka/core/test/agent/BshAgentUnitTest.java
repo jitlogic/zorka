@@ -23,14 +23,11 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.*;
-import com.jitlogic.zorka.core.test.support.TestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import com.jitlogic.zorka.core.util.ObjectDumper;
-import com.jitlogic.zorka.core.integ.ZabbixLib;
+import com.jitlogic.zorka.core.integ.zabbix.ZabbixLib;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

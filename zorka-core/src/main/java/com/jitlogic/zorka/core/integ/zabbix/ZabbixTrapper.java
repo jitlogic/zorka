@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.integ;
+package com.jitlogic.zorka.core.integ.zabbix;
 
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
