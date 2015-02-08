@@ -9,6 +9,8 @@
 
 package com.jitlogic.zorka.common.util;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.CharacterIterator;
@@ -18,6 +20,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+// TODO bean serialization this only covers basic cases, so it is not complete nor secure;
+// TODO implement useful set of unit tests, refactor and implement corner cases;
 
 public class JSONReader {
 
@@ -64,7 +69,7 @@ public class JSONReader {
         }
     }
 
-    public Object read(CharacterIterator ci, int start) {
+    public Object read(CharacterIterator ci, int start, Class<?> clazz) {
     	reset();
         it = ci;
         switch (start) {
@@ -78,27 +83,37 @@ public class JSONReader {
             c = it.next();
             break;
         }
-        return read();
+        return read(clazz);
     }
 
-    public Object read(CharacterIterator it) {
-        return read(it, NEXT);
+    public Object read(CharacterIterator it, Class<?> clazz) {
+        return read(it, NEXT, clazz);
     }
 
     public Object read(String string) {
-        return read(new StringCharacterIterator(string), FIRST);
+        return read(string, Object.class);
     }
 
-    protected Object read() {
+    public <T> T read(String string, Class<T> clazz) {
+        return (T)read(new StringCharacterIterator(string), FIRST, clazz);
+    }
+
+    protected Object read(Class<?> clazz) {
         skipWhiteSpace();
         char ch = c;
         next();
         switch (ch) {
             case '"': token = string(); break;
-            case '[': token = array(); break;
+            case '[': token = array(clazz); break;
             case ']': token = ARRAY_END; break;
             case ',': token = COMMA; break;
-            case '{': token = object(); break;
+            case '{':
+                if (clazz != Object.class) {
+                    token = bean(clazz);
+                } else {
+                    token = object(clazz);
+                }
+                break;
             case '}': token = OBJECT_END; break;
             case ':': token = COLON; break;
             case 't':
@@ -122,16 +137,42 @@ public class JSONReader {
         // System.out.println("token: " + token); // enable this line to see the token stream
         return token;
     }
-    
-    protected Object object() {
-        Map<Object, Object> ret = new LinkedHashMap<Object, Object>();
-        Object key = read();
+
+    protected <T> T bean(Class<T> clazz) {
+        T obj = ObjectInspector.instantiate(clazz);
+
+        String key = (String)read(String.class);
+
+        Field field = ObjectInspector.lookupField(clazz, key);
+
+        Class<?> fieldClazz = field.getType();
+
+        if (fieldClazz == List.class || ZorkaUtil.interfaceOf(fieldClazz, "java.util.List")) {
+            fieldClazz = (Class)((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
+        }
+
         while (token != OBJECT_END) {
-            read(); // should be a colon
+            read(Object.class); // should be a colon
             if (token != OBJECT_END) {
-                ret.put(key, read());
-                if (read() == COMMA) {
-                    key = read();
+                ObjectInspector.setField(obj, key, read(fieldClazz));
+                if (read(Object.class) == COMMA) {
+                    key = (String)read(String.class);
+                }
+            }
+        }
+
+        return obj;
+    }
+
+    protected Object object(Class<?> clazz) {
+        Map<Object, Object> ret = new LinkedHashMap<Object, Object>();
+        Object key = read(clazz);
+        while (token != OBJECT_END) {
+            read(clazz); // should be a colon
+            if (token != OBJECT_END) {
+                ret.put(key, read(clazz));
+                if (read(clazz) == COMMA) {
+                    key = read(clazz);
                 }
             }
         }
@@ -139,13 +180,13 @@ public class JSONReader {
         return ret;
     }
 
-    protected Object array() {
-        List<Object> ret = new ArrayList<Object>();
-        Object value = read();
+    protected Object array(Class<?> clazz) {
+        List ret = new ArrayList();
+        Object value = read(clazz);
         while (token != ARRAY_END) {
             ret.add(value);
-            if (read() == COMMA) {
-                value = read();
+            if (read(clazz) == COMMA) {
+                value = read(clazz);
             }
         }
         return ret;

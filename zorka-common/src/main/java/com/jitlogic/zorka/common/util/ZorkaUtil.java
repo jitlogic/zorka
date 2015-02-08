@@ -78,17 +78,17 @@ public class ZorkaUtil {
             return val;
         } else if (c == String.class) {
             return castString(val);
-        } else if (c == Boolean.class) {
+        } else if (c == Boolean.class || c == Boolean.TYPE) {
             return coerceBool(val);
-        } else if (c == Long.class) {
+        } else if (c == Long.class || c == Long.TYPE) {
             return castLong(val);
-        } else if (c == Integer.class) {
+        } else if (c == Integer.class || c == Integer.TYPE) {
             return castInteger(val);
-        } else if (c == Double.class) {
+        } else if (c == Double.class || c == Double.TYPE) {
             return castDouble(val);
-        } else if (c == Short.class) {
+        } else if (c == Short.class || c == Short.TYPE) {
             return castShort(val);
-        } else if (c == Float.class) {
+        } else if (c == Float.class || c == Float.TYPE) {
             return castFloat(val);
         }
 

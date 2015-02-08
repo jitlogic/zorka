@@ -113,19 +113,6 @@ public final class ZabbixUtils {
 		return res.replace(_HOSTMETADATA_TAG, hostMetadata);
 	}
 
-    private static List<Map<String,Object>> activeCheckResultList(ArrayList<ActiveCheckResult> rslt) {
-        List<Map<String,Object>> lst = new ArrayList<Map<String, Object>>(rslt.size());
-        for (ActiveCheckResult acr : rslt) {
-            lst.add(ZorkaUtil.<String,Object>map(
-                    "host", acr.getHost(),
-                    "key", acr.getKey(),
-                    "value", acr.getValue(),
-                    "lastlogsize", acr.getLastlogsize(),
-                    "clock", acr.getClock()
-            ));
-        }
-        return lst;
-    }
 
 	/**
 	 * Creates an Agent Data String Message
@@ -139,13 +126,7 @@ public final class ZabbixUtils {
 		query.setData(results);
 		query.setClock(clock);
 
-        return new JSONWriter().write(
-                ZorkaUtil.map(
-                        "request", "agent data",
-                        "clock", clock,
-                        "data", activeCheckResultList(results)
-                )
-        );
+        return new JSONWriter(false).write(query);
 	}
 	
 

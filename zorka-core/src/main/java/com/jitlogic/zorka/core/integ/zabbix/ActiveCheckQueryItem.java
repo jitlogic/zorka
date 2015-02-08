@@ -16,10 +16,6 @@
  */
 package com.jitlogic.zorka.core.integ.zabbix;
 
-import com.jitlogic.zorka.common.util.JSONReader;
-
-import java.util.Map;
-
 /**
  * Represents single item from active check query.
  */
@@ -36,9 +32,15 @@ public class ActiveCheckQueryItem {
 	private int delay;
 
 
+    /**
+     * Last position (if applicable).
+     */
 	protected int lastlogsize;
 
 
+    /**
+     * Last item modification time.
+     */
 	private int mtime;
 	
 	public String getKey() {
@@ -118,18 +120,4 @@ public class ActiveCheckQueryItem {
 	}
 
 
-    public static ActiveCheckQueryItem fromJsonStr(String json) {
-        return fromJsonObj(new JSONReader().read(json));
-    }
-
-
-	public static ActiveCheckQueryItem fromJsonObj(Object obj) {
-        Map itm = (Map)obj;
-        ActiveCheckQueryItem qi = new ActiveCheckQueryItem();
-        qi.setKey(itm.get("key").toString());
-        qi.setDelay(((Number)itm.get("delay")).intValue());
-        qi.setLastlogsize(((Number)itm.get("lastlogsize")).intValue());
-        qi.setMtime(((Number)itm.get("mtime")).intValue());
-        return qi;
-    }
 }

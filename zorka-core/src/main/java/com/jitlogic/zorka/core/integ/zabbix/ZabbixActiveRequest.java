@@ -142,16 +142,9 @@ public class ZabbixActiveRequest {
 		ActiveCheckResponse response = null;
 		if (reqs.isEmpty()) {
 			try {
-                Map map = (Map)(new JSONReader().read(getReq()));
-                response = new ActiveCheckResponse();
-                response.setResponse(map.get("response").toString());
-                ArrayList<ActiveCheckQueryItem> items = new ArrayList<ActiveCheckQueryItem>();
-                for (Object obj : ((List)map.get("data"))) {
-                    items.add(ActiveCheckQueryItem.fromJsonObj(obj));
-                }
-                response.setData(items);
+                response = new JSONReader().read(getReq(), ActiveCheckResponse.class);
 			} catch (IOException e) {
-				e.printStackTrace();
+                log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing active response", e);
 			}
 		}
 		
