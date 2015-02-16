@@ -104,7 +104,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 	public ZabbixActiveAgent(ZorkaConfig config, ZorkaBshAgent agent, QueryTranslator translator, ScheduledExecutorService scheduledExecutorService) {
 		this.prefix = "zabbix.active";
 		this.config = config;
-		this.defaultPort = 10055;
+		this.defaultPort = 10051;
 		this.defaultAddr = config.stringCfg("zabbix.server.addr", "127.0.0.1:10051");
 
 		this.scheduler = scheduledExecutorService;
@@ -123,7 +123,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		activeIpPort = config.stringCfg(prefix + ".server.addr", defaultAddr);
 		String [] ipPort = activeIpPort.split(":");  
 		String activeIp = ipPort[0];
-		activePort = (ipPort[1] == null || ipPort[1].length() == 0)? defaultPort : Integer.parseInt(ipPort[1]);
+		activePort = (ipPort.length < 2 || ipPort[1].length() == 0) ? defaultPort : Integer.parseInt(ipPort[1]);
 
 		/* Zabbix Server address */
 		try {
@@ -141,7 +141,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		agentHost = config.stringCfg("zorka.hostname", null);
 
 		log.info(ZorkaLogger.ZAG_INFO, "ZabbixActive Agent (" + agentHost + ") will send Active Checks to " + 
-				activeIpPort + " every " + activeCheckInterval + " seconds");
+				activeAddr + ":" + activePort + " every " + activeCheckInterval + " seconds");
 
 		senderInterval = config.intCfg(prefix + ".sender.interval", 60);
 		maxBatchSize = config.intCfg(prefix + ".batch.size", 10);
