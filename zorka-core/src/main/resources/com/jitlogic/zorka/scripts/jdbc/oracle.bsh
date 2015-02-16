@@ -29,7 +29,7 @@ __oracle() {
       spy.byMethod(0, "oracle.jdbc.driver.OracleCallableStatement", "~execute[^I].*", null, spy.SM_NOARGS)));
 
   if (zorka.boolCfg("tracer")) {
-      tracer.exclude("oracle.jdbc.**");
+      tracer.exclude("oracle.jdbc.**", "oracle.sql.**");
   }
 
   return this;

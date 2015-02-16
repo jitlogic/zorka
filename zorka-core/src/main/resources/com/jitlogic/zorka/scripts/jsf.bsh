@@ -33,6 +33,7 @@ if (zorka.boolCfg("tracer")) {
         "org.apache.myfaces.el.**",
         "org.apache.myfaces.renderkit.**",
         "org.apache.myfaces.shared**",
+        "org.primefaces.util.**",
         "org.richfaces.**"
     );
 }

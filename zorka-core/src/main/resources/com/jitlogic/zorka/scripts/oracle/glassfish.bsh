@@ -66,6 +66,8 @@ __glassfish() {
   }
 
   tracer.exclude(
+    "com.sun.appserv.connectors.internal.**",
+    "com.sun.enterprise.container.**",
     "com.sun.enterprise.deployment.**",
     "com.sun.enterprise.loader.ASURLClassL**",
     "com.sun.enterprise.module.ModuleMetadata",

@@ -19,8 +19,8 @@
   if (zorka.boolCfg("tracer")) {
 
     tracer.exclude(
-        "org.jboss.weld.util.**",
-        "org.jboss.weld.**/hashCode"
+        "org.jboss.classfilewriter.**",
+        "org.jboss.weld.**"
     );
 
   }
