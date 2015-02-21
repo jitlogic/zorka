@@ -143,15 +143,13 @@ public class JSONReader {
 
         String key = (String)read(String.class);
 
-        Field field = ObjectInspector.lookupField(clazz, key);
-
-        Class<?> fieldClazz = field.getType();
-
-        if (fieldClazz == List.class || ZorkaUtil.interfaceOf(fieldClazz, "java.util.List")) {
-            fieldClazz = (Class)((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
-        }
 
         while (token != OBJECT_END) {
+            Field field = ObjectInspector.lookupField(clazz, key);
+            Class<?> fieldClazz = field != null ? field.getType() : Object.class;
+            if (fieldClazz == List.class || ZorkaUtil.interfaceOf(fieldClazz, "java.util.List")) {
+                fieldClazz = (Class)((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
+            }
             read(Object.class); // should be a colon
             if (token != OBJECT_END) {
                 ObjectInspector.setField(obj, key, read(fieldClazz));
