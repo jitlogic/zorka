@@ -134,7 +134,7 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
             return;
         }
 
-        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
             log.debug(ZorkaLogger.ZSP_ARGPROC, "Dispatching collector record: " + record);
         }
 

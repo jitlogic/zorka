@@ -185,7 +185,7 @@ public class SpyClassVisitor extends ClassVisitor {
         boolean doTrace = tracer.getMatcherSet().methodMatch(className, classAnnotations, classInterfaces,
                 access, methodName, methodDesc, null) || (tracer.isTraceSpyMethods() && ctxs.size() > 0);
 
-        if (doTrace && ZorkaLogger.isSpyLevel(ZorkaLogger.ZTR_INSTRUMENT_METHOD)) {
+        if (doTrace && ZorkaLogger.isLogMask(ZorkaLogger.ZTR_INSTRUMENT_METHOD)) {
             log.debug(ZorkaLogger.ZTR_INSTRUMENT_METHOD, "Instrumenting method (for trace): "
                     + className + "." + methodName + " " + methodDesc);
         }

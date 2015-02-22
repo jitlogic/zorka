@@ -90,8 +90,8 @@ public class TraceBuilder {
             return;
         }
 
-        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACER_DBG)) {
-            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS) ||
+        if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACER_DBG)) {
+            if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACE_CALLS) ||
                     (ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
                 log.trace(ZorkaLogger.ZTR_TRACER_DBG, "traceEnter("
                         + symbols.symbolName(classId) + "." + symbols.symbolName(methodId) + ")");
@@ -129,8 +129,8 @@ public class TraceBuilder {
             return;
         }
 
-        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACER_DBG)) {
-            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_CALLS) ||
+        if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACER_DBG)) {
+            if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACE_CALLS) ||
                     (ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
                 TraceRecord tr = ttop;
                 if (tr.getClassId() == 0 && tr.getParent() != null) {
@@ -157,8 +157,8 @@ public class TraceBuilder {
             return;
         }
 
-        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACER_DBG)) {
-            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACE_EXCEPTIONS) ||
+        if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACER_DBG)) {
+            if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACE_EXCEPTIONS) ||
                     (ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
                 TraceRecord tr = ttop;
                 if (tr.getClassId() == 0 && tr.getParent() != null) {

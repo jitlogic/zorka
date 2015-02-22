@@ -306,7 +306,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     @Test
     public void testTraceWithMultipleBeginFlags() throws Exception {
         tracer.setTracerMinTraceTime(0);
-        ZorkaLogger.setGlobalLogLevel(0); // TODO check why ZorkaLog objects are not constructed correctly in this test
+        ZorkaLogger.setLogMask(0); // TODO check why ZorkaLog objects are not constructed correctly in this test
 
         b.traceEnter(c1, m1, s1, 1 * MS);
         b.traceBegin(t1, 2 * MS, TraceMarker.DROP_INTERIM);

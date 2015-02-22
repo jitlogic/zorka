@@ -264,7 +264,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
         List<SpyDefinition> found = new ArrayList<SpyDefinition>();
 
-        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_CLASS_TRC)) {
+        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_CLASS_TRC)) {
             log.debug(ZorkaLogger.ZSP_CLASS_TRC, "Encountered class: %s", className);
         }
 
@@ -291,7 +291,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
             long tt1 = System.nanoTime();
 
-            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_CLASS_TRC)) {
+            if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_CLASS_TRC)) {
                 log.debug(ZorkaLogger.ZSP_CLASS_TRC, "Transforming class: %s (sdefs found: %d; tracer match: %b)",
                         className, found.size(), tracerMatch);
             }

@@ -44,7 +44,7 @@ public class SetFilterProcessor implements SpyProcessor {
     public Map<String, Object> process(Map<String, Object> record) {
         Object val = record.get(srcField);
         boolean pass = candidates.contains(val) ^ invert;
-        if (ZorkaLogger.isSpyLevel(ZorkaLogger.ZSP_ARGPROC)) {
+        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
             log.debug(ZorkaLogger.ZSP_ARGPROC, "pass(" + val + ":" + val.getClass().getName() + ") -> " + pass);
         }
         return pass ? record : null;

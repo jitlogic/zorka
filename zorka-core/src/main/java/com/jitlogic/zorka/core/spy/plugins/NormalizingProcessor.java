@@ -71,7 +71,7 @@ public class NormalizingProcessor implements SpyProcessor {
 
         String s = (v instanceof String) ? normalizer.normalize((String) v) : null;
 
-        if (ZorkaLogger.isAgentLevel(ZorkaLogger.ZSP_ARGPROC)) {
+        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
             log.debug(ZorkaLogger.ZAG_TRACES, "Normalizing: '" + v + "' -> '" + s + "'");
         }
 

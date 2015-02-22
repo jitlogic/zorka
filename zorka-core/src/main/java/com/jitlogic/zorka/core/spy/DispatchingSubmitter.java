@@ -73,7 +73,7 @@ public class DispatchingSubmitter implements SpySubmitter {
     @Override
     public void submit(int stage, int id, int submitFlags, Object[] vals) {
 
-        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_SUBMIT)) {
+        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_SUBMIT)) {
             log.debug(ZorkaLogger.ZSP_SUBMIT, "Submitted: stage=" + stage + ", id=" + id + ", flags=" + submitFlags);
         }
 
@@ -172,7 +172,7 @@ public class DispatchingSubmitter implements SpySubmitter {
         record.put(".STAGES", (Integer) record.get(".STAGES") | (1 << stage));
         record.put(".STAGE", stage);
 
-        if (ZorkaLogger.isAgentLevel(ZorkaLogger.ZSP_ARGPROC)) {
+        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
             log.debug(ZorkaLogger.ZSP_ARGPROC, "Processing records (stage=" + stage + ")");
         }
 

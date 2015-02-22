@@ -69,7 +69,7 @@ public class GetterProcessor implements SpyProcessor {
     public Map<String, Object> process(Map<String, Object> record) {
         Object val = ObjectInspector.get(record.get(srcField), attrChain);
 
-        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
             log.debug(ZorkaLogger.ZSP_ARGPROC, "Final result: '" + val + "' stored to slot " + dstField);
         }
 

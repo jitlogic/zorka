@@ -130,7 +130,7 @@ public class RegexFilterProcessor implements SpyProcessor {
         if (expr == null) {
             boolean matches = val != null && regex.matcher(val.toString()).matches();
 
-            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+            if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
                 log.debug(ZorkaLogger.ZSP_ARGPROC, "Filtering '" + val + "' through '" + regex.pattern() + "': " + matches);
             }
 
@@ -144,22 +144,22 @@ public class RegexFilterProcessor implements SpyProcessor {
                 }
                 String subst = ObjectInspector.substitute(expr, vals);
                 record.put(dst, subst);
-                if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
                     log.debug(ZorkaLogger.ZSP_ARGPROC, "Processed '" + val + "' to '" + subst + "' using pattern '" + regex.pattern() + "'");
                 }
             } else if (defval != null) {
                 record.put(dst, defval);
-                if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
                     log.debug(ZorkaLogger.ZSP_ARGPROC, "No value to be processed. Using default value of '" + defval + "'");
                 }
             } else if (Boolean.TRUE.equals(filterOut)) {
-                if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
                     log.debug(ZorkaLogger.ZSP_ARGPROC, "No value to be processed. Filtering out.");
                 }
                 return null;
             }
         } else {
-            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+            if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
                 log.debug(ZorkaLogger.ZSP_ARGPROC, "No value to be processed. Leaving record unprocessed.");
             }
         }
