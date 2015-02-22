@@ -25,6 +25,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -198,11 +199,11 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 				senderTask.cancel(true);
 				
 				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive cancelling all ZorkaBsh tasks...");
-				for (ActiveCheckQueryItem task : runningTasks.keySet()) {
-					ScheduledFuture<?> future = runningTasks.remove(task);
-					future.cancel(true);					
-				}
-				
+                for (Map.Entry<ActiveCheckQueryItem,ScheduledFuture<?>> e : runningTasks.entrySet()) {
+                    e.getValue().cancel(true);
+                }
+                runningTasks.clear();
+
 				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive clearing dataQueue...");
 				resultsQueue.clear();
 				
