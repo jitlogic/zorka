@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -69,7 +69,7 @@ public class GetterProcessor implements SpyProcessor {
     public Map<String, Object> process(Map<String, Object> record) {
         Object val = ObjectInspector.get(record.get(srcField), attrChain);
 
-        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
             log.debug(ZorkaLogger.ZSP_ARGPROC, "Final result: '" + val + "' stored to slot " + dstField);
         }
 

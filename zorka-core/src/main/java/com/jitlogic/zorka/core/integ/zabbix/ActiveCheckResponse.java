@@ -1,6 +1,6 @@
 /**
  * Copyright 2014 Daniel Makoto Iguchi <daniel.iguchi@gmail.com>
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -14,15 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.common.zabbix;
+package com.jitlogic.zorka.core.integ.zabbix;
 
-import java.util.ArrayList;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
+import java.util.List;
 
 public class ActiveCheckResponse {
 
 	private String response;
-	private ArrayList<ActiveCheckQueryItem> data;
+	private List<ActiveCheckQueryItem> data;
 
 	public String getResponse() {
 		return response;
@@ -32,31 +33,34 @@ public class ActiveCheckResponse {
 		this.response = response;
 	}
 
-	public ArrayList<ActiveCheckQueryItem> getData() {
+	public List<ActiveCheckQueryItem> getData() {
 		return data;
 	}
 
-	public void setData(ArrayList<ActiveCheckQueryItem> data) {
+	public void setData(List<ActiveCheckQueryItem> data) {
 		this.data = data;
 	}
 
+    @Override
+    public int hashCode() {
+        return 31 * (response != null ? response.hashCode() : 1) +
+            17 * (data != null ? data.hashCode() : 1);
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ActiveCheckResponse) {
+            ActiveCheckResponse r = (ActiveCheckResponse)obj;
+            return ZorkaUtil.objEquals(response, r.response) && ZorkaUtil.objEquals(data, r.data);
+        }
+        return false;
+    }
+
 	@Override
 	public String toString(){
-		StringBuilder stringBuilder = new StringBuilder(100);
-		stringBuilder.append("{response=");
-		stringBuilder.append(response);
-		stringBuilder.append(", data=[");
-		
-		int size = data.size();
-		if (size > 0) {
-			stringBuilder.append(data.get(0));
-			for (int i = 1; i < size; i++) {
-				stringBuilder.append(", ");
-				stringBuilder.append(data.get(i));
-			}
-		}
-		stringBuilder.append("]}");
-		
-		return stringBuilder.toString();
+        return "{response=" + response + ", data=" + data + "}";
 	}
+
+
 }

@@ -1,6 +1,6 @@
 /**
  * Copyright 2014 Daniel Makoto Iguchi <daniel.iguchi@gmail.com>
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.common.zabbix;
+package com.jitlogic.zorka.core.integ.zabbix;
 
 /**
  * Represents single item from active check query.
@@ -32,9 +32,15 @@ public class ActiveCheckQueryItem {
 	private int delay;
 
 
+    /**
+     * Last position (if applicable).
+     */
 	protected int lastlogsize;
 
 
+    /**
+     * Last item modification time.
+     */
 	private int mtime;
 	
 	public String getKey() {
@@ -112,6 +118,6 @@ public class ActiveCheckQueryItem {
 		
 		return true;
 	}
-	
-	
+
+
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -627,7 +627,7 @@ public final class ObjectInspector {
             }
 
             if (!accessible) {
-                field.setAccessible(accessible);
+                field.setAccessible(false);
             }
 
             return ret;
@@ -637,12 +637,12 @@ public final class ObjectInspector {
     }
 
 
-    public static void setField(Object obj, String fieldName, Object value) {
+    public static boolean setField(Object obj, String fieldName, Object value) {
         if (obj != null) {
             Field field = lookupField(obj instanceof Class ? (Class) obj : obj.getClass(), fieldName);
 
             if (field == null) {
-                return;
+                return false;
             }
 
             boolean accessible = field.isAccessible();
@@ -651,14 +651,36 @@ public final class ObjectInspector {
                 field.setAccessible(true);
             }
 
+            Class<?> t = field.getType();
+
             try {
-                field.set(obj, value);
+                field.set(obj, t.isInstance(value) ? value : ZorkaUtil.coerce(value, t));
             } catch (IllegalAccessException e) {
+                e.printStackTrace();
             }
 
             if (!accessible) {
                 field.setAccessible(accessible);
             }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public static <T> T instantiate(Class<T> clazz) {
+        try {
+            return clazz.newInstance();
+        } catch (InstantiationException e) {
+            return null;
+        } catch (IllegalAccessException e) {
+            return null;
         }
     }
+
+//    private static <T> List<T> instantiateList(Class<T> clazz) {
+//        Class<? extends T> listClazz = List.class.asSubclass()
+//        //List<T>
+//    }
 }

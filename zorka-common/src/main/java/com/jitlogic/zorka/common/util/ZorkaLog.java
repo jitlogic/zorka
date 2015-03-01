@@ -1,5 +1,5 @@
 /** 
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * 
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -54,7 +54,7 @@ public class ZorkaLog {
      * @param args optional arguments
      */
 	public void trace(long level, String msg, Object...args) {
-        if (ZorkaLogger.isLogLevel(level)) {
+        if (ZorkaLogger.isLogMask(level)) {
 		    output.trap(ZorkaLogLevel.TRACE, tag, msg, null, args);
         }
 	}
@@ -70,7 +70,7 @@ public class ZorkaLog {
      * @param args optional arguments
      */
     public void trace(long level, String msg, Throwable e, Object...args) {
-        if (ZorkaLogger.isLogLevel(level)) {
+        if (ZorkaLogger.isLogMask(level)) {
             output.trap(ZorkaLogLevel.TRACE, tag, msg, e, args);
         }
     }
@@ -83,7 +83,7 @@ public class ZorkaLog {
      * @param args optional arguments
      */
 	public void debug(long level, String msg, Object...args) {
-        if (ZorkaLogger.isLogLevel(level)) {
+        if (ZorkaLogger.isLogMask(level)) {
             output.trap( ZorkaLogLevel.DEBUG, tag, msg, null, args);
         }
 	}
@@ -99,7 +99,7 @@ public class ZorkaLog {
      * @param args optional arguments
      */
     public void debug(long level, String msg, Throwable e, Object...args) {
-        if (ZorkaLogger.isLogLevel(level)) {
+        if (ZorkaLogger.isLogMask(level)) {
             output.trap(ZorkaLogLevel.DEBUG, tag, msg, e, args);
         }
     }
@@ -113,7 +113,7 @@ public class ZorkaLog {
      * @param args optional arguments
      */
 	public void info(long level, String msg, Object...args) {
-        if (ZorkaLogger.isLogLevel(level)) {
+        if (ZorkaLogger.isLogMask(level)) {
             output.trap(ZorkaLogLevel.INFO, tag, msg, null, args);
         }
 	}
@@ -127,7 +127,7 @@ public class ZorkaLog {
      * @param args optional arguments
      */
 	public void warn(long level, String msg, Object...args) {
-        if (ZorkaLogger.isLogLevel(level)) {
+        if (ZorkaLogger.isLogMask(level)) {
             output.trap(ZorkaLogLevel.WARN, tag, msg, null, args);
         }
 	}
@@ -141,7 +141,7 @@ public class ZorkaLog {
      * @param args optional arguments
      */
 	public void error(long level, String msg, Object...args) {
-        if (ZorkaLogger.isLogLevel(level)) {
+        if (ZorkaLogger.isLogMask(level)) {
             output.trap(ZorkaLogLevel.ERROR, tag, msg, null, args);
         }
 	}
@@ -157,7 +157,7 @@ public class ZorkaLog {
      * @param args optional arguments
      */
     public void error(long level, String msg, Throwable e, Object...args) {
-        if (ZorkaLogger.isLogLevel(level)) {
+        if (ZorkaLogger.isLogMask(level)) {
             output.trap(ZorkaLogLevel.ERROR, tag, msg, e, args);
         }
 	}

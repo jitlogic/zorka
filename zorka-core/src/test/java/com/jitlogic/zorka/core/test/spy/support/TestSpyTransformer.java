@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -33,7 +33,7 @@ public class TestSpyTransformer extends SpyClassTransformer {
     private SymbolRegistry sreg;
 
     public TestSpyTransformer(SymbolRegistry symbolRegistry, Tracer tracer, SpyRetransformer spyRetransformer) {
-        super(symbolRegistry, tracer, new MethodCallStatistics(), spyRetransformer);
+        super(symbolRegistry, tracer, true, new MethodCallStatistics(), spyRetransformer);
         sreg = symbolRegistry;
     }
 

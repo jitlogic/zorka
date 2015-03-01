@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -204,7 +204,7 @@ public class ZorkaStatsCollector implements SpyProcessor {
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
 
-        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
             log.debug(ZorkaLogger.ZSP_ARGPROC, "Collecting record: " + record);
         }
 
@@ -382,7 +382,7 @@ public class ZorkaStatsCollector implements SpyProcessor {
             if (v instanceof Number) {
                 throughput = (Number) v;
             } else {
-                if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
                     log.debug(ZorkaLogger.ZSP_ARGPROC, "Invalid value of throughput field: " + throughput);
                 }
             }
@@ -390,7 +390,7 @@ public class ZorkaStatsCollector implements SpyProcessor {
 
         if (executionTime instanceof Long) {
             if (0 != ((Integer) record.get(".STAGES") & (1 << ON_RETURN))) {
-                if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
                     log.debug(ZorkaLogger.ZSP_ARGPROC, "Updating stats using logCall()");
                 }
                 if (throughput != null) {
@@ -399,7 +399,7 @@ public class ZorkaStatsCollector implements SpyProcessor {
                     statistic.logCall((Long) executionTime);
                 }
             } else if (0 != ((Integer) record.get(".STAGES") & (1 << ON_ERROR))) {
-                if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
                     log.debug(ZorkaLogger.ZSP_ARGPROC, "Updating stats using logError()");
                 }
                 if (throughput != null) {
@@ -408,12 +408,12 @@ public class ZorkaStatsCollector implements SpyProcessor {
                     statistic.logError((Long) executionTime);
                 }
             } else {
-                if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
                     log.debug(ZorkaLogger.ZSP_ARGPROC, "No ON_RETURN nor ON_ERROR marked on record " + record);
                 }
             }
         } else {
-            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+            if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
                 log.debug(ZorkaLogger.ZSP_ARGPROC, "Unknown type of timeField: " + executionTime);
             }
         }

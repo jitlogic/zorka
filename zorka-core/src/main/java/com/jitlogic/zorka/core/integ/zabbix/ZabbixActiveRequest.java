@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -15,19 +15,19 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.integ;
+package com.jitlogic.zorka.core.integ.zabbix;
 
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.google.gson.GsonBuilder;
-import com.jitlogic.zorka.common.zabbix.ActiveCheckResponse;
+import com.jitlogic.zorka.common.util.JSONReader;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
-import com.jitlogic.zorka.common.util.ZabbixUtils;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 
@@ -141,12 +141,10 @@ public class ZabbixActiveRequest {
 	public ActiveCheckResponse getActiveResponse() {
 		ActiveCheckResponse response = null;
 		if (reqs.isEmpty()) {
-			String jsonMsg;
 			try {
-				jsonMsg = getReq();
-				response = (new GsonBuilder().disableHtmlEscaping().create()).fromJson(jsonMsg.trim(), ActiveCheckResponse.class);
+                response = new JSONReader().read(getReq(), ActiveCheckResponse.class);
 			} catch (IOException e) {
-				e.printStackTrace();
+                log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing active response", e);
 			}
 		}
 		

@@ -1,0 +1,64 @@
+/**
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+
+// This is sample script intended to help understanding how to implement agent extensions.
+
+// In order to enable this script, add it to list of loaded scripts in zorka.properties:
+// scripts = jvm.bsh, zabbix.bsh, sample.bsh
+
+// Functions defined in this script can be called using zabbix_get tool, for example:
+// zabbix_get -s 127.0.0.1 -p 10055 -k 'sample.util[]'
+// zabbix_get -s 127.0.0.1 -p 10055 -k 'sample.sample_util["PS Eden Space"]'
+
+
+// Call zorka.require(...) to load additional scripts that this one depends on.
+zorka.require("jvm.bsh");
+
+
+// BeanShall has no notion of namespaces, so we simulate namespace using function
+// that returns reference to its own instance and then defining variable that
+// holds instance of this function.
+
+__sample() {
+
+    // This defines sample parameter that can be defined in zorka.properties
+    zorka.defCfg("sample.pool", "PS Old Gen");
+
+    // Sample function that calls another function defined in jvm.bsh
+    util() {
+        return jvm.memutil(zorka.stringCfg("sample.pool"));
+    }
+
+    // Another sample - function with arguments and some (not very useful) logic
+    sample_util(name) {
+        mem_used = zorka.jmx("java", "java.lang:name="+name+",type=MemoryPool", "Usage", "used");
+        mem_max = zorka.jmx("java", "java.lang:name="+name+",type=MemoryPool", "PeakUsage", "max");
+        if (mem_used != null && mem_max != null && mem_max != 0) {
+            return 100.0 * mem_used / mem_max;
+        } else {
+            return -1.0;
+        }
+    }
+
+    return this;
+}
+
+// Instantiate namespace here
+sample = __sample();
+

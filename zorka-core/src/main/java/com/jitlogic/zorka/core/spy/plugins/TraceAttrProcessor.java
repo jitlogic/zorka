@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -123,7 +123,7 @@ public class TraceAttrProcessor implements SpyProcessor {
                 : ObjectInspector.substitute(srcVal, record);
 
         if (val != null) {
-            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+            if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
                 TraceRecord top = tracer.getHandler().realTop();
                 log.debug(ZorkaLogger.ZSP_ARGPROC, "Value: '" + val + "' stored as trace attribute "
                         + symbolRegistry.symbolName(attrId) + " (classId= " + top.getClassId() + " methodId=" + top.getMethodId()
@@ -131,7 +131,7 @@ public class TraceAttrProcessor implements SpyProcessor {
             }
             tracer.getHandler().newAttr(traceId, attrId, attrTagId != null ? new TaggedValue(attrTagId, val) : val);
         } else {
-            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_ARGPROC)) {
+            if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
                 log.debug(ZorkaLogger.ZSP_ARGPROC, "Null value received. ");
             }
         }

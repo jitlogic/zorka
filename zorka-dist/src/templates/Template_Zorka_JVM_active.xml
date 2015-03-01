@@ -1274,7 +1274,7 @@
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
-                            <expression>{Template_Zorka_JVM:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].last(0)}&gt;25</expression>
+                            <expression>{Template_Zorka_JVM_active:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].last(0)}&gt;25</expression>
                             <name>{HOSTNAME} {#NAME} GC overload</name>
                             <url/>
                             <status>0</status>
@@ -1283,7 +1283,7 @@
                             <type>7</type>
                         </trigger_prototype>
                         <trigger_prototype>
-                            <expression>({Template_Zorka_JVM:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].last(0)}&gt;50)&amp;({$PROD}=1)</expression>
+                            <expression>({Template_Zorka_JVM_active:zorka.jmx[&quot;java&quot;,&quot;java.lang:name={#NAME},type=GarbageCollector&quot;,&quot;CollectionTime&quot;].last(0)}&gt;50)&amp;({$PROD}=1)</expression>
                             <name>{HOSTNAME} {#NAME} severe GC overload</name>
                             <url/>
                             <status>0</status>
@@ -1544,7 +1544,7 @@
     </templates>
     <triggers>
         <trigger>
-            <expression>(({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_H})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M}))&amp;({$PROD}=1)</expression>
+            <expression>(({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM_active:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_H})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM_active:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M}))&amp;({$PROD}=1)</expression>
             <name>{HOSTNAME} memory usage too high</name>
             <url/>
             <status>0</status>
@@ -1554,7 +1554,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_L})</expression>
+            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM_active:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM_active:jvm.heaputil[&quot;HeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_L})</expression>
             <name>{HOSTNAME} memory usage too high</name>
             <url/>
             <status>0</status>
@@ -1564,7 +1564,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>{Template_Zorka_JVM:jvm.fdutil[].last(0)}&gt;80</expression>
+            <expression>{Template_Zorka_JVM_active:jvm.fdutil[].last(0)}&gt;80</expression>
             <name>{HOSTNAME} more than 80% file descriptors used</name>
             <url/>
             <status>0</status>
@@ -1574,7 +1574,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>(({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM:jvm.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_H})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM:jvm.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M}))&amp;({$PROD}=1)</expression>
+            <expression>(({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM_active:jvm.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_H})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM_active:jvm.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M}))&amp;({$PROD}=1)</expression>
             <name>{HOSTNAME} NonHeap memory usage to high</name>
             <url/>
             <status>0</status>
@@ -1584,7 +1584,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM:jvm.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM:jvm.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_L})</expression>
+            <expression>({TRIGGER.VALUE}=0&amp;{Template_Zorka_JVM_active:jvm.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_M})|({TRIGGER.VALUE}=1&amp;{Template_Zorka_JVM_active:jvm.heaputil[&quot;NonHeapMemoryUsage&quot;].avg(3)}&gt;{$MEM_L})</expression>
             <name>{HOSTNAME} NonHeap memory usage to high</name>
             <url/>
             <status>0</status>
@@ -1594,7 +1594,7 @@
             <dependencies/>
         </trigger>
         <trigger>
-            <expression>({Template_Zorka_JVM:jvm.memutil[&quot;Perm Gen&quot;].last(0)}&gt;90.0)&amp;({$PROD}=1)</expression>
+            <expression>({Template_Zorka_JVM_active:jvm.memutil[&quot;Perm Gen&quot;].last(0)}&gt;90.0)&amp;({$PROD}=1)</expression>
             <name>{HOSTNAME} PermGen utilization is &gt; 90%</name>
             <url/>
             <status>0</status>

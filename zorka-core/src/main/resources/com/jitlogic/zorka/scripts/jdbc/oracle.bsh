@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -29,7 +29,7 @@ __oracle() {
       spy.byMethod(0, "oracle.jdbc.driver.OracleCallableStatement", "~execute[^I].*", null, spy.SM_NOARGS)));
 
   if (zorka.boolCfg("tracer")) {
-      tracer.exclude("oracle.jdbc.**");
+      tracer.exclude("oracle.jdbc.**", "oracle.sql.**");
   }
 
   return this;

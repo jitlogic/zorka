@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,10 @@ import com.jitlogic.zorka.common.stats.ValGetter;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import com.jitlogic.zorka.core.integ.zabbix.ZabbixActiveAgent;
+import com.jitlogic.zorka.core.integ.zabbix.ZabbixAgent;
+import com.jitlogic.zorka.core.integ.zabbix.ZabbixLib;
+import com.jitlogic.zorka.core.integ.zabbix.ZabbixQueryTranslator;
 import com.jitlogic.zorka.core.mbeans.AttrGetter;
 import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
 import com.jitlogic.zorka.core.perfmon.PerfMonLib;
@@ -345,7 +349,8 @@ public class AgentInstance implements ZorkaService {
 
     public synchronized SpyClassTransformer getClassTransformer() {
         if (classTransformer == null) {
-            classTransformer = new SpyClassTransformer(getSymbolRegistry(), getTracer(), stats, getRetransformer());
+            classTransformer = new SpyClassTransformer(getSymbolRegistry(), getTracer(),
+                getConfig().boolCfg("zorka.spy.compute.frames", true), stats, getRetransformer());
         }
         return classTransformer;
     }

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>zorka</artifactId>
         <groupId>com.jitlogic.zorka</groupId>
-        <version>1.0.11</version>
+        <version>1.0.12</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -39,6 +39,9 @@
                                       toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
                                 <copy file="../CHANGES.md"
                                       toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
+                                <mkdir dir="${project.build.outputDirectory}zorka-${project.version}/scripts"/>
+                                <copy file="src/sample.bsh"
+                                      toDir="${project.build.outputDirectory}/zorka-${project.version}/scripts"/>
                                 <mkdir dir="${project.build.outputDirectory}/zorka-${project.version}/templates"/>
                                 <copy toDir="${project.build.outputDirectory}/zorka-${project.version}/templates">
                                     <fileset dir="${project.basedir}/src/templates" defaultexcludes="false">

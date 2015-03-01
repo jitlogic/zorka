@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -185,7 +185,7 @@ public class SpyClassVisitor extends ClassVisitor {
         boolean doTrace = tracer.getMatcherSet().methodMatch(className, classAnnotations, classInterfaces,
                 access, methodName, methodDesc, null) || (tracer.isTraceSpyMethods() && ctxs.size() > 0);
 
-        if (doTrace && ZorkaLogger.isSpyLevel(ZorkaLogger.ZTR_INSTRUMENT_METHOD)) {
+        if (doTrace && ZorkaLogger.isLogMask(ZorkaLogger.ZTR_INSTRUMENT_METHOD)) {
             log.debug(ZorkaLogger.ZTR_INSTRUMENT_METHOD, "Instrumenting method (for trace): "
                     + className + "." + methodName + " " + methodDesc);
         }

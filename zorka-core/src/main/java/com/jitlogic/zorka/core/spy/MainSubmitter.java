@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -100,7 +100,7 @@ public class MainSubmitter {
                 log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceEnter", e);
                 AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
             }
-        } else if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACER_DBG)) {
+        } else if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACER_DBG)) {
             log.warn(ZorkaLogger.ZTR_TRACE_CALLS, "Submitter is null !");
         }
 
@@ -119,7 +119,7 @@ public class MainSubmitter {
                 log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceReturn", e);
                 AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
             }
-        } else if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACER_DBG)) {
+        } else if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACER_DBG)) {
             log.warn(ZorkaLogger.ZTR_TRACE_CALLS, "Submitter is null !");
         }
 
@@ -140,7 +140,7 @@ public class MainSubmitter {
                 log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceError", e);
                 AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
             }
-        } else if (ZorkaLogger.isLogLevel(ZorkaLogger.ZTR_TRACER_DBG)) {
+        } else if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACER_DBG)) {
             log.warn(ZorkaLogger.ZTR_TRACE_CALLS, "Submitter is null !");
         }
     }

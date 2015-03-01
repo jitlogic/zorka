@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -105,39 +105,16 @@ public class ZorkaLogger implements ZorkaTrapper {
     /**
      * Default perfmon log verbosity
      */
-    private static long logLevel = ZTR_INFO | ZPM_INFO | ZSP_INFO | ZAG_INFO | ZCL_INFO;
+    private static long logMask = ZTR_INFO | ZPM_INFO | ZSP_INFO | ZAG_INFO | ZCL_INFO;
 
     /**
-     * Returns true if tracer is configured to log at given level
+     * Returns true if tracer is configured to log at given mask
      *
-     * @param level log level (bitmask)
+     * @param mask log mask (bitmask)
      * @return true or false
      */
-    public static boolean isLogLevel(long level) {
-        return 0 != (logLevel & level);
-    }
-
-
-    public static boolean isTracerLevel(long level) {
-        return 0 != (logLevel & level);
-    }
-
-    /**
-     * @param level
-     * @return
-     */
-    public static boolean isPerfMonLevel(long level) {
-        return 0 != (logLevel & level);
-    }
-
-
-    public static boolean isSpyLevel(long level) {
-        return 0 != (logLevel & level);
-    }
-
-
-    public static boolean isAgentLevel(long level) {
-        return 0 != (logLevel & level);
+    public static boolean isLogMask(long mask) {
+        return 0 != (logMask & mask);
     }
 
 
@@ -146,8 +123,8 @@ public class ZorkaLogger implements ZorkaTrapper {
      *
      * @param level tracer log level mask.
      */
-    public static void setGlobalLogLevel(long level) {
-        logLevel = level;
+    public static void setLogMask(long level) {
+        logMask = level;
     }
 
     /**
@@ -155,6 +132,9 @@ public class ZorkaLogger implements ZorkaTrapper {
      * log verbosity parameters from zorka.properties file.
      */
     private static Map<String, Long> flags = new HashMap<String, Long>();
+
+
+    private static ZorkaLogLevel logLevel = ZorkaLogLevel.INFO;
 
 
     /**
@@ -192,11 +172,12 @@ public class ZorkaLogger implements ZorkaTrapper {
      * @param properties configuration properties (read from zorka.properties file).
      */
     public static void configure(Properties properties) {
-        logLevel = parse("zorka.log.tracer", "ZTR", properties.getProperty("zorka.log.tracer", "INFO"))
+        logMask = parse("zorka.log.tracer", "ZTR", properties.getProperty("zorka.log.tracer", "INFO"))
                 | parse("zorka.log.perfmon", "ZPM", properties.getProperty("zorka.log.perfmon", "INFO"))
                 | parse("zorka.log.spy", "ZSP", properties.getProperty("zorka.log.spy", "INFO"))
                 | parse("zorka.log.agent", "ZAG", properties.getProperty("zorka.log.agent", "INFO"))
                 | parse("zorka.log.collect", "ZCL", properties.getProperty("zorka.log.collect", "INFO"));
+        logLevel = ZorkaLogLevel.valueOf(properties.getProperty("zorka.log.level", "INFO").trim().toUpperCase());
     }
 
 
@@ -302,15 +283,17 @@ public class ZorkaLogger implements ZorkaTrapper {
     /**
      * Logs a message. Log message is sent to all registered trappers.
      *
-     * @param logLevel log level
+     * @param level    log level
      * @param tag      log message tag (eg. component name)
      * @param message  message text (optionally format string)
      * @param e        exception thrown (if any)
      * @param args     optional argument used when message text is a format string
      */
-    public synchronized void trap(ZorkaLogLevel logLevel, String tag, String message, Throwable e, Object... args) {
-        for (ZorkaTrapper trapper : trappers) {
-            trapper.trap(logLevel, tag, message, e, args);
+    public synchronized void trap(ZorkaLogLevel level, String tag, String message, Throwable e, Object... args) {
+        if (level.getPriority() >= logLevel.getPriority()) {
+            for (ZorkaTrapper trapper : trappers) {
+                trapper.trap(logLevel, tag, message, e, args);
+            }
         }
     }
 

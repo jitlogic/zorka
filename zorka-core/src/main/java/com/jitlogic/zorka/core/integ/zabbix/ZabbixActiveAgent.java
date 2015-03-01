@@ -1,6 +1,6 @@
 /**
  * Copyright 2014 Daniel Makoto Iguchi <daniel.iguchi@gmail.com>
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * 
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -16,7 +16,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.integ;
+package com.jitlogic.zorka.core.integ.zabbix;
 
 
 import java.io.IOException;
@@ -25,17 +25,15 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.jitlogic.zorka.common.ZorkaService;
-import com.jitlogic.zorka.common.zabbix.ActiveCheckQueryItem;
-import com.jitlogic.zorka.common.zabbix.ActiveCheckResponse;
-import com.jitlogic.zorka.common.zabbix.ActiveCheckResult;
+import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
-import com.jitlogic.zorka.common.util.ZabbixUtils;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
@@ -107,7 +105,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 	public ZabbixActiveAgent(ZorkaConfig config, ZorkaBshAgent agent, QueryTranslator translator, ScheduledExecutorService scheduledExecutorService) {
 		this.prefix = "zabbix.active";
 		this.config = config;
-		this.defaultPort = 10055;
+		this.defaultPort = 10051;
 		this.defaultAddr = config.stringCfg("zabbix.server.addr", "127.0.0.1:10051");
 
 		this.scheduler = scheduledExecutorService;
@@ -126,7 +124,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		activeIpPort = config.stringCfg(prefix + ".server.addr", defaultAddr);
 		String [] ipPort = activeIpPort.split(":");  
 		String activeIp = ipPort[0];
-		activePort = (ipPort[1] == null || ipPort[1].length() == 0)? defaultPort : Integer.parseInt(ipPort[1]);
+		activePort = (ipPort.length < 2 || ipPort[1].length() == 0) ? defaultPort : Integer.parseInt(ipPort[1]);
 
 		/* Zabbix Server address */
 		try {
@@ -144,7 +142,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		agentHost = config.stringCfg("zorka.hostname", null);
 
 		log.info(ZorkaLogger.ZAG_INFO, "ZabbixActive Agent (" + agentHost + ") will send Active Checks to " + 
-				activeIpPort + " every " + activeCheckInterval + " seconds");
+				activeAddr + ":" + activePort + " every " + activeCheckInterval + " seconds");
 
 		senderInterval = config.intCfg(prefix + ".sender.interval", 60);
 		maxBatchSize = config.intCfg(prefix + ".batch.size", 10);
@@ -201,11 +199,11 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 				senderTask.cancel(true);
 				
 				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive cancelling all ZorkaBsh tasks...");
-				for (ActiveCheckQueryItem task : runningTasks.keySet()) {
-					ScheduledFuture<?> future = runningTasks.remove(task);
-					future.cancel(true);					
-				}
-				
+                for (Map.Entry<ActiveCheckQueryItem,ScheduledFuture<?>> e : runningTasks.entrySet()) {
+                    e.getValue().cancel(true);
+                }
+                runningTasks.clear();
+
 				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive clearing dataQueue...");
 				resultsQueue.clear();
 				

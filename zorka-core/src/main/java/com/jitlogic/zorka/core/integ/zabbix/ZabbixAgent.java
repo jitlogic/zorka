@@ -1,5 +1,5 @@
 /** 
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * 
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -15,13 +15,16 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.integ;
+package com.jitlogic.zorka.core.integ.zabbix;
 
 
 import java.net.Socket;
 
 import com.jitlogic.zorka.core.ZorkaBshAgent;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
+import com.jitlogic.zorka.core.integ.AbstractTcpAgent;
+import com.jitlogic.zorka.core.integ.QueryTranslator;
+import com.jitlogic.zorka.core.integ.ZorkaRequestHandler;
 
 /**
  * Zabbix agent integrates Zorka with Zabbix server. It handles incoming zabbix

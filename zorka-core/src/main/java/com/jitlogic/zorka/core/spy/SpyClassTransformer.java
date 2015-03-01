@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -78,6 +78,8 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
     private SpyRetransformer retransformer;
 
+    private boolean computeFrames;
+
     /**
      * Reference to tracer instance.
      */
@@ -91,16 +93,21 @@ public class SpyClassTransformer implements ClassFileTransformer {
      *
      * @param tracer reference to tracer engine object
      */
-    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer,
+    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer, boolean computeFrames,
                                MethodCallStatistics statistics, SpyRetransformer retransformer) {
         this.symbolRegistry = symbolRegistry;
         this.tracer = tracer;
+        this.computeFrames = computeFrames;
         this.retransformer = retransformer;
 
         this.spyLookups = statistics.getMethodCallStatistic("SpyLookups");
         this.tracerLookups = statistics.getMethodCallStatistic("TracerLookups");
         this.classesProcessed = statistics.getMethodCallStatistic("ClassesProcessed");
         this.classesTransformed = statistics.getMethodCallStatistic("ClassesTransformed");
+
+        if (!computeFrames) {
+            log.info(ZorkaLogger.ZAG_CONFIG, "Disabling COMPUTE_FRAMES. Remeber to add -XX:-UseSplitVerifier JVM option in JDK7 or -noverify in JDK8.");
+        }
     }
 
 
@@ -257,7 +264,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
         List<SpyDefinition> found = new ArrayList<SpyDefinition>();
 
-        if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_CLASS_TRC)) {
+        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_CLASS_TRC)) {
             log.debug(ZorkaLogger.ZSP_CLASS_TRC, "Encountered class: %s", className);
         }
 
@@ -284,13 +291,15 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
             long tt1 = System.nanoTime();
 
-            if (ZorkaLogger.isLogLevel(ZorkaLogger.ZSP_CLASS_TRC)) {
+            if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_CLASS_TRC)) {
                 log.debug(ZorkaLogger.ZSP_CLASS_TRC, "Transforming class: %s (sdefs found: %d; tracer match: %b)",
                         className, found.size(), tracerMatch);
             }
 
+            boolean doComputeFrames = computeFrames && (cbf[7] > (byte) 0x32);
+
             ClassReader cr = new ClassReader(cbf);
-            ClassWriter cw = new ClassWriter(cr, cbf[7] > (byte)0x32 ? ClassWriter.COMPUTE_FRAMES : 0);
+            ClassWriter cw = new ClassWriter(cr, doComputeFrames ? ClassWriter.COMPUTE_FRAMES : 0);
             ClassVisitor scv = createVisitor(classLoader, clazzName, found, tracer, cw);
             cr.accept(scv, 0);
             buf = cw.toByteArray();

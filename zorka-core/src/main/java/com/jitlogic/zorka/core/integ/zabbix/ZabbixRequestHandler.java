@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.integ;
+package com.jitlogic.zorka.core.integ.zabbix;
 
 
 import java.io.IOException;
@@ -26,6 +26,8 @@ import java.net.Socket;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.core.integ.QueryTranslator;
+import com.jitlogic.zorka.core.integ.ZorkaRequestHandler;
 
 /**
  * Zabbix request handler is used by ZabbixAgent thread to parse queries from zabbix server and format responses.
