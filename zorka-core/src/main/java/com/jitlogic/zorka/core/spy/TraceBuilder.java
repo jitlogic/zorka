@@ -196,6 +196,28 @@ public class TraceBuilder {
 
 
     /**
+     * Returns given trace attribute.
+     *
+     * @param traceId positive number (trace id) if attribute has to be fetched from a top record of specific
+     *                trace, 0 if attribute has to be fetched from a top record of any trace, -1 if attribute
+     *                has to be fetched from current method;
+     * @param attrId  attribute ID
+     * @return  attribute value
+     */
+    public Object getAttr(int traceId, int attrId) {
+        TraceRecord tr = realTop();
+        while (tr != null) {
+            if (traceId == -1 || (tr.hasFlag(TraceRecord.TRACE_BEGIN) &&
+                (traceId == 0 || tr.getMarker().getTraceId() == traceId))) {
+                return tr.getAttr(attrId);
+            }
+            tr = tr.getParent();
+        }
+        return null;
+    }
+
+
+    /**
      * Attaches attribute to current trace record (or any other record up the call stack).
      *
      * @param traceId positive number (trace id) if attribute has to be attached to a top record of specific
@@ -209,7 +231,7 @@ public class TraceBuilder {
 
         while (tr != null) {
             if (traceId == -1 || (tr.hasFlag(TraceRecord.TRACE_BEGIN) &&
-                    (traceId == 0 || tr.getMarker().getTraceId() == traceId))) {
+                (traceId == 0 || tr.getMarker().getTraceId() == traceId))) {
                 tr.setAttr(attrId, attrVal);
                 break;
             }
