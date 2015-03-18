@@ -41,7 +41,7 @@ public class FressianTraceWriter implements MetadataChecker, TraceWriter {
 
     BitVector symbolsSent = new BitVector(), metricsSent = new BitVector(16), templatesSent = new BitVector(16);
 
-    private TraceOutput output;
+    private TraceStreamOutput output;
 
     private OutputStream os;
 
@@ -62,7 +62,7 @@ public class FressianTraceWriter implements MetadataChecker, TraceWriter {
 
 
     @Override
-    public void setOutput(TraceOutput output) {
+    public void setOutput(TraceStreamOutput output) {
         this.output = output;
     }
 

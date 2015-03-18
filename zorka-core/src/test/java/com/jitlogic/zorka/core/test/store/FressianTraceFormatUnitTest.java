@@ -40,8 +40,8 @@ public class FressianTraceFormatUnitTest {
     private MetricsRegistry metrics = new MetricsRegistry();
     private FressianTraceWriter writer;
 
-    private TraceOutput mkf(final OutputStream output) {
-        return new TraceOutput() {
+    private TraceStreamOutput mkf(final OutputStream output) {
+        return new TraceStreamOutput() {
             @Override
             public OutputStream getOutputStream() {
                 return output;

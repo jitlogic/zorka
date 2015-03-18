@@ -20,14 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
-import com.jitlogic.zorka.common.tracedata.FileTraceOutput;
-import com.jitlogic.zorka.common.tracedata.FressianTraceWriter;
-import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
-import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
-import com.jitlogic.zorka.common.tracedata.TaggedValue;
-import com.jitlogic.zorka.common.tracedata.TraceMarker;
-import com.jitlogic.zorka.common.tracedata.TraceWriter;
+import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaLog;
@@ -82,13 +75,13 @@ public class TracerLib {
      *
      * @param output trace processing object
      */
-    public void output(ZorkaAsyncThread<SymbolicRecord> output) {
+    public void output(TracerOutput output) {
         tracer.addOutput(output);
     }
 
 
     public void clearOutputs() {
-        tracer.clearOutputs();
+        tracer.shutdown();
     }
 
 

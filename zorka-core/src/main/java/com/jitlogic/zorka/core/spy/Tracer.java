@@ -18,12 +18,12 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
+import com.jitlogic.zorka.common.tracedata.TracerOutput;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -44,8 +44,8 @@ public class Tracer implements TracerOutput {
     private static int maxTraceRecords = 4096;
 
 
-    private AtomicReference<List<ZorkaAsyncThread<SymbolicRecord>>> outputs
-            = new AtomicReference<List<ZorkaAsyncThread<SymbolicRecord>>>(new ArrayList<ZorkaAsyncThread<SymbolicRecord>>());
+    private AtomicReference<List<TracerOutput>> outputs
+            = new AtomicReference<List<TracerOutput>>(new ArrayList<TracerOutput>());
 
     /**
      * Defines which classes and methods should be traced.
@@ -138,9 +138,23 @@ public class Tracer implements TracerOutput {
 
 
     @Override
-    public void submit(SymbolicRecord record) {
-        for (ZorkaAsyncThread<SymbolicRecord> output : outputs.get()) {
-            output.submit(record);
+    public void submitTrace(SymbolicRecord record) {
+        for (TracerOutput output : outputs.get()) {
+            output.submitTrace(record);
+        }
+    }
+
+    @Override
+    public synchronized void shutdown() {
+        List<TracerOutput> old = outputs.get();
+        outputs.set(new ArrayList<TracerOutput>());
+
+        for (TracerOutput output : old) {
+            output.shutdown();
+        }
+
+        if (old.size() > 0) {
+            ZorkaUtil.sleep(100);
         }
     }
 
@@ -152,25 +166,11 @@ public class Tracer implements TracerOutput {
      *
      * @param output trace event handler
      */
-    public synchronized void addOutput(ZorkaAsyncThread<SymbolicRecord> output) {
-        List<ZorkaAsyncThread<SymbolicRecord>> newOutputs = new ArrayList<ZorkaAsyncThread<SymbolicRecord>>();
+    public synchronized void addOutput(TracerOutput output) {
+        List<TracerOutput> newOutputs = new ArrayList<TracerOutput>();
         newOutputs.addAll(outputs.get());
         newOutputs.add(output);
         outputs.set(newOutputs);
-    }
-
-
-    public synchronized void clearOutputs() {
-        List<ZorkaAsyncThread<SymbolicRecord>> old = outputs.get();
-        outputs.set(new ArrayList<ZorkaAsyncThread<SymbolicRecord>>());
-
-        for (ZorkaAsyncThread<SymbolicRecord> output : old) {
-            output.shutdown();
-        }
-
-        if (old.size() > 0) {
-            ZorkaUtil.sleep(100);
-        }
     }
 
 

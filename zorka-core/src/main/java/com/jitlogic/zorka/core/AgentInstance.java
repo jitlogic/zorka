@@ -538,7 +538,7 @@ public class AgentInstance implements ZorkaService {
         log.info(ZorkaLogger.ZAG_CONFIG, "Shutting down agent ...");
 
         tracer.clearMatchers();
-        tracer.clearOutputs();
+        tracer.shutdown();
 
         if (zorkaLib != null) {
             zorkaLib.shutdown();

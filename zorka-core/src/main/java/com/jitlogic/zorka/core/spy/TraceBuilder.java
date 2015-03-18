@@ -21,6 +21,7 @@ import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.common.tracedata.TracerOutput;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 
@@ -353,7 +354,7 @@ public class TraceBuilder {
         if (record.getException() != null || record.hasFlag(TraceRecord.EXCEPTION_PASS)) {
             record.getMarker().markFlags(TraceMarker.ERROR_MARK);
         }
-        output.submit(record);
+        output.submitTrace(record);
     }
 
 

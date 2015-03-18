@@ -13,17 +13,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.jitlogic.zorka.common.tracedata;
 
-import java.io.OutputStream;
+public interface TracerOutput {
 
-/**
- * Objects implementing this interface can server output stream for
- * trace writer objects.
- */
-public interface TraceOutput {
+    public void submitTrace(SymbolicRecord record);
 
-    /** Returns output stream for trace writer. */
-    public OutputStream getOutputStream();
+    public void shutdown();
 
 }

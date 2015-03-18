@@ -18,8 +18,9 @@ package com.jitlogic.zorka.common.zico;
 
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
-import com.jitlogic.zorka.common.tracedata.TraceOutput;
+import com.jitlogic.zorka.common.tracedata.TraceStreamOutput;
 import com.jitlogic.zorka.common.tracedata.TraceWriter;
+import com.jitlogic.zorka.common.tracedata.TracerOutput;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
@@ -38,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements TraceOutput {
+public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements TracerOutput, TraceStreamOutput {
 
     private static ZorkaLog log = ZorkaLogger.getLog(ZicoTraceOutput.class);
 
@@ -235,4 +236,8 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
         }
     }
 
+    @Override
+    public void submitTrace(SymbolicRecord record) {
+        submit(record);
+    }
 }

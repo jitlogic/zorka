@@ -20,7 +20,7 @@ import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.core.spy.TracerOutput;
+import com.jitlogic.zorka.common.tracedata.TracerOutput;
 
 import java.util.List;
 
@@ -105,7 +105,7 @@ public class TraceOutputJmxScanner extends JmxScanner implements Runnable {
         AgentDiagnostics.inc(AgentDiagnostics.PMON_SAMPLES_SENT, samples.size());
 
         if (samples.size() > 0) {
-            output.submit(new PerfRecord(clock, id, samples));
+            output.submitTrace(new PerfRecord(clock, id, samples));
         }
     }
 

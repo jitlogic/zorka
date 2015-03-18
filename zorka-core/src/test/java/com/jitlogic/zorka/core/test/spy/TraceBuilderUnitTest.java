@@ -40,8 +40,12 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     private TraceBuilder b = new TraceBuilder(
             new TracerOutput() {
                 @Override
-                public void submit(SymbolicRecord obj) {
+                public void submitTrace(SymbolicRecord obj) {
                     records.add((TraceRecord) obj);
+                }
+
+                @Override
+                public void shutdown() {
                 }
             }, symbols);
 

@@ -24,7 +24,7 @@ import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.perfmon.TraceOutputJmxScanner;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
-import com.jitlogic.zorka.core.spy.TracerOutput;
+import com.jitlogic.zorka.common.tracedata.TracerOutput;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,8 +45,12 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
         makeTestJmx("test:name=bean2,type=TestJmx", 10, 10, "oja", "woja", "aja", "waja", "eja", "weja");
         out = new TracerOutput() {
             @Override
-            public void submit(SymbolicRecord record) {
+            public void submitTrace(SymbolicRecord record) {
                 results.add(record);
+            }
+
+            @Override
+            public void shutdown() {
             }
         };
     }
