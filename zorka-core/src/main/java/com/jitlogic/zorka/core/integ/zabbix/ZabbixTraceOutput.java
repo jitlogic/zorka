@@ -282,7 +282,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 			result = new ActiveCheckResult();
 
 			result.setHost(hostname);
-			result.setKey(sample.getMetric().getName());
+			result.setKey(sample.getMetric().getDescription());
 			result.setValue(String.valueOf(sample.getValue()));
 			result.setLastlogsize(0);
 			result.setClock(clock);

@@ -190,6 +190,7 @@ public class FressianTraceFormat {
             w.writeInt(m.getTemplate().getType());
             w.writeInt(m.getTemplateId());
             w.writeString(m.getName());
+            w.writeString(m.getDescription());
             w.writeObject(m.getAttrs());
         }
     };
@@ -205,20 +206,22 @@ public class FressianTraceFormat {
             int type = (int) r.readInt();
             int templateId = (int) r.readInt();
             String name = (String) r.readObject();
+            String description = (String) r.readObject();
+
 
             Map<String, Object> attrs = (Map<String, Object>) r.readObject();
 
             switch (type) {
                 case MetricTemplate.RAW_DATA:
-                    return new RawDataMetric(id, templateId, name, attrs);
+                    return new RawDataMetric(id, templateId, name, description, attrs);
                 case MetricTemplate.RAW_DELTA:
-                    return new RawDeltaMetric(id, templateId, name, attrs);
+                    return new RawDeltaMetric(id, templateId, name, description, attrs);
                 case MetricTemplate.TIMED_DELTA:
-                    return new TimedDeltaMetric(id, templateId, name, attrs);
+                    return new TimedDeltaMetric(id, templateId, name, description, attrs);
                 case MetricTemplate.UTILIZATION:
-                    return new UtilizationMetric(id, templateId, name, attrs);
+                    return new UtilizationMetric(id, templateId, name, description, attrs);
                 case MetricTemplate.WINDOWED_RATE:
-                    return new WindowedRateMetric(id, templateId, name, attrs);
+                    return new WindowedRateMetric(id, templateId, name, description, attrs);
             }
 
             return null;
@@ -239,6 +242,7 @@ public class FressianTraceFormat {
             w.writeInt(t.getId());
             w.writeInt(t.getType());
             w.writeString(t.getName());
+            w.writeString(t.getDescription());
             w.writeString(t.getUnits());
             w.writeString(t.getNomField());
             w.writeString(t.getDivField());
@@ -255,12 +259,13 @@ public class FressianTraceFormat {
         @Override
         public Object read(Reader r, Object tag, int componentCount) throws IOException {
             MetricTemplate mt = new MetricTemplate(
-                    (int) r.readInt(),        // id
-                    (int) r.readInt(),        // type
-                    (String) r.readObject(),  // name
-                    (String) r.readObject(),  // units
-                    (String) r.readObject(),  // nomField
-                    (String) r.readObject()); // divField
+                (int) r.readInt(),        // id
+                (int) r.readInt(),        // type
+                (String) r.readObject(),  // name
+                (String) r.readObject(),  // description
+                (String) r.readObject(),  // units
+                (String) r.readObject(),  // nomField
+                (String) r.readObject()); // divField
 
             return mt.multiply(r.readDouble())
                     .dynamicAttrs((Set<String>) r.readObject());

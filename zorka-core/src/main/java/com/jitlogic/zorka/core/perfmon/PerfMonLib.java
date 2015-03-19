@@ -43,27 +43,27 @@ public class PerfMonLib {
     }
 
 
-    public MetricTemplate metric(String name, String units) {
-        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.RAW_DATA, name, units));
+    public MetricTemplate metric(String name, String description, String units) {
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.RAW_DATA, name, description, units));
     }
 
 
-    public MetricTemplate timedDelta(String name, String units) {
-        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.TIMED_DELTA, name, units));
+    public MetricTemplate timedDelta(String name, String description, String units) {
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.TIMED_DELTA, name, description, units));
     }
 
 
-    public MetricTemplate delta(String name, String units) {
-        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.RAW_DELTA, name, units));
+    public MetricTemplate delta(String name, String description, String units) {
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.RAW_DELTA, name, description, units));
     }
 
 
-    public MetricTemplate rate(String name, String units, String nom, String div) {
-        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.WINDOWED_RATE, name, units, nom, div));
+    public MetricTemplate rate(String name, String description, String units, String nom, String div) {
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.WINDOWED_RATE, name, description, units, nom, div));
     }
 
-    public MetricTemplate util(String name, String units, String nom, String div) {
-        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.UTILIZATION, name, units, nom, div));
+    public MetricTemplate util(String name, String description, String units, String nom, String div) {
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.UTILIZATION, name, description, units, nom, div));
     }
 
     /**

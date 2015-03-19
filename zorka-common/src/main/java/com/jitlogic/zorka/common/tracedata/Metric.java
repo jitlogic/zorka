@@ -39,9 +39,14 @@ public abstract class Metric implements Serializable {
     private int id, templateId;
 
     /**
-     * Metric name
+     * Metric short name (eg. cpu_load etc.)
      */
     private String name;
+
+    /**
+     * Metric description
+     */
+    private String description;
 
     /**
      * Dynamic attributes for this metric
@@ -58,12 +63,14 @@ public abstract class Metric implements Serializable {
      * Creates new metric
      *
      * @param id    metric ID
-     * @param name  metric name
+     * @param name metric short name
+     * @param description  metric description
      * @param attrs metric attributes
      */
-    public Metric(int id, String name, Map<String, Object> attrs) {
+    public Metric(int id, String name, String description, Map<String, Object> attrs) {
         this.id = id;
         this.name = name;
+        this.description = description;
         this.attrs = attrs;
     }
 
@@ -73,13 +80,14 @@ public abstract class Metric implements Serializable {
      *
      * @param id         metric ID
      * @param templateId template ID
-     * @param name       metric name
+     * @param description       metric description
      * @param attrs      metric attributes
      */
-    public Metric(int id, int templateId, String name, Map<String, Object> attrs) {
+    public Metric(int id, int templateId, String name, String description, Map<String, Object> attrs) {
         this.id = id;
         this.templateId = templateId;
         this.name = name;
+        this.description = description;
         this.attrs = attrs;
     }
 
@@ -87,10 +95,10 @@ public abstract class Metric implements Serializable {
      * Creates new metric
      *
      * @param template metric template
-     * @param name     metric name
+     * @param description     metric description
      * @param attrs    metric attributes
      */
-    public Metric(MetricTemplate template, String name, Map<String, Object> attrs) {
+    public Metric(MetricTemplate template, String name, String description, Map<String, Object> attrs) {
         this.template = template;
 
         for (Map.Entry<String, Object> entry : attrs.entrySet()) {
@@ -98,6 +106,7 @@ public abstract class Metric implements Serializable {
         }
 
         this.name = name;
+        this.description = description;
     }
 
 
@@ -144,8 +153,18 @@ public abstract class Metric implements Serializable {
     }
 
 
+    public String getDescription() {
+        return description;
+    }
+
+
     public String getName() {
         return name;
+    }
+
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 
