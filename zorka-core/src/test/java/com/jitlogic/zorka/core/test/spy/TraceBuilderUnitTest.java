@@ -40,12 +40,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     private TraceBuilder b = new TraceBuilder(
             new TracerOutput() {
                 @Override
-                public void submitTrace(SymbolicRecord obj) {
-                    records.add((TraceRecord) obj);
-                }
-
-                @Override
-                public void shutdown() {
+                public boolean submit(SymbolicRecord obj) {
+                    return records.add((TraceRecord) obj);
                 }
             }, symbols);
 
@@ -68,7 +64,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         tracer.setTracerMinTraceTime(50);
     }
 
-    private void checkRC(int recs, int... chld) {
+    private void checkRC(int recs, int...chld) {
         assertThat(records.size()).isEqualTo(recs);
         if (chld.length > 0) {
             TraceRecord rec = records.get(0);

@@ -105,7 +105,7 @@ public class TraceOutputJmxScanner extends JmxScanner implements Runnable {
         AgentDiagnostics.inc(AgentDiagnostics.PMON_SAMPLES_SENT, samples.size());
 
         if (samples.size() > 0) {
-            output.submitTrace(new PerfRecord(clock, id, samples));
+            output.submit(new PerfRecord(clock, id, samples));
         }
     }
 

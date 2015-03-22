@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2014 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -14,11 +14,10 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.common.tracedata;
+package com.jitlogic.zorka.common;
 
-import com.jitlogic.zorka.common.ZorkaSubmitter;
+public interface ZorkaSubmitter<T> {
 
-public interface TracerOutput extends ZorkaSubmitter<SymbolicRecord> {
+    public boolean submit(T item);
 
-    public boolean submit(SymbolicRecord record);
 }

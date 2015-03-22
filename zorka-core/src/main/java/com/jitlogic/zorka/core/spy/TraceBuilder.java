@@ -354,7 +354,7 @@ public class TraceBuilder {
         if (record.getException() != null || record.hasFlag(TraceRecord.EXCEPTION_PASS)) {
             record.getMarker().markFlags(TraceMarker.ERROR_MARK);
         }
-        output.submitTrace(record);
+        output.submit(record);
     }
 
 

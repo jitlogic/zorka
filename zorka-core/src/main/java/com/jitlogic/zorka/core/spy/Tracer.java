@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.tracedata.TracerOutput;
@@ -31,7 +32,7 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class Tracer implements TracerOutput {
+public class Tracer implements TracerOutput, ZorkaService {
 
     /**
      * Minimum default method execution time required to attach method to trace.
@@ -138,10 +139,12 @@ public class Tracer implements TracerOutput {
 
 
     @Override
-    public void submitTrace(SymbolicRecord record) {
+    public boolean submit(SymbolicRecord record) {
+        boolean submitted = false;
         for (TracerOutput output : outputs.get()) {
-            output.submitTrace(record);
+            submitted |= output.submit(record);
         }
+        return submitted;
     }
 
     @Override
@@ -150,7 +153,9 @@ public class Tracer implements TracerOutput {
         outputs.set(new ArrayList<TracerOutput>());
 
         for (TracerOutput output : old) {
-            output.shutdown();
+            if (output instanceof ZorkaService) {
+                ((ZorkaService)output).shutdown();
+            }
         }
 
         if (old.size() > 0) {

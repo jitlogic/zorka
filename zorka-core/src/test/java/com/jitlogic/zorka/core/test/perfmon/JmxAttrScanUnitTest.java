@@ -45,12 +45,8 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
         makeTestJmx("test:name=bean2,type=TestJmx", 10, 10, "oja", "woja", "aja", "waja", "eja", "weja");
         out = new TracerOutput() {
             @Override
-            public void submitTrace(SymbolicRecord record) {
-                results.add(record);
-            }
-
-            @Override
-            public void shutdown() {
+            public boolean submit(SymbolicRecord record) {
+                return results.add(record);
             }
         };
     }

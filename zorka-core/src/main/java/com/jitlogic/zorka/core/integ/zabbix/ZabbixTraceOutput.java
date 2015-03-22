@@ -418,9 +418,4 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		log.debug(ZorkaLogger.ZAG_DEBUG, "### run()");
 		super.run();
 	}
-
-    @Override
-    public void submitTrace(SymbolicRecord record) {
-        submit(record);
-    }
 }

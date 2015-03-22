@@ -235,9 +235,4 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
             log.error(ZorkaLogger.ZCL_STORE, "Error disconnecting " + conn.getAddr() + ":" + conn.getPort(), e);
         }
     }
-
-    @Override
-    public void submitTrace(SymbolicRecord record) {
-        submit(record);
-    }
 }

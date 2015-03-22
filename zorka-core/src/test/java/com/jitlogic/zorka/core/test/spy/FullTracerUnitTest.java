@@ -49,14 +49,9 @@ public class FullTracerUnitTest extends ZorkaFixture {
     public void initOutput() {
         output = new TracerOutput() {
             @Override
-            public void submitTrace(SymbolicRecord obj) {
-                results.add((TraceRecord) obj);
+            public boolean submit(SymbolicRecord obj) {
+                return results.add((TraceRecord) obj);
             }
-
-            @Override
-            public void shutdown() {
-            }
-
         };
     }
 
