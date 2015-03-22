@@ -17,11 +17,12 @@
 package com.jitlogic.zorka.core.spy;
 
 
+import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
-import com.jitlogic.zorka.common.tracedata.TracerOutput;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 
@@ -39,7 +40,7 @@ public class TraceBuilder {
     /**
      * Output
      */
-    private TracerOutput output;
+    private ZorkaSubmitter<SymbolicRecord> output;
 
     private SymbolRegistry symbols;
 
@@ -61,7 +62,7 @@ public class TraceBuilder {
      *
      * @param output object completed traces will be submitted to
      */
-    public TraceBuilder(TracerOutput output, SymbolRegistry symbols) {
+    public TraceBuilder(ZorkaSubmitter<SymbolicRecord> output, SymbolRegistry symbols) {
         this.output = output;
         this.symbols = symbols;
     }

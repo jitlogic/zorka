@@ -39,7 +39,7 @@ import com.jitlogic.zorka.common.util.ZorkaLogger;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements TracerOutput, TraceStreamOutput {
+public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements TraceStreamOutput {
 
 	private static ZorkaLog log = ZorkaLogger.getLog(ZabbixTraceOutput.class);
 

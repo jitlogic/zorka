@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.test.perfmon;
 
+import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.test.support.TestJmx;
 import com.jitlogic.zorka.common.tracedata.Metric;
 import com.jitlogic.zorka.common.tracedata.PerfRecord;
@@ -24,7 +25,6 @@ import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.perfmon.TraceOutputJmxScanner;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
-import com.jitlogic.zorka.common.tracedata.TracerOutput;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,14 +36,14 @@ import java.util.List;
 
 public class JmxAttrScanUnitTest extends ZorkaFixture {
 
-    TracerOutput out;
+    ZorkaSubmitter<SymbolicRecord> out;
     List<Object> results = new ArrayList<Object>();
 
     @Before
     public void createSomeMBeans() throws Exception {
         makeTestJmx("test:name=bean1,type=TestJmx", 10, 10, "oja", "woja", "aja", "waja", "uja", "wuja");
         makeTestJmx("test:name=bean2,type=TestJmx", 10, 10, "oja", "woja", "aja", "waja", "eja", "weja");
-        out = new TracerOutput() {
+        out = new ZorkaSubmitter<SymbolicRecord>() {
             @Override
             public boolean submit(SymbolicRecord record) {
                 return results.add(record);

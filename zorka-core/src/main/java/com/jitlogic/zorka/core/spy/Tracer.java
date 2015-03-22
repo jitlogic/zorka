@@ -17,9 +17,9 @@
 package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.common.ZorkaService;
+import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
-import com.jitlogic.zorka.common.tracedata.TracerOutput;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class Tracer implements TracerOutput, ZorkaService {
+public class Tracer implements ZorkaSubmitter<SymbolicRecord>, ZorkaService {
 
     /**
      * Minimum default method execution time required to attach method to trace.
@@ -45,8 +45,8 @@ public class Tracer implements TracerOutput, ZorkaService {
     private static int maxTraceRecords = 4096;
 
 
-    private AtomicReference<List<TracerOutput>> outputs
-            = new AtomicReference<List<TracerOutput>>(new ArrayList<TracerOutput>());
+    private AtomicReference<List<ZorkaSubmitter<SymbolicRecord>>> outputs
+            = new AtomicReference<List<ZorkaSubmitter<SymbolicRecord>>>(new ArrayList<ZorkaSubmitter<SymbolicRecord>>());
 
     /**
      * Defines which classes and methods should be traced.
@@ -141,7 +141,7 @@ public class Tracer implements TracerOutput, ZorkaService {
     @Override
     public boolean submit(SymbolicRecord record) {
         boolean submitted = false;
-        for (TracerOutput output : outputs.get()) {
+        for (ZorkaSubmitter<SymbolicRecord> output : outputs.get()) {
             submitted |= output.submit(record);
         }
         return submitted;
@@ -149,10 +149,10 @@ public class Tracer implements TracerOutput, ZorkaService {
 
     @Override
     public synchronized void shutdown() {
-        List<TracerOutput> old = outputs.get();
-        outputs.set(new ArrayList<TracerOutput>());
+        List<ZorkaSubmitter<SymbolicRecord>> old = outputs.get();
+        outputs.set(new ArrayList<ZorkaSubmitter<SymbolicRecord>>());
 
-        for (TracerOutput output : old) {
+        for (ZorkaSubmitter<SymbolicRecord> output : old) {
             if (output instanceof ZorkaService) {
                 ((ZorkaService)output).shutdown();
             }
@@ -171,8 +171,8 @@ public class Tracer implements TracerOutput, ZorkaService {
      *
      * @param output trace event handler
      */
-    public synchronized void addOutput(TracerOutput output) {
-        List<TracerOutput> newOutputs = new ArrayList<TracerOutput>();
+    public synchronized void addOutput(ZorkaSubmitter<SymbolicRecord> output) {
+        List<ZorkaSubmitter<SymbolicRecord>> newOutputs = new ArrayList<ZorkaSubmitter<SymbolicRecord>>();
         newOutputs.addAll(outputs.get());
         newOutputs.add(output);
         outputs.set(newOutputs);

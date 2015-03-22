@@ -31,7 +31,7 @@ import java.util.zip.DeflaterOutputStream;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class FileTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements TracerOutput, TraceStreamOutput {
+public class FileTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements TraceStreamOutput {
 
     private static final ZorkaLog log = ZorkaLogger.getLog(FileTraceOutput.class);
 

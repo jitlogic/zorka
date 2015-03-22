@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
+import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
@@ -75,7 +76,7 @@ public class TracerLib {
      *
      * @param output trace processing object
      */
-    public void output(TracerOutput output) {
+    public void output(ZorkaSubmitter<SymbolicRecord> output) {
         tracer.addOutput(output);
     }
 

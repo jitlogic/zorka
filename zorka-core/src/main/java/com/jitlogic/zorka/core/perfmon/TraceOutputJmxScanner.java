@@ -16,11 +16,11 @@
 
 package com.jitlogic.zorka.core.perfmon;
 
+import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.common.tracedata.TracerOutput;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class TraceOutputJmxScanner extends JmxScanner implements Runnable {
     /**
      * Output handler - handles generated data (eg. saves them to trace files).
      */
-    private TracerOutput output;
+    private ZorkaSubmitter<SymbolicRecord> output;
 
 
     /**
@@ -62,7 +62,7 @@ public class TraceOutputJmxScanner extends JmxScanner implements Runnable {
      * @param qdefs    JMX queries
      */
     public TraceOutputJmxScanner(SymbolRegistry symbols, MetricsRegistry metricRegistry, String name,
-                                 MBeanServerRegistry registry, TracerOutput output, QueryDef... qdefs) {
+                                 MBeanServerRegistry registry, ZorkaSubmitter<SymbolicRecord> output, QueryDef... qdefs) {
 
         super(registry, metricRegistry, symbols, qdefs);
 
