@@ -31,7 +31,7 @@ import java.util.zip.DeflaterOutputStream;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class FileTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements TraceOutput {
+public class FileTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements TraceStreamOutput {
 
     private static final ZorkaLog log = ZorkaLogger.getLog(FileTraceOutput.class);
 
@@ -212,5 +212,4 @@ public class FileTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
             log.error(ZorkaLogger.ZTR_ERRORS, "Cannot flush trace file " + path, e);
         }
     }
-
 }

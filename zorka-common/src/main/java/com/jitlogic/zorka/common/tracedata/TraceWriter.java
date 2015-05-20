@@ -35,7 +35,7 @@ public interface TraceWriter {
      *
      * @param output trace output object
      */
-    void setOutput(TraceOutput output);
+    void setOutput(TraceStreamOutput output);
 
     /**
      * Resets internal state of trace writer. This clears internal state

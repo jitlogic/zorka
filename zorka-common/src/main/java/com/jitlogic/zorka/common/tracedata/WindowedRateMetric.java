@@ -31,16 +31,16 @@ public class WindowedRateMetric extends Metric {
 
     private long lastNom, lastDiv;
 
-    public WindowedRateMetric(int id, String name, Map<String, Object> attrs) {
-        super(id, name, attrs);
+    public WindowedRateMetric(int id, String name, String description, Map<String, Object> attrs) {
+        super(id, name, description, attrs);
     }
 
-    public WindowedRateMetric(int id, int templateId, String name, Map<String, Object> attrs) {
-        super(id, templateId, name, attrs);
+    public WindowedRateMetric(int id, int templateId, String name, String description, Map<String, Object> attrs) {
+        super(id, templateId, name, description, attrs);
     }
 
-    public WindowedRateMetric(MetricTemplate template, String name, Map<String, Object> attrs) {
-        super(template, name, attrs);
+    public WindowedRateMetric(MetricTemplate template, String name, String description, Map<String, Object> attrs) {
+        super(template, name, description, attrs);
     }
 
     @Override

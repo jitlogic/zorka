@@ -20,26 +20,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
-import com.jitlogic.zorka.common.tracedata.FileTraceOutput;
-import com.jitlogic.zorka.common.tracedata.FressianTraceWriter;
-import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
-import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
-import com.jitlogic.zorka.common.tracedata.TaggedValue;
-import com.jitlogic.zorka.common.tracedata.TraceMarker;
-import com.jitlogic.zorka.common.tracedata.TraceWriter;
+import com.jitlogic.zorka.common.ZorkaSubmitter;
+import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.integ.zabbix.ZabbixTraceOutput;
 import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
-import com.jitlogic.zorka.core.spy.plugins.TraceAttrProcessor;
-import com.jitlogic.zorka.core.spy.plugins.TraceBeginProcessor;
-import com.jitlogic.zorka.core.spy.plugins.TraceCheckerProcessor;
-import com.jitlogic.zorka.core.spy.plugins.TraceFilterProcessor;
-import com.jitlogic.zorka.core.spy.plugins.TraceFlagsProcessor;
-import com.jitlogic.zorka.core.spy.plugins.TraceTaggerProcessor;
+import com.jitlogic.zorka.core.spy.plugins.*;
 import com.jitlogic.zorka.core.util.OverlayClassLoader;
 
 /**
@@ -87,13 +76,13 @@ public class TracerLib {
      *
      * @param output trace processing object
      */
-    public void output(ZorkaAsyncThread<SymbolicRecord> output) {
+    public void output(ZorkaSubmitter<SymbolicRecord> output) {
         tracer.addOutput(output);
     }
 
 
     public void clearOutputs() {
-        tracer.clearOutputs();
+        tracer.shutdown();
     }
 
 
@@ -221,10 +210,35 @@ public class TracerLib {
     }
 
 
+    /**
+     * Creates spy processor that attaches
+     * @param traceName
+     * @param attrName
+     * @param srcField
+     * @return
+     */
     public SpyProcessor traceAttr(String traceName, String attrName, String srcField) {
         return traceAttr(traceName, attrName, null, srcField);
     }
 
+
+    public SpyProcessor getTraceAttr(String dstField, String attrName) {
+        return getTraceAttr(dstField, null, attrName);
+    }
+
+    /**
+     * Looks for trace of given attribute name in trace stack.
+     *
+     * @param dstField
+     * @param traceName
+     * @param attrName
+     * @return
+     */
+    public SpyProcessor getTraceAttr(String dstField, String traceName, String attrName) {
+        return new TraceAttrGetterProcessor(tracer, dstField,
+            traceName != null ? symbolRegistry.symbolId(traceName) : 0,
+            symbolRegistry.symbolId(attrName));
+    }
 
     /**
      * Creates spy processor that formats a string and attaches it as attribute to trace record.

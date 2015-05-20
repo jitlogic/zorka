@@ -86,23 +86,23 @@ public class JmxScanner {
                 attrs.put(e.getKey(), e.getValue().toString());
             }
 
-            String name = ObjectInspector.substitute(template.getName(), attrs);
+            String description = ObjectInspector.substitute(template.getDescription(), attrs);
 
             switch (template.getType()) {
                 case MetricTemplate.RAW_DATA:
-                    metric = metricsRegistry.getMetric(new RawDataMetric(template, name, attrs));
+                    metric = metricsRegistry.getMetric(new RawDataMetric(template, template.getName(), description, attrs));
                     break;
                 case MetricTemplate.RAW_DELTA:
-                    metric = metricsRegistry.getMetric(new RawDeltaMetric(template, name, attrs));
+                    metric = metricsRegistry.getMetric(new RawDeltaMetric(template, template.getName(), description, attrs));
                     break;
                 case MetricTemplate.TIMED_DELTA:
-                    metric = metricsRegistry.getMetric(new TimedDeltaMetric(template, name, attrs));
+                    metric = metricsRegistry.getMetric(new TimedDeltaMetric(template, template.getName(), description, attrs));
                     break;
                 case MetricTemplate.WINDOWED_RATE:
-                    metric = metricsRegistry.getMetric(new WindowedRateMetric(template, name, attrs));
+                    metric = metricsRegistry.getMetric(new WindowedRateMetric(template, template.getName(), description, attrs));
                     break;
                 case MetricTemplate.UTILIZATION:
-                    metric = metricsRegistry.getMetric(new UtilizationMetric(template, name, attrs));
+                    metric = metricsRegistry.getMetric(new UtilizationMetric(template, template.getName(), description, attrs));
                     break;
                 default:
                     return null;

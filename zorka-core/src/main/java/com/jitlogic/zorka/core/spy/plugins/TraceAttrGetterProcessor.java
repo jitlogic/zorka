@@ -14,33 +14,39 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.common.tracedata;
+package com.jitlogic.zorka.core.spy.plugins;
+
+import com.jitlogic.zorka.core.spy.SpyProcessor;
+import com.jitlogic.zorka.core.spy.Tracer;
 
 import java.util.Map;
 
-/**
- * Raw data metric. Presents tracked values as is (with optional multiplication).
- */
-public class RawDataMetric extends Metric {
+public class TraceAttrGetterProcessor  implements SpyProcessor {
 
+    private String dstField;
 
-    public RawDataMetric(int id, String name, String description, Map<String, Object> attrs) {
-        super(id, name, description, attrs);
-    }
+    private int traceId;
 
-    public RawDataMetric(int id, int templateId, String name, String description, Map<String, Object> attrs) {
-        super(id, templateId, name, description, attrs);
-    }
+    private int attrId;
 
+    /**
+     * Tracer object
+     */
+    private Tracer tracer;
 
-    public RawDataMetric(MetricTemplate template, String name, String description, Map<String, Object> attrs) {
-        super(template, name, description, attrs);
+    public TraceAttrGetterProcessor(Tracer tracer, String dstField, int traceId, int attrId) {
+        this.tracer = tracer;
+        this.dstField = dstField;
+        this.traceId = traceId;
+        this.attrId = attrId;
     }
 
 
     @Override
-    public Number getValue(long clock, Object value) {
-        return multiply((Number) value);
-    }
+    public Map<String, Object> process(Map<String, Object> record) {
 
+        record.put(dstField, tracer.getHandler().getAttr(traceId, attrId));
+
+        return record;
+    }
 }

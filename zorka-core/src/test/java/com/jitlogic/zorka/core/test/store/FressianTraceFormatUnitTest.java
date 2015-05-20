@@ -40,8 +40,8 @@ public class FressianTraceFormatUnitTest {
     private MetricsRegistry metrics = new MetricsRegistry();
     private FressianTraceWriter writer;
 
-    private TraceOutput mkf(final OutputStream output) {
-        return new TraceOutput() {
+    private TraceStreamOutput mkf(final OutputStream output) {
+        return new TraceStreamOutput() {
             @Override
             public OutputStream getOutputStream() {
                 return output;
@@ -92,7 +92,7 @@ public class FressianTraceFormatUnitTest {
     @Test
     public void testReadWriteMetricTemplate() throws Exception {
         MetricTemplate mt = metrics.getTemplate(
-                new MetricTemplate(0, MetricTemplate.WINDOWED_RATE, "Test Metric", "m/s", "nomNom", "divDiv")
+                new MetricTemplate(0, MetricTemplate.WINDOWED_RATE, "test", "Test Metric", "m/s", "nomNom", "divDiv")
                         .multiply(2.0));
 
         writer.checkTemplate(mt.getId());
@@ -100,7 +100,7 @@ public class FressianTraceFormatUnitTest {
         MetricTemplate mt2 = (MetricTemplate) reader().readObject();
 
         assertThat(mt2.getId()).isEqualTo(mt.getId());
-        assertThat(mt2.getName()).isEqualTo(mt.getName());
+        assertThat(mt2.getDescription()).isEqualTo(mt.getDescription());
         assertThat(mt2.getUnits()).isEqualTo(mt.getUnits());
         assertThat(mt2.getNomField()).isEqualTo(mt.getNomField());
         assertThat(mt2.getDivField()).isEqualTo(mt.getDivField());
@@ -112,7 +112,7 @@ public class FressianTraceFormatUnitTest {
     @Test
     public void testReadWriteMetricTemplateWithAttrs() throws Exception {
         MetricTemplate mt = metrics.getTemplate(
-                new MetricTemplate(0, MetricTemplate.WINDOWED_RATE, "Test Metric", "m/s", "nomNom", "divDiv")
+                new MetricTemplate(0, MetricTemplate.WINDOWED_RATE, "test", "Test Metric", "m/s", "nomNom", "divDiv")
                         .dynamicAttrs("a", "b", "c", "d"));
 
         writer.checkTemplate(mt.getId());
@@ -126,10 +126,10 @@ public class FressianTraceFormatUnitTest {
     @Test
     public void testReadWriteMetric() throws Exception {
         MetricTemplate mt = metrics.getTemplate(
-                new MetricTemplate(0, MetricTemplate.RAW_DATA, "Test Metric", "m/s", "nomNom", "divDiv"));
+                new MetricTemplate(0, MetricTemplate.RAW_DATA, "test", "Test Metric", "m/s", "nomNom", "divDiv"));
 
         Metric m = metrics.getMetric(
-                new RawDataMetric(0, mt.getId(), "Test", ZorkaUtil.<String, Object>map("a", 1, "b", 2)));
+                new RawDataMetric(0, mt.getId(), "test", "Test", ZorkaUtil.<String, Object>map("a", 1, "b", 2)));
 
         m.setTemplate(mt);
         m.setTemplateId(mt.getId());
@@ -144,7 +144,7 @@ public class FressianTraceFormatUnitTest {
         assertThat(m2).isInstanceOfAny(RawDataMetric.class);
 
         assertThat(m2.getId()).isEqualTo(m.getId());
-        assertThat(m2.getName()).isEqualTo(m.getName());
+        assertThat(m2.getDescription()).isEqualTo(m.getDescription());
         assertThat(m2.getAttrs()).isEqualTo(ZorkaUtil.<String, Object>constMap("a", 1L, "b", 2L));
     }
 
@@ -298,10 +298,10 @@ public class FressianTraceFormatUnitTest {
     @Test
     public void testReadWritePerfDataRecord() throws Exception {
         MetricTemplate mt = metrics.getTemplate(
-                new MetricTemplate(0, MetricTemplate.RAW_DATA, "Test Metric", "m/s", "nomNom", "divDiv"));
+                new MetricTemplate(0, MetricTemplate.RAW_DATA, "test", "Test Metric", "m/s", "nomNom", "divDiv"));
 
         Metric m = metrics.getMetric(
-                new RawDataMetric(0, mt.getId(), "Test", ZorkaUtil.<String, Object>map("a", 1, "b", 2)));
+                new RawDataMetric(0, mt.getId(), "test", "Test", ZorkaUtil.<String, Object>map("a", 1, "b", 2)));
 
         m.setTemplate(mt);
         m.setTemplateId(mt.getId());

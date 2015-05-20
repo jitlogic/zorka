@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.test.perfmon;
 
+import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.test.support.TestJmx;
 import com.jitlogic.zorka.common.tracedata.Metric;
 import com.jitlogic.zorka.common.tracedata.PerfRecord;
@@ -24,7 +25,6 @@ import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.perfmon.TraceOutputJmxScanner;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
-import com.jitlogic.zorka.core.spy.TracerOutput;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,17 +36,17 @@ import java.util.List;
 
 public class JmxAttrScanUnitTest extends ZorkaFixture {
 
-    TracerOutput out;
+    ZorkaSubmitter<SymbolicRecord> out;
     List<Object> results = new ArrayList<Object>();
 
     @Before
     public void createSomeMBeans() throws Exception {
         makeTestJmx("test:name=bean1,type=TestJmx", 10, 10, "oja", "woja", "aja", "waja", "uja", "wuja");
         makeTestJmx("test:name=bean2,type=TestJmx", 10, 10, "oja", "woja", "aja", "waja", "eja", "weja");
-        out = new TracerOutput() {
+        out = new ZorkaSubmitter<SymbolicRecord>() {
             @Override
-            public void submit(SymbolicRecord record) {
-                results.add(record);
+            public boolean submit(SymbolicRecord record) {
+                return results.add(record);
             }
         };
     }
@@ -56,7 +56,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
     public void testSimpleNullScan() throws Exception {
         TraceOutputJmxScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=XXX,*", "name").get("Nom")
-                        .metric(perfmon.metric("test", "test")));
+                        .metric(perfmon.metric("test", "test", "test")));
         ObjectInspector.setField(scanner, "output", out);
         scanner.runCycle(100);
         Assert.assertEquals(0, results.size());
@@ -67,7 +67,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
     public void testSimpleScanWithOneResult() throws Exception {
         TraceOutputJmxScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom")
-                        .metric(perfmon.metric("test", "test")));
+                        .metric(perfmon.metric("test", "test", "test")));
         ObjectInspector.setField(scanner, "output", out);
         scanner.runCycle(100);
         Assert.assertEquals(1, results.size());
@@ -78,7 +78,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
     public void testCheckIfMetricObjectsAreRegisteredAndHaveIds() throws Exception {
         TraceOutputJmxScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").get("Nom")
-                        .metric(perfmon.metric("test", "test")));
+                        .metric(perfmon.metric("test", "test", "test")));
         ObjectInspector.setField(scanner, "output", out);
         scanner.runCycle(100);
         List<PerfSample> samples = ((PerfRecord) results.get(0)).getSamples();
@@ -101,7 +101,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
         TraceOutputJmxScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").getAs("Nom", "ATTR")
                         .metric(
-                                perfmon.metric("test", "test").dynamicAttrs("ATTR")));
+                                perfmon.metric("test", "test", "test").dynamicAttrs("ATTR")));
         ObjectInspector.setField(scanner, "output", out);
 
         scanner.runCycle(100);
@@ -122,7 +122,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
         TraceOutputJmxScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").getAs("Nom", "ATTR")
                         .metric(
-                                perfmon.metric("test", "test").dynamicAttrs("ATTR")));
+                                perfmon.metric("test", "test", "test").dynamicAttrs("ATTR")));
         ObjectInspector.setField(scanner, "output", out);
 
         scanner.runCycle(100);

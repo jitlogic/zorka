@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.test.spy;
 
+import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.spy.*;
@@ -38,10 +39,10 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     private List<TraceRecord> records = new ArrayList<TraceRecord>();
 
     private TraceBuilder b = new TraceBuilder(
-            new TracerOutput() {
+            new ZorkaSubmitter<SymbolicRecord>() {
                 @Override
-                public void submit(SymbolicRecord obj) {
-                    records.add((TraceRecord) obj);
+                public boolean submit(SymbolicRecord obj) {
+                    return records.add((TraceRecord) obj);
                 }
             }, symbols);
 
@@ -64,7 +65,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         tracer.setTracerMinTraceTime(50);
     }
 
-    private void checkRC(int recs, int... chld) {
+    private void checkRC(int recs, int...chld) {
         assertThat(records.size()).isEqualTo(recs);
         if (chld.length > 0) {
             TraceRecord rec = records.get(0);

@@ -16,12 +16,12 @@
 
 package com.jitlogic.zorka.core.test.spy;
 
+import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,7 +37,7 @@ public class FullTracerUnitTest extends ZorkaFixture {
 
     private List<TraceRecord> results = new ArrayList<TraceRecord>();
 
-    private ZorkaAsyncThread<SymbolicRecord> output;
+    private ZorkaSubmitter<SymbolicRecord> output;
 
     private int sym(String s) {
         return agentInstance.getSymbolRegistry().symbolId(s);
@@ -46,15 +46,10 @@ public class FullTracerUnitTest extends ZorkaFixture {
 
     @Before
     public void initOutput() {
-        output = new ZorkaAsyncThread<SymbolicRecord>("test") {
+        output = new ZorkaSubmitter<SymbolicRecord>() {
             @Override
             public boolean submit(SymbolicRecord obj) {
-                results.add((TraceRecord) obj);
-                return true;
-            }
-
-            @Override
-            protected void process(List<SymbolicRecord> obj) {
+                return results.add((TraceRecord) obj);
             }
         };
     }
@@ -231,6 +226,45 @@ public class FullTracerUnitTest extends ZorkaFixture {
         assertEquals("TEST1", symbols.symbolName(results.get(0).getMarker().getTraceId()));
         assertEquals("XXX", results.get(0).getAttr(symbols.symbolId("X")));
     }
+
+
+    @Test
+    public void testGetTraceAttrFromUpperAndCurrentFrame() throws Exception {
+        agentInstance.getTracer().setMinMethodTime(0);
+        tracer.output(output);
+
+        tracer.include(spy.byMethod(TCLASS4, "recur*"));
+
+        spy.add(spy.instance()
+                .onEnter(tracer.begin("TEST1", 0), tracer.formatAttr("FIELD1", "XXX"))
+                .include(spy.byMethod(TCLASS4, "recursive3")));
+
+        spy.add(spy.instance()
+                .onEnter(tracer.begin("TEST2", 0),
+                    tracer.formatAttr("FIELD2", "YYY"),
+                    tracer.getTraceAttr("FIELD2C", "FIELD2"),
+                    tracer.attr("FIELD2C", "FIELD2C"),
+                    tracer.getTraceAttr("FIELD1C", "TEST1", "FIELD1"),
+                    tracer.attr("FIELD1C", "FIELD1C"))
+                .include(spy.byMethod(TCLASS4, "recursive1")));
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
+        invoke(obj, "recursive3");
+
+        // Check if both traces came back
+        assertEquals(2, results.size());
+        assertEquals("TEST2", symbols.symbolName(results.get(0).getMarker().getTraceId()));
+        assertEquals("TEST1", symbols.symbolName(results.get(1).getMarker().getTraceId()));
+
+        // Check standard attributes are set
+        assertEquals("YYY", results.get(0).getAttr(symbols.symbolId("FIELD2")));
+        assertEquals("XXX", results.get(1).getAttr(symbols.symbolId("FIELD1")));
+
+        // Check if attributes taken from another trace are set
+        assertEquals("XXX", results.get(0).getAttr(symbols.symbolId("FIELD1C")));
+        assertEquals("YYY", results.get(0).getAttr(symbols.symbolId("FIELD2C")));
+    }
+
 
     @Test
     public void testTraceFlagsUpwardPropagation() throws Exception {

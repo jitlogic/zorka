@@ -46,9 +46,14 @@ public class MetricTemplate implements Serializable {
     private int type;
 
     /**
-     * Metric name
+     * Metric short name (eg. cpu_load, mem_util etc.)
      */
     private String name;
+
+    /**
+     * Metric description
+     */
+    private String description;
 
     /**
      * Units of measure (human readable string)
@@ -80,11 +85,11 @@ public class MetricTemplate implements Serializable {
      * Creates new template
      *
      * @param type  metric type
-     * @param name  metric name
+     * @param description  metric description
      * @param units units of measure
      */
-    public MetricTemplate(int type, String name, String units) {
-        this(type, name, units, null, null);
+    public MetricTemplate(int type, String name, String description, String units) {
+        this(type, name, description, units, null, null);
     }
 
 
@@ -93,15 +98,16 @@ public class MetricTemplate implements Serializable {
      *
      * @param id       template ID
      * @param type     metric type
-     * @param name     metric name
+     * @param description     metric description
      * @param units    units of measure
      * @param nomField nominal field
      * @param divField divider field
      */
-    public MetricTemplate(int id, int type, String name, String units, String nomField, String divField) {
+    public MetricTemplate(int id, int type, String name, String description, String units, String nomField, String divField) {
         this.id = id;
         this.type = type;
         this.name = name;
+        this.description = description;
         this.units = units;
         this.nomField = nomField;
         this.divField = divField;
@@ -112,14 +118,15 @@ public class MetricTemplate implements Serializable {
      * Creates new template
      *
      * @param type     metric type
-     * @param name     metric name
+     * @param description     metric description
      * @param units    units of measure
      * @param nomField nominal field
      * @param divField divider field
      */
-    public MetricTemplate(int type, String name, String units, String nomField, String divField) {
+    public MetricTemplate(int type, String name, String description, String units, String nomField, String divField) {
         this.type = type;
         this.name = name;
+        this.description = description;
         this.units = units;
         this.nomField = nomField;
         this.divField = divField;
@@ -135,6 +142,7 @@ public class MetricTemplate implements Serializable {
         this.id = orig.id;
         this.type = orig.type;
         this.name = orig.name;
+        this.description = orig.description;
         this.nomField = orig.nomField;
         this.divField = orig.divField;
         this.multiplier = orig.getMultiplier();
@@ -148,7 +156,7 @@ public class MetricTemplate implements Serializable {
         if (obj instanceof MetricTemplate) {
             MetricTemplate mt = (MetricTemplate) obj;
             return type == mt.type
-                    && ZorkaUtil.objEquals(name, mt.name)
+                    && ZorkaUtil.objEquals(description, mt.description)
                     && ZorkaUtil.objEquals(nomField, mt.nomField)
                     && ZorkaUtil.objEquals(divField, mt.divField);
         } else {
@@ -159,13 +167,13 @@ public class MetricTemplate implements Serializable {
 
     @Override
     public int hashCode() {
-        return (1117 * type) ^ (name != null ? name.hashCode() : 0);
+        return (1117 * type) ^ (description != null ? description.hashCode() : 0);
     }
 
 
     @Override
     public String toString() {
-        return "MT(type=" + type + ", name=" + name + ")";
+        return "MT(type=" + type + ", description=" + description + ")";
     }
 
 
@@ -174,8 +182,8 @@ public class MetricTemplate implements Serializable {
     }
 
 
-    public String getName() {
-        return name;
+    public String getDescription() {
+        return description;
     }
 
 
@@ -196,6 +204,16 @@ public class MetricTemplate implements Serializable {
 
     public double getMultiplier() {
         return multiplier;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 
