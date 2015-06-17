@@ -46,12 +46,13 @@ public class TraceDataSet {
         };
 
         synchronized (FressianTraceFormat.class) {
-            FressianTraceFormat.TRACE_RECORD_BUILDER = newb;
-            try {
-                load(file);
-            } finally {
-                FressianTraceFormat.TRACE_RECORD_BUILDER = oldb;
-            }
+            // TODO remove whole module
+//            FressianTraceFormat.TRACE_RECORD_BUILDER = newb;
+//            try {
+//                load(file);
+//            } finally {
+//                FressianTraceFormat.TRACE_RECORD_BUILDER = oldb;
+//            }
         }
 
     }

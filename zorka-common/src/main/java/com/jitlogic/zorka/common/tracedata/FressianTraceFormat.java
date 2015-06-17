@@ -28,10 +28,7 @@ import org.fressian.impl.InheritanceLookup;
 import org.fressian.impl.MapLookup;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class contains Fressian handlers for Zorka Trace Format. This data format
@@ -129,7 +126,7 @@ public class FressianTraceFormat {
      * builder implementation and assign it to this variable in order to change this
      * data type.
      */
-    public static TraceRecordBuilder TRACE_RECORD_BUILDER = new TraceRecordBuilder() {
+    public static final TraceRecordBuilder TRACE_RECORD_BUILDER = new TraceRecordBuilder() {
         @Override
         public TraceRecord get() {
             return new TraceRecord(null);
@@ -209,7 +206,7 @@ public class FressianTraceFormat {
             String description = (String) r.readObject();
 
 
-            Map<String, Object> attrs = (Map<String, Object>) r.readObject();
+            HashMap<String, Object> attrs = (HashMap<String, Object>) r.readObject();
 
             switch (type) {
                 case MetricTemplate.RAW_DATA:
@@ -310,7 +307,7 @@ public class FressianTraceFormat {
     /**
      * SymbolicException write handler
      */
-    public static WriteHandler EXCEPTION_WH = new WriteHandler() {
+    public static final WriteHandler EXCEPTION_WH = new WriteHandler() {
         @Override
         public void write(Writer w, Object instance) throws IOException {
             SymbolicException e = (SymbolicException) instance;
@@ -328,7 +325,7 @@ public class FressianTraceFormat {
     /**
      * SymbolicException read handler
      */
-    public static ReadHandler EXCEPTION_RH = new ReadHandler() {
+    public static final ReadHandler EXCEPTION_RH = new ReadHandler() {
         @Override
         public Object read(Reader r, Object tag, int componentCount) throws IOException {
             return new SymbolicException(
@@ -475,7 +472,7 @@ public class FressianTraceFormat {
     /**
      * Lookup object grouping all write handlers
      */
-    public static ILookup<Class, Map<String, WriteHandler>> WRITE_LOOKUP =
+    public static final ILookup<Class, Map<String, WriteHandler>> WRITE_LOOKUP =
             new ChainedLookup<Class, Map<String, WriteHandler>>(
 
                     // Default handlers
@@ -511,7 +508,7 @@ public class FressianTraceFormat {
     /**
      * Lookup object grouping all read handlers
      */
-    public static ILookup<Object, ReadHandler> READ_LOOKUP =
+    public static final ILookup<Object, ReadHandler> READ_LOOKUP =
             new MapLookup<Object, ReadHandler>(
                     ZorkaUtil.<Object, ReadHandler>constMap(
                             SYMBOL_TAG, SYMBOL_RH,

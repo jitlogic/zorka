@@ -48,7 +48,6 @@ public class DispatchingSubmitter implements SpySubmitter {
 
     /**
      * Submission stack is used to associate results from method entry probes with results from return/error probes.
-     * TODO what happens to submission stack when spy context disappears when some method is executing ?
      */
     private ThreadLocal<Stack<Map<String, Object>>> submissionStack =
             new ThreadLocal<Stack<Map<String, Object>>>() {
@@ -98,8 +97,8 @@ public class DispatchingSubmitter implements SpySubmitter {
 
         AgentDiagnostics.inc(AgentDiagnostics.SPY_SUBMISSIONS);
 
-        if (sdef.getProcessors(ON_SUBMIT).size() > 0 && null == (record = process(ON_SUBMIT, sdef, record))) {
-            return;
+        if (sdef.getProcessors(ON_SUBMIT).size() > 0) {
+            process(ON_SUBMIT, sdef, record);
         }
 
     }
@@ -182,6 +181,7 @@ public class DispatchingSubmitter implements SpySubmitter {
                     break;
                 }
             } catch (Throwable e) {
+                // This has to catch everything, even OOM.
                 log.error(ZorkaLogger.ZSP_ERRORS, "Error processing record %s (on processor %s, stage=%s)", e,
                         record, processor, stage);
             }

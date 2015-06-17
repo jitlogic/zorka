@@ -56,13 +56,15 @@ public class TraceOutputJmxScanner extends JmxScanner implements Runnable {
      * Creates new JMX attribute scanner object.
      *
      * @param symbols  symbol registry
-     * @param name     scanner name (converted to ID using symbol registry and attached to every emitted packet of data).
+     * @param metricRegistry metrics registry
+     * @param name     scanner name (converted to ID using symbol registry and attached to emitted data).
      * @param registry MBean server registry object
      * @param output   tracer output
      * @param qdefs    JMX queries
      */
     public TraceOutputJmxScanner(SymbolRegistry symbols, MetricsRegistry metricRegistry, String name,
-                                 MBeanServerRegistry registry, ZorkaSubmitter<SymbolicRecord> output, QueryDef... qdefs) {
+                                 MBeanServerRegistry registry, ZorkaSubmitter<SymbolicRecord> output,
+                                 QueryDef... qdefs) {
 
         super(registry, metricRegistry, symbols, qdefs);
 
@@ -76,7 +78,7 @@ public class TraceOutputJmxScanner extends JmxScanner implements Runnable {
     public void run() {
         try {
             runCycle(System.currentTimeMillis());
-        } catch (Error e) {
+        } catch (Exception e) {
             log.error(ZorkaLogger.ZPM_ERRORS, "Error executing scanner '" + name + "'", e);
             AgentDiagnostics.inc(AgentDiagnostics.PMON_ERRORS);
         }
@@ -97,14 +99,14 @@ public class TraceOutputJmxScanner extends JmxScanner implements Runnable {
 
         long t2 = System.nanoTime();
 
-        log.info(ZorkaLogger.ZPM_RUNS, "Scanner %s execution took " + (t2 - t1) / 1000000L + " milliseconds to execute. "
-                + "Collected samples: " + samples.size());
+        log.info(ZorkaLogger.ZPM_RUNS, "Scanner %s execution took " + (t2 - t1) / 1000000L
+            + " milliseconds to execute. Collected samples: " + samples.size());
 
         AgentDiagnostics.inc(AgentDiagnostics.PMON_TIME, t2 - t1);
         AgentDiagnostics.inc(AgentDiagnostics.PMON_PACKETS_SENT);
         AgentDiagnostics.inc(AgentDiagnostics.PMON_SAMPLES_SENT, samples.size());
 
-        if (samples.size() > 0) {
+        if (!samples.isEmpty()) {
             output.submit(new PerfRecord(clock, id, samples));
         }
     }

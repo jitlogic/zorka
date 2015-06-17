@@ -80,7 +80,7 @@ public class JmxScanner {
 
         Metric metric = template.getMetric(key);
         if (metric == null) {
-            Map<String, Object> attrs = new HashMap<String, Object>();
+            HashMap<String, Object> attrs = new HashMap<String, Object>();
 
             for (Map.Entry<String, Object> e : result.attrSet()) {
                 attrs.put(e.getKey(), e.getValue().toString());
@@ -116,7 +116,7 @@ public class JmxScanner {
             metricsRegistry.getMetric(metric);
 
             if (template.getDynamicAttrs().size() > 0) {
-                Map<String, Integer> dynamicAttrs = new HashMap<String, Integer>();
+                HashMap<String, Integer> dynamicAttrs = new HashMap<String, Integer>();
                 for (String attr : template.getDynamicAttrs()) {
                     dynamicAttrs.put(attr, symbols.symbolId(attr));
                 }

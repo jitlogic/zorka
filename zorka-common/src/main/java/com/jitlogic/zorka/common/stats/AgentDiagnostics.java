@@ -130,7 +130,7 @@ public class AgentDiagnostics {
         counters[counter].set(0);
     }
 
-    public static void clear() {
+    public synchronized static void clear() {
         counters = new AtomicLong[counterNames.length];
 
         for (int i = 0; i < counterNames.length; i++) {

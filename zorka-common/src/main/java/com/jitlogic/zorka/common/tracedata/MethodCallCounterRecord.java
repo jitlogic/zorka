@@ -68,7 +68,12 @@ public class MethodCallCounterRecord implements SymbolicRecord {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof MethodCallCounterRecord) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (obj != null &&
+            obj.getClass() == this.getClass()) {
             MethodCallCounterRecord rec = (MethodCallCounterRecord) obj;
             return this.classId == rec.classId
                     && this.methodId == rec.methodId
