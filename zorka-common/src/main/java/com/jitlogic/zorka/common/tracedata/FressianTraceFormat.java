@@ -126,12 +126,20 @@ public class FressianTraceFormat {
      * builder implementation and assign it to this variable in order to change this
      * data type.
      */
-    public static final TraceRecordBuilder TRACE_RECORD_BUILDER = new TraceRecordBuilder() {
+    private static TraceRecordBuilder traceRecordBuilder = new TraceRecordBuilder() {
         @Override
         public TraceRecord get() {
             return new TraceRecord(null);
         }
     };
+
+    public static void setTraceRecordBuilder(TraceRecordBuilder builder) {
+        traceRecordBuilder = builder;
+    }
+
+    public static TraceRecordBuilder getTraceRecordBuilder() {
+        return traceRecordBuilder;
+    }
 
 
     /**
@@ -140,7 +148,7 @@ public class FressianTraceFormat {
     private static final ReadHandler RECORD_RH = new ReadHandler() {
         @Override
         public Object read(Reader r, Object tag, int componentCount) throws IOException {
-            TraceRecord tr = TRACE_RECORD_BUILDER.get();
+            TraceRecord tr = traceRecordBuilder.get();
             tr.setClassId((int) r.readInt());
             tr.setMethodId((int) r.readInt());
             tr.setSignatureId((int) r.readInt());

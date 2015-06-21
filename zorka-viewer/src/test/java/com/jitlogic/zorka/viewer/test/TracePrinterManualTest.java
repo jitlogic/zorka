@@ -28,7 +28,7 @@ import java.util.List;
 
 public class TracePrinterManualTest {
 
-    //@Test
+    @Test
     public void testReadAndPrintTrace() throws Exception {
         String path = this.getClass().getResource("/trace.ztr").getPath();
         TraceDataSet tds = new TraceDataSet(new File(path));

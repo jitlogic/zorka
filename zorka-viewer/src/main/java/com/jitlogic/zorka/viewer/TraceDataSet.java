@@ -37,7 +37,7 @@ public class TraceDataSet {
 
     public TraceDataSet(File file) {
 
-        FressianTraceFormat.TraceRecordBuilder oldb = FressianTraceFormat.TRACE_RECORD_BUILDER;
+        FressianTraceFormat.TraceRecordBuilder oldb = FressianTraceFormat.getTraceRecordBuilder();
         FressianTraceFormat.TraceRecordBuilder newb = new FressianTraceFormat.TraceRecordBuilder() {
             @Override
             public TraceRecord get() {
@@ -46,13 +46,12 @@ public class TraceDataSet {
         };
 
         synchronized (FressianTraceFormat.class) {
-            // TODO remove whole module
-//            FressianTraceFormat.TRACE_RECORD_BUILDER = newb;
-//            try {
-//                load(file);
-//            } finally {
-//                FressianTraceFormat.TRACE_RECORD_BUILDER = oldb;
-//            }
+            FressianTraceFormat.setTraceRecordBuilder(newb);
+            try {
+                load(file);
+            } finally {
+                FressianTraceFormat.setTraceRecordBuilder(oldb);
+            }
         }
 
     }
