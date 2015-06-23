@@ -62,6 +62,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
     /** Hostname agent advertises itself to zabbix. */
 	private String agentHost;
+	private int agentPort;
 	private String activeIpPort;
 
     /** Interval between fetching new item list from Zabbix. */
@@ -119,6 +120,8 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
 	protected void setup() {
 		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive setup...");
+
+		agentPort = config.intCfg("zabbix.listen.port", 10055);
 
 		/* Zabbix Server IP:Port */
 		activeIpPort = config.stringCfg(prefix + ".server.addr", defaultAddr);
@@ -271,7 +274,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 				ZabbixActiveRequest request = new ZabbixActiveRequest(socket);
 
 				// send Active Check Message 
-				request.sendActiveMessage(agentHost, config.stringCfg(prefix + ".host_metadata", ""));
+				request.sendActiveMessage(agentHost, agentPort, config.stringCfg(prefix + ".host_metadata", ""));
 
 				// get requests for metrics
 				ActiveCheckResponse response = request.getActiveResponse();

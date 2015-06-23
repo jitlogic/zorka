@@ -112,8 +112,8 @@ public class ZabbixActiveRequest {
 	 * @param host destination host
 	 * @throws IOException if I/O error occurs
 	 */
-	public void sendActiveMessage(String host, String hostMetadata) throws IOException {
-		String message = ZabbixUtils.createActiveCheck(host, hostMetadata);
+	public void sendActiveMessage(String host, int port, String hostMetadata) throws IOException {
+		String message = ZabbixUtils.createActiveCheck(host, port, hostMetadata);
 		send(message);
 	} // send()
 
