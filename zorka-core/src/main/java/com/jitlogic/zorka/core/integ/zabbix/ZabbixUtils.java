@@ -104,7 +104,6 @@ public final class ZabbixUtils {
 			"request", "active checks",
 			"host", host,
 			"host_metadata", hostMetadata,
-			"ip", "127.0.0.1",
 			"port", port
 		);
 		return new JSONWriter().write(ac);
