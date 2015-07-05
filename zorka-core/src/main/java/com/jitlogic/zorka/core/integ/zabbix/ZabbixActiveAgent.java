@@ -268,7 +268,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive Refreshing Active Check");
 
 				socket = new Socket(activeAddr, activePort);
-				ZabbixActiveRequest request = new ZabbixActiveRequest(socket);
+				ZabbixActiveRequest request = new ZabbixActiveRequest(socket, config);
 
 				// send Active Check Message 
 				request.sendActiveMessage(agentHost, config.stringCfg(prefix + ".host_metadata", ""));
@@ -336,7 +336,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 	}
 
 	private void scheduleTasks() {
-		ZabbixActiveSenderTask sender = new ZabbixActiveSenderTask(activeAddr, activePort, resultsQueue, maxBatchSize);
+		ZabbixActiveSenderTask sender = new ZabbixActiveSenderTask(activeAddr, activePort, resultsQueue, maxBatchSize, config);
 		senderTask = scheduler.scheduleAtFixedRate(sender, senderInterval, senderInterval, TimeUnit.SECONDS);
 		
 		ZabbixActiveCleanerTask cleaner = new ZabbixActiveCleanerTask(resultsQueue, maxCacheSize);

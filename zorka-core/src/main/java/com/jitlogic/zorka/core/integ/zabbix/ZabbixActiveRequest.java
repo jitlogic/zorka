@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import com.jitlogic.zorka.common.util.JSONReader;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
+import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 
@@ -72,15 +73,17 @@ public class ZabbixActiveRequest {
 	 */
 	private static Pattern pattern = Pattern.compile(regex);
 
+	int port;
 
 	/**
 	 * Standard constructor
 	 *
 	 * @param socket open socket (result from ServerSocket.accept())
 	 */
-	public ZabbixActiveRequest(Socket socket) {
+	public ZabbixActiveRequest(Socket socket, ZorkaConfig config) {
 		this.socket = socket;
 		this.tStart = System.nanoTime();
+		this.port = config.intCfg("zabbix.listen.port", 10055);
 
 		AgentDiagnostics.inc(AgentDiagnostics.ZABBIX_REQUESTS);
 	}
@@ -113,7 +116,7 @@ public class ZabbixActiveRequest {
 	 * @throws IOException if I/O error occurs
 	 */
 	public void sendActiveMessage(String host, String hostMetadata) throws IOException {
-		String message = ZabbixUtils.createActiveCheck(host, hostMetadata);
+		String message = ZabbixUtils.createActiveCheck(host, port, hostMetadata);
 		send(message);
 	} // send()
 
