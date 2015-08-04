@@ -3,7 +3,7 @@
     <groupId>com.jitlogic.zorka</groupId>
     <artifactId>zorka</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.13</version>
+    <version>1.0.14-SNAPSHOT</version>
     <name>zorka: parent aggregator</name>
     <url>http://zorka.io</url>
 
@@ -16,6 +16,8 @@
         <dependency.plugin.version>2.3</dependency.plugin.version>
         <jar.plugin.version>2.4</jar.plugin.version>
         <jarjar.plugin.version>1.7</jarjar.plugin.version>
+        <pitest.plugin.version>1.1.5</pitest.plugin.version>
+        <sonar.plugin.version>2.5</sonar.plugin.version>
         <source.plugin.version>2.1.2</source.plugin.version>
         <surefire.plugin.version>2.12</surefire.plugin.version>
         <war.plugin.version>2.1.1</war.plugin.version>
@@ -40,6 +42,34 @@
         <slf4j.version>1.7.7</slf4j.version>
         <zoola.version>0.1.0</zoola.version>
     </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>${sonar.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.pitest</groupId>
+                    <artifactId>pitest-maven</artifactId>
+                    <version>${pitest.plugin.version}</version>
+                    <configuration>
+                        <inScopeClasses>
+                            <param>com.jitlogic.zorka.*</param>
+                        </inScopeClasses>
+                        <targetClasses>
+                            <param>com.jitlogic.zorka.*</param>
+                        </targetClasses>
+                        <outputFormats>
+                            <outputFormat>XML</outputFormat>
+                        </outputFormats>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
     <repositories>
         <repository>

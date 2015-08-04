@@ -51,12 +51,12 @@ public abstract class Metric implements Serializable {
     /**
      * Dynamic attributes for this metric
      */
-    private Map<String, Object> attrs = new HashMap<String, Object>();
+    private HashMap<String, Object> attrs = new HashMap<String, Object>();
 
     /**
      * Maps dynamic attributes to their symbol IDs
      */
-    private Map<String, Integer> dynamicAttrs;
+    private HashMap<String, Integer> dynamicAttrs;
 
 
     /**
@@ -67,7 +67,7 @@ public abstract class Metric implements Serializable {
      * @param description  metric description
      * @param attrs metric attributes
      */
-    public Metric(int id, String name, String description, Map<String, Object> attrs) {
+    public Metric(int id, String name, String description, HashMap<String, Object> attrs) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -83,7 +83,7 @@ public abstract class Metric implements Serializable {
      * @param description       metric description
      * @param attrs      metric attributes
      */
-    public Metric(int id, int templateId, String name, String description, Map<String, Object> attrs) {
+    public Metric(int id, int templateId, String name, String description, HashMap<String, Object> attrs) {
         this.id = id;
         this.templateId = templateId;
         this.name = name;
@@ -148,7 +148,7 @@ public abstract class Metric implements Serializable {
     }
 
 
-    public void setDynamicAttrs(Map<String, Integer> dynamicAttrs) {
+    public void setDynamicAttrs(HashMap<String, Integer> dynamicAttrs) {
         this.dynamicAttrs = dynamicAttrs;
     }
 

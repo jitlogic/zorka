@@ -26,7 +26,7 @@ public class TestInspectorClass {
 
     private static int priv = 234;
 
-    public static int count = 123;
+    private static int count = 123;
 
     private Properties props;
 

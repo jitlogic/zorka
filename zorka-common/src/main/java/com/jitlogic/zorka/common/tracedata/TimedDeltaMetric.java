@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.common.tracedata;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -30,15 +31,15 @@ public class TimedDeltaMetric extends RawDeltaMetric {
      */
     private long lastClock;
 
-    public TimedDeltaMetric(int id, String name, String description, Map<String, Object> attrs) {
+    public TimedDeltaMetric(int id, String name, String description, HashMap<String, Object> attrs) {
         super(id, name, description, attrs);
     }
 
-    public TimedDeltaMetric(int id, int templateId, String name, String description, Map<String, Object> attrs) {
+    public TimedDeltaMetric(int id, int templateId, String name, String description, HashMap<String, Object> attrs) {
         super(id, templateId, name, description, attrs);
     }
 
-    public TimedDeltaMetric(MetricTemplate template, String name, String description, Map<String, Object> attrs) {
+    public TimedDeltaMetric(MetricTemplate template, String name, String description, HashMap<String, Object> attrs) {
         super(template, name, description, attrs);
     }
 
