@@ -38,7 +38,8 @@ __jersey() {
   tracer.exclude(
     "org.glassfish.jersey.message.internal.**",
     "org.glassfish.jersey.uri.internal.**",
-    "org.glassfish.jersey.internal.util.**"
+    "org.glassfish.jersey.internal.util.**",
+    "com.sun.jersey.core.reflection.**"
   );
 
   return this;

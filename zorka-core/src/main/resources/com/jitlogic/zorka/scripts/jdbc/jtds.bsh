@@ -1,0 +1,41 @@
+/**
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+zorka.require("sql.bsh");
+
+__mssql() {
+
+  spy.add(sql._instrumentStmt("JTDS_SQLJDBC_1", "${THIS.connection.url}")
+    .include(
+      spy.byMethod(spy.AC_PUBLIC, "net.sourceforge.jtds.jdbc.JtdsStatement", "execut*", null, "String")));
+
+  spy.add(sql._instrumentPStmt("JTDS_SQLJDBC_2", "${THIS.connection.url}", "${THIS.sql}")
+    .include(
+      spy.byMethod(1, "net.sourceforge.jtds.jdbc.JtdsPreparedStatement", "execut*", null, spy.SM_NOARGS),
+      spy.byMethod(1, "net.sourceforge.jtds.jdbc.JtdsCallableStatement", "execut*", null, spy.SM_NOARGS)));
+
+
+  if (zorka.boolCfg("tracer")) {
+      tracer.exclude("net.sourceforge.jtds.jdbc.**");
+  }
+
+  return this;
+}
+
+
+mssql = __mssql();
+
