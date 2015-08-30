@@ -47,10 +47,15 @@ public class MainSubmitter {
      * Thread local
      */
     private static ThreadLocal<Boolean> inSubmit = new ThreadLocal<Boolean>() {
+        @Override
         public Boolean initialValue() {
             return false;
         }
     };
+
+    public MainSubmitter() {
+
+    }
 
     /**
      * This method is called by spy probes.
@@ -76,6 +81,7 @@ public class MainSubmitter {
             log.debug(ZorkaLogger.ZSP_ERRORS, "Error submitting value from instrumented code: ", e);
             AgentDiagnostics.inc(AgentDiagnostics.SPY_ERRORS);
         } catch (Throwable e) {
+            // This is special case. We must catch everything going out of agent, even OOM errors.
             log.debug(ZorkaLogger.ZSP_ERRORS, "Error submitting value from instrumented code: ", e);
             AgentDiagnostics.inc(AgentDiagnostics.SPY_ERRORS);
         } finally {
@@ -97,6 +103,7 @@ public class MainSubmitter {
             try {
                 tracer.getHandler().traceEnter(classId, methodId, signatureId, System.nanoTime());
             } catch (Throwable e) {
+                // This is special case. We must catch everything going out of agent, even OOM errors.
                 log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceEnter", e);
                 AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
             }
@@ -116,6 +123,7 @@ public class MainSubmitter {
             try {
                 tracer.getHandler().traceReturn(System.nanoTime());
             } catch (Throwable e) {
+                // This is special case. We must catch everything going out of agent, even OOM errors.
                 log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceReturn", e);
                 AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
             }
@@ -137,6 +145,7 @@ public class MainSubmitter {
             try {
                 tracer.getHandler().traceError(exception, System.nanoTime());
             } catch (Throwable e) {
+                // This is special case. We must catch everything going out of agent, even OOM errors.
                 log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceError", e);
                 AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
             }

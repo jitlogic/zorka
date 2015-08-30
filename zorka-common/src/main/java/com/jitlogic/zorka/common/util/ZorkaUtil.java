@@ -676,8 +676,8 @@ public class ZorkaUtil {
      * @param <V>  type of values
      * @return mutable map
      */
-    public static <K, V> Map<K, V> map(Object... data) {
-        Map<K, V> map = new HashMap<K, V>(data.length + 2);
+    public static <K, V> HashMap<K, V> map(Object... data) {
+        HashMap<K, V> map = new HashMap<K, V>(data.length + 2);
 
         for (int i = 1; i < data.length; i += 2) {
             map.put((K) data[i - 1], (V) data[i]);
@@ -731,9 +731,7 @@ public class ZorkaUtil {
      */
     public static <T> Set<T> set(T...objs) {
         Set<T> set = new HashSet<T>(objs.length * 2 + 1);
-        for (T s : objs) {
-            set.add(s);
-        }
+        Collections.addAll(set, objs);
 
         return set;
     }

@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 
@@ -45,11 +46,14 @@ public class ZabbixActiveSenderTask implements Runnable {
 
 	private final String _SUCCESS = "success";
 
-	public ZabbixActiveSenderTask(InetAddress serverAddr, int serverPort, ConcurrentLinkedQueue<ActiveCheckResult> responseQueue, int maxBatchSize){
+	private ZorkaConfig config;
+
+	public ZabbixActiveSenderTask(InetAddress serverAddr, int serverPort, ConcurrentLinkedQueue<ActiveCheckResult> responseQueue, int maxBatchSize, ZorkaConfig config){
 		this.serverAddr = serverAddr;
 		this.serverPort = serverPort;
 		this.responseQueue = responseQueue;
 		this.maxBatchSize = maxBatchSize;
+		this.config = config;
 	}
 
 	@Override
@@ -60,7 +64,7 @@ public class ZabbixActiveSenderTask implements Runnable {
 			clock = (new Date()).getTime() / 1000L;
 
 			socket = new Socket(serverAddr, serverPort);
-			ZabbixActiveRequest request = new ZabbixActiveRequest(socket);
+			ZabbixActiveRequest request = new ZabbixActiveRequest(socket, config);
 
 			/* copy cache */
 			int endIndex = responseQueue.size();

@@ -63,9 +63,11 @@ public class HelloRequest {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof HelloRequest
-            && tstamp == ((HelloRequest)obj).tstamp
-            && ZorkaUtil.objEquals(hostname, ((HelloRequest)obj).hostname);
+        return obj == this
+            || obj != null
+            && obj.getClass() == this.getClass()
+            && tstamp == ((HelloRequest) obj).tstamp
+            && ZorkaUtil.objEquals(hostname, ((HelloRequest) obj).hostname);
     }
 
     @Override

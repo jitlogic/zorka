@@ -37,6 +37,9 @@ __ejb() {
   zorka.defCfg("ejb.params.include", "");
   zorka.defCfg("ejb.params.exclude", "");
 
+  zorka.defCfg("ejb.params.include.beans", "");
+  zorka.defCfg("ejb.params.exclude.beans", "");
+
   // Default values for EJB slow calls log configuration options
   zorka.defCfg("ejb.slow", "no");
   zorka.defCfg("ejb.slow.time", "1000");
@@ -61,7 +64,9 @@ __ejb() {
   _stats = zorka.boolCfg("ejb.stats");
 
   _paramsMatcher = util.stringMatcher(zorka.listCfg("ejb.params.include"), zorka.listCfg("ejb.params.exclude"));
+  _beanParamsMatcher = util.stringMatcher(zorka.listCfg("ejb.params.include.beans"), zorka.listCfg("ejb.params.exclude.beans"));
   _paramsPrefix = zorka.stringCfg("ejb.params.prefix");
+
 
   _slow_chain = traps.subchain("ejb", "slow");
   _error_chain = traps.subchain("ejb", "error");
@@ -92,20 +97,22 @@ __ejb() {
     }
 
     process(rec) {
-      rec.put("RET", str(rec.get("RET")));
-      args = rec.get("ARGS");
-      sb = new StringBuilder();
-      if (args != null) {
-        for (i = 0; i < args.length; i++) {
-          s = str(args[i]);
-          sb.append(sb.length() > 0 ? ", " : "");
-          sb.append(s);
-          if (_trace) {
-            tracer.newAttr(_paramsPrefix + i, s);
+      if (_beanParamsMatcher.matches(rec.get("CLASS"))) {
+        rec.put("RET", str(rec.get("RET")));
+        args = rec.get("ARGS");
+        sb = new StringBuilder();
+        if (args != null) {
+          for (i = 0; i < args.length; i++) {
+            s = str(args[i]);
+            sb.append(sb.length() > 0 ? ", " : "");
+            sb.append(s);
+            if (_trace) {
+              tracer.newAttr(_paramsPrefix + i, s);
+            }
           }
         }
+        rec.put("PARAMS", sb.toString());
       }
-      rec.put("PARAMS", sb.toString());
       return rec;
     }
 

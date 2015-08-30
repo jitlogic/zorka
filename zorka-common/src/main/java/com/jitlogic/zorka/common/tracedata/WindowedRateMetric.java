@@ -18,6 +18,7 @@ package com.jitlogic.zorka.common.tracedata;
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,11 +32,11 @@ public class WindowedRateMetric extends Metric {
 
     private long lastNom, lastDiv;
 
-    public WindowedRateMetric(int id, String name, String description, Map<String, Object> attrs) {
+    public WindowedRateMetric(int id, String name, String description, HashMap<String, Object> attrs) {
         super(id, name, description, attrs);
     }
 
-    public WindowedRateMetric(int id, int templateId, String name, String description, Map<String, Object> attrs) {
+    public WindowedRateMetric(int id, int templateId, String name, String description, HashMap<String, Object> attrs) {
         super(id, templateId, name, description, attrs);
     }
 

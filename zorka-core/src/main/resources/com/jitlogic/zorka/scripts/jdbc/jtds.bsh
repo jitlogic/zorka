@@ -15,38 +15,27 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.common.test.support;
+zorka.require("sql.bsh");
 
-import java.util.Properties;
+__mssql() {
 
-/**
- * @author RLE <rafal.lewczuk@gmail.com>
- */
-public class TestInspectorClass {
+  spy.add(sql._instrumentStmt("JTDS_SQLJDBC_1", "${THIS.connection.url}")
+    .include(
+      spy.byMethod(spy.AC_PUBLIC, "net.sourceforge.jtds.jdbc.JtdsStatement", "execut*", null, "String")));
 
-    private static int priv = 234;
+  spy.add(sql._instrumentPStmt("JTDS_SQLJDBC_2", "${THIS.connection.url}", "${THIS.sql}")
+    .include(
+      spy.byMethod(1, "net.sourceforge.jtds.jdbc.JtdsPreparedStatement", "execut*", null, spy.SM_NOARGS),
+      spy.byMethod(1, "net.sourceforge.jtds.jdbc.JtdsCallableStatement", "execut*", null, spy.SM_NOARGS)));
 
-    private static int count = 123;
 
-    private Properties props;
+  if (zorka.boolCfg("tracer")) {
+      tracer.exclude("net.sourceforge.jtds.jdbc.**");
+  }
 
-    public TestInspectorClass() {
-    }
-
-    public TestInspectorClass(Properties props) {
-        this.props = props;
-    }
-
-    public static int count() {
-        return count + 3;
-    }
-
-    public static int getCount() {
-        return count + 2;
-    }
-
-    protected Properties getProperties() {
-        return props;
-    }
-
+  return this;
 }
+
+
+mssql = __mssql();
+

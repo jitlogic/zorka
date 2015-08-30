@@ -1,0 +1,83 @@
+/**
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// This file contains instrumentation definitions for Apache httpclient library.
+
+zorka.require("tracer.bsh");
+zorka.require("apache/apache.bsh");
+
+// Tracer tuning
+if (zorka.boolCfg("tracer")) {
+    tracer.exclude(
+        "org.apache.commons.httpclient.**"
+    );
+}
+
+
+__apache_httpclient() {
+
+  // Default values for httpclient tracer options
+  zorka.defCfg("apache.httpclient.trace", zorka.stringCfg("tracer", "no"));
+  zorka.defCfg("apache.httpclient.trace.time", zorka.longCfg("tracer.min.trace.time"));
+
+  _trace = zorka.boolCfg("apache.httpclient.trace");
+  _traceTime = zorka.longCfg("apache.httpclient.trace.time");
+
+  headers_processor() {
+      process(rec) {
+          method = rec.get("METHOD");
+          if (method != null && method.getRequestHeaders() != null) {
+              for (hdr : method.getRequestHeaders()) {
+                  tracer.newAttr("ReqHdr__" + hdr.getName(), ""+hdr.getValue());
+              }
+          }
+          if (method != null && method.getReplyHeaders() != null) {
+              for (hdr : method.getResponseHeaders()) {
+                  tracer.newAttr("RespHdr__" + hdr.getName(), ""+hdr.getValue());
+              }
+          }
+          return rec;
+      }
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+  spy.add(
+    spy.instrument("APACHE_HTTPCLIENT_EXECUTE")
+      .onEnter(spy.fetchArg("METHOD", 2),
+        _trace ? spy.subchain(
+          tracer.begin("HTTP_CLIENT", _traceTime),
+          tracer.formatAttr("URI", "${METHOD.URI}"),
+          tracer.formatAttr("METHOD", "${METHOD.method}")
+        ) : null)
+      .onReturn(spy.fetchRetVal("RET"), _trace ? tracer.attr("RET", "RET") : null)
+      .onSubmit(
+        _trace ? spy.subchain(
+          tracer.formatAttr("STATUS", "${METHOD.statusCode}"),
+          tracer.formatAttr("STATUS_LINE", "${METHOD.getStatusLine}"),
+          headers_processor()
+        ) : null)
+      .include(spy.byMethod(0, "org.apache.commons.httpclient.HttpClient", "executeMethod", "int", 
+          "org.apache.commons.httpclient.HostConfiguration", "org.apache.commons.httpclient.HttpMethod", "org.apache.commons.httpclient.HttpState"))
+  );
+
+
+  return this;
+
+}
+
+apache_httpclient = __apache_httpclient();
+
