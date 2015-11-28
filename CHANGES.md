@@ -1,8 +1,18 @@
+Zorka 1.0.15 (2015-11-29)
+-------------------------
+
+* Minor fixes for ZICO UI;
+* Unboundid LDAP SDK support;
+* Fix/extend nagios scipts;
+* Preliminary support for Clojure+Ring/Jetty;
+
+
 Zorka 1.0.14 (2015-08-29)
 -------------------------
 
 * Apache HTTPClient support
 * various fixes
+
 
 Zorka 1.0.13 (2015-05-20)
 -------------------------
