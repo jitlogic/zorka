@@ -17,17 +17,17 @@
 
 __nagios_util() {
 
-  def_zorka_stat(_mbean, name) {
-        // Monitor zorka stat 
+  def_zorka_stat(_mbean, name, attr, tag, desc) {
+        // Monitor zorka stat
         nagios.defcmd(name, nagios.jmxscan(
-          zorka.query("java", _mbean, "type", "name").get("stats", "ALL", "calls")
-            .metric(perfmon.timedDelta("LVAL0", "req/min").multiply(60)),
-          zorka.query("java", _mbean, "type", "name").get("stats", "ALL", "errors")
-            .metric(perfmon.timedDelta("LVAL1", "req/min").multiply(60)),
-          zorka.query("java", _mbean, "type", "name").get("stats", "ALL", "maxTimeCLR")
-            .metric(perfmon.metric("LVAL2", "ms")),
-          zorka.query("java", _mbean, "type", "name").get("stats", "ALL", "maxTimeCLR")
-            .metric(perfmon.rate("LVAL3", "ms", "time", "calls"))
+          zorka.query("java", _mbean, "type", "name").get(attr, tag, "calls")
+            .metric(perfmon.timedDelta("LVAL0", desc+" requests", "calls/min").multiply(60)),
+          zorka.query("java", _mbean, "type", "name").get(attr, tag, "errors")
+            .metric(perfmon.timedDelta("LVAL1", desc+" errors", "err/min").multiply(60)),
+          zorka.query("java", _mbean, "type", "name").get(attr, tag, "maxTimeCLR")
+            .metric(perfmon.metric("LVAL2", desc+" peak time", "ms")),
+          zorka.query("java", _mbean, "type", "name").get(attr, tag)
+            .metric(perfmon.rate("LVAL3", desc+" average time", "ms", "time", "calls"))
           ).withLabel(name)
            .withRcMax("LVAL1",
              zorka.longCfg("nagios.cmd." + name + ".err.warn", 0),
@@ -36,6 +36,14 @@ __nagios_util() {
            .withSummaryLine(name + " ${STATUS} ${LVAL0} req/min, ${LVAL1} err/min, peak(t)=${LVAL2} ms, avg(t)=${LVAL3} ms; ")
            .withPerfLine("${LABEL}=${LVAL0};${LVAL1};${LVAL2};${LVAL3}")
            .withTextLine(name + " ${LVAL0} req/min, ${LVAL1} err/min, peak(t)=${LVAL2} ms, avg(t)=${LVAL3} ms; "));
+  }
+
+  def_zorka_stat(_mbean, name, desc) {
+    def_zorka_stat(_mbean, name, "stats", "ALL", desc);
+  }
+
+  def_zorka_stat(_mbean, name) {
+    def_zorka_stat(_mbean, name, name);
   }
 
   return this;

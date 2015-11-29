@@ -3,7 +3,7 @@
     <groupId>com.jitlogic.zorka</groupId>
     <artifactId>zorka</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.14</version>
+    <version>1.0.15</version>
     <name>zorka: parent aggregator</name>
     <url>http://zorka.io</url>
 
@@ -50,22 +50,6 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
                     <version>${sonar.plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.pitest</groupId>
-                    <artifactId>pitest-maven</artifactId>
-                    <version>${pitest.plugin.version}</version>
-                    <configuration>
-                        <inScopeClasses>
-                            <param>com.jitlogic.zorka.*</param>
-                        </inScopeClasses>
-                        <targetClasses>
-                            <param>com.jitlogic.zorka.*</param>
-                        </targetClasses>
-                        <outputFormats>
-                            <outputFormat>XML</outputFormat>
-                        </outputFormats>
-                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

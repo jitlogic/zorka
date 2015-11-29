@@ -1,0 +1,73 @@
+/**
+ * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+zorka.require("tracer.bsh");
+
+// This script handles Unboundid LDAP SDK instrumentation.
+
+__unboundid() {
+
+    // Default values for LDAP tracer options
+    zorka.defCfg("ldap.trace", zorka.stringCfg("tracer", "no"));
+    zorka.defCfg("ldap.trace.time", zorka.longCfg("tracer.min.trace.time"));
+
+    _mbean = "zorka:type=ZorkaStats,name=Ldap";
+    _trace = zorka.boolCfg("ldap.trace");
+    _traceTime = zorka.longCfg("ldap.trace.time");
+
+
+    spy.add(spy.instrument("UNBOUNDID_CONNECT")
+        .onEnter(spy.fetchArg("HOST", 1), spy.fetchArg("PORT", 2),
+            _trace ? tracer.attr("HOST", "HOST") : null,
+            _trace ? tracer.attr("PORT", "PORT") : null)
+        .onSubmit(spy.zorkaStats("java", _mbean, "stats", "CONNECT"), spy.zorkaStats("java", _mbean, "stats", "ALL"))
+        .include(spy.byMethod("com.unboundid.ldap.sdk.LDAPConnection", "connect")));
+
+
+    spy.add(spy.instrument("UNBOUNDID_BIND")
+        .onEnter(spy.fetchArg("REQ", 1),
+            _trace ? tracer.formatAttr("USERDN", "${REQ.bindDN}") : null)
+        .onSubmit(spy.zorkaStats("java", _mbean, "stats", "BIND"), spy.zorkaStats("java", _mbean, "stats", "ALL"))
+        .include(spy.byMethod(0, "com.unboundid.ldap.sdk.LDAPConnection", "bind", 
+                                 "com.unboundid.ldap.sdk.BindResult", 
+                                 "com.unboundid.ldap.sdk.BindRequest")));
+
+
+    spy.add(spy.instrument("UNBOUNDID_SEARCH")
+        .onEnter(spy.fetchArg("REQ", 1),
+            _trace ? spy.subchain(
+                tracer.formatAttr("BASEDN", "${REQ.baseDN}"),
+                tracer.formatAttr("FILTER", "${REQ.filter}")) : null)
+        .onSubmit(spy.zorkaStats("java", _mbean, "stats", "SEARCH"), spy.zorkaStats("java", _mbean, "stats", "ALL"))
+        .include(spy.byMethod(0, "com.unboundid.ldap.sdk.LDAPConnection", "search",
+                                 "com.unboundid.ldap.sdk.SearchResult",
+                                 "com.unboundid.ldap.sdk.SearchRequest")));
+
+
+  // Nagios commands for zorka stats
+  if (zorka.boolCfg("nagios", false)) {
+    zorka.require("nagios.bsh");
+    nagios_util.def_zorka_stat(_mbean, "LDAP");
+  }
+
+  return this;
+
+}
+
+unboundid = __unboundid();
+
