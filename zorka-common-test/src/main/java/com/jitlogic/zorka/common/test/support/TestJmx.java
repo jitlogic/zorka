@@ -40,6 +40,21 @@ public class TestJmx implements TestJmxMBean {
         return strMap;
     }
 
+    @Override
+    public String someOp() {
+        return "Hello world";
+    }
+
+    @Override
+    public String someOp(String s) {
+        return "Hello " + s;
+    }
+
+    @Override
+    public String someOp(String s, int x) {
+        return "Hello " + s + x;
+    }
+
     public void put(String key, String val) {
         strMap.put(key, val);
     }
