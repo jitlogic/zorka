@@ -140,6 +140,17 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
 
     @Test
+    public void testInstrumentWithBadProbe() throws Exception {
+        engine.add(spy.instrument("x").onEnter(spy.fetchArg("S", 2))
+                    .include(spy.byMethod(TCLASS1, "trivialStrMethod")));
+
+        Object obj = instantiate(engine, TCLASS1);
+
+        invoke(obj, "trivialStrMethod", "abc");
+    }
+
+
+    @Test
     public void testInstrumentConstructorWithTime() throws Exception {
         engine.add(spy.instrument("y").include(spy.byMethod(TCLASS1, SM_CONSTRUCTOR)));
         instantiate(engine, TCLASS1);
