@@ -253,6 +253,23 @@ public class SpyDefinition {
         return true;
     }
 
+    public int getLastArgIndex() {
+        int idx = -1;
+
+        if (probes != null) {
+            for (List<SpyProbe> lp : probes) {
+                if (lp != null) {
+                    for (SpyProbe p : lp) {
+                        if (p instanceof SpyArgProbe) {
+                            idx = Math.max(idx, ((SpyArgProbe)p).getArgIndex());
+                        }
+                    }
+                }
+            }
+        }
+
+        return idx;
+    }
 
     // TODO toString() method
 
