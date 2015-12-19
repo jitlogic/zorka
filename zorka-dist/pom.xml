@@ -39,7 +39,7 @@
                                       toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
                                 <copy file="../CHANGES.md"
                                       toDir="${project.build.outputDirectory}/zorka-${project.version}"/>
-                                <mkdir dir="${project.build.outputDirectory}zorka-${project.version}/scripts"/>
+                                <mkdir dir="${project.build.outputDirectory}/zorka-${project.version}/scripts"/>
                                 <copy file="src/sample.bsh"
                                       toDir="${project.build.outputDirectory}/zorka-${project.version}/scripts"/>
                                 <mkdir dir="${project.build.outputDirectory}/zorka-${project.version}/templates"/>
