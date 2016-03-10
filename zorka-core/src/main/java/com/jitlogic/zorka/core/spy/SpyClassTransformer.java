@@ -242,20 +242,20 @@ public class SpyClassTransformer implements ClassFileTransformer {
                             ProtectionDomain protectionDomain, byte[] cbf) throws IllegalClassFormatException {
 
         if (Boolean.TRUE.equals(transformLock.get())) {
-            return cbf;
+            return null;
         }
 
         if (cbf == null || cbf.length < 128 ||
             cbf[0] != (byte)0xca || cbf[1] != (byte)0xfe ||
             cbf[2] != (byte)0xba || cbf[3] != (byte)0xbe) {
-            return cbf;
+            return null;
         }
 
         String clazzName = className.replace("/", ".");
 
         Set<String> currentTransforms = currentTransformsTL.get();
         if (currentTransforms.contains(clazzName)) {
-            return cbf;
+            return null;
         } else {
             currentTransforms.add(clazzName);
         }
@@ -300,9 +300,12 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
             ClassReader cr = new ClassReader(cbf);
             ClassWriter cw = new ClassWriter(cr, doComputeFrames ? ClassWriter.COMPUTE_FRAMES : 0);
-            ClassVisitor scv = createVisitor(classLoader, clazzName, found, tracer, cw);
+            SpyClassVisitor scv = createVisitor(classLoader, clazzName, found, tracer, cw);
             cr.accept(scv, 0);
-            buf = cw.toByteArray();
+
+            if(scv.wasBytecodeModified()) {
+                buf = cw.toByteArray();
+            }
 
             long tt2 = System.nanoTime();
             classesTransformed.logCall(tt2 - tt1);
@@ -313,7 +316,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
         long pt2 = System.nanoTime();
         classesProcessed.logCall(pt2 - pt1);
 
-        return buf;
+        return buf == cbf ? null : buf;
     }
 
     /**
@@ -324,7 +327,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
      * @param cw        output (class writer)
      * @return class visitor for instrumenting this class
      */
-    protected ClassVisitor createVisitor(ClassLoader classLoader, String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
+    protected SpyClassVisitor createVisitor(ClassLoader classLoader, String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
         return new SpyClassVisitor(this, classLoader, symbolRegistry, className, found, tracer, cw);
     }
 

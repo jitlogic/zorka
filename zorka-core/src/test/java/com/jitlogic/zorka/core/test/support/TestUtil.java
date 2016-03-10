@@ -44,13 +44,20 @@ public class TestUtil extends ClassLoader {
 
 
     public static Object instantiate(SpyClassTransformer engine, String clazzName) throws Exception {
-        String className = clazzName.replace(".", "/");
-        byte[] classBytes = readResource(className + ".class");
-        byte[] transformed = engine.transform(TestUtil.getSystemClassLoader(), className, null, null, classBytes);
+        TransformationResult result = transform(engine, clazzName);
+        byte[] classBytes = result.transformedBytecode != null ? result.transformedBytecode : result.originalBytecode;
 
-        Class<?> clazz = new TestUtil().defineClass(clazzName, transformed, 0, transformed.length);
+        Class<?> clazz = new TestUtil().defineClass(result.clazzName, classBytes, 0, classBytes.length);
 
         return clazz.newInstance();
+    }
+
+    public static TransformationResult transform(SpyClassTransformer engine, String clazzName) throws Exception {
+        String className = clazzName.replace(".", "/");
+        byte[] original = readResource(className + ".class");
+        byte[] transformed = engine.transform(TestUtil.getSystemClassLoader(), className, null, null, original);
+
+        return new TransformationResult(clazzName, original, transformed);
     }
 
 
@@ -160,6 +167,18 @@ public class TestUtil extends ClassLoader {
                 }
             }
             f.delete();
+        }
+    }
+
+    public static class TransformationResult {
+        public final String clazzName;
+        public final byte[] originalBytecode;
+        public final byte[] transformedBytecode;
+
+        private TransformationResult(String clazzName, byte[] originalBytecode, byte[] transformedBytecode) {
+            this.clazzName = clazzName;
+            this.originalBytecode = originalBytecode;
+            this.transformedBytecode = transformedBytecode;
         }
     }
 }

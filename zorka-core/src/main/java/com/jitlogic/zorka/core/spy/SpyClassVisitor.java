@@ -76,6 +76,8 @@ public class SpyClassVisitor extends ClassVisitor {
 
     private boolean recursive;
 
+    private boolean bytecodeWasModified = false;
+
     /**
      * Creates Spy class visitor.
      *
@@ -191,6 +193,7 @@ public class SpyClassVisitor extends ClassVisitor {
         }
 
         if (ctxs.size() > 0 || doTrace) {
+            bytecodeWasModified = true;
             return new SpyMethodVisitor(m, doTrace ? symbolRegistry : null, className,
                     classAnnotations, classInterfaces, access, methodName, methodDesc, ctxs, mv);
         }
@@ -210,5 +213,9 @@ public class SpyClassVisitor extends ClassVisitor {
      */
     protected MethodVisitor createVisitor(int access, String name, String desc, String signature, String[] exceptions) {
         return cv.visitMethod(access, name, desc, signature, exceptions);
+    }
+
+    public boolean wasBytecodeModified() {
+        return bytecodeWasModified;
     }
 }
