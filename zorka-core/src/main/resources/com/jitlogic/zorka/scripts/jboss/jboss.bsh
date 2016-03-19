@@ -206,7 +206,14 @@ __jboss() {
 
           "org.jboss.security.**/run",
 
+          "org.jboss.stdio.**",
+
           "org.jboss.tm.**",
+
+          "org.jboss.vfs.VirtualFile",
+          "org.jboss.vfs.VFSUtils",
+          "org.jboss.vfs.spi.JavaZipFileSystem",
+          "org.jboss.vfs.util.PathTokenizer",
 
           "org.jboss.virtual.Visitor**",
           "org.jboss.virtual.plugins.cache.**",
