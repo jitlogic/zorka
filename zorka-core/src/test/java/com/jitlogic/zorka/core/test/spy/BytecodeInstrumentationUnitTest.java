@@ -39,6 +39,13 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
         assertEquals("should be of class " + TCLASS1, TCLASS1, obj.getClass().getName());
     }
 
+    @Test
+    public void testNoTransformation() throws Exception {
+        TransformationResult transformationResult = transform(engine, TCLASS1);
+
+        assertNull("should not transform classes not touched by instrumentation", transformationResult.transformedBytecode);
+    }
+
 
     @Test
     public void testTrivialInstrumentOnlyEntryPointWithThisRef() throws Exception {
