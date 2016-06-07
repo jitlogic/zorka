@@ -42,7 +42,7 @@ public class TestSpyTransformer extends SpyClassTransformer {
     }
 
     @Override
-    protected SpyClassVisitor createVisitor(ClassLoader classLoader, String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
+    protected SpyClassVisitor createVisitor(ClassLoader classLoader, String className, List<SpyDefinition> found, Tracer tracer, SpyClassWriter cw) {
 
         if (debug) {
             return new SpyClassVisitor(this, classLoader, sreg, className, found,

@@ -23,7 +23,6 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 
 import java.lang.instrument.ClassFileTransformer;
@@ -299,7 +298,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
             boolean doComputeFrames = computeFrames && (cbf[7] > (byte) 0x32);
 
             ClassReader cr = new ClassReader(cbf);
-            ClassWriter cw = new ClassWriter(cr, doComputeFrames ? ClassWriter.COMPUTE_FRAMES : 0);
+            SpyClassWriter cw = new SpyClassWriter(cr, doComputeFrames ? SpyClassWriter.COMPUTE_FRAMES : 0);
             SpyClassVisitor scv = createVisitor(classLoader, clazzName, found, tracer, cw);
             cr.accept(scv, 0);
 
@@ -327,7 +326,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
      * @param cw        output (class writer)
      * @return class visitor for instrumenting this class
      */
-    protected SpyClassVisitor createVisitor(ClassLoader classLoader, String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
+    protected SpyClassVisitor createVisitor(ClassLoader classLoader, String className, List<SpyDefinition> found, Tracer tracer, SpyClassWriter cw) {
         return new SpyClassVisitor(this, classLoader, symbolRegistry, className, found, tracer, cw);
     }
 
