@@ -25,7 +25,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -305,9 +307,9 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 	}
 
 	private void scheduleTasks(ActiveCheckResponse checkData) {
-		ArrayList<ActiveCheckQueryItem> newTasks = new ArrayList<ActiveCheckQueryItem>(checkData.getData());
-		ArrayList<ActiveCheckQueryItem> tasksToInsert = new ArrayList<ActiveCheckQueryItem>(checkData.getData());
-		ArrayList<ActiveCheckQueryItem> tasksToDelete = new ArrayList<ActiveCheckQueryItem>(runningTasks.keySet());
+		Set<ActiveCheckQueryItem> newTasks = new HashSet<ActiveCheckQueryItem>(checkData.getData());
+		Set<ActiveCheckQueryItem> tasksToInsert = new HashSet<ActiveCheckQueryItem>(checkData.getData());
+		Set<ActiveCheckQueryItem> tasksToDelete = new HashSet<ActiveCheckQueryItem>(runningTasks.keySet());
 
 		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive - schedule Tasks: " + checkData.toString());
 
