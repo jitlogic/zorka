@@ -21,9 +21,15 @@ import java.util.Map;
 
 public interface TestJmxMBean {
 
-    public long getNom();
+    long getNom();
 
-    public long getDiv();
+    long getDiv();
 
-    public Map<String, String> getStrMap();
+    Map<String, String> getStrMap();
+
+    String someOp();
+
+    String someOp(String s);
+
+    String someOp(String s, int x);
 }

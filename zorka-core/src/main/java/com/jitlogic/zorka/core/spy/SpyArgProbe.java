@@ -93,6 +93,7 @@ public class SpyArgProbe extends SpyProbe {
                 argIndex == ((SpyArgProbe) obj).argIndex;
     }
 
+    public int getArgIndex() { return argIndex; }
 
     @Override
     public String toString() {
