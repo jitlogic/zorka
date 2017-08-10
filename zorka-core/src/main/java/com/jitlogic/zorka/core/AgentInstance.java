@@ -206,12 +206,6 @@ public class AgentInstance implements ZorkaService {
             zorkaAgent.put("zabbix.active", getZabbixLib());
         }
         
-        if (config.boolCfg("zabbix", true)) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Enabling ZABBIX subsystem ...");
-            getZabbixAgent().start();
-            zorkaAgent.put("zabbix", getZabbixLib());
-        }
-
         if (config.boolCfg("syslog", true)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Syslog subsystem ....");
             zorkaAgent.put("syslog", getSyslogLib());
@@ -220,12 +214,6 @@ public class AgentInstance implements ZorkaService {
         if (config.boolCfg("snmp", true)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling SNMP subsystem ...");
             zorkaAgent.put("snmp", getSnmpLib());
-        }
-
-        if (config.boolCfg("nagios", false)) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Nagios support ...");
-            getNagiosAgent().start();
-            zorkaAgent.put("nagios", getNagiosLib());
         }
 
         getZorkaAgent().put("normalizers", getNormLib());
