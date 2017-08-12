@@ -608,6 +608,14 @@ public class ZorkaLib implements ZorkaService {
         return l == 0 ? "OK" : "ERRORS(" + l + ") see agent log.";
     }
 
+    public AgentInstance getAgentInstance() {
+        return instance;
+    }
+
+    public ZorkaBshAgent getBshAgent() {
+        return agent;
+    }
+
     public String loadScript(String script) {
         return agent.loadScript(script);
     }

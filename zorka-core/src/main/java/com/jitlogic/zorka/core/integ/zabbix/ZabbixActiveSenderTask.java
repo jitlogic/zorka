@@ -95,9 +95,15 @@ public class ZabbixActiveSenderTask implements Runnable {
 					log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActiveSender " + endIndex + " items removed from cache");
 				}
 			}
-
 		} catch (IOException e) {
-			e.printStackTrace();
+			if (ZorkaLogger.isLogMask(ZorkaLogger.ZAG_DEBUG)) {
+				log.debug(ZorkaLogger.ZAG_DEBUG, "Failed to run ZabbixActiveSenderTask, IO Exception " + e.getMessage(), e);
+			}
+			else {
+				log.warn(ZorkaLogger.ZAG_WARNINGS, "Failed to run ZabbixActiveSenderTask, IO Exception " + e.getMessage());
+			}
+		} catch (Exception e) {
+			log.error(ZorkaLogger.ZAG_ERRORS, "Failed to run ZabbixActiveSenderTask", e);
 		} finally {
 			log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActiveSender finished");
 			if (socket != null) {

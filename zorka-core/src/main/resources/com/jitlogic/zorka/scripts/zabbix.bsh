@@ -15,6 +15,8 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
+zorka.defCfg("zabbix", "yes");
+zorka.defCfg("zabbix.active", "no");
 
 // Basic items to make zorka compliant with Zabbix 2.0 agent template.
 
@@ -28,3 +30,15 @@ agent.version = zorka.version();
 // user can set presented hostname in zorka.properties file
 agent.hostname = zorka.getHostname();
 
+
+if (zorka.boolCfg("zabbix")) {
+  zorka.logInfo("Enabling ZABBIX Agent subsystem ...");
+  zorka.getAgentInstance().getZabbixAgent().start();
+  zorka.getBshAgent().put("zabbix", zorka.getAgentInstance().getZabbixLib());
+}
+
+if (zorka.boolCfg("zabbix.active")) {
+  zorka.logInfo("Enabling ZABBIX Active Agent subsystem ...");
+  zorka.getAgentInstance().getZabbixActiveAgent().start();
+  zorka.getBshAgent().put("zabbix", zorka.getAgentInstance().getZabbixLib());
+}
