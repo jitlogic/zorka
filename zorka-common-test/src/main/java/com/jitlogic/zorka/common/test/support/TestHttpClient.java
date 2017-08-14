@@ -29,13 +29,18 @@ import static org.junit.Assert.*;
 public class TestHttpClient implements HttpClient {
 
     private List<TestHttpRequestMock> mocks = new ArrayList<TestHttpRequestMock>();
+    private List<HttpRequest> requests = new ArrayList<HttpRequest>();
+    private List<HttpResponse> responses = new ArrayList<HttpResponse>();
 
     private int curIdx = 0;
 
     @Override
     public HttpResponse execute(HttpRequest req) throws IOException {
         if (curIdx < mocks.size()) {
-            return mocks.get(curIdx++).handleRequest(req);
+            requests.add(req);
+            HttpResponse resp = mocks.get(curIdx++).handleRequest(req);
+            responses.add(resp);
+            return resp;
         } else {
             fail("Unexpected HTTP call.");
         }
@@ -47,6 +52,18 @@ public class TestHttpClient implements HttpClient {
         mock.setExpectedRequest(expectedReq);
         mocks.add(mock);
         return mock;
+    }
+
+    public int numRequests() {
+        return requests.size();
+    }
+
+    public HttpRequest getRequest(int idx) {
+        return requests.get(idx);
+    }
+
+    public HttpResponse getResponse(int idx) {
+        return responses.get(idx);
     }
 
     public void verify() {

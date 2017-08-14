@@ -154,22 +154,6 @@ public class TestUtil extends ClassLoader {
     }
 
 
-    public static void rmrf(String path) throws IOException {
-        rmrf(new File(path));
-    }
-
-
-    public static void rmrf(File f) throws IOException {
-        if (f.exists()) {
-            if (f.isDirectory()) {
-                for (File c : f.listFiles()) {
-                    rmrf(c);
-                }
-            }
-            f.delete();
-        }
-    }
-
     public static class TransformationResult {
         public final String clazzName;
         public final byte[] originalBytecode;

@@ -47,10 +47,8 @@ public class JdkHttpClient implements HttpClient {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod(req.method);
 
-        for (Map.Entry<String,List<String>> e : req.headers.entrySet()) {
-            for (String v : e.getValue()) {
-                conn.addRequestProperty(e.getKey(), v);
-            }
+        for (Map.Entry<String,String> e : req.headers.entrySet()) {
+            conn.addRequestProperty(e.getKey(), e.getValue());
         }
 
         conn.setDoOutput(true);

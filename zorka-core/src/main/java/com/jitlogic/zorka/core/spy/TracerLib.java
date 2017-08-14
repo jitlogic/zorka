@@ -26,6 +26,7 @@ import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.common.zico.CborTraceOutput;
 import com.jitlogic.zorka.core.integ.zabbix.ZabbixTraceOutput;
 import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
 import com.jitlogic.zorka.core.spy.plugins.*;
@@ -432,7 +433,8 @@ public class TracerLib {
     }
 
     /**
-     * Creates trace network sender. It will receive traces and send them to remote collector.
+     * Creates trace network sender using ZICO protocol and Fressian representation.
+     * It will receive traces and send them to remote collector.
      *
      * @param addr     collector host name or IP address
      * @param port     collector port
@@ -451,7 +453,23 @@ public class TracerLib {
         return output;
     }
 
-    
+    /**
+     * Creates trace network sender using HTTP protocol and CBOR representation.
+     *
+     * @param url ZICO collector URL
+     * @param agentUUID agent UUID (as registered in collector)
+     * @param agentKey agent auth key (used to authenticate agent registrations)
+     * @param hostname agent name (passed as parameter to agent registration)
+     * @param app application name (passed as parameter to agent registration)
+     * @param env environment name (passed as parameter to agent registration)
+     * @return Submitter object (can be registered later on via tracer.output())
+     */
+    public ZorkaAsyncThread<SymbolicRecord> toCbor(String url, String agentUUID, String agentKey,
+                                                   String hostname, String app, String env) {
+        return new CborTraceOutput(url, agentUUID, agentKey, hostname, app, env, symbolRegistry,
+            64, 10, 125, 2, 60000);
+    }
+
     /**
      * Creates trace network sender. It will receive traces and send them to remote Zabbix Server.
      *

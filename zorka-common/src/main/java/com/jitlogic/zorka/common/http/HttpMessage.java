@@ -50,6 +50,10 @@ public abstract class HttpMessage<T extends HttpMessage<T>> {
         return (T) this;
     }
 
+    public String getBody() {
+        return body;
+    }
+
     /**
      * Adds headers.
      */

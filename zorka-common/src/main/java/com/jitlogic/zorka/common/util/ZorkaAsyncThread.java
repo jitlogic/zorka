@@ -52,7 +52,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
     /**
      * Processing thread will be working as long as this attribute value is true
      */
-    private final AtomicBoolean running = new AtomicBoolean(false);
+    private final AtomicBoolean running = new AtomicBoolean(false); // TODO use volatile here
 
     /**
      * Thread object representing actual processing thread.

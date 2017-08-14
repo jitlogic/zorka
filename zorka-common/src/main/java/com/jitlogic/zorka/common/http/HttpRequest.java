@@ -27,6 +27,7 @@ import java.util.Map;
 public class HttpRequest extends HttpMessage<HttpRequest> {
 
     Map<String, String> params = new HashMap<String, String>();
+    Map<String, String> headers = new HashMap<String, String>();
 
     HttpClient client;
     String url;
@@ -51,6 +52,19 @@ public class HttpRequest extends HttpMessage<HttpRequest> {
 
     public Map<String,String> params() {
         return params;
+    }
+
+    public HttpRequest headers(String...hs) {
+        for (int i = 1; i < hs.length; i += 2) {
+            headers.put(hs[i-1], hs[i]);
+        }
+        return this;
+    }
+
+    public Map<String,String> headers() { return headers; }
+
+    public String header(String name) {
+        return headers.get(name);
     }
 
     public HttpRequest method(String method) {
