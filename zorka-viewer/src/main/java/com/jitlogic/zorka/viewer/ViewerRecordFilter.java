@@ -1,7 +1,5 @@
-package com.jitlogic.zorka.viewer;
-
-/**
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+/*
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -15,6 +13,9 @@ package com.jitlogic.zorka.viewer;
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+
+package com.jitlogic.zorka.viewer;
+
 
 public interface ViewerRecordFilter {
 
