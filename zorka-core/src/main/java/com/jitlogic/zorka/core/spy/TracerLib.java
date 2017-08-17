@@ -453,6 +453,11 @@ public class TracerLib {
         return output;
     }
 
+    public ZorkaAsyncThread<SymbolicRecord> toCbor(String url, String agentUUID, String agentKey,
+                                                   String hostname, String app, String env) {
+        return toCbor(url, agentUUID, agentKey, hostname, app, env, 64, 10, 125, 2, 60000);
+    }
+
     /**
      * Creates trace network sender using HTTP protocol and CBOR representation.
      *
@@ -465,9 +470,12 @@ public class TracerLib {
      * @return Submitter object (can be registered later on via tracer.output())
      */
     public ZorkaAsyncThread<SymbolicRecord> toCbor(String url, String agentUUID, String agentKey,
-                                                   String hostname, String app, String env) {
+                                                   String hostname, String app, String env,
+                                                   int qlen, int retries, long retryTime,
+                                                   long retryTimeExp, int timeout) {
+
         return new CborTraceOutput(url, agentUUID, agentKey, hostname, app, env, symbolRegistry,
-            64, 10, 125, 2, 60000);
+            qlen, retries, retryTime, retryTimeExp, timeout);
     }
 
     /**

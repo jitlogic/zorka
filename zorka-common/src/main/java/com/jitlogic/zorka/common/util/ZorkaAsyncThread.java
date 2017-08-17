@@ -95,7 +95,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
     	this(name, qlen, plen);
     	
     	// convert to millis
-        this.interval = interval * 1000l;
+        this.interval = interval * 1000L;
     }
     
 

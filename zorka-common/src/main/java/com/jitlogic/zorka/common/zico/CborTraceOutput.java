@@ -220,36 +220,38 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
         sessionUUID = null;
 
         try {
-            HttpRequest req = HttpUtil.GET(authUrl)
-                .headers("X-ZICO-Agent-UUID", agentUUID)
-                .headers("X-ZICO-Auth-Key", authKey)
-                .params("env", env).params("app", app);
+            HttpRequest req = HttpUtil.GET(authUrl);
+            req.setHeader("X-ZICO-Agent-UUID", agentUUID);
+            req.setHeader("X-ZICO-Auth-Key", authKey);
+            req.setParam("env", env);
+            req.setParam("app", app);
             HttpResponse res = req.go();
-            if (res.getResponseCode() == 200) {
-                sessionUUID = res.getBody();
-            } else if (res.getResponseCode() == 401) {
+            if (res.getStatus() == 200) {
+                sessionUUID = res.getBodyAsString();
+            } else if (res.getStatus() == 401) {
                 throw new ZorkaRuntimeException("Not authorized. Check trapper.cbor.auth-key property.");
             } else {
-                throw new ZorkaRuntimeException("Server error: " + res.getResponseCode() + " " + res.getResponseMessage());
+                throw new ZorkaRuntimeException("Server error: " + res.getStatus() + " " + res.getStatusMsg());
             }
         } catch (IOException e) {
-            throw new ZorkaRuntimeException("I/O exception: " + e.getMessage());
+            throw new ZorkaRuntimeException("I/O exception: " + e.getMessage(), e);
         }
     }
 
     private void send(CborDataWriter w, String uri, String traceUUID) {
         try {
             // TODO this is inefficient, implement dedicated Base64/json/etc encoding in HttpClient
-            HttpRequest req = HttpUtil.POST(uri, DatatypeConverter.printBase64Binary(Arrays.copyOf(w.getBuf(), w.position())))
-                .headers("X-ZICO-Agent-UUID", agentUUID).headers("X-ZICO-Session-UUID", sessionUUID);
-            if (traceUUID != null) req = req.headers("X-ZICO-Trace-UUID", traceUUID);
+            HttpRequest req = HttpUtil.POST(uri, DatatypeConverter.printBase64Binary(Arrays.copyOf(w.getBuf(), w.position())));
+            req.setHeader("X-ZICO-Agent-UUID", agentUUID);
+            req.setHeader("X-ZICO-Session-UUID", sessionUUID);
+            if (traceUUID != null) req.setHeader("X-ZICO-Trace-UUID", traceUUID);
             HttpResponse res = req.go();
-            if (res.getResponseCode() < 300) {
+            if (res.getStatus() < 300) {
                 log.trace(ZorkaLogger.ZTR_TRACER_DBG, "Submitted: " + uri + " : " + traceUUID);
-            } else if (res.getResponseCode() == 412) {
+            } else if (res.getStatus() == 412) {
                 throw new ZorkaRuntimeException("Resend.");
             } else {
-               throw new ZorkaRuntimeException("Server error: " + res.getResponseCode() + " " + res.getResponseMessage());
+               throw new ZorkaRuntimeException("Server error: " + res.getStatus() + " " + res.getStatus());
             }
         } catch (IOException e) {
             throw new ZorkaRuntimeException("I/O exception: " + e.getMessage());
@@ -287,7 +289,7 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
                     log.info(ZorkaLogger.ZTR_TRACER_DBG, "Session expired. Reauthenticating ...");
                     authenticate();
                 } catch (Exception e) {
-                    log.error(ZorkaLogger.ZCL_STORE, "Error sending trace record: " + e + ". Resetting connection.");
+                    log.error(ZorkaLogger.ZCL_STORE, "Error sending trace record: " + e + ". Resetting connection.", e);
                     authenticate();
                 }
 

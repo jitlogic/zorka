@@ -20,16 +20,27 @@ import java.io.IOException;
 
 public class HttpUtil {
 
-    private static HttpClient client = new JdkHttpClient();
+    private static HttpClient client = new MiniHttpClient();
 
-    public static HttpRequest GET(String url, String...params) throws IOException {
-        return new HttpRequest(client, url).params(params).method("GET");
+    public static HttpRequest GET(String url) throws IOException {
+        HttpRequest req = new HttpRequest(client, url);
+        req.setMethod("GET");
+        return req;
     }
 
     public static HttpRequest POST(String url, String body) throws IOException {
-        return new HttpRequest(client, url).body(body).method("POST");
+        HttpRequest req = new HttpRequest(client, url);
+        req.setMethod("POST");
+        req.setBody(body.getBytes());
+        return req;
     }
 
+    public static HttpRequest POST(String url, byte [] body) throws IOException {
+        HttpRequest req = new HttpRequest(client, url);
+        req.setMethod("POST");
+        req.setBody(body);
+        return req;
+    }
 
 
 }

@@ -24,14 +24,20 @@ import java.util.Map;
 /**
  * This class represents an HTTP Request message.
  */
-public class HttpRequest extends HttpMessage<HttpRequest> {
+public class HttpRequest extends HttpMsg {
+
+    public final static int F_CNT_LENGTH = 0x01;  // Send Content-Length header
+    public final static int F_ENC_BASE64 = 0x02;  // Encode body using base64
 
     Map<String, String> params = new HashMap<String, String>();
-    Map<String, String> headers = new HashMap<String, String>();
 
     HttpClient client;
+
     String url;
     String method = "GET";
+
+    int flags;
+
 
     public HttpRequest(HttpClient client, String url) throws IOException {
         this.client = client;
@@ -39,56 +45,41 @@ public class HttpRequest extends HttpMessage<HttpRequest> {
     }
 
 
-    public HttpRequest params(String...ps) {
+    public void setParams(String...ps) {
         for (int i = 1; i < ps.length; i += 2) {
             params.put(ps[i-1], ps[i]);
         }
-        return this;
     }
 
-    public String param(String name) {
+    public String getParam(String name) {
         return params.get(name);
     }
 
-    public Map<String,String> params() {
+    public void setParam(String name, String value) {
+        params.put(name, value);
+    }
+
+    public Map<String,String> getParams() {
         return params;
     }
 
-    public HttpRequest headers(String...hs) {
-        for (int i = 1; i < hs.length; i += 2) {
-            headers.put(hs[i-1], hs[i]);
-        }
-        return this;
-    }
 
-    public Map<String,String> headers() { return headers; }
-
-    public String header(String name) {
-        return headers.get(name);
-    }
-
-    public HttpRequest method(String method) {
-        this.method = method;
-        return this;
-    }
-
-    public String method() {
+    public String getMethod() {
         return method;
     }
 
-    /**
-     * Returns request URL
-     */
-    public String url() {
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public String getUrl() {
         return url;
     }
 
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-    /**
-     * Executes request. Returns reply object containing reply data.
-     *
-     * @return HttpResponse object
-     */
     public HttpResponse go() throws IOException {
         return client.execute(this);
     }

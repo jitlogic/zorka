@@ -16,13 +16,17 @@
 
 package com.jitlogic.zorka.core.test.spy;
 
+import com.jitlogic.zorka.common.http.HttpClient;
 import com.jitlogic.zorka.common.http.HttpUtil;
+import com.jitlogic.zorka.common.http.MiniHttpClient;
 import com.jitlogic.zorka.common.tracedata.Symbol;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.zico.CborTraceOutput;
 import com.jitlogic.zorka.core.test.support.TestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -76,6 +80,20 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
         assertEquals("someUUID", TestUtil.getField(output, "sessionUUID"));
 
         httpClient.verify();
+    }
+
+    @Test @Ignore("This requires working ZICO 2.x collector.")
+    public void testOutputAuthManual() throws Exception {
+        HttpClient miniClient = new MiniHttpClient();
+        ObjectInspector.setField(HttpUtil.class, "client", miniClient);
+
+        CborTraceOutput output = (CborTraceOutput) tracer.toCbor(
+            "http://127.0.0.1:8640/", "21c00000-0201-0000-0015-deadbeef1003", "deadbeefdadacafe",
+            "myapp.local", "MYAPP2", "PRD");
+
+        output.submit(tr("some.class", "someMethod", "()V", 1, 0, 0, 100));
+
+        output.runCycle();
     }
 
     @Test

@@ -42,18 +42,18 @@ public class TestHttpRequestMock {
         providedRequest = req;
 
         assertEquals("Request URL does not match",
-            expectedRequest.url(), providedRequest.url());
+            expectedRequest.getUrl(), providedRequest.getUrl());
 
-        for (Map.Entry<String,String> e : expectedRequest.params().entrySet()) {
+        for (Map.Entry<String,String> e : expectedRequest.getParams().entrySet()) {
             String name = e.getKey();
             assertEquals("Parameter " + name + " does not match.",
-                expectedRequest.param(name), providedRequest.param(name));
+                expectedRequest.getParam(name), providedRequest.getParam(name));
         }
 
-        for (Map.Entry<String,String> e : expectedRequest.headers().entrySet()) {
+        for (Map.Entry<String,String> e : expectedRequest.getHeaders().entrySet()) {
             String name = e.getKey();
             assertEquals("Header " + name + " + does not match.",
-                expectedRequest.header(name), providedRequest.header(name));
+                expectedRequest.getHeader(name), providedRequest.getHeader(name));
         }
 
         return response;
@@ -89,12 +89,17 @@ public class TestHttpRequestMock {
         this.response = response;
     }
 
+
     public void response(int status, String body) {
         setResponse(RESP(status, body));
     }
 
+
     public static HttpResponse RESP(int status, String body) {
-        return new HttpResponse().setResponseCode(status).body(body);
+        HttpResponse resp = new HttpResponse();
+        resp.setStatus(status);
+        resp.setBody(body.getBytes());
+        return resp;
     }
 
 }
