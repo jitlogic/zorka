@@ -44,9 +44,12 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
     private CborDataWriter awriter = new CborDataWriter(ABUFSZ, ABUFSZ), twriter = new CborDataWriter(TBUFSZ, TBUFSZ);
     private SymbolRegistry registry;
 
+    private Map<String,Integer> traceTypes;
+
 
     public CborTraceOutput(String url, String agentUUID, String authKey,
-                           String hostname, String app, String env, SymbolRegistry registry,
+                           String hostname, String app, String env,
+                           SymbolRegistry registry, Map<String,Integer> traceTypes,
                            int qlen, int retries, long retryTime, long retryTimeExp, int timeout) {
         super("ZORKA-CBOR-TRACE-OUTPUT", qlen, 1);
 
@@ -64,6 +67,7 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
         this.authUrl = url + "auth";
 
         this.registry = registry;
+        this.traceTypes = traceTypes;
 
         this.retries = retries;
         this.retryTime = retryTime;
@@ -138,10 +142,22 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
 
         // Trace Marker (if any)
         if (tm != null) {
-            twriter.writeTag(TraceDataFormat.TAG_TRACE_BEGIN);
-            twriter.writeUInt(CBOR.ARR_BASE, 2);
-            twriter.writeLong(tm.getClock());
-            twriter.writeLong(tm.getTraceId());
+            String traceType = registry.symbolName(tm.getTraceId());
+            if (traceType != null) {
+                Integer tid = traceTypes.get(traceType);
+                if (tid != null) {
+                    twriter.writeTag(TraceDataFormat.TAG_TRACE_BEGIN);
+                    twriter.writeUInt(CBOR.ARR_BASE, 2);
+                    twriter.writeLong(tm.getClock());
+                    twriter.writeInt(tid);
+                } else {
+                    log.error(ZorkaLogger.ZTR_ERRORS, "Mapping for trace type '" + traceType + "' not found. "
+                        + "Use tracer.defType() function to define mapping for CBOR output.");
+                }
+            } else {
+                log.error(ZorkaLogger.ZTR_ERRORS, "Symbol name for typeId '" + tm.getTraceId()
+                    + "' not found. Internal error. (?)");
+            }
         }
 
         Map<Integer,Object> attrs = tr.getAttrs();

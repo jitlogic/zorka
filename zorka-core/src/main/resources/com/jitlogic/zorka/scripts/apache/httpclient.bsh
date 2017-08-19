@@ -60,7 +60,7 @@ __apache_httpclient() {
     spy.instrument("APACHE_HTTPCLIENT_EXECUTE")
       .onEnter(spy.fetchArg("METHOD", 2),
         _trace ? spy.subchain(
-          tracer.begin("HTTP_CLIENT", _traceTime),
+          tracer.begin("HTTP_CLI", _traceTime),
           tracer.formatAttr("URI", "${METHOD.URI}"),
           tracer.formatAttr("METHOD", "${METHOD.method}")
         ) : null)
@@ -94,7 +94,7 @@ __apache_httpclient() {
     spy.instrument("APACHE_HTTPCLIENT_EXECUTE1")
       .onEnter(spy.fetchArg("HOST", 1), spy.fetchArg("REQ", 2),
         _trace ? spy.subchain(
-          tracer.begin("HTTP_CLIENT", _traceTime),
+          tracer.begin("HTTP_CLI", _traceTime),
           tracer.formatAttr("HOST", "${HOST}")
         ) : null)
       .onReturn(spy.fetchRetVal("RET"),
@@ -115,7 +115,7 @@ __apache_httpclient() {
     spy.instrument("APACHE_HTTPCLIENT_EXECUTE2")
       .onEnter(spy.fetchArg("REQ", 1), spy.fetchArg("CONN", 2),
         _trace ? spy.subchain(
-          tracer.begin("HTTP_CLIENT", _traceTime),
+          tracer.begin("HTTP_CLI", _traceTime),
           tracer.formatAttr("URI", "${REQ.requestLine}"),
           tracer.formatAttr("HOST", "${CONN.remoteAddress}:${CONN.remotePort}}")
         ) : null)

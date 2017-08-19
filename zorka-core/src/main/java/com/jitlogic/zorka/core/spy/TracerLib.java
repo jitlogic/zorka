@@ -18,7 +18,9 @@ package com.jitlogic.zorka.core.spy;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
@@ -53,6 +55,8 @@ public class TracerLib {
     private MetricsRegistry metricsRegistry;
 
     private ZorkaConfig config;
+
+    private Map<String,Integer> traceTypes = new ConcurrentHashMap<String, Integer>();
 
     /**
      * Default trace flags
@@ -474,7 +478,9 @@ public class TracerLib {
                                                    int qlen, int retries, long retryTime,
                                                    long retryTimeExp, int timeout) {
 
-        return new CborTraceOutput(url, agentUUID, agentKey, hostname, app, env, symbolRegistry,
+        return new CborTraceOutput(
+            url, agentUUID, agentKey, hostname, app, env,
+            symbolRegistry, traceTypes,
             qlen, retries, retryTime, retryTimeExp, timeout);
     }
 
@@ -600,6 +606,9 @@ public class TracerLib {
         return tracer.isTraceSpyMethods();
     }
 
+    public void defType(String typeName, int typeId) {
+        traceTypes.put(typeName, typeId);
+    }
 
     /**
      * Sets default trace marker flags. This setting will be used when beginning new traces

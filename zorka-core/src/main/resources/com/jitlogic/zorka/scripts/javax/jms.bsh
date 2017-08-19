@@ -64,6 +64,9 @@ __javax_jms() {
   _slow_chain  = traps.subchain("jms", "slow");
   _error_chain = traps.subchain("jms", "error");
 
+  // Register trace types for CBOR collector.
+  tracer.defType("JMS", 42);
+
   if (zorka.boolCfg("jms")) {
 
     _fetchAttrs = zorka.boolCfg("jms.fetch.attrs") ? spy.subchain(
