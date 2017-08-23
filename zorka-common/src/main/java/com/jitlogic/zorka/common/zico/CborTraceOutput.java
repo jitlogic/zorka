@@ -138,10 +138,10 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
         long prolog = (t & 0xFFFFFFFFFFL) | (methodId << 40);
         twriter.writeRawLong(prolog, false);
 
-        TraceMarker tm = tr.getMarker();
 
-        // Trace Marker (if any)
-        if (tm != null) {
+        // Trace Marker (if this is trace beginning)
+        if (tr.hasFlag(TraceRecord.TRACE_BEGIN)) {
+            TraceMarker tm = tr.getMarker();
             String traceType = registry.symbolName(tm.getTraceId());
             if (traceType != null) {
                 Integer tid = traceTypes.get(traceType);
