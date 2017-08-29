@@ -135,7 +135,7 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
         // Trace Prolog
         twriter.writeTag(TraceDataFormat.TAG_PROLOG_BE);
         twriter.writeUInt(CBOR.BYTES_BASE, 8);
-        long prolog = (t & 0xFFFFFFFFFFL) | (methodId << 40);
+        long prolog = ((t >>> 16) & 0xFFFFFFFFFFL) | (methodId << 40);
         twriter.writeRawLong(prolog, false);
 
 
@@ -215,11 +215,11 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
         }
 
         // Epilog
-        t += tr.getTime() >>> 16;
+        t += tr.getTime();
         long calls = tr.getCalls() < 0x1000000 ? tr.getCalls() : 0;
         twriter.writeTag(TraceDataFormat.TAG_EPILOG_BE);
         twriter.writeULong(CBOR.BYTES_BASE, calls != 0 ? 8 : 16);
-        twriter.writeRawLong((t & 0xFFFFFFFFFFL) | (calls << 40), false);
+        twriter.writeRawLong(((t >>> 16) & 0xFFFFFFFFFFL) | (calls << 40), false);
         if (calls == 0) {
             twriter.writeRawLong(tr.getCalls(), false);
         }
