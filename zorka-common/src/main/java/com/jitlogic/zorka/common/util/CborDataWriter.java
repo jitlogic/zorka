@@ -172,6 +172,11 @@ public class CborDataWriter {
     }
 
 
+    public void writeSimpleToken(int token) {
+        writeUInt(CBOR.SIMPLE_BASE, token);
+    }
+
+
     public void writeObj(Object obj) {
         if (obj == null) {
             write(CBOR.NULL_CODE);

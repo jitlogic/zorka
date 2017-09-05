@@ -51,7 +51,13 @@ public class TraceDataFormat {
     public static final int TAG_EXCEPTION      = 0x22;
     public static final int TAG_EXCEPTION_REF  = 0x23;
     public static final int TAG_KEYWORD        = 0x24;
+    public static final int TAG_FLAG_TOKEN     = 0x25;
 
+    /** Sets error flag */
+    public static final int FLAG_ERROR    = 0x01;
+
+    /** Clears error flag */
+    public static final int FLAG_NO_ERROR = 0x02;
 
     /** Trace ID (refers to trace UUID from text index) */
     public static final int TI_TRACE_ID = 0x01;  // Translatable, indexable

@@ -158,6 +158,10 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
                 log.error(ZorkaLogger.ZTR_ERRORS, "Symbol name for typeId '" + tm.getTraceId()
                     + "' not found. Internal error. (?)");
             }
+            if (tm.hasFlag(TraceMarker.ERROR_MARK)) {
+                twriter.writeTag(TraceDataFormat.TAG_FLAG_TOKEN);
+                twriter.writeInt(TraceDataFormat.FLAG_ERROR);
+            }
         }
 
         Map<Integer,Object> attrs = tr.getAttrs();
