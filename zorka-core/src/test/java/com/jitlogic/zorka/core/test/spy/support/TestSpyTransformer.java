@@ -33,7 +33,7 @@ public class TestSpyTransformer extends SpyClassTransformer {
     private SymbolRegistry sreg;
 
     public TestSpyTransformer(SymbolRegistry symbolRegistry, Tracer tracer, SpyRetransformer spyRetransformer) {
-        super(symbolRegistry, tracer, true, new MethodCallStatistics(), spyRetransformer);
+        super(symbolRegistry, tracer, true, true, new MethodCallStatistics(), spyRetransformer);
         sreg = symbolRegistry;
     }
 
@@ -42,7 +42,7 @@ public class TestSpyTransformer extends SpyClassTransformer {
     }
 
     @Override
-    protected SpyClassVisitor createVisitor(ClassLoader classLoader, String className, List<SpyDefinition> found, Tracer tracer, SpyClassWriter cw) {
+    protected SpyClassVisitor createVisitor(ClassLoader classLoader, String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
 
         if (debug) {
             return new SpyClassVisitor(this, classLoader, sreg, className, found,

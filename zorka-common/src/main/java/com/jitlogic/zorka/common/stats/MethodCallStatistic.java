@@ -331,6 +331,15 @@ public class MethodCallStatistic implements ZorkaStat {
 
 
     /**
+     * Log succesful call without measuring time.
+     * This is useful when using stats only as counter only.
+     */
+    public void logCall() {
+        logCall(1);
+    }
+
+
+    /**
      * Logs successful method call
      *
      * @param time execution time

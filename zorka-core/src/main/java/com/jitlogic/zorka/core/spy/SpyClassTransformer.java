@@ -20,6 +20,7 @@ package com.jitlogic.zorka.core.spy;
 import com.jitlogic.zorka.common.stats.MethodCallStatistic;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import org.objectweb.asm.ClassReader;
@@ -73,6 +74,8 @@ public class SpyClassTransformer implements ClassFileTransformer {
         }
     };
 
+    private SpyClassResolver resolver;
+
     private SymbolRegistry symbolRegistry;
 
     private SpyRetransformer retransformer;
@@ -82,7 +85,9 @@ public class SpyClassTransformer implements ClassFileTransformer {
     /**
      * Reference to tracer instance.
      */
-    Tracer tracer;
+    private Tracer tracer;
+
+    private boolean useCustomResolver = true;
 
     private MethodCallStatistic tracerLookups, classesProcessed, classesTransformed, spyLookups;
 
@@ -92,17 +97,24 @@ public class SpyClassTransformer implements ClassFileTransformer {
      *
      * @param tracer reference to tracer engine object
      */
-    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer, boolean computeFrames,
+    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer,
+                               boolean computeFrames, boolean useCustomResolver,
                                MethodCallStatistics statistics, SpyRetransformer retransformer) {
         this.symbolRegistry = symbolRegistry;
         this.tracer = tracer;
         this.computeFrames = computeFrames;
+        this.useCustomResolver = useCustomResolver;
         this.retransformer = retransformer;
+
+        if (useCustomResolver) {
+            this.resolver = new SpyClassResolver(statistics);
+        }
 
         this.spyLookups = statistics.getMethodCallStatistic("SpyLookups");
         this.tracerLookups = statistics.getMethodCallStatistic("TracerLookups");
         this.classesProcessed = statistics.getMethodCallStatistic("ClassesProcessed");
         this.classesTransformed = statistics.getMethodCallStatistic("ClassesTransformed");
+
 
         if (!computeFrames) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Disabling COMPUTE_FRAMES. Remeber to add -XX:-UseSplitVerifier JVM option in JDK7 or -noverify in JDK8.");
@@ -298,7 +310,9 @@ public class SpyClassTransformer implements ClassFileTransformer {
             boolean doComputeFrames = computeFrames && (cbf[7] > (byte) 0x32);
 
             ClassReader cr = new ClassReader(cbf);
-            SpyClassWriter cw = new SpyClassWriter(cr, doComputeFrames ? SpyClassWriter.COMPUTE_FRAMES : 0);
+            ClassWriter cw = useCustomResolver
+                ? new SpyClassWriter(cr, doComputeFrames ? SpyClassWriter.COMPUTE_FRAMES : 0, classLoader, resolver)
+                : new ClassWriter(cr, doComputeFrames ? SpyClassWriter.COMPUTE_FRAMES : 0);
             SpyClassVisitor scv = createVisitor(classLoader, clazzName, found, tracer, cw);
             cr.accept(scv, 0);
 
@@ -326,7 +340,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
      * @param cw        output (class writer)
      * @return class visitor for instrumenting this class
      */
-    protected SpyClassVisitor createVisitor(ClassLoader classLoader, String className, List<SpyDefinition> found, Tracer tracer, SpyClassWriter cw) {
+    protected SpyClassVisitor createVisitor(ClassLoader classLoader, String className, List<SpyDefinition> found, Tracer tracer, ClassWriter cw) {
         return new SpyClassVisitor(this, classLoader, symbolRegistry, className, found, tracer, cw);
     }
 

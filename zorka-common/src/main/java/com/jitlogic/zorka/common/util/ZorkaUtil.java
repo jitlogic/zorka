@@ -17,8 +17,10 @@
 
 package com.jitlogic.zorka.common.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -862,5 +864,15 @@ public class ZorkaUtil {
             Thread.sleep(interval);
         } catch (InterruptedException e) {
         }
+    }
+
+    public static byte[] slurp(InputStream is) throws IOException {
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream(4096);
+        byte[] buf = new byte[4096];
+        int len = 0;
+        while ((len = is.read(buf)) > 0) {
+            bos.write(buf, 0, len);
+        }
+        return bos.toByteArray();
     }
 }

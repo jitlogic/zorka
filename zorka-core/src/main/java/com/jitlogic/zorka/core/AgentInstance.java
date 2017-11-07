@@ -338,7 +338,9 @@ public class AgentInstance implements ZorkaService {
     public synchronized SpyClassTransformer getClassTransformer() {
         if (classTransformer == null) {
             classTransformer = new SpyClassTransformer(getSymbolRegistry(), getTracer(),
-                getConfig().boolCfg("zorka.spy.compute.frames", true), stats, getRetransformer());
+                getConfig().boolCfg("zorka.spy.compute.frames", true),
+                getConfig().boolCfg("zorka.spy.custom.resolver", true),
+                stats, getRetransformer());
         }
         return classTransformer;
     }
