@@ -28,6 +28,8 @@ __quartz() {
   _stats = zorka.boolCfg("quartz.stats");
   _mbean = zorka.stringCfg("quartz.stats.mbean");
 
+  // Register trace types for CBOR collector.
+  tracer.defType("QUARTZ", 43);
 
   spy.add(
     spy.instrument("QUARTZ_JOB_EXECUTE")

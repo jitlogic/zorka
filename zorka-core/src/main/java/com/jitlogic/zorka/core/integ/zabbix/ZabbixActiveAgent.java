@@ -1,6 +1,6 @@
-/**
+/*
  * Copyright 2014 Daniel Makoto Iguchi <daniel.iguchi@gmail.com>
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * 
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software

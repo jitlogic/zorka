@@ -1,5 +1,5 @@
-/**
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+/*
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -253,6 +253,23 @@ public class SpyDefinition {
         return true;
     }
 
+    public int getLastArgIndex() {
+        int idx = -1;
+
+        if (probes != null) {
+            for (List<SpyProbe> lp : probes) {
+                if (lp != null) {
+                    for (SpyProbe p : lp) {
+                        if (p instanceof SpyArgProbe) {
+                            idx = Math.max(idx, ((SpyArgProbe)p).getArgIndex());
+                        }
+                    }
+                }
+            }
+        }
+
+        return idx;
+    }
 
     // TODO toString() method
 

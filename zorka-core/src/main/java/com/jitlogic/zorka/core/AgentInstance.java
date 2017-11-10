@@ -1,5 +1,5 @@
-/**
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+/*
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -206,12 +206,6 @@ public class AgentInstance implements ZorkaService {
             zorkaAgent.put("zabbix.active", getZabbixLib());
         }
         
-        if (config.boolCfg("zabbix", true)) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Enabling ZABBIX subsystem ...");
-            getZabbixAgent().start();
-            zorkaAgent.put("zabbix", getZabbixLib());
-        }
-
         if (config.boolCfg("syslog", true)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Syslog subsystem ....");
             zorkaAgent.put("syslog", getSyslogLib());
@@ -220,12 +214,6 @@ public class AgentInstance implements ZorkaService {
         if (config.boolCfg("snmp", true)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling SNMP subsystem ...");
             zorkaAgent.put("snmp", getSnmpLib());
-        }
-
-        if (config.boolCfg("nagios", false)) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Nagios support ...");
-            getNagiosAgent().start();
-            zorkaAgent.put("nagios", getNagiosLib());
         }
 
         getZorkaAgent().put("normalizers", getNormLib());
@@ -350,7 +338,9 @@ public class AgentInstance implements ZorkaService {
     public synchronized SpyClassTransformer getClassTransformer() {
         if (classTransformer == null) {
             classTransformer = new SpyClassTransformer(getSymbolRegistry(), getTracer(),
-                getConfig().boolCfg("zorka.spy.compute.frames", true), stats, getRetransformer());
+                getConfig().boolCfg("zorka.spy.compute.frames", true),
+                getConfig().boolCfg("zorka.spy.custom.resolver", true),
+                stats, getRetransformer());
         }
         return classTransformer;
     }

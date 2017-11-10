@@ -95,6 +95,10 @@ __http() {
       tracer.traceFlags("HTTP", tracer.SUBMIT_TRACE|tracer.ERROR_MARK)
     ) : null;
 
+  // Register trace types for CBOR collector.
+  tracer.defType("HTTP", 32);
+  tracer.defType("HTTP_CLI", 33);
+
   param_processor() {
 
       _pprefix = zorka.stringCfg("http.params.prefix");

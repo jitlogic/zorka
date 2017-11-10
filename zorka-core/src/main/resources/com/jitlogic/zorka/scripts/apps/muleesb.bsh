@@ -40,6 +40,10 @@ __muleesb() {
     _stats = zorka.boolCfg("mule.stats");
     _mbean = zorka.stringCfg("mule.stats.mbean");
 
+    // Register trace types for CBOR collector.
+    tracer.defType("MULE_CMP", 106);
+    tracer.defType("MULE_DISP", 107);
+    tracer.defType("MULE_FLOW", 108);
 
     extract_annotations() {
 
@@ -71,7 +75,7 @@ __muleesb() {
             spy.format("FLOW", "${EVENT.flowConstruct.name}"),
             spy.format("APPLICATION", "${EVENT.message.muleContext.config.id}"),
             _trace ? spy.subchain(
-                tracer.begin("COMPONENT", zorka.longCfg("mule.component.time")),
+                tracer.begin("MULE_CMP", zorka.longCfg("mule.component.time")),
                 tracer.attr("APPLICATION", "APPLICATION"),
                 tracer.attr("FLOW", "FLOW"),
                 spy.get("ANNOTATIONS", "THIS", "annotations"),
@@ -140,7 +144,7 @@ __muleesb() {
             spy.format("APPLICATION", "${MSG.muleContext.configuration.id}"),
             spy.format("FLOW", "${MSG.flowConstruct.name}"),
             _trace ? spy.subchain(
-                tracer.begin("DISPATCH", zorka.longCfg("mule.dispatch.time")),
+                tracer.begin("MULE_DISP", zorka.longCfg("mule.dispatch.time")),
                 tracer.attr("PROTOCOL", "PROTOCOL"),
                 tracer.attr("URI", "URI"),
                 tracer.attr("ENDPOINT", "ENDPOINT"),
@@ -167,7 +171,7 @@ __muleesb() {
             spy.format("APPLICATION", "${THIS.val$messageProcessContext.flowExecutionWorkManager.muleContext.configuration.id}"),
             spy.format("FLOW", "${THIS.val$messageProcessContext.flowConstruct.name}"),
             _trace ? spy.subchain(
-                tracer.begin("FLOW", zorka.longCfg("mule.flow.time")),
+                tracer.begin("MULE_FLOW", zorka.longCfg("mule.flow.time")),
                 tracer.attr("APPLICATION", "APPLICATION"),
                 tracer.attr("FLOW", "FLOW")
             ) : null)

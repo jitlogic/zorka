@@ -1,3 +1,15 @@
+Zorka 1.0.16 (2016-11-30)
+-------------------------
+
+* Update: ASM 6.0;
+* JBoss 8.x/9.x: catch HTTP traces in the lowest layer of Undertow;
+* HTTP/CBOR tracer output (new CBOR collector is yet to be released);
+* Fixes & performance improvements for active checks (by dd00ff@github);
+* Add Zabbix host metadata to default and sample property files;
+* Detect and skip instrumentation if argument index out of scope;
+* Various fixes;
+
+
 Zorka 1.0.15 (2015-11-29)
 -------------------------
 

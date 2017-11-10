@@ -1,5 +1,5 @@
-/**
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+/*
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -93,6 +93,7 @@ public class SpyArgProbe extends SpyProbe {
                 argIndex == ((SpyArgProbe) obj).argIndex;
     }
 
+    public int getArgIndex() { return argIndex; }
 
     @Override
     public String toString() {

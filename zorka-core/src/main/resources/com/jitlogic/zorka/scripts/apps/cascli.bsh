@@ -35,13 +35,15 @@ __casclient() {
   _trace = zorka.boolCfg("cas.trace");
   _trace_time = zorka.longCfg("cas.trace.time");
 
+  // Register trace types for CBOR collector.
+  tracer.defType("CAS_CLI", 105);
 
   spy.add(spy.instrument("CASCLI_VALIDATE")
     .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("TICKET", 1), spy.fetchArg("SERVICE", 2),
       _secure ? spy.crc32sum("TICKET", "TICKET") : null,
       spy.format("CAS_URI", "${THIS.casServerUrlPrefix}"),
       _trace ? spy.subchain(
-        tracer.begin("CASCLI", _trace_time),
+        tracer.begin("CAS_CLI", _trace_time),
         tracer.attr("CAS_URI", "CAS_URI"),
         tracer.attr("TICKET", "TICKET"),
         tracer.attr("SERVICE", "SERVICE")

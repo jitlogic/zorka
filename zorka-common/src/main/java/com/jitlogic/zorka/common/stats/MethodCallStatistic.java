@@ -1,5 +1,5 @@
-/**
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+/*
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -327,6 +327,15 @@ public class MethodCallStatistic implements ZorkaStat {
                 return;
             }
         }
+    }
+
+
+    /**
+     * Log succesful call without measuring time.
+     * This is useful when using stats only as counter only.
+     */
+    public void logCall() {
+        logCall(1);
     }
 
 

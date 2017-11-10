@@ -15,6 +15,14 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
+zorka.defCfg("nagios", "no");
+
+if (zorka.boolCfg("nagios")) {
+  zorka.logInfo("Enabling NAGIOS Agent subsystem ...");
+  zorka.getAgentInstance().getNagiosAgent().start();
+  zorka.getBshAgent().put("nagios", zorka.getAgentInstance().getNagiosLib());
+}
+
 __nagios_util() {
 
   def_zorka_stat(_mbean, name, attr, tag, desc) {

@@ -1,5 +1,5 @@
-/**
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+/*
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -20,10 +20,7 @@ package com.jitlogic.zorka.core.spy;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -160,6 +157,11 @@ public class SpyClassVisitor extends ClassVisitor {
     }
 
 
+    private int lastArgIndex(int access, String methodSignature) {
+        return Type.getArgumentTypes(methodSignature).length + ((0 != (access & 8)) ? 0 : 1) - 1;
+    }
+
+
     @Override
     public MethodVisitor visitMethod(int access, String methodName, String methodDesc,
                                      String methodSignature, String[] exceptions) {
@@ -174,9 +176,14 @@ public class SpyClassVisitor extends ClassVisitor {
         for (SpyDefinition sdef : sdefs) {
             if (sdef.getMatcherSet().methodMatch(className, classAnnotations, classInterfaces,
                     access, methodName, methodDesc, null)) {
-                log.debug(ZorkaLogger.ZSP_METHOD_DBG, "Instrumenting method (full SPY): " + className + "." + methodName + " " + methodDesc);
-                ctxs.add(transformer.lookup(
+                if (sdef.getLastArgIndex() > lastArgIndex(access, methodDesc)) {
+                    log.error(ZorkaLogger.ZSP_ERRORS, "Cannot instrument method " + className + "." + methodName
+                        + "(). SpyDef refers to argument(s) beyond method argument list.");
+                } else {
+                    log.debug(ZorkaLogger.ZSP_METHOD_DBG, "Instrumenting method (full SPY): " + className + "." + methodName + " " + methodDesc);
+                    ctxs.add(transformer.lookup(
                         new SpyContext(sdef, className, methodName, methodDesc, access)));
+                }
             }
 
             if (sdef.getMatcherSet().hasMethodAnnotations()) {

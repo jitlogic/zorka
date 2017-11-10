@@ -71,6 +71,10 @@ __ejb() {
   _slow_chain = traps.subchain("ejb", "slow");
   _error_chain = traps.subchain("ejb", "error");
 
+  // Register trace types for CBOR collector.
+  tracer.defType("EJB", 38);
+  tracer.defType("EJB_CLI", 39);
+
   // Set of types allowed to convert to string by parameter processing
   // This is for safety purposes: calling toString() on some objects may have
   // unintended consequences.

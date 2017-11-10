@@ -1,5 +1,5 @@
-/**
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+/*
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -52,7 +52,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
     /**
      * Processing thread will be working as long as this attribute value is true
      */
-    private final AtomicBoolean running = new AtomicBoolean(false);
+    private final AtomicBoolean running = new AtomicBoolean(false); // TODO use volatile here
 
     /**
      * Thread object representing actual processing thread.
@@ -95,7 +95,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
     	this(name, qlen, plen);
     	
     	// convert to millis
-        this.interval = interval * 1000l;
+        this.interval = interval * 1000L;
     }
     
 

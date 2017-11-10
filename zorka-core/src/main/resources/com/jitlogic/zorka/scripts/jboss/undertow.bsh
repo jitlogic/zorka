@@ -22,15 +22,161 @@ zorka.require(
 
 __undertow() {
 
-    spy.add(spy.instrument("UNDERTOW_HTTP")
-      .onEnter(spy.fetchArg("EXCH",1), spy.fetchArg("REQ", 4), spy.fetchArg("RESP", 5),
+
+  param_processor() {
+
+      _pprefix = zorka.stringCfg("http.params.prefix");
+      _matcher = util.stringMatcher(zorka.listCfg("http.params.include"), zorka.listCfg("http.params.exclude"));
+
+      process(rec) {
+          sb = new StringBuilder();
+          pmap = rec.get("EXCH").getQueryParameters();
+          if (pmap != null) {
+              for (e : pmap.entrySet()) {
+                  String k = e.getKey();
+                  if (_matcher.matches(k)) {
+                      String v = e.getValue().size() > 0 ? e.getValue().peek() : "";
+                      if (v == null) v = "";
+                      if (v.length() > http._paramLen) {
+                          v = v.substring(0, http._paramLen);
+                      }
+                      if (http._trace) {
+                          tracer.newAttr(_pprefix+k, v);
+                      }
+                      c = sb.length() > 0 ? "&" : "?";
+                      sb.append(c + k + "=" + v);
+                  }
+              }
+          }
+          rec.put("PARAMS", sb.toString());
+          return rec;
+      }
+
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+
+  cookies_processor(cIn, cOut) {
+
+      _cookieLen = zorka.intCfg("http.cookie.maxlen", 128);
+      _iprefix = zorka.stringCfg("http.cookies.iprefix");
+      _oprefix = zorka.stringCfg("http.cookies.oprefix");
+      _matcher = util.stringMatcher(zorka.listCfg("http.cookies.include"), zorka.listCfg("http.cookies.exclude"));
+
+      process(rec) {
+          if (cIn) {
+              icookies = rec.get("EXCH").getRequestCookies();
+              if (icookies != null) {
+                  for (c : icookies.values()) {
+                      name = c.getName();
+                      if (_matcher.matches(name)) {
+                          val = c.getValue();
+                          if (val != null && val.length() > _cookieLen) {
+                              val = val.substring(0, _cookieLen);
+                          }
+                          if (http._trace) {
+                              tracer.newAttr(_iprefix + name, val);
+                          }
+                      }
+                  }
+              }
+          }
+
+          if (cOut) {
+              ocookies = rec.get("EXCH").getResponseCookies();
+              if (ocookies != null) {
+                  for (c : ocookies.values()) {
+                      name = c.getName();
+                      if (_matcher.matches(name)) {
+                          val = c.getValue();
+                          if (val != null && val.length() > _cookieLen) {
+                              val = val.substring(0, _cookieLen);
+                          }
+                          if (http._trace) {
+                              tracer.newAttr(_oprefix + name, val);
+                          }
+                      }
+                  }
+              }
+          }
+
+          return rec;
+      }
+
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+
+  headers_processor(hdrIn, hdrOut) {
+
+      _iprefix = zorka.stringCfg("http.headers.iprefix");
+      _oprefix = zorka.stringCfg("http.headers.oprefix");
+      _matcher = util.stringMatcher(zorka.listCfg("http.headers.include"), zorka.listCfg("http.headers.exclude"));
+      _maxlen = zorka.intCfg("http.headers.maxlen");
+
+      process(rec) {
+
+          req = rec.get("EXCH").getRequestHeaders();
+          if (hdrIn && req != null && req.getHeaderNames() != null) {
+              for (name : req.getHeaderNames()) {
+                  hdrs = req.get(""+name);
+                  if (hdrs != null) {
+                      i = 0;
+                      for (hdr : hdrs) {
+                          if (hdr.length() > _maxlen) {
+                              hdr = hdr.substring(0, _maxlen) + "...";
+                          }
+                          if (i == 0) {
+                              tracer.newAttr(_iprefix + name, hdr);
+                          } else {
+                              tracer.newAttr(_iprefix + i + "_" + name, hdr);
+                          }
+                          i++;
+                      }
+                  }
+              }
+          }
+
+          resp = rec.get("EXCH").getResponseHeaders();
+          if (hdrOut && resp != null && resp.getHeaderNames() != null) {
+              for (name : resp.getHeaderNames()) {
+                  hdrs = resp.get(""+name);
+                  if (hdrs != null) {
+                      i = 0;
+                      for (hdr : hdrs) {
+                          if (hdr.length() > _maxlen) {
+                              hdr = hdr.substring(0, _maxlen) + "...";
+                          }
+                          if (i == 0) {
+                              tracer.newAttr(_oprefix + name, hdr);
+                          } else {
+                              tracer.newAttr(_oprefix + i + "_" + name, hdr);
+                          }
+                          i++;
+                      }
+                  }
+                  if ("Location".equals(name) && hdrs.length > 0) {
+                    tracer.newAttr("REDIRECT", hdrs[0]);
+                    rec.put("REDIRECT", hdrs[0]);
+                  }
+              }
+          }
+
+          return rec;
+      }
+
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+
+  spy.add(spy.instrument("UNDERTOW_HTTP_2")
+      .onEnter(spy.fetchArg("EXCH", 1),
         spy.format("URI", "${EXCH.requestURI}"),
         http._trace ? spy.subchain(
           http._uriQualifier,
           tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
           tracer.attr("URI", "URI")
-        ) : null,
-        http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
+        ) : null)
       .onReturn(spy.put("ERR", ""))
       .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),
         http._trace ? spy.subchain(
@@ -38,19 +184,19 @@ __undertow() {
           http._error_chain,
           tracer.markError(),
           tracer.attr("ERR", "ERR")
-          ) : null)
+        ) : null)
       .onSubmit(
         spy.strTime("TIME"),
         spy.format("STATUS", "${EXCH.responseCode}"),
-        spy.get("USER", "REQ", "remoteUser"),
+        spy.get("USER", "EXCH", "securityContext", "authenticatedAccount", "principal", "name"),
         http._trace ? spy.subchain(
           http._uriQualifier,
           tracer.attr("STATUS", "STATUS"),
           tracer.filterBy("STATUS", null, http._errors, null, null),
           tracer.attr("USER", "USER"),
-          http._cookies ? http.cookies_processor(true, true) : spy.put("COOKIES", ""),
-          http._headers ? http.headers_processor(true, true) : null,
-          http._params ? http.param_processor() : spy.put("PARAMS", "")
+          http._cookies ? cookies_processor(true, true) : spy.put("COOKIES", ""),
+          http._headers ? headers_processor(true, true) : null,
+          http._params ? param_processor() : spy.put("PARAMS", "")
         ) : null,
         http._slow_chain,
         spy.subchain(
@@ -60,11 +206,13 @@ __undertow() {
         http._redirQualifier,
         http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null,
         http._tags_chain)
-      .include(spy.byMethod("io.undertow.servlet.handlers.ServletInitialHandler", "handleFirstRequest")));
+      .include(spy.byMethod(0, "io.undertow.server.Connectors", "executeRootHandler", null)));
+
 
   tracer.exclude(
     "io.undertow.util.**"
   );
+
 
   return this;
 }

@@ -1,5 +1,5 @@
-/**
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+/*
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -261,6 +261,116 @@ public class ZorkaLib implements ZorkaService {
         return obj;
     } // jmx()
 
+    private static final Map<Character,String> signTypes = ZorkaUtil.constMap(
+        'b', "byte",   'B', Byte.class.getName(),
+        'c', "char",   'C', Character.class.getName(),
+        's', "short",  'S', Short.class.getName(),
+        'i', "int",    'I', Integer.class.getName(),
+        'l', "long",   'L', Long.class.getName(),
+        'f', "float",  'F', Float.class.getName(),
+        'd', "double", 'D', Double.class.getName(),
+        'T', String.class.getName()
+    );
+
+
+    private String[] parseSignature(String s) {
+        String[] rslt = new String[s.length()];
+        for (int i = 0; i < s.length(); i++) {
+            rslt[i] = signTypes.get(s.charAt(i));
+        }
+        return rslt;
+    }
+
+
+    public Object[] coerceArgs(String signature, Object[] args) {
+        Object[] rslt = new Object[args.length];
+        for (int i = 0; i < args.length; i++) {
+            Object o = args[i];
+            switch (Character.toUpperCase(signature.charAt(i))) {
+                case 'B':
+                    rslt[i] = o instanceof Number ? ((Number)o).byteValue() : o != null ? Byte.parseByte(o.toString()) : null;
+                    break;
+                case 'C':
+                    rslt[i] = o != null ? o.toString().charAt(0) : null;
+                case 'S':
+                    rslt[i] = o instanceof Number ? ((Number)o).shortValue() : o != null ? Short.parseShort(""+o) : null;
+                    break;
+                case 'I':
+                    rslt[i] = o instanceof Number ? ((Number)o).intValue() : o != null ? Integer.parseInt(""+o) : null;
+                    break;
+                case 'L':
+                    rslt[i] = o instanceof Number ? ((Number)o).longValue() : o != null ? Long.parseLong(""+o) : null;
+                    break;
+                case 'F':
+                    rslt[i] = o instanceof Number ? ((Number)o).floatValue() : o != null ? Float.parseFloat(""+o) : null;
+                case 'T':
+                    rslt[i] = o;
+                    break;
+            }
+        }
+        return rslt;
+    }
+
+
+    /**
+     * Invokes JMX operation on an mbean (JMX Call).
+     *
+     * Operation signature where each character represents type of corresponding parameter. Use lower case b,c,s,i,l,f,d
+     * for unboxed byte,char,short,int,long,float,double; B,S,I,L,F,D for corresponding boxed types and T for Strings.
+     *
+     * Arguments will be coerced to declared types and cannot be null.
+     *
+     * @param conname name of registered mbean server connection (eg. "java")
+     * @param objname object name
+     * @param mname operation name
+     * @param msign operation signature
+     * @param args operation arguments
+     *
+     * @return opration result or null
+     */
+    public Object jmxc(String conname, String objname, String mname, String msign, Object...args) {
+
+        MBeanServerConnection conn = mbsRegistry.lookup(conname);
+
+        if (conn == null) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "MBean server named '" + conname + "' is not registered.");
+            return null;
+        }
+
+        Set<ObjectName> names = ObjectInspector.queryNames(conn, objname);
+
+        if (names.isEmpty()) {
+            return null;
+        }
+
+        ObjectName name = names.iterator().next();
+
+        ClassLoader cl0 = Thread.currentThread().getContextClassLoader(), cl1 = mbsRegistry.getClassLoader(conname);
+
+        Object obj = null;
+
+        try {
+            if (cl1 != null) {
+                Thread.currentThread().setContextClassLoader(cl1);
+            }
+            obj = conn.invoke(name, mname, coerceArgs(msign,args), parseSignature(msign));
+        } catch (Exception e) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Error invoking method '" + mname + "' from '" + conname + "|" + name + "'", e);
+        } finally {
+            if (cl1 != null) {
+                Thread.currentThread().setContextClassLoader(cl0);
+            }
+        }
+
+        return obj;
+    }
+
+
+    public Object jmxcv(Object defval, String conname, String objname, String mname, String msign, Object...args) {
+        Object rslt = jmxc(conname, objname, mname, msign, args);
+        return rslt != null ? rslt : defval;
+    }
+
 
     /**
      * Lists attributes of given object(s)
@@ -496,6 +606,14 @@ public class ZorkaLib implements ZorkaService {
         instance.reload();
         long l = AgentDiagnostics.get(AgentDiagnostics.CONFIG_ERRORS);
         return l == 0 ? "OK" : "ERRORS(" + l + ") see agent log.";
+    }
+
+    public AgentInstance getAgentInstance() {
+        return instance;
+    }
+
+    public ZorkaBshAgent getBshAgent() {
+        return agent;
     }
 
     public String loadScript(String script) {

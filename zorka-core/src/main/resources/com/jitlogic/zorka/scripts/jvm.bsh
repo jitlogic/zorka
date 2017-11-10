@@ -86,6 +86,7 @@ __jvm() {
           "sun.misc.IOUtils",
           "sun.misc.URLClassPat*",
           "sun.net.www.http.ChunkedInputStream",
+          "sun.net.www.MeteredStream",
           "sun.net.www.protocol.http.HttpURLConnection$HttpInputStream",
           "sun.nio.cs.**",
           "sun.security.provider.**",

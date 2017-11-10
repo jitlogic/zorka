@@ -65,6 +65,9 @@ __sql() {
 
   _tags_chain = null;
 
+  // Register trace types for CBOR collector.
+  tracer.defType("SQL", 34);
+
   if (_stats && zorka.boolCfg("sql.tags", false)) {
       zorka.logInfo("Enabling SQL tagging ...");
       _tags_chain = spy.subchain(spy.put("TAG",

@@ -178,6 +178,7 @@ __spring() {
       "org.springframework.remoting.httpinvoker.HttpInvokerClientConfiguration",
       "org.springframework.remoting.support.RemoteInvocation")));
 
+  tracer.defType("SPRING_REMOTING", 101);
 
   // Spring Webflow
 
@@ -236,6 +237,7 @@ __spring() {
       .include(spy.byInterfaceAndMethod(0, "org.springframework.http.client.ClientHttpRequest", "execute",
         "org.springframework.http.client.ClientHttpResponse")));
 
+  tracer.defType("SPRING_HTTP", 102);
 
   // Tracer tuning
   if (zorka.boolCfg("tracer")) {

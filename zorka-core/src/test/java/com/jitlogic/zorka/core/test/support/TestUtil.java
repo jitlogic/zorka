@@ -1,5 +1,5 @@
-/**
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+/*
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -153,22 +153,6 @@ public class TestUtil extends ClassLoader {
         return mbs.getAttribute(new ObjectName(mbeanName), attr);
     }
 
-
-    public static void rmrf(String path) throws IOException {
-        rmrf(new File(path));
-    }
-
-
-    public static void rmrf(File f) throws IOException {
-        if (f.exists()) {
-            if (f.isDirectory()) {
-                for (File c : f.listFiles()) {
-                    rmrf(c);
-                }
-            }
-            f.delete();
-        }
-    }
 
     public static class TransformationResult {
         public final String clazzName;

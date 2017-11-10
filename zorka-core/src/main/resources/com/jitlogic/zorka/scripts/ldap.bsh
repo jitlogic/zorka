@@ -28,6 +28,9 @@ __ldap() {
     _trace = zorka.boolCfg("ldap.trace");
     _traceTime = zorka.longCfg("ldap.trace.time");
 
+    // Register trace types for CBOR collector.
+    tracer.defType("LDAP", 35);
+
     spy.add(spy.instrument("LDAP_CONNECT")
         .onEnter(spy.fetchArg("MAP", 1), 
             _trace ? tracer.formatAttr("ARGS", "${MAP}") : null)

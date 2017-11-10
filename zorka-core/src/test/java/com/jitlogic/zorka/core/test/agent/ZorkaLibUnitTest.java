@@ -1,5 +1,5 @@
-/**
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+/*
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -112,5 +112,14 @@ public class ZorkaLibUnitTest extends ZorkaFixture {
         assertEquals("db17", util.crc32sum("ABCD", 4));
         assertEquals("cb08ca4a7bb5f9683c19133a84872ca7", util.md5sum("ABCD"));
         assertEquals("fb2f85c88567f3c8ce9b799c7c54642d0c7b41f6", util.sha1sum("ABCD"));
+    }
+
+    @Test
+    public void testInvokeJmxOps() throws Exception {
+        makeTestJmx("test:type=ZorkaLib,name=test1", 1, 1);
+
+        assertEquals("Hello world", zorka.jmxc("test", "test:type=ZorkaLib,name=test1", "someOp", ""));
+        assertEquals("Hello borg", zorka.jmxc("test", "test:type=ZorkaLib,name=test1", "someOp", "T", "borg"));
+        assertEquals("Hello J23", zorka.jmxc("test", "test:type=ZorkaLib,name=test1", "someOp", "Ti", "J", "23"));
     }
 }

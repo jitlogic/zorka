@@ -1,5 +1,5 @@
-/**
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+/*
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -143,6 +143,17 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
         assertTrue("should pass Long", submitter.get(0).get(0) instanceof Long);
         assertEquals("should return object instance itself", obj, submitter.get(1).get(0));
         assertTrue("should pass Long", submitter.get(2).get(0) instanceof Long);
+    }
+
+
+    @Test
+    public void testInstrumentWithBadProbe() throws Exception {
+        engine.add(spy.instrument("x").onEnter(spy.fetchArg("S", 2))
+                    .include(spy.byMethod(TCLASS1, "trivialStrMethod")));
+
+        Object obj = instantiate(engine, TCLASS1);
+
+        invoke(obj, "trivialStrMethod", "abc");
     }
 
 

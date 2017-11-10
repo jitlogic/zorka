@@ -42,6 +42,8 @@ __apache_camel() {
             spy.byMethod("org.apache.camel.component.directvm.DirectVmBlockingProducer", "process")
         ));
 
+    tracer.defType("CAMEL", 103);
+
     return this;
 }
 
