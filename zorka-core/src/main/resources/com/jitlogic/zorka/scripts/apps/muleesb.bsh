@@ -16,6 +16,7 @@
  */
 
 zorka.require(
+  "zabbix.bsh",
   "jvm.bsh",
   "javax.bsh",
   "libs.bsh",
@@ -197,6 +198,10 @@ __muleesb() {
             "org.mule.util.annotation.**"
         );
     }
+
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("MULE_ESB");
+  }
 
     jvm.autoregister();
 

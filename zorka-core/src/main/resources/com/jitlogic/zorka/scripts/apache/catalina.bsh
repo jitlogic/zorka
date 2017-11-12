@@ -15,7 +15,11 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("http.bsh", "audit.bsh");
+zorka.require(
+  "zabbix.bsh",
+  "http.bsh",
+  "audit.bsh"
+);
 
 __catalina() {
 
@@ -165,6 +169,9 @@ __catalina() {
       "${ACTION} who=${REQ.remoteUser} type=HTTP what=${REQ.requestURI}");
   }
 
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("CATALINA");
+  }
 
   if (zorka.boolCfg("tracer")) {
     tracer.exclude(

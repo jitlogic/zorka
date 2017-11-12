@@ -18,16 +18,17 @@
 // Common JBoss 4/5/6 support functions
 
 zorka.require(
-    "javax.bsh",
-    "jsf.bsh",
-    "libs.bsh",
-    "audit.bsh",
-    "apache/apache.bsh",
-    "apache/catalina.bsh",
-    "jboss/hibernate.bsh",
-    "jboss/jbossejb.bsh",
-    "javax/jms.bsh",
-    "jboss/seam.bsh"
+  "zabbix.bsh",
+  "javax.bsh",
+  "jsf.bsh",
+  "libs.bsh",
+  "audit.bsh",
+  "apache/apache.bsh",
+  "apache/catalina.bsh",
+  "jboss/hibernate.bsh",
+  "jboss/jbossejb.bsh",
+  "javax/jms.bsh",
+  "jboss/seam.bsh"
 );
 
 __jboss() {
@@ -250,6 +251,10 @@ __jboss() {
 
           "com.arjuna.common.internal.util.logging.**"
       );
+  }
+
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("JBOSS");
   }
 
   return this;

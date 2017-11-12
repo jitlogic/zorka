@@ -15,7 +15,10 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("rest.bsh");
+zorka.require(
+  "zabbix.bsh",
+  "rest.bsh"
+);
 
 __jersey() {
 
@@ -41,6 +44,10 @@ __jersey() {
     "org.glassfish.jersey.internal.util.**",
     "com.sun.jersey.core.reflection.**"
   );
+
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("JERSEY");
+  }
 
   return this;
 }

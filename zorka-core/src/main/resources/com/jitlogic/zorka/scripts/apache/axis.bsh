@@ -15,7 +15,11 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("soap.bsh", "apache/apache.bsh");
+zorka.require(
+  "zabbix.bsh",
+  "soap.bsh",
+  "apache/apache.bsh"
+);
 
 __axis() {
 
@@ -99,6 +103,9 @@ __axis() {
     );
   }
 
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("AXIS");
+  }
 
   return this;
 }

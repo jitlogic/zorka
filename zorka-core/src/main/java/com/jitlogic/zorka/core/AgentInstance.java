@@ -199,12 +199,6 @@ public class AgentInstance implements ZorkaService {
         }
 
         getZorkaAgent().put("perfmon", getPerfMonLib());
-
-        if (config.boolCfg("zabbix.active", false)) {
-        	log.info(ZorkaLogger.ZAG_CONFIG, "Enabling ZABBIX Active Agent subsystem ...");
-        	getZabbixActiveAgent().start();
-            zorkaAgent.put("zabbix.active", getZabbixLib());
-        }
         
         if (config.boolCfg("syslog", true)) {
             log.info(ZorkaLogger.ZAG_CONFIG, "Enabling Syslog subsystem ....");

@@ -16,6 +16,7 @@
  */
 
 zorka.require(
+  "zabbix.bsh",
   "jvm.bsh",
   "javax.bsh",
   "libs.bsh",
@@ -78,6 +79,10 @@ __glassfish() {
     "org.glassfish.web.deployment.descriptor.**",
     "org.jvnet.hk2.**"
   );
+
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("GLASSFISH");
+  }
 
   jvm.autoregister();
 

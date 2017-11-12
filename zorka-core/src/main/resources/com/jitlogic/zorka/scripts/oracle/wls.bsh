@@ -16,6 +16,7 @@
  */
 
 zorka.require(
+  "zabbix.bsh",
   "ejb.bsh",
   "jvm.bsh",
   "jsf.bsh",
@@ -149,6 +150,10 @@ __wls() {
       "weblogic.work.ExecuteThread",
       "weblogic.xml.**"
     );
+  }
+
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("WEBLOGIC");
   }
 
   jvm.autoregister();

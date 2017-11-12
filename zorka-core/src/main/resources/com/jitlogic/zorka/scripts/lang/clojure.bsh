@@ -17,7 +17,10 @@
 
 // This file contains agent configurations for Clojure language
 
-zorka.require("tracer.bsh");
+zorka.require(
+  "zabbix.bsh",
+  "tracer.bsh"
+);
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
@@ -26,3 +29,9 @@ if (zorka.boolCfg("tracer")) {
         "hiccup.**"
     );
 }
+
+
+if (zorka.boolCfg("zabbix.active")) {
+  zabbix.tagMetadata("CLOJURE");
+}
+

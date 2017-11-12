@@ -20,6 +20,7 @@
  */
 
 zorka.require(
+  "zabbix.bsh",
   "javax.bsh",
   "ldap.bsh",
   "tracer.bsh",
@@ -258,6 +259,10 @@ __cas() {
 
   discovery() {
     return zabbix.discovery(zorka.query("java", mbean, "name", "type").get("stats").listAs("**", "ACTION"));
+  }
+
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("JASIG_CAS");
   }
 
   if (zorka.boolCfg("tracer")) {

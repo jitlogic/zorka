@@ -28,6 +28,9 @@ zorka.require(
   "wso2/carbon.bsh"
 );
 
+if (zorka.boolCfg("zabbix.active")) {
+  zabbix.tagMetadata("WSO2:ESB");
+}
 
 jvm.autoregister();
 

@@ -17,7 +17,10 @@
 
 // This file contains agent configurations for various unqualified libraries
 
-zorka.require("tracer.bsh");
+zorka.require(
+  "zabbix.bsh",
+  "tracer.bsh"
+);
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
@@ -25,4 +28,8 @@ if (zorka.boolCfg("tracer")) {
         "org.codehaus.groovy.**",
         "groovy**"
     );
+}
+
+if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("GROOVY");
 }
