@@ -103,7 +103,7 @@ public final class ZabbixUtils {
 		Map<String,Object> ac = ZorkaUtil.map(
 			"request", "active checks",
 			"host", host,
-			"host.metadata", hostMetadata,
+			"host_metadata", hostMetadata,
 			"port", port
 		);
 		return new JSONWriter().write(ac);
