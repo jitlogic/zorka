@@ -17,20 +17,21 @@
 
 
 zorka.require(
-    "ejb.bsh",
-    "javax.bsh",
-    "jsf.bsh",
-    "libs.bsh",
-    "audit.bsh",
-    "javax/jms.bsh",
-    "apache/catalina.bsh",
-    "apache/apache.bsh",
-    "apache/cxf.bsh",
-    "google/libs.bsh",
-    "jboss/hibernate.bsh",
-    "jboss/undertow.bsh",
-    "jboss/weld.bsh",
-    "jdbc/h2.bsh"
+  "zabbix.bsh",
+  "ejb.bsh",
+  "javax.bsh",
+  "jsf.bsh",
+  "libs.bsh",
+  "audit.bsh",
+  "javax/jms.bsh",
+  "apache/catalina.bsh",
+  "apache/apache.bsh",
+  "apache/cxf.bsh",
+  "google/libs.bsh",
+  "jboss/hibernate.bsh",
+  "jboss/undertow.bsh",
+  "jboss/weld.bsh",
+  "jdbc/h2.bsh"
 );
 
 
@@ -392,6 +393,9 @@ __jboss7() {
         "${ACTION} who=${REQ.remoteUser} type=HTTP what=${REQ.requestURI}");
   }
 
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("WILDFLY");
+  }
 
   return this;
 }

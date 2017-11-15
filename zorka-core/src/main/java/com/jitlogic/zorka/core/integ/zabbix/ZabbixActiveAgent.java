@@ -34,6 +34,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.jitlogic.zorka.common.ZorkaService;
+import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
@@ -115,6 +116,12 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		this.agent = agent;
 		this.translator = translator;
 
+
+		if (null != config.stringCfg(prefix + ".host_metadata", null)) {
+		    throw new ZorkaRuntimeException("Config key " + prefix + ".host_metadata is not supported anymore. "
+                + " Use " + prefix + ".metadata instead.");
+        }
+
 		setup();
 	}
 
@@ -163,29 +170,11 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive start...");
 
 		if (!running) {
-			try {
-				socket = new Socket(activeAddr, activePort);
-				log.info(ZorkaLogger.ZAG_ERRORS, "Successfuly connected to " + activeIpPort);
-
-			} catch (IOException e) {
-				log.error(ZorkaLogger.ZAG_ERRORS, "Failed to connect to " + activeIpPort + ". Will try to connect later.", e);
-			} finally {
-				if (socket != null) {
-					try {
-						socket.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					} finally {
-						socket = null;
-					}
-				}
-				
-				running = true;
-				thread = new Thread(this);
-				thread.setName("ZORKA-" + prefix + "-main");
-				thread.setDaemon(true);
-				thread.start();
-			}
+			running = true;
+			thread = new Thread(this);
+			thread.setName("ZORKA-" + prefix + "-main");
+			thread.setDaemon(true);
+			thread.start();
 		}
 		
 	}
@@ -247,11 +236,15 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 	public void shutdown() {
 		log.info(ZorkaLogger.ZAG_CONFIG, "Shutting down " + prefix + " agent ...");
 		stop();
+		close();
+	}
+
+	private void close() {
 		if (socket != null) {
 			try {
 				socket.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				log.error(ZorkaLogger.ZAG_ERRORS,"Error closing zabbix.active socket", e);
 			}
 			socket = null;
 		}
@@ -260,7 +253,24 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
 	@Override
 	public void run() {
-		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive run...");
+		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive run ... ");
+
+        try {
+            log.debug(ZorkaLogger.ZAG_DEBUG, "Waiting for rest of script to start ...");
+            Thread.sleep(10000);  // TODO initFinished method should be implemented here ...
+        } catch (InterruptedException e) {
+            log.error(ZorkaLogger.ZAG_ERRORS, "Interrupted when sleeping.");
+        }
+
+
+        try {
+			socket = new Socket(activeAddr, activePort);
+			log.info(ZorkaLogger.ZAG_ERRORS, "Successfuly connected to " + activeIpPort);
+		} catch (IOException e) {
+			log.error(ZorkaLogger.ZAG_ERRORS, "Failed to connect to " + activeIpPort + ". Will try to connect later.", e);
+		} finally {
+			close();
+		}
 
 		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive Scheduling sender task");
 		scheduleTasks();
@@ -273,11 +283,11 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 				ZabbixActiveRequest request = new ZabbixActiveRequest(socket, config);
 
 				// send Active Check Message 
-				request.sendActiveMessage(agentHost, config.stringCfg(prefix + ".host_metadata", ""));
+				request.sendActiveMessage(agentHost, config.stringCfg(prefix + ".metadata", ""));
 
 				// get requests for metrics
 				ActiveCheckResponse response = request.getActiveResponse();
-//				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive response.toString() " + response.toString());
+				//log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive response.toString() " + response.toString());
 
 				if(response.getData() == null) {
 				   response.setData(new ArrayList<ActiveCheckQueryItem>());
@@ -287,15 +297,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 			} catch (IOException e) {
 				log.error(ZorkaLogger.ZAG_ERRORS, "Failed to connect to " + activeIpPort, e);
 			} finally {
-				if (socket != null) {
-					try {
-						socket.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					} finally {
-						socket = null;
-					}
-				}
+				close();
 			}
 			
 			try {

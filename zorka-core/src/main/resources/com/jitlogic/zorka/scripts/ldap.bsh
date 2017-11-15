@@ -16,7 +16,10 @@
  */
 
 
-zorka.require("tracer.bsh");
+zorka.require(
+  "zabbix.bsh",
+  "tracer.bsh"
+);
 
 __ldap() {
 
@@ -30,6 +33,10 @@ __ldap() {
 
     // Register trace types for CBOR collector.
     tracer.defType("LDAP", 35);
+
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("LDAP");
+  }
 
     spy.add(spy.instrument("LDAP_CONNECT")
         .onEnter(spy.fetchArg("MAP", 1), 

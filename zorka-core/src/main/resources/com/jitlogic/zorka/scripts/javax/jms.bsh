@@ -15,7 +15,11 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("tracer.bsh", "traps.bsh");
+zorka.require(
+  "zabbix.bsh",
+  "tracer.bsh",
+  "traps.bsh"
+);
 
 // Generic JMS monitoring
 
@@ -66,6 +70,10 @@ __javax_jms() {
 
   // Register trace types for CBOR collector.
   tracer.defType("JMS", 42);
+
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("JMS");
+  }
 
   if (zorka.boolCfg("jms")) {
 

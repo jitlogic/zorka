@@ -17,8 +17,11 @@
 
 // This file contains instrumentation definitions for Apache httpclient library.
 
-zorka.require("tracer.bsh");
-zorka.require("apache/apache.bsh");
+zorka.require(
+  "zabbix.bsh",
+  "tracer.bsh",
+  "apache/apache.bsh"
+);
 
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
@@ -132,6 +135,9 @@ __apache_httpclient() {
       .include(spy.byMethod(0, "org.apache.http.**", "execute", "org.apache.http.HttpResponse",
         "org.apache.http.HttpRequest", "org.apache.http.HttpClientConnection", "org.apache.http.HttpContext")));
 
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("HTTP:CLIENT");
+  }
 
   return this;
 

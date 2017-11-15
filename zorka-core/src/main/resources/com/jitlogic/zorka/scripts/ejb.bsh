@@ -159,6 +159,10 @@ __ejb() {
     nagios_util.def_zorka_stat(_mbean, "EJB");
   }
 
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("HTTP");
+  }
+
   // Utility functions (for zabbix)
 
   discovery(attr, tag) {

@@ -16,6 +16,7 @@
  */
 
 zorka.require(
+  "zabbix.bsh",
   "jvm.bsh",
   "http.bsh",
   "javax.bsh",
@@ -70,6 +71,10 @@ __jetty() {
       "org.eclipse.jetty.server.HttpOutput",
       "org.eclipse.jetty.webapp.WebAppClassLoader/loadClass"
     );
+  }
+
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("JETTY");
   }
 
   jvm.autoregister();

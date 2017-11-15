@@ -15,7 +15,10 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("tracer.bsh");
+zorka.require(
+  "zabbix.bsh",
+  "tracer.bsh"
+);
 
 __rest() {
 
@@ -40,6 +43,10 @@ __rest() {
   // Register trace types for CBOR collector.
   tracer.defType("REST", 40);
   tracer.defType("REST_CLI", 41);
+
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("REST");
+  }
 
   return this;
 }

@@ -147,6 +147,21 @@ public class ZabbixLib implements ZorkaService {
     }
 
 
+    public void tagMetadata(String tag) {
+        String meta = config.stringCfg("zabbix.active.metadata", "");
+
+        // TODO always sort tags (?)
+
+        if (!tag.startsWith("ZORKA:")) {
+            tag = "ZORKA:" + tag;
+        }
+
+        if (!meta.contains(tag)) {
+            config.setCfg("zabbix.active.metadata", meta + " " + tag);
+        }
+    }
+
+
     /**
      * Stops and removes zabbix trapper
      *

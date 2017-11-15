@@ -16,6 +16,7 @@
  */
 
 zorka.require(
+  "zabbix.bsh",
   "jvm.bsh",
   "javax.bsh",
   "libs.bsh",
@@ -103,6 +104,10 @@ __tomcat() {
       "org.apache.tomcat.jdbc.pool.**",
       "org.apache.juli.logging.**"
     );
+  }
+
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("TOMCAT");
   }
 
   jvm.autoregister();

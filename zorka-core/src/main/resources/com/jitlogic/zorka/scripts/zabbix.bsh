@@ -32,12 +32,14 @@ agent.hostname = zorka.getHostname();
 
 
 if (zorka.boolCfg("zabbix")) {
+  // TODO possibly moving this back to hava codebase would be better than including this script everywhere
   zorka.logInfo("Enabling ZABBIX Agent subsystem ...");
   zorka.getAgentInstance().getZabbixAgent().start();
   zorka.getBshAgent().put("zabbix", zorka.getAgentInstance().getZabbixLib());
 }
 
 if (zorka.boolCfg("zabbix.active")) {
+  // TODO possibly moving this back to hava codebase would be better than including this script everywhere
   zorka.logInfo("Enabling ZABBIX Active Agent subsystem ...");
   zorka.getAgentInstance().getZabbixActiveAgent().start();
   zorka.getBshAgent().put("zabbix", zorka.getAgentInstance().getZabbixLib());

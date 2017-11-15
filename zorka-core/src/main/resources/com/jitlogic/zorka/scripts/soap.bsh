@@ -15,7 +15,11 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("tracer.bsh", "traps.bsh");
+zorka.require(
+  "zabbix.bsh",
+  "tracer.bsh",
+  "traps.bsh"
+);
 
 __soap() {
 
@@ -76,6 +80,9 @@ __soap() {
     return zabbix.discovery(zorka.query("java", _mbean, "name", "type").get(type).listAs("**", "OP"));
   }
 
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("SOAP");
+  }
 
   return this;
 }

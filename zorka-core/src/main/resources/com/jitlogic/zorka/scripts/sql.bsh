@@ -15,7 +15,11 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("tracer.bsh", "traps.bsh");
+zorka.require(
+  "zabbix.bsh",
+  "tracer.bsh",
+  "traps.bsh"
+);
 
 __sql() {
 
@@ -67,6 +71,10 @@ __sql() {
 
   // Register trace types for CBOR collector.
   tracer.defType("SQL", 34);
+
+  if (zorka.boolCfg("zabbix.active")) {
+    zabbix.tagMetadata("SQL");
+  }
 
   if (_stats && zorka.boolCfg("sql.tags", false)) {
       zorka.logInfo("Enabling SQL tagging ...");
