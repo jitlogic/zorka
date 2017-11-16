@@ -278,8 +278,10 @@ __http() {
               break;
           }
       }
-      _tags_chain = _tags_chain.with(
-          spy.zorkaStats("java", _mbean, "byTag", "${TAG}"));
+      _tags_chain = _tags_chain.with(spy.zorkaStats("java", _mbean, "byTag", "${TAG}"));
+      if (zorka.boolCfg("zabbix.active")) {
+          zabbix.tagMetadata("HTTP:TAGS");
+      }
   }
 
 
@@ -310,6 +312,10 @@ __http() {
 
   threads(attr, tag) {
     threads = zorka.jmx("java",  _mbean, attr, tag, "maxThreadsCLR");
+  }
+
+  avg1(attr, tag) {
+    return zorka.rate("java", _mbean, attr, tag, "time", "calls", "AVG5");
   }
 
   avg5(attr, tag) {
