@@ -28,6 +28,7 @@ if (zorka.boolCfg("tracer")) {
     tracer.exclude(
         "org.apache.commons.httpclient.**",
         "org.apache.http.impl.client.**",
+        "org.apache.http.message.TokenParser",
         "org.apache.http.util.Args"
     );
 }

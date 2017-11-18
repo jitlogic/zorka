@@ -24,6 +24,7 @@ if (zorka.boolCfg("tracer")) {
     tracer.exclude(
       "com.google.common.**",
       "com.google.inject.internal.**",
+      "com.google.javascript.jscomp.**",
       "com.google.gwt.core.client.impl.WeakMapping",
       "com.google.template.soy.**",
       "com.google.protobuf.**",

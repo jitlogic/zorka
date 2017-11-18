@@ -10,7 +10,8 @@ zorka.require(
   "lang/rhino.bsh",
   "jboss/hibernate.bsh",
   "libs/quartz.bsh",
-  "apache/httpclient.bsh"
+  "apache/httpclient.bsh",
+  "google/libs.bsh"
 );
 
 
@@ -18,14 +19,35 @@ zorka.require(
 if (zorka.boolCfg("tracer")) {
     tracer.exclude(
         "org.gagravarr.**",
-        "org.alfresco.repo.dictionary.M2**",
-        "org.alfresco.repo.dictionary.JiBX**",
+        "org.alfresco.httpclient.HttpClientFact**/getParameter",
         "org.alfresco.repo.cache.lookup.EntityLookupCache",
         "org.alfresco.repo.content.AbstractContentRead**",
-        "org.apache.tika.sax.**",
-        "org.apache.solr.common.**",
-        "org.apache.solr.schema.**",
-        "org.apache.fontbox.cff.**"
+        "org.alfresco.repo.content.MimetypeMap",
+        "org.alfresco.repo.content.transform.DoubleMap",
+        "org.alfresco.repo.dictionary.M2**",
+        "org.alfresco.repo.dictionary.JiBX**",
+        "org.alfresco.repo.dict**/get*",
+        "org.alfresco.repo.dom**/get*",
+        "org.alfresco.repo.dom**/compare*",
+        "org.alfresco.repo.lock.mem.LocableAspectInterceptor/invoke",
+        "org.alfresco.repo.security.authentication.AuthenticationUtil/logNDC",
+        "org.alfresco.repo.security.permissions.impl.model.Perm*/get*",
+        "org.alfresco.repo.security.permissions.impl.PermissionServiceImp**",
+        "org.alfresco.repo.security.person.UsernameMatcherImpl/matches",
+        "org.alfresco.repo.service.ServiceDescriptorRegistry/getService",
+        "org.alfresco.service.namespace.QName",
+        "org.alfresco.service.namespace.QNameMap",
+        "org.alfresco.solr.tracker.TrackerStat**",
+        "org.alfresco.traitextender.RouteExtensions",
+        "org.alfresco.traitextender.ExtenderImpl/getExtension",
+        "org.alfresco.util.EqualsHelper",
+        "org.alfresco.util.ParameterCheck/mandatory",
+        "org.alfresco.util.ValueProtectingMap",
+        "org.alfresco.util.cache.AbstractAsynchronouslyRefreshedCache/get",
+        "org.alfresco.util.log.NDC",
+        "org.alfresco.util.transaction.TransactionSupportUtil/getResource",
+        "org.alfresco.web.config.forms.NodeMetadataBasedEvaluator",
+        "org.alfresco.web.config.forms.TaskTypeEvaluator/applies"
     );
 }
 
