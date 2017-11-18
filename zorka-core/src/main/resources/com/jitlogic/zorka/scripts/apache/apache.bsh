@@ -42,6 +42,7 @@ if (zorka.boolCfg("tracer")) {
         "org.apache.neethi.**",
         "org.apache.openjpa.**",
         "org.apache.portals.bridges.**",
+        "org.apache.pdfbox.**",
         "org.apache.soap.**",
         "org.apache.struts.**",
         "org.apache.synapse.transport.nhttp.ServerWorker$1/compare",

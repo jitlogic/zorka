@@ -26,6 +26,7 @@ if (zorka.boolCfg("tracer")) {
       "com.google.inject.internal.**",
       "com.google.gwt.core.client.impl.WeakMapping",
       "com.google.template.soy.**",
+      "com.google.protobuf.**",
       "com.google.web.bindery.autobean.shared.**",
       "com.google.web.bindery.autobean.vm.**",
       "com.google.web.bindery.requestfactory.shared.**",

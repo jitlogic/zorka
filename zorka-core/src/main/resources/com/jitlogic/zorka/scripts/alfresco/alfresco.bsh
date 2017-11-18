@@ -1,0 +1,31 @@
+
+zorka.require(
+  "tracer.bsh",
+  "jms.bsh",
+  "spring.bsh",
+  "apache/cxf.bsh",
+  "apache/camel.bsh",
+  "apache/apache.bsh",
+  "lang/groovy.bsh",
+  "lang/rhino.bsh",
+  "jboss/hibernate.bsh",
+  "libs/quartz.bsh",
+  "apache/httpclient.bsh"
+);
+
+
+// Tracer tuning
+if (zorka.boolCfg("tracer")) {
+    tracer.exclude(
+        "org.gagravarr.**",
+        "org.alfresco.repo.dictionary.M2**",
+        "org.alfresco.repo.dictionary.JiBX**",
+        "org.alfresco.repo.cache.lookup.EntityLookupCache",
+        "org.alfresco.repo.content.AbstractContentRead**",
+        "org.apache.tika.sax.**",
+        "org.apache.solr.common.**",
+        "org.apache.solr.schema.**",
+        "org.apache.fontbox.cff.**"
+    );
+}
+

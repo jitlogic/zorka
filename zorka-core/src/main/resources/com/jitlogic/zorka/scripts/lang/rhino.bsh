@@ -1,0 +1,9 @@
+
+// Tracer tuning
+if (zorka.boolCfg("tracer")) {
+    tracer.exclude(
+      "org.mozilla.javascript.**",
+      "org.mozilla.classfile.**"
+    );
+}
+
