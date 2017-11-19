@@ -44,6 +44,7 @@ if (zorka.boolCfg("tracer")) {
         "org.alfresco.repo.cache.lookup.EntityLookupCache",
         "org.alfresco.repo.content.AbstractContentRead**",
         "org.alfresco.repo.content.MimetypeMap",
+        "org.alfresco.repo.content.metadata.MediaTypeDisablingDocumentSelector/select",
         "org.alfresco.repo.content.transform.DoubleMap",
         "org.alfresco.repo.dictionary.M2**",
         "org.alfresco.repo.dictionary.JiBX**",

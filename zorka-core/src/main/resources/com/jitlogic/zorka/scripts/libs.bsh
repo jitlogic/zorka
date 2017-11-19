@@ -55,6 +55,7 @@ if (zorka.boolCfg("tracer")) {
         "org.dom4j.**",
         "org.exolab.castor.**",
         "org.fressian.**",
+        "org.htmlparser.lexer.**",
         "org.jaxen.**",
         "org.jdom.**",
         "org.jibx.**",
