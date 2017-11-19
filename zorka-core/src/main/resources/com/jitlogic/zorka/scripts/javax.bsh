@@ -31,6 +31,7 @@ if (zorka.boolCfg("tracer")) {
         "javax.crypto.**",
         "javax.el.**",
         "javax.enterprise.util.**",
+        "javax.imageio.stream.**",
         "javax.media.jai.**",
         "javax.security.**",
         "javax.servlet.**",

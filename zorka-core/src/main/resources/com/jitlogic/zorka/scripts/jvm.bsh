@@ -84,6 +84,7 @@ __jvm() {
           "sun.java2d.**",
           "com.sun.media.imageioimpl.**",
           "sun.misc.CharacterDecoder",
+          "sun.misc.FDBigInteger",
           "sun.misc.FpUtils",
           "sun.misc.IOUtils",
           "sun.misc.URLClassPat*",
