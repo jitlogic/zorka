@@ -44,6 +44,7 @@ public class Tracer implements ZorkaSubmitter<SymbolicRecord>, ZorkaService {
      */
     private static int maxTraceRecords = 4096;
 
+    private static int minTraceCalls = 262144;
 
     private AtomicReference<List<ZorkaSubmitter<SymbolicRecord>>> outputs
             = new AtomicReference<List<ZorkaSubmitter<SymbolicRecord>>>(new ArrayList<ZorkaSubmitter<SymbolicRecord>>());
@@ -82,6 +83,15 @@ public class Tracer implements ZorkaSubmitter<SymbolicRecord>, ZorkaService {
 
     public static void setMaxTraceRecords(int traceSize) {
         maxTraceRecords = traceSize;
+    }
+
+
+    public static int getMinTraceCalls() {
+        return minTraceCalls;
+    }
+
+    public static void setMinTraceCalls(int traceCalls) {
+        minTraceCalls = traceCalls;
     }
 
 

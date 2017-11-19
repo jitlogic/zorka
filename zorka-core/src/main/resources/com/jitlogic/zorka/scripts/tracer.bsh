@@ -20,6 +20,7 @@ zorka.defCfg("tracer", "no");
 zorka.defCfg("tracer.min.trace.time", 1000);
 zorka.defCfg("tracer.min.method.time", 250000);
 zorka.defCfg("tracer.max.trace.records", 4096);
+zorka.defCfg("tracer.min.trace.calls", 262144);
 
 zorka.defCfg("tracer.file", "no");
 zorka.defCfg("tracer.net", "yes");
@@ -123,6 +124,12 @@ if (zorka.boolCfg("tracer")) {
     mtr = zorka.intCfg("tracer.max.trace.records");
     zorka.logInfo("Setting maximum records per trace to " + mtr + ".");
     tracer.setTracerMaxTraceRecords(mtr);
+  }
+
+  if (zorka.hasCfg("tracer.min.trace.calls")) {
+    mtc = zorka.intCfg("tracer.min.trace.calls");
+    zorka.logInfo("Setting minimum calls to force trace submission to " + mtc + ".");
+    tracer.setTracerMinTraceCalls(mtc);
   }
 
   if (zorka.hasCfg("tracer.flags")) {

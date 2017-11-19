@@ -596,6 +596,17 @@ public class TracerLib {
         return Tracer.getMaxTraceRecords();
     }
 
+    public void setTracerMinTraceCalls(int minCalls) {
+        Tracer.setMinTraceCalls(minCalls);
+    }
+
+    public void setTracerMinTraceCalls(long minCalls) {
+        Tracer.setMinTraceCalls((int)minCalls);
+    }
+
+    public int getTracerMinTraceCalls() {
+        return Tracer.getMinTraceCalls();
+    }
 
     public void setTraceSpyMethods(boolean tsm) {
         tracer.setTraceSpyMethods(tsm);

@@ -10,6 +10,7 @@ Zorka 1.0.16 (2017-11-30)
 * Add Zabbix host metadata to default and sample property files;
 * Detect and skip instrumentation if argument index out of scope;
 * Templates for Zabbix 3.x + support for automatic registration;
+* new tracer.min.trace.calls setting to ease tracer tuning;
 * Various fixes;
 
 This version is released after a long break. As full QA/testing process hasn't
