@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>3.4</version>
-    <date>2017-11-16T17:57:50Z</date>
+    <date>2017-11-16T17:59:01Z</date>
     <groups>
+        <group>
+            <name>Templates</name>
+        </group>
         <group>
             <name>Templates/Zorka</name>
         </group>
     </groups>
     <templates>
         <template>
-            <template>Template_Zorka_Wildfly_Undertow_Active</template>
-            <name>Template_Zorka_Wildfly_Undertow_Active</name>
+            <template>Template_Zorka_Wildfly_JCA_Active</template>
+            <name>Template_Zorka_Wildfly_JCA_Active</name>
             <description/>
             <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
                 <group>
                     <name>Templates/Zorka</name>
                 </group>
@@ -21,11 +27,11 @@
             <items/>
             <discovery_rules>
                 <discovery_rule>
-                    <name>HTTP Listeners</name>
+                    <name>Long Running Threads</name>
                     <type>7</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix.discovery[&quot;java&quot;,&quot;jboss.as:subsystem=undertow,server=*,http-listener=*&quot;, &quot;subsystem&quot;, &quot;server&quot;, &quot;http-listener&quot;]</key>
+                    <key>zabbix.discovery[&quot;java&quot;,&quot;jboss.as:subsystem=jca,*&quot;, &quot;subsystem&quot;, &quot;workmanager&quot;, &quot;long-running-threads&quot;]</key>
                     <delay>30m</delay>
                     <status>0</status>
                     <allowed_hosts/>
@@ -53,18 +59,18 @@
                     <description/>
                     <item_prototypes>
                         <item_prototype>
-                            <name>HTTP: {#SERVER}:{#HTTPLISTENER}: Incoming Traffic</name>
+                            <name>JCA: Long Pool: {#WORKMANAGER}:{#LONGRUNNINGTHREADS}: Thread Count</name>
                             <type>7</type>
                             <snmp_community/>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;java&quot;,&quot;jboss.as:subsystem=undertow,server={#SERVER},http-listener={#HTTPLISTENER}&quot;, &quot;bytesReceived&quot;]</key>
+                            <key>zorka.jmx[&quot;java&quot;,&quot;jboss.as:subsystem=jca,workmanager={#WORKMANAGER},long-running-threads={#LONGRUNNINGTHREADS}&quot;, &quot;currentThreadCount&quot;]</key>
                             <delay>1m</delay>
                             <history>7d</history>
                             <trends>365d</trends>
                             <status>0</status>
-                            <value_type>0</value_type>
+                            <value_type>3</value_type>
                             <allowed_hosts/>
-                            <units>B/s</units>
+                            <units>threads</units>
                             <snmpv3_contextname/>
                             <snmpv3_securityname/>
                             <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -85,33 +91,28 @@
                             <applications/>
                             <valuemap/>
                             <logtimefmt/>
-                            <preprocessing>
-                                <step>
-                                    <type>10</type>
-                                    <params/>
-                                </step>
-                            </preprocessing>
+                            <preprocessing/>
                             <jmx_endpoint/>
                             <application_prototypes>
                                 <application_prototype>
-                                    <name>HTTP: {#SERVER}:{#HTTPLISTENER}</name>
+                                    <name>JCA: {#WORKMANAGER}:{#LONGRUNNINGTHREADS}</name>
                                 </application_prototype>
                             </application_prototypes>
                             <master_item_prototype/>
                         </item_prototype>
                         <item_prototype>
-                            <name>HTTP: {#SERVER}:{#HTTPLISTENER}: Outgoing Traffic</name>
+                            <name>JCA: Short Pool: {#WORKMANAGER}:{#LONGRUNNINGTHREADS}: Queue Size</name>
                             <type>7</type>
                             <snmp_community/>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;java&quot;,&quot;jboss.as:subsystem=undertow,server={#SERVER},http-listener={#HTTPLISTENER}&quot;, &quot;bytesSent&quot;]</key>
+                            <key>zorka.jmx[&quot;java&quot;,&quot;jboss.as:subsystem=jca,workmanager={#WORKMANAGER},long-running-threads={#LONGRUNNINGTHREADS}&quot;, &quot;queueSize&quot;]</key>
                             <delay>1m</delay>
                             <history>7d</history>
                             <trends>365d</trends>
                             <status>0</status>
-                            <value_type>0</value_type>
+                            <value_type>3</value_type>
                             <allowed_hosts/>
-                            <units>B/s</units>
+                            <units>threads</units>
                             <snmpv3_contextname/>
                             <snmpv3_securityname/>
                             <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -132,33 +133,28 @@
                             <applications/>
                             <valuemap/>
                             <logtimefmt/>
-                            <preprocessing>
-                                <step>
-                                    <type>10</type>
-                                    <params/>
-                                </step>
-                            </preprocessing>
+                            <preprocessing/>
                             <jmx_endpoint/>
                             <application_prototypes>
                                 <application_prototype>
-                                    <name>HTTP: {#SERVER}:{#HTTPLISTENER}</name>
+                                    <name>JCA: {#WORKMANAGER}:{#LONGRUNNINGTHREADS}</name>
                                 </application_prototype>
                             </application_prototypes>
                             <master_item_prototype/>
                         </item_prototype>
                         <item_prototype>
-                            <name>HTTP: {#SERVER}:{#HTTPLISTENER}: Errors</name>
+                            <name>JCA: Short Pool: {#WORKMANAGER}:{#LONGRUNNINGTHREADS}: Tasks Rejected</name>
                             <type>7</type>
                             <snmp_community/>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;java&quot;,&quot;jboss.as:subsystem=undertow,server={#SERVER},http-listener={#HTTPLISTENER}&quot;, &quot;errorCount&quot;]</key>
+                            <key>zorka.jmx[&quot;java&quot;,&quot;jboss.as:subsystem=jca,workmanager={#WORKMANAGER},long-running-threads={#LONGRUNNINGTHREADS}&quot;, &quot;rejectedCount&quot;]</key>
                             <delay>1m</delay>
                             <history>7d</history>
                             <trends>365d</trends>
                             <status>0</status>
-                            <value_type>0</value_type>
+                            <value_type>3</value_type>
                             <allowed_hosts/>
-                            <units>req/min</units>
+                            <units>tasks/min</units>
                             <snmpv3_contextname/>
                             <snmpv3_securityname/>
                             <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -192,24 +188,62 @@
                             <jmx_endpoint/>
                             <application_prototypes>
                                 <application_prototype>
-                                    <name>HTTP: {#SERVER}:{#HTTPLISTENER}</name>
+                                    <name>JCA: {#WORKMANAGER}:{#LONGRUNNINGTHREADS}</name>
                                 </application_prototype>
                             </application_prototypes>
                             <master_item_prototype/>
                         </item_prototype>
+                    </item_prototypes>
+                    <trigger_prototypes/>
+                    <graph_prototypes/>
+                    <host_prototypes/>
+                    <jmx_endpoint/>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Short Running Threads</name>
+                    <type>7</type>
+                    <snmp_community/>
+                    <snmp_oid/>
+                    <key>zabbix.discovery[&quot;java&quot;,&quot;jboss.as:subsystem=jca,*&quot;, &quot;subsystem&quot;, &quot;workmanager&quot;, &quot;short-running-threads&quot;]</key>
+                    <delay>30m</delay>
+                    <status>0</status>
+                    <allowed_hosts/>
+                    <snmpv3_contextname/>
+                    <snmpv3_securityname/>
+                    <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                    <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                    <snmpv3_authpassphrase/>
+                    <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                    <snmpv3_privpassphrase/>
+                    <params/>
+                    <ipmi_sensor/>
+                    <authtype>0</authtype>
+                    <username/>
+                    <password/>
+                    <publickey/>
+                    <privatekey/>
+                    <port/>
+                    <filter>
+                        <evaltype>0</evaltype>
+                        <formula/>
+                        <conditions/>
+                    </filter>
+                    <lifetime>30d</lifetime>
+                    <description/>
+                    <item_prototypes>
                         <item_prototype>
-                            <name>HTTP: {#SERVER}:{#HTTPLISTENER}: Processing Time</name>
+                            <name>JCA: Short Pool: {#WORKMANAGER}:{#SHORTRUNNINGTHREADS}: Thread Count</name>
                             <type>7</type>
                             <snmp_community/>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;java&quot;,&quot;jboss.as:subsystem=undertow,server={#SERVER},http-listener={#HTTPLISTENER}&quot;, &quot;processingTime&quot;]</key>
+                            <key>zorka.jmx[&quot;java&quot;,&quot;jboss.as:subsystem=jca,workmanager={#WORKMANAGER},short-running-threads={#SHORTRUNNINGTHREADS}&quot;, &quot;currentThreadCount&quot;]</key>
                             <delay>1m</delay>
                             <history>7d</history>
                             <trends>365d</trends>
                             <status>0</status>
-                            <value_type>0</value_type>
+                            <value_type>3</value_type>
                             <allowed_hosts/>
-                            <units>%cpu</units>
+                            <units>threads</units>
                             <snmpv3_contextname/>
                             <snmpv3_securityname/>
                             <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -230,37 +264,70 @@
                             <applications/>
                             <valuemap/>
                             <logtimefmt/>
-                            <preprocessing>
-                                <step>
-                                    <type>10</type>
-                                    <params/>
-                                </step>
-                                <step>
-                                    <type>1</type>
-                                    <params>0.1</params>
-                                </step>
-                            </preprocessing>
+                            <preprocessing/>
                             <jmx_endpoint/>
                             <application_prototypes>
                                 <application_prototype>
-                                    <name>HTTP: {#SERVER}:{#HTTPLISTENER}</name>
+                                    <name>JCA: {#WORKMANAGER}:{#SHORTRUNNINGTHREADS} Short Running Threads</name>
                                 </application_prototype>
                             </application_prototypes>
                             <master_item_prototype/>
                         </item_prototype>
                         <item_prototype>
-                            <name>HTTP: {#SERVER}:{#HTTPLISTENER}: Requests</name>
+                            <name>JCA: Short Pool: {#WORKMANAGER}:{#SHORTRUNNINGTHREADS}: Queue Size</name>
                             <type>7</type>
                             <snmp_community/>
                             <snmp_oid/>
-                            <key>zorka.jmx[&quot;java&quot;,&quot;jboss.as:subsystem=undertow,server={#SERVER},http-listener={#HTTPLISTENER}&quot;, &quot;requestCount&quot;]</key>
+                            <key>zorka.jmx[&quot;java&quot;,&quot;jboss.as:subsystem=jca,workmanager={#WORKMANAGER},short-running-threads={#SHORTRUNNINGTHREADS}&quot;, &quot;queueSize&quot;]</key>
+                            <delay>1m</delay>
+                            <history>7d</history>
+                            <trends>365d</trends>
+                            <status>0</status>
+                            <value_type>3</value_type>
+                            <allowed_hosts/>
+                            <units>threads</units>
+                            <snmpv3_contextname/>
+                            <snmpv3_securityname/>
+                            <snmpv3_securitylevel>0</snmpv3_securitylevel>
+                            <snmpv3_authprotocol>0</snmpv3_authprotocol>
+                            <snmpv3_authpassphrase/>
+                            <snmpv3_privprotocol>0</snmpv3_privprotocol>
+                            <snmpv3_privpassphrase/>
+                            <params/>
+                            <ipmi_sensor/>
+                            <authtype>0</authtype>
+                            <username/>
+                            <password/>
+                            <publickey/>
+                            <privatekey/>
+                            <port/>
+                            <description/>
+                            <inventory_link>0</inventory_link>
+                            <applications/>
+                            <valuemap/>
+                            <logtimefmt/>
+                            <preprocessing/>
+                            <jmx_endpoint/>
+                            <application_prototypes>
+                                <application_prototype>
+                                    <name>JCA: {#WORKMANAGER}:{#SHORTRUNNINGTHREADS} Short Running Threads</name>
+                                </application_prototype>
+                            </application_prototypes>
+                            <master_item_prototype/>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>JCA: Short Pool: {#WORKMANAGER}:{#SHORTRUNNINGTHREADS}: Tasks Rejected</name>
+                            <type>7</type>
+                            <snmp_community/>
+                            <snmp_oid/>
+                            <key>zorka.jmx[&quot;java&quot;,&quot;jboss.as:subsystem=jca,workmanager={#WORKMANAGER},short-running-threads={#SHORTRUNNINGTHREADS}&quot;, &quot;rejectedCount&quot;]</key>
                             <delay>1m</delay>
                             <history>7d</history>
                             <trends>365d</trends>
                             <status>0</status>
                             <value_type>0</value_type>
                             <allowed_hosts/>
-                            <units>req/min</units>
+                            <units>tasks/min</units>
                             <snmpv3_contextname/>
                             <snmpv3_securityname/>
                             <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -294,148 +361,7 @@
                             <jmx_endpoint/>
                             <application_prototypes>
                                 <application_prototype>
-                                    <name>HTTP: {#SERVER}:{#HTTPLISTENER}</name>
-                                </application_prototype>
-                            </application_prototypes>
-                            <master_item_prototype/>
-                        </item_prototype>
-                        <item_prototype>
-                            <name>HTTP: {#SERVER}:{#HTTPLISTENER}: Time per Request (AVG1)</name>
-                            <type>7</type>
-                            <snmp_community/>
-                            <snmp_oid/>
-                            <key>zorka.rate[&quot;java&quot;,&quot;jboss.as:subsystem=undertow,server={#SERVER},http-listener={#HTTPLISTENER}&quot;, &quot;processingTime&quot;, &quot;requestCount&quot;, &quot;AVG1&quot;]</key>
-                            <delay>1m</delay>
-                            <history>7d</history>
-                            <trends>365d</trends>
-                            <status>0</status>
-                            <value_type>0</value_type>
-                            <allowed_hosts/>
-                            <units>req/min</units>
-                            <snmpv3_contextname/>
-                            <snmpv3_securityname/>
-                            <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                            <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                            <snmpv3_authpassphrase/>
-                            <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                            <snmpv3_privpassphrase/>
-                            <params/>
-                            <ipmi_sensor/>
-                            <authtype>0</authtype>
-                            <username/>
-                            <password/>
-                            <publickey/>
-                            <privatekey/>
-                            <port/>
-                            <description/>
-                            <inventory_link>0</inventory_link>
-                            <applications/>
-                            <valuemap/>
-                            <logtimefmt/>
-                            <preprocessing>
-                                <step>
-                                    <type>1</type>
-                                    <params>0.001</params>
-                                </step>
-                            </preprocessing>
-                            <jmx_endpoint/>
-                            <application_prototypes>
-                                <application_prototype>
-                                    <name>HTTP: {#SERVER}:{#HTTPLISTENER}</name>
-                                </application_prototype>
-                            </application_prototypes>
-                            <master_item_prototype/>
-                        </item_prototype>
-                        <item_prototype>
-                            <name>HTTP: {#SERVER}:{#HTTPLISTENER}: Time per Request (AVG5)</name>
-                            <type>7</type>
-                            <snmp_community/>
-                            <snmp_oid/>
-                            <key>zorka.rate[&quot;java&quot;,&quot;jboss.as:subsystem=undertow,server={#SERVER},http-listener={#HTTPLISTENER}&quot;, &quot;processingTime&quot;, &quot;requestCount&quot;, &quot;AVG5&quot;]</key>
-                            <delay>1m</delay>
-                            <history>7d</history>
-                            <trends>365d</trends>
-                            <status>0</status>
-                            <value_type>0</value_type>
-                            <allowed_hosts/>
-                            <units>req/min</units>
-                            <snmpv3_contextname/>
-                            <snmpv3_securityname/>
-                            <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                            <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                            <snmpv3_authpassphrase/>
-                            <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                            <snmpv3_privpassphrase/>
-                            <params/>
-                            <ipmi_sensor/>
-                            <authtype>0</authtype>
-                            <username/>
-                            <password/>
-                            <publickey/>
-                            <privatekey/>
-                            <port/>
-                            <description/>
-                            <inventory_link>0</inventory_link>
-                            <applications/>
-                            <valuemap/>
-                            <logtimefmt/>
-                            <preprocessing>
-                                <step>
-                                    <type>1</type>
-                                    <params>0.001</params>
-                                </step>
-                            </preprocessing>
-                            <jmx_endpoint/>
-                            <application_prototypes>
-                                <application_prototype>
-                                    <name>HTTP: {#SERVER}:{#HTTPLISTENER}</name>
-                                </application_prototype>
-                            </application_prototypes>
-                            <master_item_prototype/>
-                        </item_prototype>
-                        <item_prototype>
-                            <name>HTTP: {#SERVER}:{#HTTPLISTENER}: Time per Request (AVG15)</name>
-                            <type>7</type>
-                            <snmp_community/>
-                            <snmp_oid/>
-                            <key>zorka.rate[&quot;java&quot;,&quot;jboss.as:subsystem=undertow,server={#SERVER},http-listener={#HTTPLISTENER}&quot;, &quot;processingTime&quot;, &quot;requestCount&quot;, &quot;AVG15&quot;]</key>
-                            <delay>1m</delay>
-                            <history>7d</history>
-                            <trends>365d</trends>
-                            <status>0</status>
-                            <value_type>0</value_type>
-                            <allowed_hosts/>
-                            <units>req/min</units>
-                            <snmpv3_contextname/>
-                            <snmpv3_securityname/>
-                            <snmpv3_securitylevel>0</snmpv3_securitylevel>
-                            <snmpv3_authprotocol>0</snmpv3_authprotocol>
-                            <snmpv3_authpassphrase/>
-                            <snmpv3_privprotocol>0</snmpv3_privprotocol>
-                            <snmpv3_privpassphrase/>
-                            <params/>
-                            <ipmi_sensor/>
-                            <authtype>0</authtype>
-                            <username/>
-                            <password/>
-                            <publickey/>
-                            <privatekey/>
-                            <port/>
-                            <description/>
-                            <inventory_link>0</inventory_link>
-                            <applications/>
-                            <valuemap/>
-                            <logtimefmt/>
-                            <preprocessing>
-                                <step>
-                                    <type>1</type>
-                                    <params>0.001</params>
-                                </step>
-                            </preprocessing>
-                            <jmx_endpoint/>
-                            <application_prototypes>
-                                <application_prototype>
-                                    <name>HTTP: {#SERVER}:{#HTTPLISTENER}</name>
+                                    <name>JCA: {#WORKMANAGER}:{#SHORTRUNNINGTHREADS} Short Running Threads</name>
                                 </application_prototype>
                             </application_prototypes>
                             <master_item_prototype/>

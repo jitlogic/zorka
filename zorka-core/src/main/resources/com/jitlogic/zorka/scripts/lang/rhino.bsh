@@ -15,28 +15,11 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// This file contains agent configurations for JSF libraries
-
-zorka.require(
-  "tracer.bsh",
-  "lang/groovy.bsh"
-);
-
 // Tracer tuning
 if (zorka.boolCfg("tracer")) {
     tracer.exclude(
-        "org.chromattic.**",
-        "org.exoplatform.commons.utils.**",
-        "org.exoplatform.container.UnifiedClassLoader",
-        "org.exoplatform.groovyscript.**",
-        "org.exoplatform.services.jcr.**",
-        "org.exoplatform.services.log.**",
-        "org.gatein.common.logging.**",
-        "org.gatein.common.text.**",
-        "org.gatein.common.util.**",
-        "org.gatein.pc.api.**",
-        "org.gatein.pc.portlet.impl.jsr168.**",
-        "org.jboss.cache.**",
-        "org.picketlink.idm.impl.configuration.jaxb2.generated.**"
+      "org.mozilla.javascript.**",
+      "org.mozilla.classfile.**"
     );
 }
+

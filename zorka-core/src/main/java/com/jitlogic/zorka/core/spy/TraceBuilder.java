@@ -270,8 +270,8 @@ public class TraceBuilder {
         // Submit data if trace marker found
         if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {
             int flags = ttop.getMarker().getFlags();
-            if ((ttop.getTime() >= ttop.getMarker().getMinimumTime() && 0 == (flags & TraceMarker.DROP_TRACE))
-                    || 0 != (flags & TraceMarker.SUBMIT_TRACE)) {
+            if (((ttop.getTime() >= ttop.getMarker().getMinimumTime() || ttop.getCalls() >= Tracer.getMinTraceCalls())
+                && 0 == (flags & TraceMarker.DROP_TRACE)) || 0 != (flags & TraceMarker.SUBMIT_TRACE)) {
                 submit(ttop);
                 AgentDiagnostics.inc(AgentDiagnostics.TRACES_SUBMITTED);
                 clean = false;

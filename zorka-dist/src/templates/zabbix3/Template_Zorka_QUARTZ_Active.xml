@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>3.4</version>
-    <date>2017-11-14T19:00:54Z</date>
+    <date>2017-11-16T18:00:42Z</date>
     <groups>
         <group>
             <name>Templates/Zorka</name>
@@ -175,12 +175,12 @@
             </items>
             <discovery_rules>
                 <discovery_rule>
-                    <name>Quaartz jobs</name>
+                    <name>Quartz jobs</name>
                     <type>0</type>
                     <snmp_community/>
                     <snmp_oid/>
                     <key>quartz.discovery[]</key>
-                    <delay>3600</delay>
+                    <delay>30m</delay>
                     <status>0</status>
                     <allowed_hosts/>
                     <snmpv3_contextname/>

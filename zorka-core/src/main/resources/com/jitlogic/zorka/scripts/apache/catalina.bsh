@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -185,6 +185,7 @@ __catalina() {
         "org.apache.catalina.core.StandardContext",
         "org.apache.catalina.connector.**", // TODO but this is sometimes useful for resolving connectivity problems
         "org.apache.catalina.deploy.Security**",
+        "org.apache.catalina.loader.WebappClassLoaderBase/*",
         "org.apache.catalina.session.StandardSession",
         "org.apache.catalina.session.StandardSessionFacade",
         "org.apache.catalina.util.**",

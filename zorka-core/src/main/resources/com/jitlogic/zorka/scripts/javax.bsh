@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,7 @@ if (zorka.boolCfg("tracer")) {
         "javax.crypto.**",
         "javax.el.**",
         "javax.enterprise.util.**",
+        "javax.imageio.stream.**",
         "javax.media.jai.**",
         "javax.security.**",
         "javax.servlet.**",

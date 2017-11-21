@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -24,8 +24,10 @@ if (zorka.boolCfg("tracer")) {
     tracer.exclude(
       "com.google.common.**",
       "com.google.inject.internal.**",
+      "com.google.javascript.jscomp.**",
       "com.google.gwt.core.client.impl.WeakMapping",
       "com.google.template.soy.**",
+      "com.google.protobuf.**",
       "com.google.web.bindery.autobean.shared.**",
       "com.google.web.bindery.autobean.vm.**",
       "com.google.web.bindery.requestfactory.shared.**",

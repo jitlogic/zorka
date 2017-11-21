@@ -561,4 +561,34 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         assertThat(records.get(0).numAttrs()).isEqualTo(1);
     }
 
+    @Test
+    public void testTraceSubmitWhenMinTraceCallsExceeded() throws Exception {
+        tracer.setTracerMinMethodTime(10);
+        tracer.setTracerMinTraceCalls(3);
+
+        b.traceEnter(c1, m1, s1, 100L);
+        b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
+        b.traceEnter(c1, m1, s1, 110L);
+        b.traceEnter(c1, m1, s1, 120L);
+        b.traceReturn(130L);
+        b.traceReturn(140L);
+        b.traceReturn(150L);
+
+        assertThat(records.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void testTraceSubmitWhenMinTraceCallsNotExceeded() throws Exception {
+        tracer.setTracerMinMethodTime(10);
+        tracer.setTracerMinTraceCalls(3);
+
+        b.traceEnter(c1, m1, s1, 100L);
+        b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
+        b.traceEnter(c1, m1, s1, 110L);
+        b.traceReturn(140L);
+        b.traceReturn(150L);
+
+        assertThat(records.size()).isEqualTo(0);
+    }
+
 }

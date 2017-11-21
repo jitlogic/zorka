@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>3.4</version>
-    <date>2017-11-15T21:20:20Z</date>
+    <date>2017-11-16T17:59:23Z</date>
     <groups>
         <group>
             <name>Templates/Zorka</name>

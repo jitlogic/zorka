@@ -1,13 +1,20 @@
-Zorka 1.0.16 (2016-11-30)
+Zorka 1.0.16 (2017-11-30)
 -------------------------
 
 * Update: ASM 6.0;
-* JBoss 8.x/9.x: catch HTTP traces in the lowest layer of Undertow;
+* Wildfly 8.x/9.x: catch HTTP traces in the lowest layer of Undertow;
+* Wildfly 10.x, 11.x support;
+* Alfresco 2017+ support;
 * HTTP/CBOR tracer output (new CBOR collector is yet to be released);
 * Fixes & performance improvements for active checks (by dd00ff@github);
 * Add Zabbix host metadata to default and sample property files;
 * Detect and skip instrumentation if argument index out of scope;
+* Templates for Zabbix 3.x + support for automatic registration;
+* new tracer.min.trace.calls setting to ease tracer tuning;
 * Various fixes;
+
+This version is released after a long break. As full QA/testing process hasn't
+been fully restarted, please test agent in a non-production environment first. 
 
 
 Zorka 1.0.15 (2015-11-29)

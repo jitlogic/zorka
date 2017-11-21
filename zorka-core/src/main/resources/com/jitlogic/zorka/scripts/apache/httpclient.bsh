@@ -1,5 +1,5 @@
 /**
- * Copyright 2012-2015 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -27,7 +27,9 @@ zorka.require(
 if (zorka.boolCfg("tracer")) {
     tracer.exclude(
         "org.apache.commons.httpclient.**",
-        "org.apache.http.impl.client.**"
+        "org.apache.http.impl.client.**",
+        "org.apache.http.message.TokenParser",
+        "org.apache.http.util.Args"
     );
 }
 
@@ -44,15 +46,19 @@ __apache_httpclient() {
   headers_processor() {
       process(rec) {
           method = rec.get("METHOD");
-          if (method != null && method.getRequestHeaders() != null) {
-              for (hdr : method.getRequestHeaders()) {
+          if (method != null) {
+            ihdr = util.get(method, "requestHeaders");
+            if (method != null && ihdr != null) {
+              for (hdr : ihdr) {
                   tracer.newAttr("ReqHdr__" + hdr.getName(), ""+hdr.getValue());
-              }
-          }
-          if (method != null && method.getReplyHeaders() != null) {
-              for (hdr : method.getResponseHeaders()) {
-                  tracer.newAttr("RespHdr__" + hdr.getName(), ""+hdr.getValue());
-              }
+                }
+            }
+            ohdr = util.get(method, "responseHeaders");
+            if (method != null && ohdr != null) {
+                for (hdr : ohdr) {
+                    tracer.newAttr("RespHdr__" + hdr.getName(), ""+hdr.getValue());
+                }
+            }
           }
           return rec;
       }
