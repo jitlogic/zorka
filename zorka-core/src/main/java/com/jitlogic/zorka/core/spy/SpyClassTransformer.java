@@ -20,9 +20,9 @@ package com.jitlogic.zorka.core.spy;
 import com.jitlogic.zorka.common.stats.MethodCallStatistic;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.core.ZorkaBshAgent;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 
@@ -82,6 +82,10 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
     private boolean computeFrames;
 
+    private boolean scriptsAuto;
+
+    private ZorkaBshAgent bshAgent;
+
     /**
      * Reference to tracer instance.
      */
@@ -97,13 +101,15 @@ public class SpyClassTransformer implements ClassFileTransformer {
      *
      * @param tracer reference to tracer engine object
      */
-    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer,
-                               boolean computeFrames, boolean useCustomResolver,
+    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer, ZorkaBshAgent bshAgent,
+                               boolean computeFrames, boolean useCustomResolver, boolean scriptsAuto,
                                MethodCallStatistics statistics, SpyRetransformer retransformer) {
         this.symbolRegistry = symbolRegistry;
         this.tracer = tracer;
+        this.bshAgent = bshAgent;
         this.computeFrames = computeFrames;
         this.useCustomResolver = useCustomResolver;
+        this.scriptsAuto = scriptsAuto;
         this.retransformer = retransformer;
 
         if (useCustomResolver) {
@@ -247,7 +253,6 @@ public class SpyClassTransformer implements ClassFileTransformer {
         return ret;
     }
 
-
     @Override
     public byte[] transform(ClassLoader classLoader, String className, Class<?> classBeingRedefined,
                             ProtectionDomain protectionDomain, byte[] cbf) throws IllegalClassFormatException {
@@ -262,7 +267,11 @@ public class SpyClassTransformer implements ClassFileTransformer {
             return null;
         }
 
-        String clazzName = className.replace("/", ".");
+        String clazzName = className.replace('/', '.');
+
+        if (scriptsAuto) {
+            bshAgent.probe(clazzName);
+        }
 
         Set<String> currentTransforms = currentTransformsTL.get();
         if (currentTransforms.contains(clazzName)) {

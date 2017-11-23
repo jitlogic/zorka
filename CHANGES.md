@@ -1,7 +1,7 @@
 Zorka 1.0.17 (2017-12-??)
 -------------------------
 
-* TBD
+* Automatic detection and support script execution
 
 
 Zorka 1.0.16 (2017-11-22)

@@ -24,6 +24,7 @@ zorka.require(
   "javax.bsh",
   "ldap.bsh",
   "tracer.bsh",
+  "libs.bsh",
   "jboss/hibernate.bsh",
   "spring.bsh"
 );
@@ -268,8 +269,6 @@ __cas() {
   if (zorka.boolCfg("tracer")) {
     tracer.exclude(
       "org.jasig.cas.aspect.LogAspect",
-      "org.opensaml.xml.**",
-      "org.perf4j.**",
       "com.github.inspektr.**"
     );
   }

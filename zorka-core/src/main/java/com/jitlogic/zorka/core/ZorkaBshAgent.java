@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
@@ -69,6 +70,8 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
 
     private Set<String> loadedScripts = new HashSet<String>();
 
+    private Map<String,String> probeMap = new ConcurrentHashMap<String, String>();
+
     /**
      * Standard constructor.
      *
@@ -83,6 +86,8 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
         this.mainExecutor = mainExecutor;
         this.timeout = timeout;
         this.config = config;
+
+        probeSetup();
     }
 
 
@@ -196,12 +201,48 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
         }
     }
 
-
     public synchronized String require(String script) {
         if (!loadedScripts.contains(script)) {
             return loadScript(script);
         } else {
             return "Already loaded.";
+        }
+    }
+
+    public Set<String> getLoadedScripts() {
+        return loadedScripts;
+    }
+
+    public Map<String,String> getProbeMap() {
+        return probeMap;
+    }
+
+    private void probeSetup() {
+        Properties props = config.getProperties();
+        for (String s : props.stringPropertyNames()) {
+            if (s.startsWith("auto.")) {
+                probeMap.put(s.substring(5), props.getProperty(s));
+            }
+        }
+    }
+
+
+    public synchronized void probe(String className) {
+        int nhits = 0;
+        for (Map.Entry<String,String> e : probeMap.entrySet()) {
+            if (className.startsWith(e.getKey())) {
+                require(e.getValue().trim());
+                nhits++;
+            }
+        }
+
+        if (nhits > 0) {
+            Iterator<Map.Entry<String, String>> iter = probeMap.entrySet().iterator();
+            while (iter.hasNext()) {
+                if (loadedScripts.contains(iter.next().getValue())) {
+                    iter.remove();
+                }
+            }
         }
     }
 

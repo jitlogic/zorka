@@ -630,6 +630,14 @@ public class ZorkaLib implements ZorkaService {
     }
 
 
+    public String listLoadedScripts() {
+        List<String> rslt = new ArrayList<String>();
+        rslt.addAll(agent.getLoadedScripts());
+        Collections.sort(rslt);
+        return new JSONWriter().write(rslt);
+    }
+
+
     /**
      * Returns true if agent has been initialized (i.e. executing BSH code is
      * executing after initial execution of configuration scripts

@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core.test.spy.support;
 
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
+import com.jitlogic.zorka.core.ZorkaBshAgent;
 import com.jitlogic.zorka.core.spy.*;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import org.objectweb.asm.ClassVisitor;
@@ -32,8 +33,8 @@ public class TestSpyTransformer extends SpyClassTransformer {
 
     private SymbolRegistry sreg;
 
-    public TestSpyTransformer(SymbolRegistry symbolRegistry, Tracer tracer, SpyRetransformer spyRetransformer) {
-        super(symbolRegistry, tracer, true, true, new MethodCallStatistics(), spyRetransformer);
+    public TestSpyTransformer(SymbolRegistry symbolRegistry, Tracer tracer, ZorkaBshAgent bshAgent, SpyRetransformer spyRetransformer) {
+        super(symbolRegistry, tracer, bshAgent, true, true, true, new MethodCallStatistics(), spyRetransformer);
         sreg = symbolRegistry;
     }
 

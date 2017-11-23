@@ -45,5 +45,15 @@ public class SpyInstanceIntegTest extends ZorkaFixture {
         assertEquals(1, stats.getMethodCallStatistic("trivialMethod").getCalls());
     }
 
+    @Test
+    public void testAutoProbeScript() throws Exception {
+        int nprobes = zorkaAgent.getProbeMap().size();
+        instantiate(agentInstance.getClassTransformer(), BytecodeInstrumentationFixture.TCLASS1);
+        assertNull(zorkaAgent.get("test_bsh"));
+        assertEquals(nprobes, zorkaAgent.getProbeMap().size());
+        instantiate(agentInstance.getClassTransformer(), BytecodeInstrumentationFixture.TPROBE1);
+        assertNotNull(zorkaAgent.get("test_bsh"));
+        assertEquals(nprobes - 1, zorkaAgent.getProbeMap().size());
+    }
 
 }

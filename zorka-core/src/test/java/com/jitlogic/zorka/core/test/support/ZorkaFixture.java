@@ -79,7 +79,10 @@ public class ZorkaFixture extends CommonFixture {
                 "zorka.hostname", "test",
                 "zorka.filelog", "no",
                 "zorka.mbs.autoregister", "yes",
-                "spy", "yes"
+                "scripts", "",
+                "spy", "yes",
+                "scripts.auto", "yes",
+                "auto.com.jitlogic.zorka.core.test.spy.probe", "test.bsh"
         );
 
         config = new AgentConfig(configProperties);

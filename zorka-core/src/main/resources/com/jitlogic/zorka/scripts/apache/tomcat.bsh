@@ -100,9 +100,7 @@ __tomcat() {
 
   if (zorka.boolCfg("tracer")) {
     tracer.exclude(
-      "org.apache.naming.NamingContextBindingEnumeration",
-      "org.apache.tomcat.jdbc.pool.**",
-      "org.apache.juli.logging.**"
+      "org.apache.tomcat.jdbc.pool.**"
     );
   }
 
