@@ -221,7 +221,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
         Properties props = config.getProperties();
         for (String s : props.stringPropertyNames()) {
             if (s.startsWith("auto.")) {
-                probeMap.put(s.substring(5), props.getProperty(s));
+                probeMap.put(s.substring(5), config.get(s));
             }
         }
     }

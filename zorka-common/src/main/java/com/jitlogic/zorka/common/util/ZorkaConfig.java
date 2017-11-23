@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
  * @author rafal.lewczuk@jitlogic.com
  *
  */
-public abstract class ZorkaConfig {
+public class ZorkaConfig {
 
     /** Logger */
     private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaConfig.class);
@@ -48,9 +48,39 @@ public abstract class ZorkaConfig {
     /** Home directory */
 	protected String homeDir;
 
+	private Map<String,String> sysenv = System.getenv();
+	private Properties sysprops = System.getProperties();
 
     public static final String PROP_HOME_DIR = "zorka.home.dir";
 
+    public ZorkaConfig() {
+        this(new Properties());
+    }
+
+    public ZorkaConfig(Properties properties) {
+        this.properties = properties;
+    }
+
+    public String get(String key) {
+        if (key.startsWith("$")) {
+            return sysenv.get(key.substring(1));
+        }
+        if (key.startsWith("@")) {
+            return sysprops.getProperty(key.substring(1));
+        }
+        if (key.startsWith("&")) {
+            return get(key.substring(1));
+        }
+        String val = properties.getProperty(key);
+        return val != null ? ObjectInspector.substitute(
+            ObjectInspector.reCfgSubstPattern, val, this) : null;
+    }
+
+
+    public String get(String key, String defval) {
+        String rslt = get(key);
+        return rslt != null ? rslt : defval;
+    }
 
 
     /**
@@ -142,7 +172,7 @@ public abstract class ZorkaConfig {
      * @return
      */
     public String formatCfg(String input) {
-        return properties == null ? input : ObjectInspector.substitute(input, properties);
+        return properties == null ? input : ObjectInspector.substitute(ObjectInspector.reVarSubstPattern, input, this);
     }
 
 
@@ -152,7 +182,7 @@ public abstract class ZorkaConfig {
 
 
     protected List<String> listCfg(Properties properties, String key, String...defVals) {
-        String s = properties.getProperty(key);
+        String s = get(key);
 
         if (s != null) {
             String[] ss = s.split(",");
@@ -181,7 +211,7 @@ public abstract class ZorkaConfig {
 
 
     public Long kiloCfg(String key, Long defval) {
-        String s = properties.getProperty(key);
+        String s = get(key);
 
         long multi = 1L;
 
@@ -208,14 +238,14 @@ public abstract class ZorkaConfig {
 
 
     public String stringCfg(String key, String defval) {
-        String s = properties.getProperty(key);
+        String s = get(key);
 
         return s != null ? s.trim() : defval;
     }
 
 
     public Long longCfg(String key, Long defval) {
-        String s = properties.getProperty(key);
+        String s = get(key);
 
         try {
             if (s != null) {
@@ -231,7 +261,7 @@ public abstract class ZorkaConfig {
 
 
     public Integer intCfg(String key, Integer defval) {
-        String s = properties.getProperty(key);
+        String s = get(key);
 
         try {
             if (s != null) {
@@ -247,7 +277,7 @@ public abstract class ZorkaConfig {
 
 
     public Boolean boolCfg(String key, Boolean defval) {
-        String s = properties.getProperty(key);
+        String s = get(key);
 
         if (s != null) {
             s = s.trim();
@@ -269,7 +299,7 @@ public abstract class ZorkaConfig {
     }
 
     public boolean hasCfg(String key) {
-        String s = properties.getProperty(key);
+        String s = get(key);
 
         return s != null && s.trim().length() > 0;
     }

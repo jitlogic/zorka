@@ -18,6 +18,7 @@ package com.jitlogic.zorka.common.test;
 import com.jitlogic.zorka.common.test.support.*;
 import com.jitlogic.zorka.common.util.JmxObject;
 import com.jitlogic.zorka.common.util.ObjectInspector;
+import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -258,15 +259,19 @@ public class ObjectInspectorUnitTest extends CommonFixture {
     @Test
     public void testSubstituteWithPropertyValues() {
         Properties props = props("zorka.home.dir", "/opt/zorka", "my.prop", "Oja!");
+        ZorkaConfig conf = new ZorkaConfig(props);
 
         assertEquals("Oja! Zorka found in /opt/zorka !",
-                ObjectInspector.substitute("${my.prop} Zorka found in ${zorka.home.dir} !", props));
+                ObjectInspector.substitute(ObjectInspector.reVarSubstPattern,
+                    "${my.prop} Zorka found in ${zorka.home.dir} !", conf));
 
         assertEquals("This is ${non.existent}.",
-                ObjectInspector.substitute("This is ${non.existent}.", props));
+                ObjectInspector.substitute(ObjectInspector.reVarSubstPattern,
+                    "This is ${non.existent}.", conf));
 
         assertEquals("This is by default !",
-                ObjectInspector.substitute("This is ${fubar:by default} !", props));
+                ObjectInspector.substitute(ObjectInspector.reVarSubstPattern,
+                    "This is ${fubar:by default} !", conf));
     }
 
     @Test
@@ -320,7 +325,7 @@ public class ObjectInspectorUnitTest extends CommonFixture {
     public void testSubstitutePropWithLimit() {
         Properties props = new Properties();
         props.setProperty("X", "ABCDEF");
-        assertEquals("ABC", ObjectInspector.substitute("${X~3}", props));
+        assertEquals("ABC", ObjectInspector.substitute(ObjectInspector.reVarSubstPattern,"${X~3}", new ZorkaConfig(props)));
     }
 
     @Test
@@ -346,7 +351,7 @@ public class ObjectInspectorUnitTest extends CommonFixture {
         Properties props = new Properties();
         props.setProperty("Y", "ABC");
 
-        assertEquals("ABC", ObjectInspector.substitute("${X|Y|Z}", props));
+        assertEquals("ABC", ObjectInspector.substitute(ObjectInspector.reVarSubstPattern,"${X|Y|Z}", new ZorkaConfig(props)));
     }
 
 

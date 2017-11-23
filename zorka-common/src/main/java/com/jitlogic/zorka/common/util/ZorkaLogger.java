@@ -169,15 +169,15 @@ public class ZorkaLogger implements ZorkaTrapper {
     /**
      * Configures log filtering configuration from given properties object.
      *
-     * @param properties configuration properties (read from zorka.properties file).
+     * @param config configuration properties (read from zorka.properties file).
      */
-    public static void configure(Properties properties) {
-        logMask = parse("zorka.log.tracer", "ZTR", properties.getProperty("zorka.log.tracer", "INFO"))
-                | parse("zorka.log.perfmon", "ZPM", properties.getProperty("zorka.log.perfmon", "INFO"))
-                | parse("zorka.log.spy", "ZSP", properties.getProperty("zorka.log.spy", "INFO"))
-                | parse("zorka.log.agent", "ZAG", properties.getProperty("zorka.log.agent", "INFO"))
-                | parse("zorka.log.collect", "ZCL", properties.getProperty("zorka.log.collect", "INFO"));
-        logLevel = ZorkaLogLevel.valueOf(properties.getProperty("zorka.log.level", "INFO").trim().toUpperCase());
+    public static void configure(ZorkaConfig config) {
+        logMask = parse("zorka.log.tracer", "ZTR", config.get("zorka.log.tracer", "INFO"))
+                | parse("zorka.log.perfmon", "ZPM", config.get("zorka.log.perfmon", "INFO"))
+                | parse("zorka.log.spy", "ZSP", config.get("zorka.log.spy", "INFO"))
+                | parse("zorka.log.agent", "ZAG", config.get("zorka.log.agent", "INFO"))
+                | parse("zorka.log.collect", "ZCL", config.get("zorka.log.collect", "INFO"));
+        logLevel = ZorkaLogLevel.valueOf(config.get("zorka.log.level", "INFO").trim().toUpperCase());
     }
 
 

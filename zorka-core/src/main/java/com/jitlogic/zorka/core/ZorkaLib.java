@@ -90,8 +90,8 @@ public class ZorkaLib implements ZorkaService {
         this.translator = translator;
         this.instance = instance;
 
-        this.hostname = config.getProperties().getProperty("zorka.hostname").trim();
-        this.version = config.getProperties().getProperty("zorka.version").trim();
+        this.hostname = config.get("zorka.hostname", "zorka").trim();
+        this.version = config.get("zorka.version", "zorka").trim();
     }
 
 

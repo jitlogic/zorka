@@ -457,6 +457,7 @@ public final class ObjectInspector {
      * Regular expression for identifying substitution markers in strings. Used by substitute() methods.
      */
     public static final Pattern reVarSubstPattern = Pattern.compile("\\$\\{([^\\}]+)\\}");
+    public static final Pattern reCfgSubstPattern = Pattern.compile("\\$\\{([@$&][^\\}]+)\\}");
 
     private static final Pattern reDollarSign = Pattern.compile("$", Pattern.LITERAL);
     private static final String reDollarReplacement = Matcher.quoteReplacement("\\$");
@@ -515,10 +516,10 @@ public final class ObjectInspector {
      * Substitutes marked variables in a string with property strings.
      *
      * @param input      input (template) string
-     * @param properties spy record to be substituted
+     * @param config     zorka config
      * @return string with substitutions filled with values from record
      */
-    public static String substitute(String input, Properties properties) {
+    public static String substitute(Pattern pattern, String input, ZorkaConfig config) {
         Matcher m = reVarSubstPattern.matcher(input);
         StringBuffer sb = new StringBuffer();
 
@@ -537,7 +538,7 @@ public final class ObjectInspector {
             }
             String val = null;
             for (String k : key.split("\\|")) {
-                val = properties.getProperty(k);
+                val = config.get(k);
                 if (val != null) break;
             }
             if (val != null) {

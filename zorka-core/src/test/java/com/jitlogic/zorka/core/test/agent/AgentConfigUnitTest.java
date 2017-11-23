@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.test.agent;
 
+import com.jitlogic.zorka.common.test.support.TestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
 import com.jitlogic.zorka.common.util.ZorkaLogger;
@@ -24,10 +25,12 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import  static org.junit.Assert.*;
 
-public class LogConfigUnitTest extends ZorkaFixture {
+public class AgentConfigUnitTest extends ZorkaFixture {
 
     @Before
     public void setTestProps() {
@@ -38,6 +41,11 @@ public class LogConfigUnitTest extends ZorkaFixture {
         config.getProperties().setProperty("ten.bytes", "10");
         config.getProperties().setProperty("one.kilobyte", "1k");
         config.getProperties().setProperty("ten.megabytes", "10M");
+
+        Map<String,String> m = new HashMap();
+        m.putAll((Map<String,String>)util.getField(config, "sysenv"));
+        m.put("FOO", "BAR");
+        util.setField(config, "sysenv", m);
     }
 
 
@@ -92,5 +100,43 @@ public class LogConfigUnitTest extends ZorkaFixture {
         assertEquals((Long)10L, zorka.kiloCfg("ten.bytes"));
         assertEquals((Long)1024L, zorka.kiloCfg("one.kilobyte"));
         assertEquals((Long)10485760L, zorka.kiloCfg("ten.megabytes"));
+    }
+
+    @Test
+    public void testParseEnvVar() {
+        config.getProperties().put("test.foo", "${$FOO}");
+        assertEquals("BAR", zorka.stringCfg("test.foo"));
+    }
+
+    @Test
+    public void testParseEnvVarNonExistent() {
+        config.getProperties().put("test.foo1", "${$FOO1}r");
+        assertEquals("${$FOO1}r", zorka.stringCfg("test.foo1")); // TODO should this expand to null/empty ?
+    }
+
+    @Test
+    public void testParseEnvVarNonExistentWithDefVal() {
+        config.getProperties().put("test.foo1", "${$FOO1:ba}r");
+        assertEquals("bar", zorka.stringCfg("test.foo1"));
+    }
+
+    @Test
+    public void testParseSysProp() {
+        config.getProperties().put("test.bar", "${@sys.bar}");
+        System.setProperty("sys.bar", "foo");
+        assertEquals("foo", zorka.stringCfg("test.bar"));
+    }
+
+    @Test
+    public void testParseSysPropNonExistentWithDefVal() {
+        config.getProperties().put("test.bar1", "${@sys.bar1:ooo}");
+        assertEquals("ooo", zorka.stringCfg("test.bar1"));
+    }
+
+    @Test
+    public void testParseCfgVal() {
+        config.getProperties().put("test.foo", "bar");
+        config.getProperties().put("test.bar", "${&test.foo}");
+        assertEquals("bar", zorka.stringCfg("test.bar"));
     }
 }

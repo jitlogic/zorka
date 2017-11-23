@@ -145,10 +145,6 @@ public class AgentInstance implements ZorkaService {
 
     private MethodCallStatistics stats = new MethodCallStatistics();
 
-    /**
-     * Agent configuration properties
-     */
-    private Properties props;                // TODO get rid of this, access configuration via ZorkaConfig methods
 
     private Tracer tracer;
 
@@ -164,7 +160,6 @@ public class AgentInstance implements ZorkaService {
 
     public AgentInstance(AgentConfig config, SpyRetransformer retransformer) {
         this.config = config;
-        props = config.getProperties();
         this.retransformer = retransformer;
     }
 
@@ -216,7 +211,7 @@ public class AgentInstance implements ZorkaService {
 
 
     public void createZorkaDiagMBean() {
-        String mbeanName = props.getProperty("zorka.diagnostics.mbean").trim();
+        String mbeanName = config.get("zorka.diagnostics.mbean").trim();
 
         MBeanServerRegistry registry = getMBeanServerRegistry();
 

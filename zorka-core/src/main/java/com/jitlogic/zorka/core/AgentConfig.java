@@ -48,7 +48,7 @@ public class AgentConfig extends ZorkaConfig {
 
     public AgentConfig(Properties props) {
         properties = props;
-        homeDir = props.getProperty(PROP_HOME_DIR);
+        homeDir = get(PROP_HOME_DIR);
         setBaseProps();
     }
 
@@ -82,9 +82,9 @@ public class AgentConfig extends ZorkaConfig {
             initSyslogTrapper();
         }
 
-        ZorkaLogger.configure(getProperties());
+        ZorkaLogger.configure(this);
 
-        log.info(ZorkaLogger.ZAG_CONFIG, "Starting ZORKA agent " + getProperties().getProperty("zorka.version"));
+        log.info(ZorkaLogger.ZAG_CONFIG, "Starting ZORKA agent " + get("zorka.version"));
     }
 
 
