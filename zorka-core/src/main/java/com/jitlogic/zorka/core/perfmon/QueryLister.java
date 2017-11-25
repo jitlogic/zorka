@@ -176,7 +176,7 @@ public class QueryLister {
         for (QueryResult res : input) {
             res.setValue(ObjectInspector.get(res.getValue(), seg.getAttr()));
             if (seg.getName() != null) {
-                res.setAttr(seg.getName(), seg.getAttr()); // This attribute fetch is really trivial ...
+                res.setAttr(seg.getName(), seg.shouldFetchValue() ? res.getValue() : seg.getAttr());
             }
         }
 

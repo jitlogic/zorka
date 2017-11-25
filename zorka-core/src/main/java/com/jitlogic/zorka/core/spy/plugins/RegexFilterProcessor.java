@@ -22,6 +22,7 @@ import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -67,6 +68,11 @@ public class RegexFilterProcessor implements SpyProcessor {
      * Inverse filter flag
      */
     private Boolean filterOut;
+
+    /**
+     * Transforms of additional arguments
+     */
+    private Map<String,String> transforms;
 
     /**
      * Creates regex filter that filters records based on supplied regular expression.
@@ -122,6 +128,13 @@ public class RegexFilterProcessor implements SpyProcessor {
         this.defval = defval;
     }
 
+    public RegexFilterProcessor transform(String dst, String expr) {
+        if (transforms == null) {
+            transforms = new HashMap<String,String>();
+        }
+        transforms.put(dst, expr);
+        return this;
+    }
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
@@ -144,6 +157,11 @@ public class RegexFilterProcessor implements SpyProcessor {
                 }
                 String subst = ObjectInspector.substitute(expr, vals);
                 record.put(dst, subst);
+                if (transforms != null) {
+                    for (Map.Entry<String,String> e : transforms.entrySet()) {
+                        record.put(e.getKey(), ObjectInspector.substitute(e.getValue(), vals));
+                    }
+                }
                 if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
                     log.debug(ZorkaLogger.ZSP_ARGPROC, "Processed '" + val + "' to '" + subst + "' using pattern '" + regex.pattern() + "'");
                 }

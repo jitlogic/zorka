@@ -264,21 +264,21 @@ __http() {
 
   if (_stats && zorka.boolCfg("http.tags", false)) {
       zorka.logInfo("Enabling HTTP tagging ...");
-      _tags_chain = spy.subchain(spy.put("TAG",
-          zorka.stringCfg("http.tags.0", "OTHER")));
+      _tags_chain = spy.subchain(
+        spy.put("TAG", zorka.stringCfg("http.tags.0", "OTHER")),
+        spy.put("TAG_DESC", zorka.stringCfg("http.tags.0.desc", "Other pages")));
       for (i = 1; ; i++) {
           if (zorka.hasCfg("http.tags."+i+".uri")) {
               zorka.logInfo("HTTP_TAG: " + zorka.stringCfg("http.tags."+i+".uri")
                   + " -> " + zorka.stringCfg("http.tags."+i));
               _tags_chain = _tags_chain.with(
-                  spy.transform("TAG", "URI",
-                      zorka.stringCfg("http.tags."+i+".uri"),
-                      zorka.stringCfg("http.tags."+i)));
+                  spy.transform("TAG", "URI", zorka.stringCfg("http.tags."+i+".uri"), zorka.stringCfg("http.tags."+i))
+                     .transform("TAG_DESC", zorka.stringCfg("http.tags."+i+".desc", "${TAG}")));
           } else {
               break;
           }
       }
-      _tags_chain = _tags_chain.with(spy.zorkaStats("java", _mbean, "byTag", "${TAG}"));
+      _tags_chain = _tags_chain.with(spy.zorkaStatsDesc("java", _mbean, "byTag", "${TAG}", "${TAG_DESC}"));
       if (zorka.boolCfg("zabbix.active")) {
           zabbix.tagMetadata("HTTP:TAGS");
       }
@@ -292,7 +292,11 @@ __http() {
   }
 
   discovery(attr, tag) {
-    return zabbix.discovery(zorka.query("java", _mbean, "name", "type").get(attr).listAs("**", tag));
+    return zabbix.discovery(
+      zorka.query("java", _mbean, "name", "type")
+        .get(attr)
+        .listAs("**", tag)
+        .getValueAs("description", "DESC"));
   }
 
   calls(attr, tag) {

@@ -86,9 +86,14 @@ public class ZorkaStatsCollector implements SpyProcessor {
     private String attrTemplate;
 
     /**
-     * Statistic name tmeplate
+     * Statistic name template
      */
     private String statTemplate;
+
+    /**
+     * Statistic description template
+     */
+    private String descTemplate;
 
     /**
      * Execution time field
@@ -151,7 +156,8 @@ public class ZorkaStatsCollector implements SpyProcessor {
      * @param timeField     execution time field name
      */
     public ZorkaStatsCollector(MBeanServerRegistry mbsRegistry, String mbsName, String mbeanTemplate,
-                               String attrTemplate, String statTemplate, String timeField, String throughputField,
+                               String attrTemplate, String statTemplate, String descTemplate,
+                               String timeField, String throughputField,
                                int actions) {
 
         // Some strings are intern()ed immediately, so
@@ -161,6 +167,7 @@ public class ZorkaStatsCollector implements SpyProcessor {
         this.mbeanTemplate = mbeanTemplate.intern();
         this.attrTemplate = attrTemplate.intern();
         this.statTemplate = statTemplate.intern();
+        this.descTemplate = descTemplate.intern();
 
         this.timeField = timeField;
         this.throughputField = throughputField;
@@ -234,6 +241,10 @@ public class ZorkaStatsCollector implements SpyProcessor {
             String key = statFlags != 0 ? subst(statTemplate, record, ctx, statFlags) : statTemplate;
 
             statistic = statistics.getMethodCallStatistic(key);
+        }
+
+        if (descTemplate != null && !statistic.hasDescription()) {
+            statistic.setDescription(ObjectInspector.substitute(descTemplate, record));
         }
 
         if (0 != (actions & ACTION_STATS)) {

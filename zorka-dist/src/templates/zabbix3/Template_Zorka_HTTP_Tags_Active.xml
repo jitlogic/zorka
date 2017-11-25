@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>3.4</version>
-    <date>2017-11-16T18:01:56Z</date>
+    <date>2017-11-25T08:50:22Z</date>
     <groups>
         <group>
             <name>Templates/Zorka</name>
@@ -53,7 +53,7 @@
                     <description/>
                     <item_prototypes>
                         <item_prototype>
-                            <name>HTTP: {#TAG} average handling time (AVG1)</name>
+                            <name>HTTP: {#DESC}: average handling time (AVG1)</name>
                             <type>7</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -100,7 +100,7 @@
                             <master_item_prototype/>
                         </item_prototype>
                         <item_prototype>
-                            <name>HTTP: {#TAG} average handling time (AVG5)</name>
+                            <name>HTTP: {#DESC} average handling time (AVG5)</name>
                             <type>7</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -147,7 +147,7 @@
                             <master_item_prototype/>
                         </item_prototype>
                         <item_prototype>
-                            <name>HTTP: {#TAG} average handling time (AVG15)</name>
+                            <name>HTTP: {#DESC} average handling time (AVG15)</name>
                             <type>7</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -194,7 +194,7 @@
                             <master_item_prototype/>
                         </item_prototype>
                         <item_prototype>
-                            <name>HTTP: {#TAG} requests per minute</name>
+                            <name>HTTP: {#DESC} requests per minute</name>
                             <type>7</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -245,7 +245,7 @@
                             <master_item_prototype/>
                         </item_prototype>
                         <item_prototype>
-                            <name>HTTP: {#TAG} errors per minute</name>
+                            <name>HTTP: {#DESC} errors per minute</name>
                             <type>7</type>
                             <snmp_community/>
                             <snmp_oid/>
@@ -296,7 +296,7 @@
                             <master_item_prototype/>
                         </item_prototype>
                         <item_prototype>
-                            <name>HTTP: {#TAG} peak handling time</name>
+                            <name>HTTP: {#DESC} peak handling time</name>
                             <type>7</type>
                             <snmp_community/>
                             <snmp_oid/>
