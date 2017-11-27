@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "http.bsh",
   "audit.bsh",
   "apache/apache.bsh"
@@ -171,6 +170,7 @@ __catalina() {
   }
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("CATALINA");
   }
 

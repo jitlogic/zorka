@@ -20,7 +20,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "javax.bsh",
   "ldap.bsh",
   "tracer.bsh",
@@ -263,6 +262,7 @@ __cas() {
   }
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("JASIG_CAS");
   }
 

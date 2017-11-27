@@ -18,7 +18,6 @@
 // This file contains instrumentation definitions for Apache httpclient library.
 
 zorka.require(
-  "zabbix.bsh",
   "tracer.bsh",
   "apache/apache.bsh"
 );
@@ -142,6 +141,7 @@ __apache_httpclient() {
         "org.apache.http.HttpRequest", "org.apache.http.HttpClientConnection", "org.apache.http.HttpContext")));
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("HTTP:CLIENT");
   }
 

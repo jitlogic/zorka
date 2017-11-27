@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "tracer.bsh",
   "traps.bsh"
 );
@@ -81,6 +80,7 @@ __soap() {
   }
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("SOAP");
   }
 

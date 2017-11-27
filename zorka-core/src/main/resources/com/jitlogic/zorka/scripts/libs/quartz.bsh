@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "tracer.bsh"
 );
 
@@ -36,6 +35,7 @@ __quartz() {
   tracer.defType("QUARTZ", 43);
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("QUARTZ");
   }
 

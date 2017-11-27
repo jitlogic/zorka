@@ -17,7 +17,6 @@
 
 
 zorka.require(
-  "zabbix.bsh",
   "tracer.bsh"
 );
 
@@ -69,6 +68,7 @@ __unboundid() {
   }
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("LDAP");
   }
 

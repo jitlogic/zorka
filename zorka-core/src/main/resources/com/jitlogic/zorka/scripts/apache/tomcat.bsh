@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "jvm.bsh",
   "javax.bsh",
   "libs.bsh",
@@ -105,6 +104,7 @@ __tomcat() {
   }
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("TOMCAT");
   }
 

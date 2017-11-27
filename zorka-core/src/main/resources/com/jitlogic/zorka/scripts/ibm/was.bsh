@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "jvm.bsh",
   "jsf.bsh",
   "ejb.bsh",
@@ -244,6 +243,7 @@ __was() {
 
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("WEBSPHERE");
   }
 

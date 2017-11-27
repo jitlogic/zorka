@@ -18,7 +18,6 @@
 // This file contains agent configurations for a variety of Apache libraries
 
 zorka.require(
-  "zabbix.bsh",
   "soap.bsh"
 );
 
@@ -71,6 +70,7 @@ __axis2() {
       ));
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("AXIS");
   }
 

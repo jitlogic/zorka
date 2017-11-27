@@ -29,6 +29,7 @@ zorka.require(
 );
 
 if (zorka.boolCfg("zabbix.active")) {
+  zorka.require("zabbix.bsh");
   zabbix.tagMetadata("WSO2:ESB");
 }
 

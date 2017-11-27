@@ -15,8 +15,6 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("zabbix.bsh");
-
 __jvm() {
 
   autoregister() {
@@ -156,6 +154,7 @@ __jvm() {
   }
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("JVM");
   }
 

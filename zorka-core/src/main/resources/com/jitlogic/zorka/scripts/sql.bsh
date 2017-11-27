@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "tracer.bsh",
   "traps.bsh"
 );
@@ -73,6 +72,7 @@ __sql() {
   tracer.defType("SQL", 34);
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("SQL");
   }
 

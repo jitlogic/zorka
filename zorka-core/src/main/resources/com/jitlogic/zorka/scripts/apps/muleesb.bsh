@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "jvm.bsh",
   "javax.bsh",
   "libs.bsh",
@@ -200,6 +199,7 @@ __muleesb() {
     }
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("MULE_ESB");
   }
 

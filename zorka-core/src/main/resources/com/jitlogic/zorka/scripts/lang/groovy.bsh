@@ -18,7 +18,6 @@
 // This file contains agent configurations for various unqualified libraries
 
 zorka.require(
-  "zabbix.bsh",
   "tracer.bsh"
 );
 
@@ -31,5 +30,6 @@ if (zorka.boolCfg("tracer")) {
 }
 
 if (zorka.boolCfg("zabbix.active")) {
-    zabbix.tagMetadata("GROOVY");
+  zorka.require("zabbix.bsh");
+  zabbix.tagMetadata("GROOVY");
 }

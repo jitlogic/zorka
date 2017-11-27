@@ -298,6 +298,10 @@ __cxf() {
     .onSubmit(soap._trace ? _cxf_cli_submit() : null)
     .include(spy.byMethod("org.apache.cxf.jaxws.JaxWsClientProxy", "invoke")));
 
+  if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
+    zabbix.tagMetadata("CXF");
+  }
 
   tracer.exclude(
     "org.apache.cxf.bus.extension.Extension",

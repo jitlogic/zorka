@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "libs.bsh",
   "tracer.bsh",
   "audit.bsh",
@@ -252,6 +251,7 @@ __spring() {
   tracer.defType("SPRING_HTTP", 102);
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("SPRING");
   }
 

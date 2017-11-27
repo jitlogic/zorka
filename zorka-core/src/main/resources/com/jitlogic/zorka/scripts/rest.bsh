@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "tracer.bsh"
 );
 
@@ -45,6 +44,7 @@ __rest() {
   tracer.defType("REST_CLI", 41);
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("REST");
   }
 

@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "tracer.bsh"
 );
 
@@ -65,6 +64,7 @@ __casclient() {
     .include(spy.byMethod("org.jasig.cas.client.validation.AbstractUrlBasedTicketValidator", "validate")));
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("JASIG_CAS:CLIENT");
   }
 

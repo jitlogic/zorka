@@ -17,7 +17,6 @@
 
 
 zorka.require(
-  "zabbix.bsh",
   "ejb.bsh",
   "javax.bsh",
   "jsf.bsh",
@@ -394,6 +393,7 @@ __jboss7() {
   }
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("WILDFLY");
   }
 

@@ -17,7 +17,6 @@
 
 
 zorka.require(
-  "zabbix.bsh",
   "tracer.bsh"
 );
 
@@ -35,6 +34,7 @@ __ldap() {
     tracer.defType("LDAP", 35);
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("LDAP");
   }
 

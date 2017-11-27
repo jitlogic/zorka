@@ -18,7 +18,6 @@
 // Common JBoss 4/5/6 support functions
 
 zorka.require(
-  "zabbix.bsh",
   "javax.bsh",
   "jsf.bsh",
   "libs.bsh",
@@ -254,6 +253,7 @@ __jboss() {
   }
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("JBOSS");
   }
 
