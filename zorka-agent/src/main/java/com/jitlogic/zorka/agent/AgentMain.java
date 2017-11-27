@@ -24,6 +24,7 @@ import com.jitlogic.zorka.core.ZorkaControl;
 import com.jitlogic.zorka.core.spy.MainSubmitter;
 import com.jitlogic.zorka.core.spy.SpyRetransformer;
 
+import java.io.File;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Constructor;
@@ -91,6 +92,12 @@ public class AgentMain {
     public static void premain(String args, Instrumentation instrumentation) throws Exception {
 
         String home = System.getProperties().getProperty("zorka.home.dir", args);
+
+        if (new File(home, "zorka.properties").canRead()) {
+            System.out.println("ZORKA agent starting at " + home);
+        } else {
+            System.out.println("ERROR: " + home + " is not a proper ZORKA home directory.");
+        }
 
         boolean retransformSupported = supportsRetransform(instrumentation);
 
