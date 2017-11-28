@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core.test.agent;
 
 import com.jitlogic.zorka.common.test.support.TestUtil;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
 import com.jitlogic.zorka.common.util.ZorkaLogger;
@@ -138,5 +139,22 @@ public class AgentConfigUnitTest extends ZorkaFixture {
         config.getProperties().put("test.foo", "bar");
         config.getProperties().put("test.bar", "${&test.foo}");
         assertEquals("bar", zorka.stringCfg("test.bar"));
+    }
+
+    @Test
+    public void testParseListCfg() {
+        config.getProperties().setProperty("test.lst", "a, b, c, d");
+        assertEquals(Arrays.asList("a","b","c","d"), config.listCfg("test.lst"));
+    }
+
+    @Test
+    public void testParseMapCfg() {
+        config.getProperties().setProperty("test.map.a", "1");
+        config.getProperties().setProperty("test.map.b", "2");
+        config.getProperties().setProperty("test.map.c", "3");
+
+        assertEquals(
+            ZorkaUtil.map("a", "1", "b", "2", "c", "3", "d", "4"),
+            config.mapCfg("test.map", "c", "5", "d", "4"));
     }
 }

@@ -177,11 +177,6 @@ public class ZorkaConfig {
 
 
     public List<String> listCfg(String key, String...defVals) {
-        return listCfg(properties, key, defVals);
-    }
-
-
-    protected List<String> listCfg(Properties properties, String key, String...defVals) {
         String s = get(key);
 
         if (s != null) {
@@ -197,6 +192,32 @@ public class ZorkaConfig {
         } else {
             return Arrays.asList(defVals);
         }
+    }
+
+    public Map<String,String> mapCfg(String key, Map<String,String> defVals) {
+        Map<String,String> rslt = new HashMap<String, String>();
+        rslt.putAll(defVals);
+
+        String prefix = key + ".";
+
+        for (String k : getProperties().stringPropertyNames()) {
+            if (k.startsWith(prefix) && k.length() > prefix.length()) {
+                String v = stringCfg(k, null);
+                if (v != null) {
+                    rslt.put(k.substring(prefix.length()), v);
+                }
+            }
+        }
+
+        return rslt;
+    }
+
+    public Map<String,String> mapCfg(String key, String... defVals) {
+        Map<String,String> dv = new HashMap<String, String>();
+        for (int i = 1; i < defVals.length; i+=2) {
+            dv.put(defVals[i-1],defVals[i]);
+        }
+        return mapCfg(key, dv);
     }
 
 
