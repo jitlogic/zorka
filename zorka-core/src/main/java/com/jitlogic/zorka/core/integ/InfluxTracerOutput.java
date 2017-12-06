@@ -19,25 +19,41 @@ package com.jitlogic.zorka.core.integ;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.PerfRecord;
 import com.jitlogic.zorka.common.tracedata.PerfSample;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
+import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.common.util.ZorkaLogger;
+import com.jitlogic.zorka.core.perfmon.PerfAttrFilter;
+import com.jitlogic.zorka.core.perfmon.PerfSampleFilter;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class InfluxTracerOutput implements ZorkaSubmitter<SymbolicRecord> {
 
-    private Map<String,String> constTags = new HashMap<String, String>();
-    private Map<String,String> dynamicTags = new HashMap<String, String>();
+    private static ZorkaLog log = ZorkaLogger.getLog(InfluxTracerOutput.class);
 
+    // TODO wydzielić dedykowany filtr do atrybutów - osobna klasa używana też w innych outputach
+
+    private Map<String,String> constAttrMap;
+    private PerfAttrFilter attrFilter;
+    private PerfSampleFilter filter;
     private ZorkaSubmitter<String> output;
+    private SymbolRegistry symbolRegistry;
 
-    public InfluxTracerOutput(Map<String,String> constTags, Map<String,String> dynamicTags, ZorkaSubmitter<String> output) {
-        this.constTags = constTags;
-        this.dynamicTags = dynamicTags;
+    public InfluxTracerOutput(
+            SymbolRegistry symbolRegistry,
+            Map<String,String> constAttrMap,
+            PerfAttrFilter attrFilter,
+            PerfSampleFilter filter,
+            ZorkaSubmitter<String> output) {
+        this.symbolRegistry = symbolRegistry;
+        this.constAttrMap = constAttrMap;
+        this.attrFilter = attrFilter;
+        this.filter = filter;
         this.output = output;
     }
 
-    private void normalize(StringBuilder sb, String s) {
+    private void appendNormalized(StringBuilder sb, String s) {
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             sb.append(Character.isJavaIdentifierPart(c) ? c : '_');
@@ -48,26 +64,46 @@ public class InfluxTracerOutput implements ZorkaSubmitter<SymbolicRecord> {
     public boolean submit(SymbolicRecord sr) {
         if (sr instanceof PerfRecord) {
             PerfRecord pr = (PerfRecord)sr;
+            log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Got data: " + sr);
+            long t = System.currentTimeMillis();
             for (PerfSample ps : pr.getSamples()) {
-                StringBuilder sb = new StringBuilder(256);
-                sb.append(ps.getMetric().getName());
-                for (Map.Entry<String,String> e : constTags.entrySet()) {
-                    sb.append(',');
-                    sb.append(e.getKey());
-                    sb.append('=');
-                    normalize(sb, e.getValue());
+                if (filter.matches(ps)) {
+                    StringBuilder sb = new StringBuilder(256);
+                    sb.append(ps.getMetric().getName());
+                    for (Map.Entry<String, String> e : constAttrMap.entrySet()) {
+                        sb.append(',');
+                        sb.append(e.getKey());
+                        sb.append('=');
+                        appendNormalized(sb, e.getValue());
+                    }
+                    if (ps.getAttrs() != null) {
+                        for (Map.Entry<Integer, String> e : ps.getAttrs().entrySet()) {
+                            if (attrFilter.matches(e.getKey())) {
+                                sb.append(',');
+                                sb.append(symbolRegistry.symbolName(e.getKey()));
+                                sb.append('=');
+                                appendNormalized(sb, e.getValue());
+                            }
+                        }
+                    }
+                    if (ps.getMetric().getAttrs() != null) {
+                        for (Map.Entry<String, Object> e : ps.getMetric().getAttrs().entrySet()) {
+                            if (attrFilter.matches(e.getKey())) {
+                                sb.append(',');
+                                sb.append(e.getKey());
+                                sb.append('=');
+                                appendNormalized(sb, e.getValue().toString());
+                            }
+                        }
+                    }
+                    sb.append(" value=");
+                    sb.append(ps.getValue().toString());
+                    //sb.append(' ');
+                    //sb.append(t);
+                    String s = sb.toString();
+                    log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Submitting data: '" + s + "'");
+                    output.submit(s);
                 }
-                for (Map.Entry<String,String> e : dynamicTags.entrySet()) {
-                    sb.append(',');
-                    sb.append(e.getKey());
-                    sb.append('=');
-                    normalize(sb, ps.getAttrs().get(ps.getMetric().getDynamicAttrs().get(e.getValue())));
-                }
-                sb.append(" value=");
-                sb.append(ps.getValue().toString());
-                sb.append(' ');
-                sb.append(pr.getClock());
-                output.submit(sb.toString());
             }
         }
         return false;

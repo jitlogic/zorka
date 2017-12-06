@@ -1,21 +1,23 @@
-Zorka 1.0.17 (2017-12-??)
+Zorka 1.1.1 (2017-12-??)
 -------------------------
 
-* Automatic detection and support script execution
+* automatic detection and support script execution;
+* environment variables, system properties, references in zorka.properties;
+* implement InfluxDB integration;
 
 
 Zorka 1.0.16 (2017-11-22)
 -------------------------
 
-* Update: ASM 6.0;
+* update: ASM 6.0;
 * Wildfly 8.x/9.x: catch HTTP traces in the lowest layer of Undertow;
 * Wildfly 10.x, 11.x support;
 * Alfresco 2017+ support;
 * HTTP/CBOR tracer output (new CBOR collector is yet to be released);
-* Fixes & performance improvements for active checks (by dd00ff@github);
-* Add Zabbix host metadata to default and sample property files;
-* Detect and skip instrumentation if argument index out of scope;
-* Templates for Zabbix 3.x + support for automatic registration;
+* fixes & performance improvements for active checks (by dd00ff@github);
+* add Zabbix host metadata to default and sample property files;
+* detect and skip instrumentation if argument index out of scope;
+* templates for Zabbix 3.x + support for automatic registration;
 * new tracer.min.trace.calls setting to ease tracer tuning;
 * Various fixes;
 

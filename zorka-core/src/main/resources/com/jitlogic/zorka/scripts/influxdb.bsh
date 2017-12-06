@@ -1,0 +1,57 @@
+/**
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// Set defaults
+zorka.defCfg("influxdb", "no");
+
+if (zorka.boolCfg("influxdb")) {
+    zorka.setCfg("metrics", "yes");
+}
+
+zorka.require("metrics.bsh");
+
+__influxdb() {
+
+  if (zorka.boolCfg("influxdb")) {
+
+    zorka.defCfg("influxdb.url", "http://localhost:8086");
+    zorka.defCfg("influxdb.db", "zorka");
+
+    constAttrs = zorka.mapCfg("metrics.attr.set");
+
+    attrFilter = perfmon.attrFilter(constAttrs,
+                    zorka.listCfg("metrics.attr.include"),
+                    zorka.listCfg("metrics.attr.exclude"));
+
+    sampleFilter = perfmon.sampleFilter(
+                    zorka.mapCfg("metrics.filter.include"),
+                    zorka.mapCfg("metrics.filter.exclude"));
+
+    httpOutput = perfmon.influxHttp(zorka.mapCfg("influxdb"));
+
+    output = perfmon.influxOutput(constAttrs, attrFilter, 
+                    sampleFilter, httpOutput);
+
+    tracer.output(output);
+  }
+
+  return this;
+}
+
+
+influxdb = __influxdb();
+

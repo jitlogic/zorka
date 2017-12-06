@@ -17,6 +17,7 @@ package com.jitlogic.zorka.common.zico;
 
 
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
+import com.jitlogic.zorka.common.tracedata.PerfRecord;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.tracedata.TraceStreamOutput;
 import com.jitlogic.zorka.common.tracedata.TraceWriter;
@@ -82,6 +83,8 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
      */
     private long packetSize;
 
+    private boolean submitPerfData = false;
+
     /**
      * Creates trace output object.
      *
@@ -99,7 +102,8 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
      * @throws IOException when connection to remote server cannot be established;
      */
     public ZicoTraceOutput(TraceWriter writer, String addr, int port, String hostname, String auth,
-                           int qlen, long packetSize, int retries, long retryTime, long retryTimeExp, int timeout) throws IOException {
+                           int qlen, long packetSize, int retries, long retryTime, long retryTimeExp, int timeout)
+            throws IOException {
         super("zico-output", qlen, 1);
 
         this.hostname = hostname;
@@ -148,8 +152,17 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
     protected void process(List<SymbolicRecord> records) {
         long rt = retryTime;
 
-        List<SymbolicRecord> packet = new ArrayList<SymbolicRecord>();
-        packet.addAll(records);
+        List<SymbolicRecord> packet = new ArrayList<SymbolicRecord>(records.size()+1);
+
+        if (submitPerfData) {
+            packet.addAll(records);
+        } else {
+            for (SymbolicRecord r : records) {
+                if (!(r instanceof PerfRecord)) {
+                    packet.add(r);
+                }
+            }
+        }
 
         for (int i = 0; i < retries; i++) {
             try {

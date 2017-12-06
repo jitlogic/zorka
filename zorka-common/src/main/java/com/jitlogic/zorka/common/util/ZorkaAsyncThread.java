@@ -61,6 +61,9 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
 
     protected boolean countTraps = true;
 
+    /**
+     * Maximum number of items taken from queue at once.
+     */
     private int plen;
     
     /**

@@ -46,6 +46,8 @@ public class ZorkaFixture extends CommonFixture {
     protected AgentInstance agentInstance;
     protected SpyClassTransformer spyTransformer;
 
+    protected TestTaskScheduler taskScheduler;
+
     protected SyslogLib syslogLib;
     protected SpyLib spy;
     protected TracerLib tracer;
@@ -84,6 +86,8 @@ public class ZorkaFixture extends CommonFixture {
                 "scripts.auto", "yes",
                 "auto.com.jitlogic.zorka.core.test.spy.probe", "test.bsh"
         );
+
+        taskScheduler = TestTaskScheduler.instance();
 
         config = new AgentConfig(configProperties);
         agentInstance = new AgentInstance(config, new DummySpyRetransformer(null, config));

@@ -31,21 +31,24 @@ public class TimedDeltaMetric extends RawDeltaMetric {
      */
     private long lastClock;
 
-    public TimedDeltaMetric(int id, String name, String description, HashMap<String, Object> attrs) {
-        super(id, name, description, attrs);
+    public TimedDeltaMetric(int id, String name, String description, String domain,
+                            Map<String, Object> attrs) {
+        super(id, name, description, domain, attrs);
     }
 
-    public TimedDeltaMetric(int id, int templateId, String name, String description, HashMap<String, Object> attrs) {
-        super(id, templateId, name, description, attrs);
+    public TimedDeltaMetric(int id, int templateId, String name, String description, String domain,
+                            Map<String, Object> attrs) {
+        super(id, templateId, name, description, domain, attrs);
     }
 
-    public TimedDeltaMetric(MetricTemplate template, String name, String description, HashMap<String, Object> attrs) {
-        super(template, name, description, attrs);
+    public TimedDeltaMetric(MetricTemplate template, String name, String description, String domain,
+                            Map<String, Object> attrs) {
+        super(template, name, description, domain, attrs);
     }
 
     @Override
     public Number getValue(long clock, Object value) {
-        Number val = super.getValue(clock, (Number) value);
+        Number val = super.getValue(clock, value);
 
         long dclock = clock - lastClock;
 

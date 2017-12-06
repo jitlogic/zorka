@@ -1,0 +1,57 @@
+/**
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// Basic setup for collecting and submitting metrics to various monitoring systems
+
+zorka.require("tracer.bsh");
+
+__metrics() {
+
+  zorka.defCfg("metrics", "no");
+
+  if (!zorka.boolCfg("metrics")) {
+     return this;
+  }
+
+  _interval = zorka.intCfg("metrics.interval", 10000);
+  _delay = zorka.intCfg("metrics.delay", 10000);
+
+  // Set up basic metrics collection for ZorkaStats
+
+  zs = perfmon.scanner("ZORKA_STATS",
+    zorka.query("java", "zorka:type=ZorkaStats,*", "type", "name")
+      .listAs("**", "section").listAs("**", "tag").get("calls")
+      .metric(perfmon.timedDelta("zorka", "calls", "Calls", "calls/min").multiply(60)),
+    zorka.query("java", "zorka:type=ZorkaStats,*", "type", "name")
+      .listAs("**", "section").listAs("**", "tag").get("errors")
+      .metric(perfmon.timedDelta("zorka", "errors", "Errors", "err/min").multiply(60)),
+    zorka.query("java", "zorka:type=ZorkaStats,*", "type", "name")
+      .listAs("**", "section").listAs("**", "tag").get("maxTimeCLR")
+      .metric(perfmon.metric("zorka", "peak", "Peak time", "s").multiply(0.001)),
+    zorka.query("java", "zorka:type=ZorkaStats,*", "type", "name")
+      .listAs("**", "section").listAs("**", "tag")
+      .metric(perfmon.rate("zorka", "avg", "Average time", "s", "time", "calls").multiply(0.001)));
+
+  zs.setAttachResults(true);
+
+  zorka.schedule(zs, _interval, _delay);
+
+  return this;
+}
+
+metrics = __metrics();
+

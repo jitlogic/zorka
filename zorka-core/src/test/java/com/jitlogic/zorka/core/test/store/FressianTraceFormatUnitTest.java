@@ -22,6 +22,7 @@ import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.fressian.FressianReader;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -89,10 +90,10 @@ public class FressianTraceFormatUnitTest {
     }
 
 
-    @Test
+    @Test @Ignore("deprecated")
     public void testReadWriteMetricTemplate() throws Exception {
         MetricTemplate mt = metrics.getTemplate(
-                new MetricTemplate(0, MetricTemplate.WINDOWED_RATE, "test", "Test Metric", "m/s", "nomNom", "divDiv")
+                new MetricTemplate(0, MetricTemplate.WINDOWED_RATE, "", "test", "Test Metric", "m/s", "nomNom", "divDiv")
                         .multiply(2.0));
 
         writer.checkTemplate(mt.getId());
@@ -109,10 +110,10 @@ public class FressianTraceFormatUnitTest {
     }
 
 
-    @Test
+    @Test @Ignore("deprecated")
     public void testReadWriteMetricTemplateWithAttrs() throws Exception {
         MetricTemplate mt = metrics.getTemplate(
-                new MetricTemplate(0, MetricTemplate.WINDOWED_RATE, "test", "Test Metric", "m/s", "nomNom", "divDiv")
+                new MetricTemplate(0, MetricTemplate.WINDOWED_RATE, "", "test", "Test Metric", "m/s", "nomNom", "divDiv")
                         .dynamicAttrs("a", "b", "c", "d"));
 
         writer.checkTemplate(mt.getId());
@@ -123,13 +124,13 @@ public class FressianTraceFormatUnitTest {
     }
 
 
-    @Test
+    @Test @Ignore("deprecated")
     public void testReadWriteMetric() throws Exception {
         MetricTemplate mt = metrics.getTemplate(
-                new MetricTemplate(0, MetricTemplate.RAW_DATA, "test", "Test Metric", "m/s", "nomNom", "divDiv"));
+                new MetricTemplate(0, MetricTemplate.RAW_DATA, "", "test", "Test Metric", "m/s", "nomNom", "divDiv"));
 
         Metric m = metrics.getMetric(
-                new RawDataMetric(0, mt.getId(), "test", "Test", ZorkaUtil.<String, Object>map("a", 1, "b", 2)));
+                new RawDataMetric(0, mt.getId(), "", "test", "Test", ZorkaUtil.<String, Object>map("a", 1, "b", 2)));
 
         m.setTemplate(mt);
         m.setTemplateId(mt.getId());
@@ -295,13 +296,13 @@ public class FressianTraceFormatUnitTest {
     }
 
 
-    @Test
+    @Test @Ignore("deprecated")
     public void testReadWritePerfDataRecord() throws Exception {
         MetricTemplate mt = metrics.getTemplate(
-                new MetricTemplate(0, MetricTemplate.RAW_DATA, "test", "Test Metric", "m/s", "nomNom", "divDiv"));
+                new MetricTemplate(0, MetricTemplate.RAW_DATA, "", "test", "Test Metric", "m/s", "nomNom", "divDiv"));
 
         Metric m = metrics.getMetric(
-                new RawDataMetric(0, mt.getId(), "test", "Test", ZorkaUtil.<String, Object>map("a", 1, "b", 2)));
+                new RawDataMetric(0, mt.getId(), "", "test", "Test", ZorkaUtil.<String, Object>map("a", 1, "b", 2)));
 
         m.setTemplate(mt);
         m.setTemplateId(mt.getId());

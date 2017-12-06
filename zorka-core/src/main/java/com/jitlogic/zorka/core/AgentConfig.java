@@ -30,10 +30,12 @@ public class AgentConfig extends ZorkaConfig {
 
     public final static String DEFAULT_CONF_PATH = "/com/jitlogic/zorka/core/zorka.properties";
     public static final String PROP_SCRIPTS_DIR = "zorka.scripts.dir";
-    ;
+
     public static final String PROP_PROFILE_DIR = "zorka.profile.dir";
 
     private String agentHome;
+
+    private Map<String,String> agentAttrs = null;
 
     public AgentConfig(String home) {
         this.agentHome = home;
@@ -65,6 +67,12 @@ public class AgentConfig extends ZorkaConfig {
         if (!properties.containsKey("zorka.log.dir")) {
             properties.put("zorka.log.dir", ZorkaUtil.path(homeDir, "log"));
         }
+
+        agentAttrs = mapCfg("zorka.agent", "host", stringCfg("zorka.hostname", System.getenv("HOSTNAME")));
+    }
+
+    public Map<String,String> getAgentAttrs() {
+        return Collections.unmodifiableMap(agentAttrs);
     }
 
     /**

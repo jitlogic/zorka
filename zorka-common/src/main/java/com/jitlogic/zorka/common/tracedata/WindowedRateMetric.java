@@ -32,22 +32,25 @@ public class WindowedRateMetric extends Metric {
 
     private long lastNom, lastDiv;
 
-    public WindowedRateMetric(int id, String name, String description, HashMap<String, Object> attrs) {
-        super(id, name, description, attrs);
+    public WindowedRateMetric(int id, String name, String description, String domain,
+                              Map<String, Object> attrs) {
+        super(id, name, description, domain, attrs);
     }
 
-    public WindowedRateMetric(int id, int templateId, String name, String description, HashMap<String, Object> attrs) {
-        super(id, templateId, name, description, attrs);
+    public WindowedRateMetric(int id, int templateId, String name, String description, String domain,
+                              Map<String, Object> attrs) {
+        super(id, templateId, name, description, domain, attrs);
     }
 
-    public WindowedRateMetric(MetricTemplate template, String name, String description, Map<String, Object> attrs) {
-        super(template, name, description, attrs);
+    public WindowedRateMetric(MetricTemplate template, String name, String description, String domain,
+                              Map<String, Object> attrs) {
+        super(template, name, description, domain, attrs);
     }
 
     @Override
     public Number getValue(long clock, Object value) {
-        Number rawNom = (Number) ObjectInspector.get(value, getTemplate().getNomField());
-        Number rawDiv = (Number) ObjectInspector.get(value, getTemplate().getDivField());
+        Number rawNom = ObjectInspector.get(value, getTemplate().getNomField());
+        Number rawDiv = ObjectInspector.get(value, getTemplate().getDivField());
 
         if (rawNom == null || rawDiv == null) {
             return 0.0;

@@ -21,14 +21,11 @@ zorka.defCfg("tracer", "no");
 zorka.defCfg("nagios", "no");
 zorka.defCfg("zabbix", "yes");
 zorka.defCfg("zabbix.active", "yes");
-
+zorka.defCfg("influxdb", "no");
 
 if (zorka.boolCfg("zabbix") || zorka.boolCfg("zabbix.active")) {
   zorka.require("zabbix.bsh");
 }
-
-zorka.require("jvm.bsh");
-
 
 if (zorka.boolCfg("tracer")) {
   zorka.require("tracer.bsh");
@@ -37,4 +34,11 @@ if (zorka.boolCfg("tracer")) {
 if (zorka.boolCfg("nagios")) {
   zorka.require("nagios.bsh");
 }
+
+if (zorka.boolCfg("influxdb")) {
+  zorka.require("influxdb.bsh");
+}
+
+
+zorka.require("jvm.bsh");
 

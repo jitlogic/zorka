@@ -27,9 +27,6 @@ import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
-import com.jitlogic.zorka.core.spy.SpyClassTransformer;
-import com.jitlogic.zorka.core.spy.SpyDefinition;
-import com.jitlogic.zorka.core.spy.SpyMatcherSet;
 import com.jitlogic.zorka.core.util.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.*;
@@ -90,6 +87,7 @@ public class ZorkaLib implements ZorkaService {
         this.translator = translator;
         this.instance = instance;
 
+        // TODO wycofać hostname, używać agentAttrs.hostname
         this.hostname = config.get("zorka.hostname", "zorka").trim();
         this.version = config.get("zorka.version", "zorka").trim();
     }
@@ -978,7 +976,7 @@ public class ZorkaLib implements ZorkaService {
      * @param defVals set of default values (if key is missing)
      * @return parsed list
      */
-    public List<String> listCfg(String key, String... defVals) {
+    public List<String> listCfg(String key, String...defVals) {
         return config.listCfg(key, defVals);
     }
 

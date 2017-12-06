@@ -25,17 +25,20 @@ import java.util.Map;
 public class RawDataMetric extends Metric {
 
 
-    public RawDataMetric(int id, String name, String description, HashMap<String, Object> attrs) {
-        super(id, name, description, attrs);
+    public RawDataMetric(int id, String name, String description, String domain,
+                         Map<String, Object> attrs) {
+        super(id, name, description, domain, attrs);
     }
 
-    public RawDataMetric(int id, int templateId, String name, String description, HashMap<String, Object> attrs) {
-        super(id, templateId, name, description, attrs);
+    public RawDataMetric(int id, int templateId, String name, String description, String domain,
+                         Map<String, Object> attrs) {
+        super(id, templateId, name, description, domain, attrs);
     }
 
 
-    public RawDataMetric(MetricTemplate template, String name, String description, HashMap<String, Object> attrs) {
-        super(template, name, description, attrs);
+    public RawDataMetric(MetricTemplate template, String name, String description, String domain,
+                         Map<String, Object> attrs) {
+        super(template, name, description, domain, attrs);
     }
 
 

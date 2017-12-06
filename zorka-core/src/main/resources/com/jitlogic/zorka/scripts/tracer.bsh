@@ -76,7 +76,7 @@ if (zorka.boolCfg("tracer")) {
       zorka.stringCfg("tracer.net.url", "http://127.0.0.1:8640/"),
       zorka.stringCfg("zorka.agent.uuid"),
       zorka.stringCfg("tracer.net.authkey"),
-      zorka.stringCfg("zorka.agent.hostname", zorka.getHostname()),
+      zorka.stringCfg("zorka.agent.host", zorka.getHostname()),
       zorka.stringCfg("zorka.agent.app", "MYAPP"),
       zorka.stringCfg("zorka.agent.env", "DEV"),
       zorka.intCfg("tracer.net.qlen", 64),

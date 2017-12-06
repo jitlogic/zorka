@@ -90,19 +90,29 @@ public class JmxScanner {
 
             switch (template.getType()) {
                 case MetricTemplate.RAW_DATA:
-                    metric = metricsRegistry.getMetric(new RawDataMetric(template, template.getName(), description, attrs));
+                    metric = metricsRegistry.getMetric(
+                            new RawDataMetric(template, template.getName(), description,
+                                    template.getDomain(), attrs));
                     break;
                 case MetricTemplate.RAW_DELTA:
-                    metric = metricsRegistry.getMetric(new RawDeltaMetric(template, template.getName(), description, attrs));
+                    metric = metricsRegistry.getMetric(
+                            new RawDeltaMetric(template, template.getName(), description,
+                                    template.getDomain(), attrs));
                     break;
                 case MetricTemplate.TIMED_DELTA:
-                    metric = metricsRegistry.getMetric(new TimedDeltaMetric(template, template.getName(), description, attrs));
+                    metric = metricsRegistry.getMetric(
+                            new TimedDeltaMetric(template, template.getName(), description,
+                                    template.getDomain(), attrs));
                     break;
                 case MetricTemplate.WINDOWED_RATE:
-                    metric = metricsRegistry.getMetric(new WindowedRateMetric(template, template.getName(), description, attrs));
+                    metric = metricsRegistry.getMetric(
+                            new WindowedRateMetric(template, template.getName(), description,
+                                    template.getDomain(), attrs));
                     break;
                 case MetricTemplate.UTILIZATION:
-                    metric = metricsRegistry.getMetric(new UtilizationMetric(template, template.getName(), description, attrs));
+                    metric = metricsRegistry.getMetric(
+                            new UtilizationMetric(template, template.getName(), description,
+                                    template.getDomain(), attrs));
                     break;
                 default:
                     return null;

@@ -17,28 +17,49 @@
 package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.zorka.common.http.HttpRequest;
+import com.jitlogic.zorka.common.http.HttpResponse;
 import com.jitlogic.zorka.common.http.HttpUtil;
-import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
+import com.jitlogic.zorka.common.util.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class InfluxHttpOutput extends ZorkaAsyncThread<String> {
 
-    private String url;
+    // TODO refactor into generic HTTP output
+    private static ZorkaLog log = ZorkaLogger.getLog(InfluxHttpOutput.class);
 
-    public InfluxHttpOutput(String name, String url) {
-        super(name, 1024, 256);
-        this.url = url;
+    private String url, db;
+
+    public InfluxHttpOutput(String name, Map<String,String> conf) {
+        super(name, 4096, 256);
+        this.url = conf.get("url");
+        this.db = conf.get("db");
+        log.info(ZorkaLogger.ZPM_CONFIG, "InfluxDB URL=" + url + ", database=" + db);
     }
 
     @Override
     protected void process(List<String> lines) {
         try {
-            HttpRequest req = HttpUtil.POST(url, ZorkaUtil.join("\n", lines));
-            req.go();
+            int len = lines.size();
+            for (String line : lines) {
+                len += line.length();
+            }
+            StringBuilder sb = new StringBuilder(len);
+            for (String line : lines) {
+                sb.append(line);
+                sb.append('\n');
+            }
+            String s = sb.toString();
+            log.debug(ZorkaLogger.ZPM_RUN_TRACE, "Packet sent: '" + s + "'");
+            HttpRequest req = HttpUtil.POST(url+"/write?db="+db, s);
+            HttpResponse res = req.go();
+            log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "HTTP: " + url + " /write?db=" + db + "  -> " + res.getStatus()
+                    + " " + res.getStatusMsg());
+            if (res.getStatus() >= 400) {
+                throw new ZorkaRuntimeException("Error: " + res.getStatus());
+            }
         } catch (IOException e) {
             log.error(ZorkaLogger.ZPM_ERRORS, "Error sending performance data", e);
         }

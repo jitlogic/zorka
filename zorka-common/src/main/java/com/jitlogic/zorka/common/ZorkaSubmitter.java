@@ -18,6 +18,6 @@ package com.jitlogic.zorka.common;
 
 public interface ZorkaSubmitter<T> {
 
-    public boolean submit(T item);
+    boolean submit(T item);
 
 }

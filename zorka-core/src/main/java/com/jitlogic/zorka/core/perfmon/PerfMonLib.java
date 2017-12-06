@@ -16,12 +16,18 @@
 
 package com.jitlogic.zorka.core.perfmon;
 
+import com.jitlogic.zorka.common.ZorkaSubmitter;
+import com.jitlogic.zorka.core.integ.InfluxHttpOutput;
+import com.jitlogic.zorka.core.integ.InfluxTracerOutput;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.common.stats.MethodCallStatistic;
 import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.common.tracedata.MetricTemplate;
 import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+
+import java.util.List;
+import java.util.Map;
 
 public class PerfMonLib {
 
@@ -43,27 +49,27 @@ public class PerfMonLib {
     }
 
 
-    public MetricTemplate metric(String name, String description, String units) {
-        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.RAW_DATA, name, description, units));
+    public MetricTemplate metric(String domain, String name, String description, String units) {
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.RAW_DATA, domain, name, description, units));
     }
 
 
-    public MetricTemplate timedDelta(String name, String description, String units) {
-        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.TIMED_DELTA, name, description, units));
+    public MetricTemplate timedDelta(String domain, String name, String description, String units) {
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.TIMED_DELTA, domain, name, description, units));
     }
 
 
-    public MetricTemplate delta(String name, String description, String units) {
-        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.RAW_DELTA, name, description, units));
+    public MetricTemplate delta(String domain, String name, String description, String units) {
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.RAW_DELTA, domain, name, description, units));
     }
 
 
-    public MetricTemplate rate(String name, String description, String units, String nom, String div) {
-        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.WINDOWED_RATE, name, description, units, nom, div));
+    public MetricTemplate rate(String domain, String name, String description, String units, String nom, String div) {
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.WINDOWED_RATE, domain, name, description, units, nom, div));
     }
 
-    public MetricTemplate util(String name, String description, String units, String nom, String div) {
-        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.UTILIZATION, name, description, units, nom, div));
+    public MetricTemplate util(String domain, String name, String description, String units, String nom, String div) {
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.UTILIZATION, domain, name, description, units, nom, div));
     }
 
     /**
@@ -112,8 +118,35 @@ public class PerfMonLib {
 
     public HiccupMeter dskHiccup(String mbsName, String mbeanName, String attr, long resolution, long delay, String path) {
         MethodCallStatistic mcs = mbsRegistry.getOrRegister(mbsName, mbeanName, attr, new MethodCallStatistic("dskHiccup"));
-        HiccupMeter meter = HiccupMeter.dskMeter(resolution, delay, path, mcs);
-        return meter;
+        return HiccupMeter.dskMeter(resolution, delay, path, mcs);
+    }
+
+
+    public PerfAttrFilter attrFilter(Map<String,String> constAttrs, List<String> include, List<String> exclude) {
+        return new PerfAttrFilter(symbolRegistry, constAttrs, include, exclude);
+    }
+
+
+    public PerfSampleMatcher sampleMatcher(String pattern) {
+        return new PerfSampleMatcher(symbolRegistry, pattern);
+    }
+
+
+    public PerfSampleFilter sampleFilter(Map<String,String> include, Map<String,String> exclude) {
+        return new PerfSampleFilter(symbolRegistry, include, exclude);
+    }
+
+
+    public InfluxHttpOutput influxHttp(Map<String,String> conf) {
+        InfluxHttpOutput httpOutput = new InfluxHttpOutput("INFLUX", conf);
+        httpOutput.start();
+        return httpOutput;
+    }
+
+
+    public InfluxTracerOutput influxOutput(Map<String,String> constAttrs, PerfAttrFilter attrFilter,
+                                           PerfSampleFilter sampleFilter, ZorkaSubmitter<String> httpOutput) {
+        return new InfluxTracerOutput(symbolRegistry, constAttrs, attrFilter, sampleFilter, httpOutput);
     }
 
 }

@@ -29,13 +29,13 @@ __nagios_util() {
         // Monitor zorka stat
         nagios.defcmd(name, nagios.jmxscan(
           zorka.query("java", _mbean, "type", "name").get(attr, tag, "calls")
-            .metric(perfmon.timedDelta("LVAL0", desc+" requests", "calls/min").multiply(60)),
+            .metric(perfmon.timedDelta("java.lang", "LVAL0", desc+" requests", "calls/min").multiply(60)),
           zorka.query("java", _mbean, "type", "name").get(attr, tag, "errors")
-            .metric(perfmon.timedDelta("LVAL1", desc+" errors", "err/min").multiply(60)),
+            .metric(perfmon.timedDelta("java.lang", "LVAL1", desc+" errors", "err/min").multiply(60)),
           zorka.query("java", _mbean, "type", "name").get(attr, tag, "maxTimeCLR")
-            .metric(perfmon.metric("LVAL2", desc+" peak time", "ms")),
+            .metric(perfmon.metric("java.lang", "LVAL2", desc+" peak time", "ms")),
           zorka.query("java", _mbean, "type", "name").get(attr, tag)
-            .metric(perfmon.rate("LVAL3", desc+" average time", "ms", "time", "calls"))
+            .metric(perfmon.rate("java.lang", "LVAL3", desc+" average time", "ms", "time", "calls"))
           ).withLabel(name)
            .withRcMax("LVAL1",
              zorka.longCfg("nagios.cmd." + name + ".err.warn", 0),

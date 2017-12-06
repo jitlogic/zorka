@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.http.HttpClient;
+import com.jitlogic.zorka.common.http.HttpRequest;
 import com.jitlogic.zorka.common.http.HttpUtil;
 import com.jitlogic.zorka.common.http.MiniHttpClient;
 import com.jitlogic.zorka.common.tracedata.Symbol;
@@ -28,6 +29,8 @@ import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.IOException;
 
 import static org.junit.Assert.*;
 
@@ -67,13 +70,18 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
         return tr;
     }
 
+    private HttpRequest GET(String url) throws IOException {
+        return HttpUtil.GET(url).withHeader("Host", "zorka.io");
+    }
+
+
     @Test
     public void testOutputAuth() throws Exception {
         CborTraceOutput output = (CborTraceOutput) tracer.toCbor(
             "http://zorka.io/", "123", "secret",
             "myapp.local", "myapp", "TST");
 
-        httpClient.expect(HttpUtil.GET("http://zorka.io/agent/auth")).response(200, "someUUID");
+        httpClient.expect(GET("http://zorka.io/agent/auth")).response(200, "someUUID");
 
         output.authenticate();
 
@@ -83,7 +91,7 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
     }
 
     @Test @Ignore("This requires working ZICO 2.x collector.")
-    public void testOutputAuthManual() throws Exception {
+    public void testOutputAuthManual() {
         HttpClient miniClient = new MiniHttpClient();
         ObjectInspector.setField(HttpUtil.class, "client", miniClient);
 
@@ -102,9 +110,9 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
             "http://zorka.io", "123", "secret",
             "myapp.local", "myapp", "TST");
 
-        httpClient.expect(HttpUtil.GET("http://zorka.io/agent/auth")).response(200, "someUUID");
-        httpClient.expect(HttpUtil.GET("http://zorka.io/agent/submit/agd")).response(202, "OK");
-        httpClient.expect(HttpUtil.GET("http://zorka.io/agent/submit/trc")).response(202, "OK");
+        httpClient.expect(GET("http://zorka.io/agent/auth")).response(200, "someUUID");
+        httpClient.expect(GET("http://zorka.io/agent/submit/agd")).response(202, "OK");
+        httpClient.expect(GET("http://zorka.io/agent/submit/trc")).response(202, "OK");
 
         output.submit(tr("some.class", "someMethod", "()V", 1, 0, 0, 100));
         output.runCycle();
@@ -118,10 +126,10 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
             "http://zorka.io/", "123", "secret",
             "myapp.local", "myapp", "TST");
 
-        httpClient.expect(HttpUtil.GET("http://zorka.io/agent/auth")).response(200, "someUUID");
-        httpClient.expect(HttpUtil.GET("http://zorka.io/agent/submit/agd")).response(202, "OK");
-        httpClient.expect(HttpUtil.GET("http://zorka.io/agent/submit/trc")).response(202, "OK");
-        httpClient.expect(HttpUtil.GET("http://zorka.io/agent/submit/trc")).response(202, "OK");
+        httpClient.expect(GET("http://zorka.io/agent/auth")).response(200, "someUUID");
+        httpClient.expect(GET("http://zorka.io/agent/submit/agd")).response(202, "OK");
+        httpClient.expect(GET("http://zorka.io/agent/submit/trc")).response(202, "OK");
+        httpClient.expect(GET("http://zorka.io/agent/submit/trc")).response(202, "OK");
 
         output.submit(tr("some.class", "someMethod", "()V", 1, 0, 0, 100));
         output.submit(tr("some.class", "someMethod", "()V", 1, 0, 0, 100));
@@ -136,13 +144,13 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
             "http://zorka.io/", "123", "secret",
             "myapp.local", "myapp", "TST");
 
-        httpClient.expect(HttpUtil.GET("http://zorka.io/agent/auth")).response(200, "someUUID");
-        httpClient.expect(HttpUtil.GET("http://zorka.io/agent/submit/agd")).response(202, "OK");
-        httpClient.expect(HttpUtil.GET("http://zorka.io/agent/submit/trc")).response(202, "OK");
-        httpClient.expect(HttpUtil.GET("http://zorka.io/agent/submit/trc")).response(412, "OK");
-        httpClient.expect(HttpUtil.GET("http://zorka.io/agent/auth")).response(200, "someUUID");
-        httpClient.expect(HttpUtil.GET("http://zorka.io/agent/submit/agd")).response(202, "OK");
-        httpClient.expect(HttpUtil.GET("http://zorka.io/agent/submit/trc")).response(202, "OK");
+        httpClient.expect(GET("http://zorka.io/agent/auth")).response(200, "someUUID");
+        httpClient.expect(GET("http://zorka.io/agent/submit/agd")).response(202, "OK");
+        httpClient.expect(GET("http://zorka.io/agent/submit/trc")).response(202, "OK");
+        httpClient.expect(GET("http://zorka.io/agent/submit/trc")).response(412, "OK");
+        httpClient.expect(GET("http://zorka.io/agent/auth")).response(200, "someUUID");
+        httpClient.expect(GET("http://zorka.io/agent/submit/agd")).response(202, "OK");
+        httpClient.expect(GET("http://zorka.io/agent/submit/trc")).response(202, "OK");
 
         output.submit(tr("some.class", "someMethod", "()V", 1, 0, 0, 100));
         output.submit(tr("some.class", "someMethod", "()V", 1, 0, 0, 100));
