@@ -21,16 +21,16 @@ import com.jitlogic.zorka.common.tracedata.PerfRecord;
 import com.jitlogic.zorka.common.tracedata.PerfSample;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.perfmon.PerfAttrFilter;
 import com.jitlogic.zorka.core.perfmon.PerfSampleFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 public class InfluxTracerOutput implements ZorkaSubmitter<SymbolicRecord> {
 
-    private static ZorkaLog log = ZorkaLogger.getLog(InfluxTracerOutput.class);
+    private static Logger log = LoggerFactory.getLogger(InfluxTracerOutput.class);
 
     // TODO wydzielić dedykowany filtr do atrybutów - osobna klasa używana też w innych outputach
 
@@ -64,7 +64,7 @@ public class InfluxTracerOutput implements ZorkaSubmitter<SymbolicRecord> {
     public boolean submit(SymbolicRecord sr) {
         if (sr instanceof PerfRecord) {
             PerfRecord pr = (PerfRecord)sr;
-            log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Got data: " + sr);
+            log.debug("Got data: " + sr);
             long t = System.currentTimeMillis();
             for (PerfSample ps : pr.getSamples()) {
                 if (filter.matches(ps)) {
@@ -101,7 +101,7 @@ public class InfluxTracerOutput implements ZorkaSubmitter<SymbolicRecord> {
                     //sb.append(' ');
                     //sb.append(t);
                     String s = sb.toString();
-                    log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Submitting data: '" + s + "'");
+                    log.debug("Submitting data: '" + s + "'");
                     output.submit(s);
                 }
             }

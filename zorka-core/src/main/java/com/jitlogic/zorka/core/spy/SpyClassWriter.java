@@ -16,15 +16,15 @@
 
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class SpyClassWriter extends ClassWriter {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(SpyClassWriter.class);
+    private static final Logger log = LoggerFactory.getLogger(SpyClassWriter.class);
 
     private ClassLoader loader;
     private SpyClassResolver resolver;
@@ -50,8 +50,8 @@ public class SpyClassWriter extends ClassWriter {
 
         rslt = rslt != null ? rslt.replace('.', '/') : "java/lang/Object";
 
-        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_CLASS_TRC)) {
-            log.trace(ZorkaLogger.ZSP_CLASS_TRC, "getCommonSuperclass('" + type1 + "', '" + type2 + "') -> '" + rslt + "'");
+        if (log.isTraceEnabled()) {
+            log.trace("getCommonSuperclass('" + type1 + "', '" + type2 + "') -> '" + rslt + "'");
         }
 
         return rslt;

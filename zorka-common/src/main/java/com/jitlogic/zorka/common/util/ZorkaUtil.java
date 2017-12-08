@@ -17,6 +17,9 @@
 
 package com.jitlogic.zorka.common.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +38,7 @@ import java.util.zip.CRC32;
  */
 public class ZorkaUtil {
 
-    private final static ZorkaLog log = ZorkaLogger.getLog(ZorkaUtil.class);
+    private final static Logger log = LoggerFactory.getLogger(ZorkaUtil.class);
 
     /**
      * Singleton instance
@@ -841,7 +844,7 @@ public class ZorkaUtil {
             md.update(input.getBytes());
             return hex(md.digest());
         } catch (NoSuchAlgorithmException e) {
-            log.error(ZorkaLogger.ZSP_ERRORS, "Not supported digest algorithm: 'MD5'");
+            log.error("Not supported digest algorithm: 'MD5'");
         }
         return null;
     }
@@ -853,7 +856,7 @@ public class ZorkaUtil {
             sha.update(input.getBytes());
             return hex(sha.digest());
         } catch (NoSuchAlgorithmException e) {
-            log.error(ZorkaLogger.ZSP_ERRORS, "Not supported digest algorithm: 'SHA1'");
+            log.error("Not supported digest algorithm: 'SHA1'");
         }
         return null;
     }

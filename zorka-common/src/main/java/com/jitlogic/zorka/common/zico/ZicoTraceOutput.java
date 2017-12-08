@@ -22,8 +22,8 @@ import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.tracedata.TraceStreamOutput;
 import com.jitlogic.zorka.common.tracedata.TraceWriter;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements TraceStreamOutput {
 
-    private static ZorkaLog log = ZorkaLogger.getLog(ZicoTraceOutput.class);
+    private static Logger log = LoggerFactory.getLogger(ZicoTraceOutput.class);
 
     /**
      * Hostname this client will advertise itself as when connecting to ZICO server
@@ -120,7 +120,7 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
         this.os = new ByteArrayOutputStream(512 * 1024);
         this.writer.setOutput(this);
 
-        log.info(ZorkaLogger.ZAG_CONFIG, "Configured tracer output: host=" + hostname + ", retries=" + retries
+        log.info("Configured tracer output: host=" + hostname + ", retries=" + retries
             + ", retryTime=" + retryTime + ", packetSize=" + packetSize + ", addr=" + addr + ", port=" + port
             + ", timeout=" + timeout);
     }
@@ -167,8 +167,7 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
         for (int i = 0; i < retries; i++) {
             try {
                 if (!conn.isOpen()) {
-                    log.debug(ZorkaLogger.ZTR_TRACER_DBG,
-                            "Opening connection to " + conn.getAddr() + ":" + conn.getPort());
+                    log.debug("Opening connection to " + conn.getAddr() + ":" + conn.getPort());
                     conn.connect();
                 }
 
@@ -186,29 +185,29 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
                 }
 
                 byte[] data = os.toByteArray();
-                log.debug(ZorkaLogger.ZTR_TRACER_DBG, "Sending ZICO packet: len=" + data.length);
+                log.debug("Sending ZICO packet: len=" + data.length);
                 conn.send(ZicoPacket.ZICO_DATA, data);
                 ZicoPacket rslt = conn.recv();
-                log.debug(ZorkaLogger.ZTR_TRACER_DBG, "Received response: status=" + rslt.getStatus());
+                log.debug("Received response: status=" + rslt.getStatus());
                 if (rslt.getStatus() != ZicoPacket.ZICO_OK) {
                     throw new ZicoException(rslt.getStatus(), "Error submitting data.");
                 }
                 AgentDiagnostics.inc(AgentDiagnostics.ZICO_PACKETS_SENT);
                 return;
             } catch (SocketTimeoutException e) {
-                log.info(ZorkaLogger.ZCL_STORE, "Resetting collector connection.");
+                log.info("Resetting collector connection.");
                 this.close();
                 this.open();
                 AgentDiagnostics.inc(AgentDiagnostics.ZICO_RECONNECTS);
             } catch (Exception e) {
-                log.error(ZorkaLogger.ZCL_STORE, "Error sending trace record: " + e + ". Resetting connection.");
+                log.error("Error sending trace record: " + e + ". Resetting connection.");
                 this.close();
                 this.open();
                 AgentDiagnostics.inc(AgentDiagnostics.ZICO_RECONNECTS);
             }
 
             try {
-                log.debug(ZorkaLogger.ZTR_TRACER_DBG, "Will retry (wait=" + rt + ")");
+                log.debug("Will retry (wait=" + rt + ")");
                 Thread.sleep(rt);
             } catch (InterruptedException e) {
 
@@ -218,20 +217,20 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
         } // for ( ... )
 
         AgentDiagnostics.inc(AgentDiagnostics.ZICO_PACKETS_LOST);
-        log.error(ZorkaLogger.ZCL_STORE, "Too many errors while trying to send trace. Giving up. Trace will be lost.");
+        log.error("Too many errors while trying to send trace. Giving up. Trace will be lost.");
     }
 
 
     @Override
     public void open() {
-        log.info(ZorkaLogger.ZSP_CONFIG, "Starting network tracer output: " + hostname
+        log.info("Starting network tracer output: " + hostname
                 + " -> " + conn.getAddr() + ":" + conn.getPort());
         try {
             writer.reset();
             conn.connect();
             conn.hello(hostname, auth);
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZCL_STORE, "Error connecting " + conn.getAddr() + ":" + conn.getPort()
+            log.error("Error connecting " + conn.getAddr() + ":" + conn.getPort()
                     + ": " + e.getMessage() + "       (will reconnect later)");
         }
     }
@@ -239,12 +238,12 @@ public class ZicoTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
 
     @Override
     public synchronized void close() {
-        log.info(ZorkaLogger.ZSP_CONFIG, "Stopping network tracer output: " + hostname
+        log.info("Stopping network tracer output: " + hostname
                 + " -> " + conn.getAddr() + ":" + conn.getPort());
         try {
             conn.close();
         } catch (IOException e) {
-            log.error(ZorkaLogger.ZCL_STORE, "Error disconnecting " + conn.getAddr() + ":" + conn.getPort(), e);
+            log.error("Error disconnecting " + conn.getAddr() + ":" + conn.getPort(), e);
         }
     }
 }

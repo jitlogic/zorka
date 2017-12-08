@@ -20,8 +20,6 @@ package com.jitlogic.zorka.core.perfmon;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.ZorkaLib;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Some old stuff to calculate average rates. To be removed soon.
  */
 public class AvgRateCounter {
-
-    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
 
     public static final long AVG1 = 60 * 1000;
     public static final long AVG5 = 5 * 60 * 1000;

@@ -16,15 +16,15 @@
 
 package com.jitlogic.zorka.core.util;
 
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.regex.Pattern;
 
 public class OverlayClassLoader extends ClassLoader {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(OverlayClassLoader.class);
+    private static final Logger log = LoggerFactory.getLogger(OverlayClassLoader.class);
 
     private ClassLoader overlay;
     private Pattern pattern;
@@ -38,7 +38,7 @@ public class OverlayClassLoader extends ClassLoader {
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         if (pattern.matcher(name).matches()) {
-            log.info(ZorkaLogger.ZAG_TRACE, "Loading class " + name + " via overlay.");
+            log.info("Loading class " + name + " via overlay.");
             return overlay.loadClass(name);
         } else {
             return super.loadClass(name, resolve);

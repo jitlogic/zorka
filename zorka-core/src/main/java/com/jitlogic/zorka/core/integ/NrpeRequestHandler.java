@@ -16,8 +16,8 @@
 package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -30,7 +30,7 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
     /**
      * Logger
      */
-    private static final ZorkaLog log = ZorkaLogger.getLog(NrpeRequestHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(NrpeRequestHandler.class);
 
     /**
      * Request packet
@@ -74,12 +74,12 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
     @Override
     public void handleResult(Object rslt) {
         tStop = System.nanoTime();
-        log.debug(ZorkaLogger.ZAG_QUERIES, "OK [t=" + (tStop - tStart) / 1000000L + "ms] '" + req + "' -> '" + rslt + "'");
+        log.debug("OK [t=" + (tStop - tStart) / 1000000L + "ms] '" + req + "' -> '" + rslt + "'");
 
         AgentDiagnostics.inc(AgentDiagnostics.NAGIOS_TIME, tStop - tStart);
 
         if (req == null) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error: nagios request is null (propably parse error or deadlock)");
+            log.error("Error: nagios request is null (propably parse error or deadlock)");
             try {
                 socket.close();
             } catch (IOException e) {
@@ -99,12 +99,12 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
             resp.encode(socket.getOutputStream());
             socket.getOutputStream().flush();
         } catch (IOException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error sending NRPE response", e);
+            log.error("Error sending NRPE response", e);
         } finally {
             try {
                 socket.close();
             } catch (IOException e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error closing network socket", e);
+                log.error("Error closing network socket", e);
             }
         }
     }
@@ -114,7 +114,7 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
     public void handleError(Throwable e) {
         AgentDiagnostics.inc(AgentDiagnostics.NAGIOS_ERRORS);
         tStop = System.nanoTime();
-        log.debug(ZorkaLogger.ZAG_QUERIES, "ERROR [t=" + (tStop - tStart) / 1000000L + "ms] '" + req + "' -> '", e);
+        log.debug("ERROR [t=" + (tStop - tStart) / 1000000L + "ms] '" + req + "' -> '", e);
 
         AgentDiagnostics.inc(AgentDiagnostics.NAGIOS_TIME, tStop - tStart);
 
@@ -122,12 +122,12 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
         try {
             resp.encode(socket.getOutputStream());
         } catch (IOException e1) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error sending NRPE response", e);
+            log.error("Error sending NRPE response", e);
         } finally {
             try {
                 socket.close();
             } catch (IOException e2) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error closing network socket", e);
+                log.error("Error closing network socket", e);
             }
         }
     }
@@ -140,7 +140,7 @@ public class NrpeRequestHandler implements ZorkaRequestHandler {
             try {
                 req = NrpePacket.fromStream(socket.getInputStream());
             } catch (IOException e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing NRPE packet", e);
+                log.error("Error parsing NRPE packet", e);
                 return "";
             }
         }

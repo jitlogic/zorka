@@ -18,10 +18,10 @@ package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.common.util.JmxObject;
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.common.tracedata.MetricTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.management.*;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 
 public class QueryLister {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(QueryLister.class);
+    private static final Logger log = LoggerFactory.getLogger(QueryLister.class);
 
     private MBeanServerRegistry registry;
     private QueryDef query;
@@ -47,7 +47,7 @@ public class QueryLister {
         MBeanServerConnection conn = registry.lookup(query.getMbsName());
 
         if (conn == null) {
-            log.warn(ZorkaLogger.ZAG_WARNINGS, "Trying to query non-existent MBS: " + query.getMbsName());
+            log.warn("Trying to query non-existent MBS: " + query.getMbsName());
             return new ArrayList<QueryResult>(1);
         }
 
@@ -113,7 +113,7 @@ public class QueryLister {
                     getSingleResult(conn, seg, results, on);
                 }
             } catch (Exception e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error listing results of " + query, e);
+                log.error("Error listing results of " + query, e);
             }
         }
 
@@ -131,7 +131,7 @@ public class QueryLister {
                 }
             }
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error listing attributes of: " + on, e);
+            log.error("Error listing attributes of: " + on, e);
         }
     }
 
@@ -143,7 +143,7 @@ public class QueryLister {
                     : new JmxObject(on, conn, null),
                     seg != null ? seg.getAttr() : null);
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error listing results of " + query, e);
+            log.error("Error listing results of " + query, e);
         }
     }
 

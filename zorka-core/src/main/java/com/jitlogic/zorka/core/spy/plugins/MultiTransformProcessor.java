@@ -17,9 +17,9 @@ package com.jitlogic.zorka.core.spy.plugins;
 
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 public class MultiTransformProcessor implements SpyProcessor {
 
-    private static ZorkaLog log = ZorkaLogger.getLog(MultiTransformProcessor.class);
+    private static Logger log = LoggerFactory.getLogger(MultiTransformProcessor.class);
 
     private File cfgFile;
     private long cfgModTime = 0;
@@ -63,12 +63,12 @@ public class MultiTransformProcessor implements SpyProcessor {
         }
 
         if (!cfgFile.exists()) {
-            log.error(ZorkaLogger.ZSP_SUBMIT, "Config file " + cfgFile + " does not exist. MultiTransformProcessor will have no configuration.");
+            log.error("Config file " + cfgFile + " does not exist. MultiTransformProcessor will have no configuration.");
             return;
         }
 
         if (!cfgFile.isFile() || !cfgFile.canRead()) {
-            log.error(ZorkaLogger.ZSP_SUBMIT, "Config file " + cfgFile + " is not readable. MultiTransformProcessor will have no configuration.");
+            log.error("Config file " + cfgFile + " is not readable. MultiTransformProcessor will have no configuration.");
             return;
         }
 
@@ -89,7 +89,7 @@ public class MultiTransformProcessor implements SpyProcessor {
                 }
                 String[] segs = line.split("\\s+");
                 if (segs.length != srcExprs.size() + 1) {
-                    log.error(ZorkaLogger.ZSP_SUBMIT, "Invalid config line: '" + line + "'. Skipping.");
+                    log.error("Invalid config line: '" + line + "'. Skipping.");
                     try {
                         Pattern[] patterns = new Pattern[segs.length - 1];
                         for (int i = 1; i < segs.length; i++) {
@@ -98,12 +98,12 @@ public class MultiTransformProcessor implements SpyProcessor {
                         outputs.add(segs[0]);
                         inputs.add(patterns);
                     } catch (Exception e) {
-                        log.error(ZorkaLogger.ZSP_SUBMIT, "Error processing config line: '" + line + "'. Skipped", e);
+                        log.error("Error processing config line: '" + line + "'. Skipped", e);
                     }
                 }
             }
         } catch (IOException e) {
-            log.error(ZorkaLogger.ZSP_SUBMIT, "I/O error while reading file: " + cfgFile, e);
+            log.error("I/O error while reading file: " + cfgFile, e);
         } finally {
             if (rdr != null) {
                 try {

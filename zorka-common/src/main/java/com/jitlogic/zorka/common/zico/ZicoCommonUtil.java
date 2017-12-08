@@ -17,10 +17,10 @@ package com.jitlogic.zorka.common.zico;
 
 
 import com.jitlogic.zorka.common.tracedata.FressianTraceFormat;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import org.fressian.FressianReader;
 import org.fressian.FressianWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ import java.util.List;
 
 public class ZicoCommonUtil {
 
-    private static ZorkaLog log = ZorkaLogger.getLog(ZicoCommonUtil.class);
+    private static Logger log = LoggerFactory.getLogger(ZicoCommonUtil.class);
 
     /**
      * Unpacks list of (fressian-encoded) objects from byte array.
@@ -45,7 +45,7 @@ public class ZicoCommonUtil {
                 lst.add(r.readObject());
             }
         } catch (IOException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Should not happen.", e);
+            log.error("Should not happen.", e);
         }
         return lst;
     }
@@ -65,7 +65,7 @@ public class ZicoCommonUtil {
                 writer.writeObject(d);
             }
         } catch (IOException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Should not happen.", e);
+            log.error("Should not happen.", e);
         }
         return os.toByteArray();
     }

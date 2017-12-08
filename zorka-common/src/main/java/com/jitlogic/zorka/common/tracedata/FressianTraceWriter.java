@@ -16,10 +16,10 @@
 package com.jitlogic.zorka.common.tracedata;
 
 import com.jitlogic.zorka.common.util.BitVector;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import org.fressian.FressianWriter;
 import org.fressian.Writer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,7 +30,7 @@ import java.io.OutputStream;
  */
 public class FressianTraceWriter implements MetadataChecker, TraceWriter {
 
-    private static ZorkaLog log = ZorkaLogger.getLog(FressianTraceWriter.class);
+    private static Logger log = LoggerFactory.getLogger(FressianTraceWriter.class);
 
     /**
      * Symbol registry used by event sender.
@@ -93,7 +93,7 @@ public class FressianTraceWriter implements MetadataChecker, TraceWriter {
         checkOutput();
         if (!symbolsSent.get(id)) {
             String sym = symbols.symbolName(id);
-            log.debug(ZorkaLogger.ZTR_SYMBOL_ENRICHMENT, "Enriching output stream with symbol '%s', id=%s", sym, id);
+            log.debug("Enriching output stream with symbol '%s', id=%s", sym, id);
             writer.writeObject(new Symbol(id, sym));
             symbolsSent.set(id);
         }
@@ -106,7 +106,7 @@ public class FressianTraceWriter implements MetadataChecker, TraceWriter {
         checkOutput();
         if (!metricsSent.get(id)) {
             Metric metric = metrics.getMetric(id);
-            log.debug(ZorkaLogger.ZTR_SYMBOL_ENRICHMENT, "Enriching output stream with metric '" + metric + "', id=" + id);
+            log.debug("Enriching output stream with metric '" + metric + "', id=" + id);
             checkTemplate(metric.getTemplateId());
             writer.writeObject(metric);
             metricsSent.set(id);
@@ -118,7 +118,7 @@ public class FressianTraceWriter implements MetadataChecker, TraceWriter {
         checkOutput();
         if (!templatesSent.get(id)) {
             MetricTemplate template = metrics.getTemplate(id);
-            log.debug(ZorkaLogger.ZTR_SYMBOL_ENRICHMENT, "Enriching output stream with metric '" + template + "', id=" + id);
+            log.debug("Enriching output stream with metric '" + template + "', id=" + id);
             writer.writeObject(template);
             templatesSent.set(id);
         }

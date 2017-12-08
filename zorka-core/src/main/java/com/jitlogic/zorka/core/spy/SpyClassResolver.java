@@ -2,10 +2,10 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.common.stats.MethodCallStatistic;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.objectweb.asm.ClassReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +15,7 @@ import java.util.*;
 
 public class SpyClassResolver {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(SpyClassResolver.class);
+    private static final Logger log = LoggerFactory.getLogger(SpyClassResolver.class);
 
     private Map<String,ClassInfo> cache = new HashMap<String, ClassInfo>();
 
@@ -29,7 +29,7 @@ public class SpyClassResolver {
             m = ClassLoader.class.getDeclaredMethod("findLoadedClass", String.class);
             if (!m.isAccessible()) m.setAccessible(true);
         } catch (NoSuchMethodException e) {
-            log.error(ZorkaLogger.ZSP_ERRORS, "Error obtaining ClassLoader.findLoadedClass reference.", e);
+            log.error("Error obtaining ClassLoader.findLoadedClass reference.", e);
         }
         findLoadedClass = m;
     }
@@ -152,9 +152,9 @@ public class SpyClassResolver {
                 return rslt;
             }
         } catch (IllegalAccessException e) {
-            log.error(ZorkaLogger.ZSP_ERRORS, "Error calling findLoadedClass(): ", e);
+            log.error("Error calling findLoadedClass(): ", e);
         } catch (InvocationTargetException e) {
-            log.error(ZorkaLogger.ZSP_ERRORS, "Error calling findLoadedClass(): ", e);
+            log.error("Error calling findLoadedClass(): ", e);
         }
 
         if (rslt != null) {
@@ -169,17 +169,16 @@ public class SpyClassResolver {
             try {
                 classBytes = ZorkaUtil.slurp(is);
             } catch (Exception e) {
-                log.error(ZorkaLogger.ZSP_ERRORS, "Error reading class bytecode: ", e);
+                log.error("Error reading class bytecode: ", e);
             } finally {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    log.error(ZorkaLogger.ZSP_ERRORS, "Cannot close stream: ", e);
+                    log.error("Cannot close stream: ", e);
                 }
             }
         } else {
-            log.error(ZorkaLogger.ZSP_ERRORS, "Bytecode for class not found: "
-                + type + " (using class loader: " + loader + ")");
+            log.error("Bytecode for class not found: " + type + " (using class loader: " + loader + ")");
         }
 
         if (classBytes == null) return null;

@@ -22,15 +22,15 @@ import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.jitlogic.zorka.core.integ.QueryTranslator;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.ZorkaBshAgent;
 import com.jitlogic.zorka.core.integ.ZorkaRequestHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ZabbixActiveTask implements Runnable, ZorkaRequestHandler {
 
 	/* Logger */
-	private final ZorkaLog log = ZorkaLogger.getLog(ZabbixActiveTask.class);
+	private final Logger log = LoggerFactory.getLogger(ZabbixActiveTask.class);
 	
 	private String agentHost;
 	private ActiveCheckQueryItem item;
@@ -51,17 +51,17 @@ public class ZabbixActiveTask implements Runnable, ZorkaRequestHandler {
 	@Override
 	public void run() {
 		String key = item.getKey();
-		log.debug(ZorkaLogger.ZAG_DEBUG, "Running task: " + key);
+		log.debug("Running task: " + key);
 		try {
 			
 			String expr = translator.translate(key);
-			log.debug(ZorkaLogger.ZAG_DEBUG, "Translated task: " + expr);
+			log.debug("Translated task: " + expr);
 			
 			clock = (new Date()).getTime() / 1000L;
 			agent.exec(expr, this);
 		}
 		catch (Exception ex ) {
-			log.error(ZorkaLogger.ZAG_ERRORS, "Failed to run ZabbixActiveTask key : " + key, ex);
+			log.error("Failed to run ZabbixActiveTask key : " + key, ex);
 		}
 	}
 	
@@ -74,7 +74,7 @@ public class ZabbixActiveTask implements Runnable, ZorkaRequestHandler {
 	public void handleResult(Object rslt) {
 		String key = item.getKey();
 		String value = serialize(rslt);
-		log.debug(ZorkaLogger.ZAG_DEBUG, "Task response: " + key + " -> " + value);
+		log.debug("Task response: " + key + " -> " + value);
 		
 		if (!value.equals(ZabbixActiveRequest.ZBX_NOTSUPPORTED)) { // TODO  && !value.equals("{\"data\":[]}")
 			ActiveCheckResult response = new ActiveCheckResult();
@@ -85,7 +85,7 @@ public class ZabbixActiveTask implements Runnable, ZorkaRequestHandler {
 			response.setClock(clock);
 			
 			responseQueue.offer(response);
-			log.debug(ZorkaLogger.ZAG_DEBUG, "Cache size: " + responseQueue.size());
+			log.debug("Cache size: " + responseQueue.size());
 		}
 	}
 	

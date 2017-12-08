@@ -15,10 +15,10 @@
  */
 package com.jitlogic.zorka.core.spy.plugins;
 
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.normproc.Normalizer;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -32,7 +32,7 @@ public class NormalizingProcessor implements SpyProcessor {
     /**
      * Logger
      */
-    private static final ZorkaLog log = ZorkaLogger.getLog(NormalizingProcessor.class);
+    private static final Logger log = LoggerFactory.getLogger(NormalizingProcessor.class);
 
     /**
      * Source field
@@ -71,8 +71,8 @@ public class NormalizingProcessor implements SpyProcessor {
 
         String s = (v instanceof String) ? normalizer.normalize((String) v) : null;
 
-        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-            log.debug(ZorkaLogger.ZAG_TRACES, "Normalizing: '" + v + "' -> '" + s + "'");
+        if (log.isDebugEnabled()) {
+            log.debug("Normalizing: '" + v + "' -> '" + s + "'");
         }
 
         record.put(dst, s);

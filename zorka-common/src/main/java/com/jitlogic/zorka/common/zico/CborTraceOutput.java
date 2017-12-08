@@ -5,6 +5,8 @@ import com.jitlogic.zorka.common.http.HttpResponse;
 import com.jitlogic.zorka.common.http.HttpUtil;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
@@ -17,7 +19,7 @@ import java.util.*;
  */
 public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
 
-    private static ZorkaLog log = ZorkaLogger.getLog(CborTraceOutput.class);
+    private static Logger log = LoggerFactory.getLogger(CborTraceOutput.class);
 
     private static final int C_SHIFT = 0;
     private static final int M_SHIFT = 21;
@@ -151,11 +153,11 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
                     twriter.writeLong(tm.getClock());
                     twriter.writeInt(tid);
                 } else {
-                    log.error(ZorkaLogger.ZTR_ERRORS, "Mapping for trace type '" + traceType + "' not found. "
+                    log.error("Mapping for trace type '" + traceType + "' not found. "
                         + "Use tracer.defType() function to define mapping for CBOR output.");
                 }
             } else {
-                log.error(ZorkaLogger.ZTR_ERRORS, "Symbol name for typeId '" + tm.getTraceId()
+                log.error("Symbol name for typeId '" + tm.getTraceId()
                     + "' not found. Internal error. (?)");
             }
             if (tm.hasFlag(TraceMarker.ERROR_MARK)) {
@@ -267,7 +269,7 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
             if (traceUUID != null) req.setHeader("X-ZICO-Trace-UUID", traceUUID);
             HttpResponse res = req.go();
             if (res.getStatus() < 300) {
-                log.trace(ZorkaLogger.ZTR_TRACER_DBG, "Submitted: " + uri + " : " + traceUUID);
+                log.trace("Submitted: " + uri + " : " + traceUUID);
             } else if (res.getStatus() == 412) {
                 throw new ZorkaRuntimeException("Resend.");
             } else {
@@ -306,18 +308,18 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
                     break;
 
                 } catch (CborResendException e) {
-                    log.info(ZorkaLogger.ZTR_TRACER_DBG, "Session expired. Reauthenticating ...");
+                    log.info("Session expired. Reauthenticating ...");
                     authenticate();
                 } catch (Exception e) {
-                    log.error(ZorkaLogger.ZCL_STORE, "Error sending trace record: " + e + ". Resetting connection.", e);
+                    log.error("Error sending trace record: " + e + ". Resetting connection.", e);
                     authenticate();
                 }
 
                 try {
-                    log.debug(ZorkaLogger.ZTR_TRACER_DBG, "Will retry (wait=" + rt + ")");
+                    log.debug("Will retry (wait=" + rt + ")");
                     Thread.sleep(rt);
                 } catch (InterruptedException e) {
-                    log.warn(ZorkaLogger.ZTR_TRACER_DBG,"Huh? Sleep interrupted?");
+                    log.warn("Huh? Sleep interrupted?");
                 }
 
                 rt *= retryTimeExp;

@@ -26,13 +26,13 @@ import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.zico.CborTraceOutput;
 import com.jitlogic.zorka.core.integ.zabbix.ZabbixTraceOutput;
 import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
 import com.jitlogic.zorka.core.spy.plugins.*;
 import com.jitlogic.zorka.core.util.OverlayClassLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tracer library contains functions for configuring and using tracer.
@@ -41,7 +41,7 @@ import com.jitlogic.zorka.core.util.OverlayClassLoader;
  */
 public class TracerLib {
 
-    public static final ZorkaLog log = ZorkaLogger.getLog(TracerLib.class);
+    public static final Logger log = LoggerFactory.getLogger(TracerLib.class);
 
     public static final int SUBMIT_TRACE = TraceMarker.SUBMIT_TRACE;
     public static final int ALL_METHODS = TraceMarker.ALL_METHODS;
@@ -98,14 +98,14 @@ public class TracerLib {
      */
     public void include(String... matchers) {
         for (String matcher : matchers) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Tracer include: " + matcher);
+            log.info("Tracer include: " + matcher);
             tracer.include(SpyMatcher.fromString(matcher.toString()));
         }
     }
 
     public void include(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Tracer include: " + matcher);
+            log.info("Tracer include: " + matcher);
             tracer.include(matcher);
         }
     }
@@ -117,14 +117,14 @@ public class TracerLib {
      */
     public void exclude(String... matchers) {
         for (String matcher : matchers) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Tracer exclude: " + matcher);
+            log.info("Tracer exclude: " + matcher);
             tracer.include(SpyMatcher.fromString(matcher.toString()).exclude());
         }
     }
 
     public void exclude(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Tracer exclude: " + matcher);
+            log.info("Tracer exclude: " + matcher);
             tracer.include((matcher).exclude());
         }
 

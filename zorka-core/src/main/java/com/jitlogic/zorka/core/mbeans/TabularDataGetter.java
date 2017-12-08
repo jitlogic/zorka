@@ -17,9 +17,9 @@ package com.jitlogic.zorka.core.mbeans;
 
 import com.jitlogic.zorka.common.stats.ValGetter;
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.management.openmbean.*;
 
@@ -34,7 +34,7 @@ public class TabularDataGetter implements ValGetter {
     /**
      * Logger
      */
-    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Source field
@@ -89,7 +89,7 @@ public class TabularDataGetter implements ValGetter {
             rowType = new CompositeType(typeName, typeDesc, itemNames, itemDesc, itemTypes);
             tableType = new TabularType(typeName + "Table", typeDesc + " table", rowType, new String[]{indexField});
         } catch (OpenDataException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error creating row type or table type", e);
+            log.error("Error creating row type or table type", e);
         }
     }
 
@@ -109,7 +109,7 @@ public class TabularDataGetter implements ValGetter {
             try {
                 table.put(new CompositeDataSupport(rowType, itemNames, values));
             } catch (OpenDataException e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error creating composite data.", e);
+                log.error("Error creating composite data.", e);
             }
         }
 

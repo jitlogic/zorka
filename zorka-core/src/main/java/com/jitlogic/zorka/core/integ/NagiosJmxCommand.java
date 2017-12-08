@@ -20,20 +20,20 @@ import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
 import com.jitlogic.zorka.common.tracedata.PerfSample;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.JmxScanner;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
 import com.jitlogic.zorka.core.perfmon.QueryLister;
 import com.jitlogic.zorka.core.perfmon.QueryResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class NagiosJmxCommand extends AbstractNagiosCommand {
 
-    protected static final ZorkaLog log = ZorkaLogger.getLog(NagiosJmxCommand.class);
+    protected static final Logger log = LoggerFactory.getLogger(NagiosJmxCommand.class);
 
     private JmxScanner scanner;
     private List<QueryLister> listers;
@@ -65,12 +65,12 @@ public class NagiosJmxCommand extends AbstractNagiosCommand {
                 List<PerfSample> samples = results.get(label);
 
                 while (samples.size() < ln) {
-                    log.warn(ZorkaLogger.ZPM_ERRORS, "Non-aligned sample: " + sample);
+                    log.warn("Non-aligned sample: " + sample);
                     samples.add(null);  // Make sure result are aligned properly ...
                 }
 
                 if (samples.size() > ln) {
-                    log.error(ZorkaLogger.ZPM_ERRORS, "Overlapping sample when using label " + tmplLabel + ". " +
+                    log.error("Overlapping sample when using label " + tmplLabel + ". " +
                             "old_sample=" + samples.get(samples.size()-1) + " new_sample=" + sample);
                 }
 
@@ -146,12 +146,12 @@ public class NagiosJmxCommand extends AbstractNagiosCommand {
         }
 
         if (rcAttr == null) {
-            log.error(ZorkaLogger.ZPM_ERRORS, "Result calculation mode != NONE but reference attribute not configured.");
+            log.error("Result calculation mode != NONE but reference attribute not configured.");
             return NrpePacket.OK;
         }
 
         if (!(sdata.get(rcAttr) instanceof Number)) {
-            log.error(ZorkaLogger.ZPM_ERRORS, "Result value `" + rcAttr + "` is not a number.");
+            log.error("Result value `" + rcAttr + "` is not a number.");
             return NrpePacket.ERROR;
         }
 
@@ -222,7 +222,7 @@ public class NagiosJmxCommand extends AbstractNagiosCommand {
         }
 
         if (sdata == null) {
-            log.error(ZorkaLogger.ZPM_ERRORS, "Cannot calculate summary data for nagios request.");
+            log.error("Cannot calculate summary data for nagios request.");
             return NrpePacket.error("Cannot calculate summary data.");
         }
 

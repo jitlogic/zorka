@@ -25,6 +25,10 @@ import com.jitlogic.zorka.core.integ.SnmpTrapper;
 import com.jitlogic.zorka.core.integ.TrapVarBindDef;
 import com.jitlogic.zorka.core.normproc.Normalizer;
 import com.jitlogic.zorka.core.spy.plugins.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.impl.ZorkaLogLevel;
+import org.slf4j.impl.ZorkaTrapper;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,7 +40,7 @@ import java.util.regex.Matcher;
  */
 public class SpyLib {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(SpyLib.class);
+    private static final Logger log = LoggerFactory.getLogger(SpyLib.class);
 
     public static final String SM_NOARGS = "<no-args>";
     public static final String SM_CONSTRUCTOR = "<init>";
@@ -198,7 +202,7 @@ public class SpyLib {
     private AtomicInteger anonymousSdef = new AtomicInteger(0);
 
     public SpyDefinition instance() {
-        log.warn(ZorkaLogger.ZAG_CONFIG, "Attempt to create anonymous spy definition. "
+        log.warn("Attempt to create anonymous spy definition. "
                 + "This API is depreciated as spy definitions should to be named since 0.9.12. "
                 + "Sdef will be created for now BUT this will be forbidden in the future. " +
                 "Error counter will be incremented as well, so administrator won't forget about this.");
@@ -219,7 +223,7 @@ public class SpyLib {
 
 
     public SpyDefinition instrument() {
-        log.warn(ZorkaLogger.ZAG_CONFIG, "Attempt to create anonymous spy definition. "
+        log.warn("Attempt to create anonymous spy definition. "
                 + "This API is depreciated as spy definitions should to be named since 0.9.12. "
                 + "Sdef will be created for now BUT this will be forbidden in the future. " +
                 "Error counter will be incremented as well, so administrator won't forget about this.");
@@ -243,7 +247,7 @@ public class SpyLib {
 
 
     public SpyDefinition instrument(String mbsName, String mbeanName, String attrName, String expr) {
-        log.warn(ZorkaLogger.ZAG_CONFIG, "Attempt to create anonymous spy definition. "
+        log.warn("Attempt to create anonymous spy definition. "
                 + "This API is depreciated as spy definitions should to be named since 0.9.12. "
                 + "Sdef will be created for now BUT this will be forbidden in the future. " +
                 "Error counter will be incremented as well, so administrator won't forget about this.");
@@ -265,7 +269,7 @@ public class SpyLib {
      */
     public SpyDefinition instrument(String name, String mbsName, String mbeanName, String attrName, String expr) {
 
-        log.warn(ZorkaLogger.ZAG_CONFIG, "Function spy.instrument(mbsName, mbeanName, attrName, expr) is deprecated due to lack of utility. "
+        log.warn("Function spy.instrument(mbsName, mbeanName, attrName, expr) is deprecated due to lack of utility. "
                 + "Sdef will be created for now BUT this will be forbidden in the future. " +
                 "Error counter will be incremented as well, so administrator won't forget about this.");
         AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);

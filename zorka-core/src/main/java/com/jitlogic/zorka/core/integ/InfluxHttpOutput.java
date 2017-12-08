@@ -20,6 +20,8 @@ import com.jitlogic.zorka.common.http.HttpRequest;
 import com.jitlogic.zorka.common.http.HttpResponse;
 import com.jitlogic.zorka.common.http.HttpUtil;
 import com.jitlogic.zorka.common.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,7 +30,7 @@ import java.util.Map;
 public class InfluxHttpOutput extends ZorkaAsyncThread<String> {
 
     // TODO refactor into generic HTTP output
-    private static ZorkaLog log = ZorkaLogger.getLog(InfluxHttpOutput.class);
+    private static Logger log = LoggerFactory.getLogger(InfluxHttpOutput.class);
 
     private String url, db;
 
@@ -36,7 +38,7 @@ public class InfluxHttpOutput extends ZorkaAsyncThread<String> {
         super(name, 4096, 256);
         this.url = conf.get("url");
         this.db = conf.get("db");
-        log.info(ZorkaLogger.ZPM_CONFIG, "InfluxDB URL=" + url + ", database=" + db);
+        log.info("InfluxDB URL=" + url + ", database=" + db);
     }
 
     @Override
@@ -52,16 +54,15 @@ public class InfluxHttpOutput extends ZorkaAsyncThread<String> {
                 sb.append('\n');
             }
             String s = sb.toString();
-            log.debug(ZorkaLogger.ZPM_RUN_TRACE, "Packet sent: '" + s + "'");
+            log.debug("Packet sent: '" + s + "'");
             HttpRequest req = HttpUtil.POST(url+"/write?db="+db, s);
             HttpResponse res = req.go();
-            log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "HTTP: " + url + " /write?db=" + db + "  -> " + res.getStatus()
-                    + " " + res.getStatusMsg());
+            log.debug("HTTP: " + url + " /write?db=" + db + "  -> " + res.getStatus() + " " + res.getStatusMsg());
             if (res.getStatus() >= 400) {
                 throw new ZorkaRuntimeException("Error: " + res.getStatus());
             }
         } catch (IOException e) {
-            log.error(ZorkaLogger.ZPM_ERRORS, "Error sending performance data", e);
+            log.error("Error sending performance data", e);
         }
     }
 }

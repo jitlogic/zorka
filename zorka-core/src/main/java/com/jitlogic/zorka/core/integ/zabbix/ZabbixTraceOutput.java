@@ -30,8 +30,8 @@ import java.util.concurrent.TimeUnit;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tracer output sending data to remote ZICO collector. It automatically handles reconnections and retransmissions,
@@ -41,7 +41,7 @@ import com.jitlogic.zorka.common.util.ZorkaLogger;
  */
 public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements TraceStreamOutput {
 
-	private static ZorkaLog log = ZorkaLogger.getLog(ZabbixTraceOutput.class);
+	private static Logger log = LoggerFactory.getLogger(ZabbixTraceOutput.class);
 
 	SymbolRegistry symbolRegistry;
 	MetricsRegistry metricsRegistry;
@@ -99,7 +99,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 
 		super("zabbix-output", qlen, 1, interval);
 
-		log.debug(ZorkaLogger.ZAG_DEBUG, "Configured tracer output: host=" + hostname
+		log.debug("Configured tracer output: host=" + hostname
 				+ ", addr=" + addr 
 				+ ", port=" + port
 				+ ", qlen=" + qlen 
@@ -163,8 +163,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 
 				/* Open Connection */
 				close();
-				log.debug(ZorkaLogger.ZTR_TRACER_DBG, "Opening connection to " + hostname
-						+ " -> " + serverAddr + ":" + serverPort);
+				log.debug("Opening connection to " + hostname + " -> " + serverAddr + ":" + serverPort);
 				socket = new Socket(serverAddr, serverPort);
 
 				results.clear();
@@ -196,36 +195,36 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 
 			} catch (UnknownHostException e) {
 				/* Error caused by unkown host -> failure with no retries */
-				log.error(ZorkaLogger.ZCL_STORE, "Error sending trace record: " + e + ". Trace will be lost.");
+				log.error("Error sending trace record: " + e + ". Trace will be lost.");
 				AgentDiagnostics.inc(AgentDiagnostics.ZICO_PACKETS_LOST);
 				return;
 
 			} catch (InterruptedException e) {
 				/* Error while taking record from queue */
-				log.error(ZorkaLogger.ZCL_STORE, "Error retrieving trace record: " + e + ". Trace will be lost.");
+				log.error("Error retrieving trace record: " + e + ". Trace will be lost.");
 				AgentDiagnostics.inc(AgentDiagnostics.ZICO_PACKETS_LOST);
 				return;
 
 			} catch (IOException e) {
 				/* Error while sending */
-				log.error(ZorkaLogger.ZCL_STORE, "Error sending trace record: " + e + ". Resetting connection.");
+				log.error("Error sending trace record: " + e + ". Resetting connection.");
 				close();
 				AgentDiagnostics.inc(AgentDiagnostics.ZICO_RECONNECTS);
 			}
 
 			/* Wait before retry */
 			try {
-				log.debug(ZorkaLogger.ZTR_TRACER_DBG, "Will retry (wait=" + rt + ")");
+				log.debug("Will retry (wait=" + rt + ")");
 				Thread.sleep(rt);
 			} catch (InterruptedException e) {
-				log.debug(ZorkaLogger.ZTR_TRACER_DBG, e.getMessage());
+				log.debug(e.getMessage());
 			}
 
 			rt *= retryTimeExp;
 		} // for ( ... )
 
 		AgentDiagnostics.inc(AgentDiagnostics.ZICO_PACKETS_LOST);
-		log.error(ZorkaLogger.ZCL_STORE, "Too many errors while trying to send trace. Giving up. Trace will be lost.");
+		log.error("Too many errors while trying to send trace. Giving up. Trace will be lost.");
 	}
 
 
@@ -254,7 +253,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		}
 
 		for (ActiveCheckResult result : list){
-			log.debug(ZorkaLogger.ZAG_DEBUG, "### Data: " + result.toString());
+			log.debug("### Data: " + result.toString());
 		}
 
 		return list;
@@ -269,7 +268,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 	 *    Number value]
 	 */
 	private ArrayList<ActiveCheckResult> perfRecordToData(SymbolicRecord rec) {
-		log.debug(ZorkaLogger.ZAG_DEBUG, "### perfRecordToData");
+		log.debug("### perfRecordToData");
 
 		ArrayList<ActiveCheckResult> list = new ArrayList<ActiveCheckResult>();
 
@@ -309,7 +308,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 	 * List<TraceRecord> children
 	 */
 	private ArrayList<ActiveCheckResult> traceRecordToData(SymbolicRecord rec, String prefix, int level) {
-		log.debug(ZorkaLogger.ZAG_DEBUG, "### traceRecordToData");
+		log.debug("### traceRecordToData");
 
 		ArrayList<ActiveCheckResult> list = new ArrayList<ActiveCheckResult>();
 		ActiveCheckResult result;
@@ -340,7 +339,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		} else {
 			key = prefix + "." + keySuffix;
 		}
-		log.debug(ZorkaLogger.ZAG_DEBUG, "### traceRecordToData: key=" + key);
+		log.debug("### traceRecordToData: key=" + key);
 		
 		
 		/* Time */
@@ -352,7 +351,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		result.setLastlogsize(0);
 		result.setClock(clock);
 		list.add(result);
-		log.debug(ZorkaLogger.ZAG_DEBUG, "### traceRecordToData: data=" + result.toString());
+		log.debug("### traceRecordToData: data=" + result.toString());
 
 		/* Calls */
 		result = new ActiveCheckResult();
@@ -363,7 +362,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		result.setLastlogsize(0);
 		result.setClock(clock);
 		list.add(result);
-		log.debug(ZorkaLogger.ZAG_DEBUG, "### traceRecordToData: data=" + result.toString());
+		log.debug("### traceRecordToData: data=" + result.toString());
 
 		/* Errors */
 		result = new ActiveCheckResult();
@@ -373,13 +372,13 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		result.setLastlogsize(0);
 		result.setClock(clock);
 		list.add(result);
-		log.debug(ZorkaLogger.ZAG_DEBUG, "### traceRecordToData: data=" + result.toString());
+		log.debug("### traceRecordToData: data=" + result.toString());
 
 		/* Recursive check children */
 		if ((level <= 1) && (traceRecord.getChildren() != null)) {
-			log.debug(ZorkaLogger.ZAG_DEBUG, "### traceRecordToData: children.size()=" + traceRecord.getChildren().size());
+			log.debug("### traceRecordToData: children.size()=" + traceRecord.getChildren().size());
 			for (TraceRecord child : traceRecord.getChildren()) {
-				log.debug(ZorkaLogger.ZAG_DEBUG, "### traceRecordToData: child=" + child.toString());
+				log.debug("### traceRecordToData: child=" + child.toString());
 				list.addAll(traceRecordToData(child, key + ".backends", level+1));
 			}
 		}
@@ -393,7 +392,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 
 	@Override
 	public synchronized void close() {
-		log.debug(ZorkaLogger.ZAG_DEBUG, "Closing connection: " + hostname
+		log.debug("Closing connection: " + hostname
 				+ " -> " + serverAddr + ":" + serverPort);
 
 		if (socket != null) {
@@ -409,13 +408,13 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 
 	@Override
 	public void start() {
-		log.debug(ZorkaLogger.ZAG_DEBUG, "### Start()");
+		log.debug("### Start()");
 		super.start();
 	}
 
 	@Override
 	public void run() {
-		log.debug(ZorkaLogger.ZAG_DEBUG, "### run()");
+		log.debug("### run()");
 		super.run();
 	}
 }

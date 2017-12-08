@@ -31,12 +31,12 @@ import com.jitlogic.zorka.common.ZorkaAgent;
 import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.core.util.ObjectDumper;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.common.util.ZorkaLog;
 
 import bsh.EvalError;
 import bsh.Interpreter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is central part of Zorka agent - it processes actual queries and executes BSH scripts.
@@ -48,7 +48,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
     /**
      * Logger
      */
-    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Beanshell interpreter
@@ -102,7 +102,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
         try {
             interpreter.set(name, obj);
         } catch (EvalError e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error adding module '" + name + "' to global namespace", e);
+            log.error("Error adding module '" + name + "' to global namespace", e);
         }
     }
 
@@ -126,7 +126,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
         try {
             return "" + interpreter.eval(expr); // TODO proper object-to-string conversion
         } catch (EvalError e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error evaluating '" + expr + "': ", e);
+            log.error("Error evaluating '" + expr + "': ", e);
             return ObjectDumper.errorDump(e);
         }
     }
@@ -151,7 +151,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
      * @param callback callback object
      */
     public void exec(String expr, ZorkaCallback callback) {
-        log.debug(ZorkaLogger.ZAG_TRACE, "Processing request BSH expression: " + expr);
+        log.debug("Processing request BSH expression: " + expr);
         ZorkaBshWorker worker = new ZorkaBshWorker(mainExecutor, timeout, this, expr, callback);
         connExecutor.execute(worker);
     }
@@ -167,7 +167,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
         Reader rdr = null;
         try {
             if (new File(path).canRead()) {
-                log.info(ZorkaLogger.ZAG_CONFIG, "Executing script: " + path);
+                log.info("Executing script: " + path);
                 interpreter.source(path);
                 loadedScripts.add(script);
             } else {
@@ -178,16 +178,16 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
                     interpreter.eval(rdr, interpreter.getNameSpace(), script);
                     loadedScripts.add(script);
                 } else {
-                    log.error(ZorkaLogger.ZAG_ERRORS, "Cannot find script: " + script);
+                    log.error("Cannot find script: " + script);
                 }
             }
             return "OK";
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error loading script " + script, e);
+            log.error("Error loading script " + script, e);
             AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
             return "Error: " + e.getMessage();
         } catch (EvalError e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error executing script " + script, e);
+            log.error("Error executing script " + script, e);
             AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
             return "Error: " + e.getMessage();
         } finally {
@@ -195,7 +195,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
                 try {
                     rdr.close();
                 } catch (IOException e) {
-                    log.error(ZorkaLogger.ZAG_ERRORS, "Error closing script " + script, e);
+                    log.error("Error closing script " + script, e);
                 }
             }
         }
@@ -254,7 +254,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
         String scriptsDir = config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null);
 
         if (scriptsDir == null) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Scripts directory not set. Internal error ?!?");
+            log.error("Scripts directory not set. Internal error ?!?");
             return;
         }
 

@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.common.util;
+package org.slf4j.impl;
 
 /**
  */

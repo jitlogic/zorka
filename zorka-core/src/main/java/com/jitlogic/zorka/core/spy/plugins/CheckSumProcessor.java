@@ -16,16 +16,16 @@
 package com.jitlogic.zorka.core.spy.plugins;
 
 
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 public class CheckSumProcessor implements SpyProcessor {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(CheckSumProcessor.class);
+    private static final Logger log = LoggerFactory.getLogger(CheckSumProcessor.class);
 
     public final static int CRC32_TYPE = 1;
     public final static int MD5_TYPE = 2;
@@ -78,7 +78,7 @@ public class CheckSumProcessor implements SpyProcessor {
                     record.put(dstField, cut(ZorkaUtil.sha1(val.toString())));
                     break;
                 default:
-                    log.error(ZorkaLogger.ZSP_ERRORS, "Unknown checksum type: " + type);
+                    log.error("Unknown checksum type: " + type);
             }
         }
 

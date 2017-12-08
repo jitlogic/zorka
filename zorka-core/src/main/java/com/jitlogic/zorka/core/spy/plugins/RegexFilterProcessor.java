@@ -18,9 +18,9 @@
 package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +37,7 @@ public class RegexFilterProcessor implements SpyProcessor {
     /**
      * Logger
      */
-    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Source field
@@ -143,8 +143,8 @@ public class RegexFilterProcessor implements SpyProcessor {
         if (expr == null) {
             boolean matches = val != null && regex.matcher(val.toString()).matches();
 
-            if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-                log.debug(ZorkaLogger.ZSP_ARGPROC, "Filtering '" + val + "' through '" + regex.pattern() + "': " + matches);
+            if (log.isDebugEnabled()) {
+                log.debug("Filtering '" + val + "' through '" + regex.pattern() + "': " + matches);
             }
 
             return matches ^ filterOut ? record : null;
@@ -162,23 +162,23 @@ public class RegexFilterProcessor implements SpyProcessor {
                         record.put(e.getKey(), ObjectInspector.substitute(e.getValue(), vals));
                     }
                 }
-                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-                    log.debug(ZorkaLogger.ZSP_ARGPROC, "Processed '" + val + "' to '" + subst + "' using pattern '" + regex.pattern() + "'");
+                if (log.isDebugEnabled()) {
+                    log.debug("Processed '" + val + "' to '" + subst + "' using pattern '" + regex.pattern() + "'");
                 }
             } else if (defval != null) {
                 record.put(dst, defval);
-                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-                    log.debug(ZorkaLogger.ZSP_ARGPROC, "No value to be processed. Using default value of '" + defval + "'");
+                if (log.isDebugEnabled()) {
+                    log.debug("No value to be processed. Using default value of '" + defval + "'");
                 }
             } else if (Boolean.TRUE.equals(filterOut)) {
-                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-                    log.debug(ZorkaLogger.ZSP_ARGPROC, "No value to be processed. Filtering out.");
+                if (log.isDebugEnabled()) {
+                    log.debug("No value to be processed. Filtering out.");
                 }
                 return null;
             }
         } else {
-            if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-                log.debug(ZorkaLogger.ZSP_ARGPROC, "No value to be processed. Leaving record unprocessed.");
+            if (log.isDebugEnabled()) {
+                log.debug("No value to be processed. Leaving record unprocessed.");
             }
         }
         return record;

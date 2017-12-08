@@ -38,9 +38,9 @@ import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.ZorkaBshAgent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Zabbix Active Agent integrates Zorka with Zabbix server. It handles incoming zabbix
@@ -51,7 +51,7 @@ import com.jitlogic.zorka.core.ZorkaBshAgent;
 public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
 	/* Logger */
-	private final ZorkaLog log = ZorkaLogger.getLog(ZabbixActiveAgent.class);
+	private final Logger log = LoggerFactory.getLogger(ZabbixActiveAgent.class);
 
 
 	/* Thread */
@@ -127,7 +127,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
 
 	protected void setup() {
-		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive setup...");
+		log.debug("ZabbixActive setup...");
 
 		/* Zabbix Server IP:Port */
 		activeIpPort = config.stringCfg(prefix + ".server.addr", defaultAddr);
@@ -139,7 +139,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		try {
 			activeAddr = InetAddress.getByName(activeIp.trim());
 		} catch (UnknownHostException e) {
-			log.error(ZorkaLogger.ZAG_ERRORS, "Cannot parse " + prefix + ".server.addr in zorka.properties", e);
+			log.error("Cannot parse " + prefix + ".server.addr in zorka.properties", e);
 			AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
 		}
 
@@ -150,13 +150,13 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		activeCheckInterval = config.intCfg(prefix + ".check.interval", 120);
 		agentHost = config.stringCfg("zorka.hostname", null);
 
-		log.info(ZorkaLogger.ZAG_INFO, "ZabbixActive Agent (" + agentHost + ") will send Active Checks to " + 
+		log.info("ZabbixActive Agent (" + agentHost + ") will send Active Checks to " +
 				activeAddr + ":" + activePort + " every " + activeCheckInterval + " seconds");
 
 		senderInterval = config.intCfg(prefix + ".sender.interval", 60);
 		maxBatchSize = config.intCfg(prefix + ".batch.size", 10);
 		maxCacheSize = config.intCfg(prefix + ".cache.size", 150);
-		log.info(ZorkaLogger.ZAG_INFO, "ZabbixActive Agent (" + agentHost + ") will send up to " + maxBatchSize + " metrics every " + 
+		log.info("ZabbixActive Agent (" + agentHost + ") will send up to " + maxBatchSize + " metrics every " +
 				senderInterval + " seconds. Agent will persist up to " + maxCacheSize + " metrics per " + (senderInterval*2) + 
 				" seconds, exceeding records will be discarded.");
 
@@ -167,7 +167,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
 
 	public void start() {
-		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive start...");
+		log.debug("ZabbixActive start...");
 
 		if (!running) {
 			running = true;
@@ -182,23 +182,23 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
 	@SuppressWarnings("deprecation")
 	public void stop() {
-		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive stop...");
+		log.debug("ZabbixActive stop...");
 		if (running) {
 			running = false;
 			try {
-				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive cancelling sender task...");
+				log.debug("ZabbixActive cancelling sender task...");
 				senderTask.cancel(true);
 				
-				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive cancelling all ZorkaBsh tasks...");
+				log.debug("ZabbixActive cancelling all ZorkaBsh tasks...");
                 for (Map.Entry<ActiveCheckQueryItem,ScheduledFuture<?>> e : runningTasks.entrySet()) {
                     e.getValue().cancel(true);
                 }
                 runningTasks.clear();
 
-				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive clearing dataQueue...");
+				log.debug("ZabbixActive clearing dataQueue...");
 				resultsQueue.clear();
 				
-				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive closing socket...");
+				log.debug("ZabbixActive closing socket...");
 				if (socket != null) {
 					socket.close();
 					socket = null;
@@ -214,19 +214,19 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 					}
 				}
 
-				log.warn(ZorkaLogger.ZAG_WARNINGS, "ZORKA-" + prefix + " thread didn't stop after 1000 milliseconds. Shutting down forcibly.");
+				log.warn("ZORKA-" + prefix + " thread didn't stop after 1000 milliseconds. Shutting down forcibly.");
 
 				thread.stop();
 				thread = null;
 			} catch (IOException e) {
-				log.error(ZorkaLogger.ZAG_ERRORS, "I/O error in zabbix core main loop: " + e.getMessage());
+				log.error("I/O error in zabbix core main loop: " + e.getMessage());
 			}
 		}
 	}
 
 
 	public void restart() {
-		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive restart...");
+		log.debug("ZabbixActive restart...");
 		setup();
 		start();
 	}
@@ -234,7 +234,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
 	@Override
 	public void shutdown() {
-		log.info(ZorkaLogger.ZAG_CONFIG, "Shutting down " + prefix + " agent ...");
+		log.info("Shutting down " + prefix + " agent ...");
 		stop();
 		close();
 	}
@@ -244,7 +244,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 			try {
 				socket.close();
 			} catch (IOException e) {
-				log.error(ZorkaLogger.ZAG_ERRORS,"Error closing zabbix.active socket", e);
+				log.error("Error closing zabbix.active socket", e);
 			}
 			socket = null;
 		}
@@ -253,31 +253,31 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
 	@Override
 	public void run() {
-		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive run ... ");
+		log.debug("ZabbixActive run ... ");
 
         try {
-            log.debug(ZorkaLogger.ZAG_DEBUG, "Waiting for rest of script to start ...");
+            log.debug("Waiting for rest of script to start ...");
             Thread.sleep(10000);  // TODO initFinished method should be implemented here ...
         } catch (InterruptedException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Interrupted when sleeping.");
+            log.error("Interrupted when sleeping.");
         }
 
 
         try {
 			socket = new Socket(activeAddr, activePort);
-			log.info(ZorkaLogger.ZAG_ERRORS, "Successfuly connected to " + activeIpPort);
+			log.info("Successfuly connected to " + activeIpPort);
 		} catch (IOException e) {
-			log.error(ZorkaLogger.ZAG_ERRORS, "Failed to connect to " + activeIpPort + ". Will try to connect later.", e);
+			log.error("Failed to connect to " + activeIpPort + ". Will try to connect later.", e);
 		} finally {
 			close();
 		}
 
-		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive Scheduling sender task");
+		log.debug("ZabbixActive Scheduling sender task");
 		scheduleTasks();
 
 		while (running) {
 			try {
-				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive Refreshing Active Check");
+				log.debug("ZabbixActive Refreshing Active Check");
 
 				socket = new Socket(activeAddr, activePort);
 				ZabbixActiveRequest request = new ZabbixActiveRequest(socket, config);
@@ -287,7 +287,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
 				// get requests for metrics
 				ActiveCheckResponse response = request.getActiveResponse();
-				//log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive response.toString() " + response.toString());
+				log.debug("ZabbixActive response.toString() " + response.toString());
 
 				if(response.getData() == null) {
 				   response.setData(new ArrayList<ActiveCheckQueryItem>());
@@ -295,7 +295,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 				// Schedule all requests
 				scheduleTasks(response);
 			} catch (IOException e) {
-				log.error(ZorkaLogger.ZAG_ERRORS, "Failed to connect to " + activeIpPort, e);
+				log.error("Failed to connect to " + activeIpPort, e);
 			} finally {
 				close();
 			}
@@ -303,7 +303,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 			try {
 				Thread.sleep(activeCheckInterval * 1000L);
 			} catch (InterruptedException e) {
-				log.error(ZorkaLogger.ZAG_ERRORS, "Failed to sleep", e);
+				log.error("Failed to sleep", e);
 			}
 		}
 	}
@@ -313,7 +313,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		Set<ActiveCheckQueryItem> tasksToInsert = new HashSet<ActiveCheckQueryItem>(checkData.getData());
 		Set<ActiveCheckQueryItem> tasksToDelete = new HashSet<ActiveCheckQueryItem>(runningTasks.keySet());
 
-		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive - schedule Tasks: " + checkData.toString());
+		log.debug("ZabbixActive - schedule Tasks: " + checkData.toString());
 
 		// Configuring: Insert = New - Running(=tasksToDelete antes da alteração)
 		tasksToInsert.removeAll(tasksToDelete);
@@ -331,11 +331,11 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		for (ActiveCheckQueryItem task : tasksToInsert) {
 			ZabbixActiveTask zabbixActiveTask = new ZabbixActiveTask(agentHost, task, agent, translator, resultsQueue);
 			ScheduledFuture<?> taskHandler = scheduler.scheduleAtFixedRate(zabbixActiveTask, 5, task.getDelay(), TimeUnit.SECONDS);
-			log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive - task: " + task.toString());
+			log.debug("ZabbixActive - task: " + task.toString());
 			runningTasks.put(task, taskHandler);
 		}
-		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive - new scheduled tasks: " + tasksToInsert.size());
-		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActive - deleted old tasks: " + tasksToDelete.size());
+		log.debug("ZabbixActive - new scheduled tasks: " + tasksToInsert.size());
+		log.debug("ZabbixActive - deleted old tasks: " + tasksToDelete.size());
 		
 	}
 

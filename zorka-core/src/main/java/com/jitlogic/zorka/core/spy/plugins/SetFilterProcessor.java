@@ -15,9 +15,9 @@
  */
 package com.jitlogic.zorka.core.spy.plugins;
 
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +25,7 @@ import java.util.Set;
 
 public class SetFilterProcessor implements SpyProcessor {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(SetFilterProcessor.class);
+    private static final Logger log = LoggerFactory.getLogger(SetFilterProcessor.class);
 
     private String srcField;
     private boolean invert;
@@ -36,16 +36,15 @@ public class SetFilterProcessor implements SpyProcessor {
         this.invert = invert;
         this.candidates = candidates;
 
-        log.info(ZorkaLogger.ZSP_CONFIG, "SetFilterProcessor configured for "
-                + srcField + ", candidates=" + this.candidates);
+        log.info("SetFilterProcessor configured for " + srcField + ", candidates=" + this.candidates);
     }
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
         Object val = record.get(srcField);
         boolean pass = candidates.contains(val) ^ invert;
-        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-            log.debug(ZorkaLogger.ZSP_ARGPROC, "pass(" + val + ":" + val.getClass().getName() + ") -> " + pass);
+        if (log.isDebugEnabled()) {
+            log.debug("pass(" + val + ":" + val.getClass().getName() + ") -> " + pass);
         }
         return pass ? record : null;
     }

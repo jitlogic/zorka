@@ -18,7 +18,6 @@ package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.core.Labeled;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
@@ -80,7 +79,7 @@ public class TraceOutputJmxScanner extends JmxScanner implements Runnable, Label
         try {
             runCycle(System.currentTimeMillis());
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZPM_ERRORS, "Error executing scanner '" + label + "'", e);
+            log.error("Error executing scanner '" + label + "'", e);
             AgentDiagnostics.inc(AgentDiagnostics.PMON_ERRORS);
         }
     }
@@ -100,7 +99,7 @@ public class TraceOutputJmxScanner extends JmxScanner implements Runnable, Label
 
         long t2 = System.nanoTime();
 
-        log.info(ZorkaLogger.ZPM_RUNS, "Scanner %s execution took " + (t2 - t1) / 1000000L
+        log.info("Scanner %s execution took " + (t2 - t1) / 1000000L
             + " milliseconds to execute. Collected samples: " + samples.size());
 
         AgentDiagnostics.inc(AgentDiagnostics.PMON_TIME, t2 - t1);

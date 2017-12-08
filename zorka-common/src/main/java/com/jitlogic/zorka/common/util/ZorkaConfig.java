@@ -17,6 +17,9 @@
 
 package com.jitlogic.zorka.common.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +43,7 @@ import java.util.regex.Pattern;
 public class ZorkaConfig {
 
     /** Logger */
-    private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(ZorkaConfig.class);
 
     /** Configuration properties */
     protected Properties properties;
@@ -124,13 +127,13 @@ public class ZorkaConfig {
             props.load(is);
             is.close();
         } catch (IOException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error loading property file", e);
+            log.error("Error loading property file", e);
         } finally {
             if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    log.error(ZorkaLogger.ZAG_ERRORS, "Error closing property file", e);
+                    log.error("Error closing property file", e);
                 }
             }
         }
@@ -147,7 +150,7 @@ public class ZorkaConfig {
             return properties;
         } catch (IOException e) {
             if (verbose) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error loading property file", e);
+                log.error("Error loading property file", e);
             }
         } finally {
             if (is != null)
@@ -155,7 +158,7 @@ public class ZorkaConfig {
                     is.close();
                 } catch (IOException e) {
                     if (verbose) {
-                        log.error(ZorkaLogger.ZAG_ERRORS, "Error closing property file", e);
+                        log.error("Error closing property file", e);
                     }
                 }
         }
@@ -316,7 +319,7 @@ public class ZorkaConfig {
     }
 
     protected void markError(String msg, Throwable e) {
-        log.error(ZorkaLogger.ZAG_CONFIG, msg, e);
+        log.error(msg, e);
     }
 
     public boolean hasCfg(String key) {

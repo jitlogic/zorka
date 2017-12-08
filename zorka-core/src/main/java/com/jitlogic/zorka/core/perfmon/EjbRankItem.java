@@ -15,9 +15,9 @@
  */
 package com.jitlogic.zorka.core.perfmon;
 
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ObjectInspector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Wraps EJB statistic to be suitable to use with rank lists and maintains average statistics for wrapped object.
@@ -25,7 +25,7 @@ import com.jitlogic.zorka.common.util.ObjectInspector;
 public class EjbRankItem implements Rankable<Object> {
 
     /** Logger. */
-    private static final ZorkaLog log = ZorkaLogger.getLog(EjbRankItem.class);
+    private static final Logger log = LoggerFactory.getLogger(EjbRankItem.class);
 
     /** Number of calls metric */
     private static final int BY_CALLS = 0;
@@ -71,7 +71,7 @@ public class EjbRankItem implements Rankable<Object> {
                 }
             }
             default:
-                log.error(ZorkaLogger.ZAG_ERRORS, "Invalid metric passed to getAverage(): " + metric);
+                log.error("Invalid metric passed to getAverage(): " + metric);
                 break;
         }
 

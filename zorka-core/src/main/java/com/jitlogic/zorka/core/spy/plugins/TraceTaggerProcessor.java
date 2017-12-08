@@ -17,17 +17,17 @@ package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TaggedValue;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.Tracer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 
 public class TraceTaggerProcessor implements SpyProcessor {
 
-    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     private Tracer tracer;
     private int attrNameId, attrTagId;
@@ -58,7 +58,7 @@ public class TraceTaggerProcessor implements SpyProcessor {
         }
 
         if (!(tagObj instanceof TaggedValue) || ((TaggedValue) tagObj).getTagId() != attrTagId) {
-            log.error(ZorkaLogger.ZSP_ERRORS, "Trace Tag attribute already occupied with different object: " + record);
+            log.error("Trace Tag attribute already occupied with different object: " + record);
         }
 
         Set<Integer> tagSet = (Set<Integer>) ((TaggedValue) tagObj).getValue();

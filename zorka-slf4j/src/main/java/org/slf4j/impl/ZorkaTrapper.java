@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License along with
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jitlogic.zorka.common.util;
+package org.slf4j.impl;
 
 /**
  * Zorka trapper interface. Objects implementing this interface can accept traps (logs)
@@ -31,6 +31,6 @@ public interface ZorkaTrapper {
      * @param e        exception object (or null if no exception has to be logged)
      * @param args     optional arguments (if log message is a format string)
      */
-    public void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e, Object... args);
+    void trap(ZorkaLogLevel logLevel, String tag, String msg, Throwable e, Object... args);
 
 }

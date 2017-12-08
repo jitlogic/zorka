@@ -19,9 +19,9 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import org.objectweb.asm.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ import static java.lang.Math.max;
  */
 public class SpyMethodVisitor extends MethodVisitor {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(SpyMethodVisitor.class);
+    private static final Logger log = LoggerFactory.getLogger(SpyMethodVisitor.class);
 
     /**
      * Class that receives data from probes
@@ -231,7 +231,7 @@ public class SpyMethodVisitor extends MethodVisitor {
 
         // Emit trace probe if required
         if (symbolRegistry != null) {
-            log.debug(ZorkaLogger.ZTR_INSTRUMENT_METHOD, "Will trace method: %s.%s", className, methodName);
+            log.debug("Will trace method: %s.%s", className, methodName);
             stackDelta = max(stackDelta, emitTraceEnter(
                     symbolRegistry.symbolId(className),
                     symbolRegistry.symbolId(methodName),

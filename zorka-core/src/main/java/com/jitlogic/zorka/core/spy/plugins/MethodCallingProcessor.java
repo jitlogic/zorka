@@ -16,9 +16,9 @@
  */
 package com.jitlogic.zorka.core.spy.plugins;
 
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -35,7 +35,7 @@ public class MethodCallingProcessor implements SpyProcessor {
     /**
      * Logger
      */
-    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Source field
@@ -103,7 +103,7 @@ public class MethodCallingProcessor implements SpyProcessor {
             val = method.invoke(val, args);
             record.put(dst, val);
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZSP_ARGPROC, "Error processing record calling its method", e);
+            log.error("Error processing record calling its method", e);
         }
 
         return record;

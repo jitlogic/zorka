@@ -19,8 +19,8 @@ package com.jitlogic.zorka.core;
 
 import bsh.EvalError;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -33,7 +33,7 @@ import java.util.concurrent.*;
  */
 public class ZorkaBshWorker implements Runnable, Closeable {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaBshWorker.class);
+    private static final Logger log = LoggerFactory.getLogger(ZorkaBshWorker.class);
 
     /**
      * Reference to Zorka BSH agent
@@ -95,16 +95,16 @@ public class ZorkaBshWorker implements Runnable, Closeable {
             callback.handleResult(future.get(timeout, TimeUnit.MILLISECONDS));
         } catch (InterruptedException e) {
             AgentDiagnostics.inc(AgentDiagnostics.AGENT_ERRORS);
-            log.error(ZorkaLogger.ZAG_ERRORS, "Executing expression '" + expr + "' has been interrupted.");
+            log.error("Executing expression '" + expr + "' has been interrupted.");
             callback.handleError(new RuntimeException("Request has been interrupted."));
             future.cancel(true);
         } catch (ExecutionException e) {
             AgentDiagnostics.inc(AgentDiagnostics.AGENT_ERRORS);
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error evaluating expression '" + expr + "'", e);
+            log.error("Error evaluating expression '" + expr + "'", e);
             callback.handleError(e.getCause());
         } catch (TimeoutException e) {
             AgentDiagnostics.inc(AgentDiagnostics.AGENT_ERRORS);
-            log.error(ZorkaLogger.ZAG_ERRORS, "Timeout executing expression '" + expr + "'.");
+            log.error("Timeout executing expression '" + expr + "'.");
             callback.handleError(e);
             future.cancel(true);
         }
@@ -123,11 +123,11 @@ public class ZorkaBshWorker implements Runnable, Closeable {
         } catch (EvalError e) {
             callback.handleError(e);
             AgentDiagnostics.inc(AgentDiagnostics.AGENT_ERRORS);
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error evaluating expression '" + expr + "'", e);
+            log.error("Error evaluating expression '" + expr + "'", e);
         } catch (Exception e) {
             callback.handleError(e);
             AgentDiagnostics.inc(AgentDiagnostics.AGENT_ERRORS);
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error evaluating expression '" + expr + "'", e);
+            log.error("Error evaluating expression '" + expr + "'", e);
         }
 
         long t2 = System.nanoTime();

@@ -21,10 +21,10 @@ import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.common.stats.MethodCallStatistic;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.core.spy.SpyContext;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,7 +63,7 @@ public class ZorkaStatsCollector implements SpyProcessor {
     /**
      * Logger
      */
-    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Actions that will be taken when method execution hits collector
@@ -211,8 +211,8 @@ public class ZorkaStatsCollector implements SpyProcessor {
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
 
-        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-            log.debug(ZorkaLogger.ZSP_ARGPROC, "Collecting record: " + record);
+        if (log.isDebugEnabled()) {
+            log.debug("Collecting record: " + record);
         }
 
         MethodCallStatistic statistic = cachedStatistic;
@@ -393,16 +393,16 @@ public class ZorkaStatsCollector implements SpyProcessor {
             if (v instanceof Number) {
                 throughput = (Number) v;
             } else {
-                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-                    log.debug(ZorkaLogger.ZSP_ARGPROC, "Invalid value of throughput field: " + throughput);
+                if (log.isDebugEnabled()) {
+                    log.debug("Invalid value of throughput field: " + throughput);
                 }
             }
         }
 
         if (executionTime instanceof Long) {
             if (0 != ((Integer) record.get(".STAGES") & (1 << ON_RETURN))) {
-                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-                    log.debug(ZorkaLogger.ZSP_ARGPROC, "Updating stats using logCall()");
+                if (log.isDebugEnabled()) {
+                    log.debug("Updating stats using logCall()");
                 }
                 if (throughput != null) {
                     statistic.logCall((Long) executionTime, throughput.longValue());
@@ -410,8 +410,8 @@ public class ZorkaStatsCollector implements SpyProcessor {
                     statistic.logCall((Long) executionTime);
                 }
             } else if (0 != ((Integer) record.get(".STAGES") & (1 << ON_ERROR))) {
-                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-                    log.debug(ZorkaLogger.ZSP_ARGPROC, "Updating stats using logError()");
+                if (log.isDebugEnabled()) {
+                    log.debug("Updating stats using logError()");
                 }
                 if (throughput != null) {
                     statistic.logError((Long) executionTime, throughput.longValue());
@@ -419,13 +419,13 @@ public class ZorkaStatsCollector implements SpyProcessor {
                     statistic.logError((Long) executionTime);
                 }
             } else {
-                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-                    log.debug(ZorkaLogger.ZSP_ARGPROC, "No ON_RETURN nor ON_ERROR marked on record " + record);
+                if (log.isDebugEnabled()) {
+                    log.debug("No ON_RETURN nor ON_ERROR marked on record " + record);
                 }
             }
         } else {
-            if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-                log.debug(ZorkaLogger.ZSP_ARGPROC, "Unknown type of timeField: " + executionTime);
+            if (log.isDebugEnabled()) {
+                log.debug("Unknown type of timeField: " + executionTime);
             }
         }
     }

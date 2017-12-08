@@ -20,6 +20,8 @@ package com.jitlogic.zorka.common.util;
 import com.jitlogic.zorka.common.stats.ZorkaStats;
 import com.jitlogic.zorka.common.util.JmxObject;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.management.*;
 import javax.management.openmbean.CompositeData;
@@ -43,7 +45,7 @@ import java.util.regex.Pattern;
  */
 public final class ObjectInspector {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(ObjectInspector.class);
+    private static final Logger log = LoggerFactory.getLogger(ObjectInspector.class);
 
     /**
      * Special attribute name that will extract stack trace from throwable objects.
@@ -312,7 +314,7 @@ public final class ObjectInspector {
                 }
                 ret = method.invoke(obj);
             } catch (Exception e) {
-                log.error(ZorkaLogger.ZSP_ERRORS, "Method '" + method.getName() + "' invocation failed", e);
+                log.error("Method '" + method.getName() + "' invocation failed", e);
             } finally {
                 method.setAccessible(false);
             }
@@ -340,7 +342,7 @@ public final class ObjectInspector {
                 Object ret = method.invoke(obj);
                 return ret;
             } catch (Exception e) {
-                log.error(ZorkaLogger.ZSP_ERRORS, "Method '" + method.getName() + "' invocation failed", e);
+                log.error("Method '" + method.getName() + "' invocation failed", e);
                 return null;
             }
         }
@@ -447,7 +449,7 @@ public final class ObjectInspector {
             ObjectName on = new ObjectName(query);
             return conn.queryNames(on, null);
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error performing '" + query + "' JMX query", e);
+            log.error("Error performing '" + query + "' JMX query", e);
             return new HashSet<ObjectName>();
         }
     }

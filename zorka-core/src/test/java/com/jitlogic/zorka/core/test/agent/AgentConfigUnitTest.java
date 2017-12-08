@@ -16,11 +16,9 @@
 
 package com.jitlogic.zorka.core.test.agent;
 
-import com.jitlogic.zorka.common.test.support.TestUtil;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,16 +45,6 @@ public class AgentConfigUnitTest extends ZorkaFixture {
         m.putAll((Map<String,String>)util.getField(config, "sysenv"));
         m.put("FOO", "BAR");
         util.setField(config, "sysenv", m);
-    }
-
-
-    @Test
-    public void testParseSimpleLogConfigStrings() {
-        assertEquals(ZorkaLogger.ZTR_CONFIG, ZorkaLogger.parse("", "ZTR", "CONFIG"));
-        assertEquals(ZorkaLogger.ZTR_CONFIG | ZorkaLogger.ZTR_TRACE_CALLS,
-                ZorkaLogger.parse("", "ZTR", "CONFIG,TRACE_CALLS"));
-        assertEquals(ZorkaLogger.ZTR_CONFIG | ZorkaLogger.ZTR_TRACE_CALLS,
-                ZorkaLogger.parse("", "ZTR", "config, trace_calls"));
     }
 
 

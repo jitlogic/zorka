@@ -17,9 +17,9 @@
 package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -34,7 +34,7 @@ public class GetterProcessor implements SpyProcessor {
     /**
      * Logger
      */
-    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Source field
@@ -69,8 +69,8 @@ public class GetterProcessor implements SpyProcessor {
     public Map<String, Object> process(Map<String, Object> record) {
         Object val = ObjectInspector.get(record.get(srcField), attrChain);
 
-        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-            log.debug(ZorkaLogger.ZSP_ARGPROC, "Final result: '" + val + "' stored to slot " + dstField);
+        if (log.isDebugEnabled()) {
+            log.debug("Final result: '" + val + "' stored to slot " + dstField);
         }
 
         record.put(dstField, val);

@@ -17,8 +17,8 @@
 package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.common.stats.MethodCallStatistic;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -26,7 +26,7 @@ import java.io.IOException;
 
 public class HiccupMeter implements Runnable {
 
-    private static ZorkaLog log = ZorkaLogger.getLog(HiccupMeter.class);
+    private static Logger log = LoggerFactory.getLogger(HiccupMeter.class);
 
     public static final long MS = 1000000L;
 
@@ -91,9 +91,9 @@ public class HiccupMeter implements Runnable {
             os.flush();
             os.getFD().sync();
         } catch (FileNotFoundException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot perform disk test", e);
+            log.error("Cannot perform disk test", e);
         } catch (IOException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot perform disk test", e);
+            log.error("Cannot perform disk test", e);
         } finally {
             if (os != null) {
                 try { os.close(); } catch (IOException e) { }
@@ -127,7 +127,7 @@ public class HiccupMeter implements Runnable {
         try {
             Thread.sleep(resolution);
         } catch (InterruptedException e) {
-            log.warn(ZorkaLogger.ZAG_WARNINGS, "Hiccup-meter thread encountered interruption. ");
+            log.warn("Hiccup-meter thread encountered interruption. ");
         }
     }
 

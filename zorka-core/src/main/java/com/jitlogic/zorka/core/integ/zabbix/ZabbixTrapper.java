@@ -19,6 +19,10 @@ package com.jitlogic.zorka.core.integ.zabbix;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.core.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.impl.ZorkaLogLevel;
+import org.slf4j.impl.ZorkaTrapper;
 
 import java.io.OutputStream;
 import java.net.Socket;
@@ -34,7 +38,7 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
     /**
      * Logger
      */
-    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Zabbix server IP address
@@ -77,7 +81,7 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
                 this.serverAddr = serverAddr;
             }
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot initialize zabbix trapper object.", e);
+            log.error("Cannot initialize zabbix trapper object.", e);
         }
     }
 
@@ -137,14 +141,14 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
                 os.flush();
                 AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SENT);
             } catch (Exception e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error sending packet", e);
+                log.error("Error sending packet", e);
             } finally {
                 try {
                     if (socket != null) {
                         socket.close();
                     }
                 } catch (Exception e) {
-                    log.error(ZorkaLogger.ZAG_ERRORS, "Error closing zabbix trapper socket. Possible leak.", e);
+                    log.error("Error closing zabbix trapper socket. Possible leak.", e);
                 }
             }
         }
@@ -158,7 +162,7 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
      * @param e   exception object
      */
     protected void handleError(String msg, Throwable e) {
-        log.error(ZorkaLogger.ZAG_ERRORS, msg, e);
+        log.error(msg, e);
     }
 
 

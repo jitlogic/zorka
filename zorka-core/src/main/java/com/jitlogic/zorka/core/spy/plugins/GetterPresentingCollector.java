@@ -19,10 +19,10 @@ package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.mbeans.AttrGetter;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.spy.SpyContext;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -37,7 +37,7 @@ public class GetterPresentingCollector implements SpyProcessor {
     /**
      * Logger
      */
-    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * MBean server registry
@@ -106,7 +106,7 @@ public class GetterPresentingCollector implements SpyProcessor {
         Object obj2 = registry.getOrRegister(mbsName, mbeanName, attrName, obj1, desc);
 
         if (!obj1.equals(obj2)) {
-            log.warn(ZorkaLogger.ZSP_ERRORS, "Attribute '" + attrName + "' of '" + mbeanName + "' is already used.");
+            log.warn("Attribute '" + attrName + "' of '" + mbeanName + "' is already used.");
         }
 
         return record;

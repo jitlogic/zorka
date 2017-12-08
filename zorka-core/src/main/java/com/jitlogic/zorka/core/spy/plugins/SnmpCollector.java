@@ -19,10 +19,10 @@ import com.jitlogic.zorka.core.integ.SnmpLib;
 import com.jitlogic.zorka.core.integ.SnmpTrapper;
 import com.jitlogic.zorka.core.integ.TrapVarBindDef;
 import com.jitlogic.contrib.libsnmp.*;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -37,7 +37,7 @@ public class SnmpCollector implements SpyProcessor {
     /**
      * Logger object
      */
-    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * SNMP trapper
@@ -89,7 +89,7 @@ public class SnmpCollector implements SpyProcessor {
             this.varBindDefs = ZorkaUtil.copyArray(varBindDefs);
             this.oid = new SNMPObjectIdentifier(oid);
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error initializing SNMP-trap sending collector", e);
+            log.error("Error initializing SNMP-trap sending collector", e);
         }
     }
 
@@ -108,7 +108,7 @@ public class SnmpCollector implements SpyProcessor {
             }
             trapper.trap(gtrap, strap, oid, vars);
         } catch (SNMPBadValueException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error submitting record to SNMP trapper", e);
+            log.error("Error submitting record to SNMP trapper", e);
         }
 
         return record;

@@ -19,8 +19,8 @@ package com.jitlogic.zorka.core.spy;
 
 import bsh.EvalError;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Main submitter contains static methods that can be called directly by
@@ -31,7 +31,7 @@ import com.jitlogic.zorka.common.util.ZorkaLogger;
  */
 public class MainSubmitter {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(MainSubmitter.class);
+    private static final Logger log = LoggerFactory.getLogger(MainSubmitter.class);
 
     /**
      * Submitter receiving full submissions
@@ -78,11 +78,11 @@ public class MainSubmitter {
                 submitter.submit(stage, id, submitFlags, vals);
             }
         } catch (EvalError e) {
-            log.debug(ZorkaLogger.ZSP_ERRORS, "Error submitting value from instrumented code: ", e);
+            log.debug("Error submitting value from instrumented code: ", e);
             AgentDiagnostics.inc(AgentDiagnostics.SPY_ERRORS);
         } catch (Throwable e) {
             // This is special case. We must catch everything going out of agent, even OOM errors.
-            log.debug(ZorkaLogger.ZSP_ERRORS, "Error submitting value from instrumented code: ", e);
+            log.debug("Error submitting value from instrumented code: ", e);
             AgentDiagnostics.inc(AgentDiagnostics.SPY_ERRORS);
         } finally {
             inSubmit.set(false);
@@ -104,11 +104,11 @@ public class MainSubmitter {
                 tracer.getHandler().traceEnter(classId, methodId, signatureId, System.nanoTime());
             } catch (Throwable e) {
                 // This is special case. We must catch everything going out of agent, even OOM errors.
-                log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceEnter", e);
+                log.debug("Error executing traceEnter", e);
                 AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
             }
-        } else if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACER_DBG)) {
-            log.warn(ZorkaLogger.ZTR_TRACE_CALLS, "Submitter is null !");
+        } else if (log.isTraceEnabled()) {
+            log.trace("Submitter is null !");
         }
 
     }
@@ -124,11 +124,11 @@ public class MainSubmitter {
                 tracer.getHandler().traceReturn(System.nanoTime());
             } catch (Throwable e) {
                 // This is special case. We must catch everything going out of agent, even OOM errors.
-                log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceReturn", e);
+                log.debug("Error executing traceReturn", e);
                 AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
             }
-        } else if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACER_DBG)) {
-            log.warn(ZorkaLogger.ZTR_TRACE_CALLS, "Submitter is null !");
+        } else if (log.isWarnEnabled()) {
+            log.warn("Submitter is null !");
         }
 
     }
@@ -146,11 +146,11 @@ public class MainSubmitter {
                 tracer.getHandler().traceError(exception, System.nanoTime());
             } catch (Throwable e) {
                 // This is special case. We must catch everything going out of agent, even OOM errors.
-                log.debug(ZorkaLogger.ZTR_TRACE_ERRORS, "Error executing traceError", e);
+                log.debug("Error executing traceError", e);
                 AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
             }
-        } else if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACER_DBG)) {
-            log.warn(ZorkaLogger.ZTR_TRACE_CALLS, "Submitter is null !");
+        } else if (log.isWarnEnabled()) {
+            log.warn("Submitter is null !");
         }
     }
 
