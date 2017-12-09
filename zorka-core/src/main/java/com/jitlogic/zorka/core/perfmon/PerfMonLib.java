@@ -19,6 +19,8 @@ package com.jitlogic.zorka.core.perfmon;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.core.integ.InfluxHttpOutput;
 import com.jitlogic.zorka.core.integ.InfluxTracerOutput;
+import com.jitlogic.zorka.core.integ.OpenTsdbHttpOutput;
+import com.jitlogic.zorka.core.integ.OpenTsdbTracerOutput;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.common.stats.MethodCallStatistic;
 import com.jitlogic.zorka.core.spy.Tracer;
@@ -138,7 +140,7 @@ public class PerfMonLib {
 
 
     public InfluxHttpOutput influxHttp(Map<String,String> conf) {
-        InfluxHttpOutput httpOutput = new InfluxHttpOutput("INFLUX", conf);
+        InfluxHttpOutput httpOutput = new InfluxHttpOutput("INFLUX-HTTP", conf);
         httpOutput.start();
         return httpOutput;
     }
@@ -149,4 +151,17 @@ public class PerfMonLib {
         return new InfluxTracerOutput(symbolRegistry, constAttrs, attrFilter, sampleFilter, httpOutput);
     }
 
+
+    public OpenTsdbHttpOutput openTsdbHttp(Map<String,String> conf) {
+        OpenTsdbHttpOutput httpOutput = new OpenTsdbHttpOutput("OPENTSDB-HTTP", conf);
+        httpOutput.start();
+        return httpOutput;
+    }
+
+
+    public OpenTsdbTracerOutput openTsdbOutput(
+            Map<String,String> config, Map<String,String> constAttrs, PerfAttrFilter attrFilter,
+            PerfSampleFilter sampleFilter, ZorkaSubmitter<String> httpOutput) {
+        return new OpenTsdbTracerOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, httpOutput);
+    }
 }

@@ -16,6 +16,9 @@
 package com.jitlogic.zorka.common.test.support;
 
 
+import org.slf4j.impl.MemoryTrapper;
+import org.slf4j.impl.ZorkaLoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -130,4 +133,12 @@ public class TestUtil {
 
         return props;
     }
+
+    public static void printLogs() {
+        MemoryTrapper mt = (MemoryTrapper)(ZorkaLoggerFactory.getInstance().getTrapper());
+        for (MemoryTrapper.TrapperMessage m : mt.drain()) {
+            System.out.println(m.getLogLevel() + " " + m.getMsg() + " " + m.getE());
+        }
+    }
+
 }

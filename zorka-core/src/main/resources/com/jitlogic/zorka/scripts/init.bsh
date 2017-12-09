@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
@@ -18,10 +18,13 @@
 // This script is initially loaded when agent starts.
 
 zorka.defCfg("tracer", "no");
+
 zorka.defCfg("nagios", "no");
 zorka.defCfg("zabbix", "yes");
 zorka.defCfg("zabbix.active", "yes");
+
 zorka.defCfg("influxdb", "no");
+zorka.defCfg("opentsdb", "no");
 
 if (zorka.boolCfg("zabbix") || zorka.boolCfg("zabbix.active")) {
   zorka.require("zabbix.bsh");
@@ -35,10 +38,8 @@ if (zorka.boolCfg("nagios")) {
   zorka.require("nagios.bsh");
 }
 
-if (zorka.boolCfg("influxdb")) {
-  zorka.require("influxdb.bsh");
+if (zorka.boolCfg("influxdb")||zorka.boolCfg("opentsdb")) {
+  zorka.require("metrics.bsh");
 }
 
-
 zorka.require("jvm.bsh");
-

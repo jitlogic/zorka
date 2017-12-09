@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ * <p/>
+ * This is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ * <p/>
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * <p/>
+ * You should have received a copy of the GNU General Public License
+ * along with this software. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.slf4j.impl;
 
 import org.slf4j.ILoggerFactory;
@@ -12,7 +27,7 @@ import static org.slf4j.spi.LocationAwareLogger.*;
 public class ZorkaLoggerFactory implements ILoggerFactory {
 
     private ConcurrentMap<String, ZorkaTrapperLogger> loggerMap = new ConcurrentHashMap<String, ZorkaTrapperLogger>();
-    private volatile ZorkaTrapper trapper = new MemoryTrapper();
+    private ZorkaTrapper trapper = new MemoryTrapper();
 
     /** Predefined log level names */
     private static final Map<String,Integer> LOG_LEVEL_NAMES;
@@ -20,9 +35,8 @@ public class ZorkaLoggerFactory implements ILoggerFactory {
     /** Log levels configured for various classes and packages */
     private List<LogLevel> logLevels = new ArrayList<LogLevel>();
 
-
+    /** Default log level. */
     private int logLevel = INFO_INT;
-
 
     /**
      * Configures log levels based on properties. All properties
@@ -49,13 +63,23 @@ public class ZorkaLoggerFactory implements ILoggerFactory {
                     }
                 });
 
-        this.logLevels = Collections.unmodifiableList(logLevels);
+        this.logLevels = logLevels;
 
         for (Map.Entry<String,ZorkaTrapperLogger> e : loggerMap.entrySet()) {
             e.getValue().setLogLevel(logLevel(e.getValue().getName()));
         }
     }
 
+    public void shutdown() {
+        if (trapper instanceof MemoryTrapper) {
+            ((MemoryTrapper) trapper).drain();
+        } else {
+            trapper = new MemoryTrapper();
+            // TODO trapper.shutdown() here
+        }
+        loggerMap.clear();
+        logLevel = INFO_INT;
+    }
 
     synchronized List<LogLevel> getLogLevels() {
         return logLevels;

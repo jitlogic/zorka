@@ -1,9 +1,14 @@
-Zorka 1.1.1 (2017-12-??)
+Zorka 1.1.1 (201?-??-??)
 -------------------------
 
-* automatic detection and support script execution;
+* automatic detection of application servers and frameworks;
 * environment variables, system properties, references in zorka.properties;
-* implement InfluxDB integration;
+* description field in zorka metrics (useful for autodiscovered items);
+* InfluxDB integration (HTTP push via perfmon library);
+* use slf4j instead of custom logging API (jarjar moves all classes aside, so no conflicts should occur);
+* OpenTSDB integration (HTTP push via perfmon library);
+* (TBD) Prometheus integration (HTTP push via perfmon library, scrapping mode not yet supported); 
+* (TBD) Graphite integration (HTTP push via perfmon library);
 
 
 Zorka 1.0.16 (2017-11-22)

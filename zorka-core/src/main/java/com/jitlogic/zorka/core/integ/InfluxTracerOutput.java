@@ -32,8 +32,6 @@ public class InfluxTracerOutput implements ZorkaSubmitter<SymbolicRecord> {
 
     private static Logger log = LoggerFactory.getLogger(InfluxTracerOutput.class);
 
-    // TODO wydzielić dedykowany filtr do atrybutów - osobna klasa używana też w innych outputach
-
     private Map<String,String> constAttrMap;
     private PerfAttrFilter attrFilter;
     private PerfSampleFilter filter;
@@ -64,8 +62,9 @@ public class InfluxTracerOutput implements ZorkaSubmitter<SymbolicRecord> {
     public boolean submit(SymbolicRecord sr) {
         if (sr instanceof PerfRecord) {
             PerfRecord pr = (PerfRecord)sr;
-            log.debug("Got data: " + sr);
-            long t = System.currentTimeMillis();
+            if (log.isTraceEnabled()) {
+                log.trace("Got data: " + sr);
+            }
             for (PerfSample ps : pr.getSamples()) {
                 if (filter.matches(ps)) {
                     StringBuilder sb = new StringBuilder(256);
@@ -106,6 +105,6 @@ public class InfluxTracerOutput implements ZorkaSubmitter<SymbolicRecord> {
                 }
             }
         }
-        return false;
+        return true;
     }
 }

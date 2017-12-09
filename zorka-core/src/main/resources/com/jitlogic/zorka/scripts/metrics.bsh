@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  *
  * ZORKA is free software. You can redistribute it and/or modify it under the
@@ -21,18 +21,21 @@ zorka.require("tracer.bsh");
 
 __metrics() {
 
-  zorka.defCfg("metrics", "no");
-
-  if (!zorka.boolCfg("metrics")) {
-     return this;
-  }
+  zorka.logInfo("Enabling metrics collection.");
 
   _interval = zorka.intCfg("metrics.interval", 10000);
   _delay = zorka.intCfg("metrics.delay", 10000);
 
-  // Set up basic metrics collection for ZorkaStats
+  _constAttrs = zorka.mapCfg("metrics.attr.set");
+  _attrFilter = perfmon.attrFilter(_constAttrs,
+      zorka.listCfg("metrics.attr.include"),
+      zorka.listCfg("metrics.attr.exclude"));
+  _sampleFilter = perfmon.sampleFilter(
+      zorka.mapCfg("metrics.filter.include"),
+      zorka.mapCfg("metrics.filter.exclude"));
 
-  zs = perfmon.scanner("ZORKA_STATS",
+  // Set up basic metrics collection for all ZorkaStats
+  _zorkaStatsScanner = perfmon.scanner("ZORKA_STATS",
     zorka.query("java", "zorka:type=ZorkaStats,*", "type", "name")
       .listAs("**", "section").listAs("**", "tag").get("calls")
       .metric(perfmon.timedDelta("zorka", "calls", "Calls", "calls/min").multiply(60)),
@@ -46,12 +49,36 @@ __metrics() {
       .listAs("**", "section").listAs("**", "tag")
       .metric(perfmon.rate("zorka", "avg", "Average time", "s", "time", "calls").multiply(0.001)));
 
-  zs.setAttachResults(true);
+  _zorkaStatsScanner.setAttachResults(true);
+  zorka.schedule(_zorkaStatsScanner, _interval, _delay);
 
-  zorka.schedule(zs, _interval, _delay);
+  // Configure InfluxDB output (if enabled)
+  if (zorka.boolCfg("influxdb")) {
+    zorka.defCfg("influxdb.url", "http://localhost:8086");
+    zorka.defCfg("influxdb.db", "zorka");
+    zorka.logInfo("Enabling InfluxDB: sending data to " + zorka.stringCfg("influxdb.url"));
+    httpOutput = perfmon.influxHttp(zorka.mapCfg("influxdb"));
+    influxOutput = perfmon.influxOutput(_constAttrs, _attrFilter, _sampleFilter, _httpOutput);
+    tracer.output(influxOutput);
+  }
+
+  // Configure OpenTSDB output (if enabled)
+  if (zorka.boolCfg("opentsdb")) {
+    zorka.defCfg("opentsdb.url", "http://localhost:4242");
+    zorka.logInfo("Enabling OpenTSDB: sending data to " + zorka.stringCfg("opentsdb.url"));
+    _openTsdbCfg = zorka.mapCfg("opentsdb");
+    openTsdbHttp = perfmon.openTsdbHttp(_openTsdbCfg);
+    openTsdbOutput = perfmon.openTsdbOutput(_openTsdbCfg, _constAttrs, _attrFilter, _sampleFilter, openTsdbHttp);
+    tracer.output(openTsdbOutput);
+  }
 
   return this;
 }
 
-metrics = __metrics();
+zorka.defCfg("influxdb", "no");
+zorka.defCfg("opentsdb", "no");
+
+zorka.defCfg("metrics", zorka.boolCfg("influxdb")||zorka.boolCfg("opentsdb"));
+
+metrics = zorka.boolCfg("metrics") ? __metrics() : null;
 
