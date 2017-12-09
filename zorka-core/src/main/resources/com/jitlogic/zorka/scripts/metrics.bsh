@@ -53,6 +53,7 @@ __metrics() {
   zorka.schedule(_zorkaStatsScanner, _interval, _delay);
 
   // Configure InfluxDB output (if enabled)
+  zorka.defCfg("influxdb", "no");
   if (zorka.boolCfg("influxdb")) {
     zorka.defCfg("influxdb.url", "http://localhost:8086");
     zorka.defCfg("influxdb.db", "zorka");
@@ -63,6 +64,7 @@ __metrics() {
   }
 
   // Configure OpenTSDB output (if enabled)
+  zorka.defCfg("opentsdb", "no");
   if (zorka.boolCfg("opentsdb")) {
     zorka.defCfg("opentsdb.url", "http://localhost:4242");
     zorka.logInfo("Enabling OpenTSDB: sending data to " + zorka.stringCfg("opentsdb.url"));
@@ -70,6 +72,18 @@ __metrics() {
     openTsdbHttp = perfmon.openTsdbHttp(_openTsdbCfg);
     openTsdbOutput = perfmon.openTsdbOutput(_openTsdbCfg, _constAttrs, _attrFilter, _sampleFilter, openTsdbHttp);
     tracer.output(openTsdbOutput);
+  }
+
+  // Configure graphite integration
+  zorka.defCfg("graphite", "no");
+  if (zorka.boolCfg("graphite")) {
+    zorka.defCfg("graphite.addr", "127.0.0.1:2003");
+    zorka.defCfg("graphite.prefix", "zorka.${&zorka.hostname}");
+    zorka.logInfo("Enabling Graphite (TCP): sending data to:" + zorka.stringCfg("graphite.addr"));
+    _graphiteCfg = zorka.mapCfg("graphite");
+    graphiteTcp = perfmon.tcpTextOutput("GRAPHITE-TCP", _graphiteCfg);
+    graphiteOutput = perfmon.graphiteTextOutput(_graphiteCfg, _constAttrs, _attrFilter, _sampleFilter, graphiteTcp);
+    tracer.output(graphiteOutput);
   }
 
   return this;

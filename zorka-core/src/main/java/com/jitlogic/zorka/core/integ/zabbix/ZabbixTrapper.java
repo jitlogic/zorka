@@ -131,6 +131,7 @@ public class ZabbixTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
 
     @Override
     protected void process(List<String> msgs) {
+        // TODO use TcpTextOutput instead of manual implementation
         for (String msg : msgs) {
             Socket socket = null;
             try {

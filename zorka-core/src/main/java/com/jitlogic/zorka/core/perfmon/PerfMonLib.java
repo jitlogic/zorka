@@ -17,10 +17,7 @@
 package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
-import com.jitlogic.zorka.core.integ.InfluxHttpOutput;
-import com.jitlogic.zorka.core.integ.InfluxTracerOutput;
-import com.jitlogic.zorka.core.integ.OpenTsdbHttpOutput;
-import com.jitlogic.zorka.core.integ.OpenTsdbTracerOutput;
+import com.jitlogic.zorka.core.integ.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.common.stats.MethodCallStatistic;
 import com.jitlogic.zorka.core.spy.Tracer;
@@ -164,4 +161,18 @@ public class PerfMonLib {
             PerfSampleFilter sampleFilter, ZorkaSubmitter<String> httpOutput) {
         return new OpenTsdbTracerOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, httpOutput);
     }
+
+
+    public TcpTextOutput tcpTextOutput(String label, Map<String,String> config) {
+        TcpTextOutput tcpOutput = new TcpTextOutput(label, config);
+        tcpOutput.start();
+        return tcpOutput;
+    }
+
+    public GraphiteTextTracerOutput graphiteTextOutput(Map<String,String> config,
+                                                       Map<String,String> constAttrs, PerfAttrFilter attrFilter,
+                                                       PerfSampleFilter sampleFilter, ZorkaSubmitter<String> tcpOutput) {
+        return new GraphiteTextTracerOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, tcpOutput);
+    }
+
 }

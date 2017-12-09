@@ -16,8 +16,17 @@
 
 package com.jitlogic.zorka.common;
 
+/**
+ * Represents all components that accept and process data items submitted ti them.
+ * @param <T> Item class
+ */
 public interface ZorkaSubmitter<T> {
 
+    /**
+     * Accepts and processes data.
+     * @param item submitted data item
+     * @return true if item was sucessfully submitted
+     */
     boolean submit(T item);
 
 }

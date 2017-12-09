@@ -74,7 +74,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
     private long interval = 0l ;
 
     public ZorkaAsyncThread(String name) {
-        this(name, 256, 1);
+        this(name, 256, 2);
     }
 
     /**

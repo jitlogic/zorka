@@ -7,8 +7,7 @@ Zorka 1.1.1 (201?-??-??)
 * InfluxDB integration (HTTP push via perfmon library);
 * use slf4j instead of custom logging API (jarjar moves all classes aside, so no conflicts should occur);
 * OpenTSDB integration (HTTP push via perfmon library);
-* (TBD) Prometheus integration (HTTP push via perfmon library, scrapping mode not yet supported); 
-* (TBD) Graphite integration (HTTP push via perfmon library);
+* Graphite integration (TCP/pickle push via perfmon library);
 
 
 Zorka 1.0.16 (2017-11-22)

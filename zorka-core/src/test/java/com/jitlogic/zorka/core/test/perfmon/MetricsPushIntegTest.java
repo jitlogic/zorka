@@ -16,6 +16,7 @@
  */
 package com.jitlogic.zorka.core.test.perfmon;
 
+import com.jitlogic.zorka.common.test.support.TestUtil;
 import com.jitlogic.zorka.core.perfmon.PerfAttrFilter;
 import com.jitlogic.zorka.core.perfmon.PerfSampleFilter;
 import com.jitlogic.zorka.core.test.support.TestStringOutput;
@@ -59,6 +60,7 @@ public class MetricsPushIntegTest extends ZorkaFixture {
         zorka.require("ldap.bsh");
         zorka.require("apache/catalina.bsh");
         zorka.require("metrics.bsh");
+        TestUtil.printLogs();
         assertNotNull(zorkaAgent.get("metrics")); // Some function to check if scripts loaded properly
     }
 
@@ -86,6 +88,19 @@ public class MetricsPushIntegTest extends ZorkaFixture {
         taskScheduler.runCycle("*");
 
         //System.out.println(httpOutput);
+        assertEquals("Only two sets of metrics should be visible.",
+                1, httpOutput.getResults().size());
+        // TODO check results in more detail: json schema, filtering (no diagnostics), attrs (no type), etc.
+    }
+
+    @Test
+    public void testSingleGraphiteCycleWithZorkaStats() {
+        configProperties.setProperty("metrics", "yes");
+        runScripts();
+        tracer.output(perfmon.graphiteTextOutput(zorka.mapCfg("graphite"),
+                cattr, attrFilter, sampleFilter, httpOutput));
+        taskScheduler.runCycle("*");
+        System.out.println(httpOutput);
         assertEquals("Only two sets of metrics should be visible.",
                 1, httpOutput.getResults().size());
         // TODO check results in more detail: json schema, filtering (no diagnostics), attrs (no type), etc.
