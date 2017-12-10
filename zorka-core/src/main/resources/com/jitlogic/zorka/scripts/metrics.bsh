@@ -74,7 +74,7 @@ __metrics() {
     tracer.output(openTsdbOutput);
   }
 
-  // Configure graphite integration
+  // Configure Graphite integration
   zorka.defCfg("graphite", "no");
   if (zorka.boolCfg("graphite")) {
     zorka.defCfg("graphite.addr", "127.0.0.1:2003");
@@ -86,13 +86,27 @@ __metrics() {
     tracer.output(graphiteOutput);
   }
 
+  // Configure Prometheus push gateway
+  zorka.defCfg("prometheus.push", "no");
+  if (zorka.boolCfg("prometheus.push")) {
+    zorka.defCfg("prometheus.push.url", "http://localhost:9191");
+    zorka.logInfo("Enabling Prometheus Push Gateway: sending data to:"
+      + zorka.stringCfg("prometheus.push.url"));
+    _promPushCfg = zorka.mapCfg("prometheus.push");
+    promPushHttp = perfmon.httpTextOutput("PROMETHEUS-PUSH-HTTP", _promPushCfg, null, null);
+    promPushOutput = perfmon.prometheusPushOutput(_promPushCfg, _constAttrs, _attrFilter, _sampleFilter, promPushHttp);
+    tracer.output(promPushOutput);
+  }
+
   return this;
 }
 
-zorka.defCfg("influxdb", "no");
-zorka.defCfg("opentsdb", "no");
 
-zorka.defCfg("metrics", zorka.boolCfg("influxdb")||zorka.boolCfg("opentsdb"));
+zorka.defCfg("metrics",
+  zorka.boolCfg("influxdb") ||
+  zorka.boolCfg("opentsdb") ||
+  zorka.boolCfg("graphite") ||
+  zorka.boolCfg("prometheus.push"));
 
 metrics = zorka.boolCfg("metrics") ? __metrics() : null;
 

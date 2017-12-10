@@ -163,16 +163,31 @@ public class PerfMonLib {
     }
 
 
-    public TcpTextOutput tcpTextOutput(String label, Map<String,String> config) {
-        TcpTextOutput tcpOutput = new TcpTextOutput(label, config);
+    public TcpTextOutput tcpTextOutput(String name, Map<String,String> config) {
+        TcpTextOutput tcpOutput = new TcpTextOutput(name, config);
         tcpOutput.start();
         return tcpOutput;
     }
 
-    public GraphiteTextTracerOutput graphiteTextOutput(Map<String,String> config,
-                                                       Map<String,String> constAttrs, PerfAttrFilter attrFilter,
-                                                       PerfSampleFilter sampleFilter, ZorkaSubmitter<String> tcpOutput) {
+    public HttpTextOutput httpTextOutput(String name, Map<String,String> config, Map<String,String> urlParams, Map<String,String> headers) {
+        HttpTextOutput httpOutput = new HttpTextOutput(name, config, urlParams, headers);
+        httpOutput.start();
+        return httpOutput;
+    }
+
+    public GraphiteTextTracerOutput graphiteTextOutput(
+            Map<String,String> config,
+            Map<String,String> constAttrs, PerfAttrFilter attrFilter,
+            PerfSampleFilter sampleFilter, ZorkaSubmitter<String> tcpOutput) {
         return new GraphiteTextTracerOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, tcpOutput);
     }
 
+
+
+    public PrometheusPushTracerOutput prometheusPushOutput(
+            Map<String,String> config,
+            Map<String,String> constAttrs, PerfAttrFilter attrFilter,
+            PerfSampleFilter sampleFilter, ZorkaSubmitter<String> tcpOutput) {
+        return new PrometheusPushTracerOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, tcpOutput);
+    }
 }

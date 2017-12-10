@@ -878,4 +878,19 @@ public class ZorkaUtil {
         }
         return bos.toByteArray();
     }
+
+    public static String urlEncode(String s) {
+
+        if (s == null || s.length() == 0) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            sb.append(Character.isJavaIdentifierPart(c) ? ""+c : "%"+Integer.toHexString((int)c));
+        }
+        return sb.toString();
+    }
+
 }

@@ -60,7 +60,7 @@ public class MetricsPushIntegTest extends ZorkaFixture {
         zorka.require("ldap.bsh");
         zorka.require("apache/catalina.bsh");
         zorka.require("metrics.bsh");
-        TestUtil.printLogs();
+        //TestUtil.printLogs();
         assertNotNull(zorkaAgent.get("metrics")); // Some function to check if scripts loaded properly
     }
 
@@ -106,4 +106,17 @@ public class MetricsPushIntegTest extends ZorkaFixture {
         // TODO check results in more detail: json schema, filtering (no diagnostics), attrs (no type), etc.
     }
 
+    @Test
+    public void testSinglePrometheusPushCycleWithZorkaStats() {
+        configProperties.setProperty("metrics", "yes");
+        runScripts();
+        tracer.output(perfmon.prometheusPushOutput(zorka.mapCfg("prometheus.push"),
+                cattr, attrFilter, sampleFilter, httpOutput));
+        taskScheduler.runCycle("*");
+        System.out.println(httpOutput);
+        assertEquals("Only two sets of metrics should be visible.",
+                1, httpOutput.getResults().size());
+        // TODO check results in more detail: json schema, filtering (no diagnostics), attrs (no type), etc.
+
+    }
 }
