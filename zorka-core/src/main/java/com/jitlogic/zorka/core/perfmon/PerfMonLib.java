@@ -136,38 +136,12 @@ public class PerfMonLib {
     }
 
 
-    public InfluxHttpOutput influxHttp(Map<String,String> conf) {
-        InfluxHttpOutput httpOutput = new InfluxHttpOutput("INFLUX-HTTP", conf);
-        httpOutput.start();
-        return httpOutput;
-    }
-
-
-    public InfluxTracerOutput influxOutput(Map<String,String> constAttrs, PerfAttrFilter attrFilter,
-                                           PerfSampleFilter sampleFilter, ZorkaSubmitter<String> httpOutput) {
-        return new InfluxTracerOutput(symbolRegistry, constAttrs, attrFilter, sampleFilter, httpOutput);
-    }
-
-
-    public OpenTsdbHttpOutput openTsdbHttp(Map<String,String> conf) {
-        OpenTsdbHttpOutput httpOutput = new OpenTsdbHttpOutput("OPENTSDB-HTTP", conf);
-        httpOutput.start();
-        return httpOutput;
-    }
-
-
-    public OpenTsdbTracerOutput openTsdbOutput(
-            Map<String,String> config, Map<String,String> constAttrs, PerfAttrFilter attrFilter,
-            PerfSampleFilter sampleFilter, ZorkaSubmitter<String> httpOutput) {
-        return new OpenTsdbTracerOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, httpOutput);
-    }
-
-
     public TcpTextOutput tcpTextOutput(String name, Map<String,String> config) {
         TcpTextOutput tcpOutput = new TcpTextOutput(name, config);
         tcpOutput.start();
         return tcpOutput;
     }
+
 
     public HttpTextOutput httpTextOutput(String name, Map<String,String> config, Map<String,String> urlParams, Map<String,String> headers) {
         HttpTextOutput httpOutput = new HttpTextOutput(name, config, urlParams, headers);
@@ -175,19 +149,33 @@ public class PerfMonLib {
         return httpOutput;
     }
 
-    public GraphiteTextTracerOutput graphiteTextOutput(
-            Map<String,String> config,
-            Map<String,String> constAttrs, PerfAttrFilter attrFilter,
-            PerfSampleFilter sampleFilter, ZorkaSubmitter<String> tcpOutput) {
-        return new GraphiteTextTracerOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, tcpOutput);
+
+    public InfluxPushOutput influxPushOutput(
+            Map<String,String> config, Map<String,String> constAttrs, PerfAttrFilter attrFilter,
+            PerfSampleFilter sampleFilter, ZorkaSubmitter<String> httpOutput) {
+        return new InfluxPushOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, httpOutput);
     }
 
 
+    public OpenTsdbPushOutput tsdbPushOutput(
+            Map<String,String> config, Map<String,String> constAttrs, PerfAttrFilter attrFilter,
+            PerfSampleFilter sampleFilter, ZorkaSubmitter<String> httpOutput) {
+        return new OpenTsdbPushOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, httpOutput);
+    }
 
-    public PrometheusPushTracerOutput prometheusPushOutput(
+
+    public GraphitePushOutput graphitePushOutput(
             Map<String,String> config,
             Map<String,String> constAttrs, PerfAttrFilter attrFilter,
             PerfSampleFilter sampleFilter, ZorkaSubmitter<String> tcpOutput) {
-        return new PrometheusPushTracerOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, tcpOutput);
+        return new GraphitePushOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, tcpOutput);
+    }
+
+
+    public PrometheusPushOutput prometheusPushOutput(
+            Map<String,String> config,
+            Map<String,String> constAttrs, PerfAttrFilter attrFilter,
+            PerfSampleFilter sampleFilter, ZorkaSubmitter<String> tcpOutput) {
+        return new PrometheusPushOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, tcpOutput);
     }
 }
