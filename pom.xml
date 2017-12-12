@@ -63,6 +63,8 @@
     </repositories>
 
     <modules>
+        <module>zorka-bsh-core</module>
+        <module>zorka-bsh-shell</module>
         <module>zorka-common</module>
         <module>zorka-common-test</module>
         <module>zorka-core</module>
