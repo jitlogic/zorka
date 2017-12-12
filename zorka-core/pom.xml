@@ -20,9 +20,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.jitlogic.contrib</groupId>
-            <artifactId>libsnmp</artifactId>
-            <version>${libsnmp.version}</version>
+            <groupId>com.jitlogic.zorka</groupId>
+            <artifactId>zorka-snmp</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.fressian</groupId>

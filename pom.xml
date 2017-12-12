@@ -34,12 +34,10 @@
         <jetty.version>6.1.26</jetty.version>
         <json.version>1.2</json.version>
         <junit.version>4.11</junit.version>
-        <libsnmp.version>0.0.1</libsnmp.version>
         <logback.version>1.1.2</logback.version>
         <mapdb.version>0.9.8</mapdb.version>
         <parboiled.version>1.1.6</parboiled.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <zoola.version>0.1.0</zoola.version>
     </properties>
 
     <build>
@@ -54,17 +52,10 @@
         </pluginManagement>
     </build>
 
-    <repositories>
-        <repository>
-            <id>zorka-repo</id>
-            <name>Artifacts for Zorka agent</name>
-            <url>http://zorka.io/repo</url>
-        </repository>
-    </repositories>
-
     <modules>
         <module>zorka-bsh-core</module>
         <module>zorka-bsh-shell</module>
+        <module>zorka-snmp</module>
         <module>zorka-common</module>
         <module>zorka-common-test</module>
         <module>zorka-core</module>
