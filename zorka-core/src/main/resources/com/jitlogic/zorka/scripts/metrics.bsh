@@ -58,8 +58,10 @@ __metrics() {
     zorka.defCfg("influxdb.db", "zorka");
     zorka.logInfo("Enabling InfluxDB: sending data to " + zorka.stringCfg("influxdb.url"));
     cfg = zorka.mapCfg("influxdb");
-    params = util.map("db", cfg.get("db"));
+    params = util.map("db", cfg.get("db"), "precision", "ms");
     url = cfg.get("url"); url += (url.endsWith("/") ? "" : "/") + "write"; cfg.put("url", url);
+    if (cfg.get("user") != null) params.put("u", cfg.get("user"));
+    if (cfg.get("pass") != null) params.put("p", cfg.get("pass"));
     httpOut = perfmon.httpTextOutput("INFLUXDB-PUSH-HTTP", cfg, params, null);
     influxOutput = perfmon.influxPushOutput(cfg, _constAttrs, _attrFilter, _sampleFilter, httpOut);
     tracer.output(influxOutput);
@@ -83,7 +85,7 @@ __metrics() {
   // Configure Graphite integration
   if (zorka.boolCfg("graphite")) {
     zorka.defCfg("graphite.addr", "127.0.0.1:2003");
-    zorka.defCfg("graphite.prefix", "zorka.${&zorka.hostname}");
+    zorka.defCfg("graphite.prefix", "zorka");
     zorka.logInfo("Enabling Graphite (TCP): sending data to:" + zorka.stringCfg("graphite.addr"));
     cfg = zorka.mapCfg("graphite");
     tcpOut = perfmon.tcpTextOutput("GRAPHITE-PUSH-TCP", cfg);

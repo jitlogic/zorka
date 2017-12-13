@@ -36,6 +36,6 @@ public class InfluxPushOutput extends AbstractMetricPushOutput {
         rec.append(" value=");
         rec.append(val);
         rec.append(' ');
-        rec.append(tstamp * 1000000);
+        rec.append(tstamp);
     }
 }

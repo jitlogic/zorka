@@ -8,6 +8,8 @@ Zorka 1.1.1 (201?-??-??)
 * use slf4j instead of custom logging API (jarjar moves all classes aside, so no conflicts should occur);
 * OpenTSDB integration (HTTP push via perfmon library);
 * Graphite integration (TCP/pickle push via perfmon library);
+* Prometheus integration (via Push Gateway); 
+* include BSH and libsnmp into agent codebase;
 
 
 Zorka 1.0.16 (2017-11-22)
