@@ -24,6 +24,7 @@ if (zorka.boolCfg("tracer")) {
     tracer.exclude(
         "com.sun.activation.registries.MailcapTokenizer",
         "com.sun.el.**",
+        "com.sun.jndi.ldap.LdapAttribute",
         "com.sun.naming.internal.**",
         "com.sun.media.jai.**",
 
@@ -39,9 +40,12 @@ if (zorka.boolCfg("tracer")) {
         "javax.ws.**",
 
         "javax.naming.Binding",
-        "javax.naming.NameImpl",
         "javax.naming.CompoundName",
+        "javax.naming.CompositeName",
+        "javax.naming.NameImpl",
         "javax.naming.NamingException",
+        "javax.naming.directory.BasicAttribute**",
+        "javax.naming.ldap.Rdn",
 
         "org.xml.sax.**",
 

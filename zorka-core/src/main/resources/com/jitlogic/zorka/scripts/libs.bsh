@@ -26,8 +26,12 @@ if (zorka.boolCfg("tracer")) {
         "ch.qos.**",
         "com.caucho.hessian.io.**",
         "com.ctc.wstx.**",
+        "com.hazelcast.impl.ThreadContext",
+        "com.hazelcast.nio.**",
+        "com.hazelcast.util.Clock",
         "com.sun.pdfview.**",
         "com.sun.xml.fastinfoset.**",
+        "com.yahoo.platform.yui.javascript.**",
         //"com.itextpdf.**",
         //"com.lowagie.text.**",
         "EDU.oswego.cs.dl.util.concurrent.**",
@@ -40,6 +44,7 @@ if (zorka.boolCfg("tracer")) {
         "net.arnx.jsonic.IntegerConverter",
         "net.arnx.jsonic.PlainConverter",
         "net.arnx.jsonic.io.CharSequenceInputSource",
+        "net.bull.javamelody.**",
         "net.java.ao.**",
         "net.minidev.json.**",
         "net.sf.jasperreports.engine.**",
@@ -73,6 +78,7 @@ if (zorka.boolCfg("tracer")) {
         "org.slf4j.**",
         "org.stringtemplate.**",
         "org.xml.sax.**",
+        "org.xmlpull.mxp1.MXParser",
         "serp.**"
     );
 }

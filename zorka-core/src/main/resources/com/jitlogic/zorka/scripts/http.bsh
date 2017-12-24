@@ -319,7 +319,7 @@ __http() {
   }
 
   avg1(attr, tag) {
-    return zorka.rate("java", _mbean, attr, tag, "time", "calls", "AVG5");
+    return zorka.rate("java", _mbean, attr, tag, "time", "calls", "AVG1");
   }
 
   avg5(attr, tag) {

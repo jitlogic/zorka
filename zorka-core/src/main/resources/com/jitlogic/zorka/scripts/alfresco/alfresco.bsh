@@ -32,14 +32,58 @@ zorka.require(
 );
 
 
-// Tracer tuning
-if (zorka.boolCfg("tracer")) {
-    tracer.exclude(
+__alfresco() {
+
+    // Default values for ALFRESCO tracer options
+    zorka.defCfg("alfresco.batch.trace", zorka.stringCfg("tracer", "no"));
+    zorka.defCfg("alfresco.batch.trace.time", zorka.longCfg("tracer.min.trace.time"));
+    zorka.defCfg("alfresco.batch.import.time", zorka.longCfg("tracer.min.trace.time"));
+
+    _mbean = "zorka:type=ZorkaStats,name=AlfrescoBatches";
+    _trace = zorka.boolCfg("alfresco.batch.trace");
+    _traceTime = zorka.longCfg("alfresco.batch.trace.time");
+    _importTime = zorka.longCfg("alfresco.batch.import.time");
+
+
+    spy.add(spy.instrument("ALFRESCO_BATCH")
+       .onEnter(spy.fetchArg("THIS", 0),
+           _trace ? spy.subchain(
+               tracer.begin("AF_BATCH", _traceTime),
+               tracer.formatAttr("WORKER", "${THIS}")
+           ) : null)
+       .onError(_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
+       .onSubmit(spy.zorkaStats("java", _mbean, "stats", "ALL"))
+       .include(
+           spy.byInterfaceAndMethod("org.alfresco.repo.batch.Batch**", "process")
+        ));
+
+
+    spy.add(spy.instrument("ALFRESCO_IMPORT_FILE")
+       .onEnter(spy.fetchArg("NODE_REF", 1),
+           _trace ? spy.subchain(
+               tracer.begin("AF_IMP_FILE", _importTime),
+               tracer.formatAttr("NODE", "${NODE_REF}")
+           ) : null)
+       .onError(_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
+       .onSubmit(spy.zorkaStats("java", _mbean, "stats", "importFile"))
+       .include(spy.byMethod(0, "org.alfresco.repo.bulkimport.impl.AbstractNodeImporter", "importImportableItemFile", null)));
+
+
+    // Tracer tuning
+    if (zorka.boolCfg("tracer")) {
+      tracer.exclude(
         "org.gagravarr.**",
         "org.alfresco.httpclient.HttpClientFact**/getParameter",
         "org.alfresco.ibatis.SerializableTypeHandler/getResult",
+        "org.alfresco.opencmis.CMISUtil**Stream",
+        "org.alfresco.opencmis.dictionary.AbstractTypeDefinitionWrapper/getTypeDefinition",
+        "org.alfresco.opencmis.dictionary.QNameFilterImpl/isExcluded",
+        "org.alfresco.opencmis.mapping.CMISMapping",
+        "org.alfresco.repo.audit.model.AuditApplication/buildPath",
+        "org.alfresco.repo.bulkimport.Importable**/contentFileExists",
+        "org.alfresco.repo.bulkimport.MetadataLoad**/addProperty",
         "org.alfresco.repo.cache.DefaultSimpleCache",
-        "org.alfresco.repo.cache.TransactionStats",
+        "org.alfresco.repo.cache.TransactionStat**",
         "org.alfresco.repo.cache.TransactionalCach**",
         "org.alfresco.repo.cache.lookup.EntityLookupCache",
         "org.alfresco.repo.content.AbstractContentRead**",
@@ -47,8 +91,9 @@ if (zorka.boolCfg("tracer")) {
         "org.alfresco.repo.content.metadata.MediaTypeDisablingDocumentSelector/select",
         "org.alfresco.repo.content.transform.DoubleMap",
         "org.alfresco.repo.dictionary.M2**",
-        "org.alfresco.repo.dictionary.JiBX**",
         "org.alfresco.repo.dict**/get*",
+        "org.alfresco.repo.dictionary.JiBX**",
+        "org.alfresco.repo.dictionary.constraint.AbstractConstraint/evaluate",
         "org.alfresco.repo.dictionary.DictionaryComponent/isSubclass",
         "org.alfresco.repo.dom**/get*",
         "org.alfresco.repo.dom**/compare*",
@@ -70,16 +115,25 @@ if (zorka.boolCfg("tracer")) {
         "org.alfresco.repo.service.ServiceDescriptorRegistry/getService",
         "org.alfresco.repo.service.StoreRedirectorProxyFact**/invoke",
         "org.alfresco.service.cmr.repository.datatype.TypeConverter",
+        "org.alfresco.solr.query.*Position",
+        "org.alfresco.solr.query.**Scorer/nex**",
+        "org.alfresco.solr.query.Abstract**/doc**",
+        "org.alfresco.solr.query.CachingTermPositions",
+        "org.alfresco.solr.query.DocValuesCach**/get",
+        "org.alfresco.solr.query.HybridBitSet/get",
         "org.alfresco.repo.tagging.TagScopePropertyMethodInterceptor/invoke",
         "org.alfresco.repo.template.QNameAwareObjectWrapp**",
         "org.alfresco.repo.tenant.MultiTServiceImpl",
+        "org.alfresco.repo.tenant.TenantContextHolder",
         "org.alfresco.repo.transaction.TransactionalResourceHelper/getMap",
+        "org.alfresco.repo.web.scripts.solr.SOLRSerialize**",
         "org.alfresco.service.namespace.QName",
         "org.alfresco.service.namespace.QNameMap",
         "org.alfresco.solr.tracker.TrackerStat**",
         "org.alfresco.traitextender.RouteExtensions",
         "org.alfresco.traitextender.ExtenderImpl/getExtension",
         "org.alfresco.util.EqualsHelper",
+        "org.alfresco.util.ISO9075/encodeSQL",
         "org.alfresco.util.LockHelper",
         "org.alfresco.util.ParameterCheck/mandatory",
         "org.alfresco.util.ValueProtectingMap",
@@ -88,6 +142,11 @@ if (zorka.boolCfg("tracer")) {
         "org.alfresco.util.transaction.TransactionSupportUtil/getResource",
         "org.alfresco.web.config.forms.NodeMetadataBasedEvaluator",
         "org.alfresco.web.config.forms.TaskTypeEvaluator/applies"
-    );
+      );
+    }
+
+    return this;
 }
+
+alfresco = __alfresco();
 
