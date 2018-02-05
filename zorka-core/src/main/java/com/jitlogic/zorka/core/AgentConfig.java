@@ -28,6 +28,8 @@ import org.slf4j.impl.ZorkaLoggerFactory;
 import org.slf4j.impl.ZorkaTrapper;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 public class AgentConfig extends ZorkaConfig {
@@ -38,6 +40,8 @@ public class AgentConfig extends ZorkaConfig {
     public static final String PROP_SCRIPTS_DIR = "zorka.scripts.dir";
 
     public static final String PROP_PROFILE_DIR = "zorka.profile.dir";
+
+    public static boolean persistent = true;
 
     private String agentHome;
 
@@ -162,6 +166,27 @@ public class AgentConfig extends ZorkaConfig {
         }
     }
 
+    public void writeCfg(String key, Object val) {
+        super.writeCfg(key, val);
+        if (persistent) {
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(new File(agentHome, "zorka.properties"), true);
+                String s = "\n" + key + " = " + val + "\n";
+                fos.write(s.getBytes());
+            } catch (IOException e) {
+                log.error("I/O error when updating zorka.properties file.");
+            } finally {
+                if (fos != null) {
+                    try {
+                        fos.close();
+                    } catch (IOException e) {
+                        log.error("Error closing zorka.properties.", e);
+                    }
+                }
+            }
+        }
+    }
 
     @Override
     protected void markError(String msg, Throwable e) {

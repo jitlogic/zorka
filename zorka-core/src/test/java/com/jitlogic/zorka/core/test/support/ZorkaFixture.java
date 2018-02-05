@@ -17,6 +17,7 @@ package com.jitlogic.zorka.core.test.support;
 
 import com.jitlogic.zorka.common.test.support.CommonFixture;
 import com.jitlogic.zorka.common.test.support.TestJmx;
+import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.*;
 import com.jitlogic.zorka.core.integ.NagiosLib;
@@ -149,5 +150,31 @@ public class ZorkaFixture extends CommonFixture {
 
         return bean;
     }
+
+    public int sid(String symbol) {
+        return symbols.symbolId(symbol);
+    }
+
+    public TraceRecord tr(String className, String methodName, String methodSignature,
+                          long calls, long errors, int flags, long time,
+                          TraceRecord... children) {
+
+        TraceRecord tr = new TraceRecord(null);
+        tr.setClassId(sid(className));
+        tr.setMethodId(sid(methodName));
+        tr.setSignatureId(sid(methodSignature));
+        tr.setCalls(calls);
+        tr.setErrors(errors);
+        tr.setFlags(flags);
+        tr.setTime(time);
+
+        for (TraceRecord child : children) {
+            child.setParent(tr);
+            tr.addChild(child);
+        }
+
+        return tr;
+    }
+
 
 }

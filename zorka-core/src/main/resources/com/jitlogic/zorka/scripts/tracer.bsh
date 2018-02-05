@@ -72,18 +72,19 @@ if (zorka.boolCfg("tracer")) {
 
   if (zorka.boolCfg("tracer.net") && "cbor".equalsIgnoreCase(zorka.stringCfg("tracer.net.protocol").trim())) {
     zorka.logInfo("Configuring CBOR output for tracer ...");
-    output = tracer.toCbor(
-      zorka.stringCfg("tracer.net.url", "http://127.0.0.1:8640/"),
-      zorka.stringCfg("zorka.agent.uuid"),
-      zorka.stringCfg("tracer.net.authkey"),
-      zorka.stringCfg("zorka.agent.host", zorka.getHostname()),
-      zorka.stringCfg("zorka.agent.app", "MYAPP"),
-      zorka.stringCfg("zorka.agent.env", "DEV"),
-      zorka.intCfg("tracer.net.qlen", 64),
-      zorka.intCfg("tracer.net.retries", 10),
-      zorka.intCfg("tracer.net.retry.time", 125L),
-      zorka.intCfg("tracer.net.retry.exp", 2L),
-      zorka.intCfg("tracer.net.timeout", 60000));
+    cfg = zorka.mapCfg("tracer.net",
+            util.map(
+              "hostname", zorka.stringCfg("zorka.hostname", zorka.getHostname()),
+              "app.name", "DSC",
+              "env.name", "TST",
+              "auth.key", "zorka",
+              "http.url", "http://zico:8640",
+              "http.retries", "10",
+              "http.retry.time", "125",
+              "http.retry.exp", "2",
+              "http.timeout", "60000",
+              "qlen", 64));
+    output = tracer.toCbor(cfg);
     output.start();
     tracer.output(output);
   }

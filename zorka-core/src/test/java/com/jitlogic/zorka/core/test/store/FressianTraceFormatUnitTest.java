@@ -20,6 +20,7 @@ import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.fressian.FressianReader;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -34,10 +35,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class FressianTraceFormatUnitTest {
+public class FressianTraceFormatUnitTest extends ZorkaFixture {
 
-    ByteArrayOutputStream output = new ByteArrayOutputStream();
-    private SymbolRegistry symbols = new SymbolRegistry();
+    private ByteArrayOutputStream output = new ByteArrayOutputStream();
     private MetricsRegistry metrics = new MetricsRegistry();
     private FressianTraceWriter writer;
 
@@ -58,20 +58,6 @@ public class FressianTraceFormatUnitTest {
         FileOutputStream fos = new FileOutputStream(path);
         fos.write(output.toByteArray());
         fos.close();
-    }
-
-    private int sid(String symbol) {
-        return symbols.symbolId(symbol);
-    }
-
-
-    private Symbol sym(String name) {
-        return new Symbol(symbols.symbolId(name), name);
-    }
-
-
-    private Symbol sym(int id, String name) {
-        return new Symbol(id, name);
     }
 
 
@@ -147,26 +133,6 @@ public class FressianTraceFormatUnitTest {
         assertThat(m2.getId()).isEqualTo(m.getId());
         assertThat(m2.getDescription()).isEqualTo(m.getDescription());
         assertThat(m2.getAttrs()).isEqualTo(ZorkaUtil.<String, Object>constMap("a", 1L, "b", 2L));
-    }
-
-    public TraceRecord tr(String className, String methodName, String methodSignature,
-                          long calls, long errors, int flags, long time,
-                          TraceRecord... children) {
-        TraceRecord tr = new TraceRecord(null);
-        tr.setClassId(sid(className));
-        tr.setMethodId(sid(methodName));
-        tr.setSignatureId(sid(methodSignature));
-        tr.setCalls(calls);
-        tr.setErrors(errors);
-        tr.setFlags(flags);
-        tr.setTime(time);
-
-        for (TraceRecord child : children) {
-            child.setParent(tr);
-            tr.addChild(child);
-        }
-
-        return tr;
     }
 
     @Test

@@ -1,16 +1,20 @@
-package com.jitlogic.zorka.common.zico;
+package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.common.http.HttpRequest;
 import com.jitlogic.zorka.common.http.HttpResponse;
 import com.jitlogic.zorka.common.http.HttpUtil;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.*;
+import com.jitlogic.zorka.common.zico.CborResendException;
+import com.jitlogic.zorka.common.zico.TraceDataFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
 import java.util.*;
+
+import static com.jitlogic.zorka.common.util.ZorkaConfig.*;
 
 /**
  * Tracer output sending data to remote ZICO collector using ZICO2+CBOR protocol.
@@ -29,9 +33,9 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
 
     private String agentUUID, authKey;
     private String app, env, hostname;
-    private String sessionUUID;
+    private String sessionUUID, sessionKey;
 
-    private String submitTraceUrl, submitAgentUrl, authUrl;
+    private String submitTraceUrl, submitAgentUrl, registerUrl, sessionUrl;
 
     private int retries, timeout;
     private long retryTime, retryTimeExp;
@@ -46,35 +50,50 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
     private CborDataWriter awriter = new CborDataWriter(ABUFSZ, ABUFSZ), twriter = new CborDataWriter(TBUFSZ, TBUFSZ);
     private SymbolRegistry registry;
 
+
     private Map<String,Integer> traceTypes;
 
+    private ZorkaConfig config;
 
-    public CborTraceOutput(String url, String agentUUID, String authKey,
-                           String hostname, String app, String env,
-                           SymbolRegistry registry, Map<String,Integer> traceTypes,
-                           int qlen, int retries, long retryTime, long retryTimeExp, int timeout) {
-        super("ZORKA-CBOR-TRACE-OUTPUT", qlen, 1);
+    public CborTraceOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry, Map<String,Integer> traceTypes) {
 
-        this.agentUUID = agentUUID;
-        this.authKey = authKey;
-        this.hostname = hostname;
-        this.app = app;
-        this.env = env;
+        super("ZORKA-CBOR-OUTPUT", parseInt(conf.get("http.qlen"), 64, "tracer.http.qlen"), 1);
+
+        this.config = config;
+
+        this.agentUUID = conf.get("agent.uuid");
+
+        this.hostname = parseStr(conf.get("hostname"), null, null,
+                "CborTraceOutput: missing mandatory parameter: tracer.hostname");
+
+        this.app = parseStr(conf.get("app.name"), null, null,
+                "CborTraceOutput: missing mandatory parameter: tracer.app.name");
+
+        this.env = parseStr(conf.get("env.name"), null, null,
+                "CborTraceOutput: missing mandatory parameter: tracer.env.name");
+
+        this.authKey = conf.get("auth.key");
+        this.sessionKey = conf.get("sessn.key");
+
+        String url = parseStr(conf.get("http.url"), null, null,
+                "CborTraceOutput: missing mandatory parameter: tracer.http.url");
 
         if (!url.endsWith("/")) url = url + "/";
         url += "agent/";
 
         this.submitAgentUrl = url + "submit/agd";
         this.submitTraceUrl = url + "submit/trc";
-        this.authUrl = url + "auth";
+
+        this.registerUrl = url + "register";
+        this.sessionUrl = url + "session";
 
         this.registry = registry;
         this.traceTypes = traceTypes;
 
-        this.retries = retries;
-        this.retryTime = retryTime;
-        this.retryTimeExp = retryTimeExp;
-        this.timeout = timeout;
+        this.retries = parseInt(conf.get("http.retries"), 10, "tracer.http.retries");
+        this.retryTime = parseInt(conf.get("http.retry.time"), 125, "tracer.http.retry.time");
+        this.retryTimeExp = parseInt(conf.get("http.retry.exp"), 2, "tracer.http.retry.exp");
+        this.timeout = parseInt(conf.get("http.timeout"), 60000, "tracer.http.output");
     }
 
     private static long cms2key(int classId, int methodId, int signatureId) {
@@ -235,21 +254,93 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
 
     } // processTraceRecord()
 
-    public void authenticate() {
+    public void register() {
+        symbolsSent.reset();
+        mids.clear();
+        lastMid = 0;
+        sessionUUID = null;
+
+        String json = new JSONWriter()
+                .write(ZorkaUtil.map(
+                        "rkey", authKey,
+                        "name", hostname,
+                        "app", app,
+                        "env", env
+                ));
+
+        log.info("Registering agent as: name=" + hostname + " app=" + app + " env=" + env);
+
+        try {
+            HttpRequest req = HttpUtil.POST(registerUrl, json)
+                    .withHeader("Content-Type", "application/json");
+            HttpResponse res = req.go();
+            if (res.getStatus() == 201 || res.getStatus() == 200) {
+                Object rslt = new JSONReader().read(res.getBodyAsString());
+                if (rslt instanceof Map) {
+                    Map m = (Map)rslt;
+                    Object u = m.get("uuid");
+                    if (u instanceof String) {
+                        agentUUID = (String) m.get("uuid");
+                        sessionKey = (String) m.get("authkey");
+                        config.writeCfg("tracer.net.agent.uuid", agentUUID);
+                        config.writeCfg("tracer.net.sessn.key", sessionKey);
+                        log.info("Successfully registered agent with uuid=" + agentUUID);
+                    } else {
+                        throw new ZorkaRuntimeException("Invalid registration response from collector: missing or bad UUID '" + res.getBodyAsString() + "'");
+                    }
+                } else {
+                    throw new ZorkaRuntimeException("Invalid registration response from collector: '" + res.getBodyAsString() + "'");
+                }
+            } else {
+                throw new ZorkaRuntimeException("Invalid registration response from collector: "
+                        + res.getStatus() + ": " + res.getStatusMsg());
+            }
+        } catch (IOException e) {
+            throw new ZorkaRuntimeException("I/O error occured while registering agent", e);
+        }
+    }
+
+    public String getAgentUUID() {
+        return agentUUID;
+    }
+
+    public void openSession() {
         symbolsSent.reset();
         mids.clear();
         lastMid = 0;
         sessionUUID = null;
 
         try {
-            HttpRequest req = HttpUtil.GET(authUrl);
-            req.setHeader("X-ZICO-Agent-UUID", agentUUID);
-            req.setHeader("X-ZICO-Auth-Key", authKey);
-            req.setParam("env", env);
-            req.setParam("app", app);
+            if (agentUUID == null) {
+                log.info("Agent not registered (yet). Registering ...");
+                register();
+            }
+        } catch (ZorkaRuntimeException e) {
+            log.error("Error registering agent.", e);
+            throw e;
+        }
+
+        try {
+            log.debug("Requesting session for agent: uuid=" + agentUUID);
+            HttpRequest req = HttpUtil.POST(sessionUrl,
+                    new JSONWriter().write(ZorkaUtil.map(
+                            "uuid", agentUUID,
+                            "authkey", sessionKey)));
             HttpResponse res = req.go();
             if (res.getStatus() == 200) {
-                sessionUUID = res.getBodyAsString();
+                Object rslt = new JSONReader().read(res.getBodyAsString());
+                if (rslt instanceof Map) {
+                    Map m = (Map)rslt;
+                    Object s = m.get("session");
+                    if (s instanceof String) {
+                        sessionUUID = (String)s;
+                        log.debug("Obtained session: uuid=" + sessionUUID);
+                    } else {
+                        throw new ZorkaRuntimeException("Invalid session response: '" + res.getBodyAsString() + "'");
+                    }
+                } else {
+                    throw new ZorkaRuntimeException("Invalid session response: '" + res.getBodyAsString() + "'");
+                }
             } else if (res.getStatus() == 401) {
                 throw new ZorkaRuntimeException("Not authorized. Check trapper.cbor.auth-key property.");
             } else {
@@ -260,12 +351,23 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
         }
     }
 
+    public void newSession() {
+        do {
+            try {
+                openSession();
+            } catch (Exception e) {
+                log.error("Cannot open collector session to: " + sessionUrl, e);
+            }
+        } while (sessionUUID == null);
+    }
+
     private void send(CborDataWriter w, String uri, String traceUUID) {
         try {
             // TODO this is inefficient, implement dedicated Base64/json/etc encoding in HttpClient
             HttpRequest req = HttpUtil.POST(uri, DatatypeConverter.printBase64Binary(Arrays.copyOf(w.getBuf(), w.position())));
             req.setHeader("X-ZICO-Agent-UUID", agentUUID);
             req.setHeader("X-ZICO-Session-UUID", sessionUUID);
+            req.setHeader("Content-Type", "application/zico+cbor+v1");
             if (traceUUID != null) req.setHeader("X-ZICO-Trace-UUID", traceUUID);
             HttpResponse res = req.go();
             if (res.getStatus() < 300) {
@@ -290,7 +392,7 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
                     twriter.reset();
                     nExceptions = 0;
 
-                    if (sessionUUID == null) authenticate();
+                    if (sessionUUID == null) newSession();
 
                     if (sr instanceof TraceRecord) {
                         TraceRecord tr = (TraceRecord) sr;
@@ -309,10 +411,10 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
 
                 } catch (CborResendException e) {
                     log.info("Session expired. Reauthenticating ...");
-                    authenticate();
+                    newSession();
                 } catch (Exception e) {
                     log.error("Error sending trace record: " + e + ". Resetting connection.", e);
-                    authenticate();
+                    newSession();
                 }
 
                 try {

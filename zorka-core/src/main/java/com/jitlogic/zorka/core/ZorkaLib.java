@@ -990,6 +990,10 @@ public class ZorkaLib implements ZorkaService {
         return config.mapCfg(key, defVals);
     }
 
+    public Map<String,String> mapCfg(String key, Map<String,String> defVals) {
+        return config.mapCfg(key, defVals);
+    }
+
     /**
      * Schedules a task.
      *

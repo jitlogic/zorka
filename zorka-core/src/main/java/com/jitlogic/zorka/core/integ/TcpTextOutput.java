@@ -1,6 +1,7 @@
 package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.common.util.ZorkaConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,7 @@ public class TcpTextOutput extends ZorkaAsyncThread<String> {
 
     private String host = "127.0.0.1";
     private int port = 9999;
-    private int timeout = 30000;
+    private int timeout;
 
     public TcpTextOutput(String name, Map<String,String> config) {
         super(name);
@@ -48,15 +49,7 @@ public class TcpTextOutput extends ZorkaAsyncThread<String> {
 
         }
 
-        String ptmo = config.get("timeout");
-        if (ptmo != null) {
-            ptmo = ptmo.trim();
-            if (ptmo.matches("\\d+")) {
-                this.timeout = Integer.parseInt(ptmo);
-            } else {
-                log.error("Cannot parse TCP timeout: '" + ptmo + "'");
-            }
-        }
+        this.timeout = ZorkaConfig.parseInt(config.get("timeout"), 30000, "TCP timeout");
     }
 
     @Override

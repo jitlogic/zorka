@@ -333,6 +333,30 @@ public class ZorkaConfig {
         properties.setProperty(key, ""+val);
     }
 
+    public void writeCfg(String key, Object val) {
+        properties.setProperty(key, ""+val);
+    }
+
+    public static int parseInt(String val, Integer defVal, String msg) {
+        if (val != null && !val.matches("\\d+")) {
+            return Integer.parseInt(val);
+        } else if (defVal != null) {
+            return defVal;
+        } else {
+            throw new ZorkaConfigException("Cannot parse " + msg, val);
+        }
+    }
+
+    public static String parseStr(String val, Pattern regex, String defVal, String msg) {
+        if (val != null && (regex == null || regex.matcher(val).matches())) {
+            return val;
+        } else if (defVal != null) {
+            return defVal;
+        } else {
+            throw new ZorkaConfigException(msg, null);
+        }
+    }
+
     /**
      * Sets agent home directory and load zorka.properties file from it.
      *

@@ -133,14 +133,15 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
 
     @Override
     public void run() {
+        init();
         while (running.get()) {
             runCycle();
-            
+
             try {
-				Thread.sleep(interval);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+                Thread.sleep(interval);
+            } catch (InterruptedException e) {
+                log.error("Interrupted sleeping", e);
+            }
         }
 
         synchronized (this) {
@@ -191,6 +192,14 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
      * before thread starts (eg. network socket).
      */
     public void open() {
+
+    }
+
+    /**
+     * Override this method if some resources need to be allocated
+     * in the background thread before starting processing work.
+     */
+    protected void init() {
 
     }
 
