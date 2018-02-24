@@ -1,6 +1,7 @@
-Zorka 1.1.1 (201?-??-??)
+Zorka 1.1.1 (2018-02-24)
 -------------------------
 
+* this is development version: things may change in unpredictable ways;
 * automatic detection of application servers and frameworks;
 * environment variables, system properties, references in zorka.properties;
 * description field in zorka metrics (useful for autodiscovered items);
@@ -10,6 +11,7 @@ Zorka 1.1.1 (201?-??-??)
 * Graphite integration (TCP/pickle push via perfmon library);
 * Prometheus integration (via Push Gateway); 
 * include BSH and libsnmp into agent codebase;
+* HTTP/CBOR tracer output - fixes and protocol changes;
 
 
 Zorka 1.0.16 (2017-11-22)
