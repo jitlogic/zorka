@@ -64,9 +64,6 @@ __cas() {
   _trace = zorka.boolCfg("cas.trace");
   _trace_time = zorka.longCfg("cas.trace.time");
 
-  // Register trace types for CBOR collector.
-  tracer.defType("CAS", 104);
-
   if (_audit_file) {
     filePath = zorka.stringCfg("cas.audit.file.path");
     zorka.logInfo("CAS Audit logs will be logged to local file: " + filePath);

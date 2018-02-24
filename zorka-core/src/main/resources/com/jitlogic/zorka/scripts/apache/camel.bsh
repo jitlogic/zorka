@@ -45,8 +45,6 @@ __apache_camel() {
             spy.byMethod("org.apache.camel.component.directvm.DirectVmBlockingProducer", "process")
         ));
 
-    tracer.defType("CAMEL", 103);
-
   if (zorka.boolCfg("zabbix.active")) {
     zorka.require("zabbix.bsh");
     zabbix.tagMetadata("CAMEL");

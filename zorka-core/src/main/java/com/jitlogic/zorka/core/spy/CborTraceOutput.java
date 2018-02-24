@@ -51,11 +51,9 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
     private SymbolRegistry registry;
 
 
-    private Map<String,Integer> traceTypes;
-
     private ZorkaConfig config;
 
-    public CborTraceOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry, Map<String,Integer> traceTypes) {
+    public CborTraceOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry) {
 
         super("ZORKA-CBOR-OUTPUT", parseInt(conf.get("http.qlen"), 64, "tracer.http.qlen"), 1);
 
@@ -88,7 +86,6 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
         this.sessionUrl = url + "session";
 
         this.registry = registry;
-        this.traceTypes = traceTypes;
 
         this.retries = parseInt(conf.get("http.retries"), 10, "tracer.http.retries");
         this.retryTime = parseInt(conf.get("http.retry.time"), 125, "tracer.http.retry.time");
@@ -163,22 +160,11 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
         // Trace Marker (if this is trace beginning)
         if (tr.hasFlag(TraceRecord.TRACE_BEGIN)) {
             TraceMarker tm = tr.getMarker();
-            String traceType = registry.symbolName(tm.getTraceId());
-            if (traceType != null) {
-                Integer tid = traceTypes.get(traceType);
-                if (tid != null) {
-                    twriter.writeTag(TraceDataFormat.TAG_TRACE_BEGIN);
-                    twriter.writeUInt(CBOR.ARR_BASE, 2);
-                    twriter.writeLong(tm.getClock());
-                    twriter.writeInt(tid);
-                } else {
-                    log.error("Mapping for trace type '" + traceType + "' not found. "
-                        + "Use tracer.defType() function to define mapping for CBOR output.");
-                }
-            } else {
-                log.error("Symbol name for typeId '" + tm.getTraceId()
-                    + "' not found. Internal error. (?)");
-            }
+            int tid = ref(tm.getTraceId(), TraceDataFormat.STRING_TYPE);
+            twriter.writeTag(TraceDataFormat.TAG_TRACE_BEGIN);
+            twriter.writeUInt(CBOR.ARR_BASE, 2);
+            twriter.writeLong(tm.getClock());
+            twriter.writeInt(tid);
             if (tm.hasFlag(TraceMarker.ERROR_MARK)) {
                 twriter.writeTag(TraceDataFormat.TAG_FLAG_TOKEN);
                 twriter.writeInt(TraceDataFormat.FLAG_ERROR);

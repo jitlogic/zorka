@@ -75,6 +75,8 @@ public class ZorkaFixture extends CommonFixture {
 
         // Configure and spawn agent instance ...
 
+        AgentConfig.persistent = false;
+
         configProperties = TestUtil.setProps(
                 ZorkaConfig.defaultProperties(AgentConfig.DEFAULT_CONF_PATH),
                 "zorka.home.dir", "/tmp",

@@ -71,10 +71,6 @@ __soap() {
   _slow_chain = traps.subchain("soap", "slow");
   _error_chain = traps.subchain("soap", "error");
 
-  // Register trace types for CBOR collector.
-  tracer.defType("SOAP", 36);
-  tracer.defType("SOAP_CLI", 37);
-
   discovery(type) {
     return zabbix.discovery(zorka.query("java", _mbean, "name", "type").get(type).listAs("**", "OP"));
   }

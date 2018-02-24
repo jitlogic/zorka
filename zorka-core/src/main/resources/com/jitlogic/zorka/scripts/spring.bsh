@@ -189,8 +189,6 @@ __spring() {
         "org.springframework.remoting.support.RemoteInvocation")));
   }
 
-  tracer.defType("SPRING_REMOTING", 101);
-
   // Spring Webflow
 
   __extract_webflow_scope(prefix, attr, isView) {
@@ -247,8 +245,6 @@ __spring() {
       )
       .include(spy.byInterfaceAndMethod(0, "org.springframework.http.client.ClientHttpRequest", "execute",
         "org.springframework.http.client.ClientHttpResponse")));
-
-  tracer.defType("SPRING_HTTP", 102);
 
   if (zorka.boolCfg("zabbix.active")) {
     zorka.require("zabbix.bsh");

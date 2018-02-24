@@ -55,8 +55,6 @@ public class TracerLib {
 
     private ZorkaConfig config;
 
-    private Map<String,Integer> traceTypes = new ConcurrentHashMap<String, Integer>();
-
     /**
      * Default trace flags
      */
@@ -464,7 +462,7 @@ public class TracerLib {
      */
     public ZorkaAsyncThread<SymbolicRecord> toCbor(Map<String,String> config) {
 
-        return new CborTraceOutput(this.config, config, symbolRegistry, traceTypes);
+        return new CborTraceOutput(this.config, config, symbolRegistry);
     }
 
     /**
@@ -598,10 +596,6 @@ public class TracerLib {
 
     public boolean isTraceSpyMethods() {
         return tracer.isTraceSpyMethods();
-    }
-
-    public void defType(String typeName, int typeId) {
-        traceTypes.put(typeName, typeId);
     }
 
     /**

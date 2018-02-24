@@ -40,11 +40,6 @@ __muleesb() {
     _stats = zorka.boolCfg("mule.stats");
     _mbean = zorka.stringCfg("mule.stats.mbean");
 
-    // Register trace types for CBOR collector.
-    tracer.defType("MULE_CMP", 106);
-    tracer.defType("MULE_DISP", 107);
-    tracer.defType("MULE_FLOW", 108);
-
     extract_annotations() {
 
         process(rec) {
