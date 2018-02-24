@@ -16,10 +16,10 @@
 
 package com.jitlogic.zorka.core.integ;
 
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Map;
@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
  */
 public class NagiosLib {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(NagiosLib.class);
+    private static final Logger log = LoggerFactory.getLogger(NagiosLib.class);
 
     /** OK status */
     public static final int OK = NrpePacket.OK;
@@ -104,10 +104,10 @@ public class NagiosLib {
     public void defcmd(String id, NagiosCommand cmd) {
 
         if (commands.containsKey(id)) {
-            log.warn(ZorkaLogger.ZAG_CONFIG, "Redefining already defined nagios command '" + id + "'");
+            log.warn("Redefining already defined nagios command '" + id + "'");
         }
 
-        log.info(ZorkaLogger.ZAG_CONFIG, "Definig Nagios command: " + id);
+        log.info("Definig Nagios command: " + id);
 
         commands.put(id, cmd);
     }

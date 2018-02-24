@@ -39,6 +39,11 @@ public abstract class Metric implements Serializable {
     private int id, templateId;
 
     /**
+     * Metric domain
+     */
+    private String domain;
+
+    /**
      * Metric short name (eg. cpu_load etc.)
      */
     private String name;
@@ -49,14 +54,14 @@ public abstract class Metric implements Serializable {
     private String description;
 
     /**
-     * Dynamic attributes for this metric
+     * Dynamic attributes for this metric.
      */
-    private HashMap<String, Object> attrs = new HashMap<String, Object>();
+    private Map<String, Object> attrs = new HashMap<String, Object>();
 
     /**
      * Maps dynamic attributes to their symbol IDs
      */
-    private HashMap<String, Integer> dynamicAttrs;
+    private Map<String, Integer> dynamicAttrs;
 
 
     /**
@@ -67,11 +72,13 @@ public abstract class Metric implements Serializable {
      * @param description  metric description
      * @param attrs metric attributes
      */
-    public Metric(int id, String name, String description, HashMap<String, Object> attrs) {
+    public Metric(int id, String name, String description, String domain,
+                  Map<String, Object> attrs) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.attrs = attrs;
+        this.domain = domain;
     }
 
 
@@ -83,11 +90,13 @@ public abstract class Metric implements Serializable {
      * @param description       metric description
      * @param attrs      metric attributes
      */
-    public Metric(int id, int templateId, String name, String description, HashMap<String, Object> attrs) {
+    public Metric(int id, int templateId, String name, String description, String domain,
+                  Map<String, Object> attrs) {
         this.id = id;
         this.templateId = templateId;
         this.name = name;
         this.description = description;
+        this.domain = domain;
         this.attrs = attrs;
     }
 
@@ -98,7 +107,8 @@ public abstract class Metric implements Serializable {
      * @param description     metric description
      * @param attrs    metric attributes
      */
-    public Metric(MetricTemplate template, String name, String description, Map<String, Object> attrs) {
+    public Metric(MetricTemplate template, String name, String description, String domain,
+                  Map<String, Object> attrs) {
         this.template = template;
 
         for (Map.Entry<String, Object> entry : attrs.entrySet()) {
@@ -107,6 +117,7 @@ public abstract class Metric implements Serializable {
 
         this.name = name;
         this.description = description;
+        this.domain = domain;
     }
 
 
@@ -155,6 +166,11 @@ public abstract class Metric implements Serializable {
 
     public String getDescription() {
         return description;
+    }
+
+
+    public String getDomain() {
+        return domain;
     }
 
 

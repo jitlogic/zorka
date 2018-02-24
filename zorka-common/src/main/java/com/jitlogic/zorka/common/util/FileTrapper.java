@@ -18,10 +18,11 @@ package com.jitlogic.zorka.common.util;
 //import com.jitlogic.zorka.core.AgentDiagnostics;
 
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
+import org.slf4j.impl.ZorkaLogLevel;
+import org.slf4j.impl.ZorkaTrapper;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -253,7 +254,7 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
                 os.close();
             } catch (IOException e) {
                 if (log != null) {
-                    log.error(ZorkaLogger.ZAG_ERRORS, "Error closing log file " + logFile, e);
+                    log.error("Error closing log file " + logFile, e);
                 }
             }
             os = null;
@@ -307,7 +308,7 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
             currentSize = 0;
         } catch (Exception e) {
             if (log != null) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error opening log file " + logFile, e);
+                log.error("Error opening log file " + logFile, e);
             }
         }
     }
@@ -325,7 +326,7 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
             currentSize = f.exists() ? f.length() : 0;
         } catch (Exception e) {
             if (log != null) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Cannot open log file " + f.getAbsolutePath(), e);
+                log.error("Cannot open log file " + f.getAbsolutePath(), e);
             }
         }
     }

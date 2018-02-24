@@ -17,8 +17,8 @@
 package com.jitlogic.zorka.common.tracedata;
 
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.List;
@@ -33,7 +33,7 @@ import java.util.zip.DeflaterOutputStream;
  */
 public class FileTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements TraceStreamOutput {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(FileTraceOutput.class);
+    private static final Logger log = LoggerFactory.getLogger(FileTraceOutput.class);
 
     /**
      * Path to trace file.
@@ -110,7 +110,7 @@ public class FileTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
                 traceWriter.reset();
             }
         } catch (IOException e) {
-            log.error(ZorkaLogger.ZSP_SUBMIT, "Error writing trace data to file.", e);
+            log.error("Error writing trace data to file.", e);
             roll();
         }
     }
@@ -140,7 +140,7 @@ public class FileTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
 
         path.renameTo(new File(path.getPath() + ".1"));
 
-        log.info(ZorkaLogger.ZSP_SUBMIT, "Opening trace file: " + path);
+        log.info("Opening trace file: " + path);
 
         reopen();
 
@@ -167,39 +167,39 @@ public class FileTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
             fileStream = new FileOutputStream(path);
 
             if (compress) {
-                log.info(ZorkaLogger.ZSP_SUBMIT, "Opening compressed trace file.");
+                log.info("Opening compressed trace file.");
                 fileStream.write(ZTRZ_MAGIC);
                 stream = new BufferedOutputStream(new DeflaterOutputStream(fileStream, new Deflater(6, true), 65536));
 
             } else {
-                log.info(ZorkaLogger.ZSP_SUBMIT, "Opening plain trace file.");
+                log.info("Opening plain trace file.");
                 fileStream.write(ZTRC_MAGIC);
                 stream = new BufferedOutputStream(fileStream);
             }
 
         } catch (FileNotFoundException e) {
-            log.error(ZorkaLogger.ZTR_ERRORS, "Cannot open trace file " + path, e);
+            log.error("Cannot open trace file " + path, e);
         } catch (IOException e) {
-            log.error(ZorkaLogger.ZTR_ERRORS, "Cannot write to trace file " + path, e);
+            log.error("Cannot write to trace file " + path, e);
         }
     }
 
 
     @Override
     public void open() {
-        log.info(ZorkaLogger.ZSP_CONFIG, "Starting file tracer output: " + path);
+        log.info("Starting file tracer output: " + path);
         roll();
     }
 
 
     @Override
     public void close() {
-        log.info(ZorkaLogger.ZSP_CONFIG, "Stopping file tracer output: " + path);
+        log.info("Stopping file tracer output: " + path);
         try {
             stream.close();
             stream = null;
         } catch (IOException e) {
-            log.error(ZorkaLogger.ZSP_SUBMIT, "Error closing output stream.", e);
+            log.error("Error closing output stream.", e);
         }
     }
 
@@ -209,7 +209,7 @@ public class FileTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implements
         try {
             stream.flush();
         } catch (IOException e) {
-            log.error(ZorkaLogger.ZTR_ERRORS, "Cannot flush trace file " + path, e);
+            log.error("Cannot flush trace file " + path, e);
         }
     }
 }

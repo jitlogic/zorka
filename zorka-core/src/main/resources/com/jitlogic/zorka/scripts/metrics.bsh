@@ -1,0 +1,123 @@
+/*
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// Basic setup for collecting and submitting metrics to various monitoring systems
+
+zorka.require("tracer.bsh");
+
+__metrics() {
+
+  zorka.logInfo("Enabling metrics collection.");
+
+  _interval = zorka.intCfg("metrics.interval", 10000);
+  _delay = zorka.intCfg("metrics.delay", 10000);
+
+  _constAttrs = zorka.mapCfg("metrics.attr.set");
+  _attrFilter = perfmon.attrFilter(_constAttrs,
+      zorka.listCfg("metrics.attr.include"),
+      zorka.listCfg("metrics.attr.exclude"));
+  _sampleFilter = perfmon.sampleFilter(
+      zorka.mapCfg("metrics.filter.include"),
+      zorka.mapCfg("metrics.filter.exclude"));
+
+  // Set up basic metrics collection for all ZorkaStats
+  _zorkaStatsScanner = perfmon.scanner("ZORKA_STATS",
+    zorka.query("java", "zorka:type=ZorkaStats,*", "type", "name")
+      .listAs("**", "section").listAs("**", "tag").get("calls")
+      .metric(perfmon.timedDelta("zorka", "calls", "Calls", "calls/min").multiply(60)),
+    zorka.query("java", "zorka:type=ZorkaStats,*", "type", "name")
+      .listAs("**", "section").listAs("**", "tag").get("errors")
+      .metric(perfmon.timedDelta("zorka", "errors", "Errors", "err/min").multiply(60)),
+    zorka.query("java", "zorka:type=ZorkaStats,*", "type", "name")
+      .listAs("**", "section").listAs("**", "tag").get("maxTimeCLR")
+      .metric(perfmon.metric("zorka", "peak", "Peak time", "s").multiply(0.001)),
+    zorka.query("java", "zorka:type=ZorkaStats,*", "type", "name")
+      .listAs("**", "section").listAs("**", "tag")
+      .metric(perfmon.rate("zorka", "avg", "Average time", "s", "time", "calls").multiply(0.001)));
+
+  _zorkaStatsScanner.setAttachResults(true);
+  zorka.schedule(_zorkaStatsScanner, _interval, _delay);
+
+  // Configure InfluxDB output (if enabled)
+  if (zorka.boolCfg("influxdb")) {
+    zorka.defCfg("influxdb.url", "http://localhost:8086");
+    zorka.defCfg("influxdb.db", "zorka");
+    zorka.logInfo("Enabling InfluxDB: sending data to " + zorka.stringCfg("influxdb.url"));
+    cfg = zorka.mapCfg("influxdb");
+    params = util.map("db", cfg.get("db"), "precision", "ms");
+    url = cfg.get("url"); url += (url.endsWith("/") ? "" : "/") + "write"; cfg.put("url", url);
+    if (cfg.get("user") != null) params.put("u", cfg.get("user"));
+    if (cfg.get("pass") != null) params.put("p", cfg.get("pass"));
+    httpOut = perfmon.httpTextOutput("INFLUXDB-PUSH-HTTP", cfg, params, null);
+    influxOutput = perfmon.influxPushOutput(cfg, _constAttrs, _attrFilter, _sampleFilter, httpOut);
+    tracer.output(influxOutput);
+  }
+
+  // Configure OpenTSDB output (if enabled)
+  if (zorka.boolCfg("opentsdb")) {
+    zorka.defCfg("opentsdb.url", "http://localhost:4242");
+    zorka.defCfg("opentsdb.report", "none");
+    zorka.logInfo("Enabling OpenTSDB: sending data to " + zorka.stringCfg("opentsdb.url"));
+    cfg = zorka.mapCfg("opentsdb");
+    url = cfg.get("url"); url += (url.endsWith("/") ? "" : "/") + "api/put"; cfg.put("url", url);
+    params = util.map(); report = cfg.get("report");
+    if ("summary".equals(report)) params.put("summary", "true");
+    if ("detail".equals(report)) params.put("detail", "true");
+    httpOut = perfmon.httpTextOutput("OPENTSDB-PUSH-HTTP", cfg, params, null);
+    tsdbOutput = perfmon.tsdbPushOutput(cfg, _constAttrs, _attrFilter, _sampleFilter, httpOut);
+    tracer.output(tsdbOutput);
+  }
+
+  // Configure Graphite integration
+  if (zorka.boolCfg("graphite")) {
+    zorka.defCfg("graphite.addr", "127.0.0.1:2003");
+    zorka.defCfg("graphite.prefix", "zorka");
+    zorka.logInfo("Enabling Graphite (TCP): sending data to:" + zorka.stringCfg("graphite.addr"));
+    cfg = zorka.mapCfg("graphite");
+    tcpOut = perfmon.tcpTextOutput("GRAPHITE-PUSH-TCP", cfg);
+    graphiteOutput = perfmon.graphitePushOutput(cfg, _constAttrs, _attrFilter, _sampleFilter, tcpOut);
+    tracer.output(graphiteOutput);
+  }
+
+  // Configure Prometheus push gateway
+  if (zorka.boolCfg("prometheus.push")) {
+    zorka.defCfg("prometheus.push.url", "http://localhost:9191");
+    zorka.logInfo("Enabling Prometheus Push Gateway: sending data to:"
+      + zorka.stringCfg("prometheus.push.url"));
+    _promPushCfg = zorka.mapCfg("prometheus.push");
+    promPushHttp = perfmon.httpTextOutput("PROMETHEUS-PUSH-HTTP", _promPushCfg, null, null);
+    promPushOutput = perfmon.prometheusPushOutput(_promPushCfg, _constAttrs, _attrFilter, _sampleFilter, promPushHttp);
+    tracer.output(promPushOutput);
+  }
+
+  return this;
+}
+
+// All metrics output are disabled by default.
+zorka.defCfg("influxdb", "no");
+zorka.defCfg("opentsdb", "no");
+zorka.defCfg("graphite", "no");
+zorka.defCfg("prometheus.push", "no");
+
+zorka.defCfg("metrics",
+  zorka.boolCfg("influxdb") ||
+  zorka.boolCfg("opentsdb") ||
+  zorka.boolCfg("graphite") ||
+  zorka.boolCfg("prometheus.push"));
+
+metrics = zorka.boolCfg("metrics") ? __metrics() : null;
+

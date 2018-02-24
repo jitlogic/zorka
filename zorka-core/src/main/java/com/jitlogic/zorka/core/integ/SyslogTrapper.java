@@ -17,6 +17,8 @@ package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
+import org.slf4j.impl.ZorkaLogLevel;
+import org.slf4j.impl.ZorkaTrapper;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -101,7 +103,7 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
 
         } catch (Exception e) {
             if (log != null) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Cannot configure syslog to " + syslogServer, e);
+                log.error("Cannot configure syslog to " + syslogServer, e);
             }
         }
 

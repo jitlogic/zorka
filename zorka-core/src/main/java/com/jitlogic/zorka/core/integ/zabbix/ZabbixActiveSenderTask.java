@@ -26,14 +26,14 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.jitlogic.zorka.common.util.ZorkaConfig;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ZabbixActiveSenderTask implements Runnable {
 	/**
 	 * Logger
 	 */
-	private static final ZorkaLog log = ZorkaLogger.getLog(ZabbixActiveSenderTask.class);
+	private static final Logger log = LoggerFactory.getLogger(ZabbixActiveSenderTask.class);
 
 	private InetAddress serverAddr;
 	private int serverPort;
@@ -48,7 +48,9 @@ public class ZabbixActiveSenderTask implements Runnable {
 
 	private ZorkaConfig config;
 
-	public ZabbixActiveSenderTask(InetAddress serverAddr, int serverPort, ConcurrentLinkedQueue<ActiveCheckResult> responseQueue, int maxBatchSize, ZorkaConfig config){
+	public ZabbixActiveSenderTask(InetAddress serverAddr, int serverPort,
+								  ConcurrentLinkedQueue<ActiveCheckResult> responseQueue,
+								  int maxBatchSize, ZorkaConfig config){
 		this.serverAddr = serverAddr;
 		this.serverPort = serverPort;
 		this.responseQueue = responseQueue;
@@ -58,7 +60,7 @@ public class ZabbixActiveSenderTask implements Runnable {
 
 	@Override
 	public void run() {
-		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActiveSender run...");
+		log.debug("ZabbixActiveSender run...");
 		Socket socket = null;
 		try {
 			clock = (new Date()).getTime() / 1000L;
@@ -76,14 +78,14 @@ public class ZabbixActiveSenderTask implements Runnable {
 				results.add(iterator.next());
 			}
 
-			log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActiveSender " + endIndex + " items cached");
+			log.debug("ZabbixActiveSender " + endIndex + " items cached");
 
 			if (results.size() > 0) {
 				/* send message */
 				String message = ZabbixUtils.createAgentData(results, clock);
 
 				request.send(message);
-				log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActiveSender message sent: " + message);
+				log.debug("ZabbixActiveSender message sent: " + message);
 
 				/* verify OK */
 				String response = request.getReq();
@@ -92,25 +94,25 @@ public class ZabbixActiveSenderTask implements Runnable {
 					for (int count = 0; count < endIndex; count++) {
 						responseQueue.poll();
 					}
-					log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActiveSender " + endIndex + " items removed from cache");
+					log.debug("ZabbixActiveSender " + endIndex + " items removed from cache");
 				}
 			}
 		} catch (IOException e) {
-			if (ZorkaLogger.isLogMask(ZorkaLogger.ZAG_DEBUG)) {
-				log.debug(ZorkaLogger.ZAG_DEBUG, "Failed to run ZabbixActiveSenderTask, IO Exception " + e.getMessage(), e);
+			if (log.isDebugEnabled()) {
+				log.debug("Failed to run ZabbixActiveSenderTask, IO Exception " + e.getMessage(), e);
 			}
 			else {
-				log.warn(ZorkaLogger.ZAG_WARNINGS, "Failed to run ZabbixActiveSenderTask, IO Exception " + e.getMessage());
+				log.warn("Failed to run ZabbixActiveSenderTask, IO Exception " + e.getMessage());
 			}
 		} catch (Exception e) {
-			log.error(ZorkaLogger.ZAG_ERRORS, "Failed to run ZabbixActiveSenderTask", e);
+			log.error("Failed to run ZabbixActiveSenderTask", e);
 		} finally {
-			log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActiveSender finished");
+			log.debug("ZabbixActiveSender finished");
 			if (socket != null) {
 				try {
 					socket.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					log.error("Erro closing socket: ", e);
 				} finally {
 					socket = null;
 				}

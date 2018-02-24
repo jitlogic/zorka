@@ -17,10 +17,9 @@ package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.contrib.libsnmp.*;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
-import com.jitlogic.zorka.common.util.ZorkaLogLevel;
-import com.jitlogic.zorka.common.util.ZorkaTrapper;
+import org.slf4j.impl.ZorkaLogLevel;
+import org.slf4j.impl.ZorkaTrapper;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -94,7 +93,7 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
             this.agentAddr = new SNMPIPAddress(agentAddr);
             this.protocol = protocol;
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot initialize SNMP sender", e);
+            log.error("Cannot initialize SNMP sender", e);
         }
     }
 
@@ -122,7 +121,7 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
             } else if (protocol == SnmpLib.SNMP_V2) {
                 trap = new SNMPv2TrapPDU(timestamp, oid, varBindList);
             } else {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Unsupported SNMP protocol version: " + protocol);
+                log.error("Unsupported SNMP protocol version: " + protocol);
             }
 
             if (trap != null) {
@@ -133,7 +132,7 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
             }
 
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error creating trap object", e);
+            log.error("Error creating trap object", e);
         }
     }
 
@@ -166,7 +165,7 @@ public class SnmpTrapper extends ZorkaAsyncThread<SNMPSequence> implements Zorka
                 }
                 AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SENT);
             } catch (IOException e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error sending SNMP trap", e);
+                log.error("Error sending SNMP trap", e);
             }
         }
     }

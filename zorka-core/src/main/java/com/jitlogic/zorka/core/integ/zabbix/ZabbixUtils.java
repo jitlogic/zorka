@@ -19,21 +19,20 @@ package com.jitlogic.zorka.core.integ.zabbix;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.jitlogic.zorka.common.util.JSONWriter;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class ZabbixUtils {
 	/**
 	 * Logger
 	 */
-	private static final ZorkaLog log = ZorkaLogger.getLog(ZabbixUtils.class);
+	private static final Logger log = LoggerFactory.getLogger(ZabbixUtils.class);
 	
 	/**
 	 * Message header 
@@ -78,8 +77,8 @@ public final class ZabbixUtils {
 		}
 
 		long len = msg.length();
-		log.debug(ZorkaLogger.ZAG_DEBUG, "Message: '" + msg + "'");
-		log.debug(ZorkaLogger.ZAG_DEBUG, "Message length: " + len);
+		log.debug("Message: '" + msg + "'");
+		log.debug("Message length: " + len);
 
 		for (int i = 0; i < 8; i++) {
 			buf[i + ZabbixUtils._ZBX_HDR.length] = (byte) (len & 0xff);

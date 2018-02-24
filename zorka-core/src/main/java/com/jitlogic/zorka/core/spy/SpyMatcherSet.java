@@ -16,9 +16,9 @@
 
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.jitlogic.zorka.core.spy.SpyMatcher.*;
 
@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
  */
 public class SpyMatcherSet {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(SpyMatcherSet.class);
+    private static final Logger log = LoggerFactory.getLogger(SpyMatcherSet.class);
 
     /**
      * List of (included) matchers.
@@ -146,8 +146,8 @@ public class SpyMatcherSet {
                 return finalClassMatch(matcher);
             }
         } catch (NoClassDefFoundError e) {
-            log.warn(ZorkaLogger.ZSP_CONFIG,
-                "NoClassDefFoundError occured when inspecting " + clazz + " for retransform. Consider disabling method filtering in retransformation.");
+            log.warn("NoClassDefFoundError occured when inspecting " + clazz
+                    + " for retransform. Consider disabling method filtering in retransformation.");
         }
 
         return false;

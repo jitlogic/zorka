@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "tracer.bsh"
 );
 
@@ -40,11 +39,8 @@ __rest() {
   _fetch_args  = zorka.boolCfg("rest.fetch.args");
   _fetch_limit = zorka.longCfg("rest.fetch.limit");
 
-  // Register trace types for CBOR collector.
-  tracer.defType("REST", 40);
-  tracer.defType("REST_CLI", 41);
-
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("REST");
   }
 

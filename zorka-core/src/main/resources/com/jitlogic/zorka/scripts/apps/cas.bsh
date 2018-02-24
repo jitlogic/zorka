@@ -20,10 +20,10 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "javax.bsh",
   "ldap.bsh",
   "tracer.bsh",
+  "libs.bsh",
   "jboss/hibernate.bsh",
   "spring.bsh"
 );
@@ -63,9 +63,6 @@ __cas() {
 
   _trace = zorka.boolCfg("cas.trace");
   _trace_time = zorka.longCfg("cas.trace.time");
-
-  // Register trace types for CBOR collector.
-  tracer.defType("CAS", 104);
 
   if (_audit_file) {
     filePath = zorka.stringCfg("cas.audit.file.path");
@@ -262,14 +259,13 @@ __cas() {
   }
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("JASIG_CAS");
   }
 
   if (zorka.boolCfg("tracer")) {
     tracer.exclude(
       "org.jasig.cas.aspect.LogAspect",
-      "org.opensaml.xml.**",
-      "org.perf4j.**",
       "com.github.inspektr.**"
     );
   }

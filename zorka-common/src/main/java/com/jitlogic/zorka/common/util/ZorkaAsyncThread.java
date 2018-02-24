@@ -17,6 +17,8 @@ package com.jitlogic.zorka.common.util;
 
 import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +39,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
     /**
      * Logger
      */
-    protected final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Submit queue
@@ -61,6 +63,9 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
 
     protected boolean countTraps = true;
 
+    /**
+     * Maximum number of items taken from queue at once.
+     */
     private int plen;
     
     /**
@@ -69,7 +74,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
     private long interval = 0l ;
 
     public ZorkaAsyncThread(String name) {
-        this(name, 256, 1);
+        this(name, 256, 2);
     }
 
     /**
@@ -128,14 +133,15 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
 
     @Override
     public void run() {
+        init();
         while (running.get()) {
             runCycle();
-            
+
             try {
-				Thread.sleep(interval);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+                Thread.sleep(interval);
+            } catch (InterruptedException e) {
+                log.error("Interrupted sleeping", e);
+            }
         }
 
         synchronized (this) {
@@ -160,7 +166,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
                 flush();
             }
         } catch (InterruptedException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Cannot perform run cycle", e);
+            log.error("Cannot perform run cycle", e);
         }
     }
 
@@ -186,6 +192,14 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
      * before thread starts (eg. network socket).
      */
     public void open() {
+
+    }
+
+    /**
+     * Override this method if some resources need to be allocated
+     * in the background thread before starting processing work.
+     */
+    protected void init() {
 
     }
 
@@ -219,7 +233,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
      */
     protected void handleError(String message, Throwable e) {
         if (log != null) {
-            log.error(ZorkaLogger.ZAG_ERRORS, message, e);
+            log.error(message, e);
         }
     }
 

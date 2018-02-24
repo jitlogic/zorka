@@ -18,9 +18,9 @@
 package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import org.objectweb.asm.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public class SpyClassVisitor extends ClassVisitor {
     /**
      * Logger
      */
-    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Parent class transformer
@@ -118,7 +118,7 @@ public class SpyClassVisitor extends ClassVisitor {
                 try {
                     recursiveInterfaceScan(interfaceClass);
                 } catch (Exception e) {
-                    log.error(ZorkaLogger.ZSP_CONFIG, "Cannot (recursively) load class: " + interfaceClass, e);
+                    log.error("Cannot (recursively) load class: " + interfaceClass, e);
                 }
 
             }
@@ -128,7 +128,7 @@ public class SpyClassVisitor extends ClassVisitor {
             try {
                 recursiveInterfaceScan(superName.replace('/', '.'));
             } catch (Exception e) {
-                log.error(ZorkaLogger.ZSP_CONFIG, "Cannot (recursively) load class: " + superName, e);
+                log.error("Cannot (recursively) load class: " + superName, e);
             }
         }
 
@@ -166,7 +166,7 @@ public class SpyClassVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String methodName, String methodDesc,
                                      String methodSignature, String[] exceptions) {
 
-        log.debug(ZorkaLogger.ZSP_METHOD_TRC, "Encountered method: " + className + "." + methodName + " " + methodDesc);
+        log.debug("Encountered method: " + className + "." + methodName + " " + methodDesc);
 
         MethodVisitor mv = createVisitor(access, methodName, methodDesc, methodSignature, exceptions);
         List<SpyContext> ctxs = new ArrayList<SpyContext>(sdefs.size() + 2);
@@ -177,10 +177,10 @@ public class SpyClassVisitor extends ClassVisitor {
             if (sdef.getMatcherSet().methodMatch(className, classAnnotations, classInterfaces,
                     access, methodName, methodDesc, null)) {
                 if (sdef.getLastArgIndex() > lastArgIndex(access, methodDesc)) {
-                    log.error(ZorkaLogger.ZSP_ERRORS, "Cannot instrument method " + className + "." + methodName
+                    log.error("Cannot instrument method " + className + "." + methodName
                         + "(). SpyDef refers to argument(s) beyond method argument list.");
                 } else {
-                    log.debug(ZorkaLogger.ZSP_METHOD_DBG, "Instrumenting method (full SPY): " + className + "." + methodName + " " + methodDesc);
+                    log.debug("Instrumenting method (full SPY): " + className + "." + methodName + " " + methodDesc);
                     ctxs.add(transformer.lookup(
                         new SpyContext(sdef, className, methodName, methodDesc, access)));
                 }
@@ -194,9 +194,8 @@ public class SpyClassVisitor extends ClassVisitor {
         boolean doTrace = tracer.getMatcherSet().methodMatch(className, classAnnotations, classInterfaces,
                 access, methodName, methodDesc, null) || (tracer.isTraceSpyMethods() && ctxs.size() > 0);
 
-        if (doTrace && ZorkaLogger.isLogMask(ZorkaLogger.ZTR_INSTRUMENT_METHOD)) {
-            log.debug(ZorkaLogger.ZTR_INSTRUMENT_METHOD, "Instrumenting method (for trace): "
-                    + className + "." + methodName + " " + methodDesc);
+        if (doTrace && log.isDebugEnabled()) {
+            log.debug("Instrumenting method (for trace): " + className + "." + methodName + " " + methodDesc);
         }
 
         if (ctxs.size() > 0 || doTrace) {

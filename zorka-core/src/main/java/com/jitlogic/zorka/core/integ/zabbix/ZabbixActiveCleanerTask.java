@@ -19,8 +19,8 @@ package com.jitlogic.zorka.core.integ.zabbix;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Responsible for sending data batches to a "Zabbix Server"
@@ -31,7 +31,7 @@ public class ZabbixActiveCleanerTask implements Runnable {
 	/**
 	 * Logger
 	 */
-	private static final ZorkaLog log = ZorkaLogger.getLog(ZabbixActiveCleanerTask.class);
+	private static final Logger log = LoggerFactory.getLogger(ZabbixActiveCleanerTask.class);
 
 	private ConcurrentLinkedQueue<ActiveCheckResult> responseQueue;
 
@@ -44,10 +44,10 @@ public class ZabbixActiveCleanerTask implements Runnable {
 
 	@Override
 	public void run() {
-		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActiveSender Cleaning cache...");
+		log.debug("ZabbixActiveSender Cleaning cache...");
 		int endIndex = responseQueue.size();
 		removeFromCache(endIndex - maxCacheSize);
-		log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActiveSender ... cache cleaned");
+		log.debug("ZabbixActiveSender ... cache cleaned");
 	}
 
 	private void removeFromCache(int itemsCount) {
@@ -56,7 +56,7 @@ public class ZabbixActiveCleanerTask implements Runnable {
 			responseQueue.poll();
 		}
 		if (itemsCount > 0) {
-			log.debug(ZorkaLogger.ZAG_DEBUG, "ZabbixActiveSender " + itemsCount + " items removed from cache");
+			log.debug("ZabbixActiveSender " + itemsCount + " items removed from cache");
 		}
 	}
 

@@ -16,9 +16,9 @@
 package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.management.*;
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ import java.util.List;
 public class JmxAggregatingLister<T extends Rankable<?>> implements RankLister<T> {
 
     /** Logger. */
-    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     /** Class loader lister switches to to when performing listing. */
     private ClassLoader classLoader;
@@ -77,7 +77,7 @@ public class JmxAggregatingLister<T extends Rankable<?>> implements RankLister<T
                     }
                 }
             } catch (Exception e) {
-                log.error(ZorkaLogger.ZSP_ERRORS, "Error processing name '" + on + "'", e);
+                log.error("Error processing name '" + on + "'", e);
             }
         }
 

@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "jvm.bsh",
   "javax.bsh",
   "libs.bsh",
@@ -40,11 +39,6 @@ __muleesb() {
     _trace = zorka.boolCfg("mule.trace");
     _stats = zorka.boolCfg("mule.stats");
     _mbean = zorka.stringCfg("mule.stats.mbean");
-
-    // Register trace types for CBOR collector.
-    tracer.defType("MULE_CMP", 106);
-    tracer.defType("MULE_DISP", 107);
-    tracer.defType("MULE_FLOW", 108);
 
     extract_annotations() {
 
@@ -200,6 +194,7 @@ __muleesb() {
     }
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("MULE_ESB");
   }
 

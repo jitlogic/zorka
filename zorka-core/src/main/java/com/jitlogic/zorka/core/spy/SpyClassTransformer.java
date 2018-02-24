@@ -20,11 +20,11 @@ package com.jitlogic.zorka.core.spy;
 import com.jitlogic.zorka.common.stats.MethodCallStatistic;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.common.util.ZorkaConfig;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaLog;
+import com.jitlogic.zorka.core.ZorkaBshAgent;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
@@ -42,7 +42,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
     /**
      * Logger
      */
-    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * All spy defs configured
@@ -82,6 +82,10 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
     private boolean computeFrames;
 
+    private boolean scriptsAuto;
+
+    private ZorkaBshAgent bshAgent;
+
     /**
      * Reference to tracer instance.
      */
@@ -97,13 +101,15 @@ public class SpyClassTransformer implements ClassFileTransformer {
      *
      * @param tracer reference to tracer engine object
      */
-    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer,
-                               boolean computeFrames, boolean useCustomResolver,
+    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer, ZorkaBshAgent bshAgent,
+                               boolean computeFrames, boolean useCustomResolver, boolean scriptsAuto,
                                MethodCallStatistics statistics, SpyRetransformer retransformer) {
         this.symbolRegistry = symbolRegistry;
         this.tracer = tracer;
+        this.bshAgent = bshAgent;
         this.computeFrames = computeFrames;
         this.useCustomResolver = useCustomResolver;
+        this.scriptsAuto = scriptsAuto;
         this.retransformer = retransformer;
 
         if (useCustomResolver) {
@@ -117,7 +123,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
 
         if (!computeFrames) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Disabling COMPUTE_FRAMES. Remeber to add -XX:-UseSplitVerifier JVM option in JDK7 or -noverify in JDK8.");
+            log.info("Disabling COMPUTE_FRAMES. Remeber to add -XX:-UseSplitVerifier JVM option in JDK7 or -noverify in JDK8.");
         }
     }
 
@@ -164,13 +170,12 @@ public class SpyClassTransformer implements ClassFileTransformer {
     public synchronized SpyDefinition add(SpyDefinition sdef) {
         SpyDefinition osdef = sdefs.get(sdef.getName());
 
-        log.info(ZorkaLogger.ZSP_CONFIG, (osdef == null ? "Adding " : "Replacing ")
-                + sdef.getName() + " spy definition.");
+        log.info((osdef == null ? "Adding " : "Replacing ") + sdef.getName() + " spy definition.");
 
         boolean shouldRetransform = osdef != null && !osdef.sameProbes(sdef) && !retransformer.isEnabled();
 
         if (shouldRetransform) {
-            log.warn(ZorkaLogger.ZSP_CONFIG, "Cannot overwrite spy definition '" + osdef.getName()
+            log.warn("Cannot overwrite spy definition '" + osdef.getName()
                     + "' because probes have changed and retransform is not possible.");
             return null;
         }
@@ -180,7 +185,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
         if (retransformer.isEnabled() && (osdef == null || !osdef.sameProbes(sdef))) {
             retransformer.retransform(osdef != null ? osdef.getMatcherSet() : null, sdef.getMatcherSet(), true);
         } else {
-            log.info(ZorkaLogger.ZSP_CONFIG, "Probes didn't change for " + sdef.getName() + ". Retransform not needed.");
+            log.info("Probes didn't change for " + sdef.getName() + ". Retransform not needed.");
         }
 
         if (osdef != null) {
@@ -206,7 +211,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
     public synchronized void remove(SpyDefinition sdef) {
         if (sdefs.get(sdef.getName()) == sdef) {
-            log.info(ZorkaLogger.ZSP_CONFIG, "Removing spy definition: " + sdef.getName());
+            log.info("Removing spy definition: " + sdef.getName());
 
             sdefs.remove(sdef.getName());
 
@@ -231,7 +236,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
             }
 
         } else {
-            log.info(ZorkaLogger.ZSP_CONFIG, "Spy definition " + sdef.getName() + " has changed.");
+            log.info("Spy definition " + sdef.getName() + " has changed.");
         }
     }
 
@@ -247,7 +252,6 @@ public class SpyClassTransformer implements ClassFileTransformer {
         return ret;
     }
 
-
     @Override
     public byte[] transform(ClassLoader classLoader, String className, Class<?> classBeingRedefined,
                             ProtectionDomain protectionDomain, byte[] cbf) throws IllegalClassFormatException {
@@ -262,7 +266,11 @@ public class SpyClassTransformer implements ClassFileTransformer {
             return null;
         }
 
-        String clazzName = className.replace("/", ".");
+        String clazzName = className.replace('/', '.');
+
+        if (scriptsAuto) {
+            bshAgent.probe(clazzName);
+        }
 
         Set<String> currentTransforms = currentTransformsTL.get();
         if (currentTransforms.contains(clazzName)) {
@@ -275,8 +283,8 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
         List<SpyDefinition> found = new ArrayList<SpyDefinition>();
 
-        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_CLASS_TRC)) {
-            log.debug(ZorkaLogger.ZSP_CLASS_TRC, "Encountered class: %s", className);
+        if (log.isDebugEnabled()) {
+            log.debug("Encountered class: %s", className);
         }
 
         long st1 = System.nanoTime();
@@ -302,9 +310,8 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
             long tt1 = System.nanoTime();
 
-            if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_CLASS_TRC)) {
-                log.debug(ZorkaLogger.ZSP_CLASS_TRC, "Transforming class: %s (sdefs found: %d; tracer match: %b)",
-                        className, found.size(), tracerMatch);
+            if (log.isDebugEnabled()) {
+                log.debug("Transforming class: %s (sdefs found: %d; tracer match: %b)", className, found.size(), tracerMatch);
             }
 
             boolean doComputeFrames = computeFrames && (cbf[7] > (byte) 0x32);

@@ -17,8 +17,8 @@ package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.management.*;
 import java.util.*;
@@ -31,7 +31,7 @@ import java.util.*;
 public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
 
     /** Logger */
-    private static final ZorkaLog log = ZorkaLogger.getLog(EjbRankLister.class);
+    private static final Logger log = LoggerFactory.getLogger(EjbRankLister.class);
 
     /** Tracked EJB statistics */
     private volatile Map<String,EjbRankItem> stats = new HashMap<String, EjbRankItem>();
@@ -85,7 +85,7 @@ public class EjbRankLister implements Runnable, RankLister<EjbRankItem> {
                     }
                 }
             } catch (Exception e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Cannot perform discovery on " + name, e);
+                log.error("Cannot perform discovery on " + name, e);
             }
         }
 

@@ -16,17 +16,17 @@
 
 package com.jitlogic.zorka.core.integ.zabbix;
 
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class ZabbixQueryTranslator implements QueryTranslator {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(ZabbixQueryTranslator.class);
+    private static final Logger log = LoggerFactory.getLogger(ZabbixQueryTranslator.class);
 
     private Set<String> allowed = new HashSet<String>();
 

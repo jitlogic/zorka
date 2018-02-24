@@ -17,6 +17,7 @@ package com.jitlogic.zorka.core.test.support;
 
 import com.jitlogic.zorka.common.test.support.CommonFixture;
 import com.jitlogic.zorka.common.test.support.TestJmx;
+import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.*;
 import com.jitlogic.zorka.core.integ.NagiosLib;
@@ -46,6 +47,8 @@ public class ZorkaFixture extends CommonFixture {
     protected AgentInstance agentInstance;
     protected SpyClassTransformer spyTransformer;
 
+    protected TestTaskScheduler taskScheduler;
+
     protected SyslogLib syslogLib;
     protected SpyLib spy;
     protected TracerLib tracer;
@@ -72,6 +75,8 @@ public class ZorkaFixture extends CommonFixture {
 
         // Configure and spawn agent instance ...
 
+        AgentConfig.persistent = false;
+
         configProperties = TestUtil.setProps(
                 ZorkaConfig.defaultProperties(AgentConfig.DEFAULT_CONF_PATH),
                 "zorka.home.dir", "/tmp",
@@ -79,8 +84,13 @@ public class ZorkaFixture extends CommonFixture {
                 "zorka.hostname", "test",
                 "zorka.filelog", "no",
                 "zorka.mbs.autoregister", "yes",
-                "spy", "yes"
+                "scripts", "",
+                "spy", "yes",
+                "scripts.auto", "yes",
+                "auto.com.jitlogic.zorka.core.test.spy.probe", "test.bsh"
         );
+
+        taskScheduler = TestTaskScheduler.instance();
 
         config = new AgentConfig(configProperties);
         agentInstance = new AgentInstance(config, new DummySpyRetransformer(null, config));
@@ -142,5 +152,31 @@ public class ZorkaFixture extends CommonFixture {
 
         return bean;
     }
+
+    public int sid(String symbol) {
+        return symbols.symbolId(symbol);
+    }
+
+    public TraceRecord tr(String className, String methodName, String methodSignature,
+                          long calls, long errors, int flags, long time,
+                          TraceRecord... children) {
+
+        TraceRecord tr = new TraceRecord(null);
+        tr.setClassId(sid(className));
+        tr.setMethodId(sid(methodName));
+        tr.setSignatureId(sid(methodSignature));
+        tr.setCalls(calls);
+        tr.setErrors(errors);
+        tr.setFlags(flags);
+        tr.setTime(time);
+
+        for (TraceRecord child : children) {
+            child.setParent(tr);
+            tr.addChild(child);
+        }
+
+        return tr;
+    }
+
 
 }

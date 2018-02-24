@@ -16,24 +16,36 @@
 package com.jitlogic.zorka.core;
 
 
+import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.core.integ.SyslogLib;
 import com.jitlogic.zorka.core.integ.SyslogTrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.impl.ZorkaLogLevel;
+import org.slf4j.impl.ZorkaLoggerFactory;
+import org.slf4j.impl.ZorkaTrapper;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 public class AgentConfig extends ZorkaConfig {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(AgentConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(AgentConfig.class);
 
     public final static String DEFAULT_CONF_PATH = "/com/jitlogic/zorka/core/zorka.properties";
     public static final String PROP_SCRIPTS_DIR = "zorka.scripts.dir";
-    ;
+
     public static final String PROP_PROFILE_DIR = "zorka.profile.dir";
 
+    public static boolean persistent = true;
+
     private String agentHome;
+
+    private Map<String,String> agentAttrs = null;
 
     public AgentConfig(String home) {
         this.agentHome = home;
@@ -48,12 +60,12 @@ public class AgentConfig extends ZorkaConfig {
 
     public AgentConfig(Properties props) {
         properties = props;
-        homeDir = props.getProperty(PROP_HOME_DIR);
+        homeDir = get(PROP_HOME_DIR);
         setBaseProps();
     }
 
 
-    protected void setBaseProps() {
+    private void setBaseProps() {
         if (!properties.containsKey(PROP_SCRIPTS_DIR)) {
             properties.put(PROP_SCRIPTS_DIR, ZorkaUtil.path(homeDir, "scripts"));
         }
@@ -65,6 +77,12 @@ public class AgentConfig extends ZorkaConfig {
         if (!properties.containsKey("zorka.log.dir")) {
             properties.put("zorka.log.dir", ZorkaUtil.path(homeDir, "log"));
         }
+
+        agentAttrs = mapCfg("zorka.agent", "host", stringCfg("zorka.hostname", System.getenv("HOSTNAME")));
+    }
+
+    public Map<String,String> getAgentAttrs() {
+        return Collections.unmodifiableMap(agentAttrs);
     }
 
     /**
@@ -82,9 +100,10 @@ public class AgentConfig extends ZorkaConfig {
             initSyslogTrapper();
         }
 
-        ZorkaLogger.configure(getProperties());
+        // TODO configure logger here
+        ZorkaLoggerFactory.getInstance().configure(this.getProperties());
 
-        log.info(ZorkaLogger.ZAG_CONFIG, "Starting ZORKA agent " + getProperties().getProperty("zorka.version"));
+        log.info("Starting ZORKA agent " + get("zorka.version"));
     }
 
 
@@ -97,16 +116,20 @@ public class AgentConfig extends ZorkaConfig {
             String hostname = stringCfg("zorka.hostname", "zorka");
             int syslogFacility = SyslogLib.getFacility(stringCfg("zorka.syslog.facility", "F_LOCAL0"));
 
-            SyslogTrapper syslog = new SyslogTrapper(server, hostname, syslogFacility, true);
-            syslog.disableTrapCounter();
-            syslog.start();
+            SyslogTrapper trapper = new SyslogTrapper(server, hostname, syslogFacility, true);
+            trapper.disableTrapCounter();
+            trapper.start();
 
-            ZorkaLogger.getLogger().addTrapper(syslog);
+            ZorkaTrapper oldTrapper = ZorkaLoggerFactory.getInstance().swapTrapper(trapper);
+            if (oldTrapper instanceof ZorkaService) {
+                ((ZorkaService)oldTrapper).shutdown();
+            }
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing logger arguments", e);
-            log.info(ZorkaLogger.ZAG_ERRORS, "Syslog trapper will be disabled.");
+            log.error("Error parsing logger arguments", e);
+            log.info("Syslog trapper will be disabled.");
             AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         }
+
     }
 
 
@@ -126,8 +149,8 @@ public class AgentConfig extends ZorkaConfig {
             maxSize = (int) (long) kiloCfg("zorka.log.size", 4L * 1024 * 1024);
             maxLogs = intCfg("zorka.log.num", 8);
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing logger arguments", e);
-            log.info(ZorkaLogger.ZAG_ERRORS, "File trapper will be disabled.");
+            log.error("Error parsing logger arguments", e);
+            log.info("File trapper will be disabled.");
             AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         }
 
@@ -137,9 +160,33 @@ public class AgentConfig extends ZorkaConfig {
         trapper.disableTrapCounter();
         trapper.start();
 
-        ZorkaLogger.getLogger().addTrapper(trapper);
+        ZorkaTrapper oldTrapper = ZorkaLoggerFactory.getInstance().swapTrapper(trapper);
+        if (oldTrapper instanceof ZorkaService) {
+            ((ZorkaService)oldTrapper).shutdown();
+        }
     }
 
+    public void writeCfg(String key, Object val) {
+        super.writeCfg(key, val);
+        if (persistent) {
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(new File(agentHome, "zorka.properties"), true);
+                String s = "\n" + key + " = " + val + "\n";
+                fos.write(s.getBytes());
+            } catch (IOException e) {
+                log.error("I/O error when updating zorka.properties file.");
+            } finally {
+                if (fos != null) {
+                    try {
+                        fos.close();
+                    } catch (IOException e) {
+                        log.error("Error closing zorka.properties.", e);
+                    }
+                }
+            }
+        }
+    }
 
     @Override
     protected void markError(String msg, Throwable e) {

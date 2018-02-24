@@ -27,13 +27,20 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class MethodCallStatistic implements ZorkaStat {
 
+    public static final String DEFAULT_DESC = "Method call statistic.";
+
     private static final long US = 1000L;
     private static final long MS = 1000000L;
 
     /**
-     * Statistic name.
+     * Statistic name (short, symbolic).
      */
     private String name;
+
+    /**
+     * Statistic description (full, human-readable).
+     */
+    private String description;
 
     /**
      * Summary data.
@@ -82,10 +89,17 @@ public class MethodCallStatistic implements ZorkaStat {
         return name;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean hasDescription() {
+        return description != null;
+    }
 
     @Override
     public String getDescription() {
-        return "Number of calls (as measured by Zorka Spy) and its summary time.";
+        return description != null ? description : DEFAULT_DESC;
     }
 
 

@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "tracer.bsh"
 );
 
@@ -32,10 +31,8 @@ __quartz() {
   _stats = zorka.boolCfg("quartz.stats");
   _mbean = zorka.stringCfg("quartz.stats.mbean");
 
-  // Register trace types for CBOR collector.
-  tracer.defType("QUARTZ", 43);
-
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("QUARTZ");
   }
 

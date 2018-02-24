@@ -38,8 +38,8 @@ import javax.management.openmbean.TabularData;
 import javax.management.openmbean.TabularType;
 
 import com.jitlogic.zorka.common.stats.ValGetter;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -52,7 +52,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
     /**
      * Logger
      */
-    private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaMappedMBean.class);
+    private static final Logger log = LoggerFactory.getLogger(ZorkaMappedMBean.class);
 
     /**
      * Bean description (presented by JMX)
@@ -122,7 +122,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
                 final Object val = getAttribute(attr);
                 lst.add(val);
             } catch (Exception e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error getting attribute '" + attr + "':", e);
+                log.error("Error getting attribute '" + attr + "':", e);
             }
         }
 
@@ -139,7 +139,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
                 setAttribute(attr);
                 lst.add(new Attribute(attr.getName(), attr.getValue()));
             } catch (Exception e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error setting attribute '" + e + "'", e);
+                log.error("Error setting attribute '" + e + "'", e);
             }
         }
 
@@ -220,7 +220,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
             Attribute attr = new Attribute(name, value);
             setAttribute(attr);
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error setting attribute '" + name + "':", e);
+            log.error("Error setting attribute '" + name + "':", e);
         }
     }
 

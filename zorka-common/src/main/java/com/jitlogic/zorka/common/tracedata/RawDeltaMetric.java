@@ -32,16 +32,19 @@ public class RawDeltaMetric extends RawDataMetric {
      */
     private Number last;
 
-    public RawDeltaMetric(int id, String name, String description, HashMap<String, Object> attrs) {
-        super(id, name, description, attrs);
+    public RawDeltaMetric(int id, String name, String description, String domain,
+                          Map<String, Object> attrs) {
+        super(id, name, description, domain, attrs);
     }
 
-    public RawDeltaMetric(int id, int templateId, String name, String description, HashMap<String, Object> attrs) {
-        super(id, templateId, name, description, attrs);
+    public RawDeltaMetric(int id, int templateId, String name, String description, String domain,
+                          Map<String, Object> attrs) {
+        super(id, templateId, name, description, domain, attrs);
     }
 
-    public RawDeltaMetric(MetricTemplate template, String name, String description, HashMap<String, Object> attrs) {
-        super(template, name, description, attrs);
+    public RawDeltaMetric(MetricTemplate template, String name, String description, String domain,
+                          Map<String, Object> attrs) {
+        super(template, name, description, domain, attrs);
     }
 
     @Override

@@ -23,8 +23,8 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class receives loose tracer submissions from single thread
@@ -34,7 +34,7 @@ import com.jitlogic.zorka.common.util.ZorkaLogger;
  */
 public class TraceBuilder {
 
-    private final static ZorkaLog log = ZorkaLogger.getLog(TraceBuilder.class);
+    private final static Logger log = LoggerFactory.getLogger(TraceBuilder.class);
 
 
     /**
@@ -71,12 +71,12 @@ public class TraceBuilder {
     public void traceBegin(int traceId, long clock, int flags) {
 
         if (ttop == null) {
-            log.error(ZorkaLogger.ZTR_TRACE_ERRORS, "Attempt to set trace marker on an non-traced method.");
+            log.error("Attempt to set trace marker on an non-traced method.");
             return;
         }
 
         if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {
-            log.error(ZorkaLogger.ZTR_TRACE_ERRORS, "Trace marker already set on current frame. Skipping.");
+            log.error("Trace marker already set on current frame. Skipping.");
             return;
         } else {
             ttop.setMarker(new TraceMarker(ttop, traceId, clock));
@@ -92,11 +92,10 @@ public class TraceBuilder {
             return;
         }
 
-        if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACER_DBG)) {
-            if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACE_CALLS) ||
-                    (ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
-                log.trace(ZorkaLogger.ZTR_TRACER_DBG, "traceEnter("
-                        + symbols.symbolName(classId) + "." + symbols.symbolName(methodId) + ")");
+
+        if (log.isTraceEnabled()) {
+            if ((ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
+                log.trace("traceEnter(" + symbols.symbolName(classId) + "." + symbols.symbolName(methodId) + ")");
             }
         }
 
@@ -131,15 +130,13 @@ public class TraceBuilder {
             return;
         }
 
-        if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACER_DBG)) {
-            if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACE_CALLS) ||
-                    (ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
+        if (log.isTraceEnabled()) {
+            if ((ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
                 TraceRecord tr = ttop;
                 if (tr.getClassId() == 0 && tr.getParent() != null) {
                     tr = tr.getParent();
                 }
-                log.trace(ZorkaLogger.ZTR_TRACER_DBG, "traceReturn("
-                        + symbols.symbolName(tr.getClassId()) + "." + symbols.symbolName(tr.getMethodId()) + ")");
+                log.trace("traceReturn(" + symbols.symbolName(tr.getClassId()) + "." + symbols.symbolName(tr.getMethodId()) + ")");
             }
         }
 
@@ -159,14 +156,13 @@ public class TraceBuilder {
             return;
         }
 
-        if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACER_DBG)) {
-            if (ZorkaLogger.isLogMask(ZorkaLogger.ZTR_TRACE_EXCEPTIONS) ||
-                    (ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
+        if (log.isTraceEnabled()) {
+            if ((ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
                 TraceRecord tr = ttop;
                 if (tr.getClassId() == 0 && tr.getParent() != null) {
                     tr = tr.getParent();
                 }
-                log.trace(ZorkaLogger.ZTR_TRACER_DBG, "traceError(" + symbols.symbolName(tr.getClassId()) +
+                log.trace("traceError(" + symbols.symbolName(tr.getClassId()) +
                         "." + symbols.symbolName(tr.getMethodId()) + ")", (Throwable) exception);
             }
         }

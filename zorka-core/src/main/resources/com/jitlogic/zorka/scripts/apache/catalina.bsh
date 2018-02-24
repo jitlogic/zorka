@@ -16,9 +16,9 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "http.bsh",
-  "audit.bsh"
+  "audit.bsh",
+  "apache/apache.bsh"
 );
 
 __catalina() {
@@ -170,14 +170,13 @@ __catalina() {
   }
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("CATALINA");
   }
 
   if (zorka.boolCfg("tracer")) {
     tracer.exclude(
         "org.apache.tomcat.util.**",
-        "org.apache.naming.resources.**",
-        "org.apache.naming.StringManager",
         "org.apache.catalina.security.**",
         "org.apache.catalina.core.ApplicationCont**",
         "org.apache.catalina.core.ContainerBase/fireContainerEvent",

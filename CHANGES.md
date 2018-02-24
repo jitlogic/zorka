@@ -1,15 +1,31 @@
+Zorka 1.1.1 (2018-02-24)
+-------------------------
+
+* this is development version: things may change in unpredictable ways;
+* automatic detection of application servers and frameworks;
+* environment variables, system properties, references in zorka.properties;
+* description field in zorka metrics (useful for autodiscovered items);
+* InfluxDB integration (HTTP push via perfmon library);
+* use slf4j instead of custom logging API (jarjar moves all classes aside, so no conflicts should occur);
+* OpenTSDB integration (HTTP push via perfmon library);
+* Graphite integration (TCP/pickle push via perfmon library);
+* Prometheus integration (via Push Gateway); 
+* include BSH and libsnmp into agent codebase;
+* HTTP/CBOR tracer output - fixes and protocol changes;
+
+
 Zorka 1.0.16 (2017-11-22)
 -------------------------
 
-* Update: ASM 6.0;
+* update: ASM 6.0;
 * Wildfly 8.x/9.x: catch HTTP traces in the lowest layer of Undertow;
 * Wildfly 10.x, 11.x support;
 * Alfresco 2017+ support;
 * HTTP/CBOR tracer output (new CBOR collector is yet to be released);
-* Fixes & performance improvements for active checks (by dd00ff@github);
-* Add Zabbix host metadata to default and sample property files;
-* Detect and skip instrumentation if argument index out of scope;
-* Templates for Zabbix 3.x + support for automatic registration;
+* fixes & performance improvements for active checks (by dd00ff@github);
+* add Zabbix host metadata to default and sample property files;
+* detect and skip instrumentation if argument index out of scope;
+* templates for Zabbix 3.x + support for automatic registration;
 * new tracer.min.trace.calls setting to ease tracer tuning;
 * Various fixes;
 

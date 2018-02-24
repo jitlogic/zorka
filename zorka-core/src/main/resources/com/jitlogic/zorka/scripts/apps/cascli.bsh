@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "tracer.bsh"
 );
 
@@ -37,9 +36,6 @@ __casclient() {
 
   _trace = zorka.boolCfg("cas.trace");
   _trace_time = zorka.longCfg("cas.trace.time");
-
-  // Register trace types for CBOR collector.
-  tracer.defType("CAS_CLI", 105);
 
   spy.add(spy.instrument("CASCLI_VALIDATE")
     .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("TICKET", 1), spy.fetchArg("SERVICE", 2),
@@ -65,6 +61,7 @@ __casclient() {
     .include(spy.byMethod("org.jasig.cas.client.validation.AbstractUrlBasedTicketValidator", "validate")));
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("JASIG_CAS:CLIENT");
   }
 

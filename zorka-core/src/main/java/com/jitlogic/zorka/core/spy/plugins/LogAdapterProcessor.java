@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLogLevel;
+import org.slf4j.impl.ZorkaLogLevel;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.util.Map;

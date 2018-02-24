@@ -24,10 +24,10 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.core.integ.ZorkaRequestHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Zabbix request handler is used by ZabbixAgent thread to parse queries from zabbix server and format responses.
@@ -38,7 +38,7 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
     /**
      * Logger
      */
-    private static final ZorkaLog log = ZorkaLogger.getLog(ZabbixRequestHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(ZabbixRequestHandler.class);
 
     /**
      * Socket with established server connection.
@@ -258,16 +258,16 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
     public void handleResult(Object rslt) {
         try {
             tStop = System.nanoTime();
-            log.debug(ZorkaLogger.ZAG_DEBUG, "OK [t=" + (tStop - tStart) / 1000000L + "ms] '" + req + "' -> '" + rslt + "'");
+            log.debug("OK [t=" + (tStop - tStart) / 1000000L + "ms] '" + req + "' -> '" + rslt + "'");
             AgentDiagnostics.inc(AgentDiagnostics.ZABBIX_TIME, tStop - tStart);
             send(serialize(rslt));
         } catch (IOException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "I/O error returning result: " + e.getMessage());
+            log.error("I/O error returning result: " + e.getMessage());
         } finally {
             try {
                 socket.close();
             } catch (IOException e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "I/O error closing socket.", e);
+                log.error("I/O error closing socket.", e);
             }
         }
     }
@@ -291,16 +291,16 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
         AgentDiagnostics.inc(AgentDiagnostics.ZABBIX_ERRORS);
         try {
             this.tStop = System.nanoTime();
-            log.error(ZorkaLogger.ZAG_ERRORS, "ERROR [t=" + (tStop - tStart) / 1000000L + "ms] + '" + req + "'", e);
+            log.error("ERROR [t=" + (tStop - tStart) / 1000000L + "ms] + '" + req + "'", e);
             AgentDiagnostics.inc(AgentDiagnostics.ZABBIX_TIME, tStop - tStart);
             send(ZBX_NOTSUPPORTED);
         } catch (IOException e1) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "I/O Error returning (error) result: " + e.getMessage());
+            log.error("I/O Error returning (error) result: " + e.getMessage());
         } finally {
             try {
                 socket.close();
             } catch (IOException e2) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "I/O error closing socket.", e2);
+                log.error("I/O error closing socket.", e2);
             }
         }
     }

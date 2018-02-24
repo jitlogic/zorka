@@ -23,14 +23,16 @@ public class QuerySegment {
 
     private Object attr;
     private String name;
+    private boolean fetchValue;
 
     public QuerySegment(Object attr) {
-        this(attr, null);
+        this(attr, null, false);
     }
 
-    public QuerySegment(Object attr, String name) {
+    public QuerySegment(Object attr, String name, boolean fetchValue) {
         this.attr = attr;
         this.name = name;
+        this.fetchValue = fetchValue;
     }
 
 
@@ -43,6 +45,9 @@ public class QuerySegment {
         return name;
     }
 
+    public boolean shouldFetchValue() {
+        return fetchValue;
+    }
 
     public boolean matches(Object v) {
         return v != null && attr instanceof Pattern

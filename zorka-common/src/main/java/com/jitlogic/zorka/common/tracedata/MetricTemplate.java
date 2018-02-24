@@ -41,9 +41,14 @@ public class MetricTemplate implements Serializable {
     private int id;
 
     /**
-     * Determines types of metrics created from this template.
+     * Determines types of metrics created from this template (see above constants).
      */
     private int type;
+
+    /**
+     * Domain name (as in JMX).
+     */
+    private String domain;
 
     /**
      * Metric short name (eg. cpu_load, mem_util etc.)
@@ -71,7 +76,7 @@ public class MetricTemplate implements Serializable {
     private double multiplier = 1.0;
 
     /**
-     * Names of dynamic attributes
+     * Names of dynamic attributes.
      */
     private Set<String> dynamicAttrs = new HashSet<String>();
 
@@ -88,8 +93,8 @@ public class MetricTemplate implements Serializable {
      * @param description  metric description
      * @param units units of measure
      */
-    public MetricTemplate(int type, String name, String description, String units) {
-        this(type, name, description, units, null, null);
+    public MetricTemplate(int type, String domain, String name, String description, String units) {
+        this(type, domain, name, description, units, null, null);
     }
 
 
@@ -103,10 +108,11 @@ public class MetricTemplate implements Serializable {
      * @param nomField nominal field
      * @param divField divider field
      */
-    public MetricTemplate(int id, int type, String name, String description, String units, String nomField, String divField) {
+    public MetricTemplate(int id, int type, String domain, String name, String description, String units, String nomField, String divField) {
         this.id = id;
         this.type = type;
         this.name = name;
+        this.domain = domain;
         this.description = description;
         this.units = units;
         this.nomField = nomField;
@@ -123,9 +129,10 @@ public class MetricTemplate implements Serializable {
      * @param nomField nominal field
      * @param divField divider field
      */
-    public MetricTemplate(int type, String name, String description, String units, String nomField, String divField) {
+    public MetricTemplate(int type, String domain, String name, String description, String units, String nomField, String divField) {
         this.type = type;
         this.name = name;
+        this.domain = domain;
         this.description = description;
         this.units = units;
         this.nomField = nomField;
@@ -141,6 +148,7 @@ public class MetricTemplate implements Serializable {
     private MetricTemplate(MetricTemplate orig) {
         this.id = orig.id;
         this.type = orig.type;
+        this.domain = orig.domain;
         this.name = orig.name;
         this.description = orig.description;
         this.nomField = orig.nomField;
@@ -181,6 +189,9 @@ public class MetricTemplate implements Serializable {
         return type;
     }
 
+    public String getDomain() {
+        return domain;
+    }
 
     public String getDescription() {
         return description;

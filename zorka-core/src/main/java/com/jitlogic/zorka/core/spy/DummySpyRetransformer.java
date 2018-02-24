@@ -15,24 +15,24 @@
  */
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.AgentConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.instrument.Instrumentation;
 
 
 public class DummySpyRetransformer implements SpyRetransformer {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(DummySpyRetransformer.class);
+    private static final Logger log = LoggerFactory.getLogger(DummySpyRetransformer.class);
 
     public DummySpyRetransformer(Instrumentation instrumentation, AgentConfig config) {
-        log.info(ZorkaLogger.ZSP_CONFIG, "Class retransform is not supported. Online reconfiguration will be crippled.");
+        log.info("Class retransform is not supported. Online reconfiguration will be crippled.");
     }
 
     @Override
     public boolean retransform(SpyMatcherSet oldSet, SpyMatcherSet newSet, boolean isSdef) {
-        log.warn(ZorkaLogger.ZSP_CONFIG, "Ignoring classes retransform due to lack of platform support.");
+        log.warn("Ignoring classes retransform due to lack of platform support.");
         return false;
     }
 

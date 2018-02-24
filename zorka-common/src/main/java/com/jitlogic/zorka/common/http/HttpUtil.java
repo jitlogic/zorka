@@ -16,30 +16,55 @@
 
 package com.jitlogic.zorka.common.http;
 
+import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
+
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HttpUtil {
 
     private static HttpClient client = new MiniHttpClient();
+    public static final Pattern RE_HTTP_URL = Pattern.compile("(https?)://([^/]+)(/.*)");
+
+
 
     public static HttpRequest GET(String url) throws IOException {
-        HttpRequest req = new HttpRequest(client, url);
-        req.setMethod("GET");
-        return req;
+        Matcher m = RE_HTTP_URL.matcher(url);
+        if (m.matches()) {
+            HttpRequest req = new HttpRequest(client, url);
+            req.setMethod("GET");
+            req.setHeader("Host", m.group(2));
+            return req;
+        } else {
+            throw new ZorkaRuntimeException("Invalid URL: '" + url + "'");
+        }
     }
 
     public static HttpRequest POST(String url, String body) throws IOException {
-        HttpRequest req = new HttpRequest(client, url);
-        req.setMethod("POST");
-        req.setBody(body.getBytes());
-        return req;
+        Matcher m = RE_HTTP_URL.matcher(url);
+        if (m.matches()) {
+            HttpRequest req = new HttpRequest(client, url);
+            req.setMethod("POST");
+            req.setBody(body.getBytes());
+            req.setHeader("Host", m.group(2));
+            return req;
+        } else {
+            throw new ZorkaRuntimeException("Invalid URL: '" + url + "'");
+        }
     }
 
     public static HttpRequest POST(String url, byte [] body) throws IOException {
-        HttpRequest req = new HttpRequest(client, url);
-        req.setMethod("POST");
-        req.setBody(body);
-        return req;
+        Matcher m = RE_HTTP_URL.matcher(url);
+        if (m.matches()) {
+            HttpRequest req = new HttpRequest(client, url);
+            req.setMethod("POST");
+            req.setBody(body);
+            req.setHeader("Host", m.group(2));
+            return req;
+        } else {
+            throw new ZorkaRuntimeException("Invalid URL: '" + url + "'");
+        }
     }
 
 

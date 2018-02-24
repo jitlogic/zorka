@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "ejb.bsh",
   "jvm.bsh",
   "jsf.bsh",
@@ -153,6 +152,7 @@ __wls() {
   }
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("WEBLOGIC");
   }
 

@@ -20,5 +20,5 @@ import com.jitlogic.zorka.common.ZorkaSubmitter;
 
 public interface TracerOutput extends ZorkaSubmitter<SymbolicRecord> {
 
-    public boolean submit(SymbolicRecord record);
+    boolean submit(SymbolicRecord record);
 }

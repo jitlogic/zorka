@@ -15,12 +15,12 @@
  */
 package com.jitlogic.zorka.core.spy.plugins;
 
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.SpyContext;
 import com.jitlogic.zorka.core.spy.SpyDefinition;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -43,7 +43,7 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
     /**
      * Logger
      */
-    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Record processing thread
@@ -134,8 +134,8 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
             return;
         }
 
-        if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-            log.debug(ZorkaLogger.ZSP_ARGPROC, "Dispatching collector record: " + record);
+        if (log.isDebugEnabled()) {
+            log.debug("Dispatching collector record: " + record);
         }
 
         SpyDefinition sdef = ((SpyContext) record.get(".CTX")).getSpyDefinition();
@@ -146,7 +146,7 @@ public class AsyncQueueCollector implements SpyProcessor, Runnable {
                     break;
                 }
             } catch (Exception e) {
-                log.error(ZorkaLogger.ZSP_ERRORS, "Error transforming record: " + record + " (on processor " + processor + ")", e);
+                log.error("Error transforming record: " + record + " (on processor " + processor + ")", e);
                 break;
             }
         }

@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "rest.bsh"
 );
 
@@ -46,6 +45,7 @@ __jersey() {
   );
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("JERSEY");
   }
 

@@ -20,9 +20,9 @@ import com.jitlogic.contrib.libsnmp.*;
 import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Vector;
@@ -39,7 +39,7 @@ public class SnmpLib implements ZorkaService {
     /**
      * Logger.
      */
-    private static final ZorkaLog log = ZorkaLogger.getLog(SnmpLib.class);
+    private static final Logger log = LoggerFactory.getLogger(SnmpLib.class);
 
     /**
      * SNMPv1 protocol version
@@ -240,11 +240,11 @@ public class SnmpLib implements ZorkaService {
                 case UINTEGER32:
                     return new SNMPUInteger32((Long) ZorkaUtil.coerce(val, Long.class));
                 default:
-                    log.error(ZorkaLogger.ZAG_ERRORS, "Invalid type code passed to val(): " + type);
+                    log.error("Invalid type code passed to val(): " + type);
                     break;
             }
         } catch (SNMPBadValueException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error creating value", e);
+            log.error("Error creating value", e);
         }
         return null;
     }

@@ -16,16 +16,16 @@
 
 package com.jitlogic.zorka.core.spy.plugins;
 
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 public class UtilFnProcessor implements SpyProcessor {
 
-    private final static ZorkaLog log = ZorkaLogger.getLog(UtilFnProcessor.class);
+    private final static Logger log = LoggerFactory.getLogger(UtilFnProcessor.class);
 
     public static final int UF_STRTIME = 1;
     public static final int UF_STRCLOCK = 2;
@@ -55,7 +55,7 @@ public class UtilFnProcessor implements SpyProcessor {
                 if (t instanceof Long) {
                     record.put(dstField, ZorkaUtil.strTime((Long) t));
                 } else {
-                    log.error(ZorkaLogger.ZSP_ERRORS, "Cannot process value " + t + ": must be of type Long.");
+                    log.error("Cannot process value " + t + ": must be of type Long.");
                 }
                 break;
             }
@@ -64,12 +64,12 @@ public class UtilFnProcessor implements SpyProcessor {
                 if (t instanceof Long) {
                     record.put(dstField, ZorkaUtil.strClock((Long) t));
                 } else {
-                    log.error(ZorkaLogger.ZSP_ERRORS, "Cannot process value " + t + ": must be of type Long.");
+                    log.error("Cannot process value " + t + ": must be of type Long.");
                 }
                 break;
             }
             default:
-                log.error(ZorkaLogger.ZSP_ERRORS, "Invalid function id: " + function);
+                log.error("Invalid function id: " + function);
         }
         return record;
     }

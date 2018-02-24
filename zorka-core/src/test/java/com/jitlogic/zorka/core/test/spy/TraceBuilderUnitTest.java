@@ -18,7 +18,6 @@ package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.spy.*;
 
 import com.jitlogic.zorka.core.test.support.TestUtil;
@@ -77,7 +76,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     }
 
     @Test
-    public void testStrayTraceFragment() throws Exception {
+    public void testStrayTraceFragment() {
         b.traceEnter(c1, m1, s1, 100 * MS);
         b.traceReturn(200 * MS);
 
@@ -86,7 +85,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testSingleTraceWithOneShortElement() throws Exception {
+    public void testSingleTraceWithOneShortElement() {
         b.traceEnter(c1, m1, s1, 100 * MS);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
         b.traceReturn(100 * MS + 100);
@@ -96,7 +95,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testSingleTraceWithOneShortElementAndAlwaysSubmitFlag() throws Exception {
+    public void testSingleTraceWithOneShortElementAndAlwaysSubmitFlag() {
         b.traceEnter(c1, m1, s1, 10 * MS);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
         b.markTraceFlags(0, TraceMarker.SUBMIT_TRACE);
@@ -107,7 +106,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testAllMethodsSubmitFlag() throws Exception {
+    public void testAllMethodsSubmitFlag() {
         b.traceEnter(c1, m1, s1, 10 * MS);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
         b.markTraceFlags(0, TraceMarker.ALL_METHODS);
@@ -120,7 +119,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testSingleOneElementTrace() throws Exception {
+    public void testSingleOneElementTrace() {
         b.traceEnter(c1, m1, s1, 100 * MS);
         b.traceBegin(t1, 200L, TraceMarker.DROP_INTERIM);
         b.traceReturn(200 * MS);
@@ -130,7 +129,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testSingleTraceWithOneChildElement() throws Exception {
+    public void testSingleTraceWithOneChildElement() {
         b.traceEnter(c1, m1, s1, 100 * MS);
         b.traceBegin(t1, 300L, TraceMarker.DROP_INTERIM);
         b.traceEnter(c1, m2, s1, 200 * MS);
@@ -143,7 +142,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testTraceWithErrorElement() throws Exception {
+    public void testTraceWithErrorElement() {
         b.traceEnter(c1, m1, s1, 100 * MS);
         b.traceBegin(t1, 400L, TraceMarker.DROP_INTERIM);
         b.traceError(new Exception("oja!"), 200 * MS);
@@ -154,7 +153,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testTraceWithShortErrorChildElement() throws Exception {
+    public void testTraceWithShortErrorChildElement() {
         b.traceEnter(c1, m1, s1, 100 * MS);
         b.traceBegin(t1, 500L, TraceMarker.DROP_INTERIM);
         b.traceEnter(c1, m2, s1, 200 * MS);
@@ -167,7 +166,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testMixedTraceWithSomeShortElementsAndSomeErrors() throws Exception {
+    public void testMixedTraceWithSomeShortElementsAndSomeErrors() {
         b.traceEnter(c1, m1, s1, 100 * MS);
         b.traceBegin(t1, 600L, TraceMarker.DROP_INTERIM);
         b.setMinimumTraceTime(0);
@@ -305,9 +304,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testTraceWithMultipleBeginFlags() throws Exception {
+    public void testTraceWithMultipleBeginFlags() {
         tracer.setTracerMinTraceTime(0);
-        ZorkaLogger.setLogMask(0); // TODO check why ZorkaLog objects are not constructed correctly in this test
 
         b.traceEnter(c1, m1, s1, 1 * MS);
         b.traceBegin(t1, 2 * MS, TraceMarker.DROP_INTERIM);
@@ -320,7 +318,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testTraceWithTooManyReturns() throws Exception {
+    public void testTraceWithTooManyReturns() {
         tracer.setTracerMinTraceTime(0);
 
         // Submit one frame
@@ -341,7 +339,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testSingleTraceWithMultipleEmbeddedTracesInside() throws Exception {
+    public void testSingleTraceWithMultipleEmbeddedTracesInside() {
         tracer.setTracerMinTraceTime(0);
         tracer.setTracerMinMethodTime(0);
 
@@ -374,7 +372,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testExceptionObjectCleanupAndMarkIfPassedThrough() throws Exception {
+    public void testExceptionObjectCleanupAndMarkIfPassedThrough() {
         tracer.setTracerMinTraceTime(0);
         tracer.setTracerMinMethodTime(0);
 
@@ -396,7 +394,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testThrowAndWrapExceptionCheckIfWrappingExceptionIsMarked() throws Exception {
+    public void testThrowAndWrapExceptionCheckIfWrappingExceptionIsMarked() {
         tracer.setTracerMinTraceTime(0);
         tracer.setTracerMinMethodTime(0);
 
@@ -419,7 +417,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testTimeCalculationAfterShortMethodDrop() throws Exception {
+    public void testTimeCalculationAfterShortMethodDrop() {
         tracer.setTracerMinTraceTime(0);
         tracer.setTracerMinMethodTime(10);
 
@@ -442,7 +440,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testTimeCalculationAfterShortInnerMethodDrop() throws Exception {
+    public void testTimeCalculationAfterShortInnerMethodDrop() {
         tracer.setTracerMinTraceTime(0);
         tracer.setTracerMinMethodTime(10);
 
@@ -500,7 +498,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testFilterOutShortInterimMethods() throws Exception {
+    public void testFilterOutShortInterimMethods() {
         tracer.setTracerMinTraceTime(0);
         tracer.setTracerMinMethodTime(10);
 
@@ -520,7 +518,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testProperExceptionCleanupAfterTraceExit() throws Exception {
+    public void testProperExceptionCleanupAfterTraceExit() {
 
         tracer.setTracerMinTraceTime(0);
         tracer.setTracerMinMethodTime(10);
@@ -547,7 +545,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testTraceAttrReusableRecordBug() throws Exception {
+    public void testTraceAttrReusableRecordBug() {
         tracer.setTracerMinTraceTime(0);
 
         b.traceEnter(c1, m1, s1, 10 * MS);
@@ -562,7 +560,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     }
 
     @Test
-    public void testTraceSubmitWhenMinTraceCallsExceeded() throws Exception {
+    public void testTraceSubmitWhenMinTraceCallsExceeded() {
         tracer.setTracerMinMethodTime(10);
         tracer.setTracerMinTraceCalls(3);
 
@@ -578,7 +576,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     }
 
     @Test
-    public void testTraceSubmitWhenMinTraceCallsNotExceeded() throws Exception {
+    public void testTraceSubmitWhenMinTraceCallsNotExceeded() {
         tracer.setTracerMinMethodTime(10);
         tracer.setTracerMinTraceCalls(3);
 

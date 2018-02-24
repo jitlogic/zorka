@@ -17,7 +17,6 @@
 
 
 zorka.require(
-  "zabbix.bsh",
   "tracer.bsh"
 );
 
@@ -31,10 +30,8 @@ __ldap() {
     _trace = zorka.boolCfg("ldap.trace");
     _traceTime = zorka.longCfg("ldap.trace.time");
 
-    // Register trace types for CBOR collector.
-    tracer.defType("LDAP", 35);
-
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("LDAP");
   }
 

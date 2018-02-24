@@ -27,15 +27,17 @@ import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
-import com.jitlogic.zorka.core.spy.SpyClassTransformer;
-import com.jitlogic.zorka.core.spy.SpyDefinition;
-import com.jitlogic.zorka.core.spy.SpyMatcherSet;
 import com.jitlogic.zorka.core.util.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.*;
 import com.jitlogic.zorka.core.mbeans.AttrGetter;
 import com.jitlogic.zorka.common.stats.ValGetter;
 import com.jitlogic.zorka.core.mbeans.ZorkaMappedMBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.impl.StaticLoggerBinder;
+import org.slf4j.impl.ZorkaLogLevel;
+import org.slf4j.impl.ZorkaLoggerFactory;
 
 
 /**
@@ -46,7 +48,7 @@ import com.jitlogic.zorka.core.mbeans.ZorkaMappedMBean;
  */
 public class ZorkaLib implements ZorkaService {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaLib.class);
+    private static final Logger log = LoggerFactory.getLogger(ZorkaLib.class);
 
     public static final ZorkaLogLevel TRACE = ZorkaLogLevel.TRACE;
     public static final ZorkaLogLevel DEBUG = ZorkaLogLevel.DEBUG;
@@ -57,8 +59,6 @@ public class ZorkaLib implements ZorkaService {
 
     private static final int MINUTE = 60000;
     private static final int SECOND = 1000;
-
-    private ZorkaLogger logger = ZorkaLogger.getLogger();
 
     private ZorkaBshAgent agent;
     private Set<JmxObject> registeredObjects = new HashSet<JmxObject>();
@@ -90,8 +90,9 @@ public class ZorkaLib implements ZorkaService {
         this.translator = translator;
         this.instance = instance;
 
-        this.hostname = config.getProperties().getProperty("zorka.hostname").trim();
-        this.version = config.getProperties().getProperty("zorka.version").trim();
+        // TODO wycofać hostname, używać agentAttrs.hostname
+        this.hostname = config.get("zorka.hostname", "zorka").trim();
+        this.version = config.get("zorka.version", "zorka").trim();
     }
 
 
@@ -131,13 +132,13 @@ public class ZorkaLib implements ZorkaService {
     public List<Object> jmxList(List<Object> args) {
         List<Object> objs = new ArrayList<Object>();
         if (args.size() < 2) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Zorka JMX function takes at least 2 arguments.");
+            log.error("Zorka JMX function takes at least 2 arguments.");
             return objs;
         }
         String conname = args.get(0).toString();
         MBeanServerConnection conn = mbsRegistry.lookup(conname);
         if (conn == null) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "MBean server named '" + args.get(0) + "' is not registered.");
+            log.error("MBean server named '" + args.get(0) + "' is not registered.");
             return objs;
         }
         ClassLoader cl0 = Thread.currentThread().getContextClassLoader(), cl1 = mbsRegistry.getClassLoader(conname);
@@ -156,9 +157,9 @@ public class ZorkaLib implements ZorkaService {
                 try {
                     obj = conn.getAttribute(name, args.get(2).toString());
                 } catch (AttributeNotFoundException e) {
-                    log.error(ZorkaLogger.ZAG_ERRORS, "Object '" + conname + "|" + name + "' has no attribute '" + args.get(2) + "'.", e);
+                    log.error("Object '" + conname + "|" + name + "' has no attribute '" + args.get(2) + "'.", e);
                 } catch (Exception e) {
-                    log.error(ZorkaLogger.ZAG_ERRORS, "Error getting attribute '" + args.get(2) + "' from '" + conname + "|" + name + "'", e);
+                    log.error("Error getting attribute '" + args.get(2) + "' from '" + conname + "|" + name + "'", e);
                 }
 
                 if (args.size() > 3) {
@@ -210,7 +211,7 @@ public class ZorkaLib implements ZorkaService {
         List<Object> argList = Arrays.asList(args);
 
         if (argList.size() < 2) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "zorka.jmx() function requires at least 2 arguments");
+            log.error("zorka.jmx() function requires at least 2 arguments");
             return null;
         }
 
@@ -219,7 +220,7 @@ public class ZorkaLib implements ZorkaService {
         MBeanServerConnection conn = mbsRegistry.lookup(conname);
 
         if (conn == null) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "MBean server named '" + argList.get(0) + "' is not registered.");
+            log.error("MBean server named '" + argList.get(0) + "' is not registered.");
             return null;
         }
 
@@ -244,10 +245,10 @@ public class ZorkaLib implements ZorkaService {
             }
             obj = conn.getAttribute(name, argList.get(2).toString());
         } catch (AttributeNotFoundException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Object '" + conname + "|" + name + "' has no attribute '" + argList.get(2) + "'.", e);
+            log.error("Object '" + conname + "|" + name + "' has no attribute '" + argList.get(2) + "'.", e);
             return null;
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error getting attribute '" + argList.get(2) + "' from '" + conname + "|" + name + "'", e);
+            log.error("Error getting attribute '" + argList.get(2) + "' from '" + conname + "|" + name + "'", e);
         } finally {
             if (cl1 != null) {
                 Thread.currentThread().setContextClassLoader(cl0);
@@ -333,7 +334,7 @@ public class ZorkaLib implements ZorkaService {
         MBeanServerConnection conn = mbsRegistry.lookup(conname);
 
         if (conn == null) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "MBean server named '" + conname + "' is not registered.");
+            log.error("MBean server named '" + conname + "' is not registered.");
             return null;
         }
 
@@ -355,7 +356,7 @@ public class ZorkaLib implements ZorkaService {
             }
             obj = conn.invoke(name, mname, coerceArgs(msign,args), parseSignature(msign));
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error invoking method '" + mname + "' from '" + conname + "|" + name + "'", e);
+            log.error("Error invoking method '" + mname + "' from '" + conname + "|" + name + "'", e);
         } finally {
             if (cl1 != null) {
                 Thread.currentThread().setContextClassLoader(cl0);
@@ -385,7 +386,7 @@ public class ZorkaLib implements ZorkaService {
         MBeanServerConnection conn = mbsRegistry.lookup(mbsName);
 
         if (conn == null) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "MBean server named '" + mbsName + "' is not registered.");
+            log.error("MBean server named '" + mbsName + "' is not registered.");
             return null;
         }
 
@@ -403,7 +404,7 @@ public class ZorkaLib implements ZorkaService {
 
             if (cl1 != null) {
                 Thread.currentThread().setContextClassLoader(cl1);
-                log.debug(ZorkaLogger.ZAG_DEBUG, "Switching to MBS class loader ...");
+                log.debug("Switching to MBS class loader ...");
             }
 
             List<QueryResult> results = new QueryLister(mbsRegistry, qdef).list();
@@ -427,7 +428,7 @@ public class ZorkaLib implements ZorkaService {
         } finally {
             if (cl1 != null) {
                 Thread.currentThread().setContextClassLoader(cl0);
-                log.debug(ZorkaLogger.ZAG_DEBUG, "Switching back from class loader ...");
+                log.debug("Switching back from class loader ...");
             }
         }
 
@@ -504,7 +505,7 @@ public class ZorkaLib implements ZorkaService {
     public Double rate(Object... args) {
 
         if (args.length < 5) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Too little arguments for zorka.rate(). At least 5 args are required");
+            log.error("Too little arguments for zorka.rate(). At least 5 args are required");
             return null;
         }
 
@@ -518,7 +519,7 @@ public class ZorkaLib implements ZorkaService {
         }
 
         if (horizon == 0) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Invalid time horizon in zorka.rate()");
+            log.error("Invalid time horizon in zorka.rate()");
             return null;
         }
 
@@ -593,7 +594,9 @@ public class ZorkaLib implements ZorkaService {
             ex = (Throwable) args[args.length - 1];
             args = args.length > 1 ? ZorkaUtil.clipArray(args, -1) : new Object[0];
         }
-        logger.trap(level, "bsh", message, ex, args);
+
+        ZorkaLoggerFactory f = (ZorkaLoggerFactory)StaticLoggerBinder.getSingleton().getLoggerFactory();
+        f.getTrapper().trap(level, "bsh", message, ex, args);
     }
 
 
@@ -627,6 +630,14 @@ public class ZorkaLib implements ZorkaService {
             s += agent.require(name) + "; ";
         }
         return s;
+    }
+
+
+    public String listLoadedScripts() {
+        List<String> rslt = new ArrayList<String>();
+        rslt.addAll(agent.getLoadedScripts());
+        Collections.sort(rslt);
+        return new JSONWriter().write(rslt);
     }
 
 
@@ -943,9 +954,9 @@ public class ZorkaLib implements ZorkaService {
         String path = ZorkaUtil.path(config.getHomeDir(), fname);
         Properties props = config.loadCfg(config.getProperties(), path, false);
         if (props != null) {
-            log.info(ZorkaLogger.ZAG_INFO, "Loaded property file: " + path);
+            log.info("Loaded property file: " + path);
         } else {
-            log.info(ZorkaLogger.ZAG_INFO, "Property file not found: " + path);
+            log.info("Property file not found: " + path);
         }
         return props;
     }
@@ -955,9 +966,9 @@ public class ZorkaLib implements ZorkaService {
         String path = ZorkaUtil.path(config.getHomeDir(), fname);
         Properties props = config.loadCfg(properties, path, verbose);
         if (props != null) {
-            log.info(ZorkaLogger.ZAG_INFO, "Loaded property file: " + path);
+            log.info("Loaded property file: " + path);
         } else {
-            log.info(ZorkaLogger.ZAG_INFO, "Property file not found: " + path);
+            log.info("Property file not found: " + path);
         }
         return props;
     }
@@ -970,10 +981,18 @@ public class ZorkaLib implements ZorkaService {
      * @param defVals set of default values (if key is missing)
      * @return parsed list
      */
-    public List<String> listCfg(String key, String... defVals) {
+    public List<String> listCfg(String key, String...defVals) {
         return config.listCfg(key, defVals);
     }
 
+
+    public Map<String,String> mapCfg(String key, String...defVals) {
+        return config.mapCfg(key, defVals);
+    }
+
+    public Map<String,String> mapCfg(String key, Map<String,String> defVals) {
+        return config.mapCfg(key, defVals);
+    }
 
     /**
      * Schedules a task.

@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "libs.bsh",
   "tracer.bsh",
   "audit.bsh",
@@ -190,8 +189,6 @@ __spring() {
         "org.springframework.remoting.support.RemoteInvocation")));
   }
 
-  tracer.defType("SPRING_REMOTING", 101);
-
   // Spring Webflow
 
   __extract_webflow_scope(prefix, attr, isView) {
@@ -249,9 +246,8 @@ __spring() {
       .include(spy.byInterfaceAndMethod(0, "org.springframework.http.client.ClientHttpRequest", "execute",
         "org.springframework.http.client.ClientHttpResponse")));
 
-  tracer.defType("SPRING_HTTP", 102);
-
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("SPRING");
   }
 
@@ -269,6 +265,7 @@ __spring() {
       "org.springframework.extensions.config.DefaultLookupAlgorithm/process",
       "org.springframework.extensions.config.element.ConfigElementAdapter/getAttribute",
       "org.springframework.extensions.config.evaluator.StringEvaluator/applies",
+      "org.springframework.extensions.surf.DependencyHandle/loadInputStream",
       "org.springframework.extensions.surf.DojoDependencyHandler",
       "org.springframework.extensions.surf.ModelHelper/isModelProperty",
       "org.springframework.extensions.surf.support.AbstractRequestContext/getValue",
@@ -283,6 +280,8 @@ __spring() {
       "org.springframework.extensions.webscripts.UriTemplate/match",
       "org.springframework.extensions.webscripts.json.JSONWriter",
       "org.springframework.extensions.webscripts.json.JSONUtils",
+      "org.springframework.jdbc.core.ColumnMapRowMapper/mapRow",
+      "org.springframework.jdbc.support.JdbcUtils",
       "org.springframework.orm.**",
       "org.springframework.transaction.support.TransactionS**",
       "org.springframework.transaction.support.TransactionSynchronizationUtil**",

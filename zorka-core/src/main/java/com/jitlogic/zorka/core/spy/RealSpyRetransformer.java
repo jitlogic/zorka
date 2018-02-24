@@ -16,9 +16,9 @@
 package com.jitlogic.zorka.core.spy;
 
 
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.AgentConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
@@ -27,7 +27,7 @@ import java.util.List;
 
 public class RealSpyRetransformer implements SpyRetransformer {
 
-    private static final ZorkaLog log = ZorkaLogger.getLog(RealSpyRetransformer.class);
+    private static final Logger log = LoggerFactory.getLogger(RealSpyRetransformer.class);
 
     private Instrumentation instrumentation;
 
@@ -36,14 +36,14 @@ public class RealSpyRetransformer implements SpyRetransformer {
     public RealSpyRetransformer(Instrumentation instrumentation, AgentConfig config) {
         this.instrumentation = instrumentation;
         matchMethods = config.boolCfg("zorka.retransform.match.methods", false);
-        log.info(ZorkaLogger.ZSP_CONFIG, "Enabling spy retransformer. Full online reconfiguration should be possible.");
+        log.info("Enabling spy retransformer. Full online reconfiguration should be possible.");
     }
 
 
     @Override
     public boolean retransform(SpyMatcherSet oldSet, SpyMatcherSet newSet, boolean isSdef) {
         if (instrumentation == null || !instrumentation.isRetransformClassesSupported()) {
-            log.warn(ZorkaLogger.ZSP_CONFIG, "Class retransform is not supported. Skipping.");
+            log.warn("Class retransform is not supported. Skipping.");
             return false;
         }
 
@@ -66,17 +66,17 @@ public class RealSpyRetransformer implements SpyRetransformer {
 
         if (classes.size() > 0) {
 
-            log.info(ZorkaLogger.ZSP_CONFIG, "Retransforming " + classes.size() + " classes.");
+            log.info("Retransforming " + classes.size() + " classes.");
 
             try {
                 instrumentation.retransformClasses(classes.toArray(new Class[0]));
             } catch (UnmodifiableClassException e) {
-                log.error(ZorkaLogger.ZSP_CONFIG, "Error when trying to retransform classes", e);
+                log.error("Error when trying to retransform classes", e);
             }
 
             return true;
         } else {
-            log.info(ZorkaLogger.ZSP_CONFIG, "No classes need to be retransformed.");
+            log.info("No classes need to be retransformed.");
         }
 
 

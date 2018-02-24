@@ -31,9 +31,6 @@
       "com.ibm.rmi.util.**",
       "com.ibm.sec.authz.**",
       "com.ibm.security.util.**",
-      "com.ibm.websphere.models.config.**",
-      "com.ibm.websphere.pmi.**",
-      "com.ibm.websphere.resource.**",
 
       "com.ibm.ws.adaptor.ClasspathPrepend**",
       "com.ibm.ws.bootstrap.**",
@@ -55,7 +52,10 @@
       "com.ibm.ws.webservices.engine.**",
       "com.ibm.ws.wim.xpath.**",
 
+      "com.ibm.ws.rsadapter.jdbc.**",
+
       "com.ibm.xml.**",
+
 
       "com.ibm.xtq.common.utils.**",
       "com.ibm.xtq.xslt.**"

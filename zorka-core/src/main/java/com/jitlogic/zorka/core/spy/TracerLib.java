@@ -26,13 +26,12 @@ import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.zico.CborTraceOutput;
 import com.jitlogic.zorka.core.integ.zabbix.ZabbixTraceOutput;
 import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
 import com.jitlogic.zorka.core.spy.plugins.*;
 import com.jitlogic.zorka.core.util.OverlayClassLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tracer library contains functions for configuring and using tracer.
@@ -41,7 +40,7 @@ import com.jitlogic.zorka.core.util.OverlayClassLoader;
  */
 public class TracerLib {
 
-    public static final ZorkaLog log = ZorkaLogger.getLog(TracerLib.class);
+    public static final Logger log = LoggerFactory.getLogger(TracerLib.class);
 
     public static final int SUBMIT_TRACE = TraceMarker.SUBMIT_TRACE;
     public static final int ALL_METHODS = TraceMarker.ALL_METHODS;
@@ -55,8 +54,6 @@ public class TracerLib {
     private MetricsRegistry metricsRegistry;
 
     private ZorkaConfig config;
-
-    private Map<String,Integer> traceTypes = new ConcurrentHashMap<String, Integer>();
 
     /**
      * Default trace flags
@@ -98,14 +95,14 @@ public class TracerLib {
      */
     public void include(String... matchers) {
         for (String matcher : matchers) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Tracer include: " + matcher);
+            log.debug("Tracer include: " + matcher);
             tracer.include(SpyMatcher.fromString(matcher.toString()));
         }
     }
 
     public void include(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Tracer include: " + matcher);
+            log.debug("Tracer include: " + matcher);
             tracer.include(matcher);
         }
     }
@@ -117,14 +114,14 @@ public class TracerLib {
      */
     public void exclude(String... matchers) {
         for (String matcher : matchers) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Tracer exclude: " + matcher);
+            log.debug("Tracer exclude: " + matcher);
             tracer.include(SpyMatcher.fromString(matcher.toString()).exclude());
         }
     }
 
     public void exclude(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Tracer exclude: " + matcher);
+            log.debug("Tracer exclude: " + matcher);
             tracer.include((matcher).exclude());
         }
 
@@ -457,31 +454,15 @@ public class TracerLib {
         return output;
     }
 
-    public ZorkaAsyncThread<SymbolicRecord> toCbor(String url, String agentUUID, String agentKey,
-                                                   String hostname, String app, String env) {
-        return toCbor(url, agentUUID, agentKey, hostname, app, env, 64, 10, 125, 2, 60000);
-    }
-
     /**
      * Creates trace network sender using HTTP protocol and CBOR representation.
      *
-     * @param url ZICO collector URL
-     * @param agentUUID agent UUID (as registered in collector)
-     * @param agentKey agent auth key (used to authenticate agent registrations)
-     * @param hostname agent name (passed as parameter to agent registration)
-     * @param app application name (passed as parameter to agent registration)
-     * @param env environment name (passed as parameter to agent registration)
+     * @param config Config map
      * @return Submitter object (can be registered later on via tracer.output())
      */
-    public ZorkaAsyncThread<SymbolicRecord> toCbor(String url, String agentUUID, String agentKey,
-                                                   String hostname, String app, String env,
-                                                   int qlen, int retries, long retryTime,
-                                                   long retryTimeExp, int timeout) {
+    public ZorkaAsyncThread<SymbolicRecord> toCbor(Map<String,String> config) {
 
-        return new CborTraceOutput(
-            url, agentUUID, agentKey, hostname, app, env,
-            symbolRegistry, traceTypes,
-            qlen, retries, retryTime, retryTimeExp, timeout);
+        return new CborTraceOutput(this.config, config, symbolRegistry);
     }
 
     /**
@@ -615,10 +596,6 @@ public class TracerLib {
 
     public boolean isTraceSpyMethods() {
         return tracer.isTraceSpyMethods();
-    }
-
-    public void defType(String typeName, int typeId) {
-        traceTypes.put(typeName, typeId);
     }
 
     /**

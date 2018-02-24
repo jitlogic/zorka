@@ -17,8 +17,6 @@
 package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.Tracer;
 
@@ -27,8 +25,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class TraceFilterProcessor implements SpyProcessor {
-
-    private static final ZorkaLog log = ZorkaLogger.getLog(TraceFilterProcessor.class);
 
     public static final Object ANY = new Object();
 

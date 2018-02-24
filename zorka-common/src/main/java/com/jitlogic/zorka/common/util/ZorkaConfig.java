@@ -17,6 +17,9 @@
 
 package com.jitlogic.zorka.common.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,10 +40,10 @@ import java.util.regex.Pattern;
  * @author rafal.lewczuk@jitlogic.com
  *
  */
-public abstract class ZorkaConfig {
+public class ZorkaConfig {
 
     /** Logger */
-    private static final ZorkaLog log = ZorkaLogger.getLog(ZorkaConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(ZorkaConfig.class);
 
     /** Configuration properties */
     protected Properties properties;
@@ -48,9 +51,39 @@ public abstract class ZorkaConfig {
     /** Home directory */
 	protected String homeDir;
 
+	private Map<String,String> sysenv = System.getenv();
+	private Properties sysprops = System.getProperties();
 
     public static final String PROP_HOME_DIR = "zorka.home.dir";
 
+    public ZorkaConfig() {
+        this(new Properties());
+    }
+
+    public ZorkaConfig(Properties properties) {
+        this.properties = properties;
+    }
+
+    public String get(String key) {
+        if (key.startsWith("$")) {
+            return sysenv.get(key.substring(1));
+        }
+        if (key.startsWith("@")) {
+            return sysprops.getProperty(key.substring(1));
+        }
+        if (key.startsWith("&")) {
+            return get(key.substring(1));
+        }
+        String val = properties.getProperty(key);
+        return val != null ? ObjectInspector.substitute(
+            ObjectInspector.reCfgSubstPattern, val, this) : null;
+    }
+
+
+    public String get(String key, String defval) {
+        String rslt = get(key);
+        return rslt != null ? rslt : defval;
+    }
 
 
     /**
@@ -94,13 +127,13 @@ public abstract class ZorkaConfig {
             props.load(is);
             is.close();
         } catch (IOException e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error loading property file", e);
+            log.error("Error loading property file", e);
         } finally {
             if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
-                    log.error(ZorkaLogger.ZAG_ERRORS, "Error closing property file", e);
+                    log.error("Error closing property file", e);
                 }
             }
         }
@@ -117,7 +150,7 @@ public abstract class ZorkaConfig {
             return properties;
         } catch (IOException e) {
             if (verbose) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error loading property file", e);
+                log.error("Error loading property file", e);
             }
         } finally {
             if (is != null)
@@ -125,7 +158,7 @@ public abstract class ZorkaConfig {
                     is.close();
                 } catch (IOException e) {
                     if (verbose) {
-                        log.error(ZorkaLogger.ZAG_ERRORS, "Error closing property file", e);
+                        log.error("Error closing property file", e);
                     }
                 }
         }
@@ -142,17 +175,12 @@ public abstract class ZorkaConfig {
      * @return
      */
     public String formatCfg(String input) {
-        return properties == null ? input : ObjectInspector.substitute(input, properties);
+        return properties == null ? input : ObjectInspector.substitute(ObjectInspector.reVarSubstPattern, input, this);
     }
 
 
     public List<String> listCfg(String key, String...defVals) {
-        return listCfg(properties, key, defVals);
-    }
-
-
-    protected List<String> listCfg(Properties properties, String key, String...defVals) {
-        String s = properties.getProperty(key);
+        String s = get(key);
 
         if (s != null) {
             String[] ss = s.split(",");
@@ -169,6 +197,32 @@ public abstract class ZorkaConfig {
         }
     }
 
+    public Map<String,String> mapCfg(String key, Map<String,String> defVals) {
+        Map<String,String> rslt = new HashMap<String, String>();
+        rslt.putAll(defVals);
+
+        String prefix = key + ".";
+
+        for (String k : getProperties().stringPropertyNames()) {
+            if (k.startsWith(prefix) && k.length() > prefix.length()) {
+                String v = stringCfg(k, null);
+                if (v != null) {
+                    rslt.put(k.substring(prefix.length()), v);
+                }
+            }
+        }
+
+        return rslt;
+    }
+
+    public Map<String,String> mapCfg(String key, String... defVals) {
+        Map<String,String> dv = new HashMap<String, String>();
+        for (int i = 1; i < defVals.length; i+=2) {
+            dv.put(defVals[i-1],defVals[i]);
+        }
+        return mapCfg(key, dv);
+    }
+
 
     private static Map<String,Long> kilos = ZorkaUtil.map(
             "k", 1024L, "K", 1024L,
@@ -181,7 +235,7 @@ public abstract class ZorkaConfig {
 
 
     public Long kiloCfg(String key, Long defval) {
-        String s = properties.getProperty(key);
+        String s = get(key);
 
         long multi = 1L;
 
@@ -208,14 +262,14 @@ public abstract class ZorkaConfig {
 
 
     public String stringCfg(String key, String defval) {
-        String s = properties.getProperty(key);
+        String s = get(key);
 
         return s != null ? s.trim() : defval;
     }
 
 
     public Long longCfg(String key, Long defval) {
-        String s = properties.getProperty(key);
+        String s = get(key);
 
         try {
             if (s != null) {
@@ -231,7 +285,7 @@ public abstract class ZorkaConfig {
 
 
     public Integer intCfg(String key, Integer defval) {
-        String s = properties.getProperty(key);
+        String s = get(key);
 
         try {
             if (s != null) {
@@ -247,7 +301,7 @@ public abstract class ZorkaConfig {
 
 
     public Boolean boolCfg(String key, Boolean defval) {
-        String s = properties.getProperty(key);
+        String s = get(key);
 
         if (s != null) {
             s = s.trim();
@@ -265,11 +319,11 @@ public abstract class ZorkaConfig {
     }
 
     protected void markError(String msg, Throwable e) {
-        log.error(ZorkaLogger.ZAG_CONFIG, msg, e);
+        log.error(msg, e);
     }
 
     public boolean hasCfg(String key) {
-        String s = properties.getProperty(key);
+        String s = get(key);
 
         return s != null && s.trim().length() > 0;
     }
@@ -277,6 +331,30 @@ public abstract class ZorkaConfig {
 
     public void setCfg(String key, Object val) {
         properties.setProperty(key, ""+val);
+    }
+
+    public void writeCfg(String key, Object val) {
+        properties.setProperty(key, ""+val);
+    }
+
+    public static int parseInt(String val, Integer defVal, String msg) {
+        if (val != null && !val.matches("\\d+")) {
+            return Integer.parseInt(val);
+        } else if (defVal != null) {
+            return defVal;
+        } else {
+            throw new ZorkaConfigException("Cannot parse " + msg, val);
+        }
+    }
+
+    public static String parseStr(String val, Pattern regex, String defVal, String msg) {
+        if (val != null && (regex == null || regex.matcher(val).matches())) {
+            return val;
+        } else if (defVal != null) {
+            return defVal;
+        } else {
+            throw new ZorkaConfigException(msg, null);
+        }
     }
 
     /**

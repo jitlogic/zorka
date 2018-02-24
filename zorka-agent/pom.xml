@@ -5,7 +5,7 @@
     <parent>
         <artifactId>zorka</artifactId>
         <groupId>com.jitlogic.zorka</groupId>
-        <version>1.0.16</version>
+        <version>1.1.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -60,10 +60,12 @@
                         <configuration>
                             <includes>
                                 <include>org.ow2.asm:asm</include>
+                                <include>com.jitlogic.zorka:zorka-slf4j</include>
                                 <include>com.jitlogic.zorka:zorka-common</include>
-                                <include>com.jitlogic.zoola:zoola-core</include>
-                                <include>com.jitlogic.contrib:libsnmp</include>
+                                <include>com.jitlogic.zorka:zorka-bsh-core</include>
+                                <include>com.jitlogic.zorka:zorka-snmp</include>
                                 <include>com.jitlogic.zorka:zorka-core</include>
+                                <include>org.slf4j:slf4j-api</include>
                                 <include>org.fressian:fressian</include>
                             </includes>
                             <rules>
@@ -82,6 +84,10 @@
                                 <rule>
                                     <pattern>org.fressian.**</pattern>
                                     <result>com.jitlogic.zorka.deps.fressian.@1</result>
+                                </rule>
+                                <rule>
+                                    <pattern>org.slf4j.**</pattern>
+                                    <result>com.jitlogic.zorka.deps.slf4j.@1</result>
                                 </rule>
                                 <keep>
                                     <pattern>com.jitlogic.zorka.**</pattern>

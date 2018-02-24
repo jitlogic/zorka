@@ -22,15 +22,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import com.jitlogic.zorka.common.util.JSONReader;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Zabbix Active Request is used by Zabbix Active Agent to 
@@ -41,7 +39,7 @@ public class ZabbixActiveRequest {
 	/**
 	 * Logger
 	 */
-	private static final ZorkaLog log = ZorkaLogger.getLog(ZabbixActiveRequest.class);
+	private static final Logger log = LoggerFactory.getLogger(ZabbixActiveRequest.class);
 
 	/**
 	 * Socket with established server connection.
@@ -102,7 +100,7 @@ public class ZabbixActiveRequest {
 	 */
 	public void send(String message) throws IOException {
 		byte[] buf = ZabbixUtils.zbx_format(message);
-		log.debug(ZorkaLogger.ZAG_DEBUG, "Zorka send: " + new String(buf));
+		log.debug("Zorka send: " + new String(buf));
 
 		OutputStream out = socket.getOutputStream();
 		out.write(buf);
@@ -132,7 +130,7 @@ public class ZabbixActiveRequest {
 		String s = null;
 		if (reqs.isEmpty()) {
 			s = ZabbixUtils.decode(socket.getInputStream());
-			log.debug(ZorkaLogger.ZAG_DEBUG, "Zorka get:" + s);
+			log.debug("Zorka get:" + s);
 		}
 		return s;
 	} // getReq()
@@ -147,7 +145,7 @@ public class ZabbixActiveRequest {
 			try {
                 response = new JSONReader().read(getReq(), ActiveCheckResponse.class);
 			} catch (IOException e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error parsing active response", e);
+                log.error("Error parsing active response", e);
 			}
 		}
 		

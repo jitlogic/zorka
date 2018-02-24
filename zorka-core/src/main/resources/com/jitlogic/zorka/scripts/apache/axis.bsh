@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "soap.bsh",
   "apache/apache.bsh"
 );
@@ -104,6 +103,7 @@ __axis() {
   }
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("AXIS");
   }
 

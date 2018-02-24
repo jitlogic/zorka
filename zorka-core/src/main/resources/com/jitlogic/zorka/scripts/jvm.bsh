@@ -15,8 +15,6 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require("zabbix.bsh");
-
 __jvm() {
 
   autoregister() {
@@ -104,11 +102,11 @@ __jvm() {
     // Monitor memory pools
     nagios.defcmd("MEM_POOL", nagios.jmxscan(
       zorka.query("java", "java.lang:type=MemoryPool,*", "type", "name").get("Usage").get("used")
-        .metric(perfmon.metric("LVAL0", "Memory pool ${ATTR.name} usage", "B").divide(1048576)),   // TODO czemu dzielenie nie działa ?
+        .metric(perfmon.metric("java.lang", "LVAL0", "Memory pool ${ATTR.name} usage", "B").divide(1048576)),   // TODO czemu dzielenie nie działa ?
       zorka.query("java", "java.lang:type=MemoryPool,*", "type", "name").get("Usage")
-        .metric(perfmon.util("LVAL1", "Memory pool ${ATTR.name} utilization", "%", "used", "max")),
+        .metric(perfmon.util("java.lang", "LVAL1", "Memory pool ${ATTR.name} utilization", "%", "used", "max")),
       zorka.query("java", "java.lang:type=MemoryPool,*", "type", "name").get("Usage").get("max")
-        .metric(perfmon.metric("LVAL2", "Memory pool ${ATTR.name} limit", "B").divide(1048576))    // TODO czemu dzielenie nie działa ?
+        .metric(perfmon.metric("java.lang", "LVAL2", "Memory pool ${ATTR.name} limit", "B").divide(1048576))    // TODO czemu dzielenie nie działa ?
       ).withLabel("${name}")                                                                       // TODO to jest kiepskie - powinno być ${ATTR.name}
        .withRcMax("LVAL1",
          zorka.longCfg("nagios.cmd.MEM_POOL.warn", 80),
@@ -121,9 +119,9 @@ __jvm() {
     // Monitor Garbage Collectors
     nagios.defcmd("GC", nagios.jmxscan(
       zorka.query("java", "java.lang:type=GarbageCollector,*", "type", "name").get("CollectionCount")
-        .metric(perfmon.timedDelta("LVAL0", "GC cycle frequency", "cycles/min").divide(1000).multiply(60)),
+        .metric(perfmon.timedDelta("java.lang", "LVAL0", "GC cycle frequency", "cycles/min").divide(1000).multiply(60)),
       zorka.query("java", "java.lang:type=GarbageCollector,*", "type", "name").get("CollectionTime")
-        .metric(perfmon.timedDelta("LVAL1", "GC CPU time", "%CPU").divide(10))
+        .metric(perfmon.timedDelta("java.lang", "LVAL1", "GC CPU time", "%CPU").divide(10))
       ).withLabel("${name}")                                                                       // TODO to jest kiepskie - powinno być ${ATTR.name}
        .withRcMax("LVAL1",
          zorka.longCfg("nagios.cmd.GC.warn", 10),
@@ -136,11 +134,11 @@ __jvm() {
     // Monitor Threads
     nagios.defcmd("THREAD", nagios.jmxscan(
       zorka.query("java", "java.lang:type=Threading", "type").get("ThreadCount")
-        .metric(perfmon.metric("LVAL0", "JVM threads total", "threads")),
+        .metric(perfmon.metric("java.lang", "LVAL0", "JVM threads total", "threads")),
       zorka.query("java", "java.lang:type=Threading", "type").get("DaemonThreadCount")
-        .metric(perfmon.metric("LVAL1", "JVM daemon threads", "threads")),
+        .metric(perfmon.metric("java.lang", "LVAL1", "JVM daemon threads", "threads")),
       zorka.query("java", "java.lang:type=Threading", "type").get("TotalStartedThreadCount")
-        .metric(perfmon.timedDelta("LVAL2", "JVM threads creation", "threads/min").multiply(60))
+        .metric(perfmon.timedDelta("java.lang", "LVAL2", "JVM threads creation", "threads/min").multiply(60))
       ).withLabel("Threads")
        .withRcMax("LVAL0",
          zorka.longCfg("nagios.cmd.THREAD.warn", 500),
@@ -156,6 +154,7 @@ __jvm() {
   }
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("JVM");
   }
 

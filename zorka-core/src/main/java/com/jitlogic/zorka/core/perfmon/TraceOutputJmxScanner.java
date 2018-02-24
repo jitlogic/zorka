@@ -18,8 +18,8 @@ package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
+import com.jitlogic.zorka.core.Labeled;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 
 import java.util.List;
@@ -32,7 +32,7 @@ import java.util.List;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TraceOutputJmxScanner extends JmxScanner implements Runnable {
+public class TraceOutputJmxScanner extends JmxScanner implements Runnable, Labeled {
 
     /**
      * Output handler - handles generated data (eg. saves them to trace files).
@@ -43,7 +43,7 @@ public class TraceOutputJmxScanner extends JmxScanner implements Runnable {
     /**
      * Scanner name.
      */
-    protected String name;
+    protected String label;
 
 
     /**
@@ -57,20 +57,20 @@ public class TraceOutputJmxScanner extends JmxScanner implements Runnable {
      *
      * @param symbols  symbol registry
      * @param metricRegistry metrics registry
-     * @param name     scanner name (converted to ID using symbol registry and attached to emitted data).
+     * @param label    scanner name (converted to ID using symbol registry and attached to emitted data).
      * @param registry MBean server registry object
      * @param output   tracer output
      * @param qdefs    JMX queries
      */
-    public TraceOutputJmxScanner(SymbolRegistry symbols, MetricsRegistry metricRegistry, String name,
+    public TraceOutputJmxScanner(SymbolRegistry symbols, MetricsRegistry metricRegistry, String label,
                                  MBeanServerRegistry registry, ZorkaSubmitter<SymbolicRecord> output,
                                  QueryDef... qdefs) {
 
         super(registry, metricRegistry, symbols, qdefs);
 
         this.output = output;
-        this.name = name;
-        this.id = symbols.symbolId(name);
+        this.label = label;
+        this.id = symbols.symbolId(label);
     }
 
 
@@ -79,7 +79,7 @@ public class TraceOutputJmxScanner extends JmxScanner implements Runnable {
         try {
             runCycle(System.currentTimeMillis());
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZPM_ERRORS, "Error executing scanner '" + name + "'", e);
+            log.error("Error executing scanner '" + label + "'", e);
             AgentDiagnostics.inc(AgentDiagnostics.PMON_ERRORS);
         }
     }
@@ -99,7 +99,7 @@ public class TraceOutputJmxScanner extends JmxScanner implements Runnable {
 
         long t2 = System.nanoTime();
 
-        log.info(ZorkaLogger.ZPM_RUNS, "Scanner %s execution took " + (t2 - t1) / 1000000L
+        log.info("Scanner %s execution took " + (t2 - t1) / 1000000L
             + " milliseconds to execute. Collected samples: " + samples.size());
 
         AgentDiagnostics.inc(AgentDiagnostics.PMON_TIME, t2 - t1);
@@ -112,4 +112,8 @@ public class TraceOutputJmxScanner extends JmxScanner implements Runnable {
     }
 
 
+    @Override
+    public String getLabel() {
+        return label;
+    }
 }

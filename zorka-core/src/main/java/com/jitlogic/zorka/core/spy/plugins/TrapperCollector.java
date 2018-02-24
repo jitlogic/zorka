@@ -19,6 +19,10 @@ package com.jitlogic.zorka.core.spy.plugins;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.core.spy.SpyLib;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.impl.ZorkaLogLevel;
+import org.slf4j.impl.ZorkaTrapper;
 
 import java.util.Map;
 
@@ -29,7 +33,7 @@ import java.util.Map;
  */
 public class TrapperCollector implements SpyProcessor {
 
-    private static ZorkaLog log = ZorkaLogger.getLog(TrapperCollector.class);
+    private static Logger log = LoggerFactory.getLogger(TrapperCollector.class);
 
     /**
      * Trapper object.
@@ -75,8 +79,7 @@ public class TrapperCollector implements SpyProcessor {
     public Map<String, Object> process(Map<String, Object> record) {
 
         if (trapper == null || logLevel == null || tag == null || message == null) {
-            log.error(ZorkaLogger.ZSP_CONFIG,
-                    "Improperly configured TrapperCollector (null trapper or log level or tag or message).");
+            log.error("Improperly configured TrapperCollector (null trapper or log level or tag or message).");
             return record;
         }
 

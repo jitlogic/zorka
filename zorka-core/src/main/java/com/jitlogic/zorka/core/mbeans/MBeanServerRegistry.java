@@ -17,10 +17,9 @@
 
 package com.jitlogic.zorka.core.mbeans;
 
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.core.ZorkaControl;
-import com.jitlogic.zorka.core.ZorkaControlMBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.management.*;
 import java.io.IOException;
@@ -42,7 +41,7 @@ public class MBeanServerRegistry {
     /**
      * Logger
      */
-    private final ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Represents deferred registration of mbean attributes for not yet registered mbean servers.
@@ -139,7 +138,7 @@ public class MBeanServerRegistry {
                 }
                 registerDeferred(mbsName);
             } else {
-                log.error(ZorkaLogger.ZAG_ERRORS, "MBean server '" + mbsName + "' is already registered.");
+                log.error("MBean server '" + mbsName + "' is already registered.");
             }
         }
     }
@@ -155,7 +154,7 @@ public class MBeanServerRegistry {
         classLoaders.remove(name);
 
         if (conns.remove(name) == null) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Trying to unregister non-existent MBean server '" + name + "'");
+            log.error("Trying to unregister non-existent MBean server '" + name + "'");
         }
 
     }
@@ -196,19 +195,19 @@ public class MBeanServerRegistry {
             try {
                 return (T) mbs.getAttribute(new ObjectName(beanName), attrName);
             } catch (MBeanException e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error registering mbean", e);
+                log.error("Error registering mbean", e);
             } catch (AttributeNotFoundException e) {
                 return registerAttr(mbs, beanName, attrName, obj);
             } catch (InstanceNotFoundException e) {
                 return registerBeanAttr(mbs, beanName, attrName, obj, desc);
             } catch (ReflectionException e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error registering bean", e);
+                log.error("Error registering bean", e);
             } catch (IOException e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Error registering bean", e);
+                log.error("Error registering bean", e);
             } catch (MalformedObjectNameException e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Malformed object name: '" + beanName + "'");
+                log.error("Malformed object name: '" + beanName + "'");
             } catch (ClassCastException e) {
-                log.error(ZorkaLogger.ZAG_ERRORS, "Object '" + beanName + "'.'" + attrName + "' of invalid type'", e);
+                log.error("Object '" + beanName + "'.'" + attrName + "' of invalid type'", e);
             }
         } else {
             DeferredRegistration reg = new DeferredRegistration(mbsName, beanName, attrName, obj, desc);
@@ -244,7 +243,7 @@ public class MBeanServerRegistry {
         try {
             conn.setAttribute(new ObjectName(bean), new Attribute(attr, obj));
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error registering object '" + bean + "'.'" + attr + "'", e);
+            log.error("Error registering object '" + bean + "'.'" + attr + "'", e);
         }
         return obj;
     }
@@ -268,7 +267,7 @@ public class MBeanServerRegistry {
         try {
             mbs.registerMBean(mbean, new ObjectName(bean));
         } catch (Exception e) {
-            log.error(ZorkaLogger.ZAG_ERRORS, "Error registering object '" + bean + "'.'" + attr + "'", e);
+            log.error("Error registering object '" + bean + "'.'" + attr + "'", e);
         }
         return obj;
     }
@@ -283,12 +282,12 @@ public class MBeanServerRegistry {
     private void registerZorkaControlDeferred() {
         MBeanServer mbs = (MBeanServer) conns.get(zorkaControl.getMbsName());
         if (zorkaControl != null && mbs != null) {
-            log.info(ZorkaLogger.ZAG_CONFIG, "Registering ZorkaControl MBean...");
+            log.info("Registering ZorkaControl MBean...");
             try {
                 ObjectName on = new ObjectName(zorkaControl.getObjectName());
                 mbs.registerMBean(zorkaControl, on);
             } catch (Exception e) {
-                log.error(ZorkaLogger.ZAG_CONFIG, "Cannot register ZorkaControl MBean", e);
+                log.error("Cannot register ZorkaControl MBean", e);
             }
         }
     }

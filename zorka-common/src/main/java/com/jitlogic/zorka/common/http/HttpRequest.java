@@ -19,6 +19,7 @@ package com.jitlogic.zorka.common.http;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 
 /**
@@ -29,9 +30,11 @@ public class HttpRequest extends HttpMsg {
     public final static int F_CNT_LENGTH = 0x01;  // Send Content-Length header
     public final static int F_ENC_BASE64 = 0x02;  // Encode body using base64
 
-    Map<String, String> params = new HashMap<String, String>();
+    private Map<String, String> params = new HashMap<String, String>();
 
-    HttpClient client;
+    private HttpClient client;
+
+    boolean ignoreResp = false;
 
     String url;
     String method = "GET";
@@ -63,6 +66,10 @@ public class HttpRequest extends HttpMsg {
         return params;
     }
 
+    public HttpRequest withHeader(String name, String value) {
+        setHeader(name, value);
+        return this;
+    }
 
     public String getMethod() {
         return method;
@@ -78,6 +85,14 @@ public class HttpRequest extends HttpMsg {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public boolean isIgnoreResp() {
+        return ignoreResp;
+    }
+
+    public void setIgnoreResp(boolean ignoreResp) {
+        this.ignoreResp = ignoreResp;
     }
 
     public HttpResponse go() throws IOException {

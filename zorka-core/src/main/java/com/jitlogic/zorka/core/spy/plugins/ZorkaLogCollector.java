@@ -17,22 +17,20 @@
 package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaLogLevel;
+import org.slf4j.impl.ZorkaLogLevel;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import org.slf4j.impl.ZorkaLoggerFactory;
 
 import java.util.Map;
 
 public class ZorkaLogCollector implements SpyProcessor {
 
-    private ZorkaLogger logger;
     private ZorkaLogLevel logLevel;
     private String tag, message;
     private String fCond, fErr;
 
 
     public ZorkaLogCollector(ZorkaLogLevel logLevel, String tag, String message, String fCond, String fErr) {
-        this.logger = ZorkaLogger.getLogger();
         this.logLevel = logLevel;
         this.tag = tag;
         this.message = message;
@@ -56,7 +54,7 @@ public class ZorkaLogCollector implements SpyProcessor {
             e = (Throwable) record.get(fErr);
         }
 
-        logger.trap(logLevel, tag, ObjectInspector.substitute(message, record), e);
+        ZorkaLoggerFactory.getInstance().getTrapper().trap(logLevel, tag, ObjectInspector.substitute(message, record), e);
 
         return record;
     }

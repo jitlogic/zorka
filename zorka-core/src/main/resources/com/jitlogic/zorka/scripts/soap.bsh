@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "tracer.bsh",
   "traps.bsh"
 );
@@ -72,15 +71,12 @@ __soap() {
   _slow_chain = traps.subchain("soap", "slow");
   _error_chain = traps.subchain("soap", "error");
 
-  // Register trace types for CBOR collector.
-  tracer.defType("SOAP", 36);
-  tracer.defType("SOAP_CLI", 37);
-
   discovery(type) {
     return zabbix.discovery(zorka.query("java", _mbean, "name", "type").get(type).listAs("**", "OP"));
   }
 
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("SOAP");
   }
 

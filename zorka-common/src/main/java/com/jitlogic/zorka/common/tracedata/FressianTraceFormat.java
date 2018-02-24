@@ -210,6 +210,7 @@ public class FressianTraceFormat {
             int id = (int) r.readInt();
             int type = (int) r.readInt();
             int templateId = (int) r.readInt();
+            String domain = (String)r.readObject();
             String name = (String) r.readObject();
             String description = (String) r.readObject();
 
@@ -218,15 +219,15 @@ public class FressianTraceFormat {
 
             switch (type) {
                 case MetricTemplate.RAW_DATA:
-                    return new RawDataMetric(id, templateId, name, description, attrs);
+                    return new RawDataMetric(id, templateId, name, description, domain, attrs);
                 case MetricTemplate.RAW_DELTA:
-                    return new RawDeltaMetric(id, templateId, name, description, attrs);
+                    return new RawDeltaMetric(id, templateId, name, description, domain, attrs);
                 case MetricTemplate.TIMED_DELTA:
-                    return new TimedDeltaMetric(id, templateId, name, description, attrs);
+                    return new TimedDeltaMetric(id, templateId, name, description, domain, attrs);
                 case MetricTemplate.UTILIZATION:
-                    return new UtilizationMetric(id, templateId, name, description, attrs);
+                    return new UtilizationMetric(id, templateId, name, description, domain, attrs);
                 case MetricTemplate.WINDOWED_RATE:
-                    return new WindowedRateMetric(id, templateId, name, description, attrs);
+                    return new WindowedRateMetric(id, templateId, name, description, domain, attrs);
             }
 
             return null;
@@ -266,6 +267,7 @@ public class FressianTraceFormat {
             MetricTemplate mt = new MetricTemplate(
                 (int) r.readInt(),        // id
                 (int) r.readInt(),        // type
+                (String) r.readObject(),  // domain
                 (String) r.readObject(),  // name
                 (String) r.readObject(),  // description
                 (String) r.readObject(),  // units

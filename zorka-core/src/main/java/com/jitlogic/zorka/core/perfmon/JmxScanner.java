@@ -19,9 +19,9 @@ package com.jitlogic.zorka.core.perfmon;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLog;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +35,7 @@ public class JmxScanner {
     /**
      * Logger
      */
-    protected static final ZorkaLog log = ZorkaLogger.getLog(JmxScanner.class);
+    protected static final Logger log = LoggerFactory.getLogger(JmxScanner.class);
 
     /**
      * Symbol registry
@@ -90,19 +90,29 @@ public class JmxScanner {
 
             switch (template.getType()) {
                 case MetricTemplate.RAW_DATA:
-                    metric = metricsRegistry.getMetric(new RawDataMetric(template, template.getName(), description, attrs));
+                    metric = metricsRegistry.getMetric(
+                            new RawDataMetric(template, template.getName(), description,
+                                    template.getDomain(), attrs));
                     break;
                 case MetricTemplate.RAW_DELTA:
-                    metric = metricsRegistry.getMetric(new RawDeltaMetric(template, template.getName(), description, attrs));
+                    metric = metricsRegistry.getMetric(
+                            new RawDeltaMetric(template, template.getName(), description,
+                                    template.getDomain(), attrs));
                     break;
                 case MetricTemplate.TIMED_DELTA:
-                    metric = metricsRegistry.getMetric(new TimedDeltaMetric(template, template.getName(), description, attrs));
+                    metric = metricsRegistry.getMetric(
+                            new TimedDeltaMetric(template, template.getName(), description,
+                                    template.getDomain(), attrs));
                     break;
                 case MetricTemplate.WINDOWED_RATE:
-                    metric = metricsRegistry.getMetric(new WindowedRateMetric(template, template.getName(), description, attrs));
+                    metric = metricsRegistry.getMetric(
+                            new WindowedRateMetric(template, template.getName(), description,
+                                    template.getDomain(), attrs));
                     break;
                 case MetricTemplate.UTILIZATION:
-                    metric = metricsRegistry.getMetric(new UtilizationMetric(template, template.getName(), description, attrs));
+                    metric = metricsRegistry.getMetric(
+                            new UtilizationMetric(template, template.getName(), description,
+                                    template.getDomain(), attrs));
                     break;
                 default:
                     return null;
@@ -123,7 +133,7 @@ public class JmxScanner {
                 metric.setDynamicAttrs(dynamicAttrs);
             }
 
-            log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Created new metric: " + metric);
+            log.debug("Created new metric: " + metric);
             AgentDiagnostics.inc(AgentDiagnostics.METRICS_CREATED);
         }
 
@@ -138,7 +148,7 @@ public class JmxScanner {
             Number val = metric.getValue(clock, result.getValue());
 
             if (val == null) {
-                log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Obtained null value for metric '%s'. Skipping. ", metric);
+                log.debug("Obtained null value for metric '%s'. Skipping. ", metric);
                 AgentDiagnostics.inc(AgentDiagnostics.PMON_NULLS);
                 continue;
             }
@@ -165,7 +175,7 @@ public class JmxScanner {
                 sample.setAttrs(attrs);
             }
 
-            log.trace(ZorkaLogger.ZPM_RUN_TRACE, "Submitting sample: %s", sample);
+            log.trace("Submitting sample: %s", sample);
             smpl.add(sample);
         }
         return smpl;
@@ -179,7 +189,7 @@ public class JmxScanner {
             MetricTemplate template = lister.getMetricTemplate();
             if (template != null) {
 
-                log.debug(ZorkaLogger.ZPM_RUN_DEBUG, "Scanning query: %s", lister);
+                log.debug("Scanning query: %s", lister);
                 AgentDiagnostics.inc(AgentDiagnostics.PMON_QUERIES);
 
                 samples.addAll(getPerfSamples(clock, lister));

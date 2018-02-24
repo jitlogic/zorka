@@ -20,10 +20,10 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TaggedValue;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.Tracer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -42,7 +42,7 @@ public class TraceAttrProcessor implements SpyProcessor {
     /**
      * Logger
      */
-    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Tracer object
@@ -123,16 +123,16 @@ public class TraceAttrProcessor implements SpyProcessor {
                 : ObjectInspector.substitute(srcVal, record);
 
         if (val != null) {
-            if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
+            if (log.isDebugEnabled()) {
                 TraceRecord top = tracer.getHandler().realTop();
-                log.debug(ZorkaLogger.ZSP_ARGPROC, "Value: '" + val + "' stored as trace attribute "
+                log.debug("Value: '" + val + "' stored as trace attribute "
                         + symbolRegistry.symbolName(attrId) + " (classId= " + top.getClassId() + " methodId=" + top.getMethodId()
                         + " signatureId=" + top.getSignatureId() + ")");
             }
             tracer.getHandler().newAttr(traceId, attrId, attrTagId != null ? new TaggedValue(attrTagId, val) : val);
         } else {
-            if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-                log.debug(ZorkaLogger.ZSP_ARGPROC, "Null value received. ");
+            if (log.isDebugEnabled()) {
+                log.debug("Null value received. ");
             }
         }
 

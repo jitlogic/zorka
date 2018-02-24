@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.jitlogic.zorka</groupId>
         <artifactId>zorka</artifactId>
-        <version>1.0.16</version>
+        <version>1.1.1</version>
     </parent>
     <dependencies>
         <dependency>
@@ -15,14 +15,14 @@
             <version>${asm.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.jitlogic.zoola</groupId>
-            <artifactId>zoola-core</artifactId>
-            <version>${zoola.version}</version>
+            <groupId>com.jitlogic.zorka</groupId>
+            <artifactId>zorka-bsh-core</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.jitlogic.contrib</groupId>
-            <artifactId>libsnmp</artifactId>
-            <version>${libsnmp.version}</version>
+            <groupId>com.jitlogic.zorka</groupId>
+            <artifactId>zorka-snmp</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.fressian</groupId>

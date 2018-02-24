@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "tracer.bsh",
   "traps.bsh"
 );
@@ -69,10 +68,8 @@ __sql() {
 
   _tags_chain = null;
 
-  // Register trace types for CBOR collector.
-  tracer.defType("SQL", 34);
-
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("SQL");
   }
 

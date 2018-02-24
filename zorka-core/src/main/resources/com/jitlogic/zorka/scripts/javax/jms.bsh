@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "zabbix.bsh",
   "tracer.bsh",
   "traps.bsh"
 );
@@ -68,10 +67,8 @@ __javax_jms() {
   _slow_chain  = traps.subchain("jms", "slow");
   _error_chain = traps.subchain("jms", "error");
 
-  // Register trace types for CBOR collector.
-  tracer.defType("JMS", 42);
-
   if (zorka.boolCfg("zabbix.active")) {
+    zorka.require("zabbix.bsh");
     zabbix.tagMetadata("JMS");
   }
 

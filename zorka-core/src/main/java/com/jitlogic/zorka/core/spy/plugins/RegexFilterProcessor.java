@@ -18,10 +18,11 @@
 package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,7 +37,7 @@ public class RegexFilterProcessor implements SpyProcessor {
     /**
      * Logger
      */
-    private ZorkaLog log = ZorkaLogger.getLog(this.getClass());
+    private Logger log = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Source field
@@ -67,6 +68,11 @@ public class RegexFilterProcessor implements SpyProcessor {
      * Inverse filter flag
      */
     private Boolean filterOut;
+
+    /**
+     * Transforms of additional arguments
+     */
+    private Map<String,String> transforms;
 
     /**
      * Creates regex filter that filters records based on supplied regular expression.
@@ -122,6 +128,13 @@ public class RegexFilterProcessor implements SpyProcessor {
         this.defval = defval;
     }
 
+    public RegexFilterProcessor transform(String dst, String expr) {
+        if (transforms == null) {
+            transforms = new HashMap<String,String>();
+        }
+        transforms.put(dst, expr);
+        return this;
+    }
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
@@ -130,8 +143,8 @@ public class RegexFilterProcessor implements SpyProcessor {
         if (expr == null) {
             boolean matches = val != null && regex.matcher(val.toString()).matches();
 
-            if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-                log.debug(ZorkaLogger.ZSP_ARGPROC, "Filtering '" + val + "' through '" + regex.pattern() + "': " + matches);
+            if (log.isDebugEnabled()) {
+                log.debug("Filtering '" + val + "' through '" + regex.pattern() + "': " + matches);
             }
 
             return matches ^ filterOut ? record : null;
@@ -144,23 +157,28 @@ public class RegexFilterProcessor implements SpyProcessor {
                 }
                 String subst = ObjectInspector.substitute(expr, vals);
                 record.put(dst, subst);
-                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-                    log.debug(ZorkaLogger.ZSP_ARGPROC, "Processed '" + val + "' to '" + subst + "' using pattern '" + regex.pattern() + "'");
+                if (transforms != null) {
+                    for (Map.Entry<String,String> e : transforms.entrySet()) {
+                        record.put(e.getKey(), ObjectInspector.substitute(e.getValue(), vals));
+                    }
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug("Processed '" + val + "' to '" + subst + "' using pattern '" + regex.pattern() + "'");
                 }
             } else if (defval != null) {
                 record.put(dst, defval);
-                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-                    log.debug(ZorkaLogger.ZSP_ARGPROC, "No value to be processed. Using default value of '" + defval + "'");
+                if (log.isDebugEnabled()) {
+                    log.debug("No value to be processed. Using default value of '" + defval + "'");
                 }
             } else if (Boolean.TRUE.equals(filterOut)) {
-                if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-                    log.debug(ZorkaLogger.ZSP_ARGPROC, "No value to be processed. Filtering out.");
+                if (log.isDebugEnabled()) {
+                    log.debug("No value to be processed. Filtering out.");
                 }
                 return null;
             }
         } else {
-            if (ZorkaLogger.isLogMask(ZorkaLogger.ZSP_ARGPROC)) {
-                log.debug(ZorkaLogger.ZSP_ARGPROC, "No value to be processed. Leaving record unprocessed.");
+            if (log.isDebugEnabled()) {
+                log.debug("No value to be processed. Leaving record unprocessed.");
             }
         }
         return record;
