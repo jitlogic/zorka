@@ -351,10 +351,10 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
         try {
             // TODO this is inefficient, implement dedicated Base64/json/etc encoding in HttpClient
             HttpRequest req = HttpUtil.POST(uri, DatatypeConverter.printBase64Binary(Arrays.copyOf(w.getBuf(), w.position())));
-            req.setHeader("X-ZICO-Agent-UUID", agentUUID);
-            req.setHeader("X-ZICO-Session-UUID", sessionUUID);
-            req.setHeader("Content-Type", "application/zico+cbor+v1");
-            if (traceUUID != null) req.setHeader("X-ZICO-Trace-UUID", traceUUID);
+            req.setHeader("X-Zorka-Agent-UUID", agentUUID);
+            req.setHeader("X-Zorka-Session-UUID", sessionUUID);
+            req.setHeader("Content-Type", "application/zorka+cbor+v1");
+            if (traceUUID != null) req.setHeader("X-Zorka-Trace-UUID", traceUUID);
             HttpResponse res = req.go();
             if (res.getStatus() < 300) {
                 log.trace("Submitted: " + uri + " : " + traceUUID);
