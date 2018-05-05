@@ -1,3 +1,11 @@
+
+Zorka 1.90.1 (2018-05-04)
+-------------------------
+
+* this is development version: things may change in unpredictable ways;
+* released along with next gen ZICO collector (development snapshot);
+
+
 Zorka 1.1.1 (2018-02-24)
 -------------------------
 
