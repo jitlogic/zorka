@@ -82,7 +82,14 @@ public abstract class SpyProbe implements SpyDefArg {
             return 1;
         }
 
-        mv.visitInsn(DUP);
+        switch (type.getSort()) {
+            case Type.LONG:
+            case Type.DOUBLE:
+                mv.visitInsn(DUP2);
+                break;
+            default:
+                mv.visitInsn(DUP);
+        }
         emitAutoboxing(mv, type);
         mv.visitVarInsn(ASTORE, mv.getRetValProbeSlot());
 
