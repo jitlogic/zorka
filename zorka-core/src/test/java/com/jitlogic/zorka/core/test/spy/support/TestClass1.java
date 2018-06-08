@@ -67,6 +67,14 @@ public class TestClass1 {
         return 42;
     }
 
+    public long getUltimateQuestionOfLongLife() {
+        return 42L;
+    }
+
+    public double getUltimateQuestionOfDoubleLife() {
+        return 42.0;
+    }
+
     public int getUltimateQuestionWithLocalVars() {
         String s = "oja!";
         return 38 + s.length();

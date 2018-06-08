@@ -412,6 +412,34 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
         assertEquals("fetched value should be the same as returned", retVal, submitter.get(0).get(0));
     }
 
+    @Test
+    public void testFetchReturnSimpleTypeLongObject() throws Exception {
+        engine.add(spy.instance("x").onReturn(spy.fetchRetVal("R0"))
+                .include(spy.byMethod(TCLASS1, "getUltimateQuestionOfLongLife")));
+
+        Object obj = instantiate(engine, TCLASS1);
+
+        Object retVal = checkForError(invoke(obj, "getUltimateQuestionOfLongLife"));
+
+        assertEquals("should submit one record", 1, submitter.size());
+        assertEquals("should return long integer value", 42L, submitter.get(0).get(0));
+        assertEquals("fetched value should be the same as returned", retVal, submitter.get(0).get(0));
+    }
+
+    @Test
+    public void testFetchReturnSimpleTypeDoubleObject() throws Exception {
+        engine.add(spy.instance("x").onReturn(spy.fetchRetVal("R0"))
+                .include(spy.byMethod(TCLASS1, "getUltimateQuestionOfDoubleLife")));
+
+        Object obj = instantiate(engine, TCLASS1);
+
+        Object retVal = checkForError(invoke(obj, "getUltimateQuestionOfDoubleLife"));
+
+        assertEquals("should submit one record", 1, submitter.size());
+        assertEquals("should return long integer value", 42.0, submitter.get(0).get(0));
+        assertEquals("fetched value should be the same as returned", retVal, submitter.get(0).get(0));
+    }
+
 
     @Test
     public void testFetchReturnValWithDirtyVariableStack() throws Exception {
