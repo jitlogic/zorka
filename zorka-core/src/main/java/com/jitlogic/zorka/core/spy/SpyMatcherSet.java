@@ -310,15 +310,17 @@ public class SpyMatcherSet {
     private void includeInternal(SpyMatcher... includes) {
 
         for (SpyMatcher m : includes) {
-            if (matchers.size() == 0 || m.getPriority() >= matchers.get(matchers.size() - 1).getPriority()) {
-                matchers.add(m);
-            } else if (m.getPriority() < matchers.get(0).getPriority()) {
-                matchers.add(0, m);
-            } else {
-                for (int i = 0; i < matchers.size(); i++) {
-                    if (matchers.get(i).getPriority() > m.getPriority()) {
-                        matchers.add(i, m);
-                        break;
+            if (m != null) {
+                if (matchers.size() == 0 || m.getPriority() >= matchers.get(matchers.size() - 1).getPriority()) {
+                    matchers.add(m);
+                } else if (m.getPriority() < matchers.get(0).getPriority()) {
+                    matchers.add(0, m);
+                } else {
+                    for (int i = 0; i < matchers.size(); i++) {
+                        if (matchers.get(i).getPriority() > m.getPriority()) {
+                            matchers.add(i, m);
+                            break;
+                        }
                     }
                 }
             }

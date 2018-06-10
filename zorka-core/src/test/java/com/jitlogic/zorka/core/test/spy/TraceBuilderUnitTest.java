@@ -117,6 +117,17 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         checkRC(1, 1, 0);
     }
 
+    @Test
+    public void testForceTraceRecordFlag() {
+        b.traceEnter(c1, m1, s1, 10 * MS);
+        b.traceBegin(t1,5L, TraceMarker.DROP_INTERIM);
+        b.traceEnter(c1, m2, s1, 20 * MS);
+        b.markRecordFlags(TraceRecord.FORCE_TRACE);
+        b.traceReturn(20 * MS + 10);
+        b.traceReturn(200 * MS);
+
+        checkRC(1, 1, 0);
+    }
 
     @Test
     public void testSingleOneElementTrace() {

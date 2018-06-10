@@ -56,6 +56,11 @@ public class TraceRecord implements SymbolicRecord, Serializable {
     public static final int DROPPED_PARENT = 0x0010;
 
     /**
+     * Forces current method to be added to trace.
+     */
+    public static final int FORCE_TRACE = 0x0020;
+
+    /**
      * Class ID refers to class name in symbol registry.
      */
     private int classId;

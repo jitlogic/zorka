@@ -283,7 +283,7 @@ public class TraceBuilder {
 
         // Determine how the top of stack should be rolled back
         if (parent != null) {
-            if ((ttop.getTime() > Tracer.getMinMethodTime() || ttop.getErrors() > 0)
+            if ((ttop.getTime() > Tracer.getMinMethodTime() || ttop.getErrors() > 0 || ttop.hasFlag(TraceRecord.FORCE_TRACE))
                     || 0 != (ttop.getMarker().getFlags() & TraceMarker.ALL_METHODS)) {
 
 
@@ -377,6 +377,13 @@ public class TraceBuilder {
                 tm.markFlags(flag);
                 break;
             }
+        }
+    }
+
+    public void markRecordFlags(int flag) {
+        TraceRecord tr = realTop();
+        if (tr != null) {
+            tr.markFlag(flag);
         }
     }
 

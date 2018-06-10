@@ -48,6 +48,8 @@ public class TracerLib {
     public static final int TRACE_CALLS = TraceMarker.TRACE_CALLS;
     public static final int ERROR_MARK = TraceMarker.ERROR_MARK;
 
+    public static final int TR_FORCE_TRACE = TraceRecord.FORCE_TRACE;
+
     private Tracer tracer;
 
     private SymbolRegistry symbolRegistry;
@@ -95,15 +97,19 @@ public class TracerLib {
      */
     public void include(String... matchers) {
         for (String matcher : matchers) {
-            log.debug("Tracer include: " + matcher);
-            tracer.include(SpyMatcher.fromString(matcher.toString()));
+            if (matcher != null) {
+                log.debug("Tracer include: " + matcher);
+                tracer.include(SpyMatcher.fromString(matcher));
+            }
         }
     }
 
     public void include(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
-            log.debug("Tracer include: " + matcher);
-            tracer.include(matcher);
+            if (matcher != null) {
+                log.debug("Tracer include: " + matcher);
+                tracer.include(matcher);
+            }
         }
     }
 
@@ -114,15 +120,19 @@ public class TracerLib {
      */
     public void exclude(String... matchers) {
         for (String matcher : matchers) {
-            log.debug("Tracer exclude: " + matcher);
-            tracer.include(SpyMatcher.fromString(matcher.toString()).exclude());
+            if (matcher != null) {
+                log.debug("Tracer exclude: " + matcher);
+                tracer.include(SpyMatcher.fromString(matcher).exclude());
+            }
         }
     }
 
     public void exclude(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
-            log.debug("Tracer exclude: " + matcher);
-            tracer.include((matcher).exclude());
+            if (matcher != null) {
+                log.debug("Tracer exclude: " + matcher);
+                tracer.include((matcher).exclude());
+            }
         }
 
     }
@@ -359,6 +369,10 @@ public class TracerLib {
 
     public SpyProcessor traceFlags(String traceName, int flags) {
         return new TraceFlagsProcessor(tracer, null, symbolRegistry.symbolId(traceName), flags);
+    }
+
+    public SpyProcessor recordFlags(int flags) {
+        return new TraceRecordFlagsProcessor(tracer, flags);
     }
 
 

@@ -166,7 +166,9 @@ public class SpyClassVisitor extends ClassVisitor {
     public MethodVisitor visitMethod(int access, String methodName, String methodDesc,
                                      String methodSignature, String[] exceptions) {
 
-        log.debug("Encountered method: " + className + "." + methodName + " " + methodDesc);
+        if (log.isTraceEnabled()) {
+            log.trace("Encountered method: " + className + "." + methodName + " " + methodDesc);
+        }
 
         MethodVisitor mv = createVisitor(access, methodName, methodDesc, methodSignature, exceptions);
         List<SpyContext> ctxs = new ArrayList<SpyContext>(sdefs.size() + 2);
@@ -194,8 +196,8 @@ public class SpyClassVisitor extends ClassVisitor {
         boolean doTrace = tracer.getMatcherSet().methodMatch(className, classAnnotations, classInterfaces,
                 access, methodName, methodDesc, null) || (tracer.isTraceSpyMethods() && ctxs.size() > 0);
 
-        if (doTrace && log.isDebugEnabled()) {
-            log.debug("Instrumenting method (for trace): " + className + "." + methodName + " " + methodDesc);
+        if (doTrace && log.isTraceEnabled()) {
+            log.trace("Instrumenting method (for trace): " + className + "." + methodName + " " + methodDesc);
         }
 
         if (ctxs.size() > 0 || doTrace) {
