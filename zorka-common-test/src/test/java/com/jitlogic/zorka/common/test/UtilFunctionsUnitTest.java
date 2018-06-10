@@ -26,14 +26,14 @@ import java.io.File;
 
 public class UtilFunctionsUnitTest {
 
-    private String _(String path) {
+    private String _u(String path) {
         return path.replace("/", File.separator);
     }
 
     @Test
     public void testUtilPathFn() {
-        assertEquals(_("/tmp/asd"), _(ZorkaUtil.path(_("/tmp"), "asd")));
-        assertEquals(_("/tmp/asd"), _(ZorkaUtil.path(_("/tmp/"), "/asd/")));
+        assertEquals(_u("/tmp/asd"), _u(ZorkaUtil.path(_u("/tmp"), "asd")));
+        assertEquals(_u("/tmp/asd"), _u(ZorkaUtil.path(_u("/tmp/"), "/asd/")));
     }
 
 

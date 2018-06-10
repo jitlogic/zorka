@@ -22,13 +22,11 @@ import com.jitlogic.zorka.core.AgentConfig;
 import com.jitlogic.zorka.core.AgentInstance;
 import com.jitlogic.zorka.core.ZorkaControl;
 import com.jitlogic.zorka.core.spy.MainSubmitter;
-import com.jitlogic.zorka.core.spy.SpyRetransformer;
+import com.jitlogic.zorka.core.spy.RealSpyRetransformer;
+import com.jitlogic.zorka.core.spy.SpyClassLookup;
 
 import java.io.File;
-import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.Instrumentation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 
 /**
  * This class is responsible for bootstrapping zorka agent.
@@ -37,59 +35,13 @@ import java.lang.reflect.Method;
  */
 public class AgentMain {
 
-    private static volatile AgentInstance instance;
-
-    private static boolean supportsRetransform(Instrumentation instrumentation) throws Exception {
-        for (Method m : instrumentation.getClass().getMethods()) {
-            if ("isRetransformClassesSupported".equals(m.getName())) {
-                return (Boolean) m.invoke(instrumentation);
-            }
-        }
-        return false;
-    }
-
-    private static SpyRetransformer instantiateRetransformer(Instrumentation instrumentation, AgentConfig config,
-                                                             String className) throws Exception {
-        Class<?> clazz = Class.forName(className);
-
-        for (Constructor<?> constructor : clazz.getConstructors()) {
-            Class<?>[] args = constructor.getParameterTypes();
-            if (args.length == 2) {
-                return (SpyRetransformer) constructor.newInstance(instrumentation, config);
-            }
-        }
-
-        throw new IllegalArgumentException("Cannot instantiate retransformer of class " + className);
-    }
-
-    private static void addTransformer(Instrumentation instrumentation, ClassFileTransformer transformer,
-                                       boolean retransformSupported) throws Exception {
-        Method atm = null;
-
-        for (Method m : Instrumentation.class.getMethods()) {
-            if ("addTransformer".equals(m.getName())) {
-                atm = m;
-                if (m.getParameterTypes().length == 2 || !retransformSupported) {
-                    break;
-                }
-            }
-        }
-
-        if (atm.getParameterTypes().length == 2) {
-            atm.invoke(instrumentation, transformer, retransformSupported);
-        } else {
-            atm.invoke(instrumentation, transformer);
-        }
-
-    }
-
     /**
      * This is entry method of java agent.
      *
      * @param args            arguments (supplied via -javaagent:/path/to/agent.jar=arguments)
      * @param instrumentation reference to JVM instrumentation interface
      */
-    public static void premain(String args, Instrumentation instrumentation) throws Exception {
+    public static void premain(String args, Instrumentation instrumentation) {
 
         String home = System.getProperties().getProperty("zorka.home.dir", args);
 
@@ -99,16 +51,20 @@ public class AgentMain {
             System.out.println("ERROR: " + home + " is not a proper ZORKA home directory.");
         }
 
-        boolean retransformSupported = supportsRetransform(instrumentation);
-
         AgentConfig config = new AgentConfig(ZorkaUtil.path(home));
-        instance = new AgentInstance(config, instantiateRetransformer(instrumentation, config,
-                "com.jitlogic.zorka.core.spy." + (retransformSupported ? "RealSpyRetransformer" : "DummySpyRetransformer")));
+
+        if (config.boolCfg("spy.reflection.enabled", true)) {
+            SpyClassLookup.INSTANCE = new SpyClassLookup();
+        } else {
+            SpyClassLookup.INSTANCE = new SpyClassLookup(instrumentation);
+        }
+
+        AgentInstance instance = new AgentInstance(config, new RealSpyRetransformer(instrumentation, config));
 
         instance.start();
 
         if (instance.getConfig().boolCfg("spy", true)) {
-            addTransformer(instrumentation, instance.getClassTransformer(), retransformSupported);
+            instrumentation.addTransformer(instance.getClassTransformer(), true);
             MainSubmitter.setSubmitter(instance.getSubmitter());
             MainSubmitter.setTracer(instance.getTracer());
         }

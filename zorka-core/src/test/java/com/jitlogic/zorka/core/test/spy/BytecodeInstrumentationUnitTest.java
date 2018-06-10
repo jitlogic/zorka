@@ -20,6 +20,7 @@ import com.jitlogic.zorka.core.spy.*;
 import com.jitlogic.zorka.core.test.spy.support.TestCollector;
 import com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -69,7 +70,7 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
 
         invoke(obj, "nonPublicStatic");
 
-        assertEquals(1, getField(obj, "scalls"));
+        assertEquals((Integer)1, getField(obj, "scalls"));
 
         assertEquals("should submit one record", 1, submitter.size());
     }

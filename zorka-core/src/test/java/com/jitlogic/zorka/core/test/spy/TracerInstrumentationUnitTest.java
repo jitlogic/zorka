@@ -106,8 +106,8 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         Object obj = instantiate(engine, TCLASS3);
         invoke(obj, "tryCatchFinally0", true);
 
-        assertEquals("Outer try { } block didn't execute.", 1, getField(obj, "calls"));
-        assertEquals("Inner catch { } block didn't execute.", 1, getField(obj, "catches"));
+        assertEquals("Outer try { } block didn't execute.", (Integer)1, getField(obj, "calls"));
+        assertEquals("Inner catch { } block didn't execute.", (Integer)1, getField(obj, "catches"));
     }
 
 
@@ -118,9 +118,9 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         Object obj = instantiate(engine, TCLASS3);
         invoke(obj, "tryCatchFinally1", true);
 
-        assertEquals("Outer try { } block didn't execute.", 1, getField(obj, "calls"));
-        assertEquals("Inner catch { } block didn't execute.", 1, getField(obj, "catches"));
-        assertEquals("Outer finally { } block didn't execute.", 1, getField(obj, "finals"));
+        assertEquals("Outer try { } block didn't execute.", (Integer)1, getField(obj, "calls"));
+        assertEquals("Inner catch { } block didn't execute.", (Integer)1, getField(obj, "catches"));
+        assertEquals("Outer finally { } block didn't execute.", (Integer)1, getField(obj, "finals"));
     }
 
 
@@ -131,9 +131,9 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         Object obj = instantiate(engine, TCLASS3);
         invoke(obj, "tryCatchFinally2", true);
 
-        assertEquals("Outer try { } block didn't execute.", 1, getField(obj, "calls"));
-        assertEquals("Inner catch { } block didn't execute.", 1, getField(obj, "catches"));
-        assertEquals("Outer finally { } block didn't execute.", 0, getField(obj, "finals"));
+        assertEquals("Outer try { } block didn't execute.", (Integer)1, getField(obj, "calls"));
+        assertEquals("Inner catch { } block didn't execute.", (Integer)1, getField(obj, "catches"));
+        assertEquals("Outer finally { } block didn't execute.", (Integer)0, getField(obj, "finals"));
     }
 
     @Test

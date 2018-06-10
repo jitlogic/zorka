@@ -1,12 +1,10 @@
 package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
-import com.jitlogic.zorka.core.spy.CachedClassInfo;
-import com.jitlogic.zorka.core.spy.ClassInfo;
-import com.jitlogic.zorka.core.spy.ResidentClassInfo;
-import com.jitlogic.zorka.core.spy.SpyClassResolver;
+import com.jitlogic.zorka.core.spy.*;
 
 
+import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.junit.Test;
 
 
@@ -14,7 +12,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class SpyClassResolverUnitTest {
+public class SpyClassResolverUnitTest extends ZorkaFixture {
 
     private static final String RP = "com/jitlogic/zorka/core/test/spy/crv/";
     private static final String LP = RP.replace('/', '.');
@@ -87,6 +85,15 @@ public class SpyClassResolverUnitTest {
         test("K", "Z", "K");
         test("J", "Z", "J");
         // TODO superinterface case (ie. common interface implemented by type1 and type2) - if and when needed
+    }
+
+    @Test
+    public void testFindLoadedClass() {
+        SpyClassLookup u = new SpyClassLookup();
+
+        Class clazz = u.findLoadedClass(ClassLoader.getSystemClassLoader(), "java.lang.Object");
+
+        assertNotNull(clazz);
     }
 
 }

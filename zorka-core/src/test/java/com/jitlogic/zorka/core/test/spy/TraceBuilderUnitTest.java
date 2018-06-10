@@ -480,31 +480,31 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         b.traceEnter(c1, m1, s1, 1);
         b.traceBegin(t1, 2, TraceMarker.DROP_INTERIM);
-        assertEquals(1, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)1, TestUtil.getField(b, "numRecords"));
 
         b.traceEnter(c1, m2, s1, 2);
-        assertEquals(2, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)2, TestUtil.getField(b, "numRecords"));
 
         b.traceReturn(3);
-        assertEquals(1, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)1, TestUtil.getField(b, "numRecords"));
 
         b.traceEnter(c1, m2, s1, 4);
-        assertEquals(2, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)2, TestUtil.getField(b, "numRecords"));
 
         b.traceEnter(c1, m2, s1, 5);
-        assertEquals(3, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)3, TestUtil.getField(b, "numRecords"));
 
         b.traceReturn(6);
-        assertEquals(2, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)2, TestUtil.getField(b, "numRecords"));
 
         b.traceReturn(20);
-        assertEquals(2, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)2, TestUtil.getField(b, "numRecords"));
 
         b.traceReturn(40);
-        assertEquals(0, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)0, TestUtil.getField(b, "numRecords"));
 
         b.traceEnter(c1, m1, s1, 41);
-        assertEquals(1, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)1, TestUtil.getField(b, "numRecords"));
     }
 
 

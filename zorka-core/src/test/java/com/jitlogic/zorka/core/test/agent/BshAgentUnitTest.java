@@ -52,7 +52,8 @@ public class BshAgentUnitTest extends ZorkaFixture {
 
     @Test
     public void testJmxCalls() throws Exception {
-        assertTrue("1.0", zorkaAgent.query("zorka.jmx(\"java\",\"java.lang:type=Runtime\",\"SpecVersion\")").startsWith("1."));
+        String v = zorkaAgent.query("zorka.jmx(\"java\",\"java.lang:type=Runtime\",\"SpecVersion\")");
+        assertTrue("1.0", v.length() > 0 && Character.isDigit(v.charAt(0)));
     }
 
 

@@ -36,12 +36,12 @@ public class ObjectInspectorUnitTest extends CommonFixture {
     public void testInspectStatic() {
 
         // Call specifically for methods or fields
-        assertEquals(126, ObjectInspector.get(TestInspectorClass.class, "count()"));
-        assertEquals(123, ObjectInspector.get(TestInspectorClass.class, ".count"));
-        assertEquals(234, ObjectInspector.get(TestInspectorClass.class, ".priv"));
+        assertEquals((Integer)126, ObjectInspector.get(TestInspectorClass.class, "count()"));
+        assertEquals((Integer)123, ObjectInspector.get(TestInspectorClass.class, ".count"));
+        assertEquals((Integer)234, ObjectInspector.get(TestInspectorClass.class, ".priv"));
 
         // Automatic resolve
-        assertEquals(125, ObjectInspector.get(TestInspectorClass.class, "count"));
+        assertEquals((Integer)125, ObjectInspector.get(TestInspectorClass.class, "count"));
     }
 
 
@@ -57,60 +57,60 @@ public class ObjectInspectorUnitTest extends CommonFixture {
     @Test
     public void testInspectArrayLength() {
         String[] array = {"a", "b", "c"};
-        assertEquals(3, ObjectInspector.get(array, "length"));
+        assertEquals((Integer)3, ObjectInspector.get(array, "length"));
     }
 
 
     @Test
     public void testInspectByteArrayLength() {
         byte[] array = {1, 2, 3};
-        assertEquals(3, ObjectInspector.get(array, "length"));
-        assertEquals((byte) 2, ObjectInspector.get(array, 1));
+        assertEquals((Integer)3, ObjectInspector.get(array, "length"));
+        assertEquals((Byte) (byte)2, ObjectInspector.get(array, 1));
     }
 
 
     @Test
     public void testInspectIntArrayLength() {
         int[] array = {1, 2, 3};
-        assertEquals(3, ObjectInspector.get(array, "length"));
-        assertEquals(2, ObjectInspector.get(array, 1));
+        assertEquals((Integer)3, ObjectInspector.get(array, "length"));
+        assertEquals((Integer)2, ObjectInspector.get(array, 1));
     }
 
 
     @Test
     public void testInspectLongArrayLength() {
         long[] array = {1, 2, 3};
-        assertEquals(3, ObjectInspector.get(array, "length"));
-        assertEquals(2L, ObjectInspector.get(array, 1));
+        assertEquals((Integer)3, ObjectInspector.get(array, "length"));
+        assertEquals((Long)2L, ObjectInspector.get(array, 1));
     }
 
     @Test
     public void testInspectDoubleArrayLength() {
         double[] array = {1.0, 2.0, 3.0};
-        assertEquals(3, ObjectInspector.get(array, "length"));
+        assertEquals((Integer)3, ObjectInspector.get(array, "length"));
         assertEquals(2.0, (Double) (ObjectInspector.get(array, 1)), 0.01);
     }
 
     @Test
     public void testInspectFloatArrayLength() {
         float[] array = {1, 2, 3};
-        assertEquals(3, ObjectInspector.get(array, "length"));
-        assertEquals(2, (Float) (ObjectInspector.get(array, 1)), 0.01);
+        assertEquals((Integer)3, ObjectInspector.get(array, "length"));
+        assertEquals((float)2, (Float)(ObjectInspector.get(array, 1)), 0.01);
     }
 
     @Test
     public void testInspectShortArrayLength() {
         short[] array = {1, 2, 3};
-        assertEquals(3, ObjectInspector.get(array, "length"));
-        assertEquals((short) 2, ObjectInspector.get(array, 1));
+        assertEquals((Integer)3, ObjectInspector.get(array, "length"));
+        assertEquals((Short) (short)2, ObjectInspector.get(array, 1));
     }
 
 
     @Test
     public void testInspectCharArrayLength() {
         char[] array = {'A', 'B', 'C'};
-        assertEquals(3, ObjectInspector.get(array, "length"));
-        assertEquals('B', ObjectInspector.get(array, 1));
+        assertEquals((Integer)3, ObjectInspector.get(array, "length"));
+        assertEquals((Character)(char)'B', ObjectInspector.get(array, 1));
     }
 
     @Test
@@ -128,8 +128,8 @@ public class ObjectInspectorUnitTest extends CommonFixture {
         map.put("b", 22);
         map.put("c", 33);
 
-        assertEquals(11, ObjectInspector.get(map, "a"));
-        assertEquals(3, ObjectInspector.get(map, "size()"));
+        assertEquals((Integer)11, ObjectInspector.get(map, "a"));
+        assertEquals((Integer)3, ObjectInspector.get(map, "size()"));
     }
 
 
@@ -188,7 +188,7 @@ public class ObjectInspectorUnitTest extends CommonFixture {
     public void testInspectJmxObj() throws Exception {
         JmxObject jmxObject = mkJmxObject();
 
-        assertEquals(100L, ObjectInspector.get(jmxObject, "Nom"));
+        assertEquals((Long)(long)100L, ObjectInspector.get(jmxObject, "Nom"));
     }
 
 

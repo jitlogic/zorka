@@ -1,3 +1,10 @@
+Zorka.1.90.2 (2018-06-30)
+-------------------------
+
+* FIX: try/catch on constructors generated verify errors on JDK8+;
+* FIX: return probes for long and double types caused verify errors;
+* JDK9, JDK10, JDK11, GraalVM now works properly (tested only on Tomcat);
+
 
 Zorka 1.90.1 (2018-05-04)
 -------------------------

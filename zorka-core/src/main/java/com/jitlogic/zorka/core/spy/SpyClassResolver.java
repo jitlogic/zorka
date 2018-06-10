@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 public class SpyClassResolver {
@@ -20,19 +18,6 @@ public class SpyClassResolver {
     private Map<String,ClassInfo> cache = new HashMap<String, ClassInfo>();
 
     public final static String OBJECT_CLAZZ = "java.lang.Object";
-
-    private final static Method findLoadedClass;
-
-    static {
-        Method m = null;
-        try {
-            m = ClassLoader.class.getDeclaredMethod("findLoadedClass", String.class);
-            if (!m.isAccessible()) m.setAccessible(true);
-        } catch (NoSuchMethodException e) {
-            log.error("Error obtaining ClassLoader.findLoadedClass reference.", e);
-        }
-        findLoadedClass = m;
-    }
 
     private MethodCallStatistic numCalls, classGets;
     private MethodCallStatistic cacheHits, cacheMisses, cacheDels;
@@ -139,22 +124,13 @@ public class SpyClassResolver {
             cacheHits.logCall();
         }
 
-        try {
-            // In case, application code made this method inaccessible again ...
-            if (!findLoadedClass.isAccessible()) findLoadedClass.setAccessible(true);
-
-            Class<?> clazz = (Class)findLoadedClass.invoke(loader, type);
-            if (clazz != null) {
-                if (rslt != null) cacheDels.logCall();
-                rslt = new ResidentClassInfo(clazz);
-                delCached(type);
-                residentGets.logCall();
-                return rslt;
-            }
-        } catch (IllegalAccessException e) {
-            log.error("Error calling findLoadedClass(): ", e);
-        } catch (InvocationTargetException e) {
-            log.error("Error calling findLoadedClass(): ", e);
+        Class<?> clazz = SpyClassLookup.INSTANCE.findLoadedClass(loader, type);
+        if (clazz != null) {
+            if (rslt != null) cacheDels.logCall();
+            rslt = new ResidentClassInfo(clazz);
+            delCached(type);
+            residentGets.logCall();
+            return rslt;
         }
 
         if (rslt != null) {

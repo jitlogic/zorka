@@ -32,6 +32,7 @@ import com.jitlogic.zorka.core.spy.*;
 import com.jitlogic.zorka.common.test.support.TestUtil;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.core.spy.SpyClassLookup;
 import org.junit.After;
 import org.junit.Before;
 
@@ -124,6 +125,8 @@ public class ZorkaFixture extends CommonFixture {
         tmpDir = "/tmp" + File.separatorChar + "zorka-unit-test";
         TestUtil.rmrf(tmpDir);
         new File(tmpDir).mkdirs();
+
+        SpyClassLookup.INSTANCE = new SpyClassLookup();
     }
 
 

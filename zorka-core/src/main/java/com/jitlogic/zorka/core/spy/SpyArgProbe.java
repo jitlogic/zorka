@@ -17,6 +17,8 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.objectweb.asm.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.jitlogic.zorka.core.spy.SpyLib.ON_ENTER;
 import static org.objectweb.asm.Opcodes.*;
@@ -27,6 +29,8 @@ import static org.objectweb.asm.Opcodes.*;
  * @author rafal.lewczuk@jitlogic.com
  */
 public class SpyArgProbe extends SpyProbe {
+
+    private static Logger log = LoggerFactory.getLogger(SpyArgProbe.class);
 
     /**
      * Argument index
@@ -49,7 +53,7 @@ public class SpyArgProbe extends SpyProbe {
     @Override
     public int emit(SpyMethodVisitor mv, int stage, int opcode) {
         if (stage == ON_ENTER && argIndex == 0 && "<init>".equals(mv.getMethodName())) {
-            // TODO log warning
+            log.warn("Tried to fetch <this> at the beginning of constructor of class " + mv.getClassName());
             mv.visitInsn(ACONST_NULL);
         } else if (argIndex >= 0) {
 
