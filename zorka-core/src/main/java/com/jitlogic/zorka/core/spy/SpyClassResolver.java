@@ -15,12 +15,12 @@ public class SpyClassResolver {
 
     private static final Logger log = LoggerFactory.getLogger(SpyClassResolver.class);
 
-    private Map<String,ClassInfo> cache = new HashMap<String, ClassInfo>();
+    private Map<String,CachedClassInfo> cache = new HashMap<String, CachedClassInfo>();
 
     public final static String OBJECT_CLAZZ = "java.lang.Object";
 
     private MethodCallStatistic numCalls, classGets;
-    private MethodCallStatistic cacheHits, cacheMisses, cacheDels;
+    private MethodCallStatistic cacheHits, cacheMisses;
     private MethodCallStatistic residentGets, bytecodeGets;
 
     public SpyClassResolver(MethodCallStatistics stats) {
@@ -28,7 +28,6 @@ public class SpyClassResolver {
         classGets = stats.getMethodCallStatistic("CrvClassGets");
         cacheHits = stats.getMethodCallStatistic("CrvCacheHits");
         cacheMisses = stats.getMethodCallStatistic("CrvCacheMisses");
-        cacheDels = stats.getMethodCallStatistic("CrvCacheDeletes");
         residentGets = stats.getMethodCallStatistic("CrvResidentGets");
         bytecodeGets = stats.getMethodCallStatistic("CrvBytecodeGets");
     }
@@ -37,14 +36,14 @@ public class SpyClassResolver {
 
         numCalls.logCall();
 
-        ClassInfo ci1 = getClassInfo(loader, type1), ci2 = getClassInfo(loader, type2);
+        CachedClassInfo ci1 = getClassInfo(loader, type1), ci2 = getClassInfo(loader, type2);
 
-        ClassInfo rslt = null;
+        CachedClassInfo rslt = null;
 
         if (!ci1.isInterface() && !ci2.isInterface()) {
             // Both are classes
 
-            List<ClassInfo> cs1 = getAllSuperclasses(loader, ci1), cs2 = getAllSuperclasses(loader, ci2);
+            List<CachedClassInfo> cs1 = getAllSuperclasses(loader, ci1), cs2 = getAllSuperclasses(loader, ci2);
             cs1.add(ci1); cs2.add(ci2);
 
             int csl = Math.min(cs1.size(), cs2.size());
@@ -57,7 +56,7 @@ public class SpyClassResolver {
         } else if (ci1.isInterface() && ci2.isInterface()) {
             return OBJECT_CLAZZ;
         } else {
-            ClassInfo ci = ci1.isInterface() ? ci1 : ci2, co = ci1.isInterface() ? ci2 : ci1;
+            CachedClassInfo ci = ci1.isInterface() ? ci1 : ci2, co = ci1.isInterface() ? ci2 : ci1;
 
             while (!OBJECT_CLAZZ.equals(co.getClassName())) {
                 if (interfaceMatches(loader, ci, co)) {
@@ -72,7 +71,7 @@ public class SpyClassResolver {
         return rslt != null ? rslt.getClassName() : OBJECT_CLAZZ;
     }
 
-    private boolean interfaceMatches(ClassLoader loader, ClassInfo ci, ClassInfo cc) {
+    private boolean interfaceMatches(ClassLoader loader, CachedClassInfo ci, CachedClassInfo cc) {
         String[] ifcs = cc.getInterfaceNames();
         if (ifcs != null) {
             // Check for direct interface implementation
@@ -83,7 +82,7 @@ public class SpyClassResolver {
             }
             // Check for indirect interface implementation
             for (String ifc : ifcs) {
-                ClassInfo ci1 = getClassInfo(loader, ifc);
+                CachedClassInfo ci1 = getClassInfo(loader, ifc);
                 if (ci1 != null && interfaceMatches(loader, ci, ci1)) {
                     return true;
                 }
@@ -93,16 +92,16 @@ public class SpyClassResolver {
         return false;
     }
 
-    public List<ClassInfo> getAllSuperclasses(ClassLoader loader, String type) {
-        ClassInfo ci = getClassInfo(loader, type);
+    public List<CachedClassInfo> getAllSuperclasses(ClassLoader loader, String type) {
+        CachedClassInfo ci = getClassInfo(loader, type);
         return ci != null ? getAllSuperclasses(loader, ci) : null;
     }
 
 
-    private List<ClassInfo> getAllSuperclasses(ClassLoader loader, ClassInfo ci) {
-        List<ClassInfo> rslt = new ArrayList<ClassInfo>();
+    private List<CachedClassInfo> getAllSuperclasses(ClassLoader loader, CachedClassInfo ci) {
+        List<CachedClassInfo> rslt = new ArrayList<CachedClassInfo>();
 
-        ClassInfo i = ci;
+        CachedClassInfo i = ci;
 
         do {
             i = getClassInfo(loader, i.getSuperclassName());
@@ -115,28 +114,33 @@ public class SpyClassResolver {
     }
 
 
-    public ClassInfo getClassInfo(ClassLoader loader, String type) {
+    public CachedClassInfo getClassInfo(ClassLoader loader, String type) {
+
+        if (log.isTraceEnabled()) {
+            log.trace("Class: " + type + ", cached: " + cache.size());
+        }
+
         classGets.logCall(1);
 
-        ClassInfo rslt = getCached(type);
+        CachedClassInfo rslt = getCached(type);
 
         if (rslt != null) {
             cacheHits.logCall();
+            return rslt;
         }
+
+        cacheMisses.logCall();
 
         Class<?> clazz = SpyClassLookup.INSTANCE.findLoadedClass(loader, type);
         if (clazz != null) {
-            if (rslt != null) cacheDels.logCall();
-            rslt = new ResidentClassInfo(clazz);
-            delCached(type);
+            rslt = new CachedClassInfo(
+                    clazz.isInterface() ? CachedClassInfo.IS_INTERFACE : 0,
+                    clazz.getName(),
+                    clazz.getSuperclass() != null ? clazz.getSuperclass().getName() : null,
+                    clazz.getInterfaces() != null ? new String[clazz.getInterfaces().length] : new String[0]);
+            setCached(type, rslt);
             residentGets.logCall();
             return rslt;
-        }
-
-        if (rslt != null) {
-            return rslt;
-        } else {
-            cacheMisses.logCall();
         }
 
         InputStream is = loader.getResourceAsStream(type.replace(".", "/") + ".class");
@@ -179,11 +183,11 @@ public class SpyClassResolver {
 
     }
 
-    private synchronized ClassInfo getCached(String type) {
+    private synchronized CachedClassInfo getCached(String type) {
         return cache.get(type);
     }
 
-    private synchronized void setCached(String type, ClassInfo ci) {
+    private synchronized void setCached(String type, CachedClassInfo ci) {
         cache.put(type, ci);
     }
 

@@ -24,26 +24,26 @@ public class SpyClassResolverUnitTest extends ZorkaFixture {
 
     @Test
     public void testGetClassInfo() throws Exception {
-        ClassInfo i1 = cr.getClassInfo(cl, LP+"A");
+        CachedClassInfo i1 = cr.getClassInfo(cl, LP+"A");
 
         assertNotNull(i1);
         assertTrue("Class A should NOT be loaded.", i1 instanceof CachedClassInfo);
         assertEquals(LP+"A", i1.getClassName());
 
-        ClassInfo s1 = cr.getClassInfo(cl, i1.getSuperclassName());
+        CachedClassInfo s1 = cr.getClassInfo(cl, i1.getSuperclassName());
         assertNotNull(s1);
-        assertTrue(s1 instanceof ResidentClassInfo);
+        assertTrue(s1 instanceof CachedClassInfo);
         assertEquals("java.lang.Object", s1.getClassName());
 
         Class.forName(LP+"B");
-        ClassInfo i2 = cr.getClassInfo(cl, LP+"A");
-        assertTrue(i2 instanceof ResidentClassInfo);
+        CachedClassInfo i2 = cr.getClassInfo(cl, LP+"A");
+        assertTrue(i2 instanceof CachedClassInfo);
         assertEquals(LP+"A", i2.getClassName());
     }
 
     @Test
     public void testGetAllSuperclasses() throws Exception {
-        List<ClassInfo> lc = cr.getAllSuperclasses(cl, LP+"E");
+        List<CachedClassInfo> lc = cr.getAllSuperclasses(cl, LP+"E");
         assertEquals(4, lc.size());
 
         assertEquals("java.lang.Object", lc.get(0).getClassName());

@@ -1,6 +1,6 @@
 package com.jitlogic.zorka.core.spy;
 
-public class CachedClassInfo implements ClassInfo {
+public class CachedClassInfo {
 
     final static int IS_INTERFACE = 0x01;
 
@@ -15,22 +15,18 @@ public class CachedClassInfo implements ClassInfo {
         this.flags = flags;
     }
 
-    @Override
     public String getClassName() {
         return name;
     }
 
-    @Override
     public String getSuperclassName() {
         return superclassName;
     }
 
-    @Override
     public String[] getInterfaceNames() {
         return interfaceNames;
     }
 
-    @Override
     public boolean isInterface() {
         return 0 != (flags & IS_INTERFACE);
     }

@@ -61,7 +61,7 @@ public class SpyClassLookup {
             }
         }
 
-        log.warn("Failed looking for class " + className + ": no instrumentation nor reflection/loader available.");
+        log.debug("Class " + className + " not resident. Will try via bytecode.");
         return null;
     }
 }
