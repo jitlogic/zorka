@@ -20,17 +20,23 @@ package com.jitlogic.zorka.core.spy;
 import com.jitlogic.zorka.common.stats.MethodCallStatistic;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.ZorkaBshAgent;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 /**
  * This is main class transformer installed in JVM by Zorka agent (see premain() method).
@@ -95,21 +101,23 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
     private MethodCallStatistic tracerLookups, classesProcessed, classesTransformed, spyLookups;
 
+    private boolean dumpEnabled = false;
+    private List<Pattern> dumpFilters = new ArrayList<Pattern>();
+    private File dumpDir;
 
     /**
      * Creates new spy class transformer
      *
      * @param tracer reference to tracer engine object
      */
-    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer, ZorkaBshAgent bshAgent,
-                               boolean computeFrames, boolean useCustomResolver, boolean scriptsAuto,
+    public SpyClassTransformer(SymbolRegistry symbolRegistry, Tracer tracer, ZorkaBshAgent bshAgent, ZorkaConfig config,
                                MethodCallStatistics statistics, SpyRetransformer retransformer) {
         this.symbolRegistry = symbolRegistry;
         this.tracer = tracer;
         this.bshAgent = bshAgent;
-        this.computeFrames = computeFrames;
-        this.useCustomResolver = useCustomResolver;
-        this.scriptsAuto = scriptsAuto;
+        this.computeFrames = config.boolCfg("zorka.spy.compute.frames", true);
+        this.useCustomResolver = config.boolCfg("zorka.spy.custom.resolver", true);
+        this.scriptsAuto = config.boolCfg("scripts.auto", true);
         this.retransformer = retransformer;
 
         if (useCustomResolver) {
@@ -121,6 +129,18 @@ public class SpyClassTransformer implements ClassFileTransformer {
         this.classesProcessed = statistics.getMethodCallStatistic("ClassesProcessed");
         this.classesTransformed = statistics.getMethodCallStatistic("ClassesTransformed");
 
+        List<String> df = config.listCfg("spy.dump");
+        if (df.size() > 0) {
+            dumpEnabled = true;
+            log.info("Enabling bytecode dump for: " + df);
+            for (String d : df) {
+                dumpFilters.add(Pattern.compile(d
+                        .replace(".", "\\.")
+                        .replace("**", ".*")
+                        .replace("*", "[^\\.]*")));
+            }
+            dumpDir = new File(config.getHomeDir(), "dump");
+        }
 
         if (!computeFrames) {
             log.info("Disabling COMPUTE_FRAMES. Remeber to add -XX:-UseSplitVerifier JVM option in JDK7 or -noverify in JDK8.");
@@ -336,8 +356,43 @@ public class SpyClassTransformer implements ClassFileTransformer {
         long pt2 = System.nanoTime();
         classesProcessed.logCall(pt2 - pt1);
 
+        if (dumpEnabled) {
+            for (Pattern f : dumpFilters) {
+                if (f.matcher(clazzName).matches()) {
+                    log.debug("Dumping class: " + clazzName);
+                    dump(className, "in", cbf);
+                    dump(className, "out", buf);
+                    break;
+                }
+            }
+        }
+
         return buf == cbf ? null : buf;
     }
+
+    private void dump(String className, String prefix, byte[] buf) {
+        OutputStream os = null;
+        try {
+            File f = new File(new File(dumpDir, prefix), className + ".class");
+            if (!f.getParentFile().isDirectory() && !f.getParentFile().mkdirs()) {
+                log.error("Cannot create directory: " + f.getParent());
+            } else {
+                os = new FileOutputStream(f);
+                os.write(buf);
+            }
+        } catch (Exception e) {
+            log.error("Error dumping class: " + className, e);
+        } finally {
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    log.error("Cannot close output stream (dumping " + className + ")", e);
+                }
+            }
+        }
+    }
+
 
     /**
      * Spawn class visitor for transformed class.

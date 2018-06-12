@@ -329,9 +329,7 @@ public class AgentInstance implements ZorkaService {
                 getSymbolRegistry(),
                 getTracer(),
                 getZorkaAgent(),
-                getConfig().boolCfg("zorka.spy.compute.frames", true),
-                getConfig().boolCfg("zorka.spy.custom.resolver", true),
-                getConfig().boolCfg("scripts.auto", true),
+                getConfig(),
                 stats, getRetransformer());
         }
         return classTransformer;

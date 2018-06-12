@@ -50,11 +50,12 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
     public Tracer tracerObj;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         engine = new TestSpyTransformer(
             agentInstance.getSymbolRegistry(),
             agentInstance.getTracer(),
             agentInstance.getZorkaAgent(),
+            agentInstance.getConfig(),
             agentInstance.getRetransformer());
         submitter = new TestSubmitter();
         MainSubmitter.setSubmitter(submitter);

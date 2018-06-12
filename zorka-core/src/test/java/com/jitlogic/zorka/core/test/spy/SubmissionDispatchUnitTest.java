@@ -47,6 +47,7 @@ public class SubmissionDispatchUnitTest extends ZorkaFixture {
             agentInstance.getSymbolRegistry(),
             agentInstance.getTracer(),
             agentInstance.getZorkaAgent(),
+            agentInstance.getConfig(),
             agentInstance.getRetransformer());
         collector = new TestCollector();
         submitter = new DispatchingSubmitter(engine);
