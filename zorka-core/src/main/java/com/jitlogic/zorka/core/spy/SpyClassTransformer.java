@@ -334,7 +334,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
                 log.debug("Transforming class: %s (sdefs found: %d; tracer match: %b)", className, found.size(), tracerMatch);
             }
 
-            boolean doComputeFrames = computeFrames && (cbf[7] > (byte) 0x32);
+            boolean doComputeFrames = computeFrames && (cbf[7] >= (byte) 0x32);
 
             ClassReader cr = new ClassReader(cbf);
             ClassWriter cw = useCustomResolver
