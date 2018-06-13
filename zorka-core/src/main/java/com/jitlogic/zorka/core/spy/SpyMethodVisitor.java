@@ -141,6 +141,8 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     private int spyProbesEmitted = 0, tracerProbesEmitted = 0;
 
+    private boolean prologEmitted = false;
+
     /**
      * Standard constructor.
      *
@@ -222,6 +224,13 @@ public class SpyMethodVisitor extends MethodVisitor {
     public void visitCode() {
         mv.visitCode();
 
+        if (!"<init>".equals(methodName)) {
+            emitProlog();
+        }
+    }
+
+
+    private void emitProlog() {
         for (SpyContext ctx : ctxs) {
             SpyMatcherSet sms = ctx.getSpyDefinition().getMatcherSet();
             ctxMatches.add((!sms.hasMethodAnnotations()) || sms.methodMatch(className, classAnnotations, classInterfaces,
@@ -252,6 +261,8 @@ public class SpyMethodVisitor extends MethodVisitor {
         }
 
         mv.visitLabel(lTryFrom);
+
+        prologEmitted = true;
     }
 
 
@@ -283,6 +294,23 @@ public class SpyMethodVisitor extends MethodVisitor {
         }
 
         mv.visitInsn(opcode);
+    }
+
+
+    public void visitMethodInsn(int opcode, String owner, String name, String descriptor) {
+        super.visitMethodInsn(opcode, owner, name, descriptor);
+
+        if (opcode == Opcodes.INVOKESPECIAL && !prologEmitted) {
+            emitProlog();
+        }
+    }
+
+
+    public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
+        super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
+        if (opcode == Opcodes.INVOKESPECIAL && !prologEmitted) {
+            emitProlog();
+        }
     }
 
 
