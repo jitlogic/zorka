@@ -1,3 +1,12 @@
+Zorka 1.0.17 (2018-06-14)
+-------------------------
+
+* Update: ASM 6.2;
+* Fix: generate stack frames for classfile format 50 (JDK6);
+* Fix: spy return probe generated verify errors for unboxed long and double values;
+* Fix: generate proper stack frames for constructors;
+
+
 Zorka 1.0.16 (2017-11-22)
 -------------------------
 
