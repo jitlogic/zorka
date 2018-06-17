@@ -1,4 +1,8 @@
-Zorka.1.90.2 (2018-06-14)
+Zorka 1.90.3 (2018-08-01)
+-------------------------
+
+
+Zorka 1.90.2 (2018-06-14)
 -------------------------
 
 * Fix: try/catch on constructors generated verify errors on JDK8+;
