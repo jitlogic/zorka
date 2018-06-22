@@ -62,6 +62,8 @@ if (zorka.boolCfg("tracer")) {
         "org.apache.jasper.**",
         "org.apache.juli.logging.**",
         "org.apache.log4j.**",
+        "org.apache.logging.slf4j.**",
+        "org.apache.logging.log4j.**",
         "org.apache.lucene.**",
         "org.apache.naming.NamingContextBindingEnumeration",
         "org.apache.naming.StringManager",

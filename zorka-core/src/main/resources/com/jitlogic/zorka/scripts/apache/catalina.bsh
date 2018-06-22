@@ -188,6 +188,7 @@ __catalina() {
         "org.apache.catalina.session.StandardSession",
         "org.apache.catalina.session.StandardSessionFacade",
         "org.apache.catalina.util.**",
+        "org.apache.catalina.webresources.StandardRoot/getClassLoaderResource",
         "org.apache.coyote.Request",
         "org.apache.coyote.Response",
         "org.apache.catalina.core.ApplicationHttpRequest",

@@ -26,6 +26,7 @@ if (zorka.boolCfg("tracer")) {
         "ch.qos.**",
         "com.caucho.hessian.io.**",
         "com.ctc.wstx.**",
+        "com.fasterxml.jackson.databind.**",
         "com.hazelcast.impl.ThreadContext",
         "com.hazelcast.nio.**",
         "com.hazelcast.util.Clock",
