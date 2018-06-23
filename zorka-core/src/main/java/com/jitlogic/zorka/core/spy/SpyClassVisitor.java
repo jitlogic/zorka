@@ -180,7 +180,7 @@ public class SpyClassVisitor extends ClassVisitor {
                     access, methodName, methodDesc, null)) {
                 if (sdef.getLastArgIndex() > lastArgIndex(access, methodDesc)) {
                     log.error("Cannot instrument method " + className + "." + methodName
-                        + "(). SpyDef refers to argument(s) beyond method argument list.");
+                        + "(). SpyDef " + sdef.getName() + " refers to argument(s) beyond method argument list.");
                 } else {
                     log.debug("Instrumenting method (full SPY): " + className + "." + methodName + " " + methodDesc);
                     ctxs.add(transformer.lookup(
