@@ -22,6 +22,8 @@ zorka.defCfg("tracer.min.method.time", 250000);
 zorka.defCfg("tracer.max.trace.records", 4096);
 zorka.defCfg("tracer.min.trace.calls", 262144);
 
+zorka.defCfg("tracer.distributed", "no");
+
 zorka.defCfg("tracer.file", "no");
 zorka.defCfg("tracer.net", "yes");
 zorka.defCfg("tracer.net.protocol", "zico");
@@ -143,4 +145,58 @@ if (zorka.boolCfg("tracer")) {
 } else {
   tracer.setTraceSpyMethods(false);
 }
+
+
+// Distributed tracing
+
+__dtrace() {
+
+  enabled = zorka.boolCfg("tracer.distributed");
+  tidgen = util.atomicLong();
+
+  uuidLocal = new ThreadLocal();
+  tidLocal = new ThreadLocal();
+
+  DTRACE_UUID_HDR = "X-Zorka-DTrace-UUID";
+  DTRACE_TID_HDR = "X-Zorka-DTrace-TID";   // TODO consider using full trace UUID here
+  DTRACE_FORCE_HDR = "X-Zorka-DTrace-Force";
+
+  DTRACE_UUID = "DTRACE_UUID";
+  DTRACE_IN   = "DTRACE_IN";
+  DTRACE_OUT  = "DTRACE_OUT";
+
+  // TODO think about implementing it directly in Java (for performance reasons)
+  trace_in() {
+    process(rec) {
+
+      uuid = rec.get(DTRACE_UUID);
+      if (uuid == null) {
+        uuid = util.uuid();
+        rec.set(DTRACE_UUID, uuid);
+      }
+
+      uuidLocal.set(uuid);
+      tracer.newAttr(DTRACE_UUID, uuid);
+
+      // TODO we probably need 2 variants of X_ZORKA_TRACE: for inbound and outbound requests)
+
+      tid = rec.get(DTRACE_IN);
+      if (tid == null) {
+        tid = "";
+      }
+
+      tracer.newAttr(DTRACE_IN, tid);
+      rec.set(DTRACE_IN, tid);
+      tidLocal.set(tid);
+
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+
+  return this;
+}
+
+dtrace = __dtrace();
 

@@ -62,7 +62,7 @@ __spring() {
         .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("ARGS", 1),
           spy.get("BT", "THIS", "beanType"),
           _trace ? spy.subchain(
-            tracer.begin("SPRING_INVOKE", _traceTime),
+            tracer.begin("SPRING-INVOKE", _traceTime),
             tracer.formatAttr("CLASS", "${BT.name}"),
             tracer.formatAttr("METHOD", "${THIS.method.name}"),
             __invokeArgsProcessor()
@@ -80,6 +80,75 @@ __spring() {
     );
   }
 
+  __http_client() {
+
+    zorka.defCfg("spring.http.client.trace", zorka.stringCfg("tracer", "no"));
+    zorka.defCfg("spring.http.client.trace.time", zorka.longCfg("tracer.min.trace.time"));
+
+    _trace = zorka.boolCfg("spring.http.client.trace");
+    _traceTime = zorka.longCfg("spring.http.client.trace.time");
+
+    dtrace_req() {
+      process(rec) {
+        uuid = dtrace.uuidLocal.get();
+        tid = dtrace.tidLocal().get();
+        hdrs = rec.get("HDR_IN");
+        if (uuid != null && tid != null && hdrs != null) {
+          tid1 = tid + "/" + dtrace.tidgen.incrementAndGet();
+          hdrs.add(dtrace.DTRACE_UUID_HDR, uuid);
+          hdrs.add(dtrace.DTRACE_TID_HDR, tid1);
+          tracer.newAttr(dtrace.DTRACE_UUID, uuid);
+          tracer.newAttr(dtrace.DTRACE_OUT, tid1);
+        }
+        return rec;
+      }
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+    }
+
+    proc_headers(hattr, prefix) {
+      process(rec) {
+        hdrs = rec.get(hattr);
+        if (hdrs != null) {
+          for (e : hdrs.entrySet()) {
+            k = e.getKey();
+            v = e.getValue();
+            if (v != null) {
+              tracer.newAttr(prefix+k, v.size() == 1 ? v.get(0) : ""+v);
+            }
+          }
+        }
+        return rec;
+      }
+    }
+
+    if (zorka.boolCfg("spring.instrument.http.client", true)) {
+      spy.add(
+        spy.instrument("SPRING_WEB_HTTP_CLIENT")
+          .onEnter(spy.fetchArg("REQ", 0),
+            spy.get("CONN", "REQ", "connection"),
+            spy.get("HDR_OUT", "REQ", "headers"),
+            _trace ? spy.subchain(
+              proc_headers("HDR_OUT", "HdrOut_"),
+              tracer.begin("HTTP_CLI", _traceTime),
+              tracer.formatAttr("URI", "${CONN.requestUri}"),
+              dtrace.enabled ? dtrace_req() : null
+              )
+            : null)
+          .onReturn(spy.fetchRetVal("RESP"),
+            spy.get("HDR_IN", "RESP", "headers"),
+            _trace ? spy.subchain(
+              tracer.formatAttr("STATUS", "${CONN.status}"),
+              proc_headers("HDR_IN", "HdrIn_"))
+            : null)
+          .onError(tracer.flags(tracer.SUBMIT_TRACE))
+          .onSubmit(_stats ? spy.zorkaStats("java", _mbean, "webClient", "ALL") : null)
+          .include(spy.byMethod("org.springframework.http.client.AbstractClientHttpRequest","execute")));
+    }
+
+    return this;
+  }
+
+  http_client = __http_client();
 
   // Tracer tuning
   if (zorka.boolCfg("tracer")) {

@@ -27,10 +27,8 @@ import com.jitlogic.zorka.core.util.Base64;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 
 public class UtilLib {
@@ -180,5 +178,13 @@ public class UtilLib {
 
     public TapOutputStream tapOutputStream(OutputStream os, long init, long limit) {
         return new TapOutputStream(os, (int)init, (int)limit);
+    }
+
+    public AtomicLong atomicLong() {
+        return new AtomicLong();
+    }
+
+    public String uuid() {
+        return UUID.randomUUID().toString();
     }
 }
