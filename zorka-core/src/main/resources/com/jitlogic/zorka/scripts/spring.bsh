@@ -54,7 +54,6 @@ __spring() {
     return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
   }
 
-  zorka.logInfo("Trace=" + _trace + ", time = " + _traceTime);
 
   if (zorka.boolCfg("spring.instrument.invocable.handler", false)) {
     spy.add(

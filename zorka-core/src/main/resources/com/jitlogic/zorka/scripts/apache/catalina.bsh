@@ -58,7 +58,6 @@ __catalina() {
                     }
                     tid = req.getHeader(dtrace.DTRACE_TID_HDR);
                     if (tid != null) {
-                        zorka.logInfo("tid=" + tid);
                         rec.put(dtrace.DTRACE_IN, tid);
                     }
                 }
