@@ -20,7 +20,6 @@ import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.File;
 
@@ -39,8 +38,7 @@ public class UtilFunctionsUnitTest {
 
     @Test
     public void testUtilClipArray() {
-        assertThat(ZorkaUtil.clipArray(new String[]{"a", "b"}, -1))
-                .isEqualTo(new String[]{"a"});
+        assertArrayEquals(ZorkaUtil.clipArray(new String[]{"a", "b"}, -1), new String[]{"a"});
     }
 
 }

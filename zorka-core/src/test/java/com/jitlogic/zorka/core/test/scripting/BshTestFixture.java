@@ -14,21 +14,21 @@ import java.util.Properties;
 
 public class BshTestFixture {
 
-    protected AgentInstance instance(Map<String,String> props) {
-        Properties configProperties = TestUtil.setProps(
-                ZorkaConfig.defaultProperties(AgentConfig.DEFAULT_CONF_PATH),
-                "zorka.home.dir", "/tmp",
-                "zabbix.enabled", "no",
-                "zorka.hostname", "test",
-                "zorka.filelog", "no",
-                "zorka.mbs.autoregister", "yes",
-                "scripts", "",
-                "spy", "yes",
-                "scripts.auto", "yes",
-                "auto.com.jitlogic.zorka.core.test.spy.probe", "test.bsh"
-        );
+    private Properties configProperties = TestUtil.setProps(
+            ZorkaConfig.defaultProperties(AgentConfig.DEFAULT_CONF_PATH),
+            "zorka.home.dir", "/tmp",
+            "zabbix.enabled", "no",
+            "zorka.hostname", "test",
+            "zorka.filelog", "no",
+            "zorka.mbs.autoregister", "yes",
+            "scripts", "",
+            "spy", "yes",
+            "scripts.auto", "yes",
+            "auto.com.jitlogic.zorka.core.test.spy.probe", "test.bsh"
+    );
 
 
+    protected AgentInstance instance(String...props) {
         AgentConfig config = new AgentConfig(configProperties);
         MBeanServer testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
 

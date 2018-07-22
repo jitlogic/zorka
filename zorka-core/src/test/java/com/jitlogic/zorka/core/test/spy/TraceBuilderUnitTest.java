@@ -65,11 +65,11 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     }
 
     private void checkRC(int recs, int...chld) {
-        assertThat(records.size()).isEqualTo(recs);
+        assertEquals(records.size(), recs);
         if (chld.length > 0) {
             TraceRecord rec = records.get(0);
             for (int c : chld) {
-                assertThat(rec.numChildren()).isEqualTo(c);
+                assertEquals(rec.numChildren(), c);
                 rec = rec.getChild(0);
             }
         }
@@ -148,7 +148,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceReturn(400 * MS);
 
         checkRC(1, 1, 0);
-        assertThat(records.get(0).getCalls()).isEqualTo(2);
+        assertEquals(2, records.get(0).getCalls());
     }
 
 
@@ -159,7 +159,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceError(new Exception("oja!"), 200 * MS);
 
         checkRC(1, 0);
-        assertThat(records.get(0).getException()).isNotNull();
+        assertNotNull(records.get(0).getException());
     }
 
 
@@ -172,7 +172,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceReturn(400 * MS);
 
         checkRC(1, 1, 0);
-        assertThat(records.get(0).getCalls()).isEqualTo(2L);
+        assertEquals(2L, records.get(0).getCalls());
     }
 
 
@@ -188,7 +188,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceReturn(140 * MS);
 
         checkRC(1, 1, 0);
-        assertThat(records.get(0).getCalls()).isEqualTo(3L);
+        assertEquals(3L, records.get(0).getCalls());
     }
 
 
@@ -202,7 +202,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceReturn(110 * MS);
 
         checkRC(1, 0);
-        assertThat(records.get(0).numAttrs()).isEqualTo(2);
+        assertEquals(records.get(0).numAttrs(), 2);
     }
 
 

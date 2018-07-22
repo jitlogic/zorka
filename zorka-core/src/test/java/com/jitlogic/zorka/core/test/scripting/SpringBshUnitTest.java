@@ -10,7 +10,7 @@ public class SpringBshUnitTest extends BshTestFixture {
 
     @Test
     public void testSpringBshBasic() {
-        AgentInstance inst = instance(ZorkaUtil.<String, String>constMap());
+        AgentInstance inst = instance();
 
         assertEquals("OK", inst.getZorkaAgent().loadScript("spring.bsh"));
     }

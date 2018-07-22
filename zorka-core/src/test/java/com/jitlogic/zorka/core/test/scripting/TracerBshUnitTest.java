@@ -11,7 +11,7 @@ public class TracerBshUnitTest extends BshTestFixture {
 
     @Test
     public void testTraceBshBasic() {
-        AgentInstance inst = instance(ZorkaUtil.<String, String>constMap());
+        AgentInstance inst = instance();
 
         assertEquals("OK", inst.getZorkaAgent().loadScript("tracer.bsh"));
     }

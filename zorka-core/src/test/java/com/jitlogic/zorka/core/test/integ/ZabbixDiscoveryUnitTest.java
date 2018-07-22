@@ -32,8 +32,6 @@ import java.util.Map;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
-import static org.fest.assertions.Assertions.assertThat;
-
 /**
  * @author RLE <rafal.lewczuk@gmail.com>
  */
@@ -68,8 +66,10 @@ public class ZabbixDiscoveryUnitTest extends ZorkaFixture {
         makeTestJmx("test:name=bean1,type=TestJmx", 10, 10);
         makeTestJmx("test:name=bean2,type=TestJmx", 10, 10);
 
-        assertThat(zabbixLib.discovery("test", "test:type=TestJmx,*", "name", "type"))
-                .contains("{#NAME}").contains("{#TYPE}").contains("TestJmx");
+        String s = zabbixLib.discovery("test", "test:type=TestJmx,*", "name", "type");
+        assertTrue(s.contains("{#NAME}"));
+        assertTrue(s.contains("{#TYPE}"));
+        assertTrue(s.contains("TestJmx"));
     }
 
 
