@@ -34,10 +34,10 @@ __catalina() {
             req = rec.get("REQ");
             if (http._trace && req != null && req.getHeaderNames() != null) {
                 for (name : req.getHeaderNames()) {
-                    hdrs = req.getHeaders(name);
-                    if (hdrs != null) {
+                    headers = req.getHeaders(name);
+                    if (headers != null) {
                         i = 0;
-                        for (hdr : hdrs) {
+                        for (hdr : headers) {
                             if (hdr.length() > _maxlen) {
                                 hdr = hdr.substring(0, _maxlen) + "...";
                             }
@@ -50,9 +50,20 @@ __catalina() {
                         }
                     }
                 }
-            }
 
-          return rec;
+                if (http._trace && dtrace.enabled) {
+                    uuid = req.getHeader(dtrace.DTRACE_UUID_HDR);
+                    if (uuid != null) {
+                        rec.put(dtrace.DTRACE_UUID, uuid);
+                    }
+                    tid = req.getHeader(dtrace.DTRACE_TID_HDR);
+                    if (tid != null) {
+                        zorka.logInfo("tid=" + tid);
+                        rec.put(dtrace.DTRACE_IN, tid);
+                    }
+                }
+            }
+            return rec;
         }
 
         return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
@@ -87,16 +98,16 @@ __catalina() {
                     rec.put("REDIRECT", location);
                 }
 
-                if (http._trace && dtrace.enabled) {
-                    spanId = headers.getHeader(dtrace.DTRACE_UUID_HDR);
-                    if (spanId != null) {
-                        rec.put(dtrace.DTRACE_UUID, spanId);
-                    }
-                    traceId = headers.getHeader("X-Zorka-TraceID");
-                    if (traceId != null) {
-                        rec.put("X_ZORKA_TRACE", traceId);
-                    }
-                }
+//                if (http._trace && dtrace.enabled) {
+//                    spanId = headers.getHeader(dtrace.DTRACE_UUID_HDR);
+//                    if (spanId != null) {
+//                        rec.put(dtrace.DTRACE_UUID, spanId);
+//                    }
+//                    traceId = headers.getHeader("X-Zorka-TraceID");
+//                    if (traceId != null) {
+//                        rec.put("X_ZORKA_TRACE", traceId);
+//                    }
+//                }
             }
             return rec;
         }

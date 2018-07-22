@@ -157,9 +157,9 @@ __dtrace() {
   uuidLocal = new ThreadLocal();
   tidLocal = new ThreadLocal();
 
-  DTRACE_UUID_HDR = "X-Zorka-DTrace-UUID";
-  DTRACE_TID_HDR = "X-Zorka-DTrace-TID";   // TODO consider using full trace UUID here
-  DTRACE_FORCE_HDR = "X-Zorka-DTrace-Force";
+  DTRACE_UUID_HDR = "x-zorka-dtrace-uuid";
+  DTRACE_TID_HDR = "x-zorka-dtrace-tid";
+  DTRACE_FORCE_HDR = "x-zorka-dtrace-force";
 
   DTRACE_UUID = "DTRACE_UUID";
   DTRACE_IN   = "DTRACE_IN";
@@ -172,21 +172,19 @@ __dtrace() {
       uuid = rec.get(DTRACE_UUID);
       if (uuid == null) {
         uuid = util.uuid();
-        rec.set(DTRACE_UUID, uuid);
+        rec.put(DTRACE_UUID, uuid);
       }
 
       uuidLocal.set(uuid);
       tracer.newAttr(DTRACE_UUID, uuid);
 
-      // TODO we probably need 2 variants of X_ZORKA_TRACE: for inbound and outbound requests)
-
       tid = rec.get(DTRACE_IN);
       if (tid == null) {
         tid = "";
+        rec.put(DTRACE_IN, tid);
       }
 
       tracer.newAttr(DTRACE_IN, tid);
-      rec.set(DTRACE_IN, tid);
       tidLocal.set(tid);
 
       return rec;

@@ -91,14 +91,15 @@ __spring() {
     dtrace_req() {
       process(rec) {
         uuid = dtrace.uuidLocal.get();
-        tid = dtrace.tidLocal().get();
-        hdrs = rec.get("HDR_IN");
-        if (uuid != null && tid != null && hdrs != null) {
+        tid = dtrace.tidLocal.get();
+        hdrs = rec.get("HDR_OUT");
+        if (uuid != null && hdrs != null) {
           tid1 = tid + "/" + dtrace.tidgen.incrementAndGet();
           hdrs.add(dtrace.DTRACE_UUID_HDR, uuid);
           hdrs.add(dtrace.DTRACE_TID_HDR, tid1);
           tracer.newAttr(dtrace.DTRACE_UUID, uuid);
           tracer.newAttr(dtrace.DTRACE_OUT, tid1);
+          rec.put(dtrace.DTRACE_OUT, tid1);
         }
         return rec;
       }
@@ -119,6 +120,7 @@ __spring() {
         }
         return rec;
       }
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
     }
 
     if (zorka.boolCfg("spring.instrument.http.client", true)) {
@@ -131,8 +133,7 @@ __spring() {
               proc_headers("HDR_OUT", "HdrOut_"),
               tracer.begin("HTTP_CLI", _traceTime),
               tracer.formatAttr("URI", "${CONN.requestUri}"),
-              dtrace.enabled ? dtrace_req() : null
-              )
+              dtrace.enabled ? dtrace_req() : null)
             : null)
           .onReturn(spy.fetchRetVal("RESP"),
             spy.get("HDR_IN", "RESP", "headers"),
