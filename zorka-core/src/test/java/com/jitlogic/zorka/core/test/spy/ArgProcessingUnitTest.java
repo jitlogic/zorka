@@ -32,20 +32,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
-import static org.fest.assertions.Assertions.assertThat;
 
 public class ArgProcessingUnitTest extends ZorkaFixture {
 
-    protected SpyContext ctx;
-    protected SpyDefinition sdef;
-    protected Map<String, Object> record;
+    private Map<String, Object> record;
 
     @Before
     public void setUp() {
         zorkaAgent.put("test", this);
 
-        sdef = spy.instance("x");
-        ctx = new SpyContext(sdef, "some.Class", "someMethod", "()V", 1);
+        SpyDefinition sdef = spy.instance("x");
+        SpyContext ctx = new SpyContext(sdef, "some.Class", "someMethod", "()V", 1);
         record = ZorkaUtil.map(".CTX", ctx, ".STAGE", 0, ".STAGES", 0);
     }
 
@@ -329,10 +326,10 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
     public void testFilterDecider() {
         TraceFilterProcessor p = (TraceFilterProcessor) tracer.filterBy("TEST", false,
                 util.set(100, 200), util.set(500, 503), util.set(401, 404));
-        assertThat(p.decide(100)).isTrue();
-        assertThat(p.decide(500)).isFalse();
-        assertThat(p.decide(401)).isNull();
-        assertThat(p.decide(403)).isFalse();
+        assertTrue(p.decide(100));
+        assertFalse(p.decide(500));
+        assertNull(p.decide(401));
+        assertFalse(p.decide(403));
     }
 
 
@@ -344,13 +341,13 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
         record.put("X", "a");
         record.put("Y", "b");
-        assertThat(f1.process(record)).isNotNull();
+        assertNotNull(f1.process(record));
 
         record.put("X", "b");
-        assertThat(f1.process(record)).isNull();
+        assertNull(f1.process(record));
 
         record.put("Y", "a");
-        assertThat(f1.process(record)).isNull();
+        assertNull(f1.process(record));
     }
 
 
@@ -362,13 +359,13 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
         record.put("X", "a");
         record.put("Y", "b");
-        assertThat(f1.process(record)).isNotNull();
+        assertNotNull(f1.process(record));
 
         record.put("X", "b");
-        assertThat(f1.process(record)).isNotNull();
+        assertNotNull(f1.process(record));
 
         record.put("Y", "a");
-        assertThat(f1.process(record)).isNull();
+        assertNull(f1.process(record));
     }
 
 
@@ -380,13 +377,13 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
 
         record.put("X", "a");
         record.put("Y", "b");
-        assertThat(f1.process(record)).isNotNull();
+        assertNotNull(f1.process(record));
 
         record.put("X", "b");
-        assertThat(f1.process(record)).isNotNull();
+        assertNotNull(f1.process(record));
 
         record.put("Y", "a");
-        assertThat(f1.process(record)).isNotNull();
+        assertNotNull(f1.process(record));
     }
 
     @Test

@@ -22,11 +22,12 @@ import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.fressian.FressianReader;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.*;
 
 import static com.jitlogic.zorka.common.tracedata.FressianTraceFormat.READ_LOOKUP;
 
@@ -72,7 +73,7 @@ public class FressianTraceFormatUnitTest extends ZorkaFixture {
         symbols.put(10, "oja!");
         writer.checkSymbol(10, null);
 
-        assertThat(reader().readObject()).isEqualTo(new Symbol(10, "oja!"));
+        assertEquals(new Symbol(10, "oja!"), reader().readObject());
     }
 
 
@@ -86,13 +87,13 @@ public class FressianTraceFormatUnitTest extends ZorkaFixture {
 
         MetricTemplate mt2 = (MetricTemplate) reader().readObject();
 
-        assertThat(mt2.getId()).isEqualTo(mt.getId());
-        assertThat(mt2.getDescription()).isEqualTo(mt.getDescription());
-        assertThat(mt2.getUnits()).isEqualTo(mt.getUnits());
-        assertThat(mt2.getNomField()).isEqualTo(mt.getNomField());
-        assertThat(mt2.getDivField()).isEqualTo(mt.getDivField());
-        assertThat(mt2.getMultiplier()).isEqualTo(2.0);
-        assertThat(mt2.getType()).isEqualTo(MetricTemplate.WINDOWED_RATE);
+        assertEquals(mt.getId(), mt2.getId());
+        assertEquals(mt.getDescription(), mt2.getDescription());
+        assertEquals(mt.getUnits(), mt2.getUnits());
+        assertEquals(mt.getNomField(), mt2.getNomField());
+        assertEquals(mt.getDivField(), mt2.getDivField());
+        assertEquals(2.0, mt2.getMultiplier(), 0.01);
+        assertEquals(MetricTemplate.WINDOWED_RATE, mt2.getType());
     }
 
 
@@ -106,7 +107,7 @@ public class FressianTraceFormatUnitTest extends ZorkaFixture {
 
         MetricTemplate mt2 = (MetricTemplate) reader().readObject();
 
-        assertThat(mt2.getDynamicAttrs()).isEqualTo(ZorkaUtil.<String>set("a", "b", "c", "d"));
+        assertEquals(ZorkaUtil.set("a", "b", "c", "d"), mt2.getDynamicAttrs());
     }
 
 
@@ -128,11 +129,11 @@ public class FressianTraceFormatUnitTest extends ZorkaFixture {
         MetricTemplate mt2 = (MetricTemplate) reader.readObject();
         Metric m2 = (Metric) reader.readObject();
 
-        assertThat(m2).isInstanceOfAny(RawDataMetric.class);
+        assertNotNull(m2);
 
-        assertThat(m2.getId()).isEqualTo(m.getId());
-        assertThat(m2.getDescription()).isEqualTo(m.getDescription());
-        assertThat(m2.getAttrs()).isEqualTo(ZorkaUtil.<String, Object>constMap("a", 1L, "b", 2L));
+        assertEquals(m.getId(), m2.getId());
+        assertEquals(m.getDescription(), m2.getDescription());
+        assertEquals(ZorkaUtil.<String, Object>constMap("a", 1L, "b", 2L), m2.getAttrs());
     }
 
     @Test
@@ -150,14 +151,14 @@ public class FressianTraceFormatUnitTest extends ZorkaFixture {
 
         while (obj instanceof Symbol) {
             Symbol s = (Symbol) obj;
-            assertThat(s.getId()).isEqualTo(sid(s.getName()));
+            assertEquals(sid(s.getName()), s.getId());
             obj = reader.readObject();
         }
 
         TraceRecord tr2 = (TraceRecord) obj;
-        assertThat(tr2.getFlags()).isEqualTo(TraceRecord.EXCEPTION_PASS);
-        assertThat(tr2.getCalls()).isEqualTo(tr.getCalls());
-        assertThat(tr2.getTime()).isEqualTo(tr.getTime());
+        assertEquals(TraceRecord.EXCEPTION_PASS, tr2.getFlags());
+        assertEquals(tr.getCalls(), tr2.getCalls());
+        assertEquals(tr.getTime(), tr2.getTime());
     }
 
 
@@ -178,23 +179,21 @@ public class FressianTraceFormatUnitTest extends ZorkaFixture {
 
         while (obj instanceof Symbol) {
             Symbol s = (Symbol) obj;
-            assertThat(s.getId()).isEqualTo(sid(s.getName()));
+            assertEquals(sid(s.getName()), s.getId());
             obj = reader.readObject();
             ids.add(s.getId());
         }
 
         TraceRecord tr2 = (TraceRecord) obj;
-        assertThat(tr2.getFlags()).isEqualTo(TraceRecord.TRACE_BEGIN);
+        assertEquals(TraceRecord.TRACE_BEGIN, tr2.getFlags());
 
         TraceMarker tm2 = tr2.getMarker();
 
-        assertThat(tm2).isNotNull();
-        assertThat(tm2.getFlags()).isEqualTo(TraceMarker.OVERFLOW_FLAG);
-        assertThat(tm2.getClock()).isEqualTo(100L);
-        assertThat(tm2.getTraceId()).isEqualTo(sid("TRACE"));
-
-        assertThat(ids.size()).isEqualTo(symbols.size());
-
+        assertNotNull(tm2);
+        assertEquals(TraceMarker.OVERFLOW_FLAG, tm2.getFlags());
+        assertEquals(100L, tm2.getClock());
+        assertEquals(sid("TRACE"), tm2.getTraceId());
+        assertEquals(symbols.size(), ids.size());
     }
 
 
@@ -212,13 +211,13 @@ public class FressianTraceFormatUnitTest extends ZorkaFixture {
 
         while (obj instanceof Symbol) {
             Symbol s = (Symbol) obj;
-            assertThat(s.getId()).isEqualTo(sid(s.getName()));
+            assertEquals(sid(s.getName()), s.getId());
             obj = reader.readObject();
         }
 
         TraceRecord tr2 = (TraceRecord) obj;
-        assertThat(tr2.numChildren()).isEqualTo(1);
-        assertThat(tr2.getChild(0).getTime()).isEqualTo(50L);
+        assertEquals(1, tr2.numChildren());
+        assertEquals(50L, tr2.getChild(0).getTime());
     }
 
 
@@ -239,19 +238,19 @@ public class FressianTraceFormatUnitTest extends ZorkaFixture {
 
         while (obj instanceof Symbol) {
             Symbol s = (Symbol) obj;
-            assertThat(s.getId()).isEqualTo(sid(s.getName()));
+            assertEquals(sid(s.getName()), s.getId());
             obj = reader.readObject();
         }
 
         TraceRecord tr2 = (TraceRecord) obj;
 
         SymbolicException se = (SymbolicException) tr2.getException();
-        assertThat(se.getMessage()).isEqualTo("oja!");
-        assertThat(se.getClassId()).isEqualTo(sid("java.lang.Exception"));
-        assertThat(se.getStackTrace()).isNotNull();
+        assertEquals("oja!", se.getMessage());
+        assertEquals(sid("java.lang.Exception"), se.getClassId());
+        assertNotNull(se.getStackTrace());
 
         SymbolicStackElement sse = se.getStackTrace()[0];
-        assertThat(sse.getClassId()).isEqualTo(sid(this.getClass().getName()));
+        assertEquals(sid(this.getClass().getName()), sse.getClassId());
     }
 
 
@@ -284,16 +283,16 @@ public class FressianTraceFormatUnitTest extends ZorkaFixture {
         while (obj != null && !(obj instanceof PerfRecord)) {
             if (obj instanceof Symbol) {
                 Symbol s = (Symbol) obj;
-                assertThat(s.getId()).isEqualTo(sid(s.getName()));
+                assertEquals(sid(s.getName()), s.getId());
             }
             obj = reader.readObject();
         }
 
         PerfRecord pr2 = (PerfRecord) obj;
-        assertThat(pr2).isNotNull();
-        assertThat(pr2.getClock()).isEqualTo(100L);
-        assertThat(pr2.getScannerId()).isEqualTo(sid("PERF"));
-        assertThat(pr2.getSamples()).isEqualTo(Arrays.asList(ps(m, 100L, 100L), ps(m, 200L, 200L)));
+        assertNotNull(pr2);
+        assertEquals(100L, pr2.getClock());
+        assertEquals(sid("PERF"), pr2.getScannerId());
+        assertEquals(Arrays.asList(ps(m, 100L, 100L), ps(m, 200L, 200L)), pr2.getSamples());
     }
 
 }

@@ -16,8 +16,8 @@
 
 package com.jitlogic.zorka.core.test.spy;
 
-import com.jitlogic.zorka.core.spy.SpyDefinition;
 import com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture;
+import com.jitlogic.zorka.core.test.support.TestUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -28,9 +28,6 @@ import static com.jitlogic.zorka.core.test.support.TestUtil.getField;
 import static com.jitlogic.zorka.core.test.support.TestUtil.instantiate;
 import static com.jitlogic.zorka.core.test.support.TestUtil.invoke;
 import static org.junit.Assert.assertEquals;
-
-import static org.fest.assertions.Assertions.assertThat;
-import static org.fest.reflect.core.Reflection.field;
 
 public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixture {
 
@@ -54,8 +51,11 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
 
-        assertThat(field("ctxInstances").ofType(Map.class).in(engine).get().size()).isEqualTo(0);
-        assertThat(field("ctxById").ofType(Map.class).in(engine).get().size()).isEqualTo(0);
+        Map ctxInstances = TestUtil.getField(engine, "ctxInstances");
+        assertEquals(0, ctxInstances.size());
+
+        Map ctxById = TestUtil.getField(engine, "ctxById");
+        assertEquals(0, ctxById.size());
     }
 
 
