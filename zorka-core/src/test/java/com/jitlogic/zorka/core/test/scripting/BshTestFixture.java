@@ -9,10 +9,13 @@ import com.jitlogic.zorka.core.spy.DummySpyRetransformer;
 
 import javax.management.MBeanServer;
 import javax.management.MBeanServerBuilder;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-public class BshTestFixture {
+import static org.junit.Assert.assertEquals;
+
+class BshTestFixture {
 
     private Properties configProperties = TestUtil.setProps(
             ZorkaConfig.defaultProperties(AgentConfig.DEFAULT_CONF_PATH),
@@ -28,8 +31,13 @@ public class BshTestFixture {
     );
 
 
-    protected AgentInstance instance(String...props) {
+    AgentInstance instance(String...props) {
         AgentConfig config = new AgentConfig(configProperties);
+
+        for (int i = 1; i < props.length; i += 2) {
+            config.setCfg(props[i-1], props[i]);
+        }
+
         MBeanServer testMbs = new MBeanServerBuilder().newMBeanServer("test", null, null);
 
         AgentInstance inst = new AgentInstance(config, new DummySpyRetransformer(null, config));
@@ -46,4 +54,19 @@ public class BshTestFixture {
         return inst;
     }
 
+    AgentInstance checkLoadScript(String script, String...props) {
+        AgentInstance inst = instance(props);
+        assertEquals("OK", inst.getZorkaAgent().loadScript(script));
+        return inst;
+    }
+
+    Map<String,Object> rec(Object...args) {
+        Map<String,Object> r = new HashMap<String, Object>();
+
+        for (int i = 1; i < args.length; i+=2) {
+            r.put(args[i-1].toString(), args[i]);
+        }
+
+        return r;
+    }
 }

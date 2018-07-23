@@ -24,6 +24,7 @@ import com.jitlogic.zorka.core.test.support.TestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -55,6 +56,15 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     private int t2 = symbols.symbolId("TRACE2");
     private int a1 = symbols.symbolId("ATTR1");
     private int a2 = symbols.symbolId("ATTR2");
+
+    @Before
+    public void setUp() {
+        // TODO get rid of static settings
+        tracer.setTracerMaxTraceRecords(4096);
+        tracer.setTracerMinMethodTime(250000);
+        tracer.setTracerMinTraceTime(50);
+    }
+
 
     @After
     public void tearDown() {

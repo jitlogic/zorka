@@ -20,10 +20,10 @@ import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
-import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -182,12 +182,14 @@ public class Tracer implements ZorkaSubmitter<SymbolicRecord>, ZorkaService {
      * @param output trace event handler
      */
     public synchronized void addOutput(ZorkaSubmitter<SymbolicRecord> output) {
-        List<ZorkaSubmitter<SymbolicRecord>> newOutputs = new ArrayList<ZorkaSubmitter<SymbolicRecord>>();
-        newOutputs.addAll(outputs.get());
+        List<ZorkaSubmitter<SymbolicRecord>> newOutputs = new ArrayList<ZorkaSubmitter<SymbolicRecord>>(outputs.get());
         newOutputs.add(output);
         outputs.set(newOutputs);
     }
 
+    public List<ZorkaSubmitter<SymbolicRecord>> getOutputs() {
+        return Collections.unmodifiableList(outputs.get());
+    }
 
     public SpyMatcherSet getMatcherSet() {
         return matcherSet;

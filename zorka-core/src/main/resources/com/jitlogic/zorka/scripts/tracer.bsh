@@ -80,7 +80,7 @@ if (zorka.boolCfg("tracer")) {
               "app.name", "DSC",
               "env.name", "TST",
               "auth.key", "zorka",
-              "http.url", "http://zico:8640",
+              "http.url", "http://127.0.0.1:8640",
               "http.retries", "10",
               "http.retry.time", "125",
               "http.retry.exp", "2",
