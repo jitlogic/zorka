@@ -31,7 +31,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 import static com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture.*;
-import static com.jitlogic.zorka.core.test.support.TestUtil.*;
+import static com.jitlogic.zorka.core.test.support.CoreTestUtil.*;
 
 public class FullTracerUnitTest extends ZorkaFixture {
 

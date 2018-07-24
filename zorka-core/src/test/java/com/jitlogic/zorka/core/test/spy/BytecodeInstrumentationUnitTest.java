@@ -20,14 +20,13 @@ import com.jitlogic.zorka.core.spy.*;
 import com.jitlogic.zorka.core.test.spy.support.TestCollector;
 import com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 import static com.jitlogic.zorka.core.spy.SpyLib.*;
 
-import static com.jitlogic.zorka.core.test.support.TestUtil.*;
+import static com.jitlogic.zorka.core.test.support.CoreTestUtil.*;
 
 public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixture {
 

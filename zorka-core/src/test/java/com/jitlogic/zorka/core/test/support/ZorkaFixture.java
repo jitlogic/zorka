@@ -19,6 +19,7 @@ import com.jitlogic.zorka.common.test.support.CommonFixture;
 import com.jitlogic.zorka.common.test.support.TestJmx;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.*;
 import com.jitlogic.zorka.core.integ.NagiosLib;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
@@ -29,7 +30,7 @@ import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.PerfMonLib;
 import com.jitlogic.zorka.core.spy.*;
 
-import com.jitlogic.zorka.common.test.support.TestUtil;
+import com.jitlogic.zorka.common.test.support.CommonTestUtil;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.spy.SpyClassLookup;
@@ -39,6 +40,8 @@ import org.junit.Before;
 import javax.management.ObjectName;
 import java.io.File;
 import java.util.Properties;
+
+import static org.junit.Assert.*;
 
 public class ZorkaFixture extends CommonFixture {
 
@@ -78,7 +81,7 @@ public class ZorkaFixture extends CommonFixture {
 
         AgentConfig.persistent = false;
 
-        configProperties = TestUtil.setProps(
+        configProperties = CommonTestUtil.setProps(
                 ZorkaConfig.defaultProperties(AgentConfig.DEFAULT_CONF_PATH),
                 "zorka.home.dir", "/tmp",
                 "zabbix.enabled", "no",
@@ -123,8 +126,8 @@ public class ZorkaFixture extends CommonFixture {
         symbols = agentInstance.getSymbolRegistry();
 
         tmpDir = "/tmp" + File.separatorChar + "zorka-unit-test";
-        TestUtil.rmrf(tmpDir);
-        new File(tmpDir).mkdirs();
+        ZorkaUtil.rmrf(tmpDir);
+        assertTrue(new File(tmpDir).mkdirs());
 
         SpyClassLookup.INSTANCE = new SpyClassLookup();
     }

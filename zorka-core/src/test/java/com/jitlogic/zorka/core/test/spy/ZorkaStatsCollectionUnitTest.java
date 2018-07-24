@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
 
 import java.util.Map;
 
-import static com.jitlogic.zorka.core.test.support.TestUtil.getAttr;
+import static com.jitlogic.zorka.core.test.support.CoreTestUtil.getAttr;
 import static com.jitlogic.zorka.core.perfmon.BucketAggregate.MS;
 import static com.jitlogic.zorka.core.spy.SpyLib.*;
 

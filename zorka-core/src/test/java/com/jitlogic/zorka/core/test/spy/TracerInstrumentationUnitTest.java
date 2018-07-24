@@ -17,16 +17,16 @@
 package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture;
-import com.jitlogic.zorka.core.test.support.TestUtil;
+import com.jitlogic.zorka.core.test.support.CoreTestUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Map;
 
-import static com.jitlogic.zorka.core.test.support.TestUtil.getField;
-import static com.jitlogic.zorka.core.test.support.TestUtil.instantiate;
-import static com.jitlogic.zorka.core.test.support.TestUtil.invoke;
+import static com.jitlogic.zorka.core.test.support.CoreTestUtil.getField;
+import static com.jitlogic.zorka.core.test.support.CoreTestUtil.instantiate;
+import static com.jitlogic.zorka.core.test.support.CoreTestUtil.invoke;
 import static org.junit.Assert.assertEquals;
 
 public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixture {
@@ -51,10 +51,10 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");
 
-        Map ctxInstances = TestUtil.getField(engine, "ctxInstances");
+        Map ctxInstances = CoreTestUtil.getField(engine, "ctxInstances");
         assertEquals(0, ctxInstances.size());
 
-        Map ctxById = TestUtil.getField(engine, "ctxById");
+        Map ctxById = CoreTestUtil.getField(engine, "ctxById");
         assertEquals(0, ctxById.size());
     }
 

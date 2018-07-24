@@ -25,7 +25,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-import static com.jitlogic.zorka.core.test.support.TestUtil.*;
+import static com.jitlogic.zorka.core.test.support.CoreTestUtil.*;
 
 public class SpyInstanceIntegTest extends ZorkaFixture {
 

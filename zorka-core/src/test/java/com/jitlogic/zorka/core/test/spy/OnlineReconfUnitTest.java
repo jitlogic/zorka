@@ -17,7 +17,6 @@ package com.jitlogic.zorka.core.test.spy;
 
 
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
-import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.spy.SpyDefinition;
 import com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
@@ -26,9 +25,9 @@ import org.junit.Test;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Method;
 
-import static com.jitlogic.zorka.core.test.support.TestUtil.getAttr;
-import static com.jitlogic.zorka.core.test.support.TestUtil.instantiate;
-import static com.jitlogic.zorka.core.test.support.TestUtil.invoke;
+import static com.jitlogic.zorka.core.test.support.CoreTestUtil.getAttr;
+import static com.jitlogic.zorka.core.test.support.CoreTestUtil.instantiate;
+import static com.jitlogic.zorka.core.test.support.CoreTestUtil.invoke;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 

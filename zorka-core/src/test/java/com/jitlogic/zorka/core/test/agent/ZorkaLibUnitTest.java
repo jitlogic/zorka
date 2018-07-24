@@ -16,7 +16,6 @@
 package com.jitlogic.zorka.core.test.agent;
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.core.test.support.TestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
 import org.junit.Test;

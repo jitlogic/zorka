@@ -23,17 +23,16 @@ import static org.junit.Assert.fail;
 
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class TestUtil extends ClassLoader {
+public class CoreTestUtil extends ClassLoader {
 
     public static byte[] readResource(String name) throws Exception {
-        InputStream is = TestUtil.class.getResourceAsStream("/" + name);
+        InputStream is = CoreTestUtil.class.getResourceAsStream("/" + name);
         byte[] buf = new byte[65536];
         int len = is.read(buf);
         is.close();
@@ -43,19 +42,29 @@ public class TestUtil extends ClassLoader {
     }
 
 
-    public static Object instantiate(SpyClassTransformer engine, String clazzName) throws Exception {
+    public static Object instantiate(SpyClassTransformer engine, String clazzName, Object...args) throws Exception {
         TransformationResult result = transform(engine, clazzName);
         byte[] classBytes = result.transformedBytecode != null ? result.transformedBytecode : result.originalBytecode;
 
-        Class<?> clazz = new TestUtil().defineClass(result.clazzName, classBytes, 0, classBytes.length);
+        Class<?> clazz = new CoreTestUtil().defineClass(result.clazzName, classBytes, 0, classBytes.length);
 
-        return clazz.newInstance();
+        if (args.length == 0) {
+            return clazz.newInstance();
+        } else {
+            for (Constructor c : clazz.getConstructors()) {
+                Class[] pts = c.getParameterTypes();
+                if (pts.length == args.length) {
+                    return c.newInstance(args);
+                }
+            }
+        }
+        throw new RuntimeException("Cannot find constructor of " + args.length + " arguments.");
     }
 
     public static TransformationResult transform(SpyClassTransformer engine, String clazzName) throws Exception {
         String className = clazzName.replace(".", "/");
         byte[] original = readResource(className + ".class");
-        byte[] transformed = engine.transform(TestUtil.getSystemClassLoader(), className, null, null, original);
+        byte[] transformed = engine.transform(CoreTestUtil.getSystemClassLoader(), className, null, null, original);
 
         return new TransformationResult(clazzName, original, transformed);
     }
@@ -163,6 +172,14 @@ public class TestUtil extends ClassLoader {
             this.clazzName = clazzName;
             this.originalBytecode = originalBytecode;
             this.transformedBytecode = transformedBytecode;
+        }
+    }
+
+    public static void sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            fail("Interrupted on sleep.");
         }
     }
 }

@@ -17,6 +17,7 @@ package com.jitlogic.zorka.common.test.support;
 
 
 import org.slf4j.impl.MemoryTrapper;
+import org.slf4j.impl.ZorkaLogLevel;
 import org.slf4j.impl.ZorkaLoggerFactory;
 
 import java.io.File;
@@ -30,7 +31,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-public class TestUtil {
+import static org.junit.Assert.fail;
+
+public class CommonTestUtil {
 
     public static Properties loadProps(String path) throws IOException {
         Properties props = new Properties();
@@ -57,22 +60,6 @@ public class TestUtil {
             if (os != null) {
                 os.close();
             }
-        }
-    }
-
-    public static void rmrf(String path) throws IOException {
-        rmrf(new File(path));
-    }
-
-
-    public static void rmrf(File f) throws IOException {
-        if (f.exists()) {
-            if (f.isDirectory()) {
-                for (File c : f.listFiles()) {
-                    rmrf(c);
-                }
-            }
-            f.delete();
         }
     }
 
@@ -134,10 +121,30 @@ public class TestUtil {
         return props;
     }
 
-    public static void printLogs() {
-        MemoryTrapper mt = (MemoryTrapper)(ZorkaLoggerFactory.getInstance().getTrapper());
-        for (MemoryTrapper.TrapperMessage m : mt.drain()) {
-            System.out.println(m.getLogLevel() + " " + m.getMsg() + " " + m.getE());
+    public static void printLogs(ZorkaLogLevel level) {
+        printLogs((MemoryTrapper)(ZorkaLoggerFactory.getInstance().getTrapper()), level);
+    }
+
+    public static void checkLogs(MemoryTrapper logs, ZorkaLogLevel level) {
+        for (MemoryTrapper.TrapperMessage msg : logs.getAll()) {
+            if (msg.getLogLevel().getPriority() >= level.getPriority()) {
+                System.out.println(msg);
+                if (msg.getE() != null) {
+                    msg.getE().printStackTrace(System.out);
+                }
+                fail("Bad log: " + msg);
+            }
+        }
+    }
+
+    public static void printLogs(MemoryTrapper logs, ZorkaLogLevel level) {
+        for (MemoryTrapper.TrapperMessage msg : logs.getAll()) {
+            if (msg.getLogLevel().getPriority() >= level.getPriority()) {
+                System.out.println(msg);
+                if (msg.getE() != null) {
+                    msg.getE().printStackTrace(System.out);
+                }
+            }
         }
     }
 

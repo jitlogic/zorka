@@ -25,7 +25,7 @@ import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.CborTraceOutput;
-import com.jitlogic.zorka.core.test.support.TestUtil;
+import com.jitlogic.zorka.core.test.support.CoreTestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
 import org.junit.Ignore;
@@ -133,7 +133,7 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
         output.openSession();
 
         assertEquals("someUUID",
-                TestUtil.getField(output, "sessionUUID"));
+                CoreTestUtil.getField(output, "sessionUUID"));
 
         httpClient.verify();
     }

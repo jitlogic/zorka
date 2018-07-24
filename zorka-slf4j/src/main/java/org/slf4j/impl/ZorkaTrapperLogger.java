@@ -17,6 +17,8 @@ package org.slf4j.impl;
 
 import org.slf4j.helpers.MarkerIgnoringBase;
 
+import java.util.Arrays;
+
 import static org.slf4j.spi.LocationAwareLogger.*;
 
 public class ZorkaTrapperLogger extends MarkerIgnoringBase {
@@ -73,7 +75,7 @@ public class ZorkaTrapperLogger extends MarkerIgnoringBase {
     @Override
     public void trace(String msg, Object...args) {
         if (logLevel <= TRACE_INT) {
-            trapper.trap(ZorkaLogLevel.TRACE, shortName, msg, null, args);
+            trapVarags(ZorkaLogLevel.TRACE, msg, args);
         }
     }
 
@@ -113,7 +115,7 @@ public class ZorkaTrapperLogger extends MarkerIgnoringBase {
     @Override
     public void debug(String msg, Object...args) {
         if (logLevel <= DEBUG_INT) {
-            trapper.trap(ZorkaLogLevel.DEBUG, shortName, msg, null, args);
+            trapVarags(ZorkaLogLevel.DEBUG, msg, args);
         }
     }
 
@@ -153,7 +155,7 @@ public class ZorkaTrapperLogger extends MarkerIgnoringBase {
     @Override
     public void info(String msg, Object...args) {
         if (logLevel <= INFO_INT) {
-            trapper.trap(ZorkaLogLevel.INFO, shortName, msg, null, args);
+            trapVarags(ZorkaLogLevel.INFO, msg, args);
         }
     }
 
@@ -186,7 +188,7 @@ public class ZorkaTrapperLogger extends MarkerIgnoringBase {
     @Override
     public void warn(String msg, Object...args) {
         if (logLevel <= WARN_INT) {
-            trapper.trap(ZorkaLogLevel.WARN, shortName, msg, null, args);
+            trapVarags(ZorkaLogLevel.WARN, msg, args);
         }
     }
 
@@ -233,8 +235,18 @@ public class ZorkaTrapperLogger extends MarkerIgnoringBase {
     @Override
     public void error(String msg, Object...args) {
         if (logLevel <= ERROR_INT) {
-            trapper.trap(ZorkaLogLevel.ERROR, shortName, msg, null, args);
+            trapVarags(ZorkaLogLevel.ERROR, msg, args);
         }
+    }
+
+    private void trapVarags(ZorkaLogLevel level, String msg, Object...args) {
+        if (args.length > 0 && args[0] instanceof Throwable) {
+            Throwable e = (Throwable)args[0];
+            trapper.trap(level, shortName, msg, e, Arrays.copyOfRange(args, 1, args.length));
+        } else {
+            trapper.trap(level, shortName, msg, null, args);
+        }
+
     }
 
     @Override

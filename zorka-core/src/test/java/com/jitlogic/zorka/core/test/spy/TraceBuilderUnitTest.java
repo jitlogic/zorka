@@ -20,7 +20,7 @@ import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.core.spy.*;
 
-import com.jitlogic.zorka.core.test.support.TestUtil;
+import com.jitlogic.zorka.core.test.support.CoreTestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.junit.After;
 import org.junit.Assert;
@@ -220,7 +220,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceEnter(c1, m1, s1, 100 * MS);
         b.traceEnter(c1, m2, s1, 100 * MS);
 
-        TraceRecord top = TestUtil.getField(b, "ttop");
+        TraceRecord top = CoreTestUtil.getField(b, "ttop");
         Assert.assertTrue("Trace record top should have no parent.", top.getParent() == null);
     }
 
@@ -243,7 +243,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceReturn(10 * MS);
 
 
-        TraceRecord top = TestUtil.getField(b, "ttop");
+        TraceRecord top = CoreTestUtil.getField(b, "ttop");
         assertEquals("Should limit to 2 children (plus parent)",
                 2, top.numChildren());
 
@@ -274,7 +274,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceReturn(9 * MS);
         b.traceReturn(10 * MS);
 
-        TraceRecord top = TestUtil.getField(b, "ttop");
+        TraceRecord top = CoreTestUtil.getField(b, "ttop");
         assertEquals("Root record of a trace should have one child.", 1, top.numChildren());
 
         b.traceReturn(11 * MS);
@@ -309,7 +309,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceReturn(11 * MS);
 
         // Check inner trace
-        TraceRecord top = TestUtil.getField(b, "ttop");
+        TraceRecord top = CoreTestUtil.getField(b, "ttop");
         assertEquals("Root record of a trace should have only one child.", 1, top.numChildren());
         checkRC(1, 2, 0);
 
@@ -489,31 +489,31 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         b.traceEnter(c1, m1, s1, 1);
         b.traceBegin(t1, 2, TraceMarker.DROP_INTERIM);
-        assertEquals((Integer)1, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)1, CoreTestUtil.getField(b, "numRecords"));
 
         b.traceEnter(c1, m2, s1, 2);
-        assertEquals((Integer)2, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)2, CoreTestUtil.getField(b, "numRecords"));
 
         b.traceReturn(3);
-        assertEquals((Integer)1, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)1, CoreTestUtil.getField(b, "numRecords"));
 
         b.traceEnter(c1, m2, s1, 4);
-        assertEquals((Integer)2, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)2, CoreTestUtil.getField(b, "numRecords"));
 
         b.traceEnter(c1, m2, s1, 5);
-        assertEquals((Integer)3, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)3, CoreTestUtil.getField(b, "numRecords"));
 
         b.traceReturn(6);
-        assertEquals((Integer)2, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)2, CoreTestUtil.getField(b, "numRecords"));
 
         b.traceReturn(20);
-        assertEquals((Integer)2, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)2, CoreTestUtil.getField(b, "numRecords"));
 
         b.traceReturn(40);
-        assertEquals((Integer)0, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)0, CoreTestUtil.getField(b, "numRecords"));
 
         b.traceEnter(c1, m1, s1, 41);
-        assertEquals((Integer)1, TestUtil.getField(b, "numRecords"));
+        assertEquals((Integer)1, CoreTestUtil.getField(b, "numRecords"));
     }
 
 

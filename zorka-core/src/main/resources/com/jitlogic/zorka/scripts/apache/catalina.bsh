@@ -96,17 +96,6 @@ __catalina() {
                     tracer.newAttr("REDIRECT", location);
                     rec.put("REDIRECT", location);
                 }
-
-//                if (http._trace && dtrace.enabled) {
-//                    spanId = headers.getHeader(dtrace.DTRACE_UUID_HDR);
-//                    if (spanId != null) {
-//                        rec.put(dtrace.DTRACE_UUID, spanId);
-//                    }
-//                    traceId = headers.getHeader("X-Zorka-TraceID");
-//                    if (traceId != null) {
-//                        rec.put("X_ZORKA_TRACE", traceId);
-//                    }
-//                }
             }
             return rec;
         }
@@ -118,10 +107,10 @@ __catalina() {
       spy.format("URI", "${REQ.request.requestURI}"),
       http._trace ? spy.subchain(
         http._uriQualifier,
+        tracer.attr("URI", "URI"),
         tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
         http._headers ? headers_in() : null,
-        (http._trace && dtrace.enabled && http._headers) ? dtrace.trace_in() : null,
-        tracer.attr("URI", "URI")
+        (http._trace && dtrace.enabled && http._headers) ? dtrace.trace_in() : null
       ) : null,
       http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
     .onReturn(spy.put("ERR", ""))

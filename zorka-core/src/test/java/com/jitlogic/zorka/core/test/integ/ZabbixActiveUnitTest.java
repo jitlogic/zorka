@@ -21,7 +21,7 @@ import com.jitlogic.zorka.common.util.JSONWriter;
 import com.jitlogic.zorka.core.integ.zabbix.ActiveCheckQueryItem;
 
 import com.jitlogic.zorka.core.integ.zabbix.ActiveCheckResponse;
-import com.jitlogic.zorka.core.test.support.TestUtil;
+import com.jitlogic.zorka.core.test.support.CoreTestUtil;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -76,7 +76,7 @@ public class ZabbixActiveUnitTest {
 
     @Test
     public void testParseBigActiveCheckResponse() throws Exception {
-        String json = new String(TestUtil.readResource("zabbix/testActiveRequest.json"));
+        String json = new String(CoreTestUtil.readResource("zabbix/testActiveRequest.json"));
         ActiveCheckResponse resp = new JSONReader().read(json, ActiveCheckResponse.class);
         assertNotNull("No response parsed.", resp);
         assertNotNull("No data array in response.", resp.getData());

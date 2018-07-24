@@ -1,6 +1,6 @@
 package com.jitlogic.zorka.core.test.scripting;
 
-import com.jitlogic.zorka.common.test.support.TestUtil;
+import com.jitlogic.zorka.common.test.support.CommonTestUtil;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.AgentConfig;
 import com.jitlogic.zorka.core.AgentInstance;
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 
 class BshTestFixture {
 
-    private Properties configProperties = TestUtil.setProps(
+    private Properties configProperties = CommonTestUtil.setProps(
             ZorkaConfig.defaultProperties(AgentConfig.DEFAULT_CONF_PATH),
             "zorka.home.dir", "/tmp",
             "zabbix.enabled", "no",

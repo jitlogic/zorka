@@ -21,6 +21,7 @@ import java.util.List;
 public class MemoryTrapper implements ZorkaTrapper {
 
     public  static class TrapperMessage {
+        private final long tstamp;
         private final ZorkaLogLevel logLevel;
         private final String tag;
         private final String msg;
@@ -28,6 +29,7 @@ public class MemoryTrapper implements ZorkaTrapper {
         private final Object[] args;
 
         TrapperMessage(ZorkaLogLevel logLevel, String tag, String msg, Throwable e, Object[] args) {
+            this.tstamp = System.currentTimeMillis();
             this.logLevel = logLevel;
             this.tag = tag;
             this.msg = msg;
@@ -54,6 +56,11 @@ public class MemoryTrapper implements ZorkaTrapper {
         public Object[] getArgs() {
             return args;
         }
+
+        @Override
+        public String toString() {
+            return String.valueOf(logLevel) + ' ' + tag + ' ' + String.format(msg, args) + ' ' + e;
+        }
     }
 
     private List<TrapperMessage> messages = new ArrayList<TrapperMessage>(128);
@@ -67,5 +74,9 @@ public class MemoryTrapper implements ZorkaTrapper {
         List<TrapperMessage> rslt = messages;
         messages = new ArrayList<TrapperMessage>(128);
         return rslt;
+    }
+
+    public synchronized List<TrapperMessage> getAll() {
+        return new ArrayList<TrapperMessage>(messages);
     }
 }
