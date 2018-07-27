@@ -184,7 +184,7 @@ __dtrace() {
         rec.put(DTRACE_IN, tid);
       }
 
-      tracer.newAttr(DTRACE_IN, tid);
+      tracer.newAttr(DTRACE_IN, uuid+tid);
       tidLocal.set(tid);
 
       return rec;

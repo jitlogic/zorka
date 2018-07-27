@@ -88,6 +88,7 @@ __spring() {
     _traceTime = zorka.longCfg("spring.http.client.trace.time");
 
     dtrace_req() {
+      // TODO this is universal component, should be put in tracer.bsh
       process(rec) {
         uuid = dtrace.uuidLocal.get();
         tid = dtrace.tidLocal.get();
@@ -97,7 +98,7 @@ __spring() {
           hdrs.add(dtrace.DTRACE_UUID_HDR, uuid);
           hdrs.add(dtrace.DTRACE_TID_HDR, tid1);
           tracer.newAttr(dtrace.DTRACE_UUID, uuid);
-          tracer.newAttr(dtrace.DTRACE_OUT, tid1);
+          tracer.newAttr(dtrace.DTRACE_OUT, uuid+tid1);
           rec.put(dtrace.DTRACE_OUT, tid1);
         }
         return rec;
