@@ -7,6 +7,7 @@ import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.zico.CborResendException;
 import com.jitlogic.zorka.common.zico.TraceDataFormat;
+import com.jitlogic.zorka.common.zico.ZicoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -338,13 +339,29 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
     }
 
     public void newSession() {
-        do {
+        long rt = retryTime;
+        for (int i = 0; i < retries; i++) {
             try {
                 openSession();
+
+                if (sessionUUID != null) {
+                    break;
+                }
             } catch (Exception e) {
                 log.error("Cannot open collector session to: " + sessionUrl, e);
             }
-        } while (sessionUUID == null);
+
+            rt *= retryTimeExp;
+
+            try {
+                Thread.sleep(rt);
+            } catch (InterruptedException e) {
+            }
+        }
+
+        if (sessionUUID == null) {
+            throw new ZorkaRuntimeException("Cannot obtain agent session.");
+        }
     }
 
     private void send(CborDataWriter w, String uri, String traceUUID) {
@@ -411,7 +428,7 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
                 }
 
                 rt *= retryTimeExp;
-            } // for (int i = 0 ....
+            } // for
         }
     }
 }
