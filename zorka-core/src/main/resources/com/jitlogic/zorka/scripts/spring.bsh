@@ -94,7 +94,7 @@ __spring() {
         tid = dtrace.tidLocal.get();
         hdrs = rec.get("HDR_OUT");
         if (uuid != null && hdrs != null) {
-          tid1 = tid + "/" + dtrace.tidgen.incrementAndGet();
+          tid1 = tid + dtrace.SEP + util.hex(dtrace.tidgen.incrementAndGet());
           hdrs.add(dtrace.DTRACE_UUID_HDR, uuid);
           hdrs.add(dtrace.DTRACE_TID_HDR, tid1);
           tracer.newAttr(dtrace.DTRACE_UUID, uuid);

@@ -165,6 +165,8 @@ __dtrace() {
   DTRACE_IN   = "DTRACE_IN";
   DTRACE_OUT  = "DTRACE_OUT";
 
+  SEP = "_";
+
   // TODO think about implementing it directly in Java (for performance reasons)
   trace_in() {
     process(rec) {

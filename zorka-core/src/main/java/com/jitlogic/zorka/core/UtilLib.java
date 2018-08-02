@@ -184,6 +184,14 @@ public class UtilLib {
         return new AtomicLong();
     }
 
+    public String hex(long l) {
+        return String.format("%x", l);
+    }
+
+    public String hex(int i) {
+        return String.format("%x", i);
+    }
+
     public String uuid() {
         return UUID.randomUUID().toString();
     }
