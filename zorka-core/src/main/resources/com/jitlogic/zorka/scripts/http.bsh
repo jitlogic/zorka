@@ -215,15 +215,15 @@ __http() {
                   }
               }
 
-              if (http._trace && dtrace.enabled) {
-                  uuid = req.getHeader(dtrace.DTRACE_UUID_HDR);
+              if (http._trace && _dtrace_enabled) {
+                  uuid = req.getHeader(tracer.DTRACE_UUID_HDR);
                   if (uuid != null) {
-                      rec.put(dtrace.DTRACE_UUID, uuid);
+                      rec.put(tracer.DTRACE_UUID, uuid);
                   }
 
-                  tid = req.getHeader(dtrace.DTRACE_TID_HDR);
+                  tid = req.getHeader(tracer.DTRACE_TID_HDR);
                   if (tid != null) {
-                      rec.put(dtrace.DTRACE_IN, tid);
+                      rec.put(tracer.DTRACE_IN, tid);
                   }
               }
           }

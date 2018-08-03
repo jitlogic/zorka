@@ -88,18 +88,13 @@ __spring() {
     _traceTime = zorka.longCfg("spring.http.client.trace.time");
 
     dtrace_req() {
-      // TODO this is universal component, should be put in tracer.bsh
       process(rec) {
-        uuid = dtrace.uuidLocal.get();
-        tid = dtrace.tidLocal.get();
+        uuid = rec.get("DTRACE_UUID");
+        tid = rec.get("DTRACE_OUT");
         hdrs = rec.get("HDR_OUT");
-        if (uuid != null && hdrs != null) {
-          tid1 = tid + dtrace.SEP + util.hex(dtrace.tidgen.incrementAndGet());
-          hdrs.add(dtrace.DTRACE_UUID_HDR, uuid);
-          hdrs.add(dtrace.DTRACE_TID_HDR, tid1);
-          tracer.newAttr(dtrace.DTRACE_UUID, uuid);
-          tracer.newAttr(dtrace.DTRACE_OUT, uuid+tid1);
-          rec.put(dtrace.DTRACE_OUT, tid1);
+        if (uuid != null && tid != null && hdrs != null) {
+          hdrs.add(tracer.DTRACE_UUID_HDR, uuid);
+          hdrs.add(tracer.DTRACE_TID_HDR, tid);
         }
         return rec;
       }
@@ -133,7 +128,8 @@ __spring() {
               proc_headers("HDR_OUT", "HdrOut_"),
               tracer.begin("HTTP_CLI", _traceTime),
               tracer.formatAttr("URI", "${CONN.requestUri}"),
-              dtrace.enabled ? dtrace_req() : null)
+              _dtrace_enabled ? tracer.dtraceOutput() : null,
+              _dtrace_enabled ? dtrace_req() : null)
             : null)
           .onReturn(spy.fetchRetVal("RESP"),
             spy.get("HDR_IN", "RESP", "headers"),

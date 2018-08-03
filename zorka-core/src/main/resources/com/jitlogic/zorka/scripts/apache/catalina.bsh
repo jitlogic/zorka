@@ -51,14 +51,14 @@ __catalina() {
                     }
                 }
 
-                if (http._trace && dtrace.enabled) {
-                    uuid = req.getHeader(dtrace.DTRACE_UUID_HDR);
+                if (http._trace && _dtrace_enabled) {
+                    uuid = req.getHeader(tracer.DTRACE_UUID_HDR);
                     if (uuid != null) {
-                        rec.put(dtrace.DTRACE_UUID, uuid);
+                        rec.put(tracer.DTRACE_UUID, uuid);
                     }
-                    tid = req.getHeader(dtrace.DTRACE_TID_HDR);
+                    tid = req.getHeader(tracer.DTRACE_TID_HDR);
                     if (tid != null) {
-                        rec.put(dtrace.DTRACE_IN, tid);
+                        rec.put(tracer.DTRACE_IN, tid);
                     }
                 }
             }
@@ -110,7 +110,7 @@ __catalina() {
         tracer.attr("URI", "URI"),
         tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
         http._headers ? headers_in() : null,
-        (http._trace && dtrace.enabled && http._headers) ? dtrace.trace_in() : null
+        (http._trace && _dtrace_enabled && http._headers) ? tracer.dtraceInput() : null
       ) : null,
       http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
     .onReturn(spy.put("ERR", ""))
@@ -134,6 +134,7 @@ __catalina() {
         http._headers ? headers_out() : null,
         http._params ? http.param_processor() : spy.put("PARAMS", "")
       ) : null,
+      _dtrace_enabled ? tracer.dtraceClean() : null,
       http._slow_chain,
       spy.subchain(
         spy.valSetFilter("STATUS", http._errors),

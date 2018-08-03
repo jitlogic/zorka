@@ -147,56 +147,5 @@ if (zorka.boolCfg("tracer")) {
 }
 
 
-// Distributed tracing
-
-__dtrace() {
-
-  enabled = zorka.boolCfg("tracer.distributed");
-  tidgen = util.atomicLong();
-
-  uuidLocal = new ThreadLocal();
-  tidLocal = new ThreadLocal();
-
-  DTRACE_UUID_HDR = "x-zorka-dtrace-uuid";
-  DTRACE_TID_HDR = "x-zorka-dtrace-tid";
-  DTRACE_FORCE_HDR = "x-zorka-dtrace-force";
-
-  DTRACE_UUID = "DTRACE_UUID";
-  DTRACE_IN   = "DTRACE_IN";
-  DTRACE_OUT  = "DTRACE_OUT";
-
-  SEP = "_";
-
-  // TODO think about implementing it directly in Java (for performance reasons)
-  trace_in() {
-    process(rec) {
-
-      uuid = rec.get(DTRACE_UUID);
-      if (uuid == null) {
-        uuid = util.uuid();
-        rec.put(DTRACE_UUID, uuid);
-      }
-
-      uuidLocal.set(uuid);
-      tracer.newAttr(DTRACE_UUID, uuid);
-
-      tid = rec.get(DTRACE_IN);
-      if (tid == null) {
-        tid = "";
-        rec.put(DTRACE_IN, tid);
-      }
-
-      tracer.newAttr(DTRACE_IN, uuid+tid);
-      tidLocal.set(tid);
-
-      return rec;
-    }
-    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
-  }
-
-
-  return this;
-}
-
-dtrace = __dtrace();
+_dtrace_enabled = zorka.boolCfg("tracer.distributed");
 

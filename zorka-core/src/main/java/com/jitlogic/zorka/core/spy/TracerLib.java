@@ -20,7 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
@@ -50,10 +50,25 @@ public class TracerLib {
 
     public static final int TR_FORCE_TRACE = TraceRecord.FORCE_TRACE;
 
+    public static final String DTRACE_UUID = "DTRACE_UUID";
+    public static final String DTRACE_IN   = "DTRACE_IN";
+    public static final String DTRACE_OUT  = "DTRACE_OUT";
+
+    public static final String DTRACE_SEP  = "_";
+
+    public static final String DTRACE_UUID_HDR  = "x-zorka-dtrace-uuid";
+    public static final String DTRACE_TID_HDR   = "x-zorka-dtrace-tid";
+    public static final String DTRACE_FORCE_HDR = "x-zorka-dtrace-force";
+
     private Tracer tracer;
 
     private SymbolRegistry symbolRegistry;
     private MetricsRegistry metricsRegistry;
+
+    private final ThreadLocal<String> dtraceUuid = new ThreadLocal<String>();
+    private final ThreadLocal<String> dtraceTid = new ThreadLocal<String>();
+
+    private final AtomicLong dtraceTidGen = new AtomicLong();
 
     private ZorkaConfig config;
 
@@ -420,6 +435,29 @@ public class TracerLib {
         return new TraceTaggerProcessor(symbolRegistry, tracer, attrName, attrTag, tags);
     }
 
+    private final SpyProcessor DTRACE_INPUT_PROC = new DTraceInputProcessor(this, dtraceUuid, dtraceTid);
+
+    public SpyProcessor dtraceInput() {
+        return DTRACE_INPUT_PROC;
+    }
+
+    public SpyProcessor dtraceOutput() {
+        return new DTraceOutputProcessor(this, dtraceTidGen, dtraceUuid, dtraceTid);
+    }
+
+    public SpyProcessor dtraceClean() {
+        return new DTraceCleanProcessor(dtraceUuid, dtraceTid);
+    }
+
+    // TODO temporary
+    public ThreadLocal<String> getDtraceUuid() {
+        return dtraceUuid;
+    }
+
+    // TODO temporary
+    public ThreadLocal<String> getDtraceTid() {
+        return dtraceTid;
+    }
 
     /**
      * Creates trace file writer object. Trace writer can receive traces and store them in a file.
