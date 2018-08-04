@@ -53,6 +53,7 @@ public class TracerLib {
     public static final String DTRACE_UUID = "DTRACE_UUID";
     public static final String DTRACE_IN   = "DTRACE_IN";
     public static final String DTRACE_OUT  = "DTRACE_OUT";
+    public static final String DTRACE_FORCE = "DTRACE_FORCE";
 
     public static final String DTRACE_SEP  = "_";
 
@@ -67,6 +68,7 @@ public class TracerLib {
 
     private final ThreadLocal<String> dtraceUuid = new ThreadLocal<String>();
     private final ThreadLocal<String> dtraceTid = new ThreadLocal<String>();
+    private final ThreadLocal<Boolean> dtraceForce = new ThreadLocal<Boolean>();
 
     private final AtomicLong dtraceTidGen = new AtomicLong();
 
@@ -435,18 +437,18 @@ public class TracerLib {
         return new TraceTaggerProcessor(symbolRegistry, tracer, attrName, attrTag, tags);
     }
 
-    private final SpyProcessor DTRACE_INPUT_PROC = new DTraceInputProcessor(this, dtraceUuid, dtraceTid);
+    private final SpyProcessor DTRACE_INPUT_PROC = new DTraceInputProcessor(this, dtraceUuid, dtraceTid, dtraceForce);
 
     public SpyProcessor dtraceInput() {
         return DTRACE_INPUT_PROC;
     }
 
     public SpyProcessor dtraceOutput() {
-        return new DTraceOutputProcessor(this, dtraceTidGen, dtraceUuid, dtraceTid);
+        return new DTraceOutputProcessor(this, dtraceTidGen, dtraceUuid, dtraceTid, dtraceForce);
     }
 
     public SpyProcessor dtraceClean() {
-        return new DTraceCleanProcessor(dtraceUuid, dtraceTid);
+        return new DTraceCleanProcessor(dtraceUuid, dtraceTid, dtraceForce);
     }
 
     // TODO temporary

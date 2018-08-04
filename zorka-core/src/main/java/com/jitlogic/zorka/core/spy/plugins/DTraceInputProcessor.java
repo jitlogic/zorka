@@ -31,11 +31,14 @@ public class DTraceInputProcessor implements SpyProcessor {
     private TracerLib tracer;
     private ThreadLocal<String> uuidLocal;
     private ThreadLocal<String> tidLocal;
+    private ThreadLocal<Boolean> forceLocal;
 
-    public DTraceInputProcessor(TracerLib tracer, ThreadLocal<String> uuidLocal, ThreadLocal<String> tidLocal) {
+    public DTraceInputProcessor(TracerLib tracer, ThreadLocal<String> uuidLocal, ThreadLocal<String> tidLocal,
+                                ThreadLocal<Boolean> forceLocal) {
         this.tracer = tracer;
         this.uuidLocal = uuidLocal;
         this.tidLocal = tidLocal;
+        this.forceLocal = forceLocal;
     }
 
     @Override
@@ -58,6 +61,9 @@ public class DTraceInputProcessor implements SpyProcessor {
 
         tracer.newAttr(DTRACE_IN, uuid+tid);
         tidLocal.set(tid);
+
+        boolean force = "true".equalsIgnoreCase((String)rec.get(DTRACE_FORCE));
+        forceLocal.set(force);
 
         return rec;
     }

@@ -30,12 +30,19 @@ public class DTraceOutputProcessor implements SpyProcessor {
     private AtomicLong dtraceTidGen;
     private ThreadLocal<String> uuidLocal;
     private ThreadLocal<String> tidLocal;
+    private ThreadLocal<Boolean> forceLocal;
 
-    public DTraceOutputProcessor(TracerLib tracer, AtomicLong dtraceTidGen, ThreadLocal<String> uuidLocal, ThreadLocal<String> tidLocal) {
+    public DTraceOutputProcessor(
+            TracerLib tracer,
+            AtomicLong dtraceTidGen,
+            ThreadLocal<String> uuidLocal,
+            ThreadLocal<String> tidLocal,
+            ThreadLocal<Boolean> forceLocal) {
         this.tracer = tracer;
         this.dtraceTidGen = dtraceTidGen;
         this.uuidLocal = uuidLocal;
         this.tidLocal = tidLocal;
+        this.forceLocal = forceLocal;
     }
 
     @Override
@@ -47,6 +54,7 @@ public class DTraceOutputProcessor implements SpyProcessor {
             rec.put(DTRACE_UUID, uuid);
             String tid1 = String.format("%s%s%x", tid, DTRACE_SEP, dtraceTidGen.incrementAndGet());
             rec.put(DTRACE_OUT, tid1);
+            rec.put(DTRACE_FORCE, Boolean.TRUE.equals(forceLocal.get()));
             tracer.newAttr(DTRACE_UUID, uuid);
             tracer.newAttr(DTRACE_OUT, uuid + tid1);
         }
