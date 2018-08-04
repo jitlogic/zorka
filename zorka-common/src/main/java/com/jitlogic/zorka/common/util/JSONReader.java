@@ -1,4 +1,4 @@
-/**
+/*
  * Shamlessly copied from StringTree project:
  *
  * http://sourceforge.net/projects/stringtree.
