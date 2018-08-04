@@ -1,0 +1,197 @@
+/**
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+zorka.require(
+  "libs.bsh",
+  "tracer.bsh",
+  "audit.bsh",
+  "apache/apache.bsh"
+);
+
+__spring() {
+
+  zorka.defCfg("spring.trace", zorka.boolCfg("tracer"));
+  zorka.defCfg("spring.trace.time", zorka.longCfg("tracer.min.trace.time"));
+
+  zorka.defCfg("spring.stats", "yes");
+  zorka.defCfg("spring.stats.mbean", "zorka:type=ZorkaStats,name=Spring");
+
+  zorka.defCfg("spring.instrument.all", "yes");
+
+  _instrumentAll = zorka.boolCfg("spring.instrument.all");
+
+  zorka.defCfg("spring.instrument.invocable.handler", _instrumentAll);
+
+  _trace = zorka.boolCfg("spring.trace");
+  _traceTime = zorka.longCfg("spring.trace.time");
+  _stats = zorka.boolCfg("spring.stats");
+  _mbean = zorka.stringCfg("spring.stats.mbean");
+
+  __invokeArgsProcessor() {
+    process(rec) {
+      args = rec.get("ARGS");
+      if (args != null) {
+        for (i = 0; i < args.length; i++) {
+          tracer.newAttr("ARG["+i+"]", ""+args[i]);
+        }
+      }
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+
+  if (zorka.boolCfg("spring.instrument.invocable.handler", false)) {
+    spy.add(
+      spy.instrument("SPRING_WEB_INVOCABLE_HANDLER")
+        .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("ARGS", 1),
+          spy.get("BT", "THIS", "beanType"),
+          _trace ? spy.subchain(
+            tracer.begin("SPRING-INVOKE", _traceTime),
+            tracer.formatAttr("CLASS", "${BT.name}"),
+            tracer.formatAttr("METHOD", "${THIS.method.name}"),
+            __invokeArgsProcessor()
+          ) : null)
+        .onReturn(
+          spy.fetchRetVal("RSLT"),
+          _trace ? spy.subchain(
+            tracer.formatAttr("RSLT", "${RSLT}")
+          ) : null)
+        .onSubmit(
+          _stats ? spy.zorkaStats("java", _mbean, "mvcRenders", "ALL") : null,
+          _stats ? spy.zorkaStats("java", _mbean, "mvcRenders", "${BEAN}") : null
+        )
+        .include(spy.byMethod(0, "org.springframework.web.method.support.InvocableHandlerMethod", "doInvoke", null))
+    );
+  }
+
+  __http_client() {
+
+    zorka.defCfg("spring.http.client.trace", zorka.stringCfg("tracer", "no"));
+    zorka.defCfg("spring.http.client.trace.time", zorka.longCfg("tracer.min.trace.time"));
+
+    _trace = zorka.boolCfg("spring.http.client.trace");
+    _traceTime = zorka.longCfg("spring.http.client.trace.time");
+
+    dtrace_req() {
+      process(rec) {
+        uuid = rec.get("DTRACE_UUID");
+        tid = rec.get("DTRACE_OUT");
+        hdrs = rec.get("HDR_OUT");
+        if (uuid != null && tid != null && hdrs != null) {
+          hdrs.add(tracer.DTRACE_UUID_HDR, uuid);
+          hdrs.add(tracer.DTRACE_TID_HDR, tid);
+        }
+        return rec;
+      }
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+    }
+
+    proc_headers(hattr, prefix) {
+      process(rec) {
+        hdrs = rec.get(hattr);
+        if (hdrs != null) {
+          for (e : hdrs.entrySet()) {
+            k = e.getKey();
+            v = e.getValue();
+            if (v != null) {
+              tracer.newAttr(prefix+k, v.size() == 1 ? v.get(0) : ""+v);
+            }
+          }
+        }
+        return rec;
+      }
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+    }
+
+    if (zorka.boolCfg("spring.instrument.http.client", true)) {
+      spy.add(
+        spy.instrument("SPRING_WEB_HTTP_CLIENT")
+          .onEnter(spy.fetchArg("REQ", 0),
+            spy.get("CONN", "REQ", "connection"),
+            spy.get("HDR_OUT", "REQ", "headers"),
+            _trace ? spy.subchain(
+              proc_headers("HDR_OUT", "HdrOut_"),
+              tracer.begin("HTTP_CLI", _traceTime),
+              tracer.formatAttr("URI", "${CONN.requestUri}"),
+              _dtrace_enabled ? tracer.dtraceOutput() : null,
+              _dtrace_enabled ? dtrace_req() : null)
+            : null)
+          .onReturn(spy.fetchRetVal("RESP"),
+            spy.get("HDR_IN", "RESP", "headers"),
+            _trace ? spy.subchain(
+              tracer.formatAttr("STATUS", "${CONN.status}"),
+              proc_headers("HDR_IN", "HdrIn_"))
+            : null)
+          .onError(tracer.flags(tracer.SUBMIT_TRACE))
+          .onSubmit(_stats ? spy.zorkaStats("java", _mbean, "webClient", "ALL") : null)
+          .include(spy.byMethod("org.springframework.http.client.AbstractClientHttpRequest","execute")));
+    }
+
+    return this;
+  }
+
+  http_client = __http_client();
+
+  // Tracer tuning
+  if (zorka.boolCfg("tracer")) {
+    tracer.exclude(
+      "net.sf.acegisecurity.vote.RoleVoter",
+      "org.springframework.aop.**",
+      "org.springframework.asm.**",
+      "org.springframework.beans.**",
+      "org.springframework.binding.**",
+      "org.springframework.core.**",
+      "org.springframework.context.**",
+      "org.springframework.expression.**",
+      "org.springframework.extensions.config.DefaultLookupAlgorithm/process",
+      "org.springframework.extensions.config.element.ConfigElementAdapter/getAttribute",
+      "org.springframework.extensions.config.evaluator.StringEvaluator/applies",
+      "org.springframework.extensions.surf.DependencyHandle/loadInputStream",
+      "org.springframework.extensions.surf.DojoDependencyHandler",
+      "org.springframework.extensions.surf.ModelHelper/isModelProperty",
+      "org.springframework.extensions.surf.support.AbstractRequestContext/getValue",
+      "org.springframework.extensions.surf.types.AbstractModelObject/removeModelProperty",
+      "org.springframework.extensions.surf.util.Base6**",
+      "org.springframework.extensions.surf.util.I18NUtil/getMessage",
+      "org.springframework.extensions.surf.util.ParameterCheck",
+      "org.springframework.extensions.surf.util.StringBuilderWriter",
+      "org.springframework.extensions.surf.util.XMLUtil",
+      "org.springframework.extensions.webscripts.processor.JSScriptProcess**",
+      "org.springframework.extensions.webscripts.NativeMap",
+      "org.springframework.extensions.webscripts.UriTemplate/match",
+      "org.springframework.extensions.webscripts.json.JSONWriter",
+      "org.springframework.extensions.webscripts.json.JSONUtils",
+      "org.springframework.jdbc.core.ColumnMapRowMapper/mapRow",
+      "org.springframework.jdbc.support.JdbcUtils",
+      "org.springframework.orm.**",
+      "org.springframework.transaction.support.TransactionS**",
+      "org.springframework.transaction.support.TransactionSynchronizationUtil**",
+      "org.springframework.util.**",
+      "org.springframework.web.context.**",
+      "org.springframework.web.servlet.**",
+      "org.springframework.web.util.**",
+      "org.springframework.webflow.core.**",
+      "org.springframework.webflow.engine.**"
+    );
+  }
+
+
+  return this;
+}
+
+spring = __spring();

@@ -1,0 +1,265 @@
+/**
+ * Copyright 2012-2017 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+zorka.require(
+  "libs.bsh",
+  "tracer.bsh",
+  "audit.bsh",
+  "apache/apache.bsh"
+);
+
+__spring() {
+
+  zorka.defCfg("spring.trace", zorka.boolCfg("tracer"));
+  zorka.defCfg("spring.trace.time", zorka.longCfg("tracer.min.trace.time"));
+
+  zorka.defCfg("spring.stats", "yes");
+  zorka.defCfg("spring.stats.mbean", "zorka:type=ZorkaStats,name=Spring");
+
+  zorka.defCfg("spring.fetch.all", "no");
+  zorka.defCfg("spring.fetch.view.render.attrs",     zorka.boolCfg("spring.fetch.all"));
+  zorka.defCfg("spring.fetch.view.static.attrs",     zorka.boolCfg("spring.fetch.all"));
+  zorka.defCfg("spring.fetch.remoting.args",         zorka.boolCfg("spring.fetch.all"));
+  zorka.defCfg("spring.fetch.remoting.attrs",        zorka.boolCfg("spring.fetch.all"));
+  zorka.defCfg("spring.fetch.webmvc.modelmap",       zorka.boolCfg("spring.fetch.all"));
+  zorka.defCfg("spring.fetch.webflow.request.scope", zorka.boolCfg("spring.fetch.all"));
+  zorka.defCfg("spring.fetch.webflow.flash.scope",   zorka.boolCfg("spring.fetch.all"));
+  zorka.defCfg("spring.fetch.webflow.view.scope",    zorka.boolCfg("spring.fetch.all"));
+  zorka.defCfg("spring.fetch.webflow.flow.scope",    zorka.boolCfg("spring.fetch.all"));
+
+  _trace = zorka.boolCfg("spring.trace");
+  _stats = zorka.boolCfg("spring.stats");
+  _mbean = zorka.stringCfg("spring.stats.mbean");
+
+  sdefSpringAuthManager = spy.instrument("SPRING_SECURITY_AUTH_MANAGER")
+    .onEnter(spy.fetchArg("AUTH", 1), spy.get("USER", "AUTH", "name"), spy.get("DETAILS", "AUTH", "details"))
+    .onReturn(spy.fetchRetVal("AUTH"),
+      spy.get("USER", "AUTH", "name"),
+      spy.get("DETAILS", "AUTH", "details"),
+      spy.put("ACTION", "AUTHENTICATION_SUCCESS"),
+      spy.format("AUTHORITIES", "${AUTH.authorities}"),
+      _trace ? spy.subchain(
+        tracer.attr("USER", "USER"),
+        tracer.attr("DETAILS", "DETAILS"),
+        tracer.attr("AUTHORITIES", "AUTHORITIES")
+      ) : null)
+    .onError(spy.fetchError("ERR"), spy.put("ACTION", "AUTHENTICATION_FAILURE"))
+    .onSubmit(_stats ? spy.zorkaStats("java", _mbean, "authentication", "ALL") : null)
+    .include(spy.byInterfaceAndMethod(0, "org.springframework.security.authentication.AuthenticationManager",
+      "authenticate", "org.springframework.security.core.Authentication", "org.springframework.security.core.Authentication"));
+
+  if (zorka.boolCfg("audit.log.logins")) {
+    audit.audit(sdefSpringAuthManager, "AUTHENTICATION", "${ACTION} who=${USER} details=${DETAILS}");
+  } else if (_stats || _trace) {
+    spy.add(sdefSpringAuthManager);
+  }
+
+  // TODO org.springframework.security.access.AccessDecisionManager.decide()
+  // TODO org.springframework.security.provisioning.UserDetailsManager: createUser(), updateUser(), deleteUser(),
+  // TODO changePassword(), userExists(), loadUserByName()
+
+  // Spring Web - Views
+
+  __get_attrs(field) {
+    process(rec) {
+      map = rec.get(field);
+      if (map != null) {
+        for (e : map.entrySet()) {
+          tracer.newAttr("A_"+e.getKey(), ""+e.getValue());
+        }
+      }
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+  __get_args(field) {
+    process(rec) {
+      args = rec.get(field);
+      if (args != null) {
+        for (int i = 0; i < args.length; i++) {
+          tracer.newAttr("ARG"+i, ""+args[i]);
+        }
+      }
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+  spy.add(
+    spy.instrument("SPRING_WEB_VIEW_RENDER")
+      .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("MAP", 1),
+        spy.get("BEAN", "THIS", "beanName"),
+        _trace ? spy.subchain(
+          tracer.attr("BEAN", "BEAN"),
+          spy.get("CONTENT_TYPE", "THIS", "contentType"), tracer.attr("CONTENT_TYPE", "CONTENT_TYPE"),
+          tracer.formatAttr("RESOLVED", "${THIS.url|THIS.class.simpleName}"),
+          zorka.boolCfg("spring.fetch.view.render.attrs") ? __get_attrs("MAP") : null
+        ) : null)
+      .onSubmit(
+        _stats ? spy.zorkaStats("java", _mbean, "mvcRenders", "ALL") : null,
+        _stats ? spy.zorkaStats("java", _mbean, "mvcRenders", "${BEAN}") : null
+      )
+      .include(spy.byInterfaceAndMethod(0, "org.springframework.web.servlet.View", "render", "void",
+        "java.util.Map", "javax.servlet.http.HttpServletRequest", "javax.servlet.http.HttpServletResponse")));
+
+  spy.add(
+    spy.instrument("SPRING_WEB_VIEW_RESOLVER")
+      .onEnter(spy.fetchArg("VIEW_NAME", 1), spy.fetchArg("LOCALE", 2),
+        _trace ? spy.subchain(
+          tracer.attr("VIEW_NAME", "VIEW_NAME"), tracer.formatAttr("LOCALE", "${LOCALE}")
+        ) : null)
+      .onReturn(spy.fetchRetVal("VIEW"),
+        _trace ? tracer.formatAttr("RESOLVED", "${VIEW.url|VIEW.class.simpleName}") : null)
+      .onSubmit(
+        _stats ? spy.zorkaStats("java", _mbean, "mvcResolves", "ALL") : null,
+        _stats ? spy.zorkaStats("java", _mbean, "mvcResolves", "${VIEW_NAME}") : null
+      )
+      .include(spy.byInterfaceAndMethod(0, "org.springframework.web.servlet.ViewResolver", "resolveViewName",
+        "org.springframework.web.servlet.View", "String", "java.util.Locale"))
+  );
+
+  // Spring Web - MVC controller
+
+  spy.add(
+    spy.instrument("SPRING_WEB_MVC_LEGACY_CONTROLLER")
+    .onEnter(spy.fetchArg("REQ", 1), spy.fetchArg("RESP", 1),
+      _trace ? spy.subchain(
+        tracer.formatAttr("URI", "${REQ.requestURI}")
+      ) : null)
+    .onReturn(spy.fetchRetVal("MV"),
+      _trace ? spy.subchain(
+        tracer.formatAttr("VIEW", "${MV.viewName|MV.view.beanName|MV.view.class.simpleName}")
+      ) : null)
+    .include(spy.byInterfaceAndMethod(0, "org.springframework.web.servlet.mvc.Controller", "handleRequest",
+      "org.springframework.web.servlet.ModelAndView",
+      "javax.servlet.http.HttpServletRequest", "javax.servlet.http.HttpServletResponse")));
+
+  // Spring remoting
+
+  spy.add(
+    spy.instrument("SPRING_REMOTING_REQUEST_CLIENT")
+    .onEnter(spy.fetchArg("CFG", 1), spy.fetchArg("INV", 2),
+      spy.get("ARGS", "INV", "arguments"),
+      spy.get("ATTRS", "INV", "attributes"),
+      _trace ? spy.subchain(
+        tracer.begin("SPRING_REMOTING", zorka.longCfg("spring.trace.time")),
+        tracer.formatAttr("SERVICE_URL", "${CFG.serviceUrl}"),
+        tracer.formatAttr("CODEBASE_URL", "${CFG.codebaseUrl}"),
+        tracer.formatAttr("METHOD", "${INV.methodName}"),
+        zorka.boolCfg("spring.fetch.remoting.args") ? __get_args("ARGS") : null,
+        zorka.boolCfg("spring.fetch.remoting.attrs") ? __get_attrs("ATTRS") : null
+      ) : null)
+    .onReturn(spy.fetchRetVal("RSLT"),
+      _trace ? spy.subchain(
+        tracer.formatAttr("RESULT", "${RSLT.value}"),
+        tracer.formatAttr("ERROR", "${RSLT.exception}")
+      ) : null)
+    .onSubmit(
+      _stats ? spy.zorkaStats("java", _mbean, "remoteCalls", "ALL") : null,
+      _stats ? spy.zorkaStats("java", _mbean, "remoteCalls", "${INV.methodName}") : null
+    )
+    .include(spy.byInterfaceAndMethod(0, "org.springframework.remoting.httpinvoker.HttpInvokerRequestExecutor",
+      "executeRequest", "org.springframework.remoting.support.RemoteInvocationResult",
+      "org.springframework.remoting.httpinvoker.HttpInvokerClientConfiguration",
+      "org.springframework.remoting.support.RemoteInvocation")));
+
+
+  // Spring Webflow
+
+  __extract_webflow_scope(prefix, attr, isView) {
+    process(rec) {
+      ctx = rec.get("CTX");
+      if (isView && !ctx.inViewState()) {
+        return rec;
+      }
+      scope = util.get(ctx, attr);
+      if (scope != null) {
+        for (e : scope.asMap().entrySet()) {
+          tracer.newAttr(prefix + e.getKey(), ""+e.getValue());
+        }
+      }
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+  spy.add(
+    spy.instrument("SPRING_WEBFLOW_ACTION")
+      .onEnter(spy.fetchArg("CTX", 1),
+        tracer.formatAttr("STATE", "${CTX.currentState.id}"))
+      .onReturn(spy.fetchRetVal("RET"),
+        tracer.formatAttr("RESULT", "${RET.id}"))
+      .onSubmit(
+        zorka.boolCfg("spring.fetch.webflow.request.scope") ? __extract_webflow_scope("REQ__", "requestScope", false) : null,
+        zorka.boolCfg("spring.fetch.webflow.flash.scope") ? __extract_webflow_scope("FLASH__", "flashScope", false) : null,
+        zorka.boolCfg("spring.fetch.webflow.view.scope") ? __extract_webflow_scope("VIEW__", "viewScope", true) : null,
+        zorka.boolCfg("spring.fetch.webflow.flow.scope") ? __extract_webflow_scope("FLOW__", "flowScope", false) : null,
+        _stats ? spy.zorkaStats("java", _mbean, "webflowActions", "ALL") : null,
+        _stats ? spy.zorkaStats("java", _mbean, "webflowActions", "${CTX.currentStats.id}") : null
+      )
+      .include(spy.byMethod("org.springframework.webflow.action.AbstractAction", "execute")));
+
+  // Client HTTP requests
+
+  spy.add(
+    spy.instrument("SPRING_WEB_HTTP_CLIENT")
+      .onEnter(spy.fetchArg("THIS", 0),
+        _trace ? spy.subchain(
+          tracer.begin("SPRING_HTTP", zorka.longCfg("spring.trace.time")),
+          tracer.formatAttr("URI", "${THIS.URI}"),
+          tracer.formatAttr("METHOD", "${THIS.method}")
+        ) : null)
+      .onReturn(spy.fetchRetVal("RESP"),
+        _trace ? spy.subchain(
+          tracer.formatAttr("STATUS", "${RESP.statusCode}"),
+          tracer.formatAttr("STATUS_TEXT", "${RESP.statusText}")
+        ) : null)
+      .onSubmit(
+        _stats ? spy.zorkaStats("java", _mbean, "httpClient", "ALL") : null,
+        _stats ? spy.zorkaStats("java", _mbean, "httpClient", "${THIS.method}") : null
+      )
+      .include(spy.byInterfaceAndMethod(0, "org.springframework.http.client.ClientHttpRequest", "execute",
+        "org.springframework.http.client.ClientHttpResponse")));
+
+
+  // Tracer tuning
+  if (zorka.boolCfg("tracer")) {
+    tracer.exclude(
+      "org.aspectj.**",
+      "org.springframework.aop.**",
+      "org.springframework.asm.**",
+      "org.springframework.beans.**",
+      "org.springframework.binding.**",
+      "org.springframework.core.**",
+      "org.springframework.context.**",
+      "org.springframework.expression.**",
+      "org.springframework.orm.**",
+      "org.springframework.util.**",
+      "org.springframework.web.context.**",
+      "org.springframework.web.servlet.**",
+      "org.springframework.web.util.**",
+      "org.springframework.webflow.core.**",
+      "org.springframework.webflow.engine.**"
+    );
+  }
+
+
+  return this;
+}
+
+spring = __spring();
