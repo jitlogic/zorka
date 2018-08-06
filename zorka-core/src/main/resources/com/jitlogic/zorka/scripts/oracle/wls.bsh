@@ -42,7 +42,7 @@ __wls() {
         tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
         tracer.attr("URI", "URI"),
         http._headers ? http.headers_processor(true, false) : null,
-        (http._trace && _dtrace_enabled && http._headers) ? tracer.dtraceInput() : null
+        (http._trace && _dtrace_enabled && http._headers) ? tracer.dtraceInput(zorka.longCfg("http.trace.time")) : null
       ) : null,
       http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
     .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),

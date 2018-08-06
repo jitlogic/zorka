@@ -21,6 +21,7 @@ import com.jitlogic.zorka.core.spy.TracerLib;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import static com.jitlogic.zorka.core.spy.TracerLib.*;
 
@@ -29,12 +30,16 @@ import static com.jitlogic.zorka.core.spy.TracerLib.*;
  */
 public class DTraceInputProcessor implements SpyProcessor {
 
+    private long threshold;
     private TracerLib tracer;
     private ThreadLocal<DTraceState> dtraceLocal;
 
-    public DTraceInputProcessor(TracerLib tracer, ThreadLocal<DTraceState> dtraceLocal) {
+    private Pattern RE_DIGIT = Pattern.compile("\\d+");
+
+    public DTraceInputProcessor(TracerLib tracer, ThreadLocal<DTraceState> dtraceLocal, long threshold) {
         this.tracer = tracer;
         this.dtraceLocal = dtraceLocal;
+        this.threshold = threshold;
     }
 
     @Override
@@ -52,7 +57,17 @@ public class DTraceInputProcessor implements SpyProcessor {
             tid = "";
         }
 
-        DTraceState ds = new DTraceState(tracer, uuid, tid, null);
+        String s = (String)rec.get(DTRACE_XTT);
+
+        long t = s != null && RE_DIGIT.matcher(s).matches() ? Long.parseLong(s) : threshold;
+
+        Long tstart = (Long)rec.get("T1");
+
+        if (tstart == null) {
+            tstart = System.currentTimeMillis();
+        }
+
+        DTraceState ds = new DTraceState(tracer, uuid, tid, tstart, t);
         rec.put(DTRACE_STATE, ds);
 
         dtraceLocal.set(ds);

@@ -26,15 +26,15 @@ public class DTraceState {
     private String tid;
     private int seq;
     private long tstart;
-    private long minTime;
+    private long threshold;
     private TracerLib tracer;
 
-    public DTraceState(TracerLib tracer, String uuid, String tid, String mt) {
+    public DTraceState(TracerLib tracer, String uuid, String tid, long tstart, long threshold) {
         this.tracer = tracer;
         this.uuid = uuid != null ? uuid : UUID.randomUUID().toString();
         this.tid = tid != null ? tid : "";
-        this.tstart = System.currentTimeMillis();
-        this.minTime = mt != null ? Long.parseLong(mt) : -1;
+        this.tstart = tstart;
+        this.threshold = threshold;
     }
 
     public String getUuid() {
@@ -49,8 +49,8 @@ public class DTraceState {
         return tstart;
     }
 
-    public long getMinTime() {
-        return minTime;
+    public long getThreshold() {
+        return threshold;
     }
 
     public synchronized int nextSeq() {
@@ -65,6 +65,6 @@ public class DTraceState {
 
     @Override
     public String toString() {
-        return "DT(" + uuid + ", '" + tid + "', " + minTime + ")";
+        return "DT(" + uuid + ", '" + tid + "', " + threshold + ")";
     }
 }

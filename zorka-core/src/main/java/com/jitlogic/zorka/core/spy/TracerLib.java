@@ -52,15 +52,15 @@ public class TracerLib {
     public static final String DTRACE_UUID = "DTRACE_UUID";
     public static final String DTRACE_IN   = "DTRACE_IN";
     public static final String DTRACE_OUT  = "DTRACE_OUT";
-    public static final String DTRACE_FORCE = "DTRACE_FORCE";
+    public static final String DTRACE_XTT = "DTRACE_XTT";
 
     public static final String DTRACE_STATE = "DTRACE";
 
     public static final String DTRACE_SEP  = "_";
 
-    public static final String DTRACE_UUID_HDR  = "x-zorka-dtrace-uuid";
-    public static final String DTRACE_TID_HDR   = "x-zorka-dtrace-tid";
-    public static final String DTRACE_FORCE_HDR = "x-zorka-dtrace-force";
+    public static final String DTRACE_UUID_HDR = "x-zorka-dtrace-uuid";
+    public static final String DTRACE_TID_HDR  = "x-zorka-dtrace-tid";
+    public static final String DTRACE_XTT_HDR  = "x-zorka-dtrace-xtt";
 
     private Tracer tracer;
 
@@ -434,8 +434,8 @@ public class TracerLib {
         return new TraceTaggerProcessor(symbolRegistry, tracer, attrName, attrTag, tags);
     }
 
-    public SpyProcessor dtraceInput() {
-        return new DTraceInputProcessor(this, dtraceLocal);
+    public SpyProcessor dtraceInput(long threshold) {
+        return new DTraceInputProcessor(this, dtraceLocal, threshold);
     }
 
     public SpyProcessor dtraceOutput() {
@@ -443,7 +443,7 @@ public class TracerLib {
     }
 
     public SpyProcessor dtraceClean() {
-        return new DTraceCleanProcessor(dtraceLocal);
+        return new DTraceCleanProcessor(this, dtraceLocal);
     }
 
     /**

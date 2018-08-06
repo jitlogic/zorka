@@ -45,6 +45,12 @@ public class DTraceOutputProcessor implements SpyProcessor {
             rec.put(DTRACE_STATE, ds);
             rec.put(DTRACE_OUT, tid);
 
+            Long t1 = ((Long)rec.get("T1"));
+
+            if (ds.getThreshold() >= 0 && t1 != null) {
+                rec.put(DTRACE_XTT, Math.max(0, ds.getThreshold() - ((Long)rec.get("T1")-ds.getTstart()) / 1000000L));
+            }
+
             tracer.newAttr(DTRACE_UUID, uuid);
             tracer.newAttr(DTRACE_OUT, uuid + tid);
         }

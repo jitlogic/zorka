@@ -94,7 +94,12 @@ __spring() {
         if (ds != null && hdrs != null) {
           hdrs.add(tracer.DTRACE_UUID_HDR, ds.getUuid());
           hdrs.add(tracer.DTRACE_TID_HDR, rec.get("DTRACE_OUT"));
+          xtt = rec.get(tracer.DTRACE_XTT);
+          if (xtt != null) {
+              hdrs.add(tracer.DTRACE_XTT, xtt.toString());
+          }
         }
+
         return rec;
       }
       return (com.jitlogic.zorka.core.spy.SpyProcessor)this;

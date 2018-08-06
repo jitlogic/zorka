@@ -225,6 +225,10 @@ __http() {
                   if (tid != null) {
                       rec.put(tracer.DTRACE_IN, tid);
                   }
+                  xtt = req.getHeader(tracer.DTRACE_XTT_HDR);
+                  if (xtt != null) {
+                      rec.put(tracer.DTRACE_XTT, xtt);
+                  }
               }
           }
 
