@@ -16,47 +16,37 @@
 
 package com.jitlogic.zorka.core.spy.plugins;
 
+import com.jitlogic.zorka.core.spy.DTraceState;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.TracerLib;
 
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static com.jitlogic.zorka.core.spy.TracerLib.*;
 
 public class DTraceOutputProcessor implements SpyProcessor {
 
     private TracerLib tracer;
-    private AtomicLong dtraceTidGen;
-    private ThreadLocal<String> uuidLocal;
-    private ThreadLocal<String> tidLocal;
-    private ThreadLocal<Boolean> forceLocal;
+    private ThreadLocal<DTraceState> dtraceLocal;
 
-    public DTraceOutputProcessor(
-            TracerLib tracer,
-            AtomicLong dtraceTidGen,
-            ThreadLocal<String> uuidLocal,
-            ThreadLocal<String> tidLocal,
-            ThreadLocal<Boolean> forceLocal) {
+    public DTraceOutputProcessor(TracerLib tracer, ThreadLocal<DTraceState> dtraceLocal) {
         this.tracer = tracer;
-        this.dtraceTidGen = dtraceTidGen;
-        this.uuidLocal = uuidLocal;
-        this.tidLocal = tidLocal;
-        this.forceLocal = forceLocal;
+        this.dtraceLocal = dtraceLocal;
     }
 
     @Override
     public Map<String, Object> process(Map<String, Object> rec) {
-        String uuid = uuidLocal.get();
-        String tid = tidLocal.get();
+        DTraceState ds = dtraceLocal.get();
 
-        if (uuid != null && tid != null) {
-            rec.put(DTRACE_UUID, uuid);
-            String tid1 = String.format("%s%s%x", tid, DTRACE_SEP, dtraceTidGen.incrementAndGet());
-            rec.put(DTRACE_OUT, tid1);
-            rec.put(DTRACE_FORCE, Boolean.TRUE.equals(forceLocal.get()));
+        if (ds != null) {
+            String uuid = ds.getUuid();
+            String tid = ds.nextTid();
+
+            rec.put(DTRACE_STATE, ds);
+            rec.put(DTRACE_OUT, tid);
+
             tracer.newAttr(DTRACE_UUID, uuid);
-            tracer.newAttr(DTRACE_OUT, uuid + tid1);
+            tracer.newAttr(DTRACE_OUT, uuid + tid);
         }
 
         return rec;

@@ -89,12 +89,11 @@ __spring() {
 
     dtrace_req() {
       process(rec) {
-        uuid = rec.get("DTRACE_UUID");
-        tid = rec.get("DTRACE_OUT");
+        ds = rec.get("DTRACE");
         hdrs = rec.get("HDR_OUT");
-        if (uuid != null && tid != null && hdrs != null) {
-          hdrs.add(tracer.DTRACE_UUID_HDR, uuid);
-          hdrs.add(tracer.DTRACE_TID_HDR, tid);
+        if (ds != null && hdrs != null) {
+          hdrs.add(tracer.DTRACE_UUID_HDR, ds.getUuid());
+          hdrs.add(tracer.DTRACE_TID_HDR, rec.get("DTRACE_OUT"));
         }
         return rec;
       }

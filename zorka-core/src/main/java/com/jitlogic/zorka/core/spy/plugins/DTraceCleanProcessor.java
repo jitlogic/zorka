@@ -13,8 +13,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.jitlogic.zorka.core.spy.plugins;
 
+import com.jitlogic.zorka.core.spy.DTraceState;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.util.Map;
@@ -25,21 +27,15 @@ import java.util.Map;
  */
 public class DTraceCleanProcessor implements SpyProcessor {
 
-    private ThreadLocal<String> uuidLocal;
-    private ThreadLocal<String> tidLocal;
-    private ThreadLocal<Boolean> forceLocal;
+    private ThreadLocal<DTraceState> dtraceLocal;
 
-    public DTraceCleanProcessor(ThreadLocal<String> uuidLocal, ThreadLocal<String> tidLocal, ThreadLocal<Boolean> forceLocal) {
-        this.uuidLocal = uuidLocal;
-        this.tidLocal = tidLocal;
-        this.forceLocal = forceLocal;
+    public DTraceCleanProcessor(ThreadLocal<DTraceState> dtraceLocal) {
+        this.dtraceLocal = dtraceLocal;
     }
 
     @Override
     public Map<String, Object> process(Map<String, Object> rec) {
-        uuidLocal.remove();
-        tidLocal.remove();
-        forceLocal.remove();
+        dtraceLocal.remove();
 
         // TODO force trace submission if forceLocal == true
 

@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zorka.core.spy.plugins;
 
+import com.jitlogic.zorka.core.spy.DTraceState;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.TracerLib;
 
@@ -29,16 +30,11 @@ import static com.jitlogic.zorka.core.spy.TracerLib.*;
 public class DTraceInputProcessor implements SpyProcessor {
 
     private TracerLib tracer;
-    private ThreadLocal<String> uuidLocal;
-    private ThreadLocal<String> tidLocal;
-    private ThreadLocal<Boolean> forceLocal;
+    private ThreadLocal<DTraceState> dtraceLocal;
 
-    public DTraceInputProcessor(TracerLib tracer, ThreadLocal<String> uuidLocal, ThreadLocal<String> tidLocal,
-                                ThreadLocal<Boolean> forceLocal) {
+    public DTraceInputProcessor(TracerLib tracer, ThreadLocal<DTraceState> dtraceLocal) {
         this.tracer = tracer;
-        this.uuidLocal = uuidLocal;
-        this.tidLocal = tidLocal;
-        this.forceLocal = forceLocal;
+        this.dtraceLocal = dtraceLocal;
     }
 
     @Override
@@ -47,24 +43,24 @@ public class DTraceInputProcessor implements SpyProcessor {
         String uuid = (String)rec.get(DTRACE_UUID);
         if (uuid == null) {
             uuid = UUID.randomUUID().toString();
-            rec.put(DTRACE_UUID, uuid);
         }
 
         tracer.newAttr(DTRACE_UUID, uuid);
-        uuidLocal.set(uuid);
 
         String tid = (String)rec.get(DTRACE_IN);
         if (tid == null) {
             tid = "";
-            rec.put(DTRACE_IN, tid);
         }
 
-        tracer.newAttr(DTRACE_IN, uuid+tid);
-        tidLocal.set(tid);
+        DTraceState ds = new DTraceState(tracer, uuid, tid, null);
+        rec.put(DTRACE_STATE, ds);
 
-        boolean force = "true".equalsIgnoreCase((String)rec.get(DTRACE_FORCE));
-        forceLocal.set(force);
+        dtraceLocal.set(ds);
+
+        tracer.newAttr(DTRACE_UUID, uuid);
+        tracer.newAttr(DTRACE_IN, uuid+tid);
 
         return rec;
     }
+
 }
