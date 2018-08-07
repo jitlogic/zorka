@@ -49,13 +49,14 @@ __apache_httpclient() {
             ihdr = util.get(method, "requestHeaders");
             if (method != null && ihdr != null) {
               for (hdr : ihdr) {
-                  tracer.newAttr("ReqHdr__" + hdr.getName(), ""+hdr.getValue());
+                  tracer.newAttr("HdrOut__" + hdr.getName(), ""+hdr.getValue());
                 }
+
             }
             ohdr = util.get(method, "responseHeaders");
             if (method != null && ohdr != null) {
                 for (hdr : ohdr) {
-                    tracer.newAttr("RespHdr__" + hdr.getName(), ""+hdr.getValue());
+                    tracer.newAttr("HdrIn__" + hdr.getName(), ""+hdr.getValue());
                 }
             }
           }
@@ -64,14 +65,35 @@ __apache_httpclient() {
       return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
   }
 
+
+  dtrace_req() {
+      process(rec) {
+        ds = rec.get("DTRACE");
+        m = rec.get("METHOD");
+        if (ds != null && m != null) {
+          m.addRequestHeader(tracer.DTRACE_UUID_HDR, ds.getUuid());
+          m.addRequestHeader(tracer.DTRACE_TID_HDR, rec.get("DTRACE_OUT"));
+          xtt = rec.get(tracer.DTRACE_XTT);
+          if (xtt != null) {
+              m.addRequestHeader(tracer.DTRACE_XTT, xtt.toString());
+          }
+        }
+
+        return rec;
+      }
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+
   spy.add(
     spy.instrument("APACHE_HTTPCLIENT_EXECUTE")
       .onEnter(spy.fetchArg("METHOD", 2),
         _trace ? spy.subchain(
           tracer.begin("HTTP_CLI", _traceTime),
           tracer.formatAttr("URI", "${METHOD.URI}"),
-          tracer.formatAttr("METHOD", "${METHOD.method}")
-        ) : null)
+          tracer.formatAttr("METHOD", "${METHOD.name}"),
+          _dtrace_enabled ? tracer.dtraceOutput() : null,
+          _dtrace_enabled ? dtrace_req() : null) : null)
       .onReturn(spy.fetchRetVal("RET"), _trace ? tracer.attr("RET", "RET") : null)
       .onError(tracer.flags(tracer.SUBMIT_TRACE))
       .onSubmit(
@@ -80,8 +102,10 @@ __apache_httpclient() {
           tracer.formatAttr("STATUS_LINE", "${METHOD.getStatusLine}"),
           headers_processor()
         ) : null)
-      .include(spy.byMethod(0, "org.apache.commons.httpclient.HttpClient", "executeMethod", "int", 
-          "org.apache.commons.httpclient.HostConfiguration", "org.apache.commons.httpclient.HttpMethod",
+      .include(
+        spy.byMethod(0, "org.apache.commons.httpclient.HttpClient", "executeMethod", "int",
+          "org.apache.commons.httpclient.HostConfiguration",
+          "org.apache.commons.httpclient.HttpMethod",
           "org.apache.commons.httpclient.HttpState"))
   );
 
