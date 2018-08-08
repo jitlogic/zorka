@@ -115,7 +115,7 @@ public class CoreTestUtil extends ClassLoader {
         Class<?> clazz = obj.getClass();
 
         for (Method met : clazz.getMethods()) {
-            if (name.equals(met.getName())) {
+            if (name.equals(met.getName()) && met.getParameterTypes().length == args.length) {
                 method = met;
                 break;
             }
@@ -123,7 +123,7 @@ public class CoreTestUtil extends ClassLoader {
 
         if (method == null) {
             for (Method met : clazz.getDeclaredMethods()) {
-                if (name.equals(met.getName())) {
+                if (name.equals(met.getName()) && met.getParameterTypes().length == args.length) {
                     method = met;
                     method.setAccessible(true);
                 }
