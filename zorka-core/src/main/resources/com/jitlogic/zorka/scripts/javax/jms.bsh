@@ -55,6 +55,7 @@ __javax_jms() {
 
   zorka.defCfg("jms.trace", zorka.boolCfg("tracer"));
   zorka.defCfg("jms.trace.time", zorka.longCfg("tracer.min.trace.time"));
+  zorka.defCfg("jms.trace.comms", "no");
 
   zorka.defCfg("jms.stats", "yes");
   zorka.defCfg("jms.stats.mbean", "zorka:name=JMS,type=ZorkaStats");
@@ -138,16 +139,23 @@ __javax_jms() {
         .include(spy.byInterfaceAndMethod(0, "javax.jms.MessageListener", "onMessage", "void", "javax.jms.Message")));
 
       spy.add(spy.instrument("JAVAX_JMS_PRODUCER1")
-        .onEnter(spy.fetchArg("MSG", 1), _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
+        .onEnter(
+          zorka.boolCfg("jms.trace.comms") ? tracer.begin("JMS_SEND", zorka.longCfg("jms.trace.time")) : null,
+          spy.fetchArg("MSG", 1),
+          _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
         .onSubmit(zorka.boolCfg("jms.stats") ? spy.zorkaStats("java", zorka.stringCfg("jms.stats.mbean"), "sent", "ALL") : null)
         .include(spy.byInterfaceAndMethod(0, "javax.jms.MessageProducer", "send", "void", "javax.jms.Message")));
 
       spy.add(spy.instrument("JAVAX_JMS_PRODUCER2")
-        .onEnter(spy.fetchArg("MSG", 2), _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
+        .onEnter(
+          zorka.boolCfg("jms.trace.comms") ? tracer.begin("JMS_SEND", zorka.longCfg("jms.trace.time")) : null,
+          spy.fetchArg("MSG", 2),
+          _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
         .onSubmit(zorka.boolCfg("jms.stats") ? spy.zorkaStats("java", zorka.stringCfg("jms.stats.mbean"), "sent", "ALL") : null)
         .include(spy.byInterfaceAndMethod(0, "javax.jms.MessageProducer", "send", "void", "javax.jms.Destination", "javax.jms.Message")));
 
       spy.add(spy.instrument("JAVAX_JMX_CONSUMER")
+        .onEnter(zorka.boolCfg("jms.trace.comms") ? tracer.begin("JMS_RECV", zorka.longCfg("jms.trace.time")) : null)
         .onReturn(spy.fetchRetVal("MSG"), _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
         .onSubmit(zorka.boolCfg("jms.stats") ? spy.zorkaStats("java", zorka.stringCfg("jms.stats.mbean"), "received", "ALL") : null)
         .include(spy.byInterfaceAndMethod(0, "javax.jms.MessageConsumer", "~receive.*", "javax.jms.Message")));
