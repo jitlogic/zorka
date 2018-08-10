@@ -128,10 +128,51 @@ __javax_jms() {
 
     _fetchProps = zorka.boolCfg("jms.fetch.props") ? _fetchPropsProcessor() : null;
 
+    dtrace_req() {
+      process(rec) {
+        ds = rec.get("DTRACE");
+        m = rec.get("MSG");
+        if (ds != null && m != null) {
+          m.setStringProperty(tracer.DTRACE_UUID_HDR, ds.getUuid());
+          m.setStringProperty(tracer.DTRACE_TID_HDR, rec.get("DTRACE_OUT"));
+          xtt = rec.get(tracer.DTRACE_XTT);
+          if (xtt != null) {
+              m.setStringProperty(tracer.DTRACE_XTT, xtt.toString());
+          }
+        }
+
+        return rec;
+      }
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+    }
+
+    dtrace_resp() {
+      process(rec) {
+        m = rec.get("MSG");
+        if (m != null) {
+          if (m.propertyExists(tracer.DTRACE_UUID_HDR)) {
+            rec.put(tracer.DTRACE_UUID, m.getStringProperty(tracer.DTRACE_UUID_HDR));
+          }
+          if (m.propertyExists(tracer.DTRACE_TID_HDR)) {
+            rec.put(tracer.DTRACE_IN, m.getStringProperty(tracer.DTRACE_TID_HDR));
+          }
+          if (m.propertyExists(tracer.DTRACE_XTT_HDR)) {
+            rec.put(tracer.DTRACE_XTT, m.getStringProperty(tracer.DTRACE_XTT_HDR));
+          }
+        }
+        return rec;
+      }
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+    }
+
+    _jms_dtrace = zorka.boolCfg("jms.trace") && _dtrace_enabled;
+
     if (zorka.boolCfg("jms.generic")) {
       spy.add(spy.instrument("JAVAX_JMS_LISTENER")
         .onEnter(spy.fetchArg("MSG", 1),
           zorka.boolCfg("jms.trace") ? tracer.begin("JMS", zorka.longCfg("jms.trace.time")) : null,
+          _jms_dtrace ? dtrace_resp() : null,
+          _jms_dtrace ? tracer.dtraceInput(zorka.longCfg("jms.trace.time")) : null,
           _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
         .onError(spy.fetchError("ERR"), spy.strTime("TIME"), _error_chain, spy.markError())
         .onSubmit(spy.strTime("TIME"), _slow_chain,
@@ -142,6 +183,8 @@ __javax_jms() {
         .onEnter(
           zorka.boolCfg("jms.trace.comms") ? tracer.begin("JMS_SEND", zorka.longCfg("jms.trace.time")) : null,
           spy.fetchArg("MSG", 1),
+          _jms_dtrace ? tracer.dtraceOutput() : null,
+          _jms_dtrace ? dtrace_req() : null,
           _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
         .onSubmit(zorka.boolCfg("jms.stats") ? spy.zorkaStats("java", zorka.stringCfg("jms.stats.mbean"), "sent", "ALL") : null)
         .include(spy.byInterfaceAndMethod(0, "javax.jms.MessageProducer", "send", "void", "javax.jms.Message")));
@@ -150,13 +193,18 @@ __javax_jms() {
         .onEnter(
           zorka.boolCfg("jms.trace.comms") ? tracer.begin("JMS_SEND", zorka.longCfg("jms.trace.time")) : null,
           spy.fetchArg("MSG", 2),
+          _jms_dtrace ? tracer.dtraceOutput() : null,
+          _jms_dtrace ? dtrace_req() : null,
           _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
         .onSubmit(zorka.boolCfg("jms.stats") ? spy.zorkaStats("java", zorka.stringCfg("jms.stats.mbean"), "sent", "ALL") : null)
         .include(spy.byInterfaceAndMethod(0, "javax.jms.MessageProducer", "send", "void", "javax.jms.Destination", "javax.jms.Message")));
 
       spy.add(spy.instrument("JAVAX_JMX_CONSUMER")
         .onEnter(zorka.boolCfg("jms.trace.comms") ? tracer.begin("JMS_RECV", zorka.longCfg("jms.trace.time")) : null)
-        .onReturn(spy.fetchRetVal("MSG"), _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
+        .onReturn(spy.fetchRetVal("MSG"),
+          _jms_dtrace ? dtrace_resp() : null,
+          _jms_dtrace ? tracer.dtraceInput(zorka.longCfg("jms.trace.time")) : null,
+          _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
         .onSubmit(zorka.boolCfg("jms.stats") ? spy.zorkaStats("java", zorka.stringCfg("jms.stats.mbean"), "received", "ALL") : null)
         .include(spy.byInterfaceAndMethod(0, "javax.jms.MessageConsumer", "~receive.*", "javax.jms.Message")));
     }
