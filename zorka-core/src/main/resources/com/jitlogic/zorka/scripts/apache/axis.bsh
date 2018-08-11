@@ -22,6 +22,34 @@ zorka.require(
 
 __axis() {
 
+  dtrace_req() {
+    process(rec) {
+      ds = rec.get("DTRACE");
+      hb = rec.get("HBUF");
+      dt = rec.get("DTRACE_OUT");
+      if (ds != null && hb != null && dt != null) {
+        hb.append(tracer.DTRACE_UUID_HDR);
+        hb.append(": ");
+        hb.append(ds.getUuid());
+        hb.append("\r\n");
+        hb.append(tracer.DTRACE_TID_HDR);
+        hb.append(": ");
+        hb.append(dt);
+        hb.append("\r\n");
+
+        xtt = rec.get(tracer.DTRACE_XTT);
+        if (xtt != null) {
+          hb.append(tracer.DTRACE_XTT_HDR);
+          hb.append(": ");
+          hb.append(xtt);
+          hb.append("\r\n");
+        }
+      }
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
   spy.add(
     spy.instrument("AXIS_SERVER_INVOKE")
       .onEnter(spy.fetchArg("CTX", 1),
@@ -64,7 +92,43 @@ __axis() {
 
 
   spy.add(
-    spy.instrument("AXIS_CLIENT_INVOKE")
+    spy.instrument("AXIS_CLIENT_HTTP")
+      .onEnter(spy.fetchArg("CTX", 2),
+        _dtrace_enabled ? spy.fetchArg("HBUF", 4) : null,
+        soap._trace ? spy.subchain(
+          tracer.begin("SOAP_CLI", zorka.longCfg("soap.trace.time")),
+          _dtrace_enabled ? tracer.dtraceOutput() : null,
+          _dtrace_enabled ? dtrace_req() : null) : null)
+      .onError(spy.fetchError("ERROR"), tracer.flags(tracer.SUBMIT_TRACE),
+        __get_call_obj(),
+        spy.format("SERVICE", "${CALL_OBJ.operationName.namespaceURI}"),
+        spy.format("METHOD", "${CALL_OBJ.operationName.localPart}"),
+        soap._fetch_xml ? spy.format("XML_IN",  "${CTX.requestMessage.SOAPEnvelope}") : null,
+        soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
+        soap._error_chain)
+      .onSubmit(
+        __get_call_obj(),
+        spy.format("SERVICE", "${CALL_OBJ.operationName.namespaceURI}"),
+        spy.format("METHOD", "${CALL_OBJ.operationName.localPart}"),
+        soap._fetch_xml ? spy.format("XML_IN",  "${CTX.requestMessage.SOAPEnvelope}") : null,
+        soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
+        spy.strTime("TIME"), soap._slow_chain,
+        soap._trace ? spy.subchain(
+          tracer.attr("SERVICE", "SERVICE"),
+          tracer.attr("METHOD", "METHOD"),
+          soap._fetch_xml ? tracer.attr("XML_IN", "XML_IN") : null,
+          soap._fetch_xml ? tracer.attr("XML_OUT", "XML_OUT") : null
+        ) : null,
+        soap._stats ? spy.subchain(
+          spy.zorkaStats("java", soap._mbean, "stats", "CLI"),
+          spy.zorkaStats("java", soap._mbean, "cli", "${SERVICE}.${METHOD}")
+        ) : null)
+      .include(spy.byMethod(0, "org.apache.axis.transport.http.HTTPSender", "writeToSocket", "java.io.InputStream",
+        "org.apache.axis.transport.http.SocketHolder", "org.apache.axis.MessageContext")));
+
+
+  spy.add(
+    spy.instrument("AXIS_CLIENT_JMS")
       .onEnter(spy.fetchArg("CTX", 1),
         soap._trace ? tracer.begin("SOAP_CLI", zorka.longCfg("soap.trace.time")) : null)
       .onError(spy.fetchError("ERROR"), tracer.flags(tracer.SUBMIT_TRACE),
@@ -91,7 +155,8 @@ __axis() {
           spy.zorkaStats("java", soap._mbean, "stats", "CLI"),
           spy.zorkaStats("java", soap._mbean, "cli", "${SERVICE}.${METHOD}")
         ) : null)
-      .include(spy.byMethod(0, "org.apache.axis.client.AxisClient", "invoke", "void")));
+      .include(spy.byMethod(0, "org.apache.axis.transport.jms.JMSSender", "invoke", "void",
+        "org.apache.axis.MessageContext")));
 
 
   if (zorka.boolCfg("tracer")) {

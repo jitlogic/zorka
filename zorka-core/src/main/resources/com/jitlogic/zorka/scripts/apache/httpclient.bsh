@@ -75,7 +75,7 @@ __apache_httpclient() {
           m.addRequestHeader(tracer.DTRACE_TID_HDR, rec.get("DTRACE_OUT"));
           xtt = rec.get(tracer.DTRACE_XTT);
           if (xtt != null) {
-              m.addRequestHeader(tracer.DTRACE_XTT, xtt.toString());
+              m.addRequestHeader(tracer.DTRACE_XTT_HDR, xtt.toString());
           }
         }
 
