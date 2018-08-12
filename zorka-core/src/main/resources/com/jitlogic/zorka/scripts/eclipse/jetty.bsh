@@ -32,6 +32,8 @@ __jetty() {
         tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
         tracer.attr("URI", "URI")
       ) : null,
+      http._headers ? http.headers_processor(true, false) : null,
+      (http._trace && _dtrace_enabled && http._headers) ? tracer.dtraceInput(zorka.longCfg("http.trace.time")) : null,
       http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
     .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),
       http._trace ? spy.subchain(
@@ -50,7 +52,7 @@ __jetty() {
         tracer.attr("USER", "USER"),
         http._params ? http.param_processor() : null,
         http._cookies ? http.cookies_processor(true, false) : null,
-        http._headers ? http.headers_processor(true, true) : null
+        http._headers ? http.headers_processor(false, true) : null
       ) : null,
       http._slow_chain,
       spy.subchain(

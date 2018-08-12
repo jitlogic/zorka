@@ -140,8 +140,12 @@ public class CoreTestUtil extends ClassLoader {
                 }
             }
         } catch (InvocationTargetException e) {
+            System.err.println(e);
+            e.printStackTrace();
             return e.getCause();
         } catch (Exception e) {
+            System.err.println(e);
+            e.printStackTrace();
             return e;
         }
 
