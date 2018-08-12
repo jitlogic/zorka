@@ -25,7 +25,9 @@ __grizzly() {
         http._trace ? spy.subchain(
           http._uriQualifier,
           tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
-          tracer.attr("URI", "URI")
+          tracer.attr("URI", "URI"),
+          http._headers ? http.headers_processor(true, false) : null,
+          (_dtrace_enabled && http._headers) ? tracer.dtraceInput(zorka.longCfg("http.trace.time")) : null
         ) : null,
         http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
       .onReturn(spy.put("ERR", ""))
@@ -46,7 +48,6 @@ __grizzly() {
           tracer.filterBy("STATUS", null, http._errors, null, null),
           tracer.attr("USER", "USER"),
           http._cookies ? http.cookies_processor(true, true) : spy.put("COOKIES", ""),
-          http._headers ? http.headers_processor(true, false) : null,
           http._params ? http.param_processor() : spy.put("PARAMS", "")
         ) : null,
         http._slow_chain,

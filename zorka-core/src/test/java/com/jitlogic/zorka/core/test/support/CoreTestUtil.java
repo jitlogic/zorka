@@ -61,6 +61,50 @@ public class CoreTestUtil extends ClassLoader {
         throw new RuntimeException("Cannot find constructor of " + args.length + " arguments.");
     }
 
+    public static Object invokeStatic(SpyClassTransformer engine, String clazzName, String methodName, Object...args) throws Exception {
+        TransformationResult result = transform(engine, clazzName);
+        byte[] classBytes = result.transformedBytecode != null ? result.transformedBytecode : result.originalBytecode;
+
+        Class<?> clazz = new CoreTestUtil().defineClass(result.clazzName, classBytes, 0, classBytes.length);
+        Method method = null;
+
+        for (Method met : clazz.getMethods()) {
+            if (methodName.equals(met.getName()) && met.getParameterTypes().length == args.length) {
+                method = met;
+                break;
+            }
+        }
+
+        if (method == null) {
+            for (Method met : clazz.getDeclaredMethods()) {
+                if (methodName.equals(met.getName()) && met.getParameterTypes().length == args.length) {
+                    method = met;
+                    method.setAccessible(true);
+                }
+            }
+        }
+
+        try {
+            if (method != null) {
+                if (args.length == 0) {
+                    return method.invoke(null);
+                } else {
+                    return method.invoke(null, args);
+                }
+            }
+        } catch (InvocationTargetException e) {
+            System.err.println(e);
+            e.printStackTrace();
+            return e.getCause();
+        } catch (Exception e) {
+            System.err.println(e);
+            e.printStackTrace();
+            return e;
+        }
+
+        return null;
+    }
+
     public static TransformationResult transform(SpyClassTransformer engine, String clazzName) throws Exception {
         String className = clazzName.replace(".", "/");
         byte[] original = readResource(className + ".class");

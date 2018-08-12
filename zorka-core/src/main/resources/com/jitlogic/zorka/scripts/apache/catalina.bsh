@@ -114,7 +114,7 @@ __catalina() {
         tracer.attr("URI", "URI"),
         tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
         http._headers ? headers_in() : null,
-        (http._trace && _dtrace_enabled && http._headers) ? tracer.dtraceInput(zorka.longCfg("http.trace.time")) : null
+        (_dtrace_enabled && http._headers) ? tracer.dtraceInput(zorka.longCfg("http.trace.time")) : null
       ) : null,
       http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
     .onReturn(spy.put("ERR", ""))
