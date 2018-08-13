@@ -62,7 +62,7 @@ __wls() {
         tracer.attr("USER", "USER"),
         http._params ? http.param_processor() : null,
         http._cookies ? http.cookies_processor(true, false) : null,
-        http._headers ? http.headers_processor(false, true) : null
+        (zorka.boolCfg("wls.headers.out", true) && http._headers) ? http.headers_processor(false, true) : null
       ) : null,
       _dtrace_enabled ? tracer.dtraceClean() : null,
       http._slow_chain,
@@ -159,7 +159,9 @@ __wls() {
     zabbix.tagMetadata("WEBLOGIC");
   }
 
-  jvm.autoregister();
+  if (zorka.boolCfg("wls.mbs.autoregister", true)) {
+    jvm.autoregister();
+  }
 
   return this;
 }
