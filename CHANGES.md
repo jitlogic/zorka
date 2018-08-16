@@ -1,5 +1,9 @@
-Zorka 1.90.3 (2018-08-01)
+Zorka 1.90.3 (2018-08-16)
 -------------------------
+
+* distributed tracing support (see docs);
+* `spring.version` option - switch between spring3 and spring5;
+* cleanups, cut useless dependencies and components (zorka-viewer, fest);
 
 
 Zorka 1.90.2 (2018-06-14)
