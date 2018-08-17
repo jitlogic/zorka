@@ -89,4 +89,9 @@ public class RealSpyRetransformer implements SpyRetransformer {
         return instrumentation != null && instrumentation.isRetransformClassesSupported();
     }
 
+    @Override
+    public List<Class<?>> getAllLoadedClasses() {
+        return getAllLoadedClasses();
+    }
+
 }

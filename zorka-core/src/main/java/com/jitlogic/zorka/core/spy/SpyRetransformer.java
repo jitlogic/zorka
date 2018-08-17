@@ -16,10 +16,13 @@
 
 package com.jitlogic.zorka.core.spy;
 
+import java.util.List;
+
 public interface SpyRetransformer {
 
     boolean retransform(SpyMatcherSet oldSet, SpyMatcherSet newSet, boolean isSdef);
 
     boolean isEnabled();
 
+    List<Class<?>> getAllLoadedClasses();
 }

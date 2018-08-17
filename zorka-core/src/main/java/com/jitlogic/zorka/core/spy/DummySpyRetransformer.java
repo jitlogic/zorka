@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.instrument.Instrumentation;
+import java.util.Collections;
+import java.util.List;
 
 
 public class DummySpyRetransformer implements SpyRetransformer {
@@ -39,6 +41,12 @@ public class DummySpyRetransformer implements SpyRetransformer {
     @Override
     public boolean isEnabled() {
         return false;
+    }
+
+    @Override
+    public List<Class<?>> getAllLoadedClasses() {
+        // This is for Java 5 and testing, so it will be ignored
+        return Collections.EMPTY_LIST;
     }
 
 }

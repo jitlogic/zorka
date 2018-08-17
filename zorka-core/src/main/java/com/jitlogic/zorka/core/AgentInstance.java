@@ -582,30 +582,42 @@ public class AgentInstance implements ZorkaService {
 
     public void reload() {
         SpyMatcherSet oldSet = getTracer().getMatcherSet();
-        SpyClassTransformer classTransformer = getClassTransformer();
-        Set<SpyDefinition> oldSdefs = classTransformer.getSdefs();
+        SpyClassTransformer transformer = getClassTransformer();
+        Set<SpyDefinition> oldSdefs = transformer.getSdefs();
+
+        // Restart agent ...
         shutdown();
         ZorkaUtil.sleep(1000);
         restart();
         long l = AgentDiagnostics.get(AgentDiagnostics.CONFIG_ERRORS);
-        if (l == 0) {
-            SpyMatcherSet newSet = getTracer().getMatcherSet();
-            log.info("Reinstrumenting classes for tracer ...");
-            getRetransformer().retransform(oldSet, newSet, false);
-            log.info("Checking for old sdefs to be removed...");
-            int removed = 0;
-            for (SpyDefinition sdef : oldSdefs) {
-                if (sdef == classTransformer.getSdef(sdef.getName())) {
-                    classTransformer.remove(sdef);
-                    removed++;
-                }
-            }
-            log.info("Number of sdefs removed: " + removed);
-        } else {
-            log.info("Reinstrumentating classes for tracer skipped due to configuration errors. " +
-                    "Fix config scripts and try again.");
+
+        if (l != 0) {
+            log.info("Error loading configuration scripts. ");
             getTracer().setMatcherSet(oldSet);
         }
+
+        ZorkaBshAgent bsh = getZorkaAgent();
+
+        // Check for scripts to load automatically
+        if (getConfig().boolCfg("scripts.auto", false)) {
+            log.info("Probing for BSH scripts ...");
+            for (Class<?> c : getRetransformer().getAllLoadedClasses()) {
+                bsh.probe(c.getName());
+            }
+        }
+
+        SpyMatcherSet newSet = getTracer().getMatcherSet();
+        log.info("Reinstrumenting classes for tracer ...");
+        getRetransformer().retransform(oldSet, newSet, false);
+        log.info("Checking for old sdefs to be removed...");
+        int removed = 0;
+        for (SpyDefinition sdef : oldSdefs) {
+            if (sdef == transformer.getSdef(sdef.getName())) {
+                transformer.remove(sdef);
+                removed++;
+            }
+        }
+        log.info("Number of sdefs removed: " + removed);
 
     }
 }
