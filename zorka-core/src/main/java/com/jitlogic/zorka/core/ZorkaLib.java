@@ -293,6 +293,7 @@ public class ZorkaLib implements ZorkaService {
                     break;
                 case 'C':
                     rslt[i] = o != null ? o.toString().charAt(0) : null;
+                    break;
                 case 'S':
                     rslt[i] = o instanceof Number ? ((Number)o).shortValue() : o != null ? Short.parseShort(""+o) : null;
                     break;
@@ -304,6 +305,7 @@ public class ZorkaLib implements ZorkaService {
                     break;
                 case 'F':
                     rslt[i] = o instanceof Number ? ((Number)o).floatValue() : o != null ? Float.parseFloat(""+o) : null;
+                    break;
                 case 'T':
                     rslt[i] = o;
                     break;
