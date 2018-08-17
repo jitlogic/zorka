@@ -44,9 +44,9 @@ public class DummySpyRetransformer implements SpyRetransformer {
     }
 
     @Override
-    public List<Class<?>> getAllLoadedClasses() {
+    public Class[] getAllLoadedClasses() {
         // This is for Java 5 and testing, so it will be ignored
-        return Collections.EMPTY_LIST;
+        return new Class[0];
     }
 
 }

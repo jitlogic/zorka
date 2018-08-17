@@ -37,6 +37,7 @@ import com.jitlogic.zorka.core.util.DaemonThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -182,29 +183,31 @@ public class AgentInstance implements ZorkaService {
 
     private void initBshLibs() {
 
-        getZorkaAgent().put("zorka", getZorkaLib());
+        ZorkaBshAgent bsh = getZorkaAgent();
 
-        getZorkaAgent().put("util", getUtilLib());
+        bsh.put("zorka", getZorkaLib());
+
+        bsh.put("util", getUtilLib());
 
         if (config.boolCfg("spy", true)) {
             log.info("Enabling Zorka SPY");
-            getZorkaAgent().put("spy", getSpyLib());
-            getZorkaAgent().put("tracer", getTracerLib());
+            bsh.put("spy", getSpyLib());
+            bsh.put("tracer", getTracerLib());
         }
 
-        getZorkaAgent().put("perfmon", getPerfMonLib());
+        bsh.put("perfmon", getPerfMonLib());
         
         if (config.boolCfg("syslog", true)) {
             log.info("Enabling Syslog subsystem ....");
-            zorkaAgent.put("syslog", getSyslogLib());
+            this.zorkaAgent.put("syslog", getSyslogLib());
         }
 
         if (config.boolCfg("snmp", true)) {
             log.info("Enabling SNMP subsystem ...");
-            zorkaAgent.put("snmp", getSnmpLib());
+            this.zorkaAgent.put("snmp", getSnmpLib());
         }
 
-        getZorkaAgent().put("normalizers", getNormLib());
+        bsh.put("normalizers", getNormLib());
 
     }
 
@@ -581,7 +584,7 @@ public class AgentInstance implements ZorkaService {
     }
 
     public void reload() {
-        SpyMatcherSet oldSet = getTracer().getMatcherSet();
+        SpyMatcherSet oldSet = new SpyMatcherSet(getTracer().getMatcherSet());
         SpyClassTransformer transformer = getClassTransformer();
         Set<SpyDefinition> oldSdefs = transformer.getSdefs();
 
@@ -600,8 +603,16 @@ public class AgentInstance implements ZorkaService {
 
         // Check for scripts to load automatically
         if (getConfig().boolCfg("scripts.auto", false)) {
-            log.info("Probing for BSH scripts ...");
-            for (Class<?> c : getRetransformer().getAllLoadedClasses()) {
+            if (log.isDebugEnabled()) {
+                log.debug("Loaded scripts (before): " + bsh.getLoadedScripts());
+            }
+            Class[] allLoadedClasses = getRetransformer().getAllLoadedClasses();
+            log.info("Probing for BSH scripts (" + allLoadedClasses.length + " classes to be probed).");
+            bsh.probeSetup();
+            for (Class c : allLoadedClasses) {
+                if (log.isTraceEnabled()) {
+                    log.trace("Probing class: " + c.getName());
+                }
                 bsh.probe(c.getName());
             }
         }

@@ -174,6 +174,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
                 InputStream is = getClass().getResourceAsStream(
                         "/com/jitlogic/zorka/scripts"+(script.startsWith("/") ? "" : "/")+script);
                 if (is != null) {
+                    log.info("Executing internal script: " + script);
                     rdr = new InputStreamReader(is);
                     interpreter.eval(rdr, interpreter.getNameSpace(), script);
                     loadedScripts.add(script);
@@ -205,6 +206,9 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
         if (!loadedScripts.contains(script)) {
             return loadScript(script);
         } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Skipping already loaded script: " + script);
+            }
             return "Already loaded.";
         }
     }
@@ -217,7 +221,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
         return probeMap;
     }
 
-    private void probeSetup() {
+    public void probeSetup() {
         Properties props = config.getProperties();
         for (String s : props.stringPropertyNames()) {
             if (s.startsWith("auto.")) {

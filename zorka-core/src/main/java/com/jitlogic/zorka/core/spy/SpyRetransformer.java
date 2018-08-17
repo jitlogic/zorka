@@ -16,7 +16,6 @@
 
 package com.jitlogic.zorka.core.spy;
 
-import java.util.List;
 
 public interface SpyRetransformer {
 
@@ -24,5 +23,5 @@ public interface SpyRetransformer {
 
     boolean isEnabled();
 
-    List<Class<?>> getAllLoadedClasses();
+    Class[] getAllLoadedClasses();
 }

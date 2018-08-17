@@ -45,7 +45,7 @@ if (zorka.boolCfg("tracer")) {
 
 
   tracer.exclude("100:com.jitlogic.zorka.**");
-  tracer.exclude("java.**", "sun.reflect.**", "sun.awt.**", "com.sun.beans.**", "$Proxy*");
+  tracer.exclude("java.**", "sun.reflect.**", "sun.awt.**", "com.sun.beans.**", "$Proxy*", "**$$Lambda$**");
   tracer.include(spy.byClass("**").forTrace().priority(1000));
 
 
