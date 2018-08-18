@@ -129,7 +129,7 @@ __spring() {
             spy.get("CONN", "REQ", "connection"),
             spy.get("HDR_OUT", "REQ", "headers"),
             _trace ? spy.subchain(
-              proc_headers("HDR_OUT", "HdrOut_"),
+              proc_headers("HDR_OUT", "HdrOut__"),
               tracer.begin("HTTP_CLI", _traceTime),
               tracer.formatAttr("URI", "${CONN.requestUri}"),
               _dtrace_enabled ? tracer.dtraceOutput() : null,
@@ -138,8 +138,9 @@ __spring() {
           .onReturn(spy.fetchRetVal("RESP"),
             spy.get("HDR_IN", "RESP", "headers"),
             _trace ? spy.subchain(
+              tracer.formatAttr("METHOD", "${REQ.method}"),
               tracer.formatAttr("STATUS", "${CONN.status}"),
-              proc_headers("HDR_IN", "HdrIn_"))
+              proc_headers("HDR_IN", "HdrIn__"))
             : null)
           .onError(tracer.flags(tracer.SUBMIT_TRACE))
           .onSubmit(_stats ? spy.zorkaStats("java", _mbean, "webClient", "ALL") : null)

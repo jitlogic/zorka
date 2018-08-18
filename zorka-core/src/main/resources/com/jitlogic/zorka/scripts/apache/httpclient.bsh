@@ -110,12 +110,12 @@ __apache_httpclient() {
   );
 
 
-  headers_processor_4x(String attr) {
+  headers_processor_4x(String attr, String prefix) {
       process(rec) {
           req = rec.get(attr);
           if (req != null && req.getAllHeaders() != null) {
               for (hdr : req.getAllHeaders()) {
-                  tracer.newAttr("ReqHdr__" + hdr.getName(), ""+hdr.getValue());
+                  tracer.newAttr(prefix + hdr.getName(), ""+hdr.getValue());
               }
           }
           return rec;
@@ -161,8 +161,8 @@ __apache_httpclient() {
       .onError(tracer.flags(tracer.SUBMIT_TRACE))
       .onSubmit(
         _trace ? spy.subchain(
-          headers_processor_4x("RET"),
-          headers_processor_4x("REQ")
+          headers_processor_4x("RET", "HdrIn__"),
+          headers_processor_4x("REQ", "HdrOut__")
         ) : null)
       .include(spy.byMethod(0, "org.apache.**", "doExecute",
         "org.apache.http.client.methods.CloseableHttpResponse",

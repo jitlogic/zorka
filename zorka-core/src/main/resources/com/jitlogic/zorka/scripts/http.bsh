@@ -233,7 +233,7 @@ __http() {
           }
 
           resp = rec.get("RESP");
-          if (hdrOut && resp != null && resp.getHeaderNames() != null) {
+          if (hdrOut && resp != null && util.get(resp, "headerNames") != null) {
               for (name : resp.getHeaderNames()) {
                   hdrs = resp.getHeaders(name);
                   if (hdrs != null) {

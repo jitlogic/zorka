@@ -50,7 +50,8 @@ __jetty6() {
         tracer.filterBy("STATUS", null, http._errors, null, null),
         tracer.attr("USER", "USER"),
         http._params ? http.param_processor() : null,
-        http._cookies ? http.cookies_processor(true, false) : null
+        http._cookies ? http.cookies_processor(true, false) : null,
+        http._headers ? http.headers_processor(false, true) : null
       ) : null,
       http._slow_chain,
       spy.subchain(
