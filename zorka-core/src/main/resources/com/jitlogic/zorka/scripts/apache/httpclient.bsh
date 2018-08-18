@@ -84,9 +84,9 @@ __apache_httpclient() {
       return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
   }
 
-
+  // For Apache HTTP Client 3.x
   spy.add(
-    spy.instrument("APACHE_HTTPCLIENT_EXECUTE")
+    spy.instrument("APACHE_HTTPCLIENT3_EXECUTE")
       .onEnter(spy.fetchArg("METHOD", 2),
         _trace ? spy.subchain(
           tracer.begin("HTTP_CLI", _traceTime),
@@ -109,19 +109,7 @@ __apache_httpclient() {
           "org.apache.commons.httpclient.HttpState"))
   );
 
-  headers_processor1() {
-      process(rec) {
-          req = rec.get("REQ");
-          if (req != null && req.getAllHeaders() != null) {
-              for (hdr : req.getAllHeaders()) {
-                  tracer.newAttr("ReqHdr__" + hdr.getName(), ""+hdr.getValue());
-              }
-          }
-          return rec;
-      }
-      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
-  }
-
+/*
   spy.add(
     spy.instrument("APACHE_HTTPCLIENT_EXECUTE1")
       .onEnter(spy.fetchArg("HOST", 1), spy.fetchArg("REQ", 2),
@@ -153,7 +141,7 @@ __apache_httpclient() {
         ) : null)
       .onReturn(spy.fetchRetVal("RET"),
         _trace ? spy.subchain(
-          tracer.formatAttr("STATUS", "${RET.status}"),
+          tracer.formatAttr("STATUS", "${RET.status|RET.statusCode}"),
           tracer.formatAttr("STATUS_LINE", "${RET.statusLine}")
         ) : null)
       .onError(tracer.flags(tracer.SUBMIT_TRACE))
@@ -163,6 +151,47 @@ __apache_httpclient() {
         ) : null)
       .include(spy.byMethod(0, "org.apache.http.**", "execute", "org.apache.http.HttpResponse",
         "org.apache.http.HttpRequest", "org.apache.http.HttpClientConnection", "org.apache.http.HttpContext")));
+
+*/
+
+  headers_processor_4x(String attr) {
+      process(rec) {
+          req = rec.get(attr);
+          if (req != null && req.getAllHeaders() != null) {
+              for (hdr : req.getAllHeaders()) {
+                  tracer.newAttr("ReqHdr__" + hdr.getName(), ""+hdr.getValue());
+              }
+          }
+          return rec;
+      }
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+  // For Apache HTTP Client 4.x
+  spy.add(
+    spy.instrument("APACHE_HTTPCLIENT_4_DO_EXECUTE")
+      .onEnter(spy.fetchArg("REQ", 2), spy.fetchArg("TGT", 1),
+        _trace ? spy.subchain(
+          tracer.begin("HTTP_CLI", _traceTime),
+          tracer.formatAttr("METHOD", "${REQ.requestLine.method}"),
+          tracer.formatAttr("URI", "${REQ.requestLine.uri}"),
+          tracer.formatAttr("HOST", "${TGT.hostName}:${TGT.port}}")
+        ) : null)
+      .onReturn(spy.fetchRetVal("RET"),
+        _trace ? spy.subchain(
+          tracer.formatAttr("STATUS", "${RET.statusLine.statusCode}"),
+          tracer.formatAttr("STATUS_LINE", "${RET.statusLine.reasonPhrase}")
+        ) : null)
+      .onError(tracer.flags(tracer.SUBMIT_TRACE))
+      .onSubmit(
+        _trace ? spy.subchain(
+          headers_processor_4x("RET"),
+          headers_processor_4x("REQ")
+        ) : null)
+      .include(spy.byMethod(0, "org.apache.**", "doExecute",
+        "org.apache.http.client.methods.CloseableHttpResponse",
+        "org.apache.http.HttpHost", "org.apache.http.HttpRequest",
+        "org.apache.http.protocol.HttpContext")));
 
   if (zorka.boolCfg("zabbix.active")) {
     zorka.require("zabbix.bsh");
