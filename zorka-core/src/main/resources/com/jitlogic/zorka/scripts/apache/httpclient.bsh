@@ -66,7 +66,7 @@ __apache_httpclient() {
   }
 
 
-  dtrace_req() {
+  dtrace_req_3x() {
       process(rec) {
         ds = rec.get("DTRACE");
         m = rec.get("METHOD");
@@ -93,7 +93,7 @@ __apache_httpclient() {
           tracer.formatAttr("URI", "${METHOD.URI}"),
           tracer.formatAttr("METHOD", "${METHOD.name}"),
           _dtrace_enabled ? tracer.dtraceOutput() : null,
-          _dtrace_enabled ? dtrace_req() : null) : null)
+          _dtrace_enabled ? dtrace_req_3x() : null) : null)
       .onReturn(spy.fetchRetVal("RET"), _trace ? tracer.attr("RET", "RET") : null)
       .onError(tracer.flags(tracer.SUBMIT_TRACE))
       .onSubmit(
@@ -109,50 +109,6 @@ __apache_httpclient() {
           "org.apache.commons.httpclient.HttpState"))
   );
 
-/*
-  spy.add(
-    spy.instrument("APACHE_HTTPCLIENT_EXECUTE1")
-      .onEnter(spy.fetchArg("HOST", 1), spy.fetchArg("REQ", 2),
-        _trace ? spy.subchain(
-          tracer.begin("HTTP_CLI", _traceTime),
-          tracer.formatAttr("HOST", "${HOST}")
-        ) : null)
-      .onReturn(spy.fetchRetVal("RET"),
-        _trace ? spy.subchain(
-          tracer.formatAttr("STATUS", "${RET.status}"),
-          tracer.formatAttr("STATUS_LINE", "${RET.statusLine}")
-        ) : null)
-      .onError(tracer.flags(tracer.SUBMIT_TRACE))
-      .onSubmit(
-        _trace ? spy.subchain(
-          headers_processor1()
-        ) : null)
-      .include(spy.byMethod(0, "org.apache.http.**", "execute", "org.apache.http.HttpResponse",
-        "org.apache.http.HttpHost", "org.apache.http.HttpRequest", "org.apache.http.HttpContext")));
-
-
-  spy.add(
-    spy.instrument("APACHE_HTTPCLIENT_EXECUTE2")
-      .onEnter(spy.fetchArg("REQ", 1), spy.fetchArg("CONN", 2),
-        _trace ? spy.subchain(
-          tracer.begin("HTTP_CLI", _traceTime),
-          tracer.formatAttr("URI", "${REQ.requestLine}"),
-          tracer.formatAttr("HOST", "${CONN.remoteAddress}:${CONN.remotePort}}")
-        ) : null)
-      .onReturn(spy.fetchRetVal("RET"),
-        _trace ? spy.subchain(
-          tracer.formatAttr("STATUS", "${RET.status|RET.statusCode}"),
-          tracer.formatAttr("STATUS_LINE", "${RET.statusLine}")
-        ) : null)
-      .onError(tracer.flags(tracer.SUBMIT_TRACE))
-      .onSubmit(
-        _trace ? spy.subchain(
-          headers_processor1()
-        ) : null)
-      .include(spy.byMethod(0, "org.apache.http.**", "execute", "org.apache.http.HttpResponse",
-        "org.apache.http.HttpRequest", "org.apache.http.HttpClientConnection", "org.apache.http.HttpContext")));
-
-*/
 
   headers_processor_4x(String attr) {
       process(rec) {
@@ -167,6 +123,24 @@ __apache_httpclient() {
       return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
   }
 
+  dtrace_req_4x() {
+      process(rec) {
+        ds = rec.get("DTRACE");
+        m = rec.get("REQ");
+        if (ds != null && m != null) {
+          m.addHeader(tracer.DTRACE_UUID_HDR, ds.getUuid());
+          m.addHeader(tracer.DTRACE_TID_HDR, rec.get("DTRACE_OUT"));
+          xtt = rec.get(tracer.DTRACE_XTT);
+          if (xtt != null) {
+              m.addHeader(tracer.DTRACE_XTT_HDR, xtt.toString());
+          }
+        }
+
+        return rec;
+      }
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
   // For Apache HTTP Client 4.x
   spy.add(
     spy.instrument("APACHE_HTTPCLIENT_4_DO_EXECUTE")
@@ -175,7 +149,9 @@ __apache_httpclient() {
           tracer.begin("HTTP_CLI", _traceTime),
           tracer.formatAttr("METHOD", "${REQ.requestLine.method}"),
           tracer.formatAttr("URI", "${REQ.requestLine.uri}"),
-          tracer.formatAttr("HOST", "${TGT.hostName}:${TGT.port}}")
+          tracer.formatAttr("HOST", "${TGT.hostName}:${TGT.port}}"),
+          _dtrace_enabled ? tracer.dtraceOutput() : null,
+          _dtrace_enabled ? dtrace_req_4x() : null
         ) : null)
       .onReturn(spy.fetchRetVal("RET"),
         _trace ? spy.subchain(
