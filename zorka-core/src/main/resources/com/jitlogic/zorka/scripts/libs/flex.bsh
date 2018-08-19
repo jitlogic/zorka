@@ -1,0 +1,76 @@
+/**
+ * Copyright 2012-2018 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+zorka.require(
+  "libs.bsh",
+  "tracer.bsh",
+  "audit.bsh"
+);
+
+__flex() {
+
+  zorka.defCfg("flex.trace", zorka.boolCfg("tracer"));
+  zorka.defCfg("flex.trace.time", zorka.longCfg("tracer.min.trace.time"));
+
+  zorka.defCfg("flex.stats", "yes");
+  zorka.defCfg("flex.stats.mbean", "zorka:type=ZorkaStats,name=Flex");
+
+  _trace = zorka.boolCfg("flex.trace");
+  _traceTime = zorka.longCfg("flex.trace.time");
+  _stats = zorka.boolCfg("flex.stats");
+  _mbean = zorka.stringCfg("flex.stats.mbean");
+
+
+  proc_headers(prefix) {
+    process(rec) {
+      hdrs = rec.get("MSG").getHeaders();
+      if (hdrs != null) {
+        for (e : hdrs.entrySet()) {
+          k = e.getKey();
+          v = e.getValue();
+          if (v != null) {
+            tracer.newAttr(prefix+k, ""+v);
+          }
+        }
+      }
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+  spy.add(
+    spy.instrument("FLEX_REMOTING_SERVICE_1")
+    .onEnter(spy.fetchArg("MSG", 1),
+      _trace ? spy.subchain(
+        tracer.begin("FLEX", _traceTime),
+        tracer.formatAttr("DEST", "${MSG.destination}"),
+        tracer.formatAttr("CLIENT_ID", "${MSG.clientId}"),
+        tracer.formatAttr("MESSAGE", "${MSG.body}"),
+        tracer.formatAttr("MESSAGE_ID", "${MSG.messageId}"),
+        proc_headers("HdrIn__")
+      ) : null)
+    .onError(tracer.flags(tracer.SUBMIT_TRACE))
+    .onSubmit(
+      _stats ? spy.zorkaStats("java", _mbean, "remoting", "ALL") : null,
+      _stats ? spy.zorkaStats("java", _mbean, "remoting", "${MSG.destination}") : null)
+    .include(spy.byMethod(0, "flex.messaging.services.RemotingService", "serviceMessage",
+      "java.lang.Object", "flex.messaging.messages.Message")));
+
+  return this;
+}
+
+flex = __flex();
