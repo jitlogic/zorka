@@ -23,7 +23,7 @@ zorka.require(
 
 __flex() {
 
-  zorka.defCfg("flex.trace", zorka.boolCfg("tracer"));
+  zorka.defCfg("flex.trace", "no");
   zorka.defCfg("flex.trace.time", zorka.longCfg("tracer.min.trace.time"));
 
   zorka.defCfg("flex.stats", "yes");
@@ -55,20 +55,58 @@ __flex() {
   spy.add(
     spy.instrument("FLEX_REMOTING_SERVICE_1")
     .onEnter(spy.fetchArg("MSG", 1),
+      tracer.formatAttr("DEST", "${MSG.destination}"),
+      tracer.formatAttr("CLIENT_ID", "${MSG.clientId}"),
+      tracer.formatAttr("MESSAGE_ID", "${MSG.messageId}"),
       _trace ? spy.subchain(
         tracer.begin("FLEX", _traceTime),
-        tracer.formatAttr("DEST", "${MSG.destination}"),
-        tracer.formatAttr("CLIENT_ID", "${MSG.clientId}"),
-        tracer.formatAttr("MESSAGE", "${MSG.body}"),
-        tracer.formatAttr("MESSAGE_ID", "${MSG.messageId}"),
         proc_headers("HdrIn__")
       ) : null)
     .onError(tracer.flags(tracer.SUBMIT_TRACE))
     .onSubmit(
-      _stats ? spy.zorkaStats("java", _mbean, "remoting", "ALL") : null,
-      _stats ? spy.zorkaStats("java", _mbean, "remoting", "${MSG.destination}") : null)
+      _stats ? spy.zorkaStats("java", _mbean, "stats", "ALL") : null,
+      _stats ? spy.zorkaStats("java", _mbean, "byDest", "${MSG.destination}") : null)
     .include(spy.byMethod(0, "flex.messaging.services.RemotingService", "serviceMessage",
       "java.lang.Object", "flex.messaging.messages.Message")));
+
+  discovery(attr, tag) {
+    return zabbix.discovery(
+      zorka.query("java", _mbean, "name", "type")
+        .get(attr)
+        .listAs("**", tag)
+        .getValueAs("description", "DESC"));
+  }
+
+  calls(attr, tag) {
+    calls = zorka.jmx("java", _mbean, attr, tag, "calls");
+    return calls != null ? calls : 0;
+  }
+
+  errors(attr, tag) {
+    errors = zorka.jmx("java", _mbean, attr, tag, "errors");
+    return errors != null ? errors : 0;
+  }
+
+  peak(attr, tag) {
+    peak = zorka.jmx("java",  _mbean, attr, tag, "maxTimeCLR");
+    return peak != null ? peak : 0;
+  }
+
+  threads(attr, tag) {
+    threads = zorka.jmx("java",  _mbean, attr, tag, "maxThreadsCLR");
+  }
+
+  avg1(attr, tag) {
+    return zorka.rate("java", _mbean, attr, tag, "time", "calls", "AVG1");
+  }
+
+  avg5(attr, tag) {
+    return zorka.rate("java", _mbean, attr, tag, "time", "calls", "AVG5");
+  }
+
+  avg15(attr, tag) {
+    return zorka.rate("java", _mbean, attr, tag, "time", "calls", "AVG15");
+  }
 
   return this;
 }
