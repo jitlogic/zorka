@@ -82,7 +82,7 @@ __jvm() {
           "sun.font.**",
           "sun.java2d.**",
           "com.sun.media.imageioimpl.**",
-          "sun.invoke.util.Wrapper",
+          "sun.invoke.util.**",
           "sun.misc.CharacterDecoder",
           "sun.misc.FDBigInteger",
           "sun.misc.FpUtils",

@@ -340,4 +340,9 @@ public class SpyMatcherSet {
     public void clear() {
         matchers.clear();
     }
+
+    @Override
+    public String toString() {
+        return matchers.toString();
+    }
 }

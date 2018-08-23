@@ -303,14 +303,17 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
         List<SpyDefinition> found = new ArrayList<SpyDefinition>();
 
-        if (log.isDebugEnabled()) {
-            log.debug("Encountered class: %s", className);
+        if (log.isTraceEnabled()) {
+            log.trace("Encountered class: %s", className);
         }
 
         long st1 = System.nanoTime();
         for (Map.Entry<String, SpyDefinition> e : sdefs.entrySet()) {
             SpyDefinition sdef = e.getValue();
             if (sdef.getMatcherSet().classMatch(clazzName)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("MATCH: Class: " + clazzName + " matcher: " + sdef.getMatcherSet());
+                }
                 found.add(sdef);
             }
         }
