@@ -46,17 +46,18 @@ __quartz() {
         tracer.formatAttr("NAME", "${KEY.name|DETAIL.name}"),
         tracer.formatAttr("GROUP", "${KEY.group|DETAIL.group}"),
         spy.get("DESCRIPTION", "DETAIL", "description"), tracer.attr("DESCRIPTION", "DESCRIPTION"),
-        tracer.formatAttr("DURABLE", "${DETAIL.durable}"),
+        spy.get("DURABLE", "DETAIL", "durable"), tracer.attr("DURABLE", "DURABLE"),
         spy.get("PERSIST", "DETAIL", "persistJobDataAfterExecution"), tracer.attr("PERSIST", "PERSIST"),
         spy.get("NO_CONCURRENT", "DETAIL", "concurrentExecutionDisabled"), tracer.attr("NO_CONCURRENT", "NO_CONCURRENT"),
         spy.get("VOLATILE", "DETAIL", "volatile"), tracer.attr("VOLATILE", "VOLATILE"),
         spy.get("STATEFUL", "DETAIL", "stateful"), tracer.attr("STATEFUL", "STATEFUL"),
-        tracer.formatAttr("RECOVERING", "${CTX.recovering}"),
+        spy.get("RECOVERING", "CTX", "recovering"), tracer.attr("RECOVERING", "RECOVERING"),
         tracer.formatAttr("REFIRE_COUNT", "${CTX.refireCount}"),
         tracer.formatAttr("FIRE_TIME", "${CTX.fireTime}"),
         tracer.formatAttr("SCHEDULED_FIRE_TIME", "${CTX.scheduledFireTime}"),
         tracer.formatAttr("NEXT_FIRE_TIME", "${CTX.nextFireTime}"),
-        spy.get("FIRE_INSTANCE_ID", "CTX", "fireInstanceId"), tracer.attr("FIRE_INSTANCE_ID", "FIRE_INSTANCE_ID")
+        spy.get("FIRE_INSTANCE_ID", "CTX", "fireInstanceId"), tracer.attr("FIRE_INSTANCE_ID", "FIRE_INSTANCE_ID"),
+        _dtrace_enabled ? tracer.dtraceInput(zorka.longCfg("quartz.trace.time")) : null
       ) : null)
     .onError(tracer.markError())
     .onSubmit(
