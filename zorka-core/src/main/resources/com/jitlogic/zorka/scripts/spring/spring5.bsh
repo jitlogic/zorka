@@ -61,7 +61,7 @@ __spring() {
         .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("ARGS", 1),
           spy.get("BT", "THIS", "beanType"),
           _trace ? spy.subchain(
-            tracer.begin("SPRING_INVOKE", _traceTime),
+            tracer.begin("SPRING", _traceTime),
             tracer.formatAttr("CLASS", "${BT.name}"),
             tracer.formatAttr("METHOD", "${THIS.method.name}"),
             __invokeArgsProcessor()

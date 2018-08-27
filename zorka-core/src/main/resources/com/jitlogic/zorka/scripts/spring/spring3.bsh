@@ -157,7 +157,7 @@ __spring() {
       spy.get("ARGS", "INV", "arguments"),
       spy.get("ATTRS", "INV", "attributes"),
       _trace ? spy.subchain(
-        tracer.begin("SPRING_REMOTING", zorka.longCfg("spring.trace.time")),
+        tracer.begin("SPRING", zorka.longCfg("spring.trace.time")),
         tracer.formatAttr("SERVICE_URL", "${CFG.serviceUrl}"),
         tracer.formatAttr("CODEBASE_URL", "${CFG.codebaseUrl}"),
         tracer.formatAttr("METHOD", "${INV.methodName}"),
@@ -220,7 +220,7 @@ __spring() {
     spy.instrument("SPRING_WEB_HTTP_CLIENT")
       .onEnter(spy.fetchArg("THIS", 0),
         _trace ? spy.subchain(
-          tracer.begin("SPRING_HTTP", zorka.longCfg("spring.trace.time")),
+          tracer.begin("SPRING", zorka.longCfg("spring.trace.time")),
           tracer.formatAttr("URI", "${THIS.URI}"),
           tracer.formatAttr("METHOD", "${THIS.method}")
         ) : null)
