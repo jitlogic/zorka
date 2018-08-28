@@ -438,6 +438,10 @@ public class TracerLib {
         return new DTraceInputProcessor(this, dtraceLocal, threshold);
     }
 
+    public SpyProcessor dtraceOutput(boolean nextTid, boolean setAttrs) {
+        return new DTraceOutputProcessor(this, dtraceLocal, nextTid, setAttrs);
+    }
+
     public SpyProcessor dtraceOutput() {
         return new DTraceOutputProcessor(this, dtraceLocal);
     }

@@ -26,12 +26,22 @@ import static com.jitlogic.zorka.core.spy.TracerLib.*;
 
 public class DTraceOutputProcessor implements SpyProcessor {
 
+    private boolean nextTid;
+    private boolean setAttrs;
+
     private TracerLib tracer;
     private ThreadLocal<DTraceState> dtraceLocal;
 
     public DTraceOutputProcessor(TracerLib tracer, ThreadLocal<DTraceState> dtraceLocal) {
+        this(tracer, dtraceLocal, true, true);
+    }
+
+    public DTraceOutputProcessor(TracerLib tracer, ThreadLocal<DTraceState> dtraceLocal,
+                                 boolean nextTid, boolean setAttrs) {
         this.tracer = tracer;
         this.dtraceLocal = dtraceLocal;
+        this.nextTid = nextTid;
+        this.setAttrs = setAttrs;
     }
 
     @Override
@@ -40,7 +50,7 @@ public class DTraceOutputProcessor implements SpyProcessor {
 
         if (ds != null) {
             String uuid = ds.getUuid();
-            String tid = ds.nextTid();
+            String tid = nextTid ? ds.nextTid() : ds.lastTid();
 
             rec.put(DTRACE_STATE, ds);
             rec.put(DTRACE_OUT, tid);
@@ -51,8 +61,10 @@ public class DTraceOutputProcessor implements SpyProcessor {
                 rec.put(DTRACE_XTT, Math.max(0, ds.getThreshold() - ((Long)rec.get("T1")-ds.getTstart()) / 1000000L));
             }
 
-            tracer.newAttr(DTRACE_UUID, uuid);
-            tracer.newAttr(DTRACE_OUT, uuid + tid);
+            if (setAttrs) {
+                tracer.newAttr(DTRACE_UUID, uuid);
+                tracer.newAttr(DTRACE_OUT, uuid + tid);
+            }
         }
 
         return rec;

@@ -63,6 +63,10 @@ public class DTraceState {
         return String.format("%s%s%x", tid, DTRACE_SEP, seq);
     }
 
+    public synchronized String lastTid() {
+        return String.format("%s%s%x", tid, DTRACE_SEP, seq);
+    }
+
     @Override
     public String toString() {
         return "DT(" + uuid + ", '" + tid + "', " + threshold + ")";
