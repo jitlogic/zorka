@@ -36,12 +36,12 @@ public class MainSubmitter {
     /**
      * Submitter receiving full submissions
      */
-    private static SpySubmitter submitter;
+    private static volatile SpySubmitter submitter;
 
     /**
      * Tracer receiving trace events
      */
-    private static Tracer tracer;
+    private static volatile Tracer tracer;
 
     /**
      * Thread local
@@ -161,7 +161,7 @@ public class MainSubmitter {
      *
      * @param submitter spy submitter
      */
-    public static void setSubmitter(SpySubmitter submitter) {
+    public synchronized static void setSubmitter(SpySubmitter submitter) {
         MainSubmitter.submitter = submitter;
     }
 
@@ -171,7 +171,7 @@ public class MainSubmitter {
      *
      * @param tracer
      */
-    public static void setTracer(Tracer tracer) {
+    public synchronized static void setTracer(Tracer tracer) {
         MainSubmitter.tracer = tracer;
     }
 
