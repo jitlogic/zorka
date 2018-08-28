@@ -196,8 +196,8 @@ public class SpyClassVisitor extends ClassVisitor {
         boolean doTrace = tracer.getMatcherSet().methodMatch(className, classAnnotations, classInterfaces,
                 access, methodName, methodDesc, null) || (tracer.isTraceSpyMethods() && ctxs.size() > 0);
 
-        if (doTrace && log.isTraceEnabled()) {
-            log.trace("Instrumenting method (for trace): " + className + "." + methodName + " " + methodDesc);
+        if (doTrace && log.isDebugEnabled()) {
+            log.debug("Instrumenting method (for trace): " + className + "." + methodName + " " + methodDesc);
         }
 
         if (ctxs.size() > 0 || doTrace) {

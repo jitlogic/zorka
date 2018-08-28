@@ -76,6 +76,8 @@ public class MainSubmitter {
             if (submitter != null) {
                 inSubmit.set(true);
                 submitter.submit(stage, id, submitFlags, vals);
+            } else if (log.isDebugEnabled()) {
+                log.debug("Skipping submit because submitter is not set.");
             }
         } catch (EvalError e) {
             log.debug("Error submitting value from instrumented code: ", e);
