@@ -285,9 +285,9 @@ public class AgentInstance implements ZorkaService {
 
     private synchronized Executor getConnExecutor() {
         if (connExecutor == null) {
-            int rt = config.intCfg("zorka.req.threads", 8);
+            int rt = config.intCfg("zorka.req.threads", 16);
             connExecutor = new ThreadPoolExecutor(rt, rt, 1000, TimeUnit.MILLISECONDS,
-                    new ArrayBlockingQueue<Runnable>(config.intCfg("zorka.req.queue", 64)),
+                    new ArrayBlockingQueue<Runnable>(config.intCfg("zorka.req.queue", 256)),
                     new DaemonThreadFactory("ZORKA-conn-pool"));
         }
         return connExecutor;
@@ -296,9 +296,9 @@ public class AgentInstance implements ZorkaService {
 
     private synchronized ExecutorService getMainExecutor() {
         if (mainExecutor == null) {
-            int rt = config.intCfg("zorka.req.threads", 8);
+            int rt = config.intCfg("zorka.req.threads", 16);
             mainExecutor = new ThreadPoolExecutor(rt, rt, 1000, TimeUnit.MILLISECONDS,
-                    new ArrayBlockingQueue<Runnable>(config.intCfg("zorka.req.queue", 64)),
+                    new ArrayBlockingQueue<Runnable>(config.intCfg("zorka.req.queue", 256)),
                     new DaemonThreadFactory("ZORKA-main-pool"));
         }
         return mainExecutor;
