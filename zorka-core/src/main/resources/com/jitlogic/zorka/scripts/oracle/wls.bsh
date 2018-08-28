@@ -122,6 +122,8 @@ __wls() {
 
       "com.oracle.injection.**",
 
+      "oracle.net.ns.NetInputStream",
+
       "weblogic.application.ApplicationAcc**",
       "weblogic.application.descriptor.ReaderEvent2",
       "weblogic.application.io.DescriptorFinder",
@@ -132,6 +134,7 @@ __wls() {
       "weblogic.diagnostics.instrumentation.**",
       "weblogic.j2ee.ApplicationManager/loadClass",
       "weblogic.i18ntools.**",
+      "weblogic.jdbc.wrapper.**",
       "weblogic.jsp.**",
       "weblogic.kernel.FinalThread**",
       "weblogic.kernel.ResettableThread**",
