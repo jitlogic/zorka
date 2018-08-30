@@ -24,6 +24,7 @@ import javax.management.*;
 
 import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.util.FileTrapper;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
@@ -717,6 +718,9 @@ public class ZorkaLib implements ZorkaService {
         return mbsRegistry.getOrRegister(mbsName, beanName, attrName, obj, desc);
     }
 
+    public MethodCallStatistics registerZorkaStats(String mbsName, String beanName, String attrName, String desc) {
+        return mbsRegistry.getOrRegister(mbsName, beanName, attrName, new MethodCallStatistics(), desc);
+    }
 
     /**
      * Creates JMX lister object that can be used to create rankings
