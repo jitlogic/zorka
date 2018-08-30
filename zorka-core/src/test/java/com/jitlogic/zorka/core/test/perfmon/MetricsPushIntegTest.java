@@ -71,7 +71,6 @@ public class MetricsPushIntegTest extends ZorkaFixture {
         tracer.output(perfmon.influxPushOutput(zorka.mapCfg("influxdb"), cattr, attrFilter, sampleFilter, httpOutput));
         taskScheduler.runCycle("*");
 
-        System.out.println(httpOutput);
         assertEquals("Only two sets of metrics should be visible.",
                 1, httpOutput.getResults().size());
         // TODO check results in more detail: syntax, filtering (no diagnostics), attrs (no type) etc.
@@ -87,7 +86,6 @@ public class MetricsPushIntegTest extends ZorkaFixture {
                 cattr, attrFilter, sampleFilter, httpOutput));
         taskScheduler.runCycle("*");
 
-        System.out.println(httpOutput);
         assertTrue("Only two sets of metrics should be visible.", httpOutput.getResults().size() > 0);
         // TODO check results in more detail: json schema, filtering (no diagnostics), attrs (no type), etc.
     }
@@ -101,7 +99,6 @@ public class MetricsPushIntegTest extends ZorkaFixture {
                 cattr, attrFilter, sampleFilter, httpOutput));
         taskScheduler.runCycle("*");
 
-        System.out.println(httpOutput);
         assertTrue("Only two sets of metrics should be visible.", httpOutput.getResults().size() > 0);
         // TODO check results in more detail: json schema, filtering (no diagnostics), attrs (no type), etc.
     }
@@ -114,7 +111,6 @@ public class MetricsPushIntegTest extends ZorkaFixture {
                 cattr, attrFilter, sampleFilter, httpOutput));
         taskScheduler.runCycle("*");
 
-        //System.out.println(httpOutput);
         assertEquals("Only two sets of metrics should be visible.",
                 1, httpOutput.getResults().size());
         // TODO check results in more detail: json schema, filtering (no diagnostics), attrs (no type), etc.
