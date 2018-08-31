@@ -545,12 +545,9 @@ public class SpyLib {
      * @param keyExpr  key expression
      * @return collector object
      */
-    public SpyProcessor zorkaStatsDesc(String mbsName, String beanName, String attrName, String keyExpr, String descTempl) {
-        return zorkaStatsDesc(mbsName, beanName, attrName, keyExpr, descTempl, "T");
-    }
-
     public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr) {
-        return zorkaStatsDesc(mbsName, beanName, attrName, keyExpr, "T");
+        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr,
+                "T", null, ZorkaStatsCollector.ACTION_STATS);
     }
 
     /**
@@ -564,15 +561,10 @@ public class SpyLib {
      * @param timeField field containing execution time (in nanoseconds)
      * @return collector object
      */
-    public SpyProcessor zorkaStatsDesc(String mbsName, String beanName, String attrName, String keyExpr,
-                                       String descTempl, String timeField) {
-        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr, descTempl,
-            timeField, null, ZorkaStatsCollector.ACTION_STATS);
-    }
-
     public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr,
                                    String timeField) {
-        return zorkaStatsDesc(mbsName, beanName, attrName, keyExpr, "Call stats", timeField);
+        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr,
+                timeField, null, ZorkaStatsCollector.ACTION_STATS);
     }
 
     /**
@@ -587,16 +579,12 @@ public class SpyLib {
      * @param throughputField field containing throughput value (or null to skip throughput calculation)
      * @return collector object
      */
-    public SpyProcessor zorkaStatsDesc(String mbsName, String beanName, String attrName, String keyExpr,
-                                       String descTempl, String timeField, String throughputField) {
-        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr, descTempl,
-                                       timeField, throughputField, ZorkaStatsCollector.ACTION_STATS);
-    }
-
     public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr,
                                    String timeField, String throughputField) {
-        return zorkaStatsDesc(mbsName, beanName, attrName, keyExpr, "Call stats", timeField, throughputField);
+        return new ZorkaStatsCollector(mbsRegistry, mbsName, beanName, attrName, keyExpr,
+                timeField, throughputField, ZorkaStatsCollector.ACTION_STATS);
     }
+
 
     /**
      * Creates method call statistics collector object. It will maintain zorka call statistics and update them with
@@ -606,22 +594,15 @@ public class SpyLib {
      * @param beanName        bean name
      * @param attrName        attribute name
      * @param keyExpr         key expression
-     * @param descTempl       description (or description template)
      * @param timeField       field containing execution time (in nanoseconds)
      * @param throughputField field containing throughput value (or null to skip throughput calculation)
      * @param actions         which actions will be performed: ENTER, EXIT or STATS (or combination of them)
      * @return collector object
      */
-    public SpyProcessor zorkaStatsDesc(String mbsName, String beanName, String attrName, String keyExpr, String descTempl,
-                                       String timeField, String throughputField, int actions) {
-        return new ZorkaStatsCollector(
-            mbsRegistry, mbsName, beanName, attrName, keyExpr, descTempl, timeField, throughputField, actions);
-    }
-
-
     public SpyProcessor zorkaStats(String mbsName, String beanName, String attrName, String keyExpr,
                                        String timeField, String throughputField, int actions) {
-        return zorkaStatsDesc(mbsName, beanName, attrName, keyExpr,"Call stats", timeField, throughputField, actions);
+        return new ZorkaStatsCollector(
+            mbsRegistry, mbsName, beanName, attrName, keyExpr, timeField, throughputField, actions);
     }
 
     /**

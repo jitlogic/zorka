@@ -38,7 +38,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
     @Test
     public void testCollectToStatsMbeanWithoutPlaceholders() throws Exception {
         ZorkaStatsCollector collector = new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=Test", "stats",
-                "test", "Call stats", "T", null, ZorkaStatsCollector.ACTION_STATS);
+                "test", "T", null, ZorkaStatsCollector.ACTION_STATS);
 
         SpyContext ctx = new SpyContext(spy.instance("x"), "TClass", "testMethod", "()V", 1);
 
@@ -49,15 +49,13 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
         MethodCallStatistics stats = (MethodCallStatistics) getAttr(testMbs, "test:name=Test", "stats");
 
         assertNotNull(stats.getStatistic("test"));
-
-        assertEquals("Call stats", stats.getStatistic("test").getDescription());
     }
 
 
     @Test
     public void testCollectorToStatsMbeanWithMethodNamePlaceholder() throws Exception {
         ZorkaStatsCollector collector = new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=Test", "stats",
-                "${methodName}",  "Call stats","T", null, ZorkaStatsCollector.ACTION_STATS);
+                "${methodName}",  "T", null, ZorkaStatsCollector.ACTION_STATS);
 
         SpyContext ctx = new SpyContext(spy.instance("x"), "TClass", "testMethod", "()V", 1);
 
@@ -74,7 +72,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
     @Test
     public void testCollectoToStatsMbeanWithClassAndMethodNamePlaceholder() throws Exception {
         ZorkaStatsCollector collector = new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=${shortClassName}",
-                "stats", "${methodName}", "Call stats","T", null, ZorkaStatsCollector.ACTION_STATS);
+                "stats", "${methodName}", "T", null, ZorkaStatsCollector.ACTION_STATS);
 
         SpyContext ctx = new SpyContext(spy.instance("x"), "some.TClass", "testMethod", "()V", 1);
 
@@ -91,7 +89,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
     @Test
     public void testCollectToStatsWithKeyExpression() throws Exception {
         ZorkaStatsCollector collector = new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=${shortClassName}",
-                "stats", "${C1}",  "Call stsats","T", null, ZorkaStatsCollector.ACTION_STATS);
+                "stats", "${C1}", "T", null, ZorkaStatsCollector.ACTION_STATS);
 
         SpyContext ctx = new SpyContext(spy.instance("x"), "some.TClass", "testMethod", "()V", 1);
 
@@ -109,11 +107,11 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
     @Test
     public void testTwoCollectorsReportingToIndependentItemsInSingleZorkaStatsObject() throws Exception {
         new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=SomeBean",
-                    "stats", "AAA", "Call stats","T",
+                    "stats", "AAA","T",
                 null, ZorkaStatsCollector.ACTION_STATS);
 
         new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=SomeBean",
-                    "stats", "BBB", "Call stats", "T",
+                    "stats", "BBB", "T",
                     null, ZorkaStatsCollector.ACTION_STATS);
 
         MethodCallStatistics stats = (MethodCallStatistics) getAttr(testMbs, "test:name=SomeBean", "stats");
@@ -124,11 +122,11 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
     @Test
     public void testTwoCollectorsReportingToSingleZorkaStat() throws Exception {
         ZorkaStatsCollector c1 = new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=SomeBean",
-            "stats", "AAA",  "Call stats","T",
+            "stats", "AAA", "T",
                 null, ZorkaStatsCollector.ACTION_STATS);
 
         ZorkaStatsCollector c2 = new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=SomeBean",
-            "stats", "AAA", "Call stats","T",
+            "stats", "AAA", "T",
                 null, ZorkaStatsCollector.ACTION_STATS);
 
         SpyContext ctx = new SpyContext(spy.instance("x"), "some.TClass", "testMethod", "()V", 1);
@@ -145,7 +143,7 @@ public class ZorkaStatsCollectionUnitTest extends ZorkaFixture {
     @Test
     public void testThroughputCounting() throws Exception {
         ZorkaStatsCollector c1 = new ZorkaStatsCollector(mBeanServerRegistry, "test", "test:name=SomeBean",
-                "stats", "AAA", "Call stats", "T", "LEN", ZorkaStatsCollector.ACTION_STATS);
+                "stats", "AAA", "T", "LEN", ZorkaStatsCollector.ACTION_STATS);
 
         SpyContext ctx = new SpyContext(spy.instance("x"), "some.TClass", "testMethod", "()V", 1);
         c1.process(ZorkaUtil.<String, Object>map(".CTX", ctx, ".STAGE", ON_SUBMIT, ".STAGES", (1 << ON_RETURN), "T", 1L, "LEN", 100));
