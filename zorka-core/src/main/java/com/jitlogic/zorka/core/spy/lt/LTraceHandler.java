@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.lt;
 
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
@@ -32,9 +32,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class TraceBuilder {
+public class LTraceHandler extends TraceHandler {
 
-    private final static Logger log = LoggerFactory.getLogger(TraceBuilder.class);
+    private final static Logger log = LoggerFactory.getLogger(LTraceHandler.class);
 
 
     /**
@@ -49,8 +49,6 @@ public class TraceBuilder {
      */
     private TraceRecord ttop = new TraceRecord(null);
 
-    private boolean disabled;
-
     /**
      * Number of records collected so far
      */
@@ -62,12 +60,13 @@ public class TraceBuilder {
      *
      * @param output object completed traces will be submitted to
      */
-    public TraceBuilder(ZorkaSubmitter<SymbolicRecord> output, SymbolRegistry symbols) {
+    public LTraceHandler(ZorkaSubmitter<SymbolicRecord> output, SymbolRegistry symbols) {
         this.output = output;
         this.symbols = symbols;
     }
 
 
+    @Override
     public void traceBegin(int traceId, long clock, int flags) {
 
         if (ttop == null) {
@@ -117,7 +116,7 @@ public class TraceBuilder {
         ttop.setTime(tstamp);
         ttop.setCalls(ttop.getCalls() + 1);
 
-        if (numRecords > Tracer.getMaxTraceRecords()) {
+        if (numRecords > LTracer.getMaxTraceRecords()) {
             ttop.markFlag(TraceRecord.OVERFLOW_FLAG);
         }
 
@@ -188,20 +187,13 @@ public class TraceBuilder {
     }
 
 
+    @Override
     public Object getAttr(int attrId) {
         return realTop().getAttr(attrId);
     }
 
 
-    /**
-     * Returns given trace attribute.
-     *
-     * @param traceId positive number (trace id) if attribute has to be fetched from a top record of specific
-     *                trace, 0 if attribute has to be fetched from a top record of any trace, -1 if attribute
-     *                has to be fetched from current method;
-     * @param attrId  attribute ID
-     * @return  attribute value
-     */
+    @Override
     public Object getAttr(int traceId, int attrId) {
         TraceRecord tr = realTop();
         while (tr != null) {
@@ -215,15 +207,7 @@ public class TraceBuilder {
     }
 
 
-    /**
-     * Attaches attribute to current trace record (or any other record up the call stack).
-     *
-     * @param traceId positive number (trace id) if attribute has to be attached to a top record of specific
-     *                trace, 0 if attribute has to be attached to a top record of any trace, -1 if attribute
-     *                has to be attached to current method;
-     * @param attrId  attribute ID
-     * @param attrVal attribute value
-     */
+    @Override
     public void newAttr(int traceId, int attrId, Object attrVal) {
         TraceRecord tr = realTop();
 
@@ -235,16 +219,6 @@ public class TraceBuilder {
             }
             tr = tr.getParent();
         }
-    }
-
-
-    public void disable() {
-        disabled = true;
-    }
-
-
-    public void enable() {
-        disabled = false;
     }
 
 
@@ -266,7 +240,7 @@ public class TraceBuilder {
         // Submit data if trace marker found
         if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {
             int flags = ttop.getMarker().getFlags();
-            if (((ttop.getTime() >= ttop.getMarker().getMinimumTime() || ttop.getCalls() >= Tracer.getMinTraceCalls())
+            if (((ttop.getTime() >= ttop.getMarker().getMinimumTime() || ttop.getCalls() >= LTracer.getMinTraceCalls())
                 && 0 == (flags & TraceMarker.DROP_TRACE)) || 0 != (flags & TraceMarker.SUBMIT_TRACE)) {
                 submit(ttop);
                 AgentDiagnostics.inc(AgentDiagnostics.TRACES_SUBMITTED);
@@ -283,7 +257,7 @@ public class TraceBuilder {
 
         // Determine how the top of stack should be rolled back
         if (parent != null) {
-            if ((ttop.getTime() > Tracer.getMinMethodTime() || ttop.getErrors() > 0 || ttop.hasFlag(TraceRecord.FORCE_TRACE))
+            if ((ttop.getTime() > LTracer.getMinMethodTime() || ttop.getErrors() > 0 || ttop.hasFlag(TraceRecord.FORCE_TRACE))
                     || 0 != (ttop.getMarker().getFlags() & TraceMarker.ALL_METHODS)) {
 
 
@@ -333,7 +307,7 @@ public class TraceBuilder {
     private void reparentTop(TraceRecord parent) {
         // Drop interim record if necessary
         if (ttop.getMarker().hasFlag(TraceMarker.DROP_INTERIM) && ttop.isInterimDroppable()
-                && ttop.getTime() - ttop.getChild(0).getTime() < Tracer.getMinMethodTime()) {
+                && ttop.getTime() - ttop.getChild(0).getTime() < LTracer.getMinMethodTime()) {
             TraceRecord child = ttop.getChild(0);
             child.setCalls(ttop.getCalls());
             child.setErrors(ttop.getErrors());
@@ -355,13 +329,7 @@ public class TraceBuilder {
     }
 
 
-    /**
-     * Sets minimum trace execution time for currently recorded trace.
-     * If there is no trace being recorded just yet, this method will
-     * have no effect.
-     *
-     * @param minimumTraceTime (in nanoseconds)
-     */
+    @Override
     public void setMinimumTraceTime(long minimumTraceTime) {
         TraceRecord top = realTop();
         if (top.inTrace()) {
@@ -370,6 +338,7 @@ public class TraceBuilder {
     }
 
 
+    @Override
     public void markTraceFlags(int traceId, int flag) {
         for (TraceRecord tr = realTop(); tr != null; tr = tr.getParent()) {
             TraceMarker tm = tr.getMarker();
@@ -380,6 +349,7 @@ public class TraceBuilder {
         }
     }
 
+    @Override
     public void markRecordFlags(int flag) {
         TraceRecord tr = realTop();
         if (tr != null) {
@@ -388,6 +358,7 @@ public class TraceBuilder {
     }
 
 
+    @Override
     public boolean isInTrace(int traceId) {
         for (TraceRecord tr = realTop(); tr != null; tr = tr.getParent()) {
             TraceMarker tm = tr.getMarker();

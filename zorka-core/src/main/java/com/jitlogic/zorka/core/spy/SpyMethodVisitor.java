@@ -59,6 +59,11 @@ public class SpyMethodVisitor extends MethodVisitor {
     private static final String ERROR_METHOD = "traceError";
     private static final String ERROR_SIGNATURE = "(Ljava/lang/Throwable;)V";
 
+    private static final String ENTER_S_METHOD = "traceEnterS";
+    private static final String ENTER_S_SIGNATURE = "(I)V";
+    private static final String RETURN_S_METHOD = "traceReturnS";
+    private static final String ERROR_S_METHOD = "traceErrorS";
+
     /**
      * Access flags of (instrumented) method
      */
@@ -145,6 +150,8 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     private boolean prologEmitted = false;
 
+    private boolean streamingTracer = false;
+
     /**
      * Standard constructor.
      *
@@ -171,6 +178,7 @@ public class SpyMethodVisitor extends MethodVisitor {
         this.methodName = methodName;
         this.methodSignature = methodSignature;
         this.ctxs = ctxs;
+        this.streamingTracer = MainSubmitter.isStreamingTracer();
 
         argTypes = Type.getArgumentTypes(methodSignature);
         returnType = Type.getReturnType(methodSignature);
@@ -419,15 +427,24 @@ public class SpyMethodVisitor extends MethodVisitor {
      */
     private int emitTraceEnter(int classId, int methodId, int signatureId) {
 
-        emitLoadInt(classId);
-        emitLoadInt(methodId);
-        emitLoadInt(signatureId);
+        if (streamingTracer) {
+            int mid = symbolRegistry.methodId(classId, methodId, signatureId);
+            emitLoadInt(mid);
 
-        mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, ENTER_METHOD, ENTER_SIGNATURE);
+            mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, ENTER_S_METHOD, ENTER_S_SIGNATURE, false);
+            tracerProbesEmitted++;
 
-        tracerProbesEmitted++;
+            return 1;
+        } else {
+            emitLoadInt(classId);
+            emitLoadInt(methodId);
+            emitLoadInt(signatureId);
 
-        return 3;
+            mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, ENTER_METHOD, ENTER_SIGNATURE, false);
+            tracerProbesEmitted++;
+
+            return 3;
+        }
     }
 
 
@@ -437,7 +454,11 @@ public class SpyMethodVisitor extends MethodVisitor {
      * @return number of JVM stack slots consumed
      */
     private int emitTraceReturn() {
-        mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, RETURN_METHOD, RETURN_SIGNATURE);
+        if (streamingTracer) {
+            mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, RETURN_S_METHOD, RETURN_SIGNATURE, false);
+        } else {
+            mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, RETURN_METHOD, RETURN_SIGNATURE, false);
+        }
 
         tracerProbesEmitted++;
 
@@ -452,7 +473,12 @@ public class SpyMethodVisitor extends MethodVisitor {
      */
     private int emitTraceError() {
         mv.visitInsn(DUP);
-        mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, ERROR_METHOD, ERROR_SIGNATURE);
+
+        if (streamingTracer) {
+            mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, ERROR_S_METHOD, ERROR_SIGNATURE, false);
+        } else {
+            mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, ERROR_METHOD, ERROR_SIGNATURE, false);
+        }
 
         tracerProbesEmitted++;
 

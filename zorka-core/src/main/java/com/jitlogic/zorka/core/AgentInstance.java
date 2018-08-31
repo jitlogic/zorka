@@ -33,11 +33,15 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.integ.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.normproc.NormLib;
+import com.jitlogic.zorka.core.spy.lt.LTracer;
+import com.jitlogic.zorka.core.spy.lt.LTracerLib;
+import com.jitlogic.zorka.core.spy.st.STraceBufManager;
+import com.jitlogic.zorka.core.spy.st.STracer;
+import com.jitlogic.zorka.core.spy.st.STracerLib;
 import com.jitlogic.zorka.core.util.DaemonThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -157,6 +161,8 @@ public class AgentInstance implements ZorkaService {
     private ZabbixQueryTranslator translator;
 
     private SpyRetransformer retransformer;
+
+    private STraceBufManager bufManager;
 
     public AgentInstance(AgentConfig config, SpyRetransformer retransformer) {
         this.config = config;
@@ -312,10 +318,25 @@ public class AgentInstance implements ZorkaService {
         return scheduledExecutor;
     }
 
+
+    public synchronized STraceBufManager getBufManager() {
+        if (bufManager == null) {
+            bufManager = new STraceBufManager(
+                    getConfig().intCfg("tracer.chunk.size", 65536),
+                    getConfig().intCfg("tracer.chunk.max", 16));
+        }
+        return bufManager;
+    }
+
     public synchronized Tracer getTracer() {
         if (tracer == null) {
-            tracer = new Tracer(getTracerMatcherSet(), getSymbolRegistry());
-            MainSubmitter.setTracer(getTracer());
+            if ("streaming".equals(getConfig().stringCfg("tracer.type", "local"))) {
+                tracer = new STracer(getTracerMatcherSet(), getSymbolRegistry(), getBufManager());
+                MainSubmitter.setSTracer((STracer)tracer);
+            } else {
+                tracer = new LTracer(getTracerMatcherSet(), getSymbolRegistry());
+                MainSubmitter.setLTracer((LTracer)tracer);
+            }
         }
         return tracer;
     }
@@ -443,7 +464,12 @@ public class AgentInstance implements ZorkaService {
     public synchronized TracerLib getTracerLib() {
 
         if (tracerLib == null) {
-            tracerLib = new TracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config);
+            Tracer tracer = getTracer();
+            if (tracer instanceof LTracer) {
+                tracerLib = new LTracerLib(getSymbolRegistry(), getMetricsRegistry(), (LTracer)tracer, config);
+            } else {
+                tracerLib = new STracerLib(getSymbolRegistry(), getMetricsRegistry(), (STracer)tracer, config);
+            }
         }
 
         return tracerLib;

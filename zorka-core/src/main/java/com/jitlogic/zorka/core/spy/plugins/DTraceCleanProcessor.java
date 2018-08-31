@@ -17,10 +17,9 @@
 package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.core.spy.DTraceState;
+import com.jitlogic.zorka.core.spy.lt.LTracerLib;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.TracerLib;
-
-import static com.jitlogic.zorka.core.spy.TracerLib.*;
 
 import java.util.Map;
 
@@ -50,7 +49,7 @@ public class DTraceCleanProcessor implements SpyProcessor {
             if (t1 != null && t2 != null && xtt >= 0L) {
                 long t = (t2 - t1) / 1000000L;
                 if (t >= xtt) {
-                    tracer.newFlags(TracerLib.SUBMIT_TRACE);
+                    tracer.newFlags(LTracerLib.SUBMIT_TRACE);
                 }
             }
         }

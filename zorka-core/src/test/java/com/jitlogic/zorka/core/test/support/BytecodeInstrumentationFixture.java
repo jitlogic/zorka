@@ -19,12 +19,14 @@ package com.jitlogic.zorka.core.test.support;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.spy.*;
+import com.jitlogic.zorka.core.spy.lt.LTracer;
+import com.jitlogic.zorka.core.spy.lt.LTraceHandler;
+import com.jitlogic.zorka.core.spy.lt.TraceHandler;
 import com.jitlogic.zorka.core.test.spy.support.TestSpyTransformer;
 import com.jitlogic.zorka.core.test.spy.support.TestSubmitter;
 import com.jitlogic.zorka.core.test.spy.support.TestTraceBuilder;
 import org.junit.After;
 import org.junit.Before;
-import org.objectweb.asm.ClassWriter;
 
 public class BytecodeInstrumentationFixture extends ZorkaFixture {
 
@@ -48,7 +50,7 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
     public SymbolRegistry symbols;
     public TestSubmitter submitter;
     public TestTraceBuilder traceBuilder;
-    public Tracer tracerObj;
+    public LTracer tracerObj;
 
     @Before
     public void setUp() {
@@ -61,13 +63,16 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
         submitter = new TestSubmitter();
         MainSubmitter.setSubmitter(submitter);
         traceBuilder = new TestTraceBuilder();
-        tracerObj = new Tracer(agentInstance.getTracerMatcherSet(),
+        tracerObj = new LTracer(agentInstance.getTracerMatcherSet(),
                 agentInstance.getSymbolRegistry()) {
-            public TraceBuilder getHandler() {
+            public TraceHandler getHandler() {
+                return traceBuilder;
+            }
+            public LTraceHandler getLtHandler() {
                 return traceBuilder;
             }
         };
-        MainSubmitter.setTracer(tracerObj);
+        MainSubmitter.setLTracer(tracerObj);
         symbols = agentInstance.getSymbolRegistry();
     }
 

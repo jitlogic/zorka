@@ -18,13 +18,13 @@
 package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.core.spy.lt.LTracer;
 import org.objectweb.asm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Traverses class file and instruments selected method according to supplied spy definitions.

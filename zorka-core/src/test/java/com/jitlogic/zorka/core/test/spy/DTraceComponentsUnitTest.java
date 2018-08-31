@@ -2,8 +2,9 @@ package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.core.spy.DTraceState;
+import com.jitlogic.zorka.core.spy.lt.LTracer;
+import com.jitlogic.zorka.core.spy.lt.LTracerLib;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
-import com.jitlogic.zorka.core.spy.TracerLib;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
 import org.junit.Test;
@@ -32,7 +33,7 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
         assertEquals(42L, ds.getThreshold());
         assertEquals(100L, ds.getTstart());
 
-        TraceRecord tr = agentInstance.getTracer().getHandler().realTop();
+        TraceRecord tr = ((LTracer)(agentInstance.getTracer())).getLtHandler().realTop();
         assertEquals(ds.getUuid(), tr.getAttr(symbols.symbolId("DTRACE_UUID")));
         assertEquals(ds.getUuid(), tr.getAttr(symbols.symbolId("DTRACE_IN")));
     }
@@ -57,7 +58,7 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
         assertEquals("_1", ds.getTid());
         assertEquals(-1L, ds.getThreshold());
 
-        TraceRecord tr = agentInstance.getTracer().getHandler().realTop();
+        TraceRecord tr = ((LTracer)(agentInstance.getTracer())).getLtHandler().realTop();
         assertNotNull(tr);
         assertEquals(ds.getUuid(), tr.getAttr(symbols.symbolId("DTRACE_UUID")));
         assertEquals(ds.getUuid() + "_1", tr.getAttr(symbols.symbolId("DTRACE_IN")));
@@ -94,7 +95,7 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
 
         assertEquals("_1_1", rec.get("DTRACE_OUT"));
 
-        TraceRecord tr = agentInstance.getTracer().getHandler().realTop();
+        TraceRecord tr = ((LTracer)(agentInstance.getTracer())).getLtHandler().realTop();
         assertNotNull(tr);
         assertEquals(ds.getUuid(), tr.getAttr(symbols.symbolId("DTRACE_UUID")));
         assertEquals(ds.getUuid() + "_1_1", tr.getAttr(symbols.symbolId("DTRACE_OUT")));
@@ -130,10 +131,10 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
         agentInstance.getTracer().getHandler().traceBegin(symbols.symbolId("HTTP"), 100, 0);
         assertSame(rec, dtc.process(rec));
 
-        TraceRecord tr = agentInstance.getTracer().getHandler().realTop();
+        TraceRecord tr = ((LTracer)(agentInstance.getTracer())).getLtHandler().realTop();
         assertNotNull(tr);
         assertNotNull(tr.getMarker());
 
-        assertTrue(0 != (tr.getMarker().getFlags() & TracerLib.SUBMIT_TRACE));
+        assertTrue(0 != (tr.getMarker().getFlags() & LTracerLib.SUBMIT_TRACE));
     }
 }

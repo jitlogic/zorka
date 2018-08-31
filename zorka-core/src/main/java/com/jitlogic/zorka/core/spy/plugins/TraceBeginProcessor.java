@@ -19,8 +19,8 @@ package com.jitlogic.zorka.core.spy.plugins;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
-import com.jitlogic.zorka.core.spy.TraceBuilder;
 import com.jitlogic.zorka.core.spy.Tracer;
+import com.jitlogic.zorka.core.spy.lt.TraceHandler;
 
 import java.util.Map;
 
@@ -74,7 +74,7 @@ public class TraceBeginProcessor implements SpyProcessor {
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
-        TraceBuilder traceBuilder = tracer.getHandler();
+        TraceHandler traceBuilder = tracer.getHandler();
         int traceId = symbolRegistry.symbolId(ObjectInspector.substitute(traceName, record));
         traceBuilder.traceBegin(traceId, System.currentTimeMillis(), flags);
 

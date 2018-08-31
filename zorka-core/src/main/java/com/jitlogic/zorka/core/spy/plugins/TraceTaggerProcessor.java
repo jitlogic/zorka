@@ -19,6 +19,7 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TaggedValue;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.Tracer;
+import com.jitlogic.zorka.core.spy.lt.LTracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

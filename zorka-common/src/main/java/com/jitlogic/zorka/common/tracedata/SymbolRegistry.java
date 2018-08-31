@@ -37,10 +37,20 @@ public class SymbolRegistry {
      */
     protected ConcurrentMap<Integer, String> symbolNames;
 
+    protected AtomicInteger lastMethodId;
+
+    protected ConcurrentMap<Long, Integer> methodIds;
+
+    protected ConcurrentMap<Integer, Long> methodDefs;
+
     public SymbolRegistry() {
         lastSymbolId = new AtomicInteger(0);
         symbolIds = new ConcurrentHashMap<String, Integer>();
         symbolNames = new ConcurrentHashMap<Integer, String>();
+
+        lastMethodId = new AtomicInteger(0);
+        methodIds = new ConcurrentHashMap<Long, Integer>();
+        methodDefs = new ConcurrentHashMap<Integer, Long>();
     }
 
     /**
@@ -116,11 +126,75 @@ public class SymbolRegistry {
         persist(symbolId, symbol);
     }
 
+    private final static long MDEF_MASK = 0x00000000001FFFFFL;
+
+
+    public int methodId(String className, String methodName, String methodDescription) {
+        return methodId(symbolId(className), symbolId(methodName), symbolId(methodDescription));
+    }
+
+
+    public int methodId(int className, int methodName, int methodDescription) {
+        long mdef = (className & MDEF_MASK)
+                | ((methodName & MDEF_MASK) << 21)
+                | ((methodDescription & MDEF_MASK) << 42);
+        Integer id = methodIds.get(mdef);
+        if (id == null) {
+            int newid = lastMethodId.incrementAndGet();
+            id = methodIds.putIfAbsent(mdef, newid);
+            if (id == null) {
+                methodDefs.put(newid, mdef);
+                id = newid;
+            }
+        }
+        return id;
+    }
+
+
+    public int[] methodDef(int methodId) {
+        Long mdef = methodDefs.get(methodId);
+        return mdef != null ? new int[]{
+                (int)(mdef & MDEF_MASK),
+                (int)((mdef >> 21) & MDEF_MASK),
+                (int)((mdef >> 42) & MDEF_MASK) }
+                : null;
+    }
+
+
+    public void putMethod(int methodId, String className, String methodName, String methodDescription) {
+        putMethod(methodId, symbolId(className), symbolId(methodName), symbolId(methodDescription));
+    }
+
+
+    public void putMethod(int methodId, int className, int methodName, int methodDescription) {
+        long mdef = (className & MDEF_MASK)
+                | ((methodName & MDEF_MASK) << 21)
+                | ((methodDescription & MDEF_MASK) << 42);
+        methodIds.put(mdef, methodId);
+        methodDefs.put(methodId, mdef);
+        if (methodId > lastMethodId.get()) {
+            lastMethodId.set(methodId);
+        }
+    }
+
+
     protected void persist(int id, String name) {
     }
 
     public int size() {
         return symbolIds.size();
+    }
+
+    public int methodCount() { return methodIds.size(); }
+
+
+    public int lastSymbolId() {
+        return lastSymbolId.get();
+    }
+
+
+    public int lastMethodId() {
+        return lastMethodId.get();
     }
 
 }

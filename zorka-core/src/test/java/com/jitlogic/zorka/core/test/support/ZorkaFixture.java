@@ -34,6 +34,9 @@ import com.jitlogic.zorka.common.test.support.CommonTestUtil;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.spy.SpyClassLookup;
+import com.jitlogic.zorka.core.spy.lt.LTracer;
+import com.jitlogic.zorka.core.spy.lt.LTracerLib;
+import com.jitlogic.zorka.core.spy.st.STracer;
 import org.junit.After;
 import org.junit.Before;
 
@@ -55,7 +58,7 @@ public class ZorkaFixture extends CommonFixture {
 
     protected SyslogLib syslogLib;
     protected SpyLib spy;
-    protected TracerLib tracer;
+    protected LTracerLib tracer;
     protected SnmpLib snmpLib;
 
     protected ZorkaBshAgent zorkaAgent;
@@ -108,7 +111,7 @@ public class ZorkaFixture extends CommonFixture {
         syslogLib = agentInstance.getSyslogLib();
         snmpLib = agentInstance.getSnmpLib();
         spy = agentInstance.getSpyLib();
-        tracer = agentInstance.getTracerLib();
+        tracer = (LTracerLib)agentInstance.getTracerLib();
         perfmon = agentInstance.getPerfMonLib();
         spyTransformer = agentInstance.getClassTransformer();
         zabbixLib = agentInstance.getZabbixLib();
@@ -121,7 +124,12 @@ public class ZorkaFixture extends CommonFixture {
         mBeanServerRegistry.register("test", testMbs, testMbs.getClass().getClassLoader());
 
         MainSubmitter.setSubmitter(agentInstance.getSubmitter());
-        MainSubmitter.setTracer(agentInstance.getTracer());
+        Tracer tracer = agentInstance.getTracer();
+        if (tracer instanceof LTracer) {
+            MainSubmitter.setLTracer((LTracer)tracer);
+        } else {
+            MainSubmitter.setSTracer((STracer)tracer);
+        }
 
         symbols = agentInstance.getSymbolRegistry();
 
@@ -140,7 +148,7 @@ public class ZorkaFixture extends CommonFixture {
         mBeanServerRegistry.unregister("test");
 
         MainSubmitter.setSubmitter(null);
-        MainSubmitter.setTracer(null);
+        MainSubmitter.setLTracer(null);
     }
 
 

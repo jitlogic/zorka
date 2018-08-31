@@ -18,52 +18,37 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
-import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
+import com.jitlogic.zorka.core.spy.lt.TraceHandler;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-
-/**
- * Groups all tracer engine components and global settings.
- *
- * @author rafal.lewczuk@jitlogic.com
- */
-public class Tracer implements ZorkaSubmitter<SymbolicRecord>, ZorkaService {
+public abstract class Tracer implements ZorkaService, ZorkaSubmitter<SymbolicRecord> {
 
     /**
      * Minimum default method execution time required to attach method to trace.
      */
-    private static long minMethodTime = 250000;
+    protected static long minMethodTime = 250000;
 
     /**
      * Maximum number of records inside trace
      */
-    private static int maxTraceRecords = 4096;
+    protected static int maxTraceRecords = 4096;
 
-    private static int minTraceCalls = 262144;
-
-    private AtomicReference<List<ZorkaSubmitter<SymbolicRecord>>> outputs
-            = new AtomicReference<List<ZorkaSubmitter<SymbolicRecord>>>(new ArrayList<ZorkaSubmitter<SymbolicRecord>>());
-
-    /**
-     * Defines which classes and methods should be traced.
-     */
-    private SpyMatcherSet matcherSet;
-
-    /**
-     * Symbol registry containing names of all symbols tracer knows about.
-     */
-    private SymbolRegistry symbolRegistry;
-
+    protected static int minTraceCalls = 262144;
 
     /**
      * If true, methods instrumented by SPY will also be traced by default.
      */
-    private boolean traceSpyMethods = true;
+    protected boolean traceSpyMethods = true;
+
+    /**
+     * Defines which classes and methods should be traced.
+     */
+    protected SpyMatcherSet matcherSet;
+
+
+    public abstract TraceHandler getHandler();
+
+    public abstract void include(SpyMatcher matcher);
 
 
     public static long getMinMethodTime() {
@@ -94,7 +79,6 @@ public class Tracer implements ZorkaSubmitter<SymbolicRecord>, ZorkaService {
         minTraceCalls = traceCalls;
     }
 
-
     public boolean isTraceSpyMethods() {
         return traceSpyMethods;
     }
@@ -104,93 +88,6 @@ public class Tracer implements ZorkaSubmitter<SymbolicRecord>, ZorkaService {
         this.traceSpyMethods = traceSpyMethods;
     }
 
-
-    /**
-     * Thread local serving trace builder objects for application threads
-     */
-    private ThreadLocal<TraceBuilder> localHandlers =
-            new ThreadLocal<TraceBuilder>() {
-                public TraceBuilder initialValue() {
-                    return new TraceBuilder(Tracer.this, symbolRegistry);
-                }
-            };
-
-
-    public Tracer(SpyMatcherSet matcherSet, SymbolRegistry symbolRegistry) {
-        this.matcherSet = matcherSet;
-        this.symbolRegistry = symbolRegistry;
-    }
-
-
-    /**
-     * Returns trace even handler receiving events from local application thread.
-     *
-     * @return trace event handler (trace builder object)
-     */
-    public TraceBuilder getHandler() {
-        return localHandlers.get();
-    }
-
-
-    /**
-     * Adds new matcher that includes (or excludes) classes and method to be traced.
-     *
-     * @param matcher spy matcher to be added
-     */
-    public void include(SpyMatcher matcher) {
-        matcherSet = matcherSet.include(matcher);
-    }
-
-    public SpyMatcherSet clearMatchers() {
-        SpyMatcherSet ret = matcherSet;
-        matcherSet = new SpyMatcherSet();
-        return ret;
-    }
-
-
-    @Override
-    public boolean submit(SymbolicRecord record) {
-        boolean submitted = false;
-        for (ZorkaSubmitter<SymbolicRecord> output : outputs.get()) {
-            submitted |= output.submit(record);
-        }
-        return submitted;
-    }
-
-    @Override
-    public synchronized void shutdown() {
-        List<ZorkaSubmitter<SymbolicRecord>> old = outputs.get();
-        outputs.set(new ArrayList<ZorkaSubmitter<SymbolicRecord>>());
-
-        for (ZorkaSubmitter<SymbolicRecord> output : old) {
-            if (output instanceof ZorkaService) {
-                ((ZorkaService)output).shutdown();
-            }
-        }
-
-        if (old.size() > 0) {
-            ZorkaUtil.sleep(100);
-        }
-    }
-
-
-    /**
-     * Sets output trace event handler tracer will submit completed traces to.
-     * Note that submit() method of supplied handler is called from application
-     * threads, so it must be thread safe.
-     *
-     * @param output trace event handler
-     */
-    public synchronized void addOutput(ZorkaSubmitter<SymbolicRecord> output) {
-        List<ZorkaSubmitter<SymbolicRecord>> newOutputs = new ArrayList<ZorkaSubmitter<SymbolicRecord>>(outputs.get());
-        newOutputs.add(output);
-        outputs.set(newOutputs);
-    }
-
-    public List<ZorkaSubmitter<SymbolicRecord>> getOutputs() {
-        return Collections.unmodifiableList(outputs.get());
-    }
-
     public SpyMatcherSet getMatcherSet() {
         return matcherSet;
     }
@@ -198,6 +95,12 @@ public class Tracer implements ZorkaSubmitter<SymbolicRecord>, ZorkaService {
 
     public void setMatcherSet(SpyMatcherSet matcherSet) {
         this.matcherSet = matcherSet;
+    }
+
+    public SpyMatcherSet clearMatchers() {
+        SpyMatcherSet ret = matcherSet;
+        matcherSet = new SpyMatcherSet();
+        return ret;
     }
 
 }

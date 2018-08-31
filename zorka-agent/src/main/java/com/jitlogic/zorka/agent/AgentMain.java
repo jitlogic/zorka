@@ -66,7 +66,7 @@ public class AgentMain {
         if (instance.getConfig().boolCfg("spy", true)) {
             instrumentation.addTransformer(instance.getClassTransformer(), true);
             MainSubmitter.setSubmitter(instance.getSubmitter());
-            MainSubmitter.setTracer(instance.getTracer());
+            MainSubmitter.setLTracer(instance.getTracer());
         }
 
         instance.getMBeanServerRegistry().registerZorkaControl(

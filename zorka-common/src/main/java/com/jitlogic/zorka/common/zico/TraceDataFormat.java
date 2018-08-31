@@ -52,6 +52,7 @@ public class TraceDataFormat {
     public static final int TAG_EXCEPTION_REF  = 0x23;
     public static final int TAG_KEYWORD        = 0x24;
     public static final int TAG_FLAG_TOKEN     = 0x25;
+    public static final int TAG_TRACE_UP_ATTR  = 0x26;
 
     /** Sets error flag */
     public static final int FLAG_ERROR    = 0x01;

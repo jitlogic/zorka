@@ -18,8 +18,8 @@ package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
-import com.jitlogic.zorka.core.spy.*;
 
+import com.jitlogic.zorka.core.spy.lt.LTraceHandler;
 import com.jitlogic.zorka.core.test.support.CoreTestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.junit.After;
@@ -37,7 +37,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     private SymbolRegistry symbols = new SymbolRegistry();
     private List<TraceRecord> records = new ArrayList<TraceRecord>();
 
-    private TraceBuilder b = new TraceBuilder(
+    private LTraceHandler b = new LTraceHandler(
             new ZorkaSubmitter<SymbolicRecord>() {
                 @Override
                 public boolean submit(SymbolicRecord obj) {

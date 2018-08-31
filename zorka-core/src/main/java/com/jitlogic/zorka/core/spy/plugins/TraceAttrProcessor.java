@@ -22,6 +22,7 @@ import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.Tracer;
+import com.jitlogic.zorka.core.spy.lt.LTraceHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,7 +125,7 @@ public class TraceAttrProcessor implements SpyProcessor {
 
         if (val != null) {
             if (log.isDebugEnabled()) {
-                TraceRecord top = tracer.getHandler().realTop();
+                TraceRecord top = ((LTraceHandler)(tracer.getHandler())).realTop(); // TODO fix when STracer implementation appears
                 log.debug("Value: '" + val + "' stored as trace attribute "
                         + symbolRegistry.symbolName(attrId) + " (classId= " + top.getClassId() + " methodId=" + top.getMethodId()
                         + " signatureId=" + top.getSignatureId() + ")");
