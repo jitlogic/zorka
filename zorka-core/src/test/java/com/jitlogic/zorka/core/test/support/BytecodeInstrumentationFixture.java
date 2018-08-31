@@ -28,6 +28,7 @@ import org.objectweb.asm.ClassWriter;
 
 public class BytecodeInstrumentationFixture extends ZorkaFixture {
 
+    public final static String TCLASS = "com.jitlogic.zorka.core.test.spy.support.TestClass";
     public final static String MCLASS0 = "com.jitlogic.zorka.core.test.**";
     public final static String TCLASS1 = "com.jitlogic.zorka.core.test.spy.support.TestClass1";
     public final static String MCLASS1 = "com.jitlogic.zorka.core.test.spy.support.*Class1";

@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Traverses class file and instruments selected method according to supplied spy definitions.
@@ -75,6 +76,8 @@ public class SpyClassVisitor extends ClassVisitor {
 
     private boolean bytecodeWasModified = false;
 
+    private List<String> superclasses;
+
     /**
      * Creates Spy class visitor.
      *
@@ -85,8 +88,7 @@ public class SpyClassVisitor extends ClassVisitor {
      * @param cv          output class visitor (typically ClassWriter)
      */
     public SpyClassVisitor(SpyClassTransformer transformer, ClassLoader classLoader, SymbolRegistry symbolRegistry,
-                           String className,
-                           List<SpyDefinition> sdefs, Tracer tracer, ClassVisitor cv) {
+                           String className, List<SpyDefinition> sdefs, Tracer tracer, ClassVisitor cv) {
         super(Opcodes.ASM5, cv);
         this.transformer = transformer;
         this.classLoader = classLoader;
@@ -100,6 +102,9 @@ public class SpyClassVisitor extends ClassVisitor {
                 if (matcher.hasFlags(SpyMatcher.RECURSIVE)) {
                     recursive = true;
                 }
+                if (matcher.hasFlags(SpyMatcher.BY_SUPERCLASS)) {
+                    superclasses = new ArrayList<String>();
+                }
             }
         }
     }
@@ -110,6 +115,26 @@ public class SpyClassVisitor extends ClassVisitor {
         cv.visit(version, access, name, signature, superName, interfaces);
 
         this.classInterfaces = new ArrayList(interfaces.length);
+
+
+        if (superclasses != null) {
+            String superclass = superName.replace('/', '.');
+            superclasses.add(superclass);
+
+            if (recursive) {
+                try {
+                    Class<?> clazz = classLoader.loadClass(superclass);
+                    while (!"java.lang.Object".equals(clazz.getName())) {
+                        clazz = clazz.getSuperclass();
+                        superclasses.add(clazz.getName());
+                    }
+                } catch (Exception e) {
+                    log.error("Cannot (recursively) load class: " + superclass, e);
+                }
+            }
+
+        }
+
         for (String ifname : interfaces) {
             String interfaceClass = ifname.replace('/', '.');
             this.classInterfaces.add(interfaceClass);
@@ -176,7 +201,7 @@ public class SpyClassVisitor extends ClassVisitor {
         boolean m = true;
 
         for (SpyDefinition sdef : sdefs) {
-            if (sdef.getMatcherSet().methodMatch(className, classAnnotations, classInterfaces,
+            if (sdef.getMatcherSet().methodMatch(className, superclasses, classAnnotations, classInterfaces,
                     access, methodName, methodDesc, null)) {
                 if (sdef.getLastArgIndex() > lastArgIndex(access, methodDesc)) {
                     log.error("Cannot instrument method " + className + "." + methodName
@@ -193,7 +218,7 @@ public class SpyClassVisitor extends ClassVisitor {
             }
         }
 
-        boolean doTrace = tracer.getMatcherSet().methodMatch(className, classAnnotations, classInterfaces,
+        boolean doTrace = tracer.getMatcherSet().methodMatch(className, superclasses, classAnnotations, classInterfaces,
                 access, methodName, methodDesc, null) || (tracer.isTraceSpyMethods() && ctxs.size() > 0);
 
         if (doTrace && log.isDebugEnabled()) {
@@ -202,7 +227,7 @@ public class SpyClassVisitor extends ClassVisitor {
 
         if (ctxs.size() > 0 || doTrace) {
             bytecodeWasModified = true;
-            return new SpyMethodVisitor(m, doTrace ? symbolRegistry : null, className,
+            return new SpyMethodVisitor(m, doTrace ? symbolRegistry : null, className, superclasses,
                     classAnnotations, classInterfaces, access, methodName, methodDesc, ctxs, mv);
         }
 

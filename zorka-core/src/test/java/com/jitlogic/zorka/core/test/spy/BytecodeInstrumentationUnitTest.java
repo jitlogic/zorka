@@ -657,6 +657,44 @@ public class BytecodeInstrumentationUnitTest extends BytecodeInstrumentationFixt
         assertEquals(2, submitter.size());
     }
 
+    @Test
+    public void testInstrumentBySuperclassAndMethod() throws Exception {
+        engine.add(spy.instrument("x").include(
+                spy.bySuperclassAndMethod(TCLASS+7, "foobar")));
+
+        Object obj = instantiate(engine, TCLASS+8);
+        Object rslt = invoke(obj, "foobar");
+        assertEquals("FOOBAR", rslt);
+
+        assertEquals(2, submitter.size());
+    }
+
+    @Test
+    public void testInstrumentByIndirectSuperclassAndMethod() throws Exception {
+        engine.add(spy.instrument("x").include(
+                spy.bySuperclassAndMethod(TCLASS+6, "foobar").recursive()));
+
+        Object obj = instantiate(engine, TCLASS+8);
+        Object rslt = invoke(obj, "foobar");
+        assertEquals("FOOBAR", rslt);
+
+        assertEquals(2, submitter.size());
+
+    }
+
+    @Test
+    public void testInstrumentByNonRecursiveIndirectSuperclassAndMethod() throws Exception {
+        engine.add(spy.instrument("x").include(
+                spy.bySuperclassAndMethod(TCLASS+6, "foobar")));
+
+        Object obj = instantiate(engine, TCLASS+8);
+        Object rslt = invoke(obj, "foobar");
+        assertEquals("FOOBAR", rslt);
+
+        assertEquals(0, submitter.size());
+
+    }
+
     // TODO test if stack traces in exceptions are the same with and without intercepting errors by instrumentation
 
     // TODO test instrumenting static method

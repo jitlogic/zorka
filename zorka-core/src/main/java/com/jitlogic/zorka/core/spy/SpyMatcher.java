@@ -64,18 +64,20 @@ public class SpyMatcher {
      */
     public static final int DEFAULT_PRIORITY = 500;
 
-    public static final int BY_CLASS_NAME = 0x001;
-    public static final int BY_CLASS_ANNOTATION = 0x002;
-    public static final int BY_INTERFACE = 0x004;
-    public static final int BY_METHOD_NAME = 0x008;
-    public static final int BY_METHOD_SIGNATURE = 0x010;
-    public static final int BY_METHOD_ANNOTATION = 0x020;
-    public static final int NO_CONSTRUCTORS = 0x040;
-    public static final int NO_ACCESSORS = 0x080;
-    public static final int NO_COMMONS = 0x100;
+    public static final int BY_CLASS_NAME        = 0x0001;
+    public static final int BY_CLASS_ANNOTATION  = 0x0002;
+    public static final int BY_INTERFACE         = 0x0004;
+    public static final int BY_METHOD_NAME       = 0x0008;
+    public static final int BY_METHOD_SIGNATURE  = 0x0010;
+    public static final int BY_METHOD_ANNOTATION = 0x0020;
+    public static final int BY_SUPERCLASS        = 0x0040;
 
-    public static final int RECURSIVE = 0x400;
-    public static final int EXCLUDE_MATCH = 0x800;
+    public static final int NO_CONSTRUCTORS      = 0x0100;
+    public static final int NO_ACCESSORS         = 0x0200;
+    public static final int NO_COMMONS           = 0x0400;
+
+    public static final int RECURSIVE            = 0x1000;
+    public static final int EXCLUDE_MATCH        = 0x2000;
 
     /**
      * Special access bit - package private

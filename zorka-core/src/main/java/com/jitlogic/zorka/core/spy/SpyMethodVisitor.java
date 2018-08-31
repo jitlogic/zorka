@@ -66,6 +66,8 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     private final String className;
 
+    private final List<String> superclasses;
+
     /**
      * Name of (instrumented) metod
      */
@@ -155,13 +157,14 @@ public class SpyMethodVisitor extends MethodVisitor {
      *                        TODO add explicit doTrace argument
      */
     public SpyMethodVisitor(boolean matches, SymbolRegistry symbolRegistry,
-                            String className, List<String> classAnnotations, List<String> classInterfaces,
+                            String className, List<String> superclasses, List<String> classAnnotations, List<String> classInterfaces,
                             int access, String methodName, String methodSignature,
                             List<SpyContext> ctxs, MethodVisitor mv) {
         super(Opcodes.ASM4, mv);
         this.matches = matches;
         this.symbolRegistry = symbolRegistry;
         this.className = className;
+        this.superclasses = superclasses;
         this.classAnnotations = classAnnotations;
         this.classInterfaces = classInterfaces;
         this.access = access;
@@ -237,7 +240,8 @@ public class SpyMethodVisitor extends MethodVisitor {
     private void emitProlog() {
         for (SpyContext ctx : ctxs) {
             SpyMatcherSet sms = ctx.getSpyDefinition().getMatcherSet();
-            ctxMatches.add((!sms.hasMethodAnnotations()) || sms.methodMatch(className, classAnnotations, classInterfaces,
+            ctxMatches.add((!sms.hasMethodAnnotations()) ||
+                    sms.methodMatch(className, superclasses, classAnnotations, classInterfaces,
                     access, methodName, methodSignature, annotations));
         }
 

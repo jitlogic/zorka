@@ -92,7 +92,7 @@ public class SpyMatcherSet {
                 return finalClassMatch(matcher);
             }
 
-            if (0 != (flags & (BY_CLASS_ANNOTATION | BY_INTERFACE | BY_METHOD_ANNOTATION))) {
+            if (0 != (flags & (BY_CLASS_ANNOTATION | BY_INTERFACE | BY_METHOD_ANNOTATION | BY_SUPERCLASS))) {
                 return finalClassMatch(matcher);
             }
         }
@@ -204,6 +204,7 @@ public class SpyMatcherSet {
      * and any of included matchers looks for mathod annotations, this method will return true.
      *
      * @param className         class name
+     * @param superclasses      superclass name
      * @param classAnnotations  list of class names of class annotations
      * @param classInterfaces   list of class names of interfaces directly implemented by this class
      * @param access            method access flags
@@ -212,13 +213,16 @@ public class SpyMatcherSet {
      * @param methodAnnotations list of class names of method annotations
      * @return true if method matches
      */
-    public boolean methodMatch(String className, List<String> classAnnotations, List<String> classInterfaces,
-                               int access, String methodName, String methodSignature, List<String> methodAnnotations) {
+    public boolean methodMatch(String className, List<String> superclasses,
+                               List<String> classAnnotations, List<String> classInterfaces,
+                               int access, String methodName,
+                               String methodSignature, List<String> methodAnnotations) {
 
         for (SpyMatcher matcher : matchers) {
             int flags = matcher.getFlags();
 
             if ((0 != (flags & BY_CLASS_NAME) && match(matcher.getClassPattern(), className))
+                    || (0 != (flags & BY_SUPERCLASS) && match(matcher.getClassPattern(), superclasses))
                     || (0 != (flags & BY_CLASS_ANNOTATION) && match(matcher.getClassPattern(), classAnnotations))
                     || (0 != (flags & BY_INTERFACE) && match(matcher.getClassPattern(), classInterfaces))) {
 

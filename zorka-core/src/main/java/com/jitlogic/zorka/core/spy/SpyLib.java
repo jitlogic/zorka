@@ -403,6 +403,15 @@ public class SpyLib {
                 access, iClassPattern, methodPattern, retType, argTypes);
     }
 
+    public SpyMatcher bySuperclassAndMethod(String classPattern, String methodPattern) {
+        return new SpyMatcher(SpyMatcher.BY_SUPERCLASS | SpyMatcher.BY_METHOD_NAME,
+                1, classPattern, methodPattern, null);
+    }
+
+    public SpyMatcher bySuperclassAndMethod(int access, String classPattern, String methodPattern, String retType, String...argTypes) {
+        return new SpyMatcher(SpyMatcher.BY_SUPERCLASS | SpyMatcher.BY_METHOD_NAME | SpyMatcher.BY_METHOD_SIGNATURE,
+                access, classPattern, methodPattern, retType, argTypes);
+    }
 
     /**
      * Creates new matcher object that will match methods by class name and method name.
