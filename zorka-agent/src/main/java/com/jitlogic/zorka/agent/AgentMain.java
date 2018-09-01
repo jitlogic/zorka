@@ -24,6 +24,9 @@ import com.jitlogic.zorka.core.ZorkaControl;
 import com.jitlogic.zorka.core.spy.MainSubmitter;
 import com.jitlogic.zorka.core.spy.RealSpyRetransformer;
 import com.jitlogic.zorka.core.spy.SpyClassLookup;
+import com.jitlogic.zorka.core.spy.Tracer;
+import com.jitlogic.zorka.core.spy.lt.LTracer;
+import com.jitlogic.zorka.core.spy.st.STracer;
 
 import java.io.File;
 import java.lang.instrument.Instrumentation;
@@ -66,7 +69,12 @@ public class AgentMain {
         if (instance.getConfig().boolCfg("spy", true)) {
             instrumentation.addTransformer(instance.getClassTransformer(), true);
             MainSubmitter.setSubmitter(instance.getSubmitter());
-            MainSubmitter.setLTracer(instance.getTracer());
+            Tracer tracer = instance.getTracer();
+            if (tracer instanceof LTracer) {
+                MainSubmitter.setLTracer((LTracer)tracer);
+            } else {
+                MainSubmitter.setSTracer((STracer)tracer);
+            }
         }
 
         instance.getMBeanServerRegistry().registerZorkaControl(

@@ -23,7 +23,7 @@ import com.jitlogic.zorka.common.util.ZorkaUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestSubmitter implements SpySubmitter {
+public class TestLSubmitter implements SpySubmitter {
 
     public static class SubmitEntry {
         public final int stage;

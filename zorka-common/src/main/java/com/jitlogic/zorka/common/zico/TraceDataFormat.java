@@ -111,11 +111,6 @@ public class TraceDataFormat {
     //
     public static final int TRACE_DROP_TOKEN   = 0xe0; /* TRACE DROP is encoded as simple value. */
 
-    /** This is pre-computed 4-byte trace record header. */
-
-    public static final int TREC_HEADER_BE = 0xd80a9f48;
-    public static final int TREC_HEADER_LE = 0x489f0bd8;
-
     public static final byte STRING_TYPE  = 0x00; // Generic string, raw encoding (no prefix);
 
     public static final byte TYPE_MIN     = 0x04;

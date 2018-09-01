@@ -58,6 +58,22 @@ public class STraceHandler extends STraceBuffer {
 
     public static final long TSTART_FUZZ = System.currentTimeMillis() - (System.nanoTime() / 1000000L);
 
+    /**
+     * This is pre-computed 4-byte trace record header.
+     */
+    public static final int TREC_HEADER;
+
+    /**
+     * Initial fragment of trace record header (four bytes):
+     * - 0xd8 - TRACE_START tag
+     * - 0x9f - VCODE - unbounded array start
+     * - 0xda/0xdb - PROLOG_BE/PROLOG_LE
+     * - 0x48 - prolog start (byte array of length 8)
+     */
+    public static final int TREC_HEADER_BE = 0xc89fca48;
+
+    public static final int TREC_HEADER_LE = 0x48cb9fc8;
+
     private long minMethodTime = 4;   // Default minimum duration = 4 ticks = ~250us
 
     private long minTraceTime = 16777216; // Approximately 1s
@@ -351,8 +367,6 @@ public class STraceHandler extends STraceBuffer {
         writeUInt(CBOR.UINT_BASE, symbols.symbolId(s));
     }
 
-    /** This is pre-computed 4-byte trace record header. */
-    public static final int TREC_HEADER;
 
     static {
         /* Determine byte order here. */
@@ -360,10 +374,10 @@ public class STraceHandler extends STraceBuffer {
         UNSAFE.putShort(b, BYTE_ARRAY_OFFS, (short)0x0102);
         if (b[0] == 0x01) {
             // Big Endian
-            TREC_HEADER = TraceDataFormat.TREC_HEADER_BE;
+            TREC_HEADER = TREC_HEADER_BE;
         } else {
             // Little endian
-            TREC_HEADER = TraceDataFormat.TREC_HEADER_LE;
+            TREC_HEADER = TREC_HEADER_LE;
         }
     }
 

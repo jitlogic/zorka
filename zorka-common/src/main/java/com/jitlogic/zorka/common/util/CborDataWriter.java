@@ -162,7 +162,7 @@ public class CborDataWriter {
             writeUInt(CBOR.STR_BASE, b.length);
             write(b);
         } else {
-            writeNull();;
+            writeNull();
         }
     }
 

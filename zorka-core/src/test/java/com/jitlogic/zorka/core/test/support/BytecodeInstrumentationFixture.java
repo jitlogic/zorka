@@ -23,7 +23,7 @@ import com.jitlogic.zorka.core.spy.lt.LTracer;
 import com.jitlogic.zorka.core.spy.lt.LTraceHandler;
 import com.jitlogic.zorka.core.spy.lt.TraceHandler;
 import com.jitlogic.zorka.core.test.spy.support.TestSpyTransformer;
-import com.jitlogic.zorka.core.test.spy.support.TestSubmitter;
+import com.jitlogic.zorka.core.test.spy.support.TestLSubmitter;
 import com.jitlogic.zorka.core.test.spy.support.TestTraceBuilder;
 import org.junit.After;
 import org.junit.Before;
@@ -48,7 +48,7 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
 
     public TestSpyTransformer engine;
     public SymbolRegistry symbols;
-    public TestSubmitter submitter;
+    public TestLSubmitter submitter;
     public TestTraceBuilder traceBuilder;
     public LTracer tracerObj;
 
@@ -60,7 +60,7 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
             agentInstance.getZorkaAgent(),
             agentInstance.getConfig(),
             agentInstance.getRetransformer());
-        submitter = new TestSubmitter();
+        submitter = new TestLSubmitter();
         MainSubmitter.setSubmitter(submitter);
         traceBuilder = new TestTraceBuilder();
         tracerObj = new LTracer(agentInstance.getTracerMatcherSet(),
