@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.test.spy.st;
+package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ObjectInspector;
