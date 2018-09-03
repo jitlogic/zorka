@@ -19,17 +19,13 @@ package com.jitlogic.zorka.core.spy.lt;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 
-import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.integ.zabbix.ZabbixTraceOutput;
 import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
 import com.jitlogic.zorka.core.spy.*;
-import com.jitlogic.zorka.core.spy.plugins.*;
-import com.jitlogic.zorka.core.util.OverlayClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +107,7 @@ public class LTracerLib extends TracerLib {
     @Override
     public ZorkaAsyncThread<SymbolicRecord> toCbor(Map<String, String> config) {
 
-        return new CborTraceOutput(this.config, config, symbolRegistry);
+        return new LTraceHttpOutput(this.config, config, symbolRegistry);
     }
 
     /**

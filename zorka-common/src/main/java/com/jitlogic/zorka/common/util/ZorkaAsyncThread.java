@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -36,41 +37,30 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, ZorkaSubmitter<T> {
 
-    /**
-     * Logger
-     */
+    /** Logger */
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    /**
-     * Submit queue
-     */
+    /** Queue length */
+    protected int qlen;
+
+    /** Submit queue */
     protected BlockingQueue<T> submitQueue;
 
-    /**
-     * Thred name (will be prefixed with ZORKA-)
-     */
+    /** Thred name (will be prefixed with ZORKA-) */
     private final String name;
 
-    /**
-     * Processing thread will be working as long as this attribute value is true
-     */
+    /** Processing thread will be working as long as this attribute value is true */
     private final AtomicBoolean running = new AtomicBoolean(false); // TODO use volatile here
 
-    /**
-     * Thread object representing actual processing thread.
-     */
+    /** Thread object representing actual processing thread. */
     private Thread thread;
 
     protected boolean countTraps = true;
 
-    /**
-     * Maximum number of items taken from queue at once.
-     */
+    /** Maximum number of items taken from queue at once. */
     private int plen;
     
-    /**
-     * Sleeping interval in milliseconds
-     */
+    /** Sleeping interval in milliseconds */
     private long interval = 0l ;
 
     public ZorkaAsyncThread(String name) {
@@ -86,7 +76,10 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
     public ZorkaAsyncThread(String name, int qlen, int plen) {
         this.name = "ZORKA-" + name;
         this.plen = plen;
-        submitQueue = new ArrayBlockingQueue<T>(qlen);
+        this.qlen = qlen;
+        if (qlen > 0) {
+            submitQueue = new ArrayBlockingQueue<T>(qlen);
+        }
     }
     
     /**
@@ -177,8 +170,14 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
      */
     public boolean submit(T obj) {
         try {
-            return submitQueue.offer(obj, 1, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
+            if (qlen > 0) {
+                return submitQueue.offer(obj, 1, TimeUnit.MILLISECONDS);
+            } else {
+                process(Collections.singletonList(obj));
+                return true;
+            }
+        } catch (Exception e) {
+            log.error("Error submitting item [" + name + "]", e);
             return false;
         }
     }

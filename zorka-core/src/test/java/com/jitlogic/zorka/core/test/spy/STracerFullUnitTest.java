@@ -16,7 +16,6 @@ import java.util.Map;
 
 import static com.jitlogic.zorka.core.test.spy.support.cbor.STTrcTestUtils.chunksCount;
 import static com.jitlogic.zorka.core.test.spy.support.cbor.STTrcTestUtils.parseTrace;
-import static com.jitlogic.zorka.core.test.spy.support.cbor.STTrcTestUtils.parseTraces;
 import static com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture.TCLASS4;
 import static org.junit.Assert.*;
 
@@ -29,7 +28,7 @@ public class STracerFullUnitTest extends ZorkaFixture {
     private TestTraceBufOutput o = new TestTraceBufOutput();
 
     public STracerFullUnitTest() {
-        this.tracerType = "streaming";
+        configProperties.setProperty("tracer.type", "streaming");
     }
 
     private static Object l(Object...args) {
@@ -60,8 +59,7 @@ public class STracerFullUnitTest extends ZorkaFixture {
     public void testSimpleTrace() throws Exception {
         tracer.include(spy.byMethod(TCLASS1, "trivialMethod"));
 
-        spy.add(
-                spy.instance().onEnter(tracer.begin("TEST", 0))
+        spy.add(spy.instance().onEnter(tracer.begin("TEST", 0))
                         .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         agentInstance.getTracer().setMinMethodTime(0); // Catch everything

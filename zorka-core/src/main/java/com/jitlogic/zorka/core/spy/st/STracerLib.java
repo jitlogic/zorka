@@ -16,13 +16,11 @@
 
 package com.jitlogic.zorka.core.spy.st;
 
-import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
-import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.core.spy.TracerLib;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,16 +32,18 @@ public class STracerLib extends TracerLib {
     public static final Logger log = LoggerFactory.getLogger(STracerLib.class);
 
     private MetricsRegistry metricsRegistry;
+    private ZorkaConfig config;
 
     public STracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, STracer tracer, ZorkaConfig config) {
         super(tracer);
         this.symbolRegistry = symbolRegistry;
         this.metricsRegistry = metricsRegistry;
+        this.config = config;
     }
 
 
     public ZorkaAsyncThread<SymbolicRecord> toCbor(Map<String, String> config) {
-        throw new ZorkaRuntimeException("Not implemented.");
+        return new STraceHttpOutput(this.config, config, symbolRegistry);
     }
 
 

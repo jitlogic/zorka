@@ -75,17 +75,9 @@ public class ZorkaFixture extends CommonFixture {
 
     protected QueryTranslator translator;
 
-    private String tmpDir;
+    protected String tmpDir;
 
-    protected String tracerType = "local"; // local <-> tracing
-
-    @Before
-    public void setUpFixture() throws Exception {
-
-        // Configure and spawn agent instance ...
-
-        AgentConfig.persistent = false;
-
+    public ZorkaFixture() {
         configProperties = CommonTestUtil.setProps(
                 ZorkaConfig.defaultProperties(AgentConfig.DEFAULT_CONF_PATH),
                 "zorka.home.dir", "/tmp",
@@ -96,9 +88,17 @@ public class ZorkaFixture extends CommonFixture {
                 "scripts", "",
                 "spy", "yes",
                 "scripts.auto", "yes",
-                "tracer.type", tracerType,
                 "auto.com.jitlogic.zorka.core.test.spy.probe", "test.bsh"
         );
+    }
+
+    @Before
+    public void setUpFixture() throws Exception {
+
+        // Configure and spawn agent instance ...
+
+        AgentConfig.persistent = false;
+
 
         taskScheduler = TestTaskScheduler.instance();
 
@@ -152,11 +152,6 @@ public class ZorkaFixture extends CommonFixture {
 
         MainSubmitter.setSubmitter(null);
         MainSubmitter.setLTracer(null);
-    }
-
-
-    public String getTmpDir() {
-        return tmpDir;
     }
 
 

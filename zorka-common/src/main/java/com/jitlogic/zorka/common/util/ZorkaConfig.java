@@ -338,7 +338,7 @@ public class ZorkaConfig {
     }
 
     public static int parseInt(String val, Integer defVal, String msg) {
-        if (val != null && !val.matches("\\d+")) {
+        if (val != null && val.matches("\\d+")) {
             return Integer.parseInt(val);
         } else if (defVal != null) {
             return defVal;

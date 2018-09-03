@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.core.test.spy.support.cbor;
 
 
-import com.jitlogic.zorka.core.util.SimpleValResolver;
+import com.jitlogic.zorka.common.util.SimpleValResolver;
 
 import static com.jitlogic.zorka.common.zico.TraceDataFormat.TRACE_DROP_TOKEN;
 

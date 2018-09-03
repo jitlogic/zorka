@@ -24,7 +24,7 @@ import com.jitlogic.zorka.common.util.JSONWriter;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.core.spy.CborTraceOutput;
+import com.jitlogic.zorka.core.spy.lt.LTraceHttpOutput;
 import com.jitlogic.zorka.core.test.support.CoreTestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
@@ -51,7 +51,7 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
 
     @Test
     public void testRegisterNewAgent() throws Exception {
-        CborTraceOutput output = (CborTraceOutput) tracer.toCbor(
+        LTraceHttpOutput output = (LTraceHttpOutput) tracer.toCbor(
                 ZorkaUtil.<String,String>constMap(
                         "http.url", "http://zorka.io/",
                         "auth.key", "secret",
@@ -83,7 +83,7 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
 
     @Test(expected = ZorkaRuntimeException.class)
     public void testRegisterAgentWithBadAuthKey() throws Exception {
-        CborTraceOutput output = (CborTraceOutput) tracer.toCbor(
+        LTraceHttpOutput output = (LTraceHttpOutput) tracer.toCbor(
             ZorkaUtil.<String,String>constMap(
                 "http.url", "http://zorka.io/",
                 "auth.key", "bad",
@@ -114,7 +114,7 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
 
     @Test @Ignore
     public void testOutputSession() throws Exception {
-        CborTraceOutput output = (CborTraceOutput) tracer.toCbor(
+        LTraceHttpOutput output = (LTraceHttpOutput) tracer.toCbor(
                 ZorkaUtil.<String,String>constMap(
                         "http.url", "http://zorka.io/",
                         "agent.uuid", "123",
@@ -143,7 +143,7 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
         HttpClient miniClient = new MiniHttpClient();
         ObjectInspector.setField(HttpUtil.class, "client", miniClient);
 
-        CborTraceOutput output = (CborTraceOutput) tracer.toCbor(
+        LTraceHttpOutput output = (LTraceHttpOutput) tracer.toCbor(
                 ZorkaUtil.<String,String>constMap(
                         "http.url", "http://127.0.0.1:8640/",
                         "agent.uuid", "21c00000-0201-0000-0015-deadbeef1003",
@@ -159,7 +159,7 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
 
     @Test @Ignore
     public void testPostSimpleTrace() throws Exception {
-        CborTraceOutput output = (CborTraceOutput) tracer.toCbor(
+        LTraceHttpOutput output = (LTraceHttpOutput) tracer.toCbor(
                 ZorkaUtil.<String,String>constMap(
                         "http.url", "http://zorka.io",
                         "agent.uuid", "123",
@@ -180,7 +180,7 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
 
     @Test @Ignore
     public void testPostTwoTracesOneAgd() throws Exception {
-        CborTraceOutput output = (CborTraceOutput) tracer.toCbor(
+        LTraceHttpOutput output = (LTraceHttpOutput) tracer.toCbor(
                 ZorkaUtil.<String,String>constMap(
                 "http.url", "http://zorka.io/",
                         "agent.uuid", "123",
@@ -203,7 +203,7 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
 
     @Test @Ignore
     public void testSwitchSessionAndRepost() throws Exception {
-        CborTraceOutput output = (CborTraceOutput) tracer.toCbor(
+        LTraceHttpOutput output = (LTraceHttpOutput) tracer.toCbor(
                 ZorkaUtil.<String,String>constMap(
                         "http.url", "http://zorka.io/",
                         "agent.uuid", "123",

@@ -68,6 +68,7 @@ public class STraceHandler extends TraceHandler {
      * This is pre-computed 4-byte trace record header.
      */
     public static final int TREC_HEADER;
+    public static final int TREC_EPILOG;
 
     /**
      * Initial fragment of trace record header (four bytes):
@@ -77,7 +78,6 @@ public class STraceHandler extends TraceHandler {
      * - 0x48 - prolog start (byte array of length 8)
      */
     public static final int TREC_HEADER_BE = 0xc89fca48;
-
     public static final int TREC_HEADER_LE = 0x48cb9fc8;
 
     private long minMethodTime = 4;   // Default minimum duration = 4 ticks = ~250us
@@ -185,14 +185,16 @@ public class STraceHandler extends TraceHandler {
 
         if (dur >= minMethodTime || fsm || pos < bufOffs) {
             if (calls < 0x1000000) {
-                if (bufLen - bufPos < 10) nextChunk();
+                if (bufLen - bufPos < 12) nextChunk();
+                writeUInt(CBOR.TAG_BASE, TREC_EPILOG);
                 tst |= (calls << TSTAMP_BITS);
                 buffer[bufPos]   = (byte) (CBOR.BYTES_BASE+8);
                 UNSAFE.putLong(buffer, BYTE_ARRAY_OFFS+bufPos+1, tst);
                 buffer[bufPos+9] = (byte) CBOR.BREAK_CODE;
                 bufPos += 10;
             } else {
-                if (bufLen - bufPos < 18) nextChunk();
+                if (bufLen - bufPos < 20) nextChunk();
+                writeUInt(CBOR.TAG_BASE, TREC_EPILOG);
                 buffer[bufPos]   = (byte) CBOR.BYTES_BASE+16;
                 long p = BYTE_ARRAY_OFFS+bufPos+1;
                 UNSAFE.putLong(buffer, p, tst);
@@ -310,20 +312,16 @@ public class STraceHandler extends TraceHandler {
 
     @Override
     public Object getAttr(int attrId) {
-        // TODO eventually implement version with non-guaranteed result
         throw new ZorkaRuntimeException("Not implemented.");
     }
 
     @Override
     public Object getAttr(int traceId, int attrId) {
-        // TODO eventually implement version with non-guaranteed result
         throw new ZorkaRuntimeException("Not implemented.");
     }
 
     @Override
     public void newAttr(int traceId, int attrId, Object attrVal) {
-        //if (disabled) return;
-
         if (traceId >= 0) {
             writeUInt(CBOR.TAG_BASE, TraceDataFormat.TAG_TRACE_UP_ATTR);
             if (bufLen - bufPos < 2) nextChunk();
@@ -332,9 +330,10 @@ public class STraceHandler extends TraceHandler {
         } else {
             writeUInt(CBOR.TAG_BASE, TraceDataFormat.TAG_TRACE_ATTR);
         }
-        if (bufLen - bufPos < 1) nextChunk();
+        if (bufLen - bufPos < 2) nextChunk();
         buffer[bufPos++] = (byte) (CBOR.MAP_BASE+1);
-        stack[stackPos-2] |= TF_SUBMIT_METHOD;
+        buffer[bufPos++] = (byte)(CBOR.TAG_BASE + TraceDataFormat.TAG_STRING_REF);
+        stack[stackPos-2] |= TF_SUBMIT_METHOD; // TODO submit force behavior is controlled by API, make this thing configurable as in LTracer
 
         writeUInt(0,attrId);
         writeObject(attrVal);
@@ -619,9 +618,11 @@ public class STraceHandler extends TraceHandler {
         if (b[0] == 0x01) {
             // Big Endian
             TREC_HEADER = TREC_HEADER_BE;
+            TREC_EPILOG = TraceDataFormat.TAG_EPILOG_BE;
         } else {
             // Little endian
             TREC_HEADER = TREC_HEADER_LE;
+            TREC_EPILOG = TraceDataFormat.TAG_EPILOG_LE;
         }
     }
 

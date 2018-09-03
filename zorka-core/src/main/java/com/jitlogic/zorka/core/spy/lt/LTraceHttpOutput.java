@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.lt;
 
 import com.jitlogic.zorka.common.http.HttpRequest;
 import com.jitlogic.zorka.common.http.HttpResponse;
@@ -23,9 +23,7 @@ import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.zico.CborResendException;
 import com.jitlogic.zorka.common.zico.TraceDataFormat;
-import com.jitlogic.zorka.common.zico.ZicoException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.jitlogic.zorka.core.spy.ZicoHttpOutput;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.IOException;
@@ -38,24 +36,13 @@ import static com.jitlogic.zorka.common.util.ZorkaConfig.*;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
-
-    private static Logger log = LoggerFactory.getLogger(CborTraceOutput.class);
+public class LTraceHttpOutput extends ZicoHttpOutput {
 
     private static final int C_SHIFT = 0;
     private static final int M_SHIFT = 21;
     private static final int S_SHIFT = 42;
 
     private static final int K_MASK = 0x001fffff;
-
-    private String agentUUID, authKey;
-    private String app, env, hostname;
-    private String sessionUUID, sessionKey;
-
-    private String submitTraceUrl, submitAgentUrl, registerUrl, sessionUrl;
-
-    private int retries, timeout;
-    private long retryTime, retryTimeExp;
 
     private int lastMid = 0, nExceptions;
     private Map<Long,Integer> mids = new HashMap<Long, Integer>();
@@ -65,49 +52,9 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
     private int TBUFSZ = 512 * 1024, ABUFSZ = 128 * 1024;
 
     private CborDataWriter awriter = new CborDataWriter(ABUFSZ, ABUFSZ), twriter = new CborDataWriter(TBUFSZ, TBUFSZ);
-    private SymbolRegistry registry;
 
-
-    private ZorkaConfig config;
-
-    public CborTraceOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry) {
-
-        super("ZORKA-CBOR-OUTPUT", parseInt(conf.get("http.qlen"), 64, "tracer.http.qlen"), 1);
-
-        this.config = config;
-
-        this.agentUUID = conf.get("agent.uuid");
-
-        this.hostname = parseStr(conf.get("hostname"), null, null,
-                "CborTraceOutput: missing mandatory parameter: tracer.hostname");
-
-        this.app = parseStr(conf.get("app.name"), null, null,
-                "CborTraceOutput: missing mandatory parameter: tracer.app.name");
-
-        this.env = parseStr(conf.get("env.name"), null, null,
-                "CborTraceOutput: missing mandatory parameter: tracer.env.name");
-
-        this.authKey = conf.get("auth.key");
-        this.sessionKey = conf.get("sessn.key");
-
-        String url = parseStr(conf.get("http.url"), null, null,
-                "CborTraceOutput: missing mandatory parameter: tracer.http.url");
-
-        if (!url.endsWith("/")) url = url + "/";
-        url += "agent/";
-
-        this.submitAgentUrl = url + "submit/agd";
-        this.submitTraceUrl = url + "submit/trc";
-
-        this.registerUrl = url + "register";
-        this.sessionUrl = url + "session";
-
-        this.registry = registry;
-
-        this.retries = parseInt(conf.get("http.retries"), 10, "tracer.http.retries");
-        this.retryTime = parseInt(conf.get("http.retry.time"), 125, "tracer.http.retry.time");
-        this.retryTimeExp = parseInt(conf.get("http.retry.exp"), 2, "tracer.http.retry.exp");
-        this.timeout = parseInt(conf.get("http.timeout"), 60000, "tracer.http.output");
+    public LTraceHttpOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry) {
+        super(config, conf, registry);
     }
 
     private static long cms2key(int classId, int methodId, int signatureId) {
@@ -195,7 +142,7 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
             twriter.writeTag(TraceDataFormat.TAG_TRACE_ATTR);
             twriter.writeUInt(CBOR.MAP_BASE, attrs.size());
             for (Map.Entry<Integer,Object> e : attrs.entrySet()) {
-                twriter.writeTag(TraceDataFormat.TAG_STRING_REF);
+                twriter.writeTag(TraceDataFormat.TAG_STRING_REF); // TODO get rid of this tag
                 twriter.writeInt(ref(e.getKey(), TraceDataFormat.STRING_TYPE));
                 Object v = e.getValue();
                 if (v == null) {
@@ -257,149 +204,14 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
 
     } // processTraceRecord()
 
-    public void register() {
+
+    protected void resetState() {
         symbolsSent.reset();
         mids.clear();
         lastMid = 0;
         sessionUUID = null;
-
-        String json = new JSONWriter()
-                .write(ZorkaUtil.map(
-                        "rkey", authKey,
-                        "name", hostname,
-                        "app", app,
-                        "env", env
-                ));
-
-        log.info("Registering agent as: name=" + hostname + " app=" + app + " env=" + env);
-
-        try {
-            HttpRequest req = HttpUtil.POST(registerUrl, json)
-                    .withHeader("Content-Type", "application/json");
-            HttpResponse res = req.go();
-            if (res.getStatus() == 201 || res.getStatus() == 200) {
-                Object rslt = new JSONReader().read(res.getBodyAsString());
-                if (rslt instanceof Map) {
-                    Map m = (Map)rslt;
-                    Object u = m.get("uuid");
-                    if (u instanceof String) {
-                        agentUUID = (String) m.get("uuid");
-                        sessionKey = (String) m.get("authkey");
-                        config.writeCfg("tracer.net.agent.uuid", agentUUID);
-                        config.writeCfg("tracer.net.sessn.key", sessionKey);
-                        log.info("Successfully registered agent with uuid=" + agentUUID);
-                    } else {
-                        throw new ZorkaRuntimeException("Invalid registration response from collector: missing or bad UUID '" + res.getBodyAsString() + "'");
-                    }
-                } else {
-                    throw new ZorkaRuntimeException("Invalid registration response from collector: '" + res.getBodyAsString() + "'");
-                }
-            } else {
-                throw new ZorkaRuntimeException("Invalid registration response from collector: "
-                        + res.getStatus() + ": " + res.getStatusMsg());
-            }
-        } catch (IOException e) {
-            throw new ZorkaRuntimeException("I/O error occured while registering agent", e);
-        }
     }
 
-    public String getAgentUUID() {
-        return agentUUID;
-    }
-
-    public void openSession() {
-        symbolsSent.reset();
-        mids.clear();
-        lastMid = 0;
-        sessionUUID = null;
-
-        try {
-            if (agentUUID == null) {
-                log.info("Agent not registered (yet). Registering ...");
-                register();
-            }
-        } catch (ZorkaRuntimeException e) {
-            log.error("Error registering agent.", e);
-            throw e;
-        }
-
-        try {
-            log.debug("Requesting session for agent: uuid=" + agentUUID);
-            HttpRequest req = HttpUtil.POST(sessionUrl,
-                    new JSONWriter().write(ZorkaUtil.map(
-                            "uuid", agentUUID,
-                            "authkey", sessionKey)));
-            HttpResponse res = req.go();
-            if (res.getStatus() == 200) {
-                Object rslt = new JSONReader().read(res.getBodyAsString());
-                if (rslt instanceof Map) {
-                    Map m = (Map)rslt;
-                    Object s = m.get("session");
-                    if (s instanceof String) {
-                        sessionUUID = (String)s;
-                        log.debug("Obtained session: uuid=" + sessionUUID);
-                    } else {
-                        throw new ZorkaRuntimeException("Invalid session response: '" + res.getBodyAsString() + "'");
-                    }
-                } else {
-                    throw new ZorkaRuntimeException("Invalid session response: '" + res.getBodyAsString() + "'");
-                }
-            } else if (res.getStatus() == 401) {
-                throw new ZorkaRuntimeException("Not authorized. Check trapper.cbor.auth-key property.");
-            } else {
-                throw new ZorkaRuntimeException("Server error: " + res.getStatus() + " " + res.getStatusMsg());
-            }
-        } catch (IOException e) {
-            throw new ZorkaRuntimeException("I/O exception: " + e.getMessage(), e);
-        }
-    }
-
-    public void newSession() {
-        long rt = retryTime;
-        for (int i = 0; i < retries; i++) {
-            try {
-                openSession();
-
-                if (sessionUUID != null) {
-                    break;
-                }
-            } catch (Exception e) {
-                log.error("Cannot open collector session to: " + sessionUrl, e);
-            }
-
-            rt *= retryTimeExp;
-
-            try {
-                Thread.sleep(rt);
-            } catch (InterruptedException e) {
-            }
-        }
-
-        if (sessionUUID == null) {
-            throw new ZorkaRuntimeException("Cannot obtain agent session.");
-        }
-    }
-
-    private void send(CborDataWriter w, String uri, String traceUUID) {
-        try {
-            // TODO this is inefficient, implement dedicated Base64/json/etc encoding in HttpClient
-            HttpRequest req = HttpUtil.POST(uri, DatatypeConverter.printBase64Binary(Arrays.copyOf(w.getBuf(), w.position())));
-            req.setHeader("X-Zorka-Agent-UUID", agentUUID);
-            req.setHeader("X-Zorka-Session-UUID", sessionUUID);
-            req.setHeader("Content-Type", "application/zorka+cbor+v1");
-            if (traceUUID != null) req.setHeader("X-Zorka-Trace-UUID", traceUUID);
-            HttpResponse res = req.go();
-            if (res.getStatus() < 300) {
-                log.trace("Submitted: " + uri + " : " + traceUUID);
-            } else if (res.getStatus() == 412) {
-                throw new ZorkaRuntimeException("Resend.");
-            } else {
-               throw new ZorkaRuntimeException("Server error: " + res.getStatus() + " " + res.getStatus());
-            }
-        } catch (IOException e) {
-            throw new ZorkaRuntimeException("I/O exception: " + e.getMessage());
-        }
-    }
 
     @Override
     protected void process(List<SymbolicRecord> obj) {
@@ -419,11 +231,13 @@ public class CborTraceOutput extends ZorkaAsyncThread<SymbolicRecord> {
                     }
 
                     if (awriter.position() > 0) {
-                        send(awriter, submitAgentUrl, null);
+                        String data = DatatypeConverter.printBase64Binary(ZorkaUtil.clipArray(awriter.getBuf(), awriter.position()));
+                        send(data, submitAgentUrl, null);
                     }
 
                     if (twriter.position() > 0) {
-                        send(twriter, submitTraceUrl, UUID.randomUUID().toString());
+                        String data = DatatypeConverter.printBase64Binary(ZorkaUtil.clipArray(twriter.getBuf(), twriter.position()));
+                        send(data, submitTraceUrl, UUID.randomUUID().toString());
                     }
 
                     break;

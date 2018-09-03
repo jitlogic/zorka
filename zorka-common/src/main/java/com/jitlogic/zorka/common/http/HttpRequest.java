@@ -98,4 +98,9 @@ public class HttpRequest extends HttpMsg {
     public HttpResponse go() throws IOException {
         return client.execute(this);
     }
+
+    @Override
+    public String toString() {
+        return method + " " + url + " " + getHeaders() + "\n" + getBodyAsString();
+    }
 }

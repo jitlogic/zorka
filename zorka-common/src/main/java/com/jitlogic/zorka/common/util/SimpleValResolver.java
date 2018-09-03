@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.util;
+package com.jitlogic.zorka.common.util;
 
 public interface SimpleValResolver {
 

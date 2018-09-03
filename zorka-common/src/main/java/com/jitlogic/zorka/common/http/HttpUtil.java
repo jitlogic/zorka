@@ -27,7 +27,9 @@ public class HttpUtil {
     private static HttpClient client = new MiniHttpClient();
     public static final Pattern RE_HTTP_URL = Pattern.compile("(https?)://([^/]+)(/.*)");
 
-
+    public static void setHttpClient(HttpClient httpClient) {
+        client = httpClient;
+    }
 
     public static HttpRequest GET(String url) throws IOException {
         Matcher m = RE_HTTP_URL.matcher(url);
