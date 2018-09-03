@@ -62,16 +62,6 @@ public class LTracerLib extends TracerLib {
 
 
     /**
-     * Configures tracer output.
-     *
-     * @param output trace processing object
-     */
-    public void output(ZorkaSubmitter<SymbolicRecord> output) {
-        ((LTracer)tracer).addOutput(output);
-    }
-
-
-    /**
      * Creates trace file writer object. Trace writer can receive traces and store them in a file.
      *
      * @param path     path to a file

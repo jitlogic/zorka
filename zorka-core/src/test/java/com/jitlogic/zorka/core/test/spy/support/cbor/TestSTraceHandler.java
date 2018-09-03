@@ -14,29 +14,23 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.test.spy.cbor;
+package com.jitlogic.zorka.core.test.spy.support.cbor;
 
+import com.jitlogic.zorka.common.ZorkaSubmitter;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
+import com.jitlogic.zorka.core.spy.st.STraceBufManager;
+import com.jitlogic.zorka.core.spy.st.STraceHandler;
 
-import com.jitlogic.zorka.core.spy.st.STraceBufChunk;
-import com.jitlogic.zorka.core.spy.st.STraceBufOutput;
+public class TestSTraceHandler extends STraceHandler {
 
-public class TestTraceBufOutput implements STraceBufOutput {
-
-    private STraceBufChunk chunks;
-
-    @Override
-    public void process(Object source, STraceBufChunk newChunks) {
-        for (STraceBufChunk c = newChunks; c != null; c = c.getNext()) {
-            if (c.getNext() == null) {
-                c.setNext(chunks);
-                break;
-            }
-        }
-        chunks = newChunks;
+    public TestSTraceHandler(STraceBufManager bufManager, SymbolRegistry symbols, ZorkaSubmitter<SymbolicRecord> output) {
+        super(bufManager, symbols, output);
     }
 
-    public STraceBufChunk getChunks() {
-        return chunks;
+    public long t, c;
+    protected long ticks() {
+        return t;
     }
-
+    protected long clock() { return c; }
 }

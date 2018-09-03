@@ -14,8 +14,10 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.test.spy.cbor;
+package com.jitlogic.zorka.core.test.spy.support.cbor;
 
+
+import com.jitlogic.zorka.core.util.SimpleValResolver;
 
 import static com.jitlogic.zorka.common.zico.TraceDataFormat.TRACE_DROP_TOKEN;
 

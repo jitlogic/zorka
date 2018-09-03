@@ -58,7 +58,7 @@ public class ZorkaFixture extends CommonFixture {
 
     protected SyslogLib syslogLib;
     protected SpyLib spy;
-    protected LTracerLib tracer;
+    protected TracerLib tracer;
     protected SnmpLib snmpLib;
 
     protected ZorkaBshAgent zorkaAgent;
@@ -77,6 +77,8 @@ public class ZorkaFixture extends CommonFixture {
 
     private String tmpDir;
 
+    protected String tracerType = "local"; // local <-> tracing
+
     @Before
     public void setUpFixture() throws Exception {
 
@@ -94,6 +96,7 @@ public class ZorkaFixture extends CommonFixture {
                 "scripts", "",
                 "spy", "yes",
                 "scripts.auto", "yes",
+                "tracer.type", tracerType,
                 "auto.com.jitlogic.zorka.core.test.spy.probe", "test.bsh"
         );
 
@@ -111,7 +114,7 @@ public class ZorkaFixture extends CommonFixture {
         syslogLib = agentInstance.getSyslogLib();
         snmpLib = agentInstance.getSnmpLib();
         spy = agentInstance.getSpyLib();
-        tracer = (LTracerLib)agentInstance.getTracerLib();
+        tracer = agentInstance.getTracerLib();
         perfmon = agentInstance.getPerfMonLib();
         spyTransformer = agentInstance.getClassTransformer();
         zabbixLib = agentInstance.getZabbixLib();

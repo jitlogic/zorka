@@ -14,8 +14,10 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy.st;
+package com.jitlogic.zorka.core.util;
 
-public interface STraceBufOutput {
-    void process(Object source, STraceBufChunk chunks);
+public interface SimpleValResolver {
+
+    Object resolve(int sv);
+
 }

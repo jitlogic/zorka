@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.test.spy.cbor;
+package com.jitlogic.zorka.core.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

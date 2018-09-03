@@ -79,5 +79,7 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
     @After
     public void tearDown() throws Exception {
         MainSubmitter.setSubmitter(null);
+        MainSubmitter.setLTracer(null);
+        MainSubmitter.setSTracer(null);
     }
 }

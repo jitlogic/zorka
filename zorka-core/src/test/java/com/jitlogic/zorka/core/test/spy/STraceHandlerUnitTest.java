@@ -21,8 +21,8 @@ import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.st.STraceBufChunk;
 import com.jitlogic.zorka.core.spy.st.STraceBufManager;
-import com.jitlogic.zorka.core.test.spy.cbor.TestTraceBufOutput;
-import com.jitlogic.zorka.core.test.spy.cbor.TestTraceRecorder;
+import com.jitlogic.zorka.core.test.spy.support.cbor.TestTraceBufOutput;
+import com.jitlogic.zorka.core.test.spy.support.cbor.TestSTraceHandler;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import com.jitlogic.zorka.core.util.ZorkaUnsafe;
 import org.junit.After;
@@ -34,9 +34,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.jitlogic.zorka.core.test.spy.cbor.TraceCborUtils.chunksCount;
-import static com.jitlogic.zorka.core.test.spy.cbor.TraceCborUtils.decodeTrace;
-import static com.jitlogic.zorka.core.test.spy.cbor.TraceCborUtils.mkString;
+import static com.jitlogic.zorka.core.test.spy.support.cbor.STTrcTestUtils.chunksCount;
+import static com.jitlogic.zorka.core.test.spy.support.cbor.STTrcTestUtils.decodeTrace;
+import static com.jitlogic.zorka.core.test.spy.support.cbor.STTrcTestUtils.mkString;
 import static com.jitlogic.zorka.core.util.ZorkaUnsafe.BYTE_ARRAY_OFFS;
 import static org.junit.Assert.*;
 
@@ -56,7 +56,7 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
     private TestTraceBufOutput o = new TestTraceBufOutput();
 
-    private TestTraceRecorder r = new TestTraceRecorder(bm,symbols,o);
+    private TestSTraceHandler r = new TestSTraceHandler(bm,symbols,o);
 
     private static Object l(Object...args) {
         return Arrays.asList(args);

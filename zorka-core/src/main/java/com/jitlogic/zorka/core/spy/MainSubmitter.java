@@ -40,6 +40,8 @@ public class MainSubmitter {
      */
     private static volatile SpySubmitter submitter;
 
+    private static volatile Tracer t;
+
     /**
      * Local tracer (old implementation)
      */
@@ -79,7 +81,7 @@ public class MainSubmitter {
         }
 
         try {
-            lt.getHandler().disable();
+            t.getHandler().disable();
             if (submitter != null) {
                 inSubmit.set(true);
                 submitter.submit(stage, id, submitFlags, vals);
@@ -95,7 +97,7 @@ public class MainSubmitter {
             AgentDiagnostics.inc(AgentDiagnostics.SPY_ERRORS);
         } finally {
             inSubmit.set(false);
-            lt.getHandler().enable();
+            t.getHandler().enable();
         }
     }
 
@@ -163,7 +165,7 @@ public class MainSubmitter {
     /**
      * This method is called by tracer probes at method exit.
      */
-    public static void traceReturnR() {
+    public static void traceReturnS() {
 
         if (st != null) {
             try {
@@ -234,11 +236,11 @@ public class MainSubmitter {
      * @param tracer
      */
     public synchronized static void setLTracer(LTracer tracer) {
-        MainSubmitter.lt = tracer;
+        t = lt = tracer;
     }
 
     public synchronized static void setSTracer(STracer tracer) {
-        MainSubmitter.st = tracer;
+        t = st = tracer;
     }
 
     public synchronized static boolean isStreamingTracer() {

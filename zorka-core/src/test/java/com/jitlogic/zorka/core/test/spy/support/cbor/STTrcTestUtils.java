@@ -14,16 +14,21 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.test.spy.cbor;
+package com.jitlogic.zorka.core.test.spy.support.cbor;
 
 
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.spy.st.STraceBufChunk;
+import com.jitlogic.zorka.core.util.CBORReader;
+
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class TraceCborUtils {
+public class STTrcTestUtils {
 
     public static int chunksCount(STraceBufChunk chunks) {
         int count = 0;
@@ -51,8 +56,6 @@ public class TraceCborUtils {
         return buf;
     }
 
-
-
     public static String chunksHex(STraceBufChunk chunks) {
         return DatatypeConverter.printHexBinary(chunksMerge(chunks));
     }
@@ -67,6 +70,21 @@ public class TraceCborUtils {
         return new CBORReader(bis, new TestTagProcessor(), new TestValResolver()).read();
     }
 
+    public static STRec parseTrace(STraceBufChunk chunks, SymbolRegistry symbols) throws IOException {
+        ByteArrayInputStream bis = new ByteArrayInputStream(chunksMerge(chunks));
+        STRec tr = (STRec) (new CBORReader(bis, new STTagProcessor(symbols), new TestValResolver()).read());
+        tr.promoteUpAttrs();
+        return tr;
+    }
+
+    public static List<STRec> parseTraces(STraceBufChunk chunks, SymbolRegistry symbols) throws IOException {
+        ByteArrayInputStream bis = new ByteArrayInputStream(chunksMerge(chunks));
+        List<STRec> lst = new ArrayList<STRec>();
+        while (bis.available() > 0) {
+            lst.add((STRec) (new CBORReader(bis, new STTagProcessor(symbols), new TestValResolver()).read()));
+        }
+        return lst;
+    }
 
     public static String mkString(int len) {
         StringBuilder sb = new StringBuilder(len);

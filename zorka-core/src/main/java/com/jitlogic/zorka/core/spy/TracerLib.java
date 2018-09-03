@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.core.spy.lt.LTracer;
@@ -519,5 +520,14 @@ public abstract class TracerLib {
 
     public ClassLoader overlayClassLoader(ClassLoader parent, String pattern, ClassLoader overlay) {
         return new OverlayClassLoader(parent, pattern, overlay);
+    }
+
+    /**
+     * Configures tracer output.
+     *
+     * @param output trace processing object
+     */
+    public void output(ZorkaSubmitter<SymbolicRecord> output) {
+        tracer.addOutput(output);
     }
 }

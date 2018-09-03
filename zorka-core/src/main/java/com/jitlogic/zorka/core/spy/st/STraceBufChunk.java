@@ -16,7 +16,12 @@
 
 package com.jitlogic.zorka.core.spy.st;
 
-public class STraceBufChunk {
+import com.jitlogic.zorka.common.tracedata.MetadataChecker;
+import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
+
+import java.io.IOException;
+
+public class STraceBufChunk implements SymbolicRecord {
 
     private byte[] buffer;
 
@@ -63,6 +68,11 @@ public class STraceBufChunk {
         offset = 0;
         size = 0;
         next = null;
+    }
+
+    @Override
+    public void traverse(MetadataChecker checker) throws IOException {
+
     }
 }
 

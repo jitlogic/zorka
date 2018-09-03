@@ -26,9 +26,7 @@ import com.jitlogic.zorka.core.spy.SpyMatcherSet;
 import com.jitlogic.zorka.core.spy.Tracer;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Groups all tracer engine components and global settings.
@@ -36,17 +34,6 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author rafal.lewczuk@jitlogic.com
  */
 public class LTracer extends Tracer {
-
-
-    private AtomicReference<List<ZorkaSubmitter<SymbolicRecord>>> outputs
-            = new AtomicReference<List<ZorkaSubmitter<SymbolicRecord>>>(new ArrayList<ZorkaSubmitter<SymbolicRecord>>());
-
-
-    /**
-     * Symbol registry containing names of all symbols tracer knows about.
-     */
-    private SymbolRegistry symbolRegistry;
-
 
     /**
      * Thread local serving trace builder objects for application threads
@@ -114,22 +101,6 @@ public class LTracer extends Tracer {
     }
 
 
-    /**
-     * Sets output trace event handler tracer will submit completed traces to.
-     * Note that submit() method of supplied handler is called from application
-     * threads, so it must be thread safe.
-     *
-     * @param output trace event handler
-     */
-    public synchronized void addOutput(ZorkaSubmitter<SymbolicRecord> output) {
-        List<ZorkaSubmitter<SymbolicRecord>> newOutputs = new ArrayList<ZorkaSubmitter<SymbolicRecord>>(outputs.get());
-        newOutputs.add(output);
-        outputs.set(newOutputs);
-    }
-
-    public List<ZorkaSubmitter<SymbolicRecord>> getOutputs() {
-        return Collections.unmodifiableList(outputs.get());
-    }
 
 
 }

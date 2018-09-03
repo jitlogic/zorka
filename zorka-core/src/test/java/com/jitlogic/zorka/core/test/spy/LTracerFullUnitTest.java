@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
 import static com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture.*;
 import static com.jitlogic.zorka.core.test.support.CoreTestUtil.*;
 
-public class FullTracerUnitTest extends ZorkaFixture {
+public class LTracerFullUnitTest extends ZorkaFixture {
 
     private List<TraceRecord> results = new ArrayList<TraceRecord>();
 

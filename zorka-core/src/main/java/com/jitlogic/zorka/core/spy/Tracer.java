@@ -18,8 +18,14 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.core.spy.lt.TraceHandler;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class Tracer implements ZorkaService, ZorkaSubmitter<SymbolicRecord> {
 
@@ -44,6 +50,15 @@ public abstract class Tracer implements ZorkaService, ZorkaSubmitter<SymbolicRec
      * Defines which classes and methods should be traced.
      */
     protected SpyMatcherSet matcherSet;
+
+    /**
+     * Symbol registry containing names of all symbols tracer knows about.
+     */
+    protected SymbolRegistry symbolRegistry;
+
+    protected AtomicReference<List<ZorkaSubmitter<SymbolicRecord>>> outputs
+            = new AtomicReference<List<ZorkaSubmitter<SymbolicRecord>>>(new ArrayList<ZorkaSubmitter<SymbolicRecord>>());
+
 
 
     public abstract TraceHandler getHandler();
@@ -102,5 +117,24 @@ public abstract class Tracer implements ZorkaService, ZorkaSubmitter<SymbolicRec
         matcherSet = new SpyMatcherSet();
         return ret;
     }
+
+
+    /**
+     * Sets output trace event handler tracer will submit completed traces to.
+     * Note that submit() method of supplied handler is called from application
+     * threads, so it must be thread safe.
+     *
+     * @param output trace event handler
+     */
+    public synchronized void addOutput(ZorkaSubmitter<SymbolicRecord> output) {
+        List<ZorkaSubmitter<SymbolicRecord>> newOutputs = new ArrayList<ZorkaSubmitter<SymbolicRecord>>(outputs.get());
+        newOutputs.add(output);
+        outputs.set(newOutputs);
+    }
+
+    public List<ZorkaSubmitter<SymbolicRecord>> getOutputs() {
+        return Collections.unmodifiableList(outputs.get());
+    }
+
 
 }

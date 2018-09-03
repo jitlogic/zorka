@@ -31,22 +31,6 @@ import com.jitlogic.zorka.core.spy.lt.TraceHandler;
  */
 public class STracer extends Tracer {
 
-    /**
-     * Minimum default method execution time required to attach method to trace.
-     */
-    private static long minMethodTime = 250000;
-
-    /**
-     * Maximum number of records inside trace
-     */
-    private static int maxTraceRecords = 4096;
-
-    private static long minTraceTime = 1000000000L;
-
-    /**
-     * Symbol registry containing names of all symbols tracer knows about.
-     */
-    private SymbolRegistry symbolRegistry;
 
     /**
      * Buffer manager for streaming tracer.
@@ -54,20 +38,14 @@ public class STracer extends Tracer {
     private STraceBufManager bufManager;
 
     /**
-     * Buffer output for streaming tracer.
-     */
-    private STraceBufOutput bufOutput;
-
-
-    /**
      * Thread local serving streaming tracer objects for application threads.
      */
     private ThreadLocal<STraceHandler> handlers =
         new ThreadLocal<STraceHandler>() {
             public STraceHandler initialValue() {
-                STraceHandler recorder = new STraceHandler(bufManager, symbolRegistry, bufOutput);
-                recorder.setMinimumMethodTime(minMethodTime >> 16);
-                return recorder;
+                STraceHandler handler = new STraceHandler(bufManager, symbolRegistry, outputs.get().get(0));
+                handler.setMinimumMethodTime(minMethodTime >> 16);
+                return handler;
             }
         };
 
@@ -92,55 +70,14 @@ public class STracer extends Tracer {
         matcherSet = matcherSet.include(matcher);
     }
 
-    public SpyMatcherSet clearMatchers() {
-        SpyMatcherSet ret = matcherSet;
-        matcherSet = new SpyMatcherSet();
-        return ret;
-    }
-
-
     @Override
     public synchronized void shutdown() {
     }
 
-
-    public SpyMatcherSet getMatcherSet() {
-        return matcherSet;
-    }
-
-    public void setMatcherSet(SpyMatcherSet matcherSet) {
-        this.matcherSet = matcherSet;
-    }
-
-    public void setBufOutput(STraceBufOutput bufOutput) {
-        this.bufOutput = bufOutput;
-    }
-
-    public static long getMinMethodTime() {
-        return minMethodTime;
-    }
-
-    public static void setMinMethodTime(long methodTime) {
-        minMethodTime = methodTime;
-    }
-
-    public static int getMaxTraceRecords() {
-        return maxTraceRecords;
-    }
-
-    public static void setMaxTraceRecords(int traceSize) {
-        maxTraceRecords = traceSize;
-    }
-
-    public static void setMinTraceTime(long traceTime) { STracer.minTraceTime = traceTime; }
-
-    public static long getMinTraceTime() { return STracer.minTraceTime; }
-
     @Override
     public TraceHandler getHandler() {
-        return null;
+        return handlers.get();
     }
-
 
     @Override
     public boolean submit(SymbolicRecord item) {

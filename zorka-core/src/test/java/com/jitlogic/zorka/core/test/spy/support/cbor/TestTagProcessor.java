@@ -14,10 +14,11 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.test.spy.cbor;
+package com.jitlogic.zorka.core.test.spy.support.cbor;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.st.STraceHandler;
+import com.jitlogic.zorka.core.util.TagProcessor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +31,8 @@ import static com.jitlogic.zorka.common.zico.TraceDataFormat.*;
 import static org.junit.Assert.fail;
 
 public class TestTagProcessor implements TagProcessor {
+
+    // TODO get rid of this (unnecesary) tag processor, migrate STRaceHandlerUnitTest to STTagProcessor.
 
     private long unpackLong(byte[] buf, int offs) {
         if (buf.length-offs >= 8) {
