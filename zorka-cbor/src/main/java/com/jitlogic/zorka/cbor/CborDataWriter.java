@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package com.jitlogic.zorka.common.util;
+package com.jitlogic.zorka.cbor;
 
+
+import com.jitlogic.zorka.cbor.CBOR;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  *
@@ -81,8 +84,10 @@ public class CborDataWriter {
 
     public void flush() {
         if (delta > 0) {
+            byte[] b = new byte[limit+delta];
+            System.arraycopy(this.buf, 0, b, 0, limit);
+            this.buf = b;
             limit += delta;
-            this.buf = Arrays.copyOf(this.buf, limit);
         } else {
             throw new RuntimeException("Buffer overflow.");
         }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.jitlogic.zorka.common.util;
+package com.jitlogic.zorka.cbor;
 
 /**
  *
@@ -102,5 +102,9 @@ public class CBOR {
             : v < 0x100 ? 2
             : v < 0x10000 ? 3
             : v < 0x1000000L ? 5 : 9;
+    }
+
+    private CBOR() {
+        // This class cannot be instantiated
     }
 }

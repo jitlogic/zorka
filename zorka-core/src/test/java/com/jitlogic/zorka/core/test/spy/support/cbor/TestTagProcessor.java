@@ -18,7 +18,7 @@ package com.jitlogic.zorka.core.test.spy.support.cbor;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.st.STraceHandler;
-import com.jitlogic.zorka.common.util.TagProcessor;
+import com.jitlogic.zorka.cbor.TagProcessor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.jitlogic.zorka.core.util.ZorkaUnsafe.*;
-import static com.jitlogic.zorka.common.zico.TraceDataFormat.*;
+import static com.jitlogic.zorka.cbor.TraceDataFormat.*;
 
 import static org.junit.Assert.fail;
 

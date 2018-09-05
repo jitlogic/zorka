@@ -48,6 +48,7 @@
         <module>zorka-core</module>
         <module>zorka-agent</module>
         <module>zorka-dist</module>
+        <module>zorka-cbor</module>
     </modules>
 
 </project>

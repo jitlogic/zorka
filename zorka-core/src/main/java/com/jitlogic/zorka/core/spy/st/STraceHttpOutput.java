@@ -1,9 +1,11 @@
 package com.jitlogic.zorka.core.spy.st;
 
+import com.jitlogic.zorka.cbor.CBORReader;
+import com.jitlogic.zorka.cbor.SimpleValResolver;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.*;
-import com.jitlogic.zorka.common.zico.CborResendException;
+import com.jitlogic.zorka.cbor.CborResendException;
 import com.jitlogic.zorka.core.spy.ZicoHttpOutput;
 
 import javax.xml.bind.DatatypeConverter;

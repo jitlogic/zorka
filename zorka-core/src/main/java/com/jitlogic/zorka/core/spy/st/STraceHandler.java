@@ -20,10 +20,10 @@ package com.jitlogic.zorka.core.spy.st;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
-import com.jitlogic.zorka.common.util.CBOR;
+import com.jitlogic.zorka.cbor.CBOR;
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.common.zico.TraceDataFormat;
+import com.jitlogic.zorka.cbor.TraceDataFormat;
 import com.jitlogic.zorka.core.spy.lt.TraceHandler;
 
 import java.util.List;

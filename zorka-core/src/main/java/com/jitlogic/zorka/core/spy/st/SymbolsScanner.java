@@ -16,15 +16,18 @@
 
 package com.jitlogic.zorka.core.spy.st;
 
+import com.jitlogic.zorka.cbor.CBOR;
+import com.jitlogic.zorka.cbor.CborDataWriter;
+import com.jitlogic.zorka.cbor.TagProcessor;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.*;
-import com.jitlogic.zorka.common.zico.TraceDataFormat;
+import com.jitlogic.zorka.cbor.TraceDataFormat;
 
 import javax.xml.bind.DatatypeConverter;
 import java.util.List;
 import java.util.Map;
 
-import static com.jitlogic.zorka.common.zico.TraceDataFormat.*;
+import static com.jitlogic.zorka.cbor.TraceDataFormat.*;
 import static com.jitlogic.zorka.core.util.ZorkaUnsafe.BYTE_ARRAY_OFFS;
 import static com.jitlogic.zorka.core.util.ZorkaUnsafe.UNSAFE;
 

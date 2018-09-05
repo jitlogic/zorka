@@ -16,20 +16,16 @@
 
 package com.jitlogic.zorka.core.spy.lt;
 
-import com.jitlogic.zorka.common.http.HttpRequest;
-import com.jitlogic.zorka.common.http.HttpResponse;
-import com.jitlogic.zorka.common.http.HttpUtil;
+import com.jitlogic.zorka.cbor.CBOR;
+import com.jitlogic.zorka.cbor.CborDataWriter;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.*;
-import com.jitlogic.zorka.common.zico.CborResendException;
-import com.jitlogic.zorka.common.zico.TraceDataFormat;
+import com.jitlogic.zorka.cbor.CborResendException;
+import com.jitlogic.zorka.cbor.TraceDataFormat;
 import com.jitlogic.zorka.core.spy.ZicoHttpOutput;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.IOException;
 import java.util.*;
-
-import static com.jitlogic.zorka.common.util.ZorkaConfig.*;
 
 /**
  * Tracer output sending data to remote ZICO collector using ZICO2+CBOR protocol.

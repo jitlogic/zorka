@@ -17,9 +17,9 @@
 package com.jitlogic.zorka.core.test.spy.support.cbor;
 
 
-import com.jitlogic.zorka.common.util.SimpleValResolver;
+import com.jitlogic.zorka.cbor.SimpleValResolver;
 
-import static com.jitlogic.zorka.common.zico.TraceDataFormat.TRACE_DROP_TOKEN;
+import static com.jitlogic.zorka.cbor.TraceDataFormat.TRACE_DROP_TOKEN;
 
 public class TestValResolver implements SimpleValResolver {
 

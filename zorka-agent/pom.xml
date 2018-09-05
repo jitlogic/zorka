@@ -61,6 +61,7 @@
                             <includes>
                                 <include>org.ow2.asm:asm</include>
                                 <include>com.jitlogic.zorka:zorka-slf4j</include>
+                                <include>com.jitlogic.zorka:zorka-cbor</include>
                                 <include>com.jitlogic.zorka:zorka-common</include>
                                 <include>com.jitlogic.zorka:zorka-bsh-core</include>
                                 <include>com.jitlogic.zorka:zorka-snmp</include>

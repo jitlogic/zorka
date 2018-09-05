@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.jitlogic.zorka.common.zico;
+package com.jitlogic.zorka.cbor;
 
 /**
  *
@@ -105,11 +105,18 @@ public class TraceDataFormat {
 
     public static final int TI_SKIP     = 0x0f;
 
+    public static final int TI_FLAGS_C  = 0x10;
+
     /** Marks trace as ending with error (th. thrown exception). */
     public static final int TF_ERROR    = 0x01; // Error flag
 
     //
     public static final int TRACE_DROP_TOKEN   = 0xe0; /* TRACE DROP is encoded as simple value. */
+
+    /** This is pre-computed 4-byte trace record header. */
+
+    public static final int TREC_HEADER_BE = 0xd80a9f48;
+    public static final int TREC_HEADER_LE = 0x489f0bd8;
 
     public static final byte STRING_TYPE  = 0x00; // Generic string, raw encoding (no prefix);
 
@@ -120,5 +127,7 @@ public class TraceDataFormat {
     public static final byte UUID_TYPE    = 0x07; // UUID              0x07|uuid_encoded|0x07
     public static final byte SIGN_TYPE    = 0x08; // Method signature  0x08|method_signature|0x08
     public static final byte TYPE_MAX     = 0x08;
+
+    public static int TICKS_IN_SECOND = 15259;    //
 
 }
