@@ -185,20 +185,6 @@ public class LTraceHandler extends TraceHandler {
 
 
     @Override
-    public Object getAttr(int traceId, int attrId) {
-        TraceRecord tr = realTop();
-        while (tr != null) {
-            if (traceId == -1 || (tr.hasFlag(TraceRecord.TRACE_BEGIN) &&
-                (traceId == 0 || tr.getMarker().getTraceId() == traceId))) {
-                return tr.getAttr(attrId);
-            }
-            tr = tr.getParent();
-        }
-        return null;
-    }
-
-
-    @Override
     public void newAttr(int traceId, int attrId, Object attrVal) {
         TraceRecord tr = realTop();
 

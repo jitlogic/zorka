@@ -336,12 +336,6 @@ public class STraceHandler extends TraceHandler {
     }
 
     @Override
-    public Object getAttr(int traceId, int attrId) {
-        log.warn("Not implemented: getAttr(" + traceId + ", " + attrId + ")");
-        return null;
-    }
-
-    @Override
     public void newAttr(int traceId, int attrId, Object attrVal) {
         if (traceId >= 0) {
             writeUInt(CBOR.TAG_BASE, TraceDataFormat.TAG_TRACE_UP_ATTR);

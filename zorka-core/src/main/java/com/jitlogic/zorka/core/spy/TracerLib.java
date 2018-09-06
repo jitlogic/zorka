@@ -203,30 +203,6 @@ public abstract class TracerLib {
         return traceAttr(traceName, attrName, null, srcField);
     }
 
-    /**
-     * Looks for trace of given name in trace stack and retrieves named attribute from it.
-     *
-     * @param dstField field where attribute value will be stored
-     * @param attrName attribute name
-     * @return spy processor
-     */
-    public SpyProcessor getTraceAttr(String dstField, String attrName) {
-        return getTraceAttr(dstField, null, attrName);
-    }
-
-    /**
-     * Looks for trace of given name in trace stack and retrieves named attribute from it.
-     *
-     * @param dstField field where attribute value will be stored
-     * @param traceName trace name
-     * @param attrName attribute name
-     * @return spy processor
-     */
-    public SpyProcessor getTraceAttr(String dstField, String traceName, String attrName) {
-        return new TraceAttrGetterProcessor(tracer, dstField,
-                traceName != null ? symbolRegistry.symbolId(traceName) : 0,
-                symbolRegistry.symbolId(attrName));
-    }
 
     /**
      * Creates spy processor that formats a string and attaches it as attribute to trace record.

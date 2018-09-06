@@ -28,17 +28,6 @@ public abstract class TraceHandler {
     public abstract void traceBegin(int traceId, long clock, int flags);
 
     /**
-     * Returns given trace attribute.
-     *
-     * @param traceId positive number (trace id) if attribute has to be fetched from a top record of specific
-     *                trace, 0 if attribute has to be fetched from a top record of any trace, -1 if attribute
-     *                has to be fetched from current method;
-     * @param attrId  attribute ID
-     * @return  attribute value
-     */
-    public abstract Object getAttr(int traceId, int attrId);
-
-    /**
      * Attaches attribute to current trace record (or any other record up the call stack).
      *
      * @param traceId positive number (trace id) if attribute has to be attached to a top record of specific
