@@ -53,17 +53,6 @@ public class TestTraceBuilder extends LTraceHandler {
     }
 
     @Override
-    public Object getAttr(int attrId) {
-        Object attr = null;
-        for (Map<Object, Object> m : data) {
-            if ("newAttr".equals(m.get("action"))) {
-                attr = m.get("attrVal");
-            }
-        }
-        return attr;
-    }
-
-    @Override
     public void newAttr(int traceId, int attrId, Object attrVal) {
         data.add(ZorkaUtil.map("action", "newAttr", "attrId", attrId, "attrVal", attrVal));
     }

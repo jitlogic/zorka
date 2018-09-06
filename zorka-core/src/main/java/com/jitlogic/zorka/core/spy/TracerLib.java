@@ -365,27 +365,6 @@ public abstract class TracerLib {
         return new TraceFlagsProcessor(tracer, srcField, symbolRegistry.symbolId(traceName), flags);
     }
 
-    /**
-     * Labels current trace with tags.
-     *
-     * @param tags tag strings
-     * @return spy processor object
-     */
-    public SpyProcessor tags(String... tags) {
-        return customTags("TAGS", "TAGS", tags);
-    }
-
-    /**
-     * Labels
-     *
-     * @param attrName
-     * @param attrTag
-     * @param tags
-     * @return
-     */
-    public SpyProcessor customTags(String attrName, String attrTag, String... tags) {
-        return new TraceTaggerProcessor(symbolRegistry, tracer, attrName, attrTag, tags);
-    }
 
     public SpyProcessor dtraceInput(long threshold) {
         return new DTraceInputProcessor(this, dtraceLocal, threshold);

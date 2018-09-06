@@ -34,9 +34,6 @@ import org.slf4j.LoggerFactory;
  */
 public class LTraceHandler extends TraceHandler {
 
-    private final static Logger log = LoggerFactory.getLogger(LTraceHandler.class);
-
-
     /**
      * Output
      */
@@ -184,12 +181,6 @@ public class LTraceHandler extends TraceHandler {
         } else {
             return ttop;
         }
-    }
-
-
-    @Override
-    public Object getAttr(int attrId) {
-        return realTop().getAttr(attrId);
     }
 
 

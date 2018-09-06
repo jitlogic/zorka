@@ -336,12 +336,6 @@ public class STraceHandler extends TraceHandler {
     }
 
     @Override
-    public Object getAttr(int attrId) {
-        log.warn("Not imeplented: getAttr(" + attrId + ")");
-        return null;
-    }
-
-    @Override
     public Object getAttr(int traceId, int attrId) {
         log.warn("Not implemented: getAttr(" + traceId + ", " + attrId + ")");
         return null;

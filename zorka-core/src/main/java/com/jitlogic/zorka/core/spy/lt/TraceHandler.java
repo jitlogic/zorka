@@ -27,8 +27,6 @@ public abstract class TraceHandler {
 
     public abstract void traceBegin(int traceId, long clock, int flags);
 
-    public abstract Object getAttr(int attrId);
-
     /**
      * Returns given trace attribute.
      *
