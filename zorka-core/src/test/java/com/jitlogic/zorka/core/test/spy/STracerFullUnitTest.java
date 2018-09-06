@@ -1,17 +1,14 @@
 package com.jitlogic.zorka.core.test.spy;
 
-import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.test.spy.support.cbor.STBeg;
 import com.jitlogic.zorka.core.test.spy.support.cbor.STRec;
 import com.jitlogic.zorka.core.test.spy.support.cbor.TestTraceBufOutput;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import static com.jitlogic.zorka.core.test.spy.support.cbor.STTrcTestUtils.chunksCount;

@@ -169,6 +169,11 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
      * @param obj object to be submitted
      */
     public boolean submit(T obj) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("Submitting: " + obj);
+        }
+
         try {
             if (qlen > 0) {
                 return submitQueue.offer(obj, 1, TimeUnit.MILLISECONDS);

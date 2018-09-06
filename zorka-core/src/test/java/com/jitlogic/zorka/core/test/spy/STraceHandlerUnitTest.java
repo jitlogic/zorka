@@ -27,6 +27,7 @@ import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import com.jitlogic.zorka.core.util.ZorkaUnsafe;
 import org.junit.After;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -44,19 +45,20 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
     private SymbolRegistry symbols = new SymbolRegistry();
 
+    private STraceBufManager bm = new STraceBufManager(128, 4);
+    private TestTraceBufOutput o = new TestTraceBufOutput();
+    private TestSTraceHandler r;
+
+    @Before
+    public void setUp() {
+        r = new TestSTraceHandler(4, bm,symbols,o);
+    }
 
     @After
     public void tearDown() {
         tracer.setTracerMinMethodTime(250000);
         tracer.setTracerMinTraceTime(50);
     }
-
-    private STraceBufManager bm = new STraceBufManager(128, 4);
-
-
-    private TestTraceBufOutput o = new TestTraceBufOutput();
-
-    private TestSTraceHandler r = new TestSTraceHandler(bm,symbols,o);
 
     private static Object l(Object...args) {
         return Arrays.asList(args);

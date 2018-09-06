@@ -434,7 +434,7 @@ public class SpyMethodVisitor extends MethodVisitor {
             mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, ENTER_S_METHOD, ENTER_S_SIGNATURE, false);
             tracerProbesEmitted++;
 
-            return 1;
+            return 2;
         } else {
             emitLoadInt(classId);
             emitLoadInt(methodId);

@@ -16,14 +16,13 @@
 
 package com.jitlogic.zorka.core.spy.st;
 
-
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.cbor.CBOR;
-import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.cbor.TraceDataFormat;
+import com.jitlogic.zorka.core.spy.TracerLib;
 import com.jitlogic.zorka.core.spy.lt.TraceHandler;
 
 import java.util.List;
@@ -40,7 +39,6 @@ import static com.jitlogic.zorka.core.util.ZorkaUnsafe.*;
  * @author Rafal Lewczuk
  */
 public class STraceHandler extends TraceHandler {
-
 
     public static final int STACK_DEFAULT_SIZE = 256;
 
@@ -61,6 +59,7 @@ public class STraceHandler extends TraceHandler {
 
     public static final long TF_SUBMIT_TRACE  = 0x0100000000000000L;
     public static final long TF_SUBMIT_METHOD = 0x0200000000000000L;
+    public static final long TF_DROP_TRACE    = 0x0400000000000000L;
 
     public static final long TSTART_FUZZ = System.currentTimeMillis() - (System.nanoTime() / 1000000L);
 
@@ -80,9 +79,15 @@ public class STraceHandler extends TraceHandler {
     public static final int TREC_HEADER_BE = 0xc89fca48;
     public static final int TREC_HEADER_LE = 0x48cb9fc8;
 
-    private long minMethodTime = 4;   // Default minimum duration = 4 ticks = ~250us
+    private final long minMethodTime;   // Default minimum duration = 4 ticks = ~250us
+    private long minTraceTime = 16384; // Approximately 1s
 
-    private long minTraceTime = 16777216; // Approximately 1s
+    /**
+     * If true, streaming mode will be enabled. In streaming mode tracer
+     * will be able to send partial data. In non-streaming mode data will
+     * be sent only at the end of top-level trace.
+     */
+    private final boolean streamingEnabled;
 
     protected STraceBufManager bufManager;
     protected STraceBufChunk chunk = null;
@@ -102,8 +107,11 @@ public class STraceHandler extends TraceHandler {
 
     protected SymbolRegistry symbols;
 
+    private final boolean debug;
+
     /**
      * Contains 'image' of traced thread call stack containing basic information needed to manage tracing process.
+     *
      * Each stack frame is represented by two entries:
      * Entry 0: [tstamp|tid|flags]
      * Entry 1: [calls|bufpos]
@@ -120,6 +128,9 @@ public class STraceHandler extends TraceHandler {
     /** Position of first unused slot in stack[]. If non-zero, Entry0 is at [stackPos-2], Entry1 is at [stackPos-1]. */
     private int stackPos = 0;
 
+    /** Number of traces marked on stack (increases with each recursive  */
+    private int tracePos = 0;
+
     /** Stack length is kept separately, so we avoid indirection when refering to it. */
     private int stackLen = STACK_DEFAULT_SIZE;
 
@@ -127,10 +138,16 @@ public class STraceHandler extends TraceHandler {
     private int exceptionId;
 
 
-    public STraceHandler(STraceBufManager bufManager, SymbolRegistry symbols, ZorkaSubmitter<SymbolicRecord> output) {
+    public STraceHandler(boolean streamingEnabled, long minMethodTime, STraceBufManager bufManager, SymbolRegistry symbols, ZorkaSubmitter<SymbolicRecord> output) {
+
+        this.streamingEnabled = streamingEnabled;
+        this.minMethodTime = minMethodTime;
+
         this.bufManager = bufManager;
         this.symbols = symbols;
         this.output = output;
+
+        this.debug = log.isDebugEnabled();
     }
 
 
@@ -177,7 +194,7 @@ public class STraceHandler extends TraceHandler {
         long sp2 = stack[stackPos-2];
 
         long dur = tst - (sp2 & TSTAMP_MASK);
-        int tid = (int)((sp2 & TRACEID_MASK) >> TRACEID_BITS);
+        int tid = (int)((sp2 & TRACEID_MASK) >> TSTAMP_BITS);
         int pos = (int)(sp1 >> TPOS_BITS);
         long calls = sp1 & CALLS_MASK;
 
@@ -209,7 +226,17 @@ public class STraceHandler extends TraceHandler {
         stackPos -= 2;
 
         if (tid != 0) {
-            if (dur >= minTraceTime || 0 != (sp2 & TF_SUBMIT_TRACE)) {
+
+            tracePos--;
+
+            boolean forceSubmit = 0 != (sp2 & TF_SUBMIT_TRACE);
+            if (debug) {
+                log.debug("TraceReturn: streamingEnabled=" + streamingEnabled + ", tracePos=" + tracePos
+                        + ", stackPos=" + stackPos + ", dur=" + dur + ", minTraceTime=" + minTraceTime
+                        + ", submitTrace=" + forceSubmit);
+            }
+
+            if ((streamingEnabled || tracePos == 0) && (dur >= minTraceTime || forceSubmit)) {
                 flush();
             }
         }
@@ -295,29 +322,29 @@ public class STraceHandler extends TraceHandler {
 
     @Override
     public void traceBegin(int traceId, long clock, int flags) {
-        //if (disabled) return;
         if (stackPos == 0) return;
 
         long sp2 = stack[stackPos-2];
         stack[stackPos-2] = (sp2 & TSTAMP_MASK) | ((long)traceId << TSTAMP_BITS);
 
-        // TODO stack[stackPos-2] |= ((long)traceId << TSTAMP_BITS)  -- will work if traceId is always 0
-        // TODO eventually merge traceBegin with traceEnter
-
         writeUInt(CBOR.TAG_BASE, TraceDataFormat.TAG_TRACE_BEGIN);
         writeUInt(CBOR.ARR_BASE, 2);
         writeLong(clock);
         writeInt(traceId);
+
+        tracePos++;
     }
 
     @Override
     public Object getAttr(int attrId) {
-        throw new ZorkaRuntimeException("Not implemented.");
+        log.warn("Not imeplented: getAttr(" + attrId + ")");
+        return null;
     }
 
     @Override
     public Object getAttr(int traceId, int attrId) {
-        throw new ZorkaRuntimeException("Not implemented.");
+        log.warn("Not implemented: getAttr(" + traceId + ", " + attrId + ")");
+        return null;
     }
 
     @Override
@@ -345,28 +372,54 @@ public class STraceHandler extends TraceHandler {
     }
 
 
-    public void setMinimumMethodTime(long minMethodTime) {
-        this.minMethodTime = minMethodTime;
+    private long flags2bits(int flags) {
+        long lfbits = 0L;
+
+        if (0 != (flags & TracerLib.SUBMIT_TRACE)) {
+            lfbits |= TF_SUBMIT_TRACE;
+        } else if (0 != (flags & TracerLib.DROP_TRACE)) {
+            lfbits |= TF_DROP_TRACE;
+        }
+        return lfbits;
     }
 
-    @Override
-    public void markTraceFlags(int traceId, int flag) {
-        throw new ZorkaRuntimeException("Not implemented.");
-    }
 
     @Override
-    public void markRecordFlags(int flag) {
-        throw new ZorkaRuntimeException("Not implemented.");
+    public void markTraceFlags(int traceId, int flags) {
+
+        long lfbits = flags2bits(flags);
+
+        if (lfbits != 0) {
+            for (int i = stackPos - 2; i >= 0; i -= 2) {
+                if ((int) ((stack[i] & TRACEID_MASK) >> TSTAMP_BITS) == traceId) {
+                    stack[i] |= lfbits;
+                }
+            }
+        }
+    }
+
+
+    @Override
+    public void markRecordFlags(int flags) {
+
+        long lfbits = flags2bits(flags);
+
+        if (lfbits != 0 && stackPos >= 2) {
+            stack[stackPos-2] |= lfbits;
+        }
     }
 
 
     public boolean isInTrace(int traceId) {
-        throw new ZorkaRuntimeException("Not implemented.");
+        for (int i = stackPos - 2; i >= 0; i -= 2) {
+            if ((int) ((stack[i] & TRACEID_MASK) >> TSTAMP_BITS) == traceId) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
-    public void close() {
-    }
 
     private void extendStack() {
         stack = ZorkaUtil.clipArray(stack, stack.length * 2);
@@ -609,7 +662,6 @@ public class STraceHandler extends TraceHandler {
             write(CBOR.UNKNOWN_CODE);
         }
     }
-
 
     static {
         /* Determine byte order here. */

@@ -19,13 +19,14 @@ package com.jitlogic.zorka.core.test.spy.support.cbor;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
+import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.spy.st.STraceBufManager;
 import com.jitlogic.zorka.core.spy.st.STraceHandler;
 
 public class TestSTraceHandler extends STraceHandler {
 
-    public TestSTraceHandler(STraceBufManager bufManager, SymbolRegistry symbols, ZorkaSubmitter<SymbolicRecord> output) {
-        super(bufManager, symbols, output);
+    public TestSTraceHandler(long minMethodTime, STraceBufManager bufManager, SymbolRegistry symbols, ZorkaSubmitter<SymbolicRecord> output) {
+        super(false, minMethodTime, bufManager, symbols, output);
     }
 
     public long t, c;

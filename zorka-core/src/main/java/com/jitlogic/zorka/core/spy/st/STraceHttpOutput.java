@@ -10,7 +10,6 @@ import com.jitlogic.zorka.core.spy.ZicoHttpOutput;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -48,6 +47,12 @@ public class STraceHttpOutput extends ZicoHttpOutput {
         scanner.reset();
     }
 
+    private static SimpleValResolver svr = new SimpleValResolver() {
+        @Override
+        public Object resolve(int sv) {
+            return null;
+        }
+    };
 
     @Override
     protected void process(List<SymbolicRecord> obj) {
@@ -58,8 +63,13 @@ public class STraceHttpOutput extends ZicoHttpOutput {
                     scanner.clear();
                     if (sessionUUID == null) newSession();
                     byte[] b = chunksMerge((STraceBufChunk)sr);
-                    processAgentData(b);
+                    new CBORReader(new ByteArrayInputStream(b), scanner, svr).read();
+                    String agd = scanner.getData();
+                    if (agd != null) {
+                        send(agd, submitAgentUrl, null);
+                    }
                     send(DatatypeConverter.printBase64Binary(b), submitTraceUrl, UUID.randomUUID().toString());
+                    break;
                 } catch (CborResendException e) {
                     log.info("Session expired. Reauthenticating ...");
                     newSession();
@@ -77,21 +87,6 @@ public class STraceHttpOutput extends ZicoHttpOutput {
 
                 rt *= retryTimeExp;
             }
-        }
-    }
-
-    private void processAgentData(byte[] b) throws IOException {
-        new CBORReader(new ByteArrayInputStream(b), scanner,
-                new SimpleValResolver() {
-                    @Override
-                    public Object resolve(int sv) {
-                        return null;
-                    }
-                }).read();
-
-        String agd = scanner.getData();
-        if (agd != null) {
-            send(agd, submitAgentUrl, null);
         }
     }
 

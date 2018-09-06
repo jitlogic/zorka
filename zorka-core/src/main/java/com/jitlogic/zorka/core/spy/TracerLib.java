@@ -33,11 +33,13 @@ public abstract class TracerLib {
 
     public static final Logger log = LoggerFactory.getLogger(TracerLib.class);
 
-    public final static int SUBMIT_TRACE = TraceMarker.SUBMIT_TRACE;
-    public final static int ALL_METHODS = TraceMarker.ALL_METHODS;
-    public final static int DROP_INTERIM = TraceMarker.DROP_INTERIM;
-    public final static int TRACE_CALLS = TraceMarker.TRACE_CALLS;
-    public final static int ERROR_MARK = TraceMarker.ERROR_MARK;
+    public static final int SUBMIT_TRACE = TraceMarker.SUBMIT_TRACE;
+    public static final int ALL_METHODS = TraceMarker.ALL_METHODS;
+    public static final int DROP_INTERIM = TraceMarker.DROP_INTERIM;
+    public static final int TRACE_CALLS = TraceMarker.TRACE_CALLS;
+    public static final int ERROR_MARK = TraceMarker.ERROR_MARK;
+    public static final int DROP_TRACE = TraceMarker.DROP_TRACE;
+    public static final int SUBMIT_MEHTOD = TraceMarker.SUBMIT_METHOD;
 
     public final static int TR_FORCE_TRACE = TraceRecord.FORCE_TRACE;
 

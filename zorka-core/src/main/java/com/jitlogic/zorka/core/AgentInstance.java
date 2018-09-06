@@ -330,10 +330,13 @@ public class AgentInstance implements ZorkaService {
 
     public synchronized Tracer getTracer() {
         if (tracer == null) {
-            if ("streaming".equals(getConfig().stringCfg("tracer.type", "local"))) {
-                tracer = new STracer(getTracerMatcherSet(), getSymbolRegistry(), getBufManager());
+            AgentConfig config = getConfig();
+            if ("streaming".equals(config.stringCfg("tracer.type", "local"))) {
+                log.info("STREAMING tracer selected.");
+                tracer = new STracer(config, getTracerMatcherSet(), getSymbolRegistry(), getBufManager());
                 MainSubmitter.setSTracer((STracer)tracer);
             } else {
+                log.info("LOCAL tracer selected.");
                 tracer = new LTracer(getTracerMatcherSet(), getSymbolRegistry());
                 MainSubmitter.setLTracer((LTracer)tracer);
             }

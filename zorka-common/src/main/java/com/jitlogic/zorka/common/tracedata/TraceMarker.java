@@ -58,6 +58,11 @@ public class TraceMarker implements SymbolicRecord, Serializable {
     public static final int DROP_TRACE = 0x20;
 
     /**
+     * Always submit method (regardles of its execution time).
+     */
+    public static final int SUBMIT_METHOD = 0x40;
+
+    /**
      * Trace error mark. This flag is used indicate that this trace ended with error condition (eg. HTTP/500).
      */
     public static final int ERROR_MARK = 0x1000;

@@ -16,7 +16,12 @@
 
 package com.jitlogic.zorka.core.spy.lt;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class TraceHandler {
+
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     protected boolean disabled;
 

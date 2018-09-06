@@ -19,6 +19,7 @@ package com.jitlogic.zorka.core.spy.st;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
+import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.spy.SpyMatcher;
 import com.jitlogic.zorka.core.spy.SpyMatcherSet;
 import com.jitlogic.zorka.core.spy.Tracer;
@@ -37,19 +38,21 @@ public class STracer extends Tracer {
      */
     private STraceBufManager bufManager;
 
+    private boolean streamingEnabled;
+
     /**
      * Thread local serving streaming tracer objects for application threads.
      */
     private ThreadLocal<STraceHandler> handlers =
         new ThreadLocal<STraceHandler>() {
             public STraceHandler initialValue() {
-                STraceHandler handler = new STraceHandler(bufManager, symbolRegistry, outputs.get().get(0));
-                handler.setMinimumMethodTime(minMethodTime >> 16);
-                return handler;
+                return new STraceHandler(streamingEnabled, minMethodTime >> 16,
+                        bufManager, symbolRegistry, outputs.get().get(0));
             }
         };
 
-    public STracer(SpyMatcherSet matcherSet, SymbolRegistry symbolRegistry, STraceBufManager bufManager) {
+    public STracer(ZorkaConfig config, SpyMatcherSet matcherSet, SymbolRegistry symbolRegistry, STraceBufManager bufManager) {
+        this.streamingEnabled = config.boolCfg("tracer.streaming.enabled", false);
         this.matcherSet = matcherSet;
         this.symbolRegistry = symbolRegistry;
         this.bufManager = bufManager;

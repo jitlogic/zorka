@@ -68,16 +68,6 @@ public class TestTraceBuilder extends LTraceHandler {
         data.add(ZorkaUtil.map("action", "newAttr", "attrId", attrId, "attrVal", attrVal));
     }
 
-    @Override
-    public void disable() {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public void enable() {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
     public List<Map<Object, Object>> getData() {
         return data;
     }
