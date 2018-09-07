@@ -134,7 +134,21 @@ public class STTagProcessor implements TagProcessor {
             translateMap(m, rslt);
             return new STAttr(tid, registry.symbolName(tid), rslt);
         } else if (tag == TAG_EXCEPTION) {
-            fail("To be implemented.");
+            List<Object> lst = (List<Object>)obj;
+            STErr err = new STErr();
+            err.setClassId((Integer)lst.get(1));
+            err.setClassName(registry.symbolName(err.getClassId()));
+            err.setMessage((String)lst.get(2));
+
+            for (List ls : (List<List>)lst.get(4)) {
+                err.getStack().add(
+                    new StackTraceElement(
+                        registry.symbolName((Integer)ls.get(0)),
+                        registry.symbolName((Integer)ls.get(1)),
+                        registry.symbolName((Integer)ls.get(2)),
+                        (Integer)lst.get(3)));
+            }
+            return err;
         } else if (tag == TAG_EXCEPTION_REF) {
             fail("To be implemented.");
         } else if (tag == TAG_PROLOG_BE || tag == TAG_PROLOG_LE || tag == TAG_EPILOG_BE || tag == TAG_EPILOG_LE) {

@@ -22,6 +22,8 @@ import com.jitlogic.zorka.cbor.TagProcessor;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.cbor.TraceDataFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.DatatypeConverter;
 import java.util.List;
@@ -32,6 +34,8 @@ import static com.jitlogic.zorka.core.util.ZorkaUnsafe.BYTE_ARRAY_OFFS;
 import static com.jitlogic.zorka.core.util.ZorkaUnsafe.UNSAFE;
 
 public class SymbolsScanner implements TagProcessor {
+
+    private final static Logger log = LoggerFactory.getLogger(TagProcessor.class);
 
     private BitVector symbolsSent = new BitVector();
     private BitVector methodsSent = new BitVector();
@@ -57,7 +61,11 @@ public class SymbolsScanner implements TagProcessor {
     }
 
     public String getData() {
-        return writer.position() > 0 ? DatatypeConverter.printBase64Binary(ZorkaUtil.clipArray(writer.getBuf(), writer.position())) : null;
+        if (log.isDebugEnabled()) {
+            log.debug("GetData: position=" + writer.position());
+        }
+        byte[] b = ZorkaUtil.clipArray(writer.getBuf(), writer.position());
+        return writer.position() > 0 ? DatatypeConverter.printBase64Binary(b) : null;
     }
 
     private long unpackLong(byte[] buf, int offs) {
@@ -149,5 +157,9 @@ public class SymbolsScanner implements TagProcessor {
             return obj;
         }
         return obj;
+    }
+
+    public int getPosition() {
+        return writer.position();
     }
 }

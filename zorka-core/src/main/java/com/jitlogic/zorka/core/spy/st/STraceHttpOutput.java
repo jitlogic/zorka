@@ -44,6 +44,9 @@ public class STraceHttpOutput extends ZicoHttpOutput {
 
     @Override
     protected void resetState() {
+        if (log.isDebugEnabled()) {
+            log.debug("Resetting state ...");
+        }
         scanner.reset();
     }
 
@@ -59,16 +62,29 @@ public class STraceHttpOutput extends ZicoHttpOutput {
         for (SymbolicRecord sr : obj) {
             long rt = retryTime;
             for (int i = 0; i < retries+1; i++) {
+                byte[] b = chunksMerge((STraceBufChunk) sr);
+                String trc = DatatypeConverter.printBase64Binary(b);
                 try {
-                    scanner.clear();
-                    if (sessionUUID == null) newSession();
-                    byte[] b = chunksMerge((STraceBufChunk)sr);
-                    new CBORReader(new ByteArrayInputStream(b), scanner, svr).read();
-                    String agd = scanner.getData();
-                    if (agd != null) {
-                        send(agd, submitAgentUrl, null);
+                    synchronized (scanner) {
+                        scanner.clear();
+                        if (log.isTraceEnabled()) {
+                            log.trace("OLD data: (pos=" + scanner.getPosition() + "): " + scanner.getData());
+                        }
+                        if (sessionUUID == null) newSession();
+                        new CBORReader(new ByteArrayInputStream(b), scanner, svr).read();
+                        String agd = scanner.getData();
+                        if (log.isTraceEnabled()) {
+                            log.trace("AGD data: (pos=" + scanner.getPosition() + "): " + agd);
+                        }
+                        if (agd != null) {
+                            send(agd, submitAgentUrl, null);
+                        }
                     }
-                    send(DatatypeConverter.printBase64Binary(b), submitTraceUrl, UUID.randomUUID().toString());
+
+                    if (log.isTraceEnabled()) {
+                        log.trace("TRC data: " + trc);
+                    }
+                    send(trc, submitTraceUrl, UUID.randomUUID().toString());
                     break;
                 } catch (CborResendException e) {
                     log.info("Session expired. Reauthenticating ...");

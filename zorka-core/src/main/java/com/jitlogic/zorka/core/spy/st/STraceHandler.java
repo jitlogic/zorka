@@ -107,7 +107,8 @@ public class STraceHandler extends TraceHandler {
 
     protected SymbolRegistry symbols;
 
-    private final boolean debug;
+    private final boolean debugEnabled;
+    private final boolean traceEnabled;
 
     /**
      * Contains 'image' of traced thread call stack containing basic information needed to manage tracing process.
@@ -147,7 +148,8 @@ public class STraceHandler extends TraceHandler {
         this.symbols = symbols;
         this.output = output;
 
-        this.debug = log.isDebugEnabled();
+        this.debugEnabled = log.isDebugEnabled();
+        this.traceEnabled = log.isTraceEnabled();
     }
 
 
@@ -230,8 +232,9 @@ public class STraceHandler extends TraceHandler {
             tracePos--;
 
             boolean forceSubmit = 0 != (sp2 & TF_SUBMIT_TRACE);
-            if (debug) {
-                log.debug("TraceReturn: streamingEnabled=" + streamingEnabled + ", tracePos=" + tracePos
+
+            if (traceEnabled) {
+                log.trace("TraceReturn: streamingEnabled=" + streamingEnabled + ", tracePos=" + tracePos
                         + ", stackPos=" + stackPos + ", dur=" + dur + ", minTraceTime=" + minTraceTime
                         + ", submitTrace=" + forceSubmit);
             }
@@ -281,29 +284,30 @@ public class STraceHandler extends TraceHandler {
             // Class name (as string ref)
             if (bufLen - bufPos < 1) nextChunk();
             buffer[bufPos++] = (byte) (CBOR.TAG_CODE0 + TraceDataFormat.TAG_STRING_REF);
-            writeUInt(CBOR.UINT_CODE0, symbols.symbolId(e.getClass().getName()));
+            writeInt(symbols.symbolId(e.getClass().getName()));
 
             // Message
             writeString(e.getMessage());
 
+            writeInt(0); // TODO generate proper causeId
+            //Throwable cause = e.getCause();
+            //if (cause != null) {
+            //    serializeException(cause);
+            //} else {
+            //    write(CBOR.NULL_CODE);
+            //}
+
             // Stack trace
-            StackTraceElement[] stack = e.getStackTrace();
-            writeUInt(CBOR.ARR_BASE, stack.length);
-            for (StackTraceElement el : stack) {
+            StackTraceElement[] stk = e.getStackTrace();
+            writeUInt(CBOR.ARR_BASE, stk.length);
+            for (StackTraceElement el : stk) {
                 writeUInt(CBOR.ARR_BASE, 4);
-                writeStringRef(el.getClassName());
-                writeStringRef(el.getMethodName());
-                writeStringRef(el.getFileName());
-                writeInt(el.getLineNumber());
+                writeInt(symbols.symbolId(el.getClassName()));
+                writeInt(symbols.symbolId(el.getMethodName()));
+                writeInt(symbols.symbolId(el.getFileName()));
+                writeInt(el.getLineNumber() >= 0 ? el.getLineNumber() : 0);
             }
 
-            // Cause
-            Throwable cause = e.getCause();
-            if (cause != null) {
-                serializeException(cause);
-            } else {
-                write(CBOR.NULL_CODE);
-            }
         }
     }
 
@@ -453,11 +457,18 @@ public class STraceHandler extends TraceHandler {
 
 
     public void flush() {
+
+        if (traceEnabled) {
+            log.trace("Flushing: bufLen=" + bufLen + ", bufPos=" + bufPos + ", bufOffs=" + bufOffs);
+        }
+
         if (buffer != null) {
             flushChunk();
         }
         output.submit(chunk);
         chunk = null;
+
+        bufOffs = 0;
     }
 
 

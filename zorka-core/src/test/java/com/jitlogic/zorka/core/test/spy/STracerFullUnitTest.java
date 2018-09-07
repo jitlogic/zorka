@@ -2,6 +2,7 @@ package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.test.spy.support.cbor.STBeg;
+import com.jitlogic.zorka.core.test.spy.support.cbor.STErr;
 import com.jitlogic.zorka.core.test.spy.support.cbor.STRec;
 import com.jitlogic.zorka.core.test.spy.support.cbor.TestTraceBufOutput;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
@@ -254,4 +255,26 @@ public class STracerFullUnitTest extends ZorkaFixture {
     // TODO testTraceExceptionThrowMarkError
 
     // TODO testTraceExceptionUnmarkError
+
+    @Test
+    public void testTraceExceptionThrowCheckError() throws Exception {
+        tracer.include(spy.byMethod(TCLASS1, "errorMethod"));
+
+        spy.add(spy.instance().onEnter(tracer.begin("TEST", 0))
+                .include(spy.byMethod(TCLASS1, "errorMethod")));
+
+        agentInstance.getTracer().setMinMethodTime(0);
+        tracer.output(o);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS1);
+
+        invoke(obj, "errorMethod");
+
+        STRec tr = parseTrace(o.getChunks(), symbols);
+        STErr err = tr.getError();
+        assertNotNull(err);
+        assertEquals("java.lang.NullPointerException", err.getClassName());
+
+    }
+
 }

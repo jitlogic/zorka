@@ -113,9 +113,9 @@ public class TestTagProcessor implements TagProcessor {
         } else if (tag == TAG_EXCEPTION) {
             List<Object> lst = (List<Object>)obj;
             Map<String,Object> rec = ZorkaUtil.map(
-                "_", "E", "id", lst.get(0), "class", lst.get(1), "message", lst.get(2), "stack", lst.get(3));
-            if (lst.get(4) != null) {
-                rec.put("cause", lst.get(4));
+                "_", "E", "id", lst.get(0), "class", lst.get(1), "message", lst.get(2), "stack", lst.get(4));
+            if ((Integer)lst.get(3) != 0) {
+                rec.put("cause", lst.get(3));
             }
             return rec;
         } else if (tag == TAG_EXCEPTION_REF) {
