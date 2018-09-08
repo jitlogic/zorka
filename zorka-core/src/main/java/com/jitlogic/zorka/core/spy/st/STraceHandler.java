@@ -22,6 +22,7 @@ import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.cbor.CBOR;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.cbor.TraceDataFormat;
+import com.jitlogic.zorka.common.zico.ZicoException;
 import com.jitlogic.zorka.core.spy.TracerLib;
 import com.jitlogic.zorka.core.spy.lt.TraceHandler;
 
@@ -647,9 +648,9 @@ public class STraceHandler extends TraceHandler {
             writeList((List)obj);
         } else if (obj instanceof Map) {
             writeMap((Map)obj);
-        } else if (obj == Boolean.FALSE) {
+        } else if (Boolean.FALSE.equals(obj)) {
             write(CBOR.FALSE_CODE);
-        } else if (obj == Boolean.TRUE) {
+        } else if (Boolean.TRUE.equals(obj)) {
             write(CBOR.TRUE_CODE);
         } else if (obj == CBOR.BREAK) {
             write(CBOR.BREAK_CODE);
@@ -659,6 +660,8 @@ public class STraceHandler extends TraceHandler {
             writeDouble((Double)obj);
         } else if (obj == CBOR.UNKNOWN) {
             write(CBOR.UNKNOWN_CODE);
+        } else {
+            throw new RuntimeException("Unsupported data type: " + c);
         }
     }
 
