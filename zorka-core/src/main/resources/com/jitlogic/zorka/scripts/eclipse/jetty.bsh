@@ -31,6 +31,7 @@ __jetty() {
         http._uriQualifier,
         tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
         tracer.attr("URI", "URI"),
+        tracer.formatAttr("METHOD", "${REQ.method}"),
         http._headers ? http.headers_processor(true, false) : null
       ) : null,
       (http._trace && _dtrace_enabled && http._headers) ? tracer.dtraceInput(zorka.longCfg("http.trace.time")) : null,

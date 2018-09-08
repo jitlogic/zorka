@@ -111,8 +111,8 @@ __catalina() {
       spy.format("URI", "${REQ.request.requestURI}"),
       http._trace ? spy.subchain(
         http._uriQualifier,
-        tracer.attr("URI", "URI"),
         tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
+        tracer.attr("URI", "URI"),
         http._headers ? headers_in() : null,
         (_dtrace_enabled && http._headers) ? tracer.dtraceInput(zorka.longCfg("http.trace.time")) : null
       ) : null,
@@ -132,6 +132,7 @@ __catalina() {
       http._trace ? spy.subchain(
         http._uriQualifier,
         tracer.attr("STATUS", "STATUS"),
+        tracer.formatAttr("METHOD", "${REQ.method}"),
         tracer.filterBy("STATUS", null, http._errors, null, null),
         tracer.attr("USER", "USER"),
         http._cookies ? http.cookies_processor(true, true) : spy.put("COOKIES", ""),

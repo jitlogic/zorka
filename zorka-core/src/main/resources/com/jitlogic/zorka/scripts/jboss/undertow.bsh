@@ -176,6 +176,7 @@ __undertow() {
           http._uriQualifier,
           tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
           tracer.attr("URI", "URI"),
+          tracer.formatAttr("METHOD", "${EXCH.requestMethod}"),
           http._headers ? headers_processor(true, false) : null,
           _dtrace_enabled ? tracer.dtraceInput(zorka.longCfg("http.trace.time")) : null
         ) : null)
