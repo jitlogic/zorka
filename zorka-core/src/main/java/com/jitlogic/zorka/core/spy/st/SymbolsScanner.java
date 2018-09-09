@@ -21,7 +21,6 @@ import com.jitlogic.zorka.cbor.CborDataWriter;
 import com.jitlogic.zorka.cbor.TagProcessor;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.*;
-import com.jitlogic.zorka.cbor.TraceDataFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +28,9 @@ import javax.xml.bind.DatatypeConverter;
 import java.util.List;
 import java.util.Map;
 
-import static com.jitlogic.zorka.cbor.TraceDataFormat.*;
+import static com.jitlogic.zorka.cbor.TraceDataTags.*;
+import static com.jitlogic.zorka.cbor.TextIndexTypeMarkers.*;
+
 import static com.jitlogic.zorka.core.util.ZorkaUnsafe.BYTE_ARRAY_OFFS;
 import static com.jitlogic.zorka.core.util.ZorkaUnsafe.UNSAFE;
 
@@ -80,7 +81,7 @@ public class SymbolsScanner implements TagProcessor {
         if (symbolsSent.get(id)) return false;
         String s = registry.symbolName(id);
         if (s != null) {
-            writer.writeTag(TraceDataFormat.TAG_STRING_DEF);
+            writer.writeTag(TAG_STRING_DEF);
             writer.writeUInt(CBOR.ARR_BASE, 3);
             writer.writeInt(id);
             writer.writeString(s);
@@ -94,7 +95,7 @@ public class SymbolsScanner implements TagProcessor {
         if (methodsSent.get(mid)) return false;
         int[] md = registry.methodDef(mid);
         if (md != null) {
-            writer.writeTag(TraceDataFormat.TAG_METHOD_DEF);
+            writer.writeTag(TAG_METHOD_DEF);
             writer.writeUInt(CBOR.ARR_BASE, 4);
             writer.writeInt(mid);
             writer.writeInt(md[0]);
@@ -114,9 +115,9 @@ public class SymbolsScanner implements TagProcessor {
                 if (!methodsSent.get(mid)) {
                     int[] md = registry.methodDef(mid);
                     if (md != null) {
-                        addSymbol(md[0], TraceDataFormat.CLASS_TYPE);
-                        addSymbol(md[1], TraceDataFormat.METHOD_TYPE);
-                        addSymbol(md[2], TraceDataFormat.SIGN_TYPE);
+                        addSymbol(md[0], CLASS_TYPE);
+                        addSymbol(md[1], METHOD_TYPE);
+                        addSymbol(md[2], SIGN_TYPE);
                     }
                     addMethod(mid);
                 }
@@ -124,36 +125,36 @@ public class SymbolsScanner implements TagProcessor {
             return null;
         } else if (tag == TAG_TRACE_BEGIN) {
             List<Object> lst = (List<Object>)obj;
-            addSymbol((Integer)lst.get(1), TraceDataFormat.STRING_TYPE);
+            addSymbol((Integer)lst.get(1), STRING_TYPE);
             return null;
         } else if (tag == TAG_TRACE_ATTR) {
             Map<Object, Object> m = (Map) obj;
             for (Map.Entry e : m.entrySet()) {
-                addSymbol((Integer)e.getKey(), TraceDataFormat.STRING_TYPE);
+                addSymbol((Integer)e.getKey(), STRING_TYPE);
             }
             return null;
         } else if (tag == TAG_TRACE_UP_ATTR) {
             List<Object> lst = (List<Object>)obj;
-            addSymbol((Integer)lst.get(0), TraceDataFormat.STRING_TYPE);
+            addSymbol((Integer)lst.get(0), STRING_TYPE);
             Map<Object,Object> m = (Map<Object,Object>)lst.get(1);
             for (Map.Entry e : m.entrySet()) {
-                addSymbol((Integer)e.getKey(), TraceDataFormat.STRING_TYPE);
+                addSymbol((Integer)e.getKey(), STRING_TYPE);
             }
             return null;
         } else if (tag == TAG_EXCEPTION) {
             List<Object> lst = (List<Object>)obj;
             Integer sid = (Integer) lst.get(1);
-            if (sid != null) addSymbol(sid, TraceDataFormat.CLASS_TYPE);
+            if (sid != null) addSymbol(sid, CLASS_TYPE);
             List<Object> stk = (List<Object>)lst.get(4);
             for (Object o : stk) {
                 List<Object> si = (List<Object>)o;
-                addSymbol((Integer)si.get(0), TraceDataFormat.CLASS_TYPE);
-                addSymbol((Integer)si.get(1), TraceDataFormat.METHOD_TYPE);
-                addSymbol((Integer)si.get(2), TraceDataFormat.STRING_TYPE);
+                addSymbol((Integer)si.get(0), CLASS_TYPE);
+                addSymbol((Integer)si.get(1), METHOD_TYPE);
+                addSymbol((Integer)si.get(2), STRING_TYPE);
             }
             return null;
         } else if (tag == TAG_STRING_REF) {
-            addSymbol((Integer)obj, TraceDataFormat.STRING_TYPE);
+            addSymbol((Integer)obj, STRING_TYPE);
             return obj;
         }
         return obj;

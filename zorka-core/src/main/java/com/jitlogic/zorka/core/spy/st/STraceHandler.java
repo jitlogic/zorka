@@ -16,19 +16,19 @@
 
 package com.jitlogic.zorka.core.spy.st;
 
+import com.jitlogic.zorka.cbor.TraceRecordFlags;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.cbor.CBOR;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.cbor.TraceDataFormat;
-import com.jitlogic.zorka.common.zico.ZicoException;
 import com.jitlogic.zorka.core.spy.TracerLib;
 import com.jitlogic.zorka.core.spy.lt.TraceHandler;
 
 import java.util.List;
 import java.util.Map;
 
+import static com.jitlogic.zorka.cbor.TraceDataTags.*;
 import static com.jitlogic.zorka.core.util.ZorkaUnsafe.*;
 
 /**
@@ -58,9 +58,14 @@ public class STraceHandler extends TraceHandler {
     public static final int  TPOS_BITS  = 32;
     public static final long TPOS_MASK  = 0xFFFFFFFF00000000L;
 
-    public static final long TF_SUBMIT_TRACE  = 0x0100000000000000L;
-    public static final long TF_SUBMIT_METHOD = 0x0200000000000000L;
-    public static final long TF_DROP_TRACE    = 0x0400000000000000L;
+    public static final long TF_BITS = 56;
+    public static final long TF_MASK = 0xff00000000000000L;
+
+    public static final long TF_SUBMIT_TRACE  = ((long)TraceRecordFlags.TF_SUBMIT_TRACE) << TF_BITS;
+    public static final long TF_SUBMIT_METHOD = ((long)TraceRecordFlags.TF_SUBMIT_METHOD) << TF_BITS;
+    public static final long TF_DROP_TRACE    = ((long)TraceRecordFlags.TF_DROP_TRACE) << TF_BITS;
+    public static final long TF_ERROR_MARK    = ((long)TraceRecordFlags.TF_ERROR_MARK) << TF_BITS;
+
 
     public static final long TSTART_FUZZ = System.currentTimeMillis() - (System.nanoTime() / 1000000L);
 
@@ -203,7 +208,18 @@ public class STraceHandler extends TraceHandler {
 
         boolean fsm = 0 != (sp2 & TF_SUBMIT_METHOD);
 
-        if (dur >= minMethodTime || fsm || pos < bufOffs) {
+        if (dur >= minMethodTime || fsm || pos < bufOffs || tid != 0) {
+
+            // Output trace flags (if any)
+            int flags = (int)(sp1 >>> TF_BITS);
+            if (flags != 0) {
+                if (bufLen - bufPos < 2) nextChunk();
+                buffer[bufPos] = (byte)(CBOR.TAG_BASE+TAG_TRACE_FLAGS);
+                buffer[bufPos+1] = (byte)flags;
+                bufPos += 2;
+            }
+
+            // Output epilog
             if (calls < 0x1000000) {
                 if (bufLen - bufPos < 12) nextChunk();
                 writeUInt(CBOR.TAG_BASE, TREC_EPILOG);
@@ -270,12 +286,12 @@ public class STraceHandler extends TraceHandler {
 
         if (id == exceptionId) {
             // Known (already written) exception - save reference to it;
-            writeUInt(CBOR.TAG_BASE, TraceDataFormat.TAG_EXCEPTION_REF);
+            writeUInt(CBOR.TAG_BASE, TAG_EXCEPTION_REF);
             writeUInt(CBOR.UINT_BASE, id);
         } else {
             // Unknown exception
             buffer[bufPos] = (byte) (CBOR.TAG_CODE1);
-            buffer[bufPos + 1] = (byte) TraceDataFormat.TAG_EXCEPTION;
+            buffer[bufPos + 1] = (byte) TAG_EXCEPTION;
             buffer[bufPos + 2] = (byte) (CBOR.ARR_CODE0 + 5);
             bufPos += 3;
 
@@ -284,7 +300,7 @@ public class STraceHandler extends TraceHandler {
 
             // Class name (as string ref)
             if (bufLen - bufPos < 1) nextChunk();
-            buffer[bufPos++] = (byte) (CBOR.TAG_CODE0 + TraceDataFormat.TAG_STRING_REF);
+            buffer[bufPos++] = (byte) (CBOR.TAG_CODE0 + TAG_STRING_REF);
             writeInt(symbols.symbolId(e.getClass().getName()));
 
             // Message
@@ -332,7 +348,7 @@ public class STraceHandler extends TraceHandler {
         long sp2 = stack[stackPos-2];
         stack[stackPos-2] = (sp2 & TSTAMP_MASK) | ((long)traceId << TSTAMP_BITS);
 
-        writeUInt(CBOR.TAG_BASE, TraceDataFormat.TAG_TRACE_BEGIN);
+        writeUInt(CBOR.TAG_BASE, TAG_TRACE_BEGIN);
         writeUInt(CBOR.ARR_BASE, 2);
         writeLong(clock);
         writeInt(traceId);
@@ -343,16 +359,16 @@ public class STraceHandler extends TraceHandler {
     @Override
     public void newAttr(int traceId, int attrId, Object attrVal) {
         if (traceId >= 0) {
-            writeUInt(CBOR.TAG_BASE, TraceDataFormat.TAG_TRACE_UP_ATTR);
+            writeUInt(CBOR.TAG_BASE, TAG_TRACE_UP_ATTR);
             if (bufLen - bufPos < 2) nextChunk();
             buffer[bufPos++] = (byte) (CBOR.ARR_BASE+2);
             writeInt(traceId);
         } else {
-            writeUInt(CBOR.TAG_BASE, TraceDataFormat.TAG_TRACE_ATTR);
+            writeUInt(CBOR.TAG_BASE, TAG_TRACE_ATTR);
         }
         if (bufLen - bufPos < 2) nextChunk();
         buffer[bufPos++] = (byte) (CBOR.MAP_BASE+1);
-        buffer[bufPos++] = (byte)(CBOR.TAG_BASE + TraceDataFormat.TAG_STRING_REF);
+        buffer[bufPos++] = (byte)(CBOR.TAG_BASE + TAG_STRING_REF);
         stack[stackPos-2] |= TF_SUBMIT_METHOD; // TODO submit force behavior is controlled by API, make this thing configurable as in LTracer
 
         writeUInt(0,attrId);
@@ -372,6 +388,8 @@ public class STraceHandler extends TraceHandler {
             lfbits |= TF_SUBMIT_TRACE;
         } else if (0 != (flags & TracerLib.DROP_TRACE)) {
             lfbits |= TF_DROP_TRACE;
+        } else if (0 != (flags & TracerLib.ERROR_MARK)) {
+            lfbits |= TF_ERROR_MARK;
         }
         return lfbits;
     }
@@ -430,7 +448,7 @@ public class STraceHandler extends TraceHandler {
 
 
     protected void writeStringRef(String s) {
-        writeUInt(CBOR.TAG_BASE, TraceDataFormat.TAG_STRING_REF);
+        writeUInt(CBOR.TAG_BASE, TAG_STRING_REF);
         writeUInt(CBOR.UINT_BASE, symbols.symbolId(s));
     }
 
@@ -672,11 +690,11 @@ public class STraceHandler extends TraceHandler {
         if (b[0] == 0x01) {
             // Big Endian
             TREC_HEADER = TREC_HEADER_BE;
-            TREC_EPILOG = TraceDataFormat.TAG_EPILOG_BE;
+            TREC_EPILOG = TAG_EPILOG_BE;
         } else {
             // Little endian
             TREC_HEADER = TREC_HEADER_LE;
-            TREC_EPILOG = TraceDataFormat.TAG_EPILOG_LE;
+            TREC_EPILOG = TAG_EPILOG_LE;
         }
     }
 

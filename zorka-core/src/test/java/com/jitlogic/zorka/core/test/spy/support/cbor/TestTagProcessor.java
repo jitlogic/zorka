@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.jitlogic.zorka.core.util.ZorkaUnsafe.*;
-import static com.jitlogic.zorka.cbor.TraceDataFormat.*;
+import static com.jitlogic.zorka.cbor.TraceDataTags.*;
 
 import static org.junit.Assert.fail;
 

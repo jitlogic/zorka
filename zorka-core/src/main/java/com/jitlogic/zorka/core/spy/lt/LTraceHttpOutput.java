@@ -21,8 +21,11 @@ import com.jitlogic.zorka.cbor.CborDataWriter;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.cbor.CborResendException;
-import com.jitlogic.zorka.cbor.TraceDataFormat;
 import com.jitlogic.zorka.core.spy.ZicoHttpOutput;
+
+import static com.jitlogic.zorka.cbor.TraceDataTags.*;
+import static com.jitlogic.zorka.cbor.TraceRecordFlags.*;
+import static com.jitlogic.zorka.cbor.TextIndexTypeMarkers.*;
 
 import javax.xml.bind.DatatypeConverter;
 import java.util.*;
@@ -66,7 +69,7 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
         if (!symbolsSent.get(id)) {
             String s = registry.symbolName(id);
             if (s != null) {
-                awriter.writeTag(TraceDataFormat.TAG_STRING_DEF);
+                awriter.writeTag(TAG_STRING_DEF);
                 awriter.writeUInt(CBOR.ARR_BASE, 3);
                 awriter.writeInt(id);
                 awriter.writeString(s);
@@ -79,9 +82,9 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
     }
 
     private int mid(TraceRecord tr) {
-        int classId = ref(tr.getClassId(), TraceDataFormat.CLASS_TYPE);
-        int methodId = ref(tr.getMethodId(), TraceDataFormat.METHOD_TYPE);
-        int signatureId = ref(tr.getSignatureId(), TraceDataFormat.SIGN_TYPE);
+        int classId = ref(tr.getClassId(), CLASS_TYPE);
+        int methodId = ref(tr.getMethodId(), METHOD_TYPE);
+        int signatureId = ref(tr.getSignatureId(), SIGN_TYPE);
 
         long key = cms2key(classId, methodId, signatureId);
 
@@ -92,7 +95,7 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
             mid = lastMid;
             mids.put(key, mid);
 
-            awriter.writeTag(TraceDataFormat.TAG_METHOD_DEF);
+            awriter.writeTag(TAG_METHOD_DEF);
             awriter.writeUInt(CBOR.ARR_BASE, 4);
             awriter.writeInt(mid);
             awriter.writeInt(classId);
@@ -107,11 +110,11 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
         long methodId = mid(tr);
 
         // Leading tag and Array Start
-        twriter.writeTag(TraceDataFormat.TAG_TRACE_START);
+        twriter.writeTag(TAG_TRACE_START);
         twriter.write(CBOR.ARR_VCODE);
 
         // Trace Prolog
-        twriter.writeTag(TraceDataFormat.TAG_PROLOG_BE);
+        twriter.writeTag(TAG_PROLOG_BE);
         twriter.writeUInt(CBOR.BYTES_BASE, 8);
         long prolog = ((t >>> 16) & 0xFFFFFFFFFFL) | (methodId << 40);
         twriter.writeRawLong(prolog, false);
@@ -120,14 +123,14 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
         // Trace Marker (if this is trace beginning)
         if (tr.hasFlag(TraceRecord.TRACE_BEGIN)) {
             TraceMarker tm = tr.getMarker();
-            int tid = ref(tm.getTraceId(), TraceDataFormat.STRING_TYPE);
-            twriter.writeTag(TraceDataFormat.TAG_TRACE_BEGIN);
+            int tid = ref(tm.getTraceId(), STRING_TYPE);
+            twriter.writeTag(TAG_TRACE_BEGIN);
             twriter.writeUInt(CBOR.ARR_BASE, 2);
             twriter.writeLong(tm.getClock());
             twriter.writeInt(tid);
             if (tm.hasFlag(TraceMarker.ERROR_MARK)) {
-                twriter.writeTag(TraceDataFormat.TAG_FLAG_TOKEN);
-                twriter.writeInt(TraceDataFormat.FLAG_ERROR);
+                twriter.writeTag(TAG_TRACE_FLAGS);
+                twriter.writeInt(TF_ERROR_MARK);
             }
         }
 
@@ -135,11 +138,11 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
 
         // Attributes (if any)
         if (attrs != null) {
-            twriter.writeTag(TraceDataFormat.TAG_TRACE_ATTR);
+            twriter.writeTag(TAG_TRACE_ATTR);
             twriter.writeUInt(CBOR.MAP_BASE, attrs.size());
             for (Map.Entry<Integer,Object> e : attrs.entrySet()) {
-                twriter.writeTag(TraceDataFormat.TAG_STRING_REF); // TODO get rid of this tag
-                twriter.writeInt(ref(e.getKey(), TraceDataFormat.STRING_TYPE));
+                twriter.writeTag(TAG_STRING_REF); // TODO get rid of this tag
+                twriter.writeInt(ref(e.getKey(), STRING_TYPE));
                 Object v = e.getValue();
                 if (v == null) {
                     twriter.writeNull();
@@ -168,19 +171,19 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
 
         if (tr.getException() != null) {
             SymbolicException se = (SymbolicException)(tr.getException());
-            twriter.writeTag(TraceDataFormat.TAG_EXCEPTION);
+            twriter.writeTag(TAG_EXCEPTION);
             twriter.writeUInt(CBOR.ARR_BASE, 5);
             twriter.writeInt(++nExceptions);    // just allocating sequential exception IDs for now
-            twriter.writeTag(TraceDataFormat.TAG_STRING_REF);
-            twriter.writeInt(ref(se.getClassId(), TraceDataFormat.CLASS_TYPE));
+            twriter.writeTag(TAG_STRING_REF);
+            twriter.writeInt(ref(se.getClassId(), CLASS_TYPE));
             twriter.writeString(se.getMessage());
             twriter.writeInt(0); // TODO generate proper CauseID
             twriter.writeUInt(CBOR.ARR_BASE, se.getStackTrace().length);
             for (SymbolicStackElement el : se.getStackTrace()) {
                 twriter.writeUInt(CBOR.ARR_BASE, 4);
-                twriter.writeInt(ref(el.getClassId(), TraceDataFormat.CLASS_TYPE));
-                twriter.writeInt(ref(el.getMethodId(), TraceDataFormat.METHOD_TYPE));
-                twriter.writeInt(ref(el.getFileId(), TraceDataFormat.STRING_TYPE));
+                twriter.writeInt(ref(el.getClassId(), CLASS_TYPE));
+                twriter.writeInt(ref(el.getMethodId(), METHOD_TYPE));
+                twriter.writeInt(ref(el.getFileId(), STRING_TYPE));
                 twriter.writeInt(el.getLineNum() >= 0 ? el.getLineNum() : 0);
             }
         }
@@ -188,7 +191,7 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
         // Epilog
         t += tr.getTime();
         long calls = tr.getCalls() < 0x1000000 ? tr.getCalls() : 0;
-        twriter.writeTag(TraceDataFormat.TAG_EPILOG_BE);
+        twriter.writeTag(TAG_EPILOG_BE);
         twriter.writeULong(CBOR.BYTES_BASE, calls != 0 ? 8 : 16);
         twriter.writeRawLong(((t >>> 16) & 0xFFFFFFFFFFL) | (calls << 40), false);
         if (calls == 0) {

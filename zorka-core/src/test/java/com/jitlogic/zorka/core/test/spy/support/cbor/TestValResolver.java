@@ -19,22 +19,12 @@ package com.jitlogic.zorka.core.test.spy.support.cbor;
 
 import com.jitlogic.zorka.cbor.SimpleValResolver;
 
-import static com.jitlogic.zorka.cbor.TraceDataFormat.TRACE_DROP_TOKEN;
-
 public class TestValResolver implements SimpleValResolver {
 
-    public static enum Tokens {
-        TRACE_DROP;
-    }
 
     @Override
     public Object resolve(int sv) {
-        switch (sv) {
-            case TRACE_DROP_TOKEN:
-                return Tokens.TRACE_DROP;
-            default:
-                return null;
-        }
+        return null;
     }
 }
 
