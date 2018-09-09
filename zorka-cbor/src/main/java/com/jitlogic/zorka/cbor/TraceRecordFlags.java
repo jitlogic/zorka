@@ -14,6 +14,15 @@ public class TraceRecordFlags {
     /** Marks trace as ending with error (th. thrown exception). */
     public static final int TF_ERROR_MARK = 0x08;
 
+    /** If set, chunk is only part of whole trace. */
+    public static final int TF_CHUNK_ENABLED = 0x10;
+
+    /** Marks first chunk of trace. */
+    public static final int TF_CHUNK_FIRST = 0x20;
+
+    /** Marks final chunk of trace. */
+    public static final int TF_CHUNK_LAST = 0x40;
+
     // Do not instantiate this class.
     private TraceRecordFlags() { }
 }
