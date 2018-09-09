@@ -16,9 +16,6 @@
 
 package com.jitlogic.zorka.cbor;
 
-import com.jitlogic.zorka.cbor.SimpleValResolver;
-import com.jitlogic.zorka.cbor.TagProcessor;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +26,7 @@ import java.util.Map;
 
 import static com.jitlogic.zorka.cbor.CBOR.*;
 
-public class CBORReader {
+public class CborStreamReader {
 
     private InputStream in;
 
@@ -38,11 +35,11 @@ public class CBORReader {
 
     byte[] buf = new byte[16];
 
-    public CBORReader(InputStream in) throws IOException {
+    public CborStreamReader(InputStream in) throws IOException {
         this.in = in;
     }
 
-    public CBORReader(InputStream in, TagProcessor tagProcessor, SimpleValResolver simpleValResolver) {
+    public CborStreamReader(InputStream in, TagProcessor tagProcessor, SimpleValResolver simpleValResolver) {
         this.in = in;
         this.tagProcessor = tagProcessor;
         this.simpleValResolver = simpleValResolver;

@@ -19,7 +19,7 @@ package com.jitlogic.zorka.core.test.spy.support.cbor;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.spy.st.STraceBufChunk;
-import com.jitlogic.zorka.cbor.CBORReader;
+import com.jitlogic.zorka.cbor.CborStreamReader;
 
 
 import javax.xml.bind.DatatypeConverter;
@@ -62,17 +62,17 @@ public class STTrcTestUtils {
 
     public static Object decodeCbor(STraceBufChunk chunks) throws IOException {
         ByteArrayInputStream bis = new ByteArrayInputStream(chunksMerge(chunks));
-        return new CBORReader(bis).read();
+        return new CborStreamReader(bis).read();
     }
 
     public static Object decodeTrace(STraceBufChunk chunks) throws IOException {
         ByteArrayInputStream bis = new ByteArrayInputStream(chunksMerge(chunks));
-        return new CBORReader(bis, new TestTagProcessor(), new TestValResolver()).read();
+        return new CborStreamReader(bis, new TestTagProcessor(), new TestValResolver()).read();
     }
 
     public static STRec parseTrace(STraceBufChunk chunks, SymbolRegistry symbols) throws IOException {
         ByteArrayInputStream bis = new ByteArrayInputStream(chunksMerge(chunks));
-        STRec tr = (STRec) (new CBORReader(bis, new STTagProcessor(symbols), new TestValResolver()).read());
+        STRec tr = (STRec) (new CborStreamReader(bis, new STTagProcessor(symbols), new TestValResolver()).read());
         tr.promoteUpAttrs();
         return tr;
     }
@@ -81,7 +81,7 @@ public class STTrcTestUtils {
         ByteArrayInputStream bis = new ByteArrayInputStream(chunksMerge(chunks));
         List<STRec> lst = new ArrayList<STRec>();
         while (bis.available() > 0) {
-            lst.add((STRec) (new CBORReader(bis, new STTagProcessor(symbols), new TestValResolver()).read()));
+            lst.add((STRec) (new CborStreamReader(bis, new STTagProcessor(symbols), new TestValResolver()).read()));
         }
         return lst;
     }
