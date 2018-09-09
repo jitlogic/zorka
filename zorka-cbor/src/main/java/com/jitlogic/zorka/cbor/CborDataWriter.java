@@ -23,6 +23,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static com.jitlogic.zorka.cbor.CBOR.FALSE_CODE;
+import static com.jitlogic.zorka.cbor.CBOR.TRUE_CODE;
+
 
 /**
  *
@@ -204,6 +207,14 @@ public class CborDataWriter {
                 writeObj(e.getKey());
                 writeObj(e.getValue());
             }
+        } else if (obj.getClass() == Boolean.class) {
+            write(Boolean.TRUE.equals(obj) ? TRUE_CODE : FALSE_CODE);
+        } else if (obj.getClass() == Short.class || obj.getClass() == Byte.class) {
+            writeInt(((Number)obj).intValue());
+        } else if (obj.getClass() == Float.class || obj.getClass() == Double.class) {
+            writeString(""+obj); // TODO handle float values properly
+        } else {
+            throw new RuntimeException("Unsupported data type: " + obj.getClass());
         }
     }
 
