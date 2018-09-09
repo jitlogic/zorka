@@ -17,19 +17,12 @@
 package com.jitlogic.zorka.cbor;
 
 
-import com.jitlogic.zorka.cbor.CBOR;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.jitlogic.zorka.cbor.CBOR.FALSE_CODE;
-import static com.jitlogic.zorka.cbor.CBOR.TRUE_CODE;
+import static com.jitlogic.zorka.cbor.CBOR.*;
 
-
-/**
- *
- */
 public class CborDataWriter {
 
     protected byte[] buf;
@@ -194,6 +187,8 @@ public class CborDataWriter {
             writeLong((Long) obj);
         } else if (obj.getClass() == String.class) {
             writeString((String) obj);
+        } else if (obj instanceof CborObject) {
+            ((CborObject)obj).write(this);
         } else if (obj instanceof List) {
             List lst = (List)obj;
             writeUInt(CBOR.ARR_BASE, lst.size());
