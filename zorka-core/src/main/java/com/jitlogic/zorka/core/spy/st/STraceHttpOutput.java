@@ -1,6 +1,6 @@
 package com.jitlogic.zorka.core.spy.st;
 
-import com.jitlogic.zorka.cbor.CborStreamReader;
+import com.jitlogic.zorka.cbor.CborDataReader;
 import com.jitlogic.zorka.cbor.SimpleValResolver;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
@@ -9,7 +9,6 @@ import com.jitlogic.zorka.cbor.CborResendException;
 import com.jitlogic.zorka.core.spy.ZicoHttpOutput;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -71,7 +70,7 @@ public class STraceHttpOutput extends ZicoHttpOutput {
                             log.trace("OLD data: (pos=" + scanner.getPosition() + "): " + scanner.getData());
                         }
                         if (sessionUUID == null) newSession();
-                        new CborStreamReader(new ByteArrayInputStream(b), scanner, svr).read();
+                        new CborDataReader(b, scanner, svr).read();
                         String agd = scanner.getData();
                         if (log.isTraceEnabled()) {
                             log.trace("AGD data: (pos=" + scanner.getPosition() + "): " + agd);

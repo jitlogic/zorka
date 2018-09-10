@@ -19,14 +19,10 @@ package com.jitlogic.zorka.core.test.spy.support.cbor;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.spy.st.STraceBufChunk;
-import com.jitlogic.zorka.cbor.CborStreamReader;
+import com.jitlogic.zorka.cbor.CborDataReader;
 
 
-import javax.xml.bind.DatatypeConverter;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class STTrcTestUtils {
 
@@ -56,34 +52,14 @@ public class STTrcTestUtils {
         return buf;
     }
 
-    public static String chunksHex(STraceBufChunk chunks) {
-        return DatatypeConverter.printHexBinary(chunksMerge(chunks));
-    }
-
-    public static Object decodeCbor(STraceBufChunk chunks) throws IOException {
-        ByteArrayInputStream bis = new ByteArrayInputStream(chunksMerge(chunks));
-        return new CborStreamReader(bis).read();
-    }
-
     public static Object decodeTrace(STraceBufChunk chunks) throws IOException {
-        ByteArrayInputStream bis = new ByteArrayInputStream(chunksMerge(chunks));
-        return new CborStreamReader(bis, new TestTagProcessor(), new TestValResolver()).read();
+        return new CborDataReader(chunksMerge(chunks), new TestTagProcessor(), new TestValResolver()).read();
     }
 
     public static STRec parseTrace(STraceBufChunk chunks, SymbolRegistry symbols) throws IOException {
-        ByteArrayInputStream bis = new ByteArrayInputStream(chunksMerge(chunks));
-        STRec tr = (STRec) (new CborStreamReader(bis, new STTagProcessor(symbols), new TestValResolver()).read());
+        STRec tr = (STRec) (new CborDataReader(chunksMerge(chunks), new STTagProcessor(symbols), new TestValResolver()).read());
         tr.promoteUpAttrs();
         return tr;
-    }
-
-    public static List<STRec> parseTraces(STraceBufChunk chunks, SymbolRegistry symbols) throws IOException {
-        ByteArrayInputStream bis = new ByteArrayInputStream(chunksMerge(chunks));
-        List<STRec> lst = new ArrayList<STRec>();
-        while (bis.available() > 0) {
-            lst.add((STRec) (new CborStreamReader(bis, new STTagProcessor(symbols), new TestValResolver()).read()));
-        }
-        return lst;
     }
 
     public static String mkString(int len) {

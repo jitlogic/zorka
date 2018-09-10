@@ -18,7 +18,6 @@ package com.jitlogic.zorka.cbor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,78 +25,45 @@ import java.util.Map;
 
 import static com.jitlogic.zorka.cbor.CBOR.*;
 
-public class CborStreamReader {
+public class CborDataReader {
 
-    private InputStream in;
+    private CborInput input;
 
     private TagProcessor tagProcessor;
     private SimpleValResolver simpleValResolver;
 
-    byte[] buf = new byte[16];
-
-    public CborStreamReader(InputStream in) throws IOException {
-        this.in = in;
-    }
-
-    public CborStreamReader(InputStream in, TagProcessor tagProcessor, SimpleValResolver simpleValResolver) {
-        this.in = in;
+    public CborDataReader(byte[] buf, TagProcessor tagProcessor, SimpleValResolver simpleValResolver) {
+        this.input = new ByteArrayCborInput(buf);
         this.tagProcessor = tagProcessor;
         this.simpleValResolver = simpleValResolver;
     }
-
-
-    private int readBytes(byte[] b, int offs, int len) throws IOException {
-        int done = 0;
-        do {
-            int i = in.read(b, offs+done,len-done);
-            if (i == -1) {
-                return done > 0 ? done : -1;
-            }
-            done += i;
-        } while (len-done > 0);
-        return done;
-    }
-
 
     private int readUInt(int b0) throws IOException {
         int i = b0 & UINT_MASK;
         if (i < UINT_CODE1) {
             return i;
         } else if (i == UINT_CODE1) {
-            return in.read();
+            return input.readI();
         } else if (i == UINT_CODE2) {
-            return ((in.read() << 8) | in.read());
+            return input.size() >= 0 ? ((input.readI() << 8) | input.readI()) : -1;
         } else if (i == UINT_CODE4) {
-            readBytes(buf, 0, 4);
-            return (((int)buf[0] & 0xff) << 24)
-                |  (((int)buf[1] & 0xff) << 16)
-                |  (((int)buf[2] & 0xff) << 8)
-                |   ((int)buf[3] & 0xff);
+            return (input.readI() << 24) | (input.readI() << 16) | (input.readI() << 8) | input.readI();
         }
         throw new IOException(String.format("Invalid prefix: 0x%x", b0));
     }
 
-
     private long readULong(int b0) throws IOException {
         int i = b0 & UINT_MASK;
         if (i == UINT_CODE8) {
-            readBytes(buf, 0, 8);
-            return (((long)buf[0] & 0xff) << 56)
-                |  (((long)buf[1] & 0xff) << 48)
-                |  (((long)buf[2] & 0xff) << 40)
-                |  (((long)buf[3] & 0xff) << 32)
-                |  (((long)buf[4] & 0xff) << 24)
-                |  (((long)buf[5] & 0xff) << 16)
-                |  (((long)buf[6] & 0xff) << 8)
-                |   ((long)buf[7] & 0xff);
+            return (input.readL() << 56) | (input.readL() << 48) | (input.readL() << 40) | (input.readL() << 32) |
+                    (input.readL() << 24) | (input.readL() << 16) | (input.readL() << 8) | input.readL();
         } else {
             return readUInt(b0);
         }
     }
 
-
     public Object read() throws IOException {
-        int i = in.read();
+        int i = input.readI();
         if (i == -1) {
             return BREAK;
         } else if (i < UINT_CODE8) {
@@ -111,7 +77,9 @@ public class CborStreamReader {
         } else if (i < BYTES_CODE8) {
             int len = readUInt(i);
             byte[] b = new byte[len];
-            readBytes(b, 0, b.length);
+            for (int x = 0; x < len; x++) {
+                b[x] = input.readB();
+            }
             return b;
         } else if (i == BYTES_VCODE) {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -125,7 +93,9 @@ public class CborStreamReader {
         } else if (i < STR_CODE8) {
             int len = readUInt(i);
             byte[] b = new byte[len];
-            readBytes(b, 0, b.length);
+            for (int x = 0; x < len; x++) {
+                b[x] = input.readB();
+            }
             return new String(b);
         } else if (i == STR_VCODE) {
             StringBuilder sb = new StringBuilder();
@@ -181,31 +151,17 @@ public class CborStreamReader {
         } else if (i < SIMPLE_END) {
             return simpleValResolver.resolve(readUInt(i));
         } else if (i == FLOAT_BASE2) {
-            return fromHalfFloat(((in.read() & 0xff) << 8) | ((in.read() & 0xff)));
+            return fromHalfFloat(((input.readI() & 0xff) << 8) | ((input.readI() & 0xff)));
         } else if (i == FLOAT_BASE4) {
-            readBytes(buf, 0, 4);
-            return Float.intBitsToFloat(
-                (((int) buf[0] & 0xff) << 24)
-                    | (((int) buf[1] & 0xff) << 16)
-                    | (((int) buf[2] & 0xff) << 8)
-                    | (((int) buf[3] & 0xff)));
+            return Float.intBitsToFloat((input.readI() << 24) | (input.readI() << 16) | (input.readI() << 8) | (input.readI()));
         } else if (i == FLOAT_BASE8) {
-            readBytes(buf, 0, 8);
-            return Double.longBitsToDouble(
-                      (((long) buf[0] & 0xff) << 56)
-                    | (((long) buf[1] & 0xff) << 48)
-                    | (((long) buf[2] & 0xff) << 40)
-                    | (((long) buf[3] & 0xff) << 32)
-                    | (((long) buf[4] & 0xff) << 24)
-                    | (((long) buf[5] & 0xff) << 16)
-                    | (((long) buf[6] & 0xff) << 8)
-                    | (((long) buf[7] & 0xff)));
+            return Double.longBitsToDouble((input.readL() << 56) | (input.readL() << 48) | (input.readL() << 40) | (input.readL() << 32) |
+                    (input.readL() << 24) | (input.readL() << 16) | (input.readL() << 8) | input.readL());
         } else if (i == BREAK_CODE) {
             return BREAK;
         }
         throw new IOException("Invalid prefix: " + i);
     }
-
 
     public static float fromHalfFloat(int h) {
         switch (h) {
