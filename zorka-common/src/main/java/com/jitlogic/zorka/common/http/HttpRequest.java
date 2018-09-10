@@ -27,9 +27,6 @@ import java.util.regex.Pattern;
  */
 public class HttpRequest extends HttpMsg {
 
-    public final static int F_CNT_LENGTH = 0x01;  // Send Content-Length header
-    public final static int F_ENC_BASE64 = 0x02;  // Encode body using base64
-
     private Map<String, String> params = new HashMap<String, String>();
 
     private HttpClient client;
@@ -41,6 +38,8 @@ public class HttpRequest extends HttpMsg {
 
     int flags;
 
+    private int bodyLength;
+    private InputStream bodyStream;
 
     public HttpRequest(HttpClient client, String url) throws IOException {
         this.client = client;
@@ -97,6 +96,19 @@ public class HttpRequest extends HttpMsg {
 
     public HttpResponse go() throws IOException {
         return client.execute(this);
+    }
+
+    public void setBody(InputStream bodyStream, int bodyLength) {
+        this.bodyLength = bodyLength;
+        this.bodyStream = bodyStream;
+    }
+
+    public InputStream getBodyStream() {
+        return bodyStream;
+    }
+
+    public int getBodyLength() {
+        return bodyLength;
     }
 
     @Override

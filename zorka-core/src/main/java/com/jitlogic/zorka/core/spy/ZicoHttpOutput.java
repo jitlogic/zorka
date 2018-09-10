@@ -23,7 +23,9 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import static com.jitlogic.zorka.common.util.ZorkaConfig.parseInt;
@@ -206,10 +208,9 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
         }
     }
 
-    protected void send(String data, String uri, String traceUUID) {
+    protected void send(InputStream bodyStream, int bodyLength, String uri, String traceUUID) {
         try {
-            // TODO this is inefficient, implement dedicated Base64/json/etc encoding in HttpClient
-            HttpRequest req = HttpUtil.POST(uri, data);
+            HttpRequest req = HttpUtil.POST(uri, bodyStream, bodyLength);
             req.setHeader("X-Zorka-Agent-UUID", agentUUID);
             req.setHeader("X-Zorka-Session-UUID", sessionUUID);
             req.setHeader("Content-Type", "application/zorka+cbor+v1");

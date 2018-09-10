@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.common.http;
 
+import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,26 +62,53 @@ public class MiniHttpClient implements HttpClient {
             for (Map.Entry<String, String> e : req.getHeaders().entrySet()) {
                 out.write(e.getKey() + ": " + e.getValue() + "\r\n");
             }
-            out.write("Content-Length: " + req.getBody().length + "\r\n");
+
+            int bodyLength = req.getBody() != null ? req.getBody().length : req.getBodyLength();
+
+            out.write("Content-Length: " + bodyLength + "\r\n");
             out.write("\r\n");
             out.flush();
+            os.write(bos.toByteArray());
 
             if (log.isTraceEnabled()) {
                 log.trace("HTTP-REQUEST --> \n" + new String(bos.toByteArray()) + req.getBodyAsString());
             }
 
-            os.write(bos.toByteArray());
-            os.write(req.getBody());
+            if ("POST".equals(req.method) || "PUT".equals(req.getMethod())) {
+
+                if (req.getBody() == null && req.getBodyStream() == null) {
+                    throw new ZorkaRuntimeException("Attempted to execute POST/PUT request without body.");
+                }
+
+                if (req.getBody() != null) {
+                    os.write(req.getBody());
+                } else if (req.getBodyStream() != null) {
+                    byte[] buf = new byte[1024];
+                    int bytesSent = 0;
+                    InputStream is = req.getBodyStream();
+                    while (bytesSent < bodyLength) {
+                        int l = is.read(buf);
+                        if (l < 0) {
+                            log.warn("Unexpected end of bodyStream.");
+                            break;
+                        }
+                        os.write(buf, 0, l);
+                        bytesSent += l;
+                    }
+                }
+
+            }
+
             os.flush();
 
             InputStream is = socket.getInputStream();
             BufferedReader rdr = new BufferedReader(new InputStreamReader(is));
             HttpResponse resp = new HttpResponse();
 
-            StringBuffer sb = null;
+            StringBuilder sb = null;
 
             if (log.isTraceEnabled()) {
-                sb = new StringBuffer(512);
+                sb = new StringBuilder(512);
             }
 
             String s = rdr.readLine();

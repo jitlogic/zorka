@@ -23,7 +23,7 @@ import java.util.Map;
 public class HttpMsg {
 
     private Map<String, String> headers = new HashMap<String, String>();
-    private byte[] body = new byte[0];
+    private byte[] body;
 
     public void setHeaders(String...hs) {
         for (int i = 1; i < hs.length; i += 2) {

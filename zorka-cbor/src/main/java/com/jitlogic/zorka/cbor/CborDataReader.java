@@ -32,8 +32,9 @@ public class CborDataReader {
     private TagProcessor tagProcessor;
     private SimpleValResolver simpleValResolver;
 
-    public CborDataReader(byte[] buf, TagProcessor tagProcessor, SimpleValResolver simpleValResolver) {
-        this.input = new ByteArrayCborInput(buf);
+
+    public CborDataReader(CborInput input, TagProcessor tagProcessor, SimpleValResolver simpleValResolver) {
+        this.input = input;
         this.tagProcessor = tagProcessor;
         this.simpleValResolver = simpleValResolver;
     }

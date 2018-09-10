@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core.test.spy.support.cbor;
 
 
+import com.jitlogic.zorka.cbor.ByteArrayCborInput;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.spy.st.STraceBufChunk;
 import com.jitlogic.zorka.cbor.CborDataReader;
@@ -53,11 +54,13 @@ public class STTrcTestUtils {
     }
 
     public static Object decodeTrace(STraceBufChunk chunks) throws IOException {
-        return new CborDataReader(chunksMerge(chunks), new TestTagProcessor(), new TestValResolver()).read();
+        ByteArrayCborInput input = new ByteArrayCborInput(chunksMerge(chunks));
+        return new CborDataReader(input, new TestTagProcessor(), new TestValResolver()).read();
     }
 
     public static STRec parseTrace(STraceBufChunk chunks, SymbolRegistry symbols) throws IOException {
-        STRec tr = (STRec) (new CborDataReader(chunksMerge(chunks), new STTagProcessor(symbols), new TestValResolver()).read());
+        ByteArrayCborInput input = new ByteArrayCborInput(chunksMerge(chunks));
+        STRec tr = (STRec) (new CborDataReader(input, new STTagProcessor(symbols), new TestValResolver()).read());
         tr.promoteUpAttrs();
         return tr;
     }

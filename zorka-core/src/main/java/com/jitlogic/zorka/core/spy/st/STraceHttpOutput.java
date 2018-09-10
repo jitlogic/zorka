@@ -1,14 +1,11 @@
 package com.jitlogic.zorka.core.spy.st;
 
-import com.jitlogic.zorka.cbor.CborDataReader;
-import com.jitlogic.zorka.cbor.SimpleValResolver;
+import com.jitlogic.zorka.cbor.*;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.*;
-import com.jitlogic.zorka.cbor.CborResendException;
 import com.jitlogic.zorka.core.spy.ZicoHttpOutput;
 
-import javax.xml.bind.DatatypeConverter;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -16,7 +13,7 @@ import java.util.UUID;
 
 public class STraceHttpOutput extends ZicoHttpOutput {
 
-    private SymbolsScanner scanner;
+    private final SymbolsScanner scanner;
 
     public static int chunksLength(STraceBufChunk chunks) {
         int len = 0;
@@ -61,29 +58,21 @@ public class STraceHttpOutput extends ZicoHttpOutput {
         for (SymbolicRecord sr : obj) {
             long rt = retryTime;
             for (int i = 0; i < retries+1; i++) {
-                byte[] b = chunksMerge((STraceBufChunk) sr);
-                String trc = DatatypeConverter.printBase64Binary(b);
+                STraceBufChunk chunk = (STraceBufChunk) sr;
+                Base64FormattingStream bs = null;
                 try {
                     synchronized (scanner) {
                         scanner.clear();
-                        if (log.isTraceEnabled()) {
-                            log.trace("OLD data: (pos=" + scanner.getPosition() + "): " + scanner.getData());
-                        }
                         if (sessionUUID == null) newSession();
-                        new CborDataReader(b, scanner, svr).read();
-                        String agd = scanner.getData();
-                        if (log.isTraceEnabled()) {
-                            log.trace("AGD data: (pos=" + scanner.getPosition() + "): " + agd);
-                        }
-                        if (agd != null) {
-                            send(agd, submitAgentUrl, null);
+                        new CborDataReader(new ChunkedCborInput(chunk), scanner, svr).read();
+                        if (scanner.getPosition() > 0) {
+                            bs = new Base64FormattingStream(new ByteArrayCborInput(scanner.getBuf(), 0, scanner.getPosition()));
+                            send(bs, bs.available(), submitAgentUrl, null);
                         }
                     }
 
-                    if (log.isTraceEnabled()) {
-                        log.trace("TRC data: " + trc);
-                    }
-                    send(trc, submitTraceUrl, UUID.randomUUID().toString());
+                    bs = new Base64FormattingStream(new ChunkedCborInput(chunk));
+                    send(bs, bs.available(), submitTraceUrl, UUID.randomUUID().toString());
                     break;
                 } catch (CborResendException e) {
                     log.info("Session expired. Reauthenticating ...");
@@ -91,6 +80,14 @@ public class STraceHttpOutput extends ZicoHttpOutput {
                 } catch (Exception e) {
                     log.error("Error sending trace record: " + e + ". Resetting connection.", e);
                     newSession();
+                } finally {
+                    if (bs != null) {
+                        try {
+                            bs.close();
+                        } catch (Exception e) {
+                            log.warn("Cannot close BIS:", e);
+                        }
+                    }
                 }
 
                 try {

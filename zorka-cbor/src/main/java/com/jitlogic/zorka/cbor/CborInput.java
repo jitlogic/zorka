@@ -10,4 +10,6 @@ public abstract class CborInput {
 
     public abstract int size();
 
+    public abstract boolean eof();
+
 }

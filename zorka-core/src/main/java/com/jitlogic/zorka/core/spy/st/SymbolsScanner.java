@@ -160,6 +160,10 @@ public class SymbolsScanner implements TagProcessor {
         return obj;
     }
 
+    public byte[] getBuf() {
+        return writer.getBuf();
+    }
+
     public int getPosition() {
         return writer.position();
     }

@@ -3,7 +3,8 @@ package com.jitlogic.zorka.cbor;
 public class ByteArrayCborInput extends CborInput {
 
     private byte[] buf;
-    private int pos, lim;
+    private int pos;
+    private int lim;
 
     public ByteArrayCborInput(byte[] buf) {
         this(buf, 0, buf.length);
@@ -22,10 +23,14 @@ public class ByteArrayCborInput extends CborInput {
     }
 
     public long readL() {
-        return pos < lim ? buf[pos++] & 0xff : -1;
+        return pos < lim ? buf[pos++] & 0xffL : -1;
     }
 
     public int size() {
         return lim - pos;
+    }
+
+    public boolean eof() {
+        return pos < lim;
     }
 }
