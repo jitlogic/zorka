@@ -59,7 +59,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
     public void testSimpleTooShortTrace() throws Exception {
         tracer.include(spy.byMethod(TCLASS1, "trivialMethod"));
         spy.add(
-                spy.instance().onEnter(tracer.begin("TEST"))
+                spy.instance("1").onEnter(tracer.begin("TEST"))
                         .include(spy.byMethod(TCLASS1, "trivialMethod")));
         tracer.output(output);
 
@@ -75,7 +75,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
         tracer.include(spy.byMethod(TCLASS1, "trivialMethod"));
 
         spy.add(
-                spy.instance().onEnter(tracer.begin("TEST", 0))
+                spy.instance("1").onEnter(tracer.begin("TEST", 0))
                         .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
         agentInstance.getTracer().setMinMethodTime(0); // Catch everything
@@ -97,7 +97,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
         tracer.include(spy.byMethod(TCLASS1, "trivialStrMethod"));
 
         spy.add(
-          spy.instance()
+          spy.instance("1")
             .onEnter(spy.fetchArg("TAG", 1), tracer.begin("${TAG}", 0))
             .include(spy.byMethod(TCLASS1, "trivialStrMethod")));
 
@@ -118,7 +118,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
     @Test
     public void testSimpleTraceWithAttr() throws Exception {
         tracer.include(spy.byMethod(TCLASS1, "trivialMethod"));
-        spy.add(spy.instance().onEnter(
+        spy.add(spy.instance("1").onEnter(
                 tracer.begin("TEST", 0),
                 spy.put("URL", "http://some.url"),
                 tracer.attr("URL", "URL")
@@ -139,9 +139,9 @@ public class LTracerFullUnitTest extends ZorkaFixture {
     @Test
     public void testTraceAttrUpwardPropagationToNamedTrace() throws Exception {
         tracer.include(spy.byMethod(TCLASS4, "recur*"));
-        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
-        spy.add(spy.instance().onEnter(tracer.begin("TEST2", 0)).include(spy.byMethod(TCLASS4, "recursive2")));
-        spy.add(spy.instance().onEnter(tracer.formatTraceAttr("TEST1", "X", "XXX")).include(spy.byMethod(TCLASS4, "recursive1")));
+        spy.add(spy.instance("1").onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
+        spy.add(spy.instance("2").onEnter(tracer.begin("TEST2", 0)).include(spy.byMethod(TCLASS4, "recursive2")));
+        spy.add(spy.instance("3").onEnter(tracer.formatTraceAttr("TEST1", "X", "XXX")).include(spy.byMethod(TCLASS4, "recursive1")));
 
         agentInstance.getTracer().setMinMethodTime(0);
         tracer.output(output);
@@ -158,9 +158,12 @@ public class LTracerFullUnitTest extends ZorkaFixture {
     @Test
     public void testTraceAttrUpwardPropagationToAnyTrace() throws Exception {
         tracer.include(spy.byMethod(TCLASS4, "recur*"));
-        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
-        spy.add(spy.instance().onEnter(tracer.begin("TEST2", 0)).include(spy.byMethod(TCLASS4, "recursive2")));
-        spy.add(spy.instance().onEnter(tracer.formatTraceAttr(null, "X", "XXX")).include(spy.byMethod(TCLASS4, "recursive1")));
+        spy.add(spy.instance("1").onEnter(tracer.begin("TEST1", 0))
+                .include(spy.byMethod(TCLASS4, "recursive3")));
+        spy.add(spy.instance("2").onEnter(tracer.begin("TEST2", 0))
+                .include(spy.byMethod(TCLASS4, "recursive2")));
+        spy.add(spy.instance("3").onEnter(tracer.formatTraceAttr(null, "X", "XXX"))
+                .include(spy.byMethod(TCLASS4, "recursive1")));
 
         agentInstance.getTracer().setMinMethodTime(0);
         tracer.output(output);
@@ -176,9 +179,12 @@ public class LTracerFullUnitTest extends ZorkaFixture {
     @Test
     public void testTraceAttrUpwardPropagationToUnknownTrace() throws Exception {
         tracer.include(spy.byMethod(TCLASS4, "recur*"));
-        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
-        spy.add(spy.instance().onEnter(tracer.begin("TEST2", 0)).include(spy.byMethod(TCLASS4, "recursive2")));
-        spy.add(spy.instance().onEnter(tracer.formatTraceAttr("TEST3", "X", "XXX")).include(spy.byMethod(TCLASS4, "recursive1")));
+        spy.add(spy.instance("1").onEnter(tracer.begin("TEST1", 0))
+                .include(spy.byMethod(TCLASS4, "recursive3")));
+        spy.add(spy.instance("2").onEnter(tracer.begin("TEST2", 0))
+                .include(spy.byMethod(TCLASS4, "recursive2")));
+        spy.add(spy.instance("3").onEnter(tracer.formatTraceAttr("TEST3", "X", "XXX"))
+                .include(spy.byMethod(TCLASS4, "recursive1")));
 
         agentInstance.getTracer().setMinMethodTime(0);
         tracer.output(output);
@@ -195,7 +201,9 @@ public class LTracerFullUnitTest extends ZorkaFixture {
     @Test
     public void testTraceAttrUpwardPropagationToTheSameMethodNamed() throws Exception {
         tracer.include(spy.byMethod(TCLASS4, "recur*"));
-        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0), tracer.formatTraceAttr("TEST1", "X", "XXX")).include(spy.byMethod(TCLASS4, "recursive3")));
+        spy.add(spy.instance("1").onEnter(tracer.begin("TEST1", 0),
+                tracer.formatTraceAttr("TEST1", "X", "XXX"))
+                .include(spy.byMethod(TCLASS4, "recursive3")));
 
         agentInstance.getTracer().setMinMethodTime(0);
         tracer.output(output);
@@ -212,8 +220,9 @@ public class LTracerFullUnitTest extends ZorkaFixture {
     @Test
     public void testTraceAttrUpwardPropagationToTheSameMethodUnnamed() throws Exception {
         tracer.include(spy.byMethod(TCLASS4, "recur*"));
-        spy.add(spy.instance()
-                .onEnter(tracer.begin("TEST1", 0), tracer.formatTraceAttr(null, "X", "XXX"))
+        spy.add(spy.instance("1")
+                .onEnter(tracer.begin("TEST1", 0),
+                        tracer.formatTraceAttr(null, "X", "XXX"))
                 .include(spy.byMethod(TCLASS4, "recursive3")));
 
         agentInstance.getTracer().setMinMethodTime(0);
@@ -232,10 +241,12 @@ public class LTracerFullUnitTest extends ZorkaFixture {
     @Test
     public void testTraceFlagsUpwardPropagation() throws Exception {
         tracer.include(spy.byMethod(TCLASS4, "recur*"));
-        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
-        spy.add(spy.instance().onEnter(tracer.begin("TEST2", 0)).include(spy.byMethod(TCLASS4, "recursive2")));
+        spy.add(spy.instance("1").onEnter(tracer.begin("TEST1", 0))
+                .include(spy.byMethod(TCLASS4, "recursive3")));
+        spy.add(spy.instance("2").onEnter(tracer.begin("TEST2", 0))
+                .include(spy.byMethod(TCLASS4, "recursive2")));
 
-        spy.add(spy.instance()
+        spy.add(spy.instance("3")
                 .onEnter(tracer.traceFlags("TEST1", TraceMarker.ERROR_MARK))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 
@@ -258,10 +269,12 @@ public class LTracerFullUnitTest extends ZorkaFixture {
     @Test
     public void testInTraceCheckerPositiveCheck() throws Exception {
         tracer.include(spy.byMethod(TCLASS4, "recur*"));
-        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
+        spy.add(spy.instance("1").onEnter(tracer.begin("TEST1", 0))
+                .include(spy.byMethod(TCLASS4, "recursive3")));
 
-        spy.add(spy.instance()
-                .onEnter(spy.subchain(tracer.inTrace("TEST1"), tracer.formatTraceAttr("TEST1", "IN", "YES")))
+        spy.add(spy.instance("2")
+                .onEnter(spy.subchain(tracer.inTrace("TEST1"),
+                        tracer.formatTraceAttr("TEST1", "IN", "YES")))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 
         agentInstance.getTracer().setMinMethodTime(0);
@@ -278,10 +291,12 @@ public class LTracerFullUnitTest extends ZorkaFixture {
     @Test
     public void testInTraceCheckerNegativeCheck() throws Exception {
         tracer.include(spy.byMethod(TCLASS4, "recur*"));
-        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
+        spy.add(spy.instance("1").onEnter(tracer.begin("TEST1", 0))
+                .include(spy.byMethod(TCLASS4, "recursive3")));
 
-        spy.add(spy.instance()
-                .onEnter(spy.subchain(tracer.inTrace("TEST2"), tracer.formatTraceAttr("TEST1", "IN", "YES")))
+        spy.add(spy.instance("2")
+                .onEnter(spy.subchain(tracer.inTrace("TEST2"),
+                        tracer.formatTraceAttr("TEST1", "IN", "YES")))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 
         agentInstance.getTracer().setMinMethodTime(0);
@@ -298,9 +313,10 @@ public class LTracerFullUnitTest extends ZorkaFixture {
 
     @Test
     public void testTraceSpyMethodsFlagOn() throws Exception {
-        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
+        spy.add(spy.instance("1").onEnter(tracer.begin("TEST1", 0))
+                .include(spy.byMethod(TCLASS4, "recursive3")));
 
-        spy.add(spy.instance()
+        spy.add(spy.instance("2")
                 .onEnter(spy.put("AA", "OJA"))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 
@@ -319,9 +335,10 @@ public class LTracerFullUnitTest extends ZorkaFixture {
 
     @Test
     public void testTraceSpyMethodsFlagOff() throws Exception {
-        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
+        spy.add(spy.instance("1").onEnter(tracer.begin("TEST1", 0))
+                .include(spy.byMethod(TCLASS4, "recursive3")));
 
-        spy.add(spy.instance()
+        spy.add(spy.instance("2")
                 .onEnter(spy.put("AA", "OJA"))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 
@@ -341,9 +358,10 @@ public class LTracerFullUnitTest extends ZorkaFixture {
     @Test
     public void testTraceSpyMethodsFlagOffAndOneMethodManuallyAddedToTracer() throws Exception {
         tracer.include(spy.byMethod(TCLASS4, "recursive3"));
-        spy.add(spy.instance().onEnter(tracer.begin("TEST1", 0)).include(spy.byMethod(TCLASS4, "recursive3")));
+        spy.add(spy.instance("1").onEnter(tracer.begin("TEST1", 0))
+                .include(spy.byMethod(TCLASS4, "recursive3")));
 
-        spy.add(spy.instance()
+        spy.add(spy.instance("2")
                 .onEnter(spy.put("AA", "OJA"))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 

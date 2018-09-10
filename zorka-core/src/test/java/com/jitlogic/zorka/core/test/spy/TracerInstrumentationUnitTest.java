@@ -46,7 +46,7 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
     @Test
     public void testInstrumentMethodForTraceAndCheckIfSpyContextHasBeenCreated() throws Exception {
         tracer.include(spy.byMethod(TCLASS1, "trivialMethod"));
-        spy.add(spy.instance().include(spy.byMethodAnnotation(TCLASS1, "com.SomeTestAnnotation")));
+        spy.add(spy.instance("1").include(spy.byMethodAnnotation(TCLASS1, "com.SomeTestAnnotation")));
 
         Object obj = instantiate(engine, TCLASS1);
         invoke(obj, "trivialMethod");

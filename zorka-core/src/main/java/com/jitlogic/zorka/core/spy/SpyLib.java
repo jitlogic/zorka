@@ -201,16 +201,6 @@ public class SpyLib {
 
     private AtomicInteger anonymousSdef = new AtomicInteger(0);
 
-    public SpyDefinition instance() {
-        log.warn("Attempt to create anonymous spy definition. "
-                + "This API is depreciated as spy definitions should to be named since 0.9.12. "
-                + "Sdef will be created for now BUT this will be forbidden in the future. " +
-                "Error counter will be incremented as well, so administrator won't forget about this.");
-        AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
-        return instance("anonymous-" + anonymousSdef.incrementAndGet());
-    }
-
-
     /**
      * Created an empty (unconfigured) spy definition. Use created object's methods to configure it before registering
      * with add() function.
@@ -219,16 +209,6 @@ public class SpyLib {
      */
     public SpyDefinition instance(String name) {
         return SpyDefinition.instance(name);
-    }
-
-
-    public SpyDefinition instrument() {
-        log.warn("Attempt to create anonymous spy definition. "
-                + "This API is depreciated as spy definitions should to be named since 0.9.12. "
-                + "Sdef will be created for now BUT this will be forbidden in the future. " +
-                "Error counter will be incremented as well, so administrator won't forget about this.");
-        AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
-        return instrument("anonymous-" + anonymousSdef.incrementAndGet());
     }
 
 
