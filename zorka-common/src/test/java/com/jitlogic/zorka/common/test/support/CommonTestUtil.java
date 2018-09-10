@@ -128,10 +128,7 @@ public class CommonTestUtil {
     public static void checkLogs(MemoryTrapper logs, ZorkaLogLevel level) {
         for (MemoryTrapper.TrapperMessage msg : logs.getAll()) {
             if (msg.getLogLevel().getPriority() >= level.getPriority()) {
-                System.out.println(msg);
-                if (msg.getE() != null) {
-                    msg.getE().printStackTrace(System.out);
-                }
+                printLogs(logs, ZorkaLogLevel.DEBUG);
                 fail("Bad log: " + msg);
             }
         }
