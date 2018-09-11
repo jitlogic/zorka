@@ -38,7 +38,7 @@ public class STTrcTestUtils {
     public static int chunksLength(STraceBufChunk chunks) {
         int len = 0;
         for (STraceBufChunk c  = chunks; c != null; c = c.getNext()) {
-            len = Math.max(len, c.getOffset()+c.getSize());
+            len = Math.max(len, c.getExtOffset()+c.getPosition());
         }
         return len;
     }
@@ -47,7 +47,7 @@ public class STTrcTestUtils {
         byte[] buf = new byte[chunksLength(chunks)];
 
         for (STraceBufChunk c = chunks; c != null; c = c.getNext()) {
-            System.arraycopy(c.getBuffer(), 0, buf, c.getOffset(), c.getSize());
+            System.arraycopy(c.getBuffer(), 0, buf, c.getExtOffset(), c.getPosition());
         }
 
         return buf;

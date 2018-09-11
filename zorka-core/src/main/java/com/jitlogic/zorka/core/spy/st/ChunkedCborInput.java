@@ -35,12 +35,12 @@ public class ChunkedCborInput extends CborInput {
                 new Comparator<STraceBufChunk>() {
                     @Override
                     public int compare(STraceBufChunk o1, STraceBufChunk o2) {
-                        return o1.getOffset() - o2.getOffset();
+                        return o1.getExtOffset() - o2.getExtOffset();
                     }
                 });
 
         for (int i = 1; i < chunks.size(); i++) {
-            if (chunks.get(i).getOffset() != chunks.get(i-1).getOffset()+chunks.get(i-1).getSize()) {
+            if (chunks.get(i).getExtOffset() != chunks.get(i-1).getExtOffset()+chunks.get(i-1).getPosition()) {
                 throw new ZorkaRuntimeException("Chunks list should be contiguous and from single trace.");
             }
         }
@@ -52,8 +52,8 @@ public class ChunkedCborInput extends CborInput {
         if (ccidx < chunks.size()) {
             STraceBufChunk c = chunks.get(ccidx++);
             buf = c.getBuffer();
-            pos = 0;
-            lim = c.getSize();
+            pos = c.getStartOffset();
+            lim = c.getPosition();
         } else {
             buf = null;
             pos = lim = 0;
@@ -95,7 +95,7 @@ public class ChunkedCborInput extends CborInput {
         size = 0;
 
         for (STraceBufChunk c : chunks) {
-            size += c.getSize();
+            size += c.size();
         }
 
         nextChunk();

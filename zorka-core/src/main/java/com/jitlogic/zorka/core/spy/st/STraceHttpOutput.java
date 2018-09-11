@@ -18,7 +18,7 @@ public class STraceHttpOutput extends ZicoHttpOutput {
     public static int chunksLength(STraceBufChunk chunks) {
         int len = 0;
         for (STraceBufChunk c  = chunks; c != null; c = c.getNext()) {
-            len = Math.max(len, c.getOffset()+c.getSize());
+            len = Math.max(len, c.getExtOffset()+c.getPosition());
         }
         return len;
     }
@@ -27,7 +27,7 @@ public class STraceHttpOutput extends ZicoHttpOutput {
         byte[] buf = new byte[chunksLength(chunks)];
 
         for (STraceBufChunk c = chunks; c != null; c = c.getNext()) {
-            System.arraycopy(c.getBuffer(), 0, buf, c.getOffset(), c.getSize());
+            System.arraycopy(c.getBuffer(), 0, buf, c.getExtOffset(), c.getPosition());
         }
 
         return buf;
@@ -72,7 +72,8 @@ public class STraceHttpOutput extends ZicoHttpOutput {
                     }
 
                     bs = new Base64FormattingStream(new ChunkedCborInput(chunk));
-                    send(bs, bs.available(), submitTraceUrl, UUID.randomUUID().toString());
+                    UUID uuid = new UUID(chunk.getUuidH(), chunk.getUuidL());
+                    send(bs, bs.available(), submitTraceUrl, uuid.toString());
                     break;
                 } catch (CborResendException e) {
                     log.info("Session expired. Reauthenticating ...");

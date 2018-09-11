@@ -94,16 +94,6 @@ public class CBOR {
     public static final Object BREAK = new Object();
     public static final Object UNKNOWN = new Object();
 
-    public static int cborSize(long v) {
-        if (v < 0) {
-            v = -v - 1;
-        }
-        return v < UINT_CODE1 ? 1
-            : v < 0x100 ? 2
-            : v < 0x10000 ? 3
-            : v < 0x1000000L ? 5 : 9;
-    }
-
     private CBOR() {
         // This class cannot be instantiated
     }

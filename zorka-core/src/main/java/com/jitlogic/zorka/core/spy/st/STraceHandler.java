@@ -27,6 +27,7 @@ import com.jitlogic.zorka.core.spy.lt.TraceHandler;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import static com.jitlogic.zorka.cbor.TraceDataTags.*;
 import static com.jitlogic.zorka.core.util.ZorkaUnsafe.*;
@@ -104,6 +105,8 @@ public class STraceHandler extends TraceHandler {
     protected int bufPos;
     protected int bufLen;
 
+    protected int lastPos = 0;
+
     protected int nchunks = 0;
 
     protected int minChunks = 2, maxChunks = 16;
@@ -115,6 +118,8 @@ public class STraceHandler extends TraceHandler {
 
     private final boolean debugEnabled;
     private final boolean traceEnabled;
+
+    private long uuidL, uuidH;
 
     /**
      * Contains 'image' of traced thread call stack containing basic information needed to manage tracing process.
@@ -144,6 +149,8 @@ public class STraceHandler extends TraceHandler {
     /** Identity hash code of last seen exception. */
     private int exceptionId;
 
+    /** Used to generate UUIDs of traces. */
+    private Random random = new Random();
 
     public STraceHandler(boolean streamingEnabled, long minMethodTime, STraceBufManager bufManager, SymbolRegistry symbols, ZorkaSubmitter<SymbolicRecord> output) {
 
@@ -177,6 +184,7 @@ public class STraceHandler extends TraceHandler {
         long tst = ticks();
         long tr0 = tst | ((long)methodId << TSTAMP_BITS);
 
+        lastPos = bufPos;
         UNSAFE.putInt(buffer, BYTE_ARRAY_OFFS+bufPos, TREC_HEADER);
         UNSAFE.putLong(buffer, BYTE_ARRAY_OFFS+bufPos+4, tr0);
 
@@ -258,6 +266,11 @@ public class STraceHandler extends TraceHandler {
 
             if ((streamingEnabled || tracePos == 0) && (dur >= minTraceTime || forceSubmit)) {
                 flush();
+            }
+
+            // Reset UUID
+            if (tracePos == 0) {
+                uuidL = uuidH = 0;
             }
         }
 
@@ -353,6 +366,16 @@ public class STraceHandler extends TraceHandler {
         writeLong(clock);
         writeInt(traceId);
 
+        if (tracePos == 0) {
+            uuidL = random.nextLong();
+            uuidH = random.nextLong();
+            if (chunk != null) {
+                chunk.setUuidL(uuidL);
+                chunk.setUuidH(uuidH);
+                chunk.setStartOffset(lastPos);
+            }
+        }
+
         tracePos++;
     }
 
@@ -377,7 +400,7 @@ public class STraceHandler extends TraceHandler {
 
     @Override
     public void setMinimumTraceTime(long minTraceTime) {
-        this.minTraceTime = minTraceTime;
+        this.minTraceTime = minTraceTime / 65536;
     }
 
 
@@ -493,7 +516,7 @@ public class STraceHandler extends TraceHandler {
 
     protected void flushChunk() {
         if (buffer != null) {
-            chunk.setSize(bufPos);
+            chunk.setPosition(bufPos);
             buffer = null;
             bufLen = 0;
             bufOffs += bufPos;
@@ -507,8 +530,12 @@ public class STraceHandler extends TraceHandler {
             flushChunk();
         }
         STraceBufChunk ch = bufManager.get();
-        ch.setOffset(bufOffs);
+        ch.setStartOffset(0);
+        ch.setExtOffset(bufOffs);
         ch.setNext(chunk);
+        ch.setUuidL(uuidL);
+        ch.setUuidH(uuidH);
+
         chunk = ch;
         buffer = ch.getBuffer();
         bufLen = buffer.length;

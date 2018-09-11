@@ -21,39 +21,67 @@ import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 
 import java.io.IOException;
 
+/**
+ * Stores chunk of trace data as it is recorded by tracer.
+ */
 public class STraceBufChunk implements SymbolicRecord {
 
+    /** Trace data buffer. */
     private byte[] buffer;
 
-    private int offset;
+    /** Internal offset: number of bytes to skip at the beginning of current buffer. */
+    private int startOffset;
 
-    private int size;
+    /** External offset: offset of current chunk in whole trace */
+    private int extOffset;
 
+    /** Size of this chunk (in bytes). */
+    private int position;
+
+    /** Low word of top-level trace UUID (sent to collector in order to bind all chunks together). */
+    private long uuidL;
+
+    /** High word of top-level trace UUID (sent to collector in order to bind all chunks together). */
+    private long uuidH;
+
+    /** Previous chunk (used if chunks are grouped together). */
     private STraceBufChunk next;
 
-    public STraceBufChunk(int size) {
-        this.size = size;
-        this.buffer = new byte[size];
+    public STraceBufChunk(int position) {
+        this.position = position;
+        this.buffer = new byte[position];
     }
 
     public byte[] getBuffer() {
         return buffer;
     }
 
-    public int getOffset() {
-        return offset;
+    public int getStartOffset() {
+        return startOffset;
     }
 
-    public void setOffset(int offset) {
-        this.offset = offset;
+    public void setStartOffset(int startOffset) {
+        this.startOffset = startOffset;
     }
 
-    public int getSize() {
-        return size;
+    public int getExtOffset() {
+        return extOffset;
     }
 
-    public void setSize(int size) {
-        this.size = size;
+    public void setExtOffset(int extOffset) {
+        this.extOffset = extOffset;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public int size() {
+        return position - startOffset;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     public STraceBufChunk getNext() {
@@ -65,9 +93,27 @@ public class STraceBufChunk implements SymbolicRecord {
     }
 
     public void reset() {
-        offset = 0;
-        size = 0;
+        extOffset = 0;
+        position = 0;
+        uuidL = 0L;
+        uuidH = 0L;
         next = null;
+    }
+
+    public long getUuidL() {
+        return uuidL;
+    }
+
+    public void setUuidL(long uuidL) {
+        this.uuidL = uuidL;
+    }
+
+    public long getUuidH() {
+        return uuidH;
+    }
+
+    public void setUuidH(long uuidH) {
+        this.uuidH = uuidH;
     }
 
     @Override
