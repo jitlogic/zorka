@@ -56,7 +56,7 @@ public class SpyDefinition {
     /**
      * List of matchers defining that classes/methods this sdef looks for
      */
-    private SpyMatcherSet matcherSet = new SpyMatcherSet();
+    private PatternMatcherSet matcherSet = new PatternMatcherSet();
 
     /**
      * Creates partially configured spy definition that is suitable for measuring
@@ -102,7 +102,7 @@ public class SpyDefinition {
         this.name = orig.name;
         this.probes = ZorkaUtil.copyArray(orig.probes);
         this.processors = ZorkaUtil.copyArray(orig.processors);
-        this.matcherSet = new SpyMatcherSet(orig.matcherSet);
+        this.matcherSet = new PatternMatcherSet(orig.matcherSet);
     }
 
 
@@ -128,7 +128,7 @@ public class SpyDefinition {
     }
 
 
-    public SpyMatcherSet getMatcherSet() {
+    public PatternMatcherSet getMatcherSet() {
         return matcherSet;
     }
 
@@ -185,7 +185,7 @@ public class SpyDefinition {
      */
     public SpyDefinition include(SpyMatcher... matchers) {
         SpyDefinition sdef = new SpyDefinition(this);
-        sdef.matcherSet = new SpyMatcherSet(sdef.matcherSet, matchers);
+        sdef.matcherSet = new PatternMatcherSet(sdef.matcherSet, matchers);
         return sdef;
     }
 

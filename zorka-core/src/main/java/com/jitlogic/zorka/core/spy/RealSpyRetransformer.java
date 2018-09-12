@@ -21,10 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.instrument.Instrumentation;
-import java.lang.instrument.UnmodifiableClassException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -84,34 +83,54 @@ public class RealSpyRetransformer implements SpyRetransformer {
         }
 
         if (classes.size() > 0) {
-
-            Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                    Class[] cc = new Class[1];
-
-                    for (Class c : classes) {
-                        if (log.isTraceEnabled()) {
-                            log.trace("Retransforming class: " + c.getName());
-                        }
-                        cc[0] = c;
-                        try {
-                            instrumentation.retransformClasses(cc);
-                            Thread.sleep(100);
-                        } catch (Throwable e) {
-                            log.error("Error when trying to retransform class:" + c.getName(), e);
-                        }
-                    }
-
-                    log.info("Finished retransforming classes.");
-                }
-            };
-
-            executor.execute(r);
-
+            retransform(classes);
             return true;
         } else {
             log.info("No classes need to be retransformed.");
+        }
+
+        return false;
+    }
+
+    private void retransform(final List<Class<?>> classes) {
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                Class[] cc = new Class[1];
+
+                for (Class c : classes) {
+                    if (log.isTraceEnabled()) {
+                        log.trace("Retransforming class: " + c.getName());
+                    }
+                    cc[0] = c;
+                    try {
+                        instrumentation.retransformClasses(cc);
+                        Thread.sleep(100);
+                    } catch (Throwable e) {
+                        log.error("Error when trying to retransform class:" + c.getName(), e);
+                    }
+                }
+
+                log.info("Finished retransforming classes.");
+            }
+        };
+
+        executor.execute(r);
+    }
+
+    @Override
+    public boolean retransform(Set<String> classNames) {
+        List<Class<?>> classes = new ArrayList<Class<?>>();
+
+        for (Class c : instrumentation.getAllLoadedClasses()) {
+            if (classNames.contains(c.getName())) {
+                classes.add(c);
+            }
+        }
+
+        if (!classes.isEmpty()) {
+            retransform(classes);
+            return true;
         }
 
         return false;

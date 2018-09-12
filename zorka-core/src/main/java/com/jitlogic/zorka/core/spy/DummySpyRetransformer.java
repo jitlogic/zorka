@@ -20,8 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.instrument.Instrumentation;
-import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 
 public class DummySpyRetransformer implements SpyRetransformer {
@@ -34,7 +33,13 @@ public class DummySpyRetransformer implements SpyRetransformer {
 
     @Override
     public boolean retransform(SpyMatcherSet oldSet, SpyMatcherSet newSet, boolean isSdef) {
-        log.warn("Ignoring classes retransform due to lack of platform support.");
+        log.info("Ignoring classes retransform due to lack of platform support.");
+        return false;
+    }
+
+    @Override
+    public boolean retransform(Set<String> classNames) {
+        log.info("Ignoring classes retransform due to lack of platform support.");
         return false;
     }
 

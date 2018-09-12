@@ -20,10 +20,10 @@ package com.jitlogic.zorka.core.spy.st;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
-import com.jitlogic.zorka.core.spy.SpyMatcher;
-import com.jitlogic.zorka.core.spy.SpyMatcherSet;
 import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.spy.lt.TraceHandler;
+import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
+import com.jitlogic.zorka.core.spy.tuner.ZtxMatcherSet;
 
 /**
  * Groups all tracer engine components and global settings.
@@ -47,13 +47,13 @@ public class STracer extends Tracer {
         new ThreadLocal<STraceHandler>() {
             public STraceHandler initialValue() {
                 return new STraceHandler(streamingEnabled, minMethodTime >> 16,
-                        bufManager, symbolRegistry, outputs.get().get(0));
+                        bufManager, symbolRegistry, tracerTuner, outputs.get().get(0));
             }
         };
 
-    public STracer(ZorkaConfig config, SpyMatcherSet matcherSet, SymbolRegistry symbolRegistry, STraceBufManager bufManager) {
+    public STracer(ZorkaConfig config, ZtxMatcherSet matcherSet, SymbolRegistry symbolRegistry, TracerTuner tuner, STraceBufManager bufManager) {
+        super(matcherSet, symbolRegistry, tuner);
         this.streamingEnabled = config.boolCfg("tracer.streaming.enabled", false);
-        this.matcherSet = matcherSet;
         this.symbolRegistry = symbolRegistry;
         this.bufManager = bufManager;
     }
@@ -63,15 +63,6 @@ public class STracer extends Tracer {
         return handlers.get();
     }
 
-    /**
-     * Adds new matcher that includes (or excludes) classes and method to be traced.
-     *
-     * @param matcher spy matcher to be added
-     */
-    @Override
-    public void include(SpyMatcher matcher) {
-        matcherSet = matcherSet.include(matcher);
-    }
 
     @Override
     public synchronized void shutdown() {

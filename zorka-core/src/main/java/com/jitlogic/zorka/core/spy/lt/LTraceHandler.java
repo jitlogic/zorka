@@ -23,6 +23,7 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
 
 /**
  * This class receives loose tracer submissions from single thread
@@ -49,15 +50,17 @@ public class LTraceHandler extends TraceHandler {
      */
     private int numRecords = 0;
 
+    private TracerTuner tracerTuner;
 
     /**
      * Creates new trace builder object.
      *
      * @param output object completed traces will be submitted to
      */
-    public LTraceHandler(ZorkaSubmitter<SymbolicRecord> output, SymbolRegistry symbols) {
+    public LTraceHandler(ZorkaSubmitter<SymbolicRecord> output, SymbolRegistry symbols, TracerTuner tracerTuner) {
         this.output = output;
         this.symbols = symbols;
+        this.tracerTuner = tracerTuner;
     }
 
 
@@ -80,7 +83,7 @@ public class LTraceHandler extends TraceHandler {
     }
 
 
-    public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
+    public void traceEnter(int mid, int classId, int methodId, int signatureId, long tstamp) {
 
         if (disabled) {
             return;
@@ -105,6 +108,7 @@ public class LTraceHandler extends TraceHandler {
             numRecords++;
         }
 
+        ttop.setMid(mid);
         ttop.setClassId(classId);
         ttop.setMethodId(methodId);
         ttop.setSignatureId(signatureId);

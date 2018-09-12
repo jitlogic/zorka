@@ -45,15 +45,15 @@ public class SpyMethodVisitor extends MethodVisitor {
     /**
      * Class that receives data from probes
      */
-    private final static String SUBMIT_CLASS = "com/jitlogic/zorka/core/spy/MainSubmitter";
+    private static final String SUBMIT_CLASS = "com/jitlogic/zorka/core/spy/MainSubmitter";
 
     /**
      * Method used by various probes
      */
-    private final static String SUBMIT_METHOD = "submit";
-    private final static String SUBMIT_SIGNATURE = "(III[Ljava/lang/Object;)V";
+    private static final String SUBMIT_METHOD = "submit";
+    private static final String SUBMIT_SIGNATURE = "(III[Ljava/lang/Object;)V";
     private static final String ENTER_METHOD = "traceEnter";
-    private static final String ENTER_SIGNATURE = "(III)V";
+    private static final String ENTER_SIGNATURE = "(IIII)V";
     private static final String RETURN_METHOD = "traceReturn";
     private static final String RETURN_SIGNATURE = "()V";
     private static final String ERROR_METHOD = "traceError";
@@ -247,7 +247,7 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     private void emitProlog() {
         for (SpyContext ctx : ctxs) {
-            SpyMatcherSet sms = ctx.getSpyDefinition().getMatcherSet();
+            PatternMatcherSet sms = ctx.getSpyDefinition().getMatcherSet();
             ctxMatches.add((!sms.hasMethodAnnotations()) ||
                     sms.methodMatch(className, superclasses, classAnnotations, classInterfaces,
                     access, methodName, methodSignature, annotations));
@@ -427,8 +427,9 @@ public class SpyMethodVisitor extends MethodVisitor {
      */
     private int emitTraceEnter(int classId, int methodId, int signatureId) {
 
+        int mid = symbolRegistry.methodId(classId, methodId, signatureId);
+
         if (streamingTracer) {
-            int mid = symbolRegistry.methodId(classId, methodId, signatureId);
             emitLoadInt(mid);
 
             mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, ENTER_S_METHOD, ENTER_S_SIGNATURE, false);
@@ -436,6 +437,7 @@ public class SpyMethodVisitor extends MethodVisitor {
 
             return 2;
         } else {
+            emitLoadInt(mid);
             emitLoadInt(classId);
             emitLoadInt(methodId);
             emitLoadInt(signatureId);
@@ -443,7 +445,7 @@ public class SpyMethodVisitor extends MethodVisitor {
             mv.visitMethodInsn(INVOKESTATIC, SUBMIT_CLASS, ENTER_METHOD, ENTER_SIGNATURE, false);
             tracerProbesEmitted++;
 
-            return 3;
+            return 4;
         }
     }
 

@@ -21,9 +21,9 @@ import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.core.spy.SpyMatcher;
-import com.jitlogic.zorka.core.spy.SpyMatcherSet;
 import com.jitlogic.zorka.core.spy.Tracer;
+import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
+import com.jitlogic.zorka.core.spy.tuner.ZtxMatcherSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,14 +41,13 @@ public class LTracer extends Tracer {
     private ThreadLocal<LTraceHandler> localHandlers =
             new ThreadLocal<LTraceHandler>() {
                 public LTraceHandler initialValue() {
-                    return new LTraceHandler(LTracer.this, symbolRegistry);
+                    return new LTraceHandler(LTracer.this, symbolRegistry, tracerTuner);
                 }
             };
 
 
-    public LTracer(SpyMatcherSet matcherSet, SymbolRegistry symbolRegistry) {
-        this.matcherSet = matcherSet;
-        this.symbolRegistry = symbolRegistry;
+    public LTracer(ZtxMatcherSet matcherSet, SymbolRegistry symbolRegistry, TracerTuner tuner) {
+        super(matcherSet, symbolRegistry, tuner);
     }
 
 
@@ -63,15 +62,6 @@ public class LTracer extends Tracer {
 
     public LTraceHandler getLtHandler() {
         return localHandlers.get();
-    }
-
-    /**
-     * Adds new matcher that includes (or excludes) classes and method to be traced.
-     *
-     * @param matcher spy matcher to be added
-     */
-    public void include(SpyMatcher matcher) {
-        matcherSet = matcherSet.include(matcher);
     }
 
 

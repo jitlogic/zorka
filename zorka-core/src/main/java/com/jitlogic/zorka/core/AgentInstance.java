@@ -38,10 +38,13 @@ import com.jitlogic.zorka.core.spy.lt.LTracerLib;
 import com.jitlogic.zorka.core.spy.st.STraceBufManager;
 import com.jitlogic.zorka.core.spy.st.STracer;
 import com.jitlogic.zorka.core.spy.st.STracerLib;
+import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
+import com.jitlogic.zorka.core.spy.tuner.ZtxMatcherSet;
 import com.jitlogic.zorka.core.util.DaemonThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -149,6 +152,13 @@ public class AgentInstance implements ZorkaService {
 
     private MethodCallStatistics stats = new MethodCallStatistics();
 
+    private MetricsRegistry metricsRegistry;
+
+    private SymbolRegistry symbolRegistry;
+
+    private ZtxMatcherSet tracerMatcherSet;
+
+    private TracerTuner tracerTuner;
 
     private Tracer tracer;
 
@@ -259,17 +269,22 @@ public class AgentInstance implements ZorkaService {
     }
 
 
-    private SpyMatcherSet tracerMatcherSet;
-
-    public synchronized SpyMatcherSet getTracerMatcherSet() {
+    public synchronized ZtxMatcherSet getTracerMatcherSet() {
         if (tracerMatcherSet == null) {
-            tracerMatcherSet = new SpyMatcherSet();
+
+            File ztxDir = config.hasCfg("tracer.tuner.dir")
+                    ? new File(config.stringCfg("tracer.tuner.dir", null))
+                    : new File(config.getHomeDir(), "ztx");
+
+            File ztxLog = config.hasCfg("tracer.tuner.xlog")
+                    ? new File(config.stringCfg("tracer.tuner.xlog", null))
+                    : new File(ztxDir, "_log.ztx");
+
+            tracerMatcherSet = new ZtxMatcherSet(ztxDir, ztxLog, getSymbolRegistry(), false);
         }
         return tracerMatcherSet;
     }
 
-
-    private MetricsRegistry metricsRegistry;
 
     public synchronized MetricsRegistry getMetricsRegistry() {
         if (metricsRegistry == null) {
@@ -278,8 +293,6 @@ public class AgentInstance implements ZorkaService {
         return metricsRegistry;
     }
 
-
-    private SymbolRegistry symbolRegistry;
 
     public synchronized SymbolRegistry getSymbolRegistry() {
         if (symbolRegistry == null) {
@@ -328,16 +341,24 @@ public class AgentInstance implements ZorkaService {
         return bufManager;
     }
 
+    public synchronized TracerTuner getTracerTuner() {
+        if (tracerTuner == null) {
+            if (config.boolCfg("tracer.tuner", false)) {
+                tracerTuner = new TracerTuner(getConfig(), getSymbolRegistry(), getRetransformer());
+            }
+        }
+        return tracerTuner;
+    }
+
     public synchronized Tracer getTracer() {
         if (tracer == null) {
-            AgentConfig config = getConfig();
             if ("streaming".equals(config.stringCfg("tracer.type", "local"))) {
                 log.info("STREAMING tracer selected.");
-                tracer = new STracer(config, getTracerMatcherSet(), getSymbolRegistry(), getBufManager());
+                tracer = new STracer(config, getTracerMatcherSet(), getSymbolRegistry(), getTracerTuner(), getBufManager());
                 MainSubmitter.setSTracer((STracer)tracer);
             } else {
                 log.info("LOCAL tracer selected.");
-                tracer = new LTracer(getTracerMatcherSet(), getSymbolRegistry());
+                tracer = new LTracer(getTracerMatcherSet(), getSymbolRegistry(), getTracerTuner());
                 MainSubmitter.setLTracer((LTracer)tracer);
             }
         }
@@ -613,7 +634,7 @@ public class AgentInstance implements ZorkaService {
     }
 
     public void reload() {
-        SpyMatcherSet oldSet = new SpyMatcherSet(getTracer().getMatcherSet());
+        PatternMatcherSet oldSet = getTracer().getMatcherSet().getPatternMatcherSet();
         SpyClassTransformer transformer = getClassTransformer();
         Set<SpyDefinition> oldSdefs = transformer.getSdefs();
 
@@ -621,11 +642,12 @@ public class AgentInstance implements ZorkaService {
         shutdown();
         ZorkaUtil.sleep(1000);
         restart();
+
         long l = AgentDiagnostics.get(AgentDiagnostics.CONFIG_ERRORS);
 
         if (l != 0) {
             log.info("Error loading configuration scripts. ");
-            getTracer().setMatcherSet(oldSet);
+            getTracer().getMatcherSet().setPatternMatcherSet(oldSet);
         }
 
         ZorkaBshAgent bsh = getZorkaAgent();
@@ -646,7 +668,7 @@ public class AgentInstance implements ZorkaService {
             }
         }
 
-        SpyMatcherSet newSet = getTracer().getMatcherSet();
+        PatternMatcherSet newSet = getTracer().getMatcherSet().getPatternMatcherSet();
         log.info("Reinstrumenting classes for tracer ...");
         getRetransformer().retransform(oldSet, newSet, false);
         log.info("Checking for old sdefs to be removed...");

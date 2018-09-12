@@ -26,7 +26,7 @@ import com.jitlogic.zorka.core.spy.st.STraceHandler;
 public class TestSTraceHandler extends STraceHandler {
 
     public TestSTraceHandler(long minMethodTime, STraceBufManager bufManager, SymbolRegistry symbols, ZorkaSubmitter<SymbolicRecord> output) {
-        super(false, minMethodTime, bufManager, symbols, output);
+        super(false, minMethodTime, bufManager, symbols, null, output);
     }
 
     public long t, c;

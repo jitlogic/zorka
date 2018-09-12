@@ -21,6 +21,8 @@ import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.core.spy.lt.TraceHandler;
+import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
+import com.jitlogic.zorka.core.spy.tuner.ZtxMatcherSet;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +43,18 @@ public abstract class Tracer implements ZorkaService, ZorkaSubmitter<SymbolicRec
 
     protected static int minTraceCalls = 262144;
 
+    /** Tracer tuning disabled. */
+    public static final int TUNING_OFF = 0x00;
+
+    /** Summary statistics are collected. */
+    public static final int TUNING_SUM = 0x01;
+
+    /** Detail statistics are collected. */
+    public static final int TUNING_DET = 0x02;
+
+
+    protected static int tuningMode = TUNING_OFF;
+
     /**
      * If true, methods instrumented by SPY will also be traced by default.
      */
@@ -49,12 +63,20 @@ public abstract class Tracer implements ZorkaService, ZorkaSubmitter<SymbolicRec
     /**
      * Defines which classes and methods should be traced.
      */
-    protected SpyMatcherSet matcherSet;
+    protected ZtxMatcherSet matcherSet;
 
     /**
      * Symbol registry containing names of all symbols tracer knows about.
      */
     protected SymbolRegistry symbolRegistry;
+
+    protected TracerTuner tracerTuner;
+
+    public Tracer(ZtxMatcherSet matcherSet, SymbolRegistry symbolRegistry, TracerTuner tracerTuner) {
+        this.matcherSet = matcherSet;
+        this.symbolRegistry = symbolRegistry;
+        this.tracerTuner = tracerTuner;
+    }
 
     protected AtomicReference<List<ZorkaSubmitter<SymbolicRecord>>> outputs
             = new AtomicReference<List<ZorkaSubmitter<SymbolicRecord>>>(new ArrayList<ZorkaSubmitter<SymbolicRecord>>());
@@ -63,7 +85,14 @@ public abstract class Tracer implements ZorkaService, ZorkaSubmitter<SymbolicRec
 
     public abstract TraceHandler getHandler();
 
-    public abstract void include(SpyMatcher matcher);
+    /**
+     * Adds new matcher that includes (or excludes) classes and method to be traced.
+     *
+     * @param matcher spy matcher to be added
+     */
+    public void include(SpyMatcher matcher) {
+        matcherSet.include(matcher);
+    }
 
 
     public static long getMinMethodTime() {
@@ -103,19 +132,25 @@ public abstract class Tracer implements ZorkaService, ZorkaSubmitter<SymbolicRec
         this.traceSpyMethods = traceSpyMethods;
     }
 
-    public SpyMatcherSet getMatcherSet() {
+    public ZtxMatcherSet getMatcherSet() {
         return matcherSet;
     }
 
+    public static int getTuningMode() {
+        return tuningMode;
+    }
 
-    public void setMatcherSet(SpyMatcherSet matcherSet) {
+    public static void setTuningMode(int tuningMode) {
+        Tracer.tuningMode = tuningMode;
+    }
+
+    public void setMatcherSet(ZtxMatcherSet matcherSet) {
         this.matcherSet = matcherSet;
     }
 
     public SpyMatcherSet clearMatchers() {
-        SpyMatcherSet ret = matcherSet;
-        matcherSet = new SpyMatcherSet();
-        return ret;
+        matcherSet.clear();
+        return matcherSet;
     }
 
 

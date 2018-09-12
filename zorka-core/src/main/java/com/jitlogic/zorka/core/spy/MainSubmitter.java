@@ -108,11 +108,11 @@ public class MainSubmitter {
      * @param classId  class ID (registered)
      * @param methodId method ID (registered)
      */
-    public static void traceEnter(int classId, int methodId, int signatureId) {
+    public static void traceEnter(int mid, int classId, int methodId, int signatureId) {
 
         if (lt != null) {
             try {
-                lt.getLtHandler().traceEnter(classId, methodId, signatureId, System.nanoTime());
+                lt.getLtHandler().traceEnter(mid, classId, methodId, signatureId, System.nanoTime());
             } catch (Throwable e) {
                 // This is special case. We must catch everything going out of agent, even OOM errors.
                 log.debug("Error executing traceEnter", e);

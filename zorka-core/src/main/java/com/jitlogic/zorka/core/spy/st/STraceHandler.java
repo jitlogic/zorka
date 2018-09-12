@@ -24,6 +24,7 @@ import com.jitlogic.zorka.cbor.CBOR;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.TracerLib;
 import com.jitlogic.zorka.core.spy.lt.TraceHandler;
+import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
 
 import java.util.List;
 import java.util.Map;
@@ -152,12 +153,16 @@ public class STraceHandler extends TraceHandler {
     /** Used to generate UUIDs of traces. */
     private Random random = new Random();
 
-    public STraceHandler(boolean streamingEnabled, long minMethodTime, STraceBufManager bufManager, SymbolRegistry symbols, ZorkaSubmitter<SymbolicRecord> output) {
+    private TracerTuner tracerTuner;
+
+    public STraceHandler(boolean streamingEnabled, long minMethodTime, STraceBufManager bufManager,
+                         SymbolRegistry symbols, TracerTuner tracerTuner, ZorkaSubmitter<SymbolicRecord> output) {
 
         this.streamingEnabled = streamingEnabled;
         this.minMethodTime = minMethodTime;
 
         this.bufManager = bufManager;
+        this.tracerTuner = tracerTuner;
         this.symbols = symbols;
         this.output = output;
 

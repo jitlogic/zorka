@@ -29,7 +29,7 @@ public class TestTraceBuilder extends LTraceHandler {
     private List<Map<Object, Object>> data = new ArrayList<Map<Object, Object>>();
 
     public TestTraceBuilder() {
-        super(null, null);
+        super(null, null, null);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class TestTraceBuilder extends LTraceHandler {
     }
 
     @Override
-    public void traceEnter(int classId, int methodId, int signatureId, long tstamp) {
+    public void traceEnter(int mid, int classId, int methodId, int signatureId, long tstamp) {
         data.add(ZorkaUtil.map("action", "traceEnter", "classId", classId, "methodId", methodId, "signatureId", signatureId, "tstamp", tstamp));
     }
 

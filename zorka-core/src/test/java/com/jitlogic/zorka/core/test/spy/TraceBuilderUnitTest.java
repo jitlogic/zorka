@@ -43,7 +43,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
                 public boolean submit(SymbolicRecord obj) {
                     return records.add((TraceRecord) obj);
                 }
-            }, symbols);
+            }, symbols, null);
 
     private static final int MS = 1000000;
 
@@ -86,7 +86,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testStrayTraceFragment() {
-        b.traceEnter(c1, m1, s1, 100 * MS);
+        b.traceEnter(0, c1, m1, s1, 100 * MS);
         b.traceReturn(200 * MS);
 
         checkRC(0);
@@ -95,7 +95,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testSingleTraceWithOneShortElement() {
-        b.traceEnter(c1, m1, s1, 100 * MS);
+        b.traceEnter(0, c1, m1, s1, 100 * MS);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
         b.traceReturn(100 * MS + 100);
 
@@ -105,7 +105,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testSingleTraceWithOneShortElementAndAlwaysSubmitFlag() {
-        b.traceEnter(c1, m1, s1, 10 * MS);
+        b.traceEnter(0, c1, m1, s1, 10 * MS);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
         b.markTraceFlags(0, TraceMarker.SUBMIT_TRACE);
         b.traceReturn(20 * MS);
@@ -116,10 +116,10 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testAllMethodsSubmitFlag() {
-        b.traceEnter(c1, m1, s1, 10 * MS);
+        b.traceEnter(0, c1, m1, s1, 10 * MS);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
         b.markTraceFlags(0, TraceMarker.ALL_METHODS);
-        b.traceEnter(c1, m1, s1, 20 * MS);
+        b.traceEnter(0, c1, m1, s1, 20 * MS);
         b.traceReturn(20 * MS + 10);
         b.traceReturn(200 * MS);
 
@@ -128,9 +128,9 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testForceTraceRecordFlag() {
-        b.traceEnter(c1, m1, s1, 10 * MS);
+        b.traceEnter(0, c1, m1, s1, 10 * MS);
         b.traceBegin(t1,5L, TraceMarker.DROP_INTERIM);
-        b.traceEnter(c1, m2, s1, 20 * MS);
+        b.traceEnter(0, c1, m2, s1, 20 * MS);
         b.markRecordFlags(TraceRecord.FORCE_TRACE);
         b.traceReturn(20 * MS + 10);
         b.traceReturn(200 * MS);
@@ -140,7 +140,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testSingleOneElementTrace() {
-        b.traceEnter(c1, m1, s1, 100 * MS);
+        b.traceEnter(0, c1, m1, s1, 100 * MS);
         b.traceBegin(t1, 200L, TraceMarker.DROP_INTERIM);
         b.traceReturn(200 * MS);
 
@@ -150,9 +150,9 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testSingleTraceWithOneChildElement() {
-        b.traceEnter(c1, m1, s1, 100 * MS);
+        b.traceEnter(0, c1, m1, s1, 100 * MS);
         b.traceBegin(t1, 300L, TraceMarker.DROP_INTERIM);
-        b.traceEnter(c1, m2, s1, 200 * MS);
+        b.traceEnter(0, c1, m2, s1, 200 * MS);
         b.traceReturn(300 * MS);
         b.traceReturn(400 * MS);
 
@@ -163,7 +163,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testTraceWithErrorElement() {
-        b.traceEnter(c1, m1, s1, 100 * MS);
+        b.traceEnter(0, c1, m1, s1, 100 * MS);
         b.traceBegin(t1, 400L, TraceMarker.DROP_INTERIM);
         b.traceError(new Exception("oja!"), 200 * MS);
 
@@ -174,9 +174,9 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testTraceWithShortErrorChildElement() {
-        b.traceEnter(c1, m1, s1, 100 * MS);
+        b.traceEnter(0, c1, m1, s1, 100 * MS);
         b.traceBegin(t1, 500L, TraceMarker.DROP_INTERIM);
-        b.traceEnter(c1, m2, s1, 200 * MS);
+        b.traceEnter(0, c1, m2, s1, 200 * MS);
         b.traceError(new Exception("oja!"), 200 * MS + 100);
         b.traceReturn(400 * MS);
 
@@ -187,12 +187,12 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testMixedTraceWithSomeShortElementsAndSomeErrors() {
-        b.traceEnter(c1, m1, s1, 100 * MS);
+        b.traceEnter(0, c1, m1, s1, 100 * MS);
         b.traceBegin(t1, 600L, TraceMarker.DROP_INTERIM);
         b.setMinimumTraceTime(0);
-        b.traceEnter(c1, m2, s1, 110 * MS);
+        b.traceEnter(0, c1, m2, s1, 110 * MS);
         b.traceReturn(110 * MS + 100);
-        b.traceEnter(c1, m2, s1, 120 * MS);
+        b.traceEnter(0, c1, m2, s1, 120 * MS);
         b.traceReturn(130 * MS);
         b.traceReturn(140 * MS);
 
@@ -203,7 +203,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testAttrsEncode() throws Exception {
-        b.traceEnter(c1, m1, s1, 100 * MS);
+        b.traceEnter(0, c1, m1, s1, 100 * MS);
         b.traceBegin(t1, 700L, TraceMarker.DROP_INTERIM);
         b.setMinimumTraceTime(0);
         b.newAttr(-1, a1, "some val");
@@ -217,8 +217,8 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testSkipTraceRecordsIfNoMarkerIsSet() throws Exception {
-        b.traceEnter(c1, m1, s1, 100 * MS);
-        b.traceEnter(c1, m2, s1, 100 * MS);
+        b.traceEnter(0, c1, m1, s1, 100 * MS);
+        b.traceEnter(0, c1, m2, s1, 100 * MS);
 
         TraceRecord top = CoreTestUtil.getField(b, "ttop");
         Assert.assertTrue("Trace record top should have no parent.", top.getParent() == null);
@@ -230,16 +230,16 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         tracer.setTracerMaxTraceRecords(3);
         tracer.setTracerMinTraceTime(0);
 
-        b.traceEnter(c1, m1, s1, 1 * MS);
+        b.traceEnter(0, c1, m1, s1, 1 * MS);
         b.traceBegin(t1, 2 * MS, TraceMarker.DROP_INTERIM);
 
-        b.traceEnter(c1, m2, s1, 3 * MS);
+        b.traceEnter(0, c1, m2, s1, 3 * MS);
         b.traceReturn(4 * MS);
-        b.traceEnter(c1, m2, s1, 5 * MS);
+        b.traceEnter(0, c1, m2, s1, 5 * MS);
         b.traceReturn(6 * MS);
-        b.traceEnter(c1, m2, s1, 7 * MS);
+        b.traceEnter(0, c1, m2, s1, 7 * MS);
         b.traceReturn(8 * MS);
-        b.traceEnter(c1, m2, s1, 9 * MS);
+        b.traceEnter(0, c1, m2, s1, 9 * MS);
         b.traceReturn(10 * MS);
 
 
@@ -261,14 +261,14 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         tracer.setTracerMinTraceTime(0);
 
         // Start new trace
-        b.traceEnter(c1, m1, s1, 1 * MS);
+        b.traceEnter(0, c1, m1, s1, 1 * MS);
         b.traceBegin(t1, 2 * MS, TraceMarker.DROP_INTERIM);
 
         // Recursively enter 3 times
-        b.traceEnter(c1, m2, s1, 3 * MS);
-        b.traceEnter(c1, m2, s1, 4 * MS);
-        b.traceEnter(c1, m2, s1, 5 * MS);
-        b.traceEnter(c1, m2, s1, 6 * MS);
+        b.traceEnter(0, c1, m2, s1, 3 * MS);
+        b.traceEnter(0, c1, m2, s1, 4 * MS);
+        b.traceEnter(0, c1, m2, s1, 5 * MS);
+        b.traceEnter(0, c1, m2, s1, 6 * MS);
         b.traceReturn(7 * MS);
         b.traceReturn(8 * MS);
         b.traceReturn(9 * MS);
@@ -290,19 +290,19 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         tracer.setTracerMinTraceTime(0);
 
         // Start new trace
-        b.traceEnter(c1, m1, s1, 1 * MS);
+        b.traceEnter(0, c1, m1, s1, 1 * MS);
         b.traceBegin(t1, 2 * MS, TraceMarker.DROP_INTERIM);
 
         // Start subsequent trace
-        b.traceEnter(c1, m2, s1, 3 * MS);
+        b.traceEnter(0 ,c1, m2, s1, 3 * MS);
         b.traceBegin(t2, 4 * MS, TraceMarker.DROP_INTERIM);
 
         // Submit some records, so b will reach limit
-        b.traceEnter(c1, m2, s1, 5 * MS);
+        b.traceEnter(0, c1, m2, s1, 5 * MS);
         b.traceReturn(6 * MS);
-        b.traceEnter(c1, m2, s1, 7 * MS);
+        b.traceEnter(0, c1, m2, s1, 7 * MS);
         b.traceReturn(8 * MS);
-        b.traceEnter(c1, m2, s1, 9 * MS);
+        b.traceEnter(0 ,c1, m2, s1, 9 * MS);
         b.traceReturn(10 * MS);
 
         // Return back to trace root frame
@@ -327,7 +327,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     public void testTraceWithMultipleBeginFlags() {
         tracer.setTracerMinTraceTime(0);
 
-        b.traceEnter(c1, m1, s1, 1 * MS);
+        b.traceEnter(0, c1, m1, s1, 1 * MS);
         b.traceBegin(t1, 2 * MS, TraceMarker.DROP_INTERIM);
         b.traceBegin(t2, 2 * MS, TraceMarker.DROP_INTERIM);
         b.traceReturn(3 * MS);
@@ -342,7 +342,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         tracer.setTracerMinTraceTime(0);
 
         // Submit one frame
-        b.traceEnter(c1, m1, s1, 1 * MS);
+        b.traceEnter(0, c1, m1, s1, 1 * MS);
         b.traceBegin(t1, 2 * MS, TraceMarker.DROP_INTERIM);
         b.traceReturn(3 * MS);
 
@@ -350,7 +350,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceReturn(4 * MS);
 
         // Submit another frame
-        b.traceEnter(c1, m1, s1, 5 * MS);
+        b.traceEnter(0, c1, m1, s1, 5 * MS);
         b.traceBegin(t1, 6 * MS, TraceMarker.DROP_INTERIM);
         b.traceReturn(7 * MS);
 
@@ -364,11 +364,11 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         tracer.setTracerMinMethodTime(0);
 
         // Submit one frame
-        b.traceEnter(c1, m1, s1, 1 * MS);
+        b.traceEnter(0, c1, m1, s1, 1 * MS);
         b.traceBegin(t1, 2 * MS, TraceMarker.DROP_INTERIM);
 
         // Start subsequent trace
-        b.traceEnter(c1, m2, s1, 3 * MS);
+        b.traceEnter(0, c1, m2, s1, 3 * MS);
         b.traceBegin(t2, 4 * MS, TraceMarker.DROP_INTERIM);
         b.traceReturn(5 * MS);
 
@@ -377,7 +377,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         records.clear();
 
         // Start subsequent trace
-        b.traceEnter(c1, m2, s1, 6 * MS);
+        b.traceEnter(0, c1, m2, s1, 6 * MS);
         b.traceBegin(t2, 7 * MS, 0);
         b.traceReturn(8 * MS);
 
@@ -398,9 +398,9 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
         Exception e = new Exception("oja!");
 
-        b.traceEnter(c1, m1, s1, 1 * MS);
+        b.traceEnter(0, c1, m1, s1, 1 * MS);
         b.traceBegin(t1, 2 * MS, TraceMarker.DROP_INTERIM);
-        b.traceEnter(c1, m2, s1, 3 * MS);
+        b.traceEnter(0, c1, m2, s1, 3 * MS);
 
         b.traceError(e, 4 * MS);
         b.traceError(e, 5 * MS);
@@ -421,9 +421,9 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         Exception e1 = new Exception("oja!");
         Exception e2 = new Exception("OJA!", e1);
 
-        b.traceEnter(c1, m1, s1, 1 * MS);
+        b.traceEnter(0, c1, m1, s1, 1 * MS);
         b.traceBegin(t1, 2 * MS, TraceMarker.DROP_INTERIM);
-        b.traceEnter(c1, m2, s1, 3 * MS);
+        b.traceEnter(0, c1, m2, s1, 3 * MS);
 
         b.traceError(e1, 4 * MS);
         b.traceError(e2, 5 * MS);
@@ -441,13 +441,13 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         tracer.setTracerMinTraceTime(0);
         tracer.setTracerMinMethodTime(10);
 
-        b.traceEnter(c1, m1, s1, 1);
+        b.traceEnter(0, c1, m1, s1, 1);
         b.traceBegin(t1, 2, TraceMarker.DROP_INTERIM);
 
-        b.traceEnter(c1, m2, s1, 3);
+        b.traceEnter(0, c1, m2, s1, 3);
         b.traceReturn(4);
 
-        b.traceEnter(c1, m2, s1, 10);
+        b.traceEnter(0, c1, m2, s1, 10);
         b.traceReturn(25);
 
         b.traceReturn(56);
@@ -464,14 +464,14 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         tracer.setTracerMinTraceTime(0);
         tracer.setTracerMinMethodTime(10);
 
-        b.traceEnter(c1, m1, s1, 1);
+        b.traceEnter(0, c1, m1, s1, 1);
         b.traceBegin(t1, 2, TraceMarker.DROP_INTERIM);
 
-        b.traceEnter(c1, m2, s1, 2);
+        b.traceEnter(0, c1, m2, s1, 2);
         b.traceReturn(3);
 
-        b.traceEnter(c1, m2, s1, 4);
-        b.traceEnter(c1, m2, s1, 5);
+        b.traceEnter(0, c1, m2, s1, 4);
+        b.traceEnter(0, c1, m2, s1, 5);
         b.traceReturn(6);
         b.traceReturn(20);
 
@@ -487,20 +487,20 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         tracer.setTracerMinTraceTime(0);
         tracer.setTracerMinMethodTime(10);
 
-        b.traceEnter(c1, m1, s1, 1);
+        b.traceEnter(0 ,c1, m1, s1, 1);
         b.traceBegin(t1, 2, TraceMarker.DROP_INTERIM);
         assertEquals((Integer)1, CoreTestUtil.getField(b, "numRecords"));
 
-        b.traceEnter(c1, m2, s1, 2);
+        b.traceEnter(0, c1, m2, s1, 2);
         assertEquals((Integer)2, CoreTestUtil.getField(b, "numRecords"));
 
         b.traceReturn(3);
         assertEquals((Integer)1, CoreTestUtil.getField(b, "numRecords"));
 
-        b.traceEnter(c1, m2, s1, 4);
+        b.traceEnter(0 ,c1, m2, s1, 4);
         assertEquals((Integer)2, CoreTestUtil.getField(b, "numRecords"));
 
-        b.traceEnter(c1, m2, s1, 5);
+        b.traceEnter(0, c1, m2, s1, 5);
         assertEquals((Integer)3, CoreTestUtil.getField(b, "numRecords"));
 
         b.traceReturn(6);
@@ -512,7 +512,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         b.traceReturn(40);
         assertEquals((Integer)0, CoreTestUtil.getField(b, "numRecords"));
 
-        b.traceEnter(c1, m1, s1, 41);
+        b.traceEnter(0 ,c1, m1, s1, 41);
         assertEquals((Integer)1, CoreTestUtil.getField(b, "numRecords"));
     }
 
@@ -522,10 +522,10 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         tracer.setTracerMinTraceTime(0);
         tracer.setTracerMinMethodTime(10);
 
-        b.traceEnter(c1, m1, s1, 1);
+        b.traceEnter(0 ,c1, m1, s1, 1);
         b.traceBegin(t1, 2, TraceMarker.DROP_INTERIM);
-        b.traceEnter(c1, m2, s1, 2);
-        b.traceEnter(c1, m3, s1, 3);
+        b.traceEnter(0, c1, m2, s1, 2);
+        b.traceEnter(0, c1, m3, s1, 3);
 
         b.traceReturn(20);
         b.traceReturn(21);
@@ -544,7 +544,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         tracer.setTracerMinMethodTime(10);
 
         b.traceError(new Exception("oja!"), 300);
-        b.traceEnter(c1, m1, s1, 100);
+        b.traceEnter(0, c1, m1, s1, 100);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
         b.traceReturn(200);
 
@@ -555,7 +555,7 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
 
     @Test
     public void testTraceDropFlag() {
-        b.traceEnter(c1, m1, s1, 10 * MS);
+        b.traceEnter(0, c1, m1, s1, 10 * MS);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
         b.markTraceFlags(0, TraceMarker.DROP_TRACE);
         b.traceReturn(20 * MS);
@@ -568,9 +568,9 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
     public void testTraceAttrReusableRecordBug() {
         tracer.setTracerMinTraceTime(0);
 
-        b.traceEnter(c1, m1, s1, 10 * MS);
+        b.traceEnter(0, c1, m1, s1, 10 * MS);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
-        b.traceEnter(c1, m1, s1, 10 * MS + 1);
+        b.traceEnter(0, c1, m1, s1, 10 * MS + 1);
         b.traceReturn(10 * MS + 2);
         b.newAttr(-1, 1, "oja!");
         b.traceReturn(20 * MS);
@@ -584,10 +584,10 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         tracer.setTracerMinMethodTime(10);
         tracer.setTracerMinTraceCalls(3);
 
-        b.traceEnter(c1, m1, s1, 100L);
+        b.traceEnter(0, c1, m1, s1, 100L);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
-        b.traceEnter(c1, m1, s1, 110L);
-        b.traceEnter(c1, m1, s1, 120L);
+        b.traceEnter(0, c1, m1, s1, 110L);
+        b.traceEnter(0, c1, m1, s1, 120L);
         b.traceReturn(130L);
         b.traceReturn(140L);
         b.traceReturn(150L);
@@ -600,9 +600,9 @@ public class TraceBuilderUnitTest extends ZorkaFixture {
         tracer.setTracerMinMethodTime(10);
         tracer.setTracerMinTraceCalls(3);
 
-        b.traceEnter(c1, m1, s1, 100L);
+        b.traceEnter(0, c1, m1, s1, 100L);
         b.traceBegin(t1, 100L, TraceMarker.DROP_INTERIM);
-        b.traceEnter(c1, m1, s1, 110L);
+        b.traceEnter(0, c1, m1, s1, 110L);
         b.traceReturn(140L);
         b.traceReturn(150L);
 

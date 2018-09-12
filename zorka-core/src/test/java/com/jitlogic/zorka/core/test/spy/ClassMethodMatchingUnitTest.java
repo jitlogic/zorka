@@ -18,6 +18,7 @@ package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.AgentConfig;
+import com.jitlogic.zorka.core.spy.PatternMatcherSet;
 import com.jitlogic.zorka.core.spy.SpyLib;
 import com.jitlogic.zorka.core.spy.SpyMatcherSet;
 import com.jitlogic.zorka.core.test.spy.support.*;
@@ -31,7 +32,6 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import static com.jitlogic.zorka.core.spy.SpyLib.SM_NOARGS;
 
@@ -39,7 +39,7 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testSimpleClassOnlyMatch() {
-        SpyMatcherSet sms = new SpyMatcherSet(new SpyMatcher(SpyMatcher.BY_CLASS_NAME, 0xFF, "com.jitlogic.zorka.core.spy.**", "*", null));
+        SpyMatcherSet sms = new PatternMatcherSet(new SpyMatcher(SpyMatcher.BY_CLASS_NAME, 0xFF, "com.jitlogic.zorka.core.spy.**", "*", null));
 
         Assert.assertTrue(sms.classMatch("com.jitlogic.zorka.core.spy.unittest.SomeClass"));
         Assert.assertTrue(sms.classMatch("com.jitlogic.zorka.core.spy.AClass"));
@@ -48,28 +48,28 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testClassMatchWithSingleLevelWildcard() {
-        SpyMatcherSet sms = new SpyMatcherSet(new SpyMatcher(SpyMatcher.BY_CLASS_NAME, 0xFF, "com.jitlogic.zorka.core.spy.*", "*", null));
+        SpyMatcherSet sms = new PatternMatcherSet(new SpyMatcher(SpyMatcher.BY_CLASS_NAME, 0xFF, "com.jitlogic.zorka.core.spy.*", "*", null));
         Assert.assertFalse(sms.classMatch("com.jitlogic.zorka.core.spy.unittest.SomeClass"));
         Assert.assertTrue(sms.classMatch("com.jitlogic.zorka.core.spy.AClass"));
     }
 
     @Test
     public void testClassMethodMatch() {
-        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod("test.SomeClass", "get*"));
+        SpyMatcherSet sms = new PatternMatcherSet(spy.byMethod("test.SomeClass", "get*"));
         Assert.assertTrue(sms.methodMatch("test.SomeClass", null, null, null, 1, "getVal", "()I", null));
         Assert.assertFalse(sms.methodMatch("test.SomeClass", null, null, null, 1, "setVal", "(I)V", null));
     }
 
     @Test
     public void testClassMethodStrictMatch() {
-        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod("test.SomeClass", "get"));
+        SpyMatcherSet sms = new PatternMatcherSet(spy.byMethod("test.SomeClass", "get"));
         Assert.assertTrue(sms.methodMatch("test.SomeClass", null, null, null, 1, "get", "()I", null));
         Assert.assertFalse(sms.methodMatch("test.SomeClass", null, null, null, 1, "getVal", "()I", null));
     }
 
     @Test
     public void testClassMatchSignatureWithoutTypes() {
-        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0, "test.*", "get", null));
+        SpyMatcherSet sms = new PatternMatcherSet(spy.byMethod(0, "test.*", "get", null));
         Assert.assertTrue(sms.methodMatch("test.SomeClass", null, null, null, 1, "get", "()V", null));
         Assert.assertTrue(sms.methodMatch("test.SomeClass", null, null, null, 1, "get", "(II)V", null));
         Assert.assertFalse(sms.methodMatch("test.SomeClass", null, null, null, 1, "get", "malformed", null));
@@ -77,7 +77,7 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testClassMatchSignatureWithReturnVoidType() {
-        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xff, "test.*", "someMethod", "void"));
+        SpyMatcherSet sms = new PatternMatcherSet(spy.byMethod(0xff, "test.*", "someMethod", "void"));
         Assert.assertTrue(sms.methodMatch("test.SomeClass", null, null, null, 1, "someMethod", "()V", null));
         Assert.assertFalse(sms.methodMatch("test.SomeClass", null, null, null, 1, "someMethod", "()Void", null));
         Assert.assertFalse(sms.methodMatch("test.SomeClass", null, null, null, 1, "someMethod", "()I", null));
@@ -85,13 +85,13 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testClassMatchSignatureReturnClassType() {
-        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xff, "test.*", "get", "java.lang.String"));
+        SpyMatcherSet sms = new PatternMatcherSet(spy.byMethod(0xff, "test.*", "get", "java.lang.String"));
         Assert.assertTrue(sms.methodMatch("test.someClass", null, null, null, 1, "get", "()Ljava/lang/String;", null));
     }
 
     @Test
     public void testClassMatchWithNullArgument() {
-        SpyMatcherSet sms = new SpyMatcherSet(
+        SpyMatcherSet sms = new PatternMatcherSet(
                 spy.byMethod(0, "javax.naming.directory.InitialDirContext", "search", null, "String", "String", null,
                         "javax.naming.directory.SearchControls"));
         Assert.assertTrue(sms.methodMatch("javax.naming.directory.InitialDirContext", null, null, null, 1, "search",
@@ -100,7 +100,7 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testClassMatchWithArrayArgument() {
-        SpyMatcherSet sms = new SpyMatcherSet(
+        SpyMatcherSet sms = new PatternMatcherSet(
                 spy.byMethod(0, "javax.naming.directory.InitialDirContext", "search", null, "String", "String", "Object[]",
                         "javax.naming.directory.SearchControls"));
         Assert.assertTrue(sms.methodMatch("javax.naming.directory.InitialDirContext", null, null, null, 1, "search",
@@ -109,7 +109,7 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testClassMatchSignatureWithSimpleReturnAndArgumentType() {
-        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xff, "test.*", "frobnicate", "int", "int"));
+        SpyMatcherSet sms = new PatternMatcherSet(spy.byMethod(0xff, "test.*", "frobnicate", "int", "int"));
         SpyMatcher cm = new SpyMatcher(0, 0xFF, "test.*", "frobnicate", "int", "int");
         Assert.assertTrue(sms.methodMatch("test.someClass", null, null, null, 1, "frobnicate", "(I)I", null));
         Assert.assertFalse(sms.methodMatch("test.someClass", null, null, null, 1, "frobnicate", "(J)I", null));
@@ -118,54 +118,54 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testClassMatchSignatureWithStringType() {
-        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xff, "test.*", "frobnicate", "String", "String"));
+        SpyMatcherSet sms = new PatternMatcherSet(spy.byMethod(0xff, "test.*", "frobnicate", "String", "String"));
         Assert.assertTrue(sms.methodMatch("test.someClass", null, null, null, 1, "frobnicate", "(Ljava/lang/String;)Ljava/lang/String;", null));
         Assert.assertFalse(sms.methodMatch("test.someClass", null, null, null, 1, "frobnicate", "(J)I", null));
     }
 
     @Test
     public void testClassMatchWithVariousArgs() {
-        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xff, "test.*", "frobnicate", "String", "int", "com.jitlogic.zorka.spy.CallInfo"));
+        SpyMatcherSet sms = new PatternMatcherSet(spy.byMethod(0xff, "test.*", "frobnicate", "String", "int", "com.jitlogic.zorka.spy.CallInfo"));
         Assert.assertTrue(sms.methodMatch("test.SomeClass", null, null, null, 1, "frobnicate", "(ILcom/jitlogic/zorka/spy/CallInfo;)Ljava/lang/String;", null));
     }
 
     @Test
     public void testClassMatchWithNoArgsMarker() {
-        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xFF, "test.*", "frobnicate", null, SM_NOARGS));
+        SpyMatcherSet sms = new PatternMatcherSet(spy.byMethod(0xFF, "test.*", "frobnicate", null, SM_NOARGS));
         Assert.assertTrue(sms.methodMatch("test.someClass", null, null, null, 1, "frobnicate", "()V", null));
         Assert.assertFalse(sms.methodMatch("test.someClass", null, null, null, 1, "frobnicate", "(I)V", null));
     }
 
     @Test
     public void testMatchWithMoreAttributesAndNoArgsFlag() {
-        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xff, "test.*", "frobnicate", null, "int", SM_NOARGS));
+        SpyMatcherSet sms = new PatternMatcherSet(spy.byMethod(0xff, "test.*", "frobnicate", null, "int", SM_NOARGS));
         Assert.assertTrue(sms.methodMatch("test.someClass", null, null, null, 1, "frobnicate", "(I)V", null));
         Assert.assertFalse(sms.methodMatch("test.someClass", null, null, null, 1, "frobnicate", "(II)V", null));
     }
 
     @Test
     public void testMatchWithJustSomeAttributes() {
-        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod(0xFF, "test.*", "frobnicate", null, "int"));
+        SpyMatcherSet sms = new PatternMatcherSet(spy.byMethod(0xFF, "test.*", "frobnicate", null, "int"));
         Assert.assertTrue(sms.methodMatch("test.SomeClass", null, null, null, 1, "frobnicate", "(I)V", null));
         Assert.assertTrue(sms.methodMatch("test.someClass", null, null, null, 1, "frobnicate", "(II)V", null));
     }
 
     @Test
     public void testMatchOnlyNames() {
-        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod("test.someClass", "trivialMethod"));
+        SpyMatcherSet sms = new PatternMatcherSet(spy.byMethod("test.someClass", "trivialMethod"));
         Assert.assertTrue(sms.methodMatch("test.someClass", null, null, null, 1, "trivialMethod", "()V", null));
         Assert.assertTrue(sms.methodMatch("test.someClass", null, null, null, 1, "trivialMethod", "(II)V", null));
     }
 
     @Test
     public void testMatchAnnotationBits() {
-        SpyMatcherSet sms = new SpyMatcherSet(spy.byClassAnnotation("some.Annotation"));
+        SpyMatcherSet sms = new PatternMatcherSet(spy.byClassAnnotation("some.Annotation"));
         Assert.assertTrue(sms.methodMatch(null, null, Arrays.asList("Lsome.Annotation;"), null, 1, "trivialMethod", "()V", null));
     }
 
     @Test
     public void testMatchWithFilterExclusion() {
-        SpyMatcherSet sms = new SpyMatcherSet(
+        SpyMatcherSet sms = new PatternMatcherSet(
                 spy.byMethod("java**", "*").exclude(),
                 spy.byMethod("com.sun.**", "*").exclude(),
                 spy.byMethod("**", "*").forTrace());
@@ -176,7 +176,7 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testMatchMethodsWithFilterExclusion() {
-        SpyMatcherSet sms = new SpyMatcherSet(
+        SpyMatcherSet sms = new PatternMatcherSet(
                 spy.byMethod("com.jitlogic.foo.SomeClass", "some*"),
                 spy.byClass("com.jitlogic.**").exclude(),
                 spy.byClass("**")
@@ -188,13 +188,13 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testMatchInnerClass() {
-        SpyMatcherSet sms = new SpyMatcherSet(spy.byMethod("some.Class$1", "run"));
+        SpyMatcherSet sms = new PatternMatcherSet(spy.byMethod("some.Class$1", "run"));
         Assert.assertTrue(sms.methodMatch("some.Class$1", null, null, null, 1, "run", "()V", null));
     }
 
     @Test
     public void testMatchFilterWithPriorities() {
-        SpyMatcherSet sms = new SpyMatcherSet(
+        SpyMatcherSet sms = new PatternMatcherSet(
                 spy.byClass("**").priority(1000),
                 spy.byClass("com.jitlogic.**").exclude(),
                 spy.byClass("com.jitlogic.TestClazz").priority(10)
@@ -207,7 +207,7 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testClassExclusionWithOnlySomeMethod() {
-        SpyMatcherSet sms = new SpyMatcherSet(
+        SpyMatcherSet sms = new PatternMatcherSet(
                 spy.byMethod("com.jitlogic.zorka.core.**", "mapRow").exclude(),
                 spy.byClass("**"));
         assertTrue(sms.classMatch("com.jitlogic.zorka.core.AgentConfig"));
@@ -216,7 +216,7 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testClassExclusionWithAllMethodsInClassExcluded() {
-        SpyMatcherSet sms = new SpyMatcherSet(
+        SpyMatcherSet sms = new PatternMatcherSet(
                 spy.byClass("com.jitlogic.zorka.core.**").exclude(),
                 spy.byClass("**"));
         assertFalse(sms.classMatch("com.jitlogic.zorka.core.AgentConfig"));
@@ -244,7 +244,7 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testSpyMatchClazzByName() {
-        SpyMatcherSet sms = new SpyMatcherSet(
+        SpyMatcherSet sms = new PatternMatcherSet(
                 spy.byClass("com.jitlogic.zorka.core.test.spy.support.Test*"));
         assertTrue(sms.classMatch(TestClass1.class, true));
         assertFalse(sms.classMatch(Integer.class, true));
@@ -253,7 +253,7 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testSpyMatchClazzByInterface() {
-        SpyMatcherSet sms = new SpyMatcherSet(
+        SpyMatcherSet sms = new PatternMatcherSet(
                 spy.byInterfaceAndMethod("com.jitlogic.zorka.core.test.spy.support.TestInterface1", "*"));
         assertFalse(sms.classMatch(TestClass1.class, true));
         assertTrue(sms.classMatch(TestClass2.class, true));
@@ -264,7 +264,7 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testSpyMatchClazzBySuperInterface() {
-        SpyMatcherSet sms = new SpyMatcherSet(
+        SpyMatcherSet sms = new PatternMatcherSet(
                 spy.byInterface("com.jitlogic.zorka.core.test.spy.support.TestInterface2"));
         assertFalse(sms.classMatch(TestClass1.class, true));
         assertTrue(sms.classMatch(TestClass2.class, true));
@@ -282,7 +282,7 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testSpyMatchClazzByClassAnnotation() {
-        SpyMatcherSet sms = new SpyMatcherSet(
+        SpyMatcherSet sms = new PatternMatcherSet(
                 spy.byClassAnnotation("com.jitlogic.zorka.core.test.spy.support.ClassAnnotation"));
         assertTrue(sms.classMatch(TestClass1.class, true));
         assertFalse(sms.classMatch(TestClass2.class, true));
@@ -291,7 +291,7 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testSpyMatchClazzByMethodAnnotation() {
-        SpyMatcherSet sms = new SpyMatcherSet(
+        SpyMatcherSet sms = new PatternMatcherSet(
                 spy.byMethodAnnotation("**", "com.jitlogic.zorka.core.test.spy.support.TestAnnotation"));
         assertFalse(sms.classMatch(TestClass1.class, true));
         assertTrue(sms.classMatch(TestClass2.class, true));
@@ -299,7 +299,7 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testSpyMatchClazzByMethodSignatureWithBasicTypes() {
-        SpyMatcherSet sms = new SpyMatcherSet(
+        SpyMatcherSet sms = new PatternMatcherSet(
                 spy.byMethod(0, "**", "paramMethod*", "void", "boolean"));
         assertTrue(sms.classMatch(TestClass1.class, true));
         assertFalse(sms.classMatch(TestClass2.class, true));
@@ -307,7 +307,7 @@ public class ClassMethodMatchingUnitTest extends ZorkaFixture {
 
     @Test
     public void testSpyMatchClassByMethodSignatureWithClassTypes() {
-        SpyMatcherSet sms = new SpyMatcherSet(
+        SpyMatcherSet sms = new PatternMatcherSet(
                 spy.byMethod(0, "**", "*", "String", "String", SpyLib.SM_NOARGS));
         assertFalse(sms.classMatch(TestClass1.class, true));
         assertTrue(sms.classMatch(TestClass2.class, true));

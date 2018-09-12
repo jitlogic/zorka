@@ -76,6 +76,11 @@ public class TraceRecord implements SymbolicRecord, Serializable {
     private int signatureId;
 
     /**
+     * Class-method-signature ID (agent internal, transient);
+     */
+    private int mid;
+
+    /**
      * Various flags (see *_FLAG constants defined above)
      */
     private int flags;
@@ -147,6 +152,7 @@ public class TraceRecord implements SymbolicRecord, Serializable {
         tr.signatureId = signatureId;
         tr.flags = flags;
         tr.time = time;
+        tr.mid = mid;
         tr.calls = calls;
         tr.errors = errors;
         tr.marker = marker;
@@ -533,6 +539,16 @@ public class TraceRecord implements SymbolicRecord, Serializable {
      */
     public void fixup(SymbolRegistry symbols) {
 
+        if (classId == 0 && mid != 0) {
+            // TODO get rid of allocation here, use raw values & parse functions
+            int[] cms = symbols.methodDef(mid);
+            if (cms != null) {
+                classId = cms[0];
+                methodId = cms[1];
+                signatureId = cms[2];
+            }
+        }
+
         if (children != null) {
             for (int i = 0; i < children.size(); i++) {
                 children.get(i).fixup(symbols);
@@ -561,5 +577,13 @@ public class TraceRecord implements SymbolicRecord, Serializable {
     @Override
     public String toString() {
         return "TraceRecord(classId=" + classId + ", methodId=" + methodId + ", " + marker + ")";
+    }
+
+    public int getMid() {
+        return mid;
+    }
+
+    public void setMid(int mid) {
+        this.mid = mid;
     }
 }

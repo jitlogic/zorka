@@ -1,0 +1,13 @@
+# Some example comment
+
+test.myapp|SomeClass|myMethod|()V
+test.otherapp
+ OtherClass
+  someMethod|()V
+  otherMethod|(II)I
+ AnotherClass
+  yetAnotherMethod
+   ()V
+   (II)I
+|$Proxy1234|someMethod|()V
+
