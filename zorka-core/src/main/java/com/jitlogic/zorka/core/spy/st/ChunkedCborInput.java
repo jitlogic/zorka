@@ -87,7 +87,7 @@ public class ChunkedCborInput extends CborInput {
     }
 
     public boolean eof() {
-        return pos < lim;
+        return size <= 0;
     }
 
     public void reset() {

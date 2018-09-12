@@ -64,7 +64,9 @@ public class STraceHttpOutput extends ZicoHttpOutput {
                     synchronized (scanner) {
                         scanner.clear();
                         if (sessionUUID == null) newSession();
-                        new CborDataReader(new ChunkedCborInput(chunk), scanner, svr).read();
+                        CborInput input = new ChunkedCborInput(chunk);
+                        CborDataReader rdr = new CborDataReader(input, scanner, svr);
+                        while (!input.eof()) rdr.read();
                         if (scanner.getPosition() > 0) {
                             bs = new Base64FormattingStream(new ByteArrayCborInput(scanner.getBuf(), 0, scanner.getPosition()));
                             send(bs, bs.available(), submitAgentUrl, null);
